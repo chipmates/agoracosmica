@@ -1163,17 +1163,19 @@ async function openWing(slug: string, at: number | string, view?: string): Promi
      wait would only look shorter: the seconds would move out of the entry and
      into the first leg, as stutters. The caller's loading field holds until
      this resolves, and the count of poses warmed is what it shows. */
-  await wingFrame.ready()
+  await wingFrame.ready(breath.progress)
 }
 
-/** One gold breath, then a hard cut into the wing that was chosen. */
+/** One gold breath, then a hard cut into the wing that was chosen. The cut
+    is not on a clock: the gold holds its own beat and then for as long as the
+    wing needs, so what follows it is a wing and never a raw stage. */
 function enterWing(slug: string): void {
   if (!wingBySlug(slug)) return
   closePane()
   setPhase('breath')
   breath.begin(() => {
     history.pushState({}, '', `/w/${slug}${location.search}`)
-    void openWing(slug, 0)
+    return openWing(slug, 0)
   })
 }
 
@@ -1909,7 +1911,9 @@ function bootRoute(): boolean {
   skyBirth = 0.34
   flashAt = -1
   wakeInstruments()
-  void openWing(here.slug, here.station)
+  /* A DEEP LINK WAITS AT THE SAME FIELD. Typed straight in, the address used
+     to stand the visitor on the raw stage until the wing was built. */
+  breath.hold(openWing(here.slug, here.station))
   return true
 }
 

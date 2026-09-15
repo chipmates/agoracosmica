@@ -329,9 +329,6 @@ export function createWing():VinciWingModule {
     const s=vinciContent[card]!
     aimPrint(s.id);exposureAt=s.id;rail.set(s.id,stationPose(s.id,narrow()),true,narrow());paintHeader();paintDock()
     if(pendingView){const id=pendingView;pendingView='';showView(id)}
-    // THE PANEL IS FOR A VISITOR. The eyes arrive through the forge marker and
-    // a sheet over the arrival frame would stand in every frame they shoot.
-    if(!document.body.classList.contains('forge')&&!vinciWelcomeSeen()&&card===0)welcome?.open()
     announceBuilt()
   }
   function standShadowCache():void {
@@ -360,6 +357,12 @@ export function createWing():VinciWingModule {
     warm=undefined
     focusNearCascade(true)
     standShadowCache()
+    // THE PANEL IS FOR A VISITOR, and a visitor cannot see it until the
+    // entry's own field lifts: a modal sheet is drawn in the top layer, over
+    // the field and its backdrop over the gold. The eyes arrive through the
+    // forge marker, and a sheet over the arrival frame would stand in every
+    // frame they shoot.
+    if(!document.body.classList.contains('forge')&&!vinciWelcomeSeen()&&card===0)welcome?.open()
   }
   /** The bar carries the walk, so the hand lands there when a sheet closes. */
   function focusTheBar():void {

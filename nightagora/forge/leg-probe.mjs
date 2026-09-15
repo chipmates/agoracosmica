@@ -83,20 +83,51 @@ async function sampleLeg(page, ids) {
     press and struck on the wing's first frame, so its own life IS the wait */
 async function timeEntry(page, how) {
   return page.evaluate(async (how) => {
-    const gold = document.getElementById('goldbreath')
-    const struck = () => !gold.classList.contains('lit')
-    const t0 = performance.now()
+    const struck = () => {
+      const gold = document.getElementById('goldbreath')
+      return gold !== null && !gold.classList.contains('lit')
+    }
+    let t0 = performance.now()
     if (how === 'press') {
+      // the module boots on its own time; the press is not a press until the
+      // page can take one
+      for (let i = 0; i < 600 && window.__forge === undefined; i++) await new Promise(r => setTimeout(r, 20))
       window.__forge.jump('pane', { slug: 'vinci' })
-      for (let i = 0; i < 200 && !document.querySelector('.pane-enter:not([hidden])'); i++) await new Promise(r => setTimeout(r, 20))
+      for (let i = 0; i < 400 && !document.querySelector('.pane-enter:not([hidden])'); i++) await new Promise(r => setTimeout(r, 20))
+      // the press is the moment the wait starts, not the page load
+      t0 = performance.now()
       document.querySelector('.pane-enter').click()
     }
-    for (let i = 0; i < 4000; i++) {
-      if (document.body.dataset.phase === 'wing' && struck()) return Math.round(performance.now() - t0) / 1000
-      await new Promise(r => requestAnimationFrame(r))
+    // the field's own line is the warm up's count of frames paid for, so the
+    // moment it first opens splits the wait into the part that is the wing
+    // arriving and the part that is the walk being paid for
+    let warm = null
+    for (let i = 0; i < 6000; i++) {
+      const line = document.querySelector('#goldbreath .dark-line')
+      if (warm === null && line instanceof HTMLElement && /scaleX\(0\.[0-9]/.test(line.style.transform))
+        warm = performance.now() - t0
+      if (document.body.dataset['phase'] === 'wing' && struck())
+        return { total: Math.round(performance.now() - t0) / 1000, warm: warm === null ? null : Math.round(warm) / 1000 }
+      await new Promise(r => setTimeout(r, 16))
     }
     return null
   }, how)
+}
+
+/** one entry, in a context of its own, so two wings never share a GPU */
+async function oneEntry(browser, url, how, again) {
+  const ctx = await browser.newContext({ viewport: VIEW })
+  const page = await ctx.newPage()
+  try {
+    await page.goto(url, { waitUntil: 'commit' })
+    const cold = await timeEntry(page, how)
+    if (!again) return { cold, warm: null }
+    await page.goto('about:blank')
+    await page.goto(url, { waitUntil: 'commit' })
+    return { cold, warm: await timeEntry(page, how) }
+  } finally {
+    await ctx.close()
+  }
 }
 
 const server = flags.has('serve') && flag('serve') === 'off' ? null
@@ -108,23 +139,20 @@ try {
   console.error(`server ${said.head.slice(0, 7)} on ${BASE}${DEV ? ' (dev: unbundled modules, slower than the ship)' : ''}`)
   const browser = await chromium.launch({ args: browserArgs() })
   for (const tier of TIERS) {
+    if (ENTRY) {
+      const press = await oneEntry(browser, `${BASE}/?probe=1&tier=${tier}`, 'press', true)
+      const link = await oneEntry(browser, `${BASE}/w/${WING}?probe=1&tier=${tier}`, 'link', true)
+      const say = (r) => r === null ? 'never' : `${r.total} s (the wing arriving ${r.warm ?? '?'} s, then the warm up)`
+      console.log(`== ${tier} == the press in the lobby: cold ${say(press.cold)}, warm cache ${say(press.warm)}`)
+      console.log(`            the deep link: cold ${say(link.cold)}, warm cache ${say(link.warm)}`)
+      continue
+    }
     const ctx = await browser.newContext({ viewport: VIEW })
     const page = await ctx.newPage()
     const noise = []
     page.on('console', m => { if (m.type() !== 'log' || /backend=/.test(m.text())) noise.push(m.text().slice(0, 110)) })
     page.on('pageerror', e => noise.push(`PAGE ERROR ${e.message.slice(0, 90)}`))
-    if (ENTRY) {
-      await page.goto(`${BASE}/?probe=1&tier=${tier}`, { waitUntil: 'load' })
-      const cold = await timeEntry(page, 'press')
-      const deep = await ctx.newPage()
-      const t0 = Date.now()
-      await deep.goto(`${BASE}/w/${WING}?probe=1&tier=${tier}`, { waitUntil: 'commit' })
-      const deepCold = await timeEntry(deep, 'link')
-      console.log(`== ${tier} == press cold ${cold ?? 'never'} s | deep link cold ${deepCold ?? 'never'} s (+${Math.round(Date.now() - t0 - deepCold * 1000) / 1000} s of navigation)`)
-      await deep.reload({ waitUntil: 'commit' })
-      console.log(`   warm cache: deep link ${await timeEntry(deep, 'link') ?? 'never'} s`)
-      await deep.close()
-    } else {
+    {
       await page.goto(`${BASE}/w/${WING}?probe=1&tier=${tier}#s=${FROM}`, { waitUntil: 'load' })
       const ids = await page.waitForFunction(() => {
         const s = window.__forge?.state?.()

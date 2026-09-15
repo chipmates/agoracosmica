@@ -229,10 +229,21 @@
       position: absolute; left: 27%; right: 27%; top: 46%;
       height: 1px; background: #140b04;
     }
+    /* the incised rule is also the measure of the wait: it opens from the
+       middle of the field as the wing is paid for, and stands full at the
+       cut. It is the only thing the field shows, so an entry that is
+       instant simply never shows it opening. */
+    #goldbreath .dark-line { transition: transform 0.25s ease-out; }
+    #goldbreath.cutting .dark-line { transition: none; }
     #goldbreath.lit { opacity: 0.97; }
     /* the cut owns the whole frame: even the masthead would ghost through
-       the gold at this opacity, and a label inside a cut is a label */
-    body[data-phase='breath'] #veil { visibility: hidden; }
+       the gold at this opacity, and a label inside a cut is a label. The
+       field outlives the breath's own phase now, so the class the field
+       sets is what hides the lobby under it. */
+    body[data-phase='breath'] #veil, body.entering #veil { visibility: hidden; }
+    /* the wing's own chrome ghosts through the field exactly as the masthead
+       does, and it stands there while the place behind it is still arriving */
+    body.entering #wing { visibility: hidden; }
     /* the way out of the gold is a CUT: the class is struck with the
        transition suppressed, so no frame of the lobby dissolves through */
     #goldbreath.cutting { transition: none; }
@@ -1092,6 +1103,8 @@
       body[data-phase='held'] .status { animation: none; }
       .copy, .status { transition: none; }
       #keeper, #keeper *, #verse { transition: none; }
+      /* the wait's measure still reads, it simply steps instead of gliding */
+      #goldbreath .dark-line { transition: none; }
       /* the same composition, it simply arrives already composed */
       .star-chip::after,
 .pane-sibling::after,
