@@ -1,8 +1,8 @@
 {
- "format": "vinci-rail-clearance-v1",
+ "format": "vinci-rail-clearance-v2",
  "completeNearClearance": true,
  "recipe": "src/wings/vinci/rail-certify.mjs",
- "recipeSha256": "095293cbed15435ee21f695c6ae06454eafb16fa95580310f1710ec71b1bd5b3",
+ "recipeSha256": "f3ff06ac9287b737563227d1aeab43f41bbc7417cb70fd4dc7807d09c1b551e2",
  "sources": [
   {
    "file": "src/stack/detail.ts",
@@ -26,6 +26,12 @@
    "file": "src/wings/vinci/collection.ts",
    "sha256": "199f78f32d2544217631f6842e6d91771a8c2a4c49b8589681b46a849bfc40d6",
    "bytes": 45610,
+   "unchangedDuringAudit": true
+  },
+  {
+   "file": "src/wings/vinci/collection/approaches.ts",
+   "sha256": "4fb46b8b2a71724ce4a68fbfcaace85c999c04a212258fce96fd8e9e4463f611",
+   "bytes": 5984,
    "unchangedDuringAudit": true
   },
   {
@@ -458,6 +464,7 @@
   "The 0.25 m near distance, both authored viewport aspect ratios and the authored endpoint FOV are used. The authored aspect gives the largest near rectangle, so a wider or narrower canvas is inside it.",
   "Every straight span of the finished path is proved end to end by exact segment/triangle distance; every rounded corner is proved by closed balls over its control hull, and those balls are what the runtime replays. Stored balls reserve 4 µm beyond the requested radius; runtime matching of quantized geometry consumes at most 2 µm of it.",
   "The walk carries a step rhythm of at most 10.82 mm off the certified line, and that envelope is added to the clearance radius every span and every corner above is proved against.",
+  "An approach is one straight leg from a station eye to one exhibit's viewing eye and back, proved by the same exact segment/triangle distance and the same near rectangle plus gait envelope as a route. It is reachable from that station only, it is not addressable by the station rail, and the table is linear: two entries per exhibit, never the product of poses.",
   "A station whose full near ball is not clear carries an oriented certificate instead: its near pyramid is proved over the whole ±0.6 rad yaw and ±0.32 rad pitch look envelope, sampled every 0.02 rad, with the distance a corner can travel between two samples subtracted from the measured margin."
  ],
  "arrivalEN": {
@@ -71230,6 +71237,2308 @@
      "radiusM": 0.8005470478775245
     }
    ]
+  }
+ ],
+ "approaches": [
+  {
+   "viewport": "desktop",
+   "station": "picture-room",
+   "exhibit": "picture/baptism-of-christ/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -4.65,
+     41.8
+    ],
+    "fov": 58
+   },
+   "toPose": {
+    "eye": [
+     -58.765,
+     -4.68,
+     39.93039621970666
+    ],
+    "at": [
+     -58.765,
+     -4.75,
+     41.750499999999995
+    ],
+    "fov": 58
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -58.765,
+     -39.93039621970666,
+     -4.68
+    ]
+   ],
+   "roundedLength": 21.015983355999538,
+   "maxNearRadius": 0.3881715261463817,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "picture-room",
+   "exhibit": "picture/annunciation/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -4.65,
+     41.8
+    ],
+    "fov": 58
+   },
+   "toPose": {
+    "eye": [
+     -56.296958333333336,
+     -4.68,
+     40.49532249897143
+    ],
+    "at": [
+     -56.296958333333336,
+     -4.75,
+     41.750499999999995
+    ],
+    "fov": 58
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -56.296958333333336,
+     -40.49532249897143,
+     -4.68
+    ]
+   ],
+   "roundedLength": 18.747375370630916,
+   "maxNearRadius": 0.3881715261463817,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "picture-room",
+   "exhibit": "picture/ginevra-de-benci/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -4.65,
+     41.8
+    ],
+    "fov": 58
+   },
+   "toPose": {
+    "eye": [
+     -54.39891666666667,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -54.39891666666667,
+     -4.75,
+     41.750499999999995
+    ],
+    "fov": 34
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -54.39891666666667,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 16.96798312775007,
+   "maxNearRadius": 0.3881715261463817,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "picture-room",
+   "exhibit": "picture/ginevra-de-benci/reverse",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -4.65,
+     41.8
+    ],
+    "fov": 58
+   },
+   "toPose": {
+    "eye": [
+     -53.400875000000006,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -53.400875000000006,
+     -4.75,
+     41.750499999999995
+    ],
+    "fov": 34
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -53.400875000000006,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 16.0179321704028,
+   "maxNearRadius": 0.3881715261463817,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "picture-room",
+   "exhibit": "picture/madonna-of-the-carnation/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -4.65,
+     41.8
+    ],
+    "fov": 58
+   },
+   "toPose": {
+    "eye": [
+     -52.34533333333334,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -52.34533333333334,
+     -4.75,
+     41.750499999999995
+    ],
+    "fov": 35.62159096125431
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -52.34533333333334,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 15.019920284778852,
+   "maxNearRadius": 0.3881715261463817,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "picture-room",
+   "exhibit": "picture/benois-madonna/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -4.65,
+     41.8
+    ],
+    "fov": 58
+   },
+   "toPose": {
+    "eye": [
+     -51.30979166666668,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -51.30979166666668,
+     -4.75,
+     41.750499999999995
+    ],
+    "fov": 34
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -51.30979166666668,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 14.048992412034503,
+   "maxNearRadius": 0.3881715261463817,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "picture-room",
+   "exhibit": "picture/saint-jerome/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -4.65,
+     41.8
+    ],
+    "fov": 58
+   },
+   "toPose": {
+    "eye": [
+     -50.14175000000002,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -50.14175000000002,
+     -4.75,
+     41.750499999999995
+    ],
+    "fov": 56.180113379099616
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -50.14175000000002,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 12.965837547667348,
+   "maxNearRadius": 0.3881715261463817,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "picture-room",
+   "exhibit": "picture/adoration-of-the-magi/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -4.65,
+     41.8
+    ],
+    "fov": 58
+   },
+   "toPose": {
+    "eye": [
+     -47.93870833333336,
+     -4.68,
+     39.650499999999994
+    ],
+    "at": [
+     -47.93870833333336,
+     -4.75,
+     41.750499999999995
+    ],
+    "fov": 67.03187953619353
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -47.93870833333336,
+     -39.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 10.547463688097556,
+   "maxNearRadius": 0.4310015574552482,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "picture-room",
+   "exhibit": "picture/annunciation-predella/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -4.65,
+     41.8
+    ],
+    "fov": 58
+   },
+   "toPose": {
+    "eye": [
+     -45.8106666666667,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -45.8106666666667,
+     -4.75,
+     41.750499999999995
+    ],
+    "fov": 34
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -45.8106666666667,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 9.133991316019053,
+   "maxNearRadius": 0.3881715261463817,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "picture-room",
+   "exhibit": "picture/virgin-of-the-rocks-louvre/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -4.65,
+     41.8
+    ],
+    "fov": 58
+   },
+   "toPose": {
+    "eye": [
+     -44.27262500000004,
+     -4.68,
+     39.69902709509309
+    ],
+    "at": [
+     -44.27262500000004,
+     -4.75,
+     41.750499999999995
+    ],
+    "fov": 58
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -44.27262500000004,
+     -39.69902709509309,
+     -4.68
+    ]
+   ],
+   "roundedLength": 7.3265815710283855,
+   "maxNearRadius": 0.3881715261463817,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "picture-room",
+   "exhibit": "picture/portrait-of-a-musician/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -4.65,
+     41.8
+    ],
+    "fov": 58
+   },
+   "toPose": {
+    "eye": [
+     -42.87458333333338,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -42.87458333333338,
+     -4.75,
+     41.750499999999995
+    ],
+    "fov": 34
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -42.87458333333338,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 6.881807872229371,
+   "maxNearRadius": 0.3881715261463817,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "picture-room",
+   "exhibit": "picture/lady-with-an-ermine/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -4.65,
+     41.8
+    ],
+    "fov": 58
+   },
+   "toPose": {
+    "eye": [
+     -41.88504166666672,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -41.88504166666672,
+     -4.75,
+     41.750499999999995
+    ],
+    "fov": 34
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -41.88504166666672,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 6.251966277505803,
+   "maxNearRadius": 0.3881715261463817,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "picture-room",
+   "exhibit": "picture/la-belle-ferronniere/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -4.65,
+     41.8
+    ],
+    "fov": 58
+   },
+   "toPose": {
+    "eye": [
+     -40.83050000000006,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -40.83050000000006,
+     -4.75,
+     41.750499999999995
+    ],
+    "fov": 36.159013816393276
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -40.83050000000006,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 5.694478070903444,
+   "maxNearRadius": 0.3881715261463817,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "picture-room",
+   "exhibit": "picture/madonna-litta/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -4.65,
+     41.8
+    ],
+    "fov": 58
+   },
+   "toPose": {
+    "eye": [
+     -39.812458333333396,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -39.812458333333396,
+     -4.75,
+     41.750499999999995
+    ],
+    "fov": 34
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -39.812458333333396,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 5.301657488629026,
+   "maxNearRadius": 0.3881715261463817,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "picture-room",
+   "exhibit": "picture/burlington-house-cartoon/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -4.65,
+     41.8
+    ],
+    "fov": 58
+   },
+   "toPose": {
+    "eye": [
+     -38.49641666666673,
+     -4.68,
+     40.29544528298583
+    ],
+    "at": [
+     -38.49641666666673,
+     -4.75,
+     41.750499999999995
+    ],
+    "fov": 58
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -38.49641666666673,
+     -40.29544528298583,
+     -4.68
+    ]
+   ],
+   "roundedLength": 4.704792157555071,
+   "maxNearRadius": 0.3881715261463817,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "picture-room",
+   "exhibit": "picture/yarnwinder-buccleuch/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -4.65,
+     41.8
+    ],
+    "fov": 58
+   },
+   "toPose": {
+    "eye": [
+     -37.16087500000007,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -37.16087500000007,
+     -4.75,
+     41.750499999999995
+    ],
+    "fov": 34
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -37.16087500000007,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 5.156290431659643,
+   "maxNearRadius": 0.3881715261463817,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "picture-room",
+   "exhibit": "picture/yarnwinder-lansdowne/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -4.65,
+     41.8
+    ],
+    "fov": 58
+   },
+   "toPose": {
+    "eye": [
+     -36.166333333333405,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -36.166333333333405,
+     -4.75,
+     41.750499999999995
+    ],
+    "fov": 34
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -36.166333333333405,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 5.4445707233087495,
+   "maxNearRadius": 0.3881715261463817,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "picture-room",
+   "exhibit": "picture/anghiari-copy/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -4.65,
+     41.8
+    ],
+    "fov": 58
+   },
+   "toPose": {
+    "eye": [
+     -35.038291666666744,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -35.038291666666744,
+     -4.75,
+     41.750499999999995
+    ],
+    "fov": 34
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -35.038291666666744,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 5.958519097482939,
+   "maxNearRadius": 0.3881715261463817,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "picture-room",
+   "exhibit": "picture/mona-lisa/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -4.65,
+     41.8
+    ],
+    "fov": 58
+   },
+   "toPose": {
+    "eye": [
+     -33.82525000000008,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -33.82525000000008,
+     -4.75,
+     41.750499999999995
+    ],
+    "fov": 44.72809568360333
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -33.82525000000008,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 6.68176532156729,
+   "maxNearRadius": 0.3881715261463817,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "picture-room",
+   "exhibit": "picture/virgin-of-the-rocks-london/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -4.65,
+     41.8
+    ],
+    "fov": 58
+   },
+   "toPose": {
+    "eye": [
+     -32.33020833333342,
+     -4.68,
+     39.80185781714357
+    ],
+    "at": [
+     -32.33020833333342,
+     -4.75,
+     41.750499999999995
+    ],
+    "fov": 58
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -32.33020833333342,
+     -39.80185781714357,
+     -4.68
+    ]
+   ],
+   "roundedLength": 7.218730035508948,
+   "maxNearRadius": 0.3881715261463817,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "picture-room",
+   "exhibit": "picture/virgin-and-child-with-st-anne/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -4.65,
+     41.8
+    ],
+    "fov": 58
+   },
+   "toPose": {
+    "eye": [
+     -30.53716666666675,
+     -4.68,
+     40.02294386955208
+    ],
+    "at": [
+     -30.53716666666675,
+     -4.75,
+     41.750499999999995
+    ],
+    "fov": 58
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -30.53716666666675,
+     -40.02294386955208,
+     -4.68
+    ]
+   ],
+   "roundedLength": 8.847680326936068,
+   "maxNearRadius": 0.3881715261463817,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "picture-room",
+   "exhibit": "picture/salvator-mundi/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -4.65,
+     41.8
+    ],
+    "fov": 58
+   },
+   "toPose": {
+    "eye": [
+     -29.115625000000083,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -29.115625000000083,
+     -4.75,
+     41.750499999999995
+    ],
+    "fov": 37.601816175190656
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -29.115625000000083,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 10.393912612227576,
+   "maxNearRadius": 0.3881715261463817,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "picture-room",
+   "exhibit": "picture/saint-john-the-baptist/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -4.65,
+     41.8
+    ],
+    "fov": 58
+   },
+   "toPose": {
+    "eye": [
+     -27.977583333333417,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -27.977583333333417,
+     -4.75,
+     41.750499999999995
+    ],
+    "fov": 41.38857171298965
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -27.977583333333417,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 11.401988982495235,
+   "maxNearRadius": 0.3881715261463817,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "picture-room",
+   "exhibit": "picture/la-scapigliata/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -4.65,
+     41.8
+    ],
+    "fov": 58
+   },
+   "toPose": {
+    "eye": [
+     -26.96304166666675,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -26.96304166666675,
+     -4.75,
+     41.750499999999995
+    ],
+    "fov": 34
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -26.96304166666675,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 12.319772028534762,
+   "maxNearRadius": 0.3881715261463817,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "picture-room",
+   "exhibit": "picture/bacchus/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -4.65,
+     41.8
+    ],
+    "fov": 58
+   },
+   "toPose": {
+    "eye": [
+     -25.655000000000086,
+     -4.68,
+     39.93039621970666
+    ],
+    "at": [
+     -25.655000000000086,
+     -4.75,
+     41.750499999999995
+    ],
+    "fov": 58
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -25.655000000000086,
+     -39.93039621970666,
+     -4.68
+    ]
+   ],
+   "roundedLength": 13.27137356944064,
+   "maxNearRadius": 0.3881715261463817,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "picture-room",
+   "exhibit": "picture/baptism-of-christ/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -6.736536947130796,
+     41.8
+    ],
+    "fov": 73.08
+   },
+   "toPose": {
+    "eye": [
+     -58.765,
+     -4.68,
+     39.8379817829751
+    ],
+    "at": [
+     -58.765,
+     -5.429701333333333,
+     41.750499999999995
+    ],
+    "fov": 96
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -58.765,
+     -39.8379817829751,
+     -4.68
+    ]
+   ],
+   "roundedLength": 20.997135866418276,
+   "maxNearRadius": 0.4058508346350509,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "picture-room",
+   "exhibit": "picture/annunciation/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -6.736536947130796,
+     41.8
+    ],
+    "fov": 73.08
+   },
+   "toPose": {
+    "eye": [
+     -56.296958333333336,
+     -4.68,
+     39.650499999999994
+    ],
+    "at": [
+     -56.296958333333336,
+     -5.610120776833749,
+     41.750499999999995
+    ],
+    "fov": 104
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -56.296958333333336,
+     -39.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 18.544714912028244,
+   "maxNearRadius": 0.44296640257164804,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "picture-room",
+   "exhibit": "picture/ginevra-de-benci/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -6.736536947130796,
+     41.8
+    ],
+    "fov": 73.08
+   },
+   "toPose": {
+    "eye": [
+     -54.39891666666667,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -54.39891666666667,
+     -4.916549333333333,
+     41.750499999999995
+    ],
+    "fov": 50.64248571870965
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -54.39891666666667,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 16.96798312775007,
+   "maxNearRadius": 0.3335392423527442,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "picture-room",
+   "exhibit": "picture/ginevra-de-benci/reverse",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -6.736536947130796,
+     41.8
+    ],
+    "fov": 73.08
+   },
+   "toPose": {
+    "eye": [
+     -53.400875000000006,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -53.400875000000006,
+     -4.916549333333333,
+     41.750499999999995
+    ],
+    "fov": 50.64248571870965
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -53.400875000000006,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 16.0179321704028,
+   "maxNearRadius": 0.3335392423527442,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "picture-room",
+   "exhibit": "picture/madonna-of-the-carnation/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -6.736536947130796,
+     41.8
+    ],
+    "fov": 73.08
+   },
+   "toPose": {
+    "eye": [
+     -52.34533333333334,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -52.34533333333334,
+     -4.968314666666666,
+     41.750499999999995
+    ],
+    "fov": 63.615381984391455
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -52.34533333333334,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 15.019920284778852,
+   "maxNearRadius": 0.3335392423527442,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "picture-room",
+   "exhibit": "picture/benois-madonna/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -6.736536947130796,
+     41.8
+    ],
+    "fov": 73.08
+   },
+   "toPose": {
+    "eye": [
+     -51.30979166666668,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -51.30979166666668,
+     -4.898544,
+     41.750499999999995
+    ],
+    "fov": 45.75948960438484
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -51.30979166666668,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 14.048992412034503,
+   "maxNearRadius": 0.3335392423527442,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "picture-room",
+   "exhibit": "picture/saint-jerome/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -6.736536947130796,
+     41.8
+    ],
+    "fov": 73.08
+   },
+   "toPose": {
+    "eye": [
+     -50.14175000000002,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -50.14175000000002,
+     -5.0876,
+     41.750499999999995
+    ],
+    "fov": 87.60748452552306
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -50.14175000000002,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 12.965837547667348,
+   "maxNearRadius": 0.37450139847721664,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "picture-room",
+   "exhibit": "picture/adoration-of-the-magi/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -6.736536947130796,
+     41.8
+    ],
+    "fov": 73.08
+   },
+   "toPose": {
+    "eye": [
+     -47.93870833333336,
+     -4.68,
+     39.650499999999994
+    ],
+    "at": [
+     -47.93870833333336,
+     -5.610120776833749,
+     41.750499999999995
+    ],
+    "fov": 104
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -47.93870833333336,
+     -39.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 10.547463688097556,
+   "maxNearRadius": 0.44296640257164804,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "picture-room",
+   "exhibit": "picture/annunciation-predella/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -6.736536947130796,
+     41.8
+    ],
+    "fov": 73.08
+   },
+   "toPose": {
+    "eye": [
+     -45.8106666666667,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -45.8106666666667,
+     -5.02008,
+     41.750499999999995
+    ],
+    "fov": 74.99608634300215
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -45.8106666666667,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 9.133991316019053,
+   "maxNearRadius": 0.3381553466732822,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "picture-room",
+   "exhibit": "picture/virgin-of-the-rocks-louvre/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -6.736536947130796,
+     41.8
+    ],
+    "fov": 73.08
+   },
+   "toPose": {
+    "eye": [
+     -44.27262500000004,
+     -4.68,
+     40.20528660611233
+    ],
+    "at": [
+     -44.27262500000004,
+     -5.299162666666667,
+     41.750499999999995
+    ],
+    "fov": 96
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -44.27262500000004,
+     -40.20528660611233,
+     -4.68
+    ]
+   ],
+   "roundedLength": 7.62138039432904,
+   "maxNearRadius": 0.4058508346350509,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "picture-room",
+   "exhibit": "picture/portrait-of-a-musician/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -6.736536947130796,
+     41.8
+    ],
+    "fov": 73.08
+   },
+   "toPose": {
+    "eye": [
+     -42.87458333333338,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -42.87458333333338,
+     -4.8940426666666665,
+     41.750499999999995
+    ],
+    "fov": 44.50994540153616
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -42.87458333333338,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 6.881807872229371,
+   "maxNearRadius": 0.3335392423527442,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "picture-room",
+   "exhibit": "picture/lady-with-an-ermine/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -6.736536947130796,
+     41.8
+    ],
+    "fov": 73.08
+   },
+   "toPose": {
+    "eye": [
+     -41.88504166666672,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -41.88504166666672,
+     -4.931403733333333,
+     41.750499999999995
+    ],
+    "fov": 54.52876706147623
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -41.88504166666672,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 6.251966277505803,
+   "maxNearRadius": 0.3335392423527442,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "picture-room",
+   "exhibit": "picture/la-belle-ferronniere/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -6.736536947130796,
+     41.8
+    ],
+    "fov": 73.08
+   },
+   "toPose": {
+    "eye": [
+     -40.83050000000006,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -40.83050000000006,
+     -4.95256,
+     41.750499999999995
+    ],
+    "fov": 59.836940805448734
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -40.83050000000006,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 5.694478070903444,
+   "maxNearRadius": 0.3335392423527442,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "picture-room",
+   "exhibit": "picture/madonna-litta/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -6.736536947130796,
+     41.8
+    ],
+    "fov": 73.08
+   },
+   "toPose": {
+    "eye": [
+     -39.812458333333396,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -39.812458333333396,
+     -4.898544,
+     41.750499999999995
+    ],
+    "fov": 45.75948960438484
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -39.812458333333396,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 5.301657488629026,
+   "maxNearRadius": 0.3335392423527442,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "picture-room",
+   "exhibit": "picture/burlington-house-cartoon/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -6.736536947130796,
+     41.8
+    ],
+    "fov": 73.08
+   },
+   "toPose": {
+    "eye": [
+     -38.49641666666673,
+     -4.68,
+     40.42566949999467
+    ],
+    "at": [
+     -38.49641666666673,
+     -5.220839466666667,
+     41.750499999999995
+    ],
+    "fov": 96
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -38.49641666666673,
+     -40.42566949999467,
+     -4.68
+    ]
+   ],
+   "roundedLength": 4.8347646233768815,
+   "maxNearRadius": 0.4058508346350509,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "picture-room",
+   "exhibit": "picture/yarnwinder-buccleuch/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -6.736536947130796,
+     41.8
+    ],
+    "fov": 73.08
+   },
+   "toPose": {
+    "eye": [
+     -37.16087500000007,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -37.16087500000007,
+     -4.9160992,
+     41.750499999999995
+    ],
+    "fov": 50.52269322216501
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -37.16087500000007,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 5.156290431659643,
+   "maxNearRadius": 0.3335392423527442,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "picture-room",
+   "exhibit": "picture/yarnwinder-lansdowne/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -6.736536947130796,
+     41.8
+    ],
+    "fov": 73.08
+   },
+   "toPose": {
+    "eye": [
+     -36.166333333333405,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -36.166333333333405,
+     -4.916999466666667,
+     41.750499999999995
+    ],
+    "fov": 50.76215982736924
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -36.166333333333405,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 5.4445707233087495,
+   "maxNearRadius": 0.3335392423527442,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "picture-room",
+   "exhibit": "picture/anghiari-copy/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -6.736536947130796,
+     41.8
+    ],
+    "fov": 73.08
+   },
+   "toPose": {
+    "eye": [
+     -35.038291666666744,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -35.038291666666744,
+     -5.0362848,
+     41.750499999999995
+    ],
+    "fov": 78.24354280863521
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -35.038291666666744,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 5.958519097482939,
+   "maxNearRadius": 0.34647933636092837,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "picture-room",
+   "exhibit": "picture/mona-lisa/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -6.736536947130796,
+     41.8
+    ],
+    "fov": 73.08
+   },
+   "toPose": {
+    "eye": [
+     -33.82525000000008,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -33.82525000000008,
+     -4.9903712,
+     41.750499999999995
+    ],
+    "fov": 68.65620646240188
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -33.82525000000008,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 6.68176532156729,
+   "maxNearRadius": 0.3335392423527442,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "picture-room",
+   "exhibit": "picture/virgin-of-the-rocks-london/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -6.736536947130796,
+     41.8
+    ],
+    "fov": 73.08
+   },
+   "toPose": {
+    "eye": [
+     -32.33020833333342,
+     -4.68,
+     40.23061797322524
+    ],
+    "at": [
+     -32.33020833333342,
+     -5.29016,
+     41.750499999999995
+    ],
+    "fov": 96
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -32.33020833333342,
+     -40.23061797322524,
+     -4.68
+    ]
+   ],
+   "roundedLength": 7.476434780296365,
+   "maxNearRadius": 0.4058508346350509,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "picture-room",
+   "exhibit": "picture/virgin-and-child-with-st-anne/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -6.736536947130796,
+     41.8
+    ],
+    "fov": 73.08
+   },
+   "toPose": {
+    "eye": [
+     -30.53716666666675,
+     -4.68,
+     40.319277758120435
+    ],
+    "at": [
+     -30.53716666666675,
+     -5.258650666666667,
+     41.750499999999995
+    ],
+    "fov": 96
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -30.53716666666675,
+     -40.319277758120435,
+     -4.68
+    ]
+   ],
+   "roundedLength": 8.99947760999123,
+   "maxNearRadius": 0.4058508346350509,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "picture-room",
+   "exhibit": "picture/salvator-mundi/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -6.736536947130796,
+     41.8
+    ],
+    "fov": 73.08
+   },
+   "toPose": {
+    "eye": [
+     -29.115625000000083,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -29.115625000000083,
+     -4.955710933333333,
+     41.750499999999995
+    ],
+    "fov": 60.604547934537685
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -29.115625000000083,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 10.393912612227576,
+   "maxNearRadius": 0.3335392423527442,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "picture-room",
+   "exhibit": "picture/saint-john-the-baptist/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -6.736536947130796,
+     41.8
+    ],
+    "fov": 73.08
+   },
+   "toPose": {
+    "eye": [
+     -27.977583333333417,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -27.977583333333417,
+     -5.003425066666667,
+     41.750499999999995
+    ],
+    "fov": 71.50457274525525
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -27.977583333333417,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 11.401988982495235,
+   "maxNearRadius": 0.3335392423527442,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "picture-room",
+   "exhibit": "picture/la-scapigliata/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -6.736536947130796,
+     41.8
+    ],
+    "fov": 73.08
+   },
+   "toPose": {
+    "eye": [
+     -26.96304166666675,
+     -4.68,
+     40.650499999999994
+    ],
+    "at": [
+     -26.96304166666675,
+     -4.857617199873449,
+     41.750499999999995
+    ],
+    "fov": 34
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -26.96304166666675,
+     -40.650499999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 12.319772028534762,
+   "maxNearRadius": 0.3335392423527442,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "picture-room",
+   "exhibit": "picture/bacchus/front",
+   "fromPose": {
+    "eye": [
+     -38.2,
+     -4.68,
+     35.6
+    ],
+    "at": [
+     -42.6,
+     -6.736536947130796,
+     41.8
+    ],
+    "fov": 73.08
+   },
+   "toPose": {
+    "eye": [
+     -25.655000000000086,
+     -4.68,
+     40.29394639100752
+    ],
+    "at": [
+     -25.655000000000086,
+     -5.2676533333333335,
+     41.750499999999995
+    ],
+    "fov": 96
+   },
+   "points": [
+    [
+     -38.2,
+     -35.6,
+     -4.68
+    ],
+    [
+     -25.655000000000086,
+     -40.29394639100752,
+     -4.68
+    ]
+   ],
+   "roundedLength": 13.39440770327865,
+   "maxNearRadius": 0.4058508346350509,
+   "certifiedBalls": []
   }
  ]
 }

@@ -95,6 +95,7 @@ const { createCollectionStandSolids } = await load(path.join(WING, 'collection/s
 const { geometryForPart } = await load(path.join(WING, 'machines/geometry.ts'))
 const { jointValuesAt } = await load(path.join(WING, 'machines/motion.ts'))
 const { gradeAt } = await load(path.join(WING, 'terrain-mesh.ts'))
+const { vinciExhibitRecords, vinciApproachPose, vinciApproachFit, vinciApproachPlateMetres } = await load(path.join(WING, 'collection/approaches.ts'))
 
 /* ---- the mounted geometry, at every tier ---- */
 
@@ -421,6 +422,63 @@ for (const { viewport, seen } of families) {
   }
 }
 
+/* ---- the approaches: one short certified leg per exhibit, per viewport ----
+ *
+ * An approach is reachable from exactly one station and returns to it, so it
+ * is a LINEAR table and never part of the any-to-any product of station poses.
+ * The proof is the routes' own: the same certified path, the same closed
+ * balls, the same exact segment/triangle distance, the same near rectangle
+ * plus the gait envelope, against the same solids.
+ */
+
+const approaches = [], approachReadings = [], approachCones = []
+for (const { viewport, seen } of families) {
+  for (const record of vinciExhibitRecords()) {
+    const station = seen.find(family => family.stations.includes(record.station))
+    if (!station) throw new Error(`${record.id}: no station pose for ${record.station}`)
+    const pose = vinciApproachPose(record.id, viewport.phone)
+    if (!pose) throw new Error(`${record.id}: no viewing pose at ${viewport.name}`)
+    const fov = fittedRailFov(pose.fov, viewport.aspect, viewport.phone)
+    const radius = railNearRectangleRadius(NEAR_M, fov, viewport.aspect)
+    const clearance = Math.max(station.radius, radius) + (NO_GAIT ? 0 : gaitEnvelopeM)
+    const enh = [[station.pose.eye.x, -station.pose.eye.z, station.pose.eye.y], [pose.eye.x, -pose.eye.z, pose.eye.y]]
+    const points = enh.map(([east, north, height]) => new THREE.Vector3(east, height, -north))
+    const balls = []
+    const path = createCertifiedRailPath(points, {
+      clearanceRadiusM: clearance, maxTrimM: .5, certificateDepth: 6, numericalMarginM: NUMERICAL_MARGIN_M,
+      certifyBall(centre, radiusM) {
+        if (!ballIsClear(centre, radiusM)) return false
+        balls.push({ centre: [centre.x, centre.y, centre.z], radiusM: radiusM + BALL_RESERVE_M })
+        return true
+      },
+    })
+    // A straight leg between two points has no corner to round, so the ball
+    // certificate is empty by construction and the span proof below is whole.
+    if (path.corners.length || balls.length) throw new Error(`${record.id}: an approach is not a straight leg`)
+    const span = segmentClearance(points[0], points[1], clearance)
+    const probe = ballClearance(pose.eye, radius + .05)
+    const fullBall = probe.distance > radius
+    const oriented = fullBall ? null : orientedStationClearance(pose, fov, viewport.aspect, radius)
+    const fit = vinciApproachFit(record.id, viewport.phone)
+    approachReadings.push({
+      viewport: viewport.name, station: record.station, exhibit: record.id,
+      lengthM: +path.length.toFixed(4), spanClearanceM: +(span.distance === Infinity ? clearance : span.distance).toFixed(4),
+      spanMesh: span.mesh, requiredM: +clearance.toFixed(4), plateMetres: +vinciApproachPlateMetres(record.id, viewport.phone).toFixed(4),
+      fitHeight: +fit.height.toFixed(3), fitWidth: +fit.width.toFixed(3),
+      clear: span.distance > clearance - 1e-9 || span.distance === Infinity,
+    })
+    approachCones.push({ viewport: viewport.name, exhibit: record.id, fov: pose.fov, radius: +radius.toFixed(4),
+      fullBallM: +probe.distance.toFixed(4), mesh: probe.mesh, clearAtEveryOrientation: fullBall,
+      ...(oriented ? { oriented: { minimumM: +oriented.minimumM.toFixed(4), clear: oriented.clear } } : {}) })
+    approaches.push({
+      viewport: viewport.name, station: record.station, exhibit: record.id,
+      fromPose: { eye: station.pose.eye.toArray(), at: station.pose.at.toArray(), fov: station.pose.fov },
+      toPose: { eye: pose.eye.toArray(), at: pose.at.toArray(), fov: pose.fov },
+      points: enh, roundedLength: path.length, maxNearRadius: clearance, certifiedBalls: balls,
+    })
+  }
+}
+
 /* ---- the station envelopes ---- */
 
 const stationCones = []
@@ -446,7 +504,7 @@ const arrivalEN = Object.fromEntries(families.map(({ viewport, seen }) => {
 }))
 const recipeSha256 = createHash('sha256').update(fs.readFileSync(path.join(ROOT, RECIPE))).digest('hex')
 const certificate = {
-  format: 'vinci-rail-clearance-v1',
+  format: 'vinci-rail-clearance-v2',
   completeNearClearance: true,
   recipe: RECIPE,
   recipeSha256,
@@ -462,6 +520,7 @@ const certificate = {
     `The ${NEAR_M} m near distance, both authored viewport aspect ratios and the authored endpoint FOV are used. The authored aspect gives the largest near rectangle, so a wider or narrower canvas is inside it.`,
     `Every straight span of the finished path is proved end to end by exact segment/triangle distance; every rounded corner is proved by closed balls over its control hull, and those balls are what the runtime replays. Stored balls reserve ${BALL_RESERVE_M * 1e6} µm beyond the requested radius; runtime matching of quantized geometry consumes at most ${GEOMETRY_TOLERANCE_M * 1e6} µm of it.`,
     `The walk carries a step rhythm of at most ${(gaitEnvelopeM * 1000).toFixed(2)} mm off the certified line, and that envelope is added to the clearance radius every span and every corner above is proved against.`,
+    'An approach is one straight leg from a station eye to one exhibit\'s viewing eye and back, proved by the same exact segment/triangle distance and the same near rectangle plus gait envelope as a route. It is reachable from that station only, it is not addressable by the station rail, and the table is linear: two entries per exhibit, never the product of poses.',
     `A station whose full near ball is not clear carries an oriented certificate instead: its near pyramid is proved over the whole ±${LOOK_YAW} rad yaw and ±${LOOK_PITCH} rad pitch look envelope, sampled every ${LOOK_STEP} rad, with the distance a corner can travel between two samples subtracted from the measured margin.`,
   ],
   arrivalEN,
@@ -473,6 +532,7 @@ const certificate = {
   })),
   stationCones,
   routes,
+  approaches,
 }
 
 const failures = []
@@ -484,6 +544,15 @@ for (const cone of stationCones) {
   // close; it is a diagnosis for whoever moves the pose, never a pass.
   failures.push(`${cone.viewport} ${cone.id}: the eye stands ${cone.fullBall.distance.toFixed(4)} m from ${cone.fullBall.mesh}, inside its own ${cone.radius.toFixed(4)} m near envelope; the near plane itself misses by ${cone.oriented.minimumM.toFixed(4)} m over the look envelope`)
 }
+for (const reading of approachReadings) if (!reading.clear) failures.push(`${reading.viewport} ${reading.station} to ${reading.exhibit}: a span passes within ${reading.spanClearanceM} m of ${reading.spanMesh}, under the ${reading.requiredM} m envelope`)
+for (const cone of approachCones) {
+  if (cone.clearAtEveryOrientation) continue
+  failures.push(`${cone.viewport} ${cone.exhibit}: the viewing eye stands ${cone.fullBallM} m from ${cone.mesh}, inside its own ${cone.radius} m near envelope${cone.oriented ? `; the near plane itself misses by ${cone.oriented.minimumM} m over the look envelope` : ''}`)
+}
+// Two entries per exhibit, one per viewport: an approach belongs to one
+// station, so the table is linear and the rail refuses anything not in it.
+const expectedApproaches = families.length * vinciExhibitRecords().length
+if (approaches.length !== expectedApproaches) failures.push(`Expected ${expectedApproaches} approaches, certified ${approaches.length}`)
 // Every ordered pair of distinct station poses, both viewports: a visitor can
 // press any mark on the rail, so any pair is a route the walk may be asked for.
 const expectedRoutes = families.reduce((sum, family) => sum + family.seen.length * (family.seen.length - 1), 0)
@@ -495,11 +564,15 @@ const previousCertificate = previous ? JSON.parse(previous) : null
 const sameGeometry = previousCertificate ? JSON.stringify(previousCertificate.geometrySha256) === JSON.stringify(geometrySha256) : false
 const samePoints = previousCertificate ? JSON.stringify(previousCertificate.routes.map(route => [route.viewport, route.from, route.to, route.points, route.roundedLength]))
   === JSON.stringify(routes.map(route => [route.viewport, route.from, route.to, route.points, route.roundedLength])) : false
+const approachIdentity = table => JSON.stringify((table ?? []).map(entry => [entry.viewport, entry.station, entry.exhibit, entry.fromPose, entry.toPose, entry.points, entry.roundedLength, entry.maxNearRadius]))
+const sameApproaches = previousCertificate ? previousCertificate.format === certificate.format
+  && approachIdentity(previousCertificate.approaches) === approachIdentity(approaches) : false
 
 if (args.has('--dump')) fs.writeFileSync(path.join(ROOT, 'forge/scratch/candidate.json'), text)
 if (VERIFY) {
   if (!sameGeometry) failures.push('The certificate on disk does not carry the geometry hash the mounted factories produce')
   if (!samePoints) failures.push('The certificate on disk does not carry the routes the current poses produce')
+  if (!sameApproaches) failures.push('The certificate on disk does not carry the approaches the current viewing poses produce')
 } else if (!failures.length) {
   fs.writeFileSync(CERTIFICATE, text)
   const manifest = JSON.parse(fs.readFileSync(MANIFEST, 'utf8'))
@@ -518,11 +591,16 @@ const report = {
   geometrySha256, geometry,
   gaitEnvelopeM: +gaitEnvelopeM.toFixed(6),
   routes: routes.length,
+  approaches: approaches.length,
   triangles: index.data.count,
-  sameGeometryAsDisk: sameGeometry, sameRoutesAsDisk: samePoints,
+  sameGeometryAsDisk: sameGeometry, sameRoutesAsDisk: samePoints, sameApproachesAsDisk: sameApproaches,
   worstSpanClearance: readings.reduce((worst, reading) => reading.spanClearanceM < worst.spanClearanceM ? reading : worst, readings[0]),
+  worstApproachSpan: approachReadings.reduce((worst, reading) => reading.spanClearanceM - reading.requiredM < worst.spanClearanceM - worst.requiredM ? reading : worst, approachReadings[0]),
+  worstApproachNearBall: approachCones.reduce((worst, cone) => cone.fullBallM - cone.radius < worst.fullBallM - worst.radius ? cone : worst, approachCones[0]),
+  furthestApproachPlateMetres: approachReadings.reduce((worst, reading) => reading.plateMetres > worst.plateMetres ? reading : worst, approachReadings[0]),
+  worstApproachFit: approachReadings.reduce((worst, reading) => Math.max(reading.fitHeight, reading.fitWidth) > Math.max(worst.fitHeight, worst.fitWidth) ? reading : worst, approachReadings[0]),
   stationCones: stationCones.map(cone => ({ viewport: cone.viewport, id: cone.id, radius: +cone.radius.toFixed(4), fullBallM: +cone.fullBall.distance.toFixed(4), oriented: cone.oriented ? { minimumM: +cone.oriented.minimumM.toFixed(4), travelM: +cone.oriented.travelBetweenSamplesM.toFixed(5), orientations: cone.oriented.orientations, clear: cone.oriented.clear } : null })),
-  ...(args.has('--json') ? { readings } : {}),
+  ...(args.has('--json') ? { readings, approachReadings, approachCones } : {}),
   ok: failures.length === 0,
   failures,
 }
