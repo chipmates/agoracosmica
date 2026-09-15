@@ -31,54 +31,71 @@ interface ClearanceData {
   geometrySignatures?: { tier: string; toleranceM: number; meshes: RailMeshSignature[] }[]
 }
 const data = JSON.parse(certificateText) as ClearanceData
-const savedPoseKey = (pose: SavedPose) => JSON.stringify([pose.eye, pose.at, pose.fov])
-const routeKey = (viewport: string, from: SavedPose, to: SavedPose) => `${viewport}:${savedPoseKey(from)}>${savedPoseKey(to)}`
-const approachKey = (viewport: string, station: string, exhibit: string, from: SavedPose, to: SavedPose) =>
-  `${viewport}:${station}:${exhibit}:${savedPoseKey(from)}>${savedPoseKey(to)}`
-const requiredRoutes = new Set<string>()
-for (const viewport of ['desktop', 'phone'] as const) {
-  const poses = new Map<string, SavedPose>()
+/* A pose is matched within a micron and a millionth of a degree, never by its
+   exact digits: a pose that passes through atan or tan differs in its last
+   bit from one engine to the next, and the certify program wrote the file in
+   one of them. Both tolerances sit far above that noise and far below any
+   authored move. */
+const POSE_TOLERANCE_M = 1e-6, POSE_TOLERANCE_DEG = 1e-6
+const near = (a: readonly number[], b: readonly number[], tolerance: number) =>
+  a.length === b.length && a.every((value, i) => Math.abs(value - b[i]!) <= tolerance)
+const samePose = (a: SavedPose, b: SavedPose) =>
+  near(a.eye, b.eye, POSE_TOLERANCE_M) && near(a.at, b.at, POSE_TOLERANCE_M) && Math.abs(a.fov - b.fov) <= POSE_TOLERANCE_DEG
+const toSaved = (pose: Pose): SavedPose => ({ eye: pose.eye.toArray(), at: pose.at.toArray(), fov: pose.fov })
+const VIEWPORTS = ['desktop', 'phone'] as const
+/** The physical poses the stations stand at, one entry per distinct pose. */
+function physicalPoses(viewport: 'desktop' | 'phone'): SavedPose[] {
+  const poses: SavedPose[] = []
   for (const station of vinciContent) {
-    const pose = stationPose(station.id, viewport === 'phone')
-    const saved = { eye: pose.eye.toArray(), at: pose.at.toArray(), fov: pose.fov }
-    poses.set(savedPoseKey(saved), saved)
+    const pose = toSaved(stationPose(station.id, viewport === 'phone'))
+    if (!poses.some(held => samePose(held, pose))) poses.push(pose)
   }
-  for (const [fromKey, from] of poses) for (const [toKey, to] of poses) {
-    if (fromKey !== toKey) requiredRoutes.add(routeKey(viewport, from, to))
-  }
+  return poses
 }
 // Semantic stations may share a physical pose. Require every directed pair
 // of the current physical poses, so a newly opened station cannot silently
-// rely on the route count of the previous room arrangement.
-const savedRoutes = new Set(data.routes.map(route => routeKey(route.viewport, route.fromPose, route.toPose)))
+// rely on the route count of the previous room arrangement. Every saved route
+// must answer to one required pair and every required pair to one saved route.
+let requiredRoutes = 0, matchedRoutes = 0
+const unmatchedRoutes = new Set(data.routes)
+for (const viewport of VIEWPORTS) {
+  const poses = physicalPoses(viewport)
+  for (const from of poses) for (const to of poses) {
+    if (from === to) continue
+    requiredRoutes++
+    const saved = data.routes.find(route => unmatchedRoutes.has(route) && route.viewport === viewport
+      && samePose(route.fromPose, from) && samePose(route.toPose, to))
+    if (saved) { matchedRoutes++; unmatchedRoutes.delete(saved) }
+  }
+}
 if (data.format !== 'vinci-rail-clearance-v2' || data.completeNearClearance !== true
-  || data.routes.length !== requiredRoutes.size || savedRoutes.size !== requiredRoutes.size
-  || [...requiredRoutes].some(route => !savedRoutes.has(route))) throw new Error('Missing complete Vinci rail certificate')
+  || data.routes.length !== requiredRoutes || matchedRoutes !== requiredRoutes
+  || unmatchedRoutes.size !== 0) throw new Error('Missing complete Vinci rail certificate')
 // EVERY DECLARED VIEWING EYE IS CERTIFIED, at both viewports, on the station
 // pose it actually returns to. An exhibit whose pose moved, or a new one that
 // was never certified, is refused here and not on the visitor's first press.
-const requiredApproaches = new Set<string>()
-for (const viewport of ['desktop', 'phone'] as const) {
+let requiredApproaches = 0, matchedApproaches = 0
+const unmatchedApproaches = new Set(data.approaches)
+for (const viewport of VIEWPORTS) {
   for (const record of vinciExhibitRecords()) {
-    const station = stationPose(record.station, viewport === 'phone')
+    const station = toSaved(stationPose(record.station, viewport === 'phone'))
     const viewing = vinciApproachPose(record.id, viewport === 'phone')
     if (!viewing) throw new Error(`Missing Vinci viewing pose: ${record.id}`)
-    requiredApproaches.add(approachKey(viewport, record.station, record.id,
-      { eye: station.eye.toArray(), at: station.at.toArray(), fov: station.fov },
-      { eye: viewing.eye.toArray(), at: viewing.at.toArray(), fov: viewing.fov }))
+    const eye = toSaved(viewing)
+    requiredApproaches++
+    const saved = data.approaches.find(approach => unmatchedApproaches.has(approach) && approach.viewport === viewport
+      && approach.station === record.station && approach.exhibit === record.id
+      && samePose(approach.fromPose, station) && samePose(approach.toPose, eye))
+    if (saved) { matchedApproaches++; unmatchedApproaches.delete(saved) }
   }
 }
-const savedApproaches = new Set(data.approaches.map(approach =>
-  approachKey(approach.viewport, approach.station, approach.exhibit, approach.fromPose, approach.toPose)))
-if (data.approaches.length !== requiredApproaches.size || savedApproaches.size !== requiredApproaches.size
-  || [...requiredApproaches].some(approach => !savedApproaches.has(approach))) throw new Error('Missing complete Vinci approach certificate')
+if (data.approaches.length !== requiredApproaches || matchedApproaches !== requiredApproaches
+  || unmatchedApproaches.size !== 0) throw new Error('Missing complete Vinci approach certificate')
 const geometryToleranceM = .000002
 export { collectRailSolids, railCollisionIds } from './rail-solids'
 
 function sameSavedPose(saved: SavedPose, pose: Pose) {
-  return pose.eye.distanceToSquared(new Vector3().fromArray(saved.eye)) < 1e-18
-    && pose.at.distanceToSquared(new Vector3().fromArray(saved.at)) < 1e-18
-    && Math.abs(pose.fov - saved.fov) < 1e-9
+  return samePose(saved, toSaved(pose))
 }
 
 /** Runs one SHA-256 of actual mounted positions/topology/transforms at mount.
