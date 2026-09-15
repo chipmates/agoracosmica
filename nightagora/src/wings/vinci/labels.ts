@@ -35,6 +35,33 @@ function visibleAncestors(object: Object3D): boolean {
   return true
 }
 
+/** THE ONE SIGHT TEST both layers read. A binary visibility query: the first
+ * eligible opaque hit before the anchor blocks it, and a transparent group is
+ * skipped by its material. The tolerance keeps an anchor on a surface from
+ * reading as its own occluder. */
+export function vinciSightBlocked(eye: Readonly<Vector3>, anchor: Readonly<Vector3>,
+  occluders: readonly Mesh[], ray: Raycaster, hits: Intersection<Mesh>[], tolerance = 0.08): boolean {
+  const direction = new Vector3().subVectors(anchor, eye)
+  const distance = direction.length()
+  if (distance <= tolerance) return true
+  ray.set(eye as Vector3, direction.multiplyScalar(1 / distance))
+  ray.near = 0
+  ray.far = distance - tolerance
+  for (const mesh of occluders) {
+    if (!visibleAncestors(mesh)) continue
+    mesh.updateWorldMatrix(true, false)
+    hits.length = 0
+    ray.intersectObject(mesh, false, hits)
+    for (const hit of hits) {
+      const material = Array.isArray(mesh.material)
+        ? mesh.material[hit.face?.materialIndex ?? 0]
+        : mesh.material
+      if (opaqueMaterial(material)) return true
+    }
+  }
+  return false
+}
+
 /** Static scene membership is collected once. Water's opaque banks and bed
  * remain eligible; only its reflective surface meshes are excluded. */
 export function collectVinciLabelOccluders(root: Object3D): Mesh[] {
@@ -83,7 +110,7 @@ export function createVinciLabelAnchor(options: {
 
   const anchor = new Vector3()
   const observedEye = new Vector3(Infinity, 0, 0)
-  const eye = new Vector3(), projected = new Vector3(), direction = new Vector3()
+  const eye = new Vector3(), projected = new Vector3()
   const ray = new Raycaster()
   const hits: Intersection<Mesh>[] = []
   let mode: VinciLabelMode = 1, hasAnchor = false, dirty = true, occluded = true
@@ -104,27 +131,7 @@ export function createVinciLabelAnchor(options: {
   }
 
   function blocked(): boolean {
-    direction.subVectors(anchor, eye)
-    const distance = direction.length()
-    if (distance <= tolerance) return true
-    ray.set(eye, direction.multiplyScalar(1 / distance))
-    ray.near = 0
-    ray.far = distance - tolerance
-    // This is a binary visibility query. The first eligible hit before the
-    // anchor blocks it; a hit on a transparent group is skipped by material.
-    for (const mesh of occluders) {
-      if (!visibleAncestors(mesh)) continue
-      mesh.updateWorldMatrix(true, false)
-      hits.length = 0
-      ray.intersectObject(mesh, false, hits)
-      for (const hit of hits) {
-        const material = Array.isArray(mesh.material)
-          ? mesh.material[hit.face?.materialIndex ?? 0]
-          : mesh.material
-        if (opaqueMaterial(material)) return true
-      }
-    }
-    return false
+    return vinciSightBlocked(eye, anchor, occluders, ray, hits, tolerance)
   }
 
   return {
@@ -189,6 +196,159 @@ export function createVinciLabelAnchor(options: {
       dot.removeEventListener('click', onOpen)
       dot.remove()
       leader.remove()
+      hits.length = 0
+    },
+  }
+}
+
+/** One exhibit's mark, as the wing hands it to the layer. */
+export interface VinciExhibitMark {
+  id: string
+  /** Just off the object's own face, so it is not its own occluder. */
+  anchor: Readonly<Vector3>
+  /** The exhibit's own name. A mark names, it never claims. */
+  label: string
+  /** The certainty colour of this object, which is a fact, not a style. */
+  colour: string
+  /** False while the object itself is not being drawn. */
+  drawn: boolean
+  object: Object3D
+}
+
+export interface VinciExhibitDots {
+  setExhibits(marks: readonly VinciExhibitMark[]): void
+  setMode(mode: VinciLabelMode): void
+  /** Three on calm, six on standard, eight on hero. */
+  setLimit(limit: number): void
+  update(cardRect?: VinciLabelRect | null, now?: number): void
+  invalidate(): void
+  dispose(): void
+}
+
+/** THE EXHIBIT DOTS LIVE IN THE LABEL LAYER `L` ALREADY OWNS, in the mode the
+ * grammar calls dots, so they are not a fourth persistent mark. The set is
+ * capped per tier and chosen by nearness to the frame's centre: what is in
+ * front of the visitor is what carries a mark.
+ */
+export function createVinciExhibitDots(options: {
+  host: HTMLElement
+  camera: PerspectiveCamera
+  occluders: readonly Mesh[]
+  onOpen: (id: string) => void
+  limit?: number
+}): VinciExhibitDots {
+  const { host, camera, occluders, onOpen } = options
+  const document = host.ownerDocument
+  const view = document.defaultView!
+  const POOL = 8
+  const buttons: HTMLButtonElement[] = []
+  const pressed = new Map<HTMLButtonElement, string>()
+  for (let i = 0; i < POOL; i++) {
+    const dot = document.createElement('button')
+    dot.className = 'vinci-dot vinci-exhibit-dot'
+    dot.type = 'button'
+    dot.hidden = true
+    dot.style.width = dot.style.height = '44px'
+    dot.addEventListener('click', () => { const id = pressed.get(dot); if (id) onOpen(id) })
+    buttons.push(dot)
+    host.append(dot)
+  }
+  const eye = new Vector3(), observedEye = new Vector3(Infinity, 0, 0), projected = new Vector3()
+  const ray = new Raycaster()
+  const hits: Intersection<Mesh>[] = []
+  const sight = new Map<string, boolean>()
+  let marks: readonly VinciExhibitMark[] = []
+  let mode: VinciLabelMode = 1, limit = options.limit ?? 6
+  let dirty = true, changedAt = -Infinity, disposed = false
+  const settleMs = 80
+
+  function hide(): void {
+    for (const dot of buttons) { dot.hidden = true; pressed.delete(dot) }
+  }
+
+  function invalidate(): void {
+    dirty = true
+    sight.clear()
+    changedAt = view.performance.now()
+    hide()
+  }
+
+  return {
+    setExhibits(next) {
+      marks = next
+      invalidate()
+    },
+    setMode(next) {
+      mode = next
+      if (mode === 0) hide()
+    },
+    setLimit(next) {
+      const value = Math.max(0, Math.min(POOL, Math.floor(next)))
+      if (value === limit) return
+      limit = value
+      invalidate()
+    },
+    update(cardRect = null, now = view.performance.now()) {
+      if (disposed || mode === 0 || !marks.length || limit === 0) { hide(); return }
+      camera.updateWorldMatrix(true, false)
+      camera.getWorldPosition(eye)
+      if (eye.distanceToSquared(observedEye) > 1e-10) {
+        observedEye.copy(eye)
+        changedAt = now
+        dirty = true
+        sight.clear()
+      }
+      // A DOT IS NOT PLACED WHILE THE EYE IS TRAVELLING. A new sightline has
+      // to settle, exactly as the station's own mark does, so nothing stale
+      // stands on the frame and the raycast is paid once per standing.
+      if (dirty) {
+        if (now - changedAt < settleMs) { hide(); return }
+        dirty = false
+      }
+      const width = view.innerWidth, height = view.innerHeight
+      const centreX = width / 2, centreY = height / 2
+      const candidates: { mark: VinciExhibitMark; x: number; y: number; from: number }[] = []
+      for (const mark of marks) {
+        if (!mark.drawn || !mark.object.visible) continue
+        projected.copy(mark.anchor as Vector3).project(camera)
+        if (projected.z <= -1 || projected.z >= 1) continue
+        const x = (projected.x * .5 + .5) * width, y = (-projected.y * .5 + .5) * height
+        if (!(x > 22 && x < width - 22 && y > 120 && y < height - 220)) continue
+        if (cardRect && x + 22 >= cardRect.left && x - 22 <= cardRect.right
+          && y + 22 >= cardRect.top && y - 22 <= cardRect.bottom) continue
+        candidates.push({ mark, x, y, from: Math.hypot(x - centreX, y - centreY) })
+      }
+      candidates.sort((a, b) => a.from - b.from)
+      const shown: typeof candidates = []
+      for (const candidate of candidates) {
+        if (shown.length >= limit) break
+        let clear = sight.get(candidate.mark.id)
+        if (clear === undefined) {
+          clear = !vinciSightBlocked(eye, candidate.mark.anchor, occluders, ray, hits)
+          sight.set(candidate.mark.id, clear)
+        }
+        if (clear) shown.push(candidate)
+      }
+      // Tab order is reading order: the marks are placed left to right, so a
+      // hand and a keyboard meet them in the same sequence.
+      shown.sort((a, b) => a.x - b.x)
+      for (let i = 0; i < buttons.length; i++) {
+        const dot = buttons[i]!, entry = shown[i]
+        if (!entry) { dot.hidden = true; pressed.delete(dot); continue }
+        dot.hidden = false
+        dot.style.left = `${entry.x}px`
+        dot.style.top = `${entry.y}px`
+        dot.style.setProperty('--certainty', entry.mark.colour)
+        if (dot.getAttribute('aria-label') !== entry.mark.label) dot.setAttribute('aria-label', entry.mark.label)
+        pressed.set(dot, entry.mark.id)
+      }
+    },
+    invalidate,
+    dispose() {
+      disposed = true
+      for (const dot of buttons) dot.remove()
+      buttons.length = 0
+      pressed.clear()
       hits.length = 0
     },
   }

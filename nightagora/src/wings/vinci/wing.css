@@ -214,3 +214,7 @@
 .vinci-record-fold {margin:16px 0 0;}
 .vinci-record-fold > summary {display:flex;align-items:center;min-height:44px;padding:8px 0;color:#e6d6b8;font:12px var(--sans);cursor:pointer;}
 .vinci-record-fold > summary:focus-visible {outline:1px solid #edcc8c;outline-offset:2px;}
+
+/* THE EXHIBIT MARKS. The same 44 px dot the station's own mark is, in the
+   layer L cycles, each in its object's own certainty colour. */
+.vinci-exhibit-dot::after {background:var(--certainty,#d2a557);border-color:#f4dab2cc;}
