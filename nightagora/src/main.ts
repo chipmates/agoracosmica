@@ -693,7 +693,12 @@ const dFitTall = channel([
   { p: 0.45, v: 1.86 },
   { p: 0.62, v: 1.78 },
   { p: 0.78, v: 1.60, e: 'sineInOut' },
-  { p: 0.90, v: 1, e: 'sineInOut' },
+  // the map now carries the court's colonnade, three metres of stone at the
+  // rim where there used to be a lamp's height: the last stretch of the
+  // narrow ride gives that back, so the closing line still has sky behind it
+  // while it can be read
+  { p: 0.86, v: 1.24, e: 'sineInOut' },
+  { p: 0.948, v: 1, e: 'sineInOut' },
 ])
 const dLiftTall = channel([
   { p: 0.16, v: 0 },
