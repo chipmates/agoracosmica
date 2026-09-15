@@ -131,7 +131,7 @@ const STAR_COOL = lin('#c9d4f2')
 const SMOKE_COOL = lin('#161c3c') // smoke is night that has been breathed on
 
 // ------------------------------------------------------------------ the map
-const FLOOR_Y = -0.9
+export const FLOOR_Y = -0.9
 const FIRE = { x: 0, y: -0.45, z: -5.6 } // the light anchor sits low in the bowl
 const COURT_R = 12.6 // the temenos: where the polished marble stops
 const GROUND_R = 86 // and how far the ground carries on past it
@@ -141,6 +141,106 @@ const TAU = Math.PI * 2
    through the real circumference of the thing being dressed. */
 const SHAFT_ROUND = 2.64 // a column at its widest
 const BOWL_ROUND = 3.44 // the fire bowl at its lip
+
+/* THE NEAR COLONNADE, AS ONE RECORD. The descent's map stands this same ring
+   on the disc it flies over, so the profile, the radius, the ten angles and
+   the bay rule are authored here once and read in both places. At the cut the
+   two rings have to BE one ring, and two lists of numbers cannot stay one. */
+export const COL_H = 2.72 // a carried crown visible from the seated eye
+export const PLINTH_H = 0.2
+export const NEAR = {
+  r: 10.6,
+  lift: 0.2,
+  angles: [-62, -44, -30, -19, -9, 9, 19, 30, 44, 62],
+}
+
+/** the shaft, base mouldings to necking, as radius and height pairs */
+export function columnProfile(): Array<[number, number]> {
+  const pts: Array<[number, number]> = [
+    [0.4, 0.0],
+    [0.4, 0.055],
+    [0.386, 0.078],
+    [0.374, 0.126],
+    [0.343, 0.166],
+    [0.318, 0.19],
+    [0.336, 0.228],
+    [0.352, 0.258],
+    [0.344, 0.288],
+    [0.309, 0.318],
+  ]
+  const rB = 0.288
+  const rT = 0.211
+  const y0 = 0.318
+  const N_ = 14
+  for (let i = 0; i <= N_; i++) {
+    const t = i / N_
+    // entasis: the shaft swells about a third up, which is the whole
+    // reason a stone column reads as round instead of as a pipe
+    const r = rB + (rT - rB) * Math.pow(t, 1.22) + 0.015 * Math.sin(Math.pow(t, 0.8) * Math.PI)
+    pts.push([r, y0 + t * (COL_H - y0)])
+  }
+  // the necking: three annulets under the capital
+  pts.push([rT * 0.965, COL_H + 0.028])
+  pts.push([rT * 1.07, COL_H + 0.058])
+  pts.push([rT * 1.07, COL_H + 0.1])
+  return pts
+}
+
+/** the cushion between shaft and abacus */
+export const ECHINUS_PROFILE: Array<[number, number]> = [
+  [0.212, 0.0],
+  [0.232, 0.022],
+  [0.268, 0.058],
+  [0.3, 0.09],
+  [0.318, 0.112],
+  [0.318, 0.132],
+]
+export const plinthGeometry = (): BufferGeometry =>
+  new BoxGeometry(0.74, PLINTH_H, 0.74).translate(0, PLINTH_H / 2, 0)
+export const abacusGeometry = (): BufferGeometry => new BoxGeometry(0.66, 0.11, 0.66)
+export const beamGeometry = (): BufferGeometry => new RoundedBoxGeometry(1, 0.34, 0.5, 1, 0.018)
+
+/** where each column of a register meets its floor, and the yaw that turns
+    its flutes to the centre */
+export function ringStandings(
+  radius: number,
+  angles: readonly number[]
+): Array<{ x: number; z: number; yaw: number }> {
+  return angles.map((deg) => {
+    const a = (deg * Math.PI) / 180
+    return { x: Math.sin(a) * radius, z: -Math.cos(a) * radius, yaw: -a }
+  })
+}
+
+/** the bays of a register: one architrave block between each pair of columns,
+    the central bay left open so the arc breathes where the gaze passes */
+export function ringBays(
+  radius: number,
+  angles: readonly number[]
+): Array<{ mid: number; half: number; chord: number }> {
+  const bays: Array<{ mid: number; half: number; chord: number }> = []
+  for (let i = 0; i < angles.length - 1; i++) {
+    const d0 = angles[i]
+    const d1 = angles[i + 1]
+    if (d0 === undefined || d1 === undefined) continue
+    if (d0 < 0 && d1 > 0) continue
+    const a0 = (d0 * Math.PI) / 180
+    const a1 = (d1 * Math.PI) / 180
+    bays.push({
+      mid: (a0 + a1) / 2,
+      half: (a1 - a0) / 2,
+      chord: 2 * radius * Math.sin(Math.abs(a1 - a0) / 2),
+    })
+  }
+  return bays
+}
+
+/** a bay's centre at a given radius: the chord's midpoint, never the arc's,
+    so a beam lies on the two columns that carry it */
+export function bayCentre(radius: number, mid: number, half: number): [number, number] {
+  const k = radius * Math.cos(half)
+  return [Math.sin(mid) * k, -Math.cos(mid) * k]
+}
 
 /** the empty seats around the fire, in world space. The circle has one gap,
     at the near side, and the gap is where the visitor is sitting. */
@@ -991,38 +1091,6 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
   //     far stoa holds the horizon at every azimuth (which is the only
   //     thing a phone's narrow slot can see).
   // ==================================================================
-  const COL_H = 2.72 // a carried crown visible from the seated eye
-  function columnProfile(): Array<[number, number]> {
-    const pts: Array<[number, number]> = [
-      [0.4, 0.0],
-      [0.4, 0.055],
-      [0.386, 0.078],
-      [0.374, 0.126],
-      [0.343, 0.166],
-      [0.318, 0.19],
-      [0.336, 0.228],
-      [0.352, 0.258],
-      [0.344, 0.288],
-      [0.309, 0.318],
-    ]
-    const rB = 0.288
-    const rT = 0.211
-    const y0 = 0.318
-    const N_ = 14
-    for (let i = 0; i <= N_; i++) {
-      const t = i / N_
-      // entasis: the shaft swells about a third up, which is the whole
-      // reason a stone column reads as round instead of as a pipe
-      const r = rB + (rT - rB) * Math.pow(t, 1.22) + 0.015 * Math.sin(Math.pow(t, 0.8) * Math.PI)
-      pts.push([r, y0 + t * (COL_H - y0)])
-    }
-    // the necking: three annulets under the capital
-    pts.push([rT * 0.965, COL_H + 0.028])
-    pts.push([rT * 1.07, COL_H + 0.058])
-    pts.push([rT * 1.07, COL_H + 0.1])
-    return pts
-  }
-
   const shaftMat = new MeshBasicNodeMaterial()
   {
     const { world, normal, hLocal, tint, clip: c } = inkVertex()
@@ -1096,7 +1164,6 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
 
   const dressMat = dressedStone({ albedo: DRESS_ALB, rim: 0.28, facePow: 1.5, baseK: 0.42, ambK: 0.014 })
 
-  const NEAR_ANGLES = [-62, -44, -30, -19, -9, 9, 19, 30, 44, 62]
   const MID_ANGLES = [-71, -53, -37, -24.5, -14, 14, 24.5, 37, 53, 71]
   const STOA_ANGLES: number[] = []
   for (let a = -94.5; a <= 94.5; a += 9) STOA_ANGLES.push(a)
@@ -1109,7 +1176,7 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
     tint: number
   }
   const REGISTERS: Register[] = [
-    { r: 10.6, angles: NEAR_ANGLES, scale: 1, lift: 0.2, tint: 1 },
+    { r: NEAR.r, angles: [...NEAR.angles], scale: 1, lift: NEAR.lift, tint: 1 },
     { r: 16.3, angles: MID_ANGLES, scale: 1, lift: 0.2, tint: 0.95 },
     { r: 26.0, angles: narrow ? STOA_ANGLES.filter((_, i) => i % 2 === 0) : STOA_ANGLES, scale: 0.58, lift: 0.38, tint: 0.9 },
   ]
@@ -1129,29 +1196,17 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
   for (const reg of REGISTERS) {
     const s = reg.scale
     const base = FLOOR_Y + reg.lift
-    for (const deg of reg.angles) {
-      const a = (deg * Math.PI) / 180
-      const x = Math.sin(a) * reg.r
-      const z = -Math.cos(a) * reg.r
-      shafts.push({ p: [x, base, z], s: [s, s, s], r: -a, tint: reg.tint })
-      if (reg.r < 20) castShafts.push({ p: [x, base, z], s: [s, s, s], r: -a })
-      plinths.push({ p: [x, base - 0.2 * s, z], s: [s, s, s], r: -a, tint: reg.tint })
-      echini.push({ p: [x, base + (COL_H + 0.1) * s, z], s: [s, s, s], r: -a, tint: reg.tint })
-      abaci.push({ p: [x, base + (COL_H + 0.235) * s, z], s: [s, s, s], r: -a, tint: reg.tint })
+    for (const { x, z, yaw } of ringStandings(reg.r, reg.angles)) {
+      shafts.push({ p: [x, base, z], s: [s, s, s], r: yaw, tint: reg.tint })
+      if (reg.r < 20) castShafts.push({ p: [x, base, z], s: [s, s, s], r: yaw })
+      plinths.push({ p: [x, base - PLINTH_H * s, z], s: [s, s, s], r: yaw, tint: reg.tint })
+      echini.push({ p: [x, base + (COL_H + 0.1) * s, z], s: [s, s, s], r: yaw, tint: reg.tint })
+      abaci.push({ p: [x, base + (COL_H + 0.235) * s, z], s: [s, s, s], r: yaw, tint: reg.tint })
     }
-    // the architrave crowns each register, but the two central gaps stay
-    // open: the arc breathes where the visitor's gaze passes through it
-    for (let i = 0; i < reg.angles.length - 1; i++) {
-      const d0 = reg.angles[i]
-      const d1 = reg.angles[i + 1]
-      if (d0 === undefined || d1 === undefined) continue
-      if (d0 < 0 && d1 > 0) continue
-      const a0 = (d0 * Math.PI) / 180
-      const a1 = (d1 * Math.PI) / 180
-      const mid = (a0 + a1) / 2
-      const chord = 2 * reg.r * Math.sin(Math.abs(a1 - a0) / 2)
+    for (const { mid, half, chord } of ringBays(reg.r, reg.angles)) {
+      const [bx, bz] = bayCentre(reg.r, mid, half)
       beams.push({
-        p: [Math.sin(mid) * reg.r * Math.cos((a1 - a0) / 2), base + (COL_H + 0.44) * s, -Math.cos(mid) * reg.r * Math.cos((a1 - a0) / 2)],
+        p: [bx, base + (COL_H + 0.44) * s, bz],
         s: [chord + 0.18 * s, s, s],
         r: -mid,
         tint: reg.tint,
@@ -1162,8 +1217,8 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
       fascias.push({ ...beam, p: [beam.p[0], beam.p[1] - 0.12 * s, beam.p[2]], s: [chord + 0.2 * s, s, s] })
       // Two broad treads carry each bay. The central passage stays open.
       if (reg.r < 20) for (let j = 0; j < 2; j++) {
-        const rr = reg.r - 0.15 - j * 0.2
-        steps.push({ p: [Math.sin(mid) * rr * Math.cos((a1 - a0) / 2), FLOOR_Y + 0.045 + j * 0.07, -Math.cos(mid) * rr * Math.cos((a1 - a0) / 2)],
+        const [sx, sz] = bayCentre(reg.r - 0.15 - j * 0.2, mid, half)
+        steps.push({ p: [sx, FLOOR_Y + 0.045 + j * 0.07, sz],
           s: [chord + 0.3, 0.09, 1.32 - j * 0.34], r: -mid, tint: reg.tint })
       }
     }
@@ -1205,27 +1260,13 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
     castRoot.add(mesh)
   }
   casters(lathe(columnProfile(), 10), castShafts)
-  casters(new RoundedBoxGeometry(1, 0.34, 0.5, 1, 0.018), castBeams)
+  casters(beamGeometry(), castBeams)
 
   field(lathe(columnProfile(), 26), shaftMat, shafts)
-  field(new BoxGeometry(0.74, 0.2, 0.74).translate(0, 0.1, 0), dressMat, plinths)
-  field(
-    lathe(
-      [
-        [0.212, 0.0],
-        [0.232, 0.022],
-        [0.268, 0.058],
-        [0.3, 0.09],
-        [0.318, 0.112],
-        [0.318, 0.132],
-      ],
-      22
-    ),
-    dressMat,
-    echini
-  )
-  field(new BoxGeometry(0.66, 0.11, 0.66), dressMat, abaci)
-  field(new RoundedBoxGeometry(1, 0.34, 0.5, 1, 0.018), dressMat, beams)
+  field(plinthGeometry(), dressMat, plinths)
+  field(lathe(ECHINUS_PROFILE, 22), dressMat, echini)
+  field(abacusGeometry(), dressMat, abaci)
+  field(beamGeometry(), dressMat, beams)
   field(new RoundedBoxGeometry(1, 0.12, 0.76, 1, 0.012), dressMat, cornices)
   field(new BoxGeometry(1, 0.075, 0.63), dressMat, fascias)
   field(new BoxGeometry(1, 1, 1), dressMat, steps)
@@ -1278,10 +1319,10 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
   }
   {
     const items: Item[] = []
-    for (const deg of NEAR_ANGLES) {
+    for (const deg of NEAR.angles) {
       const a = (deg * Math.PI) / 180
-      const x = Math.sin(a) * 10.6
-      const z = -Math.cos(a) * 10.6
+      const x = Math.sin(a) * NEAR.r
+      const z = -Math.cos(a) * NEAR.r
       // how much of the fire this base actually catches, so the streaks
       // fall off around the arc instead of all burning the same
       const d2 = (x - FIRE.x) ** 2 + 0.2 + (z - FIRE.z) ** 2
