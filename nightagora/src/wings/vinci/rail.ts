@@ -204,8 +204,12 @@ const wrap=(a:number):number=>Math.atan2(Math.sin(a),Math.cos(a))
 const turn=(from:number,to:number,t:number):number=>from+wrap(to-from)*t
 const ramp=(edge0:number,edge1:number,x:number):number=>{const t=Math.max(0,Math.min(1,(x-edge0)/(edge1-edge0)));return t*t*(3-2*t)}
 export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:RailGeometryAuthority) {
-  interface Request { id:VinciStationId; pose:Pose; phone:boolean }
+  interface Request { id:VinciStationId; pose:Pose; phone:boolean; exhibit?:string }
   let completed:Request|undefined, active:Request|undefined, pending:Request|undefined
+  /** THE STATION AN APPROACH LEFT FROM, and the exhibit eye standing in front
+   * of one object. A viewing eye is never a station: it carries its station's
+   * id so the card keeps naming the room, and it is not on the rail. */
+  let standing:Request|undefined, viewing:Request|undefined, wantsReturn=false
   let path:ReturnType<typeof createCertifiedRailPath>|undefined, placementNeedsFrame=false
   let duration=1.1, leg=gaitLeg(0), strideM=0, strideTarget=0, strideAt=0
   /** The leg's own clock retains its measured pace when the target changes. */
@@ -247,14 +251,25 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
   function matrices() { camera.updateProjectionMatrix();camera.updateMatrixWorld() }
   function placeEndpoint(request:Request) {
     completed=request;active=undefined;path=undefined;look.snap();strideM=strideTarget=0
+    if(!request.exhibit){viewing=undefined;standing=request;wantsReturn=false}
     camera.position.copy(request.pose.eye);base.copy(poseQuaternion(request.pose))
     camera.quaternion.copy(base);camera.fov=fittedRailFov(request.pose.fov,camera.aspect,request.phone);matrices()
+  }
+  /** The one certified path this request is allowed to move on: a station pair
+   * for a station, the exhibit's own leg for an approach, and that same leg
+   * reversed for the return, which is why the return lands on the exact eye
+   * the certificate holds. */
+  function certifiedPath(request:Request):ReturnType<typeof createCertifiedRailPath> {
+    if(request.exhibit)return authority.approach(completed!.pose,request.pose,request.phone,camera)
+    if(viewing&&standing&&request.id===standing.id&&samePose(request.pose,standing.pose))
+      return authority.approach(standing.pose,viewing.pose,request.phone,camera,true)
+    return authority.route(completed!.pose,request.pose,request.phone,camera)
   }
   function begin(request:Request,now:number) {
     if(!completed)throw new Error('Rail needs an explicit initial placement')
     // Exact eyes, aims, authored FOV and actual mounted solids must match
     // the offline proof. An inspection eye cannot borrow a station proof.
-    path=authority.route(completed.pose,request.pose,request.phone,camera)
+    path=certifiedPath(request)
     // Route orientation stays separate from the bounded visitor look.
     fromQ.copy(base);toQ.copy(poseQuaternion(request.pose))
     const from=angles(fromQ),to=angles(toQ)
@@ -281,7 +296,8 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
   }
   return {
     /** Physical scheduler state, separate from the shared selected destination. */
-    get navigation() { return { completed:completed?.id, active:active?.id, queued:pending?[pending.id]:[], legSeconds:active?duration:0, legMetres:active&&path?path.length:0, legWalked:active?walkedShare:1, legPace:active?pace:1 } },
+    get navigation() { return { completed:completed?.id, active:active?.id, queued:pending?[pending.id]:[], legSeconds:active?duration:0, legMetres:active&&path?path.length:0, legWalked:active?walkedShare:1, legPace:active?pace:1,
+      exhibit:viewing?.exhibit, approaching:active?.exhibit, returning:wantsReturn||Boolean(viewing&&active&&!active.exhibit) } },
     set(id:VinciStationId,pose:Pose,instant=false,phone=camera.aspect<=.9) {
       const request={id,pose:{eye:pose.eye.clone(),at:pose.at.clone(),fov:pose.fov},phone}
       // Initial/named placement, explicit inspection return and resize are
@@ -290,6 +306,33 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
       // A certified leg finishes at its station before the newest target can
       // begin. Asking for that active endpoint cancels an older pending target.
       pending=sameRequest(active??completed,request)?undefined:request
+      // WHILE AN APPROACH STANDS THE RAIL TAKES THE RETURN AND A STATION, and
+      // a station is walked from the station eye, which is the pair the
+      // certificate holds: so the visitor comes back first, then walks on.
+      if(viewing)wantsReturn=true
+    },
+    /** A LEG TO ONE EXHIBIT'S OWN VIEWING EYE. It throws on an uncertified
+     * approach instead of moving, exactly as a route does, and it refuses a
+     * second exhibit while one is open. */
+    approach(exhibit:string,pose:Pose,phone=camera.aspect<=.9,instant=false):boolean {
+      if(!completed||active||viewing||pending)return false
+      const request:Request={id:completed.id,pose:{eye:pose.eye.clone(),at:pose.at.clone(),fov:pose.fov},phone,exhibit}
+      standing=completed
+      if(instant) {
+        // An eye placed on a leg is still an eye on a certified leg: the proof
+        // runs whether the visitor walks it or the rig cuts to it.
+        authority.approach(completed.pose,request.pose,phone,camera)
+        placeEndpoint(request);viewing=request;placementNeedsFrame=true
+        return true
+      }
+      begin(request,clock())
+      return true
+    },
+    /** The way back is the way it came. */
+    returnToStation():boolean {
+      if(!viewing||!standing)return false
+      wantsReturn=true
+      return true
     },
     look(y:number,pit:number){look.snap(y,pit)},
     /** Walk on by hand. True when a leg was actually walking and took it. */
@@ -307,7 +350,14 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
       const now=clock()
       // An explicit cut gets one rendered update before any queued movement.
       if(placementNeedsFrame){placementNeedsFrame=false;render(now);return}
-      if(!active&&pending&&authority.status==='verified') {
+      // THE RETURN IS THE ONLY LEG THAT LEAVES A VIEWING EYE. Its own path is
+      // the approach reversed, so its endpoint is the certified station eye.
+      if(!active&&viewing&&wantsReturn&&standing&&authority.status==='verified') {
+        wantsReturn=false
+        begin({...standing,pose:{eye:standing.pose.eye.clone(),at:standing.pose.at.clone(),fov:standing.pose.fov}},now)
+        if(pending&&samePose(pending.pose,standing.pose))pending=undefined
+      }
+      if(!active&&!viewing&&pending&&authority.status==='verified') {
         const request=pending
         if(samePose(completed.pose,request.pose)) {
           // Preserve settled gaze at a shared construction threshold, while
@@ -321,7 +371,8 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
       }
       if(active&&reducedMotion()) {
         // One genuine endpoint per update; the newest pending target remains.
-        placeEndpoint(active);render(now);return
+        const arrived=active
+        placeEndpoint(arrived);viewing=arrived.exhibit?arrived:undefined;render(now);return
       }
       if(active&&path&&strideTarget>strideM) {
         // A wheel notch during a leg is a stride, not a new destination: the
@@ -360,7 +411,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
       }
       render(now)
       if(active&&s===1) {
-        completed=active;active=undefined;path=undefined
+        completed=active;viewing=active.exhibit?active:undefined;active=undefined;path=undefined
         // Do not drain the queue or consume catch-up time after a delayed
         // frame. The next update starts the next leg at its own clock origin.
       }

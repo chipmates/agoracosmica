@@ -43,15 +43,16 @@ const NEAREST_M = 1.1, FURTHEST_M = 2.1
  * frame that holds the work then takes the lens the work asks for at that
  * distance, which is why a wide work on a narrow stage ends at the ceiling. */
 const READING_FOV = { desktop: 58, phone: 96 }
-/** What the frame leaves around the work. The wide stage frames it; the
- * narrow one leaves the band the card rises into. */
-const HEIGHT_MARGIN = { desktop: 1.14, phone: 1.62 }
-const WIDTH_MARGIN = { desktop: 1.14, phone: 1.3 }
+/** What the frame leaves around the work. The wide stage frames it and docks
+ * the card beside it; the narrow stage has to leave the whole band the card
+ * rises into, so the work takes less of it. */
+const HEIGHT_MARGIN = { desktop: 1.14, phone: 2.4 }
+const WIDTH_MARGIN = { desktop: 1.14, phone: 1.45 }
 /** The aspect each pose is composed against, as `rail-projection.ts` fits it. */
 const AUTHORED_ASPECT = { desktop: 1280 / 720, phone: 390 / 844 }
 /** THE NARROW FRAME'S AIM DROPS, which lifts the whole work above the card,
  * and never so far that the work's own top leaves the frame. */
-const NARROW_AIM_DROP = .32, NARROW_TOP_EDGE = .04
+const NARROW_AIM_DROP = .5, NARROW_TOP_EDGE = .04
 const FOV_FLOOR = 34, FOV_CEILING = 104
 
 const exhibitId = (workId: string, face: string): string => `picture/${workId}/${face}`
