@@ -223,8 +223,12 @@
    bottom on the narrow one. One reading surface, 44 px controls, the station's
    own question at its foot. */
 .vinci-exhibit-card {position:fixed;right:28px;top:104px;width:min(372px,calc(100vw - 56px));box-sizing:border-box;
-  max-height:calc(100dvh - var(--wing-rail-bottom) - 168px);overflow-y:auto;overscroll-behavior:contain;
-  padding:20px;background:#101d27f2;border:1px solid #a9977355;color:#eae1d1;pointer-events:auto;user-select:text;scrollbar-width:thin;}
+  max-height:calc(100dvh - var(--wing-rail-bottom) - 168px);display:flex;flex-direction:column;overflow:hidden;
+  padding:20px;background:#101d27f2;border:1px solid #a9977355;color:#eae1d1;pointer-events:auto;user-select:text;}
+/* The label is what scrolls. The controls and the question stay where a hand
+   left them, so a phone never hides the way out under a fold. */
+.vinci-exhibit-body {flex:0 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;}
+.vinci-exhibit-controls,.vinci-exhibit-question {flex:0 0 auto;}
 .vinci-exhibit-card[hidden] {display:none;}
 .vinci-exhibit-card:focus-visible {outline:1px solid #edcc8c;outline-offset:3px;}
 .vinci-exhibit-card .picture-policy-label {display:block;min-width:0;}
@@ -244,7 +248,7 @@
 .vinci-exhibit-question {margin:14px 0 0;font:13px/1.45 var(--serif);color:#c6bfb0;}
 @media(max-aspect-ratio:9/10) {
   .vinci-exhibit-card {left:8px;right:8px;top:auto;bottom:calc(var(--wing-rail-bottom) + 46px);width:auto;padding:14px;
-    max-height:min(272px,calc(100dvh - var(--wing-rail-bottom) - 120px));}
+    max-height:min(228px,calc(100dvh - var(--wing-rail-bottom) - 120px));}
   .vinci-exhibit-card .picture-first,.vinci-exhibit-card .picture-first-de {font-size:17px;margin-bottom:7px;}
   .vinci-exhibit-card p {font-size:13px;line-height:1.45;}
   .vinci-exhibit-control {font-size:11px;padding:10px 8px;}

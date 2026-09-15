@@ -124,14 +124,17 @@ for (const viewport of ['desktop', 'phone']) {
     assert.equal(out.pointAtDistance(out.length, new THREE.Vector3()).distanceTo(viewing.eye), 0)
     assert.equal(+out.length.toFixed(9), +back.length.toFixed(9))
 
-    /* ---- 3. the frame holds the whole work ---- */
+    /* ---- 3. the frame holds the whole work inside the band it settled on ---- */
     const fit = vinciApproachFit(record.id, narrow)
-    assert.ok(fit.height <= .98 && fit.width <= .98,
+    assert.ok(fit.height <= 1.001 && fit.width <= 1.001,
       `the frame cuts the work: ${viewport} ${record.id} height ${fit.height} width ${fit.width}`)
+    assert.ok(fit.bottom >= -.96, `the work stands on the frame's own edge: ${viewport} ${record.id}`)
     const metres = vinciApproachPlateMetres(record.id, narrow)
     assert.ok(metres < 2.2, `the viewing eye stands ${metres} m off the plate: ${viewport} ${record.id}`)
-    const worst = report.worst[viewport] ?? { fit: 0, metres: 0 }
-    report.worst[viewport] = { fit: Math.max(worst.fit, fit.height, fit.width), metres: Math.max(worst.metres, metres) }
+    const worst = report.worst[viewport] ?? { fit: 0, metres: 0, band: fit.authoredBottom, relaxed: [] }
+    report.worst[viewport] = { fit: Math.max(worst.fit, fit.height, fit.width), metres: Math.max(worst.metres, metres),
+      band: Math.min(worst.band, fit.bottom),
+      relaxed: fit.bottom < fit.authoredBottom - 1e-9 ? [...worst.relaxed, record.id] : worst.relaxed }
   }
 }
 

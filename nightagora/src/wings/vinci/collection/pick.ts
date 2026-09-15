@@ -36,12 +36,20 @@ export interface VinciPickEntry {
  * in the room and still takes a press. */
 const PROXY_FLOOR_M = .11
 const ANCHOR_OFF_M = .05
+/** A LABEL STANDS BESIDE A WORK, NOT ON ITS FACE. The mark takes the lower
+ * corner of the object's own bounds, where a museum hangs its label. */
+const ANCHOR_CORNER = .84
 const PLATES = 'vinci/collection-plates/'
 
-function proxy(object: Object3D): { centre: Vector3; radiusM: number } {
+function proxy(object: Object3D): { centre: Vector3; radiusM: number; corner: Vector3 } {
   const box = new Box3().setFromObject(object)
   const sphere = box.getBoundingSphere(new Sphere())
-  return { centre: sphere.center.clone(), radiusM: Math.max(PROXY_FLOOR_M, sphere.radius) }
+  const size = box.getSize(new Vector3())
+  const corner = sphere.center.clone()
+  corner.y -= size.y / 2 * ANCHOR_CORNER
+  if (size.x >= size.z) corner.x += size.x / 2 * ANCHOR_CORNER
+  else corner.z += size.z / 2 * ANCHOR_CORNER
+  return { centre: sphere.center.clone(), radiusM: Math.max(PROXY_FLOOR_M, sphere.radius), corner }
 }
 
 /** The face a flat exhibit presents, from its own world transform. */
@@ -64,9 +72,9 @@ export function readVinciExhibits(root: Object3D): VinciPickEntry[] {
       if (!id) return
       const openable = vinciApproachPose(id, false) !== undefined && vinciApproachPose(id, true) !== undefined
       const kind: VinciExhibitKind = sheet ? 'sheet' : workId === 'last-supper' ? 'mural' : 'picture'
-      const { centre, radiusM } = proxy(object)
+      const { centre, radiusM, corner } = proxy(object)
       entries.push({ id, kind, station: openable ? 'picture-room' : null, object, centre, radiusM,
-        anchor: centre.clone().addScaledVector(faceNormal(object), ANCHOR_OFF_M), openable, workId, face })
+        anchor: corner.addScaledVector(faceNormal(object), ANCHOR_OFF_M), openable, workId, face })
       return
     }
     // The machines arrive part by part under one stamp, so they are collected

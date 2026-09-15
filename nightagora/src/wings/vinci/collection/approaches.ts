@@ -35,58 +35,124 @@ export interface VinciExhibitRecord {
 
 /** The room's own standing eye, the one its station pose stands at. */
 const EYE = FLOOR + 1.62
-/** A person stands off a work far enough to hold it whole, never closer than
- * a small panel asks for and never past the 2.2 m inside which the picture
+/** A person stands about a picture's own height off it, never closer than a
+ * small panel asks for and never past the 2.2 m inside which the picture
  * module raises the full plate. */
 const NEAREST_M = 1.1, FURTHEST_M = 2.1
-/** The lens the standing distance is measured against, per viewport. The
- * frame that holds the work then takes the lens the work asks for at that
- * distance, which is why a wide work on a narrow stage ends at the ceiling. */
-const READING_FOV = { desktop: 58, phone: 96 }
-/** What the frame leaves around the work. The wide stage frames it and docks
- * the card beside it; the narrow stage has to leave the whole band the card
- * rises into, so the work takes less of it. */
-const HEIGHT_MARGIN = { desktop: 1.14, phone: 2.4 }
-const WIDTH_MARGIN = { desktop: 1.14, phone: 1.45 }
+/** THE FRAME IS NOT THE STAGE. The bar, the door and the card stand on the
+ * stage too, so the band a work may fill is what is left of it, in the
+ * frame's own coordinates: plus one at the top edge, minus one at the bottom.
+ * The wide stage docks the card at its right, which is what the side bound
+ * holds the work clear of; the narrow stage raises the card from the bottom.
+ */
+const BAND = {
+  desktop: { top: .87, bottom: -.66, side: .45 },
+  phone: { top: .92, bottom: -.02, side: .94 },
+}
 /** The aspect each pose is composed against, as `rail-projection.ts` fits it. */
 const AUTHORED_ASPECT = { desktop: 1280 / 720, phone: 390 / 844 }
-/** THE NARROW FRAME'S AIM DROPS, which lifts the whole work above the card,
- * and never so far that the work's own top leaves the frame. */
-const NARROW_AIM_DROP = .5, NARROW_TOP_EDGE = .04
-const FOV_FLOOR = 34, FOV_CEILING = 104
+/** The lens a work may ask for. The narrow stage goes wider than the wide one
+ * because it has half the band and the work is square to the eye, where a
+ * wide lens is a scale and not a distortion. */
+const FOV_FLOOR = 34, FOV_CEILING = { desktop: 84, phone: 118 }
+/** How near the frame's own edge a work may ever stand, when the band gives way. */
+const FRAME_EDGE = .96
 
 const exhibitId = (workId: string, face: string): string => `picture/${workId}/${face}`
 const halfAngle = (fov: number): number => Math.tan(fov * Math.PI / 360)
 
-/** One straight square eye per plate: on the plate's own normal through its
- * centre, at the distance the work asks for, with the lens that holds it. */
-function pictureApproach(field: { east: number; north: number; datum: number; width: number; height: number },
-  narrow: boolean): { pose: ApproachPose; distance: number; reach: number; drop: number; aspect: number } {
-  const viewport = narrow ? 'phone' : 'desktop'
-  const aspect = AUTHORED_ASPECT[viewport]
-  // What the work needs of the frame's own half height, on both axes, framed.
-  const half = Math.max(field.height / 2 * HEIGHT_MARGIN[viewport], field.width / 2 * WIDTH_MARGIN[viewport] / aspect)
-  const distance = Math.min(FURTHEST_M, Math.max(NEAREST_M, half / halfAngle(READING_FOV[viewport])))
-  const fov = Math.min(FOV_CEILING, Math.max(FOV_FLOOR, Math.atan(half / distance) * 360 / Math.PI))
-  const reach = distance * halfAngle(fov)
-  const drop = narrow ? Math.max(0, Math.min(NARROW_AIM_DROP * reach, reach * (1 - NARROW_TOP_EDGE) - field.height / 2)) : 0
-  return { distance, reach, drop, aspect,
-    pose: { eye: world(field.east, field.north + distance, EYE),
-      at: world(field.east, field.north, field.datum - drop), fov } }
+interface Field { east: number; north: number; datum: number; width: number; height: number }
+
+/** Where the work's own four corners land in the frame, exactly: the camera
+ * has no roll and the eye stands on the work's centre line, so this is the
+ * same projection the renderer runs, without a renderer. */
+function corners(field: Field, distance: number, drop: number, fov: number, aspect: number)
+  : { top: number; bottom: number; side: number } {
+  const eye = world(field.east, field.north + distance, EYE)
+  const at = world(field.east, field.north, field.datum - drop)
+  const forward = at.clone().sub(eye).normalize()
+  // The camera's own right, which is forward crossed with world up.
+  const right = new Vector3(-forward.z, 0, forward.x).normalize()
+  const up = right.clone().cross(forward).normalize()
+  const tan = halfAngle(fov), point = new Vector3()
+  let top = -Infinity, bottom = Infinity, side = 0
+  for (const [x, y] of [[-1, -1], [1, -1], [1, 1], [-1, 1]] as const) {
+    point.set(field.east + x * field.width / 2, field.datum + y * field.height / 2, -field.north).sub(eye)
+    const along = point.dot(forward)
+    if (!(along > 0)) return { top: Infinity, bottom: -Infinity, side: Infinity }
+    const ndcY = point.dot(up) / along / tan
+    const ndcX = point.dot(right) / along / (tan * aspect)
+    top = Math.max(top, ndcY); bottom = Math.min(bottom, ndcY); side = Math.max(side, Math.abs(ndcX))
+  }
+  return { top, bottom, side }
 }
 
-function placement(id: string) {
+/** The aim that stands the work in the middle of the band it is left. Aiming
+ * lower lifts the work, and the response is monotone, so this is exact to the
+ * tenth of a millimetre in thirty steps. */
+function centredDrop(field: Field, distance: number, fov: number, aspect: number, top: number, bottom: number): number {
+  let low = -1, high = 3
+  for (let step = 0; step < 40; step++) {
+    const drop = (low + high) / 2
+    const seen = corners(field, distance, drop, fov, aspect)
+    if ((top - seen.top) - (seen.bottom - bottom) > 0) low = drop; else high = drop
+  }
+  return (low + high) / 2
+}
+
+/** One straight square eye per plate: on the plate's own normal through its
+ * centre, at the distance the work's own size asks for, with the narrowest
+ * lens that holds the whole work. The band the card leaves is a preference,
+ * not a law: where the largest works cannot stand inside it, the band gives
+ * way at the bottom rather than the frame cutting the work.
+ */
+function pictureApproach(field: Field, narrow: boolean)
+  : { pose: ApproachPose; distance: number; drop: number; bottom: number; fit: { height: number; width: number } } {
+  const viewport = narrow ? 'phone' : 'desktop'
+  const aspect = AUTHORED_ASPECT[viewport], band = BAND[viewport], ceiling = FOV_CEILING[viewport]
+  const distance = Math.min(FURTHEST_M, Math.max(NEAREST_M, field.height, field.width))
+  const solve = (bottom: number): { fov: number; drop: number; holds: boolean } => {
+    const fits = (fov: number): boolean => {
+      const drop = centredDrop(field, distance, fov, aspect, band.top, bottom)
+      const seen = corners(field, distance, drop, fov, aspect)
+      return seen.top <= band.top && seen.bottom >= bottom && seen.side <= band.side
+    }
+    let low = FOV_FLOOR, high = ceiling
+    if (fits(low)) high = low
+    else for (let step = 0; step < 24; step++) {
+      const fov = (low + high) / 2
+      if (fits(fov)) high = fov; else low = fov
+    }
+    return { fov: high, drop: centredDrop(field, distance, high, aspect, band.top, bottom), holds: fits(high) }
+  }
+  let bottom = band.bottom, answer = solve(bottom)
+  while (!answer.holds && bottom > FRAME_EDGE * -1) {
+    bottom = Math.max(-FRAME_EDGE, bottom - .04)
+    answer = solve(bottom)
+  }
+  const seen = corners(field, distance, answer.drop, answer.fov, aspect)
+  return {
+    distance, drop: answer.drop, bottom,
+    fit: { height: (seen.top - seen.bottom) / (band.top - bottom), width: seen.side / band.side },
+    pose: { eye: world(field.east, field.north + distance, EYE),
+      at: world(field.east, field.north, field.datum - answer.drop), fov: answer.fov },
+  }
+}
+
+function placement(id: string): Field & { id: string; face: string } | undefined {
   return hangPlacements().find(field => exhibitId(field.id, field.face) === id)
 }
 
-/** What the frame holds of the work at its own pose: the share of the frame's
- * own half extents the work takes, both axes. Over one means the frame cuts
- * the work, which is what the offline check refuses. */
-export function vinciApproachFit(id: string, narrow: boolean): { height: number; width: number } | undefined {
+/** What the frame holds of the work at its own pose: the share of the band it
+ * takes, both axes, and the band it settled on. Over one means the frame cuts
+ * the work, which is what the offline check refuses; a bottom under the
+ * authored one is a work whose own foot stands behind the card. */
+export function vinciApproachFit(id: string, narrow: boolean)
+  : { height: number; width: number; bottom: number; authoredBottom: number } | undefined {
   const field = placement(id)
   if (!field) return undefined
-  const { reach, drop, aspect } = pictureApproach(field, narrow)
-  return { height: (field.height / 2 + drop) / reach, width: field.width / 2 / (reach * aspect) }
+  const answer = pictureApproach(field, narrow)
+  return { ...answer.fit, bottom: answer.bottom, authoredBottom: BAND[narrow ? 'phone' : 'desktop'].bottom }
 }
 
 /** THIS WINDOW'S OPENABLE SET: the picture room's hang, whose wall placement
