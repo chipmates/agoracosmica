@@ -18,9 +18,12 @@ export const COURT_PLAQUE_STUD = 'flight-quote'
 export const COURT_PLAQUE_MANIFEST_ID = 'vinci/court-plaque'
 
 /** East, north and the bearing its face takes, in the wing's own metres. The
- * parachute stands at -37.00, -23.10: this is 3.7 m south of its axis, past
- * the cloth's own corner, on open paving. */
-export const COURT_PLAQUE_STAND = { east: -37, north: -26.8, bearing: 49 } as const
+ * parachute stands at -37.00, -23.10, and this is four metres south-west of
+ * its axis on open paving, turned to the display wall's own station eye.
+ * Both of the station frame's limits set it: its whole width stands inside
+ * the wide frame at 7.5 m, and its nearest corner clears the cone between
+ * that eye and its field by 0.42 m, so nothing of it is before the field. */
+export const COURT_PLAQUE_STAND = { east: -40.2, north: -25.5, bearing: 57.6 } as const
 
 const PLATE = words.court_plaque
 
@@ -55,7 +58,7 @@ export function createCourtPlaque(materials: ExhibitMaterials, language: 'en' | 
     y -= block.height + gap
     return block
   }
-  cut(de ? PLATE.title_de : PLATE.title_en, .058, materials.bronze, .105)
+  cut(de ? PLATE.title_de : PLATE.title_en, .058, materials.ink, .105)
   // The sentence itself stands in English on every stage, the way it circulates.
   cut(PLATE.quote, .062, materials.ink, .115)
   cut(de ? PLATE.line_de : PLATE.line_en, .046)
