@@ -66,7 +66,9 @@ export function createVinciCloseLook(options: {
   const question = document.createElement('p')
   question.className = 'vinci-exhibit-question'
   card.append(body, controls, question)
-  host.append(card)
+  // A CARD THAT IS NOT OPEN IS NOT A DRAWER ON THE PAGE. It is mounted when
+  // an exhibit stands and taken off when it closes, so nothing offers a
+  // reading surface no control can open.
 
   let open: string | null = null, invoker: HTMLElement | null = null
   let marked = false, popping = false, disposed = false
@@ -92,6 +94,7 @@ export function createVinciCloseLook(options: {
     const id = open
     open = null
     card.hidden = true
+    card.remove()
     body.textContent = ''
     controls.textContent = ''
     onClose(id)
@@ -128,6 +131,7 @@ export function createVinciCloseLook(options: {
       controls.replaceChildren(...exhibit.controls)
       question.textContent = exhibit.question
       card.hidden = false
+      if (!card.isConnected) host.append(card)
       mark()
       // The eye walks where it can walk. On calm and on reduced motion it
       // stands still and the card is the whole close look.
