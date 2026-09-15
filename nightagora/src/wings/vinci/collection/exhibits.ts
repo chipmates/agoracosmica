@@ -11,7 +11,8 @@ import { buildMachine, MACHINE_SLUGS, type MachineSlug } from '../machines'
 import type { ReadyMachineBuild } from '../machines/runtime'
 import { createCollectionLineFloor, fitCollectionExhibitFloor } from './line-floor'
 import { createCourtPlaque, COURT_PLAQUE_STAND } from './court-plaque'
-import { createGrave } from '../grave'
+import { createGrave, createGraveDeathbed } from '../grave'
+import { loadPlate, PLATES } from '../line/bench/assets'
 import { buildTable, type PageRecord } from '../table'
 import { loadManifest } from '../../../manifest'
 import pageMap from '../table/data/msb-pages.json?raw'
@@ -136,6 +137,15 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   grave.group.position.set(GRAVE_ORIGIN.east, COURT.level + .035, -GRAVE_ORIGIN.north)
   stamp(grave.group, 'vinci/grave-geometry')
   host.add(grave.group)
+  // THE PAINTING OF THE KING AT THE BEDSIDE HANGS HERE, and the frame is built
+  // inside the plate's own promise: a reproduction that never arrives leaves
+  // the wall bare instead of standing an empty frame in front of a visitor.
+  void loadPlate(PLATES.ingres, stack.tierName()).then(plate => {
+    if (!live) { plate.texture.dispose(); return }
+    const hung = createGraveDeathbed(exhibitStones, plate.texture, plate.entry.id, lang())
+    grave.group.add(hung.group)
+    teardown.push(() => { hung.dispose(); plate.texture.dispose() })
+  }).catch((error: unknown) => console.error(`The grave's reproduction did not arrive: ${String(error)}`))
 
   // THE FLIGHT QUOTATION STANDS BESIDE THE FLIGHT MACHINE. One plaque on the
   // court's paving, built with the page like the cloth beside it, because it

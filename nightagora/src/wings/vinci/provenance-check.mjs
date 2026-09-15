@@ -176,6 +176,7 @@ section('canonical stations, questions, hour and carrier claims', () => {
   function loadContent(doors) {
     const exports = {};
     script.runInNewContext({ exports, require(specifier) {
+      if (specifier === './line/data/never-said.json?raw') return { default: read('src/wings/vinci/line/data/never-said.json').toString('utf8') };
       if (specifier !== './data/doors.json?raw') throw new Error(`Unexpected content dependency: ${specifier}`);
       return { default: JSON.stringify({ ...canonical, doors }) };
     } }, { timeout: 1000 });

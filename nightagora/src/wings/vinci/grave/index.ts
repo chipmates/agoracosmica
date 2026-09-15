@@ -1,6 +1,7 @@
-import { CylinderGeometry, ExtrudeGeometry, LatheGeometry, Vector2, Path, Shape, type Material } from 'three/webgpu'
+import { CylinderGeometry, ExtrudeGeometry, LatheGeometry, Mesh, MeshStandardNodeMaterial, PlaneGeometry, Vector2, Path, Shape, type Material, type Texture } from 'three/webgpu'
 import { Construction, exhibitionFloor, galleryBackdrop, type ExhibitMaterials, type ExhibitionObject } from '../myths/construction'
 import { lineAdvance } from '../words'
+import words from '../line/data/never-said.json'
 
 /** Kept from the local computation, not from the later sunset row. */
 export const GRAVE_HOUR = {
@@ -272,4 +273,82 @@ export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, l
   }
   build.group.userData.exhibit = metadata
   return { group: build.group, metadata, dispose: () => build.dispose() }
+}
+
+/* THE PAINTING OF A DEATH NOBODY WITNESSED, at the grave it belongs to.
+   A French painter imagined the scene three hundred years after it, and the
+   museum hangs it where the record of that afternoon is read, not as the
+   likeness of an hour. The label is cut into the wall beside it and the card
+   carries the record: at this distance a label is a label, and the reading is
+   in the card. */
+const DEATHBED = words.deathbed_label
+/** The reproduction is 40 by 50.5 cm. It hangs here at 1.9 m across, and the
+ * wall says so. The far wall stands fourteen metres from the eye, and this is
+ * the one band of it both viewports hold whole: east of the card's edge on the
+ * wide stage, west of the diagram frame's own silhouette, and inside the
+ * narrow stage's much shorter field. Wider than this and the phone cuts it. */
+const DEATHBED_DISPLAY = {
+  width: 1.9, height: 1.9 * 3252 / 4096, imageWidth: 4096, imageHeight: 3252,
+  originalWidth: 0.505, originalHeight: 0.4,
+  centreX: -0.42, centreY: 2.62, faceZ: -5.39,
+} as const
+
+/** Hangs the reproduction on the grave's backdrop wall. The frame is built
+ * INSIDE the plate's own promise, so a plate that never arrives leaves the
+ * wall as it was: no empty frame stands in this museum. */
+export function createGraveDeathbed(
+  materials: ExhibitMaterials, plateTexture: Texture, plateManifestId: string,
+  language: 'en' | 'de' = 'en',
+): ExhibitionObject {
+  const text = (en: string, de: string) => language === 'en' ? en : de
+  const build = new Construction(materials, 'vinci-grave-deathbed', 'vinci/grave-geometry')
+  const D = DEATHBED_DISPLAY
+  const x = D.centreX, y = D.centreY, z = D.faceZ
+  // The support, then two stepped mouldings that take the grazing light.
+  build.box(x, y, z + .045, D.width, D.height, .09, materials.dark)
+  for (const [inset, thickness, depth, material] of [
+    [.10, .13, .13, materials.dark], [.21, .09, .085, materials.bronze],
+  ] as const) {
+    const halfW = D.width / 2 + inset, halfH = D.height / 2 + inset
+    for (const [dx, dy, w, h] of [
+      [0, halfH, halfW * 2 + thickness, thickness], [0, -halfH, halfW * 2 + thickness, thickness],
+      [-halfW, 0, thickness, halfH * 2 - thickness], [halfW, 0, thickness, halfH * 2 - thickness],
+    ] as const) build.box(x + dx, y + dy, z + .09 + depth / 2, w, h, depth, material)
+  }
+  // The label on the wall under it. The card is the reading; this says whose
+  // hand, which year, and that the painting on the wall is an enlargement.
+  const labelWidth = 1.55, labelLeft = x - labelWidth / 2
+  const labelTop = 1.22
+  build.box(x, labelTop - .34, z + .045, labelWidth + .22, .90, .07, materials.stone)
+  build.box(x, labelTop - .80, z + .075, labelWidth + .16, .035, .06, materials.bronze)
+  const title = build.text(text(DEATHBED.title_en, DEATHBED.title_de), labelLeft, labelTop, z + .085, .115, labelWidth)
+  build.text('INGRES · 1818', labelLeft, labelTop - title.height - .10, z + .085, .082, labelWidth, materials.bronze)
+  build.text('Paris Musées', labelLeft, labelTop - title.height - .26, z + .085, .058, labelWidth)
+  build.text(text('A small painting enlarged for this room', 'Ein kleines Gemälde für diesen Raum vergrößert'),
+    labelLeft, labelTop - title.height - .40, z + .085, .058, labelWidth)
+  build.finish()
+  // Varnished oil under a gallery key, not a file on a screen.
+  const plate = new MeshStandardNodeMaterial({ roughness: .58, metalness: 0, map: plateTexture })
+  plate.name = 'Ingres-PD-ART-reproduction-paint-surface'
+  const paint = new Mesh(new PlaneGeometry(D.width, D.height), plate)
+  paint.name = 'Ingres-full-image-unwarped'
+  paint.position.set(x, y, z + .098)
+  paint.receiveShadow = true
+  paint.castShadow = false
+  paint.userData = {
+    manifestId: plateManifestId, manifestClass: 'PD-ART',
+    originalSizeM: [D.originalWidth, D.originalHeight], supportSizeM: [D.width, D.height],
+    imagePixels: [D.imageWidth, D.imageHeight], imageUncropped: true,
+  }
+  build.group.add(paint)
+  const metadata = {
+    kind: 'grave-deathbed', plate: plateManifestId, display: D,
+    label: text(DEATHBED.label_en, DEATHBED.label_de),
+    record: text(DEATHBED.record_en, DEATHBED.record_de),
+    lastWords: text(DEATHBED.last_words_en, DEATHBED.last_words_de),
+    certainty: DEATHBED.certainty,
+    anchors: { plate: [x, y, z + .098], label: [x, labelTop, z + .085] },
+  }
+  build.group.userData.exhibit = metadata
+  return { group: build.group, metadata, dispose: () => { build.dispose(); plate.dispose() } }
 }

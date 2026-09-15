@@ -39,8 +39,10 @@ function loadModule(relative, stubs = new Map()) {
 
 const registers = loadModule('src/wings/vinci/machines/bench/registers.ts')
 const doors = fs.readFileSync(path.join(root, 'src/wings/vinci/data/doors.json'), 'utf8')
+const neverSaid = fs.readFileSync(path.join(root, 'src/wings/vinci/line/data/never-said.json'), 'utf8')
 const content = loadModule('src/wings/vinci/content.ts', new Map([
   ['./data/doors.json?raw', { default: doors }],
+  ['./line/data/never-said.json?raw', { default: neverSaid }],
 ]))
 const hour = loadModule('src/wings/vinci/machines/bench/hour.ts', new Map([
   ['../../content', content],

@@ -1,4 +1,5 @@
 import doorsSource from './data/doors.json?raw';
+import neverSaidSource from './line/data/never-said.json?raw';
 
 export type VinciLanguage = 'en' | 'de';
 export type VinciCertainty = 'documented' | 'reconstructed' | 'conjectural' | 'unknown';
@@ -421,6 +422,21 @@ const body = statement('anatomy-absence',
   'About six hundred of his sheets are at Windsor, and twenty-nine of them hang here. Of 538 catalogued sheet groups the rights review admitted a faithful public reproduction for 389 and found none it may show for 149.',
   'Etwa sechshundert seiner Blätter befinden sich in Windsor, neunundzwanzig davon hängen hier. Von 538 verzeichneten Blattgruppen ließ die Rechteprüfung für 389 eine getreue öffentliche Reproduktion zu und fand für 149 keine, die sie zeigen darf.',
   'documented', 'document', 'brief/CONCEPT-OPUS.md §3 S17; the rights review of 2026-09-14');
+/* THE PAINTING AT THE GRAVE. The words are the museum's own record of that
+   story, so they are read from it rather than written again here. It carries
+   no visitor wording of its own: the record IS the plain sentence. */
+const deathbed = (JSON.parse(neverSaidSource) as { deathbed_label: Record<string, string> }).deathbed_label;
+const deathbedPainting: VinciStatement = {
+  id: 'deathbed-painting',
+  en: deathbed['label_en']!, de: deathbed['label_de']!,
+  certainty: 'conjectural', target: 'document',
+  source: 'The tracing record of the deathbed painting and of what the accounts of the death say',
+  record: {
+    en: `${deathbed['record_en']} ${deathbed['last_words_en']}`,
+    de: `${deathbed['record_de']} ${deathbed['last_words_de']}`,
+  },
+  germanProvenance: 'museum translation',
+};
 const grave = statement('burial-record',
   'He was buried on 12 August 1519 in the collegiate church of Saint-Florentin inside the chateau walls. That church was pulled down in 1807.',
   'Er wurde am 12. August 1519 in der Stiftskirche Saint-Florentin innerhalb der Schlossmauern bestattet. Diese Kirche wurde 1807 abgerissen.',
@@ -568,7 +584,7 @@ const seeds: readonly StationSeed[] = [
     { en: `${statementRecord(supper).en} ${statementRecord(supperAbsence).en}`, de: `${statementRecord(supper).de} ${statementRecord(supperAbsence).de}` },
     [supper, supperAbsence], 'brief/CONCEPT-OPUS.md §3 S12'),
   seed('grave', { en: 'Presumed', de: 'Vermutlich' }, grave,
-    [grave], 'brief/CONCEPT-OPUS.md §3 S19'),
+    [grave, deathbedPainting], 'brief/CONCEPT-OPUS.md §3 S19'),
 ];
 
 /* THE ENTRANCE PANEL. Every museum has a panel at the door of a wing, and a
