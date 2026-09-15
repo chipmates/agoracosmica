@@ -262,14 +262,12 @@ export function createWing():VinciWingModule {
     closeLook=createVinciCloseLook({host:h.labels,narrow,
       onOpen:id=>{
         dots?.invalidate();paintExhibitTitle();paintHeaderVisibility()
-        const pose=openMode==='auto'||openMode==='walk'||openMode==='cut'?vinciApproachPose(id,narrow()):undefined
-        if(!pose)return false
-        // A cut is the rig's own placement and the calm body's; a walk is what
-        // a visitor gets. Neither moves without the leg's own certificate.
-        if(openMode==='walk')return rail.approach(id,pose,narrow(),false)
-        if(openMode==='cut')return rail.approach(id,pose,narrow(),true)
-        if(!exhibitWalks())return false
-        return rail.approach(id,pose,narrow(),cutToStation())
+        const pose=vinciApproachPose(id,narrow())
+        // ON CALM AND UNDER REDUCED MOTION THE EYE DOES NOT MOVE: the card is
+        // the whole close look. Where it may move, the eye walks; a rig
+        // composing a still cuts to the same certified eye.
+        if(!pose||!exhibitWalks())return false
+        return rail.approach(id,pose,narrow(),openMode==='walk'?false:openMode==='cut'||cutToStation())
       },
       onClose:()=>{
         if(exhibitSources){exhibitSources=null;if(mode===2)mode=1;paintDock()}
@@ -356,7 +354,7 @@ export function createWing():VinciWingModule {
   /** A named composition at the standing station. Asked for before the place
    * is built it is remembered, so the eye never shoots the plain station
    * believing it shot a corner. */
-  let pendingView=''
+  let pendingView='', pendingExhibit=''
   function showView(id:string) {
     if(id==='welcome'){welcome?.open();return}
     if(id.startsWith('sources-')){const tab=id.slice(8);if(tab==='station'||tab==='room'||tab==='wing'){sources.select(tab);mode=2;paintDock();return}}
@@ -369,12 +367,14 @@ export function createWing():VinciWingModule {
       else if(work.endsWith('-return')){work=work.slice(0,-7);back=true}
       if(!picks.length)refreshExhibits()
       const target=picks.find(pick=>pick.openable&&pick.workId===work&&pick.face==='front')
-      if(target){
-        closeLook?.close();placeCanonicalStation()
-        openExhibit(target.id,null,how)
-        if(back)closeLook?.close()
-        if(inspectCost)measurement.show(`${s.id} / ${id}`)
-      }
+      if(!target){pendingExhibit=inspectCost?`${id}-cost`:id;return}
+      pendingExhibit=''
+      // The previous card is replaced by the owner itself, so this never walks
+      // the browser's own history back while a new exhibit is opening.
+      placeCanonicalStation()
+      openExhibit(target.id,null,how)
+      if(back)closeLook?.close()
+      if(inspectCost)measurement.show(`${s.id} / ${id}`)
       return
     }if(id==='scene')endInspection();if(id==='scene'||id.startsWith('audit-'))rail.look(0,0);if(id==='scene'||id==='audit-cost'){mode=1;paintDock()}if(id==='audit-cost')measurement.show(s.id);if(id==='audit-ui'){mode=1;paintDock();measurement.show(s.id,'ui')}if(id==='audit-ui-labels'){mode=2;paintDock();measurement.show(s.id,'ui')}if(id.startsWith('collection-room')||id.startsWith('collection-hang'))exhibits?.warm()
     const pose=namedPose(id,narrow())??collectionView(id,narrow());if(pose){activeView=id;mode=1;paintDock();rail.set(s.id,pose,true,narrow());header.querySelector('.vinci-insertion')?.remove();titleForView(id);if(id.startsWith('collection')&&!s.built&&!vinciStandsInRoom(s.id))header.append(make('p','vinci-insertion',lang()==='de'?'Museumseinbau der Gegenwart · Räume im Bau':'Modern museum insertion · Rooms in construction'))}const cone=/(?:^|-)cone-(ul|ur|dl|dr)$/.exec(id);if(cone){placeCanonicalStation();rail.look(cone[1]!.includes('l')?.6:-.6,cone[1]!.startsWith('u')?.32:-.32)}if(id==='labels'||id==='hour'||id==='record'){sources.select(id==='hour'?'wing':'station');mode=2;paintDock();if(id==='record'){if(record.hidden)dock.querySelector<HTMLButtonElement>('.vinci-record-toggle')?.click();dock.scrollTop=record.offsetTop-(dock.querySelector('.vinci-sources-toolbar')?.getBoundingClientRect().height??0)-18}}if(inspectCost&&(pose||cone))measurement.show(`${s.id} / ${id}`)
@@ -387,6 +387,7 @@ export function createWing():VinciWingModule {
     picks=readVinciExhibits(collectionRoot)
     picksTier=hosts.world.stack.tierName()
     paintExhibitMarks()
+    if(pendingExhibit){const id=pendingExhibit;pendingExhibit='';showView(id)}
   }
   /** What each exhibit's mark says and what colour it carries: its own name
    * and its own certainty, both off the picture module's register. */
