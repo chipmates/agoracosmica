@@ -686,7 +686,7 @@ export function createWing():VinciWingModule {
     // Opening Sources changes presentation only, inside the same proven lens.
     camera.zoom=1;camera.clearViewOffset();camera.updateProjectionMatrix()
     sources.setOpen(mode===2)
-    labels.setMode(mode)
+    labels.setMode(mode);dots?.setMode(mode)
     const collectionView=activeView.startsWith('collection')
     const entryAnchor=entryInspectionAnchors[activeView]
     labels.setAnchor(materialInspectionAnchors[activeView]??entryAnchor??(activeView==='collection-court-access'?world(...collectionAccessPoint(1.05,.65),-.46):collectionView?world(-21.92,-33.92,narrow()?-5.85:-3.2):s.outdoor?anchors[s.id]??null:null),`${text(vinciCertaintyWords.reconstructed)} · ${entryAnchor?(lang()==='de'?'Vorgeschlagene Eingangsstruktur':'Proposed entrance structure'):collectionView?(lang()==='de'?'Museumseinbau der Gegenwart':'Modern museum insertion'):text(s.name)}`)
