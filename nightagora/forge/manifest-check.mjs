@@ -159,6 +159,12 @@ for (const scope of scopeList) {
       const file = join(STORE, scope, record.path)
       named.add(record.path)
       if (!existsSync(file)) {
+        // A lobby likeness may release its original from the local store once
+        // it is hashed and its source recorded: the pane serves the previews,
+        // and the record keeps what a re-fetch needs (hash, bytes, source).
+        const released = record === e && scope === 'lobby' && e.original_held === false
+          && typeof e.retired_note === 'string' && e.sha256 && e.bytes && e.original_url
+        if (released) continue
         // Older remote assets remain valid. Tier records and derived files
         // explicitly claim local bytes; a source page cannot excuse a gap.
         if (required) errors.push(`${where}: no file at ${scope}/${record.path}`)

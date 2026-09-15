@@ -349,7 +349,9 @@
       "derivation": "Converted embedded ICC profile to sRGB. JPEG previews resized with Lanczos, quality 88, embedded sRGB profile. Original bytes unchanged.",
       "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/",
       "rights_note": "Library cooperation TIFF. Current ETH holder properties attribute Lucien Chavan and state Public Domain Mark. Commons cooperation TIFF metadata still says Unbekannt. The current holder attribution takes precedence under the cross-check rule. Retouched 2016 user JPEG is not selected.",
-      "source_sha1": "dacaeca6bd4921abf7198a3886b64073ee781489"
+      "source_sha1": "dacaeca6bd4921abf7198a3886b64073ee781489",
+      "original_held": false,
+      "retired_note": "The 290 MB original was released from the local store on 2026-09-15 to free disk space; hash, bytes and source stay recorded for a re-fetch; the pane serves the previews."
     },
     {
       "id": "lobby/likeness-gautama",
