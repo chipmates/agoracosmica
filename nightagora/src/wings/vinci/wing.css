@@ -183,7 +183,10 @@
 /* THE ENTRANCE PANEL. One sheet over the arrival frame, one scrolling
    surface, and two controls a thumb can hit. The phone gets the whole
    German text and scrolls it. */
-.vinci-welcome {width:min(940px,calc(100vw - 48px));max-height:calc(100dvh - 72px);margin:auto;box-sizing:border-box;padding:0;border:1px solid #a9977366;background:#101d27f7;color:#eae1d1;display:flex;flex-direction:column;overflow:hidden;}
+.vinci-welcome {width:min(940px,calc(100vw - 48px));max-height:calc(100dvh - 72px);margin:auto;box-sizing:border-box;padding:0;border:1px solid #a9977366;background:#101d27f7;color:#eae1d1;flex-direction:column;overflow:hidden;}
+/* a closed dialog paints nothing: the flex display belongs to the open state only */
+.vinci-welcome[open] {display:flex;}
+.vinci-welcome:not([open]) {display:none;}
 .vinci-welcome-sheet {flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;}
 .vinci-welcome-foot {flex:0 0 auto;padding:14px 28px 20px;border-top:1px solid #a9977344;background:#0e1a23;}
 /* The page's own reset clears the margin a modal dialog centres itself with. */
