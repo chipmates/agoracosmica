@@ -102,12 +102,13 @@ export function createVinciCloseLook(options: {
     invoker = null
     if (back?.isConnected) back.focus({ preventScroll: true })
   }
+  const leaving = new AbortController()
   view.addEventListener('popstate', () => {
     if (popping) { popping = false; return }
     if (!open) return
     marked = false
     dismiss()
-  })
+  }, { signal: leaving.signal })
 
   function shut(pop = true): void {
     if (!open) return
@@ -150,6 +151,7 @@ export function createVinciCloseLook(options: {
     dispose() {
       disposed = true
       open = null
+      leaving.abort()
       card.remove()
     },
   }
