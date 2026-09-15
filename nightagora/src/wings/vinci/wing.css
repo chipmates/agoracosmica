@@ -218,3 +218,35 @@
 /* THE EXHIBIT MARKS. The same 44 px dot the station's own mark is, in the
    layer L cycles, each in its object's own certainty colour. */
 .vinci-exhibit-dot::after {background:var(--certainty,#d2a557);border-color:#f4dab2cc;}
+
+/* THE CLOSE LOOK'S CARD. Beside the work on the wide stage, risen from the
+   bottom on the narrow one. One reading surface, 44 px controls, the station's
+   own question at its foot. */
+.vinci-exhibit-card {position:fixed;right:28px;top:104px;width:min(372px,calc(100vw - 56px));box-sizing:border-box;
+  max-height:calc(100dvh - var(--wing-rail-bottom) - 168px);overflow-y:auto;overscroll-behavior:contain;
+  padding:20px;background:#101d27f2;border:1px solid #a9977355;color:#eae1d1;pointer-events:auto;user-select:text;scrollbar-width:thin;}
+.vinci-exhibit-card[hidden] {display:none;}
+.vinci-exhibit-card:focus-visible {outline:1px solid #edcc8c;outline-offset:3px;}
+.vinci-exhibit-card .picture-policy-label {display:block;min-width:0;}
+.vinci-exhibit-card .picture-label-language {display:block;}
+.vinci-exhibit-card .picture-label-language + .picture-label-language {margin-top:14px;padding-top:12px;border-top:1px solid #a9977333;}
+.vinci-exhibit-card .picture-first,.vinci-exhibit-card .picture-first-de {display:flex;align-items:baseline;gap:9px;margin:0 0 9px;font:400 19px/1.24 var(--serif);color:#fff5e3;}
+.vinci-exhibit-card .picture-certainty {flex:0 0 8px;width:8px;height:8px;border-radius:50%;background:var(--certainty,#d2a557);}
+.vinci-exhibit-card p {margin:8px 0;font:14px/1.5 var(--serif);color:#e6e0d2;text-wrap:pretty;}
+.vinci-exhibit-card .picture-holder,.vinci-exhibit-card .picture-source-reading,.vinci-exhibit-card .picture-column-note {font:12px/1.5 var(--sans);color:#b6bcae;overflow-wrap:anywhere;}
+.vinci-exhibit-card .picture-label-more {display:block;width:100%;min-height:44px;margin-top:8px;padding:10px 0;text-align:left;background:none;border:0;border-top:1px solid #a9977344;color:#e6d6b8;font:12px var(--sans);cursor:pointer;}
+.vinci-exhibit-card .picture-label-more:focus-visible {outline:1px solid #edcc8c;outline-offset:2px;}
+.vinci-exhibit-controls {display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid #a9977344;}
+.vinci-exhibit-control {flex:1 1 40%;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;
+  min-height:44px;min-width:44px;padding:10px 12px;background:transparent;border:1px solid #a9977366;color:#e6d6b8;
+  font:12px var(--sans);text-align:center;text-decoration:none;cursor:pointer;}
+.vinci-exhibit-control:focus-visible {outline:1px solid #edcc8c;outline-offset:2px;}
+.vinci-exhibit-question {margin:14px 0 0;font:13px/1.45 var(--serif);color:#c6bfb0;}
+@media(max-aspect-ratio:9/10) {
+  .vinci-exhibit-card {left:8px;right:8px;top:auto;bottom:calc(var(--wing-rail-bottom) + 46px);width:auto;padding:14px;
+    max-height:min(272px,calc(100dvh - var(--wing-rail-bottom) - 120px));}
+  .vinci-exhibit-card .picture-first,.vinci-exhibit-card .picture-first-de {font-size:17px;margin-bottom:7px;}
+  .vinci-exhibit-card p {font-size:13px;line-height:1.45;}
+  .vinci-exhibit-control {font-size:11px;padding:10px 8px;}
+  .vinci-exhibit-question {font-size:12px;}
+}
