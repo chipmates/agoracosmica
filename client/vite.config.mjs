@@ -2,6 +2,41 @@ import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import basicSsl from '@vitejs/plugin-basic-ssl'
 import path from 'path'
+import { createHash } from 'crypto'
+import { readdirSync, readFileSync } from 'fs'
+
+// Content families served from R2 and mirrored on disk. R2 answers with a
+// one-year immutable cache header, so the client appends a per-family version
+// to these URLs; it changes only when that family's files change.
+const CONTENT_FAMILIES = {
+  factchecks: 'src/assets/factchecks',
+  stories: 'src/assets/stories',
+  seeds: 'src/assets/translations/seeds',
+  'figure-translations': 'src/assets/translations/figures',
+};
+
+function hashDir(dir, hash) {
+  let entries;
+  try { entries = readdirSync(dir, { withFileTypes: true }); } catch { return; }
+  entries.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+  for (const entry of entries) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) { hashDir(full, hash); continue; }
+    if (entry.name.startsWith('.') || !/\.(json|txt)$/.test(entry.name)) continue;
+    // symlinks into the story tree may dangle (a chapter without timestamps yet)
+    try { hash.update(entry.name).update(readFileSync(full)); } catch { /* skip */ }
+  }
+}
+
+function contentVersions() {
+  const versions = {};
+  for (const [family, dir] of Object.entries(CONTENT_FAMILIES)) {
+    const hash = createHash('sha1');
+    hashDir(path.resolve(dir), hash);
+    versions[family] = hash.digest('hex').slice(0, 10);
+  }
+  return versions;
+}
 
 export default defineConfig(({ command, mode }) => {
   // Load .env files so proxy config can access VITE_AUDIO_API_URL, AUDIO_API_KEY,
@@ -9,6 +44,8 @@ export default defineConfig(({ command, mode }) => {
   // audio hardening, since dev requests don't transit the CF Worker that stamps
   // X-Origin-Verify in production).
   const env = loadEnv(mode, process.cwd(), ['VITE_', 'AUDIO_']);
+  const versions = contentVersions();
+  console.log('[vite/content] versions ' + Object.entries(versions).map(([k, v]) => `${k}=${v}`).join(' '));
 
   // Build the audio-proxy header set once — both Bearer auth (gateway-level)
   // and X-Admin-Token (nginx edge-auth) are server-side only and never reach
@@ -242,6 +279,7 @@ export default defineConfig(({ command, mode }) => {
     __FF_COUNCIL_ZUSTAND__: JSON.stringify(env.VITE_FF_COUNCIL_ZUSTAND ?? 'false'),
     __FF_UI_ZUSTAND__: JSON.stringify(env.VITE_FF_UI_ZUSTAND ?? 'false'),
     __FF_IDB_STORAGE__: JSON.stringify(env.VITE_FF_IDB_STORAGE ?? 'false'),
+    __CONTENT_VERSIONS__: JSON.stringify(versions),
   },
   css: {
     modules: {

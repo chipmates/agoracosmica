@@ -1,6 +1,6 @@
 // src/utils/figureTranslations.ts
 
-import { mediaBaseUrl } from '../config/runtime';
+import { getContentUrl } from './mediaConfig';
 
 /**
  * Utility functions for loading figure translations
@@ -80,7 +80,7 @@ export async function loadFigureTranslation(figureName: string, language: string
   
   try {
     // Fetch from R2 (was dynamic import from bundled assets)
-    const response = await fetch(`${mediaBaseUrl}/figure-translations/${language}/${figureId}.json`);
+    const response = await fetch(getContentUrl(`figure-translations/${language}/${figureId}.json`));
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const translation: FigureTranslation = await response.json();
     

@@ -6,10 +6,11 @@
 
 import { Language, SeedCollection } from '../types/global';
 import { mediaBaseUrl as MEDIA_BASE } from '../config/runtime';
+import { getContentUrl } from '../utils/mediaConfig';
 
 export const loadSeedsDirectly = async (figure: string, language: Language | string = 'en'): Promise<SeedCollection | null> => {
   try {
-    const url = `${MEDIA_BASE}/seeds/${language}/${figure}-seeds.json`;
+    const url = getContentUrl(`seeds/${language}/${figure}-seeds.json`);
     const response = await fetch(url);
 
     if (!response.ok) {

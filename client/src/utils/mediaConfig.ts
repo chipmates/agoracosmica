@@ -42,6 +42,27 @@ function getMediaConfig(): MediaConfig {
   return isDev ? MEDIA_CONFIGS.development : MEDIA_CONFIGS.production;
 }
 
+// R2 serves content with a one-year immutable cache header, so a browser only
+// refetches a sheet or a chapter after a content ship when the URL changes.
+// The build hashes each content family on disk (vite.config) and the version
+// rides the query string; families without a version keep the bare URL.
+const CONTENT_VERSIONS: Record<string, string> =
+  typeof __CONTENT_VERSIONS__ === 'object' && __CONTENT_VERSIONS__ ? __CONTENT_VERSIONS__ : {};
+
+/**
+ * Append the content version of the file's family (the first path segment,
+ * e.g. 'factchecks' or 'stories') to a media URL.
+ */
+export function withContentVersion(
+  url: string,
+  filePath: string,
+  versions: Record<string, string> = CONTENT_VERSIONS
+): string {
+  const version = versions[filePath.split('/')[0]];
+  if (!version) return url;
+  return `${url}${url.includes('?') ? '&' : '?'}v=${version}`;
+}
+
 /**
  * Get full URL for a media file
  *
@@ -70,8 +91,21 @@ export function getMediaUrl(filePath: string): string {
     return `${config.baseUrl}/${filePath}`;
   } else {
     // Production: Cloudflare Worker with R2 backend
-    return `${config.baseUrl}/${filePath}`;
+    return withContentVersion(`${config.baseUrl}/${filePath}`, filePath);
   }
+}
+
+/**
+ * URL for content whose local layout differs from the R2 one (fact sheets,
+ * seeds, figure translations): the bare media base in development, where the
+ * Vite proxy serves it, and the versioned R2 URL in production.
+ */
+export function getContentUrl(filePath: string): string {
+  if (filePath.includes('..') || filePath.includes('\0')) {
+    throw new Error('Invalid media path');
+  }
+  const url = `${mediaBaseUrl}/${filePath}`;
+  return import.meta.env.DEV ? url : withContentVersion(url, filePath);
 }
 
 
