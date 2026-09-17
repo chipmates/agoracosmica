@@ -41,6 +41,11 @@ export interface CollectionExhibits {
   holdPlates(release: boolean): void
   dispose(): void
   ready: Promise<void>
+  /** THE ENTRY'S OWN COUNT. Every body this module builds before the wing's
+   * first frame, and how many of them stand: the machines of all three
+   * grounds, the reading table, the grave's reproduction and the pictures on
+   * the walls. The field over the entry shows this and never a clock. */
+  bodies(): { done: number; total: number }
   pending(): number
   pictureSources(): readonly CollectionPictureSource[]
   /** The body wall's own records, for the row that names every sheet. */
@@ -58,6 +63,11 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   let live = true
   let demonstrating: MachineSlug | null = null
   const warmed = new Set<StandGround>()
+  /* Counted, never timed: each of these rises once and never falls, and a
+     body whose own build FAILED still counts as settled, or the count would
+     stand short of its total for the rest of the entry. */
+  let machinesUp = 0, tableUp = 0, deathbedUp = 0, picturesAsked = 0, picturesUp = 0
+  const machineUp = (): void => { machinesUp++ }
   let reading: ReturnType<typeof buildTable> | undefined
   const teardown: (() => void)[] = []
   // The court's exhibit stands outdoors and is seen from every station on
@@ -110,6 +120,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
     // a machine's own graph is not one of those. The court's cloth casts
     // through a plain double three centimetres inside it, which it hides.
     void machine.ready.then(() => machine.object.traverse(child => { child.castShadow = false }))
+    void machine.ready.then(machineUp, machineUp)
     return machine
   }
 
@@ -151,7 +162,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
     grave.group.add(hung.group)
     teardown.push(() => { hung.dispose(); plate.texture.dispose() })
   }).catch((error: unknown) => console.error(`The grave's reproduction did not arrive: ${String(error)}`))
-    .finally(() => deathbedArrived())
+    .finally(() => { deathbedUp = 1; deathbedArrived() })
 
   // THE FLIGHT QUOTATION STANDS BESIDE THE FLIGHT MACHINE. One plaque on the
   // court's paving, built with the page like the cloth beside it, because it
@@ -227,6 +238,8 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       reading = built
       teardown.push(() => { built.dispose() })
     })
+    const settled = (): void => { tableUp = 1 }
+    void table.then(settled, settled)
   }
 
   /* THE WALK CREATES NOTHING. A body, a material or a light that first
@@ -271,7 +284,26 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   stack.hold(standing)
   for (const body of [rooms, line, grave.group, plaque.group]) if (body) body.userData['naWarm'] = true
 
+  /** The walls' pictures are only countable once the manifest names them, so
+   * they are read as what is still outstanding against the most that was ever
+   * outstanding at once. Both halves are held at their own high water mark,
+   * so a total that grows never pushes the count backwards. */
+  function pictureBodies(): { done: number; total: number } {
+    const left = pictures.pending()
+    picturesAsked = Math.max(picturesAsked, picturesUp + left)
+    picturesUp = Math.max(picturesUp, picturesAsked - left)
+    return { done: picturesUp, total: picturesAsked }
+  }
+
   return {
+    bodies() {
+      const plates = pictureBodies()
+      return {
+        done: machinesUp + tableUp + deathbedUp + plates.done,
+        // the reading table and the grave's reproduction are one body each
+        total: MACHINE_SLUGS.length + 1 + 1 + plates.total,
+      }
+    },
     ready: Promise.all([court.then(() => courtGround).then(() => hall ?? Promise.resolve()).then(() => table ?? Promise.resolve()), pictures.ready]).then(() => undefined),
     pending: () => [...warmed].filter(ground => !machines.some(machine => machine.ground === ground)).length + pictures.pending(),
     pictureSources: pictures.sources,

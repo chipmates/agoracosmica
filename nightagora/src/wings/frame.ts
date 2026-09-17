@@ -39,6 +39,23 @@ const APP_ORIGIN = 'https://agoracosmica.org'
    names it with aria-controls, so the walk opens it the way a hand does. */
 export type TextRegister = 'label' | 'drawer' | 'record'
 
+/* WHAT AN ENTRY SAYS ABOUT ITSELF. Thirty wings will wait behind the same
+   gold field, so the field is told in one shape: which of the three stages
+   of building a place is really running, and how much of the whole wait is
+   paid for. The share is COUNTED, never timed, it never runs backwards, and
+   it stands at 1 only when the wing does. A wing with nothing it can count
+   yet says so with null, and the field shows that it is working without
+   claiming a number it does not have. */
+export type WingStage = 'house' | 'exhibits' | 'walk'
+
+export interface WingProgress {
+  stage: WingStage
+  /** the whole entry paid for, 0 to 1, or null while nothing can be counted */
+  share: number | null
+}
+
+export type WingReport = (progress: WingProgress) => void
+
 export function setRegister(el: HTMLElement, register: TextRegister): void {
   el.dataset['register'] = register
 }
@@ -88,10 +105,10 @@ export interface WingModule {
   show(index: number, hosts: WingHosts): void
   /** Resolves when the wing is standing and everything the walk will meet
       has been compiled, so the caller may lift its loading field on a frame
-      that costs what every later frame costs. `report` is the count of poses
-      warmed, which is the only progress the field has to show. A wing
-      without this stands as soon as it is shown. */
-  ready?(report?: (done: number, total: number) => void): Promise<void>
+      that costs what every later frame costs. `report` takes the entry's own
+      counts, in the one shape every wing reports. A wing without this stands
+      as soon as it is shown, and reports nothing. */
+  ready?(report?: WingReport): Promise<void>
   /** strike everything the wing put on the page */
   stop(): void
   /** one frame of the wing's own time, when it holds a living stage */
@@ -138,7 +155,7 @@ export interface WingFrame {
       its draw, so a DOM payload stands over a still picture at no cost. */
   held(): boolean
   /** resolves when the wing standing has paid for its first frame */
-  ready(report?: (done: number, total: number) => void): Promise<void>
+  ready(report?: WingReport): Promise<void>
   /** the gaze a hand or the rig asks for, in radians */
   look(yaw: number, pitch: number): void
   /** the camera the wing is seen through, which is what telemetry reads */

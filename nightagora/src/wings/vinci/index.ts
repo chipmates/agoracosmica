@@ -1,5 +1,5 @@
 import { createStaticShadowCache } from './static-shadow-cache'
-import { warmWalk, type WarmWalk } from '../../stack/warm-up'
+import { warmWalk, WARM_EXTRA_FRAMES, type WarmWalk } from '../../stack/warm-up'
 import { applyDisplayedHorizonHaze, displayedHorizonHazeProvenance } from './display-sky-haze'
 import { mineralSurfaceProvenance, closeSurfaceProvenance } from './surface'
 import { entryMineralSurfaceProvenance } from './entry-mineral-surface'
@@ -7,7 +7,7 @@ import { foundationPlinthProvenance } from './foundation-plinth'
 import { Box3, Color, FogExp2, DirectionalLight, Mesh, Raycaster, Vector2, Vector3, type Group } from 'three/webgpu'
 import { float, mix, vec3, vec4, dot as nodeDot, positionWorld, cameraPosition, smoothstep, mx_fractal_noise_float } from 'three/tsl'
 import { SkyMesh } from 'three/addons/objects/SkyMesh.js'
-import { setRegister, type WingHosts, type WingModule } from '../frame'
+import { setRegister, type WingHosts, type WingModule, type WingProgress, type WingReport, type WingStage } from '../frame'
 import { beginVisit, type Visit } from '../visit'
 import { createWingPlan, type WingPlan } from '../plan'
 import { PLAN_WORDS } from '../plan/words'
@@ -175,6 +175,15 @@ export function createWing():VinciWingModule {
    * a frame draws it. The caller holds its loading field until both are done,
    * so no compile lands inside a stride. */
   let warm:WarmWalk|undefined, warmed:Promise<void>|undefined
+  /* THE ENTRY REPORTS TWO COUNTS AND NOTHING ELSE: the bodies this entry
+   * builds, and the poses its warm up draws. Both totals are known before the
+   * first one is paid, every unit weighs the same, and each half is held at
+   * its own high water mark, so a total that grows when the walls' pictures
+   * are named holds the share where it stands instead of dropping it. */
+  const ENTRY_STAGES:readonly WingStage[]=['house','exhibits','walk']
+  const posesAsked=vinciContent.length+WARM_EXTRA_FRAMES
+  let tell:WingReport|undefined, toldAt=0, stageAt=0
+  let posesUp=0, setsAsked=0, setsUp=0, shareUp=0
   let announceBuilt:()=>void=()=>{}
   const built=new Promise<void>(resolve=>{announceBuilt=resolve})
   let authority:ReturnType<typeof createRailGeometryAuthority>|undefined
@@ -435,11 +444,29 @@ export function createWing():VinciWingModule {
     shadowCache?.dispose()
     shadowCache=createStaticShadowCache(scene,camera,stack.renderer,()=>stack.materials.pending())
   }
+  /** The one measure the field shows. Counted, never timed: it may not run
+   * backwards and it may not stand at 1 while a body or a pose is unpaid. */
+  function entryShare():WingProgress {
+    if(!hosts||!standing)return {stage:'house',share:null}
+    // the house's own library sets: what is still in flight, against the most
+    // that was ever in flight at once
+    const left=hosts.world.stack.materials.pending()
+    setsAsked=Math.max(setsAsked,setsUp+left)
+    setsUp=Math.max(setsUp,setsAsked-left)
+    const bodies=exhibits?.bodies()??{done:0,total:0}
+    const done=bodies.done+setsUp+posesUp
+    const asked=bodies.total+setsAsked+posesAsked
+    shareUp=Math.max(shareUp,Math.min(1,asked>0?done/asked:0))
+    // the poses hold at their last one until every body stands, so the stage
+    // that gates is the one named; it only ever moves forward
+    stageAt=Math.max(stageAt,bodies.done<bodies.total||setsUp<setsAsked?1:2)
+    return {stage:ENTRY_STAGES[stageAt]!,share:shareUp}
+  }
   /** Every station's own eye, drawn once behind the loading field, so the
    * first leg meets pipelines that already exist. The near cascade travels
    * with the eye, so it is re-aimed at each pose: a caster warmed outside it
    * never compiles its depth pass. */
-  async function warmUp(report?:(done:number,total:number)=>void):Promise<void> {
+  async function warmUp():Promise<void> {
     if(!hosts||!standing)return
     // one ordinary frame first: the rail places the station's eye, and the
     // pose the warm up restores at the end is the one the visitor arrives at
@@ -450,7 +477,7 @@ export function createWing():VinciWingModule {
     // a warm frame draws the shadow map too, which is where the depth
     // pipelines are built; the cache takes over once they exist
     key.light.shadow.autoUpdate=true
-    warm=warmWalk(stack,scene,camera,vinciContent.map(s=>stationPose(s.id,wide)),report,()=>focusNearCascade(true))
+    warm=warmWalk(stack,scene,camera,vinciContent.map(s=>stationPose(s.id,wide)),done=>{posesUp=Math.max(posesUp,done)},()=>focusNearCascade(true))
     await warm.done
     warm=undefined
     focusNearCascade(true)
@@ -1400,9 +1427,15 @@ export function createWing():VinciWingModule {
       else if(closeSources)paintDock()
     },
     async ready(report){
+      tell=report
+      // the module is here and the place is being built, which is a stage a
+      // visitor can be told about even though nothing in it can be counted
+      report?.({stage:'house',share:null})
       await built
-      warmed??=warmUp(report)
+      warmed??=warmUp()
       await warmed
+      report?.({stage:'walk',share:1})
+      tell=undefined
     },
     view(id){if(!standing){pendingView=id;return}showView(id)},
     look(y,p){if(standing)rail.look(y,p)},
@@ -1410,6 +1443,12 @@ export function createWing():VinciWingModule {
     update(dt=0){
       if(!hosts)return
       if(!standing)return
+      if(tell){
+        // ten readings a second: the field writes no faster, and the count
+        // itself may not be taken in every frame of a wing being built
+        const at=performance.now()
+        if(at-toldAt>=100){toldAt=at;tell(entryShare())}
+      }
       // THE WARM UP OWNS THE EYE. While it steps through the walk's poses
       // the rail may not put the camera back, or half the walk is compiled
       // from the seat of one station, and nothing is being looked at yet.

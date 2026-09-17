@@ -47,6 +47,10 @@ export interface WarmWalk {
     away that a visitor's frame would keep, small enough to cost nothing. */
 const WARM_WIDTH = 320
 
+/** THE WALK IS TWO FRAMES LONGER THAN ITS STATIONS: the uncull sweep and the
+    frame that draws what the sweep asked for. A wing counting its own entry
+    knows the total before the first pose is drawn. */
+export const WARM_EXTRA_FRAMES = 2
 /** how long the sweep waits for the bodies the stack is holding for it. A
     build that never settles must not keep a visitor at the field: past this
     the sweep draws what stands, which is what the walk would have met. */
@@ -75,7 +79,7 @@ export function warmWalk(
   // the poses, the sweep, and the frame that draws what the sweep compiled:
   // the walk is two steps longer than its stations, and the field's line is
   // measured against that
-  const total = poses.length + 2
+  const total = poses.length + WARM_EXTRA_FRAMES
   const culled: Object3D[] = []
   const hidden: Object3D[] = []
   const began = performance.now()
