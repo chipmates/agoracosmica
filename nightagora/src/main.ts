@@ -622,6 +622,8 @@ const smooth = (a: number, b: number, k: number): number => {
 }
 // Three reading stops over the falling disc: the museum, the walk, tonight.
 const BEAT_HALF = 0.065
+/** how far past its rest the closing line is gone */
+const LAST_EXIT = 0.04
 const CARD_HALF = 0.075
 const DESCENT_RESTS = [0.35, 0.6, 0.85]
 const DESCENT_STATIONS: Array<[number, number]> = DESCENT_RESTS.map(
@@ -871,7 +873,11 @@ function syncDescentBeats(k: number): void {
     const mid = (range[0] + range[1]) / 2
     const half = (range[1] - range[0]) / 2
     const p = (k - mid) / (half * 1.55)
-    if (Math.abs(p) > 1.1) {
+    // the last line fades on the way down before the ring's crown climbs into
+    // its band (0.895 on the wide stage, 0.893 on the tall one), while it
+    // still travels at the questions' own pace, below the masthead
+    const fade = i === descentBeats.length - 1 && k > mid ? (k - mid) / LAST_EXIT : p
+    if (Math.abs(p) > 1.1 || Math.abs(fade) >= 1) {
       beat.style.opacity = '0'
       continue
     }
@@ -880,7 +886,7 @@ function syncDescentBeats(k: number): void {
     // fades out well below the masthead instead of printing through it
     const travel = (i === 0 ? 7 : 15 + (i % 3) * 4) * (p < 0 ? 0.5 : 1)
     const scale = i === 0 ? 1 : 1 + p * 0.045
-    beat.style.opacity = String(Math.max(0, 1 - Math.pow(Math.abs(p), 1.6)))
+    beat.style.opacity = String(Math.max(0, 1 - Math.pow(Math.abs(fade), 1.6)))
     beat.style.transform = `translate3d(0, ${(-p * travel).toFixed(2)}vh, 0) scale(${scale.toFixed(3)})`
   }
 }
