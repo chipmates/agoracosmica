@@ -842,6 +842,18 @@ export const vinciWingCounts: VinciText = {
   de: 'Dieser Flügel hat achtzehn Stationen auf den zwei Gründen. Der Bildersaal trägt 25 Plätze in den Maßen, die die Sammlungen verzeichnen, und jeder davon trägt ein Bild, die Wand des Körpers 29 Blätter aus Windsor, die Maschinenhalle 14 nach den Blättern gebaute Maschinen und der Lesetisch eine offene Seite. Die Rechteprüfung dieses Museums las 538 verzeichnete Windsor-Blattgruppen und ließ 389 von ihnen zu, und von 25 benannten Codex-Einheiten ließ sie 11 zu. Was sie nicht zulassen konnte, steht in dem Raum, zu dem es gehört, mit Sammlung und Grund.',
 }
 
+/** THE PLAN'S ROOMS. The plan draws the wing from geometry the collection
+ * already declares, and each room is named here in the words the wing uses
+ * for it elsewhere, so a text seat finds all six in one place. */
+export const vinciPlanRooms = {
+  house: { en: 'The house', de: 'Das Haus' },
+  court: { en: 'The court', de: 'Der Hof' },
+  grave: { en: 'The grave court', de: 'Der Grabhof' },
+  'picture-room': { en: 'The picture room', de: 'Der Bildersaal' },
+  'mechanism-hall': { en: 'The mechanism hall', de: 'Die Maschinenhalle' },
+  'long-gallery': { en: 'The long gallery', de: 'Die lange Galerie' },
+} satisfies Record<string, VinciText>;
+
 /** The sources window's own headings, in the museum's voice. */
 export const vinciSourcesHeadings = {
   elsewhere: { en: 'Elsewhere or lost', de: 'Anderswo oder verloren' },

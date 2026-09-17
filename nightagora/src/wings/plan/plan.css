@@ -1,0 +1,68 @@
+/* THE PLAN. One sheet over the frame the canvas already holds: the wing drawn
+   as a plan on the left, the walk read as a list on the right, and the same
+   two stacked on a narrow stage. The weights are the museum's own. */
+.wing-plan {position:fixed;box-sizing:border-box;display:flex;flex-direction:column;margin:0;padding:0;max-width:none;max-height:none;
+  background:#101d27f2;border:1px solid #a9977355;color:#eae1d1;overflow:hidden;}
+.wing-plan::backdrop {background:#081016b3;}
+.wing-plan-sheet {flex:1 1 auto;display:flex;gap:22px;min-height:0;padding:20px;}
+.wing-plan[data-narrow='true'] .wing-plan-sheet {flex-direction:column;gap:10px;padding:12px;}
+
+/* THE PLATE: a drawing, never a screenshot. */
+.wing-plan-drawing {position:relative;flex:0 0 auto;align-self:flex-start;}
+.wing-plan[data-narrow='true'] .wing-plan-drawing {align-self:center;}
+.wing-plan-plate {display:block;overflow:visible;}
+.wing-plan-room {fill:#cfc6b40f;stroke:#a99773aa;stroke-width:1;}
+.wing-plan-room[data-kind='court'] {fill:#cfc6b40a;stroke-dasharray:none;}
+.wing-plan-room[data-kind='field'] {fill:#d2a5571f;stroke:#d2a55766;}
+/* A ROOM IN CONSTRUCTION IS AN OUTLINE. It is not built, so it is not filled. */
+.wing-plan-room[data-built='false'] {fill:none;stroke:#a9977388;stroke-dasharray:4 4;}
+.wing-plan-shape {stroke:#a99773aa;stroke-width:1;}
+.wing-plan-shape[data-fill='true'] {fill:#cfc6b433;}
+.wing-plan-shape[data-fill='false'] {fill:none;}
+.wing-plan-shape[data-built='false'] {stroke-dasharray:4 4;}
+.wing-plan-room-name {fill:#cfc6b4cc;font:11px/1.2 var(--sans);letter-spacing:.04em;text-anchor:middle;dominant-baseline:middle;}
+.wing-plan-north-stem,.wing-plan-north-head {stroke:#cfc6b499;stroke-width:1;fill:#cfc6b499;}
+.wing-plan-north-letter {fill:#cfc6b4cc;font:10px var(--sans);letter-spacing:.1em;text-anchor:middle;}
+.wing-plan[data-narrow='true'] .wing-plan-room-name {font-size:8.5px;}
+
+/* THE MARKS stand where the station stands. On the wide stage each one is a
+   44 px target; on a 390 px stage the eyes stand a few pixels apart, so there
+   they are drawn and the list below takes the hand. */
+.wing-plan-marks {position:absolute;inset:0;pointer-events:none;}
+.wing-plan-mark {position:absolute;display:grid;place-items:center;width:44px;height:44px;margin:0;padding:0;
+  transform:translate(-50%,-50%);background:none;border:0;color:#e6d6b8;cursor:pointer;pointer-events:auto;}
+.wing-plan-mark:not(button) {cursor:default;pointer-events:none;}
+.wing-plan-dot {grid-area:1/1;width:9px;height:9px;border-radius:50%;background:#d2a557;border:1px solid #f4dab2;box-shadow:0 0 0 4px #101d27cc;}
+.wing-plan-mark[data-stood='true'] .wing-plan-dot {background:#8cba8b;}
+.wing-plan-mark[data-here='true'] .wing-plan-dot {width:13px;height:13px;background:#fff5e3;box-shadow:0 0 0 4px #101d27cc,0 0 0 6px #edcc8c;}
+.wing-plan-number {grid-area:1/1;transform:translate(13px,-11px);font:9px/1 var(--sans);letter-spacing:.06em;color:#e6d6b8;text-shadow:0 1px 4px #0a0f13;}
+.wing-plan-mark[data-here='true'] .wing-plan-number {color:#fff5e3;}
+.wing-plan-mark:focus-visible {outline:1px solid #edcc8c;outline-offset:-4px;}
+
+/* THE READING: the walk's own order, one line per station. */
+.wing-plan-reading {flex:1 1 auto;min-width:0;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;}
+.wing-plan[data-narrow='false'] .wing-plan-reading {max-width:380px;}
+.wing-plan-heading {margin:0 0 10px;font:400 21px/1.2 var(--serif);color:#fff5e3;}
+.wing-plan-list {margin:0;padding:0;list-style:none;}
+.wing-plan-item {border-bottom:1px solid #a9977322;}
+.wing-plan-entry {display:flex;align-items:center;gap:10px;width:100%;min-height:44px;padding:6px 6px 6px 2px;text-align:left;
+  background:none;border:0;color:#cfc6b4;font:14px/1.35 var(--serif);cursor:pointer;}
+.wing-plan-entry-number {flex:0 0 26px;font:10px/1 var(--sans);letter-spacing:.1em;color:#a8b3b7;}
+.wing-plan-entry-name {min-width:0;}
+.wing-plan-entry[aria-current='true'] {background:#edcc8c14;color:#fff5e3;}
+.wing-plan-entry[aria-current='true'] .wing-plan-entry-number {color:#edcc8c;}
+.wing-plan-entry:focus-visible,.wing-plan-work:focus-visible,.wing-plan-close:focus-visible {outline:1px solid #edcc8c;outline-offset:-2px;}
+.wing-plan-works {margin:0 0 6px 38px;padding:0;list-style:none;}
+.wing-plan-work {display:block;width:100%;min-height:44px;padding:4px 6px 4px 0;text-align:left;background:none;border:0;
+  color:#b6bcae;font:13px/1.4 var(--sans);cursor:pointer;}
+/* THE WORD READ OUT AND NOT SHOWN: the walk already lights what it has stood at. */
+.wing-plan-said {position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap;}
+
+.wing-plan-foot {flex:0 0 auto;display:flex;justify-content:flex-end;gap:8px;padding:10px 20px;border-top:1px solid #a9977344;}
+.wing-plan-close {min-width:120px;min-height:44px;padding:10px 16px;background:transparent;border:1px solid #a9977366;color:#e6d6b8;
+  font:12px/1.2 var(--sans);cursor:pointer;}
+.wing-plan[data-narrow='true'] .wing-plan-foot {padding:8px 12px;}
+.wing-plan[data-narrow='true'] .wing-plan-close {flex:1 1 auto;}
+.wing-plan[data-narrow='true'] .wing-plan-heading {font-size:18px;}
+.wing-plan[data-narrow='true'] .wing-plan-entry {font-size:13px;}
+.wing-plan[data-narrow='true'] .wing-plan-work {font-size:12px;}
