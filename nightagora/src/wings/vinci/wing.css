@@ -253,6 +253,10 @@
 /* THE WHOLE WORK, NOT A CROP OF IT. A centre crop of a portrait on a black
    ground reads as an empty cell, and a row of works is a row of works. */
 .vinci-strip-thumb {position:absolute;inset:2px;width:calc(100% - 4px);height:calc(100% - 4px);object-fit:contain;}
+/* A DATE HAS NO PLATE. Its cell carries the year the record gives it, so the
+   row reads as a row of exhibits instead of a run of empty mounts. */
+.vinci-strip-year {position:absolute;inset:2px;display:flex;align-items:center;justify-content:center;
+  padding-bottom:9px;font-size:13px;letter-spacing:.01em;color:#1b2630;}
 .vinci-strip-dot {position:relative;width:7px;height:7px;margin-bottom:2px;border-radius:50%;
   background:var(--certainty,#d2a557);box-shadow:0 0 0 2px #0d1720cc;}
 @media(max-aspect-ratio:9/10) {

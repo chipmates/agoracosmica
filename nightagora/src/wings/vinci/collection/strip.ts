@@ -121,6 +121,17 @@ export function createVinciHangStrip(options: {
       button.setAttribute('aria-label', entry.title)
       button.disabled = !entry.openable
       button.tabIndex = -1
+      // A DATE IS AN EXHIBIT WITHOUT A PICTURE. Its own year stands in the
+      // cell, read off the date its record names, and the button keeps the
+      // whole date as its name.
+      const year = entry.preview === null ? /\d{4}/.exec(entry.title)?.[0] : undefined
+      if (year !== undefined && entry.id.startsWith('stud/')) {
+        const stamp = document.createElement('span')
+        stamp.className = 'vinci-strip-year'
+        stamp.textContent = year
+        stamp.setAttribute('aria-hidden', 'true')
+        button.append(stamp)
+      }
       if (entry.preview) {
         const thumb = document.createElement('img')
         thumb.className = 'vinci-strip-thumb'
