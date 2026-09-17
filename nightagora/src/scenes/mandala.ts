@@ -3,12 +3,13 @@
  * the nearest three members of a circular lamp field, in world space, so
  * each pool follows its source while the stones turn independently. */
 import {
-  AdditiveBlending, BackSide, BufferGeometry, Color, Group,
+  AdditiveBlending, BackSide, BoxGeometry, BufferGeometry, Color, Group,
   InstancedBufferAttribute, InstancedBufferGeometry, LatheGeometry, Mesh,
   MeshBasicNodeMaterial, PlaneGeometry, Scene, SphereGeometry, Sprite,
   SpriteNodeMaterial, Vector2,
 } from 'three/webgpu'
 import * as TSL from 'three/tsl'
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js'
 import { combine, piercedCourt, revolve, stoneRing } from './mandala/geometry'
 import {
   abacusGeometry, bayCentre, beamGeometry, COL_H, columnProfile,
@@ -419,15 +420,23 @@ export function createMandala(scene: Scene): MandalaHandles {
       put(abacusGeometry(), COL_H + 0.235)
       put(plinthGeometry(), -PLINTH_H)
     }
+    /* the whole entablature and the treads, as the court lays them: from
+       overhead a beam alone read as a thin strip over pale pegs, and every
+       member the map leaves out is one the room adds at the handover */
+    const lay = (g: BufferGeometry, sx: number, mid: number, x: number, y: number, z: number): void => {
+      const placed = g.scale(sx, 1, 1).rotateY(-mid).translate(x, y, z)
+      parts.push(placed.index ? placed.toNonIndexed() : placed)
+    }
     for (const { mid, half, chord } of ringBays(NEAR.r, NEAR.angles)) {
       const [bx, bz] = bayCentre(NEAR.r, mid, half)
-      parts.push(
-        beamGeometry()
-          .scale(chord + 0.18, 1, 1)
-          .rotateY(-mid)
-          .translate(bx, COL_BASE + COL_H + 0.44, bz)
-          .toNonIndexed()
-      )
+      const beamY = COL_BASE + COL_H + 0.44
+      lay(beamGeometry(), chord + 0.18, mid, bx, beamY, bz)
+      lay(new RoundedBoxGeometry(1, 0.12, 0.76, 1, 0.012), chord + 0.3, mid, bx, beamY + 0.27, bz)
+      lay(new BoxGeometry(1, 0.075, 0.63), chord + 0.2, mid, bx, beamY - 0.12, bz)
+      for (let j = 0; j < 2; j++) {
+        const [sx, sz] = bayCentre(NEAR.r - 0.15 - j * 0.2, mid, half)
+        lay(new BoxGeometry(1, 0.09, 1.32 - j * 0.34), chord + 0.3, mid, sx, FLOOR_Y + 0.045 + j * 0.07, sz)
+      }
     }
     return combine(parts)
   }
@@ -451,11 +460,10 @@ export function createMandala(scene: Scene): MandalaHandles {
     const bedding = oneMinus(
       smoothstep(0.0, 0.02, abs(fract(h.sub(0.32).div(0.59)).sub(0.5))).mul(0.18).mul(shaftMask)
     )
-    /* the court's stone is the PALE one, against the lapis of its floor, so
-       the ring on the map is quarried a step lighter than the paving it
-       stands on. It is still the night's stone: nothing here is limestone in
-       daylight. */
-    let alb: N = mix(c('#2c3750'), c('#6e7587'), grain.mul(0.22).add(0.5))
+    /* the court's stone in the court's night: a column is ink where no fire
+       finds it, so the ring on the map is quarried dark and takes its read
+       from the lamps beside it, never from the sky over it */
+    let alb: N = mix(c('#1c2233'), c('#4a5061'), grain.mul(0.22).add(0.5))
     alb = alb.mul(bedding).mul(hollow)
     /* EVERY LAMP OF THE RING STANDS OUTSIDE THIS COLONNADE, so the faces the
        ride looks at are the unlit ones and the light arrives around the
@@ -472,8 +480,8 @@ export function createMandala(scene: Scene): MandalaHandles {
     // dark verticals from overhead and the questions keep their field
     const lift = smoothstep(0.4, COL_H, h)
     let col: N = alb.mul(
-      c('#8d93ad', 0.7).mul(sky).mul(oneMinus(lift.mul(0.34)))
-        .add(c(GOLD, 1.55).mul(lamp).mul(oneMinus(lift.mul(0.5))))
+      c('#8d93ad', 0.5).mul(sky).mul(oneMinus(lift.mul(0.34)))
+        .add(c(GOLD, 1.7).mul(lamp).mul(oneMinus(lift.mul(0.5))))
     )
     // the well is far from this ring, but it is the only fire in the map and
     // the inner faces know it
@@ -486,6 +494,26 @@ export function createMandala(scene: Scene): MandalaHandles {
     col = col.add(alb.mul(c('#ffb469', 1.2)).mul(courtFire(nF, 7.0, 2.0)).mul(oneMinus(lift.mul(0.73))))
     const dCam = length(cameraPosition.div(uScale).sub(P))
     col = mix(col, c('#101b35', 0.62), smoothstep(9, 42, dCam).mul(uHeat).mul(0.44))
+    /* AT THE SEAT THE RING IS LIT AS THE ROOM LIGHTS IT: ink, a trace of sky,
+       and the one fire on the faces turned to it, dying up the shaft; the
+       dressed members take it more plainly. These are the court's own terms,
+       so the handover changes the stone's grain and not its light. */
+    {
+      const toFire = vec3(0, COURT_FIRE.y, COURT_FIRE.z).sub(P)
+      const fall = float(7.0).div(dot(toFire, toFire).add(2.0)).mul(uFireFlick)
+      const facing = (k: number): N => pow(clamp(dot(nF, normalize(toFire)), 0, 1), k)
+      const isShaft = smoothstep(0.3, 0.34, h).mul(oneMinus(smoothstep(COL_H, COL_H + 0.02, h)))
+      const up = smoothstep(0.5, COL_H, h)
+      const foot = smoothstep(0.1, 0.85, h).mul(0.4).add(0.6)
+      const shaftLit = c('#a9a79c').mul(c('#ffb469')).mul(fall).mul(facing(2.2))
+        .mul(oneMinus(up.mul(0.73)).add(0.055)).mul(0.66).mul(hollow).mul(foot)
+        .add(c('#c2ceff', 0.011).mul(up.mul(0.9).add(0.5)))
+      const dressLit = c('#6f6b60').mul(c('#ffb469')).mul(fall.mul(0.8)).mul(facing(1.5)).mul(0.28)
+        .add(c('#c2ceff', 0.02).mul(max(nF.y, 0).mul(0.58).add(0.42)))
+      const courtCol = c('#0a0e22', 0.42).add(mix(dressLit, shaftLit, isShaft))
+        .mul(grain.mul(0.18).add(0.9))
+      col = mix(col, courtCol, uCourtFire)
+    }
     colonnadeMat.colorNode = shoulder(col).add(dither()).mul(uReveal)
   }
   root.add(new Mesh(colonnadeGeometry(), colonnadeMat))
