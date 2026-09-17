@@ -1,0 +1,1158 @@
+{
+  "schema_version": "1.0",
+  "provenance": {
+    "scope": "A name for every part of every machine, so a tap on the model names the part it lands on and not only a part a step speaks of. Keyed by machine slug and by the part id the machine's own record gives it.",
+    "rule": "Each name is the plain word for the part as the machine's record describes it: its material and role in the dossier, the part notes, the mechanism section and the steps. Repeated parts share one name. A body built outside its record keeps these ids, and the vitrine maps them onto its own node names.",
+    "prepared": "2026-09-17"
+  },
+  "parts": {
+    "aerial-screw": {
+      "platform": {
+        "en": "Platform",
+        "de": "Plattform"
+      },
+      "bearing": {
+        "en": "Plain bearing",
+        "de": "Gleitlager"
+      },
+      "mast": {
+        "en": "Mast",
+        "de": "Mast"
+      },
+      "sail": {
+        "en": "Starched linen spiral",
+        "de": "Spirale aus gestärktem Leinen"
+      },
+      "outer-wire": {
+        "en": "Iron rim",
+        "de": "Rand aus Eisendraht"
+      },
+      "rib-0": {
+        "en": "Cane rib",
+        "de": "Rohrstab"
+      },
+      "rib-1": {
+        "en": "Cane rib",
+        "de": "Rohrstab"
+      },
+      "rib-2": {
+        "en": "Cane rib",
+        "de": "Rohrstab"
+      },
+      "rib-3": {
+        "en": "Cane rib",
+        "de": "Rohrstab"
+      },
+      "rib-4": {
+        "en": "Cane rib",
+        "de": "Rohrstab"
+      },
+      "rib-5": {
+        "en": "Cane rib",
+        "de": "Rohrstab"
+      },
+      "rib-6": {
+        "en": "Cane rib",
+        "de": "Rohrstab"
+      },
+      "rib-7": {
+        "en": "Cane rib",
+        "de": "Rohrstab"
+      },
+      "rib-8": {
+        "en": "Cane rib",
+        "de": "Rohrstab"
+      },
+      "rib-9": {
+        "en": "Cane rib",
+        "de": "Rohrstab"
+      },
+      "rib-10": {
+        "en": "Cane rib",
+        "de": "Rohrstab"
+      },
+      "rib-11": {
+        "en": "Cane rib",
+        "de": "Rohrstab"
+      },
+      "rib-12": {
+        "en": "Cane rib",
+        "de": "Rohrstab"
+      },
+      "push-bar-0": {
+        "en": "Push bar",
+        "de": "Schubstange"
+      },
+      "stay-0": {
+        "en": "Rope brace",
+        "de": "Seilstrebe"
+      },
+      "push-bar-1": {
+        "en": "Push bar",
+        "de": "Schubstange"
+      },
+      "stay-1": {
+        "en": "Rope brace",
+        "de": "Seilstrebe"
+      },
+      "push-bar-2": {
+        "en": "Push bar",
+        "de": "Schubstange"
+      },
+      "stay-2": {
+        "en": "Rope brace",
+        "de": "Seilstrebe"
+      },
+      "push-bar-3": {
+        "en": "Push bar",
+        "de": "Schubstange"
+      },
+      "stay-3": {
+        "en": "Rope brace",
+        "de": "Seilstrebe"
+      }
+    },
+    "parachute": {
+      "canopy": {
+        "en": "Sealed linen canopy",
+        "de": "Schirm aus abgedichtetem Leinen"
+      },
+      "frame-0": {
+        "en": "Frame pole",
+        "de": "Rahmenstange"
+      },
+      "frame-1": {
+        "en": "Frame pole",
+        "de": "Rahmenstange"
+      },
+      "frame-2": {
+        "en": "Frame pole",
+        "de": "Rahmenstange"
+      },
+      "frame-3": {
+        "en": "Frame pole",
+        "de": "Rahmenstange"
+      },
+      "harness": {
+        "en": "Harness ring",
+        "de": "Tragering"
+      },
+      "suspension-0": {
+        "en": "Suspension rope",
+        "de": "Tragseil"
+      },
+      "suspension-1": {
+        "en": "Suspension rope",
+        "de": "Tragseil"
+      },
+      "suspension-2": {
+        "en": "Suspension rope",
+        "de": "Tragseil"
+      },
+      "suspension-3": {
+        "en": "Suspension rope",
+        "de": "Tragseil"
+      }
+    },
+    "anemometer": {
+      "base": {
+        "en": "Base",
+        "de": "Sockel"
+      },
+      "post": {
+        "en": "Post",
+        "de": "Pfosten"
+      },
+      "rail": {
+        "en": "Overhead rail",
+        "de": "Oberer Balken"
+      },
+      "vane": {
+        "en": "Hinged plate",
+        "de": "Klappplatte"
+      },
+      "quadrant": {
+        "en": "Curved scale",
+        "de": "Skalenbogen"
+      },
+      "tick-0": {
+        "en": "Scale mark",
+        "de": "Teilstrich"
+      },
+      "tick-1": {
+        "en": "Scale mark",
+        "de": "Teilstrich"
+      },
+      "tick-2": {
+        "en": "Scale mark",
+        "de": "Teilstrich"
+      },
+      "tick-3": {
+        "en": "Scale mark",
+        "de": "Teilstrich"
+      },
+      "tick-4": {
+        "en": "Scale mark",
+        "de": "Teilstrich"
+      },
+      "tick-5": {
+        "en": "Scale mark",
+        "de": "Teilstrich"
+      },
+      "tick-6": {
+        "en": "Scale mark",
+        "de": "Teilstrich"
+      },
+      "hinge-pin": {
+        "en": "Hinge pin",
+        "de": "Scharnierstift"
+      },
+      "fixed-hinge-eye--1": {
+        "en": "Fixed hinge eye",
+        "de": "Feste Scharnieröse"
+      },
+      "hinge-hanger--1": {
+        "en": "Hinge hanger",
+        "de": "Scharnierhalter"
+      },
+      "moving-hinge-eye--1": {
+        "en": "Moving hinge eye",
+        "de": "Bewegliche Scharnieröse"
+      },
+      "fixed-hinge-eye-1": {
+        "en": "Fixed hinge eye",
+        "de": "Feste Scharnieröse"
+      },
+      "hinge-hanger-1": {
+        "en": "Hinge hanger",
+        "de": "Scharnierhalter"
+      },
+      "moving-hinge-eye-1": {
+        "en": "Moving hinge eye",
+        "de": "Bewegliche Scharnieröse"
+      },
+      "quadrant-bracket": {
+        "en": "Scale bracket",
+        "de": "Skalenhalter"
+      }
+    },
+    "inclinometer": {
+      "support": {
+        "en": "Support",
+        "de": "Gestell"
+      },
+      "deck": {
+        "en": "Deck",
+        "de": "Deck"
+      },
+      "wind-shield": {
+        "en": "Glass bell",
+        "de": "Glashaube"
+      },
+      "pendulum": {
+        "en": "Plumb thread",
+        "de": "Lotfaden"
+      },
+      "bob": {
+        "en": "Lead weight",
+        "de": "Bleigewicht"
+      },
+      "ring-1": {
+        "en": "Marked circle",
+        "de": "Markierungskreis"
+      },
+      "ring-2": {
+        "en": "Marked circle",
+        "de": "Markierungskreis"
+      },
+      "ring-3": {
+        "en": "Marked circle",
+        "de": "Markierungskreis"
+      },
+      "ring-4": {
+        "en": "Marked circle",
+        "de": "Markierungskreis"
+      },
+      "roll-shaft": {
+        "en": "Tilt shaft",
+        "de": "Kippachse"
+      },
+      "journal-eye--1": {
+        "en": "Bearing eye",
+        "de": "Lageröse"
+      },
+      "journal-post--1": {
+        "en": "Bearing post",
+        "de": "Lagerpfosten"
+      },
+      "journal-eye-1": {
+        "en": "Bearing eye",
+        "de": "Lageröse"
+      },
+      "journal-post-1": {
+        "en": "Bearing post",
+        "de": "Lagerpfosten"
+      },
+      "thread-suspension": {
+        "en": "Thread hook",
+        "de": "Fadenaufhängung"
+      }
+    },
+    "multi-barrel-gun": {
+      "chassis": {
+        "en": "Chassis",
+        "de": "Fahrgestell"
+      },
+      "trail-left": {
+        "en": "Left trail",
+        "de": "Linker Lafettenholm"
+      },
+      "trail-right": {
+        "en": "Right trail",
+        "de": "Rechter Lafettenholm"
+      },
+      "axle": {
+        "en": "Axle",
+        "de": "Achse"
+      },
+      "wheel--1": {
+        "en": "Wheel",
+        "de": "Rad"
+      },
+      "upright--1": {
+        "en": "Upright",
+        "de": "Ständer"
+      },
+      "wheel-1": {
+        "en": "Wheel",
+        "de": "Rad"
+      },
+      "upright-1": {
+        "en": "Upright",
+        "de": "Ständer"
+      },
+      "drum": {
+        "en": "Turning frame",
+        "de": "Drehrahmen"
+      },
+      "bank-0": {
+        "en": "Barrel bank",
+        "de": "Rohrreihe"
+      },
+      "barrel-0-0": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "barrel-0-1": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "barrel-0-2": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "barrel-0-3": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "barrel-0-4": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "barrel-0-5": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "barrel-0-6": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "barrel-0-7": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "barrel-0-8": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "barrel-0-9": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "barrel-0-10": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "bank-1": {
+        "en": "Barrel bank",
+        "de": "Rohrreihe"
+      },
+      "barrel-1-0": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "barrel-1-1": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "barrel-1-2": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "barrel-1-3": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "barrel-1-4": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "barrel-1-5": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "barrel-1-6": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "barrel-1-7": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "barrel-1-8": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "barrel-1-9": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "barrel-1-10": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "bank-2": {
+        "en": "Barrel bank",
+        "de": "Rohrreihe"
+      },
+      "barrel-2-0": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "barrel-2-1": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "barrel-2-2": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "barrel-2-3": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "barrel-2-4": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "barrel-2-5": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "barrel-2-6": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "barrel-2-7": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "barrel-2-8": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "barrel-2-9": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "barrel-2-10": {
+        "en": "Barrel",
+        "de": "Rohr"
+      },
+      "triangle--1": {
+        "en": "Triangular end plate",
+        "de": "Dreieckige Endplatte"
+      },
+      "triangle-1": {
+        "en": "Triangular end plate",
+        "de": "Dreieckige Endplatte"
+      },
+      "handbar": {
+        "en": "Hand bar",
+        "de": "Handgriff"
+      }
+    },
+    "rolling-mill": {
+      "base": {
+        "en": "Base",
+        "de": "Sockel"
+      },
+      "left-post": {
+        "en": "Left post",
+        "de": "Linker Ständer"
+      },
+      "right-post": {
+        "en": "Right post",
+        "de": "Rechter Ständer"
+      },
+      "upper": {
+        "en": "Upper bronze roller",
+        "de": "Obere Bronzewalze"
+      },
+      "lower": {
+        "en": "Lower bronze roller",
+        "de": "Untere Bronzewalze"
+      },
+      "upper-axle": {
+        "en": "Upper axle",
+        "de": "Obere Achse"
+      },
+      "lower-axle": {
+        "en": "Lower axle",
+        "de": "Untere Achse"
+      },
+      "driver": {
+        "en": "Small gear",
+        "de": "Kleines Zahnrad"
+      },
+      "driven": {
+        "en": "Large gear",
+        "de": "Großes Zahnrad"
+      },
+      "crank-arm": {
+        "en": "Crank arm",
+        "de": "Kurbelarm"
+      },
+      "crank-grip": {
+        "en": "Crank handle",
+        "de": "Kurbelgriff"
+      },
+      "input-shaft": {
+        "en": "Crank shaft",
+        "de": "Kurbelwelle"
+      },
+      "input-journal": {
+        "en": "Shaft bearing",
+        "de": "Wellenlager"
+      },
+      "input-journal-post": {
+        "en": "Bearing post",
+        "de": "Lagerpfosten"
+      }
+    },
+    "ball-bearing": {
+      "base": {
+        "en": "Base",
+        "de": "Sockel"
+      },
+      "lower-plate": {
+        "en": "Lower plate",
+        "de": "Untere Platte"
+      },
+      "upper-plate": {
+        "en": "Upper plate",
+        "de": "Obere Platte"
+      },
+      "carrier": {
+        "en": "Ball carrier",
+        "de": "Kugelträger"
+      },
+      "ball-0": {
+        "en": "Wooden ball",
+        "de": "Holzkugel"
+      },
+      "separator-0": {
+        "en": "Pivoted wheel",
+        "de": "Gelagertes Rädchen"
+      },
+      "ball-1": {
+        "en": "Wooden ball",
+        "de": "Holzkugel"
+      },
+      "separator-1": {
+        "en": "Pivoted wheel",
+        "de": "Gelagertes Rädchen"
+      },
+      "ball-2": {
+        "en": "Wooden ball",
+        "de": "Holzkugel"
+      },
+      "separator-2": {
+        "en": "Pivoted wheel",
+        "de": "Gelagertes Rädchen"
+      },
+      "ball-3": {
+        "en": "Wooden ball",
+        "de": "Holzkugel"
+      },
+      "separator-3": {
+        "en": "Pivoted wheel",
+        "de": "Gelagertes Rädchen"
+      },
+      "ball-4": {
+        "en": "Wooden ball",
+        "de": "Holzkugel"
+      },
+      "separator-4": {
+        "en": "Pivoted wheel",
+        "de": "Gelagertes Rädchen"
+      },
+      "ball-5": {
+        "en": "Wooden ball",
+        "de": "Holzkugel"
+      },
+      "separator-5": {
+        "en": "Pivoted wheel",
+        "de": "Gelagertes Rädchen"
+      },
+      "ball-6": {
+        "en": "Wooden ball",
+        "de": "Holzkugel"
+      },
+      "separator-6": {
+        "en": "Pivoted wheel",
+        "de": "Gelagertes Rädchen"
+      },
+      "ball-7": {
+        "en": "Wooden ball",
+        "de": "Holzkugel"
+      },
+      "separator-7": {
+        "en": "Pivoted wheel",
+        "de": "Gelagertes Rädchen"
+      },
+      "separator-axle-0": {
+        "en": "Wheel axle",
+        "de": "Achse des Rädchens"
+      },
+      "separator-axle-1": {
+        "en": "Wheel axle",
+        "de": "Achse des Rädchens"
+      },
+      "separator-axle-2": {
+        "en": "Wheel axle",
+        "de": "Achse des Rädchens"
+      },
+      "separator-axle-3": {
+        "en": "Wheel axle",
+        "de": "Achse des Rädchens"
+      },
+      "separator-axle-4": {
+        "en": "Wheel axle",
+        "de": "Achse des Rädchens"
+      },
+      "separator-axle-5": {
+        "en": "Wheel axle",
+        "de": "Achse des Rädchens"
+      },
+      "separator-axle-6": {
+        "en": "Wheel axle",
+        "de": "Achse des Rädchens"
+      },
+      "separator-axle-7": {
+        "en": "Wheel axle",
+        "de": "Achse des Rädchens"
+      },
+      "central-post": {
+        "en": "Central post",
+        "de": "Mittelzapfen"
+      }
+    },
+    "flywheel": {
+      "base": {
+        "en": "Base",
+        "de": "Sockel"
+      },
+      "support": {
+        "en": "Bearing stand",
+        "de": "Lagerbock"
+      },
+      "rotor": {
+        "en": "Shaft",
+        "de": "Welle"
+      },
+      "spoke-x": {
+        "en": "Spoke",
+        "de": "Speiche"
+      },
+      "spoke-z": {
+        "en": "Spoke",
+        "de": "Speiche"
+      },
+      "weight-0": {
+        "en": "Stone weight",
+        "de": "Steingewicht"
+      },
+      "weight-1": {
+        "en": "Stone weight",
+        "de": "Steingewicht"
+      },
+      "weight-2": {
+        "en": "Stone weight",
+        "de": "Steingewicht"
+      },
+      "weight-3": {
+        "en": "Stone weight",
+        "de": "Steingewicht"
+      },
+      "thrust-pad": {
+        "en": "Thrust pad",
+        "de": "Spurlager"
+      }
+    },
+    "revolving-crane": {
+      "base": {
+        "en": "Base",
+        "de": "Sockel"
+      },
+      "turntable": {
+        "en": "Turntable",
+        "de": "Drehscheibe"
+      },
+      "mast": {
+        "en": "Mast",
+        "de": "Mast"
+      },
+      "jib": {
+        "en": "Jib",
+        "de": "Ausleger"
+      },
+      "counterweight": {
+        "en": "Counterweight",
+        "de": "Gegengewicht"
+      },
+      "drum": {
+        "en": "Drum",
+        "de": "Trommel"
+      },
+      "rear-pulley": {
+        "en": "Pulley at the mast",
+        "de": "Rolle am Mast"
+      },
+      "tip-pulley": {
+        "en": "Pulley at the tip of the jib",
+        "de": "Rolle an der Spitze des Auslegers"
+      },
+      "load": {
+        "en": "Stone load",
+        "de": "Steinlast"
+      },
+      "handle": {
+        "en": "Crank",
+        "de": "Kurbel"
+      },
+      "brace": {
+        "en": "Brace",
+        "de": "Strebe"
+      },
+      "hoist-rope": {
+        "en": "Hoist rope",
+        "de": "Hubseil"
+      },
+      "pawl": {
+        "en": "Pawl",
+        "de": "Sperrklinke"
+      },
+      "ratchet": {
+        "en": "Ratchet wheel",
+        "de": "Sperrrad"
+      },
+      "counterweight-bracket": {
+        "en": "Counterweight bracket",
+        "de": "Halter des Gegengewichts"
+      },
+      "drum-support-crossbar": {
+        "en": "Drum crossbar",
+        "de": "Querholz der Trommel"
+      },
+      "drum-axle": {
+        "en": "Drum axle",
+        "de": "Trommelachse"
+      },
+      "handle-grip": {
+        "en": "Crank handle",
+        "de": "Kurbelgriff"
+      },
+      "drum-journal-left": {
+        "en": "Left drum bearing",
+        "de": "Linkes Trommellager"
+      },
+      "drum-journal-right": {
+        "en": "Right drum bearing",
+        "de": "Rechtes Trommellager"
+      },
+      "rear-cheek-left": {
+        "en": "Cheek of the mast pulley",
+        "de": "Wange der Rolle am Mast"
+      },
+      "rear-cheek-right": {
+        "en": "Cheek of the mast pulley",
+        "de": "Wange der Rolle am Mast"
+      },
+      "rear-axle": {
+        "en": "Axle of the mast pulley",
+        "de": "Achse der Rolle am Mast"
+      },
+      "tip-cheek-left": {
+        "en": "Cheek of the jib pulley",
+        "de": "Wange der Rolle am Ausleger"
+      },
+      "tip-cheek-right": {
+        "en": "Cheek of the jib pulley",
+        "de": "Wange der Rolle am Ausleger"
+      },
+      "tip-axle": {
+        "en": "Axle of the jib pulley",
+        "de": "Achse der Rolle am Ausleger"
+      },
+      "slew-pin": {
+        "en": "Pivot pin",
+        "de": "Drehzapfen"
+      },
+      "turntable-thrust-ring": {
+        "en": "Thrust ring",
+        "de": "Laufring"
+      },
+      "drum-wrap": {
+        "en": "Rope on the drum",
+        "de": "Seil auf der Trommel"
+      },
+      "rope-anchor": {
+        "en": "Rope anchor",
+        "de": "Seilanker"
+      }
+    },
+    "lathe": {
+      "base": {
+        "en": "Base",
+        "de": "Sockel"
+      },
+      "bench": {
+        "en": "Bench",
+        "de": "Werkbank"
+      },
+      "left-leg": {
+        "en": "Left leg",
+        "de": "Linkes Bein"
+      },
+      "right-leg": {
+        "en": "Right leg",
+        "de": "Rechtes Bein"
+      },
+      "headstock": {
+        "en": "Headstock",
+        "de": "Spindelstock"
+      },
+      "tailstock": {
+        "en": "Tailstock",
+        "de": "Reitstock"
+      },
+      "spindle": {
+        "en": "Spindle",
+        "de": "Spindel"
+      },
+      "spool": {
+        "en": "Rope spool",
+        "de": "Seilspule"
+      },
+      "footbar": {
+        "en": "Foot bar",
+        "de": "Fußstange"
+      },
+      "bow-post": {
+        "en": "Bow post",
+        "de": "Bogenpfosten"
+      },
+      "drill-bit": {
+        "en": "Drill",
+        "de": "Bohrer"
+      },
+      "feed-screw": {
+        "en": "Feed screw",
+        "de": "Vorschubschraube"
+      },
+      "nut": {
+        "en": "Bronze nut",
+        "de": "Bronzemutter"
+      },
+      "bow": {
+        "en": "Spring bow",
+        "de": "Federbogen"
+      },
+      "drive-rope": {
+        "en": "Drive rope",
+        "de": "Zugseil"
+      },
+      "thread": {
+        "en": "Screw thread",
+        "de": "Gewinde"
+      },
+      "nut-post": {
+        "en": "Nut post",
+        "de": "Halter der Mutter"
+      },
+      "drill-tip": {
+        "en": "Drill point",
+        "de": "Bohrerspitze"
+      },
+      "foot-guide-left": {
+        "en": "Foot bar guide",
+        "de": "Führung der Fußstange"
+      },
+      "foot-guide-right": {
+        "en": "Foot bar guide",
+        "de": "Führung der Fußstange"
+      }
+    },
+    "miter-lock-gates": {
+      "sill": {
+        "en": "Sill",
+        "de": "Schwelle"
+      },
+      "post-left": {
+        "en": "Left gate post",
+        "de": "Linker Torpfosten"
+      },
+      "post-right": {
+        "en": "Right gate post",
+        "de": "Rechter Torpfosten"
+      },
+      "leaf-left": {
+        "en": "Left leaf",
+        "de": "Linker Torflügel"
+      },
+      "panel-left": {
+        "en": "Lower planking",
+        "de": "Untere Beplankung"
+      },
+      "upper-panel-left": {
+        "en": "Upper planking",
+        "de": "Obere Beplankung"
+      },
+      "wicket-side-a-left": {
+        "en": "Planking beside the small door",
+        "de": "Beplankung neben der kleinen Tür"
+      },
+      "wicket-side-b-left": {
+        "en": "Planking beside the small door",
+        "de": "Beplankung neben der kleinen Tür"
+      },
+      "wicket-left": {
+        "en": "Small door",
+        "de": "Kleine Tür"
+      },
+      "latch-left": {
+        "en": "Latch",
+        "de": "Riegel"
+      },
+      "crossbeam-left-0": {
+        "en": "Crossbeam",
+        "de": "Querbalken"
+      },
+      "crossbeam-left-1": {
+        "en": "Crossbeam",
+        "de": "Querbalken"
+      },
+      "crossbeam-left-2": {
+        "en": "Crossbeam",
+        "de": "Querbalken"
+      },
+      "leaf-right": {
+        "en": "Right leaf",
+        "de": "Rechter Torflügel"
+      },
+      "panel-right": {
+        "en": "Lower planking",
+        "de": "Untere Beplankung"
+      },
+      "upper-panel-right": {
+        "en": "Upper planking",
+        "de": "Obere Beplankung"
+      },
+      "wicket-side-a-right": {
+        "en": "Planking beside the small door",
+        "de": "Beplankung neben der kleinen Tür"
+      },
+      "wicket-side-b-right": {
+        "en": "Planking beside the small door",
+        "de": "Beplankung neben der kleinen Tür"
+      },
+      "wicket-right": {
+        "en": "Small door",
+        "de": "Kleine Tür"
+      },
+      "latch-right": {
+        "en": "Latch",
+        "de": "Riegel"
+      },
+      "crossbeam-right-0": {
+        "en": "Crossbeam",
+        "de": "Querbalken"
+      },
+      "crossbeam-right-1": {
+        "en": "Crossbeam",
+        "de": "Querbalken"
+      },
+      "crossbeam-right-2": {
+        "en": "Crossbeam",
+        "de": "Querbalken"
+      }
+    },
+    "water-lifting-screw": {
+      "base": {
+        "en": "Base",
+        "de": "Sockel"
+      },
+      "lower-bearing": {
+        "en": "Lower bearing",
+        "de": "Unteres Lager"
+      },
+      "upper-bearing": {
+        "en": "Upper bearing",
+        "de": "Oberes Lager"
+      },
+      "support": {
+        "en": "Support",
+        "de": "Stütze"
+      },
+      "support2": {
+        "en": "Support",
+        "de": "Stütze"
+      },
+      "rotor": {
+        "en": "Shaft hub",
+        "de": "Wellennabe"
+      },
+      "shaft": {
+        "en": "Shaft",
+        "de": "Welle"
+      },
+      "crank": {
+        "en": "Crank",
+        "de": "Kurbel"
+      },
+      "handle": {
+        "en": "Crank handle",
+        "de": "Kurbelgriff"
+      },
+      "helical-tube": {
+        "en": "Helical tube",
+        "de": "Gewundenes Rohr"
+      },
+      "lower-trough-base": {
+        "en": "Lower trough",
+        "de": "Untere Rinne"
+      },
+      "lower-wall-l": {
+        "en": "Wall of the lower trough",
+        "de": "Wand der unteren Rinne"
+      },
+      "lower-wall-r": {
+        "en": "Wall of the lower trough",
+        "de": "Wand der unteren Rinne"
+      },
+      "lower-wall-front": {
+        "en": "Wall of the lower trough",
+        "de": "Wand der unteren Rinne"
+      },
+      "lower-wall-back": {
+        "en": "Wall of the lower trough",
+        "de": "Wand der unteren Rinne"
+      },
+      "upper-trough-base": {
+        "en": "Upper trough",
+        "de": "Obere Rinne"
+      },
+      "upper-wall-l": {
+        "en": "Wall of the upper trough",
+        "de": "Wand der oberen Rinne"
+      },
+      "upper-wall-r": {
+        "en": "Wall of the upper trough",
+        "de": "Wand der oberen Rinne"
+      },
+      "upper-wall-front": {
+        "en": "Wall of the upper trough",
+        "de": "Wand der oberen Rinne"
+      },
+      "upper-wall-back": {
+        "en": "Wall of the upper trough",
+        "de": "Wand der oberen Rinne"
+      }
+    },
+    "proportional-compass": {
+      "pivot": {
+        "en": "Pivot",
+        "de": "Drehpunkt"
+      },
+      "leg-left": {
+        "en": "Leg",
+        "de": "Schenkel"
+      },
+      "leg-right": {
+        "en": "Leg",
+        "de": "Schenkel"
+      },
+      "screw-head": {
+        "en": "Screw",
+        "de": "Schraube"
+      }
+    },
+    "camera-obscura": {
+      "floor": {
+        "en": "Floor",
+        "de": "Boden"
+      },
+      "roof": {
+        "en": "Roof",
+        "de": "Decke"
+      },
+      "left-wall": {
+        "en": "Left wall",
+        "de": "Linke Wand"
+      },
+      "right-wall": {
+        "en": "Right wall",
+        "de": "Rechte Wand"
+      },
+      "back-wall": {
+        "en": "Back wall",
+        "de": "Rückwand"
+      },
+      "front-left": {
+        "en": "Front wall",
+        "de": "Vorderwand"
+      },
+      "front-right": {
+        "en": "Front wall",
+        "de": "Vorderwand"
+      },
+      "front-bottom": {
+        "en": "Front wall",
+        "de": "Vorderwand"
+      },
+      "front-top": {
+        "en": "Front wall",
+        "de": "Vorderwand"
+      },
+      "screen": {
+        "en": "White paper",
+        "de": "Weißes Papier"
+      },
+      "aperture-plate": {
+        "en": "Iron plate with the hole",
+        "de": "Eisenplatte mit dem Loch"
+      }
+    }
+  }
+}
