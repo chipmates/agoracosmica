@@ -8,6 +8,10 @@
 //   node forge/leg-probe.mjs <from> <to> [--tier=hero,standard] [--wing=vinci]
 //   node forge/leg-probe.mjs --entry [--tier=hero,standard]
 //   FORGE_PORT=5288 node forge/leg-probe.mjs chamber garden
+//   node forge/leg-probe.mjs --walk [--tier=hero,standard] [--json=out.json]
+//
+// `--walk` walks every leg of the rail in order in one page, each one read
+// to its arrival and two seconds past it: the whole walk a visitor makes.
 //
 // `--entry` measures the other half of the same wait: the seconds from the
 // press in the lobby (and from the deep link) to the wing's first frame,
@@ -17,7 +21,8 @@
 // unbundled modules make every number slower than the one that ships.
 import { chromium } from 'playwright'
 import { spawn } from 'node:child_process'
-import { APP_ROOT, assertServer, browserArgs, waitForServer } from './rig.mjs'
+import { writeFileSync } from 'node:fs'
+import { APP_ROOT, assertServer, browserArgs, FRAME_TIME_FLAGS, waitForServer } from './rig.mjs'
 
 const argv = process.argv.slice(2)
 const flags = new Map()
@@ -37,17 +42,24 @@ const SETTLE = Number(flag('settle', 6))
 const VIEW = { width: Number(flag('width', 1440)), height: Number(flag('height', 900)) }
 const ENTRY = flags.has('entry')
 const DEV = flags.has('dev')
+const WALK = flags.has('walk')
 const [FROM, TO] = [words[0] ?? 'chamber', words[1] ?? 'garden']
 
 /** the number a station's own card carries, which is what says ARRIVED: the
     rail's index is the station ASKED for and it changes when the leg starts */
 const cardNumber = (ids, id) => `${String(ids.indexOf(id) + 1).padStart(2, '0')} / ${ids.length}`
 
-async function sampleLeg(page, ids) {
+async function sampleLeg(page, ids, to = TO) {
   return page.evaluate(async ([to, toNo, seconds]) => {
     const t0 = performance.now(); const dts = []; let last = t0; let arrived = null; let stop = false
+    // what the renderer created for the first time, frame by frame: a leg
+    // that creates nothing has nothing to stall on
+    const ledger = window.__naStack?.ledger
+    const kinds = ['nodeBuilds', 'programs', 'pipelines', 'textures', 'buffers']
+    const created = []; let before = ledger?.counts()
     const tick = (t) => {
       dts.push(t - last); last = t
+      if (ledger) { const now = ledger.counts(); created.push(kinds.map(k => now[k] - before[k])); before = now }
       if (arrived === null && document.body.innerText.includes(toNo)) arrived = t - t0
       if (!stop) requestAnimationFrame(tick)
     }
@@ -56,7 +68,11 @@ async function sampleLeg(page, ids) {
     const idleN = dts.length
     history.pushState({}, '', location.pathname + location.search + '#s=' + to)
     dispatchEvent(new PopStateEvent('popstate'))
-    await new Promise(r => setTimeout(r, seconds * 1000)); stop = true
+    // the window closes two seconds after the arrival, or at the cap
+    const began = performance.now()
+    while (performance.now() - began < seconds * 1000 && !(arrived !== null && performance.now() - t0 > arrived + 2000))
+      await new Promise(r => setTimeout(r, 100))
+    stop = true
     const q = (a, p) => [...a].sort((x, y) => x - y)[Math.floor(p * (a.length - 1))]
     const band = (a) => a.length ? {
       frames: a.length, mean: Math.round(a.reduce((x, c) => x + c, 0) / a.length),
@@ -67,16 +83,22 @@ async function sampleLeg(page, ids) {
     // settling, which is a different reading and is reported as one.
     let arrivedN = dts.length
     for (let i = idleN, acc = 0; i < dts.length; i++) { acc += dts[i]; if (arrived !== null && acc >= arrived - 1500) { arrivedN = i; break } }
+    const said = (c) => c && c.some(Boolean) ? ` [${kinds.map((k, j) => c[j] ? `${k} ${c[j]}` : '').filter(Boolean).join(' ')}]` : ''
     let acc = 0; const hitches = []
-    for (let i = 0; i < dts.length; i++) { acc += dts[i]; if (i >= idleN && dts[i] > 50) hitches.push(`${(acc / 1000 - 1.5).toFixed(2)}s ${Math.round(dts[i])}ms`) }
+    // a frame's creations are counted in the tick that follows it
+    for (let i = 0; i < dts.length; i++) { acc += dts[i]; if (i >= idleN && dts[i] > 50) hitches.push(`${(acc / 1000 - 1.5).toFixed(2)}s ${Math.round(dts[i])}ms${said(created[i])}`) }
+    const total = (from, to) => kinds.map((_, j) => created.slice(from, to).reduce((a, c) => a + c[j], 0))
+    const firstUse = ledger ? { leg: Object.fromEntries(kinds.map((k, j) => [k, total(idleN, arrivedN)[j]])),
+      after: Object.fromEntries(kinds.map((k, j) => [k, total(arrivedN, dts.length)[j]])) } : null
     return {
       idle: band(dts.slice(0, idleN)),
       leg: band(dts.slice(idleN, arrivedN)),
       after: band(dts.slice(arrivedN)),
       arrivedAt: arrived === null ? null : Math.round(arrived) / 1000,
       hitches: hitches.slice(0, 16),
+      firstUse,
     }
-  }, [TO, cardNumber(ids, TO), SECONDS])
+  }, [to, cardNumber(ids, to), SECONDS])
 }
 
 /** the entry as the visitor waits it out: the gold field is lit from the
@@ -137,7 +159,7 @@ try {
   await waitForServer(`${BASE}/`)
   const said = await assertServer(BASE)
   console.error(`server ${said.head.slice(0, 7)} on ${BASE}${DEV ? ' (dev: unbundled modules, slower than the ship)' : ''}`)
-  const browser = await chromium.launch({ args: browserArgs() })
+  const browser = await chromium.launch({ args: [...browserArgs(), ...FRAME_TIME_FLAGS] })
   for (const tier of TIERS) {
     if (ENTRY) {
       const press = await oneEntry(browser, `${BASE}/?probe=1&tier=${tier}`, 'press', true)
@@ -150,6 +172,35 @@ try {
     const ctx = await browser.newContext({ viewport: VIEW })
     const page = await ctx.newPage()
     const noise = []
+    if (WALK) {
+      page.on('pageerror', e => noise.push(`PAGE ERROR ${e.message.slice(0, 90)}`))
+      await page.goto(`${BASE}/w/${WING}?probe=1&tier=${tier}`, { waitUntil: 'load' })
+      const ids = await page.waitForFunction(() => {
+        const s = window.__forge?.state?.()
+        return s && s.phase === 'wing' && s.stationIds.length ? s.stationIds : null
+      }, null, { timeout: 90000 }).then(h => h.jsonValue())
+      await page.waitForFunction(n => document.body.innerText.includes(n), cardNumber(ids, ids[0]), { timeout: 90000 })
+      const legs = []
+      for (let i = 0; i + 1 < ids.length; i++) {
+        await page.waitForFunction(() => window.__forge.state().texturesPending === 0, null, { timeout: 30000 }).catch(() => {})
+        await page.waitForTimeout(SETTLE * 1000)
+        const r = await sampleLeg(page, ids, ids[i + 1])
+        legs.push({ from: ids[i], to: ids[i + 1], ...r })
+        const b = r.leg
+        console.log(`${tier.padEnd(9)}${`${ids[i]} to ${ids[i + 1]}`.padEnd(30)}` +
+          (b ? `p95 ${String(b.p95).padStart(3)} max ${String(b.max).padStart(5)} over50 ${String(b.over50).padStart(2)}` : 'no frames') +
+          `  arrive ${r.arrivedAt ?? 'never'}  ${r.firstUse ? JSON.stringify(r.firstUse.leg) : ''}` +
+          (r.hitches.length ? `\n            ${r.hitches.join(' | ')}` : ''))
+      }
+      const worst = legs.reduce((m, l) => Math.max(m, l.leg?.max ?? 0), 0)
+      const over = legs.reduce((n, l) => n + (l.leg?.over50 ?? 0), 0)
+      console.log(`${tier}: ${legs.length} legs, worst frame ${worst} ms, ${over} frame(s) over 50 ms on a leg`)
+      const file = flag('json', '')
+      if (file) writeFileSync(String(file).replace('.json', `-${tier}.json`), JSON.stringify(legs, null, 1))
+      console.log(`   console ${noise.filter(l => !/PostProcessing|uv" not found/.test(l)).slice(0, 6).join(' | ') || 'quiet'}`)
+      await ctx.close()
+      continue
+    }
     page.on('console', m => { if (m.type() !== 'log' || /backend=/.test(m.text())) noise.push(m.text().slice(0, 110)) })
     page.on('pageerror', e => noise.push(`PAGE ERROR ${e.message.slice(0, 90)}`))
     {
@@ -175,6 +226,7 @@ try {
       console.log(`   after  ${line(r.after)}`)
       console.log(`   arrive ${r.arrivedAt === null ? `not within ${SECONDS} s` : r.arrivedAt + ' s'}`)
       console.log(`   hitches ${r.hitches.length ? r.hitches.join(' | ') : 'none over 50 ms'}`)
+      if (r.firstUse) console.log(`   created on the leg ${JSON.stringify(r.firstUse.leg)}, after ${JSON.stringify(r.firstUse.after)}`)
     }
     console.log(`   console ${noise.filter(l => !/PostProcessing|uv" not found/.test(l)).slice(0, 6).join(' | ') || 'quiet'}`)
     await ctx.close()

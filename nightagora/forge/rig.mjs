@@ -21,6 +21,12 @@ export const GPU_FLAGS = [
   '--ignore-gpu-blocklist',
 ]
 
+/* A FRAME TIME IS NOT CLAMPED TO THE DISPLAY. Headless Chromium still paces
+   presentation to a refresh interval, so a stall shorter than one interval
+   reads as one interval and a fast frame reads as a slow one. Every
+   instrument that reports a frame time runs with these on top. */
+export const FRAME_TIME_FLAGS = ['--disable-gpu-vsync', '--disable-frame-rate-limit']
+
 /** the WebGL2 path is tested by taking the flags away: without them the
     adapter request fails, the app falls back through forceWebGL, and the same
     node graph has to compile on the other backend */

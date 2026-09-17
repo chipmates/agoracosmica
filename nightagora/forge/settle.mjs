@@ -161,6 +161,25 @@ export async function steadyCost(page, { frames = WINDOW_FRAMES, holds = HOLDS, 
   }
 }
 
+/* A STATION IS READ WHERE IT STANDS. Asking the frame for a station walks
+   the rail there, and a leg takes seconds: four windows taken on the way can
+   agree for a second and put a frame of the corridor on the station's line.
+   So a reading waits until the rail bar names the station as the one the
+   walker completed, with no station still a target. */
+export async function arrive(page, id, ms = 60000) {
+  return page
+    .waitForFunction(
+      (want) => {
+        const here = document.querySelector('.wing-step[aria-current="true"]')
+        return here?.dataset.station === want && !document.querySelector('.wing-step[data-target="true"]')
+      },
+      id,
+      { timeout: ms, polling: 100 }
+    )
+    .then(() => true)
+    .catch(() => false)
+}
+
 /* THE COLD FIRST STATION. The first thing a run measures is a scene that has
    just been built: sets still in flight, shaders still compiling. The
    courtyard has read 183 draws and 1.5 M triangles that way. So the first

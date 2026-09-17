@@ -24,6 +24,7 @@
 
 import { PCFSoftShadowMap, Vector2, WebGPURenderer, type Camera, type Mesh, type Scene } from 'three/webgpu'
 import { createCostMeter, frameBytes, type CostReading } from './cost'
+import { createLedger, type Ledger } from './ledger'
 import { applyDetail, type DetailNodes, type DetailScales } from './detail'
 import { GRADES, resolveGrade, type Grade, type GradeName } from './grade'
 import { createKeyLight, type KeyLight, type KeyLightOptions } from './light'
@@ -87,7 +88,11 @@ export interface Stack {
   cost: () => CostReading
   /** Include privately owned image mip chains in the shared texture meter.
    * The owner unregisters before releasing its streams. Values are MiB. */
-  registerTextureMemory: (measure: () => number) => () => void
+  registerTextureMemory: (measure: () => number, name?: string) => () => void
+  /** what holds the texture line, owner by owner, in MiB */
+  textures: () => Array<{ owner: string; MB: number }>
+  /** the probe's own instrument: draws by body and pass, first uses by kind */
+  ledger: Ledger
   tier: (name: TierName) => void
   tierName: () => TierName
   tierConfig: () => Tier
@@ -134,7 +139,16 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
   const models = createModelLibrary(tier, materials, renderer)
   const meter = createCostMeter(renderer)
   const lights: KeyLight[] = []
-  const textureOwners = new Set<() => number>()
+  const textureOwners = new Map<() => number, string>()
+  const ledger = createLedger(renderer)
+  // a probe run reads the residency from the first allocation on
+  if (new URLSearchParams(location.search).has('probe')) ledger.install()
+  /* THE RIG READS THE LEDGER HERE. It is a read and a counter; nothing is
+     patched in the renderer until the rig first asks for a count. */
+  ;(window as Window & { __naStack?: unknown }).__naStack = {
+    ledger,
+    textures: () => textures(),
+  }
 
   let chain: PostChain | null = null
   let scene: Scene | null = null
@@ -145,6 +159,15 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
   document.body.dataset['backend'] = backend
   // the rig asserts on this line, so it is one line and it never moves
   console.log(`backend=${backend} tier=${tierName} adapter=${architecture}`)
+
+  function textures(): Array<{ owner: string; MB: number }> {
+    const round = (mb: number): number => Math.round(mb * 100) / 100
+    return [
+      ...(materials.inventory?.() ?? []).map((set) => ({ owner: `set ${set.name} ${set.size}px x${set.maps}`, MB: round(set.MB) })),
+      ...models.loaded().map((model) => ({ owner: `model ${model.slug}`, MB: round(model.textureMB) })),
+      ...[...textureOwners].map(([measure, name], i) => ({ owner: name || `owner ${i}`, MB: round(measure()) })),
+    ].sort((a, b) => b.MB - a.MB)
+  }
 
   function build(): void {
     if (!scene || !camera) return
@@ -227,10 +250,12 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
 
     hdri: loadHDRI,
 
-    registerTextureMemory(measure) {
-      textureOwners.add(measure)
+    registerTextureMemory(measure, name = '') {
+      textureOwners.set(measure, name)
       return () => { textureOwners.delete(measure) }
     },
+    textures,
+    ledger,
 
     cost() {
       const size = renderer.getDrawingBufferSize(new Vector2())
@@ -239,7 +264,7 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
         tier: tierName,
         backend,
         textureMB: Math.round((materials.textureMB() + models.textureMB()
-          + [...textureOwners].reduce((sum, measure) => sum + measure(), 0)) * 100) / 100,
+          + [...textureOwners.keys()].reduce((sum, measure) => sum + measure(), 0)) * 100) / 100,
         models: {
           loaded: models.loaded().length,
           tris: models.tris(),

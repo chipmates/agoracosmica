@@ -87,7 +87,7 @@ export function mountCollectionPlates(host: Group, stack: Stack) {
   const reported = new Set<string>()
   const position = new Vector3(), toEye = new Vector3()
   const textureMB = () => cards.reduce((sum, card) => sum + card.stream.textureMB(), 0)
-  const unregisterMemory = stack.registerTextureMemory(textureMB)
+  const unregisterMemory = stack.registerTextureMemory(textureMB, 'collection plates')
   const errors = (): readonly string[] => [failure, ...cards.map(card => card.stream.error())]
     .filter((error): error is string => error !== null)
   function reportErrors(): void {

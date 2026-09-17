@@ -391,6 +391,8 @@ export interface MaterialLibrary {
   manifest: () => ManifestEntry[]
   /** what the loaded sets hold on the GPU, in megabytes */
   textureMB: () => number
+  /** the same, set by set: the side each was uploaded at and how many maps */
+  inventory?: () => Array<{ name: string; size: number; maps: number; MB: number }>
   /** every set that asked for its bytes and did not get them */
   missing: () => Array<{ name: string; reason: string }>
   /** how many sets have asked for their bytes and are still waiting. A
@@ -432,6 +434,7 @@ async function fill(tex: Texture, url: string, size: number): Promise<void> {
     resizeQuality: 'high',
   })
   tex.image = bitmap
+  tex.name = url.slice(url.lastIndexOf('/', url.lastIndexOf('/') - 1) + 1)
   tex.anisotropy = 8
   tex.generateMipmaps = true
   tex.needsUpdate = true
@@ -445,6 +448,7 @@ export function createMaterialLibrary(tier: Tier): MaterialLibrary {
   const missing = new Map<string, string>()
   let budget = texturesFor(tier)
   let bytes = 0
+  const uploaded = new Map<string, { size: number; maps: number }>()
 
   async function manifestOnce(): Promise<Map<string, ManifestEntry>> {
     if (remote) return remote
@@ -655,6 +659,7 @@ export function createMaterialLibrary(tier: Tier): MaterialLibrary {
       await Promise.all(jobs)
       maps.size = budget.size
       bytes += count * textureBytes(budget.size)
+      uploaded.set(name, { size: budget.size, maps: count })
       held.push(maps.albedo, maps.normal, maps.surface)
       ready.value = 1
     }
@@ -707,6 +712,8 @@ export function createMaterialLibrary(tier: Tier): MaterialLibrary {
     sync,
     manifest: () => [...seen.values()],
     textureMB: () => bytes / (1024 * 1024),
+    inventory: () =>
+      [...uploaded].map(([name, u]) => ({ name, size: u.size, maps: u.maps, MB: (u.maps * textureBytes(u.size)) / 1048576 })),
     missing: () => [...missing].map(([name, reason]) => ({ name, reason })),
     pending: () => [...sets.values()].filter((set) => !set.ready.value && !missing.has(set.entry.id.replace(/^library\//, ''))).length,
     setTier(next) {
@@ -716,6 +723,7 @@ export function createMaterialLibrary(tier: Tier): MaterialLibrary {
       for (const t of held) t.dispose()
       held.length = 0
       bytes = 0
+      uploaded.clear()
     },
   }
 }

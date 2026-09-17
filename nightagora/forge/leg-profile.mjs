@@ -12,7 +12,7 @@
 // FORGE_PORT, `--serve=off` shoots one that is already up.
 import { chromium } from 'playwright'
 import { spawn } from 'node:child_process'
-import { APP_ROOT, assertServer, browserArgs, waitForServer } from './rig.mjs'
+import { APP_ROOT, assertServer, browserArgs, FRAME_TIME_FLAGS, waitForServer } from './rig.mjs'
 
 const argv = process.argv.slice(2)
 const flags = new Map()
@@ -38,7 +38,7 @@ try {
   await waitForServer(`${BASE}/`)
   const said = await assertServer(BASE)
   console.error(`server ${said.head.slice(0, 7)} on ${BASE}`)
-  const browser = await chromium.launch({ args: browserArgs() })
+  const browser = await chromium.launch({ args: [...browserArgs(), ...FRAME_TIME_FLAGS] })
   const ctx = await browser.newContext({ viewport: VIEW })
   const page = await ctx.newPage()
   await page.goto(`${BASE}/w/${WING}?probe=1&tier=${TIER}#s=${FROM}`, { waitUntil: 'load' })

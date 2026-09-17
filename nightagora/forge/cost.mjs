@@ -7,6 +7,14 @@
 // Usage:  pnpm build && node forge/cost.mjs [--strict] [--tier=hero]
 //   --strict  exit non-zero when a tier is over its own budget
 //
+// WING MODE, the per-object reading:
+//   node forge/cost.mjs --wing=vinci [--tier=standard,calm] [--phone]
+//        [--stations=picture-room,body] [--rows=14] [--serve=off] [--json=out.json]
+// stands at every station of the wing, settles it, and says WHOSE the cost
+// is: the draws and triangles by body and by pass (the stack's ledger), and
+// the texture line owner by owner. `--phone` reads the calm tier at the
+// phone's viewport, which is the gate's calm-phone line.
+//
 // Every reading is a SETTLED one: forge/settle.mjs stands at the stage until
 // the count stops moving and reports the count that repeats, with the frames
 // that cost more than it on their own column (`refresh`).
@@ -17,13 +25,17 @@
 //                the owner's frame rate)
 import { chromium } from 'playwright'
 import { spawn } from 'node:child_process'
-import { steadyCost, warmScene } from './settle.mjs'
+import { writeFileSync } from 'node:fs'
+import { arrive, steadyCost, warmScene } from './settle.mjs'
 import {
+  APP_ROOT,
   assertAdapter,
   assertBackend,
   assertServer,
   browserArgs,
+  FRAME_TIME_FLAGS,
   TIERS,
+  VIEWPORTS,
   waitForServer,
 } from './rig.mjs'
 
@@ -35,7 +47,88 @@ const FPS_STRICT = process.env['FORGE_FPS'] === '1'
     anyway, and the run says it never settled */
 const SETTLE_CAP = 25000
 const only = process.argv.find((a) => a.startsWith('--tier='))?.split('=')[1]
-const tiers = only ? [only] : TIERS
+const tiers = only ? only.split(',') : TIERS
+const named = (flag) => process.argv.find((a) => a.startsWith(`--${flag}=`))?.slice(flag.length + 3)
+const WING = named('wing')
+const SERVE = named('serve') !== 'off'
+
+if (WING) {
+  await wingCost()
+  process.exit(process.exitCode ?? 0)
+}
+
+/** one wing, station by station, with the cost said owner by owner */
+async function wingCost() {
+  const PHONE = process.argv.includes('--phone')
+  const ROWS = Number(named('rows') ?? 14)
+  const onlyStations = named('stations')?.split(',')
+  const wingTiers = PHONE ? ['calm'] : only ? only.split(',') : TIERS
+  const vp = PHONE ? VIEWPORTS.mobile : VIEWPORTS.desktop
+  const server = SERVE
+    ? spawn('pnpm', ['exec', 'vite', 'preview', '--port', String(PORT), '--strictPort', '--host', '127.0.0.1'], { stdio: 'ignore', cwd: APP_ROOT })
+    : null
+  const out = { wing: WING, viewport: vp.tag, tiers: {} }
+  try {
+    await waitForServer(BASE)
+    const said = await assertServer(BASE)
+    console.log(`server ${said.head.slice(0, 7)}  wing ${WING}  ${vp.tag}`)
+    const browser = await chromium.launch({ args: [...browserArgs(), ...FRAME_TIME_FLAGS] })
+    for (const tier of wingTiers) {
+      const page = await browser.newPage({
+        viewport: { width: vp.width, height: vp.height },
+        deviceScaleFactor: vp.deviceScaleFactor,
+      })
+      await page.goto(`${BASE}/w/${WING}?probe=1&tier=${tier}`)
+      await page.waitForFunction(() => Boolean(window.__forge && window.__naStack), null, { timeout: 90000 })
+      const ids = await page
+        .waitForFunction(() => {
+          const s = window.__forge.state()
+          return s.phase === 'wing' && s.stationIds.length ? s.stationIds : null
+        }, null, { timeout: 90000 })
+        .then((h) => h.jsonValue())
+      await page.evaluate((s) => window.__forge.station(s), ids[0])
+      await arrive(page, ids[0])
+      const warm = await warmScene(page, { ms: SETTLE_CAP })
+      const label = PHONE ? 'calm-phone' : tier
+      console.log(`\n== ${label} == cold ${warm.cold.draws} / ${warm.cold.triangles}, steady ${warm.warm.draws} / ${warm.warm.triangles}`)
+      const rows = {}
+      for (const id of ids) {
+        if (onlyStations && !onlyStations.includes(id)) continue
+        const took = await page.evaluate((s) => window.__forge.station?.(s) ?? false, id)
+        if (!took || !(await arrive(page, id))) { console.log(`${id}: the frame would not stand here`); continue }
+        const c = await steadyCost(page, { ms: SETTLE_CAP })
+        const ledger = await page.evaluate((n) => window.__naStack.ledger.tally(n), 20)
+        const textures = await page.evaluate(() => window.__naStack.textures())
+        const residency = await page.evaluate(() => window.__naStack.ledger.residency())
+        const byPass = {}
+        for (const r of ledger) byPass[r.pass] = (byPass[r.pass] ?? 0) + r.draws
+        rows[id] = { draws: c.draws, triangles: c.triangles, textureMB: c.textureMB, first: c.steady.first,
+          refresh: c.settled.refresh, held: c.steady.held, byPass, ledger, textures, residency }
+        console.log(`\n${id}: ${c.draws} draws / ${c.triangles} tris / ${c.textureMB} MB` +
+          `  (first ${c.steady.first.draws} / ${c.steady.first.triangles}, refresh ${c.settled.refresh.frames}f+${c.settled.refresh.draws})` +
+          `  over ${c.budget.draws} / ${c.budget.triangles} / ${c.budget.textureMB}: ` +
+          `${c.draws > c.budget.draws ? 'DRAWS ' : ''}${c.triangles > c.budget.triangles ? 'TRIS ' : ''}${c.textureMB > c.budget.textureMB ? 'TEXTURE' : ''}`)
+        console.log(`   passes  ${Object.entries(byPass).map(([k, v]) => `${k} ${v.toFixed(1)}`).join(' | ')}`)
+        for (const r of ledger.slice(0, ROWS))
+          console.log(`   ${r.draws.toFixed(1).padStart(6)} draws ${String(r.triangles).padStart(8)} tris  ${r.pass.padEnd(22)} ${r.owner}`)
+        console.log(`   texture ${textures.filter((t) => t.MB >= 1).map((t) => `${t.owner} ${t.MB}`).join(' | ')}`)
+        const onDevice = residency.reduce((a, t) => a + t.MB, 0)
+        console.log(`   on the device ${onDevice.toFixed(1)} MB in ${residency.length} textures; largest ` +
+          residency.slice(0, 8).map((t) => `${t.name} ${t.width}x${t.height} ${t.format} ${t.MB.toFixed(1)}`).join(' | '))
+      }
+      out.tiers[label] = rows
+      await page.close()
+    }
+    await browser.close()
+    const file = named('json')
+    if (file) writeFileSync(file, JSON.stringify(out, null, 1))
+  } catch (err) {
+    console.error(`RIG REFUSED: ${err.message}`)
+    process.exitCode = 1
+  } finally {
+    server?.kill()
+  }
+}
 
 // the stages of the museum's path, in the order a visitor meets them
 const STAGES = [

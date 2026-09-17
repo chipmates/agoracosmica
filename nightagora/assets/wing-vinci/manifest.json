@@ -3278,7 +3278,7 @@
       "prompt": "Place the picture module sources on every field of the room's holder-sized wall, including the paired panel reverse, and stand the body wall's admitted Windsor sheets in modern carriers at their own proportion. No field is withheld: the store's register is the only admission decision, and a work it does not admit leaves the wall. The current holder measurement for the Lansdowne Yarnwinder is 37.1 by 49.5 cm while its earlier layout slot preserves neighbouring placements. Place the admitted Last Supper source within the existing 8.8 by 4.6 metre mural field. Source admission, windows, arch shoulders, decoding and transitions are imported unchanged from the picture module. The room openings and fittings supply the light. All previews remain present: 512 pixel uploads at calm and standard, 1024 at hero, one distance-earned full source outside calm across both walls. Source pixels are never copied into this repository.",
       "model": "Deterministic TypeScript and TSL exhibition placement",
       "date": "2026-09-14",
-      "sha256": "30c7ed794501917f3dcd7fe08e52a7da3d53c2e26018da505ab4031ce3e78907",
+      "sha256": "c85140f12f75becddc1fc8ef8927d8932fabe9e567dffc8ce7f25490e7562060",
       "note": "Modern exhibition supports, no historical room claim. recipe_file=src/wings/vinci/collection/plates.ts wall_register=src/wings/vinci/collection/body-wall.ts; streaming bytes and displayed licences resolve through the store manifest.",
       "recipe_files": [
         {

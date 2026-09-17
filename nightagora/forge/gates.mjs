@@ -45,7 +45,7 @@ import { chromium } from 'playwright'
 import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { basename, join, resolve } from 'node:path'
-import { steadyCost, warmScene } from './settle.mjs'
+import { arrive, steadyCost, warmScene } from './settle.mjs'
 import {
   APP_ROOT,
   assertAdapter,
@@ -246,7 +246,7 @@ async function measure(browser, tier, vp) {
   for (const id of ids) {
     const took = await page.evaluate((s) => window.__forge.station?.(s) ?? false, id)
     const at = await page.evaluate(() => window.__forge.state().stationId)
-    if (!took || at !== id) {
+    if (!took || at !== id || !(await arrive(page, id))) {
       missed.push(`${id} (standing at ${at || 'nowhere'})`)
       continue
     }
