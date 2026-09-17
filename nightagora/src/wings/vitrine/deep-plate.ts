@@ -98,6 +98,7 @@ export function createDeepPlatePayload(options: {
   let library: typeof import('openseadragon') | undefined
   let live = false, seated = false, tileSize = 256, said = ''
   let framed: DeepPlateDetail | null = null
+  let grown = false, waiting = 0
   let seat: VitrineRect | null = null
   const cut = options.window ?? { left: 0, top: 0, right: 1, bottom: 1 }
   const { width, height } = options.source
@@ -210,10 +211,16 @@ export function createDeepPlatePayload(options: {
     const container = root.clientHeight
     const foot = host.caption.getBoundingClientRect().height
       + (host.narrow ? 0 : host.controls.getBoundingClientRect().height + 16)
-    const share = container > 0 ? Math.min(.4, foot / container) : 0
     framed = detail
-    viewer.viewport.fitBoundsWithConstraints(
-      new library.Rect(box.x, box.y, box.width, box.height / (1 - share)), host.reducedMotion)
+    viewer.viewport.fitBoundsWithConstraints(box, host.reducedMotion)
+    // The detail is lifted by half the band the words take, in the units the
+    // fit just chose; where the plate ends there, the constraint wins.
+    const target = viewer.viewport.getBounds()
+    const band = container > 0 ? Math.min(.4, foot / container) * target.height : 0
+    if (band > 0) {
+      viewer.viewport.panBy(new library.Point(0, band / 2), host.reducedMotion)
+      viewer.viewport.applyConstraints(host.reducedMotion)
+    }
     said = ''
     speak()
   }
@@ -224,17 +231,25 @@ export function createDeepPlatePayload(options: {
     return item && viewer ? item.viewportToImageZoom(viewer.viewport.getZoom(true)) : 0
   }
 
-  /** The one motion of the opening: the work grows from where the room drew
-   * it to the window, or stands at the window at once. */
-  function seatAndFit(): void {
-    if (!viewer || !host) return
+  /** THE FIRST FRAME IS THE FRAME THE VISITOR HAD. The viewer is stood on
+   * the work's own rectangle and nothing moves yet: the room's frozen work
+   * is still what is seen through it, until the first tile is drawn. */
+  function seatNow(): void {
+    if (!viewer) return
     const start = seatBounds()
+    grown = Boolean(start)
     if (start) viewer.viewport.fitBounds(start, true)
+    else fit()
+  }
+
+  /** The one motion of the opening. The room dims whole at the same moment,
+   * because from here the plate no longer stands where the room drew it. */
+  function fit(): void {
+    if (!viewer || !host || seated) return
     seated = true
-    // The frozen work is no longer under the plate, so the room dims whole.
     seat = null
     host.surface('hold')
-    viewer.viewport.fitBounds(windowBounds(), !start || host.reducedMotion)
+    viewer.viewport.fitBounds(windowBounds(), !grown || host.reducedMotion)
   }
 
   async function mountViewer(): Promise<void> {
@@ -283,9 +298,13 @@ export function createDeepPlatePayload(options: {
       made.tileCache = new loaded.TileCache({ maxImageCacheCount: Math.round(cap / 2) })
     }
     made.addHandler('canvas-key', event => { event.preventDefaultAction = true })
-    made.addHandler('open', () => { if (!seated) seatAndFit() })
+    made.addHandler('open', () => seatNow())
     made.addHandler('viewport-change', () => readout())
-    made.addHandler('tile-drawn', () => readout())
+    made.addHandler('tile-drawn', () => { fit(); readout() })
+    // A source that never draws a tile may not leave the window standing on
+    // a frame the room is no longer keeping.
+    waiting = setTimeout(() => fit(), 1500) as unknown as number
+    if (made.world.getItemCount() > 0) seatNow()
     readout()
   }
 
@@ -365,6 +384,8 @@ export function createDeepPlatePayload(options: {
     },
     unmount() {
       live = false
+      clearTimeout(waiting)
+      waiting = 0
       // v6 destroys only what it made, and the stage it stood in goes with
       // the payload's own root.
       viewer?.destroy()
