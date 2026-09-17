@@ -54,7 +54,7 @@ export const LOBBY_TEXT = {
     en: 'Finest detail. Highest graphics and memory use.',
     de: 'Die feinsten Details. Braucht am meisten Grafikleistung und Speicher.',
   },
-  plan: { en: 'The plan · in preparation', de: 'Der Plan · in Vorbereitung' },
+  plan: { en: 'The plan', de: 'Der Plan' },
   labelsTitle: {
     en: 'How this museum labels what it shows',
     de: 'So kennzeichnet das Museum, was es zeigt',

@@ -926,6 +926,13 @@ if (!railNode || !railSound || !railInstruments || !instrumentsNode) throw new E
 const railEl: HTMLElement = railNode
 const instrumentsEl: HTMLElement = instrumentsNode
 const instSound = document.getElementById('inst-sound')
+/** THE PLAN BELONGS TO A WING, so its row stands only while one does. The
+    panel tells the wing standing to open it and gets out of the way. */
+const instPlan = document.getElementById('inst-plan') as HTMLButtonElement | null
+instPlan?.addEventListener('click', () => {
+  setInstruments(false, false)
+  dispatchEvent(new Event('na-wing-plan'))
+})
 const inertBefore = new Map<HTMLElement, boolean>()
 
 function syncSoundLabel(): void {
@@ -945,6 +952,7 @@ instSound?.addEventListener('click', toggleSound)
 
 function setInstruments(open: boolean, focus = true): void {
   instrumentsEl.hidden = !open
+  if (instPlan) instPlan.disabled = phase !== 'wing'
   railInstruments?.setAttribute('aria-expanded', String(open))
   if (open) {
     for (const el of Array.from(document.body.children)) {

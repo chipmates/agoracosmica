@@ -404,6 +404,8 @@ export function createWing():VinciWingModule {
       if(e.key==='ArrowRight'||e.key==='ArrowDown'){e.preventDefault();h.navigate(station+1)}
       if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();h.navigate(station-1)}
     },options)
+    // The instruments panel of the museum opens the plan of the wing standing.
+    window.addEventListener('na-wing-plan',()=>openPlan(),options)
     // THE SHEET TAKES ITS OWN GESTURE: a drag up opens it, a drag down or a
     // tap on the peek closes or opens it, and the card itself outlives every
     // repaint, so this is bound once.
@@ -1096,8 +1098,8 @@ export function createWing():VinciWingModule {
     kicker.textContent=away||activeView?viewKicker():stationKicker()
   }
   const stationNumber=()=>String(card+1).padStart(2,'0')
-  const stationKicker=()=>`CLOS LUCE, 1517 · ${stationNumber()} / ${vinciContent.length}`
-  const viewKicker=()=>`CLOS LUCE, 1517 · ${lang()==='de'?'BLICK VON STATION':'A VIEW FROM STATION'} ${stationNumber()}`
+  const stationKicker=()=>`CLOS LUCÉ, 1517 · ${stationNumber()} / ${vinciContent.length}`
+  const viewKicker=()=>`CLOS LUCÉ, 1517 · ${lang()==='de'?'BLICK VON STATION':'A VIEW FROM STATION'} ${stationNumber()}`
   function aimPrint(id:VinciStationId):void {
     if(!hosts)return
     const {scene,camera,stack}=hosts.world
