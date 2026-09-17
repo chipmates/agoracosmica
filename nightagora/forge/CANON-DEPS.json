@@ -7,6 +7,7 @@
   "devDependencies": {
     "@types/three": "types for the renderer",
     "playwright": "the rigs: the shots, the walk, the gates",
+    "sharp": "the tile cutter of the forge, libvips inside it; no byte of it reaches a visitor",
     "typescript": "the language",
     "vite": "the dev server and the bundle"
   }
