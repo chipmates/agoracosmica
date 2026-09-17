@@ -26,6 +26,7 @@ import stepsRaw from '../data/steps.json?raw'
 import cardsRaw from '../data/cards.json?raw'
 import limitsRaw from '../data/limits.json?raw'
 import partsRaw from '../data/parts.json?raw'
+import sizesRaw from '../data/sizes.json?raw'
 
 export type VinciCloseLook = Vitrine
 export type VinciCloseLookExhibit = VitrineExhibit
@@ -68,6 +69,9 @@ const CONTROLS = (JSON.parse(cardsRaw) as { controls: {
 type Slot = (Words & { source: string }) | null
 const LIMITS = (JSON.parse(limitsRaw) as { slots: Record<string, { limit: Slot; visual_note: Slot }> }).slots
 const PARTS = (JSON.parse(partsRaw) as { parts: Record<string, Record<string, Words>> }).parts
+/** THE SIZE A MACHINE HAS, SAID ALOUD. The card speaks it, the record behind
+ * the card keeps the three numerals of the same envelope. */
+const SIZES = (JSON.parse(sizesRaw) as { sizes: Record<string, Words> }).sizes
 
 /** What the evidence behind an exhibit does not settle, and what the view
  * adds or refuses, in the page's language: the record's two slots. */
@@ -151,10 +155,10 @@ function folioName(slug: MachineSlug): string {
 
 /** The machine's card, in the card model's order after its line: the
  * description, then the steps the payload lays in, then the certainty, the
- * size the dossier gives and what the model does not show. */
+ * size said as a sentence and what the model does not show. */
 export function vinciMachineCard(slug: MachineSlug, narrow: boolean, certainty: { word: string; colour: string })
   : { card: HTMLElement[]; after: HTMLElement[] } {
-  const record = machineCatalog[slug], dossier = dossiers[slug], language = lang()
+  const record = machineCatalog[slug], language = lang()
   const description = make('div', 'vitrine-description')
   description.id = `vitrine-description-${slug}`
   setRegister(description, 'drawer')
@@ -183,12 +187,18 @@ export function vinciMachineCard(slug: MachineSlug, narrow: boolean, certainty: 
   const word = make('p', 'vitrine-certainty', certainty.word)
   word.style.setProperty('--certainty', certainty.colour)
   after.push(word)
-  const { x, y, z } = dossier.scale_m
-  const metres = (value: number): string => language === 'de' ? String(value).replace('.', ',') : String(value)
-  after.push(make('p', 'vitrine-meta', `${metres(x)} × ${metres(y)} × ${metres(z)} m`))
+  const said = SIZES[slug]?.[language]
+  after.push(make('p', 'vitrine-meta', said ?? machineEnvelope(slug, language)))
   const absence = BENCH_ABSENCE[slug]
   if (absence) after.push(make('p', 'vitrine-meta', absence[language]))
   return { card, after }
+}
+
+/** The envelope's three numerals, in the page's own separator. */
+function machineEnvelope(slug: MachineSlug, language: 'en' | 'de'): string {
+  const { x, y, z } = dossiers[slug].scale_m
+  const metres = (value: number): string => language === 'de' ? String(value).replace('.', ',') : String(value)
+  return `${metres(x)} × ${metres(y)} × ${metres(z)} m`
 }
 
 /** THE RECORD behind "Where it comes from": the folio, the sections, the
@@ -201,6 +211,7 @@ export function renderVinciMachineRecord(slug: MachineSlug, host: HTMLElement): 
   for (const folio of record.folio) full.append(make('p', 'vinci-statement', `${folio.codex} ${folio.folio} · ${folio.holder} · ${folio.catalogue_reference}`))
   for (const section of record.sections[language]) full.append(make('h3', '', section.title), make('p', 'vinci-statement', section.body))
   full.append(make('pre', 'vinci-arithmetic', record.arithmetic[language]))
+  full.append(make('p', 'vinci-statement', machineEnvelope(slug, language)))
   for (const gap of record.gaps) full.append(make('p', 'vinci-statement', gap))
   for (const slot of ['limit', 'visual_note']) {
     const empty = make('p', 'vinci-statement')
