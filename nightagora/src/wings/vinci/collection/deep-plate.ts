@@ -72,11 +72,11 @@ interface TilesRecord extends ManifestEntry {
   readonly scale_factors?: readonly number[]
 }
 export async function vinciPlatePyramid(plate: ResolvedPicturePlate): Promise<DeepTilePyramid | null> {
+  // The two faces of one panel share a file name, so a pyramid is named by
+  // the face the records give the plate and never by its path.
   const record = validatePaintingRecord(plate.plate, 'painting-plate')
-  const name = /\/([a-z0-9-]+)__[1-9]\d*x[1-9]\d*\.jpg$/.exec(record.path)?.[1]
-  if (!name) return null
   const index = await loadManifest()
-  const tiles = index.byId.get(`vinci/painting-tiles/${name}`) as TilesRecord | undefined
+  const tiles = index.byId.get(`vinci/painting-tiles/${record.identity.replace(':', '-')}`) as TilesRecord | undefined
   if (!tiles || tiles.role !== 'painting-tiles' || tiles.display !== true) return null
   if (tiles.derived_from !== plate.plate.id || tiles.source_sha256 !== plate.plate.sha256) return null
   if (tiles.width !== plate.pixels.width || tiles.height !== plate.pixels.height) return null

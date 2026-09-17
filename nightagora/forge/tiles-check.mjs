@@ -30,8 +30,21 @@ const QUIET = process.argv.includes('--quiet') || JSON_OUT
 
 export const TILES_ROLE = 'painting-tiles'
 const TILES_ID = /^vinci\/painting-tiles\/[a-z0-9-]+$/
+const PLATE_ID = /^vinci\/painting-plate\/([a-z0-9-]+?)(?:__[1-9]\d*x[1-9]\d*)?$/
 const TILES_PATH = /^paintings\/([a-z0-9-]+)\/tiles\/([a-f0-9]{12})\/$/
 const PLATE_PIXELS = /__([1-9]\d*)x([1-9]\d*)\.jpg$/
+
+/** WHAT A PLATE IS CALLED among the faces of its work, which is what names
+ * its pyramid. A policy record carries the name in plate_id; a legacy record
+ * carries it in its id, where the reverse is a face of its own and the
+ * obverse is the work itself. Two faces share one path, so the path cannot
+ * name a pyramid. */
+export function plateIdentity(plate) {
+  if (plate.plate_id) return plate.plate_id.replace(':', '-')
+  const named = PLATE_ID.exec(plate.id ?? '')?.[1]
+  if (!named || !plate.work_id) return null
+  return named === `${plate.work_id}-reverse` ? named : plate.work_id
+}
 
 /** How many halvings the pyramid takes before one tile holds the whole
  * image: the last level is the first whose long edge fits a tile. */
@@ -121,6 +134,9 @@ export function checkTiles() {
     if (!plate) { say(`derived_from names ${record.derived_from}, which no manifest holds`); continue }
     if (plate.role !== 'painting-plate' || plate.display !== true) say('derived_from is not a displayed plate record')
     if (plate.work_id !== path[1]) say(`the folder says ${path[1]}, the plate says ${plate.work_id}`)
+    const identity = plateIdentity(plate)
+    if (!identity || record.id !== `vinci/painting-tiles/${identity}`)
+      say(`the id does not name the plate's own face, which is ${identity}`)
     if (!/^[a-f0-9]{64}$/.test(record.source_sha256 ?? '') || record.source_sha256 !== plate.sha256)
       say('source_sha256 is not the admitted file\'s own hash')
     if (record.source_sha256?.slice(0, 12) !== path[2]) say('the folder is not the source hash\'s own folder')

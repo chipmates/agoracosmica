@@ -21,7 +21,7 @@ import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import sharp from 'sharp'
 import { mergeManifests, STORE } from './vite-na-assets.mjs'
-import { expectedTileFiles, filesUnder, scaleFactorsFor, tileRecipe, treeHash } from './tiles-check.mjs'
+import { expectedTileFiles, filesUnder, plateIdentity, scaleFactorsFor, tileRecipe, treeHash } from './tiles-check.mjs'
 
 const TILE_SIZE = 256
 /** Where the bytes stand once they are pushed, which is the only address an
@@ -50,7 +50,11 @@ const superseder = assets.find(entry => (entry.supersedes ?? []).includes(plateI
 if (superseder) throw new Error(`${plateId} is superseded by ${superseder.id} and does not hang`)
 const path = PLATE_PATH.exec(plate.path ?? '')
 if (!path) throw new Error(`${plateId} does not name its own work and pixels`)
-const [, work, name, widthText, heightText] = path
+const [, work, , widthText, heightText] = path
+// Two faces of one panel share a file name, so the pyramid is named by the
+// face the records give it and never by the path.
+const name = plateIdentity(plate)
+if (!name) throw new Error(`${plateId} does not name its own face`)
 const width = Number(widthText), height = Number(heightText)
 
 // THE SOURCE IS THE ADMITTED FILE, BYTE FOR BYTE. A pyramid cut from
