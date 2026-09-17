@@ -305,8 +305,8 @@ export function createWing():VinciWingModule {
     // A notch asks for the next station AND walks a stride along the leg that
     // is under way, so a visitor who keeps scrolling keeps moving instead of
     // waiting the walk out, and the station asked for is never lost.
-    h.stage.addEventListener('wheel',(e)=>{if(e.ctrlKey||e.defaultPrevented||(e.target as Element).closest('.vinci-dock,.wing-rail-group,.vinci-exhibit-card'))return;e.preventDefault();const step=wheelStep(e.deltaY,e.deltaMode,innerHeight);if(!step)return;rail.stride(1);h.navigate(station+step)},{...options,passive:false})
-    h.stage.addEventListener('pointerdown',(e)=>{if(!e.isPrimary||e.button!==0||(e.target as Element).closest('button,a,input,textarea,select,.vinci-dock,.wing-rail-group,.vinci-exhibit-card,.vinci-heading'))return;if(sheetOpen){sheetOpen=false;paintSheet()}e.preventDefault();dragging=true;pointer=e.pointerId;touchX=lastX=e.clientX;touchY=lastY=e.clientY;h.stage.setPointerCapture(e.pointerId)},options)
+    h.stage.addEventListener('wheel',(e)=>{if(e.ctrlKey||e.defaultPrevented||(e.target as Element).closest('.vinci-dock,.wing-rail-group,.vinci-exhibit-card,.vinci-strip,.vinci-heading'))return;e.preventDefault();const step=wheelStep(e.deltaY,e.deltaMode,innerHeight);if(!step)return;rail.stride(1);h.navigate(station+step)},{...options,passive:false})
+    h.stage.addEventListener('pointerdown',(e)=>{if(!e.isPrimary||e.button!==0||(e.target as Element).closest('button,a,input,textarea,select,.vinci-dock,.wing-rail-group,.vinci-exhibit-card,.vinci-heading,.vinci-strip'))return;if(sheetOpen){sheetOpen=false;paintSheet()}e.preventDefault();dragging=true;pointer=e.pointerId;touchX=lastX=e.clientX;touchY=lastY=e.clientY;h.stage.setPointerCapture(e.pointerId)},options)
     h.stage.addEventListener('pointermove',(e)=>{if(!dragging||pointer!==e.pointerId)return;rail.drag(e.clientX-lastX,e.clientY-lastY,h.stage.getBoundingClientRect().height);lastX=e.clientX;lastY=e.clientY},options)
     // A PRESS IS A PRESS, NOT A DRAG AND NOT A SWIPE. A flick on the phone is
     // still a station, a drag is still a look, and what is left is one ray.
