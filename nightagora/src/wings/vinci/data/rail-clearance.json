@@ -36,8 +36,8 @@
   },
   {
    "file": "src/wings/vinci/collection/body-wall.ts",
-   "sha256": "cf14802560f4d76b59b8f3bf5e0ffedfb873f3432e02e4c7a368a20355e0744a",
-   "bytes": 6369,
+   "sha256": "096464623029e01698feec36a15b2e7668eafa9af13b7fc313ed4c73f3bab3f0",
+   "bytes": 8233,
    "unchangedDuringAudit": true
   },
   {
@@ -104,6 +104,12 @@
    "file": "src/wings/vinci/data/light-rig.json",
    "sha256": "530043551e5ea2341b220805448d5e31f25d26a27dfc449181e177c7f5a92dd6",
    "bytes": 1305800,
+   "unchangedDuringAudit": true
+  },
+  {
+   "file": "src/wings/vinci/data/sheet-sizes.json",
+   "sha256": "575a3fc5262084dcc2b1f4da8cf9a38aaef720d269598e9d76c1a04222521cae",
+   "bytes": 7508,
    "unchangedDuringAudit": true
   },
   {
@@ -438,25 +444,25 @@
   }
  ],
  "geometrySha256": [
-  "e21383d2e068f8526eaf680e8496a544068d90e2420a5cb59a6a32512c20c2e9",
-  "d75f3f29d84c5be58f8bfca6393e07ee12e4d605de8922bb243790222a2bcea1"
+  "1f4516b38cb842604c88bc8a34473392d7c75f4dea017a2985c8982cd2b0d0fb",
+  "4a2711bd9011a6c3f9d8f42c4d6ae03e5936abf9b145bb374dcc6ce8ca799d8b"
  ],
  "geometry": [
   {
    "tier": "hero",
-   "sha256": "e21383d2e068f8526eaf680e8496a544068d90e2420a5cb59a6a32512c20c2e9",
+   "sha256": "1f4516b38cb842604c88bc8a34473392d7c75f4dea017a2985c8982cd2b0d0fb",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   },
   {
    "tier": "standard",
-   "sha256": "e21383d2e068f8526eaf680e8496a544068d90e2420a5cb59a6a32512c20c2e9",
+   "sha256": "1f4516b38cb842604c88bc8a34473392d7c75f4dea017a2985c8982cd2b0d0fb",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   },
   {
    "tier": "calm",
-   "sha256": "d75f3f29d84c5be58f8bfca6393e07ee12e4d605de8922bb243790222a2bcea1",
+   "sha256": "4a2711bd9011a6c3f9d8f42c4d6ae03e5936abf9b145bb374dcc6ce8ca799d8b",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   }
@@ -1538,13 +1544,13 @@
      ],
      "centroid": [
       -41.20379114974712,
-      -4.405505755787022,
-      45.03213015588499
+      -4.380675759360558,
+      45.032130143333205
      ],
      "rms": [
       42.35828075157323,
-      4.666273877478914,
-      45.71725239384727
+      4.6444437042587845,
+      45.717301903557406
      ]
     },
     {
@@ -3660,13 +3666,13 @@
      ],
      "centroid": [
       -41.20379114974712,
-      -4.405505755787022,
-      45.03213015588499
+      -4.380675759360558,
+      45.032130143333205
      ],
      "rms": [
       42.35828075157323,
-      4.666273877478914,
-      45.71725239384727
+      4.6444437042587845,
+      45.717301903557406
      ]
     },
     {
@@ -5046,13 +5052,13 @@
      ],
      "centroid": [
       -41.20379114974712,
-      -4.405505755787022,
-      45.03213015588499
+      -4.380675759360558,
+      45.032130143333205
      ],
      "rms": [
       42.35828075157323,
-      4.666273877478914,
-      45.71725239384727
+      4.6444437042587845,
+      45.717301903557406
      ]
     },
     {

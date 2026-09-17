@@ -74,6 +74,7 @@ const hang = loadModule('src/wings/vinci/collection/hang.ts', new Map([
 ]))
 const bodyWall = loadModule('src/wings/vinci/collection/body-wall.ts', new Map([
   ['../../../manifest', {}], ['../pictures/sheet-record', { validateSheetRecord: () => ({}) }], ['./layout', layoutStub],
+  ['../data/sheet-sizes.json?raw', { default: read('src/wings/vinci/data/sheet-sizes.json') }],
 ]))
 const machineStubs = new Map([['./types', {}], ['./data/records.json?raw', { default: read('src/wings/vinci/machines/data/records.json') }]])
 const SLUG_FILES = fs.readdirSync(path.join(root, 'src/wings/vinci/machines/data'))

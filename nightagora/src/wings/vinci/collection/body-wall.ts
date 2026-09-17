@@ -6,13 +6,10 @@
  * reproductions. Twenty eight of them stand in the four courses, and the
  * sheet the vortex arithmetic in the drawer is read from stands apart.
  *
- * The mounts are modern furniture. The register records no centimetres for
- * twenty eight of these sheets, so each carrier holds a constant area and
- * takes its sheet's own proportion: a mount here is never a claim about a
- * sheet's size. The one sheet whose centimetres the holder's catalogue does
- * record is built at that size instead, and its own record carries the
- * second published measurement.
+ * Every sheet hangs at the size its holder records (`data/sheet-sizes.json`);
+ * a sheet whose holder entry is missing keeps a mount of constant area.
  */
+import sizesSource from '../data/sheet-sizes.json?raw'
 import type { ManifestEntry, ManifestIndex } from '../../../manifest'
 import { validateSheetRecord, type SheetManifestEntry } from '../pictures/sheet-record'
 import { FACE, FLOOR } from './layout'
@@ -24,14 +21,27 @@ export interface BodySheet {
   readonly row: number | 'vortex'
   readonly column: number
   readonly pixels: { readonly width: number; readonly height: number }
-  /** Present only where the holder's catalogue records the sheet itself. */
+  /** Present only where the holder records the sheet's own size. */
   readonly measured?: BodySheetSize
 }
-const s = (id: string, width: number, height: number, row: number | 'vortex', column: number,
-  measured?: BodySheetSize): BodySheet => ({ id, row, column, pixels: { width, height }, measured })
 
-/** One mount holds this much wall, and the sheet's proportion decides the
- * rest. It is the area the four courses were laid out with. */
+interface SizeRecord { readonly heightCm: number | null; readonly widthCm: number | null }
+const SIZES = (JSON.parse(sizesSource) as { sheets: Record<string, SizeRecord> }).sheets
+
+/** A sheet without a size record is refused, never hung at a guess. */
+function holderSize(id: string): BodySheetSize | undefined {
+  const record = SIZES[id]
+  if (!record) throw new Error(`The body wall has no size record for ${id}`)
+  if (record.heightCm === null && record.widthCm === null) return undefined
+  if (!(Number(record.heightCm) > 0 && Number(record.widthCm) > 0))
+    throw new Error(`The body wall's size record is incomplete: ${id}`)
+  return { widthCm: record.widthCm!, heightCm: record.heightCm! }
+}
+const s = (id: string, width: number, height: number, row: number | 'vortex', column: number): BodySheet =>
+  ({ id, row, column, pixels: { width, height }, measured: holderSize(id) })
+
+/** A sheet with no recorded size gets this much wall at its reproduction's
+ * proportion: the area the courses were first laid out with. */
 const MOUNT_AREA = .19 * .278
 
 export const BODY_WALL: readonly BodySheet[] = [
@@ -63,16 +73,20 @@ export const BODY_WALL: readonly BodySheet[] = [
   s('rcin-919101', 1477, 2000, 3, 4),
   s('rcin-919102', 1498, 2000, 3, 5),
   s('rcin-919116', 1808, 1273, 3, 6),
-  s('rcin-919082', 1253, 1698, 'vortex', 0, { widthCm: 20.4, heightCm: 28.3 }),
+  s('rcin-919082', 1253, 1698, 'vortex', 0),
 ]
 
 const WALL = FACE.hallPartitionEast + .033
-/** The four courses hang off this datum. It stands where it does because the
- * reading ledge in front of the wall is 0.92 m high and touches it: the
- * lowest course's bottom edge clears that contact line by a hand's width, so
- * no sheet is read over the ledge. */
-const CENTRE = -52.6, DATUM = FLOOR + 1.84
-const COLUMN_PITCH = .46, ROW_PITCH = .42
+/** The lowest edge of the lowest course. The reading ledge in front of the
+ * wall is 0.92 m high and touches it at FLOOR + .945; the sheets clear that
+ * contact line by a hand's width, so no sheet is read over the ledge. */
+const SILL = FLOOR + 1.047
+const CENTRE = -52.6
+/** What the carrier's moulding adds beyond the sheet on each side. */
+const MOULDING = .028
+/** The clear interval the tightest pair of neighbours keeps, across a course
+ * and down a column. Both pitches are uniform and set by that pair. */
+const INTERVAL = .08
 
 export interface BodyMount extends BodySheet {
   /** Metres of wall the carrier's opening holds. */
@@ -83,14 +97,33 @@ export interface BodyMount extends BodySheet {
   readonly datum: number
 }
 
-/** A single layout supplies both the wall's carriers and the sheets on them. */
+/** A single layout supplies both the wall's carriers and the sheets on them.
+ * A print room's grid of mixed sizes: every course shares one centre line,
+ * every column one axis, so each sheet stands centred in its cell. */
 export function bodyMounts(): readonly BodyMount[] {
-  return BODY_WALL.map(sheet => {
+  const sized = BODY_WALL.map(sheet => {
     const aspect = sheet.pixels.width / sheet.pixels.height
     const width = sheet.measured ? sheet.measured.widthCm / 100 : Math.sqrt(MOUNT_AREA * aspect)
     const height = sheet.measured ? sheet.measured.heightCm / 100 : Math.sqrt(MOUNT_AREA / aspect)
-    const north = sheet.row === 'vortex' ? CENTRE + 4.05 : CENTRE + (sheet.column - 3) * COLUMN_PITCH
-    const datum = sheet.row === 'vortex' ? DATUM + .28 : DATUM + (1.5 - sheet.row) * ROW_PITCH
+    return { sheet, width, height }
+  })
+  const grid = sized.filter(entry => entry.sheet.row !== 'vortex')
+  const courses = Math.max(...grid.map(entry => entry.sheet.row as number)) + 1
+  const columns = Math.max(...grid.map(entry => entry.sheet.column)) + 1
+  let columnPitch = 0, coursePitch = 0
+  for (const a of grid) for (const b of grid) {
+    if (a.sheet.row === b.sheet.row && b.sheet.column === a.sheet.column + 1)
+      columnPitch = Math.max(columnPitch, (a.width + b.width) / 2 + 2 * MOULDING + INTERVAL)
+    if (a.sheet.column === b.sheet.column && b.sheet.row === (a.sheet.row as number) + 1)
+      coursePitch = Math.max(coursePitch, (a.height + b.height) / 2 + 2 * MOULDING + INTERVAL)
+  }
+  const lowest = grid.filter(entry => entry.sheet.row === courses - 1)
+  const lowestLine = SILL + Math.max(...lowest.map(entry => entry.height / 2 + MOULDING))
+  const line = (row: number): number => lowestLine + (courses - 1 - row) * coursePitch
+  return sized.map(({ sheet, width, height }) => {
+    // The sheet apart stands on the second course's centre line, off the grid.
+    const north = sheet.row === 'vortex' ? CENTRE + 4.05 : CENTRE + (sheet.column - (columns - 1) / 2) * columnPitch
+    const datum = sheet.row === 'vortex' ? line(1) : line(sheet.row)
     return { ...sheet, width, height, east: WALL + .026, north, datum }
   })
 }

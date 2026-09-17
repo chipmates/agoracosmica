@@ -84,7 +84,7 @@ const { HANG, hangPlacements, buildHang, buildBodyWall } = load('src/wings/vinci
 const { BODY_WALL, bodyMounts } = load('src/wings/vinci/collection/body-wall.ts')
 const { mountCollectionPlates } = load('src/wings/vinci/collection/plates.ts')
 const { getWork } = load('src/wings/vinci/pictures/register.ts')
-const { COURT, FACE, HANG_DATUM, SUPPER_WALL } = load('src/wings/vinci/collection/layout.ts')
+const { COURT, FACE, FLOOR, HANG_DATUM, SUPPER_WALL } = load('src/wings/vinci/collection/layout.ts')
 const host = new THREE.Group()
 const hang = mountCollectionPlates(host, stack)
 assert.ok(hang.pending() > 0, 'manifest loading must prevent a settled reading')
@@ -152,16 +152,34 @@ assert.equal(createHash('sha256').update(JSON.stringify(retainedBoxes)).digest('
 const bodyBoxes = []
 buildBodyWall({ box: (...args) => bodyBoxes.push(args) })
 assert.equal(bodyBoxes.length, BODY_WALL.length * 5 + 4)
-for (const mount of bodyMounts()) {
+// A sheet the holder sizes hangs at that size; one without a size keeps its
+// reproduction's proportion. No moulding comes within 8 cm of another, and
+// the lowest clears the reading ledge's contact line by a hand's width.
+const sizes = JSON.parse(source('src/wings/vinci/data/sheet-sizes.json')).sheets
+const mounts = bodyMounts()
+for (const mount of mounts) {
+  const size = sizes[mount.id]
+  assert.ok(size, `no size record: ${mount.id}`)
   assert.ok(mount.width > 0 && mount.height > 0)
-  assert.ok(Math.abs(mount.width / mount.height - mount.pixels.width / mount.pixels.height) < 1e-9
-    || !!mount.measured, `a carrier must take its sheet's proportion: ${mount.id}`)
-  assert.ok(mount.width <= .37 && mount.height <= .38, `a carrier overruns its slot: ${mount.id}`)
+  if (size.heightCm === null) {
+    assert.equal(mount.measured, undefined)
+    assert.ok(Math.abs(mount.width / mount.height - mount.pixels.width / mount.pixels.height) < 1e-9,
+      `a carrier must take its sheet's proportion: ${mount.id}`)
+  } else {
+    assert.ok(Math.abs(mount.width - size.widthCm / 100) < 1e-12 && Math.abs(mount.height - size.heightCm / 100) < 1e-12,
+      `a carrier must be the holder's size: ${mount.id}`)
+  }
 }
-const measured = bodyMounts().filter(mount => mount.measured)
-assert.equal(measured.length, 1)
-assert.ok(Math.abs(measured[0].width - .204) < 1e-12)
-assert.ok(Math.abs(measured[0].height - .283) < 1e-12)
+const measured = mounts.filter(mount => mount.measured)
+assert.equal(measured.length, 26)
+const outline = mount => ({ south: mount.north - mount.width / 2 - .028, north: mount.north + mount.width / 2 + .028,
+  low: mount.datum - mount.height / 2 - .028, high: mount.datum + mount.height / 2 + .028 })
+for (const a of mounts) for (const b of mounts) if (a !== b) {
+  const A = outline(a), B = outline(b)
+  assert.ok(Math.max(B.south - A.north, A.south - B.north, B.low - A.high, A.low - B.high) >= .08 - 1e-9,
+    `carriers crowd each other: ${a.id}, ${b.id}`)
+}
+assert.ok(Math.min(...mounts.map(mount => outline(mount).low)) >= FLOOR + .945 + .1, 'a sheet is read over the reading ledge')
 const group = host.getObjectByName('vinci/collection-plates')
 const cards = group.children.filter(mesh => mesh.userData.previewId)
 assert.equal(cards.length, CARDS)
@@ -178,13 +196,13 @@ for (const card of cards) {
   const expected = acrossTheRoom ? new THREE.Vector3(1, 0, 0) : new THREE.Vector3(0, 0, -1)
   assert.ok(normal.distanceTo(expected) < 1e-12, 'source must face out of its own room wall')
 }
-// One sheet carries the holder's own centimetres; its carrier is that size
-// and the source is contained inside it without stretching.
+// A sized sheet's card carries the holder's centimetres; the source is
+// contained inside its carrier without stretching.
 const vortex = cards.find(card => card.userData.sheetId === 'rcin-919082')
 assert.equal(vortex.userData.measuredSheet.widthCm, 20.4)
 assert.equal(vortex.userData.measuredSheet.heightCm, 28.3)
-assert.ok(cards.filter(card => card.userData.sheetId).every(card => card.userData.measuredSheet === null
-  || card.userData.sheetId === 'rcin-919082'))
+assert.ok(cards.filter(card => card.userData.sheetId).every(card => (card.userData.measuredSheet === null)
+  === (sizes[card.userData.sheetId].heightCm === null)))
 const mural = cards.find(card => card.userData.workId === 'last-supper')
 assert.equal(mural.rotation.y, Math.PI / 2)
 assert.equal(mural.position.x, SUPPER_WALL.east + SUPPER_WALL.thickness / 2 + .0005)
