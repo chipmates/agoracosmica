@@ -132,3 +132,24 @@
   .vitrine-reader-row {gap:6px;width:100%;}
   .vitrine-reader-row .vitrine-control {flex:1 1 auto;}
 }
+
+/* THE DATE READER: the date the list stands at in the viewport, the whole
+   line as an ordered list in the card. */
+.vitrine-date {position:absolute;inset:0 0 118px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:12px;text-align:center;pointer-events:auto;}
+.vitrine-date-year {margin:0;font:400 44px/1.15 var(--serif);color:#fff5e3;text-wrap:balance;}
+.vitrine-date .vitrine-certainty {justify-content:center;}
+.vitrine-date-ask {font-size:15px;min-width:160px;}
+.vitrine-dates {margin:10px 0 0;padding:0;list-style:none;border-top:1px solid #a9977333;}
+.vitrine-dates-item {border-bottom:1px solid #a9977322;}
+.vitrine-dates-heading {margin:0;font:inherit;}
+.vitrine-dates-link {display:flex;align-items:center;gap:10px;min-height:44px;padding:6px 4px;color:#cfc6b4;font:14px/1.35 var(--serif);text-decoration:none;}
+.vitrine-dates-link .vinci-title-dot {flex:0 0 7px;width:7px;height:7px;border-radius:50%;}
+.vitrine-dates-link:focus-visible {outline:1px solid #edcc8c;outline-offset:-2px;}
+.vitrine-dates-item[aria-current='true'] {background:#edcc8c14;}
+.vitrine-dates-item[aria-current='true'] .vitrine-dates-link {color:#fff5e3;font-size:16px;}
+.vitrine-date-line {margin:0 4px 10px 21px;font:14px/1.5 var(--serif);color:#e6e0d2;text-wrap:pretty;}
+.vitrine-date-line[hidden] {display:none;}
+@media(max-aspect-ratio:9/10) {
+  .vitrine-date {inset:0 0 28px;gap:2px;}
+  .vitrine-date-year {font-size:30px;}
+}

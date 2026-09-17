@@ -48,7 +48,16 @@ export function createVinciCloseLook(options: {
 type Words = { en: string; de: string }
 const LINES = (JSON.parse(linesRaw) as { lines: Record<string, Words> }).lines
 const STEPS = (JSON.parse(stepsRaw) as { steps: Record<string, (Words & { at: number; part: string; certainty: string })[]> }).steps
-const CARDS = JSON.parse(cardsRaw) as { honesty_variants: { page: Words } }
+const CARDS = JSON.parse(cardsRaw) as { honesty_variants: { page: Words }; floor_honesty: Words
+  controls: { date: { previous: Words; next: Words; which_year?: Words; age?: Words } } }
+/** The date reader's own words. The question before a date and the age beside
+ * it are read where the card models carry them, and stand down where not. */
+export function vinciDateWords(): { previous: string; next: string; floor: string; whichYear: string | null; age: ((years: number) => string) | null } {
+  const language = lang(), date = CARDS.controls.date
+  const age = date.age?.[language]
+  return { previous: date.previous[language], next: date.next[language], floor: CARDS.floor_honesty[language],
+    whichYear: date.which_year?.[language] ?? null, age: age ? (years: number) => age.replace('{years}', String(years)) : null }
+}
 /** What a page's reproduction is labelled as, beside every page the reader shows. */
 export const VINCI_PAGE_HONESTY: Words = CARDS.honesty_variants.page
 const CONTROLS = (JSON.parse(cardsRaw) as { controls: {
