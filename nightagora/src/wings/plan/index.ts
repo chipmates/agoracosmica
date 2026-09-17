@@ -173,7 +173,7 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
       const element = narrow ? make('span', 'wing-plan-mark') : make('button', 'wing-plan-mark')
       if (element instanceof HTMLButtonElement) {
         element.type = 'button'
-        element.addEventListener('click', () => { const id = first.id; shut(); options.station(id) })
+        element.addEventListener('click', () => { const id = first.id; press(() => options.station(id)) })
       }
       element.setAttribute('aria-hidden', 'true')
       element.tabIndex = -1
@@ -202,7 +202,7 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
       )
       if (stood.has(station.id) && station.id !== standing)
         entry.append(make('span', 'wing-plan-said', say(PLAN_WORDS.stood)))
-      entry.addEventListener('click', () => { shut(); options.station(station.id) })
+      entry.addEventListener('click', () => press(() => options.station(station.id)))
       item.append(entry)
       const works = site.highlights.filter(highlight => highlight.station === station.id)
       if (works.length) {
@@ -212,7 +212,7 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
           const button = make('button', 'wing-plan-work', work.title[language])
           button.type = 'button'
           button.dataset['kind'] = work.kind
-          button.addEventListener('click', () => { shut(); options.highlight(work.id) })
+          button.addEventListener('click', () => press(() => options.highlight(work.id)))
           line.append(button)
           inner.append(line)
         }
@@ -229,6 +229,27 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
     unmark()
     if (dialog.open) dialog.close()
     options.returnFocus()
+  }
+
+  /** THE WALK STARTS AFTER THE ENTRY IS GONE. Dismissing the sheet is a
+   * history traversal and the frame writes the station into the address as
+   * it walks, so a walk begun in the same task would have its address undone
+   * by the pop that follows it. The sheet closes, the entry goes, the museum
+   * walks. */
+  function press(run: () => void): void {
+    const held = marked
+    shut()
+    if (!held) { run(); return }
+    let done = false
+    const go = (): void => {
+      if (done) return
+      done = true
+      view.removeEventListener('popstate', go)
+      run()
+    }
+    view.addEventListener('popstate', go)
+    // a traversal that never answers still walks
+    view.setTimeout(go, 150)
   }
 
   const leaving = new AbortController()
