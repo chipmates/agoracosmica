@@ -16,7 +16,7 @@
      certainty word, so this file holds a sheet and no claims. */
 
 import { lang } from '../content'
-import { vinciCertaintyWords, vinciWelcomeBlocks, vinciWelcomeText, type VinciText } from './content'
+import { vinciCertaintyWords, vinciThroughLine, vinciWelcomeBlocks, vinciWelcomeText, type VinciText } from './content'
 
 const FLAG = 'vinci-welcome'
 
@@ -73,7 +73,9 @@ export function createVinciWelcome(
     foot.textContent = ''
     sheet.append(
       make('p', 'vinci-kicker', text(vinciWelcomeText.kicker)),
-      make('h1', 'vinci-welcome-title', text(vinciWelcomeText.title))
+      make('h1', 'vinci-welcome-title', text(vinciWelcomeText.title)),
+      // The wing's one sentence, the same one the recap carries at the exit.
+      make('p', 'vinci-promise', text(vinciThroughLine))
     )
     const narrow = phone()
     const blocks = make('div', 'vinci-welcome-blocks')
