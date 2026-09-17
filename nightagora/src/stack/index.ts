@@ -141,7 +141,8 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
 
   const backend: 'webgpu' | 'webgl2' = adapter === null ? 'webgl2' : 'webgpu'
   const architecture = adapter?.architecture ?? 'webgl2'
-  const materials = createMaterialLibrary(tier)
+  // `?ktx2=off` reads the photographs instead, for an A and B of the encode
+  const materials = createMaterialLibrary(tier, { compressed: new URLSearchParams(location.search).get('ktx2') !== 'off' })
   // the renderer is what tells the KTX2 transcoder which GPU format to target
   const models = createModelLibrary(tier, materials, renderer)
   const meter = createCostMeter(renderer)

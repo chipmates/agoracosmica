@@ -29,6 +29,10 @@
 
 import {
   Color,
+  CompressedTexture,
+  DataTexture,
+  LinearFilter,
+  LinearMipmapLinearFilter,
   LinearSRGBColorSpace,
   MeshStandardNodeMaterial,
   RepeatWrapping,
@@ -38,6 +42,7 @@ import {
 import * as TSL from 'three/tsl'
 import { applyDetail, type DetailScales } from './detail'
 import { loadManifest, type ManifestEntry } from '../manifest'
+import { compressedReady, ktx2 } from './ktx2'
 import type { Tier } from './tier'
 
 export type { AssetClass, ManifestEntry } from '../manifest/schema'
@@ -442,7 +447,54 @@ async function fill(tex: Texture, url: string, size: number): Promise<void> {
   tex.needsUpdate = true
 }
 
-export function createMaterialLibrary(tier: Tier): MaterialLibrary {
+type MapName = 'albedo' | 'normal' | 'surface'
+/** a map re-encoded as Basis UASTC in a KTX2 file, beside its source, with
+    the source's own hash so a changed photograph cannot keep an old encode */
+interface EncodedMap { path: string; sha256: string; bytes: number; width: number; height: number; source_sha256: string }
+type EncodedEntry = ManifestEntry & { ktx2?: Partial<Record<MapName, EncodedMap>> }
+
+/* A MAP THAT ARRIVES AS GPU BLOCKS. Transcoded once for this machine (BC7 or
+   ASTC, a quarter of the RGBA8 the photograph decodes to), with the mip chain
+   the encoder wrote; a tier that holds a smaller side drops the chain's top
+   levels instead of resizing, because blocks cannot be resampled. What it
+   costs is the bytes it holds. */
+async function compressed(url: string, size: number): Promise<{ texture: Texture; bytes: number }> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const loaded = (await ktx2.loadAsync(url)) as any
+  const chain = loaded.mipmaps as Array<{ data: ArrayBufferView; width: number; height: number }>
+  let mips = chain
+  while (mips.length > 1 && mips[0]!.width > size) mips = mips.slice(1)
+  let texture: Texture = loaded
+  if (mips !== chain) {
+    const top = mips[0]!
+    const next = loaded.isCompressedTexture
+      ? new CompressedTexture(mips as never, top.width, top.height, loaded.format, loaded.type)
+      : new DataTexture(top.data as never, top.width, top.height, loaded.format, loaded.type)
+    if (!loaded.isCompressedTexture) next.mipmaps = mips as never
+    next.colorSpace = loaded.colorSpace
+    loaded.dispose()
+    texture = next
+  }
+  texture.wrapS = RepeatWrapping
+  texture.wrapT = RepeatWrapping
+  texture.magFilter = LinearFilter
+  texture.minFilter = LinearMipmapLinearFilter
+  texture.generateMipmaps = false
+  texture.anisotropy = 8
+  texture.flipY = false
+  texture.name = url.slice(url.lastIndexOf('/', url.lastIndexOf('/') - 1) + 1)
+  texture.needsUpdate = true
+  return { texture, bytes: mips.reduce((sum, mip) => sum + mip.data.byteLength, 0) }
+}
+
+export interface MaterialLibraryOptions {
+  /** read a map's KTX2 encode where the store records one. The stack's own
+      library does; a private library that manages its own texture objects
+      keeps the decoded photographs. */
+  compressed?: boolean
+}
+
+export function createMaterialLibrary(tier: Tier, options: MaterialLibraryOptions = {}): MaterialLibrary {
   const sets = new Map<string, MaterialSet>()
   const seen = new Map<string, ManifestEntry>()
   const held: Texture[] = []
@@ -450,7 +502,10 @@ export function createMaterialLibrary(tier: Tier): MaterialLibrary {
   const missing = new Map<string, string>()
   let budget = texturesFor(tier)
   let bytes = 0
-  const uploaded = new Map<string, { size: number; maps: number }>()
+  const uploaded = new Map<string, { size: number; maps: number; MB: number; encoded: number }>()
+  /** one resolution per set: the first request's budget decides its maps, and
+      a second request while the first is in flight waits for it */
+  const resolving = new Map<string, Promise<void>>()
 
   async function manifestOnce(): Promise<Map<string, ManifestEntry>> {
     if (remote) return remote
@@ -482,7 +537,7 @@ export function createMaterialLibrary(tier: Tier): MaterialLibrary {
   }
 
   /** the one function that turns a manifest entry into pixels, per set */
-  const resolvers = new Map<string, (entry: ManifestEntry | undefined) => Promise<void>>()
+  const resolvers = new Map<string, (entry: ManifestEntry | undefined, want: TextureBudget) => Promise<void>>()
 
   function build(name: string): MaterialSet {
     const recipe = { ...DEFAULT_RECIPE, ...RECIPES[name] }
@@ -497,6 +552,8 @@ export function createMaterialLibrary(tier: Tier): MaterialLibrary {
     maps.albedo.name = `${name}/albedo (placeholder)`
     maps.normal.name = `${name}/normal (placeholder)`
     maps.surface.name = `${name}/surface (placeholder)`
+    // every node that samples a map, so an encoded map can take its place
+    const users: Record<MapName, N[]> = { albedo: [], normal: [], surface: [] }
     const ready = uniform(0)
     /* the reciprocal of the set's own mean, as a uniform rather than a
        constant: the manifest may land after the shader is compiled, and the
@@ -552,9 +609,14 @@ export function createMaterialLibrary(tier: Tier): MaterialLibrary {
         const size = at.metres ?? set.scale
         const tile = typeof size === 'number' ? [size, size] : size
         const uv = set.place(at).div(vec2(tile[0], tile[1]))
-        const colour = texture(maps.albedo, uv).rgb.mul(tint)
+        const albedoNode = texture(maps.albedo, uv)
         const surface = texture(maps.surface, uv)
-        const packed = texture(maps.normal, uv).rgb.mul(2).sub(1)
+        const normalNode = texture(maps.normal, uv)
+        users.albedo.push(albedoNode)
+        users.surface.push(surface)
+        users.normal.push(normalNode)
+        const colour = albedoNode.rgb.mul(tint)
+        const packed = normalNode.rgb.mul(2).sub(1)
         return {
           albedo: mix(vec3(1, 1, 1), colour.mul(invMean), ready),
           colour,
@@ -648,47 +710,64 @@ export function createMaterialLibrary(tier: Tier): MaterialLibrary {
       rough.value = set.roughness
     }
 
-    async function attach(entry: ManifestEntry): Promise<void> {
+    async function attach(entry: EncodedEntry, want: TextureBudget): Promise<void> {
       if (entry.class === 'GENERATED') return
       const has = (m: string): boolean => (entry.maps ?? []).includes(m)
-      const url = (file: string, ext: string): string =>
-        `${ASSET_BASE}${entry.wing}/${entry.path}${file}.${ext}`
-      const jobs: Array<Promise<void>> = [fill(maps.albedo, url('albedo', 'jpg'), budget.size)]
-      let count = 1
-      if (has('normal') && budget.maps.includes('normal')) {
-        jobs.push(fill(maps.normal, url('normal', 'png'), budget.size))
-        count++
-      }
-      if (has('surface') && budget.maps.includes('surface')) {
-        jobs.push(fill(maps.surface, url('surface', 'png'), budget.size))
-        count++
-      }
-      await Promise.all(jobs)
-      maps.size = budget.size
-      bytes += count * textureBytes(budget.size)
-      uploaded.set(name, { size: budget.size, maps: count })
+      const url = (file: string): string => `${ASSET_BASE}${entry.wing}/${entry.path}${file}`
+      const wanted: MapName[] = ['albedo', ...(['normal', 'surface'] as const).filter((m) => has(m) && want.maps.includes(m))]
+      let onDevice = 0, encoded = 0
+      await Promise.all(wanted.map(async (map) => {
+        const record = options.compressed && compressedReady() ? entry.ktx2?.[map] : undefined
+        if (record) {
+          const made = await compressed(`${ASSET_BASE}${entry.wing}/${record.path}`, want.size)
+          const placeholder = maps[map]
+          maps[map] = made.texture
+          for (const node of users[map]) node.value = made.texture
+          placeholder.dispose()
+          onDevice += made.bytes
+          encoded++
+          return
+        }
+        await fill(maps[map], url(`${map}.${map === 'albedo' ? 'jpg' : 'png'}`), want.size)
+        onDevice += textureBytes(want.size)
+      }))
+      maps.size = want.size
+      bytes += onDevice
+      uploaded.set(name, { size: want.size, maps: wanted.length, MB: onDevice / 1048576, encoded })
       held.push(maps.albedo, maps.normal, maps.surface)
       ready.value = 1
     }
 
-    resolvers.set(name, async (entry) => {
+    resolvers.set(name, async (entry, want) => {
       if (!entry) return
       if (!entry.display || entry.class === 'REFERENCE-ONLY') {
         throw new Error(`material set "${name}" may not be displayed`)
       }
       adopt(entry)
-      await attach(entry)
+      await attach(entry, want)
     })
     seen.set(set.entry.id, set.entry)
     sets.set(name, set)
     return set
   }
 
+  /** the budget is taken when the set is asked for, never when its bytes
+      arrive: a caller that narrows the tier for its own request cannot change
+      the size of a set someone else asked for a moment before */
+  function resolve(name: string): Promise<void> {
+    const already = resolving.get(name)
+    if (already) return already
+    const want = budget
+    const work = manifestOnce().then((index) => resolvers.get(name)?.(index.get(`library/${name}`), want))
+    resolving.set(name, work)
+    return work
+  }
+
   async function load(name: string): Promise<MaterialSet> {
     const set = sets.get(name) ?? build(name)
     if (!set.ready.value) {
       try {
-        await resolvers.get(name)?.((await manifestOnce()).get(`library/${name}`))
+        await resolve(name)
       } catch (err) {
         missing.set(name, (err as Error).message)
         throw err
@@ -705,8 +784,7 @@ export function createMaterialLibrary(tier: Tier): MaterialLibrary {
        the library adds is gated on it: the scene draws exactly as it was
        authored. It says so once and does not throw, because a missing CDN is
        not a reason for a museum to go dark. */
-    void manifestOnce()
-      .then((index) => resolvers.get(name)?.(index.get(`library/${name}`)))
+    void resolve(name)
       .catch((err: Error) => {
         missing.set(name, err.message)
         console.warn(`library/${name} was not loaded: ${err.message}`)
@@ -720,7 +798,7 @@ export function createMaterialLibrary(tier: Tier): MaterialLibrary {
     manifest: () => [...seen.values()],
     textureMB: () => bytes / (1024 * 1024),
     inventory: () =>
-      [...uploaded].map(([name, u]) => ({ name, size: u.size, maps: u.maps, MB: (u.maps * textureBytes(u.size)) / 1048576 })),
+      [...uploaded].map(([name, u]) => ({ name: u.encoded ? `${name} ktx2 ${u.encoded}` : name, size: u.size, maps: u.maps, MB: u.MB })),
     missing: () => [...missing].map(([name, reason]) => ({ name, reason })),
     pending: () => [...sets.values()].filter((set) => !set.ready.value && !missing.has(set.entry.id.replace(/^library\//, ''))).length,
     setTier(next) {

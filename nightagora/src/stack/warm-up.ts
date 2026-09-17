@@ -187,7 +187,9 @@ export function warmWalk(
       if (at >= total) return false
       adopt()
       // the last pose stands while the stack still holds bodies for the sweep
-      if (at === poses.length - 1 && stack.holding() > 0 && performance.now() - began < HOLD_CAP_MS) return true
+      // and while a library set is still arriving: an encoded map takes its
+      // placeholder's place when it lands, which the sweep must draw
+      if (at === poses.length - 1 && (stack.holding() > 0 || stack.materials.pending() > 0) && performance.now() - began < HOLD_CAP_MS) return true
       // and the sweep's eye stands, drawing nothing new, while what it asked
       // for is being linked
       if (at === poses.length) {

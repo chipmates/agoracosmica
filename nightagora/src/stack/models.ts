@@ -66,7 +66,7 @@ import {
   type WebGPURenderer,
 } from 'three/webgpu'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
-import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js'
+import { detectCompressedSupport, ktx2 } from './ktx2'
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js'
 import * as TSL from 'three/tsl'
 import { detailNodes } from './detail'
@@ -141,25 +141,9 @@ export function modelTextureSide(tier: Tier): number {
 /* THE ONE LOADER THE STORE USES, AND THE TWO EXTENSIONS A COMPRESSED EXPORT
    ARRIVES IN. `gltfpack -cc -tc -tq 8` packs the geometry with meshopt and
    the maps as ETC1S inside KTX2; a bare GLTFLoader refuses both and the
-   whole document fails, not just its textures. The transcoder is two files
-   the KTX2 worker FETCHES at load rather than imports, so they stand in
-   `public/basis/` and not in the bundle graph: `basis_transcoder.js` and
-   `basis_transcoder.wasm`, Apache License 2.0, from the Basis Universal
-   project, delivered with three and copied from its own libs folder. */
-const ktx2 = new KTX2Loader().setTranscoderPath(`${import.meta.env.BASE_URL}basis/`)
+   whole document fails, not just its textures. The KTX2 loader is the
+   stack's one (`./ktx2`). */
 const loader = new GLTFLoader().setKTX2Loader(ktx2).setMeshoptDecoder(MeshoptDecoder)
-
-/* WHICH GPU FORMAT THE TRANSCODER TARGETS IS A FACT ABOUT THE MACHINE, so it
-   is read off the renderer rather than assumed: ETC1S is a container, not a
-   format, and what it becomes is BC on this desktop and ETC2 or ASTC on a
-   phone. One call covers both backends, because three's WebGPU renderer
-   answers `hasFeature` through its WebGL fallback too, and it has to happen
-   after `renderer.init()`, which is why the library takes the renderer. Where
-   an adapter supports no compressed format at all the transcoder falls back
-   to RGBA8 and the picture still arrives. */
-export function detectCompressedSupport(renderer: WebGPURenderer): void {
-  ktx2.detectSupport(renderer)
-}
 
 /* the density under which a source's own maps stop carrying the room-scale
    band. Measured, not chosen by eye: at 400 texels per metre one texel is
