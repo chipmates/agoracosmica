@@ -490,6 +490,11 @@ export function createMaterialLibrary(tier: Tier): MaterialLibrary {
       surface: placeholder([128, 255, 128], false),
       size: budget.size,
     }
+    // the residency ledger names an allocation by the texture's name when it
+    // was made, so a map drawn before its pixels arrived says so
+    maps.albedo.name = `${name}/albedo (placeholder)`
+    maps.normal.name = `${name}/normal (placeholder)`
+    maps.surface.name = `${name}/surface (placeholder)`
     const ready = uniform(0)
     /* the reciprocal of the set's own mean, as a uniform rather than a
        constant: the manifest may land after the shader is compiled, and the

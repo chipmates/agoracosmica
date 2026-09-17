@@ -57,10 +57,16 @@ async function sampleLeg(page, ids, to = TO) {
     const ledger = window.__naStack?.ledger
     const kinds = ['nodeBuilds', 'programs', 'pipelines', 'textures', 'buffers']
     const created = []; let before = ledger?.counts()
+    // the rail bar says ARRIVED without a layout: reading the page's text in
+    // every frame would force one, and the probe would time its own reading
+    const bar = () => {
+      const here = document.querySelector('.wing-step[aria-current="true"]')
+      return here ? here.dataset.station === to && !document.querySelector('.wing-step[data-target="true"]') : null
+    }
     const tick = (t) => {
       dts.push(t - last); last = t
       if (ledger) { const now = ledger.counts(); created.push(kinds.map(k => now[k] - before[k])); before = now }
-      if (arrived === null && document.body.innerText.includes(toNo)) arrived = t - t0
+      if (arrived === null && t - t0 > 1500 && (bar() ?? document.body.innerText.includes(toNo))) arrived = t - t0
       if (!stop) requestAnimationFrame(tick)
     }
     requestAnimationFrame(tick)
