@@ -68,4 +68,21 @@ export const LOBBY_TEXT = {
   privacy: { en: 'Privacy', de: 'Datenschutz' },
   close: { en: 'Close', de: 'Schließen' },
   paneEnter: { en: 'Enter the museum', de: 'Das Museum betreten' },
+  /* WHAT THE GOLD FIELD SAYS WHILE A WING IS BEING BUILT. One line per stage
+     of the entry, and the stage that is really running is the one shown. The
+     first is the fallback: the wing's own module is still arriving, so
+     nothing under the field has said anything yet. */
+  entryOpening: { en: 'Opening the wing', de: 'Der Flügel wird geöffnet' },
+  entryHouse: {
+    en: 'Building the house and its rooms',
+    de: 'Das Haus und seine Räume entstehen',
+  },
+  entryExhibits: {
+    en: 'Hanging the pictures and setting up the machines',
+    de: 'Die Bilder werden gehängt, die Maschinen aufgestellt',
+  },
+  entryWalk: {
+    en: 'Walking through every room once, so your walk runs smoothly',
+    de: 'Ein Gang durch alle Räume, damit dein Rundgang ruhig läuft',
+  },
 } satisfies Record<string, Bilingual>

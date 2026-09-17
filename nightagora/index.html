@@ -221,20 +221,62 @@
     #goldbreath {
       position: fixed; inset: 0; z-index: 4; pointer-events: none;
       opacity: 0;
+      /* the one ink this field already carries, named once */
+      --breath-ink: #140b04;
       background: radial-gradient(ellipse 90% 70% at 50% 46%,
         #f6d998 0%, #d9a852 34%, #8a5a1c 68%, #24160a 100%);
       transition: opacity 0.8s ease;
     }
-    #goldbreath .dark-line {
+    /* the incised rule is the measure of the wait: the faint cut stands the
+       whole width, and the dark ink opens along it from the middle to both
+       ends as the wing is paid for. The field is radial, so the growth is
+       symmetrical, and an entry that is instant never shows it opening. */
+    #goldbreath .field-measure {
       position: absolute; left: 27%; right: 27%; top: 46%;
-      height: 1px; background: #140b04;
+      height: 1px; overflow: hidden;
+      background: color-mix(in srgb, var(--breath-ink) 24%, transparent);
     }
-    /* the incised rule is also the measure of the wait: it opens from the
-       middle of the field as the wing is paid for, and stands full at the
-       cut. It is the only thing the field shows, so an entry that is
-       instant simply never shows it opening. */
-    #goldbreath .dark-line { transition: transform 0.25s ease-out; }
+    #goldbreath .dark-line {
+      position: absolute; inset: 0; background: var(--breath-ink);
+      transform: scaleX(0); transition: transform 0.25s ease-out;
+    }
     #goldbreath.cutting .dark-line { transition: none; }
+    /* NO COUNT YET, so nothing may be claimed: a highlight travels out of the
+       middle to each end and leaves nothing behind it, which is the one thing
+       a fill must never look like. Transform and opacity only, because the
+       thread that would drive anything else is blocked building the wing. */
+    #goldbreath .line-travel {
+      position: absolute; top: 0; bottom: 0; left: 50%; width: 24%;
+      transform: translateX(-50%); opacity: 0;
+      background: linear-gradient(90deg, transparent,
+        color-mix(in srgb, var(--breath-ink) 78%, transparent), transparent);
+    }
+    #goldbreath[data-measure='indeterminate'] .line-travel {
+      animation: breath-travel 2.6s ease-in-out infinite;
+    }
+    #goldbreath[data-measure='indeterminate'] .line-travel.mirror {
+      animation-name: breath-travel-back;
+    }
+    @keyframes breath-travel {
+      0% { transform: translateX(-50%); opacity: 0; }
+      18% { opacity: 0.9; }
+      100% { transform: translateX(210%); opacity: 0; }
+    }
+    @keyframes breath-travel-back {
+      0% { transform: translateX(-50%); opacity: 0; }
+      18% { opacity: 0.9; }
+      100% { transform: translateX(-310%); opacity: 0; }
+    }
+    /* one quiet line under the rule, naming the stage that is really running */
+    #goldbreath .field-stage {
+      position: absolute; left: 50%; top: calc(46% + 18px);
+      transform: translateX(-50%);
+      width: min(62ch, 78vw); text-align: center; text-wrap: balance;
+      font-family: var(--serif);
+      font-size: clamp(13px, 1.15vw, 15px);
+      letter-spacing: 0.04em; line-height: 1.6;
+      color: var(--breath-ink);
+    }
     #goldbreath.lit { opacity: 0.97; }
     /* the cut owns the whole frame: even the masthead would ghost through
        the gold at this opacity, and a label inside a cut is a label. The
@@ -1113,8 +1155,10 @@
       body[data-phase='held'] .status { animation: none; }
       .copy, .status { transition: none; }
       #keeper, #keeper *, #verse { transition: none; }
-      /* the wait's measure still reads, it simply steps instead of gliding */
+      /* the wait's measure still reads, it simply steps instead of gliding,
+         and nothing travels or pulses while there is no count to show */
       #goldbreath .dark-line { transition: none; }
+      #goldbreath .line-travel { animation: none; opacity: 0; }
       /* the same composition, it simply arrives already composed */
       .star-chip::after,
 .pane-sibling::after,
@@ -1158,7 +1202,14 @@
     <p class="keeper-note" data-na-claim="tradition" data-na-disclosure="watchman" data-na-anchor="lobby/keeper" data-na-anchor-class="procedural">An AI museum voice · An interpretation, not a person</p>
   </div>
   <p id="voice" aria-live="polite"></p>
-  <div id="goldbreath" aria-hidden="true"><div class="dark-line"></div></div>
+  <div id="goldbreath" aria-hidden="true">
+    <div class="field-measure" role="progressbar" aria-valuemin="0" aria-valuemax="1" aria-labelledby="breath-stage">
+      <div class="dark-line"></div>
+      <div class="line-travel"></div>
+      <div class="line-travel mirror"></div>
+    </div>
+    <p id="breath-stage" class="field-stage" aria-live="polite"></p>
+  </div>
   <div id="constellation-plate">
     <p class="plate-kicker"></p>
     <h2 class="plate-name"></h2>

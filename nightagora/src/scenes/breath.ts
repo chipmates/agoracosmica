@@ -10,6 +10,9 @@
    tooth the rest of the night is printed on. */
 
 import { FOUNDING_SEED, mulberry32 } from '../core/seed'
+import { LOBBY_TEXT } from '../content/lobby'
+import { say } from '../wings/content'
+import type { WingProgress, WingStage } from '../wings/frame'
 
 /** a stable hand per stroke. It reads from the stroke's index instead of
     the scene's seeded sequence, so adding the bow moved no other mark. */
@@ -59,9 +62,10 @@ export interface BreathHandles {
       breathe out of, so the gold is simply there from the first paint, and
       it holds until the work is done. */
   hold(work: PromiseLike<unknown>): void
-  /** How much of the wait is paid for, as a share of the whole. The dark
-      line is the only thing the field shows it in: no spinner, no text. */
-  progress(done: number, total: number): void
+  /** What the wing under the field reports about its own building: the dark
+      ink on the rule, and the one line under it naming the stage. A field
+      that is never told keeps the indeterminate state. */
+  progress(reading: WingProgress): void
   /** the rig's frozen moment: the gold at full, no cut scheduled */
   forgeStage(): void
   /** strike it with no transition at all */
@@ -75,6 +79,19 @@ export function createBreath(): BreathHandles {
   const el: HTMLElement = node
 
   const rule = el.querySelector<HTMLElement>('.dark-line')
+  const measure = el.querySelector<HTMLElement>('.field-measure')
+  const stageWord = el.querySelector<HTMLElement>('.field-stage')
+  /** the aria-hidden the shell carries while the field is dark: a progress
+      bar that is not running has nothing to say to a screen reader */
+  const shellHidden = el.getAttribute('aria-hidden')
+  const STAGE_WORDS: Record<WingStage, { en: string; de: string }> = {
+    house: LOBBY_TEXT.entryHouse,
+    exhibits: LOBBY_TEXT.entryExhibits,
+    walk: LOBBY_TEXT.entryWalk,
+  }
+  let stageSaid: WingStage | 'none' | '' = ''
+  let shareSaid: number | null = -1
+  let paintedAt = 0
   const glory = document.createElement('canvas')
   glory.setAttribute('aria-hidden', 'true')
   glory.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none'
@@ -87,10 +104,26 @@ export function createBreath(): BreathHandles {
      token is what a finished wait compares itself against. */
   let waiting: object | null = null
 
-  /** the incised rule as a measure: it opens from the middle of the field to
-      its full width as the wait is paid off, and stands full at the cut */
-  function line(share: number): void {
-    if (rule) rule.style.transform = `scaleX(${Math.max(0, Math.min(1, share))})`
+  /** the incised rule as a measure: the dark ink opens from the middle of the
+      field to both ends as the wait is paid off, and stands full at the cut.
+      A null share is a wing that cannot count yet, and the rule says so by
+      travelling instead of standing at a number it has not earned. */
+  function line(share: number | null): void {
+    const held = share === null ? 0 : Math.max(0, Math.min(1, share))
+    if (rule) rule.style.transform = `scaleX(${held})`
+    el.dataset['measure'] = share === null ? 'indeterminate' : 'counted'
+    // ARIA has one way to say working-with-no-number: no aria-valuenow at all
+    if (share === null) measure?.removeAttribute('aria-valuenow')
+    else measure?.setAttribute('aria-valuenow', held.toFixed(3))
+  }
+
+  /** the stage's own sentence, written at most once per stage */
+  function word(stage: WingStage | 'none'): void {
+    if (stage === stageSaid) return
+    stageSaid = stage
+    const said = say(stage === 'none' ? LOBBY_TEXT.entryOpening : STAGE_WORDS[stage])
+    if (stageWord) stageWord.textContent = said
+    measure?.setAttribute('aria-valuetext', said)
   }
 
   function paint(): void {
@@ -227,6 +260,8 @@ export function createBreath(): BreathHandles {
     waiting = null
     document.body.classList.remove('entering')
     line(1)
+    if (shellHidden === null) el.removeAttribute('aria-hidden')
+    else el.setAttribute('aria-hidden', shellHidden)
     window.clearTimeout(timer)
     // the cut is a cut: no class may be left that can animate the gold out
     el.classList.add('cutting')
@@ -242,7 +277,13 @@ export function createBreath(): BreathHandles {
     paint()
     running = true
     document.body.classList.add('entering')
-    line(0)
+    // the field is a live region only while it is lit
+    el.removeAttribute('aria-hidden')
+    stageSaid = ''
+    shareSaid = -1
+    paintedAt = 0
+    word('none')
+    line(null)
     window.clearTimeout(timer)
   }
 
@@ -288,8 +329,19 @@ export function createBreath(): BreathHandles {
       glory.style.transform = 'scale(1.05)'
       holdFor(work, false)
     },
-    progress(done, total) {
-      if (running) line(total > 0 ? done / total : 0)
+    progress(reading) {
+      if (!running) return
+      const now = performance.now()
+      // ten writes a second at most. A new stage and the last reading of an
+      // entry always land: they are what the visitor is waiting to see.
+      const due = reading.stage !== stageSaid || reading.share === 1
+      if (!due && now - paintedAt < 100) return
+      paintedAt = now
+      word(reading.stage)
+      if (reading.share !== shareSaid) {
+        shareSaid = reading.share
+        line(reading.share)
+      }
     },
     forgeStage() {
       paint()
@@ -297,6 +349,7 @@ export function createBreath(): BreathHandles {
       window.clearTimeout(timer)
       el.classList.remove('cutting')
       el.classList.add('lit')
+      word('none')
       line(1)
       glory.style.transform = 'scale(1.05)'
     },
