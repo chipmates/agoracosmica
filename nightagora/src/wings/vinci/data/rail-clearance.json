@@ -2,7 +2,7 @@
  "format": "vinci-rail-clearance-v2",
  "completeNearClearance": true,
  "recipe": "src/wings/vinci/rail-certify.mjs",
- "recipeSha256": "09868caeb305926f83f0f25018fb6c37f804019034ecbedb26146fe50123eea1",
+ "recipeSha256": "5fcd1b9aec962ef60b045224b0c22122ccb4547f1afcd7adc6062df7308b99cc",
  "sources": [
   {
    "file": "src/stack/detail.ts",
@@ -30,8 +30,8 @@
   },
   {
    "file": "src/wings/vinci/collection/approaches.ts",
-   "sha256": "e30e67b425b3893878754522adcb536cd4902d084f2e448727277d75602e6574",
-   "bytes": 10636,
+   "sha256": "811c48a40ac9a2797194535d8e4e4ce789ddb9d55c81308c559e60757344c120",
+   "bytes": 19948,
    "unchangedDuringAudit": true
   },
   {
@@ -48,8 +48,8 @@
   },
   {
    "file": "src/wings/vinci/collection/hang.ts",
-   "sha256": "a5d67b119caf36307a3c07db0bef586b0523e8cee97bb53317a408d191bc6489",
-   "bytes": 6994,
+   "sha256": "b94de36a074967c8bda4248cc21b90652c4da86c31aa745eaef968e0936fa6be",
+   "bytes": 7036,
    "unchangedDuringAudit": true
   },
   {
@@ -167,6 +167,12 @@
    "unchangedDuringAudit": true
   },
   {
+   "file": "src/wings/vinci/grave/placement.ts",
+   "sha256": "bbbca27b3348cfb65427d7e87b90a9425ee37f184ae9fdf2e180e02d85d48916",
+   "bytes": 815,
+   "unchangedDuringAudit": true
+  },
+  {
    "file": "src/wings/vinci/ground-dressing.ts",
    "sha256": "772303e904cd3616424eb7c5e0d41c89959b88dcd095161a20c4a1938b37bd4d",
    "bytes": 19179,
@@ -188,6 +194,18 @@
    "file": "src/wings/vinci/line/data/never-said.json",
    "sha256": "2166ba8d4a97ad8c477cc80eb391f580e729b8a417d1b32c5cce2c711205aaf9",
    "bytes": 6680,
+   "unchangedDuringAudit": true
+  },
+  {
+   "file": "src/wings/vinci/line/data/timeline.json",
+   "sha256": "50ea7f7d43d6d8153e11c2704f1805c42a5ac9d51548732d6947206bd6c08d30",
+   "bytes": 91986,
+   "unchangedDuringAudit": true
+  },
+  {
+   "file": "src/wings/vinci/line/studs.ts",
+   "sha256": "c1823a4cbbaee3cef6007380f05e5d8936ed176f2bf6036b957fa0f98e8d3f0d",
+   "bytes": 1913,
    "unchangedDuringAudit": true
   },
   {
@@ -5970,7 +5988,7 @@
   "The 0.25 m near distance, both authored viewport aspect ratios and the authored endpoint FOV are used. The authored aspect gives the largest near rectangle, so a wider or narrower canvas is inside it.",
   "Every straight span of the finished path is proved end to end by exact segment/triangle distance; every rounded corner is proved by closed balls over its control hull, and those balls are what the runtime replays. Stored balls reserve 4 µm beyond the requested radius; runtime matching of quantized geometry consumes at most 2 µm of it.",
   "The walk carries a step rhythm of at most 10.82 mm off the certified line, and that envelope is added to the clearance radius every span and every corner above is proved against.",
-  "An approach is one straight leg from a station eye to one exhibit's viewing eye and back, proved by the same exact segment/triangle distance and the same near rectangle plus gait envelope as a route. It is reachable from that station only, it is not addressable by the station rail, and the table is linear: two entries per exhibit, never the product of poses.",
+  "An approach is one straight leg from a station eye to one exhibit's viewing eye and back, proved by the same exact segment/triangle distance and the same near rectangle plus gait envelope as a route. It is reachable from that station only, it is not addressable by the station rail, and the table is linear: two entries per exhibit, never the product of poses. The exhibits are the hang's plates, the mural, the machines, the grave's three, the plaque, the book and the twelve cut dates.",
   "A station whose full near ball is not clear carries an oriented certificate instead: its near pyramid is proved over the whole ±0.6 rad yaw and ±0.32 rad pitch look envelope, sampled every 0.02 rad, with the distance a corner can travel between two samples subtracted from the measured margin."
  ],
  "arrivalEN": {
@@ -69771,6 +69789,1432 @@
    "certifiedBalls": []
   },
   {
+   "viewport": "desktop",
+   "station": "supper-wall",
+   "exhibit": "picture/last-supper/front",
+   "fromPose": {
+    "eye": [
+     -33.9,
+     -4.78,
+     29.5
+    ],
+    "at": [
+     -44.77,
+     -3.49,
+     29.5
+    ],
+    "fov": 62
+   },
+   "toPose": {
+    "eye": [
+     -36.400000000000006,
+     -4.82,
+     29.5
+    ],
+    "at": [
+     -44.77,
+     -4.160844040486627,
+     29.5
+    ],
+    "fov": 67.27990174293518
+   },
+   "points": [
+    [
+     -33.9,
+     -29.5,
+     -4.78
+    ],
+    [
+     -36.400000000000006,
+     -29.5,
+     -4.82
+    ]
+   ],
+   "roundedLength": 2.500319979522628,
+   "maxNearRadius": 0.43228064105606206,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "flight",
+   "exhibit": "machine/aerial-screw",
+   "fromPose": {
+    "eye": [
+     -46.5,
+     -4.68,
+     48.8
+    ],
+    "at": [
+     -54.5,
+     -3.1999999999999997,
+     46.4
+    ],
+    "fov": 62
+   },
+   "toPose": {
+    "eye": [
+     -50.8,
+     -4.68,
+     48.4
+    ],
+    "at": [
+     -57,
+     -4.1,
+     45.6
+    ],
+    "fov": 75
+   },
+   "points": [
+    [
+     -46.5,
+     -48.8,
+     -4.68
+    ],
+    [
+     -50.8,
+     -48.4,
+     -4.68
+    ]
+   ],
+   "roundedLength": 4.318564576337834,
+   "maxNearRadius": 0.4751481692738077,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "supper-wall",
+   "exhibit": "machine/parachute",
+   "fromPose": {
+    "eye": [
+     -33.9,
+     -4.78,
+     29.5
+    ],
+    "at": [
+     -44.77,
+     -3.49,
+     29.5
+    ],
+    "fov": 62
+   },
+   "toPose": {
+    "eye": [
+     -36.2,
+     -4.82,
+     28.3
+    ],
+    "at": [
+     -37,
+     -4.24,
+     23.1
+    ],
+    "fov": 75
+   },
+   "points": [
+    [
+     -33.9,
+     -29.5,
+     -4.78
+    ],
+    [
+     -36.2,
+     -28.3,
+     -4.82
+    ]
+   ],
+   "roundedLength": 2.5945327132260285,
+   "maxNearRadius": 0.4751481692738077,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "supper-wall",
+   "exhibit": "machine/anemometer",
+   "fromPose": {
+    "eye": [
+     -33.9,
+     -4.78,
+     29.5
+    ],
+    "at": [
+     -44.77,
+     -3.49,
+     29.5
+    ],
+    "fov": 62
+   },
+   "toPose": {
+    "eye": [
+     -42.4,
+     -4.82,
+     26.9
+    ],
+    "at": [
+     -42.65,
+     -5.290000000000001,
+     22.4
+    ],
+    "fov": 35
+   },
+   "points": [
+    [
+     -33.9,
+     -29.5,
+     -4.78
+    ],
+    [
+     -42.4,
+     -26.9,
+     -4.82
+    ]
+   ],
+   "roundedLength": 8.888846944345481,
+   "maxNearRadius": 0.40626557431837856,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "supper-wall",
+   "exhibit": "machine/inclinometer",
+   "fromPose": {
+    "eye": [
+     -33.9,
+     -4.78,
+     29.5
+    ],
+    "at": [
+     -44.77,
+     -3.49,
+     29.5
+    ],
+    "fov": 62
+   },
+   "toPose": {
+    "eye": [
+     -42.4,
+     -4.82,
+     26.9
+    ],
+    "at": [
+     -41.9,
+     -5.345000000000001,
+     22.4
+    ],
+    "fov": 35
+   },
+   "points": [
+    [
+     -33.9,
+     -29.5,
+     -4.78
+    ],
+    [
+     -42.4,
+     -26.9,
+     -4.82
+    ]
+   ],
+   "roundedLength": 8.888846944345481,
+   "maxNearRadius": 0.40626557431837856,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "works",
+   "exhibit": "machine/multi-barrel-gun",
+   "fromPose": {
+    "eye": [
+     -42.9,
+     -3.9799999999999995,
+     45.5
+    ],
+    "at": [
+     -50.5,
+     -4.1,
+     46.2
+    ],
+    "fov": 66
+   },
+   "toPose": {
+    "eye": [
+     -42.2,
+     -4.68,
+     47.9
+    ],
+    "at": [
+     -41.3,
+     -5.025,
+     50.8
+    ],
+    "fov": 64.61183523524205
+   },
+   "points": [
+    [
+     -42.9,
+     -45.5,
+     -3.9799999999999995
+    ],
+    [
+     -42.2,
+     -47.9,
+     -4.68
+    ]
+   ],
+   "roundedLength": 2.5961509971494316,
+   "maxNearRadius": 0.42574179660705236,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "works",
+   "exhibit": "machine/rolling-mill",
+   "fromPose": {
+    "eye": [
+     -42.9,
+     -3.9799999999999995,
+     45.5
+    ],
+    "at": [
+     -50.5,
+     -4.1,
+     46.2
+    ],
+    "fov": 66
+   },
+   "toPose": {
+    "eye": [
+     -45.8,
+     -4.68,
+     46.3
+    ],
+    "at": [
+     -46.6,
+     -5.41,
+     44.3
+    ],
+    "fov": 35
+   },
+   "points": [
+    [
+     -42.9,
+     -45.5,
+     -3.9799999999999995
+    ],
+    [
+     -45.8,
+     -46.3,
+     -4.68
+    ]
+   ],
+   "roundedLength": 3.0886890422960978,
+   "maxNearRadius": 0.42574179660705236,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "works",
+   "exhibit": "machine/ball-bearing",
+   "fromPose": {
+    "eye": [
+     -42.9,
+     -3.9799999999999995,
+     45.5
+    ],
+    "at": [
+     -50.5,
+     -4.1,
+     46.2
+    ],
+    "fov": 66
+   },
+   "toPose": {
+    "eye": [
+     -41.9,
+     -4.68,
+     47.4
+    ],
+    "at": [
+     -40.6,
+     -5.5,
+     46.6
+    ],
+    "fov": 38.9640718318587
+   },
+   "points": [
+    [
+     -42.9,
+     -45.5,
+     -3.9799999999999995
+    ],
+    [
+     -41.9,
+     -47.4,
+     -4.68
+    ]
+   ],
+   "roundedLength": 2.258317958127242,
+   "maxNearRadius": 0.42574179660705236,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "flight",
+   "exhibit": "machine/flywheel",
+   "fromPose": {
+    "eye": [
+     -46.5,
+     -4.68,
+     48.8
+    ],
+    "at": [
+     -54.5,
+     -3.1999999999999997,
+     46.4
+    ],
+    "fov": 62
+   },
+   "toPose": {
+    "eye": [
+     -45.9,
+     -4.68,
+     49.4
+    ],
+    "at": [
+     -44,
+     -5.49,
+     49.6
+    ],
+    "fov": 47.46788877365489
+   },
+   "points": [
+    [
+     -46.5,
+     -48.8,
+     -4.68
+    ],
+    [
+     -45.9,
+     -49.4,
+     -4.68
+    ]
+   ],
+   "roundedLength": 0.848528137423859,
+   "maxNearRadius": 0.40626557431837856,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "supper-wall",
+   "exhibit": "machine/revolving-crane",
+   "fromPose": {
+    "eye": [
+     -33.9,
+     -4.78,
+     29.5
+    ],
+    "at": [
+     -44.77,
+     -3.49,
+     29.5
+    ],
+    "fov": 62
+   },
+   "toPose": {
+    "eye": [
+     -44,
+     -4.82,
+     26.3
+    ],
+    "at": [
+     -44.9,
+     -4.99,
+     22.5
+    ],
+    "fov": 59.23505298595687
+   },
+   "points": [
+    [
+     -33.9,
+     -29.5,
+     -4.78
+    ],
+    [
+     -44,
+     -26.3,
+     -4.82
+    ]
+   ],
+   "roundedLength": 10.594885558607984,
+   "maxNearRadius": 0.40626557431837856,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "works",
+   "exhibit": "machine/lathe",
+   "fromPose": {
+    "eye": [
+     -42.9,
+     -3.9799999999999995,
+     45.5
+    ],
+    "at": [
+     -50.5,
+     -4.1,
+     46.2
+    ],
+    "fov": 66
+   },
+   "toPose": {
+    "eye": [
+     -44,
+     -4.68,
+     45.4
+    ],
+    "at": [
+     -44.2,
+     -5.225,
+     43.6
+    ],
+    "fov": 60.207357732440386
+   },
+   "points": [
+    [
+     -42.9,
+     -45.5,
+     -3.9799999999999995
+    ],
+    [
+     -44,
+     -45.4,
+     -4.68
+    ]
+   ],
+   "roundedLength": 1.3076696830622034,
+   "maxNearRadius": 0.42574179660705236,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "flight",
+   "exhibit": "machine/miter-lock-gates",
+   "fromPose": {
+    "eye": [
+     -46.5,
+     -4.68,
+     48.8
+    ],
+    "at": [
+     -54.5,
+     -3.1999999999999997,
+     46.4
+    ],
+    "fov": 62
+   },
+   "toPose": {
+    "eye": [
+     -51.2,
+     -4.68,
+     52
+    ],
+    "at": [
+     -55.53,
+     -4.77,
+     51.18
+    ],
+    "fov": 64.11634655171939
+   },
+   "points": [
+    [
+     -46.5,
+     -48.8,
+     -4.68
+    ],
+    [
+     -51.2,
+     -52,
+     -4.68
+    ]
+   ],
+   "roundedLength": 5.6859475903318035,
+   "maxNearRadius": 0.41639239886037377,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "works",
+   "exhibit": "machine/water-lifting-screw",
+   "fromPose": {
+    "eye": [
+     -42.9,
+     -3.9799999999999995,
+     45.5
+    ],
+    "at": [
+     -50.5,
+     -4.1,
+     46.2
+    ],
+    "fov": 66
+   },
+   "toPose": {
+    "eye": [
+     -47.3,
+     -4.68,
+     47.8
+    ],
+    "at": [
+     -49.5,
+     -5.0649999999999995,
+     45
+    ],
+    "fov": 62.48103131727361
+   },
+   "points": [
+    [
+     -42.9,
+     -45.5,
+     -3.9799999999999995
+    ],
+    [
+     -47.3,
+     -47.8,
+     -4.68
+    ]
+   ],
+   "roundedLength": 5.013980454688668,
+   "maxNearRadius": 0.42574179660705236,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "flight",
+   "exhibit": "machine/camera-obscura",
+   "fromPose": {
+    "eye": [
+     -46.5,
+     -4.68,
+     48.8
+    ],
+    "at": [
+     -54.5,
+     -3.1999999999999997,
+     46.4
+    ],
+    "fov": 62
+   },
+   "toPose": {
+    "eye": [
+     -46.4,
+     -4.68,
+     50.2
+    ],
+    "at": [
+     -45.6,
+     -5.38,
+     52.6
+    ],
+    "fov": 35
+   },
+   "points": [
+    [
+     -46.5,
+     -48.8,
+     -4.68
+    ],
+    [
+     -46.4,
+     -50.2,
+     -4.68
+    ]
+   ],
+   "roundedLength": 1.4035668847618257,
+   "maxNearRadius": 0.40626557431837856,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "supper-wall",
+   "exhibit": "plaque/flight-quote",
+   "fromPose": {
+    "eye": [
+     -33.9,
+     -4.78,
+     29.5
+    ],
+    "at": [
+     -44.77,
+     -3.49,
+     29.5
+    ],
+    "fov": 62
+   },
+   "toPose": {
+    "eye": [
+     -38.17,
+     -4.82,
+     26.79
+    ],
+    "at": [
+     -40.2,
+     -5.49,
+     25.5
+    ],
+    "fov": 50
+   },
+   "points": [
+    [
+     -33.9,
+     -29.5,
+     -4.78
+    ],
+    [
+     -38.17,
+     -26.79,
+     -4.82
+    ]
+   ],
+   "roundedLength": 5.0575290409448,
+   "maxNearRadius": 0.40626557431837856,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "grave",
+   "exhibit": "grave",
+   "fromPose": {
+    "eye": [
+     -46.9,
+     -4.78,
+     29.2
+    ],
+    "at": [
+     -55.1,
+     -5.54,
+     24.8
+    ],
+    "fov": 60
+   },
+   "toPose": {
+    "eye": [
+     -51.5,
+     -4.82,
+     26.9
+    ],
+    "at": [
+     -54.85,
+     -6.165,
+     25.95
+    ],
+    "fov": 55
+   },
+   "points": [
+    [
+     -46.9,
+     -29.2,
+     -4.78
+    ],
+    [
+     -51.5,
+     -26.9,
+     -4.82
+    ]
+   ],
+   "roundedLength": 5.143111898452144,
+   "maxNearRadius": 0.39705098002295136,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "grave",
+   "exhibit": "grave-diagram",
+   "fromPose": {
+    "eye": [
+     -46.9,
+     -4.78,
+     29.2
+    ],
+    "at": [
+     -55.1,
+     -5.54,
+     24.8
+    ],
+    "fov": 60
+   },
+   "toPose": {
+    "eye": [
+     -52.5,
+     -4.82,
+     23.8
+    ],
+    "at": [
+     -56.74,
+     -4.774697077821548,
+     23.8
+    ],
+    "fov": 60.64845585823059
+   },
+   "points": [
+    [
+     -46.9,
+     -29.2,
+     -4.78
+    ],
+    [
+     -52.5,
+     -23.8,
+     -4.82
+    ]
+   ],
+   "roundedLength": 7.779562969730369,
+   "maxNearRadius": 0.4000014283350258,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "grave",
+   "exhibit": "picture/deathbed-painting/front",
+   "fromPose": {
+    "eye": [
+     -46.9,
+     -4.78,
+     29.2
+    ],
+    "at": [
+     -55.1,
+     -5.54,
+     24.8
+    ],
+    "fov": 60
+   },
+   "toPose": {
+    "eye": [
+     -56.9,
+     -4.82,
+     27.9
+    ],
+    "at": [
+     -60.792,
+     -3.785,
+     25.42
+    ],
+    "fov": 44
+   },
+   "points": [
+    [
+     -46.9,
+     -29.2,
+     -4.78
+    ],
+    [
+     -56.9,
+     -27.9,
+     -4.82
+    ]
+   ],
+   "roundedLength": 10.084225304900718,
+   "maxNearRadius": 0.39705098002295136,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "reading-table",
+   "exhibit": "codex/paris-B",
+   "fromPose": {
+    "eye": [
+     -34.6,
+     -4.76,
+     46.3
+    ],
+    "at": [
+     -37.7,
+     -5.02,
+     45.35
+    ],
+    "fov": 60
+   },
+   "toPose": {
+    "eye": [
+     -36.75,
+     -4.68,
+     45.4
+    ],
+    "at": [
+     -37.72,
+     -5.514,
+     45.4
+    ],
+    "fov": 44
+   },
+   "points": [
+    [
+     -34.6,
+     -46.3,
+     -4.76
+    ],
+    [
+     -36.75,
+     -45.4,
+     -4.68
+    ]
+   ],
+   "roundedLength": 2.3321449354617716,
+   "maxNearRadius": 0.39705098002295136,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "line-early",
+   "exhibit": "stud/life-01",
+   "fromPose": {
+    "eye": [
+     -30.099999999999998,
+     -4.64,
+     47.05
+    ],
+    "at": [
+     -29.942621304375734,
+     -5.062618261740699,
+     46.157461064710965
+    ],
+    "fov": 72
+   },
+   "toPose": {
+    "eye": [
+     -30.25,
+     -4.68,
+     45.15
+    ],
+    "at": [
+     -30.25,
+     -6.29,
+     43.65
+    ],
+    "fov": 50
+   },
+   "points": [
+    [
+     -30.099999999999998,
+     -47.05,
+     -4.64
+    ],
+    [
+     -30.25,
+     -45.15,
+     -4.68
+    ]
+   ],
+   "roundedLength": 1.9063315556324392,
+   "maxNearRadius": 0.4577628964554845,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "line-early",
+   "exhibit": "stud/life-02",
+   "fromPose": {
+    "eye": [
+     -30.099999999999998,
+     -4.64,
+     47.05
+    ],
+    "at": [
+     -29.942621304375734,
+     -5.062618261740699,
+     46.157461064710965
+    ],
+    "fov": 72
+   },
+   "toPose": {
+    "eye": [
+     -30.25,
+     -4.68,
+     46.8
+    ],
+    "at": [
+     -30.25,
+     -6.29,
+     45.3
+    ],
+    "fov": 50
+   },
+   "points": [
+    [
+     -30.099999999999998,
+     -47.05,
+     -4.64
+    ],
+    [
+     -30.25,
+     -46.8,
+     -4.68
+    ]
+   ],
+   "roundedLength": 0.2942787793912443,
+   "maxNearRadius": 0.4577628964554845,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "line-early",
+   "exhibit": "stud/life-04",
+   "fromPose": {
+    "eye": [
+     -30.099999999999998,
+     -4.64,
+     47.05
+    ],
+    "at": [
+     -29.942621304375734,
+     -5.062618261740699,
+     46.157461064710965
+    ],
+    "fov": 72
+   },
+   "toPose": {
+    "eye": [
+     -30.25,
+     -4.68,
+     48.449999999999996
+    ],
+    "at": [
+     -30.25,
+     -6.29,
+     46.949999999999996
+    ],
+    "fov": 50
+   },
+   "points": [
+    [
+     -30.099999999999998,
+     -47.05,
+     -4.64
+    ],
+    [
+     -30.25,
+     -48.449999999999996,
+     -4.68
+    ]
+   ],
+   "roundedLength": 1.4085808461000726,
+   "maxNearRadius": 0.4577628964554845,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "line-early",
+   "exhibit": "stud/life-03",
+   "fromPose": {
+    "eye": [
+     -30.099999999999998,
+     -4.64,
+     47.05
+    ],
+    "at": [
+     -29.942621304375734,
+     -5.062618261740699,
+     46.157461064710965
+    ],
+    "fov": 72
+   },
+   "toPose": {
+    "eye": [
+     -30.25,
+     -4.68,
+     50.099999999999994
+    ],
+    "at": [
+     -30.25,
+     -6.29,
+     48.599999999999994
+    ],
+    "fov": 50
+   },
+   "points": [
+    [
+     -30.099999999999998,
+     -47.05,
+     -4.64
+    ],
+    [
+     -30.25,
+     -50.099999999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 3.0539482641328393,
+   "maxNearRadius": 0.4577628964554845,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "line-late",
+   "exhibit": "stud/life-29",
+   "fromPose": {
+    "eye": [
+     -30.099999999999998,
+     -4.64,
+     53.65
+    ],
+    "at": [
+     -29.942621304375734,
+     -5.062618261740699,
+     52.75746106471097
+    ],
+    "fov": 72
+   },
+   "toPose": {
+    "eye": [
+     -30.25,
+     -4.68,
+     51.75
+    ],
+    "at": [
+     -30.25,
+     -6.29,
+     50.25
+    ],
+    "fov": 50
+   },
+   "points": [
+    [
+     -30.099999999999998,
+     -53.65,
+     -4.64
+    ],
+    [
+     -30.25,
+     -51.75,
+     -4.68
+    ]
+   ],
+   "roundedLength": 1.9063315556324392,
+   "maxNearRadius": 0.4577628964554845,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "line-late",
+   "exhibit": "stud/life-30",
+   "fromPose": {
+    "eye": [
+     -30.099999999999998,
+     -4.64,
+     53.65
+    ],
+    "at": [
+     -29.942621304375734,
+     -5.062618261740699,
+     52.75746106471097
+    ],
+    "fov": 72
+   },
+   "toPose": {
+    "eye": [
+     -30.25,
+     -4.68,
+     53.4
+    ],
+    "at": [
+     -30.25,
+     -6.29,
+     51.9
+    ],
+    "fov": 50
+   },
+   "points": [
+    [
+     -30.099999999999998,
+     -53.65,
+     -4.64
+    ],
+    [
+     -30.25,
+     -53.4,
+     -4.68
+    ]
+   ],
+   "roundedLength": 0.2942787793912443,
+   "maxNearRadius": 0.4577628964554845,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "line-late",
+   "exhibit": "stud/life-31",
+   "fromPose": {
+    "eye": [
+     -30.099999999999998,
+     -4.64,
+     53.65
+    ],
+    "at": [
+     -29.942621304375734,
+     -5.062618261740699,
+     52.75746106471097
+    ],
+    "fov": 72
+   },
+   "toPose": {
+    "eye": [
+     -30.25,
+     -4.68,
+     55.05
+    ],
+    "at": [
+     -30.25,
+     -6.29,
+     53.55
+    ],
+    "fov": 50
+   },
+   "points": [
+    [
+     -30.099999999999998,
+     -53.65,
+     -4.64
+    ],
+    [
+     -30.25,
+     -55.05,
+     -4.68
+    ]
+   ],
+   "roundedLength": 1.4085808461000726,
+   "maxNearRadius": 0.4577628964554845,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "line-late",
+   "exhibit": "stud/life-32",
+   "fromPose": {
+    "eye": [
+     -30.099999999999998,
+     -4.64,
+     53.65
+    ],
+    "at": [
+     -29.942621304375734,
+     -5.062618261740699,
+     52.75746106471097
+    ],
+    "fov": 72
+   },
+   "toPose": {
+    "eye": [
+     -30.25,
+     -4.68,
+     56.699999999999996
+    ],
+    "at": [
+     -30.25,
+     -6.29,
+     55.199999999999996
+    ],
+    "fov": 50
+   },
+   "points": [
+    [
+     -30.099999999999998,
+     -53.65,
+     -4.64
+    ],
+    [
+     -30.25,
+     -56.699999999999996,
+     -4.68
+    ]
+   ],
+   "roundedLength": 3.0539482641328393,
+   "maxNearRadius": 0.4577628964554845,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "line-amboise",
+   "exhibit": "stud/life-39",
+   "fromPose": {
+    "eye": [
+     -30.099999999999998,
+     -4.64,
+     60.25
+    ],
+    "at": [
+     -29.942621304375734,
+     -5.062618261740699,
+     59.35746106471097
+    ],
+    "fov": 72
+   },
+   "toPose": {
+    "eye": [
+     -30.25,
+     -4.68,
+     58.349999999999994
+    ],
+    "at": [
+     -30.25,
+     -6.29,
+     56.849999999999994
+    ],
+    "fov": 50
+   },
+   "points": [
+    [
+     -30.099999999999998,
+     -60.25,
+     -4.64
+    ],
+    [
+     -30.25,
+     -58.349999999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 1.9063315556324463,
+   "maxNearRadius": 0.4577628964554845,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "line-amboise",
+   "exhibit": "stud/life-40",
+   "fromPose": {
+    "eye": [
+     -30.099999999999998,
+     -4.64,
+     60.25
+    ],
+    "at": [
+     -29.942621304375734,
+     -5.062618261740699,
+     59.35746106471097
+    ],
+    "fov": 72
+   },
+   "toPose": {
+    "eye": [
+     -30.25,
+     -4.68,
+     60
+    ],
+    "at": [
+     -30.25,
+     -6.29,
+     58.5
+    ],
+    "fov": 50
+   },
+   "points": [
+    [
+     -30.099999999999998,
+     -60.25,
+     -4.64
+    ],
+    [
+     -30.25,
+     -60,
+     -4.68
+    ]
+   ],
+   "roundedLength": 0.2942787793912443,
+   "maxNearRadius": 0.4577628964554845,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "line-amboise",
+   "exhibit": "stud/life-41",
+   "fromPose": {
+    "eye": [
+     -30.099999999999998,
+     -4.64,
+     60.25
+    ],
+    "at": [
+     -29.942621304375734,
+     -5.062618261740699,
+     59.35746106471097
+    ],
+    "fov": 72
+   },
+   "toPose": {
+    "eye": [
+     -30.25,
+     -4.68,
+     61.65
+    ],
+    "at": [
+     -30.25,
+     -6.29,
+     60.15
+    ],
+    "fov": 50
+   },
+   "points": [
+    [
+     -30.099999999999998,
+     -60.25,
+     -4.64
+    ],
+    [
+     -30.25,
+     -61.65,
+     -4.68
+    ]
+   ],
+   "roundedLength": 1.4085808461000726,
+   "maxNearRadius": 0.4577628964554845,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
+   "station": "line-amboise",
+   "exhibit": "stud/life-42",
+   "fromPose": {
+    "eye": [
+     -30.099999999999998,
+     -4.64,
+     60.25
+    ],
+    "at": [
+     -29.942621304375734,
+     -5.062618261740699,
+     59.35746106471097
+    ],
+    "fov": 72
+   },
+   "toPose": {
+    "eye": [
+     -30.25,
+     -4.68,
+     62.21
+    ],
+    "at": [
+     -30.25,
+     -6.29,
+     61.8
+    ],
+    "fov": 50
+   },
+   "points": [
+    [
+     -30.099999999999998,
+     -60.25,
+     -4.64
+    ],
+    [
+     -30.25,
+     -62.21,
+     -4.68
+    ]
+   ],
+   "roundedLength": 1.9661383471159917,
+   "maxNearRadius": 0.4577628964554845,
+   "certifiedBalls": []
+  },
+  {
    "viewport": "phone",
    "station": "picture-room",
    "exhibit": "picture/baptism-of-christ/front",
@@ -70918,6 +72362,1432 @@
    ],
    "roundedLength": 13.28780663804218,
    "maxNearRadius": 0.4810748640815225,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "supper-wall",
+   "exhibit": "picture/last-supper/front",
+   "fromPose": {
+    "eye": [
+     -33.9,
+     -4.78,
+     29.5
+    ],
+    "at": [
+     -44.77,
+     -6.29,
+     29.5
+    ],
+    "fov": 90.91804538973742
+   },
+   "toPose": {
+    "eye": [
+     -36.400000000000006,
+     -4.82,
+     29.5
+    ],
+    "at": [
+     -44.77,
+     -6.5199999999981815,
+     29.5
+    ],
+    "fov": 107.07106828689575
+   },
+   "points": [
+    [
+     -33.9,
+     -29.5,
+     -4.78
+    ],
+    [
+     -36.400000000000006,
+     -29.5,
+     -4.82
+    ]
+   ],
+   "roundedLength": 2.500319979522628,
+   "maxNearRadius": 0.45956953247437105,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "flight",
+   "exhibit": "machine/aerial-screw",
+   "fromPose": {
+    "eye": [
+     -46.5,
+     -4.68,
+     48.8
+    ],
+    "at": [
+     -54.5,
+     -5.324578511401869,
+     46.4
+    ],
+    "fov": 78.12
+   },
+   "toPose": {
+    "eye": [
+     -50.8,
+     -4.68,
+     48.4
+    ],
+    "at": [
+     -57,
+     -4.1,
+     45.6
+    ],
+    "fov": 100
+   },
+   "points": [
+    [
+     -46.5,
+     -48.8,
+     -4.68
+    ],
+    [
+     -50.8,
+     -48.4,
+     -4.68
+    ]
+   ],
+   "roundedLength": 4.318564576337834,
+   "maxNearRadius": 0.4233952912279731,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "supper-wall",
+   "exhibit": "machine/parachute",
+   "fromPose": {
+    "eye": [
+     -33.9,
+     -4.78,
+     29.5
+    ],
+    "at": [
+     -44.77,
+     -6.29,
+     29.5
+    ],
+    "fov": 90.91804538973742
+   },
+   "toPose": {
+    "eye": [
+     -36.2,
+     -4.82,
+     28.3
+    ],
+    "at": [
+     -37,
+     -4.24,
+     23.1
+    ],
+    "fov": 100
+   },
+   "points": [
+    [
+     -33.9,
+     -29.5,
+     -4.78
+    ],
+    [
+     -36.2,
+     -28.3,
+     -4.82
+    ]
+   ],
+   "roundedLength": 2.5945327132260285,
+   "maxNearRadius": 0.4233952912279731,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "supper-wall",
+   "exhibit": "machine/anemometer",
+   "fromPose": {
+    "eye": [
+     -33.9,
+     -4.78,
+     29.5
+    ],
+    "at": [
+     -44.77,
+     -6.29,
+     29.5
+    ],
+    "fov": 90.91804538973742
+   },
+   "toPose": {
+    "eye": [
+     -42.4,
+     -4.82,
+     26.9
+    ],
+    "at": [
+     -42.65,
+     -5.290000000000001,
+     22.4
+    ],
+    "fov": 47.25
+   },
+   "points": [
+    [
+     -33.9,
+     -29.5,
+     -4.78
+    ],
+    [
+     -42.4,
+     -26.9,
+     -4.82
+    ]
+   ],
+   "roundedLength": 8.888846944345481,
+   "maxNearRadius": 0.38607012734657814,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "supper-wall",
+   "exhibit": "machine/inclinometer",
+   "fromPose": {
+    "eye": [
+     -33.9,
+     -4.78,
+     29.5
+    ],
+    "at": [
+     -44.77,
+     -6.29,
+     29.5
+    ],
+    "fov": 90.91804538973742
+   },
+   "toPose": {
+    "eye": [
+     -42.4,
+     -4.82,
+     26.9
+    ],
+    "at": [
+     -41.9,
+     -5.345000000000001,
+     22.4
+    ],
+    "fov": 47.25
+   },
+   "points": [
+    [
+     -33.9,
+     -29.5,
+     -4.78
+    ],
+    [
+     -42.4,
+     -26.9,
+     -4.82
+    ]
+   ],
+   "roundedLength": 8.888846944345481,
+   "maxNearRadius": 0.38607012734657814,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "works",
+   "exhibit": "machine/multi-barrel-gun",
+   "fromPose": {
+    "eye": [
+     -42.9,
+     -3.9799999999999995,
+     45.5
+    ],
+    "at": [
+     -50.5,
+     -5.788586535556377,
+     46.2
+    ],
+    "fov": 83.16
+   },
+   "toPose": {
+    "eye": [
+     -42.2,
+     -4.68,
+     47.9
+    ],
+    "at": [
+     -41.3,
+     -5.025,
+     50.8
+    ],
+    "fov": 87.22597756757678
+   },
+   "points": [
+    [
+     -42.9,
+     -45.5,
+     -3.9799999999999995
+    ],
+    [
+     -42.2,
+     -47.9,
+     -4.68
+    ]
+   ],
+   "roundedLength": 2.5961509971494316,
+   "maxNearRadius": 0.3732290282501179,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "works",
+   "exhibit": "machine/rolling-mill",
+   "fromPose": {
+    "eye": [
+     -42.9,
+     -3.9799999999999995,
+     45.5
+    ],
+    "at": [
+     -50.5,
+     -5.788586535556377,
+     46.2
+    ],
+    "fov": 83.16
+   },
+   "toPose": {
+    "eye": [
+     -45.8,
+     -4.68,
+     46.3
+    ],
+    "at": [
+     -46.6,
+     -5.41,
+     44.3
+    ],
+    "fov": 47.25
+   },
+   "points": [
+    [
+     -42.9,
+     -45.5,
+     -3.9799999999999995
+    ],
+    [
+     -45.8,
+     -46.3,
+     -4.68
+    ]
+   ],
+   "roundedLength": 3.0886890422960978,
+   "maxNearRadius": 0.36039054376487917,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "works",
+   "exhibit": "machine/ball-bearing",
+   "fromPose": {
+    "eye": [
+     -42.9,
+     -3.9799999999999995,
+     45.5
+    ],
+    "at": [
+     -50.5,
+     -5.788586535556377,
+     46.2
+    ],
+    "fov": 83.16
+   },
+   "toPose": {
+    "eye": [
+     -41.9,
+     -4.68,
+     47.4
+    ],
+    "at": [
+     -40.6,
+     -5.5,
+     46.6
+    ],
+    "fov": 52.601496973009255
+   },
+   "points": [
+    [
+     -42.9,
+     -45.5,
+     -3.9799999999999995
+    ],
+    [
+     -41.9,
+     -47.4,
+     -4.68
+    ]
+   ],
+   "roundedLength": 2.258317958127242,
+   "maxNearRadius": 0.36039054376487917,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "flight",
+   "exhibit": "machine/flywheel",
+   "fromPose": {
+    "eye": [
+     -46.5,
+     -4.68,
+     48.8
+    ],
+    "at": [
+     -54.5,
+     -5.324578511401869,
+     46.4
+    ],
+    "fov": 78.12
+   },
+   "toPose": {
+    "eye": [
+     -45.9,
+     -4.68,
+     49.4
+    ],
+    "at": [
+     -44,
+     -5.49,
+     49.6
+    ],
+    "fov": 64.08164984443411
+   },
+   "points": [
+    [
+     -46.5,
+     -48.8,
+     -4.68
+    ],
+    [
+     -45.9,
+     -49.4,
+     -4.68
+    ]
+   ],
+   "roundedLength": 0.848528137423859,
+   "maxNearRadius": 0.3461506418563341,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "supper-wall",
+   "exhibit": "machine/revolving-crane",
+   "fromPose": {
+    "eye": [
+     -33.9,
+     -4.78,
+     29.5
+    ],
+    "at": [
+     -44.77,
+     -6.29,
+     29.5
+    ],
+    "fov": 90.91804538973742
+   },
+   "toPose": {
+    "eye": [
+     -44,
+     -4.82,
+     26.3
+    ],
+    "at": [
+     -44.9,
+     -4.99,
+     22.5
+    ],
+    "fov": 79.96732153104178
+   },
+   "points": [
+    [
+     -33.9,
+     -29.5,
+     -4.78
+    ],
+    [
+     -44,
+     -26.3,
+     -4.82
+    ]
+   ],
+   "roundedLength": 10.594885558607984,
+   "maxNearRadius": 0.38607012734657814,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "works",
+   "exhibit": "machine/lathe",
+   "fromPose": {
+    "eye": [
+     -42.9,
+     -3.9799999999999995,
+     45.5
+    ],
+    "at": [
+     -50.5,
+     -5.788586535556377,
+     46.2
+    ],
+    "fov": 83.16
+   },
+   "toPose": {
+    "eye": [
+     -44,
+     -4.68,
+     45.4
+    ],
+    "at": [
+     -44.2,
+     -5.225,
+     43.6
+    ],
+    "fov": 81.27993293879453
+   },
+   "points": [
+    [
+     -42.9,
+     -45.5,
+     -3.9799999999999995
+    ],
+    [
+     -44,
+     -45.4,
+     -4.68
+    ]
+   ],
+   "roundedLength": 1.3076696830622034,
+   "maxNearRadius": 0.36039054376487917,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "flight",
+   "exhibit": "machine/miter-lock-gates",
+   "fromPose": {
+    "eye": [
+     -46.5,
+     -4.68,
+     48.8
+    ],
+    "at": [
+     -54.5,
+     -5.324578511401869,
+     46.4
+    ],
+    "fov": 78.12
+   },
+   "toPose": {
+    "eye": [
+     -51.2,
+     -4.68,
+     52
+    ],
+    "at": [
+     -55.53,
+     -4.77,
+     51.18
+    ],
+    "fov": 86.55706784482118
+   },
+   "points": [
+    [
+     -46.5,
+     -48.8,
+     -4.68
+    ],
+    [
+     -51.2,
+     -52,
+     -4.68
+    ]
+   ],
+   "roundedLength": 5.6859475903318035,
+   "maxNearRadius": 0.37102713962336886,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "works",
+   "exhibit": "machine/water-lifting-screw",
+   "fromPose": {
+    "eye": [
+     -42.9,
+     -3.9799999999999995,
+     45.5
+    ],
+    "at": [
+     -50.5,
+     -5.788586535556377,
+     46.2
+    ],
+    "fov": 83.16
+   },
+   "toPose": {
+    "eye": [
+     -47.3,
+     -4.68,
+     47.8
+    ],
+    "at": [
+     -49.5,
+     -5.0649999999999995,
+     45
+    ],
+    "fov": 84.34939227831939
+   },
+   "points": [
+    [
+     -42.9,
+     -45.5,
+     -3.9799999999999995
+    ],
+    [
+     -47.3,
+     -47.8,
+     -4.68
+    ]
+   ],
+   "roundedLength": 5.013980454688668,
+   "maxNearRadius": 0.36401381530329197,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "flight",
+   "exhibit": "machine/camera-obscura",
+   "fromPose": {
+    "eye": [
+     -46.5,
+     -4.68,
+     48.8
+    ],
+    "at": [
+     -54.5,
+     -5.324578511401869,
+     46.4
+    ],
+    "fov": 78.12
+   },
+   "toPose": {
+    "eye": [
+     -46.4,
+     -4.68,
+     50.2
+    ],
+    "at": [
+     -45.6,
+     -5.38,
+     52.6
+    ],
+    "fov": 47.25
+   },
+   "points": [
+    [
+     -46.5,
+     -48.8,
+     -4.68
+    ],
+    [
+     -46.4,
+     -50.2,
+     -4.68
+    ]
+   ],
+   "roundedLength": 1.4035668847618257,
+   "maxNearRadius": 0.3461506418563341,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "supper-wall",
+   "exhibit": "plaque/flight-quote",
+   "fromPose": {
+    "eye": [
+     -33.9,
+     -4.78,
+     29.5
+    ],
+    "at": [
+     -44.77,
+     -6.29,
+     29.5
+    ],
+    "fov": 90.91804538973742
+   },
+   "toPose": {
+    "eye": [
+     -38.17,
+     -4.82,
+     26.79
+    ],
+    "at": [
+     -40.2,
+     -5.49,
+     25.5
+    ],
+    "fov": 67.5
+   },
+   "points": [
+    [
+     -33.9,
+     -29.5,
+     -4.78
+    ],
+    [
+     -38.17,
+     -26.79,
+     -4.82
+    ]
+   ],
+   "roundedLength": 5.0575290409448,
+   "maxNearRadius": 0.38607012734657814,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "grave",
+   "exhibit": "grave",
+   "fromPose": {
+    "eye": [
+     -46.9,
+     -4.78,
+     29.2
+    ],
+    "at": [
+     -55.1,
+     -8.195456498928369,
+     24.8
+    ],
+    "fov": 75.6
+   },
+   "toPose": {
+    "eye": [
+     -51.5,
+     -4.82,
+     26.9
+    ],
+    "at": [
+     -54.85,
+     -6.165,
+     25.95
+    ],
+    "fov": 74.25
+   },
+   "points": [
+    [
+     -46.9,
+     -29.2,
+     -4.78
+    ],
+    [
+     -51.5,
+     -26.9,
+     -4.82
+    ]
+   ],
+   "roundedLength": 5.143111898452144,
+   "maxNearRadius": 0.33965465009297907,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "grave",
+   "exhibit": "grave-diagram",
+   "fromPose": {
+    "eye": [
+     -46.9,
+     -4.78,
+     29.2
+    ],
+    "at": [
+     -55.1,
+     -8.195456498928369,
+     24.8
+    ],
+    "fov": 75.6
+   },
+   "toPose": {
+    "eye": [
+     -52.5,
+     -4.82,
+     23.8
+    ],
+    "at": [
+     -56.74,
+     -6.405000043317051,
+     23.8
+    ],
+    "fov": 100.88250041007996
+   },
+   "points": [
+    [
+     -46.9,
+     -29.2,
+     -4.78
+    ],
+    [
+     -52.5,
+     -23.8,
+     -4.82
+    ]
+   ],
+   "roundedLength": 7.779562969730369,
+   "maxNearRadius": 0.42752854755765046,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "grave",
+   "exhibit": "picture/deathbed-painting/front",
+   "fromPose": {
+    "eye": [
+     -46.9,
+     -4.78,
+     29.2
+    ],
+    "at": [
+     -55.1,
+     -8.195456498928369,
+     24.8
+    ],
+    "fov": 75.6
+   },
+   "toPose": {
+    "eye": [
+     -56.9,
+     -4.82,
+     27.9
+    ],
+    "at": [
+     -60.792,
+     -3.785,
+     25.42
+    ],
+    "fov": 59.400000000000006
+   },
+   "points": [
+    [
+     -46.9,
+     -29.2,
+     -4.78
+    ],
+    [
+     -56.9,
+     -27.9,
+     -4.82
+    ]
+   ],
+   "roundedLength": 10.084225304900718,
+   "maxNearRadius": 0.33965465009297907,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "reading-table",
+   "exhibit": "codex/paris-B",
+   "fromPose": {
+    "eye": [
+     -34.6,
+     -4.76,
+     46.3
+    ],
+    "at": [
+     -37.7,
+     -5.945084966277221,
+     45.35
+    ],
+    "fov": 75.6
+   },
+   "toPose": {
+    "eye": [
+     -36.75,
+     -4.68,
+     45.4
+    ],
+    "at": [
+     -37.72,
+     -5.514,
+     45.4
+    ],
+    "fov": 59.400000000000006
+   },
+   "points": [
+    [
+     -34.6,
+     -46.3,
+     -4.76
+    ],
+    [
+     -36.75,
+     -45.4,
+     -4.68
+    ]
+   ],
+   "roundedLength": 2.3321449354617716,
+   "maxNearRadius": 0.33965465009297907,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "line-early",
+   "exhibit": "stud/life-01",
+   "fromPose": {
+    "eye": [
+     -30.099999999999998,
+     -4.64,
+     47.05
+    ],
+    "at": [
+     -29.979373839868714,
+     -5.359339800338651,
+     46.36589505107715
+    ],
+    "fov": 104
+   },
+   "toPose": {
+    "eye": [
+     -30.25,
+     -4.68,
+     45.15
+    ],
+    "at": [
+     -30.25,
+     -6.29,
+     43.65
+    ],
+    "fov": 67.5
+   },
+   "points": [
+    [
+     -30.099999999999998,
+     -47.05,
+     -4.64
+    ],
+    [
+     -30.25,
+     -45.15,
+     -4.68
+    ]
+   ],
+   "roundedLength": 1.9063315556324392,
+   "maxNearRadius": 0.44296640257164804,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "line-early",
+   "exhibit": "stud/life-02",
+   "fromPose": {
+    "eye": [
+     -30.099999999999998,
+     -4.64,
+     47.05
+    ],
+    "at": [
+     -29.979373839868714,
+     -5.359339800338651,
+     46.36589505107715
+    ],
+    "fov": 104
+   },
+   "toPose": {
+    "eye": [
+     -30.25,
+     -4.68,
+     46.8
+    ],
+    "at": [
+     -30.25,
+     -6.29,
+     45.3
+    ],
+    "fov": 67.5
+   },
+   "points": [
+    [
+     -30.099999999999998,
+     -47.05,
+     -4.64
+    ],
+    [
+     -30.25,
+     -46.8,
+     -4.68
+    ]
+   ],
+   "roundedLength": 0.2942787793912443,
+   "maxNearRadius": 0.44296640257164804,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "line-early",
+   "exhibit": "stud/life-04",
+   "fromPose": {
+    "eye": [
+     -30.099999999999998,
+     -4.64,
+     47.05
+    ],
+    "at": [
+     -29.979373839868714,
+     -5.359339800338651,
+     46.36589505107715
+    ],
+    "fov": 104
+   },
+   "toPose": {
+    "eye": [
+     -30.25,
+     -4.68,
+     48.449999999999996
+    ],
+    "at": [
+     -30.25,
+     -6.29,
+     46.949999999999996
+    ],
+    "fov": 67.5
+   },
+   "points": [
+    [
+     -30.099999999999998,
+     -47.05,
+     -4.64
+    ],
+    [
+     -30.25,
+     -48.449999999999996,
+     -4.68
+    ]
+   ],
+   "roundedLength": 1.4085808461000726,
+   "maxNearRadius": 0.44296640257164804,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "line-early",
+   "exhibit": "stud/life-03",
+   "fromPose": {
+    "eye": [
+     -30.099999999999998,
+     -4.64,
+     47.05
+    ],
+    "at": [
+     -29.979373839868714,
+     -5.359339800338651,
+     46.36589505107715
+    ],
+    "fov": 104
+   },
+   "toPose": {
+    "eye": [
+     -30.25,
+     -4.68,
+     50.099999999999994
+    ],
+    "at": [
+     -30.25,
+     -6.29,
+     48.599999999999994
+    ],
+    "fov": 67.5
+   },
+   "points": [
+    [
+     -30.099999999999998,
+     -47.05,
+     -4.64
+    ],
+    [
+     -30.25,
+     -50.099999999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 3.0539482641328393,
+   "maxNearRadius": 0.44296640257164804,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "line-late",
+   "exhibit": "stud/life-29",
+   "fromPose": {
+    "eye": [
+     -30.099999999999998,
+     -4.64,
+     53.65
+    ],
+    "at": [
+     -29.979373839868714,
+     -5.359339800338651,
+     52.965895051077155
+    ],
+    "fov": 104
+   },
+   "toPose": {
+    "eye": [
+     -30.25,
+     -4.68,
+     51.75
+    ],
+    "at": [
+     -30.25,
+     -6.29,
+     50.25
+    ],
+    "fov": 67.5
+   },
+   "points": [
+    [
+     -30.099999999999998,
+     -53.65,
+     -4.64
+    ],
+    [
+     -30.25,
+     -51.75,
+     -4.68
+    ]
+   ],
+   "roundedLength": 1.9063315556324392,
+   "maxNearRadius": 0.44296640257164804,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "line-late",
+   "exhibit": "stud/life-30",
+   "fromPose": {
+    "eye": [
+     -30.099999999999998,
+     -4.64,
+     53.65
+    ],
+    "at": [
+     -29.979373839868714,
+     -5.359339800338651,
+     52.965895051077155
+    ],
+    "fov": 104
+   },
+   "toPose": {
+    "eye": [
+     -30.25,
+     -4.68,
+     53.4
+    ],
+    "at": [
+     -30.25,
+     -6.29,
+     51.9
+    ],
+    "fov": 67.5
+   },
+   "points": [
+    [
+     -30.099999999999998,
+     -53.65,
+     -4.64
+    ],
+    [
+     -30.25,
+     -53.4,
+     -4.68
+    ]
+   ],
+   "roundedLength": 0.2942787793912443,
+   "maxNearRadius": 0.44296640257164804,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "line-late",
+   "exhibit": "stud/life-31",
+   "fromPose": {
+    "eye": [
+     -30.099999999999998,
+     -4.64,
+     53.65
+    ],
+    "at": [
+     -29.979373839868714,
+     -5.359339800338651,
+     52.965895051077155
+    ],
+    "fov": 104
+   },
+   "toPose": {
+    "eye": [
+     -30.25,
+     -4.68,
+     55.05
+    ],
+    "at": [
+     -30.25,
+     -6.29,
+     53.55
+    ],
+    "fov": 67.5
+   },
+   "points": [
+    [
+     -30.099999999999998,
+     -53.65,
+     -4.64
+    ],
+    [
+     -30.25,
+     -55.05,
+     -4.68
+    ]
+   ],
+   "roundedLength": 1.4085808461000726,
+   "maxNearRadius": 0.44296640257164804,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "line-late",
+   "exhibit": "stud/life-32",
+   "fromPose": {
+    "eye": [
+     -30.099999999999998,
+     -4.64,
+     53.65
+    ],
+    "at": [
+     -29.979373839868714,
+     -5.359339800338651,
+     52.965895051077155
+    ],
+    "fov": 104
+   },
+   "toPose": {
+    "eye": [
+     -30.25,
+     -4.68,
+     56.699999999999996
+    ],
+    "at": [
+     -30.25,
+     -6.29,
+     55.199999999999996
+    ],
+    "fov": 67.5
+   },
+   "points": [
+    [
+     -30.099999999999998,
+     -53.65,
+     -4.64
+    ],
+    [
+     -30.25,
+     -56.699999999999996,
+     -4.68
+    ]
+   ],
+   "roundedLength": 3.0539482641328393,
+   "maxNearRadius": 0.44296640257164804,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "line-amboise",
+   "exhibit": "stud/life-39",
+   "fromPose": {
+    "eye": [
+     -30.099999999999998,
+     -4.64,
+     60.25
+    ],
+    "at": [
+     -29.979373839868714,
+     -5.359339800338651,
+     59.565895051077156
+    ],
+    "fov": 104
+   },
+   "toPose": {
+    "eye": [
+     -30.25,
+     -4.68,
+     58.349999999999994
+    ],
+    "at": [
+     -30.25,
+     -6.29,
+     56.849999999999994
+    ],
+    "fov": 67.5
+   },
+   "points": [
+    [
+     -30.099999999999998,
+     -60.25,
+     -4.64
+    ],
+    [
+     -30.25,
+     -58.349999999999994,
+     -4.68
+    ]
+   ],
+   "roundedLength": 1.9063315556324463,
+   "maxNearRadius": 0.44296640257164804,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "line-amboise",
+   "exhibit": "stud/life-40",
+   "fromPose": {
+    "eye": [
+     -30.099999999999998,
+     -4.64,
+     60.25
+    ],
+    "at": [
+     -29.979373839868714,
+     -5.359339800338651,
+     59.565895051077156
+    ],
+    "fov": 104
+   },
+   "toPose": {
+    "eye": [
+     -30.25,
+     -4.68,
+     60
+    ],
+    "at": [
+     -30.25,
+     -6.29,
+     58.5
+    ],
+    "fov": 67.5
+   },
+   "points": [
+    [
+     -30.099999999999998,
+     -60.25,
+     -4.64
+    ],
+    [
+     -30.25,
+     -60,
+     -4.68
+    ]
+   ],
+   "roundedLength": 0.2942787793912443,
+   "maxNearRadius": 0.44296640257164804,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "line-amboise",
+   "exhibit": "stud/life-41",
+   "fromPose": {
+    "eye": [
+     -30.099999999999998,
+     -4.64,
+     60.25
+    ],
+    "at": [
+     -29.979373839868714,
+     -5.359339800338651,
+     59.565895051077156
+    ],
+    "fov": 104
+   },
+   "toPose": {
+    "eye": [
+     -30.25,
+     -4.68,
+     61.65
+    ],
+    "at": [
+     -30.25,
+     -6.29,
+     60.15
+    ],
+    "fov": 67.5
+   },
+   "points": [
+    [
+     -30.099999999999998,
+     -60.25,
+     -4.64
+    ],
+    [
+     -30.25,
+     -61.65,
+     -4.68
+    ]
+   ],
+   "roundedLength": 1.4085808461000726,
+   "maxNearRadius": 0.44296640257164804,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "line-amboise",
+   "exhibit": "stud/life-42",
+   "fromPose": {
+    "eye": [
+     -30.099999999999998,
+     -4.64,
+     60.25
+    ],
+    "at": [
+     -29.979373839868714,
+     -5.359339800338651,
+     59.565895051077156
+    ],
+    "fov": 104
+   },
+   "toPose": {
+    "eye": [
+     -30.25,
+     -4.68,
+     62.21
+    ],
+    "at": [
+     -30.25,
+     -6.29,
+     61.8
+    ],
+    "fov": 67.5
+   },
+   "points": [
+    [
+     -30.099999999999998,
+     -60.25,
+     -4.64
+    ],
+    [
+     -30.25,
+     -62.21,
+     -4.68
+    ]
+   ],
+   "roundedLength": 1.9661383471159917,
+   "maxNearRadius": 0.44296640257164804,
    "certifiedBalls": []
   }
  ]
