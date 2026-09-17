@@ -276,8 +276,8 @@
       {
         "at": 0,
         "part": "crank",
-        "en": "A hand turns the crank at the lower end.",
-        "de": "Eine Hand dreht die Kurbel am unteren Ende.",
+        "en": "A hand turns the crank at the upper end.",
+        "de": "Eine Hand dreht die Kurbel am oberen Ende.",
         "certainty": "reconstructed"
       },
       {

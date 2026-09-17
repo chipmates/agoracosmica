@@ -32,8 +32,8 @@ const NOTES: Readonly<Record<string, PictureBilingual>> = {
     de: 'Leonardos Madonna wurde von Holz auf Leinwand übertragen. Die verfügbare Fotografie zeigt das Gemälde der Eremitage.',
   },
   'adoration-of-the-magi': {
-    en: 'Leonardo left this painting unfinished. The photograph shows its appearance after the Uffizi’s restoration.',
-    de: 'Leonardo ließ dieses Gemälde unvollendet. Die Fotografie zeigt seinen Zustand nach der Restaurierung in den Uffizien.',
+    en: 'Leonardo left this painting unfinished. What hangs here is a monochrome facsimile printed in 1901, long before the Uffizi’s restoration.',
+    de: 'Leonardo ließ dieses Gemälde unvollendet. Hier hängt ein einfarbiges Faksimile, gedruckt 1901, lange vor der Restaurierung in den Uffizien.',
   },
   'saint-jerome': {
     en: 'Leonardo left this walnut panel unfinished. The date of this photograph has not been verified.',
@@ -68,8 +68,8 @@ const NOTES: Readonly<Record<string, PictureBilingual>> = {
     de: 'Leonardo und seine Werkstatt bemalten Wände und Gewölbe. Spätere Restaurierungen waren umfangreich. Die Fotografie zeigt eine monochrome Wandpartie. Die Maße der gesamten bemalten Fläche sind hier unbekannt.',
   },
   'virgin-and-child-with-st-anne': {
-    en: 'Leonardo’s original painted field is 113 cm wide. The support was widened later to 130 cm, which is the width of the frame on the wall.',
-    de: 'Leonardos ursprüngliches Bildfeld ist 113 cm breit. Die Holztafel wurde später auf 130 cm verbreitert, und so breit ist der Rahmen an der Wand.',
+    en: 'Leonardo’s original painted field is 113 cm wide. The panel was widened later to 130 cm, and this room hangs the original field.',
+    de: 'Leonardos ursprüngliches Bildfeld ist 113 cm breit. Die Holztafel wurde später auf 130 cm verbreitert, und dieser Raum zeigt das ursprüngliche Bildfeld.',
   },
   'mona-lisa': {
     en: 'This is a historical printed reproduction, not the painting. Its publication date is uncertain, and it cannot establish the painting’s colour. The panel itself belongs to the Louvre collection.',
