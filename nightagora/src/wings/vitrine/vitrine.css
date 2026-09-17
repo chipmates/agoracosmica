@@ -1,0 +1,110 @@
+/* THE VITRINE. One window for every close look: the work alone in its
+   viewport, its words beside it on the wide stage and under it on the
+   narrow one. The room stays under it, frozen and dimmed. */
+.vitrine {position:fixed;inset:0;pointer-events:none;}
+.vitrine[hidden] {display:none;}
+.vitrine-scrim {position:fixed;inset:0;background:#0a0f13a8;pointer-events:none;}
+/* The scrim with the work's own rectangle left clear. */
+.vitrine-hole {position:fixed;box-shadow:0 0 0 200vmax #0a0f13a8;pointer-events:none;}
+.vitrine-scrim[hidden],.vitrine-hole[hidden] {display:none;}
+.vitrine-sheet {position:fixed;display:none;pointer-events:auto;background:#0d171ff5;border:1px solid #a9977344;}
+.vitrine[data-narrow='true'] .vitrine-sheet {display:block;}
+.vitrine-view {position:fixed;pointer-events:none;}
+.vitrine-payload {position:absolute;inset:0;pointer-events:auto;touch-action:none;outline:none;}
+.vitrine-payload:empty {pointer-events:none;}
+.vitrine-payload:focus-visible {outline:1px solid #edcc8c;outline-offset:-3px;}
+.vitrine-caption {position:absolute;left:0;right:0;bottom:4px;margin:0 auto;max-width:640px;padding:8px 14px;
+  font:15px/1.45 var(--serif);color:#f2eadb;text-align:center;text-wrap:balance;text-shadow:0 1px 14px #0a0f13;pointer-events:none;}
+.vitrine-caption:empty {display:none;}
+
+/* THE CARD. The line first, in its own type, then the module's own label
+   sentences, the payload's text, and the controls where a hand left them. */
+.vitrine-card {position:fixed;box-sizing:border-box;display:flex;flex-direction:column;overflow:hidden;padding:20px;
+  background:#101d27f2;border:1px solid #a9977355;color:#eae1d1;pointer-events:auto;user-select:text;}
+.vitrine-card:focus-visible {outline:1px solid #edcc8c;outline-offset:3px;}
+.vitrine-body {flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;}
+.vitrine-line {margin:0 0 14px;font:400 21px/1.3 var(--serif);color:#fff5e3;text-wrap:pretty;}
+.vitrine-line[hidden] {display:none;}
+.vitrine-words p {margin:8px 0;font:14px/1.5 var(--serif);color:#e6e0d2;text-wrap:pretty;}
+.vitrine-words .picture-policy-label,.vitrine-words .picture-label-language {display:block;min-width:0;}
+.vitrine-words .picture-first,.vitrine-words .picture-first-de {display:flex;align-items:baseline;gap:9px;margin:0 0 8px;font:400 16px/1.3 var(--serif);color:#f4ead6;}
+.vitrine-words .picture-certainty {flex:0 0 8px;width:8px;height:8px;border-radius:50%;background:var(--certainty,#d2a557);}
+.vitrine-words .picture-holder,.vitrine-words .picture-source-reading,.vitrine-words .picture-column-note,.vitrine-meta {font:12px/1.5 var(--sans);color:#b6bcae;overflow-wrap:anywhere;}
+.vitrine-words .picture-label-more,.vitrine-more {display:block;width:100%;min-height:44px;margin-top:6px;padding:10px 0;text-align:left;background:none;border:0;border-top:1px solid #a9977344;color:#e6d6b8;font:12px var(--sans);cursor:pointer;}
+.vitrine-certainty {display:flex;align-items:center;gap:9px;margin:10px 0 4px;font:11px/1.4 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:#d8cdb6;}
+.vitrine-certainty::before {content:'';flex:0 0 8px;width:8px;height:8px;border-radius:50%;background:var(--certainty,#d2a557);}
+.vitrine-controls {flex:0 0 auto;display:flex;flex-wrap:nowrap;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid #a9977344;}
+.vitrine[data-narrow='false'] .vitrine-caption {bottom:64px;}
+.vitrine-control {flex:1 1 0;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;
+  min-height:44px;min-width:44px;padding:10px 12px;background:transparent;border:1px solid #a9977366;color:#e6d6b8;
+  font:12px/1.2 var(--sans);text-align:center;text-decoration:none;cursor:pointer;}
+.vitrine-control:focus-visible,.vitrine-more:focus-visible,.vitrine-words .picture-label-more:focus-visible {outline:1px solid #edcc8c;outline-offset:2px;}
+.vitrine-control[aria-pressed='true'] {border-color:#edcc8c;color:#fff5e3;}
+.vitrine-control[disabled] {opacity:.38;cursor:default;}
+/* The two controls that walk the wall carry a mark and not a word: the work
+   each one opens is what names it. */
+.vitrine-walk {flex:0 0 auto;display:flex;justify-content:space-between;gap:8px;margin-top:8px;}
+.vitrine-walk:empty {display:none;}
+.vitrine-step {flex:0 0 44px;min-width:44px;padding:10px 0;font:17px/1 var(--serif);}
+.vitrine-foot {flex:0 0 auto;min-width:0;}
+.vitrine-foot:empty {display:none;}
+.vitrine-foot .vinci-strip {position:static;max-width:none;margin-top:10px;}
+
+/* THE PAYLOAD'S ROW, under the work on the wide stage. */
+.vitrine-payload-controls {position:fixed;box-sizing:border-box;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;padding:0 8px;pointer-events:none;}
+.vitrine-payload-controls:empty {display:none;}
+.vitrine-payload-controls > * {pointer-events:auto;}
+.vitrine-payload-controls .vitrine-control {flex:0 0 auto;background:#101d27d9;}
+
+@media(max-aspect-ratio:9/10) {
+  .vitrine-card {padding:10px 12px 12px;background:transparent;border:0;}
+  .vitrine-view {border:1px solid #a9977344;border-bottom:0;box-sizing:border-box;}
+  .vitrine-line {margin-bottom:6px;font-size:15px;line-height:1.32;}
+  .vitrine-words p {font-size:13px;line-height:1.42;margin:5px 0;}
+  .vitrine-controls {gap:6px;margin-top:8px;padding-top:8px;flex-wrap:nowrap;}
+  .vitrine-control {flex:1 1 0;min-width:0;padding:10px 8px;font-size:11px;}
+  .vitrine-walk {margin-top:6px;gap:6px;}
+  .vitrine-step {flex:1 1 0;}
+  .vitrine-caption {font-size:13px;padding:6px 10px;}
+  .vitrine-payload-controls {position:static;flex:0 0 auto;padding:8px 0 0;justify-content:stretch;}
+  .vitrine-payload-controls .vitrine-control {flex:1 1 0;background:transparent;}
+}
+
+/* THE PLATE over the paused frame. */
+.vitrine-plate {position:fixed;display:block;overflow:hidden;pointer-events:none;}
+.vitrine-plate img {position:absolute;display:block;max-width:none;}
+.vitrine-plate[hidden] {display:none;}
+
+/* THE MACHINE'S CLOCK, its viewpoints, its steps and its folio. */
+.vitrine-views {display:flex;gap:8px;}
+.vitrine-clock {display:flex;align-items:center;gap:10px;flex:1 1 320px;max-width:560px;}
+.vitrine-play {min-width:96px;}
+.vitrine-track {position:relative;flex:1 1 auto;display:flex;align-items:center;min-height:44px;}
+.vitrine-slider {width:100%;min-height:44px;margin:0;accent-color:#edcc8c;background:transparent;cursor:pointer;}
+.vitrine-slider:focus-visible {outline:1px solid #edcc8c;outline-offset:2px;}
+.vitrine-tick {position:absolute;top:8px;width:2px;height:8px;margin-left:-1px;background:#edcc8ccc;pointer-events:none;}
+.vitrine-steps {margin:14px 0 4px;padding:0;list-style:none;border-top:1px solid #a9977333;}
+.vitrine-step-item {display:flex;align-items:baseline;gap:10px;width:100%;min-height:44px;padding:9px 4px;text-align:left;
+  background:none;border:0;border-bottom:1px solid #a9977322;color:#cfc6b4;font:14px/1.45 var(--serif);cursor:pointer;}
+.vitrine-step-item .vinci-title-dot {flex:0 0 7px;width:7px;height:7px;border-radius:50%;background:#d2a557;transform:translateY(-1px);}
+.vitrine-step-item[aria-current='step'] {color:#fff5e3;background:#edcc8c14;}
+.vitrine-step-item:focus-visible {outline:1px solid #edcc8c;outline-offset:-2px;}
+.vitrine-folio {position:absolute;bottom:118px;right:0;display:flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;
+  max-width:132px;padding:4px;background:#101d27d9;border:1px solid #a9977366;color:#e6d6b8;font:11px/1.3 var(--sans);cursor:pointer;pointer-events:auto;}
+.vitrine-folio-thumb {display:block;width:112px;height:auto;}
+.vitrine-folio:focus-visible {outline:1px solid #edcc8c;outline-offset:2px;}
+.vitrine-leader {position:fixed;inset:0;width:100vw;height:100vh;overflow:visible;pointer-events:none;}
+.vitrine-leader line {stroke:#edcc8c;stroke-width:1;}
+.vitrine-part-name {position:fixed;max-width:260px;margin:0;padding:8px 12px;background:#101d27e6;border:1px solid #a9977366;
+  color:#fff5e3;font:14px/1.4 var(--serif);pointer-events:none;}
+.vitrine-part-name[hidden] {display:none;}
+@media(max-aspect-ratio:9/10) {
+  .vitrine-views {order:-1;width:100%;gap:6px;}
+  .vitrine-views .vitrine-control {flex:1 1 0;}
+  .vitrine-clock {flex:1 1 100%;max-width:none;gap:6px;}
+  .vitrine-play {flex:0 0 auto !important;min-width:84px;}
+  .vitrine-step-item {font-size:13px;min-height:44px;padding:7px 2px;}
+  .vitrine-folio {top:0;bottom:auto;max-width:84px;}
+  .vitrine-folio-thumb {width:64px;}
+  .vitrine-part-name {max-width:200px;font-size:13px;}
+}
