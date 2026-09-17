@@ -46,8 +46,11 @@ import { createMeasurement, type VinciMeasurement } from './measurement'
 import { collectVinciLabelOccluders, createVinciExhibitDots, createVinciLabelAnchor, vinciSightBlocked, type VinciExhibitDots, type VinciExhibitMark, type VinciLabelAnchor, type VinciLabelMode } from './labels'
 import { pickVinciExhibit, readVinciExhibits, vinciMachineRoom, type VinciPickEntry } from './collection/pick'
 import { vinciApproachPose, vinciApproachStation } from './collection/approaches'
-import { createVinciCloseLook, createVinciMachinePayload, fillVinciLimitSlots, renderVinciMachineRecord, vinciDeathbedCard, vinciLimits, vinciLine, vinciMachineCard, vinciPlaceCard, vinciPlaceTitle, VINCI_EXHIBIT_CARD, VINCI_VITRINE_WORDS, type VinciPlaceCard, type VinciPlaceCertainty, type VinciPlaceId } from './collection/close-look'
+import { createVinciCloseLook, createVinciMachinePayload, fillVinciLimitSlots, renderVinciMachineRecord, vinciDeathbedCard, vinciLimits, vinciLine, vinciMachineCard, vinciPlaceCard, vinciPlaceTitle, VINCI_EXHIBIT_CARD, VINCI_PAGE_HONESTY, VINCI_VITRINE_WORDS, type VinciPlaceCard, type VinciPlaceCertainty, type VinciPlaceId } from './collection/close-look'
 import { createPlacePayload } from '../vitrine/place'
+import { readingTableOf } from './table'
+import { CODEX_ENTRIES } from './table/codex-shelf'
+import { createReaderPayload, type ReaderPayload } from './table/reader'
 import { GRAVE_DEATHBED } from './grave/placement'
 import { loadManifest } from '../../manifest'
 import { createPlatePayload } from '../vitrine/picture'
@@ -588,6 +591,7 @@ export function createWing():VinciWingModule {
   /** THE KINDS WHOSE NAME IS THEIR OWN RECORD'S: the grave's places, the plaque
    * and the painting at the grave. */
   function namedExhibit(pick:VinciPickEntry):{title:string;colour:string}|null {
+    if(pick.kind==='manuscript'){const codex=CODEX_ENTRIES.find(entry=>`codex/${entry.id}`===pick.id);return codex?{title:lang()==='de'?codex.de:codex.en,colour:certaintyColour('documented')}:null}
     if(pick.kind!=='place'&&pick.workId!==DEATHBED_WORK)return null
     const named=vinciPlaceTitle(pick.id as VinciPlaceId)
     return {title:named.title,colour:certaintyColour(named.certainty)}
@@ -724,6 +728,28 @@ export function createWing():VinciWingModule {
         standing:()=>{const nav=rail.navigation;return !nav.active&&!nav.approaching}})
       openMode=how
       closeLook.open({id,title,line:vinciLine(id),card:words.card,after:words.after,payload,
+        controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),shut],walk,...vinciLimits(id)},from,how_)
+      openMode='auto'
+      return
+    }
+    if(entry.kind==='manuscript'){
+      const table=readingTableOf(entry.object), codex=CODEX_ENTRIES.find(record=>`codex/${record.id}`===id)
+      if(!table||!codex)return
+      const title=lang()==='de'?codex.de:codex.en
+      // THE BOOK IS READ WHERE IT LIES when the eye was walked to it, and in the
+      // viewport where it was not; the record follows the page open now.
+      let reader:ReaderPayload|undefined
+      const openRecord=()=>{
+        exhibitSources={id,title:{en:codex.en,de:codex.de},certainty:'documented',renderStation(host){reader?.renderRecord(host)}}
+        sources.resetScroll();sources.select('station');mode=2;paintDock()
+      }
+      reader=createReaderPayload({table,manifest:loadManifest(),
+        walked:()=>{const nav=rail.navigation;return nav.approaching===id||nav.exhibit===id},
+        standing:()=>{const nav=rail.navigation;return !nav.active&&!nav.approaching},
+        more:text(VINCI_VITRINE_WORDS.more),honesty:text(VINCI_PAGE_HONESTY),
+        changed:()=>{if(exhibitSources?.id===id&&mode===2)paintDock()}})
+      openMode=how
+      closeLook.open({id,title,line:vinciLine(id),card:[],payload:reader,
         controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),shut],walk,...vinciLimits(id)},from,how_)
       openMode='auto'
       return

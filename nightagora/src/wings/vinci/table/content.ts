@@ -133,6 +133,17 @@ export const MIRROR_EXPLANATION = {
   ],
 } as const;
 
+/** The sentence that says where a page's image comes from, by its identity. */
+export function folioProvenance(page: PageRecord, lang: Language, identity: string): string {
+  return page.codex && page.folio !== null
+    ? lang === 'en'
+      ? `${identity}, from the 1883 facsimile. The original is in the Institut de France.`
+      : `${identity}, aus dem Faksimile von 1883. Das Original befindet sich im Institut de France.`
+    : lang === 'en'
+      ? 'From Ravaisson-Mollien’s 1883 edition of manuscripts B and D.'
+      : 'Aus Ravaisson-Molliens Ausgabe der Manuskripte B und D von 1883.';
+}
+
 export function folioKey(page: PageRecord): string {
   return page.codex && page.folio !== null && page.side
     ? `${page.codex}:${page.folio}${page.side === 'recto' ? 'r' : 'v'}`

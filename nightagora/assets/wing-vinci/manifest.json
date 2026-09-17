@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed to a pale grey at 30 per cent. Assumed weather, no observation claimed.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "24d65435e1b14ba748ac70663ca69429b2efe64cd6024f267f1eb3ff5e1aebae",
+      "sha256": "6ccac0204ec773dfbda4b735319a75e56a97bfbe328010d4fae45410bf7f820c",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=80c458f2cb5ccddb7fcedccda5df70e5cdccda7d9ca97d65ebfa6462920f61ef;"
     },
     {
@@ -2522,7 +2522,7 @@
       "prompt": "Manuscript presentation, strict source-page joins and labelled horizontal mirrored reading copy. Scanned historical paper is retained in sRGB without crop or relettering.",
       "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6, revised with Claude Opus 5",
       "date": "2026-09-10",
-      "sha256": "986b4ea0314db3e54ae7be035a5092eaeecc2a5da7b41a4b08b8cc9541273e67",
+      "sha256": "ef291a49bab7906b2e061c424e82cc7b1e4b9bec4a1bba62d12a2c16966f7409",
       "note": "recipe_file=src/wings/vinci/table/index.ts; output_source=src/wings/vinci/table/index.ts; modern exhibition design, not documentary reconstruction"
     },
     {
@@ -2535,7 +2535,7 @@
       "prompt": "English and German visitor interface, verified local folio names and the codex shelf copy. Historical transcription and French are displayed verbatim from the locked collection. Handedness documented, reasons hypotheses, own reason unknown.",
       "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
       "date": "2026-09-14",
-      "sha256": "a7b26de32b2a3fcc7d2498611817bbde052317b348b47ca4d5b685ea2c1798cb",
+      "sha256": "01995859fefcf46e0ab7512fe4e6700eedb00417cc67481213a9f11e289abbeb",
       "note": "recipe_file=src/wings/vinci/table/content.ts; output_source=src/wings/vinci/table/content.ts; modern exhibition design, not documentary reconstruction"
     },
     {
@@ -2548,7 +2548,7 @@
       "prompt": "Semantic reading panel, edition-order index, manuscript-leaf index, a codex selector naming holder and class, eight named leaves and the named absences. Source text remains DOM text.",
       "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
       "date": "2026-09-14",
-      "sha256": "59a96f31c03a82dec615ab20b53a182b914f59220bfe16444f1ae0a18b2e5168",
+      "sha256": "16d803d923cc2f33a52c51cdc8b5b91d72152bc29a4e472344e16d9b3620d8b0",
       "note": "recipe_file=src/wings/vinci/table/panel.ts; output_source=src/wings/vinci/table/panel.ts; modern exhibition design, not documentary reconstruction"
     },
     {

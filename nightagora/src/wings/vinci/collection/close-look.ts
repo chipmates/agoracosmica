@@ -48,6 +48,9 @@ export function createVinciCloseLook(options: {
 type Words = { en: string; de: string }
 const LINES = (JSON.parse(linesRaw) as { lines: Record<string, Words> }).lines
 const STEPS = (JSON.parse(stepsRaw) as { steps: Record<string, (Words & { at: number; part: string; certainty: string })[]> }).steps
+const CARDS = JSON.parse(cardsRaw) as { honesty_variants: { page: Words } }
+/** What a page's reproduction is labelled as, beside every page the reader shows. */
+export const VINCI_PAGE_HONESTY: Words = CARDS.honesty_variants.page
 const CONTROLS = (JSON.parse(cardsRaw) as { controls: {
   shared: { back: Words; record: Words; more: Words }
   picture: { whole_plate: Words }

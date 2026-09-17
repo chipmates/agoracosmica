@@ -13,6 +13,13 @@ import type { PageRecord } from './content'
 export { LEAF } from './geometry'
 export type { PageRecord } from './content'
 
+/** The reader finds the table it reads by the table's own object, the way
+ * the registry finds every exhibit: a read over the scene. */
+const tables = new WeakMap<object, ReadingTable>()
+export function readingTableOf(object: object): ReadingTable | undefined {
+  return tables.get(object)
+}
+
 /** A room imports this module unchanged. It owns placement and light; the
  * module owns its independent sheets, manifested pixels and reading controls. */
 /** how far the reading copy's mount is raked back from the table, in radians */
@@ -23,7 +30,7 @@ export function buildTable(stack: Stack, pages: PageRecord[], manifest: Manifest
   const furniture = buildFurniture(stack)
   const object = furniture.object
   const stream = createPageStream(manifest)
-  let index = 340, serial = 0, alive = true, isClosed = false, mirrored = false
+  let index = 340, serial = 0, alive = true, isClosed = false, mirrored = false, flipped = false
   let turning = false, preparing = false, turnProgress = 0, started = 0, held = false, direction = 1
   let targetIndex = index, lastTurnMs = 0
   let rightTexture: Texture | null = null, leftTexture: Texture | null = null
@@ -217,6 +224,8 @@ export function buildTable(stack: Stack, pages: PageRecord[], manifest: Manifest
     stamp(readingPage, tex)
     readingPage.position.x = -(0.003 + LEAF.width / 2) * readingPage.scale.x
     right.visible = !isClosed
+    // A leaf read in the mirror hand keeps its reversal through a turn.
+    if (flipped && !withReflection) reflectedSample.value = tex
     if (withReflection) {
       mirrorDetail.update(tex)
       reflectedSample.value = tex
@@ -517,13 +526,26 @@ export function buildTable(stack: Stack, pages: PageRecord[], manifest: Manifest
     reflection.visible = on && !isClosed && Boolean(rightTexture)
     furniture.copyContact.value = reflection.visible ? 1 : 0
   }
+  /** THE MIRROR HAND ON THE LEAF ITSELF: the open leaf samples its own plate
+   * reversed, where it lies, with no second sheet and no second texture. */
+  function flipLeaf(on: boolean) {
+    flipped = on
+    if (on && rightTexture) reflectedSample.value = rightTexture
+    right.material = on ? reflected : front
+    readingPage.material = on ? reflected : front
+  }
   function holdTurn(progress = 0.5) {
     ready = prepareTurn(1, Math.max(0, Math.min(1, progress)))
   }
   close(false)
   ready = show(index)
-  return {
-    object, open, turn, panel, mirror, mirrorDetail, paperOnly, prewarmTurn, shelf: panel.shelf, close, update, holdTurn,
+  const api = {
+    object, open, turn, panel, mirror, mirrorDetail, paperOnly, prewarmTurn, shelf: panel.shelf, close, update, holdTurn, flipLeaf,
+    pages: pages as readonly PageRecord[],
+    /** The edition record open now, and whether a leaf is on its way over. */
+    at: () => index,
+    turning: () => turning || preparing,
+    resolve,
     ready: () => ready,
     pending: () => stream.pending() + folioShelf.pending() + furniture.library.pending() + Number(preparing) + Number(warming !== null),
     snapshot: (includeText = true) => ({
@@ -555,6 +577,8 @@ export function buildTable(stack: Stack, pages: PageRecord[], manifest: Manifest
       furniture.dispose()
     },
   }
+  tables.set(object, api)
+  return api
 }
 
 export type ReadingTable = ReturnType<typeof buildTable>

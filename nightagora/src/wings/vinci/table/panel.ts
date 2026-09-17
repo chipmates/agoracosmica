@@ -1,6 +1,6 @@
 import inscriptionsText from '../words/data/inscriptions.json?raw';
 import { buildAbsences, buildCodexList } from './codex-shelf'
-import { FAMOUS_FOLIOS, SOURCE_READINGS, TABLE_UI, folioKey, hasItalian, type Language, type PageRecord } from './content';
+import { FAMOUS_FOLIOS, SOURCE_READINGS, TABLE_UI, folioKey, folioProvenance, hasItalian, type Language, type PageRecord } from './content';
 import panelCss from './panel.css?raw';
 
 interface Inscription {
@@ -127,13 +127,7 @@ export function createPanel(pages: PageRecord[], onOpen: (folio: string) => void
       : pageKind(current);
     const title = node('h2', 'vt-folio-title', identity);
     title.tabIndex = -1;
-    const provenance = current.codex && current.folio !== null
-      ? lang === 'en'
-        ? `${identity}, from the 1883 facsimile. The original is in the Institut de France.`
-        : `${identity}, aus dem Faksimile von 1883. Das Original befindet sich im Institut de France.`
-      : lang === 'en'
-        ? 'From Ravaisson-Mollien’s 1883 edition of manuscripts B and D.'
-        : 'Aus Ravaisson-Molliens Ausgabe der Manuskripte B und D von 1883.';
+    const provenance = folioProvenance(current, lang, identity);
     const titleRow = node('div', 'vt-heading-row');
     titleRow.append(title, languageSelector());
     header.append(eyebrow, titleRow);
