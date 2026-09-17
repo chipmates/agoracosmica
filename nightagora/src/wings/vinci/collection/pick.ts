@@ -96,8 +96,22 @@ export function readVinciExhibits(root: Object3D): VinciPickEntry[] {
   const entries: VinciPickEntry[] = []
   const machines = new Map<string, Object3D[]>()
   root.traverse(object => {
-    if (!(object instanceof Mesh)) return
     const data = object.userData
+    // A MACHINE IS ITS OWN GROUP, and its parts arrive from the library a
+    // moment after that group stands, so it is read where it is named: by the
+    // stamp the hall puts on it, or by its own name where the group carries
+    // the id of the model it was built from.
+    const stamped = typeof data['manifestId'] === 'string' ? data['manifestId'] : ''
+    const named = /^vinci\/([a-z0-9-]+)$/.exec(object.name)
+    const slug = stamped.startsWith('vinci/machine/') ? stamped.slice('vinci/machine/'.length)
+      : named && Object.hasOwn(STANDS, named[1]!) ? named[1]! : ''
+    if (slug) {
+      const parts = machines.get(slug) ?? []
+      parts.push(object)
+      machines.set(slug, parts)
+      return
+    }
+    if (!(object instanceof Mesh)) return
     if (object.name.startsWith(PLATES) && !object.name.startsWith(PLATES + 'source-shoulder/')) {
       const workId = typeof data['workId'] === 'string' ? data['workId'] : null
       const face = data['face'] === 'reverse' ? 'reverse' as const : data['face'] === 'front' ? 'front' as const : null
@@ -110,16 +124,6 @@ export function readVinciExhibits(root: Object3D): VinciPickEntry[] {
       const placed = placedAt(kind, id, workId, sheet)
       entries.push({ id, kind, station: placed.station, order: placed.order, object, centre, radiusM,
         anchor: corner.addScaledVector(faceNormal(object), ANCHOR_OFF_M), openable, workId, face })
-      return
-    }
-    // The machines arrive part by part under one stamp, so they are collected
-    // and closed once the whole scene has been read.
-    const manifestId = typeof data['manifestId'] === 'string' ? data['manifestId'] : ''
-    if (manifestId.startsWith('vinci/machine/')) {
-      const slug = manifestId.slice('vinci/machine/'.length)
-      const parts = machines.get(slug) ?? []
-      parts.push(object)
-      machines.set(slug, parts)
       return
     }
     const stud = typeof data['studId'] === 'string' ? data['studId'] : null
@@ -139,6 +143,9 @@ export function readVinciExhibits(root: Object3D): VinciPickEntry[] {
   for (const [slug, parts] of machines) {
     const box = new Box3()
     for (const part of parts) box.union(new Box3().setFromObject(part))
+    // A machine whose parts have not landed is still an exhibit of its
+    // station: it stands at its own group's place until they do.
+    if (box.isEmpty()) for (const part of parts) box.expandByPoint(part.getWorldPosition(new Vector3()))
     const sphere = box.getBoundingSphere(new Sphere())
     const placed = placedAt('machine', `machine/${slug}`, null, null, slug)
     entries.push({ id: `machine/${slug}`, kind: 'machine', station: placed.station, order: placed.order,

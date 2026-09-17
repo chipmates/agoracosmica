@@ -46,7 +46,7 @@ import { collectVinciLabelOccluders, createVinciExhibitDots, createVinciLabelAnc
 import { pickVinciExhibit, readVinciExhibits, type VinciPickEntry } from './collection/pick'
 import { vinciApproachPose } from './collection/approaches'
 import { createVinciCloseLook } from './collection/close-look'
-import { vinciSheetTitle, type VinciStripEntry } from './collection/strip'
+import { createVinciHangStrip, vinciSheetTitle, type VinciStripEntry } from './collection/strip'
 import { pathSpecifications } from './paths'
 import { roadGradeProvenance } from './road-grade'
 import { apronProvenance } from './apron'
@@ -153,6 +153,7 @@ export function createWing():VinciWingModule {
    * the dots live in the label layer, and one owner holds the open exhibit. */
   let collectionRoot:Group|undefined, occluders:readonly Mesh[]=[]
   let dots:VinciExhibitDots|undefined, closeLook:ReturnType<typeof createVinciCloseLook>|undefined
+  let strip:ReturnType<typeof createVinciHangStrip>|undefined
   let picks:VinciPickEntry[]=[], picksTier=''
   const pickRay=new Raycaster(), sightRay=new Raycaster(), sightHits:Parameters<typeof vinciSightBlocked>[4]=[]
   /** Three on calm, six on standard, eight on hero: what is in front of the
@@ -272,7 +273,7 @@ export function createWing():VinciWingModule {
       onOpen:(id,dot)=>openExhibit(id,dot)})
     closeLook=createVinciCloseLook({host:h.labels,narrow,
       onOpen:(id,from)=>{
-        dots?.setOpen(id);dots?.invalidate();paintExhibitTitle();paintHeaderVisibility()
+        dots?.setOpen(id);dots?.invalidate();paintExhibitTitle();paintHeaderVisibility();paintStrip()
         const pose=vinciApproachPose(id,narrow())
         // ON CALM AND UNDER REDUCED MOTION THE EYE DOES NOT MOVE: the card is
         // the whole close look. Where it may move, the eye walks; a rig
@@ -286,9 +287,14 @@ export function createWing():VinciWingModule {
       },
       onClose:()=>{
         if(exhibitSources){exhibitSources=null;if(mode===2)mode=1;paintDock()}
-        rail.returnToStation();dots?.setOpen(null);dots?.invalidate();paintExhibitTitle();paintHeaderVisibility()
+        rail.returnToStation();dots?.setOpen(null);dots?.invalidate();paintExhibitTitle();paintHeaderVisibility();paintStrip()
       }})
+    strip=createVinciHangStrip({host:h.labels,onOpen:(id,button)=>openExhibit(id,button)})
     void exhibits?.picturesReady.then(()=>{if(hosts&&standing)refreshExhibits()})
+    // THE REGISTRY IS A READ, and the court's own exhibits land after the
+    // plates do: the row of a station that stands over them is empty until
+    // the ground it names has arrived.
+    void exhibits?.ready.then(()=>{if(hosts&&standing)refreshExhibits()})
     welcome=createVinciWelcome(h.labels,route=>{if(route==='collection')enterCollection();focusTheBar()})
     controller=new AbortController();const options={signal:controller.signal}
     let touchX=0,touchY=0,lastX=0,lastY=0,dragging=false,pointer=-1
@@ -436,7 +442,7 @@ export function createWing():VinciWingModule {
     if(!hosts||!collectionRoot)return
     picks=readVinciExhibits(collectionRoot)
     picksTier=hosts.world.stack.tierName()
-    paintExhibitMarks()
+    paintExhibitMarks();paintStrip()
     if(pendingExhibit){const id=pendingExhibit;pendingExhibit='';showView(id)}
   }
   /** What each exhibit's mark says and what colour it carries: its own name
@@ -454,6 +460,16 @@ export function createWing():VinciWingModule {
         colour:policyLabelText(found.work,entries).colour})
     }
     dots?.setExhibits(marks)
+  }
+  /** THE ROW UNDER THE CARD. It stands wherever a station holds more than
+   * one exhibit: docked under the station card on the wide stage, above the
+   * bar on the narrow one, and down while a card covers that row. */
+  function paintStrip():void {
+    if(!strip||!hosts||!standing)return
+    strip.setEntries(stationExhibits(),text(vinciContent[card]!.name))
+    strip.setOpen(closeLook?.id??null)
+    strip.setHidden(mode===2||(narrow()&&Boolean(closeLook?.id)))
+    if(!narrow()&&header)strip.dockUnder(Math.round(header.getBoundingClientRect().bottom+14))
   }
   /** The wing's own certainty word for a picture, read off the picture
    * module's own key so the two cannot drift. */
@@ -619,7 +635,7 @@ export function createWing():VinciWingModule {
     // stations used to carry a title and the hour and nothing that said what
     // the visitor was looking at.
     header.append(make('p','vinci-promise',text(s.promise)))
-    paintExhibitTitle()
+    paintExhibitTitle();paintStrip()
   }
   /** The card names what the frame holds: a sub-view carries its own title.
    * THE NUMBER COUNTS STATIONS. Two frames could otherwise read the same
@@ -801,7 +817,7 @@ export function createWing():VinciWingModule {
     // Opening Sources changes presentation only, inside the same proven lens.
     camera.zoom=1;camera.clearViewOffset();camera.updateProjectionMatrix()
     sources.setOpen(mode===2)
-    labels.setMode(mode);dots?.setMode(mode)
+    labels.setMode(mode);dots?.setMode(mode);paintStrip()
     const collectionView=activeView.startsWith('collection')
     const entryAnchor=entryInspectionAnchors[activeView]
     labels.setAnchor(materialInspectionAnchors[activeView]??entryAnchor??(activeView==='collection-court-access'?world(...collectionAccessPoint(1.05,.65),-.46):collectionView?world(-21.92,-33.92,narrow()?-5.85:-3.2):s.outdoor?anchors[s.id]??null:null),`${text(vinciCertaintyWords.reconstructed)} · ${entryAnchor?(lang()==='de'?'Vorgeschlagene Eingangsstruktur':'Proposed entrance structure'):collectionView?(lang()==='de'?'Museumseinbau der Gegenwart':'Modern museum insertion'):text(s.name)}`)
@@ -983,6 +999,6 @@ export function createWing():VinciWingModule {
       // ONE EXHIBIT AT A TIME: while one is open the other marks stand down.
       dots?.setLimit(closeLook?.id?0:DOTS_PER_TIER[hosts.world.stack.tierName()]??6)
       dots?.update(reading)},
-    stop(){if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;sign=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();closeLook?.dispose();closeLook=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
+    stop(){if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;sign=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();closeLook?.dispose();closeLook=undefined;strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
   }
 }

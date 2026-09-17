@@ -219,6 +219,30 @@
    layer L cycles, each in its object's own certainty colour. */
 .vinci-exhibit-dot::after {background:var(--certainty,#d2a557);border-color:#f4dab2cc;}
 
+/* THE HANG STRIP. The whole wall as one row: every exhibit of the station a
+   visitor stands in, in the order the wall hangs them, each a 44 px target
+   with its plate at rest and its own certainty under it. It docks under the
+   station card on the wide stage and stands above the bar on the narrow one,
+   and it never scrolls the page: the row scrolls inside itself. */
+.vinci-strip {position:fixed;left:46px;display:flex;gap:6px;margin:0;padding:6px;list-style:none;box-sizing:border-box;
+  max-width:min(620px,calc(100vw - 92px));overflow-x:auto;overscroll-behavior:contain;scrollbar-width:thin;
+  background:#101d27e6;border:1px solid #a9977344;pointer-events:auto;}
+.vinci-strip[hidden] {display:none;}
+.vinci-strip li {flex:0 0 auto;}
+.vinci-strip-item {position:relative;display:flex;align-items:flex-end;justify-content:center;width:44px;height:44px;
+  padding:0;background:#16242e;border:1px solid #a9977355;cursor:pointer;overflow:hidden;}
+.vinci-strip-item[disabled] {cursor:default;opacity:.5;}
+.vinci-strip-item[aria-current='true'] {border-color:#edcc8c;box-shadow:0 0 0 1px #edcc8c;}
+.vinci-strip-item:focus-visible {outline:1px solid #edcc8c;outline-offset:2px;}
+.vinci-strip-thumb {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.vinci-strip-dot {position:relative;width:7px;height:7px;margin-bottom:3px;border-radius:50%;
+  background:var(--certainty,#d2a557);box-shadow:0 0 0 2px #0d1720cc;}
+@media(max-aspect-ratio:9/10) {
+  /* The bar's own offset is its foot, so the row clears its head as the
+     card does, and the two never stand at once. */
+  .vinci-strip {left:8px;right:8px;top:auto !important;bottom:calc(var(--wing-rail-bottom) + 60px);max-width:none;}
+}
+
 /* THE CLOSE LOOK'S CARD. Beside the work on the wide stage, risen from the
    bottom on the narrow one. One reading surface, 44 px controls, the station's
    own question at its foot. */
