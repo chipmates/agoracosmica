@@ -1554,6 +1554,8 @@ function setPhase(next: Phase): void {
 
 function setStatus(key: keyof typeof LOBBY_TEXT | ''): void {
   if (!status) return
+  // the ride asks for this every frame; only a change touches the page
+  if (status.dataset['lobby'] === key) return
   status.dataset['lobby'] = key
   status.textContent = key ? say(LOBBY_TEXT[key]) : ''
 }
@@ -1733,6 +1735,11 @@ function frame(now: number): void {
        Instruments withdraws for the ride. Sound keeps its own control. */
     document.body.classList.toggle('riding', desc > 0.155 && desc <= 0.80)
     document.body.classList.toggle('arriving', desc > 0.80)
+    /* WHERE THE ROOM COMES UP, THE RIDE IS OVER. A scroll cannot descend
+       any further from here, so the foot of the frame stops asking for one
+       and names what the court expects instead. Scrubbing back up the
+       travel gives the instruction back. */
+    setStatus(desc >= CUT.courtRise[0] ? 'fireStatus' : 'descend')
     // a push back at the top of the travel hands the night to the eclipse
     if (descTarget <= 0 && desc < 0.02) setPhase('held')
     if (desc > 0.993) {
