@@ -842,6 +842,15 @@ export const vinciWingCounts: VinciText = {
   de: 'Dieser Flügel hat achtzehn Stationen auf den zwei Gründen. Der Bildersaal trägt 25 Plätze in den Maßen, die die Sammlungen verzeichnen, und jeder davon trägt ein Bild, die Wand des Körpers 29 Blätter aus Windsor, die Maschinenhalle 14 nach den Blättern gebaute Maschinen und der Lesetisch eine offene Seite. Die Rechteprüfung dieses Museums las 538 verzeichnete Windsor-Blattgruppen und ließ 389 von ihnen zu, und von 25 benannten Codex-Einheiten ließ sie 11 zu. Was sie nicht zulassen konnte, steht in dem Raum, zu dem es gehört, mit Sammlung und Grund.',
 }
 
+/** THE WING'S ONE SENTENCE, the same in the welcome, the recap at the exit
+ * and the life view. It names the two things a visitor can repeat a week
+ * later, a place and a documented day, and both are claims this wing already
+ * makes at its own stations. */
+export const vinciThroughLine: VinciText = {
+  en: 'You are standing in the last house Leonardo da Vinci lived in, on an afternoon a visitor wrote down.',
+  de: 'Du stehst im letzten Haus, in dem Leonardo da Vinci lebte, an einem Nachmittag, den ein Besucher aufgeschrieben hat.',
+};
+
 /** THE PLAN'S ROOMS. The plan draws the wing from geometry the collection
  * already declares, and each room is named here in the words the wing uses
  * for it elsewhere, so a text seat finds all six in one place. */

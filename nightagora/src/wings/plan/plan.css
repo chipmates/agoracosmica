@@ -76,3 +76,33 @@
 .wing-plan[data-narrow='true'] .wing-plan-heading {font-size:18px;}
 .wing-plan[data-narrow='true'] .wing-plan-entry {font-size:13px;}
 .wing-plan[data-narrow='true'] .wing-plan-work {font-size:12px;}
+
+/* THE RECAP at the exit of a wing: it stands under the station's own card,
+   so it takes the pointer the label layer does not and scrolls inside itself
+   rather than growing past the frame. */
+.wing-recap {max-width:420px;max-height:min(44dvh,400px);margin:14px 0 0;padding:14px 0 0;border-top:1px solid #a9977344;
+  overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;pointer-events:auto;}
+.wing-recap-through {margin:0 0 10px;font:400 17px/1.4 var(--serif);color:#fff5e3;text-wrap:pretty;}
+.wing-recap-heading {margin:0 0 4px;font:10px var(--sans);letter-spacing:.18em;text-transform:uppercase;color:#d2a557;}
+.wing-recap-prompt,.wing-recap-empty {margin:0 0 6px;font:13px/1.45 var(--sans);color:#b6bcae;text-wrap:pretty;}
+.wing-recap-list {margin:0;padding:0;list-style:none;}
+.wing-recap-item {border-bottom:1px solid #a9977322;}
+.wing-recap-title {display:block;width:100%;min-height:44px;padding:8px 4px 8px 0;text-align:left;background:none;border:0;
+  color:#e6d6b8;font:14px/1.35 var(--serif);cursor:pointer;}
+.wing-recap-title[aria-expanded='true'] {color:#fff5e3;}
+.wing-recap-title[disabled] {opacity:.62;cursor:default;}
+.wing-recap-line {margin:0 4px 10px 0;font:13px/1.5 var(--serif);color:#cfc6b4;text-wrap:pretty;}
+.wing-recap-line[hidden] {display:none;}
+.wing-recap-privacy {margin:12px 0 6px;font:11px/1.5 var(--sans);color:#a8b3b7;text-wrap:pretty;}
+.wing-recap-forget {min-height:44px;padding:8px 12px;background:none;border:1px solid #a9977344;color:#b6bcae;font:11px var(--sans);cursor:pointer;}
+.wing-recap-doors {display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+.wing-recap-door {flex:1 1 0;min-width:128px;min-height:44px;padding:10px 12px;background:transparent;border:1px solid #a9977366;
+  color:#e6d6b8;font:12px/1.2 var(--sans);text-align:center;cursor:pointer;}
+.wing-recap-title:focus-visible,.wing-recap-door:focus-visible,.wing-recap-forget:focus-visible {outline:1px solid #edcc8c;outline-offset:2px;}
+@media(max-aspect-ratio:9/10) {
+  /* The station card is already a sheet that scrolls inside itself here. */
+  .wing-recap {max-width:none;max-height:none;overflow:visible;margin-top:10px;padding-top:10px;}
+  .wing-recap-through {font-size:15px;}
+  .wing-recap-title {font-size:13px;}
+  .wing-recap-door {min-width:0;font-size:11px;padding:10px 6px;}
+}

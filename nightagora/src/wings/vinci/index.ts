@@ -11,6 +11,7 @@ import { setRegister, type WingHosts, type WingModule } from '../frame'
 import { beginVisit, type Visit } from '../visit'
 import { createWingPlan, type WingPlan } from '../plan'
 import { PLAN_WORDS } from '../plan/words'
+import { createWingRecap } from '../plan/recap'
 import type { PlanHighlight, PlanPoint, PlanRoom, PlanShape, PlanSite, PlanStation } from '../plan/types'
 import { constructionRecords, evidenceWords } from './evidence-copy'
 import { lang, WING_TEXT } from '../content'
@@ -68,7 +69,7 @@ import { createVinciHangStrip, vinciSheetTitle, type VinciStripEntry } from './c
 import { pathSpecifications } from './paths'
 import { roadGradeProvenance } from './road-grade'
 import { apronProvenance } from './apron'
-import { vinciContent, vinciPlanRooms, vinciWelcomeText, vinciLegacyStationIds, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, vinciAbsences, vinciGrounds, vinciRightsPolicy, vinciWingCounts, vinciSourcesHeadings, type VinciCertainty, type VinciStatement, type VinciStationId, type VinciText } from './content'
+import { vinciContent, vinciPlanRooms, vinciThroughLine, vinciWelcomeText, vinciLegacyStationIds, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, vinciAbsences, vinciGrounds, vinciRightsPolicy, vinciWingCounts, vinciSourcesHeadings, type VinciCertainty, type VinciStatement, type VinciStationId, type VinciText } from './content'
 import wingCss from './wing.css?inline'
 
 const text=(value:VinciText):string=>value[lang()]
@@ -353,7 +354,7 @@ export function createWing():VinciWingModule {
       },
       onClose:()=>{
         if(exhibitSources){exhibitSources=null;if(mode===2)mode=1;paintDock()}
-        rail.returnToStation();dots?.setOpen(null);dots?.invalidate();paintExhibitTitle();paintHeaderVisibility();paintStrip()
+        rail.returnToStation();dots?.setOpen(null);dots?.invalidate();paintExhibitTitle();paintHeaderVisibility();paintStrip();refreshRecap()
       }})
     strip=createVinciHangStrip({host:h.labels,onOpen:(id,button)=>openExhibit(id,button)})
     void exhibits?.picturesReady.then(()=>{if(hosts&&standing)refreshExhibits()})
@@ -481,6 +482,31 @@ export function createWing():VinciWingModule {
       row.push({order:pick.order,entry:{id:pick.id,station:pick.station,title,kind:pick.kind}})
     }
     return row.sort((a,b)=>a.order-b.order).map(item=>item.entry)
+  }
+  /** The recap names what the night holds, so it is composed again whenever
+   * that changed: a work opened and closed, and the registry read that lets
+   * an id be named at all. */
+  function refreshRecap():void {
+    if(standing&&hosts&&vinciContent[card]!.id==='grave')paintHeader()
+  }
+  /** THE RECAP AT THE EXIT. The night holds ids, so every title and every
+   * line is resolved here from the wing's own registers, the way the card
+   * resolves them, and an id the registry cannot name is simply not shown. */
+  function recapAtTheGrave():HTMLElement {
+    const frame=hosts?.stage.parentElement
+    return createWingRecap({lang,narrow,throughLine:()=>text(vinciThroughLine),
+      opened:()=>visit?.opened??[],
+      resolve:id=>{
+        const pick=picks.find(entry=>entry.id===id)
+        const title=pick?exhibitTitleBi(pick):null
+        return title&&pick?{id,title:text(title),line:vinciLine(id),station:pick.station??''}:null
+      },
+      onLobby:()=>frame?.querySelector<HTMLElement>('.wing-lobby')?.click(),
+      // THE DOOR IS THE FRAME'S OWN, pressed from here: a second link would
+      // walk past the disclosure the frame puts in front of the first press.
+      door:()=>({word:text(WING_TEXT.door),press:()=>frame?.querySelector<HTMLElement>('.wing-door')?.click()}),
+      // The card is composed again, so the hand keeps the control it pressed.
+      onForget:()=>{visit?.forget();paintHeader();header.querySelector<HTMLElement>('.wing-recap-forget')?.focus({preventScroll:true})}})
   }
   /** A WORK CHOSEN ON THE PLAN. The visitor is walked to the station the work
    * hangs in and the work opens when that walk ends, so the plan uses the
@@ -621,7 +647,7 @@ export function createWing():VinciWingModule {
     if(!hosts||!collectionRoot)return
     picks=readVinciExhibits(collectionRoot)
     picksTier=hosts.world.stack.tierName()
-    paintExhibitMarks();paintStrip()
+    paintExhibitMarks();paintStrip();refreshRecap()
     if(pendingExhibit){const id=pendingExhibit;pendingExhibit='';showView(id)}
     openPendingDate()
   }
@@ -1013,6 +1039,9 @@ export function createWing():VinciWingModule {
     // stations used to carry a title and the hour and nothing that said what
     // the visitor was looking at.
     header.append(make('p','vinci-promise',text(s.promise)))
+    // THE EXIT OF THE WING. The station card stands as it is, and the night
+    // the visitor had stands under it.
+    if(s.id==='grave'&&standing)header.append(recapAtTheGrave())
     // The sheet's own control, at the top of the card where a thumb finds it.
     if(standing){
       const grab=make('button','vinci-sheet-grab')
