@@ -324,6 +324,9 @@ export function createReaderPayload(options: {
         wrap.append(label)
         const select = record.ownerDocument.createElement('select')
         select.setAttribute('aria-label', label)
+        // A control a hand has to hit, in a window a thumb reaches.
+        select.style.minHeight = '44px'
+        select.style.marginLeft = '8px'
         for (const entry of records) {
           const option = record.ownerDocument.createElement('option')
           option.value = value(entry); option.textContent = text(entry); option.selected = entry.file === page.file

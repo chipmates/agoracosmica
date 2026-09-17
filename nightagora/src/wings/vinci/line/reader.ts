@@ -37,12 +37,15 @@ export function createStudReaderPayload(options: {
   /** The address that opens the wing at one date. */
   link(stud: Stud): string
   standing(): boolean
+  /** True when the eye was walked to the socket, so the date is read off the
+   * floor and the viewport does not repeat it. */
+  walked(): boolean
   /** The list stands at another date: the record follows it. */
   changed(): void
 }): StudReaderPayload {
   let host: VitrinePayloadHost | undefined, lang: 'en' | 'de' = 'en'
   let at = Math.max(0, Math.min(LINE_STUDS.length - 1, options.start))
-  let settled = 0, held = false, asked = false, veiled = false
+  let settled = 0, held = false, asked = false, veiled = false, room = false
   let plate: HTMLElement | undefined, list: HTMLOListElement | undefined
   let previous: HTMLButtonElement | undefined, next: HTMLButtonElement | undefined
   const listening = new AbortController()
@@ -66,6 +69,10 @@ export function createStudReaderPayload(options: {
     plate.textContent = ''
     plate.lang = lang
     const year = make('p', 'vitrine-date-year')
+    // THE DATE IS CUT INTO THE FLOOR the visitor walked to: the viewport
+    // leaves it standing there and says only how sure it is and where in the
+    // line it falls. Where no eye moved, the viewport carries the date.
+    year.hidden = room
     if (veiled && options.words.whichYear) {
       // THE QUESTION IS ONE TAP, AND THE TAP IS THE ANSWER: nothing is scored.
       const ask = make('button', 'vitrine-control vitrine-date-ask', options.words.whichYear)
@@ -114,6 +121,7 @@ export function createStudReaderPayload(options: {
     mount(nextHost) {
       host = nextHost
       lang = nextHost.lang
+      room = options.walked()
       plate = make('div', 'vitrine-date')
       nextHost.element.append(plate)
       const aside = nextHost.aside

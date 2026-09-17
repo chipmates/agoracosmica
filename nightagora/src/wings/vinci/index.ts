@@ -779,12 +779,14 @@ export function createWing():VinciWingModule {
       const openRecord=()=>{record();sources.resetScroll();sources.select('station');mode=2;paintDock()}
       reader=createStudReaderPayload({start,words:vinciDateWords(),
         link:stud=>`${location.pathname}${location.search}#s=${stud.station}&d=${stud.id}`,
+        walked:()=>{const nav=rail.navigation;return nav.approaching===id||nav.exhibit===id},
         standing:()=>{const nav=rail.navigation;return !nav.active&&!nav.approaching},
         changed:()=>{if(exhibitSources?.id===id&&mode===2){record();paintDock()}}})
       const stud=LINE_STUDS[vinciStudIndex(id)]!
       openMode=how
       closeLook.open({id,title:lang()==='de'?stud.date_label_de:stud.date_label_en,line:null,card:[],payload:reader,
-        controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),shut],walk,...vinciLimits(id)},from,how_)
+        controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),shut],walk,...vinciLimits(id),
+        work:()=>{const nav=rail.navigation;return nav.exhibit===id&&!nav.active?sphereRect(entry.centre,entry.radiusM):null}},from,how_)
       openMode='auto'
       return
     }
@@ -806,7 +808,8 @@ export function createWing():VinciWingModule {
         changed:()=>{if(exhibitSources?.id===id&&mode===2)paintDock()}})
       openMode=how
       closeLook.open({id,title,line:vinciLine(id),card:[],payload:reader,
-        controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),shut],walk,...vinciLimits(id)},from,how_)
+        controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),shut],walk,...vinciLimits(id),
+        work:()=>{const nav=rail.navigation;return nav.exhibit===id&&!nav.active?sphereRect(entry.centre,entry.radiusM):null}},from,how_)
       openMode='auto'
       return
     }

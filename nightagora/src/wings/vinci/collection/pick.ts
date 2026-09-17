@@ -88,6 +88,9 @@ export function vinciMachineRoom(station: VinciStationId | null): readonly Vinci
 const MACHINE_MARK_SHARE = .12
 
 function proxy(object: Object3D): { centre: Vector3; radiusM: number; corner: Vector3 } {
+  // A BODY THE REGISTRY READS BEFORE ITS FIRST FRAME still has to be measured
+  // where it stands: three's box reads the matrices as they are.
+  object.updateWorldMatrix(true, true)
   const box = new Box3().setFromObject(object)
   const sphere = box.getBoundingSphere(new Sphere())
   const size = box.getSize(new Vector3())
@@ -107,7 +110,10 @@ function faceNormal(mesh: Mesh): Vector3 {
 const STUD_PROXY_M = .6, STUD_MARK_M = .06
 /** The slab and the framed diagram take a press over their own size. */
 const GRAVE_PROXY_M = { slab: 1.2, frame: 1.7 }
-const TABLE_OBJECT = 'vinci-reading-table'
+const TABLE_OBJECT = 'vinci-reading-table', TABLE_LEAF = 'open-facsimile-plate', TABLE_BOOK = 'facsimile-binding'
+/** The open leaf lies this far over the table's own top, and a hand needs
+ * this much of it to press. */
+const BOOK_OVER_TABLE_M = .04, BOOK_PROXY_M = .22, BOOK_MARK_M = .09
 const DEATHBED_PLATE = 'Ingres-full-image-unwarped'
 
 /** An exhibit that is not a plate or a machine: a proxy, a mark, a station. */
@@ -167,14 +173,25 @@ export function readVinciExhibits(root: Object3D): VinciPickEntry[] {
         entries.push(place(id, 'stud', object, centre, STUD_PROXY_M, centre.clone().setY(level + STUD_MARK_M), index))
       }
     } else if (object.name === TABLE_OBJECT) {
-      const book = object.getObjectByName('facsimile-binding') ?? object
-      const { centre, radiusM } = proxy(book)
-      entries.push(place('codex/paris-B', 'manuscript', object, centre, radiusM, centre.clone(), 0))
+      // THE BOOK, NOT THE ROOM THE TABLE BRINGS: the open leaf is the exhibit,
+      // and until its plate is mounted the book's own place on the table is.
+      object.updateWorldMatrix(true, true)
+      const leaf = object.getObjectByName(TABLE_LEAF) ?? object.getObjectByName(TABLE_BOOK)
+      const box = leaf ? new Box3().setFromObject(leaf) : new Box3()
+      if (box.isEmpty()) {
+        const at = object.getWorldPosition(new Vector3())
+        box.setFromCenterAndSize(at.setY(at.y + BOOK_OVER_TABLE_M), new Vector3(.36, .08, .26))
+      }
+      const sphere = box.getBoundingSphere(new Sphere())
+      // The mark stands over the open leaf, not inside the book.
+      const over = sphere.center.clone().setY(box.max.y + BOOK_MARK_M)
+      entries.push(place('codex/paris-B', 'manuscript', object, sphere.center.clone(),
+        Math.max(BOOK_PROXY_M, sphere.radius), over, 0))
     } else if (exhibit?.kind === 'court-plaque') {
       const { centre, radiusM } = proxy(object)
       entries.push(place('plaque/flight-quote', 'place', object, centre, radiusM, centre.clone(), MACHINE_OFFSET + Object.keys(STANDS).length))
     } else if (exhibit?.kind === 'grave' && exhibit.anchors) {
-      object.updateWorldMatrix(true, false)
+      object.updateWorldMatrix(true, true)
       const slab = new Vector3().fromArray(exhibit.anchors['slab']!)
       const frame = new Vector3().fromArray(exhibit.anchors['computedFrame']!)
       entries.push(place('grave', 'place', object, object.localToWorld(slab.clone()), GRAVE_PROXY_M.slab, object.localToWorld(slab.clone()), 0))

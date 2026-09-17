@@ -297,7 +297,10 @@ function otherKinds(): Placed[] {
   // A DATE IS READ FROM ITS SOUTH, where its numerals stand upright, looking
   // down at the socket from a stride and a half.
   for (const stud of lineCutStuds(LINE_ORIGIN)) {
-    const east = stud.east + .15
+    // THE DATE AND ITS NUMERALS STAND CLEAR OF THE CARD: the year is cut east
+    // of its socket, so the eye stands east of both and they read on the open
+    // side of the frame.
+    const east = stud.east + .75
     // The last date lies close to the gallery's south cross wall, so its eye
     // stands as far back as the wall leaves and looks more steeply down.
     const back = Math.min(1.5, stud.north - (FACE.southStripNorth + .6))
