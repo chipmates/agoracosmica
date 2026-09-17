@@ -67,4 +67,5 @@ export const LOBBY_TEXT = {
   terms: { en: 'Terms', de: 'Nutzungsbedingungen' },
   privacy: { en: 'Privacy', de: 'Datenschutz' },
   close: { en: 'Close', de: 'Schließen' },
+  paneEnter: { en: 'Enter the museum', de: 'Das Museum betreten' },
 } satisfies Record<string, Bilingual>
