@@ -37,7 +37,7 @@ import { createGround } from './ground'
 import { createVegetation } from './vegetation'
 import { createRail, stationPose, namedPose, vinciStandsInRoom } from './rail'
 import { collectRailSolids, createRailGeometryAuthority } from './rail-proof'
-import { createWheelStepper } from './input'
+import { bindRailPointer, createWheelStepper } from './input'
 import { dossier, world, hourKey, type Quantity } from './site'
 import { gradeAt as groundHeight, galleryBankCapProvenance } from './terrain-mesh'
 import { createGroundDressing } from './ground-dressing'
@@ -320,26 +320,19 @@ export function createWing():VinciWingModule {
     void exhibits?.ready.then(()=>{if(hosts&&standing)refreshExhibits()})
     welcome=createVinciWelcome(h.labels,route=>{if(route==='collection')enterCollection();focusTheBar()})
     controller=new AbortController();const options={signal:controller.signal}
-    let touchX=0,touchY=0,lastX=0,lastY=0,dragging=false,pointer=-1
     const wheelStep=createWheelStepper(()=>performance.now())
     // A notch asks for the next station AND walks a stride along the leg that
     // is under way, so a visitor who keeps scrolling keeps moving instead of
     // waiting the walk out, and the station asked for is never lost.
     h.stage.addEventListener('wheel',(e)=>{if(e.ctrlKey||e.defaultPrevented||(e.target as Element).closest('.vinci-dock,.wing-rail-group,.vinci-exhibit-card,.vinci-strip,.vinci-heading'))return;e.preventDefault();const step=wheelStep(e.deltaY,e.deltaMode,innerHeight);if(!step)return;rail.stride(1);h.navigate(station+step)},{...options,passive:false})
-    h.stage.addEventListener('pointerdown',(e)=>{if(!e.isPrimary||e.button!==0||(e.target as Element).closest('button,a,input,textarea,select,.vinci-dock,.wing-rail-group,.vinci-exhibit-card,.vinci-heading,.vinci-strip'))return;if(sheetOpen){sheetOpen=false;paintSheet()}e.preventDefault();dragging=true;pointer=e.pointerId;touchX=lastX=e.clientX;touchY=lastY=e.clientY;h.stage.setPointerCapture(e.pointerId)},options)
-    h.stage.addEventListener('pointermove',(e)=>{if(!dragging||pointer!==e.pointerId)return;rail.drag(e.clientX-lastX,e.clientY-lastY,h.stage.getBoundingClientRect().height);lastX=e.clientX;lastY=e.clientY},options)
     // A PRESS IS A PRESS, NOT A DRAG AND NOT A SWIPE. A flick on the phone is
     // still a station, a drag is still a look, and what is left is one ray.
-    h.stage.addEventListener('pointerup',(e)=>{
-      if(!dragging||pointer!==e.pointerId)return
-      dragging=false;pointer=-1
-      const dx=e.clientX-touchX,dy=e.clientY-touchY
-      if(e.pointerType==='touch'&&Math.abs(dy)>65&&Math.abs(dy)>Math.abs(dx)*1.3){h.navigate(station+(dy<0?1:-1));return}
-      if(Math.hypot(dx,dy)<=8)pressExhibit(e.clientX,e.clientY)
-    },options)
-    const cancelDrag=()=>{dragging=false;pointer=-1}
-    h.stage.addEventListener('pointercancel',cancelDrag,options)
-    h.stage.addEventListener('lostpointercapture',cancelDrag,options)
+    bindRailPointer({stage:h.stage,signal:controller.signal,
+      ignores:target=>Boolean(target?.closest?.('button,a,input,textarea,select,.vinci-dock,.wing-rail-group,.vinci-exhibit-card,.vinci-heading,.vinci-strip')),
+      began:()=>{if(sheetOpen){sheetOpen=false;paintSheet()}},
+      look:(dx,dy,height)=>rail.drag(dx,dy,height),
+      step:direction=>h.navigate(station+direction),
+      press:(x,y)=>pressExhibit(x,y)})
     window.addEventListener('keydown',(e)=>{
       if(e.defaultPrevented||e.ctrlKey||e.metaKey||e.altKey)return
       const target=e.target instanceof Element?e.target:document.body
