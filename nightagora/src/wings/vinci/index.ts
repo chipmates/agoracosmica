@@ -161,6 +161,9 @@ export function createWing():VinciWingModule {
   const DOTS_PER_TIER:Record<string,number>={hero:8,standard:6,calm:3}
   /** The one mode a press opens in, set by the caller the press came from. */
   let openMode:'auto'|'walk'|'cut'='auto', exhibitAway=false
+  /** THE STATION CARD IS A SHEET ON THE PHONE. Peeked or opened belongs to
+   * the walk, so it is held here and never written down. */
+  let sheetOpen=false
   let restoreEnvironmentRotation:(()=>void)|null=null
   const narrow=()=>innerWidth/innerHeight<=.9
   const shadowFocus=new Vector3(NaN,NaN,NaN), focusAhead=new Vector3()
@@ -181,7 +184,7 @@ export function createWing():VinciWingModule {
     // Vinci's interactive source cards need an accessible host only while mounted.
     labelHostHidden=h.labels.getAttribute('aria-hidden');h.labels.removeAttribute('aria-hidden')
     hosts=h;h.stage.textContent='';h.labels.textContent='';h.stage.parentElement!.dataset['wing']='vinci';const style=make('style','');style.textContent=wingCss;h.stage.append(style)
-    header=make('div','vinci-heading');h.stage.append(header)
+    header=make('div','vinci-heading');header.id='vinci-station-card';h.stage.append(header)
     sign=make('div','vinci-opening');sign.append(make('span','vinci-opening-fill'));h.stage.append(sign)
   }
   function schedule() { scheduled=requestAnimationFrame(()=>{scheduled=requestAnimationFrame(build)}) }
@@ -303,7 +306,7 @@ export function createWing():VinciWingModule {
     // is under way, so a visitor who keeps scrolling keeps moving instead of
     // waiting the walk out, and the station asked for is never lost.
     h.stage.addEventListener('wheel',(e)=>{if(e.ctrlKey||e.defaultPrevented||(e.target as Element).closest('.vinci-dock,.wing-rail-group,.vinci-exhibit-card'))return;e.preventDefault();const step=wheelStep(e.deltaY,e.deltaMode,innerHeight);if(!step)return;rail.stride(1);h.navigate(station+step)},{...options,passive:false})
-    h.stage.addEventListener('pointerdown',(e)=>{if(!e.isPrimary||e.button!==0||(e.target as Element).closest('button,a,input,textarea,select,.vinci-dock,.wing-rail-group,.vinci-exhibit-card'))return;e.preventDefault();dragging=true;pointer=e.pointerId;touchX=lastX=e.clientX;touchY=lastY=e.clientY;h.stage.setPointerCapture(e.pointerId)},options)
+    h.stage.addEventListener('pointerdown',(e)=>{if(!e.isPrimary||e.button!==0||(e.target as Element).closest('button,a,input,textarea,select,.vinci-dock,.wing-rail-group,.vinci-exhibit-card,.vinci-heading'))return;if(sheetOpen){sheetOpen=false;paintSheet()}e.preventDefault();dragging=true;pointer=e.pointerId;touchX=lastX=e.clientX;touchY=lastY=e.clientY;h.stage.setPointerCapture(e.pointerId)},options)
     h.stage.addEventListener('pointermove',(e)=>{if(!dragging||pointer!==e.pointerId)return;rail.drag(e.clientX-lastX,e.clientY-lastY,h.stage.getBoundingClientRect().height);lastX=e.clientX;lastY=e.clientY},options)
     // A PRESS IS A PRESS, NOT A DRAG AND NOT A SWIPE. A flick on the phone is
     // still a station, a drag is still a look, and what is left is one ray.
@@ -332,12 +335,27 @@ export function createWing():VinciWingModule {
         if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();stepExhibit(-1)}
         return
       }
+      if(e.key==='Escape'&&sheetOpen&&narrow()){e.preventDefault();sheetOpen=false;paintSheet();return}
       if(e.key==='Escape'){e.preventDefault();mode=1;rail.look(0,0);paintDock();source.focus({preventScroll:true});return}
       if(e.key.toLowerCase()==='l'&&!e.repeat){e.preventDefault();mode=((mode+1)%3) as VinciLabelMode;paintDock();if(mode!==2&&target.closest('.vinci-dock'))source.focus({preventScroll:true});return}
       if(target.closest('.vinci-dock'))return
       if(e.key==='ArrowRight'||e.key==='ArrowDown'){e.preventDefault();h.navigate(station+1)}
       if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();h.navigate(station-1)}
     },options)
+    // THE SHEET TAKES ITS OWN GESTURE: a drag up opens it, a drag down or a
+    // tap on the peek closes or opens it, and the card itself outlives every
+    // repaint, so this is bound once.
+    let sheetFrom=0,sheetHeld=false
+    header.addEventListener('pointerdown',(e)=>{if(!narrow()||!e.isPrimary)return;sheetHeld=true;sheetFrom=e.clientY},options)
+    header.addEventListener('pointerup',(e)=>{
+      if(!sheetHeld||!narrow())return
+      sheetHeld=false
+      if((e.target as Element).closest('.vinci-sheet-grab'))return
+      const dy=e.clientY-sheetFrom
+      const want=dy<-24?true:dy>24?false:Math.abs(dy)<=8?!sheetOpen:sheetOpen
+      if(want!==sheetOpen){sheetOpen=want;paintSheet()}
+    },options)
+    header.addEventListener('pointercancel',()=>{sheetHeld=false},options)
     window.addEventListener('resize',()=>{placeCanonicalStation();paintDock()},options)
     standing=true
     plates=stack.materials.pending()
@@ -635,6 +653,16 @@ export function createWing():VinciWingModule {
     // stations used to carry a title and the hour and nothing that said what
     // the visitor was looking at.
     header.append(make('p','vinci-promise',text(s.promise)))
+    // The sheet's own control, at the top of the card where a thumb finds it.
+    if(standing){
+      const grab=make('button','vinci-sheet-grab')
+      grab.type='button'
+      grab.setAttribute('aria-label',text(s.name))
+      grab.setAttribute('aria-controls','vinci-station-card')
+      grab.addEventListener('click',()=>{sheetOpen=!sheetOpen;paintSheet()})
+      header.prepend(grab)
+    }
+    paintSheet()
     paintExhibitTitle();paintStrip()
   }
   /** The card names what the frame holds: a sub-view carries its own title.
@@ -648,6 +676,18 @@ export function createWing():VinciWingModule {
     if(h1)h1.textContent=text(name??s.name)
     const kicker=header.querySelector('.vinci-kicker')
     if(kicker)kicker.textContent=name?viewKicker():stationKicker()
+  }
+  /** THE SHEET'S TWO STATES. Peeked, the card is the room's name and one
+   * line; opened, it is the whole card scrolling inside itself. The door
+   * line, the bar and the wall's own row stand under it in both. */
+  function paintSheet():void {
+    if(!header)return
+    const sheet=narrow()&&header.classList.contains('vinci-standing')
+    if(!sheet){delete header.dataset['sheet'];return}
+    header.dataset['sheet']=sheetOpen?'open':'peek'
+    const grab=header.querySelector('.vinci-sheet-grab')
+    grab?.setAttribute('aria-expanded',String(sheetOpen))
+    if(!sheetOpen)header.scrollTop=0
   }
   /** ONE CARD AT A TIME ON A NARROW STAGE. The room's card stands beside the
    * exhibit's on the wide one and would cover it on the phone. */

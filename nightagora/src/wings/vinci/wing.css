@@ -121,11 +121,25 @@
 .vinci-standing .vinci-status {margin:14px 0 8px;}
 .vinci-standing .vinci-promise {font-size:15px;max-width:380px;}
 @media(max-aspect-ratio:9/10) {
-  .vinci-heading.vinci-standing {top:auto;bottom:272px;left:16px;right:16px;max-width:none;margin-left:0;padding:12px 14px 13px;}
+  .vinci-heading.vinci-standing {top:auto;bottom:272px;left:16px;right:16px;max-width:none;margin-left:0;padding:4px 14px 13px;}
   .vinci-standing .vinci-title {font-size:21px;margin-top:4px;}
   .vinci-standing .vinci-status {margin:8px 0 5px;}
   .vinci-standing .vinci-promise {font-size:13px;line-height:1.4;max-width:none;}
+  /* THE STATION CARD IS A SHEET ON THE PHONE. Peeked it is the room's name
+     and one line; opened it is the whole card, scrolling inside itself. The
+     door line, the station bar and the wall's own row stand clear of it in
+     both states, and it takes the pointer the label layer does not. */
+  .vinci-heading.vinci-standing[data-sheet] {pointer-events:auto;overscroll-behavior:contain;}
+  .vinci-heading.vinci-standing[data-sheet='peek'] .vinci-promise {display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;}
+  .vinci-heading.vinci-standing[data-sheet='peek'] .vinci-status,
+  .vinci-heading.vinci-standing[data-sheet='peek'] .vinci-insertion {display:none;}
+  .vinci-heading.vinci-standing[data-sheet='open'] {max-height:min(52dvh,calc(100dvh - 350px));overflow-y:auto;}
+  .vinci-heading.vinci-standing .vinci-sheet-grab {display:flex;align-items:center;justify-content:center;width:100%;
+    min-height:44px;margin:0;padding:0;background:none;border:0;cursor:pointer;}
+  .vinci-sheet-grab::after {content:'';width:38px;height:3px;border-radius:2px;background:#c8bda6aa;}
+  .vinci-sheet-grab:focus-visible {outline:1px solid #edcc8c;outline-offset:-2px;}
 }
+.vinci-sheet-grab {display:none;}
 
 /* The certainty shares the title line; its word remains in Sources. */
 .vinci-title {display:flex;align-items:baseline;gap:10px;}
