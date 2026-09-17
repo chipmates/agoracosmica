@@ -894,10 +894,20 @@
     .pane-close:hover::after, .pane-close:focus-visible::after { background: var(--rule); }
     @media (max-aspect-ratio: 9/10) {
       #constellation-plate { top: 11%; }
+      /* THE CLOSE WORDS NEVER STAND ON A PICTURE. On a phone the column
+         scrolls and the control does not, so the portrait used to pass
+         under it. The column now scrolls inside a box that begins below
+         the control, and the box's own top edge fades, so a picture is
+         gone a few pixels before the words. */
       .pane-inner {
         flex-direction: column; align-items: flex-start;
-        gap: 20px; max-height: 100%; overflow-y: auto;
-        padding: 84px 24px 40px;
+        gap: 20px; overflow-y: auto;
+        --pane-clear: calc(max(22px, env(safe-area-inset-top)) + 54px);
+        margin-top: var(--pane-clear);
+        max-height: calc(100% - var(--pane-clear));
+        padding: 16px 24px 40px;
+        -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 16px);
+        mask-image: linear-gradient(to bottom, transparent 0, #000 16px);
       }
       .pane-text, .pane-portrait { display: contents; }
       .pane-head { order: 1; }
