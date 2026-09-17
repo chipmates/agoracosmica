@@ -38,6 +38,13 @@ export const GRAVE_WORDS = {
   dig: '1863',
   identification: { en: 'The identification remains presumed.', de: 'Die Identifizierung bleibt unbewiesen.' },
   medallion: { en: 'The portrait medallion\nis left empty here.', de: 'Das Porträtmedaillon\nbleibt hier leer.' },
+  /** What the setting on the real slab holds. The bronze is a 2004 sculpture
+   * whose copyright runs, so no photograph of it is admissible and the record
+   * carries the fact in words. */
+  medallionRecord: {
+    en: 'A bronze medallion with his profile was set into the slab in 2004. It is modern work, so the museum shows the words and not the picture.',
+    de: 'Ein Bronzemedaillon mit seinem Profil kam 2004 in die Grabplatte. Es ist ein modernes Werk, darum zeigt das Museum die Worte und nicht das Bild.',
+  },
   diagram: { en: 'CHOSEN LIGHT · A DIAGRAM', de: 'GEWÄHLTES LICHT · EINE STUDIE' },
   diagramDate: { en: '2 MAY 1519 · JULIAN CALENDAR', de: '2. MAI 1519 · JULIANISCH' },
   disclosure: {

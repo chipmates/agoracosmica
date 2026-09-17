@@ -2743,7 +2743,7 @@
       "prompt": "Interpretive museum slab with name only, an empty bronze bezel with its own note, a separate presumed plaque on a footed base and based on a sourced account, and a constructed framed gable relief for the computed sun under a raked reading ledge. No bones or invented historical plaque facsimile.",
       "model": "Deterministic TypeScript geometry and TSL materials",
       "date": "2026-09-10",
-      "sha256": "71297d519bd37d8229a020958542131a88e5fd41f15374c2f49b56f96805d1b0",
+      "sha256": "4e04f1c7e211467d46f434c9382e57d6f182be49dca38dee40e966609ce0a011",
       "note": "recipe_file=src/wings/vinci/grave/index.ts"
     },
     {
