@@ -54,6 +54,7 @@ import { vinciContent, vinciLegacyStationIds, vinciConstructionStatus, vinciReco
 import wingCss from './wing.css?inline'
 
 const text=(value:VinciText):string=>value[lang()]
+const sourcesWord=()=>lang()==='de'?'Quellen':'Sources'
 const make=<K extends keyof HTMLElementTagNameMap>(tag:K,cls:string,value?:string):HTMLElementTagNameMap[K]=>{
   const e=document.createElement(tag);e.className=cls;if(value!==undefined)e.textContent=value;return e
 }
@@ -267,7 +268,7 @@ export function createWing():VinciWingModule {
     shadowBody=createWingShadowBody(scene);scene.add(shadowBody.group)
     authority=createRailGeometryAuthority(collectRailSolids(scene))
     rail=createRail(camera,clock,authority);measurement=createMeasurement(h.labels,stack)
-    source=make('button','vinci-source',lang()==='de'?'Quellen':'Sources');source.type='button';source.setAttribute('aria-keyshortcuts','l');source.setAttribute('aria-controls','vinci-source-card');source.addEventListener('click',()=>{mode=mode===2?1:2;paintDock()});h.stage.parentElement!.querySelector('.wing-rail-group')!.append(source)
+    source=make('button','vinci-source',sourcesWord());source.type='button';source.setAttribute('aria-keyshortcuts','l');source.setAttribute('aria-controls','vinci-source-card');source.addEventListener('click',()=>{mode=mode===2?1:2;paintDock()});h.stage.parentElement!.querySelector('.wing-rail-group')!.append(source)
     sources=createVinciSourcesWindow(h.labels,source,()=>{mode=1;paintDock()});dock=sources.element;drawer=sources.panels.station
     occluders=collectVinciLabelOccluders(scene)
     labels=createVinciLabelAnchor({host:h.labels,camera,occluders,onOpen:()=>{mode=2;paintDock()}})
@@ -853,6 +854,8 @@ export function createWing():VinciWingModule {
     const recordOpen=dock.dataset['station']===s.id&&record?.isConnected&&!record.hidden
     paintHeaderVisibility()
     const camera=hosts.world.camera
+    // The bar's word is painted with the dock, so it follows the language.
+    if(source.textContent!==sourcesWord())source.textContent=sourcesWord()
     dock.dataset['station']=s.id
     // Opening Sources changes presentation only, inside the same proven lens.
     camera.zoom=1;camera.clearViewOffset();camera.updateProjectionMatrix()

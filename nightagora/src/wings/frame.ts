@@ -272,6 +272,18 @@ export function createWingFrame(
   let wing: WingModule | null = null
   let index = 0
 
+  /** THE LANGUAGE IS CHOSEN IN THE LOBBY, and this frame outlives every wing
+      it opens: a control word set once keeps the language the page loaded
+      in, so each open paints them all again. */
+  function paintWords(): void {
+    lobby.textContent = say(WING_TEXT.lobby)
+    rail.setAttribute('aria-label', say(WING_TEXT.rail))
+    door.textContent = continueDoor.textContent = say(WING_TEXT.door)
+    disclosure.setAttribute('aria-label', say(WING_TEXT.door))
+    note.textContent = disclosureText.textContent = say(WING_TEXT.doorNote)
+    closeDisclosure.textContent = lang() === 'de' ? 'Schließen' : 'Close'
+  }
+
   /** a station's id, or the position it stands at when a wing predates ids */
   function idAt(i: number): string {
     return wing?.stations[i]?.id ?? `station-${i + 1}`
@@ -348,6 +360,10 @@ export function createWingFrame(
       if (!reuse) { disclosure.close(); disclosureSeen = false }
       entry = nextEntry
       if (!reuse) wing = nextWing
+      // a kept wing takes the fresh module's names: same stations, the
+      // page's language now
+      else wing!.stations = nextWing.stations
+      paintWords()
       note.hidden = wing?.doorDisclosure === 'first-press'
       index = 0
       host.hidden = false
