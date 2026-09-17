@@ -4,7 +4,9 @@
     "scope": "One sentence, two at most, per work the museum shows: the one thing worth remembering. The line stands first on the card and at the head of the vitrine, before any description. The fifty-six dates keep their own sentences and are not written here.",
     "rule": "Every line rests on a document the wing's registers hold, named in `source`. A claim on a tradition carries the certainty word. A work whose registers hold no documented line has no record here and its reason stands in the seat's STATUS.",
     "detail": "A rectangle in the coordinates of the plate the picture module resolves for that work, as fractions of the plate's width and height from its top left. Present only where the line points at something on the surface. A line about a work's fate carries no rectangle.",
-    "prepared": "2026-09-15"
+    "prepared": "2026-09-15",
+    "sheets": "A Windsor sheet's line speaks about the side that hangs. It rests on the holder's catalogue entry for that sheet and, where the entry is silent or missing, on the public domain Windsor anatomy facsimiles of 1898 and 1901, read against the reproduction on the wall.",
+    "sheets_revised": "2026-09-17"
   },
   "lines": {
     "picture/baptism-of-christ/front": {
@@ -219,10 +221,118 @@
         "name_de": "Die eingebrochene Tür"
       }
     },
+    "sheet/rcin-919000": {
+      "en": "The foot seen from the side at the bottom of the sheet is drawn upside down, with its leg bones below it.",
+      "de": "Der Fuß in Seitenansicht unten auf dem Blatt steht auf dem Kopf, die Knochen des Unterschenkels liegen unter ihm.",
+      "source": "Royal Collection catalogue entry, RCIN 919000; program sheet facts 2026-09-15",
+      "certainty": "documented"
+    },
+    "sheet/rcin-919001": {
+      "en": "In the note down the right margin he advises his reader: the further you keep from doctors, the better you will keep your health.",
+      "de": "In der Notiz am rechten Rand rät er seinem Leser: Je mehr du dich vor Ärzten hütest, desto besser bleibst du gesund.",
+      "source": "Windsor anatomy facsimile of 1898, fogli A, folio 2 recto, matched to this sheet by its notes; program sheet facts 2026-09-15",
+      "certainty": "documented"
+    },
+    "sheet/rcin-919002": {
+      "en": "Drawing the throat, he noted something you can test on yourself: nobody can swallow and breathe, or swallow and speak, at the same time.",
+      "de": "Zum Hals notierte er etwas, das du an dir selbst prüfen kannst: Niemand kann gleichzeitig schlucken und atmen oder schlucken und sprechen.",
+      "source": "Royal Collection catalogue entry, RCIN 919002; program sheet facts 2026-09-15",
+      "certainty": "documented"
+    },
+    "sheet/rcin-919003": {
+      "en": "Most of these drawings study a living model, informed by what dissection had shown him lies beneath the skin.",
+      "de": "Die meisten dieser Zeichnungen studieren ein lebendes Modell, gestützt auf das, was ihm die Sektion unter der Haut gezeigt hatte.",
+      "source": "Royal Collection catalogue entry, RCIN 919003; program sheet facts 2026-09-15",
+      "certainty": "documented"
+    },
+    "sheet/rcin-919004": {
+      "en": "The small note between the thighbones says the tailbone moves during childbirth, and it really does.",
+      "de": "Die kleine Notiz zwischen den Oberschenkelknochen sagt, dass sich das Steißbein bei der Geburt bewegt, und das tut es wirklich.",
+      "source": "Royal Collection catalogue entry, RCIN 919004; program sheet facts 2026-09-15",
+      "certainty": "documented"
+    },
+    "sheet/rcin-919005": {
+      "en": "The old man at the top appears to be dead. Some of these dissections were presumably made on his body.",
+      "de": "Der alte Mann oben scheint tot zu sein. Vermutlich wurden einige dieser Sektionen an ihm vorgenommen.",
+      "source": "Royal Collection catalogue entry, RCIN 919005, the recto; program sheet facts 2026-09-15",
+      "certainty": "tradition"
+    },
+    "sheet/rcin-919006": {
+      "en": "The small crossed lines at the right are the muscles between the ribs. He wrote that they tie the ribs together and keep them from moving sideways.",
+      "de": "Die kleinen gekreuzten Linien rechts sind die Zwischenrippenmuskeln. Er schrieb, sie binden die Rippen zusammen und verhindern seitliche Bewegungen.",
+      "source": "Royal Collection catalogue entry, RCIN 919006; Windsor anatomy facsimile of 1898, fogli A, folio 7 recto; program sheet facts 2026-09-15",
+      "certainty": "documented"
+    },
+    "sheet/rcin-919007": {
+      "en": "The letters beside the curved spine mark his count: seven vertebrae in the neck, twelve that carry the twenty four ribs, then five more.",
+      "de": "Die Buchstaben neben der gebogenen Wirbelsäule markieren, wie er zählte: sieben Halswirbel, zwölf, an denen die vierundzwanzig Rippen sitzen, dann fünf weitere.",
+      "source": "Windsor anatomy facsimile of 1898, fogli A, folio 8 verso, matched to the spine side by its lettering; program sheet facts 2026-09-15",
+      "certainty": "documented"
+    },
+    "sheet/rcin-919008": {
+      "en": "He called the muscle that runs down the thigh to the kneecap the fish of the thigh.",
+      "de": "Den Muskel, der am Oberschenkel hinab zur Kniescheibe läuft, nannte er den Fisch des Oberschenkels.",
+      "source": "Royal Collection catalogue entry, RCIN 919014, on 919008 recto; Windsor anatomy facsimile of 1898, fogli A, folio 9 recto; program sheet facts 2026-09-15",
+      "certainty": "documented"
+    },
+    "sheet/rcin-919009": {
+      "en": "He builds the hand up like an engineer instead of taking it apart, starting with the bones at the lower left.",
+      "de": "Er baut die Hand auf wie ein Ingenieur, statt sie zu zerlegen, und beginnt unten links mit den Knochen.",
+      "source": "Royal Collection catalogue entry, RCIN 919009; program sheet facts 2026-09-15",
+      "certainty": "documented"
+    },
+    "sheet/rcin-919010": {
+      "en": "His note here draws the comparison: the hand is to the arm as the foot is to the leg.",
+      "de": "Seine Notiz hier zieht den Vergleich: Die Hand verhält sich zum Arm wie der Fuß zum Bein.",
+      "source": "Royal Collection catalogue entry, RCIN 919010; program sheet facts 2026-09-15",
+      "certainty": "documented"
+    },
+    "sheet/rcin-919011": {
+      "en": "Six studies of the left foot, and his note that a foot has six views: from below, above, inside, outside, behind and in front.",
+      "de": "Sechs Studien des linken Fußes, dazu seine Notiz, ein Fuß habe sechs Ansichten: von unten, oben, innen, außen, hinten und vorn.",
+      "source": "Royal Collection catalogue entry, RCIN 919011; Windsor anatomy facsimile of 1898, fogli A, folio 12 recto; program sheet facts 2026-09-15",
+      "certainty": "documented"
+    },
     "sheet/rcin-919012": {
       "en": "This sheet takes the whole skeleton at once. The other twenty eight here take the body a part at a time, a foot, a hand, a heart.",
       "de": "Dieses Blatt nimmt das ganze Skelett auf einmal. Die anderen achtundzwanzig hier nehmen den Körper Stück für Stück, einen Fuß, eine Hand, ein Herz.",
       "source": "collection/body-wall.ts BODY_WALL, with the holder's catalogue titles of its twenty nine sheets",
+      "certainty": "documented"
+    },
+    "sheet/rcin-919013": {
+      "en": "A note here calls the biceps the fish of the arm: in the fourth drawing, lift it off and describe what remains.",
+      "de": "Eine Notiz hier nennt den Bizeps den Fisch des Arms: Nimm ihn in der vierten Zeichnung ab und beschreibe, was übrig bleibt.",
+      "source": "Royal Collection catalogue entry, RCIN 919013, the verso; program sheet facts 2026-09-15",
+      "certainty": "documented"
+    },
+    "sheet/rcin-919014": {
+      "en": "He had two words for muscle: muscolo for the bulging kind, after a mouse, and lacerto for the long thin kind, after a lizard.",
+      "de": "Er hatte zwei Wörter für Muskeln: muscolo für die gewölbten, nach der Maus, und lacerto für die langen, dünnen, nach der Eidechse.",
+      "source": "Royal Collection catalogue entry, RCIN 919014; program sheet facts 2026-09-15",
+      "certainty": "documented"
+    },
+    "sheet/rcin-919015": {
+      "en": "Read this sheet from the upper right to the lower left: the drawings marked 1st to 5th follow his dissection from the surface to the deepest layer.",
+      "de": "Lies das Blatt von oben rechts nach unten links: Die Zeichnungen 1 bis 5 folgen seiner Sektion von der Oberfläche bis in die tiefste Schicht.",
+      "source": "Royal Collection catalogue entry, RCIN 919015; program sheet facts 2026-09-15",
+      "certainty": "documented"
+    },
+    "sheet/rcin-919016": {
+      "en": "His note here says he believes he will finish all of this anatomy in the winter of 1510.",
+      "de": "Seine Notiz hier sagt, er glaube, diese ganze Anatomie im Winter 1510 abzuschließen.",
+      "source": "Royal Collection catalogue entry, RCIN 919016; program sheet facts 2026-09-15",
+      "certainty": "documented"
+    },
+    "sheet/rcin-919017": {
+      "en": "In the long notes here he asks what makes a muscle swell so quickly. They say it is air, he writes.",
+      "de": "In den langen Notizen hier fragt er, was einen Muskel so schnell anschwellen lässt. Man sagt, es sei Luft, schreibt er.",
+      "source": "Royal Collection catalogue entry, RCIN 919017; program sheet facts 2026-09-15",
+      "certainty": "documented"
+    },
+    "sheet/rcin-919018": {
+      "en": "His note here says he finds the veins have no other task than to give warmth.",
+      "de": "Seine Notiz hier sagt, er finde, dass die Venen keine andere Aufgabe haben, als zu wärmen.",
+      "source": "Windsor anatomy facsimile of 1901, fogli B, folio 1 recto, matched to this sheet by its notes; program sheet facts 2026-09-15",
       "certainty": "documented"
     },
     "sheet/rcin-919019": {
@@ -255,16 +365,34 @@
       "source": "collection/body-wall.ts BODY_WALL, with the holder's catalogue titles of its twenty nine sheets",
       "certainty": "documented"
     },
-    "sheet/rcin-919082": {
-      "en": "The one sheet here whose own size the Royal Collection records, 20.4 by 28.3 cm. The other twenty eight hang in mounts that claim no size.",
-      "de": "Das einzige Blatt hier, dessen eigene Maße die Royal Collection verzeichnet, 20,4 auf 28,3 cm. Die anderen achtundzwanzig hängen in Montierungen ohne Maßangabe.",
-      "source": "collection/body-wall.ts BODY_WALL, the one measured sheet and the constant mount area of the other twenty eight",
+    "sheet/rcin-919075": {
+      "en": "Count the vertebrae in this neck: he drew eleven, where a neck has seven.",
+      "de": "Zähl die Wirbel in diesem Hals: Er zeichnete elf, ein Hals hat sieben.",
+      "source": "Royal Collection catalogue entry, RCIN 919075; program sheet facts 2026-09-15",
+      "certainty": "documented"
+    },
+    "sheet/rcin-919101": {
+      "en": "His notes put a newborn at about one braccio, some 60 cm, and a dead woman's womb at a quarter of that. He drew the child curled tight.",
+      "de": "Nach seinen Notizen misst ein Neugeborenes etwa ein Braccio, rund 60 cm, die Gebärmutter einer Toten ein Viertel davon. Er zeichnete das Kind eng zusammengerollt.",
+      "source": "Royal Collection catalogue entry, RCIN 919101; program sheet facts 2026-09-15",
+      "certainty": "documented"
+    },
+    "sheet/rcin-919102": {
+      "en": "The placenta here is a cow's, from the cow whose womb hangs on this wall. He never learned that a human placenta is a single disc.",
+      "de": "Die Plazenta hier stammt von der Kuh, deren Gebärmutter an dieser Wand hängt. Dass die menschliche Plazenta eine einzige Scheibe ist, erfuhr er nie.",
+      "source": "Royal Collection catalogue entry, RCIN 919102 and RCIN 919055; program sheet facts 2026-09-15",
       "certainty": "documented"
     },
     "sheet/rcin-919116": {
       "en": "Three subjects share this one sheet: the nerves and the muscles, the heart, and optics.",
       "de": "Drei Gegenstände teilen sich dieses eine Blatt: Nerven und Muskeln, das Herz und die Optik.",
       "source": "the holder's catalogue title, the Windsor census of 14 September 2026",
+      "certainty": "documented"
+    },
+    "sheet/rcin-919082": {
+      "en": "His notes plan a glass model of this valve, cast in wax from an ox's heart, with water and grass seeds pumped through it.",
+      "de": "Seine Notizen entwerfen ein Glasmodell dieser Klappe: in Wachs von einem Ochsenherz abgeformt, dann mit Wasser und Grassamen durchströmt.",
+      "source": "Royal Collection catalogue entry, RCIN 919082; program sheet facts 2026-09-15",
       "certainty": "documented"
     },
     "codex/paris-B": {
