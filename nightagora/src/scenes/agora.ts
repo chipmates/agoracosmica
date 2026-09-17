@@ -272,8 +272,10 @@ export interface AgoraState {
   air?: number
   /** 0 while the descent's map still stands in this room: its paving lies a
       few millimetres over this floor and its ring stands in the near ring's
-      place, so what lies ON the floor (reflections, cinders, the wash) and
-      the near ring itself wait for the map to go. Default 1. */
+      place, so what lies ON the floor (the star reflections, the colonnade's
+      streaks, the cinders, the wash) and the near ring itself wait for the
+      map to go. The flame's own image stands at the mirror's depth, over the
+      map's paving, and comes up with the fire. Default 1. */
   landed?: number
 }
 
@@ -795,7 +797,7 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
       const joint = min(min(fract(row), oneMinus(fract(row))), min(fract(col), oneMinus(fract(col))))
       const grain = vn(vec3(hit.x.mul(17), hit.z.mul(28), 4.2))
       alpha = alpha.mul(exp(y.mul(-2.2))).mul(smoothstep(0.005, 0.025, joint))
-        .mul(grain.mul(0.75).add(0.25)).mul(uLanded)
+        .mul(grain.mul(0.75).add(0.25))
     }
     const heat = smoothstep(0.85, 1.6, fieldV.add(oneMinus(y).mul(0.5)).sub(abs(xx).mul(1.8)))
     const body = mix(hex3('#e8500c'), hex3('#ffc873'), smoothstep(0.0, 1.05, fieldV))

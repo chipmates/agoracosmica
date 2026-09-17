@@ -169,21 +169,48 @@ export function createMandala(scene: Scene): MandalaHandles {
     alb = alb.mul(grain.mul(0.18).add(0.9)).mul(fine.mul(0.065).add(1))
     alb = alb.add(c('#8d93ad', 0.055).mul(vein))
     let cut: N = float(0), lip: N = float(0), cupShade: N = float(0)
+    let courtLook: N = null
     if (kind === 'map') {
-      const rowF = Q.z.add(4.8).div(0.94)
+      /* ONCE THE COURT RISES BEHIND THE RING the paving is laid on the court's
+         own joint lines, in the court's metres, so the joints the ride lands
+         on are the joints of the room. Its survey and its rings belong to the
+         instrument and leave with it. */
+      const onCourt = step(0.0001, uCourtFire)
+      const jx = mix(Q.x, positionWorld.x, onCourt)
+      const rowF = mix(Q.z.add(4.8), positionWorld.z.sub(COURT_FIRE.z), onCourt).div(0.94)
       const row = floor(rowF)
-      const colF = Q.x.div(1.28).add(fract(row.mul(0.5)))
+      const colF = jx.div(1.28).add(fract(row.mul(0.5)))
       const dj = min(min(fract(rowF), oneMinus(fract(rowF))).mul(0.94), min(fract(colF), oneMinus(fract(colF))).mul(1.28))
-      cut = line(dj, 0.015)
+      const joint = line(dj, 0.015)
+      cut = joint
       lip = line(dj.sub(0.043), 0.013)
-      alb = alb.mul(hash(vec2(row, floor(colF))).mul(0.24).add(0.88))
+      const slab = hash(vec2(row, floor(colF)))
+      alb = alb.mul(slab.mul(0.24).add(0.88))
       // The map's eight survey axes are incised, never continuously gilded.
+      const instrument = oneMinus(uCourtFire)
       const survey = line(arc(8).sub(0.035), 0.02).mul(smoothstep(1.3, 2.0, r))
-      cut = max(cut, survey.mul(0.65))
+      cut = max(cut, survey.mul(0.65).mul(instrument))
       for (const radius of [1.95, 3.16, 8.8, 9.1, 13.65]) {
-        cut = max(cut, line(r.sub(radius), 0.025))
-        lip = max(lip, line(r.sub(radius + 0.055), 0.014))
+        cut = max(cut, line(r.sub(radius), 0.025).mul(instrument))
+        lip = max(lip, line(r.sub(radius + 0.055), 0.014).mul(instrument))
       }
+      /* and the stone takes the court's own light: polished lapis under the
+         sky, a pool where the fire stands, the polish lifting toward the
+         far rim. The same terms the court's floor is lit by, so the swap at
+         the seat changes the marble's grain and not its light. */
+      const W = positionWorld.xz
+      const dF = length(W.sub(vec2(0, COURT_FIRE.z)))
+      const dS = length(W)
+      const pool = float(5.6).div(dF.mul(dF).add(1.2)).mul(uFireFlick)
+      const lapis = c('#0c1132').mul(quarry.mul(0.22).add(0.98)).mul(slab.sub(0.5).mul(0.24).add(1))
+        .add(c('#46589c', 0.04).mul(vein))
+        .mul(oneMinus(joint.mul(0.3)))
+      let lit: N = lapis.mul(c('#c2ceff', 0.62).add(c('#fbd8a4', 0.62).mul(pool)))
+      const fres = pow(oneMinus(clamp(float(0.9).div(sqrt(dS.mul(dS).add(0.81))), 0, 1)), 5)
+      lit = lit.add(c('#2f3d78', 0.05).mul(fres))
+      lit = lit.add(c('#fbd8a4', 0.017).mul(pool).mul(fres.mul(0.65).add(0.35)))
+      lit = lit.add(c(GOLD, 0.005).mul(lip).mul(pool))
+      courtLook = lit
       /* THE SUSPENDED COURT STANDS OVER THIS PAVING, AND THE THIRTY LAMPS
          STAND OUTSIDE IT. Its own footprint painted straight down is an
          occlusion and nothing more: the wheel reads as a print of a wheel.
@@ -290,6 +317,7 @@ export function createMandala(scene: Scene): MandalaHandles {
     const dCam = length(cameraPosition.div(uScale).sub(P))
     const air = smoothstep(9, 42, dCam).mul(uHeat).mul(0.44)
     col = mix(col, c('#101b35', 0.62), air)
+    if (courtLook) col = mix(col, courtLook.mul(oneMinus(cupShade.mul(0.5))), uCourtFire)
     mat.colorNode = shoulder(col).add(dither()).mul(uReveal)
     return mat
   }
