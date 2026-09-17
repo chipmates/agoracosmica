@@ -30,6 +30,7 @@ import {
   Color,
   CylinderGeometry,
   DoubleSide,
+  Float32BufferAttribute,
   Group,
   IcosahedronGeometry,
   InstancedBufferAttribute,
@@ -690,7 +691,22 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
     ao = ao.add(cast(BASIN.x, BASIN.z, 0.21, 1.05).mul(0.34))
     colr = colr.mul(oneMinus(clamp(ao, 0, 0.72)))
 
-    stoneMat.colorNode = shoulder(haze(colr, d, 14, 62))
+    /* the land past the temenos at three scales, the long swell, the worn
+       and grown patches between the flags, the tufts and stones of the
+       ground, laid in AFTER the haze at a contrast that falls with distance:
+       under haze alone the whole of it was one band of blue. Near the hills
+       the ground goes into their night, so the land meets them without a
+       line. */
+    const land = smoothstep(COURT_R + 1.5, COURT_R + 5.0, d)
+    const patch = vn(vec3(P.x.mul(0.075).add(warp.mul(0.2)), P.z.mul(0.12), 4.4))
+    const tufts = smoothstep(0.35, 0.75, facets).mul(oneMinus(smoothstep(0.02, 0.2, fwidth(P.z.mul(21)))))
+    const reach = oneMinus(smoothstep(24, 72, d)).mul(0.6).add(0.4)
+    const ground = float(1)
+      .add(swell.sub(1).mul(0.9))
+      .add(patch.sub(0.5).mul(0.55).mul(reach))
+      .sub(tufts.mul(0.14).mul(reach))
+      .mul(oneMinus(smoothstep(46, 79, d).mul(0.42)))
+    stoneMat.colorNode = shoulder(haze(colr, d, 14, 62).mul(mix(float(1), ground, land)))
       .mul(courtDetail.albedo)
       .add(dith(0.0024))
       .mul(uR)
@@ -843,6 +859,8 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
     baseK?: number
     bounce?: number
     near?: boolean
+    /** where the air takes this stone, in metres from the seat */
+    air?: [number, number]
   }): MeshBasicNodeMaterial {
     const mat = new MeshBasicNodeMaterial()
     const { world, normal, tint, clip: c } = inkVertex(opts.near ?? false)
@@ -873,7 +891,8 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
     )
     if (opts.bounce) colr = colr.add(alb.mul(c3(FIRE_WARM, opts.bounce))
       .mul(max(normal.y.negate(), 0).mul(0.5).add(0.5)).mul(uFlick))
-    mat.colorNode = shoulder(haze(colr, length(world.xz), 9, 32)).add(dith(0.0022)).mul(uR)
+    const [airFrom, airTo] = opts.air ?? [9, 32]
+    mat.colorNode = shoulder(haze(colr, length(world.xz), airFrom, airTo)).add(dith(0.0022)).mul(uR)
     return mat
   }
 
@@ -1314,6 +1333,33 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
     field(new BoxGeometry(w * 0.97, 0.18, 1.4).translate(0, 0.09, 0), dressMat, items)
   }
 
+  // the stones of what stood here before: dense by the stoa, thinning out
+  // into the haze, a few long courses of a wall among the fallen blocks
+  {
+    const rnd = mulberry32(FOUNDING_SEED + 137)
+    const items: Item[] = []
+    const want = tier(150, 80)
+    let guard = 0
+    while (items.length < want && guard++ < want * 20) {
+      const r = 27.6 + 40 * Math.pow(rnd(), 1.9)
+      const a = (rnd() - 0.5) * (230 * Math.PI / 180)
+      if (Math.abs(a) < 0.05 && r < 44) continue // the passage runs on
+      const course = rnd() < 0.12
+      const s = 0.3 + 0.8 * rnd() * rnd()
+      items.push({
+        p: [Math.sin(a) * r, FLOOR_Y - 0.03, -Math.cos(a) * r],
+        s: course
+          ? [2.2 + rnd() * 3.4, 0.35 + rnd() * 0.45, 0.55 + rnd() * 0.3]
+          : [s * (1.1 + rnd()), s * (0.45 + rnd() * 0.4), s * (0.8 + rnd() * 0.6)],
+        r: course ? -a + (rnd() - 0.5) * 0.3 : rnd() * TAU,
+        tint: 0.75 + rnd() * 0.4,
+      })
+    }
+    // the stones stand in the ground's own air, not in the colonnade's
+    const rubbleMat = dressedStone({ albedo: DRESS_ALB, rim: 0.28, facePow: 1.5, baseK: 0.3, ambK: 0.01, air: [14, 70] })
+    field(new BoxGeometry(1, 1, 1).translate(0, 0.5, 0), rubbleMat, items)
+  }
+
   // ---- the colonnade in the polish -----------------------------------
   /* A stone floor is a weak mirror, and the one thing standing near enough
      to the fire to leave an image in it is the colonnade. Each lit base
@@ -1377,6 +1423,54 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
   airBand.position.y = FLOOR_Y + 1.5
   airBand.renderOrder = 1
   root.add(airBand)
+
+  /* THE LAND GOES ON. Past the stoa the ground used to run flat to a
+     ruler-straight edge, one band of blue seen between every column. So it
+     rises to a far line of hills at three scales (the long swell of the
+     land, its ridges, the ragged scrub along the crest), dark against the
+     sky's own glow, and nearer in the ground is strewn with the stones of
+     what stood here before, thick by the stoa and thinning into the haze. */
+  const ridgeMat = new MeshBasicNodeMaterial()
+  {
+    const t = uv()
+    const mottle = vn(vec3(t.x.mul(900), t.y.mul(6), 3.3)).mul(0.22).add(0.86)
+    // the crest holds a trace of the sky it stands against; the flank is night
+    const crest = smoothstep(0.55, 1.0, t.y)
+    ridgeMat.colorNode = mix(c3(HORIZON, 0.5), c3(HORIZON, 0.72), crest).mul(mottle)
+      .add(dith(0.002)).mul(uR)
+  }
+  {
+    const R = 79
+    const SEG = narrow ? 540 : 900
+    const rnd = mulberry32(FOUNDING_SEED + 131)
+    const phase = Array.from({ length: 6 }, () => rnd() * TAU)
+    const pos: number[] = []
+    const uvs: number[] = []
+    const idx: number[] = []
+    for (let i = 0; i <= SEG; i++) {
+      const a = (i / SEG) * TAU
+      const swell = 0.5 + 0.5 * Math.sin(a * 2 + phase[0]!) * Math.sin(a * 3 + phase[1]!)
+      const ridge = 0.5 + 0.5 * Math.sin(a * 17 + phase[2]!) * Math.cos(a * 11 + phase[3]!)
+      const scrub = Math.abs(Math.sin(a * 131 + phase[4]!)) * 0.6 + Math.abs(Math.sin(a * 223 + phase[5]!)) * 0.4
+      const h = 0.7 + 3.1 * swell + 1.1 * ridge * swell + 0.35 * scrub
+      const x = Math.sin(a) * R
+      const z = -Math.cos(a) * R
+      pos.push(x, FLOOR_Y - 0.6, z, x, FLOOR_Y + h, z)
+      uvs.push(i / SEG, 0, i / SEG, 1)
+      if (i < SEG) {
+        const b = i * 2
+        idx.push(b, b + 2, b + 1, b + 1, b + 2, b + 3)
+      }
+    }
+    const g = new BufferGeometry()
+    g.setAttribute('position', new Float32BufferAttribute(pos, 3))
+    g.setAttribute('uv', new Float32BufferAttribute(uvs, 2))
+    g.setIndex(idx)
+    const ridge = new Mesh(g, ridgeMat)
+    ridge.frustumCulled = false
+    ridge.renderOrder = -2
+    root.add(ridge)
+  }
 
   // ==================================================================
   // 7 · WHAT SAYS PEOPLE GATHER HERE — no bodies, no faces. Four low
