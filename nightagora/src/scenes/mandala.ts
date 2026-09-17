@@ -52,13 +52,15 @@ export const CUT = {
   wheelDown: [0.856, 0.912],
   lampsOut: [0.885, 0.915],
   beltDown: [0.895, 0.928],
-  hearthOut: [0.9, 0.93],
+  hearthOut: [0.9, 0.925],
+  kerbDown: [0.918, 0.932],
   landScale: [0.895, 0.922],
   courtRise: [0.922, 0.944],
   mapOut: 0.947,
 } as const
 const WHEEL_SINK = 3.2 // the rails' crown under the paving's face
 const BELT_SINK = 1.9 // the cups' lips under the paving's face
+const KERB_SINK = 0.14 // the kerb's crown under the paving's face
 const ramp = (k: number, [a, b]: readonly [number, number]): number => {
   const t = Math.min(1, Math.max(0, (k - a) / (b - a)))
   return t * t * (3 - 2 * t)
@@ -110,6 +112,7 @@ export function createMandala(scene: Scene): MandalaHandles {
   const uLampAngle = uniform(0), uCourtAngle = uniform(0), uFlick = uniform(1)
   const uScale = uniform(1), uFireFlick = uniform(1), uDeep = uniform(0)
   const uLamps = uniform(1), uHearth = uniform(1), uCourtFire = uniform(0)
+  const uWheel = uniform(1)
 
   /** World coordinates expressed in the full-size stage: portrait restages
    * the complete instrument uniformly, including the lamps and their light. */
@@ -202,8 +205,10 @@ export function createMandala(scene: Scene): MandalaHandles {
       const thrown = r.add(0.72)
       const railPen = max(soft(thrown.sub(7.42), 0.44, 0.62), soft(thrown.sub(3.35), 0.44, 0.58))
       const spokePen = spokeAt(thrown, 0.055, 0.26)
-      alb = alb.mul(oneMinus(max(rail, spoke).mul(0.43)))
-      alb = alb.mul(oneMinus(max(railPen, spokePen).mul(0.3)))
+      // the wheel's print leaves with the wheel: a shadow of a wheel that has
+      // gone down into the paving is a ghost on the floor
+      alb = alb.mul(oneMinus(max(rail, spoke).mul(0.43).mul(uWheel)))
+      alb = alb.mul(oneMinus(max(railPen, spokePen).mul(0.3).mul(uWheel)))
       // the ring's plinths stand on this paving once the belt has gone down
       // into it: each foot keeps its contact dark
       for (const { x, z } of ringStandings(NEAR.r, NEAR.angles)) {
@@ -348,7 +353,12 @@ export function createMandala(scene: Scene): MandalaHandles {
     deep.renderOrder = through ? 30 : -20
   }
 
-  const base = new Mesh(stoneRing(0, 14, -2.1, -0.9, 0.18), stoneMaterial('map'))
+  // solid to the axis: a bevel at radius zero is a dimple the court's floor
+  // shows through once the coal bed has gone cold
+  const base = new Mesh(
+    revolve([[0, -2.1], [13.82, -2.1], [14, -1.92], [14, -1.08], [13.82, -0.9], [0, -0.9]], 192),
+    stoneMaterial('map')
+  )
   const limb = new Mesh(stoneRing(9.85, 13.55, -0.25, 0.45, 0.11), stoneMaterial('limb'))
   const pierced = new Mesh(piercedCourt(), stoneMaterial('court'))
   plate.add(base)
@@ -568,12 +578,13 @@ export function createMandala(scene: Scene): MandalaHandles {
     // a coal runs from black through dull red to the one hot place in it
     const ember = mix(c('#4a1002'), c('#ff9a3c'), clamp(pow(glow, 1.45), 0, 1))
       .add(c('#ffd9a0', 0.5).mul(clamp(glow.sub(0.85).mul(2.4), 0, 1)))
-    bedMat.colorNode = mix(ash, ember, clamp(glow.mul(1.7).sub(0.16).mul(uHeat), 0, 1))
+    // a bed going out goes to ash where it lies; it leaves with its kerb
+    bedMat.colorNode = mix(ash, ember, clamp(glow.mul(1.7).sub(0.16).mul(uHeat).mul(uHearth), 0, 1))
       .add(dither())
     // the ash spills where it spills: the edge is noise, never a circle
     const edge = noise(vec2(cos(ang), sin(ang)).mul(2.6)).mul(0.16).add(0.90)
     bedMat.opacityNode = oneMinus(smoothstep(edge.sub(0.13), edge, hr))
-      .mul(clamp(uHeat.mul(2.2), 0, 1)).mul(uHearth).mul(uReveal)
+      .mul(clamp(uHeat.mul(2.2), 0, 1)).mul(uReveal)
   }
   const bed = new Mesh(stoneRing(0, 1.06, -0.93, -0.868, 0.01, 48), bedMat)
   bed.renderOrder = 3
@@ -682,10 +693,16 @@ export function createMandala(scene: Scene): MandalaHandles {
       uScale.value = scale
       // the machinery goes down into the paving it stood on; only the ring
       // and the paving are left when the court comes up behind them
-      court.position.y = -WHEEL_SINK * ramp(k, CUT.wheelDown)
+      const wheelDown = ramp(k, CUT.wheelDown)
+      court.position.y = -WHEEL_SINK * wheelDown
+      uWheel.value = 1 - wheelDown
       rim.position.y = -BELT_SINK * ramp(k, CUT.beltDown)
       uLamps.value = 1 - ramp(k, CUT.lampsOut)
       uHearth.value = 1 - ramp(k, CUT.hearthOut)
+      // the kerb goes down once its fire is cold, so the seat the ride lands
+      // on is paving and nothing else
+      kerb.position.y = -KERB_SINK * ramp(k, CUT.kerbDown)
+      bed.position.y = kerb.position.y
       uCourtFire.value = courtRiseAt(k)
     },
     visible(v) {
