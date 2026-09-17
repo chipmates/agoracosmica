@@ -46,7 +46,7 @@ import { createMeasurement, type VinciMeasurement } from './measurement'
 import { collectVinciLabelOccluders, createVinciExhibitDots, createVinciLabelAnchor, vinciSightBlocked, type VinciExhibitDots, type VinciExhibitMark, type VinciLabelAnchor, type VinciLabelMode } from './labels'
 import { pickVinciExhibit, readVinciExhibits, vinciMachineRoom, type VinciPickEntry } from './collection/pick'
 import { vinciApproachPose } from './collection/approaches'
-import { createVinciCloseLook, createVinciMachinePayload, renderVinciMachineRecord, vinciLine, vinciMachineCard, VINCI_EXHIBIT_CARD, VINCI_VITRINE_WORDS } from './collection/close-look'
+import { createVinciCloseLook, createVinciMachinePayload, fillVinciLimitSlots, renderVinciMachineRecord, vinciLimits, vinciLine, vinciMachineCard, VINCI_EXHIBIT_CARD, VINCI_VITRINE_WORDS } from './collection/close-look'
 import { createPlatePayload } from '../vitrine/picture'
 import type { VitrineRect } from '../vitrine'
 import { machineBuildOf } from './machines'
@@ -567,6 +567,7 @@ export function createWing():VinciWingModule {
         // What the evidence does not say and what the view invents: two slots
         // a text seat fills, empty until it does.
         for(const slot of ['limit','visual_note']){const empty=make('p','vinci-statement');empty.dataset['slot']=slot;empty.hidden=true;record.append(empty)}
+        fillVinciLimitSlots(id,record)
       }}
     sources.resetScroll();sources.select('station');mode=2;paintDock()
   }
@@ -683,7 +684,7 @@ export function createWing():VinciWingModule {
         grade:{...PRINT,exposure:STATION_EXPOSURE[here]??PRINT.exposure},light:KEY_RIG,restore:restoreRoom,openRecord})
       openMode=how
       closeLook.open({id,title,line:vinciLine(id),card:words.card,after:words.after,payload,
-        controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),shut],walk,limit:null,visualNote:null},from,how_)
+        controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),shut],walk,...vinciLimits(id)},from,how_)
       openMode='auto'
       return
     }
@@ -716,7 +717,7 @@ export function createWing():VinciWingModule {
       aspect:plate.pixels.width/plate.pixels.height,window:cut,
       standing:()=>{const nav=rail.navigation;return !nav.active&&!nav.approaching}}):null
     openMode=how
-    closeLook.open({id,title,line:vinciLine(id),card:[label],payload,controls,walk,limit:null,visualNote:null,
+    closeLook.open({id,title,line:vinciLine(id),card:[label],payload,controls,walk,...vinciLimits(id),
       work:()=>{const nav=rail.navigation;return nav.exhibit===id&&!nav.active?workRect(entry.object):null}},from,how_)
     openMode='auto'
   }
@@ -883,11 +884,23 @@ export function createWing():VinciWingModule {
     const works=id==='picture-room'?MAIN_HANG:id==='supper-wall'?REGISTER.filter(w=>w.hang.wall==='supper-wall'):[]
     // The hall is one room under three stations, so its machines are listed once.
     const machines=id==='flight'?MACHINE_SLUGS:[]
-    if(!works.length&&!machines.length)return
+    // THE BODY WALL NAMES EVERY SHEET: the holder's own title for the side that
+    // hangs, its RCIN, the holder's size where one is recorded, and its line.
+    const sheets=id==='body'?exhibits?.sheetSources()??[]:[]
+    if(!works.length&&!machines.length&&!sheets.length)return
     host.append(make('h3','',text(vinciSourcesHeadings.inThisRoom)))
     const list=make('ul','vinci-room-list')
     for(const work of works)list.append(make('li','',`${lang()==='de'?work.title_de:work.title_en} · ${work.holder} · ${text(ROOM_CLASS_WORD[work.rights_class])}`))
     for(const slug of machines){const machine=machineCatalog[slug];list.append(make('li','',`${text(machine.title)} · ${text(machine.label)}`))}
+    const centimetres=(value:number)=>lang()==='de'?String(value).replace('.',','):String(value)
+    for(const {sheet,page} of sheets){
+      const size=sheet.measured?` · ${centimetres(sheet.measured.heightCm)} × ${centimetres(sheet.measured.widthCm)} cm`:''
+      const item=make('li','')
+      item.append(make('span','vinci-absence-work',`${vinciSheetTitle(lang()==='de'?page.honesty_de:page.honesty_en)} · RCIN ${sheet.id.replace(/^rcin-/,'')}${size}`))
+      const said=vinciLine(`sheet/${sheet.id}`)
+      if(said)item.append(document.createTextNode(' '+said))
+      list.append(item)
+    }
     host.append(list)
   }
   /** ABSENCE IS A SENTENCE. It stands here, with its holder and its reason,

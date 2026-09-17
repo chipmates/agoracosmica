@@ -40,6 +40,12 @@ export function createVinciSourcesWindow(host: HTMLElement, control: HTMLButtonE
   close.type = 'button'
   close.textContent = lang() === 'de' ? 'Schließen' : 'Close'
   close.addEventListener('click', () => dialog.close())
+  // A press on the backdrop closes: on the phone the thumb is already below the window.
+  dialog.addEventListener('click', event => {
+    if (event.target !== dialog) return
+    const box = dialog.getBoundingClientRect()
+    if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) dialog.close()
+  })
   toolbar.append(tabs, close)
   dialog.append(toolbar)
   const buttons = {} as Record<VinciSourcesTab, HTMLButtonElement>

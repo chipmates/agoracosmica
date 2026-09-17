@@ -20,6 +20,8 @@ import { setRegister } from '../../frame'
 import linesRaw from '../data/lines.json?raw'
 import stepsRaw from '../data/steps.json?raw'
 import cardsRaw from '../data/cards.json?raw'
+import limitsRaw from '../data/limits.json?raw'
+import partsRaw from '../data/parts.json?raw'
 
 export type VinciCloseLook = Vitrine
 export type VinciCloseLookExhibit = VitrineExhibit
@@ -45,8 +47,29 @@ const STEPS = (JSON.parse(stepsRaw) as { steps: Record<string, (Words & { at: nu
 const CONTROLS = (JSON.parse(cardsRaw) as { controls: {
   shared: { back: Words; record: Words; more: Words }
   picture: { whole_plate: Words }
-  machine: { provenance: Words; play: Words; pause: Words; viewpoints: (Words & { id: string })[] }
+  machine: { provenance: Words; play: Words; pause: Words; clock: Words; viewpoints: (Words & { id: string })[] }
 } }).controls
+type Slot = (Words & { source: string }) | null
+const LIMITS = (JSON.parse(limitsRaw) as { slots: Record<string, { limit: Slot; visual_note: Slot }> }).slots
+const PARTS = (JSON.parse(partsRaw) as { parts: Record<string, Record<string, Words>> }).parts
+
+/** What the evidence behind an exhibit does not settle, and what the view
+ * adds or refuses, in the page's language: the record's two slots. */
+export function vinciLimits(id: string): { limit: string | null; visualNote: string | null } {
+  const slots = LIMITS[id]
+  return { limit: slots?.limit?.[lang()] ?? null, visualNote: slots?.visual_note?.[lang()] ?? null }
+}
+
+/** The record's two slots, filled where the text seat wrote them. */
+export function fillVinciLimitSlots(id: string, host: HTMLElement): void {
+  const { limit, visualNote } = vinciLimits(id)
+  for (const [slot, text] of [['limit', limit], ['visual_note', visualNote]] as const) {
+    const node = host.querySelector<HTMLElement>(`[data-slot="${slot}"]`)
+    if (!node) continue
+    node.textContent = text ?? ''
+    node.hidden = !text
+  }
+}
 
 /** The words a control of the vitrine carries, from the card models' file. */
 export const VINCI_VITRINE_WORDS = {
@@ -169,6 +192,7 @@ export function renderVinciMachineRecord(slug: MachineSlug, host: HTMLElement): 
     empty.hidden = true
     full.append(empty)
   }
+  fillVinciLimitSlots(`machine/${slug}`, full)
   host.append(full)
 }
 
@@ -203,11 +227,10 @@ export function createVinciMachinePayload(options: {
       play: VINCI_VITRINE_WORDS.play[language],
       pause: VINCI_VITRINE_WORDS.pause[language],
       again: VINCI_VITRINE_WORDS.again[language],
-      // ASK: the clock's own name. Until it is written the slider carries the
-      // machine's title, which is what it turns.
-      clock: record.title[language],
+      clock: CONTROLS.machine.clock[language],
     },
     nodeNames: STORE_NODE_NAMES[slug],
+    partNames: new Map(Object.entries(PARTS[slug] ?? {}).map(([id, words]) => [id, words[language]])),
     light: options.light,
     grade: options.grade,
     sheet: {

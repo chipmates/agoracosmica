@@ -5,7 +5,7 @@
  * holds still, and handed back at rest. The machine's clock is a scalar the
  * visitor's hand writes: a drag across the model, the slider under it, the
  * arrow keys, a step in the list. The steps light the part they name, and a
- * tap on the model names a part by the step that speaks of it.
+ * tap on the model names the part it lands on.
  */
 import {
   AdditiveBlending, Box3, CircleGeometry, Color, Group, Mesh, MeshBasicNodeMaterial, MeshStandardNodeMaterial,
@@ -18,6 +18,7 @@ import { createBenchBackdrop } from '../vinci/machines/bench/backdrop'
 import {
   advancePlayback, initialPlayback, type PlaybackSchedule, type PlaybackState,
 } from '../vinci/machines/bench/playback'
+import { LOOK_RULE } from '../vinci/input'
 import type { VitrinePayload, VitrinePayloadHost } from './types'
 
 export interface TurntableBody {
@@ -52,6 +53,8 @@ export interface TurntableOptions {
   words: { play: string; pause: string; again: string; clock: string }
   /** Where a part lives in a body that was not built from its dossier. */
   nodeNames?: Readonly<Record<string, string>>
+  /** Every part's own name by its dossier id, in the page's language. */
+  partNames?: ReadonlyMap<string, string>
   light: {
     key: StackLightOptions
     fill: { color: string; groundColor: string; intensity: number }
@@ -335,6 +338,9 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
     }
     return -1
   }
+  /** The dossier id a node of the body stands for: its own name, or the name
+   * a body built outside its record gives that part. */
+  const idsByNode = new Map(Object.entries(options.nodeNames ?? {}).map(([part, node]) => [node, part]))
   function tap(x: number, y: number): void {
     if (!camera) return
     ray.setFromCamera(new Vector2(x / innerWidth * 2 - 1, -(y / innerHeight) * 2 + 1), camera)
@@ -343,12 +349,17 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
     if (hit) {
       for (let node: Object3D | null = hit.object; node && node !== body.object; node = node.parent) {
         const name = node.name.replace(/:(surface|rigid-surfaces)$/, '')
-        let at = stepFor(name)
-        if (at < 0) for (const [part, value] of Object.entries(options.nodeNames ?? {})) if (value === name && at < 0) at = stepFor(part)
-        if (at < 0) continue
-        tapped = { node: hit.object, local: hit.object.worldToLocal(hit.point.clone()), text: steps[at]!.text }
-        if (leaderText) { leaderText.textContent = tapped.text; leaderText.lang = host!.lang }
-        light(steps[at]!.part)
+        const part = options.partNames?.has(name) ? name : idsByNode.get(name)
+        const named = part ? options.partNames?.get(part) : undefined
+        // A PART IS NAMED BY ITS OWN NAME. Where the record names none, the step
+        // that speaks of it still does.
+        let at = named ? -1 : stepFor(name)
+        if (!named && at < 0 && part) at = stepFor(part)
+        if (!named && at < 0) continue
+        const text = named ?? steps[at]!.text
+        tapped = { node: hit.object, local: hit.object.worldToLocal(hit.point.clone()), text }
+        if (leaderText) { leaderText.textContent = text; leaderText.lang = host!.lang }
+        light(named ? part! : steps[at]!.part)
         break
       }
     }
@@ -356,17 +367,27 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
   }
 
   const pointers = new Map<number, { x: number; y: number }>()
-  let press: { x: number; y: number; clock: number; moved: boolean; orbit: boolean } | null = null
+  /** THE FIRST FINGER OWNS THE CLOCK. A press, a drag and a tap are told apart
+   * by the tracked path from where it went down, never by the lifting event's
+   * own coordinates, which WebKit does not promise; a second contact turns the
+   * table and takes the tap away. */
+  let press: { id: number; x: number; y: number; clock: number; moved: boolean; orbit: boolean } | null = null
   const listening = new AbortController()
+  function clear(): void {
+    pointers.clear()
+    press = null
+  }
   function bindHand(surface: HTMLElement): void {
     const signal = listening.signal
     surface.addEventListener('contextmenu', event => event.preventDefault(), { signal })
     surface.addEventListener('pointerdown', event => {
       if ((event.target as Element).closest('button,a,input')) return
+      if (pointers.has(event.pointerId)) return
       pointers.set(event.pointerId, { x: event.clientX, y: event.clientY })
-      surface.setPointerCapture(event.pointerId)
+      // WebKit refuses capture for a pointer it no longer tracks.
+      try { surface.setPointerCapture(event.pointerId) } catch { /* the viewport covers the model either way */ }
       event.preventDefault()
-      if (pointers.size === 1) press = { x: event.clientX, y: event.clientY, clock: state.clock, moved: false, orbit: event.button === 2 }
+      if (pointers.size === 1) press = { id: event.pointerId, x: event.clientX, y: event.clientY, clock: state.clock, moved: false, orbit: event.button === 2 }
       else if (press) { press.orbit = true; press.moved = true }
     }, { signal })
     surface.addEventListener('pointermove', event => {
@@ -374,24 +395,32 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
       if (!last || !press) return
       const dx = event.clientX - last.x, dy = event.clientY - last.y
       last.x = event.clientX; last.y = event.clientY
-      if (!press.moved && Math.hypot(event.clientX - press.x, event.clientY - press.y) > 6) press.moved = true
+      if (!press.moved && event.pointerId === press.id
+        && Math.hypot(event.clientX - press.x, event.clientY - press.y) > LOOK_RULE.slopPx) press.moved = true
       if (!press.moved) return
       if (press.orbit) { orbit(dx * .008 / Math.max(1, pointers.size), dy * .006 / Math.max(1, pointers.size)); return }
-      if (!period) return
+      if (!period || event.pointerId !== press.id) return
       tapped = null
       const across = viewportFit().width
       setClock(press.clock + (event.clientX - press.x) / across * period * DRAG_PERIODS)
     }, { signal })
-    const lift = (event: PointerEvent): void => {
-      if (!pointers.delete(event.pointerId) || !press) return
-      if (pointers.size) return
+    surface.addEventListener('pointerup', event => {
+      if (!pointers.delete(event.pointerId) || !press || pointers.size) return
       const was = press
       press = null
-      if (!was.moved && event.type === 'pointerup') tap(event.clientX, event.clientY)
+      if (!was.moved && event.pointerId === was.id) tap(was.x, was.y)
       else if (!was.orbit && period) release()
+    }, { signal })
+    // A cancelled or lost contact ends as nothing at all: no tap, no coast.
+    const lost = (event: PointerEvent): void => {
+      if (!pointers.delete(event.pointerId)) return
+      if (!pointers.size) press = null
     }
-    surface.addEventListener('pointerup', lift, { signal })
-    surface.addEventListener('pointercancel', lift, { signal })
+    surface.addEventListener('pointercancel', lost, { signal })
+    surface.addEventListener('lostpointercapture', lost, { signal })
+    const view = surface.ownerDocument.defaultView
+    view?.addEventListener('blur', clear, { signal })
+    surface.ownerDocument.addEventListener('visibilitychange', clear, { signal })
     surface.addEventListener('wheel', event => event.preventDefault(), { signal, passive: false })
   }
 

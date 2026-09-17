@@ -187,6 +187,43 @@ for (const [slug, moving] of moves) {
   if (moving && !steps.steps[slug]) refuse('machine-without-steps', slug, 'a machine that moves owes the visitor its steps')
 }
 
+/* ---------------------------------------------- the honesty slots and parts */
+
+/* What the record says the evidence leaves open and what the view adds, and
+   the name of every part a tap can land on: both are displayed now, so both
+   are read under the same rules as the lines. */
+const limits = readJson('src/wings/vinci/data/limits.json')
+let slotStrings = 0
+for (const [id, slots] of Object.entries(limits.slots)) {
+  if (!registry.has(id)) refuse('unknown-key', `limits ${id}`, 'no exhibit of the registry carries this id')
+  if (!slots || typeof slots !== 'object') { refuse('slots', id, 'an exhibit\'s slots are an object'); continue }
+  for (const field of ['limit', 'visual_note']) {
+    const slot = slots[field]
+    if (slot === null) continue
+    if (!slot || typeof slot !== 'object') { refuse('slot', `${id} ${field}`, 'a slot is null or carries both languages'); continue }
+    if (typeof slot.source !== 'string' || slot.source.trim().length < 8) refuse('source', `${id} ${field}`, 'a slot without a named source does not exist', slot.source)
+    for (const lang of ['en', 'de']) {
+      slotStrings++
+      speak(`limits ${id}`, `${field}.${lang}`, slot[lang], lang)
+      if (sentences(slot[lang] ?? '') > 1) refuse('too-many-sentences', `limits ${id} ${field}`, 'one sentence per slot', slot[lang])
+    }
+  }
+  if (slots.limit === null && slots.visual_note === null) refuse('slots-empty', id, 'an exhibit with both slots empty has no entry')
+}
+const partNames = readJson('src/wings/vinci/data/parts.json')
+let partStrings = 0
+for (const slug of machines.MACHINE_SLUGS) {
+  const named = partNames.parts[slug]
+  if (!named) { refuse('parts-missing', slug, 'a machine a tap can land on owes every part a name'); continue }
+  const ids = new Set((machines.dossiers[slug]?.parts ?? []).map((part) => part.id))
+  for (const id of ids) if (!named[id]) refuse('part-unnamed', `${slug} ${id}`, 'the dossier has this part and the file names it not')
+  for (const [id, words] of Object.entries(named)) {
+    if (!ids.has(id)) refuse('part-unknown', `${slug} ${id}`, 'the dossier has no part of this id')
+    for (const lang of ['en', 'de']) { partStrings++; speak(`parts ${slug} ${id}`, lang, words?.[lang], lang) }
+  }
+}
+for (const slug of Object.keys(partNames.parts)) if (!machines.MACHINE_SLUGS.includes(slug)) refuse('unknown-machine', `parts ${slug}`, 'no machine of the catalogue carries this slug')
+
 /* --------------------------------------------------------------- the cards */
 
 /* Every pair of words the card models carry. The pointers beside them name the
@@ -229,6 +266,8 @@ const report = {
   steps: `${Object.keys(steps.steps).length} machines, ${Object.values(steps.steps).reduce((n, l) => n + l.length, 0)} steps`,
   details: Object.values(lines.lines).filter((l) => l.detail).length,
   cards: `${cardStrings} pairs of card words`,
+  slots: `${Object.keys(limits.slots).length} exhibits, ${slotStrings} slot strings`,
+  parts: `${Object.keys(partNames.parts).length} machines, ${partStrings} part names`,
   silent,
   errors,
   ok: errors.length === 0,
