@@ -2,18 +2,18 @@
  *
  * Every exhibit already carries its identity in its own scene data, put there
  * by the module that built it: a plate by work and face, a machine by the
- * stamp on its parts, a date inlay by its stud, a leaf by its page. This
- * module joins those to a stable id, a proxy a 44 px target can sit on
- * without enlarging the object, and the station a close look returns to.
+ * stamp on its parts, the dates by the floor's own list of its sockets, the
+ * book by the table it lies on, the grave's and the plaque's stones by their
+ * exhibit records. This module joins those to a stable id, a proxy a 44 px
+ * target can sit on without enlarging the object, and the station a close
+ * look returns to.
  *
- * A picture opens where it carries a certified viewing pose. A machine opens
- * in the vitrine where it stands, with no leg to walk: the room holds still
- * and the machine is lent to the vitrine's own turntable. The other kinds
- * are read here and inert until the window that wires them.
+ * An exhibit opens where it carries a certified viewing pose at both
+ * viewports; a sheet is read and inert until the window that wires it.
  */
 import { Box3, Mesh, Raycaster, Sphere, Vector3, type Object3D } from 'three/webgpu'
 import type { VinciStationId } from '../content'
-import { vinciApproachPose, vinciPlateExhibitId, type VinciExhibitKind } from './approaches'
+import { vinciApproachPose, vinciApproachStation, vinciPlateExhibitId, type VinciExhibitKind } from './approaches'
 import { BODY_WALL } from './body-wall'
 import { hangPlacements } from './hang'
 import { STANDS } from './stands'
@@ -72,20 +72,12 @@ function placedAt(kind: VinciExhibitKind, id: string, workId: string | null, she
   }
   if (kind === 'machine' && slug !== undefined) {
     const table = Object.keys(STANDS), at = table.indexOf(slug)
-    const stand = STANDS[slug as keyof typeof STANDS]
-    return { station: stand ? machineStation(slug, stand.ground) : null, order: MACHINE_OFFSET + Math.max(0, at) }
+    // THE HALL IS ONE ROOM UNDER TWO STATIONS, and both walk one row of its
+    // machines; the station a machine's certified leg leaves from is its own.
+    // The house's compass waits for its ledge.
+    return { station: vinciApproachStation(id) ?? null, order: MACHINE_OFFSET + Math.max(0, at) }
   }
-  return { station: null, order: 0 }
-}
-
-/** THE HALL IS ONE ROOM UNDER TWO STATIONS. The screw is the flight
- * station's own exhibit and the rest are the second station's, and both
- * stations walk one row of the hall's machines. The house's compass waits
- * for its ledge. */
-function machineStation(slug: string, ground: string): VinciStationId | null {
-  if (ground === 'court') return 'supper-wall'
-  if (ground === 'hall') return slug === 'aerial-screw' ? 'flight' : 'works'
-  return null
+  return { station: vinciApproachStation(id) ?? null, order: 0 }
 }
 /** The stations that share one room's row of machines. */
 export function vinciMachineRoom(station: VinciStationId | null): readonly VinciStationId[] {
@@ -109,6 +101,19 @@ function proxy(object: Object3D): { centre: Vector3; radiusM: number; corner: Ve
 function faceNormal(mesh: Mesh): Vector3 {
   mesh.updateWorldMatrix(true, false)
   return new Vector3(0, 0, 1).applyQuaternion(mesh.getWorldQuaternion(mesh.quaternion.clone())).normalize()
+}
+
+/** A date's proxy covers its socket and the numerals beside it. */
+const STUD_PROXY_M = .6, STUD_MARK_M = .06
+/** The slab and the framed diagram take a press over their own size. */
+const GRAVE_PROXY_M = { slab: 1.2, frame: 1.7 }
+const TABLE_OBJECT = 'vinci-reading-table'
+const DEATHBED_PLATE = 'Ingres-full-image-unwarped'
+
+/** An exhibit that is not a plate or a machine: a proxy, a mark, a station. */
+function place(id: string, kind: VinciExhibitKind, object: Object3D, centre: Vector3, radiusM: number, anchor: Vector3, order: number): VinciPickEntry {
+  return { id, kind, station: vinciApproachStation(id) ?? null, order, object, centre, radiusM: Math.max(PROXY_FLOOR_M, radiusM), anchor,
+    openable: vinciApproachPose(id, false) !== undefined && vinciApproachPose(id, true) !== undefined, workId: null, face: null }
 }
 
 export function readVinciExhibits(root: Object3D): VinciPickEntry[] {
@@ -143,20 +148,42 @@ export function readVinciExhibits(root: Object3D): VinciPickEntry[] {
       const placed = placedAt(kind, id, workId, sheet)
       entries.push({ id, kind, station: placed.station, order: placed.order, object, centre, radiusM,
         anchor: corner.addScaledVector(faceNormal(object), ANCHOR_OFF_M), openable, workId, face })
-      return
     }
-    const stud = typeof data['studId'] === 'string' ? data['studId'] : null
-    const page = data['page']
-    // A stud and a leaf are read for the window that opens them; their station
-    // is assigned with their viewing pose, not guessed here.
-    if (stud !== null) {
+  })
+  // THE KINDS THAT ARE NOT A PLATE OR A MACHINE are read by what their own
+  // factories put on their groups: the floor's list of its sockets, the
+  // table's name, the grave's and the plaque's exhibit records.
+  root.traverse(object => {
+    const exhibit = object.userData['exhibit'] as { kind?: string; anchors?: Record<string, number[]> } | undefined
+    if (object.name === 'vinci/collection-line-floor' && Array.isArray(object.userData['studs'])) {
+      // THE DATES ARE THE FLOOR'S OWN SOCKETS. The floor is welded, so a date is
+      // a place on it: a proxy over the socket, the mark just above the stone.
+      const studs = object.userData['studs'] as { id: string; east: number; north: number }[]
+      object.updateWorldMatrix(true, false)
+      const level = object.getWorldPosition(new Vector3()).y
+      for (const [index, stud] of studs.entries()) {
+        const id = `stud/${stud.id}`
+        const centre = new Vector3(stud.east, level, -stud.north)
+        entries.push(place(id, 'stud', object, centre, STUD_PROXY_M, centre.clone().setY(level + STUD_MARK_M), index))
+      }
+    } else if (object.name === TABLE_OBJECT) {
+      const book = object.getObjectByName('facsimile-binding') ?? object
+      const { centre, radiusM } = proxy(book)
+      entries.push(place('codex/paris-B', 'manuscript', object, centre, radiusM, centre.clone(), 0))
+    } else if (exhibit?.kind === 'court-plaque') {
       const { centre, radiusM } = proxy(object)
-      entries.push({ id: `stud/${stud}`, kind: 'stud', station: null, order: 0, object, centre, radiusM,
-        anchor: centre.clone(), openable: false, workId: null, face: null })
-    } else if (typeof page === 'number' || typeof page === 'string') {
-      const { centre, radiusM } = proxy(object)
-      entries.push({ id: `leaf/${page}`, kind: 'leaf', station: null, order: 0, object, centre, radiusM,
-        anchor: centre.clone(), openable: false, workId: null, face: null })
+      entries.push(place('plaque/flight-quote', 'place', object, centre, radiusM, centre.clone(), MACHINE_OFFSET + Object.keys(STANDS).length))
+    } else if (exhibit?.kind === 'grave' && exhibit.anchors) {
+      object.updateWorldMatrix(true, false)
+      const slab = new Vector3().fromArray(exhibit.anchors['slab']!)
+      const frame = new Vector3().fromArray(exhibit.anchors['computedFrame']!)
+      entries.push(place('grave', 'place', object, object.localToWorld(slab.clone()), GRAVE_PROXY_M.slab, object.localToWorld(slab.clone()), 0))
+      entries.push(place('grave-diagram', 'place', object, object.localToWorld(frame.clone()), GRAVE_PROXY_M.frame, object.localToWorld(frame.clone()), 1))
+    } else if (object instanceof Mesh && object.name === DEATHBED_PLATE) {
+      const { centre, radiusM, corner } = proxy(object)
+      const id = vinciPlateExhibitId('deathbed-painting', 'front')
+      entries.push({ ...place(id, 'picture', object, centre, radiusM, corner.addScaledVector(faceNormal(object), ANCHOR_OFF_M), 2),
+        workId: 'deathbed-painting', face: 'front' })
     }
   })
   for (const [slug, parts] of machines) {
@@ -193,6 +220,9 @@ export function pickVinciExhibit(options: {
   if (!live.length) return undefined
   let best: VinciPickEntry | undefined, at = Infinity
   for (const entry of live) {
+    // A date, a place and the book are a region of a larger body: only their
+    // proxy takes the press.
+    if (entry.kind === 'stud' || entry.kind === 'place' || entry.kind === 'manuscript') continue
     const hits = ray.intersectObject(entry.object, entry.kind === 'machine')
     const hit = hits[0]
     if (!hit || hit.distance >= at) continue

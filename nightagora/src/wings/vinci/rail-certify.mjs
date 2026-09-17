@@ -463,12 +463,16 @@ for (const { viewport, seen } of families) {
     const probe = ballClearance(pose.eye, radius + .05)
     const fullBall = probe.distance > radius
     const oriented = fullBall ? null : orientedStationClearance(pose, fov, viewport.aspect, radius)
+    // A plate of the hang carries its fit in the band and its distance to the
+    // plate; the other kinds are an eye in front of an object, and carry neither.
     const fit = vinciApproachFit(record.id, viewport.phone)
+    const plateMetres = vinciApproachPlateMetres(record.id, viewport.phone)
     approachReadings.push({
-      viewport: viewport.name, station: record.station, exhibit: record.id,
+      viewport: viewport.name, station: record.station, exhibit: record.id, kind: record.kind,
       lengthM: +path.length.toFixed(4), spanClearanceM: +(span.distance === Infinity ? clearance : span.distance).toFixed(4),
-      spanMesh: span.mesh, requiredM: +clearance.toFixed(4), plateMetres: +vinciApproachPlateMetres(record.id, viewport.phone).toFixed(4),
-      fitHeight: +fit.height.toFixed(3), fitWidth: +fit.width.toFixed(3),
+      spanMesh: span.mesh, requiredM: +clearance.toFixed(4),
+      ...(plateMetres === undefined ? {} : { plateMetres: +plateMetres.toFixed(4) }),
+      ...(fit ? { fitHeight: +fit.height.toFixed(3), fitWidth: +fit.width.toFixed(3) } : {}),
       clear: span.distance > clearance - 1e-9 || span.distance === Infinity,
     })
     approachCones.push({ viewport: viewport.name, exhibit: record.id, fov: pose.fov, radius: +radius.toFixed(4),
@@ -525,7 +529,7 @@ const certificate = {
     `The ${NEAR_M} m near distance, both authored viewport aspect ratios and the authored endpoint FOV are used. The authored aspect gives the largest near rectangle, so a wider or narrower canvas is inside it.`,
     `Every straight span of the finished path is proved end to end by exact segment/triangle distance; every rounded corner is proved by closed balls over its control hull, and those balls are what the runtime replays. Stored balls reserve ${BALL_RESERVE_M * 1e6} µm beyond the requested radius; runtime matching of quantized geometry consumes at most ${GEOMETRY_TOLERANCE_M * 1e6} µm of it.`,
     `The walk carries a step rhythm of at most ${(gaitEnvelopeM * 1000).toFixed(2)} mm off the certified line, and that envelope is added to the clearance radius every span and every corner above is proved against.`,
-    'An approach is one straight leg from a station eye to one exhibit\'s viewing eye and back, proved by the same exact segment/triangle distance and the same near rectangle plus gait envelope as a route. It is reachable from that station only, it is not addressable by the station rail, and the table is linear: two entries per exhibit, never the product of poses.',
+    'An approach is one straight leg from a station eye to one exhibit\'s viewing eye and back, proved by the same exact segment/triangle distance and the same near rectangle plus gait envelope as a route. It is reachable from that station only, it is not addressable by the station rail, and the table is linear: two entries per exhibit, never the product of poses. The exhibits are the hang\'s plates, the mural, the machines, the grave\'s three, the plaque, the book and the twelve cut dates.',
     `A station whose full near ball is not clear carries an oriented certificate instead: its near pyramid is proved over the whole ±${LOOK_YAW} rad yaw and ±${LOOK_PITCH} rad pitch look envelope, sampled every ${LOOK_STEP} rad, with the distance a corner can travel between two samples subtracted from the measured margin.`,
   ],
   arrivalEN,
@@ -590,6 +594,7 @@ if (VERIFY) {
   }
 }
 
+const plated = approachReadings.filter(reading => reading.plateMetres !== undefined)
 const report = {
   checker: 'vinci-rail-certify',
   mode: VERIFY ? 'verify' : 'write',
@@ -602,8 +607,9 @@ const report = {
   worstSpanClearance: readings.reduce((worst, reading) => reading.spanClearanceM < worst.spanClearanceM ? reading : worst, readings[0]),
   worstApproachSpan: approachReadings.reduce((worst, reading) => reading.spanClearanceM - reading.requiredM < worst.spanClearanceM - worst.requiredM ? reading : worst, approachReadings[0]),
   worstApproachNearBall: approachCones.reduce((worst, cone) => cone.fullBallM - cone.radius < worst.fullBallM - worst.radius ? cone : worst, approachCones[0]),
-  furthestApproachPlateMetres: approachReadings.reduce((worst, reading) => reading.plateMetres > worst.plateMetres ? reading : worst, approachReadings[0]),
-  worstApproachFit: approachReadings.reduce((worst, reading) => Math.max(reading.fitHeight, reading.fitWidth) > Math.max(worst.fitHeight, worst.fitWidth) ? reading : worst, approachReadings[0]),
+  furthestApproachPlateMetres: plated.reduce((worst, reading) => reading.plateMetres > worst.plateMetres ? reading : worst, plated[0]),
+  worstApproachFit: plated.reduce((worst, reading) => Math.max(reading.fitHeight, reading.fitWidth) > Math.max(worst.fitHeight, worst.fitWidth) ? reading : worst, plated[0]),
+  approachesByKind: approachReadings.reduce((count, reading) => ({ ...count, [reading.kind]: (count[reading.kind] ?? 0) + 1 }), {}),
   stationCones: stationCones.map(cone => ({ viewport: cone.viewport, id: cone.id, radius: +cone.radius.toFixed(4), fullBallM: +cone.fullBall.distance.toFixed(4), oriented: cone.oriented ? { minimumM: +cone.oriented.minimumM.toFixed(4), travelM: +cone.oriented.travelBetweenSamplesM.toFixed(5), orientations: cone.oriented.orientations, clear: cone.oriented.clear } : null })),
   ...(args.has('--json') ? { readings, approachReadings, approachCones } : {}),
   ok: failures.length === 0,

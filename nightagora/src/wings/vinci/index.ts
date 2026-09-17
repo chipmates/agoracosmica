@@ -45,7 +45,7 @@ import { createWater, type WaterGroup } from './water'
 import { createMeasurement, type VinciMeasurement } from './measurement'
 import { collectVinciLabelOccluders, createVinciExhibitDots, createVinciLabelAnchor, vinciSightBlocked, type VinciExhibitDots, type VinciExhibitMark, type VinciLabelAnchor, type VinciLabelMode } from './labels'
 import { pickVinciExhibit, readVinciExhibits, vinciMachineRoom, type VinciPickEntry } from './collection/pick'
-import { vinciApproachPose } from './collection/approaches'
+import { vinciApproachPose, vinciApproachStation } from './collection/approaches'
 import { createVinciCloseLook, createVinciMachinePayload, fillVinciLimitSlots, renderVinciMachineRecord, vinciLimits, vinciLine, vinciMachineCard, VINCI_EXHIBIT_CARD, VINCI_VITRINE_WORDS } from './collection/close-look'
 import { createPlatePayload } from '../vitrine/picture'
 import type { VitrineRect } from '../vitrine'
@@ -296,11 +296,12 @@ export function createWing():VinciWingModule {
         // ONE EXHIBIT AT A TIME: the room's marks stand down before the
         // stage may be held, so none is left standing on a still frame.
         dots?.setOpen(id);dots?.setLimit(0);paintExhibitTitle();paintHeaderVisibility();paintStrip()
-        const pose=vinciApproachPose(id,narrow())
+        // A LEG LEAVES FROM ITS OWN STATION ONLY: a hall machine opened from the
+        // hall's other station opens where the visitor stands.
+        const pose=vinciApproachStation(id)===vinciContent[card]!.id?vinciApproachPose(id,narrow()):undefined
         // ON CALM, ON THE PHONE AND UNDER REDUCED MOTION THE EYE DOES NOT MOVE:
         // the vitrine opens where the visitor stands. Where it may move, the
         // eye walks; a rig composing a still cuts to the same certified eye.
-        // A machine has no leg: it is lent to the vitrine's own turntable.
         if(!pose){if(from!==null&&rail.navigation.exhibit)rail.returnToStation();return false}
         // WALKING ON IS ONE MOTION: the certified return and the certified
         // approach out, with nothing standing still at the station.

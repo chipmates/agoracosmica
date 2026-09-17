@@ -2,6 +2,7 @@ import { CylinderGeometry, ExtrudeGeometry, LatheGeometry, Mesh, MeshStandardNod
 import { Construction, exhibitionFloor, galleryBackdrop, type ExhibitMaterials, type ExhibitionObject } from '../myths/construction'
 import { lineAdvance } from '../words'
 import words from '../line/data/never-said.json'
+import { GRAVE_DEATHBED, GRAVE_FRAME, GRAVE_SLAB } from './placement'
 
 /** Kept from the local computation, not from the later sunset row. */
 export const GRAVE_HOUR = {
@@ -45,8 +46,8 @@ export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, l
   galleryBackdrop(build)
   // Low masonry holds the slab in the floor. The narrow stepped reveal makes
   // its weight readable even under the grazing light of the closing room.
-  const centreX = -0.95
-  const centreZ = 0.65
+  const centreX = GRAVE_SLAB.x
+  const centreZ = GRAVE_SLAB.z
   build.box(centreX, 0.075, centreZ, 2.16, 0.15, 3.74, materials.dark)
   // The bedding stone stops short of the empty setting on both sides, so the
   // well under the bezel is a real void and not the course's own top face.
@@ -119,11 +120,11 @@ export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, l
   const gableBuild=new Construction(materials,'vinci-computed-gable','vinci/grave-geometry')
   // An architectural study in a deep frame, distinct from the burial object.
   // Its three-dimensional stones and roof catch the computed low sun.
-  const frameX = 1.20
-  const frameY = 2.46
-  const frameZ = -1.34
-  const fw = 3.13
-  const fh = 2.55
+  const frameX = GRAVE_FRAME.x
+  const frameY = GRAVE_FRAME.y
+  const frameZ = GRAVE_FRAME.z
+  const fw = GRAVE_FRAME.width
+  const fh = GRAVE_FRAME.height
   gableBuild.box(frameX, frameY, frameZ - 0.22, fw, fh, 0.13, materials.dark)
   // Mitred solid strips retain the frame footprint; a small bevel catches
   // the grazing sun and exposes the corner joint as actual construction.
@@ -282,16 +283,11 @@ export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, l
    carries the record: at this distance a label is a label, and the reading is
    in the card. */
 const DEATHBED = words.deathbed_label
-/** The reproduction is 40 by 50.5 cm. It hangs here at 1.9 m across, and the
- * wall says so. The far wall stands fourteen metres from the eye, and this is
- * the one band of it both viewports hold whole: east of the card's edge on the
- * wide stage, west of the diagram frame's own silhouette, and inside the
+/** The far wall stands fourteen metres from the eye, and the painting's place
+ * is the one band of it both viewports hold whole: east of the card's edge on
+ * the wide stage, west of the diagram frame's own silhouette, and inside the
  * narrow stage's much shorter field. Wider than this and the phone cuts it. */
-const DEATHBED_DISPLAY = {
-  width: 1.9, height: 1.9 * 3252 / 4096, imageWidth: 4096, imageHeight: 3252,
-  originalWidth: 0.505, originalHeight: 0.4,
-  centreX: -0.42, centreY: 2.62, faceZ: -5.39,
-} as const
+const DEATHBED_DISPLAY = GRAVE_DEATHBED
 
 /** Hangs the reproduction on the grave's backdrop wall. The frame is built
  * INSIDE the plate's own promise, so a plate that never arrives leaves the

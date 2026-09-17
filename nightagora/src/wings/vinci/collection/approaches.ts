@@ -13,14 +13,17 @@
 import { Vector3 } from 'three/webgpu'
 import { world } from '../site'
 import type { VinciStationId } from '../content'
+import { GRAVE_DEATHBED, GRAVE_FRAME, GRAVE_SLAB } from '../grave/placement'
+import { LINE_STUDS, lineCutStuds } from '../line/studs'
 import { hangPlacements } from './hang'
-import { FLOOR } from './layout'
+import { COURT, FACE, FLOOR, GRAVE_ORIGIN, LINE_ORIGIN, SUPPER_WALL } from './layout'
+import { STANDS, standLevel } from './stands'
+import { dossiers, MACHINE_SLUGS, type MachineSlug } from '../machines/catalog'
 
 export interface ApproachPose { eye: Vector3; at: Vector3; fov: number }
 
-/** The kinds the registry reads off the scene. Only `picture` carries a
- * viewing pose in this window; the others are read and inert. */
-export type VinciExhibitKind = 'picture' | 'sheet' | 'mural' | 'machine' | 'stud' | 'leaf'
+/** The kinds the registry reads off the scene. A sheet is read and inert. */
+export type VinciExhibitKind = 'picture' | 'sheet' | 'mural' | 'machine' | 'stud' | 'manuscript' | 'place'
 
 export interface VinciExhibitRecord {
   /** Stable across a rebuild and independent of the manifest, because the
@@ -29,8 +32,9 @@ export interface VinciExhibitRecord {
   kind: VinciExhibitKind
   /** The station the approach leaves from and the return lands on. */
   station: VinciStationId
-  workId: string
-  face: 'front' | 'reverse'
+  /** A plate's work and face; null for the kinds that are not plates. */
+  workId: string | null
+  face: 'front' | 'reverse' | null
 }
 
 /** The room's own standing eye, the one its station pose stands at. */
@@ -67,14 +71,19 @@ const FRAME_EDGE = .96
 const exhibitId = (workId: string, face: string): string => `picture/${workId}/${face}`
 const halfAngle = (fov: number): number => Math.tan(fov * Math.PI / 360)
 
-interface Field { east: number; north: number; datum: number; width: number; height: number }
+/** A flat work, in a frame where it faces north: the eye stands north of it. */
+interface Field {
+  east: number; north: number; datum: number; width: number; height: number
+  /** The height the standing eye is at, and how near and far it may stand. */
+  eye?: number; nearest?: number; furthest?: { desktop: number; phone: number }
+}
 
 /** Where the work's own four corners land in the frame, exactly: the camera
  * has no roll and the eye stands on the work's centre line, so this is the
  * same projection the renderer runs, without a renderer. */
 function corners(field: Field, distance: number, drop: number, fov: number, aspect: number)
   : { top: number; bottom: number; side: number } {
-  const eye = world(field.east, field.north + distance, EYE)
+  const eye = world(field.east, field.north + distance, field.eye ?? EYE)
   const at = world(field.east, field.north, field.datum - drop)
   const forward = at.clone().sub(eye).normalize()
   // The camera's own right, which is forward crossed with world up.
@@ -117,8 +126,8 @@ function pictureApproach(field: Field, narrow: boolean)
   : { pose: ApproachPose; distance: number; drop: number; bottom: number; fit: { height: number; width: number } } {
   const viewport = narrow ? 'phone' : 'desktop'
   const aspect = AUTHORED_ASPECT[viewport], band = BAND[viewport], ceiling = FOV_CEILING[viewport]
-  const furthest = narrow ? PHONE_FURTHEST_M : FURTHEST_M
-  let distance = Math.min(furthest, Math.max(NEAREST_M, field.height, field.width))
+  const furthest = field.furthest?.[viewport] ?? (narrow ? PHONE_FURTHEST_M : FURTHEST_M)
+  let distance = Math.min(furthest, Math.max(field.nearest ?? NEAREST_M, field.height, field.width))
   const solve = (distance: number, bottom: number): { fov: number; drop: number; holds: boolean } => {
     const fits = (fov: number): boolean => {
       const drop = centredDrop(field, distance, fov, aspect, band.top, bottom)
@@ -149,9 +158,18 @@ function pictureApproach(field: Field, narrow: boolean)
   return {
     distance, drop: answer.drop, bottom,
     fit: { height: (seen.top - seen.bottom) / (band.top - bottom), width: seen.side / band.side },
-    pose: { eye: world(field.east, field.north + distance, EYE),
+    pose: { eye: world(field.east, field.north + distance, field.eye ?? EYE),
       at: world(field.east, field.north, field.datum - answer.drop), fov: answer.fov },
   }
+}
+
+/** A WALL THAT FACES EAST IS A WALL THAT FACES NORTH, turned a quarter. The
+ * plane is solved in a frame where it faces north and the pose is turned back:
+ * a quarter turn only swaps coordinates and one sign, so it is exact. */
+function eastFacingApproach(field: Field, narrow: boolean): ApproachPose {
+  const turned = pictureApproach({ ...field, east: -field.north, north: field.east }, narrow).pose
+  const back = (v: Vector3): Vector3 => new Vector3(-v.z, v.y, v.x)
+  return { eye: back(turned.eye), at: back(turned.at), fov: turned.fov }
 }
 
 function placement(id: string): Field & { id: string; face: string } | undefined {
@@ -170,23 +188,149 @@ export function vinciApproachFit(id: string, narrow: boolean)
   return { ...answer.fit, bottom: answer.bottom, authoredBottom: BAND[narrow ? 'phone' : 'desktop'].bottom }
 }
 
-/** THIS WINDOW'S OPENABLE SET: the picture room's hang, whose wall placement
- * is the same list the room builds its frames from and the picture module
- * streams its sources onto. */
-export function vinciExhibitRecords(): readonly VinciExhibitRecord[] {
-  return hangPlacements().map(field => ({ id: exhibitId(field.id, field.face), kind: 'picture' as const,
-    station: 'picture-room' as VinciStationId, workId: field.id, face: field.face }))
+/* ---- the kinds beyond the hang ----------------------------------------- */
+
+/** The lens a narrow stage takes for an object it is not walked to: the same
+ * eye, opened by a third, never past what a phone lens is allowed. */
+const narrowLens = (fov: number): number => Math.min(100, fov * 1.35)
+const pose = (eye: [number, number, number], at: [number, number, number], fov: number, narrow: boolean): ApproachPose =>
+  ({ eye: world(...eye), at: world(...at), fov: narrow ? narrowLens(fov) : fov })
+
+/** THE MURAL IS READ SQUARE, ONE CERTIFIED STEP INSIDE THE STATION'S OWN EYE:
+ * eleven metres hold the whole measurement, eight and a third hold it at a
+ * lens a card can stand beside. */
+const MURAL_ID = 'picture/last-supper/front'
+const MURAL: Field = {
+  east: SUPPER_WALL.east + SUPPER_WALL.thickness / 2, north: SUPPER_WALL.north,
+  datum: COURT.level + SUPPER_WALL.field.sill + SUPPER_WALL.field.height / 2,
+  width: SUPPER_WALL.field.width, height: SUPPER_WALL.field.height,
+  eye: COURT.level + 1.62, nearest: 8.37, furthest: { desktop: 8.37, phone: 8.37 },
 }
 
-/** The viewing pose of one exhibit, or undefined when this window does not
- * stand a person in front of it. */
+/** The grave's frame in the wing: turned a quarter so its +Z faces east. */
+const GRAVE_LEVEL = COURT.level + .035
+const graveWorld = (x: number, y: number, z: number): [number, number, number] =>
+  [GRAVE_ORIGIN.east + z, GRAVE_ORIGIN.north + x, GRAVE_LEVEL + y]
+/** The diagram stands free on its own legs and ledge, so the eye holds the
+ * whole standing object, four metres off: east of the lectern that stands
+ * between the slab and the frame. */
+const DIAGRAM: Field = (() => {
+  const [east, north] = graveWorld(GRAVE_FRAME.x, 0, GRAVE_FRAME.z + .1)
+  return { east, north, datum: GRAVE_LEVEL + 1.9, width: 3.3, height: 3.8,
+    eye: COURT.level + 1.62, nearest: 4.24, furthest: { desktop: 4.24, phone: 4.24 } }
+})()
+
+/** Where each object's eye stands, in east, north: every one is a short
+ * straight leg from its own station eye that passes no plinth, no upright and
+ * no furniture, and every eye stands clear of its object's swept envelope. */
+const MACHINE_EYES: Record<Exclude<MachineSlug, 'proportional-compass'>, { station: VinciStationId; east: number; north: number }> = {
+  // The court, from the display wall's eye: every leg passes south of the
+  // plaque and of the parachute's south-west upright.
+  'parachute': { station: 'supper-wall', east: -36.2, north: -28.3 },
+  'revolving-crane': { station: 'supper-wall', east: -44.0, north: -26.3 },
+  'anemometer': { station: 'supper-wall', east: -42.4, north: -26.9 },
+  'inclinometer': { station: 'supper-wall', east: -42.4, north: -26.9 },
+  // The hall's west half, from the screw's own station.
+  'aerial-screw': { station: 'flight', east: -50.8, north: -48.4 },
+  'miter-lock-gates': { station: 'flight', east: -51.2, north: -52.0 },
+  'camera-obscura': { station: 'flight', east: -46.4, north: -50.2 },
+  'flywheel': { station: 'flight', east: -45.9, north: -49.4 },
+  // The aisle's east half, from the workshop's station.
+  'multi-barrel-gun': { station: 'works', east: -42.2, north: -47.9 },
+  'ball-bearing': { station: 'works', east: -41.9, north: -47.4 },
+  'rolling-mill': { station: 'works', east: -45.8, north: -46.3 },
+  'lathe': { station: 'works', east: -44.0, north: -45.4 },
+  'water-lifting-screw': { station: 'works', east: -47.3, north: -47.8 },
+}
+
+function machinePose(slug: keyof typeof MACHINE_EYES, narrow: boolean): ApproachPose {
+  const stand = STANDS[slug], { x, y, z } = dossiers[slug].scale_m
+  const level = standLevel(stand.ground), eye = MACHINE_EYES[slug]
+  // The aim stands at the body's own middle, never higher than a person looks
+  // up at a nine metre screw from the aisle.
+  const aim = level + stand.plinth + Math.min(y / 2, 2.2)
+  const reach = Math.hypot(eye.east - stand.east, eye.north - stand.north)
+  const fov = Math.max(35, Math.min(75, 2 * Math.atan(1.2 * Math.max(y, x, z) / 2 / reach) * 180 / Math.PI))
+  return pose([eye.east, eye.north, level + 1.62], [stand.east, stand.north, aim], fov, narrow)
+}
+
+/** The book lies open on the table under its lamp, read from the chair side. */
+export const VINCI_READING_TABLE = { east: -37.72, north: -45.4, top: FLOOR + .755 }
+const READING_TABLE = VINCI_READING_TABLE
+/** The flight plaque's stone, and the standing distance its lines read at. */
+export const VINCI_PLAQUE_AT = { east: -40.2, north: -25.5 }
+const PLAQUE = VINCI_PLAQUE_AT
+
+interface Placed { record: VinciExhibitRecord; pose(narrow: boolean): ApproachPose }
+
+function otherKinds(): Placed[] {
+  const placed: Placed[] = []
+  const add = (id: string, kind: VinciExhibitKind, station: VinciStationId, at: (narrow: boolean) => ApproachPose,
+    workId: string | null = null, face: 'front' | null = null): void => {
+    placed.push({ record: { id, kind, station, workId, face }, pose: at })
+  }
+  add(MURAL_ID, 'mural', 'supper-wall', narrow => eastFacingApproach(MURAL, narrow), 'last-supper', 'front')
+  for (const slug of MACHINE_SLUGS) {
+    if (slug === 'proportional-compass') continue
+    add(`machine/${slug}`, 'machine', MACHINE_EYES[slug].station, narrow => machinePose(slug, narrow))
+  }
+  // The plaque is read square, from the side it turns to the display wall's eye.
+  add('plaque/flight-quote', 'place', 'supper-wall', narrow =>
+    pose([-38.17, -26.79, COURT.level + 1.62], [PLAQUE.east, PLAQUE.north, COURT.level + .95], 50, narrow))
+  // The grave: the slab from three and a half metres, the diagram square to
+  // its frame, and the painting on the backdrop past the diagram's south end,
+  // where the frame no longer stands between the eye and the painting.
+  add('grave', 'place', 'grave', narrow =>
+    pose([-51.5, -26.9, COURT.level + 1.62], graveWorld(GRAVE_SLAB.x, GRAVE_SLAB.y, GRAVE_SLAB.z), 55, narrow))
+  add('grave-diagram', 'place', 'grave', narrow => eastFacingApproach(DIAGRAM, narrow))
+  add('picture/deathbed-painting/front', 'picture', 'grave', narrow =>
+    pose([-56.9, -27.9, COURT.level + 1.62], graveWorld(GRAVE_DEATHBED.centreX, GRAVE_DEATHBED.centreY, GRAVE_DEATHBED.faceZ + .098), 44, narrow),
+  'deathbed-painting', 'front')
+  add('codex/paris-B', 'manuscript', 'reading-table', narrow =>
+    pose([READING_TABLE.east + .97, READING_TABLE.north, FLOOR + 1.62], [READING_TABLE.east, READING_TABLE.north, READING_TABLE.top + .031], 44, narrow))
+  // A DATE IS READ FROM ITS SOUTH, where its numerals stand upright, looking
+  // down at the socket from a stride and a half.
+  for (const stud of lineCutStuds(LINE_ORIGIN)) {
+    const east = stud.east + .15
+    // The last date lies close to the gallery's south cross wall, so its eye
+    // stands as far back as the wall leaves and looks more steeply down.
+    const back = Math.min(1.5, stud.north - (FACE.southStripNorth + .6))
+    add(`stud/${stud.id}`, 'stud', stud.station as VinciStationId, narrow =>
+      pose([east, stud.north - back, FLOOR + 1.62], [east, stud.north, FLOOR + .01], 50, narrow))
+  }
+  return placed
+}
+let others: Placed[] | undefined
+const otherPlaced = (): Placed[] => (others ??= otherKinds())
+
+/** EVERY EXHIBIT A VISITOR CAN BE WALKED TO: the picture room's hang, whose
+ * wall placement is the same list the room builds its frames from, then the
+ * mural, the machines, the plaque, the grave's three, the book and the twelve
+ * dates cut into the gallery floor. */
+export function vinciExhibitRecords(): readonly VinciExhibitRecord[] {
+  return [
+    ...hangPlacements().map(field => ({ id: exhibitId(field.id, field.face), kind: 'picture' as const,
+      station: 'picture-room' as VinciStationId, workId: field.id, face: field.face })),
+    ...otherPlaced().map(entry => entry.record),
+  ]
+}
+
+/** The viewing pose of one exhibit, or undefined when no person is stood in
+ * front of it. */
 export function vinciApproachPose(id: string, narrow: boolean): ApproachPose | undefined {
   const field = placement(id)
-  return field ? pictureApproach(field, narrow).pose : undefined
+  if (field) return pictureApproach(field, narrow).pose
+  return otherPlaced().find(entry => entry.record.id === id)?.pose(narrow)
+}
+
+/** The station an exhibit's certified leg leaves from. */
+export function vinciApproachStation(id: string): VinciStationId | undefined {
+  return vinciExhibitRecords().find(record => record.id === id)?.station
 }
 
 /** The distance from the viewing eye to the plate's own centre, which is what
- * the picture module's near rule measures. */
+ * the picture module's near rule measures. The hang's plates only: the room's
+ * one full slot belongs to the picture room. */
 export function vinciApproachPlateMetres(id: string, narrow: boolean): number | undefined {
   const field = placement(id)
   if (!field) return undefined
@@ -195,16 +339,18 @@ export function vinciApproachPlateMetres(id: string, narrow: boolean): number | 
 
 let reach = 0
 /** THE ROOM'S ONE FULL SLOT HAS TO REACH THE EYE THE MODULE STANDS. The
- * furthest certified viewing eye, over every exhibit and both viewports, so
- * the plate a visitor has walked up to raises at whatever distance the band
- * solver settled on and nowhere else. */
+ * furthest certified viewing eye, over every hang plate and both viewports,
+ * so the plate a visitor has walked up to raises at whatever distance the
+ * band solver settled on and nowhere else. */
 export function vinciApproachReachMetres(): number {
   if (reach) return reach
-  for (const record of vinciExhibitRecords()) for (const narrow of [false, true]) {
-    reach = Math.max(reach, vinciApproachPlateMetres(record.id, narrow) ?? 0)
+  for (const field of hangPlacements()) for (const narrow of [false, true]) {
+    reach = Math.max(reach, vinciApproachPlateMetres(exhibitId(field.id, field.face), narrow) ?? 0)
   }
   return reach
 }
 
 /** The identity the registry joins a mounted plate to. */
 export const vinciPlateExhibitId = exhibitId
+/** The date a stud exhibit names, by its place in the whole line. */
+export const vinciStudIndex = (id: string): number => LINE_STUDS.findIndex(stud => `stud/${stud.id}` === id)
