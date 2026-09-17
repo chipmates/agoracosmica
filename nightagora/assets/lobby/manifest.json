@@ -716,7 +716,8 @@
       "source_url": "https://commons.wikimedia.org/wiki/File:Friedrich_Nietzsche,_RP-P-1952-463.jpg",
       "original_url": "https://upload.wikimedia.org/wikipedia/commons/8/86/Friedrich_Nietzsche%2C_RP-P-1952-463.jpg",
       "holder_record_url": "https://www.rijksmuseum.nl/en/collection/RP-P-1952-463",
-      "display": true,
+      "display": false,
+      "retired": "Retired from display on 2026-09-17 under brief LIKENESS-NIETZSCHE-2026-09-15: the pane hangs the September 1882 photograph, lobby/likeness-nietzsche-1882, instead. Record and store bytes kept.",
       "label_en": "Friedrich Nietzsche. Drypoint by Hans Olde, dated 1870–1917 in the Rijksmuseum catalogue. Rijksmuseum, Amsterdam. Licence: “This file is made available under the Creative Commons CC0 1.0 Universal Public Domain Dedication.”",
       "label_de": "Friedrich Nietzsche. Kaltnadelradierung von Hans Olde, im Rijksmuseum auf 1870–1917 datiert. Rijksmuseum, Amsterdam. Lizenz: „This file is made available under the Creative Commons CC0 1.0 Universal Public Domain Dedication.“",
       "previews": [
@@ -1765,6 +1766,72 @@
       "source_sha1": "212b50ad58a50bc350ad3c26aeee8d358a26e355",
       "honesty_en": "Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the painting. Non-profit cultural use.",
       "honesty_de": "Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht das Gemälde. Nichtkommerzielle kulturelle Nutzung."
+    },
+    {
+      "id": "lobby/likeness-nietzsche-1882",
+      "path": "likenesses/nietzsche/photograph-1882/original.jpg",
+      "sha256": "2252e93b009f4b997073a8f09b41969f8bef4713cdde782fa4018bbda2247460",
+      "bytes": 336971,
+      "width": 1274,
+      "height": 1700,
+      "pixels": 2165800,
+      "slug": "nietzsche",
+      "name": "Friedrich Nietzsche",
+      "wing": "lobby",
+      "class": "Tier 2",
+      "tier": 2,
+      "licence": "Public domain",
+      "licence_source_url": "https://commons.wikimedia.org/wiki/File:Nietzsche1882.jpg#Licensing",
+      "licence_location": "Commons file page, Licensing",
+      "holder": "Original: Klassik Stiftung Weimar, Goethe- und Schiller-Archiv; GSA 101/18",
+      "maker": "Gustav Adolf Schultze",
+      "date": "September 1882",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Nietzsche1882.jpg",
+      "original_url": "https://upload.wikimedia.org/wikipedia/commons/2/23/Nietzsche1882.jpg",
+      "holder_record_url": "https://www.klassik-stiftung.de/en/digital/fotothek/digitalisat/?cHash=bad9b718998123d5619d91e14f9dc02c&tx_dreipckswfotothek_show%5Baction%5D=show&tx_dreipckswfotothek_show%5Bcontroller%5D=Photo&tx_dreipckswfotothek_show%5Bphoto%5D=1017",
+      "display": true,
+      "label_en": "Friedrich Nietzsche. Photograph by Gustav Adolf Schultze, September 1882. Original: Klassik Stiftung Weimar, Goethe- und Schiller-Archiv. Licence: “Public domain”. Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the photograph. Non-profit cultural use.",
+      "label_de": "Friedrich Nietzsche. Fotografie von Gustav Adolf Schultze, September 1882. Original: Klassik Stiftung Weimar, Goethe- und Schiller-Archiv. Lizenz: „Public domain“. Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht die Fotografie. Nichtkommerzielle kulturelle Nutzung.",
+      "previews": [
+        {
+          "path": "likenesses/nietzsche/photograph-1882/preview-512.jpg",
+          "sha256": "1fe1ede562c4aec3d7f3a48723df463d10eee3550c4431a5830a943a1d75e061",
+          "bytes": 50846,
+          "width": 384,
+          "height": 512,
+          "pixels": 196608,
+          "long_edge": 512,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/nietzsche/photograph-1882/original.jpg"
+        },
+        {
+          "path": "likenesses/nietzsche/photograph-1882/preview-1024.jpg",
+          "sha256": "13ff182ff884a6106a898ad260b02cad2c31deab3aa17d1bdb0d865518718554",
+          "bytes": 155643,
+          "width": 767,
+          "height": 1024,
+          "pixels": 785408,
+          "long_edge": 1024,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/nietzsche/photograph-1882/original.jpg"
+        }
+      ],
+      "verified_on": "2026-09-17",
+      "source_verification": "Current Commons imageinfo, original link, licence template and file history checked. Holder record rechecked.",
+      "derivation": "No embedded ICC profile. Source interpreted as sRGB. JPEG previews resized with Lanczos, quality 88, embedded sRGB profile. Original bytes unchanged.",
+      "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/",
+      "rights_note": "Holder identifies Gustav Schultze, September 1882, first photograph with head supported and left profile. Commons reproduces the same portrait from Walter Kaufmann’s Nietzsche, fourth edition, Princeton University Press; scan processed by Anton. Photographer died 1897. Olaf Mokansky is the maker of the holder’s modern reproduction, not the 1882 portrait. Do not claim holder release of this book scan. Commons PD-scan (PD-old-100) and PD-US-expired.",
+      "source_version": {
+        "file_timestamp": "2012-01-29T03:31:33Z",
+        "commons_revision_id": 1189966537
+      },
+      "source_sha1": "7d54532cb41dd67764948ae8dc3f59e1307bc8f9",
+      "honesty_en": "Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the photograph. Non-profit cultural use.",
+      "honesty_de": "Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht die Fotografie. Nichtkommerzielle kulturelle Nutzung."
     }
   ]
 }
