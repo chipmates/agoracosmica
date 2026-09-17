@@ -367,6 +367,13 @@ export function createMandala(scene: Scene): MandalaHandles {
     deepMat.opacityNode = uDeep
   }
   const deep = new Mesh(new SphereGeometry(84, 40, 28), deepMat)
+  /* THE PHONE'S DOOR HAS A RIVER IN IT. Through the door the ride looks
+     straight ahead, and a tall frame is a third as wide as a wide one: the
+     river that crosses the edge of the wide frame missed the tall one, which
+     held even navy and dust. So on a tall stage the night is turned until
+     the river runs through the door, and it turns back inside the flip,
+     where the whole sky is already wheeling past, before the map rises. */
+  const DOOR_YAW = -0.47
   deep.renderOrder = -20
   deep.frustumCulled = false
   deep.visible = false
@@ -733,6 +740,8 @@ export function createMandala(scene: Scene): MandalaHandles {
       uDeep.value = deepAmount ?? 0
       deep.visible = uDeep.value > 0.002
       deepThroughDoor((progress ?? 1) < 0.19)
+      const tall = Math.min(1, Math.max(0, (1.15 - window.innerWidth / window.innerHeight) / 0.69))
+      deep.rotation.y = DOOR_YAW * tall * (1 - ramp(progress ?? 1, [0.12, 0.22]))
       if (!root.visible) return
       const t = reduced ? 11.2 : elapsed
       uT.value = t
