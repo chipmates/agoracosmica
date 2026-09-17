@@ -34,6 +34,12 @@ export interface PlateStreamOptions {
    * the default; a drawn sheet carries its own record shape. The rule for
    * each family lives in this module, never in the caller. */
   family?: PlateFamily
+  /** THE PREVIEW IS DRAWN BY THE CALLER'S OWN BATCH. The caller takes the
+   * decoded preview once (`takePreview`) and draws it in one call with its
+   * wall; this stream then draws only the earned plate, over that batch,
+   * with the plate's share as its opacity. Blending the plate over the
+   * preview is the same mix the unbatched material computes. */
+  layered?: boolean
 }
 export type PlateFamily = 'painting' | 'sheet'
 
@@ -57,6 +63,15 @@ export interface PlateStream {
   high(enable: boolean): Promise<void>
   /** Requests plus unfinished first-arrival and resolution transitions. */
   pending(): number
+  /** True while the earned plate is requested, resident or fading. */
+  raised(): boolean
+  /** A small upright copy of the decoded preview, for a row of thumbnails
+   * that must not fetch or decode the same file a second time. Null when the
+   * preview is not held (it failed, or a batch has taken it). */
+  thumbnail(maxEdge: number): Promise<{ url: string; blob: Blob } | null>
+  /** A layered stream hands its decoded preview over once, and keeps no copy:
+   * the caller owns the bitmap and closes it. Null when there is none. */
+  takePreview(): ImageBitmap | null
   textureMB(): number
   allocation(): { previewMB: number; fullMB: number; previewWidth: number; previewHeight: number; fullWidth: number; fullHeight: number }
   residency(): { preview: boolean; full: boolean; blending: boolean; previewUpload: PlateUpload | null; fullUpload: PlateUpload | null }
@@ -170,7 +185,7 @@ async function load(plate: ValidPlate, signal: AbortSignal, upload: PlateUpload)
 
 export function createPlateStream(preview: ManifestEntry, full: ManifestEntry, options: PlateStreamOptions = {}): PlateStream {
   if (!options || typeof options !== 'object' || Array.isArray(options)
-    || Object.keys(options).some(key => key !== 'previewMaxEdge' && key !== 'tone' && key !== 'family')) throw new Error('Invalid picture preview upload options')
+    || Object.keys(options).some(key => key !== 'previewMaxEdge' && key !== 'tone' && key !== 'family' && key !== 'layered')) throw new Error('Invalid picture preview upload options')
   const family: PlateFamily = options.family === undefined ? 'painting' : options.family
   if (family !== 'painting' && family !== 'sheet') throw new Error('Invalid picture source family')
   if (options.tone !== undefined && (options.tone === null || typeof options.tone !== 'object'
@@ -191,12 +206,12 @@ export function createPlateStream(preview: ManifestEntry, full: ManifestEntry, o
   const fullNode = texture(empty)
   const blend = uniform(0)
   const arrival = uniform(0)
+  const layered = options.layered === true
   const material = new MeshBasicNodeMaterial()
   material.name = `vinci/pictures/plate/${previewRecord.face}`
-  material.colorNode = options.tone === undefined
-    ? mix(previewNode.rgb, fullNode.rgb, blend)
-    : mix(previewNode.rgb, fullNode.rgb, blend).mul(options.tone)
-  material.opacityNode = arrival
+  const colour = layered ? fullNode.rgb : mix(previewNode.rgb, fullNode.rgb, blend)
+  material.colorNode = options.tone === undefined ? colour : colour.mul(options.tone)
+  material.opacityNode = layered ? arrival.mul(blend) : arrival
   material.transparent = true
   material.depthWrite = false
   material.toneMapped = false
@@ -205,6 +220,7 @@ export function createPlateStream(preview: ManifestEntry, full: ManifestEntry, o
   let live = true
   let desiredHigh = false
   let previewImage: LoadedPlate | null = null
+  let previewArrived = false
   let fullImage: LoadedPlate | null = null
   let previewError: string | null = null
   let fullError: string | null = null
@@ -278,6 +294,7 @@ export function createPlateStream(preview: ManifestEntry, full: ManifestEntry, o
       const loaded = await load(previewRecord, previewController.signal, previewUpload)
       if (!live) { release(loaded); return }
       previewImage = loaded
+      previewArrived = true
       previewNode.value = loaded.texture
       fullNode.value = loaded.texture
       // The first decoded preview appears continuously. Its source colours
@@ -305,7 +322,7 @@ export function createPlateStream(preview: ManifestEntry, full: ManifestEntry, o
       return
     }
     await ready
-    if (!live || !desiredHigh || !previewImage) return
+    if (!live || !desiredHigh || !previewArrived) return
     if (fullImage) { await transition(1); return }
     // If a superseded request is decoding, let it close its bitmap before a
     // new request takes the residency slot. Fetch cancellation alone cannot
@@ -342,7 +359,32 @@ export function createPlateStream(preview: ManifestEntry, full: ManifestEntry, o
   return {
     material,
     ready,
-    available: () => live && previewImage !== null,
+    available: () => live && previewArrived,
+    raised: () => live && (desiredHigh || fullImage !== null || fade !== null),
+    async thumbnail(maxEdge) {
+      if (!live || !previewImage) return null
+      const { bitmap } = previewImage
+      const scale = Math.min(1, maxEdge / Math.max(bitmap.width, bitmap.height))
+      const width = Math.max(1, Math.round(bitmap.width * scale)), height = Math.max(1, Math.round(bitmap.height * scale))
+      const canvas = new OffscreenCanvas(width, height)
+      const context = canvas.getContext('2d')
+      if (!context) return null
+      context.imageSmoothingQuality = 'high'
+      // the preview was decoded upside down for the GPU; a thumbnail stands upright
+      context.setTransform(1, 0, 0, -1, 0, height)
+      context.drawImage(bitmap, 0, 0, width, height)
+      return { url: previewRecord.url, blob: await canvas.convertToBlob({ type: 'image/png' }) }
+    },
+    takePreview() {
+      if (!layered || !previewImage) return null
+      const { bitmap, texture: uploaded } = previewImage
+      // the texture never drew: a layered material samples no preview
+      if (fullNode.value === uploaded) fullNode.value = empty
+      previewNode.value = empty
+      uploaded.dispose()
+      previewImage = null
+      return bitmap
+    },
     update(_dt) { if (live) advance() },
     high,
     pending: () => live ? requests + (fade ? 1 : 0) + (arrivalStarted !== null ? 1 : 0) : 0,
@@ -351,8 +393,8 @@ export function createPlateStream(preview: ManifestEntry, full: ManifestEntry, o
       fullMB: mipBytes(fullUpload.width, fullUpload.height) / 1048576,
       previewWidth: previewUpload.width, previewHeight: previewUpload.height,
       fullWidth: fullUpload.width, fullHeight: fullUpload.height }),
-    residency: () => ({ preview: previewImage !== null, full: fullImage !== null, blending: fade !== null,
-      previewUpload: previewImage ? { ...previewImage.upload } : null,
+    residency: () => ({ preview: previewImage !== null || (layered && previewArrived), full: fullImage !== null, blending: fade !== null,
+      previewUpload: previewImage ? { ...previewImage.upload } : previewArrived ? { ...previewUpload } : null,
       fullUpload: fullImage ? { ...fullImage.upload } : null }),
     error: () => previewError ?? fullError,
     dispose() {

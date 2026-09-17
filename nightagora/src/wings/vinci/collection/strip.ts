@@ -19,6 +19,24 @@ export function vinciSheetTitle(honesty: string): string {
   return stop < 0 ? said : said.slice(0, stop)
 }
 
+/* THE ROW'S THUMBNAILS ARE THE ROOM'S OWN PREVIEWS, made small once. The
+ * plates decode every preview at entry; a row that fetched and decoded the
+ * same files again stood with blank cells when its station stood. The
+ * picture module registers a small upright copy by the preview's address,
+ * and a cell takes it the moment it exists. */
+const thumbs = new Map<string, string>()
+const waiting = new Set<(address: string, thumb: string) => void>()
+export function registerVinciStripThumb(address: string, thumb: string): void {
+  thumbs.set(address, thumb)
+  for (const tell of waiting) tell(address, thumb)
+}
+export function releaseVinciStripThumb(address: string): void {
+  const thumb = thumbs.get(address)
+  if (thumb === undefined) return
+  thumbs.delete(address)
+  URL.revokeObjectURL(thumb)
+}
+
 export interface VinciStripEntry {
   id: string
   /** The exhibit's own name, already in the page's language. */
@@ -60,6 +78,11 @@ export function createVinciHangStrip(options: {
   let docked = ''
   let open: string | null = null, hidden = false, disposed = false
   const buttons: HTMLButtonElement[] = []
+  const arrive = (address: string, thumb: string): void => {
+    for (const image of row.querySelectorAll<HTMLImageElement>('img.vinci-strip-thumb'))
+      if (image.dataset['preview'] === address && image.getAttribute('src') !== thumb) image.src = thumb
+  }
+  waiting.add(arrive)
 
   /** THE ROW TAKES ONE TAB STOP. Inside it the arrows walk, which is what a
    * row of targets owes a keyboard: Home and End are its two ends. */
@@ -101,12 +124,10 @@ export function createVinciHangStrip(options: {
       if (entry.preview) {
         const thumb = document.createElement('img')
         thumb.className = 'vinci-strip-thumb'
-        // The plate the room already streams: the same file, from the cache,
-        // and only the ones the row actually shows are decoded.
-        thumb.loading = 'lazy'
         thumb.decoding = 'async'
         thumb.alt = ''
-        thumb.src = entry.preview
+        thumb.dataset['preview'] = entry.preview
+        thumb.src = thumbs.get(entry.preview) ?? entry.preview
         button.append(thumb)
       }
       const dot = document.createElement('span')
@@ -180,6 +201,7 @@ export function createVinciHangStrip(options: {
     },
     dispose() {
       disposed = true
+      waiting.delete(arrive)
       row.remove()
       buttons.length = 0
     },

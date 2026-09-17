@@ -36,6 +36,9 @@ export interface CollectionExhibits {
    * own schedule has at t=0. The close-look host names the one machine whose
    * clock may run, and `null` puts every machine back at rest. */
   demonstrate(slug: MachineSlug | null): void
+  /** Release the room's one full plate while a payload holds the stage
+   * (true), and let the room choose again once it lets go (false). */
+  holdPlates(release: boolean): void
   dispose(): void
   ready: Promise<void>
   pending(): number
@@ -264,7 +267,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   warmTable()
   /** Every body the walk can show, standing with its materials resolved. */
   const standing = Promise.all([courtGround, hall, house, table]).then(() =>
-    Promise.all([...machines.map(machine => machine.build.ready), reading?.ready(), deathbed]))
+    Promise.all([...machines.map(machine => machine.build.ready), reading?.ready(), deathbed, pictures.ready]))
   stack.hold(standing)
   for (const body of [rooms, line, grave.group, plaque.group]) if (body) body.userData['naWarm'] = true
 
@@ -277,6 +280,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
     picturesReady: pictures.ready,
     warm: warmHall,
     demonstrate(slug) { demonstrating = slug },
+    holdPlates(release) { pictures.hold(release) },
     update(now, step, eye) {
       if (!live) return
       pictures.update(step, eye)
@@ -297,6 +301,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       // the radius sits between them.
       const near = eye.distanceToSquared(graveNear) < 48 * 48
       if (rooms && rooms.visible !== near) rooms.visible = near
+      pictures.show(near)
       if (line.visible !== near) line.visible = near
       if (grave.group.visible !== near) grave.group.visible = near
       if (plaque.group.visible !== near) plaque.group.visible = near

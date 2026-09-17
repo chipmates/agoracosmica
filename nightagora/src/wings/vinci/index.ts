@@ -1112,7 +1112,9 @@ export function createWing():VinciWingModule {
       // THE ROOM HOLDS STILL WHILE A PAYLOAD HOLDS THE STAGE: nothing of it
       // walks, streams or is drawn until the vitrine hands it back.
       closeLook?.update(dt)
-      if(closeLook?.id&&closeLook.surface!=='room')return
+      const payload=Boolean(closeLook?.id&&closeLook.surface!=='room')
+      exhibits?.holdPlates(payload)
+      if(payload)return
       measurement.update();rail.update()
       if(exhibits){const now=hosts.world.clock();exhibits.update(now,Math.max(0,Math.min(.25,now-exhibitClock)),hosts.world.camera.position);exhibitClock=now}
       // THE CARD NAMES THE STATION THE WALKER IS IN. It hands over at the

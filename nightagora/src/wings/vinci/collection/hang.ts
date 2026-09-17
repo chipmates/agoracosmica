@@ -100,9 +100,10 @@ export function buildPictureRoomFurniture(b: RoomBatch): void {
 }
 
 /** The body as a machine: about six hundred sheets are at Windsor, and the
- * ones whose faithful reproductions the source policy admits hang here. The
- * carriers come from the wall's own register, each at its sheet's proportion;
- * the picture module streams the sheets onto them through plates.ts.
+ * ones whose faithful reproductions the source policy admits hang here. Each
+ * carrier holds its sheet at the size the holder records, and the three
+ * without a recorded size at a constant area; the picture module streams the
+ * sheets onto them through plates.ts.
  */
 export function buildBodyWall(b: RoomBatch): void {
   const wall = FACE.hallPartitionEast + .033
