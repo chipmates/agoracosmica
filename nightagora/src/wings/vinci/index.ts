@@ -11,7 +11,7 @@ import { setRegister, type WingHosts, type WingModule } from '../frame'
 import { beginVisit, type Visit } from '../visit'
 import { createWingPlan, type WingPlan } from '../plan'
 import { PLAN_WORDS } from '../plan/words'
-import type { PlanPoint, PlanRoom, PlanShape, PlanSite, PlanStation } from '../plan/types'
+import type { PlanHighlight, PlanPoint, PlanRoom, PlanShape, PlanSite, PlanStation } from '../plan/types'
 import { constructionRecords, evidenceWords } from './evidence-copy'
 import { lang, WING_TEXT } from '../content'
 import { createVinciSourcesWindow, type VinciSourcesTab, type VinciExhibitSources } from './sources'
@@ -321,7 +321,7 @@ export function createWing():VinciWingModule {
       // THE QUICK SELECT IS THE PRESS THE BAR ALREADY MAKES: every pair is
       // certified, so the museum walks there and nothing is cut.
       station:id=>{const index=vinciContent.findIndex(station=>station.id===id);if(index>=0)h.navigate(index)},
-      highlight:()=>{},
+      highlight:openFromPlan,
       returnFocus:focusTheBar,adopt:()=>planAdopt})
     sources=createVinciSourcesWindow(h.labels,source,()=>{mode=1;paintDock()});dock=sources.element;drawer=sources.panels.station
     occluders=collectVinciLabelOccluders(scene)
@@ -459,6 +459,40 @@ export function createWing():VinciWingModule {
     // frame they shoot.
     if(!document.body.classList.contains('forge')&&!vinciWelcomeSeen()&&card===0)welcome?.open()
   }
+  /** AN EXHIBIT'S NAME IN BOTH LANGUAGES, from the module that owns its kind.
+   * Two kinds publish one language only, and there their own record is the
+   * title in both columns rather than a second one being invented. */
+  function exhibitTitleBi(pick:VinciPickEntry):VinciText|null {
+    if(pick.kind==='machine'){const slug=pick.id.slice('machine/'.length);return isMachineSlug(slug)?machineCatalog[slug].title:null}
+    if(pick.kind==='stud'){const stud=LINE_STUDS[vinciStudIndex(pick.id)];return stud?{en:stud.date_label_en,de:stud.date_label_de}:null}
+    if(pick.kind==='manuscript'){const codex=CODEX_ENTRIES.find(entry=>`codex/${entry.id}`===pick.id);return codex?{en:codex.en,de:codex.de}:null}
+    if(pick.kind==='place'||pick.workId===DEATHBED_WORK){const named=namedExhibit(pick);return named?{en:named.title,de:named.title}:null}
+    const found=(exhibits?.pictureSources()??[]).find(source=>source.work.id===pick.workId)
+    return found?{en:found.work.title_en,de:found.work.title_de}:null
+  }
+  /** THE WORKS THE PLAN OFFERS: the registry's own openable exhibits, each
+   * under the station it hangs in, in that wall's own order. */
+  function planHighlights():PlanHighlight[] {
+    const row:{order:number;entry:PlanHighlight}[]=[]
+    for(const pick of picks){
+      if(!pick.openable||!pick.station)continue
+      const title=exhibitTitleBi(pick)
+      if(!title)continue
+      row.push({order:pick.order,entry:{id:pick.id,station:pick.station,title,kind:pick.kind}})
+    }
+    return row.sort((a,b)=>a.order-b.order).map(item=>item.entry)
+  }
+  /** A WORK CHOSEN ON THE PLAN. The visitor is walked to the station the work
+   * hangs in and the work opens when that walk ends, so the plan uses the
+   * museum's own grammar and adds no cut of its own. */
+  function openFromPlan(id:string):void {
+    if(!hosts)return
+    const station=vinciApproachStation(id)??picks.find(pick=>pick.id===id)?.station
+    const index=station?vinciContent.findIndex(content=>content.id===station):-1
+    if(index<0)return
+    pendingExhibit=`walk:${id}`
+    if(index!==card)hosts.navigate(index)
+  }
   /** THE WING AS A PLAN, from the geometry the site and the collection have
    * already declared: the pavilion's three rooms, the court with its parapet,
    * the grave's floor, the field the dates are cut into, the wall that is not
@@ -499,7 +533,7 @@ export function createWing():VinciWingModule {
         // carries the standstill instead of explaining it.
         sharesPoseWith:vinciContent.flatMap((other,at)=>at===index||eyes[at]!.east!==here.east||eyes[at]!.north!==here.north?[]:[other.id])}
     })
-    return {rooms,shapes,stations,highlights:[]}
+    return {rooms,shapes,stations,highlights:planHighlights()}
   }
   /** One sheet at a time: a close look stands down for the plan and the plan
    * takes the history entry it pushed, so Back is one press either way. */
@@ -1375,6 +1409,12 @@ export function createWing():VinciWingModule {
         if(arrived>=0){card=arrived;dock.scrollTop=0;paintHeader();paintDock();paintQuestion();standHere()}
       }
       if(nav.completed&&nav.completed!==exposureAt){exposureAt=nav.completed;aimPrint(nav.completed)}
+      // A WORK CHOSEN ON THE PLAN OPENS WHEN ITS WALK ENDS: the rail at rest,
+      // the card already the work's own station, and the registry read.
+      if(pendingExhibit&&picks.length&&!closeLook?.id&&!nav.active&&!nav.approaching&&!nav.exhibit){
+        const named=/^(?:open|walk):(.+)$/.exec(pendingExhibit)
+        if(named&&vinciApproachStation(named[1]!)===vinciContent[card]!.id){const id=pendingExhibit;pendingExhibit='';showView(id)}
+      }
       // The kicker follows the body: it says a view only while the eye stands
       // away from its station.
       if(closeLook?.id||exhibitAway!==Boolean(nav.exhibit??nav.approaching)){exhibitAway=Boolean(nav.exhibit??nav.approaching);paintExhibitTitle()}
