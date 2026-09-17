@@ -35,20 +35,22 @@ export interface VinciPickEntry {
 /** The smallest proxy an exhibit gets, so a small object keeps its own size
  * in the room and still takes a press. */
 const PROXY_FLOOR_M = .11
-const ANCHOR_OFF_M = .05
-/** A LABEL STANDS BESIDE A WORK, NOT ON ITS FACE. The mark takes the lower
- * corner of the object's own bounds, where a museum hangs its label. */
-const ANCHOR_CORNER = .84
+/** Clear of the frame's own profile, which stands 74 mm off the wall. */
+const ANCHOR_OFF_M = .1
+/** A LABEL STANDS UNDER A WORK, NEVER ON ITS FACE. The mark drops out of the
+ * work's own bounds onto the frame's lower band, where a museum screws its
+ * plaque, and the drop grows with the work so one rule serves a 21 cm panel
+ * and a 2.4 m canvas. */
+const ANCHOR_BAND_M = { least: .014, most: .05, share: .03 }
 const PLATES = 'vinci/collection-plates/'
 
 function proxy(object: Object3D): { centre: Vector3; radiusM: number; corner: Vector3 } {
   const box = new Box3().setFromObject(object)
   const sphere = box.getBoundingSphere(new Sphere())
   const size = box.getSize(new Vector3())
+  const band = Math.max(ANCHOR_BAND_M.least, Math.min(ANCHOR_BAND_M.most, size.y * ANCHOR_BAND_M.share))
   const corner = sphere.center.clone()
-  corner.y -= size.y / 2 * ANCHOR_CORNER
-  if (size.x >= size.z) corner.x += size.x / 2 * ANCHOR_CORNER
-  else corner.z += size.z / 2 * ANCHOR_CORNER
+  corner.y -= size.y / 2 + band
   return { centre: sphere.center.clone(), radiusM: Math.max(PROXY_FLOOR_M, sphere.radius), corner }
 }
 
