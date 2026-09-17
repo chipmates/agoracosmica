@@ -57,6 +57,11 @@ const {
     scene can be written in lux and still read as a picture. */
 const LUX_REF = 100
 
+/** THE LAYER A SILENT DOUBLE CASTS FROM. A shadow-only body writes neither
+    colour nor depth, so in the colour pass it is a draw call that changes no
+    pixel; on this layer only the key's cascades see it. */
+export const SHADOW_ONLY_LAYER = 1
+
 export interface KeyLightOptions {
   /** degrees, 0 = the light stands behind -Z, growing clockwise seen from
       above. Optional only because a probe can answer for it: a sky knows
@@ -226,6 +231,7 @@ export function createKeyLight(scene: Scene, tier: Tier, opts: KeyLightOptions):
       own(l)
     }
     l.castShadow = true
+    l.shadow.camera.layers.enable(SHADOW_ONLY_LAYER)
     l.shadow.mapSize.setScalar(tier.shadow.mapSize)
     l.shadow.bias = -0.0009
     l.shadow.normalBias = 0.03

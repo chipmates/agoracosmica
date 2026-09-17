@@ -2,6 +2,7 @@ import {
   BufferGeometry, DoubleSide, Float32BufferAttribute, Group, Matrix4, Mesh,
   MeshBasicNodeMaterial, Vector3,
 } from 'three/webgpu'
+import { SHADOW_ONLY_LAYER } from '../../stack/light'
 
 const SHADOW_TRIANGLE_LIMIT = 3000
 const ENTRY_SHADOW_TRIANGLE_LIMIT = 600
@@ -134,6 +135,7 @@ export function createShellShadowDouble(shell:Group,entry?:Group):Group {
   const mesh=new Mesh(geometry,material)
   mesh.name='vinci/shell-shadow/structure'
   mesh.castShadow=true;mesh.receiveShadow=false;mesh.frustumCulled=false;mesh.renderOrder=-1
+  mesh.layers.set(SHADOW_ONLY_LAYER)
   mesh.userData['labelOccluder']=false;mesh.userData['naLabelOccluder']=false
   mesh.raycast=()=>{}
 

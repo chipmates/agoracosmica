@@ -205,7 +205,7 @@
       "prompt": "Silent calm shadow double extracted from actual registered shell geometry, preserving cut apertures and main roof unions within 3000 triangles. No photographed surface. The complete 516-triangle A-LAYOUT entrance enclosure is copied at actual transforms into the existing calm caster, separately counted; vinci/entry-passage supplies geometry and provenance. All actual foundation structural triangles are appended unchanged to the existing caster; a separate 1000-triangle growth guard preserves the original 3000 shell and 600 entry limits.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "e1f86239911b03468b95b99bb4fda3a105688b28844b5f3522acdc3f25bfd440",
+      "sha256": "fba4adb2c088166f7b557e3e6a8eb42bdbea8f8bf70d275bf2d1a1f168594f70",
       "note": "recipe_file=src/wings/vinci/shadow-shell.ts; geometry_dependency=vinci/entry-passage; geometry_dependency=vinci/foundation-plinth"
     },
     {
@@ -218,7 +218,7 @@
       "prompt": "Silent shadow body welded from the wing's fixed casters at mount and re-welded when one of them appears, hides or moves: the shell's existing calm double, the terrain, the planting, the gate and entry passages, the court and road dressing and the modern insertion with its rooms and access. Every source triangle is copied once at its own world transform and the source stops casting, so the two cascades draw one body instead of one per group. No silhouette, material, light, tier or geometry changes; instanced, skinned, morphing and non-opaque casters are left to cast for themselves.",
       "model": "Deterministic TypeScript geometry weld",
       "date": "2026-09-12",
-      "sha256": "bb529c268e1ce2a2b4b00f284ff59f4d0f0c4f368ef16a3c961c4e0bfade3c0d",
+      "sha256": "011beebe9cc0c1fe43b709dca001985d4877c3a1aae66699da8deec2dbb89b23",
       "note": "recipe_file=src/wings/vinci/shadow-body.ts; geometry_dependency=vinci/shell-shadow; shadow_only=true; colorWrite=false"
     },
     {

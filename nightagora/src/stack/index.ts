@@ -40,6 +40,7 @@ import { pickTier, readAdapter, TIERS, tierFromQuery, type Tier, type TierName }
 export type { Tier, TierName } from './tier'
 export type { Grade, GradeName } from './grade'
 export type { KeyLight } from './light'
+export { SHADOW_ONLY_LAYER } from './light'
 export type { MaterialSet, SampledMaps } from './materials'
 export type { ModelAsset, ModelLibrary, ModelPlacement } from './models'
 export type { SkyProbe } from './hdri'

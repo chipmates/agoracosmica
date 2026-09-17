@@ -2,6 +2,7 @@ import {
   BufferGeometry, DoubleSide, Float32BufferAttribute, Group, Matrix4, Mesh,
   MeshBasicNodeMaterial, Vector3, type Object3D,
 } from 'three/webgpu'
+import { SHADOW_ONLY_LAYER } from '../../stack/light'
 
 /** THE PLACE CASTS AS ONE BODY.
  *
@@ -66,6 +67,7 @@ export function createWingShadowBody(scene: Object3D): WingShadowBody {
   const mesh = new Mesh(new BufferGeometry(), material)
   mesh.name = 'vinci/shadow-body/static'
   mesh.castShadow = true; mesh.receiveShadow = false; mesh.frustumCulled = false; mesh.renderOrder = -1
+  mesh.layers.set(SHADOW_ONLY_LAYER)
   mesh.userData = { manifestId: shadowBodyProvenance.manifestId, asset: shadowBodyProvenance.manifestId,
     assetClass: 'GENERATED', certainty: 'reconstructed', labelOccluder: false, naLabelOccluder: false }
   mesh.raycast = () => {}
