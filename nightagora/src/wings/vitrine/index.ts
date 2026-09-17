@@ -11,6 +11,7 @@
  * every control are the caller's, already in the page's language.
  */
 import { setRegister } from '../frame'
+import { noteOpened } from '../visit'
 import css from './vitrine.css?inline'
 import type { VitrineExhibit, VitrinePayloadHost, VitrineRect, VitrineSurface } from './types'
 
@@ -300,6 +301,10 @@ export function createVitrine(options: {
       // The eye walks where it can walk. On calm, on the phone and under
       // reduced motion it stands still and the window opens where it stands.
       onOpen(next.id, advancing ? previous : null)
+      // THE ONE DOOR OF THE NIGHT. Every close look of every kind opens here,
+      // so the visitor's own record is written by one line and holds nothing
+      // a visitor did not open.
+      noteOpened(next.id)
       next.payload?.mount(payloadHost())
       layout()
       const row = [...controls.children]

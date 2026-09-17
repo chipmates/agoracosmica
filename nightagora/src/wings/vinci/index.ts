@@ -8,6 +8,7 @@ import { Box3, Color, FogExp2, DirectionalLight, Mesh, Raycaster, Vector2, Vecto
 import { float, mix, vec3, vec4, dot as nodeDot, positionWorld, cameraPosition, smoothstep, mx_fractal_noise_float } from 'three/tsl'
 import { SkyMesh } from 'three/addons/objects/SkyMesh.js'
 import { setRegister, type WingHosts, type WingModule } from '../frame'
+import { beginVisit, type Visit } from '../visit'
 import { constructionRecords, evidenceWords } from './evidence-copy'
 import { lang, WING_TEXT } from '../content'
 import { createVinciSourcesWindow, type VinciSourcesTab, type VinciExhibitSources } from './sources'
@@ -151,6 +152,8 @@ export function createWing():VinciWingModule {
   let header:HTMLElement,dock:HTMLDialogElement,drawer:HTMLElement,record:HTMLElement,source:HTMLButtonElement,sky:SkyMesh
   let sources:ReturnType<typeof createVinciSourcesWindow>
   let welcome:ReturnType<typeof createVinciWelcome>|undefined
+  /** THE NIGHT ON THE DEVICE: ids only, opened by the vitrine's own door. */
+  let visit:Visit|undefined
   let exhibitSources:VinciExhibitSources|null=null
   let labelHostHidden:string|null=null
   // THE WAIT AT THE STREET SHOWS ITSELF. The heading is painted and the frame
@@ -209,6 +212,7 @@ export function createWing():VinciWingModule {
   /** The heading, the hairline and nothing else: cheap enough to paint in the
    * frame the visitor arrives in. */
   function mount(h:WingHosts) {
+    visit=beginVisit('vinci')
     // Vinci's interactive source cards need an accessible host only while mounted.
     labelHostHidden=h.labels.getAttribute('aria-hidden');h.labels.removeAttribute('aria-hidden')
     hosts=h;h.stage.textContent='';h.labels.textContent='';h.stage.parentElement!.dataset['wing']='vinci';const style=make('style','');style.textContent=wingCss;h.stage.append(style)
@@ -394,7 +398,7 @@ export function createWing():VinciWingModule {
     plates=stack.materials.pending()
     card=station
     const s=vinciContent[card]!
-    aimPrint(s.id);exposureAt=s.id;rail.set(s.id,stationPose(s.id,narrow()),true,narrow());paintHeader();paintDock()
+    aimPrint(s.id);exposureAt=s.id;rail.set(s.id,stationPose(s.id,narrow()),true,narrow());paintHeader();paintDock();standHere()
     if(pendingView){const id=pendingView;pendingView='';showView(id)}
     announceBuilt()
   }
@@ -431,6 +435,8 @@ export function createWing():VinciWingModule {
     // frame they shoot.
     if(!document.body.classList.contains('forge')&&!vinciWelcomeSeen()&&card===0)welcome?.open()
   }
+  /** The station the visitor is standing in, written to the night's record. */
+  function standHere():void { visit?.stand(vinciContent[card]!.id) }
   /** The bar carries the walk, so the hand lands there when a sheet closes. */
   function focusTheBar():void {
     const group=hosts?.stage.parentElement?.querySelector('.wing-rail-group')
@@ -1245,7 +1251,7 @@ export function createWing():VinciWingModule {
       // On a walk the card changes when the visitor arrives, not when the
       // rail mark is pressed: a title that names the next room over the room
       // you are still standing in is a lie the frame tells.
-      if(cut||rail.navigation.completed===s.id){card=index;dock.scrollTop=0;aimPrint(s.id);exposureAt=s.id;paintHeader();paintDock()}
+      if(cut||rail.navigation.completed===s.id){card=index;dock.scrollTop=0;aimPrint(s.id);exposureAt=s.id;paintHeader();paintDock();standHere()}
       else if(closeSources)paintDock()
     },
     async ready(report){
@@ -1289,7 +1295,7 @@ export function createWing():VinciWingModule {
       const here=nav.active&&nav.legWalked>=CARD_HANDOVER?nav.active:nav.completed
       if(here&&here!==vinciContent[card]!.id&&!activeView){
         const arrived=vinciContent.findIndex(s=>s.id===here)
-        if(arrived>=0){card=arrived;dock.scrollTop=0;paintHeader();paintDock();paintQuestion()}
+        if(arrived>=0){card=arrived;dock.scrollTop=0;paintHeader();paintDock();paintQuestion();standHere()}
       }
       if(nav.completed&&nav.completed!==exposureAt){exposureAt=nav.completed;aimPrint(nav.completed)}
       // The kicker follows the body: it says a view only while the eye stands
@@ -1304,6 +1310,6 @@ export function createWing():VinciWingModule {
       // ONE EXHIBIT AT A TIME: while one is open the other marks stand down.
       dots?.setLimit(closeLook?.id?0:DOTS_PER_TIER[hosts.world.stack.tierName()]??6)
       dots?.update(reading)},
-    stop(){closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;sign=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
+    stop(){visit?.close();visit=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;sign=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
   }
 }
