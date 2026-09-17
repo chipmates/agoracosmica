@@ -163,7 +163,13 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
           isCeiling.select(colourOf('ceiling'), colourOf('paving'))))))
   const figure = isFloor.select(slabTone.mul(.155).add(macro.mul(.085)).add(middle.mul(.05)).add(grain.mul(.06)),
     isPlaster.select(plasterDrift.mul(.125).add(trowel.mul(.105).mul(resolved(.2))).add(middle.mul(.04)).add(grain.mul(.05)),
-      isDark.select(macro.mul(.145).add(middle.mul(.09)).add(grain.mul(.06)),
+      // A FEATURE BELONGS TO THE PART, NOT TO THE ROOM. The dark stone is a
+      // 0.10 m plinth slab and a 0.16 m base band, and the room's 3.2 m drift
+      // is one sample over either, which is why they read as flat paint. They
+      // take the ladder that fits them, off the reads this material already
+      // makes: a stone-to-stone drift that no footprint can filter away, and
+      // a 0.2 m block figure for the faces a visitor stands in front of.
+      isDark.select(plasterDrift.mul(.20).add(trowel.mul(.26).mul(resolved(.2))).add(middle.mul(.16)).add(grain.mul(.09)),
         isSteel.select(brushed.mul(.06).add(middle.mul(.03)),
           isCeiling.select(plasterDrift.mul(.11).add(trowel.mul(.105).mul(resolved(.2))).add(middle.mul(.05)).add(grain.mul(.04)), macro.mul(.11).add(middle.mul(.06)).add(grain.mul(.06)))))))
   const cut = isFloor.select(slabJoint.mul(.34),
@@ -176,7 +182,11 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
   m.metalnessNode = isSteel.select(float(.72), float(.02))
   const height = isFloor.select(slabJoint.mul(-.0022).add(grain.mul(.0004)),
     isPlaster.select(trowel.mul(.0006).add(boardV.mul(-.0012)).add(grain.mul(.0003)),
-      isCeiling.select(bayNorth.max(bayEast).mul(-.004), macro.mul(.0009).add(grain.mul(.0004))))).toVar()
+      isCeiling.select(bayNorth.max(bayEast).mul(-.004),
+        // A sawn slab keeps a shallow relief of its own; at the room's drift
+        // it had none, so nothing on it ever caught a raking light.
+        isDark.select(trowel.mul(.005).mul(resolved(.2)).add(middle.mul(.0015)).add(grain.mul(.0005)),
+          macro.mul(.0009).add(grain.mul(.0004)))))).toVar()
   const viewNormal = n.transformDirection(cameraViewMatrix), sx = positionView.dFdx(), sy = positionView.dFdy()
   const rx = sy.cross(viewNormal), ry = viewNormal.cross(sx), det = sx.dot(rx)
   const gradient = rx.mul(height.dFdx()).add(ry.mul(height.dFdy())).mul(det.sign()).div(det.abs().max(1e-10)).toVar()
