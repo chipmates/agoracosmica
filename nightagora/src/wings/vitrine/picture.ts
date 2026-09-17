@@ -21,8 +21,11 @@ export function createPlatePayload(options: {
   /** Or the pixels the room already decoded: drawn at the size the frame
    * shows them, so no second full-size copy is decoded. */
   pixels?: () => CanvasImageSource & { width: number; height: number } | null
-  /** The work's own name, the viewport's accessible name. */
+  /** The work's own name, the viewport's accessible name where nobody has
+   * written what is on the plate. */
   title: string
+  /** What is on the plate, in words, for a visitor who cannot see it. */
+  description?: string | null
   /** The source's own width over its height. */
   aspect: number
   window: PlateWindow | null
@@ -87,7 +90,7 @@ export function createPlatePayload(options: {
       }
       frame.append(image)
       next.element.append(frame)
-      next.describe(options.title)
+      next.describe(options.description ?? options.title)
       next.surface('room')
       settled = 0; held = false
     },

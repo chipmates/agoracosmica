@@ -63,6 +63,7 @@ import { CERTAINTY as LINE_CERTAINTY } from './line'
 import { GRAVE_DEATHBED } from './grave/placement'
 import { loadManifest } from '../../manifest'
 import { createPlatePayload } from '../vitrine/picture'
+import { createVinciWholePlate, isWholePlate, vinciPlateDescription } from './collection/deep-plate'
 import type { VitrineRect } from '../vitrine'
 import { machineBuildOf } from './machines'
 import { createVinciHangStrip, vinciSheetTitle, type VinciStripEntry } from './collection/strip'
@@ -348,6 +349,9 @@ export function createWing():VinciWingModule {
         // ONE EXHIBIT AT A TIME: the room's marks stand down before the
         // stage may be held, so none is left standing on a still frame.
         dots?.setOpen(id);dots?.setLimit(0);paintExhibitTitle();paintHeaderVisibility();paintStrip()
+        // THE WHOLE PLATE IS THE SAME PLACE: the visitor already stands where
+        // the work hangs, so the eye neither walks out to it nor back from it.
+        if(isWholePlate(id)||isWholePlate(from))return false
         // A LEG LEAVES FROM ITS OWN STATION ONLY: a hall machine opened from the
         // hall's other station opens where the visitor stands.
         const pose=vinciApproachStation(id)===vinciContent[card]!.id?vinciApproachPose(id,narrow()):undefined
@@ -1020,12 +1024,21 @@ export function createWing():VinciWingModule {
     const label=createPolicyWorkLabel(work,entries,false,[],narrow())
     for(const column of [...label.querySelectorAll<HTMLElement>('.picture-label-language')])if(column.lang!==lang())column.remove()
     const controls:HTMLElement[]=[]
+    const workRectNow=():VitrineRect|null=>{const nav=rail.navigation;return nav.exhibit===id&&!nav.active?workRect(entry.object):null}
     if(plate){
-      // E4 BUILDS THE PLATE VIEW. Until it does, the whole plate is the
-      // admitted file itself.
-      const whole=make('a','vitrine-control',text(VINCI_VITRINE_WORDS.wholePlate))
-      whole.href=ASSET_BASE+validatePaintingRecord(plate.plate,'painting-plate').path
-      whole.target='_blank';whole.rel='noopener'
+      // THE WHOLE PLATE stands in the same window, one press on from the
+      // close look: the source itself, as deeply as the store holds it. The
+      // rectangle is taken here, where the room's own frame still shows the
+      // work, so the deep view opens on it without a jump.
+      const whole=control(VINCI_VITRINE_WORDS.wholePlate,()=>{
+        if(!closeLook||!plate)return
+        const seat=workRectNow()
+        closeLook.open(createVinciWholePlate({id,title,line:vinciLine(id),work,entries,plate,...vinciLimits(id),
+          controls:[control(VINCI_VITRINE_WORDS.provenance,()=>showExhibitRecord(id,work,entries)),
+            control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())],
+          back:()=>openExhibit(id,null),from:()=>seat,
+          tier:()=>hosts?.world.stack.tierName()??'standard'}),whole,'advance')
+      })
       controls.push(whole)
     }
     controls.push(control(VINCI_VITRINE_WORDS.provenance,()=>showExhibitRecord(id,work,entries)),shut)
@@ -1035,11 +1048,11 @@ export function createWing():VinciWingModule {
     const registration=plate?pictureDisplayWindow(plate.plate):null
     const cut=registration?pictureDisplayUV(registration):null
     const payload=plate?createPlatePayload({src:ASSET_BASE+validatePaintingRecord(plate.preview,'painting-preview').path,title,
-      aspect:plate.pixels.width/plate.pixels.height,window:cut,
+      description:vinciPlateDescription(id),aspect:plate.pixels.width/plate.pixels.height,window:cut,
       standing:()=>{const nav=rail.navigation;return !nav.active&&!nav.approaching}}):null
     openMode=how
     closeLook.open({id,title,line:vinciLine(id),card:[label],payload,controls,walk,...vinciLimits(id),
-      work:()=>{const nav=rail.navigation;return nav.exhibit===id&&!nav.active?workRect(entry.object):null}},from,how_)
+      work:workRectNow},from,how_)
     openMode='auto'
   }
   /** The door asks about the place the visitor is standing in, so the
