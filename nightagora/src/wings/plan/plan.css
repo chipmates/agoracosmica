@@ -80,7 +80,7 @@
 /* THE RECAP at the exit of a wing: it stands under the station's own card,
    so it takes the pointer the label layer does not and scrolls inside itself
    rather than growing past the frame. */
-.wing-recap {max-width:420px;max-height:min(44dvh,400px);margin:14px 0 0;padding:14px 0 0;border-top:1px solid #a9977344;
+.wing-recap {max-width:420px;max-height:min(36dvh,320px);margin:14px 0 0;padding:14px 0 0;border-top:1px solid #a9977344;
   overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;pointer-events:auto;}
 .wing-recap-through {margin:0 0 10px;font:400 17px/1.4 var(--serif);color:#fff5e3;text-wrap:pretty;}
 .wing-recap-heading {margin:0 0 4px;font:10px var(--sans);letter-spacing:.18em;text-transform:uppercase;color:#d2a557;}
@@ -99,6 +99,9 @@
 .wing-recap-door {flex:1 1 0;min-width:128px;min-height:44px;padding:10px 12px;background:transparent;border:1px solid #a9977366;
   color:#e6d6b8;font:12px/1.2 var(--sans);text-align:center;cursor:pointer;}
 .wing-recap-title:focus-visible,.wing-recap-door:focus-visible,.wing-recap-forget:focus-visible {outline:1px solid #edcc8c;outline-offset:2px;}
+/* A CARD ONLY PEEKED SHOWS NO RECAP. Peeked, the card is the room's name and
+   one line, and a list under it would push its own head off a 390 px stage. */
+[data-sheet='peek'] .wing-recap {display:none;}
 @media(max-aspect-ratio:9/10) {
   /* The station card is already a sheet that scrolls inside itself here. */
   .wing-recap {max-width:none;max-height:none;overflow:visible;margin-top:10px;padding-top:10px;}
