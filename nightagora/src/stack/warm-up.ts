@@ -47,6 +47,11 @@ export interface WarmWalk {
     away that a visitor's frame would keep, small enough to cost nothing. */
 const WARM_WIDTH = 320
 
+/** how long the sweep waits for the bodies the stack is holding for it. A
+    build that never settles must not keep a visitor at the field: past this
+    the sweep draws what stands, which is what the walk would have met. */
+const HOLD_CAP_MS = 30000
+
 export function warmWalk(
   stack: Stack,
   scene: Scene,
@@ -69,6 +74,8 @@ export function warmWalk(
   // stations, and the field's line is measured against that
   const total = poses.length + 1
   const culled: Object3D[] = []
+  const hidden: Object3D[] = []
+  const began = performance.now()
   let at = -1
   let finish = (): void => {}
   const done = new Promise<void>((resolve) => {
@@ -87,6 +94,15 @@ export function warmWalk(
      pipelines come with it. */
   function sweep(on: boolean): void {
     if (on) {
+      /* A BODY THE WALK SHOWS BY DISTANCE is hidden wherever the warm up's
+         eye stands, so a wing marks it `naWarm` and the sweep draws it too:
+         its pipeline is keyed on what it is, not on where it is seen from. */
+      scene.traverse((object) => {
+        if (object.userData['naWarm'] === true && !object.visible) {
+          object.visible = true
+          hidden.push(object)
+        }
+      })
       scene.traverse((object) => {
         if (!object.frustumCulled) return
         object.frustumCulled = false
@@ -96,6 +112,8 @@ export function warmWalk(
     }
     for (const object of culled) object.frustumCulled = true
     culled.length = 0
+    for (const object of hidden) object.visible = false
+    hidden.length = 0
   }
 
   function restore(): void {
@@ -118,6 +136,8 @@ export function warmWalk(
     },
     frame() {
       if (at >= total) return false
+      // the last pose stands while the stack still holds bodies for the sweep
+      if (at === poses.length - 1 && stack.holding() > 0 && performance.now() - began < HOLD_CAP_MS) return true
       // the pose placed last frame has been drawn by now, so the count the
       // loading field shows is of frames PAID FOR, not of frames asked for
       if (at >= 0) report?.(at + 1, total)

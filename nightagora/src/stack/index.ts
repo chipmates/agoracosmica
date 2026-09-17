@@ -93,6 +93,12 @@ export interface Stack {
   textures: () => Array<{ owner: string; MB: number }>
   /** the probe's own instrument: draws by body and pass, first uses by kind */
   ledger: Ledger
+  /** Work the entry's warm up waits for before its sweep: a body a walk can
+      show that is still being built when the sweep draws is a body the walk
+      compiles in the middle of a stride. */
+  hold: (work: Promise<unknown>) => void
+  /** how many held works are still running */
+  holding: () => number
   tier: (name: TierName) => void
   tierName: () => TierName
   tierConfig: () => Tier
@@ -141,6 +147,7 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
   const lights: KeyLight[] = []
   const textureOwners = new Map<() => number, string>()
   const ledger = createLedger(renderer)
+  const held = new Set<Promise<unknown>>()
   // a probe run reads the residency from the first allocation on
   if (new URLSearchParams(location.search).has('probe')) ledger.install()
   /* THE RIG READS THE LEDGER HERE. It is a read and a counter; nothing is
@@ -256,6 +263,12 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
     },
     textures,
     ledger,
+    hold(work) {
+      held.add(work)
+      const release = (): void => { held.delete(work) }
+      work.then(release, release)
+    },
+    holding: () => held.size,
 
     cost() {
       const size = renderer.getDrawingBufferSize(new Vector2())
