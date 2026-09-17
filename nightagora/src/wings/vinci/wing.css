@@ -245,14 +245,23 @@
   min-height:44px;min-width:44px;padding:10px 12px;background:transparent;border:1px solid #a9977366;color:#e6d6b8;
   font:12px var(--sans);text-align:center;text-decoration:none;cursor:pointer;}
 .vinci-exhibit-control:focus-visible {outline:1px solid #edcc8c;outline-offset:2px;}
+/* The two controls that walk the wall carry a mark and not a word: the work
+   each one opens is what names it. They stand at the card's two ends. */
+.vinci-exhibit-walk {display:flex;justify-content:space-between;gap:8px;margin-top:8px;}
+.vinci-exhibit-step {flex:0 0 44px;min-width:44px;padding:10px 0;font:17px/1 var(--serif);}
+.vinci-exhibit-step[disabled] {opacity:.38;cursor:default;}
 .vinci-exhibit-question {margin:14px 0 0;font:13px/1.45 var(--serif);color:#c6bfb0;}
 @media(max-aspect-ratio:9/10) {
-  .vinci-exhibit-card {left:8px;right:8px;top:auto;bottom:calc(var(--wing-rail-bottom) + 46px);width:auto;padding:14px;
-    max-height:min(228px,calc(100dvh - var(--wing-rail-bottom) - 120px));}
+  /* The sheet keeps its own air above the station bar, and its whole height
+     is what the viewing pose stands the work above. */
+  .vinci-exhibit-card {left:8px;right:8px;top:auto;bottom:calc(var(--wing-rail-bottom) + 60px);width:auto;padding:12px;
+    max-height:min(224px,calc(100dvh - var(--wing-rail-bottom) - 120px));}
   /* One row of controls, and the door's own question stands under the bar at
      this width: the card would only print it twice. */
-  .vinci-exhibit-controls {gap:6px;margin-top:12px;padding-top:11px;}
+  .vinci-exhibit-controls {gap:6px;margin-top:10px;padding-top:9px;flex-wrap:nowrap;}
   .vinci-exhibit-control {flex:1 1 0;min-width:0;}
+  .vinci-exhibit-walk {gap:6px;margin-top:6px;}
+  .vinci-exhibit-step {flex:1 1 0;min-width:44px;padding:10px 0;}
   .vinci-exhibit-question {display:none;}
   .vinci-exhibit-card .picture-first,.vinci-exhibit-card .picture-first-de {font-size:16px;margin-bottom:6px;}
   .vinci-exhibit-card p {font-size:13px;line-height:1.42;margin:6px 0;}

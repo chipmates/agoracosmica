@@ -12,6 +12,9 @@
 import { Box3, Mesh, Raycaster, Sphere, Vector3, type Object3D } from 'three/webgpu'
 import type { VinciStationId } from '../content'
 import { vinciApproachPose, vinciPlateExhibitId, type VinciExhibitKind } from './approaches'
+import { BODY_WALL } from './body-wall'
+import { hangPlacements } from './hang'
+import { STANDS } from './stands'
 
 export interface VinciPickEntry {
   id: string
@@ -30,6 +33,9 @@ export interface VinciPickEntry {
   openable: boolean
   workId: string | null
   face: 'front' | 'reverse' | null
+  /** Where this exhibit stands in its own station's hang: the wall's own
+   * order, so a row of them reads as the wall reads. */
+  order: number
 }
 
 /** The smallest proxy an exhibit gets, so a small object keeps its own size
@@ -43,6 +49,32 @@ const ANCHOR_OFF_M = .1
  * and a 2.4 m canvas. */
 const ANCHOR_BAND_M = { least: .014, most: .05, share: .03 }
 const PLATES = 'vinci/collection-plates/'
+/** The mural hangs on the display wall in the court, where the four outdoor
+ * machines stand: it takes the first place in that station's own order. */
+const MURAL_ORDER = 0, MACHINE_OFFSET = 1
+
+/** WHERE AN EXHIBIT IS READ FROM, and in what order its station hangs it.
+ * Both are placements the collection already made: the hang's own list, the
+ * body wall's courses, the machines' placement table. A kind whose station
+ * this window cannot name yet is read and left standing where it is. */
+function placedAt(kind: VinciExhibitKind, id: string, workId: string | null, sheet: string | null, slug?: string)
+  : { station: VinciStationId | null; order: number } {
+  if (kind === 'mural') return { station: 'supper-wall', order: MURAL_ORDER }
+  if (kind === 'picture') {
+    const at = hangPlacements().findIndex(field => vinciPlateExhibitId(field.id, field.face) === id)
+    return { station: at < 0 ? null : 'picture-room', order: Math.max(0, at) }
+  }
+  if (kind === 'sheet') {
+    const at = BODY_WALL.findIndex(entry => entry.id === sheet)
+    return { station: at < 0 ? null : 'body', order: Math.max(0, at) }
+  }
+  if (kind === 'machine' && slug !== undefined) {
+    const table = Object.keys(STANDS), at = table.indexOf(slug)
+    const stand = STANDS[slug as keyof typeof STANDS]
+    return { station: stand?.ground === 'court' ? 'supper-wall' : null, order: MACHINE_OFFSET + Math.max(0, at) }
+  }
+  return { station: null, order: 0 }
+}
 
 function proxy(object: Object3D): { centre: Vector3; radiusM: number; corner: Vector3 } {
   const box = new Box3().setFromObject(object)
@@ -75,7 +107,8 @@ export function readVinciExhibits(root: Object3D): VinciPickEntry[] {
       const openable = vinciApproachPose(id, false) !== undefined && vinciApproachPose(id, true) !== undefined
       const kind: VinciExhibitKind = sheet ? 'sheet' : workId === 'last-supper' ? 'mural' : 'picture'
       const { centre, radiusM, corner } = proxy(object)
-      entries.push({ id, kind, station: openable ? 'picture-room' : null, object, centre, radiusM,
+      const placed = placedAt(kind, id, workId, sheet)
+      entries.push({ id, kind, station: placed.station, order: placed.order, object, centre, radiusM,
         anchor: corner.addScaledVector(faceNormal(object), ANCHOR_OFF_M), openable, workId, face })
       return
     }
@@ -95,11 +128,11 @@ export function readVinciExhibits(root: Object3D): VinciPickEntry[] {
     // is assigned with their viewing pose, not guessed here.
     if (stud !== null) {
       const { centre, radiusM } = proxy(object)
-      entries.push({ id: `stud/${stud}`, kind: 'stud', station: null, object, centre, radiusM,
+      entries.push({ id: `stud/${stud}`, kind: 'stud', station: null, order: 0, object, centre, radiusM,
         anchor: centre.clone(), openable: false, workId: null, face: null })
     } else if (typeof page === 'number' || typeof page === 'string') {
       const { centre, radiusM } = proxy(object)
-      entries.push({ id: `leaf/${page}`, kind: 'leaf', station: null, object, centre, radiusM,
+      entries.push({ id: `leaf/${page}`, kind: 'leaf', station: null, order: 0, object, centre, radiusM,
         anchor: centre.clone(), openable: false, workId: null, face: null })
     }
   })
@@ -107,7 +140,8 @@ export function readVinciExhibits(root: Object3D): VinciPickEntry[] {
     const box = new Box3()
     for (const part of parts) box.union(new Box3().setFromObject(part))
     const sphere = box.getBoundingSphere(new Sphere())
-    entries.push({ id: `machine/${slug}`, kind: 'machine', station: null,
+    const placed = placedAt('machine', `machine/${slug}`, null, null, slug)
+    entries.push({ id: `machine/${slug}`, kind: 'machine', station: placed.station, order: placed.order,
       object: parts[0]!.parent ?? parts[0]!, centre: sphere.center.clone(),
       radiusM: Math.max(PROXY_FLOOR_M, sphere.radius), anchor: sphere.center.clone(),
       openable: false, workId: null, face: null })

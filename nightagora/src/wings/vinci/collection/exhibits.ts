@@ -22,6 +22,7 @@ import { collectionExhibitMaterials, collectionInteriorMaterial, collectionProce
 import { COURT, FLOOR, GRAVE_ORIGIN, LINE_ORIGIN } from './layout'
 import { createCollectionStandSolids, standLevel, STANDS, type StandGround } from './stands'
 import { mountCollectionPlates, type CollectionPictureSource } from './plates'
+import type { BodySheetSource } from './body-wall'
 
 /** Which ground each machine is built with, and when. The court's own
  * exhibit is built at once because it is seen from every station on this
@@ -40,6 +41,8 @@ export interface CollectionExhibits {
   ready: Promise<void>
   pending(): number
   pictureSources(): readonly CollectionPictureSource[]
+  /** The body wall's own records, for the row that names every sheet. */
+  sheetSources(): readonly BodySheetSource[]
   pictureErrors(): readonly string[]
   /** The room's own sources, separately from the whole ground: the close
    * look's registry is a read over these meshes. */
@@ -267,6 +270,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
     ready: Promise.all([court.then(() => courtGround).then(() => hall ?? Promise.resolve()).then(() => table ?? Promise.resolve()), pictures.ready]).then(() => undefined),
     pending: () => [...warmed].filter(ground => !machines.some(machine => machine.ground === ground)).length + pictures.pending(),
     pictureSources: pictures.sources,
+    sheetSources: pictures.sheets,
     pictureErrors: pictures.errors,
     picturesReady: pictures.ready,
     warm: warmHall,

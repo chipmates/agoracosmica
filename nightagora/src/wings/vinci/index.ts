@@ -24,6 +24,7 @@ import { createPictureRecord, createPolicyWorkLabel, policyLabelText, PICTURE_CE
 import { MAIN_HANG, REGISTER, type PictureRights } from './pictures/register'
 import { MACHINE_SLUGS, machineCatalog } from './machines/catalog'
 import { validatePaintingRecord } from './pictures/policy'
+import { validateSheetRecord } from './pictures/sheet-record'
 import { ASSET_BASE } from '../../stack/materials'
 import { createCollectionReceiverPlaneShadowFilter } from './receiver-plane-shadow'
 import { createCollectionAccess, collectionAccessPoint, collectionAccessProvenance } from './collection-access'
@@ -45,6 +46,7 @@ import { collectVinciLabelOccluders, createVinciExhibitDots, createVinciLabelAnc
 import { pickVinciExhibit, readVinciExhibits, type VinciPickEntry } from './collection/pick'
 import { vinciApproachPose } from './collection/approaches'
 import { createVinciCloseLook } from './collection/close-look'
+import { vinciSheetTitle, type VinciStripEntry } from './collection/strip'
 import { pathSpecifications } from './paths'
 import { roadGradeProvenance } from './road-grade'
 import { apronProvenance } from './apron'
@@ -269,13 +271,17 @@ export function createWing():VinciWingModule {
     dots=createVinciExhibitDots({host:h.labels,camera,occluders,limit:DOTS_PER_TIER[stack.tierName()]??6,controls:'vinci-exhibit-card',
       onOpen:(id,dot)=>openExhibit(id,dot)})
     closeLook=createVinciCloseLook({host:h.labels,narrow,
-      onOpen:id=>{
+      onOpen:(id,from)=>{
         dots?.setOpen(id);dots?.invalidate();paintExhibitTitle();paintHeaderVisibility()
         const pose=vinciApproachPose(id,narrow())
         // ON CALM AND UNDER REDUCED MOTION THE EYE DOES NOT MOVE: the card is
         // the whole close look. Where it may move, the eye walks; a rig
         // composing a still cuts to the same certified eye.
-        if(!pose||!exhibitWalks())return false
+        if(!pose)return false
+        // WALKING ON IS ONE MOTION: the certified return and the certified
+        // approach out, with nothing standing still at the station.
+        if(from!==null)return exhibitWalks(true)?rail.chain(id,pose,narrow()):rail.returnToStation()
+        if(!exhibitWalks())return false
         return rail.approach(id,pose,narrow(),openMode==='walk'?false:openMode==='cut'||cutToStation())
       },
       onClose:()=>{
@@ -312,8 +318,12 @@ export function createWing():VinciWingModule {
       if(target.closest('input,textarea,select,[contenteditable="true"]'))return
       // THE READER OWNS ITS OWN KEYS. Nothing typed inside an open exhibit
       // walks the rail or cycles the label layer, and Escape is one step back.
-      if(closeLook?.id&&(e.key==='Escape'||closeLook.owns(target))){
-        if(e.key==='Escape'){e.preventDefault();closeLook.close()}
+      if(closeLook?.id&&(e.key==='Escape'||e.key.startsWith('Arrow')||closeLook.owns(target))){
+        if(e.key==='Escape'){e.preventDefault();closeLook.close();return}
+        // THE ARROWS WALK THE WALL while an exhibit stands: the station rail
+        // is what the visitor left to come here.
+        if(e.key==='ArrowRight'||e.key==='ArrowDown'){e.preventDefault();stepExhibit(1)}
+        if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();stepExhibit(-1)}
         return
       }
       if(e.key==='Escape'){e.preventDefault();mode=1;rail.look(0,0);paintDock();source.focus({preventScroll:true});return}
@@ -455,12 +465,14 @@ export function createWing():VinciWingModule {
   /** WHEN OPENING IS A MOVE OF THE BODY. On calm the stream raises no full
    * plate and the card is the whole close look; under reduced motion a view
    * changes without a walk; at an inspection eye there is no station to leave. */
-  function exhibitWalks():boolean {
+  function exhibitWalks(chained=false):boolean {
     if(!hosts||activeView||!railReady())return false
     if(hosts.world.stack.tierName()==='calm')return false
     if(matchMedia('(prefers-reduced-motion: reduce)').matches)return false
     const nav=rail.navigation
-    return !nav.active&&!nav.exhibit
+    // A chain leaves FROM a standing viewing eye, which is the one state an
+    // approach may not begin in.
+    return chained?Boolean(nav.exhibit)&&!nav.active:!nav.active&&!nav.exhibit
   }
   /** ONE RAY ON A PRESS, never on a hover. */
   function pressExhibit(x:number,y:number):void {
@@ -482,7 +494,67 @@ export function createWing():VinciWingModule {
       renderStation(host){host.append(record)}}
     sources.resetScroll();sources.select('station');mode=2;paintDock()
   }
-  /** THE CARD IS THE PICTURE MODULE'S OWN LABEL, mounted as it is, with two
+  /** THE STANDING STATION'S OWN ROW: every exhibit it holds, in the order its
+   * wall hangs them, with the name and the certainty the module that owns
+   * each kind gives it. The strip paints this and the close look walks it. */
+  function stationExhibits():VinciStripEntry[] {
+    const here=vinciContent[card]!.id
+    const pictures=exhibits?.pictureSources()??[]
+    const sheets=exhibits?.sheetSources()??[]
+    const row:{order:number;entry:VinciStripEntry}[]=[]
+    for(const pick of picks){
+      if(pick.station!==here)continue
+      if(pick.kind==='picture'||pick.kind==='mural'){
+        const found=pictures.find(source=>source.work.id===pick.workId&&source.entry.face===pick.face)
+        if(!found)continue
+        const entries=pictures.filter(source=>source.work.id===pick.workId).map(source=>source.entry)
+        row.push({order:pick.order,entry:{id:pick.id,openable:pick.openable,
+          title:lang()==='de'?found.work.title_de:found.work.title_en,
+          colour:policyLabelText(found.work,entries).colour,
+          preview:ASSET_BASE+validatePaintingRecord(found.entry.preview,'painting-preview').path}})
+      }else if(pick.kind==='sheet'){
+        const found=sheets.find(source=>`sheet/${source.sheet.id}`===pick.id)
+        if(!found)continue
+        row.push({order:pick.order,entry:{id:pick.id,openable:pick.openable,
+          title:vinciSheetTitle(lang()==='de'?found.page.honesty_de:found.page.honesty_en),
+          colour:PICTURE_CERTAINTY_KEY[0]!.colour,
+          preview:ASSET_BASE+validateSheetRecord(found.preview,'sheet-thumb').path}})
+      }else if(pick.kind==='machine'){
+        const slug=pick.id.slice('machine/'.length)
+        if(!isMachineSlug(slug))continue
+        row.push({order:pick.order,entry:{id:pick.id,openable:pick.openable,
+          title:machineCatalog[slug].title[lang()],colour:PICTURE_CERTAINTY_KEY[2]!.colour,preview:null}})
+      }
+    }
+    return row.sort((a,b)=>a.order-b.order).map(item=>item.entry)
+  }
+  /** The next or the previous work of this wall, skipping what the spine
+   * cannot open yet. The ends are ends: a wall does not wrap. */
+  function exhibitStep(id:string,step:number):VinciStripEntry|undefined {
+    const row=stationExhibits(), at=row.findIndex(item=>item.id===id)
+    if(at<0)return undefined
+    for(let i=at+step;i>=0&&i<row.length;i+=step)if(row[i]!.openable)return row[i]
+    return undefined
+  }
+  function stepExhibit(step:number):void {
+    const open=closeLook?.id
+    const target=open?exhibitStep(open,step):undefined
+    if(target)openExhibit(target.id,null)
+  }
+  /** One control of the close look that walks to a named work. It carries a
+   * mark and not a word: its name is the work it opens. */
+  function stepControl(glyph:string,target:VinciStripEntry|undefined):HTMLElement {
+    const button=make('button','vinci-exhibit-control vinci-exhibit-step',glyph)
+    button.type='button'
+    button.disabled=!target
+    if(target){
+      button.setAttribute('aria-label',target.title)
+      button.setAttribute('aria-controls','vinci-exhibit-card')
+      button.addEventListener('click',()=>openExhibit(target.id,button))
+    }
+    return button
+  }
+  /** THE CARD IS THE PICTURE MODULE'S OWN LABEL, mounted as it is, with its
    * controls under it and the station's own question at its foot. */
   function openExhibit(id:string,from:HTMLElement|null,how:'auto'|'walk'|'cut'='auto'):void {
     const entry=picks.find(pick=>pick.id===id)
@@ -513,9 +585,12 @@ export function createWing():VinciWingModule {
     shut.type='button'
     shut.addEventListener('click',()=>closeLook?.close())
     controls.push(record,shut)
+    // THE WALL IS WALKED FROM INSIDE THE CLOSE LOOK. Each control carries the
+    // name of the work it walks to, so it needs no word of its own.
+    const walk=[stepControl('\u2039',exhibitStep(id,-1)),stepControl('\u203a',exhibitStep(id,1))]
     openMode=how
     closeLook.open({id,title:lang()==='de'?work.title_de:work.title_en,label,
-      question:text(vinciContent[card]!.door),controls},from)
+      question:text(vinciContent[card]!.door),controls,walk},from,closeLook.id&&closeLook.id!==id?'advance':'enter')
     openMode='auto'
   }
   /** The door asks about the place the visitor is standing in, so the

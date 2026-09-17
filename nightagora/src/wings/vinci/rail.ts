@@ -209,6 +209,11 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
    * of one object. A viewing eye is never a station: it carries its station's
    * id so the card keeps naming the room, and it is not on the rail. */
   let standing:Request|undefined, viewing:Request|undefined, wantsReturn=false
+  /** THE NEXT EXHIBIT, WAITING ON THE WAY BACK. The certificate holds no leg
+   * from one viewing eye to another, so a chain is the certified return and
+   * the certified approach out, begun in the same update the return lands in:
+   * one motion, with no standing at the station between them. */
+  let chained:Request|undefined
   let path:ReturnType<typeof createCertifiedRailPath>|undefined, placementNeedsFrame=false
   let duration=1.1, leg=gaitLeg(0), strideM=0, strideTarget=0, strideAt=0
   /** The leg's own clock retains its measured pace when the target changes. */
@@ -249,7 +254,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
   function sameRequest(a:Request,b:Request) { return a.id===b.id&&a.phone===b.phone&&samePose(a.pose,b.pose) }
   function matrices() { camera.updateProjectionMatrix();camera.updateMatrixWorld() }
   function placeEndpoint(request:Request) {
-    completed=request;active=undefined;path=undefined;look.snap();strideM=strideTarget=0
+    completed=request;active=undefined;path=undefined;look.snap();strideM=strideTarget=0;chained=undefined
     if(!request.exhibit){viewing=undefined;standing=request;wantsReturn=false}
     camera.position.copy(request.pose.eye);base.copy(poseQuaternion(request.pose))
     camera.quaternion.copy(base);camera.fov=fittedRailFov(request.pose.fov,camera.aspect,request.phone);matrices()
@@ -296,7 +301,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
   return {
     /** Physical scheduler state, separate from the shared selected destination. */
     get navigation() { return { completed:completed?.id, active:active?.id, queued:pending?[pending.id]:[], legSeconds:active?duration:0, legMetres:active&&path?path.length:0, legWalked:active?walkedShare:1, legPace:active?pace:1,
-      exhibit:viewing?.exhibit, approaching:active?.exhibit, returning:wantsReturn||Boolean(viewing&&active&&!active.exhibit) } },
+      exhibit:viewing?.exhibit, approaching:active?.exhibit??chained?.exhibit, returning:wantsReturn||Boolean(viewing&&active&&!active.exhibit) } },
     set(id:VinciStationId,pose:Pose,instant=false,phone=camera.aspect<=.9) {
       const request={id,pose:{eye:pose.eye.clone(),at:pose.at.clone(),fov:pose.fov},phone}
       // Initial/named placement, explicit inspection return and resize are
@@ -305,6 +310,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
       // A certified leg finishes at its station before the newest target can
       // begin. Asking for that active endpoint cancels an older pending target.
       pending=sameRequest(active??completed,request)?undefined:request
+      chained=undefined
       // WHILE AN APPROACH STANDS THE RAIL TAKES THE RETURN AND A STATION, and
       // a station is walked from the station eye, which is the pair the
       // certificate holds: so the visitor comes back first, then walks on.
@@ -330,6 +336,15 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     /** The way back is the way it came. */
     returnToStation():boolean {
       if(!viewing||!standing)return false
+      wantsReturn=true
+      return true
+    },
+    /** ONE EXHIBIT TO THE NEXT, as one motion: the return this leaves on and
+     * the approach it walks out again, both certified, with nothing standing
+     * still at the station between them. */
+    chain(exhibit:string,pose:Pose,phone=camera.aspect<=.9):boolean {
+      if(!viewing||!standing||active)return false
+      chained={id:standing.id,pose:{eye:pose.eye.clone(),at:pose.at.clone(),fov:pose.fov},phone,exhibit}
       wantsReturn=true
       return true
     },
@@ -373,6 +388,8 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
         const arrived=active
         placeEndpoint(arrived);viewing=arrived.exhibit?arrived:undefined;render(now);return
       }
+      // A chain whose return has already landed leaves in this same update.
+      if(!active&&!viewing&&chained&&authority.status==='verified'){const next=chained;chained=undefined;begin(next,now)}
       if(active&&path&&strideTarget>strideM) {
         // A wheel notch during a leg is a stride, not a new destination: the
         // visitor walks on rather than waiting the leg out.
@@ -411,6 +428,9 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
       render(now)
       if(active&&s===1) {
         completed=active;viewing=active.exhibit?active:undefined;active=undefined;path=undefined
+        // THE CHAIN DOES NOT STOP AT THE STATION: the outward leg begins in
+        // the update the return lands in, so the eye never stands still.
+        if(chained&&!viewing&&authority.status==='verified'){const next=chained;chained=undefined;begin(next,now)}
         // Do not drain the queue or consume catch-up time after a delayed
         // frame. The next update starts the next leg at its own clock origin.
       }
