@@ -31,6 +31,10 @@ export interface DeepPlateSource {
   height: number
 }
 
+/** A rectangle a line points at, in fractions of the source from its top
+ * left, with the name the wing's own register gives it. */
+export interface DeepPlateDetail { x: number; y: number; w: number; h: number; name: string }
+
 export interface DeepPlateWords {
   /** The control that puts the work back in the window. */
   whole: string
@@ -84,6 +88,8 @@ export function createDeepPlatePayload(options: {
    * display window the museum hangs it by. Null where the register holds no
    * measured extent, and then no rule is drawn. */
   pxPerCm: number | null
+  /** What a line of this wing points at on this plate. */
+  details?: readonly DeepPlateDetail[]
 }): DeepPlatePayload {
   let host: VitrinePayloadHost | undefined
   let root: HTMLDivElement | undefined, stage: HTMLDivElement | undefined
@@ -91,6 +97,7 @@ export function createDeepPlatePayload(options: {
   let viewer: import('openseadragon').Viewer | undefined
   let library: typeof import('openseadragon') | undefined
   let live = false, seated = false, tileSize = 256, said = ''
+  let framed: DeepPlateDetail | null = null
   let seat: VitrineRect | null = null
   const cut = options.window ?? { left: 0, top: 0, right: 1, bottom: 1 }
   const { width, height } = options.source
@@ -163,15 +170,52 @@ export function createDeepPlatePayload(options: {
     root.dataset['rule'] = `${chosen.label} ${Math.round(width)}px`
   }
 
-  /** The one line under the viewport. At the ceiling it says so, in the
-   * words the wing wrote, and says nothing the rest of the time: the plate
-   * is what the visitor came to look at. */
+  /** The one line under the viewport: at the ceiling the wing's own
+   * sentence, otherwise the name of the detail the view is standing on, and
+   * nothing at all the rest of the time. The plate is what the visitor came
+   * to look at. */
   function speak(): void {
     if (!host) return
-    const wanted = magnification() >= AT_THE_CEILING ? options.words.ceiling : ''
+    const wanted = magnification() >= AT_THE_CEILING ? options.words.ceiling : standingOn()
     if (said === wanted) return
     said = wanted
     host.caption.textContent = wanted
+  }
+
+  /** The framed detail's name while its middle is still in the view, and
+   * nothing once the visitor has panned off it. */
+  function standingOn(): string {
+    if (!framed || !viewer || !library) return ''
+    const rect = detailBounds(framed), view = viewer.viewport.getBounds(true)
+    const x = rect.x + rect.width / 2, y = rect.y + rect.height / 2
+    if (x >= view.x && x <= view.x + view.width && y >= view.y && y <= view.y + view.height) return framed.name
+    framed = null
+    return ''
+  }
+
+  /** A detail's rectangle in the viewer's own coordinates. */
+  function detailBounds(detail: DeepPlateDetail): import('openseadragon').Rect {
+    return new library!.Rect(detail.x, detail.y * height / width, detail.w, detail.h * height / width)
+  }
+
+  /** THE TEXT NEVER STANDS ON THE DETAIL. The caption and the payload's own
+   * row take the foot of the viewport, so the frame is given that much
+   * empty room under the rectangle and the detail rides above it. */
+  function frame(detail: DeepPlateDetail): void {
+    if (!viewer || !library || !host || !root) return
+    const bounds = detailBounds(detail)
+    const margin = .1
+    const wide = bounds.width * (1 + margin * 2), high = bounds.height * (1 + margin * 2)
+    const box = new library.Rect(bounds.x - bounds.width * margin, bounds.y - bounds.height * margin, wide, high)
+    const container = root.clientHeight
+    const foot = host.caption.getBoundingClientRect().height
+      + (host.narrow ? 0 : host.controls.getBoundingClientRect().height + 16)
+    const share = container > 0 ? Math.min(.4, foot / container) : 0
+    framed = detail
+    viewer.viewport.fitBoundsWithConstraints(
+      new library.Rect(box.x, box.y, box.width, box.height / (1 - share)), host.reducedMotion)
+    said = ''
+    speak()
   }
 
   /** CSS pixels per pixel of the source: 1 is the source's own pixels. */
@@ -262,6 +306,7 @@ export function createDeepPlatePayload(options: {
       live = true
       seated = false
       said = ''
+      framed = null
       const document = next.element.ownerDocument
       root = document.createElement('div')
       root.className = 'deep-plate'
@@ -284,8 +329,12 @@ export function createDeepPlatePayload(options: {
       seat = options.from()
       next.surface('hold')
       next.controls.append(press(options.words.whole, () => {
+        framed = null
         if (viewer && library) viewer.viewport.fitBounds(windowBounds(), host?.reducedMotion ?? false)
       }))
+      // ONE CONTROL PER LINE THAT POINTS: the name is the one the wing's own
+      // register already carries, in both languages.
+      for (const detail of options.details ?? []) next.controls.append(press(detail.name, () => frame(detail)))
       void mountViewer()
     },
     layout() {
@@ -323,7 +372,7 @@ export function createDeepPlatePayload(options: {
       root?.remove()
       root = undefined; stage = undefined; host = undefined; library = undefined
       rule = undefined; ruleBar = undefined; ruleLabel = undefined
-      seat = null; seated = false
+      seat = null; seated = false; framed = null
     },
   }
 }

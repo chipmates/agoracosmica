@@ -9,7 +9,7 @@
 import { lang } from '../../content'
 import { ASSET_BASE } from '../../../stack/materials'
 import { loadManifest, type ManifestEntry } from '../../../manifest'
-import { createDeepPlatePayload, type DeepPlateTier } from '../../vitrine/deep-plate'
+import { createDeepPlatePayload, type DeepPlateDetail, type DeepPlateTier } from '../../vitrine/deep-plate'
 import type { DeepTilePyramid } from '../../vitrine/deep-viewer'
 import type { VitrineExhibit, VitrineRect } from '../../vitrine'
 import { validatePaintingRecord } from '../pictures/policy'
@@ -17,6 +17,7 @@ import { createPolicyWorkLabel } from '../pictures/policy-label'
 import { pictureDisplayUV, pictureDisplayWindow } from '../pictures/registration'
 import type { PictureWork, ResolvedPicturePlate } from '../pictures/register'
 import cardsRaw from '../data/cards.json?raw'
+import linesRaw from '../data/lines.json?raw'
 import platesRaw from '../data/plate-descriptions.json?raw'
 
 type Words = { en: string; de: string }
@@ -26,6 +27,8 @@ const CARDS = JSON.parse(cardsRaw) as {
   controls: { shared: { back: Words }; machine: { viewpoints: readonly (Words & { id: string })[] } }
 }
 const DESCRIPTIONS = (JSON.parse(platesRaw) as { descriptions: Record<string, Words> }).descriptions
+type DetailRect = { x: number; y: number; w: number; h: number; name_en: string; name_de: string }
+const LINES = (JSON.parse(linesRaw) as { lines: Record<string, { detail?: DetailRect }> }).lines
 
 /** The whole plate stands in front of the close look of the same work, so
  * it carries the same id with one word after it. */
@@ -43,6 +46,16 @@ const RULE: readonly { label: string; cm: number }[] = CARDS.rule_labels
  * see it. Null where no one has written it yet. */
 export function vinciPlateDescription(id: string): string | null {
   return DESCRIPTIONS[id]?.[lang()] ?? null
+}
+
+/** WHAT A LINE POINTS AT on this plate, named in the page's language by the
+ * register that holds the rectangle. The fractions are of the source, which
+ * is what the record's own numbers are measured against. */
+export function vinciPlateDetails(id: string): readonly DeepPlateDetail[] {
+  const detail = LINES[id]?.detail
+  if (!detail) return []
+  return [{ x: detail.x, y: detail.y, w: detail.w, h: detail.h,
+    name: lang() === 'de' ? detail.name_de : detail.name_en }]
 }
 
 /** THE STORE'S PYRAMID FOR THIS PLATE, or nothing. A record is read only
@@ -135,6 +148,7 @@ export function createVinciWholePlate(options: {
     from: options.from,
     tier: options.tier,
     pxPerCm: platePxPerCm(options.work, options.plate, cut),
+    details: vinciPlateDetails(options.id),
   })
   const back = document.createElement('button')
   back.type = 'button'
