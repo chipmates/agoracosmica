@@ -19,14 +19,16 @@ export function createWheelStepper(clock:()=>number) {
 export const LOOK_RULE={
   /** travel under which a contact is a press and moves nothing */
   slopPx:8,
-  /** a vertical swipe this long is a step */
-  swipePx:65,
+  /** the look follows the finger one to one up to this speed and no faster */
+  lookPxPerMs:1,
+  /** a step is a vertical flick: this short, this far, this fast at the lift */
+  flickMs:350, flickPx:48, flickPxPerMs:.5, liftWindowMs:120,
 } as const
 
 export type LookEnd =
   | {kind:'press';x:number;y:number}
   | {kind:'look'}
-  | {kind:'step';direction:1|-1}
+  | {kind:'step';direction:1|-1;giveBack:{dx:number;dy:number}}
 
 interface Sample {x:number;y:number;t:number}
 
@@ -35,7 +37,8 @@ interface Sample {x:number;y:number;t:number}
  * the lifting event's own coordinates, which WebKit does not promise. */
 export function createLookGesture() {
   let owner:number|null=null,touch=false,spoiled=false,looking=false,far=0
-  let start:Sample={x:0,y:0,t:0},last:Sample=start
+  let start:Sample={x:0,y:0,t:0},last:Sample=start,recent:Sample[]=[]
+  const given={dx:0,dy:0}
   const finite=(...values:number[])=>values.every(Number.isFinite)
   return {
     get active(){return owner!==null},
@@ -44,7 +47,7 @@ export function createLookGesture() {
       if(owner!==null){if(id!==owner)spoiled=true;return false}
       if(!finite(id,x,y,t))return false
       owner=id;touch=pointerType==='touch';spoiled=false;looking=false;far=0
-      start=last={x,y,t}
+      start=last={x,y,t};recent=[start];given.dx=given.dy=0
       return true
     },
     /** A second contact takes the press and the step away from the first. */
@@ -52,20 +55,35 @@ export function createLookGesture() {
     move(id:number,x:number,y:number,t:number):{dx:number;dy:number}|undefined{
       if(id!==owner||!finite(x,y,t))return
       far=Math.max(far,Math.hypot(x-start.x,y-start.y))
+      recent.push({x,y,t})
+      while(recent.length>2&&recent[1]!.t<t-LOOK_RULE.liftWindowMs)recent.shift()
       if(!looking&&far<=LOOK_RULE.slopPx)return
       const from=looking?last:start
       looking=true;last={x,y,t}
-      const dx=x-from.x,dy=y-from.y
-      return dx===0&&dy===0?undefined:{dx,dy}
+      let dx=x-from.x,dy=y-from.y
+      const distance=Math.hypot(dx,dy)
+      if(distance===0)return
+      // The look moves no faster than the ceiling over the events' own times,
+      // however an engine batches them.
+      const speed=distance/Math.max(t-from.t,1)
+      const scale=Math.min(1,LOOK_RULE.lookPxPerMs/speed)
+      dx*=scale;dy*=scale;given.dx+=dx;given.dy+=dy
+      return {dx,dy}
     },
     end(id:number,t:number):LookEnd|undefined{
       if(id!==owner)return
       owner=null
       if(spoiled)return {kind:'look'}
       if(far<=LOOK_RULE.slopPx)return {kind:'press',x:start.x,y:start.y}
+      if(!touch||!finite(t))return {kind:'look'}
       const dx=last.x-start.x,dy=last.y-start.y
-      if(!touch||Math.abs(dy)<=LOOK_RULE.swipePx||Math.abs(dy)<=Math.abs(dx)*1.3)return {kind:'look'}
-      return {kind:'step',direction:dy<0?1:-1}
+      // The lift's own speed: a finger that stopped before lifting is no flick.
+      const from=recent.find(sample=>sample.t>=t-LOOK_RULE.liftWindowMs)??last
+      const vy=from===last?0:(last.y-from.y)/Math.max(t-from.t,1)
+      const flick=t-start.t<=LOOK_RULE.flickMs&&Math.abs(dy)>=LOOK_RULE.flickPx&&Math.abs(dy)>Math.abs(dx)*1.3
+        &&Math.abs(vy)>=LOOK_RULE.flickPxPerMs&&Math.sign(vy)===Math.sign(dy)
+      if(!flick)return {kind:'look'}
+      return {kind:'step',direction:dy<0?1:-1,giveBack:{dx:-given.dx,dy:-given.dy}}
     },
     /** A cancelled, lost or interrupted contact ends as nothing at all. */
     cancel(id?:number){if(id===undefined||id===owner)owner=null},
@@ -107,7 +125,7 @@ export function bindRailPointer(host:RailPointerHost):LookGesture {
   stage.addEventListener('pointerup',(e:PointerEvent)=>{
     const end=gesture.end(e.pointerId,e.timeStamp)
     if(end?.kind==='press')host.press(end.x,end.y)
-    if(end?.kind==='step')host.step(end.direction)
+    if(end?.kind==='step'){host.look(end.giveBack.dx,end.giveBack.dy,height());host.step(end.direction)}
   },options)
   for(const type of ['pointercancel','lostpointercapture'])
     stage.addEventListener(type,(e:Event)=>gesture.cancel((e as PointerEvent).pointerId),options)

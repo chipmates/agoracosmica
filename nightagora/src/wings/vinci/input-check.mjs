@@ -40,7 +40,7 @@ const linkCases=[
 linkCases.push({name:'numeric API uses current order',actual:frame.exports.resolveWingStationIndex(2,reordered,old),expected:2,ok:frame.exports.resolveWingStationIndex(2,reordered,old)===2})
 linkCases.push({name:'wings without legacy maps keep numeric hashes',actual:frame.exports.resolveWingStationIndex('1',reordered),expected:1,ok:frame.exports.resolveWingStationIndex('1',reordered)===1})
 // THE ONE-FINGER LOOK: the pure machine, then the binder on a stage that is only an event target.
-const {createLookGesture,bindRailPointer}=context.exports
+const {createLookGesture,bindRailPointer,LOOK_RULE}=context.exports
 const drive=(steps,{type='touch',lift=0,id=1}={})=>{
   // steps: [[x,y,t],...] with the down first; lift is the delay after the last move
   const g=createLookGesture(),sum={dx:0,dy:0};let emitted=0
@@ -57,13 +57,33 @@ gcase('a press inside the slop moves nothing and presses where the finger landed
   const r=drive([[200,400,0],[203,404,40],[205,399,90]],{lift:30})
   must(r.emitted===0&&r.end.kind==='press'&&r.end.x===200&&r.end.y===400,JSON.stringify(r));return {end:r.end}
 })
+gcase('a slow tilt of 90 px over 900 ms is a look, one to one, never a step',()=>{
+  const r=drive(line(195,380,195,470,900,30),{lift:16})
+  must(r.end.kind==='look'&&close(r.sum.dy,90)&&close(r.sum.dx,0),JSON.stringify(r));return {lookPx:r.sum.dy,end:r.end.kind}
+})
 gcase('a slow pan is batching independent',()=>{
   const a=drive(line(120,420,280,420,1000,20)),b=drive(line(120,420,280,420,1000,5)),c=drive(line(120,420,280,420,1000,160))
   must(close(a.sum.dx,160)&&close(b.sum.dx,160)&&close(c.sum.dx,160),JSON.stringify([a.sum,b.sum,c.sum]));return {lookPx:a.sum.dx}
 })
-gcase('a vertical swipe on touch is a step, a mouse drag and a pan are looks',()=>{
-  const up=drive(line(195,520,195,370,300,10)),mouse=drive(line(195,520,195,370,300,10),{type:'mouse'}),pan=drive(line(80,420,320,420,300,10))
-  must(up.end.kind==='step'&&up.end.direction===1&&mouse.end.kind==='look'&&pan.end.kind==='look'&&close(pan.sum.dx,240),JSON.stringify([up.end,mouse.end,pan]))
+gcase('a vertical flick of 150 px in 60 ms steps, its look bounded by the ceiling and given back',()=>{
+  const up=drive(line(195,520,195,370,60,5),{lift:4}),down=drive(line(195,370,195,520,60,5),{lift:4})
+  must(up.end.kind==='step'&&up.end.direction===1&&down.end.kind==='step'&&down.end.direction===-1,JSON.stringify([up.end,down.end]))
+  must(Math.abs(up.sum.dy)<=LOOK_RULE.lookPxPerMs*60+1e-9,'flick look unbounded '+up.sum.dy)
+  must(close(up.end.giveBack.dy,-up.sum.dy)&&close(up.end.giveBack.dx,-up.sum.dx),'the look is not given back')
+  return {lookPx:up.sum.dy,giveBack:up.end.giveBack.dy}
+})
+gcase('a horizontal flick of 240 px in 60 ms is a look bounded to 60 px, in any batching',()=>{
+  const a=drive(line(80,420,320,420,60,5)),b=drive(line(80,420,320,420,60,20)),c=drive(line(80,420,320,420,60,1))
+  must(a.end.kind==='look'&&close(a.sum.dx,60)&&close(b.sum.dx,60)&&close(c.sum.dx,60),JSON.stringify([a.sum,b.sum,c.sum]))
+  return {lookPx:a.sum.dx}
+})
+gcase('a mouse never steps, and a finger that stops before lifting does not flick',()=>{
+  const mouse=drive(line(195,520,195,370,60,5),{type:'mouse',lift:4}),held=drive(line(195,520,195,370,60,5),{lift:200})
+  must(mouse.end.kind==='look'&&held.end.kind==='look',JSON.stringify([mouse.end,held.end]))
+})
+gcase('a slow look that ends in a quick flick is a look, not a step',()=>{
+  const steps=[...line(195,600,195,560,700,20),...line(195,560,195,440,60,5,1700).slice(1)]
+  const r=drive(steps,{lift:4});must(r.end.kind==='look',JSON.stringify(r.end))
 })
 gcase('a second finger takes the press and the step away, and cannot take the look',()=>{
   const g=createLookGesture();g.begin(1,200,400,0,'touch')
@@ -79,7 +99,7 @@ gcase('cancel, a duplicate end and a late lost capture are harmless, and a fresh
   g.begin(7,30,40,200,'touch');must(g.move(7,31,38,210)===undefined,'fresh contact inherited the old look')
   must(g.end(7,220).kind==='press'&&g.end(7,221)===undefined,'duplicate end');g.cancel(7);must(!g.active,'late cancel')
 })
-gcase('the binder presses, looks, steps and survives refused capture',()=>{
+gcase('the binder presses, looks, steps with the look given back, and survives refused capture',()=>{
   const calls=[];const doc=new EventTarget(),view=new EventTarget();view.screen={orientation:new EventTarget()}
   doc.defaultView=view;doc.visibilityState='visible'
   const stage=new EventTarget();Object.assign(stage,{ownerDocument:doc,getBoundingClientRect:()=>({height:844}),setPointerCapture(){throw new Error('NotFoundError')}})
@@ -92,8 +112,8 @@ gcase('the binder presses, looks, steps and survives refused capture',()=>{
   const down=fire('pointerdown',{clientX:195,clientY:520,timeStamp:1000});must(down.defaultPrevented,'down not taken')
   for(const [x,y,t] of line(195,520,195,370,60,5).slice(1))fire('pointermove',{clientX:x,clientY:y,timeStamp:t})
   fire('pointerup',{clientX:0,clientY:0,timeStamp:1064})
-  const looked=calls.filter(c=>c[0]==='look')
-  must(calls.at(-1)[0]==='step'&&calls.at(-1)[1]===1&&close(looked.reduce((a,c)=>a+c[2],0),-150)&&looked.every(c=>c[3]===844),'step '+JSON.stringify(calls));calls.length=0
+  const looked=calls.filter(c=>c[0]==='look'),sum=looked.slice(0,-1).reduce((a,c)=>a+c[2],0)
+  must(calls.at(-1)[0]==='step'&&calls.at(-1)[1]===1&&close(looked.at(-1)[2],-sum)&&looked.every(c=>c[3]===844),'step '+JSON.stringify(calls));calls.length=0
   fire('pointerdown',{clientX:100,clientY:100,timeStamp:2000});fire('pointermove',{clientX:160,clientY:100,timeStamp:2100})
   view.dispatchEvent(new Event('orientationchange'));fire('pointermove',{clientX:260,clientY:100,timeStamp:2200});fire('pointerup',{timeStamp:2210})
   must(calls.filter(c=>c[0]==='look').length===1&&!calls.some(c=>c[0]==='press'||c[0]==='step'),'orientation kept the hold '+JSON.stringify(calls));calls.length=0
