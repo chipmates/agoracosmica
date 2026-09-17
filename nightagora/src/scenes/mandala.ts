@@ -612,6 +612,8 @@ export function createMandala(scene: Scene): MandalaHandles {
   }
   // it floats clear of the kerb, which is stone and holds its own shadow
   const heart = new Mesh(stoneRing(0, 2.0, -0.706, -0.700, 0.01, 48), heartMat)
+  /** what only burns while the hub is warm, so a cold hub costs no draw */
+  const hubAir: Array<{ visible: boolean }> = [heart]
   heart.renderOrder = 4
   plate.add(heart)
 
@@ -645,6 +647,7 @@ export function createMandala(scene: Scene): MandalaHandles {
       .mul(oneMinus(smoothstep(0.35, 1.0, climb)))
       .mul(uHeat).mul(uHearth).mul(uReveal).mul(uFireFlick).mul(0.46)
     const smoke = new Sprite(sm)
+    hubAir.push(smoke)
     smoke.count = SMOKE
     smoke.frustumCulled = false
     smoke.renderOrder = 4
@@ -696,13 +699,22 @@ export function createMandala(scene: Scene): MandalaHandles {
       const wheelDown = ramp(k, CUT.wheelDown)
       court.position.y = -WHEEL_SINK * wheelDown
       uWheel.value = 1 - wheelDown
-      rim.position.y = -BELT_SINK * ramp(k, CUT.beltDown)
+      const beltDown = ramp(k, CUT.beltDown)
+      rim.position.y = -BELT_SINK * beltDown
+      // what has gone down under the paving is not drawn: the court rises
+      // behind the ring in this same stretch and the calm tier has no draws
+      // to spare for stone nobody can see
+      court.visible = wheelDown < 1
+      rim.visible = beltDown < 1
       uLamps.value = 1 - ramp(k, CUT.lampsOut)
       uHearth.value = 1 - ramp(k, CUT.hearthOut)
       // the kerb goes down once its fire is cold, so the seat the ride lands
       // on is paving and nothing else
-      kerb.position.y = -KERB_SINK * ramp(k, CUT.kerbDown)
+      const kerbDown = ramp(k, CUT.kerbDown)
+      kerb.position.y = -KERB_SINK * kerbDown
       bed.position.y = kerb.position.y
+      kerb.visible = bed.visible = kerbDown < 1
+      for (const air of hubAir) air.visible = uHearth.value > 0
       uCourtFire.value = courtRiseAt(k)
     },
     visible(v) {
