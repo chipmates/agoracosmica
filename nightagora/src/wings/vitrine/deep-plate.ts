@@ -34,6 +34,8 @@ export interface DeepPlateSource {
 export interface DeepPlateWords {
   /** The control that puts the work back in the window. */
   whole: string
+  /** What the view says when there is no more of the source to show. */
+  ceiling: string
 }
 
 export interface DeepPlatePayload extends VitrinePayload {
@@ -48,6 +50,11 @@ export interface DeepPlatePayload extends VitrinePayload {
  * has released its one full plate by the time this opens. */
 const TILE_CAP = { hero: 200, standard: 150, calm: 100, phone: 80 } as const
 export type DeepPlateTier = 'hero' | 'standard' | 'calm'
+
+/** THE CEILING IS THE SOURCE'S OWN PIXELS: one pixel of the file to one CSS
+ * pixel of the screen, and no further. A spring settles on its target rather
+ * than reaching it, so this is what counts as standing there. */
+const AT_THE_CEILING = .999
 
 /** One tile as RGBA8 in megabytes, which is what a cache count costs. */
 const tileMB = (size: number): number => size * size * 4 / 1e6
@@ -70,7 +77,7 @@ export function createDeepPlatePayload(options: {
   let root: HTMLDivElement | undefined, stage: HTMLDivElement | undefined
   let viewer: import('openseadragon').Viewer | undefined
   let library: typeof import('openseadragon') | undefined
-  let live = false, seated = false, tileSize = 256
+  let live = false, seated = false, tileSize = 256, said = ''
   let seat: VitrineRect | null = null
   const cut = options.window ?? { left: 0, top: 0, right: 1, bottom: 1 }
   const { width, height } = options.source
@@ -117,6 +124,18 @@ export function createDeepPlatePayload(options: {
     root.dataset['tiles'] = String(tiles)
     root.dataset['cacheMb'] = (tiles * tileMB(tileSize)).toFixed(1)
     root.dataset['zoom'] = magnification().toFixed(3)
+    speak()
+  }
+
+  /** The one line under the viewport. At the ceiling it says so, in the
+   * words the wing wrote, and says nothing the rest of the time: the plate
+   * is what the visitor came to look at. */
+  function speak(): void {
+    if (!host) return
+    const wanted = magnification() >= AT_THE_CEILING ? options.words.ceiling : ''
+    if (said === wanted) return
+    said = wanted
+    host.caption.textContent = wanted
   }
 
   /** CSS pixels per pixel of the source: 1 is the source's own pixels. */
@@ -163,6 +182,9 @@ export function createDeepPlatePayload(options: {
       // canvas is not in the tab order and its own key actions are off.
       tabIndex: -1,
       animationTime: host.reducedMotion ? 0 : 0.4,
+      // No pixel of the source may be shown larger than itself: what a
+      // visitor reaches here is the whole of what the museum holds.
+      maxZoomPixelRatio: 1,
       springStiffness: 8,
       // Home is the display window and the pan is bounded by the source.
       minZoomImageRatio: 1,
@@ -203,6 +225,7 @@ export function createDeepPlatePayload(options: {
       host = next
       live = true
       seated = false
+      said = ''
       const document = next.element.ownerDocument
       root = document.createElement('div')
       root.className = 'deep-plate'

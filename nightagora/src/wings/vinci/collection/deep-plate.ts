@@ -21,6 +21,7 @@ import platesRaw from '../data/plate-descriptions.json?raw'
 
 type Words = { en: string; de: string }
 const CARDS = JSON.parse(cardsRaw) as {
+  zoom_ceiling: Words
   controls: { shared: { back: Words }; machine: { viewpoints: readonly (Words & { id: string })[] } }
 }
 const DESCRIPTIONS = (JSON.parse(platesRaw) as { descriptions: Record<string, Words> }).descriptions
@@ -105,7 +106,7 @@ export function createVinciWholePlate(options: {
       width: options.plate.pixels.width,
       height: options.plate.pixels.height,
     },
-    words: { whole: CARDS.controls.machine.viewpoints[0]![language] },
+    words: { whole: CARDS.controls.machine.viewpoints[0]![language], ceiling: CARDS.zoom_ceiling[language] },
     from: options.from,
     tier: options.tier,
   })
