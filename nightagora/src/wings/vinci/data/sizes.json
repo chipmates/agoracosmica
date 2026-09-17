@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0",
+  "provenance": {
+    "scope": "The size of each of the fourteen machines as a sentence a visitor says aloud, English and German, keyed by the machine slug of machines/catalog.ts. One sentence each: the size the machine itself has, and that the vitrine's window fits the whole of it, whatever size the screen then gives it.",
+    "rule": "Every number is the `scale_m` of that machine's own record, rounded no further than the record writes it. That envelope is the size the museum's reconstruction stands at, and the record calls its dimensions modern modelling choices, so no sentence here says that a machine was ever built at this size. The card's certainty word keeps saying reconstructed beside it.",
+    "read": "machines/data/<slug>.json, the `scale_m` block with its note, read 2026-09-17. The turntable frames the whole rest box of the model, so the window holds every machine whole and none of them at its own size.",
+    "prepared": "2026-09-17"
+  },
+  "sizes": {
+    "aerial-screw": {
+      "en": "The screw is 9.5 m across and 6.1 m high, and the window here fits the whole of it, so what the screen shows is not its size.",
+      "de": "Die Schraube misst 9,5 m in der Breite und 6,1 m in der Höhe, und das Fenster hier fasst sie ganz, die Größe auf dem Schirm ist also nicht ihre eigene.",
+      "source": "machines/data/aerial-screw.json, scale_m 9.5 by 6.1 by 9.5 m, certainty C, source a-geometry"
+    },
+    "parachute": {
+      "en": "The parachute is 7.08 m across and 10.34 m from the floor to the top of its ropes, and the window fits all of it at once.",
+      "de": "Der Fallschirm misst 7,08 m in der Breite und 10,34 m vom Boden bis zum oberen Ende der Seile, und das Fenster fasst alles auf einmal.",
+      "source": "machines/data/parachute.json, scale_m 7.08 by 10.34 by 7.08 m, static envelope with the origin at the floor"
+    },
+    "anemometer": {
+      "en": "The instrument is 0.86 m high and 0.74 m across, and the window holds the whole of it, at whatever size the screen gives it.",
+      "de": "Das Instrument ist 0,86 m hoch und 0,74 m breit, und das Fenster zeigt es ganz, in der Größe, die der Schirm ihm gibt.",
+      "source": "machines/data/anemometer.json, scale_m 0.74 by 0.86 by 0.74 m, conservative world bounds"
+    },
+    "inclinometer": {
+      "en": "The inclinometer stands 0.75 m high and 0.7 m across, and the window shows the whole of it.",
+      "de": "Der Neigungsmesser steht 0,75 m hoch und 0,7 m breit, und das Fenster zeigt ihn ganz.",
+      "source": "machines/data/inclinometer.json, scale_m 0.7 by 0.75 by 0.7 m, conservative bounds over the tilting support"
+    },
+    "multi-barrel-gun": {
+      "en": "The carriage is 2.5 m wide, 2.55 m high and 3.2 m from the trails to the muzzles, and the window fits the whole of it on the screen.",
+      "de": "Der Wagen ist 2,5 m breit, 2,55 m hoch und 3,2 m von den Holmen bis zu den Mündungen, und das Fenster bringt das Ganze auf den Schirm.",
+      "source": "machines/data/multi-barrel-gun.json, scale_m 2.5 by 2.55 by 3.2 m, swept bounds with the trails at the back"
+    },
+    "rolling-mill": {
+      "en": "The mill is 1.1 m wide and 1.1 m high, with 0.92 m of depth for the sweep of the crank, and the window holds the whole of it.",
+      "de": "Das Walzwerk ist 1,1 m breit und 1,1 m hoch, dazu 0,92 m Tiefe für den Umlauf der Kurbel, und das Fenster zeigt das Ganze.",
+      "source": "machines/data/rolling-mill.json, scale_m 1.1 by 1.1 by 0.92 m, the depth including the outer crank grip"
+    },
+    "ball-bearing": {
+      "en": "The bearing measures 0.9 m across and 0.36 m high, and the window shows all of it.",
+      "de": "Das Lager misst 0,9 m im Durchmesser und 0,36 m in der Höhe, und das Fenster zeigt es ganz.",
+      "source": "machines/data/ball-bearing.json, scale_m 0.9 by 0.36 by 0.9 m, full swept bound"
+    },
+    "flywheel": {
+      "en": "The wheel is 1.4 m across and stands 1.1 m high with its frame, and the window fits the whole of it.",
+      "de": "Das Rad misst 1,4 m im Durchmesser und steht mit seinem Gestell 1,1 m hoch, und das Fenster fasst es ganz.",
+      "source": "machines/data/flywheel.json, scale_m 1.4 by 1.1 by 1.4 m, full swept bound"
+    },
+    "revolving-crane": {
+      "en": "The crane turns inside a circle of 3.7 m and stands 2.9 m high, and the window holds that whole circle.",
+      "de": "Der Kran dreht sich in einem Kreis von 3,7 m und steht 2,9 m hoch, und das Fenster fasst diesen ganzen Kreis.",
+      "source": "machines/data/revolving-crane.json, scale_m 3.7 by 2.9 by 3.7 m, full swept bound"
+    },
+    "lathe": {
+      "en": "The machine is 1.7 m long, 1.75 m high and 0.8 m deep, and the window shows the whole of it.",
+      "de": "Die Maschine ist 1,7 m lang, 1,75 m hoch und 0,8 m tief, und das Fenster zeigt sie ganz.",
+      "source": "machines/data/lathe.json, scale_m 1.7 by 1.75 by 0.8 m, full swept bound"
+    },
+    "miter-lock-gates": {
+      "en": "The pair of gates measures 4.6 m across the lock and 2.7 m high, with 3.2 m for the swing of the leaves, and the window fits all of it.",
+      "de": "Das Torpaar misst 4,6 m über die Schleuse und 2,7 m in der Höhe, dazu 3,2 m für den Schwung der Flügel, und das Fenster fasst alles.",
+      "source": "machines/data/miter-lock-gates.json, scale_m 4.6 by 2.7 by 3.2 m, conservative swept envelope"
+    },
+    "water-lifting-screw": {
+      "en": "The screw runs 3.6 m from one end to the other, 2.15 m high and 1.4 m wide, and the window shows the whole run.",
+      "de": "Die Schnecke misst 3,6 m von einem Ende zum anderen, 2,15 m in der Höhe und 1,4 m in der Breite, und das Fenster zeigt den ganzen Lauf.",
+      "source": "machines/data/water-lifting-screw.json, scale_m 1.4 by 2.15 by 3.6 m, conservative swept envelope"
+    },
+    "proportional-compass": {
+      "en": "The compass is 0.67 m long and opens to 0.4 m across, the smallest of the fourteen machines, and the window shows all of it.",
+      "de": "Der Zirkel ist 0,67 m lang und öffnet sich auf 0,4 m, die kleinste der vierzehn Maschinen, und das Fenster zeigt ihn ganz.",
+      "source": "machines/data/proportional-compass.json, scale_m 0.4 by 0.67 by 0.08 m, smaller than every other scale_m in machines/data"
+    },
+    "camera-obscura": {
+      "en": "The chamber is 1.24 m wide, 1.24 m high and 0.64 m deep, and the window shows the whole box.",
+      "de": "Die Kammer ist 1,24 m breit, 1,24 m hoch und 0,64 m tief, und das Fenster zeigt den ganzen Kasten.",
+      "source": "machines/data/camera-obscura.json, scale_m 1.24 by 1.24 by 0.64 m, chamber bounds"
+    }
+  }
+}
