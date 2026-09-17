@@ -46,7 +46,10 @@ import { createMeasurement, type VinciMeasurement } from './measurement'
 import { collectVinciLabelOccluders, createVinciExhibitDots, createVinciLabelAnchor, vinciSightBlocked, type VinciExhibitDots, type VinciExhibitMark, type VinciLabelAnchor, type VinciLabelMode } from './labels'
 import { pickVinciExhibit, readVinciExhibits, vinciMachineRoom, type VinciPickEntry } from './collection/pick'
 import { vinciApproachPose, vinciApproachStation } from './collection/approaches'
-import { createVinciCloseLook, createVinciMachinePayload, fillVinciLimitSlots, renderVinciMachineRecord, vinciLimits, vinciLine, vinciMachineCard, VINCI_EXHIBIT_CARD, VINCI_VITRINE_WORDS } from './collection/close-look'
+import { createVinciCloseLook, createVinciMachinePayload, fillVinciLimitSlots, renderVinciMachineRecord, vinciDeathbedCard, vinciLimits, vinciLine, vinciMachineCard, vinciPlaceCard, vinciPlaceTitle, VINCI_EXHIBIT_CARD, VINCI_VITRINE_WORDS, type VinciPlaceCard, type VinciPlaceCertainty, type VinciPlaceId } from './collection/close-look'
+import { createPlacePayload } from '../vitrine/place'
+import { GRAVE_DEATHBED } from './grave/placement'
+import { loadManifest } from '../../manifest'
 import { createPlatePayload } from '../vitrine/picture'
 import type { VitrineRect } from '../vitrine'
 import { machineBuildOf } from './machines'
@@ -58,6 +61,8 @@ import { vinciContent, vinciLegacyStationIds, vinciConstructionStatus, vinciReco
 import wingCss from './wing.css?inline'
 
 const text=(value:VinciText):string=>value[lang()]
+/** The painting at the grave: read by its own record, not the hang's register. */
+const DEATHBED_WORK='deathbed-painting', GRAVE_PAINTING_ASPECT=GRAVE_DEATHBED.imageWidth/GRAVE_DEATHBED.imageHeight
 const sourcesWord=()=>lang()==='de'?'Quellen':'Sources'
 const make=<K extends keyof HTMLElementTagNameMap>(tag:K,cls:string,value?:string):HTMLElementTagNameMap[K]=>{
   const e=document.createElement(tag);e.className=cls;if(value!==undefined)e.textContent=value;return e
@@ -493,6 +498,8 @@ export function createWing():VinciWingModule {
         if(isMachineSlug(slug))marks.push({id:entry.id,anchor:entry.anchor,object:entry.object,label:machineCatalog[slug].title[lang()],colour:PICTURE_CERTAINTY_KEY[2]!.colour})
         continue
       }
+      const named=namedExhibit(entry)
+      if(named){marks.push({id:entry.id,anchor:entry.anchor,object:entry.object,label:named.title,colour:named.colour});continue}
       const found=sources.find(source=>source.work.id===entry.workId)
       if(!found)continue
       const entries=sources.filter(source=>source.work.id===entry.workId).map(source=>source.entry)
@@ -572,6 +579,19 @@ export function createWing():VinciWingModule {
       }}
     sources.resetScroll();sources.select('station');mode=2;paintDock()
   }
+  /** The colour of the wing's own certainty word, off the picture module's key. */
+  function certaintyColour(key:VinciCertainty):string {
+    const order:VinciCertainty[]=['documented','unknown','reconstructed','conjectural']
+    return PICTURE_CERTAINTY_KEY[order.indexOf(key)]!.colour
+  }
+  const placeCertainty=(key:VinciPlaceCertainty)=>({word:text(vinciCertaintyWords[key]),colour:certaintyColour(key)})
+  /** THE KINDS WHOSE NAME IS THEIR OWN RECORD'S: the grave's places, the plaque
+   * and the painting at the grave. */
+  function namedExhibit(pick:VinciPickEntry):{title:string;colour:string}|null {
+    if(pick.kind!=='place'&&pick.workId!==DEATHBED_WORK)return null
+    const named=vinciPlaceTitle(pick.id as VinciPlaceId)
+    return {title:named.title,colour:certaintyColour(named.certainty)}
+  }
   /** THE STANDING STATION'S OWN ROW: every exhibit it holds, in the order its
    * wall hangs them, with the name and the certainty the module that owns
    * each kind gives it. The strip paints this and the close look walks it. */
@@ -583,7 +603,7 @@ export function createWing():VinciWingModule {
     for(const pick of picks){
       // The hall is one room under two stations, and both walk its one row.
       if(pick.station!==here&&!(pick.kind==='machine'&&vinciMachineRoom(pick.station).includes(here)))continue
-      if(pick.kind==='picture'||pick.kind==='mural'){
+      if((pick.kind==='picture'||pick.kind==='mural')&&pick.workId!==DEATHBED_WORK){
         const found=pictures.find(source=>source.work.id===pick.workId&&source.entry.face===pick.face)
         if(!found)continue
         const entries=pictures.filter(source=>source.work.id===pick.workId).map(source=>source.entry)
@@ -603,6 +623,9 @@ export function createWing():VinciWingModule {
         if(!isMachineSlug(slug))continue
         row.push({order:pick.order,entry:{id:pick.id,openable:pick.openable,
           title:machineCatalog[slug].title[lang()],colour:PICTURE_CERTAINTY_KEY[2]!.colour,preview:null}})
+      }else{
+        const named=namedExhibit(pick)
+        if(named)row.push({order:pick.order,entry:{id:pick.id,openable:pick.openable,title:named.title,colour:named.colour,preview:null}})
       }
     }
     return row.sort((a,b)=>a.order-b.order).map(item=>item.entry)
@@ -653,6 +676,19 @@ export function createWing():VinciWingModule {
     }
     return {left,top,width:right-left,height:bottom-top}
   }
+  /** A place's own region on the held frame: the box around its proxy. */
+  function sphereRect(centre:Vector3,radius:number):VitrineRect|null {
+    if(!hosts)return null
+    const camera=hosts.world.camera, corner=new Vector3()
+    let left=Infinity,top=Infinity,right=-Infinity,bottom=-Infinity
+    for(const x of [-1,1])for(const y of [-1,1])for(const z of [-1,1]){
+      corner.set(centre.x+x*radius,centre.y+y*radius,centre.z+z*radius).project(camera)
+      if(corner.z<=-1||corner.z>=1)return null
+      const px=(corner.x*.5+.5)*innerWidth,py=(-corner.y*.5+.5)*innerHeight
+      left=Math.min(left,px);right=Math.max(right,px);top=Math.min(top,py);bottom=Math.max(bottom,py)
+    }
+    return {left,top,width:right-left,height:bottom-top}
+  }
   /** The room draws again under its own print, at the same camera. */
   function restoreRoom():void {
     if(!hosts)return
@@ -689,6 +725,31 @@ export function createWing():VinciWingModule {
       openMode=how
       closeLook.open({id,title,line:vinciLine(id),card:words.card,after:words.after,payload,
         controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),shut],walk,...vinciLimits(id)},from,how_)
+      openMode='auto'
+      return
+    }
+    if(entry.kind==='place'||entry.workId===DEATHBED_WORK){
+      const standing=()=>{const nav=rail.navigation;return !nav.active&&!nav.approaching}
+      const plate=entry.object instanceof Mesh?entry.object:null
+      const manifestId=plate?String(plate.userData['manifestId']):''
+      const place:VinciPlaceCard=entry.kind==='place'?vinciPlaceCard(id as VinciPlaceId,placeCertainty)
+        :vinciDeathbedCard(placeCertainty('conjectural'),null)
+      const openRecord=()=>{void loadManifest().then(index=>{
+        if(closeLook?.id!==id)return
+        const record=entry.kind==='place'?place:vinciDeathbedCard(placeCertainty('conjectural'),index.byId.get(manifestId)?.licence??null)
+        exhibitSources={id,title:{en:place.title,de:place.title},certainty:place.certainty,renderStation(host){record.record(host)}}
+        sources.resetScroll();sources.select('station');mode=2;paintDock()
+      })}
+      // A place is its own stones: the room dims around the object where the
+      // eye walked to it. The painting is shown whole in the viewport, drawn
+      // from the pixels the room already holds, because no eye sees it square.
+      const payload=entry.kind==='place'?createPlacePayload({title:place.title,standing})
+        :createPlatePayload({title:place.title,aspect:GRAVE_PAINTING_ASPECT,window:null,standing,
+          pixels:()=>{const map=(plate?.material as {map?:{image?:unknown}}|undefined)?.map?.image;return map instanceof HTMLImageElement||map instanceof ImageBitmap||map instanceof HTMLCanvasElement?map:null}})
+      openMode=how
+      closeLook.open({id,title:place.title,line:vinciLine(id),card:place.card,after:place.after,payload,
+        controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),shut],walk,...vinciLimits(id),
+        work:entry.kind==='place'?()=>{const nav=rail.navigation;return nav.exhibit===id&&!nav.active?sphereRect(entry.centre,entry.radiusM):null}:undefined},from,how_)
       openMode='auto'
       return
     }

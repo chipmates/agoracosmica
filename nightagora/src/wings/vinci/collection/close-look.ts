@@ -17,6 +17,10 @@ import type { ReadyMachineBuild } from '../machines/runtime'
 import { playbackSchedule } from '../machines/bench/playback'
 import { BENCH_ABSENCE } from '../machines/bench/registers'
 import { setRegister } from '../../frame'
+import { GRAVE_EVIDENCE, GRAVE_HOUR, GRAVE_WORDS } from '../grave'
+import { GRAVE_DEATHBED } from '../grave/placement'
+import { GRAVE_DIAGRAM, GRAVE_SOURCE, INGRES_SOURCE } from '../line/bench/visitor-sources'
+import neverSaidRaw from '../line/data/never-said.json?raw'
 import linesRaw from '../data/lines.json?raw'
 import stepsRaw from '../data/steps.json?raw'
 import cardsRaw from '../data/cards.json?raw'
@@ -244,4 +248,146 @@ export function createVinciMachinePayload(options: {
     standing: options.standing,
   })
   return payload
+}
+
+/* ---- the places and the painting at the grave ------------------------- */
+
+type Both = { en: string; de: string }
+const NEVER_SAID = JSON.parse(neverSaidRaw) as {
+  court_plaque: { title_en: string; title_de: string; quote: string; line_en: string; line_de: string
+    where_en: string; where_de: string; when: string; certainty: string; language_note_de: string }
+  deathbed_label: { title_en: string; title_de: string; label_en: string; label_de: string; record_en: string
+    record_de: string; last_words_en: string; last_words_de: string; certainty: string }
+}
+export type VinciPlaceId = 'grave' | 'grave-diagram' | 'plaque/flight-quote'
+/** The museum's own certainty word each place is read under. */
+export type VinciPlaceCertainty = 'documented' | 'reconstructed' | 'conjectural'
+export interface VinciPlaceCard {
+  title: string
+  certainty: VinciPlaceCertainty
+  card: HTMLElement[]
+  after: HTMLElement[]
+  /** The record behind "Where it comes from". */
+  record(host: HTMLElement): void
+}
+
+const cut = (text: string): string => text.replace(/\n/g, ' ')
+/** A cut or written line in both languages, one paragraph each, the record's
+ * register: the stones are read here, not off the floor. */
+function bothLanguages(host: HTMLElement, words: Both): void {
+  for (const language of ['en', 'de'] as const) {
+    const paragraph = make('p', 'vinci-statement', cut(words[language]))
+    paragraph.lang = language
+    host.append(paragraph)
+  }
+}
+function recordRoot(host: HTMLElement): HTMLElement {
+  const full = make('div', 'vinci-record')
+  setRegister(full, 'record')
+  host.append(full)
+  return full
+}
+function certaintyWord(certainty: { word: string; colour: string }): HTMLElement {
+  const word = make('p', 'vitrine-certainty', certainty.word)
+  word.style.setProperty('--certainty', certainty.colour)
+  return word
+}
+function drawer(...texts: string[]): HTMLElement {
+  const description = make('div', 'vitrine-description')
+  setRegister(description, 'drawer')
+  for (const text of texts) description.append(make('p', '', text))
+  return description
+}
+
+/** What a place and the painting are called on a mark and in the row. */
+export function vinciPlaceTitle(id: VinciPlaceId | 'picture/deathbed-painting/front'): { title: string; certainty: VinciPlaceCertainty } {
+  const language = lang()
+  if (id === 'picture/deathbed-painting/front') {
+    const label = NEVER_SAID.deathbed_label
+    return { title: language === 'de' ? label.title_de : label.title_en, certainty: 'conjectural' }
+  }
+  if (id === 'plaque/flight-quote') {
+    const plate = NEVER_SAID.court_plaque
+    return { title: language === 'de' ? plate.title_de : plate.title_en, certainty: 'documented' }
+  }
+  return id === 'grave-diagram' ? { title: GRAVE_WORDS.diagram[language], certainty: 'reconstructed' }
+    : { title: GRAVE_WORDS.slab, certainty: 'documented' }
+}
+
+/** A place's card: what it is called where it stands, the reading the museum
+ * wrote for it, its certainty, and the record with every cut word. */
+export function vinciPlaceCard(id: VinciPlaceId, certainty: (key: VinciPlaceCertainty) => { word: string; colour: string }): VinciPlaceCard {
+  const language = lang()
+  if (id === 'plaque/flight-quote') {
+    const plate = NEVER_SAID.court_plaque
+    const quote = make('p', '', plate.quote)
+    quote.lang = 'en'
+    return {
+      title: language === 'de' ? plate.title_de : plate.title_en, certainty: 'documented',
+      card: [drawer(language === 'de' ? plate.line_de : plate.line_en)],
+      after: [certaintyWord(certainty('documented')), quote, make('p', 'vitrine-meta', `${language === 'de' ? plate.where_de : plate.where_en} · ${plate.when}`)],
+      record(host) {
+        const full = recordRoot(host)
+        bothLanguages(full, { en: plate.title_en, de: plate.title_de })
+        full.append(Object.assign(make('p', 'vinci-statement', plate.quote), { lang: 'en' }))
+        bothLanguages(full, { en: plate.line_en, de: plate.line_de })
+        bothLanguages(full, { en: plate.where_en, de: plate.where_de })
+        full.append(make('p', 'vinci-statement', plate.when))
+        full.append(Object.assign(make('p', 'vinci-statement', plate.language_note_de), { lang: 'de' }))
+      },
+    }
+  }
+  if (id === 'grave-diagram') {
+    return {
+      title: GRAVE_WORDS.diagram[language], certainty: 'reconstructed',
+      card: [drawer(GRAVE_DIAGRAM[language])],
+      after: [certaintyWord(certainty('reconstructed'))],
+      record(host) {
+        const full = recordRoot(host)
+        bothLanguages(full, GRAVE_WORDS.diagram)
+        bothLanguages(full, GRAVE_WORDS.diagramDate)
+        full.append(make('p', 'vinci-statement', GRAVE_EVIDENCE.frame))
+        full.append(make('pre', 'vinci-arithmetic', JSON.stringify(GRAVE_HOUR, null, 1)))
+        bothLanguages(full, GRAVE_DIAGRAM)
+      },
+    }
+  }
+  return {
+    title: GRAVE_WORDS.slab, certainty: 'documented',
+    card: [drawer(GRAVE_SOURCE[language])],
+    after: [certaintyWord(certainty('documented'))],
+    record(host) {
+      const full = recordRoot(host)
+      full.append(make('p', 'vinci-statement', GRAVE_WORDS.slab))
+      bothLanguages(full, GRAVE_WORDS.presumption)
+      full.append(make('p', 'vinci-statement', GRAVE_WORDS.dig))
+      bothLanguages(full, GRAVE_WORDS.identification)
+      bothLanguages(full, GRAVE_WORDS.medallion)
+      for (const key of ['plaque', 'dig', 'transfer'] as const) full.append(make('p', 'vinci-statement', GRAVE_EVIDENCE[key]))
+      bothLanguages(full, GRAVE_WORDS.disclosure)
+      bothLanguages(full, GRAVE_SOURCE)
+    },
+  }
+}
+
+/** THE PAINTING AT THE GRAVE, under the card model of a picture: its label,
+ * the words its wall label carries, the certainty of the story it shows, and
+ * the record of what the letters and the acts of that week say. */
+export function vinciDeathbedCard(certainty: { word: string; colour: string }, licence: string | null): VinciPlaceCard {
+  const language = lang(), label = NEVER_SAID.deathbed_label
+  return {
+    title: language === 'de' ? label.title_de : label.title_en, certainty: 'conjectural',
+    card: [drawer(language === 'de' ? label.label_de : label.label_en, language === 'de' ? label.last_words_de : label.last_words_en)],
+    after: [certaintyWord(certainty), make('p', 'vitrine-meta', `${GRAVE_WORDS.painter} · ${GRAVE_WORDS.holder}`),
+      make('p', 'vitrine-meta', GRAVE_WORDS.enlarged[language])],
+    record(host) {
+      const full = recordRoot(host)
+      bothLanguages(full, { en: label.record_en, de: label.record_de })
+      bothLanguages(full, { en: label.last_words_en, de: label.last_words_de })
+      bothLanguages(full, INGRES_SOURCE)
+      bothLanguages(full, GRAVE_WORDS.enlarged)
+      full.append(make('pre', 'vinci-arithmetic', JSON.stringify(GRAVE_DEATHBED, null, 1)))
+      if (licence) full.append(make('p', 'vinci-statement', licence))
+    },
+  }
 }

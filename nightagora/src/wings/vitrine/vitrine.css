@@ -72,7 +72,7 @@
 
 /* THE PLATE over the paused frame. */
 .vitrine-plate {position:fixed;display:block;overflow:hidden;pointer-events:none;}
-.vitrine-plate img {position:absolute;display:block;max-width:none;}
+.vitrine-plate img,.vitrine-plate canvas {position:absolute;display:block;max-width:none;}
 .vitrine-plate[hidden] {display:none;}
 
 /* THE MACHINE'S CLOCK, its viewpoints, its steps and its folio. */

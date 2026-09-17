@@ -29,6 +29,26 @@ export const GRAVE_EVIDENCE = {
   frame: 'Computed light · 2 May 1519 · 18:50 UT. A chosen minute, not a witnessed moment.',
 } as const
 
+/** EVERY WORD CUT INTO THE GRAVE'S STONES, in both languages. The stones are
+ * the atmosphere and the card is the reading, so the close look repeats these
+ * in its record rather than asking a visitor to read them off the floor. */
+export const GRAVE_WORDS = {
+  slab: GRAVE_EVIDENCE.slab,
+  presumption: { en: 'presumed remains', de: 'mutmaßliche Überreste' },
+  dig: '1863',
+  identification: { en: 'The identification remains presumed.', de: 'Die Identifizierung bleibt unbewiesen.' },
+  medallion: { en: 'The portrait medallion\nis left empty here.', de: 'Das Porträtmedaillon\nbleibt hier leer.' },
+  diagram: { en: 'CHOSEN LIGHT · A DIAGRAM', de: 'GEWÄHLTES LICHT · EINE STUDIE' },
+  diagramDate: { en: '2 MAY 1519 · JULIAN CALENDAR', de: '2. MAI 1519 · JULIANISCH' },
+  disclosure: {
+    en: 'Generated exhibition study; slab and gable dimensions are interpretive, not a measured architectural replica. Portrait medallion not reproduced.',
+    de: 'Generierte Ausstellungsstudie. Die Maße von Grabplatte und Giebel beruhen auf einer Interpretation. Die Studie ist keine vermessene architektonische Nachbildung. Das Porträtmedaillon wird nicht wiedergegeben.',
+  },
+  painter: 'INGRES · 1818',
+  holder: 'Paris Musées',
+  enlarged: { en: 'A small painting enlarged for this room', de: 'Ein kleines Gemälde für diesen Raum vergrößert' },
+} as const
+
 /** Frame-space +Z faces the measured NW gable, +X runs right along its facade. */
 export function graveSunDirection(): [number, number, number] {
   const radians = Math.PI / 180
@@ -90,13 +110,13 @@ export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, l
   build.box(plaqueX, 0.225, plaqueZ + 0.06, 1.64, 0.028, 0.14, materials.bronze)
   build.box(plaqueX, 0.62, plaqueZ - 0.11, 1.54, 0.88, 0.20, materials.stone)
   build.box(plaqueX, 0.66, plaqueZ + 0.014, 1.60, 0.80, 0.065, pale)
-  build.text(text('presumed remains','mutmaßliche Überreste'), plaqueX - 0.70, 0.98, plaqueZ + 0.05, options.mobile?(language==='de'?.135:.16):(language === 'de' ? 0.102 : 0.13), 1.40, materials.ink)
-  build.text('1863', plaqueX - 0.70, options.mobile?0.46:0.68, plaqueZ + 0.05, 0.095, 1.4, materials.bronze)
-  if(!options.mobile)build.text(text('The identification remains presumed.','Die Identifizierung bleibt unbewiesen.'), plaqueX - 0.70, 0.51, plaqueZ + 0.05, 0.070, 1.4)
+  build.text(text(GRAVE_WORDS.presumption.en,GRAVE_WORDS.presumption.de), plaqueX - 0.70, 0.98, plaqueZ + 0.05, options.mobile?(language==='de'?.135:.16):(language === 'de' ? 0.102 : 0.13), 1.40, materials.ink)
+  build.text(GRAVE_WORDS.dig, plaqueX - 0.70, options.mobile?0.46:0.68, plaqueZ + 0.05, 0.095, 1.4, materials.bronze)
+  if(!options.mobile)build.text(text(GRAVE_WORDS.identification.en,GRAVE_WORDS.identification.de), plaqueX - 0.70, 0.51, plaqueZ + 0.05, 0.070, 1.4)
 
   // Absence carries a label of its own, on its own carrier, off the pale slab.
   const noteX=centreX-.30, noteZ=centreZ-1.86
-  const noteWords=text('The portrait medallion\nis left empty here.','Das Porträtmedaillon\nbleibt hier leer.')
+  const noteWords=text(GRAVE_WORDS.medallion.en,GRAVE_WORDS.medallion.de)
   if(options.mobile){
     // The phone reads the same words from a floor-set strip: no standing plate
     // crowds the slab, and the caption stays inside the narrow stage.
@@ -237,8 +257,8 @@ export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, l
   // wider than a lowercase sentence and German runs wider again; a size typed
   // once for English wraps the caption and the two lines then collide.
   const fit=(value:string,cap:number)=>Math.min(cap,inner/Math.max(1e-6,lineAdvance(value,1))*.985)
-  const first=text('CHOSEN LIGHT · A DIAGRAM','GEWÄHLTES LICHT · EINE STUDIE')
-  const second=text('2 MAY 1519 · JULIAN CALENDAR','2. MAI 1519 · JULIANISCH')
+  const first=text(GRAVE_WORDS.diagram.en,GRAVE_WORDS.diagram.de)
+  const second=text(GRAVE_WORDS.diagramDate.en,GRAVE_WORDS.diagramDate.de)
   ledge.text(first, -inner/2, ledgeHeight/2-.085, .042, fit(first,options.mobile?.155:.118), inner)
   ledge.text(second, -inner/2, -.075, .042, fit(second,options.mobile?.115:.082), inner)
   const caption=ledge.finish()
@@ -263,13 +283,13 @@ export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, l
   const metadata = {
     kind: 'grave',
     slabText: GRAVE_EVIDENCE.slab,
-    plaqueText: text(GRAVE_EVIDENCE.presumption,'mutmaßliche Überreste'),
+    plaqueText: text(GRAVE_WORDS.presumption.en,GRAVE_WORDS.presumption.de),
     evidence: GRAVE_EVIDENCE,
     hour: GRAVE_HOUR,
     sunDirection: graveSunDirection(),
     classification: 'GENERATED',
     framePoints,
-    geometryDisclosure: text('Generated exhibition study; slab and gable dimensions are interpretive, not a measured architectural replica. Portrait medallion not reproduced.','Generierte Ausstellungsstudie. Die Maße von Grabplatte und Giebel beruhen auf einer Interpretation. Die Studie ist keine vermessene architektonische Nachbildung. Das Porträtmedaillon wird nicht wiedergegeben.'),
+    geometryDisclosure: text(GRAVE_WORDS.disclosure.en,GRAVE_WORDS.disclosure.de),
     anchors: { slab: [centreX, 0.24, centreZ], plaque: [plaqueX, 0.9, plaqueZ + 0.05], computedFrame: options.mobile?[frameX*.84-1.26,frameY*.84,(frameZ+.1)*.84-1.55]:[frameX, frameY, frameZ + 0.1] },
   }
   build.group.userData.exhibit = metadata
@@ -318,9 +338,9 @@ export function createGraveDeathbed(
   build.box(x, labelTop - .34, z + .045, labelWidth + .22, .90, .07, materials.stone)
   build.box(x, labelTop - .80, z + .075, labelWidth + .16, .035, .06, materials.bronze)
   const title = build.text(text(DEATHBED.title_en, DEATHBED.title_de), labelLeft, labelTop, z + .085, .115, labelWidth)
-  build.text('INGRES · 1818', labelLeft, labelTop - title.height - .10, z + .085, .082, labelWidth, materials.bronze)
-  build.text('Paris Musées', labelLeft, labelTop - title.height - .26, z + .085, .058, labelWidth)
-  build.text(text('A small painting enlarged for this room', 'Ein kleines Gemälde für diesen Raum vergrößert'),
+  build.text(GRAVE_WORDS.painter, labelLeft, labelTop - title.height - .10, z + .085, .082, labelWidth, materials.bronze)
+  build.text(GRAVE_WORDS.holder, labelLeft, labelTop - title.height - .26, z + .085, .058, labelWidth)
+  build.text(text(GRAVE_WORDS.enlarged.en, GRAVE_WORDS.enlarged.de),
     labelLeft, labelTop - title.height - .40, z + .085, .058, labelWidth)
   build.finish()
   // Varnished oil under a gallery key, not a file on a screen.

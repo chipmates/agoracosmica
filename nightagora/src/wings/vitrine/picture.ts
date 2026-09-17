@@ -16,7 +16,11 @@ const SETTLE_FRAMES = 2
 export interface PlateWindow { left: number; top: number; right: number; bottom: number }
 
 export function createPlatePayload(options: {
-  src: string
+  /** The file the room already streams. */
+  src?: string
+  /** Or the pixels the room already decoded: drawn at the size the frame
+   * shows them, so no second full-size copy is decoded. */
+  pixels?: () => CanvasImageSource & { width: number; height: number } | null
   /** The work's own name, the viewport's accessible name. */
   title: string
   /** The source's own width over its height. */
@@ -26,7 +30,7 @@ export function createPlatePayload(options: {
   standing(): boolean
 }): VitrinePayload {
   let host: VitrinePayloadHost | undefined
-  let frame: HTMLDivElement | undefined, image: HTMLImageElement | undefined
+  let frame: HTMLDivElement | undefined, image: HTMLImageElement | HTMLCanvasElement | undefined
   let settled = 0, held = false
   const cut = options.window ?? { left: 0, top: 0, right: 1, bottom: 1 }
   const shownAspect = options.aspect * (cut.right - cut.left) / (cut.bottom - cut.top)
@@ -51,6 +55,13 @@ export function createPlatePayload(options: {
     image.style.height = `${height}px`
     image.style.left = `${-cut.left * width}px`
     image.style.top = `${-cut.top * height}px`
+    const pixels = image instanceof HTMLCanvasElement ? options.pixels?.() : null
+    if (pixels && image instanceof HTMLCanvasElement) {
+      const scale = Math.min(devicePixelRatio, pixels.width / width)
+      image.width = Math.max(1, Math.round(width * scale))
+      image.height = Math.max(1, Math.round(height * scale))
+      image.getContext('2d')?.drawImage(pixels, 0, 0, image.width, image.height)
+    }
     frame.hidden = false
     host.surface('hold')
     held = true
@@ -64,10 +75,16 @@ export function createPlatePayload(options: {
       frame = document.createElement('div')
       frame.className = 'vitrine-plate'
       frame.hidden = true
-      image = document.createElement('img')
-      image.alt = ''
-      image.decoding = 'async'
-      image.src = options.src
+      if (options.src) {
+        const img = document.createElement('img')
+        img.alt = ''
+        img.decoding = 'async'
+        img.src = options.src
+        image = img
+      } else {
+        image = document.createElement('canvas')
+        image.setAttribute('aria-hidden', 'true')
+      }
       frame.append(image)
       next.element.append(frame)
       next.describe(options.title)
