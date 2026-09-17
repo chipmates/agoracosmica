@@ -243,13 +243,17 @@
   background:#101d27e6;border:1px solid #a9977344;pointer-events:auto;}
 .vinci-strip[hidden] {display:none;}
 .vinci-strip li {flex:0 0 auto;}
+/* Every cell is a pale mount, as the wall's own fields are: half these works
+   are dark, and a dark reproduction on a dark cell reads as an empty one. */
 .vinci-strip-item {position:relative;display:flex;align-items:flex-end;justify-content:center;width:44px;height:44px;
-  padding:0;background:#16242e;border:1px solid #a9977355;cursor:pointer;overflow:hidden;}
+  padding:0;background:#b5ae9d;border:1px solid #a9977355;cursor:pointer;overflow:hidden;}
 .vinci-strip-item[disabled] {cursor:default;opacity:.5;}
 .vinci-strip-item[aria-current='true'] {border-color:#edcc8c;box-shadow:0 0 0 1px #edcc8c;}
 .vinci-strip-item:focus-visible {outline:1px solid #edcc8c;outline-offset:2px;}
-.vinci-strip-thumb {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
-.vinci-strip-dot {position:relative;width:7px;height:7px;margin-bottom:3px;border-radius:50%;
+/* THE WHOLE WORK, NOT A CROP OF IT. A centre crop of a portrait on a black
+   ground reads as an empty cell, and a row of works is a row of works. */
+.vinci-strip-thumb {position:absolute;inset:2px;width:calc(100% - 4px);height:calc(100% - 4px);object-fit:contain;}
+.vinci-strip-dot {position:relative;width:7px;height:7px;margin-bottom:2px;border-radius:50%;
   background:var(--certainty,#d2a557);box-shadow:0 0 0 2px #0d1720cc;}
 @media(max-aspect-ratio:9/10) {
   /* The bar's own offset is its foot, so the row clears its head as the
