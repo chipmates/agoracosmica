@@ -3,5 +3,16 @@
   "living": {
     "lobby/agora": "the keeper's fire, the embers on the bowl's rim and the sparks that rise from it: measured at 0.19 percent of pixels over six levels, in a band along the rim",
     "lobby/wheel": "the sky itself: every star twinkles, the constellation's lines are drawn live between them, and a meteor crosses the frame"
-  }
+  },
+  "extra": {
+    "wing/vinci": [
+      {
+        "id": "gate-passage",
+        "station": "arrival",
+        "view": "gateway",
+        "why": "The walk from the street to the court passes under the gate, and the owner's walk read flicker on the door's head and the dark wall beside it. The passage is a leg and not a station, so the camera is stood there by the wing's own named composition."
+      }
+    ]
+  },
+  "extra-note": "AN EXTRA SPOT IS NOT AN EXEMPTION. It adds a place to read, with the station and the named composition that stand the camera there, and it gates exactly like a station: the same static and drag tests, the same thresholds."
 }

@@ -110,14 +110,22 @@ const say = (line) => process.stderr.write(`${line}\n`)
    life is in the frame and why. A named station still gets measured, printed
    and drawn; its STATIC line warns instead of failing, and its pop-in line
    gates like every other. The file's own note carries the rest. */
-const LIVING = (() => {
+const BASE_FILE = (() => {
   try {
-    return JSON.parse(readFileSync(join(APP_ROOT, 'forge', 'FLICKER-BASE.json'), 'utf8')).living ?? {}
+    return JSON.parse(readFileSync(join(APP_ROOT, 'forge', 'FLICKER-BASE.json'), 'utf8'))
   } catch {
     return {}
   }
 })()
+const LIVING = BASE_FILE.living ?? {}
 const livingWhy = (station) => LIVING[`${WING ? `wing/${SLUG}` : SURFACE}/${station}`] ?? null
+
+/* A PLACE THAT IS NOT A STATION. Some of what a visitor sees happens on the
+   way: `forge/FLICKER-BASE.json` names those spots with the station and the
+   named composition that stand the camera there, so the gate reads them
+   beside the stations without a wing gaining a station it does not have. */
+const EXTRA = (BASE_FILE.extra ?? {})[`${WING ? `wing/${SLUG}` : SURFACE}`] ?? []
+const extraSpots = () => EXTRA.map((e) => ({ id: e.id, jump: ['wing', { slug: SLUG, station: e.station, view: e.view }] }))
 
 /* ---- the numbers the gate is decided on --------------------------------- */
 /** consecutive frames per static reading */
@@ -666,6 +674,14 @@ async function openPage(browser, url) {
     if (m.text().startsWith('backend=')) firstLine = m.text()
     if (m.type() === 'error') problems.push(`console: ${m.text()}`)
   })
+  /* THE RIG ARRIVES THROUGH THE FORGE MARKER, like every other eye. Without
+     it a wing may open its own entrance sheet over the frame once its field
+     lifts, and the instrument then measures a modal dialog holding still. */
+  await page.addInitScript(() => {
+    const mark = () => document.body?.classList.add('forge')
+    if (document.body) mark()
+    else document.addEventListener('DOMContentLoaded', mark)
+  })
   await page.goto(url)
   await page.waitForFunction(() => Boolean(window.__forge))
   await page.waitForTimeout(2000)
@@ -685,14 +701,15 @@ function plan(ids) {
     ]
     return named ? both.filter((s) => named.includes(s.id)) : both
   }
-  if (ASKED === 'all') return ids.map((id) => ({ id, station: id }))
+  const extras = extraSpots()
+  const spotFor = (id) => extras.find((e) => e.id === id) ?? { id, station: id }
+  if (ASKED === 'all') return [...ids.map(spotFor), ...extras]
   if (ASKED) {
     const named = ASKED.split(',').map((s) => s.trim()).filter(Boolean)
-    return named.map((id) => ({ id, station: id }))
+    return named.map(spotFor)
   }
-  if (ids.length <= 3) return ids.map((id) => ({ id, station: id }))
-  const pick = [ids[0], ids[(ids.length / 2) | 0], ids[ids.length - 1]]
-  return pick.map((id) => ({ id, station: id }))
+  const pick = ids.length <= 3 ? ids : [ids[0], ids[(ids.length / 2) | 0], ids[ids.length - 1]]
+  return [...pick.map(spotFor), ...extras]
 }
 
 function verdict(off, drag, living = null) {
