@@ -4,8 +4,9 @@
  * each pool follows its source while the stones turn independently. */
 import {
   AdditiveBlending, BackSide, BufferGeometry, Color, Group,
-  InstancedBufferAttribute, LatheGeometry, Mesh, MeshBasicNodeMaterial, Scene,
-  SphereGeometry, Sprite, SpriteNodeMaterial, Vector2,
+  InstancedBufferAttribute, InstancedBufferGeometry, LatheGeometry, Mesh,
+  MeshBasicNodeMaterial, PlaneGeometry, Scene, SphereGeometry, Sprite,
+  SpriteNodeMaterial, Vector2,
 } from 'three/webgpu'
 import * as TSL from 'three/tsl'
 import { combine, piercedCourt, revolve, stoneRing } from './mandala/geometry'
@@ -18,14 +19,17 @@ import { FOUNDING_SEED, mulberry32 } from '../core/seed'
 
 // A single boundary for TSL's polymorphic node graph, as in the donor organs.
 type N = any
-const { abs, atan, cameraPosition, clamp, cos, dot, exp, float, floor, fract,
-  fwidth, instancedBufferAttribute, length, max, min, mix, mx_noise_float,
-  mx_fractal_noise_float, normalWorld, normalize, oneMinus, positionLocal,
-  positionWorld, pow, screenCoordinate, sin, smoothstep, step, uniform, uv,
-  vec2, vec3 } = TSL as unknown as Record<string, N>
+const { abs, atan, attribute, cameraPosition, cameraProjectionMatrix,
+  cameraViewMatrix, clamp, cos, cross, dot, exp, float, floor, fract, fwidth,
+  instancedBufferAttribute, length, max, min, mix, modelWorldMatrix,
+  mx_noise_float, mx_fractal_noise_float, normalWorld, normalize, oneMinus,
+  positionLocal, positionWorld, pow, screenCoordinate, sin, smoothstep, sqrt,
+  step, uniform, uv, vec2, vec3, vec4 } = TSL as unknown as Record<string, N>
 const TAU = Math.PI * 2
 const LAMP_R = 11.35
 const LAMP_Y = 1.42
+/** where a flame's root sits: inside the cup, under its lip */
+const FLAME_ROOT_Y = 0.78
 /** where the coal bed's light stands over the well: the paving is at -0.9,
     the bed sits on it, and a fire lights from just above its own coals */
 const HEARTH_Y = -0.28
@@ -448,9 +452,9 @@ export function createMandala(scene: Scene): MandalaHandles {
   }
   root.add(new Mesh(colonnadeGeometry(), colonnadeMat))
 
-  // Thirty physical cups share a mesh; the thirty flames share a Sprite.
+  // Thirty physical cups share a mesh; the thirty flames share one draw.
   const cups = []
-  const positions = new Float32Array(30 * 3)
+  const flameAt = new Float32Array(30 * 3)
   const phases = new Float32Array(30 * 2)
   for (let i = 0; i < 30; i++) {
     const a = i * TAU / 30
@@ -458,7 +462,7 @@ export function createMandala(scene: Scene): MandalaHandles {
     const cup = revolve([[0.11, 0.45], [0.18, 0.52], [0.17, 0.68], [0.34, 0.83], [0.32, 0.91], [0.25, 0.89], [0.09, 0.7]], 16)
     cup.translate(x, 0, z)
     cups.push(cup)
-    positions.set([x, LAMP_Y, z], i * 3)
+    flameAt.set([x, FLAME_ROOT_Y, z], i * 3)
     phases.set([a, 0.8 + rand() * 0.35], i * 2)
   }
   const cupMat = new MeshBasicNodeMaterial()
@@ -467,22 +471,59 @@ export function createMandala(scene: Scene): MandalaHandles {
     .add(c(GOLD, 0.028).mul(pow(max(cupN.y, 0), 3)))
     .mul(uReveal)
   rim.add(new Mesh(combine(cups), cupMat))
-  const lampMat = new SpriteNodeMaterial({ transparent: true, blending: AdditiveBlending, depthWrite: false })
-  const lp = instancedBufferAttribute(new InstancedBufferAttribute(positions, 3))
-  const lv = instancedBufferAttribute(new InstancedBufferAttribute(phases, 2))
-  lampMat.positionNode = lp
-  lampMat.scaleNode = vec2(1.2, 1.5).mul(lv.y)
-  const q = uv().sub(0.5)
-  const flick = sin(uT.mul(3.4).add(lv.x.mul(4))).mul(0.07).add(0.93)
-  const bend = sin(q.y.mul(11).sub(uT.mul(2.2)).add(lv.x)).mul(0.025).mul(smoothstep(-0.1, 0.4, q.y))
-  const tongue = exp(pow(q.x.sub(bend).div(max(float(0.025), float(0.10).sub(q.y.mul(0.15)))), 2).negate())
-    .mul(smoothstep(-0.21, -0.13, q.y)).mul(oneMinus(smoothstep(0.12, 0.39, q.y)))
-  const halo = exp(dot(q.mul(vec2(1, 0.85)), q.mul(vec2(1, 0.85))).mul(-20))
-  const core = exp(dot(q.sub(vec2(0, -0.1)), q.sub(vec2(0, -0.1))).mul(-240))
-  lampMat.colorNode = mix(c(GOLD), c('#fff3d6'), core.add(tongue.mul(0.5)))
-  lampMat.opacityNode = clamp(tongue.mul(0.92).add(core.mul(0.6)).add(halo.mul(0.14)), 0, 1).mul(uReveal).mul(flick).mul(uLamps)
-  const lamps = new Sprite(lampMat)
-  lamps.count = 30
+  /* A FLAME STANDS IN ITS OWN CUP. A view-aligned sprite hung over the cup
+     leans along the screen's up, which from above is not the column's up:
+     on the side arcs the flames rode clear of their bowls. Each flame is a
+     quad anchored at its root inside the cup, facing the eye, with its axis
+     the world vertical as the eye sees it, so the cup's lip covers the root
+     from the side and the flame cannot leave the bowl at any azimuth or
+     scale. Seen from above a flame is shorter, and it is drawn so. */
+  const flameGeo = new InstancedBufferGeometry()
+  {
+    const quad = new PlaneGeometry(1, 1)
+    flameGeo.index = quad.index
+    for (const key of Object.keys(quad.attributes)) {
+      const attr = quad.attributes[key]
+      if (attr) flameGeo.setAttribute(key, attr)
+    }
+    flameGeo.setAttribute('flameAt', new InstancedBufferAttribute(flameAt, 3))
+    flameGeo.setAttribute('flameVar', new InstancedBufferAttribute(phases, 2))
+    flameGeo.instanceCount = 30
+  }
+  const lampMat = new MeshBasicNodeMaterial({
+    // the quad is built facing the eye, so its front face is the one seen
+    transparent: true, blending: AdditiveBlending, depthWrite: false,
+  })
+  {
+    const at = attribute('flameAt', 'vec3')
+    const lv = attribute('flameVar', 'vec2')
+    const root = modelWorldMatrix.mul(vec4(at, 1)).xyz
+    const up = vec3(0, 1, 0)
+    const toEye = normalize(cameraPosition.sub(root))
+    const across = cross(up, toEye)
+    const cosElev = length(across)
+    const right = across.div(max(cosElev, float(0.001)))
+    const upSeen = cross(toEye, right)
+    // a flame grows back into its cup as the lamp goes out
+    const size = lv.y.mul(uScale)
+    const w = size.mul(1.2)
+    const h = size.mul(1.5).mul(sqrt(uLamps)).mul(cosElev.mul(0.55).add(0.45))
+    const world = root
+      .add(right.mul(positionLocal.x.mul(w)))
+      .add(upSeen.mul(positionLocal.y.add(0.2).mul(h)))
+    lampMat.vertexNode = cameraProjectionMatrix.mul(cameraViewMatrix).mul(vec4(world, 1))
+    const q = uv().sub(0.5)
+    const flick = sin(uT.mul(3.4).add(lv.x.mul(4))).mul(0.07).add(0.93)
+    const bend = sin(q.y.mul(11).sub(uT.mul(2.2)).add(lv.x)).mul(0.025).mul(smoothstep(-0.1, 0.4, q.y))
+    const tongue = exp(pow(q.x.sub(bend).div(max(float(0.025), float(0.10).sub(q.y.mul(0.15)))), 2).negate())
+      .mul(smoothstep(-0.21, -0.13, q.y)).mul(oneMinus(smoothstep(0.12, 0.39, q.y)))
+    const halo = exp(dot(q.mul(vec2(1, 0.85)), q.mul(vec2(1, 0.85))).mul(-20))
+    const core = exp(dot(q.sub(vec2(0, -0.1)), q.sub(vec2(0, -0.1))).mul(-240))
+    lampMat.colorNode = mix(c(GOLD), c('#fff3d6'), core.add(tongue.mul(0.5)))
+    lampMat.opacityNode = clamp(tongue.mul(0.92).add(core.mul(0.6)).add(halo.mul(0.14)), 0, 1)
+      .mul(uReveal).mul(flick).mul(uLamps)
+  }
+  const lamps = new Mesh(flameGeo, lampMat)
   lamps.frustumCulled = false
   lamps.renderOrder = 5
   rim.add(lamps)
