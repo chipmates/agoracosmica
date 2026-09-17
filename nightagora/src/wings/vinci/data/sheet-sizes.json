@@ -1,0 +1,194 @@
+{
+  "schema_version": "1.0",
+  "provenance": {
+    "scope": "Each body wall sheet's size as its holder prints it: the sheet of paper, height by width in centimetres. Data for a hang at each sheet's own size. No module reads it yet.",
+    "rule": "Numbers exactly as printed on the holder entry. A sheet whose holder entry is not online carries no size and names its facsimile folio instead.",
+    "report": "program sheet facts 2026-09-15, section 3",
+    "read": "2026-09-17"
+  },
+  "sheets": {
+    "rcin-919000": {
+      "heightCm": 29.3,
+      "widthCm": 20.1,
+      "holderEntry": "https://www.rct.uk/collection/919000/the-bones-of-the-foot-the-bones-and-muscles-of-the-arm",
+      "read": "2026-09-17"
+    },
+    "rcin-919001": {
+      "heightCm": null,
+      "widthCm": null,
+      "holderEntry": "https://www.rct.uk/collection/919001",
+      "holderStatus": 404,
+      "facsimile": "Windsor anatomy facsimile of 1898, fogli A, folio 2",
+      "note": "The holder entry is not online and the facsimile prints no size, so none is recorded.",
+      "read": "2026-09-17"
+    },
+    "rcin-919002": {
+      "heightCm": 29.0,
+      "widthCm": 19.6,
+      "holderEntry": "https://www.rct.uk/collection/919002/the-throat-and-the-muscles-of-the-leg-recto-the-bones-of-the-foot-and-the-muscles",
+      "read": "2026-09-17"
+    },
+    "rcin-919003": {
+      "heightCm": 29.2,
+      "widthCm": 19.8,
+      "holderEntry": "https://www.rct.uk/collection/919003/the-superficial-anatomy-of-the-shoulder-and-neck-the-muscles-of-the-shoulder",
+      "read": "2026-09-17"
+    },
+    "rcin-919004": {
+      "heightCm": 28.6,
+      "widthCm": 19.3,
+      "holderEntry": "https://www.rct.uk/collection/919004/the-bones-of-the-arm-and-leg-rectonbspthe-surface-anatomy-of-the-shoulder-verso",
+      "read": "2026-09-17"
+    },
+    "rcin-919005": {
+      "heightCm": 28.9,
+      "widthCm": 19.9,
+      "holderEntry": "https://www.rct.uk/collection/919005/the-muscles-of-the-arm-and-the-veins-of-the-arm-and-trunk-rectonbspthe-muscles-of",
+      "read": "2026-09-17"
+    },
+    "rcin-919006": {
+      "heightCm": 28.6,
+      "widthCm": 19.8,
+      "holderEntry": "https://www.rct.uk/collection/919006/recto-the-muscles-of-the-leg-and-the-intercostal-muscles-verso-the-muscles-of-the",
+      "read": "2026-09-17"
+    },
+    "rcin-919007": {
+      "heightCm": null,
+      "widthCm": null,
+      "holderEntry": "https://www.rct.uk/collection/919007",
+      "holderStatus": 404,
+      "facsimile": "Windsor anatomy facsimile of 1898, fogli A, folio 8",
+      "note": "The holder entry is not online and the facsimile prints no size, so none is recorded.",
+      "read": "2026-09-17"
+    },
+    "rcin-919008": {
+      "heightCm": null,
+      "widthCm": null,
+      "holderEntry": "https://www.rct.uk/collection/919008",
+      "holderStatus": 404,
+      "facsimile": "Windsor anatomy facsimile of 1898, fogli A, folio 9",
+      "note": "The holder entry is not online and the facsimile prints no size, so none is recorded.",
+      "read": "2026-09-17"
+    },
+    "rcin-919009": {
+      "heightCm": 28.8,
+      "widthCm": 20.2,
+      "holderEntry": "https://www.rct.uk/collection/919009/the-bones-muscles-and-tendons-of-the-hand",
+      "read": "2026-09-17"
+    },
+    "rcin-919010": {
+      "heightCm": 29.5,
+      "widthCm": 20.0,
+      "holderEntry": "https://www.rct.uk/collection/919010/the-muscles-and-tendons-of-the-sole-of-the-foot-recto-the-muscles-of-the-lower-leg",
+      "read": "2026-09-17"
+    },
+    "rcin-919011": {
+      "heightCm": 28.7,
+      "widthCm": 19.8,
+      "holderEntry": "https://www.rct.uk/collection/919011/recto-the-bones-of-the-foot-and-the-shoulder-verso-the-veins-and-muscles-of-the",
+      "read": "2026-09-17"
+    },
+    "rcin-919012": {
+      "heightCm": 28.8,
+      "widthCm": 20.0,
+      "holderEntry": "https://www.rct.uk/collection/919012/the-skeleton-recto-the-muscles-of-the-face-and-arm-and-the-nerves-and-veins-of-the",
+      "read": "2026-09-17"
+    },
+    "rcin-919013": {
+      "heightCm": 28.9,
+      "widthCm": 20.1,
+      "holderEntry": "https://www.rct.uk/collection/919013/the-muscles-of-the-shoulder-and-arm-recto-the-muscles-of-the-shoulder-and-arm-and",
+      "read": "2026-09-17"
+    },
+    "rcin-919014": {
+      "heightCm": 28.6,
+      "widthCm": 20.7,
+      "holderEntry": "https://www.rct.uk/collection/919014/recto-the-muscles-of-the-leg-verso-the-muscles-of-the-trunk-and-leg",
+      "read": "2026-09-17"
+    },
+    "rcin-919015": {
+      "heightCm": 28.9,
+      "widthCm": 20.5,
+      "holderEntry": "https://www.rct.uk/collection/919015/the-muscles-of-the-upper-spine",
+      "read": "2026-09-17"
+    },
+    "rcin-919016": {
+      "heightCm": 39.0,
+      "widthCm": 26.5,
+      "holderEntry": "https://www.rct.uk/collection/919016/the-tendons-of-the-lower-leg-and-foot",
+      "read": "2026-09-17"
+    },
+    "rcin-919017": {
+      "heightCm": 38.9,
+      "widthCm": 28.2,
+      "holderEntry": "https://www.rct.uk/collection/919017/the-muscles-and-tendons-of-the-lower-leg-and-foot",
+      "read": "2026-09-17"
+    },
+    "rcin-919018": {
+      "heightCm": 19.1,
+      "widthCm": 13.4,
+      "holderEntry": "https://www.rct.uk/collection/919018/recto-the-veins-of-the-face-and-a-torso-verso-the-veins-of-the-scalp-and-a",
+      "read": "2026-09-17"
+    },
+    "rcin-919019": {
+      "heightCm": 19.1,
+      "widthCm": 13.5,
+      "holderEntry": "https://www.rct.uk/collection/919019/recto-notes-on-the-senses-and-the-nervous-system-verso-notes-on-the-nervous-system",
+      "read": "2026-09-17"
+    },
+    "rcin-919028": {
+      "heightCm": 19.2,
+      "widthCm": 14.0,
+      "holderEntry": "https://www.rct.uk/collection/919028/recto-the-heart-compared-to-a-seed-verso-the-vessels-of-liver-spleen-and-kidneys",
+      "read": "2026-09-17"
+    },
+    "rcin-919055": {
+      "heightCm": 19.2,
+      "widthCm": 14.2,
+      "holderEntry": "https://www.rct.uk/collection/919055/recto-the-uterus-of-a-gravid-cow-verso-the-anatomy-of-the-mouth",
+      "read": "2026-09-17"
+    },
+    "rcin-919057": {
+      "heightCm": 18.8,
+      "widthCm": 13.4,
+      "holderEntry": "https://www.rct.uk/collection/919057/recto-the-skull-sectioned-verso-the-cranium",
+      "read": "2026-09-17"
+    },
+    "rcin-919058": {
+      "heightCm": 19.0,
+      "widthCm": 13.7,
+      "holderEntry": "https://www.rct.uk/collection/919058/recto-the-cranium-sectioned-verso-the-skull-sectioned",
+      "read": "2026-09-17"
+    },
+    "rcin-919075": {
+      "heightCm": 27.6,
+      "widthCm": 20.7,
+      "holderEntry": "https://www.rct.uk/collection/919075/the-anatomy-of-the-neck",
+      "read": "2026-09-17"
+    },
+    "rcin-919101": {
+      "heightCm": 30.4,
+      "widthCm": 21.3,
+      "holderEntry": "https://www.rct.uk/collection/919101/the-fetus-and-the-muscles-attached-to-the-pelvis-recto-studies-of-the-fetus",
+      "read": "2026-09-17"
+    },
+    "rcin-919102": {
+      "heightCm": 30.4,
+      "widthCm": 22.0,
+      "holderEntry": "https://www.rct.uk/collection/919102/the-fetus-in-the-womb-sketches-and-notes-on-reproduction",
+      "read": "2026-09-17"
+    },
+    "rcin-919116": {
+      "heightCm": 30.7,
+      "widthCm": 43.8,
+      "holderEntry": "https://www.rct.uk/collection/919116/recto-studies-of-the-nerves-and-muscles-the-heart-and-optics-verso-blood-flow",
+      "read": "2026-09-17"
+    },
+    "rcin-919082": {
+      "heightCm": 28.3,
+      "widthCm": 20.4,
+      "holderEntry": "https://www.rct.uk/collection/919082/the-aortic-valve",
+      "read": "2026-09-17"
+    }
+  }
+}
