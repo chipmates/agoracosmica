@@ -1,6 +1,7 @@
-import { PerspectiveCamera, Scene, Vector3 } from 'three/webgpu'
+import { DepthTexture, PerspectiveCamera, RenderTarget, Scene, Vector3 } from 'three/webgpu'
 import { createEclipse, type EclipseState } from './scenes/eclipse'
-import { createAgora } from './scenes/agora'
+import { createAgora, WARM_LAYER } from './scenes/agora'
+import { samplesFor } from './stack/post'
 import { createKeeper } from './scenes/keeper'
 import { createBreath } from './scenes/breath'
 import { createAtlas, type LabelBounds } from './scenes/atlas'
@@ -142,6 +143,11 @@ const KEY_OPTIONS = {
   sky: { zenith: '#04060e', horizon: '#111c40', ground: '#05060f', stars: 1 },
 }
 const key = stack.light(KEY_OPTIONS)
+/* the warm camera has to collect the same lights the seated eye does: a
+   material's shader is cached against the scene's light set, and a court
+   compiled under no light at all would be compiled again at the landing */
+key.light.layers.enable(WARM_LAYER)
+key.fill.layers.enable(WARM_LAYER)
 
 const eclipse = createEclipse(scene)
 const agora = createAgora(scene, { key, stack })
@@ -891,8 +897,54 @@ function syncDescentBeats(k: number): void {
   }
 }
 
+/* THE COURT IS PAID FOR IN THE MIDDLE OF THE FALL. Every material of the
+   room builds its pipeline the first time it is drawn, and the first time is
+   the landing: on this machine that one frame cost about three hundred
+   milliseconds, inside the stride the visitor is watching. The same work is
+   done here instead, at a rest in the middle of the ride, where the map
+   holds the frame and the court is on a layer the seated eye does not test.
+
+   The target is small, and it carries the SCENE PASS's own colour type,
+   depth and sample count: a pipeline is keyed on those and on the material,
+   never on which target it was first built for, so what is built here is
+   what the landing needs. The render target is set for the call alone,
+   because the pass the compile belongs to is settled the moment it starts,
+   and the loop's own frames must keep the canvas. */
+const warmCamera = new PerspectiveCamera(46, 1, 0.1, 200)
+warmCamera.layers.set(WARM_LAYER)
+warmCamera.rotation.x = -0.12
+let courtWarm = false
+function warmCourt(): void {
+  if (courtWarm) return
+  courtWarm = true
+  const target = new RenderTarget(320, 200, { type: renderer.getOutputBufferType(), depthBuffer: true })
+  target.samples = samplesFor(stack.tierConfig(), renderer.getPixelRatio())
+  const depth = new DepthTexture()
+  depth.isRenderTargetTexture = true
+  depth.name = 'depth'
+  target.depthTexture = depth
+  warmCamera.aspect = camera.aspect
+  warmCamera.updateProjectionMatrix()
+  warmCamera.updateMatrixWorld(true)
+  agora.warm(true)
+  renderer.setRenderTarget(target)
+  const built = renderer.compileAsync(scene, warmCamera)
+  renderer.setRenderTarget(null)
+  void built
+    .catch(() => {
+      /* a court that could not be compiled early is compiled at the landing,
+         which is the behaviour this replaces */
+    })
+    .finally(() => {
+      agora.warm(false)
+      target.dispose()
+    })
+}
+
 function skipDescent(): void {
   if (phase !== 'descent') return
+  // the impatient way down leaves under a second: the court is put up now
+  warmCourt()
   lastHand = rideClock
   // the impatient way down is still a move: the last stretch of the travel
   // runs out under the visitor instead of cutting
@@ -1670,6 +1722,9 @@ function frame(now: number): void {
   if (phase === 'descent') {
     descentCamera(desc)
     syncDescentBeats(desc)
+    // past the first question, with the whole middle of the fall left to
+    // build the room in
+    if (desc > 0.38) warmCourt()
     // the arrival clears the foot of the frame: no instruction, no gauge and
     // no way past standing on the fire as it comes up
     /* THREE MARKS, AND A WAY ON AT EVERY STATE. The foot of the frame holds
@@ -1798,6 +1853,9 @@ function frame(now: number): void {
 
   keeperScene.update(dt)
   ambience.update(dt)
+  /* the room is never held back once it has to be seen: a build still in
+     flight gives the court its layer back here and finishes on its own */
+  if (agoraReveal > 0.01) agora.warm(false)
   agora.update({
     reveal: agoraReveal,
     elapsed,
