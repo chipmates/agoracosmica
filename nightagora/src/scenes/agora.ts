@@ -281,11 +281,6 @@ export interface AgoraState {
   landed?: number
 }
 
-/** The layer the court stands on while its pipelines are being built. The
-    lobby's camera tests layer 0 only, so the court is in the scene and out
-    of every frame the visitor sees; the warm camera tests this one. */
-export const WARM_LAYER = 5
-
 /**
  * The ground hub, material-first. Camera stays at the origin; everything
  * below is staged for the seated eye (pitch -0.12, fov 46).
@@ -1895,14 +1890,14 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
   // update
   // ==================================================================
   function update(s: AgoraState): void {
-    // a court being warmed stands in the scene for the warm camera alone
+    // a room being put up stands for its one frame, whatever the ride says
     root.visible = warming || s.reveal > 0.01
     if (!root.visible) return
     // a tier with no shadows has nothing to cast: the silent double leaves
     // the frame rather than costing two draw calls for nothing
     castRoot.visible = rig.stack.tierConfig().shadow.on
 
-    const r = s.reveal
+    const r = warming ? 0 : s.reveal
     const t = reduced ? 12.4 : s.elapsed
     uT.value = t
     uTP.value = t
@@ -1935,12 +1930,13 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
     airMat.opacity = r * (0.24 + 0.06 * Math.sin(t * 1.7))
   }
 
-  /* THE COURT IS PUT UP BEFORE IT IS SEEN. Every material here builds its
-     pipeline the first time it is drawn, and the first time is the landing.
-     `warm(true)` puts the whole court on the warm layer with nothing culled
-     away, so one frame drawn by a camera that tests that layer meets every
-     material and every geometry, including what stands outside the seated
-     eye's frustum; the visitor's own camera sees none of it. */
+  /* THE COURT IS PUT UP BEFORE IT IS SEEN. Every material of this room
+     builds its node graph, its shader and its pipeline the first time it is
+     DRAWN, through the pass it is drawn in, and the first time is the
+     landing. `warm(true)` stands the whole room up for one frame with every
+     colour at zero and nothing culled away, so that frame meets every
+     material and every geometry, the shadow and the mirror included, and
+     paints nothing. It belongs in a frame that is already black. */
   let warming = false
   const uncull: Object3D[] = []
   function warm(on: boolean): void {
@@ -1949,14 +1945,12 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
     if (on) {
       root.visible = true
       root.traverse((object) => {
-        object.layers.set(WARM_LAYER)
         if (!object.frustumCulled) return
         object.frustumCulled = false
         uncull.push(object)
       })
       return
     }
-    root.traverse((object) => object.layers.set(0))
     for (const object of uncull) object.frustumCulled = true
     uncull.length = 0
   }
