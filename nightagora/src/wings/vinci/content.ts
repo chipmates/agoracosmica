@@ -863,6 +863,149 @@ export const vinciPlanRooms = {
   'long-gallery': { en: 'The long gallery', de: 'Die lange Galerie' },
 } satisfies Record<string, VinciText>;
 
+/** THE LIFE VIEW'S OWN SECOND LINE, under the wing's through line. */
+export const vinciLifeSecondLine: VinciText = {
+  en: 'The whole life, 1452 to 1519, and where the papers went after.',
+  de: 'Das ganze Leben, 1452 bis 1519, und wohin die Blätter danach gingen.',
+};
+
+/** What a date the gallery floor does not carry says, instead of offering a
+ * walk to a socket that was never cut. */
+export const vinciLifeNotCut: VinciText = {
+  en: 'This date is not cut into the floor. The gallery holds twelve of the fifty-six.',
+  de: 'Dieses Datum ist nicht in den Boden geschnitten. Die Galerie trägt zwölf der sechsundfünfzig.',
+};
+
+/** THE SEVEN PERIODS, named by place and by the years the period runs
+ * between, each with one cue sentence. The dates that fall in each are the
+ * record's own, named here by their first and last id, and the seventh is not
+ * a period of a life: the rows after the death belong to the reception of the
+ * work and are drawn apart. */
+export const vinciLifeBands: readonly {
+  id: string; from: string; to: string; name: VinciText; line: VinciText; afterlife?: true;
+}[] = [
+  {
+    id: 'vinci-florence', from: 'life-01', to: 'life-11',
+    name: { en: 'Vinci and Florence, 1452 to 1481', de: 'Vinci und Florenz, 1452 bis 1481' },
+    line: {
+      en: 'He is born near Vinci and learns his trade in Florence, in Verrocchio’s workshop.',
+      de: 'Er wird bei Vinci geboren und lernt sein Handwerk in Florenz, in Verrocchios Werkstatt.',
+    },
+  },
+  {
+    id: 'milan', from: 'life-12', to: 'life-25',
+    name: { en: 'Milan, 1482 to 1499', de: 'Mailand, 1482 bis 1499' },
+    line: {
+      en: 'Seventeen years at the Sforza court, with the horse, the Last Supper and the first machines.',
+      de: 'Siebzehn Jahre am Hof der Sforza, mit dem Pferd, dem Abendmahl und den ersten Maschinen.',
+    },
+  },
+  {
+    id: 'venice-romagna', from: 'life-26', to: 'life-31',
+    name: { en: 'Venice, Florence and the Romagna, 1500 to 1506', de: 'Venedig, Florenz und die Romagna, 1500 bis 1506' },
+    line: {
+      en: 'He moves from city to city, works for Cesare Borgia, and begins the portrait of Lisa del Giocondo.',
+      de: 'Er zieht von Stadt zu Stadt, arbeitet für Cesare Borgia und beginnt das Bildnis der Lisa del Giocondo.',
+    },
+  },
+  {
+    id: 'milan-again', from: 'life-32', to: 'life-34',
+    name: { en: 'Milan again, 1506 to 1513', de: 'Wieder Mailand, 1506 bis 1513' },
+    line: {
+      en: 'Back under French rule, with the anatomy sheets and a second horse that stayed a plan.',
+      de: 'Zurück unter französischer Herrschaft, mit den anatomischen Blättern und einem zweiten Pferd, das ein Plan blieb.',
+    },
+  },
+  {
+    id: 'rome', from: 'life-35', to: 'life-36',
+    name: { en: 'Rome, 1513 to 1516', de: 'Rom, 1513 bis 1516' },
+    line: {
+      en: 'He leaves for Rome with his household, and the records grow thin.',
+      de: 'Er bricht mit seinem Haushalt nach Rom auf, und die Belege werden dünn.',
+    },
+  },
+  {
+    id: 'amboise', from: 'life-37', to: 'life-42',
+    name: { en: 'Amboise, 1516 to 1519', de: 'Amboise, 1516 bis 1519' },
+    line: {
+      en: 'The last house, the visit of 1517, the will, and the grave in the town.',
+      de: 'Das letzte Haus, der Besuch von 1517, das Testament und das Grab in der Stadt.',
+    },
+  },
+  {
+    id: 'after', from: 'life-43', to: 'life-56', afterlife: true,
+    name: { en: 'After 1519, where the papers went', de: 'Nach 1519, wohin die Blätter gingen' },
+    line: {
+      en: 'Five hundred years of heirs, sales and thefts, from Melzi’s house to an exhibition at the Louvre.',
+      de: 'Fünfhundert Jahre Erben, Verkäufe und Diebstähle, von Melzis Haus bis zu einer Ausstellung im Louvre.',
+    },
+  },
+];
+
+/** THE PEOPLE OF THIS LIFE, authored from the dates the record already holds
+ * and never from a network: each tie names the events it rests on, and how
+ * sure it is follows from them. One life does not need a graph. */
+export const vinciLifePeople: readonly {
+  id: string; name: VinciText; role: VinciText; events: readonly string[];
+}[] = [
+  {
+    id: 'verrocchio', name: { en: 'Andrea del Verrocchio', de: 'Andrea del Verrocchio' },
+    role: {
+      en: 'The Florentine workshop he probably trained in, between about 1466 and 1472.',
+      de: 'Die Florentiner Werkstatt, in der er wahrscheinlich zwischen etwa 1466 und 1472 lernte.',
+    },
+    events: ['life-04'],
+  },
+  {
+    id: 'ludovico', name: { en: 'Ludovico Sforza', de: 'Ludovico Sforza' },
+    role: {
+      en: 'The duke in Milan he offered his services to, and who granted him a vineyard.',
+      de: 'Der Herzog in Mailand, dem er seine Dienste anbot und der ihm einen Weinberg schenkte.',
+    },
+    events: ['life-13', 'life-19', 'life-23'],
+  },
+  {
+    id: 'salai', name: { en: 'Salaì', de: 'Salaì' },
+    role: {
+      en: 'Giacomo, who entered his household in 1490 and left for Rome with him.',
+      de: 'Giacomo, der 1490 in seinen Haushalt kam und mit ihm nach Rom aufbrach.',
+    },
+    events: ['life-17', 'life-35'],
+  },
+  {
+    id: 'melzi', name: { en: 'Melzi', de: 'Melzi' },
+    role: {
+      en: 'He left for Rome with him and reported his death. The manuscripts stayed in his house.',
+      de: 'Er brach mit ihm nach Rom auf und meldete seinen Tod. Die Manuskripte blieben in seinem Haus.',
+    },
+    events: ['life-35', 'life-41', 'life-43'],
+  },
+  {
+    id: 'borgia', name: { en: 'Cesare Borgia', de: 'Cesare Borgia' },
+    role: {
+      en: 'He named him architect and general engineer in 1502.',
+      de: 'Er ernannte ihn 1502 zum Architekten und Generalingenieur.',
+    },
+    events: ['life-27'],
+  },
+  {
+    id: 'charles', name: { en: 'Charles d’Amboise', de: 'Charles d’Amboise' },
+    role: {
+      en: 'He asked Florence to let him stay in Milan for two months.',
+      de: 'Er bat Florenz, ihn zwei Monate in Mailand bleiben zu lassen.',
+    },
+    events: ['life-32'],
+  },
+  {
+    id: 'francis', name: { en: 'Francis I', de: 'Franz I.' },
+    role: {
+      en: 'The king whose service he entered when he came to Cloux.',
+      de: 'Der König, in dessen Dienst er trat, als er nach Cloux kam.',
+    },
+    events: ['life-37'],
+  },
+];
+
 /** The sources window's own headings, in the museum's voice. */
 export const vinciSourcesHeadings = {
   elsewhere: { en: 'Elsewhere or lost', de: 'Anderswo oder verloren' },
