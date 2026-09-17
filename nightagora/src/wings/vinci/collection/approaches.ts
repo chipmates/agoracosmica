@@ -267,7 +267,13 @@ function otherKinds(): Placed[] {
   const placed: Placed[] = []
   const add = (id: string, kind: VinciExhibitKind, station: VinciStationId, at: (narrow: boolean) => ApproachPose,
     workId: string | null = null, face: 'front' | null = null): void => {
-    placed.push({ record: { id, kind, station, workId, face }, pose: at })
+    // A pose is solved once per viewport: the registry reads it on every refresh.
+    const solved: Partial<Record<'wide' | 'narrow', ApproachPose>> = {}
+    const pose = (narrow: boolean): ApproachPose => {
+      const key = narrow ? 'narrow' : 'wide', held = solved[key] ??= at(narrow)
+      return { eye: held.eye.clone(), at: held.at.clone(), fov: held.fov }
+    }
+    placed.push({ record: { id, kind, station, workId, face }, pose })
   }
   add(MURAL_ID, 'mural', 'supper-wall', narrow => eastFacingApproach(MURAL, narrow), 'last-supper', 'front')
   for (const slug of MACHINE_SLUGS) {
