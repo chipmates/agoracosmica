@@ -517,6 +517,11 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
   async function stand(): Promise<void> {
     await body.ready
     if (!mounted || !host) return
+    // A body out of the store names its parts only once it stands.
+    for (const entry of options.viewpoints) {
+      const button = viewButtons.get(entry.id)
+      if (button) button.disabled = entry.id !== 'whole' && (!entry.part || !nodeFor(entry.part))
+    }
     scene = new Scene()
     scene.background = new Color('#1a2026')
     const backdrop = createBenchBackdrop()
