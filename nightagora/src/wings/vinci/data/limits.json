@@ -1,0 +1,475 @@
+{
+  "schema_version": "1.0",
+  "provenance": {
+    "scope": "The two honesty slots of every exhibit the vitrine opens: the twenty five pictures of the picture room and the machines. `limit` says what the evidence behind the work does not settle. `visual_note` says what the museum's view adds to the work or refuses to show. One sentence each, English and German, keyed by the exhibit id of data/lines.json.",
+    "rule": "Every sentence rests on a record the museum already holds, named in `source`: the picture register and the store record of the plate the reclassification displays, the display windows, the machine dossiers and their evidence records. A slot the records give nothing for is null and is listed in the seat's STATUS.",
+    "read": "Behind the record's control, in the slots `limit` and `visual_note` of the vitrine's exhibit.",
+    "prepared": "2026-09-17"
+  },
+  "slots": {
+    "picture/baptism-of-christ/front": {
+      "limit": {
+        "en": "How much of the panel Leonardo painted is debated, and it is dated only as about 1470 to 1475.",
+        "de": "Wie viel der Tafel Leonardo malte, ist umstritten, und datiert ist sie nur auf etwa 1470 bis 1475.",
+        "source": "pictures/visitor-copy.ts, baptism-of-christ note; pictures/data/paintings.json, baptism-of-christ, date_label and date_certainty"
+      },
+      "visual_note": {
+        "en": "This is a modern photograph of the panel, and its colours are not a measured reference.",
+        "de": "Das ist eine moderne Aufnahme der Tafel, und ihre Farben sind keine vermessene Referenz.",
+        "source": "store manifest, vinci/painting-plate/baptism-of-christ__3407x4096, state_note"
+      }
+    },
+    "picture/annunciation/front": {
+      "limit": {
+        "en": "The Uffizi gives 90 by 222 cm, the room hangs the panel at 98 by 217 cm, and nothing in the photograph settles which is right.",
+        "de": "Die Uffizien nennen 90 mal 222 cm, der Raum hängt die Tafel mit 98 mal 217 cm, und die Aufnahme entscheidet nicht, welches Maß stimmt.",
+        "source": "pictures/data/paintings.json, annunciation, gaps and measurement alternatives; pictures/registration.ts, the annunciation window note"
+      },
+      "visual_note": {
+        "en": "The photograph dates from September 2023, and the museum trims it to the panel but keeps a thin uncertain edge rather than cut into paint.",
+        "de": "Die Aufnahme stammt vom September 2023, und das Museum beschneidet sie auf die Tafel, lässt aber einen schmalen unsicheren Rand stehen, statt in die Malerei zu schneiden.",
+        "source": "store manifest, vinci/painting-plate/annunciation, state_note; pictures/registration.ts, the annunciation window note"
+      }
+    },
+    "picture/ginevra-de-benci/front": {
+      "limit": {
+        "en": "The record does not say when the bottom of the panel was cut away, and that her hands were lost with it is only believed.",
+        "de": "Wann der untere Teil der Tafel abgeschnitten wurde, sagt der Nachweis nicht, und dass ihre Hände mit ihm verloren gingen, wird nur angenommen.",
+        "source": "data/lines.json, picture/ginevra-de-benci/front; pictures/visitor-copy.ts, ginevra-de-benci note"
+      },
+      "visual_note": {
+        "en": "The museum shows the original panel of 38.1 by 37 cm without the later addition at the bottom, and it does not paint in the missing hands.",
+        "de": "Das Museum zeigt die ursprüngliche Tafel von 38,1 mal 37 cm ohne die spätere Ergänzung am unteren Rand und malt die fehlenden Hände nicht hinzu.",
+        "source": "pictures/data/paintings.json, ginevra-de-benci, measurement alternatives and reproduction_note; pictures/README.md, the Ginevra row"
+      }
+    },
+    "picture/ginevra-de-benci/reverse": {
+      "limit": null,
+      "visual_note": {
+        "en": "The back of the same panel stands in its own modern mount beside the front, although both faces belong to one panel.",
+        "de": "Die Rückseite derselben Tafel steht in einer eigenen modernen Fassung neben der Vorderseite, obwohl beide Seiten zu einer Tafel gehören.",
+        "source": "pictures/data/paintings.json, ginevra-de-benci, reproduction_note; pictures/README.md, the Ginevra row"
+      }
+    },
+    "picture/madonna-of-the-carnation/front": {
+      "limit": {
+        "en": "It is dated only as about 1475.",
+        "de": "Datiert ist sie nur auf etwa 1475.",
+        "source": "pictures/data/paintings.json, madonna-of-the-carnation, date_label and date_certainty"
+      },
+      "visual_note": {
+        "en": "The image is the Alte Pinakothek's own published photograph, and it gives no date for when it was taken.",
+        "de": "Das Bild ist die veröffentlichte Aufnahme der Alten Pinakothek selbst, und sie nennt kein Aufnahmedatum.",
+        "source": "store manifest, vinci/painting-plate/madonna-of-the-carnation__2229x3000, state_note"
+      }
+    },
+    "picture/benois-madonna/front": {
+      "limit": {
+        "en": "Its size of 49.5 by 33 cm comes from a catalogue and was not checked against the Hermitage's own record.",
+        "de": "Das Maß von 49,5 mal 33 cm stammt aus einem Katalog und wurde nicht am eigenen Nachweis der Eremitage geprüft.",
+        "source": "pictures/data/paintings.json, benois-madonna, gaps and measurement status"
+      },
+      "visual_note": {
+        "en": "The image is a published photograph of the painting, which is now on canvas, and when it was taken is not established.",
+        "de": "Das Bild ist eine veröffentlichte Aufnahme des heute auf Leinwand übertragenen Gemäldes, und das Aufnahmedatum ist nicht belegt.",
+        "source": "store manifest, vinci/painting-plate/benois-madonna, state_note"
+      }
+    },
+    "picture/saint-jerome/front": {
+      "limit": {
+        "en": "It is dated only as about 1480 to 1490, and its size was not checked against the Vatican gallery's own record.",
+        "de": "Datiert ist es nur auf etwa 1480 bis 1490, und sein Maß wurde nicht am eigenen Nachweis der Vatikanischen Pinakothek geprüft.",
+        "source": "pictures/data/paintings.json, saint-jerome, date_label, gaps and measurement status"
+      },
+      "visual_note": {
+        "en": "Neither the date of the photograph nor the latest treatment of the panel is established.",
+        "de": "Weder das Aufnahmedatum noch die jüngste Behandlung der Tafel ist belegt.",
+        "source": "store manifest, vinci/painting-plate/saint-jerome, state_note"
+      }
+    },
+    "picture/adoration-of-the-magi/front": {
+      "limit": {
+        "en": "The Uffizi gives 244 by 240 cm, another catalogue gives 246 by 243 cm, and the room follows the Uffizi.",
+        "de": "Die Uffizien nennen 244 mal 240 cm, ein anderer Katalog 246 mal 243 cm, und der Raum folgt den Uffizien.",
+        "source": "pictures/data/paintings.json, adoration-of-the-magi, measurement alternatives"
+      },
+      "visual_note": {
+        "en": "The image is a monochrome facsimile printed in 1901, so it shows the tones of that year and not the colour the panel has after its restoration of 2012 to 2017.",
+        "de": "Die Abbildung ist ein einfarbiges Druckfaksimile von 1901 und zeigt die Tonwerte jenes Jahres, nicht die Farben der Tafel nach ihrer Restaurierung von 2012 bis 2017.",
+        "source": "store manifest, vinci/painting-plate/adoration-of-the-magi__1940x1852, state_note; pictures/data/paintings.json, adoration-of-the-magi, facts"
+      }
+    },
+    "picture/annunciation-predella/front": {
+      "limit": {
+        "en": "Whether Leonardo or Lorenzo di Credi painted it is disputed, and it is dated only as about 1475 to 1478.",
+        "de": "Ob Leonardo oder Lorenzo di Credi sie malte, ist umstritten, und datiert ist sie nur auf etwa 1475 bis 1478.",
+        "source": "pictures/data/paintings.json, annunciation-predella, attribution_line and date_label"
+      },
+      "visual_note": {
+        "en": "The image is an older C2RMF photograph, cropped and with adjusted tones, and its date is not verified.",
+        "de": "Das Bild ist eine ältere, beschnittene Aufnahme des C2RMF mit angepassten Tonwerten, und ihr Datum ist nicht belegt.",
+        "source": "store manifest, vinci/painting-plate/annunciation-predella, state_note and note"
+      }
+    },
+    "picture/virgin-of-the-rocks-louvre/front": {
+      "limit": {
+        "en": "It is dated only as about 1483 to 1494, although the contract asked for delivery in December 1483.",
+        "de": "Datiert ist es nur auf etwa 1483 bis 1494, obwohl der Vertrag die Lieferung für Dezember 1483 verlangte.",
+        "source": "pictures/data/paintings.json, virgin-of-the-rocks-louvre, date_label; data/lines.json, picture/virgin-of-the-rocks-louvre/front"
+      },
+      "visual_note": {
+        "en": "The photograph carried no record of its colour space, so the colours shown rest on an assumed one.",
+        "de": "Die Aufnahme trug keine Angabe zu ihrem Farbraum, die gezeigten Farben beruhen daher auf einem angenommenen.",
+        "source": "store manifest, vinci/painting-plate/virgin-of-the-rocks-louvre, note (untagged source, sRGB assigned)"
+      }
+    },
+    "picture/portrait-of-a-musician/front": {
+      "limit": {
+        "en": "It is only attributed to Leonardo, and who painted the torso is debated.",
+        "de": "Es ist Leonardo nur zugeschrieben, und wer den Oberkörper malte, ist umstritten.",
+        "source": "pictures/data/paintings.json, portrait-of-a-musician, attribution_line"
+      },
+      "visual_note": {
+        "en": "The museum crops away the dark surround of the photograph but keeps a narrow uncertain edge, and it claims no exact panel edges.",
+        "de": "Das Museum schneidet den dunklen Rand der Aufnahme weg, lässt aber einen schmalen unsicheren Rand stehen und behauptet keine genauen Tafelkanten.",
+        "source": "pictures/registration.ts, the portrait-of-a-musician window note"
+      }
+    },
+    "picture/lady-with-an-ermine/front": {
+      "limit": {
+        "en": "Two published sizes, 54.8 by 40.3 cm and 54 by 39 cm, have not been reconciled, and the room hangs the first.",
+        "de": "Zwei veröffentlichte Maße, 54,8 mal 40,3 cm und 54 mal 39 cm, sind nicht geklärt, und der Raum hängt nach dem ersten.",
+        "source": "pictures/data/paintings.json, lady-with-an-ermine, reproduction_note and measurement alternatives"
+      },
+      "visual_note": {
+        "en": "The museum shows the Kraków museum's own image with the later black background left in, and it does not bring back the bluish grey beneath.",
+        "de": "Das Museum zeigt das Bild des Krakauer Museums mit dem späteren schwarzen Hintergrund und holt das bläuliche Grau darunter nicht zurück.",
+        "source": "store manifest, vinci/painting-plate/lady-with-an-ermine__2936x4000, state_note; data/lines.json, picture/lady-with-an-ermine/front"
+      }
+    },
+    "picture/la-belle-ferronniere/front": {
+      "limit": {
+        "en": "Who the sitter was is uncertain, and the painting is dated only as about 1490 to 1497.",
+        "de": "Wer die Dargestellte war, ist ungewiss, und datiert ist das Bild nur auf etwa 1490 bis 1497.",
+        "source": "pictures/visitor-copy.ts, la-belle-ferronniere note; pictures/data/paintings.json, la-belle-ferronniere, date_label"
+      },
+      "visual_note": {
+        "en": "The image is a monochrome facsimile printed in 1901, so it shows the tones of that year and not the painting's colour.",
+        "de": "Die Abbildung ist ein einfarbiges Druckfaksimile von 1901 und zeigt die Tonwerte jenes Jahres, nicht die Farben des Gemäldes.",
+        "source": "store manifest, vinci/painting-plate/la-belle-ferronniere__1806x2523, state_note"
+      }
+    },
+    "picture/madonna-litta/front": {
+      "limit": {
+        "en": "The Hermitage names Leonardo, but Boltraffio and Marco d’Oggiono have also been proposed, and the attribution remains disputed.",
+        "de": "Die Eremitage nennt Leonardo, doch auch Boltraffio und Marco d’Oggiono wurden vorgeschlagen, und die Zuschreibung bleibt umstritten.",
+        "source": "pictures/data/paintings.json, madonna-litta, attribution_line; pictures/visitor-copy.ts, madonna-litta note"
+      },
+      "visual_note": {
+        "en": "The museum crops away the grey scale and colour chart photographed beside the painting and keeps a narrow uncertain edge around it.",
+        "de": "Das Museum schneidet die mitfotografierte Grauskala und Farbkarte ab und lässt einen schmalen unsicheren Rand um das Bild stehen.",
+        "source": "pictures/registration.ts, the madonna-litta window note"
+      }
+    },
+    "picture/burlington-house-cartoon/front": {
+      "limit": {
+        "en": "Its date of about 1506 to 1508 is disputed.",
+        "de": "Seine Datierung auf etwa 1506 bis 1508 ist umstritten.",
+        "source": "pictures/data/paintings.json, burlington-house-cartoon, date_label and date_certainty"
+      },
+      "visual_note": {
+        "en": "The image is a photogravure of 1898, so it shows the drawing as it was then, long before the shotgun attack of 1987 and the restoration that followed.",
+        "de": "Die Abbildung ist eine Fotogravüre von 1898 und zeigt die Zeichnung, wie sie damals war, lange vor dem Flintenschuss von 1987 und der folgenden Restaurierung.",
+        "source": "store manifest, vinci/painting-plate/burlington-house-cartoon__1088x1530, state_note; data/lines.json, picture/burlington-house-cartoon/front"
+      }
+    },
+    "picture/yarnwinder-buccleuch/front": {
+      "limit": {
+        "en": "It is given to Leonardo and his workshop, not to Leonardo alone, and it is dated only as about 1501.",
+        "de": "Zugeschrieben ist es Leonardo und seiner Werkstatt, nicht Leonardo allein, und datiert nur auf etwa 1501.",
+        "source": "pictures/data/paintings.json, yarnwinder-buccleuch, attribution_line, attribution_certainty and date_label"
+      },
+      "visual_note": {
+        "en": "The photograph from the National Galleries of Scotland carried no record of its colour space, so the colours shown rest on an assumed one.",
+        "de": "Die Aufnahme der National Galleries of Scotland trug keine Angabe zu ihrem Farbraum, die gezeigten Farben beruhen daher auf einem angenommenen.",
+        "source": "store manifest, vinci/painting-plate/yarnwinder-buccleuch, note (logged credit, untagged source, sRGB assigned)"
+      }
+    },
+    "picture/yarnwinder-lansdowne/front": {
+      "limit": {
+        "en": "The Met now records 49.5 by 37.1 cm where the older catalogue gave 50.2 by 36.4 cm, and the support the paint was transferred to is not named.",
+        "de": "Das Metropolitan Museum verzeichnet heute 49,5 mal 37,1 cm, der ältere Katalog nannte 50,2 mal 36,4 cm, und der Träger, auf den die Malerei übertragen wurde, ist nicht genannt.",
+        "source": "pictures/data/paintings.json, yarnwinder-lansdowne, gaps, support and measurement alternatives"
+      },
+      "visual_note": {
+        "en": "The photograph was taken at the Louvre exhibition of 2019 to 2020, and the museum crops away its gilt frame but not a thin uncertain edge.",
+        "de": "Die Aufnahme entstand in der Louvre-Ausstellung 2019 bis 2020, und das Museum schneidet ihren vergoldeten Rahmen weg, einen schmalen unsicheren Rand aber nicht.",
+        "source": "store manifest, vinci/painting-plate/yarnwinder-lansdowne__1992x2401, state_note; pictures/registration.ts, the yarnwinder-lansdowne window note"
+      }
+    },
+    "picture/anghiari-copy/front": {
+      "limit": {
+        "en": "Neither the copy nor its later reworking is exactly dated, and the size of the lost mural it follows is unknown.",
+        "de": "Weder die Kopie noch ihre spätere Überarbeitung ist genau datiert, und die Größe des verlorenen Wandbilds, dem sie folgt, ist unbekannt.",
+        "source": "pictures/data/paintings.json, anghiari-copy, gaps and date_certainty"
+      },
+      "visual_note": {
+        "en": "The image is a historical library slide cropped to the drawing, without its glass border, mount and typed labels, and the museum does not picture the lost mural itself.",
+        "de": "Die Abbildung ist ein historisches Bibliotheksdia, auf die Zeichnung beschnitten, ohne Glasrand, Montierung und Beschriftung, und das verlorene Wandbild selbst zeigt das Museum nicht.",
+        "source": "store manifest, vinci/painting-plate/anghiari-copy__2135x1453, state_note; pictures/data/paintings.json, held_assets P02 decision"
+      }
+    },
+    "picture/mona-lisa/front": {
+      "limit": {
+        "en": "A visitor in 1517 saw a portrait of a Florentine woman in this house, but that he meant this panel is inferred, not established.",
+        "de": "Ein Besucher sah 1517 in diesem Haus das Bildnis einer Florentinerin, doch dass er diese Tafel meinte, ist erschlossen, nicht belegt.",
+        "source": "pictures/data/paintings.json, mona-lisa, de_beatis with identification_certainty inferred"
+      },
+      "visual_note": {
+        "en": "The image is a historical printed reproduction of unverified date, cropped to the print, and it shows neither the panel's present colour nor its exact edges.",
+        "de": "Die Abbildung ist eine historische Druckreproduktion unbestätigten Datums, auf den Druck beschnitten, und zeigt weder die heutige Farbigkeit der Tafel noch ihre genauen Kanten.",
+        "source": "store manifest, vinci/painting-plate/mona-lisa, state_note; pictures/registration.ts, the mona-lisa window note"
+      }
+    },
+    "picture/virgin-of-the-rocks-london/front": {
+      "limit": {
+        "en": "How much of it his workshop painted is debated, and it is dated only as about 1491 to 1508.",
+        "de": "Wie viel davon seine Werkstatt malte, ist umstritten, und datiert ist es nur auf etwa 1491 bis 1508.",
+        "source": "pictures/data/paintings.json, virgin-of-the-rocks-london, attribution_line and date_label"
+      },
+      "visual_note": {
+        "en": "The photograph of 1 March 2017 shows the picture in its frame, and the museum cuts it to the arched opening without rebuilding the panel edges the frame hides.",
+        "de": "Die Aufnahme vom 1. März 2017 zeigt das Bild im Rahmen, und das Museum schneidet sie auf die Bogenöffnung zu, ohne die vom Rahmen verdeckten Tafelränder zu ergänzen.",
+        "source": "store manifest, vinci/painting-plate/virgin-of-the-rocks-london, state_note; pictures/registration.ts and pictures/arch-mask.ts, the virgin-of-the-rocks-london notes"
+      }
+    },
+    "picture/virgin-and-child-with-st-anne/front": {
+      "limit": {
+        "en": "A visitor in 1517 describes a Madonna with the Child in Saint Anne's lap in this house, but he names a subject, not this panel.",
+        "de": "Ein Besucher beschreibt 1517 in diesem Haus eine Madonna mit dem Kind im Schoß der heiligen Anna, doch er nennt ein Motiv, nicht diese Tafel.",
+        "source": "pictures/data/paintings.json, virgin-and-child-with-st-anne, de_beatis with identification_certainty inferred"
+      },
+      "visual_note": {
+        "en": "The photograph was taken in February 2024, and the museum cuts it to the frame opening it shows, which does not prove where the original 113 cm field ends.",
+        "de": "Die Aufnahme entstand im Februar 2024, und das Museum schneidet sie auf die sichtbare Rahmenöffnung zu, die nicht belegt, wo das ursprüngliche 113 cm breite Bildfeld endet.",
+        "source": "store manifest, vinci/painting-plate/virgin-and-child-with-st-anne__3081x4096, state_note; pictures/registration.ts, the virgin-and-child-with-st-anne window note"
+      }
+    },
+    "picture/salvator-mundi/front": {
+      "limit": {
+        "en": "The attribution to Leonardo is disputed, and where the painting is now has not been confirmed.",
+        "de": "Die Zuschreibung an Leonardo ist umstritten, und wo sich das Gemälde heute befindet, ist nicht bestätigt.",
+        "source": "pictures/data/paintings.json, salvator-mundi, attribution_line and holder"
+      },
+      "visual_note": {
+        "en": "The image is the photograph made for the sale of 2017, after an extensive restoration that shapes much of what is visible.",
+        "de": "Die Abbildung ist die Aufnahme für die Auktion von 2017, nach umfangreichen Restaurierungen, die vieles von dem prägen, was zu sehen ist.",
+        "source": "store manifest, vinci/painting-plate/salvator-mundi-restored__2478x3200, honesty_en and state_note"
+      }
+    },
+    "picture/saint-john-the-baptist/front": {
+      "limit": {
+        "en": "That this is the young Saint John a visitor saw in the house in 1517 is inferred, since he names a subject and not a panel.",
+        "de": "Dass dies der junge Johannes ist, den ein Besucher 1517 im Haus sah, ist erschlossen, denn er nennt ein Motiv und keine Tafel.",
+        "source": "pictures/data/paintings.json, saint-john-the-baptist, de_beatis with identification_certainty inferred"
+      },
+      "visual_note": {
+        "en": "The photograph was taken at the Louvre Abu Dhabi in November 2023, and the museum cuts away the outer frame but keeps its dark inner edge.",
+        "de": "Die Aufnahme entstand im November 2023 im Louvre Abu Dhabi, und das Museum schneidet den äußeren Rahmen weg, behält aber seinen dunklen inneren Rand.",
+        "source": "store manifest, vinci/painting-plate/saint-john-the-baptist, state_note; pictures/registration.ts, the saint-john-the-baptist window note"
+      }
+    },
+    "picture/la-scapigliata/front": {
+      "limit": {
+        "en": "It is attributed to Leonardo, and its height is given as 24.7 cm in one source and 24.6 cm in another.",
+        "de": "Sie ist Leonardo zugeschrieben, und ihre Höhe wird in einer Quelle mit 24,7 cm, in einer anderen mit 24,6 cm angegeben.",
+        "source": "pictures/data/paintings.json, la-scapigliata, attribution_line, gaps and measurement alternatives"
+      },
+      "visual_note": {
+        "en": "The image was published for an exhibition at the Shanghai Museum, and it gives no capture date.",
+        "de": "Die Abbildung wurde für eine Ausstellung im Shanghai Museum veröffentlicht und nennt kein Aufnahmedatum.",
+        "source": "store manifest, vinci/painting-plate/la-scapigliata, state_note"
+      }
+    },
+    "picture/bacchus/front": {
+      "limit": {
+        "en": "It is a workshop painting whose painter is not settled, and the Louvre also names Francesco Melzi.",
+        "de": "Es ist ein Werkstattbild, dessen Maler nicht feststeht, und der Louvre nennt auch Francesco Melzi.",
+        "source": "pictures/data/paintings.json, bacchus, attribution_line and attribution_certainty"
+      },
+      "visual_note": {
+        "en": "The photograph shows the painting after the restoration of 2017 to 2019, and the museum does not undo the later change into Bacchus.",
+        "de": "Die Aufnahme zeigt das Gemälde nach der Restaurierung von 2017 bis 2019, und das Museum macht die spätere Umarbeitung zum Bacchus nicht rückgängig.",
+        "source": "store manifest, vinci/painting-plate/bacchus, note; pictures/data/paintings.json, bacchus, facts"
+      }
+    },
+    "machine/aerial-screw": {
+      "limit": {
+        "en": "The sheet does not say how the screw was to be driven or how a flying machine would keep from turning with it, and no build in his lifetime is documented.",
+        "de": "Das Blatt sagt nicht, wie die Schraube angetrieben werden sollte oder wie sich ein fliegendes Gerät am Mitdrehen hindern ließe, und ein Bau zu Lebzeiten ist nicht belegt.",
+        "source": "machines/data/aerial-screw.json, gaps and research claims; machines/data/records.json, aerial-screw, the myth section"
+      },
+      "visual_note": {
+        "en": "Of the sizes, only the radius of eight braccia comes from the sheet, while the turns, the pitch, the push bars and the bearing are the museum's, and the model never leaves the floor.",
+        "de": "Von den Maßen stammt nur der Radius von acht Braccia vom Blatt, während Windungen, Steigung, Schubstangen und Lager Zutaten des Museums sind, und das Modell verlässt nie den Boden.",
+        "source": "machines/data/aerial-screw.json, gaps, the sail part note and assumption a-display"
+      }
+    },
+    "machine/parachute": {
+      "limit": {
+        "en": "The sheet gives the size and the sealed linen but not how the frame was joined or how long the ropes were, and no jump in his lifetime is documented.",
+        "de": "Das Blatt nennt Größe und abgedichtetes Leinen, aber nicht, wie der Rahmen gefügt war oder wie lang die Seile waren, und ein Sprung zu Lebzeiten ist nicht belegt.",
+        "source": "machines/data/parachute.json, gaps and research claims"
+      },
+      "visual_note": {
+        "en": "The frame sizes, the four ropes and the harness ring are assumptions, and the canopy stands still on modern supports without showing a descent.",
+        "de": "Rahmenstärken, die vier Seile und der Tragering sind Annahmen, und der Schirm steht still auf modernen Halterungen, ohne einen Sinkflug zu zeigen.",
+        "source": "machines/data/records.json, parachute, the mechanism section; machines/data/parachute.json, assumption a-display; machines/bench/registers.ts, BENCH_ABSENCE"
+      }
+    },
+    "machine/anemometer": {
+      "limit": {
+        "en": "The sheet asks for a clock to turn the reading into distance travelled but gives no sizes and no calibration, so no wind speed can be read from it.",
+        "de": "Das Blatt verlangt eine Uhr, um die Anzeige in zurückgelegte Strecke umzurechnen, nennt aber weder Maße noch eine Eichung, also lässt sich keine Windgeschwindigkeit ablesen.",
+        "source": "machines/data/anemometer.json, gaps and research claims; machines/data/records.json, anemometer, the folio and purpose sections"
+      },
+      "visual_note": {
+        "en": "Every size and every mark on the scale is assumed, the clock he asked for is left out, and the swing of the plate is a demonstration.",
+        "de": "Alle Maße und alle Teilstriche sind angenommen, die verlangte Uhr fehlt, und der Ausschlag der Platte ist eine Vorführung.",
+        "source": "machines/data/anemometer.json, scope and assumption a-motion; machines/data/records.json, anemometer, the mechanism section"
+      }
+    },
+    "machine/inclinometer": {
+      "limit": {
+        "en": "The sheet tells the reader to try it out, but no test is recorded and it gives no sizes.",
+        "de": "Das Blatt fordert dazu auf, es auszuprobieren, doch ein Versuch ist nicht verzeichnet, und Maße nennt es keine.",
+        "source": "machines/data/inclinometer.json, gaps and research claims"
+      },
+      "visual_note": {
+        "en": "The glass bell stands in for the text's wish to keep the wind off, and the tilting support and every size are the museum's.",
+        "de": "Die Glashaube steht für den Wunsch des Textes, den Wind abzuhalten, und die neigbare Unterlage sowie alle Maße stammen vom Museum.",
+        "source": "machines/data/inclinometer.json, scope and the wind-shield part note; machines/data/records.json, inclinometer, the mechanism section"
+      }
+    },
+    "machine/multi-barrel-gun": {
+      "limit": {
+        "en": "The note gives the number of barrels but no calibre, length or loading time, and no build of it is recorded.",
+        "de": "Die Notiz nennt die Zahl der Rohre, aber weder Kaliber noch Länge oder Ladezeit, und ein Bau ist nicht belegt.",
+        "source": "machines/data/multi-barrel-gun.json, gaps, research dimensions and claims"
+      },
+      "visual_note": {
+        "en": "The barrels are solid and cannot fire, the sizes and the turning time are the museum's, and the fan of barrels elsewhere on the sheet is left out.",
+        "de": "Die Rohre sind massiv und können nicht feuern, Maße und Drehzeit stammen vom Museum, und die Fächerstudie auf demselben Blatt ist nicht eingebaut.",
+        "source": "machines/data/multi-barrel-gun.json, scope, the barrel part notes and research sheet_vs_reconstruction"
+      }
+    },
+    "machine/rolling-mill": {
+      "limit": {
+        "en": "The sheet asks for a tin sheet about half a braccio wide, but which braccio he meant is uncertain, and no build in his lifetime is verified.",
+        "de": "Das Blatt verlangt ein etwa einen halben Braccio breites Zinnblech, doch welcher Braccio gemeint ist, bleibt offen, und ein Bau zu Lebzeiten ist nicht belegt.",
+        "source": "machines/data/rolling-mill.json, research dimensions and claims; machines/data/records.json, rolling-mill, the arithmetic section"
+      },
+      "visual_note": {
+        "en": "The model holds the adjustable gap fixed, gives the gears a modern tooth profile and runs without tin.",
+        "de": "Das Modell hält den einstellbaren Spalt fest, gibt den Zahnrädern ein heutiges Zahnprofil und läuft ohne Zinn.",
+        "source": "machines/data/rolling-mill.json, scope and animation notes"
+      }
+    },
+    "machine/ball-bearing": {
+      "limit": {
+        "en": "The sheet names eight wooden balls and eight wheels but gives no sizes, and no test of the friction it saves is recorded.",
+        "de": "Das Blatt nennt acht Holzkugeln und acht Rädchen, aber keine Maße, und ein Versuch zur eingesparten Reibung ist nicht verzeichnet.",
+        "source": "machines/data/ball-bearing.json, research dimensions and claims"
+      },
+      "visual_note": {
+        "en": "The plates, the shape of the wheels and their axles are modern choices, and the balls roll without the slip that real wood allows.",
+        "de": "Platten, Form der Rädchen und ihre Achsen sind heutige Entscheidungen, und die Kugeln rollen ohne das Gleiten, das echtes Holz zulässt.",
+        "source": "machines/data/ball-bearing.json, assumption A-DETAIL and animation notes; machines/data/records.json, ball-bearing, the mechanism and myth sections"
+      }
+    },
+    "machine/flywheel": {
+      "limit": {
+        "en": "The sheet compares arrangements of turning weights but gives no sizes, and no test of it is verified.",
+        "de": "Das Blatt vergleicht Anordnungen drehender Gewichte, nennt aber keine Maße, und ein Versuch dazu ist nicht belegt.",
+        "source": "machines/data/flywheel.json, research sheet_vs_reconstruction, dimensions and claims"
+      },
+      "visual_note": {
+        "en": "Four equal weights on rigid spokes are the museum's pick, not a copy of one drawing on the sheet, and a person supplies the turning.",
+        "de": "Vier gleiche Gewichte an starren Speichen sind die Wahl des Museums, keine Kopie einer Zeichnung des Blatts, und ein Mensch liefert die Drehung.",
+        "source": "machines/data/flywheel.json, scope; machines/data/records.json, flywheel, the mechanism section"
+      }
+    },
+    "machine/revolving-crane": {
+      "limit": {
+        "en": "The sheet gives no size or load for the crane, since the measurements on the page belong to a weapon, and no build by him is established.",
+        "de": "Das Blatt nennt für den Kran weder Maß noch Last, denn die Maße auf der Seite gehören zu einer Waffe, und ein Bau durch ihn ist nicht belegt.",
+        "source": "machines/data/revolving-crane.json, research dimensions and claims; machines/data/records.json, revolving-crane, the folio section"
+      },
+      "visual_note": {
+        "en": "The counterweight, the stone load, the ratchet and every dimension are the museum's choices, and the pawl is left open, so the hand has to hold the load.",
+        "de": "Gegengewicht, Steinlast, Sperrrad und alle Maße wählte das Museum, und die Sperrklinke bleibt ausgerückt, sodass die Hand die Last halten muss.",
+        "source": "machines/data/revolving-crane.json, scope, assumption A-DETAIL and motion final_hold"
+      }
+    },
+    "machine/lathe": {
+      "limit": {
+        "en": "No written size belongs to this machine, since the labels beside it concern a plane, and that it was meant for drilling is inferred.",
+        "de": "Keine Maßangabe gehört zu dieser Maschine, denn die Beschriftungen daneben betreffen einen Hobel, und dass sie zum Bohren gedacht war, ist erschlossen.",
+        "source": "machines/data/lathe.json, research dimensions and claims"
+      },
+      "visual_note": {
+        "en": "The guided foot bar, the spool and every size are modern simplifications, the feed screw stays locked, and nothing is drilled.",
+        "de": "Geführte Fußstange, Spule und alle Maße sind heutige Vereinfachungen, die Vorschubschraube bleibt fest, und gebohrt wird nichts.",
+        "source": "machines/data/lathe.json, scope and research sheet_vs_reconstruction; machines/data/records.json, lathe, the mechanism section"
+      }
+    },
+    "machine/miter-lock-gates": {
+      "limit": {
+        "en": "The sheet is dated to about 1499 by one study and about 1506 by the Milan museum, and whether he improved the small doors or drew them after they were built is uncertain.",
+        "de": "Eine Studie datiert das Blatt auf etwa 1499, das Mailänder Museum auf etwa 1506, und ob er die kleinen Türen verbesserte oder nach ihrem Bau zeichnete, ist ungewiss.",
+        "source": "machines/data/records.json, miter-lock-gates, the folio and build sections"
+      },
+      "visual_note": {
+        "en": "The leaves move with the water at the same level on both sides, the small doors stay shut, and the lock chamber and its water are not shown.",
+        "de": "Die Flügel bewegen sich bei gleichem Wasserstand auf beiden Seiten, die kleinen Türen bleiben zu, und Schleusenkammer und Wasser sind nicht dargestellt.",
+        "source": "machines/data/miter-lock-gates.json, scope and animation notes; machines/bench/registers.ts, BENCH_ABSENCE"
+      }
+    },
+    "machine/water-lifting-screw": {
+      "limit": {
+        "en": "The sheet carries no writing, so the width, pitch and material of the tube and how much water it lifts are all unknown.",
+        "de": "Das Blatt trägt keinen Text, daher sind Weite, Steigung und Material des Rohrs und die gehobene Wassermenge unbekannt.",
+        "source": "machines/data/water-lifting-screw.json, gaps"
+      },
+      "visual_note": {
+        "en": "The museum picks one screw from several pumps on the sheet, turns it by a crank on the shaft and shows no water.",
+        "de": "Das Museum wählt eine Schnecke aus mehreren Pumpen des Blatts, dreht sie mit einer Kurbel an der Welle und zeigt kein Wasser.",
+        "source": "machines/data/water-lifting-screw.json, scope and gaps; machines/bench/registers.ts, BENCH_ABSENCE"
+      }
+    },
+    "machine/proportional-compass": {
+      "limit": {
+        "en": "The sheet gives no leg length, and what proportions its settings stand for has not been verified.",
+        "de": "Das Blatt nennt keine Schenkellänge, und welche Verhältnisse seine Einstellungen meinen, ist nicht geprüft.",
+        "source": "machines/data/proportional-compass.json, gaps"
+      },
+      "visual_note": {
+        "en": "The ratio of two to one and both leg lengths are the museum's settings, not the drawing's.",
+        "de": "Das Verhältnis zwei zu eins und beide Schenkellängen sind Festlegungen des Museums, nicht der Zeichnung.",
+        "source": "machines/data/proportional-compass.json, gaps and research sheet_vs_reconstruction"
+      }
+    },
+    "machine/camera-obscura": {
+      "limit": {
+        "en": "Leonardo gives neither the depth of the room nor the width of the hole, and no chamber of his is known to survive.",
+        "de": "Leonardo nennt weder die Tiefe des Raums noch die Weite des Lochs, und eine erhaltene Kammer von ihm ist nicht belegt.",
+        "source": "machines/data/camera-obscura.json, gaps; machines/data/records.json, camera-obscura, the build section"
+      },
+      "visual_note": {
+        "en": "He describes a darkened room, not this small box, whose size, hole and distance to the paper are the museum's.",
+        "de": "Er beschreibt einen verdunkelten Raum, nicht diesen kleinen Kasten, dessen Größe, Loch und Abstand zum Papier vom Museum stammen.",
+        "source": "machines/data/camera-obscura.json, scope and research sheet_vs_reconstruction"
+      }
+    }
+  }
+}
