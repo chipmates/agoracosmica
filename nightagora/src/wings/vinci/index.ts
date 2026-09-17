@@ -1382,6 +1382,9 @@ export function createWing():VinciWingModule {
       if(!standing){station=card=index;paintHeader();return}
       const closeSources=mode===2
       if(closeSources)mode=1
+      // A WORK QUEUED FROM THE PLAN BELONGS TO THE WALK THE PLAN BEGAN. A
+      // station the visitor asks for instead cancels it.
+      if(pendingExhibit&&vinciApproachStation(pendingExhibit.replace(/^(?:open|walk):/,''))!==vinciContent[index]!.id)pendingExhibit=''
       // THE STATION RAIL STAYS LIVE. Pressing a station closes the exhibit and
       // the rail walks from the station eye, which is the certified pair.
       closeLook?.close()
