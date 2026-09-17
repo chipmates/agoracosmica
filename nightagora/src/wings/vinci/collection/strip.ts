@@ -38,8 +38,9 @@ export interface VinciHangStrip {
   /** Which exhibit stands open, so the row says where the visitor is. */
   setOpen(id: string | null): void
   setHidden(hidden: boolean): void
-  /** Dock the row under the station card on the wide stage. */
-  dockUnder(top: number): void
+  /** Where the row stands: at a rectangle on the wide stage, inline inside a
+   * card that holds it, or null for the narrow stage's own place. */
+  dock(place: { left: number; top: number; width: number } | 'inline' | null, parent: HTMLElement): void
   dispose(): void
 }
 
@@ -56,6 +57,7 @@ export function createVinciHangStrip(options: {
   host.append(row)
 
   let entries: readonly VinciStripEntry[] = []
+  let docked = ''
   let open: string | null = null, hidden = false, disposed = false
   const buttons: HTMLButtonElement[] = []
 
@@ -127,6 +129,15 @@ export function createVinciHangStrip(options: {
       if (current) button.setAttribute('aria-current', 'true')
       else button.removeAttribute('aria-current')
     }
+    reveal()
+  }
+  /** THE OPEN WORK STANDS IN VIEW in its own row, centred where the row can
+   * centre it. Only the row scrolls, never the page. */
+  function reveal(): void {
+    const current = buttons.find(button => button.dataset['exhibit'] === open && open !== null)
+    if (!current || row.hidden || !row.isConnected) return
+    const target = current.offsetLeft - (row.clientWidth - current.offsetWidth) / 2
+    row.scrollLeft = Math.max(0, Math.min(row.scrollWidth - row.clientWidth, target))
   }
 
   return {
@@ -148,10 +159,24 @@ export function createVinciHangStrip(options: {
     },
     setHidden(next) {
       hidden = next
+      const was = row.hidden
       row.hidden = hidden || entries.length < 2
+      if (was && !row.hidden) reveal()
     },
-    dockUnder(top) {
-      if (row.style.top !== `${top}px`) row.style.top = `${top}px`
+    dock(place, parent) {
+      const key = place === null ? 'narrow' : place === 'inline' ? 'inline' : `${place.left},${place.top},${place.width}`
+      const moved = row.parentElement !== parent
+      if (moved) parent.append(row)
+      if (key === docked && !moved) return
+      docked = key
+      row.dataset['dock'] = place === null ? 'narrow' : place === 'inline' ? 'inline' : 'card'
+      if (place === null || place === 'inline') row.style.left = row.style.top = row.style.width = ''
+      else {
+        row.style.left = `${place.left}px`
+        row.style.top = `${place.top}px`
+        row.style.width = `${place.width}px`
+      }
+      reveal()
     },
     dispose() {
       disposed = true
