@@ -76,7 +76,11 @@ export function mapScaleAt(progress: number, aspect: number): number {
 }
 /** 0 until the court rises behind the ring, 1 once it stands */
 export function courtRiseAt(progress: number): number {
-  return ramp(progress, CUT.courtRise)
+  const [a, b] = CUT.courtRise
+  const t = Math.min(1, Math.max(0, (progress - a) / (b - a)))
+  // the room comes up quickly and settles: a slow start held the far land
+  // as a black band across the top of the frame for most of the rise
+  return Math.sin((t * Math.PI) / 2)
 }
 const c = (hex: string, gain = 1): N => {
   const v = new Color(hex)
