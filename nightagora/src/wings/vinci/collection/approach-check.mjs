@@ -79,7 +79,7 @@ function load(relative) {
   return module.exports
 }
 
-const { vinciExhibitRecords, vinciApproachPose, vinciApproachFit, vinciApproachPlateMetres } =
+const { vinciExhibitRecords, vinciApproachPose, vinciApproachFit, vinciApproachPlateMetres, vinciApproachReachMetres } =
   load('src/wings/vinci/collection/approaches.ts')
 const { stationPose } = load('src/wings/vinci/rail.ts')
 const { mountCollectionPlates } = load('src/wings/vinci/collection/plates.ts')
@@ -130,7 +130,8 @@ for (const viewport of ['desktop', 'phone']) {
       `the frame cuts the work: ${viewport} ${record.id} height ${fit.height} width ${fit.width}`)
     assert.ok(fit.bottom >= -.96, `the work stands on the frame's own edge: ${viewport} ${record.id}`)
     const metres = vinciApproachPlateMetres(record.id, narrow)
-    assert.ok(metres < 2.2, `the viewing eye stands ${metres} m off the plate: ${viewport} ${record.id}`)
+    assert.ok(metres <= vinciApproachReachMetres(), `the viewing eye stands ${metres} m off the plate: ${viewport} ${record.id}`)
+    assert.ok(fit.bottom >= fit.authoredBottom - 1e-9, `the work's foot stands behind the card: ${viewport} ${record.id}`)
     const worst = report.worst[viewport] ?? { fit: 0, metres: 0, band: fit.authoredBottom, relaxed: [] }
     report.worst[viewport] = { fit: Math.max(worst.fit, fit.height, fit.width), metres: Math.max(worst.metres, metres),
       band: Math.min(worst.band, fit.bottom),

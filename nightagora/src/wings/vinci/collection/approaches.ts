@@ -36,9 +36,15 @@ export interface VinciExhibitRecord {
 /** The room's own standing eye, the one its station pose stands at. */
 const EYE = FLOOR + 1.62
 /** A person stands about a picture's own height off it, never closer than a
- * small panel asks for and never past the 2.2 m inside which the picture
- * module raises the full plate. */
+ * small panel asks for. */
 const NEAREST_M = 1.1, FURTHEST_M = 2.1
+/** THE NARROW STAGE STEPS BACK RATHER THAN STANDING A WORK BEHIND ITS CARD.
+ * A phone leaves a work less than half its frame and the lens is already at
+ * its ceiling, so the largest works are held whole by distance instead: the
+ * eye takes a step back, the way a person does in front of a big picture.
+ * The furthest still stands in front of the room's own bench, and the full
+ * plate raises at that distance because the module reads its own reach. */
+const PHONE_FURTHEST_M = 2.72, STEP_BACK_M = .04
 /** THE FRAME IS NOT THE STAGE. The bar, the door and the card stand on the
  * stage too, so the band a work may fill is what is left of it, in the
  * frame's own coordinates: plus one at the top edge, minus one at the bottom.
@@ -47,7 +53,7 @@ const NEAREST_M = 1.1, FURTHEST_M = 2.1
  */
 const BAND = {
   desktop: { top: .87, bottom: -.66, side: .45 },
-  phone: { top: .92, bottom: -.02, side: .94 },
+  phone: { top: .92, bottom: 0, side: .94 },
 }
 /** The aspect each pose is composed against, as `rail-projection.ts` fits it. */
 const AUTHORED_ASPECT = { desktop: 1280 / 720, phone: 390 / 844 }
@@ -102,16 +108,18 @@ function centredDrop(field: Field, distance: number, fov: number, aspect: number
 
 /** One straight square eye per plate: on the plate's own normal through its
  * centre, at the distance the work's own size asks for, with the narrowest
- * lens that holds the whole work. The band the card leaves is a preference,
- * not a law: where the largest works cannot stand inside it, the band gives
- * way at the bottom rather than the frame cutting the work.
+ * lens that holds the whole work. Where that distance cannot hold it in the
+ * band the card leaves, the eye steps back until it can; the band gives way
+ * at the bottom only when the room behind the eye has run out, and the frame
+ * never cuts the work.
  */
 function pictureApproach(field: Field, narrow: boolean)
   : { pose: ApproachPose; distance: number; drop: number; bottom: number; fit: { height: number; width: number } } {
   const viewport = narrow ? 'phone' : 'desktop'
   const aspect = AUTHORED_ASPECT[viewport], band = BAND[viewport], ceiling = FOV_CEILING[viewport]
-  const distance = Math.min(FURTHEST_M, Math.max(NEAREST_M, field.height, field.width))
-  const solve = (bottom: number): { fov: number; drop: number; holds: boolean } => {
+  const furthest = narrow ? PHONE_FURTHEST_M : FURTHEST_M
+  let distance = Math.min(furthest, Math.max(NEAREST_M, field.height, field.width))
+  const solve = (distance: number, bottom: number): { fov: number; drop: number; holds: boolean } => {
     const fits = (fov: number): boolean => {
       const drop = centredDrop(field, distance, fov, aspect, band.top, bottom)
       const seen = corners(field, distance, drop, fov, aspect)
@@ -125,10 +133,17 @@ function pictureApproach(field: Field, narrow: boolean)
     }
     return { fov: high, drop: centredDrop(field, distance, high, aspect, band.top, bottom), holds: fits(high) }
   }
-  let bottom = band.bottom, answer = solve(bottom)
+  let bottom = band.bottom, answer = solve(distance, bottom)
+  // A STEP BACK BEFORE THE BAND GIVES WAY. Only the band's own last resort
+  // puts a work's foot behind the card, and it is reached now only where the
+  // room itself runs out behind the standing eye.
+  while (!answer.holds && distance < furthest - 1e-9) {
+    distance = Math.min(furthest, distance + STEP_BACK_M)
+    answer = solve(distance, bottom)
+  }
   while (!answer.holds && bottom > FRAME_EDGE * -1) {
     bottom = Math.max(-FRAME_EDGE, bottom - .04)
-    answer = solve(bottom)
+    answer = solve(distance, bottom)
   }
   const seen = corners(field, distance, answer.drop, answer.fov, aspect)
   return {
@@ -171,11 +186,24 @@ export function vinciApproachPose(id: string, narrow: boolean): ApproachPose | u
 }
 
 /** The distance from the viewing eye to the plate's own centre, which is what
- * the picture module's 2.2 m rule measures. */
+ * the picture module's near rule measures. */
 export function vinciApproachPlateMetres(id: string, narrow: boolean): number | undefined {
   const field = placement(id)
   if (!field) return undefined
   return pictureApproach(field, narrow).pose.eye.distanceTo(new Vector3(field.east, field.datum, -field.north))
+}
+
+let reach = 0
+/** THE ROOM'S ONE FULL SLOT HAS TO REACH THE EYE THE MODULE STANDS. The
+ * furthest certified viewing eye, over every exhibit and both viewports, so
+ * the plate a visitor has walked up to raises at whatever distance the band
+ * solver settled on and nowhere else. */
+export function vinciApproachReachMetres(): number {
+  if (reach) return reach
+  for (const record of vinciExhibitRecords()) for (const narrow of [false, true]) {
+    reach = Math.max(reach, vinciApproachPlateMetres(record.id, narrow) ?? 0)
+  }
+  return reach
 }
 
 /** The identity the registry joins a mounted plate to. */

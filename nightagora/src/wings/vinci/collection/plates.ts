@@ -9,6 +9,7 @@ import { trueScale } from '../pictures/scale'
 import { pictureDisplayUV, pictureDisplayWindow } from '../pictures/registration'
 import { ARCH_MASK_MANIFEST_ID, buildArchShoulderGeometry, pictureArchMask } from '../pictures/arch-mask'
 import { createPlateStream, type PlateStream } from '../pictures/stream'
+import { vinciApproachReachMetres } from './approaches'
 import { bodySheetSources, type BodySheetSource } from './body-wall'
 import { hangPlacements } from './hang'
 import { COURT, SUPPER_WALL } from './layout'
@@ -195,9 +196,11 @@ export function mountCollectionPlates(host: Group, stack: Stack) {
   }
 
   /** One slot across BOTH walls. Every other full texture has completed its
-   * release, including late decodes and fades, before the next is requested. */
+   * release, including late decodes and fades, before the next is requested.
+   * The reach is the module's own: the furthest eye the close look stands a
+   * visitor at, so an arrival raises its plate and a room away raises none. */
   function streamNear(eye: Vector3): void {
-    let selected: Card | undefined, nearest = 2.2
+    let selected: Card | undefined, nearest = Math.max(2.2, vinciApproachReachMetres() + .02)
     if (tier !== 'calm') {
       const cost = stack.cost()
       const previews = cards.reduce((sum, card) => sum + card.stream.allocation().previewMB + 4 / 1048576, 0)
