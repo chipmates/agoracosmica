@@ -15,6 +15,8 @@
  *   · every detail rectangle lies inside the plate, 0 to 1;
  *   · every step names a part its machine's dossier actually has, stands in
  *     clock order inside 0 to 1, and only machines that move have steps;
+ *   · every machine says its own size and every hung face its description,
+ *     each keyed by the registry, sourced, and the length its slot holds;
  *   · every displayed string passes the spoken registers of the machine bench
  *     and the wing's §B14 rules, and the museum's voice: no dashes, no
  *     semicolons, no filler.
@@ -254,6 +256,48 @@ for (const model of ['picture', 'machine', 'manuscript', 'date']) {
   if (model !== 'date' && fields?.[1]?.id !== 'description') refuse('card-model', model, 'the description is the second paragraph')
 }
 
+/* ------------------------------------------------ the sizes and the plates */
+
+/* Two files a component reads as a sentence: the size a machine's card says
+   aloud, and what is on a plate for a visitor who cannot see it. Both are
+   keyed by the registry, both carry a source, and both have a length their
+   own slot holds. */
+
+const sizes = readJson('src/wings/vinci/data/sizes.json').sizes
+for (const slug of machines.MACHINE_SLUGS) {
+  if (!sizes[slug]) refuse('size-missing', slug, 'a machine whose card says its size owes that sentence')
+}
+let sizeStrings = 0
+for (const [slug, said] of Object.entries(sizes)) {
+  if (!machines.MACHINE_SLUGS.includes(slug)) { refuse('unknown-machine', `sizes ${slug}`, 'no machine of the catalogue carries this slug'); continue }
+  if (typeof said.source !== 'string' || said.source.trim().length < 8) refuse('source', `sizes ${slug}`, 'a size sentence without a named source does not exist', said.source)
+  for (const lang of ['en', 'de']) {
+    sizeStrings++
+    speak(`sizes ${slug}`, lang, said[lang], lang)
+    if (sentences(said[lang] ?? '') > 1) refuse('too-many-sentences', `sizes ${slug} ${lang}`, 'one sentence per machine', said[lang])
+  }
+}
+
+const plates = readJson('src/wings/vinci/data/plate-descriptions.json').descriptions
+for (const id of registry.keys()) {
+  const kind = registry.get(id)
+  if ((kind === 'picture' || kind === 'mural') && !plates[id])
+    refuse('description-missing', id, 'a hung face owes the words that stand in place of seeing it')
+}
+let plateStrings = 0
+for (const [id, said] of Object.entries(plates)) {
+  const kind = registry.get(id)
+  if (kind !== 'picture' && kind !== 'mural') { refuse('unknown-key', `descriptions ${id}`, 'a description belongs to a hung face of the registry'); continue }
+  if (typeof said.plate !== 'string' || !said.plate.startsWith('vinci/')) refuse('description-plate', id, 'a description names the plate record it was read from', said.plate)
+  if (typeof said.source !== 'string' || said.source.trim().length < 8) refuse('source', `descriptions ${id}`, 'a description without a named source does not exist', said.source)
+  for (const lang of ['en', 'de']) {
+    plateStrings++
+    speak(`descriptions ${id}`, lang, said[lang], lang)
+    const count = sentences(said[lang] ?? '')
+    if (count < 3 || count > 5) refuse('description-length', `descriptions ${id} ${lang}`, `three to five sentences, this one runs ${count}`, said[lang])
+  }
+}
+
 /* -------------------------------------------------------------- the report */
 
 const written = new Set(Object.keys(lines.lines))
@@ -267,6 +311,8 @@ const report = {
   details: Object.values(lines.lines).filter((l) => l.detail).length,
   cards: `${cardStrings} pairs of card words`,
   slots: `${Object.keys(limits.slots).length} exhibits, ${slotStrings} slot strings`,
+  sizes: `${Object.keys(sizes).length} machines, ${sizeStrings} size sentences`,
+  descriptions: `${Object.keys(plates).length} faces, ${plateStrings} descriptions`,
   parts: `${Object.keys(partNames.parts).length} machines, ${partStrings} part names`,
   silent,
   errors,
