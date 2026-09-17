@@ -1,0 +1,167 @@
+{
+  "schema_version": "1.0",
+  "provenance": {
+    "scope": "What is on the plate, in words, for a visitor who cannot see it: the twenty five hung faces of the picture room and the mural on the court wall, keyed by the exhibit id of data/lines.json. Three to five sentences each, English and German. Read in the vitrine as the viewport's description, beside the label and never in place of it.",
+    "rule": "Every sentence describes the reproduction that hangs, as it hangs: cut to its display window where one exists, and behind its arch mat where one exists. What the picture shows and where it stands in the frame, the detail the line points at and its place on the plate, the colours only as this reproduction carries them. A facsimile printed in one ink is described as such. Nothing is interpreted, nothing is completed, and no attribution stands here that the records do not carry.",
+    "read": "The preview of the displayed plate record named in `plate`, opened one by one from the store scope wing-vinci, with that record's own note and state note, the display window in pictures/registration.ts, the reading in pictures/visitor-copy.ts, and the line and its rectangle in data/lines.json.",
+    "prepared": "2026-09-17"
+  },
+  "descriptions": {
+    "picture/baptism-of-christ/front": {
+      "en": "Christ stands in the middle of the picture in shallow water, his hands joined. At the right John the Baptist tips water from a bowl over his head, and in his other hand he holds a long thin cross with a scroll wound around it. Two angels kneel at the lower left with cloth folded over their arms and knees. Above the water a dove spreads its wings under gold rays, a palm rises at the left edge, and rocks and a river valley stand behind. The mark on the plate covers the heads of the two angels, on the outer one at the left.",
+      "de": "Christus steht in der Mitte des Bildes im flachen Wasser, die Hände gefaltet. Rechts gießt Johannes der Täufer Wasser aus einer Schale über seinen Kopf, in der anderen Hand hält er ein langes dünnes Kreuz mit einem Schriftband. Links unten knien zwei Engel, über ihren Armen und Knien liegt gefaltetes Tuch. Über dem Wasser breitet eine Taube ihre Flügel unter goldenen Strahlen aus, am linken Rand steht eine Palme, dahinter Felsen und ein Flusstal. Die Markierung auf der Tafel liegt auf den Köpfen der beiden Engel, auf dem äußeren links.",
+      "plate": "vinci/painting-plate/baptism-of-christ",
+      "source": "store manifest, vinci/painting-plate/baptism-of-christ, preview read 2026-09-17; data/lines.json detail rectangle x 0.09 y 0.47"
+    },
+    "picture/annunciation/front": {
+      "en": "The panel is much wider than it is high. The angel kneels at the left on a flowered meadow, a lily in one hand and the other raised, his wings out behind him. The Virgin sits at the right in front of a house, a book open on a carved stone table before her and one hand lifted from the page. Between them a low wall runs back to trees and a bay with masted ships, and blue mountains close the distance.",
+      "de": "Die Tafel ist viel breiter als hoch. Links kniet der Engel auf einer Blumenwiese, in der einen Hand eine Lilie, die andere erhoben, die Flügel hinter sich ausgebreitet. Rechts sitzt Maria vor einem Haus, vor ihr liegt ein aufgeschlagenes Buch auf einem steinernen Tisch mit Schnitzwerk, eine Hand hat sie vom Buch gehoben. Dazwischen läuft eine niedrige Mauer nach hinten zu Bäumen und einer Bucht mit Segelschiffen, blaue Berge schließen die Ferne ab.",
+      "plate": "vinci/painting-plate/annunciation",
+      "source": "store manifest, vinci/painting-plate/annunciation, preview read 2026-09-17; pictures/registration.ts window for the same record"
+    },
+    "picture/ginevra-de-benci/front": {
+      "en": "Ginevra is shown from the chest up and almost face on, with tight curls to her shoulders. A dark juniper stands behind her head, and at the right the ground opens onto water, trees and a thin spire far off. She wears a brown red dress with gold at the neckline, blue lacing at the front, a dark wrap over the shoulders and a small pendant on a fine chain. The panel ends just below the bodice. The mark on the plate lies along that bottom edge, over the full width.",
+      "de": "Ginevra ist bis zur Brust zu sehen, fast frontal, die engen Locken fallen ihr auf die Schultern. Hinter ihrem Kopf steht ein dunkler Wacholder, rechts öffnet sich der Grund auf Wasser, Bäume und einen schmalen Turm in der Ferne. Sie trägt ein braunrotes Kleid mit Gold am Ausschnitt, blauer Schnürung vorn, ein dunkles Tuch über den Schultern und einen kleinen Anhänger an feiner Kette. Die Tafel endet knapp unter dem Mieder. Die Markierung auf der Tafel liegt auf dieser unteren Kante, über die ganze Breite.",
+      "plate": "vinci/painting-plate/ginevra-de-benci-obverse",
+      "source": "store manifest, vinci/painting-plate/ginevra-de-benci-obverse, preview read 2026-09-17; data/lines.json detail rectangle y 0.84 h 0.16"
+    },
+    "picture/ginevra-de-benci/reverse": {
+      "en": "The back of the panel carries no figure. A laurel branch rises at the left and a palm frond at the right, and their tips meet at the top to close a wreath around an upright sprig of juniper. A scroll winds across the lower half with the words VIRTVTEM FORMA DECORAT. The ground behind it is a dark red brown flecked with lighter red, a red seal sits in the upper right corner, and along the bottom edge the painted ground gives way to a band of plain brown. The mark on the plate follows the scroll.",
+      "de": "Die Rückseite der Tafel zeigt keine Figur. Links steigt ein Lorbeerzweig auf, rechts ein Palmwedel, und ihre Spitzen treffen sich oben zu einem Kranz um einen aufrechten Wacholderzweig. Quer über die untere Hälfte windet sich ein Schriftband mit den Worten VIRTVTEM FORMA DECORAT. Der Grund dahinter ist dunkelrotbraun mit helleren roten Sprenkeln, in der oberen rechten Ecke sitzt ein rotes Siegel, und an der Unterkante geht der bemalte Grund in ein glattes Braun über. Die Markierung auf der Tafel folgt dem Schriftband.",
+      "plate": "vinci/painting-plate/ginevra-de-benci-reverse",
+      "source": "store manifest, vinci/painting-plate/ginevra-de-benci-reverse, preview read 2026-09-17; data/lines.json detail rectangle x 0.02 y 0.62"
+    },
+    "picture/madonna-of-the-carnation/front": {
+      "en": "The Virgin sits behind a dark ledge under two round headed windows, and blue crags rise over a valley in both openings. The child lies on a cushion at the left and reaches up with both hands to the small red flower she holds between them. She wears a blue mantle over a gold lined cloak with a red sleeve, a jewel at the breast and her hair braided across the crown. At the right edge a glass vase of flowers stands on the ledge.",
+      "de": "Maria sitzt hinter einer dunklen Brüstung unter zwei rundbogigen Fenstern, in beiden Öffnungen steigen blaue Felszacken über einem Tal auf. Links liegt das Kind auf einem Kissen und greift mit beiden Händen nach der kleinen roten Blume, die sie zwischen ihnen hält. Sie trägt einen blauen Mantel über goldgefüttertem Umhang und rotem Ärmel, an der Brust eine Schmucknadel, das Haar über dem Scheitel geflochten. Am rechten Rand steht eine Glasvase mit Blumen auf der Brüstung.",
+      "plate": "vinci/painting-plate/madonna-of-the-carnation__2229x3000",
+      "source": "store manifest, vinci/painting-plate/madonna-of-the-carnation__2229x3000, preview read 2026-09-17"
+    },
+    "picture/benois-madonna/front": {
+      "en": "The picture is arched at the top and very dark. A young mother sits at the left with the child on her lap, and she holds out a small sprig of flowers that he takes in both hands and studies. Her dress is green with a gold edge and a round brooch at the neck, and a grey blue cloth lies over her knees. A window with a pointed head opens at the upper right onto an empty pale sky.",
+      "de": "Das Bild ist oben rundbogig und sehr dunkel. Links sitzt eine junge Mutter, das Kind auf dem Schoß, und hält ihm einen kleinen Blütenzweig hin, den es mit beiden Händen fasst und betrachtet. Ihr Kleid ist grün mit goldenem Saum und einer runden Spange am Hals, über ihren Knien liegt ein graublaues Tuch. Rechts oben öffnet sich ein Spitzbogenfenster auf einen leeren hellen Himmel.",
+      "plate": "vinci/painting-plate/benois-madonna",
+      "source": "store manifest, vinci/painting-plate/benois-madonna, preview read 2026-09-17; pictures/README.md, the generated arch mat for this work"
+    },
+    "picture/saint-jerome/front": {
+      "en": "The panel was left unfinished, and most of it stands in brown underpaint. Jerome kneels in the middle with his head turned up and to the right, his right arm swung out to the left and a stone in the hand. A lion lies across the whole foreground, its tail sweeping to the left edge. At the upper right a church front is drawn on the bare ground, and at the left the rock opens onto a pale green sky. The mark on the plate sits on his head, in the upper half and a little right of the middle.",
+      "de": "Die Tafel blieb unvollendet, das meiste steht in brauner Untermalung. Hieronymus kniet in der Mitte, den Kopf nach rechts oben gewendet, den rechten Arm nach links geworfen, einen Stein in der Hand. Ein Löwe liegt quer über den ganzen Vordergrund, sein Schwanz schwingt bis an den linken Rand. Rechts oben ist eine Kirchenfassade auf den blanken Grund gezeichnet, links öffnet sich der Fels auf einen blassgrünen Himmel. Die Markierung auf der Tafel liegt auf seinem Kopf, in der oberen Hälfte etwas rechts der Mitte.",
+      "plate": "vinci/painting-plate/saint-jerome",
+      "source": "store manifest, vinci/painting-plate/saint-jerome, preview read 2026-09-17; data/lines.json detail rectangle x 0.46 y 0.11"
+    },
+    "picture/adoration-of-the-magi/front": {
+      "en": "What hangs is a grey printed plate, so the picture carries no colour. The Virgin sits in the middle with the child on her knee, turned toward the men who kneel at the left and the right and hold out their gifts. Behind her a crowd of heads and raised hands presses in from both sides, and two trees rise in the middle. At the upper left a broken flight of stairs and empty arches stand open to the sky, and at the upper right horsemen fight among the trees. The ground in front of the kneeling men is empty and unworked.",
+      "de": "Hier hängt ein grauer Druck, das Bild trägt also keine Farbe. In der Mitte sitzt Maria mit dem Kind auf dem Knie und wendet sich den Männern zu, die links und rechts knien und ihre Gaben hinhalten. Hinter ihr drängt von beiden Seiten eine Menge aus Köpfen und erhobenen Händen, in der Mitte steigen zwei Bäume auf. Links oben stehen eine abgebrochene Treppe und leere Bögen offen zum Himmel, rechts oben kämpfen Reiter zwischen den Bäumen. Der Boden vor den Knienden ist leer und unausgeführt.",
+      "plate": "vinci/painting-plate/adoration-of-the-magi__1940x1852",
+      "source": "store manifest, vinci/painting-plate/adoration-of-the-magi__1940x1852, state note and preview read 2026-09-17"
+    },
+    "picture/annunciation-predella/front": {
+      "en": "This is a long narrow strip, only 16 cm high. The angel kneels at the left on the grass with one hand raised and his wing reaching up behind him. The Virgin kneels at the right on a red floor with her hands crossed at her breast. Between them stands a low desk carrying a shell shaped stand, and behind both runs a wall with trees and hills above it. At each end a dark curve cuts across the corners.",
+      "de": "Das ist ein langer schmaler Streifen, nur 16 cm hoch. Links kniet der Engel im Gras, eine Hand erhoben, der Flügel hinter ihm aufgerichtet. Rechts kniet Maria auf rotem Boden, die Hände vor der Brust gekreuzt. Zwischen beiden steht ein niedriges Pult mit einem muschelförmigen Aufsatz, dahinter läuft eine Mauer mit Bäumen und Hügeln darüber. An beiden Enden schneidet ein dunkler Bogen die Ecken ab.",
+      "plate": "vinci/painting-plate/annunciation-predella",
+      "source": "store manifest, vinci/painting-plate/annunciation-predella, preview read 2026-09-17; pictures/data/paintings.json, annunciation-predella, height 16 cm"
+    },
+    "picture/virgin-of-the-rocks-louvre/front": {
+      "en": "The top of this picture is arched. Four figures sit in a rock cave: the Virgin in the middle with one hand on the shoulder of a child kneeling at the left, an angel in red at the right, and a second child in front of him with a hand raised. Her other hand is held open over that child's head. Beyond the rocks at the left a pale grey blue opens onto water and thin peaks. In the dark foreground the plants and stones are painted one by one.",
+      "de": "Dieses Bild ist oben rundbogig. In einer Felsgrotte sitzen vier Gestalten: in der Mitte Maria, die eine Hand auf der Schulter eines links knienden Kindes, rechts ein Engel in Rot und vor ihm ein zweites Kind mit erhobener Hand. Ihre andere Hand hält sie offen über dessen Kopf. Links hinter den Felsen öffnet sich ein blasses Graublau auf Wasser und schmale Zacken. Im dunklen Vordergrund sind Pflanzen und Steine einzeln gemalt.",
+      "plate": "vinci/painting-plate/virgin-of-the-rocks-louvre",
+      "source": "store manifest, vinci/painting-plate/virgin-of-the-rocks-louvre, preview read 2026-09-17; pictures/README.md, the generated arch mat for this work"
+    },
+    "picture/portrait-of-a-musician/front": {
+      "en": "A young man is shown against a dark ground, his face turned to the right and his eyes going past the edge of the picture. He wears a red cap over long curls, a black doublet with a white collar and a wide tawny cloak over both shoulders. At the lower right his hand comes forward with a folded sheet of paper in it, a few lines of music written on the sheet. The head is carried further than the cloak and the hand, which stay unfinished. The mark on the plate covers that hand and its sheet in the lower right corner.",
+      "de": "Ein junger Mann ist vor dunklem Grund zu sehen, das Gesicht nach rechts gewendet, der Blick geht am Bildrand vorbei. Er trägt eine rote Kappe über langen Locken, ein schwarzes Wams mit weißem Kragen und einen breiten ockerfarbenen Umhang über beiden Schultern. Rechts unten kommt seine Hand nach vorn, darin ein gefaltetes Blatt Papier mit ein paar Notenzeilen. Der Kopf ist weiter ausgeführt als Umhang und Hand, die unvollendet bleiben. Die Markierung auf der Tafel liegt auf dieser Hand und ihrem Blatt in der rechten unteren Ecke.",
+      "plate": "vinci/painting-plate/portrait-of-a-musician",
+      "source": "store manifest, vinci/painting-plate/portrait-of-a-musician, state note and preview read 2026-09-17; data/lines.json detail rectangle x 0.5 y 0.76"
+    },
+    "picture/lady-with-an-ermine/front": {
+      "en": "A young woman is turned to the right and looks out past the edge of the picture, a white ermine along her arm with her hand across its back. Her hair is smoothed under a fine cap and held by a band under the chin, a double string of black beads lies at her throat, and she wears a red dress with a blue cloth over the shoulder at the right. The ground behind her is flat black, with no window and no wall. In the upper left corner the words LA BELE FERONIERE and under them LEONARD D'AWINCI are painted on that black. The mark on the plate sits in the upper right corner, on the black itself.",
+      "de": "Eine junge Frau ist nach rechts gewendet und blickt am Bildrand vorbei, auf ihrem Arm liegt ein weißes Hermelin, die Hand über seinem Rücken. Ihr Haar liegt glatt unter einer feinen Haube und wird von einem Band unter dem Kinn gehalten, am Hals eine doppelte Reihe schwarzer Perlen, dazu ein rotes Kleid, über der Schulter rechts im Bild ein blaues Tuch. Der Grund hinter ihr ist flaches Schwarz, ohne Fenster und ohne Wand. In der linken oberen Ecke stehen auf diesem Schwarz die Worte LA BELE FERONIERE und darunter LEONARD D'AWINCI. Die Markierung auf der Tafel liegt in der rechten oberen Ecke, auf dem Schwarz selbst.",
+      "plate": "vinci/painting-plate/lady-with-an-ermine__2936x4000",
+      "source": "store manifest, vinci/painting-plate/lady-with-an-ermine__2936x4000, preview read 2026-09-17; data/lines.json detail rectangle x 0.7 y 0.06"
+    },
+    "picture/la-belle-ferronniere/front": {
+      "en": "What hangs is a grey printed plate, so the picture carries no colour. A woman is shown from the chest up against a dark ground, her body turned to the right and her face brought back to the front. A narrow band crosses her forehead with a small jewel at the middle of it, and two cords lie around her throat. Her sleeve is gathered and tied with a ribbon at the shoulder. A plain parapet runs across the bottom edge in front of her.",
+      "de": "Hier hängt ein grauer Druck, das Bild trägt also keine Farbe. Eine Frau ist vor dunklem Grund bis zur Brust zu sehen, der Körper nach rechts gedreht, das Gesicht nach vorn gewendet. Ein schmales Band läuft über ihre Stirn, in der Mitte ein kleiner Schmuckstein, um den Hals liegen zwei Schnüre. Ihr Ärmel ist gerafft und an der Schulter mit einer Schleife gebunden. Am unteren Rand zieht sich vor ihr eine schlichte Brüstung hin.",
+      "plate": "vinci/painting-plate/la-belle-ferronniere__1806x2523",
+      "source": "store manifest, vinci/painting-plate/la-belle-ferronniere__1806x2523, state note and preview read 2026-09-17"
+    },
+    "picture/madonna-litta/front": {
+      "en": "The Virgin holds the child across her body and looks down at him while he feeds and turns his eyes out at the room. In one hand he holds a small bird by the wing. She wears a red dress under a blue mantle, her hair bound in a braided coil. Behind them the wall is dark, and two round headed windows at left and right open onto blue hills and a clouded sky.",
+      "de": "Maria hält das Kind quer vor sich und sieht auf es hinunter, während es trinkt und die Augen in den Raum richtet. In einer Hand hält es einen kleinen Vogel am Flügel. Sie trägt ein rotes Kleid unter blauem Mantel, das Haar in einem geflochtenen Knoten. Hinter ihnen ist die Wand dunkel, links und rechts öffnen sich zwei rundbogige Fenster auf blaue Hügel und einen bewölkten Himmel.",
+      "plate": "vinci/painting-plate/madonna-litta",
+      "source": "store manifest, vinci/painting-plate/madonna-litta, preview read 2026-09-17; pictures/registration.ts window for the same record"
+    },
+    "picture/burlington-house-cartoon/front": {
+      "en": "What hangs is a printed plate of 1898 in one brown ink, so the sheet carries no colour here. Two women sit close together with their heads almost touching, the one at the left a little in front. The child on the near knee leans across to a second child at the right and lifts a hand toward his face. The woman behind raises her right hand and points up into the empty upper right. Toward the edges the drawing thins out and the ground is left bare.",
+      "de": "Hier hängt ein Druck von 1898 in einer einzigen braunen Druckfarbe, andere Farben zeigt das Blatt hier nicht. Zwei Frauen sitzen dicht beieinander, die Köpfe fast aneinander, die linke ein wenig vorn. Das Kind auf dem vorderen Knie beugt sich zu einem zweiten Kind rechts hinüber und hebt die Hand zu dessen Gesicht. Die hintere Frau hebt die rechte Hand und weist nach rechts oben ins Leere. Zu den Rändern hin wird die Zeichnung dünner und der Grund bleibt blank.",
+      "plate": "vinci/painting-plate/burlington-house-cartoon__1088x1530",
+      "source": "store manifest, vinci/painting-plate/burlington-house-cartoon__1088x1530, state note and preview read 2026-09-17"
+    },
+    "picture/yarnwinder-buccleuch/front": {
+      "en": "The Virgin sits on a rock at the left, turned down toward the child, one hand open beside him. The child sits on a stone ledge at the right and grips a dark yarnwinder in the shape of a cross, taller than he is. Her dress and mantle are a deep blue green, and a net of fine cracks runs over them. Behind the two a wide valley falls away to water, low hills and a pale sky.",
+      "de": "Links sitzt Maria auf einem Felsen, zum Kind hinuntergewandt, eine Hand offen neben ihm. Rechts sitzt das Kind auf einer Steinkante und hält eine dunkle Spindel in Kreuzform, größer als es selbst. Kleid und Mantel sind tiefblaugrün, darüber läuft ein Netz feiner Risse. Hinter beiden fällt ein weites Tal ab zu Wasser, flachen Hügeln und einem blassen Himmel.",
+      "plate": "vinci/painting-plate/yarnwinder-buccleuch",
+      "source": "store manifest, vinci/painting-plate/yarnwinder-buccleuch, preview read 2026-09-17"
+    },
+    "picture/yarnwinder-lansdowne/front": {
+      "en": "The same scene stands here a second time. The Virgin sits at the left in a blue mantle with one hand open beside the child, and the child sits at the right on a rock and holds the yarnwinder in the shape of a cross. He looks up past it to the right while her eyes stay on him. Behind them a river winds between rocks to snowy peaks and a bright sky.",
+      "de": "Dieselbe Szene steht hier ein zweites Mal. Links sitzt Maria im blauen Mantel, eine Hand offen neben dem Kind, rechts sitzt das Kind auf einem Felsen und hält die Spindel in Kreuzform. Es blickt an ihr vorbei nach rechts oben, während ihre Augen auf ihm bleiben. Hinter beiden windet sich ein Fluss zwischen Felsen zu verschneiten Gipfeln und hellem Himmel.",
+      "plate": "vinci/painting-plate/yarnwinder-lansdowne__1992x2401",
+      "source": "store manifest, vinci/painting-plate/yarnwinder-lansdowne__1992x2401, preview read 2026-09-17; pictures/registration.ts window for the same record"
+    },
+    "picture/anghiari-copy/front": {
+      "en": "What hangs is a grey slide of the drawing, so the sheet carries no colour. Four riders collide in the middle, two from each side, and their raised swords meet over a standard that they all pull at. The horses bite and rear, one of them screaming with its head thrown back. Under the hooves two foot soldiers crouch at the lower left with shields raised, and a third falls back at the lower right. Around the fight the sheet is nearly empty.",
+      "de": "Hier hängt ein graues Lichtbild der Zeichnung, das Blatt trägt also keine Farbe. In der Mitte prallen vier Reiter aufeinander, zwei von jeder Seite, über ihnen treffen sich die Schwerter an einer Standarte, an der alle zerren. Die Pferde beißen und bäumen sich auf, eines schreit mit zurückgeworfenem Kopf. Unter den Hufen kauern links unten zwei Fußsoldaten mit erhobenen Schilden, rechts unten stürzt ein dritter zurück. Um den Kampf herum bleibt das Blatt fast leer.",
+      "plate": "vinci/painting-plate/anghiari-copy__2135x1453",
+      "source": "store manifest, vinci/painting-plate/anghiari-copy__2135x1453, state note and preview read 2026-09-17"
+    },
+    "picture/mona-lisa/front": {
+      "en": "What hangs is a colour plate printed in a book, cut to the printed picture itself. The sitter is shown to the waist, her body turned a little to the left, her face to the front and her eyes looking out of the picture. Her hands lie one over the other on the arm of a chair, a dark veil covers her hair, and her sleeves are a warm gold brown. Behind her a road and a stretch of water wind back between rocks to hazy blue heights. The colours are the printer's, browner and flatter than paint.",
+      "de": "Hier hängt eine farbige Drucktafel aus einem Buch, beschnitten auf das gedruckte Bild selbst. Die Dargestellte ist bis zur Taille zu sehen, der Körper leicht nach links gedreht, das Gesicht nach vorn, der Blick geht aus dem Bild heraus. Ihre Hände liegen übereinander auf einer Stuhllehne, ein dunkler Schleier bedeckt das Haar, die Ärmel sind warm goldbraun. Hinter ihr winden sich ein Weg und ein Stück Wasser zwischen Felsen zu dunstigen blauen Höhen. Die Farben sind die des Druckers, brauner und flacher als Malerei.",
+      "plate": "vinci/painting-plate/mona-lisa",
+      "source": "store manifest, vinci/painting-plate/mona-lisa, state note and preview read 2026-09-17; pictures/registration.ts window cropping to the printed illustration"
+    },
+    "picture/virgin-of-the-rocks-london/front": {
+      "en": "The top of this picture is arched. The Virgin kneels in the middle in a blue mantle, one arm around a child kneeling at the left, the other hand held open over a second child at the right. An angel sits behind that child and looks back across the group. Around them a cave of dark rock closes in, and at the left a gap opens onto pale blue water and stone spires. The flowers and stems in the foreground are picked out one by one.",
+      "de": "Dieses Bild ist oben rundbogig. In der Mitte kniet Maria im blauen Mantel, ein Arm um ein links kniendes Kind, die andere Hand offen über einem zweiten Kind rechts. Hinter diesem sitzt ein Engel und blickt über die Gruppe zurück. Um sie schließt sich eine Höhle aus dunklem Fels, links öffnet sich eine Lücke auf blassblaues Wasser und steinerne Zacken. Blüten und Halme im Vordergrund sind einzeln herausgearbeitet.",
+      "plate": "vinci/painting-plate/virgin-of-the-rocks-london",
+      "source": "store manifest, vinci/painting-plate/virgin-of-the-rocks-london, preview read 2026-09-17; pictures/registration.ts arch window and pictures/README.md arch mat"
+    },
+    "picture/virgin-and-child-with-st-anne/front": {
+      "en": "Anne sits at the back with the Virgin on her lap, and the Virgin leans forward and down to the right. The child sits on the ground below, has taken a lamb around the neck and looks back up at his mother. Anne looks down over them both with a faint smile. Behind the group a wide plain runs back to blue mountains, a single tree stands at the right, and a bare rock ledge fills the foreground.",
+      "de": "Hinten sitzt Anna, auf ihrem Schoß Maria, die sich nach vorn und nach rechts unten beugt. Darunter sitzt das Kind am Boden, hat ein Lamm am Hals gefasst und blickt zu seiner Mutter hinauf. Anna sieht über beide hinweg nach unten und lächelt leicht. Hinter der Gruppe zieht sich eine weite Ebene zu blauen Bergen, rechts steht ein einzelner Baum, und im Vordergrund liegt eine kahle Felskante.",
+      "plate": "vinci/painting-plate/virgin-and-child-with-st-anne__3081x4096",
+      "source": "store manifest, vinci/painting-plate/virgin-and-child-with-st-anne__3081x4096, preview read 2026-09-17; pictures/registration.ts window for the same record"
+    },
+    "picture/salvator-mundi/front": {
+      "en": "A figure faces straight out of a black ground, seen to just below the chest. The right hand is raised in front of the body with two fingers up, and the left holds a clear sphere with three small bright points in it. A blue robe crosses the chest, with two bands of gold embroidery meeting at the middle. The hair falls in long curls, and the face stands soft and low in contrast while the bands and the sphere are sharp.",
+      "de": "Eine Gestalt blickt geradeaus aus schwarzem Grund, zu sehen bis knapp unter die Brust. Die rechte Hand ist vor dem Körper erhoben, zwei Finger aufgerichtet, die linke hält eine klare Kugel mit drei kleinen hellen Punkten darin. Ein blaues Gewand liegt über der Brust, zwei goldene Stickbänder treffen sich in der Mitte. Das Haar fällt in langen Locken, und das Gesicht bleibt weich und kontrastarm, während Bänder und Kugel scharf stehen.",
+      "plate": "vinci/painting-plate/salvator-mundi-restored",
+      "source": "store manifest, vinci/painting-plate/salvator-mundi-restored, state note and preview read 2026-09-17"
+    },
+    "picture/saint-john-the-baptist/front": {
+      "en": "A figure comes forward out of an almost black ground, lit on the face, the shoulder and one arm only. That arm is raised at the right with a finger pointing up, and a thin cross stands behind it. The other hand lies flat on the chest. Long curls fall to the shoulders, and a dark fur covers the body below. Nothing else is shown, no room and no country behind.",
+      "de": "Eine Gestalt tritt aus fast schwarzem Grund hervor, beleuchtet sind nur Gesicht, Schulter und ein Arm. Dieser Arm ist rechts erhoben, ein Finger zeigt nach oben, dahinter steht ein dünnes Kreuz. Die andere Hand liegt flach auf der Brust. Lange Locken fallen auf die Schultern, darunter bedeckt ein dunkles Fell den Körper. Mehr ist nicht zu sehen, kein Raum und keine Gegend dahinter.",
+      "plate": "vinci/painting-plate/saint-john-the-baptist",
+      "source": "store manifest, vinci/painting-plate/saint-john-the-baptist, preview read 2026-09-17; pictures/registration.ts window for the same record"
+    },
+    "picture/la-scapigliata/front": {
+      "en": "This is a small head on a brown panel, worked in umber and white. The face is carried furthest and is turned down and to the left, the eyes almost closed. The hair around it is only drawn, loose strands running out into the bare ground on both sides. Below the chin the neck and the shoulder stop after a few lines. The surface is rubbed and scratched, most of all at the lower left.",
+      "de": "Das ist ein kleiner Kopf auf brauner Tafel, in Umbra und Weiß gearbeitet. Am weitesten ausgeführt ist das Gesicht, es neigt sich nach links unten, die Augen fast geschlossen. Das Haar darum ist nur gezeichnet, einzelne Strähnen laufen zu beiden Seiten in den blanken Grund aus. Unter dem Kinn brechen Hals und Schulter nach wenigen Linien ab. Die Oberfläche ist abgerieben und zerkratzt, am stärksten links unten.",
+      "plate": "vinci/painting-plate/la-scapigliata",
+      "source": "store manifest, vinci/painting-plate/la-scapigliata, preview read 2026-09-17"
+    },
+    "picture/bacchus/front": {
+      "en": "A young man sits at the foot of a dark tree in the middle of the picture, one leg drawn up and one hand raised in front of the chest with the finger pointing up to the right. Vine leaves and grapes are wound into his hair, a spotted skin lies across his lap, and a long staff stands beside him. In the other hand he holds a bunch of grapes over the plants at his feet. At the left the ground falls away to a river, blue mountains and two deer, and blue flowers grow in the corner.",
+      "de": "Ein junger Mann sitzt am Fuß eines dunklen Baums in der Mitte des Bildes, ein Bein angezogen, eine Hand vor der Brust erhoben, der Finger weist nach rechts oben. In sein Haar sind Weinlaub und Trauben geflochten, über seinem Schoß liegt ein geflecktes Fell, neben ihm steht ein langer Stab. In der anderen Hand hält er eine Traube über die Pflanzen zu seinen Füßen. Links fällt der Grund ab zu einem Fluss, blauen Bergen und zwei Hirschen, in der Ecke wachsen blaue Blumen.",
+      "plate": "vinci/painting-plate/bacchus",
+      "source": "store manifest, vinci/painting-plate/bacchus, preview read 2026-09-17"
+    },
+    "picture/last-supper/front": {
+      "en": "A long table crosses the whole width of the wall under a white cloth, with Christ in the middle and the apostles in four groups of three beside him. The room behind opens through three windows onto hills, tapestries hang along both side walls, and a coffered ceiling runs back over them. The paint is worn across the whole surface, with pale losses and repaired patches in every part of it. At the bottom in the middle a stone arch is cut into the wall, its opening a flat pale grey, and it reaches up into the cloth where the feet of Christ would be. The mark on the plate sits on that arch.",
+      "de": "Ein langer Tisch zieht sich unter weißem Tuch über die ganze Breite der Wand, in der Mitte Christus, neben ihm die Apostel in vier Dreiergruppen. Der Raum dahinter öffnet sich durch drei Fenster auf Hügel, an beiden Seitenwänden hängen Teppiche, darüber läuft eine Kassettendecke nach hinten. Die Malerei ist über die ganze Fläche abgerieben, überall helle Fehlstellen und ausgebesserte Partien. Unten in der Mitte ist ein steinerner Bogen in die Wand gebrochen, seine Öffnung ein flaches Hellgrau, und er reicht bis in das Tuch hinauf, wo die Füße von Christus wären. Die Markierung auf der Tafel liegt auf diesem Bogen.",
+      "plate": "vinci/painting-plate/last-supper",
+      "source": "store manifest, vinci/painting-plate/last-supper, state note and preview read 2026-09-17; data/lines.json detail rectangle x 0.36 y 0.76"
+    }
+  }
+}
