@@ -34,6 +34,43 @@ const HEARTH_Y = -0.28
 const COL_BASE = FLOOR_Y + NEAR.lift
 const GOLD = '#e0b96a'
 const PAPER = '#f3efe2'
+/** where the court's own fire stands, in the court's metres: the map takes
+    its first light from here once the ride has come down to the room */
+const COURT_FIRE = { y: -0.45, z: -5.6 }
+/** the map's size in the court's metres once the ride has landed: a hair
+    under one, so its paving and ring win the depth test against the court
+    rising at the same place behind them */
+export const LANDED_SCALE = 0.996
+/** the ride's last stretch, in descent progress. The instrument's machinery
+    goes down into the paving it stands on, and the court comes up behind the
+    ring before the map is switched off with the camera at the seat. */
+export const CUT = {
+  wheelDown: [0.856, 0.912],
+  lampsOut: [0.885, 0.915],
+  beltDown: [0.895, 0.928],
+  hearthOut: [0.9, 0.93],
+  landScale: [0.895, 0.922],
+  courtRise: [0.922, 0.944],
+  mapOut: 0.947,
+} as const
+const WHEEL_SINK = 3.2 // the rails' crown under the paving's face
+const BELT_SINK = 1.9 // the cups' lips under the paving's face
+const ramp = (k: number, [a, b]: readonly [number, number]): number => {
+  const t = Math.min(1, Math.max(0, (k - a) / (b - a)))
+  return t * t * (3 - 2 * t)
+}
+/** The map's scale along the ride. A tall stage draws the whole instrument
+    smaller; before the court rises the scale comes up to the court's own
+    metres. The camera scales with it about the same origin, so the picture
+    of the map does not change while its size does. */
+export function mapScaleAt(progress: number, aspect: number): number {
+  const fit = Math.min(1, aspect / 1.05)
+  return fit + (LANDED_SCALE - fit) * ramp(progress, CUT.landScale)
+}
+/** 0 until the court rises behind the ring, 1 once it stands */
+export function courtRiseAt(progress: number): number {
+  return ramp(progress, CUT.courtRise)
+}
 const c = (hex: string, gain = 1): N => {
   const v = new Color(hex)
   return vec3(v.r * gain, v.g * gain, v.b * gain)
@@ -68,6 +105,7 @@ export function createMandala(scene: Scene): MandalaHandles {
   const uReveal = uniform(0), uHeat = uniform(0), uT = uniform(0)
   const uLampAngle = uniform(0), uCourtAngle = uniform(0), uFlick = uniform(1)
   const uScale = uniform(1), uFireFlick = uniform(1), uDeep = uniform(0)
+  const uLamps = uniform(1), uHearth = uniform(1), uCourtFire = uniform(0)
 
   /** World coordinates expressed in the full-size stage: portrait restages
    * the complete instrument uniformly, including the lamps and their light. */
@@ -84,7 +122,15 @@ export function createMandala(scene: Scene): MandalaHandles {
       const incidence = max(dot(n, normalize(delta)), 0)
       light = light.add(incidence.mul(2.3).div(d2.add(0.48)))
     }
-    return light.mul(uFlick)
+    return light.mul(uFlick).mul(uLamps)
+  }
+  /** the court's fire, seen from the map once the ride is low enough to be in
+      the room: a point source low in its bowl, falling off as the court's own
+      floor pool does */
+  const courtFire = (n: N, k: number, soft: number): N => {
+    const delta = vec3(0, COURT_FIRE.y, COURT_FIRE.z).sub(P)
+    const incidence = max(dot(n, normalize(delta)), 0)
+    return incidence.mul(k).div(dot(delta, delta).add(soft)).mul(uCourtFire).mul(uFireFlick)
   }
 
   /** The same quarry and half-bond paving as the agora. Grooves remove
@@ -154,6 +200,11 @@ export function createMandala(scene: Scene): MandalaHandles {
       const spokePen = spokeAt(thrown, 0.055, 0.26)
       alb = alb.mul(oneMinus(max(rail, spoke).mul(0.43)))
       alb = alb.mul(oneMinus(max(railPen, spokePen).mul(0.3)))
+      // the ring's plinths stand on this paving once the belt has gone down
+      // into it: each foot keeps its contact dark
+      for (const { x, z } of ringStandings(NEAR.r, NEAR.angles)) {
+        cupShade = max(cupShade, oneMinus(smoothstep(0.42, 1.05, length(P.xz.sub(vec2(x, z))))).mul(0.7))
+      }
     } else if (kind === 'limb') {
       const ticks = (count: number, depth: number, width: number): N => line(arc(count), width).mul(step(float(13.2).sub(depth), r)).mul(step(r, 13.2))
       cut = max(ticks(150, 0.29, 0.018), max(ticks(30, 0.65, 0.035), ticks(6, 1.06, 0.06)))
@@ -216,12 +267,13 @@ export function createMandala(scene: Scene): MandalaHandles {
     const hv = vec3(0, HEARTH_Y, 0).sub(P)
     const hd2 = dot(hv, hv)
     const hinc = max(dot(N, normalize(hv)), 0)
-    const fire = hinc.mul(7.2).div(hd2.add(1.1)).mul(uHeat).mul(uFireFlick)
+    const fire = hinc.mul(7.2).div(hd2.add(1.1)).mul(uHeat).mul(uHearth).mul(uFireFlick)
     col = col.add(alb.mul(c('#ff8c3a', 1.9)).mul(fire))
     // and the ash it throws: the stone nearest the bed is warm even where no
     // face turns toward it
-    col = col.add(c('#ff7a2e', 0.05).mul(uHeat).mul(uFireFlick)
+    col = col.add(c('#ff7a2e', 0.05).mul(uHeat).mul(uHearth).mul(uFireFlick)
       .div(dot(P.xz, P.xz).mul(0.35).add(1)))
+    col = col.add(alb.mul(c('#fbd8a4', 1.1)).mul(courtFire(N, 5.6, 1.2)))
     /* AIR. At arrival range the far rim is thirty metres of night away and the
        near rim is ten, and stone that reads the same at both distances reads
        as a print. The air arrives with the fire, because that is when the
@@ -386,7 +438,10 @@ export function createMandala(scene: Scene): MandalaHandles {
     const hv = vec3(0, HEARTH_Y, 0).sub(P)
     const hinc = max(dot(nF, normalize(hv)), 0)
     col = col.add(alb.mul(c('#ff8c3a', 1.9))
-      .mul(hinc.mul(7.2).div(dot(hv, hv).add(1.1)).mul(uHeat).mul(uFireFlick)))
+      .mul(hinc.mul(7.2).div(dot(hv, hv).add(1.1)).mul(uHeat).mul(uHearth).mul(uFireFlick)))
+    // and once the ride is in the room, the court's fire finds the faces
+    // turned to it, dying as the shaft climbs as the court's own shafts do
+    col = col.add(alb.mul(c('#ffb469', 1.2)).mul(courtFire(nF, 7.0, 2.0)).mul(oneMinus(lift.mul(0.73))))
     const dCam = length(cameraPosition.div(uScale).sub(P))
     col = mix(col, c('#101b35', 0.62), smoothstep(9, 42, dCam).mul(uHeat).mul(0.44))
     colonnadeMat.colorNode = shoulder(col).add(dither()).mul(uReveal)
@@ -425,7 +480,7 @@ export function createMandala(scene: Scene): MandalaHandles {
   const halo = exp(dot(q.mul(vec2(1, 0.85)), q.mul(vec2(1, 0.85))).mul(-20))
   const core = exp(dot(q.sub(vec2(0, -0.1)), q.sub(vec2(0, -0.1))).mul(-240))
   lampMat.colorNode = mix(c(GOLD), c('#fff3d6'), core.add(tongue.mul(0.5)))
-  lampMat.opacityNode = clamp(tongue.mul(0.92).add(core.mul(0.6)).add(halo.mul(0.14)), 0, 1).mul(uReveal).mul(flick)
+  lampMat.opacityNode = clamp(tongue.mul(0.92).add(core.mul(0.6)).add(halo.mul(0.14)), 0, 1).mul(uReveal).mul(flick).mul(uLamps)
   const lamps = new Sprite(lampMat)
   lamps.count = 30
   lamps.frustumCulled = false
@@ -477,7 +532,7 @@ export function createMandala(scene: Scene): MandalaHandles {
     // the ash spills where it spills: the edge is noise, never a circle
     const edge = noise(vec2(cos(ang), sin(ang)).mul(2.6)).mul(0.16).add(0.90)
     bedMat.opacityNode = oneMinus(smoothstep(edge.sub(0.13), edge, hr))
-      .mul(clamp(uHeat.mul(2.2), 0, 1)).mul(uReveal)
+      .mul(clamp(uHeat.mul(2.2), 0, 1)).mul(uHearth).mul(uReveal)
   }
   const bed = new Mesh(stoneRing(0, 1.06, -0.93, -0.868, 0.01, 48), bedMat)
   bed.renderOrder = 3
@@ -500,7 +555,7 @@ export function createMandala(scene: Scene): MandalaHandles {
       .mul(0.22).add(0.86)
     // the air over the coals is a HALO, not a wash: the round before this
     // one drowned the bed's own structure under its own glow
-    heartMat.colorNode = c('#ff9440', 0.24).mul(lick).mul(uHeat).mul(uFireFlick)
+    heartMat.colorNode = c('#ff9440', 0.24).mul(lick).mul(uHeat).mul(uHearth).mul(uFireFlick)
       .mul(exp(pow(hr2.div(0.70), 2).negate())).mul(uReveal)
   }
   // it floats clear of the kerb, which is stone and holds its own shadow
@@ -536,7 +591,7 @@ export function createMandala(scene: Scene): MandalaHandles {
     sm.opacityNode = pow(clamp(oneMinus(sd), 0, 1), 1.7)
       .mul(smoothstep(0.0, 0.12, climb))
       .mul(oneMinus(smoothstep(0.35, 1.0, climb)))
-      .mul(uHeat).mul(uReveal).mul(uFireFlick).mul(0.46)
+      .mul(uHeat).mul(uHearth).mul(uReveal).mul(uFireFlick).mul(0.46)
     const smoke = new Sprite(sm)
     smoke.count = SMOKE
     smoke.frustumCulled = false
@@ -580,10 +635,17 @@ export function createMandala(scene: Scene): MandalaHandles {
       court.rotation.y = t * -0.0114
       uLampAngle.value = rim.rotation.y
       uCourtAngle.value = court.rotation.y
-      const aspect = window.innerWidth / window.innerHeight
-      const scale = Math.min(1, aspect / 1.05)
+      const k = progress ?? 1
+      const scale = mapScaleAt(k, window.innerWidth / window.innerHeight)
       root.scale.setScalar(scale)
       uScale.value = scale
+      // the machinery goes down into the paving it stood on; only the ring
+      // and the paving are left when the court comes up behind them
+      court.position.y = -WHEEL_SINK * ramp(k, CUT.wheelDown)
+      rim.position.y = -BELT_SINK * ramp(k, CUT.beltDown)
+      uLamps.value = 1 - ramp(k, CUT.lampsOut)
+      uHearth.value = 1 - ramp(k, CUT.hearthOut)
+      uCourtFire.value = courtRiseAt(k)
     },
     visible(v) {
       root.visible = v

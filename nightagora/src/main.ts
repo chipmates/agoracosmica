@@ -4,7 +4,7 @@ import { createAgora } from './scenes/agora'
 import { createKeeper } from './scenes/keeper'
 import { createBreath } from './scenes/breath'
 import { createAtlas, type LabelBounds } from './scenes/atlas'
-import { createMandala } from './scenes/mandala'
+import { courtRiseAt, createMandala, CUT, mapScaleAt } from './scenes/mandala'
 import { createHotspots } from './core/hotspots'
 import { fireScript } from './content/keeper-script'
 import { ambience } from './core/ambience'
@@ -744,14 +744,14 @@ function descentPos(k: number, out: Vector3): Vector3 {
     small and the tall frame holds the same picture instead of a small drum
     in a void. The factor gives way as the fall reaches the floor, where
     what the camera stands in is the room and not the map. */
-function mapScale(): number {
-  return Math.min(1, innerWidth / innerHeight / 1.05)
+function mapScale(k: number): number {
+  return mapScaleAt(k, innerWidth / innerHeight)
 }
 function descentCamera(k: number): void {
   const tall = tallness()
   const fit = dFitWide(k) + (dFitTall(k) - dFitWide(k)) * tall
   const lift = dLiftWide(k) + (dLiftTall(k) - dLiftWide(k)) * tall
-  const ms = mapScale() * fit
+  const ms = mapScale(k) * fit
   descentPos(k, camera.position).multiplyScalar(ms)
   descentLook.set(dLookX(k), dLookY(k), dLookZ(k))
   const lead = dLead(k)
@@ -861,8 +861,9 @@ function syncDescentBeats(k: number): void {
   const tall = innerWidth / innerHeight < 0.9
   if (plumbEl)
     plumbEl.style.opacity = (1 - smooth(tall ? 0.3 : 0.52, tall ? 0.42 : 0.66, k)).toFixed(3)
-  if (hearthVeil)
-    hearthVeil.style.opacity = (smooth(0.89, 0.945, k) * (1 - smooth(0.972, 0.998, k)) * 0.95).toFixed(3)
+  // the cut is carried by the room itself now: the court stands behind the
+  // ring before the map goes, so no veil is laid over the handover
+  if (hearthVeil) hearthVeil.style.opacity = '0'
   for (let i = 0; i < descentBeats.length; i++) {
     const beat = descentBeats[i]
     const range = DESCENT_STATIONS[i]
@@ -1259,7 +1260,7 @@ window.__forge = {
     flashAt = elapsed - (opts.sinceFlash ?? 999)
     agoraReveal =
       p === 'agora' || p === 'wheel' ? 1
-      : p === 'descent' ? smooth(0.952, 0.995, desc)
+      : p === 'descent' ? courtRiseAt(desc)
       : 0
     lookUp = lookTarget = p === 'wheel' ? 1 : 0
     camera.position.y = 0
@@ -1682,8 +1683,11 @@ function frame(now: number): void {
   // the map carries the whole dive; the territory only wakes at the very
   // cut, once the camera has leveled (from above, the flame billboard
   // would fill the frame with streaks)
+  // the map is switched off, not faded: by then the court stands complete
+  // behind its ring and the camera is within centimetres of the seat, where
+  // the two rings are the same pixels
   const mandalaReveal =
-    phase === 'descent' ? smooth(0.22, 0.32, desc) * (1 - smooth(0.918, 0.955, desc)) : 0
+    phase === 'descent' && desc < CUT.mapOut ? smooth(0.22, 0.32, desc) : 0
   mandala.visible(mandalaReveal > 0.004)
   // the heart warms at overview altitude and yields before the close
   // pass, or its glow would paint the whole near frame beige
@@ -1703,7 +1707,7 @@ function frame(now: number): void {
     // but its own embers stop cutting across the wheel's letterpress (and the
     // heaviest fragment shader in the night stops paying full price)
     : phase === 'wheel' ? 0.72
-    : phase === 'descent' ? smooth(0.952, 0.995, desc)
+    : phase === 'descent' ? courtRiseAt(desc)
     : 0
   // a wing owns its own room: the lobby's court strikes fast so nothing
   // of the fire is left standing behind the first station
@@ -1712,6 +1716,9 @@ function frame(now: number): void {
   agoraReveal +=
     (revealTarget - agoraReveal) *
     Math.min(1, dt * (reducedMotion ? 20 : phase === 'agora' ? 2.2 : 1.2))
+  // the ride's own clock already eases the fall: the court rises with it, or
+  // the live cut lands on a room still a second behind the stills
+  if (phase === 'descent') agoraReveal = revealTarget
 
   if (phase === 'agora') {
     lookUp += (lookTarget - lookUp) * Math.min(1, dt * 4)
@@ -1792,6 +1799,8 @@ function frame(now: number): void {
     // looking up, the court is scenery and its air belongs to the room
     // below: the sky phase keeps the colonnade and gives back the sparks
     air: phase === 'wheel' || phase === 'breath' ? 0 : 1,
+    // the court's floor layers and its near ring wait for the map to go
+    landed: phase === 'descent' && desc < CUT.mapOut ? 0 : 1,
   })
 
   // the lobby's points breathe in after the arrival breath

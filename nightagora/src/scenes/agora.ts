@@ -270,6 +270,11 @@ export interface AgoraState {
       ember plume). The sky phase looks up PAST the court, and a spark
       crossing the letterpress up there is a mark nobody chose. Default 1. */
   air?: number
+  /** 0 while the descent's map still stands in this room: its paving lies a
+      few millimetres over this floor and its ring stands in the near ring's
+      place, so what lies ON the floor (reflections, cinders, the wash) and
+      the near ring itself wait for the map to go. Default 1. */
+  landed?: number
 }
 
 /**
@@ -297,6 +302,9 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
   /** the fire's AIR: the plume, the sparks, the motes and the smoke. One
       uniform so the frame that looks up past this room can take it back. */
   const uAir = uniform(1)
+  const uLanded = uniform(1)
+  /** the near register's own band, measured from the seat */
+  const NEAR_BAND: [number, number] = [NEAR.r - 1.1, NEAR.r + 1.1]
   /* THE PAGE RESERVES ITS PAPER HERE TOO. The night's stars are kept off the
      museum's own lines by the firmament; the fire's air has to be kept off
      them as well, or an ember ends its life sitting on a glyph. Eight
@@ -382,11 +390,17 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
   /** the shared instanced vertex path: place the shape, carry its world
       position, its own normal (three's normalWorld cannot know about an
       instance) and its local height, which is what the flutes are cut from */
-  function inkVertex(): { world: N; normal: N; hLocal: N; tint: N; clip: N } {
+  function inkVertex(nearGate = false): { world: N; normal: N; hLocal: N; tint: N; clip: N } {
     const iPos = attribute('iPos', 'vec3')
     const iScl = attribute('iScl', 'vec3')
     const iRot = attribute('iRot', 'vec2')
-    const p = yawRot(positionLocal.mul(iScl), iRot.x).add(iPos)
+    // an instance of the near register collapses to its own foot while the
+    // map's ring stands in its place: two rings at one place fight for depth
+    const rI = length(iPos.xz)
+    const gone = nearGate
+      ? oneMinus(smoothstep(NEAR_BAND[0] - 0.01, NEAR_BAND[0], rI).mul(oneMinus(smoothstep(NEAR_BAND[1], NEAR_BAND[1] + 0.01, rI))).mul(oneMinus(uLanded)))
+      : float(1)
+    const p = yawRot(positionLocal.mul(iScl).mul(gone), iRot.x).add(iPos)
     const n = normalize(yawRot(normalLocal.div(max(iScl, vec3(0.001, 0.001, 0.001))), iRot.x))
     const world = varying(modelWorldMatrix.mul(vec4(p, 1)).xyz)
     return {
@@ -705,6 +719,7 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
       .mul(oneMinus(smoothstep(9.5, 12.4, dCam)))
       .mul(0.28)
       .mul(uR)
+      .mul(uLanded)
   }
   {
     const rnd = mulberry32(FOUNDING_SEED + 34)
@@ -780,7 +795,7 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
       const joint = min(min(fract(row), oneMinus(fract(row))), min(fract(col), oneMinus(fract(col))))
       const grain = vn(vec3(hit.x.mul(17), hit.z.mul(28), 4.2))
       alpha = alpha.mul(exp(y.mul(-2.2))).mul(smoothstep(0.005, 0.025, joint))
-        .mul(grain.mul(0.75).add(0.25))
+        .mul(grain.mul(0.75).add(0.25)).mul(uLanded)
     }
     const heat = smoothstep(0.85, 1.6, fieldV.add(oneMinus(y).mul(0.5)).sub(abs(xx).mul(1.8)))
     const body = mix(hex3('#e8500c'), hex3('#ffc873'), smoothstep(0.0, 1.05, fieldV))
@@ -825,9 +840,10 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
     ambK?: number
     baseK?: number
     bounce?: number
+    near?: boolean
   }): MeshBasicNodeMaterial {
     const mat = new MeshBasicNodeMaterial()
-    const { world, normal, tint, clip: c } = inkVertex()
+    const { world, normal, tint, clip: c } = inkVertex(opts.near ?? false)
     mat.vertexNode = c
     // an instance reads the map at its own world position, never three's
     mat.receivedShadowPositionNode = world
@@ -1076,7 +1092,7 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
     const a = oneMinus(smoothstep(0.06, 0.5, dd)).mul(0.025)
     const shim = vn(vec3(uv().x.mul(5), uv().y.mul(5), uT.mul(0.4))).mul(0.4).add(0.8)
     washMat.colorNode = c3(GOLD)
-    washMat.opacityNode = a.mul(shim).mul(uFlick).mul(uR).add(dith(0.006))
+    washMat.opacityNode = a.mul(shim).mul(uFlick).mul(uR).add(dith(0.006)).mul(uLanded)
   }
   const wash = new Mesh(new PlaneGeometry(3.4, 3.6), washMat)
   wash.rotation.x = -Math.PI / 2
@@ -1093,7 +1109,7 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
   // ==================================================================
   const shaftMat = new MeshBasicNodeMaterial()
   {
-    const { world, normal, hLocal, tint, clip: c } = inkVertex()
+    const { world, normal, hLocal, tint, clip: c } = inkVertex(true)
     shaftMat.vertexNode = c
     /* the shadow LOOKUP would otherwise use three's positionWorld, which
        cannot know about an instance: every column would read the map at the
@@ -1162,7 +1178,7 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
     shaftMat.colorNode = shoulder(haze(colr, dCam, 9, 32)).add(dith(0.0022)).mul(uR)
   }
 
-  const dressMat = dressedStone({ albedo: DRESS_ALB, rim: 0.28, facePow: 1.5, baseK: 0.42, ambK: 0.014 })
+  const dressMat = dressedStone({ albedo: DRESS_ALB, rim: 0.28, facePow: 1.5, baseK: 0.42, ambK: 0.014, near: true })
 
   const MID_ANGLES = [-71, -53, -37, -24.5, -14, 14, 24.5, 37, 53, 71]
   const STOA_ANGLES: number[] = []
@@ -1315,7 +1331,7 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
     const across = pow(oneMinus(abs(t.x.sub(0.5)).mul(2)), 1.4)
     const wobble = vn(vec3(world.x.mul(2.2), world.z.mul(0.7), uT.mul(0.35))).mul(0.7).add(0.5)
     reflectMat.colorNode = c3(GOLD)
-    reflectMat.opacityNode = away.mul(across).mul(wobble).mul(tint).mul(uFlick).mul(0.08).mul(uR)
+    reflectMat.opacityNode = away.mul(across).mul(wobble).mul(tint).mul(uFlick).mul(0.08).mul(uR).mul(uLanded)
   }
   {
     const items: Item[] = []
@@ -1524,7 +1540,7 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
     const glow = oneMinus(smoothstep(0.1, 1.0, length(p)))
     const pulse = sin(uT.mul(0.9).add(tint.mul(19.0))).mul(0.4).add(0.55)
     cinderMat.colorNode = mix(c3(lin('#c2521a')), c3(EMBER_GOLD), pulse)
-    cinderMat.opacityNode = pow(glow, 2.0).mul(pulse).mul(uFlick).mul(0.5).mul(uR)
+    cinderMat.opacityNode = pow(glow, 2.0).mul(pulse).mul(uFlick).mul(0.5).mul(uR).mul(uLanded)
   }
   {
     const rnd = mulberry32(FOUNDING_SEED + 47)
@@ -1789,6 +1805,7 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
     uTP.value = t
     uR.value = r
     uAir.value = s.air ?? 1
+    uLanded.value = s.landed ?? 1
 
     // ONE fire, many flickers: the source stays steady, the light it throws
     // trembles a little more. All motion is sine-woven and deterministic.
