@@ -1,4 +1,4 @@
-import { CylinderGeometry, ExtrudeGeometry, LatheGeometry, Mesh, MeshStandardNodeMaterial, PlaneGeometry, Vector2, Path, Shape, type Material, type Texture } from 'three/webgpu'
+import { CylinderGeometry, ExtrudeGeometry, LatheGeometry, Matrix4, Mesh, MeshStandardNodeMaterial, PlaneGeometry, Quaternion, Vector2, Vector3, Path, Shape, type BufferGeometry, type Material, type Texture } from 'three/webgpu'
 import { Construction, exhibitionFloor, galleryBackdrop, type ExhibitMaterials, type ExhibitionObject } from '../myths/construction'
 import { lineAdvance } from '../words'
 import words from '../line/data/never-said.json'
@@ -56,6 +56,28 @@ export const GRAVE_WORDS = {
   enlarged: { en: 'A small painting enlarged for this room', de: 'Ein kleines Gemälde für diesen Raum vergrößert' },
 } as const
 
+/** A PART SHAPED IN ITS OWN FRAME, welded into the object's own batches.
+ * A sub-assembly that stands on a group of its own costs a draw per material
+ * again; the same geometry carried here costs none, and the placement it
+ * would have had as a group is baked into its vertices instead. */
+class Placed extends Construction {
+  constructor(private readonly into: Construction, private readonly matrix: Matrix4) {
+    super(into.materials, into.group.name, into.manifestId)
+  }
+  override geometry(geometry: BufferGeometry, material: Material): void {
+    this.into.geometry(geometry.applyMatrix4(this.matrix), material)
+  }
+}
+/** The matrix a group would have carried: rotation about X, then the place. */
+function placed(into: Construction, place: { rotationX?: number; scale?: number; position: [number, number, number] }): Placed {
+  const matrix = new Matrix4().compose(
+    new Vector3(...place.position),
+    new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), place.rotationX ?? 0),
+    new Vector3().setScalar(place.scale ?? 1),
+  )
+  return new Placed(into, matrix)
+}
+
 /** Frame-space +Z faces the measured NW gable, +X runs right along its facade. */
 export function graveSunDirection(): [number, number, number] {
   const radians = Math.PI / 180
@@ -89,13 +111,9 @@ export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, l
 
   // The documented name is the ONLY writing on the slab. The portrait
   // medallion is omitted from this openly generated study; no face invented.
-  const slabName = new Construction(materials, 'vinci-grave-slab-name', 'vinci/grave-geometry')
+  const slabName = placed(build, { rotationX: -Math.PI / 2, position: [centreX, 0.2348, centreZ + (options.mobile?.76:1.06)] })
   const labelWidth = 1.92
   slabName.text(options.mobile?'LEONARDO\nDA VINCI':GRAVE_EVIDENCE.slab, -labelWidth / 2, 0, 0, options.mobile?.20:.153, labelWidth, materials.ink, 0.003)
-  const slabText = slabName.finish()
-  slabText.rotation.x = -Math.PI / 2
-  slabText.position.set(centreX, 0.2348, centreZ + (options.mobile?.76:1.06))
-  build.group.add(slabText)
 
   // Beaten bronze inset rings recall the mounting's material without
   // fabricating the profile carried by the modern tomb photograph.
@@ -127,16 +145,12 @@ export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, l
   if(options.mobile){
     // The phone reads the same words from a floor-set strip: no standing plate
     // crowds the slab, and the caption stays inside the narrow stage.
-    const strip=new Construction(materials,'vinci-grave-medallion-note','vinci/grave-geometry')
+    const strip=placed(build,{rotationX:-Math.PI/2,position:[centreX+.34,.062,centreZ-2.74]})
     // Local XY becomes the paving plane once the strip is laid down, so the
     // plate's thickness is its local Z and its depth is its local Y.
     strip.box(0,-.30,-.028,2.06,.72,.056,pale)
     strip.box(0,-.665,-.030,2.10,.05,.060,materials.bronze)
     strip.text(noteWords,-.94,-.08,.004,.150,1.90)
-    const floorNote=strip.finish()
-    floorNote.rotation.x=-Math.PI/2
-    floorNote.position.set(centreX+.34,.062,centreZ-2.74)
-    build.group.add(floorNote)
   }else{
     build.box(noteX,.20,noteZ-.09,1.18,.40,.14,materials.dark)
     build.box(noteX,.43,noteZ,1.56,.56,.07,pale)
@@ -144,7 +158,8 @@ export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, l
     build.text(noteWords,noteX-.70,.60,noteZ+.04,.112,1.42)
   }
 
-  const gableBuild=new Construction(materials,'vinci-computed-gable','vinci/grave-geometry')
+  const gableScale=options.mobile?.84:1, gableShift:[number,number,number]=options.mobile?[-1.26,0,-1.55]:[0,0,0]
+  const gableBuild=placed(build,{scale:gableScale,position:gableShift})
   // An architectural study in a deep frame, distinct from the burial object.
   // Its three-dimensional stones and roof catch the computed low sun.
   const frameX = GRAVE_FRAME.x
@@ -254,7 +269,7 @@ export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, l
   // A reading ledge raked back towards the eye. A vertical caption under a
   // camera that looks down foreshortens two lines into one; at 25 degrees the
   // face meets the visitor and the lines keep their air.
-  const ledge=new Construction(materials,'vinci-light-caption','vinci/grave-geometry')
+  const ledge=placed(gableBuild,{rotationX:-.44,position:[frameX,options.mobile?1.00:.95,frameZ+(options.mobile?.34:.32)]})
   const ledgeWidth=options.mobile?2.62:2.36, ledgeHeight=options.mobile?.58:.50
   const inner=ledgeWidth-.26
   ledge.box(0,0,0,ledgeWidth,ledgeHeight,.075,materials.plaster)
@@ -268,22 +283,15 @@ export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, l
   const second=text(GRAVE_WORDS.diagramDate.en,GRAVE_WORDS.diagramDate.de)
   ledge.text(first, -inner/2, ledgeHeight/2-.085, .042, fit(first,options.mobile?.155:.118), inner)
   ledge.text(second, -inner/2, -.075, .042, fit(second,options.mobile?.115:.082), inner)
-  const caption=ledge.finish()
-  caption.rotation.x=-.44
-  caption.position.set(frameX,options.mobile?1.00:.95,frameZ+(options.mobile?.34:.32))
-  gableBuild.group.add(caption)
-  const framedGable=gableBuild.finish()
-  const gableScale=options.mobile?.84:1, gableShift:[number,number,number]=options.mobile?[-1.26,0,-1.55]:[0,0,0]
-  if(options.mobile){framedGable.scale.setScalar(gableScale);framedGable.position.set(...gableShift)}
-  build.group.add(framedGable);build.finish()
+  build.finish()
   // The points a frame has to hold: nothing of the burial or its diagram may
   // fall under a card, so the host composes from these and not from a guess.
-  const placed=(x:number,y:number,z:number):[number,number,number]=>[x*gableScale+gableShift[0],y*gableScale+gableShift[1],z*gableScale+gableShift[2]]
+  const gablePoint=(x:number,y:number,z:number):[number,number,number]=>[x*gableScale+gableShift[0],y*gableScale+gableShift[1],z*gableScale+gableShift[2]]
   const framePoints:[number,number,number][]=[
     [centreX-0.99,0.24,centreZ+1.775],[centreX+0.99,0.24,centreZ+1.775],
     [centreX-0.99,0.24,centreZ-1.775],[centreX+0.99,0.24,centreZ-1.775],
     [plaqueX-0.80,1.12,plaqueZ],[plaqueX+0.80,0.02,plaqueZ+0.10],
-    placed(frameX-1.66,0.0,frameZ),placed(frameX+1.66,frameY+1.33,frameZ),
+    gablePoint(frameX-1.66,0.0,frameZ),gablePoint(frameX+1.66,frameY+1.33,frameZ),
     options.mobile?[centreX+.34,.12,centreZ-2.74]:[noteX-.78,.72,noteZ],
     options.mobile?[centreX-.60,.12,centreZ-2.20]:[noteX+.78,.06,noteZ],
   ]

@@ -2743,7 +2743,7 @@
       "prompt": "Interpretive museum slab with name only, an empty bronze bezel with its own note, a separate presumed plaque on a footed base and based on a sourced account, and a constructed framed gable relief for the computed sun under a raked reading ledge. No bones or invented historical plaque facsimile.",
       "model": "Deterministic TypeScript geometry and TSL materials",
       "date": "2026-09-10",
-      "sha256": "4e04f1c7e211467d46f434c9382e57d6f182be49dca38dee40e966609ce0a011",
+      "sha256": "9c63dd5dfa75a656554747c87784a19cddb5fe818cb842c98f2d3deebca668d1",
       "note": "recipe_file=src/wings/vinci/grave/index.ts"
     },
     {
@@ -3388,12 +3388,12 @@
       "prompt": "Twelve complete date sockets from the unchanged line bench, mounted in three fixed excerpts of four at true scale on the long gallery floor. The sections begin with the recorded birth in1452, the Vespucci note in1503 and the Amboise visit in1517, and end with the1519 will and death. Original bronze numerals, certainty words and colours, two named1504 events and1.65m nonchronological spacing are retained. The collection host clips the original paving to its room and excludes the standalone bench walls, rail and threshold continuation, keeping the gallery doors and crossing clear. Modern exhibition composition, no historical building claim.",
       "model": "Deterministic TypeScript geometry derived from the line module",
       "date": "2026-09-14",
-      "sha256": "faac45880faabc9df3449abcce5ab092a2b79d408d071e11a26c189bb828b36c",
+      "sha256": "b2964753e9a65b318691ede749481f50522274cb63447a779a13112755885040",
       "note": "recipe_file=src/wings/vinci/collection/line-floor.ts; source_module=src/wings/vinci/line/index.ts; source_indices=0..3,28..31,38..41; all56 records remain at the bench address",
       "recipe_files": [
         {
           "path": "src/wings/vinci/collection/line-floor.ts",
-          "sha256": "faac45880faabc9df3449abcce5ab092a2b79d408d071e11a26c189bb828b36c"
+          "sha256": "b2964753e9a65b318691ede749481f50522274cb63447a779a13112755885040"
         },
         {
           "path": "src/wings/vinci/collection/layout.ts",
@@ -3443,12 +3443,12 @@
       "prompt": "The collection host fits the unchanged grave and corrections modules to their existing museum floor reservations. Only the original native stage paving triangles are clipped: grave 12 by 13 m, deathbed and quote corrections 13 by 12 m, each around local depth centre 2.5 m. The larger independent bench stages remain unchanged at their bench addresses. All upright exhibit geometry and its attributes pass through intact. This prevents the corrections paving from covering the date course or adjoining picture room and keeps one instance of each built exhibit. The shared collection paving coordinates retain their original datum. Authored museum installation, no historical architectural claim.",
       "model": "Deterministic TypeScript clipping of the original native floor triangles",
       "date": "2026-09-14",
-      "sha256": "faac45880faabc9df3449abcce5ab092a2b79d408d071e11a26c189bb828b36c",
+      "sha256": "b2964753e9a65b318691ede749481f50522274cb63447a779a13112755885040",
       "note": "recipe_file=src/wings/vinci/collection/line-floor.ts; recipe_function=fitCollectionExhibitFloor; source_modules=grave,myths; floor_only=true",
       "recipe_files": [
         {
           "path": "src/wings/vinci/collection/line-floor.ts",
-          "sha256": "faac45880faabc9df3449abcce5ab092a2b79d408d071e11a26c189bb828b36c"
+          "sha256": "b2964753e9a65b318691ede749481f50522274cb63447a779a13112755885040"
         },
         {
           "path": "src/wings/vinci/collection/exhibits.ts",

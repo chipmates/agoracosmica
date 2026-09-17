@@ -120,6 +120,18 @@ export function createCollectionLineFloor(materials: LineMaterials, language: 'e
   floor.userData['sourceManifestIds'] = ['vinci/line-geometry']
   const batches = new Map<Material, Buffers>()
   const owned = new Set<Material>(), used = new Set<Material>()
+  /** THE THREE SECTIONS ARE CUT FROM THREE BUILDS of the bench, and each
+   * build makes its own inlay material per certainty. The colour is the
+   * certainty's, not the section's, so one material serves all three and the
+   * floor draws each certainty once instead of once per section. */
+  const byCertainty = new Map<string, Material>()
+  const canonical = (material: Material): Material => {
+    if (material.userData['owned'] !== true) return material
+    const first = byCertainty.get(material.name)
+    if (first) return first
+    byCertainty.set(material.name, material)
+    return material
+  }
   const limits = {
     west: LINE_FIELD.west - LINE_ORIGIN.east,
     east: LINE_FIELD.east - LINE_ORIGIN.east,
@@ -147,8 +159,8 @@ export function createCollectionLineFloor(materials: LineMaterials, language: 'e
     source.updateMatrixWorld(true)
     source.traverse(object => {
       if (!(object instanceof Mesh) || Array.isArray(object.material)) return
-      const material = object.material
-      if (material.userData['owned']) owned.add(material)
+      if (object.material.userData['owned']) owned.add(object.material)
+      const material = canonical(object.material)
       const geometry = object.geometry.clone().applyMatrix4(object.matrixWorld)
       const position = geometry.getAttribute('position'), normal = geometry.getAttribute('normal')
       const uv = geometry.getAttribute('uv'), index = geometry.getIndex()
