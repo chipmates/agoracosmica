@@ -1,4 +1,4 @@
-import { Box3, Group, Vector3 } from 'three/webgpu'
+import { Box3, Group, Vector3, type BufferGeometry, type Object3D } from 'three/webgpu'
 import type { Stack } from '../../../stack'
 import { buildParts } from './parts'
 import { applyMotion, jointValuesAt } from './motion'
@@ -14,6 +14,21 @@ export interface ReadyMachineBuild extends MachineBuild {
   tightBounds(): Box3
   /** Camera-obscura inspection only: remove roof and right wall from view. */
   section(enabled: boolean): void
+  /** One named part of the dossier: the node its joints move, and the
+   * surface it was built with, which stays whole even where the part is
+   * welded or instanced into a shared draw. */
+  part?(id: string): { node: Object3D; geometry: BufferGeometry } | null
+}
+
+/** THE ROOM'S MACHINE IS THE VITRINE'S MACHINE. A close look lends the one
+ * body the room built, with its clock, and never builds a second one. */
+const builds = new WeakMap<Object3D, ReadyMachineBuild>()
+export function registerMachineBuild(build: ReadyMachineBuild): ReadyMachineBuild {
+  builds.set(build.object, build)
+  return build
+}
+export function machineBuildOf(object: Object3D): ReadyMachineBuild | undefined {
+  return builds.get(object)
 }
 
 /** The schema specifies conservative swept envelopes, with their own origins. */
@@ -86,6 +101,10 @@ export function makeMachine(stack: Stack, record: MachineRecord): ReadyMachineBu
       if (disposed || record.slug !== 'camera-obscura') return
       sectionEnabled = enabled
       applySection()
+    },
+    part(id) {
+      const node = assembly?.parts.get(id), mesh = assembly?.meshes.get(id)
+      return node && mesh ? { node, geometry: mesh.geometry } : null
     },
     dispose() {
       if (disposed) return

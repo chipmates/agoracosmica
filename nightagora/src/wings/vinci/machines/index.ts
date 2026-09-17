@@ -1,6 +1,6 @@
 import type { Stack } from '../../../stack'
 import type { MachineSlug } from './catalog'
-import type { ReadyMachineBuild } from './runtime'
+import { registerMachineBuild, type ReadyMachineBuild } from './runtime'
 import { build as aerial_screw } from './aerial-screw'
 import { build as parachute } from './parachute'
 import { build as anemometer } from './anemometer'
@@ -18,6 +18,7 @@ import { build as camera_obscura } from './camera-obscura'
 
 export * from './catalog'
 export type { ReadyMachineBuild } from './runtime'
+export { machineBuildOf } from './runtime'
 export type { Dossier, MachineBuild, Certainty } from './types'
 
 export const builders: Record<MachineSlug, (stack: Stack) => ReadyMachineBuild> = {
@@ -38,5 +39,5 @@ export const builders: Record<MachineSlug, (stack: Stack) => ReadyMachineBuild> 
 }
 
 export function buildMachine(slug: MachineSlug, stack: Stack): ReadyMachineBuild {
-  return builders[slug](stack)
+  return registerMachineBuild(builders[slug](stack))
 }
