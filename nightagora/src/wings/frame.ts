@@ -96,6 +96,9 @@ export interface WingModule {
   stop(): void
   /** one frame of the wing's own time, when it holds a living stage */
   update?(dt: number): void
+  /** True while a payload stands over the frame the canvas already holds:
+      nothing may draw until it lets go. */
+  held?(): boolean
   /** a named composition at the standing station, for the eye and the rig */
   view?(id: string): void
   /** the gaze, in radians, when the wing drives its own camera */
@@ -131,6 +134,9 @@ export interface WingFrame {
   doorHere(): { href: string; question: string }
   /** one frame of the wing's own time */
   update(dt: number): void
+  /** True while the wing holds the canvas on its last frame: the loop skips
+      its draw, so a DOM payload stands over a still picture at no cost. */
+  held(): boolean
   /** resolves when the wing standing has paid for its first frame */
   ready(report?: (done: number, total: number) => void): Promise<void>
   /** the gaze a hand or the rig asks for, in radians */
@@ -404,6 +410,7 @@ export function createWingFrame(
       wing?.update?.(dt)
       paintNavigation()
     },
+    held: () => wing?.held?.() ?? false,
     look: (yaw, pitch) => wing?.look?.(yaw, pitch),
     camera: () => world.camera,
   }

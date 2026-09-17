@@ -1848,7 +1848,7 @@ function frame(now: number): void {
   camera.rotation.y += yaw
   camera.rotation.x += pitch
   if (phase === 'wing') wingFrame.update(dt)
-  stack.render(dt)
+  if (!(phase === 'wing' && wingFrame.held())) stack.render(dt)
   camera.rotation.x = baseRx
   camera.rotation.y = baseRy
 }
