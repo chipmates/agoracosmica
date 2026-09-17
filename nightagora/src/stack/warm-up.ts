@@ -51,6 +51,8 @@ const WARM_WIDTH = 320
     build that never settles must not keep a visitor at the field: past this
     the sweep draws what stands, which is what the walk would have met. */
 const HOLD_CAP_MS = 30000
+/** and how long the last frame waits for the pipelines being linked */
+const LINK_CAP_MS = 60000
 
 export function warmWalk(
   stack: Stack,
@@ -70,17 +72,43 @@ export function warmWalk(
     quaternion: camera.quaternion.clone(),
     fov: camera.fov,
   }
-  // the poses, and then the sweep: the walk is one step longer than its
-  // stations, and the field's line is measured against that
-  const total = poses.length + 1
+  // the poses, the sweep, and the frame that draws what the sweep compiled:
+  // the walk is two steps longer than its stations, and the field's line is
+  // measured against that
+  const total = poses.length + 2
   const culled: Object3D[] = []
   const hidden: Object3D[] = []
   const began = performance.now()
   let at = -1
+  let linkedFrom = 0
   let finish = (): void => {}
   const done = new Promise<void>((resolve) => {
     finish = resolve
   })
+  /* THE PIPELINES ARE LINKED IN PARALLEL. A pipeline asked for inside a frame
+     is linked synchronously, one after the other, and the submit that uses it
+     waits for each: with every body of a wing standing at entry that is half
+     a minute of one blocked queue. So while the warm up owns the loop, every
+     pipeline goes through the device's asynchronous link, which runs them
+     side by side and draws nothing until each is ready; the walk then waits
+     for all of them and draws one last frame with everything in it, which
+     links whatever is left the ordinary way and uploads what they read. */
+  const pipelines = (stack.renderer as unknown as { _pipelines: { getForRender: (object: unknown, promises?: unknown[] | null) => unknown } })._pipelines
+  const ordinary = pipelines.getForRender
+  let linking = 0
+  pipelines.getForRender = function (this: unknown, object: unknown, promises: unknown[] | null = null) {
+    if (promises) return ordinary.call(this, object, promises)
+    const asked: Promise<unknown>[] = []
+    const pipeline = ordinary.call(this, object, asked)
+    for (const link of asked) {
+      linking++
+      void link.then(() => { linking-- })
+    }
+    return pipeline
+  }
+  const unlink = (): void => {
+    pipelines.getForRender = ordinary
+  }
   // the style is left alone, so the canvas keeps the frame it had and none
   // of this is visible even if the field above it were to lift early
   stack.renderer.setSize(WARM_WIDTH, Math.round(WARM_WIDTH / (camera.aspect || 1)), false)
@@ -117,6 +145,7 @@ export function warmWalk(
   }
 
   function restore(): void {
+    unlink()
     sweep(false)
     camera.position.copy(held.position)
     camera.quaternion.copy(held.quaternion)
@@ -138,6 +167,13 @@ export function warmWalk(
       if (at >= total) return false
       // the last pose stands while the stack still holds bodies for the sweep
       if (at === poses.length - 1 && stack.holding() > 0 && performance.now() - began < HOLD_CAP_MS) return true
+      // and the sweep's eye stands, drawing nothing new, while what it asked
+      // for is being linked
+      if (at === poses.length) {
+        sweep(false)
+        linkedFrom ||= performance.now()
+        if (linking > 0 && performance.now() - linkedFrom < LINK_CAP_MS) return true
+      }
       // the pose placed last frame has been drawn by now, so the count the
       // loading field shows is of frames PAID FOR, not of frames asked for
       if (at >= 0) report?.(at + 1, total)
@@ -148,6 +184,13 @@ export function warmWalk(
         return false
       }
       if (at === poses.length) {
+        sweep(true)
+        return true
+      }
+      if (at === poses.length + 1) {
+        // the last frame draws everything, and links the ordinary way
+        // whatever the parallel link did not reach
+        unlink()
         sweep(true)
         return true
       }
