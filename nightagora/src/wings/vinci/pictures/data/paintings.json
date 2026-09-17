@@ -679,8 +679,8 @@
       "title_de": "Anbetung der Könige aus dem Morgenland",
       "holder": "Gallerie degli Uffizi, Florence",
       "inventory": "1890 n. 1594",
-      "height_cm": 244,
-      "width_cm": 240,
+      "height_cm": 240,
+      "width_cm": 244,
       "medium": "Charcoal, ink wash and oil drawing",
       "support": "Wood",
       "medium_de": "Kohle, lavierte Tinte und Öl",
@@ -731,6 +731,15 @@
           "verification": "holder record as transcribed in catalog"
         },
         {
+          "url": "https://opificiodellepietredure.cultura.gov.it/attivita/leonardo-da-vinci-adorazione-dei-magi-le-gallerie-degli-uffizi-firenze/",
+          "supports": [
+            "height_cm",
+            "width_cm"
+          ],
+          "local_source": "program/rounds/vinci-small-research/REPORT-2026-09-17.md §1",
+          "verification": "restorer's measurement, stated in words: 244 cm in larghezza, 240 in altezza"
+        },
+        {
           "url": "https://commons.wikimedia.org/wiki/File:Adoration_of_the_Magi_(Leonardo).jpg",
           "supports": [
             "held_scan",
@@ -760,8 +769,8 @@
           {
             "height_cm": 246,
             "width_cm": 243,
-            "note": "Competing catalog measurement. Main dimensions follow the holder.",
-            "source_url": "https://www.uffizi.it/en/artworks/leonardo-adoration-of-the-magi"
+            "note": "Competing catalogue measurement, printed with the height first. Whether that pair should instead be read width first is not established. Main dimensions follow the holder and the restorers.",
+            "source_url": "https://it.wikipedia.org/wiki/Adorazione_dei_Magi_(Leonardo)"
           }
         ],
         "registration": "not established",

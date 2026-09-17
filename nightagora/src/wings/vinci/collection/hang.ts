@@ -28,7 +28,11 @@ export const HANG: readonly Work[] = [
   w('baptism-of-christ', 151, 177), w('annunciation', 217, 98),
   w('ginevra-de-benci', 37, 38.1), w('ginevra-de-benci', 37, 38.1, 'reverse'),
   w('madonna-of-the-carnation', 48.5, 62), w('benois-madonna', 33, 49.5),
-  w('saint-jerome', 75, 103), w('adoration-of-the-magi', 240, 244),
+  // The holder's pair is 244 by 240 with the width first, which the
+  // restoration record states in words. Its old layout slot keeps every
+  // neighbouring frame and batten in place.
+  // https://opificiodellepietredure.cultura.gov.it/attivita/leonardo-da-vinci-adorazione-dei-magi-le-gallerie-degli-uffizi-firenze/
+  w('saint-jerome', 75, 103), w('adoration-of-the-magi', 244, 240, 'front', 240),
   w('annunciation-predella', 60, 16), w('virgin-of-the-rocks-louvre', 122, 199.5),
   w('portrait-of-a-musician', 32, 44.7), w('lady-with-an-ermine', 40.3, 54.8),
   w('la-belle-ferronniere', 45, 63), w('madonna-litta', 33, 42),

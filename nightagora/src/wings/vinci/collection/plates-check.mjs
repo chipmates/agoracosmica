@@ -136,7 +136,8 @@ assert.equal(lansdowne.width * 100, getWork(lansdowne.id).width_cm)
 // and its moulding stands on the 12 mm standoff, so the fourteen that used to
 // be empty changed their own boxes. The centre loop above is what proves no
 // neighbour moved. Lansdowne's eleven holder-corrected boxes stay outside the
-// snapshot, as they were before.
+// snapshot, as they were before. Re-taken again when the Adoration's height
+// and width were untransposed: its own eleven boxes, and no others, moved.
 const boxes = [], retainedBoxes = []
 buildHang({ box: (...args) => boxes.push(args) })
 let offset = 0
@@ -147,7 +148,7 @@ for (const field of HANG) {
 assert.equal(boxes.length, 275)
 assert.equal(retainedBoxes.length, 264)
 assert.equal(createHash('sha256').update(JSON.stringify(retainedBoxes)).digest('hex'),
-  '69f0c11d586e34e3e06edeefcde3339675792bb21aecdb341074768c76571389')
+  '1317d22ffc92791ff630464a65d5951dc3e280ada4be6c18cabc8f5a07fb4546')
 // The body wall builds one carrier per admitted sheet, and nothing else.
 const bodyBoxes = []
 buildBodyWall({ box: (...args) => bodyBoxes.push(args) })

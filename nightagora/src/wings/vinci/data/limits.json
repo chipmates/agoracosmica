@@ -89,9 +89,9 @@
     },
     "picture/adoration-of-the-magi/front": {
       "limit": {
-        "en": "The Uffizi gives 244 by 240 cm, another catalogue gives 246 by 243 cm, and the room follows the Uffizi.",
-        "de": "Die Uffizien nennen 244 mal 240 cm, ein anderer Katalog 246 mal 243 cm, und der Raum folgt den Uffizien.",
-        "source": "pictures/data/paintings.json, adoration-of-the-magi, measurement alternatives"
+        "en": "The restorers measured the panel at 244 cm wide and 240 cm high, and an older catalogue gives 246 by 243 cm, height first.",
+        "de": "Die Restauratoren maßen die Tafel mit 244 cm Breite und 240 cm Höhe, und ein älterer Katalog nennt 246 mal 243 cm, die Höhe zuerst.",
+        "source": "pictures/data/paintings.json, adoration-of-the-magi, sources and measurement alternatives"
       },
       "visual_note": {
         "en": "The image is a monochrome facsimile printed in 1901, so it shows the tones of that year and not the colour the panel has after its restoration of 2012 to 2017.",
