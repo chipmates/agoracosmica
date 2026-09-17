@@ -77,6 +77,8 @@
     "de": "Das ist die ganze Quelle. Mehr Detail gibt es nicht."
   },
   "rule_labels": [
+    { "en": "1 cm", "de": "1 cm" },
+    { "en": "5 cm", "de": "5 cm" },
     { "en": "10 cm", "de": "10 cm" },
     { "en": "50 cm", "de": "50 cm" }
   ],

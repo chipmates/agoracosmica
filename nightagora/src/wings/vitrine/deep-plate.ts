@@ -36,6 +36,8 @@ export interface DeepPlateWords {
   whole: string
   /** What the view says when there is no more of the source to show. */
   ceiling: string
+  /** The rule's numerals, each with the centimetres it names. */
+  rule: readonly { label: string; cm: number }[]
 }
 
 export interface DeepPlatePayload extends VitrinePayload {
@@ -59,6 +61,12 @@ const AT_THE_CEILING = .999
 /** One tile as RGBA8 in megabytes, which is what a cache count costs. */
 const tileMB = (size: number): number => size * size * 4 / 1e6
 
+/** The rule is a reading, so it is never a stub and never runs past the
+ * plate: the numeral chosen is the largest one whose bar stands inside
+ * these bounds of the viewport's own width. */
+const RULE_SHORTEST = 24
+const RULE_SHARE = .42
+
 export function createDeepPlatePayload(options: {
   /** The work's own name, and the viewport's accessible name where no
    * description is written for it. */
@@ -72,9 +80,14 @@ export function createDeepPlatePayload(options: {
    * the eye did not walk to it. */
   from(): VitrineRect | null
   tier(): DeepPlateTier
+  /** Pixels of the source across one centimetre of the work, through the
+   * display window the museum hangs it by. Null where the register holds no
+   * measured extent, and then no rule is drawn. */
+  pxPerCm: number | null
 }): DeepPlatePayload {
   let host: VitrinePayloadHost | undefined
   let root: HTMLDivElement | undefined, stage: HTMLDivElement | undefined
+  let rule: HTMLDivElement | undefined, ruleBar: HTMLDivElement | undefined, ruleLabel: HTMLSpanElement | undefined
   let viewer: import('openseadragon').Viewer | undefined
   let library: typeof import('openseadragon') | undefined
   let live = false, seated = false, tileSize = 256, said = ''
@@ -124,7 +137,30 @@ export function createDeepPlatePayload(options: {
     root.dataset['tiles'] = String(tiles)
     root.dataset['cacheMb'] = (tiles * tileMB(tileSize)).toFixed(1)
     root.dataset['zoom'] = magnification().toFixed(3)
+    measure()
     speak()
+  }
+
+  /** THE RULE MEASURES THE WORK, NOT THE SCREEN. Ten centimetres of the
+   * painting are this many pixels of the glass at the magnification
+   * standing now, whatever size the glass is: the view never claims that
+   * ten centimetres on the screen are ten centimetres of the panel, which
+   * would need a pixel pitch a browser does not know. */
+  function measure(): void {
+    if (!rule || !ruleBar || !ruleLabel || !root) return
+    const perCm = options.pxPerCm, zoom = magnification()
+    if (!perCm || !(zoom > 0) || !options.words.rule.length) { rule.hidden = true; return }
+    const steps = [...options.words.rule].sort((a, b) => a.cm - b.cm)
+    const most = root.clientWidth * RULE_SHARE
+    let chosen = steps[0]!
+    for (const step of steps) if (step.cm * perCm * zoom <= most) chosen = step
+    const width = chosen.cm * perCm * zoom
+    // A bar too short to read against is no measurement.
+    if (width < RULE_SHORTEST) { rule.hidden = true; return }
+    rule.hidden = false
+    ruleBar.style.width = `${Math.round(width)}px`
+    ruleLabel.textContent = chosen.label
+    root.dataset['rule'] = `${chosen.label} ${Math.round(width)}px`
   }
 
   /** The one line under the viewport. At the ceiling it says so, in the
@@ -233,7 +269,15 @@ export function createDeepPlatePayload(options: {
       style.textContent = css
       stage = document.createElement('div')
       stage.className = 'deep-plate-stage'
-      root.append(style, stage)
+      rule = document.createElement('div')
+      rule.className = 'deep-rule'
+      rule.hidden = true
+      ruleBar = document.createElement('div')
+      ruleBar.className = 'deep-rule-bar'
+      ruleLabel = document.createElement('span')
+      ruleLabel.className = 'deep-rule-label'
+      rule.append(ruleBar, ruleLabel)
+      root.append(style, stage, rule)
       next.element.append(root)
       next.element.tabIndex = 0
       next.describe(options.description ?? options.title)
@@ -248,6 +292,7 @@ export function createDeepPlatePayload(options: {
       // The stage moved under the viewer. Its own resize watch takes the
       // new container; the view the visitor made is left where it is.
       if (!seated) seat = options.from()
+      measure()
     },
     key(event) {
       if (!viewer) return false
@@ -277,6 +322,7 @@ export function createDeepPlatePayload(options: {
       viewer = undefined
       root?.remove()
       root = undefined; stage = undefined; host = undefined; library = undefined
+      rule = undefined; ruleBar = undefined; ruleLabel = undefined
       seat = null; seated = false
     },
   }

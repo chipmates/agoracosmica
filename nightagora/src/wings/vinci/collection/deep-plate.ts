@@ -22,6 +22,7 @@ import platesRaw from '../data/plate-descriptions.json?raw'
 type Words = { en: string; de: string }
 const CARDS = JSON.parse(cardsRaw) as {
   zoom_ceiling: Words
+  rule_labels: readonly Words[]
   controls: { shared: { back: Words }; machine: { viewpoints: readonly (Words & { id: string })[] } }
 }
 const DESCRIPTIONS = (JSON.parse(platesRaw) as { descriptions: Record<string, Words> }).descriptions
@@ -30,6 +31,13 @@ const DESCRIPTIONS = (JSON.parse(platesRaw) as { descriptions: Record<string, Wo
  * it carries the same id with one word after it. */
 const WHOLE = '/whole'
 export const isWholePlate = (id: string | null): boolean => Boolean(id?.endsWith(WHOLE))
+
+/** THE RULE'S NUMERALS, as the card models write them. A numeral is a
+ * measurement and reads the same in both languages, so the centimetres are
+ * taken from the label itself rather than kept a second time in code. */
+const RULE: readonly { label: string; cm: number }[] = CARDS.rule_labels
+  .map(words => ({ label: words[lang()], cm: Number.parseFloat(words.en) }))
+  .filter(step => Number.isFinite(step.cm) && step.cm > 0)
 
 /** What is on the plate, in the page's language, for a visitor who cannot
  * see it. Null where no one has written it yet. */
@@ -64,6 +72,23 @@ export async function vinciPlatePyramid(plate: ResolvedPicturePlate): Promise<De
   // provenance line, and never a place to fetch a tile from.
   return { base: `${ASSET_BASE}${tiles.wing}/${tiles.path}`.slice(0, -1), width: tiles.width,
     height: tiles.height, tileSize: tiles.tile_size, scaleFactors: tiles.scale_factors }
+}
+
+/** PIXELS OF THE SOURCE ACROSS ONE CENTIMETRE OF THE WORK. The display
+ * window is the extent the museum hangs the work by and the register holds
+ * its size in centimetres; a work missing either has no rule. The window's
+ * own aspect and the register's differ by a little, and the room resolves
+ * that by containing the measurement inside the window, so the rule takes
+ * the same reading rather than a second one. The window carries
+ * physicalRegistration: false, so this is the museum's own assumption and
+ * never an authenticated registration of the panel. */
+function platePxPerCm(work: PictureWork, plate: ResolvedPicturePlate,
+  cut: { left: number; right: number; top: number; bottom: number } | null): number | null {
+  if (!work.width_cm || !work.height_cm || !(work.width_cm > 0) || !(work.height_cm > 0)) return null
+  const across = (cut ? cut.right - cut.left : 1) * plate.pixels.width
+  const down = (cut ? cut.bottom - cut.top : 1) * plate.pixels.height
+  if (!(across > 0) || !(down > 0)) return null
+  return Math.max(across / work.width_cm, down / work.height_cm)
 }
 
 /** THE WHOLE PLATE AS AN EXHIBIT of the wing's own window: the same label
@@ -106,9 +131,10 @@ export function createVinciWholePlate(options: {
       width: options.plate.pixels.width,
       height: options.plate.pixels.height,
     },
-    words: { whole: CARDS.controls.machine.viewpoints[0]![language], ceiling: CARDS.zoom_ceiling[language] },
+    words: { whole: CARDS.controls.machine.viewpoints[0]![language], ceiling: CARDS.zoom_ceiling[language], rule: RULE },
     from: options.from,
     tier: options.tier,
+    pxPerCm: platePxPerCm(options.work, options.plate, cut),
   })
   const back = document.createElement('button')
   back.type = 'button'
