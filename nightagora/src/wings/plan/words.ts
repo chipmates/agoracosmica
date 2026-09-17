@@ -7,8 +7,9 @@
 import type { Bi } from './types'
 
 export const PLAN_WORDS = {
-  /** the control in the wing's bar, beside the sources of the station */
-  plan: { en: 'The plan', de: 'Der Plan' },
+  /** The control in the wing's bar, beside the sources of the station. A
+   * bare noun, the way the bar's other word is one. */
+  plan: { en: 'Plan', de: 'Plan' },
   close: { en: 'Close', de: 'Schließen' },
   /** read out beside a station a visitor has already stood at */
   stood: { en: 'stood here', de: 'hier gestanden' },

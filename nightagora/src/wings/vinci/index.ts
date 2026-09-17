@@ -9,6 +9,9 @@ import { float, mix, vec3, vec4, dot as nodeDot, positionWorld, cameraPosition, 
 import { SkyMesh } from 'three/addons/objects/SkyMesh.js'
 import { setRegister, type WingHosts, type WingModule } from '../frame'
 import { beginVisit, type Visit } from '../visit'
+import { createWingPlan, type WingPlan } from '../plan'
+import { PLAN_WORDS } from '../plan/words'
+import type { PlanPoint, PlanRoom, PlanShape, PlanSite, PlanStation } from '../plan/types'
 import { constructionRecords, evidenceWords } from './evidence-copy'
 import { lang, WING_TEXT } from '../content'
 import { createVinciSourcesWindow, type VinciSourcesTab, type VinciExhibitSources } from './sources'
@@ -18,6 +21,7 @@ import { createShell } from './shell'
 import { createShellShadowDouble } from './shadow-shell'
 import { createWingShadowBody, type WingShadowBody } from './shadow-body'
 import { createCollection, collectionProvenance } from './collection'
+import { COURT, GRAVE_ORIGIN, LINE_FIELD, ROOMS, SUPPER_WALL } from './collection/layout'
 import { collectionView } from './collection/views'
 import { mountCollectionExhibits, type CollectionExhibits } from './collection/exhibits'
 import { isMachineSlug, type MachineSlug } from './machines'
@@ -64,7 +68,7 @@ import { createVinciHangStrip, vinciSheetTitle, type VinciStripEntry } from './c
 import { pathSpecifications } from './paths'
 import { roadGradeProvenance } from './road-grade'
 import { apronProvenance } from './apron'
-import { vinciContent, vinciLegacyStationIds, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, vinciAbsences, vinciGrounds, vinciRightsPolicy, vinciWingCounts, vinciSourcesHeadings, type VinciCertainty, type VinciStatement, type VinciStationId, type VinciText } from './content'
+import { vinciContent, vinciPlanRooms, vinciWelcomeText, vinciLegacyStationIds, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, vinciAbsences, vinciGrounds, vinciRightsPolicy, vinciWingCounts, vinciSourcesHeadings, type VinciCertainty, type VinciStatement, type VinciStationId, type VinciText } from './content'
 import wingCss from './wing.css?inline'
 
 const text=(value:VinciText):string=>value[lang()]
@@ -154,6 +158,9 @@ export function createWing():VinciWingModule {
   let welcome:ReturnType<typeof createVinciWelcome>|undefined
   /** THE NIGHT ON THE DEVICE: ids only, opened by the vitrine's own door. */
   let visit:Visit|undefined
+  /** THE PLAN, and the one case where it takes an entry instead of pushing
+   * its own: a close look that stood down for it already pushed one. */
+  let plan:WingPlan|undefined, planControl:HTMLButtonElement|undefined, planAdopt=false
   let exhibitSources:VinciExhibitSources|null=null
   let labelHostHidden:string|null=null
   // THE WAIT AT THE STREET SHOWS ITSELF. The heading is painted and the frame
@@ -300,6 +307,22 @@ export function createWing():VinciWingModule {
     authority=createRailGeometryAuthority(collectRailSolids(scene))
     rail=createRail(camera,clock,authority);measurement=createMeasurement(h.labels,stack)
     source=make('button','vinci-source',sourcesWord());source.type='button';source.setAttribute('aria-keyshortcuts','l');source.setAttribute('aria-controls','vinci-source-card');source.addEventListener('click',()=>{mode=mode===2?1:2;paintDock()});h.stage.parentElement!.querySelector('.wing-rail-group')!.append(source)
+    // THE PLAN STANDS IN THE BAR'S OWN GROUP, beside the sources of the
+    // station: the group is the frame's one persistent mark, so the plan
+    // adds no second one.
+    planControl=make('button','wing-plan-open',text(PLAN_WORDS.plan));planControl.type='button'
+    planControl.setAttribute('aria-keyshortcuts','p');planControl.setAttribute('aria-controls','wing-plan')
+    planControl.addEventListener('click',()=>openPlan())
+    h.stage.parentElement!.querySelector('.wing-rail-group')!.append(planControl)
+    plan=createWingPlan({host:h.labels,lang,narrow,
+      floor:()=>h.stage.parentElement?.querySelector('.wing-rail-group')?.getBoundingClientRect().top??innerHeight,
+      title:()=>text(vinciWelcomeText.title),site:planSite,
+      standing:()=>vinciContent[card]!.id,stood:()=>visit?.stood??[],
+      // THE QUICK SELECT IS THE PRESS THE BAR ALREADY MAKES: every pair is
+      // certified, so the museum walks there and nothing is cut.
+      station:id=>{const index=vinciContent.findIndex(station=>station.id===id);if(index>=0)h.navigate(index)},
+      highlight:()=>{},
+      returnFocus:focusTheBar,adopt:()=>planAdopt})
     sources=createVinciSourcesWindow(h.labels,source,()=>{mode=1;paintDock()});dock=sources.element;drawer=sources.panels.station
     occluders=collectVinciLabelOccluders(scene)
     labels=createVinciLabelAnchor({host:h.labels,camera,occluders,onOpen:()=>{mode=2;paintDock()}})
@@ -375,6 +398,7 @@ export function createWing():VinciWingModule {
       if(e.key==='Escape'&&sheetOpen&&narrow()){e.preventDefault();sheetOpen=false;paintSheet();return}
       if(e.key==='Escape'){e.preventDefault();mode=1;rail.look(0,0);paintDock();source.focus({preventScroll:true});return}
       if(e.key.toLowerCase()==='l'&&!e.repeat){e.preventDefault();mode=((mode+1)%3) as VinciLabelMode;paintDock();if(mode!==2&&target.closest('.vinci-dock'))source.focus({preventScroll:true});return}
+      if(e.key.toLowerCase()==='p'&&!e.repeat){e.preventDefault();openPlan();return}
       if(target.closest('.vinci-dock'))return
       if(e.key==='ArrowRight'||e.key==='ArrowDown'){e.preventDefault();h.navigate(station+1)}
       if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();h.navigate(station-1)}
@@ -434,6 +458,58 @@ export function createWing():VinciWingModule {
     // forge marker, and a sheet over the arrival frame would stand in every
     // frame they shoot.
     if(!document.body.classList.contains('forge')&&!vinciWelcomeSeen()&&card===0)welcome?.open()
+  }
+  /** THE WING AS A PLAN, from the geometry the site and the collection have
+   * already declared: the pavilion's three rooms, the court with its parapet,
+   * the grave's floor, the field the dates are cut into, the wall that is not
+   * here, the house footprint, and every station at its own certified eye.
+   * Nothing in here measures the scene, so the plan costs no draw. */
+  function planSite():PlanSite {
+    const box=(west:number,east:number,south:number,north:number):PlanPoint[]=>
+      [[west,south],[east,south],[east,north],[west,north]]
+    const rooms:PlanRoom[]=[
+      {id:'court',name:vinciPlanRooms.court,kind:'court',west:COURT.west,east:COURT.east,south:COURT.south,north:COURT.north,built:true},
+      // The grave's floor is the west half of the court's paving, at the
+      // offsets the room module builds it from.
+      {id:'grave',name:vinciPlanRooms.grave,kind:'court',west:GRAVE_ORIGIN.east-4,east:GRAVE_ORIGIN.east+9,south:GRAVE_ORIGIN.north-6,north:GRAVE_ORIGIN.north+6,built:true},
+      {id:ROOMS.picture.id,name:vinciPlanRooms['picture-room'],kind:'room',west:ROOMS.picture.west,east:ROOMS.picture.east,south:ROOMS.picture.south,north:ROOMS.picture.north,built:true},
+      {id:ROOMS.hall.id,name:vinciPlanRooms['mechanism-hall'],kind:'room',west:ROOMS.hall.west,east:ROOMS.hall.east,south:ROOMS.hall.south,north:ROOMS.hall.north,built:true},
+      {id:ROOMS.gallery.id,name:vinciPlanRooms['long-gallery'],kind:'room',west:ROOMS.gallery.west,east:ROOMS.gallery.east,south:ROOMS.gallery.south,north:ROOMS.gallery.north,built:true},
+      // The cut field is drawn where the floor is cut, which is the declared
+      // field clipped to the room that carries it.
+      {id:'line-field',name:null,kind:'field',west:LINE_FIELD.west,east:LINE_FIELD.east,
+        south:Math.max(LINE_FIELD.south,ROOMS.gallery.south),north:Math.min(LINE_FIELD.north,ROOMS.gallery.north),built:true},
+    ]
+    const shapes:PlanShape[]=[
+      // THE HOUSE IS NOT OPEN. Its rooms are shown from outside, so its
+      // footprint is an outline and never a fill.
+      {id:'house',points:dossier.site.footprint.map(point=>[point.value[0]!,point.value[1]!] as PlanPoint),closed:true,fill:false,built:false},
+      {id:'supper-wall',points:box(SUPPER_WALL.east-SUPPER_WALL.thickness/2,SUPPER_WALL.east+SUPPER_WALL.thickness/2,
+        SUPPER_WALL.north-SUPPER_WALL.length/2,SUPPER_WALL.north+SUPPER_WALL.length/2),closed:true,fill:true,built:true},
+      {id:'parapet-north',points:box(COURT.west,COURT.east,COURT.north-COURT.parapetThickness,COURT.north),closed:true,fill:true,built:true},
+      {id:'parapet-west',points:box(COURT.west,COURT.west+COURT.parapetThickness,COURT.south,COURT.north),closed:true,fill:true,built:true},
+      {id:'parapet-east',points:box(COURT.east-COURT.parapetThickness,COURT.east,COURT.south,COURT.north),closed:true,fill:true,built:true},
+    ]
+    const eyes=vinciContent.map(station=>{const eye=stationPose(station.id,false).eye;return {east:eye.x,north:-eye.z}})
+    const stations:PlanStation[]=vinciContent.map((station,index)=>{
+      const here=eyes[index]!
+      return {id:station.id,number:index+1,name:station.name,group:station.group,east:here.east,north:here.north,
+        // FOUR ROOMS ENTERED FROM ONE PLACE ARE ONE MARK. The rail's own
+        // poses say which stations share a standing place, so the drawing
+        // carries the standstill instead of explaining it.
+        sharesPoseWith:vinciContent.flatMap((other,at)=>at===index||eyes[at]!.east!==here.east||eyes[at]!.north!==here.north?[]:[other.id])}
+    })
+    return {rooms,shapes,stations,highlights:[]}
+  }
+  /** One sheet at a time: a close look stands down for the plan and the plan
+   * takes the history entry it pushed, so Back is one press either way. */
+  function openPlan():void {
+    if(!plan||!standing)return
+    if(plan.standing){plan.close();return}
+    planAdopt=Boolean(closeLook?.id)
+    if(planAdopt)closeLook?.close(false)
+    plan.show()
+    planAdopt=false
   }
   /** The station the visitor is standing in, written to the night's record. */
   function standHere():void { visit?.stand(vinciContent[card]!.id) }
@@ -1117,6 +1193,7 @@ export function createWing():VinciWingModule {
     const camera=hosts.world.camera
     // The bar's word is painted with the dock, so it follows the language.
     if(source.textContent!==sourcesWord())source.textContent=sourcesWord()
+    if(planControl&&planControl.textContent!==text(PLAN_WORDS.plan))planControl.textContent=text(PLAN_WORDS.plan)
     dock.dataset['station']=s.id
     // Opening Sources changes presentation only, inside the same proven lens.
     camera.zoom=1;camera.clearViewOffset();camera.updateProjectionMatrix()
@@ -1261,7 +1338,7 @@ export function createWing():VinciWingModule {
     },
     view(id){if(!standing){pendingView=id;return}showView(id)},
     look(y,p){if(standing)rail.look(y,p)},
-    held:()=>closeLook?.held()??false,
+    held:()=>(closeLook?.held()??false)||(plan?.held()??false),
     update(dt=0){
       if(!hosts)return
       if(!standing)return
@@ -1281,7 +1358,7 @@ export function createWing():VinciWingModule {
       // THE ROOM HOLDS STILL WHILE A PAYLOAD HOLDS THE STAGE: nothing of it
       // walks, streams or is drawn until the vitrine hands it back.
       closeLook?.update(dt)
-      const payload=Boolean(closeLook?.id&&closeLook.surface!=='room')
+      const payload=Boolean(closeLook?.id&&closeLook.surface!=='room')||Boolean(plan?.held())
       exhibits?.holdPlates(payload)
       if(payload)return
       measurement.update();rail.update()
@@ -1310,6 +1387,6 @@ export function createWing():VinciWingModule {
       // ONE EXHIBIT AT A TIME: while one is open the other marks stand down.
       dots?.setLimit(closeLook?.id?0:DOTS_PER_TIER[hosts.world.stack.tierName()]??6)
       dots?.update(reading)},
-    stop(){visit?.close();visit=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;sign=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
+    stop(){visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;sign=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
   }
 }

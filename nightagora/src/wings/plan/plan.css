@@ -1,8 +1,18 @@
+/* THE PLAN'S CONTROL in a wing's bar. It carries the bar's own weight and a
+   width that leaves the rail its room on a 390 px stage. */
+.wing-plan-open {flex:0 0 76px;min-width:76px;min-height:44px;padding:8px 4px;white-space:nowrap;border:0;border-left:1px solid #a9977355;
+  background:none;color:#eee4d3;font:9px var(--sans);letter-spacing:.1em;text-transform:uppercase;cursor:pointer;}
+.wing-plan-open:focus-visible {outline:1px solid #edcc8c;outline-offset:3px;}
+
 /* THE PLAN. One sheet over the frame the canvas already holds: the wing drawn
    as a plan on the left, the walk read as a list on the right, and the same
    two stacked on a narrow stage. The weights are the museum's own. */
-.wing-plan {position:fixed;box-sizing:border-box;display:flex;flex-direction:column;margin:0;padding:0;max-width:none;max-height:none;
+.wing-plan {position:fixed;box-sizing:border-box;flex-direction:column;margin:0;padding:0;max-width:none;max-height:none;
   background:#101d27f2;border:1px solid #a9977355;color:#eae1d1;overflow:hidden;}
+/* A closed dialog paints nothing, and an open one takes the pointer: the
+   sheet hangs in a label layer that ignores it by default. */
+.wing-plan[open] {display:flex;pointer-events:auto;}
+.wing-plan:not([open]) {display:none;}
 .wing-plan::backdrop {background:#081016b3;}
 .wing-plan-sheet {flex:1 1 auto;display:flex;gap:22px;min-height:0;padding:20px;}
 .wing-plan[data-narrow='true'] .wing-plan-sheet {flex-direction:column;gap:10px;padding:12px;}
