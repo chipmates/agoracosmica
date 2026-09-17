@@ -30,10 +30,11 @@
 .wing-plan-shape[data-fill='true'] {fill:#cfc6b433;}
 .wing-plan-shape[data-fill='false'] {fill:none;}
 .wing-plan-shape[data-built='false'] {stroke-dasharray:4 4;}
-.wing-plan-room-name {fill:#cfc6b4cc;font:11px/1.2 var(--sans);letter-spacing:.04em;text-anchor:middle;dominant-baseline:middle;}
+/* The size is set on the element: the plate only draws a name that fits the
+   room it names, and the rule that measures that has to know the size. */
+.wing-plan-room-name {fill:#cfc6b4cc;font-family:var(--sans);letter-spacing:.04em;text-anchor:middle;dominant-baseline:middle;}
 .wing-plan-north-stem,.wing-plan-north-head {stroke:#cfc6b499;stroke-width:1;fill:#cfc6b499;}
 .wing-plan-north-letter {fill:#cfc6b4cc;font:10px var(--sans);letter-spacing:.1em;text-anchor:middle;}
-.wing-plan[data-narrow='true'] .wing-plan-room-name {font-size:8.5px;}
 
 /* THE MARKS stand where the station stands. On the wide stage each one is a
    44 px target; on a 390 px stage the eyes stand a few pixels apart, so there

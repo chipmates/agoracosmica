@@ -18,7 +18,7 @@
  */
 
 import css from './plan.css?inline'
-import { drawPlanPlate, type PlanPlate } from './plate'
+import { drawPlanPlate, PLATE_NAME_PX, type PlanPlate } from './plate'
 import { PLAN_WORDS } from './words'
 import type { PlanSite } from './types'
 
@@ -31,7 +31,7 @@ const HISTORY_MARK = 'wingPlan'
 export const PLAN_WIDE = { top: 76, side: 28, bottom: 18, padding: 20, gap: 22, plateShare: .66, readingMin: 270, readingMax: 380 } as const
 /** THE NARROW STAGE: the sheet rises from the bar, the plate on top scaled to
  * fit whole, the reading under it. */
-export const PLAN_NARROW = { top: 58, side: 8, bottom: 10, padding: 12, gap: 10, plateShare: .42, plateLeast: 170, plateMost: 330 } as const
+export const PLAN_NARROW = { top: 58, side: 8, bottom: 10, padding: 12, gap: 10, plateShare: .58, plateLeast: 190, plateMost: 400 } as const
 
 export interface WingPlanOptions {
   host: HTMLElement
@@ -156,7 +156,7 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
         width: Math.max(80, (box.width - numbers.padding * 2 - numbers.gap) * numbers.plateShare),
         height: Math.max(80, box.height - numbers.padding * 2),
       }
-    plate = drawPlanPlate(site, area, language)
+    plate = drawPlanPlate(site, area, language, narrow ? PLATE_NAME_PX.narrow : PLATE_NAME_PX.wide)
     drawing.style.width = `${Math.round(plate.width)}px`
     drawing.style.height = `${Math.round(plate.height)}px`
     drawing.replaceChildren(plate.element, marksHost)
