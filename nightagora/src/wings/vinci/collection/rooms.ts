@@ -13,12 +13,18 @@ import {
 
 const CEILING = -1.88, COFFER = .19, BAY = 4
 const BASE = .16, LINING = .022, GAP = .04
+/** Underside of the coffered slab, and how far the band that closes the
+ * reveal above a wall stands back from the room. The reveal is by design;
+ * what stood in it was the pavilion's own lit interior, which reads as a leak
+ * and not as a shadow. A recessed band of the dark stone closes it. */
+const SOFFIT = CEILING - .07, HEAD = .03
 
 /** The hall's roof falls south from its clerestory; its beams follow it. */
 const hallSoffit = (north: number) => 1.05 - .75 * (-42.5 - north) / 22.2
 
-function wallEastWest(b: RoomBatch, north: number, inward: 1 | -1, west: number, east: number, top: number, skip: [number, number][] = []): void {
+function wallEastWest(b: RoomBatch, north: number, inward: 1 | -1, west: number, east: number, top: number, skip: [number, number][] = [], soffit?: number): void {
   const face = north + inward * .011
+  const head = top - GAP
   const runs: [number, number][] = []
   let cursor = west
   for (const [from, to] of [...skip].sort((a, b) => a[0] - b[0])) {
@@ -29,18 +35,23 @@ function wallEastWest(b: RoomBatch, north: number, inward: 1 | -1, west: number,
   for (const [from, to] of runs) {
     const width = to - from
     if (width <= .001) continue
-    b.box((from + to) / 2, face, (FLOOR + BASE + top - GAP) / 2, width, LINING * 2, top - GAP - FLOOR - BASE, 1)
+    b.box((from + to) / 2, face, (FLOOR + BASE + head) / 2, width, LINING * 2, head - FLOOR - BASE, 1)
     b.box((from + to) / 2, north + inward * .018, FLOOR + BASE / 2, width, .036, BASE, 2)
+    // The band runs a centimetre into the slab, so the two faces never share
+    // a plane and no line of sight is left between the room and the envelope.
+    if (soffit !== undefined)
+      b.box((from + to) / 2, north + inward * (.011 - HEAD / 2), (head + soffit + .01) / 2, width, LINING * 2 - HEAD, soffit + .01 - head, 2)
     // Ribs on the structure's own bay give the plane its middle scale.
     for (let east2 = Math.ceil(from / BAY) * BAY; east2 < to; east2 += BAY) {
       if (east2 - from < .4 || to - east2 < .4) continue
-      b.box(east2, face + inward * .012, (FLOOR + BASE + top - GAP) / 2, .34, .024, top - GAP - FLOOR - BASE, 1)
+      b.box(east2, face + inward * .012, (FLOOR + BASE + head) / 2, .34, .024, head - FLOOR - BASE, 1)
     }
   }
 }
 
-function wallNorthSouth(b: RoomBatch, east: number, inward: 1 | -1, south: number, north: number, top: number, skip: [number, number][] = []): void {
+function wallNorthSouth(b: RoomBatch, east: number, inward: 1 | -1, south: number, north: number, top: number, skip: [number, number][] = [], soffit?: number): void {
   const face = east + inward * .011
+  const head = top - GAP
   const runs: [number, number][] = []
   let cursor = south
   for (const [from, to] of [...skip].sort((a, b) => a[0] - b[0])) {
@@ -51,11 +62,13 @@ function wallNorthSouth(b: RoomBatch, east: number, inward: 1 | -1, south: numbe
   for (const [from, to] of runs) {
     const depth = to - from
     if (depth <= .001) continue
-    b.box(face, (from + to) / 2, (FLOOR + BASE + top - GAP) / 2, LINING * 2, depth, top - GAP - FLOOR - BASE, 1)
+    b.box(face, (from + to) / 2, (FLOOR + BASE + head) / 2, LINING * 2, depth, head - FLOOR - BASE, 1)
     b.box(east + inward * .018, (from + to) / 2, FLOOR + BASE / 2, .036, depth, BASE, 2)
+    if (soffit !== undefined)
+      b.box(east + inward * (.011 - HEAD / 2), (from + to) / 2, (head + soffit + .01) / 2, LINING * 2 - HEAD, depth, soffit + .01 - head, 2)
     for (let north2 = Math.ceil(from / BAY) * BAY; north2 < to; north2 += BAY) {
       if (north2 - from < .4 || to - north2 < .4) continue
-      b.box(face + inward * .012, north2, (FLOOR + BASE + top - GAP) / 2, .024, .34, top - GAP - FLOOR - BASE, 1)
+      b.box(face + inward * .012, north2, (FLOOR + BASE + head) / 2, .024, .34, head - FLOOR - BASE, 1)
     }
   }
 }
@@ -99,8 +112,8 @@ export function createCollectionRooms(): Group {
   // window looks at. Its floor is laid on the line's own grid.
   b.slab(P.west, P.south, P.east, P.north, FLOOR, .09, 0)
   b.slab(P.west, P.north - .9, P.east, P.north, FLOOR + .001, .09, 2)
-  wallEastWest(b, FACE.pictureWallNorth, 1, P.west, P.east, -2.04, [[OPENING.pictureToHall.east[0], OPENING.pictureToHall.east[1]], [OPENING.pictureToGallery.east[0], OPENING.pictureToGallery.east[1]]])
-  wallNorthSouth(b, FACE.wallWest, 1, P.south, P.north, -1.94)
+  wallEastWest(b, FACE.pictureWallNorth, 1, P.west, P.east, -2.04, [[OPENING.pictureToHall.east[0], OPENING.pictureToHall.east[1]], [OPENING.pictureToGallery.east[0], OPENING.pictureToGallery.east[1]]], SOFFIT)
+  wallNorthSouth(b, FACE.wallWest, 1, P.south, P.north, -1.94, [], SOFFIT)
   ceiling(b, P.west, P.south, P.east, P.north)
   lightCove(b, FACE.pictureWallNorth, P.west + .3, P.east - .3, 1)
   // The hanging wall gets its own picture rail and a continuous stone bench
@@ -148,9 +161,9 @@ export function createCollectionRooms(): Group {
   // its floor is twenty-six metres long. The floor is cut around it.
   b.slabAround(G.west, G.south, G.east, G.north, FLOOR, .09, LINE_FIELD, 0)
   buildBodyWall(b)
-  wallNorthSouth(b, FACE.hallPartitionEast, 1, G.south, G.north, -2.06, [[OPENING.hallToGallery.north[0], OPENING.hallToGallery.north[1]], [OPENING.hallToSouth.north[0], OPENING.hallToSouth.north[1]]])
-  wallEastWest(b, FACE.pictureWallSouth, -1, G.west, G.east, -2.06, [[OPENING.pictureToGallery.east[0], OPENING.pictureToGallery.east[1]]])
-  wallEastWest(b, FACE.southStripNorth, 1, G.west + .1, -22.8, -2.1)
+  wallNorthSouth(b, FACE.hallPartitionEast, 1, G.south, G.north, -2.06, [[OPENING.hallToGallery.north[0], OPENING.hallToGallery.north[1]], [OPENING.hallToSouth.north[0], OPENING.hallToSouth.north[1]]], SOFFIT)
+  wallEastWest(b, FACE.pictureWallSouth, -1, G.west, G.east, -2.06, [[OPENING.pictureToGallery.east[0], OPENING.pictureToGallery.east[1]]], SOFFIT)
+  wallEastWest(b, FACE.southStripNorth, 1, G.west + .1, -22.8, -2.1, [], SOFFIT)
   ceiling(b, G.west, G.south, G.east, G.north)
   doorEastWest(b, FACE.pictureWallSouth + .1, OPENING.pictureToGallery.east[0], OPENING.pictureToGallery.east[1] - .1, -2.5)
   // The gallery's east end is the glazed elevation: its sill and reveal are
