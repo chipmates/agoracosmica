@@ -1,7 +1,10 @@
 /* THE WHOLE PLATE. The deep viewer fills the vitrine's viewport, the room
    frozen and dimmed behind it. Everything the visitor can press is ours and
    is 44 px; the viewer's own controls are off. */
-.deep-plate {position:absolute;inset:0;overflow:hidden;background:#0a0f13;}
+/* THE ROOM'S OWN FRAME STAYS VISIBLE while the viewer seats itself on the
+   work: the ground is laid only once the plate has grown out of it. */
+.deep-plate {position:absolute;inset:0;overflow:hidden;background:transparent;}
+.deep-plate[data-seated='true'] {background:#0a0f13;}
 .deep-plate-stage {position:absolute;inset:0;}
 .deep-plate-stage .openseadragon-canvas {outline:none;}
 .deep-plate-stage .openseadragon-canvas:focus-visible {outline:1px solid #edcc8c;outline-offset:-3px;}

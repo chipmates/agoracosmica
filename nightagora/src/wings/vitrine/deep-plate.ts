@@ -248,6 +248,7 @@ export function createDeepPlatePayload(options: {
     if (!viewer || !host || seated) return
     seated = true
     seat = null
+    if (root) root.dataset['seated'] = 'true'
     host.surface('hold')
     viewer.viewport.fitBounds(windowBounds(), !grown || host.reducedMotion)
   }
@@ -329,6 +330,7 @@ export function createDeepPlatePayload(options: {
       const document = next.element.ownerDocument
       root = document.createElement('div')
       root.className = 'deep-plate'
+      root.dataset['seated'] = 'false'
       const style = document.createElement('style')
       style.textContent = css
       stage = document.createElement('div')
