@@ -6,7 +6,9 @@
  * module joins those to a stable id, a proxy a 44 px target can sit on
  * without enlarging the object, and the station a close look returns to.
  *
- * Only what carries a certified viewing pose can be opened. The other kinds
+ * A picture opens where it carries a certified viewing pose. A machine opens
+ * in the vitrine where it stands, with no leg to walk: the room holds still
+ * and the machine is lent to the vitrine's own turntable. The other kinds
  * are read here and inert until the window that wires them.
  */
 import { Box3, Mesh, Raycaster, Sphere, Vector3, type Object3D } from 'three/webgpu'
@@ -71,10 +73,27 @@ function placedAt(kind: VinciExhibitKind, id: string, workId: string | null, she
   if (kind === 'machine' && slug !== undefined) {
     const table = Object.keys(STANDS), at = table.indexOf(slug)
     const stand = STANDS[slug as keyof typeof STANDS]
-    return { station: stand?.ground === 'court' ? 'supper-wall' : null, order: MACHINE_OFFSET + Math.max(0, at) }
+    return { station: stand ? machineStation(slug, stand.ground) : null, order: MACHINE_OFFSET + Math.max(0, at) }
   }
   return { station: null, order: 0 }
 }
+
+/** THE HALL IS ONE ROOM UNDER TWO STATIONS. The screw is the flight
+ * station's own exhibit and the rest are the second station's, and both
+ * stations walk one row of the hall's machines. The house's compass waits
+ * for its ledge. */
+function machineStation(slug: string, ground: string): VinciStationId | null {
+  if (ground === 'court') return 'supper-wall'
+  if (ground === 'hall') return slug === 'aerial-screw' ? 'flight' : 'works'
+  return null
+}
+/** The stations that share one room's row of machines. */
+export function vinciMachineRoom(station: VinciStationId | null): readonly VinciStationId[] {
+  return station === 'flight' || station === 'works' ? ['flight', 'works'] : station ? [station] : []
+}
+/** A MACHINE'S MARK STANDS LOW ON ITS OWN BODY, above the plinth it stands
+ * on, so the plinth is never read as the mark's own occluder. */
+const MACHINE_MARK_SHARE = .12
 
 function proxy(object: Object3D): { centre: Vector3; radiusM: number; corner: Vector3 } {
   const box = new Box3().setFromObject(object)
@@ -141,17 +160,21 @@ export function readVinciExhibits(root: Object3D): VinciPickEntry[] {
     }
   })
   for (const [slug, parts] of machines) {
-    const box = new Box3()
-    for (const part of parts) box.union(new Box3().setFromObject(part))
+    // The machine's own group is the one its builder named: the stamp only
+    // reaches the meshes that stood when it was put on.
+    const body = parts.find(part => part.name === `vinci/${slug}`) ?? parts[0]!
+    const box = new Box3().setFromObject(body)
     // A machine whose parts have not landed is still an exhibit of its
     // station: it stands at its own group's place until they do.
-    if (box.isEmpty()) for (const part of parts) box.expandByPoint(part.getWorldPosition(new Vector3()))
+    if (box.isEmpty()) box.expandByPoint(body.getWorldPosition(new Vector3()))
     const sphere = box.getBoundingSphere(new Sphere())
     const placed = placedAt('machine', `machine/${slug}`, null, null, slug)
+    const anchor = box.getCenter(new Vector3())
+    anchor.y = box.min.y + (box.max.y - box.min.y) * MACHINE_MARK_SHARE
     entries.push({ id: `machine/${slug}`, kind: 'machine', station: placed.station, order: placed.order,
-      object: parts[0]!.parent ?? parts[0]!, centre: sphere.center.clone(),
-      radiusM: Math.max(PROXY_FLOOR_M, sphere.radius), anchor: sphere.center.clone(),
-      openable: false, workId: null, face: null })
+      object: body, centre: sphere.center.clone(),
+      radiusM: Math.max(PROXY_FLOOR_M, sphere.radius), anchor,
+      openable: placed.station !== null, workId: null, face: null })
   }
   return entries
 }
@@ -170,7 +193,7 @@ export function pickVinciExhibit(options: {
   if (!live.length) return undefined
   let best: VinciPickEntry | undefined, at = Infinity
   for (const entry of live) {
-    const hits = ray.intersectObject(entry.object, false)
+    const hits = ray.intersectObject(entry.object, entry.kind === 'machine')
     const hit = hits[0]
     if (!hit || hit.distance >= at) continue
     best = entry

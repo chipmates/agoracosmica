@@ -1,179 +1,221 @@
-/** ONE OWNER FOR THE CLOSE LOOK.
+/** THE WING'S CLOSE LOOK IS THE MUSEUM'S VITRINE.
  *
- * Opening an exhibit is a move of the body, not a window over a frozen room:
- * the room stays live, the station rail stays live, one exhibit is open at a
- * time, and the way back is the way the visitor came. This module owns the
- * card, the reading history inside it, the one history entry a visitor's Back
- * dismisses, where the focus goes and where it returns to. It owns no words:
- * the card is the picture module's own label, mounted as it is.
+ * One window and one state owner for every kind, shared by every wing: the
+ * one history entry, Back and Escape, where the focus goes and returns, and
+ * who draws the stage while a payload stands. This module names the card the
+ * wing's marks and row open, and composes what the vitrine shows of this
+ * wing out of its registers: the line, the steps, the card's words.
  */
+import { createVitrine, type Vitrine, type VitrineExhibit, type VitrinePayload } from '../../vitrine'
+import { createTurntablePayload, type TurntableOptions, type TurntableViewpoint } from '../../vitrine/turntable'
+import { lang } from '../../content'
+import type { Grade, Stack } from '../../../stack'
+import { ASSET_BASE } from '../../../stack/materials'
+import { assetUrl, loadManifest } from '../../../manifest'
+import { dossiers, machineCatalog, type MachineSlug } from '../machines/catalog'
+import type { ReadyMachineBuild } from '../machines/runtime'
+import { playbackSchedule } from '../machines/bench/playback'
+import { BENCH_ABSENCE } from '../machines/bench/registers'
 import { setRegister } from '../../frame'
+import linesRaw from '../data/lines.json?raw'
+import stepsRaw from '../data/steps.json?raw'
+import cardsRaw from '../data/cards.json?raw'
 
-export interface VinciCloseLookExhibit {
-  id: string
-  /** The exhibit's own name, already in the page's language. */
-  title: string
-  /** The museum's own label for this object, built by the caller. */
-  label: HTMLElement
-  /** The station's question, which is the door's while an exhibit is open. */
-  question: string
-  /** The controls under the label, in the order a hand meets them. */
-  controls: readonly HTMLElement[]
-  /** The two that walk this station's own row, at the card's two ends. */
-  walk?: readonly HTMLElement[]
-}
+export type VinciCloseLook = Vitrine
+export type VinciCloseLookExhibit = VitrineExhibit
 
-export interface VinciCloseLook {
-  /** The exhibit standing open, or null. */
-  readonly id: string | null
-  /** `advance` puts the next exhibit in the card a visitor already has open:
-   * the same card, the same history entry, the hand where it was left. */
-  open(exhibit: VinciCloseLookExhibit, invoker?: HTMLElement | null, how?: 'enter' | 'advance'): void
-  /** `pop` false leaves the browser's own entry where it is, for a caller
-   * that is composing a still rather than dismissing on a visitor's behalf. */
-  close(pop?: boolean): void
-  /** One step back: the record first, then the exhibit. True when it took it. */
-  escape(): boolean
-  /** True while this reader owns the keys and the wheel over its own surface. */
-  owns(target: Element | null): boolean
-  element: HTMLElement
-  dispose(): void
-}
-
-const HISTORY_MARK = 'vinciExhibit'
+/** The card every mark and every row names with aria-controls. */
+export const VINCI_EXHIBIT_CARD = 'vinci-exhibit-card'
 
 export function createVinciCloseLook(options: {
   host: HTMLElement
-  /** Walk the eye to the exhibit. `from` is the exhibit the visitor is
-   * walking on from, which is one motion and not a second opening. False
-   * leaves the eye where it stands, which is the calm tier's own body and
-   * reduced motion's. */
   onOpen(id: string, from: string | null): boolean
-  /** Walk the eye back to the station it left. */
   onClose(id: string): void
   narrow(): boolean
+  /** The top of the wing's bar, which the window stands clear of. */
+  floor(): number
+  returnFocus?(id: string): HTMLElement | null
 }): VinciCloseLook {
-  const { host, onOpen, onClose } = options
-  const document = host.ownerDocument
-  const view = document.defaultView!
-  const card = document.createElement('section')
-  card.className = 'vinci-exhibit-card'
-  // The drawer a visitor opens carries an id, and the marks that open it name
-  // it, so the walk can open it the way a hand does.
-  card.id = 'vinci-exhibit-card'
-  card.hidden = true
-  card.tabIndex = -1
-  card.setAttribute('role', 'group')
-  setRegister(card, 'drawer')
-  const body = document.createElement('div')
-  body.className = 'vinci-exhibit-body'
-  const controls = document.createElement('div')
-  controls.className = 'vinci-exhibit-controls'
-  const walk = document.createElement('div')
-  walk.className = 'vinci-exhibit-walk'
-  const question = document.createElement('p')
-  question.className = 'vinci-exhibit-question'
-  card.append(body, controls, walk, question)
-  // A CARD THAT IS NOT OPEN IS NOT A DRAWER ON THE PAGE. It is mounted when
-  // an exhibit stands and taken off when it closes, so nothing offers a
-  // reading surface no control can open.
+  return createVitrine({ ...options, id: VINCI_EXHIBIT_CARD, lang })
+}
 
-  let open: string | null = null, invoker: HTMLElement | null = null
-  let marked = false, popping = false, disposed = false
+type Words = { en: string; de: string }
+const LINES = (JSON.parse(linesRaw) as { lines: Record<string, Words> }).lines
+const STEPS = (JSON.parse(stepsRaw) as { steps: Record<string, (Words & { at: number; part: string; certainty: string })[]> }).steps
+const CONTROLS = (JSON.parse(cardsRaw) as { controls: {
+  shared: { back: Words; record: Words; more: Words }
+  picture: { whole_plate: Words }
+  machine: { provenance: Words; play: Words; pause: Words; viewpoints: (Words & { id: string })[] }
+} }).controls
 
-  /** Our own entry, so a visitor's Back dismisses the exhibit and nothing
-   * else. The address does not change: an exhibit is a place inside a
-   * station, not a second station. */
-  function mark(): void {
-    const state = { ...(view.history.state as object | null ?? {}), [HISTORY_MARK]: open }
-    view.history.pushState(state, '')
-    marked = true
-  }
-  function unmark(): void {
-    const state = view.history.state as Record<string, unknown> | null
-    const ours = marked && state?.[HISTORY_MARK] !== undefined
-    marked = false
-    if (!ours) return
-    popping = true
-    view.history.back()
-  }
-  function dismiss(): void {
-    if (!open) return
-    const id = open
-    open = null
-    card.hidden = true
-    card.remove()
-    body.textContent = ''
-    controls.textContent = ''
-    walk.textContent = ''
-    onClose(id)
-    const back = invoker
-    invoker = null
-    if (back?.isConnected) back.focus({ preventScroll: true })
-  }
-  const leaving = new AbortController()
-  view.addEventListener('popstate', () => {
-    if (popping) { popping = false; return }
-    if (!open) return
-    marked = false
-    dismiss()
-  }, { signal: leaving.signal })
+/** The words a control of the vitrine carries, from the card models' file. */
+export const VINCI_VITRINE_WORDS = {
+  provenance: CONTROLS.machine.provenance,
+  wholePlate: CONTROLS.picture.whole_plate,
+  more: CONTROLS.shared.more,
+  play: CONTROLS.machine.play,
+  pause: CONTROLS.machine.pause,
+  /** The bench's own word for a finished demonstration started again. */
+  again: { en: 'Run again', de: 'Erneut starten' },
+  close: { en: 'Close', de: 'Schließen' },
+}
 
-  function shut(pop = true): void {
-    if (!open) return
-    if (pop) unmark(); else marked = false
-    dismiss()
-  }
+/** The one thing to remember about an exhibit, in the page's language. */
+export function vinciLine(id: string): string | null {
+  return LINES[id]?.[lang()] ?? null
+}
 
-  return {
-    get id() { return open },
-    element: card,
-    open(exhibit, from = null, how = 'enter') {
-      if (disposed) return
-      if (open === exhibit.id) return
-      const previous = open
-      const advancing = how === 'advance' && previous !== null
-      // WALKING ON IS NOT A SECOND OPENING. The card stays mounted, the one
-      // history entry stays where it is, and the hand keeps the control it
-      // was on, so a visitor holding next walks the wall with one finger.
-      const hand = advancing && card.contains(document.activeElement) ? document.activeElement : null
-      const held = hand ? [...controls.children, ...walk.children].findIndex(child => child.contains(hand)) : -1
-      if (previous && !advancing) { marked = false; dismiss() }
-      open = exhibit.id
-      if (!advancing) invoker = from
-      card.dataset['exhibit'] = exhibit.id
-      card.setAttribute('aria-label', exhibit.title)
-      body.textContent = ''
-      body.append(exhibit.label)
-      body.scrollTop = 0
-      controls.replaceChildren(...exhibit.controls)
-      walk.replaceChildren(...exhibit.walk ?? [])
-      question.textContent = exhibit.question
-      card.hidden = false
-      if (!card.isConnected) host.append(card)
-      if (!advancing) mark()
-      // The eye walks where it can walk. On calm and on reduced motion it
-      // stands still and the card is the whole close look.
-      onOpen(exhibit.id, advancing ? previous : null)
-      const row = [...controls.children, ...walk.children]
-      const back = held < 0 ? null : row[Math.min(held, row.length - 1)]
-      if (back instanceof HTMLElement) back.focus({ preventScroll: true })
-      else if (!advancing) card.focus({ preventScroll: true })
-    },
-    close: shut,
-    escape() {
-      if (!open) return false
-      shut()
-      return true
-    },
-    owns(target) {
-      return open !== null && target !== null && card.contains(target)
-    },
-    dispose() {
-      disposed = true
-      open = null
-      leaving.abort()
-      card.remove()
-    },
+const make = <K extends keyof HTMLElementTagNameMap>(tag: K, cls: string, text?: string): HTMLElementTagNameMap[K] => {
+  const n = document.createElement(tag); n.className = cls; if (text !== undefined) n.textContent = text; return n
+}
+
+/** THE FOLIO A MACHINE WAS READ FROM, where the store holds the page. */
+const FOLIO_THUMB: Partial<Record<MachineSlug, string>> = {
+  'aerial-screw': 'vinci/ms-thumb/lesmanuscritsdel02lo__n0340',
+  'revolving-crane': 'vinci/ms-thumb/lesmanuscritsdel02lo__n0202',
+  'camera-obscura': 'vinci/ms-thumb/lesmanuscritsdel02lo__n0386',
+}
+
+/** THE THREE VIEWPOINTS of the four-station grammar: the whole, the part a
+ * hand or a force drives, and the part that does the work. A machine with
+ * no drive of its own has no drive to look at. */
+const VIEWPOINT_PARTS: Record<MachineSlug, { drive: string | null; working: string | null }> = {
+  'aerial-screw': { drive: 'push-bar-0', working: 'sail' },
+  'parachute': { drive: null, working: 'harness' },
+  'anemometer': { drive: 'vane', working: 'quadrant' },
+  'inclinometer': { drive: 'deck', working: 'pendulum' },
+  'multi-barrel-gun': { drive: 'handbar', working: 'bank-0' },
+  'rolling-mill': { drive: 'crank-grip', working: 'upper' },
+  'ball-bearing': { drive: 'upper-plate', working: 'ball-0' },
+  'flywheel': { drive: 'rotor', working: 'weight-0' },
+  'revolving-crane': { drive: 'handle', working: 'load' },
+  'lathe': { drive: 'footbar', working: 'spindle' },
+  'miter-lock-gates': { drive: 'wicket-left', working: 'leaf-left' },
+  'water-lifting-screw': { drive: 'handle', working: 'helical-tube' },
+  'proportional-compass': { drive: 'screw-head', working: 'leg-left' },
+  'camera-obscura': { drive: null, working: 'screen' },
+}
+
+/** The crane stands out of the store, and its body names its joints its own
+ * way: these are the dossier's parts under the names that body gives them. */
+const STORE_NODE_NAMES: Partial<Record<MachineSlug, Record<string, string>>> = {
+  // The crank turns on the drum's own axle, so the body carries it in the drum.
+  'revolving-crane': { 'handle': 'drum', 'hoist-rope': 'rope-fall' },
+}
+
+/** A citation marker belongs to the record, never to the card. */
+const uncited = (text: string): string => text.replace(/\s*\[\d+(?:\s*,\s*\d+)*\]/g, '')
+
+function folioName(slug: MachineSlug): string {
+  return machineCatalog[slug].folio.map(f => `${f.codex} ${lang() === 'de' ? 'Blatt' : 'f.'} ${f.folio}`).join(', ')
+}
+
+/** The machine's card, in the card model's order after its line: the
+ * description, then the steps the payload lays in, then the certainty, the
+ * size the dossier gives and what the model does not show. */
+export function vinciMachineCard(slug: MachineSlug, narrow: boolean, certainty: { word: string; colour: string })
+  : { card: HTMLElement[]; after: HTMLElement[] } {
+  const record = machineCatalog[slug], dossier = dossiers[slug], language = lang()
+  const description = make('div', 'vitrine-description')
+  description.id = `vitrine-description-${slug}`
+  setRegister(description, 'drawer')
+  const at = record.sections.en.findIndex(section => section.title === 'The mechanism')
+  const mechanism = at < 0 ? null : record.sections[language][at]
+  const label = make('p', '', record.label[language])
+  if (mechanism) description.append(make('p', '', uncited(mechanism.body)))
+  const card: HTMLElement[] = narrow ? [] : [label]
+  // TWO TO FOUR SENTENCES ON A CARD. The mechanism is one deliberate control
+  // away on the wide stage, and the whole description is on the phone, so the
+  // steps stand beside the model where the hand is.
+  if (narrow) description.prepend(label)
+  if (description.childElementCount) {
+    description.hidden = true
+    const more = make('button', 'vitrine-more', VINCI_VITRINE_WORDS.more[language])
+    more.type = 'button'
+    more.setAttribute('aria-expanded', 'false')
+    more.setAttribute('aria-controls', description.id)
+    more.addEventListener('click', () => {
+      description.hidden = !description.hidden
+      more.setAttribute('aria-expanded', String(!description.hidden))
+    })
+    card.push(more, description)
   }
+  const after: HTMLElement[] = []
+  const word = make('p', 'vitrine-certainty', certainty.word)
+  word.style.setProperty('--certainty', certainty.colour)
+  after.push(word)
+  const { x, y, z } = dossier.scale_m
+  const metres = (value: number): string => language === 'de' ? String(value).replace('.', ',') : String(value)
+  after.push(make('p', 'vitrine-meta', `${metres(x)} × ${metres(y)} × ${metres(z)} m`))
+  const absence = BENCH_ABSENCE[slug]
+  if (absence) after.push(make('p', 'vitrine-meta', absence[language]))
+  return { card, after }
+}
+
+/** THE RECORD behind "Where it comes from": the folio, the sections, the
+ * arithmetic and what the sheet does not say, and the two slots a text seat
+ * fills later. */
+export function renderVinciMachineRecord(slug: MachineSlug, host: HTMLElement): void {
+  const record = machineCatalog[slug], language = lang()
+  const full = make('div', 'vinci-record')
+  setRegister(full, 'record')
+  for (const folio of record.folio) full.append(make('p', 'vinci-statement', `${folio.codex} ${folio.folio} · ${folio.holder} · ${folio.catalogue_reference}`))
+  for (const section of record.sections[language]) full.append(make('h3', '', section.title), make('p', 'vinci-statement', section.body))
+  full.append(make('pre', 'vinci-arithmetic', record.arithmetic[language]))
+  for (const gap of record.gaps) full.append(make('p', 'vinci-statement', gap))
+  for (const slot of ['limit', 'visual_note']) {
+    const empty = make('p', 'vinci-statement')
+    empty.dataset['slot'] = slot
+    empty.hidden = true
+    full.append(empty)
+  }
+  host.append(full)
+}
+
+export function createVinciMachinePayload(options: {
+  stack: Stack
+  slug: MachineSlug
+  body: ReadyMachineBuild
+  grade: Grade
+  light: TurntableOptions['light']
+  restore(): void
+  openRecord(): void
+}): VitrinePayload {
+  const { slug } = options
+  const dossier = dossiers[slug], language = lang(), record = machineCatalog[slug]
+  const parts = VIEWPOINT_PARTS[slug]
+  const viewpoints = CONTROLS.machine.viewpoints.map(entry => ({
+    id: entry.id as TurntableViewpoint,
+    label: entry[language],
+    part: entry.id === 'drive' ? parts.drive : entry.id === 'working-part' ? parts.working : null,
+  }))
+  const sheetLabel = folioName(slug)
+  const thumb = FOLIO_THUMB[slug]
+  const payload = createTurntablePayload({
+    stack: options.stack,
+    body: options.body,
+    title: record.title[language],
+    schedule: playbackSchedule(dossier),
+    steps: (STEPS[slug] ?? []).map(step => ({ at: step.at, part: step.part, text: step[language], certainty: step.certainty })),
+    parents: new Map(dossier.parts.map(part => [part.id, part.parent])),
+    viewpoints,
+    words: {
+      play: VINCI_VITRINE_WORDS.play[language],
+      pause: VINCI_VITRINE_WORDS.pause[language],
+      again: VINCI_VITRINE_WORDS.again[language],
+      // ASK: the clock's own name. Until it is written the slider carries the
+      // machine's title, which is what it turns.
+      clock: record.title[language],
+    },
+    nodeNames: STORE_NODE_NAMES[slug],
+    light: options.light,
+    grade: options.grade,
+    sheet: {
+      src: thumb ? loadManifest().then(index => { const entry = index.byId.get(thumb); return entry?.display ? assetUrl(ASSET_BASE, entry) : null }) : null,
+      label: sheetLabel,
+      open: options.openRecord,
+    },
+    restore: options.restore,
+  })
+  return payload
 }
