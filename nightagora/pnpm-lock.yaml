@@ -8,6 +8,9 @@ overrides:
   postcss: ^8.5.23
 
 dependencies:
+  openseadragon:
+    specifier: ^6.1.1
+    version: 6.1.1
   three:
     specifier: ^0.185.1
     version: 0.185.1
@@ -411,6 +414,10 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
     dev: true
+
+  /openseadragon@6.1.1:
+    resolution: {integrity: sha512-g4iKe2q8B642SaBT3+x4ZF3/8b1TxPPydyjmtrOLgDrlYWMKd9ZXM+1Cb/xa9DVySkvs/7l6HR1nHKfD5F3Tsw==}
+    dev: false
 
   /picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}

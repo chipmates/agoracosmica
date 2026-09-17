@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "openseadragon": "^6.1.1",
     "three": "^0.185.1"
   },
   "devDependencies": {
