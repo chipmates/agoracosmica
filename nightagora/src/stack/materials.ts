@@ -433,6 +433,8 @@ async function fill(tex: Texture, url: string, size: number): Promise<void> {
     resizeHeight: size,
     resizeQuality: 'high',
   })
+  // storage already allocated for the one-texel stand-in is immutable on WebGL2
+  tex.dispose()
   tex.image = bitmap
   tex.name = url.slice(url.lastIndexOf('/', url.lastIndexOf('/') - 1) + 1)
   tex.anisotropy = 8
