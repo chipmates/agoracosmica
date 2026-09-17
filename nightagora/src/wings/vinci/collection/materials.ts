@@ -120,25 +120,37 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
   const isOutdoor = role.greaterThan(4.5)
   const pixel = anisotropicFootprint(P)
   const resolved = (metres: number) => smoothstep(2, 4, float(metres).div(pixel))
+  // ONE PIXEL PER AXIS. A joint at a fixed east is a line in P.x and a joint
+  // at a fixed north a line in P.z, and a floor running away from the eye has
+  // a pixel that is centimetres across those lines and metres along them. The
+  // isotropic footprint above is the across figure, so the along axis kept a
+  // line far thinner than its own pixel and it broke into dashes from about
+  // eight metres. Each coordinate is now filtered on its own derivative.
+  const dPx = P.dFdx().toVar(), dPy = P.dFdy().toVar()
+  const footprintOf = (across: TSLNode) => across.length().max(.00001)
+  const pixelEast = footprintOf(vec2(dPx.x, dPy.x))
+  const pixelUp = footprintOf(vec2(dPx.y, dPy.y))
+  const pixelNorth = footprintOf(vec2(dPx.z, dPy.z))
   // A joint is a groove, and a groove has to survive the pixel it lands in:
   // every line below fades to its own area mean instead of shimmering.
-  const line = (coordinate: TSLNode, spacing: number, offset: number, width: number) => {
+  const line = (coordinate: TSLNode, spacing: number, offset: number, width: number, axis: TSLNode) => {
     const f = fract(coordinate.sub(offset).div(spacing)), edge = f.min(float(1).sub(f)).mul(spacing)
-    return float(1).sub(smoothstep(float(width).sub(pixel.mul(.5)).max(0), float(width).add(pixel.mul(.5)), edge)).mul(resolved(spacing))
+    return float(1).sub(smoothstep(float(width).sub(axis.mul(.5)).max(0), float(width).add(axis.mul(.5)), edge))
+      .mul(smoothstep(2, 4, float(spacing).div(axis)))
   }
   // Existing rooms keep their established paving grid. The date field has
   // its own half-metre offset to fit twelve courses; moving that exhibit
   // must not move the joints or stone tones in every room.
-  const slabEast = line(P.x, LINE_SLAB.pitchEast, COLLECTION_PAVING_ORIGIN.east, .008)
-  const slabNorth = line(P.z, LINE_SLAB.pitchNorth, -COLLECTION_PAVING_ORIGIN.north, .008)
+  const slabEast = line(P.x, LINE_SLAB.pitchEast, COLLECTION_PAVING_ORIGIN.east, .008, pixelEast)
+  const slabNorth = line(P.z, LINE_SLAB.pitchNorth, -COLLECTION_PAVING_ORIGIN.north, .008, pixelNorth)
   const slabJoint = slabEast.max(slabNorth).mul(n.y.abs())
   const slabIndex = floor(P.x.sub(COLLECTION_PAVING_ORIGIN.east).div(LINE_SLAB.pitchEast)).add(floor(P.z.add(COLLECTION_PAVING_ORIGIN.north).div(LINE_SLAB.pitchNorth)).mul(7.31))
   const slabTone = fract(slabIndex.mul(13.17).sin().mul(4371.13)).sub(.5).mul(resolved(1.6))
   // Walls: a 1.2 by 2.4 m board rhythm on the lining, its shadow joints 6 mm.
-  const boardV = line(P.y, 1.2, 0, .006), plasterDrift = mx_noise_float(P.mul(.42))
+  const boardV = line(P.y, 1.2, 0, .006, pixelUp), plasterDrift = mx_noise_float(P.mul(.42))
   const trowel = mx_noise_float(P.mul(vec3(5.4, 3.1, 5.4)))
   // The ceiling is coffered on the structure's own four-metre bay.
-  const bayNorth = line(P.z, 4, 0, .02), bayEast = line(P.x, 4, 2, .02)
+  const bayNorth = line(P.z, 4, 0, .02, pixelNorth), bayEast = line(P.x, 4, 2, .02, pixelEast)
   const macro = mx_noise_float(P.mul(.31)).mul(resolved(3.2)).toVar()
   const middle = mx_noise_float(P.mul(7.6)).mul(resolved(.13)).toVar()
   const grain = mx_noise_float(P.mul(215)).mul(resolved(.0047)).toVar()
