@@ -15,14 +15,25 @@ export interface PaneWords {
   wing?: Record<Lang, string>
 }
 
-export const PANE_SHARED: Record<'preparing' | 'open' | 'nameOnly', Record<Lang, string>> = {
+export const PANE_SHARED: Record<'preparing' | 'open' | 'nameOnly' | 'close', Record<Lang, string>> = {
   preparing: { en: 'Wing in preparation', de: 'Flügel in Vorbereitung' },
+  close: { en: 'Back to the sky', de: 'Zurück zum Himmel' },
   open: { en: 'Wing open', de: 'Flügel geöffnet' },
   /** the pane without a likeness: the name stands alone and this line says why */
   nameOnly: {
     en: 'No public-domain likeness at museum size exists yet. The name stands for the person.',
     de: 'Es gibt noch kein gemeinfreies Bildnis in Museumsgröße. Der Name steht für den Menschen.',
   },
+}
+
+/** the label over the other names of the same constellation, keyed by its key */
+export const PANE_AMONG: Record<string, Record<Lang, string>> = {
+  philosophers: { en: 'Also among the Philosophers', de: 'Auch unter den Philosophen' },
+  teachers: { en: 'Also among the Spiritual Teachers', de: 'Auch unter den spirituellen Lehrern' },
+  activists: { en: 'Also among the Activists and Leaders', de: 'Auch unter den Aktivisten und Vorkämpfern' },
+  artists: { en: 'Also among the Artists', de: 'Auch unter den Künstlern' },
+  writers: { en: 'Also among the Writers', de: 'Auch unter den Schriftstellern' },
+  scientists: { en: 'Also among the Scientists and Thinkers', de: 'Auch unter den Wissenschaftlern und Denkern' },
 }
 
 export const PANES: Record<string, PaneWords> = {

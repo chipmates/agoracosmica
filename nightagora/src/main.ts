@@ -11,7 +11,7 @@ import { ambience } from './core/ambience'
 import { WANDERERS } from './content/wanderers'
 import { CONSTELLATIONS, SKY_INVITE } from './content/constellations'
 import { channel, EASE } from './core/motion'
-import { PANE_SHARED, paneWords } from './content/panes'
+import { PANE_AMONG, PANE_SHARED, paneWords } from './content/panes'
 import { loadLikenesses, paneLikeness, type LikenessRecord } from './content/likenesses'
 import { createStack } from './stack'
 import type { GradeName } from './stack/grade'
@@ -384,7 +384,9 @@ function openPane(slug: string): void {
   if (paneEnter) paneEnter.hidden = !wing
   hangLikeness(slug, w.name)
   const sibLabel = paneEl.querySelector('.pane-sib-label')
-  if (sibLabel) sibLabel.textContent = `Also among the ${c.name}`
+  const among = PANE_AMONG[c.key]
+  if (sibLabel) sibLabel.textContent = among ? say(among) : `Also among the ${c.name}`
+  if (paneClose) paneClose.textContent = say(PANE_SHARED.close)
   if (paneSiblings) {
     paneSiblings.textContent = ''
     for (const sib of c.stars) {
