@@ -78,6 +78,8 @@ const OVERLAY = { color: '#f2c77a', opacity: .3 }
 /** The sphere fit leaves a machine's box corners air; the table stands it a
  * little nearer. */
 const WHOLE_FIT = .86
+/** Air around the box the whole view fits. */
+const WHOLE_MARGIN = 1.04
 
 interface View { yaw: number; pitch: number; distance: number; target: Vector3 }
 
@@ -194,23 +196,49 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
     const tanX = Math.tan(camera!.fov * DEG / 2) * (w / h) * fit.width / w
     return r / Math.sin(Math.atan(Math.min(tanX, tanY))) * 1.02
   }
+  /** THE WHOLE MACHINE FILLS ITS VIEWPORT: every corner of its rest box
+   * stands inside the viewport from the whole view's own bearing, which a
+   * sphere cannot do for a tall crane or a flat gate. */
+  let rest = new Box3()
+  function wholeDistance(): number {
+    if (rest.isEmpty()) return fitDistance(radius) * WHOLE_FIT
+    const fit = viewportFit(), w = innerWidth, h = innerHeight
+    const tanY = Math.tan(camera!.fov * DEG / 2) * fit.height / h
+    const tanX = Math.tan(camera!.fov * DEG / 2) * (w / h) * fit.width / w
+    const cos = Math.cos(WHOLE.pitch)
+    const toward = new Vector3(Math.sin(WHOLE.yaw) * cos, Math.sin(WHOLE.pitch), Math.cos(WHOLE.yaw) * cos)
+    const right = new Vector3().crossVectors(new Vector3(0, 1, 0), toward).normalize()
+    const up = new Vector3().crossVectors(toward, right).normalize()
+    const corner = new Vector3()
+    let distance = radius * .5
+    for (const x of [rest.min.x, rest.max.x]) for (const y of [rest.min.y, rest.max.y]) for (const z of [rest.min.z, rest.max.z]) {
+      corner.set(x, y, z).sub(centre)
+      const depth = corner.dot(toward)
+      distance = Math.max(distance, depth + Math.abs(corner.dot(right)) / tanX, depth + Math.abs(corner.dot(up)) / tanY)
+    }
+    return Math.min(distance * WHOLE_MARGIN, fitDistance(radius) * WHOLE_FIT)
+  }
   function goalFor(id: TurntableViewpoint): View {
     const entry = options.viewpoints.find(v => v.id === id)
     const part = entry?.part ? family(entry.part).flatMap(name => nodeFor(name)?.geometries ?? []) : []
-    if (!part.length || id === 'whole') return { ...WHOLE, distance: fitDistance(radius) * WHOLE_FIT, target: centre.clone() }
+    if (!part.length || id === 'whole') return { ...WHOLE, distance: wholeDistance(), target: centre.clone() }
     const box = new Box3()
     for (const { node, geometry } of part) {
       if (!geometry.boundingBox) geometry.computeBoundingBox()
       box.union(geometry.boundingBox!.clone().applyMatrix4(node.matrixWorld))
     }
     const sphere = box.getBoundingSphere(new Sphere())
+    const whole = wholeDistance()
+    const toward = new Vector3(Math.sin(WHOLE.yaw), 0, Math.cos(WHOLE.yaw))
     const across = new Vector3(sphere.center.x - centre.x, 0, sphere.center.z - centre.z)
-    // A part at the machine's edge is looked at from its own side, so the
-    // body does not stand between the eye and it.
-    const yaw = across.length() > radius * .15 ? Math.atan2(across.x, across.z) : view.yaw
-    // A part is read with the parts around it: close enough to see, never so
-    // close that the machine it belongs to leaves the frame.
-    return { yaw, pitch: 20 * DEG, distance: fitDistance(Math.max(sphere.radius * 3, radius * .45)), target: sphere.center.clone() }
+    // A part on the far side of the machine is looked at from its own side,
+    // so the body does not stand between the eye and it.
+    const yaw = across.dot(toward) < -radius * .1 ? WHOLE.yaw + Math.PI : WHOLE.yaw
+    // A STEP IN, NEVER A NEW PLACE: the eye comes a third to two thirds of
+    // the way toward the part, which keeps the machine it belongs to in the
+    // frame and the eye inside the air the whole view stands in.
+    const distance = Math.min(whole * .7, Math.max(whole * .35, fitDistance(sphere.radius * 2.6)))
+    return { yaw, pitch: WHOLE.pitch + 4 * DEG, distance, target: centre.clone().lerp(sphere.center, .75) }
   }
   function choose(id: TurntableViewpoint): void {
     chosen = id
@@ -285,8 +313,10 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
     const box = leaderText.getBoundingClientRect()
     // The name stands at the viewport's upper corner on the far side of the
     // part, and its line rides the part as the machine moves.
-    const left = x < rect.left + rect.width / 2 ? rect.left + rect.width - box.width - 16 : rect.left + 16
-    const top = rect.top + 16
+    // The phone's folio stands in its viewport's upper right, so the name keeps
+    // to the left there.
+    const left = host.narrow ? rect.left + 8 : x < rect.left + rect.width / 2 ? rect.left + rect.width - box.width - 16 : rect.left + 16
+    const top = rect.top + (host.narrow ? 8 : 16)
     leaderText.style.left = `${Math.round(left)}px`
     leaderText.style.top = `${Math.round(top)}px`
     leaderLine.setAttribute('x1', String(x))
@@ -510,6 +540,7 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
     const size = box.getSize(new Vector3())
     object.position.set(-(box.min.x + box.max.x) / 2, -box.min.y, -(box.min.z + box.max.z) / 2)
     object.updateMatrixWorld(true)
+    rest = new Box3().setFromObject(object, true)
     radius = Math.max(.05, box.getBoundingSphere(new Sphere()).radius)
     centre = new Vector3(0, size.y / 2, 0)
     const span = Math.max(size.x, size.y, size.z)
@@ -539,8 +570,8 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
     fitting.position.set(-span * .35, Math.max(f.height, size.y + 1), span * .45)
     fitting.castShadow = false
     scene.add(fitting)
-    view.distance = fitDistance(radius) * WHOLE_FIT
     view.target.copy(centre)
+    view.distance = wholeDistance()
     view.yaw = WHOLE.yaw; view.pitch = WHOLE.pitch
     placeCamera(0)
     const near = view.distance + span * .5, far = view.distance + span * 2.4
@@ -573,7 +604,7 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
     },
     layout() {
       if (!standing) return
-      if (!goal) view.distance = chosen === 'whole' ? fitDistance(radius) * WHOLE_FIT : view.distance
+      if (!goal && chosen === 'whole') view.distance = wholeDistance()
       placeCamera(0)
     },
     key(event) {
