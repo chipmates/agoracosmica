@@ -74,4 +74,9 @@ export const WING_TEXT = {
     en: 'Station',
     de: 'Station',
   },
+  /** the grabber of a station card that opens as a sheet on the phone */
+  sheet: {
+    en: 'More about this place',
+    de: 'Mehr über diesen Ort',
+  },
 } satisfies Record<string, Bilingual>

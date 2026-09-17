@@ -657,7 +657,7 @@ export function createWing():VinciWingModule {
     if(standing){
       const grab=make('button','vinci-sheet-grab')
       grab.type='button'
-      grab.setAttribute('aria-label',text(s.name))
+      grab.setAttribute('aria-label',text(WING_TEXT.sheet))
       grab.setAttribute('aria-controls','vinci-station-card')
       grab.addEventListener('click',()=>{sheetOpen=!sheetOpen;paintSheet()})
       header.prepend(grab)
