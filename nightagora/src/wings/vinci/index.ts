@@ -13,6 +13,9 @@ import { createWingPlan, type WingPlan } from '../plan'
 import { PLAN_WORDS } from '../plan/words'
 import { createWingRecap } from '../plan/recap'
 import type { PlanHighlight, PlanPoint, PlanRoom, PlanShape, PlanSite, PlanStation } from '../plan/types'
+import { createWingLife, type WingLife } from '../life'
+import { LIFE_WORDS } from '../life/words'
+import type { LifeBand, LifeEvent, LifePerson, LifeRecord, LifeWork, MuseumDate, Sure } from '../life/types'
 import { constructionRecords, evidenceWords } from './evidence-copy'
 import { lang, WING_TEXT } from '../content'
 import { createVinciSourcesWindow, type VinciSourcesTab, type VinciExhibitSources } from './sources'
@@ -58,7 +61,10 @@ import { readingTableOf } from './table'
 import { CODEX_ENTRIES } from './table/codex-shelf'
 import { createReaderPayload, type ReaderPayload } from './table/reader'
 import { createStudReaderPayload, type StudReaderPayload } from './line/reader'
-import { LINE_STUDS } from './line/studs'
+import { LINE_SECTIONS, LINE_STUDS, type Stud } from './line/studs'
+import { ageAt, studBounds, studEdtf } from './line/edtf'
+import { SOURCE_READINGS } from './line/bench/visitor-sources'
+import cardsSource from './data/cards.json?raw'
 import { CERTAINTY as LINE_CERTAINTY } from './line'
 import { GRAVE_DEATHBED } from './grave/placement'
 import { loadManifest } from '../../manifest'
@@ -70,7 +76,7 @@ import { createVinciHangStrip, vinciSheetTitle, type VinciStripEntry } from './c
 import { pathSpecifications } from './paths'
 import { roadGradeProvenance } from './road-grade'
 import { apronProvenance } from './apron'
-import { vinciContent, vinciPlanRooms, vinciThroughLine, vinciWelcomeText, vinciLegacyStationIds, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, vinciAbsences, vinciGrounds, vinciRightsPolicy, vinciWingCounts, vinciSourcesHeadings, type VinciCertainty, type VinciStatement, type VinciStationId, type VinciText } from './content'
+import { vinciContent, vinciPlanRooms, vinciThroughLine, vinciLifeBands, vinciLifePeople, vinciLifeSecondLine, vinciLifeNotCut, vinciWelcomeText, vinciLegacyStationIds, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, vinciAbsences, vinciGrounds, vinciRightsPolicy, vinciWingCounts, vinciSourcesHeadings, type VinciCertainty, type VinciStatement, type VinciStationId, type VinciText } from './content'
 import wingCss from './wing.css?inline'
 
 const text=(value:VinciText):string=>value[lang()]
@@ -163,6 +169,9 @@ export function createWing():VinciWingModule {
   /** THE PLAN, and the one case where it takes an entry instead of pushing
    * its own: a close look that stood down for it already pushed one. */
   let plan:WingPlan|undefined, planControl:HTMLButtonElement|undefined, planAdopt=false
+  /** THE LIFE VIEW, and the same one case: an exhibit that stood down for it
+   * already pushed the entry this sheet would push. */
+  let life:WingLife|undefined, lifeControl:HTMLButtonElement|undefined, lifeAdopt=false
   let exhibitSources:VinciExhibitSources|null=null
   let labelHostHidden:string|null=null
   // THE WAIT AT THE STREET SHOWS ITSELF. The heading is painted and the frame
@@ -333,6 +342,17 @@ export function createWing():VinciWingModule {
       station:id=>{const index=vinciContent.findIndex(station=>station.id===id);if(index>=0)h.navigate(index)},
       highlight:openFromPlan,
       returnFocus:focusTheBar,adopt:()=>planAdopt})
+    // THE LIFE STANDS IN THE SAME GROUP, after the plan: the place and the
+    // years are the two ways through this wing, so they are two words in one
+    // bar and not two marks on the frame.
+    lifeControl=make('button','wing-life-open',text(LIFE_WORDS.door));lifeControl.type='button'
+    lifeControl.setAttribute('aria-keyshortcuts','e');lifeControl.setAttribute('aria-controls','wing-life')
+    lifeControl.addEventListener('click',()=>openLife())
+    h.stage.parentElement!.querySelector('.wing-rail-group')!.append(lifeControl)
+    life=createWingLife({host:h.labels,lang,narrow,
+      floor:()=>h.stage.parentElement?.querySelector('.wing-rail-group')?.getBoundingClientRect().top??innerHeight,
+      record:lifeRecord,walk:id=>openFromPlan(id),
+      returnFocus:focusTheBar,adopt:()=>lifeAdopt})
     sources=createVinciSourcesWindow(h.labels,source,()=>{mode=1;paintDock()});dock=sources.element;drawer=sources.panels.station
     occluders=collectVinciLabelOccluders(scene)
     labels=createVinciLabelAnchor({host:h.labels,camera,occluders,onOpen:()=>{mode=2;paintDock()}})
@@ -412,6 +432,7 @@ export function createWing():VinciWingModule {
       if(e.key==='Escape'){e.preventDefault();mode=1;rail.look(0,0);paintDock();source.focus({preventScroll:true});return}
       if(e.key.toLowerCase()==='l'&&!e.repeat){e.preventDefault();mode=((mode+1)%3) as VinciLabelMode;paintDock();if(mode!==2&&target.closest('.vinci-dock'))source.focus({preventScroll:true});return}
       if(e.key.toLowerCase()==='p'&&!e.repeat){e.preventDefault();openPlan();return}
+      if(e.key.toLowerCase()==='e'&&!e.repeat){e.preventDefault();openLife();return}
       if(target.closest('.vinci-dock'))return
       if(e.key==='ArrowRight'||e.key==='ArrowDown'){e.preventDefault();h.navigate(station+1)}
       if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();h.navigate(station-1)}
@@ -601,6 +622,100 @@ export function createWing():VinciWingModule {
     if(planAdopt)closeLook?.close(false)
     plan.show()
     planAdopt=false
+  }
+  /** ONE SHEET AT A TIME, the way the plan is one: a close look stands down
+   * for the life and takes the entry it already pushed. Opened from a date,
+   * the view stands at that date. */
+  function openLife(at?:string):void {
+    if(!life||!standing)return
+    if(life.standing){life.close();return}
+    lifeAdopt=Boolean(closeLook?.id)
+    if(lifeAdopt)closeLook?.close(false)
+    life.show(at)
+    lifeAdopt=false
+  }
+  /** THE TWELVE DATES THE FLOOR CUTS. The gallery lays three rows of four, so
+   * these twelve carry the walk and the other forty four say so instead. */
+  const LIFE_CUT=new Set(LINE_SECTIONS.flatMap(section=>[0,1,2,3].map(offset=>LINE_STUDS[section.selected+offset]?.id??'')))
+  const LIFE_BIRTH=LINE_STUDS.find(stud=>stud.id==='life-01')!,LIFE_DEATH=LINE_STUDS.find(stud=>stud.id==='life-41')!
+  const LIFE_HONESTY=(JSON.parse(cardsSource) as {floor_honesty:{en:string;de:string}}).floor_honesty
+  const SURE_RANK:Record<Sure,number>={documented:2,inferred:1,tradition:0}
+  /** A day and a year apart, in milliseconds: the widest span an age may be
+   * said about. */
+  const LIFE_YEAR_MS=366*864e5
+  function lifeDate(stud:Stud):MuseumDate {
+    const bounds=studBounds(stud)
+    return {edtf:studEdtf(stud),calendar:stud.calendar,earliest:bounds.earliest,latest:bounds.latest,
+      label:{en:stud.date_label_en,de:stud.date_label_de},certainty:stud.certainty as Sure}
+  }
+  /** THE AGE BESIDE A YEAR. Exact where every day the date can mean gives the
+   * same one. About where the date is a year or a season and the two ends
+   * differ, counted at the last day it can mean, which is the age the record's
+   * own sentences use. Nothing at all where the span is wider than a year or
+   * the life has ended by it. */
+  function lifeAge(stud:Stud):{age:number|null;about:boolean} {
+    const exact=ageAt(stud,LIFE_BIRTH,LIFE_DEATH)
+    if(exact!==null)return{age:exact,about:false}
+    const {earliest,latest}=studBounds(stud)
+    if(!earliest||!latest||stud.calendar!==LIFE_BIRTH.calendar||earliest<LIFE_BIRTH.date||latest>LIFE_DEATH.date)return{age:null,about:false}
+    if(Date.parse(`${latest}T00:00:00Z`)-Date.parse(`${earliest}T00:00:00Z`)>LIFE_YEAR_MS)return{age:null,about:false}
+    const [by,bm,bd]=LIFE_BIRTH.date.split('-').map(Number),[y,m,d]=latest.split('-').map(Number)
+    const years=y!-by!-(m!<bm!||(m===bm&&d!<bd!)?1:0)
+    return years>0?{age:years,about:true}:{age:null,about:false}
+  }
+  /** THE LIFE THIS WING HOLDS, from the records it already carries: the 56
+   * dates with their own calendar and their own sentences, the register's
+   * painted works by the years it dates them to, and the people those dates
+   * name. Nothing here is scraped and no sentence is retyped. */
+  function lifeRecord():LifeRecord {
+    const events:LifeEvent[]=[]
+    for(const band of vinciLifeBands){
+      const first=LINE_STUDS.findIndex(stud=>stud.id===band.from),last=LINE_STUDS.findIndex(stud=>stud.id===band.to)
+      if(first<0||last<first)continue
+      for(const stud of LINE_STUDS.slice(first,last+1)){
+        const {age,about}=lifeAge(stud)
+        events.push({id:stud.id,band:band.id,date:lifeDate(stud),certainty:stud.certainty as Sure,
+          line:{en:stud.line_en,de:stud.line_de},source:SOURCE_READINGS[stud.id]??null,age,ageApproximate:about,
+          walk:LIFE_CUT.has(stud.id)?{stud:`stud/${stud.id}`}:{station:stud.station},exhibit:null,
+          people:vinciLifePeople.filter(person=>person.events.includes(stud.id)).map(person=>person.id)})
+      }
+    }
+    const bands:LifeBand[]=[]
+    for(const band of vinciLifeBands){
+      const own=events.filter(event=>event.band===band.id)
+      if(!own.length)continue
+      const from=own[0]!.date,to=own[own.length-1]!.date
+      bands.push({id:band.id,name:band.name,line:band.line,from,to,
+        certainty:SURE_RANK[from.certainty]<=SURE_RANK[to.certainty]?from.certainty:to.certainty,
+        first:own.slice(0,4).map(event=>event.id),...(band.afterlife?{afterlife:true as const}:{})})
+    }
+    const people:LifePerson[]=vinciLifePeople.map(person=>({id:person.id,name:person.name,role:person.role,
+      events:person.events,
+      certainty:person.events.reduce<Sure>((best,id)=>{
+        const stud=LINE_STUDS.find(entry=>entry.id===id)
+        const kind=(stud?.certainty??'tradition') as Sure
+        return SURE_RANK[kind]>SURE_RANK[best]?kind:best},'tradition')}))
+    const sure=Object.fromEntries((['documented','inferred','tradition'] as const).map(key=>
+      [key,{word:{en:LINE_CERTAINTY[key].en,de:LINE_CERTAINTY[key].de},colour:LINE_CERTAINTY[key].colour}])) as LifeRecord['sure']
+    return {bands,events,works:lifeWorks(),people,sure,
+      words:{throughLine:vinciThroughLine,secondLine:vinciLifeSecondLine,honesty:LIFE_HONESTY,notCut:vinciLifeNotCut},
+      span:{from:Number(LIFE_BIRTH.date.slice(0,4)),to:Number(LIFE_DEATH.date.slice(0,4))}}
+  }
+  /** THE WORKS ROW. The register dates its paintings to a span of years and
+   * says how sure that span is; the three it cannot date at all stand apart
+   * rather than at a guess. The wing's machines, sheets and codices carry no
+   * date in the registers they publish, so they are not on this row. */
+  function lifeWorks():LifeWork[] {
+    return REGISTER.map(work=>{
+      const from=work.date_from,to=work.date_to??work.date_from
+      const sure:Sure=work.date_certainty==='documented'?'documented':'inferred'
+      const mark=work.date_certainty==='documented'?'':work.date_certainty==='disputed'?'?':'~'
+      return {id:work.id,title:{en:work.title_en,de:work.title_de},domain:'painting',
+        state:work.rights_class==='DG'?'reproduction':'absent',exhibit:null,
+        date:from===null||to===null?null:{edtf:from===to?`${from}${mark}`:`${from}${mark}/${to}${mark}`,
+          calendar:'Gregorian',earliest:`${from}-01-01`,latest:`${to}-12-31`,
+          label:{en:work.date_label_en,de:work.date_label_de},certainty:sure}}
+    })
   }
   /** The station the visitor is standing in, written to the night's record. */
   function standHere():void { visit?.stand(vinciContent[card]!.id) }
@@ -957,8 +1072,11 @@ export function createWing():VinciWingModule {
         changed:()=>{if(exhibitSources?.id===id&&mode===2){record();paintDock()}}})
       const stud=LINE_STUDS[vinciStudIndex(id)]!
       openMode=how
+      // THE WAY BACK UP THE LADDER. A date was reached from the life, and the
+      // life is where it belongs: the control climbs there and opens the view
+      // standing at this date, whether the visitor came down that way or not.
       closeLook.open({id,title:lang()==='de'?stud.date_label_de:stud.date_label_en,line:null,card:[],payload:reader,
-        controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),shut],walk,...vinciLimits(id),
+        controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),control(LIFE_WORDS.life,()=>openLife(reader?.current().id)),shut],walk,...vinciLimits(id),
         work:()=>{const nav=rail.navigation;return nav.exhibit===id&&!nav.active?sphereRect(entry.centre,entry.radiusM):null}},from,how_)
       openMode='auto'
       return
@@ -1450,7 +1568,7 @@ export function createWing():VinciWingModule {
     },
     view(id){if(!standing){pendingView=id;return}showView(id)},
     look(y,p){if(standing)rail.look(y,p)},
-    held:()=>(closeLook?.held()??false)||(plan?.held()??false),
+    held:()=>(closeLook?.held()??false)||(plan?.held()??false)||(life?.held()??false),
     update(dt=0){
       if(!hosts)return
       if(!standing)return
@@ -1467,7 +1585,7 @@ export function createWing():VinciWingModule {
       // THE ROOM HOLDS STILL WHILE A PAYLOAD HOLDS THE STAGE: nothing of it
       // walks, streams or is drawn until the vitrine hands it back.
       closeLook?.update(dt)
-      const payload=Boolean(closeLook?.id&&closeLook.surface!=='room')||Boolean(plan?.held())
+      const payload=Boolean(closeLook?.id&&closeLook.surface!=='room')||Boolean(plan?.held())||Boolean(life?.held())
       exhibits?.holdPlates(payload)
       if(payload)return
       measurement.update();rail.update()
@@ -1502,6 +1620,6 @@ export function createWing():VinciWingModule {
       // ONE EXHIBIT AT A TIME: while one is open the other marks stand down.
       dots?.setLimit(closeLook?.id?0:DOTS_PER_TIER[hosts.world.stack.tierName()]??6)
       dots?.update(reading)},
-    stop(){visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
+    stop(){visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;life?.dispose();life=undefined;lifeControl?.remove();lifeControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
   }
 }
