@@ -681,8 +681,11 @@ export function createWing():VinciWingModule {
         sources.resetScroll();sources.select('station');mode=2;paintDock()
       }
       const words=vinciMachineCard(slug,narrow(),{word:text(vinciCertaintyWords.reconstructed),colour:PICTURE_CERTAINTY_KEY[2]!.colour})
+      // THE WALK TO THE PLINTH IS DRAWN BY THE ROOM; the turntable takes the
+      // stage once the eye stands, and on the phone that is at once.
       const payload=createVinciMachinePayload({stack:hosts.world.stack,slug,body,
-        grade:{...PRINT,exposure:STATION_EXPOSURE[here]??PRINT.exposure},light:KEY_RIG,restore:restoreRoom,openRecord})
+        grade:{...PRINT,exposure:STATION_EXPOSURE[here]??PRINT.exposure},light:KEY_RIG,restore:restoreRoom,openRecord,
+        standing:()=>{const nav=rail.navigation;return !nav.active&&!nav.approaching}})
       openMode=how
       closeLook.open({id,title,line:vinciLine(id),card:words.card,after:words.after,payload,
         controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),shut],walk,...vinciLimits(id)},from,how_)

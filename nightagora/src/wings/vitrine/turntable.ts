@@ -66,6 +66,9 @@ export interface TurntableOptions {
   sheet?: { src: Promise<string | null> | null; label: string; open(): void }
   /** Hand the stage back to the room. */
   restore(): void
+  /** True once the eye stands where it walked for this machine: the room
+   * draws the walk until then, and the body is lent only after it. */
+  standing?(): boolean
 }
 
 const DEG = Math.PI / 180
@@ -543,9 +546,9 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
     setClock(state.clock + direction * period * KEY_SHARE)
   }
 
-  async function stand(): Promise<void> {
-    await body.ready
-    if (!mounted || !host) return
+  let bodyReady = false
+  function stand(): void {
+    if (!mounted || !host || standing) return
     // A body out of the store names its parts only once it stands.
     for (const entry of options.viewpoints) {
       const button = viewButtons.get(entry.id)
@@ -627,9 +630,12 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
       next.element.tabIndex = 0
       next.describe(options.title)
       paint()
-      void stand().catch(error => console.error(error))
+      void body.ready.then(() => { bodyReady = true }).catch(error => console.error(error))
     },
     update(dt) {
+      // THE WALK COMES FIRST: the room draws the leg to the plinth, and the
+      // body is lent to the table in the frame after the eye stands.
+      if (!standing && mounted && bodyReady && (options.standing?.() ?? true)) stand()
       if (!standing || !host) return
       if (!press || press.orbit) state = advancePlayback(schedule, state, Math.min(.1, dt))
       body.animate(state.clock, dt)

@@ -204,6 +204,8 @@ export function createVinciMachinePayload(options: {
   light: TurntableOptions['light']
   restore(): void
   openRecord(): void
+  /** True once the eye stands where it walked for this machine. */
+  standing(): boolean
 }): VitrinePayload {
   const { slug } = options
   const dossier = dossiers[slug], language = lang(), record = machineCatalog[slug]
@@ -239,6 +241,7 @@ export function createVinciMachinePayload(options: {
       open: options.openRecord,
     },
     restore: options.restore,
+    standing: options.standing,
   })
   return payload
 }
