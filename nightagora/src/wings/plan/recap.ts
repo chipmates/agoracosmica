@@ -83,12 +83,6 @@ export function createWingRecap(options: WingRecapOptions): HTMLElement {
     root.append(list)
   }
 
-  root.append(make('p', 'wing-recap-privacy', say(RECAP_WORDS.privacy)))
-  const forget = make('button', 'wing-recap-forget', say(RECAP_WORDS.forget))
-  forget.type = 'button'
-  forget.addEventListener('click', () => options.onForget())
-  root.append(forget)
-
   /* THE TWO DOORS. One goes back to the wheel for another life, and the other
      is the library door this frame already carries at every station, named
      here as the way out rather than added a second time. */
@@ -102,6 +96,14 @@ export function createWingRecap(options: WingRecapOptions): HTMLElement {
   ask.addEventListener('click', () => library.press())
   doors.append(another, ask)
   root.append(doors)
+
+  /* THE WAY OUT STANDS DIRECTLY UNDER WHAT WAS OPENED, and the sentence about
+     the list and the control that drops it stand under the way out. */
+  root.append(make('p', 'wing-recap-privacy', say(RECAP_WORDS.privacy)))
+  const forget = make('button', 'wing-recap-forget', say(RECAP_WORDS.forget))
+  forget.type = 'button'
+  forget.addEventListener('click', () => options.onForget())
+  root.append(forget)
 
   return root
 }

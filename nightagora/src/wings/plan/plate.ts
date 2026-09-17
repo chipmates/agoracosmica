@@ -15,13 +15,31 @@ import type { PlanPoint, PlanSite } from './types'
 export const PLATE_PAD_M = 2.5
 /** Two eyes closer than this are one standing place, so they are one mark. */
 export const CLUSTER_M = 1.2
-/** The room names, in pixels, at the two stages. */
+/** The room names, in pixels: the size each stage starts at, and the size
+ * below which a name is left off rather than shrunk into illegibility. */
 export const PLATE_NAME_PX = { wide: 11, narrow: 8.5 } as const
-/** A NAME WIDER THAN THE ROOM IT NAMES IS NOT DRAWN: at the scale a whole
- * wing needs, a name that overruns reads as the name of the room beside it.
- * The share is the average advance of this face, measured against its worst
- * case, which is the German. */
-const NAME_ADVANCE = .54
+export const PLATE_NAME_FLOOR = { wide: 8, narrow: 6.5 } as const
+/** the plate's own tracking, which the ruler has to add back */
+const NAME_TRACKING = .04
+/** clear ground each side of a name inside its room */
+const NAME_MARGIN = 4
+
+/** THE NAME IS MEASURED, NOT ESTIMATED. A name wider than the room it names
+ * reads as the name of the room beside it, so each one shrinks to fit its own
+ * room and is left off only when even the floor will not hold it. German is
+ * the worst case and is the one that decides. */
+let ruler: CanvasRenderingContext2D | null | undefined
+function nameWidth(words: string, px: number): number {
+  ruler ??= document.createElement('canvas').getContext('2d')
+  const face = getComputedStyle(document.documentElement).getPropertyValue('--sans').trim() || 'sans-serif'
+  if (!ruler) return words.length * px * .54
+  ruler.font = `${px}px ${face}`
+  return ruler.measureText(words).width + words.length * px * NAME_TRACKING
+}
+function nameSize(words: string, room: number, base: number, floor: number): number | null {
+  for (let px = base; px >= floor; px -= .5) if (nameWidth(words, px) <= room - NAME_MARGIN) return px
+  return null
+}
 
 export interface PlanMark {
   /** the stations this one standing place carries, in rail order */
@@ -82,6 +100,7 @@ export function drawPlanPlate(
   area: { width: number; height: number },
   language: 'en' | 'de',
   namePx: number = PLATE_NAME_PX.wide,
+  nameFloor: number = PLATE_NAME_FLOOR.wide,
 ): PlanPlate {
   const box = bounds(site)
   const spanEast = Math.max(1, box.east - box.west + PLATE_PAD_M * 2)
@@ -105,6 +124,16 @@ export function drawPlanPlate(
   const names = node('g', 'wing-plan-names')
   element.append(shapes, rooms, names)
 
+  function label(words: string, centre: { x: number; y: number }, room: number): void {
+    const size = nameSize(words, room, namePx, nameFloor)
+    if (size === null) return
+    const text = node('text', 'wing-plan-room-name')
+    text.setAttribute('x', centre.x.toFixed(2)); text.setAttribute('y', centre.y.toFixed(2))
+    text.setAttribute('font-size', String(size))
+    text.textContent = words
+    names.append(text)
+  }
+
   for (const room of site.rooms) {
     const a = project(room.west, room.north), b = project(room.east, room.south)
     const rect = node('rect', 'wing-plan-room')
@@ -115,14 +144,8 @@ export function drawPlanPlate(
     rect.dataset['built'] = String(room.built)
     rooms.append(rect)
     if (!room.name) continue
-    const words = room.name[language]
-    if (words.length * namePx * NAME_ADVANCE > Math.abs(b.x - a.x) - 4) continue
     const centre = project((room.west + room.east) / 2, (room.south + room.north) / 2)
-    const text = node('text', 'wing-plan-room-name')
-    text.setAttribute('x', centre.x.toFixed(2)); text.setAttribute('y', centre.y.toFixed(2))
-    text.setAttribute('font-size', String(namePx))
-    text.textContent = words
-    names.append(text)
+    label(room.name[language], centre, Math.abs(b.x - a.x))
   }
 
   const path = (points: readonly PlanPoint[]): string =>
@@ -133,6 +156,14 @@ export function drawPlanPlate(
     line.dataset['fill'] = String(shape.fill)
     line.dataset['built'] = String(shape.built)
     shapes.append(line)
+    if (!shape.name) continue
+    // A named outline takes its name at the middle of its own extent.
+    let west = Infinity, east = -Infinity, south = Infinity, north = -Infinity
+    for (const [e, n] of shape.points) {
+      west = Math.min(west, e); east = Math.max(east, e)
+      south = Math.min(south, n); north = Math.max(north, n)
+    }
+    label(shape.name[language], project((west + east) / 2, (south + north) / 2), (east - west) * scale)
   }
 
   /* NORTH AS THE SITE HAS IT. The site's own frame is east and north, so the

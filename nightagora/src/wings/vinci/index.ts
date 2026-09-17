@@ -545,7 +545,7 @@ export function createWing():VinciWingModule {
     const shapes:PlanShape[]=[
       // THE HOUSE IS NOT OPEN. Its rooms are shown from outside, so its
       // footprint is an outline and never a fill.
-      {id:'house',points:dossier.site.footprint.map(point=>[point.value[0]!,point.value[1]!] as PlanPoint),closed:true,fill:false,built:false},
+      {id:'house',name:vinciPlanRooms.house,points:dossier.site.footprint.map(point=>[point.value[0]!,point.value[1]!] as PlanPoint),closed:true,fill:false,built:false},
       {id:'supper-wall',points:box(SUPPER_WALL.east-SUPPER_WALL.thickness/2,SUPPER_WALL.east+SUPPER_WALL.thickness/2,
         SUPPER_WALL.north-SUPPER_WALL.length/2,SUPPER_WALL.north+SUPPER_WALL.length/2),closed:true,fill:true,built:true},
       {id:'parapet-north',points:box(COURT.west,COURT.east,COURT.north-COURT.parapetThickness,COURT.north),closed:true,fill:true,built:true},
@@ -649,7 +649,7 @@ export function createWing():VinciWingModule {
     if(!hosts||!collectionRoot)return
     picks=readVinciExhibits(collectionRoot)
     picksTier=hosts.world.stack.tierName()
-    paintExhibitMarks();paintStrip();refreshRecap()
+    paintExhibitMarks();paintStrip();refreshRecap();plan?.repaint()
     if(pendingExhibit){const id=pendingExhibit;pendingExhibit='';showView(id)}
     openPendingDate()
   }

@@ -26,6 +26,7 @@ export interface PlanRoom {
  * standing wall, the edge a parapet runs along. */
 export interface PlanShape {
   id: string
+  name?: Bi
   points: readonly PlanPoint[]
   closed: boolean
   fill: boolean

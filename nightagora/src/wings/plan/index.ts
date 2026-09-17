@@ -18,7 +18,7 @@
  */
 
 import css from './plan.css?inline'
-import { drawPlanPlate, PLATE_NAME_PX, type PlanPlate } from './plate'
+import { drawPlanPlate, PLATE_NAME_FLOOR, PLATE_NAME_PX, type PlanPlate } from './plate'
 import { PLAN_WORDS } from './words'
 import type { PlanSite } from './types'
 
@@ -64,6 +64,9 @@ export interface WingPlan {
   show(): void
   close(): void
   toggle(): void
+  /** Compose it again where it stands: the wing's registry is a read, and it
+   * can land while the sheet is already open. */
+  repaint(): void
   /** True while nothing may draw: the canvas holds its last frame. */
   held(): boolean
   dispose(): void
@@ -156,7 +159,9 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
         width: Math.max(80, (box.width - numbers.padding * 2 - numbers.gap) * numbers.plateShare),
         height: Math.max(80, box.height - numbers.padding * 2),
       }
-    plate = drawPlanPlate(site, area, language, narrow ? PLATE_NAME_PX.narrow : PLATE_NAME_PX.wide)
+    plate = drawPlanPlate(site, area, language,
+      narrow ? PLATE_NAME_PX.narrow : PLATE_NAME_PX.wide,
+      narrow ? PLATE_NAME_FLOOR.narrow : PLATE_NAME_FLOOR.wide)
     drawing.style.width = `${Math.round(plate.width)}px`
     drawing.style.height = `${Math.round(plate.height)}px`
     drawing.replaceChildren(plate.element, marksHost)
@@ -280,11 +285,16 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
       if (!dialog.open) dialog.showModal()
       mark()
       layout()
+      // THE READING OPENS WHERE THE VISITOR STANDS, with their own room's
+      // works under it, and not at the top of a walk they are in the middle of.
       reading.scrollTop = 0
-      dialog.querySelector<HTMLElement>('.wing-plan-entry[aria-current="true"]')?.focus({ preventScroll: true })
+      const here = dialog.querySelector<HTMLElement>('.wing-plan-entry[aria-current="true"]')
+      here?.focus({ preventScroll: true })
+      if (here) reading.scrollTop = Math.max(0, here.getBoundingClientRect().top - reading.getBoundingClientRect().top - 4)
     },
     close: shut,
     toggle() { if (open) shut(); else this.show() },
+    repaint() { if (open) layout() },
     held: () => open,
     dispose() {
       live = false
