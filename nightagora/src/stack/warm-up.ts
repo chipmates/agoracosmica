@@ -144,6 +144,26 @@ export function warmWalk(
     hidden.length = 0
   }
 
+  /* AN EYE PLACED WHILE THE WALK RUNS IS THE ONE IT RETURNS TO. A station
+     asked for during the warm up places the camera at once, and the next
+     warm pose would overwrite it; restoring the eye the walk started from
+     would then leave the visitor at the old station's eye with the new
+     station's gaze. So an eye that is not the pose this walk placed is taken
+     as the eye to restore. */
+  const placed = { position: camera.position.clone(), quaternion: camera.quaternion.clone(), fov: camera.fov }
+  function adopt(): void {
+    if (camera.position.equals(placed.position) && camera.quaternion.equals(placed.quaternion) && camera.fov === placed.fov) return
+    held.position.copy(camera.position)
+    held.quaternion.copy(camera.quaternion)
+    held.fov = camera.fov
+    remember()
+  }
+  function remember(): void {
+    placed.position.copy(camera.position)
+    placed.quaternion.copy(camera.quaternion)
+    placed.fov = camera.fov
+  }
+
   function restore(): void {
     unlink()
     sweep(false)
@@ -165,6 +185,7 @@ export function warmWalk(
     },
     frame() {
       if (at >= total) return false
+      adopt()
       // the last pose stands while the stack still holds bodies for the sweep
       if (at === poses.length - 1 && stack.holding() > 0 && performance.now() - began < HOLD_CAP_MS) return true
       // and the sweep's eye stands, drawing nothing new, while what it asked
@@ -200,6 +221,7 @@ export function warmWalk(
       camera.fov = pose.fov
       camera.updateProjectionMatrix()
       camera.updateMatrixWorld(true)
+      remember()
       aim?.(at)
       return true
     },
