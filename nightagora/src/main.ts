@@ -1202,6 +1202,10 @@ addEventListener('popstate', () => {
     return
   }
   const here = wingPath()
+  // A POP THAT LANDS WHERE THE VISITOR ALREADY STANDS IS THE WING'S OWN. The
+  // close look pushes an entry inside a station, and re-opening the wing on
+  // that pop strikes the card the wing just raised and cuts its walk short.
+  if (here && phase === 'wing' && wingSlug === here.slug && wingFrame.standsAt(here.station)) return
   if (here) void openWing(here.slug, here.station)
   else if (phase === 'wing' || phase === 'bench') toLobby()
 })

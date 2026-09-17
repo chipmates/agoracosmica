@@ -120,6 +120,10 @@ export interface WingFrame {
   stationId(): string
   /** every station's id, in rail order: the walk a machine addresses */
   stationIds(): string[]
+  /** True when the wing standing is already at that address. A wing may push
+      its own history entry inside a station, and the pop that entry makes
+      must not rebuild the place the visitor is standing in. */
+  standsAt(at: number | string): boolean
   /** how many this wing has, which is what the motion eye walks */
   stations(): number
   /** the door as it stands right now: where it goes and what it asks, so a
@@ -369,6 +373,7 @@ export function createWingFrame(
     station: () => index,
     stationId: () => (wing ? idAt(index) : ''),
     stationIds: () => (wing?.stations ?? []).map((_, i) => idAt(i)),
+    standsAt: at => wing !== null && resolveWingStationIndex(at, wing.stations, wing.legacyStationIds) === index,
     stations: () => wing?.stations.length ?? 0,
     pending: () => wing?.pending?.() ?? 0,
     errors: () => wing?.errors?.() ?? [],
