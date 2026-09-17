@@ -239,7 +239,7 @@ export function createWing():VinciWingModule {
     // The collection is built after the house has asked the library for its
     // own sets, so the machines' smaller requests never arrive first.
     const collection=createCollection()
-    exhibits=mountCollectionExhibits(collection,stack,narrow())
+    exhibits=mountCollectionExhibits(collection,stack)
     scene.add(ground,shell,entry,createGatePassage(stack.tierName()),createInnerCourtDressing(groundHeight,stack.tierName()),createRoadDressing(groundHeight,stack.tierName()),collection,createCollectionAccess(),createVegetation(groundHeight,stack.tierName()),createGroundDressing(groundHeight,stack.tierName()))
     // THE SHELL CASTS ITS SHADOW THROUGH ITS DOUBLE, AT EVERY TIER. The
     // detailed shell carries its surface relief into both cascades, which is

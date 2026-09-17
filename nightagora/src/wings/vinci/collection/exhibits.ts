@@ -49,10 +49,7 @@ export interface CollectionExhibits {
   picturesReady: Promise<unknown>
 }
 
-/** `narrow` is the wing's viewport family at mount: the grave cuts its words
- * for that stage, and like every worded exhibit here it is cut again, in the
- * page's language, when the wing is mounted again. */
-export function mountCollectionExhibits(host: Group, stack: Stack, narrow = false): CollectionExhibits {
+export function mountCollectionExhibits(host: Group, stack: Stack): CollectionExhibits {
   const machines: { build: ReadyMachineBuild; slug: MachineSlug; ground: StandGround; at: Vector3; reach: number }[] = []
   const material = collectionInteriorMaterial()
   const pictures = mountCollectionPlates(host, stack)
@@ -137,7 +134,10 @@ export function mountCollectionExhibits(host: Group, stack: Stack, narrow = fals
   /** Where the reading table stands, for the two distances it answers to. */
   const TABLE_AT = new Vector3(-37.72, FLOOR + .755, 45.4)
   const rooms = host.getObjectByName('vinci/collection-rooms')
-  const grave = createGrave(exhibitStones, lang(), { mobile: narrow })
+  // The bench's phone restaging moves the diagram frame in front of the
+  // deathbed painting hung on this backdrop, so the wing keeps the one
+  // composition both viewports hold whole and takes only the language.
+  const grave = createGrave(exhibitStones, lang())
   fitCollectionExhibitFloor(grave.group, exhibitStones, 'grave')
   grave.group.rotation.y = Math.PI / 2
   grave.group.position.set(GRAVE_ORIGIN.east, COURT.level + .035, -GRAVE_ORIGIN.north)
