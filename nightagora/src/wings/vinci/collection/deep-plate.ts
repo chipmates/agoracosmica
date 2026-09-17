@@ -124,13 +124,15 @@ export function createVinciWholePlate(options: {
   back(): void
   from(): VitrineRect | null
   tier(): DeepPlateTier
+  /** The phone folds the card so the viewport takes the sheet. */
+  narrow: boolean
 }): VitrineExhibit {
   const language = lang()
   const registration = pictureDisplayWindow(options.plate.plate)
   const cut = registration ? pictureDisplayUV(registration) : null
-  // TWO TO FOUR SENTENCES ON A CARD, here one and More: the plate is what
-  // the window is for, so the words fold and the viewport takes the room.
-  const label = createPolicyWorkLabel(options.work, options.entries, false, [], true)
+  // The same label the close look carries, folded where it folds there: the
+  // plate is what this window is for, and the words stand beside it.
+  const label = createPolicyWorkLabel(options.work, options.entries, false, [], options.narrow)
   for (const column of [...label.querySelectorAll<HTMLElement>('.picture-label-language')]) {
     if (column.lang !== language) column.remove()
   }

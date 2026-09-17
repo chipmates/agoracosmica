@@ -1036,7 +1036,7 @@ export function createWing():VinciWingModule {
         closeLook.open(createVinciWholePlate({id,title,line:vinciLine(id),work,entries,plate,...vinciLimits(id),
           controls:[control(VINCI_VITRINE_WORDS.provenance,()=>showExhibitRecord(id,work,entries)),
             control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())],
-          back:()=>openExhibit(id,null),from:()=>seat,
+          back:()=>openExhibit(id,null),from:()=>seat,narrow:narrow(),
           tier:()=>hosts?.world.stack.tierName()??'standard'}),whole,'advance')
       })
       controls.push(whole)
