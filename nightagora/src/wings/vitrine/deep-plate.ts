@@ -365,24 +365,28 @@ export function createDeepPlatePayload(options: {
       measure()
     },
     key(event) {
-      if (!viewer) return false
-      const step = event.shiftKey ? .25 : .1
-      const pan = (x: number, y: number): boolean => {
+      // THE KEYS OF AN OPEN PLATE ARE THE PLATE'S, from the moment it is
+      // mounted: arrows that walked the wall would otherwise carry the
+      // visitor off the work while the viewer is still arriving.
+      const mine = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', '+', '=', '-', '0']
+      if (!mine.includes(event.key)) return false
+      if (!viewer || !library || !host) return true
+      const now = host.reducedMotion, step = event.shiftKey ? .25 : .1
+      const pan = (x: number, y: number): void => {
         const bounds = viewer!.viewport.getBounds()
-        viewer!.viewport.panBy(new library!.Point(bounds.width * x, bounds.height * y))
-        viewer!.viewport.applyConstraints()
-        return true
+        viewer!.viewport.panBy(new library!.Point(bounds.width * x, bounds.height * y), now)
+        viewer!.viewport.applyConstraints(now)
       }
-      switch (event.key) {
-        case 'ArrowLeft': return pan(-step, 0)
-        case 'ArrowRight': return pan(step, 0)
-        case 'ArrowUp': return pan(0, -step)
-        case 'ArrowDown': return pan(0, step)
-        case '+': case '=': viewer.viewport.zoomBy(1.4); viewer.viewport.applyConstraints(); return true
-        case '-': viewer.viewport.zoomBy(1 / 1.4); viewer.viewport.applyConstraints(); return true
-        case '0': viewer.viewport.fitBounds(windowBounds(), host?.reducedMotion ?? false); return true
-        default: return false
+      if (event.key === 'ArrowLeft') pan(-step, 0)
+      else if (event.key === 'ArrowRight') pan(step, 0)
+      else if (event.key === 'ArrowUp') pan(0, -step)
+      else if (event.key === 'ArrowDown') pan(0, step)
+      else if (event.key === '0') { framed = null; viewer.viewport.fitBounds(windowBounds(), now) }
+      else {
+        viewer.viewport.zoomBy(event.key === '-' ? 1 / 1.4 : 1.4, undefined, now)
+        viewer.viewport.applyConstraints(now)
       }
+      return true
     },
     unmount() {
       live = false
