@@ -58,6 +58,7 @@ import {
   TIERS,
   VIEWPORTS,
   waitForServer,
+  wingStanding,
 } from './rig.mjs'
 
 const args = process.argv.slice(2).filter((a) => !a.startsWith('--'))
@@ -226,6 +227,7 @@ async function measure(browser, tier, vp) {
   const stamp = await assertBackend(page)
   assertAdapter(firstLine, process.env['FORGE_BACKEND'] ?? 'webgpu')
   if (stamp.tier !== tier) throw new Error(`asked for tier=${tier}, the app stamped ${stamp.tier}`)
+  if (WING && !(await wingStanding(page))) problems.push('the wing never stood: its entry field did not lift')
 
   // the walk happens where a hand may turn the gaze, which is the lobby's
   // one place for it; a wing walks its own rail, station by station
@@ -319,6 +321,7 @@ async function cones(browser, ids) {
   await page.goto(pageUrl('hero'))
   await page.waitForFunction(() => Boolean(window.__forge))
   await page.waitForTimeout(1800)
+  if (WING) await wingStanding(page)
   const plan = conePlan(ids)
   const missing = []
   let shot = 0

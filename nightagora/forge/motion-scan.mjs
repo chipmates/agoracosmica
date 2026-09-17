@@ -47,7 +47,7 @@ import { chromium } from 'playwright'
 import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readdirSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
-import { APP_ROOT, assertAdapter, assertBackend, assertServer, browserArgs, waitForServer } from './rig.mjs'
+import { APP_ROOT, assertAdapter, assertBackend, assertServer, browserArgs, waitForServer, wingStanding } from './rig.mjs'
 
 const plain = process.argv.slice(2).filter((a) => !a.startsWith('--'))
 const JSON_OUT = process.argv.includes('--json')
@@ -145,6 +145,7 @@ try {
   await page.goto(`${BASE}/w/${SLUG}?tier=${TIER}`)
   await page.waitForFunction(() => Boolean(window.__forge))
   await page.waitForTimeout(2200)
+  if (!(await wingStanding(page))) flags.push('the wing never stood: its entry field did not lift')
   if (INTRUDE && !poisoned) throw new Error(`MOTION_INTRUDE found no '${INTRUDE.split('=>')[0]}' in the ${SLUG} chunk`)
   if (INTRUDE) out(`[motion] POISONED: ${poisoned} site(s) in the ${SLUG} chunk, this run only`)
   const stamp = await assertBackend(page)

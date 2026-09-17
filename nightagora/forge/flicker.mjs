@@ -80,7 +80,7 @@ import { createServer } from 'node:http'
 import { createHash } from 'node:crypto'
 import { closeSync, mkdirSync, openSync, readFileSync, readSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { APP_ROOT, assertAdapter, assertBackend, assertServer, browserArgs, DEFAULT_CONE, waitForServer } from './rig.mjs'
+import { APP_ROOT, assertAdapter, assertBackend, assertServer, browserArgs, DEFAULT_CONE, waitForServer, wingStanding } from './rig.mjs'
 
 const argv = process.argv.slice(2)
 const plain = argv.filter((a) => !a.startsWith('--'))
@@ -669,6 +669,7 @@ async function openPage(browser, url) {
   await page.goto(url)
   await page.waitForFunction(() => Boolean(window.__forge))
   await page.waitForTimeout(2000)
+  if (url.includes('/w/') && !(await wingStanding(page))) problems.push('the wing never stood: its entry field did not lift')
   return { page, problems, line: () => firstLine }
 }
 

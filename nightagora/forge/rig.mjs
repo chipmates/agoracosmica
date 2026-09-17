@@ -54,6 +54,21 @@ export function headHere() {
   }
 }
 
+/* A WING STANDS WHEN ITS ENTRY FIELD LIFTS. The entry builds every body a
+   walk can show and compiles it behind the gold field, which takes seconds;
+   a reading or a frame taken before the field lifts is of the field or of
+   the warm up's own poses, never of a station. Resolves false at the cap. */
+export async function wingStanding(page, ms = 180000) {
+  return page
+    .waitForFunction(() => {
+      if (document.body.dataset.phase !== 'wing') return false
+      const gold = document.getElementById('goldbreath')
+      return !gold || !gold.classList.contains('lit')
+    }, null, { timeout: ms, polling: 250 })
+    .then(() => true)
+    .catch(() => false)
+}
+
 /**
  * Refuse to shoot a server that is not ours. A busy port made the rig lie
  * three times this year; the cost of being sure is one fetch.

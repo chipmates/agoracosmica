@@ -37,6 +37,7 @@ import {
   TIERS,
   VIEWPORTS,
   waitForServer,
+  wingStanding,
 } from './rig.mjs'
 
 const PORT = Number(process.env['FORGE_PORT'] ?? 5199)
@@ -86,6 +87,7 @@ async function wingCost() {
           return s.phase === 'wing' && s.stationIds.length ? s.stationIds : null
         }, null, { timeout: 90000 })
         .then((h) => h.jsonValue())
+      await wingStanding(page)
       await page.evaluate((s) => window.__forge.station(s), ids[0])
       await arrive(page, ids[0])
       const warm = await warmScene(page, { ms: SETTLE_CAP })
