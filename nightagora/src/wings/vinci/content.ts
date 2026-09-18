@@ -485,8 +485,8 @@ const stationCards: Record<VinciStationId, VinciText> = {
     de: 'Dieses Ende ist das späteste. Von hier läuft die Wand zurück bis zum ersten Bild, und die Tür neben dir führt zu den Maschinen.',
   },
   'line-early': {
-    en: 'The dates are cut into the floor, and you walk his life along them. Twelve of the fifty-six are cut here. Every date carries its document in the sources, and its colour says how sure we are.',
-    de: 'Die Daten sind in den Boden geschnitten, und du gehst sein Leben an ihnen ab. Zwölf der sechsundfünfzig sind hier geschnitten. Zu jedem Datum steht der Beleg in den Quellen, und seine Farbe sagt, wie sicher wir sind.',
+    en: 'The dates are cut into the floor, and you walk his life along them. Twelve of the fifty-six are cut here. Every date carries its document in the sources, and its colour says how sure we are. The whole life opens from this line.',
+    de: 'Die Daten sind in den Boden geschnitten, und du gehst sein Leben an ihnen ab. Zwölf der sechsundfünfzig sind hier geschnitten. Zu jedem Datum steht der Beleg in den Quellen, und seine Farbe sagt, wie sicher wir sind. Von dieser Linie aus öffnet sich das ganze Leben.',
   },
   'reading-table': {
     en: 'A page of Manuscript B lies open on this table, in a facsimile printed in 1883. He wrote from right to left because he was left handed, and a mirror reads it back. The notebook itself is in Paris.',
@@ -567,8 +567,8 @@ const seeds: readonly StationSeed[] = [
     { en: 'The two that were real, and how they differ.', de: 'Die beiden, die es wirklich gab, und ihr Unterschied.' },
     [], 'brief/CONCEPT-OPUS.md §3 S16'),
   seed('line-early', { en: 'The whole life, cut into the floor', de: 'Das ganze Leben, in den Boden geschnitten' },
-    { en: 'His grandfather recorded the birth on 15 April 1452. The whole life opens from this line.',
-      de: 'Sein Großvater verzeichnete die Geburt am 15. April 1452. Von dieser Linie aus öffnet sich das ganze Leben.' },
+    { en: 'His grandfather recorded the birth on 15 April 1452.',
+      de: 'Sein Großvater verzeichnete die Geburt am 15. April 1452.' },
     [scattered], 'brief/CONCEPT-GPT6.md Station 02; brief/CONCEPT-OPUS.md §3 S8'),
   seed('body', { en: 'The body as a machine', de: 'Der Körper als Maschine' }, body,
     [body], 'brief/CONCEPT-OPUS.md §3 S17'),
