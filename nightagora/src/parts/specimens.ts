@@ -267,10 +267,11 @@ const EYES: Record<string, Record<string, Eye>> = {
     stand16: { from: [0, 1.66, 16.4], to: [0, 0.06, -1.2] },
   },
   'detail-drum': {
-    stand2: { from: [1.5, 1.35, 1.5], to: [0, 1.2, 0] },
+    stand2: { from: [1.35, 1.5, 2.45], to: [0, 1.1, 0] },
   },
   'detail-base': {
-    stand1: { from: [0.9, 0.42, 1.5], to: [0, 0.05, 0] },
+    // the 0.10 m band across its own 2.2 m, from where a visitor stands
+    stand1: { from: [0.55, 0.64, 2.55], to: [0, 0.05, 0.35] },
   },
 }
 
@@ -355,14 +356,15 @@ export const DETAIL_SPECIMENS: Record<
       const sheet = new Object3D()
       const floor = floorSlab(mode, count)
       floor.position.set(0, 0.06, 0)
+      // the floor's top face is at 0.12, and everything stands on it
       const wall = wallRun(mode, count)
-      wall.position.set(0, 1.8, -3.2)
+      wall.position.set(0, 1.92, -3.2)
       const stand = plinth(mode, count)
-      stand.position.set(-2.4, 0.575, 1.1)
+      stand.position.set(-2.3, 0.695, 0.9)
       const base = baseSlab(mode, count)
-      base.position.set(0.4, 0.05, 1.4)
+      base.position.set(0.55, 0.17, 1.75)
       const column = drum(mode, count)
-      column.position.set(2.6, 1.2, 0.4)
+      column.position.set(2.5, 1.32, -0.4)
       sheet.add(floor, wall, stand, base, column)
       return seal(
         sheet,
@@ -372,7 +374,7 @@ export const DETAIL_SPECIMENS: Record<
       )
     },
     eyes: {
-      sheet: { from: [5.6, 3.4, 7.2], to: [-0.2, 0.9, -0.6] },
+      sheet: { from: [4.9, 2.9, 6.4], to: [-0.2, 0.75, -0.9] },
     },
   },
 }
