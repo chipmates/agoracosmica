@@ -76,10 +76,23 @@ export function collectionView(id: string, narrow: boolean): RoomPose | undefine
       return narrow
         ? { eye: world(-23.4, -40.8, EYE), at: world(-46, -45, HANG_DATUM - 8.25), fov: 104 }
         : { eye: world(-23.4, -40.8, EYE), at: world(-46, -45, HANG_DATUM - .1), fov: 60 }
+    // THE WEST END IS READ RAKING, ALONG THE WALL'S OWN LAST WORK. Aimed east
+    // down the room instead, the cone takes in the east glazing and with it
+    // the outdoor ground and the planting beyond: 222 draws and 1.52 M
+    // triangles against the tier's 150 and 1.2 M, and the ground dressing
+    // alone is 18 draws drawn twice. Turned onto the last painting the cone
+    // leaves the glazing outside it and the reading is 134 draws and 647 K,
+    // with every one of the twenty-five still inside the frame, the last one
+    // whole at 2.21 m and the door to the machines at the visitor's shoulder.
     case 'collection-room-picture-west':
-      return narrow
-        ? { eye: world(-60.6, -40.6, EYE), at: world(-38, -46, HANG_DATUM - 6.25), fov: 104 }
-        : { eye: world(-60.6, -40.6, EYE), at: world(-38, FACE.pictureWallNorth, HANG_DATUM - .1), fov: 60 }
+      return { eye: world(-60.6, -40, EYE), at: world(-58.945, -41.767, HANG_DATUM - (narrow ? .95 : .1)), fov: narrow ? 104 : 60 }
+    // The two rejected trials, kept reproducible: both are cheaper still and
+    // both lose the wall's run, a metre further off the wall holding ten of
+    // the twenty-five at 122 draws and seventeen at 127 with a wider lens.
+    case 'collection-room-picture-west-trial-a':
+      return { eye: world(-60.6, -39.4, EYE), at: world(-58.945, -41.767, HANG_DATUM - .1), fov: narrow ? 104 : 60 }
+    case 'collection-room-picture-west-trial-b':
+      return { eye: world(-60.6, -39.4, EYE), at: world(-58.945, -41.767, HANG_DATUM - .1), fov: narrow ? 104 : 66 }
     case 'collection-room-picture-long':
       return pose(-24.9, -37.9, EYE, -58, -39.9, HANG_DATUM + .3, narrow ? 78 : 62, .6)
     case 'collection-hang-near':
@@ -132,6 +145,7 @@ export const COLLECTION_VIEW_IDS = [
   'collection-room-line',
   'collection-room-line-early', 'collection-room-line-late', 'collection-room-line-amboise',
   'collection-room-picture', 'collection-room-picture-west', 'collection-room-picture-long', 'collection-hang-near',
+  'collection-room-picture-west-trial-a', 'collection-room-picture-west-trial-b',
   'collection-room-hall', 'collection-room-hall-screw',
   'collection-room-gallery', 'collection-room-reading', 'collection-room-body',
   'collection-room-court', 'collection-room-grave', 'collection-room-parachute',
