@@ -31,8 +31,10 @@
    under it, so it is hidden from the reading and takes no press. */
 .wing-life-drawing {flex:0 0 auto;padding:6px 0 10px;}
 .wing-life-plate {display:block;overflow:visible;}
-.wing-life-band {opacity:.85;}
-.wing-life-band[data-afterlife='true'] {opacity:.5;}
+/* The bar of one period on the axis. It carries its own name so a rule for
+   the drawing can never reach the reading's list item of the same period. */
+.wing-life-period {opacity:.85;}
+.wing-life-period[data-afterlife='true'] {opacity:.5;}
 .wing-life-gap {fill:none;stroke:#a9977366;stroke-width:1;stroke-dasharray:3 3;}
 .wing-life-gap-count {fill:#a8b3b7;font:8px var(--sans);text-anchor:middle;}
 .wing-life-year {fill:#cfc6b499;font:9px var(--sans);letter-spacing:.04em;}

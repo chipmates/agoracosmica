@@ -101,7 +101,7 @@ export function drawLifePlate(options: {
     const first = Math.min(...years.map(span => span.from)), last = Math.max(...years.map(span => span.to))
     const left = band.afterlife ? xAfter(first) : x(first)
     const right = band.afterlife ? xAfter(last) : x(last)
-    const bar = add('rect', { class: 'wing-life-band', x: left, y: top, width: Math.max(PLATE.least, right - left), height: 11, rx: 1 })
+    const bar = add('rect', { class: 'wing-life-period', x: left, y: top, width: Math.max(PLATE.least, right - left), height: 11, rx: 1 })
     bar.style.fill = colour(band.certainty)
     if (band.afterlife) bar.setAttribute('data-afterlife', 'true')
     if (crowded && !band.afterlife && band !== record.bands[0]) continue
