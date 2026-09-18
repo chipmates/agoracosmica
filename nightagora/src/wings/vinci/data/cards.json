@@ -81,6 +81,8 @@
     "de": "Das ist der ganze Scan. Einen feineren hat das Museum nicht."
   },
   "rule_labels": [
+    { "en": "1 mm", "de": "1 mm" },
+    { "en": "5 mm", "de": "5 mm" },
     { "en": "1 cm", "de": "1 cm" },
     { "en": "5 cm", "de": "5 cm" },
     { "en": "10 cm", "de": "10 cm" },
