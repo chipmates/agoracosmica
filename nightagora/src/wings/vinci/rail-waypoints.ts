@@ -95,7 +95,7 @@ export function railSide(stationId: string): RailSide {
   // head and came back down the same stair to reach its own ground.
   if (stationId === 'garden') return 'apron'
   if (stationId === 'picture-room' || stationId === 'picture-room-west') return 'picture-room'
-  if (['line-early', 'line-late', 'line-amboise', 'reading-table', 'scattered', 'body'].includes(stationId)) return 'long-gallery'
+  if (['line-early', 'reading-table', 'body'].includes(stationId)) return 'long-gallery'
   if (['flight', 'works'].includes(stationId)) return 'mechanism-hall'
   if (stationId === 'supper-wall') return 'exhibit-court'
   if (stationId === 'grave') return 'grave-court'

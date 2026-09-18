@@ -5,8 +5,8 @@ export type VinciLanguage = 'en' | 'de';
 export type VinciCertainty = 'documented' | 'reconstructed' | 'conjectural' | 'unknown';
 export type VinciStationId =
   | 'arrival' | 'courtyard' | 'hall' | 'oratory' | 'study' | 'chamber' | 'garden'
-  | 'line-early' | 'line-late' | 'line-amboise' | 'picture-room' | 'picture-room-west'
-  | 'supper-wall' | 'reading-table' | 'scattered' | 'flight' | 'works' | 'body' | 'grave';
+  | 'line-early' | 'picture-room' | 'picture-room-west'
+  | 'supper-wall' | 'reading-table' | 'flight' | 'works' | 'body' | 'grave';
 
 export interface VinciText {
   en: string;
@@ -492,21 +492,9 @@ const stationCards: Record<VinciStationId, VinciText> = {
     en: 'A page of Manuscript B lies open on this table, in a facsimile printed in 1883. He wrote from right to left because he was left handed, and a mirror reads it back. The notebook itself is in Paris.',
     de: 'Auf diesem Tisch liegt eine Seite aus Manuskript B, in einem Faksimile von 1883. Er schrieb von rechts nach links, weil er Linkshänder war, und ein Spiegel liest es zurück. Das Notizbuch selbst liegt in Paris.',
   },
-  'line-late': {
-    en: 'Venice, Florence, Milan again, then Rome. This stretch covers the years from 1500 to 1515, when he moved from one patron to the next. In October 1503 a Florentine clerk noted in the margin of a book that Leonardo was painting the head of Lisa del Giocondo.',
-    de: 'Venedig, Florenz, wieder Mailand, dann Rom. Dieser Abschnitt umfasst die Jahre von 1500 bis 1515, in denen er von einem Auftraggeber zum nächsten zog. Im Oktober 1503 notierte ein Florentiner Kanzleischreiber am Rand eines Buches, Leonardo male den Kopf der Lisa del Giocondo.',
-  },
   body: {
     en: 'He opened bodies and drew what he found, and about six hundred of those sheets are at Windsor. Twenty-nine of them hang on this wall, each from a public reproduction the law lets us show. The sources name every sheet, its number in the royal collection and what its licence asks of us.',
     de: 'Er öffnete Körper und zeichnete, was er fand, und etwa sechshundert dieser Blätter liegen in Windsor. Neunundzwanzig davon hängen an dieser Wand, jedes aus einer öffentlichen Reproduktion, die das Recht uns zeigen lässt. Die Quellen nennen jedes Blatt, seine Nummer in der königlichen Sammlung und was seine Lizenz von uns verlangt.',
-  },
-  'line-amboise': {
-    en: 'The last stretch, and it runs past his death. He came to France for the young king, the first firm record of him at this house is dated 22 May 1517, and he died here on 2 May 1519. The dates after that year belong to what happened to his work.',
-    de: 'Der letzte Abschnitt, und er reicht über seinen Tod hinaus. Er kam für den jungen König nach Frankreich, der erste sichere Beleg für ihn in diesem Haus ist vom 22. Mai 1517, und am 2. Mai 1519 starb er hier. Die Daten danach gehören zu dem, was mit seinem Werk geschah.',
-  },
-  scattered: {
-    en: 'Nothing from his own hand is in this gallery. The notebooks were taken apart after his death, rebound and sold, and today they lie in Milan, Paris, Madrid, London, Windsor and one private collection. The sources name each volume and where it is tonight.',
-    de: 'In dieser Galerie liegt nichts aus seiner eigenen Hand. Die Notizbücher wurden nach seinem Tod zerlegt, neu gebunden und verkauft, und heute liegen sie in Mailand, Paris, Madrid, London, Windsor und einer Privatsammlung. Die Quellen nennen jeden Band und seinen heutigen Ort.',
   },
   works: {
     en: 'This end of the hall holds what worked on land and in water. The lock gates and the lifting screw existed before him, and his sheets record them rather than invent them. Each machine names the page it was rebuilt from and what that page does not say.',
@@ -565,21 +553,13 @@ const seeds: readonly StationSeed[] = [
   seed('picture-room-west', { en: 'Where the wall ends', de: 'Wo die Wand endet' },
     { en: 'The latest painting on the wall, and the door to the machines.', de: 'Das späteste Gemälde der Wand und die Tür zu den Maschinen.' },
     [], 'brief/CONCEPT-OPUS.md §3 S11'),
-  seed('line-early', { en: 'Vinci, Florence, Milan', de: 'Vinci, Florenz, Mailand' },
+  seed('line-early', { en: 'The whole life, cut into the floor', de: 'Das ganze Leben, in den Boden geschnitten' },
     { en: 'His grandfather recorded the birth on 15 April 1452.', de: 'Sein Großvater verzeichnete die Geburt am 15. April 1452.' },
-    [], 'brief/CONCEPT-GPT6.md Station 02; brief/CONCEPT-OPUS.md §3 S8'),
+    [scattered], 'brief/CONCEPT-GPT6.md Station 02; brief/CONCEPT-OPUS.md §3 S8'),
   seed('reading-table', { en: 'The reading table', de: 'Der Lesetisch' }, readingTable,
     [readingTable], 'brief/CONCEPT-GPT6.md Station 10; brief/CONCEPT-OPUS.md §3 S13'),
-  seed('line-late', { en: 'The wandering years, and Rome', de: 'Die Wanderjahre und Rom' },
-    { en: 'In October 1503, Vespucci named Lisa del Giocondo in a margin.', de: 'Im Oktober 1503 nannte Vespucci Lisa del Giocondo in einer Randnotiz.' },
-    [], 'brief/CONCEPT-GPT6.md Station 04; brief/CONCEPT-OPUS.md §3 S9'),
   seed('body', { en: 'The body as a machine', de: 'Der Körper als Maschine' }, body,
     [body], 'brief/CONCEPT-OPUS.md §3 S17'),
-  seed('line-amboise', { en: 'Amboise, and the threshold', de: 'Amboise und die Schwelle' },
-    { en: 'A visitor recorded three pictures and notebooks here in 1517.', de: 'Ein Besucher verzeichnete hier 1517 drei Gemälde und Notizbücher.' },
-    [], 'brief/CONCEPT-GPT6.md Station 06; brief/CONCEPT-OPUS.md §3 S10'),
-  seed('scattered', { en: 'Where the papers are now', de: 'Wo die Blätter heute sind' }, scattered,
-    [scattered], 'brief/CONCEPT-OPUS.md §3 S14'),
   seed('works', { en: 'The mechanism hall, two: land, water, measure', de: 'Die Maschinenhalle, zwei: Land, Wasser, Maß' },
     { en: 'The two that were real, and how they differ.', de: 'Die beiden, die es wirklich gab, und ihr Unterschied.' },
     [], 'brief/CONCEPT-OPUS.md §3 S16'),
@@ -1088,7 +1068,12 @@ const originalWalk = [
 
 /** A station that has left the walk keeps its numeric position, and the link
  * lands where its subject now stands. */
-const retiredStations: Readonly<Record<string, VinciStationId>> = { myths: 'grave' };
+const retiredStations: Readonly<Record<string, VinciStationId>> = {
+  myths: 'grave',
+  // The gallery reads its whole line from one station, so the three excerpts
+  // and the station that stood beside them land on it.
+  'line-late': 'line-early', 'line-amboise': 'line-early', scattered: 'line-early',
+};
 
 /** Numeric links from the original walk always keep their original meaning. */
 export const vinciLegacyStationIds: readonly VinciStationId[] = Object.freeze(
@@ -1112,7 +1097,7 @@ export const vinciOutdoorStationIds: readonly VinciStationId[] = ['arrival', 'co
 
 /** Sources follow the physical rooms, independently of the walking order. */
 const sourceRooms: readonly (readonly VinciStationId[])[] = [
-  ['line-early', 'line-late', 'line-amboise', 'reading-table', 'scattered', 'body'],
+  ['line-early', 'reading-table', 'body'],
   ['flight', 'works'],
   ['supper-wall', 'grave'],
 ];

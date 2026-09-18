@@ -19,14 +19,11 @@ export interface Pose { eye: Vector3; at: Vector3; fov: number }
  * where a hang is read, the hall from its north door, the line down its
  * length, the court from the end a visitor arrives at. */
 export const COLLECTION_STATION_ROOMS:Partial<Record<VinciStationId,string>>={
-  'line-early':'collection-room-line-early',
-  'line-late':'collection-room-line-late',
-  'line-amboise':'collection-room-line-amboise',
+  'line-early':'collection-room-line',
   'picture-room':'collection-room-picture',
   'picture-room-west':'collection-room-picture-west',
   'supper-wall':'collection-room-supper',
   'reading-table':'collection-room-reading',
-  scattered:'collection-room-gallery',
   flight:'collection-room-hall-screw',
   works:'collection-room-hall',
   body:'collection-room-body',
@@ -93,7 +90,7 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // Floor subjects and the wall read end-on have a measured phone composition
   // of their own; the generic room adjustment below is for upright exhibits
   // and architecture, and a subject that runs away from the eye is neither.
-  if(room?.startsWith('collection-room-line-')||room?.startsWith('collection-room-picture')){const pose=collectionView(room,narrow);if(pose)return pose}
+  if(room?.startsWith('collection-room-line')||room?.startsWith('collection-room-picture')){const pose=collectionView(room,narrow);if(pose)return pose}
   if(room){const pose=collectionView(room,false)
     if(pose)return narrow?narrowRoomPose(pose,NARROW_AIM_STATION[id]??NARROW_AIM_SHARE):pose}
   // A future station without a room keeps the held terrace composition.

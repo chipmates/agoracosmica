@@ -31,9 +31,24 @@ export function collectionView(id: string, narrow: boolean): RoomPose | undefine
   const pose = (e: number, n: number, h: number, te: number, tn: number, th: number, fov: number, lift = .9): RoomPose =>
     ({ eye: world(e, n, h), at: world(te, tn, th + (narrow ? lift : 0)), fov })
   switch (id) {
-    // Three fixed excerpts of the bench's date course, walked south from
-    // the picture room. The selected dates are 1452, 1503 and 1517; the
-    // last section continues to the two 1519 studs at the end of the line.
+    // THE WHOLE LINE, FROM THE END IT IS READ FROM. Eighteen metres of cut
+    // dates, and every numeral is cut to be read from its own south: from the
+    // north end the whole line stands mirrored. So the one station is at the
+    // south end, where the reading begins, and the earliest date is the
+    // farthest away. The eye stands 0.4 m south of the last socket, which is
+    // all the room the cross wall leaves, and the aim comes down two and a
+    // half metres ahead: that is the pitch that holds the near socket inside
+    // the frame's foot and still lifts 1452 to the middle of it. The phone
+    // takes a wider lens and a shallower drop, which stands the run of them
+    // above its card.
+    case 'collection-room-line':
+      return {
+        eye: world(LINE_ORIGIN.east + .3, LINE_ORIGIN.north - 2.24 * LINE_SLAB.pitchNorth, FLOOR + 1.66),
+        at: world(LINE_ORIGIN.east, narrow ? -60.8 : -59.8, FLOOR + .01),
+        fov: narrow ? 104 : 88,
+      }
+    // Three fixed excerpts of the bench's date course, kept as the named
+    // inspections the excerpt stations were composed from.
     case 'collection-room-line-early': {
       const north = LINE_ORIGIN.north + 9 * LINE_SLAB.pitchNorth
       return lineFloorView(north, narrow)
@@ -112,6 +127,7 @@ export function collectionView(id: string, narrow: boolean): RoomPose | undefine
 }
 
 export const COLLECTION_VIEW_IDS = [
+  'collection-room-line',
   'collection-room-line-early', 'collection-room-line-late', 'collection-room-line-amboise',
   'collection-room-picture', 'collection-room-picture-west', 'collection-room-picture-long', 'collection-hang-near',
   'collection-room-hall', 'collection-room-hall-screw',

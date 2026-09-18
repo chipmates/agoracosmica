@@ -254,6 +254,8 @@ function machinePose(slug: keyof typeof MACHINE_EYES, narrow: boolean): Approach
   return pose([eye.east, eye.north, level + 1.62], [stand.east, stand.north, aim], fov, narrow)
 }
 
+/** The one station the gallery's cut line is read and walked from. */
+const LINE_STATION: VinciStationId = 'line-early'
 /** The book lies open on the table under its lamp, read from the chair side. */
 export const VINCI_READING_TABLE = { east: -37.72, north: -45.4, top: FLOOR + .755 }
 const READING_TABLE = VINCI_READING_TABLE
@@ -304,7 +306,11 @@ function otherKinds(): Placed[] {
     // The last date lies close to the gallery's south cross wall, so its eye
     // stands as far back as the wall leaves and looks more steeply down.
     const back = Math.min(1.5, stud.north - (FACE.southStripNorth + .6))
-    add(`stud/${stud.id}`, 'stud', stud.station as VinciStationId, narrow =>
+    // THE GALLERY READS ITS WHOLE LINE FROM ONE STATION. The sections the
+    // bench cut its excerpts in are still how the floor lays the twelve
+    // sockets, so the data keeps them and every approach leaves from the one
+    // station that now stands at the head of the line.
+    add(`stud/${stud.id}`, 'stud', LINE_STATION, narrow =>
       pose([east, stud.north - back, FLOOR + 1.62], [east, stud.north, FLOOR + .01], 50, narrow))
   }
   return placed

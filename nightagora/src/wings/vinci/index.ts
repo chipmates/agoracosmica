@@ -139,7 +139,7 @@ const PRINT={...GRADES['first-station'],name:'clos-luce-1517',exposure:.94,lift:
  * under a clerestory and two fittings, and the outdoor exposure left them a
  * stop and a half under. The eye opens at the door, as a camera does. */
 const STATION_EXPOSURE:Partial<Record<VinciStationId,number>>={courtyard:1.0,
-  'picture-room':1.34,'reading-table':1.5,scattered:1.3,flight:1.24,works:1.24,body:1.4}
+  'picture-room':1.34,'picture-room-west':1.34,'reading-table':1.5,'line-early':1.3,flight:1.24,works:1.24,body:1.4}
 const SHADOW={nearHalfM:20,nearMapPx:1024,aheadM:10,refocusM:3,lightDistanceM:80} as const
 /** THE WING'S ONE LIGHT RIG, which the vitrine's turntable stands under too:
  * the key and fill of the hour, and the hall's own fittings. */
