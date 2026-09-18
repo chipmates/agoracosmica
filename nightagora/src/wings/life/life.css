@@ -175,10 +175,12 @@
 /* THE NARROW STAGE: one column, the ribbon inert, the places an accordion.
    No viewport height anywhere: the sheet is given its box by the frame, and
    everything inside it scrolls in that box. */
-.wing-life[data-narrow='true'] .wing-life-head {padding:12px 12px 2px;}
-.wing-life[data-narrow='true'] .wing-life-through {font-size:16px;}
-.wing-life[data-narrow='true'] .wing-life-second {font-size:12px;margin-top:4px;}
-.wing-life[data-narrow='true'] .wing-life-caption {font-size:10px;margin-bottom:6px;}
+.wing-life[data-narrow='true'] .wing-life-head {padding:10px 12px 0;}
+.wing-life[data-narrow='true'] .wing-life-through {font-size:15px;line-height:1.24;}
+.wing-life[data-narrow='true'] .wing-life-drawing {padding:4px 0 0;}
+.wing-life[data-narrow='true'] .wing-life-second {font-size:11.5px;line-height:1.4;margin-top:3px;}
+.wing-life[data-narrow='true'] .wing-life-caption {font-size:10px;line-height:1.35;margin:2px 0 5px;}
+.wing-life[data-narrow='true'] .wing-life-reading {padding-bottom:4px;}
 .wing-life[data-narrow='true'] .wing-life-body {padding:0 12px;}
 .wing-life[data-narrow='true'] .wing-life-reading {flex-direction:column;gap:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;}
 .wing-life[data-narrow='true'] .wing-life-spine {flex:0 0 auto;overflow:visible;padding-right:0;}

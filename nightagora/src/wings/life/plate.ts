@@ -17,7 +17,9 @@ import type { Bi, LifeBand, LifeRecord } from './types'
 const NS = 'http://www.w3.org/2000/svg'
 
 export const PLATE = {
-  pad: 10,
+  pad: { wide: 10, narrow: 6 },
+  /** the room the standing ring keeps over the ribbon */
+  ring: { wide: 8, narrow: 6 },
   /** the painted height of one period */
   strip: { wide: 26, narrow: 18 },
   /** the blank between two periods, in pixels */
@@ -25,7 +27,7 @@ export const PLATE = {
   /** the ticks of every date, under the periods */
   ticks: { normal: 5, floor: 9, gap: 5 },
   /** the afterlife, on its own scale, under a blank */
-  after: { gap: 12, height: 8, years: 11 },
+  after: { gap: 10, height: 8, years: 10 },
   least: 3,
   name: { wide: 11, narrow: 9, floor: 7.5, margin: 6 },
   /** the tracking the ribbon's names carry, which the ruler adds back */
@@ -114,10 +116,11 @@ export function drawLifePlate(options: {
   const afterEvents = after ? record.events.filter(event => event.band === after.id) : []
   const afterYears = afterEvents.map(event => dateYears(event.date)?.from).filter((year): year is number => year !== undefined)
   const hasAfter = Boolean(after && afterYears.length)
-  const top = PLATE.pad + 8
+  const pad = narrow ? PLATE.pad.narrow : PLATE.pad.wide
+  const top = pad + (narrow ? PLATE.ring.narrow : PLATE.ring.wide)
   const ticksTop = top + stripHeight + 3
   const afterTop = ticksTop + PLATE.ticks.floor + PLATE.after.gap
-  const height = (hasAfter ? afterTop + PLATE.after.height + PLATE.after.years : ticksTop + PLATE.ticks.floor) + PLATE.pad
+  const height = (hasAfter ? afterTop + PLATE.after.height + PLATE.after.years : ticksTop + PLATE.ticks.floor) + pad
 
   const svg = document.createElementNS(NS, 'svg')
   svg.setAttribute('class', 'wing-life-plate')
@@ -133,7 +136,7 @@ export function drawLifePlate(options: {
     return node
   }
 
-  const left = PLATE.pad, span = Math.max(40, width - PLATE.pad * 2)
+  const left = pad, span = Math.max(40, width - pad * 2)
   const x = (year: number): number => left + scale.at(year) * span
   const living = record.bands.filter(band => !band.afterlife)
   // what one full year is worth in pixels, for the instruments that read the
@@ -215,7 +218,7 @@ export function drawLifePlate(options: {
       // over the ribbon, never on it: a ring around a segment would sit on
       // that segment's own name
       const ring = add('g', { class: 'wing-life-standing' })
-      add('circle', { class: 'wing-life-standing-ring', cx: place, cy: top - 6, r: 4 }, ring)
+      add('circle', { class: 'wing-life-standing-ring', cx: place, cy: top - 5, r: 3.6 }, ring)
       add('line', { class: 'wing-life-standing-stem', x1: place, y1: top - 2, x2: place, y2: top + 2 }, ring)
     }
   }
