@@ -73,8 +73,8 @@
       "source": "machines/data/proportional-compass.json, scale_m 0.4 by 0.67 by 0.08 m, smaller than every other scale_m in machines/data"
     },
     "camera-obscura": {
-      "en": "The chamber is 1.24 m wide, 1.24 m high and 0.64 m deep, and the window shows the whole box.",
-      "de": "Die Kammer ist 1,24 m breit, 1,24 m hoch und 0,64 m tief, und das Fenster zeigt den ganzen Kasten.",
+      "en": "The chamber is 1.24 m wide, 1.24 m high and 0.64 m deep.",
+      "de": "Die Kammer ist 1,24 m breit, 1,24 m hoch und 0,64 m tief.",
       "source": "machines/data/camera-obscura.json, scale_m 1.24 by 1.24 by 0.64 m, chamber bounds"
     }
   }
