@@ -5,7 +5,7 @@ import { roadGradeProvenance } from './road-grade'
 import type { VinciStationId } from './content'
 import { createRailLookSmoother, createCertifiedRailPath } from './rail-smoothing'
 import { projectRailDrag } from './projection-drag'
-import { gaitAt, gaitHeadLift, gaitLeg, gaitRhythm, strollMetresPerSecond, type GaitThreshold } from './gait'
+import { carriedPace, gaitAt, gaitHeadLift, gaitLeg, gaitRhythm, strollMetresPerSecond, type GaitThreshold } from './gait'
 import { collectionLayout } from './collection'
 import { collectionView } from './collection/views'
 import { vinciWallEndVertex, vinciWallNearerEnd, vinciWallStops } from './collection/wall'
@@ -225,8 +225,10 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
   let wallAt:number|undefined, wallReturn:number|undefined
   let path:ReturnType<typeof createCertifiedRailPath>|undefined, placementNeedsFrame=false
   let duration=1.1, leg=gaitLeg(0), strideM=0, strideTarget=0, strideAt=0
-  /** The leg's own clock retains its measured pace when the target changes. */
-  let legClock=0, legClockAt=0, pace=1
+  /** The leg's own clock retains its measured pace when the target changes.
+   * A visitor who has already asked for the station after this one is not
+   * strolling: each one still waiting speeds the leg under way. */
+  let legClock=0, legClockAt=0, pace=1, waiting=0
   /** The share of the leg under way the body has covered, for the overlay. */
   let walkedShare=1
   const fromQ=new Quaternion(), toQ=new Quaternion()
@@ -292,7 +294,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     const from=angles(fromQ),to=angles(toQ)
     fromHeading=from.heading;fromElevation=from.elevation;toHeading=to.heading;toElevation=to.elevation
     walked=path.length>=WALKED_LEG_M
-    leg=gaitLeg(path.length);duration=leg.seconds;legClock=0;legClockAt=now;pace=1;strideM=strideTarget=0;strideAt=now
+    leg=gaitLeg(path.length);duration=leg.seconds;legClock=0;legClockAt=now;pace=1;waiting=0;strideM=strideTarget=0;strideAt=now
     fromFov=completed.pose.fov;targetFov=request.pose.fov;look.recenter()
     active=request
   }
@@ -327,6 +329,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
       // A certified leg finishes at its station before the newest target can
       // begin. Asking for that active endpoint cancels an older pending target.
       pending=sameRequest(active??completed,request)?undefined:request
+      if(active&&pending)pace=carriedPace(++waiting)
       chained=undefined
       // WHILE AN APPROACH STANDS THE RAIL TAKES THE RETURN AND A STATION, and
       // a station is walked from the station eye, which is the pair the
@@ -343,7 +346,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     along(vertex:number,id:VinciStationId,pose:Pose,exhibit?:string,phone=camera.aspect<=.9):boolean {
       if(!completed||wallAt===undefined||vertex===wallAt||wallReturn!==undefined)return false
       const request:Request={id,pose:{eye:pose.eye.clone(),at:pose.at.clone(),fov:pose.fov},phone,exhibit,wall:vertex}
-      if(active){pending=request;return true}
+      if(active){pending=request;pace=carriedPace(++waiting);return true}
       begin(request,clock())
       return true
     },

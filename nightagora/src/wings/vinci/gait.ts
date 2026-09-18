@@ -5,8 +5,30 @@
  * not a tuning constant, and `gait-check.mjs` reports all of them.
  */
 
-/** The cruise of the wing's walk, in metres per second. */
-export const strollMetresPerSecond = 1.6
+/** THE PACE THE VISITOR SETS, in metres per second. Three, and the middle one
+ * is the museum's own walk: at a stroll the rooms of this insertion are half a
+ * minute apart, which is a long time to watch a floor. The stroll is kept as
+ * the pace the walk was measured at, and the brisk one is a person late for
+ * something, not a run.
+ */
+export const GAIT_PACES = { stroll: 1.6, walk: 2.4, brisk: 3.6 } as const
+export type GaitPaceName = keyof typeof GAIT_PACES
+/** The stroll, which is what every quantity below was measured against. */
+export const strollMetresPerSecond = GAIT_PACES.stroll
+/** ONE KEY ON THE DEVICE, like the visit record: a refused store forgets the
+ * choice quietly rather than making a visitor answer for their browser. */
+const PACE_KEY = 'na-gait-pace'
+const named = (value: string | null): GaitPaceName | null =>
+  value === 'stroll' || value === 'walk' || value === 'brisk' ? value : null
+let pace: GaitPaceName = (() => {
+  try { return named(localStorage.getItem(PACE_KEY)) ?? 'walk' } catch { return 'walk' }
+})()
+export const gaitPace = (): GaitPaceName => pace
+export const gaitMetresPerSecond = (): number => GAIT_PACES[pace]
+export function setGaitPace(next: GaitPaceName): void {
+  pace = next
+  try { localStorage.setItem(PACE_KEY, next) } catch { /* a refused store forgets */ }
+}
 /** Getting under way and stopping. A walker reaches a stroll in about a
  * second and gives the stop a little longer, because a stop is a choice. */
 const ACCEL_SECONDS = .9, BRAKE_SECONDS = 1.1
@@ -23,11 +45,13 @@ const BOB_M = .009, SWAY_M = .006
 /** The distance over which the rhythm arrives and leaves, so a station is
  * reached at the exact certified eye however the visitor got there. */
 const RHYTHM_FADE_M = 1
-/** Past a stroll a step rhythm would be a lie about the pace: a traverse
- * across the whole site carries no step, and the fade ends at the top of the
- * walking band, so a leg either strolls with its rhythm or traverses
- * without one. */
-const RHYTHM_FULL_MPS = 1.6, RHYTHM_NONE_MPS = 1.75
+/** Past the pace being walked a step rhythm would be a lie about it: a
+ * traverse across the whole site carries no step, and the fade ends just above
+ * the walking band, so a leg either walks with its rhythm or traverses without
+ * one. The band moves with the pace; the RISE AND FALL ITSELF DOES NOT, which
+ * is why the clearance certificate's gait envelope is the same number at every
+ * pace. */
+const RHYTHM_NONE_SHARE = 1.75 / 1.6
 /** A visitor who has already asked for the station after this one is not
  * strolling, so the leg's own clock runs at the pace of the asking: each
  * station still waiting adds its share, up to four. The step rhythm goes out
@@ -54,8 +78,10 @@ export interface GaitLeg {
 /** The timing of one leg, from its length alone. */
 export function gaitLeg(lengthM: number): GaitLeg {
   const length = Math.max(0, Number.isFinite(lengthM) ? lengthM : 0)
+  const walk = gaitMetresPerSecond()
+  const full = walk, none = walk * RHYTHM_NONE_SHARE
   const ramps = ACCEL_SECONDS + BRAKE_SECONDS
-  const seconds = Math.max(MIN_SECONDS, Math.min(MAX_SECONDS, ramps / 2 + length / strollMetresPerSecond))
+  const seconds = Math.max(MIN_SECONDS, Math.min(MAX_SECONDS, ramps / 2 + length / walk))
   // A leg too short for both ramps keeps their proportion and loses its cruise.
   const scale = Math.min(1, seconds / ramps)
   const accelSeconds = ACCEL_SECONDS * scale, brakeSeconds = BRAKE_SECONDS * scale
@@ -63,7 +89,7 @@ export function gaitLeg(lengthM: number): GaitLeg {
   return {
     lengthM: length, seconds, cruiseMetresPerSecond, accelSeconds, brakeSeconds,
     cadenceStepsPerSecond: cruiseMetresPerSecond / stepMetres,
-    rhythm: clamp01((RHYTHM_NONE_MPS - cruiseMetresPerSecond) / (RHYTHM_NONE_MPS - RHYTHM_FULL_MPS)),
+    rhythm: clamp01((none - cruiseMetresPerSecond) / (none - full)),
   }
 }
 
