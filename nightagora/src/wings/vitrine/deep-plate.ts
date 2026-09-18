@@ -38,6 +38,10 @@ export interface DeepPlateDetail { x: number; y: number; w: number; h: number; n
 export interface DeepPlateWords {
   /** The control that puts the work back in the window. */
   whole: string
+  /** One step nearer and one step further, for a hand with no wheel, no
+   * pinch and no keyboard. */
+  nearer: string
+  further: string
   /** What the view says when there is no more of the source to show. */
   ceiling: string
   /** The rule's numerals, each with the centimetres it names. */
@@ -70,6 +74,9 @@ const tileMB = (size: number): number => size * size * 4 / 1e6
  * these bounds of the viewport's own width. */
 const RULE_SHORTEST = 24
 const RULE_SHARE = .42
+
+/** One step nearer, which is what a press and a key each take. */
+const ZOOM_STEP = 1.4
 
 export function createDeepPlatePayload(options: {
   /** The work's own name, and the viewport's accessible name where no
@@ -309,6 +316,15 @@ export function createDeepPlatePayload(options: {
     readout()
   }
 
+  /** Nearer or further by one step, bounded by the same constraints the
+   * wheel and the keys are bounded by, so no press passes the ceiling. */
+  function zoom(factor: number): void {
+    if (!viewer || !host) return
+    const now = host.reducedMotion
+    viewer.viewport.zoomBy(factor, undefined, now)
+    viewer.viewport.applyConstraints(now)
+  }
+
   function press(label: string, run: () => void): HTMLButtonElement {
     const button = host!.element.ownerDocument.createElement('button')
     button.type = 'button'
@@ -353,6 +369,10 @@ export function createDeepPlatePayload(options: {
         framed = null
         if (viewer && library) viewer.viewport.fitBounds(windowBounds(), host?.reducedMotion ?? false)
       }))
+      // A HAND THAT CANNOT SPIN A WHEEL still reaches the ceiling: the two
+      // steps stand beside the fit, at the row's own size.
+      next.controls.append(press(options.words.nearer, () => zoom(ZOOM_STEP)),
+        press(options.words.further, () => zoom(1 / ZOOM_STEP)))
       // ONE CONTROL PER LINE THAT POINTS: the name is the one the wing's own
       // register already carries, in both languages.
       for (const detail of options.details ?? []) next.controls.append(press(detail.name, () => frame(detail)))
@@ -382,10 +402,7 @@ export function createDeepPlatePayload(options: {
       else if (event.key === 'ArrowUp') pan(0, -step)
       else if (event.key === 'ArrowDown') pan(0, step)
       else if (event.key === '0') { framed = null; viewer.viewport.fitBounds(windowBounds(), now) }
-      else {
-        viewer.viewport.zoomBy(event.key === '-' ? 1 / 1.4 : 1.4, undefined, now)
-        viewer.viewport.applyConstraints(now)
-      }
+      else zoom(event.key === '-' ? 1 / ZOOM_STEP : ZOOM_STEP)
       return true
     },
     unmount() {

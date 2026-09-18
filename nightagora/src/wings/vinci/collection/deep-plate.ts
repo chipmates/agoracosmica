@@ -42,6 +42,12 @@ const RULE: readonly { label: string; cm: number }[] = CARDS.rule_labels
   .map(words => ({ label: words[lang()], cm: Number.parseFloat(words.en) }))
   .filter(step => Number.isFinite(step.cm) && step.cm > 0)
 
+/** THE TWO STEPS, in the page's language. The wheel, the pinch, the double
+ * tap and the keys all reach the ceiling; a hand with none of them needs a
+ * control, and the card models hold no word for one yet. */
+const NEARER: Words = { en: 'Zoom in', de: 'Näher' }
+const FURTHER: Words = { en: 'Zoom out', de: 'Weiter weg' }
+
 /** What is on the plate, in the page's language, for a visitor who cannot
  * see it. Null where no one has written it yet. */
 export function vinciPlateDescription(id: string): string | null {
@@ -146,7 +152,8 @@ export function createVinciWholePlate(options: {
       width: options.plate.pixels.width,
       height: options.plate.pixels.height,
     },
-    words: { whole: CARDS.controls.machine.viewpoints[0]![language], ceiling: CARDS.zoom_ceiling[language], rule: RULE },
+    words: { whole: CARDS.controls.machine.viewpoints[0]![language], nearer: NEARER[language],
+      further: FURTHER[language], ceiling: CARDS.zoom_ceiling[language], rule: RULE },
     from: options.from,
     tier: options.tier,
     pxPerCm: platePxPerCm(options.work, options.plate, cut),
