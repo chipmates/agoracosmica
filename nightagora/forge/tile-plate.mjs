@@ -1,9 +1,11 @@
-// THE TILE CUTTER. One admitted plate becomes a static IIIF Image API 3
-// level-0 pyramid in the store, so a painting can be seen as closely as its
-// reproduction allows without one texture holding all of it.
+// THE TILE CUTTER. One admitted source becomes a static IIIF Image API 3
+// level-0 pyramid in the store, so a painting or a manuscript leaf can be
+// seen as closely as its reproduction allows without one texture holding
+// all of it.
 //
-//   node forge/tile-plate.mjs --plate vinci/painting-plate/<id> [--force]
-//   node forge/tile-plate.mjs --plate vinci/painting-plate/<id> --recut
+//   node forge/tile-plate.mjs --source vinci/painting-plate/<id> [--force]
+//   node forge/tile-plate.mjs --source vinci/ms-page-near/<file> [--force]
+//   node forge/tile-plate.mjs --source <manifest id> --recut
 //
 // --recut cuts a second time into a scratch folder and compares the tree
 // hash: a cutter whose output is not byte identical run to run cannot carry
@@ -21,13 +23,14 @@ import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import sharp from 'sharp'
 import { mergeManifests, STORE } from './vite-na-assets.mjs'
-import { expectedTileFiles, filesUnder, plateIdentity, scaleFactorsFor, tileRecipe, treeHash } from './tiles-check.mjs'
+import { DEEP_ROLE, expectedTileFiles, familyOfSource, filesUnder, LEAF_ROLE, plateIdentity, scaleFactorsFor, tileRecipe, treeHash } from './tiles-check.mjs'
 
 const TILE_SIZE = 256
 /** Where the bytes stand once they are pushed, which is the only address an
  * outside reader of the pyramid's own info.json could use. */
 const MEDIA_BASE = 'https://media.agoracosmica.org/night/'
 const PLATE_PATH = /^paintings\/([a-z0-9-]+)\/([a-z0-9-]+)__([1-9]\d*)x([1-9]\d*)\.jpg$/
+const LEAF_PATH = /^msb\/(?:near\/)?([a-z0-9_-]+?)(?:__[1-9]\d*x[1-9]\d*)?\.jpg$/
 
 const argv = process.argv.slice(2)
 const flag = name => argv.includes(name)
@@ -35,27 +38,34 @@ const value = name => { const at = argv.indexOf(name); return at < 0 ? null : ar
 const JSON_OUT = flag('--json')
 const say = (...words) => { if (!JSON_OUT) console.log(...words) }
 
-const plateId = value('--plate')
+const plateId = value('--source') ?? value('--plate')
 if (!plateId) {
-  console.error('usage: node forge/tile-plate.mjs --plate <manifest id> [--force] [--recut] [--json]')
+  console.error('usage: node forge/tile-plate.mjs --source <manifest id> [--force] [--recut] [--json]')
   process.exit(2)
 }
 
 const { assets } = mergeManifests()
 const plate = assets.find(entry => entry.id === plateId)
 if (!plate) throw new Error(`no manifest record ${plateId}`)
-if (plate.role !== 'painting-plate' || plate.display !== true) throw new Error(`${plateId} is not a displayed plate record`)
+const family = familyOfSource(plate)
+if (!family) throw new Error(`${plateId} is a ${plate.role ?? 'record with no role'}, which no pyramid is cut from`)
+const leaf = family === LEAF_ROLE
+const deep = family === DEEP_ROLE
+// A deep source is held on this machine and never downloaded: its pyramid
+// is what the museum shows, so it alone is display: true.
+if (!leaf && !deep && plate.display !== true) throw new Error(`${plateId} is not a displayed plate record`)
+if (deep && plate.display !== false) throw new Error(`${plateId} is a deep source and stays on this machine`)
 if (plate.wing !== 'wing-vinci') throw new Error(`${plateId} is not of the picture wing`)
 const superseder = assets.find(entry => (entry.supersedes ?? []).includes(plateId))
 if (superseder) throw new Error(`${plateId} is superseded by ${superseder.id} and does not hang`)
-const path = PLATE_PATH.exec(plate.path ?? '')
-if (!path) throw new Error(`${plateId} does not name its own work and pixels`)
-const [, work, , widthText, heightText] = path
-// Two faces of one panel share a file name, so the pyramid is named by the
-// face the records give it and never by the path.
-const name = plateIdentity(plate)
+const path = (leaf ? LEAF_PATH : PLATE_PATH).exec(plate.path ?? '')
+if (!path) throw new Error(`${plateId} does not stand where its family stands`)
+// A plate names its work and its pixels in its path and its face in the
+// records; a leaf's scan names neither, so the file itself is measured and
+// the pyramid is named by the file the edition gave it.
+const work = leaf ? null : path[1]
+const name = leaf ? path[1] : deep ? (plate.id.split('/').pop() ?? '') : plateIdentity(plate)
 if (!name) throw new Error(`${plateId} does not name its own face`)
-const width = Number(widthText), height = Number(heightText)
 
 // THE SOURCE IS THE ADMITTED FILE, BYTE FOR BYTE. A pyramid cut from
 // anything else is a new work, not a re-encoding of a recorded one.
@@ -63,23 +73,32 @@ const source = join(STORE, 'wing-vinci', plate.path)
 if (!existsSync(source)) throw new Error(`no file at wing-vinci/${plate.path}`)
 const sourceSha = createHash('sha256').update(readFileSync(source)).digest('hex')
 if (sourceSha !== plate.sha256) throw new Error(`${plateId}: the bytes on disk are not the recorded source`)
-const metadata = await sharp(source).metadata()
+const metadata = await sharp(source, { limitInputPixels: 700e6 }).metadata()
+const width = leaf ? metadata.width : Number(path[3])
+const height = leaf ? metadata.height : Number(path[4])
 if (metadata.width !== width || metadata.height !== height) {
   throw new Error(`${plateId}: the file is ${metadata.width}x${metadata.height}, the record says ${width}x${height}`)
 }
+if (plate.pixels !== undefined && plate.pixels !== width * height) {
+  throw new Error(`${plateId}: the record holds ${plate.pixels} pixels, the file ${width * height}`)
+}
 
 const recipe = tileRecipe(sharp.versions.sharp, sharp.versions.vips, TILE_SIZE)
-const folder = `paintings/${work}/tiles/${sourceSha.slice(0, 12)}/`
+const folder = leaf ? `msb/tiles/${sourceSha.slice(0, 12)}/`
+  : `paintings/${work}/${deep ? 'deep' : 'tiles'}/${sourceSha.slice(0, 12)}/`
 // dzsave writes INTO a path that ends in a separator, so the folder is
 // named without one here and with one in the record.
 const out = join(STORE, 'wing-vinci', folder.slice(0, -1))
+/** The shelf every pyramid of this family stands on, which is what the
+ * pyramid's own info.json names itself under. */
+const shelf = folder.replace(/[^/]+\/$/, '')
 
 /** One cut. The id is the folder's parent on the media origin, so the
  * pyramid's own info.json names itself where the bytes will stand. */
 async function cut(destination) {
   await sharp(source, { limitInputPixels: 700e6, sequentialRead: true })
     .jpeg({ quality: 92, chromaSubsampling: '4:4:4' })
-    .tile({ layout: 'iiif3', size: TILE_SIZE, overlap: 0, id: `${MEDIA_BASE}wing-vinci/paintings/${work}/tiles` })
+    .tile({ layout: 'iiif3', size: TILE_SIZE, overlap: 0, id: `${MEDIA_BASE}wing-vinci/${shelf.slice(0, -1)}` })
     .toFile(destination)
   // dzsave drops a dated properties file beside the folder it writes. It is
   // not a tile, it is not reproducible, and the record names the recipe.
@@ -106,7 +125,7 @@ if (existsSync(out) && !flag('--force')) {
   say(`already cut at wing-vinci/${folder} (--force cuts it again)`)
 } else {
   if (existsSync(out)) rmSync(out, { recursive: true, force: true })
-  mkdirSync(join(STORE, 'wing-vinci', `paintings/${work}/tiles`), { recursive: true })
+  mkdirSync(join(STORE, 'wing-vinci', shelf), { recursive: true })
   const started = Date.now()
   await cut(out)
   say(`cut wing-vinci/${folder} in ${((Date.now() - started) / 1000).toFixed(1)} s`)
@@ -129,7 +148,7 @@ if (info.width !== width || info.height !== height || info.profile !== 'level0'
 const bytes = files.reduce((sum, file) => sum + statSync(join(out, file)).size, 0)
 
 const record = {
-  id: `vinci/painting-tiles/${name}`,
+  id: `vinci/${family}/${name}`,
   path: folder,
   class: plate.class,
   licence: plate.licence,
@@ -139,8 +158,10 @@ const record = {
   pixels: width * height,
   wing: 'vinci',
   display: true,
-  role: 'painting-tiles',
-  work_id: plate.work_id,
+  role: family,
+  // A leaf is joined to the edition by the page it is, a plate to the work
+  // and the face it is.
+  ...(leaf ? { page: plate.page } : { work_id: plate.work_id }),
   ...(plate.plate_id === undefined ? {} : { plate_id: plate.plate_id }),
   width,
   height,
@@ -153,7 +174,7 @@ const record = {
   tree_sha256: treeHash(out, files),
   recipe,
   recipe_sha256: createHash('sha256').update(recipe).digest('hex'),
-  note: 'A technical re-encoding of the admitted plate: the whole source cut into pieces at its own pixels. '
+  note: `A technical re-encoding of the admitted ${leaf ? 'scan' : 'plate'}: the whole source cut into pieces at its own pixels. `
     + 'IIIF Image API 3, level 0, so every piece is a file on a shelf and nothing answers a request. '
     + 'The folder is named for the first twelve of the source hash, so a new source is a new folder.',
 }
