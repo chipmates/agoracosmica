@@ -196,7 +196,10 @@ export function createDeepPlatePayload(options: {
    * nothing once the visitor has panned off it. */
   function standingOn(): string {
     if (!framed || !viewer || !library) return ''
-    const rect = detailBounds(framed), view = viewer.viewport.getBounds(true)
+    // The bounds the view is HEADING for, not the ones it is passing
+    // through: read mid ease, a frame that has just been asked for is not
+    // yet standing on the detail and the name would be dropped unsaid.
+    const rect = detailBounds(framed), view = viewer.viewport.getBounds()
     const x = rect.x + rect.width / 2, y = rect.y + rect.height / 2
     if (x >= view.x && x <= view.x + view.width && y >= view.y && y <= view.y + view.height) return framed.name
     framed = null
