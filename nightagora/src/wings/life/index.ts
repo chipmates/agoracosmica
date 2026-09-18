@@ -42,8 +42,9 @@ export interface WingLifeOptions {
   floor(): number
   /** the life, read fresh on every open */
   record(): LifeRecord
-  /** walk to the date the floor cuts and open it where it is cut */
-  walk(stud: string): void
+  /** walk to one exhibit of the wing and open it where it stands: a date the
+   * floor cuts, or a work that hangs on a wall */
+  walk(exhibit: string): void
   /** where the hand goes when the sheet closes */
   returnFocus(): void
   /** the wing's own record layer for one date, with the way back to the door */
@@ -419,6 +420,15 @@ export function createWingLife(options: WingLifeOptions): WingLife {
       item.dataset['domain'] = work.domain
       item.append(make('span', 'wing-life-work-date', work.date?.label[language] ?? ''),
         make('span', 'wing-life-work-title', work.title[language]))
+      /* THE PICTURE IS REACHED FROM THE LIFE: the sheet closes and the museum
+         walks to the wall it hangs on, which is where it can be looked at. */
+      if (work.exhibit) {
+        const door = make('button', 'wing-life-work-door', LIFE_WORDS.wall[language])
+        door.type = 'button'
+        const exhibit = work.exhibit
+        door.addEventListener('click', () => press(() => options.walk(exhibit)))
+        item.append(door)
+      }
       list.append(item)
     }
     section.append(list)

@@ -140,6 +140,10 @@
 .wing-life-work-item[data-domain='machine']::before {background:#b59a8e;}
 .wing-life-work-item[data-domain='codex']::before {background:#9ab48f;}
 .wing-life-work-item[data-domain='building']::before {background:#a2a2ac;}
+.wing-life-work-door {flex:0 0 auto;min-height:44px;margin-left:auto;padding:8px 10px;background:transparent;border:1px solid #a9977344;
+  color:#b6bcae;font:11px var(--sans);cursor:pointer;}
+.wing-life-work-door:hover {color:#edcc8c;border-color:#a9977399;}
+.wing-life-work-door:focus-visible {outline:1px solid #edcc8c;outline-offset:-2px;}
 .wing-life-work-count {margin:7px 0 0;font:11px/1.5 var(--sans);color:#a8b3b7;text-wrap:pretty;}
 .wing-life-person {display:flex;flex-wrap:wrap;gap:5px 8px;padding:6px 0;border-bottom:1px solid #a9977318;}
 .wing-life-person-name {flex:0 0 auto;font:13px/1.4 var(--serif);color:#e6d6b8;}

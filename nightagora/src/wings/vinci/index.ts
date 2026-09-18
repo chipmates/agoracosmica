@@ -774,8 +774,12 @@ export function createWing():VinciWingModule {
       const from=work.date_from,to=work.date_to??work.date_from
       const sure:Sure=work.date_certainty==='documented'?'documented':'inferred'
       const mark=work.date_certainty==='documented'?'':work.date_certainty==='disputed'?'?':'~'
+      // A WORK THAT HANGS CAN BE WALKED TO from inside the life: the hang's
+      // own exhibit id, where the room has one, and nothing where it has not.
+      const front=`picture/${work.id}/front`
       return {id:work.id,title:{en:work.title_en,de:work.title_de},domain:'painting',
-        state:work.rights_class==='DG'?'reproduction':'absent',exhibit:null,
+        state:work.rights_class==='DG'?'reproduction':'absent',
+        exhibit:vinciApproachStation(front)?front:null,
         date:from===null||to===null?null:{edtf:from===to?`${from}${mark}`:`${from}${mark}/${to}${mark}`,
           calendar:'Gregorian',earliest:`${from}-01-01`,latest:`${to}-12-31`,
           label:{en:work.date_label_en,de:work.date_label_de},certainty:sure}}
