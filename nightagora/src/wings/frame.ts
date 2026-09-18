@@ -441,6 +441,9 @@ export function createWingFrame(
     disclosure.setAttribute('aria-label', say(WING_TEXT.door))
     note.textContent = disclosureText.textContent = say(WING_TEXT.doorNote)
     closeDisclosure.textContent = lang() === 'de' ? 'Schließen' : 'Close'
+    // the pace stands in the wing's own sheet, so its four words are the
+    // frame's to repaint as well
+    paintPace()
   }
 
   /** a station's id, or the position it stands at when a wing predates ids */
