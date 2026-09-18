@@ -128,7 +128,6 @@
     },
     "date": {
       "previous": { "en": "Previous", "de": "Zurück" },
-      "which_year": { "en": "Which year?", "de": "Welches Jahr?" },
       "age": { "en": "age {years}", "de": "mit {years} Jahren" },
       "age_about": { "en": "age about {years}", "de": "mit etwa {years} Jahren" },
       "next": { "en": "Next", "de": "Weiter" }
