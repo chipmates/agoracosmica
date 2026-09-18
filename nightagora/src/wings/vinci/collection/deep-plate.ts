@@ -43,8 +43,15 @@ export const isWholePlate = (id: string | null): boolean => Boolean(id?.endsWith
  * measurement and reads the same in both languages, so the centimetres are
  * taken from the label itself rather than kept a second time in code. */
 const RULE: readonly { label: string; cm: number }[] = CARDS.rule_labels
-  .map(words => ({ label: words[lang()], cm: Number.parseFloat(words.en) }))
+  .map(words => ({ label: words[lang()], cm: centimetres(words.en) }))
   .filter(step => Number.isFinite(step.cm) && step.cm > 0)
+
+/** The centimetres a numeral names, in the unit it is written in. Deep in a
+ * small panel one centimetre is wider than a phone, so a numeral may be
+ * written in millimetres and the bar follows it. */
+function centimetres(label: string): number {
+  return /mm/i.test(label) ? Number.parseFloat(label) / 10 : Number.parseFloat(label)
+}
 
 /** THE TWO STEPS, as the card models write them. The wheel, the pinch, the
  * double tap and the keys all reach the ceiling; a hand with none of them
