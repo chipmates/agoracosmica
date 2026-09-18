@@ -27,9 +27,11 @@ export const COLLECTIONS = [
   },
   {
     name: 'doors', file: 'src/wings/vinci/data/doors.json',
+    // The public copy carries the revision's station set, a twentieth question for the west end
+    // and its own wording for it; the sealed original does not. Sixteen of the twenty stations stand.
     originalSHA256: 'c6bcb90a55fa4d3ce3ec00928ab276613233432468f05a1566ca306d81c47647',
-    normalizedSHA256: '0c6bf19eed2fc1749d54bc52b09ecc4aafa0736b1744988962d965ff1a596161',
-    expected: { doors: 19 },
+    normalizedSHA256: '40aefa2f6d559c56ed2e8935cf959d9454e6e6fb4c2805ef3160309a41256e37',
+    expected: { doors: 20 },
   },
   {
     name: 'paintings', file: 'src/wings/vinci/pictures/data/paintings.json',
