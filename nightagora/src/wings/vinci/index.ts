@@ -363,7 +363,6 @@ export function createWing():VinciWingModule {
     // The collection is built after the house has asked the library for its
     // own sets, so the machines' smaller requests never arrive first.
     const collection=createCollection()
-    exhibits=mountCollectionExhibits(collection,stack)
     yield
     // THE TWO SOWINGS ARE THE LONG HALF OF THE BUILD. Their groups stand in
     // the scene from here and are filled a seam at a time, so the order the
@@ -388,13 +387,21 @@ export function createWing():VinciWingModule {
       key.light.castShadow=true;key.light.shadow.autoUpdate=true;key.light.shadow.needsUpdate=true
     }
     water=createWater(scene,stack);scene.add(water)
+    // THE EXHIBITS ARE ASKED FOR IN THE SAME STEP THE RAIL READS THE SCENE
+    // IN. The stands under them are a rail solid and the certificate is
+    // written with them standing, while the bodies themselves arrive on
+    // their own time and are certified from their placement table instead.
+    // While the build was one blocked task no body could land between the
+    // two; dealing it into frames opened twenty frames in which one did, and
+    // the rail then found the parachute twice.
+    exhibits=mountCollectionExhibits(collection,stack)
+    void exhibits.ready.then(()=>{if(!hosts||!standing)return;if(!warm)standShadowCache();if(mode===2)paintDock()})
     // The cache proves the scene's casters are the ones it snapshotted, so it
     // is taken at the end of the warm up with every static caster standing,
     // and not on the first leg. The court's exhibit brings its own materials
     // from the library a moment later, so the snapshot is taken again once
     // they have arrived; without it the whole shadow map is re-rendered on
     // every frame of the walk.
-    void exhibits?.ready.then(()=>{if(!hosts||!standing)return;if(!warm)standShadowCache();if(mode===2)paintDock()})
     for(const root of scene.children){const id=root===shell?'vinci/shell':root.name==='vinci/shell-shadow'?'vinci/shell-shadow':root.name==='wing-vinci/gate-passage'?'vinci/gate-passage':root===water?'vinci/water':root===sky?'vinci/sky':root.name.includes('landscape trees')?'vinci/vegetation':root.name==='vinci/collection-modern-insertion'?'vinci/collection':root.name==='vinci generated road dressing'?'vinci/road-dressing':root.name==='vinci generated inner court dressing'?'vinci/inner-court':root.name.includes('dressing')?'vinci/ground-dressing':'vinci/terrain';root.traverse(o=>{if(o instanceof Mesh){const assetId=typeof o.userData['manifestId']==='string'?o.userData['manifestId']:id;o.userData['manifestId']=assetId;o.userData['asset']=assetId}})}
     // The ids above are what the shadow body folds by, so it is welded
     // after them and before the rail reads the scene.
