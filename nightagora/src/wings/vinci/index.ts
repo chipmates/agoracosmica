@@ -394,7 +394,7 @@ export function createWing():VinciWingModule {
     // plates do: the row of a station that stands over them is empty until
     // the ground it names has arrived.
     void exhibits?.ready.then(()=>{if(hosts&&standing)refreshExhibits()})
-    welcome=createVinciWelcome(h.labels,route=>{if(route==='collection')enterCollection();focusTheBar()})
+    welcome=createVinciWelcome(h.labels,route=>{if(route==='life'){openLife();return}if(route==='collection')enterCollection();focusTheBar()})
     controller=new AbortController();const options={signal:controller.signal}
     const wheelStep=createWheelStepper(()=>performance.now())
     // A notch asks for the next station AND walks a stride along the leg that

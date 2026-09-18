@@ -16,6 +16,7 @@
      certainty word, so this file holds a sheet and no claims. */
 
 import { lang } from '../content'
+import { LIFE_WORDS } from '../life/words'
 import { vinciCertaintyWords, vinciThroughLine, vinciWelcomeBlocks, vinciWelcomeText, type VinciText } from './content'
 
 const FLAG = 'vinci-welcome'
@@ -45,7 +46,7 @@ export interface VinciWelcome {
 
 export function createVinciWelcome(
   host: HTMLElement,
-  onEnter: (route: 'house' | 'collection') => void
+  onEnter: (route: 'house' | 'collection' | 'life') => void
 ): VinciWelcome {
   const text = (value: VinciText): string => value[lang()]
   const document_ = host.ownerDocument
@@ -66,7 +67,7 @@ export function createVinciWelcome(
   const foot = make('div', 'vinci-welcome-foot')
   dialog.append(sheet, foot)
   let live = true
-  let route: 'house' | 'collection' = 'house'
+  let route: 'house' | 'collection' | 'life' = 'house'
 
   function paint(): void {
     sheet.textContent = ''
@@ -106,6 +107,14 @@ export function createVinciWelcome(
     collection.addEventListener('click', () => { route = 'collection'; dialog.close() })
     controls.append(enter, collection)
     foot.append(controls)
+    /* THE THIRD DOOR IS NOT A THIRD WAY IN. The two controls above choose
+       where the visitor arrives; this one opens the years over the house they
+       arrive in, so it stands under them and carries less weight. */
+    const life = make('button', 'wing-life-door', text(LIFE_WORDS.life))
+    life.type = 'button'
+    life.setAttribute('aria-controls', 'wing-life')
+    life.addEventListener('click', () => { route = 'life'; dialog.close() })
+    foot.append(life)
   }
 
   // Escape enters: the panel is a welcome and not a question, so cancelling
