@@ -22,6 +22,7 @@ import { collectionExhibitMaterials, collectionInteriorMaterial, collectionProce
 import { COURT, FLOOR, GRAVE_ORIGIN, LINE_ORIGIN } from './layout'
 import { createCollectionStandSolids, standLevel, STANDS, type StandGround } from './stands'
 import { mountCollectionPlates, type CollectionPictureSource } from './plates'
+import { VINCI_READING_TABLE } from './approaches'
 import type { BodySheetSource } from './body-wall'
 
 /** Which ground each machine is built with. Every ground is built at entry,
@@ -143,7 +144,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   host.add(line)
   const graveNear = new Vector3(-42, FLOOR, 46)
   /** Where the reading table stands, for the distance it is drawn at. */
-  const TABLE_AT = new Vector3(-37.72, FLOOR + .755, 45.4)
+  const TABLE_AT = new Vector3(VINCI_READING_TABLE.east, VINCI_READING_TABLE.top, -VINCI_READING_TABLE.north)
   const rooms = host.getObjectByName('vinci/collection-rooms')
   // The bench's phone restaging moves the diagram frame in front of the
   // deathbed painting hung on this backdrop, so the wing keeps the one
@@ -227,15 +228,16 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       // The table brings a back wall of its own, because its bench had none.
       // It stands against the gallery's west wall, so that wall is the one it
       // brings: the reader faces it with the window elevation behind them.
-      // Keep the bench's south edge and shorten only the north end. At the
-      // mounted bearing the 3.25 m panel ends at north -44.35, 150 mm short
-      // of the hall door's south reveal at -44.2.
+      // Keep the bench's south edge and shorten only the north end. The
+      // 3.25 m panel is what the table brought; with the table 0.8 m south of
+      // the reveal it used to end at, the panel ends at north -45.15 and the
+      // book has 1.85 m of wall between it and the hall door's opening.
       const backWall = built.object.getObjectByName('reading-room-wall')
       if (!(backWall instanceof Mesh)) throw new Error('The reading table has no back wall')
       backWall.scale.x = 3.25 / 4.4
       backWall.position.x = -.575
       built.object.rotation.y = Math.PI / 2
-      built.object.position.set(-37.72, FLOOR + .755, 45.4)
+      built.object.position.set(VINCI_READING_TABLE.east, VINCI_READING_TABLE.top, -VINCI_READING_TABLE.north)
       stamp(built.object, 'vinci/table-furniture')
       host.add(built.object)
       reading = built
@@ -263,10 +265,10 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
     // The reading lamp on the table is emissive geometry: it shows that it
     // is lit, it does not light the book. The room's own fitting over the
     // table does that, because the object under it is not this module's to shade.
-    ['reading-lamp', -37.55, -45.3, FLOOR + 1.34, 5.2, 5.4, '#ffcf92'],
+    ['reading-lamp', VINCI_READING_TABLE.east + .17, VINCI_READING_TABLE.north + .1, FLOOR + 1.34, 5.2, 5.4, '#ffcf92'],
     // THE GALLERY HAS ITS OWN FITTINGS TOO, or the alcove and the wall of
     // sheets stand a stop and a half under the rest of the insertion.
-    ...[[-35.6, -46.2, 13], [-32.4, -50.6, 12], [-31.6, -58.4, 13]]
+    ...[[-35.6, -47, 13], [-32.4, -50.6, 12], [-31.6, -58.4, 13]]
       .map(([east, north, reach]) => ['gallery-fitting', east!, north!, FLOOR + 3.9, 7.4, reach!, '#f4e6cc'] as [string, number, number, number, number, number, string]),
   ]
   // None casts a shadow: the one shadowing light in this scene is the measured sun.

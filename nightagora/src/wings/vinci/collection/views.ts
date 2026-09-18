@@ -95,8 +95,10 @@ export function collectionView(id: string, narrow: boolean): RoomPose | undefine
     case 'collection-room-gallery':
       // The gallery's existing survey view remains at its south end.
       return pose(-30.2, -60.4, EYE, -30.4, -46, FLOOR + .25, narrow ? 76 : 60, -.55)
+    // The table 0.8 m south of the hall door's reveal, and the eye nearer and
+    // lower over it: two metres out, the book large, the panel behind it whole.
     case 'collection-room-reading':
-      return pose(-34.6, -46.3, EYE - .08, -37.7, -45.35, FLOOR + 1.28, narrow ? 76 : 60, .3)
+      return pose(-36, -47.2, FLOOR + 1.45, -37.72, -46.2, FLOOR + .9, narrow ? 76 : 60, .3)
     // The eye stands a stride further down the gallery than the hang's own
     // axis asks, because from the nearer place the hall's south-east door
     // opens at the frame's left edge and a slice of the corrections wall's

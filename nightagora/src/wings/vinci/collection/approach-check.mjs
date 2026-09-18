@@ -281,10 +281,14 @@ for (const stud of floor.collectionLineStuds) assert.ok(records.some(record => r
 // The plaque's stone and the reading table, read off the modules that stand them.
 const plaque = /COURT_PLAQUE_STAND = \{ east: (-?[\d.]+), north: (-?[\d.]+)/.exec(source('src/wings/vinci/collection/court-plaque.ts'))
 assert.ok(plaque && +plaque[1] === VINCI_PLAQUE_AT.east && +plaque[2] === VINCI_PLAQUE_AT.north, 'the plaque stands where its pose looks')
-const table = /built\.object\.position\.set\((-?[\d.]+), FLOOR \+ (\.\d+), (-?[\d.]+)\)/.exec(source('src/wings/vinci/collection/exhibits.ts'))
-const { FLOOR } = load('src/wings/vinci/collection/layout.ts')
-assert.ok(table && +table[1] === VINCI_READING_TABLE.east && -table[3] === VINCI_READING_TABLE.north
-  && Math.abs(FLOOR + +table[2] - VINCI_READING_TABLE.top) < 1e-9, 'the book lies where its pose looks')
+// The table's place is ONE constant now, imported by the module that stands
+// it from the module that composes the eye, so there are no two literals left
+// to disagree. What is checked is that the import is the one that is used.
+const exhibitsSource = source('src/wings/vinci/collection/exhibits.ts')
+assert.ok(/import \{ VINCI_READING_TABLE \} from '\.\/approaches'/.test(exhibitsSource),
+  'the table does not read its place from the module that composes its eye')
+assert.ok(exhibitsSource.includes('built.object.position.set(VINCI_READING_TABLE.east, VINCI_READING_TABLE.top, -VINCI_READING_TABLE.north)'),
+  'the book lies where its pose looks')
 const grave = source('src/wings/vinci/collection/exhibits.ts')
 assert.ok(grave.includes('grave.group.rotation.y = Math.PI / 2')
   && grave.includes('grave.group.position.set(GRAVE_ORIGIN.east, COURT.level + .035, -GRAVE_ORIGIN.north)'),

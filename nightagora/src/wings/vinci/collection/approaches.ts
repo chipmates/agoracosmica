@@ -256,8 +256,10 @@ function machinePose(slug: keyof typeof MACHINE_EYES, narrow: boolean): Approach
 
 /** The one station the gallery's cut line is read and walked from. */
 const LINE_STATION: VinciStationId = 'line-early'
-/** The book lies open on the table under its lamp, read from the chair side. */
-export const VINCI_READING_TABLE = { east: -37.72, north: -45.4, top: FLOOR + .755 }
+/** The book lies open on the table under its lamp, read from the chair side.
+ * The table stands 0.8 m south of the hall door's reveal it used to end at,
+ * which leaves 1.85 m of wall between the book and that opening. */
+export const VINCI_READING_TABLE = { east: -37.72, north: -46.2, top: FLOOR + .755 }
 const READING_TABLE = VINCI_READING_TABLE
 /** The flight plaque's stone, and the standing distance its lines read at. */
 export const VINCI_PLAQUE_AT = { east: -40.2, north: -25.5 }
@@ -294,8 +296,12 @@ function otherKinds(): Placed[] {
   add('picture/deathbed-painting/front', 'picture', 'grave', narrow =>
     pose([-56.9, -27.9, COURT.level + 1.62], graveWorld(GRAVE_DEATHBED.centreX, GRAVE_DEATHBED.centreY, GRAVE_DEATHBED.faceZ + .098), 44, narrow),
   'deathbed-painting', 'front')
+  // THE EYE COMES OVER THE PAGE. At 0.97 m out and 0.83 m above the leaf the
+  // look was 41 degrees and the page foreshortened to 0.65 of its own height.
+  // Nearer and higher over it, 0.60 m out and 0.71 m up, is 50 degrees and
+  // 0.77, which is the difference between reading a page and seeing one.
   add('codex/paris-B', 'manuscript', 'reading-table', narrow =>
-    pose([READING_TABLE.east + .97, READING_TABLE.north, FLOOR + 1.62], [READING_TABLE.east, READING_TABLE.north, READING_TABLE.top + .031], 44, narrow))
+    pose([READING_TABLE.east + .60, READING_TABLE.north, READING_TABLE.top + .741], [READING_TABLE.east, READING_TABLE.north, READING_TABLE.top + .031], 44, narrow))
   // A DATE IS READ FROM ITS SOUTH, where its numerals stand upright, looking
   // down at the socket from a stride and a half.
   for (const stud of lineCutStuds(LINE_ORIGIN)) {
