@@ -180,14 +180,15 @@ for (const record of hang) {
   raised.push(record.id)
 }
 assert.equal(raised.length, hang.length)
-// THE TWO END STATIONS STAND AT THE ENDS OF THE WALL, a stride off the
-// nearest work, so the room's one full slot is spent on that work while a
-// visitor stands there. It is still one slot, and it is the work at their
-// shoulder. A station in another room raises nothing at all, which is what
-// keeps the budget from being spent from across the building.
+// THE TWO END STATIONS STAND BACK FROM THE WALL, at the room's own mid depth,
+// because a pose a stride off the hang shows a painting to nobody. From back
+// there the nearest work is past the module's own reach, so a station spends
+// NO full slot and the whole budget stands ready for the stop the visitor
+// walks to. A station in another room raises nothing at all either, which is
+// what keeps the budget from being spent from across the building.
 for (const station of ['picture-room', 'picture-room-west']) {
   await tick(stationPose(station, false).eye)
-  assert.equal(fullCount(), 1, `the ${station} eye raised ${fullCount()} full plates`)
+  assert.equal(fullCount(), 0, `the ${station} eye raised ${fullCount()} full plates`)
 }
 await tick(stationPose('body', false).eye)
 assert.equal(fullCount(), 0, 'a station in another room holds a full plate')
