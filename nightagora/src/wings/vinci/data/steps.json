@@ -317,6 +317,22 @@
         "de": "Sie schließen sich, und das Verhältnis zwei zu eins hält den ganzen Weg.",
         "certainty": "reconstructed"
       }
+    ],
+    "camera-obscura": [
+      {
+        "at": 0,
+        "part": "aperture-plate",
+        "en": "A small round hole in a thin iron plate, a dark room, a sheet of white paper.",
+        "de": "Ein kleines rundes Loch in einer dünnen Eisenplatte, ein dunkler Raum, ein Blatt weißes Papier.",
+        "certainty": "reconstructed"
+      },
+      {
+        "at": 0.5,
+        "part": "screen",
+        "en": "What arrives on the paper stands upside down.",
+        "de": "Was auf dem Papier ankommt, steht auf dem Kopf.",
+        "certainty": "reconstructed"
+      }
     ]
   }
 }

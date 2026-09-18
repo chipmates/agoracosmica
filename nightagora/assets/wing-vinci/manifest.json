@@ -927,7 +927,7 @@
         },
         {
           "path": "src/wings/vinci/machines/data/camera-obscura.json",
-          "sha256": "cc94ae5187c1a98fb282fdcc92aa147f3f7ad9ff7ec033315c3a116552eac6aa"
+          "sha256": "9234afcd418f470d785b9950f2ca774354bd186222f75e6b990df6e02f0f40fe"
         },
         {
           "path": "src/wings/vinci/machines/data/records.json",
@@ -956,7 +956,7 @@
       ],
       "dossier": {
         "path": "brief/dossiers/camera-obscura.json",
-        "sha256": "cc94ae5187c1a98fb282fdcc92aa147f3f7ad9ff7ec033315c3a116552eac6aa"
+        "sha256": "9234afcd418f470d785b9950f2ca774354bd186222f75e6b990df6e02f0f40fe"
       },
       "explanation_page": {
         "path": "brief/pages/camera-obscura.md",

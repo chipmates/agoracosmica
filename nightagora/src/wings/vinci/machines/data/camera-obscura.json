@@ -1664,10 +1664,18 @@
     "source": "geometry"
   },
   "motion": {
-    "period_s": null,
-    "loop": false,
-    "phases": [],
-    "visitor_12s": "A quiet static chamber. The optically projected image remains still. Any cutaway visibility is a presentation mode and must not be represented as a light-leaking working chamber."
+    "period_s": 12,
+    "loop": true,
+    "phases": [
+      {
+        "name": "source crossing",
+        "start_s": 0,
+        "duration_s": 12,
+        "joint_values": {},
+        "interpolation": "sinusoidal"
+      }
+    ],
+    "visitor_12s": "The chamber itself is still and has no joint to move. What crosses in twelve seconds is the lit source outside the aperture, and with it the projected image on the paper, the opposite way. Any cutaway visibility is a presentation mode and must not be represented as a light-leaking working chamber."
   },
   "animation_notes": [
     "No bounce or decorative motion.",
@@ -1675,6 +1683,7 @@
     "Use straight ray projection through the aperture, not a lens.",
     "For a virtual source plane3 m before the aperture, map source coordinates (x,y) relative to aperture centre to screen coordinates(-x/6,-y/6). This is an optical rendering rule, not moving geometry.",
     "If a wall is hidden to show the interior, explain that the physical experiment requires darkness.",
+    "The lit source and its projected image are modern demonstration furniture outside the dossier parts. They carry no certainty claim about Leonardo's own apparatus and must not be added to the parts list or to the certified footprint.",
     "No photographic film, permanent recording, double inversion inside an anatomical eye, or powered projector."
   ],
   "label_en": "A modern chamber illustrates the experiment in Manuscript D 8r. Leonardo da Vinci described an inverted image on paper.",
