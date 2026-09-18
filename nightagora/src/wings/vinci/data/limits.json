@@ -466,8 +466,8 @@
         "source": "machines/data/camera-obscura.json, gaps; machines/data/records.json, camera-obscura, the build section"
       },
       "visual_note": {
-        "en": "He describes a darkened room, not this small box, whose size, hole and distance to the paper are the museum's.",
-        "de": "Er beschreibt einen verdunkelten Raum, nicht diesen kleinen Kasten, dessen Größe, Loch und Abstand zum Papier vom Museum stammen.",
+        "en": "He describes a darkened room, not this small box, and the candle outside it and its image on the paper are the museum's own demonstration.",
+        "de": "Er beschreibt einen verdunkelten Raum, nicht diesen kleinen Kasten, und die Kerze davor und ihr Bild auf dem Papier sind die Vorführung des Museums.",
         "source": "machines/data/camera-obscura.json, scope and research sheet_vs_reconstruction"
       }
     }
