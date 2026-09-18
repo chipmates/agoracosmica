@@ -130,13 +130,18 @@ const TENS: Record<'en' | 'de', readonly string[]> = {
   de: ['', '', 'zwanzig', 'dreißig', 'vierzig', 'fünfzig', 'sechzig', 'siebzig', 'achtzig', 'neunzig'],
 }
 
-/** A count as a person says it. Above ninety nine the numeral is what a person
- * says, so the numeral is what comes back. */
+/** A COUNT AS A PERSON SAYS IT, from two upward. Above ninety nine the numeral
+ * is what a person says, so the numeral is what comes back.
+ *
+ * ONE AND NONE NEVER PASS THROUGH HERE. German inflects both with the gender
+ * of the noun they count (ein Datum, eine Zeichnung, kein Bild), which this
+ * module cannot know, so every counted sentence carries its own singular and
+ * its own none, the way a period's date count carries `oneDate` and `noDate`
+ * and the works line carries `one` and `none`. A caller that asks anyway gets
+ * a numeral, which is visibly wrong in prose rather than quietly ungrammatical,
+ * and a wing whose own counted clause can stand at one owes it a singular. */
 export function spokenCount(value: number, language: 'en' | 'de'): string {
-  // None is not a word here: a sentence that would count nothing is not
-  // printed at all, and a caller that asks anyway gets a numeral, never a
-  // hole in its own sentence.
-  if (!Number.isInteger(value) || value < 1 || value > 99) return String(value)
+  if (!Number.isInteger(value) || value < 2 || value > 99) return String(value)
   if (value < 20) return ONES[language][value] ?? String(value)
   const ten = TENS[language][Math.floor(value / 10)] ?? '', one = ONES[language][value % 10] ?? ''
   if (!one) return ten
