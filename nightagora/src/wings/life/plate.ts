@@ -222,7 +222,11 @@ export function drawLifePlate(options: {
       add('line', { class: 'wing-life-standing-stem', x1: place, y1: top - 2, x2: place, y2: top + 2 }, ring)
     }
   }
-  const marker = add('line', { class: 'wing-life-marker', x1: 0, y1: top, x2: 0, y2: ticksTop + PLATE.ticks.floor })
+  /* The marker crosses a lit segment and the dark ground alike, so it is two
+     lines: a dark one the width of the gold, and the gold inside it. */
+  const marker = add('g', { class: 'wing-life-marker' })
+  for (const cls of ['wing-life-marker-back', 'wing-life-marker-core'])
+    add('line', { class: cls, x1: 0, y1: top, x2: 0, y2: ticksTop + PLATE.ticks.floor }, marker)
   const markerAt = options.at ? at.get(options.at) : undefined
   if (markerAt === undefined) marker.setAttribute('opacity', '0')
   else marker.setAttribute('transform', `translate(${markerAt.toFixed(1)},0)`)

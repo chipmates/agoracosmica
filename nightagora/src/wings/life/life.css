@@ -59,8 +59,9 @@
 /* The hour the visitor is standing in, and the date being read. */
 .wing-life-standing-ring {fill:none;stroke:#fff5e3;stroke-width:1.5;opacity:.92;}
 .wing-life-standing-stem {stroke:#fff5e3;stroke-width:1.5;opacity:.92;}
-.wing-life-marker {stroke:#edcc8c;stroke-width:2;
-  transition:transform 240ms cubic-bezier(.25,.1,.25,1),opacity 160ms linear;}
+.wing-life-marker {transition:transform 240ms cubic-bezier(.25,.1,.25,1),opacity 160ms linear;}
+.wing-life-marker-back {stroke:#101d27;stroke-width:4.5;}
+.wing-life-marker-core {stroke:#edcc8c;stroke-width:1.8;}
 .wing-life-after {fill:#a99773;opacity:.3;}
 .wing-life-after-word {fill:#a8b3b7;font:9px var(--sans);letter-spacing:.14em;text-transform:uppercase;}
 .wing-life-after-year {fill:#cfc6b499;font:9px var(--sans);letter-spacing:.04em;}
