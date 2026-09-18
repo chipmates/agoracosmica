@@ -80,6 +80,12 @@ export interface WingHosts {
   /** move along the rail from inside the wing, so a wheel or a swipe over
       the stage and a click on the rail arrive at the same station */
   navigate: (index: number) => void
+  /** WHERE THE BAR'S WORDS STAND ON A NARROW STAGE. A phone bar keeps one
+      line, so the words a wing appends to the bar, and the question and the
+      door under it, move into a foot the wing offers inside its own sheet.
+      Null gives all of them back to the frame, which is where they stand on
+      a wide stage and in a wing that offers no foot. */
+  barFoot: (host: HTMLElement | null) => void
 }
 
 export interface WingStation {
@@ -263,6 +269,46 @@ export function createWingFrame(
   const RAIL_SHARE = 1 / 3
   /** what the bar keeps clear of the door block under it */
   const BAR_CLEAR = 8
+  /* THE PHONE KEEPS ONE BAR LINE. A 390 px bar that carries the way home,
+     the rail and three words spends two lines on chrome and leaves the room
+     half the screen. So on a narrow stage the words a wing appended, and the
+     question and door block beneath them, stand in the foot the wing offers
+     inside its own sheet, and the bar is the way home and the rail. The
+     decision is the frame's: a wing never places the frame's own chrome. */
+  const words: HTMLElement[] = []
+  const wordRow = el('div', 'wing-bar-words')
+  let footHost: HTMLElement | null = null
+  const narrowStage = () => innerWidth / innerHeight <= 0.9
+  /** every child a wing appended to the bar, in the order it appended them */
+  function trackWords(): void {
+    for (const child of railGroup.children) {
+      const node = child as HTMLElement
+      if (node === lobby || node === rail || node === wordRow || words.includes(node)) continue
+      words.push(node)
+    }
+  }
+  function placeChrome(): void {
+    const away = footHost !== null && narrowStage()
+    const home = away ? wordRow : railGroup
+    for (const word of words) if (word.parentElement !== home) home.append(word)
+    if (away) {
+      if (doorBlock.parentElement !== footHost) footHost!.append(doorBlock)
+      if (wordRow.parentElement !== footHost) footHost!.append(wordRow)
+    } else {
+      // back to its own place in the frame, which is under the bar and
+      // before the disclosure the door opens
+      if (doorBlock.parentElement !== host) railGroup.after(doorBlock)
+      wordRow.remove()
+    }
+  }
+  /** The words belong to the wing that made them, so they die with it and
+      the frame's own blocks come home before the wing's layer is struck. */
+  function releaseWords(): void {
+    footHost = null
+    words.length = 0
+    wordRow.textContent = ''
+    placeChrome()
+  }
   function fitTheBar(): void {
     /* Measured with nothing wrapped. A group that has already wrapped is
        narrower and taller than its own ceiling, and deciding from that would
@@ -302,8 +348,8 @@ export function createWingFrame(
     const drop = Math.max(0, Math.min(grew, Math.floor(slack - BAR_CLEAR)))
     if (drop > 0) railGroup.style.bottom = `calc(${BAR_BOTTOM} - ${drop}px)`
   }
-  new MutationObserver(() => fitTheBar()).observe(railGroup, { childList: true })
-  addEventListener('resize', () => fitTheBar())
+  new MutationObserver(() => { trackWords(); placeChrome(); fitTheBar() }).observe(railGroup, { childList: true })
+  addEventListener('resize', () => { placeChrome(); fitTheBar() })
 
   const question = el('p', 'wing-question')
   const door = el('a', 'wing-door', say(WING_TEXT.door))
@@ -394,12 +440,20 @@ export function createWingFrame(
     }
   }
 
+  /** A wing offers the foot its own sheet keeps, or takes it back. */
+  function barFoot(next: HTMLElement | null): void {
+    if (footHost === next) { placeChrome(); return }
+    footHost = next
+    placeChrome()
+    fitTheBar()
+  }
+
   function goto(n: number): void {
     if (!wing || !entry) return
     const count = wing.stations.length
     index = Math.min(Math.max(n, 0), Math.max(0, count - 1))
     const station = wing.stations[index]
-    wing.show(index, { labels, stage, world, navigate: goto })
+    wing.show(index, { labels, stage, world, navigate: goto, barFoot })
     question.textContent = station?.question ?? ''
     door.href = doorUrl(entry)
     paintNavigation()
@@ -430,7 +484,7 @@ export function createWingFrame(
          room next door. The module that is standing is kept and the fresh
          one is dropped, so a wing may allocate only in `show`. */
       const reuse = entry?.slug === nextEntry.slug && wing !== null
-      if (!reuse) wing?.stop()
+      if (!reuse) { releaseWords(); wing?.stop() }
       if (!reuse) { disclosure.close(); disclosureSeen = false }
       entry = nextEntry
       if (!reuse) wing = nextWing
@@ -452,6 +506,7 @@ export function createWingFrame(
     ready: (report) => wing?.ready?.(report) ?? Promise.resolve(),
     close() {
       disclosure.close()
+      releaseWords()
       wing?.stop()
       wing = null
       entry = null

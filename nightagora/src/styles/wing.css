@@ -189,6 +189,32 @@
   .wing-note { font-size: 9px; letter-spacing: 0.12em; }
 }
 
+/* THE BAR'S WORDS IN A WING'S OWN FOOT. On a narrow stage the frame hands
+   the words a wing appended to the bar, and the question and the door under
+   them, to the foot of the wing's sheet: one row of even cells a thumb can
+   hit, and a bar of one line above the room. */
+.wing-bar-words { display: flex; align-items: stretch; }
+#wing .wing-bar-words > * {
+  position: static;
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 44px;
+  margin: 0;
+  padding: 8px 4px;
+  background: none;
+  border: 0;
+  border-left: 1px solid color-mix(in srgb, var(--rule) 70%, transparent);
+  border-radius: 0;
+  white-space: nowrap;
+}
+#wing .wing-bar-words > :first-child { border-left: 0; }
+#wing .wing-sheet-foot .wing-doorblock {
+  position: static;
+  inset: auto;
+  padding: 0;
+  background: none;
+}
+
 body.forge .wing-step::after,
 body.forge .wing-door,
 body.forge .wing-lobby { transition: none !important; }
