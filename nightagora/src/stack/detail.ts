@@ -120,6 +120,149 @@ export function resolved(metres: number | N, footprint: N): N {
   return smoothstep(2, 4, (typeof metres === 'number' ? float(metres) : metres).div(footprint))
 }
 
+/* ── THE COURSES ────────────────────────────────────────────────────────────
+   A laid surface is the one case where the mid scale is not noise but a
+   construction: a hand-set wall keeps its bed joints level and lets
+   everything else wander, and a sawn floor is the same field with the wander
+   taken out. The whole of it is colour and relief, no geometry and no bitmap,
+   and every joint is filtered on ITS OWN axis, which is what keeps a run of
+   them from breaking into dashes where the surface leaves the eye.
+
+   The recipe is the caller's, in metres. The mechanism is the stack's, so a
+   room's floor, a plinth and a court's paving are one piece of code and not
+   three. */
+
+export interface CourseRecipe {
+  /** mean bed-joint spacing, metres */
+  courseM: number
+  /** the metres over which course height swings, and by how much */
+  courseWaveM: number
+  courseSwing: number
+  /** mean block length and the fraction it varies by, per course */
+  blockM: number
+  blockSwing: number
+  /** joint width and how far a joint line wanders off straight, metres */
+  jointM: number
+  wanderM: number
+  /** how far a course's own face tone departs from the wall's */
+  faceSwing: number
+  /** and how far ONE BLOCK's departs from its course's. A sawn floor wants
+      stone to stone variation with no course drift under it, a coursed wall
+      wants both; the wall's own figure is the default. */
+  blockFaceSwing?: number
+  seed: number
+}
+
+export interface CourseNodes {
+  /** multiply into the albedo: the face tone with the arris under it */
+  tone: N
+  /** 1 inside a joint, 0 on the face */
+  joint: N
+  /** how deep that joint is cut, in metres */
+  depthM: N
+  /** one number per stone, so a face can be dressed as its own stone */
+  cell: N
+  /** whether the courses are resolved at this pixel at all */
+  held: N
+}
+
+const hash = (a: N, b: N, salt: number): N =>
+  fract(a.mul(31.17).add(b.mul(13.713)).add(salt).sin().mul(4317.1))
+
+/**
+ * Face tone, joint coverage and the joint's own depth, in metres, read in a
+ * surface coordinate `U` that is measured in METRES of the face itself.
+ * `pixel` overrides both axis footprints with one figure, which is what a
+ * caller with its own measured footprint hands in.
+ */
+export function courses(
+  U: N,
+  recipe: CourseRecipe,
+  opts: { pixel?: N } = {}
+): CourseNodes {
+  const r = recipe
+  const wave = float((Math.PI * 2) / r.courseWaveM)
+  // A monotone phase whose slope carries the course-height swing; dividing
+  // by that slope returns the distance to a bed joint in real metres.
+  const phase = U.y.div(r.courseM).add(sin(U.y.mul(wave)).mul(r.courseSwing))
+  const slope = float(1 / r.courseM).add(cos(U.y.mul(wave)).mul(r.courseSwing).mul(wave)).max(0.2)
+  const row = floor(phase)
+  const bedM = fract(phase).sub(0.5).abs().sub(0.5).abs().div(slope)
+  const length_ = float(r.blockM).mul(hash(row, float(0), r.seed).sub(0.5).mul(r.blockSwing).add(1))
+  const head = U.x.div(length_).add(hash(row, float(1), r.seed + 5.1))
+  const headM = fract(head).sub(0.5).abs().sub(0.5).abs().mul(length_)
+  // A bed joint is a line in U.y and a head joint a line in U.x, so each is
+  // filtered on its own axis. One shared pixel is what made the courses break
+  // into a stipple where the wall runs away from the eye.
+  const dx = U.dFdx(),
+    dy = U.dFdy()
+  const acrossCourses = opts.pixel ?? vec2(dx.y, dy.y).length().max(0.00002)
+  const alongCourses = opts.pixel ?? vec2(dx.x, dy.x).length().max(0.00002)
+  // The joint's own wander is noise: it may only be added where its own
+  // wavelength is resolved, or it jitters the line by a pixel per pixel.
+  const wanderHeld = smoothstep(2, 5, float(0.137).div(alongCourses.max(acrossCourses)))
+  const wander = mx_noise_float(vec2(U.x.mul(7.3), U.y.mul(11.7))).mul(r.wanderM).mul(wanderHeld)
+  const bedHeld = smoothstep(1.3, 2.8, float(r.courseM).div(acrossCourses))
+  const headHeld = smoothstep(1.3, 2.8, length_.div(alongCourses))
+  // A joint narrower than the pixel fades back into the wall, never into a
+  // half-covered grey across the whole face.
+  const line = (distance: N, pixel: N, held: N): N =>
+    float(1)
+      .sub(
+        smoothstep(
+          float(r.jointM * 0.5).sub(pixel).max(0),
+          float(r.jointM * 0.5).add(pixel),
+          distance
+        )
+      )
+      .mul(held)
+  const joint = line(bedM.add(wander).max(0), acrossCourses, bedHeld).max(
+    line(headM.add(wander).max(0), alongCourses, headHeld)
+  )
+  const column = floor(head)
+  // Where the heads compress under a pixel the block tone would alias, so the
+  // surface keeps the coarser thing a raking eye actually sees: course to
+  // course drift rather than stone to stone.
+  const blockTone = hash(row, column, r.seed + 11.3)
+    .sub(0.5)
+    .mul(2 * (r.blockFaceSwing ?? r.faceSwing))
+  const courseTone = hash(row, float(2), r.seed + 3.9)
+    .sub(0.5)
+    .mul(1.2 * r.faceSwing)
+  const face = mix(courseTone.mul(bedHeld), blockTone, headHeld)
+  // The arris of a hand-dressed block is never quite sharp.
+  const arris = smoothstep(r.jointM * 0.5, r.jointM * 2.6, bedM.min(headM).add(wander).max(0))
+  return {
+    tone: float(1).add(face).sub(mix(float(0.035), float(0), arris).mul(bedHeld.max(headHeld))),
+    joint,
+    depthM: joint.mul(-r.jointM * 0.22),
+    cell: hash(row, column, r.seed + 7.7),
+    held: bedHeld.max(headHeld),
+  }
+}
+
+/**
+ * A height field in metres, laid onto a surface as a normal. The gradient is
+ * taken in view space, which is the one frame a hand-written material always
+ * has, and bounded: relief invented at one scale may tilt a surface, never
+ * turn it over.
+ */
+export function reliefNormal(base: N, heightM: N, maxSlope = 0.2): N {
+  const height = heightM.toVar()
+  const sx = positionView.dFdx(),
+    sy = positionView.dFdy()
+  const rx = sy.cross(base),
+    ry = base.cross(sx),
+    det = sx.dot(rx)
+  const gradient = rx
+    .mul(height.dFdx())
+    .add(ry.mul(height.dFdy()))
+    .mul(det.sign())
+    .div(det.abs().max(1e-10))
+    .toVar()
+  return base.sub(gradient.div(length(gradient).div(maxSlope).max(1))).normalize()
+}
+
 /* ── THE GRAIN ──────────────────────────────────────────────────────────────
    One field per soft class, each built from three primitives so that the
    whole set of them costs a handful of noise taps and reads at the size it
