@@ -96,6 +96,7 @@ const { geometryForPart } = await load(path.join(WING, 'machines/geometry.ts'))
 const { jointValuesAt } = await load(path.join(WING, 'machines/motion.ts'))
 const { gradeAt } = await load(path.join(WING, 'terrain-mesh.ts'))
 const { vinciExhibitRecords, vinciApproachPose, vinciApproachFit, vinciApproachPlateMetres } = await load(path.join(WING, 'collection/approaches.ts'))
+const { vinciWallStops, VINCI_PICTURE_WALL, VINCI_WALL_ENDS } = await load(path.join(WING, 'collection/wall.ts'))
 
 /* ---- the mounted geometry, at every tier ---- */
 
@@ -487,6 +488,126 @@ for (const { viewport, seen } of families) {
   }
 }
 
+/* ---- the wall: one certified polyline through every stop ----
+ *
+ * The 25 viewing eyes of the hang, with the two end station eyes as the ends
+ * of the same line. A run from stop i to stop j is the SUB-PATH between those
+ * two vertices, and one proof serves every ordered pair of them, because the
+ * trim `createCertifiedRailPath` requests at an interior vertex depends only
+ * on its two adjoining spans and is therefore identical in every sub-path that
+ * holds it as an interior vertex. The endpoints of a sub-path take no corner,
+ * so every straight part it walks is a sub-segment of a FULL span, and the
+ * spans below are proved end to end untrimmed for exactly that reason.
+ */
+
+/** The arc length of one quadratic, in closed form: the same integral
+ * `rail-smoothing.ts` walks a fillet by, so the shortening recorded here is
+ * the shortening the runtime's own rebuilt curve takes. */
+function quadraticLength(a, control, b) {
+  const v = control.clone().sub(a).multiplyScalar(2)
+  const w = a.clone().add(b).addScaledVector(control, -2).multiplyScalar(2)
+  const wLength = w.length()
+  if (wLength < 1e-12) return v.length()
+  const projection = v.dot(w) / wLength
+  const perpendicularSquared = Math.max(0, v.lengthSq() - projection * projection)
+  const perpendicular = Math.sqrt(perpendicularSquared)
+  const integral = x => perpendicular > 1e-12
+    ? .5 * (x * Math.hypot(x, perpendicular) + perpendicularSquared * Math.asinh(x / perpendicular))
+    : .5 * x * Math.abs(x)
+  return (integral(projection + wLength) - integral(projection)) / wLength
+}
+
+const walls = [], wallReadings = []
+for (const { viewport, seen } of families) {
+  const ends = VINCI_WALL_ENDS.map(id => {
+    const family = seen.find(entry => entry.stations.includes(id))
+    if (!family) throw new Error(`No station pose for the wall end ${id}`)
+    return family
+  })
+  const stops = vinciWallStops()
+  const poses = [ends[0].pose, ...stops.map(stop => {
+    const pose = vinciApproachPose(stop.exhibit, viewport.phone)
+    if (!pose) throw new Error(`${stop.exhibit}: no viewing pose at ${viewport.name}`)
+    return pose
+  }), ends[1].pose]
+  // The widest near rectangle over every vertex of the line, plus the step
+  // rhythm's own envelope: one radius the whole polyline is proved against.
+  const clearance = Math.max(...poses.map(pose =>
+    railNearRectangleRadius(NEAR_M, fittedRailFov(pose.fov, viewport.aspect, viewport.phone), viewport.aspect))) + (NO_GAIT ? 0 : gaitEnvelopeM)
+  const enh = poses.map(pose => [pose.eye.x, -pose.eye.z, pose.eye.y])
+  const points = enh.map(([east, north, height]) => new THREE.Vector3(east, height, -north))
+  const balls = []
+  const path = createCertifiedRailPath(points, {
+    clearanceRadiusM: clearance, maxTrimM: .5, certificateDepth: 6, numericalMarginM: NUMERICAL_MARGIN_M,
+    certifyBall(centre, radius) {
+      if (!ballIsClear(centre, radius)) return false
+      balls.push({ centre: [centre.x, centre.y, centre.z], radiusM: radius + BALL_RESERVE_M })
+      return true
+    },
+  })
+  const accepted = new Map()
+  for (const ball of balls) accepted.set(ball.centre.join(','), ball)
+  const trims = new Map(path.corners.filter(corner => corner.result === 'certified').map(corner => [corner.index, corner.acceptedTrimM]))
+  const kept = []
+  // The shortening each accepted corner takes out of the chord, so a sub-path
+  // between two vertices carries its own exact certified length and a rebuilt
+  // one that is shorter than the proof is refused at the runtime.
+  const chordM = [0], shortenM = [0]
+  for (let i = 1; i < points.length; i++) chordM.push(chordM[i - 1] + points[i - 1].distanceTo(points[i]))
+  for (let i = 1; i < points.length - 1; i++) {
+    const trim = trims.get(i)
+    if (trim === undefined) { shortenM.push(shortenM[i - 1]); continue }
+    const vertex = points[i]
+    const incoming = vertex.clone().sub(points[i - 1]).normalize(), outgoing = points[i + 1].clone().sub(vertex).normalize()
+    const a = vertex.clone().addScaledVector(incoming, -trim), b = vertex.clone().addScaledVector(outgoing, trim)
+    collect(a, vertex.clone(), b, 6)
+    // the quadratic's own arc length against the two trims it replaces
+    shortenM.push(shortenM[i - 1] + (2 * trim - quadraticLength(a, vertex, b)))
+    function collect(x, control, z, remaining) {
+      const centre = x.clone().add(control).add(z).multiplyScalar(1 / 3)
+      const ball = accepted.get([centre.x, centre.y, centre.z].join(','))
+      if (ball) { kept.push(ball); return }
+      if (remaining === 0) throw new Error('A certified wall corner has no recorded ball')
+      const left = x.clone().lerp(control, .5), right = control.clone().lerp(z, .5), middle = left.clone().lerp(right, .5)
+      collect(x, left, middle, remaining - 1); collect(middle, right, z, remaining - 1)
+    }
+  }
+  shortenM.push(shortenM[points.length - 2])
+  // EVERY SPAN WHOLE, END TO END. A run's own ends are untrimmed vertices, so
+  // the trimmed spans a route is proved with would leave the two stubs at the
+  // ends of a run unproved. These cover them and everything between.
+  let worst = Infinity, worstMesh = null, worstSpan = -1
+  for (let i = 1; i < points.length; i++) {
+    const reading = segmentClearance(points[i - 1], points[i], Math.min(worst, clearance))
+    if (reading.distance < worst) { worst = reading.distance; worstMesh = reading.mesh; worstSpan = i }
+  }
+  // The near ball of every vertex, which is where a visitor stands and looks.
+  let worstBall = Infinity, worstBallAt = -1, worstBallMesh = null
+  for (const [i, pose] of poses.entries()) {
+    const radius = railNearRectangleRadius(NEAR_M, fittedRailFov(pose.fov, viewport.aspect, viewport.phone), viewport.aspect)
+    const probe = ballClearance(pose.eye, radius + .05)
+    if (probe.distance - radius < worstBall) { worstBall = probe.distance - radius; worstBallAt = i; worstBallMesh = probe.mesh }
+  }
+  const legs = []
+  for (let i = 1; i < points.length; i++) legs.push(chordM[i] - chordM[i - 1])
+  wallReadings.push({
+    viewport: viewport.name, id: VINCI_PICTURE_WALL, vertices: points.length, spans: points.length - 1,
+    lengthM: +path.length.toFixed(4), requiredM: +clearance.toFixed(4),
+    spanClearanceM: +(worst === Infinity ? clearance : worst).toFixed(4), spanMesh: worstMesh, worstSpan,
+    shortestLegM: +Math.min(...legs).toFixed(4), longestLegM: +Math.max(...legs).toFixed(4),
+    worstNearBallMarginM: +worstBall.toFixed(4), worstNearBallVertex: worstBallAt, worstNearBallMesh: worstBallMesh,
+    corners: path.corners.filter(corner => corner.result === 'certified').length,
+    uncertifiedCorners: path.corners.filter(corner => corner.result === 'uncertified').length,
+    clear: worst > clearance - 1e-9 || worst === Infinity,
+  })
+  walls.push({
+    viewport: viewport.name, id: VINCI_PICTURE_WALL, ends: [...VINCI_WALL_ENDS],
+    stops: stops.map(stop => stop.exhibit),
+    points: enh, roundedLength: path.length, maxNearRadius: clearance, certifiedBalls: kept,
+    chordM, shortenM,
+  })
+}
+
 /* ---- the station envelopes ---- */
 
 const stationCones = []
@@ -530,6 +651,7 @@ const certificate = {
     `Every straight span of the finished path is proved end to end by exact segment/triangle distance; every rounded corner is proved by closed balls over its control hull, and those balls are what the runtime replays. Stored balls reserve ${BALL_RESERVE_M * 1e6} µm beyond the requested radius; runtime matching of quantized geometry consumes at most ${GEOMETRY_TOLERANCE_M * 1e6} µm of it.`,
     `The walk carries a step rhythm of at most ${(gaitEnvelopeM * 1000).toFixed(2)} mm off the certified line, and that envelope is added to the clearance radius every span and every corner above is proved against.`,
     'An approach is one straight leg from a station eye to one exhibit\'s viewing eye and back, proved by the same exact segment/triangle distance and the same near rectangle plus gait envelope as a route. It is reachable from that station only, it is not addressable by the station rail, and the table is linear: two entries per exhibit, never the product of poses. The exhibits are the hang\'s plates, the mural, the machines, the grave\'s three, the plaque, the book and the twelve cut dates.',
+    'A wall is one polyline through every stop of a hang, with the two end station eyes as its ends. Every span is proved WHOLE, end to end and untrimmed, and every interior corner by the same closed balls a route uses, so a run from any stop to any other is the sub-path between those two vertices and needs no proof of its own: the trim at an interior vertex depends only on its two adjoining spans and is identical in every sub-path holding it, and the ends of a sub-path take no corner. The table is linear in the stops, never their product, and no viewing eye moves to be on it.',
     `A station whose full near ball is not clear carries an oriented certificate instead: its near pyramid is proved over the whole ±${LOOK_YAW} rad yaw and ±${LOOK_PITCH} rad pitch look envelope, sampled every ${LOOK_STEP} rad, with the distance a corner can travel between two samples subtracted from the measured margin.`,
   ],
   arrivalEN,
@@ -542,6 +664,7 @@ const certificate = {
   stationCones,
   routes,
   approaches,
+  walls,
 }
 
 const failures = []
@@ -557,6 +680,19 @@ for (const reading of approachReadings) if (!reading.clear) failures.push(`${rea
 for (const cone of approachCones) {
   if (cone.clearAtEveryOrientation) continue
   failures.push(`${cone.viewport} ${cone.exhibit}: the viewing eye stands ${cone.fullBallM} m from ${cone.mesh}, inside its own ${cone.radius} m near envelope${cone.oriented ? `; the near plane itself misses by ${cone.oriented.minimumM} m over the look envelope` : ''}`)
+}
+for (const reading of wallReadings) {
+  if (!reading.clear) failures.push(`${reading.viewport} ${reading.id}: a span passes within ${reading.spanClearanceM} m of ${reading.spanMesh}, under the ${reading.requiredM} m envelope`)
+  if (reading.uncertifiedCorners) failures.push(`${reading.viewport} ${reading.id}: ${reading.uncertifiedCorners} corner(s) of the wall carry no certified fillet`)
+  if (reading.worstNearBallMarginM <= 0) failures.push(`${reading.viewport} ${reading.id}: vertex ${reading.worstNearBallVertex} stands inside its own near envelope, ${reading.worstNearBallMarginM} m from ${reading.worstNearBallMesh}`)
+}
+// One wall per viewport, with every stop of the hang on it and the two end
+// stations as its ends: a run is a sub-path of this line and never a new proof.
+if (walls.length !== families.length) failures.push(`Expected ${families.length} walls, certified ${walls.length}`)
+for (const wall of walls) {
+  if (wall.points.length !== wall.stops.length + 2) failures.push(`${wall.viewport} ${wall.id}: ${wall.points.length} vertices for ${wall.stops.length} stops`)
+  const missing = wall.stops.filter(stop => !approaches.some(entry => entry.viewport === wall.viewport && entry.exhibit === stop))
+  if (missing.length) failures.push(`${wall.viewport} ${wall.id}: ${missing.length} stop(s) with no certified approach`)
 }
 // Two entries per exhibit, one per viewport: an approach belongs to one
 // station, so the table is linear and the rail refuses anything not in it.
@@ -576,12 +712,15 @@ const samePoints = previousCertificate ? JSON.stringify(previousCertificate.rout
 const approachIdentity = table => JSON.stringify((table ?? []).map(entry => [entry.viewport, entry.station, entry.exhibit, entry.fromPose, entry.toPose, entry.points, entry.roundedLength, entry.maxNearRadius]))
 const sameApproaches = previousCertificate ? previousCertificate.format === certificate.format
   && approachIdentity(previousCertificate.approaches) === approachIdentity(approaches) : false
+const wallIdentity = table => JSON.stringify((table ?? []).map(entry => [entry.viewport, entry.id, entry.stops, entry.points, entry.roundedLength, entry.maxNearRadius, entry.chordM, entry.shortenM]))
+const sameWalls = previousCertificate ? wallIdentity(previousCertificate.walls) === wallIdentity(walls) : false
 
 if (args.has('--dump')) fs.writeFileSync(path.join(ROOT, 'forge/scratch/candidate.json'), text)
 if (VERIFY) {
   if (!sameGeometry) failures.push('The certificate on disk does not carry the geometry hash the mounted factories produce')
   if (!samePoints) failures.push('The certificate on disk does not carry the routes the current poses produce')
   if (!sameApproaches) failures.push('The certificate on disk does not carry the approaches the current viewing poses produce')
+  if (!sameWalls) failures.push('The certificate on disk does not carry the wall the current stops and end stations produce')
 } else if (!failures.length) {
   fs.writeFileSync(CERTIFICATE, text)
   const manifest = JSON.parse(fs.readFileSync(MANIFEST, 'utf8'))
@@ -602,8 +741,9 @@ const report = {
   gaitEnvelopeM: +gaitEnvelopeM.toFixed(6),
   routes: routes.length,
   approaches: approaches.length,
+  walls: wallReadings,
   triangles: index.data.count,
-  sameGeometryAsDisk: sameGeometry, sameRoutesAsDisk: samePoints, sameApproachesAsDisk: sameApproaches,
+  sameGeometryAsDisk: sameGeometry, sameRoutesAsDisk: samePoints, sameApproachesAsDisk: sameApproaches, sameWallsAsDisk: sameWalls,
   worstSpanClearance: readings.reduce((worst, reading) => reading.spanClearanceM < worst.spanClearanceM ? reading : worst, readings[0]),
   worstApproachSpan: approachReadings.reduce((worst, reading) => reading.spanClearanceM - reading.requiredM < worst.spanClearanceM - worst.requiredM ? reading : worst, approachReadings[0]),
   worstApproachNearBall: approachCones.reduce((worst, cone) => cone.fullBallM - cone.radius < worst.fullBallM - worst.radius ? cone : worst, approachCones[0]),

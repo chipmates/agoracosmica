@@ -2,7 +2,7 @@
  "format": "vinci-rail-clearance-v2",
  "completeNearClearance": true,
  "recipe": "src/wings/vinci/rail-certify.mjs",
- "recipeSha256": "5fcd1b9aec962ef60b045224b0c22122ccb4547f1afcd7adc6062df7308b99cc",
+ "recipeSha256": "150d680a554fb9e02bfb6a90362cd95667c8bf3594ee4c36b7cd30830e53373e",
  "sources": [
   {
    "file": "src/stack/detail.ts",
@@ -80,6 +80,12 @@
    "file": "src/wings/vinci/collection/views.ts",
    "sha256": "6e90901f11434a5e7f4dc1b5247e5ab52eebaf48a0acf6c17ebe09bd260414d8",
    "bytes": 6953,
+   "unchangedDuringAudit": true
+  },
+  {
+   "file": "src/wings/vinci/collection/wall.ts",
+   "sha256": "444c9ebf6145dde411bd141c2f8914267f3cf7514072c13a314f036c593eb651",
+   "bytes": 2861,
    "unchangedDuringAudit": true
   },
   {
@@ -396,8 +402,8 @@
   },
   {
    "file": "src/wings/vinci/rail.ts",
-   "sha256": "b70da4388fc7211c1ae784975e813f3d1aea688eacc4f95ce19710065496b6e8",
-   "bytes": 30790,
+   "sha256": "f95d99dffa89df3f3f7867213fe11f6b2806481548e840c014d94592e552f64b",
+   "bytes": 34461,
    "unchangedDuringAudit": true
   },
   {
@@ -5989,6 +5995,7 @@
   "Every straight span of the finished path is proved end to end by exact segment/triangle distance; every rounded corner is proved by closed balls over its control hull, and those balls are what the runtime replays. Stored balls reserve 4 µm beyond the requested radius; runtime matching of quantized geometry consumes at most 2 µm of it.",
   "The walk carries a step rhythm of at most 10.82 mm off the certified line, and that envelope is added to the clearance radius every span and every corner above is proved against.",
   "An approach is one straight leg from a station eye to one exhibit's viewing eye and back, proved by the same exact segment/triangle distance and the same near rectangle plus gait envelope as a route. It is reachable from that station only, it is not addressable by the station rail, and the table is linear: two entries per exhibit, never the product of poses. The exhibits are the hang's plates, the mural, the machines, the grave's three, the plaque, the book and the twelve cut dates.",
+  "A wall is one polyline through every stop of a hang, with the two end station eyes as its ends. Every span is proved WHOLE, end to end and untrimmed, and every interior corner by the same closed balls a route uses, so a run from any stop to any other is the sub-path between those two vertices and needs no proof of its own: the trim at an interior vertex depends only on its two adjoining spans and is identical in every sub-path holding it, and the ends of a sub-path take no corner. The table is linear in the stops, never their product, and no viewing eye moves to be on it.",
   "A station whose full near ball is not clear carries an oriented certificate instead: its near pyramid is proved over the whole ±0.6 rad yaw and ±0.32 rad pitch look envelope, sampled every 0.02 rad, with the distance a corner can travel between two samples subtracted from the measured margin."
  ],
  "arrivalEN": {
@@ -79347,6 +79354,748 @@
    "roundedLength": 2.011392552437242,
    "maxNearRadius": 0.44296640257164804,
    "certifiedBalls": []
+  }
+ ],
+ "walls": [
+  {
+   "viewport": "desktop",
+   "id": "picture-room-main",
+   "ends": [
+    "picture-room",
+    "picture-room-west"
+   ],
+   "stops": [
+    "picture/baptism-of-christ/front",
+    "picture/annunciation/front",
+    "picture/ginevra-de-benci/front",
+    "picture/ginevra-de-benci/reverse",
+    "picture/madonna-of-the-carnation/front",
+    "picture/benois-madonna/front",
+    "picture/saint-jerome/front",
+    "picture/adoration-of-the-magi/front",
+    "picture/annunciation-predella/front",
+    "picture/virgin-of-the-rocks-louvre/front",
+    "picture/portrait-of-a-musician/front",
+    "picture/lady-with-an-ermine/front",
+    "picture/la-belle-ferronniere/front",
+    "picture/madonna-litta/front",
+    "picture/burlington-house-cartoon/front",
+    "picture/yarnwinder-buccleuch/front",
+    "picture/yarnwinder-lansdowne/front",
+    "picture/anghiari-copy/front",
+    "picture/mona-lisa/front",
+    "picture/virgin-of-the-rocks-london/front",
+    "picture/virgin-and-child-with-st-anne/front",
+    "picture/salvator-mundi/front",
+    "picture/saint-john-the-baptist/front",
+    "picture/la-scapigliata/front",
+    "picture/bacchus/front"
+   ],
+   "points": [
+    [
+     -23.4,
+     -40.8,
+     -4.68
+    ],
+    [
+     -25.834999999999997,
+     -39.98049999999999,
+     -4.68
+    ],
+    [
+     -28.30304166666666,
+     -39.650499999999994,
+     -4.68
+    ],
+    [
+     -30.201083333333326,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -31.199124999999988,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -32.25466666666665,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -33.29020833333331,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -34.45824999999997,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -36.661291666666635,
+     -39.650499999999994,
+     -4.68
+    ],
+    [
+     -38.789333333333296,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -40.327374999999954,
+     -39.7555,
+     -4.68
+    ],
+    [
+     -41.72541666666661,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -42.71495833333327,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -43.76949999999994,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -44.7875416666666,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -46.10358333333326,
+     -40.335499999999996,
+     -4.68
+    ],
+    [
+     -47.439124999999926,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -48.43366666666659,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -49.56170833333325,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -50.77474999999991,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -52.26979166666658,
+     -39.85549999999999,
+     -4.68
+    ],
+    [
+     -54.06283333333324,
+     -40.070499999999996,
+     -4.68
+    ],
+    [
+     -55.48437499999989,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -56.62241666666655,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -57.63695833333321,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -58.94499999999987,
+     -39.98049999999999,
+     -4.68
+    ],
+    [
+     -60.6,
+     -40.6,
+     -4.68
+    ]
+   ],
+   "roundedLength": 38.839915521780966,
+   "maxNearRadius": 0.47375656973542957,
+   "certifiedBalls": [
+    {
+     "centre": [
+      -25.84223572862038,
+      -4.68,
+      40.01157344686016
+     ],
+     "radiusM": 0.9717305784340416
+    },
+    {
+     "centre": [
+      -28.28529851870272,
+      -4.68,
+      39.75027540200677
+     ],
+     "radiusM": 0.9527905063867466
+    },
+    {
+     "centre": [
+      -30.210287662182015,
+      -4.68,
+      40.61328321718368
+     ],
+     "radiusM": 0.7070836720561048
+    },
+    {
+     "centre": [
+      -34.44989444943999,
+      -4.68,
+      40.61187713414104
+     ],
+     "radiusM": 0.7484737311940548
+    },
+    {
+     "centre": [
+      -36.660370245284824,
+      -4.68,
+      39.79027131051195
+     ],
+     "radiusM": 0.9330376635717064
+    },
+    {
+     "centre": [
+      -38.78353377668893,
+      -4.68,
+      40.51835471463464
+     ],
+     "radiusM": 0.8577028219582357
+    },
+    {
+     "centre": [
+      -40.324438531172,
+      -4.68,
+      39.89389137838768
+     ],
+     "radiusM": 0.8207544713469563
+    },
+    {
+     "centre": [
+      -41.73790847415654,
+      -4.68,
+      40.60781814218947
+     ],
+     "radiusM": 0.7027813284760542
+    },
+    {
+     "centre": [
+      -44.78530439079668,
+      -4.68,
+      40.631541703516746
+     ],
+     "radiusM": 0.7166044719860637
+    },
+    {
+     "centre": [
+      -46.1036661188152,
+      -4.68,
+      40.38555158513223
+     ],
+     "radiusM": 0.7907346788150384
+    },
+    {
+     "centre": [
+      -47.44124978866844,
+      -4.68,
+      40.63223539457566
+     ],
+     "radiusM": 0.7110398155799234
+    },
+    {
+     "centre": [
+      -50.763389127883016,
+      -4.68,
+      40.604937686797754
+     ],
+     "radiusM": 0.7572254855524059
+    },
+    {
+     "centre": [
+      -52.284686746918354,
+      -4.68,
+      39.9352274327632
+     ],
+     "radiusM": 0.8636328559321943
+    },
+    {
+     "centre": [
+      -54.05460533925718,
+      -4.68,
+      40.10227706296487
+     ],
+     "radiusM": 0.8393094126312626
+    },
+    {
+     "centre": [
+      -55.49112149142082,
+      -4.68,
+      40.61610623620421
+     ],
+     "radiusM": 0.7423652544016279
+    },
+    {
+     "centre": [
+      -57.62803327143875,
+      -4.68,
+      40.61349839439564
+     ],
+     "radiusM": 0.7112359967048391
+    },
+    {
+     "centre": [
+      -58.950467396851515,
+      -4.68,
+      40.075316675135696
+     ],
+     "radiusM": 0.7999124043346658
+    }
+   ],
+   "chordM": [
+    0,
+    2.5692032325217093,
+    5.059209190025178,
+    7.204567474415636,
+    8.202609141082299,
+    9.258150807748962,
+    10.293692474415622,
+    11.461734141082282,
+    13.881112694568575,
+    16.23240198665269,
+    18.01189550122439,
+    19.671879086003493,
+    20.661420752670153,
+    21.71596241933682,
+    22.73400408600348,
+    24.08721902399477,
+    25.45940579823608,
+    26.453947464902743,
+    27.581989131569404,
+    28.795030798236066,
+    30.488304132659497,
+    32.294189903798625,
+    33.82950117844928,
+    34.967542845115936,
+    35.982084511782595,
+    37.451735151130634,
+    39.218881226021004
+   ],
+   "shortenM": [
+    0,
+    0.003059361899619084,
+    0.03446255312429236,
+    0.04377569764804046,
+    0.04377569764804046,
+    0.04377569764804046,
+    0.04377569764804046,
+    0.052207430382332776,
+    0.11305158322147324,
+    0.1774337426069983,
+    0.25403487028764205,
+    0.2667307688696821,
+    0.2667307688696821,
+    0.2667307688696821,
+    0.26897422706815466,
+    0.28067125625633405,
+    0.2828017520214954,
+    0.2828017520214954,
+    0.2828017520214954,
+    0.2942990752338067,
+    0.31903300890983244,
+    0.32343504457054784,
+    0.33023233940159724,
+    0.33023233940159724,
+    0.33925793088077066,
+    0.37896570424003445,
+    0.37896570424003445
+   ]
+  },
+  {
+   "viewport": "phone",
+   "id": "picture-room-main",
+   "ends": [
+    "picture-room",
+    "picture-room-west"
+   ],
+   "stops": [
+    "picture/baptism-of-christ/front",
+    "picture/annunciation/front",
+    "picture/ginevra-de-benci/front",
+    "picture/ginevra-de-benci/reverse",
+    "picture/madonna-of-the-carnation/front",
+    "picture/benois-madonna/front",
+    "picture/saint-jerome/front",
+    "picture/adoration-of-the-magi/front",
+    "picture/annunciation-predella/front",
+    "picture/virgin-of-the-rocks-louvre/front",
+    "picture/portrait-of-a-musician/front",
+    "picture/lady-with-an-ermine/front",
+    "picture/la-belle-ferronniere/front",
+    "picture/madonna-litta/front",
+    "picture/burlington-house-cartoon/front",
+    "picture/yarnwinder-buccleuch/front",
+    "picture/yarnwinder-lansdowne/front",
+    "picture/anghiari-copy/front",
+    "picture/mona-lisa/front",
+    "picture/virgin-of-the-rocks-london/front",
+    "picture/virgin-and-child-with-st-anne/front",
+    "picture/salvator-mundi/front",
+    "picture/saint-john-the-baptist/front",
+    "picture/la-scapigliata/front",
+    "picture/bacchus/front"
+   ],
+   "points": [
+    [
+     -23.4,
+     -40.8,
+     -4.68
+    ],
+    [
+     -25.834999999999997,
+     -39.98049999999999,
+     -4.68
+    ],
+    [
+     -28.30304166666666,
+     -39.540499999999994,
+     -4.68
+    ],
+    [
+     -30.201083333333326,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -31.199124999999988,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -32.25466666666665,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -33.29020833333331,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -34.45824999999997,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -36.661291666666635,
+     -39.030499999999996,
+     -4.68
+    ],
+    [
+     -38.789333333333296,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -40.327374999999954,
+     -39.7555,
+     -4.68
+    ],
+    [
+     -41.72541666666661,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -42.71495833333327,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -43.76949999999994,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -44.7875416666666,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -46.10358333333326,
+     -40.335499999999996,
+     -4.68
+    ],
+    [
+     -47.439124999999926,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -48.43366666666659,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -49.56170833333325,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -50.77474999999991,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -52.26979166666658,
+     -39.85549999999999,
+     -4.68
+    ],
+    [
+     -54.06283333333324,
+     -40.070499999999996,
+     -4.68
+    ],
+    [
+     -55.48437499999989,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -56.62241666666655,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -57.63695833333321,
+     -40.650499999999994,
+     -4.68
+    ],
+    [
+     -58.94499999999987,
+     -39.98049999999999,
+     -4.68
+    ],
+    [
+     -60.6,
+     -40.6,
+     -4.68
+    ]
+   ],
+   "roundedLength": 39.42988007368959,
+   "maxNearRadius": 0.5294871999160367,
+   "certifiedBalls": [
+    {
+     "centre": [
+      -25.841118784516656,
+      -4.68,
+      40.00440980768263
+     ],
+     "radiusM": 1.0282814753332161
+    },
+    {
+     "centre": [
+      -28.282832498837582,
+      -4.68,
+      39.653889257380456
+     ],
+     "radiusM": 1.0022262063338572
+    },
+    {
+     "centre": [
+      -30.212004116900943,
+      -4.68,
+      40.61019317661275
+     ],
+     "radiusM": 0.761636535118153
+    },
+    {
+     "centre": [
+      -34.44008748407515,
+      -4.68,
+      40.59514247951046
+     ],
+     "radiusM": 0.7974494127876004
+    },
+    {
+     "centre": [
+      -36.65963283503226,
+      -4.68,
+      39.23018971834012
+     ],
+     "radiusM": 0.9421057676727446
+    },
+    {
+     "centre": [
+      -38.79910440163594,
+      -4.68,
+      40.492669982879534
+     ],
+     "radiusM": 0.8933478994200461
+    },
+    {
+     "centre": [
+      -40.324438531172,
+      -4.68,
+      39.89389137838768
+     ],
+     "radiusM": 0.8764851015275634
+    },
+    {
+     "centre": [
+      -41.73790847415654,
+      -4.68,
+      40.60781814218947
+     ],
+     "radiusM": 0.7585119586566613
+    },
+    {
+     "centre": [
+      -44.78530439079668,
+      -4.68,
+      40.631541703516746
+     ],
+     "radiusM": 0.7723351021666708
+    },
+    {
+     "centre": [
+      -46.1036661188152,
+      -4.68,
+      40.38555158513223
+     ],
+     "radiusM": 0.8464653089956455
+    },
+    {
+     "centre": [
+      -47.44124978866844,
+      -4.68,
+      40.63223539457566
+     ],
+     "radiusM": 0.7667704457605304
+    },
+    {
+     "centre": [
+      -50.763389127883016,
+      -4.68,
+      40.604937686797754
+     ],
+     "radiusM": 0.812956115733013
+    },
+    {
+     "centre": [
+      -52.284686746918354,
+      -4.68,
+      39.9352274327632
+     ],
+     "radiusM": 0.9193634861128014
+    },
+    {
+     "centre": [
+      -54.05460533925718,
+      -4.68,
+      40.10227706296487
+     ],
+     "radiusM": 0.8950400428118697
+    },
+    {
+     "centre": [
+      -55.49112149142082,
+      -4.68,
+      40.61610623620421
+     ],
+     "radiusM": 0.798095884582235
+    },
+    {
+     "centre": [
+      -57.62803327143875,
+      -4.68,
+      40.61349839439564
+     ],
+     "radiusM": 0.7669666268854461
+    },
+    {
+     "centre": [
+      -58.950467396851515,
+      -4.68,
+      40.075316675135696
+     ],
+     "radiusM": 0.8556430345152729
+    }
+   ],
+   "chordM": [
+    0,
+    2.5692032325217093,
+    5.076159488303363,
+    7.274946010092772,
+    8.272987676759435,
+    9.328529343426098,
+    10.364071010092758,
+    11.532112676759418,
+    14.266667957800454,
+    16.9411700301626,
+    18.7206635447343,
+    20.380647129513402,
+    21.370188796180063,
+    22.42473046284673,
+    23.44277212951339,
+    24.79598706750468,
+    26.16817384174599,
+    27.162715508412653,
+    28.290757175079314,
+    29.503798841745976,
+    31.197072176169407,
+    33.00295794730853,
+    34.53826922195918,
+    35.67631088862584,
+    36.6908525552925,
+    38.16050319464054,
+    39.92764926953091
+   ],
+   "shortenM": [
+    0,
+    0.0018293635401490649,
+    0.0426283420555259,
+    0.053703049488169396,
+    0.053703049488169396,
+    0.053703049488169396,
+    0.053703049488169396,
+    0.07223413913227006,
+    0.20212291799124127,
+    0.29623723420827985,
+    0.3728383618889236,
+    0.3855342604709637,
+    0.3855342604709637,
+    0.3855342604709637,
+    0.3877777186694362,
+    0.3994747478576156,
+    0.40160524362277694,
+    0.40160524362277694,
+    0.40160524362277694,
+    0.4131025668350883,
+    0.437836500511114,
+    0.4422385361718294,
+    0.4490358310028788,
+    0.4490358310028788,
+    0.4580614224820522,
+    0.497769195841316,
+    0.497769195841316
+   ]
   }
  ]
 }

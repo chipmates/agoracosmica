@@ -361,8 +361,8 @@
       "prompt": "Runtime exact canonical pose and actual mounted geometry identity guard for all40 directed physical routes. Applies conservative complete near-camera certificates; fails if stale.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-10",
-      "sha256": "4b7fa048746b01b12f9ec4e90da465dea13fee72d83f19e6a734d2eb8cd54d0e",
-      "note": "recipe_file=src/wings/vinci/rail-proof.ts; source_generator=forge/results/final-rail-route-proof.mjs; runtime dependency of vinci/rail; companion_file=src/wings/vinci/collection/pick.ts"
+      "sha256": "2dd07103848106dc7b60279135df0d7b53ea3dadafb79928bff8f1c0fe960e68",
+      "note": "recipe_file=src/wings/vinci/rail-proof.ts; source_generator=forge/results/final-rail-route-proof.mjs; runtime dependency of vinci/rail; companion_file=src/wings/vinci/collection/pick.ts; companion_file=src/wings/vinci/collection/wall.ts"
     },
     {
       "id": "vinci/rail-fingerprint",
@@ -413,7 +413,7 @@
       "prompt": "Regenerable actual geometry certificate for40 directed routes across five pose families and two viewport families. Includes foundation, entry, vegetation and all dressing; no sky, DOM or shadow-only duplicate.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-10",
-      "sha256": "3777785d6108e91a5926415cb995caa40ea11b7f1295aefde3a9cfc788dec910",
+      "sha256": "44c2d52ad59de2247c4fbeb8c769a68e1c8c4242711d7e85f6bb8c48c97971a6",
       "note": "recipe_file=src/wings/vinci/data/rail-clearance.json; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail; companion_file=src/wings/vinci/collection/approaches.ts"
     },
     {

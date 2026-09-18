@@ -86,6 +86,7 @@ const { stationPose } = load('src/wings/vinci/rail.ts')
 const { mountCollectionPlates } = load('src/wings/vinci/collection/plates.ts')
 const { readVinciExhibits } = load('src/wings/vinci/collection/pick.ts')
 const { createCertifiedRailPath } = load('src/wings/vinci/rail-smoothing.ts')
+const { vinciWallStops, VINCI_PICTURE_WALL, VINCI_WALL_ENDS } = load('src/wings/vinci/collection/wall.ts')
 const certificate = JSON.parse(source('src/wings/vinci/data/rail-clearance.json'))
 
 /* ---- 1. every declared viewing eye is certified, at both viewports ---- */
@@ -179,11 +180,89 @@ for (const record of hang) {
   raised.push(record.id)
 }
 assert.equal(raised.length, hang.length)
-// The station eye stands 6.6 m off the hang, outside the module's own 2.2 m,
-// so standing at the station raises nothing: the arrival is what raises it.
-await tick(stationPose('picture-room', false).eye)
-assert.equal(fullCount(), 0, 'the station eye holds a full plate')
+// THE TWO END STATIONS STAND AT THE ENDS OF THE WALL, a stride off the
+// nearest work, so the room's one full slot is spent on that work while a
+// visitor stands there. It is still one slot, and it is the work at their
+// shoulder. A station in another room raises nothing at all, which is what
+// keeps the budget from being spent from across the building.
+for (const station of ['picture-room', 'picture-room-west']) {
+  await tick(stationPose(station, false).eye)
+  assert.equal(fullCount(), 1, `the ${station} eye raised ${fullCount()} full plates`)
+}
+await tick(stationPose('body', false).eye)
+assert.equal(fullCount(), 0, 'a station in another room holds a full plate')
 report.raisedOnArrival = raised.length
+
+/* ---- 6. the wall: one polyline, and every run a sub-path of it ----
+ *
+ * The 25 viewing eyes with the two end station eyes as the ends of the same
+ * line. What is proved here is the claim the certificate rests on: that a run
+ * between two vertices is the sub-path between them, which needs the trims to
+ * be identical in the whole and in the part, both endpoints to be exact, and
+ * the sub-path's length to be the certificate's own cumulative tables. The
+ * fillets are accepted against the SAVED balls, as the runtime accepts them,
+ * so a corner certified in the whole and refused in a part would show here.
+ */
+
+const walls = certificate.walls ?? []
+assert.equal(walls.length, 2, 'one wall per viewport')
+const wallReport = {}
+for (const viewport of ['desktop', 'phone']) {
+  const narrow = viewport === 'phone'
+  const wall = walls.find(entry => entry.viewport === viewport)
+  assert.ok(wall, `no wall certificate: ${viewport}`)
+  assert.equal(wall.id, VINCI_PICTURE_WALL)
+  // The modules run in their own realm, so the lists are compared as text.
+  assert.equal(JSON.stringify(wall.ends), JSON.stringify([...VINCI_WALL_ENDS]))
+  assert.equal(JSON.stringify(wall.stops), JSON.stringify(vinciWallStops().map(stop => stop.exhibit)),
+    'the stops are the wall\'s own order')
+  assert.equal(wall.stops.length, 25)
+  assert.equal(wall.points.length, 27)
+  assert.equal(wall.chordM.length, 27)
+  assert.equal(wall.shortenM.length, 27)
+  const eyes = [
+    stationPose(wall.ends[0], narrow).eye,
+    ...wall.stops.map(id => vinciApproachPose(id, narrow).eye),
+    stationPose(wall.ends[1], narrow).eye,
+  ]
+  const points = wall.points.map(([east, north, height]) => new THREE.Vector3(east, height, -north))
+  points.forEach((point, at) => assert.equal(point.distanceTo(eyes[at]), 0,
+    `wall vertex ${at} is not the eye the certificate holds: ${viewport}`))
+  const balls = wall.certifiedBalls.map(ball =>
+    ({ centre: new THREE.Vector3().fromArray(ball.centre), radius: ball.radiusM - .000002 }))
+  const build = list => createCertifiedRailPath(list, {
+    clearanceRadiusM: wall.maxNearRadius, maxTrimM: .5, certificateDepth: 6,
+    certifyBall: (centre, radius) => balls.some(ball => ball.centre.distanceTo(centre) + radius <= ball.radius),
+  })
+  const whole = build(points.map(point => point.clone()))
+  assert.ok(Math.abs(whole.length - wall.roundedLength) < 1e-9, `the wall rebuilds shorter than its certificate: ${viewport}`)
+  const legs = []
+  for (let at = 1; at < points.length; at++) legs.push(points[at - 1].distanceTo(points[at]))
+  let drift = 0, lengthError = 0, runs = 0
+  const landed = new THREE.Vector3(), left = new THREE.Vector3()
+  for (let from = 0; from < points.length; from++) for (let to = 0; to < points.length; to++) {
+    if (from === to) continue
+    const low = Math.min(from, to), high = Math.max(from, to)
+    const slice = points.slice(low, high + 1).map(point => point.clone())
+    const path = build(from < to ? slice : slice.reverse())
+    path.pointAtDistance(0, left)
+    path.pointAtDistance(path.length, landed)
+    drift = Math.max(drift, left.distanceTo(points[from]), landed.distanceTo(points[to]))
+    // the run's own certified length: the chord between its two vertices, less
+    // what each corner INSIDE it takes out of that chord. Its ends take none.
+    const certified = (wall.chordM[high] - wall.chordM[low]) - (wall.shortenM[high - 1] - wall.shortenM[low])
+    lengthError = Math.max(lengthError, Math.abs(path.length - certified))
+    runs++
+  }
+  assert.equal(drift, 0, `a wall run drifts ${drift} m off its own vertex: ${viewport}`)
+  assert.ok(lengthError < 1e-9, `a wall run is ${lengthError} m off its certified length: ${viewport}`)
+  wallReport[viewport] = {
+    vertices: points.length, spans: points.length - 1, runs, drift, lengthError,
+    lengthM: +whole.length.toFixed(4),
+    shortestLegM: +Math.min(...legs).toFixed(4), longestLegM: +Math.max(...legs).toFixed(4),
+  }
+}
+report.wall = wallReport
 
 /* ---- 5. the poses stand where the room builds what they look at ---- */
 
