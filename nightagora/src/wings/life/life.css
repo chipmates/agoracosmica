@@ -27,28 +27,34 @@
 .wing-life-second {margin:6px 0 0;font:13px/1.5 var(--sans);color:#b6bcae;text-wrap:pretty;}
 .wing-life-body {position:relative;flex:1 1 auto;display:flex;flex-direction:column;min-height:0;padding:0 20px;}
 
-/* THE PLATE: a drawing, never a control. Every date it shows is in the list
-   under it, so it is hidden from the reading and takes no press. */
-.wing-life-drawing {flex:0 0 auto;padding:6px 0 10px;}
+/* THE RIBBON: the drawing of the whole life, and on a wide stage the control
+   for it. Every date it shows stands in the list under it. */
+.wing-life-drawing {position:relative;flex:0 0 auto;padding:6px 0 4px;}
 .wing-life-plate {display:block;overflow:visible;}
-/* The bar of one period on the axis. It carries its own name so a rule for
-   the drawing can never reach the reading's list item of the same period. */
-.wing-life-period {opacity:.85;}
-.wing-life-period[data-afterlife='true'] {opacity:.5;}
-.wing-life-gap {fill:none;stroke:#a9977366;stroke-width:1;stroke-dasharray:3 3;}
-.wing-life-gap-count {fill:#a8b3b7;font:8px var(--sans);text-anchor:middle;}
-.wing-life-year {fill:#cfc6b499;font:9px var(--sans);letter-spacing:.04em;}
-.wing-life-year-end {text-anchor:end;}
-.wing-life-rule {stroke:#a9977333;stroke-width:1;}
-.wing-life-break {stroke:#a9977366;stroke-width:1;stroke-dasharray:2 4;}
-.wing-life-event {opacity:.95;}
-.wing-life-span {opacity:.5;}
-.wing-life-work {fill:#c9b07d;}
-.wing-life-work[data-domain='sheet'] {fill:#8ea9b4;}
-.wing-life-work[data-domain='machine'] {fill:#b59a8e;}
-.wing-life-work[data-domain='codex'] {fill:#9ab48f;}
-.wing-life-work[data-domain='building'] {fill:#a2a2ac;}
-.wing-life-tie,.wing-life-tie-dot {opacity:.85;}
+/* ONE PLACE IS OPEN. The open period is filled and its name is cut out of it;
+   the others keep their ground and their name stays in the sheet's own ink. */
+.wing-life-period {fill:#c9b07d;opacity:.3;stroke:#c9b07d;stroke-opacity:.6;stroke-width:1;
+  transition:opacity 240ms cubic-bezier(.25,.1,.25,1),fill 240ms cubic-bezier(.25,.1,.25,1);}
+.wing-life-segment[data-open='true'] .wing-life-period {opacity:.92;stroke-opacity:.9;}
+.wing-life-place {fill:#d6ccb8;font-family:var(--sans);letter-spacing:.02em;text-anchor:middle;
+  transition:fill 240ms cubic-bezier(.25,.1,.25,1);}
+.wing-life-segment[data-open='true'] .wing-life-place {fill:#14222d;}
+/* An empty stretch interrupts the bar: the years are there and the record is
+   not, so the bar stops and a rule bridges the break. */
+.wing-life-break {stroke:#a99773;stroke-opacity:.5;stroke-width:1;stroke-dasharray:2 3;}
+.wing-life-tick {stroke:#cfc6b4;stroke-width:1.3;}
+.wing-life-tick-floor {stroke:#edcc8c;stroke-width:1.5;}
+.wing-life-tick-after {stroke:#a8b3b7;stroke-opacity:.6;}
+/* The hour the visitor is standing in, and the date being read. */
+.wing-life-standing-ring {fill:none;stroke:#fff5e3;stroke-width:1.5;opacity:.92;}
+.wing-life-standing-stem {stroke:#fff5e3;stroke-width:1.5;opacity:.92;}
+.wing-life-marker {stroke:#edcc8c;stroke-width:2;
+  transition:transform 240ms cubic-bezier(.25,.1,.25,1),opacity 160ms linear;}
+.wing-life-after {fill:#a99773;opacity:.3;}
+.wing-life-after-word {fill:#a8b3b7;font:9px var(--sans);letter-spacing:.14em;text-transform:uppercase;}
+.wing-life-after-year {fill:#cfc6b499;font:9px var(--sans);letter-spacing:.04em;}
+/* The ribbon's own honesty, under it: why an empty stretch is narrow. */
+.wing-life-caption {margin:2px 0 0;font:11px/1.45 var(--sans);color:#a8b3b7;text-wrap:pretty;}
 
 /* ONE ROW AT A TIME, on the stage that has room for one. */
 .wing-life-tabs {flex:0 0 auto;display:flex;gap:6px;padding:0 0 8px;}

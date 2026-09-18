@@ -17,8 +17,15 @@ export interface LifeGap { from: number; to: number; years: number }
 
 /** A stretch this long or longer is worth its own mark. */
 const LEAST_GAP = 2
-/** What an empty stretch costs on the axis, in the width of one year. */
-const GAP_WIDTH = 2.4
+/** WHAT AN EMPTY STRETCH COSTS ON THE AXIS, in the width of one year: the
+ * square root of the years it holds, never under one and never over five. A
+ * flat cost drew thirteen empty years and two at the same width; the root
+ * keeps a longer silence always wider than a shorter one without letting a
+ * forty year silence eat the life. */
+const GAP_LEAST = 1, GAP_MOST = 5
+function gapWidth(years: number): number {
+  return Math.min(GAP_MOST, Math.max(GAP_LEAST, Math.sqrt(years)))
+}
 
 export interface LifeScale {
   from: number
@@ -85,7 +92,7 @@ export function lifeScale(events: readonly LifeEvent[], span: { from: number; to
   const weights: number[] = []
   for (let year = from; year <= to; year++) {
     const gap = inGap.get(year)
-    weights.push(gap ? GAP_WIDTH / gap.years : 1)
+    weights.push(gap ? gapWidth(gap.years) / gap.years : 1)
   }
   const running: number[] = [0]
   for (const weight of weights) running.push(running[running.length - 1]! + weight)

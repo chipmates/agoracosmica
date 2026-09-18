@@ -151,7 +151,8 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     close.textContent = say(LIFE_WORDS.close)
 
     const area = Math.max(240, body.getBoundingClientRect().width - (narrow ? LIFE_NARROW.padding : LIFE_WIDE.padding) * 2)
-    const plate = drawLifePlate({ record, scale, area: { width: area, height: 0 }, rows: narrow ? [row] : LIFE_ROWS })
+    const plate = drawLifePlate({ record, scale, area: { width: area }, language, narrow,
+      open: [...opened][0] ?? record.bands[0]?.id ?? null, at, afterWord: LIFE_WORDS.after[language] })
     drawing.replaceChildren(plate.element)
 
     /* ONE ROW AT A TIME ON A PHONE, three at once on a wide stage: the
@@ -223,16 +224,12 @@ export function createWingLife(options: WingLifeOptions): WingLife {
       const name = make('button', 'wing-life-band-name')
       name.type = 'button'
       name.setAttribute('aria-expanded', String(wide))
-      const dot = make('span', 'wing-life-dot')
-      dot.style.background = record.sure[band.certainty]?.colour ?? ''
-      dot.setAttribute('aria-hidden', 'true')
-      name.append(dot, make('span', 'wing-life-band-title', band.name[language]),
-        make('span', 'wing-life-band-sure', record.sure[band.certainty]?.word[language] ?? ''))
+      name.append(make('span', 'wing-life-band-title', band.name[language]))
       name.addEventListener('click', () => expand(band))
       item.append(name, make('p', 'wing-life-band-line', band.line[language]))
       if (asking === band.id) item.append(question(band))
       else {
-        const shown = wide ? events : events.filter(event => band.first.includes(event.id))
+        const shown = wide ? events : events.slice(0, 4)
         item.append(dates(record, shown, band, gaps, language))
         if (events.length > shown.length) {
           const more = make('button', 'wing-life-more',
@@ -241,7 +238,7 @@ export function createWingLife(options: WingLifeOptions): WingLife {
           more.setAttribute('aria-expanded', 'false')
           more.addEventListener('click', () => expand(band))
           item.append(more)
-        } else if (wide && events.length > band.first.length) {
+        } else if (wide && events.length > 4) {
           const fewer = make('button', 'wing-life-more', LIFE_BAND_WORDS.fewer[language])
           fewer.type = 'button'
           fewer.setAttribute('aria-expanded', 'true')

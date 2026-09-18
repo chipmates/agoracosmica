@@ -1,66 +1,124 @@
-/** THE LIFE AS ONE DRAWING: a year axis with the empty stretches shrunk, the
- * periods along it, and three lanes under it for places, works and people.
+/** THE LIFE AS ONE NAMED RIBBON: the periods drawn to the years they are
+ * declared between, named where a name measures, interrupted where the record
+ * is empty, with every date under them as one thin tick.
  *
- * The drawing is the picture and never the control. The dates of one life
- * stand a few pixels apart at any width a sheet has, so a mark here could not
- * be a 44 px target without covering its neighbours; the list beside the
- * plate takes every press, at both viewports. The plate is hidden from the
- * reading for the same reason: everything it shows is in that list.
+ * The drawing carries no numeral of its own and no certainty: a period is an
+ * editorial grouping and not a claim, and every year it spans is written in
+ * the list beside it. What it does carry is the shape of a life, the place
+ * that is open, the hour the visitor stands in, and the date being read.
+ *
+ * The presses are HTML over this drawing, placed from the bands it reports,
+ * because an SVG rect cannot be a 44 px target and keep its own width.
  */
 
-import { dateYears, workYears, type LifeScale } from './scale'
-import type { LifeEvent, LifeRecord, LifeWork, Sure } from './types'
+import { dateYears, type LifeGap, type LifeScale } from './scale'
+import type { Bi, LifeBand, LifeRecord } from './types'
 
 const NS = 'http://www.w3.org/2000/svg'
 
 export const PLATE = {
   pad: 10,
-  /** the axis strip with the periods and the gap marks */
-  axis: 30,
-  lane: 38,
-  /** what the life keeps of the width, the rest being the afterlife */
-  lifeShare: .76,
-  /** the blank between the life and what happened to the papers after it */
-  gutter: 18,
+  /** the painted height of one period */
+  strip: { wide: 26, narrow: 20 },
+  /** the blank between two periods, in pixels */
+  gutter: 6,
+  /** the ticks of every date, under the periods */
+  ticks: { normal: 6, floor: 11, gap: 5 },
+  /** the afterlife, on its own scale, under a blank */
+  after: { gap: 14, height: 9, years: 11 },
   least: 3,
-  /** under this width the axis drops every numeral it cannot place */
-  crowded: 520,
-  /** a gap mark narrower than this carries no count */
-  countable: 15,
-  /** the blank two numerals keep between them */
-  apart: 5,
+  name: { wide: 11, narrow: 9, floor: 7.5, margin: 6 },
+  /** the tracking the ribbon's names carry, which the ruler adds back */
+  tracking: .02,
 } as const
 
-/** A numeral on the axis, held back until the whole axis is known. */
-interface Mark { x: number; text: string; cls: string; anchor: 'start' | 'middle' | 'end'; em: number }
-/** what a digit costs at each of the two sizes the axis writes in */
-const YEAR_EM = 5.6, COUNT_EM = 4.8
+export interface LifePlateBand {
+  id: string
+  left: number
+  right: number
+  top: number
+  height: number
+  name: Bi
+}
 
 export interface LifePlate {
   element: SVGSVGElement
   width: number
   height: number
+  /** where each period was drawn, for the presses laid over it */
+  bands: readonly LifePlateBand[]
+  /** the middle of the life strip, where a marker stands */
+  strip: { top: number; height: number }
+  /** where one date falls on the ribbon, or nothing for the afterlife */
+  at(eventId: string): number | null
+}
+
+/** THE NAME IS MEASURED, NOT ESTIMATED. Copied from the plan's plate rather
+ * than shared, because that module belongs to another hand; a name wider than
+ * the segment it names reads as the name of the segment beside it, so each
+ * one shrinks to fit and is left off when even the floor will not hold it. */
+let ruler: CanvasRenderingContext2D | null | undefined
+function nameWidth(words: string, px: number): number {
+  ruler ??= document.createElement('canvas').getContext('2d')
+  const face = getComputedStyle(document.documentElement).getPropertyValue('--sans').trim() || 'sans-serif'
+  if (!ruler) return words.length * px * .54
+  ruler.font = `${px}px ${face}`
+  return ruler.measureText(words).width + words.length * px * PLATE.tracking
+}
+function nameSize(words: string, room: number, base: number, floor: number): number | null {
+  for (let px = base; px >= floor; px -= .5) if (nameWidth(words, px) <= room - PLATE.name.margin) return px
+  return null
 }
 
 /** The afterlife has its own linear scale: five centuries cannot share an
  * axis with sixty seven years and leave either of them readable. */
-function afterScale(events: readonly LifeEvent[]): (year: number) => number {
-  const years = events.map(event => dateYears(event.date)).filter(Boolean).map(span => span!.from)
+function afterScale(years: readonly number[]): { at(year: number): number; from: number; to: number } {
   const from = Math.min(...years), to = Math.max(...years)
   const width = Math.max(1, to - from)
-  return (year: number) => Math.max(0, Math.min(1, (year - from) / width))
+  return { at: (year: number) => Math.max(0, Math.min(1, (year - from) / width)), from, to }
+}
+
+/** The pieces of a segment that the record actually reaches: a stretch of
+ * empty years interrupts the bar instead of being painted over it. */
+function pieces(left: number, right: number, gaps: readonly { left: number; right: number }[]): { left: number; right: number }[] {
+  let runs = [{ left, right }]
+  for (const gap of gaps) {
+    const next: { left: number; right: number }[] = []
+    for (const run of runs) {
+      if (gap.right <= run.left || gap.left >= run.right) { next.push(run); continue }
+      if (gap.left > run.left) next.push({ left: run.left, right: gap.left })
+      if (gap.right < run.right) next.push({ left: gap.right, right: run.right })
+    }
+    runs = next
+  }
+  return runs.filter(run => run.right - run.left >= 1)
 }
 
 export function drawLifePlate(options: {
   record: LifeRecord
   scale: LifeScale
-  area: { width: number; height: number }
-  /** the row a phone holds one of; every row on a wide stage */
-  rows: readonly ('places' | 'works' | 'people')[]
+  area: { width: number }
+  language: 'en' | 'de'
+  narrow: boolean
+  /** the period that is open, drawn lit while the others are quiet */
+  open: string | null
+  /** the date being read, where the marker stands */
+  at: string | null
+  /** the museum's word for the strip under the blank */
+  afterWord: string
 }): LifePlate {
-  const { record, scale, area, rows } = options
-  const width = Math.max(240, Math.round(area.width))
-  const height = PLATE.pad * 2 + PLATE.axis + rows.length * PLATE.lane
+  const { record, scale, language, narrow, open } = options
+  const width = Math.max(240, Math.round(options.area.width))
+  const stripHeight = narrow ? PLATE.strip.narrow : PLATE.strip.wide
+  const after = record.bands.find(band => band.afterlife)
+  const afterEvents = after ? record.events.filter(event => event.band === after.id) : []
+  const afterYears = afterEvents.map(event => dateYears(event.date)?.from).filter((year): year is number => year !== undefined)
+  const hasAfter = Boolean(after && afterYears.length)
+  const top = PLATE.pad + 8
+  const ticksTop = top + stripHeight + 3
+  const afterTop = ticksTop + PLATE.ticks.floor + PLATE.after.gap
+  const height = (hasAfter ? afterTop + PLATE.after.height + PLATE.after.years : ticksTop + PLATE.ticks.floor) + PLATE.pad
+
   const svg = document.createElementNS(NS, 'svg')
   svg.setAttribute('class', 'wing-life-plate')
   svg.setAttribute('width', String(width))
@@ -68,141 +126,117 @@ export function drawLifePlate(options: {
   svg.setAttribute('viewBox', `0 0 ${width} ${height}`)
   svg.setAttribute('aria-hidden', 'true')
   svg.setAttribute('focusable', 'false')
-
   const add = <K extends keyof SVGElementTagNameMap>(tag: K, attributes: Record<string, string | number>, parent: SVGElement = svg): SVGElementTagNameMap[K] => {
     const node = document.createElementNS(NS, tag)
     for (const [key, value] of Object.entries(attributes)) node.setAttribute(key, String(value))
     parent.append(node)
     return node
   }
-  const colour = (kind: Sure): string => record.sure[kind]?.colour ?? ''
 
-  const after = record.bands.find(band => band.afterlife)
-  const afterEvents = after ? record.events.filter(event => event.band === after.id) : []
-  const lifeWidth = Math.round((width - PLATE.pad * 2 - (after ? PLATE.gutter : 0)) * (after ? PLATE.lifeShare : 1))
-  const afterLeft = PLATE.pad + lifeWidth + PLATE.gutter
-  const afterWidth = Math.max(40, width - PLATE.pad - afterLeft)
-  const x = (year: number): number => PLATE.pad + scale.at(year) * lifeWidth
-  const place = afterScale(afterEvents.length ? afterEvents : record.events)
-  const xAfter = (year: number): number => afterLeft + place(year) * afterWidth
-  const top = PLATE.pad
-  const marks: Mark[] = [], counts: Mark[] = []
-  /* A NARROW PLATE CARRIES FEWER NUMERALS. Seven period labels and seven gap
-     counts stand on top of each other at a phone's width, so there the axis
-     keeps the years that bound it and the marks keep their shape. */
-  const crowded = width < PLATE.crowded
+  const left = PLATE.pad, span = Math.max(40, width - PLATE.pad * 2)
+  const x = (year: number): number => left + scale.at(year) * span
+  const living = record.bands.filter(band => !band.afterlife)
+  // what one full year is worth in pixels, for the instruments that read the
+  // drawing back: the last year of the life is never inside an empty stretch
+  svg.dataset['year'] = (x(record.span.to + 1) - x(record.span.to)).toFixed(2)
 
-  /* THE PERIODS along the axis, each in the colour of the weaker of its two
-     bounds, and the afterlife apart, after the blank. */
-  for (const band of record.bands) {
-    const events = record.events.filter(event => event.band === band.id)
-    const years = events.map(event => dateYears(event.date)).filter(Boolean) as { from: number; to: number }[]
-    if (!years.length) continue
-    const first = Math.min(...years.map(span => span.from)), last = Math.max(...years.map(span => span.to))
-    const left = band.afterlife ? xAfter(first) : x(first)
-    const right = band.afterlife ? xAfter(last) : x(last)
-    const bar = add('rect', { class: 'wing-life-period', x: left, y: top, width: Math.max(PLATE.least, right - left), height: 11, rx: 1 })
-    bar.style.fill = colour(band.certainty)
-    if (band.afterlife) bar.setAttribute('data-afterlife', 'true')
-    if (crowded && !band.afterlife && band !== record.bands[0]) continue
-    marks.push({ x: left, text: String(first), cls: 'wing-life-year', anchor: 'start', em: YEAR_EM })
+  /* THE PERIODS, EACH TO ITS DECLARED BOUNDS. Two periods that name the same
+     year of a move share it, so the boundary between them is drawn in the
+     middle of that year and neither bar runs under the other. */
+  const edge = (band: LifeBand, next: LifeBand | undefined): number =>
+    next ? (x(band.years.to + 1) + x(next.years.from)) / 2 : x(band.years.to + 1)
+  const gapRuns = scale.gaps.map((gap: LifeGap) => ({ left: x(gap.from), right: x(gap.to + 1), years: gap.years }))
+  const bands: LifePlateBand[] = []
+  for (const [index, band] of living.entries()) {
+    const start = index === 0 ? x(band.years.from) : edge(living[index - 1]!, band)
+    const end = edge(band, living[index + 1])
+    const from = start + PLATE.gutter / 2, to = Math.max(start + PLATE.least, end - PLATE.gutter / 2)
+    const lit = band.id === open
+    /* The declared bounds and where the scale puts them travel with the
+       drawing, so a machine can read whether a segment spans what the record
+       says it spans instead of judging it from pixels. */
+    const group = add('g', { class: 'wing-life-segment', 'data-open': String(lit), 'data-band': band.id,
+      'data-years': `${band.years.from} ${band.years.to}`,
+      'data-bounds': `${x(band.years.from).toFixed(1)} ${x(band.years.to + 1).toFixed(1)}` })
+    for (const run of pieces(from, to, gapRuns))
+      add('rect', { class: 'wing-life-period', x: run.left, y: top, width: Math.max(PLATE.least, run.right - run.left), height: stripHeight, rx: 1 }, group)
+    // the break is bridged by a rule, so the years are visibly there and the
+    // record visibly is not
+    for (const gap of gapRuns) {
+      const bridgeFrom = Math.max(from, gap.left), bridgeTo = Math.min(to, gap.right)
+      if (bridgeTo - bridgeFrom < 1) continue
+      add('line', { class: 'wing-life-break', 'data-years': gap.years, x1: bridgeFrom, y1: top + stripHeight / 2, x2: bridgeTo, y2: top + stripHeight / 2 }, group)
+    }
+    /* THE NAME STANDS ON THE WIDEST PIECE, never across a break: a name laid
+       over the middle of an interrupted segment sits on the empty years. */
+    const widest = pieces(from, to, gapRuns).reduce<{ left: number; right: number } | null>(
+      (held, piece) => !held || piece.right - piece.left > held.right - held.left ? piece : held, null)
+    const words = band.place[language]
+    const base = narrow ? PLATE.name.narrow : PLATE.name.wide
+    // a name no piece holds is written across the whole segment rather than
+    // dropped: a period with no name at all reads as no period
+    const run = widest && nameSize(words, widest.right - widest.left, base, PLATE.name.floor) !== null ? widest : { left: from, right: to }
+    const size = nameSize(words, run.right - run.left, base, PLATE.name.floor)
+    if (size !== null) {
+      const text = add('text', { class: 'wing-life-place', x: (run.left + run.right) / 2, y: top + stripHeight / 2 + size * .36, 'font-size': size }, group)
+      text.textContent = words
+    }
+    bands.push({ id: band.id, left: from, right: to, top, height: stripHeight, name: band.name })
   }
-  const last = record.span.to
 
-  /* AN EMPTY STRETCH IS DRAWN, NOT CLOSED UP: the years are there and the
-     record is not, so the mark keeps its place on the axis and says how many
-     years it stands for. */
-  for (const gap of scale.gaps) {
-    const left = x(gap.from), right = x(gap.to + 1)
-    add('rect', { class: 'wing-life-gap', x: left, y: top - 2, width: Math.max(PLATE.least, right - left), height: 15 })
-    // a numeral narrower than its own mark is a smudge, and the list says it
-    if (right - left < PLATE.countable) continue
-    counts.push({ x: (left + right) / 2, text: String(gap.years), cls: 'wing-life-gap-count', anchor: 'middle', em: COUNT_EM })
+  /* EVERY DATE AS ONE THIN TICK. One drawing for six dates and for four
+     hundred: where ticks coincide the strip darkens, and the ones the floor
+     cuts stand taller, so the ribbon says at a glance how much of the record
+     is underfoot. */
+  const seen = new Map<number, number>()
+  const at = new Map<string, number>()
+  for (const event of record.events) {
+    if (record.bands.find(band => band.id === event.band)?.afterlife) continue
+    const years = dateYears(event.date)
+    if (!years) continue
+    const place = x(years.from)
+    at.set(event.id, place)
+    const key = Math.round(place)
+    seen.set(key, (seen.get(key) ?? 0) + 1)
+    const floor = Boolean(event.walk && 'stud' in event.walk)
+    const tick = add('line', { class: floor ? 'wing-life-tick wing-life-tick-floor' : 'wing-life-tick',
+      x1: place, y1: ticksTop, x2: place, y2: ticksTop + (floor ? PLATE.ticks.floor : PLATE.ticks.normal) })
+    tick.style.opacity = String(Math.min(1, .34 + (seen.get(key) ?? 1) * .22))
   }
 
-  /* ONE NUMERAL AT A TIME ON THE AXIS. Periods that end a few years apart put
-     their labels on top of each other, and two years printed over each other
-     are a smudge and not a date. The year the life ends on is placed first
-     because it bounds the axis, then the rest left to right, and a label that
-     would touch one already standing is left out. The list under the plate
-     carries every one of them. */
-  const write = (mark: Mark, y: number): void => {
-    const node = add('text', { class: mark.cls, x: mark.x, y })
-    node.textContent = mark.text
-  }
-  const room = (mark: Mark): { from: number; to: number } => {
-    const width = mark.text.length * mark.em
-    const from = mark.anchor === 'end' ? mark.x - width : mark.anchor === 'middle' ? mark.x - width / 2 : mark.x
-    return { from, to: from + width }
-  }
-  const numerals = (row: readonly Mark[], y: number, first?: Mark): void => {
-    const taken: { from: number; to: number }[] = []
-    if (first) { taken.push(room(first)); write(first, y) }
-    for (const mark of [...row].sort((a, b) => room(a).from - room(b).from)) {
-      const at = room(mark)
-      if (taken.some(held => at.from < held.to + PLATE.apart && held.from < at.to + PLATE.apart)) continue
-      taken.push(at)
-      write(mark, y)
+  /* THE HOUR THE WING STANDS IN, as a ring on the ribbon, and the date being
+     read, as a hairline that slides between them. */
+  if (record.here) {
+    const place = at.get(record.here)
+    if (place !== undefined) {
+      // over the ribbon, never on it: a ring around a segment would sit on
+      // that segment's own name
+      const ring = add('g', { class: 'wing-life-standing' })
+      add('circle', { class: 'wing-life-standing-ring', cx: place, cy: top - 6, r: 4 }, ring)
+      add('line', { class: 'wing-life-standing-stem', x1: place, y1: top - 2, x2: place, y2: top + 2 }, ring)
     }
   }
-  // the years under the bars, the counted absences over them: one register a
-  // line, so a year and a count can never print over each other
-  numerals(marks, top + 25, { x: x(last), text: String(last), cls: 'wing-life-year wing-life-year-end', anchor: 'end', em: YEAR_EM })
-  numerals(counts, top - 5)
+  const marker = add('line', { class: 'wing-life-marker', x1: 0, y1: top, x2: 0, y2: ticksTop + PLATE.ticks.floor })
+  const markerAt = options.at ? at.get(options.at) : undefined
+  if (markerAt === undefined) marker.setAttribute('opacity', '0')
+  else marker.setAttribute('transform', `translate(${markerAt.toFixed(1)},0)`)
 
-  let lane = top + PLATE.axis
-  const line = (y: number): void => { add('line', { class: 'wing-life-rule', x1: PLATE.pad, y1: y, x2: width - PLATE.pad, y2: y }) }
-
-  for (const row of rows) {
-    line(lane)
-    const middle = lane + PLATE.lane / 2
-    if (row === 'places') {
-      for (const event of record.events) {
-        const span = dateYears(event.date)
-        if (!span) continue
-        const afterlife = record.bands.find(band => band.id === event.band)?.afterlife
-        const left = afterlife ? xAfter(span.from) : x(span.from)
-        const right = afterlife ? xAfter(span.to) : x(span.to)
-        if (right - left > PLATE.least) {
-          const bar = add('rect', { class: 'wing-life-span', x: left, y: middle - 2, width: right - left, height: 4, rx: 2 })
-          bar.style.fill = colour(event.certainty)
-        }
-        const dot = add('circle', { class: 'wing-life-event', cx: left, cy: middle, r: 3.4 })
-        dot.style.fill = colour(event.certainty)
-      }
+  /* WHAT HAPPENED TO THE PAPERS AFTER IS NOT A PERIOD OF A LIFE: it stands
+     apart, dimmer, on its own clock, and says both of its years. */
+  if (hasAfter && after) {
+    const clock = afterScale(afterYears)
+    const label = add('text', { class: 'wing-life-after-word', x: left, y: afterTop - 4 })
+    label.textContent = options.afterWord
+    add('rect', { class: 'wing-life-after', x: left, y: afterTop, width: span, height: PLATE.after.height, rx: 1 })
+    for (const year of afterYears) {
+      const place = left + clock.at(year) * span
+      add('line', { class: 'wing-life-tick wing-life-tick-after', x1: place, y1: afterTop, x2: place, y2: afterTop + PLATE.after.height })
     }
-    if (row === 'works') {
-      // The axis draws only what the record puts inside a year of this life.
-      const dated = record.works.filter(work => workYears(work, record.span))
-      for (const [index, work] of dated.entries()) {
-        const span = workYears(work, record.span)
-        if (!span) continue
-        const left = x(span.from), right = x(span.to)
-        // Works overlap in time, so they are stacked in three courses and
-        // nothing is hidden under anything else.
-        const y = middle - 9 + (index % 3) * 8
-        add('rect', { class: 'wing-life-work', 'data-domain': work.domain, x: left, y, width: Math.max(PLATE.least, right - left), height: 5, rx: 2 })
-      }
+    for (const [year, anchor] of [[clock.from, 'start'], [clock.to, 'end']] as const) {
+      const node = add('text', { class: 'wing-life-after-year', x: anchor === 'start' ? left : left + span, y: afterTop + PLATE.after.height + 11, 'text-anchor': anchor })
+      node.textContent = String(year)
     }
-    if (row === 'people') {
-      for (const [index, person] of record.people.entries()) {
-        const tied = person.events.map(id => record.events.find(event => event.id === id)).filter(Boolean) as LifeEvent[]
-        const years = tied.map(event => dateYears(event.date)).filter(Boolean) as { from: number; to: number }[]
-        if (!years.length) continue
-        const left = x(Math.min(...years.map(span => span.from))), right = x(Math.max(...years.map(span => span.to)))
-        const y = lane + 8 + (index % 4) * 7
-        const bar = add('rect', { class: 'wing-life-tie', x: left, y, width: Math.max(PLATE.least, right - left), height: 3, rx: 1.5 })
-        bar.style.fill = colour(person.certainty)
-        for (const span of years) {
-          const dot = add('circle', { class: 'wing-life-tie-dot', cx: x(span.from), cy: y + 1.5, r: 2.4 })
-          dot.style.fill = colour(person.certainty)
-        }
-      }
-    }
-    lane += PLATE.lane
   }
-  line(lane)
-  if (after) add('line', { class: 'wing-life-break', x1: afterLeft - PLATE.gutter / 2, y1: top - 4, x2: afterLeft - PLATE.gutter / 2, y2: lane })
 
-  return { element: svg, width, height }
+  return { element: svg, width, height, bands, strip: { top, height: stripHeight }, at: (id: string) => at.get(id) ?? null }
 }

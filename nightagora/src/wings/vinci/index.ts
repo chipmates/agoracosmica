@@ -16,6 +16,7 @@ import type { PlanHighlight, PlanPoint, PlanRoom, PlanShape, PlanSite, PlanStati
 import { createWingLife, type WingLife } from '../life'
 import { LIFE_WORDS } from '../life/words'
 import type { LifeBand, LifeEvent, LifePerson, LifeRecord, LifeWork, MuseumDate, Sure } from '../life/types'
+import { dateYears } from '../life/scale'
 import { constructionRecords, evidenceWords } from './evidence-copy'
 import { lang, WING_TEXT } from '../content'
 import { createVinciSourcesWindow, type VinciSourcesTab, type VinciExhibitSources } from './sources'
@@ -76,7 +77,7 @@ import { createVinciHangStrip, vinciSheetTitle, type VinciStripEntry } from './c
 import { pathSpecifications } from './paths'
 import { roadGradeProvenance } from './road-grade'
 import { apronProvenance } from './apron'
-import { vinciContent, vinciPlanRooms, vinciThroughLine, vinciLifeBands, vinciLifePeople, vinciLifeSecondLine, vinciLifeNotCut, vinciLifeWorksRow, vinciLifeWorksCount, vinciLifeCertaintyCounted, vinciWelcomeText, vinciLegacyStationIds, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, vinciAbsences, vinciGrounds, vinciRightsPolicy, vinciWingCounts, vinciSourcesHeadings, type VinciCertainty, type VinciStatement, type VinciStationId, type VinciText } from './content'
+import { vinciContent, vinciPlanRooms, vinciThroughLine, vinciLifeBands, vinciLifePeople, vinciLifeSecondLine, vinciLifeNotCut, vinciLifeWorksRow, vinciLifeWorksCount, vinciLifeCertaintyCounted, vinciHourValues, vinciWelcomeText, vinciLegacyStationIds, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, vinciAbsences, vinciGrounds, vinciRightsPolicy, vinciWingCounts, vinciSourcesHeadings, type VinciCertainty, type VinciStatement, type VinciStationId, type VinciText } from './content'
 import wingCss from './wing.css?inline'
 
 const text=(value:VinciText):string=>value[lang()]
@@ -702,9 +703,13 @@ export function createWing():VinciWingModule {
       const own=events.filter(event=>event.band===band.id)
       if(!own.length)continue
       const from=own[0]!.date,to=own[own.length-1]!.date
-      bands.push({id:band.id,name:band.name,line:band.line,from,to,
-        certainty:sureRank(from.certainty)<=sureRank(to.certainty)?from.certainty:to.certainty,
-        first:own.slice(0,4).map(event=>event.id),...(band.afterlife?{afterlife:true as const}:{})})
+      // A PERIOD IS DECLARED, NOT MEASURED: the years the wing names it
+      // between are what the ribbon draws it to. The rows after the death are
+      // on their own clock, so those take the years their own dates fall in.
+      const reach=own.map(event=>dateYears(event.date)).filter(Boolean) as {from:number;to:number}[]
+      const years=band.years??{from:Math.min(...reach.map(span=>span.from)),to:Math.max(...reach.map(span=>span.to))}
+      bands.push({id:band.id,name:band.name,place:band.place,line:band.line,from,to,years,
+        ...(band.afterlife?{afterlife:true as const}:{})})
     }
     const people:LifePerson[]=vinciLifePeople.map(person=>({id:person.id,name:person.name,role:person.role,
       events:person.events,
@@ -718,6 +723,7 @@ export function createWing():VinciWingModule {
       [key,{word:{en:LINE_CERTAINTY[key].en,de:LINE_CERTAINTY[key].de},
         counted:vinciLifeCertaintyCounted[key],colour:LINE_CERTAINTY[key].colour}])) as LifeRecord['sure']
     return {bands,events,works:lifeWorks(),people,sure,
+      here:LINE_STUDS.find(stud=>stud.date===vinciHourValues.julianDate)?.id,
       words:{throughLine:vinciThroughLine,secondLine:vinciLifeSecondLine,honesty:LIFE_HONESTY,notCut:vinciLifeNotCut,
         worksRow:vinciLifeWorksRow,worksCount:vinciLifeWorksCount,age:LIFE_AGE_WORDS,back:LIFE_CARDS.controls.shared.back},
       span:{from:Number(LIFE_BIRTH.date.slice(0,4)),to:Number(LIFE_DEATH.date.slice(0,4))}}

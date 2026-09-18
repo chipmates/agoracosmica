@@ -18,6 +18,9 @@ export const LIFE_WORDS = {
   /** The way back up from one date, on the reader that stands at it. */
   life: { en: 'The life', de: 'Das Leben' },
   walk: { en: 'Walk me there', de: 'Bring mich hin' },
+  /** The strip under the blank, on its own clock: what happened to the work
+   * after the life is not a period of that life. */
+  after: { en: 'Afterwards', de: 'Danach' },
   /** The works with no date in the record, grouped rather than guessed at. */
   undated: { en: 'Without a date', de: 'Ohne Datum' },
   ask: { en: 'What came next?', de: 'Was kam danach?' },

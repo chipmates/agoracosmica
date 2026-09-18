@@ -45,14 +45,16 @@ export interface LifeBand {
   id: string
   /** named by place and by the years the period runs between */
   name: Bi
+  /** the short name alone, for the ribbon, where a name has a segment's room */
+  place: Bi
   /** one cue sentence, the period in a line */
   line: Bi
   from: MuseumDate
   to: MuseumDate
-  /** the weaker of its two bounds */
-  certainty: Sure
-  /** what a closed band shows: four is what a boundary carries */
-  first: readonly string[]
+  /** THE YEARS THE PERIOD IS DECLARED BETWEEN, which are not the years its
+   * dates happen to fall in: a period named 1500 to 1506 whose last date is
+   * 1504 is drawn to 1506, and the thin tail is the record growing thin. */
+  years: { from: number; to: number }
   /** The rows after a death are the reception of the work, not a period of a
    * life, so the view draws them apart. */
   afterlife?: true
@@ -134,6 +136,8 @@ export interface LifeRecord {
   works: readonly LifeWork[]
   people: readonly LifePerson[]
   words: LifeWingWords
+  /** the event the wing's own hour stands on, where the view opens */
+  here?: string
   /** The record's own certainty keys, in the order its counted sentence says
    * them, with the colours the wing already cuts them in. */
   sure: Record<string, LifeSure>
