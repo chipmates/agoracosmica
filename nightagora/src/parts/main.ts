@@ -33,6 +33,7 @@ import { GRADES, type Grade } from '../stack/grade'
 import { isTierName, type TierName } from '../stack/tier'
 import type { SkyProbe } from '../stack/hdri'
 import { createParts, type Part, type PartsKit } from '../stack/parts'
+import { DETAIL_SPECIMENS, type DetailMode, type Eye } from './specimens'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type N = any
@@ -63,6 +64,14 @@ const indexEl = document.getElementById('index') as HTMLElement
 
 const asked = new URLSearchParams(location.search)
 const tierAsked = asked.get('tier')
+/* THE NODE'S OWN SPECIMENS ARE SHOT IN PAIRS, so the bench takes three more
+   words off the address: which state a detail specimen is built in, where
+   the eye stands for it, and how far that eye has stepped sideways. A
+   shimmer is two frames a hand's width apart, differenced, and it cannot be
+   read from one. */
+let mode: DetailMode = asked.get('mode') === 'before' ? 'before' : 'after'
+let eyeName = asked.get('eye') ?? ''
+let nudge = Number(asked.get('nudge') ?? 0)
 
 const scene = new Scene()
 const camera = new PerspectiveCamera(38, innerWidth / innerHeight, 0.02, 400)
@@ -261,6 +270,12 @@ const SPECIMENS: Record<string, () => Part> = {
   shrub: () => kit.shrub({ height: 1.5, season: 'october', seed: 46 }),
   grass: () => kit.grass({ width: 4, depth: 4, kind: 'meadow', seed: 47 }),
   'grass-lawn': () => kit.grass({ width: 3, depth: 3, kind: 'lawn', density: 520, seed: 48 }),
+  ...Object.fromEntries(
+    Object.entries(DETAIL_SPECIMENS).map(([name, spec]) => [
+      name,
+      () => spec.build(mode, stack.tierConfig().detail),
+    ])
+  ),
 }
 
 const names = Object.keys(SPECIMENS)
@@ -366,6 +381,9 @@ async function show(name: string): Promise<void> {
 
   setRuler(Math.max(size.y, 0.1), box.min.x - Math.max(0.12, size.x * 0.16))
   frame(size, centre)
+  const eye = DETAIL_SPECIMENS[current]?.eyes[eyeName]
+  if (eye) standAt(eye)
+  built = true
 
   const record = part.userData.part
   nameEl.textContent = current
@@ -396,6 +414,30 @@ async function show(name: string): Promise<void> {
 function round(v: number): number {
   return Math.round(v * 100) / 100
 }
+
+/* A NAMED VIEWPOINT, and the step sideways that proves a surface does not
+   shimmer. The eye and what it looks at move together: a visitor stepping
+   five centimetres is not a camera turning by an angle. */
+function standAt(eye: Eye): void {
+  const from = new Vector3(...eye.from)
+  const to = new Vector3(...eye.to)
+  if (nudge) {
+    const right = new Vector3().subVectors(to, from).cross(camera.up).normalize()
+    from.addScaledVector(right, nudge)
+    to.addScaledVector(right, nudge)
+  }
+  camera.position.copy(from)
+  camera.lookAt(to)
+  camera.near = 0.02
+  camera.far = 400
+  camera.updateProjectionMatrix()
+}
+
+/* WHAT THE SHADER COST TO STAND UP. The first frame after a part is built is
+   the one that links its pipelines, and a node that doubles that is a node a
+   station pays for on arrival. */
+let built = false
+let firstFrameMs = 0
 
 let standingOn: Part['userData']['part'] | null = null
 
@@ -428,7 +470,12 @@ function tick(now: number): void {
   const dt = Math.min(0.1, (now - last) / 1000)
   last = now
   if (kit.bench.report().some((b) => !b.ready)) writeHolding()
-  stack.render(dt)
+  if (built) {
+    const began = performance.now()
+    stack.render(dt)
+    firstFrameMs = Math.round((performance.now() - began) * 100) / 100
+    built = false
+  } else stack.render(dt)
   requestAnimationFrame(tick)
 }
 requestAnimationFrame(tick)
@@ -439,12 +486,20 @@ requestAnimationFrame(tick)
 declare global {
   interface Window {
     __forgeParts?: {
-      jump: (state: string, opts?: { part?: string }) => void
+      jump: (state: string, opts?: { part?: string; mode?: DetailMode; eye?: string; nudge?: number }) => void
       freeze: (t: number) => void
       tier: (name: TierName) => void
       look: (yaw: number, pitch: number) => void
       cost: () => ReturnType<Stack['cost']>
-      state: () => { texturesPending: number; part: string; tris: number; draws: number }
+      state: () => {
+        texturesPending: number
+        part: string
+        tris: number
+        draws: number
+        mode: DetailMode
+        eye: string
+        firstFrameMs: number
+      }
       parts: () => string[]
     }
   }
@@ -453,6 +508,9 @@ window.__forgeParts = {
   jump(_state, opts = {}) {
     document.body.classList.add('forge')
     document.body.dataset['forge'] = 'pending'
+    if (opts.mode) mode = opts.mode
+    if (opts.eye !== undefined) eyeName = opts.eye
+    if (opts.nudge !== undefined) nudge = opts.nudge
     void show(opts.part ?? current)
       .catch((err: Error) => {
         saysEl.textContent = `this part did not build: ${err.message}`
@@ -478,6 +536,9 @@ window.__forgeParts = {
     part: current,
     tris: standing?.userData?.['part']?.tris ?? 0,
     draws: standing?.userData?.['part']?.draws ?? 0,
+    mode,
+    eye: eyeName,
+    firstFrameMs,
   }),
   parts: () => names,
 }
