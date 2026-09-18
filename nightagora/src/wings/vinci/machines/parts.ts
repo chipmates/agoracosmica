@@ -166,7 +166,11 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Assemb
   const dynamic = new Set(dossier.slug === 'revolving-crane' ? ['hoist-rope', 'drum-wrap'] : dossier.slug === 'lathe' ? ['bow', 'drive-rope'] : [])
   // The complete camera remains closed by default. Its explicitly labelled
   // section view toggles these original part groups without changing geometry.
-  const sectionParts = new Set(dossier.slug === 'camera-obscura' ? ['roof', 'right-wall'] : [])
+  // A welded wall cannot be taken off, so every wall the section may lift
+  // stays its own draw: the near corner and the back, which the close look
+  // opens to show the aperture, the dark interior and the paper.
+  const sectionParts = new Set(dossier.slug === 'camera-obscura'
+    ? ['roof', 'right-wall', 'left-wall', 'front-left', 'back-wall'] : [])
   const names = [...new Set(dossier.parts.map(p => p.material.class))]
   const surfaceCache = new Map<string, Promise<Surface>>()
   const makeSurface = async (name: string, quietBank = false, quietWood = false, turned = false, burnished = false, geared = false): Promise<Surface> => {

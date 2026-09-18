@@ -943,11 +943,11 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "22101cc596e78ee072adc1f24ddbef954c1f5c602a41fd2182694c8613ba3f41"
+          "sha256": "7e5761cafd96b753026d355e19c2ff7f2a0d4f0e967e1f4ea13a7b33ec2bf77f"
         },
         {
           "path": "src/wings/vinci/machines/runtime.ts",
-          "sha256": "32eac04aa934d02334a668b0eed15811d8e063a2c35e5e44c3147a7d363abd45"
+          "sha256": "53b9e39d99b2e83a156bd5b7be3b9ccb5cb1336db83c1a9e8c40e187fc328f6c"
         },
         {
           "path": "src/wings/vinci/machines/types.ts",
