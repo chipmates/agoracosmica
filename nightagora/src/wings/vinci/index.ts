@@ -341,6 +341,9 @@ export function createWing():VinciWingModule {
       // certified, so the museum walks there and nothing is cut.
       station:id=>{const index=vinciContent.findIndex(station=>station.id===id);if(index>=0)h.navigate(index)},
       highlight:openFromPlan,
+      // THE OTHER WAY THROUGH THIS WING, from the sheet that draws the place:
+      // the word and the press are the wing's, the plan only stands them.
+      life:()=>({word:text(LIFE_WORDS.life),open:()=>openLife()}),
       returnFocus:focusTheBar,adopt:()=>planAdopt})
     // THE LIFE STANDS IN THE SAME GROUP, after the plan: the place and the
     // years are the two ways through this wing, so they are two words in one
