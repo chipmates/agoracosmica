@@ -1692,7 +1692,10 @@ export function createWing():VinciWingModule {
     stations:vinciContent.map(s=>({id:s.id,name:text(s.name),question:text(s.door)})),
     legacyStationIds:vinciLegacyStationIds,
     doorDisclosure:'first-press',
-    openSources(tab='station'){if(!standing){pendingView=`sources-${tab}`;return}sources.select(tab);mode=2;paintDock()},
+    // THE SOURCES WINDOW OPENS ON THE ROOM. A visitor who presses it is asking
+    // what the room they stand in is made of, and a room's sources are the
+    // sources of every station in it; the station's own tab is one press away.
+    openSources(tab='room'){if(!standing){pendingView=`sources-${tab}`;return}sources.select(tab);mode=2;paintDock()},
     setExhibitSources(exhibit){exhibitSources=exhibit;if(standing){sources.resetScroll();paintDock()}},
     // NO MACHINE ANIMATES WHILE THE VISITOR WALKS. A close look names the one
     // machine whose own clock may run; null puts every machine back at rest.
