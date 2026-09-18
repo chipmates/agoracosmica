@@ -5,7 +5,7 @@
  * `grave/` by their own factories. This module owns where they stand, what
  * they stand on and which way they face, and nothing else.
  */
-import { Group, Mesh, PointLight, Vector3, type Material } from 'three/webgpu'
+import { Group, Mesh, PointLight, Vector3, type Material, type PlaneGeometry } from 'three/webgpu'
 import type { Stack } from '../../../stack'
 import { buildMachine, MACHINE_SLUGS, type MachineSlug } from '../machines'
 import type { ReadyMachineBuild } from '../machines/runtime'
@@ -228,14 +228,13 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       // The table brings a back wall of its own, because its bench had none.
       // It stands against the gallery's west wall, so that wall is the one it
       // brings: the reader faces it with the window elevation behind them.
-      // Keep the bench's south edge and shorten only the north end. The
-      // 3.25 m panel is what the table brought; with the table 0.8 m south of
-      // the reveal it used to end at, the panel ends at north -45.15 and the
-      // book has 1.85 m of wall between it and the hall door's opening.
+      // THE PANEL IS CENTRED ON THE TABLE, at the length the table's own place
+      // is derived from, so the book and its lamp stand in the middle of the
+      // brown and neither end of the top overhangs it.
       const backWall = built.object.getObjectByName('reading-room-wall')
       if (!(backWall instanceof Mesh)) throw new Error('The reading table has no back wall')
-      backWall.scale.x = 3.25 / 4.4
-      backWall.position.x = -.575
+      backWall.scale.x = VINCI_READING_TABLE.panelWidthM / (backWall.geometry as PlaneGeometry).parameters.width
+      backWall.position.x = 0
       built.object.rotation.y = Math.PI / 2
       built.object.position.set(VINCI_READING_TABLE.east, VINCI_READING_TABLE.top, -VINCI_READING_TABLE.north)
       stamp(built.object, 'vinci/table-furniture')

@@ -16,7 +16,7 @@ import type { VinciStationId } from '../content'
 import { GRAVE_DEATHBED, GRAVE_FRAME, GRAVE_SLAB } from '../grave/placement'
 import { LINE_STUDS, lineCutStuds } from '../line/studs'
 import { hangPlacements } from './hang'
-import { COURT, FACE, FLOOR, GRAVE_ORIGIN, LINE_ORIGIN, SUPPER_WALL } from './layout'
+import { COURT, FACE, FLOOR, GRAVE_ORIGIN, LINE_ORIGIN, OPENING, SUPPER_WALL } from './layout'
 import { STANDS, standLevel } from './stands'
 import { dossiers, MACHINE_SLUGS, type MachineSlug } from '../machines/catalog'
 
@@ -257,9 +257,19 @@ function machinePose(slug: keyof typeof MACHINE_EYES, narrow: boolean): Approach
 /** The one station the gallery's cut line is read and walked from. */
 const LINE_STATION: VinciStationId = 'line-early'
 /** The book lies open on the table under its lamp, read from the chair side.
- * The table stands 0.8 m south of the hall door's reveal it used to end at,
- * which leaves 1.85 m of wall between the book and that opening. */
-export const VINCI_READING_TABLE = { east: -37.72, north: -46.2, top: FLOOR + .755 }
+ *
+ * THE TABLE STANDS CENTRED ON ITS OWN PANEL, and the panel is what fixes the
+ * place. The panel cannot grow and cannot walk north: the hall door beside it
+ * is how a visitor reaches the gallery, so it keeps its length and its
+ * clearance from that door's reveal, and the table's own north follows from
+ * them. The table's top is 2.8 m along the wall against the panel's 3.25, so
+ * nothing of it overhangs the brown at either end.
+ */
+export const VINCI_READING_TABLE = (() => {
+  const panelWidthM = 3.25, doorClearM = .95
+  return { east: -37.72, north: OPENING.hallToGallery.north[0] - doorClearM - panelWidthM / 2,
+    top: FLOOR + .755, panelWidthM }
+})()
 const READING_TABLE = VINCI_READING_TABLE
 /** The flight plaque's stone, and the standing distance its lines read at. */
 export const VINCI_PLAQUE_AT = { east: -40.2, north: -25.5 }
