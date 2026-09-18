@@ -38,9 +38,9 @@
 .wing-life-press {position:absolute;height:44px;padding:0;background:none;border:0;cursor:pointer;pointer-events:auto;}
 .wing-life-press:focus-visible {outline:1px solid #edcc8c;outline-offset:1px;}
 /* Hover brightens an edge and says nothing: no meaning ever sits on a
-   rollover, because a phone has none. */
-.wing-life-press:hover ~ .wing-life-plate .wing-life-segment,
-.wing-life-segment:hover .wing-life-period {stroke-opacity:.95;}
+   rollover, because a phone has none. The press covers its own segment, so
+   the edge it brightens is the press's own. */
+.wing-life-press:hover {box-shadow:inset 0 0 0 1px #edcc8c55;}
 /* ONE PLACE IS OPEN. The open period is filled and its name is cut out of it;
    the others keep their ground and their name stays in the sheet's own ink. */
 .wing-life-period {fill:#c9b07d;opacity:.3;stroke:#c9b07d;stroke-opacity:.6;stroke-width:1;
