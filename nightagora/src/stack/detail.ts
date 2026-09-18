@@ -675,3 +675,167 @@ export function applyDetail(
   }
   return nodes
 }
+
+/* ── THE SURFACE A PART CARRIES ─────────────────────────────────────────────
+   The helper above dresses a LIBRARY SET: it knows the photograph's own tile
+   and reads its scales off the manifest. Most of this museum's surfaces have
+   no photograph and never will: a room's floor, a lined wall, a plinth, a
+   black base slab, a court's paving are procedural to the last fragment. They
+   were each hand-rolled where they stand, with the room's own numbers in
+   them, and that is why a 0.10 m slab carries a 3.2 m macro and reads as
+   paint: a feature sampled once across a face is not a feature, it is a tint.
+
+   So this is the same three scales with the scales given BY THE PART, in
+   metres, filtered by the pixel rather than by the distance, with the course
+   field under them where the surface is laid rather than cast, and the
+   projection chosen so a vertical face is not wearing a floor's photograph.
+   One call, and a room, a plinth and a court recipe all make it. */
+
+/** the coarsest feature a part can carry, as a share of its smallest extent:
+    two full periods across a face is the least the eye reads as variation */
+export const MACRO_SHARE = 0.5
+/** and the gap between one scale and the next: closer than a factor of four
+    and the two read as one band rather than as two */
+export const LADDER = 4
+
+const refused = new Set<string>()
+
+/**
+ * The ladder a part of this size can actually carry. The macro is refused
+ * above half the part's smallest extent, and every scale below it is pulled
+ * under a quarter of the one above.
+ */
+export function fitScales(
+  scales: [number, number, number],
+  extent?: number
+): [number, number, number] {
+  const macro = extent ? Math.min(scales[0], extent * MACRO_SHARE) : scales[0]
+  if (extent && macro < scales[0]) {
+    const key = `${scales[0]}@${extent}`
+    if (!refused.has(key)) {
+      refused.add(key)
+      console.warn(
+        `detail: a ${scales[0]} m macro across a ${extent} m part is one sample, ` +
+          `which reads as a tint; laid at ${macro} m instead`
+      )
+    }
+  }
+  const mid = Math.min(scales[1], macro / LADDER)
+  return [macro, mid, Math.min(scales[2], mid / LADDER)]
+}
+
+export interface SurfaceDetail {
+  /** the three feature sizes in METRES, macro to micro, of THIS part */
+  scales: [number, number, number]
+  /** the part's smallest extent in metres, which caps the macro */
+  extent?: number
+  /** how far each scale swings the tone, around 1; zero mean, so no scale
+      here can move what the surface is exposed at */
+  figure?: [number, number, number]
+  /** the relief the macro carries, in metres; a twentieth of the mid feature
+      by default, which is a slope a raking light can find and no more */
+  relief?: number
+  /** how many scales this tier pays for (`stack.tierConfig().detail`) */
+  count?: 1 | 2 | 3
+  /** the world position and the world normal */
+  at?: N
+  normal?: N
+  /** how the plane the courses are laid in is found. `triplanar` reads three
+      and blends them on the normal, `face` picks the dominant world axis per
+      fragment, `down` projects straight down, which is what a hand-rolled
+      world material does and why its vertical faces smear. The tier decides
+      when the caller does not: three reads where it can pay for them. */
+  space?: 'down' | 'face' | 'triplanar'
+  /** the courses laid on this face; none by default */
+  courses?: CourseRecipe
+  /** the surface coordinate the courses run in, in metres; taken from the
+      normal when it is not given */
+  uv?: N
+  /** how dark a joint is, as a share of the face */
+  jointShade?: number
+}
+
+export interface SurfaceNodes {
+  /** multiply into the albedo: value around one, mean one */
+  tone: N
+  /** add to the roughness */
+  rough: N
+  /** the surface's own relief in METRES, for `reliefNormal` */
+  heightM: N
+  /** 1 inside a joint, 0 on the face; 0 where no courses were asked for */
+  joint: N
+  /** one number per stone, for a face dressed as its own stone */
+  cell: N
+  /** what the pixel holds of each of the three scales */
+  held: [N, N, N]
+  /** the pixel itself, for a caller laying its own lines */
+  pixel: N
+}
+
+/** the surface coordinate in metres, on the plane this face stands in */
+function faceUV(P: N, n: N): N {
+  const a = abs(n)
+  const flat = a.y.greaterThan(a.x).and(a.y.greaterThan(a.z))
+  return flat.select(vec2(P.x, P.z), a.x.greaterThan(a.z).select(vec2(P.z, P.y), vec2(P.x, P.y)))
+}
+
+export function surfaceDetail(o: SurfaceDetail): SurfaceNodes {
+  const count = o.count ?? 3
+  const s = fitScales(o.scales, o.extent)
+  const P = o.at ?? positionWorld
+  const n = o.normal ?? normalWorldGeometry
+  const figure = o.figure ?? [0.09, 0.06, 0.05]
+  const pixel = anisotropicFootprint(P).toVar()
+  const gate = (metres: number, on: boolean): N => (on ? resolved(metres, pixel).toVar() : float(0))
+  const held: [N, N, N] = [gate(s[0], true), gate(s[1], count >= 2), gate(s[2], count >= 3)]
+  const field = (metres: number, hold: N): N => mx_noise_float(P.div(metres)).mul(hold).toVar()
+  const macro = field(s[0], held[0])
+  const mid = count >= 2 ? field(s[1], held[1]) : float(0)
+  const micro = count >= 3 ? field(s[2], held[2]) : float(0)
+
+  let tone = float(1)
+    .add(macro.mul(figure[0]))
+    .add(mid.mul(figure[1]))
+    .add(micro.mul(figure[2]))
+  const relief = o.relief ?? s[1] * 0.05
+  let heightM = macro.mul(relief).add(mid.mul(relief * 0.4)).add(micro.mul(relief * 0.15))
+  const rough = micro.mul(0.05).add(mid.mul(0.03))
+  let joint: N = float(0)
+  let cell: N = macro.mul(0.5).add(0.5)
+
+  if (o.courses) {
+    const space = o.space ?? (count >= 2 ? 'triplanar' : 'face')
+    const recipe = o.courses
+    const laid = (U: N): CourseNodes => courses(U, recipe)
+    let c: CourseNodes
+    if (o.uv) c = laid(o.uv)
+    else if (space === 'down') c = laid(vec2(P.x, P.z))
+    else if (space === 'face') c = laid(faceUV(P, n))
+    else {
+      /* three reads and one blend, sharpened so a face that is nearly flat
+         pays nearly all of its weight to one plane. A per-vertex pick is
+         what moirés on a curve: the pick is interpolated between corners,
+         so the middle of a drum reads two projections at once. */
+      const a = abs(n).pow(4)
+      const w = a.div(a.x.add(a.y).add(a.z).max(1e-5)).toVar()
+      const x = laid(vec2(P.z, P.y)),
+        y = laid(vec2(P.x, P.z)),
+        z = laid(vec2(P.x, P.y))
+      const mix3 = (px: N, py: N, pz: N): N =>
+        px.mul(w.x).add(py.mul(w.y)).add(pz.mul(w.z))
+      c = {
+        tone: mix3(x.tone, y.tone, z.tone),
+        joint: mix3(x.joint, y.joint, z.joint),
+        depthM: mix3(x.depthM, y.depthM, z.depthM),
+        cell: mix3(x.cell, y.cell, z.cell),
+        held: mix3(x.held, y.held, z.held),
+      }
+    }
+    joint = c.joint.toVar()
+    tone = tone.mul(c.tone).mul(mix(float(1), float(1 - (o.jointShade ?? 0.3)), joint))
+    heightM = heightM.add(c.depthM)
+    cell = c.cell
+  }
+
+  return { tone, rough, heightM, joint, cell, held, pixel }
+}
