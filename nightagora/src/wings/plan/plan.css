@@ -50,7 +50,10 @@
 .wing-plan-dot {grid-area:1/1;width:9px;height:9px;border-radius:50%;background:#d2a557;border:1px solid #f4dab2;box-shadow:0 0 0 4px #101d27cc;}
 .wing-plan-mark[data-stood='true'] .wing-plan-dot {background:#8cba8b;}
 .wing-plan-mark[data-here='true'] .wing-plan-dot {width:13px;height:13px;background:#fff5e3;box-shadow:0 0 0 4px #101d27cc,0 0 0 6px #edcc8c;}
-.wing-plan-number {grid-area:1/1;transform:translate(13px,-11px);font:9px/1 var(--sans);letter-spacing:.06em;color:#e6d6b8;text-shadow:0 1px 4px #0a0f13;}
+/* The plate picks the side a numeral stands on, clear of every other mark and
+   numeral, and hands it here. The size is the plate's own PLATE_NUMBER_PX. */
+.wing-plan-number {grid-area:1/1;transform:translate(var(--numeral-x,13px),var(--numeral-y,-11px));font:9px/1 var(--sans);
+  letter-spacing:.06em;color:#e6d6b8;text-shadow:0 1px 4px #0a0f13;}
 .wing-plan-mark[data-here='true'] .wing-plan-number {color:#fff5e3;}
 .wing-plan-mark:focus-visible {outline:1px solid #edcc8c;outline-offset:-4px;}
 

@@ -164,11 +164,14 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
         width: Math.max(80, (box.width - numbers.padding * 2 - numbers.gap) * numbers.plateShare),
         height: Math.max(80, box.height - numbers.padding * 2),
       }
-    plate = drawPlanPlate(site, area, language,
-      narrow ? PLATE_NAME_PX.narrow : PLATE_NAME_PX.wide,
-      narrow ? PLATE_NAME_FLOOR.narrow : PLATE_NAME_FLOOR.wide)
-    drawing.style.width = `${Math.round(plate.width)}px`
-    drawing.style.height = `${Math.round(plate.height)}px`
+    plate = drawPlanPlate(site, area, {
+      language, standing,
+      namePx: narrow ? PLATE_NAME_PX.narrow : PLATE_NAME_PX.wide,
+      nameFloor: narrow ? PLATE_NAME_FLOOR.narrow : PLATE_NAME_FLOOR.wide,
+    })
+    // The marks are DOM over the drawing, so the two share one pixel exactly.
+    drawing.style.width = `${plate.width.toFixed(2)}px`
+    drawing.style.height = `${plate.height.toFixed(2)}px`
     drawing.replaceChildren(plate.element, marksHost)
 
     /* THE MARKS ARE THE MAP, THE LIST IS THE CONTROL. On the wide stage a
@@ -177,21 +180,22 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
        marks are drawn and the list beside them takes the hand. */
     marksHost.replaceChildren()
     for (const mark of plate.marks) {
-      const here = mark.stations.find(id => id === standing)
-      const first = site.stations.find(station => station.id === (here ?? mark.stations[0]))
-      if (!first) continue
       const element = narrow ? make('span', 'wing-plan-mark') : make('button', 'wing-plan-mark')
       if (element instanceof HTMLButtonElement) {
         element.type = 'button'
-        element.addEventListener('click', () => { const id = first.id; press(() => options.station(id)) })
+        element.addEventListener('click', () => { const id = mark.lead; press(() => options.station(id)) })
       }
       element.setAttribute('aria-hidden', 'true')
       element.tabIndex = -1
-      element.dataset['here'] = String(Boolean(here))
+      element.dataset['here'] = String(mark.here)
       element.dataset['stood'] = String(mark.stations.some(id => stood.has(id)))
-      element.style.left = `${mark.x.toFixed(1)}px`
-      element.style.top = `${mark.y.toFixed(1)}px`
-      element.append(make('span', 'wing-plan-dot'), make('span', 'wing-plan-number', String(first.number)))
+      element.style.left = `${mark.x.toFixed(2)}px`
+      element.style.top = `${mark.y.toFixed(2)}px`
+      const number = make('span', 'wing-plan-number', String(mark.number))
+      // The plate chose the side this numeral stands clear on; the CSS moves it.
+      number.style.setProperty('--numeral-x', `${mark.numeral.dx}px`)
+      number.style.setProperty('--numeral-y', `${mark.numeral.dy}px`)
+      element.append(make('span', 'wing-plan-dot'), number)
       marksHost.append(element)
     }
 
