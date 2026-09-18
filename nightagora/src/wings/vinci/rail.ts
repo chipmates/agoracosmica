@@ -226,8 +226,11 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
   let path:ReturnType<typeof createCertifiedRailPath>|undefined, placementNeedsFrame=false
   let duration=1.1, leg=gaitLeg(0), strideM=0, strideTarget=0, strideAt=0
   /** The leg's own clock retains its measured pace when the target changes.
-   * A visitor who has already asked for the station after this one is not
-   * strolling: each one still waiting speeds the leg under way. */
+   * A VISITOR WHO KEEPS PRESSING ON THE WALL IS NOT STROLLING: each stop
+   * pressed while a run is under way speeds that run. The station rail keeps
+   * its own law, that replacing the next target changes neither this leg nor
+   * its landing time, because it holds one pending slot and cannot tell a
+   * visitor pressing on from one changing their mind. */
   let legClock=0, legClockAt=0, pace=1, waiting=0
   /** The share of the leg under way the body has covered, for the overlay. */
   let walkedShare=1
@@ -329,7 +332,6 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
       // A certified leg finishes at its station before the newest target can
       // begin. Asking for that active endpoint cancels an older pending target.
       pending=sameRequest(active??completed,request)?undefined:request
-      if(active&&pending)pace=carriedPace(++waiting)
       chained=undefined
       // WHILE AN APPROACH STANDS THE RAIL TAKES THE RETURN AND A STATION, and
       // a station is walked from the station eye, which is the pair the
