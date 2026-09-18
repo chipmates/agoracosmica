@@ -3,7 +3,7 @@
   "provenance": {
     "scope": "The text fields of the four card models of the close look, as data. The line stands first and the description that exists today becomes the second paragraph. Everything below the description is composed from the registers by the modules named here and is never retyped, so a card cannot drift from the record it stands on.",
     "rule": "Two to four sentences on a card. The record keeps the rest and is one deliberate control away.",
-    "written_here": "The line (data/lines.json), the steps (data/steps.json), the honesty variants, the zoom ceiling's sentence, the rule labels, the floor's honesty line and every control's words.",
+    "written_here": "The line (data/lines.json), the steps (data/steps.json), the honesty variants, the zoom ceiling's sentence, the rule labels, the floor's honesty line and every control's words. A machine whose viewpoint is not the shared one names it under controls.machine.viewpoint_labels, keyed by the machine slug and the viewpoint id.",
     "prepared": "2026-09-15"
   },
   "models": {
@@ -108,7 +108,12 @@
         { "id": "whole", "en": "Whole", "de": "Ganz" },
         { "id": "drive", "en": "The drive", "de": "Der Antrieb" },
         { "id": "working-part", "en": "The working part", "de": "Das Werkstück" }
-      ]
+      ],
+      "viewpoint_labels": {
+        "camera-obscura": {
+          "drive": { "en": "The plate", "de": "Die Platte" }
+        }
+      }
     },
     "manuscript": {
       "hand": { "en": "His hand", "de": "Seine Handschrift" },

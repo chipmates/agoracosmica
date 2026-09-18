@@ -81,7 +81,9 @@ export function vinciManuscriptWords(): ReaderWords & { hand: string; mirror: st
 const CONTROLS = (JSON.parse(cardsRaw) as { controls: {
   shared: { back: Words; record: Words; more: Words }
   picture: { whole_plate: Words }
-  machine: { provenance: Words; play: Words; pause: Words; clock: Words; viewpoints: (Words & { id: string })[] }
+  machine: { provenance: Words; play: Words; pause: Words; clock: Words; viewpoints: (Words & { id: string })[]
+    /** A machine whose viewpoint is not the shared one, by slug and viewpoint id. */
+    viewpoint_labels?: Record<string, Record<string, Words>> }
 } }).controls
 type Slot = (Words & { source: string }) | null
 const LIMITS = (JSON.parse(limitsRaw) as { slots: Record<string, { limit: Slot; visual_note: Slot }> }).slots
@@ -258,9 +260,10 @@ export function createVinciMachinePayload(options: {
   const { slug } = options
   const dossier = dossiers[slug], language = lang(), record = machineCatalog[slug]
   const parts = VIEWPOINT_PARTS[slug]
+  const named = CONTROLS.machine.viewpoint_labels?.[slug]
   const viewpoints = CONTROLS.machine.viewpoints.map(entry => ({
     id: entry.id as TurntableViewpoint,
-    label: entry[language],
+    label: (named?.[entry.id] ?? entry)[language],
     part: entry.id === 'drive' ? parts.drive : entry.id === 'working-part' ? parts.working : null,
   }))
   const sheetLabel = folioName(slug)
