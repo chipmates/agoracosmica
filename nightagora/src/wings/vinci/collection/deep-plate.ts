@@ -101,10 +101,21 @@ export async function vinciPlatePyramid(plate: ResolvedPicturePlate): Promise<De
  * from; anything else falls back to the scan, and the ceiling sentence
  * stays true either way, because the ceiling is whatever source the window
  * opened. */
+const LEAF_PYRAMIDS = new WeakMap<ManifestIndex, Map<string, TilesRecord>>()
 export function vinciLeafSource(index: ManifestIndex, page: string,
   scan: { file: string; width: number; height: number }): DeepPlateSource {
-  const tiles = index.all.find(entry => (entry as TilesRecord).role === 'leaf-tiles'
-    && (entry as TilesRecord & { page?: string }).page === page) as TilesRecord | undefined
+  // A reading builds 188 sides, so the records are gathered once per index
+  // rather than walked once per side.
+  let cut = LEAF_PYRAMIDS.get(index)
+  if (!cut) {
+    cut = new Map()
+    for (const entry of index.all) {
+      const record = entry as TilesRecord & { page?: string }
+      if (record.role === 'leaf-tiles' && record.page) cut.set(record.page, record)
+    }
+    LEAF_PYRAMIDS.set(index, cut)
+  }
+  const tiles = cut.get(page)
   if (!tiles || tiles.display !== true || !tiles.width || !tiles.height) return { pyramid: null, ...scan }
   if (!tiles.tile_size || !tiles.scale_factors?.length || !tiles.path.endsWith('/')) return { pyramid: null, ...scan }
   const source = index.byId.get(tiles.derived_from ?? '')
