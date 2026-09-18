@@ -1678,6 +1678,7 @@ export function createWing():VinciWingModule {
     // The bar's word is painted with the dock, so it follows the language.
     if(source.textContent!==sourcesWord())source.textContent=sourcesWord()
     if(planControl&&planControl.textContent!==text(PLAN_WORDS.plan))planControl.textContent=text(PLAN_WORDS.plan)
+    if(lifeControl&&lifeControl.textContent!==text(LIFE_WORDS.door))lifeControl.textContent=text(LIFE_WORDS.door)
     dock.dataset['station']=s.id
     // Opening Sources changes presentation only, inside the same proven lens.
     camera.zoom=1;camera.clearViewOffset();camera.updateProjectionMatrix()
