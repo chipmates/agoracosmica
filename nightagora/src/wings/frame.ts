@@ -245,14 +245,65 @@ export function createWingFrame(
      stations keeps 44 px targets and the frame keeps one persistent mark
      where a lobby button beside a rail would have made two. */
   const railGroup = el('div', 'wing-rail-group')
+  const BAR_BOTTOM = 'var(--wing-rail-bottom,calc(168px + env(safe-area-inset-bottom)))'
   railGroup.style.cssText =
-    'position:fixed;left:50%;transform:translateX(-50%);bottom:var(--wing-rail-bottom,calc(168px + env(safe-area-inset-bottom)));max-width:calc(100vw - 32px);display:flex;align-items:center'
+    `position:fixed;left:50%;transform:translateX(-50%);bottom:${BAR_BOTTOM};max-width:calc(100vw - 32px);display:flex;align-items:center`
   railGroup.dataset['naPersistent'] = ''
   const rail = el('nav', 'wing-rail')
   rail.setAttribute('aria-label', say(WING_TEXT.rail))
   rail.style.cssText =
     'position:relative;left:auto;transform:none;bottom:auto;min-width:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;justify-content:flex-start'
   railGroup.append(lobby, rail)
+
+  /* THE RAIL KEEPS A THIRD OF THE BAR. A wing appends its own controls to
+     this group, and on a 390 px stage four words beside the rail leave it a
+     stub of about 45 px. When the words would take more than two thirds of
+     the bar, the group wraps them under the rail: the decision is the
+     frame's, so a wing never has to know how wide its own words are. */
+  const RAIL_SHARE = 1 / 3
+  /** what the bar keeps clear of the door block under it */
+  const BAR_CLEAR = 8
+  function fitTheBar(): void {
+    /* Measured with nothing wrapped. A group that has already wrapped is
+       narrower and taller than its own ceiling, and deciding from that would
+       oscillate between one line and two. */
+    railGroup.style.flexWrap = 'nowrap'
+    railGroup.style.bottom = BAR_BOTTOM
+    rail.style.flexBasis = ''
+    for (const child of railGroup.children) (child as HTMLElement).style.flexGrow = ''
+    const box = getComputedStyle(railGroup)
+    const line = railGroup.clientWidth - parseFloat(box.paddingLeft || '0') - parseFloat(box.paddingRight || '0')
+    if (line <= 0) return
+    const flat = railGroup.getBoundingClientRect().height
+    let words = 0, lead = 0, beforeRail = true
+    for (const child of railGroup.children) {
+      if (child === rail) { beforeRail = false; continue }
+      const width = (child as HTMLElement).getBoundingClientRect().width
+      words += width
+      if (beforeRail) lead += width
+    }
+    if (line - words >= line * RAIL_SHARE) return
+    railGroup.style.flexWrap = 'wrap'
+    // the rail fills the first line, so every appended word falls to the next
+    rail.style.flexBasis = `${Math.max(120, Math.floor(line - lead))}px`
+    // the second line is a row of cells, not three words against one edge
+    let past = false
+    for (const child of railGroup.children) {
+      if (child === rail) { past = true; continue }
+      if (past) (child as HTMLElement).style.flexGrow = '1'
+    }
+    /* A SECOND LINE TAKES THE BAR'S OWN SLACK FIRST. Above the bar stands
+       whatever the wing put there, keyed to the bar's one line; below it
+       stands the door block, which is this frame's. So the group drops by as
+       much of its new height as the door block leaves it, and only what is
+       left over grows upward. */
+    const grew = railGroup.getBoundingClientRect().height - flat
+    const slack = doorBlock.getBoundingClientRect().top - railGroup.getBoundingClientRect().bottom
+    const drop = Math.max(0, Math.min(grew, Math.floor(slack - BAR_CLEAR)))
+    if (drop > 0) railGroup.style.bottom = `calc(${BAR_BOTTOM} - ${drop}px)`
+  }
+  new MutationObserver(() => fitTheBar()).observe(railGroup, { childList: true })
+  addEventListener('resize', () => fitTheBar())
 
   const question = el('p', 'wing-question')
   const door = el('a', 'wing-door', say(WING_TEXT.door))
