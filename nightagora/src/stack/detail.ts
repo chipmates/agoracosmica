@@ -59,13 +59,18 @@ const {
   abs,
   cameraPosition,
   clamp,
+  cos,
   float,
+  floor,
+  fract,
   length,
   mix,
   mx_fractal_noise_float,
   mx_noise_float,
   normalMap,
   normalize,
+  normalWorldGeometry,
+  positionView,
   positionWorld,
   sin,
   smoothstep,
@@ -73,6 +78,47 @@ const {
   vec2,
   vec3,
 } = TSL as unknown as Record<string, N>
+
+/* ── THE PIXEL ──────────────────────────────────────────────────────────────
+   Every scale below is gated on what the pixel covering this fragment can
+   still resolve, and that is not a distance. A wall seen along its own length
+   has a pixel that is centimetres across the courses and metres along them,
+   so the eye's distance says nothing about whether a 4 mm tooth is a tooth or
+   a lattice: the screen derivative of the world position does.
+
+   Two figures, because a surface carries two kinds of feature. A NOISE FIELD
+   varies in every direction at once, so it takes the anisotropic figure, the
+   short axis of the pixel held up from the long one the way a sampler caps
+   anisotropy: adding both derivatives filters a grazing surface away to flat
+   colour, which is the defect it was meant to prevent. A LINE varies in one
+   axis and in nothing else, so a joint at a fixed east takes the pixel's own
+   x extent and a joint at a fixed north its z, and one figure for both is
+   what breaks a floor's joints into dashes from eight metres. */
+
+/** the world metres one pixel covers, with anisotropy capped as a sampler
+    caps it; the figure a noise field is gated on */
+export function anisotropicFootprint(P: N, maximumRatio = 8): N {
+  const dx = length(P.dFdx()),
+    dy = length(P.dFdy())
+  return dx.min(dy).max(dx.max(dy).div(maximumRatio)).max(0.00001)
+}
+
+/** the same pixel along each world axis on its own; the figure a LINE is
+    gated on, one per axis */
+export function axisFootprint(P: N): { east: N; up: N; north: N } {
+  const dx = P.dFdx().toVar(),
+    dy = P.dFdy().toVar()
+  const axis = (a: N, b: N): N => vec2(a, b).length().max(0.00002)
+  return { east: axis(dx.x, dy.x), up: axis(dx.y, dy.y), north: axis(dx.z, dy.z) }
+}
+
+/** 1 where a feature of this size is resolved by this pixel, 0 where it is
+    under it. Two to four samples per feature is where a sampler stops
+    resolving and starts averaging, and a feature that is being averaged has
+    to be gone rather than half there: half a feature per pixel is a lattice. */
+export function resolved(metres: number | N, footprint: N): N {
+  return smoothstep(2, 4, (typeof metres === 'number' ? float(metres) : metres).div(footprint))
+}
 
 /* ── THE GRAIN ──────────────────────────────────────────────────────────────
    One field per soft class, each built from three primitives so that the
@@ -215,6 +261,11 @@ export interface DetailScales {
   micro?: number
   /** where the density gradient starts and ends thinning, in metres */
   fade?: [number, number]
+  /** what thins each scale. `distance` thins the whole helper between the two
+      `fade` metres, which is what every caller in the museum reads today.
+      `footprint` gates each scale on the pixel that covers it and leaves the
+      distance term as the hand-off to the air alone. */
+  filter?: 'distance' | 'footprint'
   /** how many of the three scales this tier can afford */
   count?: 1 | 2 | 3
   /** where the maps are read from. `world` projects from the world position
@@ -254,7 +305,16 @@ export function detailNodes(set: MaterialSet, opts: DetailScales = {}): DetailNo
   const macroAmt = opts.macro ?? set.detail.macroContrast
   const microAmt = opts.micro ?? set.detail.micro
   const mapAmt = opts.maps ?? 1
-  const fade = opts.fade ?? [12 * set.falloff, 46 * set.falloff]
+  const P = opts.at ?? positionWorld
+  const footprint = opts.filter === 'footprint' ? anisotropicFootprint(P).toVar() : null
+  /* WHERE THE PIXEL DECIDES, THE DISTANCE HAS ONE JOB LEFT: to give the
+     surface to the air at the far end. So it begins where the museum's own
+     fade ends (46 m of the set's own falloff) and runs to 140, and every
+     scale between here and there is thinned by what the pixel can hold
+     instead of by how far away it is. */
+  const fade =
+    opts.fade ??
+    (footprint ? [46 * set.falloff, 140 * set.falloff] : [12 * set.falloff, 46 * set.falloff])
 
   /* THE MID BAND'S OWN LAW. A mid feature coarser than the photograph it
      stands on does not sit under the material, it replaces it: a 10 cm cloud
@@ -266,9 +326,14 @@ export function detailNodes(set: MaterialSet, opts: DetailScales = {}): DetailNo
   const midBand = count >= 2 && s[1] > 0 && s[1] <= weave * 0.5
   const midAmt = midBand ? (opts.mid ?? 1) : 0
 
-  const P = opts.at ?? positionWorld
   const d = length(P.sub(cameraPosition))
   const density = clamp(float(1).sub(smoothstep(fade[0], fade[1], d)), 0, 1)
+  /** what survives at this pixel of a feature this size, under the air */
+  const held = (metres: number): N =>
+    footprint ? density.mul(resolved(metres, footprint)) : density
+  const heldMacro = held(s[0]).toVar()
+  const heldMid = held(midBand ? s[1] : 1).toVar()
+  const heldMicro = held(s[2]).toVar()
 
   // 1 · macro: what the room-scale eye sees. Two terms, and they are kept
   //     apart on purpose. VALUE swings around 1, so a plane never gets
@@ -287,8 +352,8 @@ export function detailNodes(set: MaterialSet, opts: DetailScales = {}): DetailNo
     set.variation.g / lv / (set.albedo.g / la),
     set.variation.b / lv / (set.albedo.b / la)
   )
-  const value = float(1).add(macro.sub(0.5).mul(2).mul(density).mul(macroAmt * 0.22))
-  let albedo: N = mix(vec3(1, 1, 1), hue, macro.mul(density).mul(macroAmt * 0.3)).mul(value)
+  const value = float(1).add(macro.sub(0.5).mul(2).mul(heldMacro).mul(macroAmt * 0.22))
+  let albedo: N = mix(vec3(1, 1, 1), hue, macro.mul(heldMacro).mul(macroAmt * 0.3)).mul(value)
 
   // 2 · mid: the relief you read from where you stand. Two noise reads a
   //     step apart are a gradient, which is a normal, at a cost of two taps
@@ -306,13 +371,13 @@ export function detailNodes(set: MaterialSet, opts: DetailScales = {}): DetailNo
      keeps only the relief its own photograph carries. */
   const scatter =
     (1 - set.metalness) * Math.min(1, Math.max(0, (set.roughness - 0.12) / 0.28))
-  const relief = midBand ? density.mul(midAmt * set.normalStrength * scatter) : float(0)
+  const relief = midBand ? heldMid.mul(midAmt * set.normalStrength * scatter) : float(0)
   let normal: N = normalize(vec3(dx.mul(relief), dz.mul(relief), float(1)))
 
   // 3 · micro: not visible as shape, only as the way the light sits
   const micro =
     count >= 3
-      ? mx_noise_float(P.div(s[2])).mul(0.5).add(0.5).sub(0.5).mul(density).mul(microAmt * 0.22)
+      ? mx_noise_float(P.div(s[2])).mul(0.5).add(0.5).sub(0.5).mul(heldMicro).mul(microAmt * 0.22)
       : float(0)
   let roughness: N = float(set.roughness).add(micro)
   let occlusion: N = float(1)
@@ -390,7 +455,7 @@ export function detailNodes(set: MaterialSet, opts: DetailScales = {}): DetailNo
      not carry at this size. Its slope adds to the slopes already there and
      the whole is renormalised once. A set that declares none pays nothing. */
   if (set.grain && count >= 2) {
-    const g = grainNodes(set.grain, set.place(where), density, count)
+    const g = grainNodes(set.grain, set.place(where), held(set.grain.pitch), count)
     if (set.grain.shade > 0) albedo = albedo.mul(float(1).add(g.shade))
     if (set.grain.sheen > 0) roughness = roughness.add(g.rough)
     normal = normalize(vec3(normal.xy.add(g.slope), normal.z))
