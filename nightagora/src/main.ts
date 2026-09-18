@@ -1039,7 +1039,7 @@ const paceRow = document.createElement('fieldset')
 paceRow.className = 'inst-setting inst-tiers'
 const paceLegend = document.createElement('legend')
 paceLegend.dataset['lobby'] = 'pace'
-paceLegend.textContent = LOBBY_TEXT.pace.en
+paceLegend.textContent = say(LOBBY_TEXT.pace)
 paceRow.append(paceLegend)
 for (const [name, key] of [['stroll', 'paceStroll'], ['walk', 'paceWalk'], ['brisk', 'paceBrisk']] as const) {
   const control = document.createElement('button')
@@ -1048,12 +1048,12 @@ for (const [name, key] of [['stroll', 'paceStroll'], ['walk', 'paceWalk'], ['bri
   control.setAttribute('aria-pressed', String(gaitPace() === name))
   const word = document.createElement('span')
   word.dataset['lobby'] = key
-  word.textContent = LOBBY_TEXT[key].en
+  word.textContent = say(LOBBY_TEXT[key])
   control.append(word)
   if (name === 'walk') {
     const cost = document.createElement('small')
     cost.dataset['lobby'] = 'paceCost'
-    cost.textContent = LOBBY_TEXT.paceCost.en
+    cost.textContent = say(LOBBY_TEXT.paceCost)
     control.append(cost)
   }
   control.addEventListener('click', () => {
