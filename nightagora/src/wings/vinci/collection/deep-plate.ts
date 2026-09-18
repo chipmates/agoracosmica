@@ -77,6 +77,35 @@ interface TilesRecord extends ManifestEntry {
   readonly tile_size?: number
   readonly scale_factors?: readonly number[]
 }
+/** THE DEEP SOURCE OF THIS FACE, where the store holds one: the same source
+ * page as the plate the wall hangs, unbounded. The wall keeps its own plate,
+ * which is the file a texture can carry; this is the one the close view
+ * opens, so the ceiling is the source's own pixels rather than the wall's
+ * copy of them. Read synchronously, because the view needs the source's
+ * shape and its centimetres in the same breath it is built. */
+let INDEX: ManifestIndex | null = null
+void loadManifest().then(index => { INDEX = index })
+export function vinciDeepPlate(plate: ResolvedPicturePlate):
+{ pyramid: DeepTilePyramid; width: number; height: number } | null {
+  if (!INDEX) return null
+  const record = validatePaintingRecord(plate.plate, 'painting-plate')
+  const tiles = INDEX.byId.get(`vinci/deep-tiles/${record.identity.replace(':', '-')}`) as TilesRecord | undefined
+  if (!tiles || tiles.role !== 'deep-tiles' || tiles.display !== true) return null
+  if (!tiles.width || !tiles.height || !tiles.tile_size || !tiles.scale_factors?.length) return null
+  if (!tiles.path.endsWith('/')) return null
+  // The deep file has to be the one admitted BESIDE this very plate, or it
+  // is another work's source and the label under it would be false.
+  const source = INDEX.byId.get(tiles.derived_from ?? '') as (ManifestEntry & { stands_beside?: string }) | undefined
+  if (!source || source.stands_beside !== plate.plate.id || source.sha256 !== tiles.source_sha256) return null
+  if (source.licence !== plate.plate.licence || source.class !== plate.plate.class) return null
+  return {
+    pyramid: { base: `${ASSET_BASE}${tiles.wing}/${tiles.path}`.slice(0, -1), width: tiles.width,
+      height: tiles.height, tileSize: tiles.tile_size, scaleFactors: tiles.scale_factors },
+    width: tiles.width,
+    height: tiles.height,
+  }
+}
+
 export async function vinciPlatePyramid(plate: ResolvedPicturePlate): Promise<DeepTilePyramid | null> {
   // The two faces of one panel share a file name, so a pyramid is named by
   // the face the records give the plate and never by its path.
@@ -138,10 +167,14 @@ export function vinciLeafSource(index: ManifestIndex, page: string,
  * physicalRegistration: false, so this is the museum's own assumption and
  * never an authenticated registration of the panel. */
 function platePxPerCm(work: PictureWork, plate: ResolvedPicturePlate,
-  cut: { left: number; right: number; top: number; bottom: number } | null): number | null {
+  cut: { left: number; right: number; top: number; bottom: number } | null, scale: number): number | null {
   if (!work.width_cm || !work.height_cm || !(work.width_cm > 0) || !(work.height_cm > 0)) return null
-  const across = (cut ? cut.right - cut.left : 1) * plate.pixels.width
-  const down = (cut ? cut.bottom - cut.top : 1) * plate.pixels.height
+  if (!(scale > 0)) return null
+  // The magnification the rule multiplies is one screen pixel per pixel of
+  // the source standing in the window, so a deeper source of the same work
+  // carries proportionally more of its own pixels across one centimetre.
+  const across = (cut ? cut.right - cut.left : 1) * plate.pixels.width * scale
+  const down = (cut ? cut.bottom - cut.top : 1) * plate.pixels.height * scale
   if (!(across > 0) || !(down > 0)) return null
   return Math.max(across / work.width_cm, down / work.height_cm)
 }
@@ -178,21 +211,25 @@ export function createVinciWholePlate(options: {
   for (const column of [...label.querySelectorAll<HTMLElement>('.picture-label-language')]) {
     if (column.lang !== language) column.remove()
   }
+  // THE DEEP SOURCE WHERE THE STORE HOLDS ONE. Its pixels are the view's
+  // ceiling and the rule's own scale, so the centimetres are measured
+  // against the source that stands in the window, not the wall's plate.
+  const deep = vinciDeepPlate(options.plate)
   const payload = createDeepPlatePayload({
     title: options.title,
     description: vinciPlateDescription(options.id),
     window: cut ? { left: cut.left, top: cut.top, right: cut.right, bottom: cut.bottom } : null,
     source: {
-      pyramid: vinciPlatePyramid(options.plate),
+      pyramid: deep ? deep.pyramid : vinciPlatePyramid(options.plate),
       file: ASSET_BASE + validatePaintingRecord(options.plate.plate, 'painting-plate').path,
-      width: options.plate.pixels.width,
-      height: options.plate.pixels.height,
+      width: deep ? deep.width : options.plate.pixels.width,
+      height: deep ? deep.height : options.plate.pixels.height,
     },
     words: { whole: CARDS.controls.machine.viewpoints[0]![language], nearer: NEARER[language],
       further: FURTHER[language], ceiling: CARDS.zoom_ceiling[language], rule: RULE },
     from: options.from,
     tier: options.tier,
-    pxPerCm: platePxPerCm(options.work, options.plate, cut),
+    pxPerCm: platePxPerCm(options.work, options.plate, cut, deep ? deep.width / options.plate.pixels.width : 1),
     details: vinciPlateDetails(options.id),
   })
   const back = document.createElement('button')
