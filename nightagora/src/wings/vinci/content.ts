@@ -529,6 +529,12 @@ const seed = (
   group: id.startsWith('line-') ? 'line' : ['arrival', 'courtyard', 'hall', 'oratory', 'study', 'chamber', 'garden'].includes(id) ? 'house' : 'collection',
 });
 
+/* THE WALK'S OWN ORDER, which is the order the building is walked in: in from
+   the garden at the picture room's east end, down the wall to its west end,
+   through that door into the machines, out of the hall into the gallery for
+   the line, the body wall and the reading table, back out through the picture
+   room's east end into the court, and west along it to the grave. Numeric
+   links keep their meaning through `originalWalk` below. */
 const seeds: readonly StationSeed[] = [
   seed('arrival', { en: 'The street', de: 'Die Straße' }, arrival,
     [arrival, vinciReconstruction, vinciHourLabel, vinciHourIntegrity], 'brief/CONCEPT-OPUS.md §3 S1'),
@@ -553,20 +559,20 @@ const seeds: readonly StationSeed[] = [
   seed('picture-room-west', { en: 'Where the wall ends', de: 'Wo die Wand endet' },
     { en: 'The latest painting on the wall, and the door to the machines.', de: 'Das späteste Gemälde der Wand und die Tür zu den Maschinen.' },
     [], 'brief/CONCEPT-OPUS.md §3 S11'),
-  seed('line-early', { en: 'The whole life, cut into the floor', de: 'Das ganze Leben, in den Boden geschnitten' },
-    { en: 'His grandfather recorded the birth on 15 April 1452.', de: 'Sein Großvater verzeichnete die Geburt am 15. April 1452.' },
-    [scattered], 'brief/CONCEPT-GPT6.md Station 02; brief/CONCEPT-OPUS.md §3 S8'),
-  seed('reading-table', { en: 'The reading table', de: 'Der Lesetisch' }, readingTable,
-    [readingTable], 'brief/CONCEPT-GPT6.md Station 10; brief/CONCEPT-OPUS.md §3 S13'),
-  seed('body', { en: 'The body as a machine', de: 'Der Körper als Maschine' }, body,
-    [body], 'brief/CONCEPT-OPUS.md §3 S17'),
-  seed('works', { en: 'The mechanism hall, two: land, water, measure', de: 'Die Maschinenhalle, zwei: Land, Wasser, Maß' },
-    { en: 'The two that were real, and how they differ.', de: 'Die beiden, die es wirklich gab, und ihr Unterschied.' },
-    [], 'brief/CONCEPT-OPUS.md §3 S16'),
   seed('flight', { en: 'The mechanism hall, one: flight', de: 'Die Maschinenhalle, eins: Flug' },
     { en: 'Fourteen of Leonardo da Vinci\'s machines can be rebuilt from what the sheets actually say. Twenty-eight cannot, and they are here as sheets.',
       de: 'Vierzehn von Leonardo da Vincis Maschinen lassen sich nach dem rekonstruieren, was die Blätter tatsächlich zeigen. Achtundzwanzig nicht, und sie sind hier als Blätter zu sehen.' },
     [vinciNoBodies], 'brief/CONCEPT-OPUS.md §3 S15'),
+  seed('works', { en: 'The mechanism hall, two: land, water, measure', de: 'Die Maschinenhalle, zwei: Land, Wasser, Maß' },
+    { en: 'The two that were real, and how they differ.', de: 'Die beiden, die es wirklich gab, und ihr Unterschied.' },
+    [], 'brief/CONCEPT-OPUS.md §3 S16'),
+  seed('line-early', { en: 'The whole life, cut into the floor', de: 'Das ganze Leben, in den Boden geschnitten' },
+    { en: 'His grandfather recorded the birth on 15 April 1452.', de: 'Sein Großvater verzeichnete die Geburt am 15. April 1452.' },
+    [scattered], 'brief/CONCEPT-GPT6.md Station 02; brief/CONCEPT-OPUS.md §3 S8'),
+  seed('body', { en: 'The body as a machine', de: 'Der Körper als Maschine' }, body,
+    [body], 'brief/CONCEPT-OPUS.md §3 S17'),
+  seed('reading-table', { en: 'The reading table', de: 'Der Lesetisch' }, readingTable,
+    [readingTable], 'brief/CONCEPT-GPT6.md Station 10; brief/CONCEPT-OPUS.md §3 S13'),
   seed('supper-wall', { en: 'The wall that is not here', de: 'Die Wand, die nicht hier ist' },
     { en: `${statementRecord(supper).en} ${statementRecord(supperAbsence).en}`, de: `${statementRecord(supper).de} ${statementRecord(supperAbsence).de}` },
     [supper, supperAbsence], 'brief/CONCEPT-OPUS.md §3 S12'),

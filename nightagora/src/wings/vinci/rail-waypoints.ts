@@ -63,7 +63,15 @@ export const railTerraceWaypoints: readonly RailWaypoint[] = [
 
 /** THE DOORS OF THE INSERTION. The two interior doors are the ends of the
  * built partitions, so their middles are the openings' own; the entrance is
- * the recessed north bay of the east elevation, under the canopy. */
+ * the recessed north bay of the east elevation, under the canopy.
+ *
+ * The picture room's WEST door is not one of them. Its opening is 1.16 m
+ * between the built partitions, and its two door linings leave 0.74 m of it
+ * clear at eye height: 0.37 m at the widest line through it, against the
+ * 0.41 to 0.45 m near envelope this rail is proved with. The walk to the
+ * machines therefore keeps to the gallery's door, and the west station's card
+ * names that door as the building's, not as the walk's.
+ */
 const ENTRANCE_NORTH = -35
 const PICTURE_TO_GALLERY = (OPENING.pictureToGallery.east[0] + OPENING.pictureToGallery.east[1]) / 2
 const HALL_TO_GALLERY = (OPENING.hallToGallery.north[0] + OPENING.hallToGallery.north[1]) / 2
