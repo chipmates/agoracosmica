@@ -39,6 +39,9 @@ export interface CollectionExhibits {
   /** Release the room's one full plate while a payload holds the stage
    * (true), and let the room choose again once it lets go (false). */
   holdPlates(release: boolean): void
+  /** Where the room's one full plate measures its near rule from while a run
+   * along the wall is under way, and `null` when the body is the eye again. */
+  aimPlates(eye: Vector3 | null): void
   dispose(): void
   ready: Promise<void>
   /** THE ENTRY'S OWN COUNT. Every body this module builds before the wing's
@@ -313,6 +316,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
     warm: warmHall,
     demonstrate(slug) { demonstrating = slug },
     holdPlates(release) { pictures.hold(release) },
+    aimPlates(eye) { pictures.aim(eye) },
     update(now, step, eye) {
       if (!live) return
       pictures.update(step, eye)

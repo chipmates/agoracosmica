@@ -112,6 +112,11 @@ export function mountCollectionPlates(host: Group, stack: Stack) {
   let batches: Batch[] = []
   /** While a payload holds the stage the room's one full slot stands empty. */
   let held = false
+  /** THE SLOT DOES NOT CHASE A WALK. While an aim stands, the near rule is
+   * measured from the eye the walk will land on instead of from the body, so a
+   * run past twenty-five works carries one request, for the stop it ends at,
+   * and has the whole leg to arrive. */
+  let aimed: Vector3 | undefined
   let failure: string | null = null
   const changes = new Set<Promise<void>>()
   const reported = new Set<string>()
@@ -413,6 +418,13 @@ export function mountCollectionPlates(host: Group, stack: Stack) {
     /** A DOM PAYLOAD HOLDS THE CANVAS: the room does not update under it, so
      * the release happens here, at once, and nothing is raised until the hold
      * lets go and the next update chooses again. */
+    /** Where the near rule measures from while a run is under way. Cleared on
+     * arrival, when the body is the eye again. */
+    aim(eye: Vector3 | null): void {
+      if (!eye) { aimed = undefined; return }
+      if (!aimed) aimed = new Vector3()
+      aimed.copy(eye)
+    },
     hold(release: boolean): void {
       if (held === release || !live) return
       held = release
@@ -447,7 +459,7 @@ export function mountCollectionPlates(host: Group, stack: Stack) {
         made.arrival.value = t * t * (3 - 2 * t)
       }
       reportErrors()
-      streamNear(eye)
+      streamNear(aimed ?? eye)
     },
     dispose(): void {
       if (!live) return

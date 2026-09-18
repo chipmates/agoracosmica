@@ -1759,6 +1759,10 @@ export function createWing():VinciWingModule {
       exhibits?.holdPlates(payload)
       if(payload)return
       measurement.update();rail.update()
+      // THE ROOM'S ONE FULL PLATE DOES NOT CHASE A RUN. While the eye slides
+      // along the wall the near rule measures from the stop it will land on,
+      // so a run past twenty-five works costs one request and not twenty-five.
+      exhibits?.aimPlates(rail.navigation.aimEye??null)
       if(exhibits){const now=hosts.world.clock();exhibits.update(now,Math.max(0,Math.min(.25,now-exhibitClock)),hosts.world.camera.position);exhibitClock=now}
       // THE CARD NAMES THE STATION THE WALKER IS IN. It hands over at the
       // half of the leg, by walked distance: before that the walker is still
