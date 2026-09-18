@@ -214,20 +214,26 @@ export function createWingLife(options: WingLifeOptions): WingLife {
         total: spokenCount(tally.events.total, language),
         counted: countedCertainties(record.sure, tally.events.by, language),
       }))),
-      make('p', 'wing-life-count', capitalise(fill(record.words.worksCount[language], {
-        total: spokenCount(tally.works.total, language),
-        dated: spokenCount(tally.works.dated, language),
-        undated: spokenCount(tally.works.undated, language),
-      }))),
-      // A count is a word and a year is a numeral, in the same sentence.
-      make('p', 'wing-life-count', capitalise(fill(LIFE_COUNTS.emptyYears[language], {
-        empty: spokenCount(tally.emptyYears, language),
-        span: spokenCount(record.span.to - record.span.from + 1, language),
-        from: record.span.from, to: record.span.to,
-        longest: spokenCount(tally.longestGapYears, language),
-      }))),
+
       make('p', 'wing-life-honesty', say(record.words.honesty)),
     )
+    /* A FAMILY THE RECORD HOLDS NONE OF IS NOT COUNTED. A life with no work
+       in its register says nothing about works rather than counting none. */
+    if (tally.works.total) counts.insertBefore(make('p', 'wing-life-count', capitalise(fill(record.words.worksCount[language], {
+      total: spokenCount(tally.works.total, language),
+      dated: spokenCount(tally.works.dated, language),
+      undated: spokenCount(tally.works.undated, language),
+    }))), counts.lastElementChild)
+    /* THE EMPTY YEARS ARE COUNTED ONLY WHERE THERE ARE YEARS. A record whose
+       dates cannot be put on one says that instead, where the ribbon would
+       have stood, and counting its silence in years would be a claim. */
+    // A count is a word and a year is a numeral, in the same sentence.
+    if (drawn) counts.insertBefore(make('p', 'wing-life-count', capitalise(fill(LIFE_COUNTS.emptyYears[language], {
+      empty: spokenCount(tally.emptyYears, language),
+      span: spokenCount(record.span.to - record.span.from + 1, language),
+      from: record.span.from, to: record.span.to,
+      longest: spokenCount(tally.longestGapYears, language),
+    }))), counts.lastElementChild)
   }
 
   /** THE VIEW OPENS ON THE HOUR THE WING STANDS IN: the museum's premise is
@@ -410,7 +416,7 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     section.append(make('h4', 'wing-life-row-name', record.words.worksRow[language]))
     const own = worksOf(record, entry)
     if (!own.length) {
-      section.append(make('p', 'wing-life-empty', LIFE_WORDS.noWorks[language]))
+      section.append(make('p', 'wing-life-empty', record.words.worksEmpty[language]))
       periodBody.append(section)
       return
     }

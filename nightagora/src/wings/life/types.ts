@@ -121,6 +121,8 @@ export interface LifeWingWords {
    * the museum's others. */
   worksRow: Bi
   worksCount: Bi
+  /** what that row says for a period it holds nothing in */
+  worksEmpty: Bi
   /** The age beside a year, in the wing's own words, so the reader that
    * stands at a date and this view say it from one place. */
   age: { exact: Bi; about: Bi }

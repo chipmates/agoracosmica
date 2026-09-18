@@ -24,11 +24,8 @@ export const LIFE_WORDS = {
   },
   /** On a work of the open period that hangs in this wing. */
   wall: { en: 'See it on the wall', de: 'An der Wand ansehen' },
-  /** A period the record puts no picture in, and one it names nobody in. */
-  noWorks: {
-    en: 'No picture in this record falls in these years.',
-    de: 'Kein Bild in diesem Verzeichnis fällt in diese Jahre.',
-  },
+  /** A period the record names nobody in. What the middle row says when it
+   * holds nothing is the wing's, beside that row's own name. */
   noPeople: {
     en: 'Nobody in this record is named in these years.',
     de: 'Niemand aus diesem Verzeichnis wird in diesen Jahren genannt.',
@@ -136,7 +133,10 @@ const TENS: Record<'en' | 'de', readonly string[]> = {
 /** A count as a person says it. Above ninety nine the numeral is what a person
  * says, so the numeral is what comes back. */
 export function spokenCount(value: number, language: 'en' | 'de'): string {
-  if (!Number.isInteger(value) || value < 0 || value > 99) return String(value)
+  // None is not a word here: a sentence that would count nothing is not
+  // printed at all, and a caller that asks anyway gets a numeral, never a
+  // hole in its own sentence.
+  if (!Number.isInteger(value) || value < 1 || value > 99) return String(value)
   if (value < 20) return ONES[language][value] ?? String(value)
   const ten = TENS[language][Math.floor(value / 10)] ?? '', one = ONES[language][value % 10] ?? ''
   if (!one) return ten

@@ -891,6 +891,12 @@ export const vinciLifeCertaintyCounted = {
   tradition: { en: '{n} from tradition', de: '{n} aus Überlieferung' },
 } satisfies Record<string, VinciText>;
 
+/** What that row says for a period the register puts no picture in. */
+export const vinciLifeWorksEmpty: VinciText = {
+  en: 'No picture in this record falls in these years.',
+  de: 'Kein Bild in diesem Verzeichnis fällt in diese Jahre.',
+};
+
 /** What a date the gallery floor does not carry says, instead of offering a
  * walk to a socket that was never cut. */
 export const vinciLifeNotCut: VinciText = {
