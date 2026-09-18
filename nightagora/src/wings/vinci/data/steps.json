@@ -322,15 +322,22 @@
       {
         "at": 0,
         "part": "aperture-plate",
-        "en": "A small round hole in a thin iron plate, a dark room, a sheet of white paper.",
-        "de": "Ein kleines rundes Loch in einer dünnen Eisenplatte, ein dunkler Raum, ein Blatt weißes Papier.",
+        "en": "Light from the flame outside goes through the small round hole.",
+        "de": "Das Licht der Flamme draußen fällt durch das kleine runde Loch.",
         "certainty": "reconstructed"
       },
       {
-        "at": 0.5,
+        "at": 0.35,
         "part": "screen",
-        "en": "What arrives on the paper stands upside down.",
-        "de": "Was auf dem Papier ankommt, steht auf dem Kopf.",
+        "en": "It crosses the dark chamber and lands on the white paper, upside down.",
+        "de": "Es quert die dunkle Kammer und landet auf dem weißen Papier, auf dem Kopf.",
+        "certainty": "reconstructed"
+      },
+      {
+        "at": 0.7,
+        "part": "screen",
+        "en": "Move the flame one way and its image goes the other.",
+        "de": "Bewegt sich die Flamme zur einen Seite, wandert ihr Bild zur anderen.",
         "certainty": "reconstructed"
       }
     ]
