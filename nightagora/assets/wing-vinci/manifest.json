@@ -270,7 +270,7 @@
       "prompt": "Original masonry-lined through passage between G1/G5 preserving existing six-step grade and clear width; common3.20m head within assumed2.38–3.22m interval. Stone thresholds at existing heights and outward-open oak leaf with explicit proposed dimensions. No photograph sampled.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "f1b8abe954a1e42a7590705d6c0dfaf3ad1eae2d959a489e678700cb07dd0752",
+      "sha256": "06a5ba159f001de208e6d15ae0defb60e6d813e7d6f6dc3e63141bb358874d41",
       "note": "Q134; A-SITE; A-OPENING; recipe_file=src/wings/vinci/gate-passage.ts"
     },
     {
@@ -413,7 +413,7 @@
       "prompt": "Regenerable actual geometry certificate for40 directed routes across five pose families and two viewport families. Includes foundation, entry, vegetation and all dressing; no sky, DOM or shadow-only duplicate.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-10",
-      "sha256": "da0f9e568bf610709d0a2bb285e1de08558aa56a036055a129e34fcd9a715799",
+      "sha256": "c55ff592ef2fede5d12da6fc890955ac9c41bebe62ac0825bdf7351667cb7fdc",
       "note": "recipe_file=src/wings/vinci/data/rail-clearance.json; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail; companion_file=src/wings/vinci/collection/approaches.ts"
     },
     {

@@ -6,8 +6,8 @@
  "sources": [
   {
    "file": "src/stack/detail.ts",
-   "sha256": "f6e9df463448454bbae32c47b173f3242eda9a0b6673198443e9847538d54529",
-   "bytes": 19138,
+   "sha256": "2dffd1f69e35eb322a60b73c140e7c199538361a43d484689e26b3411f648d35",
+   "bytes": 38485,
    "unchangedDuringAudit": true
   },
   {
@@ -96,8 +96,8 @@
   },
   {
    "file": "src/wings/vinci/content.ts",
-   "sha256": "09b37f459a40e32815a08bf7df75a20749ae7b64d4d8c12f224f41a2e9dd7867",
-   "bytes": 78259,
+   "sha256": "13d86105b046e1f9de77b22d68493286896eacf67ccc589ff27fb9591eb3d685",
+   "bytes": 78118,
    "unchangedDuringAudit": true
   },
   {
@@ -108,8 +108,8 @@
   },
   {
    "file": "src/wings/vinci/data/doors.json",
-   "sha256": "b2962c4d1521500fb4382d4f5346683b33f071be1e754c4f2a628629176f086a",
-   "bytes": 12576,
+   "sha256": "40aefa2f6d559c56ed2e8935cf959d9454e6e6fb4c2805ef3160309a41256e37",
+   "bytes": 12632,
    "unchangedDuringAudit": true
   },
   {
@@ -174,8 +174,8 @@
   },
   {
    "file": "src/wings/vinci/gate-passage.ts",
-   "sha256": "f1b8abe954a1e42a7590705d6c0dfaf3ad1eae2d959a489e678700cb07dd0752",
-   "bytes": 17354,
+   "sha256": "06a5ba159f001de208e6d15ae0defb60e6d813e7d6f6dc3e63141bb358874d41",
+   "bytes": 17903,
    "unchangedDuringAudit": true
   },
   {
@@ -342,8 +342,8 @@
   },
   {
    "file": "src/wings/vinci/masonry-courses.ts",
-   "sha256": "229855512223e854dc4f2fca3baa8f79538a572f41e753cacda2d69ba8d651ad",
-   "bytes": 6905,
+   "sha256": "197c31fc5ed2f3a8f52fdd9f466b8ff51eae02b408086f3198c68bdcd68d4cf3",
+   "bytes": 2710,
    "unchangedDuringAudit": true
   },
   {
@@ -474,25 +474,25 @@
   }
  ],
  "geometrySha256": [
-  "8cdcf183350dab72433c9a0236ab19e7dacb9a2814d09e104a6d6629e250adc1",
-  "a7ad36a111a26703425d2e7ef8045054e674197a180712167c5384f99c6d49fa"
+  "6a08bda174be7435bd486151c552f0d9c7c12ca00c749437e7a514a3eb343373",
+  "e0f588caaca2dd8fcf646b6089aef652e333046bc23172749d82cd6586fedb66"
  ],
  "geometry": [
   {
    "tier": "hero",
-   "sha256": "8cdcf183350dab72433c9a0236ab19e7dacb9a2814d09e104a6d6629e250adc1",
+   "sha256": "6a08bda174be7435bd486151c552f0d9c7c12ca00c749437e7a514a3eb343373",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   },
   {
    "tier": "standard",
-   "sha256": "8cdcf183350dab72433c9a0236ab19e7dacb9a2814d09e104a6d6629e250adc1",
+   "sha256": "6a08bda174be7435bd486151c552f0d9c7c12ca00c749437e7a514a3eb343373",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   },
   {
    "tier": "calm",
-   "sha256": "a7ad36a111a26703425d2e7ef8045054e674197a180712167c5384f99c6d49fa",
+   "sha256": "e0f588caaca2dd8fcf646b6089aef652e333046bc23172749d82cd6586fedb66",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   }
@@ -2282,17 +2282,17 @@
       0,
       16.137779235839844,
       19.058080673217773,
-      3.359999895095825,
+      3.365999937057495,
       20.72463035583496
      ],
      "centroid": [
       16.36792140007019,
-      1.711794662475586,
+      1.71299467086792,
       18.694294357299803
      ],
      "rms": [
       16.431060381546562,
-      2.2506416639210443,
+      2.2523914301166754,
       18.747771384208555
      ]
     },
@@ -4404,17 +4404,17 @@
       0,
       16.137779235839844,
       19.058080673217773,
-      3.359999895095825,
+      3.365999937057495,
       20.72463035583496
      ],
      "centroid": [
       16.36792140007019,
-      1.711794662475586,
+      1.71299467086792,
       18.694294357299803
      ],
      "rms": [
       16.431060381546562,
-      2.2506416639210443,
+      2.2523914301166754,
       18.747771384208555
      ]
     },
@@ -5790,17 +5790,17 @@
       0,
       16.137779235839844,
       19.058080673217773,
-      3.359999895095825,
+      3.365999937057495,
       20.72463035583496
      ],
      "centroid": [
       16.36792140007019,
-      1.711794662475586,
+      1.71299467086792,
       18.694294357299803
      ],
      "rms": [
       16.431060381546562,
-      2.2506416639210443,
+      2.2523914301166754,
       18.747771384208555
      ]
     },

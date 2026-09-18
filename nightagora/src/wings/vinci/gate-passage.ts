@@ -25,6 +25,14 @@ const across:Point=[-along[1],along[0]],upper=line[0]![2]!,lower=line[1]![2]!
 const count=Math.round(stair.count.value),tread=stair.tread_m.value
 const landing=(stairLength-count*tread)/2
 const HEAD=3.20,SOFFIT_THICKNESS=.16,RETURN_THICKNESS=.24
+/** THE HEAD IS THE SHELL'S OWN LINTEL, AND TWO FACES MAY NOT SHARE A PLANE.
+ * Both gate fronts carry a lintel whose soffit is this same +3.20 m, so a
+ * ceiling plate laid at the head shared its depth with 3.2 of its 7.6 square
+ * metres and the depth test picked the winner per pixel: steady to a standing
+ * eye, breaking up to a walking one. The plate is bedded clear of them. The
+ * head, the clear width and the plate's own thickness are unchanged; the
+ * lintel still carries the +3.20 m head. */
+const SOFFIT_BED=.006
 const EPS=1e-6
 const at=(distance:number,offset:number,height:number):Point3=>[
   a[0]+along[0]*distance+across[0]*offset,a[1]+along[1]*distance+across[1]*offset,height,
@@ -135,7 +143,7 @@ export function createGatePassage(tier:TierName):Group {
   }
   const ceiling=[xy(at(sides[0]!.start,-halfWidth,0)),xy(at(sides[1]!.start,halfWidth,0)),
     xy(at(sides[1]!.mouth,halfWidth,0)),xy(at(sides[0]!.mouth,-halfWidth,0))]
-  prism(lining,ceiling,HEAD,HEAD+SOFFIT_THICKNESS,.92)
+  prism(lining,ceiling,HEAD+SOFFIT_BED,HEAD+SOFFIT_BED+SOFFIT_THICKNESS,.92)
   const walk=(from:number,to:number,height:number):void=>threshold.quad(rectangle(from,to,-halfWidth,halfWidth).map(p=>[...p,height]),[0,0,1],.96)
   walk(0,landing,upper)
   for(let step=0;step<count;step++){
