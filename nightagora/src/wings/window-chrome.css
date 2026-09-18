@@ -1,0 +1,9 @@
+/* THE WINDOW OWNS THE PHONE. While a sheet stands on a narrow stage the
+   station's chrome stands down: the bar with its way home, the door block
+   with its question, and the brand line thinned to its own two rules. Hidden
+   by visibility, so every one of them keeps its place in the layout and comes
+   back whole on Close. The attribute is the close look's, so one grammar
+   serves the window, the life, the plan and the sources. */
+:root[data-na-window='phone'] .wing-rail-group,
+:root[data-na-window='phone'] .wing-doorblock {visibility:hidden;pointer-events:none;}
+:root[data-na-window='phone'] .brand {font-size:0;letter-spacing:0;gap:0;opacity:.5;}

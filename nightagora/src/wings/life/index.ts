@@ -20,6 +20,7 @@
  */
 
 import css from './life.css?inline'
+import { windowOwnsTheScreen } from '../window-chrome'
 import { renderLifeDate } from './card'
 import { drawLifePlate, type LifePlate } from './plate'
 import { dateYears, lifeCounts, lifeScale, workYears, type LifeGap } from './scale'
@@ -34,7 +35,9 @@ const HISTORY_MARK = 'wingLife'
 const UNDATED = '#without-a-year'
 
 export const LIFE_WIDE = { top: 76, side: 28, bottom: 18, padding: 20, widest: 1080 } as const
-export const LIFE_NARROW = { top: 52, side: 8, bottom: 10, padding: 12 } as const
+/** THE SHEET OWNS THE SCREEN ON THE PHONE: the chrome under it stands down,
+ * so the sheet is bounded by the viewport and not by the bar. */
+export const LIFE_NARROW = { top: 10, side: 8, bottom: 10, padding: 12 } as const
 
 export interface WingLifeOptions {
   host: HTMLElement
@@ -108,13 +111,21 @@ export function createWingLife(options: WingLifeOptions): WingLife {
   close.type = 'button'
   close.addEventListener('click', () => shut())
   foot.append(counts, close)
+  /** ONE MARK DISMISSES THE SHEET where the foot's row has stood down: the
+   * close look's grammar, at the corner the thumb reaches. */
+  const shutMark = make('button', 'wing-life-shut', '\u2715')
+  shutMark.type = 'button'
+  shutMark.addEventListener('click', () => shut())
   const live = make('p', 'wing-life-live')
   live.setAttribute('aria-live', 'polite')
-  dialog.append(style, head, body, foot, live)
+  dialog.append(style, head, body, foot, shutMark, live)
   host.append(dialog)
 
   let alive = true, open = false, marked = false, popping = false
   let plate: LifePlate | undefined
+  /** THE HEAD IS FOLDED while the reading is scrolled off its top. */
+  let folded = false
+  const noMotion = view.matchMedia('(prefers-reduced-motion: reduce)')
   /** the one period that is open, and the one date unfolded inside it */
   let band: string | null = null, at: string | null = null
   /** ONE QUESTION A VISIT, at the foot of the period being read. */
@@ -139,14 +150,19 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     const narrow = options.narrow()
     const floor = Math.min(height, Math.max(0, options.floor()))
     dialog.dataset['narrow'] = String(narrow)
+    /* THE SHEET OWNS THE SCREEN ON THE PHONE. The chrome under it stands
+       down, so the bar is no longer what bounds the sheet and the reading
+       takes the height a pinned foot and a hidden bar were holding. */
+    windowOwnsTheScreen(document_, narrow)
     const numbers = narrow ? LIFE_NARROW : LIFE_WIDE
-    const top = numbers.top, bottom = Math.max(top + 220, floor - numbers.bottom)
+    const top = numbers.top, bottom = Math.max(top + 220, (narrow ? height : floor) - numbers.bottom)
     const left = narrow ? numbers.side : Math.max(numbers.side, Math.round((width - LIFE_WIDE.widest) / 2))
     Object.assign(dialog.style, {
       left: `${left}px`, top: `${top}px`,
       width: `${Math.max(280, width - left * 2)}px`, height: `${bottom - top}px`,
     })
     paint()
+    foldTheHead()
   }
 
   /** The whole sheet, painted on every open and every resize: a language or a
@@ -163,6 +179,7 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     second.textContent = say(record.words.secondLine)
     caption.textContent = LIFE_WORDS.caption[language]
     close.textContent = say(LIFE_WORDS.close)
+    shutMark.setAttribute('aria-label', say(LIFE_WORDS.close))
     spine.setAttribute('aria-label', LIFE_ROW_WORDS.places[language])
 
     /* THE RIBBON, and the presses laid over it. A segment is a 44 px target
@@ -177,6 +194,16 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     presses.replaceChildren()
     drawing.replaceChildren(...(plate ? [plate.element] : []), presses)
     drawing.hidden = !plate
+    /* WHAT THE FOLDED RIBBON KEEPS: the strip with the hour's ring over it and
+       the marker that stands on it. The ticks, the afterlife and its years are
+       what the fold gives to the reading. */
+    if (plate) {
+      drawing.style.setProperty('--life-full', `${Math.round(plate.height)}px`)
+      drawing.style.setProperty('--life-fold', `${Math.round(plate.strip.top + plate.strip.height + 4)}px`)
+    } else {
+      drawing.style.removeProperty('--life-full')
+      drawing.style.removeProperty('--life-fold')
+    }
     caption.hidden = !plate || !scale.gaps.length
     if (plate && !narrow) for (const segment of plate.bands) {
       const press = make('button', 'wing-life-press')
@@ -203,6 +230,12 @@ export function createWingLife(options: WingLifeOptions): WingLife {
 
     paintSpine(record, language)
     paintPeriod(record, scale.gaps, language)
+
+    /* THE PLACES ARE A ROW OF CHIPS ON THE PHONE, over the reading and not
+       inside it: one sideways row of 44 px targets that keeps its place while
+       the open place's reading scrolls under it. */
+    if (narrow) { if (spine.parentElement !== body) body.insertBefore(spine, reading) }
+    else if (spine.parentElement !== reading) reading.insertBefore(spine, periodBody)
 
     /* ON A PHONE THE COUNTS READ AT THE END OF THE LIST, where a pinned
        ledger of four sentences took a third of the sheet from the reading. */
@@ -258,6 +291,7 @@ export function createWingLife(options: WingLifeOptions): WingLife {
   /** THE SPINE: the seven places, always all of them, each with what it
    * holds. It is the navigation, so nothing in it is ever folded away. */
   function paintSpine(record: LifeRecord, language: 'en' | 'de'): void {
+    const narrow = options.narrow()
     spine.replaceChildren()
     for (const entry of record.bands) {
       const item = make('li', 'wing-life-item')
@@ -273,7 +307,12 @@ export function createWingLife(options: WingLifeOptions): WingLife {
          hand crosses seven controls to reach the reading. */
       press.tabIndex = entry.id === band ? 0 : -1
       if (entry.id === band) press.setAttribute('aria-current', 'true')
-      const title = make('span', 'wing-life-item-title', entry.name[language])
+      /* A CHIP CARRIES THE PLACE AND NOT THE YEARS: the row holds eight of
+         them on one line, the years stand on the ribbon over it and in the
+         reading's own heading. The afterlife is not a place, so it takes the
+         word the ribbon's strip already carries. */
+      const title = make('span', 'wing-life-item-title',
+        narrow ? (entry.afterlife ? LIFE_WORDS.after[language] : entry.place[language]) : entry.name[language])
       press.append(title, make('span', 'wing-life-item-count', dateCount(eventsOf(record, entry.id).length, language)))
       press.addEventListener('click', () => select(entry.id, 'spine'))
       press.addEventListener('keydown', event => step(event, record))
@@ -334,9 +373,9 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     const entry = bandOf(record, band)
     periodBody.replaceChildren()
     if (!entry && band !== UNDATED) return
-    const narrow = options.narrow()
-    const holder = narrow ? spine.querySelector<HTMLElement>(`[data-band="${band}"]`) : reading
-    if (holder && periodBody.parentElement !== holder) holder.append(periodBody)
+    /* THE READING STANDS UNDER THE PLACES ON BOTH STAGES: the phone's
+       accordion is a chip row now, so the body is never inside an item. */
+    if (periodBody.parentElement !== reading) reading.append(periodBody)
     /* THE WORKS NO YEAR CAN HOLD stand on their own, with no dates to read
        and nobody named in years the record does not give them. */
     if (!entry) {
@@ -557,6 +596,10 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     if (from === 'spine') spine.querySelector<HTMLElement>(`[data-band="${id}"] .wing-life-item-name`)?.focus({ preventScroll: true })
     if (from === 'ribbon') presses.querySelector<HTMLElement>(`[data-band="${id}"]`)?.focus({ preventScroll: true })
     periodBody.scrollTop = 0
+    /* A NEW PLACE IS READ FROM ITS OWN TOP, which is also where the head
+       stands whole again. Only the chip row moves sideways. */
+    showTheChip(id)
+    if (options.narrow()) { reading.scrollTop = 0; foldTheHead() }
   }
 
   /** ONE DATE IS UNFOLDED WHERE IT STANDS. The body is built into the element
@@ -602,6 +645,33 @@ export function createWingLife(options: WingLifeOptions): WingLife {
 
   function announce(words: string): void { live.textContent = words }
 
+  /** THE HEAD FOLDS AS THE READING IS SCROLLED. The through line and the two
+   * captions go, the ribbon keeps its strip with the marker and the hour's
+   * ring, and a scroll back to the top brings all of it back. The two
+   * thresholds are apart because the fold gives the reading its own height
+   * back, and one threshold would cross itself on the way down. */
+  function foldTheHead(): void {
+    if (!options.narrow()) { folded = false; dialog.dataset['folded'] = 'false'; return }
+    // A reading with nothing under the fold would fold and be clamped open
+    // again by its own new height.
+    const room = reading.scrollHeight - reading.clientHeight
+    const next = folded ? reading.scrollTop > 8 : reading.scrollTop > 40 && room > 160
+    if (next === folded) return
+    folded = next
+    dialog.dataset['folded'] = String(folded)
+  }
+
+  /** The open chip is brought into its own row and nothing else moves: the
+   * reading under it keeps the scroll the finger left it at. */
+  function showTheChip(id: string): void {
+    if (!options.narrow()) return
+    const chip = spine.querySelector<HTMLElement>(`[data-band="${id}"] .wing-life-item-name`)
+    if (!chip) return
+    const box = chip.getBoundingClientRect(), row = spine.getBoundingClientRect()
+    const left = spine.scrollLeft + (box.left - row.left) - Math.max(0, (row.width - box.width) / 2)
+    spine.scrollTo({ left: Math.max(0, left), behavior: noMotion.matches ? 'auto' : 'smooth' })
+  }
+
   /** The arrows step from period to period: left and right on the ribbon,
    * and up and down as well in the spine, which reads downward. */
   function step(event: KeyboardEvent, record: LifeRecord): void {
@@ -639,6 +709,7 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     open = false
     at = null
     asking = false
+    windowOwnsTheScreen(document_, false)
     unmark()
     if (dialog.open) dialog.close()
     options.returnFocus()
@@ -665,6 +736,7 @@ export function createWingLife(options: WingLifeOptions): WingLife {
   }
 
   const leaving = new AbortController()
+  reading.addEventListener('scroll', () => foldTheHead(), { passive: true, signal: leaving.signal })
   view.addEventListener('popstate', () => {
     if (popping) { popping = false; return }
     if (!open) return
@@ -695,15 +767,21 @@ export function createWingLife(options: WingLifeOptions): WingLife {
       const event = from ? record.events.find(entry => entry.id === from) : undefined
       band = event?.band ?? firstBand(record)
       at = event?.id ?? null
+      folded = false
+      dialog.dataset['folded'] = 'false'
       layout()
       spine.scrollTop = 0
+      spine.scrollLeft = 0
       periodBody.scrollTop = 0
+      reading.scrollTop = 0
       if (at) unfold(at, false)
       const landing = at
         ? periodBody.querySelector<HTMLElement>(`[data-event="${at}"]`)
         : spine.querySelector<HTMLElement>('.wing-life-item-name[aria-current="true"]') ?? spine.querySelector<HTMLElement>('.wing-life-item-name')
       landing?.focus({ preventScroll: true })
       landing?.scrollIntoView({ block: 'nearest' })
+      // after the landing, which would otherwise leave the chip at an edge
+      if (band) showTheChip(band)
     },
     close: shut,
     toggle() { if (open) shut(); else this.show() },
@@ -712,6 +790,7 @@ export function createWingLife(options: WingLifeOptions): WingLife {
       alive = false
       open = false
       marked = false
+      windowOwnsTheScreen(document_, false)
       leaving.abort()
       if (dialog.open) dialog.close()
       dialog.remove()

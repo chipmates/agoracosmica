@@ -175,7 +175,7 @@
 .wing-life-close {flex:0 0 auto;min-width:120px;min-height:44px;padding:10px 16px;background:transparent;border:1px solid #a9977366;
   color:#e6d6b8;font:12px/1.2 var(--sans);cursor:pointer;}
 
-/* THE NARROW STAGE: one column, the ribbon inert, the places an accordion.
+/* THE NARROW STAGE: one column, the ribbon inert, the places a chip row.
    No viewport height anywhere: the sheet is given its box by the frame, and
    everything inside it scrolls in that box. */
 .wing-life[data-narrow='true'] .wing-life-head {padding:10px 12px 0;}
@@ -186,8 +186,28 @@
 .wing-life[data-narrow='true'] .wing-life-reading {padding-bottom:4px;}
 .wing-life[data-narrow='true'] .wing-life-body {padding:0 12px;}
 .wing-life[data-narrow='true'] .wing-life-reading {flex-direction:column;gap:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;}
-.wing-life[data-narrow='true'] .wing-life-spine {flex:0 0 auto;overflow:visible;padding-right:0;}
-.wing-life[data-narrow='true'] .wing-life-period-body {flex:0 0 auto;overflow:visible;padding:0 0 6px 10px;}
+.wing-life[data-narrow='true'] .wing-life-period-body {flex:0 0 auto;overflow:visible;padding:0 0 6px;}
+
+/* THE PLACES AS ONE ROW OF CHIPS. The row stands over the reading instead of
+   inside it, so the eight places keep their place while the open one's
+   reading scrolls under them, and it scrolls sideways rather than wrapping:
+   a wrapped row of eight German names is three lines of chrome. */
+.wing-life[data-narrow='true'] .wing-life-spine {flex:0 0 auto;display:flex;gap:6px;margin:4px 0 6px;padding:0 0 2px;
+  overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:none;
+  border-bottom:1px solid #a9977333;}
+.wing-life[data-narrow='true'] .wing-life-spine::-webkit-scrollbar {display:none;}
+.wing-life[data-narrow='true'] .wing-life-item {flex:0 0 auto;border-bottom:0;}
+.wing-life[data-narrow='true'] .wing-life-item[data-afterlife='true'],
+.wing-life[data-narrow='true'] .wing-life-item[data-undated='true'] {margin-top:0;border-top:0;}
+.wing-life[data-narrow='true'] .wing-life-item-name {flex-direction:row;align-items:center;width:auto;min-height:44px;
+  padding:6px 12px;white-space:nowrap;border:1px solid #a9977333;border-left:1px solid #a9977333;background:#ffffff08;}
+.wing-life[data-narrow='true'] .wing-life-item-name:hover {border-color:#a99773;}
+.wing-life[data-narrow='true'] .wing-life-item-name[aria-current='true'] {border-color:#edcc8c;background:#edcc8c1f;color:#fff5e3;}
+.wing-life[data-narrow='true'] .wing-life-item[data-undated='true'] .wing-life-item-title {font-size:14px;}
+/* THE COUNT IS READ AND NOT SHOWN on a chip: eight chips with a count each
+   would be two rows of scrolling, and the open place counts its own dates. */
+.wing-life[data-narrow='true'] .wing-life-item-count {position:absolute;width:1px;height:1px;margin:-1px;padding:0;
+  overflow:hidden;clip-path:inset(50%);white-space:nowrap;}
 /* The item above the body already names the period, so on the narrow stage
    the heading stays for the reading and leaves the seeing to the item. */
 .wing-life[data-narrow='true'] .wing-life-period-name {position:absolute;width:1px;height:1px;margin:-1px;padding:0;
@@ -197,14 +217,51 @@
 .wing-life[data-narrow='true'] .wing-life-reading > .wing-life-counts {flex:0 0 auto;margin-top:14px;padding-top:10px;
   border-top:1px solid #a9977344;}
 .wing-life[data-narrow='true'] .wing-life-item-name {font-size:14px;}
-.wing-life[data-narrow='true'] .wing-life-foot {flex-wrap:wrap;padding:8px 12px;}
+/* THE FOOT STANDS DOWN ON THE PHONE. Its counts already read at the end of
+   the list, and its Close is one mark at the corner, so a pinned row at the
+   foot would be a second Close over the reading. */
+.wing-life[data-narrow='true'] .wing-life-foot {display:none;}
 .wing-life[data-narrow='true'] .wing-life-counts {columns:1;}
-.wing-life[data-narrow='true'] .wing-life-close {flex:1 1 auto;}
 .wing-life[data-narrow='true'] .wing-life-count,.wing-life[data-narrow='true'] .wing-life-honesty {font-size:10px;}
+
+/* ONE MARK DISMISSES THE SHEET, at the corner, the close look's own grammar.
+   The head keeps its room clear of it. */
+.wing-life-shut {position:absolute;z-index:3;top:6px;right:6px;display:none;align-items:center;justify-content:center;
+  box-sizing:border-box;min-width:44px;min-height:44px;padding:0;background:#101d27d9;border:1px solid #a9977366;
+  color:#e6d6b8;font:15px/1 var(--sans);cursor:pointer;}
+.wing-life[data-narrow='true'] .wing-life-shut {display:flex;}
+.wing-life-shut:focus-visible {outline:1px solid #edcc8c;outline-offset:2px;}
+/* The through line flows AROUND the mark instead of under a reserved column:
+   a padded head costs a whole line of a wrapped German title. */
+.wing-life[data-narrow='true'] .wing-life-through::before {content:'';float:right;width:52px;height:40px;}
+
+/* THE HEAD FOLDS AWAY AS THE READING IS SCROLLED, and the ribbon keeps a thin
+   strip of itself: the bar with the hour's ring over it and the marker on the
+   date being read. The three heights come off the drawing, so a record with no
+   afterlife folds to its own strip and not to a guess. */
+/* The two lines never take the sheet's shrink: a reading taller than the
+   sheet is what the reading's own scroll is for, and a squeezed caption is a
+   clipped line of text. */
+/* THE MARK KEEPS ITS OWN BAND. The head folds its words away and holds the
+   44 px the mark stands in, so the folded ribbon never runs under it and the
+   hour's ring at the end of a life stays visible. */
+.wing-life[data-narrow='true'] .wing-life-head {min-height:44px;}
+.wing-life[data-narrow='true'] .wing-life-head,
+.wing-life[data-narrow='true'] .wing-life-second,
+.wing-life[data-narrow='true'] .wing-life-caption {flex:0 0 auto;overflow:hidden;max-height:200px;
+  transition:max-height 220ms ease-out,opacity 140ms linear,margin 220ms ease-out,padding 220ms ease-out;}
+.wing-life[data-narrow='true'] .wing-life-drawing {height:var(--life-full,auto);overflow:hidden;
+  transition:height 220ms ease-out,padding 220ms ease-out;}
+.wing-life[data-narrow='true'][data-folded='true'] .wing-life-head,
+.wing-life[data-narrow='true'][data-folded='true'] .wing-life-second,
+.wing-life[data-narrow='true'][data-folded='true'] .wing-life-caption
+  {max-height:0;opacity:0;margin-top:0;margin-bottom:0;padding-top:0;padding-bottom:0;}
+.wing-life[data-narrow='true'][data-folded='true'] .wing-life-drawing {height:var(--life-fold,34px);padding-top:0;}
 
 /* THE QUIET CEREMONY IS OPTIONAL. Where the visitor asked for no motion the
    same states are cuts, and the marker jumps to the date it names. */
 @media (prefers-reduced-motion: reduce) {
-  .wing-life-date-body,.wing-life-date-inner,.wing-life-marker,.wing-life-period,.wing-life-place,.wing-life-item-name
+  .wing-life-date-body,.wing-life-date-inner,.wing-life-marker,.wing-life-period,.wing-life-place,.wing-life-item-name,
+  .wing-life-head,.wing-life-second,.wing-life-caption,.wing-life-drawing
     {transition:none;}
 }
