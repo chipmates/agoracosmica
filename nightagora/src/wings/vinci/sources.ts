@@ -51,7 +51,10 @@ export function createVinciSourcesWindow(host: HTMLElement, control: HTMLButtonE
   const buttons = {} as Record<VinciSourcesTab, HTMLButtonElement>
   const panels = {} as Record<VinciSourcesTab, HTMLElement>
   const order = Object.keys(vinciSourcesTabs) as VinciSourcesTab[]
-  let selected: VinciSourcesTab = 'station'
+  // THE WINDOW OPENS ON THE ROOM. A visitor who presses it is asking what the
+  // room they stand in is made of, and a room's sources are every station's in
+  // it; the station's own tab is the next one along.
+  let selected: VinciSourcesTab = 'room'
   let live = true
   const scroll = { station: 0, room: 0, wing: 0 }
 
@@ -108,7 +111,7 @@ export function createVinciSourcesWindow(host: HTMLElement, control: HTMLButtonE
     }
   })
   host.append(dialog)
-  select('station')
+  select('room')
   control.setAttribute('aria-controls', dialog.id)
   control.setAttribute('aria-haspopup', 'dialog')
   control.setAttribute('aria-expanded', 'false')
