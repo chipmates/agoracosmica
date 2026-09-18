@@ -24,7 +24,11 @@ type Words = { en: string; de: string }
 const CARDS = JSON.parse(cardsRaw) as {
   zoom_ceiling: Words
   rule_labels: readonly Words[]
-  controls: { shared: { back: Words }; machine: { viewpoints: readonly (Words & { id: string })[] } }
+  controls: {
+    shared: { back: Words }
+    machine: { viewpoints: readonly (Words & { id: string })[] }
+    picture: { whole_plate: Words; zoom_in: Words; zoom_out: Words }
+  }
 }
 const DESCRIPTIONS = (JSON.parse(platesRaw) as { descriptions: Record<string, Words> }).descriptions
 type DetailRect = { x: number; y: number; w: number; h: number; name_en: string; name_de: string }
@@ -42,11 +46,11 @@ const RULE: readonly { label: string; cm: number }[] = CARDS.rule_labels
   .map(words => ({ label: words[lang()], cm: Number.parseFloat(words.en) }))
   .filter(step => Number.isFinite(step.cm) && step.cm > 0)
 
-/** THE TWO STEPS, in the page's language. The wheel, the pinch, the double
- * tap and the keys all reach the ceiling; a hand with none of them needs a
- * control, and the card models hold no word for one yet. */
-export const NEARER: Words = { en: 'Zoom in', de: 'Näher' }
-export const FURTHER: Words = { en: 'Zoom out', de: 'Weiter weg' }
+/** THE TWO STEPS, as the card models write them. The wheel, the pinch, the
+ * double tap and the keys all reach the ceiling; a hand with none of them
+ * needs a control. */
+export const NEARER: Words = CARDS.controls.picture.zoom_in
+export const FURTHER: Words = CARDS.controls.picture.zoom_out
 
 /** What is on the plate, in the page's language, for a visitor who cannot
  * see it. Null where no one has written it yet. */
