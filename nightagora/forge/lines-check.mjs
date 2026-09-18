@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /** THE LINES CHECK. What a visitor is asked to remember, measured.
  * Run: node forge/lines-check.mjs [--json]
+ *      node forge/lines-check.mjs --selftest   (the demonstration rule alone)
  * Exit 1 means a line, a detail or a step was refused.
  *
  * The components that will show these files do not exist yet, so the walking
@@ -17,6 +18,8 @@
  *     clock order inside 0 to 1, and only machines that move have steps;
  *   · every machine says its own size and every hung face its description,
  *     each keyed by the registry, sourced, and the length its slot holds;
+ *   · every part a tap can land on is a part of its dossier, or a prop the
+ *     museum built to show the experiment, which its record owns;
  *   · every displayed string passes the spoken registers of the machine bench
  *     and the wing's §B14 rules, and the museum's voice: no dashes, no
  *     semicolons, no filler.
@@ -212,15 +215,48 @@ for (const [id, slots] of Object.entries(limits.slots)) {
   }
   if (slots.limit === null && slots.visual_note === null) refuse('slots-empty', id, 'an exhibit with both slots empty has no entry')
 }
+/** THE DEMONSTRATION. A reconstruction names the parts its dossier has, and
+ * a name for anything else is a name for something the sheet does not carry.
+ * A prop the museum built to SHOW what the sheet describes is the one
+ * exception, and it is named only where the record owns it: the entry says
+ * it is a demonstration, it carries the museum's own class, and the
+ * machine's visual note says in both languages that the view adds this. Two
+ * of the three is nothing, and the flag on a part the dossier has is a
+ * reconstruction dressed as a prop. */
+const MUSEUMS_OWN = 'reconstructed'
+const ENTRY_KEYS = new Set(['en', 'de', 'demonstration', 'certainty', 'screen'])
+const filled = (slot, lang) => typeof slot?.[lang] === 'string' && slot[lang].trim().length > 0
+export function judgeDemonstration({ id, entry, dossierIds, visualNote }) {
+  const out = []
+  for (const key of Object.keys(entry ?? {})) {
+    if (!ENTRY_KEYS.has(key)) out.push(['part-key', `${key} is not a key a part name carries`])
+  }
+  if (dossierIds.has(id)) {
+    if (entry?.demonstration !== undefined) out.push(['part-not-a-demonstration', 'the dossier carries this part, so it is not the museum\'s own prop'])
+    return out
+  }
+  if (entry?.demonstration !== true) {
+    out.push(['part-unknown', 'the dossier has no part of this id, and the record does not call it a demonstration'])
+    return out
+  }
+  if (entry.certainty !== MUSEUMS_OWN) out.push(['demonstration-certainty', `a prop the museum built is ${MUSEUMS_OWN}, not ${entry.certainty ?? 'unsaid'}`])
+  if (!filled(visualNote, 'en') || !filled(visualNote, 'de'))
+    out.push(['demonstration-unowned', 'the machine\'s visual note owns its demonstration in both languages, or the prop has no name'])
+  return out
+}
+
 const partNames = readJson('src/wings/vinci/data/parts.json')
-let partStrings = 0
+let partStrings = 0, demonstrations = 0
 for (const slug of machines.MACHINE_SLUGS) {
   const named = partNames.parts[slug]
   if (!named) { refuse('parts-missing', slug, 'a machine a tap can land on owes every part a name'); continue }
   const ids = new Set((machines.dossiers[slug]?.parts ?? []).map((part) => part.id))
   for (const id of ids) if (!named[id]) refuse('part-unnamed', `${slug} ${id}`, 'the dossier has this part and the file names it not')
   for (const [id, words] of Object.entries(named)) {
-    if (!ids.has(id)) refuse('part-unknown', `${slug} ${id}`, 'the dossier has no part of this id')
+    if (words?.demonstration === true) demonstrations++
+    for (const [code, says] of judgeDemonstration({
+      id, entry: words, dossierIds: ids, visualNote: limits.slots[`machine/${slug}`]?.visual_note,
+    })) refuse(code, `${slug} ${id}`, says)
     for (const lang of ['en', 'de']) { partStrings++; speak(`parts ${slug} ${id}`, lang, words?.[lang], lang) }
   }
 }
@@ -313,10 +349,58 @@ const report = {
   slots: `${Object.keys(limits.slots).length} exhibits, ${slotStrings} slot strings`,
   sizes: `${Object.keys(sizes).length} machines, ${sizeStrings} size sentences`,
   descriptions: `${Object.keys(plates).length} faces, ${plateStrings} descriptions`,
-  parts: `${Object.keys(partNames.parts).length} machines, ${partStrings} part names`,
+  parts: `${Object.keys(partNames.parts).length} machines, ${partStrings} part names, ${demonstrations} of them the museum's own`,
   silent,
   errors,
   ok: errors.length === 0,
 }
-console.log(JSON.stringify(report, null, 2))
-process.exitCode = errors.length ? 1 : 0
+
+/* ------------------------------------------------------------ the selftest
+
+   The demonstration rule is the one rule here that ADMITS a name the dossier
+   cannot vouch for, so it is checked against written cases as well as against
+   the wing: a rule that lets an unowned prop through is worse than no rule at
+   all. The wing's own reading above still runs, and its report is held: this
+   mode answers for the rule. */
+const OWNED = { en: 'The candle is the museum\'s own demonstration.', de: 'Die Kerze ist die Vorführung des Museums.' }
+const CASES = [
+  ['a dossier part, plainly named',
+    { id: 'screen', entry: { en: 'White paper', de: 'Weißes Papier' }, dossier: ['screen'], note: OWNED }, []],
+  ['a demonstration part without the flag',
+    { id: 'candle', entry: { en: 'Candle', de: 'Kerze' }, dossier: ['screen'], note: OWNED }, ['part-unknown']],
+  ['a demonstration part with the flag and no note',
+    { id: 'candle', entry: { en: 'Candle', de: 'Kerze', demonstration: true, certainty: 'reconstructed' }, dossier: ['screen'], note: null },
+    ['demonstration-unowned']],
+  ['a demonstration part with the flag and half a note',
+    { id: 'candle', entry: { en: 'Candle', de: 'Kerze', demonstration: true, certainty: 'reconstructed' }, dossier: ['screen'], note: { en: OWNED.en, de: '  ' } },
+    ['demonstration-unowned']],
+  ['a demonstration part with the flag, the note and the wrong class',
+    { id: 'candle', entry: { en: 'Candle', de: 'Kerze', demonstration: true, certainty: 'documented' }, dossier: ['screen'], note: OWNED },
+    ['demonstration-certainty']],
+  ['a demonstration part with the flag, the class and the note',
+    { id: 'candle', entry: { en: 'Candle', de: 'Kerze', demonstration: true, certainty: 'reconstructed' }, dossier: ['screen'], note: OWNED }, []],
+  ['the flag on a part the dossier carries',
+    { id: 'screen', entry: { en: 'White paper', de: 'Weißes Papier', demonstration: true }, dossier: ['screen'], note: OWNED },
+    ['part-not-a-demonstration']],
+  ['a key the record does not carry',
+    { id: 'candle', entry: { en: 'Candle', de: 'Kerze', demonstration: true, certainty: 'reconstructed', demonstrated: true }, dossier: ['screen'], note: OWNED },
+    ['part-key']],
+]
+
+function selftest() {
+  const bad = []
+  for (const [said, at, want] of CASES) {
+    const got = judgeDemonstration({ id: at.id, entry: at.entry, dossierIds: new Set(at.dossier), visualNote: at.note }).map(([code]) => code)
+    if (got.join(',') !== want.join(',')) bad.push(`${said}: expected ${want.join(', ') || 'nothing'}, got ${got.join(', ') || 'nothing'}`)
+  }
+  for (const line of bad) console.log(` · ${line}`)
+  console.log(bad.length ? `SELFTEST FAILED: ${bad.length} of ${CASES.length}` : `selftest: ${CASES.length} cases, all as written`)
+  process.exitCode = bad.length ? 1 : 0
+}
+
+if (argv.includes('--selftest')) {
+  selftest()
+} else {
+  console.log(JSON.stringify(report, null, 2))
+  process.exitCode = errors.length ? 1 : 0
+}
