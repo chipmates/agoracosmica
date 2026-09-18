@@ -74,9 +74,9 @@
    }
   },
   "wing/vinci": {
-   "runs": 6,
+   "runs": 9,
    "total": {
-    "min": 5286,
+    "min": 4372,
     "max": 6294
    },
    "stations": {
@@ -86,7 +86,7 @@
     },
     "en/desktop/arrival (open)": {
      "min": 54,
-     "max": 54
+     "max": 58
     },
     "en/desktop/courtyard (shut)": {
      "min": 30,
@@ -94,7 +94,7 @@
     },
     "en/desktop/courtyard (open)": {
      "min": 52,
-     "max": 53
+     "max": 56
     },
     "en/desktop/hall (shut)": {
      "min": 30,
@@ -102,7 +102,7 @@
     },
     "en/desktop/hall (open)": {
      "min": 52,
-     "max": 53
+     "max": 56
     },
     "en/desktop/oratory (shut)": {
      "min": 30,
@@ -110,7 +110,7 @@
     },
     "en/desktop/oratory (open)": {
      "min": 52,
-     "max": 53
+     "max": 57
     },
     "en/desktop/study (shut)": {
      "min": 30,
@@ -118,7 +118,7 @@
     },
     "en/desktop/study (open)": {
      "min": 52,
-     "max": 53
+     "max": 55
     },
     "en/desktop/chamber (shut)": {
      "min": 30,
@@ -126,198 +126,198 @@
     },
     "en/desktop/chamber (open)": {
      "min": 52,
-     "max": 53
+     "max": 56
     },
     "en/desktop/garden (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "en/desktop/garden (open)": {
      "min": 52,
-     "max": 53
+     "max": 54
     },
     "en/desktop/line-early (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "en/desktop/line-early (open)": {
      "min": 52,
-     "max": 53
+     "max": 54
     },
     "en/desktop/picture-room (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "en/desktop/picture-room (open)": {
      "min": 52,
-     "max": 53
+     "max": 54
     },
     "en/desktop/supper-wall (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "en/desktop/supper-wall (open)": {
      "min": 52,
-     "max": 53
+     "max": 54
     },
     "en/desktop/reading-table (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "en/desktop/reading-table (open)": {
      "min": 52,
-     "max": 53
+     "max": 54
     },
     "en/desktop/flight (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "en/desktop/flight (open)": {
      "min": 52,
-     "max": 53
+     "max": 54
     },
     "en/desktop/works (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "en/desktop/works (open)": {
      "min": 52,
-     "max": 53
+     "max": 54
     },
     "en/desktop/body (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "en/desktop/body (open)": {
      "min": 52,
-     "max": 53
+     "max": 54
     },
     "en/desktop/grave (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "en/desktop/grave (open)": {
      "min": 48,
-     "max": 52
+     "max": 54
     },
     "en/mobile/arrival (shut)": {
      "min": 31,
      "max": 31
     },
     "en/mobile/arrival (open)": {
-     "min": 53,
+     "min": 34,
      "max": 54
     },
     "en/mobile/courtyard (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "en/mobile/courtyard (open)": {
-     "min": 53,
+     "min": 34,
      "max": 54
     },
     "en/mobile/hall (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "en/mobile/hall (open)": {
-     "min": 53,
+     "min": 34,
      "max": 54
     },
     "en/mobile/oratory (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "en/mobile/oratory (open)": {
-     "min": 53,
+     "min": 34,
      "max": 54
     },
     "en/mobile/study (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "en/mobile/study (open)": {
-     "min": 53,
+     "min": 34,
      "max": 54
     },
     "en/mobile/chamber (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "en/mobile/chamber (open)": {
-     "min": 53,
+     "min": 32,
      "max": 54
     },
     "en/mobile/garden (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "en/mobile/garden (open)": {
-     "min": 53,
+     "min": 32,
      "max": 54
     },
     "en/mobile/line-early (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "en/mobile/line-early (open)": {
-     "min": 52,
+     "min": 32,
      "max": 53
     },
     "en/mobile/picture-room (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "en/mobile/picture-room (open)": {
-     "min": 53,
+     "min": 32,
      "max": 54
     },
     "en/mobile/supper-wall (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "en/mobile/supper-wall (open)": {
-     "min": 52,
+     "min": 32,
      "max": 53
     },
     "en/mobile/reading-table (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "en/mobile/reading-table (open)": {
-     "min": 52,
+     "min": 32,
      "max": 53
     },
     "en/mobile/flight (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "en/mobile/flight (open)": {
-     "min": 52,
+     "min": 32,
      "max": 53
     },
     "en/mobile/works (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "en/mobile/works (open)": {
-     "min": 52,
+     "min": 32,
      "max": 53
     },
     "en/mobile/body (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "en/mobile/body (open)": {
-     "min": 52,
+     "min": 32,
      "max": 53
     },
     "en/mobile/grave (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "en/mobile/grave (open)": {
-     "min": 48,
+     "min": 32,
      "max": 52
     },
     "de/desktop/arrival (shut)": {
@@ -326,7 +326,7 @@
     },
     "de/desktop/arrival (open)": {
      "min": 54,
-     "max": 54
+     "max": 58
     },
     "de/desktop/courtyard (shut)": {
      "min": 30,
@@ -334,7 +334,7 @@
     },
     "de/desktop/courtyard (open)": {
      "min": 52,
-     "max": 53
+     "max": 56
     },
     "de/desktop/hall (shut)": {
      "min": 30,
@@ -342,7 +342,7 @@
     },
     "de/desktop/hall (open)": {
      "min": 52,
-     "max": 53
+     "max": 56
     },
     "de/desktop/oratory (shut)": {
      "min": 30,
@@ -350,7 +350,7 @@
     },
     "de/desktop/oratory (open)": {
      "min": 52,
-     "max": 53
+     "max": 57
     },
     "de/desktop/study (shut)": {
      "min": 30,
@@ -358,7 +358,7 @@
     },
     "de/desktop/study (open)": {
      "min": 52,
-     "max": 53
+     "max": 55
     },
     "de/desktop/chamber (shut)": {
      "min": 30,
@@ -366,230 +366,230 @@
     },
     "de/desktop/chamber (open)": {
      "min": 52,
-     "max": 53
+     "max": 56
     },
     "de/desktop/garden (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "de/desktop/garden (open)": {
      "min": 52,
-     "max": 53
+     "max": 54
     },
     "de/desktop/line-early (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "de/desktop/line-early (open)": {
      "min": 52,
-     "max": 53
+     "max": 54
     },
     "de/desktop/picture-room (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "de/desktop/picture-room (open)": {
      "min": 52,
-     "max": 53
+     "max": 54
     },
     "de/desktop/supper-wall (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "de/desktop/supper-wall (open)": {
      "min": 52,
-     "max": 53
+     "max": 54
     },
     "de/desktop/reading-table (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "de/desktop/reading-table (open)": {
      "min": 52,
-     "max": 53
+     "max": 54
     },
     "de/desktop/flight (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "de/desktop/flight (open)": {
      "min": 52,
-     "max": 53
+     "max": 54
     },
     "de/desktop/works (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "de/desktop/works (open)": {
      "min": 52,
-     "max": 53
+     "max": 54
     },
     "de/desktop/body (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "de/desktop/body (open)": {
      "min": 52,
-     "max": 53
+     "max": 54
     },
     "de/desktop/grave (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "de/desktop/grave (open)": {
      "min": 48,
-     "max": 52
+     "max": 54
     },
     "de/mobile/arrival (shut)": {
      "min": 31,
      "max": 31
     },
     "de/mobile/arrival (open)": {
-     "min": 53,
+     "min": 34,
      "max": 54
     },
     "de/mobile/courtyard (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "de/mobile/courtyard (open)": {
-     "min": 53,
+     "min": 34,
      "max": 54
     },
     "de/mobile/hall (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "de/mobile/hall (open)": {
-     "min": 53,
+     "min": 34,
      "max": 54
     },
     "de/mobile/oratory (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "de/mobile/oratory (open)": {
-     "min": 53,
+     "min": 34,
      "max": 54
     },
     "de/mobile/study (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "de/mobile/study (open)": {
-     "min": 53,
+     "min": 34,
      "max": 54
     },
     "de/mobile/chamber (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "de/mobile/chamber (open)": {
-     "min": 53,
+     "min": 32,
      "max": 54
     },
     "de/mobile/garden (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "de/mobile/garden (open)": {
-     "min": 53,
+     "min": 32,
      "max": 54
     },
     "de/mobile/line-early (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "de/mobile/line-early (open)": {
-     "min": 52,
+     "min": 32,
      "max": 53
     },
     "de/mobile/picture-room (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "de/mobile/picture-room (open)": {
-     "min": 53,
+     "min": 32,
      "max": 54
     },
     "de/mobile/supper-wall (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "de/mobile/supper-wall (open)": {
-     "min": 52,
+     "min": 32,
      "max": 53
     },
     "de/mobile/reading-table (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "de/mobile/reading-table (open)": {
-     "min": 52,
+     "min": 32,
      "max": 53
     },
     "de/mobile/flight (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "de/mobile/flight (open)": {
-     "min": 52,
+     "min": 32,
      "max": 53
     },
     "de/mobile/works (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "de/mobile/works (open)": {
-     "min": 52,
+     "min": 32,
      "max": 53
     },
     "de/mobile/body (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "de/mobile/body (open)": {
-     "min": 52,
+     "min": 32,
      "max": 53
     },
     "de/mobile/grave (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "de/mobile/grave (open)": {
-     "min": 48,
+     "min": 32,
      "max": 52
     },
     "en/desktop/picture-room-west (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "en/desktop/picture-room-west (open)": {
      "min": 52,
-     "max": 52
+     "max": 54
     },
     "en/mobile/picture-room-west (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "en/mobile/picture-room-west (open)": {
-     "min": 52,
+     "min": 32,
      "max": 52
     },
     "de/desktop/picture-room-west (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "de/desktop/picture-room-west (open)": {
      "min": 52,
-     "max": 52
+     "max": 54
     },
     "de/mobile/picture-room-west (shut)": {
-     "min": 30,
+     "min": 23,
      "max": 30
     },
     "de/mobile/picture-room-west (open)": {
-     "min": 52,
+     "min": 32,
      "max": 52
     }
    }
