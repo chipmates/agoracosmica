@@ -603,12 +603,14 @@ if (WING) {
      gate line. */
   const wingDir = join('src', 'wings', SLUG)
   const checkers = existsSync(join(APP_ROOT, wingDir))
-    ? readdirSync(join(APP_ROOT, wingDir)).filter((f) => f.endsWith('-check.mjs')).sort()
+    ? [...readdirSync(join(APP_ROOT, wingDir)).filter((f) => f.endsWith('-check.mjs')).sort(), 'tiles-check.mjs']
     : []
   const ran = {}
   for (const f of checkers) {
     say(`  the wing's own ${f}, offline`)
-    ran[f] = await json('node', [join(wingDir, f)], {}, CHECKER_MS)
+    // A check whose subject is cut in the forge lives in the forge, and is
+    // a line of this gate all the same.
+    ran[f] = await json('node', [join(existsSync(join(APP_ROOT, wingDir, f)) ? wingDir : 'forge', f)], {}, CHECKER_MS)
   }
   if (checkers.length) {
     const broke = checkers.filter((f) => ran[f].code !== 0)
