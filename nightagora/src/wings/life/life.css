@@ -37,6 +37,10 @@
    period it opens and stands clear of the ticks under it. */
 .wing-life-press {position:absolute;height:44px;padding:0;background:none;border:0;cursor:pointer;pointer-events:auto;}
 .wing-life-press:focus-visible {outline:1px solid #edcc8c;outline-offset:1px;}
+/* Hover brightens an edge and says nothing: no meaning ever sits on a
+   rollover, because a phone has none. */
+.wing-life-press:hover ~ .wing-life-plate .wing-life-segment,
+.wing-life-segment:hover .wing-life-period {stroke-opacity:.95;}
 /* ONE PLACE IS OPEN. The open period is filled and its name is cut out of it;
    the others keep their ground and their name stays in the sheet's own ink. */
 .wing-life-period {fill:#c9b07d;opacity:.3;stroke:#c9b07d;stroke-opacity:.6;stroke-width:1;
@@ -80,6 +84,7 @@
 .wing-life-item-name {display:flex;flex-direction:column;gap:2px;width:100%;min-height:44px;padding:7px 8px 7px 10px;text-align:left;
   background:none;border:0;border-left:2px solid transparent;color:#cfc6b4;font:14px/1.3 var(--serif);cursor:pointer;
   transition:color 160ms linear,border-color 160ms linear,background-color 160ms linear;}
+.wing-life-item-name:hover {color:#fff5e3;border-left-color:#a99773;}
 .wing-life-item-name[aria-current='true'] {border-left-color:#edcc8c;background:#edcc8c0f;color:#fff5e3;}
 .wing-life-item-title {display:block;text-wrap:pretty;}
 .wing-life-item-count {font:9px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:#8f9a9e;}
@@ -93,6 +98,7 @@
 .wing-life-dot {flex:0 0 8px;width:8px;height:8px;border-radius:50%;}
 .wing-life-date-name {display:flex;align-items:center;gap:9px;width:100%;min-height:44px;padding:6px 4px;text-align:left;
   background:none;border:0;color:#e6d6b8;font:13px/1.4 var(--sans);cursor:pointer;}
+.wing-life-date-name:hover {color:#fff5e3;}
 .wing-life-date-name[aria-expanded='true'] {color:#fff5e3;}
 .wing-life-date-label {min-width:0;}
 /* The one date the wing's own hour stands on, said where that date is read. */

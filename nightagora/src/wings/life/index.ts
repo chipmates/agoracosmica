@@ -182,6 +182,7 @@ export function createWingLife(options: WingLifeOptions): WingLife {
       press.setAttribute('aria-label', segment.name[language])
       press.setAttribute('aria-controls', periodBody.id)
       press.setAttribute('aria-expanded', String(segment.id === band))
+      press.tabIndex = segment.id === band ? 0 : -1
       Object.assign(press.style, {
         left: `${segment.left}px`, width: `${Math.max(12, segment.right - segment.left)}px`,
         top: `${segment.top + segment.height / 2 - 22}px`,
@@ -258,6 +259,10 @@ export function createWingLife(options: WingLifeOptions): WingLife {
       press.dataset['band'] = entry.id
       press.setAttribute('aria-expanded', String(entry.id === band))
       press.setAttribute('aria-controls', periodBody.id)
+      /* ONE STOP FOR THE SEVEN PLACES. The spine is the navigation, so it
+         takes a single tab stop and the arrows walk inside it; otherwise the
+         hand crosses seven controls to reach the reading. */
+      press.tabIndex = entry.id === band ? 0 : -1
       if (entry.id === band) press.setAttribute('aria-current', 'true')
       const title = make('span', 'wing-life-item-title', entry.name[language])
       press.append(title, make('span', 'wing-life-item-count', dateCount(eventsOf(record, entry.id).length, language)))
@@ -302,6 +307,8 @@ export function createWingLife(options: WingLifeOptions): WingLife {
       make('p', 'wing-life-period-line', entry.line[language]))
     const own = eventsOf(record, entry.id)
     periodBody.append(dates(record, own, entry, gaps, language))
+    const stops = [...periodBody.querySelectorAll<HTMLElement>('.wing-life-date-name')]
+    if (stops.length && !stops.some(stop => stop.tabIndex === 0)) stops[0]!.tabIndex = 0
     paintWorks(record, entry, language)
     paintPeople(record, own, language)
     if (asking) periodBody.append(question(language))
@@ -346,8 +353,13 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     // says so in its own words beside it.
     if (record.here === event.id && record.words.hour)
       press.append(make('span', 'wing-life-date-here', record.words.hour[language]))
+    /* ONE STOP FOR THE WHOLE LIST. Fourteen dates would be fourteen tab
+       stops between the spine and the foot, so the list takes one and the
+       arrows walk inside it. */
+    press.tabIndex = event.id === at ? 0 : -1
     press.addEventListener('click', () => unfold(event.id === at ? null : event.id))
     press.addEventListener('keydown', event_ => stepDate(event_))
+    press.addEventListener('focus', () => rove(press))
     const holder = make('div', 'wing-life-date-body')
     holder.dataset['open'] = String(event.id === at)
     const inner = make('div', 'wing-life-date-inner')
@@ -356,6 +368,12 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     item.append(press, holder)
     if (event.id === at) item.setAttribute('aria-current', 'true')
     return item
+  }
+
+  /** The hand is on one date of the list, so that date is the list's stop. */
+  function rove(press: HTMLElement): void {
+    for (const other of [...periodBody.querySelectorAll<HTMLElement>('.wing-life-date-name')])
+      other.tabIndex = other === press ? 0 : -1
   }
 
   function fillDate(record: LifeRecord, event: LifeEvent, inner: HTMLElement, language: 'en' | 'de'): void {
@@ -525,16 +543,19 @@ export function createWingLife(options: WingLifeOptions): WingLife {
 
   function announce(words: string): void { live.textContent = words }
 
-  /** Left and right step from period to period, wherever the hand is. */
+  /** The arrows step from period to period: left and right on the ribbon,
+   * and up and down as well in the spine, which reads downward. */
   function step(event: KeyboardEvent, record: LifeRecord): void {
-    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
+    const ribbon = (event.currentTarget as HTMLElement).classList.contains('wing-life-press')
+    const forward = event.key === 'ArrowRight' || (!ribbon && event.key === 'ArrowDown')
+    const back = event.key === 'ArrowLeft' || (!ribbon && event.key === 'ArrowUp')
+    if (!forward && !back) return
     const index = record.bands.findIndex(entry => entry.id === band)
-    const next = record.bands[index + (event.key === 'ArrowRight' ? 1 : -1)]
+    const next = record.bands[index + (forward ? 1 : -1)]
     if (!next) return
     event.preventDefault()
     event.stopPropagation()
-    const target = event.currentTarget as HTMLElement
-    select(next.id, target.classList.contains('wing-life-press') ? 'ribbon' : 'spine')
+    select(next.id, ribbon ? 'ribbon' : 'spine')
   }
 
   /** Up and down step date to date inside the open period, Home and End to
