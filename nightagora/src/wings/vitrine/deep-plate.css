@@ -33,6 +33,10 @@
 .deep-stand .deep-stand-dot {flex:0 0 7px;width:7px;height:7px;border-radius:50%;background:var(--certainty,#d2a557);
   filter:drop-shadow(0 1px 4px #0a0f13);}
 .deep-stand .deep-stand-shows {color:#e3dbcb;}
+/* ON THE GLASS the name is the name alone: the page fills the window, its
+   own line stands in the card, and the one line under the window needs the
+   foot of the glass beside it. */
+.deep-plate[data-stand='glass'] .deep-stand-shows {display:none;}
 
 @media(max-aspect-ratio:9/10) {
   /* The caption takes the foot of a phone's viewport, so the rule stands at

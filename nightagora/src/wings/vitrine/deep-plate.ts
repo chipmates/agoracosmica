@@ -104,6 +104,15 @@ const tileMB = (pixels: number): number => pixels * 4 / 1e6
 const RULE_SHORTEST = 24
 const RULE_SHARE = .42
 
+/** THE PAGE'S OWN NAME STANDS BESIDE THE PAGE, not on it, wherever the view
+ * leaves a margin wide enough to read it in. Narrower than this and the name
+ * would be a column of single words, so it takes the glass instead, which is
+ * what it does at the ceiling where the page fills the window. */
+const STAND_LEAST = 170
+const STAND_MOST = 270
+/** What the name keeps clear of the page's own edge. */
+const STAND_CLEAR = 22
+
 /** One step nearer, which is what a press and a key each take. */
 const ZOOM_STEP = 1.4
 
@@ -190,6 +199,7 @@ export function createDeepPlatePayload(options: {
     root.dataset['cacheMb'] = (tiles * tileMB(tilePixels)).toFixed(1)
     root.dataset['zoom'] = magnification().toFixed(3)
     measure()
+    stand()
     speak()
   }
 
@@ -213,6 +223,19 @@ export function createDeepPlatePayload(options: {
     ruleBar.style.width = `${Math.round(width)}px`
     ruleLabel.textContent = chosen.label
     root.dataset['rule'] = `${chosen.label} ${Math.round(width)}px`
+  }
+
+  /** THE NAME KEEPS OFF THE PAGE. The margin the view leaves at the left of
+   * the source is what the name may take; where the page reaches the edge of
+   * the glass, as it does at the ceiling, the name stands on it. */
+  function stand(): void {
+    if (!corner || !viewer || !library || !root) return
+    const item = viewer.world.getItemAt(0)
+    if (!item) return
+    const left = item.imageToViewerElementCoordinates(new library.Point(0, 0)).x
+    const margin = Math.round(left) - 14 - STAND_CLEAR
+    corner.style.maxWidth = margin >= STAND_LEAST ? `${Math.min(margin, STAND_MOST)}px` : ''
+    root.dataset['stand'] = margin >= STAND_LEAST ? 'margin' : 'glass'
   }
 
   /** The one line under the viewport: at the ceiling the wing's own

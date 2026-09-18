@@ -103,6 +103,16 @@
 .vitrine[data-peek='true'] .vitrine-foot {display:none;}
 .vitrine[data-narrow='true'][data-fill='true'] .vitrine-card {background:#0d171ff5;}
 
+/* THE ONE LINE UNDER A PAGE is read over paper as often as over dark: the
+   reader gives it the same ground its page label has, and stands it above
+   the strip of sides rather than across it. */
+.vitrine[data-payload='manuscript'] .vitrine-caption {width:fit-content;max-width:min(640px,calc(100% - 28px));
+  padding:7px 12px;background:#101d27e0;border:1px solid #a9977344;text-shadow:none;}
+.vitrine[data-payload='manuscript'][data-narrow='false'] .vitrine-caption {bottom:154px;}
+.vitrine[data-payload='manuscript'][data-narrow='false']:has(.reader[data-strip='false']) .vitrine-caption {bottom:70px;}
+.vitrine[data-payload='manuscript'][data-narrow='true'] .vitrine-caption {bottom:calc(var(--vitrine-peek,190px) + 88px);}
+.vitrine[data-payload='manuscript'][data-narrow='true']:has(.reader[data-strip='false']) .vitrine-caption {bottom:calc(var(--vitrine-peek,190px) + 16px);}
+
 /* THE PLATE over the paused frame. */
 .vitrine-plate {position:fixed;display:block;overflow:hidden;pointer-events:none;}
 .vitrine-plate img,.vitrine-plate canvas {position:absolute;display:block;max-width:none;}

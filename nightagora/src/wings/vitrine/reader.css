@@ -43,10 +43,6 @@
 .reader-zoom {display:flex;gap:6px;}
 .reader-zoom .vitrine-control {flex:0 0 auto;}
 
-/* THE ONE LINE UNDER THE PAGE stands over the page, never over the strip:
-   the wide stage puts it where the strip's own band ends. */
-.vitrine[data-payload='manuscript'][data-narrow='false'] .vitrine-caption {bottom:154px;}
-
 /* AT THE PEEK the card is the page's name and the one control that raises
    the rest of the words over it. */
 .vitrine[data-peek='true'] .reader-place,
