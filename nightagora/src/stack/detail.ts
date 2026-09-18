@@ -724,16 +724,25 @@ export function fitScales(
   return [macro, mid, Math.min(scales[2], mid / LADDER)]
 }
 
+/** a size in metres: a number, or a node where one surface carries several
+    parts and picks the ladder per fragment (a room's floor, lining and base
+    band are three sizes on one welded mesh, and three calls would be three
+    sets of taps for one surface) */
+export type Metres = number | N
+
 export interface SurfaceDetail {
-  /** the three feature sizes in METRES, macro to micro, of THIS part */
-  scales: [number, number, number]
+  /** the three feature sizes in METRES, macro to micro, of THIS part. Numbers
+      are fitted to `extent`; a node ladder has to be fitted by the caller
+      with `fitScales`, since a node has no size at build time. */
+  scales: [Metres, Metres, Metres]
   /** the part's smallest extent in metres, which caps the macro */
   extent?: number
   /** how far each scale swings the tone, around 1; zero mean, so no scale
       here can move what the surface is exposed at */
   figure?: [number, number, number]
   /** the relief the macro carries, in metres; a twentieth of the mid feature
-      by default, which is a slope a raking light can find and no more */
+      by default, which is a slope a raking light can find and no more. A node
+      ladder states its own, or it takes 2 mm. */
   relief?: number
   /** how many scales this tier pays for (`stack.tierConfig().detail`) */
   count?: 1 | 2 | 3
@@ -781,14 +790,17 @@ function faceUV(P: N, n: N): N {
 
 export function surfaceDetail(o: SurfaceDetail): SurfaceNodes {
   const count = o.count ?? 3
-  const s = fitScales(o.scales, o.extent)
+  const plain = o.scales.every((v) => typeof v === 'number')
+  const s: [Metres, Metres, Metres] = plain
+    ? fitScales(o.scales as [number, number, number], o.extent)
+    : o.scales
   const P = o.at ?? positionWorld
   const n = o.normal ?? normalWorldGeometry
   const figure = o.figure ?? [0.09, 0.06, 0.05]
   const pixel = anisotropicFootprint(P).toVar()
-  const gate = (metres: number, on: boolean): N => (on ? resolved(metres, pixel).toVar() : float(0))
+  const gate = (metres: Metres, on: boolean): N => (on ? resolved(metres, pixel).toVar() : float(0))
   const held: [N, N, N] = [gate(s[0], true), gate(s[1], count >= 2), gate(s[2], count >= 3)]
-  const field = (metres: number, hold: N): N => mx_noise_float(P.div(metres)).mul(hold).toVar()
+  const field = (metres: Metres, hold: N): N => mx_noise_float(P.div(metres)).mul(hold).toVar()
   const macro = field(s[0], held[0])
   const mid = count >= 2 ? field(s[1], held[1]) : float(0)
   const micro = count >= 3 ? field(s[2], held[2]) : float(0)
@@ -797,7 +809,7 @@ export function surfaceDetail(o: SurfaceDetail): SurfaceNodes {
     .add(macro.mul(figure[0]))
     .add(mid.mul(figure[1]))
     .add(micro.mul(figure[2]))
-  const relief = o.relief ?? s[1] * 0.05
+  const relief = o.relief ?? (typeof s[1] === 'number' ? s[1] * 0.05 : 0.002)
   let heightM = macro.mul(relief).add(mid.mul(relief * 0.4)).add(micro.mul(relief * 0.15))
   const rough = micro.mul(0.05).add(mid.mul(0.03))
   let joint: N = float(0)
