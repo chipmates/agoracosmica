@@ -414,10 +414,14 @@ export interface DetailScales {
   /** where the maps are read from. `world` projects from the world position
       straight down, which is what a hand-written instanced material needs;
       `uv` reads the geometry's own coordinates, which is what a standard
-      material's tangent frame is built from. */
-  space?: 'world' | 'uv'
+      material's tangent frame is built from; `triplanar` reads three times,
+      on the three world planes, and blends them on the world normal, which
+      is what a vertical face and a curved one need. */
+  space?: 'world' | 'uv' | 'triplanar'
   /** the world position, for a material three cannot infer one for */
   at?: N
+  /** the world normal, where the material knows better than the geometry */
+  normal?: N
   /** the projection to read the maps through, in METRES: a column wants its
       own circumference and height, not the ground plane it stands on */
   uv?: N
@@ -537,8 +541,39 @@ export function detailNodes(set: MaterialSet, opts: DetailScales = {}): DetailNo
       ? { uv: uv().mul(vec2(set.scale[0], set.scale[1])) }
       : { world: P }
 
+  /* THREE READS, ON THE THREE WORLD PLANES. One top-down projection puts a
+     photograph of a floor on a wall, stretched into a smear wherever the face
+     stands up, and a per-vertex pick of the nearest plane moirés across every
+     curve because the pick itself is interpolated. The blend is sharpened so
+     that a face which is nearly flat pays almost all of its weight to one
+     plane. The relief is blended in the tangent frame, which is exact on an
+     axis-aligned face and an approximation on a curve, where the slope's
+     direction matters less than that it is there at all. */
+  const triplanar = opts.space === 'triplanar' && !opts.uv
+  const weights = triplanar
+    ? (() => {
+        const n = abs(opts.normal ?? normalWorldGeometry).pow(4)
+        return n.div(n.x.add(n.y).add(n.z).max(1e-5)).toVar()
+      })()
+    : null
+  const blend3 = (x: N, y: N, z: N): N =>
+    x.mul(weights.x).add(y.mul(weights.y)).add(z.mul(weights.z))
+  const read = (extra: Record<string, unknown> = {}): SampledMaps => {
+    if (!weights) return set.sample({ ...where, ...extra })
+    const x = set.sample({ uv: vec2(P.z, P.y), ...extra })
+    const y = set.sample({ uv: vec2(P.x, P.z), ...extra })
+    const z = set.sample({ uv: vec2(P.x, P.y), ...extra })
+    return {
+      albedo: blend3(x.albedo, y.albedo, z.albedo),
+      colour: blend3(x.colour, y.colour, z.colour),
+      normal: blend3(x.normal, y.normal, z.normal),
+      roughness: blend3(x.roughness, y.roughness, z.roughness),
+      occlusion: blend3(x.occlusion, y.occlusion, z.occlusion),
+    } as SampledMaps
+  }
+
   if (mapAmt > 0) {
-    let grand = set.sample(where)
+    let grand = read()
     /* A TILE THAT CAN BE COUNTED IS WALLPAPER. Where a set's tile is far
        smaller than the surface it dresses, the same knot lands in a lattice
        the eye finds at once. The second read is the same photograph turned,
@@ -546,8 +581,7 @@ export function detailNodes(set: MaterialSet, opts: DetailScales = {}): DetailNo
        with the first's, and a mask coarser than either chooses between them.
        Two taps per map, and only for a set that asks. */
     if (set.detile > 0) {
-      const alt = set.sample({
-        ...where,
+      const alt = read({
         /* a small turn, not a right angle: the second read has to break the
            lattice, not lay a second grain across the first. The tile size
            and the shift are what move the knots. */
@@ -575,8 +609,7 @@ export function detailNodes(set: MaterialSet, opts: DetailScales = {}): DetailNo
     occlusion = mix(float(1), grand.occlusion, density.mul(mapAmt))
     let tangent: N = grand.normal
     if (midBand) {
-      const near = set.sample({
-        ...where,
+      const near = read({
         metres: [set.scale[0] / 5, set.scale[1] / 5],
         turn: 0.34,
       })
