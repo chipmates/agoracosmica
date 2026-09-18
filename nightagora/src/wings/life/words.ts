@@ -39,8 +39,11 @@ export const LIFE_WORDS = {
   /** The strip under the blank, on its own clock: what happened to the work
    * after the life is not a period of that life. */
   after: { en: 'Afterwards', de: 'Danach' },
-  /** The works with no date in the record, grouped rather than guessed at. */
-  undated: { en: 'Without a date', de: 'Ohne Datum' },
+  /** THE EIGHTH ITEM OF THE SPINE: what the register cannot put on a year at
+   * all. It is not a period of a life, so it stands after the afterlife, and
+   * its works are counted in the wing's own word for what that row carries. */
+  undated: { en: 'Without a year', de: 'Ohne Jahreszahl' },
+  undatedCount: { en: '{n} {row}', de: '{n} {row}' },
   ask: { en: 'What came next?', de: 'Was kam danach?' },
   askShow: { en: 'Show me', de: 'Zeig es mir' },
   askSkip: { en: 'Skip', de: 'Überspringen' },
@@ -136,10 +139,9 @@ const TENS: Record<'en' | 'de', readonly string[]> = {
  * ONE AND NONE NEVER PASS THROUGH HERE. German inflects both with the gender
  * of the noun they count (ein Datum, eine Zeichnung, kein Bild), which this
  * module cannot know, so every counted sentence carries its own singular and
- * its own none, the way a period's date count carries `oneDate` and `noDate`
- * and the works line carries `one` and `none`. A caller that asks anyway gets
- * a numeral, which is visibly wrong in prose rather than quietly ungrammatical,
- * and a wing whose own counted clause can stand at one owes it a singular. */
+ * its own none, the way a period's date count carries `oneDate` and `noDate`.
+ * A caller that asks anyway gets a numeral, which is visibly wrong in prose
+ * rather than quietly ungrammatical. */
 export function spokenCount(value: number, language: 'en' | 'de'): string {
   if (!Number.isInteger(value) || value < 2 || value > 99) return String(value)
   if (value < 20) return ONES[language][value] ?? String(value)

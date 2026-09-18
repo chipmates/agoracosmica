@@ -81,7 +81,9 @@
 .wing-life-period-body {flex:1 1 60%;min-width:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;padding-right:4px;}
 
 .wing-life-item {margin:0;padding:0;border-bottom:1px solid #a9977322;}
-.wing-life-item[data-afterlife='true'] {margin-top:5px;border-top:1px solid #a9977355;}
+.wing-life-item[data-afterlife='true'],.wing-life-item[data-undated='true'] {margin-top:5px;border-top:1px solid #a9977355;}
+/* The one item that is not a period of a life reads quieter than the places. */
+.wing-life-item[data-undated='true'] .wing-life-item-title {color:#b6bcae;font-size:13px;}
 .wing-life-item-name {display:flex;flex-direction:column;gap:1px;width:100%;min-height:44px;padding:5px 8px 5px 10px;text-align:left;
   background:none;border:0;border-left:2px solid transparent;color:#cfc6b4;font:14px/1.3 var(--serif);cursor:pointer;
   transition:color 160ms linear,border-color 160ms linear,background-color 160ms linear;}

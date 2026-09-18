@@ -30,6 +30,8 @@ export type { LifeBand, LifeCounts, LifeEvent, LifePerson, LifeRecord, LifeWork,
 export { LIFE_WORDS } from './words'
 
 const HISTORY_MARK = 'wingLife'
+/** The one item of the spine that is not a period of a life. */
+const UNDATED = '#without-a-year'
 
 export const LIFE_WIDE = { top: 76, side: 28, bottom: 18, padding: 20, widest: 1080 } as const
 export const LIFE_NARROW = { top: 52, side: 8, bottom: 10, padding: 12 } as const
@@ -155,7 +157,7 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     const record = options.record()
     const scale = lifeScale(record.events, record.span)
     const tally = lifeCounts(record.events, record.works, record.span)
-    if (!band || !record.bands.some(entry => entry.id === band)) band = firstBand(record)
+    if (!band || !(band === UNDATED || record.bands.some(entry => entry.id === band))) band = firstBand(record)
     dialog.setAttribute('aria-label', say(record.words.throughLine))
     through.textContent = say(record.words.throughLine)
     second.textContent = say(record.words.secondLine)
@@ -278,6 +280,40 @@ export function createWingLife(options: WingLifeOptions): WingLife {
       item.append(press)
       spine.append(item)
     }
+    /* THE EIGHTH ITEM, where the register has works no year can hold. It is
+       not a period of a life, so it stands after the afterlife and carries no
+       dates, no people and no question. */
+    if (undatedWorks(record).length) spine.append(undatedItem(record, language))
+  }
+
+  /** The works the record cannot put on any year of this life. */
+  function undatedWorks(record: LifeRecord): LifeWork[] {
+    return record.works.filter(work => !workYears(work, record.span))
+  }
+
+  function undatedItem(record: LifeRecord, language: 'en' | 'de'): HTMLElement {
+    const item = make('li', 'wing-life-item')
+    item.dataset['band'] = UNDATED
+    item.dataset['undated'] = 'true'
+    const press = make('button', 'wing-life-item-name')
+    press.type = 'button'
+    press.dataset['band'] = UNDATED
+    press.setAttribute('aria-expanded', String(band === UNDATED))
+    press.setAttribute('aria-controls', periodBody.id)
+    press.tabIndex = band === UNDATED ? 0 : -1
+    if (band === UNDATED) press.setAttribute('aria-current', 'true')
+    // The row's own word for what it carries is the wing's; English lowercases
+    // a noun inside a sentence and German does not.
+    const row = record.words.worksRow[language]
+    press.append(make('span', 'wing-life-item-title', LIFE_WORDS.undated[language]),
+      make('span', 'wing-life-item-count', capitalise(fill(LIFE_WORDS.undatedCount[language], {
+        n: spokenCount(undatedWorks(record).length, language),
+        row: language === 'en' ? row.toLowerCase() : row,
+      }))))
+    press.addEventListener('click', () => select(UNDATED, 'spine'))
+    press.addEventListener('keydown', event => step(event, record))
+    item.append(press)
+    return item
   }
 
   function dateCount(n: number, language: 'en' | 'de'): string {
@@ -297,10 +333,17 @@ export function createWingLife(options: WingLifeOptions): WingLife {
   function paintPeriod(record: LifeRecord, gaps: readonly LifeGap[], language: 'en' | 'de'): void {
     const entry = bandOf(record, band)
     periodBody.replaceChildren()
-    if (!entry) return
+    if (!entry && band !== UNDATED) return
     const narrow = options.narrow()
-    const holder = narrow ? spine.querySelector<HTMLElement>(`[data-band="${entry.id}"]`) : reading
+    const holder = narrow ? spine.querySelector<HTMLElement>(`[data-band="${band}"]`) : reading
     if (holder && periodBody.parentElement !== holder) holder.append(periodBody)
+    /* THE WORKS NO YEAR CAN HOLD stand on their own, with no dates to read
+       and nobody named in years the record does not give them. */
+    if (!entry) {
+      periodBody.append(make('h3', 'wing-life-period-name', LIFE_WORDS.undated[language]))
+      paintWorkList(record, undatedWorks(record), language, false)
+      return
+    }
     periodBody.append(make('h3', 'wing-life-period-name', entry.name[language]),
       make('p', 'wing-life-period-line', entry.line[language]))
     const own = eventsOf(record, entry.id)
@@ -402,10 +445,15 @@ export function createWingLife(options: WingLifeOptions): WingLife {
   }
 
   function paintWorks(record: LifeRecord, entry: LifeBand, language: 'en' | 'de'): void {
+    paintWorkList(record, worksOf(record, entry), language, true)
+  }
+
+  /** The works of one item, each with the door to the wall it hangs on, and
+   * the line that says how many of them this wing holds. */
+  function paintWorkList(record: LifeRecord, own: readonly LifeWork[], language: 'en' | 'de', counted: boolean): void {
     const section = make('section', 'wing-life-section')
     section.dataset['row'] = 'works'
-    section.append(make('h4', 'wing-life-row-name', record.words.worksRow[language]))
-    const own = worksOf(record, entry)
+    if (counted) section.append(make('h4', 'wing-life-row-name', record.words.worksRow[language]))
     if (!own.length) {
       section.append(make('p', 'wing-life-empty', record.words.worksEmpty[language]))
       periodBody.append(section)
@@ -492,7 +540,7 @@ export function createWingLife(options: WingLifeOptions): WingLife {
    * the only things that move. */
   function select(id: string, from: 'ribbon' | 'spine'): void {
     const record = options.record()
-    if (!bandOf(record, id)) return
+    if (id !== UNDATED && !bandOf(record, id)) return
     band = id
     at = null
     if (!asked) { asked = true; asking = true }
@@ -505,6 +553,7 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     paintPeriod(record, lifeScale(record.events, record.span).gaps, options.lang())
     const entry = bandOf(record, id)
     if (entry) announce(`${entry.name[options.lang()]}. ${dateCount(eventsOf(record, id).length, options.lang())}`)
+    else if (id === UNDATED) announce(LIFE_WORDS.undated[options.lang()])
     if (from === 'spine') spine.querySelector<HTMLElement>(`[data-band="${id}"] .wing-life-item-name`)?.focus({ preventScroll: true })
     if (from === 'ribbon') presses.querySelector<HTMLElement>(`[data-band="${id}"]`)?.focus({ preventScroll: true })
     periodBody.scrollTop = 0
@@ -560,12 +609,12 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     const forward = event.key === 'ArrowRight' || (!ribbon && event.key === 'ArrowDown')
     const back = event.key === 'ArrowLeft' || (!ribbon && event.key === 'ArrowUp')
     if (!forward && !back) return
-    const index = record.bands.findIndex(entry => entry.id === band)
-    const next = record.bands[index + (forward ? 1 : -1)]
+    const walk = [...record.bands.map(entry => entry.id), ...(undatedWorks(record).length ? [UNDATED] : [])]
+    const next = walk[walk.indexOf(band ?? '') + (forward ? 1 : -1)]
     if (!next) return
     event.preventDefault()
     event.stopPropagation()
-    select(next.id, ribbon ? 'ribbon' : 'spine')
+    select(next, ribbon ? 'ribbon' : 'spine')
   }
 
   /** Up and down step date to date inside the open period, Home and End to
