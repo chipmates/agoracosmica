@@ -1078,8 +1078,12 @@ export function createWing():VinciWingModule {
     quietName.textContent=lang()==='de'?found.work.title_de:found.work.title_en
     quietYear.textContent=lang()==='de'?found.work.date_label_de:found.work.date_label_en
     quietDot.style.setProperty('--certainty',policyLabelText(found.work,entries).colour)
+    // THE NAME NEVER STANDS IN THE ROW. A work at its own viewing eye fills
+    // the frame to the foot, so the label takes the last clear band above the
+    // wall's own instrument instead of standing behind it.
+    const floor=(strip?.element.getBoundingClientRect().top??innerHeight)-12
     quiet.style.left=`${Math.round(rect.left+rect.width/2)}px`
-    quiet.style.top=`${Math.round(rect.top+rect.height+12)}px`
+    quiet.style.top=`${Math.round(Math.min(rect.top+rect.height+12,floor-quiet.offsetHeight))}px`
   }
   /** THE ROW UNDER THE CARD. It stands wherever a station holds more than
    * one exhibit: docked under the station card on the wide stage, above the

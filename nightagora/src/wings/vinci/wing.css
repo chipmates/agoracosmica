@@ -351,10 +351,15 @@
 #wing[data-wing='vinci'] .vinci-heading,
 #wing[data-wing='vinci'] .vinci-strip,
 #wing[data-wing='vinci'] .vinci-quiet,
+#wing[data-wing='vinci'] .vitrine-card,
 #wing[data-wing='vinci'] .wing-doorblock {transition:opacity .24s cubic-bezier(.22,.61,.36,1);}
+/* The card of the work being walked TO goes with them: it is the card of a
+   place the visitor has not reached, and reading it while the wall slides past
+   is what the owner's line refuses. It rises on arrival, at its own place. */
 #wing[data-wing='vinci'][data-walking] .vinci-heading,
 #wing[data-wing='vinci'][data-walking] .vinci-strip,
 #wing[data-wing='vinci'][data-walking] .vinci-quiet,
+#wing[data-wing='vinci'][data-walking] .vitrine-card,
 #wing[data-wing='vinci'][data-walking] .wing-doorblock {opacity:0;pointer-events:none;transition-duration:.16s;}
 /* The marks of the room are the wall's own targets and go with it. */
 #wing[data-wing='vinci'][data-walking] .vinci-exhibit-dot {opacity:0;pointer-events:none;}
@@ -363,10 +368,12 @@
   #wing[data-wing='vinci'] .vinci-heading,
   #wing[data-wing='vinci'] .vinci-strip,
   #wing[data-wing='vinci'] .vinci-quiet,
+  #wing[data-wing='vinci'] .vitrine-card,
   #wing[data-wing='vinci'] .wing-doorblock {transition:none;}
   #wing[data-wing='vinci'][data-walking] .vinci-heading,
   #wing[data-wing='vinci'][data-walking] .vinci-strip,
   #wing[data-wing='vinci'][data-walking] .vinci-quiet,
+  #wing[data-wing='vinci'][data-walking] .vitrine-card,
   #wing[data-wing='vinci'][data-walking] .wing-doorblock,
   #wing[data-wing='vinci'][data-walking] .vinci-exhibit-dot {opacity:1;pointer-events:auto;}
 }
