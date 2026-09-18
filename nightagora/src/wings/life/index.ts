@@ -513,7 +513,11 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     }
     section.append(list)
     const shown = own.filter(work => work.exhibit).length
-    const words = shown === 0 ? LIFE_WORKS_COUNT.none : shown === 1 ? LIFE_WORKS_COUNT.one : LIFE_WORKS_COUNT.some
+    // A ROW WHERE EVERY WORK HANGS SAYS SO, rather than counting the same
+    // number twice against itself.
+    const words = shown === 0 ? LIFE_WORKS_COUNT.none
+      : shown === own.length ? (own.length === 1 ? LIFE_WORKS_COUNT.only : LIFE_WORKS_COUNT.all)
+        : shown === 1 ? LIFE_WORKS_COUNT.one : LIFE_WORKS_COUNT.some
     section.append(make('p', 'wing-life-work-count', capitalise(fill(words[language], {
       shown: spokenCount(shown, language), total: spokenCount(own.length, language),
     }))))

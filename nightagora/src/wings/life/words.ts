@@ -85,6 +85,16 @@ export const LIFE_WORKS_COUNT = {
     en: 'None of these hangs in this wing.',
     de: 'Keines davon hängt in diesem Flügel.',
   },
+  /** A period whose works all hang here counts none of them twice. */
+  all: {
+    en: 'All {total} hang in this wing.',
+    de: 'Alle {total} hängen in diesem Flügel.',
+  },
+  /** One work, and it is here: a count of one is not spoken at all. */
+  only: {
+    en: 'It hangs in this wing.',
+    de: 'Es hängt in diesem Flügel.',
+  },
 } satisfies Record<string, Bi>
 
 /** THE COUNTED SENTENCES. Every count under a hundred is written as a word,
