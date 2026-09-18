@@ -8,7 +8,7 @@
  * reading for the same reason: everything it shows is in that list.
  */
 
-import { dateYears, type LifeScale } from './scale'
+import { dateYears, workYears, type LifeScale } from './scale'
 import type { LifeEvent, LifeRecord, LifeWork, Sure } from './types'
 
 const NS = 'http://www.w3.org/2000/svg'
@@ -127,9 +127,10 @@ export function drawLifePlate(options: {
       }
     }
     if (row === 'works') {
-      const dated = record.works.filter((work): work is LifeWork & { date: NonNullable<LifeWork['date']> } => Boolean(work.date))
+      // The axis draws only what the record puts inside a year of this life.
+      const dated = record.works.filter(work => workYears(work, record.span))
       for (const [index, work] of dated.entries()) {
-        const span = dateYears(work.date)
+        const span = workYears(work, record.span)
         if (!span) continue
         const left = x(span.from), right = x(span.to)
         // Works overlap in time, so they are stacked in three courses and

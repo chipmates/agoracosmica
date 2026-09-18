@@ -98,6 +98,14 @@ export interface LifeWingWords {
   honesty: Bi
   /** what a date the floor does not carry says instead of offering a walk */
   notCut: Bi
+  /** The middle row's name, in the word the wing's own register uses for
+   * what it holds, and that row's counted sentence in the same grammar as
+   * the museum's others. */
+  worksRow: Bi
+  worksCount: Bi
+  /** The age beside a year, in the wing's own words, so the reader that
+   * stands at a date and this view say it from one place. */
+  age: { exact: Bi; about: Bi }
 }
 
 export interface LifeRecord {

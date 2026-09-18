@@ -76,7 +76,7 @@ import { createVinciHangStrip, vinciSheetTitle, type VinciStripEntry } from './c
 import { pathSpecifications } from './paths'
 import { roadGradeProvenance } from './road-grade'
 import { apronProvenance } from './apron'
-import { vinciContent, vinciPlanRooms, vinciThroughLine, vinciLifeBands, vinciLifePeople, vinciLifeSecondLine, vinciLifeNotCut, vinciWelcomeText, vinciLegacyStationIds, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, vinciAbsences, vinciGrounds, vinciRightsPolicy, vinciWingCounts, vinciSourcesHeadings, type VinciCertainty, type VinciStatement, type VinciStationId, type VinciText } from './content'
+import { vinciContent, vinciPlanRooms, vinciThroughLine, vinciLifeBands, vinciLifePeople, vinciLifeSecondLine, vinciLifeNotCut, vinciLifeWorksRow, vinciLifeWorksCount, vinciWelcomeText, vinciLegacyStationIds, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, vinciAbsences, vinciGrounds, vinciRightsPolicy, vinciWingCounts, vinciSourcesHeadings, type VinciCertainty, type VinciStatement, type VinciStationId, type VinciText } from './content'
 import wingCss from './wing.css?inline'
 
 const text=(value:VinciText):string=>value[lang()]
@@ -638,7 +638,13 @@ export function createWing():VinciWingModule {
    * these twelve carry the walk and the other forty four say so instead. */
   const LIFE_CUT=new Set(LINE_SECTIONS.flatMap(section=>[0,1,2,3].map(offset=>LINE_STUDS[section.selected+offset]?.id??'')))
   const LIFE_BIRTH=LINE_STUDS.find(stud=>stud.id==='life-01')!,LIFE_DEATH=LINE_STUDS.find(stud=>stud.id==='life-41')!
-  const LIFE_HONESTY=(JSON.parse(cardsSource) as {floor_honesty:{en:string;de:string}}).floor_honesty
+  /** The floor's honesty line and both age forms come from the card models,
+   * so the reader that stands at a date and this view say them from one
+   * place and neither keeps a copy. */
+  const LIFE_CARDS=JSON.parse(cardsSource) as {floor_honesty:VinciText
+    controls:{date:{age:VinciText;age_about:VinciText}}}
+  const LIFE_HONESTY=LIFE_CARDS.floor_honesty
+  const LIFE_AGE_WORDS={exact:LIFE_CARDS.controls.date.age,about:LIFE_CARDS.controls.date.age_about}
   const SURE_RANK:Record<Sure,number>={documented:2,inferred:1,tradition:0}
   /** A day and a year apart, in milliseconds: the widest span an age may be
    * said about. */
@@ -698,7 +704,8 @@ export function createWing():VinciWingModule {
     const sure=Object.fromEntries((['documented','inferred','tradition'] as const).map(key=>
       [key,{word:{en:LINE_CERTAINTY[key].en,de:LINE_CERTAINTY[key].de},colour:LINE_CERTAINTY[key].colour}])) as LifeRecord['sure']
     return {bands,events,works:lifeWorks(),people,sure,
-      words:{throughLine:vinciThroughLine,secondLine:vinciLifeSecondLine,honesty:LIFE_HONESTY,notCut:vinciLifeNotCut},
+      words:{throughLine:vinciThroughLine,secondLine:vinciLifeSecondLine,honesty:LIFE_HONESTY,notCut:vinciLifeNotCut,
+        worksRow:vinciLifeWorksRow,worksCount:vinciLifeWorksCount,age:LIFE_AGE_WORDS},
       span:{from:Number(LIFE_BIRTH.date.slice(0,4)),to:Number(LIFE_DEATH.date.slice(0,4))}}
   }
   /** THE WORKS ROW. The register dates its paintings to a span of years and

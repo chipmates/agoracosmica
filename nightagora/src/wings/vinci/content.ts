@@ -869,6 +869,19 @@ export const vinciLifeSecondLine: VinciText = {
   de: 'Das ganze Leben, 1452 bis 1519, und wohin die Blätter danach gingen.',
 };
 
+/** THE MIDDLE ROW OF THE LIFE VIEW, named for what stands on it. This wing's
+ * row carries the picture register alone: the machines, the sheets and the
+ * codices publish no date the view may read, so the row is the picture room's
+ * word until one of them does. */
+export const vinciLifeWorksRow: VinciText = { en: 'Pictures', de: 'Bilder' };
+
+/** That row's count, in the same grammar as the museum's other counted
+ * sentences. The numbers are the record's own and the view fills them. */
+export const vinciLifeWorksCount: VinciText = {
+  en: '{total} pictures here. {dated} with a date in the record, {undated} without one.',
+  de: '{total} Bilder hier. {dated} mit einem Datum im Verzeichnis, {undated} ohne Datum.',
+};
+
 /** What a date the gallery floor does not carry says, instead of offering a
  * walk to a socket that was never cut. */
 export const vinciLifeNotCut: VinciText = {

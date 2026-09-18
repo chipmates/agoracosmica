@@ -29,10 +29,12 @@ export const LIFE_WORDS = {
   },
 } satisfies Record<string, Bi>
 
-/** The three facets, named for the controls that hold one of them at a time. */
+/** Two of the three facets, named for the controls that hold one of them at
+ * a time. The middle row is named by the wing, because what it holds differs:
+ * where it carries one register the row takes that register's own word, and a
+ * row that gathered several kinds would be named for all of them. */
 export const LIFE_ROW_WORDS = {
   places: { en: 'Places', de: 'Orte' },
-  works: { en: 'Works', de: 'Werke' },
   people: { en: 'People', de: 'Menschen' },
 } satisfies Record<string, Bi>
 
@@ -43,16 +45,14 @@ export const LIFE_BAND_WORDS = {
   fewer: { en: 'Fewer', de: 'Weniger' },
 } satisfies Record<string, Bi>
 
-/** THE COUNTED SENTENCES. The leading count is written as a word, the way the
- * floor's own honesty line writes it, and the numbers inside stay numerals. */
+/** THE COUNTED SENTENCES. Every count under a hundred is written as a word,
+ * wherever it stands in the sentence; a year stays a numeral. The wing's own
+ * counted sentence for the middle row is in its record, beside that row's
+ * name, and is filled the same way. */
 export const LIFE_COUNTS = {
   dates: {
     en: '{total} dates here. {documented} documented, {inferred} inferred, {tradition} from tradition.',
     de: '{total} Daten hier. {documented} belegt, {inferred} erschlossen, {tradition} aus Überlieferung.',
-  },
-  works: {
-    en: '{total} works here. {dated} with a date in the record, {undated} without one.',
-    de: '{total} Werke hier. {dated} mit einem Datum im Verzeichnis, {undated} ohne Datum.',
   },
   emptyYears: {
     en: '{empty} of the {span} years from {from} to {to} hold no event in this record. The longest stretch is {longest} years.',
@@ -63,12 +63,6 @@ export const LIFE_COUNTS = {
     en: '{years} years with nothing in this record.',
     de: '{years} Jahre, zu denen dieses Verzeichnis nichts hat.',
   },
-} satisfies Record<string, Bi>
-
-/** The age beside a year, and the form for a date that is a span or an about. */
-export const LIFE_AGE = {
-  exact: { en: 'age {years}', de: 'mit {years} Jahren' },
-  about: { en: 'age about {years}', de: 'mit etwa {years} Jahren' },
 } satisfies Record<string, Bi>
 
 const ONES: Record<'en' | 'de', readonly string[]> = {

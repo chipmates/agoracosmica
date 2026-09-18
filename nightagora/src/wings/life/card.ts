@@ -7,7 +7,7 @@
  * offering a door that would open somewhere else.
  */
 
-import { LIFE_AGE, LIFE_WORDS, fill } from './words'
+import { LIFE_WORDS, fill } from './words'
 import type { LifeEvent, LifeRecord } from './types'
 
 export interface LifeCardHost {
@@ -38,7 +38,8 @@ export function renderLifeCard(options: LifeCardHost): void {
   time.dataset['edtf'] = event.date.edtf
   head.append(time)
   if (event.age !== null) {
-    const age = fill((event.ageApproximate ? LIFE_AGE.about : LIFE_AGE.exact)[language], { years: event.age })
+    const words = record.words.age
+    const age = fill((event.ageApproximate ? words.about : words.exact)[language], { years: event.age })
     head.append(make('span', 'wing-life-card-age', age))
   }
   const sure = record.sure[event.certainty]

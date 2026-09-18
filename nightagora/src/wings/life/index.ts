@@ -23,7 +23,7 @@
 import css from './life.css?inline'
 import { renderLifeCard } from './card'
 import { drawLifePlate } from './plate'
-import { dateYears, lifeCounts, lifeScale, type LifeGap } from './scale'
+import { dateYears, lifeCounts, lifeScale, workYears, type LifeGap } from './scale'
 import { LIFE_BAND_WORDS, LIFE_COUNTS, LIFE_ROW_WORDS, LIFE_WORDS, capitalise, fill, spokenCount } from './words'
 import { LIFE_ROWS, type Bi, type LifeBand, type LifeEvent, type LifeRecord, type LifeRow } from './types'
 
@@ -160,7 +160,7 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     tabs.replaceChildren()
     tabs.hidden = !narrow
     if (narrow) for (const name of LIFE_ROWS) {
-      const control = make('button', 'wing-life-tab', LIFE_ROW_WORDS[name][language])
+      const control = make('button', 'wing-life-tab', rowWord(record, name, language))
       control.type = 'button'
       control.setAttribute('aria-pressed', String(name === row))
       control.addEventListener('click', () => { row = name; paint() })
@@ -172,7 +172,7 @@ export function createWingLife(options: WingLifeOptions): WingLife {
       const section = make('section', 'wing-life-section')
       section.dataset['row'] = name
       section.hidden = narrow && name !== row
-      section.append(make('h3', 'wing-life-row-name', LIFE_ROW_WORDS[name][language]))
+      section.append(make('h3', 'wing-life-row-name', rowWord(record, name, language)))
       if (name === 'places') paintBands(section, record, scale.gaps, language)
       if (name === 'works') paintWorks(section, record, language)
       if (name === 'people') paintPeople(section, record, language)
@@ -188,19 +188,27 @@ export function createWingLife(options: WingLifeOptions): WingLife {
         inferred: spokenCount(tally.events.inferred, language),
         tradition: spokenCount(tally.events.tradition, language),
       }))),
-      make('p', 'wing-life-count', capitalise(fill(LIFE_COUNTS.works[language], {
+      make('p', 'wing-life-count', capitalise(fill(record.words.worksCount[language], {
         total: spokenCount(tally.works.total, language),
         dated: spokenCount(tally.works.dated, language),
         undated: spokenCount(tally.works.undated, language),
       }))),
+      // A count is a word and a year is a numeral, in the same sentence.
       make('p', 'wing-life-count', capitalise(fill(LIFE_COUNTS.emptyYears[language], {
         empty: spokenCount(tally.emptyYears, language),
-        span: record.span.to - record.span.from + 1,
-        from: record.span.from, to: record.span.to, longest: tally.longestGapYears,
+        span: spokenCount(record.span.to - record.span.from + 1, language),
+        from: record.span.from, to: record.span.to,
+        longest: spokenCount(tally.longestGapYears, language),
       }))),
       make('p', 'wing-life-honesty', say(record.words.honesty)),
     )
     if (at) openCard(at)
+  }
+
+  /** Two rows are named by the museum and the middle one by the wing, in the
+   * word its own register uses for what stands there. */
+  function rowWord(record: LifeRecord, name: LifeRow, language: 'en' | 'de'): string {
+    return name === 'works' ? record.words.worksRow[language] : LIFE_ROW_WORDS[name][language]
   }
 
   function paintBands(section: HTMLElement, record: LifeRecord, gaps: readonly LifeGap[], language: 'en' | 'de'): void {
@@ -225,7 +233,8 @@ export function createWingLife(options: WingLifeOptions): WingLife {
         const shown = wide ? events : events.filter(event => band.first.includes(event.id))
         item.append(dates(record, shown, band, gaps, language))
         if (events.length > shown.length) {
-          const more = make('button', 'wing-life-more', fill(LIFE_BAND_WORDS.more[language], { n: events.length - shown.length }))
+          const more = make('button', 'wing-life-more',
+            capitalise(fill(LIFE_BAND_WORDS.more[language], { n: spokenCount(events.length - shown.length, language) })))
           more.type = 'button'
           more.setAttribute('aria-expanded', 'false')
           more.addEventListener('click', () => expand(band))
@@ -285,8 +294,8 @@ export function createWingLife(options: WingLifeOptions): WingLife {
   }
 
   function paintWorks(section: HTMLElement, record: LifeRecord, language: 'en' | 'de'): void {
-    const dated = record.works.filter(work => work.date && dateYears(work.date))
-      .sort((a, b) => (dateYears(a.date!)!.from - dateYears(b.date!)!.from))
+    const dated = record.works.filter(work => workYears(work, record.span))
+      .sort((a, b) => (workYears(a, record.span)!.from - workYears(b, record.span)!.from))
     const list = make('ol', 'wing-life-works')
     for (const work of dated) {
       const item = make('li', 'wing-life-work-item')
@@ -296,7 +305,7 @@ export function createWingLife(options: WingLifeOptions): WingLife {
       list.append(item)
     }
     section.append(list)
-    const undated = record.works.filter(work => !work.date || !dateYears(work.date))
+    const undated = record.works.filter(work => !workYears(work, record.span))
     if (!undated.length) return
     /* A WORK WITH NO DATE IS NOT PLACED AT A GUESS: it stands at the foot,
        under the words for what it is missing. */

@@ -39,6 +39,17 @@ export function dateYears(date: { earliest: string | null; latest: string | null
   return Number.isFinite(from) && Number.isFinite(to) ? { from: Math.min(from, to), to: Math.max(from, to) } : null
 }
 
+/** THE YEARS A WORK IS PLACED BETWEEN, or nothing. A register may date a work
+ * to a century, and a bar from 1500 to 1599 laid over a life that ended in
+ * 1519 claims the whole of it. A span wider than the life is therefore read
+ * as what it is, no year for that work, and the work stands with the undated
+ * ones instead of across the axis. */
+export function workYears(work: LifeWork, life: { from: number; to: number }): { from: number; to: number } | null {
+  const span = work.date ? dateYears(work.date) : null
+  if (!span) return null
+  return span.to - span.from > life.to - life.from ? null : span
+}
+
 /** Every year inside the span that at least one event reaches. */
 function reached(events: readonly LifeEvent[], from: number, to: number): Set<number> {
   const years = new Set<number>()
@@ -90,7 +101,7 @@ export function lifeCounts(events: readonly LifeEvent[], works: readonly LifeWor
   const by = (kind: LifeEvent['certainty']): number => events.filter(event => event.certainty === kind).length
   const gaps = lifeGaps(events, span.from, span.to)
   const years = reached(events, span.from, span.to)
-  const dated = works.filter(work => work.date && dateYears(work.date)).length
+  const dated = works.filter(work => workYears(work, span)).length
   return {
     events: { total: events.length, documented: by('documented'), inferred: by('inferred'), tradition: by('tradition') },
     works: { total: works.length, dated, undated: works.length - dated },
