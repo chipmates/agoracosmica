@@ -226,6 +226,7 @@ export function createVinciHangStrip(options: {
   }
   function paintScale(): void {
     foot.hidden = wall === null
+    whole.hidden = wall === null
     scale.hidden = wall === null || wall.total < 2
     if (wall === null) return
     const at = Math.max(0, Math.min(wall.total, wall.place))
