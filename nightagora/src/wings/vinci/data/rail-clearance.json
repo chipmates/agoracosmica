@@ -90,8 +90,8 @@
   },
   {
    "file": "src/wings/vinci/content.ts",
-   "sha256": "fd0b8ae6a6887543eb6196b1b7b6bef2a551c4b1748a30da09c9d84600cb8fd7",
-   "bytes": 76155,
+   "sha256": "a23f0bacfdf26334ce78c36e4e9caef72a3c06b66609192f9a82999463044d89",
+   "bytes": 78114,
    "unchangedDuringAudit": true
   },
   {
@@ -102,7 +102,7 @@
   },
   {
    "file": "src/wings/vinci/data/doors.json",
-   "sha256": "fac5f55a3ca558f9a98434c5169947a67976b196be3e0d1fbc95e626f7f70f57",
+   "sha256": "b2962c4d1521500fb4382d4f5346683b33f071be1e754c4f2a628629176f086a",
    "bytes": 12576,
    "unchangedDuringAudit": true
   },

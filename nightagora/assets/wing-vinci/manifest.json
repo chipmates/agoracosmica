@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed to a pale grey at 30 per cent. Assumed weather, no observation claimed.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "5caf788acd4461d21ccbb6d456e083f408c179c99d82c498fe9a365b83354465",
+      "sha256": "378dd5437a86943fa367085d939fbb1d7d54da414f04a14a6d83ffab14286dc0",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=80c458f2cb5ccddb7fcedccda5df70e5cdccda7d9ca97d65ebfa6462920f61ef;"
     },
     {
@@ -75,7 +75,7 @@
       "prompt": "Spoken bilingual museum labels with unchanged station names and canonical door questions. Plain source explanations and a separately opened complete record retain the original source chain, dimensional ranges, uncertainty and identical computed-hour arithmetic.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "fd0b8ae6a6887543eb6196b1b7b6bef2a551c4b1748a30da09c9d84600cb8fd7",
+      "sha256": "a23f0bacfdf26334ce78c36e4e9caef72a3c06b66609192f9a82999463044d89",
       "note": "brief/CONCEPT-OPUS.md; brief/CONCEPT-GPT6.md; src/wings/vinci/data/doors.json; recipe_file=src/wings/vinci/content.ts; visitor_evidence_recipe=src/wings/vinci/evidence-copy.ts; visitor_evidence_sha256=1154b783a9a2b7bddd75d4d1294475ae82dbe74006e4b6ff5c0eb2df9247ed00"
     },
     {
@@ -413,7 +413,7 @@
       "prompt": "Regenerable actual geometry certificate for40 directed routes across five pose families and two viewport families. Includes foundation, entry, vegetation and all dressing; no sky, DOM or shadow-only duplicate.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-10",
-      "sha256": "40c3443489ffbe6c5c563ba484cf9fb547c336766c2b0a9fbf7dec3da1059de3",
+      "sha256": "9ee80f6e3fdc2859a0911b1e056ece5768ee78640875cf76673e870a39d15c42",
       "note": "recipe_file=src/wings/vinci/data/rail-clearance.json; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail; companion_file=src/wings/vinci/collection/approaches.ts"
     },
     {

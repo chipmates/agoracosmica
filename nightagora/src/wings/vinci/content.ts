@@ -1070,6 +1070,9 @@ const originalWalk = [
   'arrival', 'courtyard', 'hall', 'oratory', 'study', 'chamber', 'garden',
   'line-early', 'line-late', 'line-amboise', 'picture-room', 'supper-wall',
   'reading-table', 'scattered', 'flight', 'works', 'body', 'myths', 'grave',
+  // A station opened after the walk was numbered takes the next number, so
+  // every number before it means what it always meant.
+  'picture-room-west',
 ] as const;
 
 /** A station that has left the walk keeps its numeric position, and the link

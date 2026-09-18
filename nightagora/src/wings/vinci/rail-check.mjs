@@ -192,7 +192,11 @@ for(const phone of [false,true]) {
     ensure(h.calls.length===0,'Equal-pose semantic change invented a route')
   })
   check(viewport,'A long held-input burst retains at most one target and walks only the active and latest endpoints',()=>{
-    const h=harness(phone),accepted=Array.from({length:257},(_,i)=>ids[(i+1)%ids.length])
+    // The burst never ends on the station it starts from: asking for the
+    // endpoint you already stand at cancels the queue by design, and a walk
+    // whose station count happens to divide the burst would test that instead.
+    const h=harness(phone),others=ids.filter(id=>id!=='courtyard')
+    const accepted=Array.from({length:257},(_,i)=>others[i%others.length])
     h.set('courtyard');h.at(0);h.at(.2)
     for(const id of accepted){h.set(id);ensure(h.rail.navigation.queued.length<=1,'A held input built a chain')}
     ensure(h.rail.navigation.queued.join(',')===accepted.at(-1),'Burst did not retain its latest target')
