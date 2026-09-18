@@ -154,12 +154,43 @@ function meshFrom(batch: Batch, name: string): Mesh {
   return mesh
 }
 
-/** Coordinates stay east/north until converted at each vertex. All placement
- * fields are explicit museum assumptions outside masonry and walking surfaces. */
+/** THE DRESSING IS LAID IN STEPS A LINE CAN COUNT. Sown in one call it was
+ * 3.7 s of the wing's entry on the main thread, inside a task nothing could
+ * report from, so the field's rule travelled through it without a number.
+ * The work is the same work in the same order from the same seeds: the
+ * generator below yields at its own seams, the caller runs one seam per
+ * frame, and the count is fixed before the first one so a total never grows.
+ */
+export const GROUND_DRESSING_STEPS = 14
+/** how many seams the two long sowings are cut at */
+const TUFT_SLICES = 6, FOREGROUND_SLICES = 4
+
+export interface DressingPlan { group: Group; steps: readonly (() => void)[] }
+
+/** The whole dressing in one call, for anything that is not counting frames. */
 export function createGroundDressing(heightAt: HeightAt, tier: TierName): Group {
+  const plan = planGroundDressing(heightAt, tier)
+  for (const step of plan.steps) step()
+  return plan.group
+}
+
+export function planGroundDressing(heightAt: HeightAt, tier: TierName): DressingPlan {
   const group = new Group()
   group.name = 'vinci generated conjectural ground dressing'
   group.userData = { ...PROVENANCE }
+  const sowing = sow(group, heightAt, tier)
+  // the last step drains what is left, so the plan finishes even if a seam
+  // is never reached: a tier whose target is met early yields fewer times
+  const steps = Array.from({ length: GROUND_DRESSING_STEPS }, (_, i) =>
+    i === GROUND_DRESSING_STEPS - 1
+      ? (): void => { while (!sowing.next().done); }
+      : (): void => { sowing.next() })
+  return { group, steps }
+}
+
+/** Coordinates stay east/north until converted at each vertex. All placement
+ * fields are explicit museum assumptions outside masonry and walking surfaces. */
+function* sow(group: Group, heightAt: HeightAt, tier: TierName): Generator<void, void, void> {
   const calm = tier === 'calm'
   const plantBatch = makeBatch(), mineralBatch = makeBatch()
   const random = randomSource(15171010)
@@ -197,9 +228,12 @@ export function createGroundDressing(heightAt: HeightAt, tier: TierName): Group 
     return [east, north, density]
   }
 
+  yield
+
   const tuftTarget = calm ? 8000 : 30000
-  let tufts = 0
+  let tufts = 0, tuftSeam = 1
   for (let attempt = 0; tufts < tuftTarget && attempt < tuftTarget * 18; attempt++) {
+    if (tuftSeam < TUFT_SLICES && tufts >= tuftTarget * tuftSeam / TUFT_SLICES) { tuftSeam++; yield }
     const [east, north, density] = sample(attempt)
     if (!clear(east, north) || random() > density) continue
     const edge = pathDistance(east, north)
@@ -213,6 +247,8 @@ export function createGroundDressing(heightAt: HeightAt, tier: TierName): Group 
     }
     tufts++
   }
+  while (tuftSeam < TUFT_SLICES) { tuftSeam++; yield }
+  yield
 
   const leafTarget = calm ? 900 : 1450
   let leaves = 0
@@ -223,6 +259,7 @@ export function createGroundDressing(heightAt: HeightAt, tier: TierName): Group 
     fallenLeaf(plantBatch, heightAt, east, north, 0.065 + random() * 0.07, random() * Math.PI * 2, colour)
     leaves++
   }
+  yield
 
   const chipTarget = calm ? 400 : 850
   const gravelSegments = pathSpecifications.flatMap(path => path.centreline.slice(1).map((b, i) => {
@@ -266,8 +303,9 @@ export function createGroundDressing(heightAt: HeightAt, tier: TierName): Group 
   // two fixed garden fields, never a camera position or a visibility decision.
   const foregroundRandom = randomSource(15171013)
   const foregroundTarget = calm ? 800 : 2800
-  let foregroundTufts = 0, foregroundBlades = 0, seedStalks = 0
+  let foregroundTufts = 0, foregroundBlades = 0, seedStalks = 0, foregroundSeam = 1
   for (let attempt = 0; foregroundTufts < foregroundTarget && attempt < foregroundTarget * 24; attempt++) {
+    if (foregroundSeam < FOREGROUND_SLICES && foregroundTufts >= foregroundTarget * foregroundSeam / FOREGROUND_SLICES) { foregroundSeam++; yield }
     const patch = WEIGHTED_FOREGROUND[attempt % WEIGHTED_FOREGROUND.length]!
     const theta = foregroundRandom() * Math.PI * 2, radius = Math.sqrt(foregroundRandom())
     const east = patch.east + Math.cos(theta) * patch.radiusEast * radius
@@ -303,6 +341,8 @@ export function createGroundDressing(heightAt: HeightAt, tier: TierName): Group 
     }
     foregroundTufts++
   }
+  while (foregroundSeam < FOREGROUND_SLICES) { foregroundSeam++; yield }
+  yield
 
   const plants = meshFrom(plantBatch, 'vinci October grass and uneven leaf litter')
   group.add(...partitionGroundDressing(plants, calm ? 1 : 4, calm ? 0 : 8))
@@ -314,5 +354,4 @@ export function createGroundDressing(heightAt: HeightAt, tier: TierName): Group 
   group.userData['patches'] = PATCHES.map(p => ({ ...p }))
   group.userData['foregroundPatches'] = FOREGROUND_PATCHES.map(p => ({ ...p }))
   group.userData['excluded'] = ['cadastre', 'build envelope', 'mapped annexes', 'courtyard', 'terrace', 'street', 'street grade', 'house-side apron', 'gate approach', 'gate steps', 'garden descent', 'retained water cuts']
-  return group
 }

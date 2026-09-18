@@ -178,15 +178,49 @@ function distanceToRoute(east: number, north: number, points: number[][]): numbe
   return nearest
 }
 
-/** X is east, Y is elevation, Z is minus north. The sampler alone decides
-    where every root meets the surveyed terrain. */
+/** THE WOOD IS GROWN IN STEPS A LINE CAN COUNT. In one call it was 1.2 s of
+ * the wing's entry inside a task nothing could report from. Same trees, same
+ * order, same seeds: the generator yields between banks of them, the caller
+ * runs one bank per frame, and the count is fixed before the first one.
+ */
+export const VEGETATION_STEPS = 8
+/** how many banks the thirty-odd trees are grown in */
+const TREE_BANKS = 6
+
+export interface VegetationPlan { group: Group; steps: readonly (() => void)[] }
+
+/** The whole wood in one call, for anything that is not counting frames. */
 export function createVegetation(
   heightAt: (east: number, north: number) => number,
   tier: TierName,
 ): Group {
+  const plan = planVegetation(heightAt, tier)
+  for (const step of plan.steps) step()
+  return plan.group
+}
+
+export function planVegetation(
+  heightAt: (east: number, north: number) => number,
+  tier: TierName,
+): VegetationPlan {
   const group = new Group()
   group.name = 'vinci generated conjectural landscape trees'
   group.userData = { ...PROVENANCE }
+  const growing = grow(group, heightAt, tier)
+  const steps = Array.from({ length: VEGETATION_STEPS }, (_, i) =>
+    i === VEGETATION_STEPS - 1
+      ? (): void => { while (!growing.next().done); }
+      : (): void => { growing.next() })
+  return { group, steps }
+}
+
+/** X is east, Y is elevation, Z is minus north. The sampler alone decides
+    where every root meets the surveyed terrain. */
+function* grow(
+  group: Group,
+  heightAt: (east: number, north: number) => number,
+  tier: TierName,
+): Generator<void, void, void> {
   const wood = batch()
   const foliage = batch()
   const calm = tier === 'calm'
@@ -241,8 +275,11 @@ export function createVegetation(
     !excluded.some(points => inside(east, north, points) || edgeDistance(east, north, points) < margin) &&
     !routes.some(route => distanceToRoute(east, north, route.points) < route.halfWidth + margin)
   const retainedPlans = plans.filter(plan => clearGround(plan.east, plan.north, plan.height * 0.028 * 4))
+  yield
 
-  for (const plan of retainedPlans) {
+  let bank = 1
+  for (const [grown, plan] of retainedPlans.entries()) {
+    if (bank < TREE_BANKS && grown >= retainedPlans.length * bank / TREE_BANKS) { bank++; yield }
     const random = randomSource(plan.seed)
     const leafRandom = randomSource(plan.seed + 98873)
     const base = new Vector3(plan.east, heightAt(plan.east, plan.north) - 0.06, -plan.north)
@@ -341,6 +378,8 @@ export function createVegetation(
       }
     }
   }
+  while (bank < TREE_BANKS) { bank++; yield }
+  yield
 
   const bark = new MeshStandardNodeMaterial({ vertexColors: true, roughness: 0.98 })
   bark.name = 'vinci generated bark with longitudinal grain'
@@ -371,5 +410,4 @@ export function createVegetation(
   group.userData['draws'] = group.children.length
   group.userData['treePlans'] = retainedPlans.map((plan) => ({ ...plan }))
   group.userData['excluded'] = ['cadastre', 'build envelope', 'mapped annexes', 'courtyard', 'terrace', 'street grade', 'house-side apron', 'street', 'gate steps', 'garden descent', 'retained water cuts']
-  return group
 }

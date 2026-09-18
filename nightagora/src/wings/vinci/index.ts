@@ -44,13 +44,13 @@ import { createInnerCourtDressing, innerCourtProvenance, courtDressingProvenance
 import { createGatePassage, gatePassageProvenance } from './gate-passage'
 import { createEntryPassage, entryPassageProvenance } from './entry-passage'
 import { createGround } from './ground'
-import { createVegetation } from './vegetation'
+import { planVegetation, VEGETATION_STEPS } from './vegetation'
 import { createRail, stationPose, namedPose, vinciStandsInRoom } from './rail'
 import { collectRailSolids, createRailGeometryAuthority } from './rail-proof'
 import { bindRailPointer, createWheelStepper } from './input'
 import { dossier, world, hourKey, type Quantity } from './site'
 import { gradeAt as groundHeight, galleryBankCapProvenance } from './terrain-mesh'
-import { createGroundDressing } from './ground-dressing'
+import { GROUND_DRESSING_STEPS, planGroundDressing } from './ground-dressing'
 import { createWater, type WaterGroup } from './water'
 import { createMeasurement, type VinciMeasurement } from './measurement'
 import { collectVinciLabelOccluders, createVinciExhibitDots, createVinciLabelAnchor, vinciSightBlocked, type VinciExhibitDots, type VinciExhibitMark, type VinciLabelAnchor, type VinciLabelMode } from './labels'
@@ -195,8 +195,17 @@ export function createWing():VinciWingModule {
    * are named holds the share where it stands instead of dropping it. */
   const ENTRY_STAGES:readonly WingStage[]=['house','exhibits','walk']
   const posesAsked=vinciContent.length+WARM_EXTRA_FRAMES
+  /** THE HOUSE STAGE IS COUNTED TOO. The wing used to be built in ONE task of
+   * about six seconds, of which the two ground sowings were four: the stage
+   * was named but nothing in it could be counted, so the field's rule
+   * travelled through the longest part of the entry without a number. The
+   * build is dealt into steps, five for the bodies the rooms are made of, the
+   * two sowings' own seams, and two for what is welded and hung at the end.
+   * The total is a constant, so it is known before the first step. */
+  const HOUSE_STEPS=5+VEGETATION_STEPS+GROUND_DRESSING_STEPS+2
   let tell:WingReport|undefined, toldAt=0, stageAt=0
-  let posesUp=0, setsAsked=0, setsUp=0, shareUp=0
+  let posesUp=0, setsAsked=0, setsUp=0, shareUp=0, houseUp=0
+  let house:Generator<void,void,void>|undefined
   let announceBuilt:()=>void=()=>{}
   const built=new Promise<void>(resolve=>{announceBuilt=resolve})
   let authority:ReturnType<typeof createRailGeometryAuthority>|undefined
@@ -278,6 +287,31 @@ export function createWing():VinciWingModule {
   function schedule() { scheduled=requestAnimationFrame(()=>{scheduled=requestAnimationFrame(build)}) }
   function build() {
     scheduled=0
+    houseUp=0
+    house=buildTheHouse()
+    houseStep()
+  }
+  /** A frame's worth of the house, and the line counts every step of it.
+   * One step a frame would pay a whole frame for a seam that costs a
+   * millisecond, and the frames themselves are what the entry grew by, so a
+   * frame takes steps until it has spent its budget. The last step drains
+   * whatever is left: a seam the build never reaches cannot leave the wing
+   * half standing. */
+  const HOUSE_FRAME_MS=18
+  function houseStep():void {
+    scheduled=0
+    if(!house)return
+    const began=performance.now()
+    let done=false
+    do {
+      done=house.next().done===true
+      houseUp=Math.min(HOUSE_STEPS,houseUp+1)
+      if(houseUp>=HOUSE_STEPS-1)while(!done)done=house.next().done===true
+    } while(!done&&performance.now()-began<HOUSE_FRAME_MS)
+    if(done){house=undefined;houseUp=HOUSE_STEPS;return}
+    scheduled=requestAnimationFrame(houseStep)
+  }
+  function* buildTheHouse():Generator<void,void,void> {
     const h=hosts!
     const {scene,camera,stack,clock}=h.world
     camera.near=.25;camera.updateProjectionMatrix()
@@ -320,14 +354,26 @@ export function createWing():VinciWingModule {
     sky.material.colorNode=vec4(veiled.div(float(1).add(skyLuma.div(.58))),1)
     applyDisplayedHorizonHaze(sky.material,scene.fog as FogExp2)
     sky.scale.setScalar(1800);sky.sunPosition.value.copy(key.direction).multiplyScalar(450000);sky.turbidity.value=4;sky.rayleigh.value=1.4;sky.cloudScale.value=.0006;sky.cloudCoverage.value=.28;sky.cloudDensity.value=.42;sky.cloudElevation.value=.35;sky.cloudSpeed.value=0;scene.add(sky)
+    yield
     const entry=createEntryPassage(stack.tierName())
     shell=createShell(stack.tierName(),stack.materials)
+    yield
     const ground=createGround(stack.tierName(),stack.materials)
+    yield
     // The collection is built after the house has asked the library for its
     // own sets, so the machines' smaller requests never arrive first.
     const collection=createCollection()
     exhibits=mountCollectionExhibits(collection,stack)
-    scene.add(ground,shell,entry,createGatePassage(stack.tierName()),createInnerCourtDressing(groundHeight,stack.tierName()),createRoadDressing(groundHeight,stack.tierName()),collection,createCollectionAccess(),createVegetation(groundHeight,stack.tierName()),createGroundDressing(groundHeight,stack.tierName()))
+    yield
+    // THE TWO SOWINGS ARE THE LONG HALF OF THE BUILD. Their groups stand in
+    // the scene from here and are filled a seam at a time, so the order the
+    // wing is welded and identified in below is the one it always had.
+    const wood=planVegetation(groundHeight,stack.tierName())
+    const dressing=planGroundDressing(groundHeight,stack.tierName())
+    scene.add(ground,shell,entry,createGatePassage(stack.tierName()),createInnerCourtDressing(groundHeight,stack.tierName()),createRoadDressing(groundHeight,stack.tierName()),collection,createCollectionAccess(),wood.group,dressing.group)
+    yield
+    for(const step of wood.steps){step();yield}
+    for(const step of dressing.steps){step();yield}
     // THE SHELL CASTS ITS SHADOW THROUGH ITS DOUBLE, AT EVERY TIER. The
     // detailed shell carries its surface relief into both cascades, which is
     // 140,000 triangles twice for a shadow that cannot show a brick. The
@@ -355,6 +401,7 @@ export function createWing():VinciWingModule {
     shadowBody=createWingShadowBody(scene);scene.add(shadowBody.group)
     authority=createRailGeometryAuthority(collectRailSolids(scene))
     rail=createRail(camera,clock,authority);measurement=createMeasurement(h.labels,stack)
+    yield
     source=make('button','vinci-source',sourcesWord());source.type='button';source.setAttribute('aria-keyshortcuts','l');source.setAttribute('aria-controls','vinci-source-card');source.addEventListener('click',()=>{mode=mode===2?1:2;paintDock()});h.stage.parentElement!.querySelector('.wing-rail-group')!.append(source)
     // THE PLAN STANDS IN THE BAR'S OWN GROUP, beside the sources of the
     // station: the group is the frame's one persistent mark, so the plan
@@ -506,15 +553,15 @@ export function createWing():VinciWingModule {
   /** The one measure the field shows. Counted, never timed: it may not run
    * backwards and it may not stand at 1 while a body or a pose is unpaid. */
   function entryShare():WingProgress {
-    if(!hosts||!standing)return {stage:'house',share:null}
+    if(!hosts)return {stage:'house',share:null}
     // the house's own library sets: what is still in flight, against the most
     // that was ever in flight at once
     const left=hosts.world.stack.materials.pending()
     setsAsked=Math.max(setsAsked,setsUp+left)
     setsUp=Math.max(setsUp,setsAsked-left)
     const bodies=exhibits?.bodies()??{done:0,total:0}
-    const done=bodies.done+setsUp+posesUp
-    const asked=bodies.total+setsAsked+posesAsked
+    const done=bodies.done+setsUp+posesUp+houseUp
+    const asked=bodies.total+setsAsked+posesAsked+HOUSE_STEPS
     shareUp=Math.max(shareUp,Math.min(1,asked>0?done/asked:0))
     // the poses hold at their last one until every body stands, so the stage
     // that gates is the one named; it only ever moves forward
@@ -1783,13 +1830,13 @@ export function createWing():VinciWingModule {
     held:()=>(closeLook?.held()??false)||(plan?.held()??false)||(life?.held()??false),
     update(dt=0){
       if(!hosts)return
-      if(!standing)return
       if(tell){
         // ten readings a second: the field writes no faster, and the count
         // itself may not be taken in every frame of a wing being built
         const at=performance.now()
         if(at-toldAt>=100){toldAt=at;tell(entryShare())}
       }
+      if(!standing)return
       // THE WARM UP OWNS THE EYE. While it steps through the walk's poses
       // the rail may not put the camera back, or half the walk is compiled
       // from the seat of one station, and nothing is being looked at yet.
@@ -1836,6 +1883,6 @@ export function createWing():VinciWingModule {
       // ONE EXHIBIT AT A TIME: while one is open the other marks stand down.
       dots?.setLimit(closeLook?.id?0:DOTS_PER_TIER[hosts.world.stack.tierName()]??6)
       dots?.update(reading)},
-    stop(){visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;life?.dispose();life=undefined;lifeControl?.remove();lifeControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
+    stop(){visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;life?.dispose();life=undefined;lifeControl?.remove();lifeControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;house=undefined;houseUp=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
   }
 }
