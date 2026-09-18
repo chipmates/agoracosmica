@@ -113,16 +113,29 @@ function lightCove(b: RoomBatch, north: number, west: number, east: number, inwa
 const ENVELOPE = { west: -62, east: -22, south: -64, north: -34, apron: -6.44, foot: -6.4 }
 const CHANNEL = { west: -61.5, east: -27.8, south: -32.8, north: -32, water: -6.56, bed: -6.82 }
 
-/** THE TERRACE MEETS THE BUILDING. The ornamental channel between the court
- * and the pavilion had no coping and no bed: its opening was a sawn edge in
- * the paving over cut ground, and from the court that reads as a strip
- * nobody laid rather than as water in a made channel. The paving cannot
- * cross the water, so the join is the honest one: a coping at both kerbs
- * that oversails the opening, a lining in the bed, and a band at the
- * terrace's own south line where the court's paving hands over to the apron.
+/** THE TERRACE MEETS THE BUILDING. Two things made the court and the
+ * pavilion read as a gap instead of one ground. The building stood on its
+ * base with its foot 40 mm clear of the apron and its sill lipping 90 mm
+ * past the base's face, so the wall met the terrace in a shadow and not in a
+ * surface. And the ornamental channel between them had no coping and no
+ * bed: its opening was a sawn edge in the paving over cut ground, which from
+ * the court reads as a strip nobody laid. The paving cannot cross the water,
+ * so the join is the honest one: a plinth course at the wall's foot, a
+ * coping at both kerbs, a lining in the bed, and a band at the terrace's own
+ * south line where the court's paving hands over to the apron.
  */
 function courtMeetsTheBuilding(b: RoomBatch): void {
-  const E = ENVELOPE
+  const E = ENVELOPE, PROUD = .045, DEPTH = .18
+  // The course runs the whole envelope and not the one elevation the court
+  // looks at: the same 40 mm stood open on all four sides.
+  const foot = (west: number, south: number, east: number, north: number): void =>
+    b.box((west + east) / 2, (south + north) / 2, E.apron - .06 + (PROUD + .06) / 2,
+      east - west, north - south, PROUD + .06, 2)
+  foot(E.west - DEPTH, E.north, E.east + DEPTH, E.north + DEPTH)
+  foot(E.west - DEPTH, E.south - DEPTH, E.east + DEPTH, E.south)
+  foot(E.west - DEPTH, E.south, E.west, E.north)
+  foot(E.east, E.south, E.east + DEPTH, E.north)
+
   // The channel: a coping at each kerb that oversails the opening, so the
   // water's edge is a line of shadow and not the end of a paving bay, and a
   // stone bed and side lining under the water in place of the cut ground.
