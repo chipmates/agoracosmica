@@ -53,7 +53,7 @@ import { gradeAt as groundHeight, galleryBankCapProvenance } from './terrain-mes
 import { GROUND_DRESSING_STEPS, planGroundDressing } from './ground-dressing'
 import { createWater, type WaterGroup } from './water'
 import { createMeasurement, type VinciMeasurement } from './measurement'
-import { collectVinciLabelOccluders, createVinciExhibitDots, createVinciLabelAnchor, vinciSightBlocked, type VinciExhibitDots, type VinciExhibitMark, type VinciLabelAnchor, type VinciLabelMode } from './labels'
+import { collectVinciLabelOccluders, createVinciExhibitDots, createVinciLabelAnchor, vinciSightBlocked, type VinciExhibitDots, type VinciExhibitMark, type VinciLabelAnchor, type VinciLabelMode, type VinciLabelRect } from './labels'
 import { pickVinciExhibit, readVinciExhibits, vinciMachineRoom, type VinciPickEntry } from './collection/pick'
 import { LINE_FLOOR_PICK, vinciApproachPose, vinciApproachStation, vinciStudIndex } from './collection/approaches'
 import { createVinciCloseLook, createVinciMachinePayload, fillVinciLimitSlots, renderVinciMachineRecord, vinciDeathbedCard, vinciLimits, vinciLine, vinciMachineCard, vinciPlaceCard, vinciPlaceTitle, vinciManuscriptWords, VINCI_EXHIBIT_CARD, VINCI_PAGE_HONESTY, VINCI_VITRINE_WORDS, type VinciPlaceCard, type VinciPlaceCertainty, type VinciPlaceId } from './collection/close-look'
@@ -231,6 +231,8 @@ export function createWing():VinciWingModule {
   /** Whether a leg is under way, so the frame's one attribute is written on
    * the edge and not in every frame. */
   let legUnderWay=false
+  /** the frame's own bar, which a mark may not stand on either */
+  let barEl:HTMLElement|null=null
   let picks:VinciPickEntry[]=[], picksTier=''
   const pickRay=new Raycaster(), sightRay=new Raycaster(), sightHits:Parameters<typeof vinciSightBlocked>[4]=[]
   /** Three on calm, six on standard, eight on hero: what is in front of the
@@ -426,7 +428,7 @@ export function createWing():VinciWingModule {
     authority=createRailGeometryAuthority(collectRailSolids(scene))
     rail=createRail(camera,clock,authority);measurement=createMeasurement(h.labels,stack)
     yield
-    source=make('button','vinci-source',sourcesWord());source.type='button';source.setAttribute('aria-keyshortcuts','l');source.setAttribute('aria-controls','vinci-source-card');source.addEventListener('click',()=>{mode=mode===2?1:2;paintDock()});h.stage.parentElement!.querySelector('.wing-rail-group')!.append(source)
+    source=make('button','vinci-source',sourcesWord());source.type='button';source.setAttribute('aria-keyshortcuts','l');source.setAttribute('aria-controls','vinci-source-card');source.addEventListener('click',()=>{mode=mode===2?1:2;paintDock()});barEl=h.stage.parentElement!.querySelector('.wing-rail-group');barEl!.append(source)
     // THE PLAN STANDS IN THE BAR'S OWN GROUP, beside the sources of the
     // station: the group is the frame's one persistent mark, so the plan
     // adds no second one.
@@ -1141,6 +1143,20 @@ export function createWing():VinciWingModule {
     if(dock.open)return dock.getBoundingClientRect()
     if(narrow()&&header&&!header.hidden&&header.dataset['sheet'])return header.getBoundingClientRect()
     return null
+  }
+  /** EVERY PANEL STANDING OVER THE ROOM. A mark stands in none of them: the
+   * reading, the station's own card, the hang strip and the bar are read, and
+   * a 44 px target on their words is drawn across a sentence or buried under
+   * one. The boxes are taken fresh each frame, so a mark returns the moment
+   * its panel leaves. */
+  function standingPanels(reading:VinciLabelRect|null):VinciLabelRect[] {
+    const panels:VinciLabelRect[]=reading?[reading]:[]
+    for(const node of [header,strip?.element,barEl]){
+      if(!node||node.hidden)continue
+      const box=node.getBoundingClientRect()
+      if(box.width>0&&box.height>0)panels.push({left:box.left,top:box.top,right:box.right,bottom:box.bottom})
+    }
+    return panels
   }
   /** ONE RAY ON A PRESS, never on a hover. */
   function pressExhibit(x:number,y:number):void {
@@ -2048,12 +2064,13 @@ export function createWing():VinciWingModule {
       const atWall=wallAt()
       if(atWall!==wallWas){wallWas=atWall;paintExhibitMarks();paintStrip()}
       const reading=readingRect()
-      labels.update(reading)
+      const panels=standingPanels(reading)
+      labels.update(panels,reading)
       paintQuietLabel()
       // ONE EXHIBIT AT A TIME: while one is open the other marks stand down,
       // and at a stop the three that stand are this work and its neighbours.
       dots?.setLimit(closeLook?.id?0:onWallStop()?3:DOTS_PER_TIER[hosts.world.stack.tierName()]??6)
-      dots?.update(reading)},
+      dots?.update(panels)},
     stop(){visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;life?.dispose();life=undefined;lifeControl?.remove();lifeControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;house=undefined;houseUp=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();languageWatch?.disconnect();languageWatch=undefined;strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
   }
 }

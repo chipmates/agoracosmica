@@ -15,11 +15,26 @@ export interface VinciLabelAnchor {
   /** A null anchor means there is no built object for this station to name. */
   setAnchor(point: Readonly<Vector3> | null, accessibleLabel?: string): void
   setMode(mode: VinciLabelMode): void
-  /** Call after the rail updates the camera. Pass the visible card's real box. */
-  update(cardRect?: VinciLabelRect | null, now?: number): void
+  /** Call after the rail updates the camera. `panels` are the boxes of every
+   * panel standing on the frame; `pointAt` is the one the leader runs to. */
+  update(panels?: readonly VinciLabelRect[] | null, pointAt?: VinciLabelRect | null, now?: number): void
   /** Invalidate after a retained opaque object changes position or geometry. */
   invalidate(): void
   dispose(): void
+}
+
+/** A MARK NEVER STANDS ON A PANEL. The station card, the hang strip, the
+ * sources window and the bar are read over the room, and a 44 px target on
+ * their words is either drawn across a sentence or buried under one, where a
+ * hand cannot reach it and a keyboard still can. A mark whose own box meets a
+ * standing panel is not drawn, not pressable and out of the tab order, and it
+ * comes back the moment the panel leaves. */
+function underPanel(x: number, y: number, panels: readonly VinciLabelRect[] | null): boolean {
+  if (!panels) return false
+  for (const rect of panels) {
+    if (x + 22 >= rect.left && x - 22 <= rect.right && y + 22 >= rect.top && y - 22 <= rect.bottom) return true
+  }
+  return false
 }
 
 function opaqueMaterial(material: Material | undefined): boolean {
@@ -151,7 +166,7 @@ export function createVinciLabelAnchor(options: {
       if (mode === 0) hide()
       else if (mode !== 2) leader.style.visibility = 'hidden'
     },
-    update(cardRect = null, now = view.performance.now()) {
+    update(panels = null, pointAt = null, now = view.performance.now()) {
       if (disposed || !hasAnchor || mode === 0) { hide(); return }
       camera.updateWorldMatrix(true, false)
       camera.getWorldPosition(eye)
@@ -171,19 +186,17 @@ export function createVinciLabelAnchor(options: {
       const width = view.innerWidth, height = view.innerHeight
       const x = (projected.x * 0.5 + 0.5) * width
       const y = (-projected.y * 0.5 + 0.5) * height
-      const covered = mode === 2 && cardRect !== null && x + 22 >= cardRect.left
-        && x - 22 <= cardRect.right && y + 22 >= cardRect.top && y - 22 <= cardRect.bottom
-      const visible = !occluded && !covered && projected.z > -1 && projected.z < 1
+      const visible = !occluded && !underPanel(x, y, panels) && projected.z > -1 && projected.z < 1
         && x > 22 && x < width - 22 && y > 120 && y < height - 220
       if (!visible) { hide(); return }
       dot.hidden = false
       dot.style.left = `${x}px`
       dot.style.top = `${y}px`
-      if (mode !== 2 || !cardRect) { leader.style.visibility = 'hidden'; return }
+      if (mode !== 2 || !pointAt) { leader.style.visibility = 'hidden'; return }
       // The nearest clamped point lies on the card's boundary because the
       // anchor has already been rejected when covered by that rectangle.
-      const endX = Math.max(cardRect.left, Math.min(cardRect.right, x))
-      const endY = Math.max(cardRect.top, Math.min(cardRect.bottom, y))
+      const endX = Math.max(pointAt.left, Math.min(pointAt.right, x))
+      const endY = Math.max(pointAt.top, Math.min(pointAt.bottom, y))
       line.setAttribute('x1', String(x))
       line.setAttribute('y1', String(y))
       line.setAttribute('x2', String(endX))
@@ -221,7 +234,8 @@ export interface VinciExhibitDots {
   setOpen(id: string | null): void
   /** Three on calm, six on standard, eight on hero. */
   setLimit(limit: number): void
-  update(cardRect?: VinciLabelRect | null, now?: number): void
+  /** `panels` are the boxes of every panel standing on the frame. */
+  update(panels?: readonly VinciLabelRect[] | null, now?: number): void
   invalidate(): void
   dispose(): void
 }
@@ -297,7 +311,7 @@ export function createVinciExhibitDots(options: {
       limit = value
       invalidate()
     },
-    update(cardRect = null, now = view.performance.now()) {
+    update(panels = null, now = view.performance.now()) {
       if (disposed || mode === 0 || !marks.length || limit === 0) { hide(); return }
       camera.updateWorldMatrix(true, false)
       camera.getWorldPosition(eye)
@@ -323,8 +337,7 @@ export function createVinciExhibitDots(options: {
         if (projected.z <= -1 || projected.z >= 1) continue
         const x = (projected.x * .5 + .5) * width, y = (-projected.y * .5 + .5) * height
         if (!(x > 22 && x < width - 22 && y > 120 && y < height - 220)) continue
-        if (cardRect && x + 22 >= cardRect.left && x - 22 <= cardRect.right
-          && y + 22 >= cardRect.top && y - 22 <= cardRect.bottom) continue
+        if (underPanel(x, y, panels)) continue
         candidates.push({ mark, x, y, from: Math.hypot(x - centreX, y - centreY) })
       }
       candidates.sort((a, b) => a.from - b.from)
