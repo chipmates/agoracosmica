@@ -8,8 +8,8 @@
  * tap on the model names the part it lands on.
  */
 import {
-  AdditiveBlending, Box3, CircleGeometry, Color, Group, Mesh, MeshBasicNodeMaterial, MeshStandardNodeMaterial,
-  PerspectiveCamera, PointLight, Raycaster, Scene, Sphere, Vector2, Vector3,
+  AdditiveBlending, Box3, BoxGeometry, CircleGeometry, Color, Group, Mesh, MeshBasicNodeMaterial,
+  MeshStandardNodeMaterial, PerspectiveCamera, PointLight, Raycaster, Scene, Sphere, Vector2, Vector3,
   type BufferGeometry, type Object3D,
 } from 'three/webgpu'
 import { float, fog, rangeFogFactor } from 'three/tsl'
@@ -55,6 +55,9 @@ export interface TurntableOptions {
   nodeNames?: Readonly<Record<string, string>>
   /** Every part's own name by its dossier id, in the page's language. */
   partNames?: ReadonlyMap<string, string>
+  /** The parts that are this machine's screen: what its demonstration lands
+   * on. The light marks them by their edge instead of filling their face. */
+  screens?: ReadonlySet<string>
   light: {
     key: StackLightOptions
     fill: { color: string; groundColor: string; intensity: number }
@@ -81,6 +84,10 @@ const DRAG_PERIODS = 1
 /** An arrow key turns the crank by this share of the period. */
 const KEY_SHARE = 1 / 24
 const OVERLAY = { color: '#f2c77a', opacity: .3 }
+/** The border that marks a screen: a share of its shorter side, never thinner
+ * than this, and standing a little proud of the sheet so it reads from both
+ * faces of something as thin as paper. */
+const EDGE = { share: .04, least: .006 }
 /** The sphere fit leaves a machine's box corners air; the table stands it a
  * little nearer. */
 const WHOLE_FIT = .86
@@ -105,6 +112,8 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
   let chosen: TurntableViewpoint = 'whole'
   let active = -1
   const overlays = new Map<string, Mesh[]>()
+  /** Geometry the overlay built itself, which it owns and gives back. */
+  const owned = new Set<BufferGeometry>()
   const overlayMaterial = new MeshBasicNodeMaterial({ color: new Color(OVERLAY.color), transparent: true,
     opacity: OVERLAY.opacity, depthWrite: false, blending: AdditiveBlending, fog: false })
   overlayMaterial.polygonOffset = true
@@ -173,21 +182,54 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
     for (let i = 0; i < out.length; i++) out.push(...(children.get(out[i]!) ?? []).filter(child => !named.has(child)))
     return out
   }
+  /** A SCREEN IS MARKED BY ITS EDGE. The step that names a machine's screen is
+   * the step about what lands on it, and a fill over the face hides exactly
+   * that, so the light runs a border round the part instead of covering it.
+   * The border is built off the part's own box, in the part's own space. */
+  function border(geometry: BufferGeometry): BufferGeometry[] {
+    if (!geometry.boundingBox) geometry.computeBoundingBox()
+    const box = geometry.boundingBox!
+    const size = box.getSize(new Vector3()), middle = box.getCenter(new Vector3())
+    const axes = ['x', 'y', 'z'] as const
+    const thin = axes.reduce((least, axis) => size[axis] < size[least] ? axis : least, 'x' as typeof axes[number])
+    const face = axes.filter(axis => axis !== thin) as [typeof axes[number], typeof axes[number]]
+    const band = Math.max(Math.min(size[face[0]], size[face[1]]) * EDGE.share, EDGE.least)
+    const bars: BufferGeometry[] = []
+    for (const along of face) {
+      const across = along === face[0] ? face[1] : face[0]
+      for (const side of [-1, 1]) {
+        const width = { x: 0, y: 0, z: 0 }
+        width[along] = size[along]
+        width[across] = band
+        width[thin] = size[thin] + band * .5
+        const bar = new BoxGeometry(width.x, width.y, width.z)
+        const at = middle.clone()
+        at[across] = middle[across] + side * (size[across] - band) / 2
+        bar.translate(at.x, at.y, at.z)
+        bars.push(bar)
+      }
+    }
+    return bars
+  }
   function light(id: string | null): void {
     for (const [part, meshes] of overlays) for (const mesh of meshes) mesh.visible = part === id
     if (!id || overlays.has(id)) return
     /* A mark built for the hand is not what the light lands on: it is the
        reach of a tap, and its own mark stands beside it. */
-    const found = family(id).flatMap(part => nodeFor(part)?.geometries ?? [])
+    const found = family(id).flatMap(part => (nodeFor(part)?.geometries ?? []).map(hit => ({ ...hit, part })))
       .filter(({ node }) => !node.userData['vitrineTarget'])
     const meshes: Mesh[] = []
-    for (const { node, geometry } of found) {
-      const mesh = new Mesh(geometry, overlayMaterial)
-      mesh.userData['vitrineOverlay'] = true
-      mesh.renderOrder = 10
-      mesh.frustumCulled = false
-      node.add(mesh)
-      meshes.push(mesh)
+    for (const { node, geometry, part } of found) {
+      const screen = options.screens?.has((node.userData['partId'] as string | undefined) ?? part) === true
+      for (const shape of screen ? border(geometry) : [geometry]) {
+        if (screen) owned.add(shape)
+        const mesh = new Mesh(shape, overlayMaterial)
+        mesh.userData['vitrineOverlay'] = true
+        mesh.renderOrder = 10
+        mesh.frustumCulled = false
+        node.add(mesh)
+        meshes.push(mesh)
+      }
     }
     overlays.set(id, meshes)
   }
@@ -681,6 +723,8 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
       listening.abort()
       for (const meshes of overlays.values()) for (const mesh of meshes) mesh.removeFromParent()
       overlays.clear()
+      for (const shape of owned) shape.dispose()
+      owned.clear()
       overlayMaterial.dispose()
       if (lent) {
         // BACK TO THE ROOM AT REST, where it stood and as it stood.

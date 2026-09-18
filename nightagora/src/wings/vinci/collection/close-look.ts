@@ -88,8 +88,8 @@ const CONTROLS = (JSON.parse(cardsRaw) as { controls: {
 type Slot = (Words & { source: string }) | null
 const LIMITS = (JSON.parse(limitsRaw) as { slots: Record<string, { limit: Slot; visual_note: Slot }> }).slots
 /** A part's name, and what the record says the part is: a prop the museum
- * built for its demonstration carries its own flag and class. */
-type PartRecord = Words & { demonstration?: boolean; certainty?: string }
+ * built for its demonstration, or the screen its demonstration lands on. */
+type PartRecord = Words & { demonstration?: boolean; certainty?: string; screen?: boolean }
 const PARTS = (JSON.parse(partsRaw) as { parts: Record<string, Record<string, PartRecord>> }).parts
 /** THE SIZE A MACHINE HAS, SAID ALOUD. The card speaks it, the record behind
  * the card keeps the three numerals of the same envelope. */
@@ -297,6 +297,7 @@ export function createVinciMachinePayload(options: {
     },
     nodeNames: STORE_NODE_NAMES[slug],
     partNames: new Map(Object.entries(PARTS[slug] ?? {}).map(([id, words]) => [id, words[language]])),
+    screens: new Set(Object.entries(PARTS[slug] ?? {}).filter(([, words]) => words.screen === true).map(([id]) => id)),
     light: options.light,
     grade: options.grade,
     sheet: {

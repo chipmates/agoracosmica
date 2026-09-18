@@ -1147,7 +1147,8 @@
       },
       "screen": {
         "en": "White paper",
-        "de": "Weißes Papier"
+        "de": "Weißes Papier",
+        "screen": true
       },
       "aperture-plate": {
         "en": "Iron plate with the hole",
