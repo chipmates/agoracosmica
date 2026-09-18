@@ -124,6 +124,8 @@ export interface LifeWingWords {
   /** The age beside a year, in the wing's own words, so the reader that
    * stands at a date and this view say it from one place. */
   age: { exact: Bi; about: Bi }
+  /** What the wing says beside the one date its own hour stands on. */
+  hour?: Bi
   /** The wing's own word for the door to the record behind one date, where
    * the wing holds such a layer. The view opens it and never draws it. */
   provenance?: Bi

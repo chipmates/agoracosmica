@@ -95,6 +95,10 @@
   background:none;border:0;color:#e6d6b8;font:13px/1.4 var(--sans);cursor:pointer;}
 .wing-life-date-name[aria-expanded='true'] {color:#fff5e3;}
 .wing-life-date-label {min-width:0;}
+/* The one date the wing's own hour stands on, said where that date is read. */
+.wing-life-date-here {flex:1 1 auto;min-width:0;font:10px/1.35 var(--sans);letter-spacing:.06em;color:#c2a86f;text-wrap:pretty;}
+.wing-life[data-narrow='true'] .wing-life-date-name {flex-wrap:wrap;}
+.wing-life[data-narrow='true'] .wing-life-date-here {flex:1 1 100%;padding-left:17px;}
 /* ONE DATE UNFOLDS WHERE IT STANDS, on its own rows, so nothing above it
    moves and the eye stays where the finger was. */
 .wing-life-date-body {display:grid;grid-template-rows:0fr;transition:grid-template-rows 220ms ease-out;}

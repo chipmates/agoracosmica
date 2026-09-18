@@ -228,8 +228,13 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     )
   }
 
+  /** THE VIEW OPENS ON THE HOUR THE WING STANDS IN: the museum's premise is
+   * that the visitor is standing on one documented afternoon, and a view that
+   * opens there says so without a word. A life whose record names no such
+   * hour opens at its first period. */
   function firstBand(record: LifeRecord): string | null {
-    return record.bands[0]?.id ?? null
+    const here = record.here ? record.events.find(event => event.id === record.here) : undefined
+    return here?.band ?? record.bands[0]?.id ?? null
   }
 
   function bandOf(record: LifeRecord, id: string | null): LifeBand | undefined {
@@ -337,6 +342,10 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     if (event.date.earliest) time.dateTime = event.date.earliest
     time.dataset['edtf'] = event.date.edtf
     press.append(dot, time)
+    // THE HOUR THE VISITOR IS STANDING IN is one of these dates, and the wing
+    // says so in its own words beside it.
+    if (record.here === event.id && record.words.hour)
+      press.append(make('span', 'wing-life-date-here', record.words.hour[language]))
     press.addEventListener('click', () => unfold(event.id === at ? null : event.id))
     press.addEventListener('keydown', event_ => stepDate(event_))
     const holder = make('div', 'wing-life-date-body')
