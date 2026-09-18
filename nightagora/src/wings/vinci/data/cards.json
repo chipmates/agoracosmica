@@ -77,8 +77,8 @@
     "de": "Das ist die ganze Quelle. Mehr Detail gibt es nicht."
   },
   "zoom_ceiling_scan": {
-    "en": "This is the whole scan. The 1883 page holds no more detail than this.",
-    "de": "Das ist der ganze Scan. Mehr Detail hat die Seite von 1883 nicht."
+    "en": "This is the whole scan. The museum holds no finer one.",
+    "de": "Das ist der ganze Scan. Einen feineren hat das Museum nicht."
   },
   "rule_labels": [
     { "en": "1 cm", "de": "1 cm" },
