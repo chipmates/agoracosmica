@@ -37,6 +37,9 @@
    room it names, and the rule that measures that has to know the size. */
 .wing-plan-room-name {fill:#cfc6b4cc;font-family:var(--sans);letter-spacing:.04em;text-anchor:middle;dominant-baseline:middle;
   paint-order:stroke;stroke:#101d27;stroke-width:3px;stroke-linejoin:round;}
+/* A NAME SET BESIDE ITS ROOM carries the line that says whose it is. It is
+   drawn under the names, so a halo never has to cut it. */
+.wing-plan-leader {stroke:#cfc6b477;stroke-width:1;}
 .wing-plan-north-stem,.wing-plan-north-head {stroke:#cfc6b499;stroke-width:1;fill:#cfc6b499;}
 .wing-plan-north-letter {fill:#cfc6b4cc;font:10px var(--sans);letter-spacing:.1em;text-anchor:middle;}
 

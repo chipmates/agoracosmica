@@ -6,9 +6,11 @@
  * arrow says so. Nothing here reads the scene, the camera or a texture, so a
  * plan costs no draw, no mesh and no shader.
  *
- * NOTHING DRAWN LANDS ON ANYTHING ELSE DRAWN. Every numeral is tested against
- * the marks and the numerals already placed, so the guarantee does not rest on
- * one engine's text metrics agreeing with another's.
+ * NOTHING DRAWN OVERLAPS ANYTHING ELSE DRAWN. Marks, numerals and names are
+ * placed in that order, each against the boxes already taken, because a
+ * numeral that lands on a wall still names its mark while a name that lands
+ * on a mark names neither. Every candidate is tested, so the guarantee does
+ * not depend on an engine's text metrics agreeing with another's.
  *
  * The drawing is aria-hidden. Everything a hand or a reader needs is the
  * list beside it, which is why no text in here has to be reachable. */
@@ -37,6 +39,8 @@ const NAME_MARGIN = 4
 const RING = 9.5, RING_HERE = 13.5
 /** the air demanded around everything placed, which is also the halo's own */
 const CLEAR = 2
+/** a name set beside its room stands this far off it, on a leader */
+const LEADER_GAP = 9
 
 /** THE NAME IS MEASURED, NOT ESTIMATED. A name wider than the room it names
  * reads as the name of the room beside it, so each one shrinks to fit its own
@@ -56,11 +60,29 @@ function nameSize(words: string, room: number, base: number, floor: number): num
 }
 
 interface Box { l: number; t: number; r: number; b: number }
+interface Seg { ax: number; ay: number; bx: number; by: number }
 const around = (x: number, y: number, w: number, h: number): Box =>
   ({ l: x - w / 2, t: y - h / 2, r: x + w / 2, b: y + h / 2 })
 const grown = (box: Box, by: number): Box => ({ l: box.l - by, t: box.t - by, r: box.r + by, b: box.b + by })
 const meets = (a: Box, b: Box): boolean =>
   Math.min(a.r, b.r) > Math.max(a.l, b.l) && Math.min(a.b, b.b) > Math.max(a.t, b.t)
+
+/** A wall is a line and not a box, so a name clears it by the segment and not
+ * by its extent: a long diagonal wall would otherwise refuse the whole field
+ * it runs across. */
+function crosses(seg: Seg, box: Box): boolean {
+  const inside = (x: number, y: number): boolean => x >= box.l && x <= box.r && y >= box.t && y <= box.b
+  if (inside(seg.ax, seg.ay) || inside(seg.bx, seg.by)) return true
+  const dx = seg.bx - seg.ax, dy = seg.by - seg.ay
+  let near = 0, far = 1
+  for (const [into, room] of [[-dx, seg.ax - box.l], [dx, box.r - seg.ax], [-dy, seg.ay - box.t], [dy, box.b - seg.ay]] as const) {
+    if (into === 0) { if (room < 0) return false; continue }
+    const at = room / into
+    if (into < 0) { if (at > far) return false; if (at > near) near = at }
+    else { if (at < near) return false; if (at < far) far = at }
+  }
+  return near <= far
+}
 
 export interface PlanMark {
   /** the stations this one standing place carries, in rail order */
@@ -178,20 +200,25 @@ export function drawPlanPlate(
 
   const rooms = node('g', 'wing-plan-rooms')
   const shapes = node('g', 'wing-plan-shapes')
+  const leaders = node('g', 'wing-plan-leaders')
   const names = node('g', 'wing-plan-names')
-  element.append(shapes, rooms, names)
-  const named: string[] = []
+  element.append(shapes, rooms, leaders, names)
 
-  function label(words: string, centre: { x: number; y: number }, room: number, id: string): void {
-    const size = nameSize(words, room, namePx, nameFloor)
-    if (size === null) return
-    const text = node('text', 'wing-plan-room-name')
-    text.setAttribute('x', centre.x.toFixed(2)); text.setAttribute('y', centre.y.toFixed(2))
-    text.setAttribute('font-size', String(size))
-    text.textContent = words
-    names.append(text)
-    named.push(id)
+  /* EVERYTHING ALREADY ON THE PLATE, in the plate's own pixels. A wall is a
+     segment, a mark and a numeral are boxes, and a name has to clear them
+     all before it is drawn. */
+  const walls: Seg[] = []
+  const taken: Box[] = []
+  const edges = (corners: { x: number; y: number }[], closed: boolean): void => {
+    const last = closed ? corners.length : corners.length - 1
+    for (let i = 0; i < last; i++) {
+      const a = corners[i]!, b = corners[(i + 1) % corners.length]!
+      walls.push({ ax: a.x, ay: a.y, bx: b.x, by: b.y })
+    }
   }
+
+  interface Named { id: string; words: string; room: Box; area: number }
+  const wanted: Named[] = []
 
   for (const room of site.rooms) {
     const a = project(room.west, room.north), b = project(room.east, room.south)
@@ -202,9 +229,9 @@ export function drawPlanPlate(
     rect.dataset['kind'] = room.kind
     rect.dataset['built'] = String(room.built)
     rooms.append(rect)
-    if (!room.name) continue
-    const centre = project((room.west + room.east) / 2, (room.south + room.north) / 2)
-    label(room.name[language], centre, Math.abs(b.x - a.x), room.id)
+    const face: Box = { l: Math.min(a.x, b.x), t: Math.min(a.y, b.y), r: Math.max(a.x, b.x), b: Math.max(a.y, b.y) }
+    edges([{ x: face.l, y: face.t }, { x: face.r, y: face.t }, { x: face.r, y: face.b }, { x: face.l, y: face.b }], true)
+    if (room.name) wanted.push({ id: room.id, words: room.name[language], room: face, area: (face.r - face.l) * (face.b - face.t) })
   }
 
   const path = (points: readonly PlanPoint[]): string =>
@@ -215,14 +242,16 @@ export function drawPlanPlate(
     line.dataset['fill'] = String(shape.fill)
     line.dataset['built'] = String(shape.built)
     shapes.append(line)
+    const corners = shape.points.map(([east, north]) => project(east, north))
+    edges(corners, shape.closed)
     if (!shape.name) continue
-    // A named outline takes its name at the middle of its own extent.
-    let west = Infinity, east = -Infinity, south = Infinity, north = -Infinity
-    for (const [e, n] of shape.points) {
-      west = Math.min(west, e); east = Math.max(east, e)
-      south = Math.min(south, n); north = Math.max(north, n)
+    // A named outline takes its name inside its own extent.
+    const face: Box = { l: Infinity, t: Infinity, r: -Infinity, b: -Infinity }
+    for (const corner of corners) {
+      face.l = Math.min(face.l, corner.x); face.r = Math.max(face.r, corner.x)
+      face.t = Math.min(face.t, corner.y); face.b = Math.max(face.b, corner.y)
     }
-    label(shape.name[language], project((west + east) / 2, (south + north) / 2), (east - west) * scale, shape.id)
+    wanted.push({ id: shape.id, words: shape.name[language], room: face, area: (face.r - face.l) * (face.b - face.t) })
   }
 
   /* NORTH AS THE SITE HAS IT. The site's own frame is east and north, so the
@@ -239,18 +268,21 @@ export function drawPlanPlate(
   letter.textContent = 'N'
   arrow.append(stem, head, letter)
   element.append(arrow)
+  taken.push({ l: x - 9, t: top - 8, r: x + 9, b: tail + 14 })
 
-  /* THE NUMERALS. A dot without its number names nothing, so one is drawn at
-     every mark; which side it stands on is the plate's to choose, and it takes
-     the first of eight ways round that is free of every mark's own ring, its
-     own included, of every numeral already placed and of the north arrow. */
+  /* THE MARKS, then their numerals, then the names. The order is the order
+     of what a mark is worth: a dot without its numeral says nothing, and a
+     name has a list beside the plate that already carries it. */
   const marks = planMarks(site, project, options.standing)
-  const taken: Box[] = [{ l: x - 9, t: top - 8, r: x + 9, b: tail + 14 }]
-  for (const mark of marks) {
+  const rings = marks.map(mark => {
     const r = mark.here ? RING_HERE : RING
-    taken.push({ l: mark.x - r, t: mark.y - r, r: mark.x + r, b: mark.y + r })
-  }
+    return { l: mark.x - r, t: mark.y - r, r: mark.x + r, b: mark.y + r }
+  })
+  taken.push(...rings)
+
   const inside = (place: Box): boolean => place.l >= 0 && place.t >= 0 && place.r <= width && place.b <= height
+  /** EIGHT WAYS ROUND A MARK, at three distances, and the first that is free
+   * of every ring, every numeral already placed and the north arrow. */
   const compass = [[1, -1], [-1, -1], [1, 1], [-1, 1], [0, -1], [0, 1], [1, 0], [-1, 0]] as const
   for (const mark of marks) {
     const words = String(mark.number)
@@ -260,7 +292,7 @@ export function drawPlanPlate(
     let chosen: { dx: number; dy: number; box: Box } | null = null
     for (const bounded of [true, false]) {
       for (let step = 0; step < 3 && !chosen; step++) for (const [sx, sy] of compass) {
-        // A diagonal meets the ring at its own angle, so it leans in.
+        // A diagonal reaches the ring at its own angle, so it leans in.
         const lean = sx !== 0 && sy !== 0 ? .72 : 1
         const off = reach * lean + 5 + step * 9
         const dx = sx === 0 ? 0 : sx * (off + w / 2)
@@ -275,9 +307,70 @@ export function drawPlanPlate(
       }
       if (chosen) break
     }
+    // A mark without its numeral names nothing, so one is always drawn.
     const put = chosen ?? first!
     mark.numeral = { dx: +put.dx.toFixed(2), dy: +put.dy.toFixed(2) }
     taken.push(put.box)
+  }
+
+  /* THE NAMES, the widest room first, so the rooms that have the space to
+     hold their own name take it and the narrow ones look for air around it. */
+  const named: string[] = []
+  for (const entry of [...wanted].sort((a, b) => b.area - a.area)) {
+    const mid = { x: (entry.room.l + entry.room.r) / 2, y: (entry.room.t + entry.room.b) / 2 }
+    const tries: { x: number; y: number; size: number; leader: Seg | null }[] = []
+    const held = nameSize(entry.words, entry.room.r - entry.room.l, namePx, nameFloor)
+    if (held !== null) {
+      const tall = held * 1.25
+      tries.push({ x: mid.x, y: mid.y, size: held, leader: null })
+      tries.push({ x: mid.x, y: entry.room.t + tall / 2 + 3, size: held, leader: null })
+      tries.push({ x: mid.x, y: entry.room.b - tall / 2 - 3, size: held, leader: null })
+    }
+    // BESIDE THE ROOM, ON A LEADER, at the plate's own size: a name that will
+    // not fit a narrow room still belongs to it, and the line says which.
+    const out = textWidth(entry.words, namePx, NAME_TRACKING), tall = namePx * 1.25
+    const beside = [
+      { x: entry.room.r + LEADER_GAP + out / 2, y: mid.y, from: { x: entry.room.r, y: mid.y } },
+      { x: entry.room.l - LEADER_GAP - out / 2, y: mid.y, from: { x: entry.room.l, y: mid.y } },
+      { x: mid.x, y: entry.room.t - LEADER_GAP - tall / 2, from: { x: mid.x, y: entry.room.t } },
+      { x: mid.x, y: entry.room.b + LEADER_GAP + tall / 2, from: { x: mid.x, y: entry.room.b } },
+    ]
+    for (const spot of beside) {
+      // The leader leaves the room's own edge and stops where the halo starts.
+      const run = Math.hypot(spot.x - spot.from.x, spot.y - spot.from.y) || 1
+      const reach = Math.max(1, LEADER_GAP - CLEAR) / run
+      tries.push({
+        x: spot.x, y: spot.y, size: namePx,
+        leader: { ax: spot.from.x, ay: spot.from.y, bx: spot.from.x + (spot.x - spot.from.x) * reach, by: spot.from.y + (spot.y - spot.from.y) * reach },
+      })
+    }
+
+    let put: { x: number; y: number; size: number; leader: Seg | null; box: Box } | null = null
+    for (const spot of tries) {
+      const place = around(spot.x, spot.y, textWidth(entry.words, spot.size, NAME_TRACKING), spot.size * 1.25)
+      const test = grown(place, CLEAR)
+      if (!inside(test)) continue
+      if (taken.some(hold => meets(test, hold))) continue
+      if (walls.some(wall => crosses(wall, test))) continue
+      put = { ...spot, box: place }
+      break
+    }
+    // A NAME THAT FITS NOWHERE IS LEFT OFF. The list beside the plate carries
+    // every one of them, so nothing is lost by the plate staying readable.
+    if (!put) continue
+    const text = node('text', 'wing-plan-room-name')
+    text.setAttribute('x', put.x.toFixed(2)); text.setAttribute('y', put.y.toFixed(2))
+    text.setAttribute('font-size', String(put.size))
+    text.textContent = entry.words
+    names.append(text)
+    if (put.leader) {
+      const line = node('line', 'wing-plan-leader')
+      line.setAttribute('x1', put.leader.ax.toFixed(2)); line.setAttribute('y1', put.leader.ay.toFixed(2))
+      line.setAttribute('x2', put.leader.bx.toFixed(2)); line.setAttribute('y2', put.leader.by.toFixed(2))
+      leaders.append(line)
+    }
+    taken.push(put.box)
+    named.push(entry.id)
   }
 
   return { element, width, height, scale, project, marks, named }
