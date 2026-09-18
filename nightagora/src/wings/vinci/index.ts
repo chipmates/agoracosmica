@@ -521,7 +521,13 @@ export function createWing():VinciWingModule {
     if(pick.kind==='manuscript'){const codex=CODEX_ENTRIES.find(entry=>`codex/${entry.id}`===pick.id);return codex?{en:codex.en,de:codex.de}:null}
     if(pick.kind==='place'||pick.workId===DEATHBED_WORK){const named=namedExhibit(pick);return named?{en:named.title,de:named.title}:null}
     const found=(exhibits?.pictureSources()??[]).find(source=>source.work.id===pick.workId)
-    return found?{en:found.work.title_en,de:found.work.title_de}:null
+    if(!found)return null
+    // TWO FACES OF ONE PANEL ARE TWO EXHIBITS. The register carries one title
+    // for the work and the hung face on the pick, so a list that holds both
+    // says which face rather than the same name twice.
+    return pick.face==='reverse'
+      ?{en:`${found.work.title_en}, reverse`,de:`${found.work.title_de}, Rückseite`}
+      :{en:found.work.title_en,de:found.work.title_de}
   }
   /** THE WORKS THE PLAN OFFERS: the registry's own openable exhibits, each
    * under the station it hangs in, in that wall's own order. */
