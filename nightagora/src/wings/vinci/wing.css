@@ -237,11 +237,35 @@
    with its plate at rest and its own certainty under it. It docks under the
    station card on the wide stage and stands above the bar on the narrow one,
    and it never scrolls the page: the row scrolls inside itself. */
-.vinci-strip {position:fixed;left:46px;display:flex;gap:6px;margin:0;padding:6px;list-style:none;box-sizing:border-box;
-  max-width:min(620px,calc(100vw - 92px));overflow-x:auto;overscroll-behavior:contain;scrollbar-width:thin;
-  background:#101d27e6;border:1px solid #a9977344;pointer-events:auto;}
+/* THE WALL'S OWN INSTRUMENT. Under the card it was a caption at 44 px, where
+   a Ginevra is a smudge and a press is a guess; along the foot of the stage it
+   is the hang itself, wide enough to recognise a face, with the scale under it
+   saying where along thirty four metres the eye stands. */
+.vinci-strip {position:fixed;left:46px;display:flex;flex-direction:column;gap:5px;margin:0;padding:6px;box-sizing:border-box;
+  max-width:min(620px,calc(100vw - 92px));background:#101d27e6;border:1px solid #a9977344;pointer-events:auto;}
 .vinci-strip[hidden] {display:none;}
-.vinci-strip li {flex:0 0 auto;}
+.vinci-strip-row {display:flex;gap:6px;margin:0;padding:0;list-style:none;
+  overflow-x:auto;overscroll-behavior:contain;scrollbar-width:thin;}
+.vinci-strip-row li {flex:0 0 auto;}
+.vinci-strip[data-dock='foot'] {left:24px;right:24px;top:auto !important;bottom:calc(var(--wing-rail-bottom) + 16px);
+  width:auto !important;max-width:none;padding:8px 10px 7px;}
+.vinci-strip[data-dock='foot'] .vinci-strip-item {width:116px;height:116px;}
+.vinci-strip[data-dock='foot'] .vinci-strip-year {font-size:26px;padding-bottom:14px;}
+/* THE SCALE IS THE WALL'S LENGTH, not the row's: the mark stands where the
+   open work hangs along the hang, so a row scrolled to its middle still says
+   the visitor is at the second of twenty five. */
+.vinci-strip-scale {position:relative;height:7px;}
+.vinci-strip-scale[hidden] {display:none;}
+.vinci-strip-scale::before {content:'';position:absolute;left:0;right:0;top:3px;height:1px;background:#a9977355;}
+.vinci-strip-mark {position:absolute;left:var(--along,0%);top:0;width:2px;height:7px;background:#edcc8c;}
+.vinci-strip-mark[hidden] {display:none;}
+.vinci-strip-foot {display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.vinci-strip-foot[hidden] {display:none;}
+.vinci-strip-place {color:#cdbb9a;font:9px var(--sans);letter-spacing:.14em;text-indent:.14em;}
+.vinci-strip-whole {min-height:44px;padding:8px 12px;background:none;border:1px solid #a9977344;color:#eae1d1;
+  font:9px var(--sans);letter-spacing:.14em;text-indent:.14em;text-transform:uppercase;cursor:pointer;}
+.vinci-strip-whole[hidden] {display:none;}
+.vinci-strip-whole:hover,.vinci-strip-whole:focus-visible {border-color:#edcc8c;color:#edcc8c;outline:none;}
 /* Every cell is a pale mount, as the wall's own fields are: half these works
    are dark, and a dark reproduction on a dark cell reads as an empty one. */
 .vinci-strip-item {position:relative;display:flex;align-items:flex-end;justify-content:center;width:44px;height:44px;
@@ -261,7 +285,13 @@
 @media(max-aspect-ratio:9/10) {
   /* The bar's own offset is its foot, so the row clears its head as the
      card does, and the two never stand at once. */
-  .vinci-strip {left:8px;right:8px;top:auto !important;bottom:calc(var(--wing-rail-bottom) + 60px);max-width:none;}
+  .vinci-strip {left:8px;right:8px;top:auto !important;width:auto !important;bottom:calc(var(--wing-rail-bottom) + 60px);max-width:none;}
+  /* The phone's row is the same instrument at the height a thumb can hit and
+     an eye can read: nearly twice the cell, and no scale line under it. */
+  .vinci-strip[data-dock='narrow'] .vinci-strip-item {width:76px;height:76px;}
+  .vinci-strip[data-dock='narrow'] .vinci-strip-year {font-size:18px;padding-bottom:11px;}
+  .vinci-strip[data-dock='narrow'] .vinci-strip-scale,
+  .vinci-strip[data-dock='narrow'] .vinci-strip-foot {display:none;}
 }
 
 /* THE PHONE AT A STATION: THE ROOM, ONE BAR LINE, ONE PEEK. The bar keeps
@@ -290,4 +320,51 @@
   #wing[data-wing='vinci'] .wing-sheet-foot .wing-bar-words {margin-top:10px;border-top:1px solid #a9977333;}
   #wing[data-wing='vinci'] .wing-bar-words > * {color:#eae1d1;font:9px var(--sans);letter-spacing:.14em;text-indent:.14em;text-transform:uppercase;}
   #wing[data-wing='vinci'] .wing-bar-words > *:focus-visible {outline:1px solid #edcc8c;outline-offset:-2px;}
+}
+
+/* THE NAME UNDER THE PAINTING. Standing at a stop, the work says what it is
+   in the two words its own record seals, small and out of the way, with the
+   certainty dot every reproduction in this museum carries. */
+.vinci-quiet {position:fixed;transform:translateX(-50%);margin:0;padding:6px 10px 7px;max-width:260px;
+  display:grid;grid-template-columns:auto 1fr;gap:1px 8px;align-items:center;
+  background:#0d1720b3;border-bottom:1px solid #a9977344;text-align:left;pointer-events:none;}
+.vinci-quiet[hidden] {display:none;}
+.vinci-quiet-dot {grid-row:1 / span 2;width:7px;height:7px;border-radius:50%;
+  background:var(--certainty,#d2a557);box-shadow:0 0 0 2px #0d172099;}
+.vinci-quiet-name {color:#f0e7d6;font:13px/1.25 var(--serif,var(--sans));letter-spacing:.01em;}
+.vinci-quiet-year {color:#c3b596;font:9px var(--sans);letter-spacing:.14em;text-indent:.14em;text-transform:uppercase;}
+@media(max-aspect-ratio:9/10) {
+  .vinci-quiet {max-width:200px;padding:4px 8px 5px;}
+  .vinci-quiet-name {font-size:11.5px;}
+  /* the taller row leaves the card its own place above it */
+  .vinci-heading.vinci-standing {bottom:calc(var(--wing-rail-bottom) + 158px);}
+}
+
+/* QUIET WHILE WALKING. A leg is under way: the card of the place being left,
+   the wall's row, the name under the painting and the question all go, and
+   the bar stays at full strength, because it is the way out of the room and
+   out of the wing. One attribute, one transition, nothing made or destroyed,
+   and the eye of the frame's own compositor. The card of the station arrived
+   at rises on arrival, at its own place, never centred over the walk. */
+#wing[data-wing='vinci'] .vinci-heading,
+#wing[data-wing='vinci'] .vinci-strip,
+#wing[data-wing='vinci'] .vinci-quiet,
+#wing[data-wing='vinci'] .wing-doorblock {transition:opacity .24s cubic-bezier(.22,.61,.36,1);}
+#wing[data-wing='vinci'][data-walking] .vinci-heading,
+#wing[data-wing='vinci'][data-walking] .vinci-strip,
+#wing[data-wing='vinci'][data-walking] .vinci-quiet,
+#wing[data-wing='vinci'][data-walking] .wing-doorblock {opacity:0;pointer-events:none;transition-duration:.16s;}
+/* The marks of the room are the wall's own targets and go with it. */
+#wing[data-wing='vinci'][data-walking] .vinci-exhibit-dot {opacity:0;pointer-events:none;}
+@media(prefers-reduced-motion:reduce) {
+  /* THE EYE IS PLACED, so there is no leg to be quiet during and no fade. */
+  #wing[data-wing='vinci'] .vinci-heading,
+  #wing[data-wing='vinci'] .vinci-strip,
+  #wing[data-wing='vinci'] .vinci-quiet,
+  #wing[data-wing='vinci'] .wing-doorblock {transition:none;}
+  #wing[data-wing='vinci'][data-walking] .vinci-heading,
+  #wing[data-wing='vinci'][data-walking] .vinci-strip,
+  #wing[data-wing='vinci'][data-walking] .vinci-quiet,
+  #wing[data-wing='vinci'][data-walking] .wing-doorblock,
+  #wing[data-wing='vinci'][data-walking] .vinci-exhibit-dot {opacity:1;pointer-events:auto;}
 }

@@ -86,6 +86,12 @@ export interface WingHosts {
       Null gives all of them back to the frame, which is where they stand on
       a wide stage and in a wing that offers no foot. */
   barFoot: (host: HTMLElement | null) => void
+  /** NOTHING ON SCREEN MOVES WITH THE WALKER. While a leg is under way the
+      frame carries one attribute and CSS alone takes the chrome that belongs
+      to a place a visitor has left: its card, its rows, its labels and the
+      question. The bar stays, at full strength, because it is the way out of
+      the room and out of the wing. */
+  walking: (underWay: boolean) => void
 }
 
 export interface WingStation {
@@ -441,6 +447,11 @@ export function createWingFrame(
   }
 
   /** A wing offers the foot its own sheet keeps, or takes it back. */
+  /** One attribute, one transition, no element made or destroyed. */
+  function walking(underWay: boolean): void {
+    if (underWay) host.dataset['walking'] = ''
+    else delete host.dataset['walking']
+  }
   function barFoot(next: HTMLElement | null): void {
     if (footHost === next) { placeChrome(); return }
     footHost = next
@@ -453,7 +464,7 @@ export function createWingFrame(
     const count = wing.stations.length
     index = Math.min(Math.max(n, 0), Math.max(0, count - 1))
     const station = wing.stations[index]
-    wing.show(index, { labels, stage, world, navigate: goto, barFoot })
+    wing.show(index, { labels, stage, world, navigate: goto, barFoot, walking })
     question.textContent = station?.question ?? ''
     door.href = doorUrl(entry)
     paintNavigation()

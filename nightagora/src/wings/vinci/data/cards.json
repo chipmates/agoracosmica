@@ -101,7 +101,10 @@
     "picture": {
       "whole_plate": { "en": "The whole plate", "de": "Die ganze Tafel" },
       "zoom_in": { "en": "Zoom in", "de": "Näher" },
-      "zoom_out": { "en": "Zoom out", "de": "Weiter weg" }
+      "zoom_out": { "en": "Zoom out", "de": "Weiter weg" },
+      "whole_wall": { "en": "The whole wall", "de": "Die ganze Wand" },
+      "hang_row": { "en": "The hang, twenty-five paintings", "de": "Die Hängung, fünfundzwanzig Gemälde" },
+      "place": { "en": "{n} of 25", "de": "{n} von 25" }
     },
     "machine": {
       "provenance": { "en": "Where it comes from", "de": "Woher es kommt" },

@@ -69,12 +69,13 @@ import { SOURCE_READINGS } from './line/bench/visitor-sources'
 import cardsSource from './data/cards.json?raw'
 import { CERTAINTY as LINE_CERTAINTY } from './line'
 import { GRAVE_DEATHBED } from './grave/placement'
-import { loadManifest } from '../../manifest'
+import { assetUrl, loadManifest, type ManifestIndex } from '../../manifest'
 import { createPlatePayload } from '../vitrine/picture'
 import { createVinciWholePlate, isWholePlate, vinciPlateDescription } from './collection/deep-plate'
 import type { VitrineRect } from '../vitrine'
 import { machineBuildOf } from './machines'
 import { createVinciHangStrip, vinciSheetTitle, type VinciStripEntry } from './collection/strip'
+import { vinciWallEndVertex, vinciWallNearerEnd, vinciWallStops, vinciWallVertex, VINCI_WALL_ENDS } from './collection/wall'
 import { pathSpecifications } from './paths'
 import { roadGradeProvenance } from './road-grade'
 import { apronProvenance } from './apron'
@@ -220,6 +221,16 @@ export function createWing():VinciWingModule {
   let collectionRoot:Group|undefined, occluders:readonly Mesh[]=[]
   let dots:VinciExhibitDots|undefined, closeLook:ReturnType<typeof createVinciCloseLook>|undefined
   let strip:ReturnType<typeof createVinciHangStrip>|undefined
+  /** THE STORE'S OWN INDEX, held: a row is painted synchronously and every
+   * exhibit without a plate of its own takes its preview by address. */
+  let assets:ManifestIndex|undefined
+  let quiet:HTMLElement|undefined, quietDot:HTMLElement|undefined, quietName:HTMLElement|undefined, quietYear:HTMLElement|undefined
+  /** The vertex the eye last stood at, so the marks and the row are taken
+   * again the moment it arrives at another stop. */
+  let wallWas:number|undefined
+  /** Whether a leg is under way, so the frame's one attribute is written on
+   * the edge and not in every frame. */
+  let legUnderWay=false
   let picks:VinciPickEntry[]=[], picksTier=''
   const pickRay=new Raycaster(), sightRay=new Raycaster(), sightHits:Parameters<typeof vinciSightBlocked>[4]=[]
   /** Three on calm, six on standard, eight on hero: what is in front of the
@@ -282,6 +293,13 @@ export function createWing():VinciWingModule {
     labelHostHidden=h.labels.getAttribute('aria-hidden');h.labels.removeAttribute('aria-hidden')
     hosts=h;h.stage.textContent='';h.labels.textContent='';h.stage.parentElement!.dataset['wing']='vinci';const style=make('style','');style.textContent=wingCss;h.stage.append(style)
     header=make('div','vinci-heading');header.id='vinci-station-card';h.stage.append(header)
+    // THE NAME UNDER THE PAINTING. Standing at a stop with no card, the work
+    // carries two sealed words of its own: the title and the year, with the
+    // certainty dot the museum owes every reproduction. Nothing is written
+    // here that the register does not already say.
+    quiet=make('p','vinci-quiet');quiet.hidden=true
+    quietDot=make('span','vinci-quiet-dot');quietName=make('span','vinci-quiet-name');quietYear=make('span','vinci-quiet-year')
+    quiet.append(quietDot,quietName,quietYear);h.stage.append(quiet)
   }
   function schedule() { scheduled=requestAnimationFrame(()=>{scheduled=requestAnimationFrame(build)}) }
   function build() {
@@ -457,6 +475,12 @@ export function createWing():VinciWingModule {
         // ONE EXHIBIT AT A TIME: the room's marks stand down before the
         // stage may be held, so none is left standing on a still frame.
         dots?.setOpen(id);dots?.setLimit(0);paintExhibitTitle();paintHeaderVisibility();paintStrip()
+        // ON THE WALL A PRESS IS A RUN. A stop is a vertex of the room's own
+        // certified line, so the eye slides along the hang to the work asked
+        // for instead of returning to a station between two neighbours. It
+        // runs at every tier and on the phone: the wall is what the room is,
+        // and the run carries one plate request, for the stop it lands on.
+        if(!isWholePlate(id)&&!isLeafDoor(id)&&wallRun(id))return true
         // THE WHOLE PLATE IS THE SAME PLACE: the visitor already stands where
         // the work hangs, so the eye neither walks out to it nor back from it.
         if(isWholePlate(id)||isWholePlate(from)||isLeafDoor(id)||isLeafDoor(from))return false
@@ -475,9 +499,14 @@ export function createWing():VinciWingModule {
       },
       onClose:()=>{
         if(exhibitSources){exhibitSources=null;if(mode===2)mode=1;paintDock()}
-        rail.returnToStation();dots?.setOpen(null);dots?.invalidate();paintExhibitTitle();paintHeaderVisibility();paintStrip();refreshRecap()
+        // THE CLOSE LEAVES THE EYE WHERE IT STANDS on the wall: a visitor who
+        // shut the card is still standing in front of that painting, with its
+        // name under it and the arrows stepping on from there.
+        if(!onWallStop())rail.returnToStation()
+        dots?.setOpen(null);dots?.invalidate();paintExhibitTitle();paintHeaderVisibility();paintStrip();refreshRecap()
       }})
     strip=createVinciHangStrip({host:h.labels,onOpen:(id,button)=>openExhibit(id,button)})
+    void loadManifest().then(index=>{assets=index;if(hosts&&standing)refreshExhibits()})
     void exhibits?.picturesReady.then(()=>{if(hosts&&standing)refreshExhibits()})
     // THE REGISTRY IS A READ, and the court's own exhibits land after the
     // plates do: the row of a station that stands over them is empty until
@@ -530,11 +559,26 @@ export function createWing():VinciWingModule {
         return
       }
       if(e.key==='Escape'&&sheetOpen&&narrow()){e.preventDefault();sheetOpen=false;paintSheet();return}
+      // ESCAPE CLOSES THE CARD FIRST (above), then stands the visitor off the
+      // wall at the nearer of the room's two ends.
+      if(e.key==='Escape'&&onWallStop()){e.preventDefault();mode=1;rail.look(0,0);paintDock();leaveWall();return}
       if(e.key==='Escape'){e.preventDefault();mode=1;rail.look(0,0);paintDock();sourceControl().focus({preventScroll:true});return}
       if(e.key.toLowerCase()==='l'&&!e.repeat){e.preventDefault();mode=((mode+1)%3) as VinciLabelMode;paintDock();if(mode!==2&&target.closest('.vinci-dock'))sourceControl().focus({preventScroll:true});return}
       if(e.key.toLowerCase()==='p'&&!e.repeat){e.preventDefault();openPlan();return}
       if(e.key.toLowerCase()==='e'&&!e.repeat){e.preventDefault();openLife();return}
       if(target.closest('.vinci-dock'))return
+      // THE ARROWS STEP THE WALL, with or without a card. Left and right are
+      // the hang's own order, which is the way each end's frame reads it: at
+      // the east end the wall runs away to the right and at the west end back
+      // to the left, so one rule agrees with both. Up and down stay the
+      // station rail, except at a stop, where they are the wall too.
+      if(wallAt()!==undefined&&!target.closest('.vinci-strip')){
+        const step=e.key==='ArrowRight'||(onWallStop()&&e.key==='ArrowDown')?1
+          :e.key==='ArrowLeft'||(onWallStop()&&e.key==='ArrowUp')?-1:0
+        if(step){e.preventDefault();stepWall(step);return}
+        const stops=vinciWallStops()
+        if(e.key==='Home'||e.key==='End'){e.preventDefault();wallRun(stops[e.key==='Home'?0:stops.length-1]!.exhibit);return}
+      }
       if(e.key==='ArrowRight'||e.key==='ArrowDown'){e.preventDefault();h.navigate(station+1)}
       if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();h.navigate(station-1)}
     },options)
@@ -1006,7 +1050,36 @@ export function createWing():VinciWingModule {
         label:lang()==='de'?found.work.title_de:found.work.title_en,
         colour:policyLabelText(found.work,entries).colour})
     }
+    // THREE MARKS AT A STOP, AND WHICH THREE: this work and its two
+    // neighbours. Standing in front of one painting, what a hand wants is the
+    // one it is looking at and the two it can step to.
+    const at=wallAt(), stops=vinciWallStops()
+    if(at!==undefined&&at>0&&at<=stops.length){
+      const near=new Set([stops[at-2]?.exhibit,stops[at-1]!.exhibit,stops[at]?.exhibit].filter(Boolean) as string[])
+      dots?.setExhibits(marks.filter(entry=>near.has(entry.id)))
+      return
+    }
     dots?.setExhibits(marks)
+  }
+  /** THE NAME UNDER THE PAINTING, at a stop with no card over it. Both words
+   * are the register's own, sealed: the title and the year. It leaves with the
+   * card, with the marks and while a leg is under way. */
+  function paintQuietLabel():void {
+    if(!quiet||!quietName||!quietYear||!quietDot||!hosts)return
+    const at=wallAt(), stops=vinciWallStops()
+    const stop=at!==undefined&&at>0&&at<=stops.length?stops[at-1]:undefined
+    const pick=stop?picks.find(entry=>entry.id===stop.exhibit):undefined
+    const sources=stop?exhibits?.pictureSources()??[]:[]
+    const found=stop?sources.find(source=>source.work.id===stop.workId&&source.entry.face===stop.face):undefined
+    const rect=pick&&found&&!closeLook?.id&&mode!==0&&!activeView?workRect(pick.object):null
+    quiet.hidden=!rect
+    if(!rect||!found)return
+    const entries=sources.filter(source=>source.work.id===found.work.id).map(source=>source.entry)
+    quietName.textContent=lang()==='de'?found.work.title_de:found.work.title_en
+    quietYear.textContent=lang()==='de'?found.work.date_label_de:found.work.date_label_en
+    quietDot.style.setProperty('--certainty',policyLabelText(found.work,entries).colour)
+    quiet.style.left=`${Math.round(rect.left+rect.width/2)}px`
+    quiet.style.top=`${Math.round(rect.top+rect.height+12)}px`
   }
   /** THE ROW UNDER THE CARD. It stands wherever a station holds more than
    * one exhibit: docked under the station card on the wide stage, above the
@@ -1015,14 +1088,27 @@ export function createWing():VinciWingModule {
     if(!strip||!hosts||!standing)return
     strip.setEntries(stationExhibits(),text(vinciContent[card]!.name))
     const open=closeLook?.id??null
+    const stops=vinciWallStops(), at=wallAt()
+    // ON A WALL THE ROW IS THE WALL'S INSTRUMENT: it says where along the hang
+    // the eye stands and carries the way back to the end it came in by.
+    strip.setWall(at===undefined?null:{place:at>0&&at<=stops.length?at:0,total:stops.length,whole:()=>wholeWall()})
     strip.setHidden(mode===2||(narrow()&&Boolean(open)))
-    // THE ROW NEVER STANDS OVER A WORK. On the wide stage it keeps to the
-    // station card's own width, and while a vitrine stands it docks at the
-    // foot of the vitrine's card; the phone keeps it above the bar.
+    // THE ROW NEVER STANDS OVER A WORK. On the wide stage it runs along the
+    // foot of the frame above the bar, which is where a row of twenty five
+    // can be large enough to recognise; while a vitrine holds the stage at an
+    // exhibit that is not a stop of the wall it docks at that card's foot,
+    // and the phone keeps it above the bar.
     if(narrow())strip.dock(null,hosts.labels)
-    else if(open&&closeLook)strip.dock('inline',closeLook.foot)
-    else if(header){const box=header.getBoundingClientRect();strip.dock({left:Math.round(box.left),top:Math.round(box.bottom+10),width:Math.round(box.width)},hosts.labels)}
+    else if(open&&closeLook&&!onWallStop())strip.dock('inline',closeLook.foot)
+    else strip.dock('foot',hosts.labels)
     strip.setOpen(open)
+  }
+  /** THE WHOLE WALL: back to the end the visitor came in by. From a stop the
+   * rail runs off the wall at its nearer end first, which is the line it is
+   * certified on, and the walk to the east end goes on from there. */
+  function wholeWall():void {
+    const index=vinciContent.findIndex(station=>station.id===VINCI_WALL_ENDS[0])
+    if(index>=0)hosts?.navigate(index)
   }
   /** The wing's own certainty word for a picture, read off the picture
    * module's own key so the two cannot drift. */
@@ -1097,6 +1183,46 @@ export function createWing():VinciWingModule {
     const named=vinciPlaceTitle(pick.id as VinciPlaceId)
     return {title:named.title,colour:certaintyColour(named.certainty)}
   }
+  /** THE ROOM WHOSE WALL IS WALKED. Its two end stations are the ends of one
+   * certified line and the twenty five stops stand between them, so both ends
+   * hold the same row and the same works. */
+  const wallEnd=(id:string|null):boolean=>id!==null&&(VINCI_WALL_ENDS as readonly string[]).includes(id)
+  /** Where the eye stands along the wall, or undefined off it. 0 and the last
+   * vertex are the two end stations; a stop of the hang is between them. */
+  const wallAt=():number|undefined=>standing?rail.navigation.wall:undefined
+  const onWallStop=():boolean=>{const at=wallAt();return at!==undefined&&at>0&&at<=vinciWallStops().length}
+  /** A RUN ALONG THE WALL. The eye leaves the stop it stands at, slides past
+   * every frame between here and there and stops square in front of the one
+   * asked for. A second press is queued by the rail, never cut. */
+  function wallRun(exhibit:string):boolean {
+    const vertex=vinciWallVertex(exhibit)
+    if(vertex===undefined||wallAt()===undefined||!railReady()||activeView)return false
+    const pose=vinciApproachPose(exhibit,narrow())
+    return pose?rail.along(vertex,vinciContent[card]!.id,pose,exhibit):false
+  }
+  /** One stop along the wall, with or without a card. Right runs on to the
+   * later work and left back to the earlier, which is the way each end's own
+   * frame reads it: at the east end the wall runs away to the right, at the
+   * west end back to the left. */
+  function stepWall(step:number):void {
+    const at=wallAt()
+    if(at===undefined)return
+    const stops=vinciWallStops()
+    const want=Math.max(1,Math.min(stops.length,at+step))
+    if(want===at)return
+    const stop=stops[want-1]!
+    if(closeLook?.id){openExhibit(stop.exhibit,null);return}
+    wallRun(stop.exhibit)
+  }
+  /** Off the wall at the nearer of the room's two ends, which is where a walk
+   * that leaves the wall begins. */
+  function leaveWall():void {
+    const at=wallAt()
+    if(at===undefined||wallEnd(vinciContent[card]!.id)&&!onWallStop())return
+    const end=vinciWallNearerEnd(at)
+    const index=vinciContent.findIndex(station=>station.id===end)
+    if(index>=0)hosts?.navigate(index)
+  }
   /** THE STANDING STATION'S OWN ROW: every exhibit it holds, in the order its
    * wall hangs them, with the name and the certainty the module that owns
    * each kind gives it. The strip paints this and the close look walks it. */
@@ -1107,7 +1233,10 @@ export function createWing():VinciWingModule {
     const row:{order:number;entry:VinciStripEntry}[]=[]
     for(const pick of picks){
       // The hall is one room under two stations, and both walk its one row.
-      if(pick.station!==here&&!(pick.kind==='machine'&&vinciMachineRoom(pick.station).includes(here)))continue
+      // The picture room is one WALL under two: the hang belongs to the line
+      // between them, so each end holds all twenty five.
+      if(pick.station!==here&&!(pick.kind==='machine'&&vinciMachineRoom(pick.station).includes(here))
+        &&!(wallEnd(here)&&wallEnd(pick.station)))continue
       if((pick.kind==='picture'||pick.kind==='mural')&&pick.workId!==DEATHBED_WORK){
         const found=pictures.find(source=>source.work.id===pick.workId&&source.entry.face===pick.face)
         if(!found)continue
@@ -1127,13 +1256,26 @@ export function createWing():VinciWingModule {
         const slug=pick.id.slice('machine/'.length)
         if(!isMachineSlug(slug))continue
         row.push({order:pick.order,entry:{id:pick.id,openable:pick.openable,
-          title:machineCatalog[slug].title[lang()],colour:PICTURE_CERTAINTY_KEY[2]!.colour,preview:null}})
+          title:machineCatalog[slug].title[lang()],colour:PICTURE_CERTAINTY_KEY[2]!.colour,preview:exhibitPreview(pick)}})
       }else{
         const named=namedExhibit(pick)
-        if(named)row.push({order:pick.order,entry:{id:pick.id,openable:pick.openable,title:named.title,colour:named.colour,preview:null}})
+        // A DATE KEEPS ITS YEAR. Its cell is the numeral the record gives it,
+        // and a picture there would take the one thing that cell says.
+        const plate=pick.workId?pictures.find(source=>source.work.id===pick.workId):undefined
+        if(named)row.push({order:pick.order,entry:{id:pick.id,openable:pick.openable,title:named.title,colour:named.colour,
+          preview:pick.kind==='stud'?null:plate?ASSET_BASE+validatePaintingRecord(plate.entry.preview,'painting-preview').path:exhibitPreview(pick)}})
       }
     }
     return row.sort((a,b)=>a.order-b.order).map(item=>item.entry)
+  }
+  /** THE PLATE AT REST FOR AN EXHIBIT THAT HAS NO PLATE OF ITS OWN: a machine,
+   * a plaque, the grave and its diagram, the book. Each is rendered once from
+   * the pose its own approach leaves the eye in, and stands in the store under
+   * the folder of its kind, so no cell of any row in this wing is blank. */
+  function exhibitPreview(pick:VinciPickEntry):string|null {
+    const name=pick.id.startsWith(`${pick.kind}/`)?pick.id.slice(pick.kind.length+1):pick.id
+    const entry=assets?.byId.get(`vinci/exhibit-preview/${pick.kind}/${name.replace(/\//g,'-')}`)
+    return entry?assetUrl(ASSET_BASE,entry):null
   }
   /** The next or the previous work of this wall, skipping what the spine
    * cannot open yet. The ends are ends: a wall does not wrap. */
@@ -1290,7 +1432,8 @@ export function createWing():VinciWingModule {
     // same, in the reader, over the frame the visitor is already looking at.
     if(!entry.openable&&entry.kind!=='sheet')return
     const here=vinciContent[card]!.id
-    if(entry.station!==here&&!(entry.kind==='machine'&&vinciMachineRoom(entry.station).includes(here)))return
+    if(entry.station!==here&&!(entry.kind==='machine'&&vinciMachineRoom(entry.station).includes(here))
+      &&!(wallEnd(here)&&wallEnd(entry.station)))return
     const walk=[stepControl('\u2039',exhibitStep(id,-1)),stepControl('\u203a',exhibitStep(id,1))]
     const how_=closeLook.id&&closeLook.id!==id?'advance':'enter'
     const shut=control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())
@@ -1891,10 +2034,21 @@ export function createWing():VinciWingModule {
       // A REMOUNTED PLATE IS A NEW MESH. The registry is a read, so it is
       // taken again when a tier change has replaced what it read.
       if(picks.length&&(picksTier!==hosts.world.stack.tierName()||!picks[0]!.object.parent))refreshExhibits()
+      // NOTHING ON SCREEN MOVES WITH THE WALKER. The frame takes one attribute
+      // for the length of a leg and CSS alone takes the chrome of the place
+      // being left; the bar stays. Written on the edge, never every frame.
+      const underWay=Boolean(nav.active)
+      if(underWay!==legUnderWay){legUnderWay=underWay;hosts.walking(underWay)}
+      // THE MARKS AND THE ROW BELONG TO THE STOP THE EYE STANDS AT, so both
+      // are taken again the moment it arrives at another one.
+      const atWall=wallAt()
+      if(atWall!==wallWas){wallWas=atWall;paintExhibitMarks();paintStrip()}
       const reading=readingRect()
       labels.update(reading)
-      // ONE EXHIBIT AT A TIME: while one is open the other marks stand down.
-      dots?.setLimit(closeLook?.id?0:DOTS_PER_TIER[hosts.world.stack.tierName()]??6)
+      paintQuietLabel()
+      // ONE EXHIBIT AT A TIME: while one is open the other marks stand down,
+      // and at a stop the three that stand are this work and its neighbours.
+      dots?.setLimit(closeLook?.id?0:onWallStop()?3:DOTS_PER_TIER[hosts.world.stack.tierName()]??6)
       dots?.update(reading)},
     stop(){visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;life?.dispose();life=undefined;lifeControl?.remove();lifeControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;house=undefined;houseUp=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();languageWatch?.disconnect();languageWatch=undefined;strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
   }
