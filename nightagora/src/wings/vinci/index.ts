@@ -175,7 +175,6 @@ export function createWing():VinciWingModule {
   /** THE LIFE VIEW, and the same one case: an exhibit that stood down for it
    * already pushed the entry this sheet would push. */
   let life:WingLife|undefined, lifeControl:HTMLButtonElement|undefined, lifeAdopt=false
-  let languageWatch:MutationObserver|undefined, barLanguage:'en'|'de'='en'
   let exhibitSources:VinciExhibitSources|null=null
   let labelHostHidden:string|null=null
   // THE WAIT AT THE STREET SHOWS ITSELF. The heading is painted and the frame
@@ -516,18 +515,6 @@ export function createWing():VinciWingModule {
     void exhibits?.ready.then(()=>{if(hosts&&standing)refreshExhibits()})
     welcome=createVinciWelcome(h.labels,route=>{if(route==='life'){openLife();return}if(route==='collection')enterCollection();focusTheBar()})
     controller=new AbortController();const options={signal:controller.signal}
-    /* THE PAGE'S LANGUAGE CAN MOVE UNDER A STANDING WING: the lobby's own
-       control rewrites it and tells nobody, so the bar reads it back. Only a
-       language that actually changed is answered: reading one writes the
-       attribute back, and answering that write would never end. */
-    barLanguage=lang()
-    languageWatch=new MutationObserver(()=>{
-      const now=document.documentElement.lang.slice(0,2)==='de'?'de':'en'
-      if(now===barLanguage)return
-      barLanguage=now
-      paintBarWords()
-    })
-    languageWatch.observe(document.documentElement,{attributes:true,attributeFilter:['lang']})
     const wheelStep=createWheelStepper(()=>performance.now())
     // A notch asks for the next station AND walks a stride along the leg that
     // is under way, so a visitor who keeps scrolling keeps moving instead of
@@ -1950,7 +1937,7 @@ export function createWing():VinciWingModule {
       else sources.select(sources.tab,true)
     }
   }
-  return {
+  const wingModule:VinciWingModule={
     stations:vinciContent.map(s=>({id:s.id,name:text(s.name),question:text(s.door)})),
     legacyStationIds:vinciLegacyStationIds,
     doorDisclosure:'first-press',
@@ -1969,6 +1956,14 @@ export function createWing():VinciWingModule {
     pending:()=>exhibits?.pending()??0,
     errors:()=>exhibits?.pictureErrors()??[],
     manifest:()=>[...new Map((exhibits?.pictureSources()??[]).flatMap(({entry})=>[entry.preview,entry.plate]).map(entry=>[entry.id,entry])).values()],
+    /* EVERY WORD OF THIS WING, READ AGAIN. The frame hands the language over
+       before it repaints its own chrome, so the rail's names are the wing's
+       own and the card, the row and the bar change together in one frame. */
+    language(){
+      wingModule.stations=vinciContent.map(s=>({id:s.id,name:text(s.name),question:text(s.door)}))
+      if(!hosts||!standing)return
+      paintBarWords();paintHeader();paintDock();paintQuestion();paintExhibitTitle();paintExhibitMarks();paintStrip()
+    },
     show(index,h){
       if(!hosts){mount(h);station=card=index;paintHeader();schedule();return}
       // A station asked for before the place is built is remembered, not lost.
@@ -2071,6 +2066,7 @@ export function createWing():VinciWingModule {
       // and at a stop the three that stand are this work and its neighbours.
       dots?.setLimit(closeLook?.id?0:onWallStop()?3:DOTS_PER_TIER[hosts.world.stack.tierName()]??6)
       dots?.update(panels)},
-    stop(){visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;life?.dispose();life=undefined;lifeControl?.remove();lifeControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;house=undefined;houseUp=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();languageWatch?.disconnect();languageWatch=undefined;strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
+    stop(){visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;life?.dispose();life=undefined;lifeControl?.remove();lifeControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;house=undefined;houseUp=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
   }
+  return wingModule
 }

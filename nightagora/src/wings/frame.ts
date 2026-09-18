@@ -123,6 +123,10 @@ export interface WingModule {
       counts, in the one shape every wing reports. A wing without this stands
       as soon as it is shown, and reports nothing. */
   ready?(report?: WingReport): Promise<void>
+  /** The page's language moved while this wing stood: read every word the
+      wing owns again, including its own station names, before the frame
+      repaints the chrome around them. */
+  language?(): void
   /** strike everything the wing put on the page */
   stop(): void
   /** one frame of the wing's own time, when it holds a living stage */
@@ -443,6 +447,39 @@ export function createWingFrame(
   function idAt(i: number): string {
     return wing?.stations[i]?.id ?? `station-${i + 1}`
   }
+
+  /** The rail's names, the question and the door's address, read again from
+      the wing's own stations. The buttons are not rebuilt: a rebuild would
+      drop the hand that is on one and scroll the track back. */
+  function paintStationWords(): void {
+    const stations = wing?.stations ?? []
+    for (let i = 0; i < rail.children.length; i++) {
+      (rail.children[i] as HTMLElement).setAttribute(
+        'aria-label',
+        `${say(WING_TEXT.station)} ${i + 1} · ${stations[i]?.name ?? ''}`
+      )
+    }
+    question.textContent = stations[index]?.question ?? ''
+    if (entry) door.href = doorUrl(entry)
+  }
+
+  /* ONE MECHANISM FOR THE WHOLE FRAME. The language is announced once, by
+     the control that changes it, and answered here for every wing: the wing
+     reads its own words first, because the rail's names are the wing's. A
+     language that did not change is not answered: reading the page's own
+     language writes it back, and answering that write would never end. */
+  let spoken = lang()
+  addEventListener('na-language', event => {
+    const said = (event as CustomEvent<unknown>).detail
+    const next = said === 'de' || said === 'en' ? said : lang()
+    if (next === spoken) return
+    spoken = next
+    if (!wing) return
+    wing.language?.()
+    paintWords()
+    paintStationWords()
+    paintNavigation()
+  })
 
   function paintRail(): void {
     rail.textContent = ''

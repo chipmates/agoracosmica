@@ -1018,6 +1018,11 @@ function setLobbyLanguage(language: 'en' | 'de'): void {
   if (paneOpen) openPane(paneSlug)
   syncInstruments()
   syncPageReserve(true)
+  /* THE LANGUAGE IS CHOSEN HERE AND SPOKEN EVERYWHERE. The lobby's control
+     rewrites the page's language under whatever stands above it, so the
+     choice is announced once, after the page itself is in it, and every
+     surface outside this file repaints from the one event. */
+  dispatchEvent(new CustomEvent('na-language', { detail: language }))
 }
 
 for (const control of instrumentsEl.querySelectorAll<HTMLButtonElement>('[data-language]')) {
