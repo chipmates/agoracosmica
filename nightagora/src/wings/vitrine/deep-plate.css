@@ -14,9 +14,14 @@
    assumes nothing about the size of the glass it is drawn on. */
 .deep-rule {position:absolute;left:14px;bottom:14px;display:flex;flex-direction:column;gap:5px;pointer-events:none;}
 .deep-rule[hidden] {display:none;}
+/* A MEASUREMENT IS READ OVER WHATEVER THE PLATE IS: deep in a light passage
+   the ground under these marks is near white, so each one carries a tight
+   dark edge of its own as well as the soft one. */
 .deep-rule-bar {box-sizing:border-box;height:9px;border:0 solid #f2eadb;border-width:0 2px;
-  background:linear-gradient(#f2eadb,#f2eadb) left bottom/100% 2px no-repeat;filter:drop-shadow(0 1px 6px #0a0f13);}
-.deep-rule-label {font:11px/1.2 var(--sans);color:#f2eadb;letter-spacing:.06em;text-shadow:0 1px 8px #0a0f13;}
+  background:linear-gradient(#f2eadb,#f2eadb) left bottom/100% 2px no-repeat;
+  filter:drop-shadow(0 1px 6px #0a0f13) drop-shadow(0 0 1px #0a0f13);}
+.deep-rule-label {font:11px/1.2 var(--sans);color:#f2eadb;letter-spacing:.06em;
+  text-shadow:0 1px 8px #0a0f13,0 0 3px #0a0f13,0 0 1px #0a0f13;}
 
 @media(max-aspect-ratio:9/10) {
   /* The caption takes the foot of a phone's viewport, so the rule stands at
