@@ -878,8 +878,8 @@ export const vinciLifeWorksRow: VinciText = { en: 'Pictures', de: 'Bilder' };
 /** That row's count, in the same grammar as the museum's other counted
  * sentences. The numbers are the record's own and the view fills them. */
 export const vinciLifeWorksCount: VinciText = {
-  en: '{total} pictures here. {dated} with a date in the record, {undated} without one.',
-  de: '{total} Bilder hier. {dated} mit einem Datum im Verzeichnis, {undated} ohne Datum.',
+  en: '{total} pictures here. {dated} with a year in the record, {undated} without one.',
+  de: '{total} Bilder hier. {dated} mit einer Jahreszahl im Verzeichnis, {undated} ohne Jahreszahl.',
 };
 
 /** What a date the gallery floor does not carry says, instead of offering a
