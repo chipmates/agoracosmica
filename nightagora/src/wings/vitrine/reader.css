@@ -33,6 +33,18 @@
   padding:6px 8px;border:1px dashed #a9977355;}
 .reader-absence p {margin:0;font:11px/1.35 var(--sans);color:#b6bcae;}
 
+/* THE STRIP BESIDE THE LEAF. A portrait page is fitted by its height, so
+   the band under it is paid for in page, and the width beside it is not.
+   The column stands at the right, the page keeps everything left of it, and
+   the row of controls keeps the foot. */
+.reader[data-dock='side'] .reader-ground,
+.reader[data-dock='side'] .reader-stage {bottom:60px;right:96px;}
+.reader[data-dock='side'] .reader-shelf {left:auto;right:0;top:0;bottom:60px;width:90px;height:auto;
+  flex-direction:column;align-items:stretch;overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:contain;
+  touch-action:pan-y;padding:2px 0;}
+.reader[data-dock='side'] .reader-page {width:100%;height:84px;}
+.reader[data-dock='side'] .reader-absence {width:100%;height:auto;min-height:60px;}
+
 /* THE ROW A HAND MEETS: the two that step one side with the ways between,
    and the viewer's own steps beside them where there is a wheel. One line:
    a second line would stand on the strip. */

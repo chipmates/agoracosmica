@@ -252,6 +252,7 @@ export function createReaderPayload(options: {
         flipped: Boolean(view?.mirrored),
       })
     }
+    dockShelf()
     paintStand()
   }
 
@@ -367,6 +368,40 @@ export function createReaderPayload(options: {
     return button
   }
 
+  /* WHERE THE STRIP STANDS. Under the leaf it takes a band of the height
+     the page is fitted into, and a portrait leaf is fitted BY its height:
+     every pixel of that band comes off the page. Beside it, it takes width
+     the same leaf is not using. So the two boxes are measured against the
+     side's own rectangle and the wider page wins, per side and per resize.
+     The phone keeps the strip under the leaf: there the page is fitted by
+     its width and a column would come straight off it. */
+  /** the column the strip takes beside the leaf, its own gap included */
+  const COLUMN = 96
+  /** what the strip and the control row take under the leaf, and the row alone */
+  const FOOT_UNDER = 156, FOOT_ALONE = 60
+
+  /** The side's displayed rectangle, as wide over high. Null while no side
+   * stands, where the strip has no measurement to decide on. */
+  function shownAspect(): number | null {
+    const here = side()
+    if (!here) return null
+    const source = sourceOf(here), cut = windowOf(here)
+    const width = source.width * (cut ? cut.right - cut.left : 1)
+    const height = source.height * (cut ? cut.bottom - cut.top : 1)
+    return width > 0 && height > 0 ? width / height : null
+  }
+
+  function dockShelf(): void {
+    if (!root || !shelf) return
+    const aspect = shownAspect()
+    if (shelf.hidden || !host || host.narrow || aspect === null) { root.dataset['dock'] = 'foot'; return }
+    const box = root.getBoundingClientRect()
+    if (box.width <= 0 || box.height <= 0) return
+    const under = Math.min(box.width, (box.height - FOOT_UNDER) * aspect)
+    const beside = Math.min(box.width - COLUMN, (box.height - FOOT_ALONE) * aspect)
+    root.dataset['dock'] = beside > under ? 'side' : 'foot'
+  }
+
   /** THE STRIP IS THE BOOK. Every side of the volume open now as one cell,
    * the one standing lit, and the places the source itself says are not
    * there standing as absences between them. */
@@ -381,6 +416,7 @@ export function createReaderPayload(options: {
     const single = inside.length < 2 && !(book.gaps ?? []).length
     shelf.hidden = single
     if (root) root.dataset['strip'] = String(!single)
+    dockShelf()
     if (single) return
     shelf.setAttribute('aria-label', book.stripLabel(side()?.volume, inside.length))
     const gaps = new Map((book.gaps ?? []).map(gap => [gap.after, gap.text]))
@@ -424,6 +460,11 @@ export function createReaderPayload(options: {
     }
     const current = cells[cellOf.indexOf(at)]
     if (!current || !shelf || !shelf.isConnected) return
+    if (root?.dataset['dock'] === 'side') {
+      const down = current.offsetTop - (shelf.clientHeight - current.offsetHeight) / 2
+      shelf.scrollTop = Math.max(0, Math.min(shelf.scrollHeight - shelf.clientHeight, down))
+      return
+    }
     const target = current.offsetLeft - (shelf.clientWidth - current.offsetWidth) / 2
     shelf.scrollLeft = Math.max(0, Math.min(shelf.scrollWidth - shelf.clientWidth, target))
   }
@@ -565,6 +606,7 @@ export function createReaderPayload(options: {
       if (++settled > SETTLE_FRAMES) mountPlate()
     },
     layout() {
+      dockShelf()
       plate?.layout?.()
       markShelf()
       // The card rose or went back down: the control that moves it says
