@@ -62,7 +62,7 @@ import { readingTableOf } from './table'
 import { CODEX_ENTRIES } from './table/codex-shelf'
 import type { ReadingTable } from './table'
 import { createReaderPayload, type ReaderPayload } from './table/reader'
-import { createReaderPayload as createVitrineReaderPayload } from '../vitrine/reader'
+import { createReaderPayload as createVitrineReaderPayload, type ReaderPayload as ReaderPayloadOfWall } from '../vitrine/reader'
 import { createStudReaderPayload, type StudReaderPayload } from './line/reader'
 import { LINE_SECTIONS, LINE_STUDS, type Stud } from './line/studs'
 import { ageAt, studBounds, studEdtf } from './line/edtf'
@@ -1149,34 +1149,50 @@ export function createWing():VinciWingModule {
       controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),control(VINCI_VITRINE_WORDS.back,back),
         control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())]},null,'advance')
   }
-  /** A SHEET OF THE BODY WALL opens as the scan it is: one page, its own
-   * name and holder, and its record. No ways, because there is only one. */
+  /** THE BODY WALL IS ONE BOOK. A press on any sheet opens the whole wall in
+   * the reader at that sheet, in the order the wall hangs them: the arrows,
+   * the keys and the swipe walk the wall itself, and the card, the strip and
+   * the record follow the sheet standing. One way, because a drawn sheet has
+   * no second face and no printed page beside it. */
   function openSheetDoor(id:string,from:HTMLElement|null,how:'enter'|'advance'):void {
-    const found=(exhibits?.sheetSources()??[]).find(source=>`sheet/${source.sheet.id}`===id)
-    if(!found||!closeLook)return
-    const page=validateSheetRecord(found.page,'sheet-page')
-    const record=found.page as typeof found.page&{holder?:string}
-    const title=vinciSheetTitle(lang()==='de'?found.page.honesty_de:found.page.honesty_en)
+    const wall=exhibits?.sheetSources()??[]
+    const opened=wall.find(source=>`sheet/${source.sheet.id}`===id)
+    if(!opened||!closeLook)return
+    const named=(source:typeof opened):string=>vinciSheetTitle(lang()==='de'?source.page.honesty_de:source.page.honesty_en)
     const door=`${id}${LEAF_DOOR}`
-    const openRecord=()=>{
+    let reader:ReaderPayloadOfWall|undefined
+    const standing=()=>{const here=reader?.current();return wall.find(source=>source.sheet.id===here?.id)??opened}
+    // The record is the sheet's, so it is composed again at every step and
+    // repainted where the window beside it is open.
+    const record=()=>{
+      const source=standing(), title=named(source)
       exhibitSources={id:door,title:{en:title,de:title},certainty:'documented',renderStation(host){
+        const at=standing()
         const block=make('div','vinci-record');block.dataset['register']='record'
-        for(const line of [lang()==='de'?found.page.honesty_de:found.page.honesty_en,found.page.licence])
+        for(const line of [lang()==='de'?at.page.honesty_de:at.page.honesty_en,at.page.licence])
           block.append(make('p','vinci-statement',line))
         host.append(block)
       }}
-      sources.resetScroll();sources.select('station');mode=2;paintDock()
     }
-    const reader=createVitrineReaderPayload({
-      book:Promise.resolve({
-        // The card's own head carries the sheet's line; the page beside it
-        // is named and not said twice.
-        sides:[{id:found.sheet.id,label:title,shows:'',
-          source:{pyramid:null,file:ASSET_BASE+page.path,width:page.pixels.width,height:page.pixels.height},
-          thumb:null,ways:[],colour:certaintyColour('documented')}],
-        stripLabel:()=>title,holder:record.holder??'',honesty:text(VINCI_PAGE_HONESTY)}),
-      words:vinciManuscriptWords(),tier:()=>hosts?.world.stack.tierName()??'standard'})
-    closeLook.open({id:door,title,line:vinciLine(id),card:[],payload:reader,
+    const openRecord=()=>{record();sources.resetScroll();sources.select('station');mode=2;paintDock()}
+    const sides=wall.map(source=>{
+      const page=validateSheetRecord(source.page,'sheet-page')
+      const thumb=validateSheetRecord(source.preview,'sheet-thumb')
+      const record=source.page as typeof source.page&{holder?:string}
+      return {id:source.sheet.id,label:named(source),shows:'',head:vinciLine(`sheet/${source.sheet.id}`),
+        source:{pyramid:null,file:ASSET_BASE+page.path,width:page.pixels.width,height:page.pixels.height},
+        thumb:ASSET_BASE+thumb.path,ways:[],colour:certaintyColour('documented'),holder:record.holder??''}
+    })
+    reader=createVitrineReaderPayload({
+      book:Promise.resolve({sides,
+        // The row of a station is named by the station, as the wall's own
+        // strip beside it is.
+        stripLabel:()=>text(vinciContent[card]!.name),
+        holder:'',honesty:text(VINCI_PAGE_HONESTY)}),
+      start:opened.sheet.id,words:vinciManuscriptWords(),
+      tier:()=>hosts?.world.stack.tierName()??'standard',
+      changed:()=>{if(exhibitSources?.id===door&&mode===2){record();paintDock()}}})
+    closeLook.open({id:door,title:named(opened),line:vinciLine(id),card:[],payload:reader,
       controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())],
       ...vinciLimits(id)},from,how)
   }

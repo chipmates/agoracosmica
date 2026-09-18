@@ -57,6 +57,9 @@ const RESIZE_FRAMES = 3
 const PEEK = 190
 /** The share of the sheet a raised card takes over the work. */
 const RAISED_SHARE = .62
+/** However much its own peek asks for, a card never takes more of the sheet
+ * than this: the work is what the window is for. */
+const PEEK_MOST = .42
 /** A drag on the grabber this far decides; a shorter one is a press. */
 const GRAB_PX = 24
 const GRAB_SLOP = 8
@@ -184,22 +187,34 @@ export function createVitrine(options: {
       const top = 58, bottom = height - 10, left = 8, right = width - 8
       const tall = bottom - top
       const fill = Boolean(exhibit?.payload?.fill)
-      const peek = Math.min(PEEK, Math.round(tall * .34))
       const viewHeight = fill ? tall : Math.round(Math.max(160, Math.min(320, tall * .34)))
       rects.view = { left, top, width: right - left, height: viewHeight }
       place(stage, rects.view)
+      root.dataset['fill'] = String(fill)
+      root.dataset['peek'] = String(fill && !raised)
+      // THE PEEK IS WHAT IT HAS TO SHOW. A work whose name takes two lines
+      // gets the two lines: the card is placed once to be measured in its
+      // own width, and then at the height its own peek needs.
+      let peek = Math.min(PEEK, Math.round(tall * .34))
+      const place2 = (height: number): void => {
+        const at = bottom - height
+        place(sheet, { left, top: at, width: right - left, height })
+        place(card, { left, top: at, width: right - left, height })
+      }
+      if (fill && !raised) {
+        place2(peek)
+        const asked = grab.getBoundingClientRect().height + body.scrollHeight
+          + payloadControls.getBoundingClientRect().height + 26
+        peek = Math.min(Math.max(peek, Math.ceil(asked)), Math.round(tall * PEEK_MOST))
+      }
       // The sheet is the card's ground; the viewport above it stays open to
       // the stage, so the work is seen and not a shade through a panel.
-      const cardTop = fill ? (raised ? bottom - Math.round(tall * RAISED_SHARE) : bottom - peek) : top + viewHeight
-      place(sheet, { left, top: cardTop, width: right - left, height: bottom - cardTop })
-      place(card, { left, top: cardTop, width: right - left, height: bottom - cardTop })
+      place2(fill ? (raised ? Math.round(tall * RAISED_SHARE) : peek) : bottom - top - viewHeight)
       payloadControls.style.cssText = ''
       place(shutMark, { left: right - 50, top: top + 6, width: 44, height: 44 })
-      root.dataset['fill'] = String(fill)
       // The peek is what the payload keeps clear of the card, raised or not:
       // a card that rises stands OVER the work rather than resizing it.
       root.style.setProperty('--vitrine-peek', `${fill ? peek : 0}px`)
-      root.dataset['peek'] = String(fill && !raised)
       grab.hidden = !fill
       shutMark.hidden = false
     } else {
@@ -261,6 +276,12 @@ export function createVitrine(options: {
     describe: text => payloadEl.setAttribute('aria-label', text),
     raise: open => setRaised(open),
     peeked: () => !raised,
+    rename: (title, head) => {
+      card.setAttribute('aria-label', title)
+      if (head === undefined) return
+      line.textContent = head ?? ''
+      line.hidden = !head
+    },
   })
 
   /** Our own entry, so a visitor's Back dismisses the exhibit and nothing

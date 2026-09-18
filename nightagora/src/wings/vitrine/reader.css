@@ -65,6 +65,7 @@
   .reader-absence {width:126px;height:72px;padding:4px 6px;}
   .reader-absence p {font-size:10px;}
   .reader-row {gap:4px;width:100%;}
+  .reader-row[data-ways='0'] .vitrine-step {flex:1 1 0;}
   .reader-folio {font-size:16px;margin-bottom:2px;}
   .reader-zoom {display:none;}
 }

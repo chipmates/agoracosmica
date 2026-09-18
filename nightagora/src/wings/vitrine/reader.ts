@@ -55,6 +55,12 @@ export interface ReaderSide {
   colour?: string
   /** A named study this side is known by, printed under its line. */
   named?: string | null
+  /** The line at the card's head while this side stands. Left out, the
+   * caller's own line stays where it is: one volume has one line, while a
+   * wall of sheets has one per sheet. */
+  head?: string | null
+  /** Who holds this one, where the book's own holder is not it. */
+  holder?: string
   /** THE STRIP IS ONE VOLUME. A wing whose book is several volumes names
    * each side's own, and the strip holds the sides of the one open now. */
   volume?: string
@@ -298,7 +304,10 @@ export function createReaderPayload(options: {
     if (here.named) block.append(make('p', 'reader-named', here.named))
     const line = chosen()?.line
     if (line) block.append(make('p', '', line))
-    block.append(make('p', 'vitrine-meta', book.holder))
+    block.append(make('p', 'vitrine-meta', here.holder ?? book.holder))
+    // THE CARD IS THE SIDE'S, not the side the window opened at: a wall of
+    // sheets renames its card as the hand walks it.
+    host.rename?.(here.label, here.head)
     if (witnesses().length) {
       const texts = make('div', 'vitrine-description reader-texts')
       texts.id = 'vitrine-reader-texts'
@@ -343,6 +352,9 @@ export function createReaderPayload(options: {
       button.hidden = false
     }
     for (let index = side()?.ways.length ?? 0; index < ways.length; index++) ways[index]!.hidden = true
+    // A PAGE WITH ONE WAY HAS NO SEGMENTS, and the two that step the book
+    // take the row rather than standing in a corner of it.
+    steps.previous?.parentElement?.setAttribute('data-ways', String(side()?.ways.length ?? 0))
     if (steps.previous) steps.previous.disabled = at <= 0
     if (steps.next) steps.next.disabled = !book || at >= book.sides.length - 1
   }

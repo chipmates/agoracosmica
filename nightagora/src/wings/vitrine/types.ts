@@ -39,6 +39,10 @@ export interface VitrinePayloadHost {
   /** True while a folded card stands at its peek, false while it is raised,
    * and undefined on a stage that folds no card. */
   peeked?(): boolean
+  /** A payload that walks a list of works renames the card as it goes: the
+   * card's accessible name, and the line at its head where the payload
+   * carries one. The words are the caller's, as every word here is. */
+  rename?(title: string, head?: string | null): void
 }
 
 export interface VitrinePayload {
