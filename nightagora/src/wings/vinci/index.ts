@@ -228,6 +228,9 @@ export function createWing():VinciWingModule {
   /** THE STATION CARD IS A SHEET ON THE PHONE. Peeked or opened belongs to
    * the walk, so it is held here and never written down. */
   let sheetOpen=false
+  /** The sheet's foot, where the frame stands the question, the door and the
+   * bar's own words while the stage is narrow. */
+  let sheetFoot:HTMLElement|undefined
   let restoreEnvironmentRotation:(()=>void)|null=null
   const narrow=()=>innerWidth/innerHeight<=.9
   const shadowFocus=new Vector3(NaN,NaN,NaN), focusAhead=new Vector3()
@@ -383,7 +386,10 @@ export function createWing():VinciWingModule {
       floor:()=>h.stage.parentElement?.querySelector('.wing-rail-group')?.getBoundingClientRect().top??innerHeight,
       record:lifeRecord,walk:id=>openFromPlan(id),openRecord:openLifeRecord,
       returnFocus:focusTheBar,adopt:()=>lifeAdopt})
-    sources=createVinciSourcesWindow(h.labels,source,()=>{mode=1;paintDock()});dock=sources.element;drawer=sources.panels.station
+    // The window hands the focus back to the control that opened it; on the
+    // phone that control stands inside the card's sheet, and a peeked sheet
+    // has no word to hand it to, so the sheet's own control takes it.
+    sources=createVinciSourcesWindow(h.labels,source,()=>{mode=1;paintDock();sourceControl().focus({preventScroll:true})});dock=sources.element;drawer=sources.panels.station
     occluders=collectVinciLabelOccluders(scene)
     labels=createVinciLabelAnchor({host:h.labels,camera,occluders,onOpen:()=>{mode=2;paintDock()}})
     collectionRoot=collection
@@ -459,8 +465,8 @@ export function createWing():VinciWingModule {
         return
       }
       if(e.key==='Escape'&&sheetOpen&&narrow()){e.preventDefault();sheetOpen=false;paintSheet();return}
-      if(e.key==='Escape'){e.preventDefault();mode=1;rail.look(0,0);paintDock();source.focus({preventScroll:true});return}
-      if(e.key.toLowerCase()==='l'&&!e.repeat){e.preventDefault();mode=((mode+1)%3) as VinciLabelMode;paintDock();if(mode!==2&&target.closest('.vinci-dock'))source.focus({preventScroll:true});return}
+      if(e.key==='Escape'){e.preventDefault();mode=1;rail.look(0,0);paintDock();sourceControl().focus({preventScroll:true});return}
+      if(e.key.toLowerCase()==='l'&&!e.repeat){e.preventDefault();mode=((mode+1)%3) as VinciLabelMode;paintDock();if(mode!==2&&target.closest('.vinci-dock'))sourceControl().focus({preventScroll:true});return}
       if(e.key.toLowerCase()==='p'&&!e.repeat){e.preventDefault();openPlan();return}
       if(e.key.toLowerCase()==='e'&&!e.repeat){e.preventDefault();openLife();return}
       if(target.closest('.vinci-dock'))return
@@ -813,6 +819,13 @@ export function createWing():VinciWingModule {
   }
   /** The station the visitor is standing in, written to the night's record. */
   function standHere():void { visit?.stand(vinciContent[card]!.id) }
+  /** WHERE SOURCES STANDS RIGHT NOW. On a narrow stage its word sits in the
+   * card's own sheet, so the hand lands on the sheet's control instead of on
+   * a word no eye can see. */
+  function sourceControl():HTMLElement {
+    if(!narrow()||!header||header.hidden)return source
+    return header.querySelector<HTMLElement>('.vinci-sheet-grab')??source
+  }
   /** The bar carries the walk, so the hand lands there when a sheet closes. */
   function focusTheBar():void {
     const group=hosts?.stage.parentElement?.querySelector('.wing-rail-group')
@@ -1394,6 +1407,10 @@ export function createWing():VinciWingModule {
       grab.setAttribute('aria-controls','vinci-station-card')
       grab.addEventListener('click',()=>{sheetOpen=!sheetOpen;paintSheet()})
       header.prepend(grab)
+      // THE FOOT OF THE SHEET. One node for the whole visit, so what the
+      // frame stands in it survives every repaint of the card above it.
+      sheetFoot??=make('div','wing-sheet-foot')
+      header.append(sheetFoot)
     }
     paintSheet()
     paintExhibitTitle();paintStrip()
@@ -1415,7 +1432,11 @@ export function createWing():VinciWingModule {
    * line, the bar and the wall's own row stand under it in both. */
   function paintSheet():void {
     if(!header)return
-    const sheet=narrow()&&header.classList.contains('vinci-standing')
+    const sheet=narrow()&&header.classList.contains('vinci-standing')&&!header.hidden
+    // THE PHONE'S BAR KEEPS ONE LINE: the question, the door and the bar's
+    // three words stand in this sheet while it is the card of the station,
+    // and go back to the frame the moment it is not.
+    hosts?.barFoot(sheet&&sheetFoot?sheetFoot:null)
     if(!sheet){delete header.dataset['sheet'];return}
     header.dataset['sheet']=sheetOpen?'open':'peek'
     const grab=header.querySelector('.vinci-sheet-grab')
@@ -1425,7 +1446,9 @@ export function createWing():VinciWingModule {
   /** ONE CARD AT A TIME ON A NARROW STAGE. The room's card stands beside the
    * exhibit's on the wide one and would cover it on the phone. */
   function paintHeaderVisibility():void {
-    if(header)header.hidden=mode===2||Boolean(closeLook?.id)
+    if(!header)return
+    header.hidden=mode===2||Boolean(closeLook?.id)
+    paintSheet()
   }
   /** AN APPROACH EYE IS NEVER A STATION. It stands in the station's own room
    * and carries the sub-view kicker the wing already writes for a view. */

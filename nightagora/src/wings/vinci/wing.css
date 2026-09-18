@@ -257,3 +257,31 @@
      card does, and the two never stand at once. */
   .vinci-strip {left:8px;right:8px;top:auto !important;bottom:calc(var(--wing-rail-bottom) + 60px);max-width:none;}
 }
+
+/* THE PHONE AT A STATION: THE ROOM, ONE BAR LINE, ONE PEEK. The bar keeps
+   the way home and the rail alone; the question, its button and the three
+   words stand in the card's own sheet, and the peeked card is the room's
+   name, its mark and the grabber. A 390 px stage that spent two bar lines
+   and a door block on chrome left the room less than half the screen. */
+@media(max-aspect-ratio:9/10) {
+  #wing[data-wing='vinci'] {--wing-rail-bottom:14px;}
+  /* the card rides the bar's own offset, so the row and the bar keep their
+     order under it however the bar is placed */
+  .vinci-heading.vinci-standing {bottom:calc(var(--wing-rail-bottom) + 126px);}
+  .vinci-heading.vinci-standing[data-sheet='peek'] > :not(.vinci-sheet-grab):not(.vinci-kicker):not(.vinci-title) {display:none;}
+  /* THE PULLED SHEET IS A READING SURFACE. Its own field is solid: the
+     card's gradient lets the room through on the right, which is calm under
+     a title and unreadable under a paragraph. */
+  .vinci-heading.vinci-standing[data-sheet='open'] {max-height:min(58dvh,calc(100dvh - 390px));background:#0e1a22f2;}
+  .vinci-heading.vinci-standing[data-sheet='open'] .vinci-promise {margin-top:9px;}
+  /* THE FOOT STAYS UNDER THE THUMB while the paragraph above it scrolls. */
+  .vinci-heading.vinci-standing .wing-sheet-foot {position:sticky;z-index:1;bottom:-13px;margin:11px -14px -13px;
+    padding:10px 14px 13px;background:#0e1a22;border-top:1px solid #a9977344;}
+  #wing[data-wing='vinci'] .wing-sheet-foot .wing-doorblock {position:static;inset:auto;display:flex;gap:10px;padding:0;background:none;}
+  #wing[data-wing='vinci'] .wing-sheet-foot .wing-question {flex:1;min-width:0;margin:0;font-size:13px;line-height:1.35;text-align:left;}
+  #wing[data-wing='vinci'] .wing-sheet-foot .wing-door {flex:none;max-width:108px;min-height:44px;margin:0;padding:8px 10px;font-size:9px;letter-spacing:.12em;text-indent:0;}
+  #wing[data-wing='vinci'] .wing-sheet-foot .wing-note {margin-top:8px;}
+  #wing[data-wing='vinci'] .wing-sheet-foot .wing-bar-words {margin-top:10px;border-top:1px solid #a9977333;}
+  #wing[data-wing='vinci'] .wing-bar-words > * {color:#eae1d1;font:9px var(--sans);letter-spacing:.14em;text-indent:.14em;text-transform:uppercase;}
+  #wing[data-wing='vinci'] .wing-bar-words > *:focus-visible {outline:1px solid #edcc8c;outline-offset:-2px;}
+}
