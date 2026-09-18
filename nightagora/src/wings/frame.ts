@@ -17,6 +17,8 @@
 
 import { PerspectiveCamera, Scene } from 'three/webgpu'
 import { WING_TEXT, lang, say } from './content'
+import { LOBBY_TEXT } from '../content/lobby'
+import { gaitPace, setGaitPace, type GaitPaceName } from './vinci/gait'
 import type { WingEntry } from './registry'
 import type { Stack } from '../stack'
 import type { ManifestEntry } from '../manifest'
@@ -283,6 +285,30 @@ export function createWingFrame(
      decision is the frame's: a wing never places the frame's own chrome. */
   const words: HTMLElement[] = []
   const wordRow = el('div', 'wing-bar-words')
+  /* THE PACE STANDS WHERE THE BAR'S WORDS STAND. On a narrow stage the bar
+     keeps one line and everything else is read in the wing's own sheet, so
+     the choice of how fast the walk goes is read there too, beside the words
+     it belongs with. The wide stage reads it in the museum's instruments. */
+  const paceRow = el('div', 'wing-pace')
+  const paceName = el('span', 'wing-pace-name')
+  paceRow.append(paceName)
+  const paceControls: [GaitPaceName, HTMLElement][] = []
+  for (const name of ['stroll', 'walk', 'brisk'] as const) {
+    const control = document.createElement('button')
+    control.type = 'button'
+    control.className = 'wing-pace-step'
+    control.dataset['paceChoice'] = name
+    control.addEventListener('click', () => { setGaitPace(name); paintPace() })
+    paceRow.append(control)
+    paceControls.push([name, control])
+  }
+  function paintPace(): void {
+    paceName.textContent = say(LOBBY_TEXT.pace)
+    for (const [name, control] of paceControls) {
+      control.textContent = say(LOBBY_TEXT[name === 'stroll' ? 'paceStroll' : name === 'walk' ? 'paceWalk' : 'paceBrisk'])
+      control.setAttribute('aria-pressed', String(gaitPace() === name))
+    }
+  }
   let footHost: HTMLElement | null = null
   const narrowStage = () => innerWidth / innerHeight <= 0.9
   /** every child a wing appended to the bar, in the order it appended them */
@@ -300,10 +326,13 @@ export function createWingFrame(
     if (away) {
       if (doorBlock.parentElement !== footHost) footHost!.append(doorBlock)
       if (wordRow.parentElement !== footHost) footHost!.append(wordRow)
+      if (paceRow.parentElement !== wordRow) wordRow.append(paceRow)
+      paintPace()
     } else {
       // back to its own place in the frame, which is under the bar and
       // before the disclosure the door opens
       if (doorBlock.parentElement !== host) railGroup.after(doorBlock)
+      paceRow.remove()
       wordRow.remove()
     }
   }

@@ -37,18 +37,29 @@ async function load(file) {
   return exports
 }
 
-const { carriedPace, gaitAt, gaitLeg, gaitRhythm, gaitEnvelopeM, gaitHeadLift, stepMetres, strollMetresPerSecond } = await load(path.join(wing, 'gait.ts'))
+const { carriedPace, gaitAt, gaitLeg, gaitRhythm, gaitEnvelopeM, gaitHeadLift, stepMetres, strollMetresPerSecond,
+  GAIT_PACES, gaitPace, gaitMetresPerSecond, setGaitPace } = await load(path.join(wing, 'gait.ts'))
 const certificate = JSON.parse(fs.readFileSync(path.join(wing, 'data/rail-clearance.json'), 'utf8'))
 
 const failures = []
 const ensure = (condition, message) => { if (!condition) failures.push(message) }
 
 /** A full walk retains its step; a ceiling-limited traverse fades it out. */
-ensure(strollMetresPerSecond === 1.6, 'The walking cruise is not 1.6 m/s')
-ensure(gaitLeg(40).rhythm === 1, 'The 1.6 m/s cruise loses its step rhythm')
-ensure(Math.abs(gaitLeg(41.875).rhythm - .5) < 1e-12, 'The rhythm does not fade between 1.6 and 1.75 m/s')
-ensure(gaitLeg(43.75).rhythm === 0, 'A 1.75 m/s traverse still carries a step rhythm')
-ensure(gaitLeg(0).seconds === 1.1 && gaitLeg(1000).seconds === 26, 'The walking duration limits changed')
+// THE PACE IS THE VISITOR'S, and the middle one is the museum's own walk.
+ensure(strollMetresPerSecond === 1.6, 'The stroll is not 1.6 m/s')
+ensure(GAIT_PACES.stroll === 1.6 && GAIT_PACES.walk === 2.4 && GAIT_PACES.brisk === 3.6, 'The three paces changed')
+ensure(gaitPace() === 'walk' && gaitMetresPerSecond() === 2.4, 'The walk a visitor is given by default is not 2.4 m/s')
+// EVERY PACE KEEPS ITS OWN STEP, and the rhythm fades over the same share of
+// it, which is what leaves the rise and fall the one amplitude the clearance
+// certificate is written against.
+for (const [name, speed] of Object.entries(GAIT_PACES)) {
+  setGaitPace(name)
+  ensure(gaitLeg(speed * 25).rhythm === 1, `The ${name} cruise loses its step rhythm`)
+  ensure(Math.abs(gaitLeg(speed * 26.171875).rhythm - .5) < 1e-9, `The ${name} rhythm does not fade over its own band`)
+  ensure(gaitLeg(speed * 27.34375).rhythm === 0, `A traverse past the ${name} band still carries a step rhythm`)
+  ensure(gaitLeg(0).seconds === 1.1 && gaitLeg(1000).seconds === 26, 'The walking duration limits changed')
+}
+setGaitPace('walk')
 
 /** Every length the rail actually walks, from the clearance certificate. */
 const lengths = [...new Set(certificate.routes.map(route => Math.round(route.roundedLength * 1000) / 1000))].sort((a, b) => a - b)
@@ -80,7 +91,8 @@ const legs = lengths.map(length => {
   ensure(gaitRhythm(leg, length / 2, true).height === 0 && gaitRhythm(leg, length / 2, true).sway === 0,
     'Reduced motion does not switch the step rhythm off')
   if (leg.rhythm > 0) {
-    ensure(peak > 0 && peak <= 1.75, `A walked ${length} m leg peaks at ${peak} m/s, outside the walking band`)
+    ensure(peak > 0 && peak <= gaitMetresPerSecond() * 1.75 / 1.6 + 1e-9,
+      `A walked ${length} m leg peaks at ${peak} m/s, outside the walking band`)
     // Close station eyes may be joined entirely by their two easing ramps.
     // Only a leg with time left to cruise must reach the strolling band.
     const hasCruise = leg.seconds > leg.accelSeconds + leg.brakeSeconds + 1e-9
@@ -157,7 +169,13 @@ function walkTrace(metres, reduced) {
 }
 const traces = [walkTrace(17.369497651827334, false), walkTrace(17.369497651827334, true), walkTrace(6.073302231899875, false)]
 ensure(traces[0].heightAmplitudeMM > 6 && traces[0].heightAmplitudeMM < 10, 'The measured rise and fall left its declared band')
-ensure(traces[0].riseAndFallPerSecond > 2.1 && traces[0].riseAndFallPerSecond < 2.5, 'The measured cadence is not a walking cadence')
+// THE CADENCE FOLLOWS THE PACE, it is not set: the measured rise and fall of
+// the trace is the leg's own cadence, whichever pace the visitor walks at.
+const walkedCadence = gaitLeg(17.369497651827334).cadenceStepsPerSecond
+// The trace carries the two ramps as well as the cruise, so it runs a tenth
+// under the cruise cadence and may not run over it.
+ensure(traces[0].riseAndFallPerSecond > walkedCadence * .85 && traces[0].riseAndFallPerSecond <= walkedCadence + 1e-9,
+  `The measured cadence ${traces[0].riseAndFallPerSecond} is not the leg's own ${walkedCadence.toFixed(2)}`)
 ensure(traces[1].heightAmplitudeMM === 0 && traces[1].swayAmplitudeMM === 0, 'Reduced motion still carries a step rhythm on the camera')
 ensure(traces.every(trace => trace.endHeightErrorMM < 1e-6 && trace.endEastErrorMM < 1e-6), 'A walk does not land on its own certified eye')
 
@@ -222,7 +240,7 @@ const report = {
   carriedPaceAndCardHandover: { share: CARD_HANDOVER, legs: carried },
   pendingReplacementsOnTheRail: pendingTraces,
   measuredOnTheRail: traces,
-  strollMetresPerSecond, stepMetres,
+  strollMetresPerSecond, stepMetres, paces: GAIT_PACES, pace: gaitPace(), paceMetresPerSecond: gaitMetresPerSecond(),
   stepRhythmEnvelopeM: +gaitEnvelopeM.toFixed(5),
   legs, headLift,
   limitations: [

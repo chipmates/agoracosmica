@@ -247,7 +247,9 @@
 .vinci-strip-row {display:flex;gap:6px;margin:0;padding:0;list-style:none;
   overflow-x:auto;overscroll-behavior:contain;scrollbar-width:thin;}
 .vinci-strip-row li {flex:0 0 auto;}
-.vinci-strip[data-dock='foot'] {left:24px;right:24px;top:auto !important;bottom:calc(var(--wing-rail-bottom) + 16px);
+/* The bar's own height is what the row stands above: the bar is 46 px at the
+   wing's own offset, and the row may never cover the way out of the room. */
+.vinci-strip[data-dock='foot'] {left:24px;right:24px;top:auto !important;bottom:calc(var(--wing-rail-bottom) + 60px);
   width:auto !important;max-width:none;padding:8px 10px 7px;}
 .vinci-strip[data-dock='foot'] .vinci-strip-item {width:116px;height:116px;}
 .vinci-strip[data-dock='foot'] .vinci-strip-year {font-size:26px;padding-bottom:14px;}
@@ -368,3 +370,12 @@
   #wing[data-wing='vinci'][data-walking] .wing-doorblock,
   #wing[data-wing='vinci'][data-walking] .vinci-exhibit-dot {opacity:1;pointer-events:auto;}
 }
+
+/* THE PACE IN THE SHEET, where the bar's words stand on a narrow stage. */
+#wing[data-wing='vinci'] .wing-sheet-foot .wing-pace {display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+  margin-top:10px;padding-top:9px;border-top:1px solid #a9977333;}
+#wing[data-wing='vinci'] .wing-pace-name {color:#c3b596;font:9px var(--sans);letter-spacing:.14em;text-indent:.14em;text-transform:uppercase;}
+#wing[data-wing='vinci'] .wing-pace-step {flex:1;min-width:0;min-height:44px;padding:8px 6px;background:none;
+  border:1px solid #a9977344;color:#eae1d1;font:9px var(--sans);letter-spacing:.12em;text-indent:.12em;text-transform:uppercase;cursor:pointer;}
+#wing[data-wing='vinci'] .wing-pace-step[aria-pressed='true'] {border-color:#edcc8c;color:#edcc8c;}
+#wing[data-wing='vinci'] .wing-pace-step:focus-visible {outline:1px solid #edcc8c;outline-offset:-2px;}

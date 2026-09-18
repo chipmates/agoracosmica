@@ -22,6 +22,7 @@ import { DISCLOSURES } from './content/disclosures'
 import { WINGS, wingBySlug, wingsOpen, wingsPreparing } from './wings/registry'
 import { lang, say, wingCount } from './wings/content'
 import { LOBBY_TEXT } from './content/lobby'
+import { gaitPace, setGaitPace } from './wings/vinci/gait'
 import { benchOptions, benchPath, createBench, type BenchOptions } from './bench'
 
 function syncLobbyCopy(): void {
@@ -994,6 +995,8 @@ function syncInstruments(): void {
     control.setAttribute('aria-pressed', String(control.dataset['language'] === lang()))
   for (const control of instrumentsEl.querySelectorAll<HTMLElement>('[data-tier-choice]'))
     control.setAttribute('aria-pressed', String(control.dataset['tierChoice'] === stack.tierName()))
+  for (const control of instrumentsEl.querySelectorAll<HTMLElement>('[data-pace-choice]'))
+    control.setAttribute('aria-pressed', String(control.dataset['paceChoice'] === gaitPace()))
   const library = instrumentsEl.querySelector<HTMLAnchorElement>('.inst-library')
   if (library) library.href = `https://agoracosmica.org/app?lang=${lang()}`
   syncSoundLabel()
@@ -1023,6 +1026,38 @@ for (const control of instrumentsEl.querySelectorAll<HTMLButtonElement>('[data-l
     if (language === 'en' || language === 'de') setLobbyLanguage(language)
   })
 }
+/* THE PACE THE VISITOR SETS. It stands beside the tier because it is the same
+   kind of choice: how the museum should behave on this device, kept on it. The
+   row is built here rather than in the page, so the wing that owns the walk
+   owns its three numbers and the shell only stands them. */
+const paceRow = document.createElement('fieldset')
+paceRow.className = 'inst-setting inst-tiers'
+const paceLegend = document.createElement('legend')
+paceLegend.dataset['lobby'] = 'pace'
+paceLegend.textContent = LOBBY_TEXT.pace.en
+paceRow.append(paceLegend)
+for (const [name, key] of [['stroll', 'paceStroll'], ['walk', 'paceWalk'], ['brisk', 'paceBrisk']] as const) {
+  const control = document.createElement('button')
+  control.type = 'button'
+  control.dataset['paceChoice'] = name
+  control.setAttribute('aria-pressed', String(gaitPace() === name))
+  const word = document.createElement('span')
+  word.dataset['lobby'] = key
+  word.textContent = LOBBY_TEXT[key].en
+  control.append(word)
+  if (name === 'walk') {
+    const cost = document.createElement('small')
+    cost.dataset['lobby'] = 'paceCost'
+    cost.textContent = LOBBY_TEXT.paceCost.en
+    control.append(cost)
+  }
+  control.addEventListener('click', () => {
+    setGaitPace(name)
+    syncInstruments()
+  })
+  paceRow.append(control)
+}
+instrumentsEl.querySelector('.inst-tiers')?.after(paceRow)
 for (const control of instrumentsEl.querySelectorAll<HTMLButtonElement>('[data-tier-choice]')) {
   control.addEventListener('click', () => {
     const name = control.dataset['tierChoice']

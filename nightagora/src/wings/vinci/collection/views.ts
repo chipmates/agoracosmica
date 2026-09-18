@@ -43,7 +43,7 @@ const HANG_EYE_NORTH = FACE.pictureWallNorth + 3.79
  * room's west wall and the door to the machines stand right behind it, so it
  * takes a shorter stand off and a longer turn, which is also why its work
  * reads squarer than the east one's. */
-const HANG_END = [{ stand: 2.335, turn: .965 }, { stand: 1.255, turn: 1.445 }] as const
+const HANG_END = [{ stand: 2.335, turn: .72 }, { stand: 1.255, turn: 1.445 }] as const
 /** The phone is the same stand with a narrower frame. Its card peeks at the
  * foot instead of docking at the side, so the aim barely turns and the work
  * takes the middle; the lens comes in rather than out, because holding the
@@ -150,11 +150,10 @@ export function collectionView(id: string, narrow: boolean): RoomPose | undefine
     // by a metre of parallax however they are built. This eye is on that
     // normal, square to the wall, 1.72 m out, which is as near as the table's
     // own edge leaves. The lens is what keeps the hall door out of the cone:
-    // its near reveal stands 42.8 degrees off the axis, against a 40.2 degree
-    // half cone at 56, where 60 would have taken it in at the frame's edge.
+ 
     case 'collection-room-reading':
-      return pose(VINCI_READING_TABLE.east + 1.72, VINCI_READING_TABLE.north, FLOOR + 1.45,
-        VINCI_READING_TABLE.east, VINCI_READING_TABLE.north, FLOOR + .9, narrow ? 76 : 56, .3)
+      return pose(VINCI_READING_TABLE.east + 2.02, VINCI_READING_TABLE.north, FLOOR + 1.45,
+        VINCI_READING_TABLE.east, VINCI_READING_TABLE.north, FLOOR + .8, narrow ? 76 : 50, .3)
     // The eye stands a stride further down the gallery than the hang's own
     // axis asks, because from the nearer place the hall's south-east door
     // opens at the frame's left edge and a slice of the corrections wall's

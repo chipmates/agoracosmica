@@ -54,6 +54,14 @@ export const LOBBY_TEXT = {
     en: 'Finest detail. Highest graphics and memory use.',
     de: 'Die feinsten Details. Braucht am meisten Grafikleistung und Speicher.',
   },
+  pace: { en: 'Pace', de: 'Gangart' },
+  paceStroll: { en: 'Stroll', de: 'Schlendern' },
+  paceWalk: { en: 'Walk', de: 'Gehen' },
+  paceBrisk: { en: 'Brisk', de: 'Zügig' },
+  paceCost: {
+    en: 'How fast you walk between stations. It stays on this device.',
+    de: 'Wie schnell du zwischen den Stationen gehst. Es bleibt auf diesem Gerät.',
+  },
   plan: { en: 'The plan', de: 'Der Plan' },
   labelsTitle: {
     en: 'How this museum labels what it shows',
