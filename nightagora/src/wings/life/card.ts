@@ -62,7 +62,7 @@ export function renderLifeCard(options: LifeCardHost): void {
     walk.addEventListener('click', () => options.walk(event))
     foot.append(walk)
   } else foot.append(make('p', 'wing-life-card-elsewhere', record.words.notCut[language]))
-  const close = make('button', 'wing-life-card-close', LIFE_WORDS.close[language])
+  const close = make('button', 'wing-life-card-close', record.words.back[language])
   close.type = 'button'
   close.addEventListener('click', () => options.close())
   foot.append(close)

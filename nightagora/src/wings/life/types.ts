@@ -106,6 +106,10 @@ export interface LifeWingWords {
   /** The age beside a year, in the wing's own words, so the reader that
    * stands at a date and this view say it from one place. */
   age: { exact: Bi; about: Bi }
+  /** One step back up, the wing's own word for it. The year card closes into
+   * the list it was opened from, and calling that Close beside the sheet's
+   * own Close puts two of the same word one under the other on a phone. */
+  back: Bi
 }
 
 export interface LifeRecord {

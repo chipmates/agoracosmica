@@ -180,7 +180,11 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     }
 
     /* THE ABSENCES STAND BESIDE WHAT IS SHOWN, counted from the record and
-       never written down beside it. */
+       never written down beside it. On a narrow stage they read at the end of
+       the list instead of standing pinned: four sentences at the foot took a
+       third of the sheet from the reading itself. */
+    if (narrow) reading.append(counts)
+    else if (counts.parentElement !== foot) foot.prepend(counts)
     counts.replaceChildren(
       make('p', 'wing-life-count', capitalise(fill(LIFE_COUNTS.dates[language], {
         total: spokenCount(tally.events.total, language),

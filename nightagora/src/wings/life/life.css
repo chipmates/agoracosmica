@@ -143,6 +143,10 @@
 .wing-life-close {flex:0 0 auto;min-width:120px;min-height:44px;padding:10px 16px;background:transparent;border:1px solid #a9977366;
   color:#e6d6b8;font:12px/1.2 var(--sans);cursor:pointer;}
 
+/* The counts read at the end of the list on a narrow stage, where a pinned
+   ledger would take a third of the sheet from the reading. */
+.wing-life-reading > .wing-life-counts {flex:0 0 auto;margin-top:14px;padding-top:10px;border-top:1px solid #a9977344;}
+
 /* THE NARROW STAGE. No viewport height anywhere: the sheet is given its box
    by the frame, and everything inside it scrolls in that box. */
 .wing-life[data-narrow='true'] .wing-life-head {padding:12px 12px 6px;}
@@ -150,7 +154,12 @@
 .wing-life[data-narrow='true'] .wing-life-second {font-size:12px;}
 .wing-life[data-narrow='true'] .wing-life-body {padding:0 12px;}
 .wing-life[data-narrow='true'] .wing-life-band-name {font-size:14px;}
-.wing-life[data-narrow='true'] .wing-life-band-sure {flex-basis:100%;padding-top:0;}
+.wing-life[data-narrow='true'] .wing-life-band-name {flex-wrap:wrap;}
+.wing-life[data-narrow='true'] .wing-life-band-sure {flex-basis:100%;padding-top:0;margin-left:16px;}
+/* The control above already names the row it is holding, so the heading stays
+   for the reading and leaves the seeing to the control. */
+.wing-life[data-narrow='true'] .wing-life-row-name {position:absolute;width:1px;height:1px;margin:-1px;padding:0;
+  overflow:hidden;clip-path:inset(50%);white-space:nowrap;}
 .wing-life[data-narrow='true'] .wing-life-date-name {flex-wrap:wrap;}
 .wing-life[data-narrow='true'] .wing-life-date-line {flex:1 1 100%;}
 .wing-life[data-narrow='true'] .wing-life-work-item {flex-wrap:wrap;}

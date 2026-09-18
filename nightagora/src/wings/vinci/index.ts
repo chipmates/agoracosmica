@@ -642,7 +642,7 @@ export function createWing():VinciWingModule {
    * so the reader that stands at a date and this view say them from one
    * place and neither keeps a copy. */
   const LIFE_CARDS=JSON.parse(cardsSource) as {floor_honesty:VinciText
-    controls:{date:{age:VinciText;age_about:VinciText}}}
+    controls:{shared:{back:VinciText};date:{age:VinciText;age_about:VinciText}}}
   const LIFE_HONESTY=LIFE_CARDS.floor_honesty
   const LIFE_AGE_WORDS={exact:LIFE_CARDS.controls.date.age,about:LIFE_CARDS.controls.date.age_about}
   const SURE_RANK:Record<Sure,number>={documented:2,inferred:1,tradition:0}
@@ -705,7 +705,7 @@ export function createWing():VinciWingModule {
       [key,{word:{en:LINE_CERTAINTY[key].en,de:LINE_CERTAINTY[key].de},colour:LINE_CERTAINTY[key].colour}])) as LifeRecord['sure']
     return {bands,events,works:lifeWorks(),people,sure,
       words:{throughLine:vinciThroughLine,secondLine:vinciLifeSecondLine,honesty:LIFE_HONESTY,notCut:vinciLifeNotCut,
-        worksRow:vinciLifeWorksRow,worksCount:vinciLifeWorksCount,age:LIFE_AGE_WORDS},
+        worksRow:vinciLifeWorksRow,worksCount:vinciLifeWorksCount,age:LIFE_AGE_WORDS,back:LIFE_CARDS.controls.shared.back},
       span:{from:Number(LIFE_BIRTH.date.slice(0,4)),to:Number(LIFE_DEATH.date.slice(0,4))}}
   }
   /** THE WORKS ROW. The register dates its paintings to a span of years and

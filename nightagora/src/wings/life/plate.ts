@@ -23,6 +23,10 @@ export const PLATE = {
   /** the blank between the life and what happened to the papers after it */
   gutter: 18,
   least: 3,
+  /** under this width the axis drops every numeral it cannot place */
+  crowded: 520,
+  /** a gap mark narrower than this carries no count */
+  countable: 15,
 } as const
 
 export interface LifePlate {
@@ -75,6 +79,10 @@ export function drawLifePlate(options: {
   const place = afterScale(afterEvents.length ? afterEvents : record.events)
   const xAfter = (year: number): number => afterLeft + place(year) * afterWidth
   const top = PLATE.pad
+  /* A NARROW PLATE CARRIES FEWER NUMERALS. Seven period labels and seven gap
+     counts stand on top of each other at a phone's width, so there the axis
+     keeps the years that bound it and the marks keep their shape. */
+  const crowded = width < PLATE.crowded
 
   /* THE PERIODS along the axis, each in the colour of the weaker of its two
      bounds, and the afterlife apart, after the blank. */
@@ -88,6 +96,7 @@ export function drawLifePlate(options: {
     const bar = add('rect', { class: 'wing-life-band', x: left, y: top, width: Math.max(PLATE.least, right - left), height: 11, rx: 1 })
     bar.style.fill = colour(band.certainty)
     if (band.afterlife) bar.setAttribute('data-afterlife', 'true')
+    if (crowded && !band.afterlife && band !== record.bands[0]) continue
     const label = add('text', { class: 'wing-life-year', x: left, y: top + 25 }, svg)
     label.textContent = String(first)
   }
@@ -101,6 +110,8 @@ export function drawLifePlate(options: {
   for (const gap of scale.gaps) {
     const left = x(gap.from), right = x(gap.to + 1)
     add('rect', { class: 'wing-life-gap', x: left, y: top - 2, width: Math.max(PLATE.least, right - left), height: 15 })
+    // a numeral narrower than its own mark is a smudge, and the list says it
+    if (right - left < PLATE.countable) continue
     const count = add('text', { class: 'wing-life-gap-count', x: (left + right) / 2, y: top + 25 })
     count.textContent = String(gap.years)
   }
