@@ -5,8 +5,8 @@ export type VinciLanguage = 'en' | 'de';
 export type VinciCertainty = 'documented' | 'reconstructed' | 'conjectural' | 'unknown';
 export type VinciStationId =
   | 'arrival' | 'courtyard' | 'hall' | 'oratory' | 'study' | 'chamber' | 'garden'
-  | 'line-early' | 'line-late' | 'line-amboise' | 'picture-room' | 'supper-wall'
-  | 'reading-table' | 'scattered' | 'flight' | 'works' | 'body' | 'grave';
+  | 'line-early' | 'line-late' | 'line-amboise' | 'picture-room' | 'picture-room-west'
+  | 'supper-wall' | 'reading-table' | 'scattered' | 'flight' | 'works' | 'body' | 'grave';
 
 export interface VinciText {
   en: string;
@@ -477,8 +477,12 @@ const stationCards: Record<VinciStationId, VinciText> = {
     de: 'Die Gartenfront nimmt die tiefe Westsonne, dahinter fällt das Tal ab. Der Hang folgt der Vermessung des Geländes, die Bepflanzung stammt von uns, denn keine Quelle hält fest, was hier zu seiner Zeit wuchs. Du verlässt das Jahr 1517. Es folgt ein Museum dessen, was erhalten ist, erbaut in unserem Jahrhundert.',
   },
   'picture-room': {
-    en: 'Twenty-five paintings hang here at the size their holders record, in the order he made them, so this wall gives you the real scale. Every position carries a picture, and each names the reproduction it comes from. The sources name every work, where it is today and what its licence says.',
-    de: 'Fünfundzwanzig Gemälde hängen hier in den Maßen, die ihre Sammlungen verzeichnen, in der Reihenfolge ihrer Entstehung, diese Wand gibt dir also den wirklichen Maßstab. Jeder Platz trägt ein Bild, und jedes nennt die Reproduktion, aus der es stammt. Die Quellen nennen jedes Werk, seinen heutigen Ort und seine Lizenz.',
+    en: 'Twenty-five paintings hang here at the size their holders record, in the order he made them, so this wall gives you the real scale. Every position carries a picture, and each names the reproduction it comes from. The sources name every work, where it is today and what its licence says. The wall is thirty-four metres long from here, and the last painting hangs at the far end.',
+    de: 'Fünfundzwanzig Gemälde hängen hier in den Maßen, die ihre Sammlungen verzeichnen, in der Reihenfolge ihrer Entstehung, diese Wand gibt dir also den wirklichen Maßstab. Jeder Platz trägt ein Bild, und jedes nennt die Reproduktion, aus der es stammt. Die Quellen nennen jedes Werk, seinen heutigen Ort und seine Lizenz. Die Wand ist von hier aus vierunddreißig Meter lang, und das letzte Gemälde hängt am anderen Ende.',
+  },
+  'picture-room-west': {
+    en: 'This end is the latest. From here the wall runs back to the first of them, and the door beside you opens on the machines.',
+    de: 'Dieses Ende ist das späteste. Von hier läuft die Wand zurück bis zum ersten Bild, und die Tür neben dir führt zu den Maschinen.',
   },
   'line-early': {
     en: 'The dates are cut into the floor, and you walk his life along them. This stretch runs from the birth his grandfather noted in 1452 to the year the French took Milan. Every date carries its document in the sources, and its colour says how sure we are.',
@@ -558,6 +562,9 @@ const seeds: readonly StationSeed[] = [
   seed('picture-room', { en: 'The picture room, at true scale', de: 'Der Bildersaal in wahrem Maßstab' },
     { en: 'Every painting of the hang stands on one wall at the size its holder records.', de: 'Jedes Gemälde der Hängung steht an einer Wand in dem Maß, das seine Sammlung verzeichnet.' },
     [emptyPicture], 'brief/CONCEPT-OPUS.md §3 S11'),
+  seed('picture-room-west', { en: 'Where the wall ends', de: 'Wo die Wand endet' },
+    { en: 'The latest painting on the wall, and the door to the machines.', de: 'Das späteste Gemälde der Wand und die Tür zu den Maschinen.' },
+    [], 'brief/CONCEPT-OPUS.md §3 S11'),
   seed('line-early', { en: 'Vinci, Florence, Milan', de: 'Vinci, Florenz, Mailand' },
     { en: 'His grandfather recorded the birth on 15 April 1452.', de: 'Sein Großvater verzeichnete die Geburt am 15. April 1452.' },
     [], 'brief/CONCEPT-GPT6.md Station 02; brief/CONCEPT-OPUS.md §3 S8'),

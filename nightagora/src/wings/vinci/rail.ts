@@ -22,6 +22,7 @@ export const COLLECTION_STATION_ROOMS:Partial<Record<VinciStationId,string>>={
   'line-late':'collection-room-line-late',
   'line-amboise':'collection-room-line-amboise',
   'picture-room':'collection-room-picture',
+  'picture-room-west':'collection-room-picture-west',
   'supper-wall':'collection-room-supper',
   'reading-table':'collection-room-reading',
   scattered:'collection-room-gallery',
@@ -88,9 +89,10 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
     return p(-33.9,SUPPER_WALL.north,COURT.level+1.66,face,SUPPER_WALL.north,COURT.level+.15,fov)
   }
   const room=COLLECTION_STATION_ROOMS[id]
-  // Floor subjects have a measured phone composition of their own; the
-  // generic room adjustment below is for upright exhibits and architecture.
-  if(room?.startsWith('collection-room-line-')){const pose=collectionView(room,narrow);if(pose)return pose}
+  // Floor subjects and the wall read end-on have a measured phone composition
+  // of their own; the generic room adjustment below is for upright exhibits
+  // and architecture, and a subject that runs away from the eye is neither.
+  if(room?.startsWith('collection-room-line-')||room?.startsWith('collection-room-picture')){const pose=collectionView(room,narrow);if(pose)return pose}
   if(room){const pose=collectionView(room,false)
     if(pose)return narrow?narrowRoomPose(pose,NARROW_AIM_STATION[id]??NARROW_AIM_SHARE):pose}
   // A future station without a room keeps the held terrace composition.

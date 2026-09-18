@@ -62,7 +62,7 @@
       "prompt": "Museum camera poses and piecewise exterior circulation in the fixed dossier frame. All poses are exhibition choices. Latest target semantic navigation on measured gate/terrace/stair/apron routes. Bounded physical near-pyramid clearance; measured geometry identity at mount. CSS projection-derived drag with 0.1 second monotone response; explicit inspection entry and return. The active certified leg finishes before a direct certified route to the newest pending target. Static material inspection aliases have separate actual placement audits.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "04a0afb12ef1aee5cce8c1f0854e9e3d237a06fce05a32a650ddee0e1b880f9c",
+      "sha256": "b70da4388fc7211c1ae784975e813f3d1aea688eacc4f95ce19710065496b6e8",
       "note": "brief/CONCEPT.md; src/wings/vinci/data/closluce.json; recipe_file=src/wings/vinci/rail.ts; companion_file=src/wings/vinci/input.ts; companion_recipe_ids=vinci/rail-smoothing,vinci/rail-proof,vinci/rail-fingerprint,vinci/rail-projection,vinci/projection-drag,vinci/rail-clearance,vinci/rail-waypoints,vinci/rail-solids,vinci/gait"
     },
     {
@@ -75,7 +75,7 @@
       "prompt": "Spoken bilingual museum labels with unchanged station names and canonical door questions. Plain source explanations and a separately opened complete record retain the original source chain, dimensional ranges, uncertainty and identical computed-hour arithmetic.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "3bd039e2c42e629f1644765eea597e34a76156eae6f51000523c406861be7224",
+      "sha256": "79553488ee6cd166b098e4c12d0c18f06f3bbf8ce51b5375bd48055302837f33",
       "note": "brief/CONCEPT-OPUS.md; brief/CONCEPT-GPT6.md; src/wings/vinci/data/doors.json; recipe_file=src/wings/vinci/content.ts; visitor_evidence_recipe=src/wings/vinci/evidence-copy.ts; visitor_evidence_sha256=1154b783a9a2b7bddd75d4d1294475ae82dbe74006e4b6ff5c0eb2df9247ed00"
     },
     {
@@ -413,7 +413,7 @@
       "prompt": "Regenerable actual geometry certificate for40 directed routes across five pose families and two viewport families. Includes foundation, entry, vegetation and all dressing; no sky, DOM or shadow-only duplicate.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-10",
-      "sha256": "78cd0b411c941165b422f1ed6f560af730e15e40a7939c1f8a85d921ab1fc794",
+      "sha256": "3777785d6108e91a5926415cb995caa40ea11b7f1295aefde3a9cfc788dec910",
       "note": "recipe_file=src/wings/vinci/data/rail-clearance.json; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail; companion_file=src/wings/vinci/collection/approaches.ts"
     },
     {
@@ -439,7 +439,7 @@
       "prompt": "The turns a route takes between two stations, written against the registered gate crossing, the access stair layout and the collection stair.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-11",
-      "sha256": "1ee4aa1732d68701a83275232ed4ec97a642171ed7dea2cf5bd0cbec85f2ddf2",
+      "sha256": "ddb8a25628b8b83e3e73939c9b310daeead6f2e101592c72548979aa443bc1d5",
       "note": "recipe_file=src/wings/vinci/rail-waypoints.ts; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail"
     },
     {

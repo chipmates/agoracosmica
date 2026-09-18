@@ -5,7 +5,7 @@
  */
 import { Vector3 } from 'three/webgpu'
 import { world } from '../site'
-import { COURT, FLOOR, GRAVE_ORIGIN, HANG_DATUM, LINE_ORIGIN, LINE_SLAB, SUPPER_WALL } from './layout'
+import { COURT, FACE, FLOOR, GRAVE_ORIGIN, HANG_DATUM, LINE_ORIGIN, LINE_SLAB, SUPPER_WALL } from './layout'
 import { STANDS } from './stands'
 
 export interface RoomPose { eye: Vector3; at: Vector3; fov: number }
@@ -46,9 +46,25 @@ export function collectionView(id: string, narrow: boolean): RoomPose | undefine
       const north = LINE_ORIGIN.north + LINE_SLAB.pitchNorth
       return lineFloorView(north, narrow)
     }
-    // The picture room, standing where a visitor stands to read a hang.
+    // THE PICTURE ROOM IS READ FROM ITS TWO ENDS. Thirty-four metres of hang
+    // in a room seven deep cannot be held from the middle: at the middle the
+    // last six works stand outside the cone and outside the look envelope too.
+    // The east end is the end a visitor comes in by from the garden, and its
+    // cone holds all twenty-five; the west end is where the wall stops, with
+    // the door to the machines at the visitor's shoulder.
+    // BOTH ENDS ARE MEASURED AGAINST THE WORKS, not adopted from the generic
+    // room adjustment, which is composed for an upright subject. End-on the
+    // wall runs from one edge of the frame to its middle, so the aim turns
+    // away from the side the card stands on; the phone takes a wider lens and
+    // a far lower aim, which is what lifts the run of it out of the card.
     case 'collection-room-picture':
-      return pose(-38.2, -35.6, EYE, -42.6, -41.8, HANG_DATUM + .1, narrow ? 74 : 58, .8)
+      return narrow
+        ? { eye: world(-23.4, -40.8, EYE), at: world(-46, -45, HANG_DATUM - 8.25), fov: 104 }
+        : { eye: world(-23.4, -40.8, EYE), at: world(-46, -45, HANG_DATUM - .1), fov: 60 }
+    case 'collection-room-picture-west':
+      return narrow
+        ? { eye: world(-60.6, -40.6, EYE), at: world(-38, -46, HANG_DATUM - 6.25), fov: 104 }
+        : { eye: world(-60.6, -40.6, EYE), at: world(-38, FACE.pictureWallNorth, HANG_DATUM - .1), fov: 60 }
     case 'collection-room-picture-long':
       return pose(-24.9, -37.9, EYE, -58, -39.9, HANG_DATUM + .3, narrow ? 78 : 62, .6)
     case 'collection-hang-near':
@@ -97,7 +113,7 @@ export function collectionView(id: string, narrow: boolean): RoomPose | undefine
 
 export const COLLECTION_VIEW_IDS = [
   'collection-room-line-early', 'collection-room-line-late', 'collection-room-line-amboise',
-  'collection-room-picture', 'collection-room-picture-long', 'collection-hang-near',
+  'collection-room-picture', 'collection-room-picture-west', 'collection-room-picture-long', 'collection-hang-near',
   'collection-room-hall', 'collection-room-hall-screw',
   'collection-room-gallery', 'collection-room-reading', 'collection-room-body',
   'collection-room-court', 'collection-room-grave', 'collection-room-parachute',

@@ -120,13 +120,16 @@ const room = hangPlacements()
 const originalWidths = [151,217,37,37,48.5,33,75,240,60,122,32,40.3,45,33,104.6,36.9,36.4,63.6,53.4,120,113,45.7,56.3,21,115].map(cm => cm / 100)
 const total = originalWidths.reduce((sum, width) => sum + width + .16, 0)
 const gap = (-25 - -59.6 - total) / 24
-let east = -59.6
+// THE WALL IS LAID FROM ITS EAST END, the end a visitor comes in by, so the
+// earliest work hangs at the door. The slot widths and the gap are unchanged,
+// which is what keeps every neighbour in the same place relative to the rest.
+let east = -25
 for (let i = 0; i < originalWidths.length; i++) {
-  const centre = east + .08 + originalWidths[i] / 2
+  const centre = east - .08 - originalWidths[i] / 2
   assert.equal(room[i].east, centre)
   assert.equal(room[i].datum, HANG_DATUM)
   assert.equal(room[i].north, FACE.pictureWallNorth + .033 + .0165)
-  east = centre + originalWidths[i] / 2 + .08 + gap
+  east = centre - originalWidths[i] / 2 - .08 - gap
 }
 const lansdowne = HANG.find(work => work.id === 'yarnwinder-lansdowne')
 assert.equal(lansdowne.width, .371)
@@ -138,6 +141,9 @@ assert.equal(lansdowne.width * 100, getWork(lansdowne.id).width_cm)
 // neighbour moved. Lansdowne's eleven holder-corrected boxes stay outside the
 // snapshot, as they were before. Re-taken again when the Adoration's height
 // and width were untransposed: its own eleven boxes, and no others, moved.
+// Re-taken at the reversal, where the wall is laid from its east end instead
+// of its west: every field is mirrored about the span, so every box moved and
+// the loop above is what proves the spacing between them did not.
 const boxes = [], retainedBoxes = []
 buildHang({ box: (...args) => boxes.push(args) })
 let offset = 0
@@ -148,7 +154,7 @@ for (const field of HANG) {
 assert.equal(boxes.length, 275)
 assert.equal(retainedBoxes.length, 264)
 assert.equal(createHash('sha256').update(JSON.stringify(retainedBoxes)).digest('hex'),
-  '1317d22ffc92791ff630464a65d5951dc3e280ada4be6c18cabc8f5a07fb4546')
+  'f11d88b8dcf1d3dc5601b86777635feaf47a60cf3a8e7ff823d3ce52e244a8dc')
 // The body wall builds one carrier per admitted sheet, and nothing else.
 const bodyBoxes = []
 buildBodyWall({ box: (...args) => bodyBoxes.push(args) })

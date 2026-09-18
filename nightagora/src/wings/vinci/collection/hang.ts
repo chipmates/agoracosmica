@@ -50,15 +50,20 @@ export const HANG: readonly Work[] = [
 const WALL = FACE.pictureWallNorth + .033
 const MOULDING = .08, DEPTH = .062
 
-/** A single layout supplies both the room's frames and the imported plates. */
+/** A single layout supplies both the room's frames and the imported plates.
+ *
+ * THE WALL IS LAID FROM ITS EAST END, which is the end a visitor comes in by
+ * from the garden: the earliest work hangs at the door, the walk down the wall
+ * runs forward in time, and the list above stays in the order of the life.
+ */
 export function hangPlacements(): readonly (Work & { east: number; north: number; datum: number })[] {
   const span: [number, number] = [-60.5 + .9, -24.1 - .9]
   const total = HANG.reduce((sum, work) => sum + work.slotWidth + MOULDING * 2, 0)
   const gap = (span[1] - span[0] - total) / (HANG.length - 1)
-  let east = span[0]
+  let east = span[1]
   return HANG.map(work => {
-    const centre = east + MOULDING + work.slotWidth / 2
-    east = centre + work.slotWidth / 2 + MOULDING + gap
+    const centre = east - MOULDING - work.slotWidth / 2
+    east = centre - work.slotWidth / 2 - MOULDING - gap
     return { ...work, east: centre, north: WALL + .0165, datum: HANG_DATUM }
   })
 }

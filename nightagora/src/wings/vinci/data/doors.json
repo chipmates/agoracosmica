@@ -164,6 +164,20 @@
       "german_provenance": "Newly authored for this commission."
     },
     {
+      "station": "picture-room-west",
+      "question_en": "Why did you leave so few paintings?",
+      "question_de": "Warum hast du so wenige Gemälde hinterlassen?",
+      "source": {
+        "converged_station": "CONCEPT.md section 3",
+        "seat_questions": [
+          "CONCEPT-OPUS.md S11",
+          "CONCEPT-GPT6.md station picture-room and door contract"
+        ]
+      },
+      "editorial_note": "Provisional: the west end ships the picture room's own question until a question of its own is written for it.",
+      "german_provenance": "Newly authored for this commission."
+    },
+    {
       "station": "supper-wall",
       "question_en": "Why did you choose such a fragile way to paint the Last Supper?",
       "question_de": "Warum hast du das Abendmahl mit einer so empfindlichen Technik gemalt?",
