@@ -42,7 +42,7 @@ const IMAGE_Z = PAPER_Z - 0.003
 /** How far the candle travels either side of the hole over one turn. Held so
  * the image, which travels 1.47 times as far the other way, stays on the part
  * of the paper the cutaway leaves open. */
-const SWEEP = 0.18
+const SWEEP = 0.15
 const PERIOD = 12
 
 /** The vitrine's own eye stands at yaw 35 degrees off the world's +z, and the
@@ -129,6 +129,10 @@ export function build(stack: Stack): ReadyMachineBuild {
   }
   demonstration.add(subject, ...faces)
   demonstration.visible = false
+  // A MOVING CASTER IS A SHADOW MAP RE-RENDERED EVERY FRAME, and the frame
+  // that catches it mid render lights the whole chamber. The candle throws no
+  // shadow: what darkens the paper is the chamber the table never moves.
+  demonstration.traverse(node => { node.castShadow = false; node.receiveShadow = false })
   stage.add(demonstration)
   base.object.add(stage)
 
@@ -161,6 +165,9 @@ export function build(stack: Stack): ReadyMachineBuild {
     if (showing === open && applied) return
     showing = open
     demonstration.visible = open
+    // The table lends itself every caster in the body, so the candle says no
+    // again on the frame it is shown.
+    if (open) demonstration.traverse(node => { node.castShadow = false })
     stage.rotation.y = open ? TABLE_YAW : 0
     stage.position.set(open ? turn.x : 0, 0, open ? turn.z : 0)
     applied = cutaway(open)
