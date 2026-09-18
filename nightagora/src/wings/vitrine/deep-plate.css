@@ -38,6 +38,19 @@
    foot of the glass beside it. */
 .deep-plate[data-stand='glass'] .deep-stand-shows {display:none;}
 
+/* THE WINDOW OWNS THE PHONE'S SCREEN, and the card folds to a peek over its
+   foot: the glass stops where the peek begins, so no part of the work is
+   read through the card, and the sentence at the ceiling stands on the glass
+   rather than under it. */
+.vitrine[data-narrow='true'][data-fill='true'] .deep-plate {bottom:var(--vitrine-peek,0px);}
+.vitrine[data-payload='deep-plate'][data-narrow='true'][data-fill='true'] .vitrine-caption
+  {bottom:calc(var(--vitrine-peek,0px) + 10px);}
+/* AT THE CEILING THE GROUND UNDER THAT SENTENCE IS THE WORK, and deep in a
+   light passage the work is near white: the sentence carries the tight dark
+   edge the rule's own marks carry, as well as the soft one. */
+.vitrine[data-payload='deep-plate'] .vitrine-caption
+  {text-shadow:0 1px 14px #0a0f13,0 0 3px #0a0f13,0 0 1px #0a0f13;}
+
 @media(max-aspect-ratio:9/10) {
   /* The caption takes the foot of a phone's viewport, so the rule stands at
      its head. */

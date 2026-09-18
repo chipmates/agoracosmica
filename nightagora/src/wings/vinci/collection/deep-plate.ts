@@ -243,6 +243,12 @@ export function createVinciWholePlate(options: {
     pxPerCm: platePxPerCm(options.work, options.plate, cut, deep ? deep.width / options.plate.pixels.width : 1),
     details: vinciPlateDetails(options.id),
   })
+  /* AN OPEN WINDOW OWNS THE SCREEN. The reproduction is the whole subject of
+     this view, and on the phone it was read through a third of the height
+     while the sheet under it stood half empty. The viewer takes the window
+     and the card folds to its peek over the foot, which is the rule the
+     other windows of this wing already stand on. */
+  if (options.narrow) Object.assign(payload, { fill: true })
   const back = document.createElement('button')
   back.type = 'button'
   back.className = 'vitrine-control'
