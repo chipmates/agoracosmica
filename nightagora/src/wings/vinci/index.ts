@@ -355,7 +355,7 @@ export function createWing():VinciWingModule {
     h.stage.parentElement!.querySelector('.wing-rail-group')!.append(lifeControl)
     life=createWingLife({host:h.labels,lang,narrow,
       floor:()=>h.stage.parentElement?.querySelector('.wing-rail-group')?.getBoundingClientRect().top??innerHeight,
-      record:lifeRecord,walk:id=>openFromPlan(id),
+      record:lifeRecord,walk:id=>openFromPlan(id),openRecord:openLifeRecord,
       returnFocus:focusTheBar,adopt:()=>lifeAdopt})
     sources=createVinciSourcesWindow(h.labels,source,()=>{mode=1;paintDock()});dock=sources.element;drawer=sources.panels.station
     occluders=collectVinciLabelOccluders(scene)
@@ -644,6 +644,42 @@ export function createWing():VinciWingModule {
     life.show(at)
     lifeAdopt=false
   }
+  /** THE RECORD BEHIND ONE DATE, opened from the life view. The reader that
+   * stands at the floor renders the same chain from its own list; the two
+   * stand side by side until that reader retires with the four stations. */
+  function renderLifeRecord(stud:Stud,host:HTMLElement):void {
+    const page=host.ownerDocument,here=lang()
+    const full=page.createElement('div');full.className='vinci-record';full.dataset['register']='record'
+    const add=(text:string|null|undefined):void=>{
+      if(!text)return
+      const line=page.createElement('p');line.className='vinci-statement';line.textContent=text;full.append(line)}
+    add(here==='de'?stud.date_label_de:stud.date_label_en)
+    add(SOURCE_READINGS[stud.id]?.[here])
+    add(stud.document);add(stud.holder)
+    add(here==='de'?stud.qualifications_de:stud.qualifications_en)
+    for(const gap of stud.gaps)add(gap)
+    for(const source of stud.sources){
+      const link=page.createElement('a');link.className='vinci-picture-source'
+      link.href=source.url;link.target='_blank';link.rel='noopener noreferrer';link.textContent=source.supports
+      full.append(link)}
+    add(stud.licence_line)
+    const data=page.createElement('pre');data.className='vinci-arithmetic'
+    data.textContent=JSON.stringify({edtf:studEdtf(stud),calendar:stud.calendar,date_original:stud.date_original,
+      date_alternatives:stud.date_alternatives,document_status:stud.document_status},null,1)
+    full.append(data)
+    host.append(full)
+  }
+  /** The same window the close look opens, over the life's own sheet. The
+   * sheet under it is inert while it stands, so the hand is handed back to
+   * the door it was opened from. */
+  function openLifeRecord(event:LifeEvent,back:()=>void):void {
+    const stud=LINE_STUDS.find(entry=>entry.id===event.id)
+    if(!stud||!sources)return
+    exhibitSources={id:`stud/${stud.id}`,title:{en:stud.date_label_en,de:stud.date_label_de},certainty:'documented',
+      renderStation(host){renderLifeRecord(stud,host)}}
+    sources.resetScroll();sources.select('station');mode=2;paintDock()
+    sources.element.addEventListener('close',()=>{exhibitSources=null;paintDock();back()},{once:true})
+  }
   /** THE TWELVE DATES THE FLOOR CUTS. The gallery lays three rows of four, so
    * these twelve carry the walk and the other forty four say so instead. */
   const LIFE_CUT=new Set(LINE_SECTIONS.flatMap(section=>[0,1,2,3].map(offset=>LINE_STUDS[section.selected+offset]?.id??'')))
@@ -725,7 +761,8 @@ export function createWing():VinciWingModule {
     return {bands,events,works:lifeWorks(),people,sure,
       here:LINE_STUDS.find(stud=>stud.date===vinciHourValues.julianDate)?.id,
       words:{throughLine:vinciThroughLine,secondLine:vinciLifeSecondLine,honesty:LIFE_HONESTY,notCut:vinciLifeNotCut,
-        worksRow:vinciLifeWorksRow,worksCount:vinciLifeWorksCount,age:LIFE_AGE_WORDS,back:LIFE_CARDS.controls.shared.back},
+        worksRow:vinciLifeWorksRow,worksCount:vinciLifeWorksCount,age:LIFE_AGE_WORDS,back:LIFE_CARDS.controls.shared.back,
+        provenance:VINCI_VITRINE_WORDS.provenance},
       span:{from:Number(LIFE_BIRTH.date.slice(0,4)),to:Number(LIFE_DEATH.date.slice(0,4))}}
   }
   /** THE WORKS ROW. The register dates its paintings to a span of years and

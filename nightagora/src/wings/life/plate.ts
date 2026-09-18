@@ -19,13 +19,13 @@ const NS = 'http://www.w3.org/2000/svg'
 export const PLATE = {
   pad: 10,
   /** the painted height of one period */
-  strip: { wide: 26, narrow: 20 },
+  strip: { wide: 26, narrow: 18 },
   /** the blank between two periods, in pixels */
   gutter: 6,
   /** the ticks of every date, under the periods */
-  ticks: { normal: 6, floor: 11, gap: 5 },
+  ticks: { normal: 5, floor: 9, gap: 5 },
   /** the afterlife, on its own scale, under a blank */
-  after: { gap: 14, height: 9, years: 11 },
+  after: { gap: 12, height: 8, years: 11 },
   least: 3,
   name: { wide: 11, narrow: 9, floor: 7.5, margin: 6 },
   /** the tracking the ribbon's names carry, which the ruler adds back */
@@ -173,11 +173,14 @@ export function drawLifePlate(options: {
       (held, piece) => !held || piece.right - piece.left > held.right - held.left ? piece : held, null)
     const words = band.place[language]
     const base = narrow ? PLATE.name.narrow : PLATE.name.wide
-    // a name no piece holds is written across the whole segment rather than
-    // dropped: a period with no name at all reads as no period
-    const run = widest && nameSize(words, widest.right - widest.left, base, PLATE.name.floor) !== null ? widest : { left: from, right: to }
-    const size = nameSize(words, run.right - run.left, base, PLATE.name.floor)
-    if (size !== null) {
+    /* A name no piece holds is written across the whole segment rather than
+       dropped, because a period with no name reads as no period. Where it
+       crosses a break it carries a halo in its own segment's ink, so the
+       dashes under it never run through the letters. */
+    const held = widest !== null && nameSize(words, widest.right - widest.left, base, PLATE.name.floor) !== null
+    const run = held ? widest : { left: from, right: to }
+    const size = run ? nameSize(words, run.right - run.left, base, PLATE.name.floor) : null
+    if (run && size !== null) {
       const text = add('text', { class: 'wing-life-place', x: (run.left + run.right) / 2, y: top + stripHeight / 2 + size * .36, 'font-size': size }, group)
       text.textContent = words
     }

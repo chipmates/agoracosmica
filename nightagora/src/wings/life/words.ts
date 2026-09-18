@@ -17,6 +17,27 @@ export const LIFE_WORDS = {
   close: { en: 'Close', de: 'Schließen' },
   /** The way back up from one date, on the reader that stands at it. */
   life: { en: 'The life', de: 'Das Leben' },
+  /** Under the ribbon: why an empty stretch is drawn narrower than it is. */
+  caption: {
+    en: 'Empty years are drawn narrow. Every stretch stands in the list.',
+    de: 'Leere Jahre sind schmal gezeichnet. Jede Strecke steht in der Liste.',
+  },
+  /** On a work of the open period that hangs in this wing. */
+  wall: { en: 'See it on the wall', de: 'An der Wand ansehen' },
+  /** A period the record puts no picture in, and one it names nobody in. */
+  noWorks: {
+    en: 'No picture in this record falls in these years.',
+    de: 'Kein Bild in diesem Verzeichnis fällt in diese Jahre.',
+  },
+  noPeople: {
+    en: 'Nobody in this record is named in these years.',
+    de: 'Niemand aus diesem Verzeichnis wird in diesen Jahren genannt.',
+  },
+  /** A life whose record holds no year at all: the ribbon is not drawn. */
+  noYears: {
+    en: 'No date in this record can be put on a year.',
+    de: 'Kein Datum in diesem Verzeichnis lässt sich auf ein Jahr legen.',
+  },
   walk: { en: 'Walk me there', de: 'Bring mich hin' },
   /** The strip under the blank, on its own clock: what happened to the work
    * after the life is not a period of that life. */
@@ -41,11 +62,30 @@ export const LIFE_ROW_WORDS = {
   people: { en: 'People', de: 'Menschen' },
 } satisfies Record<string, Bi>
 
-/** A band shows four dates closed and all of them open. The control says how
- * many are still folded away, never how many were missed. */
+/** WHAT A PERIOD HOLDS, on its item in the spine. Every date of the open
+ * period is shown, so the count is what the closed ones say about themselves
+ * and never a promise of more. */
 export const LIFE_BAND_WORDS = {
-  more: { en: '{n} more', de: '{n} weitere' },
-  fewer: { en: 'Fewer', de: 'Weniger' },
+  dates: { en: '{n} dates', de: '{n} Daten' },
+  oneDate: { en: 'One date', de: 'Ein Datum' },
+  noDate: { en: 'No date', de: 'Kein Datum' },
+} satisfies Record<string, Bi>
+
+/** HOW MANY OF A PERIOD'S WORKS HANG HERE. The museum counts what a visitor
+ * can walk to, and says so where the works are listed. */
+export const LIFE_WORKS_COUNT = {
+  some: {
+    en: '{shown} of these {total} hang in this wing.',
+    de: '{shown} dieser {total} hängen in diesem Flügel.',
+  },
+  one: {
+    en: 'One of these {total} hangs in this wing.',
+    de: 'Eines dieser {total} hängt in diesem Flügel.',
+  },
+  none: {
+    en: 'None of these hangs in this wing.',
+    de: 'Keines davon hängt in diesem Flügel.',
+  },
 } satisfies Record<string, Bi>
 
 /** THE COUNTED SENTENCES. Every count under a hundred is written as a word,

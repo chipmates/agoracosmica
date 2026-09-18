@@ -124,6 +124,9 @@ export interface LifeWingWords {
   /** The age beside a year, in the wing's own words, so the reader that
    * stands at a date and this view say it from one place. */
   age: { exact: Bi; about: Bi }
+  /** The wing's own word for the door to the record behind one date, where
+   * the wing holds such a layer. The view opens it and never draws it. */
+  provenance?: Bi
   /** One step back up, the wing's own word for it. The year card closes into
    * the list it was opened from, and calling that Close beside the sheet's
    * own Close puts two of the same word one under the other on a phone. */
@@ -144,7 +147,3 @@ export interface LifeRecord {
   /** the years the life itself runs between, the afterlife excluded */
   span: { from: number; to: number }
 }
-
-/** The three facets, in the order the view reads them. */
-export const LIFE_ROWS = ['places', 'works', 'people'] as const
-export type LifeRow = (typeof LIFE_ROWS)[number]

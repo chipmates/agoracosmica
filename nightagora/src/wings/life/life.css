@@ -13,32 +13,39 @@
 .wing-life-door:hover {color:#edcc8c;}
 .wing-life-door:focus-visible {outline:1px solid #edcc8c;outline-offset:3px;}
 
-/* THE LIFE VIEW. One sheet over the frame the canvas already holds: the years
-   drawn across the top, the three facets read under them, and one year opened
-   as a card over the foot. */
+/* THE LIFE VIEW. One sheet over the frame the canvas already holds: the whole
+   life drawn as a ribbon across the top, the places listed under it, and one
+   of them open beside the list. */
 .wing-life {position:fixed;box-sizing:border-box;flex-direction:column;margin:0;padding:0;max-width:none;max-height:none;
   background:#101d27f2;border:1px solid #a9977355;color:#eae1d1;overflow:hidden;}
 .wing-life[open] {display:flex;pointer-events:auto;}
 .wing-life:not([open]) {display:none;}
 .wing-life::backdrop {background:#081016b3;}
 
-.wing-life-head {flex:0 0 auto;padding:18px 20px 8px;}
+.wing-life-head {flex:0 0 auto;padding:16px 20px 4px;}
 .wing-life-through {margin:0;font:400 21px/1.28 var(--serif);color:#fff5e3;text-wrap:pretty;}
-.wing-life-second {margin:6px 0 0;font:13px/1.5 var(--sans);color:#b6bcae;text-wrap:pretty;}
 .wing-life-body {position:relative;flex:1 1 auto;display:flex;flex-direction:column;min-height:0;padding:0 20px;}
+/* What the live region says is for the screen reader alone. */
+.wing-life-live {position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap;}
 
 /* THE RIBBON: the drawing of the whole life, and on a wide stage the control
    for it. Every date it shows stands in the list under it. */
-.wing-life-drawing {position:relative;flex:0 0 auto;padding:6px 0 4px;}
+.wing-life-drawing {position:relative;flex:0 0 auto;padding:6px 0 2px;}
 .wing-life-plate {display:block;overflow:visible;}
+.wing-life-presses {position:absolute;inset:0;pointer-events:none;}
+/* A SEGMENT IS A 44 PX TARGET over a 26 px bar: the press is as wide as the
+   period it opens and stands clear of the ticks under it. */
+.wing-life-press {position:absolute;height:44px;padding:0;background:none;border:0;cursor:pointer;pointer-events:auto;}
+.wing-life-press:focus-visible {outline:1px solid #edcc8c;outline-offset:1px;}
 /* ONE PLACE IS OPEN. The open period is filled and its name is cut out of it;
    the others keep their ground and their name stays in the sheet's own ink. */
 .wing-life-period {fill:#c9b07d;opacity:.3;stroke:#c9b07d;stroke-opacity:.6;stroke-width:1;
   transition:opacity 240ms cubic-bezier(.25,.1,.25,1),fill 240ms cubic-bezier(.25,.1,.25,1);}
 .wing-life-segment[data-open='true'] .wing-life-period {opacity:.92;stroke-opacity:.9;}
 .wing-life-place {fill:#d6ccb8;font-family:var(--sans);letter-spacing:.02em;text-anchor:middle;
+  stroke:#101d27;stroke-width:3;stroke-linejoin:round;paint-order:stroke fill;
   transition:fill 240ms cubic-bezier(.25,.1,.25,1);}
-.wing-life-segment[data-open='true'] .wing-life-place {fill:#14222d;}
+.wing-life-segment[data-open='true'] .wing-life-place {fill:#14222d;stroke:#c9b07d;}
 /* An empty stretch interrupts the bar: the years are there and the record is
    not, so the bar stops and a rule bridges the break. */
 .wing-life-break {stroke:#a99773;stroke-opacity:.5;stroke-width:1;stroke-dasharray:2 3;}
@@ -53,127 +60,132 @@
 .wing-life-after {fill:#a99773;opacity:.3;}
 .wing-life-after-word {fill:#a8b3b7;font:9px var(--sans);letter-spacing:.14em;text-transform:uppercase;}
 .wing-life-after-year {fill:#cfc6b499;font:9px var(--sans);letter-spacing:.04em;}
-/* The ribbon's own honesty, under it: why an empty stretch is narrow. */
-.wing-life-caption {margin:2px 0 0;font:11px/1.45 var(--sans);color:#a8b3b7;text-wrap:pretty;}
+.wing-life-nothing {margin:14px 0;font:13px/1.5 var(--serif);color:#cfc6b4;}
 
-/* ONE ROW AT A TIME, on the stage that has room for one. */
-.wing-life-tabs {flex:0 0 auto;display:flex;gap:6px;padding:0 0 8px;}
-.wing-life-tabs[hidden] {display:none;}
-.wing-life-tab {flex:1 1 0;min-height:44px;padding:8px 4px;background:none;border:1px solid #a9977344;color:#b6bcae;
-  font:10px var(--sans);letter-spacing:.14em;text-transform:uppercase;cursor:pointer;}
-.wing-life-tab[aria-pressed='true'] {background:#edcc8c14;border-color:#a9977399;color:#fff5e3;}
-.wing-life-tab:focus-visible {outline:1px solid #edcc8c;outline-offset:-3px;}
+/* Under the ribbon: what the wing says about this life, and why an empty
+   stretch is drawn narrower than the years it holds. */
+.wing-life-second {margin:6px 0 0;font:13px/1.5 var(--sans);color:#b6bcae;text-wrap:pretty;}
+.wing-life-caption {margin:3px 0 8px;font:11px/1.45 var(--sans);color:#8f9a9e;text-wrap:pretty;}
+.wing-life-caption[hidden] {display:none;}
 
-/* THE READING: the three facets side by side where there is room, and one of
-   them where there is not. */
-.wing-life-reading {flex:1 1 auto;display:flex;gap:20px;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;
-  padding-bottom:12px;}
-.wing-life[data-narrow='true'] .wing-life-reading {flex-direction:column;gap:0;}
-.wing-life-section {flex:1 1 0;min-width:0;}
-.wing-life-section[data-row='places'] {flex:1.6 1 0;}
-.wing-life-section[hidden] {display:none;}
-.wing-life-row-name {margin:0 0 8px;font:10px var(--sans);letter-spacing:.18em;text-transform:uppercase;color:#d2a557;}
-.wing-life-dot {flex:0 0 8px;width:8px;height:8px;margin-top:5px;border-radius:50%;}
+/* THE READING: the places on the left, always all of them, and the one that
+   is open on the right. Each side scrolls on its own, so neither can run out
+   under the other and the sheet is never half empty. */
+.wing-life-reading {flex:1 1 auto;display:flex;gap:22px;min-height:0;padding-bottom:10px;}
+.wing-life-spine {flex:0 0 40%;margin:0;padding:0 4px 0 0;list-style:none;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;}
+.wing-life-period-body {flex:1 1 60%;min-width:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;padding-right:4px;}
 
-/* THE PERIODS. A closed band shows its name, its line and four dates. */
-.wing-life-bands {margin:0;padding:0;list-style:none;}
-.wing-life-band {margin:0 0 10px;padding:0 0 8px;border-bottom:1px solid #a9977322;}
-.wing-life-band[data-afterlife='true'] {margin-top:16px;padding-top:12px;border-top:1px solid #a9977355;}
-.wing-life-band-name {display:flex;align-items:flex-start;gap:8px;width:100%;min-height:44px;padding:4px 4px 4px 0;text-align:left;
-  background:none;border:0;color:#fff5e3;font:15px/1.35 var(--serif);cursor:pointer;}
-.wing-life-band-title {flex:1 1 auto;min-width:0;}
-.wing-life-band-sure {flex:0 0 auto;font:9px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:#a8b3b7;padding-top:4px;}
-.wing-life-band-line {margin:0 0 6px 16px;font:13px/1.5 var(--serif);color:#cfc6b4;text-wrap:pretty;}
-.wing-life-dates {margin:0 0 0 16px;padding:0;list-style:none;}
-.wing-life-date-name {display:flex;align-items:flex-start;gap:8px;width:100%;min-height:44px;padding:5px 4px 5px 0;text-align:left;
-  background:none;border:0;color:#cfc6b4;font:13px/1.4 var(--sans);cursor:pointer;}
-.wing-life-date-label {flex:0 0 auto;color:#e6d6b8;}
-.wing-life-date-line {min-width:0;color:#b6bcae;}
-.wing-life-more {min-height:44px;margin-left:16px;padding:6px 10px;background:none;border:1px solid #a9977344;color:#b6bcae;
-  font:10px var(--sans);letter-spacing:.1em;text-transform:uppercase;cursor:pointer;}
-.wing-life-band-name:focus-visible,.wing-life-date-name:focus-visible,.wing-life-more:focus-visible,.wing-life-close:focus-visible
-  {outline:1px solid #edcc8c;outline-offset:-2px;}
+.wing-life-item {margin:0;padding:0;border-bottom:1px solid #a9977322;}
+.wing-life-item[data-afterlife='true'] {margin-top:10px;border-top:1px solid #a9977355;}
+.wing-life-item-name {display:flex;flex-direction:column;gap:2px;width:100%;min-height:44px;padding:7px 8px 7px 10px;text-align:left;
+  background:none;border:0;border-left:2px solid transparent;color:#cfc6b4;font:14px/1.3 var(--serif);cursor:pointer;
+  transition:color 160ms linear,border-color 160ms linear,background-color 160ms linear;}
+.wing-life-item-name[aria-current='true'] {border-left-color:#edcc8c;background:#edcc8c0f;color:#fff5e3;}
+.wing-life-item-title {display:block;text-wrap:pretty;}
+.wing-life-item-count {font:9px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:#8f9a9e;}
+.wing-life-item-name[aria-current='true'] .wing-life-item-count {color:#c2a86f;}
+
+/* THE OPEN PERIOD, and everything the record holds about it. */
+.wing-life-period-name {margin:0;font:400 18px/1.3 var(--serif);color:#fff5e3;text-wrap:pretty;}
+.wing-life-period-line {margin:5px 0 10px;font:13px/1.5 var(--serif);color:#cfc6b4;text-wrap:pretty;}
+.wing-life-dates {margin:0;padding:0;list-style:none;}
+.wing-life-date {margin:0;padding:0;border-bottom:1px solid #a9977318;}
+.wing-life-dot {flex:0 0 8px;width:8px;height:8px;border-radius:50%;}
+.wing-life-date-name {display:flex;align-items:center;gap:9px;width:100%;min-height:44px;padding:6px 4px;text-align:left;
+  background:none;border:0;color:#e6d6b8;font:13px/1.4 var(--sans);cursor:pointer;}
+.wing-life-date-name[aria-expanded='true'] {color:#fff5e3;}
+.wing-life-date-label {min-width:0;}
+/* ONE DATE UNFOLDS WHERE IT STANDS, on its own rows, so nothing above it
+   moves and the eye stays where the finger was. */
+.wing-life-date-body {display:grid;grid-template-rows:0fr;transition:grid-template-rows 220ms ease-out;}
+.wing-life-date-body[data-open='true'] {grid-template-rows:1fr;}
+.wing-life-date-inner {overflow:hidden;padding:0 4px 0 21px;opacity:0;transition:opacity 160ms linear 60ms;}
+.wing-life-date-body[data-open='true'] .wing-life-date-inner {opacity:1;padding-bottom:10px;}
+.wing-life-date-head {display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;}
+.wing-life-date-age {font:11px var(--sans);color:#a8b3b7;}
+.wing-life-date-sure {font:9px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--certainty,#a8b3b7);}
+.wing-life-date-line {margin:6px 0 0;font:13px/1.5 var(--serif);color:#eae1d1;text-wrap:pretty;}
+.wing-life-date-source {margin:7px 0 0;font:11px/1.5 var(--sans);color:#a8b3b7;text-wrap:pretty;}
+.wing-life-date-foot {display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:9px;}
+.wing-life-date-walk,.wing-life-date-record {flex:0 1 auto;min-height:44px;padding:10px 12px;background:transparent;border:1px solid #a9977366;
+  color:#e6d6b8;font:12px var(--sans);cursor:pointer;}
+.wing-life-date-record {border-color:#a9977344;color:#b6bcae;}
+.wing-life-date-elsewhere {flex:1 1 100%;margin:0;font:11px/1.45 var(--sans);color:#a8b3b7;text-wrap:pretty;}
 /* AN EMPTY STRETCH KEEPS ITS PLACE IN THE READING: the years are there and
    the record is not. */
 .wing-life-gap-note {margin:2px 0;padding:0;}
-.wing-life-gap-line {margin:0;padding:6px 0 6px 16px;border-left:1px dashed #a9977366;font:11px/1.4 var(--sans);color:#a8b3b7;}
+.wing-life-gap-line {margin:0;padding:7px 0 7px 14px;border-left:1px dashed #a9977366;font:11px/1.4 var(--sans);color:#a8b3b7;}
 
-/* ONE QUESTION, ONCE. */
-.wing-life-ask {margin:2px 0 0 16px;padding:10px 12px;background:#edcc8c0f;border:1px solid #a9977344;}
-.wing-life-ask-line {margin:0 0 8px;font:15px/1.35 var(--serif);color:#fff5e3;}
-.wing-life-ask-row {display:flex;gap:8px;}
-.wing-life-ask-control {flex:1 1 0;min-height:44px;padding:8px 10px;background:transparent;border:1px solid #a9977366;color:#e6d6b8;
-  font:12px var(--sans);cursor:pointer;}
-.wing-life-ask-control:focus-visible {outline:1px solid #edcc8c;outline-offset:2px;}
-.wing-life-ask-note {margin:8px 0 0;font:11px/1.45 var(--sans);color:#a8b3b7;}
-
-/* THE WORKS AND THE PEOPLE. Neither is a control: a work opens where it
-   hangs, and a person is a tie the record carries, not a door. */
+/* WHAT WAS MADE IN THESE YEARS, and who the record names in them. */
+.wing-life-section {margin-top:16px;}
+.wing-life-row-name {margin:0 0 6px;font:10px var(--sans);letter-spacing:.18em;text-transform:uppercase;color:#d2a557;}
+.wing-life-empty {margin:0;font:12px/1.5 var(--sans);color:#a8b3b7;text-wrap:pretty;}
 .wing-life-works,.wing-life-people {margin:0;padding:0;list-style:none;}
-.wing-life-work-item {display:flex;gap:8px;padding:4px 0;border-bottom:1px solid #a9977318;font:12px/1.4 var(--sans);color:#cfc6b4;}
-.wing-life-work-date {flex:0 0 96px;color:#a8b3b7;}
+.wing-life-work-item {display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;padding:5px 0;border-bottom:1px solid #a9977318;
+  font:12px/1.4 var(--sans);color:#cfc6b4;}
+.wing-life-work-date {flex:0 0 auto;color:#a8b3b7;}
 .wing-life-work-title {min-width:0;}
-.wing-life-work-item::before {content:'';flex:0 0 3px;height:14px;margin-top:2px;background:#c9b07d;}
+.wing-life-work-item::before {content:'';flex:0 0 3px;align-self:stretch;min-height:14px;background:#c9b07d;}
 .wing-life-work-item[data-domain='sheet']::before {background:#8ea9b4;}
 .wing-life-work-item[data-domain='machine']::before {background:#b59a8e;}
 .wing-life-work-item[data-domain='codex']::before {background:#9ab48f;}
 .wing-life-work-item[data-domain='building']::before {background:#a2a2ac;}
-.wing-life-undated {margin:12px 0 6px;font:10px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:#a8b3b7;}
-.wing-life-person {display:flex;flex-wrap:wrap;gap:6px 8px;padding:6px 0;border-bottom:1px solid #a9977318;}
+.wing-life-work-count {margin:7px 0 0;font:11px/1.5 var(--sans);color:#a8b3b7;text-wrap:pretty;}
+.wing-life-person {display:flex;flex-wrap:wrap;gap:5px 8px;padding:6px 0;border-bottom:1px solid #a9977318;}
 .wing-life-person-name {flex:0 0 auto;font:13px/1.4 var(--serif);color:#e6d6b8;}
 .wing-life-person-role {flex:1 1 100%;font:12px/1.45 var(--sans);color:#b6bcae;text-wrap:pretty;}
 .wing-life-person-sure {flex:0 0 auto;font:9px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:#a8b3b7;padding-top:3px;}
 
-/* ONE YEAR, OPENED. It rises over the foot of the sheet on every stage, which
-   is where a phone's thumb already is. */
-.wing-life-card {position:absolute;right:20px;bottom:0;left:auto;width:min(420px,calc(100% - 40px));padding:14px 16px;
-  background:#132330f7;border:1px solid #a9977377;box-shadow:0 -6px 26px #06101799;}
-.wing-life-card[hidden] {display:none;}
-.wing-life-card-head {display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;}
-.wing-life-card-date {font:400 17px/1.3 var(--serif);color:#fff5e3;}
-.wing-life-card-age {font:11px var(--sans);color:#a8b3b7;}
-.wing-life-card-sure {font:9px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--certainty,#a8b3b7);}
-.wing-life-card-line {margin:8px 0 0;font:13px/1.5 var(--serif);color:#eae1d1;text-wrap:pretty;}
-.wing-life-card-source {margin:8px 0 0;font:11px/1.5 var(--sans);color:#a8b3b7;text-wrap:pretty;}
-.wing-life-card-foot {display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px;}
-.wing-life-card-walk {flex:1 1 auto;min-width:140px;min-height:44px;padding:10px 12px;background:transparent;border:1px solid #a9977366;
-  color:#e6d6b8;font:12px var(--sans);cursor:pointer;}
-.wing-life-card-elsewhere {flex:1 1 100%;margin:0;font:11px/1.45 var(--sans);color:#a8b3b7;text-wrap:pretty;}
-.wing-life-card-close {flex:0 0 auto;min-width:96px;min-height:44px;padding:10px 12px;background:none;border:1px solid #a9977344;
-  color:#b6bcae;font:11px var(--sans);cursor:pointer;}
-.wing-life-card-walk:focus-visible,.wing-life-card-close:focus-visible {outline:1px solid #edcc8c;outline-offset:2px;}
+/* ONE QUESTION, ONCE, at the foot of the period being read. */
+.wing-life-ask {margin:18px 0 4px;padding:10px 12px;background:#edcc8c0f;border:1px solid #a9977344;}
+.wing-life-ask-line {margin:0 0 8px;font:15px/1.35 var(--serif);color:#fff5e3;}
+.wing-life-ask-row {display:flex;gap:8px;}
+.wing-life-ask-control {flex:1 1 0;min-height:44px;padding:8px 10px;background:transparent;border:1px solid #a9977366;color:#e6d6b8;
+  font:12px var(--sans);cursor:pointer;}
+.wing-life-ask-note {margin:8px 0 0;font:11px/1.45 var(--sans);color:#a8b3b7;}
 
-.wing-life-foot {flex:0 0 auto;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:10px 20px;
+.wing-life-item-name:focus-visible,.wing-life-date-name:focus-visible,.wing-life-close:focus-visible,
+.wing-life-ask-control:focus-visible,.wing-life-date-walk:focus-visible,.wing-life-date-record:focus-visible
+  {outline:1px solid #edcc8c;outline-offset:-2px;}
+
+.wing-life-foot {flex:0 0 auto;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;padding:9px 20px;
   border-top:1px solid #a9977344;}
-.wing-life-counts {min-width:0;}
-.wing-life-count {margin:0;font:11px/1.5 var(--sans);color:#a8b3b7;text-wrap:pretty;}
-.wing-life-honesty {margin:4px 0 0;font:11px/1.5 var(--sans);color:#cfc6b4;text-wrap:pretty;}
+/* The four counts read as one block and not as a paragraph. */
+.wing-life-counts {min-width:0;columns:2;column-gap:22px;}
+.wing-life-count,.wing-life-honesty {margin:0;font:11px/1.45 var(--sans);color:#a8b3b7;text-wrap:pretty;
+  break-inside:avoid;padding-bottom:3px;}
+.wing-life-honesty {color:#cfc6b4;}
 .wing-life-close {flex:0 0 auto;min-width:120px;min-height:44px;padding:10px 16px;background:transparent;border:1px solid #a9977366;
   color:#e6d6b8;font:12px/1.2 var(--sans);cursor:pointer;}
 
-/* The counts read at the end of the list on a narrow stage, where a pinned
-   ledger would take a third of the sheet from the reading. */
-.wing-life-reading > .wing-life-counts {flex:0 0 auto;margin-top:14px;padding-top:10px;border-top:1px solid #a9977344;}
-
-/* THE NARROW STAGE. No viewport height anywhere: the sheet is given its box
-   by the frame, and everything inside it scrolls in that box. */
-.wing-life[data-narrow='true'] .wing-life-head {padding:12px 12px 6px;}
+/* THE NARROW STAGE: one column, the ribbon inert, the places an accordion.
+   No viewport height anywhere: the sheet is given its box by the frame, and
+   everything inside it scrolls in that box. */
+.wing-life[data-narrow='true'] .wing-life-head {padding:12px 12px 2px;}
 .wing-life[data-narrow='true'] .wing-life-through {font-size:16px;}
-.wing-life[data-narrow='true'] .wing-life-second {font-size:12px;}
+.wing-life[data-narrow='true'] .wing-life-second {font-size:12px;margin-top:4px;}
+.wing-life[data-narrow='true'] .wing-life-caption {font-size:10px;margin-bottom:6px;}
 .wing-life[data-narrow='true'] .wing-life-body {padding:0 12px;}
-.wing-life[data-narrow='true'] .wing-life-band-name {font-size:14px;}
-.wing-life[data-narrow='true'] .wing-life-band-name {flex-wrap:wrap;}
-.wing-life[data-narrow='true'] .wing-life-band-sure {flex-basis:100%;padding-top:0;margin-left:16px;}
-/* The control above already names the row it is holding, so the heading stays
-   for the reading and leaves the seeing to the control. */
-.wing-life[data-narrow='true'] .wing-life-row-name {position:absolute;width:1px;height:1px;margin:-1px;padding:0;
+.wing-life[data-narrow='true'] .wing-life-reading {flex-direction:column;gap:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;}
+.wing-life[data-narrow='true'] .wing-life-spine {flex:0 0 auto;overflow:visible;padding-right:0;}
+.wing-life[data-narrow='true'] .wing-life-period-body {flex:0 0 auto;overflow:visible;padding:0 0 6px 10px;}
+/* The item above the body already names the period, so on the narrow stage
+   the heading stays for the reading and leaves the seeing to the item. */
+.wing-life[data-narrow='true'] .wing-life-period-name {position:absolute;width:1px;height:1px;margin:-1px;padding:0;
   overflow:hidden;clip-path:inset(50%);white-space:nowrap;}
-.wing-life[data-narrow='true'] .wing-life-date-name {flex-wrap:wrap;}
-.wing-life[data-narrow='true'] .wing-life-date-line {flex:1 1 100%;}
-.wing-life[data-narrow='true'] .wing-life-work-item {flex-wrap:wrap;}
-.wing-life[data-narrow='true'] .wing-life-work-date {flex:0 0 auto;}
-.wing-life[data-narrow='true'] .wing-life-work-title {flex:1 1 100%;}
-.wing-life[data-narrow='true'] .wing-life-card {right:0;left:0;width:auto;padding:12px;}
+.wing-life[data-narrow='true'] .wing-life-period-line {margin-top:0;}
+/* The counts stand at the end of the one column, not pinned over it. */
+.wing-life[data-narrow='true'] .wing-life-reading > .wing-life-counts {flex:0 0 auto;margin-top:14px;padding-top:10px;
+  border-top:1px solid #a9977344;}
+.wing-life[data-narrow='true'] .wing-life-item-name {font-size:14px;}
 .wing-life[data-narrow='true'] .wing-life-foot {flex-wrap:wrap;padding:8px 12px;}
+.wing-life[data-narrow='true'] .wing-life-counts {columns:1;}
 .wing-life[data-narrow='true'] .wing-life-close {flex:1 1 auto;}
-.wing-life[data-narrow='true'] .wing-life-count {font-size:10px;}
+.wing-life[data-narrow='true'] .wing-life-count,.wing-life[data-narrow='true'] .wing-life-honesty {font-size:10px;}
+
+/* THE QUIET CEREMONY IS OPTIONAL. Where the visitor asked for no motion the
+   same states are cuts, and the marker jumps to the date it names. */
+@media (prefers-reduced-motion: reduce) {
+  .wing-life-date-body,.wing-life-date-inner,.wing-life-marker,.wing-life-period,.wing-life-place,.wing-life-item-name
+    {transition:none;}
+}
