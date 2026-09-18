@@ -48,11 +48,38 @@ export interface DeepPlateWords {
   rule: readonly { label: string; cm: number }[]
 }
 
+/** The next source in a viewer already standing: a reading turns pages, and
+ * one viewer serves the whole of it rather than one per page. */
+export interface DeepPlateShow {
+  source: DeepPlateSource
+  /** The share of the source Home shows; null is the whole of it. */
+  window?: DeepPlateWindow | null
+  title: string
+  description?: string | null
+  /** The sentence at the ceiling for this source, where it is not the one
+   * the payload was built with: a scan of a print is not "the source". */
+  ceiling?: string
+  /** Shown reversed on the glass, the viewer's own flip, so every word and
+   * every control beside it stays the right way round. */
+  flipped?: boolean
+  details?: readonly DeepPlateDetail[]
+}
+
 export interface DeepPlatePayload extends VitrinePayload {
   /** The work's rectangle on the held frame while the viewer seats itself
    * on it, and null once it has: the window dims the room behind a plate
    * that no longer stands where the room drew it. */
   origin(): VitrineRect | null
+  /** Put the next source in the same viewer. The view returns to Home for
+   * it: a new page is a new reading, not the last page's magnification. */
+  show(next: DeepPlateShow): void
+  /** The corner the rule would take, for a work whose centimetres the
+   * museum does not know. Empty clears it. */
+  stand(nodes: readonly Node[]): void
+  /** True once the source standing now has drawn a tile. */
+  drawn(): boolean
+  /** True while the view stands at Home, where there is nothing to pan. */
+  home(): boolean
 }
 
 /** Tiles a viewer may hold, by tier. A 256 px tile is 0.25 MB as RGBA8, so
@@ -99,18 +126,26 @@ export function createDeepPlatePayload(options: {
   pxPerCm: number | null
   /** What a line of this wing points at on this plate. */
   details?: readonly DeepPlateDetail[]
+  /** The source standing now has drawn its first tile: the caller may take
+   * down whatever ground it laid under the viewer. */
+  onDrawn?(): void
 }): DeepPlatePayload {
   let host: VitrinePayloadHost | undefined
   let root: HTMLDivElement | undefined, stage: HTMLDivElement | undefined
   let rule: HTMLDivElement | undefined, ruleBar: HTMLDivElement | undefined, ruleLabel: HTMLSpanElement | undefined
+  let corner: HTMLDivElement | undefined
   let viewer: import('openseadragon').Viewer | undefined
   let library: typeof import('openseadragon') | undefined
   let live = false, seated = false, tileSize = 256, tilePixels = 256 * 256, said = ''
   let framed: DeepPlateDetail | null = null
-  let grown = false, drawn = false, waiting = 0
+  let grown = false, drawn = false, waiting = 0, homeZoom = 0
   let seat: VitrineRect | null = null
-  const cut = options.window ?? { left: 0, top: 0, right: 1, bottom: 1 }
-  const { width, height } = options.source
+  /** The source standing in the viewer now. A reading replaces it; a plate
+   * never does. */
+  let shown: DeepPlateShow = { source: options.source, window: options.window, title: options.title,
+    description: options.description, details: options.details }
+  let cut = shown.window ?? { left: 0, top: 0, right: 1, bottom: 1 }
+  let { width, height } = shown.source
 
   /** The display window in the viewer's own coordinates, where the whole
    * image is one unit wide. */
@@ -186,7 +221,7 @@ export function createDeepPlatePayload(options: {
    * to look at. */
   function speak(): void {
     if (!host) return
-    const wanted = magnification() >= AT_THE_CEILING ? options.words.ceiling : standingOn()
+    const wanted = magnification() >= AT_THE_CEILING ? shown.ceiling ?? options.words.ceiling : standingOn()
     if (said === wanted) return
     said = wanted
     host.caption.textContent = wanted
@@ -254,6 +289,14 @@ export function createDeepPlatePayload(options: {
     else fit()
   }
 
+  /** Home for the page standing now: the display window, whole. */
+  function fitHome(immediate: boolean): void {
+    if (!viewer || !library) return
+    framed = null
+    viewer.viewport.fitBounds(windowBounds(), immediate)
+    homeZoom = viewer.viewport.getZoom(false)
+  }
+
   /** The one motion of the opening. The room dims whole at the same moment,
    * because from here the plate no longer stands where the room drew it. */
   function fit(): void {
@@ -263,16 +306,26 @@ export function createDeepPlatePayload(options: {
     if (root) root.dataset['seated'] = 'true'
     host.surface('hold')
     viewer.viewport.fitBounds(windowBounds(), !grown || host.reducedMotion)
+    homeZoom = viewer.viewport.getZoom(false)
+  }
+
+  /** The tile source of one page, and what one of its tiles costs. */
+  async function sourceOf(next: DeepPlateSource): Promise<Record<string, unknown>> {
+    const pyramid = await next.pyramid
+    if (pyramid) { tileSize = pyramid.tileSize; tilePixels = tileSize * tileSize; return deepTileSource(pyramid) }
+    tilePixels = next.width * next.height
+    return deepImageSource(next.file)
   }
 
   async function mountViewer(): Promise<void> {
-    const [loaded, pyramid] = await Promise.all([loadDeepViewer(), options.source.pyramid])
+    const opening = shown
+    const [loaded, source] = await Promise.all([loadDeepViewer(), sourceOf(shown.source)])
     if (!live || !stage || !host) return
+    // A page turned while the first one was still being read: the viewer is
+    // built on what the visitor is asking for now, never on what it was.
+    if (shown !== opening) { void mountViewer(); return }
     library = loaded
     const { drawer, cap } = drawing()
-    const source = pyramid ? deepTileSource(pyramid) : deepImageSource(options.source.file)
-    if (pyramid) { tileSize = pyramid.tileSize; tilePixels = tileSize * tileSize }
-    else tilePixels = width * height
     const made = new loaded.Viewer({
       element: stage,
       tileSources: source as unknown as string,
@@ -312,17 +365,20 @@ export function createDeepPlatePayload(options: {
       made.tileCache = new loaded.TileCache({ maxImageCacheCount: Math.round(cap / 2) })
     }
     made.addHandler('canvas-key', event => { event.preventDefaultAction = true })
-    made.addHandler('open', () => seatNow())
+    // The first page seats itself on the room's own frame; every page after
+    // it opens at Home in a window that already stands.
+    made.addHandler('open', () => { if (seated) fitHome(true); else seatNow() })
     made.addHandler('viewport-change', () => readout())
     // THE DRAWER THAT LANDS DECIDES WHICH EVENTS EXIST: the WebGL drawer
     // rejects a tile-drawn handler outright. A tile that has loaded is
     // drawn by the next pass of the world, and update-viewport is raised
     // after that pass, so this pair is the first drawn tile on any drawer.
-    made.addHandler('tile-loaded', () => { drawn = true; readout() })
+    made.addHandler('tile-loaded', () => { if (!drawn) { drawn = true; options.onDrawn?.() } readout() })
     made.addHandler('update-viewport', () => { if (drawn) fit() })
     // A source that never draws a tile may not leave the window standing on
     // a frame the room is no longer keeping.
     waiting = setTimeout(() => fit(), 1500) as unknown as number
+    made.viewport.setFlip(Boolean(shown.flipped))
     if (made.world.getItemCount() > 0) seatNow()
     readout()
   }
@@ -371,15 +427,20 @@ export function createDeepPlatePayload(options: {
       ruleLabel = document.createElement('span')
       ruleLabel.className = 'deep-rule-label'
       rule.append(ruleBar, ruleLabel)
-      root.append(style, stage, rule)
+      // THE CORNER THE RULE WOULD HAVE HAD. A work whose centimetres the
+      // museum does not know carries no bar; the caller's own naming of the
+      // page stands there instead, on the glass and out of the words' way.
+      corner = document.createElement('div')
+      corner.className = 'deep-stand'
+      corner.hidden = true
+      root.append(style, stage, rule, corner)
       next.element.append(root)
       next.element.tabIndex = 0
-      next.describe(options.description ?? options.title)
+      next.describe(shown.description ?? shown.title)
       seat = options.from()
       next.surface('hold')
       next.controls.append(press(options.words.whole, () => {
-        framed = null
-        if (viewer && library) viewer.viewport.fitBounds(windowBounds(), host?.reducedMotion ?? false)
+        fitHome(host?.reducedMotion ?? false)
       }))
       // A HAND THAT CANNOT SPIN A WHEEL still reaches the ceiling: the two
       // steps stand beside the fit, at the row's own size.
@@ -387,8 +448,35 @@ export function createDeepPlatePayload(options: {
         press(options.words.further, () => zoom(1 / ZOOM_STEP)))
       // ONE CONTROL PER LINE THAT POINTS: the name is the one the wing's own
       // register already carries, in both languages.
-      for (const detail of options.details ?? []) next.controls.append(press(detail.name, () => frame(detail)))
+      for (const detail of shown.details ?? []) next.controls.append(press(detail.name, () => frame(detail)))
       void mountViewer()
+    },
+    show(next) {
+      shown = next
+      cut = next.window ?? { left: 0, top: 0, right: 1, bottom: 1 }
+      width = next.source.width
+      height = next.source.height
+      framed = null
+      said = ''
+      drawn = false
+      host?.describe(next.description ?? next.title)
+      if (!viewer || !library) return
+      viewer.viewport.setFlip(Boolean(next.flipped))
+      const opening = next
+      void sourceOf(next.source).then(source => {
+        if (!live || !viewer || shown !== opening) return
+        viewer.open(source as unknown as import('openseadragon').TileSourceSpecifier)
+      })
+    },
+    stand(nodes) {
+      if (!corner) return
+      corner.replaceChildren(...nodes)
+      corner.hidden = nodes.length === 0
+    },
+    drawn() { return drawn },
+    home() {
+      if (!viewer || !homeZoom) return true
+      return viewer.viewport.getZoom(true) <= homeZoom * 1.02
     },
     layout() {
       // The stage moved under the viewer. Its own resize watch takes the
@@ -427,7 +515,7 @@ export function createDeepPlatePayload(options: {
       viewer = undefined
       root?.remove()
       root = undefined; stage = undefined; host = undefined; library = undefined
-      rule = undefined; ruleBar = undefined; ruleLabel = undefined
+      rule = undefined; ruleBar = undefined; ruleLabel = undefined; corner = undefined
       seat = null; seated = false; framed = null
     },
   }

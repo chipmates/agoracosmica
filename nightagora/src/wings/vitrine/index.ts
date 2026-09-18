@@ -51,6 +51,15 @@ const HISTORY_MARK = 'vinciExhibit'
 /** A resized canvas is a cleared canvas: it draws this many frames of the
  * room before a held payload may hold it again. */
 const RESIZE_FRAMES = 3
+/** The card's peek over the foot of a filled viewport: the grabber, the
+ * work's own name, the one control that raises the rest of the words, and
+ * the payload's own row, each at the row's own size. */
+const PEEK = 190
+/** The share of the sheet a raised card takes over the work. */
+const RAISED_SHARE = .62
+/** A drag on the grabber this far decides; a shorter one is a press. */
+const GRAB_PX = 24
+const GRAB_SLOP = 8
 
 export function createVitrine(options: {
   host: HTMLElement
@@ -68,6 +77,11 @@ export function createVitrine(options: {
   /** Where the hand lands when the control that opened the window is no
    * longer on the page to take it back. */
   returnFocus?(id: string): HTMLElement | null
+  /** The word for the one mark that dismisses a window on the phone, in the
+   * page's language. The window owns no words: this is the caller's. */
+  closeLabel?(): string
+  /** The word for the grabber that raises a folded card. */
+  raiseLabel?(): string
 }): Vitrine {
   const { host, onOpen, onClose } = options
   const document = host.ownerDocument
@@ -104,15 +118,25 @@ export function createVitrine(options: {
   body.append(line, words, aside, after)
   const controls = make('div', 'vitrine-controls')
   const foot = make('div', 'vitrine-foot')
-  card.append(body, controls, foot)
+  /** THE CARD IS A SHEET ON THE PHONE. The grabber raises it over the work
+   * and puts it back, and the work keeps the screen between the two. */
+  const grab = make('button', 'vitrine-grab')
+  grab.type = 'button'
+  grab.setAttribute('aria-controls', options.id)
+  card.append(grab, body, controls, foot)
+  /** ONE MARK DISMISSES THE WINDOW where the card's own row has stood down. */
+  const shutMark = make('button', 'vitrine-shut')
+  shutMark.type = 'button'
+  shutMark.textContent = '\u2715'
   // THE HAND MEETS THE WORDS FIRST: the card takes the focus on opening, and
   // the viewport and its controls follow it in the tab order.
-  root.append(style, scrim, hole, sheet, card, stage, payloadControls)
+  root.append(style, scrim, hole, sheet, card, stage, payloadControls, shutMark)
 
   let open: string | null = null, invoker: HTMLElement | null = null
   let marked = false, popping = false, disposed = false
   let exhibit: VitrineExhibit | null = null
   let surface: VitrineSurface = 'room', resizeFrames = 0, laidNarrow: boolean | null = null
+  let raised = false
   const reducedMotion = view.matchMedia('(prefers-reduced-motion: reduce)')
   const rects = { view: { left: 0, top: 0, width: 0, height: 0 } as VitrineRect }
 
@@ -154,16 +178,30 @@ export function createVitrine(options: {
       else root.append(payloadControls)
     }
     if (narrow) {
-      const top = 58, bottom = floor - 10, left = 8, right = width - 8
+      // THE WINDOW OWNS THE PHONE. The station's chrome stands down while a
+      // window is open, so the sheet runs to the foot of the screen and the
+      // work is not read through a third of it.
+      const top = 58, bottom = height - 10, left = 8, right = width - 8
       const tall = bottom - top
-      const viewHeight = Math.round(Math.max(160, Math.min(320, tall * .34)))
+      const fill = Boolean(exhibit?.payload?.fill)
+      const peek = Math.min(PEEK, Math.round(tall * .34))
+      const viewHeight = fill ? tall : Math.round(Math.max(160, Math.min(320, tall * .34)))
       rects.view = { left, top, width: right - left, height: viewHeight }
       place(stage, rects.view)
       // The sheet is the card's ground; the viewport above it stays open to
       // the stage, so the work is seen and not a shade through a panel.
-      place(sheet, { left, top: top + viewHeight, width: right - left, height: tall - viewHeight })
-      place(card, { left, top: top + viewHeight, width: right - left, height: tall - viewHeight })
+      const cardTop = fill ? (raised ? bottom - Math.round(tall * RAISED_SHARE) : bottom - peek) : top + viewHeight
+      place(sheet, { left, top: cardTop, width: right - left, height: bottom - cardTop })
+      place(card, { left, top: cardTop, width: right - left, height: bottom - cardTop })
       payloadControls.style.cssText = ''
+      place(shutMark, { left: right - 50, top: top + 6, width: 44, height: 44 })
+      root.dataset['fill'] = String(fill)
+      // The peek is what the payload keeps clear of the card, raised or not:
+      // a card that rises stands OVER the work rather than resizing it.
+      root.style.setProperty('--vitrine-peek', `${fill ? peek : 0}px`)
+      root.dataset['peek'] = String(fill && !raised)
+      grab.hidden = !fill
+      shutMark.hidden = false
     } else {
       const cardWidth = Math.round(Math.min(380, Math.max(320, width * .26)))
       const top = 84, bottom = floor - 16, right = width - 28
@@ -171,6 +209,11 @@ export function createVitrine(options: {
       rects.view = { left: 28, top, width: right - cardWidth - 24 - 28, height: bottom - top }
       place(stage, rects.view)
       sheet.style.cssText = ''
+      delete root.dataset['fill']
+      root.style.removeProperty('--vitrine-peek')
+      delete root.dataset['peek']
+      grab.hidden = true
+      shutMark.hidden = true
       // The payload's controls stand under the work, inside the viewport.
       const row = payloadControls
       row.style.left = `${Math.round(rects.view.left)}px`
@@ -178,8 +221,30 @@ export function createVitrine(options: {
       row.style.top = 'auto'
       row.style.bottom = `${Math.round(height - bottom)}px`
     }
+    // ONE ATTRIBUTE CARRIES THE RULE. While a window stands on the phone the
+    // station's chrome stands down, and the page's own frame reads this to
+    // know it.
+    if (narrow) document.documentElement.dataset['naWindow'] = 'phone'
+    else delete document.documentElement.dataset['naWindow']
     paintHole()
     exhibit?.payload?.layout?.()
+  }
+
+  /** The grabber says which way it goes, in the payload's own words where
+   * it has them. */
+  function nameTheGrabber(): void {
+    const words = exhibit?.payload?.raiseWords
+    grab.setAttribute('aria-label', words ? (raised ? words.down : words.up) : options.raiseLabel?.() ?? '')
+  }
+
+  /** The card over the work, or back to its peek. */
+  function setRaised(open: boolean): void {
+    if (raised === open) return
+    raised = open
+    grab.setAttribute('aria-expanded', String(raised))
+    nameTheGrabber()
+    if (!raised) body.scrollTop = 0
+    layout()
   }
 
   const payloadHost = (): VitrinePayloadHost => ({
@@ -194,6 +259,8 @@ export function createVitrine(options: {
     work: () => exhibit?.work?.() ?? null,
     surface: setSurface,
     describe: text => payloadEl.setAttribute('aria-label', text),
+    raise: open => setRaised(open),
+    peeked: () => !raised,
   })
 
   /** Our own entry, so a visitor's Back dismisses the exhibit and nothing
@@ -233,6 +300,7 @@ export function createVitrine(options: {
     exhibit = null
     root.hidden = true
     root.remove()
+    delete document.documentElement.dataset['naWindow']
     words.textContent = ''
     after.textContent = ''
     controls.textContent = ''
@@ -242,6 +310,20 @@ export function createVitrine(options: {
     back?.focus({ preventScroll: true })
   }
   const leaving = new AbortController()
+  shutMark.addEventListener('click', () => shut())
+  grab.addEventListener('click', () => setRaised(!raised))
+  // A DRAG ON THE GRABBER IS THE SAME GESTURE THE STATION'S SHEET TAKES: up
+  // raises, down lowers, and a short one is a press.
+  let grabFrom = 0, grabHeld = false
+  grab.addEventListener('pointerdown', event => { if (!event.isPrimary) return; grabHeld = true; grabFrom = event.clientY })
+  grab.addEventListener('pointerup', event => {
+    if (!grabHeld) return
+    grabHeld = false
+    const dy = event.clientY - grabFrom
+    if (Math.abs(dy) <= GRAB_SLOP) return
+    setRaised(dy <= -GRAB_PX ? true : dy >= GRAB_PX ? false : raised)
+  })
+  grab.addEventListener('pointercancel', () => { grabHeld = false })
   view.addEventListener('popstate', () => {
     if (popping) { popping = false; return }
     if (!open) return
@@ -280,6 +362,11 @@ export function createVitrine(options: {
       if (advancing) unmountPayload()
       open = next.id
       exhibit = next
+      raised = false
+      grab.setAttribute('aria-expanded', 'false')
+      shutMark.setAttribute('aria-label', options.closeLabel?.() ?? '')
+      root.dataset['payload'] = next.payload?.kind ?? ''
+      nameTheGrabber()
       if (!advancing) invoker = from
       root.dataset['exhibit'] = next.id
       card.dataset['exhibit'] = next.id
@@ -343,6 +430,7 @@ export function createVitrine(options: {
       disposed = true
       if (open) { unmountPayload(); open = null; exhibit = null }
       leaving.abort()
+      delete document.documentElement.dataset['naWindow']
       root.remove()
     },
   }

@@ -33,10 +33,24 @@ export interface VitrinePayloadHost {
   surface(kind: VitrineSurface): void
   /** The viewport's accessible name, in the page's language. */
   describe(text: string): void
+  /** Raise the card over the work, or put it back to its peek. Only the
+   * narrow stage folds a card, so a wide window ignores it. */
+  raise?(open: boolean): void
+  /** True while a folded card stands at its peek, false while it is raised,
+   * and undefined on a stage that folds no card. */
+  peeked?(): boolean
 }
 
 export interface VitrinePayload {
   readonly kind: string
+  /** THE WORK TAKES THE SCREEN. On the narrow stage the viewport runs from
+   * under the brand line to the bar and the card folds to a peek over its
+   * foot. A payload that does not ask for it is laid out as before. */
+  readonly fill?: boolean
+  /** What the grabber of a folded card is called while the card is down and
+   * while it is up, in the page's language. The window falls back to its
+   * caller's own word where a payload names none. */
+  readonly raiseWords?: { up: string; down: string }
   mount(host: VitrinePayloadHost): void
   /** One frame of the payload's own time, in seconds. */
   update?(dt: number): void

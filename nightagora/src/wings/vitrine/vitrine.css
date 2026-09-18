@@ -7,9 +7,11 @@
 /* The scrim with the work's own rectangle left clear. */
 .vitrine-hole {position:fixed;box-shadow:0 0 0 200vmax #0a0f13a8;pointer-events:none;}
 .vitrine-scrim[hidden],.vitrine-hole[hidden] {display:none;}
-.vitrine-sheet {position:fixed;display:none;pointer-events:auto;background:#0d171ff5;border:1px solid #a9977344;}
+/* THE CARD STANDS OVER THE WORK, never under it: on the narrow stage a
+   raised card covers the viewport it was peeking over. */
+.vitrine-sheet {position:fixed;display:none;z-index:1;pointer-events:auto;background:#0d171ff5;border:1px solid #a9977344;}
 .vitrine[data-narrow='true'] .vitrine-sheet {display:block;}
-.vitrine-view {position:fixed;pointer-events:none;}
+.vitrine-view {position:fixed;z-index:0;pointer-events:none;}
 .vitrine-payload {position:absolute;inset:0;pointer-events:auto;touch-action:none;outline:none;}
 .vitrine-payload:empty {pointer-events:none;}
 .vitrine-payload:focus-visible {outline:1px solid #edcc8c;outline-offset:-3px;}
@@ -19,7 +21,7 @@
 
 /* THE CARD. The line first, in its own type, then the module's own label
    sentences, the payload's text, and the controls where a hand left them. */
-.vitrine-card {position:fixed;box-sizing:border-box;display:flex;flex-direction:column;overflow:hidden;padding:20px;
+.vitrine-card {position:fixed;z-index:2;box-sizing:border-box;display:flex;flex-direction:column;overflow:hidden;padding:20px;
   background:#101d27f2;border:1px solid #a9977355;color:#eae1d1;pointer-events:auto;user-select:text;}
 .vitrine-card:focus-visible {outline:1px solid #edcc8c;outline-offset:3px;}
 .vitrine-body {flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;}
@@ -51,7 +53,7 @@
 .vitrine-foot .vinci-strip {position:static;max-width:none;margin-top:10px;}
 
 /* THE PAYLOAD'S ROW, under the work on the wide stage. */
-.vitrine-payload-controls {position:fixed;box-sizing:border-box;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;padding:0 8px;pointer-events:none;}
+.vitrine-payload-controls {position:fixed;z-index:3;box-sizing:border-box;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;padding:0 8px;pointer-events:none;}
 .vitrine-payload-controls:empty {display:none;}
 .vitrine-payload-controls > * {pointer-events:auto;}
 .vitrine-payload-controls .vitrine-control {flex:0 0 auto;background:#101d27d9;}
@@ -69,6 +71,37 @@
   .vitrine-payload-controls {position:static;flex:0 0 auto;padding:8px 0 0;justify-content:stretch;}
   .vitrine-payload-controls .vitrine-control {flex:1 1 0;background:transparent;}
 }
+
+/* THE WINDOW OWNS THE PHONE. While a close look stands on a narrow stage the
+   station's chrome stands down: the bar with its way home, the door block
+   with its question, and the brand line thinned to its own two rules. It
+   keeps its place in the layout and comes back whole on Close. */
+:root[data-na-window='phone'] .wing-rail-group,
+:root[data-na-window='phone'] .wing-doorblock {visibility:hidden;pointer-events:none;}
+:root[data-na-window='phone'] .brand {font-size:0;letter-spacing:0;gap:0;opacity:.5;}
+
+/* ONE MARK DISMISSES THE WINDOW, at the corner of the work, where the card's
+   own row has stood down behind a peek. */
+.vitrine-shut {position:fixed;z-index:4;display:none;align-items:center;justify-content:center;box-sizing:border-box;
+  min-width:44px;min-height:44px;background:#101d27d9;border:1px solid #a9977366;color:#e6d6b8;
+  font:15px/1 var(--sans);cursor:pointer;pointer-events:auto;}
+.vitrine[data-narrow='true'] .vitrine-shut {display:flex;}
+.vitrine-shut[hidden] {display:none;}
+.vitrine-shut:focus-visible {outline:1px solid #edcc8c;outline-offset:2px;}
+
+/* THE CARD IS A SHEET. Its grabber raises it over the work and puts it back,
+   which is the gesture the station's own sheet already takes. */
+.vitrine-grab {display:none;}
+.vitrine[data-narrow='true'][data-fill='true'] .vitrine-grab {flex:0 0 auto;display:flex;align-items:center;
+  justify-content:center;width:100%;min-height:44px;margin:0;padding:0;background:none;border:0;cursor:pointer;}
+.vitrine-grab::after {content:'';width:38px;height:3px;border-radius:2px;background:#c8bda6aa;}
+.vitrine-grab:focus-visible {outline:1px solid #edcc8c;outline-offset:-2px;}
+/* AT THE PEEK THE CARD IS THE WORK'S OWN NAME AND NOTHING ELSE: the volume's
+   line, the row and the walk come up with the card. */
+.vitrine[data-peek='true'] .vitrine-line,
+.vitrine[data-peek='true'] .vitrine-controls,
+.vitrine[data-peek='true'] .vitrine-foot {display:none;}
+.vitrine[data-narrow='true'][data-fill='true'] .vitrine-card {background:#0d171ff5;}
 
 /* THE PLATE over the paused frame. */
 .vitrine-plate {position:fixed;display:block;overflow:hidden;pointer-events:none;}
