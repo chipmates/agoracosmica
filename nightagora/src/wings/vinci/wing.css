@@ -99,13 +99,6 @@
   .vinci-heading:not(.vinci-construction) .vinci-title {max-width:320px;}
 }
 
-/* THE WAIT AT THE STREET. A measured hairline under the heading: the share of
-   this place's own plates that has landed. It is a measure, so it never
-   animates on its own and it is gone the moment the stone is standing. */
-.vinci-opening {position:absolute;left:46px;top:104px;width:212px;height:1px;background:#bea17333;pointer-events:none;}
-.vinci-opening-fill {display:block;height:100%;width:calc(var(--vinci-opening,0) * 100%);background:#d2a557;transition:width .5s linear;}
-@media(max-aspect-ratio:9/10) { .vinci-opening {left:18px;top:66px;width:150px;} }
-
 /* The phone's heading is the smallest block that still holds the whole hour. */
 @media(max-aspect-ratio:9/10) {
   .vinci-heading:not(.vinci-construction) {max-width:min(310px,calc(100vw - 36px));padding:6px 12px 8px;}

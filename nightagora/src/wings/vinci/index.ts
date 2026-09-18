@@ -170,7 +170,7 @@ export function createWing():VinciWingModule {
   // at a named station instead of at nothing; a measured hairline says how
   // much of the stone has landed, and a station asked for before the rail's
   // own proof is verified is placed rather than queued and lost.
-  let standing=false, scheduled=0, sign:HTMLElement|undefined, plates=0
+  let standing=false, scheduled=0
   /* THE ENTRY PAYS FOR THE WALK. `build` runs two frames after the first
    * `show`, and every material it makes compiles its pipeline the first time
    * a frame draws it. The caller holds its loading field until both are done,
@@ -235,7 +235,6 @@ export function createWing():VinciWingModule {
     labelHostHidden=h.labels.getAttribute('aria-hidden');h.labels.removeAttribute('aria-hidden')
     hosts=h;h.stage.textContent='';h.labels.textContent='';h.stage.parentElement!.dataset['wing']='vinci';const style=make('style','');style.textContent=wingCss;h.stage.append(style)
     header=make('div','vinci-heading');header.id='vinci-station-card';h.stage.append(header)
-    sign=make('div','vinci-opening');sign.append(make('span','vinci-opening-fill'));h.stage.append(sign)
   }
   function schedule() { scheduled=requestAnimationFrame(()=>{scheduled=requestAnimationFrame(build)}) }
   function build() {
@@ -435,7 +434,6 @@ export function createWing():VinciWingModule {
     header.addEventListener('pointercancel',()=>{sheetHeld=false},options)
     window.addEventListener('resize',()=>{placeCanonicalStation();paintDock()},options)
     standing=true
-    plates=stack.materials.pending()
     card=station
     const s=vinciContent[card]!
     aimPrint(s.id);exposureAt=s.id;rail.set(s.id,stationPose(s.id,narrow()),true,narrow());paintHeader();paintDock();standHere()
@@ -1466,15 +1464,6 @@ export function createWing():VinciWingModule {
       // the rail may not put the camera back, or half the walk is compiled
       // from the seat of one station, and nothing is being looked at yet.
       if(warm){if(!warm.frame())warm=undefined;return}
-      if(sign){
-        // The hairline is a measure, not a spinner: it is the share of the
-        // place's own plates that has landed.
-        const left=hosts.world.stack.materials.pending()
-        plates=Math.max(plates,left)
-        const done=plates?1-left/plates:1
-        sign.style.setProperty('--vinci-opening',String(done))
-        if(!left&&railReady()){sign.remove();sign=undefined}
-      }
       // THE ROOM HOLDS STILL WHILE A PAYLOAD HOLDS THE STAGE: nothing of it
       // walks, streams or is drawn until the vitrine hands it back.
       closeLook?.update(dt)
@@ -1513,6 +1502,6 @@ export function createWing():VinciWingModule {
       // ONE EXHIBIT AT A TIME: while one is open the other marks stand down.
       dots?.setLimit(closeLook?.id?0:DOTS_PER_TIER[hosts.world.stack.tierName()]??6)
       dots?.update(reading)},
-    stop(){visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;sign=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
+    stop(){visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
   }
 }
