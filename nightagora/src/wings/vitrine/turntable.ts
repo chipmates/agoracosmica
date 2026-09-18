@@ -176,7 +176,10 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
   function light(id: string | null): void {
     for (const [part, meshes] of overlays) for (const mesh of meshes) mesh.visible = part === id
     if (!id || overlays.has(id)) return
+    /* A mark built for the hand is not what the light lands on: it is the
+       reach of a tap, and its own mark stands beside it. */
     const found = family(id).flatMap(part => nodeFor(part)?.geometries ?? [])
+      .filter(({ node }) => !node.userData['vitrineTarget'])
     const meshes: Mesh[] = []
     for (const { node, geometry } of found) {
       const mesh = new Mesh(geometry, overlayMaterial)
@@ -344,10 +347,23 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
   /** The dossier id a node of the body stands for: its own name, or the name
    * a body built outside its record gives that part. */
   const idsByNode = new Map(Object.entries(options.nodeNames ?? {}).map(([part, node]) => [node, part]))
+  /** WHAT THE FRAME ACTUALLY DRAWS. A ray does not care whether a part is
+   * visible, so a wall a cutaway has lifted still catches every tap and names
+   * itself over the open chamber behind it. A tap lands on what a visitor can
+   * see: every node up the chain drawn, the material on, and never the light's
+   * own overlay. A mark built for the hand alone is the one exception, because
+   * nothing draws it and a hand has to reach it. */
+  function drawn(object: Object3D): boolean {
+    if (object.userData['vitrineOverlay']) return false
+    for (let node: Object3D | null = object; node; node = node.parent) if (!node.visible) return false
+    const material = (object as Mesh).material
+    if (object.userData['vitrineTarget']) return true
+    return !(material && !Array.isArray(material) && material.visible === false)
+  }
   function tap(x: number, y: number): void {
     if (!camera) return
     ray.setFromCamera(new Vector2(x / innerWidth * 2 - 1, -(y / innerHeight) * 2 + 1), camera)
-    const hit = ray.intersectObject(body.object, true).find(h => !h.object.userData['vitrineOverlay'])
+    const hit = ray.intersectObject(body.object, true).find(h => drawn(h.object))
     tapped = null
     if (hit) {
       for (let node: Object3D | null = hit.object; node && node !== body.object; node = node.parent) {

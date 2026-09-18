@@ -17,7 +17,7 @@
  */
 import {
   AdditiveBlending, Box3, Color, CylinderGeometry, DoubleSide, Group, Matrix4, Mesh,
-  MeshBasicNodeMaterial, MeshStandardNodeMaterial, SphereGeometry,
+  MeshBasicNodeMaterial, MeshStandardNodeMaterial, RingGeometry, SphereGeometry,
   type BufferGeometry, type Material,
 } from 'three/webgpu'
 import type { Stack } from '../../../stack'
@@ -44,6 +44,13 @@ const IMAGE_Z = PAPER_Z - 0.003
  * of the paper the cutaway leaves open. */
 const SWEEP = 0.15
 const PERIOD = 12
+/** WHERE A HAND CAN LAND ON THE HOLE, AND WHAT MARKS IT. The bore is 2 mm in a
+ * 1.24 m box, about one pixel of the whole view and three at the plate, so two
+ * bodies stand at it and neither is ever drawn: a ball the hand can reach,
+ * which keeps its width from every bearing, and a flat ring the light marks
+ * the place with, open in the middle so the mark never covers the hole. */
+const HOLE_REACH = 0.037
+const HOLE_MARK = { inner: 0.014, outer: 0.037, front: 0.004 }
 
 /** The vitrine's own eye stands at yaw 35 degrees off the world's +z, and the
  * chamber's hole faces the other way, because the hall's visitor meets it from
@@ -100,6 +107,9 @@ export function build(stack: Stack): ReadyMachineBuild {
   // read from the reverse, so the image stands a breath in front of it and a
   // breath behind it; the sheet's own depth hides whichever side is away.
   const carried: Group[] = []
+  // Both faces hang from one named body: a tap on either is the same picture.
+  const picture = new Group()
+  picture.name = 'vinci/camera-obscura/image'
   const faces = [IMAGE_Z, PAPER_Z + 0.003].map((z, side) => {
     const image = new Group()
     image.name = `vinci/camera-obscura/image-${side === 0 ? 'front' : 'reverse'}`
@@ -127,7 +137,27 @@ export function build(stack: Stack): ReadyMachineBuild {
       carrier.add(thrown)
     }
   }
-  demonstration.add(subject, ...faces)
+  picture.add(...faces)
+  /* The hole's own body: nothing draws either mesh, the vitrine hits the ball
+     because it is flagged as a mark built to be tapped, and the light lands on
+     the ring alone. */
+  const hole = new Group()
+  hole.name = 'vinci/camera-obscura/hole'
+  hole.position.set(0, HOLE_Y, PLATE_Z)
+  const unseen = (): MeshBasicNodeMaterial => {
+    const material = keep(new MeshBasicNodeMaterial({ color: new Color('#f2c77a'), side: DoubleSide }))
+    material.visible = false
+    return material
+  }
+  const reach = new Mesh(keep(new SphereGeometry(HOLE_REACH, 16, 12)), unseen())
+  reach.name = 'vinci/camera-obscura/hole-reach'
+  reach.userData['vitrineTarget'] = true
+  const mark = new Mesh(keep(new RingGeometry(HOLE_MARK.inner, HOLE_MARK.outer, 48)), unseen())
+  mark.name = 'vinci/camera-obscura/hole-mark'
+  mark.position.z = -HOLE_MARK.front
+  hole.add(reach, mark)
+  hole.userData['assetClass'] = 'GENERATED'
+  demonstration.add(subject, picture, hole)
   demonstration.visible = false
   // A MOVING CASTER IS A SHADOW MAP RE-RENDERED EVERY FRAME, and the frame
   // that catches it mid render lights the whole chamber. The candle throws no

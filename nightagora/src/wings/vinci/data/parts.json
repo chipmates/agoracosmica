@@ -1152,6 +1152,30 @@
       "aperture-plate": {
         "en": "Iron plate with the hole",
         "de": "Eisenplatte mit dem Loch"
+      },
+      "candle": {
+        "en": "Candle",
+        "de": "Kerze",
+        "demonstration": true,
+        "certainty": "reconstructed"
+      },
+      "image": {
+        "en": "The image on the paper",
+        "de": "Das Bild auf dem Papier",
+        "demonstration": true,
+        "certainty": "reconstructed"
+      },
+      "hole": {
+        "en": "The hole",
+        "de": "Das Loch",
+        "demonstration": true,
+        "certainty": "reconstructed"
+      },
+      "chamber": {
+        "en": "The chamber",
+        "de": "Die Kammer",
+        "demonstration": true,
+        "certainty": "reconstructed"
       }
     }
   }

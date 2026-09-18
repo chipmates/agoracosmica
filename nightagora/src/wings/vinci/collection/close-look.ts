@@ -87,7 +87,10 @@ const CONTROLS = (JSON.parse(cardsRaw) as { controls: {
 } }).controls
 type Slot = (Words & { source: string }) | null
 const LIMITS = (JSON.parse(limitsRaw) as { slots: Record<string, { limit: Slot; visual_note: Slot }> }).slots
-const PARTS = (JSON.parse(partsRaw) as { parts: Record<string, Record<string, Words>> }).parts
+/** A part's name, and what the record says the part is: a prop the museum
+ * built for its demonstration carries its own flag and class. */
+type PartRecord = Words & { demonstration?: boolean; certainty?: string }
+const PARTS = (JSON.parse(partsRaw) as { parts: Record<string, Record<string, PartRecord>> }).parts
 /** THE SIZE A MACHINE HAS, SAID ALOUD. The card speaks it, the record behind
  * the card keeps the three numerals of the same envelope. */
 const SIZES = (JSON.parse(sizesRaw) as { sizes: Record<string, Words> }).sizes
@@ -164,6 +167,16 @@ const VIEWPOINT_PARTS: Record<MachineSlug, { drive: string | null; working: stri
 const STORE_NODE_NAMES: Partial<Record<MachineSlug, Record<string, string>>> = {
   // The crank turns on the drum's own axle, so the body carries it in the drum.
   'revolving-crane': { 'handle': 'drum', 'hoist-rope': 'rope-fall' },
+  /* The chamber's demonstration is built beside the dossier and its shell is
+     welded into one body, so its four museum-built names are the nodes the
+     body carries: the lit candle, both faces of the image, the mark at the
+     hole, and the box a tap lands on where no wall is a part of its own. */
+  'camera-obscura': {
+    'candle': 'vinci/camera-obscura/source',
+    'image': 'vinci/camera-obscura/image',
+    'hole': 'vinci/camera-obscura/hole',
+    'chamber': 'camera-obscura',
+  },
 }
 
 /** A citation marker belongs to the record, never to the card. */
