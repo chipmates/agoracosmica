@@ -97,7 +97,9 @@
       "more": { "en": "More", "de": "Mehr" }
     },
     "picture": {
-      "whole_plate": { "en": "The whole plate", "de": "Die ganze Tafel" }
+      "whole_plate": { "en": "The whole plate", "de": "Die ganze Tafel" },
+      "zoom_in": { "en": "Zoom in", "de": "Näher" },
+      "zoom_out": { "en": "Zoom out", "de": "Weiter weg" }
     },
     "machine": {
       "provenance": { "en": "Where it comes from", "de": "Woher es kommt" },
