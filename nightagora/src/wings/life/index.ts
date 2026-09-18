@@ -278,7 +278,6 @@ export function createWingLife(options: WingLifeOptions): WingLife {
       item.append(press)
       spine.append(item)
     }
-    veil(record)
   }
 
   function dateCount(n: number, language: 'en' | 'de'): string {
@@ -287,18 +286,10 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     return capitalise(fill(LIFE_BAND_WORDS.dates[language], { n: spokenCount(n, language) }))
   }
 
-  /** ONE NAME IS VEILED WHILE THE QUESTION STANDS: the answer to "What came
-   * next?" is the next item of the spine, and version one printed it one line
-   * under the question. */
-  function veil(record: LifeRecord): void {
+  /** The place the question's own answer leads to, where there is one. */
+  function nextBand(record: LifeRecord): LifeBand | undefined {
     const index = record.bands.findIndex(entry => entry.id === band)
-    const next = index >= 0 ? record.bands[index + 1] : undefined
-    for (const item of [...spine.children]) {
-      const title = item.querySelector<HTMLElement>('.wing-life-item-title')
-      if (!title) continue
-      const hide = asking && next !== undefined && (item as HTMLElement).dataset['band'] === next.id
-      title.style.visibility = hide ? 'hidden' : ''
-    }
+    return index >= 0 ? record.bands[index + 1] : undefined
   }
 
   /** THE OPEN PERIOD: its dates, one of them unfolded, what was made in those
@@ -318,7 +309,7 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     if (stops.length && !stops.some(stop => stop.tabIndex === 0)) stops[0]!.tabIndex = 0
     paintWorks(record, entry, language)
     paintPeople(record, own, language)
-    if (asking) periodBody.append(question(language))
+    if (asking && nextBand(record)) periodBody.append(question(record, language))
   }
 
   /** The dates of one period in the record's own order, with the empty
@@ -472,20 +463,23 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     periodBody.append(section)
   }
 
-  /** THE ONE QUESTION, at the foot of the period being read. One tap either
-   * way and the next name is unveiled; nothing is counted, and it is never
+  /** THE ONE QUESTION, at the foot of the period being read. The answer is
+   * the place that came next, and showing it is going there: nothing in the
+   * spine is ever hidden to make the question work, because a nameless item
+   * reads as a fault and not as a veil. Nothing is counted, and it is never
    * asked again. */
-  function question(language: 'en' | 'de'): HTMLElement {
+  function question(record: LifeRecord, language: 'en' | 'de'): HTMLElement {
     const box = make('div', 'wing-life-ask')
     box.append(make('p', 'wing-life-ask-line', LIFE_WORDS.ask[language]))
     const row = make('div', 'wing-life-ask-row')
-    for (const word of [LIFE_WORDS.askShow, LIFE_WORDS.askSkip]) {
+    const next = nextBand(record)
+    for (const [index, word] of [LIFE_WORDS.askShow, LIFE_WORDS.askSkip].entries()) {
       const control = make('button', 'wing-life-ask-control', word[language])
       control.type = 'button'
       control.addEventListener('click', () => {
         asking = false
         box.remove()
-        veil(options.record())
+        if (index === 0 && next) select(next.id, 'spine')
       })
       row.append(control)
     }
