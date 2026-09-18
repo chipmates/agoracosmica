@@ -485,8 +485,8 @@ const stationCards: Record<VinciStationId, VinciText> = {
     de: 'Dieses Ende ist das späteste. Von hier läuft die Wand zurück bis zum ersten Bild, und die Tür neben dir führt zu den Maschinen.',
   },
   'line-early': {
-    en: 'The dates are cut into the floor, and you walk his life along them. This stretch runs from the birth his grandfather noted in 1452 to the year the French took Milan. Every date carries its document in the sources, and its colour says how sure we are.',
-    de: 'Die Daten sind in den Boden geschnitten, und du gehst sein Leben an ihnen ab. Dieser Abschnitt reicht von der Geburt, die sein Großvater 1452 notierte, bis zu dem Jahr, in dem die Franzosen Mailand einnahmen. Zu jedem Datum steht der Beleg in den Quellen, und seine Farbe sagt, wie sicher wir sind.',
+    en: 'The dates are cut into the floor, and you walk his life along them. Twelve of the fifty-six are cut here. Every date carries its document in the sources, and its colour says how sure we are.',
+    de: 'Die Daten sind in den Boden geschnitten, und du gehst sein Leben an ihnen ab. Zwölf der sechsundfünfzig sind hier geschnitten. Zu jedem Datum steht der Beleg in den Quellen, und seine Farbe sagt, wie sicher wir sind.',
   },
   'reading-table': {
     en: 'A page of Manuscript B lies open on this table, in a facsimile printed in 1883. He wrote from right to left because he was left handed, and a mirror reads it back. The notebook itself is in Paris.',
