@@ -171,12 +171,18 @@
 .vinci-room-source + .vinci-room-source {margin-top:24px;border-top:1px solid #a9977344;padding-top:16px;}
 .vinci-door-disclosure {font:13px/1.5 var(--sans);color:#b6bcae;margin-top:20px;}
 @media(max-aspect-ratio:9/10) {
-  #wing[data-wing='vinci'] .vinci-dock {left:8px;right:8px;top:auto;bottom:calc(var(--wing-rail-bottom) + 46px);transform:none;width:auto;height:auto;max-height:calc(100dvh - var(--wing-rail-bottom) - 110px);padding:0 16px 20px;}
+  /* THE WINDOW OWNS THE PHONE: the chrome under it stands down, so the
+     reading runs to the foot of the screen instead of stopping above a bar
+     that cannot be reached while it stands. */
+  #wing[data-wing='vinci'] .vinci-dock {left:8px;right:8px;top:10px;bottom:10px;transform:none;width:auto;height:auto;max-height:none;padding:0 16px 20px;}
   .vinci-sources-toolbar {gap:4px;padding:8px 0;align-items:stretch;}
   .vinci-sources-tabs {gap:0;}
   .vinci-sources-toolbar button {padding:8px 5px;font-size:11px;}
   .vinci-sources-tabs button {flex:1;}
-  .vinci-sources-close {max-width:66px;overflow-wrap:normal;}
+  /* ONE MARK DISMISSES THE WINDOW, at the corner: the word stays the control's
+     own name for the screen reader and the glyph is what the thumb reads. */
+  .vinci-sources-toolbar .vinci-sources-close {flex:0 0 44px;max-width:44px;font-size:0;letter-spacing:0;}
+  .vinci-sources-toolbar .vinci-sources-close::after {content:'\2715';font:15px/1 var(--sans);color:#e6d6b8;}
   .vinci-certainty-legend {display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 }
 

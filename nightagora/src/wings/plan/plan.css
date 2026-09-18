@@ -93,7 +93,17 @@
 .wing-plan-foot .wing-life-door:focus-visible {outline:1px solid #edcc8c;outline-offset:-2px;}
 .wing-plan[data-narrow='true'] .wing-plan-foot .wing-life-door {flex:1 1 auto;min-width:0;margin-right:0;padding:10px 6px;}
 .wing-plan[data-narrow='true'] .wing-plan-foot {padding:8px 12px;}
-.wing-plan[data-narrow='true'] .wing-plan-close {flex:1 1 auto;}
+/* THE FOOT'S CLOSE STANDS DOWN ON THE PHONE and one mark at the corner takes
+   it, so the foot carries the one door into the life and nothing else. */
+.wing-plan[data-narrow='true'] .wing-plan-close {display:none;}
+.wing-plan-shut {position:absolute;z-index:3;top:6px;right:6px;display:none;align-items:center;justify-content:center;
+  box-sizing:border-box;min-width:44px;min-height:44px;padding:0;background:#101d27d9;border:1px solid #a9977366;
+  color:#e6d6b8;font:15px/1 var(--sans);cursor:pointer;}
+.wing-plan[data-narrow='true'] .wing-plan-shut {display:flex;}
+.wing-plan-shut:focus-visible {outline:1px solid #edcc8c;outline-offset:2px;}
+/* The plate keeps the mark's column clear; the reading under it keeps the
+   whole width, because a station's name is what has to fit. */
+.wing-plan[data-narrow='true'] .wing-plan-drawing {margin-right:52px;}
 .wing-plan[data-narrow='true'] .wing-plan-heading {font-size:18px;}
 .wing-plan[data-narrow='true'] .wing-plan-entry {font-size:13px;}
 .wing-plan[data-narrow='true'] .wing-plan-work {font-size:12px;}

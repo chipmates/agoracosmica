@@ -1,4 +1,5 @@
 import { setRegister } from '../frame'
+import { windowOwnsTheScreen } from '../window-chrome'
 import { lang } from '../content'
 import type { VinciCertainty, VinciText } from './content'
 
@@ -98,7 +99,14 @@ export function createVinciSourcesWindow(host: HTMLElement, control: HTMLButtonE
     panels[id] = panel
     dialog.append(panel)
   }
+  /* THE WINDOW OWNS THE PHONE, the close look's rule and its one attribute:
+     while this window stands on a narrow stage the station's chrome stands
+     down, so the reading runs to the foot of the screen. */
+  const phone = matchMedia('(max-aspect-ratio: 9/10)')
+  const standDown = (): void => windowOwnsTheScreen(document, dialog.open && phone.matches)
+  phone.addEventListener('change', standDown)
   dialog.addEventListener('close', () => {
+    windowOwnsTheScreen(document, false)
     if (!live || dialog.open) return
     control.setAttribute('aria-expanded', 'false')
     onClose()
@@ -124,7 +132,13 @@ export function createVinciSourcesWindow(host: HTMLElement, control: HTMLButtonE
       if (open && !dialog.open) { dialog.showModal(); buttons[selected].focus({ preventScroll: true }) }
       else if (!open && dialog.open) dialog.close()
       control.setAttribute('aria-expanded', String(open))
+      standDown()
     },
-    dispose() { live = false; dialog.close(); dialog.remove() },
+    dispose() {
+      live = false
+      phone.removeEventListener('change', standDown)
+      windowOwnsTheScreen(document, false)
+      dialog.close(); dialog.remove()
+    },
   }
 }

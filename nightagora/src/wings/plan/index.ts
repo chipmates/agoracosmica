@@ -18,6 +18,7 @@
  */
 
 import css from './plan.css?inline'
+import { windowOwnsTheScreen } from '../window-chrome'
 import { drawPlanPlate, PLATE_NAME_FLOOR, PLATE_NAME_PX, type PlanPlate } from './plate'
 import { PLAN_WORDS } from './words'
 import type { PlanSite } from './types'
@@ -31,7 +32,9 @@ const HISTORY_MARK = 'wingPlan'
 export const PLAN_WIDE = { top: 76, side: 28, bottom: 18, padding: 20, gap: 22, plateShare: .66, readingMin: 270, readingMax: 380 } as const
 /** THE NARROW STAGE: the sheet rises from the bar, the plate on top scaled to
  * fit whole, the reading under it. */
-export const PLAN_NARROW = { top: 58, side: 8, bottom: 10, padding: 12, gap: 10, plateShare: .58, plateLeast: 190, plateMost: 400 } as const
+/** THE SHEET OWNS THE SCREEN ON THE PHONE: the chrome under it stands down,
+ * so the sheet is bounded by the viewport and not by the bar. */
+export const PLAN_NARROW = { top: 10, side: 8, bottom: 10, padding: 12, gap: 10, plateShare: .58, plateLeast: 190, plateMost: 400 } as const
 
 export interface WingPlanOptions {
   host: HTMLElement
@@ -107,8 +110,13 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
   close.type = 'button'
   close.addEventListener('click', () => shut())
   foot.append(lifeDoor, close)
+  /** ONE MARK DISMISSES THE SHEET where the foot's Close has stood down: the
+   * close look's grammar, at the corner the thumb reaches. */
+  const shutMark = make('button', 'wing-plan-shut', '\u2715')
+  shutMark.type = 'button'
+  shutMark.addEventListener('click', () => shut())
   sheet.append(drawing, reading)
-  dialog.append(style, sheet, foot)
+  dialog.append(style, sheet, foot, shutMark)
   host.append(dialog)
 
   let live = true, open = false, marked = false, popping = false
@@ -132,15 +140,15 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
     if (!open) return
     const width = view.innerWidth, height = view.innerHeight
     const narrow = options.narrow()
-    const floor = Math.min(height, Math.max(0, options.floor()))
     dialog.dataset['narrow'] = String(narrow)
     const numbers = narrow ? PLAN_NARROW : PLAN_WIDE
     /* THE SHEET IS MODAL, so the bar under it cannot be reached while it
-       stands and is not what bounds it: the wide stage takes the viewport's
-       own height less its margin, and the plate grows with it. The narrow
-       sheet still rises from the bar, which is where it comes from. */
+       stands and is not what bounds it. On the phone the chrome under it also
+       stands down, so both stages take the viewport's own height less their
+       margin and the plate grows with it. */
+    windowOwnsTheScreen(document_, narrow)
     const top = numbers.top
-    const bottom = Math.max(top + 200, (narrow ? floor : height) - numbers.bottom)
+    const bottom = Math.max(top + 200, height - numbers.bottom)
     const left = narrow ? numbers.side : Math.max(numbers.side, Math.round((width - 980) / 2))
     Object.assign(dialog.style, {
       left: `${left}px`, top: `${top}px`,
@@ -160,6 +168,7 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
     const stood = new Set(options.stood())
     dialog.setAttribute('aria-label', `${say(PLAN_WORDS.plan)} · ${options.title()}`)
     close.textContent = say(PLAN_WORDS.close)
+    shutMark.setAttribute('aria-label', say(PLAN_WORDS.close))
     // The wing answers in the page's language, so the word is read on every paint.
     const door = options.life?.()
     lifeDoor.hidden = !door
@@ -169,7 +178,8 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
     const numbers = narrow ? PLAN_NARROW : PLAN_WIDE
     const area = narrow
       ? {
-        width: Math.max(80, box.width - numbers.padding * 2),
+        // the column the one mark at the corner stands in
+        width: Math.max(80, box.width - numbers.padding * 2 - 52),
         height: Math.max(80, Math.min(PLAN_NARROW.plateMost, Math.max(PLAN_NARROW.plateLeast, (box.height - numbers.padding * 2) * numbers.plateShare))),
       }
       : {
@@ -254,6 +264,7 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
   function shut(): void {
     if (!open) return
     open = false
+    windowOwnsTheScreen(document_, false)
     unmark()
     if (dialog.open) dialog.close()
     options.returnFocus()
@@ -323,6 +334,7 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
       live = false
       open = false
       marked = false
+      windowOwnsTheScreen(document_, false)
       leaving.abort()
       if (dialog.open) dialog.close()
       dialog.remove()
