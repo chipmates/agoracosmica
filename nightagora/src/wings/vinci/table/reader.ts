@@ -14,9 +14,10 @@
  */
 import { lang } from '../../content'
 import type { ManifestEntry, ManifestIndex } from '../../../manifest'
-import type { DeepPlateTier } from '../../vitrine/deep-plate'
+import type { DeepPlateSource, DeepPlateTier } from '../../vitrine/deep-plate'
 import { createReaderPayload as createReader, type ReaderBook, type ReaderSide } from '../../vitrine/reader'
 import type { VitrinePayload } from '../../vitrine/types'
+import { vinciLeafSource } from '../collection/deep-plate'
 import { buildAbsences, buildCodexList } from './codex-shelf'
 import { FAMOUS_FOLIOS, MIRROR_EXPLANATION, TABLE_UI, folioKey, folioProvenance, hasItalian, type Language, type PageRecord } from './content'
 import type { ReadingTable } from './index'
@@ -90,6 +91,12 @@ export function createReaderPayload(options: {
   }
   const windowOf = (page: PageRecord) => SHEETS[sheetKey(page)]?.window ?? null
 
+  /** Where the pixels of one record come from: the store's pyramid for that
+   * page where one is cut, the scan itself where none is. */
+  function source(page: PageRecord, read: { file: string; width: number; height: number }): DeepPlateSource {
+    return index ? vinciLeafSource(index, page.file, read) : { pyramid: null, ...read }
+  }
+
   const identity = (page: PageRecord): string => page.codex && page.folio !== null && page.side
     ? `${page.folio} ${page.side === 'recto' ? copy.recto : copy.verso}` : kind(page)
 
@@ -111,8 +118,8 @@ export function createReaderPayload(options: {
     return [
       { id: 'hand', label: options.words.hand, ...own },
       { id: 'mirror', label: options.words.mirror, mirrored: true, line: MIRROR_EXPLANATION[language].documented, ...own },
-      ...(printed ? [{ id: 'print', label: options.words.print, line: copy.printedPage,
-        source: { pyramid: null, ...printed }, ...own }] : []),
+      ...(printed && facing ? [{ id: 'print', label: options.words.print, line: copy.printedPage,
+        source: source(facing, printed), ...own }] : []),
     ]
   }
 
@@ -127,7 +134,7 @@ export function createReaderPayload(options: {
         id: folioKey(page),
         label: identity(page),
         shows: language === 'en' ? page.what_it_shows_en : page.what_it_shows_de,
-        source: { pyramid: null, ...read },
+        source: source(page, read),
         window: windowOf(page),
         thumb: url(file(page, false)),
         ways: ways(page),

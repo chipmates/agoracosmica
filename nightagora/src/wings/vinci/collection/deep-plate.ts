@@ -8,8 +8,8 @@
  */
 import { lang } from '../../content'
 import { ASSET_BASE } from '../../../stack/materials'
-import { loadManifest, type ManifestEntry } from '../../../manifest'
-import { createDeepPlatePayload, type DeepPlateDetail, type DeepPlateTier } from '../../vitrine/deep-plate'
+import { loadManifest, type ManifestEntry, type ManifestIndex } from '../../../manifest'
+import { createDeepPlatePayload, type DeepPlateDetail, type DeepPlateSource, type DeepPlateTier } from '../../vitrine/deep-plate'
 import type { DeepTilePyramid } from '../../vitrine/deep-viewer'
 import type { VitrineExhibit, VitrineRect } from '../../vitrine'
 import { validatePaintingRecord } from '../pictures/policy'
@@ -91,6 +91,31 @@ export async function vinciPlatePyramid(plate: ResolvedPicturePlate): Promise<De
   // provenance line, and never a place to fetch a tile from.
   return { base: `${ASSET_BASE}${tiles.wing}/${tiles.path}`.slice(0, -1), width: tiles.width,
     height: tiles.height, tileSize: tiles.tile_size, scaleFactors: tiles.scale_factors }
+}
+
+/** THE STORE'S PYRAMID FOR ONE LEAF OF THE EDITION, or the scan itself
+ * where none is cut. The nearer scan of a leaf is admitted beside the one
+ * the strip shows, so the pyramid carries its own pixels and the source's
+ * shape is taken from the pyramid rather than from the thumb's record. A
+ * record is read only when the file it names is the one it says it was cut
+ * from; anything else falls back to the scan, and the ceiling sentence
+ * stays true either way, because the ceiling is whatever source the window
+ * opened. */
+export function vinciLeafSource(index: ManifestIndex, page: string,
+  scan: { file: string; width: number; height: number }): DeepPlateSource {
+  const tiles = index.all.find(entry => (entry as TilesRecord).role === 'leaf-tiles'
+    && (entry as TilesRecord & { page?: string }).page === page) as TilesRecord | undefined
+  if (!tiles || tiles.display !== true || !tiles.width || !tiles.height) return { pyramid: null, ...scan }
+  if (!tiles.tile_size || !tiles.scale_factors?.length || !tiles.path.endsWith('/')) return { pyramid: null, ...scan }
+  const source = index.byId.get(tiles.derived_from ?? '')
+  if (!source || !tiles.source_sha256 || source.sha256 !== tiles.source_sha256) return { pyramid: null, ...scan }
+  return {
+    pyramid: { base: `${ASSET_BASE}${tiles.wing}/${tiles.path}`.slice(0, -1), width: tiles.width,
+      height: tiles.height, tileSize: tiles.tile_size, scaleFactors: tiles.scale_factors },
+    file: scan.file,
+    width: tiles.width,
+    height: tiles.height,
+  }
 }
 
 /** PIXELS OF THE SOURCE ACROSS ONE CENTIMETRE OF THE WORK. The display
