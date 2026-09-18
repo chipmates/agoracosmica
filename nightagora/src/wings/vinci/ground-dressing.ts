@@ -3,6 +3,7 @@ import {
   BufferGeometry, Color, DoubleSide, Float32BufferAttribute,
   Group, Mesh, MeshStandardNodeMaterial, Vector3,
 } from 'three/webgpu'
+import { leftOutAtCalm } from './calm-tier'
 import type { TierName } from '../../stack/tier'
 import { dossier, edgeDistance, feature, inside, polygon, type Quantity } from './site'
 import { getPathCorridors, pathSpecifications } from './paths'
@@ -178,6 +179,12 @@ export function planGroundDressing(heightAt: HeightAt, tier: TierName): Dressing
   const group = new Group()
   group.name = 'vinci generated conjectural ground dressing'
   group.userData = { ...PROVENANCE }
+  // The tier switch is empty as shipped: with nothing named, this is false
+  // at every tier and the ground is sown as it always was.
+  if (leftOutAtCalm(tier, 'ground-dressing')) {
+    group.userData['leftOutAtCalm'] = true
+    return { group, steps: Array.from({ length: GROUND_DRESSING_STEPS }, () => (): void => {}) }
+  }
   const sowing = sow(group, heightAt, tier)
   // the last step drains what is left, so the plan finishes even if a seam
   // is never reached: a tier whose target is met early yields fewer times

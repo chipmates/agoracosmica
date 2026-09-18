@@ -16,6 +16,7 @@ import {
   Vector3,
 } from 'three/webgpu'
 import { mix, positionWorld, sin, vec3 } from 'three/tsl'
+import { leftOutAtCalm } from './calm-tier'
 import type { TierName } from '../../stack/tier'
 import { dossier, edgeDistance, feature, inside, polygon, type Quantity } from './site'
 import { collectionExclusions } from './collection'
@@ -206,6 +207,12 @@ export function planVegetation(
   const group = new Group()
   group.name = 'vinci generated conjectural landscape trees'
   group.userData = { ...PROVENANCE }
+  // The tier switch is empty as shipped: with nothing named, this is false
+  // at every tier and the wood is sown as it always was.
+  if (leftOutAtCalm(tier, 'vegetation')) {
+    group.userData['leftOutAtCalm'] = true
+    return { group, steps: Array.from({ length: VEGETATION_STEPS }, () => (): void => {}) }
+  }
   const growing = grow(group, heightAt, tier)
   const steps = Array.from({ length: VEGETATION_STEPS }, (_, i) =>
     i === VEGETATION_STEPS - 1
