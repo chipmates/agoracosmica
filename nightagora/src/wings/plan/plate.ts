@@ -34,6 +34,8 @@ const NAME_TRACKING = .04
 const NUMBER_TRACKING = .06
 /** clear ground each side of a name inside its room */
 const NAME_MARGIN = 4
+/** a name's line, for a plate measured before it is laid out */
+const NAME_LINE = 1.75
 /** The dot with its ring, in pixels, and the standing dot with its second
  * ring: what the drawing actually puts on the plate at a mark. */
 const RING = 9.5, RING_HERE = 13.5
@@ -47,16 +49,17 @@ const LEADER_GAP = 9
  * room and is left off only when even the floor will not hold it. German is
  * the worst case and is the one that decides. */
 let ruler: CanvasRenderingContext2D | null | undefined
-function textWidth(words: string, px: number, tracking: number): number {
+function rule(px: number): CanvasRenderingContext2D | null {
   ruler ??= document.createElement('canvas').getContext('2d')
+  if (!ruler) return null
   const face = getComputedStyle(document.documentElement).getPropertyValue('--sans').trim() || 'sans-serif'
-  if (!ruler) return words.length * px * .54
   ruler.font = `${px}px ${face}`
-  return ruler.measureText(words).width + words.length * px * tracking
+  return ruler
 }
-function nameSize(words: string, room: number, base: number, floor: number): number | null {
-  for (let px = base; px >= floor; px -= .5) if (textWidth(words, px, NAME_TRACKING) <= room - NAME_MARGIN) return px
-  return null
+function textWidth(words: string, px: number, tracking: number): number {
+  const at = rule(px)
+  if (!at) return words.length * px * .54
+  return at.measureText(words).width + words.length * px * tracking
 }
 
 interface Box { l: number; t: number; r: number; b: number }
@@ -140,6 +143,9 @@ export interface PlanPlate {
 }
 
 export interface PlanPlateOptions {
+  /** where the drawing goes, attached before a name is measured: a name is
+   * placed by what the engine actually draws and not by a proxy for it */
+  host: HTMLElement
   language: 'en' | 'de'
   /** the station standing right now, which decides a shared mark's numeral */
   standing: string
@@ -231,6 +237,35 @@ export function drawPlanPlate(
   const leaders = node('g', 'wing-plan-leaders')
   const names = node('g', 'wing-plan-names')
   element.append(shapes, rooms, leaders, names)
+  /* ATTACHED FIRST, BECAUSE A NAME IS MEASURED AND NOT ESTIMATED. Engines do
+     not agree on what a line of SVG text measures, and none of them agrees
+     with a canvas ruler, so the rule that decides where a name may stand
+     reads the same text this plate will draw, in this page's own face. */
+  options.host.replaceChildren(element)
+  const probe = node('text', 'wing-plan-room-name')
+  probe.setAttribute('x', '0'); probe.setAttribute('y', '0')
+  probe.setAttribute('visibility', 'hidden')
+  names.append(probe)
+  const sized = new Map<string, { w: number; h: number; dy: number }>()
+  function measured(words: string, px: number): { w: number; h: number; dy: number } {
+    const key = `${px}|${words}`
+    const had = sized.get(key)
+    if (had) return had
+    probe.setAttribute('font-size', String(px))
+    probe.textContent = words
+    const seen = probe.getBoundingClientRect(), face = element.getBoundingClientRect()
+    // A plate that is not laid out yet measures nothing: the ruler answers.
+    const got = face.width > 0 && seen.width > 0
+      ? { w: seen.width, h: seen.height, dy: (seen.top + seen.bottom) / 2 - face.top }
+      : { w: textWidth(words, px, NAME_TRACKING), h: px * NAME_LINE, dy: 0 }
+    sized.set(key, got)
+    return got
+  }
+  /** The largest size at which the name fits the room it names, or none. */
+  function nameSize(words: string, room: number, base: number, floor: number): number | null {
+    for (let px = base; px >= floor; px -= .5) if (measured(words, px).w <= room - NAME_MARGIN) return px
+    return null
+  }
 
   /* EVERYTHING ALREADY ON THE PLATE, in the plate's own pixels. A wall is a
      segment, a mark and a numeral are boxes, and a name has to clear them
@@ -352,7 +387,7 @@ export function drawPlanPlate(
     const tries: { x: number; y: number; size: number; leader: Seg | null }[] = []
     const held = nameSize(entry.words, entry.room.r - entry.room.l, namePx, nameFloor)
     if (held !== null) {
-      const tall = held * 1.25
+      const tall = measured(entry.words, held).h
       const hull = entry.hull
       const at = (x: number, y: number): void => {
         if (hull && !within(hull, x, y)) return
@@ -375,7 +410,7 @@ export function drawPlanPlate(
     }
     // BESIDE THE ROOM, ON A LEADER, at the plate's own size: a name that will
     // not fit a narrow room still belongs to it, and the line says which.
-    const out = textWidth(entry.words, namePx, NAME_TRACKING), tall = namePx * 1.25
+    const out = measured(entry.words, namePx).w, tall = measured(entry.words, namePx).h
     const beside = [
       { x: entry.room.r + LEADER_GAP + out / 2, y: mid.y, from: { x: entry.room.r, y: mid.y } },
       { x: entry.room.l - LEADER_GAP - out / 2, y: mid.y, from: { x: entry.room.l, y: mid.y } },
@@ -399,7 +434,8 @@ export function drawPlanPlate(
 
     let put: { x: number; y: number; size: number; leader: Seg | null; box: Box } | null = null
     for (const spot of tries) {
-      const place = around(spot.x, spot.y, textWidth(entry.words, spot.size, NAME_TRACKING), spot.size * 1.25)
+      const seen = measured(entry.words, spot.size)
+      const place = around(spot.x, spot.y + seen.dy, seen.w, seen.h)
       const test = grown(place, CLEAR)
       if (!inside(test)) continue
       if (taken.some(hold => meets(test, hold))) continue
@@ -425,5 +461,6 @@ export function drawPlanPlate(
     named.push(entry.id)
   }
 
+  probe.remove()
   return { element, width, height, scale, project, marks, named }
 }

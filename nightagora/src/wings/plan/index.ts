@@ -164,15 +164,17 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
         width: Math.max(80, (box.width - numbers.padding * 2 - numbers.gap) * numbers.plateShare),
         height: Math.max(80, box.height - numbers.padding * 2),
       }
+    // The plate attaches its own drawing, because it measures a name on the
+    // page before it decides where the name may stand.
     plate = drawPlanPlate(site, area, {
-      language, standing,
+      host: drawing, language, standing,
       namePx: narrow ? PLATE_NAME_PX.narrow : PLATE_NAME_PX.wide,
       nameFloor: narrow ? PLATE_NAME_FLOOR.narrow : PLATE_NAME_FLOOR.wide,
     })
     // The marks are DOM over the drawing, so the two share one pixel exactly.
     drawing.style.width = `${plate.width.toFixed(2)}px`
     drawing.style.height = `${plate.height.toFixed(2)}px`
-    drawing.replaceChildren(plate.element, marksHost)
+    drawing.append(marksHost)
 
     /* THE MARKS ARE THE MAP, THE LIST IS THE CONTROL. On the wide stage a
        mark is a 44 px target of its own. On a 390 px stage the wing's own
