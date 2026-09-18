@@ -51,6 +51,10 @@ export interface WingPlanOptions {
   station(id: string): void
   /** walk there and open that work */
   highlight(id: string): void
+  /** THE DOOR TO THE LIFE VIEW, where a wing has one. The word and the press
+   * are the wing's own, so the plan stands the control and knows nothing
+   * about what it opens; a wing without a life view passes nothing. */
+  life?(): { word: string; open(): void } | null
   /** where the hand goes when the sheet closes */
   returnFocus(): void
   /** True when an exhibit already pushed the entry this sheet should take,
@@ -95,10 +99,14 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
   drawing.append(marksHost)
   const reading = make('div', 'wing-plan-reading')
   const foot = make('div', 'wing-plan-foot')
+  const lifeDoor = make('button', 'wing-life-door')
+  lifeDoor.type = 'button'
+  lifeDoor.hidden = true
+  lifeDoor.addEventListener('click', () => { const door = options.life?.(); if (door) press(door.open) })
   const close = make('button', 'wing-plan-close')
   close.type = 'button'
   close.addEventListener('click', () => shut())
-  foot.append(close)
+  foot.append(lifeDoor, close)
   sheet.append(drawing, reading)
   dialog.append(style, sheet, foot)
   host.append(dialog)
@@ -152,6 +160,10 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
     const stood = new Set(options.stood())
     dialog.setAttribute('aria-label', `${say(PLAN_WORDS.plan)} · ${options.title()}`)
     close.textContent = say(PLAN_WORDS.close)
+    // The wing answers in the page's language, so the word is read on every paint.
+    const door = options.life?.()
+    lifeDoor.hidden = !door
+    if (door) lifeDoor.textContent = door.word
 
     const box = sheet.getBoundingClientRect()
     const numbers = narrow ? PLAN_NARROW : PLAN_WIDE
