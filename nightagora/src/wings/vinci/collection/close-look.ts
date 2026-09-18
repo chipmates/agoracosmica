@@ -136,7 +136,7 @@ const VIEWPOINT_PARTS: Record<MachineSlug, { drive: string | null; working: stri
   'miter-lock-gates': { drive: 'wicket-left', working: 'leaf-left' },
   'water-lifting-screw': { drive: 'handle', working: 'helical-tube' },
   'proportional-compass': { drive: 'screw-head', working: 'leg-left' },
-  'camera-obscura': { drive: null, working: 'screen' },
+  'camera-obscura': { drive: 'aperture-plate', working: 'screen' },
 }
 
 /** The crane stands out of the store, and its body names its joints its own
