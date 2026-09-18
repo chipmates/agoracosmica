@@ -9,6 +9,7 @@
 import { createVitrine, type Vitrine, type VitrineExhibit, type VitrinePayload } from '../../vitrine'
 import { createTurntablePayload, type TurntableOptions, type TurntableViewpoint } from '../../vitrine/turntable'
 import { lang } from '../../content'
+import { FURTHER, NEARER } from './deep-plate'
 import type { Grade, Stack } from '../../../stack'
 import { ASSET_BASE } from '../../../stack/materials'
 import { assetUrl, loadManifest } from '../../../manifest'
@@ -43,14 +44,23 @@ export function createVinciCloseLook(options: {
   floor(): number
   returnFocus?(id: string): HTMLElement | null
 }): VinciCloseLook {
-  return createVitrine({ ...options, id: VINCI_EXHIBIT_CARD, lang })
+  // The window owns no words: the mark that dismisses it and the grabber
+  // that raises its card take the wing's own, in the page's language.
+  return createVitrine({ ...options, id: VINCI_EXHIBIT_CARD, lang,
+    closeLabel: () => VINCI_VITRINE_WORDS.close[lang()],
+    raiseLabel: () => CONTROLS.shared.more[lang()] })
 }
 
 type Words = { en: string; de: string }
 const LINES = (JSON.parse(linesRaw) as { lines: Record<string, Words> }).lines
 const STEPS = (JSON.parse(stepsRaw) as { steps: Record<string, (Words & { at: number; part: string; certainty: string })[]> }).steps
 const CARDS = JSON.parse(cardsRaw) as { honesty_variants: { page: Words }; floor_honesty: Words
-  controls: { date: { previous: Words; next: Words; which_year?: Words; age?: Words } } }
+  zoom_ceiling_scan: Words
+  controls: { date: { previous: Words; next: Words; which_year?: Words; age?: Words }
+    picture: { whole_plate: Words }
+    machine: { viewpoints: (Words & { id: string })[] }
+    manuscript: { hand: Words; mirror: Words; print: Words; back_to_leaf: Words; place: Words
+      leaves: Words; more_leaf: Words } } }
 /** The date reader's own words. The question before a date and the age beside
  * it are read where the card models carry them, and stand down where not. */
 export function vinciDateWords(): { previous: string; next: string; floor: string; whichYear: string | null; age: ((years: number) => string) | null } {
@@ -61,6 +71,18 @@ export function vinciDateWords(): { previous: string; next: string; floor: strin
 }
 /** What a page's reproduction is labelled as, beside every page the reader shows. */
 export const VINCI_PAGE_HONESTY: Words = CARDS.honesty_variants.page
+/** THE READER'S OWN WORDS, in the page's language: the three ways one leaf
+ * can be read, where a side stands in its manuscript, and the two the deep
+ * viewer needs beside them. The ceiling is the scan's own sentence, because
+ * a photograph of a printed facsimile is not "the source". */
+export function vinciManuscriptWords(): { hand: string; mirror: string; print: string; backToLeaf: string
+  place: string; leaves: string; moreLeaf: string; whole: string; nearer: string; further: string; ceiling: string } {
+  const language = lang(), words = CARDS.controls.manuscript
+  return { hand: words.hand[language], mirror: words.mirror[language], print: words.print[language],
+    backToLeaf: words.back_to_leaf[language], place: words.place[language], leaves: words.leaves[language],
+    moreLeaf: words.more_leaf[language], whole: CARDS.controls.machine.viewpoints[0]![language],
+    nearer: NEARER[language], further: FURTHER[language], ceiling: CARDS.zoom_ceiling_scan[language] }
+}
 const CONTROLS = (JSON.parse(cardsRaw) as { controls: {
   shared: { back: Words; record: Words; more: Words }
   picture: { whole_plate: Words }

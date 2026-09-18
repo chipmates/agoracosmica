@@ -45,8 +45,8 @@ const RULE: readonly { label: string; cm: number }[] = CARDS.rule_labels
 /** THE TWO STEPS, in the page's language. The wheel, the pinch, the double
  * tap and the keys all reach the ceiling; a hand with none of them needs a
  * control, and the card models hold no word for one yet. */
-const NEARER: Words = { en: 'Zoom in', de: 'Näher' }
-const FURTHER: Words = { en: 'Zoom out', de: 'Weiter weg' }
+export const NEARER: Words = { en: 'Zoom in', de: 'Näher' }
+export const FURTHER: Words = { en: 'Zoom out', de: 'Weiter weg' }
 
 /** What is on the plate, in the page's language, for a visitor who cannot
  * see it. Null where no one has written it yet. */

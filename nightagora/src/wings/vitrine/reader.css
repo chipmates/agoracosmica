@@ -1,0 +1,69 @@
+/* THE READER. One side of the book in the window, the book's own strip of
+   sides under it, and nothing else on the glass. The strip keeps the foot of
+   the viewport, so the page above it is never read through a row of pages. */
+.reader {position:absolute;inset:0;}
+/* THE GROUND UNDER THE VIEWER: the side's own thumbnail, which is in the
+   store already, standing while the scan is on its way. */
+.reader-ground {position:absolute;left:0;right:0;top:0;bottom:var(--reader-foot,156px);
+  display:block;margin:auto;max-width:100%;max-height:100%;object-fit:contain;}
+.reader-ground[hidden] {display:none;}
+.reader-stage {position:absolute;left:0;right:0;top:0;bottom:var(--reader-foot,156px);touch-action:none;}
+/* The viewport takes the drag inside the page and the strip takes the drag
+   on itself; the page under the window keeps the wing's own flick. */
+.vitrine[data-payload='manuscript'] .vitrine-payload {touch-action:auto;}
+
+/* THE STRIP IS THE BOOK: every side of the volume open now, the one standing
+   lit, in the order the binding holds them. */
+.reader-shelf {position:absolute;left:0;right:0;bottom:60px;height:84px;margin:0;padding:0 2px;
+  display:flex;align-items:stretch;gap:6px;list-style:none;overflow-x:auto;overflow-y:hidden;
+  overscroll-behavior-x:contain;scrollbar-width:thin;touch-action:pan-x;pointer-events:auto;}
+.reader-cell {flex:0 0 auto;display:flex;}
+.reader-page {display:flex;align-items:center;justify-content:center;box-sizing:border-box;
+  min-width:44px;min-height:44px;width:58px;height:84px;padding:2px;background:#0a0f13a6;
+  border:1px solid #a9977344;color:#cfc6b4;font:11px/1.2 var(--sans);cursor:pointer;}
+.reader-page-thumb {display:block;width:100%;height:100%;object-fit:contain;}
+.reader-page[aria-current='true'] {border-color:#edcc8c;background:#edcc8c1f;}
+.reader-page:focus-visible {outline:1px solid #edcc8c;outline-offset:2px;}
+/* ABSENCE SHOWN AS ABSENCE: what the source itself says is not there stands
+   in the row as its own cell, and is not a page a hand can press. */
+.reader-absence {flex:0 0 auto;display:flex;align-items:center;box-sizing:border-box;width:150px;height:84px;
+  padding:6px 8px;border:1px dashed #a9977355;}
+.reader-absence p {margin:0;font:11px/1.35 var(--sans);color:#b6bcae;}
+
+/* THE ROW A HAND MEETS: the two that step one side with the ways between,
+   and the viewer's own steps beside them where there is a wheel. One line:
+   a second line would stand on the strip. */
+.reader-row {display:flex;flex-wrap:nowrap;align-items:stretch;gap:6px;}
+.reader-row .vitrine-step {flex:0 0 44px;}
+.reader-way {flex:1 1 0;min-width:0;}
+.reader-way[hidden] {display:none;}
+.reader-zoom {display:flex;gap:6px;}
+.reader-zoom .vitrine-control {flex:0 0 auto;}
+
+/* THE ONE LINE UNDER THE PAGE stands over the page, never over the strip:
+   the wide stage puts it where the strip's own band ends. */
+.vitrine[data-payload='manuscript'][data-narrow='false'] .vitrine-caption {bottom:154px;}
+
+/* AT THE PEEK the card is the page's name and the one control that raises
+   the rest of the words over it. */
+.vitrine[data-peek='true'] .reader-place,
+.vitrine[data-peek='true'] .reader-words > *:nth-child(n+3) {display:none;}
+
+/* THE CARD: the side's own name, where it stands in the book, what is on it,
+   who holds it, and the witnesses one deliberate press away. */
+.reader-folio {display:flex;align-items:center;gap:9px;margin:0 0 4px;font:400 19px/1.3 var(--serif);color:#f4ead6;}
+.reader-folio-dot {flex:0 0 8px;width:8px;height:8px;border-radius:50%;background:var(--certainty,#d2a557);}
+.reader-place {margin:0 0 8px;}
+.reader-named {color:#f0e4cc;}
+.reader-raise {width:100%;}
+
+@media(max-aspect-ratio:9/10) {
+  .reader-ground,.reader-stage {bottom:calc(var(--vitrine-peek,190px) + 84px);}
+  .reader-shelf {bottom:calc(var(--vitrine-peek,190px) + 8px);height:72px;padding:0;gap:4px;}
+  .reader-page {width:48px;height:72px;}
+  .reader-absence {width:126px;height:72px;padding:4px 6px;}
+  .reader-absence p {font-size:10px;}
+  .reader-row {gap:4px;width:100%;}
+  .reader-folio {font-size:16px;margin-bottom:2px;}
+  .reader-zoom {display:none;}
+}

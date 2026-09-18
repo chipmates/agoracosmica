@@ -56,7 +56,7 @@ import { createMeasurement, type VinciMeasurement } from './measurement'
 import { collectVinciLabelOccluders, createVinciExhibitDots, createVinciLabelAnchor, vinciSightBlocked, type VinciExhibitDots, type VinciExhibitMark, type VinciLabelAnchor, type VinciLabelMode } from './labels'
 import { pickVinciExhibit, readVinciExhibits, vinciMachineRoom, type VinciPickEntry } from './collection/pick'
 import { vinciApproachPose, vinciApproachStation, vinciStudIndex } from './collection/approaches'
-import { createVinciCloseLook, createVinciMachinePayload, fillVinciLimitSlots, renderVinciMachineRecord, vinciDeathbedCard, vinciLimits, vinciLine, vinciMachineCard, vinciPlaceCard, vinciPlaceTitle, vinciDateWords, VINCI_EXHIBIT_CARD, VINCI_PAGE_HONESTY, VINCI_VITRINE_WORDS, type VinciPlaceCard, type VinciPlaceCertainty, type VinciPlaceId } from './collection/close-look'
+import { createVinciCloseLook, createVinciMachinePayload, fillVinciLimitSlots, renderVinciMachineRecord, vinciDeathbedCard, vinciLimits, vinciLine, vinciMachineCard, vinciPlaceCard, vinciPlaceTitle, vinciDateWords, vinciManuscriptWords, VINCI_EXHIBIT_CARD, VINCI_PAGE_HONESTY, VINCI_VITRINE_WORDS, type VinciPlaceCard, type VinciPlaceCertainty, type VinciPlaceId } from './collection/close-look'
 import { createPlacePayload } from '../vitrine/place'
 import { readingTableOf } from './table'
 import { CODEX_ENTRIES } from './table/codex-shelf'
@@ -220,6 +220,9 @@ export function createWing():VinciWingModule {
    * date once the station's floor has been read; `dateAt` is the start the
    * next stud reader takes. */
   let pendingDate=/(?:^|[#&])d=(life-\d{2})(?:&|$)/.exec(location.hash)?.[1]??null, dateAt:number|null=null
+  /** THE LEAF A DOOR NAMES. A folio beside a machine opens the reading at
+   * that side rather than at the leaf the book lies open on. */
+  let leafAt:string|null=null
   /** THE STATION CARD IS A SHEET ON THE PHONE. Peeked or opened belongs to
    * the walk, so it is held here and never written down. */
   let sheetOpen=false
@@ -1185,7 +1188,10 @@ export function createWing():VinciWingModule {
         walked:()=>{const nav=rail.navigation;return nav.approaching===id||nav.exhibit===id},
         standing:()=>{const nav=rail.navigation;return !nav.active&&!nav.approaching},
         more:text(VINCI_VITRINE_WORDS.more),honesty:text(VINCI_PAGE_HONESTY),
+        words:vinciManuscriptWords(),colour:certaintyColour('documented'),
+        tier:()=>hosts?.world.stack.tierName()??'standard',start:leafAt??undefined,
         changed:()=>{if(exhibitSources?.id===id&&mode===2)paintDock()}})
+      leafAt=null
       openMode=how
       closeLook.open({id,title,line:vinciLine(id),card:[],payload:reader,
         controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),shut],walk,...vinciLimits(id),
