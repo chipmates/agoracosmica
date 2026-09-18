@@ -27,7 +27,14 @@ export const PLATE = {
   crowded: 520,
   /** a gap mark narrower than this carries no count */
   countable: 15,
+  /** the blank two numerals keep between them */
+  apart: 5,
 } as const
+
+/** A numeral on the axis, held back until the whole axis is known. */
+interface Mark { x: number; text: string; cls: string; anchor: 'start' | 'middle' | 'end'; em: number }
+/** what a digit costs at each of the two sizes the axis writes in */
+const YEAR_EM = 5.6, COUNT_EM = 4.8
 
 export interface LifePlate {
   element: SVGSVGElement
@@ -79,6 +86,7 @@ export function drawLifePlate(options: {
   const place = afterScale(afterEvents.length ? afterEvents : record.events)
   const xAfter = (year: number): number => afterLeft + place(year) * afterWidth
   const top = PLATE.pad
+  const marks: Mark[] = [], counts: Mark[] = []
   /* A NARROW PLATE CARRIES FEWER NUMERALS. Seven period labels and seven gap
      counts stand on top of each other at a phone's width, so there the axis
      keeps the years that bound it and the marks keep their shape. */
@@ -97,12 +105,9 @@ export function drawLifePlate(options: {
     bar.style.fill = colour(band.certainty)
     if (band.afterlife) bar.setAttribute('data-afterlife', 'true')
     if (crowded && !band.afterlife && band !== record.bands[0]) continue
-    const label = add('text', { class: 'wing-life-year', x: left, y: top + 25 }, svg)
-    label.textContent = String(first)
+    marks.push({ x: left, text: String(first), cls: 'wing-life-year', anchor: 'start', em: YEAR_EM })
   }
   const last = record.span.to
-  const end = add('text', { class: 'wing-life-year wing-life-year-end', x: x(last), y: top + 25 })
-  end.textContent = String(last)
 
   /* AN EMPTY STRETCH IS DRAWN, NOT CLOSED UP: the years are there and the
      record is not, so the mark keeps its place on the axis and says how many
@@ -112,9 +117,38 @@ export function drawLifePlate(options: {
     add('rect', { class: 'wing-life-gap', x: left, y: top - 2, width: Math.max(PLATE.least, right - left), height: 15 })
     // a numeral narrower than its own mark is a smudge, and the list says it
     if (right - left < PLATE.countable) continue
-    const count = add('text', { class: 'wing-life-gap-count', x: (left + right) / 2, y: top + 25 })
-    count.textContent = String(gap.years)
+    counts.push({ x: (left + right) / 2, text: String(gap.years), cls: 'wing-life-gap-count', anchor: 'middle', em: COUNT_EM })
   }
+
+  /* ONE NUMERAL AT A TIME ON THE AXIS. Periods that end a few years apart put
+     their labels on top of each other, and two years printed over each other
+     are a smudge and not a date. The year the life ends on is placed first
+     because it bounds the axis, then the rest left to right, and a label that
+     would touch one already standing is left out. The list under the plate
+     carries every one of them. */
+  const write = (mark: Mark, y: number): void => {
+    const node = add('text', { class: mark.cls, x: mark.x, y })
+    node.textContent = mark.text
+  }
+  const room = (mark: Mark): { from: number; to: number } => {
+    const width = mark.text.length * mark.em
+    const from = mark.anchor === 'end' ? mark.x - width : mark.anchor === 'middle' ? mark.x - width / 2 : mark.x
+    return { from, to: from + width }
+  }
+  const numerals = (row: readonly Mark[], y: number, first?: Mark): void => {
+    const taken: { from: number; to: number }[] = []
+    if (first) { taken.push(room(first)); write(first, y) }
+    for (const mark of [...row].sort((a, b) => room(a).from - room(b).from)) {
+      const at = room(mark)
+      if (taken.some(held => at.from < held.to + PLATE.apart && held.from < at.to + PLATE.apart)) continue
+      taken.push(at)
+      write(mark, y)
+    }
+  }
+  // the years under the bars, the counted absences over them: one register a
+  // line, so a year and a count can never print over each other
+  numerals(marks, top + 25, { x: x(last), text: String(last), cls: 'wing-life-year wing-life-year-end', anchor: 'end', em: YEAR_EM })
+  numerals(counts, top - 5)
 
   let lane = top + PLATE.axis
   const line = (y: number): void => { add('line', { class: 'wing-life-rule', x1: PLATE.pad, y1: y, x2: width - PLATE.pad, y2: y }) }
