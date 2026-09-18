@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed to a pale grey at 30 per cent. Assumed weather, no observation claimed.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "3d88bbc68c0da958285da9465204644f211c2bd21aa0d9fd783a8feff132835a",
+      "sha256": "3729714511112089e34481672b133b81083a56d045d1804206a419a405ce8bc6",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=80c458f2cb5ccddb7fcedccda5df70e5cdccda7d9ca97d65ebfa6462920f61ef;"
     },
     {
@@ -114,7 +114,7 @@
       "prompt": "Dossier Amasse water profile, reconstructed width 2.8m and depth 0.5m, exact channel cuts, planar reflection of constant-level reach. Modern ponds omitted from historical default.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "faf1a13aac6bff76ceaf50a68c4e91852669214f7ea34fcbf7ac5443cd64d0e4",
+      "sha256": "d9ea5fa01651d50cdee6afff2d315ee8bfd0bad3a5ac01ff8039800ab12ee689",
       "note": "A-SITE and src/wings/vinci/data/closluce.json water_profile; recipe_file=src/wings/vinci/water.ts"
     },
     {
