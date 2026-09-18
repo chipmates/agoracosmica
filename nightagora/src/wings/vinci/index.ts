@@ -526,7 +526,7 @@ export function createWing():VinciWingModule {
     // for the work and the hung face on the pick, so a list that holds both
     // says which face rather than the same name twice.
     return pick.face==='reverse'
-      ?{en:`${found.work.title_en}, reverse`,de:`${found.work.title_de}, Rückseite`}
+      ?{en:`${found.work.title_en}, the reverse`,de:`${found.work.title_de}, die Rückseite`}
       :{en:found.work.title_en,de:found.work.title_de}
   }
   /** THE WORKS THE PLAN OFFERS: the registry's own openable exhibits, each
