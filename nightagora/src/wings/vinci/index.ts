@@ -226,12 +226,33 @@ export function createWing():VinciWingModule {
   let restoreEnvironmentRotation:(()=>void)|null=null
   const narrow=()=>innerWidth/innerHeight<=.9
   const shadowFocus=new Vector3(NaN,NaN,NaN), focusAhead=new Vector3()
+  /** THE LATTICE MAY NOT MOVE BY A FRACTION OF ITS OWN TEXEL. The near
+   * cascade follows the visitor, and every time it moves, its map is redrawn
+   * from a new origin: landed at an arbitrary fraction of a texel, the whole
+   * shadow pattern shifts under every surface it falls on, which is one frame
+   * of flicker on a wall a visitor is walking past. Snapping the focus to the
+   * map's own grid, in the plane the light looks down, keeps the pattern on
+   * the same texels whatever the eye does. */
+  const SHADOW_TEXEL_M=2*SHADOW.nearHalfM/SHADOW.nearMapPx
+  const lightUp=new Vector3(0,1,0), lightX=new Vector3(), lightY=new Vector3(), lightZ=new Vector3()
+  function snapToShadowTexel(point:Vector3):void {
+    lightZ.copy(key.direction).normalize()
+    lightX.crossVectors(lightUp,lightZ)
+    // a sun straight overhead leaves no horizontal axis to snap along
+    if(lightX.lengthSq()<1e-8)return
+    lightX.normalize();lightY.crossVectors(lightZ,lightX)
+    for(const axis of [lightX,lightY]){
+      const along=point.dot(axis)
+      point.addScaledVector(axis,Math.round(along/SHADOW_TEXEL_M)*SHADOW_TEXEL_M-along)
+    }
+  }
   function focusNearCascade(force=false):void {
     if(!hosts)return
     const camera=hosts.world.camera
     camera.getWorldDirection(focusAhead)
     focusAhead.multiplyScalar(SHADOW.aheadM).add(camera.position)
     if(!force&&focusAhead.distanceToSquared(shadowFocus)<SHADOW.refocusM*SHADOW.refocusM)return
+    snapToShadowTexel(focusAhead)
     shadowFocus.copy(focusAhead)
     key.light.target.position.copy(shadowFocus)
     key.light.position.copy(key.direction).multiplyScalar(SHADOW.lightDistanceM).add(shadowFocus)
