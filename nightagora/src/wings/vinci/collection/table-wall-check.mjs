@@ -24,11 +24,24 @@ const layout = {}, solids = {}
 execute(source('layout.ts').text, { exports: layout })
 execute(source('../rail-solids.ts').text, { exports: solids, require: () => THREE })
 const furniture = source('../table/geometry.ts'), exhibits = source('exhibits.ts')
-let builder, warmer
+const approaches = source('approaches.ts')
+let builder, warmer, table
 function walk(node, visit) { visit(node); ts.forEachChild(node, child => walk(child, visit)) }
 walk(furniture, node => { if (ts.isFunctionDeclaration(node) && node.name?.text === 'buildFurniture') builder = node })
 walk(exhibits, node => { if (ts.isFunctionDeclaration(node) && node.name?.text === 'warmTable') warmer = node })
+// THE TABLE'S PLACE IS ONE CONSTANT, and the module that stands it imports
+// that constant from the module that composes its eye. So this audit reads
+// the declaration itself rather than keeping a second copy of the digits: a
+// checker that re-encoded them would pass a table that had moved.
+walk(approaches, node => {
+  if (!ts.isVariableStatement(node)) return
+  if (!node.declarationList.declarations.some(declaration => declaration.name.getText(approaches) === 'VINCI_READING_TABLE')) return
+  const held = {}
+  execute(node.getText(approaches), { exports: held, FLOOR: layout.FLOOR })
+  table = held.VINCI_READING_TABLE
+})
 if (!builder || !warmer) throw new Error('The actual table factory or host mount is absent')
+if (!table) throw new Error('The reading table has no declared place')
 const constructor = builder.body.statements.filter(statement => {
   if (ts.isVariableStatement(statement)) return statement.declarationList.declarations.some(declaration => declaration.name.getText(furniture) === 'wall')
   return /^wall\./.test(statement.getText(furniture))
@@ -43,12 +56,14 @@ walk(warmer, node => {
 })
 if (!constructor.includes('new PlaneGeometry') || !fit.length || placement.length !== 2) throw new Error('The actual panel geometry, fit or placement could not be isolated')
 
-function mount(fitted) {
+function mount(fitted, northShiftM = 0) {
   const object = new THREE.Group(), material = new THREE.MeshBasicMaterial()
   execute(constructor + '\nobject.add(wall)', { ...THREE, plaster: material, object })
   const built = { object }
   if (fitted) execute(fit.join('\n'), { built })
-  execute(placement.join('\n'), { built, FLOOR: layout.FLOOR })
+  execute(placement.join('\n'), { built, FLOOR: layout.FLOOR, VINCI_READING_TABLE: table })
+  // north is -z, so a control that walks the panel north walks z down
+  object.position.z -= northShiftM
   object.updateMatrixWorld(true)
   const wall = object.getObjectByName('reading-room-wall')
   wall.userData.manifestId = 'vinci/table-furniture'
@@ -112,17 +127,29 @@ function audit(panel) {
 const before = mount(false), after = mount(true)
 const original = audit(before), fitted = audit(after)
 const revealGapM = layout.OPENING.hallToGallery.north[0] + after.box.min.z
+// THE CONTROL THAT PROVES THIS AUDIT CAN SEE. With the table at its own place
+// the panel clears every route at its full length too, so its length is no
+// longer a negative control. The control is the panel walked north into the
+// door it must never reach, where a blocked route is certain: the shift is
+// the distance from the fitted panel's north end to the door's far reveal.
+const controlShiftM = layout.OPENING.hallToGallery.north[1] + after.box.min.z
+const control = mount(true, controlShiftM), blocked = audit(control)
 const excludedFromConstructionCertificate = solids.collectRailSolids(after.object).length === 0
 const failures = []
 if (!excludedFromConstructionCertificate) failures.push('Update this supplemental audit: the table has entered the construction certificate')
-if (Math.abs(revealGapM - .15) > .00001) failures.push('The fitted panel must stop 150 mm short of the door reveal')
+if (!(revealGapM >= .15)) failures.push('The fitted panel must stop at least 150 mm short of the door reveal')
 if (Math.abs(before.box.max.z - after.box.max.z) > .00001) failures.push('Shortening the panel moved its south edge')
-if (original.chords === 0) failures.push('The unshortened panel negative control did not reproduce the blocked route')
+if (!(controlShiftM > 0)) failures.push('The control panel does not have to move to reach the door')
+if (blocked.chords === 0) failures.push('The control panel in the doorway did not reproduce a blocked route')
+if (original.chords || original.ballIntrusions) failures.push('The unshortened table panel intrudes into a certified route envelope')
 if (fitted.chords || fitted.ballIntrusions) failures.push('The fitted table panel intrudes into a certified route envelope')
 const bounds = panel => ({ east: panel.box.min.x, south: -panel.box.max.z, north: -panel.box.min.z, bottom: panel.box.min.y, top: panel.box.max.y })
 console.log(JSON.stringify({ checker: 'vinci-collection-table-wall', ok: failures.length === 0,
-  scope: 'Actual source panel and host transforms; every certificate waypoint span and recorded corner ball, with the saved near and gait envelope. Asynchronous table furniture remains outside the rail construction fingerprint.',
-  excludedFromConstructionCertificate, revealGapM, before: { bounds: bounds(before), ...original }, after: { bounds: bounds(after), ...fitted }, failures,
+  scope: 'Actual source panel and host transforms, with the table\'s own declared place read from the module that owns it; every certificate waypoint span and recorded corner ball, with the saved near and gait envelope. Asynchronous table furniture remains outside the rail construction fingerprint.',
+  tableAt: table,
+  excludedFromConstructionCertificate, revealGapM, controlShiftM,
+  before: { bounds: bounds(before), ...original }, after: { bounds: bounds(after), ...fitted },
+  control: { bounds: bounds(control), ...blocked }, failures,
 }, null, 2))
-for (const panel of [before, after]) { panel.wall.geometry.dispose(); panel.material.dispose() }
+for (const panel of [before, after, control]) { panel.wall.geometry.dispose(); panel.material.dispose() }
 process.exitCode = failures.length ? 1 : 0
