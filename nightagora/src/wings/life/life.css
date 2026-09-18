@@ -69,7 +69,7 @@
 /* Under the ribbon: what the wing says about this life, and why an empty
    stretch is drawn narrower than the years it holds. */
 .wing-life-second {margin:6px 0 0;font:13px/1.5 var(--sans);color:#b6bcae;text-wrap:pretty;}
-.wing-life-caption {margin:3px 0 8px;font:11px/1.45 var(--sans);color:#8f9a9e;text-wrap:pretty;}
+.wing-life-caption {margin:3px 0 6px;font:11px/1.45 var(--sans);color:#8f9a9e;text-wrap:pretty;}
 .wing-life-caption[hidden] {display:none;}
 
 /* THE READING: the places on the left, always all of them, and the one that
@@ -80,8 +80,8 @@
 .wing-life-period-body {flex:1 1 60%;min-width:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;padding-right:4px;}
 
 .wing-life-item {margin:0;padding:0;border-bottom:1px solid #a9977322;}
-.wing-life-item[data-afterlife='true'] {margin-top:10px;border-top:1px solid #a9977355;}
-.wing-life-item-name {display:flex;flex-direction:column;gap:2px;width:100%;min-height:44px;padding:7px 8px 7px 10px;text-align:left;
+.wing-life-item[data-afterlife='true'] {margin-top:5px;border-top:1px solid #a9977355;}
+.wing-life-item-name {display:flex;flex-direction:column;gap:1px;width:100%;min-height:44px;padding:5px 8px 5px 10px;text-align:left;
   background:none;border:0;border-left:2px solid transparent;color:#cfc6b4;font:14px/1.3 var(--serif);cursor:pointer;
   transition:color 160ms linear,border-color 160ms linear,background-color 160ms linear;}
 .wing-life-item-name:hover {color:#fff5e3;border-left-color:#a99773;}
