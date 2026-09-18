@@ -67,6 +67,34 @@ const grown = (box: Box, by: number): Box => ({ l: box.l - by, t: box.t - by, r:
 const meets = (a: Box, b: Box): boolean =>
   Math.min(a.r, b.r) > Math.max(a.l, b.l) && Math.min(a.b, b.b) > Math.max(a.t, b.t)
 
+/** A closed outline is not its own extent: the middle of a bent footprint's
+ * box can stand outside the footprint. A name belongs to what it names, so an
+ * anchor inside the outline is the only one an outline offers. */
+function within(hull: readonly { x: number; y: number }[], x: number, y: number): boolean {
+  let held = false
+  for (let i = 0, j = hull.length - 1; i < hull.length; j = i++) {
+    const a = hull[i]!, b = hull[j]!
+    if (a.y > y !== b.y > y && x < (b.x - a.x) * (y - a.y) / (b.y - a.y) + a.x) held = !held
+  }
+  return held
+}
+
+/** The point on a closed outline nearest a place: where a leader touches the
+ * thing it names, rather than the corner of the box around it. */
+function nearest(hull: readonly { x: number; y: number }[], x: number, y: number): { x: number; y: number } {
+  let best = hull[0]!, span = Infinity
+  for (let i = 0, j = hull.length - 1; i < hull.length; j = i++) {
+    const a = hull[j]!, b = hull[i]!
+    const dx = b.x - a.x, dy = b.y - a.y
+    const run = dx * dx + dy * dy
+    const at = run === 0 ? 0 : Math.min(1, Math.max(0, ((x - a.x) * dx + (y - a.y) * dy) / run))
+    const on = { x: a.x + dx * at, y: a.y + dy * at }
+    const gap = Math.hypot(on.x - x, on.y - y)
+    if (gap < span) { span = gap; best = on }
+  }
+  return best
+}
+
 /** A wall is a line and not a box, so a name clears it by the segment and not
  * by its extent: a long diagonal wall would otherwise refuse the whole field
  * it runs across. */
@@ -217,7 +245,7 @@ export function drawPlanPlate(
     }
   }
 
-  interface Named { id: string; words: string; room: Box; area: number }
+  interface Named { id: string; words: string; room: Box; area: number; hull: { x: number; y: number }[] | null }
   const wanted: Named[] = []
 
   for (const room of site.rooms) {
@@ -231,7 +259,7 @@ export function drawPlanPlate(
     rooms.append(rect)
     const face: Box = { l: Math.min(a.x, b.x), t: Math.min(a.y, b.y), r: Math.max(a.x, b.x), b: Math.max(a.y, b.y) }
     edges([{ x: face.l, y: face.t }, { x: face.r, y: face.t }, { x: face.r, y: face.b }, { x: face.l, y: face.b }], true)
-    if (room.name) wanted.push({ id: room.id, words: room.name[language], room: face, area: (face.r - face.l) * (face.b - face.t) })
+    if (room.name) wanted.push({ id: room.id, words: room.name[language], room: face, area: (face.r - face.l) * (face.b - face.t), hull: null })
   }
 
   const path = (points: readonly PlanPoint[]): string =>
@@ -251,7 +279,10 @@ export function drawPlanPlate(
       face.l = Math.min(face.l, corner.x); face.r = Math.max(face.r, corner.x)
       face.t = Math.min(face.t, corner.y); face.b = Math.max(face.b, corner.y)
     }
-    wanted.push({ id: shape.id, words: shape.name[language], room: face, area: (face.r - face.l) * (face.b - face.t) })
+    wanted.push({
+      id: shape.id, words: shape.name[language], room: face,
+      area: (face.r - face.l) * (face.b - face.t), hull: shape.closed ? corners : null,
+    })
   }
 
   /* NORTH AS THE SITE HAS IT. The site's own frame is east and north, so the
@@ -322,9 +353,25 @@ export function drawPlanPlate(
     const held = nameSize(entry.words, entry.room.r - entry.room.l, namePx, nameFloor)
     if (held !== null) {
       const tall = held * 1.25
-      tries.push({ x: mid.x, y: mid.y, size: held, leader: null })
-      tries.push({ x: mid.x, y: entry.room.t + tall / 2 + 3, size: held, leader: null })
-      tries.push({ x: mid.x, y: entry.room.b - tall / 2 - 3, size: held, leader: null })
+      const hull = entry.hull
+      const at = (x: number, y: number): void => {
+        if (hull && !within(hull, x, y)) return
+        tries.push({ x, y, size: held, leader: null })
+      }
+      // An outline's own middle of area first, which a bent footprint has and
+      // the middle of its box has not.
+      if (hull) {
+        let weight = 0, cx = 0, cy = 0
+        for (let i = 0, j = hull.length - 1; i < hull.length; j = i++) {
+          const a = hull[i]!, b = hull[j]!
+          const cross = a.x * b.y - b.x * a.y
+          weight += cross; cx += (a.x + b.x) * cross; cy += (a.y + b.y) * cross
+        }
+        if (weight !== 0) at(cx / (3 * weight), cy / (3 * weight))
+      }
+      at(mid.x, mid.y)
+      at(mid.x, entry.room.t + tall / 2 + 3)
+      at(mid.x, entry.room.b - tall / 2 - 3)
     }
     // BESIDE THE ROOM, ON A LEADER, at the plate's own size: a name that will
     // not fit a narrow room still belongs to it, and the line says which.
@@ -336,12 +383,17 @@ export function drawPlanPlate(
       { x: mid.x, y: entry.room.b + LEADER_GAP + tall / 2, from: { x: mid.x, y: entry.room.b } },
     ]
     for (const spot of beside) {
-      // The leader leaves the room's own edge and stops where the halo starts.
-      const run = Math.hypot(spot.x - spot.from.x, spot.y - spot.from.y) || 1
-      const reach = Math.max(1, LEADER_GAP - CLEAR) / run
+      // THE LEADER TOUCHES THE THING IT NAMES: a room's own edge, and for an
+      // outline the outline itself and not the corner of its box. It stops
+      // where the name's halo starts.
+      const foot = entry.hull ? nearest(entry.hull, spot.x, spot.y) : spot.from
+      const dx = foot.x - spot.x, dy = foot.y - spot.y
+      const span = Math.hypot(dx, dy) || 1
+      const edge = Math.min(Math.abs(dx) > .01 ? (out / 2 + CLEAR) / Math.abs(dx) * span : Infinity,
+        Math.abs(dy) > .01 ? (tall / 2 + CLEAR) / Math.abs(dy) * span : Infinity, span)
       tries.push({
         x: spot.x, y: spot.y, size: namePx,
-        leader: { ax: spot.from.x, ay: spot.from.y, bx: spot.from.x + (spot.x - spot.from.x) * reach, by: spot.from.y + (spot.y - spot.from.y) * reach },
+        leader: { ax: foot.x, ay: foot.y, bx: spot.x + dx / span * edge, by: spot.y + dy / span * edge },
       })
     }
 
