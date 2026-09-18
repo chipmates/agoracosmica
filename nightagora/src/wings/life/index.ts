@@ -24,7 +24,7 @@ import css from './life.css?inline'
 import { renderLifeCard } from './card'
 import { drawLifePlate } from './plate'
 import { dateYears, lifeCounts, lifeScale, workYears, type LifeGap } from './scale'
-import { LIFE_BAND_WORDS, LIFE_COUNTS, LIFE_ROW_WORDS, LIFE_WORDS, capitalise, fill, spokenCount } from './words'
+import { LIFE_BAND_WORDS, LIFE_COUNTS, LIFE_ROW_WORDS, LIFE_WORDS, capitalise, countedCertainties, fill, spokenCount } from './words'
 import { LIFE_ROWS, type Bi, type LifeBand, type LifeEvent, type LifeRecord, type LifeRow } from './types'
 
 export type { LifeBand, LifeCounts, LifeEvent, LifePerson, LifeRecord, LifeWork, LifeWingWords, MuseumDate, Sure } from './types'
@@ -188,9 +188,7 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     counts.replaceChildren(
       make('p', 'wing-life-count', capitalise(fill(LIFE_COUNTS.dates[language], {
         total: spokenCount(tally.events.total, language),
-        documented: spokenCount(tally.events.documented, language),
-        inferred: spokenCount(tally.events.inferred, language),
-        tradition: spokenCount(tally.events.tradition, language),
+        counted: countedCertainties(record.sure, tally.events.by, language),
       }))),
       make('p', 'wing-life-count', capitalise(fill(record.words.worksCount[language], {
         total: spokenCount(tally.works.total, language),
@@ -226,10 +224,10 @@ export function createWingLife(options: WingLifeOptions): WingLife {
       name.type = 'button'
       name.setAttribute('aria-expanded', String(wide))
       const dot = make('span', 'wing-life-dot')
-      dot.style.background = record.sure[band.certainty].colour
+      dot.style.background = record.sure[band.certainty]?.colour ?? ''
       dot.setAttribute('aria-hidden', 'true')
       name.append(dot, make('span', 'wing-life-band-title', band.name[language]),
-        make('span', 'wing-life-band-sure', record.sure[band.certainty].word[language]))
+        make('span', 'wing-life-band-sure', record.sure[band.certainty]?.word[language] ?? ''))
       name.addEventListener('click', () => expand(band))
       item.append(name, make('p', 'wing-life-band-line', band.line[language]))
       if (asking === band.id) item.append(question(band))
@@ -277,7 +275,7 @@ export function createWingLife(options: WingLifeOptions): WingLife {
       press.type = 'button'
       press.dataset['event'] = event.id
       const dot = make('span', 'wing-life-dot')
-      dot.style.background = record.sure[event.certainty].colour
+      dot.style.background = record.sure[event.certainty]?.colour ?? ''
       dot.setAttribute('aria-hidden', 'true')
       const time = make('time', 'wing-life-date-label', event.date.label[language])
       if (event.date.earliest) time.dateTime = event.date.earliest
@@ -329,11 +327,11 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     for (const person of record.people) {
       const item = make('li', 'wing-life-person')
       const dot = make('span', 'wing-life-dot')
-      dot.style.background = record.sure[person.certainty].colour
+      dot.style.background = record.sure[person.certainty]?.colour ?? ''
       dot.setAttribute('aria-hidden', 'true')
       item.append(dot, make('span', 'wing-life-person-name', person.name[language]),
         make('span', 'wing-life-person-role', person.role[language]),
-        make('span', 'wing-life-person-sure', record.sure[person.certainty].word[language]))
+        make('span', 'wing-life-person-sure', record.sure[person.certainty]?.word[language] ?? ''))
       list.append(item)
     }
     section.append(list)

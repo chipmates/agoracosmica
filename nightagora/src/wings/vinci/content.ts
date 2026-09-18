@@ -882,6 +882,15 @@ export const vinciLifeWorksCount: VinciText = {
   de: '{total} Bilder hier. {dated} mit einer Jahreszahl im Verzeichnis, {undated} ohne Jahreszahl.',
 };
 
+/** THE THREE CERTAINTIES AS THEY ARE COUNTED. The word beside one date is
+ * the timeline's own; a sentence that counts them needs the same word in a
+ * counting clause, and the life view holds no word of any wing's. */
+export const vinciLifeCertaintyCounted = {
+  documented: { en: '{n} documented', de: '{n} belegt' },
+  inferred: { en: '{n} inferred', de: '{n} erschlossen' },
+  tradition: { en: '{n} from tradition', de: '{n} aus Überlieferung' },
+} satisfies Record<string, VinciText>;
+
 /** What a date the gallery floor does not carry says, instead of offering a
  * walk to a socket that was never cut. */
 export const vinciLifeNotCut: VinciText = {

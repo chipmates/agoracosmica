@@ -50,9 +50,11 @@ export const LIFE_BAND_WORDS = {
  * counted sentence for the middle row is in its record, beside that row's
  * name, and is filled the same way. */
 export const LIFE_COUNTS = {
+  /** The head of the counted sentence; the clause for each certainty comes
+   * from the record, so a life with four of them says four. */
   dates: {
-    en: '{total} dates here. {documented} documented, {inferred} inferred, {tradition} from tradition.',
-    de: '{total} Daten hier. {documented} belegt, {inferred} erschlossen, {tradition} aus Überlieferung.',
+    en: '{total} dates here. {counted}.',
+    de: '{total} Daten hier. {counted}.',
   },
   emptyYears: {
     en: '{empty} of the {span} years from {from} to {to} hold no event in this record. The longest stretch is {longest} years.',
@@ -64,6 +66,18 @@ export const LIFE_COUNTS = {
     de: '{years} Jahre, zu denen dieses Verzeichnis nichts hat.',
   },
 } satisfies Record<string, Bi>
+
+/** THE COUNTED CERTAINTIES, in the record's own order and its own words. A
+ * key no date stands under is left out rather than counted as none. */
+export function countedCertainties(sure: Record<string, { counted: Bi }>, by: Record<string, number>,
+  language: 'en' | 'de'): string {
+  const clauses: string[] = []
+  for (const [key, words] of Object.entries(sure)) {
+    const count = by[key] ?? 0
+    if (count > 0) clauses.push(fill(words.counted[language], { n: spokenCount(count, language) }))
+  }
+  return clauses.join(', ')
+}
 
 const ONES: Record<'en' | 'de', readonly string[]> = {
   en: ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten',

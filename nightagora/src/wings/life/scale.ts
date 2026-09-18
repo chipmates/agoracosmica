@@ -98,12 +98,13 @@ export function lifeScale(events: readonly LifeEvent[], span: { from: number; to
 }
 
 export function lifeCounts(events: readonly LifeEvent[], works: readonly LifeWork[], span: { from: number; to: number }): LifeCounts {
-  const by = (kind: LifeEvent['certainty']): number => events.filter(event => event.certainty === kind).length
+  const by: Record<string, number> = {}
+  for (const event of events) by[event.certainty] = (by[event.certainty] ?? 0) + 1
   const gaps = lifeGaps(events, span.from, span.to)
   const years = reached(events, span.from, span.to)
   const dated = works.filter(work => workYears(work, span)).length
   return {
-    events: { total: events.length, documented: by('documented'), inferred: by('inferred'), tradition: by('tradition') },
+    events: { total: events.length, by },
     works: { total: works.length, dated, undated: works.length - dated },
     emptyYears: span.to - span.from + 1 - years.size,
     longestGapYears: gaps.reduce((most, gap) => Math.max(most, gap.years), 0),

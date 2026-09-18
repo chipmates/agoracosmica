@@ -75,7 +75,7 @@ export function drawLifePlate(options: {
     parent.append(node)
     return node
   }
-  const colour = (kind: Sure): string => record.sure[kind].colour
+  const colour = (kind: Sure): string => record.sure[kind]?.colour ?? ''
 
   const after = record.bands.find(band => band.afterlife)
   const afterEvents = after ? record.events.filter(event => event.band === after.id) : []

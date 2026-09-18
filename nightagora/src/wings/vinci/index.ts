@@ -76,7 +76,7 @@ import { createVinciHangStrip, vinciSheetTitle, type VinciStripEntry } from './c
 import { pathSpecifications } from './paths'
 import { roadGradeProvenance } from './road-grade'
 import { apronProvenance } from './apron'
-import { vinciContent, vinciPlanRooms, vinciThroughLine, vinciLifeBands, vinciLifePeople, vinciLifeSecondLine, vinciLifeNotCut, vinciLifeWorksRow, vinciLifeWorksCount, vinciWelcomeText, vinciLegacyStationIds, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, vinciAbsences, vinciGrounds, vinciRightsPolicy, vinciWingCounts, vinciSourcesHeadings, type VinciCertainty, type VinciStatement, type VinciStationId, type VinciText } from './content'
+import { vinciContent, vinciPlanRooms, vinciThroughLine, vinciLifeBands, vinciLifePeople, vinciLifeSecondLine, vinciLifeNotCut, vinciLifeWorksRow, vinciLifeWorksCount, vinciLifeCertaintyCounted, vinciWelcomeText, vinciLegacyStationIds, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, vinciAbsences, vinciGrounds, vinciRightsPolicy, vinciWingCounts, vinciSourcesHeadings, type VinciCertainty, type VinciStatement, type VinciStationId, type VinciText } from './content'
 import wingCss from './wing.css?inline'
 
 const text=(value:VinciText):string=>value[lang()]
@@ -654,7 +654,9 @@ export function createWing():VinciWingModule {
     controls:{shared:{back:VinciText};date:{age:VinciText;age_about:VinciText}}}
   const LIFE_HONESTY=LIFE_CARDS.floor_honesty
   const LIFE_AGE_WORDS={exact:LIFE_CARDS.controls.date.age,about:LIFE_CARDS.controls.date.age_about}
-  const SURE_RANK:Record<Sure,number>={documented:2,inferred:1,tradition:0}
+  const SURE_RANK:Record<string,number>={documented:2,inferred:1,tradition:0}
+  /** A key the wing does not rank stands under every one it does. */
+  const sureRank=(key:string):number=>SURE_RANK[key]??-1
   /** A day and a year apart, in milliseconds: the widest span an age may be
    * said about. */
   const LIFE_YEAR_MS=366*864e5
@@ -701,7 +703,7 @@ export function createWing():VinciWingModule {
       if(!own.length)continue
       const from=own[0]!.date,to=own[own.length-1]!.date
       bands.push({id:band.id,name:band.name,line:band.line,from,to,
-        certainty:SURE_RANK[from.certainty]<=SURE_RANK[to.certainty]?from.certainty:to.certainty,
+        certainty:sureRank(from.certainty)<=sureRank(to.certainty)?from.certainty:to.certainty,
         first:own.slice(0,4).map(event=>event.id),...(band.afterlife?{afterlife:true as const}:{})})
     }
     const people:LifePerson[]=vinciLifePeople.map(person=>({id:person.id,name:person.name,role:person.role,
@@ -709,9 +711,12 @@ export function createWing():VinciWingModule {
       certainty:person.events.reduce<Sure>((best,id)=>{
         const stud=LINE_STUDS.find(entry=>entry.id===id)
         const kind=(stud?.certainty??'tradition') as Sure
-        return SURE_RANK[kind]>SURE_RANK[best]?kind:best},'tradition')}))
-    const sure=Object.fromEntries((['documented','inferred','tradition'] as const).map(key=>
-      [key,{word:{en:LINE_CERTAINTY[key].en,de:LINE_CERTAINTY[key].de},colour:LINE_CERTAINTY[key].colour}])) as LifeRecord['sure']
+        return sureRank(kind)>sureRank(best)?kind:best},'tradition')}))
+    // THE WING NAMES ITS OWN CERTAINTIES: the view holds no word of them, so
+    // the key set, the words and the counted clauses all come from here.
+    const sure=Object.fromEntries((Object.keys(vinciLifeCertaintyCounted) as (keyof typeof vinciLifeCertaintyCounted)[]).map(key=>
+      [key,{word:{en:LINE_CERTAINTY[key].en,de:LINE_CERTAINTY[key].de},
+        counted:vinciLifeCertaintyCounted[key],colour:LINE_CERTAINTY[key].colour}])) as LifeRecord['sure']
     return {bands,events,works:lifeWorks(),people,sure,
       words:{throughLine:vinciThroughLine,secondLine:vinciLifeSecondLine,honesty:LIFE_HONESTY,notCut:vinciLifeNotCut,
         worksRow:vinciLifeWorksRow,worksCount:vinciLifeWorksCount,age:LIFE_AGE_WORDS,back:LIFE_CARDS.controls.shared.back},

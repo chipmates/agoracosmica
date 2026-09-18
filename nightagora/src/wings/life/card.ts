@@ -43,9 +43,11 @@ export function renderLifeCard(options: LifeCardHost): void {
     head.append(make('span', 'wing-life-card-age', age))
   }
   const sure = record.sure[event.certainty]
-  const word = make('span', 'wing-life-card-sure', sure.word[language])
-  word.style.setProperty('--certainty', sure.colour)
-  head.append(word)
+  if (sure) {
+    const word = make('span', 'wing-life-card-sure', sure.word[language])
+    word.style.setProperty('--certainty', sure.colour)
+    head.append(word)
+  }
   host.append(head, make('p', 'wing-life-card-line', event.line[language]))
 
   if (event.source) {

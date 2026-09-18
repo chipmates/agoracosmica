@@ -11,8 +11,23 @@
 
 export interface Bi { en: string; de: string }
 
-/** The museum's three words for how sure a thing is. */
-export type Sure = 'documented' | 'inferred' | 'tradition'
+/** HOW SURE A THING IS, in the record's own key. The museum does not fix the
+ * set: one life is documented, inferred or held by tradition, another is
+ * documented, reported, inferred or disputed, and a module that named three
+ * of them could not draw the second life. Every word and colour for a key
+ * comes in through the record, so nothing under this folder says a certainty
+ * out loud. */
+export type Sure = string
+
+/** What a wing says about one of its own certainty keys: the word on a date,
+ * the same word inside a counted sentence, and the colour the floor already
+ * cuts it in. */
+export interface LifeSure {
+  word: Bi
+  /** the clause of the counted sentence, with {n} for the count */
+  counted: Bi
+  colour: string
+}
 
 export interface MuseumDate {
   /** Extended Date/Time Format, derived from the record, never retyped. */
@@ -81,7 +96,8 @@ export interface LifePerson {
 }
 
 export interface LifeCounts {
-  events: { total: number; documented: number; inferred: number; tradition: number }
+  /** the dates, and how many of them stand under each key of the record */
+  events: { total: number; by: Record<string, number> }
   works: { total: number; dated: number; undated: number }
   emptyYears: number
   longestGapYears: number
@@ -118,9 +134,9 @@ export interface LifeRecord {
   works: readonly LifeWork[]
   people: readonly LifePerson[]
   words: LifeWingWords
-  /** The museum's three words and the colours the wing already cuts them in,
-   * so the view says certainty in the same colour the floor does. */
-  sure: Record<Sure, { word: Bi; colour: string }>
+  /** The record's own certainty keys, in the order its counted sentence says
+   * them, with the colours the wing already cuts them in. */
+  sure: Record<string, LifeSure>
   /** the years the life itself runs between, the afterlife excluded */
   span: { from: number; to: number }
 }
