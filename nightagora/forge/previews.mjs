@@ -88,9 +88,12 @@ const EXHIBITS = [
 const only = flags.get('only') ? String(flags.get('only')).split(',') : null
 const wanted = only ? EXHIBITS.filter(e => only.includes(e.id)) : EXHIBITS
 
-const fileOf = id => `${id.replace(/\//g, '-')}.webp`
-const pathOf = e => `previews/${e.kind}/${fileOf(e.id)}`
-const recordId = e => `vinci/exhibit-preview/${e.kind}/${e.id.replace(/\//g, '-')}`
+/** The file is named by the exhibit, under the folder of its kind: a machine
+ *  whose id already says machine does not say it twice. */
+const nameOf = e => (e.id.startsWith(`${e.kind}/`) ? e.id.slice(e.kind.length + 1) : e.id).replace(/\//g, '-')
+const fileOf = e => `${nameOf(e)}.webp`
+const pathOf = e => `previews/${e.kind}/${fileOf(e)}`
+const recordId = e => `vinci/exhibit-preview/${e.kind}/${nameOf(e)}`
 
 /* ------------------------------------------------------------ the frame */
 
@@ -398,7 +401,7 @@ async function contactSheet(entries) {
 
 mkdirSync(SHOTS, { recursive: true })
 if (flags.get('sheet')) {
-  await contactSheet(wanted.map(e => ({ id: e.id, file: join(OUT_DIR, e.kind, fileOf(e.id)) })).filter(e => existsSync(e.file)))
+  await contactSheet(wanted.map(e => ({ id: e.id, file: join(OUT_DIR, e.kind, fileOf(e)) })).filter(e => existsSync(e.file)))
   process.exit(0)
 }
 
@@ -471,13 +474,13 @@ try {
     if (read.deviation < 6) problems.push(`${exhibit.id}: the frame is flat (spread ${read.deviation}): the pose, the light or the body`)
     if (exhibit.kind === 'machine' && !box) problems.push(`${exhibit.id}: no body stood out of the ground`)
     if (WRITE) {
-      const file = join(OUT_DIR, exhibit.kind, fileOf(exhibit.id))
+      const file = join(OUT_DIR, exhibit.kind, fileOf(exhibit))
       mkdirSync(dirname(file), { recursive: true })
       writeFileSync(file, webp)
       written.push({ exhibit, bytes: webp.length, sha: createHash('sha256').update(webp).digest('hex'), file })
     } else {
-      writeFileSync(join(SHOTS, fileOf(exhibit.id)), webp)
-      written.push({ exhibit, bytes: webp.length, sha: '', file: join(SHOTS, fileOf(exhibit.id)) })
+      writeFileSync(join(SHOTS, fileOf(exhibit)), webp)
+      written.push({ exhibit, bytes: webp.length, sha: '', file: join(SHOTS, fileOf(exhibit)) })
     }
     await closeExhibit(page)
   }
