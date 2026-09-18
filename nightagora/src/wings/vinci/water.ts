@@ -136,6 +136,8 @@ export function createWater(scene:Scene,stack:Stack,options:WaterOptions={}):Wat
     const material=reflective.material as MeshPhysicalNodeMaterial
     material.colorNode=material.colorNode!.mul(float(1).sub(fresnel));material.emissiveNode=reflection.node.rgb.mul(fresnel.mul(.85))
     reflective.userData['reflection']='One planar scene pass, half resolution, no bounces; calm uses the installed environment.'
+    // the warm up deals a body carrying its own pass into the first slice
+    reflective.userData['naPass']=true
   }
   group.userData['certainty']=options.comparison?'modern-reference':'reconstructed'
   group.userData['provenance']='OSM contributors ODbL1.0: dossier clipped Amasse water_profile; A-SITE width2.8m, depth0.5m, supplied water levels. IGN165-sample ground retained; exact cut banks. Procedural2026-09-09, no source textures.'

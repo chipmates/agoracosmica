@@ -164,6 +164,13 @@ export function warmWalk(
         hidden.push(object)
       }
       if (!object.frustumCulled || !draws(object)) return
+      /* A BODY CARRYING A PASS OF ITS OWN IS DEALT FIRST. A mirror is one
+         render pass over the scene, and it runs only in a frame where the
+         mirror itself is drawn: dealt to the middle of the sweep it meets
+         every batch opened before it in one frame. Marked `naPass` beside
+         `naWarm`, it opens with the first slice and meets one batch a frame
+         from there. */
+      if (object.userData['naPass'] === true) { batches[0]!.push(object); return }
       batches[dealt++ % WARM_SWEEP_SLICES]!.push(object)
     })
   }
