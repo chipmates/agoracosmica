@@ -69,12 +69,16 @@
     },
     "applies_to": {
       "painting": ["painting-plate", "painting-preview"],
-      "page": ["sheet-page", "sheet-thumb", "folio-page", "folio-thumb", "codex-page", "codex-thumb"]
+      "page": ["sheet-page", "sheet-thumb", "folio-page", "folio-thumb", "codex-page", "codex-thumb", "ms-page", "ms-thumb"]
     }
   },
   "zoom_ceiling": {
     "en": "This is the whole source. It has no more detail than this.",
     "de": "Das ist die ganze Quelle. Mehr Detail gibt es nicht."
+  },
+  "zoom_ceiling_scan": {
+    "en": "This is the whole scan. The 1883 page holds no more detail than this.",
+    "de": "Das ist der ganze Scan. Mehr Detail hat die Seite von 1883 nicht."
   },
   "rule_labels": [
     { "en": "1 cm", "de": "1 cm" },
@@ -105,6 +109,15 @@
         { "id": "drive", "en": "The drive", "de": "Der Antrieb" },
         { "id": "working-part", "en": "The working part", "de": "Das Werkstück" }
       ]
+    },
+    "manuscript": {
+      "hand": { "en": "His hand", "de": "Seine Handschrift" },
+      "mirror": { "en": "In a mirror", "de": "Im Spiegel" },
+      "print": { "en": "In print", "de": "Im Druck" },
+      "back_to_leaf": { "en": "Back to the leaf", "de": "Zurück zum Blatt" },
+      "place": { "en": "{n} of {total}", "de": "{n} von {total}" },
+      "leaves": { "en": "The leaves of manuscript {codex}, {total} sides", "de": "Die Blätter des Manuskripts {codex}, {total} Seiten" },
+      "more_leaf": { "en": "More about this leaf", "de": "Mehr über dieses Blatt" }
     },
     "date": {
       "previous": { "en": "Previous", "de": "Zurück" },
