@@ -82,10 +82,13 @@
 .wing-plan-foot {flex:0 0 auto;display:flex;justify-content:flex-end;gap:8px;padding:10px 20px;border-top:1px solid #a9977344;}
 .wing-plan-close {min-width:120px;min-height:44px;padding:10px 16px;background:transparent;border:1px solid #a9977366;color:#e6d6b8;
   font:12px/1.2 var(--sans);cursor:pointer;}
-/* THE DOOR TO THE LIFE stands at the other end of the foot from the way out.
-   Scoped to the foot: the same class names a control in the wing's welcome. */
-.wing-plan-foot .wing-life-door {margin-right:auto;min-width:120px;min-height:44px;padding:10px 16px;background:transparent;
-  border:1px solid #a9977366;color:#e6d6b8;font:12px/1.2 var(--sans);cursor:pointer;}
+/* THE DOOR TO THE LIFE stands at the other end of the foot from the way out,
+   at the weight of the control beside it. Scoped to the foot, and setting what
+   it must not inherit: the same class names a quieter underlined control in
+   the wing's welcome, and that rule reaches every button that carries it. */
+.wing-plan-foot .wing-life-door {display:inline-block;margin:0 auto 0 0;min-width:120px;min-height:44px;padding:10px 16px;
+  background:transparent;border:1px solid #a9977366;color:#e6d6b8;font:12px/1.2 var(--sans);letter-spacing:normal;
+  text-transform:none;text-decoration:none;cursor:pointer;}
 .wing-plan-foot .wing-life-door[hidden] {display:none;}
 .wing-plan-foot .wing-life-door:focus-visible {outline:1px solid #edcc8c;outline-offset:-2px;}
 .wing-plan[data-narrow='true'] .wing-plan-foot .wing-life-door {flex:1 1 auto;min-width:0;margin-right:0;padding:10px 6px;}
