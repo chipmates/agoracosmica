@@ -66,8 +66,10 @@ export type DeepPlateTier = 'hero' | 'standard' | 'calm'
  * than reaching it, so this is what counts as standing there. */
 const AT_THE_CEILING = .999
 
-/** One tile as RGBA8 in megabytes, which is what a cache count costs. */
-const tileMB = (size: number): number => size * size * 4 / 1e6
+/** What a cached tile costs as RGBA8, in megabytes. A pyramid's tile is its
+ * own square; a plate with no pyramid is one tile and that tile is the
+ * whole file, which is the number a budget has to hear. */
+const tileMB = (pixels: number): number => pixels * 4 / 1e6
 
 /** The rule is a reading, so it is never a stub and never runs past the
  * plate: the numeral chosen is the largest one whose bar stands inside
@@ -103,9 +105,9 @@ export function createDeepPlatePayload(options: {
   let rule: HTMLDivElement | undefined, ruleBar: HTMLDivElement | undefined, ruleLabel: HTMLSpanElement | undefined
   let viewer: import('openseadragon').Viewer | undefined
   let library: typeof import('openseadragon') | undefined
-  let live = false, seated = false, tileSize = 256, said = ''
+  let live = false, seated = false, tileSize = 256, tilePixels = 256 * 256, said = ''
   let framed: DeepPlateDetail | null = null
-  let grown = false, waiting = 0
+  let grown = false, drawn = false, waiting = 0
   let seat: VitrineRect | null = null
   const cut = options.window ?? { left: 0, top: 0, right: 1, bottom: 1 }
   const { width, height } = options.source
@@ -150,7 +152,7 @@ export function createDeepPlatePayload(options: {
     const tiles = viewer.tileCache.numCachesLoaded()
     root.dataset['drawer'] = viewer.drawer.getType() ?? 'unknown'
     root.dataset['tiles'] = String(tiles)
-    root.dataset['cacheMb'] = (tiles * tileMB(tileSize)).toFixed(1)
+    root.dataset['cacheMb'] = (tiles * tileMB(tilePixels)).toFixed(1)
     root.dataset['zoom'] = magnification().toFixed(3)
     measure()
     speak()
@@ -266,7 +268,8 @@ export function createDeepPlatePayload(options: {
     library = loaded
     const { drawer, cap } = drawing()
     const source = pyramid ? deepTileSource(pyramid) : deepImageSource(options.source.file)
-    if (pyramid) tileSize = pyramid.tileSize
+    if (pyramid) { tileSize = pyramid.tileSize; tilePixels = tileSize * tileSize }
+    else tilePixels = width * height
     const made = new loaded.Viewer({
       element: stage,
       tileSources: source as unknown as string,
@@ -308,7 +311,12 @@ export function createDeepPlatePayload(options: {
     made.addHandler('canvas-key', event => { event.preventDefaultAction = true })
     made.addHandler('open', () => seatNow())
     made.addHandler('viewport-change', () => readout())
-    made.addHandler('tile-drawn', () => { fit(); readout() })
+    // THE DRAWER THAT LANDS DECIDES WHICH EVENTS EXIST: the WebGL drawer
+    // rejects a tile-drawn handler outright. A tile that has loaded is
+    // drawn by the next pass of the world, and update-viewport is raised
+    // after that pass, so this pair is the first drawn tile on any drawer.
+    made.addHandler('tile-loaded', () => { drawn = true; readout() })
+    made.addHandler('update-viewport', () => { if (drawn) fit() })
     // A source that never draws a tile may not leave the window standing on
     // a frame the room is no longer keeping.
     waiting = setTimeout(() => fit(), 1500) as unknown as number
@@ -343,6 +351,7 @@ export function createDeepPlatePayload(options: {
       seated = false
       said = ''
       framed = null
+      drawn = false
       const document = next.element.ownerDocument
       root = document.createElement('div')
       root.className = 'deep-plate'
