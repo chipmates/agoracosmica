@@ -31,6 +31,7 @@ import {
   type CourseRecipe,
 } from '../stack/detail'
 import { seal, type Part } from '../stack/parts/common'
+import type { PartsKit } from '../stack/parts'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type N = any
@@ -273,9 +274,31 @@ const EYES: Record<string, Record<string, Eye>> = {
   },
 }
 
+/** A LIBRARY SET ON A FACE THAT STANDS UP. The three procedural scales are
+    read in three dimensions and never smear; the library's own photograph is
+    read through one projection, and on the world path that projection points
+    straight down, so a wall wears a floor's picture stretched up it and a
+    drum wears it wrapped. This pair is that one change and nothing else. */
+function libraryFaces(mode: DetailMode, kit: PartsKit): Object3D {
+  const material = kit.bench.surface('brick-old-red', {
+    world: true,
+    ...(mode === 'after' ? { space: 'triplanar' as const } : {}),
+  })
+  const face = body(new BoxGeometry(2.4, 2.6, 0.45), material)
+  face.position.set(-0.9, 1.3, 0)
+  const column = body(new CylinderGeometry(0.55, 0.55, 2.6, 96, 1), material)
+  column.position.set(1.7, 1.3, 0)
+  const both = new Object3D()
+  both.add(face, column)
+  return both
+}
+
 export const DETAIL_SPECIMENS: Record<
   string,
-  { build: (mode: DetailMode, count: 1 | 2 | 3) => Part; eyes: Record<string, Eye> }
+  {
+    build: (mode: DetailMode, count: 1 | 2 | 3, kit: PartsKit) => Part
+    eyes: Record<string, Eye>
+  }
 > = {
   'detail-floor': {
     build: (mode, count) =>
@@ -316,6 +339,16 @@ export const DETAIL_SPECIMENS: Record<
     build: (mode, count) =>
       seal(drum(mode, count), 'drum', 'A turned drum 1.0 m across, coursed: the curve a plane pick moirés on.', []),
     eyes: EYES['detail-drum'] ?? {},
+  },
+  'detail-library': {
+    build: (mode, _count, kit) =>
+      seal(
+        libraryFaces(mode, kit),
+        'library on a standing face',
+        'A brick set on an upright face and on a drum, read through one downward projection or through three.',
+        ['brick-old-red']
+      ),
+    eyes: { face2: { from: [0.4, 1.9, 3.6], to: [0.4, 1.25, 0] } },
   },
   'detail-sheet': {
     build: (mode, count) => {

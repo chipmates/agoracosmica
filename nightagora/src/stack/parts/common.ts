@@ -307,6 +307,10 @@ export interface SurfaceOptions {
   /** the geometry carries no uv the helper can use (an instanced scatter
       the kit lays out itself); read the maps off the world instead */
   world?: boolean
+  /** and on a world-read surface, how: one projection straight down, or
+      three blended on the world normal, which is what a face that stands
+      up and a curved one need */
+  space?: 'world' | 'triplanar'
 }
 
 /** the shop's material bench. A part asks for a library set and gets a lit
@@ -344,7 +348,9 @@ export class Bench {
   surface(name: string, o: SurfaceOptions = {}): MeshStandardNodeMaterial {
     const key = `${name}|${o.roughFloor ?? ''}|${o.tint ?? ''}|${o.maps ?? ''}|${o.value ?? ''}|${
       o.metalness ?? ''
-    }|${o.twoSided ? 2 : 1}|${o.world ? 'w' : ''}|${o.wall ? `${o.wall.azimuth}:${o.wall.base ?? 0}` : ''}`
+    }|${o.twoSided ? 2 : 1}|${o.world ? 'w' : ''}|${o.space ?? ''}|${
+      o.wall ? `${o.wall.azimuth}:${o.wall.base ?? 0}` : ''
+    }`
     const held = this.cache.get(key)
     if (held) return held
     const set = this.set(name)
@@ -360,9 +366,19 @@ export class Bench {
     const where = o.wall
       ? { uv: wallUV(o.wall.azimuth, o.wall.base ?? 0) }
       : o.world
-        ? {}
+        ? o.space === 'triplanar'
+          ? { space: 'triplanar' as const }
+          : {}
         : { uv: uv() }
-    const scales = { ...where, count: this.stack.tierConfig().detail }
+    /* THE KIT FADES BY THE PIXEL. Every part here is judged at whatever
+       distance a wing stands it at, and a roof read along its own slope has
+       a pixel metres long and centimetres across: a distance fade takes its
+       courses away at twelve metres, where the pixel still holds them. */
+    const scales = {
+      ...where,
+      count: this.stack.tierConfig().detail,
+      filter: 'footprint' as const,
+    }
     /* THE PHOTOGRAPH IS NOT READ UNTIL IT HAS ARRIVED, and that is not a
        nicety. A set's maps exist as one-texel stand-ins from the first frame
        and their pixels are filled in later; a material that samples one

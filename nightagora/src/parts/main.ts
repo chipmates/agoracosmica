@@ -273,7 +273,7 @@ const SPECIMENS: Record<string, () => Part> = {
   ...Object.fromEntries(
     Object.entries(DETAIL_SPECIMENS).map(([name, spec]) => [
       name,
-      () => spec.build(mode, stack.tierConfig().detail),
+      () => spec.build(mode, stack.tierConfig().detail, kit),
     ])
   ),
 }
