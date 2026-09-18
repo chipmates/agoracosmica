@@ -27,7 +27,7 @@ export type { PlanHighlight, PlanRoom, PlanShape, PlanSite, PlanStation, RecapEn
 const HISTORY_MARK = 'wingPlan'
 
 /** THE WIDE STAGE: the plate takes two thirds of the sheet, the reading
- * stands beside it, and both stand clear of the bar. */
+ * stands beside it, and the sheet takes the stage's own height. */
 export const PLAN_WIDE = { top: 76, side: 28, bottom: 18, padding: 20, gap: 22, plateShare: .66, readingMin: 270, readingMax: 380 } as const
 /** THE NARROW STAGE: the sheet rises from the bar, the plate on top scaled to
  * fit whole, the reading under it. */
@@ -127,7 +127,12 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
     const floor = Math.min(height, Math.max(0, options.floor()))
     dialog.dataset['narrow'] = String(narrow)
     const numbers = narrow ? PLAN_NARROW : PLAN_WIDE
-    const top = numbers.top, bottom = Math.max(top + 200, floor - numbers.bottom)
+    /* THE SHEET IS MODAL, so the bar under it cannot be reached while it
+       stands and is not what bounds it: the wide stage takes the viewport's
+       own height less its margin, and the plate grows with it. The narrow
+       sheet still rises from the bar, which is where it comes from. */
+    const top = numbers.top
+    const bottom = Math.max(top + 200, (narrow ? floor : height) - numbers.bottom)
     const left = narrow ? numbers.side : Math.max(numbers.side, Math.round((width - 980) / 2))
     Object.assign(dialog.style, {
       left: `${left}px`, top: `${top}px`,
