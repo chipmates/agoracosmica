@@ -120,10 +120,11 @@
 .wing-life-date-line {margin:6px 0 0;font:13px/1.5 var(--serif);color:#eae1d1;text-wrap:pretty;}
 .wing-life-date-source {margin:7px 0 0;font:11px/1.5 var(--sans);color:#a8b3b7;text-wrap:pretty;}
 .wing-life-date-foot {display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:9px;}
-.wing-life-date-walk,.wing-life-date-record {flex:0 1 auto;min-height:44px;padding:10px 12px;background:transparent;border:1px solid #a9977366;
-  color:#e6d6b8;font:12px var(--sans);cursor:pointer;}
-.wing-life-date-record {border-color:#a9977344;color:#b6bcae;}
-.wing-life-date-elsewhere {flex:1 1 100%;margin:0;font:11px/1.45 var(--sans);color:#a8b3b7;text-wrap:pretty;}
+.wing-life-date-record {flex:0 1 auto;min-height:44px;padding:10px 12px;background:transparent;border:1px solid #a9977344;
+  color:#b6bcae;font:12px var(--sans);cursor:pointer;}
+/* A DATE THE FLOOR CARRIES IS MARKED, NOT WALKED TO: the visitor is already
+   standing on it, so the line reads and takes no press. */
+.wing-life-date-cut {flex:0 1 auto;align-self:center;margin:0;font:11px/1.45 var(--sans);color:#c2a86f;text-wrap:pretty;}
 /* AN EMPTY STRETCH KEEPS ITS PLACE IN THE READING: the years are there and
    the record is not. */
 .wing-life-gap-note {margin:2px 0;padding:0;}
@@ -162,7 +163,7 @@
 .wing-life-ask-note {margin:8px 0 0;font:11px/1.45 var(--sans);color:#a8b3b7;}
 
 .wing-life-item-name:focus-visible,.wing-life-date-name:focus-visible,.wing-life-close:focus-visible,
-.wing-life-ask-control:focus-visible,.wing-life-date-walk:focus-visible,.wing-life-date-record:focus-visible
+.wing-life-ask-control:focus-visible,.wing-life-date-record:focus-visible
   {outline:1px solid #edcc8c;outline-offset:-2px;}
 
 .wing-life-foot {flex:0 0 auto;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;padding:9px 20px;

@@ -55,15 +55,14 @@ import { createWater, type WaterGroup } from './water'
 import { createMeasurement, type VinciMeasurement } from './measurement'
 import { collectVinciLabelOccluders, createVinciExhibitDots, createVinciLabelAnchor, vinciSightBlocked, type VinciExhibitDots, type VinciExhibitMark, type VinciLabelAnchor, type VinciLabelMode } from './labels'
 import { pickVinciExhibit, readVinciExhibits, vinciMachineRoom, type VinciPickEntry } from './collection/pick'
-import { vinciApproachPose, vinciApproachStation, vinciStudIndex } from './collection/approaches'
-import { createVinciCloseLook, createVinciMachinePayload, fillVinciLimitSlots, renderVinciMachineRecord, vinciDeathbedCard, vinciLimits, vinciLine, vinciMachineCard, vinciPlaceCard, vinciPlaceTitle, vinciDateWords, vinciManuscriptWords, VINCI_EXHIBIT_CARD, VINCI_PAGE_HONESTY, VINCI_VITRINE_WORDS, type VinciPlaceCard, type VinciPlaceCertainty, type VinciPlaceId } from './collection/close-look'
+import { LINE_FLOOR_PICK, vinciApproachPose, vinciApproachStation, vinciStudIndex } from './collection/approaches'
+import { createVinciCloseLook, createVinciMachinePayload, fillVinciLimitSlots, renderVinciMachineRecord, vinciDeathbedCard, vinciLimits, vinciLine, vinciMachineCard, vinciPlaceCard, vinciPlaceTitle, vinciManuscriptWords, VINCI_EXHIBIT_CARD, VINCI_PAGE_HONESTY, VINCI_VITRINE_WORDS, type VinciPlaceCard, type VinciPlaceCertainty, type VinciPlaceId } from './collection/close-look'
 import { createPlacePayload } from '../vitrine/place'
 import { readingTableOf } from './table'
 import { CODEX_ENTRIES } from './table/codex-shelf'
 import type { ReadingTable } from './table'
 import { createReaderPayload, type ReaderPayload } from './table/reader'
 import { createReaderPayload as createVitrineReaderPayload, type ReaderPayload as ReaderPayloadOfWall } from '../vitrine/reader'
-import { createStudReaderPayload, type StudReaderPayload } from './line/reader'
 import { LINE_SECTIONS, LINE_STUDS, type Stud } from './line/studs'
 import { ageAt, studBounds, studEdtf } from './line/edtf'
 import { SOURCE_READINGS } from './line/bench/visitor-sources'
@@ -79,7 +78,7 @@ import { createVinciHangStrip, vinciSheetTitle, type VinciStripEntry } from './c
 import { pathSpecifications } from './paths'
 import { roadGradeProvenance } from './road-grade'
 import { apronProvenance } from './apron'
-import { vinciContent, vinciPlanRooms, vinciThroughLine, vinciLifeBands, vinciLifePeople, vinciLifeSecondLine, vinciLifeNotCut, vinciLifeWorksRow, vinciLifeWorksCount, vinciLifeWorksEmpty, vinciLifeCertaintyCounted, vinciLifeHourMark, vinciHourValues, vinciWelcomeText, vinciLegacyStationIds, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, vinciAbsences, vinciGrounds, vinciRightsPolicy, vinciWingCounts, vinciSourcesHeadings, type VinciCertainty, type VinciStatement, type VinciStationId, type VinciText } from './content'
+import { vinciContent, vinciPlanRooms, vinciThroughLine, vinciLifeBands, vinciLifePeople, vinciLifeSecondLine, vinciLifeCut, vinciLifeWorksRow, vinciLifeWorksCount, vinciLifeWorksEmpty, vinciLifeCertaintyCounted, vinciLifeHourMark, vinciHourValues, vinciWelcomeText, vinciLegacyStationIds, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, vinciAbsences, vinciGrounds, vinciRightsPolicy, vinciWingCounts, vinciSourcesHeadings, type VinciCertainty, type VinciStatement, type VinciStationId, type VinciText } from './content'
 import wingCss from './wing.css?inline'
 
 const text=(value:VinciText):string=>value[lang()]
@@ -228,10 +227,9 @@ export function createWing():VinciWingModule {
   const DOTS_PER_TIER:Record<string,number>={hero:8,standard:6,calm:3}
   /** The one mode a press opens in, set by the caller the press came from. */
   let openMode:'auto'|'walk'|'cut'='auto', exhibitAway=false
-  /** THE ADDRESS OF ONE DATE. `#s=<station>&d=<date>` opens the reader at that
-   * date once the station's floor has been read; `dateAt` is the start the
-   * next stud reader takes. */
-  let pendingDate=/(?:^|[#&])d=(life-\d{2})(?:&|$)/.exec(location.hash)?.[1]??null, dateAt:number|null=null
+  /** THE ADDRESS OF ONE DATE. `#s=<station>&d=<date>` opens the life view at
+   * that date once the station carrying its floor is stood in. */
+  let pendingDate=/(?:^|[#&])d=(life-\d{2})(?:&|$)/.exec(location.hash)?.[1]??null
   /** THE LEAF A DOOR NAMES. A folio beside a machine opens the reading at
    * that side rather than at the leaf the book lies open on. */
   let leafAt:string|null=null
@@ -620,6 +618,7 @@ export function createWing():VinciWingModule {
    * title in both columns rather than a second one being invented. */
   function exhibitTitleBi(pick:VinciPickEntry):VinciText|null {
     if(pick.kind==='machine'){const slug=pick.id.slice('machine/'.length);return isMachineSlug(slug)?machineCatalog[slug].title:null}
+    if(pick.id===LINE_FLOOR_PICK){const here=vinciContent.find(entry=>entry.id===pick.station);return here?here.name:null}
     if(pick.kind==='stud'){const stud=LINE_STUDS[vinciStudIndex(pick.id)];return stud?{en:stud.date_label_en,de:stud.date_label_de}:null}
     if(pick.kind==='manuscript'){const codex=CODEX_ENTRIES.find(entry=>`codex/${entry.id}`===pick.id);return codex?{en:codex.en,de:codex.de}:null}
     if(pick.kind==='place'||pick.workId===DEATHBED_WORK){const named=namedExhibit(pick);return named?{en:named.title,de:named.title}:null}
@@ -859,7 +858,7 @@ export function createWing():VinciWingModule {
         counted:vinciLifeCertaintyCounted[key],colour:LINE_CERTAINTY[key].colour}])) as LifeRecord['sure']
     return {bands,events,works:lifeWorks(),people,sure,
       here:LINE_STUDS.find(stud=>stud.date===vinciHourValues.julianDate)?.id,
-      words:{throughLine:vinciThroughLine,secondLine:vinciLifeSecondLine,honesty:LIFE_HONESTY,notCut:vinciLifeNotCut,
+      words:{throughLine:vinciThroughLine,secondLine:vinciLifeSecondLine,honesty:LIFE_HONESTY,cut:vinciLifeCut,
         worksRow:vinciLifeWorksRow,worksCount:vinciLifeWorksCount,worksEmpty:vinciLifeWorksEmpty,age:LIFE_AGE_WORDS,back:LIFE_CARDS.controls.shared.back,
         provenance:VINCI_VITRINE_WORDS.provenance,hour:vinciLifeHourMark},
       span:{from:Number(LIFE_BIRTH.date.slice(0,4)),to:Number(LIFE_DEATH.date.slice(0,4))}}
@@ -971,20 +970,16 @@ export function createWing():VinciWingModule {
     if(pendingExhibit){const id=pendingExhibit;pendingExhibit='';showView(id)}
     openPendingDate()
   }
-  /** A date named in the address opens where the floor carrying its station
-   * stands: at its own socket where the floor cuts it, and otherwise at the
-   * station's first socket with the list at that date. */
+  /** A date named in the address opens the life view at that date, once the
+   * station whose floor carries the line is the one stood in. */
   function openPendingDate():void {
     if(!pendingDate||!standing)return
     const index=LINE_STUDS.findIndex(stud=>stud.id===pendingDate)
     const station=LINE_STUDS[index]?.station
     if(index<0||station!==vinciContent[card]!.id){if(index<0)pendingDate=null;return}
-    const here=picks.filter(pick=>pick.kind==='stud'&&pick.station===station).sort((a,b)=>a.order-b.order)
-    if(!here.length)return
-    const own=here.find(pick=>pick.id===`stud/${pendingDate}`)??here[0]!
+    const at=pendingDate
     pendingDate=null
-    dateAt=index
-    openExhibit(own.id,null,'cut')
+    openLife(at)
   }
   /** What each exhibit's mark says and what colour it carries: its own name
    * and its own certainty, both off the picture module's register. */
@@ -993,6 +988,10 @@ export function createWing():VinciWingModule {
     const marks:VinciExhibitMark[]=[]
     for(const entry of picks){
       if(!entry.openable)continue
+      /* ONE MARK FOR THE WHOLE LINE. Twelve dots over eighteen metres of floor
+         would be the room's loudest thing and say one word twelve times; the
+         field carries the mark, the sockets keep their places in the row. */
+      if(entry.kind==='stud'&&entry.id!==LINE_FLOOR_PICK)continue
       if(entry.kind==='machine'){
         const slug=entry.id.slice('machine/'.length)
         if(isMachineSlug(slug))marks.push({id:entry.id,anchor:entry.anchor,object:entry.object,label:machineCatalog[slug].title[lang()],colour:PICTURE_CERTAINTY_KEY[2]!.colour})
@@ -1088,6 +1087,10 @@ export function createWing():VinciWingModule {
   /** THE KINDS WHOSE NAME IS THEIR OWN RECORD'S: the grave's places, the plaque
    * and the painting at the grave. */
   function namedExhibit(pick:VinciPickEntry):{title:string;colour:string}|null {
+    // THE FLOOR CARRIES THE STATION'S OWN NAME: it is the whole line, so the
+    // one mark over it says what the station says and opens the whole life.
+    if(pick.id===LINE_FLOOR_PICK){const here=vinciContent.find(entry=>entry.id===pick.station)
+      return here?{title:text(here.name),colour:certaintyColour('documented')}:null}
     if(pick.kind==='stud'){const stud=LINE_STUDS[vinciStudIndex(pick.id)];return stud?{title:lang()==='de'?stud.date_label_de:stud.date_label_en,colour:LINE_CERTAINTY[stud.certainty as keyof typeof LINE_CERTAINTY].colour}:null}
     if(pick.kind==='manuscript'){const codex=CODEX_ENTRIES.find(entry=>`codex/${entry.id}`===pick.id);return codex?{title:lang()==='de'?codex.de:codex.en,colour:certaintyColour('documented')}:null}
     if(pick.kind!=='place'&&pick.workId!==DEATHBED_WORK)return null
@@ -1319,29 +1322,13 @@ export function createWing():VinciWingModule {
       openMode='auto'
       return
     }
+    /* THE FLOOR IS THE DOOR INTO THE LIFE. There is one station for the whole
+       cut line and the visitor is standing on it, so a press on a socket
+       opens the life view at that date and a press on the floor opens it
+       whole. Nothing is walked to and nothing is climbed back from. */
     if(entry.kind==='stud'){
-      const start=dateAt??vinciStudIndex(id)
-      dateAt=null
-      let reader:StudReaderPayload|undefined
-      const record=()=>{
-        const stud=reader?.current()
-        exhibitSources={id,title:{en:stud?.date_label_en??'',de:stud?.date_label_de??''},certainty:'documented',renderStation(host){reader?.renderRecord(host)}}
-      }
-      const openRecord=()=>{record();sources.resetScroll();sources.select('station');mode=2;paintDock()}
-      reader=createStudReaderPayload({start,words:vinciDateWords(),
-        link:stud=>`${location.pathname}${location.search}#s=${stud.station}&d=${stud.id}`,
-        walked:()=>{const nav=rail.navigation;return nav.approaching===id||nav.exhibit===id},
-        standing:()=>{const nav=rail.navigation;return !nav.active&&!nav.approaching},
-        changed:()=>{if(exhibitSources?.id===id&&mode===2){record();paintDock()}}})
-      const stud=LINE_STUDS[vinciStudIndex(id)]!
-      openMode=how
-      // THE WAY BACK UP THE LADDER. A date was reached from the life, and the
-      // life is where it belongs: the control climbs there and opens the view
-      // standing at this date, whether the visitor came down that way or not.
-      closeLook.open({id,title:lang()==='de'?stud.date_label_de:stud.date_label_en,line:null,card:[],payload:reader,
-        controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),control(LIFE_WORDS.life,()=>openLife(reader?.current().id)),shut],walk,...vinciLimits(id),
-        work:()=>{const nav=rail.navigation;return nav.exhibit===id&&!nav.active?sphereRect(entry.centre,entry.radiusM):null}},from,how_)
-      openMode='auto'
+      const stud=id===LINE_FLOOR_PICK?null:LINE_STUDS[vinciStudIndex(id)]
+      openLife(stud?.id)
       return
     }
     if(entry.kind==='manuscript'){

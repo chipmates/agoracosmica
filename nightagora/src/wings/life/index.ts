@@ -459,10 +459,6 @@ export function createWingLife(options: WingLifeOptions): WingLife {
   function fillDate(record: LifeRecord, event: LifeEvent, inner: HTMLElement, language: 'en' | 'de'): void {
     renderLifeDate({
       host: inner, record, event, language,
-      walk: target => {
-        const stud = target.walk && 'stud' in target.walk ? target.walk.stud : null
-        if (stud) press(() => options.walk(stud))
-      },
       ...(options.openRecord ? { open: (target: LifeEvent, back: () => void) => options.openRecord?.(target, back) } : {}),
     })
   }

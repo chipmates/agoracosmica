@@ -114,8 +114,8 @@ export interface LifeWingWords {
   secondLine: Bi
   /** the honesty line at the foot, the floor's own */
   honesty: Bi
-  /** what a date the floor does not carry says instead of offering a walk */
-  notCut: Bi
+  /** the mark on a date this wing's own floor carries, where it has one */
+  cut: Bi
   /** The middle row's name, in the word the wing's own register uses for
    * what it holds, and that row's counted sentence in the same grammar as
    * the museum's others. */

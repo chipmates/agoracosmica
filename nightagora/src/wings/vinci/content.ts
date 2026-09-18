@@ -567,7 +567,8 @@ const seeds: readonly StationSeed[] = [
     { en: 'The two that were real, and how they differ.', de: 'Die beiden, die es wirklich gab, und ihr Unterschied.' },
     [], 'brief/CONCEPT-OPUS.md §3 S16'),
   seed('line-early', { en: 'The whole life, cut into the floor', de: 'Das ganze Leben, in den Boden geschnitten' },
-    { en: 'His grandfather recorded the birth on 15 April 1452.', de: 'Sein Großvater verzeichnete die Geburt am 15. April 1452.' },
+    { en: 'His grandfather recorded the birth on 15 April 1452. The whole life opens from this line.',
+      de: 'Sein Großvater verzeichnete die Geburt am 15. April 1452. Von dieser Linie aus öffnet sich das ganze Leben.' },
     [scattered], 'brief/CONCEPT-GPT6.md Station 02; brief/CONCEPT-OPUS.md §3 S8'),
   seed('body', { en: 'The body as a machine', de: 'Der Körper als Maschine' }, body,
     [body], 'brief/CONCEPT-OPUS.md §3 S17'),
@@ -890,11 +891,13 @@ export const vinciLifeWorksEmpty: VinciText = {
   de: 'Kein Bild in diesem Verzeichnis fällt in diese Jahre.',
 };
 
-/** What a date the gallery floor does not carry says, instead of offering a
- * walk to a socket that was never cut. */
-export const vinciLifeNotCut: VinciText = {
-  en: 'This date is not cut into the floor. The gallery holds twelve of the fifty-six.',
-  de: 'Dieses Datum ist nicht in den Boden geschnitten. Die Galerie trägt zwölf der sechsundfünfzig.',
+/** THE MARK ON A DATE THE GALLERY FLOOR CARRIES. The visitor who reads it is
+ * standing on that floor, so it says where the date is and offers no walk;
+ * the dates the floor does not carry say nothing, because the count at the
+ * foot of the view already says how many of the fifty-six are cut. */
+export const vinciLifeCut: VinciText = {
+  en: 'Cut into this floor.',
+  de: 'In diesen Boden geschnitten.',
 };
 
 /** THE SEVEN PERIODS, named by place and by the years the period runs

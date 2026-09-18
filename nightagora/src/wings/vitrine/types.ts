@@ -1,6 +1,7 @@
 /** THE PAYLOAD CONTRACT. The vitrine is one window for every kind of work;
- * the payload is the kind. A picture, a machine, a leaf and a year each
- * implement this, and the window around them does not change. */
+ * the payload is the kind. A picture, a machine and a leaf each implement
+ * this, and the window around them does not change. A year is not one of
+ * them: a date of a life is read in the life view, where all of them stand. */
 
 /** Who draws the stage while a payload stands.
  * `room`: the wing draws its own scene, as it stands.

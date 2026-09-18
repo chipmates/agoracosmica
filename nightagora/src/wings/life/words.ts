@@ -35,7 +35,6 @@ export const LIFE_WORDS = {
     en: 'No date in this record can be put on a year.',
     de: 'Kein Datum in diesem Verzeichnis lässt sich auf ein Jahr legen.',
   },
-  walk: { en: 'Walk me there', de: 'Bring mich hin' },
   /** The strip under the blank, on its own clock: what happened to the work
    * after the life is not a period of that life. */
   after: { en: 'Afterwards', de: 'Danach' },

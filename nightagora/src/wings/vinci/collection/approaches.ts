@@ -373,5 +373,10 @@ export function vinciApproachReachMetres(): number {
 
 /** The identity the registry joins a mounted plate to. */
 export const vinciPlateExhibitId = exhibitId
+/** THE FLOOR ITSELF, as one thing a press can reach: the cut line's field,
+ * which is read from the station that stands at its head and so carries no
+ * approach of its own. */
+export const LINE_FLOOR_PICK = 'line/floor'
+
 /** The date a stud exhibit names, by its place in the whole line. */
 export const vinciStudIndex = (id: string): number => LINE_STUDS.findIndex(stud => `stud/${stud.id}` === id)

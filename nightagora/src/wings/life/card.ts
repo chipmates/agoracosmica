@@ -6,12 +6,12 @@
  * that floats away from it, which is the reader's own grammar and the one a
  * visitor already met at the floor.
  *
- * The bottom rung is the honest one. A date the floor carries offers the walk
- * to it; a date it does not carry says so in the wing's own words instead of
- * offering a door that would open somewhere else.
+ * The bottom rung is the honest one. A date this wing's own floor carries
+ * says so in the wing's words; a date it does not carry says nothing extra,
+ * because the count at the foot of the view already says how many are cut.
  */
 
-import { LIFE_WORDS, fill } from './words'
+import { fill } from './words'
 import type { LifeEvent, LifeRecord } from './types'
 
 export interface LifeDateHost {
@@ -19,8 +19,6 @@ export interface LifeDateHost {
   record: LifeRecord
   event: LifeEvent
   language: 'en' | 'de'
-  /** offered only where the event carries a stud the floor cuts */
-  walk(event: LifeEvent): void
   /** the record layer behind "Where it comes from", where the wing holds one */
   open?(event: LifeEvent, back: () => void): void
 }
@@ -59,12 +57,10 @@ export function renderLifeDate(options: LifeDateHost): void {
   }
 
   const foot = make('div', 'wing-life-date-foot')
-  if (event.walk && 'stud' in event.walk) {
-    const walk = make('button', 'wing-life-date-walk', LIFE_WORDS.walk[language])
-    walk.type = 'button'
-    walk.addEventListener('click', () => options.walk(event))
-    foot.append(walk)
-  } else foot.append(make('p', 'wing-life-date-elsewhere', record.words.notCut[language]))
+  // THE VISITOR IS STANDING ON THE FLOOR THAT CARRIES IT, so this is a mark
+  // and not a door: there is nowhere to be walked to.
+  if (event.walk && 'stud' in event.walk)
+    foot.append(make('p', 'wing-life-date-cut', record.words.cut[language]))
   if (options.open && record.words.provenance) {
     const door = make('button', 'wing-life-date-record', record.words.provenance[language])
     door.type = 'button'

@@ -13,7 +13,7 @@
  */
 import { Box3, Mesh, Raycaster, Sphere, Vector3, type Object3D } from 'three/webgpu'
 import type { VinciStationId } from '../content'
-import { vinciApproachPose, vinciApproachStation, vinciPlateExhibitId, type VinciExhibitKind } from './approaches'
+import { LINE_FLOOR_PICK, vinciApproachPose, vinciApproachStation, vinciPlateExhibitId, type VinciExhibitKind } from './approaches'
 import { BODY_WALL } from './body-wall'
 import { hangPlacements } from './hang'
 import { STANDS } from './stands'
@@ -108,6 +108,10 @@ function faceNormal(mesh: Mesh): Vector3 {
 
 /** A date's proxy covers its socket and the numerals beside it. */
 const STUD_PROXY_M = .6, STUD_MARK_M = .06
+/** The floor between the sockets, pressed where no single date is resolved.
+ * It stays a stride wide: a proxy over the whole eighteen metre run would
+ * swallow every other exhibit of the gallery. */
+const FLOOR_PROXY_M = 1.2
 /** The slab and the framed diagram take a press over their own size. */
 const GRAVE_PROXY_M = { slab: 1.2, frame: 1.7 }
 const TABLE_OBJECT = 'vinci-reading-table', TABLE_LEAF = 'open-facsimile-plate', TABLE_BOOK = 'facsimile-binding'
@@ -171,6 +175,20 @@ export function readVinciExhibits(root: Object3D): VinciPickEntry[] {
         const id = `stud/${stud.id}`
         const centre = new Vector3(stud.east, level, -stud.north)
         entries.push(place(id, 'stud', object, centre, STUD_PROXY_M, centre.clone().setY(level + STUD_MARK_M), index))
+      }
+      /* THE FLOOR IS ONE SELECTABLE THING. The twelve sockets are one run of
+         eighteen metres read from one station, so the line itself takes a
+         press and carries the room's one mark; a socket the eye can resolve
+         still takes its own press and opens the life at that date. The field
+         is walked to by standing at the station, so it needs no approach of
+         its own and its entry says openable on its own account. */
+      if (studs.length) {
+        const first = studs[0]!, last = studs[studs.length - 1]!
+        const middle = new Vector3((first.east + last.east) / 2, level, -(first.north + last.north) / 2)
+        entries.push({ ...place(LINE_FLOOR_PICK, 'stud', object, middle, FLOOR_PROXY_M,
+          middle.clone().setY(level + STUD_MARK_M), studs.length),
+          // the field is the station's own ground, and the station is its approach
+          station: vinciApproachStation(`stud/${first.id}`) ?? null, openable: true })
       }
     } else if (object.name === TABLE_OBJECT) {
       // THE BOOK, NOT THE ROOM THE TABLE BRINGS: the open leaf is the exhibit,
