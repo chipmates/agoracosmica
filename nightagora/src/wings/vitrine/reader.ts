@@ -263,6 +263,7 @@ export function createReaderPayload(options: {
     }
     folio.append(make('span', '', here.label))
     const shows = make('p', 'deep-stand-shows', here.shows)
+    shows.hidden = !here.shows
     folio.lang = host.lang
     shows.lang = host.lang
     plate.stand([folio, shows])
@@ -288,10 +289,12 @@ export function createReaderPayload(options: {
     }
     title.append(make('span', '', here.label))
     block.append(title)
+    // WHERE THE SIDE STANDS IN ITS BOOK, which a book of one side has no
+    // need to say.
     const inside = volume(), place = inside.indexOf(at)
-    block.append(make('p', 'vitrine-meta reader-place',
+    if (inside.length > 1) block.append(make('p', 'vitrine-meta reader-place',
       options.words.place.replace('{n}', String(place + 1)).replace('{total}', String(inside.length))))
-    block.append(make('p', '', here.shows))
+    if (here.shows) block.append(make('p', '', here.shows))
     if (here.named) block.append(make('p', 'reader-named', here.named))
     const line = chosen()?.line
     if (line) block.append(make('p', '', line))
@@ -361,6 +364,12 @@ export function createReaderPayload(options: {
     cells.length = 0
     cellOf.length = 0
     const inside = volume()
+    // A BOOK OF ONE SIDE HAS NO STRIP, and the page takes the room the strip
+    // would have stood in.
+    const single = inside.length < 2 && !(book.gaps ?? []).length
+    shelf.hidden = single
+    if (root) root.dataset['strip'] = String(!single)
+    if (single) return
     shelf.setAttribute('aria-label', book.stripLabel(side()?.volume, inside.length))
     const gaps = new Map((book.gaps ?? []).map(gap => [gap.after, gap.text]))
     for (const index of inside) {

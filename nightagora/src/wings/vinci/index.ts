@@ -60,7 +60,9 @@ import { createVinciCloseLook, createVinciMachinePayload, fillVinciLimitSlots, r
 import { createPlacePayload } from '../vitrine/place'
 import { readingTableOf } from './table'
 import { CODEX_ENTRIES } from './table/codex-shelf'
+import type { ReadingTable } from './table'
 import { createReaderPayload, type ReaderPayload } from './table/reader'
+import { createReaderPayload as createVitrineReaderPayload } from '../vitrine/reader'
 import { createStudReaderPayload, type StudReaderPayload } from './line/reader'
 import { LINE_SECTIONS, LINE_STUDS, type Stud } from './line/studs'
 import { ageAt, studBounds, studEdtf } from './line/edtf'
@@ -398,7 +400,7 @@ export function createWing():VinciWingModule {
         dots?.setOpen(id);dots?.setLimit(0);paintExhibitTitle();paintHeaderVisibility();paintStrip()
         // THE WHOLE PLATE IS THE SAME PLACE: the visitor already stands where
         // the work hangs, so the eye neither walks out to it nor back from it.
-        if(isWholePlate(id)||isWholePlate(from))return false
+        if(isWholePlate(id)||isWholePlate(from)||isLeafDoor(id)||isLeafDoor(from))return false
         // A LEG LEAVES FROM ITS OWN STATION ONLY: a hall machine opened from the
         // hall's other station opens where the visitor stands.
         const pose=vinciApproachStation(id)===vinciContent[card]!.id?vinciApproachPose(id,narrow()):undefined
@@ -1034,7 +1036,7 @@ export function createWing():VinciWingModule {
       }else if(pick.kind==='sheet'){
         const found=sheets.find(source=>`sheet/${source.sheet.id}`===pick.id)
         if(!found)continue
-        row.push({order:pick.order,entry:{id:pick.id,openable:pick.openable,
+        row.push({order:pick.order,entry:{id:pick.id,openable:true,
           title:vinciSheetTitle(lang()==='de'?found.page.honesty_de:found.page.honesty_en),
           colour:PICTURE_CERTAINTY_KEY[0]!.colour,
           preview:ASSET_BASE+validateSheetRecord(found.preview,'sheet-thumb').path}})
@@ -1114,17 +1116,86 @@ export function createWing():VinciWingModule {
     if(!hosts)return
     aimPrint(exposureAt??vinciContent[card]!.id)
   }
+  /** A DOOR INTO A READING stands where the visitor already is: a sheet on
+   * the body wall and a folio beside a machine each open their page in the
+   * reader over the held frame, with no walk out and none back. */
+  const LEAF_DOOR='/leaf'
+  const isLeafDoor=(id:string|null):boolean=>Boolean(id?.endsWith(LEAF_DOOR))
+  /** The reading table of this collection, wherever the visitor stands. */
+  function theBook():ReadingTable|undefined {
+    const found=picks.find(pick=>pick.kind==='manuscript')
+    return found?readingTableOf(found.object):undefined
+  }
+  /** THE FOLIO BESIDE A MACHINE opens that leaf, with its three ways and the
+   * strip of the manuscript it stands in. Back returns to the machine. */
+  function openFolioDoor(slug:MachineSlug,base:string,back:()=>void):void {
+    const table=theBook()
+    const leaf=table?.pages.find(page=>page.page_kind==='facsimile'&&page.machine_slugs.includes(slug))
+    if(!table||!leaf||!closeLook)return
+    const codex=CODEX_ENTRIES.find(record=>record.id===`paris-${leaf.codex}`)
+    const id=`${base}${LEAF_DOOR}`
+    let reader:ReaderPayload|undefined
+    const openRecord=()=>{
+      exhibitSources={id,title:{en:codex?.en??'',de:codex?.de??''},certainty:'documented',renderStation(host){reader?.renderRecord(host)}}
+      sources.resetScroll();sources.select('station');mode=2;paintDock()
+    }
+    reader=createReaderPayload({table,manifest:loadManifest(),
+      walked:()=>false,standing:()=>true,
+      more:text(VINCI_VITRINE_WORDS.more),honesty:text(VINCI_PAGE_HONESTY),
+      words:vinciManuscriptWords(),colour:certaintyColour('documented'),
+      tier:()=>hosts?.world.stack.tierName()??'standard',start:`edition:${leaf.edition_index}`,
+      changed:()=>{if(exhibitSources?.id===id&&mode===2)paintDock()}})
+    closeLook.open({id,title:lang()==='de'?codex?.de??'':codex?.en??'',line:null,card:[],payload:reader,
+      controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),control(VINCI_VITRINE_WORDS.back,back),
+        control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())]},null,'advance')
+  }
+  /** A SHEET OF THE BODY WALL opens as the scan it is: one page, its own
+   * name and holder, and its record. No ways, because there is only one. */
+  function openSheetDoor(id:string,from:HTMLElement|null,how:'enter'|'advance'):void {
+    const found=(exhibits?.sheetSources()??[]).find(source=>`sheet/${source.sheet.id}`===id)
+    if(!found||!closeLook)return
+    const page=validateSheetRecord(found.page,'sheet-page')
+    const record=found.page as typeof found.page&{holder?:string}
+    const title=vinciSheetTitle(lang()==='de'?found.page.honesty_de:found.page.honesty_en)
+    const door=`${id}${LEAF_DOOR}`
+    const openRecord=()=>{
+      exhibitSources={id:door,title:{en:title,de:title},certainty:'documented',renderStation(host){
+        const block=make('div','vinci-record');block.dataset['register']='record'
+        for(const line of [lang()==='de'?found.page.honesty_de:found.page.honesty_en,found.page.licence])
+          block.append(make('p','vinci-statement',line))
+        host.append(block)
+      }}
+      sources.resetScroll();sources.select('station');mode=2;paintDock()
+    }
+    const reader=createVitrineReaderPayload({
+      book:Promise.resolve({
+        // The card's own head carries the sheet's line; the page beside it
+        // is named and not said twice.
+        sides:[{id:found.sheet.id,label:title,shows:'',
+          source:{pyramid:null,file:ASSET_BASE+page.path,width:page.pixels.width,height:page.pixels.height},
+          thumb:null,ways:[],colour:certaintyColour('documented')}],
+        stripLabel:()=>title,holder:record.holder??'',honesty:text(VINCI_PAGE_HONESTY)}),
+      words:vinciManuscriptWords(),tier:()=>hosts?.world.stack.tierName()??'standard'})
+    closeLook.open({id:door,title,line:vinciLine(id),card:[],payload:reader,
+      controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())],
+      ...vinciLimits(id)},from,how)
+  }
   /** THE VITRINE, for every kind this wing can open: the line at its head,
    * the module's own card in the page's language only, the payload, the
    * record behind one control, Close, and the wall walked from inside it. */
   function openExhibit(id:string,from:HTMLElement|null,how:'auto'|'walk'|'cut'='auto'):void {
     const entry=picks.find(pick=>pick.id===id)
-    if(!entry?.openable||!hosts||!closeLook)return
+    if(!entry||!hosts||!closeLook)return
+    // A SHEET HAS NO LEG TO WALK: the registry marks it unopenable because no
+    // certified approach stands in front of the body wall. It opens all the
+    // same, in the reader, over the frame the visitor is already looking at.
+    if(!entry.openable&&entry.kind!=='sheet')return
     const here=vinciContent[card]!.id
     if(entry.station!==here&&!(entry.kind==='machine'&&vinciMachineRoom(entry.station).includes(here)))return
     const walk=[stepControl('\u2039',exhibitStep(id,-1)),stepControl('\u203a',exhibitStep(id,1))]
     const how_=closeLook.id&&closeLook.id!==id?'advance':'enter'
     const shut=control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())
+    if(entry.kind==='sheet'){openMode=how;openSheetDoor(id,from,how_);openMode='auto';return}
     if(entry.kind==='machine'){
       const slug=id.slice('machine/'.length)
       if(!isMachineSlug(slug))return
@@ -1141,6 +1212,10 @@ export function createWing():VinciWingModule {
       // stage once the eye stands, and on the phone that is at once.
       const payload=createVinciMachinePayload({stack:hosts.world.stack,slug,body,
         grade:{...PRINT,exposure:STATION_EXPOSURE[here]??PRINT.exposure},light:KEY_RIG,restore:restoreRoom,openRecord,
+        // THE FOLIO BESIDE THE MODEL IS A DOOR: the leaf the machine was read
+        // from opens in the reader, and Back stands the machine up again.
+        openFolio:theBook()?.pages.some(page=>page.page_kind==='facsimile'&&page.machine_slugs.includes(slug))
+          ?()=>openFolioDoor(slug,id,()=>openExhibit(id,null)):undefined,
         standing:()=>{const nav=rail.navigation;return !nav.active&&!nav.approaching}})
       openMode=how
       closeLook.open({id,title,line:vinciLine(id),card:words.card,after:words.after,payload,

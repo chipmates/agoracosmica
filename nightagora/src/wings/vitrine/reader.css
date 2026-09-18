@@ -14,6 +14,9 @@
 
 /* THE STRIP IS THE BOOK: every side of the volume open now, the one standing
    lit, in the order the binding holds them. */
+.reader[data-strip='false'] .reader-ground,
+.reader[data-strip='false'] .reader-stage {bottom:60px;}
+.reader-shelf[hidden] {display:none;}
 .reader-shelf {position:absolute;left:0;right:0;bottom:60px;height:84px;margin:0;padding:0 2px;
   display:flex;align-items:stretch;gap:6px;list-style:none;overflow-x:auto;overflow-y:hidden;
   overscroll-behavior-x:contain;scrollbar-width:thin;touch-action:pan-x;pointer-events:auto;}
@@ -59,6 +62,8 @@
 
 @media(max-aspect-ratio:9/10) {
   .reader-ground,.reader-stage {bottom:calc(var(--vitrine-peek,190px) + 84px);}
+  .reader[data-strip='false'] .reader-ground,
+  .reader[data-strip='false'] .reader-stage {bottom:calc(var(--vitrine-peek,190px) + 8px);}
   .reader-shelf {bottom:calc(var(--vitrine-peek,190px) + 8px);height:72px;padding:0;gap:4px;}
   .reader-page {width:48px;height:72px;}
   .reader-absence {width:126px;height:72px;padding:4px 6px;}

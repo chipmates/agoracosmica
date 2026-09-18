@@ -8,6 +8,7 @@
  */
 import { createVitrine, type Vitrine, type VitrineExhibit, type VitrinePayload } from '../../vitrine'
 import { createTurntablePayload, type TurntableOptions, type TurntableViewpoint } from '../../vitrine/turntable'
+import type { ReaderWords } from '../../vitrine/reader'
 import { lang } from '../../content'
 import { FURTHER, NEARER } from './deep-plate'
 import type { Grade, Stack } from '../../../stack'
@@ -75,13 +76,15 @@ export const VINCI_PAGE_HONESTY: Words = CARDS.honesty_variants.page
  * can be read, where a side stands in its manuscript, and the two the deep
  * viewer needs beside them. The ceiling is the scan's own sentence, because
  * a photograph of a printed facsimile is not "the source". */
-export function vinciManuscriptWords(): { hand: string; mirror: string; print: string; backToLeaf: string
-  place: string; leaves: string; moreLeaf: string; whole: string; nearer: string; further: string; ceiling: string } {
+export function vinciManuscriptWords(): ReaderWords & { hand: string; mirror: string; print: string
+  backToLeaf: string; leaves: string; moreLeaf: string } {
   const language = lang(), words = CARDS.controls.manuscript
   return { hand: words.hand[language], mirror: words.mirror[language], print: words.print[language],
     backToLeaf: words.back_to_leaf[language], place: words.place[language], leaves: words.leaves[language],
     moreLeaf: words.more_leaf[language], whole: CARDS.controls.machine.viewpoints[0]![language],
-    nearer: NEARER[language], further: FURTHER[language], ceiling: CARDS.zoom_ceiling_scan[language] }
+    nearer: NEARER[language], further: FURTHER[language], ceiling: CARDS.zoom_ceiling_scan[language],
+    previous: CARDS.controls.date.previous[language], next: CARDS.controls.date.next[language],
+    more: CONTROLS.shared.more[language], moreLabel: words.more_leaf[language], back: words.back_to_leaf[language] }
 }
 const CONTROLS = (JSON.parse(cardsRaw) as { controls: {
   shared: { back: Words; record: Words; more: Words }
@@ -123,6 +126,7 @@ export const VINCI_VITRINE_WORDS = {
   /** The bench's own word for a finished demonstration started again. */
   again: { en: 'Run again', de: 'Erneut starten' },
   close: { en: 'Close', de: 'Schließen' },
+  back: CONTROLS.shared.back,
 }
 
 /** The one thing to remember about an exhibit, in the page's language. */
@@ -253,6 +257,9 @@ export function createVinciMachinePayload(options: {
   light: TurntableOptions['light']
   restore(): void
   openRecord(): void
+  /** The folio beside the model is a door into the leaf itself, where the
+   * wing can open one; without it the folio opens the record. */
+  openFolio?(): void
   /** True once the eye stands where it walked for this machine. */
   standing(): boolean
 }): VitrinePayload {
@@ -287,7 +294,7 @@ export function createVinciMachinePayload(options: {
     sheet: {
       src: thumb ? loadManifest().then(index => { const entry = index.byId.get(thumb); return entry?.display ? assetUrl(ASSET_BASE, entry) : null }) : null,
       label: sheetLabel,
-      open: options.openRecord,
+      open: options.openFolio ?? options.openRecord,
     },
     restore: options.restore,
     standing: options.standing,
