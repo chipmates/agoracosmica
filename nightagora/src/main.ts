@@ -1098,7 +1098,7 @@ function setLobbyLanguage(language: 'en' | 'de'): void {
   const sky = HUB_SPOTS[0]
   if (sky) sky.label = say(LOBBY_TEXT.sky)
   if (phase === 'agora') hotspots.set(HUB_SPOTS)
-  verseEl.textContent = say(LOBBY_TEXT.fireVerse)
+  if (phase === 'agora') fireLine()
   if (paneOpen) openPane(paneSlug)
   syncInstruments()
   syncPageReserve(true)
@@ -1163,16 +1163,12 @@ addEventListener('na-voice', (e) => {
   ambience.duck(Boolean((e as CustomEvent).detail))
 })
 
-// each poem line appears once, at its appointed threshold
-const spokenVerses = new Set<string>()
-let verseTimer = 0
-function verseShow(line: string, holdMs = 5600): void {
-  if (spokenVerses.has(line)) return
-  spokenVerses.add(line)
-  verseEl.textContent = line
+/** THE ONE SENTENCE AT THE FIRE. It is the whole instruction of the lobby,
+    so it stands for as long as the fire is the frame and leaves with the
+    gaze, never on a timer. */
+function fireLine(): void {
+  verseEl.textContent = say(LOBBY_TEXT.fireLine)
   verseEl.classList.add('lit')
-  window.clearTimeout(verseTimer)
-  verseTimer = window.setTimeout(() => verseEl.classList.remove('lit'), holdMs)
 }
 
 // forge hook: lets the screenshot rig drive deterministic states
@@ -1596,7 +1592,7 @@ function setPhase(next: Phase): void {
     lookTarget = 0
     lookUp = 0
     setStatus('fireStatus')
-    verseShow(say(LOBBY_TEXT.fireVerse))
+    fireLine()
   }
   if (next === 'wheel') {
     setStatus('')
@@ -2016,6 +2012,10 @@ function frame(now: number): void {
     blackoutEl.classList.add('lifting')
     blackoutEl.classList.remove('down')
     window.setTimeout(() => blackoutEl.classList.remove('lifting'), 700)
+    // the way on has left the frame, so the hand that pressed it would be
+    // left on the body: the fire's own sentence takes the focus, which is
+    // also what a reader hears first on arriving
+    verseEl.focus({ preventScroll: true })
   }
   // the door's own wait starts once the still frame is actually on the
   // glass: the room is built behind a picture, never instead of one

@@ -29,7 +29,12 @@ export const LOBBY_TEXT = {
   enterMuseum: { en: 'Enter the museum', de: 'Museum betreten' },
   descend: { en: 'Scroll to descend', de: 'Scrolle, um hinabzugehen' },
   fireStatus: { en: 'Night Agora · scroll to look up', de: 'Night Agora · scrolle, um nach oben zu schauen' },
-  fireVerse: { en: 'The museum begins at the fire', de: 'Am Feuer beginnt dein Museumsbesuch' },
+  /* THE ONE SENTENCE AT THE FIRE. It is the museum's whole instruction to a
+     visitor who has just arrived: one string per language, changed here. */
+  fireLine: {
+    en: 'Look up. Each lit name opens a wing of the museum.',
+    de: 'Schau nach oben. Jeder leuchtende Name öffnet einen Flügel des Museums.',
+  },
   skipDescent: { en: 'Skip to the fire', de: 'Direkt zum Feuer' },
   sky: { en: 'The Sky', de: 'Der Himmel' },
   skyReturn: { en: 'The Fire · return', de: 'Zurück zum Feuer' },
