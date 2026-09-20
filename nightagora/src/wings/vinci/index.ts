@@ -1326,8 +1326,12 @@ export function createWing():VinciWingModule {
         // A DATE KEEPS ITS YEAR. Its cell is the numeral the record gives it,
         // and a picture there would take the one thing that cell says.
         const plate=pick.workId?pictures.find(source=>source.work.id===pick.workId):undefined
+        // A DATE KEEPS ITS YEAR, THE FLOOR DOES NOT HAVE ONE: the whole line
+        // is one exhibit with a name and no numeral, so its cell takes the
+        // picture the other nameless kinds take.
+        const numeral=pick.kind==='stud'&&pick.id!==LINE_FLOOR_PICK
         if(named)row.push({order:pick.order,entry:{id:pick.id,openable:pick.openable,title:named.title,colour:named.colour,
-          preview:pick.kind==='stud'?null:plate?ASSET_BASE+validatePaintingRecord(plate.entry.preview,'painting-preview').path:exhibitPreview(pick)}})
+          preview:numeral?null:plate?ASSET_BASE+validatePaintingRecord(plate.entry.preview,'painting-preview').path:exhibitPreview(pick)}})
       }
     }
     return row.sort((a,b)=>a.order-b.order).map(item=>item.entry)

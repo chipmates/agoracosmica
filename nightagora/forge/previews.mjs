@@ -67,7 +67,9 @@ const DATE = '2026-09-20'
  *  here; the compass has no ledge yet and stands in no station's row.
  *
  *  `plate` cuts the cell from a reproduction the store already holds, which
- *  is what an exhibit that IS a picture asks for. */
+ *  is what an exhibit that IS a picture asks for; `where: 'station'` shoots
+ *  the room from the station itself, for an exhibit the visitor is already
+ *  standing on and walks to no closer. */
 const EXHIBITS = [
   { id: 'machine/parachute', kind: 'machine', station: 'supper-wall' },
   { id: 'machine/revolving-crane', kind: 'machine', station: 'supper-wall' },
@@ -91,6 +93,12 @@ const EXHIBITS = [
   { id: 'picture/deathbed-painting/front', kind: 'picture', station: 'grave',
     plate: 'vinci/place-plate/jean-auguste-dominique-ingres-francois-ier-recoit-les-derniers-soupirs'
       + '__petit-palais-musee-des-beaux-arts-de-la-ville-de-paris__4096x3252' },
+  // The line of dates IS the station: it carries no approach of its own, so
+  // its cell is the room from the eye the station stands at. The window is
+  // the run of the line itself, read off the frame: the whole view puts a
+  // ceiling and a far wall in a cell that has 72 px to say one thing.
+  { id: 'line/floor', kind: 'stud', station: 'line-early', where: 'station',
+    window: { left: .335, top: .228, width: .402, height: .563 } },
 ]
 
 const only = flags.get('only') ? String(flags.get('only')).split(',') : null
@@ -301,6 +309,14 @@ async function openExhibit(page, exhibit) {
   return way
 }
 
+/** The station's own eye, standing: nothing is opened and nothing is walked
+ *  to, so the wait is the library's and then the room's own settle. */
+async function settleAt(page) {
+  await waiting(page, 'the library never finished', () => (window.__forge?.state?.().texturesPending ?? 1) === 0, 120000)
+  await page.waitForTimeout(SETTLE_MS)
+  return 'stand'
+}
+
 /** One wait, one sentence when it fails: a timeout with no name costs a run. */
 async function waiting(page, said, predicate, ms) {
   await page.waitForFunction(predicate, null, { timeout: ms, polling: 250 })
@@ -331,6 +347,7 @@ async function closeExhibit(page) {
 const HIDE_CHROME = `.vitrine-card,.vitrine-caption,.vitrine-payload-controls,.vitrine-controls,
   [class*='vitrine-folio'],.vitrine-aside,.vitrine-sheet,.vitrine-leader,.vitrine-scrim,.vitrine-hole,
   .vinci-strip,.wing-rail-group,.wing-question,.field-stage,.wing-labels h1,
+  .vinci-heading,.vinci-quiet,.vinci-exhibit-dot,.wing-doorblock,
   [data-na-persistent],[data-na-brand]{opacity:0 !important;pointer-events:none !important}`
 
 /* ------------------------------------------------------------ the record */
@@ -392,7 +409,8 @@ function recordFor(exhibit, bytes, sha) {
     model: MODEL,
     date: DATE,
     prompt: `One frame of the museum's own ${exhibit.kind === 'machine' ? 'model of ' : ''}${exhibit.id}, `
-      + `rendered headless from the pose the vitrine opens it in, at ${CELL.width}x${CELL.height}, `
+      + `rendered headless from ${exhibit.where === 'station' ? 'the eye its own station stands at'
+        : 'the pose the vitrine opens it in'}, at ${CELL.width}x${CELL.height}, `
       + 'for the hang strip\'s cell. No photograph sampled.',
     source: exhibit.id,
     role: 'exhibit-preview',
@@ -514,8 +532,15 @@ try {
       here = exhibit.station
       await standAt(page, here, still)
     }
-    const way = await openExhibit(page, exhibit)
-    const rect = await frameRect(page, exhibit.kind)
+    // AN EXHIBIT THE VISITOR IS ALREADY STANDING ON opens nothing: the room
+    // from the station's own eye IS the picture, and a settle stands in for
+    // the walk the others take.
+    const way = exhibit.where === 'station' ? await settleAt(page) : await openExhibit(page, exhibit)
+    const rect = exhibit.where === 'station'
+      ? { left: (exhibit.window?.left ?? 0) * WINDOW.width, top: (exhibit.window?.top ?? 0) * WINDOW.height,
+        width: (exhibit.window?.width ?? 1) * WINDOW.width, height: (exhibit.window?.height ?? 1) * WINDOW.height,
+        from: exhibit.window ? 'run' : 'window' }
+      : await frameRect(page, exhibit.kind)
     if (!rect) { problems.push(`${exhibit.id}: no viewport`); await closeExhibit(page); continue }
     const clip = exhibit.kind === 'machine'
       ? { x: Math.round(rect.left), y: Math.round(rect.top), width: Math.round(rect.width), height: Math.round(rect.height) }
@@ -549,7 +574,7 @@ try {
       writeFileSync(join(SHOTS, fileOf(exhibit)), webp)
       written.push({ exhibit, bytes: webp.length, sha: '', file: join(SHOTS, fileOf(exhibit)) })
     }
-    await closeExhibit(page)
+    if (exhibit.where !== 'station') await closeExhibit(page)
   }
   await context?.close()
   }
