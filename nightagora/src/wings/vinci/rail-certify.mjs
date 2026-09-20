@@ -95,7 +95,7 @@ const { createCollectionStandSolids } = await load(path.join(WING, 'collection/s
 const { geometryForPart } = await load(path.join(WING, 'machines/geometry.ts'))
 const { jointValuesAt } = await load(path.join(WING, 'machines/motion.ts'))
 const { gradeAt } = await load(path.join(WING, 'terrain-mesh.ts'))
-const { vinciExhibitRecords, vinciApproachPose, vinciApproachFit, vinciApproachPlateMetres } = await load(path.join(WING, 'collection/approaches.ts'))
+const { vinciExhibitRecords, vinciApproachPose, vinciApproachFit, vinciApproachPlateMetres, vinciApproachRunPairs } = await load(path.join(WING, 'collection/approaches.ts'))
 const { VINCI_WALLS } = await load(path.join(WING, 'collection/wall.ts'))
 
 /* ---- the mounted geometry, at every tier ---- */
@@ -489,6 +489,48 @@ for (const { viewport, seen } of families) {
   }
 }
 
+/* ---- the links: one leg between two neighbouring viewing eyes ----
+ *
+ * A room whose objects stand in a row is walked along that row, so the leg
+ * from the object a visitor is looking at to the one beside it is proved on
+ * its own. One entry per neighbouring pair per viewport: linear in the
+ * objects, never their product, and the same proof a straight approach takes.
+ */
+const links = [], linkReadings = []
+for (const { viewport } of families) {
+  for (const pair of vinciApproachRunPairs()) {
+    const from = vinciApproachPose(pair.from, viewport.phone), to = vinciApproachPose(pair.to, viewport.phone)
+    if (!from || !to) throw new Error(`${pair.from} to ${pair.to}: no viewing pose at ${viewport.name}`)
+    const radius = pose => railNearRectangleRadius(NEAR_M, fittedRailFov(pose.fov, viewport.aspect, viewport.phone), viewport.aspect)
+    const clearance = Math.max(radius(from), radius(to)) + (NO_GAIT ? 0 : gaitEnvelopeM)
+    const enh = [[from.eye.x, -from.eye.z, from.eye.y], [to.eye.x, -to.eye.z, to.eye.y]]
+    const points = enh.map(([east, north, height]) => new THREE.Vector3(east, height, -north))
+    const balls = []
+    const path = createCertifiedRailPath(points, {
+      clearanceRadiusM: clearance, maxTrimM: .5, certificateDepth: 6, numericalMarginM: NUMERICAL_MARGIN_M,
+      certifyBall(centre, radiusM) {
+        if (!ballIsClear(centre, radiusM)) return false
+        balls.push({ centre: [centre.x, centre.y, centre.z], radiusM: radiusM + BALL_RESERVE_M })
+        return true
+      },
+    })
+    if (path.corners.length || balls.length) throw new Error(`${pair.from} to ${pair.to}: a link is not a straight leg`)
+    const span = segmentClearance(points[0], points[1], clearance)
+    linkReadings.push({
+      viewport: viewport.name, station: pair.station, from: pair.from, to: pair.to,
+      lengthM: +path.length.toFixed(4), requiredM: +clearance.toFixed(4),
+      spanClearanceM: +(span.distance === Infinity ? clearance : span.distance).toFixed(4), spanMesh: span.mesh,
+      clear: span.distance > clearance - 1e-9 || span.distance === Infinity,
+    })
+    links.push({
+      viewport: viewport.name, station: pair.station, from: pair.from, to: pair.to,
+      fromPose: { eye: from.eye.toArray(), at: from.at.toArray(), fov: from.fov },
+      toPose: { eye: to.eye.toArray(), at: to.at.toArray(), fov: to.fov },
+      points: enh, roundedLength: path.length, maxNearRadius: clearance, certifiedBalls: balls,
+    })
+  }
+}
+
 /* ---- the wall: one certified polyline through every stop ----
  *
  * The 25 viewing eyes of the hang, with the two end station eyes as the ends
@@ -666,6 +708,7 @@ const certificate = {
   routes,
   approaches,
   walls,
+  links,
 }
 
 const failures = []
@@ -678,6 +721,7 @@ for (const cone of stationCones) {
   failures.push(`${cone.viewport} ${cone.id}: the eye stands ${cone.fullBall.distance.toFixed(4)} m from ${cone.fullBall.mesh}, inside its own ${cone.radius.toFixed(4)} m near envelope; the near plane itself misses by ${cone.oriented.minimumM.toFixed(4)} m over the look envelope`)
 }
 for (const reading of approachReadings) if (!reading.clear) failures.push(`${reading.viewport} ${reading.station} to ${reading.exhibit}: a span passes within ${reading.spanClearanceM} m of ${reading.spanMesh}, under the ${reading.requiredM} m envelope`)
+for (const reading of linkReadings) if (!reading.clear) failures.push(`${reading.viewport} ${reading.from} to ${reading.to}: a leg passes within ${reading.spanClearanceM} m of ${reading.spanMesh}, under the ${reading.requiredM} m envelope`)
 for (const cone of approachCones) {
   if (cone.clearAtEveryOrientation) continue
   failures.push(`${cone.viewport} ${cone.exhibit}: the viewing eye stands ${cone.fullBallM} m from ${cone.mesh}, inside its own ${cone.radius} m near envelope${cone.oriented ? `; the near plane itself misses by ${cone.oriented.minimumM} m over the look envelope` : ''}`)
@@ -716,6 +760,8 @@ const sameApproaches = previousCertificate ? previousCertificate.format === cert
   && approachIdentity(previousCertificate.approaches) === approachIdentity(approaches) : false
 const wallIdentity = table => JSON.stringify((table ?? []).map(entry => [entry.viewport, entry.id, entry.stops, entry.points, entry.roundedLength, entry.maxNearRadius, entry.chordM, entry.shortenM]))
 const sameWalls = previousCertificate ? wallIdentity(previousCertificate.walls) === wallIdentity(walls) : false
+const linkIdentity = table => JSON.stringify((table ?? []).map(entry => [entry.viewport, entry.from, entry.to, entry.points, entry.roundedLength, entry.maxNearRadius]))
+const sameLinks = previousCertificate ? linkIdentity(previousCertificate.links) === linkIdentity(links) : false
 
 if (args.has('--dump')) fs.writeFileSync(path.join(ROOT, 'forge/scratch/candidate.json'), text)
 if (VERIFY) {
@@ -723,6 +769,7 @@ if (VERIFY) {
   if (!samePoints) failures.push('The certificate on disk does not carry the routes the current poses produce')
   if (!sameApproaches) failures.push('The certificate on disk does not carry the approaches the current viewing poses produce')
   if (!sameWalls) failures.push('The certificate on disk does not carry the wall the current stops and end stations produce')
+  if (!sameLinks) failures.push('The certificate on disk does not carry the legs the current neighbouring viewing eyes produce')
 } else if (!failures.length) {
   fs.writeFileSync(CERTIFICATE, text)
   const manifest = JSON.parse(fs.readFileSync(MANIFEST, 'utf8'))
@@ -744,8 +791,9 @@ const report = {
   routes: routes.length,
   approaches: approaches.length,
   walls: wallReadings,
+  links: linkReadings.length,
   triangles: index.data.count,
-  sameGeometryAsDisk: sameGeometry, sameRoutesAsDisk: samePoints, sameApproachesAsDisk: sameApproaches, sameWallsAsDisk: sameWalls,
+  sameGeometryAsDisk: sameGeometry, sameRoutesAsDisk: samePoints, sameApproachesAsDisk: sameApproaches, sameWallsAsDisk: sameWalls, sameLinksAsDisk: sameLinks,
   worstSpanClearance: readings.reduce((worst, reading) => reading.spanClearanceM < worst.spanClearanceM ? reading : worst, readings[0]),
   worstApproachSpan: approachReadings.reduce((worst, reading) => reading.spanClearanceM - reading.requiredM < worst.spanClearanceM - worst.requiredM ? reading : worst, approachReadings[0]),
   worstApproachNearBall: approachCones.reduce((worst, cone) => cone.fullBallM - cone.radius < worst.fullBallM - worst.radius ? cone : worst, approachCones[0]),

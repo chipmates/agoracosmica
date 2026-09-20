@@ -9,6 +9,7 @@ import { carriedPace, gaitAt, gaitHeadLift, gaitLeg, gaitRhythm, strollMetresPer
 import { collectionLayout } from './collection'
 import { collectionView } from './collection/views'
 import { vinciWallEndVertex, vinciWallIsEnd, vinciWallNearerEnd, vinciWallOfStation, type VinciWall } from './collection/wall'
+import { vinciApproachesAreNeighbours } from './collection/approaches'
 import { COURT, SUPPER_WALL } from './collection/layout'
 import { fittedRailFov, assertRailProjection } from './rail-projection'
 import type { RailGeometryAuthority } from './rail-proof'
@@ -209,7 +210,7 @@ const wallOfStation=(id:VinciStationId):VinciWall|undefined=>vinciWallOfStation(
 export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:RailGeometryAuthority) {
   /** A request that carries a wall vertex is walked on the wall's own line,
    * whether it ends at a stop of the hang or at one of its two end stations. */
-  interface Request { id:VinciStationId; pose:Pose; phone:boolean; exhibit?:string; wall?:number; wallOn?:VinciWall }
+  interface Request { id:VinciStationId; pose:Pose; phone:boolean; exhibit?:string; wall?:number; wallOn?:VinciWall; link?:boolean }
   let completed:Request|undefined, active:Request|undefined, pending:Request|undefined
   /** THE STATION AN APPROACH LEFT FROM, and the exhibit eye standing in front
    * of one object. A viewing eye is never a station: it carries its station's
@@ -283,6 +284,11 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     // A run along the wall is the sub-path of the wall's own certified line
     // between the vertex the eye stands on and the one it is asked for.
     if(request.wall!==undefined&&wallAt!==undefined&&request.wallOn)return authority.wall(request.wallOn.id,wallAt,request.wall,request.phone,camera)
+    // TWO NEIGHBOURS ARE JOINED BY THEIR OWN LEG. Standing at one object and
+    // asking for the one beside it walks the line between the two eyes, not
+    // the way out to the station and in again.
+    if(request.exhibit&&request.link&&viewing?.exhibit)
+      return authority.link(viewing.exhibit,request.exhibit,completed!.pose,request.pose,request.phone,camera)
     if(request.exhibit)return authority.approach(completed!.pose,request.pose,request.phone,camera)
     if(viewing&&standing&&request.id===standing.id&&samePose(request.pose,standing.pose))
       return authority.approach(standing.pose,viewing.pose,request.phone,camera,true)
@@ -381,7 +387,16 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
      * still at the station between them. */
     chain(exhibit:string,pose:Pose,phone=camera.aspect<=.9):boolean {
       if(!viewing||!standing||active)return false
-      chained={id:standing.id,pose:{eye:pose.eye.clone(),at:pose.at.clone(),fov:pose.fov},phone,exhibit}
+      const request:Request={id:standing.id,pose:{eye:pose.eye.clone(),at:pose.at.clone(),fov:pose.fov},phone,exhibit}
+      // THE NEIGHBOUR IS ONE LEG AWAY. Where the room certifies the line
+      // between these two eyes the walk takes it and the station is never
+      // stood at; anywhere else the chain is still the return and the
+      // approach out, begun in the same update.
+      if(viewing.exhibit&&vinciApproachesAreNeighbours(viewing.exhibit,exhibit)&&authority.status==='verified'){
+        begin({...request,link:true},clock())
+        return true
+      }
+      chained=request
       wantsReturn=true
       return true
     },

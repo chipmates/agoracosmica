@@ -387,6 +387,37 @@ export function vinciApproachReachMetres(): number {
   return reach
 }
 
+/** ONE EXHIBIT TO THE NEXT WITHOUT GOING BACK. A room whose objects stand in
+ * a row is walked along that row: from the machine a visitor is looking at to
+ * the one beside it, on a leg of its own, never out to the station's eye and
+ * in again. These are the rows, in the order each room stands them; the
+ * certificate holds one leg per neighbouring pair, so the table is linear in
+ * the objects and never their product. The hang and the body wall have their
+ * own polylines and are not here.
+ */
+export const VINCI_APPROACH_RUNS: readonly { station: VinciStationId; exhibits: readonly string[] }[] = [
+  // The hall's west half, walked down the aisle.
+  { station: 'flight', exhibits: ['machine/aerial-screw', 'machine/flywheel', 'machine/camera-obscura', 'machine/miter-lock-gates'] },
+  // The aisle's east half, walked back up it.
+  { station: 'works', exhibits: ['machine/water-lifting-screw', 'machine/rolling-mill', 'machine/lathe', 'machine/ball-bearing', 'machine/multi-barrel-gun'] },
+  // The court, from the measurement on the display wall out to the machines
+  // standing in it, west to east as the lane passes them.
+  { station: 'supper-wall', exhibits: [MURAL_ID, 'machine/revolving-crane', 'machine/anemometer', 'machine/inclinometer', 'plaque/flight-quote', 'machine/parachute'] },
+]
+
+/** The neighbouring pairs of one run, in walking order. */
+export function vinciApproachRunPairs(): readonly { station: VinciStationId; from: string; to: string }[] {
+  const pairs: { station: VinciStationId; from: string; to: string }[] = []
+  for (const run of VINCI_APPROACH_RUNS) {
+    for (let at = 1; at < run.exhibits.length; at++) pairs.push({ station: run.station, from: run.exhibits[at - 1]!, to: run.exhibits[at]! })
+  }
+  return pairs
+}
+/** True where two viewing eyes stand next to each other in one room's run. */
+export function vinciApproachesAreNeighbours(a: string, b: string): boolean {
+  return vinciApproachRunPairs().some(pair => (pair.from === a && pair.to === b) || (pair.from === b && pair.to === a))
+}
+
 /** The identity the registry joins a mounted plate to. */
 export const vinciPlateExhibitId = exhibitId
 /** THE FLOOR ITSELF, as one thing a press can reach: the cut line's field,

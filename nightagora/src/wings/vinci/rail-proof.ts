@@ -5,7 +5,7 @@ import { railGeometryFingerprint, railGeometryFingerprintBreakdown, railGeometry
 import { createCertifiedRailPath } from './rail-smoothing'
 import { assertRailProjection } from './rail-projection'
 export { assertRailProjection, fittedRailFov } from './rail-projection'
-import { vinciApproachPose, vinciExhibitRecords } from './collection/approaches'
+import { vinciApproachPose, vinciApproachRunPairs, vinciExhibitRecords } from './collection/approaches'
 import { VINCI_WALLS } from './collection/wall'
 import type { VinciStationId } from './content'
 import certificateText from './data/rail-clearance.json?raw'
@@ -36,9 +36,17 @@ interface SavedWall {
       accepted corner takes out of it: a sub-path's own certified length */
   chordM: number[]; shortenM: number[]
 }
+/** A LEG FROM ONE VIEWING EYE TO THE ONE BESIDE IT, so a visitor walking a
+ * row of objects never goes back to the station between two of them. */
+interface SavedLink {
+  viewport: 'desktop' | 'phone'; station: string; from: string; to: string
+  fromPose: SavedPose; toPose: SavedPose; points: number[][]
+  roundedLength: number
+  maxNearRadius: number; certifiedBalls: { centre: number[]; radiusM: number }[]
+}
 interface ClearanceData {
   format: 'vinci-rail-clearance-v2'; completeNearClearance: boolean
-  geometrySha256: string[]; routes: SavedRoute[]; approaches: SavedApproach[]; walls: SavedWall[]
+  geometrySha256: string[]; routes: SavedRoute[]; approaches: SavedApproach[]; walls: SavedWall[]; links: SavedLink[]
   /** the same solids by count and moments, matched within a tolerance: the
       exact hash holds only in the engine that wrote it (see rail-fingerprint) */
   geometrySignatures?: { tier: string; toleranceM: number; meshes: RailMeshSignature[] }[]
@@ -136,6 +144,24 @@ for (const viewport of VIEWPORTS) {
     }
   }
 }
+// EVERY DECLARED NEIGHBOUR PAIR IS CERTIFIED, at both viewports, on the two
+// viewing eyes it actually joins.
+let requiredLinks = 0, matchedLinks = 0
+const unmatchedLinks = new Set(data.links ?? [])
+for (const viewport of VIEWPORTS) {
+  for (const pair of vinciApproachRunPairs()) {
+    const from = vinciApproachPose(pair.from, viewport === 'phone'), to = vinciApproachPose(pair.to, viewport === 'phone')
+    if (!from || !to) throw new Error(`Missing Vinci viewing pose: ${pair.from} or ${pair.to}`)
+    requiredLinks++
+    const saved = (data.links ?? []).find(link => unmatchedLinks.has(link) && link.viewport === viewport
+      && link.from === pair.from && link.to === pair.to
+      && samePose(link.fromPose, toSaved(from)) && samePose(link.toPose, toSaved(to)))
+    if (saved) { matchedLinks++; unmatchedLinks.delete(saved) }
+  }
+}
+if ((data.links ?? []).length !== requiredLinks || matchedLinks !== requiredLinks
+  || unmatchedLinks.size !== 0) throw new Error('Missing complete Vinci link certificate')
+
 const geometryToleranceM = .000002
 export { collectRailSolids, railCollisionIds } from './rail-solids'
 
@@ -185,6 +211,7 @@ export function createRailGeometryAuthority(roots: readonly Object3D[]) {
   const paths = new Map<SavedRoute, ReturnType<typeof createCertifiedRailPath>>()
   type Certified = ReturnType<typeof createCertifiedRailPath>
   const approachPaths = new Map<SavedApproach, { out?: Certified; back?: Certified }>()
+  const linkPaths = new Map<SavedLink, { out?: Certified; back?: Certified }>()
   /** Rebuild one certified polyline. The balls are the offline proof's own,
    * so a corner is rounded here only where a triangle test certified it. */
   const wallPaths = new Map<SavedWall, Map<string, Certified>>()
@@ -193,7 +220,7 @@ export function createRailGeometryAuthority(roots: readonly Object3D[]) {
    * another order, so a wall run allows a nanometre where a whole route,
    * whose length is stored as one number, allows nothing. */
   const SUBPATH_TOLERANCE_M = 1e-9
-  function rebuild(saved: SavedRoute | SavedApproach | SavedWall, points: Vector3[],
+  function rebuild(saved: SavedRoute | SavedApproach | SavedWall | SavedLink, points: Vector3[],
     certifiedLength = saved.roundedLength, tolerance = 0): Certified {
     const balls = saved.certifiedBalls.map(ball => ({ centre: new Vector3().fromArray(ball.centre), radius: ball.radiusM - geometryToleranceM }))
     const path = createCertifiedRailPath(points, {
@@ -244,6 +271,29 @@ export function createRailGeometryAuthority(roots: readonly Object3D[]) {
         const points = saved.points.map(([east, north, height]) => new Vector3(east!, height!, -north!))
         path = rebuild(saved, back ? points.reverse() : points)
         approachPaths.set(saved, { ...held, [direction]: path })
+      }
+      return path
+    },
+    /** THE LEG BETWEEN TWO NEIGHBOURING VIEWING EYES, on the one certified
+     * path that exists for the pair. Walked either way, so the leg back is
+     * the same points reversed and lands on the eye the certificate holds. */
+    link(from: string, to: string, fromPose: Pose, toPose: Pose, phone: boolean, camera: PerspectiveCamera) {
+      if (status !== 'verified') throw new Error(failure || 'Rail clearance identity is still being checked')
+      assertRailProjection(camera)
+      const forward = data.links.find(entry => entry.viewport === (phone ? 'phone' : 'desktop')
+        && entry.from === from && entry.to === to
+        && sameSavedPose(entry.fromPose, fromPose) && sameSavedPose(entry.toPose, toPose))
+      const saved = forward ?? data.links.find(entry => entry.viewport === (phone ? 'phone' : 'desktop')
+        && entry.from === to && entry.to === from
+        && sameSavedPose(entry.fromPose, toPose) && sameSavedPose(entry.toPose, fromPose))
+      if (!saved || camera.position.distanceToSquared(fromPose.eye) > 1e-18) throw new Error('This camera start/target has no certified Vinci link')
+      const held = linkPaths.get(saved) ?? {}
+      const direction = forward ? 'out' : 'back'
+      let path = held[direction]
+      if (!path) {
+        const points = saved.points.map(([east, north, height]) => new Vector3(east!, height!, -north!))
+        path = rebuild(saved, forward ? points : points.reverse())
+        linkPaths.set(saved, { ...held, [direction]: path })
       }
       return path
     },
