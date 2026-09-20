@@ -4,7 +4,7 @@
  */
 import {
   BufferGeometry, Color, DoubleSide, Float32BufferAttribute, Group, Mesh,
-  MeshStandardNodeMaterial, ShapeUtils, Vector2, Vector3,
+  MeshStandardNodeMaterial, type Object3D, ShapeUtils, Vector2, Vector3,
 } from 'three/webgpu'
 import { cameraPosition, float, length, mx_noise_float, normalMap, positionWorld, smoothstep, vec2, vec3 } from 'three/tsl'
 import type { TierName } from '../../stack/tier'
@@ -132,6 +132,61 @@ export const courtDressingProvenance={
     de:'Vermutete Hofoberfläche. Kies, Wagenspuren, die schmale Entwässerungsfuge und abgenutzte Steinflächen sind museale Ausgestaltung, keine erhaltenen Belege von 1517. Vorgeschlagene Steinchen messen 0,025–0,075 m; Wagenspuren liegen 1,40 m auseinander, die Entwässerungsfuge ist 0,08 m breit. Das Abnutzungsrelief bleibt innerhalb von 0,008 m.',
   },
 } as const
+
+/** WHAT STANDS IN THE COURT, AND WHOSE IT IS NOT. Four bodies out of the open
+ * model library, put against the east range where no certified walk passes:
+ * two by the gate, two further under the range. They are period furniture of a
+ * kind, never this house's inventory, and the label says so. They carry their
+ * own manifest id, so they are outside the rail's collision scope and outside
+ * the geometry fingerprint, exactly as the machines' bodies are.
+ */
+export const COURT_OBJECTS_ID='vinci/court-objects'
+export interface CourtObject {
+  /** the store's own model slug, and the bench's period judgement of it */
+  slug:string
+  east:number
+  north:number
+  /** radians about the upright axis */
+  turn:number
+  where:'gate'|'east-range'
+}
+export const courtObjects:readonly CourtObject[]=[
+  {slug:'wine_barrel_01',east:13.28,north:-18.25,turn:.6,where:'gate'},
+  {slug:'wicker_basket_01',east:12.44,north:-16.96,turn:-1.1,where:'gate'},
+  {slug:'treasure_chest',east:11.81,north:-15.99,turn:2.2,where:'east-range'},
+  {slug:'ceramic_vase_04',east:11.48,north:-15.29,turn:.3,where:'east-range'},
+]
+/** The words under the four, and the one claim they make. */
+export const courtObjectsProvenance={
+  manifestId:COURT_OBJECTS_ID,assetClass:'CC0',certainty:'conjectural',
+  source:['MODEL-LIBRARY','A-SITE'],
+  slugs:courtObjects.map(object=>object.slug),
+  recipe:'Four bodies of the open model library, unaltered, stood on the court at the levels the shared grade sampler gives. Placement is a museum choice; no inventory of this house is documented.',
+  label:{
+    en:'Objects of the period. None of them is his.',
+    de:'Gegenstände der Zeit. Keiner davon gehörte ihm.',
+  },
+} as const
+
+interface ModelPlacer {
+  place(slug:string,at:{position:[number,number,number];rotation:number;snap:'ground'}):Promise<Object3D>
+}
+/** The four bodies, asked for one at a time and stood as they land. The group
+ * stands in the scene from the first frame so nothing waits on the library.
+ */
+export function createCourtObjects(heightAt:HeightAt,models:ModelPlacer):Group {
+  const group=new Group();group.name='vinci generated court objects'
+  group.userData={...courtObjectsProvenance}
+  for(const object of courtObjects){
+    void models.place(object.slug,{position:[object.east,heightAt(object.east,object.north),-object.north],
+      rotation:object.turn,snap:'ground'}).then(body=>{
+      body.name=`vinci/court-object/${object.slug}`
+      body.traverse(child=>{child.userData['manifestId']=COURT_OBJECTS_ID;child.userData['asset']=COURT_OBJECTS_ID})
+      group.add(body)
+    }).catch(()=>{/* a body the store cannot serve leaves the court as it was */})
+  }
+  return group
+}
 
 type HeightAt=(east:number,north:number)=>number
 interface Batch {positions:number[];colours:number[]}

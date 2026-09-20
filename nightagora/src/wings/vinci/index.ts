@@ -40,7 +40,7 @@ import { ASSET_BASE } from '../../stack/materials'
 import { createCollectionReceiverPlaneShadowFilter } from './receiver-plane-shadow'
 import { createCollectionAccess, collectionAccessPoint, collectionAccessProvenance } from './collection-access'
 import { createRoadDressing, roadDressingProvenance } from './road-dressing'
-import { createInnerCourtDressing, innerCourtProvenance, courtDressingProvenance } from './inner-court'
+import { createCourtObjects, createInnerCourtDressing, courtObjectsProvenance, innerCourtProvenance, courtDressingProvenance } from './inner-court'
 import { createGatePassage, gatePassageProvenance } from './gate-passage'
 import { createEntryPassage, entryPassageProvenance } from './entry-passage'
 import { createGround } from './ground'
@@ -387,7 +387,7 @@ export function createWing():VinciWingModule {
     // wing is welded and identified in below is the one it always had.
     const wood=planVegetation(groundHeight,stack.tierName())
     const dressing=planGroundDressing(groundHeight,stack.tierName())
-    scene.add(ground,shell,entry,createGatePassage(stack.tierName()),createInnerCourtDressing(groundHeight,stack.tierName()),createRoadDressing(groundHeight,stack.tierName()),collection,createCollectionAccess(),wood.group,dressing.group)
+    scene.add(ground,shell,entry,createGatePassage(stack.tierName()),createInnerCourtDressing(groundHeight,stack.tierName()),createCourtObjects(groundHeight,stack.models),createRoadDressing(groundHeight,stack.tierName()),collection,createCollectionAccess(),wood.group,dressing.group)
     yield
     for(const step of wood.steps){step();yield}
     for(const step of dressing.steps){step();yield}
@@ -1937,6 +1937,9 @@ export function createWing():VinciWingModule {
       appendEvidence('access',collectionAccessProvenance.label,'reconstructed','vinci/collection-access',collectionAccessProvenance.source.join(' · '))
       appendEvidence('accessDesign',collectionAccessProvenance.parameterLabel,'reconstructed','vinci/collection-access','A-SITE retained court and terrace · modern museum access proposal')
     }
+    // The court's own four stand in every frame that holds the court.
+    if(s.id==='arrival'||s.id==='courtyard'||['hall','oratory','study','chamber'].includes(s.id))
+      appendEvidence('courtObjects',courtObjectsProvenance.label,'conjectural',courtObjectsProvenance.manifestId,courtObjectsProvenance.source.join(' · '))
     if(s.id==='courtyard'||['hall','oratory','study','chamber'].includes(s.id)||activeView.startsWith('entry-')){
       appendEvidence('entry',entryPassageProvenance.label,'reconstructed','vinci/entry-passage',entryPassageProvenance.source.join(' · '))
       appendEvidence('entryFinish',entryMineralSurfaceProvenance.label,'reconstructed','vinci/entry-mineral-surface',entryMineralSurfaceProvenance.source.join(' · '))
