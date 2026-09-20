@@ -52,8 +52,14 @@ function narrowRoomPose(pose:Pose,share=NARROW_AIM_SHARE):Pose {
   const drop=reach*Math.tan(fov*Math.PI/180*share)
   return {eye:pose.eye.clone(),at:pose.at.clone().setY(pose.at.y-drop),fov}
 }
-/** The stations that stand in a built room rather than on a plate. */
-export const vinciStandsInRoom=(id:VinciStationId):boolean=>COLLECTION_STATION_ROOMS[id]!==undefined
+/** THE HOUSE'S FOUR STAND IN A PLACE OF THEIR OWN. Their rooms are not open
+ * and stay named as in construction, but each of them is now an eye a visitor
+ * is stood at, not one plate shared by four marks, so the frame is the room
+ * and the card docks beside it like every other station's. */
+export const HOUSE_STATIONS_IN_PLACE:readonly VinciStationId[]=['hall','oratory','study','chamber']
+/** The stations whose frame is a place, not a plate the card may cover. */
+export const vinciStandsInRoom=(id:VinciStationId):boolean=>
+  COLLECTION_STATION_ROOMS[id]!==undefined||HOUSE_STATIONS_IN_PLACE.includes(id)
 export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // The eye stood 0.26 m off the retaining wall, inside its own near plane,
   // and the wall filled the right third of the lower cone. It now stands

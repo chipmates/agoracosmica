@@ -4,7 +4,7 @@ import { applyDisplayedHorizonHaze, displayedHorizonHazeProvenance } from './dis
 import { mineralSurfaceProvenance, closeSurfaceProvenance } from './surface'
 import { entryMineralSurfaceProvenance } from './entry-mineral-surface'
 import { foundationPlinthProvenance } from './foundation-plinth'
-import { Box3, Color, FogExp2, DirectionalLight, Mesh, Raycaster, Vector2, Vector3, type Group } from 'three/webgpu'
+import { Box3, Color, FogExp2, DirectionalLight, Group, Mesh, Raycaster, Vector2, Vector3 } from 'three/webgpu'
 import { float, mix, vec3, vec4, dot as nodeDot, positionWorld, cameraPosition, smoothstep, mx_fractal_noise_float } from 'three/tsl'
 import { SkyMesh } from 'three/addons/objects/SkyMesh.js'
 import { setRegister, type WingHosts, type WingModule, type WingProgress, type WingReport, type WingStage } from '../frame'
@@ -42,7 +42,7 @@ import { createCollectionAccess, collectionAccessPoint, collectionAccessProvenan
 import { createRoadDressing, roadDressingProvenance } from './road-dressing'
 import { createCourtObjects, createInnerCourtDressing, courtObjectsProvenance, innerCourtProvenance, courtDressingProvenance } from './inner-court'
 import { createGatePassage, gatePassageProvenance } from './gate-passage'
-import { createEntryPassage, entryPassageProvenance } from './entry-passage'
+import { createEntryPassage, entryPassageProvenance, hallLedge, hallLedgeProvenance } from './entry-passage'
 import { createGround } from './ground'
 import { planVegetation, VEGETATION_STEPS } from './vegetation'
 import { createRail, stationPose, namedPose, vinciStandsInRoom } from './rail'
@@ -55,12 +55,13 @@ import { createWater, type WaterGroup } from './water'
 import { createMeasurement, type VinciMeasurement } from './measurement'
 import { collectVinciLabelOccluders, createVinciExhibitDots, createVinciLabelAnchor, vinciSightBlocked, type VinciExhibitDots, type VinciExhibitMark, type VinciLabelAnchor, type VinciLabelMode, type VinciLabelRect } from './labels'
 import { pickVinciExhibit, readVinciExhibits, vinciMachineRoom, type VinciPickEntry } from './collection/pick'
-import { LINE_FLOOR_PICK, vinciApproachPose, vinciApproachStation, vinciStudIndex } from './collection/approaches'
+import { LINE_FLOOR_PICK, VINCI_STUDY_LEAF, vinciApproachPose, vinciApproachStation, vinciStudIndex } from './collection/approaches'
 import { createVinciCloseLook, createVinciMachinePayload, fillVinciLimitSlots, renderVinciMachineRecord, vinciDeathbedCard, vinciLimits, vinciLine, vinciMachineCard, vinciPlaceCard, vinciPlaceTitle, vinciManuscriptWords, VINCI_EXHIBIT_CARD, VINCI_PAGE_HONESTY, VINCI_VITRINE_WORDS, type VinciPlaceCard, type VinciPlaceCertainty, type VinciPlaceId } from './collection/close-look'
 import { createPlacePayload } from '../vitrine/place'
 import { readingTableOf } from './table'
 import { CODEX_ENTRIES } from './table/codex-shelf'
 import type { ReadingTable } from './table'
+import type { PageRecord } from './table/content'
 import { createReaderPayload, type ReaderPayload } from './table/reader'
 import { createReaderPayload as createVitrineReaderPayload, type ReaderPayload as ReaderPayloadOfWall } from '../vitrine/reader'
 import { LINE_SECTIONS, LINE_STUDS, type Stud } from './line/studs'
@@ -73,7 +74,7 @@ import { assetUrl, loadManifest, type ManifestIndex } from '../../manifest'
 import { createPlatePayload } from '../vitrine/picture'
 import { createVinciWholePlate, isWholePlate, vinciPlateDescription } from './collection/deep-plate'
 import type { VitrineRect } from '../vitrine'
-import { machineBuildOf } from './machines'
+import { buildMachine, machineBuildOf } from './machines'
 import { createVinciHangStrip, vinciSheetTitle, type VinciStripEntry } from './collection/strip'
 import { vinciWallById, vinciWallIsEnd, vinciWallOrderOf, VINCI_PICTURE_WALL, vinciWallNearerEnd, vinciWallOfExhibit, vinciWallOfStation, vinciWallStops, vinciWallVertex, VINCI_WALL_ENDS, type VinciWall } from './collection/wall'
 import { pathSpecifications } from './paths'
@@ -217,7 +218,7 @@ export function createWing():VinciWingModule {
   let exhibits:CollectionExhibits|undefined, exhibitClock=0
   /** THE CLOSE LOOK. The registry is a read over the collection's own group,
    * the dots live in the label layer, and one owner holds the open exhibit. */
-  let collectionRoot:Group|undefined, occluders:readonly Mesh[]=[]
+  let collectionRoot:Group|undefined, houseRoot:Group|undefined, courtRoot:Group|undefined, occluders:readonly Mesh[]=[]
   let dots:VinciExhibitDots|undefined, closeLook:ReturnType<typeof createVinciCloseLook>|undefined
   let strip:ReturnType<typeof createVinciHangStrip>|undefined
   /** THE STORE'S OWN INDEX, held: a row is painted synchronously and every
@@ -387,7 +388,9 @@ export function createWing():VinciWingModule {
     // wing is welded and identified in below is the one it always had.
     const wood=planVegetation(groundHeight,stack.tierName())
     const dressing=planGroundDressing(groundHeight,stack.tierName())
-    scene.add(ground,shell,entry,createGatePassage(stack.tierName()),createInnerCourtDressing(groundHeight,stack.tierName()),createCourtObjects(groundHeight,stack.models),createRoadDressing(groundHeight,stack.tierName()),collection,createCollectionAccess(),wood.group,dressing.group)
+    const courtDressing=createInnerCourtDressing(groundHeight,stack.tierName())
+    courtRoot=courtDressing
+    scene.add(ground,shell,entry,createGatePassage(stack.tierName()),courtDressing,createCourtObjects(groundHeight,stack.models),createRoadDressing(groundHeight,stack.tierName()),collection,createCollectionAccess(),wood.group,dressing.group)
     yield
     for(const step of wood.steps){step();yield}
     for(const step of dressing.steps){step();yield}
@@ -465,6 +468,19 @@ export function createWing():VinciWingModule {
     occluders=collectVinciLabelOccluders(scene)
     labels=createVinciLabelAnchor({host:h.labels,camera,occluders,onOpen:()=>{mode=2;paintDock()}})
     collectionRoot=collection
+    // THE HOUSE'S ONE EXHIBIT, on the hall's ledge: the compass the machine
+    // catalogue held back for it. It stands where the ledge's own record puts
+    // it, is stamped like every other machine, and is read by the registry
+    // beside the collection's, because a press has to reach it from the hall.
+    {
+      const compass=buildMachine('proportional-compass',stack)
+      compass.object.position.set(hallLedge.stand.east,hallLedge.top-compass.bounds.min.y,-hallLedge.stand.north)
+      compass.object.rotation.y=hallLedge.facing*Math.PI/180
+      compass.object.updateMatrixWorld(true)
+      houseRoot=new Group();houseRoot.name='vinci/house-exhibits'
+      houseRoot.add(compass.object)
+      scene.add(houseRoot)
+    }
     dots=createVinciExhibitDots({host:h.labels,camera,occluders,limit:DOTS_PER_TIER[stack.tierName()]??6,controls:VINCI_EXHIBIT_CARD,
       onOpen:(id,dot)=>openExhibit(id,dot)})
     closeLook=createVinciCloseLook({host:h.labels,narrow,
@@ -999,7 +1015,7 @@ export function createWing():VinciWingModule {
    * tier change remounts the plates under new meshes. */
   function refreshExhibits():void {
     if(!hosts||!collectionRoot)return
-    picks=readVinciExhibits(collectionRoot)
+    picks=[...readVinciExhibits(collectionRoot),...(houseRoot?readVinciExhibits(houseRoot):[]),...(courtRoot?readVinciExhibits(courtRoot):[])]
     picksTier=hosts.world.stack.tierName()
     paintExhibitMarks();paintStrip();refreshRecap();plan?.repaint()
     if(pendingExhibit){const id=pendingExhibit;pendingExhibit='';showView(id)}
@@ -1386,17 +1402,30 @@ export function createWing():VinciWingModule {
    * the body wall and a folio beside a machine each open their page in the
    * reader over the held frame, with no walk out and none back. */
   const LEAF_DOOR='/leaf'
+  /** The one admitted leaf the study's support is read at. */
+  const STUDY_LEAF_PAGE={codex:'B',folio:83,side:'v'} as const
   const isLeafDoor=(id:string|null):boolean=>Boolean(id?.endsWith(LEAF_DOOR))
   /** The reading table of this collection, wherever the visitor stands. */
   function theBook():ReadingTable|undefined {
-    const found=picks.find(pick=>pick.kind==='manuscript')
-    return found?readingTableOf(found.object):undefined
+    // The house's support is a manuscript too, and it is not a table: the
+    // book is the one exhibit whose own object carries a reading.
+    for(const pick of picks){
+      if(pick.kind!=='manuscript')continue
+      const table=readingTableOf(pick.object)
+      if(table)return table
+    }
+    return undefined
   }
   /** THE FOLIO BESIDE A MACHINE opens that leaf, with its three ways and the
    * strip of the manuscript it stands in. Back returns to the machine. */
   function openFolioDoor(slug:MachineSlug,base:string,back:()=>void):void {
     const table=theBook()
-    const leaf=table?.pages.find(page=>page.page_kind==='facsimile'&&page.machine_slugs.includes(slug))
+    openLeafReading(table?.pages.find(page=>page.page_kind==='facsimile'&&page.machine_slugs.includes(slug)),base,back)
+  }
+  /** ONE ADMITTED LEAF, OPENED WHERE THE VISITOR STANDS. The reading is the
+   * table module's own: its pages, its pyramids, its three ways. */
+  function openLeafReading(leaf:PageRecord|undefined,base:string,back:()=>void):void {
+    const table=theBook()
     if(!table||!leaf||!closeLook)return
     const codex=CODEX_ENTRIES.find(record=>record.id===`paris-${leaf.codex}`)
     const id=`${base}${LEAF_DOOR}`
@@ -1480,6 +1509,15 @@ export function createWing():VinciWingModule {
     const how_=closeLook.id&&closeLook.id!==id?'advance':'enter'
     const shut=control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())
     if(entry.kind==='sheet'){openMode=how;openSheetDoor(id,from,how_);openMode='auto';return}
+    // THE PAGE ON THE COURT'S SUPPORT. The eye has already walked to the
+    // board; the reading opens over the frame it stands in.
+    if(id===VINCI_STUDY_LEAF){
+      openMode=how
+      openLeafReading(theBook()?.pages.find(page=>page.page_kind==='facsimile'&&page.codex===STUDY_LEAF_PAGE.codex
+        &&page.folio===STUDY_LEAF_PAGE.folio&&page.side===STUDY_LEAF_PAGE.side),id,()=>closeLook?.close())
+      openMode='auto'
+      return
+    }
     if(entry.kind==='machine'){
       const slug=id.slice('machine/'.length)
       if(!isMachineSlug(slug))return
@@ -1629,7 +1667,10 @@ export function createWing():VinciWingModule {
     // built, the card docks to the side and the room is the frame.
     const standing=vinciStandsInRoom(s.id)
     header.classList.toggle('vinci-standing',standing)
-    if(!s.outdoor){header.classList.toggle('vinci-construction',!standing&&!s.built);if(!standing&&!s.built)header.append(make('p','vinci-status',text(vinciConstructionStatus)))}
+    // A ROOM THAT IS NOT OPEN STILL SAYS SO. The centred panel is for a
+    // station that is still one plate; the word stands under the title
+    // wherever the room behind the frame is not built.
+    if(!s.outdoor){header.classList.toggle('vinci-construction',!standing&&!s.built);if(!s.built)header.append(make('p','vinci-status',text(vinciConstructionStatus)))}
     else header.classList.remove('vinci-construction')
     // THE CARD SPEAKS AT EVERY STATION, indoors and out. The three outdoor
     // stations used to carry a title and the hour and nothing that said what
@@ -1947,6 +1988,7 @@ export function createWing():VinciWingModule {
     if(s.id==='courtyard'||['hall','oratory','study','chamber'].includes(s.id)||activeView.startsWith('entry-')){
       appendEvidence('entry',entryPassageProvenance.label,'reconstructed','vinci/entry-passage',entryPassageProvenance.source.join(' · '))
       appendEvidence('entryFinish',entryMineralSurfaceProvenance.label,'reconstructed','vinci/entry-mineral-surface',entryMineralSurfaceProvenance.source.join(' · '))
+      appendRecord({en:hallLedgeProvenance.recipe,de:hallLedgeProvenance.recipeDe},hallLedgeProvenance.source.join(' · '),'reconstructed',hallLedgeProvenance.manifestId,'GENERATED')
     }
     if(s.id==='arrival'){
       appendEvidence('road',roadDressingProvenance.label,'conjectural','vinci/road-dressing',roadDressingProvenance.source.join(' · '))
