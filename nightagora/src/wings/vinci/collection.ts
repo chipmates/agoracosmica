@@ -314,9 +314,9 @@ export function collectionConcreteMaterial(closedCaster = false): MeshStandardNo
   // aggregate and the panel were all averaged away and the plane read as
   // flat colour; each is now filtered on the axis it actually varies in.
   const span = (coordinate: typeof P.x) => coordinate.dFdx().abs().add(coordinate.dFdy().abs()).max(.000002)
-  const fu = span(U.x).toVar(), fv = span(U.y).toVar()
-  const held = (metres: number, f: typeof fu) => smoothstep(2, 4, float(metres).div(f))
-  const line = (coordinate: typeof P.x, spacing: number, width: number, f: typeof fu) => {
+  const fu = span(U.x), fv = span(U.y)
+  const held = (metres: number, f: typeof P.x) => smoothstep(2, 4, float(metres).div(f))
+  const line = (coordinate: typeof P.x, spacing: number, width: number, f: typeof P.x) => {
     const e = fract(coordinate.div(spacing)), edge = e.min(float(1).sub(e)).mul(spacing)
     return float(1).sub(smoothstep(float(width).sub(f.mul(.5)).max(0), float(width).add(f.mul(.5)), edge)).mul(held(spacing, f))
   }
