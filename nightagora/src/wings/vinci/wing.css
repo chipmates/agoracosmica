@@ -249,10 +249,32 @@
 .vinci-strip-row li {flex:0 0 auto;}
 /* The bar's own height is what the row stands above: the bar is 46 px at the
    wing's own offset, and the row may never cover the way out of the room. */
-.vinci-strip[data-dock='foot'] {left:24px;right:24px;top:auto !important;bottom:calc(var(--wing-rail-bottom) + 60px);
-  width:auto !important;max-width:none;padding:8px 10px 7px;}
-.vinci-strip[data-dock='foot'] .vinci-strip-item {width:116px;height:116px;}
-.vinci-strip[data-dock='foot'] .vinci-strip-year {font-size:26px;padding-bottom:14px;}
+.vinci-strip[data-dock='foot'] {left:24px;top:auto !important;bottom:calc(var(--wing-rail-bottom) + 60px);
+  padding:8px 10px 7px;}
+/* THE WHOLE WIDTH IS THE WALL'S. Twenty five works are recognisable at this
+   size and at no smaller one, and at the two ends of the hang the wall IS
+   the exhibit, so the band takes the foot of the frame. */
+.vinci-strip[data-dock='foot'][data-hang='wall'] {right:24px;width:auto !important;max-width:none;}
+.vinci-strip[data-dock='foot'][data-hang='wall'] .vinci-strip-item {width:116px;height:116px;}
+.vinci-strip[data-dock='foot'][data-hang='wall'] .vinci-strip-year {font-size:26px;padding-bottom:14px;}
+/* ELSEWHERE THE ROW IS THE ROOM'S FEW: it hugs its cells at the foot left,
+   small enough to leave the work whole and still a 44 px target, and it
+   stands up to the wall's own size under a hand or a keyboard. */
+.vinci-strip[data-dock='foot'][data-hang='room'] {right:auto;width:auto !important;}
+.vinci-strip[data-dock='foot'][data-hang='room'] .vinci-strip-item {width:72px;height:72px;
+  transition:width .16s cubic-bezier(.22,.61,.36,1),height .16s cubic-bezier(.22,.61,.36,1);}
+.vinci-strip[data-dock='foot'][data-hang='room'] .vinci-strip-year {font-size:17px;padding-bottom:10px;}
+.vinci-strip[data-dock='foot'][data-hang='room']:hover .vinci-strip-item,
+.vinci-strip[data-dock='foot'][data-hang='room']:has(.vinci-strip-item:focus-visible) .vinci-strip-item
+  {width:116px;height:116px;}
+.vinci-strip[data-dock='foot'][data-hang='room']:hover .vinci-strip-year,
+.vinci-strip[data-dock='foot'][data-hang='room']:has(.vinci-strip-item:focus-visible) .vinci-strip-year
+  {font-size:26px;padding-bottom:14px;}
+@media(prefers-reduced-motion:reduce) {
+  /* THE SIZE STEPS. The growth is a size, not a movement: with motion
+     refused the cell is one size or the other and never travels between. */
+  .vinci-strip[data-dock='foot'][data-hang='room'] .vinci-strip-item {transition:none;}
+}
 /* THE SCALE IS THE WALL'S LENGTH, not the row's: the mark stands where the
    open work hangs along the hang, so a row scrolled to its middle still says
    the visitor is at the second of twenty five. */

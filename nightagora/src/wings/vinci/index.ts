@@ -1124,6 +1124,11 @@ export function createWing():VinciWingModule {
     strip.setWall(at===undefined||!stops.length?null:{place:onWallStop()&&at<=stops.length?at:0,total:stops.length,
       hang:wallOn()?.id===VINCI_PICTURE_WALL,whole:()=>wholeWall()})
     strip.setHidden(mode===2||(narrow()&&Boolean(open)))
+    // THE BAND ACROSS THE FOOT IS THE WALL'S. Twenty five works at a size a
+    // face can be recognised at is what the hang needs; a row of three at
+    // that width is a band over the room, so off the wall the row hugs its
+    // own cells and stands up to the wall's size under a hand.
+    strip.element.dataset['hang']=wallEnd(vinciContent[card]!.id)||wallAt()!==undefined?'wall':'room'
     // THE ROW NEVER STANDS OVER A WORK. On the wide stage it runs along the
     // foot of the frame above the bar, which is where a row of twenty five
     // can be large enough to recognise; while a vitrine holds the stage at an
