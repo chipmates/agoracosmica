@@ -109,6 +109,22 @@ export interface Stack {
   render: (dt: number) => void
   setSize: (width: number, height: number) => void
   dispose: () => void
+  /** THE GRAPHICS CONTEXT IS GONE. A phone under memory pressure takes the
+      GPU back from the tab, and from that moment every draw is a black
+      canvas. The one who owns the picture is told once, with what the
+      renderer last held, so it can put a still and a way on in front of the
+      visitor instead of a black room. */
+  onContextLost: (told: (why: string) => void) => void
+  /** true from the loss on: the loop stops asking for frames */
+  contextLost: () => boolean
+  /** keep the frame now on the canvas, so a loss has something to show.
+      Taken inside the render that drew it: a canvas read in a later task is
+      empty on every WebGL2 path. */
+  keepStill: () => void
+  /** the last kept frame, at a fraction of the stage's own size */
+  still: () => HTMLCanvasElement | null
+  /** ask the graphics context to die, for the rig that proves the recovery */
+  loseContext: () => boolean
 }
 
 /**
@@ -157,12 +173,69 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
   ;(window as Window & { __naStack?: unknown }).__naStack = {
     ledger,
     textures: () => textures(),
+    // the rig's way to kill the graphics context on purpose, and to ask
+    // whether one died on its own: the recovery cannot be proved by waiting
+    // for a phone to run out of memory
+    lose: () => killContext(),
+    lost: () => lost !== '',
   }
 
   let chain: PostChain | null = null
   let scene: Scene | null = null
   let camera: Camera | null = null
   let look: Grade = GRADES['lapis-ember']
+
+  /* ---- the lost context, and the still that stands in for it ---- */
+  /** a still this wide is under a millisecond to copy and still reads as the
+      room on a phone; the height follows the stage's own shape */
+  const STILL_WIDTH = 480
+  const lostListeners: Array<(why: string) => void> = []
+  let lost = ''
+  let stillDue = false
+  let still: HTMLCanvasElement | null = null
+  function lose(why: string): void {
+    if (lost) return
+    lost = why
+    console.warn(`graphics context lost: ${why}`)
+    for (const told of lostListeners) told(why)
+  }
+  /* WebGL2 says so on the canvas, WebGPU on the device it handed out. Both
+     paths end in the same word, because what the visitor sees is the same. */
+  renderer.domElement.addEventListener('webglcontextlost', event => {
+    // the default action kills the context for good; a restore needs it back
+    event.preventDefault()
+    lose('webgl context lost')
+  })
+  const device = (renderer as unknown as { backend?: { device?: { lost?: Promise<{ reason?: string }>; destroy?: () => void } } })
+    .backend?.device
+  void device?.lost?.then(info => lose(`webgpu device lost: ${info?.reason ?? 'unknown'}`))
+
+  function killContext(): boolean {
+    const gl = renderer.domElement.getContext('webgl2') as WebGL2RenderingContext | null
+    const kill = gl?.getExtension('WEBGL_lose_context') as { loseContext?: () => void } | null
+    if (kill?.loseContext) { kill.loseContext(); return true }
+    if (device?.destroy) { device.destroy(); return true }
+    return false
+  }
+
+  function takeStill(): void {
+    stillDue = false
+    const canvas = renderer.domElement
+    if (!canvas.width || !canvas.height) return
+    const keep = still ?? document.createElement('canvas')
+    const scale = Math.min(1, STILL_WIDTH / canvas.width)
+    keep.width = Math.max(1, Math.round(canvas.width * scale))
+    keep.height = Math.max(1, Math.round(canvas.height * scale))
+    const paper = keep.getContext('2d')
+    if (!paper) return
+    try {
+      paper.drawImage(canvas, 0, 0, keep.width, keep.height)
+    } catch {
+      // a context already gone hands back nothing: the veil then stands plain
+      return
+    }
+    still = keep
+  }
 
   document.body.dataset['tier'] = tierName
   document.body.dataset['backend'] = backend
@@ -321,14 +394,26 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
     gi: (scopeName) => loadBakedGI(scopeName),
 
     render(dt) {
-      if (!scene || !camera) return
+      if (!scene || !camera || lost) return
       renderer.info.reset()
       const started = performance.now()
       chain?.update(dt)
       if (chain) chain.post.render()
       else renderer.render(scene, camera)
       meter.sample(dt * 1000, performance.now() - started)
+      // inside the frame that drew it: a canvas read in a later task is
+      // already empty on every WebGL2 path
+      if (stillDue) takeStill()
     },
+
+    onContextLost(told) {
+      lostListeners.push(told)
+      if (lost) told(lost)
+    },
+    contextLost: () => lost !== '',
+    keepStill: () => { stillDue = true },
+    still: () => still,
+    loseContext: killContext,
 
     setSize(width, height) {
       renderer.setSize(width, height)
