@@ -178,7 +178,14 @@ const STEP_MS = 1000 / 60
    The leg then takes as long in real seconds as the machine needs, and comes
    back with the same frames every time. A watchdog grants a frame after three
    seconds of starvation so a stopped cast cannot hang the walk. */
-const AHEAD_FRAMES = 3
+/* AND WITH `--ahead 1` THE WALK IS THE SAME WALK TWICE. Three frames of slack
+   let the encoder decide WHICH drawn frames come back, so two runs of one leg
+   read different poses at the same frame number and their event counts cannot
+   be compared. At one frame of credit the page draws, the cast returns that
+   frame, and only then is the next one drawn: every drawn frame is a captured
+   frame, and the pose at captured frame n is the pose at drawn frame n. The
+   leg then costs as many real seconds as the encoder needs. */
+const AHEAD_FRAMES = Math.max(1, Number(value('ahead', '3')) || 3)
 const STARVED_MS = 3000
 async function installEvenClock(page, step) {
   return page.evaluate(([stepMs, ahead, starvedMs]) => {
@@ -405,11 +412,17 @@ function castToDisk(page, client, dir) {
       }
     })()
   }
+  let heldFrom = null
   return {
     async start() {
       stopped = false
       client.on('Page.screencastFrame', onFrame)
-      await page.evaluate(() => window.__even?.hold())
+      // the even clock's own frame number at the moment the gate closes: with
+      // one frame of credit, captured frame n is drawn frame heldFrom + n
+      heldFrom = await page.evaluate(() => {
+        window.__even?.hold()
+        return window.__even ? window.__even.frames : null
+      })
       await client.send('Page.startScreencast', { format: 'png', everyNthFrame: 1 })
     },
     async stop() {
@@ -418,7 +431,7 @@ function castToDisk(page, client, dir) {
       await client.send('Page.stopScreencast')
       const even = await page.evaluate(() => (window.__even ? { granted: window.__even.granted, stalls: window.__even.stalls, frames: window.__even.frames } : null))
       await page.evaluate(() => window.__even?.release())
-      return { times, frames: n, even }
+      return { times, frames: n, even, heldFrom }
     },
     get count() {
       return n
@@ -615,7 +628,7 @@ function replayRefocus(samples) {
  * One captured run, read whole: the spread per tile, the events, and the
  * worst three frame pairs written out beside the report.
  */
-async function readRun(name, dir, allTimes, samples, origin, keepPairs) {
+async function readRun(name, dir, allTimes, samples, origin, keepPairs, heldFrom = null) {
   const all = readdirSync(dir).filter((f) => f.endsWith('.png')).sort()
   if (all.length < 6) return { error: `the screencast handed back ${all.length} frames` }
   /* A REPEATED SURFACE IS NOT A FRAME, and on a walk it is a defect in the
@@ -698,6 +711,34 @@ async function readRun(name, dir, allTimes, samples, origin, keepPairs) {
     return a.map((v, j) => v + (b[j] - v) * k)
   }
   for (let n = 0; n < N; n++) pose[n] = poseAt(times[n]) ?? pose[n]
+  /* AND WHERE THE CAST HELD THE REINS ONE FRAME AT A TIME, THE POSE IS NOT
+     MATCHED BY A CLOCK AT ALL. Captured frame n is drawn frame heldFrom + n,
+     so the pose is the sample the app wrote on that very frame, and two runs
+     of one leg then carry the same pose at the same frame number to the bit.
+     The offset between the two countings is read off the clock match and
+     rounded once (a cast may hand back the surface that stood before the
+     gate closed), never per frame. */
+  let byFrame = null
+  if (AHEAD_FRAMES === 1 && EVEN && heldFrom !== null) {
+    const held = new Map()
+    for (const s of samples) if (Number.isFinite(s[10])) held.set(s[10], s)
+    const offsets = []
+    for (let n = 0; n < N; n++) {
+      const p = pose[n]
+      if (p && Number.isFinite(p[10])) offsets.push(Math.round(p[10]) - (heldFrom + kept[n] + 1))
+    }
+    const shift = offsets.length ? Math.round(median(offsets)) : 0
+    const matched = []
+    let missing = 0
+    for (let n = 0; n < N; n++) {
+      const want = heldFrom + kept[n] + 1 + shift
+      const s = held.get(want)
+      if (s) matched.push(s)
+      else { missing++; matched.push(pose[n]) }
+    }
+    byFrame = { shift, missing, frames: matched.map((p) => (p && Number.isFinite(p[10]) ? p[10] : null)) }
+    if (missing <= N * 0.02) for (let n = 0; n < N; n++) pose[n] = matched[n]
+  }
   /* THE AXIS THE READING IS TAKEN ALONG. On the even clock the picture moves
      by the app's own frame, not by the wall's millisecond, so the line
      through a tile's two neighbours is drawn in frames. Off it, the wall
@@ -976,6 +1017,11 @@ async function readRun(name, dir, allTimes, samples, origin, keepPairs) {
         }
       : null,
     clock: even ? 'even' : 'wall',
+    byFrame: byFrame ? { shift: byFrame.shift, missing: byFrame.missing } : null,
+    /* THE WALK ITSELF, so one run may be laid over another frame for frame:
+       the drawn frame number and the eye it was drawn from, rounded to a
+       tenth of a millimetre and a ten thousandth of a degree. */
+    trace: pose.map((p) => (p ? [p[10] === null ? null : Math.round(p[10]), +p[1].toFixed(4), +p[2].toFixed(4), +p[3].toFixed(4), +p[4].toFixed(5), +p[5].toFixed(5), +p[6].toFixed(5)] : null)),
     /* THE LOAD-INDEPENDENT LENGTH OF THE LEG. On the even clock this is the
        number the same leg has to come back with whatever else the machine is
        doing, and the capture rate beside it is what changed instead. */
@@ -1067,10 +1113,10 @@ async function walkLeg(page, client, from, to, name, keepPairs) {
       }),
     [LEG_CEILING_MS, STAND_FRAMES, STAND_EPSILON]
   )
-  const { times, even } = await cast.stop()
+  const { times, even, heldFrom } = await cast.stop()
   const rec = await stopRecorder(page)
   const seconds = +((Date.now() - began) / 1000).toFixed(2)
-  const run = await readRun(name, join(RAW, name), times, rec.samples, rec.origin, keepPairs)
+  const run = await readRun(name, join(RAW, name), times, rec.samples, rec.origin, keepPairs, heldFrom)
   return { leg: `${from} to ${to}`, name, stoodAt, seconds, gate: even, ...run }
 }
 
@@ -1098,9 +1144,9 @@ async function holdControl(page, client, at, name, view = '') {
   await cast.start()
   const until = Date.now() + 12000
   while (cast.count < HOLD_FRAMES && Date.now() < until) await page.waitForTimeout(40)
-  const { times, even } = await cast.stop()
+  const { times, even, heldFrom } = await cast.stop()
   const rec = await stopRecorder(page)
-  const run = await readRun(name, join(RAW, name), times, rec.samples, rec.origin, null)
+  const run = await readRun(name, join(RAW, name), times, rec.samples, rec.origin, null, heldFrom)
   return { hold: at, name, gate: even, ...run }
 }
 
@@ -1108,6 +1154,8 @@ mkdirSync(OUT, { recursive: true })
 const LEGS = (value('leg', 'arrival:courtyard') || 'arrival:courtyard').split(',').map((s) => s.split(':'))
 const flags = []
 const runs = []
+/** the first walk of each leg, kept so the next walk can be laid over it */
+const traces = new Map()
 let head = 'unknown'
 say(`flicker-walk: wing/${SLUG} on port ${PORT}, ${MOBILE ? 'phone' : 'desktop'} ${VP.width}x${VP.height}, tier ${TIER}`)
 const server = spawn('pnpm', ['preview', '--port', String(PORT), '--strictPort'], { stdio: 'ignore', cwd: APP_ROOT })
@@ -1163,12 +1211,33 @@ try {
         say(`  ${run.leg}: ${run.error}`)
         continue
       }
+      /* THE WALK LAID OVER THE FIRST WALK OF THE SAME LEG. Two runs are only
+         comparable when the eye stood in the same place at the same frame
+         number, so the difference is measured and printed rather than
+         assumed, and it is the first thing the report is read for. */
+      const before = traces.get(run.leg)
+      if (!before) traces.set(run.leg, run.trace)
+      else {
+        const byFrame = new Map(before.filter(Boolean).map((p) => [p[0], p]))
+        let shared = 0, mm = 0, deg = 0
+        for (const p of run.trace) {
+          if (!p) continue
+          const q = byFrame.get(p[0])
+          if (!q) continue
+          shared++
+          mm = Math.max(mm, Math.hypot(p[1] - q[1], p[2] - q[2], p[3] - q[3]) * 1000)
+          deg = Math.max(deg, Math.max(Math.abs(p[4] - q[4]), Math.abs(p[5] - q[5]), Math.abs(p[6] - q[6])) * 180 / Math.PI)
+        }
+        run.againstRun1 = { sharedFrames: shared, maxEyeMm: +mm.toFixed(3), maxTurnDeg: +deg.toFixed(4) }
+        say(`    · against run 1: ${shared} frame(s) in both, the eye differs by at most ${mm.toFixed(3)} mm and ${deg.toFixed(4)} deg`)
+      }
       say(
         `  ${run.leg}${RUNS > 1 ? ` run ${pass}` : ''}: ${run.frames} frames at ${run.fps} fps over ${run.metresWalked} m` +
           `${run.virtualFrames === null ? '' : `, ${run.virtualFrames} of the even clock, ${run.gate?.stalls ?? '?'} stall(s)`}, ` +
           `eye step ${run.eyeStepMm.median} mm median / ${run.eyeStepMm.max} mm max, ` +
           `${run.events} event(s) (${run.eventsPer100} per 100 frames) over ${run.eventTiles} tile(s), ` +
           `spread median ${run.spread.median} p99 ${run.spread.p99}` +
+          `${run.byFrame ? `, matched by frame (shift ${run.byFrame.shift}, ${run.byFrame.missing} unmatched)` : ''}` +
           `${run.aim ? ` over ${run.aim.tilesPerFrame.median} tile(s) a frame` : ''}, ` +
           `${run.cascade.eventsOnARefocus} of them on one of ${run.cascade.refocusFramesCaptured} cascade refocus frame(s) (chance ${run.cascade.chance})`
       )
@@ -1198,6 +1267,14 @@ try {
 if (!KEEP) rmSync(RAW, { recursive: true, force: true })
 
 const walks = runs.filter((r) => r.leg && !r.error)
+/* the traces are the walk itself and they are long: they live beside the
+   report, never inside it */
+const traceFile = join(OUT, `${TAG}-traces.json`)
+writeFileSync(
+  traceFile,
+  JSON.stringify(runs.filter((r) => r.trace).map((r) => ({ name: r.name, leg: r.leg ?? r.hold, pass: r.pass ?? null, trace: r.trace })))
+)
+for (const r of runs) delete r.trace
 const report = {
   instrument: 'flicker-walk',
   surface: `wing/${SLUG}`,
@@ -1209,9 +1286,11 @@ const report = {
   clock: EVEN ? { kind: 'even', stepMs: +STEP_MS.toFixed(4) } : { kind: 'wall' },
   aim: AIM,
   query: process.env['FLICKER_QUERY'] ?? '',
+  ahead: AHEAD_FRAMES,
   runs,
   events: walks.reduce((s, r) => s + r.events, 0),
   dir: 'forge/shots/flicker-walk',
+  traces: traceFile,
   flags,
 }
 report.ok = flags.length === 0
