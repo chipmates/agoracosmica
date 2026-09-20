@@ -163,7 +163,7 @@ async function timeEntry(page, how) {
     for (let i = 0; i < 12000 && standing === null; i++) {
       const said = document.querySelector('#goldbreath .stage-line, #goldbreath .gold-line, #goldbreath p')
       if (said && said.textContent) sentences.add(said.textContent.trim())
-      if (document.body.dataset['phase'] === 'wing' && struck()) standing = performance.now() - t0
+      if (document.body?.dataset['phase'] === 'wing' && struck()) standing = performance.now() - t0
       else await new Promise(r => setTimeout(r, 16))
     }
     watching = false
@@ -187,6 +187,7 @@ async function timeEntry(page, how) {
       steps: steps.length,
       longestStillMs: ms(still),
       longestStillAt: ms(stillAt),
+      line: steps.map(([at, v]) => [ms(at), v]),
       sentences: [...sentences].filter(Boolean),
       bytes,
     }
@@ -225,7 +226,7 @@ async function oneEntry(browser, url, how, again) {
       await cdp.send('Network.enable')
       await cdp.send('Emulation.setCPUThrottlingRate', { rate: CPU })
       // the DevTools "fast 4G" profile, written out so the reading can be repeated
-      await cdp.send('Network.emulateNetworkConditions', {
+      if (flags.get('net') !== 'off') await cdp.send('Network.emulateNetworkConditions', {
         offline: false, latency: 75, downloadThroughput: Math.round((9 * 1000 * 1000 * 0.9) / 8),
         uploadThroughput: Math.round((1.5 * 1000 * 1000 * 0.9) / 8),
       })
@@ -251,7 +252,7 @@ try {
   const browser = await chromium.launch({ args: [...browserArgs(), ...FRAME_TIME_FLAGS] })
   for (const tier of TIERS) {
     if (ENTRY) {
-      const stage = `${VIEW.width}x${VIEW.height}${DPR === 1 ? '' : ` dpr${DPR}`}${THROTTLE ? `, cpu /${CPU}, fast 4G` : ''}`
+      const stage = `${VIEW.width}x${VIEW.height}${DPR === 1 ? '' : ` dpr${DPR}`}${THROTTLE ? `, cpu /${CPU}${flags.get('net') === 'off' ? '' : ', fast 4G'}` : ''}`
       console.log(`\n== ${tier}, ${stage} ==`)
       console.log('  how                  navigation  first paint  line step  standing  steps  longest still')
       const rows = []
@@ -281,7 +282,13 @@ try {
       }
       const file = flag('json', '')
       if (file) writeFileSync(String(file).replace('.json', `-${tier}${PHONE ? '-phone' : ''}${THROTTLE ? '-throttled' : ''}.json`),
-        JSON.stringify(rows.map(r => ({ ...r, bytes: undefined })), null, 1))
+        JSON.stringify(rows.map(r => ({
+          ...r,
+          // the ten biggest, by what the wire carried, so a recommendation can name them
+          heaviest: (r.bytes ?? []).map(([url, transfer, encoded]) => [url.replace(/^https?:\/\/[^/]+/, ''), Math.round((transfer || encoded || 0) / 1024)])
+            .sort((a, b) => b[1] - a[1]).slice(0, 10),
+          bytes: undefined,
+        })), null, 1))
       continue
     }
     const ctx = await browser.newContext({ viewport: VIEW })
