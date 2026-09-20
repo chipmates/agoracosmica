@@ -1,78 +1,5 @@
 {
  "surfaces": {
-  "lobby": {
-   "runs": 5,
-   "total": {
-    "min": 202,
-    "max": 204
-   },
-   "stations": {
-    "en/desktop/agora (shut)": {
-     "min": 10,
-     "max": 11
-    },
-    "en/desktop/keeper (shut)": {
-     "min": 11,
-     "max": 11
-    },
-    "en/desktop/wheel (shut)": {
-     "min": 16,
-     "max": 16
-    },
-    "en/desktop/pane (shut)": {
-     "min": 14,
-     "max": 14
-    },
-    "en/mobile/agora (shut)": {
-     "min": 10,
-     "max": 10
-    },
-    "en/mobile/keeper (shut)": {
-     "min": 10,
-     "max": 10
-    },
-    "en/mobile/wheel (shut)": {
-     "min": 16,
-     "max": 16
-    },
-    "en/mobile/pane (shut)": {
-     "min": 13,
-     "max": 14
-    },
-    "de/desktop/agora (shut)": {
-     "min": 10,
-     "max": 11
-    },
-    "de/desktop/keeper (shut)": {
-     "min": 11,
-     "max": 11
-    },
-    "de/desktop/wheel (shut)": {
-     "min": 16,
-     "max": 16
-    },
-    "de/desktop/pane (shut)": {
-     "min": 14,
-     "max": 14
-    },
-    "de/mobile/agora (shut)": {
-     "min": 10,
-     "max": 10
-    },
-    "de/mobile/keeper (shut)": {
-     "min": 10,
-     "max": 10
-    },
-    "de/mobile/wheel (shut)": {
-     "min": 16,
-     "max": 16
-    },
-    "de/mobile/pane (shut)": {
-     "min": 14,
-     "max": 14
-    }
-   }
-  },
   "wing/vinci": {
    "runs": 9,
    "total": {
@@ -591,6 +518,111 @@
     "de/mobile/picture-room-west (open)": {
      "min": 32,
      "max": 52
+    }
+   }
+  },
+  "lobby": {
+   "runs": 3,
+   "total": {
+    "min": 532,
+    "max": 532
+   },
+   "stations": {
+    "en/desktop/agora (shut)": {
+     "min": 7,
+     "max": 7
+    },
+    "en/desktop/agora (open)": {
+     "min": 27,
+     "max": 27
+    },
+    "en/desktop/wheel (shut)": {
+     "min": 16,
+     "max": 16
+    },
+    "en/desktop/wheel (open)": {
+     "min": 36,
+     "max": 36
+    },
+    "en/desktop/pane (shut)": {
+     "min": 14,
+     "max": 14
+    },
+    "en/desktop/pane (open)": {
+     "min": 34,
+     "max": 34
+    },
+    "en/mobile/agora (shut)": {
+     "min": 6,
+     "max": 6
+    },
+    "en/mobile/agora (open)": {
+     "min": 26,
+     "max": 26
+    },
+    "en/mobile/wheel (shut)": {
+     "min": 16,
+     "max": 16
+    },
+    "en/mobile/wheel (open)": {
+     "min": 36,
+     "max": 36
+    },
+    "en/mobile/pane (shut)": {
+     "min": 14,
+     "max": 14
+    },
+    "en/mobile/pane (open)": {
+     "min": 34,
+     "max": 34
+    },
+    "de/desktop/agora (shut)": {
+     "min": 7,
+     "max": 7
+    },
+    "de/desktop/agora (open)": {
+     "min": 27,
+     "max": 27
+    },
+    "de/desktop/wheel (shut)": {
+     "min": 16,
+     "max": 16
+    },
+    "de/desktop/wheel (open)": {
+     "min": 36,
+     "max": 36
+    },
+    "de/desktop/pane (shut)": {
+     "min": 14,
+     "max": 14
+    },
+    "de/desktop/pane (open)": {
+     "min": 34,
+     "max": 34
+    },
+    "de/mobile/agora (shut)": {
+     "min": 6,
+     "max": 6
+    },
+    "de/mobile/agora (open)": {
+     "min": 26,
+     "max": 26
+    },
+    "de/mobile/wheel (shut)": {
+     "min": 16,
+     "max": 16
+    },
+    "de/mobile/wheel (open)": {
+     "min": 36,
+     "max": 36
+    },
+    "de/mobile/pane (shut)": {
+     "min": 14,
+     "max": 14
+    },
+    "de/mobile/pane (open)": {
+     "min": 34,
+     "max": 34
     }
    }
   }
