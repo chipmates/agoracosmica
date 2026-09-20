@@ -133,6 +133,16 @@ export function createEclipse(scene: Scene) {
   const narrow = typeof window !== 'undefined' && window.innerWidth < 720
   const seg = (wide: number, thin: number): number => (narrow ? thin : wide)
 
+  /* THE SKY BEHIND THE MARK, BEHIND A SWITCH. The door already holds the
+     night's own firmament, very low. An address may ask for a little more
+     of it and for nothing else: read once, never stored, default off. Both
+     strengths stay under the master the meteors wake at, so no shooting
+     star ever crosses the mark. */
+  const SKY_PUSH: Record<string, number> = { pushed: 1.9, pushed2: 2.7 }
+  const skyPush =
+    typeof window === 'undefined' ? 1
+    : (SKY_PUSH[new URLSearchParams(window.location.search).get('sky') ?? ''] ?? 1)
+
   // ---------------------------------------------------------- the uniforms
   const uTime = uniform(0)
   /** how much light the corona is allowed: the transit's own ramp */
@@ -767,7 +777,7 @@ export function createEclipse(scene: Scene) {
        has no far distance at all. They are a FLOOR, not a birth: the sky's
        own bloom still belongs to the descent, and the floor dies the moment
        the door opens. */
-    const totalityFloor = uTotal.value * Math.max(0, 1 - s.door * 8) * 0.15
+    const totalityFloor = uTotal.value * Math.max(0, 1 - s.door * 8) * 0.15 * skyPush
     firmament.update(s.elapsed, Math.max(s.skyBirth, totalityFloor))
     uWand.value = s.skyBirth * s.lanterns
     // a field at zero light is still a draw call, and the wheel is a
