@@ -41,7 +41,16 @@ const TIERS = String(flag('tier', 'hero,standard')).split(',')
 const PACE = flags.has('pace') ? String(flag('pace', 'walk')) : ''
 const SECONDS = Number(flag('seconds', 30))
 const SETTLE = Number(flag('settle', 6))
-const VIEW = { width: Number(flag('width', 1440)), height: Number(flag('height', 900)) }
+/* THE PHONE'S OWN STAGE. `--phone` is 390 by 844 at a device ratio of 2 with
+   touch, which is the stage every phone reading of this wing is taken at;
+   `--throttle` puts a mid-range phone's processor and a fast 4G line under
+   it, so the wait is a visitor's wait and not this machine's. */
+const PHONE = flags.has('phone')
+const VIEW = { width: Number(flag('width', PHONE ? 390 : 1440)), height: Number(flag('height', PHONE ? 844 : 900)) }
+const DPR = Number(flag('dpr', PHONE ? 2 : 1))
+const THROTTLE = flags.has('throttle')
+const CPU = Number(flag('cpu', 4))
+const RUNS = Number(flag('runs', 1))
 const ENTRY = flags.has('entry')
 const DEV = flags.has('dev')
 const WALK = flags.has('walk')
@@ -109,46 +118,118 @@ async function sampleLeg(page, ids, to = TO) {
   }, [to, cardNumber(ids, to), SECONDS])
 }
 
-/** the entry as the visitor waits it out: the gold field is lit from the
-    press and struck on the wing's first frame, so its own life IS the wait */
+/** THE ENTRY AS A VISITOR MEETS IT, in four moments and one standstill: the
+ *  navigation, the first painted frame, the gold line's first step, the wing
+ *  standing. The line is sampled on every animation frame, so the longest
+ *  stretch in which it does not move is a measurement and not an impression.
+ *  The bytes are read off the page's own resource timing at the moment the
+ *  wing stands, which is the wait the entry paid for. */
 async function timeEntry(page, how) {
   return page.evaluate(async (how) => {
     const struck = () => {
       const gold = document.getElementById('goldbreath')
       return gold !== null && !gold.classList.contains('lit')
     }
-    let t0 = performance.now()
+    // the navigation is the page's own origin; a press starts its own clock
+    let t0 = 0
     if (how === 'press') {
-      // the module boots on its own time; the press is not a press until the
-      // page can take one
       for (let i = 0; i < 600 && window.__forge === undefined; i++) await new Promise(r => setTimeout(r, 20))
       window.__forge.jump('pane', { slug: 'vinci' })
       for (let i = 0; i < 400 && !document.querySelector('.pane-enter:not([hidden])'); i++) await new Promise(r => setTimeout(r, 20))
-      // the press is the moment the wait starts, not the page load
       t0 = performance.now()
       document.querySelector('.pane-enter').click()
     }
-    // the field's own line is the warm up's count of frames paid for, so the
-    // moment it first opens splits the wait into the part that is the wing
-    // arriving and the part that is the walk being paid for
-    let warm = null
-    for (let i = 0; i < 6000; i++) {
-      const line = document.querySelector('#goldbreath .dark-line')
-      if (warm === null && line instanceof HTMLElement && /scaleX\(0\.[0-9]/.test(line.style.transform))
-        warm = performance.now() - t0
-      if (document.body.dataset['phase'] === 'wing' && struck())
-        return { total: Math.round(performance.now() - t0) / 1000, warm: warm === null ? null : Math.round(warm) / 1000 }
-      await new Promise(r => setTimeout(r, 16))
+    /* THE LINE IS READ ON EVERY FRAME, never on a timer: a timer that fires
+       while the main thread is blocked reports the block as a standstill of
+       its own making, and an animation frame cannot fire at all until the
+       page can paint, which is the same thing the visitor sees. */
+    const line = () => {
+      const el = document.querySelector('#goldbreath .dark-line')
+      if (!(el instanceof HTMLElement)) return null
+      const m = /scaleX\(([0-9.]+)\)/.exec(el.style.transform)
+      return m ? Number(m[1]) : null
     }
-    return null
+    const steps = []
+    let last = null
+    let watching = true
+    const watch = () => {
+      const v = line()
+      if (v !== null && v !== last) { steps.push([performance.now() - t0, v]); last = v }
+      if (watching) requestAnimationFrame(watch)
+    }
+    requestAnimationFrame(watch)
+    const sentences = new Set()
+    let standing = null
+    for (let i = 0; i < 12000 && standing === null; i++) {
+      const said = document.querySelector('#goldbreath .stage-line, #goldbreath .gold-line, #goldbreath p')
+      if (said && said.textContent) sentences.add(said.textContent.trim())
+      if (document.body.dataset['phase'] === 'wing' && struck()) standing = performance.now() - t0
+      else await new Promise(r => setTimeout(r, 16))
+    }
+    watching = false
+    const paint = performance.getEntriesByType('paint').find(e => e.name === 'first-contentful-paint')
+    const bytes = performance.getEntriesByType('resource').map(r => [r.name, r.transferSize, r.encodedBodySize])
+    const nav = performance.getEntriesByType('navigation')[0]
+    if (nav) bytes.push([location.href, nav.transferSize, nav.encodedBodySize])
+    /* the longest the line stood still, and where: the stretch between two
+       counted steps, with the standing frame closing the last one */
+    let still = 0, stillAt = null
+    const marks = steps.map(s => s[0])
+    if (standing !== null) marks.push(standing)
+    for (let i = 1; i < marks.length; i++)
+      if (marks[i] - marks[i - 1] > still) { still = marks[i] - marks[i - 1]; stillAt = marks[i - 1] }
+    const ms = (v) => v === null || v === undefined ? null : Math.round(v)
+    return {
+      how,
+      firstPaint: how === 'press' ? null : ms(paint?.startTime),
+      firstStep: steps.length ? ms(steps[0][0]) : null,
+      standing: ms(standing),
+      steps: steps.length,
+      longestStillMs: ms(still),
+      longestStillAt: ms(stillAt),
+      sentences: [...sentences].filter(Boolean),
+      bytes,
+    }
   }, how)
 }
 
-/** one entry, in a context of its own, so two wings never share a GPU */
+/** every byte the entry pulled, sorted into the four families a visitor's
+ *  connection actually pays for */
+function byClass(rows) {
+  const family = (url) => {
+    if (/\/na-assets\/library\//.test(url)) return 'textures'
+    if (/\/na-assets\/models\//.test(url)) return 'models'
+    if (/\/na-assets\//.test(url)) return 'plates'
+    if (/\.(js|mjs|css)(\?|$)/.test(url) || /\/$|\.html(\?|$)/.test(url)) return 'code'
+    return 'other'
+  }
+  const out = { code: [0, 0], textures: [0, 0], models: [0, 0], plates: [0, 0], other: [0, 0] }
+  for (const [url, transfer, encoded] of rows ?? []) {
+    const k = family(url)
+    out[k][0] += transfer || encoded || 0
+    out[k][1]++
+  }
+  const mb = (n) => Math.round((n / (1024 * 1024)) * 100) / 100
+  return Object.fromEntries(Object.entries(out).map(([k, [b, n]]) => [k, { MB: mb(b), files: n }]))
+}
+
+/** one entry, in a context of its own, so two wings never share a GPU. The
+ *  throttled profile is set on the page's own CDP session, so the numbers
+ *  come from the same browser as the unthrottled ones. */
 async function oneEntry(browser, url, how, again) {
-  const ctx = await browser.newContext({ viewport: VIEW })
+  const ctx = await browser.newContext({ viewport: VIEW, deviceScaleFactor: DPR, hasTouch: PHONE, isMobile: PHONE })
   const page = await ctx.newPage()
   try {
+    if (THROTTLE) {
+      const cdp = await ctx.newCDPSession(page)
+      await cdp.send('Network.enable')
+      await cdp.send('Emulation.setCPUThrottlingRate', { rate: CPU })
+      // the DevTools "fast 4G" profile, written out so the reading can be repeated
+      await cdp.send('Network.emulateNetworkConditions', {
+        offline: false, latency: 75, downloadThroughput: Math.round((9 * 1000 * 1000 * 0.9) / 8),
+        uploadThroughput: Math.round((1.5 * 1000 * 1000 * 0.9) / 8),
+      })
+    }
     await page.goto(url, { waitUntil: 'commit' })
     const cold = await timeEntry(page, how)
     if (!again) return { cold, warm: null }
@@ -170,11 +251,37 @@ try {
   const browser = await chromium.launch({ args: [...browserArgs(), ...FRAME_TIME_FLAGS] })
   for (const tier of TIERS) {
     if (ENTRY) {
-      const press = await oneEntry(browser, `${BASE}/?probe=1&tier=${tier}`, 'press', true)
-      const link = await oneEntry(browser, `${BASE}/w/${WING}?probe=1&tier=${tier}`, 'link', true)
-      const say = (r) => r === null ? 'never' : `${r.total} s (the wing arriving ${r.warm ?? '?'} s, then the warm up)`
-      console.log(`== ${tier} == the press in the lobby: cold ${say(press.cold)}, warm cache ${say(press.warm)}`)
-      console.log(`            the deep link: cold ${say(link.cold)}, warm cache ${say(link.warm)}`)
+      const stage = `${VIEW.width}x${VIEW.height}${DPR === 1 ? '' : ` dpr${DPR}`}${THROTTLE ? `, cpu /${CPU}, fast 4G` : ''}`
+      console.log(`\n== ${tier}, ${stage} ==`)
+      console.log('  how                  navigation  first paint  line step  standing  steps  longest still')
+      const rows = []
+      for (let pass = 1; pass <= RUNS; pass++) {
+        const link = await oneEntry(browser, `${BASE}/w/${WING}?probe=1&tier=${tier}`, 'link', !THROTTLE)
+        for (const [cache, r] of [['cold', link.cold], ['warm', link.warm]]) {
+          if (!r) continue
+          rows.push({ tier, stage, how: `deep link ${cache}`, pass, ...r, classes: byClass(r.bytes) })
+          const s = (v) => v === null ? '    ?' : `${(v / 1000).toFixed(2)} s`
+          console.log(
+            `  deep link ${cache} ${pass}      0.00 s     ${s(r.firstPaint)}    ${s(r.firstStep)}   ${s(r.standing)}    ` +
+            `${String(r.steps).padStart(3)}    ${s(r.longestStillMs)} from ${s(r.longestStillAt)}`
+          )
+          const c = byClass(r.bytes)
+          console.log(`      bytes over the wire: code ${c.code.MB} MB (${c.code.files}), textures ${c.textures.MB} MB (${c.textures.files}), ` +
+            `models ${c.models.MB} MB (${c.models.files}), plates ${c.plates.MB} MB (${c.plates.files}), other ${c.other.MB} MB (${c.other.files})`)
+        }
+      }
+      if (!THROTTLE) {
+        const press = await oneEntry(browser, `${BASE}/?probe=1&tier=${tier}`, 'press', true)
+        for (const [cache, r] of [['cold', press.cold], ['warm', press.warm]]) {
+          if (!r) continue
+          rows.push({ tier, stage, how: `press ${cache}`, pass: 1, ...r, classes: byClass(r.bytes) })
+          const s = (v) => v === null ? '    ?' : `${(v / 1000).toFixed(2)} s`
+          console.log(`  press ${cache}            (from the press)      -    ${s(r.firstStep)}   ${s(r.standing)}    ${String(r.steps).padStart(3)}    ${s(r.longestStillMs)} from ${s(r.longestStillAt)}`)
+        }
+      }
+      const file = flag('json', '')
+      if (file) writeFileSync(String(file).replace('.json', `-${tier}${PHONE ? '-phone' : ''}${THROTTLE ? '-throttled' : ''}.json`),
+        JSON.stringify(rows.map(r => ({ ...r, bytes: undefined })), null, 1))
       continue
     }
     const ctx = await browser.newContext({ viewport: VIEW })
