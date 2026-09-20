@@ -206,9 +206,11 @@ const carried = lengths.map(length => {
   return row
 })
 
-/** The real controller finishes the same leg at the same pace even when its
- * pending target is repeatedly replaced. */
-function pendingTrace(metres, replacements) {
+/** THE LEG UNDER WAY AND THE TARGET BEYOND IT. A visitor who keeps pressing
+ * ON asks for a station further along the walk each time, and the leg speeds
+ * up under them; a visitor changing their mind asks for one no further off,
+ * and the leg they are on keeps its pace and its landing time. */
+function pendingTrace(metres, pendings) {
   const from = stationPose('arrival', false)
   const step = new THREE.Vector3(metres, 0, 0)
   const to = { eye: from.eye.clone().add(step), at: from.at.clone().add(step), fov: from.fov }
@@ -221,7 +223,7 @@ function pendingTrace(metres, replacements) {
   rail.update()
   rail.set('courtyard', to, false, false)
   rail.update()
-  for (let i = 0; i < replacements; i++) rail.set(i % 2 ? 'study' : 'oratory', beyond, false, false)
+  for (const id of pendings) rail.set(id, beyond, false, false)
   ensure(rail.navigation.queued.length <= 1, 'Repeated input grew a chain of pending stations')
   let landed = 0
   for (let i = 1; i <= 4000 && !landed; i++) {
@@ -229,11 +231,20 @@ function pendingTrace(metres, replacements) {
     rail.update()
     if (rail.navigation.completed === 'courtyard') landed = now
   }
-  return { metres, pendingReplacements: replacements, secondsToLand: +landed.toFixed(2), metresPerSecond: +(metres / landed).toFixed(2) }
+  return { metres, pendingReplacements: pendings.length, pendings: pendings.slice(0, 3),
+    secondsToLand: +landed.toFixed(2), metresPerSecond: +(metres / landed).toFixed(2) }
 }
-const pendingTraces = [pendingTrace(17.369497651827334, 0), pendingTrace(17.369497651827334, 257)]
-ensure(pendingTraces[0].secondsToLand > 0 && pendingTraces[1].secondsToLand === pendingTraces[0].secondsToLand,
-  'Replacing the pending target changed the active leg or its landing time')
+const LEG_M = 17.369497651827334
+// The walk from the arrival is to the courtyard; the hall, the oratory and
+// the study stand one, two and three stations beyond it.
+const mindChanged = [pendingTrace(LEG_M, ['study']),
+  pendingTrace(LEG_M, ['study', ...Array.from({ length: 256 }, (_, i) => (i % 2 ? 'oratory' : 'hall'))])]
+ensure(mindChanged[0].secondsToLand > 0 && mindChanged[1].secondsToLand === mindChanged[0].secondsToLand,
+  'A target no further along changed the active leg or its landing time')
+const pressedOn = [pendingTrace(LEG_M, []), pendingTrace(LEG_M, ['hall']), mindChanged[0]]
+ensure(pressedOn[0].secondsToLand > pressedOn[1].secondsToLand && pressedOn[1].secondsToLand > pressedOn[2].secondsToLand,
+  'Pressing on did not speed the leg under way')
+const pendingTraces = [...pressedOn, mindChanged[1]]
 
 const report = {
   checker: 'vinci-gait',

@@ -2,7 +2,7 @@ import { Quaternion, Vector3, PerspectiveCamera, Euler } from 'three/webgpu'
 import { world } from './site'
 import { gradeAt as groundHeight } from './terrain-mesh'
 import { roadGradeProvenance } from './road-grade'
-import type { VinciStationId } from './content'
+import { vinciStationIds, type VinciStationId } from './content'
 import { createRailLookSmoother, createCertifiedRailPath } from './rail-smoothing'
 import { projectRailDrag } from './projection-drag'
 import { carriedPace, gaitAt, gaitHeadLift, gaitLeg, gaitRhythm, strollMetresPerSecond, type GaitThreshold } from './gait'
@@ -200,6 +200,13 @@ export const railMoveDurationSeconds = 20
  * already looking at what they are arriving at, and leading the gaze down a
  * six-metre path only turns it into the wall the path runs at. */
 const GAZE_LEAVES = .16, GAZE_ARRIVES = .66, GAZE_AHEAD_M = 6, WALKED_LEG_M = 10
+/** How many stations of the walk lie between two of them. A visitor pressing
+ * on asks for one further along; a visitor changing their mind asks for one
+ * the same distance off. */
+const stationsApart=(a:VinciStationId,b:VinciStationId):number=>{
+  const from=vinciStationIds.indexOf(a), to=vinciStationIds.indexOf(b)
+  return from<0||to<0?0:Math.abs(to-from)
+}
 const wrap=(a:number):number=>Math.atan2(Math.sin(a),Math.cos(a))
 const turn=(from:number,to:number,t:number):number=>from+wrap(to-from)*t
 const ramp=(edge0:number,edge1:number,x:number):number=>{const t=Math.max(0,Math.min(1,(x-edge0)/(edge1-edge0)));return t*t*(3-2*t)}
@@ -339,6 +346,14 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
       // A certified leg finishes at its station before the newest target can
       // begin. Asking for that active endpoint cancels an older pending target.
       pending=sameRequest(active??completed,request)?undefined:request
+      // A VISITOR WHO KEEPS PRESSING ON IS NOT STROLLING. Asking for a
+      // station further along the walk than the one being walked to speeds
+      // the leg under way, as a second press on the wall does. Asking for one
+      // the same distance off is a change of mind, and leaves the pace alone.
+      if(active&&pending&&!active.exhibit&&pending.wall===undefined){
+        const step=stationsApart(active.id,pending.id)
+        if(step>waiting){waiting=step;pace=carriedPace(waiting)}
+      }
       chained=undefined
       // WHILE AN APPROACH STANDS THE RAIL TAKES THE RETURN AND A STATION, and
       // a station is walked from the station eye, which is the pair the
