@@ -244,7 +244,7 @@
       "prompt": "Rooms of the modern collection ground inside the existing pavilion envelope: a stone floor finish on the 1.60 by 1.65 m grid the timeline is laid on, lined walls with a dark stone base and bay ribs, a flat plaster soffit coffered on the structure's four-metre bay with a light cove at the hanging wall, dressed reveals at the four doors the rail walks through, a clerestory light shelf in the hall, and outside a terrace with its parapet and retaining faces carrying the grave, the parachute and the freestanding display wall whose field is 880 by 460 cm. Interior daylight is a per-opening sky-visibility term on the ambient channel only. No texture asset, no reference image sampled, no period claim.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-11",
-      "sha256": "492bbe91039b8717e9803a4694dc3873fa546d2f172aa80cf10d3a8b0e7adbe1",
+      "sha256": "e93077f36d16b44c005b109d4bca641608b97afcb7e5befd20b544277c386805",
       "note": "Modern museum insertion, rooms only; no 1517 claim. recipe_file=src/wings/vinci/collection/rooms.ts; companion_file=src/wings/vinci/collection/stands.ts"
     },
     {

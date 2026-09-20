@@ -122,4 +122,73 @@ for (const facade of spec.facades) {
 assert.equal(air.length, 0, `a wall of the shell stands on air: ${JSON.stringify(air.slice(0, 4))}`)
 report.shell = { facades: spec.facades.filter(f => f.render).length, plinthBottom: +PLINTH_BOTTOM.toFixed(3), onAir: 0 }
 
+/* ---- 4. no terrain is visible inside the court's walls ---- */
+// The court's walls are its own parapet and the gallery the grave brings
+// with it. The gallery is another module's, mounted by a third, so its four
+// lines are read off their own sources and proved against the numbers the
+// court declares; then every square of ground those walls enclose has to be
+// made ground, laid at one level over terrain that lies below it.
+const { COURT, GRAVE_ORIGIN } = load('src/wings/vinci/collection/layout.ts')
+const { COURT_GROUND, GALLERY } = load('src/wings/vinci/collection/rooms.ts')
+const construction = source('src/wings/vinci/myths/construction.ts')
+const signature = /export function galleryBackdrop\(build: Construction, width=([\d.]+), backZ=(-?[\d.]+), height=([\d.]+)/.exec(construction)
+assert.ok(signature, 'the gallery backdrop no longer declares its own width, back and height')
+const WIDTH = Number(signature[1]), BACK_Z = Number(signature[2])
+assert.ok(/galleryBackdrop\(build\)\s*$/m.test(source('src/wings/vinci/grave/index.ts')),
+  'the grave no longer takes the gallery backdrop at its own defaults')
+const placed = source('src/wings/vinci/collection/exhibits.ts')
+assert.ok(placed.includes('grave.group.rotation.y = Math.PI / 2')
+  && placed.includes('grave.group.position.set(GRAVE_ORIGIN.east, COURT.level + .035, -GRAVE_ORIGIN.north)'),
+  'the grave is no longer mounted at its origin turned a quarter turn')
+// A quarter turn reads the gallery's local x as north and its local z as east.
+const piece = (pattern, what) => {
+  const found = new RegExp(pattern).exec(construction)
+  assert.ok(found, `the gallery's ${what} is no longer built as this checker reads it`)
+  return found.slice(1).map(Number)
+}
+const [backDepth] = piece('build\\.box\\(0,height/2,backZ-\\.16,width,height,([\\d.]+),backing\\)', 'back wall')
+const [kerbOffset, kerbDepth] = piece('build\\.box\\(0,\\.105,backZ\\+([\\d.]+),width\\+\\.1,\\.21,([\\d.]+),stone\\)', 'back wall base')
+const [returnMid, returnThick, returnRun] = piece(
+  'build\\.box\\(side\\*width/2,height/2,backZ\\+([\\d.]+),([\\d.]+),height,([\\d.]+),backing\\)', 'side returns')
+const [kerbInset, kerbWidth] = piece(
+  'build\\.box\\(side\\*\\(width/2-([\\d.]+)\\),\\.105,backZ\\+10,([\\d.]+),\\.21,20\\.3,stone\\)', 'return base')
+const gallery = {
+  back: +(GRAVE_ORIGIN.east + BACK_Z - .16 - backDepth / 2).toFixed(3),
+  backKerb: +(GRAVE_ORIGIN.east + BACK_Z + kerbOffset + kerbDepth / 2).toFixed(3),
+  north: +(GRAVE_ORIGIN.north + WIDTH / 2 + returnThick / 2).toFixed(3),
+  northKerb: +(GRAVE_ORIGIN.north + WIDTH / 2 - kerbInset - kerbWidth / 2).toFixed(3),
+  returnEast: +(GRAVE_ORIGIN.east + BACK_Z + returnMid + returnRun / 2).toFixed(3),
+}
+for (const key of Object.keys(gallery))
+  assert.equal(GALLERY[key], gallery[key], `the court declares the gallery's ${key} at ${GALLERY[key]}, it stands at ${gallery[key]}`)
+
+// What those walls enclose: the whole gallery as far east as its returns
+// reach, and the court's own footprint east of them.
+const enclosed = [
+  { west: GALLERY.back, south: COURT.south, east: GALLERY.returnEast, north: GALLERY.north },
+  { west: GALLERY.returnEast, south: COURT.south, east: COURT.east, north: COURT.north },
+]
+const covered = (east, north) => COURT_GROUND.some(r => east >= r.west - 1e-9 && east <= r.east + 1e-9
+  && north >= r.south - 1e-9 && north <= r.north + 1e-9)
+const STEP = .1, bare = [], cut = []
+let samples = 0, lowest = Infinity
+for (const area of enclosed) {
+  for (let east = area.west; east <= area.east + 1e-9; east += STEP) {
+    for (let north = area.south; north <= area.north + 1e-9; north += STEP) {
+      samples++
+      if (!covered(east, north)) { if (bare.length < 6) bare.push([+east.toFixed(2), +north.toFixed(2)]); continue }
+      // Every tenth sample is also asked what the ground under it stands at:
+      // made ground here is a fill, so the terrain may never rise into it.
+      if (samples % 10) continue
+      const grade = gradeAt(east, north)
+      if (grade === undefined) continue
+      lowest = Math.min(lowest, COURT.level - grade)
+      if (grade > COURT.level + 1e-6 && cut.length < 6) cut.push({ east: +east.toFixed(2), north: +north.toFixed(2), grade: +grade.toFixed(3) })
+    }
+  }
+}
+assert.equal(bare.length, 0, `terrain stands inside the court's walls at ${JSON.stringify(bare)}`)
+assert.equal(cut.length, 0, `the court's ground is cut into the terrain at ${JSON.stringify(cut)}`)
+report.court = { gallery, ground: COURT_GROUND.length, samples, bare: 0, cut: 0, thinnestFill: +lowest.toFixed(3) }
+
 console.log(JSON.stringify(report, null, 1))

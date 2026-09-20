@@ -136,6 +136,63 @@ function courtMeetsTheBuilding(b: RoomBatch): void {
   b.slab(COURT.west, COURT.south - .12, COURT.east, COURT.south, COURT.level + .003, .012, 2)
 }
 
+/** THE GRAVE'S GALLERY, in the wing's own metres. The exhibit host mounts
+ * that module at the grave's origin turned a quarter turn, so its local
+ * (x, y, z) reads here as north, height and east. This module may not import
+ * it; the ground checker proves every number below against the gallery's own
+ * source and its mounting.
+ */
+export const GALLERY = {
+  /** the outer face of the back wall, and the face of its stone base */
+  back: -61.31, backKerb: -60.67,
+  /** the outer face of the north return, the face of its base, and where the
+   * return ends: east of that the terrace looks out over the park */
+  north: -15.85, northKerb: -16.30, returnEast: -40.85,
+} as const
+
+/** EVERY RECTANGLE OF GROUND INSIDE THE COURT'S WALLS THAT IS MADE, laid at
+ * one level. The court's own footprint carries its paving and, in the west
+ * half, the grave's exhibition floor; the two strips carry it out to the
+ * gallery. The checker proves these three leave no ground uncovered.
+ */
+export const COURT_GROUND: readonly { west: number; south: number; east: number; north: number }[] = [
+  { west: COURT.west, south: COURT.south, east: COURT.east, north: COURT.north },
+  { west: GALLERY.back, south: COURT.south, east: COURT.west, north: GALLERY.north },
+  { west: COURT.west, south: COURT.north, east: GALLERY.returnEast, north: GALLERY.north },
+]
+
+/** THE COURT CLOSED TO ITS WALLS. The terrace was drawn narrower than the
+ * gallery standing on it, so between the court's parapet and the gallery's
+ * wall lay a strip of falling ground three and a half metres down, read from
+ * the walk as a field of grass behind a balustrade. The paving is carried
+ * over a retained fill to the gallery's own foot on both runs, the parapet
+ * goes where a six metre wall is now the edge, and it turns north into the
+ * end of that wall where the terrace does open out.
+ */
+function courtCarriedToTheWalls(b: RoomBatch): void {
+  const W = COURT_GROUND[1]!, N = COURT_GROUND[2]!, FACE = .34, BOTTOM = -11.2
+  const faceTop = COURT.level - .22
+  for (const strip of [W, N]) b.slab(strip.west, strip.south, strip.east, strip.north, COURT.level, .22, 5)
+  // The retaining construction stands directly under the gallery's walls, so
+  // the wall lands on made ground instead of hanging over the bank.
+  const retain = (west: number, south: number, east: number, north: number): void =>
+    b.box((west + east) / 2, (south + north) / 2, (faceTop + BOTTOM) / 2, east - west, north - south, faceTop - BOTTOM, 5)
+  retain(W.west, W.south, W.west + FACE, W.north)
+  retain(W.west, N.north - FACE, N.east, N.north)
+  retain(N.east - FACE, N.south, N.east, N.north)
+  // The exhibition floor is laid 20 mm over the court's paving. Its two new
+  // edges take the same band its third one already has.
+  b.slab(W.east - .12, COURT.south, W.east, COURT.north, COURT.level + .003, .012, 2)
+  b.slab(COURT.west, COURT.north, GRAVE_ORIGIN.east + 9, COURT.north + .12, COURT.level + .003, .012, 2)
+  // A plinth course at the gallery's foot, as at the pavilion's.
+  const PROUD = .045, DEPTH = .18
+  const foot = (west: number, south: number, east: number, north: number): void =>
+    b.box((west + east) / 2, (south + north) / 2, COURT.level - .06 + (PROUD + .06) / 2,
+      east - west, north - south, PROUD + .06, 2)
+  foot(GALLERY.backKerb, COURT.south, GALLERY.backKerb + DEPTH, GALLERY.north)
+  foot(GALLERY.backKerb + DEPTH, GALLERY.northKerb - DEPTH, GALLERY.returnEast, GALLERY.northKerb)
+}
+
 export function createCollectionRooms(): Group {
   const b = new RoomBatch(), glass = new RoomBatch()
   const P = ROOMS.picture, H = ROOMS.hall, G = ROOMS.gallery
@@ -209,29 +266,33 @@ export function createCollectionRooms(): Group {
   // level as its apron.
   b.slabAround(COURT.west, COURT.south, COURT.east, COURT.north, COURT.level, .22,
     { west: GRAVE_ORIGIN.east - 4, south: GRAVE_ORIGIN.north - 6, east: GRAVE_ORIGIN.east + 9, north: GRAVE_ORIGIN.north + 6 }, 5)
+  // The parapet stands where the terrace is the edge. West of the gallery's
+  // return the gallery's own wall is the edge, so the parapet ends there and
+  // turns north into the end of it.
   for (const [west, south, east, north] of [
-    [COURT.west, COURT.north - COURT.parapetThickness, COURT.east, COURT.north],
-    [COURT.west, COURT.south, COURT.west + COURT.parapetThickness, COURT.north],
+    [GALLERY.returnEast, COURT.north - COURT.parapetThickness, COURT.east, COURT.north],
+    [GALLERY.returnEast - COURT.parapetThickness, COURT.north - COURT.parapetThickness, GALLERY.returnEast, GALLERY.north],
     [COURT.east - COURT.parapetThickness, COURT.south, COURT.east, COURT.north],
   ]) {
     b.box((west! + east!) / 2, (south! + north!) / 2, COURT.level + COURT.parapet / 2, east! - west!, north! - south!, COURT.parapet, 5)
     b.box((west! + east!) / 2, (south! + north!) / 2, COURT.level + COURT.parapet + .03, east! - west! + .07, north! - south! + .07, .06, 2)
   }
   // The terrace stands on the falling ground west of the house. Its faces
-  // are the retaining construction, closed to below the natural grade.
+  // are the retaining construction, closed to below the natural grade; the
+  // west face and the west of the north face are inside the fill now.
   const faceTop = COURT.level - .22
-  b.box((COURT.west + COURT.east) / 2, COURT.north - .17, (faceTop - 11.2) / 2, COURT.east - COURT.west, .34, faceTop + 11.2, 5)
-  for (const east of [COURT.west + .17, COURT.east - .17])
-    b.box(east, (COURT.south + COURT.north) / 2, (faceTop - 11.2) / 2, .34, COURT.north - COURT.south, faceTop + 11.2, 5)
+  b.box((GALLERY.returnEast + COURT.east) / 2, COURT.north - .17, (faceTop - 11.2) / 2, COURT.east - GALLERY.returnEast, .34, faceTop + 11.2, 5)
+  b.box(COURT.east - .17, (COURT.south + COURT.north) / 2, (faceTop - 11.2) / 2, .34, COURT.north - COURT.south, faceTop + 11.2, 5)
   // A shadow course at the head of the retaining face, which is what stops
   // a four-metre concrete wall reading as a blank.
   for (let height = faceTop - .55; height > -10.2; height -= .55) {
-    b.box((COURT.west + COURT.east) / 2, COURT.north - .335, height, COURT.east - COURT.west, .01, .02, 5)
+    b.box((GALLERY.returnEast + COURT.east) / 2, COURT.north - .335, height, COURT.east - GALLERY.returnEast, .01, .02, 5)
   }
   // A stone band marks where the court's own paving ends and the grave's
   // floor begins, which is the join the exhibit brings with it.
   b.slab(GRAVE_ORIGIN.east + 9, COURT.south, GRAVE_ORIGIN.east + 9.12, COURT.north, COURT.level + .003, .012, 2)
 
+  courtCarriedToTheWalls(b)
   courtMeetsTheBuilding(b)
 
   // THE WALL THAT IS NOT HERE. A wall of its own in the court, turned to
