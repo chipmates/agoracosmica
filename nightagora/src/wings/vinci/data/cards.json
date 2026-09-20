@@ -104,7 +104,7 @@
       "zoom_out": { "en": "Zoom out", "de": "Weiter weg" },
       "whole_wall": { "en": "The whole wall", "de": "Die ganze Wand" },
       "hang_row": { "en": "The hang, twenty-five paintings", "de": "Die Hängung, fünfundzwanzig Gemälde" },
-      "place": { "en": "{n} of 25", "de": "{n} von 25" }
+      "place": { "en": "{n} of {total}", "de": "{n} von {total}" }
     },
     "machine": {
       "provenance": { "en": "Where it comes from", "de": "Woher es kommt" },

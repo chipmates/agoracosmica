@@ -75,7 +75,7 @@ import { createVinciWholePlate, isWholePlate, vinciPlateDescription } from './co
 import type { VitrineRect } from '../vitrine'
 import { machineBuildOf } from './machines'
 import { createVinciHangStrip, vinciSheetTitle, type VinciStripEntry } from './collection/strip'
-import { vinciWallById, vinciWallIsEnd, vinciWallOrderOf, vinciWallNearerEnd, vinciWallOfExhibit, vinciWallOfStation, vinciWallStops, vinciWallVertex, VINCI_WALL_ENDS, type VinciWall } from './collection/wall'
+import { vinciWallById, vinciWallIsEnd, vinciWallOrderOf, VINCI_PICTURE_WALL, vinciWallNearerEnd, vinciWallOfExhibit, vinciWallOfStation, vinciWallStops, vinciWallVertex, VINCI_WALL_ENDS, type VinciWall } from './collection/wall'
 import { pathSpecifications } from './paths'
 import { roadGradeProvenance } from './road-grade'
 import { apronProvenance } from './apron'
@@ -1103,7 +1103,8 @@ export function createWing():VinciWingModule {
     const stops=wallRow(), at=wallAt()
     // ON A WALL THE ROW IS THE WALL'S INSTRUMENT: it says where along the hang
     // the eye stands and carries the way back to the end it came in by.
-    strip.setWall(at===undefined||!stops.length?null:{place:onWallStop()&&at<=stops.length?at:0,total:stops.length,whole:()=>wholeWall()})
+    strip.setWall(at===undefined||!stops.length?null:{place:onWallStop()&&at<=stops.length?at:0,total:stops.length,
+      hang:wallOn()?.id===VINCI_PICTURE_WALL,whole:()=>wholeWall()})
     strip.setHidden(mode===2||(narrow()&&Boolean(open)))
     // THE ROW NEVER STANDS OVER A WORK. On the wide stage it runs along the
     // foot of the frame above the bar, which is where a row of twenty five

@@ -64,6 +64,8 @@ export interface VinciStripWall {
   /** Which stop the eye stands at, counted from 1, or 0 off the wall. */
   place: number
   total: number
+  /** True for the hang, whose row carries its own name. */
+  hang?: boolean
   /** Back to the end the visitor came in by. */
   whole(): void
 }
@@ -222,7 +224,9 @@ export function createVinciHangStrip(options: {
    * for a screen reader. Off a wall the line stands down: a row of three
    * machines is a row, not thirty four metres. */
   function paintLabel(): void {
-    row.setAttribute('aria-label', wall === null ? named : WALL_WORDS.hang_row[lang()])
+    // The hang's own name is the hang's. A second wall is named by the room
+    // it stands in, which is the label the row already carries.
+    row.setAttribute('aria-label', wall === null || !wall.hang ? named : WALL_WORDS.hang_row[lang()])
   }
   function paintScale(): void {
     foot.hidden = wall === null
@@ -232,7 +236,7 @@ export function createVinciHangStrip(options: {
     const at = Math.max(0, Math.min(wall.total, wall.place))
     mark.style.setProperty('--along', `${wall.total < 2 ? 0 : (at - 1) / (wall.total - 1) * 100}%`)
     mark.hidden = at < 1
-    place.textContent = at < 1 ? '' : WALL_WORDS.place[lang()].replace('{n}', String(at))
+    place.textContent = at < 1 ? '' : WALL_WORDS.place[lang()].replace('{n}', String(at)).replace('{total}', String(wall.total))
     whole.textContent = WALL_WORDS.whole_wall[lang()]
   }
   return {
