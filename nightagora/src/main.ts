@@ -172,13 +172,13 @@ const HUB_SPOTS = [
 ]
 
 
-/* THE NIGHT STANDS AT ITS FRONT DOOR from the first frame: the eclipse
-   held, with one way on. The transit is a state of the rig now, never a
-   stage the visitor is put through. */
-let phase: Phase = 'held'
+/* THE NIGHT OPENS ON THE EVENT ITSELF: the moon crosses the sun, and the
+   door arrives at the totality it holds. The way on stands on both states
+   and is pressable on both, so nobody is made to watch the crossing out. */
+let phase: Phase = 'transit'
 /** frames the night has actually drawn; the door waits for the first one */
 let painted = 0
-let transit = 1
+let transit = 0
 let door = 0
 let desc = 0
 let descTarget = 0
@@ -915,10 +915,17 @@ function skipDescent(): void {
 }
 descentSkip.addEventListener('click', () => skipDescent())
 
-/* ---- THE FRONT DOOR. One still frame of the eclipse, one way on, and the
-   room behind it built while the visitor reads the title. The way on is
-   unlit until the fire stands, because a press that lands on a room whose
-   materials are not built yet buys a stutter instead of an arrival. ---- */
+/* ---- THE FRONT DOOR. The moon crossing the sun and the totality it holds,
+   one way on, and the room behind it built while the visitor watches. The
+   way on is unlit until the fire stands, because a press that lands on a
+   room whose materials are not built yet buys a stutter instead of an
+   arrival. ---- */
+
+/** the two states the front door stands in: the crossing, and the totality
+    it arrives at. Everything the door owns answers to both. */
+function atDoor(): boolean {
+  return phase === 'transit' || phase === 'held'
+}
 
 /** how far the door's own measure has counted: the stage painted, the room
     built. Nothing else is counted, so the mark never claims a share it has
@@ -947,7 +954,7 @@ function fireStands(): void {
   enterEl.removeAttribute('aria-disabled')
   enterEl.removeAttribute('aria-busy')
   // the door's word is the button now: the status line steps back
-  if (phase === 'held') setStatus('')
+  if (atDoor()) setStatus('')
   if (pressedEarly) enterTheFire()
 }
 
@@ -973,7 +980,7 @@ function buildTheFire(): void {
 }
 
 function enterTheFire(): void {
-  if (curtain || phase !== 'held') return
+  if (curtain || !atDoor()) return
   if (!fireReady) {
     pressedEarly = true
     return
@@ -1572,9 +1579,14 @@ function setPhase(next: Phase): void {
   phase = next
   document.body.dataset['phase'] = next
   stack.setScene(scene, camera, LOOK[next])
-  // the still door says only what it is doing: the word while the room is
-  // built, nothing once the way on is lit
-  if (next === 'held') setStatus(fireReady ? '' : 'firstLight')
+  /* the door's own layer answers to the door, not to one of its two states:
+     the way on, its measure and its word stand while the moon travels and
+     while the totality holds, and a page that has not reached the door yet
+     carries none of them */
+  document.body.classList.toggle('door', next === 'transit' || next === 'held')
+  // the door says only what it is doing: the word while the room is built,
+  // nothing once the way on is lit
+  if (next === 'transit' || next === 'held') setStatus(fireReady ? '' : 'firstLight')
   if (next === 'descent') {
     wakeInstruments()
     setStatus('descend')
@@ -2017,9 +2029,9 @@ function frame(now: number): void {
     // also what a reader hears first on arriving
     verseEl.focus({ preventScroll: true })
   }
-  // the door's own wait starts once the still frame is actually on the
+  // the door's own wait starts once its first frame is actually on the
   // glass: the room is built behind a picture, never instead of one
-  if (phase === 'held' && painted > 0 && !frozen) buildTheFire()
+  if (atDoor() && painted > 0 && !frozen) buildTheFire()
 }
 
 // ---- free-look state: pointer position, eased, phase-gated ----
@@ -2108,13 +2120,21 @@ function bootRoute(): boolean {
 }
 
 function main(): void {
-  /* THE NIGHT OPENS AT ITS FRONT DOOR: the eclipse, held, with one way on.
-     The page carries the shell's own opening state until here, so a wing
-     address never paints the door's way on for a frame. The stage is not
-     re-entered: it is where the night already is, and a phase change here
-     would put a scene rebuild in front of the first painted frame. */
+  /* THE NIGHT OPENS AT ITS FRONT DOOR: the eclipse happening, with one way
+     on. The page carries the shell's own opening state until here and never
+     the door's own layer, so a wing address never paints the door's way on
+     for a frame. The stage is not re-entered: it is where the night already
+     is, and a phase change here would put a scene rebuild in front of the
+     first painted frame. */
   if (!bootRoute()) {
+    /* a stage that asks for no motion is given the totality itself, at once
+       and complete: no crossing, and no bead in time either */
+    if (reducedMotion) {
+      phase = 'held'
+      transit = 1
+    }
     document.body.dataset['phase'] = phase
+    document.body.classList.add('door')
     setStatus('firstLight')
   }
   let logged = false

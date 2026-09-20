@@ -141,7 +141,7 @@
       transition: opacity 1.2s ease;
     }
     body.forge .status { transition: none !important; }
-    body[data-phase='held'] .status { animation: breathe 3.4s ease-in-out infinite; animation-play-state: running; }
+    body.door .status { animation: breathe 3.4s ease-in-out infinite; animation-play-state: running; }
     @keyframes breathe { 0%, 100% { opacity: 0.85; } 50% { opacity: 0.3; } }
 
     .copy { transition: opacity 1.6s ease; }
@@ -509,7 +509,7 @@
       pointer-events: auto;
       transition: border-color 0.5s ease, color 0.5s ease, box-shadow 0.5s ease;
     }
-    body[data-phase='held'] #enter-museum { display: inline-block; }
+    body.door #enter-museum { display: inline-block; }
     /* a way on that cannot be taken yet says so in the ink, not only in the
        attribute: mist, not gold, and no hand cursor */
     body #enter-museum[aria-disabled='true'] {
@@ -528,8 +528,8 @@
       background: var(--rule-faint);
       opacity: 0; transition: opacity 0.8s ease;
     }
-    body[data-phase='held'] #door-measure { display: block; opacity: 1; }
-    body[data-phase='held'] #door-measure.done { opacity: 0; }
+    body.door #door-measure { display: block; opacity: 1; }
+    body.door #door-measure.done { opacity: 0; }
     #door-measure .door-fill {
       display: block; width: 100%; height: 100%;
       background: var(--na-gold);
@@ -1053,7 +1053,7 @@ body.forge #door-measure .door-fill { transition: none !important; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      body[data-phase='held'] .status { animation: none; }
+      body.door .status { animation: none; }
       .copy, .status { transition: none; }
       /* the passage still changes the frame, it simply does not travel */
       #blackout, #blackout.down, #blackout.lifting { transition: none; }

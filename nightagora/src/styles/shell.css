@@ -55,7 +55,7 @@
   text-indent: .15em;
   color: var(--press-muted);
 }
-body[data-phase='held'] .status { animation: none; }
+body.door .status { animation: none; }
 #overture-skip {
   margin-top: 10px;
   padding: 10px 18px;
@@ -230,7 +230,7 @@ body[data-phase='held'] .status { animation: none; }
   .door-trust { max-width: 300px; font-size: 12px; line-height: 1.65; margin-top: 17px; }
   .door-actions { flex-direction: column; margin-top: 22px; gap: 8px; }
   .door-enter { min-width: 250px; }
-  body[data-phase='held'] .status { font-size: 11px; color: var(--press-white); }
+  body.door .status { font-size: 11px; color: var(--press-white); }
   #overture-skip { color: var(--press-muted); }
   #overture-skip::after { width: 0; }
   #instruments { right: 22px; left: 22px; width: auto; padding: 22px 28px 12px; }
