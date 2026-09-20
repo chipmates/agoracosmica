@@ -95,6 +95,11 @@ const COURT_EAST: RailWaypoint = [COURT.east - 1.4, SUPPER_WALL.north, COURT.lev
  * court, which a visitor walks between, not through. It runs a metre and a
  * quarter off the parapet, because the parachute's suspension cords reach
  * walking height two and a half metres from its axis. */
+/** The lane's own south end, out from under the parachute: its south-east
+ * upright stands a metre north-east of the display wall's eye on the line
+ * the lane would otherwise run, so the walk leaves the station east of it
+ * and comes back onto the lane north of the cloth. */
+const COURT_LANE_SOUTH: RailWaypoint = [-32.4, -26, COURT.level + railEyeHeightM]
 const COURT_LANE_EAST: RailWaypoint = [COURT.east - 3, -20.6, COURT.level + railEyeHeightM]
 const COURT_LANE_WEST: RailWaypoint = [-49.5, -20.6, COURT.level + railEyeHeightM]
 
@@ -118,6 +123,14 @@ export function railSide(stationId: string): RailSide {
   return 'terrace'
 }
 
+/** A ROOM THE WALK ENTERS TO SEE, NEVER TO CROSS. The machine hall has two
+ * doors now, and a walk from the picture room to the gallery through it is
+ * ten metres shorter and passes between fourteen machines: the aisle is a
+ * place to stand, not a corridor, and the envelope a visitor carries does
+ * not clear their arms. A route uses this room only when it begins or ends
+ * in it. */
+const NOT_A_CORRIDOR: readonly RailSide[] = ['mechanism-hall']
+
 /** The links of the walk, each written one way and walked either way. A route
  * is the shortest chain of them, so a visitor gets from any station to any
  * other through the doors and never through a wall. */
@@ -129,7 +142,7 @@ const LINKS: readonly { from: RailSide; to: RailSide; via: readonly RailWaypoint
   { from: 'apron', to: 'exhibit-court', via: [APRON_CORNER, APRON_NORTH, COURT_EAST] },
   // The lane leaves the display wall's eye due north, so a walk to the grave
   // begins by turning up it and never by stepping back east first.
-  { from: 'exhibit-court', to: 'grave-court', via: [COURT_LANE_EAST, COURT_LANE_WEST] },
+  { from: 'exhibit-court', to: 'grave-court', via: [COURT_LANE_SOUTH, COURT_LANE_EAST, COURT_LANE_WEST] },
   { from: 'picture-room', to: 'long-gallery',
     via: [[PICTURE_TO_GALLERY, FACE.pictureWallNorth + 1.4, INSIDE], [PICTURE_TO_GALLERY, FACE.pictureWallSouth - 1.4, INSIDE]] },
   // The picture room's west door. The hall's side of it stands north of the
@@ -182,6 +195,8 @@ export function railWaypointsBetween(from: RailSide, to: RailSide,
     }
   }
   walk([from])
+  const open = routes.filter(route => !route.slice(1, -1).some(side => NOT_A_CORRIDOR.includes(side)))
+  if (open.length) routes.length = 0, routes.push(...open)
   if (!routes.length) throw new Error(`No way from ${from} to ${to}`)
   let best: RailWaypoint[] | undefined, shortest = Infinity
   for (const route of routes) {

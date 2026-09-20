@@ -411,21 +411,44 @@ export function vinciApproachReachMetres(): number {
  * the objects and never their product. The hang and the body wall have their
  * own polylines and are not here.
  */
-export const VINCI_APPROACH_RUNS: readonly { station: VinciStationId; exhibits: readonly string[] }[] = [
-  // The hall's west half, walked down the aisle.
-  { station: 'flight', exhibits: ['machine/aerial-screw', 'machine/flywheel', 'machine/camera-obscura', 'machine/miter-lock-gates'] },
-  // The aisle's east half, walked back up it.
-  { station: 'works', exhibits: ['machine/water-lifting-screw', 'machine/rolling-mill', 'machine/lathe', 'machine/ball-bearing', 'machine/multi-barrel-gun'] },
-  // The court, from the measurement on the display wall out to the machines
-  // standing in it, west to east as the lane passes them.
-  { station: 'supper-wall', exhibits: [MURAL_ID, 'machine/revolving-crane', 'machine/anemometer', 'machine/inclinometer', 'plaque/flight-quote', 'machine/parachute'] },
-]
+const RUN_STATIONS: readonly VinciStationId[] = ['flight', 'works', 'supper-wall']
+/** A station's own objects in the order its row stands them, which is the
+ * order a hand and a keyboard step through: the measurement first where the
+ * room carries one, then the machines in the order the rooms stand them, then
+ * the plaque. */
+function runOf(station: VinciStationId): string[] {
+  return [
+    ...(station === 'supper-wall' ? [MURAL_ID] : []),
+    ...(Object.keys(STANDS) as MachineSlug[])
+      .filter(slug => slug !== 'proportional-compass' && MACHINE_EYES[slug as keyof typeof MACHINE_EYES].station === station)
+      .map(slug => `machine/${slug}`),
+    ...(station === 'supper-wall' ? ['plaque/flight-quote'] : []),
+  ]
+}
+export const VINCI_APPROACH_RUNS: readonly { station: VinciStationId; exhibits: readonly string[] }[] =
+  RUN_STATIONS.map(station => ({ station, exhibits: runOf(station) }))
 
-/** The neighbouring pairs of one run, in walking order. */
+/** A PAIR THE GROUND REFUSES. The parachute's south-west upright stands on
+ * the line between the two weather instruments' eye and the plaque's, and no
+ * walking envelope clears it: those two keep the room's own chain through the
+ * station. */
+const THE_GROUND_REFUSES = new Set(['machine/inclinometer|plaque/flight-quote'])
+
+/** The neighbouring pairs of one run, in walking order. TWO OBJECTS READ FROM
+ * ONE PLACE ARE NOT A LEG: the two weather instruments stand side by side on
+ * one plinth and share a viewing eye, so a walk between them has no length to
+ * certify and that pair keeps the room's own chain. */
 export function vinciApproachRunPairs(): readonly { station: VinciStationId; from: string; to: string }[] {
   const pairs: { station: VinciStationId; from: string; to: string }[] = []
   for (const run of VINCI_APPROACH_RUNS) {
-    for (let at = 1; at < run.exhibits.length; at++) pairs.push({ station: run.station, from: run.exhibits[at - 1]!, to: run.exhibits[at]! })
+    for (let at = 1; at < run.exhibits.length; at++) {
+      const from = run.exhibits[at - 1]!, to = run.exhibits[at]!
+      const apart = [false, true].every(narrow => {
+        const a = vinciApproachPose(from, narrow), b = vinciApproachPose(to, narrow)
+        return Boolean(a && b && a.eye.distanceToSquared(b.eye) > 1e-12)
+      })
+      if (apart && !THE_GROUND_REFUSES.has(`${from}|${to}`)) pairs.push({ station: run.station, from, to })
+    }
   }
   return pairs
 }

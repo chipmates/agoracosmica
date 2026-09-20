@@ -413,7 +413,7 @@
       "prompt": "Regenerable actual geometry certificate for40 directed routes across five pose families and two viewport families. Includes foundation, entry, vegetation and all dressing; no sky, DOM or shadow-only duplicate.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-10",
-      "sha256": "a3fe27d58db7e4fdbb5470f14d9e052f4c03043f98f0b7da0dfba4f9768e1fc4",
+      "sha256": "fe3b841eb0756c8f2a5a8325e5526caa13e284c786970558d2b743fd899be6bd",
       "note": "recipe_file=src/wings/vinci/data/rail-clearance.json; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail; companion_file=src/wings/vinci/collection/approaches.ts"
     },
     {
@@ -439,7 +439,7 @@
       "prompt": "The turns a route takes between two stations, written against the registered gate crossing, the access stair layout and the collection stair.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-11",
-      "sha256": "3d3ec90faf3946e7caf0dac62b4ef6ae928011e71210242e5f43020267b51bc9",
+      "sha256": "b8e38cf29bddbd138234ed6eec3296f513f41085c1ab2ba516f736269469ea67",
       "note": "recipe_file=src/wings/vinci/rail-waypoints.ts; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail"
     },
     {
