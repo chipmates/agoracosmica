@@ -249,11 +249,18 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
   const flatThinEast = pixelEast.lessThan(pixelNorth)
   const thin = upright.select(P.y, flatThinEast.select(P.x, P.z))
   const thinPixel = upright.select(pixelUp, pixelEast.min(pixelNorth))
+  // Two octaves of it, because a float lays laps inside laps, and because one
+  // octave over the eighteen cells a phone frame holds does not average to
+  // zero: its own mean is what moves that frame's exposure.
   const lapM = byRole([.085, .17, .034, .05, .21, .1])
-  const lap = bands(thin.div(lapM), 23.7).mul(resolved(lapM, thinPixel)).toVar()
+  const lapT = thin.div(lapM)
+  const lap = bands(lapT, 23.7).mul(.62).add(bands(lapT.mul(2.37).add(1.7), 9.41).mul(.38))
+    .mul(resolved(lapM, thinPixel)).toVar()
   // And the room-scale drift above the part: damp, handling and years of
   // light do not stop at a board's edge. Metres wide, so it survives any
-  // pixel a station stands at, which the part's own macro cannot.
+  // pixel a station stands at, which the part's own macro cannot. Its weight
+  // is held down because four cells of it across a wall that fills a phone
+  // frame do not average to zero, and that frame's exposure is what moves.
   const driftM = byRole([3.2, 3, 1.9, 1.2, 3.6, 3.4])
   const drift = bands(along.div(driftM), 5.13).mul(resolved(driftM, alongPixel)).toVar()
   const colourOf = (key: keyof typeof PALETTE) => { const c = new Color(PALETTE[key]); return vec3(c.r, c.g, c.b) }
@@ -280,9 +287,9 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
     .mul(n.y.abs().oneMinus().max(0)).mul(byRole([0, .55, 1, .8, 0, 0])).toVar()
   const density = float(1).add(cell.mul(.5)).sub(walked.mul(.4)).clamp(.3, 1.6)
   const figure = detail.tone.sub(1).mul(byRole([1, 1, 1.5, .45, .95, 1.15])).mul(density)
-    .add(cell.mul(byRole([.34, .085, .13, 0, .07, .34])))
-    .add(lap.mul(byRole([.16, .125, .17, .05, .1, .17])).mul(density))
-    .add(drift.mul(byRole([.12, .09, .1, .03, .07, .13])))
+    .add(cell.mul(byRole([.34, .055, .13, 0, .06, .34])))
+    .add(lap.mul(byRole([.18, .1, .19, .05, .09, .19])).mul(density))
+    .add(drift.mul(byRole([.075, .03, .07, .02, .03, .085])))
     .add(stroke.mul(byRole([.05, .13, .26, .06, .13, .09])))
   const silted = walked.mul(.34).oneMinus()
   const cut = isFloor.select(slabJoint.mul(.34).mul(silted),
