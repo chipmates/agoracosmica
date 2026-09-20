@@ -11,12 +11,26 @@ import { BackSide, Color, DoubleSide, MeshStandardNodeMaterial } from 'three/web
 import * as TSL from 'three/tsl'
 import type { Stack } from '../../../stack'
 import type { GrainRecipe, MaterialClass, MaterialSet } from '../../../stack/materials'
-import { applyDetail } from '../../../stack/detail'
-import { anisotropicFootprint } from '../masonry-courses'
-import { COLLECTION_PAVING_ORIGIN, FACE, LINE_SLAB } from './layout'
+import {
+  anisotropicFootprint, applyDetail, axisFootprint, fitScales, reliefNormal, resolved, surfaceDetail,
+} from '../../../stack/detail'
+import { COLLECTION_PAVING_ORIGIN, FACE, FLOOR, LINE_SLAB } from './layout'
 
 /** floor stone, wall plaster, dark stone, steel, ceiling, outdoor paving */
 export type CollectionRole = 0 | 1 | 2 | 3 | 4 | 5
+
+/** THE LADDER EACH ROLE'S OWN PART CAN CARRY, macro to micro, in metres.
+ * One room-sized drift served every surface here, so a 0.16 m base band and
+ * a 0.10 m plinth slab sampled a single value of it and read as paint. Each
+ * ladder below is fitted to the smallest extent of the part that wears it. */
+const PART_LADDER: Record<CollectionRole, [number, number, number]> = {
+  0: fitScales([.42, .045, .002], 1.6),   // a 1.60 by 1.65 m floor stone
+  1: fitScales([.55, .06, .0025], 1.2),   // a 1.2 by 2.4 m lining board
+  2: fitScales([.08, .02, .0022], .16),   // the base band, the plinth's top slab
+  3: fitScales([.09, .02, .0015], .26),   // a picture rail, a plinth shaft, a fitting
+  4: fitScales([.7, .09, .0025], 3.7),    // the plaster between two coffer ribs
+  5: fitScales([.5, .06, .0025], 1.6),    // the court's own paving stone
+}
 
 export const collectionRoomsProvenance = {
   manifestId: 'vinci/collection-rooms',
@@ -107,8 +121,8 @@ export function collectionPlateTone(): TSLNode {
  * which stone it is; the three scales and the daylight are shared. */
 export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
   const {
-    attribute, cameraViewMatrix, float, floor, fract, length, mix, mx_noise_float,
-    normalWorldGeometry, positionView, positionWorld, smoothstep, vec2, vec3,
+    attribute, cameraViewMatrix, float, floor, fract, mix, mx_noise_float,
+    normalWorldGeometry, positionWorld, smoothstep, vec3,
   } = TSL as unknown as Record<string, TSLNode>
   const m = new MeshStandardNodeMaterial({ roughness: .84, side: DoubleSide, shadowSide: BackSide })
   const P = positionWorld, n = normalWorldGeometry
@@ -118,25 +132,44 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
   const isSteel = role.greaterThan(2.5).and(role.lessThan(3.5))
   const isCeiling = role.greaterThan(3.5).and(role.lessThan(4.5))
   const isOutdoor = role.greaterThan(4.5)
-  const pixel = anisotropicFootprint(P)
-  const resolved = (metres: number) => smoothstep(2, 4, float(metres).div(pixel))
+  /** the same quantity read off whichever part this fragment belongs to:
+      six welded families on one mesh, one ladder of taps between them */
+  const byRole = (v: [number, number, number, number, number, number]): TSLNode =>
+    isFloor.select(float(v[0]), isPlaster.select(float(v[1]), isDark.select(float(v[2]),
+      isSteel.select(float(v[3]), isCeiling.select(float(v[4]), float(v[5]))))))
+  const rung = (i: 0 | 1 | 2): TSLNode => byRole([
+    PART_LADDER[0][i], PART_LADDER[1][i], PART_LADDER[2][i],
+    PART_LADDER[3][i], PART_LADDER[4][i], PART_LADDER[5][i]])
+  // A LADDER THE EYE CAN FIND. At six to twenty metres the micro rung is
+  // under the pixel and the mid rung is a few pixels across, so a figure
+  // weighted for a hand's distance leaves the plane reading as paint at a
+  // room's. Each rung is weighted for the distance it is actually seen at.
+  const detail = surfaceDetail({
+    scales: [rung(0), rung(1), rung(2)],
+    figure: [.16, .105, .075], relief: .0035, count: 3, at: P, normal: n,
+  })
+  const pixel = detail.pixel
+  const held = (metres: number | TSLNode): TSLNode => resolved(metres, pixel)
   // ONE PIXEL PER AXIS. A joint at a fixed east is a line in P.x and a joint
   // at a fixed north a line in P.z, and a floor running away from the eye has
   // a pixel that is centimetres across those lines and metres along them. The
   // isotropic footprint above is the across figure, so the along axis kept a
   // line far thinner than its own pixel and it broke into dashes from about
   // eight metres. Each coordinate is now filtered on its own derivative.
-  const dPx = P.dFdx().toVar(), dPy = P.dFdy().toVar()
-  const footprintOf = (across: TSLNode) => across.length().max(.00001)
-  const pixelEast = footprintOf(vec2(dPx.x, dPy.x))
-  const pixelUp = footprintOf(vec2(dPx.y, dPy.y))
-  const pixelNorth = footprintOf(vec2(dPx.z, dPy.z))
+  const { east: pixelEast, up: pixelUp, north: pixelNorth } = axisFootprint(P)
   // A joint is a groove, and a groove has to survive the pixel it lands in:
   // every line below fades to its own area mean instead of shimmering.
   const line = (coordinate: TSLNode, spacing: number, offset: number, width: number, axis: TSLNode) => {
     const f = fract(coordinate.sub(offset).div(spacing)), edge = f.min(float(1).sub(f)).mul(spacing)
     return float(1).sub(smoothstep(float(width).sub(axis.mul(.5)).max(0), float(width).add(axis.mul(.5)), edge))
       .mul(smoothstep(2, 4, float(spacing).div(axis)))
+  }
+  const hashOf = (index: TSLNode, salt: number): TSLNode => fract(index.mul(salt).sin().mul(4371.13)).sub(.5)
+  /** value noise in ONE axis, so a feature can be laid across the axis a
+      grazing pixel is still thin in */
+  const bands = (coordinate: TSLNode, salt: number): TSLNode => {
+    const i = floor(coordinate), f = fract(coordinate)
+    return mix(hashOf(i, salt), hashOf(i.add(1), salt), f.mul(f).mul(float(3).sub(f.mul(2))))
   }
   // Existing rooms keep their established paving grid. The date field has
   // its own half-metre offset to fit twelve courses; moving that exhibit
@@ -145,52 +178,93 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
   const slabNorth = line(P.z, LINE_SLAB.pitchNorth, -COLLECTION_PAVING_ORIGIN.north, .008, pixelNorth)
   const slabJoint = slabEast.max(slabNorth).mul(n.y.abs())
   const slabIndex = floor(P.x.sub(COLLECTION_PAVING_ORIGIN.east).div(LINE_SLAB.pitchEast)).add(floor(P.z.add(COLLECTION_PAVING_ORIGIN.north).div(LINE_SLAB.pitchNorth)).mul(7.31))
-  const slabTone = fract(slabIndex.mul(13.17).sin().mul(4371.13)).sub(.5).mul(resolved(1.6))
+  const slabCell = hashOf(slabIndex, 13.17).mul(held(1.6)).toVar()
+  // THE FACE'S OWN RUN. A wall read along its length has a pixel that is
+  // centimetres high and metres long, and a noise blob smaller than that long
+  // axis cannot be point sampled: only the short axis resolves it. So what
+  // carries a receding plane is a LINE and a cell that a line bounds, each
+  // filtered on the axis it varies in. This is the scale the walls, the base
+  // band and the soffit were missing, and no amount of figure supplies it.
+  const acrossFace = n.x.abs().greaterThan(n.z.abs())
+  const along = acrossFace.select(P.z, P.x)
+  const alongPixel = acrossFace.select(pixelNorth, pixelEast)
   // Walls: a 1.2 by 2.4 m board rhythm on the lining, its shadow joints 6 mm.
-  const boardV = line(P.y, 1.2, 0, .006, pixelUp), plasterDrift = mx_noise_float(P.mul(.42))
-  const trowel = mx_noise_float(P.mul(vec3(5.4, 3.1, 5.4)))
+  const boardV = line(P.y, 1.2, 0, .006, pixelUp)
+  const boardH = line(along, 2.4, 0, .006, alongPixel)
+  const boardJoint = boardV.max(boardH)
+  const boardCell = hashOf(floor(P.y.div(1.2)).add(floor(along.div(2.4)).mul(5.73)), 17.31)
+    .mul(resolved(2.4, alongPixel)).mul(resolved(1.2, pixelUp)).toVar()
+  // The dark stone is laid, not cast: a head joint every 0.92 m and a face
+  // tone per stone, which is the only reading a 0.16 m band can hold at all.
+  const stoneJoint = line(along, .92, 0, .004, alongPixel)
+  const stoneCell = hashOf(floor(along.div(.92)).add(floor(P.y.div(.17)).mul(3.17)), 11.73)
+    .mul(resolved(.92, alongPixel)).toVar()
   // The ceiling is coffered on the structure's own four-metre bay.
   const bayNorth = line(P.z, 4, 0, .02, pixelNorth), bayEast = line(P.x, 4, 2, .02, pixelEast)
-  const macro = mx_noise_float(P.mul(.31)).mul(resolved(3.2)).toVar()
-  const middle = mx_noise_float(P.mul(7.6)).mul(resolved(.13)).toVar()
-  const grain = mx_noise_float(P.mul(215)).mul(resolved(.0047)).toVar()
-  const brushed = mx_noise_float(P.mul(vec3(160, 12, 160))).mul(resolved(.006))
+  // ONE DIRECTIONAL READ FOR THE WHOLE MESH. A float sweep, a saw mark, a
+  // brush and a rain wash are the same anisotropic field turned and sized by
+  // the part, so they cost one tap between them instead of one each.
+  const strokeAxis = isSteel.select(vec3(160, 12, 160),
+    isFloor.select(vec3(34, 34, 3.8),
+      isOutdoor.select(vec3(52, 2.9, 52), vec3(5.4, 3.1, 5.4))))
+  const stroke = mx_noise_float(P.mul(strokeAxis)).mul(held(byRole([.03, .2, .2, .02, .2, .05]))).toVar()
+  // THE LAP, WHICH IS THE ONE MID SCALE A RECEDING PLANE CAN HOLD. A pixel
+  // out in the room is thin in one world axis and metres long in the other,
+  // so a blob under that long axis is never sampled, only averaged; a band
+  // laid across the THIN axis is. Plaster really is banded by the float's
+  // laps and a sawn floor by its saw run, so the band is what these surfaces
+  // carry between the board and the grain.
+  const upright = n.y.abs().lessThan(.5)
+  const flatThinEast = pixelEast.lessThan(pixelNorth)
+  const thin = upright.select(P.y, flatThinEast.select(P.x, P.z))
+  const thinPixel = upright.select(pixelUp, pixelEast.min(pixelNorth))
+  const lapM = byRole([.085, .17, .034, .05, .21, .1])
+  const lap = bands(thin.div(lapM), 23.7).mul(resolved(lapM, thinPixel)).toVar()
+  // And the room-scale drift above the part: damp, handling and years of
+  // light do not stop at a board's edge. Metres wide, so it survives any
+  // pixel a station stands at, which the part's own macro cannot.
+  const driftM = byRole([3.2, 3, 1.9, 1.2, 3.6, 3.4])
+  const drift = bands(along.div(driftM), 5.13).mul(resolved(driftM, alongPixel)).toVar()
   const colourOf = (key: keyof typeof PALETTE) => { const c = new Color(PALETTE[key]); return vec3(c.r, c.g, c.b) }
   const base = isFloor.select(colourOf('floor'),
     isPlaster.select(colourOf('plaster'),
       isDark.select(colourOf('dark'),
         isSteel.select(colourOf('steel'),
           isCeiling.select(colourOf('ceiling'), colourOf('paving'))))))
-  const figure = isFloor.select(slabTone.mul(.155).add(macro.mul(.085)).add(middle.mul(.05)).add(grain.mul(.06)),
-    isPlaster.select(plasterDrift.mul(.125).add(trowel.mul(.105).mul(resolved(.2))).add(middle.mul(.04)).add(grain.mul(.05)),
-      // A FEATURE BELONGS TO THE PART, NOT TO THE ROOM. The dark stone is a
-      // 0.10 m plinth slab and a 0.16 m base band, and the room's 3.2 m drift
-      // is one sample over either, which is why they read as flat paint. They
-      // take the ladder that fits them, off the reads this material already
-      // makes: a stone-to-stone drift that no footprint can filter away, and
-      // a 0.2 m block figure for the faces a visitor stands in front of.
-      isDark.select(plasterDrift.mul(.20).add(trowel.mul(.26).mul(resolved(.2))).add(middle.mul(.16)).add(grain.mul(.09)),
-        isSteel.select(brushed.mul(.06).add(middle.mul(.03)),
-          isCeiling.select(plasterDrift.mul(.11).add(trowel.mul(.105).mul(resolved(.2))).add(middle.mul(.05)).add(grain.mul(.04)), macro.mul(.11).add(middle.mul(.06)).add(grain.mul(.06)))))))
+  // A DENSITY GRADIENT, NOT A UNIFORM FIELD. How mottled a surface is varies
+  // stone by stone, which is the one gradient a laid floor really carries.
+  const cell = isFloor.select(slabCell, isPlaster.select(boardCell, isDark.select(stoneCell,
+    isSteel.select(float(0), isCeiling.select(float(0), slabCell))))).toVar()
+  const density = float(1).add(cell.mul(.5)).clamp(.3, 1.6)
+  const figure = detail.tone.sub(1).mul(byRole([1, 1, 1.5, .45, .95, 1.15])).mul(density)
+    .add(cell.mul(byRole([.15, .085, .13, 0, 0, .17])))
+    .add(lap.mul(byRole([.1, .125, .17, .05, .1, .13])).mul(density))
+    .add(drift.mul(byRole([.075, .09, .1, .03, .07, .1])))
+    .add(stroke.mul(byRole([.05, .13, .26, .06, .13, .09])))
   const cut = isFloor.select(slabJoint.mul(.34),
-    isPlaster.select(boardV.mul(.16),
-      isCeiling.select(bayNorth.max(bayEast).mul(.16), isOutdoor.select(slabJoint.mul(.24), float(0)))))
-  m.colorNode = base.mul(figure.add(1)).mul(float(1).sub(cut))
-  m.roughnessNode = isSteel.select(float(.42).add(brushed.mul(.09)),
-    isFloor.select(float(.62).add(grain.mul(.06)).add(slabJoint.mul(.15)),
-      float(.88).add(grain.mul(.04)))).clamp(.30, .97)
+    isPlaster.select(boardJoint.mul(.16),
+      isCeiling.select(bayNorth.max(bayEast).mul(.16),
+        isDark.select(stoneJoint.mul(.2), isOutdoor.select(slabJoint.mul(.24), float(0))))))
+  // ONE ALBEDO FOR BOTH CHANNELS. The fittings' wash was re-emitting the flat
+  // palette colour beside the figured albedo, so on every surface a fitting
+  // reaches, a share of the pixel carried no material at all and the figure
+  // read at a fraction of the contrast it was authored at. The wash itself is
+  // untouched: what a lamp puts on a stone is still the stone.
+  const albedo = base.mul(figure.add(1)).mul(float(1).sub(cut)).toVar()
+  m.colorNode = albedo
+  m.roughnessNode = isSteel.select(float(.42).add(stroke.mul(.09)),
+    isFloor.select(float(.62).add(detail.rough).add(slabJoint.mul(.15)),
+      float(.88).add(detail.rough))).clamp(.30, .97)
   m.metalnessNode = isSteel.select(float(.72), float(.02))
-  const height = isFloor.select(slabJoint.mul(-.0022).add(grain.mul(.0004)),
-    isPlaster.select(trowel.mul(.0006).add(boardV.mul(-.0012)).add(grain.mul(.0003)),
-      isCeiling.select(bayNorth.max(bayEast).mul(-.004),
-        // A sawn slab keeps a shallow relief of its own; at the room's drift
-        // it had none, so nothing on it ever caught a raking light.
-        isDark.select(trowel.mul(.005).mul(resolved(.2)).add(middle.mul(.0015)).add(grain.mul(.0005)),
-          macro.mul(.0009).add(grain.mul(.0004)))))).toVar()
-  const viewNormal = n.transformDirection(cameraViewMatrix), sx = positionView.dFdx(), sy = positionView.dFdy()
-  const rx = sy.cross(viewNormal), ry = viewNormal.cross(sx), det = sx.dot(rx)
-  const gradient = rx.mul(height.dFdx()).add(ry.mul(height.dFdy())).mul(det.sign()).div(det.abs().max(1e-10)).toVar()
-  m.normalNode = viewNormal.sub(gradient.div(length(gradient).div(.2).max(1))).normalize()
+  // A sawn slab keeps a shallow relief of its own; at the room's drift it had
+  // none, so nothing on it ever caught a raking light.
+  const relief = detail.heightM.mul(byRole([.45, .4, 2.1, .25, .38, .7])).toVar()
+  const height = isFloor.select(relief.add(slabJoint.mul(-.0022)),
+    isPlaster.select(relief.add(stroke.mul(.0006)).add(lap.mul(.0011)).add(boardJoint.mul(-.0012)),
+      isCeiling.select(relief.add(stroke.mul(.0005)).add(lap.mul(.0008)).add(bayNorth.max(bayEast).mul(-.004)),
+        isDark.select(relief.add(stroke.mul(.0022)).add(stoneJoint.mul(-.0018)),
+          isOutdoor.select(relief.add(slabJoint.mul(-.0024)), relief))))).toVar()
+  m.normalNode = reliefNormal(n.transformDirection(cameraViewMatrix), height, .2)
   const daylight = interiorDaylight(P, n)
   m.aoNode = isOutdoor.select(float(1), daylight.mul(1.55).add(.10).clamp(.10, 1))
   // THE ROOMS ARE LIT BY THEIR OWN FITTINGS. No room here sees the sun, and
@@ -202,12 +276,12 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
   // face. They add no second shadow-casting light, and they never touch the
   // measured sun.
   const wash = fittingWash(P, n).mul(isOutdoor.select(float(0), float(1)))
-  m.emissiveNode = base.mul(wash)
+  m.emissiveNode = albedo.mul(wash)
   m.name = 'vinci/collection-rooms/surfaces'
   m.userData = {
     manifestId: collectionRoomsProvenance.manifestId, assetClass: 'GENERATED',
     certainty: 'reconstructed', recipe: collectionRoomsProvenance.recipe,
-    filtering: 'Pixel-filtered 3.2 m drift, 0.13 m structure and 4.7 mm grain, with 8 mm floor joints on a 1.60 by 1.65 m grid, 6 mm lining joints and 20 mm soffit bay lines; all relief from bounded world and view derivatives, no normal map.',
+    filtering: 'Pixel-filtered three-scale detail sized by each part rather than by the room, from a 0.42 m floor stone down to a 0.08 m base band, with a directional read per family, 8 mm floor joints on a 1.60 by 1.65 m grid, 6 mm lining joints and 20 mm soffit bay lines; all relief from bounded world and view derivatives, no normal map.',
   }
   return m
 }
