@@ -79,6 +79,11 @@ const CONE_DIR = 'gates-cones'
 const CORNER_SPELLING = /-cone-(?:ul|ur|dl|dr)\.png$/i
 /** no offline checker of a wing may hold the gate run longer than this */
 const CHECKER_MS = 300000
+/** the honesty walk stands at every station of both viewports and waits for
+    the walker to complete each leg, so it runs in minutes rather than in a
+    checker's five. Past this it is killed: a walk that stands is a gate that
+    never ends. Its own guard gives up before this one does. */
+const HONESTY_MS = 1800000
 
 /* THE SEALED SPEC, when this checkout is a round's app. It names the wing,
    and the cone corners the judge's packet is owed per station; a checkout
@@ -131,7 +136,7 @@ function whyChecker(run) {
   return said.pop() ?? 'no output'
 }
 
-function json(cmd, argv, env = {}, ms = 0) {
+function json(cmd, argv, env = {}, ms = 0, echo = false) {
   return new Promise((done) => {
     const child = spawn(cmd, argv, {
       cwd: APP_ROOT,
@@ -141,7 +146,12 @@ function json(cmd, argv, env = {}, ms = 0) {
     })
     let out = ''
     child.stdout.on('data', (d) => (out += d))
-    child.stderr.on('data', () => {})
+    // a checker's own lines are dropped: the gate says what it measured, not
+    // how. A run of many minutes is the exception, its progress is carried
+    // through, because a long step that stops has to have an address
+    child.stderr.on('data', (d) => {
+      if (echo) process.stderr.write(d)
+    })
     child.on('close', (code) => {
       let parsed = null
       try {
@@ -696,10 +706,18 @@ let flicker = null
   else gate('flicker', flicker?.state === 'PASS', detail)
 }
 
+/* THE HONESTY WALK, THE STATIONS ONLY. Opening every close look reads ten
+   times the labels and takes about forty minutes, which no gate run can
+   carry, so `--looks` is the card walk's own run and is not asked for here. */
+say('  the honesty walk, station by station')
 const honestyArgs = ['forge/honesty-check.mjs', String(PORT), SURFACE, ...(SLUG ? [SLUG] : []), '--json']
-const honesty = await json('node', honestyArgs)
+const honesty = await json('node', honestyArgs, {}, HONESTY_MS, true)
 const h = honesty.parsed ?? { stations: [], failures: ['the honesty check did not answer JSON'], labels: 0 }
-gate('honesty', honesty.code === 0 && (h.failures?.length ?? 1) === 0, `${h.labels ?? 0} labels, ${h.failures?.length ?? '?'} failure(s)`)
+gate(
+  'honesty',
+  honesty.code === 0 && (h.failures?.length ?? 1) === 0,
+  `${h.labels ?? 0} labels over ${h.stations?.length ?? 0} reading(s), ${h.walked ?? 'stations only'}, ${h.failures?.length ?? '?'} failure(s)`
+)
 
 // what the honesty walk measured, said as the bar says it
 const allLabels = (h.stations ?? []).flatMap((s) => s.labels)

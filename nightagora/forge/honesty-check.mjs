@@ -9,8 +9,8 @@
 //   node forge/honesty-check.mjs <port> lobby --json
 //
 // It walks every station of the surface through a real server on the real
-// GPU, reads window.__forge.labels() at each, opens every close look the
-// station carries and reads that too, and fails when:
+// GPU, reads window.__forge.labels() at each, opens the close looks when it
+// is asked to, and fails when:
 //   · a `documented` label anchors a GENERATED, CC0, CC-BY or CC-BY-SA
 //     object (only what was captured, what is old enough to be nobody's,
 //     and procedural architecture built from plans may carry green)
@@ -19,6 +19,13 @@
 //     persistent marks
 //   · a disclosure on the frame differs from src/content/disclosures.ts by
 //     a single character
+//
+// NO STEP OF THE WALK STANDS FOREVER. A call into the page carries no
+// deadline of its own, so a frame that stops answering leaves the run at zero
+// percent CPU with nothing written and no address. Every station and every
+// close look is named on stderr as it is entered and is raced against a
+// clock; one that loses is given up by name, and the whole walk has a clock
+// under those. A walk that gives up says so and ends non-zero.
 //
 // THE CLOSE LOOK IS A WALK OF ITS OWN (--looks). A station's own labels are
 // what a visitor sees standing in the room; the card words of a machine, a
@@ -75,6 +82,15 @@ const ROW_MS = 4000
 const DRESSED_MS = 240000
 const OPEN_MS = 30000
 const SHUT_MS = 12000
+/** the hang guard's own clocks: one station beat, one close look, and the
+    whole walk under them. A station beat holds the leg the walker has to
+    complete, a close look holds an open, a read and a shut. */
+const STATION_MS = 150000
+const LOOK_MS = 90000
+const WALK_MS = LOOKS ? 5400000 : 1500000
+/** two stations in a row that never answer are a wedged frame, not a station:
+    the walk ends there rather than spending a deadline on each of the rest */
+const STALLS_ALLOWED = 2
 /** the classes a green label may stand on: the truth itself, a photograph
     of a work nobody owns, and architecture drawn from published plans */
 const MAY_TESTIFY = new Set(['CAPTURED', 'PD-ART', 'procedural'])
@@ -93,6 +109,39 @@ const say = (line) => {
 const stations = []
 const exhibits = []
 const failures = []
+
+/** what the walk is standing in right now, so a guard that fires has an
+    address to name, and the same line on stderr in both modes: a run that
+    says nothing until it ends cannot say where it stopped */
+let standing = 'the rig'
+let server = null
+let browser = null
+let over = false
+const entering = (what) => {
+  standing = what
+  process.stderr.write(`  at ${what}\n`)
+}
+
+class Stalled extends Error {}
+/** a step raced against a clock, so a call into the page that never answers
+    is named instead of held */
+function within(what, ms, work) {
+  let bell
+  return Promise.race([
+    work(),
+    new Promise((_, no) => {
+      bell = setTimeout(() => no(new Stalled(`${what} did not answer in ${Math.round(ms / 1000)} s`)), ms)
+    }),
+  ]).finally(() => clearTimeout(bell))
+}
+
+/* THE WALK'S OWN CLOCK, the backstop under the step deadlines: a run still
+   walking when it runs out names where it stood and ends. */
+const guard = setTimeout(() => {
+  failures.push(`the walk gave up after ${Math.round(WALK_MS / 60000)} min, standing at ${standing}`)
+  finish()
+}, WALK_MS)
+guard.unref()
 
 /** WHAT A READING OWES, wherever it was taken: a green label only on a class
     that may carry it, a target a hand can hit, one brand line, three
@@ -172,13 +221,13 @@ async function shutLook(page) {
     .catch(() => false)
 }
 
-const server = spawn('pnpm', ['exec', 'vite', '--port', String(port), '--strictPort'], { stdio: 'ignore' })
+server = spawn('pnpm', ['exec', 'vite', '--port', String(port), '--strictPort'], { stdio: 'ignore' })
 try {
   await waitForServer(BASE)
   const said = await assertServer(BASE)
   say(`server ${said.head.slice(0, 7)} at ${said.root}`)
 
-  const browser = await chromium.launch({ args: browserArgs() })
+  browser = await chromium.launch({ args: browserArgs() })
   for (const vp of Object.values(VIEWPORTS)) {
     const tier = vp.tag === 'mobile' ? 'calm' : 'hero'
     const page = await browser.newPage({
@@ -224,6 +273,7 @@ try {
          the frame's chrome at the first rooms and calls it a museum. One lap
          is walked first for the building alone, and the reading lap begins
          when the first row of close looks stands. */
+      entering(`${vp.tag}, the wing dressing`)
       for (const id of ids) {
         await page.evaluate((at) => window.__forge.station(at), id)
         await page.waitForTimeout(400)
@@ -235,34 +285,48 @@ try {
       walk.push(...LOBBY)
     }
 
+    let stalls = 0
     for (const beat of walk) {
-      let name
-      if (surface === 'wing') {
-        name = beat[0]
-        const took = await page.evaluate((id) => window.__forge.station(id), beat[1])
-        if (!took) {
-          failures.push(`${vp.tag}/${name}: the frame refused to stand at this station`)
-          continue
-        }
-        const at = await page.evaluate(() => window.__forge.state().stationId)
-        if (at !== beat[1]) failures.push(`${vp.tag}/${name}: asked for ${beat[1]}, standing at ${at}`)
-        /* A STATION IS READ WHERE THE WALKER STANDS. Asking the frame for a
-           station walks the rail there and the room dresses on the way, so a
-           reading taken on the asking read the frame's chrome over a room
-           that was not built yet: no marks, no row, no card to open. */
-        if (!(await arrive(page, beat[1], 60000)))
-          failures.push(`${vp.tag}/${name}: the walker never completed the leg to this station`)
-      } else {
-        name = beat[0]
-        await page.evaluate(([p, o]) => {
-          window.__forge.freeze(12.4)
-          window.__forge.jump(p, o)
-        }, [beat[1], beat[2]])
-        await waitFor(page, beat[0])
-      }
-      await page.waitForTimeout(1700)
-      const labels = await page.evaluate(() => window.__forge.labels())
+      const name = beat[0]
       const where = `${vp.tag}/${name}`
+      entering(where)
+      let labels = null
+      try {
+        labels = await within(where, STATION_MS, async () => {
+          if (surface === 'wing') {
+            const took = await page.evaluate((id) => window.__forge.station(id), beat[1])
+            if (!took) {
+              failures.push(`${where}: the frame refused to stand at this station`)
+              return null
+            }
+            const at = await page.evaluate(() => window.__forge.state().stationId)
+            if (at !== beat[1]) failures.push(`${where}: asked for ${beat[1]}, standing at ${at}`)
+            /* A STATION IS READ WHERE THE WALKER STANDS. Asking the frame for
+               a station walks the rail there and the room dresses on the way,
+               so a reading taken on the asking read the frame's chrome over a
+               room that was not built yet: no marks, no row, no card to open. */
+            if (!(await arrive(page, beat[1], 60000)))
+              failures.push(`${where}: the walker never completed the leg to this station`)
+          } else {
+            await page.evaluate(([p, o]) => {
+              window.__forge.freeze(12.4)
+              window.__forge.jump(p, o)
+            }, [beat[1], beat[2]])
+            await waitFor(page, beat[0])
+          }
+          await page.waitForTimeout(1700)
+          return page.evaluate(() => window.__forge.labels())
+        })
+      } catch (err) {
+        failures.push(err instanceof Stalled ? err.message : `${where}: ${err.message}`)
+        if (++stalls >= STALLS_ALLOWED) {
+          failures.push(`${vp.tag}: ${stalls} stations in a row never answered, so the walk ended here`)
+          break
+        }
+        continue
+      }
+      stalls = 0
+      if (labels === null) continue
       stations.push({ station: where, labels })
       const read = judge(labels, where, canon, langOf)
 
@@ -282,23 +346,32 @@ try {
         if (readLooks.has(id)) continue
         readLooks.add(id)
         const inside = `${where}/${id}`
-        if (!(await openLook(page, slug, beat[1], id))) {
-          failures.push(`${inside}: the close look never opened`)
-          await shutLook(page)
-          continue
+        entering(inside)
+        try {
+          await within(inside, LOOK_MS, async () => {
+            if (!(await openLook(page, slug, beat[1], id))) {
+              failures.push(`${inside}: the close look never opened`)
+              await shutLook(page)
+              return
+            }
+            await page.waitForTimeout(1400)
+            const shown = await page.evaluate(() => window.__forge.labels())
+            exhibits.push({ station: inside, labels: shown })
+            const card = judge(shown, inside, canon, langOf)
+            say(
+              `  ${inside.padEnd(44)}${String(shown.length).padStart(3)} labels  ` +
+                `${String(card.claims).padStart(2)} claims  ` +
+                `smallest target ${card.smallest === null ? 'none' : `${card.smallest} px`}`
+            )
+            if (!(await shutLook(page))) failures.push(`${inside}: the close look never shut, so the walk went on with a window open`)
+          })
+        } catch (err) {
+          failures.push(err instanceof Stalled ? err.message : `${inside}: ${err.message}`)
+          await shutLook(page).catch(() => false)
         }
-        await page.waitForTimeout(1400)
-        const shown = await page.evaluate(() => window.__forge.labels())
-        exhibits.push({ station: inside, labels: shown })
-        const card = judge(shown, inside, canon, langOf)
-        say(
-          `  ${inside.padEnd(44)}${String(shown.length).padStart(3)} labels  ` +
-            `${String(card.claims).padStart(2)} claims  ` +
-            `smallest target ${card.smallest === null ? 'none' : `${card.smallest} px`}`
-        )
-        if (!(await shutLook(page))) failures.push(`${inside}: the close look never shut, so the walk went on with a window open`)
       }
     }
+    entering(`${vp.tag} done, shutting the page`)
     await page.close()
   }
   await browser.close()
@@ -321,29 +394,46 @@ async function waitFor(page, state, ms = 8000) {
   return false
 }
 
-const atStations = stations.reduce((n, s) => n + s.labels.length, 0)
-const inLooks = exhibits.reduce((n, s) => n + s.labels.length, 0)
-const total = atStations + inLooks
-if (JSON_OUT) {
-  console.log(JSON.stringify({
-    surface: surface === 'wing' ? `wing/${slug}` : surface,
-    stations, exhibits,
-    labels: total, stationLabels: atStations, exhibitLabels: inLooks, looks: exhibits.length,
-    walked: LOOKS ? 'stations and close looks' : 'stations only',
-    failures, ok: failures.length === 0,
-  }, null, 2))
-} else {
-  say('')
-  if (!total) say(`0 labels: ${surface === 'wing' ? `the ${slug} wing` : 'this surface'} carries no marks yet`)
-  if (failures.length) {
-    say('HONESTY CHECK FAILED:')
-    for (const f of [...new Set(failures)]) say(` · ${f}`)
-  } else {
-    say(
-      `honest: ${total} label(s) read (${atStations} at ${stations.length} station reading(s)` +
-        `${LOOKS ? `, ${inLooks} in ${exhibits.length} close look(s)` : ', the close looks not walked'}), ` +
-        'every claim on a class that may carry it'
-    )
+finish()
+
+/** THE REPORT, THEN DOWN. The guard calls this from inside a walk that is
+    still standing, so the server is stopped here too and the exit waits for
+    the last write to leave: a report cut in half is a run that said nothing.
+    The browser is this process's own and goes with it. */
+function finish() {
+  if (over) return
+  over = true
+  clearTimeout(guard)
+  try {
+    server?.kill()
+  } catch {
+    /* already down */
   }
+  const atStations = stations.reduce((n, s) => n + s.labels.length, 0)
+  const inLooks = exhibits.reduce((n, s) => n + s.labels.length, 0)
+  const total = atStations + inLooks
+  const out = []
+  if (JSON_OUT) {
+    out.push(JSON.stringify({
+      surface: surface === 'wing' ? `wing/${slug}` : surface,
+      stations, exhibits,
+      labels: total, stationLabels: atStations, exhibitLabels: inLooks, looks: exhibits.length,
+      walked: LOOKS ? 'stations and close looks' : 'stations only',
+      failures, ok: failures.length === 0,
+    }, null, 2))
+  } else {
+    out.push('')
+    if (!total) out.push(`0 labels: ${surface === 'wing' ? `the ${slug} wing` : 'this surface'} carries no marks yet`)
+    if (failures.length) {
+      out.push('HONESTY CHECK FAILED:')
+      for (const f of [...new Set(failures)]) out.push(` · ${f}`)
+    } else {
+      out.push(
+        `honest: ${total} label(s) read (${atStations} at ${stations.length} station reading(s)` +
+          `${LOOKS ? `, ${inLooks} in ${exhibits.length} close look(s)` : ', the close looks not walked'}), ` +
+          'every claim on a class that may carry it'
+      )
+    }
+  }
+  process.stdout.write(`${out.join('\n')}\n`, () => process.exit(failures.length ? 1 : 0))
 }
-process.exitCode = failures.length ? 1 : 0
