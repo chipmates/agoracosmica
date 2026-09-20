@@ -41,8 +41,10 @@ export interface VinciExhibitRecord {
 /** The room's own standing eye, the one its station pose stands at. */
 const EYE = FLOOR + 1.62
 /** A person stands about a picture's own height off it, never closer than a
- * small panel asks for. */
-const NEAREST_M = 1.1, FURTHEST_M = 2.1
+ * small panel asks for. The furthest is what the largest works need now that
+ * the band above the row is shorter: the room's own bench still stands a
+ * metre behind that eye. */
+const NEAREST_M = 1.1, FURTHEST_M = 2.5
 /** THE NARROW STAGE STEPS BACK RATHER THAN STANDING A WORK BEHIND ITS CARD.
  * A phone leaves a work less than half its frame and the lens is already at
  * its ceiling, so the largest works are held whole by distance instead: the
@@ -50,15 +52,22 @@ const NEAREST_M = 1.1, FURTHEST_M = 2.1
  * The furthest still stands in front of the room's own bench, and the full
  * plate raises at that distance because the module reads its own reach. */
 const PHONE_FURTHEST_M = 2.72, STEP_BACK_M = .04
-/** THE FRAME IS NOT THE STAGE. The bar, the door and the card stand on the
- * stage too, so the band a work may fill is what is left of it, in the
- * frame's own coordinates: plus one at the top edge, minus one at the bottom.
- * The wide stage docks the card at its right, which is what the side bound
- * holds the work clear of; the narrow stage raises the card from the bottom.
+/** THE FRAME IS NOT THE STAGE. The bar, the door, the card and the row at the
+ * foot stand on the stage too, so the band a work may fill is what is left of
+ * it, in the frame's own coordinates: plus one at the top edge, minus one at
+ * the bottom. The wide stage docks the card at its side, which is what the
+ * side bound holds the work clear of; the narrow stage raises the card from
+ * the bottom.
+ *
+ * THE WIDE STAGE'S FLOOR IS THE ROW. A work centred in the old band stood its
+ * lowest quarter behind the row at the foot and its own mark under that, so
+ * neither the frame's edge nor the label could be read. The floor is now the
+ * row's own top edge with a hand's width over it, which at nine hundred
+ * pixels is the row at rest and the mark that stands under the work.
  */
 const BAND = {
-  desktop: { top: .87, bottom: -.66, side: .45 },
-  phone: { top: .92, bottom: 0, side: .94 },
+  desktop: { top: .87, bottom: -.34, side: .45, standOff: 1.27 },
+  phone: { top: .92, bottom: 0, side: .94, standOff: 1 },
 }
 /** The aspect each pose is composed against, as `rail-projection.ts` fits it. */
 const AUTHORED_ASPECT = { desktop: 1280 / 720, phone: 390 / 844 }
@@ -128,7 +137,14 @@ function pictureApproach(field: Field, narrow: boolean)
   const viewport = narrow ? 'phone' : 'desktop'
   const aspect = AUTHORED_ASPECT[viewport], band = BAND[viewport], ceiling = FOV_CEILING[viewport]
   const furthest = field.furthest?.[viewport] ?? (narrow ? PHONE_FURTHEST_M : FURTHEST_M)
-  let distance = Math.min(furthest, Math.max(field.nearest ?? NEAREST_M, field.height, field.width))
+  // THE WORK KEEPS ITS SHARE OF THE FRAME. Standing a work's own size off it
+  // holds it whole in a band as tall as the frame; where the row at the foot
+  // makes the band shorter, an eye at that distance would open its lens to
+  // hold the work and the work would read smaller. The eye stands back in the
+  // same proportion instead, so the band's loss is paid by the room around
+  // the work and not by the work.
+  let distance = Math.min(furthest, Math.max(field.nearest ?? NEAREST_M,
+    Math.max(field.height, field.width) * band.standOff))
   const solve = (distance: number, bottom: number): { fov: number; drop: number; holds: boolean } => {
     const fits = (fov: number): boolean => {
       const drop = centredDrop(field, distance, fov, aspect, band.top, bottom)
