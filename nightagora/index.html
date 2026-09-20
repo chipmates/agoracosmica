@@ -76,7 +76,7 @@
 #rail button,
 #sky-return,
 #descent-skip,
-#overture-skip,
+#enter-museum,
 .pane-enter,
 .pane-sibling,
 .pane-close,
@@ -178,6 +178,12 @@
       opacity: 0; pointer-events: none;
       transition: opacity 1.4s ease;
     }
+    /* THE ONE PASSAGE FROM THE DOOR TO THE FIRE. The curtain takes the whole
+       frame, the night changes behind it, and it lifts on a room that is
+       already standing. It rises above the marks while it is down, or the
+       door's own letterpress would stand on the black. */
+    #blackout.down { z-index: 5; opacity: 1; transition-duration: 0.32s; }
+    #blackout.lifting { z-index: 5; transition-duration: 0.45s; }
     body.forge #blackout { transition: none !important; }
 
     /* ---- the verse: one poem line per threshold, then it yields ---- */
@@ -358,9 +364,11 @@
         color-mix(in srgb, var(--na-gold) 68%, transparent) 100%);
     }
 
-    /* ---- the doors of the night: one plate, one sheen, three places
-       (the Sitting's own, the figure pane's, the Forward Door's) ---- */
-    .pane-enter {
+    /* ---- the doors of the night: one plate, one sheen, four places
+       (the front door's, the Sitting's own, the figure pane's, the
+       Forward Door's) ---- */
+    .pane-enter,
+#enter-museum {
       position: relative;
       background:
         linear-gradient(to bottom,
@@ -370,7 +378,9 @@
       transition: border-color 0.3s ease, color 0.3s ease, box-shadow 0.4s ease;
     }
     .pane-enter:hover,
-.pane-enter:focus-visible {
+.pane-enter:focus-visible,
+#enter-museum:not([aria-disabled='true']):hover,
+#enter-museum:focus-visible {
       box-shadow:
         inset 0 0 30px color-mix(in srgb, var(--na-gold) 11%, transparent),
         0 0 26px color-mix(in srgb, var(--na-gold) 9%, transparent);
@@ -487,21 +497,47 @@
 
     body.forge #rail button { transition: none !important; }
 
-    /* the impatient door: visible only while totality holds */
-    #overture-skip {
+    /* THE FRONT DOOR'S ONE WAY ON. It stands on the still frame and it is
+       also the waiting mark: unlit while the fire behind it is still being
+       built, lit the moment the room stands. */
+    /* the door's own rules carry the body, so the shared plate below cannot
+       stand this button on a frame it does not belong to */
+    body #enter-museum {
       display: none;
-      margin: 12px auto 0;
-      background: none; border: none; cursor: pointer;
-      min-height: 44px; padding: 8px 16px;
-      font-family: var(--sans);
-      font-size: 9px; letter-spacing: 0.3em; text-indent: 0.3em;
-      text-transform: uppercase; color: var(--na-gold);
+      margin: 26px auto 0;
       text-shadow: var(--ink-night);
-      opacity: 0.85; transition: opacity 0.3s ease, color 0.3s ease;
       pointer-events: auto;
+      transition: border-color 0.5s ease, color 0.5s ease, box-shadow 0.5s ease;
     }
-    body[data-phase='held'] #overture-skip { display: block; }
-    #overture-skip:hover, #overture-skip:focus-visible { opacity: 1; color: var(--na-starlight); outline: none; }
+    body[data-phase='held'] #enter-museum { display: inline-block; }
+    /* a way on that cannot be taken yet says so in the ink, not only in the
+       attribute: mist, not gold, and no hand cursor */
+    body #enter-museum[aria-disabled='true'] {
+      cursor: default;
+      color: color-mix(in srgb, var(--na-mist) 70%, transparent);
+      border-color: color-mix(in srgb, var(--na-mist) 24%, transparent);
+      background: none;
+      box-shadow: none;
+    }
+    /* the wait has the museum's own measure: a hairline that fills from the
+       middle out while the room behind the door is built, and leaves once
+       the way on is lit */
+    body #door-measure {
+      display: none;
+      width: 132px; height: 1px; margin: 20px auto 0;
+      background: var(--rule-faint);
+      opacity: 0; transition: opacity 0.8s ease;
+    }
+    body[data-phase='held'] #door-measure { display: block; opacity: 1; }
+    body[data-phase='held'] #door-measure.done { opacity: 0; }
+    #door-measure .door-fill {
+      display: block; width: 100%; height: 100%;
+      background: var(--na-gold);
+      transform: scaleX(0); transform-origin: 50% 50%;
+      transition: transform 0.4s ease-out;
+    }
+    body.forge #enter-museum, body.forge #door-measure,
+body.forge #door-measure .door-fill { transition: none !important; }
 
     /* ---- hotspots: the ring-and-bead marks, the night's one selection
        device (44px targets, letterpress labels) ---- */
@@ -872,7 +908,8 @@
       text-transform: uppercase;
       color: color-mix(in srgb, var(--na-gold) 74%, transparent);
     }
-    .pane-enter {
+    .pane-enter,
+#enter-museum {
       display: inline-block; margin-top: 18px;
       background: none; cursor: pointer;
       border: 1px solid color-mix(in srgb, var(--na-gold) 45%, transparent);
@@ -881,7 +918,9 @@
       font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
       text-transform: uppercase; color: var(--na-gold);
     }
-    .pane-enter:hover, .pane-enter:focus-visible { border-color: var(--na-gold); color: var(--na-starlight); outline: none; }
+    .pane-enter:hover, .pane-enter:focus-visible,
+#enter-museum:not([aria-disabled='true']):hover,
+#enter-museum:focus-visible { border-color: var(--na-gold); color: var(--na-starlight); outline: none; }
     .pane-enter[hidden] { display: none; }
     /* what the register says about this figure's wing tonight */
     .pane-state {
@@ -1122,7 +1161,7 @@
 .inst-close:focus-visible,
 #sky-return:focus-visible,
 #descent-skip:focus-visible,
-#overture-skip:focus-visible {
+#enter-museum:focus-visible {
       outline: 1px solid color-mix(in srgb, var(--na-gold) 52%, transparent);
       outline-offset: 4px;
     }
@@ -1138,7 +1177,7 @@
          at 0.34em: the set comes in so the line breaks where it means to */
       .tagline { font-size: 10px; letter-spacing: 0.22em; text-indent: 0.22em; }
       .status { font-size: 9px; letter-spacing: 0.26em; text-indent: 0.26em; }
-      #overture-skip { font-size: 8.5px; letter-spacing: 0.24em; text-indent: 0.24em; }
+      #enter-museum { font-size: 9px; letter-spacing: 0.24em; text-indent: 0.24em; padding: 13px 20px; }
       .descent-kicker { gap: 11px; font-size: 9px; letter-spacing: 0.26em; text-indent: 0.26em; }
       .descent-kicker::before, .descent-kicker::after { width: 15px; }
 
@@ -1154,6 +1193,9 @@
     @media (prefers-reduced-motion: reduce) {
       body[data-phase='held'] .status { animation: none; }
       .copy, .status { transition: none; }
+      /* the passage still changes the frame, it simply does not travel */
+      #blackout, #blackout.down, #blackout.lifting { transition: none; }
+      #enter-museum, #door-measure, #door-measure .door-fill { transition: none; }
       #keeper, #keeper *, #verse { transition: none; }
       /* the wait's measure still reads, it simply steps instead of gliding,
          and nothing travels or pulses while there is no count to show */
@@ -1182,7 +1224,8 @@
     </div>
     <p class="status" id="status" role="status" data-lobby="firstLight">First light</p>
     <p id="lobby-plate" data-na-claim="documented" data-na-persistent data-na-anchor="lobby/register" data-na-anchor-class="procedural"></p>
-    <button id="overture-skip" type="button" data-lobby="skipOverture">Skip the overture · begin at the fire</button>
+    <button id="enter-museum" type="button" data-lobby="enterMuseum" aria-disabled="true" aria-busy="true">Enter the museum</button>
+    <div id="door-measure" aria-hidden="true"><span class="door-fill"></span></div>
   </div>
   <div id="descent" hidden>
     <div class="descent-beat">

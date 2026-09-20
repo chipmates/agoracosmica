@@ -25,11 +25,11 @@ export const LOBBY_TEXT = {
   },
   tonight: { en: 'Tonight', de: 'Heute Nacht' },
   firstLight: { en: 'First light', de: 'Das erste Licht' },
-  enter: { en: 'Scroll to enter', de: 'Scrolle, um einzutreten' },
+  /** the front door's one way on, and the museum's own word for it */
+  enterMuseum: { en: 'Enter the museum', de: 'Museum betreten' },
   descend: { en: 'Scroll to descend', de: 'Scrolle, um hinabzugehen' },
   fireStatus: { en: 'Night Agora · scroll to look up', de: 'Night Agora · scrolle, um nach oben zu schauen' },
   fireVerse: { en: 'The museum begins at the fire', de: 'Am Feuer beginnt dein Museumsbesuch' },
-  skipOverture: { en: 'Skip the overture · begin at the fire', de: 'Vorspiel überspringen · am Feuer beginnen' },
   skipDescent: { en: 'Skip to the fire', de: 'Direkt zum Feuer' },
   sky: { en: 'The Sky', de: 'Der Himmel' },
   skyReturn: { en: 'The Fire · return', de: 'Zurück zum Feuer' },

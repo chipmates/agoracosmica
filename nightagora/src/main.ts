@@ -72,6 +72,9 @@ function isForgeState(v: string | null | undefined): v is ForgeState {
 const stage = document.getElementById('stage')
 const status = document.getElementById('status')
 const keeper = document.getElementById('keeper')
+const blackout = document.getElementById('blackout')
+const enterDoor = document.getElementById('enter-museum')
+const doorMeasure = document.getElementById('door-measure')
 const descent = document.getElementById('descent')
 const descentSkip = document.getElementById('descent-skip')
 const verse = document.getElementById('verse')
@@ -83,11 +86,16 @@ const chips = document.getElementById('star-chips')
 const pane = document.getElementById('figure-pane')
 const wingHost = document.getElementById('wing')
 if (
-  !stage || !status || !keeper || !descent || !descentSkip || !verse || !voiceDom ||
+  !stage || !status || !keeper || !blackout || !enterDoor || !doorMeasure ||
+  !descent || !descentSkip || !verse || !voiceDom ||
   !plate || !invite || !marks || !chips || !pane || !wingHost
 )
   throw new Error('missing shell')
 const keeperEl: HTMLElement = keeper
+const blackoutEl: HTMLElement = blackout
+const enterEl: HTMLElement = enterDoor
+const doorMeasureEl: HTMLElement = doorMeasure
+const doorFill = doorMeasureEl.querySelector('.door-fill') as HTMLElement | null
 const descentEl: HTMLElement = descent
 const descentBeats = Array.from(descentEl.querySelectorAll('.descent-beat')) as HTMLElement[]
 const hearthVeil = descentEl.querySelector('.hearth') as HTMLElement | null
@@ -174,8 +182,13 @@ const HUB_SPOTS = [
 ]
 
 
-let phase: Phase = 'transit'
-let transit = 0
+/* THE NIGHT STANDS AT ITS FRONT DOOR from the first frame: the eclipse
+   held, with one way on. The transit is a state of the rig now, never a
+   stage the visitor is put through. */
+let phase: Phase = 'held'
+/** frames the night has actually drawn; the door waits for the first one */
+let painted = 0
+let transit = 1
 let door = 0
 let desc = 0
 let descTarget = 0
@@ -462,6 +475,9 @@ const pageMarks: Array<HTMLElement | null> = [
   document.getElementById('chapter-marks'),
   document.getElementById('constellation-plate'),
   document.getElementById('status'),
+  // the front door's way on: it stands on the eclipse, so no star may sit
+  // inside it. It measures zero on every other frame of the night.
+  document.getElementById('enter-museum'),
 ]
 const pageRects: LabelBounds[] = []
 const pageHeights: number[] = []
@@ -909,14 +925,94 @@ function skipDescent(): void {
 }
 descentSkip.addEventListener('click', () => skipDescent())
 
-// the impatient door on the totality screen: straight down to the fire
-document.getElementById('overture-skip')?.addEventListener('click', () => {
-  if (phase !== 'held' && phase !== 'transit') return
+/* ---- THE FRONT DOOR. One still frame of the eclipse, one way on, and the
+   room behind it built while the visitor reads the title. The way on is
+   unlit until the fire stands, because a press that lands on a room whose
+   materials are not built yet buys a stutter instead of an arrival. ---- */
+
+/** how far the door's own measure has counted: the stage painted, the room
+    built. Nothing else is counted, so the mark never claims a share it has
+    not earned. */
+let doorShare = 0
+let fireReady = false
+let building = false
+/** a press while the door was still waiting: it is honoured the moment the
+    fire stands, so an early hand is never a dead press */
+let pressedEarly = false
+/** 0 none, 1 falling, 2 black and standing at the fire, 3 the room has had
+    its one dark frame */
+let curtain = 0
+
+function doorCount(share: number): void {
+  if (share <= doorShare) return
+  doorShare = share
+  if (doorFill) doorFill.style.transform = `scaleX(${share.toFixed(3)})`
+}
+
+function fireStands(): void {
+  if (fireReady) return
+  fireReady = true
+  doorCount(1)
+  doorMeasureEl.classList.add('done')
+  enterEl.removeAttribute('aria-disabled')
+  enterEl.removeAttribute('aria-busy')
+  // the door's word is the button now: the status line steps back
+  if (phase === 'held') setStatus('')
+  if (pressedEarly) enterTheFire()
+}
+
+/** Build the court's materials behind the still frame. A material compiles
+    in the pass that first DRAWS it, and this room stands around the eye, so
+    a drawn warm frame here would be a black flash over the eclipse: the
+    renderer compiles it off the frame instead, and the loop holds still
+    while it does. */
+function buildTheFire(): void {
+  if (building || fireReady) return
+  building = true
+  doorCount(0.5)
+  agora.warm(true)
+  const done = (): void => {
+    if (!building) return
+    agora.warm(false)
+    building = false
+    fireStands()
+  }
+  void renderer.compileAsync(scene, camera).then(done, done)
+  // a compile that never answers may not strand the visitor at a dark button
+  window.setTimeout(done, 8000)
+}
+
+function enterTheFire(): void {
+  if (curtain || phase !== 'held') return
+  if (!fireReady) {
+    pressedEarly = true
+    return
+  }
+  curtain = 1
   wakeInstruments()
+  blackoutEl.classList.add('down')
+  window.setTimeout(
+    () => {
+      standAtTheFire()
+      curtain = 2
+    },
+    reducedMotion ? 0 : 340
+  )
+}
+
+/** the night on the other side of the curtain: the door open, the sky whole,
+    the court standing, the eye seated at the fire */
+function standAtTheFire(): void {
   transit = 1
-  if (phase === 'held') setPhase('descent')
-  skipDescent()
-})
+  desc = descTarget = 1
+  holdRide(1)
+  door = 1
+  skyBirth = 1
+  agoraReveal = 1
+  setPhase('agora')
+}
+
+enterEl.addEventListener('click', () => enterTheFire())
 
 // ---- the instrument rail: the plain-faced layer over the poetry ----
 const railNode = document.getElementById('rail')
@@ -1349,6 +1445,10 @@ window.__forge = {
     if (p !== 'agora' && p !== 'wheel' && p !== 'descent')
       camera.rotation.set(0, 0, 0)
     railEl.hidden = p === 'transit' || p === 'held' || p === 'breath' || p === 'wing'
+    // the rig's front door is the door as it STANDS. The frame where it is
+    // still waiting is shot by navigating to it, never by a jump: a frozen
+    // eye would hold that frame for as long as it looked.
+    if (p === 'held') fireStands()
     if (opts.keeper) {
       keeperEl.hidden = false
       keeperScene.forgeStage(opts.keeper)
@@ -1494,7 +1594,9 @@ function setPhase(next: Phase): void {
   phase = next
   document.body.dataset['phase'] = next
   stack.setScene(scene, camera, LOOK[next])
-  if (next === 'held') setStatus('enter')
+  // the still door says only what it is doing: the word while the room is
+  // built, nothing once the way on is lit
+  if (next === 'held') setStatus(fireReady ? '' : 'firstLight')
   if (next === 'descent') {
     wakeInstruments()
     setStatus('descend')
@@ -1562,8 +1664,7 @@ function setStatus(key: keyof typeof LOBBY_TEXT | ''): void {
 // ---- input: scroll is the only verb ----
 function push(delta: number): void {
   if (!instrumentsEl.hidden) return
-  if (phase === 'transit') return
-  if (phase === 'held' && delta > 0) setPhase('descent')
+  if (phase === 'transit' || phase === 'held') return
   if (phase === 'descent') {
     // one push is ONE STRIDE of the travel: the line being read to the next
     // one. The whole ride scrubs both ways, and a push back at the top hands
@@ -1603,7 +1704,6 @@ addEventListener('keydown', (e) => {
     if (e.key === 'ArrowRight') stepChapter(1)
     if (e.key === 'ArrowLeft') stepChapter(-1)
   }
-  if (e.key === 'Enter' && phase === 'transit') transit = 1
   if (e.key === 'Enter' && phase === 'descent') skipDescent()
 })
 let touchY: number | null = null
@@ -1679,6 +1779,11 @@ function frame(now: number): void {
   // would make the same travel take twice as long as the visitor's
   const dtWall = Math.min((now - last) / 1000, 0.25)
   last = now
+  /* THE STILL DOOR HOLDS ITSELF WHILE THE ROOM IS BUILT. The court is in
+     the scene with nothing culled away for the compile, so a frame drawn
+     now would paint it black over the eclipse. The frame is still: nothing
+     of it is lost by not drawing it. */
+  if (building) return
   /* a bench owns the whole frame: its own clock, its own scene, its own
      render. Nothing of the night's overture runs behind it. */
   if (bench.active()) {
@@ -1864,7 +1969,11 @@ function frame(now: number): void {
      colour at zero, so the work is paid where there is nothing to see. The
      map is not up yet and the ride is between two questions. */
   const warmNow =
-    !courtWarm && phase === 'descent' && desc > 0.17 && desc < 0.30 && !frozen
+    !courtWarm &&
+    !frozen &&
+    // the passage from the door: the curtain is down and the room is the
+    // only thing behind it, so its one dark frame is paid for here
+    (curtain === 2 || (phase === 'descent' && desc > 0.17 && desc < 0.30))
   if (warmNow) agora.warm(true)
   agora.update({
     reveal: agoraReveal,
@@ -1923,6 +2032,20 @@ function frame(now: number): void {
   }
   camera.rotation.x = baseRx
   camera.rotation.y = baseRy
+  painted++
+  /* THE PASSAGE, FRAME BY FRAME. The room takes its one dark frame under
+     the curtain, and the curtain lifts on the frame after it: lifting on
+     the warm frame itself would show the court with every colour at zero. */
+  if (curtain === 2) curtain = 3
+  else if (curtain === 3) {
+    curtain = 0
+    blackoutEl.classList.add('lifting')
+    blackoutEl.classList.remove('down')
+    window.setTimeout(() => blackoutEl.classList.remove('lifting'), 700)
+  }
+  // the door's own wait starts once the still frame is actually on the
+  // glass: the room is built behind a picture, never instead of one
+  if (phase === 'held' && painted > 0 && !frozen) buildTheFire()
 }
 
 // ---- free-look state: pointer position, eased, phase-gated ----
@@ -2011,7 +2134,15 @@ function bootRoute(): boolean {
 }
 
 function main(): void {
-  if (!bootRoute()) setStatus('firstLight')
+  /* THE NIGHT OPENS AT ITS FRONT DOOR: the eclipse, held, with one way on.
+     The page carries the shell's own opening state until here, so a wing
+     address never paints the door's way on for a frame. The stage is not
+     re-entered: it is where the night already is, and a phase change here
+     would put a scene rebuild in front of the first painted frame. */
+  if (!bootRoute()) {
+    document.body.dataset['phase'] = phase
+    setStatus('firstLight')
+  }
   let logged = false
   const origRender = frame
   requestAnimationFrame((t) => {

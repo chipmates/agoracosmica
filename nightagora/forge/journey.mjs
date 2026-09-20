@@ -7,8 +7,8 @@
 //   pnpm build && node forge/journey.mjs wing <slug>     one wing's rail
 //   JOURNEY_VP=mobile ...                                the phone postcard
 //
-// The lobby's walk is: eclipse, descent, lobby, wheel, pane, breath, wing,
-// back to the wheel, then the wing's own address cold.
+// The lobby's walk is: the front door, the fire, the wheel, a pane, the
+// breath, a wing, back to the wheel, then the wing's own address cold.
 //
 // THE WING'S WALK IS INPUT, NOT API. A station reached with
 // `window.__forge` is a station the rig reached, not a station a visitor
@@ -318,15 +318,14 @@ try {
     process.exit(process.exitCode ?? 0)
   }
 
-  // 1 · the overture plays itself: transit -> held
+  // 1 · the front door: the eclipse held, and one way on that lights when
+  // the room behind it stands
   await waitPhase('held')
+  await page.waitForSelector('#enter-museum:not([aria-disabled="true"])', { timeout: 20000 })
   await shot('held')
 
-  // 2 · the descent: one gesture, and the plates carry you down
-  await wheel(300, 2)
-  if (!(await waitPhase('descent', 8000))) fail('the walk stopped here')
-  await page.waitForTimeout(1200)
-  await shot('descent')
+  // 2 · one press, one curtain, and the visitor is at the fire
+  await page.locator('#enter-museum').click()
   if (!(await waitPhase('agora', 15000))) fail('the walk stopped here')
   await page.waitForTimeout(2500)
   await shot('agora')
