@@ -112,6 +112,16 @@ function lightCove(b: RoomBatch, north: number, west: number, east: number, inwa
  */
 const ENVELOPE = { west: -62, east: -22, south: -64, north: -34, apron: -6.44, foot: -6.4 }
 
+/** WHERE TWO BODIES MEET, ONE OF THEM GIVES WAY. Two faces in one plane share
+ * an interpolated depth, and the bit that decides the winner changes with the
+ * eye: the surface breaks up as a visitor walks. Everything this module lays
+ * against another body's own plane runs this far past it, into that body,
+ * where nothing can see it and nothing can fight. `coplanar-check.mjs` proves
+ * no plane is left shared. */
+const BED = .004
+/** How far the court's two parapet runs lap instead of butting at the corner. */
+const LAP = .07
+
 /** THE TERRACE MEETS THE BUILDING. The building stood on its base with its
  * foot 40 mm clear of the apron and its sill lipping 90 mm past the base's
  * face, so the wall met the terrace in a shadow and not in a surface. A
@@ -122,13 +132,16 @@ function courtMeetsTheBuilding(b: RoomBatch): void {
   const E = ENVELOPE, PROUD = .045, DEPTH = .18
   // The course runs the whole envelope and not the one elevation the court
   // looks at: the same 40 mm stood open on all four sides.
+  // Its back and its underside run a bed past the envelope's own face and the
+  // apron's own bed, so neither plane is shared. Its proud and its depth, the
+  // two the ground checker reads, are unchanged.
   const foot = (west: number, south: number, east: number, north: number): void =>
-    b.box((west + east) / 2, (south + north) / 2, E.apron - .06 + (PROUD + .06) / 2,
-      east - west, north - south, PROUD + .06, 2)
-  foot(E.west - DEPTH, E.north, E.east + DEPTH, E.north + DEPTH)
-  foot(E.west - DEPTH, E.south - DEPTH, E.east + DEPTH, E.south)
-  foot(E.west - DEPTH, E.south, E.west, E.north)
-  foot(E.east, E.south, E.east + DEPTH, E.north)
+    b.box((west + east) / 2, (south + north) / 2, E.apron - .06 - BED + (PROUD + .06 + BED) / 2,
+      east - west, north - south, PROUD + .06 + BED, 2)
+  foot(E.west - DEPTH, E.north - BED, E.east + DEPTH, E.north + DEPTH)
+  foot(E.west - DEPTH, E.south - DEPTH, E.east + DEPTH, E.south + BED)
+  foot(E.west - DEPTH, E.south, E.west + BED, E.north)
+  foot(E.east - BED, E.south, E.east + DEPTH, E.north)
 
   // The terrace's own south line. The court's paving and the apron are laid
   // by two modules at one level and the eye was given nothing to read the
@@ -170,7 +183,12 @@ export const COURT_GROUND: readonly { west: number; south: number; east: number;
  * end of that wall where the terrace does open out.
  */
 function courtCarriedToTheWalls(b: RoomBatch): void {
-  const W = COURT_GROUND[1]!, N = COURT_GROUND[2]!, FACE = .34, BOTTOM = -11.2
+  // The strips are declared to the gallery's own lines and BUILT a bed past
+  // the court's and the exhibition floor's, and a bed short of the gallery's
+  // end, so no edge of this ground shares a plane with the body beside it.
+  const W = { ...COURT_GROUND[1]!, east: COURT_GROUND[1]!.east + BED, south: COURT_GROUND[1]!.south - BED }
+  const N = { ...COURT_GROUND[2]!, east: COURT_GROUND[2]!.east - BED, south: COURT_GROUND[2]!.south - BED }
+  const FACE = .34, BOTTOM = -11.2
   const faceTop = COURT.level - .22
   for (const strip of [W, N]) b.slab(strip.west, strip.south, strip.east, strip.north, COURT.level, .22, 5)
   // The retaining construction stands directly under the gallery's walls, so
@@ -181,16 +199,18 @@ function courtCarriedToTheWalls(b: RoomBatch): void {
   retain(W.west, N.north - FACE, N.east, N.north)
   retain(N.east - FACE, N.south, N.east, N.north)
   // The exhibition floor is laid 20 mm over the court's paving. Its two new
-  // edges take the same band its third one already has.
+  // edges take the same band its third one already has, each run a bed under
+  // that floor rather than up against its edge.
   b.slab(W.east - .12, COURT.south, W.east, COURT.north, COURT.level + .003, .012, 2)
-  b.slab(COURT.west, COURT.north, GRAVE_ORIGIN.east + 9, COURT.north + .12, COURT.level + .003, .012, 2)
-  // A plinth course at the gallery's foot, as at the pavilion's.
+  b.slab(COURT.west - BED, COURT.north - BED, GRAVE_ORIGIN.east + 9, COURT.north + .12, COURT.level + .003, .012, 2)
+  // A plinth course at the gallery's foot, as at the pavilion's, bedded under
+  // the gallery's own base on both runs.
   const PROUD = .045, DEPTH = .18
   const foot = (west: number, south: number, east: number, north: number): void =>
     b.box((west + east) / 2, (south + north) / 2, COURT.level - .06 + (PROUD + .06) / 2,
       east - west, north - south, PROUD + .06, 2)
-  foot(GALLERY.backKerb, COURT.south, GALLERY.backKerb + DEPTH, GALLERY.north)
-  foot(GALLERY.backKerb + DEPTH, GALLERY.northKerb - DEPTH, GALLERY.returnEast, GALLERY.northKerb)
+  foot(GALLERY.backKerb - BED, COURT.south, GALLERY.backKerb + DEPTH, GALLERY.north - BED)
+  foot(GALLERY.backKerb + DEPTH, GALLERY.northKerb - DEPTH, GALLERY.returnEast - BED, GALLERY.northKerb + BED)
 }
 
 export function createCollectionRooms(): Group {
@@ -265,13 +285,19 @@ export function createCollectionRooms(): Group {
   // museum's own terrace carries them, north of the pavilion, on the same
   // level as its apron.
   b.slabAround(COURT.west, COURT.south, COURT.east, COURT.north, COURT.level, .22,
-    { west: GRAVE_ORIGIN.east - 4, south: GRAVE_ORIGIN.north - 6, east: GRAVE_ORIGIN.east + 9, north: GRAVE_ORIGIN.north + 6 }, 5)
+    // The reservation is a bed narrower than the floor that fills it, so the
+    // court's paving runs under that floor's edge instead of up to its plane.
+    { west: GRAVE_ORIGIN.east - 4, south: GRAVE_ORIGIN.north - 6, east: GRAVE_ORIGIN.east + 9 - BED, north: GRAVE_ORIGIN.north + 6 }, 5)
   // The parapet stands where the terrace is the edge. West of the gallery's
   // return the gallery's own wall is the edge, so the parapet ends there and
   // turns north into the end of it.
+  // The two runs LAP at the corner instead of butting, and the return stops a
+  // bed short of the gallery's end: a butt joint puts two faces in one plane,
+  // and one plane is one depth. Its north end keeps the gallery's own line,
+  // which is this body's northmost extent and the rail's certificate reads it.
   for (const [west, south, east, north] of [
-    [GALLERY.returnEast, COURT.north - COURT.parapetThickness, COURT.east, COURT.north],
-    [GALLERY.returnEast - COURT.parapetThickness, COURT.north - COURT.parapetThickness, GALLERY.returnEast, GALLERY.north],
+    [GALLERY.returnEast - LAP, COURT.north - COURT.parapetThickness, COURT.east, COURT.north],
+    [GALLERY.returnEast - COURT.parapetThickness, COURT.north - COURT.parapetThickness, GALLERY.returnEast - BED, GALLERY.north],
     [COURT.east - COURT.parapetThickness, COURT.south, COURT.east, COURT.north],
   ]) {
     b.box((west! + east!) / 2, (south! + north!) / 2, COURT.level + COURT.parapet / 2, east! - west!, north! - south!, COURT.parapet, 5)
@@ -281,7 +307,7 @@ export function createCollectionRooms(): Group {
   // are the retaining construction, closed to below the natural grade; the
   // west face and the west of the north face are inside the fill now.
   const faceTop = COURT.level - .22
-  b.box((GALLERY.returnEast + COURT.east) / 2, COURT.north - .17, (faceTop - 11.2) / 2, COURT.east - GALLERY.returnEast, .34, faceTop + 11.2, 5)
+  b.box((GALLERY.returnEast - LAP + COURT.east) / 2, COURT.north - .17, (faceTop - 11.2) / 2, COURT.east - GALLERY.returnEast + LAP, .34, faceTop + 11.2, 5)
   b.box(COURT.east - .17, (COURT.south + COURT.north) / 2, (faceTop - 11.2) / 2, .34, COURT.north - COURT.south, faceTop + 11.2, 5)
   // A shadow course at the head of the retaining face, which is what stops
   // a four-metre concrete wall reading as a blank.
@@ -290,7 +316,7 @@ export function createCollectionRooms(): Group {
   }
   // A stone band marks where the court's own paving ends and the grave's
   // floor begins, which is the join the exhibit brings with it.
-  b.slab(GRAVE_ORIGIN.east + 9, COURT.south, GRAVE_ORIGIN.east + 9.12, COURT.north, COURT.level + .003, .012, 2)
+  b.slab(GRAVE_ORIGIN.east + 9 - BED, COURT.south, GRAVE_ORIGIN.east + 9.12, COURT.north, COURT.level + .003, .012, 2)
 
   courtCarriedToTheWalls(b)
   courtMeetsTheBuilding(b)
