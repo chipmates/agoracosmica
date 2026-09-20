@@ -37,6 +37,8 @@ const PORT = Number(flag('port', process.env['FORGE_PORT'] ?? 5199))
 const BASE = `http://127.0.0.1:${PORT}`
 const WING = String(flag('wing', 'vinci'))
 const TIERS = String(flag('tier', 'hero,standard')).split(',')
+/** stroll, walk or brisk: the pace the visitor set, written to the device. */
+const PACE = flags.has('pace') ? String(flag('pace', 'walk')) : ''
 const SECONDS = Number(flag('seconds', 30))
 const SETTLE = Number(flag('settle', 6))
 const VIEW = { width: Number(flag('width', 1440)), height: Number(flag('height', 900)) }
@@ -180,6 +182,9 @@ try {
     const noise = []
     if (WALK) {
       page.on('pageerror', e => noise.push(`PAGE ERROR ${e.message.slice(0, 90)}`))
+      // The pace is the visitor's own, kept on the device: a walk measured at
+      // the default says nothing about the one who set it faster.
+      if (PACE) await page.addInitScript(pace => { try { localStorage.setItem('na-gait-pace', pace) } catch { /* a refused store walks at the default */ } }, PACE)
       await page.goto(`${BASE}/w/${WING}?probe=1&tier=${tier}`, { waitUntil: 'load' })
       const ids = await page.waitForFunction(() => {
         const s = window.__forge?.state?.()
