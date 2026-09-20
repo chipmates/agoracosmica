@@ -32,6 +32,80 @@ const PART_LADDER: Record<CollectionRole, [number, number, number]> = {
   5: fitScales([.5, .06, .0025], 1.6),    // the court's own paving stone
 }
 
+/** THE FOUR TERMS, for a surface that is not one of the six welded room
+ * families. The rooms compose these inline off a role attribute; a plain
+ * material asks for them here, so the grave's paving, the pavilion's soffit
+ * and a lining board are read by one piece of code and not by three.
+ *
+ * `lapM` is a band laid across whichever world axis this pixel is still thin
+ * in, which is the only mid scale a plane running away from the eye can hold;
+ * `driftM` a metres-wide run along the face, which survives any pixel;
+ * `cellM` the block or board a joint bounds, read on both its own axes.
+ */
+export interface SurfaceTermsOptions {
+  scales: [number, number, number]
+  extent?: number
+  figure?: [number, number, number]
+  relief?: number
+  lapM: number
+  driftM: number
+  /** [along the run, up the face] in metres, or none */
+  cellM?: [number, number] | null
+  at?: TSLNode
+  normal?: TSLNode
+}
+
+export interface SurfaceTerms {
+  /** around one: the three-rung ladder, already fitted to the part */
+  tone: TSLNode
+  /** add to the roughness */
+  rough: TSLNode
+  /** the ladder's relief in metres */
+  heightM: TSLNode
+  /** each around zero, for the caller to weight */
+  lap: TSLNode
+  drift: TSLNode
+  cell: TSLNode
+  /** the pixel, and the run this face is read along */
+  pixel: TSLNode
+  along: TSLNode
+  alongPixel: TSLNode
+}
+
+export function surfaceTerms(o: SurfaceTermsOptions): SurfaceTerms {
+  const { float, floor, fract, mix, normalWorldGeometry, positionWorld } = TSL as unknown as Record<string, TSLNode>
+  const P = o.at ?? positionWorld, n = o.normal ?? normalWorldGeometry
+  const detail = surfaceDetail({
+    scales: fitScales(o.scales, o.extent), figure: o.figure ?? [.16, .105, .075],
+    relief: o.relief ?? .0035, count: 3, at: P, normal: n,
+  })
+  const { east, up, north } = axisFootprint(P)
+  const hashOf = (index: TSLNode, salt: number): TSLNode => fract(index.mul(salt).sin().mul(4371.13)).sub(.5)
+  const bands = (coordinate: TSLNode, salt: number): TSLNode => {
+    const i = floor(coordinate), f = fract(coordinate)
+    return mix(hashOf(i, salt), hashOf(i.add(1), salt), f.mul(f).mul(float(3).sub(f.mul(2))))
+  }
+  const acrossFace = n.x.abs().greaterThan(n.z.abs())
+  const along = acrossFace.select(P.z, P.x), alongPixel = acrossFace.select(north, east)
+  const upright = n.y.abs().lessThan(.5)
+  const thin = upright.select(P.y, east.lessThan(north).select(P.x, P.z))
+  const thinPixel = upright.select(up, east.min(north))
+  // Two octaves, because a float lays laps inside laps and because one octave
+  // over the few cells a frame holds does not average to zero.
+  const lapT = thin.div(o.lapM)
+  const lap = bands(lapT, 23.7).mul(.62).add(bands(lapT.mul(2.37).add(1.7), 9.41).mul(.38))
+    .mul(resolved(o.lapM, thinPixel)).toVar()
+  const drift = bands(along.div(o.driftM), 5.13).mul(resolved(o.driftM, alongPixel)).toVar()
+  const cell = o.cellM
+    ? hashOf(floor(along.div(o.cellM[0])).add(floor(thin.div(o.cellM[1])).mul(5.73)), 17.31)
+      .mul(resolved(o.cellM[0], alongPixel)).mul(resolved(o.cellM[1], thinPixel)).toVar()
+    : float(0)
+  return {
+    tone: detail.tone, rough: detail.rough, heightM: detail.heightM,
+    lap, drift, cell, pixel: detail.pixel, along, alongPixel,
+  }
+}
+
 export const collectionRoomsProvenance = {
   manifestId: 'vinci/collection-rooms',
   assetClass: 'GENERATED',
@@ -218,6 +292,12 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
   // Walls: a 1.2 by 2.4 m board rhythm on the lining, its shadow joints 6 mm.
   const boardV = line(P.y, 1.2, 0, .006, pixelUp)
   const boardH = line(along, 2.4, 0, .006, alongPixel)
+  // THE LIFT OF A BOARD-FORMED POUR. A cast wall is not a cloud: it is
+  // horizontal boards, each lift leaving a fine line and a change of tone,
+  // and a line in P.y is read on the one axis a receding wall keeps thin.
+  // This is the fine scale the lining was missing, in place of more drift.
+  const formLift = line(P.y, .6, .07, .004, pixelUp)
+  const formBoard = line(P.y, .15, .01, .0008, pixelUp)
   const boardJoint = boardV.max(boardH)
   const boardCell = hashOf(floor(P.y.div(1.2)).add(floor(along.div(2.4)).mul(5.73)), 17.31)
     .mul(resolved(2.4, alongPixel)).mul(resolved(1.2, pixelUp)).toVar()
@@ -238,7 +318,6 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
   const strokeAxis = isSteel.select(vec3(160, 12, 160),
     isFloor.select(vec3(34, 34, 3.8),
       isOutdoor.select(vec3(52, 2.9, 52), vec3(5.4, 3.1, 5.4))))
-  const stroke = mx_noise_float(P.mul(strokeAxis)).mul(held(byRole([.03, .2, .2, .02, .2, .05]))).toVar()
   // THE LAP, WHICH IS THE ONE MID SCALE A RECEDING PLANE CAN HOLD. A pixel
   // out in the room is thin in one world axis and metres long in the other,
   // so a blob under that long axis is never sampled, only averaged; a band
@@ -249,10 +328,15 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
   const flatThinEast = pixelEast.lessThan(pixelNorth)
   const thin = upright.select(P.y, flatThinEast.select(P.x, P.z))
   const thinPixel = upright.select(pixelUp, pixelEast.min(pixelNorth))
+  // The stroke is anisotropic by construction, so it is filtered on the same
+  // thin axis: gated on the round figure it died at the dark end of a room
+  // and took the floor's saw run with it.
+  const stroke = mx_noise_float(P.mul(strokeAxis))
+    .mul(resolved(byRole([.03, .2, .2, .02, .2, .05]), thinPixel)).toVar()
   // Two octaves of it, because a float lays laps inside laps, and because one
   // octave over the eighteen cells a phone frame holds does not average to
   // zero: its own mean is what moves that frame's exposure.
-  const lapM = byRole([.085, .17, .034, .05, .21, .1])
+  const lapM = byRole([.11, .115, .034, .05, .19, .12])
   const lapT = thin.div(lapM)
   const lap = bands(lapT, 23.7).mul(.62).add(bands(lapT.mul(2.37).add(1.7), 9.41).mul(.38))
     .mul(resolved(lapM, thinPixel)).toVar()
@@ -286,15 +370,15 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
   const handled = traffic.doors.mul(smoothstep(.44, 0, P.y.sub(FLOOR + 1.02).abs()))
     .mul(n.y.abs().oneMinus().max(0)).mul(byRole([0, .55, 1, .8, 0, 0])).toVar()
   const density = float(1).add(cell.mul(.5)).sub(walked.mul(.4)).clamp(.3, 1.6)
-  const figure = detail.tone.sub(1).mul(byRole([1, 1, 1.5, .45, .95, 1.15])).mul(density)
+  const figure = detail.tone.sub(1).mul(byRole([1, 1, 1.5, .45, .98, 1.15])).mul(density)
     .add(cell.mul(byRole([.34, .055, .13, 0, .06, .34])))
-    .add(lap.mul(byRole([.18, .1, .19, .05, .09, .19])).mul(density))
+    .add(lap.mul(byRole([.24, .26, .19, .05, .21, .23])).mul(density))
     .add(drift.mul(byRole([.075, .03, .07, .02, .03, .085])))
-    .add(stroke.mul(byRole([.05, .13, .26, .06, .13, .09])))
+    .add(stroke.mul(byRole([.075, .09, .26, .06, .09, .1])))
   const silted = walked.mul(.34).oneMinus()
   const cut = isFloor.select(slabJoint.mul(.34).mul(silted),
-    isPlaster.select(boardJoint.mul(.16),
-      isCeiling.select(bayNorth.max(bayEast).mul(.16),
+    isPlaster.select(boardJoint.mul(.16).max(formLift.mul(.06)).max(formBoard.mul(.045)),
+      isCeiling.select(bayNorth.max(bayEast).mul(.16).max(formLift.mul(.04)).max(formBoard.mul(.03)),
         isDark.select(stoneJoint.mul(.2), isOutdoor.select(slabJoint.mul(.24).mul(silted), float(0))))))
   // ONE ALBEDO FOR BOTH CHANNELS. The fittings' wash was re-emitting the flat
   // palette colour beside the figured albedo, so on every surface a fitting
@@ -312,14 +396,14 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
     isFloor.select(float(.62).add(detail.rough).add(cell.mul(.16)).add(lap.mul(.06))
       .add(slabJoint.mul(.15)).sub(walked.mul(.22)).add(grime.mul(.07)),
       isOutdoor.select(float(.88).add(detail.rough).add(cell.mul(.14)).add(lap.mul(.05)).sub(walked.mul(.18)),
-        float(.88).add(detail.rough).add(cell.mul(.1)).add(lap.mul(.05)).sub(handled.mul(.09))))).clamp(.30, .97)
+        float(.88).add(detail.rough).add(cell.mul(.1)).add(lap.mul(.07)).add(formBoard.mul(.05)).sub(handled.mul(.09))))).clamp(.30, .97)
   m.metalnessNode = isSteel.select(float(.72), float(.02))
   // A sawn slab keeps a shallow relief of its own; at the room's drift it had
   // none, so nothing on it ever caught a raking light.
   const relief = detail.heightM.mul(byRole([.45, .4, 2.1, .25, .38, .7])).toVar()
   const worn = walked.mul(.5).oneMinus()
   const height = isFloor.select(relief.mul(worn).add(slabJoint.mul(-.0022)),
-    isPlaster.select(relief.add(stroke.mul(.0006)).add(lap.mul(.0011)).add(boardJoint.mul(-.0012)),
+    isPlaster.select(relief.add(stroke.mul(.0006)).add(lap.mul(.0011)).add(formLift.mul(-.0007)).add(boardJoint.mul(-.0012)),
       isCeiling.select(relief.add(stroke.mul(.0005)).add(lap.mul(.0009)).add(bayNorth.max(bayEast).mul(-.004)),
         isDark.select(relief.add(stroke.mul(.0022)).add(stoneJoint.mul(-.0018)),
           isOutdoor.select(relief.mul(worn).add(slabJoint.mul(-.0024)), relief))))).toVar()
@@ -369,30 +453,57 @@ export function collectionExhibitMaterials(): {
   stone: MeshStandardNodeMaterial; plaster: MeshStandardNodeMaterial
   bronze: MeshStandardNodeMaterial; ink: MeshStandardNodeMaterial; dark: MeshStandardNodeMaterial
 } {
-  const { cameraViewMatrix, float, length, mx_noise_float, normalWorldGeometry, positionView, positionWorld, smoothstep, vec3 } = TSL as unknown as Record<string, TSLNode>
-  const make = (colour: string, roughness: number, metalness: number, scales: [number, number, number], depth: number) => {
+  const { cameraViewMatrix, float, normalWorldGeometry, positionWorld, vec3 } = TSL as unknown as Record<string, TSLNode>
+  interface Part {
+    /** the three feature sizes and the part's own smallest extent, metres */
+    scales: [number, number, number]; extent: number
+    /** the band across the thin axis, the run along the face, the block */
+    lapM: number; driftM: number; cellM?: [number, number]
+    /** how far each term swings the tone */
+    figure: number; lap: number; drift: number; cell: number
+    relief: number
+  }
+  const make = (colour: string, roughness: number, metalness: number, part: Part) => {
     const m = new MeshStandardNodeMaterial({ color: colour, roughness, metalness })
-    const P = positionWorld, n = normalWorldGeometry, pixel = anisotropicFootprint(P)
-    const resolved = (metres: number) => smoothstep(2, 4, float(metres).div(pixel))
-    const macro = mx_noise_float(P.mul(1 / scales[0])).mul(resolved(scales[0])).toVar()
-    const middle = mx_noise_float(P.mul(1 / scales[1])).mul(resolved(scales[1])).toVar()
-    const grain = mx_noise_float(P.mul(1 / scales[2])).mul(resolved(scales[2])).toVar()
+    const P = positionWorld, n = normalWorldGeometry
+    const t = surfaceTerms({
+      scales: part.scales, extent: part.extent, relief: part.relief,
+      lapM: part.lapM, driftM: part.driftM, cellM: part.cellM ?? null,
+    })
     const c = new Color(colour)
-    m.colorNode = vec3(c.r, c.g, c.b).mul(macro.mul(.09).add(middle.mul(.06)).add(grain.mul(.05)).add(1))
-    m.roughnessNode = float(roughness).add(grain.mul(.05)).add(middle.mul(.03)).clamp(.08, .98)
-    const height = macro.mul(depth).add(middle.mul(depth * .4)).add(grain.mul(depth * .15)).toVar()
-    const viewNormal = n.transformDirection(cameraViewMatrix), sx = positionView.dFdx(), sy = positionView.dFdy()
-    const rx = sy.cross(viewNormal), ry = viewNormal.cross(sx), det = sx.dot(rx)
-    const gradient = rx.mul(height.dFdx()).add(ry.mul(height.dFdy())).mul(det.sign()).div(det.abs().max(1e-10)).toVar()
-    m.normalNode = viewNormal.sub(gradient.div(length(gradient).div(.18).max(1))).normalize()
+    // A DENSITY GRADIENT THE BLOCK ITSELF CARRIES: how mottled a stone is
+    // varies stone to stone, which is the one gradient a laid floor has.
+    const density = float(1).add(t.cell.mul(.5)).clamp(.3, 1.6)
+    const figure = t.tone.sub(1).mul(part.figure).mul(density)
+      .add(t.lap.mul(part.lap).mul(density)).add(t.drift.mul(part.drift)).add(t.cell.mul(part.cell))
+    m.colorNode = vec3(c.r, c.g, c.b).mul(figure.add(1))
+    // Gloss carries further than tone where the light is nearly all indirect.
+    m.roughnessNode = float(roughness).add(t.rough).add(t.cell.mul(.13)).add(t.lap.mul(.06)).clamp(.08, .98)
+    m.normalNode = reliefNormal(n.transformDirection(cameraViewMatrix),
+      t.heightM.add(t.lap.mul(part.relief * .5)), .18)
     m.userData = { manifestId: collectionRoomsProvenance.manifestId, assetClass: 'GENERATED', certainty: 'reconstructed' }
     return m
   }
-  const stone = make(PALETTE.floor, .66, .02, [3.1, .14, .005], .0016)
-  const plaster = make(PALETTE.plaster, .9, .01, [2.4, .19, .004], .0011)
-  const bronze = make('#6d6350', .43, .72, [1.2, .085, .003], .0008)
-  const ink = make('#2b2f2c', .93, .02, [.9, .06, .002], .0004)
-  const dark = make(PALETTE.dark, .82, .04, [1.7, .11, .004], .0012)
+  // The grave's floor is 1.8 by 1.4 m slabs and the gallery behind it 0.58 m
+  // cast boards, both cut from this one stone, so its ladder is fitted to the
+  // board and its block to the slab.
+  const stone = make(PALETTE.floor, .66, .02, {
+    scales: [.31, .05, .002], extent: .62, lapM: .1, driftM: 2.6, cellM: [1.8, 1.4],
+    figure: 1.2, lap: .24, drift: .1, cell: .34, relief: .0028 })
+  const plaster = make(PALETTE.plaster, .9, .01, {
+    scales: [.3, .05, .0025], extent: .6, lapM: .15, driftM: 2.4,
+    figure: 1, lap: .13, drift: .06, cell: 0, relief: .0022 })
+  const bronze = make('#6d6350', .43, .72, {
+    scales: [.09, .02, .0015], extent: .2, lapM: .028, driftM: .6,
+    figure: .5, lap: .06, drift: .03, cell: 0, relief: .0009 })
+  const ink = make('#2b2f2c', .93, .02, {
+    scales: [.06, .015, .001], extent: .12, lapM: .02, driftM: .4,
+    figure: .45, lap: .05, drift: .03, cell: 0, relief: .0005 })
+  // The gallery's backing stands in the court's own shade behind the grave:
+  // the last plane of the walk, and the one with least light to read it by.
+  const dark = make(PALETTE.dark, .82, .04, {
+    scales: [.26, .045, .002], extent: .52, lapM: .095, driftM: 2.2, cellM: [1.2, .6],
+    figure: 1.8, lap: .32, drift: .14, cell: .22, relief: .0024 })
   for (const [name, material] of Object.entries({ stone, plaster, bronze, ink, dark })) material.name = `vinci/collection-rooms/${name}`
   return { stone, plaster, bronze, ink, dark }
 }
