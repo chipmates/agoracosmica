@@ -20,6 +20,8 @@ import { COURT, FLOOR, GRAVE_ORIGIN, OPENING, SUPPER_WALL } from './layout'
 import { STANDS, standLevel } from './stands'
 import { dossiers, MACHINE_SLUGS, type MachineSlug } from '../machines/catalog'
 import { bodyWallOrder } from './wall'
+import { hallLedge } from '../entry-passage'
+import { studySupport } from '../inner-court'
 
 export interface ApproachPose { eye: Vector3; at: Vector3; fov: number }
 
@@ -293,6 +295,15 @@ export const VINCI_READING_TABLE = (() => {
     top: FLOOR + .755, panelWidthM }
 })()
 const READING_TABLE = VINCI_READING_TABLE
+/** The supplied entry floor of the house, which the hall's ledge stands on. */
+const FLOOR_HOUSE=.8
+/** WHERE THE LEDGE IS READ FROM: on the entrance door's own clear axis, two
+ * and a fifth metres inside its face, which is a stride and a quarter off the
+ * shelf and the one line through that door a near envelope fits. */
+export const HALL_LEDGE_EYE={east:1.3707,north:-10.4668,height:FLOOR_HOUSE+1.65} as const
+/** Half the compass's own height, where the eye is aimed. */
+const COMPASS_MIDDLE_M=.335
+
 /** The flight plaque's stone, and the standing distance its lines read at. */
 export const VINCI_PLAQUE_AT = { east: -40.2, north: -25.5 }
 const PLAQUE = VINCI_PLAQUE_AT
@@ -329,6 +340,20 @@ function otherKinds(): Placed[] {
     if (slug === 'proportional-compass') continue
     add(`machine/${slug}`, 'machine', MACHINE_EYES[slug].station, narrow => machinePose(slug, narrow))
   }
+  // THE HOUSE'S ONE PIECE OF THE COLLECTION, on the hall's own ledge. The eye
+  // stands on the entrance door's clear axis, which is what lets a visitor be
+  // walked INTO the passage at all: an approach is proved against its own two
+  // eyes, and those two are 0.38 m of envelope against the door's 0.50 m of
+  // clear line, where a station pair of the whole wing would need 0.56 m.
+  add('machine/proportional-compass', 'machine', 'hall', narrow =>
+    pose([HALL_LEDGE_EYE.east, HALL_LEDGE_EYE.north, HALL_LEDGE_EYE.height],
+      [hallLedge.stand.east, hallLedge.stand.north, hallLedge.top + COMPASS_MIDDLE_M], 44, narrow))
+  // THE STUDY'S PAGE, on its support below the window the visit was written
+  // under. The eye stands a stride off the board, on the line in from the
+  // station's own eye, and the reading itself opens in the reader.
+  add(VINCI_STUDY_LEAF, 'manuscript', 'study', narrow =>
+    pose([studySupport.eye.east, studySupport.eye.north, studySupport.eye.height],
+      [studySupport.east, studySupport.north, studySupport.top], 46, narrow))
   // The plaque is read square, from the side it turns to the display wall's eye.
   add('plaque/flight-quote', 'place', 'supper-wall', narrow =>
     pose([-38.17, -26.79, COURT.level + 1.62], [PLAQUE.east, PLAQUE.north, COURT.level + .95], 50, narrow))
@@ -456,6 +481,11 @@ export function vinciApproachRunPairs(): readonly { station: VinciStationId; fro
 export function vinciApproachesAreNeighbours(a: string, b: string): boolean {
   return vinciApproachRunPairs().some(pair => (pair.from === a && pair.to === b) || (pair.from === b && pair.to === a))
 }
+
+/** THE ONE PAGE THE STUDY OPENS. Manuscript B 83v, of the fifteen leaves this
+ * museum has admitted, read on the court's support below the study's window.
+ * Nothing ties this page to this room: it is the page the reading opens at. */
+export const VINCI_STUDY_LEAF='leaf/paris-B-83v'
 
 /** The identity the registry joins a mounted plate to. */
 export const vinciPlateExhibitId = exhibitId

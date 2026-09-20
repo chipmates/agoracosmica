@@ -119,6 +119,62 @@ function mineralSurface(kind:'plaster'|'terracotta'):MeshStandardNodeMaterial {
     roughness:source.roughness.value,tile:tileSize,joint:tileJoint})
 }
 
+/** THE HALL'S CONTEMPORARY LEDGE. A plain modern shelf against the wall the
+ * hall lies behind, between the hall's own doorway and the entrance: the one
+ * place in this house where something of the collection stands, and plainly
+ * of our century, not of 1517. Its geometry is part of the passage, so the
+ * clearance certificate is written against it.
+ */
+const LEDGE={along:3.4,length:1.2,depth:.3,thickness:.055,top:.9,bracket:{width:.07,depth:.22,drop:.24}}
+const ledgeWall=wallFor('D')
+const ledgeAxis=(():{point:Point;along:Point;inward:Point}=>{
+  const a=ledgeWall.from.value as Point,b=ledgeWall.to.value as Point
+  const length=Math.hypot(b[0]-a[0],b[1]-a[1])
+  const along:Point=[(b[0]-a[0])/length,(b[1]-a[1])/length]
+  let inward:Point=[along[1],-along[0]]
+  const at=interpolate(a,b,LEDGE.along/length)
+  if((centroid[0]-at[0])*inward[0]+(centroid[1]-at[1])*inward[1]<0)inward=[-inward[0],-inward[1]]
+  // The face of the wall the shelf is fixed to, not its axis.
+  return {point:[at[0]+inward[0]*ledgeWall.thickness_m.value/2,at[1]+inward[1]*ledgeWall.thickness_m.value/2],along,inward}
+})()
+/** Where the shelf stands and what stands on it, for the approach that is
+ * walked to it and for the body the hall mounts on it. */
+export const hallLedge={
+  east:ledgeAxis.point[0]+ledgeAxis.inward[0]*LEDGE.depth/2,
+  north:ledgeAxis.point[1]+ledgeAxis.inward[1]*LEDGE.depth/2,
+  /** the finished top of the shelf, in world height */
+  top:floorZ+LEDGE.top,
+  lengthM:LEDGE.length,depthM:LEDGE.depth,
+  /** the bearing the shelf's own face turns to the room, in degrees */
+  facing:Math.atan2(ledgeAxis.inward[0],ledgeAxis.inward[1])*180/Math.PI,
+  /** where a body standing on it is centred */
+  stand:{
+    east:ledgeAxis.point[0]+ledgeAxis.inward[0]*LEDGE.depth*.55,
+    north:ledgeAxis.point[1]+ledgeAxis.inward[1]*LEDGE.depth*.55,
+  },
+} as const
+
+export const hallLedgeProvenance={
+  manifestId:'vinci/entry-passage/ledge',assetClass:'GENERATED',certainty:'assumed',
+  source:['A-LAYOUT','modern museum fitting'],
+  recipe:'A 1.20 by 0.30 m shelf, 55 mm thick, on two brackets, fixed to the entry passage\u2019s west partition at 0.90 m over the supplied +0.80 m floor. Square, unmoulded and unpainted: a fitting of this museum and of no other century.',
+  recipeDe:'Ein Brett von 1,20 mal 0,30 m, 55 mm stark, auf zwei Konsolen, an der Westwand des Eingangsgangs 0,90 m \u00fcber dem vorgegebenen Boden auf +0,80 m. Rechtwinklig, ohne Profil und ohne Fassung: ein Einbau dieses Museums und keines anderen Jahrhunderts.',
+} as const
+
+function ledgeBody(batch:Batch):void {
+  const {point,along,inward}=ledgeAxis
+  const half=LEDGE.length/2
+  const corner=(u:number,v:number):Point=>[point[0]+along[0]*u+inward[0]*v,point[1]+along[1]*u+inward[1]*v]
+  const top=floorZ+LEDGE.top
+  prism(batch,[corner(-half,0),corner(half,0),corner(half,LEDGE.depth),corner(-half,LEDGE.depth)],top-LEDGE.thickness,top)
+  for(const side of[-1,1]){
+    const u=side*(half-.14)
+    prism(batch,[corner(u-LEDGE.bracket.width/2,0),corner(u+LEDGE.bracket.width/2,0),
+      corner(u+LEDGE.bracket.width/2,LEDGE.bracket.depth),corner(u-LEDGE.bracket.width/2,LEDGE.bracket.depth)],
+    top-LEDGE.thickness-LEDGE.bracket.drop,top-LEDGE.thickness)
+  }
+}
+
 export function createEntryPassage(tier:TierName):Group {
   const plaster=new Batch('plaster'),tile=new Batch('terracotta'),oak=new Batch('oak')
   for(const letter of['B','C','D']){
@@ -135,6 +191,7 @@ export function createEntryPassage(tier:TierName):Group {
     }
     wallPiece(plaster,at(cursor),b,wall.thickness_m.value,floorZ,ceilingZ)
   }
+  ledgeBody(plaster)
   prism(tile,outline,floorZ-slab,floorZ)
   prism(tile,joinOutline,floorZ-slab,floorZ)
   prism(plaster,joinOutline,ceilingZ,upperZ)
