@@ -39,10 +39,9 @@
 .deep-plate[data-stand='glass'] .deep-stand-shows {display:none;}
 
 /* THE WINDOW OWNS THE PHONE'S SCREEN, and the card folds to a peek over its
-   foot: the glass stops where the peek begins, so no part of the work is
-   read through the card, and the sentence at the ceiling stands on the glass
+   foot: the glass stops where the peek begins (the vitrine's own rule for
+   every filling payload), and the sentence at the ceiling stands on the glass
    rather than under it. */
-.vitrine[data-narrow='true'][data-fill='true'] .deep-plate {bottom:var(--vitrine-peek,0px);}
 .vitrine[data-payload='deep-plate'][data-narrow='true'][data-fill='true'] .vitrine-caption
   {bottom:calc(var(--vitrine-peek,0px) + 10px);}
 /* AT THE CEILING THE GROUND UNDER THAT SENTENCE IS THE WORK, and deep in a

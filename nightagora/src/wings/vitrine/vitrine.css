@@ -13,6 +13,11 @@
 .vitrine[data-narrow='true'] .vitrine-sheet {display:block;}
 .vitrine-view {position:fixed;z-index:0;pointer-events:none;}
 .vitrine-payload {position:absolute;inset:0;pointer-events:auto;touch-action:none;outline:none;}
+/* EVERY FILLING PAYLOAD STOPS WHERE THE PEEK BEGINS. A payload that takes the
+   whole phone runs under the card's peeked foot otherwise, and no part of a
+   work may be read through the card. One rule for all of them: each payload
+   then carries only the offset of its own furniture. */
+.vitrine[data-narrow='true'][data-fill='true'] .vitrine-payload {bottom:var(--vitrine-peek,0px);}
 .vitrine-payload:empty {pointer-events:none;}
 .vitrine-payload:focus-visible {outline:1px solid #edcc8c;outline-offset:-3px;}
 .vitrine-caption {position:absolute;left:0;right:0;bottom:4px;margin:0 auto;max-width:640px;padding:8px 14px;
