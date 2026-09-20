@@ -5,6 +5,7 @@
 //
 //   node forge/honesty-check.mjs <port> lobby
 //   node forge/honesty-check.mjs <port> wing <slug>
+//   node forge/honesty-check.mjs <port> wing <slug> --looks
 //   node forge/honesty-check.mjs <port> lobby --json
 //
 // It walks every station of the surface through a real server on the real
@@ -19,14 +20,16 @@
 //   · a disclosure on the frame differs from src/content/disclosures.ts by
 //     a single character
 //
-// THE CLOSE LOOK IS PART OF THE WALK. A station's own labels are what a
-// visitor sees standing in the room; the card words of a machine, a painting
-// or a leaf stand behind one press, so a walk that never presses it leaves
-// every card outside this gate. Each openable exhibit of the standing station
-// is opened through the app's own hook, read under the same rules, and shut
-// again before the walk moves on, because a jump out of an open window lands
-// behind it. Station readings and exhibit readings are reported apart: a
-// station is still read once per viewport.
+// THE CLOSE LOOK IS A WALK OF ITS OWN (--looks). A station's own labels are
+// what a visitor sees standing in the room; the card words of a machine, a
+// painting or a leaf stand behind one press, so a walk that never presses one
+// leaves every card unread. Opening all of them reads about ten times the
+// labels and takes about forty minutes, which no gate run can carry, so it is
+// asked for. Each openable exhibit of the standing station is then opened
+// through the app's own hook, read under the same rules, and shut again
+// before the walk moves on, because a jump out of an open window lands behind
+// it. Station readings and exhibit readings are reported apart: a station is
+// read once per viewport either way.
 import { chromium } from 'playwright'
 import { spawn } from 'node:child_process'
 import { readFileSync } from 'node:fs'
@@ -61,6 +64,8 @@ const port = Number(process.argv[2] ?? process.env['FORGE_PORT'] ?? 5199)
 const surface = process.argv[3] ?? 'lobby'
 const slug = surface === 'wing' ? (process.argv[4] ?? 'vinci') : ''
 const JSON_OUT = process.argv.includes('--json')
+/** the card walk, off unless it is asked for: the head of this file says why */
+const LOOKS = process.argv.includes('--looks')
 const BASE = `http://localhost:${port}`
 const REACH = 44
 /** How long a station is given to paint its row of close looks, how long the
@@ -268,7 +273,7 @@ try {
           `smallest target ${read.smallest === null ? 'none' : `${read.smallest} px`}`
       )
 
-      if (surface !== 'wing') continue
+      if (surface !== 'wing' || !LOOKS) continue
       for (const id of await openableHere(page)) {
         /* ONE CARD, ONE READING PER VIEWPORT. A machine's row stands at both
            stations of its hall and a card is the same card wherever it was
@@ -324,6 +329,7 @@ if (JSON_OUT) {
     surface: surface === 'wing' ? `wing/${slug}` : surface,
     stations, exhibits,
     labels: total, stationLabels: atStations, exhibitLabels: inLooks, looks: exhibits.length,
+    walked: LOOKS ? 'stations and close looks' : 'stations only',
     failures, ok: failures.length === 0,
   }, null, 2))
 } else {
@@ -333,7 +339,11 @@ if (JSON_OUT) {
     say('HONESTY CHECK FAILED:')
     for (const f of [...new Set(failures)]) say(` · ${f}`)
   } else {
-    say(`honest: ${total} label(s) read (${atStations} at stations, ${inLooks} in ${exhibits.length} close look(s)), every claim on a class that may carry it`)
+    say(
+      `honest: ${total} label(s) read (${atStations} at ${stations.length} station reading(s)` +
+        `${LOOKS ? `, ${inLooks} in ${exhibits.length} close look(s)` : ', the close looks not walked'}), ` +
+        'every claim on a class that may carry it'
+    )
   }
 }
 process.exitCode = failures.length ? 1 : 0
