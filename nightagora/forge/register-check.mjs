@@ -321,7 +321,6 @@ function setDrawers(want) {
 /** the lobby's own stations, in the order a visitor meets them */
 const LOBBY = [
   ['agora', 'agora', {}],
-  ['keeper', 'agora', { keeper: 1 }],
   ['wheel', 'wheel', { chapter: 0 }],
   ['pane', 'pane', { slug: 'vinci' }],
 ]
@@ -458,7 +457,7 @@ async function walk() {
               window.__forge.freeze(12.4)
               window.__forge.jump(p, o)
             }, [state, opts])
-            await waitFor(page, name_ === 'keeper' ? 'agora' : state)
+            await waitFor(page, state)
             await page.waitForTimeout(SETTLE_MS)
             await readHere(page, `${lang}/${vp.tag}/${name_}`, lang)
             say(`  ${lang}/${vp.tag}/${name_}`)

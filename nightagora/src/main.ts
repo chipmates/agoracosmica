@@ -1,12 +1,10 @@
 import { PerspectiveCamera, Scene, Vector3 } from 'three/webgpu'
 import { createEclipse, type EclipseState } from './scenes/eclipse'
 import { createAgora } from './scenes/agora'
-import { createKeeper } from './scenes/keeper'
 import { createBreath } from './scenes/breath'
 import { createAtlas, type LabelBounds } from './scenes/atlas'
 import { courtRiseAt, createMandala, CUT, mapScaleAt } from './scenes/mandala'
 import { createHotspots } from './core/hotspots'
-import { fireScript } from './content/keeper-script'
 import { ambience } from './core/ambience'
 import { WANDERERS } from './content/wanderers'
 import { CONSTELLATIONS, SKY_INVITE } from './content/constellations'
@@ -71,7 +69,6 @@ function isForgeState(v: string | null | undefined): v is ForgeState {
 
 const stage = document.getElementById('stage')
 const status = document.getElementById('status')
-const keeper = document.getElementById('keeper')
 const blackout = document.getElementById('blackout')
 const enterDoor = document.getElementById('enter-museum')
 const doorMeasure = document.getElementById('door-measure')
@@ -86,12 +83,11 @@ const chips = document.getElementById('star-chips')
 const pane = document.getElementById('figure-pane')
 const wingHost = document.getElementById('wing')
 if (
-  !stage || !status || !keeper || !blackout || !enterDoor || !doorMeasure ||
+  !stage || !status || !blackout || !enterDoor || !doorMeasure ||
   !descent || !descentSkip || !verse || !voiceDom ||
   !plate || !invite || !marks || !chips || !pane || !wingHost
 )
   throw new Error('missing shell')
-const keeperEl: HTMLElement = keeper
 const blackoutEl: HTMLElement = blackout
 const enterEl: HTMLElement = enterDoor
 const doorMeasureEl: HTMLElement = doorMeasure
@@ -154,12 +150,6 @@ const key = stack.light(KEY_OPTIONS)
 
 const eclipse = createEclipse(scene)
 const agora = createAgora(scene, { key, stack })
-const keeperScene = createKeeper(keeperEl, reducedMotion, () => keeperExit())
-
-/** The keeper's one way onward: he lifts your gaze to the wheel. */
-function keeperExit(): void {
-  if (phase === 'agora') lookTarget = 1
-}
 const breath = createBreath()
 const atlas = createAtlas(scene)
 const mandala = createMandala(scene)
@@ -1105,8 +1095,6 @@ function setLobbyLanguage(language: 'en' | 'de'): void {
   document.documentElement.lang = language
   syncLobbyCopy()
   syncReadWeights()
-  keeperScene.setScript(fireScript())
-  if (document.body.classList.contains('forge')) keeperScene.forgeStage(1)
   const sky = HUB_SPOTS[0]
   if (sky) sky.label = say(LOBBY_TEXT.sky)
   if (phase === 'agora') hotspots.set(HUB_SPOTS)
@@ -1198,7 +1186,6 @@ declare global {
           transit?: number
           skyBirth?: number
           sinceFlash?: number
-          keeper?: number
           chapter?: number
           figure?: string
           /** which wing a `wing` or `pane` state stands in */
@@ -1449,11 +1436,6 @@ window.__forge = {
     // still waiting is shot by navigating to it, never by a jump: a frozen
     // eye would hold that frame for as long as it looked.
     if (p === 'held') fireStands()
-    if (opts.keeper) {
-      keeperEl.hidden = false
-      keeperScene.forgeStage(opts.keeper)
-      verseEl.classList.remove('lit') // the verse is long gone by the exchange
-    }
     if (p === 'breath') breath.forgeStage()
     // Additive shell staging, explicitly allowed by the commission's eyes loop.
     setInstruments(Boolean(opts.shell), false)
@@ -1613,8 +1595,6 @@ function setPhase(next: Phase): void {
     agoraEnteredAt = elapsed
     lookTarget = 0
     lookUp = 0
-    keeperScene.setScript(fireScript())
-    keeperEl.hidden = true
     setStatus('fireStatus')
     verseShow(say(LOBBY_TEXT.fireVerse))
   }
@@ -1900,9 +1880,6 @@ function frame(now: number): void {
     // bounced straight back into the sky (frame-rate dependent; the
     // slow headless eye never saw it)
     if (lookTarget > 0.9 && lookUp > 0.93) setPhase('wheel')
-    if (agoraEnteredAt >= 0 && elapsed - agoraEnteredAt > 0.5) keeperEl.hidden = false
-  } else if (phase !== 'wheel') {
-    keeperEl.hidden = true
   }
 
   // stars are born at totality and burn FULL at the fire (the lobby is
@@ -1948,7 +1925,6 @@ function frame(now: number): void {
   // the wheel of the night: the dome carries the six houses around the
   // visitor; the camera only breathes toward the focused elevation
   if (phase === 'wheel') {
-    keeperEl.hidden = true
     camera.rotation.y += (0 - camera.rotation.y) * Math.min(1, dt * 2)
     camera.rotation.x +=
       (atlas.currentElevation() - camera.rotation.x) * Math.min(1, dt * 2.2)
@@ -1959,7 +1935,6 @@ function frame(now: number): void {
   atlas.update(dt, elapsed, camera.aspect, atlasReveal)
   syncChips()
 
-  keeperScene.update(dt)
   ambience.update(dt)
   /* THE COURT IS PUT UP INSIDE THE BLACK BREATH. Every material of the room
      builds its shader and its pipeline in the frame that first draws it, and
@@ -1978,7 +1953,6 @@ function frame(now: number): void {
   agora.update({
     reveal: agoraReveal,
     elapsed,
-    speak: keeperScene.speak(),
     // looking up, the court is scenery and its air belongs to the room
     // below: the sky phase keeps the colonnade and gives back the sparks
     air: phase === 'wheel' || phase === 'breath' ? 0 : 1,

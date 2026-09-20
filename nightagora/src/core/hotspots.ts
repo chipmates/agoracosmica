@@ -11,9 +11,9 @@
    · ONE point may beckon: the first unopened point of this stretch, and only
      until it has been opened. The call is a ring that opens and dissolves
      three times, then rests. Nothing bounces.
-   · the letterpress belongs to the keeper first. A name that would fall
-     across his voice steps to the other side, then goes silent, and a bead
-     that would sit on his words is struck.
+   · the letterpress belongs to the standing line first. A name that would
+     fall across it steps to the other side, then goes silent, and a bead
+     that would sit on those words is struck.
    · two marks that crowd each other do not fight: the nearer keeps its name,
      the further keeps its bead, and a name hushed by the crowd comes back
      the moment a hand reaches for it.
@@ -304,20 +304,18 @@ const hits = (a: Rect, b: Rect, pad = 0): boolean =>
 const inside = (x: number, y: number, r: Rect, pad = 0): boolean =>
   x > r.l - pad && x < r.r + pad && y > r.t - pad && y < r.b + pad
 
-/** every text-bearing part of the keeper's voice, by TAG and not by class:
-    his letterpress is built in two places and a class list goes stale the
-    moment one of them gains a line (round 5: the station under his name was
-    a class this file had never heard of, and every mark walked over it) */
-const VOICE_SEL = '#keeper p, #keeper button, #keeper label'
+/** the standing line at the fire. Read by id and not by class, so a line
+    that changes its dress is still the line the marks must keep clear of */
+const VOICE_SEL = '#verse'
 
-/** a line that is laid out is not a line that is READ: the keeper's offers
-    sit in the flow at zero opacity long before he makes them.
+/** a line that is laid out is not a line that is READ: a line can sit in
+    the flow at zero opacity long before it is said.
 
     The test is opacity ZERO, not opacity FAINT, and that distinction is the
     whole point: a line resting at 0 is not there, but a line at 0.02 is a
     line ARRIVING, and the marks have to have moved out of its way before it
-    lands (round 5: his voice fades in over 1.4s, and every mark sat happily
-    on top of it for the whole fade). */
+    lands (round 5: a voice fading in over 1.4s had every mark sitting
+    happily on top of it for the whole fade). */
 function painted(node: Element): boolean {
   let el: Element | null = node
   for (let up = 0; up < 5 && el; up++) {
@@ -464,7 +462,7 @@ export function createHotspots(container: HTMLElement): HotspotsHandles {
   }
 
   /** ONE LINE, NOT ONE BOX. A block of centred letterpress is mostly empty
-      air at its flanks, and a bounding box over the keeper's voice made the
+      air at its flanks, and a bounding box over a spoken line made the
       whole left half of a phone a no-go zone. Ranges give the boxes the
       GLYPHS actually occupy, which is what the law was always about. */
   function addLines(el: Element): void {
@@ -503,10 +501,7 @@ export function createHotspots(container: HTMLElement): HotspotsHandles {
       Read at the head of the frame, before a single style is written. */
   function readVoice(): void {
     lineN = 0
-    const keeper = document.getElementById('keeper')
-    if (keeper && !keeper.hidden) {
-      for (const node of document.querySelectorAll(VOICE_SEL)) addLines(node)
-    }
+    for (const node of document.querySelectorAll(VOICE_SEL)) addLines(node)
     const trace = document.getElementById('trace-card')
     if (trace && !trace.hidden) addLines(trace)
     const brand = document.querySelector('.brand')
@@ -705,8 +700,8 @@ export function createHotspots(container: HTMLElement): HotspotsHandles {
           : p.y > H - EDGE_BOTTOM - NAME_GAP - NAME_H ? ['above', 'below', 'right', 'left']
           : ['below', 'above', 'right', 'left']
         // the side it took last frame is tried first and judged closer, so a
-        // name does not hop across its own bead every time the keeper draws
-        // breath and his lines shift a pixel
+        // name does not hop across its own bead every time the standing
+        // line shifts a pixel
         for (let c = -1; c < order.length; c++) {
           const side = c < 0 ? p.spot.side : order[c]
           if (!side || (c >= 0 && side === p.spot.side)) continue

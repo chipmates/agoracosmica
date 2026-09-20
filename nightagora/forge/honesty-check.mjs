@@ -59,9 +59,6 @@ const MAY_TESTIFY = new Set(['CAPTURED', 'PD-ART', 'procedural'])
 /** the lobby's own stations, in the order a visitor meets them */
 const LOBBY = [
   ['agora', 'agora', {}],
-  // the keeper's line is the voice disclosure and it is only on the frame
-  // while he is speaking, so the walk stands in front of him on purpose
-  ['keeper', 'agora', { keeper: 1 }],
   ['wheel', 'wheel', { chapter: 0 }],
   ['pane', 'pane', { slug: 'vinci' }],
 ]
