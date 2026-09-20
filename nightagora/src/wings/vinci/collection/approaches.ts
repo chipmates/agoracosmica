@@ -14,9 +14,9 @@ import { Vector3 } from 'three/webgpu'
 import { world } from '../site'
 import type { VinciStationId } from '../content'
 import { GRAVE_DEATHBED, GRAVE_FRAME, GRAVE_SLAB } from '../grave/placement'
-import { LINE_STUDS, lineCutStuds } from '../line/studs'
+import { LINE_STUDS } from '../line/studs'
 import { hangPlacements } from './hang'
-import { COURT, FACE, FLOOR, GRAVE_ORIGIN, LINE_ORIGIN, OPENING, SUPPER_WALL } from './layout'
+import { COURT, FLOOR, GRAVE_ORIGIN, OPENING, SUPPER_WALL } from './layout'
 import { STANDS, standLevel } from './stands'
 import { dossiers, MACHINE_SLUGS, type MachineSlug } from '../machines/catalog'
 
@@ -254,8 +254,8 @@ function machinePose(slug: keyof typeof MACHINE_EYES, narrow: boolean): Approach
   return pose([eye.east, eye.north, level + 1.62], [stand.east, stand.north, aim], fov, narrow)
 }
 
-/** The one station the gallery's cut line is read and walked from. */
-const LINE_STATION: VinciStationId = 'line-early'
+/** The one station the gallery's cut line is read from. */
+export const VINCI_LINE_STATION: VinciStationId = 'line-early'
 /** The book lies open on the table under its lamp, read from the chair side.
  *
  * THE TABLE STANDS CENTRED ON ITS OWN PANEL, and the panel is what fixes the
@@ -312,23 +312,10 @@ function otherKinds(): Placed[] {
   // 0.77, which is the difference between reading a page and seeing one.
   add('codex/paris-B', 'manuscript', 'reading-table', narrow =>
     pose([READING_TABLE.east + .60, READING_TABLE.north, READING_TABLE.top + .741], [READING_TABLE.east, READING_TABLE.north, READING_TABLE.top + .031], 44, narrow))
-  // A DATE IS READ FROM ITS SOUTH, where its numerals stand upright, looking
-  // down at the socket from a stride and a half.
-  for (const stud of lineCutStuds(LINE_ORIGIN)) {
-    // THE DATE AND ITS NUMERALS STAND CLEAR OF THE CARD: the year is cut east
-    // of its socket, so the eye stands east of both and they read on the open
-    // side of the frame.
-    const east = stud.east + .75
-    // The last date lies close to the gallery's south cross wall, so its eye
-    // stands as far back as the wall leaves and looks more steeply down.
-    const back = Math.min(1.5, stud.north - (FACE.southStripNorth + .6))
-    // THE GALLERY READS ITS WHOLE LINE FROM ONE STATION. The sections the
-    // bench cut its excerpts in are still how the floor lays the twelve
-    // sockets, so the data keeps them and every approach leaves from the one
-    // station that now stands at the head of the line.
-    add(`stud/${stud.id}`, 'stud', LINE_STATION, narrow =>
-      pose([east, stud.north - back, FLOOR + 1.62], [east, stud.north, FLOOR + .01], 50, narrow))
-  }
+  // A DATE CARRIES NO LEG OF ITS OWN. The gallery reads its whole line from
+  // one station and a press on a socket opens the life view at that date, so
+  // the twelve viewing eyes the excerpt stations once walked to stood in the
+  // certificate with nothing to reach them.
   return placed
 }
 let others: Placed[] | undefined

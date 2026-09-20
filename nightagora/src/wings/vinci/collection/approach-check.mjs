@@ -98,8 +98,8 @@ assert.equal(certificate.format, 'vinci-rail-clearance-v2')
 const records = vinciExhibitRecords()
 const kinds = {}
 for (const record of records) kinds[record.kind] = (kinds[record.kind] ?? 0) + 1
-assert.equal(JSON.stringify(kinds), JSON.stringify({ picture: 26, mural: 1, machine: 13, place: 3, manuscript: 1, stud: 12 }),
-  'the hang, the Ingres, the mural, thirteen machines, three places, the book and twelve dates')
+assert.equal(JSON.stringify(kinds), JSON.stringify({ picture: 26, mural: 1, machine: 13, place: 3, manuscript: 1 }),
+  'the hang, the Ingres, the mural, thirteen machines, three places and the book')
 assert.equal(new Set(records.map(record => record.id)).size, records.length, 'an exhibit is declared once')
 assert.equal(certificate.approaches.length, records.length * 2)
 const hang = records.filter(record => record.station === 'picture-room')
@@ -278,7 +278,9 @@ const { LINE_ORIGIN } = load('src/wings/vinci/collection/layout.ts')
 assert.equal(JSON.stringify(floor.collectionLineStuds.map(stud => [stud.id, stud.station, stud.east, stud.north])),
   JSON.stringify(studs.lineCutStuds(LINE_ORIGIN).map(stud => [stud.id, stud.station, stud.east, stud.north])),
   'the floor lays its dates where the poses look for them')
-for (const stud of floor.collectionLineStuds) assert.ok(records.some(record => record.id === `stud/${stud.id}`), `no pose for ${stud.id}`)
+// A date is read from the one station that stands at the line's head, so no
+// socket carries a certified leg and none may stand in the approach table.
+for (const stud of floor.collectionLineStuds) assert.ok(!records.some(record => record.id === `stud/${stud.id}`), `a dead leg for ${stud.id}`)
 // The plaque's stone and the reading table, read off the modules that stand them.
 const plaque = /COURT_PLAQUE_STAND = \{ east: (-?[\d.]+), north: (-?[\d.]+)/.exec(source('src/wings/vinci/collection/court-plaque.ts'))
 assert.ok(plaque && +plaque[1] === VINCI_PLAQUE_AT.east && +plaque[2] === VINCI_PLAQUE_AT.north, 'the plaque stands where its pose looks')

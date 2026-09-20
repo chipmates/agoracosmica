@@ -13,7 +13,7 @@
  */
 import { Box3, Mesh, Raycaster, Sphere, Vector3, type Object3D } from 'three/webgpu'
 import type { VinciStationId } from '../content'
-import { LINE_FLOOR_PICK, vinciApproachPose, vinciApproachStation, vinciPlateExhibitId, type VinciExhibitKind } from './approaches'
+import { LINE_FLOOR_PICK, VINCI_LINE_STATION, vinciApproachPose, vinciApproachStation, vinciPlateExhibitId, type VinciExhibitKind } from './approaches'
 import { BODY_WALL } from './body-wall'
 import { hangPlacements } from './hang'
 import { STANDS } from './stands'
@@ -174,7 +174,10 @@ export function readVinciExhibits(root: Object3D): VinciPickEntry[] {
       for (const [index, stud] of studs.entries()) {
         const id = `stud/${stud.id}`
         const centre = new Vector3(stud.east, level, -stud.north)
-        entries.push(place(id, 'stud', object, centre, STUD_PROXY_M, centre.clone().setY(level + STUD_MARK_M), index))
+        // A date is read from the station the visitor is already standing on,
+        // so it opens on its own account and carries no certified leg.
+        entries.push({ ...place(id, 'stud', object, centre, STUD_PROXY_M, centre.clone().setY(level + STUD_MARK_M), index),
+          station: VINCI_LINE_STATION, openable: true })
       }
       /* THE FLOOR IS ONE SELECTABLE THING. The twelve sockets are one run of
          eighteen metres read from one station, so the line itself takes a
@@ -188,7 +191,7 @@ export function readVinciExhibits(root: Object3D): VinciPickEntry[] {
         entries.push({ ...place(LINE_FLOOR_PICK, 'stud', object, middle, FLOOR_PROXY_M,
           middle.clone().setY(level + STUD_MARK_M), studs.length),
           // the field is the station's own ground, and the station is its approach
-          station: vinciApproachStation(`stud/${first.id}`) ?? null, openable: true })
+          station: VINCI_LINE_STATION, openable: true })
       }
     } else if (object.name === TABLE_OBJECT) {
       // THE BOOK, NOT THE ROOM THE TABLE BRINGS: the open leaf is the exhibit,
