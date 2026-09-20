@@ -199,8 +199,12 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
   const stoneJoint = line(along, .92, 0, .004, alongPixel)
   const stoneCell = hashOf(floor(along.div(.92)).add(floor(P.y.div(.17)).mul(3.17)), 11.73)
     .mul(resolved(.92, alongPixel)).toVar()
-  // The ceiling is coffered on the structure's own four-metre bay.
+  // The ceiling is coffered on the structure's own four-metre bay, and each
+  // bay was floated on its own day: the panel between two ribs is the unit a
+  // plasterer worked, so it is the unit that varies.
   const bayNorth = line(P.z, 4, 0, .02, pixelNorth), bayEast = line(P.x, 4, 2, .02, pixelEast)
+  const bayCell = hashOf(floor(P.x.sub(2).div(4)).add(floor(P.z.div(4)).mul(9.13)), 7.19)
+    .mul(resolved(4, pixelEast.max(pixelNorth))).toVar()
   // ONE DIRECTIONAL READ FOR THE WHOLE MESH. A float sweep, a saw mark, a
   // brush and a rain wash are the same anisotropic field turned and sized by
   // the part, so they cost one tap between them instead of one each.
@@ -234,10 +238,10 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
   // A DENSITY GRADIENT, NOT A UNIFORM FIELD. How mottled a surface is varies
   // stone by stone, which is the one gradient a laid floor really carries.
   const cell = isFloor.select(slabCell, isPlaster.select(boardCell, isDark.select(stoneCell,
-    isSteel.select(float(0), isCeiling.select(float(0), slabCell))))).toVar()
+    isSteel.select(float(0), isCeiling.select(bayCell, slabCell))))).toVar()
   const density = float(1).add(cell.mul(.5)).clamp(.3, 1.6)
   const figure = detail.tone.sub(1).mul(byRole([1, 1, 1.5, .45, .95, 1.15])).mul(density)
-    .add(cell.mul(byRole([.15, .085, .13, 0, 0, .17])))
+    .add(cell.mul(byRole([.15, .085, .13, 0, .07, .2])))
     .add(lap.mul(byRole([.1, .125, .17, .05, .1, .13])).mul(density))
     .add(drift.mul(byRole([.075, .09, .1, .03, .07, .1])))
     .add(stroke.mul(byRole([.05, .13, .26, .06, .13, .09])))
@@ -261,7 +265,7 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
   const relief = detail.heightM.mul(byRole([.45, .4, 2.1, .25, .38, .7])).toVar()
   const height = isFloor.select(relief.add(slabJoint.mul(-.0022)),
     isPlaster.select(relief.add(stroke.mul(.0006)).add(lap.mul(.0011)).add(boardJoint.mul(-.0012)),
-      isCeiling.select(relief.add(stroke.mul(.0005)).add(lap.mul(.0008)).add(bayNorth.max(bayEast).mul(-.004)),
+      isCeiling.select(relief.add(stroke.mul(.0005)).add(lap.mul(.0009)).add(bayNorth.max(bayEast).mul(-.004)),
         isDark.select(relief.add(stroke.mul(.0022)).add(stoneJoint.mul(-.0018)),
           isOutdoor.select(relief.add(slabJoint.mul(-.0024)), relief))))).toVar()
   m.normalNode = reliefNormal(n.transformDirection(cameraViewMatrix), height, .2)
