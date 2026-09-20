@@ -75,6 +75,12 @@
   .vitrine-caption {font-size:13px;padding:6px 10px;}
   .vitrine-payload-controls {position:static;flex:0 0 auto;padding:8px 0 0;justify-content:stretch;}
   .vitrine-payload-controls .vitrine-control {flex:1 1 0;background:transparent;}
+  /* A DETAIL IS NAMED IN A SENTENCE, not in a word. Sharing the row with the
+     three that fit the plate, a German name stacks to three lines in an 82 px
+     column; on its own line it is one. The plate's own controls come first,
+     so what follows them is a name that points. */
+  .vitrine[data-payload='deep-plate'] .vitrine-payload-controls > .vitrine-control:nth-child(n+4)
+    {flex:1 0 100%;}
 }
 
 /* THE WINDOW OWNS THE PHONE. While a close look stands on a narrow stage the
