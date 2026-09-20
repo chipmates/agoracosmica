@@ -117,6 +117,33 @@ export function collectionPlateTone(): TSLNode {
   return P.z.lessThan(-FACE.glazingNorth).select(float(1), room)
 }
 
+/** WHERE THE ROOMS ARE WALKED, and where a hand rests. Wear is not a noise
+ * field: a floor is polished where feet actually cross it, which on this
+ * ground is the four doors the rail walks through and the one line each room
+ * is walked along. Both terms are 0 to 1 read in plan, so the caller decides
+ * which faces may carry them. */
+function trafficLine(P: TSLNode): { feet: TSLNode; doors: TSLNode } {
+  const { smoothstep, vec2 } = TSL
+  // The wing counts north where the world counts negative z.
+  const pool = (east: number, north: number, radius: number): TSLNode =>
+    smoothstep(radius, 0, vec2(P.x.sub(east), P.z.add(north)).length())
+  const band = (value: TSLNode, at: number, half: number): TSLNode =>
+    smoothstep(half, 0, value.sub(at).abs())
+  const between = (value: TSLNode, from: number, to: number): TSLNode =>
+    smoothstep(from - .7, from + .7, value).mul(smoothstep(to + .7, to - .7, value))
+  const doors = pool(-61.08, -41.8, 2.1).max(pool(-23.09, -41.8, 2.1))
+    .max(pool(-38.9, -43.12, 2.1)).max(pool(-38.9, -62.93, 2.1)).toVar()
+  // The hang is read walking the room's length, the sheets walking beside
+  // the line let into the gallery's floor, the machines down one aisle, and
+  // the court is crossed between its own two exhibits.
+  const picture = band(P.z, 38.6, 2).mul(between(P.x, -61.66, -22.07)).mul(between(P.z, 34.07, 41.8))
+  const gallery = band(P.x, -36.9, 1.6).mul(between(P.z, 42.04, 63.66))
+  const inHall = between(P.x, -61.66, -39.02).mul(between(P.z, 42.04, 63.66)).toVar()
+  const aisle = band(P.z, 46.3, 2.6).max(band(P.x, -41.3, 1.8).mul(between(P.z, 46.3, 62.93))).mul(inHall)
+  const court = band(P.z, 27.6, 2.2).mul(between(P.x, -59.5, -30.5))
+  return { feet: doors.max(picture).max(gallery).max(aisle).max(court).toVar(), doors }
+}
+
 /** One material for every welded room surface. The role attribute decides
  * which stone it is; the three scales and the daylight are shared. */
 export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
@@ -239,35 +266,56 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
   // stone by stone, which is the one gradient a laid floor really carries.
   const cell = isFloor.select(slabCell, isPlaster.select(boardCell, isDark.select(stoneCell,
     isSteel.select(float(0), isCeiling.select(bayCell, slabCell))))).toVar()
-  const density = float(1).add(cell.mul(.5)).clamp(.3, 1.6)
+  // WEAR WHERE FEET AND HANDS GO. A floor is polished on its walk and left
+  // alone under the wall, so the grain goes first, the joint silts up and the
+  // mottle quietens; the stone's own cell breaks the line so no edge of it is
+  // ever a clean gradient. A jamb takes the same at the height of a hand.
+  const traffic = trafficLine(P)
+  const walked = traffic.feet.mul(n.y.max(0)).mul(byRole([1, 0, 0, 0, 0, 1]))
+    .mul(float(.7).add(cell.mul(.9))).clamp(0, 1).toVar()
+  // The walk itself is swept and polished; the grime collects at its edges,
+  // which is why the two terms together move the exposure by nothing.
+  const grime = walked.mul(walked.oneMinus()).mul(4).clamp(0, 1).toVar()
+  const handled = traffic.doors.mul(smoothstep(.44, 0, P.y.sub(FLOOR + 1.02).abs()))
+    .mul(n.y.abs().oneMinus().max(0)).mul(byRole([0, .55, 1, .8, 0, 0])).toVar()
+  const density = float(1).add(cell.mul(.5)).sub(walked.mul(.4)).clamp(.3, 1.6)
   const figure = detail.tone.sub(1).mul(byRole([1, 1, 1.5, .45, .95, 1.15])).mul(density)
-    .add(cell.mul(byRole([.15, .085, .13, 0, .07, .2])))
-    .add(lap.mul(byRole([.1, .125, .17, .05, .1, .13])).mul(density))
-    .add(drift.mul(byRole([.075, .09, .1, .03, .07, .1])))
+    .add(cell.mul(byRole([.34, .085, .13, 0, .07, .34])))
+    .add(lap.mul(byRole([.16, .125, .17, .05, .1, .17])).mul(density))
+    .add(drift.mul(byRole([.12, .09, .1, .03, .07, .13])))
     .add(stroke.mul(byRole([.05, .13, .26, .06, .13, .09])))
-  const cut = isFloor.select(slabJoint.mul(.34),
+  const silted = walked.mul(.34).oneMinus()
+  const cut = isFloor.select(slabJoint.mul(.34).mul(silted),
     isPlaster.select(boardJoint.mul(.16),
       isCeiling.select(bayNorth.max(bayEast).mul(.16),
-        isDark.select(stoneJoint.mul(.2), isOutdoor.select(slabJoint.mul(.24), float(0))))))
+        isDark.select(stoneJoint.mul(.2), isOutdoor.select(slabJoint.mul(.24).mul(silted), float(0))))))
   // ONE ALBEDO FOR BOTH CHANNELS. The fittings' wash was re-emitting the flat
   // palette colour beside the figured albedo, so on every surface a fitting
   // reaches, a share of the pixel carried no material at all and the figure
   // read at a fraction of the contrast it was authored at. The wash itself is
   // untouched: what a lamp puts on a stone is still the stone.
-  const albedo = base.mul(figure.add(1)).mul(float(1).sub(cut)).toVar()
+  const albedo = base.mul(figure.add(1)).mul(float(1).sub(cut))
+    .mul(float(1).add(walked.mul(.08)).sub(grime.mul(.13)).sub(handled.mul(.035))).toVar()
   m.colorNode = albedo
-  m.roughnessNode = isSteel.select(float(.42).add(stroke.mul(.09)),
-    isFloor.select(float(.62).add(detail.rough).add(slabJoint.mul(.15)),
-      float(.88).add(detail.rough))).clamp(.30, .97)
+  m.roughnessNode = isSteel.select(float(.42).add(stroke.mul(.09)).sub(handled.mul(.06)),
+    // STONE TO STONE IN THE SHEEN, not only in the tone. These rooms are lit
+    // almost wholly by an indirect term, where a change of albedo is worth two
+    // or three levels and a change of gloss is worth the whole grazing
+    // highlight: which slab catches the north light is what reads as stone.
+    isFloor.select(float(.62).add(detail.rough).add(cell.mul(.16)).add(lap.mul(.06))
+      .add(slabJoint.mul(.15)).sub(walked.mul(.22)).add(grime.mul(.07)),
+      isOutdoor.select(float(.88).add(detail.rough).add(cell.mul(.14)).add(lap.mul(.05)).sub(walked.mul(.18)),
+        float(.88).add(detail.rough).add(cell.mul(.1)).add(lap.mul(.05)).sub(handled.mul(.09))))).clamp(.30, .97)
   m.metalnessNode = isSteel.select(float(.72), float(.02))
   // A sawn slab keeps a shallow relief of its own; at the room's drift it had
   // none, so nothing on it ever caught a raking light.
   const relief = detail.heightM.mul(byRole([.45, .4, 2.1, .25, .38, .7])).toVar()
-  const height = isFloor.select(relief.add(slabJoint.mul(-.0022)),
+  const worn = walked.mul(.5).oneMinus()
+  const height = isFloor.select(relief.mul(worn).add(slabJoint.mul(-.0022)),
     isPlaster.select(relief.add(stroke.mul(.0006)).add(lap.mul(.0011)).add(boardJoint.mul(-.0012)),
       isCeiling.select(relief.add(stroke.mul(.0005)).add(lap.mul(.0009)).add(bayNorth.max(bayEast).mul(-.004)),
         isDark.select(relief.add(stroke.mul(.0022)).add(stoneJoint.mul(-.0018)),
-          isOutdoor.select(relief.add(slabJoint.mul(-.0024)), relief))))).toVar()
+          isOutdoor.select(relief.mul(worn).add(slabJoint.mul(-.0024)), relief))))).toVar()
   m.normalNode = reliefNormal(n.transformDirection(cameraViewMatrix), height, .2)
   const daylight = interiorDaylight(P, n)
   m.aoNode = isOutdoor.select(float(1), daylight.mul(1.55).add(.10).clamp(.10, 1))
