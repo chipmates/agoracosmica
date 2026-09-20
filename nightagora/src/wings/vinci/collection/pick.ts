@@ -13,6 +13,7 @@
  */
 import { Box3, Mesh, Raycaster, Sphere, Vector3, type Object3D } from 'three/webgpu'
 import type { VinciStationId } from '../content'
+import { HOUSE_CLOSE_LOOKS } from '../rail'
 import { LINE_FLOOR_PICK, VINCI_LINE_STATION, vinciApproachPose, vinciApproachStation, vinciPlateExhibitId, type VinciExhibitKind } from './approaches'
 import { vinciWallOrderOf } from './wall'
 import { hangPlacements } from './hang'
@@ -244,6 +245,27 @@ export function readVinciExhibits(root: Object3D): VinciPickEntry[] {
       openable: placed.station !== null, workId: null, face: null })
   }
   return entries
+}
+
+/** THE HOUSE'S CLOSE LOOKS, REGISTERED BESIDE THE EXHIBITS. An architecture
+ * close look carries no body a ray can hit and no approach of its own: it is a
+ * composition the rail already stands, read from the station it belongs to. It
+ * is registered here so one window can reach the exhibits and these together,
+ * and it is inert until that window opens it.
+ */
+export interface VinciAuthoredView {
+  /** the pick id a window addresses it by */
+  id: string
+  /** the named pose `rail.ts` stands at both viewports */
+  view: string
+  station: VinciStationId
+}
+export function readVinciAuthoredViews(): VinciAuthoredView[] {
+  const views: VinciAuthoredView[] = []
+  for (const [station, named] of Object.entries(HOUSE_CLOSE_LOOKS)) {
+    for (const view of named ?? []) views.push({ id: `view/${view}`, view, station: station as VinciStationId })
+  }
+  return views
 }
 
 /** ONE RAY ON A PRESS, never on a hover, and never through a wall: the hit is
