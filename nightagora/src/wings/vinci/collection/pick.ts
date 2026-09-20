@@ -14,7 +14,7 @@
 import { Box3, Mesh, Raycaster, Sphere, Vector3, type Object3D } from 'three/webgpu'
 import type { VinciStationId } from '../content'
 import { LINE_FLOOR_PICK, VINCI_LINE_STATION, vinciApproachPose, vinciApproachStation, vinciPlateExhibitId, type VinciExhibitKind } from './approaches'
-import { BODY_WALL } from './body-wall'
+import { vinciWallOrderOf } from './wall'
 import { hangPlacements } from './hang'
 import { STANDS } from './stands'
 
@@ -67,8 +67,10 @@ function placedAt(kind: VinciExhibitKind, id: string, workId: string | null, she
     return { station: at < 0 ? null : 'picture-room', order: Math.max(0, at) }
   }
   if (kind === 'sheet') {
-    const at = BODY_WALL.findIndex(entry => entry.id === sheet)
-    return { station: at < 0 ? null : 'body', order: Math.max(0, at) }
+    // The row reads as the wall is walked, which on a grid of courses is not
+    // the register's own order.
+    const at = sheet === null ? undefined : vinciWallOrderOf(`sheet/${sheet}`)
+    return { station: at === undefined ? null : 'body', order: at ?? 0 }
   }
   if (kind === 'machine' && slug !== undefined) {
     const table = Object.keys(STANDS), at = table.indexOf(slug)

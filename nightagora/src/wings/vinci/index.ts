@@ -75,7 +75,7 @@ import { createVinciWholePlate, isWholePlate, vinciPlateDescription } from './co
 import type { VitrineRect } from '../vitrine'
 import { machineBuildOf } from './machines'
 import { createVinciHangStrip, vinciSheetTitle, type VinciStripEntry } from './collection/strip'
-import { vinciWallEndVertex, vinciWallNearerEnd, vinciWallStops, vinciWallVertex, VINCI_WALL_ENDS } from './collection/wall'
+import { vinciWallById, vinciWallIsEnd, vinciWallOrderOf, vinciWallNearerEnd, vinciWallOfExhibit, vinciWallOfStation, vinciWallStops, vinciWallVertex, VINCI_WALL_ENDS, type VinciWall } from './collection/wall'
 import { pathSpecifications } from './paths'
 import { roadGradeProvenance } from './road-grade'
 import { apronProvenance } from './apron'
@@ -481,7 +481,9 @@ export function createWing():VinciWingModule {
         // for instead of returning to a station between two neighbours. It
         // runs at every tier and on the phone: the wall is what the room is,
         // and the run carries one plate request, for the stop it lands on.
-        if(!isWholePlate(id)&&!isLeafDoor(id)&&wallRun(id))return true
+        // A sheet opens in the reader, and the reader's id carries the leaf
+        // door: the run is asked for with the stop's own id under it.
+        if(!isWholePlate(id)&&wallRun(isLeafDoor(id)?id.slice(0,-LEAF_DOOR.length):id))return true
         // THE WHOLE PLATE IS THE SAME PLACE: the visitor already stands where
         // the work hangs, so the eye neither walks out to it nor back from it.
         if(isWholePlate(id)||isWholePlate(from)||isLeafDoor(id)||isLeafDoor(from))return false
@@ -565,8 +567,8 @@ export function createWing():VinciWingModule {
         const step=e.key==='ArrowRight'||(onWallStop()&&e.key==='ArrowDown')?1
           :e.key==='ArrowLeft'||(onWallStop()&&e.key==='ArrowUp')?-1:0
         if(step){e.preventDefault();stepWall(step);return}
-        const stops=vinciWallStops()
-        if(e.key==='Home'||e.key==='End'){e.preventDefault();wallRun(stops[e.key==='Home'?0:stops.length-1]!.exhibit);return}
+        const stops=wallRow()
+        if((e.key==='Home'||e.key==='End')&&stops.length){e.preventDefault();wallRun(stops[e.key==='Home'?0:stops.length-1]!.exhibit);return}
       }
       if(e.key==='ArrowRight'||e.key==='ArrowDown'){e.preventDefault();h.navigate(station+1)}
       if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();h.navigate(station-1)}
@@ -1042,8 +1044,8 @@ export function createWing():VinciWingModule {
     // THREE MARKS AT A STOP, AND WHICH THREE: this work and its two
     // neighbours. Standing in front of one painting, what a hand wants is the
     // one it is looking at and the two it can step to.
-    const at=wallAt(), stops=vinciWallStops()
-    if(at!==undefined&&at>0&&at<=stops.length){
+    const at=wallAt(), stops=wallRow()
+    if(onWallStop()&&at!==undefined&&at>0&&at<=stops.length){
       const near=new Set([stops[at-2]?.exhibit,stops[at-1]!.exhibit,stops[at]?.exhibit].filter(Boolean) as string[])
       dots?.setExhibits(marks.filter(entry=>near.has(entry.id)))
       return
@@ -1055,18 +1057,28 @@ export function createWing():VinciWingModule {
    * card, with the marks and while a leg is under way. */
   function paintQuietLabel():void {
     if(!quiet||!quietName||!quietYear||!quietDot||!hosts)return
-    const at=wallAt(), stops=vinciWallStops()
-    const stop=at!==undefined&&at>0&&at<=stops.length?stops[at-1]:undefined
+    const at=wallAt(), stops=wallRow()
+    const stop=onWallStop()&&at!==undefined&&at>0&&at<=stops.length?stops[at-1]:undefined
     const pick=stop?picks.find(entry=>entry.id===stop.exhibit):undefined
     const sources=stop?exhibits?.pictureSources()??[]:[]
     const found=stop?sources.find(source=>source.work.id===stop.workId&&source.entry.face===stop.face):undefined
-    const rect=pick&&found&&!closeLook?.id&&mode!==0&&!activeView?workRect(pick.object):null
+    // A SHEET CARRIES ONE LINE, NOT TWO. The register gives a drawing its
+    // holder's own words and no dated title, so the year line stands down.
+    const sheet=stop&&!found?exhibits?.sheetSources().find(source=>`sheet/${source.sheet.id}`===stop.exhibit):undefined
+    const rect=pick&&(found||sheet)&&!closeLook?.id&&mode!==0&&!activeView?workRect(pick.object):null
     quiet.hidden=!rect
-    if(!rect||!found)return
+    if(!rect)return
+    if(sheet&&!found){
+      quietName.textContent=vinciSheetTitle(lang()==='de'?sheet.page.honesty_de:sheet.page.honesty_en)
+      quietYear.textContent=''
+      quietDot.style.setProperty('--certainty',certaintyColour('documented'))
+    }else{
+    if(!found)return
     const entries=sources.filter(source=>source.work.id===found.work.id).map(source=>source.entry)
     quietName.textContent=lang()==='de'?found.work.title_de:found.work.title_en
     quietYear.textContent=lang()==='de'?found.work.date_label_de:found.work.date_label_en
     quietDot.style.setProperty('--certainty',policyLabelText(found.work,entries).colour)
+    }
     // THE NAME NEVER STANDS IN THE ROW. A work at its own viewing eye fills
     // the frame to the foot, so the label takes the last clear band above the
     // wall's own instrument instead of standing behind it.
@@ -1081,10 +1093,10 @@ export function createWing():VinciWingModule {
     if(!strip||!hosts||!standing)return
     strip.setEntries(stationExhibits(),text(vinciContent[card]!.name))
     const open=closeLook?.id??null
-    const stops=vinciWallStops(), at=wallAt()
+    const stops=wallRow(), at=wallAt()
     // ON A WALL THE ROW IS THE WALL'S INSTRUMENT: it says where along the hang
     // the eye stands and carries the way back to the end it came in by.
-    strip.setWall(at===undefined?null:{place:at>0&&at<=stops.length?at:0,total:stops.length,whole:()=>wholeWall()})
+    strip.setWall(at===undefined||!stops.length?null:{place:onWallStop()&&at<=stops.length?at:0,total:stops.length,whole:()=>wholeWall()})
     strip.setHidden(mode===2||(narrow()&&Boolean(open)))
     // THE ROW NEVER STANDS OVER A WORK. On the wide stage it runs along the
     // foot of the frame above the bar, which is where a row of twenty five
@@ -1100,7 +1112,9 @@ export function createWing():VinciWingModule {
    * rail runs off the wall at its nearer end first, which is the line it is
    * certified on, and the walk to the east end goes on from there. */
   function wholeWall():void {
-    const index=vinciContent.findIndex(station=>station.id===VINCI_WALL_ENDS[0])
+    const wall=wallOn(), at=wallAt()
+    const end=wall?vinciWallNearerEnd(wall,at??0):VINCI_WALL_ENDS[0]
+    const index=vinciContent.findIndex(station=>station.id===end)
     if(index>=0)hosts?.navigate(index)
   }
   /** The wing's own certainty word for a picture, read off the picture
@@ -1193,16 +1207,28 @@ export function createWing():VinciWingModule {
   /** THE ROOM WHOSE WALL IS WALKED. Its two end stations are the ends of one
    * certified line and the twenty five stops stand between them, so both ends
    * hold the same row and the same works. */
-  const wallEnd=(id:string|null):boolean=>id!==null&&(VINCI_WALL_ENDS as readonly string[]).includes(id)
-  /** Where the eye stands along the wall, or undefined off it. 0 and the last
-   * vertex are the two end stations; a stop of the hang is between them. */
+  /** Two stations share a row where they end the same wall, which is what
+   * makes both ends of the hang hold all twenty five. */
+  const sameWall=(a:string|null,b:string|null):boolean=>{
+    const wall=vinciWallOfStation(a)
+    return Boolean(wall&&wall===vinciWallOfStation(b))
+  }
+  /** The wall the eye stands on, and where along it. Vertex 0 and, on a wall
+   * with two ends, the last are station eyes; a stop stands between them. */
+  const wallOn=():VinciWall|undefined=>standing?vinciWallById(rail.navigation.wallId??''):undefined
   const wallAt=():number|undefined=>standing?rail.navigation.wall:undefined
-  const onWallStop=():boolean=>{const at=wallAt();return at!==undefined&&at>0&&at<=vinciWallStops().length}
+  const wallRow=():readonly{index:number;exhibit:string;workId:string|null;face:'front'|'reverse'|null}[]=>{
+    const wall=wallOn()
+    return wall?vinciWallStops(wall):[]
+  }
+  const onWallStop=():boolean=>{const wall=wallOn(),at=wallAt();return Boolean(wall&&at!==undefined&&!vinciWallIsEnd(wall,at)&&at>0&&at<=wall.stops().length)}
   /** A RUN ALONG THE WALL. The eye leaves the stop it stands at, slides past
    * every frame between here and there and stops square in front of the one
    * asked for. A second press is queued by the rail, never cut. */
   function wallRun(exhibit:string):boolean {
-    const vertex=vinciWallVertex(exhibit)
+    const wall=vinciWallOfExhibit(exhibit)
+    if(!wall||wall!==wallOn())return false
+    const vertex=vinciWallVertex(wall,exhibit)
     if(vertex===undefined||wallAt()===undefined||!railReady()||activeView)return false
     const pose=vinciApproachPose(exhibit,narrow())
     return pose?rail.along(vertex,vinciContent[card]!.id,pose,exhibit):false
@@ -1212,9 +1238,9 @@ export function createWing():VinciWingModule {
    * frame reads it: at the east end the wall runs away to the right, at the
    * west end back to the left. */
   function stepWall(step:number):void {
-    const at=wallAt()
-    if(at===undefined)return
-    const stops=vinciWallStops()
+    const at=wallAt(), wall=wallOn()
+    if(at===undefined||!wall)return
+    const stops=vinciWallStops(wall)
     const want=Math.max(1,Math.min(stops.length,at+step))
     if(want===at)return
     const stop=stops[want-1]!
@@ -1224,9 +1250,9 @@ export function createWing():VinciWingModule {
   /** Off the wall at the nearer of the room's two ends, which is where a walk
    * that leaves the wall begins. */
   function leaveWall():void {
-    const at=wallAt()
-    if(at===undefined||wallEnd(vinciContent[card]!.id)&&!onWallStop())return
-    const end=vinciWallNearerEnd(at)
+    const at=wallAt(), wall=wallOn()
+    if(at===undefined||!wall||vinciWallOfStation(vinciContent[card]!.id)&&!onWallStop())return
+    const end=vinciWallNearerEnd(wall,at)
     const index=vinciContent.findIndex(station=>station.id===end)
     if(index>=0)hosts?.navigate(index)
   }
@@ -1243,7 +1269,7 @@ export function createWing():VinciWingModule {
       // The picture room is one WALL under two: the hang belongs to the line
       // between them, so each end holds all twenty five.
       if(pick.station!==here&&!(pick.kind==='machine'&&vinciMachineRoom(pick.station).includes(here))
-        &&!(wallEnd(here)&&wallEnd(pick.station)))continue
+        &&!sameWall(here,pick.station))continue
       if((pick.kind==='picture'||pick.kind==='mural')&&pick.workId!==DEATHBED_WORK){
         const found=pictures.find(source=>source.work.id===pick.workId&&source.entry.face===pick.face)
         if(!found)continue
@@ -1387,7 +1413,11 @@ export function createWing():VinciWingModule {
    * the record follow the sheet standing. One way, because a drawn sheet has
    * no second face and no printed page beside it. */
   function openSheetDoor(id:string,from:HTMLElement|null,how:'enter'|'advance'):void {
-    const wall=exhibits?.sheetSources()??[]
+    // THE BOOK'S ORDER IS THE WALL'S. The sheets are read in the order the
+    // wall is walked, so the arrows in the reader and the arrows in the room
+    // step the same way.
+    const wall=[...exhibits?.sheetSources()??[]]
+      .sort((a,b)=>(vinciWallOrderOf(`sheet/${a.sheet.id}`)??0)-(vinciWallOrderOf(`sheet/${b.sheet.id}`)??0))
     const opened=wall.find(source=>`sheet/${source.sheet.id}`===id)
     if(!opened||!closeLook)return
     const named=(source:typeof opened):string=>vinciSheetTitle(lang()==='de'?source.page.honesty_de:source.page.honesty_en)
@@ -1434,13 +1464,10 @@ export function createWing():VinciWingModule {
   function openExhibit(id:string,from:HTMLElement|null,how:'auto'|'walk'|'cut'='auto'):void {
     const entry=picks.find(pick=>pick.id===id)
     if(!entry||!hosts||!closeLook)return
-    // A SHEET HAS NO LEG TO WALK: the registry marks it unopenable because no
-    // certified approach stands in front of the body wall. It opens all the
-    // same, in the reader, over the frame the visitor is already looking at.
-    if(!entry.openable&&entry.kind!=='sheet')return
+    if(!entry.openable)return
     const here=vinciContent[card]!.id
     if(entry.station!==here&&!(entry.kind==='machine'&&vinciMachineRoom(entry.station).includes(here))
-      &&!(wallEnd(here)&&wallEnd(entry.station)))return
+      &&!sameWall(here,entry.station))return
     const walk=[stepControl('\u2039',exhibitStep(id,-1)),stepControl('\u203a',exhibitStep(id,1))]
     const how_=closeLook.id&&closeLook.id!==id?'advance':'enter'
     const shut=control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())

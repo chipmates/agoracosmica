@@ -8,7 +8,7 @@ import { projectRailDrag } from './projection-drag'
 import { carriedPace, gaitAt, gaitHeadLift, gaitLeg, gaitRhythm, strollMetresPerSecond, type GaitThreshold } from './gait'
 import { collectionLayout } from './collection'
 import { collectionView } from './collection/views'
-import { vinciWallEndVertex, vinciWallNearerEnd, vinciWallStops } from './collection/wall'
+import { vinciWallEndVertex, vinciWallIsEnd, vinciWallNearerEnd, vinciWallOfStation, type VinciWall } from './collection/wall'
 import { COURT, SUPPER_WALL } from './collection/layout'
 import { fittedRailFov, assertRailProjection } from './rail-projection'
 import type { RailGeometryAuthority } from './rail-proof'
@@ -202,14 +202,14 @@ const GAZE_LEAVES = .16, GAZE_ARRIVES = .66, GAZE_AHEAD_M = 6, WALKED_LEG_M = 10
 const wrap=(a:number):number=>Math.atan2(Math.sin(a),Math.cos(a))
 const turn=(from:number,to:number,t:number):number=>from+wrap(to-from)*t
 const ramp=(edge0:number,edge1:number,x:number):number=>{const t=Math.max(0,Math.min(1,(x-edge0)/(edge1-edge0)));return t*t*(3-2*t)}
-/** THE WALL'S OWN VERTICES. Vertex 0 and the last are the two end stations,
- * and the stops of the hang stand between them in the wall's own order. */
-const wallLastVertex=():number=>vinciWallStops().length+1
-const onWallEnd=(vertex:number):boolean=>vertex===0||vertex===wallLastVertex()
+/** THE WALL A STATION ENDS, where it ends one. Vertex 0 and, on a wall with
+ * two ends, the last are station eyes; the stops stand between them in that
+ * wall's own order. */
+const wallOfStation=(id:VinciStationId):VinciWall|undefined=>vinciWallOfStation(id)
 export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:RailGeometryAuthority) {
   /** A request that carries a wall vertex is walked on the wall's own line,
    * whether it ends at a stop of the hang or at one of its two end stations. */
-  interface Request { id:VinciStationId; pose:Pose; phone:boolean; exhibit?:string; wall?:number }
+  interface Request { id:VinciStationId; pose:Pose; phone:boolean; exhibit?:string; wall?:number; wallOn?:VinciWall }
   let completed:Request|undefined, active:Request|undefined, pending:Request|undefined
   /** THE STATION AN APPROACH LEFT FROM, and the exhibit eye standing in front
    * of one object. A viewing eye is never a station: it carries its station's
@@ -222,7 +222,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
   let chained:Request|undefined
   /** THE VERTEX OF THE WALL THE EYE STANDS ON, and the end vertex a walk that
    * leaves the wall runs back to first. Off the wall both are undefined. */
-  let wallAt:number|undefined, wallReturn:number|undefined
+  let wallAt:number|undefined, wallReturn:number|undefined, wallOn:VinciWall|undefined
   let path:ReturnType<typeof createCertifiedRailPath>|undefined, placementNeedsFrame=false
   let duration=1.1, leg=gaitLeg(0), strideM=0, strideTarget=0, strideAt=0
   /** The leg's own clock retains its measured pace when the target changes.
@@ -269,7 +269,8 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
   function matrices() { camera.updateProjectionMatrix();camera.updateMatrixWorld() }
   function placeEndpoint(request:Request) {
     completed=request;active=undefined;path=undefined;look.snap();strideM=strideTarget=0;chained=undefined
-    wallAt=request.wall??vinciWallEndVertex(request.id);wallReturn=undefined
+    wallOn=request.wallOn??wallOfStation(request.id)
+    wallAt=request.wall??(wallOn?vinciWallEndVertex(wallOn,request.id):undefined);wallReturn=undefined
     if(!request.exhibit){viewing=undefined;standing=request;wantsReturn=false}
     camera.position.copy(request.pose.eye);base.copy(poseQuaternion(request.pose))
     camera.quaternion.copy(base);camera.fov=fittedRailFov(request.pose.fov,camera.aspect,request.phone);matrices()
@@ -281,7 +282,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
   function certifiedPath(request:Request):ReturnType<typeof createCertifiedRailPath> {
     // A run along the wall is the sub-path of the wall's own certified line
     // between the vertex the eye stands on and the one it is asked for.
-    if(request.wall!==undefined&&wallAt!==undefined)return authority.wall(wallAt,request.wall,request.phone,camera)
+    if(request.wall!==undefined&&wallAt!==undefined&&request.wallOn)return authority.wall(request.wallOn.id,wallAt,request.wall,request.phone,camera)
     if(request.exhibit)return authority.approach(completed!.pose,request.pose,request.phone,camera)
     if(viewing&&standing&&request.id===standing.id&&samePose(request.pose,standing.pose))
       return authority.approach(standing.pose,viewing.pose,request.phone,camera,true)
@@ -323,7 +324,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
       /** where on the wall the eye stands, and the eye a run will land on: the
        * room's one full plate is streamed against that eye and not against the
        * body, so a run past every work carries a single request */
-      wall:wallAt, running:active?.wall!==undefined, aimEye:active?.wall!==undefined?active.pose.eye:undefined } },
+      wall:wallAt, wallId:wallOn?.id, running:active?.wall!==undefined, aimEye:active?.wall!==undefined?active.pose.eye:undefined } },
     set(id:VinciStationId,pose:Pose,instant=false,phone=camera.aspect<=.9) {
       const request={id,pose:{eye:pose.eye.clone(),at:pose.at.clone(),fov:pose.fov},phone}
       // Initial/named placement, explicit inspection return and resize are
@@ -340,14 +341,14 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
       // ON THE WALL THE WAY OFF IT IS THE WALL. A stop is a vertex of one
       // certified line whose ends are the room's two stations, so the eye
       // runs to the nearer of them and the walk goes on from there.
-      if(wallAt!==undefined&&!onWallEnd(wallAt)){wantsReturn=false;wallReturn=vinciWallEndVertex(vinciWallNearerEnd(wallAt))}
+      if(wallOn&&wallAt!==undefined&&!vinciWallIsEnd(wallOn,wallAt)){wantsReturn=false;wallReturn=vinciWallEndVertex(wallOn,vinciWallNearerEnd(wallOn,wallAt))}
     },
     /** A RUN ALONG THE WALL, from the vertex the eye stands on to another. A
      * second press while one runs is queued, not cut: it leaves in the update
      * the current run lands in, so the eye never stands still between them. */
     along(vertex:number,id:VinciStationId,pose:Pose,exhibit?:string,phone=camera.aspect<=.9):boolean {
-      if(!completed||wallAt===undefined||vertex===wallAt||wallReturn!==undefined)return false
-      const request:Request={id,pose:{eye:pose.eye.clone(),at:pose.at.clone(),fov:pose.fov},phone,exhibit,wall:vertex}
+      if(!completed||wallOn===undefined||wallAt===undefined||vertex===wallAt||wallReturn!==undefined)return false
+      const request:Request={id,pose:{eye:pose.eye.clone(),at:pose.at.clone(),fov:pose.fov},phone,exhibit,wall:vertex,wallOn}
       if(active){pending=request;pace=carriedPace(++waiting);return true}
       begin(request,clock())
       return true
@@ -412,9 +413,9 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
       if(!active&&wallReturn!==undefined&&wallAt!==undefined&&authority.status==='verified') {
         const vertex=wallReturn
         wallReturn=undefined
-        if(vertex!==wallAt) {
-          const id=vinciWallNearerEnd(vertex)as VinciStationId
-          begin({id,pose:stationPose(id,completed.phone),phone:completed.phone,wall:vertex},now)
+        if(vertex!==wallAt&&wallOn) {
+          const id=vinciWallNearerEnd(wallOn,vertex)
+          begin({id,pose:stationPose(id,completed.phone),phone:completed.phone,wall:vertex,wallOn},now)
         }
       }
       // THE RETURN IS THE ONLY LEG THAT LEAVES A VIEWING EYE. Its own path is
@@ -481,7 +482,8 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
       render(now)
       if(active&&s===1) {
         const arrived=active
-        wallAt=arrived.wall??vinciWallEndVertex(arrived.id)
+        wallOn=arrived.wallOn??wallOfStation(arrived.id)
+        wallAt=arrived.wall??(wallOn?vinciWallEndVertex(wallOn,arrived.id):undefined)
         // An end of the wall is a station, so a walk that leaves from there
         // leaves from the eye the certificate holds for it.
         if(!arrived.exhibit&&arrived.wall!==undefined)standing=arrived

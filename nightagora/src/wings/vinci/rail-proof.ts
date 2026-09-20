@@ -6,7 +6,7 @@ import { createCertifiedRailPath } from './rail-smoothing'
 import { assertRailProjection } from './rail-projection'
 export { assertRailProjection, fittedRailFov } from './rail-projection'
 import { vinciApproachPose, vinciExhibitRecords } from './collection/approaches'
-import { vinciWallStops, VINCI_PICTURE_WALL, VINCI_WALL_ENDS } from './collection/wall'
+import { VINCI_WALLS } from './collection/wall'
 import type { VinciStationId } from './content'
 import certificateText from './data/rail-clearance.json?raw'
 
@@ -104,30 +104,35 @@ for (const viewport of VIEWPORTS) {
 }
 if (data.approaches.length !== requiredApproaches || matchedApproaches !== requiredApproaches
   || unmatchedApproaches.size !== 0) throw new Error('Missing complete Vinci approach certificate')
-// ONE WALL PER VIEWPORT, WITH EVERY STOP ON IT. The stops are the declared
-// wall's own, in its own order, and each vertex is the eye the approach table
-// already certifies, so a run cannot walk to a stop that was never proved.
-const wallStops = vinciWallStops().map(stop => stop.exhibit)
+// EVERY DECLARED WALL, ONCE PER VIEWPORT, WITH EVERY STOP ON IT. The stops
+// are each wall's own, in its own order, and each vertex is the eye the
+// approach table already certifies, so a run cannot walk to a stop that was
+// never proved. A wall that declares one end begins at that station's eye and
+// ends at its last stop.
+if ((data.walls?.length ?? 0) !== VINCI_WALLS.length * VIEWPORTS.length) throw new Error('Missing complete Vinci wall certificate')
 for (const viewport of VIEWPORTS) {
-  const wall = data.walls?.filter(entry => entry.viewport === viewport) ?? []
-  const saved = wall[0]
-  if (wall.length !== 1 || !saved || saved.id !== VINCI_PICTURE_WALL) throw new Error('Missing complete Vinci wall certificate')
-  if (saved.stops.length !== wallStops.length || saved.stops.some((stop, i) => stop !== wallStops[i])
-    || saved.points.length !== wallStops.length + 2 || saved.chordM.length !== saved.points.length
-    || saved.shortenM.length !== saved.points.length
-    || saved.ends.length !== VINCI_WALL_ENDS.length || saved.ends.some((end, i) => end !== VINCI_WALL_ENDS[i])) {
-    throw new Error('Missing complete Vinci wall certificate')
-  }
-  for (const [at, end] of saved.ends.entries()) {
-    const eye = stationPose(end as VinciStationId, viewport === 'phone').eye
-    if (!near(saved.points[at === 0 ? 0 : saved.points.length - 1]!, [eye.x, -eye.z, eye.y], POSE_TOLERANCE_M)) {
+  for (const declared of VINCI_WALLS) {
+    const found = data.walls.filter(entry => entry.viewport === viewport && entry.id === declared.id)
+    const saved = found[0]
+    const wallStops = declared.stops().map(stop => stop.exhibit)
+    if (found.length !== 1 || !saved) throw new Error('Missing complete Vinci wall certificate')
+    if (saved.stops.length !== wallStops.length || saved.stops.some((stop, i) => stop !== wallStops[i])
+      || saved.points.length !== wallStops.length + declared.ends.length || saved.chordM.length !== saved.points.length
+      || saved.shortenM.length !== saved.points.length
+      || saved.ends.length !== declared.ends.length || saved.ends.some((end, i) => end !== declared.ends[i])) {
       throw new Error('Missing complete Vinci wall certificate')
     }
-  }
-  for (const [at, stop] of saved.stops.entries()) {
-    const pose = vinciApproachPose(stop, viewport === 'phone')
-    if (!pose || !near(saved.points[at + 1]!, [pose.eye.x, -pose.eye.z, pose.eye.y], POSE_TOLERANCE_M)) {
-      throw new Error('Missing complete Vinci wall certificate')
+    for (const [at, end] of saved.ends.entries()) {
+      const eye = stationPose(end as VinciStationId, viewport === 'phone').eye
+      if (!near(saved.points[at === 0 ? 0 : saved.points.length - 1]!, [eye.x, -eye.z, eye.y], POSE_TOLERANCE_M)) {
+        throw new Error('Missing complete Vinci wall certificate')
+      }
+    }
+    for (const [at, stop] of saved.stops.entries()) {
+      const pose = vinciApproachPose(stop, viewport === 'phone')
+      if (!pose || !near(saved.points[at + 1]!, [pose.eye.x, -pose.eye.z, pose.eye.y], POSE_TOLERANCE_M)) {
+        throw new Error('Missing complete Vinci wall certificate')
+      }
     }
   }
 }
@@ -248,10 +253,10 @@ export function createRailGeometryAuthority(roots: readonly Object3D[]) {
      * wall's own order. No new geometry is proved here: the balls, the trims
      * and the spans are the offline proof's, and a sub-path holds a strict
      * subset of them. */
-    wall(from: number, to: number, phone: boolean, camera: PerspectiveCamera) {
+    wall(id: string, from: number, to: number, phone: boolean, camera: PerspectiveCamera) {
       if (status !== 'verified') throw new Error(failure || 'Rail clearance identity is still being checked')
       assertRailProjection(camera)
-      const saved = data.walls.find(entry => entry.viewport === (phone ? 'phone' : 'desktop'))
+      const saved = data.walls.find(entry => entry.viewport === (phone ? 'phone' : 'desktop') && entry.id === id)
       if (!saved) throw new Error('This wall has no certificate')
       const last = saved.points.length - 1
       if (!(Number.isInteger(from) && Number.isInteger(to) && from !== to

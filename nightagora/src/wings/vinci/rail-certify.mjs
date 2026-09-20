@@ -96,7 +96,7 @@ const { geometryForPart } = await load(path.join(WING, 'machines/geometry.ts'))
 const { jointValuesAt } = await load(path.join(WING, 'machines/motion.ts'))
 const { gradeAt } = await load(path.join(WING, 'terrain-mesh.ts'))
 const { vinciExhibitRecords, vinciApproachPose, vinciApproachFit, vinciApproachPlateMetres } = await load(path.join(WING, 'collection/approaches.ts'))
-const { vinciWallStops, VINCI_PICTURE_WALL, VINCI_WALL_ENDS } = await load(path.join(WING, 'collection/wall.ts'))
+const { VINCI_WALLS } = await load(path.join(WING, 'collection/wall.ts'))
 
 /* ---- the mounted geometry, at every tier ---- */
 
@@ -519,18 +519,18 @@ function quadraticLength(a, control, b) {
 }
 
 const walls = [], wallReadings = []
-for (const { viewport, seen } of families) {
-  const ends = VINCI_WALL_ENDS.map(id => {
+for (const { viewport, seen } of families) for (const declared of VINCI_WALLS) {
+  const ends = declared.ends.map(id => {
     const family = seen.find(entry => entry.stations.includes(id))
     if (!family) throw new Error(`No station pose for the wall end ${id}`)
     return family
   })
-  const stops = vinciWallStops()
+  const stops = declared.stops()
   const poses = [ends[0].pose, ...stops.map(stop => {
     const pose = vinciApproachPose(stop.exhibit, viewport.phone)
     if (!pose) throw new Error(`${stop.exhibit}: no viewing pose at ${viewport.name}`)
     return pose
-  }), ends[1].pose]
+  }), ...(ends.length > 1 ? [ends[ends.length - 1].pose] : [])]
   // The widest near rectangle over every vertex of the line, plus the step
   // rhythm's own envelope: one radius the whole polyline is proved against.
   const clearance = Math.max(...poses.map(pose =>
@@ -592,7 +592,7 @@ for (const { viewport, seen } of families) {
   const legs = []
   for (let i = 1; i < points.length; i++) legs.push(chordM[i] - chordM[i - 1])
   wallReadings.push({
-    viewport: viewport.name, id: VINCI_PICTURE_WALL, vertices: points.length, spans: points.length - 1,
+    viewport: viewport.name, id: declared.id, vertices: points.length, spans: points.length - 1,
     lengthM: +path.length.toFixed(4), requiredM: +clearance.toFixed(4),
     spanClearanceM: +(worst === Infinity ? clearance : worst).toFixed(4), spanMesh: worstMesh, worstSpan,
     shortestLegM: +Math.min(...legs).toFixed(4), longestLegM: +Math.max(...legs).toFixed(4),
@@ -602,7 +602,7 @@ for (const { viewport, seen } of families) {
     clear: worst > clearance - 1e-9 || worst === Infinity,
   })
   walls.push({
-    viewport: viewport.name, id: VINCI_PICTURE_WALL, ends: [...VINCI_WALL_ENDS],
+    viewport: viewport.name, id: declared.id, ends: [...declared.ends],
     stops: stops.map(stop => stop.exhibit),
     points: enh, roundedLength: path.length, maxNearRadius: clearance, certifiedBalls: kept,
     chordM, shortenM,
@@ -652,7 +652,7 @@ const certificate = {
     `Every straight span of the finished path is proved end to end by exact segment/triangle distance; every rounded corner is proved by closed balls over its control hull, and those balls are what the runtime replays. Stored balls reserve ${BALL_RESERVE_M * 1e6} µm beyond the requested radius; runtime matching of quantized geometry consumes at most ${GEOMETRY_TOLERANCE_M * 1e6} µm of it.`,
     `The walk carries a step rhythm of at most ${(gaitEnvelopeM * 1000).toFixed(2)} mm off the certified line, and that envelope is added to the clearance radius every span and every corner above is proved against.`,
     'An approach is one straight leg from a station eye to one exhibit\'s viewing eye and back, proved by the same exact segment/triangle distance and the same near rectangle plus gait envelope as a route. It is reachable from that station only, it is not addressable by the station rail, and the table is linear: two entries per exhibit, never the product of poses. The exhibits are the hang\'s plates, the mural, the machines, the grave\'s three, the plaque, the book and the twelve cut dates.',
-    'A wall is one polyline through every stop of a hang, with the two end station eyes as its ends. Every span is proved WHOLE, end to end and untrimmed, and every interior corner by the same closed balls a route uses, so a run from any stop to any other is the sub-path between those two vertices and needs no proof of its own: the trim at an interior vertex depends only on its two adjoining spans and is identical in every sub-path holding it, and the ends of a sub-path take no corner. The table is linear in the stops, never their product, and no viewing eye moves to be on it.',
+    'A wall is one polyline through every stop of it, with its declared station eyes as its ends. Every span is proved WHOLE, end to end and untrimmed, and every interior corner by the same closed balls a route uses, so a run from any stop to any other is the sub-path between those two vertices and needs no proof of its own: the trim at an interior vertex depends only on its two adjoining spans and is identical in every sub-path holding it, and the ends of a sub-path take no corner. The table is linear in the stops, never their product, and no viewing eye moves to be on it.',
     `A station whose full near ball is not clear carries an oriented certificate instead: its near pyramid is proved over the whole ±${LOOK_YAW} rad yaw and ±${LOOK_PITCH} rad pitch look envelope, sampled every ${LOOK_STEP} rad, with the distance a corner can travel between two samples subtracted from the measured margin.`,
   ],
   arrivalEN,
@@ -687,11 +687,12 @@ for (const reading of wallReadings) {
   if (reading.uncertifiedCorners) failures.push(`${reading.viewport} ${reading.id}: ${reading.uncertifiedCorners} corner(s) of the wall carry no certified fillet`)
   if (reading.worstNearBallMarginM <= 0) failures.push(`${reading.viewport} ${reading.id}: vertex ${reading.worstNearBallVertex} stands inside its own near envelope, ${reading.worstNearBallMarginM} m from ${reading.worstNearBallMesh}`)
 }
-// One wall per viewport, with every stop of the hang on it and the two end
-// stations as its ends: a run is a sub-path of this line and never a new proof.
-if (walls.length !== families.length) failures.push(`Expected ${families.length} walls, certified ${walls.length}`)
+// Every declared wall once per viewport, with every stop on it and its own
+// station eyes as its ends: a run is a sub-path of that line, never a new
+// proof.
+if (walls.length !== families.length * VINCI_WALLS.length) failures.push(`Expected ${families.length * VINCI_WALLS.length} walls, certified ${walls.length}`)
 for (const wall of walls) {
-  if (wall.points.length !== wall.stops.length + 2) failures.push(`${wall.viewport} ${wall.id}: ${wall.points.length} vertices for ${wall.stops.length} stops`)
+  if (wall.points.length !== wall.stops.length + wall.ends.length) failures.push(`${wall.viewport} ${wall.id}: ${wall.points.length} vertices for ${wall.stops.length} stops`)
   const missing = wall.stops.filter(stop => !approaches.some(entry => entry.viewport === wall.viewport && entry.exhibit === stop))
   if (missing.length) failures.push(`${wall.viewport} ${wall.id}: ${missing.length} stop(s) with no certified approach`)
 }

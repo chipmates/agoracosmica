@@ -19,6 +19,7 @@ import { hangPlacements } from './hang'
 import { COURT, FLOOR, GRAVE_ORIGIN, OPENING, SUPPER_WALL } from './layout'
 import { STANDS, standLevel } from './stands'
 import { dossiers, MACHINE_SLUGS, type MachineSlug } from '../machines/catalog'
+import { bodyWallOrder } from './wall'
 
 export interface ApproachPose { eye: Vector3; at: Vector3; fov: number }
 
@@ -256,6 +257,11 @@ function machinePose(slug: keyof typeof MACHINE_EYES, narrow: boolean): Approach
 
 /** The one station the gallery's cut line is read from. */
 export const VINCI_LINE_STATION: VinciStationId = 'line-early'
+/** The one station the body wall's sheets are walked from. */
+const BODY_STATION: VinciStationId = 'body'
+/** How near a sheet is read, and how far the eye steps back per metre of
+ * rise between the standing eye and the sheet's own centre. */
+const SHEET_NEAREST_M = 1.1, SHEET_STEP_BACK = .8
 /** The book lies open on the table under its lamp, read from the chair side.
  *
  * THE TABLE STANDS CENTRED ON ITS OWN PANEL, and the panel is what fixes the
@@ -290,6 +296,19 @@ function otherKinds(): Placed[] {
     placed.push({ record: { id, kind, station, workId, face }, pose })
   }
   add(MURAL_ID, 'mural', 'supper-wall', narrow => eastFacingApproach(MURAL, narrow), 'last-supper', 'front')
+  // THE BODY WALL'S SHEETS. A print room's grid is read course by course, and
+  // a sheet is read from further off the further its course hangs from the
+  // standing eye: a person steps back to look up at the top course and in
+  // again at the lowest. That step is also what keeps two sheets of one
+  // column from sharing a standing place, so the wall's own run has a leg
+  // between every pair of neighbours.
+  for (const mount of bodyWallOrder()) {
+    const distance = SHEET_NEAREST_M + SHEET_STEP_BACK * Math.abs(mount.datum - EYE)
+    const field: Field = { east: mount.east, north: mount.north, datum: mount.datum,
+      width: mount.width, height: mount.height, eye: EYE,
+      nearest: distance, furthest: { desktop: distance, phone: distance } }
+    add(`sheet/${mount.id}`, 'sheet', BODY_STATION, narrow => eastFacingApproach(field, narrow))
+  }
   for (const slug of MACHINE_SLUGS) {
     if (slug === 'proportional-compass') continue
     add(`machine/${slug}`, 'machine', MACHINE_EYES[slug].station, narrow => machinePose(slug, narrow))
