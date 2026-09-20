@@ -86,7 +86,7 @@ const { stationPose } = load('src/wings/vinci/rail.ts')
 const { mountCollectionPlates } = load('src/wings/vinci/collection/plates.ts')
 const { readVinciExhibits } = load('src/wings/vinci/collection/pick.ts')
 const { createCertifiedRailPath } = load('src/wings/vinci/rail-smoothing.ts')
-const { vinciWallStops, VINCI_PICTURE_WALL, VINCI_WALL_ENDS } = load('src/wings/vinci/collection/wall.ts')
+const { VINCI_WALLS, vinciWallStops } = load('src/wings/vinci/collection/wall.ts')
 const certificate = JSON.parse(source('src/wings/vinci/data/rail-clearance.json'))
 
 /* ---- 1. every declared viewing eye is certified, at both viewports ---- */
@@ -98,8 +98,8 @@ assert.equal(certificate.format, 'vinci-rail-clearance-v2')
 const records = vinciExhibitRecords()
 const kinds = {}
 for (const record of records) kinds[record.kind] = (kinds[record.kind] ?? 0) + 1
-assert.equal(JSON.stringify(kinds), JSON.stringify({ picture: 26, mural: 1, machine: 13, place: 3, manuscript: 1 }),
-  'the hang, the Ingres, the mural, thirteen machines, three places and the book')
+assert.equal(JSON.stringify(kinds), JSON.stringify({ picture: 26, mural: 1, sheet: 29, machine: 13, place: 3, manuscript: 1 }),
+  'the hang, the Ingres, the mural, the body wall\'s sheets, thirteen machines, three places and the book')
 assert.equal(new Set(records.map(record => record.id)).size, records.length, 'an exhibit is declared once')
 assert.equal(certificate.approaches.length, records.length * 2)
 const hang = records.filter(record => record.station === 'picture-room')
@@ -163,7 +163,9 @@ assert.equal(fullCount(), 0, 'no full plate stands before anyone walks up to one
 const registry = readVinciExhibits(host)
 // The plates' own group carries the hang and the mural; the other kinds stand
 // in the collection beside it and are read there.
-assert.equal(registry.filter(entry => entry.openable).length, hang.length + 1)
+// The hang and the mural, and now every sheet of the body wall: each one
+// carries a certified viewing eye at both viewports.
+assert.equal(registry.filter(entry => entry.openable).length, hang.length + 1 + 29)
 assert.equal(registry.filter(entry => entry.kind === 'sheet').length, 29)
 assert.equal(registry.filter(entry => entry.kind === 'mural').length, 1)
 assert.ok(registry.every(entry => entry.radiusM >= .11), 'every proxy has its own floor')
@@ -196,7 +198,7 @@ report.raisedOnArrival = raised.length
 
 /* ---- 6. the wall: one polyline, and every run a sub-path of it ----
  *
- * The 25 viewing eyes with the two end station eyes as the ends of the same
+ * Each wall's viewing eyes with its own station eyes as the ends of the same
  * line. What is proved here is the claim the certificate rests on: that a run
  * between two vertices is the sub-path between them, which needs the trims to
  * be identical in the whole and in the part, both endpoints to be exact, and
@@ -206,25 +208,24 @@ report.raisedOnArrival = raised.length
  */
 
 const walls = certificate.walls ?? []
-assert.equal(walls.length, 2, 'one wall per viewport')
+assert.equal(walls.length, VINCI_WALLS.length * 2, 'every declared wall, once per viewport')
 const wallReport = {}
-for (const viewport of ['desktop', 'phone']) {
+for (const viewport of ['desktop', 'phone']) for (const declared of VINCI_WALLS) {
   const narrow = viewport === 'phone'
-  const wall = walls.find(entry => entry.viewport === viewport)
-  assert.ok(wall, `no wall certificate: ${viewport}`)
-  assert.equal(wall.id, VINCI_PICTURE_WALL)
+  const wall = walls.find(entry => entry.viewport === viewport && entry.id === declared.id)
+  assert.ok(wall, `no wall certificate: ${viewport} ${declared.id}`)
+  const stops = vinciWallStops(declared)
   // The modules run in their own realm, so the lists are compared as text.
-  assert.equal(JSON.stringify(wall.ends), JSON.stringify([...VINCI_WALL_ENDS]))
-  assert.equal(JSON.stringify(wall.stops), JSON.stringify(vinciWallStops().map(stop => stop.exhibit)),
+  assert.equal(JSON.stringify(wall.ends), JSON.stringify([...declared.ends]))
+  assert.equal(JSON.stringify(wall.stops), JSON.stringify(stops.map(stop => stop.exhibit)),
     'the stops are the wall\'s own order')
-  assert.equal(wall.stops.length, 25)
-  assert.equal(wall.points.length, 27)
-  assert.equal(wall.chordM.length, 27)
-  assert.equal(wall.shortenM.length, 27)
+  assert.equal(wall.points.length, wall.stops.length + wall.ends.length)
+  assert.equal(wall.chordM.length, wall.points.length)
+  assert.equal(wall.shortenM.length, wall.points.length)
   const eyes = [
     stationPose(wall.ends[0], narrow).eye,
     ...wall.stops.map(id => vinciApproachPose(id, narrow).eye),
-    stationPose(wall.ends[1], narrow).eye,
+    ...(wall.ends.length > 1 ? [stationPose(wall.ends[wall.ends.length - 1], narrow).eye] : []),
   ]
   const points = wall.points.map(([east, north, height]) => new THREE.Vector3(east, height, -north))
   points.forEach((point, at) => assert.equal(point.distanceTo(eyes[at]), 0,
@@ -236,7 +237,7 @@ for (const viewport of ['desktop', 'phone']) {
     certifyBall: (centre, radius) => balls.some(ball => ball.centre.distanceTo(centre) + radius <= ball.radius),
   })
   const whole = build(points.map(point => point.clone()))
-  assert.ok(Math.abs(whole.length - wall.roundedLength) < 1e-9, `the wall rebuilds shorter than its certificate: ${viewport}`)
+  assert.ok(Math.abs(whole.length - wall.roundedLength) < 1e-9, `the wall rebuilds shorter than its certificate: ${viewport} ${declared.id}`)
   const legs = []
   for (let at = 1; at < points.length; at++) legs.push(points[at - 1].distanceTo(points[at]))
   let drift = 0, lengthError = 0, runs = 0
@@ -255,9 +256,9 @@ for (const viewport of ['desktop', 'phone']) {
     lengthError = Math.max(lengthError, Math.abs(path.length - certified))
     runs++
   }
-  assert.equal(drift, 0, `a wall run drifts ${drift} m off its own vertex: ${viewport}`)
-  assert.ok(lengthError < 1e-9, `a wall run is ${lengthError} m off its certified length: ${viewport}`)
-  wallReport[viewport] = {
+  assert.equal(drift, 0, `a wall run drifts ${drift} m off its own vertex: ${viewport} ${declared.id}`)
+  assert.ok(lengthError < 1e-9, `a wall run is ${lengthError} m off its certified length: ${viewport} ${declared.id}`)
+  wallReport[`${viewport}/${declared.id}`] = {
     vertices: points.length, spans: points.length - 1, runs, drift, lengthError,
     lengthM: +whole.length.toFixed(4),
     shortestLegM: +Math.min(...legs).toFixed(4), longestLegM: +Math.max(...legs).toFixed(4),

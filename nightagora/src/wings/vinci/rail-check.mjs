@@ -154,15 +154,20 @@ for(const phone of [false,true]) {
     for(let i=1;i<=224;i++)h.at(2+i*STEP)
     endpoint(h,'courtyard');h.at(6);compare(h.camera,canonical(phone,'courtyard'),'Settled endpoint')
   })
-  check(viewport,'New targets preserve the complete active trajectory then take the direct certified route to the latest',()=>{
+  check(viewport,'A target no further along preserves the complete active trajectory, and the newest is taken directly',()=>{
     const h=harness(phone),control=harness(phone);h.set('courtyard');control.set('courtyard')
     h.at(0);control.at(0)
-    // A leg lasts as long as its own length says, so the sub-step is the
-    // walking leg's own duration and not the longest leg in the wing.
+    // A VISITOR PRESSING ON SPEEDS THE LEG, so the control is given the first
+    // press too. What is measured here is the other half of the law: a target
+    // no further along the walk than the one already asked for changes
+    // neither a sample of the leg nor the moment it lands.
+    h.set('hall');control.set('hall')
+    // A leg lasts as long as its own length and its own pace say, so the
+    // sub-step is this leg's own duration and not the longest leg in the wing.
     const seconds=h.rail.navigation.legSeconds/h.rail.navigation.legPace,step=seconds/224
     for(let i=1;i<224;i++) {
       h.at(i*step);control.at(i*step)
-      if(i===45)h.set('garden');if(i===100)h.set('hall');if(i===145)h.set('arrival')
+      if(i===45)h.set('arrival');if(i===100)h.set('hall');if(i===145)h.set('arrival')
       ensure(h.rail.navigation.queued.length<=1,'Input grew a chain behind the active leg')
       compare(h.camera,control.camera,'Queued input changes no in-flight sample')
     }
@@ -173,6 +178,21 @@ for(const phone of [false,true]) {
     ensure(h.rail.navigation.queued.length===0&&h.calls.length===2,'Superseded targets were walked')
     ensure(h.calls[1].from.every((v,i)=>Math.abs(v-h.pose('courtyard').eye.getComponent(i))<1e-12)
       &&h.calls[1].to.every((v,i)=>Math.abs(v-h.pose('arrival').eye.getComponent(i))<1e-12),'Newest target did not get a direct station-to-station proof')
+  })
+  check(viewport,'A target further along the walk speeds the leg under way',()=>{
+    // The walk runs arrival, courtyard, hall, oratory, study, chamber,
+    // garden: the hall stands one station beyond the leg's destination and
+    // the garden five.
+    const land=pending=>{
+      const h=harness(phone);h.set('courtyard');h.at(0)
+      if(pending)h.set(pending)
+      const seconds=h.rail.navigation.legSeconds
+      for(let i=1;i<=900;i++){const now=i*seconds/300;h.at(now);if(h.rail.navigation.completed==='courtyard')return now}
+      return Infinity
+    }
+    const alone=land(null),oneOn=land('hall'),fiveOn=land('garden')
+    ensure(alone>oneOn&&oneOn>fiveOn,'Pressing on did not speed the leg under way')
+    return {secondsToLand:{alone:+alone.toFixed(2),oneStationOn:+oneOn.toFixed(2),fiveStationsOn:+fiveOn.toFixed(2)}}
   })
   check(viewport,'Repeated pending targets deduplicate and the active target cancels any pending reversal',()=>{
     const h=harness(phone);h.set('courtyard');h.set('courtyard');h.at(0);h.at(.2)
