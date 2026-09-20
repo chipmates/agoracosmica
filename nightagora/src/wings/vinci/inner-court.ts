@@ -238,14 +238,38 @@ function meshOf(source:Batch,name:string):Mesh {
  * part of the court, so the clearance certificate is written against it.
  */
 export const studySupport={
-  east:.614,north:-26.645,
+  // Under the window it belongs to, a stride and a fifth off the house: far
+  // enough from the station's eye to stand clear of the bar in its frame.
+  east:-1.283,north:-23.824,
   /** the board's own middle, in world height */
   top:1.04,
   widthM:.46,depthM:.34,rakeDeg:28,
   /** where the eye stands to read it, on the line in from the study's own eye */
-  eye:{east:1.228,north:-27.558,height:1.65},
+  eye:{east:-.67,north:-24.737,height:1.65},
   meshName:'vinci/study-support',
 } as const
+/** The bearing the board turns its face to, which is the eye that reads it. */
+const supportBearing=Math.atan2(studySupport.eye.east-studySupport.east,studySupport.eye.north-studySupport.north)
+/** Where a sheet laid on the board stands: its middle, its turn and its rake. */
+export const studySupportFace={
+  east:studySupport.east,north:studySupport.north,height:studySupport.top+.006,
+  bearingRad:supportBearing,rakeRad:studySupport.rakeDeg*Math.PI/180,
+  widthM:studySupport.widthM-.07,depthM:studySupport.depthM-.06,
+} as const
+
+/** THE FOUR CORNERS A SHEET LIES ON, in the scene's own frame: near left,
+ * near right, far right, far left, which is also the order a page's own
+ * corners are read in, so its top edge stands at the far side. */
+export function studySheetCorners():[number,number,number][] {
+  const F=studySupportFace
+  const along:CourtPoint=[Math.cos(F.bearingRad),-Math.sin(F.bearingRad)]
+  const out:CourtPoint=[Math.sin(F.bearingRad),Math.cos(F.bearingRad)]
+  const halfW=F.widthM/2,halfD=F.depthM/2,rise=halfD*Math.sin(F.rakeRad)
+  const at=(u:number,v:number,lift:number):[number,number,number]=>
+    [F.east+along[0]*u+out[0]*v,F.height+lift,-(F.north+along[1]*u+out[1]*v)]
+  return [at(-halfW,-halfD,-rise),at(halfW,-halfD,-rise),at(halfW,halfD,rise),at(-halfW,halfD,rise)]
+}
+
 export const studySupportProvenance={
   manifestId:'vinci/inner-court',assetClass:'GENERATED',certainty:'assumed',
   source:['modern museum fitting'],
@@ -330,22 +354,24 @@ export function createInnerCourtDressing(heightAt:HeightAt,tier:TierName):Group 
   // THE READING SUPPORT, in the same stone the treads are dressed with: one
   // post, one raked board, built here so the certificate covers it.
   {
-    const S=studySupport, board=batch()
+    const S=studySupport, board=batch(), thickness=.028
     const rake=S.rakeDeg*Math.PI/180
-    const toEye=Math.atan2(S.eye.east-S.east,S.eye.north-S.north)
-    const along:CourtPoint=[Math.cos(toEye),-Math.sin(toEye)]
-    const out:CourtPoint=[Math.sin(toEye),Math.cos(toEye)]
+    const along:CourtPoint=[Math.cos(supportBearing),-Math.sin(supportBearing)]
+    const out:CourtPoint=[Math.sin(supportBearing),Math.cos(supportBearing)]
     const corner=(u:number,v:number,lift:number):Vector3=>
       world([S.east+along[0]*u+out[0]*v,S.north+along[1]*u+out[1]*v],S.top+lift)
     const halfW=S.widthM/2,halfD=S.depthM/2,rise=halfD*Math.sin(rake)
     const colour=new Color('#b9b2a2')
     const quad=(a:Vector3,b:Vector3,c:Vector3,d:Vector3):void=>{tri(board,a,b,c,colour);tri(board,a,c,d,colour)}
-    const near=[corner(-halfW,-halfD,-rise),corner(halfW,-halfD,-rise)] as const
-    const far=[corner(halfW,halfD,rise),corner(-halfW,halfD,rise)] as const
-    quad(near[0]!,near[1]!,far[0]!,far[1]!)
-    quad(far[1]!,far[0]!,near[1]!,near[0]!)
+    const face=(lift:number):readonly Vector3[]=>[corner(-halfW,-halfD,-rise+lift),corner(halfW,-halfD,-rise+lift),
+      corner(halfW,halfD,rise+lift),corner(-halfW,halfD,rise+lift)]
+    const top=face(0),under=face(-thickness)
+    quad(top[0]!,top[1]!,top[2]!,top[3]!)
+    quad(under[3]!,under[2]!,under[1]!,under[0]!)
+    for(let i=0;i<4;i++)quad(top[i]!,top[(i+1)%4]!,under[(i+1)%4]!,under[i]!)
     const foot=(p:Vector3):Vector3=>new Vector3(p.x,heightAt(p.x,-p.z),p.z)
-    const post=[corner(-.045,-.045,-rise),corner(.045,-.045,-rise),corner(.045,.045,-rise),corner(-.045,.045,-rise)] as const
+    const post=[corner(-.045,-.045,-rise-thickness),corner(.045,-.045,-rise-thickness),
+      corner(.045,.045,-rise-thickness),corner(-.045,.045,-rise-thickness)] as const
     for(let i=0;i<4;i++){const a=post[i]!,b=post[(i+1)%4]!;quad(a,b,foot(b),foot(a))}
     if(board.positions.length){
       const mesh=meshOf(board,studySupport.meshName)

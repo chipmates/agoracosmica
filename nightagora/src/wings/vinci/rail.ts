@@ -79,7 +79,9 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // with 0.563 m, so the hall's eye stands on the landing and not inside.
   if(id==='hall') return narrow?p(3.0959,-13.0423,2.45,-1.301,-6.4787,.72,72):p(3.0959,-13.0423,2.45,-1.301,-6.4787,2.25,46)
   if(id==='oratory') return narrow?p(5.6,-21.3,1.65,3.053,-18.288,1.98,60):p(5.6,-21.3,1.65,3.053,-18.288,2.9,46)
-  if(id==='study') return narrow?p(2.4,-29.3,1.65,-1.94,-22.848,5.9,66):p(2.4,-29.3,1.65,-1.94,-22.848,8.1,52)
+  // The study holds two things at once now: the window of the room the visit
+  // was written in, and the support under it the page is read at.
+  if(id==='study') return narrow?p(2.4,-29.3,1.65,-1.94,-22.848,3.3,76):p(2.4,-29.3,1.65,-1.94,-22.848,2.74,60)
   // The royal château stands 590 m away on a bearing of 308.84 degrees, which
   // from this end of the court runs over the house's west corner and down the
   // valley. The aim is that bearing; nothing of the castle is built.
@@ -155,6 +157,9 @@ export function namedPose(id:string,narrow:boolean):Pose|undefined {
   // whole opening and the carving over it but repeats the court's own subject.
   if(id==='composition-hall-steps')return p(4.212,-14.942,1.65,2.487,-12.367,2.05,narrow?70:55)
   if(id==='composition-hall-door')return stationPose('hall',narrow)
+  // The two the house walks up to, from the eyes their approaches certify.
+  if(id==='composition-hall-ledge')return p(1.3707,-10.4668,2.45,.2059,-9.8828,2.035,narrow?56:44)
+  if(id==='composition-study-support')return p(-.67,-24.737,1.65,-1.283,-23.824,1.04,narrow?58:46)
   // Where the court's own four stand, from the walk that passes them.
   if(id==='composition-court-objects')return p(9.4,-20.2,1.65,11.9,-16.1,.5,narrow?76:58)
   if(id==='composition-study-near')return p(.55,-26.6,1.65,-1.94,-22.848,6.05,narrow?66:52)
