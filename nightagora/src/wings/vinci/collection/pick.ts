@@ -14,7 +14,8 @@
 import { Box3, Mesh, Raycaster, Sphere, Vector3, type Object3D } from 'three/webgpu'
 import type { VinciStationId } from '../content'
 import { HOUSE_CLOSE_LOOKS } from '../rail'
-import { LINE_FLOOR_PICK, VINCI_LINE_STATION, vinciApproachPose, vinciApproachStation, vinciPlateExhibitId, type VinciExhibitKind } from './approaches'
+import { studySupport } from '../inner-court'
+import { LINE_FLOOR_PICK, VINCI_LINE_STATION, VINCI_STUDY_LEAF, vinciApproachPose, vinciApproachStation, vinciPlateExhibitId, type VinciExhibitKind } from './approaches'
 import { vinciWallOrderOf } from './wall'
 import { hangPlacements } from './hang'
 import { STANDS } from './stands'
@@ -211,6 +212,12 @@ export function readVinciExhibits(root: Object3D): VinciPickEntry[] {
       const over = sphere.center.clone().setY(box.max.y + BOOK_MARK_M)
       entries.push(place('codex/paris-B', 'manuscript', object, sphere.center.clone(),
         Math.max(BOOK_PROXY_M, sphere.radius), over, 0))
+    } else if (object instanceof Mesh && object.name === studySupport.meshName) {
+      // THE SUPPORT IS THE PAGE'S PLACE, not the page: the reading opens in
+      // the reader, and the mark stands over the board a hand would reach.
+      const { centre, radiusM } = proxy(object)
+      const over = centre.clone().setY(studySupport.top + .1)
+      entries.push(place(VINCI_STUDY_LEAF, 'manuscript', object, centre, Math.max(.3, radiusM), over, 0))
     } else if (exhibit?.kind === 'court-plaque') {
       const { centre, radiusM } = proxy(object)
       entries.push(place('plaque/flight-quote', 'place', object, centre, radiusM, centre.clone(), MACHINE_OFFSET + Object.keys(STANDS).length))

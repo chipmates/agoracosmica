@@ -232,6 +232,27 @@ function meshOf(source:Batch,name:string):Mesh {
   return mesh
 }
 
+/** THE STUDY'S READING SUPPORT. A raked board on one post, standing on the
+ * court below the study's window: the museum's own fitting, square and
+ * unmoulded, where the page the study is read with is opened. Its geometry is
+ * part of the court, so the clearance certificate is written against it.
+ */
+export const studySupport={
+  east:.614,north:-26.645,
+  /** the board's own middle, in world height */
+  top:1.04,
+  widthM:.46,depthM:.34,rakeDeg:28,
+  /** where the eye stands to read it, on the line in from the study's own eye */
+  eye:{east:1.228,north:-27.558,height:1.65},
+  meshName:'vinci/study-support',
+} as const
+export const studySupportProvenance={
+  manifestId:'vinci/inner-court',assetClass:'GENERATED',certainty:'assumed',
+  source:['modern museum fitting'],
+  recipe:'A 0.46 by 0.34 m board raked 28 degrees on one 0.09 m post, its face 1.04 m over the court. A fitting of this museum: no support of 1517 is documented in this court and none is claimed.',
+  recipeDe:'Ein Brett von 0,46 mal 0,34 m, um 28 Grad geneigt, auf einem Pfosten von 0,09 m, seine Fl\u00e4che 1,04 m \u00fcber dem Hof. Ein Einbau dieses Museums: f\u00fcr 1517 ist in diesem Hof kein Lesepult belegt, und es wird keines behauptet.',
+} as const
+
 /** Supplemental surface detail only; physical court/stair levels come from
  * getInnerCourtRegions through the caller's single shared grade sampler.
  */
@@ -305,6 +326,32 @@ export function createInnerCourtDressing(heightAt:HeightAt,tier:TierName):Group 
   group.userData={...courtDressingProvenance,triangles:(stone.positions.length+chips.positions.length+wear.positions.length)/9,placedChips:placed}
   for(const [source,name]of[[stone,'tread stone'],[chips,'court gravel'],[wear,'court wear and drainage']] as const){
     if(source.positions.length)group.add(meshOf(source,`vinci/inner-court/${name}`))
+  }
+  // THE READING SUPPORT, in the same stone the treads are dressed with: one
+  // post, one raked board, built here so the certificate covers it.
+  {
+    const S=studySupport, board=batch()
+    const rake=S.rakeDeg*Math.PI/180
+    const toEye=Math.atan2(S.eye.east-S.east,S.eye.north-S.north)
+    const along:CourtPoint=[Math.cos(toEye),-Math.sin(toEye)]
+    const out:CourtPoint=[Math.sin(toEye),Math.cos(toEye)]
+    const corner=(u:number,v:number,lift:number):Vector3=>
+      world([S.east+along[0]*u+out[0]*v,S.north+along[1]*u+out[1]*v],S.top+lift)
+    const halfW=S.widthM/2,halfD=S.depthM/2,rise=halfD*Math.sin(rake)
+    const colour=new Color('#b9b2a2')
+    const quad=(a:Vector3,b:Vector3,c:Vector3,d:Vector3):void=>{tri(board,a,b,c,colour);tri(board,a,c,d,colour)}
+    const near=[corner(-halfW,-halfD,-rise),corner(halfW,-halfD,-rise)] as const
+    const far=[corner(halfW,halfD,rise),corner(-halfW,halfD,rise)] as const
+    quad(near[0]!,near[1]!,far[0]!,far[1]!)
+    quad(far[1]!,far[0]!,near[1]!,near[0]!)
+    const foot=(p:Vector3):Vector3=>new Vector3(p.x,heightAt(p.x,-p.z),p.z)
+    const post=[corner(-.045,-.045,-rise),corner(.045,-.045,-rise),corner(.045,.045,-rise),corner(-.045,.045,-rise)] as const
+    for(let i=0;i<4;i++){const a=post[i]!,b=post[(i+1)%4]!;quad(a,b,foot(b),foot(a))}
+    if(board.positions.length){
+      const mesh=meshOf(board,studySupport.meshName)
+      mesh.castShadow=tier!=='calm'
+      group.add(mesh)
+    }
   }
   return group
 }
