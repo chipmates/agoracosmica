@@ -958,23 +958,54 @@ function fireStands(): void {
   if (pressedEarly) enterTheFire()
 }
 
-/** Build the court's materials behind the still frame. A material compiles
-    in the pass that first DRAWS it, and this room stands around the eye, so
-    a drawn warm frame here would be a black flash over the eclipse: the
-    renderer compiles it off the frame instead, and the loop holds still
-    while it does. */
+/** Where an engine has no `scheduler.yield`, the renderer's compile waits a
+    whole frame between two of its steps, and the way on arrives seconds
+    late. For the length of the door's build, and no longer, such an engine
+    is lent a yield that waits one task. */
+function lendYield(): () => void {
+  const host = self as unknown as { scheduler?: { yield?: () => Promise<void> } }
+  if (typeof host.scheduler?.yield === 'function') return () => {}
+  try {
+    const channel = new MessageChannel()
+    const waiting: Array<() => void> = []
+    channel.port1.onmessage = () => waiting.shift()?.()
+    const lent = Object.create(host.scheduler ?? null) as { yield: () => Promise<void> }
+    lent.yield = () =>
+      new Promise<void>((resolve) => {
+        waiting.push(resolve)
+        channel.port2.postMessage(0)
+      })
+    Object.defineProperty(self, 'scheduler', { value: lent, configurable: true, writable: true })
+    return () => {
+      delete (self as unknown as { scheduler?: unknown }).scheduler
+      channel.port1.close()
+    }
+  } catch {
+    return () => {}
+  }
+}
+
+/** Build the court's materials behind the door. A material compiles in the
+    pass that first DRAWS it, and this room stands around the eye, so a drawn
+    warm frame here would be a black flash over the eclipse: the renderer
+    compiles it off the frame instead. The room is listed for the compile
+    inside the call itself, where the listing is synchronous, and struck
+    again before the next frame, so the loop never has to hold still. */
 function buildTheFire(): void {
   if (building || fireReady) return
   building = true
   doorCount(0.5)
-  agora.warm(true)
+  const returnYield = lendYield()
   const done = (): void => {
     if (!building) return
-    agora.warm(false)
     building = false
+    returnYield()
     fireStands()
   }
-  void renderer.compileAsync(scene, camera).then(done, done)
+  agora.warm(true)
+  const built = renderer.compileAsync(scene, camera)
+  agora.warm(false)
+  void built.then(done, done)
   // a compile that never answers may not strand the visitor at a dark button
   window.setTimeout(done, 8000)
 }
@@ -1566,6 +1597,8 @@ window.__forge = {
 }
 
 const TRANSIT_SECONDS = 2.0
+/** how long the opening may hold its first frame waiting for the room */
+const OPENING_HOLD = 2.5
 
 function setPhase(next: Phase): void {
   // the phase arrives from the rig as well as from the night's own verbs, so
@@ -1767,10 +1800,10 @@ function frame(now: number): void {
   // would make the same travel take twice as long as the visitor's
   const dtWall = Math.min((now - last) / 1000, 0.25)
   last = now
-  /* THE STILL DOOR HOLDS ITSELF WHILE THE ROOM IS BUILT. The court is in
-     the scene with nothing culled away for the compile, so a frame drawn
-     now would paint it black over the eclipse. The frame is still: nothing
-     of it is lost by not drawing it. */
+  /* THE OPENING GIVES THE BUILD THE WHOLE THREAD. The moon is held at its
+     first frame until the room stands, so a frame drawn now would repeat
+     the frame already on the glass and buy nothing, while it costs the
+     compile a step and the way on its arrival. */
   if (building) return
   /* a bench owns the whole frame: its own clock, its own scene, its own
      render. Nothing of the night's overture runs behind it. */
@@ -1786,7 +1819,14 @@ function frame(now: number): void {
      a two second animation and no two folders could be paired. A frozen
      eye holds the transit where the jump put it. */
   if (phase === 'transit' && !frozen) {
-    transit = reducedMotion ? 1 : Math.min(1, transit + dt / TRANSIT_SECONDS)
+    /* THE MOON WAITS FOR THE ROOM. Building the court behind the door costs
+       one long main thread stall, and a stall inside the travel is a hitch
+       in the one motion the visitor is watching. So the opening holds its
+       first frame until the room stands, and moves after it. The cap is the
+       machine that never answers: better a hitch than a door that never
+       opens. */
+    const waiting = !fireReady && elapsed < OPENING_HOLD
+    if (!waiting) transit = reducedMotion ? 1 : Math.min(1, transit + dt / TRANSIT_SECONDS)
     if (transit >= 1) {
       flashAt = elapsed
       setPhase('held')
