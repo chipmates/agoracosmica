@@ -154,7 +154,9 @@ const SIGN_AGREEMENT = 0.8
 const SPREAD_CEILING = 8
 /** how long the hold control runs, and the ceiling on one leg */
 const HOLD_FRAMES = 90
-const LEG_CEILING_MS = 40_000
+/* the ceiling is real seconds, and one frame at a time the same leg takes
+   several times as long in real seconds as it does on the wall clock */
+const LEG_CEILING_MS = flag('ahead') && value('ahead', '3') === '1' ? 180_000 : 40_000
 /** the pose has stood when it has not moved for this many frames */
 const STAND_FRAMES = 10
 const STAND_CEILING_MS = 30_000
@@ -385,28 +387,47 @@ function castToDisk(page, client, dir) {
   rmSync(dir, { recursive: true, force: true })
   mkdirSync(dir, { recursive: true })
   const times = []
+  const drawn = []
+  const strict = AHEAD_FRAMES === 1
   let n = 0
   let stopped = false
   /* THE HANDLER WRITES BEFORE IT AWAITS ANYTHING. Awaiting inside it let two
      frames interleave, and a frame in flight past the end of a cast then
      wrote into a folder its own run had already read and removed. */
+  /* AND A SURFACE THAT HAS NOT CHANGED IS NOT A FRAME. The cast emits
+     whatever the compositor is holding, which on a gated page is the frame
+     before the one just drawn; granting on that lets the page run ahead of
+     its own pictures again, and at one frame of credit it stalls on a
+     surface it has already sent. So in lockstep an exact repeat is counted,
+     acked and NOT granted: the next emission carries the new picture, and
+     one grant then stands for exactly one drawn frame. */
+  let previous = ''
+  let stale = 0
   const onFrame = (ev) => {
     if (stopped) return
-    const at = join(dir, `f${String(n + 1).padStart(4, '0')}.png`)
     const bytes = Buffer.from(ev.data, 'base64')
-    try {
-      writeFileSync(at, bytes)
-    } catch {
-      mkdirSync(dir, { recursive: true })
-      writeFileSync(at, bytes)
+    const digest = createHash('sha1').update(bytes).digest('hex')
+    const repeat = digest === previous
+    const grant = !(strict && repeat)
+    if (repeat) stale++
+    else {
+      previous = digest
+      const at = join(dir, `f${String(n + 1).padStart(4, '0')}.png`)
+      try {
+        writeFileSync(at, bytes)
+      } catch {
+        mkdirSync(dir, { recursive: true })
+        writeFileSync(at, bytes)
+      }
+      n++
+      times.push(ev.metadata.timestamp * 1000)
+      drawn.push(null)
     }
-    n++
-    times.push(ev.metadata.timestamp * 1000)
     void (async () => {
       try {
         await client.send('Page.screencastFrameAck', { sessionId: ev.sessionId })
         // the frame is on disk: the page may draw one more
-        await client.send('Runtime.evaluate', { expression: 'window.__even&&window.__even.grant()', returnByValue: true })
+        if (grant) await client.send('Runtime.evaluate', { expression: 'window.__even&&window.__even.grant()', returnByValue: true })
       } catch {
         /* the cast was stopped while a frame was in flight */
       }
@@ -431,7 +452,7 @@ function castToDisk(page, client, dir) {
       await client.send('Page.stopScreencast')
       const even = await page.evaluate(() => (window.__even ? { granted: window.__even.granted, stalls: window.__even.stalls, frames: window.__even.frames } : null))
       await page.evaluate(() => window.__even?.release())
-      return { times, frames: n, even, heldFrom }
+      return { times, frames: n, even, heldFrom, stale, drawn }
     },
     get count() {
       return n
@@ -1021,7 +1042,16 @@ async function readRun(name, dir, allTimes, samples, origin, keepPairs, heldFrom
     /* THE WALK ITSELF, so one run may be laid over another frame for frame:
        the drawn frame number and the eye it was drawn from, rounded to a
        tenth of a millimetre and a ten thousandth of a degree. */
-    trace: pose.map((p) => (p ? [p[10] === null ? null : Math.round(p[10]), +p[1].toFixed(4), +p[2].toFixed(4), +p[3].toFixed(4), +p[4].toFixed(5), +p[5].toFixed(5), +p[6].toFixed(5)] : null)),
+    trace: pose.map((p) =>
+      p
+        ? [
+            // counted from the frame the gate closed on, so two runs of one
+            // leg are on one axis and not on the page's lifetime
+            p[10] === null || heldFrom === null ? null : Math.round(p[10]) - heldFrom,
+            +p[1].toFixed(4), +p[2].toFixed(4), +p[3].toFixed(4), +p[4].toFixed(5), +p[5].toFixed(5), +p[6].toFixed(5),
+          ]
+        : null
+    ),
     /* THE LOAD-INDEPENDENT LENGTH OF THE LEG. On the even clock this is the
        number the same leg has to come back with whatever else the machine is
        doing, and the capture rate beside it is what changed instead. */
@@ -1113,11 +1143,11 @@ async function walkLeg(page, client, from, to, name, keepPairs) {
       }),
     [LEG_CEILING_MS, STAND_FRAMES, STAND_EPSILON]
   )
-  const { times, even, heldFrom } = await cast.stop()
+  const { times, even, heldFrom, stale } = await cast.stop()
   const rec = await stopRecorder(page)
   const seconds = +((Date.now() - began) / 1000).toFixed(2)
   const run = await readRun(name, join(RAW, name), times, rec.samples, rec.origin, keepPairs, heldFrom)
-  return { leg: `${from} to ${to}`, name, stoodAt, seconds, gate: even, ...run }
+  return { leg: `${from} to ${to}`, name, stoodAt, seconds, gate: even, staleEmissions: stale, ...run }
 }
 
 /** the same eye, the same length, nobody walking: the instrument's own floor.
@@ -1144,10 +1174,10 @@ async function holdControl(page, client, at, name, view = '') {
   await cast.start()
   const until = Date.now() + 12000
   while (cast.count < HOLD_FRAMES && Date.now() < until) await page.waitForTimeout(40)
-  const { times, even, heldFrom } = await cast.stop()
+  const { times, even, heldFrom, stale } = await cast.stop()
   const rec = await stopRecorder(page)
   const run = await readRun(name, join(RAW, name), times, rec.samples, rec.origin, null, heldFrom)
-  return { hold: at, name, gate: even, ...run }
+  return { hold: at, name, gate: even, staleEmissions: stale, ...run }
 }
 
 mkdirSync(OUT, { recursive: true })
