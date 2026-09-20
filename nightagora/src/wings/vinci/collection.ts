@@ -41,7 +41,6 @@ export const collectionLayout = {
   ],
   stair: { east: -20.7, north: -15, south: -30, top: -1.9, width: 2.5, count: 27 },
   topLanding: { west: -21.95, east: -19.45, south: -15, north: -13, height: -1.9 },
-  channel: { west: -61.5, east: -27.8, south: -32.8, north: -32, water: -6.56, bed: -6.82 },
 } as const
 
 const rectangle = (west: number, south: number, east: number, north: number): Point[] =>
@@ -50,7 +49,7 @@ const bounds = (points: Point[]): Bounds => ({
   minE: Math.min(...points.map(p => p[0])), maxE: Math.max(...points.map(p => p[0])),
   minN: Math.min(...points.map(p => p[1])), maxN: Math.max(...points.map(p => p[1])),
 })
-const C = collectionLayout, A = C.apron, S = C.stair, W = C.channel
+const C = collectionLayout, A = C.apron, S = C.stair
 const apronOutline = rectangle(A.west, A.south, A.east, A.north)
 const stairTread = (i: number) => {
   const depth = (S.north - S.south) / S.count
@@ -83,7 +82,6 @@ export function getCollectionGradeRegions(): CollectionGradeRegion[] {
       return region(`collection-approach-cheek-${side < 0 ? 'west' : 'east'}-${i}`,
         rectangle(Math.min(inside, outside), piece.south, Math.max(inside, outside), piece.north), piece.height - .22)
     })),
-    region('collection-water-channel', rectangle(W.west, W.south, W.east, W.north), W.bed - .04),
   ]
 }
 
@@ -143,14 +141,14 @@ export const collectionProvenance = {
   source: ['brief/COMMISSION.md § Judges list 10', 'brief/maquette/maquette.ts COLLECTION, collectionCut and garden approach', 'brief/CONCEPT.md §2 two grounds'],
   label: collectionLabel,
   parameterLabel: {
-    en: 'Exhibition design ranges, not survey errors: pavilion width 38–42 m and depth 28–32 m, floor −7.0 to −5.8 m, lower clear height 4.4–5.0 m and hall clear height 6.4–7.0 m. Fixed maquette nominals are 40 m, 30 m, −6.4 m, 4.7 m and 6.7 m. Proposed post sections 0.08–0.14 m and grid 3.5–4.2 m, roof thickness 0.16–0.30 m and apron width 2.5–3.5 m. The new ornamental channel is 0.8 m wide within a 0.6–1.2 m design range. Materials, joints and weathering are authored surface choices. All four roof soffits share the pale cast-concrete finish of the pavilion base. The two 0.10 m entrance posts retain their centres and floor-level feet; their inclined heads meet the existing canopy underside exactly, giving centre heights 4.62292 and 4.70474 m. These are construction dimensions derived from the same proposed canopy, not new survey measurements.',
-    de: 'Entwurfsbereiche der Ausstellung, keine Vermessungsfehler: Pavillonbreite 38–42 m und Tiefe 28–32 m, Bodenhöhe −7,0 bis −5,8 m, untere lichte Höhe 4,4–5,0 m und lichte Hallenhöhe 6,4–7,0 m. Die festen Nennwerte der Maquette sind 40 m, 30 m, −6,4 m, 4,7 m und 6,7 m. Vorgeschlagene Stützenquerschnitte 0,08–0,14 m und Raster 3,5–4,2 m, Dachstärke 0,16–0,30 m und Vorbereichsbreite 2,5–3,5 m. Der neue Zierwasserkanal ist 0,8 m breit innerhalb eines Entwurfsbereichs von 0,6–1,2 m. Materialien, Fugen und Verwitterung sind gestaltete Oberflächen. Alle vier Dachuntersichten erhalten denselben hellen Ortbeton wie der Pavillonsockel. Die beiden 0,10 m starken Eingangsstützen behalten ihre Mittelpunkte und ihre Füße auf Bodenhöhe; ihre geneigten Köpfe treffen die vorhandene Vordachuntersicht genau, mit mittleren Höhen von 4,62292 und 4,70474 m. Diese Konstruktionsmaße ergeben sich aus demselben vorgeschlagenen Vordach und sind keine neuen Vermessungswerte.',
+    en: 'Exhibition design ranges, not survey errors: pavilion width 38–42 m and depth 28–32 m, floor −7.0 to −5.8 m, lower clear height 4.4–5.0 m and hall clear height 6.4–7.0 m. Fixed maquette nominals are 40 m, 30 m, −6.4 m, 4.7 m and 6.7 m. Proposed post sections 0.08–0.14 m and grid 3.5–4.2 m, roof thickness 0.16–0.30 m and apron width 2.5–3.5 m. Materials, joints and weathering are authored surface choices. All four roof soffits share the pale cast-concrete finish of the pavilion base. The two 0.10 m entrance posts retain their centres and floor-level feet; their inclined heads meet the existing canopy underside exactly, giving centre heights 4.62292 and 4.70474 m. These are construction dimensions derived from the same proposed canopy, not new survey measurements.',
+    de: 'Entwurfsbereiche der Ausstellung, keine Vermessungsfehler: Pavillonbreite 38–42 m und Tiefe 28–32 m, Bodenhöhe −7,0 bis −5,8 m, untere lichte Höhe 4,4–5,0 m und lichte Hallenhöhe 6,4–7,0 m. Die festen Nennwerte der Maquette sind 40 m, 30 m, −6,4 m, 4,7 m und 6,7 m. Vorgeschlagene Stützenquerschnitte 0,08–0,14 m und Raster 3,5–4,2 m, Dachstärke 0,16–0,30 m und Vorbereichsbreite 2,5–3,5 m. Materialien, Fugen und Verwitterung sind gestaltete Oberflächen. Alle vier Dachuntersichten erhalten denselben hellen Ortbeton wie der Pavillonsockel. Die beiden 0,10 m starken Eingangsstützen behalten ihre Mittelpunkte und ihre Füße auf Bodenhöhe; ihre geneigten Köpfe treffen die vorhandene Vordachuntersicht genau, mit mittleren Höhen von 4,62292 und 4,70474 m. Diese Konstruktionsmaße ergeben sich aus demselben vorgeschlagenen Vordach und sind keine neuen Vermessungswerte.',
   },
   approachLabel: {
     en: 'Modern museum proposal: a 2.5 × 2 m top landing occupies E −21.95 to −19.45 m, N −15 to −13 m at H −1.9 m. Its paving and the 27 maquette treads alone cut the registered terrace within their exact footprints; grade is 0.06 m beneath the paving. Landing design ranges are 2.3–2.7 m wide, 1.8–2.2 m long and H −2.0 to −1.8 m; these are design choices, not measured uncertainty. Concrete finish cheeks are 0.14 m wide [0.12–0.18], rise 0.09 m [0.06–0.12] and extend 0.22 m below each paving level [0.18–0.26]. Their exact footprints now receive structural support from the existing grade to the finish underside, including both landing heads. This derived support is a modern construction proposal with no fixed historical depth. All uncovered cut and fill boundaries remain closed with modern concrete. Raw IGN samples and registered platform coordinates are unchanged.',
     de: 'Moderner Museumsvorschlag: Ein oberes Podest von 2,5 × 2 m liegt bei E −21,95 bis −19,45 m, N −15 bis −13 m auf H −1,9 m. Nur sein Belag und die 27 Stufen der Maquette schneiden innerhalb ihrer genauen Grundrisse in die registrierte Terrasse ein; das Planum liegt 0,06 m unter dem Belag. Die Entwurfsbereiche des Podests sind 2,3–2,7 m Breite, 1,8–2,2 m Länge und H −2,0 bis −1,8 m; dies sind Entwurfsentscheidungen, keine Messunsicherheiten. Die sichtbaren Betonwangen sind 0,14 m breit [0,12–0,18], stehen 0,09 m hoch [0,06–0,12] und reichen 0,22 m unter jeden Belag [0,18–0,26]. Ihre genauen Grundrisse erhalten nun einen tragenden Unterbau vom vorhandenen Gelände bis zur Unterseite, auch an beiden Podestenden. Dieser abgeleitete Unterbau ist ein moderner Konstruktionsvorschlag ohne festgelegte historische Tiefe. Alle unbedeckten Abgrabungs- und Aufschüttungskanten bleiben durch modernen Beton geschlossen. Die IGN-Rohwerte und registrierten Plattformkoordinaten bleiben unverändert.',
   },
-  recipe: 'Original welded geometry from the commissioned maquette envelope and reserved rooms. Three low roof volumes with the existing pale cast-concrete finish on every soffit, slender steel bays, entrance posts whose inclined heads are derived from the retained canopy underside plane, actual full-height glass planes with recessed dark enclosure, concrete base, saw-cut paving, twenty-seven garden treads, a separately proposed 2.5 × 2 m top landing and ornamental water channel. Exact modern walking and 140 mm cheek footprints override terrace grade; no raw IGN sample or registered platform coordinate changes. Each cheek underside has a supporting cut/fill region at paving minus 220 mm. Continuous concrete finish replaces only its actual covered height band on both side planes and the two landing heads; terrain closes all remaining support. Buried underside faces and internal underside riser caps are omitted. No period collection, machinery, paintings or occupied interiors are asserted. No reference image is sampled. Three independently filtered procedural material scales, no new texture assets.',
+  recipe: 'Original welded geometry from the commissioned maquette envelope and reserved rooms. Three low roof volumes with the existing pale cast-concrete finish on every soffit, slender steel bays, entrance posts whose inclined heads are derived from the retained canopy underside plane, actual full-height glass planes with recessed dark enclosure, concrete base, saw-cut paving, twenty-seven garden treads and a separately proposed 2.5 × 2 m top landing. Exact modern walking and 140 mm cheek footprints override terrace grade; no raw IGN sample or registered platform coordinate changes. Each cheek underside has a supporting cut/fill region at paving minus 220 mm. Continuous concrete finish replaces only its actual covered height band on both side planes and the two landing heads; terrain closes all remaining support. Buried underside faces and internal underside riser caps are omitted. No period collection, machinery, paintings or occupied interiors are asserted. No reference image is sampled. Three independently filtered procedural material scales, no new texture assets.',
   date: '2026-09-09',
 } as const
 
@@ -355,43 +353,37 @@ export function collectionConcreteMaterial(closedCaster = false): MeshStandardNo
   return m
 }
 
-function glazingMaterial(water = false): MeshStandardNodeMaterial {
+function glazingMaterial(): MeshStandardNodeMaterial {
   const { cameraViewMatrix, float, length, mx_noise_float, normalView, normalWorldGeometry, positionView, positionViewDirection, positionWorld, smoothstep, vec3 } = TSL
-  const m = new MeshStandardNodeMaterial({ color: water ? '#344b4d' : '#a5b2ae', roughness: water ? .22 : .17,
-    metalness: water ? .34 : .12, transparent: !water, opacity: water ? 1 : .27, depthWrite: water, side: DoubleSide })
-  // The wing dims the probe so it cannot wash a mineral wall. Glass and still
-  // water are the two surfaces that owe the sky its full reflection, so they
-  // take it back on the material rather than on the scene.
-  m.envMapIntensity = water ? 2.1 : 2.6
+  const m = new MeshStandardNodeMaterial({ color: '#a5b2ae', roughness: .17,
+    metalness: .12, transparent: true, opacity: .27, depthWrite: false, side: DoubleSide })
+  // The wing dims the probe so it cannot wash a mineral wall. Glass owes the
+  // sky its full reflection, so it takes it back on the material rather than
+  // on the scene.
+  m.envMapIntensity = 2.6
   m.forceSinglePass = true
   const P = positionWorld, pixel = anisotropicFootprint(P)
   const resolved = (metres: number) => smoothstep(2, 4, float(metres).div(pixel))
   const broad = mx_noise_float(P.mul(.23)).mul(resolved(4.35)).toVar()
-  const middle = mx_noise_float(P.mul(water ? vec3(2, 1, 6) : vec3(2, 7, 2))).mul(resolved(water ? .167 : .143)).toVar()
+  const middle = mx_noise_float(P.mul(vec3(2, 7, 2))).mul(resolved(.143)).toVar()
   const fine = mx_noise_float(P.mul(60)).mul(resolved(.017)).toVar()
-  m.roughnessNode = float(water ? .21 : .17).add(broad.mul(.018)).add(middle.mul(.013)).add(fine.mul(.008)).clamp(water ? .18 : .14, water ? .25 : .21)
-  const height = broad.mul(water ? .0005 : .00003).add(middle.mul(water ? .00016 : .000005))
-    .add(fine.mul(water ? .000008 : .0000007)).toVar()
+  m.roughnessNode = float(.17).add(broad.mul(.018)).add(middle.mul(.013)).add(fine.mul(.008)).clamp(.14, .21)
+  const height = broad.mul(.00003).add(middle.mul(.000005)).add(fine.mul(.0000007)).toVar()
   const viewNormal = normalWorldGeometry.transformDirection(cameraViewMatrix), sx = positionView.dFdx(), sy = positionView.dFdy()
   const rx = sy.cross(viewNormal), ry = viewNormal.cross(sx), det = sx.dot(rx)
   const gradient = rx.mul(height.dFdx()).add(ry.mul(height.dFdy())).mul(det.sign()).div(det.abs().max(1e-10)).toVar()
-  const limit = water ? .045 : .006
+  const limit = .006
   m.normalNode = viewNormal.sub(gradient.div(length(gradient).div(limit).max(1))).normalize()
-  // Glass turns to a mirror at a grazing angle: from the court this wall is
-  // seen almost edge on, and a fixed low opacity read there as a hole.
-  if (!water) {
-    // A museum's window wall is a window: the rooms behind it are the
-    // exhibit, and an opacity that climbs to a mirror at a grazing angle
-    // turned the whole north elevation into milk. The Fresnel lobe stays,
-    // because glass does that, but the sheet under it is glass and not a
-    // screen.
-    const cosine = normalView.dot(positionViewDirection).abs().clamp(0, 1)
-    m.opacityNode = float(.10).add(float(1).sub(cosine).pow(5).mul(.34)).clamp(.10, .46)
-  }
-  m.name = water ? 'vinci/collection/still-channel' : 'vinci/collection/full-height-glazing'
+  // A museum's window wall is a window: the rooms behind it are the exhibit,
+  // and an opacity that climbs to a mirror at a grazing angle turned the whole
+  // north elevation into milk. The Fresnel lobe stays, because glass does
+  // that, but the sheet under it is glass and not a screen.
+  const cosine = normalView.dot(positionViewDirection).abs().clamp(0, 1)
+  m.opacityNode = float(.10).add(float(1).sub(cosine).pow(5).mul(.34)).clamp(.10, .46)
+  m.name = 'vinci/collection/full-height-glazing'
   m.userData['provenance'] = 'Original static exhibition glass. Broad drift, middle waviness, filtered microscopic surface grain and a Schlick grazing-angle opacity. No animated water, transmission pass, photographic texture or historical glazing claim.'
   m.userData['normalGradientLimit'] = limit
-  m.userData['filtering'] = 'Independent pixel filtering of 4.35 m drift, 0.143/0.167 m waviness and 17 mm grain; world/view height derivatives preserve each geometric plane and bound its surface-normal slope.'
+  m.userData['filtering'] = 'Independent pixel filtering of 4.35 m drift, 0.143 m waviness and 17 mm grain; world/view height derivatives preserve each geometric plane and bound its surface-normal slope.'
   return m
 }
 
@@ -399,7 +391,7 @@ function glazingMaterial(water = false): MeshStandardNodeMaterial {
  * complete: enclosure supplies credible depth behind the contemporary glass.
  */
 export function createCollection(): Group {
-  const opaque = new CollectionBatch(), castConcrete = new CollectionBatch(), castConcreteReturns = new CollectionBatch(), glass = new CollectionBatch(), water = new CollectionBatch()
+  const opaque = new CollectionBatch(), castConcrete = new CollectionBatch(), castConcreteReturns = new CollectionBatch(), glass = new CollectionBatch()
   const concrete = '#9b9789', steel = '#323b3c', slate = '#424e58', interior = '#454941', paving = '#a6a393'
   const floor = C.floor, top = floor + C.galleryClear
   castConcrete.box(-42, -49, floor - .34, 40, 30, .68, concrete)
@@ -408,9 +400,9 @@ export function createCollection(): Group {
   opaque.box(-42, -65.5, A.height - .03, 46, 3, .06, paving, 4)
   opaque.box(-63.5, -49, A.height - .03, 3, 30, .06, paving, 4)
   opaque.box(-20.5, -49, A.height - .03, 3, 30, .06, paving, 4)
-  // North apron is split around its actual water void.
-  for (const [west, south, east, north] of [[A.west, -34, A.east, W.south], [A.west, W.north, A.east, A.north], [A.west, W.south, W.west, W.north], [W.east, W.south, A.east, W.north]])
-    opaque.box((west! + east!) / 2, (south! + north!) / 2, A.height - .03, east! - west!, north! - south!, .06, paving, 4)
+  // The north apron is one strip: nothing is cut into it, so the paving runs
+  // unbroken from the pavilion's foot to the court's edge.
+  opaque.box((A.west + A.east) / 2, (C.north + A.north) / 2, A.height - .03, A.east - A.west, A.north - C.north, .06, paving, 4)
   // Floor, back wall and recessed returns create a dark volume behind glass.
   opaque.box(-42, -49, floor + .045, 39.5, 29.5, .09, '#555a4d', 3)
   castConcrete.box(-42, -63.83, floor + 2.25, 40, .34, 4.5, concrete)
@@ -535,18 +527,12 @@ export function createCollection(): Group {
       }
     }
   }
-  // This is a modern ornamental channel, separate from the mapped Amasse.
-  opaque.box((W.west + W.east) / 2, (W.south + W.north) / 2, W.bed - .03, W.east - W.west, W.north - W.south, .06, '#3d4640', 3)
-  for (const north of [W.south - .045, W.north + .045]) castConcrete.box((W.west + W.east) / 2, north, (W.bed + A.height) / 2, W.east - W.west + .18, .09, A.height - W.bed, concrete)
-  for (const east of [W.west - .045, W.east + .045]) castConcrete.box(east, (W.south + W.north) / 2, (W.bed + A.height) / 2, .09, W.north - W.south, A.height - W.bed, concrete)
-  water.quad([W.west, W.south, W.water], [W.east, W.south, W.water], [W.east, W.north, W.water], [W.west, W.north, W.water], '#ffffff')
   const group = new Group(); group.name = 'vinci/collection-modern-insertion'
   const parts = [
     { batch: opaque, material: architectureMaterial(), name: 'architecture', cast: true },
     { batch: castConcrete, material: collectionConcreteMaterial(true), name: 'cast-concrete', cast: true },
     { batch: castConcreteReturns, material: collectionConcreteMaterial(), name: 'cast-concrete-hall-returns', cast: true },
     { batch: glass, material: glazingMaterial(), name: 'glazing', cast: false },
-    { batch: water, material: glazingMaterial(true), name: 'channel-water', cast: false },
   ]
   for (const part of parts) {
     const mesh = new Mesh(part.batch.geometry(), part.material)
@@ -555,7 +541,7 @@ export function createCollection(): Group {
     group.add(mesh)
   }
   group.userData = { ...collectionProvenance, layout: collectionLayout,
-    visibleMeshes: 5, shadowCasters: 3,
+    visibleMeshes: 4, shadowCasters: 3,
     triangles: group.children.reduce((sum, child) => sum + (child as Mesh).geometry.getAttribute('position').count / 3, 0) }
   // The rooms are a separate body with a separate manifest id: the pavilion's
   // own meshes are a rail collision solid whose geometry the clearance

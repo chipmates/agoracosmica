@@ -3,12 +3,13 @@
  * the numbers the court's module declares about the envelope it may not
  * import are the envelope's own.
  *
- * Three things, none of which needs a browser: the pavilion's faces, apron
- * level and channel as `collection/rooms.ts` declares them are the ones
- * `collection.ts` builds; the plinth course at the pavilion's foot covers
- * the 40 mm the envelope stood clear of its apron on every elevation; and
- * every rendered facade of the shell has its lowest wall foot at or under
- * the terrain it stands on, counting the foundation plinth's own depth.
+ * Three things, none of which needs a browser: the pavilion's faces and
+ * apron level as `collection/rooms.ts` declares them are the ones
+ * `collection.ts` builds, and nothing is cut into that apron; the plinth
+ * course at the pavilion's foot covers the 40 mm the envelope stood clear of
+ * its apron on every elevation; and every rendered facade of the shell has
+ * its lowest wall foot at or under the terrain it stands on, counting the
+ * foundation plinth's own depth.
  *
  * It claims no rendered light, no residency and no frame cost.
  */
@@ -52,18 +53,22 @@ const declared = name => {
   assert.ok(line, `${name} is not declared in collection/rooms.ts`)
   return JSON.parse(line[1].replace(/([a-z]+):/g, '"$1":').replace(/'/g, '"'))
 }
-const ENVELOPE = declared('ENVELOPE'), CHANNEL = declared('CHANNEL')
-const { collectionLayout } = load('src/wings/vinci/collection.ts')
+const ENVELOPE = declared('ENVELOPE')
+const { collectionLayout, getCollectionGradeRegions } = load('src/wings/vinci/collection.ts')
 
-/* ---- 1. the declared envelope is the built envelope ---- */
+/* ---- 1. the declared envelope is the built envelope, and the apron is whole ---- */
 const L = collectionLayout
 for (const key of ['west', 'east', 'south', 'north'])
   assert.equal(ENVELOPE[key], L[key], `the declared ${key} face is not the envelope's`)
 assert.equal(ENVELOPE.apron, L.apron.height, 'the declared apron level is not the apron\'s')
 assert.equal(ENVELOPE.foot, L.floor, 'the declared foot is not the pavilion floor the base is cast to')
-for (const key of Object.keys(CHANNEL))
-  assert.equal(CHANNEL[key], L.channel[key], `the declared channel ${key} is not the channel's`)
-report.envelope = { ...ENVELOPE, channel: CHANNEL }
+// The ornamental channel is gone: the apron carries no void, so neither the
+// layout nor the grade regions may name one again.
+assert.equal(L.channel, undefined, 'the layout declares a water channel again')
+const regionIds = getCollectionGradeRegions().map(region => region.id)
+assert.ok(!regionIds.some(id => id.includes('water')), `a water region is graded again: ${regionIds.filter(id => id.includes('water')).join(', ')}`)
+assert.ok(!rooms.includes('CHANNEL'), 'the rooms module declares a channel again')
+report.envelope = { ...ENVELOPE, gradeRegions: regionIds.length, waterRegions: 0 }
 
 /* ---- 2. the plinth course closes the foot on every elevation ---- */
 // what the envelope leaves open: its base top stands at the pavilion floor,

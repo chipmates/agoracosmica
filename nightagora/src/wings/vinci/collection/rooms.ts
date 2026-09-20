@@ -104,25 +104,19 @@ function lightCove(b: RoomBatch, north: number, west: number, east: number, inwa
   b.box((west + east) / 2, north + inward * (depth - .03), CEILING - .40, east - west, .05, .07, 3)
 }
 
-/** The pavilion's outer faces and the level its apron is paved at, and the
- * ornamental channel cut into that apron. Both are built by the envelope
- * module, which this one may not touch and may not import: the rail's
- * clearance certificate hashes that geometry, and the import would close a
- * cycle. The numbers are declared here and checked by the ground checker.
+/** The pavilion's outer faces and the level its apron is paved at. They are
+ * built by the envelope module, which this one may not touch and may not
+ * import: the rail's clearance certificate hashes that geometry, and the
+ * import would close a cycle. The numbers are declared here and checked by
+ * the ground checker.
  */
 const ENVELOPE = { west: -62, east: -22, south: -64, north: -34, apron: -6.44, foot: -6.4 }
-const CHANNEL = { west: -61.5, east: -27.8, south: -32.8, north: -32, water: -6.56, bed: -6.82 }
 
-/** THE TERRACE MEETS THE BUILDING. Two things made the court and the
- * pavilion read as a gap instead of one ground. The building stood on its
- * base with its foot 40 mm clear of the apron and its sill lipping 90 mm
- * past the base's face, so the wall met the terrace in a shadow and not in a
- * surface. And the ornamental channel between them had no coping and no
- * bed: its opening was a sawn edge in the paving over cut ground, which from
- * the court reads as a strip nobody laid. The paving cannot cross the water,
- * so the join is the honest one: a plinth course at the wall's foot, a
- * coping at both kerbs, a lining in the bed, and a band at the terrace's own
- * south line where the court's paving hands over to the apron.
+/** THE TERRACE MEETS THE BUILDING. The building stood on its base with its
+ * foot 40 mm clear of the apron and its sill lipping 90 mm past the base's
+ * face, so the wall met the terrace in a shadow and not in a surface. A
+ * plinth course at the wall's foot closes both, and a band at the terrace's
+ * own south line says where the court's paving hands over to the apron.
  */
 function courtMeetsTheBuilding(b: RoomBatch): void {
   const E = ENVELOPE, PROUD = .045, DEPTH = .18
@@ -135,18 +129,6 @@ function courtMeetsTheBuilding(b: RoomBatch): void {
   foot(E.west - DEPTH, E.south - DEPTH, E.east + DEPTH, E.south)
   foot(E.west - DEPTH, E.south, E.west, E.north)
   foot(E.east, E.south, E.east + DEPTH, E.north)
-
-  // The channel: a coping at each kerb that oversails the opening, so the
-  // water's edge is a line of shadow and not the end of a paving bay, and a
-  // stone bed and side lining under the water in place of the cut ground.
-  const W = CHANNEL
-  for (const [north, side] of [[W.north, 1], [W.south, -1]] as const) {
-    b.box((W.west + W.east) / 2, north + side * .085, E.apron - .045, W.east - W.west + .37, .17, .09, 2)
-    b.box((W.west + W.east) / 2, north - side * .035, E.apron - .115, W.east - W.west + .37, .07, .07, 5)
-  }
-  b.slab(W.west - .185, W.south, W.east + .185, W.north, W.bed + .035, .035, 5)
-  for (const east of [W.west - .0925, W.east + .0925])
-    b.box(east, (W.south + W.north) / 2, (W.bed + E.apron) / 2, .185, W.north - W.south, E.apron - W.bed, 5)
 
   // The terrace's own south line. The court's paving and the apron are laid
   // by two modules at one level and the eye was given nothing to read the
