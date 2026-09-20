@@ -153,8 +153,11 @@ export interface CourtObject {
 export const courtObjects:readonly CourtObject[]=[
   {slug:'wine_barrel_01',east:13.28,north:-18.25,turn:.6,where:'gate'},
   {slug:'wicker_basket_01',east:12.44,north:-16.96,turn:-1.1,where:'gate'},
-  {slug:'treasure_chest',east:11.81,north:-15.99,turn:2.2,where:'east-range'},
-  {slug:'ceramic_vase_04',east:11.48,north:-15.29,turn:.3,where:'east-range'},
+  // Every station of this court faces the house, so the range stands behind
+  // the visitor at all of them: these two are met on the walk in from the
+  // gate, three and a half metres off the line it runs.
+  {slug:'treasure_chest',east:11.5,north:-16.3,turn:2.2,where:'east-range'},
+  {slug:'ceramic_vase_04',east:10.9,north:-15.7,turn:.3,where:'east-range'},
 ]
 /** The words under the four, and the one claim they make. */
 export const courtObjectsProvenance={
@@ -162,9 +165,10 @@ export const courtObjectsProvenance={
   source:['MODEL-LIBRARY','A-SITE'],
   slugs:courtObjects.map(object=>object.slug),
   recipe:'Four bodies of the open model library, unaltered, stood on the court at the levels the shared grade sampler gives. Placement is a museum choice; no inventory of this house is documented.',
-  label:{
-    en:'Objects of the period. None of them is his.',
-    de:'Gegenstände der Zeit. Keiner davon gehörte ihm.',
+  /** The record behind the label: what stands where, and what it is not. */
+  record:{
+    en:'A cask and a basket stand by the gate, a chest and a jug under the east range. All four are bodies of the open model library, taken as published and unaltered, and stood on the court where no walk passes. Nothing of this house\u2019s furniture is documented, so none of them testifies to more than the kind of thing it is.',
+    de:'Ein Fass und ein Korb stehen am Tor, eine Truhe und ein Krug unter dem Ostfl\u00fcgel. Alle vier sind K\u00f6rper aus der offenen Modellbibliothek, unver\u00e4ndert \u00fcbernommen und dort auf den Hof gestellt, wo kein Weg entlangf\u00fchrt. Zur Einrichtung dieses Hauses ist nichts \u00fcberliefert, deshalb belegt keiner von ihnen mehr als die Art von Ding, die er ist.',
   },
 } as const
 

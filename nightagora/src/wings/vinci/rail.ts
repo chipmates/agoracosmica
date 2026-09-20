@@ -71,13 +71,13 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // the study's window, and the court's west end on the castle's own line.
   // The entrance door leaves 0.50 m at its widest line and the rail is proved
   // with 0.563 m, so the hall's eye stands on the landing and not inside.
-  if(id==='hall') return narrow?p(3.0959,-13.0423,2.45,-1.301,-6.4787,.72,72):p(3.0959,-13.0423,2.45,-1.301,-6.4787,2.25,55)
+  if(id==='hall') return narrow?p(3.0959,-13.0423,2.45,-1.301,-6.4787,.72,72):p(3.0959,-13.0423,2.45,-1.301,-6.4787,2.25,46)
   if(id==='oratory') return narrow?p(5.6,-21.3,1.65,3.053,-18.288,1.98,60):p(5.6,-21.3,1.65,3.053,-18.288,2.9,46)
   if(id==='study') return narrow?p(2.4,-29.3,1.65,-1.94,-22.848,5.9,66):p(2.4,-29.3,1.65,-1.94,-22.848,8.1,52)
   // The royal château stands 590 m away on a bearing of 308.84 degrees, which
   // from this end of the court runs over the house's west corner and down the
   // valley. The aim is that bearing; nothing of the castle is built.
-  if(id==='chamber') return narrow?p(-4.2,-32.4,1.65,-21.33,-18.59,-3.5,72):p(-4.2,-32.4,1.65,-21.33,-18.59,.6,56)
+  if(id==='chamber') return narrow?p(-4.2,-32.4,1.65,-21.33,-18.59,-4.65,88):p(-4.2,-32.4,1.65,-21.33,-18.59,.6,46)
   // R19 accepted: actual apron paving +1.65 m; all eight principal windows clear vegetation.
   if(id==='garden') return p(-24.5,-31.2,-4.790000057220459,-8.7,-16.6,narrow?4.2:6.2,narrow?96:62)
   // THE COLLECTION'S NINE STAND IN THEIR OWN ROOMS, at the eye the module's
@@ -149,6 +149,8 @@ export function namedPose(id:string,narrow:boolean):Pose|undefined {
   // whole opening and the carving over it but repeats the court's own subject.
   if(id==='composition-hall-steps')return p(4.212,-14.942,1.65,2.487,-12.367,2.05,narrow?70:55)
   if(id==='composition-hall-door')return stationPose('hall',narrow)
+  // Where the court's own four stand, from the walk that passes them.
+  if(id==='composition-court-objects')return p(9.4,-20.2,1.65,11.9,-16.1,.5,narrow?76:58)
   if(id==='composition-study-near')return p(.55,-26.6,1.65,-1.94,-22.848,6.05,narrow?66:52)
   if(id==='composition-chamber-corner')return p(-5,-31,1.65,-6.32,-25.71,7,narrow?76:60)
   // Standing inspection eyes on the supplied +0.80 m entry floor.

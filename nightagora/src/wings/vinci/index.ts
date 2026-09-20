@@ -1938,8 +1938,12 @@ export function createWing():VinciWingModule {
       appendEvidence('accessDesign',collectionAccessProvenance.parameterLabel,'reconstructed','vinci/collection-access','A-SITE retained court and terrace · modern museum access proposal')
     }
     // The court's own four stand in every frame that holds the court.
-    if(s.id==='arrival'||s.id==='courtyard'||['hall','oratory','study','chamber'].includes(s.id))
-      appendEvidence('courtObjects',courtObjectsProvenance.label,'conjectural',courtObjectsProvenance.manifestId,courtObjectsProvenance.source.join(' · '))
+    if(s.id==='arrival'||s.id==='courtyard'||['hall','oratory','study','chamber'].includes(s.id)){
+      appendEvidence('courtObjects',courtObjectsProvenance.record,'conjectural',courtObjectsProvenance.manifestId,courtObjectsProvenance.source.join(' · '))
+      // The licence line of a lent body is the store's own, printed as it stands.
+      const licences=courtObjectsProvenance.slugs.map(slug=>assets?.byId.get(`models/${slug}`)?.licence).filter(Boolean)
+      if(licences.length===courtObjectsProvenance.slugs.length)record.append(make('small','vinci-citation',[...new Set(licences)].join(' · ')))
+    }
     if(s.id==='courtyard'||['hall','oratory','study','chamber'].includes(s.id)||activeView.startsWith('entry-')){
       appendEvidence('entry',entryPassageProvenance.label,'reconstructed','vinci/entry-passage',entryPassageProvenance.source.join(' · '))
       appendEvidence('entryFinish',entryMineralSurfaceProvenance.label,'reconstructed','vinci/entry-mineral-surface',entryMineralSurfaceProvenance.source.join(' · '))
