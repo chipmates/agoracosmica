@@ -17,6 +17,11 @@ const EYE = FLOOR + 1.62
  * behind the selected date to hold its whole numeral and the gallery with
  * a shallow gaze; the phone places that date above the station card.
  */
+/** The course one row of the bench's excerpts is laid on. The line is read
+ * from its south end, so row zero is the nearest course to the station and
+ * the life runs north away from it. */
+const lineCourseNorth = (row: number): number => LINE_ORIGIN.north + (row - 2) * LINE_SLAB.pitchNorth
+
 function lineFloorView(north: number, narrow: boolean): RoomPose {
   const eye = world(LINE_ORIGIN.east + .3, north - 3.4, FLOOR + 1.66)
   const heading = 10 * Math.PI / 180
@@ -86,19 +91,17 @@ export function collectionView(id: string, narrow: boolean): RoomPose | undefine
         fov: narrow ? 104 : 88,
       }
     // Three fixed excerpts of the bench's date course, kept as the named
-    // inspections the excerpt stations were composed from.
-    case 'collection-room-line-early': {
-      const north = LINE_ORIGIN.north + 9 * LINE_SLAB.pitchNorth
-      return lineFloorView(north, narrow)
-    }
-    case 'collection-room-line-late': {
-      const north = LINE_ORIGIN.north + 5 * LINE_SLAB.pitchNorth
-      return lineFloorView(north, narrow)
-    }
-    case 'collection-room-line-amboise': {
-      const north = LINE_ORIGIN.north + LINE_SLAB.pitchNorth
-      return lineFloorView(north, narrow)
-    }
+    // inspections the excerpt stations were composed from. The life runs away
+    // from the visitor, so each excerpt stands four courses south of where it
+    // did. The earliest excerpt begins at the station's own feet and the
+    // cross wall leaves no room to stand south of that course, so its
+    // inspection reads the excerpt from its own head instead.
+    case 'collection-room-line-early':
+      return lineFloorView(lineCourseNorth(3), narrow)
+    case 'collection-room-line-late':
+      return lineFloorView(lineCourseNorth(4), narrow)
+    case 'collection-room-line-amboise':
+      return lineFloorView(lineCourseNorth(8), narrow)
     // THE PICTURE ROOM IS READ FROM ITS TWO ENDS. Thirty-four metres of hang
     // in a room seven deep cannot be held from the middle: at the middle the
     // last six works stand outside the cone and outside the look envelope too.

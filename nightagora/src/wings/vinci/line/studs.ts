@@ -25,14 +25,16 @@ export const LINE_SECTIONS = [
   { station: 'line-amboise', selected: 38, row: 8 },
 ] as const
 
-/** Where each of the twelve cut dates stands, in the wing's own metres. */
+/** Where each of the twelve cut dates stands, in the wing's own metres. The
+ * line is read from its south end, so the earliest date is the nearest one
+ * and the life runs away from the visitor. */
 export function lineCutStuds(origin: { east: number; north: number }): { id: string; station: string; index: number; east: number; north: number }[] {
-  const first = origin.north + 9 * LINE_STUD_SPACING
+  const first = origin.north - 2 * LINE_STUD_SPACING
   return LINE_SECTIONS.flatMap(section => Array.from({ length: 4 }, (_, offset) => ({
     id: LINE_STUDS[section.selected + offset]!.id,
     station: section.station,
     index: section.selected + offset,
     east: origin.east,
-    north: first - (section.row + offset) * LINE_STUD_SPACING,
+    north: first + (section.row + offset) * LINE_STUD_SPACING,
   })))
 }

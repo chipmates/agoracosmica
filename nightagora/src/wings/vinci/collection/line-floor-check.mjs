@@ -72,22 +72,32 @@ function readingViews(floor, materials, language) {
       actualFaces.add(triangleKey(triangle)); actualTriangles.push(triangle)
     }
   })
+  // WHICH DATE EACH NAMED INSPECTION LOOKS AT. The life runs away from the
+  // visitor, and the earliest excerpt begins at the station's own feet, so
+  // that one is read from its head: its fourth date, not its first.
+  const READ_OFFSET = { 'line-early': 3, 'line-late': 0, 'line-amboise': 0 }
   for (const section of COLLECTION_LINE_SECTIONS) {
+    const offset = READ_OFFSET[section.station]
     // The factory's own comparison flag preserves its original glyph meshes
     // before welding; the mounted floor above still uses production welding.
     benchLocation.search = '?noweld'
     const source = createLine(materials, section.selected, language, false)
     benchLocation.search = ''
     source.updateMatrixWorld(true)
-    const sourceYear = STUDS[section.selected].date.slice(0, 4)
+    const sourceYear = STUDS[section.selected + offset].date.slice(0, 4)
+    // The year is cut a fifth of a metre south of its own socket, or nearer
+    // where that socket also carries an event.
+    const socketZ = -offset * 1.65
     let numeral
     source.traverse(mesh => {
-      if (mesh instanceof THREE.Mesh && mesh.userData.text === sourceYear && Math.abs(mesh.position.z - .23) < .00001) numeral = mesh
+      if (mesh instanceof THREE.Mesh && mesh.userData.text === sourceYear && Math.abs(mesh.position.z - socketZ - .23) < .2) numeral = mesh
     })
     expect(numeral, language + ': selected source numeral is absent at ' + section.station)
     if (!numeral) continue
     const mount = new THREE.Matrix4()
-    mount.setPosition(LINE_ORIGIN.east, FLOOR + .01, -LINE_ORIGIN.north + (section.row - 9) * 1.65)
+    // The excerpt is carried onto its own course as one piece, so the source
+    // is mounted by the same one shift the floor gives it.
+    mount.setPosition(LINE_ORIGIN.east, FLOOR + .01, -LINE_ORIGIN.north + (2 - section.row) * 1.65)
     const transform = mount.clone().multiply(numeral.matrixWorld)
     const position = numeral.geometry.getAttribute('position'), normal = numeral.geometry.getAttribute('normal'), index = numeral.geometry.index
     const vertices = []
@@ -173,7 +183,9 @@ for (const [i, stud] of collectionLineStuds.entries()) {
   const record = STUDS.find(entry => entry.id === stud.id)
   expect(record && record.date === stud.date && record.certainty === stud.certainty && record.station === stud.station, 'Source record changed for ' + stud.id)
   expect(stud.north - .82 > FACE.southStripNorth + .04 && stud.north + .82 < ROOMS.gallery.north, 'Socket crosses a gallery wall: ' + stud.id)
-  if (i) expect(Math.abs(collectionLineStuds[i - 1].north - stud.north - 1.65) < 1e-9, 'The date grid has a gap or overlap before ' + stud.id)
+  // The life runs away from the visitor, so each date stands one course
+  // north of the one before it.
+  if (i) expect(Math.abs(stud.north - collectionLineStuds[i - 1].north - 1.65) < 1e-9, 'The date grid has a gap or overlap before ' + stud.id)
 }
 for (const language of ['en', 'de']) {
   const materials = Object.fromEntries(['stone', 'bronze', 'ink', 'dark', 'plaster'].map(name => {

@@ -11,8 +11,12 @@ export const COLLECTION_LINE_SECTIONS = [
   { station: 'line-late', selected: 28, row: 4 },
   { station: 'line-amboise', selected: 38, row: 8 },
 ] as const
-/** Row nine is the north end of the field the room is cut around. */
-export const COLLECTION_LINE_FIRST_NORTH = LINE_ORIGIN.north + 9 * STUD_SPACING
+/** THE LIFE RUNS AWAY FROM THE VISITOR. The one station stands at the south
+ * end, where every numeral reads upright, so the birth is the date at the
+ * standing eye's own feet and the last year is at the far wall. The twelve
+ * courses are the same twelve places on the floor either way round; which
+ * date stands on which is what this line fixes. */
+export const COLLECTION_LINE_FIRST_NORTH = LINE_ORIGIN.north - 2 * STUD_SPACING
 export const collectionLineStuds = COLLECTION_LINE_SECTIONS.flatMap(section =>
   Array.from({ length: 4 }, (_, offset) => ({
     station: section.station,
@@ -21,7 +25,7 @@ export const collectionLineStuds = COLLECTION_LINE_SECTIONS.flatMap(section =>
     date: STUDS[section.selected + offset]!.date,
     certainty: STUDS[section.selected + offset]!.certainty,
     east: LINE_ORIGIN.east,
-    north: COLLECTION_LINE_FIRST_NORTH - (section.row + offset) * STUD_SPACING,
+    north: COLLECTION_LINE_FIRST_NORTH + (section.row + offset) * STUD_SPACING,
   })),
 )
 
@@ -203,14 +207,13 @@ export function createCollectionLineFloor(materials: LineMaterials, language: 'e
         const right = socketStone ? .801 : 1.9
         if (!vertices.every(vertex => vertex[0]! >= -.801 && vertex[0]! <= right
           && vertex[2]! >= -3 * STUD_SPACING - .82 && vertex[2]! <= .82)) continue
-        // The visitor now reads from the south end. Retain each complete
-        // socket's native bearing while moving its centre onto the room's
-        // north-to-south course: text-right stays east and text-up north.
-        // Reversing the whole excerpt would also invert every numeral.
-        const socketRow = Math.round(-vertices.reduce((sum, vertex) => sum + vertex[2]!, 0) / (3 * STUD_SPACING))
+        // The visitor reads from the south end, and the excerpt already runs
+        // the way the life does: the earliest of its four at the south. So
+        // the whole excerpt is carried onto its own course as one piece, which
+        // keeps every numeral's bearing as the bench cut it.
         const translated = vertices.map(vertex => {
           const copy = [...vertex]
-          copy[2] = vertex[2]! + (section.row + 2 * socketRow - 9) * STUD_SPACING
+          copy[2] = vertex[2]! + (2 - section.row) * STUD_SPACING
           return copy
         })
         append(material, translated)

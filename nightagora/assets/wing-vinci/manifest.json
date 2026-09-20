@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed to a pale grey at 30 per cent. Assumed weather, no observation claimed.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "6355366233c6b81af9b5daad18ec7253302d349f7497e8a871a3d0ac56ddd300",
+      "sha256": "2dfbc3e5d2bea80841c0f490e8ef36c57729c6c4bf6de05c6ff148e82ed5c184",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=80c458f2cb5ccddb7fcedccda5df70e5cdccda7d9ca97d65ebfa6462920f61ef;"
     },
     {
@@ -62,7 +62,7 @@
       "prompt": "Museum camera poses and piecewise exterior circulation in the fixed dossier frame. All poses are exhibition choices. Latest target semantic navigation on measured gate/terrace/stair/apron routes. Bounded physical near-pyramid clearance; measured geometry identity at mount. CSS projection-derived drag with 0.1 second monotone response; explicit inspection entry and return. The active certified leg finishes before a direct certified route to the newest pending target. Static material inspection aliases have separate actual placement audits.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "d0d83f7674a5929cc764a7115b97d41a21b26c3f8290d173995716facf8bf9b2",
+      "sha256": "76c67cf5b558aac80743eec928a9d5edb638dff411302e46ca1a22dc7cd8f405",
       "note": "brief/CONCEPT.md; src/wings/vinci/data/closluce.json; recipe_file=src/wings/vinci/rail.ts; companion_file=src/wings/vinci/input.ts; companion_recipe_ids=vinci/rail-smoothing,vinci/rail-proof,vinci/rail-fingerprint,vinci/rail-projection,vinci/projection-drag,vinci/rail-clearance,vinci/rail-waypoints,vinci/rail-solids,vinci/gait"
     },
     {
@@ -231,7 +231,7 @@
       "prompt": "Original procedural modern museum insertion at the fixed maquette envelope. Low post-grid pavilions, shallow slate roofs, full-height glazed enclosure, concrete apron and garden stair. Exact modern approach grade cuts, supported landings and continuous concrete cheek ownership. Museum design, not a claim about1517. Share the existing pale cast-concrete finish across all four roof soffits; keep their downward normals and the sole measured sun. Derive both entrance post heads from the retained inclined canopy underside; keep their centres and buried feet. Provide continuous derived structural support beneath the existing stair cheeks and both landing heads. Keep the maquette walking widths and every finish level.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "045384efed556d41b729befa0457f171702d4bc109bad0cc3444c7ddba0d68a3",
+      "sha256": "d096fdb66f6cb7f70fe02fce7e208296e565eca13cf2b66a95d7bed3b8f74ba1",
       "note": "recipe_file=src/wings/vinci/collection.ts"
     },
     {
@@ -361,7 +361,7 @@
       "prompt": "Runtime exact canonical pose and actual mounted geometry identity guard for all40 directed physical routes. Applies conservative complete near-camera certificates; fails if stale.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-10",
-      "sha256": "2dd07103848106dc7b60279135df0d7b53ea3dadafb79928bff8f1c0fe960e68",
+      "sha256": "09c199752815db3256eeed6e56684b46c01f731d9c827dad1e761fa0eb6859dc",
       "note": "recipe_file=src/wings/vinci/rail-proof.ts; source_generator=forge/results/final-rail-route-proof.mjs; runtime dependency of vinci/rail; companion_file=src/wings/vinci/collection/pick.ts; companion_file=src/wings/vinci/collection/wall.ts"
     },
     {
@@ -439,7 +439,7 @@
       "prompt": "The turns a route takes between two stations, written against the registered gate crossing, the access stair layout and the collection stair.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-11",
-      "sha256": "ad20b506e5d98b3fe72e5e61c02be98a17ad8c55d0d49a776e4e885afc1e58fa",
+      "sha256": "3d3ec90faf3946e7caf0dac62b4ef6ae928011e71210242e5f43020267b51bc9",
       "note": "recipe_file=src/wings/vinci/rail-waypoints.ts; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail"
     },
     {
@@ -3388,7 +3388,7 @@
       "prompt": "Twelve complete date sockets from the unchanged line bench, mounted in three fixed excerpts of four at true scale on the long gallery floor. The sections begin with the recorded birth in1452, the Vespucci note in1503 and the Amboise visit in1517, and end with the1519 will and death. Original bronze numerals, certainty words and colours, two named1504 events and1.65m nonchronological spacing are retained. The collection host clips the original paving to its room and excludes the standalone bench walls, rail and threshold continuation, keeping the gallery doors and crossing clear. Modern exhibition composition, no historical building claim.",
       "model": "Deterministic TypeScript geometry derived from the line module",
       "date": "2026-09-14",
-      "sha256": "b2964753e9a65b318691ede749481f50522274cb63447a779a13112755885040",
+      "sha256": "31e06e3819d5a7b6dd45e1dd8be8e5ac6b580b8931e3da539d57a6a88ebb7210",
       "note": "recipe_file=src/wings/vinci/collection/line-floor.ts; source_module=src/wings/vinci/line/index.ts; source_indices=0..3,28..31,38..41; all56 records remain at the bench address",
       "recipe_files": [
         {
@@ -3443,7 +3443,7 @@
       "prompt": "The collection host fits the unchanged grave and corrections modules to their existing museum floor reservations. Only the original native stage paving triangles are clipped: grave 12 by 13 m, deathbed and quote corrections 13 by 12 m, each around local depth centre 2.5 m. The larger independent bench stages remain unchanged at their bench addresses. All upright exhibit geometry and its attributes pass through intact. This prevents the corrections paving from covering the date course or adjoining picture room and keeps one instance of each built exhibit. The shared collection paving coordinates retain their original datum. Authored museum installation, no historical architectural claim.",
       "model": "Deterministic TypeScript clipping of the original native floor triangles",
       "date": "2026-09-14",
-      "sha256": "b2964753e9a65b318691ede749481f50522274cb63447a779a13112755885040",
+      "sha256": "31e06e3819d5a7b6dd45e1dd8be8e5ac6b580b8931e3da539d57a6a88ebb7210",
       "note": "recipe_file=src/wings/vinci/collection/line-floor.ts; recipe_function=fitCollectionExhibitFloor; source_modules=grave,myths; floor_only=true",
       "recipe_files": [
         {
