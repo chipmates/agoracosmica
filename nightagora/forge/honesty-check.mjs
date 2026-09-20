@@ -195,10 +195,15 @@ async function openableHere(page) {
     does not draw the exhibit. A date opens the wing's life window instead of
     the vitrine, which is a close look all the same and is read as one. */
 async function openLook(page, slug, station, id) {
+  /* THE CARD MAY NAME A LEAF OF THE CELL. A wall of sheets offers one cell per
+     sheet and the card that opens names the leaf inside it (`<id>/leaf`), so a
+     reading that asks for the cell's own id word for word calls an open card
+     a card that never opened. */
   const stands = () => page
-    .waitForFunction((want) =>
-      document.querySelector('.vitrine-card')?.dataset.exhibit === want || Boolean(document.querySelector('dialog.wing-life[open]')),
-      id, { timeout: OPEN_MS, polling: 200 })
+    .waitForFunction((want) => {
+      const at = document.querySelector('.vitrine-card')?.dataset.exhibit
+      return at === want || Boolean(at && at.startsWith(`${want}/`)) || Boolean(document.querySelector('dialog.wing-life[open]'))
+    }, id, { timeout: OPEN_MS, polling: 200 })
     .then(() => true)
     .catch(() => false)
   const pressed = await page.evaluate((want) => {
