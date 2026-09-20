@@ -60,11 +60,14 @@ const SETTLE_MS = 2600, STILL_TRIES = 14
 
 const LICENCE = 'Generated for this work, regenerable from its script; a frame of the museum\'s own procedural model.'
 const MODEL = 'Night Agora renderer, headless; forge/previews.mjs'
-const DATE = '2026-09-18'
+const DATE = '2026-09-20'
 
 /** Every exhibit the strip can show whose record carries no picture. The
  *  dates carry their own year in the cell, so they are not blank and are not
- *  here; the compass has no ledge yet and stands in no station's row. */
+ *  here; the compass has no ledge yet and stands in no station's row.
+ *
+ *  `plate` cuts the cell from a reproduction the store already holds, which
+ *  is what an exhibit that IS a picture asks for. */
 const EXHIBITS = [
   { id: 'machine/parachute', kind: 'machine', station: 'supper-wall' },
   { id: 'machine/revolving-crane', kind: 'machine', station: 'supper-wall' },
@@ -83,6 +86,11 @@ const EXHIBITS = [
   { id: 'grave', kind: 'place', station: 'grave' },
   { id: 'grave-diagram', kind: 'place', station: 'grave' },
   { id: 'codex/paris-B', kind: 'manuscript', station: 'reading-table' },
+  // The painting at the grave: the cell is the reproduction the room hangs,
+  // cut small, not a photograph of the wall it hangs on.
+  { id: 'picture/deathbed-painting/front', kind: 'picture', station: 'grave',
+    plate: 'vinci/place-plate/jean-auguste-dominique-ingres-francois-ier-recoit-les-derniers-soupirs'
+      + '__petit-palais-musee-des-beaux-arts-de-la-ville-de-paris__4096x3252' },
 ]
 
 const only = flags.get('only') ? String(flags.get('only')).split(',') : null
@@ -332,6 +340,47 @@ function loadManifest() {
   return Array.isArray(raw) ? raw : raw.assets
 }
 
+/** THE CELL OF AN EXHIBIT THAT IS A PICTURE: the plate itself, whole and
+ *  small. No crop, so the rights note the source carries still describes what
+ *  the cell shows. Returns the bytes and the size they were written at. */
+async function cutPlate(exhibit) {
+  const source = loadManifest().find(entry => entry.id === exhibit.plate)
+  if (!source) throw new Error(`${exhibit.id}: the store has no ${exhibit.plate}`)
+  const file = join(STORE, SCOPE, source.path)
+  if (!existsSync(file)) throw new Error(`${exhibit.id}: ${source.path} is recorded and not in the store`)
+  const webp = await sharp(file).resize(CELL.width, CELL.height, { fit: 'inside', kernel: 'lanczos3' })
+    .webp({ quality: 88, effort: 6 }).toBuffer()
+  const meta = await sharp(webp).metadata()
+  return { webp, source, width: meta.width, height: meta.height }
+}
+
+function recordForPlate(exhibit, cut, bytes, sha) {
+  const { source } = cut
+  return {
+    id: recordId(exhibit),
+    path: pathOf(exhibit),
+    wing: SCOPE,
+    class: source.class,
+    licence: source.licence,
+    holder: source.holder,
+    display: true,
+    date: DATE,
+    // NO source_url ON A DERIVED FILE: the app reads that field as where the
+    // bytes stand, and these bytes stand in the store. The plate's own record
+    // carries the origin, and `source` names it.
+    note: `The hang strip's cell for ${exhibit.id}: ${source.id} fitted inside `
+      + `${CELL.width}x${CELL.height}, whole, no crop, by forge/previews.mjs. `
+      + `Origin of the source plate: ${source.source_url ?? 'named in its own record'}.`,
+    source: source.id,
+    role: 'exhibit-preview',
+    sha256: sha,
+    bytes,
+    width: cut.width,
+    height: cut.height,
+    station: exhibit.station,
+  }
+}
+
 function recordFor(exhibit, bytes, sha) {
   return {
     id: recordId(exhibit),
@@ -405,11 +454,29 @@ if (flags.get('sheet')) {
   process.exit(0)
 }
 
-const server = flag('serve', 'on') === 'off' ? null
-  : spawn('pnpm', ['exec', 'vite', '--port', String(PORT), '--strictPort', '--host', '127.0.0.1'], { stdio: 'ignore', cwd: APP_ROOT })
+/* A CELL CUT FROM A PLATE NEEDS NO ROOM: no server, no browser, no walk. */
+const cuts = wanted.filter(exhibit => exhibit.plate)
+const shots = wanted.filter(exhibit => !exhibit.plate)
 const written = [], problems = []
+for (const exhibit of cuts) {
+  try {
+    const cut = await cutPlate(exhibit)
+    const sha = createHash('sha256').update(cut.webp).digest('hex')
+    const file = WRITE ? join(OUT_DIR, exhibit.kind, fileOf(exhibit)) : join(SHOTS, fileOf(exhibit))
+    mkdirSync(dirname(file), { recursive: true })
+    writeFileSync(file, cut.webp)
+    written.push({ exhibit, bytes: cut.webp.length, sha, file, record: recordForPlate(exhibit, cut, cut.webp.length, sha) })
+    console.log(`${exhibit.id.padEnd(28)} cut   plate     ${cut.width}x${cut.height}  ${cut.webp.length} bytes`)
+  } catch (error) {
+    problems.push(`${exhibit.id}: ${error.message}`)
+  }
+}
+
+const server = !shots.length || flag('serve', 'on') === 'off' ? null
+  : spawn('pnpm', ['exec', 'vite', '--port', String(PORT), '--strictPort', '--host', '127.0.0.1'], { stdio: 'ignore', cwd: APP_ROOT })
 let browser
 try {
+  if (shots.length) {
   await waitForServer(`${BASE}/`)
   const said = await assertServer(BASE)
   console.log(`server ${said.head.slice(0, 7)} at ${said.root}`)
@@ -435,7 +502,7 @@ try {
   }
 
   let here = '', still = null, context, page
-  for (const exhibit of [...wanted].sort((a, b) => Number(a.kind !== 'machine') - Number(b.kind !== 'machine'))) {
+  for (const exhibit of [...shots].sort((a, b) => Number(a.kind !== 'machine') - Number(b.kind !== 'machine'))) {
     const wantStill = exhibit.kind === 'machine'
     if (wantStill !== still) {
       await context?.close()
@@ -485,8 +552,9 @@ try {
     await closeExhibit(page)
   }
   await context?.close()
+  }
   if (WRITE) {
-    writeRecords(written.map(w => recordFor(w.exhibit, w.bytes, w.sha)))
+    writeRecords(written.map(w => w.record ?? recordFor(w.exhibit, w.bytes, w.sha)))
     console.log(`${written.length} records written to ${MANIFEST}`)
   }
   await contactSheet(written.map(w => ({ id: w.exhibit.id, file: w.file })))
