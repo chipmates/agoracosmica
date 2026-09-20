@@ -4,7 +4,7 @@ import { applyDisplayedHorizonHaze, displayedHorizonHazeProvenance } from './dis
 import { mineralSurfaceProvenance, closeSurfaceProvenance } from './surface'
 import { entryMineralSurfaceProvenance } from './entry-mineral-surface'
 import { foundationPlinthProvenance } from './foundation-plinth'
-import { Box3, BufferGeometry, Color, Float32BufferAttribute, FogExp2, DirectionalLight, Group, Mesh, MeshStandardNodeMaterial, Raycaster, SRGBColorSpace, TextureLoader, Vector2, Vector3 } from 'three/webgpu'
+import { Box3, Color, FogExp2, DirectionalLight, Group, Mesh, Raycaster, Vector2, Vector3 } from 'three/webgpu'
 import { float, mix, vec3, vec4, dot as nodeDot, positionWorld, cameraPosition, smoothstep, mx_fractal_noise_float } from 'three/tsl'
 import { SkyMesh } from 'three/addons/objects/SkyMesh.js'
 import { setRegister, type WingHosts, type WingModule, type WingProgress, type WingReport, type WingStage } from '../frame'
@@ -40,7 +40,7 @@ import { ASSET_BASE } from '../../stack/materials'
 import { createCollectionReceiverPlaneShadowFilter } from './receiver-plane-shadow'
 import { createCollectionAccess, collectionAccessPoint, collectionAccessProvenance } from './collection-access'
 import { createRoadDressing, roadDressingProvenance } from './road-dressing'
-import { createCourtObjects, createInnerCourtDressing, courtObjectsProvenance, innerCourtProvenance, courtDressingProvenance, studySheetCorners } from './inner-court'
+import { createCourtObjects, createInnerCourtDressing, courtObjectsProvenance, innerCourtProvenance, courtDressingProvenance } from './inner-court'
 import { createGatePassage, gatePassageProvenance } from './gate-passage'
 import { createEntryPassage, entryPassageProvenance, hallLedge, hallLedgeProvenance } from './entry-passage'
 import { createGround } from './ground'
@@ -61,7 +61,9 @@ import { createPlacePayload } from '../vitrine/place'
 import { readingTableOf } from './table'
 import { CODEX_ENTRIES } from './table/codex-shelf'
 import type { ReadingTable } from './table'
-import { folioKey, type PageRecord } from './table/content'
+import { FAMOUS_FOLIOS, type PageRecord } from './table/content'
+import { vinciLeafSource } from './collection/deep-plate'
+import studyPageMap from './table/data/msb-pages.json?raw'
 import { createReaderPayload, type ReaderPayload } from './table/reader'
 import { createReaderPayload as createVitrineReaderPayload, type ReaderPayload as ReaderPayloadOfWall } from '../vitrine/reader'
 import { LINE_SECTIONS, LINE_STUDS, type Stud } from './line/studs'
@@ -1013,37 +1015,10 @@ export function createWing():VinciWingModule {
   /** THE REGISTRY IS A READ, so it is taken again whenever the scene it reads
    * could have changed: when the room's own sources have landed, and when a
    * tier change remounts the plates under new meshes. */
-  /** THE PAGE ON THE SUPPORT. The leaf the study is read at lies on the board
-   * as a sheet, from the same admitted record the reader opens at full size.
-   * One mount, once the table's pages and the manifest both stand. */
-  let studySheetStood=false
-  function standStudySheet():void {
-    if(studySheetStood||!assets||!courtRoot)return
-    const leaf=studyLeafPage()
-    if(!leaf)return
-    const record=assets.byId.get(`vinci/ms-thumb/${leaf.file}`)??assets.byId.get(`vinci/ms-page/${leaf.file}`)
-    if(!record)return
-    studySheetStood=true
-    const corners=studySheetCorners()
-    const geometry=new BufferGeometry()
-    geometry.setAttribute('position',new Float32BufferAttribute(
-      [...corners[0]!,...corners[1]!,...corners[2]!,...corners[0]!,...corners[2]!,...corners[3]!],3))
-    geometry.setAttribute('uv',new Float32BufferAttribute([0,0,1,0,1,1,0,0,1,1,0,1],2))
-    geometry.computeVertexNormals();geometry.computeBoundingSphere()
-    const map=new TextureLoader().load(assetUrl(ASSET_BASE,record))
-    map.colorSpace=SRGBColorSpace
-    map.anisotropy=8
-    const sheet=new Mesh(geometry,new MeshStandardNodeMaterial({map,roughness:.94}))
-    sheet.name='vinci/study-support-sheet'
-    sheet.receiveShadow=true
-    sheet.userData['manifestId']=record.id;sheet.userData['asset']=record.id
-    courtRoot.add(sheet)
-  }
   function refreshExhibits():void {
     if(!hosts||!collectionRoot)return
     picks=[...readVinciExhibits(collectionRoot),...(houseRoot?readVinciExhibits(houseRoot):[]),...(courtRoot?readVinciExhibits(courtRoot):[])]
     picksTier=hosts.world.stack.tierName()
-    standStudySheet()
     paintExhibitMarks();paintStrip();refreshRecap();plan?.repaint()
     if(pendingExhibit){const id=pendingExhibit;pendingExhibit='';showView(id)}
     openPendingDate()
@@ -1450,10 +1425,18 @@ export function createWing():VinciWingModule {
     const table=theBook()
     openLeafReading(table?.pages.find(page=>page.page_kind==='facsimile'&&page.machine_slugs.includes(slug)),base,back)
   }
-  /** The page the study's support is read at, once the table stands. */
+  /** THE PAGE THE STUDY'S SUPPORT IS READ AT. Read from the edition's own
+   * record and not from the reading table, because the table is built when a
+   * visitor reaches the gallery and this support stands in the house. */
+  let studyLeaf:PageRecord|undefined|null=null
   function studyLeafPage():PageRecord|undefined {
-    return theBook()?.pages.find(page=>page.page_kind==='facsimile'&&folioKey(page)===STUDY_LEAF_KEY)
+    if(studyLeaf!==null)return studyLeaf
+    const pages=(JSON.parse(studyPageMap) as {pages:PageRecord[]}).pages
+    studyLeaf=pages.find(page=>page.page_kind==='facsimile'&&page.codex==='B'&&page.folio===83&&page.side==='verso')
+    return studyLeaf
   }
+  /** The stem the store keys this leaf's records by. */
+  const leafStem=(page:PageRecord):string=>page.file.replace(/^.*\//,'').replace(/\.[a-z]+$/,'')
   /** ONE ADMITTED LEAF, OPENED WHERE THE VISITOR STANDS. The reading is the
    * table module's own: its pages, its pyramids, its three ways. */
   function openLeafReading(leaf:PageRecord|undefined,base:string,back:()=>void):void {
@@ -1475,6 +1458,41 @@ export function createWing():VinciWingModule {
     closeLook.open({id,title:lang()==='de'?codex?.de??'':codex?.en??'',line:null,card:[],payload:reader,
       controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),control(VINCI_VITRINE_WORDS.back,back),
         control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())]},null,'advance')
+  }
+  /** THE PAGE ON THE SUPPORT, OPENED WHERE THE VISITOR STANDS. One side, the
+   * admitted leaf's own, read from its pyramid where the store has cut one.
+   * Its words are the edition's own record and the sheet's licence line. */
+  function openStudyLeaf(from:HTMLElement|null,how:'enter'|'advance'):void {
+    const leaf=studyLeafPage()
+    if(!leaf||!assets||!closeLook)return
+    const stem=leafStem(leaf)
+    const near=assets.byId.get(`vinci/ms-page-near/${stem}`)??assets.byId.get(`vinci/ms-page/${stem}`)
+    const thumb=assets.byId.get(`vinci/ms-thumb/${stem}`)
+    if(!near)return
+    const scan=near as typeof near&{width?:number;height?:number;licence?:string}
+    const named=FAMOUS_FOLIOS.find(folio=>folio.folio==='83v')
+    const title=lang()==='de'?named?.de??'':named?.en??''
+    const shows=lang()==='de'?leaf.what_it_shows_de:leaf.what_it_shows_en
+    const source=vinciLeafSource(assets,leaf.file,{file:ASSET_BASE+near.path,
+      width:scan.width??0,height:scan.height??0})
+    const door=`${VINCI_STUDY_LEAF}${LEAF_DOOR}`
+    const openRecord=()=>{
+      exhibitSources={id:door,title:{en:named?.en??'',de:named?.de??''},certainty:'documented',renderStation(host){
+        const block=make('div','vinci-record');block.dataset['register']='record'
+        for(const line of [shows,scan.licence??''])if(line)block.append(make('p','vinci-statement',line))
+        host.append(block)
+      }}
+      sources.resetScroll();sources.select('station');mode=2;paintDock()
+    }
+    const reader=createVitrineReaderPayload({
+      book:Promise.resolve({sides:[{id:'study-leaf',label:title,shows,source,
+        thumb:thumb?ASSET_BASE+thumb.path:null,ways:[],colour:certaintyColour('documented'),
+        head:null,holder:''}],
+        stripLabel:()=>text(vinciContent[card]!.name),holder:'',honesty:text(VINCI_PAGE_HONESTY)}),
+      start:'study-leaf',words:vinciManuscriptWords(),
+      tier:()=>hosts?.world.stack.tierName()??'standard'})
+    closeLook.open({id:door,title,line:null,card:[],payload:reader,
+      controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())]},from,how)
   }
   /** THE BODY WALL IS ONE BOOK. A press on any sheet opens the whole wall in
    * the reader at that sheet, in the order the wall hangs them: the arrows,
@@ -1543,12 +1561,7 @@ export function createWing():VinciWingModule {
     if(entry.kind==='sheet'){openMode=how;openSheetDoor(id,from,how_);openMode='auto';return}
     // THE PAGE ON THE COURT'S SUPPORT. The eye has already walked to the
     // board; the reading opens over the frame it stands in.
-    if(id===VINCI_STUDY_LEAF){
-      openMode=how
-      openLeafReading(studyLeafPage(),id,()=>closeLook?.close())
-      openMode='auto'
-      return
-    }
+    if(id===VINCI_STUDY_LEAF){openMode=how;openStudyLeaf(from,how_);openMode='auto';return}
     if(entry.kind==='machine'){
       const slug=id.slice('machine/'.length)
       if(!isMachineSlug(slug))return

@@ -257,19 +257,6 @@ export const studySupportFace={
   widthM:studySupport.widthM-.07,depthM:studySupport.depthM-.06,
 } as const
 
-/** THE FOUR CORNERS A SHEET LIES ON, in the scene's own frame: near left,
- * near right, far right, far left, which is also the order a page's own
- * corners are read in, so its top edge stands at the far side. */
-export function studySheetCorners():[number,number,number][] {
-  const F=studySupportFace
-  const along:CourtPoint=[Math.cos(F.bearingRad),-Math.sin(F.bearingRad)]
-  const out:CourtPoint=[Math.sin(F.bearingRad),Math.cos(F.bearingRad)]
-  const halfW=F.widthM/2,halfD=F.depthM/2,rise=halfD*Math.sin(F.rakeRad)
-  const at=(u:number,v:number,lift:number):[number,number,number]=>
-    [F.east+along[0]*u+out[0]*v,F.height+lift,-(F.north+along[1]*u+out[1]*v)]
-  return [at(-halfW,-halfD,-rise),at(halfW,-halfD,-rise),at(halfW,halfD,rise),at(-halfW,halfD,rise)]
-}
-
 export const studySupportProvenance={
   manifestId:'vinci/inner-court',assetClass:'GENERATED',certainty:'assumed',
   source:['modern museum fitting'],
