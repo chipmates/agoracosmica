@@ -12,6 +12,7 @@ import { world } from './site'
 import { anisotropicFootprint } from './masonry-courses'
 import { createCollectionRooms } from './collection/rooms'
 import { OPENING } from './collection/layout'
+import { surfaceTerms } from './collection/materials'
 
 type Point = [east: number, north: number]
 type Point3 = [east: number, north: number, height: number]
@@ -209,6 +210,16 @@ function architectureMaterial(): MeshStandardNodeMaterial {
   const middle = mx_noise_float(P.mul(6.25)).mul(resolved(.16)).toVar()
   const grain = mx_noise_float(P.mul(180)).mul(resolved(.0055)).toVar()
   const isSlate = role.equal(2), isSteel = role.equal(1), isPaving = role.equal(4)
+  // THE TWO SCALES A RECEDING PLANE CAN STILL HOLD. A pixel out in the room
+  // is thin in one world axis and metres long in the other, so the 0.16 m
+  // blob above is averaged away on the soffit and the upper walls and they
+  // read as flat colour from the hall's two stations. A band laid across the
+  // axis this pixel is thin in survives there, and so does a run metres wide
+  // along the face: a shutter lift and a pour, which is what this concrete
+  // is. Cast boards leave both; the slate and the steel take neither.
+  const cast = isSlate.or(isSteel).select(float(0), float(1)).toVar()
+  const terms = surfaceTerms({ scales: [.62, .09, .0035], extent: 1.25, lapM: .29, driftM: 3.1,
+    cellM: [2.4, 1.22], figure: [0, .085, .075], relief: .0022 })
   const footprint = (coordinate: N): N => coordinate.dFdx().abs().add(coordinate.dFdy().abs()).max(.000001)
   const px = footprint(U.x), py = footprint(U.y), xx = U.x.div(.34), yy = U.y.div(.20)
   const fx = px.div(.34).max(.0001), fy = py.div(.20).max(.0001), roofRow = floor(yy)
@@ -244,8 +255,11 @@ function architectureMaterial(): MeshStandardNodeMaterial {
   const pavingJoint = float(1).sub(float(1).sub(jointX).mul(float(1).sub(jointZ))).toVar()
   const joints = isSlate.select(roofJoint.mul(.20), isPaving.select(pavingJoint.mul(.25), float(0)))
   const drift = isSlate.select(slateTone, float(0))
-  m.colorNode = attribute('color', 'vec3').mul(macro.mul(.11).add(middle.mul(.075)).add(grain.mul(.026)).add(drift).add(1)).mul(float(1).sub(joints))
-  m.roughnessNode = isSteel.select(float(.47), isSlate.select(float(.71), float(.87))).add(grain.mul(.025)).clamp(.44, .90)
+  const boardCast = terms.lap.mul(.19).add(terms.drift.mul(.09)).add(terms.cell.mul(.09))
+    .add(terms.tone.sub(1).mul(.9)).mul(cast).toVar()
+  m.colorNode = attribute('color', 'vec3').mul(macro.mul(.11).add(middle.mul(.075)).add(grain.mul(.026)).add(drift).add(boardCast).add(1)).mul(float(1).sub(joints))
+  m.roughnessNode = isSteel.select(float(.47), isSlate.select(float(.71), float(.87)))
+    .add(grain.mul(.025)).add(terms.cell.mul(.1).add(terms.lap.mul(.06)).mul(cast)).clamp(.44, .90)
   m.metalnessNode = isSteel.select(float(.65), float(0))
   // Procedural world-height derivatives avoid an inferred tangent frame on
   // every indexed box triangle. Geometric normals remain the common datum;
@@ -253,6 +267,7 @@ function architectureMaterial(): MeshStandardNodeMaterial {
   const relief = isSlate.select(roofJoint.sub(roofJointMean).mul(-.0007).mul(roofDetail),
     isPaving.select(pavingJoint.mul(-.0006), float(0)))
   const height = macro.mul(.0002).add(middle.mul(.00045)).add(grain.mul(.00002)).add(relief)
+    .add(terms.lap.mul(.0011).add(terms.heightM).mul(cast))
     .mul(isSteel.select(float(.18), float(1))).toVar()
   const viewNormal = normalWorldGeometry.transformDirection(cameraViewMatrix), sx = positionView.dFdx(), sy = positionView.dFdy()
   const rx = sy.cross(viewNormal), ry = viewNormal.cross(sx), det = sx.dot(rx)
@@ -264,7 +279,7 @@ function architectureMaterial(): MeshStandardNodeMaterial {
   m.aoNode = float(1).sub(joints.mul(1.6).clamp(0, .55))
   m.name = 'vinci/collection/three-scale-architecture'; m.userData['provenance'] = collectionProvenance.recipe
   m.userData['normalGradientLimit'] = .12
-  m.userData['filtering'] = 'Original 2.78 m drift, 0.16 m structure and 5.5 mm grain; exact nine-cell pixel coverage of 0.34 × 0.20 m staggered slate and 6/8 mm joints, blending to their area mean. Paving saw cuts integrate a 12 mm band on a 1.5 m world grid. Relief uses bounded world/view derivatives, no tangent-space normal map.'
+  m.userData['filtering'] = 'Original 2.78 m drift, 0.16 m structure and 5.5 mm grain, with a 0.29 m shutter lift laid across the axis each pixel is thin in, a 3.1 m pour along the face and a 2.4 by 1.22 m board panel on the cast surfaces; exact nine-cell pixel coverage of 0.34 × 0.20 m staggered slate and 6/8 mm joints, blending to their area mean. Paving saw cuts integrate a 12 mm band on a 1.5 m world grid. Relief uses bounded world/view derivatives, no tangent-space normal map.'
   return m
 }
 
@@ -292,24 +307,46 @@ export function collectionConcreteMaterial(closedCaster = false): MeshStandardNo
   const U = vec2(mix(P.x, P.x.mul(axis.x).add(P.z.mul(axis.y)), vertical), mix(P.z, P.y, vertical))
   const pixel = anisotropicFootprint(P)
   const resolved = (metres: number) => smoothstep(2, 4, float(metres).div(pixel))
-  const line = (coordinate: typeof P.x, spacing: number, width: number) => {
-    const f = fract(coordinate.div(spacing)), edge = f.min(float(1).sub(f)).mul(spacing)
-    return float(1).sub(smoothstep(float(width).sub(pixel.mul(.5)).max(0), float(width).add(pixel.mul(.5)), edge)).mul(resolved(spacing))
+  // ONE FOOTPRINT PER SURFACE AXIS. Every feature below lives in this
+  // material's own face frame, and a soffit or an upper wall read from the
+  // hall's stations has a pixel that is millimetres across the boards and
+  // metres along them. Gated on the isotropic figure, the boards, the
+  // aggregate and the panel were all averaged away and the plane read as
+  // flat colour; each is now filtered on the axis it actually varies in.
+  const span = (coordinate: typeof P.x) => coordinate.dFdx().abs().add(coordinate.dFdy().abs()).max(.000002)
+  const fu = span(U.x).toVar(), fv = span(U.y).toVar()
+  const held = (metres: number, f: typeof fu) => smoothstep(2, 4, float(metres).div(f))
+  const line = (coordinate: typeof P.x, spacing: number, width: number, f: typeof fu) => {
+    const e = fract(coordinate.div(spacing)), edge = e.min(float(1).sub(e)).mul(spacing)
+    return float(1).sub(smoothstep(float(width).sub(f.mul(.5)).max(0), float(width).add(f.mul(.5)), edge)).mul(held(spacing, f))
+  }
+  const hashOf = (index: typeof P.x, salt: number) => fract(index.mul(salt).sin().mul(4371.13)).sub(.5)
+  const bands = (coordinate: typeof P.x, salt: number) => {
+    const i = floor(coordinate), f = fract(coordinate)
+    return mix(hashOf(i, salt), hashOf(i.add(1), salt), f.mul(f).mul(float(3).sub(f.mul(2))))
   }
   const drift = mx_noise_float(P.mul(.31)).mul(resolved(3.2))
-  const aggregate = mx_noise_float(P.mul(10)).mul(resolved(.10))
-  const pores = smoothstep(.32, .66, mx_noise_float(P.mul(220))).mul(resolved(.0045))
+  const aggregate = mx_noise_float(P.mul(10)).mul(held(.10, min(fu, fv)))
+  const pores = smoothstep(.32, .66, mx_noise_float(P.mul(220))).mul(held(.0045, min(fu, fv)))
   const panelX = floor(U.x.div(1.2)), panelY = floor(U.y.div(.6))
-  const panel = fract(panelX.mul(17.37).add(panelY.mul(31.71)).sin().mul(43758.54)).sub(.5).mul(resolved(.6))
-  const joint = line(U.x, 1.2, .002).max(line(U.y, .6, .002))
-  const board = line(U.y, .15, .0007).mul(vertical)
+  const panel = fract(panelX.mul(17.37).add(panelY.mul(31.71)).sin().mul(43758.54)).sub(.5)
+    .mul(held(1.2, fu)).mul(held(.6, fv))
+  const joint = line(U.x, 1.2, .002, fu).max(line(U.y, .6, .002, fv))
+  const board = line(U.y, .15, .0007, fv).mul(vertical)
+  // The lift of a pour is a band across the boards, which is the one mid
+  // scale a plane running away from the eye can still be sampled at.
+  const lift = bands(U.y.div(.29), 23.7).mul(.62).add(bands(U.y.mul(3.45).add(1.7), 9.41).mul(.38)).mul(held(.29, fv)).toVar()
+  const run = bands(U.x.div(3.1), 5.13).mul(held(3.1, fu)).toVar()
   const tiePosition = vec2(fract(U.x.div(.6)).sub(.5), fract(U.y.div(.6)).sub(.5)).mul(.6)
   const tie = float(1).sub(smoothstep(float(.009).sub(pixel.mul(.5)).max(0), float(.013).add(pixel.mul(.5)), length(tiePosition))).mul(resolved(.024)).mul(vertical)
   const colour = new Color('#a7a295')
-  m.colorNode = vec3(colour.r, colour.g, colour.b).mul(drift.mul(.12).add(aggregate.mul(.065)).add(panel.mul(.065)).add(1))
-    .mul(float(1).sub(pores.mul(.16)).sub(joint.mul(.13)).sub(board.mul(.035)).sub(tie.mul(.28)))
-  m.roughnessNode = float(.88).add(aggregate.mul(.035)).add(pores.mul(.035)).clamp(.80, .98)
-  const height = aggregate.mul(.0008).sub(pores.mul(.0005)).sub(joint.mul(.0015)).sub(board.mul(.0004)).sub(tie.mul(.002)).toVar()
+  m.colorNode = vec3(colour.r, colour.g, colour.b)
+    .mul(drift.mul(.12).add(aggregate.mul(.075)).add(panel.mul(.15)).add(lift.mul(.2)).add(run.mul(.09)).add(1))
+    .mul(float(1).sub(pores.mul(.16)).sub(joint.mul(.13)).sub(board.mul(.085)).sub(tie.mul(.28)))
+  m.roughnessNode = float(.88).add(aggregate.mul(.035)).add(pores.mul(.035))
+    .add(panel.mul(.08)).add(lift.mul(.05)).clamp(.80, .98)
+  const height = aggregate.mul(.0008).sub(pores.mul(.0005)).sub(joint.mul(.0015)).sub(board.mul(.0006))
+    .add(lift.mul(.0009)).sub(tie.mul(.002)).toVar()
   const viewNormal = n.transformDirection(cameraViewMatrix), sx = positionView.dFdx(), sy = positionView.dFdy()
   const rx = sy.cross(viewNormal), ry = viewNormal.cross(sx), det = sx.dot(rx)
   const gradient = rx.mul(height.dFdx()).add(ry.mul(height.dFdy())).mul(det.sign()).div(det.abs().max(1e-10)).toVar()
