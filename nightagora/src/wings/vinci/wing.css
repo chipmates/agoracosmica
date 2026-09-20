@@ -247,33 +247,38 @@
 .vinci-strip-row {display:flex;gap:6px;margin:0;padding:0;list-style:none;
   overflow-x:auto;overscroll-behavior:contain;scrollbar-width:thin;}
 .vinci-strip-row li {flex:0 0 auto;}
-/* The bar's own height is what the row stands above: the bar is 46 px at the
-   wing's own offset, and the row may never cover the way out of the room. */
-.vinci-strip[data-dock='foot'] {left:24px;top:auto !important;bottom:calc(var(--wing-rail-bottom) + 60px);
+/* ONE ROW AT EVERY STATION, the picture room's wall included: cells small
+   enough to leave the work whole and still a 44 px target, hugged at the foot
+   left above the bar, standing up to the size a face is recognised at under a
+   hand or a keyboard. Twenty five works scroll inside the row's own width.
+   The bar is 46 px at the wing's own offset, and the row may never cover the
+   way out of the room. */
+.vinci-strip[data-dock='foot'] {left:24px;right:auto;top:auto !important;bottom:calc(var(--wing-rail-bottom) + 60px);
+  width:auto !important;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:0 10px;
   padding:8px 10px 7px;}
-/* THE WHOLE WIDTH IS THE WALL'S. Twenty five works are recognisable at this
-   size and at no smaller one, and at the two ends of the hang the wall IS
-   the exhibit, so the band takes the foot of the frame. */
-.vinci-strip[data-dock='foot'][data-hang='wall'] {right:24px;width:auto !important;max-width:none;}
-.vinci-strip[data-dock='foot'][data-hang='wall'] .vinci-strip-item {width:116px;height:116px;}
-.vinci-strip[data-dock='foot'][data-hang='wall'] .vinci-strip-year {font-size:26px;padding-bottom:14px;}
-/* ELSEWHERE THE ROW IS THE ROOM'S FEW: it hugs its cells at the foot left,
-   small enough to leave the work whole and still a 44 px target, and it
-   stands up to the wall's own size under a hand or a keyboard. */
-.vinci-strip[data-dock='foot'][data-hang='room'] {right:auto;width:auto !important;}
-.vinci-strip[data-dock='foot'][data-hang='room'] .vinci-strip-item {width:72px;height:72px;
+.vinci-strip[data-dock='foot'] .vinci-strip-row {grid-column:1;grid-row:1;scrollbar-width:none;}
+.vinci-strip[data-dock='foot'] .vinci-strip-row::-webkit-scrollbar {display:none;}
+.vinci-strip[data-dock='foot'] .vinci-strip-item {width:72px;height:72px;
   transition:width .16s cubic-bezier(.22,.61,.36,1),height .16s cubic-bezier(.22,.61,.36,1);}
-.vinci-strip[data-dock='foot'][data-hang='room'] .vinci-strip-year {font-size:17px;padding-bottom:10px;}
-.vinci-strip[data-dock='foot'][data-hang='room']:hover .vinci-strip-item,
-.vinci-strip[data-dock='foot'][data-hang='room']:has(.vinci-strip-item:focus-visible) .vinci-strip-item
+.vinci-strip[data-dock='foot'] .vinci-strip-year {font-size:17px;padding-bottom:10px;}
+.vinci-strip[data-dock='foot']:hover .vinci-strip-item,
+.vinci-strip[data-dock='foot']:has(.vinci-strip-item:focus-visible) .vinci-strip-item
   {width:116px;height:116px;}
-.vinci-strip[data-dock='foot'][data-hang='room']:hover .vinci-strip-year,
-.vinci-strip[data-dock='foot'][data-hang='room']:has(.vinci-strip-item:focus-visible) .vinci-strip-year
+.vinci-strip[data-dock='foot']:hover .vinci-strip-year,
+.vinci-strip[data-dock='foot']:has(.vinci-strip-item:focus-visible) .vinci-strip-year
   {font-size:26px;padding-bottom:14px;}
+/* WHAT THE WIDTH CANNOT SEAT FADES AT THE EDGE instead of standing as a cut,
+   and no scrollbar adds to the row's height. Eight cells at rest and five
+   under a hand are past what this panel gives the row. */
+.vinci-strip[data-dock='foot'] .vinci-strip-row:has(li:nth-child(8)),
+.vinci-strip[data-dock='foot']:hover .vinci-strip-row:has(li:nth-child(5)),
+.vinci-strip[data-dock='foot']:has(.vinci-strip-item:focus-visible) .vinci-strip-row:has(li:nth-child(5))
+  {mask-image:linear-gradient(to right,#000 calc(100% - 30px),transparent);
+   -webkit-mask-image:linear-gradient(to right,#000 calc(100% - 30px),transparent);}
 @media(prefers-reduced-motion:reduce) {
   /* THE SIZE STEPS. The growth is a size, not a movement: with motion
      refused the cell is one size or the other and never travels between. */
-  .vinci-strip[data-dock='foot'][data-hang='room'] .vinci-strip-item {transition:none;}
+  .vinci-strip[data-dock='foot'] .vinci-strip-item {transition:none;}
 }
 /* THE SCALE IS THE WALL'S LENGTH, not the row's: the mark stands where the
    open work hangs along the hang, so a row scrolled to its middle still says
@@ -283,6 +288,16 @@
 .vinci-strip-scale::before {content:'';position:absolute;left:0;right:0;top:3px;height:1px;background:#a9977355;}
 .vinci-strip-mark {position:absolute;left:var(--along,0%);top:0;width:2px;height:7px;background:#edcc8c;}
 .vinci-strip-mark[hidden] {display:none;}
+/* THE WALL'S LENGTH COSTS NO HEIGHT: the hairline lies in the panel's own
+   foot, under the cells, and never in a band of its own. */
+.vinci-strip[data-dock='foot']:has(.vinci-strip-scale:not([hidden])) {padding-bottom:13px;}
+.vinci-strip[data-dock='foot'] .vinci-strip-scale {position:absolute;grid-column:1;grid-row:1;
+  left:0;right:0;top:auto;bottom:-9px;}
+/* THE WAY OFF THE WALL STANDS IN THE ROW'S OWN LINE, at its end. A second
+   band under the cells carried one button across the whole screen and read
+   as an empty field. */
+.vinci-strip[data-dock='foot'] .vinci-strip-foot {grid-column:2;grid-row:1;
+  flex-direction:column;align-items:flex-end;justify-content:center;gap:4px;}
 .vinci-strip-foot {display:flex;align-items:center;justify-content:space-between;gap:12px;}
 .vinci-strip-foot[hidden] {display:none;}
 .vinci-strip-place {color:#cdbb9a;font:9px var(--sans);letter-spacing:.14em;text-indent:.14em;}
