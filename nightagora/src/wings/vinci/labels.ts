@@ -129,6 +129,7 @@ export function createVinciLabelAnchor(options: {
   const ray = new Raycaster()
   const hits: Intersection<Mesh>[] = []
   let mode: VinciLabelMode = 1, hasAnchor = false, dirty = true, occluded = true
+  const foot = VINCI_MARK_BAND.foot
   let changedAt = -Infinity, disposed = false
   const tolerance = 0.08
   const settleMs = 80
@@ -187,7 +188,7 @@ export function createVinciLabelAnchor(options: {
       const x = (projected.x * 0.5 + 0.5) * width
       const y = (-projected.y * 0.5 + 0.5) * height
       const visible = !occluded && !underPanel(x, y, panels) && projected.z > -1 && projected.z < 1
-        && x > 22 && x < width - 22 && y > 120 && y < height - 220
+        && vinciMarkInBand(x, y, width, height, foot)
       if (!visible) { hide(); return }
       dot.hidden = false
       dot.style.left = `${x}px`
@@ -227,6 +228,16 @@ export interface VinciExhibitMark {
   object: Object3D
 }
 
+/** THE BAND A MARK MAY STAND IN. The head is the brand line and the bar at
+ * the top of the frame; the foot was written as a fixed 220 px for a room
+ * seen from a station, and at a viewing eye a work fills the frame, so its
+ * own mark landed in that reserve and no mark stood at all. The foot is now
+ * whatever stands at the foot of this frame: the row at rest, measured, with
+ * a hand's width over it. */
+export const VINCI_MARK_BAND = { head: 120, foot: 220 }
+export const vinciMarkInBand = (x: number, y: number, width: number, height: number, foot: number): boolean =>
+  x > 22 && x < width - 22 && y > VINCI_MARK_BAND.head && y < height - foot
+
 export interface VinciExhibitDots {
   setExhibits(marks: readonly VinciExhibitMark[]): void
   setMode(mode: VinciLabelMode): void
@@ -234,6 +245,8 @@ export interface VinciExhibitDots {
   setOpen(id: string | null): void
   /** Three on calm, six on standard, eight on hero. */
   setLimit(limit: number): void
+  /** How much of the frame's foot is reserved, in pixels. */
+  setFoot(pixels: number): void
   /** `panels` are the boxes of every panel standing on the frame. */
   update(panels?: readonly VinciLabelRect[] | null, now?: number): void
   invalidate(): void
@@ -278,6 +291,7 @@ export function createVinciExhibitDots(options: {
   const sight = new Map<string, boolean>()
   let marks: readonly VinciExhibitMark[] = []
   let mode: VinciLabelMode = 1, limit = options.limit ?? 6, opened: string | null = null
+  let foot = VINCI_MARK_BAND.foot
   let dirty = true, changedAt = -Infinity, disposed = false
   const settleMs = 80
 
@@ -311,6 +325,12 @@ export function createVinciExhibitDots(options: {
       limit = value
       invalidate()
     },
+    setFoot(pixels) {
+      const value = Math.max(0, Math.round(pixels))
+      if (value === foot) return
+      foot = value
+      invalidate()
+    },
     update(panels = null, now = view.performance.now()) {
       if (disposed || mode === 0 || !marks.length || limit === 0) { hide(); return }
       camera.updateWorldMatrix(true, false)
@@ -336,7 +356,7 @@ export function createVinciExhibitDots(options: {
         projected.copy(mark.anchor as Vector3).project(camera)
         if (projected.z <= -1 || projected.z >= 1) continue
         const x = (projected.x * .5 + .5) * width, y = (-projected.y * .5 + .5) * height
-        if (!(x > 22 && x < width - 22 && y > 120 && y < height - 220)) continue
+        if (!vinciMarkInBand(x, y, width, height, foot)) continue
         if (underPanel(x, y, panels)) continue
         candidates.push({ mark, x, y, from: Math.hypot(x - centreX, y - centreY) })
       }

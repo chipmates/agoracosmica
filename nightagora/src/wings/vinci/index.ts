@@ -1082,9 +1082,16 @@ export function createWing():VinciWingModule {
     // THE NAME NEVER STANDS IN THE ROW. A work at its own viewing eye fills
     // the frame to the foot, so the label takes the last clear band above the
     // wall's own instrument instead of standing behind it.
-    const floor=(strip?.element.getBoundingClientRect().top??innerHeight)-12
+    const floor=markFloor()-12
     quiet.style.left=`${Math.round(rect.left+rect.width/2)}px`
     quiet.style.top=`${Math.round(Math.min(rect.top+rect.height+12,floor-quiet.offsetHeight))}px`
+  }
+  /** WHAT STANDS AT THE FOOT OF THE FRAME. The row at rest, measured where
+   * it is, or the frame's own foot where no row stands: both the quiet label
+   * and the marks are held above it. */
+  function markFloor():number {
+    const row=strip?.element.getBoundingClientRect()
+    return row&&row.height>0?row.top:innerHeight
   }
   /** THE ROW UNDER THE CARD. It stands wherever a station holds more than
    * one exhibit: docked under the station card on the wide stage, above the
@@ -2091,6 +2098,10 @@ export function createWing():VinciWingModule {
       paintQuietLabel()
       // ONE EXHIBIT AT A TIME: while one is open the other marks stand down,
       // and at a stop the three that stand are this work and its neighbours.
+      // THE MARKS STAND ABOVE WHAT THE FOOT OF THE FRAME CARRIES. At a
+      // viewing eye a work fills the frame and its own mark hangs under it,
+      // so the reserve is the row's own top edge and not a fixed band.
+      dots?.setFoot(Math.max(0,innerHeight-markFloor()+12))
       dots?.setLimit(closeLook?.id?0:onWallStop()?3:DOTS_PER_TIER[hosts.world.stack.tierName()]??6)
       dots?.update(panels)},
     stop(){visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;life?.dispose();life=undefined;lifeControl?.remove();lifeControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;house=undefined;houseUp=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
