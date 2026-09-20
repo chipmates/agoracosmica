@@ -65,7 +65,19 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // degrees the cone's right half fell between the court corner and the east
   // range's windows and held neither.
   if(id==='courtyard') return narrow?p(10,-21,1.7,2.6,-12.5,4.8,80):p(10,-21,1.7,2.6,-12.5,4.3,60)
-  if(['hall','oratory','study','chamber'].includes(id)) return p(4.4,-23.35,1.65,2,-13.8,3.5,50)
+  // THE FOUR HOUSE ROOMS ARE NOT OPEN, so each station stands on built ground
+  // at the one thing of its room a visitor can actually see: the open door of
+  // the house at the hall's threshold, the chapel's window, the court under
+  // the study's window, and the court's west end on the castle's own line.
+  // The entrance door leaves 0.50 m at its widest line and the rail is proved
+  // with 0.563 m, so the hall's eye stands on the landing and not inside.
+  if(id==='hall') return narrow?p(3.0959,-13.0423,2.45,-1.301,-6.4787,.72,72):p(3.0959,-13.0423,2.45,-1.301,-6.4787,2.25,55)
+  if(id==='oratory') return narrow?p(5.6,-21.3,1.65,3.053,-18.288,1.98,60):p(5.6,-21.3,1.65,3.053,-18.288,2.9,46)
+  if(id==='study') return narrow?p(2.4,-29.3,1.65,-1.94,-22.848,5.9,66):p(2.4,-29.3,1.65,-1.94,-22.848,8.1,52)
+  // The royal château stands 590 m away on a bearing of 308.84 degrees, which
+  // from this end of the court runs over the house's west corner and down the
+  // valley. The aim is that bearing; nothing of the castle is built.
+  if(id==='chamber') return narrow?p(-4.2,-32.4,1.65,-21.33,-18.59,-3.5,72):p(-4.2,-32.4,1.65,-21.33,-18.59,.6,56)
   // R19 accepted: actual apron paving +1.65 m; all eight principal windows clear vegetation.
   if(id==='garden') return p(-24.5,-31.2,-4.790000057220459,-8.7,-16.6,narrow?4.2:6.2,narrow?96:62)
   // THE COLLECTION'S NINE STAND IN THEIR OWN ROOMS, at the eye the module's
@@ -97,6 +109,17 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // A future station without a room keeps the held terrace composition.
   return p(-12.4,-21.6,groundHeight(-12.4,-21.6)+1.65,-38,-44,-4.2,narrow?74:58)
 }
+/** THE CLOSE LOOKS THE HOUSE ALREADY HOLDS, proposed as the eleven of its four
+ * stations. Every one is an authored inspection eye this table already stands,
+ * so a close look here adds no pose and no geometry. An architecture close
+ * look is an AUTHORED VIEW and never a pickable object: there is no body to
+ * press, only a composition to be stood in. */
+export const HOUSE_CLOSE_LOOKS:Partial<Record<VinciStationId,readonly string[]>>={
+  hall:['motto','threshold','entry-terracotta','entry-plaster','step-wear'],
+  oratory:['lancet','material-stone-close'],
+  study:['masonry','gutter'],
+  chamber:['material-brick-sunlit','slate-clear'],
+}
 export function namedPose(id:string,narrow:boolean):Pose|undefined {
   // Independent static material inspections; return explicitly to the rail.
   if(id==='material-brick-sunlit')return p(-14.34996788180643,-15.446032508323484,3.005,-13.560321684541906,-14.9178669252478,3.005,narrow?56:48)
@@ -120,6 +143,14 @@ export function namedPose(id:string,narrow:boolean):Pose|undefined {
   if(id==='composition-arrival-centre')return narrow?p(25.5,-20,groundHeight(25.5,-20)+1.65,8.328,-10.1321,5.5686,96):p(24.98,-16.13,groundHeight(24.98,-16.13)+1.65,8,-13.5,5,70)
   // Superseded garden pair: phone exposes the north gable/gap; desktop has window foliage.
   if(id==='composition-garden-clear')return narrow?p(-24,-6,groundHeight(-24,-6)+1.65,-5.5,-14.3,9.2,100):p(-28,-30,groundHeight(-28,-30)+1.65,-8,-17.5,5.4,56)
+  // The house stations' trials, kept reproducible beside the eyes that were
+  // taken. The hall was composed twice: at the door on the landing, which is
+  // the eye it stands at, and back at the foot of the steps, which holds the
+  // whole opening and the carving over it but repeats the court's own subject.
+  if(id==='composition-hall-steps')return p(4.212,-14.942,1.65,2.487,-12.367,2.05,narrow?70:55)
+  if(id==='composition-hall-door')return stationPose('hall',narrow)
+  if(id==='composition-study-near')return p(.55,-26.6,1.65,-1.94,-22.848,6.05,narrow?66:52)
+  if(id==='composition-chamber-corner')return p(-5,-31,1.65,-6.32,-25.71,7,narrow?76:60)
   // Standing inspection eyes on the supplied +0.80 m entry floor.
   if(id==='entry-structure')return p(1.6827085821,-11.1289639925,2.45,.2233233333,-7.3668775,2.50,narrow?76:64)
   if(id==='entry-plaster')return p(1.7866530846,-8.2594276119,2.45,2.2544516667,-7.4190741667,2.4,narrow?57:45)

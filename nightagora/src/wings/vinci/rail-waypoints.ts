@@ -105,12 +105,15 @@ const COURT_LANE_WEST: RailWaypoint = [-49.5, -20.6, COURT.level + railEyeHeight
 
 /** Where a station stands. The house keeps its three sides; the collection
  * ground is its rooms, because a room is entered through its door. */
-export type RailSide = 'street' | 'court' | 'terrace' | 'apron'
+export type RailSide = 'street' | 'court' | 'entry-landing' | 'terrace' | 'apron'
   | 'picture-room' | 'long-gallery' | 'mechanism-hall' | 'exhibit-court' | 'grave-court'
 
 export function railSide(stationId: string): RailSide {
   if (stationId === 'arrival') return 'street'
-  if (['courtyard', 'hall', 'oratory', 'study', 'chamber'].includes(stationId)) return 'court'
+  // The hall's eye stands at the house's own door, one storey above the court
+  // and behind the threshold steps: it is reached over them and not across.
+  if (stationId === 'hall') return 'entry-landing'
+  if (['courtyard', 'oratory', 'study', 'chamber'].includes(stationId)) return 'court'
   // The garden eye stands on the apron itself (apron.height + the eye), so it
   // is routed from there: routed as a terrace station it climbed to the stair
   // head and came back down the same stair to reach its own ground.
@@ -134,8 +137,17 @@ const NOT_A_CORRIDOR: readonly RailSide[] = ['mechanism-hall']
 /** The links of the walk, each written one way and walked either way. A route
  * is the shortest chain of them, so a visitor gets from any station to any
  * other through the doors and never through a wall. */
+/** THE OPEN COURT, AND THE FOOT OF THE THRESHOLD STEPS. The first is a turn
+ * in the middle of the court, clear of the gate's open leaf, which every walk
+ * to the house door leaves from; the second is the foot of the five treads,
+ * on the door's own axis, so the eye goes up them and not across their cheek.
+ */
+const COURT_OPEN: RailWaypoint = [8, -21, railEyeHeightM]
+const THRESHOLD_FOOT: RailWaypoint = [4.834, -14.329, railEyeHeightM]
+
 const LINKS: readonly { from: RailSide; to: RailSide; via: readonly RailWaypoint[] }[] = [
   { from: 'street', to: 'court', via: railGateWaypoints },
+  { from: 'court', to: 'entry-landing', via: [COURT_OPEN, THRESHOLD_FOOT] },
   { from: 'court', to: 'terrace', via: railAccessWaypoints },
   { from: 'terrace', to: 'apron', via: railCollectionStairWaypoints },
   { from: 'apron', to: 'picture-room', via: [APRON_CORNER, ENTRANCE_OUT, ENTRANCE_IN] },
