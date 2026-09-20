@@ -356,7 +356,8 @@ const routes = [], readings = []
 for (const { viewport, seen } of families) {
   for (const from of seen) for (const to of seen) {
     if (from === to) continue
-    const chain = railWaypointsBetween(railSide(from.id), railSide(to.id))
+    const chain = railWaypointsBetween(railSide(from.id), railSide(to.id),
+      { from: [from.pose.eye.x, -from.pose.eye.z], to: [to.pose.eye.x, -to.pose.eye.z] })
     const enh = [[from.pose.eye.x, -from.pose.eye.z, from.pose.eye.y], ...chain.map(point => [...point]), [to.pose.eye.x, -to.pose.eye.z, to.pose.eye.y]]
     const points = enh.map(([east, north, height]) => new THREE.Vector3(east, height, -north))
     // The eye leaves the certified line by the step rhythm's own envelope, so

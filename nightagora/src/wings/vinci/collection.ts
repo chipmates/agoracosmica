@@ -11,6 +11,7 @@ import * as TSL from 'three/tsl'
 import { world } from './site'
 import { anisotropicFootprint } from './masonry-courses'
 import { createCollectionRooms } from './collection/rooms'
+import { OPENING } from './collection/layout'
 
 type Point = [east: number, north: number]
 type Point3 = [east: number, north: number, height: number]
@@ -407,7 +408,11 @@ export function createCollection(): Group {
   opaque.box(-42, -49, floor + .045, 39.5, 29.5, .09, '#555a4d', 3)
   castConcrete.box(-42, -63.83, floor + 2.25, 40, .34, 4.5, concrete)
   castConcrete.box(-61.83, -49, floor + 2.25, .34, 30, 4.5, concrete)
-  opaque.box(-42.3, -41.92, floor + 2.2, 36.4, .24, 4.4, interior, 3)
+  // The hanging wall runs between its two doors, so the door the rail walks
+  // west into the machines is the partition's own west end: one copy of the
+  // digits, in the room programme.
+  const hanging = [OPENING.pictureToHall.east[1], OPENING.pictureToGallery.east[0]] as const
+  opaque.box((hanging[0] + hanging[1]) / 2, -41.92, floor + 2.2, hanging[1] - hanging[0], .24, 4.4, interior, 3)
   opaque.box(-38.9, -53.2, floor + 2.2, .24, 18.0, 4.4, interior, 3)
   opaque.box(-30.45, -62.9, floor + 2.1, 15.3, .18, 4.2, interior, 3)
   // A 4 m north elevation grid, 80 mm mullions and 140 mm perimeter posts.

@@ -1,6 +1,6 @@
 import { collectionAccessLayout, collectionAccessPoint } from './collection-access'
 import { collectionLayout } from './collection'
-import { COURT, FACE, FLOOR, OPENING } from './collection/layout'
+import { COURT, FACE, FLOOR, OPENING, SUPPER_WALL, doorClearEastWest } from './collection/layout'
 import { roadGradeProvenance } from './road-grade'
 
 /** THE RAIL'S OWN WAYPOINTS, in east, north, height, with the height already
@@ -61,18 +61,22 @@ export const railTerraceWaypoints: readonly RailWaypoint[] = [
   ...railAccessWaypoints, ...railCollectionStairWaypoints,
 ]
 
-/** THE DOORS OF THE INSERTION. The two interior doors are the ends of the
- * built partitions, so their middles are the openings' own; the entrance is
- * the recessed north bay of the east elevation, under the canopy.
+/** THE DOORS OF THE INSERTION. The three interior doors are the ends of the
+ * built partitions, so the line through each one is the middle of what its
+ * reveals leave clear; the entrance is the recessed north bay of the east
+ * elevation, under the canopy.
  *
- * The picture room's WEST door is not one of them. Its opening is 1.16 m
- * between the built partitions, and its two door linings leave 0.74 m of it
- * clear at eye height: 0.37 m at the widest line through it, against the
- * 0.41 to 0.45 m near envelope this rail is proved with. The walk to the
- * machines therefore keeps to the gallery's door, and the west station's card
- * names that door as the building's, not as the walk's.
+ * The picture room's WEST door carries the walk into the machines. Its
+ * reveals leave 1.06 m clear at eye height, so the widest line through it has
+ * 0.53 m on either side, against the 0.41 to 0.45 m near envelope this rail
+ * is proved with.
  */
 const ENTRANCE_NORTH = -35
+const clearMiddle = (opening: { east: readonly number[] }): number => {
+  const [west, east] = doorClearEastWest(opening)
+  return (west + east) / 2
+}
+const PICTURE_TO_HALL = clearMiddle(OPENING.pictureToHall)
 const PICTURE_TO_GALLERY = (OPENING.pictureToGallery.east[0] + OPENING.pictureToGallery.east[1]) / 2
 const HALL_TO_GALLERY = (OPENING.hallToGallery.north[0] + OPENING.hallToGallery.north[1]) / 2
 const ENTRANCE_IN: RailWaypoint = [FACE.glazingEast - 1.6, ENTRANCE_NORTH, INSIDE]
@@ -81,7 +85,11 @@ const ENTRANCE_OUT: RailWaypoint = [FACE.glazingEast + 1.2, ENTRANCE_NORTH, OUTS
  * clear of the pavilion, which is how the court is reached on foot. */
 const APRON_CORNER: RailWaypoint = [S.east, collectionLayout.apron.north - .4, OUTSIDE]
 const APRON_NORTH: RailWaypoint = [COURT.east - 1.4, collectionLayout.apron.north - .5, OUTSIDE]
-const COURT_EAST: RailWaypoint = [COURT.east - 1.4, COURT.south + 2.6, COURT.level + railEyeHeightM]
+/** THE COURT IS ENTERED ON THE DISPLAY WALL'S OWN LINE. Standing 2.6 m into
+ * the court put the turn onto the wall at 119 degrees over the last stride,
+ * with the eye swinging round as it arrived. On the wall's line the walk
+ * turns once, west, and the measurement grows straight ahead. */
+const COURT_EAST: RailWaypoint = [COURT.east - 1.4, SUPPER_WALL.north, COURT.level + railEyeHeightM]
 /** The lane along the court's north side: the only way west that passes the
  * wall that is not here (its north end) and the machines standing in the
  * court, which a visitor walks between, not through. It runs a metre and a
@@ -119,9 +127,15 @@ const LINKS: readonly { from: RailSide; to: RailSide; via: readonly RailWaypoint
   { from: 'terrace', to: 'apron', via: railCollectionStairWaypoints },
   { from: 'apron', to: 'picture-room', via: [APRON_CORNER, ENTRANCE_OUT, ENTRANCE_IN] },
   { from: 'apron', to: 'exhibit-court', via: [APRON_CORNER, APRON_NORTH, COURT_EAST] },
-  { from: 'exhibit-court', to: 'grave-court', via: [COURT_EAST, COURT_LANE_EAST, COURT_LANE_WEST] },
+  // The lane leaves the display wall's eye due north, so a walk to the grave
+  // begins by turning up it and never by stepping back east first.
+  { from: 'exhibit-court', to: 'grave-court', via: [COURT_LANE_EAST, COURT_LANE_WEST] },
   { from: 'picture-room', to: 'long-gallery',
     via: [[PICTURE_TO_GALLERY, FACE.pictureWallNorth + 1.4, INSIDE], [PICTURE_TO_GALLERY, FACE.pictureWallSouth - 1.4, INSIDE]] },
+  // The picture room's west door. The hall's side of it stands north of the
+  // machine bay, so the walk leaves the door before it meets a plinth.
+  { from: 'picture-room', to: 'mechanism-hall',
+    via: [[PICTURE_TO_HALL, FACE.pictureWallNorth + 1.4, INSIDE], [PICTURE_TO_HALL, FACE.pictureWallSouth - 1, INSIDE]] },
   // The gallery's side of the hall door stands clear of the alcove the
   // reading table brings its own back wall for: at a metre and a half off the
   // partition the walk went by that wall at arm's length.
@@ -130,36 +144,55 @@ const LINKS: readonly { from: RailSide; to: RailSide; via: readonly RailWaypoint
       [FACE.hallPartitionWest - 1.3, HALL_TO_GALLERY, INSIDE]] },
 ]
 
-/** The turns between two stations, in walking order. */
-export function railWaypointsBetween(from: RailSide, to: RailSide): RailWaypoint[] {
-  if (from === to) return []
-  const queue: RailSide[][] = [[from]]
-  const seen = new Set<RailSide>([from])
-  while (queue.length) {
-    const route = queue.shift()!
-    const here = route[route.length - 1]!
-    if (here === to) {
-      const chain: RailWaypoint[] = []
-      for (let i = 1; i < route.length; i++) {
-        const a = route[i - 1]!, b = route[i]!
-        const link = LINKS.find(value => (value.from === a && value.to === b) || (value.from === b && value.to === a))!
-        for (const point of link.from === a ? link.via : [...link.via].reverse()) {
-          // Two links meet AT a turn, so the junction is written in both and
-          // reached once. A repeated point is a corner with no length in it.
-          const last = chain[chain.length - 1]
-          if (last && Math.hypot(point[0] - last[0], point[1] - last[1], point[2] - last[2]) < 1e-6) continue
-          chain.push(point)
-        }
-      }
-      return chain
+/** The turns of one chain of links, in walking order. */
+function chainOf(route: readonly RailSide[]): RailWaypoint[] {
+  const chain: RailWaypoint[] = []
+  for (let i = 1; i < route.length; i++) {
+    const a = route[i - 1]!, b = route[i]!
+    const link = LINKS.find(value => (value.from === a && value.to === b) || (value.from === b && value.to === a))!
+    for (const point of link.from === a ? link.via : [...link.via].reverse()) {
+      // Two links meet AT a turn, so the junction is written in both and
+      // reached once. A repeated point is a corner with no length in it.
+      const last = chain[chain.length - 1]
+      if (last && Math.hypot(point[0] - last[0], point[1] - last[1], point[2] - last[2]) < 1e-6) continue
+      chain.push(point)
     }
+  }
+  return chain
+}
+
+/** THE WAY BETWEEN TWO STATIONS IS THE SHORTEST ONE, NOT THE ONE WITH THE
+ * FEWEST DOORS. Two rooms can be joined by one long link and by two short
+ * ones, and counting links alone sent a visitor the length of a hall to save
+ * a door. Every simple chain through the sides is measured end to end,
+ * including the two station eyes, and the shortest is walked.
+ */
+export function railWaypointsBetween(from: RailSide, to: RailSide,
+  ends?: { from: readonly [number, number]; to: readonly [number, number] }): RailWaypoint[] {
+  if (from === to) return []
+  const routes: RailSide[][] = []
+  const walk = (route: RailSide[]): void => {
+    const here = route[route.length - 1]!
+    if (here === to) { routes.push(route); return }
     for (const link of LINKS) {
       for (const [a, b] of [[link.from, link.to], [link.to, link.from]] as const) {
-        if (a !== here || seen.has(b)) continue
-        seen.add(b)
-        queue.push([...route, b])
+        if (a !== here || route.includes(b)) continue
+        walk([...route, b])
       }
     }
   }
-  throw new Error(`No way from ${from} to ${to}`)
+  walk([from])
+  if (!routes.length) throw new Error(`No way from ${from} to ${to}`)
+  let best: RailWaypoint[] | undefined, shortest = Infinity
+  for (const route of routes) {
+    const chain = chainOf(route)
+    const plan: (readonly [number, number])[] = [...(ends ? [ends.from] : []), ...chain.map(point => [point[0], point[1]] as const), ...(ends ? [ends.to] : [])]
+    let length = 0
+    for (let i = 1; i < plan.length; i++) length += Math.hypot(plan[i]![0] - plan[i - 1]![0], plan[i]![1] - plan[i - 1]![1])
+    // Without the two eyes a chain is judged by its own turns alone, which
+    // still separates a way through one room from a way through three.
+    const cost = ends ? length : route.length * 1e4 + length
+    if (cost < shortest) { shortest = cost; best = chain }
+  }
+  return best!
 }

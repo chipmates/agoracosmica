@@ -27,11 +27,18 @@ export const FACE = {
   southStripNorth: -62.81,
 } as const
 
+/** A door of this house is a metre of clear walking width; its stone reveal
+ * stands 0.26 m into the structural opening, set in from the west edge, so
+ * what a person walks is the opening less one reveal and two half reveals. */
+export const DOOR_REVEAL = { width: .26, inset: .1 }
+
 /** The existing partitions do not run wall to wall. Their ends are the doors
  * the rail walks through, and this module dresses them as openings. */
 export const OPENING = {
-  /** picture room to the hall, at the west end of the hanging wall */
-  pictureToHall: { east: [-61.66, -60.5], north: FACE.pictureWallNorth },
+  /** picture room to the hall, at the west end of the hanging wall. The
+   * opening carries the walk west into the machines, so it is cut to leave
+   * the house's own clear door width between its two reveals. */
+  pictureToHall: { east: [-61.66, -60.24], north: FACE.pictureWallNorth },
   /** picture room to the long gallery, at its east end */
   pictureToGallery: { east: [-24.1, -22.07], north: FACE.pictureWallNorth },
   /** the hall's north-east door, between the hanging wall and the partition */
@@ -39,6 +46,14 @@ export const OPENING = {
   /** the hall's south-east door */
   hallToSouth: { north: [-63.66, -62.2], east: FACE.hallPartitionEast },
 } as const
+
+/** What a person actually walks between the two reveals of an east-west
+ * door: the rail is certified against this span, never against the
+ * structural opening the wall is cut to. */
+export const doorClearEastWest = (opening: { east: readonly number[] }): [number, number] => [
+  opening.east[0]! + DOOR_REVEAL.inset + DOOR_REVEAL.width / 2,
+  opening.east[1]! - DOOR_REVEAL.width / 2,
+]
 
 export interface Room {
   id: string
