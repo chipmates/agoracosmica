@@ -49,7 +49,11 @@ const PERIOD = 12
  * bodies stand at it and neither is ever drawn: a ball the hand can reach,
  * which keeps its width from every bearing, and a flat ring the light marks
  * the place with, open in the middle so the mark never covers the hole. */
-const HOLE_REACH = 0.037
+/* The reach is the hand's, not the eye's: at the table's own distance the old
+ * ball came to 20 by 22 CSS pixels on a 390 px stage, under the 44 a thumb
+ * needs, so it is grown until it measures over 44 both ways. The ring the
+ * light marks the place with does not move: the drawn hole is unchanged. */
+const HOLE_REACH = 0.082
 const HOLE_MARK = { inner: 0.014, outer: 0.037, front: 0.004 }
 
 /** The vitrine's own eye stands at yaw 35 degrees off the world's +z, and the
