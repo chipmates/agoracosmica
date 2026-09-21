@@ -306,6 +306,24 @@ export function createPolicyWorkLabel(work: PictureWork, entries: readonly Resol
   return label
 }
 
+/** THE LABEL AS A CLOSE LOOK CARRIES IT. The wall writes both language
+ * columns; a window keeps the one the visitor reads. Its first line keeps
+ * the certainty word with its mark and drops the work's name, which the
+ * window's own heading says above it. */
+export function createWindowWorkLabel(work: PictureWork, entries: readonly ResolvedPicturePlate[],
+  language: 'en' | 'de', twoLevels: boolean): HTMLElement {
+  const label = createPolicyWorkLabel(work, entries, false, [], twoLevels)
+  for (const column of [...label.querySelectorAll<HTMLElement>('.picture-label-language')]) {
+    if (column.lang !== language) column.remove()
+  }
+  const word = policyLabelText(work, entries).certainty[language]
+  for (const first of [...label.querySelectorAll<HTMLElement>('.picture-first,.picture-first-de')]) {
+    for (const node of [...first.childNodes]) if (node.nodeType === Node.TEXT_NODE) node.remove()
+    first.append(document.createTextNode(word))
+  }
+  return label
+}
+
 export function createPictureCertaintyKey(compact = false): HTMLElement {
   const key = node('div', 'picture-certainty-key')
   key.setAttribute('aria-label', 'Attribution and reconstruction key / Legende zu Zuschreibung und Rekonstruktion')

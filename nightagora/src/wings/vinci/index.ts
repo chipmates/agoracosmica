@@ -30,7 +30,7 @@ import { COURT, GRAVE_ORIGIN, LINE_FIELD, ROOMS, SUPPER_WALL } from './collectio
 import { collectionView } from './collection/views'
 import { mountCollectionExhibits, type CollectionExhibits } from './collection/exhibits'
 import { isMachineSlug, type MachineSlug } from './machines'
-import { createPictureRecord, createPolicyWorkLabel, policyLabelText, PICTURE_CERTAINTY_KEY } from './pictures/policy-label'
+import { createPictureRecord, createPolicyWorkLabel, createWindowWorkLabel, policyLabelText, PICTURE_CERTAINTY_KEY } from './pictures/policy-label'
 import { MAIN_HANG, REGISTER, type PictureRights } from './pictures/register'
 import { MACHINE_SLUGS, machineCatalog } from './machines/catalog'
 import { validatePaintingRecord } from './pictures/policy'
@@ -1707,8 +1707,7 @@ export function createWing():VinciWingModule {
     const plate=entries.find(source=>source.face===entry.face)??entries[0]
     // THE PAGE'S LANGUAGE ONLY. The module writes both columns for the wall's
     // own record; the vitrine keeps the one the visitor reads.
-    const label=createPolicyWorkLabel(work,entries,false,[],narrow())
-    for(const column of [...label.querySelectorAll<HTMLElement>('.picture-label-language')])if(column.lang!==lang())column.remove()
+    const label=createWindowWorkLabel(work,entries,lang(),narrow())
     const controls:HTMLElement[]=[]
     const workRectNow=():VitrineRect|null=>{const nav=rail.navigation;return nav.exhibit===id&&!nav.active?workRect(entry.object):null}
     if(plate){

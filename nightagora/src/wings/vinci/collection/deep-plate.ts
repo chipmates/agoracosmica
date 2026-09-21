@@ -13,7 +13,7 @@ import { createDeepPlatePayload, type DeepPlateDetail, type DeepPlateSource, typ
 import type { DeepTilePyramid } from '../../vitrine/deep-viewer'
 import type { VitrineExhibit, VitrineRect } from '../../vitrine'
 import { validatePaintingRecord } from '../pictures/policy'
-import { createPolicyWorkLabel } from '../pictures/policy-label'
+import { createWindowWorkLabel } from '../pictures/policy-label'
 import { pictureDisplayUV, pictureDisplayWindow } from '../pictures/registration'
 import type { PictureWork, ResolvedPicturePlate } from '../pictures/register'
 import cardsRaw from '../data/cards.json?raw'
@@ -218,10 +218,7 @@ export function createVinciWholePlate(options: {
   const cut = registration ? pictureDisplayUV(registration) : null
   // The same label the close look carries, folded where it folds there: the
   // plate is what this window is for, and the words stand beside it.
-  const label = createPolicyWorkLabel(options.work, options.entries, false, [], options.narrow)
-  for (const column of [...label.querySelectorAll<HTMLElement>('.picture-label-language')]) {
-    if (column.lang !== language) column.remove()
-  }
+  const label = createWindowWorkLabel(options.work, options.entries, language, options.narrow)
   // THE DEEP SOURCE WHERE THE STORE HOLDS ONE. Its pixels are the view's
   // ceiling and the rule's own scale, so the centimetres are measured
   // against the source that stands in the window, not the wall's plate.
