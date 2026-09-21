@@ -9,9 +9,10 @@ import { partitionDressing } from './dressing-partition'
 import { collectionConcreteMaterial, collectionProvenance } from './collection'
 import { collectionAccessProvenance } from './collection-access'
 import { anisotropicFootprint, coursedFace, dressedTuffeau } from './masonry-courses'
+import { fractalField, resolved, specularAA } from '../../stack/detail'
 
 // TSL graphs retain three independent scales, even on calm's complete ground.
-const { positionWorld, positionView, normalWorldGeometry, cameraViewMatrix, mx_noise_float, mx_fractal_noise_float, mix, vec3, float, smoothstep, length, cameraPosition, normalMap, vec2, uv, fract, floor, dot, sin, cos } = TSL
+const { positionWorld, positionView, normalWorldGeometry, cameraViewMatrix, mx_noise_float, mix, vec3, float, smoothstep, length, cameraPosition, normalMap, vec2, uv, fract, floor, dot, sin, cos } = TSL
 function rgb(hex:string) { const c=new Color(hex); return vec3(c.r,c.g,c.b) }
 /** Where a slender member meets the ground it takes the sky away from the
  * grass around its foot. Without it a post reads as standing in mid air,
@@ -26,32 +27,43 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
   const m=new MeshStandardNodeMaterial({roughness:0.96,side:DoubleSide})
   m.aoNode=foundationVisibility().mul(footVisibility())
   const P=positionWorld
-  const broad=mx_fractal_noise_float(P.mul(.12),3,2,.5).mul(.5).add(.5).clamp(0,1)
-  const mid=mx_noise_float(P.mul(kind==='grass'?5:11)).mul(.5).add(.5)
-  // Packed earth at arm's length is clods and small stone, and the material
-  // had nothing between nine centimetres and one. This is that band.
-  const clods=kind==='earth'?mx_noise_float(P.mul(27)).mul(.5).add(.5):float(.5)
-  const fine=mx_noise_float(P.mul(85)).mul(.5).add(.5)
   // A SCALE IS DROPPED WHEN IT CANNOT BE RESOLVED, never because the ground is
   // far away. The old camera-distance fades are what left the far hillside one
   // colour: every scale it could still show was switched off at 110 m.
+  // AND EVERY TERM IS GATED ON ITS OWN PERIOD, never on the coarsest period
+  // beside it: a field carried at full strength by a pixel wider than itself
+  // is what crawls, and one shared ramp cannot speak for scales a factor of
+  // seventeen apart. The gate, the octave ladder and the slope it hands back
+  // are the stack's, so there is one law for every material in the wing.
   const footprint=anisotropicFootprint(P)
-  const shows=(metres:number)=>smoothstep(1.6,3.4,float(metres).div(footprint))
-  const density=shows(.2)
+  const shows=(metres:number)=>float(resolved(metres,footprint))
+  /** the slope a gated-away rung no longer draws: a flatter plane is shinier */
+  const lost=(heightM:number,periodM:number)=>float(heightM/periodM).mul(shows(periodM).oneMinus())
+  /** the sward's relief rungs, by their own heights and periods below */
+  const swardLost=lost(.115,1/.86).add(lost(.0575,.5/.86)).add(lost(.0288,.25/.86)).add(lost(.028,.345))
+  const broad=float(fractalField(P.mul(.12),1/.12,footprint,3,2,.5)).mul(.5).add(.5).clamp(0,1)
+  const midM=kind==='grass'?.2:1/11
+  const mid=mx_noise_float(P.mul(kind==='grass'?5:11)).mul(shows(midM)).mul(.5).add(.5)
+  // Packed earth at arm's length is clods and small stone, and the material
+  // had nothing between nine centimetres and one. This is that band.
+  const clods=kind==='earth'?mx_noise_float(P.mul(27)).mul(shows(1/27)).mul(.5).add(.5):float(.5)
+  const fine=mx_noise_float(P.mul(85)).mul(shows(1/85)).mul(.5).add(.5)
   const pair=kind==='grass'?['#485537','#879066']:kind==='earth'?['#796d57','#b4a388']:['#807968','#b8ad93']
-  m.colorNode=mix(rgb(pair[0]!),rgb(pair[1]!),broad).mul(mid.sub(.5).mul(density.mul(.28)).add(1)).mul(fine.sub(.5).mul(density.mul(.15)).add(1))
-  if(kind==='earth')m.colorNode=m.colorNode!.mul(clods.sub(.5).mul(shows(.037)).mul(.26).add(1))
-  const nx=mx_noise_float(P.mul(18).add(vec3(.2,0,0))).sub(mid).mul(.18)
-  const ny=mx_noise_float(P.mul(18).add(vec3(0,0,.2))).sub(mid).mul(.18)
+  m.colorNode=mix(rgb(pair[0]!),rgb(pair[1]!),broad).mul(mid.sub(.5).mul(.28).add(1)).mul(fine.sub(.5).mul(.15).add(1))
+  if(kind==='earth')m.colorNode=m.colorNode!.mul(clods.sub(.5).mul(.26).add(1))
+  const bump=shows(1/18)
+  const nx=mx_noise_float(P.mul(18).add(vec3(.2,0,0))).sub(mid).mul(.18).mul(bump)
+  const ny=mx_noise_float(P.mul(18).add(vec3(0,0,.2))).sub(mid).mul(.18).mul(bump)
   m.normalNode=normalMap(vec3(nx.add(.5),ny.add(.5),1),vec2(.4,.4))
-  m.roughnessNode=fine.mul(.12).add(.84)
+  // the bump's own slope is its encoded amplitude against its period
+  m.roughnessNode=specularAA(fine.mul(.12).add(.84),lost(.0022,1/18))
   if(kind==='grass'){
     // A MEADOW IS NOT ONE SWARD. Between the eight metre drift and the twenty
     // centimetre blade noise there was nothing, and two metres is the scale a
     // field is actually read at: tussock where nothing grazes, a shorter
     // yellower nap where something does, and the hollows holding their green
     // after a dry week. Colour and roughness only; no blade is moved.
-    const tussock=mx_fractal_noise_float(P.mul(.45),3,2,.5).clamp(-1,1)
+    const tussock=float(fractalField(P.mul(.45),1/.45,footprint,3,2,.5)).clamp(-1,1)
     const use=mx_noise_float(P.mul(.055))
     const rough=smoothstep(-.30,.42,tussock.add(use.mul(.6))).mul(shows(1.1))
     const grazed=smoothstep(.10,.72,use.negate()).mul(shows(4.5))
@@ -61,7 +73,7 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     m.colorNode=mix(m.colorNode!,rgb('#43563a'),hollow.mul(.20))
     // The fine grain belongs to the rough ground; a grazed nap has less of it.
     m.colorNode=m.colorNode!.mul(fine.sub(.5).mul(rough.mul(.16)).add(1))
-    m.roughnessNode=float(.96).sub(rough.mul(.05)).add(grazed.mul(.02))
+    m.roughnessNode=specularAA(float(.96).sub(rough.mul(.05)).add(grazed.mul(.02)),swardLost)
   }
   const earthMaps=library&&kind==='earth'?library.sync('earth-packed').sample({uv:uv(),metres:1.4}):undefined
   // The CC0 earth set carries its own metre-scale cloud, and at ±45 per cent
@@ -74,7 +86,7 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     // was cut through, and its grit is not the same from one place to the
     // next: the library's own grain now arrives through that density.
     const cut=smoothstep(.30,.74,float(1).sub(normalWorldGeometry.y.abs()))
-    const patchy=mx_noise_float(P.mul(.78).add(vec3(5.3,1.1,2.7))).mul(.5).add(.5)
+    const patchy=mx_noise_float(P.mul(.78).add(vec3(5.3,1.1,2.7))).mul(shows(1/.78)).mul(.5).add(.5)
     const beds=sin(P.y.mul(9.4).add(mx_noise_float(P.mul(.62)).mul(2.6))).mul(shows(.34)).mul(cut)
     m.colorNode=m.colorNode!.mul(mix(float(1),earthMaps.albedo.clamp(.72,1.28),patchy.mul(.44).add(.14)))
       .mul(beds.mul(.055).add(1)).mul(mix(float(.945),float(1.05),patchy))
@@ -87,12 +99,10 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     const axis=vec2(n.z,n.x.negate()).div(length(n.xz).max(.00001))
     const U=vec2(mix(P.x,P.x.mul(axis.x).add(P.z.mul(axis.y)),vertical),mix(P.z,P.y,vertical))
     const pixel=U.dFdx().abs().add(U.dFdy().abs()).max(vec2(.00001,.00001))
-    const worldPixel=anisotropicFootprint(P)
-    const resolved=(metres:number)=>smoothstep(2,4,float(metres).div(worldPixel))
     const laid=coursedFace(U,{...dressedTuffeau,courseM:.30,blockM:.62,jointM:.015,seed:7.31})
-    const seam=laid.joint,block=laid.tone.sub(1).mul(resolved(.30))
-    const drift=mx_noise_float(P.mul(.24)),cleft=mx_noise_float(P.mul(16)).mul(resolved(.0625))
-    const pores=smoothstep(.38,.68,mx_noise_float(P.mul(220))).mul(resolved(.0045))
+    const seam=laid.joint,block=laid.tone.sub(1).mul(shows(.30))
+    const drift=mx_noise_float(P.mul(.24)).mul(shows(1/.24)),cleft=mx_noise_float(P.mul(16)).mul(shows(.0625))
+    const pores=smoothstep(.38,.68,mx_noise_float(P.mul(220))).mul(shows(.0045))
     // At arm's length a visitor sees ONE stone, so the stone itself has to
     // carry the frame: a claw chisel leaves parallel grooves about 11 mm
     // apart, each block set at its own angle, and a shelly limestone shows
@@ -101,15 +111,15 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     const wanderTool=mx_noise_float(vec3(U.x.mul(3.4),U.y.mul(2.6),laid.cell.mul(13.3))).mul(2.4)
     const worked=smoothstep(-.42,.38,mx_noise_float(vec3(U.x.mul(6.1),U.y.mul(4.7),laid.cell.mul(7.9))))
     const grooves=sin(U.x.mul(cos(swing)).add(U.y.mul(sin(swing))).mul(556.1).add(wanderTool))
-      .mul(worked.mul(.72).add(.28)).mul(resolved(.0115))
-    const chatter=mx_noise_float(vec3(U.x.mul(41),U.y.mul(7.7),laid.cell.mul(19))).mul(resolved(.024))
-    const shells=smoothstep(.80,.93,mx_noise_float(P.mul(52).add(vec3(7.3,1.9,4.4)))).mul(resolved(.021))
-    const damp=float(1).sub(smoothstep(1.02,1.85,P.y)).mul(mx_noise_float(P.mul(vec3(1.2,.7,1.2))).mul(.3).add(.7))
+      .mul(worked.mul(.72).add(.28)).mul(shows(.0115))
+    const chatter=mx_noise_float(vec3(U.x.mul(41),U.y.mul(7.7),laid.cell.mul(19))).mul(shows(.024))
+    const shells=smoothstep(.80,.93,mx_noise_float(P.mul(52).add(vec3(7.3,1.9,4.4)))).mul(shows(.021))
+    const damp=float(1).sub(smoothstep(1.02,1.85,P.y)).mul(mx_noise_float(P.mul(vec3(1.2,.7,1.2))).mul(shows(1/1.2)).mul(.3).add(.7))
     // A capped tuffeau wall weathers in metre-scale bands: rain washes it in
     // vertical streaks and the foot greens. These survive a grazing angle,
     // where the courses themselves compress below one pixel.
-    const streak=mx_noise_float(vec3(U.x.mul(3.1),U.y.mul(.22),0)).mul(smoothstep(.7,2.4,float(.42).div(worldPixel)))
-    const foot=float(1).sub(smoothstep(.35,2.2,P.y.sub(-.2))).mul(mx_noise_float(P.mul(vec3(.9,2.2,.9))).mul(.35).add(.65))
+    const streak=mx_noise_float(vec3(U.x.mul(3.1),U.y.mul(.22),0)).mul(smoothstep(.7,2.4,float(.42).div(footprint)))
+    const foot=float(1).sub(smoothstep(.35,2.2,P.y.sub(-.2))).mul(mx_noise_float(P.mul(vec3(.9,2.2,.9))).mul(shows(1/2.2)).mul(.35).add(.65))
     // ONE STONE IS NOT THE NEXT. The block tone was reaching the face at
     // nine tenths of a per cent, so a coursed wall read as one tone with
     // lines on it. A quarry sends beds of different colour and a few stones
@@ -123,16 +133,17 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     stone=mix(stone,rgb('#9d9784'),bed.add(.5).mul(.34).mul(laid.held))
     // Lichen takes a coping and the shaded foot of a wall before it takes the
     // face; it is colour, and it never becomes a pattern.
-    const lichen=smoothstep(.30,.74,mx_noise_float(P.mul(vec3(2.6,1.4,2.6)).add(vec3(2.1,6.7,3.3))))
-      .mul(smoothstep(.45,.78,mx_noise_float(P.mul(9.4)).mul(.5).add(.5)))
+    const lichen=smoothstep(.30,.74,mx_noise_float(P.mul(vec3(2.6,1.4,2.6)).add(vec3(2.1,6.7,3.3))).mul(shows(1/2.6)))
+      .mul(smoothstep(.45,.78,mx_noise_float(P.mul(9.4)).mul(shows(1/9.4)).mul(.5).add(.5)))
       .mul(float(1).sub(smoothstep(.55,1.9,P.y.sub(-.1))).mul(.55).add(.45))
     stone=mix(stone,rgb('#8d8f72'),lichen.mul(.34).mul(vertical))
     stone=mix(stone,rgb('#7d8168'),foot.mul(.26).mul(vertical))
-    if(library){const maps=library.sync('stone-tuffeau').sample({uv:U,metres:.19,turn:.37});stone=stone.mul(mix(float(1),maps.albedo.clamp(.78,1.22),resolved(.03).mul(.40)))}
+    if(library){const maps=library.sync('stone-tuffeau').sample({uv:U,metres:.19,turn:.37});stone=stone.mul(mix(float(1),maps.albedo.clamp(.78,1.22),shows(.03).mul(.40)))}
     m.colorNode=mix(stone,rgb('#8c826d').mul(laid.cell.mul(.26).add(.87)),seam.mul(.58)).mul(float(1).sub(damp.mul(.15)))
     // Recessed joints and the damp foot see less sky than the block faces.
     m.aoNode=foundationVisibility().mul(float(1).sub(seam.mul(.45)).sub(foot.mul(.12).mul(vertical)))
-    m.roughnessNode=float(.89).add(cleft.mul(.035)).sub(damp.mul(.06)).clamp(.78,1)
+    m.roughnessNode=specularAA(float(.89).add(cleft.mul(.035)).sub(damp.mul(.06)).clamp(.78,1),
+      lost(.0007,.0045).add(lost(.00085,.0115)).add(lost(.0009,.024)).add(lost(.0009,.0625)))
     const height=cleft.mul(.0009).sub(pores.mul(.0007)).add(grooves.mul(.00085)).add(chatter.mul(.0009)).add(laid.depthM).toVar()
     const viewNormal=n.transformDirection(cameraViewMatrix),sx=positionView.dFdx(),sy=positionView.dFdy()
     const rx=sy.cross(viewNormal),ry=viewNormal.cross(sx),det=sx.dot(rx)
@@ -140,19 +151,19 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     m.normalNode=viewNormal.sub(gradient.div(length(gradient).div(.32).max(1))).normalize()
     m.userData['retainingAppearance']='GENERATED reconstruction choice: hand-laid coursing near .62 × .30 m, courses and blocks each varying by a third [.45–.80 × .24–.38], 15 mm joints [8–20], shallow joint relief. Continuous world tangent, block variation, 4m weather drift, 6cm cleft and filtered4.5mm pores. Q001/Q124 masonry character; no measured historic retaining-wall bond or texture.'
   }
-  if(library&&kind==='grass'){const maps=library.sync('grass-short').sample({uv:uv(),metres:1.4,turn:.19});const grain=dot(maps.albedo,vec3(.2126,.7152,.0722)).clamp(.4,1.7);m.colorNode=m.colorNode!.mul(mix(float(1),grain,.62));m.normalNode=normalMap(vec3(maps.normal.xy.mul(.5),1).normalize().mul(.5).add(.5),vec2(.5,.5));m.roughnessNode=maps.roughness.mul(.08).add(.87)}
+  if(library&&kind==='grass'){const maps=library.sync('grass-short').sample({uv:uv(),metres:1.4,turn:.19});const grain=dot(maps.albedo,vec3(.2126,.7152,.0722)).clamp(.4,1.7);m.colorNode=m.colorNode!.mul(mix(float(1),grain,.62));m.normalNode=normalMap(vec3(maps.normal.xy.mul(.5),1).normalize().mul(.5).add(.5),vec2(.5,.5));m.roughnessNode=specularAA(maps.roughness.mul(.08).add(.87),swardLost)}
   if(kind==='grass'){
     // October below a manor: rough sward, not a mown lawn. Tussocks at about
     // a metre, bleached dry ground between them, and thin scrapes where the
     // slope wears. Colour and surface normal only; the surveyed grade is
     // untouched and no blade is implied by this field.
-    const tussock=mx_fractal_noise_float(P.mul(vec3(.86,.42,.86)),3,2,.5).clamp(-1,1)
+    const tussock=float(fractalField(P.mul(vec3(.86,.42,.86)),1/.86,footprint,3,2,.5)).clamp(-1,1)
     const patch=mx_noise_float(P.mul(vec3(.34,.2,.34)).add(vec3(11.3,5.1,7.7))).clamp(-1,1)
     const swardFade=shows(1.1)
     const dry=smoothstep(.02,.62,tussock.mul(.6).add(patch.mul(.4))).mul(swardFade)
     const scrape=smoothstep(.62,.92,patch).mul(swardFade)
-    const clump=mx_noise_float(P.mul(vec3(2.9,1.2,2.9)).add(vec3(3.7,1.9,8.3))).clamp(-1,1)
-    m.colorNode=mix(m.colorNode!,rgb('#9d9670'),dry.mul(.42)).mul(float(1).sub(scrape.mul(.10))).mul(clump.mul(.055).mul(shows(.35)).add(1))
+    const clump=mx_noise_float(P.mul(vec3(2.9,1.2,2.9)).add(vec3(3.7,1.9,8.3))).clamp(-1,1).mul(shows(1/2.9))
+    m.colorNode=mix(m.colorNode!,rgb('#9d9670'),dry.mul(.42)).mul(float(1).sub(scrape.mul(.10))).mul(clump.mul(.055).add(1))
     m.colorNode=mix(m.colorNode!,rgb('#8a7d63'),scrape.mul(.42))
     // THE FAR GROUND IS WORKED LAND. A slope above a manor in October is a
     // mosaic of plots at the scale a person walks, divided by banks: without
@@ -189,16 +200,14 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     // These 1-12 cm clod fields, 0.12-1.55 m erosion variation, 4 cm stones and
     // millimetre relief are a regenerable surface recipe, not a geological section.
     const bank=float(1).sub(smoothstep(.1,.45,normalWorldGeometry.y.abs()))
-    const pixel=anisotropicFootprint(P)
-    const resolved=(metres:number)=>smoothstep(2,4,float(metres).div(pixel))
-    const crust=mx_fractal_noise_float(P.mul(vec3(2.4,3.5,2.4)),3,2,.5).clamp(-1,1)
-    const clods=mx_fractal_noise_float(P.mul(18),3,2,.5).clamp(-1,1).mul(resolved(.055))
-    const grit=mx_noise_float(P.mul(125)).mul(resolved(.008))
-    const pits=smoothstep(.20,.52,mx_noise_float(P.mul(vec3(31,18,31)))).mul(resolved(.025))
-    const erosion=mx_noise_float(P.mul(vec3(8,.65,8))).mul(crust.mul(.3).add(.7))
+    const crust=float(fractalField(P.mul(vec3(2.4,3.5,2.4)),1/3.5,footprint,3,2,.5)).clamp(-1,1)
+    const clods=float(fractalField(P.mul(18),1/18,footprint,3,2,.5)).clamp(-1,1)
+    const grit=mx_noise_float(P.mul(125)).mul(shows(.008))
+    const pits=smoothstep(.20,.52,mx_noise_float(P.mul(vec3(31,18,31)))).mul(shows(1/31))
+    const erosion=mx_noise_float(P.mul(vec3(8,.65,8))).mul(shows(1/8)).mul(crust.mul(.3).add(.7))
     // Small stones stand out of a cut face and catch the sky; without them
     // the bank reads as one soft blur at three metres.
-    const stones=smoothstep(.52,.78,mx_noise_float(P.mul(vec3(26,26,26)).add(vec3(4.1,9.3,2.7)))).mul(resolved(.04))
+    const stones=smoothstep(.52,.78,mx_noise_float(P.mul(vec3(26,26,26)).add(vec3(4.1,9.3,2.7)))).mul(shows(1/26))
     // The 0.4 m crust used to carry the whole colour swing, which is what made
     // a cut bank read as cloud noise at arm's length. It keeps two thirds of
     // its range and the clod and stone scales carry the rest.
@@ -208,8 +217,8 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     // beside dressed stone. The beds are the half-metre structure a bank has,
     // and the grit that lies over them is not the same from one part of the
     // face to the next.
-    const beds=sin(P.y.mul(8.6).add(mx_noise_float(P.mul(.55)).mul(2.7))).mul(resolved(.34))
-    const patchy=mx_noise_float(P.mul(.7).add(vec3(5.3,1.1,2.7))).mul(.5).add(.5)
+    const beds=sin(P.y.mul(8.6).add(mx_noise_float(P.mul(.55)).mul(2.7))).mul(shows(.34))
+    const patchy=mx_noise_float(P.mul(.7).add(vec3(5.3,1.1,2.7))).mul(shows(1/.7)).mul(.5).add(.5)
     let bankColour=mix(rgb('#6a5d4a'),rgb('#a2906f'),crust.mul(.34).add(.5))
       .mul(clods.mul(patchy.mul(.8).add(.3)).mul(.62).add(1)).mul(grit.mul(patchy.mul(.9).add(.25)).mul(.21).add(1))
       .mul(float(1).sub(pits.mul(.40))).mul(erosion.mul(.18).add(1))
@@ -225,7 +234,7 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
       // A 0.38 m photograph is a blur at arm's length: inside about a metre
       // and a half it hands the surface over to the clods, stones and grit,
       // which are the scales a cut bank actually shows to a face.
-      const blurred=float(1).sub(smoothstep(.0035,.011,pixel)).mul(.78)
+      const blurred=float(1).sub(smoothstep(.0035,.011,footprint)).mul(.78)
       bankColour=bankColour.mul(mix(float(1),mix(north.albedo,east.albedo,weight).clamp(.48,1.55),
         float(.55).mul(float(1).sub(blurred)).mul(patchy.mul(.55).add(.45))))
     }
@@ -237,6 +246,9 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
       .mul(det.sign()).div(det.abs().max(1e-10)).toVar()
     const bounded=gradient.div(length(gradient).div(.4).max(1))
     m.normalNode=mix(m.normalNode! as ReturnType<typeof vec3>,n.sub(bounded).normalize(),bank).normalize()
+    const bankLost=lost(.006,1/18).add(lost(.003,1/36)).add(lost(.0015,1/72))
+      .add(lost(.004,1/31)).add(lost(.0035,1/26)).add(lost(.00035,.008))
+    m.roughnessNode=specularAA(m.roughnessNode! as ReturnType<typeof float>,bankLost.mul(bank))
     m.userData['bankAppearance']='GENERATED conjectural surface recipe: clod fields 0.01–0.12 m, erosion variation 0.12–1.55 m, combined height field bounded by 0.006 m with finer 0.00035 m grain. Existing CC0 earth-packed sampled at 0.38 m in blended continuous world projections. No altered cut outline, surveyed height, geological strata or period surface measurement.'
   }
   if(kind==='earth'){
@@ -246,7 +258,7 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     // bottom of a shaded corner a base. Conjectural street dressing.
     const toWall=facadeDistance()
     const channel=smoothstep(.62,.30,toWall).mul(smoothstep(.06,.22,toWall)).mul(mask)
-    const silt=mx_noise_float(vec3(P.x.mul(7.2),P.y.mul(3),P.z.mul(7.2))).mul(.5).add(.5)
+    const silt=mx_noise_float(vec3(P.x.mul(7.2),P.y.mul(3),P.z.mul(7.2))).mul(shows(1/7.2)).mul(.5).add(.5)
     const kerb=smoothstep(.68,.60,toWall).mul(smoothstep(.52,.60,toWall)).mul(mask)
     // Reuse the already sampled CC0 earth set. Its luminance ratio retains
     // real grain without importing the preview's moss colour or new maps.
