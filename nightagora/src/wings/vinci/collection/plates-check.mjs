@@ -11,6 +11,9 @@ import { fileURLToPath } from 'node:url'
 import { createHash } from 'node:crypto'
 import ts from 'typescript'
 import * as THREE from 'three/webgpu'
+/* The wing's finishes are written in TSL, which is the same package under its
+   own subpath: a module of the room may reach for it as it reaches for three. */
+import * as TSL from 'three/tsl'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../..')
 const source = relative => fs.readFileSync(path.join(root, relative), 'utf8')
@@ -70,6 +73,7 @@ function load(relative) {
   }).outputText
   const require = specifier => {
     if (specifier === 'three' || specifier === 'three/webgpu') return THREE
+    if (specifier === 'three/tsl') return TSL
     if (!specifier.startsWith('.')) throw new Error(`Unexpected import: ${specifier}`)
     const resolved = path.posix.normalize(path.posix.join(path.posix.dirname(relative), specifier))
     if (resolved.endsWith('?raw')) return { default: source(resolved.slice(0, -4)) }
