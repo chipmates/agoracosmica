@@ -71,6 +71,8 @@ const LEG_POSES = Number(value('legs', '0')) || 0
 /** virtual frames between two stops on a leg */
 const LEG_STRIDE = Number(value('stride', '40')) || 40
 const STATIONS = value('stations', '')
+/** read only the first n of whatever station list this run resolves to */
+const FIRST = Number(value('first', '0')) || 0
 const ALL = flag('all')
 const TIME_READ = flag('time')
 const KEEP_MAPS = !flag('no-maps')
@@ -503,7 +505,8 @@ try {
 
   await installClock(page, 1000 / 60)
   const state = await page.evaluate(() => window.__forge.state())
-  const ids = ALL || !STATIONS ? state.stationIds : STATIONS.split(',').map((s) => s.trim()).filter(Boolean)
+  let ids = ALL || !STATIONS ? state.stationIds : STATIONS.split(',').map((s) => s.trim()).filter(Boolean)
+  if (FIRST > 0) ids = ids.slice(0, FIRST)
   out(`[stability] ${ids.length} station(s) of ${state.stationIds.length}`)
 
   const params = { w: stage.w, h: stage.h, tile: TILE, coplanar: COPLANAR_M, lightStep: LIGHT_STEP }

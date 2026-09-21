@@ -679,6 +679,7 @@ if (WING) {
     ? [
         ...readdirSync(join(APP_ROOT, wingDir)).filter((f) => f.endsWith('-check.mjs')).sort(),
         'tiles-check.mjs',
+        'lines-check.mjs',
         ...(existsSync(join(APP_ROOT, wingDir, 'story.ts')) ? ['story-check.mjs'] : []),
       ]
     : []
@@ -788,7 +789,7 @@ if (SURFACE === 'wing' && SLUG) {
     say("  the stability audit, at the visitor's device ratio")
     const run = await json(
       'node',
-      ['forge/stability-audit.mjs', String(PORT), SLUG, '--json', '--dpr', '2', '--no-maps',
+      ['forge/stability-audit.mjs', String(PORT), SLUG, '--json', '--dpr', '2', '--no-maps', '--first', '4',
        ...(four.length ? ['--stations', four.join(',')] : [])],
       {},
       RETINA_MS
