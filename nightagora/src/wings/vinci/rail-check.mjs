@@ -203,13 +203,54 @@ for(const phone of [false,true]) {
     settle(h,'courtyard');h.at(h.now+DURATION)
     ensure(h.calls.length===1&&!h.rail.navigation.active,'A cancelled target started another leg')
   })
+  /** ONE PLATE UNDER SEVERAL NAMES. Where stations stand at one eye, moving
+   * between them is a change of name and nothing else: no route is invented
+   * and the look the visitor settled on is still theirs. No station of this
+   * wing shares its pose with another any more, so the family is declared
+   * here, against the standing station's own plate. */
   check(viewport,'Only the latest shared-pose station completes without resetting the settled gaze',()=>{
-    const h=harness(phone,'hall');h.drag(-49,29);h.at(3);const looked=snapshot(h.camera)
-    for(const id of ['oratory','study','chamber'])h.set(id)
+    const h=harness(phone,'hall'),plate=h.pose('hall')
+    const share=id=>h.rail.set(id,{eye:plate.eye.clone(),at:plate.at.clone(),fov:plate.fov},false,phone)
+    const stands=id=>{
+      ensure(h.rail.navigation.completed===id,'Wrong actual completed semantic station: '+id)
+      ensure(h.camera.position.distanceTo(plate.eye)<1e-8,'The shared plate was left: '+id)
+      ensure(Math.abs(h.camera.fov-fittedRailFov(plate.fov,h.camera.aspect,phone))<1e-8,'Wrong shared plate FOV: '+id)
+    }
+    h.drag(-49,29);h.at(3);const looked=snapshot(h.camera)
+    for(const id of ['oratory','study','chamber'])share(id)
     ensure(h.rail.navigation.queued.join(',')==='chamber','Shared poses retained superseded targets')
-    h.at(3);endpoint(h,'chamber');compare(h.camera,looked,'Latest shared threshold gaze')
-    h.set('oratory');h.set('hall');h.at(3);endpoint(h,'hall');compare(h.camera,looked,'Returning shared threshold gaze')
+    h.at(3);stands('chamber');compare(h.camera,looked,'Latest shared threshold gaze')
+    share('oratory');share('hall');h.at(3);stands('hall');compare(h.camera,looked,'Returning shared threshold gaze')
+    endpoint(h,'hall')
     ensure(h.calls.length===0,'Equal-pose semantic change invented a route')
+    return {declaredFamily:['hall','oratory','study','chamber'],sharedBy:'the test',eye:plate.eye.toArray().map(v=>+v.toFixed(4))}
+  })
+  /** FOUR MARKS, FOUR EYES. The house's rooms are not open, and its four
+   * stations once stood at one plate. Each is now a place a visitor is put,
+   * so a change between two of them is a walk: the newest press wins it, the
+   * legs are the certified station pairs, and the arrival holds the new
+   * station's own composition instead of the look that was walked in with. */
+  check(viewport,'The house stations hold four eyes and the newest of them is walked to',()=>{
+    const houses=['hall','oratory','study','chamber']
+    const h=harness(phone,'hall')
+    let nearest=Infinity
+    for(let i=0;i<houses.length;i++)for(let j=i+1;j<houses.length;j++) {
+      const a=h.pose(houses[i]),b=h.pose(houses[j]),apart=a.eye.distanceTo(b.eye)
+      ensure(apart>1,'Two house stations fell back to one plate: '+houses[i]+' and '+houses[j])
+      nearest=Math.min(nearest,apart)
+    }
+    h.drag(-49,29);h.at(0)
+    h.set('oratory');h.at(.005)
+    const metres=h.rail.navigation.legMetres,seconds=h.rail.navigation.legSeconds
+    ensure(metres>0&&seconds>0,'A change between two house stations walked no path')
+    h.set('chamber');h.set('study')
+    ensure(h.rail.navigation.queued.join(',')==='study','The newest house target was lost')
+    settle(h,'oratory');settle(h,'study')
+    ensure(h.calls.length===2&&h.calls.every(call=>!call.kind),'The two legs were not certified station routes')
+    ensure(h.calls[1].from.every((v,i)=>Math.abs(v-h.pose('oratory').eye.getComponent(i))<1e-12)
+      &&h.calls[1].to.every((v,i)=>Math.abs(v-h.pose('study').eye.getComponent(i))<1e-12),'The second leg was not the station pair')
+    h.at(h.now+5);compare(h.camera,canonical(phone,'study'),'The arrival holds the station composition')
+    return {nearestHouseEyesM:+nearest.toFixed(2),firstLegMetres:+metres.toFixed(2),firstLegSeconds:+seconds.toFixed(2)}
   })
   check(viewport,'A long held-input burst retains at most one target and walks only the active and latest endpoints',()=>{
     // The burst never ends on the station it starts from: asking for the
