@@ -73,8 +73,8 @@ export function readLanding(value: unknown): string {
  * device class, and no user dimension.
  */
 export const SOURCE_CLASSES = new Set([
-  'ad_google', 'ad_reddit', 'search', 'assistant', 'reddit', 'social',
-  'referral', 'direct',
+  'ad_google', 'ad_reddit', 'search', 'assistant', 'edu', 'mail', 'messenger',
+  'code', 'news', 'wiki', 'directory', 'reddit', 'social', 'referral', 'direct',
 ]);
 
 /** Read the source class off a beacon payload field. Anything else is ''. */

@@ -191,28 +191,68 @@
   // discarded, nothing is stored for it, and only the class leaves the browser.
   // Twin of client/src/utils/sourceClass.ts: both lists must stay identical,
   // same hosts in the same order, or one arrival gets two different labels.
-  // AI assistants are tested before search engines: gemini.google.com and
-  // bard.google.com are suffixes of google.com.
-  var ASSISTANT_HOSTS = [
-    'chatgpt.com', 'openai.com', 'perplexity.ai', 'claude.ai', 'anthropic.com',
-    'copilot.microsoft.com', 'gemini.google.com', 'bard.google.com', 'you.com',
-    'phind.com', 'kagi.com', 'mistral.ai', 'x.ai', 'grok.com', 'meta.ai',
-  ];
-  var SEARCH_HOSTS = [
-    'bing.com', 'duckduckgo.com', 'ecosia.org', 'yahoo.com', 'startpage.com',
-    'qwant.com', 'brave.com', 'baidu.com',
-  ];
-  var REDDIT_HOSTS = ['reddit.com', 'redd.it'];
-  var SOCIAL_HOSTS = [
-    'x.com', 'twitter.com', 't.co', 'facebook.com', 'fb.com', 'instagram.com',
-    'linkedin.com', 'lnkd.in', 'mastodon.social', 'bsky.app', 'threads.net',
-    'youtube.com', 'youtu.be', 'tiktok.com', 'pinterest.com',
-    'news.ycombinator.com',
-  ];
-  var OWN_HOSTS = ['agoracosmica.org'];
+  // The keys are in the order the classifier tests them. Every specific host
+  // list runs before the search test: classroom.google.com, mail.google.com and
+  // gemini.google.com are all suffixes of google.com.
+  var HOST_LISTS = {
+    assistant: [
+      'chatgpt.com', 'openai.com', 'perplexity.ai', 'claude.ai', 'anthropic.com',
+      'copilot.microsoft.com', 'gemini.google.com', 'bard.google.com', 'you.com',
+      'phind.com', 'kagi.com', 'mistral.ai', 'x.ai', 'grok.com', 'meta.ai',
+    ],
+    edu: [
+      'instructure.com', 'schoology.com', 'blackboard.com', 'brightspace.com',
+      'd2l.com', 'moodlecloud.com', 'classroom.google.com', 'edmodo.com',
+      'seesaw.me', 'clever.com', 'itslearning.com', 'padlet.com',
+      'mebis.bycs.de', 'lernraum-berlin.de', 'schul.cloud', 'iserv.de',
+    ],
+    mail: [
+      'mail.google.com', 'outlook.live.com', 'outlook.office.com',
+      'outlook.office365.com', 'mail.yahoo.com', 'mail.proton.me',
+      'navigator.gmx.net', 'navigator.web.de', 'mail.zoho.com', 'substack.com',
+      'beehiiv.com', 'mailchi.mp', 'buttondown.email', 'buttondown.com',
+    ],
+    messenger: [
+      'discord.com', 'discordapp.com', 'web.whatsapp.com', 'web.telegram.org',
+      't.me', 'teams.microsoft.com', 'teams.live.com', 'app.slack.com',
+      'slack.com', 'signal.me', 'element.io', 'matrix.to',
+    ],
+    code: [
+      'github.com', 'gitlab.com', 'codeberg.org', 'bitbucket.org', 'sr.ht',
+      'gitea.com',
+    ],
+    news: [
+      'news.ycombinator.com', 'lobste.rs', 'slashdot.org', 'tildes.net',
+      'indiehackers.com', 'producthunt.com',
+    ],
+    wiki: [
+      'wikipedia.org', 'wikimedia.org', 'wikiquote.org', 'wikisource.org',
+      'wikidata.org', 'wikiversity.org',
+    ],
+    directory: [
+      'alternativeto.net', 'openalternative.co', 'european-alternatives.eu',
+      'theresanaiforthat.com', 'futuretools.io', 'toolify.ai', 'futurepedia.io',
+      'saashub.com', 'libhunt.com', 'opensourcealternative.to',
+    ],
+    reddit: ['reddit.com', 'redd.it'],
+    social: [
+      'x.com', 'twitter.com', 't.co', 'facebook.com', 'fb.com', 'instagram.com',
+      'linkedin.com', 'lnkd.in', 'mastodon.social', 'bsky.app', 'threads.net',
+      'youtube.com', 'youtu.be', 'tiktok.com', 'pinterest.com',
+    ],
+    search: [
+      'bing.com', 'duckduckgo.com', 'ecosia.org', 'yahoo.com', 'startpage.com',
+      'qwant.com', 'brave.com', 'baidu.com',
+    ],
+    own: ['agoracosmica.org'],
+  };
   // Google and Yandex run a country domain per market, so they have no single
   // suffix to match against.
   var MULTI_TLD_SEARCH = /(^|\.)(google|yandex)\.[a-z]{2,}(\.[a-z]{2,})?$/;
+  // Schools and universities share a naming shape rather than a host list.
+  // Anchored at the end so a lookalike cannot borrow the pattern, and
+  // label-bounded so a word inside a label is not a match.
+  var EDU_NAME_PATTERN = /(\.edu|\.(?:edu|ac|sch)\.[a-z]{2}|\.k12\.[a-z]{2}\.us|\.schule)$/;
 
   // Suffix match on a hostname: the host itself, or any subdomain of it.
   function matchesHost(hostname, hosts) {
@@ -239,18 +279,28 @@
 
   // Ad parameters win over the referrer: an ad click can carry the ad network's
   // own host as its referrer, and the parameter is the more specific fact. A
-  // referrer on one of our own hosts yields nothing, so no field is sent.
+  // referrer on one of our own hosts yields nothing, so no field is sent. The
+  // education name patterns run last of the referrer rules: they are the widest
+  // rule, so they must never shadow a named host.
   function sourceClass(landingUrl, referrer) {
     var ad = adClass(landingUrl);
     if (ad) return ad;
     if (!referrer) return 'direct';
     var host = hostOf(referrer);
     if (!host) return 'direct';
-    if (matchesHost(host, OWN_HOSTS) || host === hostOf(landingUrl)) return undefined;
-    if (matchesHost(host, ASSISTANT_HOSTS)) return 'assistant';
-    if (matchesHost(host, SEARCH_HOSTS) || MULTI_TLD_SEARCH.test(host)) return 'search';
-    if (matchesHost(host, REDDIT_HOSTS)) return 'reddit';
-    if (matchesHost(host, SOCIAL_HOSTS)) return 'social';
+    if (matchesHost(host, HOST_LISTS.own) || host === hostOf(landingUrl)) return undefined;
+    if (matchesHost(host, HOST_LISTS.assistant)) return 'assistant';
+    if (matchesHost(host, HOST_LISTS.edu)) return 'edu';
+    if (matchesHost(host, HOST_LISTS.mail)) return 'mail';
+    if (matchesHost(host, HOST_LISTS.messenger)) return 'messenger';
+    if (matchesHost(host, HOST_LISTS.code)) return 'code';
+    if (matchesHost(host, HOST_LISTS.news)) return 'news';
+    if (matchesHost(host, HOST_LISTS.wiki)) return 'wiki';
+    if (matchesHost(host, HOST_LISTS.directory)) return 'directory';
+    if (matchesHost(host, HOST_LISTS.reddit)) return 'reddit';
+    if (matchesHost(host, HOST_LISTS.social)) return 'social';
+    if (matchesHost(host, HOST_LISTS.search) || MULTI_TLD_SEARCH.test(host)) return 'search';
+    if (EDU_NAME_PATTERN.test(host)) return 'edu';
     return 'referral';
   }
 

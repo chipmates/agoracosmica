@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { sourceClass } from '../../utils/sourceClass';
+import { HOST_LISTS, HOST_PATTERNS, sourceClass } from '../../utils/sourceClass';
 
 const LANDING = 'https://agoracosmica.org/de/figures/aurelius';
 
@@ -84,7 +84,7 @@ describe('sourceClass referrer classes', () => {
     expect(sourceClass(LANDING, 'https://redd.it/abc123')).toBe('reddit');
   });
 
-  it('labels social and community hosts', () => {
+  it('labels social hosts', () => {
     for (const referrer of [
       'https://x.com/someone',
       'https://twitter.com/someone',
@@ -101,10 +101,174 @@ describe('sourceClass referrer classes', () => {
       'https://youtu.be/abc',
       'https://www.tiktok.com/',
       'https://www.pinterest.com/',
-      'https://news.ycombinator.com/item?id=1',
     ]) {
       expect(sourceClass(LANDING, referrer)).toBe('social');
     }
+  });
+
+  it('labels learning platforms as edu', () => {
+    for (const referrer of [
+      'https://canvas.instructure.com/courses/1',
+      'https://app.schoology.com/',
+      'https://blackboard.com/',
+      'https://school.brightspace.com/',
+      'https://www.d2l.com/',
+      'https://mycourse.moodlecloud.com/',
+      'https://classroom.google.com/c/abc',
+      'https://www.edmodo.com/',
+      'https://app.seesaw.me/',
+      'https://clever.com/',
+      'https://www.itslearning.com/',
+      'https://padlet.com/wall',
+      'https://mebis.bycs.de/',
+      'https://www.lernraum-berlin.de/',
+      'https://schul.cloud/',
+      'https://gymnasium.iserv.de/',
+    ]) {
+      expect(sourceClass(LANDING, referrer)).toBe('edu');
+    }
+  });
+
+  it('labels schools and universities by the shape of their name', () => {
+    for (const referrer of [
+      'https://harvard.edu/',
+      'https://www.mit.edu/news',
+      'https://ox.ac.uk/',
+      'https://www.cam.ac.uk/',
+      'https://sydney.edu.au/',
+      'https://www.uni.edu.pl/',
+      'https://lycee.sch.gr/',
+      'https://www.somedistrict.k12.ca.us/',
+      'https://gymnasium.schule/',
+    ]) {
+      expect(sourceClass(LANDING, referrer)).toBe('edu');
+    }
+  });
+
+  it('reads a word inside a label as no pattern at all', () => {
+    expect(sourceClass(LANDING, 'https://education.example.com/')).toBe('referral');
+    expect(sourceClass(LANDING, 'https://myschule.de/')).toBe('referral');
+    expect(sourceClass(LANDING, 'https://eduscience.com/')).toBe('referral');
+    // The pattern is anchored at the end, so a lookalike cannot borrow it.
+    expect(sourceClass(LANDING, 'https://ox.ac.uk.attacker.net/')).toBe('referral');
+  });
+
+  it('labels mail clients and newsletter senders', () => {
+    for (const referrer of [
+      'https://mail.google.com/mail/u/0/',
+      'https://outlook.live.com/mail/0/',
+      'https://outlook.office.com/mail/',
+      'https://outlook.office365.com/mail/',
+      'https://mail.yahoo.com/',
+      'https://mail.proton.me/',
+      'https://navigator.gmx.net/',
+      'https://navigator.web.de/',
+      'https://mail.zoho.com/',
+      'https://someone.substack.com/p/post',
+      'https://letter.beehiiv.com/',
+      'https://mailchi.mp/abc/news',
+      'https://buttondown.email/archive',
+      'https://buttondown.com/archive',
+    ]) {
+      expect(sourceClass(LANDING, referrer)).toBe('mail');
+    }
+  });
+
+  it('labels chat apps as messenger', () => {
+    for (const referrer of [
+      'https://discord.com/channels/1/2',
+      'https://discordapp.com/',
+      'https://web.whatsapp.com/',
+      'https://web.telegram.org/',
+      'https://t.me/somechannel',
+      'https://teams.microsoft.com/',
+      'https://teams.live.com/',
+      'https://app.slack.com/client/abc',
+      'https://slack.com/',
+      'https://signal.me/#p/abc',
+      'https://app.element.io/',
+      'https://matrix.to/#/room',
+    ]) {
+      expect(sourceClass(LANDING, referrer)).toBe('messenger');
+    }
+  });
+
+  it('labels code hosts', () => {
+    for (const referrer of [
+      'https://github.com/chipmates/agoracosmica',
+      'https://gitlab.com/group/project',
+      'https://codeberg.org/user/repo',
+      'https://bitbucket.org/user/repo',
+      'https://sr.ht/~user/repo',
+      'https://gitea.com/user/repo',
+    ]) {
+      expect(sourceClass(LANDING, referrer)).toBe('code');
+    }
+  });
+
+  it('labels tech news and link aggregators', () => {
+    for (const referrer of [
+      'https://news.ycombinator.com/item?id=1',
+      'https://lobste.rs/s/abc',
+      'https://slashdot.org/story/1',
+      'https://tildes.net/~tech',
+      'https://www.indiehackers.com/post/abc',
+      'https://www.producthunt.com/posts/abc',
+    ]) {
+      expect(sourceClass(LANDING, referrer)).toBe('news');
+    }
+  });
+
+  it('labels wikis', () => {
+    for (const referrer of [
+      'https://en.wikipedia.org/wiki/Stoicism',
+      'https://de.wikipedia.org/wiki/Stoa',
+      'https://commons.wikimedia.org/wiki/File',
+      'https://en.wikiquote.org/wiki/Marcus',
+      'https://en.wikisource.org/wiki/Meditations',
+      'https://www.wikidata.org/wiki/Q1',
+      'https://en.wikiversity.org/wiki/Course',
+    ]) {
+      expect(sourceClass(LANDING, referrer)).toBe('wiki');
+    }
+  });
+
+  it('labels software and tool directories', () => {
+    for (const referrer of [
+      'https://alternativeto.net/software/abc/',
+      'https://openalternative.co/abc',
+      'https://european-alternatives.eu/alternative-to/abc',
+      'https://theresanaiforthat.com/ai/abc/',
+      'https://www.futuretools.io/tools/abc',
+      'https://www.toolify.ai/tool/abc',
+      'https://www.futurepedia.io/tool/abc',
+      'https://www.saashub.com/abc',
+      'https://www.libhunt.com/r/abc',
+      'https://www.opensourcealternative.to/alternativesto/abc',
+    ]) {
+      expect(sourceClass(LANDING, referrer)).toBe('directory');
+    }
+  });
+
+  it('keeps Hacker News in news, not in social', () => {
+    expect(sourceClass(LANDING, 'https://news.ycombinator.com/item?id=1')).toBe('news');
+  });
+
+  it('resolves the hosts that sit inside another class host', () => {
+    // These are the collisions the precedence exists for: the specific lists
+    // run before the search rule, which matches google.com by suffix.
+    expect(sourceClass(LANDING, 'https://classroom.google.com/c/abc')).toBe('edu');
+    expect(sourceClass(LANDING, 'https://mail.google.com/mail/u/0/')).toBe('mail');
+    expect(sourceClass(LANDING, 'https://gemini.google.com/app')).toBe('assistant');
+    expect(sourceClass(LANDING, 'https://www.google.com/search?q=stoicism')).toBe('search');
+    expect(sourceClass(LANDING, 'https://scholar.google.com/citations')).toBe('search');
+    expect(sourceClass(LANDING, 'https://teams.microsoft.com/')).toBe('messenger');
+    expect(sourceClass(LANDING, 'https://copilot.microsoft.com/')).toBe('assistant');
+    expect(sourceClass(LANDING, 'https://harvard.edu/')).toBe('edu');
+    expect(sourceClass(LANDING, 'https://ox.ac.uk/')).toBe('edu');
+    expect(sourceClass(LANDING, 'https://sydney.edu.au/')).toBe('edu');
+    expect(sourceClass(LANDING, 'https://education.example.com/')).toBe('referral');
+    expect(sourceClass(LANDING, 'https://gymnasium.schule/')).toBe('edu');
   });
 
   it('labels any other site as a referral', () => {
@@ -160,7 +324,13 @@ function twinPath(): string {
   throw new Error(`${TWIN_REL} not found above ${process.cwd()}`);
 }
 
-function loadMarketingTwin(): (landingUrl: string, referrer: string) => string | undefined {
+interface MarketingTwin {
+  sourceClass: (landingUrl: string, referrer: string) => string | undefined;
+  lists: Record<string, string[]>;
+  patterns: Record<string, RegExp>;
+}
+
+function loadMarketingTwin(): MarketingTwin {
   const script = readFileSync(twinPath(), 'utf8');
   const from = script.indexOf(TWIN_START);
   const to = script.indexOf(TWIN_END);
@@ -168,7 +338,14 @@ function loadMarketingTwin(): (landingUrl: string, referrer: string) => string |
     throw new Error('the marketing twin moved: update TWIN_START / TWIN_END in this test');
   }
   const block = script.slice(from, to);
-  return new Function(`${block}\nreturn sourceClass;`)() as (l: string, r: string) => string | undefined;
+  return new Function(
+    `${block}
+     return {
+       sourceClass: sourceClass,
+       lists: HOST_LISTS,
+       patterns: { search: MULTI_TLD_SEARCH, edu: EDU_NAME_PATTERN },
+     };`
+  )() as MarketingTwin;
 }
 
 describe('the marketing twin in agc-public.js', () => {
@@ -200,11 +377,50 @@ describe('the marketing twin in agc-public.js', () => {
     [LANDING, 'https://www.google.com:8443/'],
     [LANDING, 'https://www.agoracosmica.org/'],
     ['http://localhost:5173/app', 'http://localhost:5173/'],
+    // The collisions the precedence exists for, plus one host per class.
+    [LANDING, 'https://classroom.google.com/c/abc'],
+    [LANDING, 'https://mail.google.com/mail/u/0/'],
+    [LANDING, 'https://scholar.google.com/citations'],
+    [LANDING, 'https://teams.microsoft.com/'],
+    [LANDING, 'https://copilot.microsoft.com/'],
+    [LANDING, 'https://canvas.instructure.com/courses/1'],
+    [LANDING, 'https://harvard.edu/'],
+    [LANDING, 'https://ox.ac.uk/'],
+    [LANDING, 'https://sydney.edu.au/'],
+    [LANDING, 'https://www.somedistrict.k12.ca.us/'],
+    [LANDING, 'https://gymnasium.schule/'],
+    [LANDING, 'https://education.example.com/'],
+    [LANDING, 'https://ox.ac.uk.attacker.net/'],
+    [LANDING, 'https://someone.substack.com/p/post'],
+    [LANDING, 'https://discord.com/channels/1/2'],
+    [LANDING, 'https://t.me/somechannel'],
+    [LANDING, 'https://github.com/chipmates/agoracosmica'],
+    [LANDING, 'https://lobste.rs/s/abc'],
+    [LANDING, 'https://en.wikipedia.org/wiki/Stoicism'],
+    [LANDING, 'https://alternativeto.net/software/abc/'],
   ];
+
+  // A case list can only catch a host it happens to name, so the lists
+  // themselves are compared entry for entry: a host added to one side only
+  // fails here.
+  it('carries the same host lists in the same order', () => {
+    expect(Object.keys(twin.lists)).toEqual(Object.keys(HOST_LISTS));
+    for (const [key, hosts] of Object.entries(HOST_LISTS)) {
+      expect(twin.lists[key], `host list "${key}"`).toEqual([...hosts]);
+    }
+  });
+
+  it('carries the same host patterns', () => {
+    expect(Object.keys(twin.patterns)).toEqual(Object.keys(HOST_PATTERNS));
+    for (const [key, pattern] of Object.entries(HOST_PATTERNS)) {
+      expect(twin.patterns[key].source, `pattern "${key}"`).toBe(pattern.source);
+      expect(twin.patterns[key].flags, `flags of pattern "${key}"`).toBe(pattern.flags);
+    }
+  });
 
   it('labels every case exactly as this module does', () => {
     for (const [landingUrl, referrer] of CASES) {
-      expect(twin(landingUrl, referrer), `${landingUrl} from "${referrer}"`)
+      expect(twin.sourceClass(landingUrl, referrer), `${landingUrl} from "${referrer}"`)
         .toBe(sourceClass(landingUrl, referrer));
     }
   });

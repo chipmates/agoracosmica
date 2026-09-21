@@ -1165,7 +1165,10 @@ async function main(): Promise<number> {
   };
 
   await test('a source class from the closed list lands in blob3', async () => {
-    for (const value of ['ad_google', 'ad_reddit', 'search', 'assistant', 'reddit', 'social', 'referral', 'direct']) {
+    for (const value of [
+      'ad_google', 'ad_reddit', 'search', 'assistant', 'edu', 'mail', 'messenger',
+      'code', 'news', 'wiki', 'directory', 'reddit', 'social', 'referral', 'direct',
+    ]) {
       const row = await pageBeacon({ path: '/', language: 'en', landing: 1, source: value });
       assertEqual(row.blobs[0], 'page', 'event type');
       assertEqual(row.blobs[2], value, `source ${value} in blob3`);
@@ -1174,7 +1177,10 @@ async function main(): Promise<number> {
   });
 
   await test('a source value off the list lands as an empty slot', async () => {
-    for (const value of ['google.com', 'AD_GOOGLE', 'ad_bing', '', 'https://reddit.com/r/x', 1, true, { source: 'search' }]) {
+    for (const value of [
+      'google.com', 'AD_GOOGLE', 'ad_bing', '', 'https://reddit.com/r/x', 1, true,
+      { source: 'search' }, 'education', 'e-mail', 'newsletter', 'wikipedia.org',
+    ]) {
       const row = await pageBeacon({ path: '/', language: 'en', landing: 1, source: value });
       assertEqual(row.blobs[2], '', `rejected: ${JSON.stringify(value)}`);
     }
