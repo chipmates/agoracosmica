@@ -294,6 +294,12 @@ section('declared target dimensions', () => {
   report.css = { declarations, minimumRequiredPx: 44, measuredBrowserRectangles: false, note: 'Declaration inspection only; cascade, flex shrink, text-dependent widths and overlap require the eyes.' };
 });
 
+/* THE VERDICT AND THE EXIT CODE ARE ONE THING, AND IT IS PROVABLE.
+   A checker that prints `ok: false` and leaves 0 behind passes a red to
+   every sweep run by hand, and nobody finds out until a gate does.
+   `--selftest` forces one error through this same path, so the shape can be
+   proved on any head in a second without breaking a file to do it. */
+if (process.argv.includes('--selftest')) fail('selftest', 'a forced error: the exit code must follow the verdict.');
 report.ok = errors.length === 0;
 process.stdout.write(JSON.stringify(report, null, 2) + '\n');
 process.exitCode = report.ok ? 0 : 1;
