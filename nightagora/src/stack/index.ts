@@ -31,7 +31,7 @@ import { createKeyLight, type KeyLight, type KeyLightOptions } from './light'
 import { createMaterialLibrary, type MaterialLibrary, type MaterialSet } from './materials'
 import { createModelLibrary, type ModelLibrary } from './models'
 import { loadHDRI, type SkyProbe } from './hdri'
-import { createPost, type PostChain } from './post'
+import { createPost, samplesFor, type PostChain } from './post'
 import { createReflector, type Reflection, type ReflectorOptions } from './reflector'
 import { loadBakedGI, type BakedGI } from './gi'
 import { planVolumetrics, type Volumetrics, type VolumetricOptions } from './volumetric'
@@ -137,6 +137,15 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
   let tierName: TierName = opts.tier ?? tierFromQuery() ?? pickTier(adapter)
   let tier = TIERS[tierName]
 
+  /* THE DEPTH SWITCH, off unless a query asks. The shipped picture is the
+     default path and stays it; these are the arms an instrument measures the
+     depth buffer's own resolution against. `reversed` is the float buffer
+     with the far plane at zero (the WebGL2 fallback refuses it without
+     EXT_clip_control and says so), `log` the logarithmic one, `near<cm>`
+     moves only the near plane a scene sets. */
+  const depthSwitch = new URLSearchParams(location.search).get('depth') ?? ''
+  const nearSwitch = /^near(\d+)$/.exec(depthSwitch)
+
   const renderer = new WebGPURenderer({
     canvas: opts.canvas,
     /* the swap chain only ever receives one fullscreen quad, so multisampling
@@ -144,8 +153,15 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
        MSAA that matters is on the scene pass, per tier. */
     antialias: false,
     forceWebGL: adapter === null,
+    reversedDepthBuffer: depthSwitch === 'reversed',
+    logarithmicDepthBuffer: depthSwitch === 'log',
   })
-  renderer.setPixelRatio(Math.min(devicePixelRatio, tier.pixelRatio))
+  /* `?pr=<ratio>` caps the buffer a measured run draws into, which is the
+     other half of the multisampling arithmetic: fewer device pixels each
+     carrying real coverage against more device pixels carrying none. */
+  const prSwitch = Number(new URLSearchParams(location.search).get('pr'))
+  const ratioCap = Number.isFinite(prSwitch) && prSwitch > 0 ? prSwitch : tier.pixelRatio
+  renderer.setPixelRatio(Math.min(devicePixelRatio, ratioCap))
   renderer.setSize(innerWidth, innerHeight)
   renderer.shadowMap.enabled = true
   renderer.shadowMap.type = PCFSoftShadowMap
@@ -172,6 +188,13 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
      patched in the renderer until the rig first asks for a count. */
   ;(window as Window & { __naStack?: unknown }).__naStack = {
     ledger,
+    /* what the depth buffer turned out to be, asked of the renderer rather
+       than of the query: a switch a backend refused reports false here */
+    depth: () => ({
+      asked: depthSwitch,
+      reversed: renderer.reversedDepthBuffer === true,
+      logarithmic: renderer.logarithmicDepthBuffer === true,
+    }),
     textures: () => textures(),
     // the rig's way to kill the graphics context on purpose, and to ask
     // whether one died on its own: the recovery cannot be proved by waiting
@@ -184,6 +207,29 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
   let scene: Scene | null = null
   let camera: Camera | null = null
   let look: Grade = GRADES['lapis-ember']
+  /** one shot, run at the end of the next frame: the audit's own pass has to
+      read the canvas inside the render that drew it */
+  let afterFrame: (() => void) | null = null
+  /* THE INSTRUMENT'S OWN PAIR, around the draw and inside it. A wing checks
+     its camera against its authored envelope in its own update, which runs
+     before this one: a sub-pixel offset put on here and taken off at the end
+     of the same draw is the frame's own and no scene ever sees it. */
+  let beforeDraw: (() => void) | null = null
+  let afterDraw: (() => void) | null = null
+  /* THE STABILITY AUDIT. Its own module, fetched only when the query asks,
+     so the shipped bundle carries none of it. */
+  if (new URLSearchParams(location.search).has('audit')) {
+    void import('./audit').then((m) =>
+      m.installAudit({
+        renderer,
+        scene: () => scene,
+        camera: () => camera,
+        askedSamples: () => samplesFor(tier, renderer.getPixelRatio()),
+        onFrame: (run) => { afterFrame = run },
+        aroundDraw: (before, after) => { beforeDraw = before; afterDraw = after },
+      })
+    )
+  }
 
   /* ---- the lost context, and the still that stands in for it ---- */
   /** a still this wide is under a millisecond to copy and still reads as the
@@ -266,6 +312,11 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
     const same = nextScene === scene && nextCamera === camera
     scene = nextScene
     camera = nextCamera
+    if (nearSwitch) {
+      const lens = nextCamera as Camera & { near?: number; updateProjectionMatrix?: () => void }
+      lens.near = Number(nearSwitch[1]) / 100
+      lens.updateProjectionMatrix?.()
+    }
     for (const l of lights) l.setCamera(nextCamera)
     // the same scene under a new look only re-aims the dials: a rebuild here
     // is a shader compile, and a shader compile mid-descent is a stutter
@@ -374,7 +425,7 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
       tierName = name
       tier = TIERS[name]
       document.body.dataset['tier'] = name
-      renderer.setPixelRatio(Math.min(devicePixelRatio, tier.pixelRatio))
+      renderer.setPixelRatio(Math.min(devicePixelRatio, Number.isFinite(prSwitch) && prSwitch > 0 ? prSwitch : tier.pixelRatio))
       materials.setTier(tier)
       models.setTier(tier)
       for (const l of lights) l.setTier(tier)
@@ -395,6 +446,7 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
 
     render(dt) {
       if (!scene || !camera || lost) return
+      beforeDraw?.()
       renderer.info.reset()
       const started = performance.now()
       chain?.update(dt)
@@ -404,6 +456,13 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
       // inside the frame that drew it: a canvas read in a later task is
       // already empty on every WebGL2 path
       if (stillDue) takeStill()
+      // after the meter, so an instrument's own pass is never in the budget
+      if (afterFrame) {
+        const run = afterFrame
+        afterFrame = null
+        run()
+      }
+      afterDraw?.()
     },
 
     onContextLost(told) {
