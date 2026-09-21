@@ -14,13 +14,24 @@
  * spine cannot open yet stands in the row disabled rather than absent, so the
  * row is the whole wall from the first day and lights up as the spine
  * reaches it.
+ *
+ * AND THE ROW IS WALKED BY EVERY HAND. A mouse has one wheel and no sideways
+ * gesture, so the wheel over the row moves it along; a mouse may drag it; the
+ * arrows walk the focus and the row follows; the two controls at its ends
+ * step it a width at a time; and the line beside it says which cell of how
+ * many is in view, so a row that can be moved says that it can.
  */
 import { lang } from '../../content'
 import cardsRaw from '../data/cards.json?raw'
 
 type Words = { en: string; de: string }
-const WALL_WORDS = (JSON.parse(cardsRaw) as { controls: { picture: {
-  whole_wall: Words; hang_row: Words; place: Words } } }).controls.picture
+const CONTROLS = (JSON.parse(cardsRaw) as { controls: {
+  picture: { whole_wall: Words; hang_row: Words; place: Words }
+  date: { previous: Words; next: Words } } }).controls
+const WALL_WORDS = CONTROLS.picture
+/** The two ends carry a mark and not a word, so their names are the two the
+ * wing already has for a step back and a step on. */
+const STEP_WORDS = CONTROLS.date
 /** THE STRIP NAMES A WORK WITH THE RECORD'S OWN WORDS. A Windsor sheet
  * carries no title of its own: its record opens with the author and then the
  * name the holder's catalogue gives the sheet, in both languages. */
@@ -87,6 +98,9 @@ export interface VinciHangStrip {
   dispose(): void
 }
 
+/** A drag this far is a drag; a shorter one is the press it looks like. */
+const DRAG_SLOP = 6
+
 export function createVinciHangStrip(options: {
   host: HTMLElement
   onOpen(id: string, button: HTMLButtonElement): void
@@ -103,9 +117,21 @@ export function createVinciHangStrip(options: {
   whole.type = 'button'
   whole.className = 'vinci-strip-whole'
   whole.hidden = true
+  const walk = document.createElement('div')
+  walk.className = 'vinci-strip-walk'
   const row = document.createElement('ul')
   row.className = 'vinci-strip-row'
   row.setAttribute('role', 'list')
+  const end = (which: 'back' | 'on'): HTMLButtonElement => {
+    const control = document.createElement('button')
+    control.type = 'button'
+    control.className = 'vinci-strip-end'
+    control.dataset['end'] = which
+    control.textContent = which === 'back' ? '\u2039' : '\u203a'
+    return control
+  }
+  const back = end('back'), on = end('on')
+  walk.append(back, row, on)
   const scale = document.createElement('div')
   scale.className = 'vinci-strip-scale'
   const mark = document.createElement('span')
@@ -117,7 +143,7 @@ export function createVinciHangStrip(options: {
   const place = document.createElement('span')
   place.className = 'vinci-strip-place'
   foot.append(place, whole)
-  frame.append(row, scale, foot)
+  frame.append(walk, scale, foot)
   host.append(frame)
   let wall: VinciStripWall | null = null, named = ''
   whole.addEventListener('click', () => wall?.whole())
@@ -131,6 +157,56 @@ export function createVinciHangStrip(options: {
       if (image.dataset['preview'] === address && image.getAttribute('src') !== thumb) image.src = thumb
   }
   waiting.add(arrive)
+  const view = document.defaultView!
+  const reduced = (): boolean => view.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  /** THE ROW MOVES SIDEWAYS UNDER A PLAIN WHEEL. A mouse has one axis, and
+   * without this the twenty five works of the hang end at the sixth. */
+  function slide(by: number, smooth = false): void {
+    const most = row.scrollWidth - row.clientWidth
+    if (most <= 0 || !by) return
+    const to = Math.max(0, Math.min(most, row.scrollLeft + by))
+    if (smooth && !reduced()) row.scrollTo({ left: to, behavior: 'smooth' })
+    else row.scrollLeft = to
+  }
+  row.addEventListener('wheel', event => {
+    if (event.ctrlKey) return
+    const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? row.clientWidth : 1
+    const was = row.scrollLeft
+    slide((Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY) * unit)
+    if (row.scrollLeft !== was) event.preventDefault()
+  }, { passive: false })
+  // A MOUSE MAY ALSO TAKE THE ROW AND MOVE IT. A finger already has the
+  // surface's own scrolling with its momentum, so only a mouse drags here,
+  // and the press that ends a drag does not open the work under it.
+  let from = 0, at = 0, pointer = -1, dragged = false
+  row.addEventListener('pointerdown', event => {
+    if (!event.isPrimary || event.button !== 0 || event.pointerType !== 'mouse') return
+    pointer = event.pointerId; from = event.clientX; at = row.scrollLeft; dragged = false
+  })
+  row.addEventListener('pointermove', event => {
+    if (event.pointerId !== pointer) return
+    const by = event.clientX - from
+    if (!dragged && Math.abs(by) < DRAG_SLOP) return
+    if (!dragged) { dragged = true; row.setPointerCapture(pointer) }
+    row.scrollLeft = at - by
+    event.preventDefault()
+  })
+  for (const name of ['pointerup', 'pointercancel'] as const)
+    row.addEventListener(name, event => { if (event.pointerId === pointer) pointer = -1 })
+  row.addEventListener('click', event => {
+    if (!dragged) return
+    dragged = false
+    event.preventDefault()
+    event.stopPropagation()
+  }, true)
+  for (const [control, step] of [[back, -1], [on, 1]] as const)
+    control.addEventListener('click', () => slide(step * Math.max(88, row.clientWidth * .8), true))
+  let painting = 0
+  row.addEventListener('scroll', () => {
+    if (painting) return
+    painting = view.requestAnimationFrame(() => { painting = 0; paintEnds(); paintPlace() })
+  }, { passive: true })
 
   /** THE ROW TAKES ONE TAB STOP. Inside it the arrows walk, which is what a
    * row of targets owes a keyboard: Home and End are its two ends. */
@@ -201,6 +277,8 @@ export function createVinciHangStrip(options: {
     const first = reachable()[0]
     if (first) first.tabIndex = 0
     mark_()
+    paintEnds()
+    paintPlace()
   }
 
   function mark_(): void {
@@ -216,8 +294,19 @@ export function createVinciHangStrip(options: {
   function reveal(): void {
     const current = buttons.find(button => button.dataset['exhibit'] === open && open !== null)
     if (!current || frame.hidden || !row.isConnected) return
-    const target = current.offsetLeft - (row.clientWidth - current.offsetWidth) / 2
+    const cell = current.getBoundingClientRect(), rail = row.getBoundingClientRect()
+    const target = row.scrollLeft + (cell.left - rail.left) - (rail.width - cell.width) / 2
     row.scrollLeft = Math.max(0, Math.min(row.scrollWidth - row.clientWidth, target))
+    paintEnds()
+    paintPlace()
+  }
+  /** THE TWO ENDS STAND DOWN AT THE END THEY POINT TO and keep their place
+   * while they do: a control that leaves the line changes the row's width
+   * under the hand, and the cell being aimed at moves with it. */
+  function paintEnds(): void {
+    const most = row.scrollWidth - row.clientWidth
+    back.dataset['off'] = String(most <= 1 || row.scrollLeft <= 1)
+    on.dataset['off'] = String(most <= 1 || row.scrollLeft >= most - 1)
   }
 
   /** WHERE ALONG THE WALL THE EYE IS, said once for the scale line and once
@@ -227,20 +316,42 @@ export function createVinciHangStrip(options: {
     // The hang's own name is the hang's. A second wall is named by the room
     // it stands in, which is the label the row already carries.
     row.setAttribute('aria-label', wall === null || !wall.hang ? named : WALL_WORDS.hang_row[lang()])
+    back.setAttribute('aria-label', STEP_WORDS.previous[lang()])
+    on.setAttribute('aria-label', STEP_WORDS.next[lang()])
   }
   function paintScale(): void {
-    foot.hidden = wall === null
     scale.hidden = wall === null || wall.total < 2
-    if (wall === null) { whole.hidden = true; return }
+    if (wall === null) { whole.hidden = true; paintPlace(); return }
     const at = Math.max(0, Math.min(wall.total, wall.place))
     mark.style.setProperty('--along', `${wall.total < 2 ? 0 : (at - 1) / (wall.total - 1) * 100}%`)
     mark.hidden = at < 1
-    place.textContent = at < 1 ? '' : WALL_WORDS.place[lang()].replace('{n}', String(at)).replace('{total}', String(wall.total))
     // THE WAY OFF THE WALL STANDS ONLY WHERE IT LEADS OFF IT. At an end
     // station the eye is already off the wall, and the control resolved to
     // the station the visitor was standing at: a word that did nothing.
     whole.hidden = at < 1
     whole.textContent = WALL_WORDS.whole_wall[lang()]
+    paintPlace()
+  }
+  /** WHICH OF HOW MANY IS IN VIEW. At a stop of the wall the place is the
+   * stop the eye stands at. Off the wall the row is the walk, so the line
+   * says the cell the row is showing: the hand, then the open work, then
+   * what the width has brought into view. */
+  function paintPlace(): void {
+    const total = wall !== null ? wall.total : entries.length
+    const stop = wall !== null && wall.place >= 1 ? Math.min(wall.total, wall.place) : rowPlace()
+    place.textContent = total < 2 || stop < 1 ? ''
+      : WALL_WORDS.place[lang()].replace('{n}', String(stop)).replace('{total}', String(total))
+    foot.hidden = !place.textContent && whole.hidden
+  }
+  function rowPlace(): number {
+    if (!buttons.length || frame.hidden) return 0
+    const held = buttons.findIndex(button => button === document.activeElement)
+    if (held >= 0) return held + 1
+    const shown = buttons.findIndex(button => button.dataset['exhibit'] === open && open !== null)
+    if (shown >= 0) return shown + 1
+    const left = row.getBoundingClientRect().left
+    const first = buttons.findIndex(button => button.getBoundingClientRect().right > left + 1)
+    return first < 0 ? buttons.length : first + 1
   }
   return {
     element: frame,
@@ -254,6 +365,7 @@ export function createVinciHangStrip(options: {
       paintLabel()
       if (!same) paint()
       frame.hidden = hidden || entries.length < 2
+      paintPlace()
     },
     setOpen(id) {
       if (open === id) return
@@ -271,6 +383,7 @@ export function createVinciHangStrip(options: {
       const was = frame.hidden
       frame.hidden = hidden || entries.length < 2
       if (was && !frame.hidden) { paintScale(); reveal() }
+      paintPlace()
     },
     dock(place_, parent) {
       const key = place_ === null ? 'narrow' : typeof place_ === 'string' ? place_
@@ -291,6 +404,7 @@ export function createVinciHangStrip(options: {
     dispose() {
       disposed = true
       waiting.delete(arrive)
+      if (painting) view.cancelAnimationFrame(painting)
       frame.remove()
       buttons.length = 0
     },
