@@ -17,7 +17,10 @@
 
 import { PerspectiveCamera, Scene } from 'three/webgpu'
 import { WING_TEXT, lang, say } from './content'
+import { DISCLOSURES } from '../content/disclosures'
 import { LOBBY_TEXT } from '../content/lobby'
+import plateCss from './title-plate.css?inline'
+import { windowOwnsTheScreen } from './window-chrome'
 import { gaitPace, setGaitPace, type GaitPaceName } from './vinci/gait'
 import type { WingEntry } from './registry'
 import type { Stack } from '../stack'
@@ -391,7 +394,7 @@ export function createWingFrame(
     if (drop > 0) railGroup.style.bottom = `calc(${BAR_BOTTOM} - ${drop}px)`
   }
   new MutationObserver(() => { trackWords(); placeChrome(); fitTheBar() }).observe(railGroup, { childList: true })
-  addEventListener('resize', () => { placeChrome(); fitTheBar() })
+  addEventListener('resize', () => { placeChrome(); fitTheBar(); doorStandsAlone() })
 
   const question = el('p', 'wing-question')
   const door = el('a', 'wing-door', say(WING_TEXT.door))
@@ -405,28 +408,79 @@ export function createWingFrame(
   const doorBlock = el('div', 'wing-doorblock')
   doorBlock.append(question, door, note)
 
-  const disclosure = el('dialog', 'wing-door-disclosure')
-  disclosure.setAttribute('aria-describedby', 'wing-door-disclosure-text')
-  disclosure.setAttribute('aria-label', say(WING_TEXT.door))
-  const disclosureText = el('p', '', say(WING_TEXT.doorNote))
-  disclosureText.id = 'wing-door-disclosure-text'
-  const continueDoor = el('a', 'wing-door', say(WING_TEXT.door))
+  /* THE DOOR SAYS WHAT IS BEHIND IT. A visitor who has never heard of the
+     library is one press from leaving the museum for it, so the first press
+     opens a plate: which library, in whose voice, on what terms. It is the
+     museum's own plate grammar, and the part that owns that grammar mounts
+     its stylesheet only where a wing builds a sheet, so the frame mounts it
+     under the same id and the door stands in a wing that builds none. */
+  const PLATE_STYLE = 'na-title-plate'
+  if (!document.getElementById(PLATE_STYLE)) {
+    const plateStyle = document.createElement('style')
+    plateStyle.id = PLATE_STYLE
+    plateStyle.textContent = plateCss
+    document.head.append(plateStyle)
+  }
+  const disclosure = el('dialog', 'na-plate wing-door-plate')
+  disclosure.id = 'wing-door-plate'
+  const doorTitle = el('h1', 'na-plate-title')
+  doorTitle.id = 'wing-door-title'
+  disclosure.setAttribute('aria-labelledby', doorTitle.id)
+  const doorWall = el('div', 'na-plate-wall')
+  doorWall.append(doorTitle)
+  const doorWords = el('div', 'wing-door-words')
+  setRegister(doorWords, 'drawer')
+  const doorLead = el('p', 'wing-door-word')
+  /* THE CANON'S OWN SENTENCE, never a second telling of it: the museum says
+     once what an Echo is, and the honesty check reads this one against it. */
+  const doorEcho = el('p', 'wing-door-word')
+  doorEcho.dataset['naDisclosure'] = 'stone'
+  const doorTerms = el('p', 'wing-door-word')
+  doorWords.append(doorLead, doorEcho, doorTerms)
+  const continueDoor = el('a', 'na-plate-primary')
   continueDoor.target = '_blank'; continueDoor.rel = 'noopener'
-  const closeDisclosure = el('button', '', lang() === 'de' ? 'Schließen' : 'Close')
+  const closeDisclosure = el('button', 'na-plate-second')
   closeDisclosure.type = 'button'
-  disclosure.append(disclosureText, continueDoor, closeDisclosure)
+  const doorControls = el('div', 'na-plate-controls')
+  doorControls.append(continueDoor, closeDisclosure)
+  const doorFoot = el('div', 'na-plate-foot')
+  doorFoot.append(doorControls)
+  disclosure.append(doorWall, doorWords, doorFoot)
+
+  /** the plate's words, read again on every open and on a language change */
+  function paintDoorPlate(): void {
+    doorTitle.textContent = say(WING_TEXT.doorTitle).replace('{name}', entry?.name ?? '')
+    doorLead.textContent = say(WING_TEXT.doorLead)
+    doorEcho.textContent = say(DISCLOSURES.stone)
+    doorTerms.textContent = say(WING_TEXT.doorTerms)
+    continueDoor.textContent = say(WING_TEXT.doorAsk)
+    closeDisclosure.textContent = say(WING_TEXT.doorStay)
+  }
+  /* ONE TEXT AT A TIME, the rule the entrance sheet follows: while the plate
+     stands, the card, the bar and the question behind it stand down. */
+  function doorStandsAlone(): void {
+    if (disclosure.open) document.documentElement.dataset['naPlate'] = 'open'
+    else delete document.documentElement.dataset['naPlate']
+    windowOwnsTheScreen(document, disclosure.open && narrowStage())
+  }
   let disclosureSeen = false
   door.addEventListener('click', event => {
     if (wing?.doorDisclosure !== 'first-press' || disclosureSeen) return
     event.preventDefault()
     disclosureSeen = true
     continueDoor.href = door.href
+    paintDoorPlate()
     disclosure.showModal()
+    doorStandsAlone()
+    disclosure.scrollTop = 0
     continueDoor.focus({ preventScroll: true })
   })
   continueDoor.addEventListener('click', () => disclosure.close())
   closeDisclosure.addEventListener('click', () => disclosure.close())
-  disclosure.addEventListener('close', () => { if (!host.hidden) door.focus({ preventScroll: true }) })
+  disclosure.addEventListener('close', () => {
+    doorStandsAlone()
+    if (!host.hidden) door.focus({ preventScroll: true })
+  })
 
   /* THE LOST CONTEXT. A phone under memory pressure takes the GPU back from
      the tab and every frame after that is black, with the card, the bar and
@@ -509,10 +563,9 @@ export function createWingFrame(
   function paintWords(): void {
     lobby.textContent = say(WING_TEXT.lobby)
     rail.setAttribute('aria-label', say(WING_TEXT.rail))
-    door.textContent = continueDoor.textContent = say(WING_TEXT.door)
-    disclosure.setAttribute('aria-label', say(WING_TEXT.door))
-    note.textContent = disclosureText.textContent = say(WING_TEXT.doorNote)
-    closeDisclosure.textContent = lang() === 'de' ? 'Schließen' : 'Close'
+    door.textContent = say(WING_TEXT.door)
+    note.textContent = say(WING_TEXT.doorNote)
+    paintDoorPlate()
     // the pace stands in the wing's own sheet, so its four words are the
     // frame's to repaint as well
     paintPace()

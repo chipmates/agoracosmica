@@ -60,6 +60,31 @@ export const WING_TEXT = {
     en: 'Opens the library in a new tab. It has a free daily quota and needs no key for it.',
     de: 'Öffnet die Bibliothek in einem neuen Tab. Sie hat ein freies Tageskontingent und braucht dafür keinen Schlüssel.',
   },
+  /* THE DOOR'S OWN PLATE. A first time visitor has never heard of the
+     library, so the door says what it leads to before it opens. The name in
+     the title is the wing's own, which is why it stands here as a mark. What
+     an Echo is comes from the disclosure canon and is never written twice. */
+  doorTitle: {
+    en: 'Talk with {name}',
+    de: 'Sprich mit {name}',
+  },
+  doorLead: {
+    en: 'This door leads to Agora Cosmica, the library this museum belongs to. There you learn from thirty lives by talking with them.',
+    de: 'Diese Tür führt zu Agora Cosmica, der Bibliothek, zu der dieses Museum gehört. Dort lernst du von dreißig Leben, indem du mit ihnen sprichst.',
+  },
+  doorTerms: {
+    en: 'Nonprofit and open source. It opens in a new tab, with free turns every day and no key needed.',
+    de: 'Gemeinnützig und Open Source. Öffnet in einem neuen Tab, mit freien Gesprächsrunden an jedem Tag und ohne Schlüssel.',
+  },
+  /** the plate's way in, which carries the station's own question */
+  doorAsk: {
+    en: 'Ask about this',
+    de: 'Danach fragen',
+  },
+  doorStay: {
+    en: 'Stay in the museum',
+    de: 'Im Museum bleiben',
+  },
   /** the way back to the lobby, which never replays the overture */
   lobby: {
     en: 'Lobby',
