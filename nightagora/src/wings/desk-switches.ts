@@ -54,6 +54,12 @@ export function deskOn(step: DeskStep): boolean {
   return steps()[step]
 }
 
+/** True while any step of the new chrome stands, which is what the parts
+    outside this chrome ask before they change anything for it. */
+export function deskAny(): boolean {
+  return DESK_STEPS.some(step => steps()[step])
+}
+
 /** the attribute's value: every step that is on, space separated for `~=` */
 export function deskWord(): string {
   return DESK_STEPS.filter(step => steps()[step]).join(' ')

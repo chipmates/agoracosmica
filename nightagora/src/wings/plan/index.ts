@@ -19,6 +19,7 @@
 
 import css from './plan.css?inline'
 import { windowOwnsTheScreen } from '../window-chrome'
+import { deskAny } from '../desk-switches'
 import { drawPlanPlate, PLATE_NAME_FLOOR, PLATE_NAME_PX, type PlanPlate } from './plate'
 import { PLAN_WORDS } from './words'
 import type { PlanSite } from './types'
@@ -146,7 +147,7 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
        stands and is not what bounds it. On the phone the chrome under it also
        stands down, so both stages take the viewport's own height less their
        margin and the plate grows with it. */
-    windowOwnsTheScreen(document_, narrow)
+    windowOwnsTheScreen(document_, narrow || deskAny(), narrow ? 'phone' : 'desk')
     const top = numbers.top
     const bottom = Math.max(top + 200, height - numbers.bottom)
     const left = narrow ? numbers.side : Math.max(numbers.side, Math.round((width - 980) / 2))

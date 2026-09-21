@@ -11,6 +11,7 @@
  * every control are the caller's, already in the page's language.
  */
 import { setRegister } from '../frame'
+import { deskAny } from '../desk-switches'
 import { noteOpened } from '../visit'
 import css from './vitrine.css?inline'
 import type { VitrineExhibit, VitrinePayloadHost, VitrineRect, VitrineSurface } from './types'
@@ -250,6 +251,7 @@ export function createVitrine(options: {
     // station's chrome stands down, and the page's own frame reads this to
     // know it.
     if (narrow) document.documentElement.dataset['naWindow'] = 'phone'
+    else if (deskAny()) document.documentElement.dataset['naWindow'] = 'desk'
     else delete document.documentElement.dataset['naWindow']
     paintHole()
     exhibit?.payload?.layout?.()

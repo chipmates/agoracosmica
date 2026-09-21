@@ -21,6 +21,7 @@
 
 import css from './life.css?inline'
 import { windowOwnsTheScreen } from '../window-chrome'
+import { deskAny } from '../desk-switches'
 import { renderLifeDate } from './card'
 import { drawLifePlate, type LifePlate } from './plate'
 import { dateYears, lifeCounts, lifeScale, workYears, type LifeGap } from './scale'
@@ -153,7 +154,7 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     /* THE SHEET OWNS THE SCREEN ON THE PHONE. The chrome under it stands
        down, so the bar is no longer what bounds the sheet and the reading
        takes the height a pinned foot and a hidden bar were holding. */
-    windowOwnsTheScreen(document_, narrow)
+    windowOwnsTheScreen(document_, narrow || deskAny(), narrow ? 'phone' : 'desk')
     const numbers = narrow ? LIFE_NARROW : LIFE_WIDE
     const top = numbers.top, bottom = Math.max(top + 220, (narrow ? height : floor) - numbers.bottom)
     const left = narrow ? numbers.side : Math.max(numbers.side, Math.round((width - LIFE_WIDE.widest) / 2))

@@ -1,5 +1,6 @@
 import { setRegister } from '../frame'
 import { windowOwnsTheScreen } from '../window-chrome'
+import { deskAny } from '../desk-switches'
 import { lang } from '../content'
 import type { VinciCertainty, VinciText } from './content'
 
@@ -103,7 +104,8 @@ export function createVinciSourcesWindow(host: HTMLElement, control: HTMLButtonE
      while this window stands on a narrow stage the station's chrome stands
      down, so the reading runs to the foot of the screen. */
   const phone = matchMedia('(max-aspect-ratio: 9/10)')
-  const standDown = (): void => windowOwnsTheScreen(document, dialog.open && phone.matches)
+  const standDown = (): void =>
+    windowOwnsTheScreen(document, dialog.open && (phone.matches || deskAny()), phone.matches ? 'phone' : 'desk')
   phone.addEventListener('change', standDown)
   dialog.addEventListener('close', () => {
     windowOwnsTheScreen(document, false)

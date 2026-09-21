@@ -10,6 +10,7 @@
 
 import css from './title-plate.css?inline'
 import { windowOwnsTheScreen } from './window-chrome'
+import { deskAny } from './desk-switches'
 
 const MOUNT = 'na-title-plate'
 /** the aspect the wing chrome already calls a phone */
@@ -288,7 +289,7 @@ export function createTitlePlate(host: HTMLElement, parts: PlateParts): TitlePla
   const standDown = (): void => {
     if (dialog.open) document_.documentElement.dataset['naPlate'] = 'open'
     else delete document_.documentElement.dataset['naPlate']
-    windowOwnsTheScreen(document_, dialog.open && narrow.matches)
+    windowOwnsTheScreen(document_, dialog.open && (narrow.matches || deskAny()), narrow.matches ? 'phone' : 'desk')
   }
 
   // Escape enters: the plate is a welcome and not a question, so cancelling
