@@ -175,7 +175,10 @@ async function load(plate: ValidPlate, signal: AbortSignal, upload: PlateUpload)
   t.magFilter = LinearFilter
   t.minFilter = LinearMipmapLinearFilter
   t.generateMipmaps = true
-  t.anisotropy = 1
+  // A hung painting is read along its own wall, where the pixel is tall and
+  // a few texels wide: one sample takes the mip the LONG axis asks for and
+  // blurs the short one away. The stack's own sets carry eight.
+  t.anisotropy = 8
   t.needsUpdate = true
   t.userData['manifestId'] = plate.entry.id
   t.userData['sourceSha256'] = plate.entry.sha256

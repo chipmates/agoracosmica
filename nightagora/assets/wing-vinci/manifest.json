@@ -2899,7 +2899,7 @@
       "prompt": "Manifest-only prepared sRGB reproduction streams. Validate the complete original preview before 512 px calm/standard or 1024 px hero uploads; one distance-earned source up to 4096 px outside calm. Preserve whole-source proportions and colour handling, 240 ms first arrival, 700 ms resolution blend, exact mip-residency accounting and abort-safe release. Display UV windows are separately declared. A drawn sheet's records are admitted by the same module through their own record shape.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-14",
-      "sha256": "2d836ab6846f297b4304ccafdcdc8ad623772532e95eee880c5f7b2550cc6eac",
+      "sha256": "a432e5f335e22405084ba672f9dc399f9343687afb4ca4a8404fd6b24386731b",
       "note": "Museum dressing, not documentary imagery. recipe_file=src/wings/vinci/pictures/stream.ts admission_files=src/wings/vinci/pictures/sheet-record.ts production_files=src/wings/vinci/pictures/aperture.ts"
     },
     {
@@ -3278,7 +3278,7 @@
       "prompt": "Place the picture module sources on every field of the room's holder-sized wall, including the paired panel reverse, and hang the body wall's admitted Windsor sheets each at the size its holder records, the three without a recorded size at a constant area. No field is withheld: the store's register is the only admission decision, and a work it does not admit leaves the wall. The current holder measurement for the Lansdowne Yarnwinder is 37.1 by 49.5 cm while its earlier layout slot preserves neighbouring placements. Place the admitted Last Supper source within the existing 8.8 by 4.6 metre mural field. Source admission, windows, arch shoulders, decoding and transitions are imported unchanged from the picture module. The room openings and fittings supply the light. All previews remain present: 512 pixel uploads at calm and standard, 1024 at hero, one distance-earned full source outside calm across both walls. Source pixels are never copied into this repository.",
       "model": "Deterministic TypeScript and TSL exhibition placement",
       "date": "2026-09-14",
-      "sha256": "4000fea49bb66e07a64ff28e837030b4e11d5f3bf1f2da96340efe3ef5583a41",
+      "sha256": "009800eff0bbd9b05bfc64fde72bdedbe6de3512927db69f22bad60100d21cfa",
       "note": "Modern exhibition supports, no historical room claim. recipe_file=src/wings/vinci/collection/plates.ts wall_register=src/wings/vinci/collection/body-wall.ts; streaming bytes and displayed licences resolve through the store manifest.",
       "recipe_files": [
         {

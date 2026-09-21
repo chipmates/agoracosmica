@@ -246,6 +246,9 @@ export function mountCollectionPlates(host: Group, stack: Stack) {
     pages.magFilter = LinearFilter
     pages.minFilter = LinearMipmapLinearFilter
     pages.generateMipmaps = true
+    // the wall is read along its own length, so the sampler is allowed the
+    // same anisotropy the stack's own sets are given
+    pages.anisotropy = 8
     pages.needsUpdate = true
     const geometry = new BufferGeometry()
     geometry.setAttribute('position', new Float32BufferAttribute(position, 3))
