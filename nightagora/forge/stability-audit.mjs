@@ -94,6 +94,13 @@ const VERIFY = flag('verify')
 const ROTATE = Number(value('rotate', '0')) || 0
 /** frames held at one offset before it is read */
 const SETTLE = Number(value('settle', '4')) || 4
+/* FRAMES HELD AT A STATION BEFORE THE WORLD IS FROZEN. Ninety was a guess
+   and it is not enough: the near shadow cascade snaps on its own rule and a
+   set that arrives late redresses a surface. Three hundred is five seconds
+   of the wing's own time with the eye standing still. */
+const SETTLE_FRAMES = Number(value('hold', '300')) || 300
+/** the reading WITHOUT the library wait, to separate it from the rest */
+const NO_DRESS = flag('no-dress')
 /* THE STAGE THE OWNER ACTUALLY HAS. The rig's desktop eye has shot at a
    device ratio of one for months, and the sample count the backend keeps
    depends on that ratio: a reading at ratio one is not a reading of his
@@ -547,16 +554,34 @@ try {
       faults.push(`no such station: ${id}`)
       continue
     }
-    // the walk to it runs on the clock; the reading is taken STANDING, so
-    // the wing's own arrival is what ends the wait, never a frame count
+    /* THE WALK TO IT RUNS ON THE CLOCK; THE READING IS TAKEN STANDING, AND
+       STANDING MEANS THREE THINGS, NOT ONE. The wing's own arrival ends the
+       walk. Then the LIBRARY has to be done: a set still in flight dresses
+       its surface one frame later and the same build reads a tenth apart.
+       Then the SUN has to have settled: the near cascade re-snaps only once
+       the eye has moved a few metres, so its box at a station depends on
+       which frames the walk in was sampled at, and a station just arrived at
+       carries the walk's own last box until the next snap. The eye is held
+       for a while with the clock still running, which is what lets both
+       finish; only then is the world frozen. */
     await page
       .waitForFunction((want) => window.__forge.state().stationId === want, id, { timeout: 60000, polling: 100 })
       .catch(() => faults.push(`the walk never arrived at ${id}`))
-    await waitFrames(page, 90)
+    const dressed = NO_DRESS
+      ? false
+      : await page
+          .waitForFunction(() => window.__forge.state().texturesPending === 0, null, { timeout: 120000, polling: 200 })
+          .then(() => true)
+          .catch(() => false)
+    if (!dressed && !NO_DRESS) faults.push(`the library never finished dressing ${id}`)
+    await waitFrames(page, SETTLE_FRAMES)
+    const pending = await page.evaluate(() => window.__forge.state().texturesPending)
     await setStep(page, 0)
     const pose = await readPose(page, `station ${id}`, { ...params, flip })
     pose.station = id
     pose.sweep = sweep
+    pose.texturesPending = pending
+    pose.dressed = dressed
     flip ??= pose.flip
     poses.push(pose)
     out(
@@ -776,6 +801,8 @@ const report = {
     name: p.name,
     station: p.station ?? null,
     sweep: p.sweep ?? 0,
+    texturesPending: p.texturesPending ?? null,
+    dressed: p.dressed ?? null,
     flaggedTiles: p.flaggedTiles,
     perMpx: { 1: per(p, 1), 2: per(p, 2), 3: per(p, 3) },
     lightLevels: { 1: light(p, 1), 2: light(p, 2), 3: light(p, 3) },

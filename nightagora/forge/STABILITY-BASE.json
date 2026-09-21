@@ -1,6 +1,6 @@
 {
  "note": "the stability ratchet. The sets and the step levels are gated; the per-million counts are recorded and are not.",
- "head": "f1c2a31d029405be21556ed0909ed079e9b2daec",
+ "head": "9cbf5de34698f4f1d2e83bd8bddc149b342c34d5",
  "measured": "2026-09-21",
  "viewport": "desktop",
  "deviceScaleFactor": 2,
@@ -21,16 +21,13 @@
  "gateFloorPx": 2000,
  "class1Pairs": [
   "vinci/collection-modern-insertion/vinci-court-plaque/vinci-court-plaque-made-surface [vinci/collection-rooms/stone] + vinci/collection-modern-insertion/vinci-court-plaque/vinci-court-plaque-made-surface [vinci/collection-rooms/ink]",
-  "vinci/collection-modern-insertion/vinci-grave/vinci-grave-made-surface [vinci/collection-rooms/dark] + vinci/collection-modern-insertion/vinci-grave/vinci-grave-made-surface [vinci/collection-rooms/stone]",
   "vinci/collection-modern-insertion/vinci/collection-line-floor/vinci/collection-line-floor/vinci/collection-rooms/stone [vinci/collection-rooms/stone] + vinci/collection-modern-insertion/vinci/collection-line-floor/vinci/collection-line-floor/vinci/collection-rooms/bronze [vinci/collection-rooms/bronze]",
   "vinci/collection-modern-insertion/vinci/collection-line-floor/vinci/collection-line-floor/vinci/collection-rooms/stone [vinci/collection-rooms/stone] + vinci/collection-modern-insertion/vinci/collection-line-floor/vinci/collection-line-floor/vinci/collection-rooms/ink [vinci/collection-rooms/ink]",
+  "vinci/collection-modern-insertion/vinci/collection-rooms/plinths [vinci/collection-rooms/surfaces] + vinci/collection-modern-insertion/vinci/rolling-mill/rolling-mill/rolling-mill:rigid-surfaces [rolling-mill:oak:oak-beams]",
   "vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces] + vinci/collection-modern-insertion/vinci-grave/vinci-grave-made-surface [vinci/collection-rooms/dark]",
-  "vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces] + vinci/collection-modern-insertion/vinci-grave/vinci-grave-made-surface [vinci/collection-rooms/stone]",
   "vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces] + vinci/collection-modern-insertion/vinci/collection-line-floor/vinci/collection-line-floor/vinci/collection-rooms/stone [vinci/collection-rooms/stone]",
-  "vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces] + vinci/collection-modern-insertion/vinci/collection-plates/vinci/collection-plates/baptism-of-christ__3407x4096 [vinci/pictures/plate/baptism-of-christ]",
   "vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces] + vinci/collection-modern-insertion/vinci/collection-plates/vinci/collection-plates/last-supper [vinci/pictures/plate/last-supper]",
-  "vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces] + vinci/collection-modern-insertion/vinci/collection-plates/vinci/collection-plates/source-shoulder/virgin-of-the-rocks-london [vinci/collection-rooms/surfaces]",
-  "vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces] + vinci/collection-modern-insertion/vinci/collection-plates/vinci/collection-plates/source-shoulder/virgin-of-the-rocks-louvre [vinci/collection-rooms/surfaces]",
+  "vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces] + vinci/collection-modern-insertion/vinci/collection-rooms/plinths [vinci/collection-rooms/surfaces]",
   "vinci/collection-modern-insertion/vinci/collection/architecture [vinci/collection/three-scale-architecture] + vinci/collection-modern-insertion/vinci/collection-line-floor/vinci/collection-line-floor/vinci/collection-rooms/stone [vinci/collection-rooms/stone]",
   "vinci/collection-modern-insertion/vinci/collection/architecture [vinci/collection/three-scale-architecture] + vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces]",
   "vinci/collection-modern-insertion/vinci/collection/architecture [vinci/collection/three-scale-architecture] + vinci/collection-modern-insertion/vinci/collection/cast-concrete [vinci/collection/filtered-cast-concrete]",
@@ -38,22 +35,21 @@
   "vinci/collection-modern-insertion/vinci/collection/glazing [vinci/collection/full-height-glazing] + vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces]",
   "vinci/collection-modern-insertion/vinci/parachute/parachute/canopy/canopy:surface [parachute:sealed linen:linen] + vinci/collection-modern-insertion/vinci/parachute/parachute/parachute:rigid-surfaces [parachute:wood:oak-beams]",
   "vinci/registered-shell/vinci/shell/brick [vinci/brick] + vinci/registered-shell/vinci/shell/stone [vinci/stone]",
-  "vinci/registered-shell/vinci/shell/glass [vinci/glass] + vinci/registered-shell/vinci/shell/glassSky [vinci/glassSky]",
   "vinci/registered-shell/vinci/shell/iron [vinci/iron] + vinci/registered-shell/vinci/shell/glass [vinci/glass]",
   "vinci/registered-shell/vinci/shell/iron [vinci/iron] + vinci/registered-shell/vinci/shell/glassSky [vinci/glassSky]",
-  "vinci/registered-shell/vinci/shell/slate [vinci/slate] + vinci/registered-shell/vinci/shell/lead [vinci/lead]",
-  "vinci/registered-shell/vinci/shell/stone [vinci/stone] + vinci/registered-shell/vinci/shell/oak [vinci/oak]",
   "wing-vinci/terrain/wing-vinci/collectionRetaining [vinci/collection/filtered-cast-concrete] + vinci/collection-court-terrace-access/vinci/collection-access/concrete [vinci/collection/filtered-cast-concrete]",
   "wing-vinci/terrain/wing-vinci/collectionRetaining [vinci/collection/filtered-cast-concrete] + vinci/collection-modern-insertion/vinci/collection/architecture [vinci/collection/three-scale-architecture]",
   "wing-vinci/terrain/wing-vinci/collectionRetaining [vinci/collection/filtered-cast-concrete] + vinci/collection-modern-insertion/vinci/collection/cast-concrete [vinci/collection/filtered-cast-concrete]",
+  "wing-vinci/terrain/wing-vinci/earth [wing-vinci/earth] + vinci generated inner court dressing/vinci/inner-court/court wear and drainage [MeshStandardNodeMaterial]",
   "wing-vinci/terrain/wing-vinci/earth [wing-vinci/earth] + vinci generated road dressing/vinci/road-dressing/gravel [MeshStandardNodeMaterial]",
+  "wing-vinci/terrain/wing-vinci/earth [wing-vinci/earth] + vinci/collection-court-terrace-access/vinci/collection-access/concrete [vinci/collection/filtered-cast-concrete]",
   "wing-vinci/terrain/wing-vinci/earth [wing-vinci/earth] + vinci/registered-shell/vinci/shell/brick [vinci/brick]",
-  "wing-vinci/terrain/wing-vinci/earth [wing-vinci/earth] + vinci/registered-shell/vinci/shell/stone [vinci/stone]",
-  "wing-vinci/terrain/wing-vinci/earth [wing-vinci/earth] + wing-vinci/terrain/wing-vinci/collectionRetaining [vinci/collection/filtered-cast-concrete]",
+  "wing-vinci/terrain/wing-vinci/earth [wing-vinci/earth] + wing-vinci/terrain/wing-vinci/retaining [wing-vinci/stone]",
   "wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass] + vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 02 [vinci October grass and uneven leaf litter]",
   "wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass] + vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 15 [vinci October grass and uneven leaf litter]",
   "wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass] + vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 16 [vinci October grass and uneven leaf litter]",
-  "wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass] + wing-vinci/terrain/wing-vinci/collectionRetaining [vinci/collection/filtered-cast-concrete]"
+  "wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass] + wing-vinci/terrain/wing-vinci/collectionRetaining [vinci/collection/filtered-cast-concrete]",
+  "wing-vinci/terrain/wing-vinci/retaining [wing-vinci/stone] + vinci generated inner court dressing/vinci/inner-court/tread stone [MeshStandardNodeMaterial]"
  ],
  "class2Bodies": [
   "mesh 1 [NodeMaterial] + vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 07 [vinci generated October folded leaves]",
@@ -62,508 +58,496 @@
   "nothing (sky) + vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 07 [vinci generated October folded leaves]",
   "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 01 [vinci October grass and uneven leaf litter] + vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces]",
   "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 01 [vinci October grass and uneven leaf litter] + wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass]",
-  "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 02 [vinci October grass and uneven leaf litter] + vinci/collection-modern-insertion/vinci/collection/architecture [vinci/collection/three-scale-architecture]",
+  "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 02 [vinci October grass and uneven leaf litter] + mesh 1 [NodeMaterial]",
   "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 02 [vinci October grass and uneven leaf litter] + vinci/collection-modern-insertion/vinci/collection/glazing [vinci/collection/full-height-glazing]",
-  "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 02 [vinci October grass and uneven leaf litter] + wing-vinci/terrain/wing-vinci/earth [wing-vinci/earth]",
   "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 02 [vinci October grass and uneven leaf litter] + wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass]",
   "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 11 [vinci October grass and uneven leaf litter] + wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass]",
-  "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 12 [vinci October grass and uneven leaf litter] + vinci generated conjectural landscape trees/vinci generated trunks roots and branching limbs cluster 02 [vinci generated bark with longitudinal grain]",
-  "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 12 [vinci October grass and uneven leaf litter] + vinci/collection-modern-insertion/vinci/collection/glazing [vinci/collection/full-height-glazing]",
   "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 12 [vinci October grass and uneven leaf litter] + wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass]",
-  "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 12 [vinci October grass and uneven leaf litter] + wing-vinci/terrain/wing-vinci/retaining [wing-vinci/stone]",
   "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 13 [vinci October grass and uneven leaf litter] + wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass]",
   "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 14 [vinci October grass and uneven leaf litter] + wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass]",
   "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 15 [vinci October grass and uneven leaf litter] + vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces]",
-  "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 15 [vinci October grass and uneven leaf litter] + vinci/collection-modern-insertion/vinci/collection/glazing [vinci/collection/full-height-glazing]",
-  "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 15 [vinci October grass and uneven leaf litter] + wing-vinci/terrain/wing-vinci/collectionRetaining [vinci/collection/filtered-cast-concrete]",
   "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 15 [vinci October grass and uneven leaf litter] + wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass]",
-  "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 16 [vinci October grass and uneven leaf litter] + vinci/collection-modern-insertion/vinci/collection/glazing [vinci/collection/full-height-glazing]",
   "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 16 [vinci October grass and uneven leaf litter] + wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass]",
   "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 16 [vinci October grass and uneven leaf litter] + wing-vinci/terrain/wing-vinci/retaining [wing-vinci/stone]",
-  "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 18 [vinci October grass and uneven leaf litter] + wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass]",
+  "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 19 [vinci October grass and uneven leaf litter] + mesh 1 [NodeMaterial]",
   "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 19 [vinci October grass and uneven leaf litter] + vinci/collection-modern-insertion/vinci/collection/glazing [vinci/collection/full-height-glazing]",
   "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 19 [vinci October grass and uneven leaf litter] + wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass]",
   "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 20 [vinci October grass and uneven leaf litter] + vinci/collection-modern-insertion/vinci/collection/glazing [vinci/collection/full-height-glazing]",
   "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 20 [vinci October grass and uneven leaf litter] + wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass]",
   "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 21 [vinci October grass and uneven leaf litter] + wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass]",
-  "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 22 [vinci October grass and uneven leaf litter] + wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass]",
   "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 23 [vinci October grass and uneven leaf litter] + wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass]",
   "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 24 [vinci October grass and uneven leaf litter] + wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass]",
+  "vinci generated conjectural ground dressing/vinci pale mineral path-edge gravel [vinci pale mineral path-edge gravel] + vinci/collection-modern-insertion/vinci/collection/glazing [vinci/collection/full-height-glazing]",
   "vinci generated conjectural ground dressing/vinci pale mineral path-edge gravel [vinci pale mineral path-edge gravel] + wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass]",
   "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 01 [vinci generated October folded leaves] + mesh 1 [NodeMaterial]",
   "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 02 [vinci generated October folded leaves] + mesh 1 [NodeMaterial]",
   "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 02 [vinci generated October folded leaves] + nothing (sky)",
   "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 02 [vinci generated October folded leaves] + wing-vinci/terrain/wing-vinci/grass cluster 01 [wing-vinci/grass]",
   "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 03 [vinci generated October folded leaves] + mesh 1 [NodeMaterial]",
-  "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 04 [vinci generated October folded leaves] + mesh 1 [NodeMaterial]",
-  "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 06 [vinci generated October folded leaves] + mesh 1 [NodeMaterial]",
+  "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 05 [vinci generated October folded leaves] + wing-vinci/terrain/wing-vinci/grass cluster 01 [wing-vinci/grass]",
   "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 07 [vinci generated October folded leaves] + mesh 1 [NodeMaterial]",
   "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 07 [vinci generated October folded leaves] + nothing (sky)",
   "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 07 [vinci generated October folded leaves] + vinci generated conjectural landscape trees/vinci generated trunks roots and branching limbs cluster 02 [vinci generated bark with longitudinal grain]",
+  "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 07 [vinci generated October folded leaves] + vinci/collection-modern-insertion/vinci/collection/architecture [vinci/collection/three-scale-architecture]",
+  "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 07 [vinci generated October folded leaves] + vinci/collection-modern-insertion/vinci/collection/glazing [vinci/collection/full-height-glazing]",
   "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 07 [vinci generated October folded leaves] + wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass]",
-  "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 08 [vinci generated October folded leaves] + mesh 1 [NodeMaterial]",
   "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 09 [vinci generated October folded leaves] + mesh 1 [NodeMaterial]",
+  "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 10 [vinci generated October folded leaves] + mesh 1 [NodeMaterial]",
   "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 11 [vinci generated October folded leaves] + mesh 1 [NodeMaterial]",
-  "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 11 [vinci generated October folded leaves] + vinci/collection-modern-insertion/vinci/collection/glazing [vinci/collection/full-height-glazing]",
   "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 12 [vinci generated October folded leaves] + mesh 1 [NodeMaterial]",
+  "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 13 [vinci generated October folded leaves] + mesh 1 [NodeMaterial]",
+  "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 14 [vinci generated October folded leaves] + mesh 1 [NodeMaterial]",
   "vinci generated conjectural landscape trees/vinci generated trunks roots and branching limbs cluster 01 [vinci generated bark with longitudinal grain] + mesh 1 [NodeMaterial]",
   "vinci generated conjectural landscape trees/vinci generated trunks roots and branching limbs cluster 02 [vinci generated bark with longitudinal grain] + mesh 1 [NodeMaterial]",
   "vinci generated conjectural landscape trees/vinci generated trunks roots and branching limbs cluster 02 [vinci generated bark with longitudinal grain] + vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 07 [vinci generated October folded leaves]",
   "vinci generated conjectural landscape trees/vinci generated trunks roots and branching limbs cluster 03 [vinci generated bark with longitudinal grain] + mesh 1 [NodeMaterial]",
+  "vinci generated conjectural landscape trees/vinci generated trunks roots and branching limbs cluster 04 [vinci generated bark with longitudinal grain] + mesh 1 [NodeMaterial]",
   "vinci generated inner court dressing/vinci/inner-court/court gravel [MeshStandardNodeMaterial] + wing-vinci/terrain/wing-vinci/earth [wing-vinci/earth]",
-  "vinci generated inner court dressing/vinci/inner-court/court wear and drainage [MeshStandardNodeMaterial] + wing-vinci/terrain/wing-vinci/earth [wing-vinci/earth]",
   "vinci generated road dressing/vinci/road-dressing/gravel [MeshStandardNodeMaterial] + wing-vinci/terrain/wing-vinci/earth [wing-vinci/earth]",
   "vinci generated road dressing/vinci/road-dressing/straw [MeshStandardNodeMaterial] + wing-vinci/terrain/wing-vinci/earth [wing-vinci/earth]",
-  "vinci/collection-court-terrace-access/vinci/collection-access/concrete [vinci/collection/filtered-cast-concrete] + wing-vinci/terrain/wing-vinci/collectionRetaining [vinci/collection/filtered-cast-concrete]",
+  "vinci/collection-modern-insertion/vinci-court-plaque/vinci-court-plaque-made-surface [vinci/collection-rooms/ink] + vinci/collection-modern-insertion/vinci-court-plaque/vinci-court-plaque-made-surface [vinci/collection-rooms/stone]",
   "vinci/collection-modern-insertion/vinci-grave/vinci-grave-made-surface [vinci/collection-rooms/dark] + vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 07 [vinci generated October folded leaves]",
   "vinci/collection-modern-insertion/vinci-grave/vinci-grave-made-surface [vinci/collection-rooms/dark] + vinci/collection-modern-insertion/vinci-grave/vinci-grave-made-surface [vinci/collection-rooms/stone]",
-  "vinci/collection-modern-insertion/vinci-grave/vinci-grave-made-surface [vinci/collection-rooms/dark] + vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces]",
-  "vinci/collection-modern-insertion/vinci-grave/vinci-grave-made-surface [vinci/collection-rooms/stone] + vinci/collection-modern-insertion/vinci-grave/vinci-grave-made-surface [vinci/collection-rooms/dark]",
   "vinci/collection-modern-insertion/vinci/collection-line-floor/vinci/collection-line-floor/vinci/collection-rooms/bronze [vinci/collection-rooms/bronze] + vinci/collection-modern-insertion/vinci/collection-line-floor/vinci/collection-line-floor/vinci/collection-rooms/stone [vinci/collection-rooms/stone]",
   "vinci/collection-modern-insertion/vinci/collection-line-floor/vinci/collection-line-floor/vinci/collection-rooms/ink [vinci/collection-rooms/ink] + vinci/collection-modern-insertion/vinci/collection-line-floor/vinci/collection-line-floor/vinci/collection-rooms/stone [vinci/collection-rooms/stone]",
-  "vinci/collection-modern-insertion/vinci/collection-line-floor/vinci/collection-line-floor/vinci/collection-rooms/stone [vinci/collection-rooms/stone] + vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces]",
-  "vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces] + vinci/collection-modern-insertion/vinci/collection-plates/vinci/collection-plates/last-supper [vinci/pictures/plate/last-supper]",
-  "vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces] + vinci/collection-modern-insertion/vinci/collection/architecture [vinci/collection/three-scale-architecture]",
-  "vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces] + vinci/collection-modern-insertion/vinci/collection/glazing [vinci/collection/full-height-glazing]",
+  "vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces] + vinci/collection-modern-insertion/vinci/collection/cast-concrete [vinci/collection/filtered-cast-concrete]",
   "vinci/collection-modern-insertion/vinci/collection/architecture [vinci/collection/three-scale-architecture] + vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 07 [vinci generated October folded leaves]",
   "vinci/collection-modern-insertion/vinci/collection/architecture [vinci/collection/three-scale-architecture] + vinci/collection-modern-insertion/vinci/collection-line-floor/vinci/collection-line-floor/vinci/collection-rooms/stone [vinci/collection-rooms/stone]",
-  "vinci/collection-modern-insertion/vinci/collection/architecture [vinci/collection/three-scale-architecture] + vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces]",
+  "vinci/collection-modern-insertion/vinci/collection/architecture [vinci/collection/three-scale-architecture] + vinci/collection-modern-insertion/vinci/collection/cast-concrete [vinci/collection/filtered-cast-concrete]",
+  "vinci/collection-modern-insertion/vinci/collection/cast-concrete [vinci/collection/filtered-cast-concrete] + vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces]",
   "vinci/collection-modern-insertion/vinci/collection/cast-concrete [vinci/collection/filtered-cast-concrete] + vinci/collection-modern-insertion/vinci/collection/architecture [vinci/collection/three-scale-architecture]",
   "vinci/collection-modern-insertion/vinci/collection/cast-concrete [vinci/collection/filtered-cast-concrete] + wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass]",
-  "vinci/collection-modern-insertion/vinci/collection/glazing [vinci/collection/full-height-glazing] + vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces]",
   "vinci/collection-modern-insertion/vinci/parachute/parachute/canopy/canopy:surface [parachute:sealed linen:linen] + vinci/collection-modern-insertion/vinci/collection-rooms/plinths [vinci/collection-rooms/surfaces]",
-  "vinci/registered-shell/vinci/shell/brick [vinci/brick] + vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 07 [vinci generated October folded leaves]",
   "vinci/registered-shell/vinci/shell/brick [vinci/brick] + vinci/registered-shell/vinci/shell/stone [vinci/stone]",
   "vinci/registered-shell/vinci/shell/glass [vinci/glass] + vinci/registered-shell/vinci/shell/iron [vinci/iron]",
+  "vinci/registered-shell/vinci/shell/glassSky [vinci/glassSky] + vinci/registered-shell/vinci/shell/stone [vinci/stone]",
   "vinci/registered-shell/vinci/shell/iron [vinci/iron] + vinci/registered-shell/vinci/shell/glass [vinci/glass]",
-  "vinci/registered-shell/vinci/shell/slate [vinci/slate] + vinci/registered-shell/vinci/shell/lead [vinci/lead]",
-  "vinci/registered-shell/vinci/shell/stone [vinci/stone] + vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 07 [vinci generated October folded leaves]",
+  "vinci/registered-shell/vinci/shell/iron [vinci/iron] + vinci/registered-shell/vinci/shell/glassSky [vinci/glassSky]",
+  "vinci/registered-shell/vinci/shell/oak [vinci/oak] + vinci/registered-shell/vinci/shell/slate [vinci/slate]",
   "vinci/registered-shell/vinci/shell/stone [vinci/stone] + vinci/registered-shell/vinci/shell/brick [vinci/brick]",
-  "wing-vinci/terrain/wing-vinci/collectionRetaining [vinci/collection/filtered-cast-concrete] + vinci/collection-court-terrace-access/vinci/collection-access/concrete [vinci/collection/filtered-cast-concrete]",
-  "wing-vinci/terrain/wing-vinci/earth [wing-vinci/earth] + vinci generated inner court dressing/vinci/inner-court/tread stone [MeshStandardNodeMaterial]",
+  "wing-vinci/terrain/wing-vinci/collectionRetaining [vinci/collection/filtered-cast-concrete] + wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass]",
   "wing-vinci/terrain/wing-vinci/earth [wing-vinci/earth] + vinci generated road dressing/vinci/road-dressing/gutter [MeshStandardNodeMaterial]",
-  "wing-vinci/terrain/wing-vinci/earth [wing-vinci/earth] + vinci/collection-modern-insertion/vinci/collection/architecture [vinci/collection/three-scale-architecture]",
   "wing-vinci/terrain/wing-vinci/earth [wing-vinci/earth] + vinci/registered-shell/vinci/shell/brick [vinci/brick]",
-  "wing-vinci/terrain/wing-vinci/earth [wing-vinci/earth] + wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass]",
-  "wing-vinci/terrain/wing-vinci/grass cluster 01 [wing-vinci/grass] + mesh 1 [NodeMaterial]",
+  "wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass] + vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 02 [vinci October grass and uneven leaf litter]",
   "wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass] + vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 15 [vinci October grass and uneven leaf litter]",
-  "wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass] + wing-vinci/terrain/wing-vinci/retaining [wing-vinci/stone]",
-  "wing-vinci/terrain/wing-vinci/retaining [wing-vinci/stone] + vinci/registered-shell/vinci/shell/stone [vinci/stone]"
+  "wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass] + vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 16 [vinci October grass and uneven leaf litter]",
+  "wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass] + vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 07 [vinci generated October folded leaves]",
+  "wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass] + wing-vinci/terrain/wing-vinci/retaining [wing-vinci/stone]"
  ],
  "stations": {
   "arrival": {
    "stepLevels": {
     "min": 0.95,
-    "max": 1.92,
+    "max": 2.02,
     "runs": 3,
     "read": [
      0.95,
-     1.92,
-     1.44
+     2.01,
+     2.02
     ]
    },
    "perMpx": {
     "1": {
      "min": 730,
-     "max": 1527
+     "max": 3880
     },
     "2": {
-     "min": 2136,
-     "max": 7661
+     "min": 6493,
+     "max": 10532
     },
     "3": {
      "min": 2581,
-     "max": 8728
+     "max": 12448
     }
    }
   },
   "courtyard": {
    "stepLevels": {
-    "min": 1.09,
-    "max": 2.59,
+    "min": 1.66,
+    "max": 2,
     "runs": 3,
     "read": [
-     1.09,
-     1.89,
-     2.59
+     1.66,
+     1.99,
+     2
     ]
    },
    "perMpx": {
     "1": {
-     "min": 434,
-     "max": 2048
+     "min": 163,
+     "max": 330
     },
     "2": {
-     "min": 37,
-     "max": 6762
+     "min": 1958,
+     "max": 4443
     },
     "3": {
-     "min": 1297,
-     "max": 9694
+     "min": 8080,
+     "max": 16024
     }
    }
   },
   "hall": {
    "stepLevels": {
-    "min": 0.9,
-    "max": 2.24,
+    "min": 0.58,
+    "max": 0.94,
     "runs": 3,
     "read": [
-     1.96,
-     2.24,
-     0.9
+     0.58,
+     0.94,
+     0.94
     ]
    },
    "perMpx": {
     "1": {
-     "min": 111,
-     "max": 1091
+     "min": 743,
+     "max": 1305
     },
     "2": {
-     "min": 48,
-     "max": 2064
+     "min": 876,
+     "max": 6504
     },
     "3": {
-     "min": 1056,
-     "max": 15067
+     "min": 268,
+     "max": 2550
     }
    }
   },
   "oratory": {
    "stepLevels": {
-    "min": 0.79,
-    "max": 1.12,
+    "min": 0.62,
+    "max": 2.63,
     "runs": 3,
     "read": [
-     1.12,
-     0.79,
-     1.07
+     2.63,
+     0.62,
+     0.62
     ]
    },
    "perMpx": {
     "1": {
-     "min": 873,
-     "max": 1933
+     "min": 100,
+     "max": 1513
     },
     "2": {
-     "min": 1744,
-     "max": 5786
+     "min": 1540,
+     "max": 2908
     },
     "3": {
-     "min": 1646,
-     "max": 9409
+     "min": 277,
+     "max": 13467
     }
    }
   },
   "study": {
    "stepLevels": {
-    "min": 0.74,
-    "max": 2.16,
+    "min": 1.76,
+    "max": 3.87,
     "runs": 3,
     "read": [
-     0.74,
-     0.81,
-     2.16
+     1.76,
+     3.87,
+     3.87
     ]
    },
    "perMpx": {
     "1": {
-     "min": 834,
-     "max": 3565
+     "min": 92,
+     "max": 777
     },
     "2": {
-     "min": 342,
-     "max": 6373
+     "min": 947,
+     "max": 2557
     },
     "3": {
-     "min": 1842,
-     "max": 13854
+     "min": 5730,
+     "max": 11008
     }
    }
   },
   "chamber": {
    "stepLevels": {
-    "min": 0.83,
-    "max": 2.79,
+    "min": 1.96,
+    "max": 2.55,
     "runs": 3,
     "read": [
-     1.45,
-     0.83,
-     2.79
+     2.55,
+     1.96,
+     1.96
     ]
    },
    "perMpx": {
     "1": {
-     "min": 294,
-     "max": 886
+     "min": 620,
+     "max": 909
     },
     "2": {
-     "min": 500,
-     "max": 4870
+     "min": 2878,
+     "max": 5996
     },
     "3": {
-     "min": 3241,
-     "max": 20430
+     "min": 10226,
+     "max": 17735
     }
    }
   },
   "garden": {
    "stepLevels": {
-    "min": 1.85,
-    "max": 2.21,
+    "min": 2.35,
+    "max": 2.85,
     "runs": 3,
     "read": [
-     1.85,
-     1.85,
-     2.21
+     2.85,
+     2.35,
+     2.35
     ]
    },
    "perMpx": {
     "1": {
-     "min": 605,
-     "max": 3423
+     "min": 484,
+     "max": 543
     },
     "2": {
-     "min": 1367,
-     "max": 5756
+     "min": 3672,
+     "max": 4600
     },
     "3": {
-     "min": 8524,
-     "max": 17000
+     "min": 7894,
+     "max": 9462
     }
    }
   },
   "picture-room": {
    "stepLevels": {
-    "min": 0.39,
-    "max": 2.24,
+    "min": 1.99,
+    "max": 2.37,
     "runs": 3,
     "read": [
-     2.24,
-     1.39,
-     0.39
+     1.99,
+     2.37,
+     2.37
     ]
    },
    "perMpx": {
     "1": {
-     "min": 186,
-     "max": 1070
+     "min": 741,
+     "max": 1230
     },
     "2": {
-     "min": 15,
-     "max": 5319
+     "min": 8360,
+     "max": 9087
     },
     "3": {
-     "min": 114,
-     "max": 7670
+     "min": 10720,
+     "max": 12785
     }
    }
   },
   "picture-room-west": {
    "stepLevels": {
-    "min": 0.71,
-    "max": 2.57,
+    "min": 1.18,
+    "max": 1.69,
     "runs": 3,
     "read": [
-     2.57,
-     0.71,
-     2.2
+     1.18,
+     1.69,
+     1.69
     ]
    },
    "perMpx": {
     "1": {
-     "min": 436,
-     "max": 836
+     "min": 803,
+     "max": 1268
     },
     "2": {
-     "min": 344,
-     "max": 3559
+     "min": 4949,
+     "max": 7718
     },
     "3": {
-     "min": 1863,
-     "max": 10699
+     "min": 6512,
+     "max": 7656
     }
    }
   },
   "flight": {
    "stepLevels": {
-    "min": 1.54,
-    "max": 2.46,
+    "min": 0.43,
+    "max": 0.58,
     "runs": 3,
     "read": [
-     2.46,
-     1.54,
-     1.78
+     0.58,
+     0.43,
+     0.43
     ]
    },
    "perMpx": {
     "1": {
-     "min": 604,
-     "max": 1339
+     "min": 269,
+     "max": 321
     },
     "2": {
-     "min": 2911,
-     "max": 8376
+     "min": 24,
+     "max": 25
     },
     "3": {
-     "min": 5061,
-     "max": 11012
+     "min": 1391,
+     "max": 1416
     }
    }
   },
   "works": {
    "stepLevels": {
-    "min": 1.28,
-    "max": 2.21,
+    "min": 1.43,
+    "max": 1.71,
     "runs": 3,
     "read": [
-     2.21,
-     1.28,
-     1.83
+     1.43,
+     1.71,
+     1.7
     ]
    },
    "perMpx": {
     "1": {
-     "min": 573,
-     "max": 2656
+     "min": 11,
+     "max": 41
     },
     "2": {
-     "min": 3717,
-     "max": 9250
+     "min": 707,
+     "max": 949
     },
     "3": {
-     "min": 7517,
-     "max": 10146
+     "min": 2913,
+     "max": 3275
     }
    }
   },
   "line-early": {
    "stepLevels": {
-    "min": 1.08,
-    "max": 2.07,
+    "min": 0.69,
+    "max": 0.72,
     "runs": 3,
     "read": [
-     2.07,
-     1.14,
-     1.08
+     0.72,
+     0.69,
+     0.69
     ]
    },
    "perMpx": {
     "1": {
-     "min": 1425,
-     "max": 2462
+     "min": 433,
+     "max": 443
     },
     "2": {
-     "min": 3629,
-     "max": 9217
+     "min": 235,
+     "max": 245
     },
     "3": {
-     "min": 4539,
-     "max": 12892
+     "min": 3474,
+     "max": 3553
     }
    }
   },
   "body": {
    "stepLevels": {
-    "min": 0.74,
-    "max": 0.86,
+    "min": 1,
+    "max": 1.08,
     "runs": 3,
     "read": [
-     0.74,
-     0.81,
-     0.86
+     1,
+     1.08,
+     1.07
     ]
    },
    "perMpx": {
     "1": {
-     "min": 3,
-     "max": 301
+     "min": 1928,
+     "max": 1985
     },
     "2": {
-     "min": 13,
-     "max": 530
+     "min": 3782,
+     "max": 4404
     },
     "3": {
-     "min": 2092,
-     "max": 2671
+     "min": 4811,
+     "max": 5281
     }
    }
   },
   "reading-table": {
    "stepLevels": {
-    "min": 0.65,
-    "max": 1.36,
+    "min": 0.78,
+    "max": 0.84,
     "runs": 3,
     "read": [
-     0.65,
-     0.99,
-     1.36
+     0.84,
+     0.78,
+     0.78
     ]
    },
    "perMpx": {
     "1": {
-     "min": 28,
-     "max": 478
+     "min": 399,
+     "max": 415
     },
     "2": {
-     "min": 83,
-     "max": 765
+     "min": 170,
+     "max": 176
     },
     "3": {
-     "min": 1800,
-     "max": 3732
+     "min": 1834,
+     "max": 1849
     }
    }
   },
   "supper-wall": {
    "stepLevels": {
-    "min": 0.8,
-    "max": 3.08,
+    "min": 0.6,
+    "max": 0.61,
     "runs": 3,
     "read": [
-     0.8,
-     3.08,
-     1.19
+     0.6,
+     0.6,
+     0.61
     ]
    },
    "perMpx": {
     "1": {
-     "min": 222,
-     "max": 1750
+     "min": 356,
+     "max": 459
     },
     "2": {
-     "min": 28,
-     "max": 1232
+     "min": 2845,
+     "max": 2853
     },
     "3": {
-     "min": 1340,
-     "max": 2895
+     "min": 3854,
+     "max": 3984
     }
    }
   },
   "grave": {
    "stepLevels": {
-    "min": 0.47,
-    "max": 2.2,
+    "min": 1.26,
+    "max": 1.31,
     "runs": 3,
     "read": [
-     1.76,
-     2.2,
-     0.47
+     1.31,
+     1.26,
+     1.28
     ]
    },
    "perMpx": {
     "1": {
-     "min": 167,
-     "max": 1566
+     "min": 845,
+     "max": 1027
     },
     "2": {
-     "min": 34,
-     "max": 3177
+     "min": 1434,
+     "max": 1485
     },
     "3": {
-     "min": 1899,
-     "max": 5556
+     "min": 6673,
+     "max": 7072
     }
    }
   }
