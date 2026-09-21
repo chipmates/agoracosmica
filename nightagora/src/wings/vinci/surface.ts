@@ -197,12 +197,15 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
   const worldPixel=anisotropicFootprint(P)
   const density=float(1).sub(smoothstep(.0035,.019,worldPixel))
   const resolvedAt=(metres:number):N=>smoothstep(2,4.2,float(metres).div(worldPixel))
-  const microDensity=density.mul(float(1).sub(smoothstep(.004,.020,worldPixel)))
   const regional=mx_noise_float(P.mul(1/.8)).mul(resolvedAt(.8))
   const mottled=mx_noise_float(P.mul(1/.18).add(vec3(7.1,3.7,11.3))).mul(resolvedAt(.18))
   const macro=mx_noise_float(P.mul(.38)).mul(resolvedAt(1/.38)).mul(.11).add(1)
   const grain=kind==='oak'?mx_noise_float(vec3(U.x.mul(22),U.y.mul(mix(float(.7),float(22),info.x)),0)):mx_noise_float(P.mul(24))
-  const micro=mx_noise_float(P.mul(125))
+  // AN EIGHT MILLIMETRE FIELD IS GATED ON EIGHT MILLIMETRES. Carried on the
+  // 42 mm grain's own ramp it kept two thirds of its amplitude where the
+  // pixel was already as wide as its period, on the roughness and on the
+  // normal both, and that is a crawl no sample count reaches.
+  const micro=mx_noise_float(P.mul(125)).mul(resolvedAt(.008))
   const salt=mx_noise_float(P.mul(vec3(5,.7,5))).mul(.5).add(.5)
   const geometric=normalWorldGeometry
   const horizontal=vec3(geometric.x,0,geometric.z)
@@ -409,11 +412,11 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
   const colour=mix(far,near,kind==='slate'?smoothstep(.65,1.7,float(.14).div(pixel)):detail).mul(macro).mul(surfaceRegion).mul(individualTone).mul(float(1).sub(damp))
   m.colorNode=mix(colour,colour.mul(vec3(.74,.82,.63)),damp.mul(.40)).max(vec3(.003,.003,.003))
   const roughRange=kind==='slate'?[.61,.83]:kind==='oak'?[.60,.82]:kind==='brick'?[.74,.96]:[.78,1]
-  const roughness=kind==='oak'?float(.72).add(oakWeather.mul(.12)).add(oakChecks.mul(.025)).add(oakFiniteRoughness).add(micro.mul(.02).mul(microDensity)).sub(damp.mul(.10)):
-    float(kind==='slate'?.73:.89).add(regional.mul(.025)).add(micro.mul(.045).mul(microDensity)).sub(damp.mul(.10))
+  const roughness=kind==='oak'?float(.72).add(oakWeather.mul(.12)).add(oakChecks.mul(.025)).add(oakFiniteRoughness).add(micro.mul(.02)).sub(damp.mul(.10)):
+    float(kind==='slate'?.73:.89).add(regional.mul(.025)).add(micro.mul(.045)).sub(damp.mul(.10))
   m.roughnessNode=clamp(roughness,roughRange[0],roughRange[1])
   const nx=grain.mul(.04).add(relief).mul(density).mul(detail).add(textureNormal.x)
-  const ny=micro.mul(.018).mul(microDensity).mul(detail).add(textureNormal.y)
+  const ny=micro.mul(.018).mul(detail).add(textureNormal.y)
   const detailedNormal=normalMap(vec3(nx,ny,1).normalize().mul(.5).add(.5),vec2(.65,.65))
   // A microscopic course bevel must converge to its wall plane, not retain
   // a bright one-pixel strip after the colour signal has been filtered.
