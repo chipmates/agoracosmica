@@ -198,13 +198,14 @@
    pointer by default, so the sheet takes it back. */
 .vinci-welcome[open] {pointer-events:auto;}
 
-.vinci-welcome .vinci-statement {margin:8px 0;border-left:0;padding-left:0;font-size:13.5px;}
+.vinci-welcome .vinci-statement {margin:9px 0;border-left:0;padding-left:0;font-size:.9375rem;line-height:1.55;}
+.vinci-welcome .vinci-certainty-word {font-size:.875rem;letter-spacing:.1em;}
 /* the sources of a group: the store's own holder and licence lines, one per
    line, complete, and long ones broken rather than cut */
-.vinci-welcome-sources {list-style:none;margin:2px 0 0;padding:0;font:12.5px/1.5 var(--sans);color:#ddd6c6;}
+.vinci-welcome-sources {list-style:none;margin:2px 0 0;padding:0;font:.875rem/1.55 var(--sans);color:#e4ded0;}
 .vinci-welcome-sources li {padding:7px 0;border-top:1px solid #a9977326;overflow-wrap:anywhere;}
 @media(max-aspect-ratio:9/10) {
-  .vinci-welcome .vinci-statement {font-size:13px;line-height:1.5;}
+  .vinci-welcome .vinci-statement {font-size:.9375rem;line-height:1.5;}
 }
 .vinci-record-fold {margin:16px 0 0;}
 .vinci-record-fold > summary {display:flex;align-items:center;min-height:44px;padding:8px 0;color:#e6d6b8;font:12px var(--sans);cursor:pointer;}
