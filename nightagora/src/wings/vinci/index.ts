@@ -1163,11 +1163,12 @@ export function createWing():VinciWingModule {
     strip.setViewSelector(Boolean(open?.endsWith(LEAF_DOOR)))
     // THE ROW NEVER STANDS OVER A WORK. On the wide stage it runs along the
     // foot of the frame above the bar, which is where a row of twenty five
-    // can be large enough to recognise; while a vitrine holds the stage at an
-    // exhibit that is not a stop of the wall it docks at that card's foot,
-    // and the phone keeps it above the bar.
+    // can be large enough to recognise; while a window holds the stage the
+    // row goes under that window's own words, a work's and a machine's alike,
+    // so it covers neither the work nor the controls beneath it; the phone
+    // keeps it above the bar and stands it down while a window is open.
     if(narrow())strip.dock(null,hosts.labels)
-    else if(open&&closeLook&&!onWallStop())strip.dock('inline',closeLook.foot)
+    else if(open&&closeLook)strip.dock('inline',closeLook.foot)
     else strip.dock('foot',hosts.labels)
     strip.setOpen(open)
   }
