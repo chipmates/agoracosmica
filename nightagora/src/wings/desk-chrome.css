@@ -229,6 +229,107 @@
 .desk-ic { width: 16px; height: 16px; display: block; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .desk-tell .desk-ic { fill: currentColor; stroke: none; }
 
+/* ---- the drawer: a plate on the words' own margin and foot line ----
+   It is the label a visitor reads while looking, so it takes the words'
+   place, keeps their name row, and leaves the picture its upper right. */
+.desk-drawer {
+  position: absolute;
+  left: var(--desk-g);
+  bottom: var(--desk-foot);
+  width: min(744px, var(--desk-read));
+  max-height: 45vh;
+  padding: 20px 24px 16px;
+  border-radius: 3px;
+  background: linear-gradient(
+    color-mix(in srgb, #0e1736 97%, transparent),
+    color-mix(in srgb, var(--na-abyss) 98%, transparent) 70%);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--na-gold) 34%, transparent),
+    0 22px 64px color-mix(in srgb, #020308 55%, transparent);
+  color: var(--na-starlight);
+  pointer-events: auto;
+}
+.desk-drawer[hidden] { display: none; }
+.desk-drawer-name { margin-bottom: 12px; padding-right: 44px; }
+.desk-drawer-name :is(.desk-chapter, .desk-clock) { text-shadow: none; }
+.desk-drawer-close {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  display: grid;
+  place-items: center;
+  color: var(--na-starlight);
+  cursor: pointer;
+}
+.desk-drawer-words p {
+  margin: 0 0 5px;
+  font: 400 1.1875rem/1.875rem var(--serif);
+  color: color-mix(in srgb, var(--na-starlight) 92%, var(--na-mist));
+  text-wrap: pretty;
+}
+.desk-drawer-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid color-mix(in srgb, var(--na-starlight) 16%, transparent);
+}
+.desk-drawer-question {
+  margin: 0;
+  font: italic 400 1.0625rem/1.5rem var(--serif);
+  color: var(--na-starlight);
+  text-align: right;
+  text-wrap: pretty;
+}
+/* the wing's own sources control, borrowed into this foot with its word,
+   its key and its window */
+#wing[data-desk~='drawer'] .desk-drawer-foot .vinci-source {
+  position: static;
+  flex: none;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  display: inline-flex;
+  align-items: center;
+  font: 500 0.9375rem/1 var(--sans);
+  letter-spacing: 0.06em;
+  text-indent: 0.06em;
+  text-transform: uppercase;
+  color: var(--desk-clock);
+  white-space: nowrap;
+}
+#wing[data-desk~='drawer'] .desk-drawer-foot .wing-door {
+  position: static;
+  flex: none;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px var(--rule);
+  font: 600 0.875rem/1 var(--sans);
+  letter-spacing: 0.12em;
+  text-indent: 0.12em;
+  color: var(--na-gold);
+}
+#wing[data-desk~='drawer'] .desk-drawer-foot .wing-door:hover,
+#wing[data-desk~='drawer'] .desk-drawer-foot .wing-door:focus-visible {
+  box-shadow: inset 0 0 0 1px var(--na-gold);
+  color: var(--na-starlight);
+}
+/* ONE TEXT AT A TIME. While the drawer stands, the line it replaces is at
+   nothing and the dusk under it goes: the plate is the backing now. */
+#wing[data-drawer='open'] .desk-cap { opacity: 0; pointer-events: none; }
+#wing[data-drawer='open'] .desk-low { background: none; }
+
 /* ---- the ways: one corner, two controls, neither ever moves ---- */
 .desk-ways { flex: none; display: flex; align-items: center; gap: 12px; }
 .desk-back {

@@ -438,6 +438,8 @@ export function createWing():VinciWingModule {
       stood:()=>visit?.stood??[],
       name:id=>vinciContent.find(s=>s.id===id)?.name??{en:'',de:''},
       door:()=>wing.querySelector<HTMLElement>('.wing-door'),
+      sources:()=>source??null,
+      question:()=>vinciContent[card]?.door[lang()]??'',
       words:{next:LIFE_CARDS.controls.date.next,back:LIFE_CARDS.controls.date.previous,rail:WING_TEXT.rail},
       go:index=>h.navigate(index),
       leg:()=>{const nav=standing?rail.navigation:undefined;return nav?.active?nav.legWalked:null},

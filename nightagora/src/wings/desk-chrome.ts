@@ -13,6 +13,7 @@
 
 import { deskOn } from './desk-switches'
 import { deskCutBetween, deskStoryStop } from './desk-story'
+import { setRegister } from './frame'
 import type { VinciCertainty, VinciText } from './vinci/content'
 
 export interface DeskStation {
@@ -41,6 +42,11 @@ export interface DeskChromeHost {
   /** the frame's own way out of the museum, which the words' foot row takes
       in while the bar stands down */
   door: () => HTMLElement | null
+  /** the wing's own way to what a station rests on, which the drawer's foot
+      takes in until the one sheet replaces it */
+  sources: () => HTMLElement | null
+  /** the question this station's door carries, as the frame wrote it */
+  question: () => string
   /** the words of the controls the frame and the wing already carry */
   words: {
     next: VinciText
@@ -98,6 +104,7 @@ function icon(path: string): SVGSVGElement {
 const ARROW_ON = 'M3 8h10M9 4l4 4-4 4'
 const ARROW_BACK = 'M13 8H3M7 4L3 8l4 4'
 const PLAY = 'M5 3l8 5-8 5z'
+const CLOSE = 'M4 4l8 8M12 4l-8 8'
 
 /* SHAPE CARRIES THE CLASS, so the mark survives a grey print and a colour
    blind eye, and the colour reinforces it: a full disc, a half disc, an open
@@ -174,9 +181,18 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
   /* THE TWO WAYS DEEPER FROM A STATION stand in their place from this step
      on, and answer from their own steps: the drawer is desk.drawer and the
      guided visit is desk.opening. Until then each names itself and refuses. */
-  for (const control of [more, tell]) {
-    control.setAttribute('aria-disabled', 'true')
-    control.addEventListener('click', event => event.preventDefault())
+  tell.setAttribute('aria-disabled', 'true')
+  tell.addEventListener('click', event => event.preventDefault())
+  if (!deskOn('drawer')) {
+    more.setAttribute('aria-disabled', 'true')
+    more.addEventListener('click', event => event.preventDefault())
+  } else {
+    more.setAttribute('aria-controls', 'desk-drawer-words')
+    more.setAttribute('aria-expanded', 'false')
+    more.addEventListener('click', () => {
+      if (more.getAttribute('aria-disabled') === 'true') return
+      openDrawer(plate.hidden)
+    })
   }
   cap.append(nameRow, line, foot)
 
@@ -293,6 +309,103 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
   const doorNext = doorNode?.nextElementSibling ?? null
   const doorNest = doorNode?.parentElement ?? null
 
+  /* THE DRAWER: the same margin, the same foot line, one sentence a row, and
+     the name row in its own place so the eye keeps the place it read. It is
+     the label a visitor reads while looking, so it is capped at a share of
+     the stage and never scrolls. */
+  const drawer = deskOn('drawer') && words
+  const plate = make('div', 'desk-drawer')
+  plate.id = 'desk-drawer'
+  plate.hidden = true
+  // the surface itself takes the hand when it opens, so the next key is the
+  // drawer's own and Escape has one layer to step back from
+  plate.tabIndex = -1
+  const plateName = make('div', 'desk-name desk-drawer-name')
+  const plateChapter = make('span', 'desk-chapter')
+  const plateClock = make('span', 'desk-clock')
+  const plateWords = make('div', 'desk-drawer-words')
+  plateWords.id = 'desk-drawer-words'
+  setRegister(plateWords, 'drawer')
+  const plateFoot = make('div', 'desk-drawer-foot')
+  const plateQuestion = make('p', 'desk-drawer-question')
+  const plateClose = make('button', 'desk-drawer-close')
+  plateClose.type = 'button'
+  plateClose.append(icon(CLOSE))
+  plate.append(plateClose, plateName, plateWords, plateFoot)
+  /* the wing's own way to the sources keeps its word, its key and its window
+     until the one sheet takes them: it is borrowed, not rebuilt. The wing
+     builds it a frame or two after this chrome stands, so it is taken at the
+     first paint that finds it and not at the first paint. */
+  let sourcesNode: HTMLElement | null = null
+  let sourcesNext: Element | null = null
+  let sourcesNest: HTMLElement | null = null
+  function borrowSources(): void {
+    if (!drawer || sourcesNode) return
+    const node = host.sources()
+    if (!node) return
+    sourcesNode = node
+    sourcesNext = node.nextElementSibling
+    sourcesNest = node.parentElement
+  }
+  if (drawer) band.append(plate)
+
+  function openDrawer(open: boolean, back: HTMLElement = more): void {
+    if (!drawer) return
+    const held = plate.contains(document.activeElement)
+    plate.hidden = !open
+    more.setAttribute('aria-expanded', String(open))
+    if (open) host.wing.dataset['drawer'] = 'open'
+    else delete host.wing.dataset['drawer']
+    // Escape steps exactly one surface back, and the hand comes back to the
+    // control that opened it
+    if (open) plate.focus({ preventScroll: true })
+    else if (held) back.focus({ preventScroll: true })
+  }
+
+  /* ONE SENTENCE A ROW. A day of a month ends in a short number whose stop is
+     not the sentence's, so a period after one or two digits never cuts. */
+  function sentences(said: string): string[] {
+    const out: string[] = []
+    let start = 0
+    for (let i = 0; i < said.length; i++) {
+      const mark = said[i]
+      if (mark !== '.' && mark !== '!' && mark !== '?') continue
+      if (said[i + 1] !== ' ') continue
+      const digits = /(\d+)$/.exec(said.slice(start, i))
+      if (mark === '.' && digits && digits[1]!.length <= 2) continue
+      out.push(said.slice(start, i + 1).trim())
+      start = i + 1
+    }
+    const rest = said.slice(start).trim()
+    if (rest) out.push(rest)
+    return out
+  }
+
+  function paintDrawer(): void {
+    if (!drawer) return
+    borrowSources()
+    const at = host.standing()
+    const stop = deskStoryStop(at.id)
+    const said = stop?.drawer ? say(stop.drawer) : ''
+    plateName.textContent = ''
+    plateName.append(mark(stop?.certainty ?? 'reconstructed'), plateChapter, plateClock)
+    plateChapter.textContent = say(titleOf(at.id))
+    plateClock.textContent = stop?.age ? say(stop.age) : ''
+    plateClock.hidden = !stop?.age
+    plateWords.textContent = ''
+    for (const line of sentences(said)) plateWords.append(make('p', '', line))
+    plateFoot.textContent = ''
+    if (sourcesNode) plateFoot.append(sourcesNode)
+    plateQuestion.textContent = host.question()
+    plateFoot.append(plateQuestion)
+    if (doorNode) plateFoot.append(doorNode)
+    // a stop the story gives no drawer keeps the control, named and inert
+    const has = said.length > 0
+    more.setAttribute('aria-disabled', String(!has))
+    if (has) more.removeAttribute('aria-disabled')
+    if (!has) openDrawer(false)
+  }
+
   back.addEventListener('click', () => {
     const at = host.standing()
     if (at.index > 0) host.go(at.index - 1)
@@ -316,6 +429,8 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
     const stop = deskStoryStop(at.id)
     if (deskOn('freearea') && NARROW_STATIONS.includes(at.id)) host.wing.dataset['measure'] = 'narrow'
     else delete host.wing.dataset['measure']
+    // one text at a time: a drawer belongs to the place it was opened in
+    openDrawer(false, on)
     if (words) {
       nameRow.textContent = ''
       const sure: VinciCertainty = stop?.certainty ?? 'reconstructed'
@@ -336,7 +451,9 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
       tell.textContent = ''
       tell.append(icon(PLAY), document.createTextNode(say(DESK_WORDS.tell)))
       foot.append(more, tell)
-      if (doorNode) foot.append(doorNode)
+      // the door stands in this row until the drawer's own foot takes it
+      if (doorNode && !drawer) foot.append(doorNode)
+      paintDrawer()
     }
     if (ways) {
       paintThread()
@@ -392,6 +509,8 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
     const running = share !== null
     if (on.dataset['leg'] !== String(running)) {
       on.dataset['leg'] = String(running)
+      // a drawer that stood folds before the first metre
+      if (running) openDrawer(false, on)
       /* ONE CONTROL, ONE MEANING: while a leg runs it says where the walker
          is and what a second press does, and the ring is the leg itself. */
       const to = host.next()
@@ -413,10 +532,15 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
   }
 
   function key(event: KeyboardEvent): boolean {
-    if (!ways) return false
+    /* ONE LAYER BACK, EXACTLY ONE. Escape belongs to the drawer while it
+       stands, wherever the hand is; the deeper key opens it. */
+    if (drawer && event.key === 'Escape' && !plate.hidden) { openDrawer(false); return true }
     const target = event.target instanceof Element ? event.target : null
     // a control under the hand answers its own key: the browser presses it
-    if (target?.closest('button,a,[role="button"]')) return false
+    const onControl = Boolean(target?.closest('button,a,[role="button"]'))
+    if (drawer && event.key === 'ArrowDown' && plate.hidden
+      && more.getAttribute('aria-disabled') !== 'true') { openDrawer(true); return true }
+    if (!ways || onControl) return false
     if (event.key === ' ' || event.key === 'Spacebar') { pressOn(); return true }
     return false
   }
@@ -425,7 +549,7 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
     panels: () => {
       if (!words || !deskOn('freearea')) return []
       const out: { left: number; top: number; right: number; bottom: number }[] = []
-      for (const node of [cap as HTMLElement]) {
+      for (const node of plate.hidden ? [cap as HTMLElement] : [cap as HTMLElement, plate]) {
         const box = node.getBoundingClientRect()
         if (box.width > 0 && box.height > 0)
           out.push({ left: box.left, top: box.top, right: box.right, bottom: box.bottom })
@@ -442,8 +566,10 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
     update,
     key,
     dispose() {
-      // the frame's door goes home before the band that borrowed it is struck
+      // the frame's door and the wing's own sources go home before the band
+      // that borrowed them is struck
       if (doorNode && doorNest) doorNest.insertBefore(doorNode, doorNext)
+      if (sourcesNode && sourcesNest) sourcesNest.insertBefore(sourcesNode, sourcesNext)
       band.remove()
       top.remove()
       thread.remove()
