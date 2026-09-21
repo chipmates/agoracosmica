@@ -117,7 +117,8 @@ export interface WingModule {
   stations: WingStation[]
   /** A walking wing distinguishes its standing station from its destination. */
   navigation?(): { completed?: string; target?: string; question?: string }
-  /** Keep the library disclosure behind the first door press of this visit. */
+  /** Keep the library disclosure behind a door press: it stands on the first
+      one and on every later one until the visitor has gone through. */
   doorDisclosure?: 'first-press'
   /** Old numeric deep links resolve through this fixed order; new links use ids. */
   legacyStationIds?: readonly string[]
@@ -428,8 +429,12 @@ export function createWingFrame(
   disclosure.setAttribute('aria-labelledby', doorTitle.id)
   const doorWall = el('div', 'na-plate-wall')
   doorWall.append(doorTitle)
+  /* THE PLATE'S WORDS ARE A DRAWER, and a drawer carries an id so the control
+     that opens it can name it. The register is declared while a wing stands
+     and taken back when it closes: a frame with no wing shows no words, and a
+     drawer nothing can open would be read as unopened rather than as absent. */
   const doorWords = el('div', 'wing-door-words')
-  setRegister(doorWords, 'drawer')
+  doorWords.id = 'wing-door-words'
   const doorLead = el('p', 'wing-door-word')
   /* THE CANON'S OWN SENTENCE, never a second telling of it: the museum says
      once what an Echo is, and the honesty check reads this one against it. */
@@ -463,21 +468,28 @@ export function createWingFrame(
     else delete document.documentElement.dataset['naPlate']
     windowOwnsTheScreen(document, disclosure.open && narrowStage())
   }
-  let disclosureSeen = false
+  /** True once the visitor has gone through the door: the plate says what is
+      behind it, so it stands on every press until it has been passed. */
+  let doorPassed = false
+  door.setAttribute('aria-controls', doorWords.id)
+  door.setAttribute('aria-expanded', 'false')
   door.addEventListener('click', event => {
-    if (wing?.doorDisclosure !== 'first-press' || disclosureSeen) return
+    // the control that opens the plate also takes it away again
+    if (disclosure.open) { event.preventDefault(); disclosure.close(); return }
+    if (wing?.doorDisclosure !== 'first-press' || doorPassed) return
     event.preventDefault()
-    disclosureSeen = true
     continueDoor.href = door.href
     paintDoorPlate()
     disclosure.showModal()
+    door.setAttribute('aria-expanded', 'true')
     doorStandsAlone()
     disclosure.scrollTop = 0
     continueDoor.focus({ preventScroll: true })
   })
-  continueDoor.addEventListener('click', () => disclosure.close())
+  continueDoor.addEventListener('click', () => { doorPassed = true; disclosure.close() })
   closeDisclosure.addEventListener('click', () => disclosure.close())
   disclosure.addEventListener('close', () => {
+    door.setAttribute('aria-expanded', 'false')
     doorStandsAlone()
     if (!host.hidden) door.focus({ preventScroll: true })
   })
@@ -690,7 +702,8 @@ export function createWingFrame(
          one is dropped, so a wing may allocate only in `show`. */
       const reuse = entry?.slug === nextEntry.slug && wing !== null
       if (!reuse) { releaseWords(); wing?.stop() }
-      if (!reuse) { disclosure.close(); disclosureSeen = false }
+      if (!reuse) { disclosure.close(); doorPassed = false }
+      setRegister(doorWords, 'drawer')
       entry = nextEntry
       if (!reuse) wing = nextWing
       // a kept wing takes the fresh module's names: same stations, the
@@ -711,6 +724,7 @@ export function createWingFrame(
     ready: (report) => wing?.ready?.(report) ?? Promise.resolve(),
     close() {
       disclosure.close()
+      delete doorWords.dataset['register']
       releaseWords()
       wing?.stop()
       wing = null
