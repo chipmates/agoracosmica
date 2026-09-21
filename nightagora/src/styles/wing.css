@@ -229,9 +229,11 @@ body.forge .wing-lobby { transition: none !important; }
 :root {
   --na-scrollbar: color-mix(in srgb, var(--na-gold) 40%, transparent);
   --na-scrollbar-live: color-mix(in srgb, var(--na-gold) 70%, transparent);
-  scrollbar-width: thin;
   scrollbar-color: var(--na-scrollbar) transparent;
 }
+/* The colour is inherited, the width is not: every scroller takes the thin
+   one at no specificity, so any panel with a rule of its own still wins. */
+:where(*) { scrollbar-width: thin; }
 @supports not (scrollbar-color: transparent) {
   ::-webkit-scrollbar { width: 10px; height: 10px; }
   ::-webkit-scrollbar-track { background: transparent; }
