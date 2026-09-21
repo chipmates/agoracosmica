@@ -218,3 +218,30 @@
 body.forge .wing-step::after,
 body.forge .wing-door,
 body.forge .wing-lobby { transition: none !important; }
+
+/* EVERY SCROLLING PANEL DRAWS THE SAME QUIET BAR. A mouse on macOS draws the
+   system's classic always visible scrollbars, white over these dark panels,
+   while a headless frame draws overlay bars that no one sees: this is the one
+   place the two are made the same, for the welcome plate, the sources window,
+   the vitrine's words, the machines' panel and the reader's strip alike. The
+   webkit rules are for the engines that do not take the two standard
+   properties, where a custom bar is the only way to tint one. */
+:root {
+  --na-scrollbar: color-mix(in srgb, var(--na-gold) 40%, transparent);
+  --na-scrollbar-live: color-mix(in srgb, var(--na-gold) 70%, transparent);
+  scrollbar-width: thin;
+  scrollbar-color: var(--na-scrollbar) transparent;
+}
+@supports not (scrollbar-color: transparent) {
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: var(--na-scrollbar);
+    background-clip: padding-box;
+    border: 3px solid transparent;
+    border-radius: 6px;
+  }
+  ::-webkit-scrollbar-thumb:hover,
+  ::-webkit-scrollbar-thumb:active { background: var(--na-scrollbar-live); background-clip: padding-box; }
+  ::-webkit-scrollbar-corner { background: transparent; }
+}
