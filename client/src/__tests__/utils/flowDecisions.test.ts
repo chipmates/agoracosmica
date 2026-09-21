@@ -31,7 +31,7 @@ import {
   CARRIED_THREAD_EVENT,
   type CarriedExchange,
 } from '../../utils/public/entryIntent';
-import { heroEntries, getHeroEntry } from '../../data/public/heroEntry';
+import { heroEntries, getHeroEntry, resolveAnchorSeedId } from '../../data/public/heroEntry';
 
 describe('isFirstContactForFigure', () => {
   it('is first contact when no keys and no free talk exist', () => {
@@ -287,7 +287,7 @@ describe('ask tags', () => {
     expect(isValidAskTag('hero')).toBe(true);
     expect(isValidAskTag('life')).toBe(true);
     for (const entry of heroEntries) {
-      for (const slot of [1, 2, 3]) {
+      for (const slot of [1, 2, 3, 4]) {
         expect(isValidAskTag(`f:${entry.figureId}:${slot}`)).toBe(true);
       }
     }
@@ -295,7 +295,8 @@ describe('ask tags', () => {
 
   it.each([
     'f:aurelius:0',
-    'f:aurelius:4',
+    'f:aurelius:5',
+    'f:dickinson:5',
     'f:aurelius',
     'f:nobody:1',
     'f:constructor:1',
@@ -327,6 +328,42 @@ describe('ask tags', () => {
     expect(idea && 'text' in idea && idea.text).not.toBe(hero);
     expect(resolveAskPrefill('f:jung:2', null, 'de')?.kind).toBe('text');
     expect(resolveAskPrefill('f:jung:3', null, 'en')).toEqual({ kind: 'text', text: hero });
+  });
+
+  it.each(['dickinson', 'rumi', 'blake'])('slot 4 is the poem question for %s', (figureId) => {
+    expect(resolveAskPrefill(`f:${figureId}:4`, null, 'en')).toEqual({
+      kind: 'text',
+      text: 'I just read one of your poems and it stayed with me. Can we talk about it?',
+    });
+    expect(resolveAskPrefill(`f:${figureId}:4`, null, 'de')).toEqual({
+      kind: 'text',
+      text: 'Ich habe gerade eines deiner Gedichte gelesen, und es lässt mich nicht los. Können wir darüber reden?',
+    });
+  });
+
+  it('slot 4 falls back to the hero question for a figure without a poem page', () => {
+    const aurelius = getHeroEntry('aurelius')!;
+    expect(resolveAskPrefill('f:aurelius:4', null, 'en')).toEqual({
+      kind: 'text',
+      text: aurelius.questionEn,
+    });
+    expect(resolveAskPrefill('f:aurelius:4', null, 'de')).toEqual({
+      kind: 'text',
+      text: aurelius.questionDe,
+    });
+  });
+
+  it.each(['dickinson', 'rumi', 'blake'])('the poem door anchors no seed for %s', (figureId) => {
+    // A visitor asking about a poem gets plain Free Talk, not the teaching
+    // behind the hero question.
+    expect(resolveAnchorSeedId(figureId, `f:${figureId}:4`)).toBeNull();
+    expect(resolveAnchorSeedId(figureId, `f:${figureId}:1`))
+      .toBe(String(getHeroEntry(figureId)!.seedId));
+  });
+
+  it('slot 4 keeps the hero anchor where it falls back to the hero question', () => {
+    expect(resolveAnchorSeedId('aurelius', 'f:aurelius:4'))
+      .toBe(String(getHeroEntry('aurelius')!.seedId));
   });
 
   it('the legacy tag keys off the selected figure, and falls back when there is none', () => {

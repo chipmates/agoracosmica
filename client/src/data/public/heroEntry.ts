@@ -199,6 +199,14 @@ export const heroEntries: HeroEntry[] = [
   },
 ];
 
+// Slot 4 of the ask contract: the poem pages' door question. It names no
+// teaching, so it carries no seed.
+const POEM_ENTRY_FIGURES = new Set(['dickinson', 'rumi', 'blake']);
+const POEM_ENTRY_QUESTION_EN =
+  'I just read one of your poems and it stayed with me. Can we talk about it?';
+const POEM_ENTRY_QUESTION_DE =
+  'Ich habe gerade eines deiner Gedichte gelesen, und es lässt mich nicht los. Können wir darüber reden?';
+
 // Map lookups run against untrusted URL input, so membership is answered by a
 // Set. A plain object would report inherited keys ("constructor") as present.
 const byFigure = new Map<string, HeroEntry>(heroEntries.map((e) => [e.figureId, e]));
@@ -224,9 +232,22 @@ export const getHeroEntryQuestion = (
 export const getHeroEntrySeedId = (figureId: string | null | undefined): number | null =>
   getHeroEntry(figureId)?.seedId ?? null;
 
+/** True only for a figure whose poems have a public page. */
+export const hasPoemEntry = (figureId: string | null | undefined): boolean =>
+  !!figureId && POEM_ENTRY_FIGURES.has(figureId);
+
+/** The figure's poem-page question, or null when that figure has no poem page. */
+export const getPoemEntryQuestion = (
+  figureId: string | null | undefined,
+  lang: string
+): string | null => {
+  if (!hasPoemEntry(figureId)) return null;
+  return lang === 'de' ? POEM_ENTRY_QUESTION_DE : POEM_ENTRY_QUESTION_EN;
+};
+
 // Same shape as entryIntent's ask-tag pattern. Duplicated rather than imported
 // because entryIntent reads this table, and the cycle would be worse.
-const FIGURE_ASK_TAG = /^f:([a-z]+):([1-3])$/;
+const FIGURE_ASK_TAG = /^f:([a-z]+):([1-4])$/;
 
 /**
  * The anchor seed behind a staged question, by the ask tag that named it.
@@ -238,7 +259,11 @@ const FIGURE_ASK_TAG = /^f:([a-z]+):([1-3])$/;
 export const resolveAnchorSeedId = (figureId: string, tag: string): string | null => {
   const match = FIGURE_ASK_TAG.exec(tag);
   if (match) {
-    // Slot 2 is the figure page's idea question, slots 1 and 3 the hero one.
+    // Slot 4 is the poem door: it asks about a poem, so it opens plain Free
+    // Talk. Only its fallback to the hero question brings that question's
+    // anchor along, so text and grounding never come from different slots.
+    if (match[2] === '4' && hasPoemEntry(match[1])) return null;
+    // Slot 2 is the figure page's idea question, the rest the hero one.
     const seedId = match[2] === '2'
       ? getIdeaSeedId(match[1])
       : getHeroEntrySeedId(match[1]);
