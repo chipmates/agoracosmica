@@ -171,11 +171,18 @@ export function galleryBackdrop(build: Construction, width=18, backZ=-5.5, heigh
   build.box(0,plinth-.115,backZ+.028,width,.055,.20,backing)
   build.box(0,height-cornice+.10,backZ+.045,width,.115,.245,backing)
   build.box(0,height-cornice+.205,backZ+.012,width,.075,.175,backing)
+  /** A RUN THAT ENDS ON ANOTHER RUN'S END PLANE FIGHTS IT. The return wall,
+   * its stone base and its two bands are one body and all four used to stop
+   * on one plane, so at the open end a pale end face and three dark ones sat
+   * at the same depth: from the court that reads as a comb of stripes, and it
+   * breaks up as the eye moves. The three inset runs stop a bed short of the
+   * wall they are set into; nothing moves on any face a visitor sees along. */
+  const END=.006
   for(const side of [-1,1]){
     build.box(side*width/2,height/2,backZ+10,.3,height,20.3,backing)
-    build.box(side*(width/2-.09),.105,backZ+10,.42,.21,20.3,stone)
-    build.box(side*(width/2-.14),plinth-.045,backZ+10,.16,.09,20.3,backing)
-    build.box(side*(width/2-.13),height-cornice+.10,backZ+10,.155,.115,20.3,backing)
+    build.box(side*(width/2-.09),.105,backZ+10-END,.42,.21,20.3-END*2,stone)
+    build.box(side*(width/2-.14),plinth-.045,backZ+10-END,.16,.09,20.3-END*2,backing)
+    build.box(side*(width/2-.13),height-cornice+.10,backZ+10-END,.155,.115,20.3-END*2,backing)
     for(let n=0;n<8;n++){
       const z=backZ+.1+(n+.5)*2.5
       for(let row=0,y=plinth;y<plinth+field-.12;row++,y+=board+joint){
