@@ -180,6 +180,9 @@ export interface MaterialSet {
    make every texture reading in that gate a zero. A deployed bundle is never
    on localhost. */
 const LOCAL = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)
+/* the A and B of the calm pack, for an eye that has to compare them:
+   `?pack=present` reads the full encode on a tier that would take the calm one */
+const PRESENT_ONLY = new URLSearchParams(location.search).get('pack') === 'present'
 export const ASSET_BASE: string =
   (import.meta.env['VITE_NA_ASSET_BASE'] as string | undefined) ??
   (import.meta.env.DEV || LOCAL ? '/na-assets/' : 'https://media.agoracosmica.org/night/')
@@ -361,11 +364,15 @@ const RECIPES: Record<string, Partial<Recipe>> = {
 export interface TextureBudget {
   size: number
   maps: Array<'albedo' | 'normal' | 'surface'>
+  /** which encoded pack of a map this tier reads. The calm pack is the same
+      photograph at the side a phone can resolve, so the tier that uploads
+      1024 stops downloading 2048 and throwing most of it away. */
+  pack: 'present' | 'calm'
 }
 export function texturesFor(tier: Tier): TextureBudget {
-  if (tier.detail >= 3) return { size: 2048, maps: ['albedo', 'normal', 'surface'] }
-  if (tier.detail === 2) return { size: 2048, maps: ['albedo', 'normal'] }
-  return { size: 1024, maps: ['albedo'] }
+  if (tier.detail >= 3) return { size: 2048, maps: ['albedo', 'normal', 'surface'], pack: 'present' }
+  if (tier.detail === 2) return { size: 2048, maps: ['albedo', 'normal'], pack: 'present' }
+  return { size: 1024, maps: ['albedo'], pack: 'calm' }
 }
 
 /** what a square texture and its mip chain cost on the GPU, in bytes */
@@ -451,14 +458,17 @@ type MapName = 'albedo' | 'normal' | 'surface'
 /** a map re-encoded as Basis UASTC in a KTX2 file, beside its source, with
     the source's own hash so a changed photograph cannot keep an old encode */
 interface EncodedMap { path: string; sha256: string; bytes: number; width: number; height: number; source_sha256: string }
-type EncodedEntry = ManifestEntry & { ktx2?: Partial<Record<MapName, EncodedMap>> }
+type EncodedEntry = ManifestEntry & {
+  ktx2?: Partial<Record<MapName, EncodedMap>>
+  ktx2_calm?: Partial<Record<MapName, EncodedMap>>
+}
 
 /* A MAP THAT ARRIVES AS GPU BLOCKS. Transcoded once for this machine (BC7 or
    ASTC, a quarter of the RGBA8 the photograph decodes to), with the mip chain
    the encoder wrote; a tier that holds a smaller side drops the chain's top
    levels instead of resizing, because blocks cannot be resampled. What it
    costs is the bytes it holds. */
-async function compressed(url: string, size: number): Promise<{ texture: Texture; bytes: number }> {
+async function compressed(url: string, size: number): Promise<{ texture: Texture; bytes: number; width: number }> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const loaded = (await ktx2.loadAsync(url)) as any
   const chain = loaded.mipmaps as Array<{ data: ArrayBufferView; width: number; height: number }>
@@ -484,7 +494,7 @@ async function compressed(url: string, size: number): Promise<{ texture: Texture
   texture.flipY = false
   texture.name = url.slice(url.lastIndexOf('/', url.lastIndexOf('/') - 1) + 1)
   texture.needsUpdate = true
-  return { texture, bytes: mips.reduce((sum, mip) => sum + mip.data.byteLength, 0) }
+  return { texture, bytes: mips.reduce((sum, mip) => sum + mip.data.byteLength, 0), width: mips[0]?.width ?? size }
 }
 
 export interface MaterialLibraryOptions {
@@ -715,9 +725,12 @@ export function createMaterialLibrary(tier: Tier, options: MaterialLibraryOption
       const has = (m: string): boolean => (entry.maps ?? []).includes(m)
       const url = (file: string): string => `${ASSET_BASE}${entry.wing}/${entry.path}${file}`
       const wanted: MapName[] = ['albedo', ...(['normal', 'surface'] as const).filter((m) => has(m) && want.maps.includes(m))]
-      let onDevice = 0, encoded = 0
+      // the side the set really stands at: a pack encoded smaller than the
+      // tier's ceiling is what the ledger and the cost meter must report
+      let onDevice = 0, encoded = 0, side = 0
       await Promise.all(wanted.map(async (map) => {
-        const record = options.compressed && compressedReady() ? entry.ktx2?.[map] : undefined
+        const pack = want.pack === 'calm' && !PRESENT_ONLY ? entry.ktx2_calm?.[map] ?? entry.ktx2?.[map] : entry.ktx2?.[map]
+        const record = options.compressed && compressedReady() ? pack : undefined
         if (record) {
           const made = await compressed(`${ASSET_BASE}${entry.wing}/${record.path}`, want.size)
           const placeholder = maps[map]
@@ -725,15 +738,17 @@ export function createMaterialLibrary(tier: Tier, options: MaterialLibraryOption
           for (const node of users[map]) node.value = made.texture
           placeholder.dispose()
           onDevice += made.bytes
+          side = Math.max(side, made.width)
           encoded++
           return
         }
         await fill(maps[map], url(`${map}.${map === 'albedo' ? 'jpg' : 'png'}`), want.size)
         onDevice += textureBytes(want.size)
+        side = Math.max(side, want.size)
       }))
-      maps.size = want.size
+      maps.size = side || want.size
       bytes += onDevice
-      uploaded.set(name, { size: want.size, maps: wanted.length, MB: onDevice / 1048576, encoded })
+      uploaded.set(name, { size: maps.size, maps: wanted.length, MB: onDevice / 1048576, encoded })
       held.push(maps.albedo, maps.normal, maps.surface)
       ready.value = 1
     }
