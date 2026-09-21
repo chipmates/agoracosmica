@@ -58,6 +58,7 @@ import {
   VIEWPORTS,
   waitForServer,
 } from './rig.mjs'
+import { arrive } from './settle.mjs'
 
 const argv = process.argv.slice(2)
 const flags = argv.filter((a) => a.startsWith('--'))
@@ -87,6 +88,10 @@ const BASE = `http://localhost:${port}`
 const MIN_PX = 4
 /** the DOM settles synchronously, so this is the paint, not the GPU */
 const SETTLE_MS = 260
+/** how long one leg of the rail may take before the walk gives up on it and
+    reads where it stands. The longest measured leg of the wing runs over a
+    minute on the desktop viewport. */
+const ARRIVE_MS = 120000
 
 const say = (line) => {
   if (!JSON_OUT) console.log(line)
@@ -447,6 +452,12 @@ async function walk() {
               errors.push(`${lang}/${vp.tag}/${id}: the frame refused to stand at this station`)
               continue
             }
+            /* A ROOM IS READ WHERE THE WALKER STANDS. Asking the frame for a
+               station walks the rail there and the room dresses on the way,
+               so a fixed wait reads the frame's chrome over a room that is
+               not built yet: no marks, no row, no card to open. */
+            if (!(await arrive(page, id, ARRIVE_MS)))
+              errors.push(`${lang}/${vp.tag}/${id}: the walker never completed the leg to this station`)
             await page.waitForTimeout(SETTLE_MS)
             await readHere(page, `${lang}/${vp.tag}/${id}`, lang)
             say(`  ${lang}/${vp.tag}/${id}`)

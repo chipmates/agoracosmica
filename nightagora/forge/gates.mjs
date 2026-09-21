@@ -84,6 +84,10 @@ const CHECKER_MS = 300000
     checker's five. Past this it is killed: a walk that stands is a gate that
     never ends. Its own guard gives up before this one does. */
 const HONESTY_MS = 1800000
+/** the register walk stands at every station of both viewports in both
+    languages until the room is dressed, so it runs in the honesty walk's
+    minutes and not in a checker's five. */
+const REGISTER_MS = 1800000
 
 /* THE SEALED SPEC, when this checkout is a round's app. It names the wing,
    and the cone corners the judge's packet is owed per station; a checkout
@@ -777,7 +781,7 @@ if (!(await freePort())) {
   register = { ok: false, errors: [`port ${PORT} never freed, the register gate was not run`], offences: [] }
 } else {
   say('  the register gate, on its own server')
-  const run = await json('node', ['forge/register-check.mjs', String(PORT), SURFACE, ...(SLUG ? [SLUG] : []), '--json'], {}, CHECKER_MS)
+  const run = await json('node', ['forge/register-check.mjs', String(PORT), SURFACE, ...(SLUG ? [SLUG] : []), '--json'], {}, REGISTER_MS, true)
   register = run.parsed ?? { ok: false, errors: ['the register check did not answer JSON'], offences: [], raw: run.raw }
 }
 gate(
