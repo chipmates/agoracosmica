@@ -84,6 +84,10 @@ import { roadGradeProvenance } from './road-grade'
 import { apronProvenance } from './apron'
 import { vinciContent, vinciPlanRooms, vinciThroughLine, vinciLifeBands, vinciLifePeople, vinciLifeSecondLine, vinciLifeCut, vinciLifeWorksRow, vinciLifeWorksCount, vinciLifeWorksEmpty, vinciLifeCertaintyCounted, vinciLifeHourMark, vinciHourValues, vinciWelcomeText, vinciLegacyStationIds, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, vinciAbsences, vinciGrounds, vinciRightsPolicy, vinciWingCounts, vinciSourcesHeadings, type VinciCertainty, type VinciStatement, type VinciStationId, type VinciText } from './content'
 import wingCss from './wing.css?inline'
+import { applyDeskSteps, deskOn } from '../desk-switches'
+import { createDeskChrome, type DeskChrome, type DeskStation } from '../desk-chrome'
+import deskCss from '../desk-chrome.css?inline'
+import deskTypeCss from '../desk-type.css?inline'
 
 const text=(value:VinciText):string=>value[lang()]
 /** The painting at the grave: read by its own record, not the hang's register. */
@@ -258,6 +262,10 @@ export function createWing():VinciWingModule {
   /** The sheet's foot, where the frame stands the question, the door and the
    * bar's own words while the stage is narrow. */
   let sheetFoot:HTMLElement|undefined
+  /** The desktop's new chrome, while one of its switches stands. */
+  let desk:DeskChrome|undefined
+  /** How far down the screen a panel of this wing may stand. */
+  let panelFloor:()=>number=()=>innerHeight
   let restoreEnvironmentRotation:(()=>void)|null=null
   const narrow=()=>innerWidth/innerHeight<=.9
   const shadowFocus=new Vector3(NaN,NaN,NaN), focusAhead=new Vector3()
@@ -300,6 +308,24 @@ export function createWing():VinciWingModule {
     // Vinci's interactive source cards need an accessible host only while mounted.
     labelHostHidden=h.labels.getAttribute('aria-hidden');h.labels.removeAttribute('aria-hidden')
     hosts=h;h.stage.textContent='';h.labels.textContent='';h.stage.parentElement!.dataset['wing']='vinci';const style=make('style','');style.textContent=wingCss;h.stage.append(style)
+    // THE DESKTOP'S NEW CHROME, behind its own switches: the attribute is
+    // written once and the stylesheet branches on it, so with every switch
+    // off nothing below this line paints.
+    const wing=h.stage.parentElement!
+    applyDeskSteps(wing)
+    /* HOW FAR DOWN A PANEL MAY STAND. Today that is the top of the bar; where
+       the desktop's words stand, it is the top of their own band. */
+    panelFloor=()=>desk?.floor()??wing.querySelector('.wing-rail-group')?.getBoundingClientRect().top??innerHeight
+    const deskStyle=make('style','');deskStyle.textContent=`${deskTypeCss}\n${deskCss}`;h.stage.append(deskStyle)
+    if(deskOn('words')||deskOn('ways'))desk=createDeskChrome({
+      stage:h.stage,wing,lang,
+      standing:()=>deskStationAt(card),
+      next:()=>card+1<vinciContent.length?deskStationAt(card+1):null,
+      name:id=>vinciContent.find(s=>s.id===id)?.name??{en:'',de:''},
+      words:{next:LIFE_CARDS.controls.date.next,back:LIFE_CARDS.controls.date.previous},
+      go:index=>h.navigate(index),
+      leg:()=>{const nav=standing?rail.navigation:undefined;return nav?.active?nav.legWalked:null},
+      hurry:()=>{if(standing)rail.stride(1)}})
     header=make('div','vinci-heading');header.id='vinci-station-card';h.stage.append(header)
     // THE NAME UNDER THE PAINTING. Standing at a stop with no card, the work
     // carries two sealed words of its own: the title and the year, with the
@@ -447,7 +473,7 @@ export function createWing():VinciWingModule {
     planControl.addEventListener('click',()=>openPlan())
     h.stage.parentElement!.querySelector('.wing-rail-group')!.append(planControl)
     plan=createWingPlan({host:h.labels,lang,narrow,
-      floor:()=>h.stage.parentElement?.querySelector('.wing-rail-group')?.getBoundingClientRect().top??innerHeight,
+      floor:panelFloor,
       title:()=>text(vinciWelcomeText.title),site:planSite,
       standing:()=>vinciContent[card]!.id,stood:()=>visit?.stood??[],
       // THE QUICK SELECT IS THE PRESS THE BAR ALREADY MAKES: every pair is
@@ -466,7 +492,7 @@ export function createWing():VinciWingModule {
     lifeControl.addEventListener('click',()=>openLife())
     h.stage.parentElement!.querySelector('.wing-rail-group')!.append(lifeControl)
     life=createWingLife({host:h.labels,lang,narrow,
-      floor:()=>h.stage.parentElement?.querySelector('.wing-rail-group')?.getBoundingClientRect().top??innerHeight,
+      floor:panelFloor,
       record:lifeRecord,walk:id=>openFromPlan(id),openRecord:openLifeRecord,
       returnFocus:focusTheBar,adopt:()=>lifeAdopt})
     // The window hands the focus back to the control that opened it; on the
@@ -495,7 +521,7 @@ export function createWing():VinciWingModule {
       // A mark stands down while its exhibit is open, so the hand comes back
       // to the row's own button for it, or to the bar.
       returnFocus:id=>strip?.element.querySelector<HTMLElement>(`[data-exhibit="${id}"]`)??hosts?.stage.parentElement?.querySelector<HTMLElement>('.wing-step[aria-current="true"]')??null,
-      floor:()=>h.stage.parentElement?.querySelector('.wing-rail-group')?.getBoundingClientRect().top??innerHeight,
+      floor:panelFloor,
       onOpen:(id,from)=>{
         // ONE EXHIBIT AT A TIME: the room's marks stand down before the
         // stage may be held, so none is left standing on a still frame.
@@ -594,6 +620,9 @@ export function createWing():VinciWingModule {
         const stops=wallRow()
         if((e.key==='Home'||e.key==='End')&&stops.length){e.preventDefault();wallRun(stops[e.key==='Home'?0:stops.length-1]!.exhibit);return}
       }
+      // SPACE IS THE GOLD CONTROL, which the right arrow already presses: one
+      // meaning everywhere. The way back is the left arrow, as it is today.
+      if(desk?.key(e)){e.preventDefault();return}
       if(e.key==='ArrowRight'||e.key==='ArrowDown'){e.preventDefault();h.navigate(station+1)}
       if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();h.navigate(station-1)}
     },options)
@@ -857,7 +886,7 @@ export function createWing():VinciWingModule {
    * so the reader that stands at a date and this view say them from one
    * place and neither keeps a copy. */
   const LIFE_CARDS=JSON.parse(cardsSource) as {floor_honesty:VinciText
-    controls:{shared:{back:VinciText};date:{age:VinciText;age_about:VinciText}}}
+    controls:{shared:{back:VinciText};date:{age:VinciText;age_about:VinciText;next:VinciText;previous:VinciText}}}
   const LIFE_HONESTY=LIFE_CARDS.floor_honesty
   const LIFE_AGE_WORDS={exact:LIFE_CARDS.controls.date.age,about:LIFE_CARDS.controls.date.age_about}
   const SURE_RANK:Record<string,number>={documented:2,inferred:1,tradition:0}
@@ -1787,6 +1816,7 @@ export function createWing():VinciWingModule {
     }
     paintSheet()
     paintExhibitTitle();paintStrip()
+    desk?.paint()
   }
   /** The card names what the frame holds: a sub-view carries its own title.
    * THE NUMBER COUNTS STATIONS. Two frames could otherwise read the same
@@ -1842,6 +1872,10 @@ export function createWing():VinciWingModule {
     const away=Boolean(nav?.exhibit??nav?.approaching)
     kicker.textContent=away||activeView?viewKicker():stationKicker()
   }
+  /** A station as the desktop's chrome addresses it: its id and its place in
+   * the order the rail walks today. The story's own order is Phase 4a's. */
+  const deskStationAt=(index:number):DeskStation=>
+    ({id:vinciContent[index]!.id,index,count:vinciContent.length})
   const stationNumber=()=>String(card+1).padStart(2,'0')
   const stationKicker=()=>`CLOS LUCÉ, 1517 · ${stationNumber()} / ${vinciContent.length}`
   const viewKicker=()=>`CLOS LUCÉ, 1517 · ${lang()==='de'?'BLICK VON STATION':'A VIEW FROM STATION'} ${stationNumber()}`
@@ -2238,6 +2272,7 @@ export function createWing():VinciWingModule {
       // being left; the bar stays. Written on the edge, never every frame.
       const underWay=Boolean(nav.active)
       if(underWay!==legUnderWay){legUnderWay=underWay;hosts.walking(underWay)}
+      desk?.update()
       // THE MARKS AND THE ROW BELONG TO THE STOP THE EYE STANDS AT, so both
       // are taken again the moment it arrives at another one.
       const atWall=wallAt()
@@ -2254,7 +2289,7 @@ export function createWing():VinciWingModule {
       dots?.setFoot(Math.max(0,innerHeight-markFloor()+12))
       dots?.setLimit(closeLook?.id?0:onWallStop()?3:DOTS_PER_TIER[hosts.world.stack.tierName()]??6)
       dots?.update(panels)},
-    stop(){visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;life?.dispose();life=undefined;lifeControl?.remove();lifeControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;house=undefined;houseUp=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
+    stop(){desk?.dispose();desk=undefined;visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;life?.dispose();life=undefined;lifeControl?.remove();lifeControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;house=undefined;houseUp=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
   }
   return wingModule
 }
