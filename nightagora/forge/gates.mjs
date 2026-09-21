@@ -214,6 +214,21 @@ async function walk(page, ms) {
 /** the wing's own address, so a measurement never carries the overture */
 const pageUrl = (tier) => (WING ? `${BASE}/w/${SLUG}?tier=${tier}` : `${BASE}/?tier=${tier}`)
 
+/* THE ENTRANCE SHEET IS NOT THE READING. A wing shows its welcome once per
+   visit over its arrival frame, so every page that opens the wing's own
+   address reads a modal dialog unless the flag the sheet itself keeps is set
+   before the first navigation. */
+async function shutTheWelcome(page) {
+  if (!WING) return
+  await page.addInitScript((flag) => {
+    try {
+      sessionStorage.setItem(flag, '1')
+    } catch {
+      /* a refused store already counts as seen */
+    }
+  }, `${SLUG}-welcome`)
+}
+
 async function stand(page) {
   if (!WING) {
     await page.evaluate(() => window.__forge.jump('agora', {}))
@@ -240,6 +255,7 @@ async function measure(browser, tier, vp) {
     if (m.text().startsWith('rail proof:')) railProof = m.text()
     if (m.type() === 'error') problems.push(`console: ${m.text()}`)
   })
+  await shutTheWelcome(page)
   await page.goto(pageUrl(tier))
   await page.waitForFunction(() => Boolean(window.__forge))
   await page.waitForTimeout(1800)
@@ -337,6 +353,7 @@ async function cones(browser, ids) {
   const dir = join(APP_ROOT, 'forge', 'shots', CONE_DIR)
   mkdirSync(dir, { recursive: true })
   const page = await browser.newPage({ viewport: { width: 1512, height: 950 } })
+  await shutTheWelcome(page)
   await page.goto(pageUrl('hero'))
   await page.waitForFunction(() => Boolean(window.__forge))
   await page.waitForTimeout(1800)
@@ -398,6 +415,7 @@ async function leak(browser) {
   const page = await browser.newPage({ viewport: { width: 1512, height: 950 } })
   const errors = []
   page.on('pageerror', (e) => errors.push(e.message))
+  await shutTheWelcome(page)
   await page.goto(pageUrl('hero'))
   await page.waitForFunction(() => Boolean(window.__forge))
   await page.waitForTimeout(1800)
