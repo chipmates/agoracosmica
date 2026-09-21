@@ -1,6 +1,6 @@
 {
  "note": "the stability ratchet. The sets and the step levels are gated; the per-million counts are recorded and are not.",
- "head": "8db14bca625a91c9caffbea7ed32ee9a3403cd6d",
+ "head": "f1c2a31d029405be21556ed0909ed079e9b2daec",
  "measured": "2026-09-21",
  "viewport": "desktop",
  "deviceScaleFactor": 2,
@@ -18,7 +18,7 @@
  },
  "runs": 3,
  "setFloorPx": 200,
- "stepSlack": 1.25,
+ "gateFloorPx": 2000,
  "class1Pairs": [
   "vinci/collection-modern-insertion/vinci-court-plaque/vinci-court-plaque-made-surface [vinci/collection-rooms/stone] + vinci/collection-modern-insertion/vinci-court-plaque/vinci-court-plaque-made-surface [vinci/collection-rooms/ink]",
   "vinci/collection-modern-insertion/vinci-grave/vinci-grave-made-surface [vinci/collection-rooms/dark] + vinci/collection-modern-insertion/vinci-grave/vinci-grave-made-surface [vinci/collection-rooms/stone]",
@@ -31,7 +31,6 @@
   "vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces] + vinci/collection-modern-insertion/vinci/collection-plates/vinci/collection-plates/last-supper [vinci/pictures/plate/last-supper]",
   "vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces] + vinci/collection-modern-insertion/vinci/collection-plates/vinci/collection-plates/source-shoulder/virgin-of-the-rocks-london [vinci/collection-rooms/surfaces]",
   "vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces] + vinci/collection-modern-insertion/vinci/collection-plates/vinci/collection-plates/source-shoulder/virgin-of-the-rocks-louvre [vinci/collection-rooms/surfaces]",
-  "vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces] + vinci/collection-modern-insertion/vinci/collection-plates/vinci/collection-plates/virgin-of-the-rocks-louvre [vinci/pictures/plate/virgin-of-the-rocks-louvre]",
   "vinci/collection-modern-insertion/vinci/collection/architecture [vinci/collection/three-scale-architecture] + vinci/collection-modern-insertion/vinci/collection-line-floor/vinci/collection-line-floor/vinci/collection-rooms/stone [vinci/collection-rooms/stone]",
   "vinci/collection-modern-insertion/vinci/collection/architecture [vinci/collection/three-scale-architecture] + vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces]",
   "vinci/collection-modern-insertion/vinci/collection/architecture [vinci/collection/three-scale-architecture] + vinci/collection-modern-insertion/vinci/collection/cast-concrete [vinci/collection/filtered-cast-concrete]",
@@ -43,7 +42,6 @@
   "vinci/registered-shell/vinci/shell/iron [vinci/iron] + vinci/registered-shell/vinci/shell/glass [vinci/glass]",
   "vinci/registered-shell/vinci/shell/iron [vinci/iron] + vinci/registered-shell/vinci/shell/glassSky [vinci/glassSky]",
   "vinci/registered-shell/vinci/shell/slate [vinci/slate] + vinci/registered-shell/vinci/shell/lead [vinci/lead]",
-  "vinci/registered-shell/vinci/shell/stone [vinci/stone] + vinci/registered-shell/vinci/shell/glass [vinci/glass]",
   "vinci/registered-shell/vinci/shell/stone [vinci/stone] + vinci/registered-shell/vinci/shell/oak [vinci/oak]",
   "wing-vinci/terrain/wing-vinci/collectionRetaining [vinci/collection/filtered-cast-concrete] + vinci/collection-court-terrace-access/vinci/collection-access/concrete [vinci/collection/filtered-cast-concrete]",
   "wing-vinci/terrain/wing-vinci/collectionRetaining [vinci/collection/filtered-cast-concrete] + vinci/collection-modern-insertion/vinci/collection/architecture [vinci/collection/three-scale-architecture]",
@@ -91,7 +89,6 @@
   "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 22 [vinci October grass and uneven leaf litter] + wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass]",
   "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 23 [vinci October grass and uneven leaf litter] + wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass]",
   "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 24 [vinci October grass and uneven leaf litter] + wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass]",
-  "vinci generated conjectural ground dressing/vinci pale mineral path-edge gravel [vinci pale mineral path-edge gravel] + vinci/collection-modern-insertion/vinci/collection/glazing [vinci/collection/full-height-glazing]",
   "vinci generated conjectural ground dressing/vinci pale mineral path-edge gravel [vinci pale mineral path-edge gravel] + wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass]",
   "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 01 [vinci generated October folded leaves] + mesh 1 [NodeMaterial]",
   "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 02 [vinci generated October folded leaves] + mesh 1 [NodeMaterial]",
@@ -104,6 +101,7 @@
   "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 07 [vinci generated October folded leaves] + nothing (sky)",
   "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 07 [vinci generated October folded leaves] + vinci generated conjectural landscape trees/vinci generated trunks roots and branching limbs cluster 02 [vinci generated bark with longitudinal grain]",
   "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 07 [vinci generated October folded leaves] + wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass]",
+  "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 08 [vinci generated October folded leaves] + mesh 1 [NodeMaterial]",
   "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 09 [vinci generated October folded leaves] + mesh 1 [NodeMaterial]",
   "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 11 [vinci generated October folded leaves] + mesh 1 [NodeMaterial]",
   "vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 11 [vinci generated October folded leaves] + vinci/collection-modern-insertion/vinci/collection/glazing [vinci/collection/full-height-glazing]",
@@ -116,6 +114,7 @@
   "vinci generated inner court dressing/vinci/inner-court/court wear and drainage [MeshStandardNodeMaterial] + wing-vinci/terrain/wing-vinci/earth [wing-vinci/earth]",
   "vinci generated road dressing/vinci/road-dressing/gravel [MeshStandardNodeMaterial] + wing-vinci/terrain/wing-vinci/earth [wing-vinci/earth]",
   "vinci generated road dressing/vinci/road-dressing/straw [MeshStandardNodeMaterial] + wing-vinci/terrain/wing-vinci/earth [wing-vinci/earth]",
+  "vinci/collection-court-terrace-access/vinci/collection-access/concrete [vinci/collection/filtered-cast-concrete] + wing-vinci/terrain/wing-vinci/collectionRetaining [vinci/collection/filtered-cast-concrete]",
   "vinci/collection-modern-insertion/vinci-grave/vinci-grave-made-surface [vinci/collection-rooms/dark] + vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 07 [vinci generated October folded leaves]",
   "vinci/collection-modern-insertion/vinci-grave/vinci-grave-made-surface [vinci/collection-rooms/dark] + vinci/collection-modern-insertion/vinci-grave/vinci-grave-made-surface [vinci/collection-rooms/stone]",
   "vinci/collection-modern-insertion/vinci-grave/vinci-grave-made-surface [vinci/collection-rooms/dark] + vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces]",
@@ -125,10 +124,13 @@
   "vinci/collection-modern-insertion/vinci/collection-line-floor/vinci/collection-line-floor/vinci/collection-rooms/stone [vinci/collection-rooms/stone] + vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces]",
   "vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces] + vinci/collection-modern-insertion/vinci/collection-plates/vinci/collection-plates/last-supper [vinci/pictures/plate/last-supper]",
   "vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces] + vinci/collection-modern-insertion/vinci/collection/architecture [vinci/collection/three-scale-architecture]",
+  "vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces] + vinci/collection-modern-insertion/vinci/collection/glazing [vinci/collection/full-height-glazing]",
+  "vinci/collection-modern-insertion/vinci/collection/architecture [vinci/collection/three-scale-architecture] + vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 07 [vinci generated October folded leaves]",
   "vinci/collection-modern-insertion/vinci/collection/architecture [vinci/collection/three-scale-architecture] + vinci/collection-modern-insertion/vinci/collection-line-floor/vinci/collection-line-floor/vinci/collection-rooms/stone [vinci/collection-rooms/stone]",
   "vinci/collection-modern-insertion/vinci/collection/architecture [vinci/collection/three-scale-architecture] + vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces]",
   "vinci/collection-modern-insertion/vinci/collection/cast-concrete [vinci/collection/filtered-cast-concrete] + vinci/collection-modern-insertion/vinci/collection/architecture [vinci/collection/three-scale-architecture]",
   "vinci/collection-modern-insertion/vinci/collection/cast-concrete [vinci/collection/filtered-cast-concrete] + wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass]",
+  "vinci/collection-modern-insertion/vinci/collection/glazing [vinci/collection/full-height-glazing] + vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces]",
   "vinci/collection-modern-insertion/vinci/parachute/parachute/canopy/canopy:surface [parachute:sealed linen:linen] + vinci/collection-modern-insertion/vinci/collection-rooms/plinths [vinci/collection-rooms/surfaces]",
   "vinci/registered-shell/vinci/shell/brick [vinci/brick] + vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 07 [vinci generated October folded leaves]",
   "vinci/registered-shell/vinci/shell/brick [vinci/brick] + vinci/registered-shell/vinci/shell/stone [vinci/stone]",
@@ -137,6 +139,7 @@
   "vinci/registered-shell/vinci/shell/slate [vinci/slate] + vinci/registered-shell/vinci/shell/lead [vinci/lead]",
   "vinci/registered-shell/vinci/shell/stone [vinci/stone] + vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 07 [vinci generated October folded leaves]",
   "vinci/registered-shell/vinci/shell/stone [vinci/stone] + vinci/registered-shell/vinci/shell/brick [vinci/brick]",
+  "wing-vinci/terrain/wing-vinci/collectionRetaining [vinci/collection/filtered-cast-concrete] + vinci/collection-court-terrace-access/vinci/collection-access/concrete [vinci/collection/filtered-cast-concrete]",
   "wing-vinci/terrain/wing-vinci/earth [wing-vinci/earth] + vinci generated inner court dressing/vinci/inner-court/tread stone [MeshStandardNodeMaterial]",
   "wing-vinci/terrain/wing-vinci/earth [wing-vinci/earth] + vinci generated road dressing/vinci/road-dressing/gutter [MeshStandardNodeMaterial]",
   "wing-vinci/terrain/wing-vinci/earth [wing-vinci/earth] + vinci/collection-modern-insertion/vinci/collection/architecture [vinci/collection/three-scale-architecture]",
@@ -151,182 +154,182 @@
   "arrival": {
    "stepLevels": {
     "min": 0.95,
-    "max": 2.05,
+    "max": 1.92,
     "runs": 3,
     "read": [
      0.95,
-     2.05,
-     1.46
+     1.92,
+     1.44
     ]
    },
    "perMpx": {
     "1": {
      "min": 730,
-     "max": 1597
+     "max": 1527
     },
     "2": {
-     "min": 2249,
-     "max": 7936
+     "min": 2136,
+     "max": 7661
     },
     "3": {
      "min": 2581,
-     "max": 8802
+     "max": 8728
     }
    }
   },
   "courtyard": {
    "stepLevels": {
     "min": 1.09,
-    "max": 2.09,
+    "max": 2.59,
     "runs": 3,
     "read": [
      1.09,
-     1.9,
-     2.09
+     1.89,
+     2.59
     ]
    },
    "perMpx": {
     "1": {
-     "min": 425,
-     "max": 1972
+     "min": 434,
+     "max": 2048
     },
     "2": {
      "min": 37,
-     "max": 6687
+     "max": 6762
     },
     "3": {
-     "min": 1566,
-     "max": 9375
+     "min": 1297,
+     "max": 9694
     }
    }
   },
   "hall": {
    "stepLevels": {
-    "min": 1.07,
-    "max": 2.21,
+    "min": 0.9,
+    "max": 2.24,
     "runs": 3,
     "read": [
      1.96,
-     2.21,
-     1.07
+     2.24,
+     0.9
     ]
    },
    "perMpx": {
     "1": {
-     "min": 112,
-     "max": 1094
+     "min": 111,
+     "max": 1091
     },
     "2": {
-     "min": 41,
+     "min": 48,
      "max": 2064
     },
     "3": {
-     "min": 1084,
-     "max": 15071
+     "min": 1056,
+     "max": 15067
     }
    }
   },
   "oratory": {
    "stepLevels": {
-    "min": 0.81,
+    "min": 0.79,
     "max": 1.12,
     "runs": 3,
     "read": [
      1.12,
-     0.81,
-     0.98
+     0.79,
+     1.07
     ]
    },
    "perMpx": {
     "1": {
      "min": 873,
-     "max": 1681
+     "max": 1933
     },
     "2": {
      "min": 1744,
-     "max": 5562
+     "max": 5786
     },
     "3": {
-     "min": 1626,
+     "min": 1646,
      "max": 9409
     }
    }
   },
   "study": {
    "stepLevels": {
-    "min": 0.75,
-    "max": 2.22,
+    "min": 0.74,
+    "max": 2.16,
     "runs": 3,
     "read": [
-     0.75,
-     0.8,
-     2.22
+     0.74,
+     0.81,
+     2.16
     ]
    },
    "perMpx": {
     "1": {
-     "min": 873,
-     "max": 3519
+     "min": 834,
+     "max": 3565
     },
     "2": {
      "min": 342,
-     "max": 6626
+     "max": 6373
     },
     "3": {
-     "min": 1867,
-     "max": 14896
+     "min": 1842,
+     "max": 13854
     }
    }
   },
   "chamber": {
    "stepLevels": {
-    "min": 0.86,
-    "max": 2.8,
+    "min": 0.83,
+    "max": 2.79,
     "runs": 3,
     "read": [
-     1.46,
-     0.86,
-     2.8
+     1.45,
+     0.83,
+     2.79
     ]
    },
    "perMpx": {
     "1": {
-     "min": 236,
-     "max": 906
+     "min": 294,
+     "max": 886
     },
     "2": {
-     "min": 496,
-     "max": 4759
+     "min": 500,
+     "max": 4870
     },
     "3": {
-     "min": 2990,
-     "max": 20486
+     "min": 3241,
+     "max": 20430
     }
    }
   },
   "garden": {
    "stepLevels": {
-    "min": 1.84,
-    "max": 2.26,
+    "min": 1.85,
+    "max": 2.21,
     "runs": 3,
     "read": [
      1.85,
-     1.84,
-     2.26
+     1.85,
+     2.21
     ]
    },
    "perMpx": {
     "1": {
-     "min": 654,
-     "max": 2895
+     "min": 605,
+     "max": 3423
     },
     "2": {
      "min": 1367,
-     "max": 5523
+     "max": 5756
     },
     "3": {
      "min": 8524,
-     "max": 18763
+     "max": 17000
     }
    }
   },
@@ -343,224 +346,224 @@
    },
    "perMpx": {
     "1": {
-     "min": 201,
+     "min": 186,
      "max": 1070
     },
     "2": {
-     "min": 9,
-     "max": 5009
+     "min": 15,
+     "max": 5319
     },
     "3": {
-     "min": 93,
-     "max": 7603
+     "min": 114,
+     "max": 7670
     }
    }
   },
   "picture-room-west": {
    "stepLevels": {
     "min": 0.71,
-    "max": 2.55,
+    "max": 2.57,
     "runs": 3,
     "read": [
-     2.55,
+     2.57,
      0.71,
-     2.17
+     2.2
     ]
    },
    "perMpx": {
     "1": {
-     "min": 433,
-     "max": 855
+     "min": 436,
+     "max": 836
     },
     "2": {
-     "min": 346,
-     "max": 3571
+     "min": 344,
+     "max": 3559
     },
     "3": {
-     "min": 1912,
-     "max": 9938
+     "min": 1863,
+     "max": 10699
     }
    }
   },
   "flight": {
    "stepLevels": {
     "min": 1.54,
-    "max": 2.48,
+    "max": 2.46,
     "runs": 3,
     "read": [
-     2.48,
+     2.46,
      1.54,
-     1.82
+     1.78
     ]
    },
    "perMpx": {
     "1": {
-     "min": 627,
-     "max": 1716
+     "min": 604,
+     "max": 1339
     },
     "2": {
-     "min": 2611,
-     "max": 8446
+     "min": 2911,
+     "max": 8376
     },
     "3": {
-     "min": 5169,
-     "max": 11378
+     "min": 5061,
+     "max": 11012
     }
    }
   },
   "works": {
    "stepLevels": {
-    "min": 1.27,
-    "max": 2.2,
+    "min": 1.28,
+    "max": 2.21,
     "runs": 3,
     "read": [
-     2.2,
-     1.27,
-     1.86
+     2.21,
+     1.28,
+     1.83
     ]
    },
    "perMpx": {
     "1": {
-     "min": 612,
-     "max": 2781
+     "min": 573,
+     "max": 2656
     },
     "2": {
-     "min": 3710,
-     "max": 10229
+     "min": 3717,
+     "max": 9250
     },
     "3": {
-     "min": 7432,
-     "max": 10282
+     "min": 7517,
+     "max": 10146
     }
    }
   },
   "line-early": {
    "stepLevels": {
-    "min": 1.06,
-    "max": 2.16,
+    "min": 1.08,
+    "max": 2.07,
     "runs": 3,
     "read": [
-     2.16,
-     1.06,
-     1.09
+     2.07,
+     1.14,
+     1.08
     ]
    },
    "perMpx": {
     "1": {
-     "min": 1469,
-     "max": 2362
+     "min": 1425,
+     "max": 2462
     },
     "2": {
-     "min": 3717,
-     "max": 9641
+     "min": 3629,
+     "max": 9217
     },
     "3": {
-     "min": 4656,
-     "max": 13094
+     "min": 4539,
+     "max": 12892
     }
    }
   },
   "body": {
    "stepLevels": {
-    "min": 0.81,
-    "max": 0.91,
+    "min": 0.74,
+    "max": 0.86,
     "runs": 3,
     "read": [
+     0.74,
      0.81,
-     0.84,
-     0.91
+     0.86
     ]
    },
    "perMpx": {
     "1": {
-     "min": 4,
-     "max": 297
+     "min": 3,
+     "max": 301
     },
     "2": {
-     "min": 16,
-     "max": 521
+     "min": 13,
+     "max": 530
     },
     "3": {
-     "min": 2339,
-     "max": 2539
+     "min": 2092,
+     "max": 2671
     }
    }
   },
   "reading-table": {
    "stepLevels": {
-    "min": 0.64,
-    "max": 1.38,
+    "min": 0.65,
+    "max": 1.36,
     "runs": 3,
     "read": [
-     0.64,
-     0.93,
-     1.38
+     0.65,
+     0.99,
+     1.36
     ]
    },
    "perMpx": {
     "1": {
-     "min": 31,
-     "max": 488
+     "min": 28,
+     "max": 478
     },
     "2": {
      "min": 83,
-     "max": 741
+     "max": 765
     },
     "3": {
-     "min": 1590,
-     "max": 3834
+     "min": 1800,
+     "max": 3732
     }
    }
   },
   "supper-wall": {
    "stepLevels": {
-    "min": 0.98,
-    "max": 3.06,
+    "min": 0.8,
+    "max": 3.08,
     "runs": 3,
     "read": [
-     0.98,
-     3.06,
-     1.12
+     0.8,
+     3.08,
+     1.19
     ]
    },
    "perMpx": {
     "1": {
-     "min": 182,
-     "max": 1769
+     "min": 222,
+     "max": 1750
     },
     "2": {
-     "min": 31,
-     "max": 1227
+     "min": 28,
+     "max": 1232
     },
     "3": {
-     "min": 1396,
-     "max": 3399
+     "min": 1340,
+     "max": 2895
     }
    }
   },
   "grave": {
    "stepLevels": {
-    "min": 0.77,
-    "max": 2.29,
+    "min": 0.47,
+    "max": 2.2,
     "runs": 3,
     "read": [
-     1.83,
-     2.29,
-     0.77
+     1.76,
+     2.2,
+     0.47
     ]
    },
    "perMpx": {
     "1": {
-     "min": 156,
-     "max": 1540
+     "min": 167,
+     "max": 1566
     },
     "2": {
-     "min": 31,
-     "max": 3276
+     "min": 34,
+     "max": 3177
     },
     "3": {
-     "min": 1997,
-     "max": 5863
+     "min": 1899,
+     "max": 5556
     }
    }
   }

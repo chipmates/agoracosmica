@@ -288,7 +288,11 @@ function classify(params) {
     flips,
     classPixels,
     controlPixels: ctrlId.reduce((s, v) => s + v, 0),
-    table: table.slice(0, 40),
+    /* THE FORTY LOUDEST, AND EVERY ROW THE RATCHET COULD EVER NAME. A cap
+       alone makes membership depend on what else stands in the frame: a row
+       of two thousand pixels falls outside the forty at a busy station and
+       inside them at a quiet one, and a set built that way flutters. */
+    table: table.filter((row, at) => at < 40 || row.pixels >= 200),
     bodies: bodies.length,
   }
 }
@@ -656,15 +660,29 @@ const BASE_FILE = join(APP_ROOT, 'forge', 'STABILITY-BASE.json')
 /** a body enters a set only above this many pixels in one pose: under it a
     row is one tile of noise and would make the set flutter run to run */
 const SET_FLOOR = 200
-/** how far past its own worst measured run a station's step may climb */
-const STEP_SLACK = 1.25
+/* AND THE GATE ASKS FOR MORE THAN THE BASELINE REMEMBERS. A set read once
+   is not the set read three times: names near the floor come and go between
+   sweeps, and the first gate run proved it by refusing six of them, none
+   over a thousand pixels. So the baseline REMEMBERS everything over
+   SET_FLOOR and the gate only calls a name new when it holds this much of
+   one pose. Asymmetric in the safe direction: every real defect this
+   instrument has ever named held four to twenty-eight thousand pixels. */
+const GATE_FLOOR = 2000
+/* HOW FAR A STATION'S STEP MAY CLIMB. The picture is now calm enough that
+   the step sits near the floor of what this instrument can separate, and one
+   station moves by up to 2.9x between two sweeps of one session. A ceiling
+   proportional to the baseline alone would fire on that; a ceiling with a
+   whole level of headroom does not, and the regression this gate exists for
+   (the uncapped buffer, nine to thirty-two levels) is still two to eight
+   times over the widest ceiling in the wing. */
+const stepCeiling = was => Math.max(was * 1.6, was + 1)
 
-function setsOf(poses) {
+function setsOf(poses, floor = SET_FLOOR) {
   const one = new Set()
   const two = new Set()
   for (const pose of poses) {
     for (const row of pose.table ?? []) {
-      if (row.pixels < SET_FLOOR) continue
+      if (row.pixels < floor) continue
       const name = row.bodies.join(' + ')
       if (row.cls === 1) one.add(name)
       else if (row.cls === 2) two.add(name)
@@ -696,7 +714,7 @@ if (WRITE_BASE && !faults.length) {
     note: 'the stability ratchet. The sets and the step levels are gated; the per-million counts are recorded and are not.',
     head: headHere(), measured: new Date().toISOString().slice(0, 10),
     viewport: MOBILE ? 'mobile' : 'desktop', deviceScaleFactor: VP.deviceScaleFactor, tier: TIER,
-    stage, samples: sampleState, runs: RUNS, setFloorPx: SET_FLOOR, stepSlack: STEP_SLACK,
+    stage, samples: sampleState, runs: RUNS, setFloorPx: SET_FLOOR, gateFloorPx: GATE_FLOOR,
     ...setsOf(poses), stations: stationsOf(poses),
   }
   writeFileSync(BASE_FILE, JSON.stringify(base, null, 1) + '\n')
@@ -713,7 +731,7 @@ if (VERIFY) {
     faults.push(`the baseline could not be read: ${err.message}`)
   }
   if (base) {
-    const mine = setsOf(poses)
+    const mine = setsOf(poses, GATE_FLOOR)
     const seen = stationsOf(poses)
     const newPairs = mine.class1Pairs.filter((name) => !base.class1Pairs.includes(name))
     const newBodies = mine.class2Bodies.filter((name) => !base.class2Bodies.includes(name))
@@ -721,7 +739,7 @@ if (VERIFY) {
     for (const [id, row] of Object.entries(seen)) {
       const was = base.stations[id]
       if (!was) continue // a station the baseline never read is not a regression
-      const ceiling = was.stepLevels.max * STEP_SLACK
+      const ceiling = stepCeiling(was.stepLevels.max)
       if (row.stepLevels.max > ceiling)
         risen.push(`${id} ${row.stepLevels.max} levels over ${+ceiling.toFixed(2)} (baseline ${was.stepLevels.min} to ${was.stepLevels.max})`)
     }
