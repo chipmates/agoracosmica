@@ -27,7 +27,15 @@ const args = process.argv.slice(2)
 const ALL = args.includes('--all')
 const AREA_MIN = Number(args[args.indexOf('--area') + 1]) || 0.01
 /** a plane is one plane when two faces lie within this of it */
-const BED = 0.002
+/* AND NEARLY ONE PLANE IS THE SAME DEFECT AT A DISTANCE. Two faces two
+   millimetres apart share a plane here; two faces twenty millimetres apart
+   share one on the SCREEN as soon as the depth buffer cannot separate them,
+   which is what a comb of stripes along a junction is. `--near <mm>` widens
+   the bed to the depth resolution the eye actually has at that range, and the
+   measured gap is reported with every pair, so a reading is never confused
+   with the exactly shared case. */
+const NEAR_MM = Number(args[args.indexOf('--near') + 1]) || 0
+const BED = NEAR_MM > 0 ? NEAR_MM / 1000 : 0.002
 const source = relative => fs.readFileSync(path.join(root, relative), 'utf8')
 /** Every three.js addon the wing's own sources import, resolved once up front:
  * the module loader below is synchronous and cannot await one. */
