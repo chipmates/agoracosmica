@@ -165,6 +165,17 @@ if ((data.links ?? []).length !== requiredLinks || matchedLinks !== requiredLink
 const geometryToleranceM = .000002
 export { collectRailSolids, railCollisionIds } from './rail-solids'
 
+/** Which proof carried the mounted geometry: the exact hash, the certified
+ * signature within its tolerance, or none, in which case nothing walks. */
+export type RailProofKind = 'hash' | 'signature' | 'none'
+/* `crypto.subtle` exists in a secure context only (https, or localhost), so a
+   page served to a LAN address over plain http can compute no hash at all and
+   the walk would fall silently back to placing the camera. There the
+   certificate's tolerant signature carries it instead, which is arithmetic
+   over the same certified solids. On a secure page the hash is tried first
+   and no tolerance moves. */
+const canHash = typeof crypto !== 'undefined' && typeof (crypto as { subtle?: SubtleCrypto }).subtle?.digest === 'function'
+
 function sameSavedPose(saved: SavedPose, pose: Pose) {
   return samePose(saved, toSaved(pose))
 }
@@ -174,11 +185,11 @@ function sameSavedPose(saved: SavedPose, pose: Pose) {
  * remains at its previous endpoint. A mismatch requires a fresh offline audit.
  */
 export function createRailGeometryAuthority(roots: readonly Object3D[]) {
-  let status: 'checking' | 'verified' | 'failed' = 'checking', failure = ''
-  const ready = railGeometryFingerprint(roots).then(async hash => {
+  let status: 'checking' | 'verified' | 'failed' = 'checking', failure = '', proof: RailProofKind = 'none'
+  const ready = (canHash ? railGeometryFingerprint(roots) : Promise.resolve('')).then(async hash => {
     // the exact hash first; failing that, the engine-tolerant identity: the
     // certified solids by name, count, extent and moments within 10 um
-    const exact = data.geometrySha256.includes(hash)
+    const exact = canHash && data.geometrySha256.includes(hash)
     let deviation = ''
     const tolerant = !exact && (() => {
       const actual = railGeometrySignature(roots)
@@ -202,12 +213,24 @@ export function createRailGeometryAuthority(roots: readonly Object3D[]) {
       return false
     })()
     if (!exact && !tolerant) {
+      // the per mesh breakdown is itself hashed, so a page that cannot hash
+      // is refused on the signature alone rather than on a TypeError
+      if (!canHash) throw new Error(`Vinci rail geometry has no matching certified signature, and this page cannot hash: ${deviation}`)
       const detail = await railGeometryFingerprintBreakdown(roots)
       const meshes = detail.meshes.map(mesh => [mesh.name, mesh.manifestId, mesh.vertices, mesh.sha256.slice(-16)])
       throw new Error(`Vinci rail geometry has no matching clearance certificate: ${hash}; tolerant signature: ${deviation}; actual mesh records [name, manifestId, vertices, SHA256 suffix]: ${JSON.stringify(meshes)}; repeated geometry hash: ${detail.sha256}`)
     }
+    proof = exact ? 'hash' : 'signature'
     status = 'verified'
-  }).catch(error => { status = 'failed'; failure = String(error); console.error(failure) })
+    // one line, so a walk that cannot be proved is read and not guessed at
+    if (exact) console.log('rail proof: the exact geometry hash')
+    else if (canHash) console.log('rail proof: the certified signature, inside its tolerance')
+    else console.warn('rail proof: the certified signature, inside its tolerance. This page is not secure, so it has no way to hash the geometry (that needs https or localhost). The strict hash on a secure page is unchanged.')
+  }).catch(error => {
+    status = 'failed'; failure = String(error); proof = 'none'
+    console.error(failure)
+    console.warn('rail proof: none, so the wing places the camera at each station instead of walking it')
+  })
   const paths = new Map<SavedRoute, ReturnType<typeof createCertifiedRailPath>>()
   type Certified = ReturnType<typeof createCertifiedRailPath>
   const approachPaths = new Map<SavedApproach, { out?: Certified; back?: Certified }>()
@@ -241,6 +264,7 @@ export function createRailGeometryAuthority(roots: readonly Object3D[]) {
     ready,
     get status() { return status },
     get failure() { return failure },
+    get proof() { return proof },
     route(from: Pose, to: Pose, phone: boolean, camera: PerspectiveCamera) {
       if (status !== 'verified') throw new Error(failure || 'Rail clearance identity is still being checked')
       assertRailProjection(camera)

@@ -225,10 +225,15 @@ async function measure(browser, tier, vp) {
     deviceScaleFactor: vp.deviceScaleFactor,
   })
   let firstLine = ''
+  /* which proof the wing's rail ran on. A walk that cannot prove its
+     geometry does not walk, it places, and that is a silent loss of the
+     museum's whole motion unless a line says so. */
+  let railProof = ''
   const problems = []
   page.on('pageerror', (e) => problems.push(`pageerror: ${e.message}`))
   page.on('console', (m) => {
     if (m.text().startsWith('backend=')) firstLine = m.text()
+    if (m.text().startsWith('rail proof:')) railProof = m.text()
     if (m.type() === 'error') problems.push(`console: ${m.text()}`)
   })
   await page.goto(pageUrl(tier))
@@ -295,7 +300,7 @@ async function measure(browser, tier, vp) {
   const unsteady = Object.entries(stations)
     .filter(([, c]) => c.steady?.held === false)
     .map(([id]) => id)
-  return { tier, viewport: vp.tag, adapter, backend: stamp.backend, cost: worst, walk: walked, warm, refresh, unsteady, stations, missed, problems, ids }
+  return { tier, viewport: vp.tag, adapter, backend: stamp.backend, cost: worst, walk: walked, warm, refresh, unsteady, stations, missed, problems, ids, railProof }
 }
 
 /** one tier, said in full: the settled numbers, what the scene cost before
@@ -515,6 +520,16 @@ gate('tier budgets', overBudget.length === 0 && Object.keys(tiers).length === 4,
 let motion = null
 let wingChecks = null
 if (WING) {
+  /* THE PROOF THE WALK RAN ON. The rail only walks a certified path, so a
+     proof that did not resolve turns every leg into a jump with nothing on
+     screen to say why. The wing says which proof carried it, once, and the
+     line carries that sentence. */
+  const proofs = [...new Set(Object.values(tiers).map((r) => r.railProof).filter(Boolean))]
+  gate(
+    'the rail\'s proof',
+    proofs.length === 1 && !proofs[0].includes('none'),
+    proofs.join(' | ') || 'the wing said nothing about which proof ran'
+  )
   gate(
     'every station stood at',
     stationIds.length > 0 && missedStations.length === 0,
