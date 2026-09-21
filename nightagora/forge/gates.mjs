@@ -782,15 +782,13 @@ let flicker = null
    the ratio-one reading. It is measured and never decides a run. */
 let retina = null
 if (SURFACE === 'wing' && SLUG) {
-  const four = SPEC_CONES ? Object.keys(SPEC_CONES).slice(0, 4) : []
   if (!(await freePort())) {
     retina = { error: `port ${PORT} never freed, the retina reading was not taken` }
   } else {
-    say("  the stability audit, at the visitor's device ratio")
+    say("  the stability ratchet, at the visitor's device ratio")
     const run = await json(
       'node',
-      ['forge/stability-audit.mjs', String(PORT), SLUG, '--json', '--dpr', '2', '--no-maps', '--first', '4',
-       ...(four.length ? ['--stations', four.join(',')] : [])],
+      ['forge/stability-audit.mjs', String(PORT), SLUG, '--json', '--dpr', '2', '--no-maps', '--rotate', '4', '--verify'],
       {},
       RETINA_MS
     )
@@ -805,7 +803,18 @@ if (SURFACE === 'wing' && SLUG) {
   const stage = retina?.samples
     ? `ratio ${retina.samples.pixelRatio}, ${retina.samples.allocated} sample(s) allocated of ${retina.samples.asked} asked`
     : 'the stage was not read'
-  warn('retina flicker', poses.length > 0 && !retina?.error, retina?.error ? retina.error : `${stage} | ${said || 'no pose was read'}`)
+  const r = retina?.ratchet
+  const verdict = r
+    ? r.ok
+      ? `RATCHET ok against ${String(r.base).slice(0, 7)}`
+      : `RATCHET RED: ${[...r.newClass1Pairs.map((n) => `new class 1 pair ${n}`), ...r.newClass2Bodies.map((n) => `new class 2 body ${n}`), ...r.risenSteps.map((n) => `step risen at ${n}`)].join('; ')}`
+    : 'the ratchet did not run'
+  /* A GATE, NOT A WARNING. The counts are read and never compared; what
+     decides the run is the SET of bodies the classes name and the step in
+     levels at a boundary, both of which repeat. A seat that improves a
+     station writes the baseline again in the same commit, by its own flag. */
+  gate('retina flicker', Boolean(poses.length && !retina?.error && r?.ok),
+    retina?.error ? retina.error : `${verdict} | ${stage} | ${said || 'no pose was read'}`)
 }
 
 /* THE HONESTY WALK, THE STATIONS ONLY. Opening every close look reads ten
