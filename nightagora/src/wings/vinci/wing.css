@@ -272,10 +272,6 @@
 .vinci-strip[data-dock='foot'] {left:24px;right:auto;top:auto !important;bottom:calc(var(--wing-rail-bottom) + 60px);
   width:auto !important;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:0 10px;
   padding:8px 10px 7px;}
-/* A ROW THAT IS NOT PAINTED IS NOT THERE IN ANY DOCK. The dock's own display
-   stands later in this file at the same weight, so without this a station
-   with nothing to show kept an empty panel at the foot. */
-.vinci-strip[data-dock][hidden] {display:none;}
 .vinci-strip[data-dock='foot'] .vinci-strip-walk {grid-column:1;grid-row:1;}
 .vinci-strip[data-dock='foot'] .vinci-strip-item {width:72px;height:72px;
   transition:width .16s cubic-bezier(.22,.61,.36,1),height .16s cubic-bezier(.22,.61,.36,1);}
