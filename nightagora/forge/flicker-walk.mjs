@@ -167,6 +167,20 @@ const HOLD_FRAMES = 90
 /* the ceiling is real seconds, and one frame at a time the same leg takes
    several times as long in real seconds as it does on the wall clock */
 const LEG_CEILING_MS = flag('ahead') && value('ahead', '3') === '1' ? 180_000 : 40_000
+/* THE OTHER WAY A VISITOR MOVES THE PICTURE. He presses the next mark and
+   the rail carries him, and he also STANDS AND DRAGS THE GAZE. A held gate
+   reads a still camera and a walking eye reads a moving body; a swept look is
+   neither, and on a floor read at a grazing angle it is the harder test: the
+   pixel's footprint turns without the eye travelling. `--drag <station>`
+   stands at the station and sweeps the look with the page's own pointer
+   input, which is the visitor's own path and not a pose written from
+   outside. */
+const DRAG_AT = value('drag', '')
+const DRAG_STEPS = Math.max(10, Number(value('drag-steps', '90')) || 90)
+const DRAG_PX = Number(value('drag-px', '2')) || 2
+const DRAG_WAIT_MS = Number(value('drag-wait', '25')) || 25
+/** the pace the visitor set, written to the device before the page opens */
+const PACE = value('pace', '')
 /** the pose has stood when it has not moved for this many frames */
 const STAND_FRAMES = 10
 const STAND_CEILING_MS = 30_000
@@ -1210,6 +1224,8 @@ async function openPage(browser, url) {
     if (document.body) mark()
     else document.addEventListener('DOMContentLoaded', mark)
   })
+  // the pace is the visitor's own and lives on the device
+  if (PACE) await page.addInitScript((p) => { try { localStorage.setItem('na-gait-pace', p) } catch { /* the default walks */ } }, PACE)
   await page.goto(url)
   await page.waitForFunction(() => Boolean(window.__forge))
   await page.waitForTimeout(2000)
@@ -1265,6 +1281,35 @@ async function walkLeg(page, client, from, to, name, keepPairs) {
   const seconds = +((Date.now() - began) / 1000).toFixed(2)
   const run = await readRun(name, join(RAW, name), times, rec.samples, rec.origin, keepPairs, heldFrom, rec.probeKeys)
   return { leg: `${from} to ${to}`, name, stoodAt, seconds, gate: even, staleEmissions: stale, ...run }
+}
+
+/** stand at a station and sweep the look, with the page's own pointer */
+async function dragLook(page, client, at, name, keepPairs) {
+  const took = await page.evaluate((s) => window.__forge.station?.(s) ?? false, at)
+  if (!took) return { drag: at, error: `the frame would not stand at ${at}` }
+  await waitForStand(page)
+  await page.waitForTimeout(ARRIVED_SETTLE_MS)
+  await page.evaluate(() => window.__forge.grain?.(false))
+  await page.waitForTimeout(300)
+  const cast = castToDisk(page, client, join(RAW, name))
+  await startRecorder(page)
+  await cast.start()
+  const began = Date.now()
+  const x0 = Math.round(VP.width / 2), y0 = Math.round(VP.height / 2)
+  await page.mouse.move(x0, y0)
+  await page.mouse.down()
+  // across and a little down: the sweep a visitor makes to read a floor
+  for (let i = 1; i <= DRAG_STEPS; i++) {
+    await page.mouse.move(x0 - i * DRAG_PX, y0 - Math.round(i * DRAG_PX * 0.18))
+    await page.waitForTimeout(DRAG_WAIT_MS)
+  }
+  await page.mouse.up()
+  await page.waitForTimeout(600)
+  const { times, even, heldFrom, stale } = await cast.stop()
+  const rec = await stopRecorder(page)
+  const seconds = +((Date.now() - began) / 1000).toFixed(2)
+  const run = await readRun(name, join(RAW, name), times, rec.samples, rec.origin, keepPairs, heldFrom, rec.probeKeys)
+  return { leg: `the look swept at ${at}`, drag: at, name, seconds, gate: even, staleEmissions: stale, ...run }
 }
 
 /** the same eye, the same length, nobody walking: the instrument's own floor.
@@ -1348,7 +1393,22 @@ try {
         `${control.events} event(s), spread p99 ${control.spread.p99}, ${control.aim ? `${control.aim.tilesPerFrame.median} tile(s) aimed` : 'whole frame'}`
   )
 
-  for (let pass = 1; pass <= RUNS; pass++)
+  for (let pass = 1; pass <= RUNS && DRAG_AT; pass++) {
+    const run = await dragLook(page, client, DRAG_AT, `${TAG}-drag-${DRAG_AT}${RUNS > 1 ? `-run${pass}` : ''}`, pairs)
+    run.pass = pass
+    runs.push(run)
+    if (run.error) { flags.push(`${run.drag}: ${run.error}`); say(`  drag at ${run.drag}: ${run.error}`); continue }
+    say(
+      `  the look swept at ${run.drag}${RUNS > 1 ? ` run ${pass}` : ''}: ${run.frames} frames at ${run.fps} fps` +
+        `${run.virtualFrames === null ? '' : `, ${run.virtualFrames} of the even clock`}, ` +
+        `the eye moved ${run.eyeStepMm.median} mm a frame, ${run.events} event(s) (${run.eventsPer100} per 100 frames) ` +
+        `over ${run.eventTiles} tile(s), spread median ${run.spread.median} p99 ${run.spread.p99}` +
+        `${run.aim ? ` over ${run.aim.tilesPerFrame.median} tile(s) a frame` : ''}`
+    )
+    for (const r of run.regions.slice(0, 3))
+      say(`    · spread region ${r.tiles} tiles at [${r.at}] box [${r.box}], mean ${r.meanSpread}, peak ${r.peakSpread}`)
+  }
+  for (let pass = 1; pass <= RUNS && !DRAG_AT; pass++)
   for (const [from, to] of LEGS) {
     for (const [a, b] of flag('back') || flag('all') ? [[from, to], [to, from]] : [[from, to]]) {
       const run = await walkLeg(page, client, a, b, `${TAG}-${a}-to-${b}${RUNS > 1 ? `-run${pass}` : ''}`, pairs)
