@@ -85,6 +85,8 @@ const EXHIBITS = [
   { id: 'machine/rolling-mill', kind: 'machine', station: 'works' },
   { id: 'machine/lathe', kind: 'machine', station: 'works' },
   { id: 'machine/water-lifting-screw', kind: 'machine', station: 'works' },
+  // The house's one piece of the collection, on the hall's own ledge.
+  { id: 'machine/proportional-compass', kind: 'machine', station: 'hall' },
   { id: 'grave', kind: 'place', station: 'grave' },
   { id: 'grave-diagram', kind: 'place', station: 'grave' },
   { id: 'codex/paris-B', kind: 'manuscript', station: 'reading-table' },

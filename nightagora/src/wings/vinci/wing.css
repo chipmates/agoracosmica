@@ -243,7 +243,10 @@
    saying where along thirty four metres the eye stands. */
 .vinci-strip {position:fixed;left:46px;display:flex;flex-direction:column;gap:5px;margin:0;padding:6px;box-sizing:border-box;
   max-width:min(620px,calc(100vw - 92px));background:#101d27e6;border:1px solid #a9977344;pointer-events:auto;}
-.vinci-strip[hidden] {display:none;}
+/* A ROW WITH NOTHING IN IT DOES NOT STAND. The docked row sets its own
+   display, which a bare [hidden] rule cannot beat, so the hidden state is
+   matched on the dock as well. */
+.vinci-strip[hidden], .vinci-strip[data-dock][hidden] {display:none;}
 .vinci-strip-row {display:flex;gap:6px;margin:0;padding:0;list-style:none;
   overflow-x:auto;overscroll-behavior:contain;scrollbar-width:thin;}
 .vinci-strip-row li {flex:0 0 auto;}

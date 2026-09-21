@@ -673,11 +673,19 @@ export function createWing():VinciWingModule {
   /** AN EXHIBIT'S NAME IN BOTH LANGUAGES, from the module that owns its kind.
    * Two kinds publish one language only, and there their own record is the
    * title in both columns rather than a second one being invented. */
+  /** THE CODEX A PICK STANDS FOR: the shelf's own record, whether the pick is
+   * the bound book or one admitted leaf of it. A leaf carries its codex in its
+   * own stem, `leaf/paris-B-83v`, so one lookup names both. */
+  function pickCodex(id:string) {
+    const stem=id.startsWith('leaf/')?id.slice('leaf/'.length).replace(/-\d+[rv]$/,'')
+      :id.startsWith('codex/')?id.slice('codex/'.length):''
+    return stem?CODEX_ENTRIES.find(entry=>entry.id===stem):undefined
+  }
   function exhibitTitleBi(pick:VinciPickEntry):VinciText|null {
     if(pick.kind==='machine'){const slug=pick.id.slice('machine/'.length);return isMachineSlug(slug)?machineCatalog[slug].title:null}
     if(pick.id===LINE_FLOOR_PICK){const here=vinciContent.find(entry=>entry.id===pick.station);return here?here.name:null}
     if(pick.kind==='stud'){const stud=LINE_STUDS[vinciStudIndex(pick.id)];return stud?{en:stud.date_label_en,de:stud.date_label_de}:null}
-    if(pick.kind==='manuscript'){const codex=CODEX_ENTRIES.find(entry=>`codex/${entry.id}`===pick.id);return codex?{en:codex.en,de:codex.de}:null}
+    if(pick.kind==='manuscript'){const codex=pickCodex(pick.id);return codex?{en:codex.en,de:codex.de}:null}
     if(pick.kind==='place'||pick.workId===DEATHBED_WORK){const named=namedExhibit(pick);return named?{en:named.title,de:named.title}:null}
     const found=(exhibits?.pictureSources()??[]).find(source=>source.work.id===pick.workId)
     if(!found)return null
@@ -1016,12 +1024,27 @@ export function createWing():VinciWingModule {
     }if(id==='scene')endInspection();if(id==='scene'||id.startsWith('audit-'))rail.look(0,0);if(id==='scene'||id==='audit-cost'){mode=1;paintDock()}if(id==='audit-cost')measurement.show(s.id);if(id==='audit-ui'){mode=1;paintDock();measurement.show(s.id,'ui')}if(id==='audit-ui-labels'){mode=2;paintDock();measurement.show(s.id,'ui')}if(id.startsWith('collection-room')||id.startsWith('collection-hang'))exhibits?.warm()
     const pose=namedPose(id,narrow())??collectionView(id,narrow());if(pose){activeView=id;mode=1;paintDock();rail.set(s.id,pose,true,narrow());header.querySelector('.vinci-insertion')?.remove();titleForView(id);if(id.startsWith('collection')&&!s.built&&!vinciStandsInRoom(s.id))header.append(make('p','vinci-insertion',lang()==='de'?'Museumseinbau der Gegenwart · Räume im Bau':'Modern museum insertion · Rooms in construction'))}const cone=/(?:^|-)cone-(ul|ur|dl|dr)$/.exec(id);if(cone){placeCanonicalStation();rail.look(cone[1]!.includes('l')?.6:-.6,cone[1]!.startsWith('u')?.32:-.32)}if(id==='labels'||id==='hour'||id==='record'){sources.select(id==='hour'?'wing':'station');mode=2;paintDock();if(id==='record'){if(record.hidden)dock.querySelector<HTMLButtonElement>('.vinci-record-toggle')?.click();dock.scrollTop=record.offsetTop-(dock.querySelector('.vinci-sources-toolbar')?.getBoundingClientRect().height??0)-18}}if(inspectCost&&(pose||cone))measurement.show(`${s.id} / ${id}`)
   }
+  /** ONE ENTRY PER EXHIBIT ID. One exhibit of this museum can stand as more
+   * than one body in the scene, and the registry is what the row, the marks
+   * and a press read: it keeps the body this exhibit's own certified eye is
+   * aimed at, so one thing is one cell and the press walks the leg the
+   * certificate holds. */
+  function oneBodyPerExhibit(entries:VinciPickEntry[]):VinciPickEntry[] {
+    const kept=new Map<string,VinciPickEntry>()
+    for(const entry of entries) {
+      const held=kept.get(entry.id)
+      if(!held){kept.set(entry.id,entry);continue}
+      const aim=vinciApproachPose(entry.id,false)?.at
+      if(aim&&entry.centre.distanceTo(aim)<held.centre.distanceTo(aim))kept.set(entry.id,entry)
+    }
+    return [...kept.values()]
+  }
   /** THE REGISTRY IS A READ, so it is taken again whenever the scene it reads
    * could have changed: when the room's own sources have landed, and when a
    * tier change remounts the plates under new meshes. */
   function refreshExhibits():void {
     if(!hosts||!collectionRoot)return
-    picks=[...readVinciExhibits(collectionRoot),...(houseRoot?readVinciExhibits(houseRoot):[]),...(courtRoot?readVinciExhibits(courtRoot):[])]
+    picks=oneBodyPerExhibit([...readVinciExhibits(collectionRoot),...(houseRoot?readVinciExhibits(houseRoot):[]),...(courtRoot?readVinciExhibits(courtRoot):[])])
     picksTier=hosts.world.stack.tierName()
     paintExhibitMarks();paintStrip();refreshRecap();plan?.repaint()
     if(pendingExhibit){const id=pendingExhibit;pendingExhibit='';showView(id)}
@@ -1229,7 +1252,7 @@ export function createWing():VinciWingModule {
     if(pick.id===LINE_FLOOR_PICK){const here=vinciContent.find(entry=>entry.id===pick.station)
       return here?{title:text(here.name),colour:certaintyColour('documented')}:null}
     if(pick.kind==='stud'){const stud=LINE_STUDS[vinciStudIndex(pick.id)];return stud?{title:lang()==='de'?stud.date_label_de:stud.date_label_en,colour:LINE_CERTAINTY[stud.certainty as keyof typeof LINE_CERTAINTY].colour}:null}
-    if(pick.kind==='manuscript'){const codex=CODEX_ENTRIES.find(entry=>`codex/${entry.id}`===pick.id);return codex?{title:lang()==='de'?codex.de:codex.en,colour:certaintyColour('documented')}:null}
+    if(pick.kind==='manuscript'){const codex=pickCodex(pick.id);return codex?{title:lang()==='de'?codex.de:codex.en,colour:certaintyColour('documented')}:null}
     if(pick.kind!=='place'&&pick.workId!==DEATHBED_WORK)return null
     const named=vinciPlaceTitle(pick.id as VinciPlaceId)
     return {title:named.title,colour:certaintyColour(named.certainty)}
@@ -1340,6 +1363,14 @@ export function createWing():VinciWingModule {
    * the pose its own approach leaves the eye in, and stands in the store under
    * the folder of its kind, so no cell of any row in this wing is blank. */
   function exhibitPreview(pick:VinciPickEntry):string|null {
+    // A LEAF'S CELL IS THE PAGE. An admitted sheet has its own thumb in the
+    // store, so the cell shows the manuscript and not the fitting it lies on.
+    if(pick.id.startsWith('leaf/')) {
+      // The store's own file, not the record's source: that address is the
+      // holder's page for the sheet and not the picture of it.
+      const folio=assets?.byId.get(`vinci/folio-thumb/${pick.id.slice('leaf/'.length).toLowerCase()}`)
+      if(folio)return `${ASSET_BASE}${folio.wing}/${folio.path}`
+    }
     const name=pick.id.startsWith(`${pick.kind}/`)?pick.id.slice(pick.kind.length+1):pick.id
     const entry=assets?.byId.get(`vinci/exhibit-preview/${pick.kind}/${name.replace(/\//g,'-')}`)
     return entry?assetUrl(ASSET_BASE,entry):null
