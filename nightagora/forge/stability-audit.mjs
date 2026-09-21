@@ -44,7 +44,8 @@ import { spawn } from 'node:child_process'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import sharp from 'sharp'
-import { APP_ROOT, assertAdapter, assertBackend, assertServer, browserArgs, waitForServer, wingStanding } from './rig.mjs'
+import { readFileSync } from 'node:fs'
+import { APP_ROOT, assertAdapter, assertBackend, assertServer, browserArgs, headHere, waitForServer, wingStanding } from './rig.mjs'
 
 const argv = process.argv.slice(2)
 const plain = argv.filter((a) => !a.startsWith('--'))
@@ -79,6 +80,18 @@ const KEEP_MAPS = !flag('no-maps')
 const SERVE = !flag('no-serve')
 const LOUD = flag('loud')
 const SHOT = flag('shot')
+/** how many times the whole station sweep is read, for the spread */
+const RUNS = Number(value('runs', '1')) || 1
+/** write the baseline this run measures, which is the only way it changes */
+const WRITE_BASE = flag('write-base')
+/** read the baseline and refuse a head that is worse than it */
+const VERIFY = flag('verify')
+/* FOUR STATIONS A GATE, AND EVERY STATION WITHIN FOUR GATES. Reading sixteen
+   stations at the visitor's ratio costs minutes that no gate can spend on
+   every landing, and reading the same four for ever leaves twelve unwatched.
+   The window rotates by the HEAD's own hash, so the choice is a fact about
+   the commit and not about the hour it ran. */
+const ROTATE = Number(value('rotate', '0')) || 0
 /** frames held at one offset before it is read */
 const SETTLE = Number(value('settle', '4')) || 4
 /* THE STAGE THE OWNER ACTUALLY HAS. The rig's desktop eye has shot at a
@@ -506,11 +519,23 @@ try {
   await installClock(page, 1000 / 60)
   const state = await page.evaluate(() => window.__forge.state())
   let ids = ALL || !STATIONS ? state.stationIds : STATIONS.split(',').map((s) => s.trim()).filter(Boolean)
+  if (ROTATE > 0 && ids.length > ROTATE) {
+    const head = headHere()
+    let seed = 0
+    for (const ch of head) seed = (seed * 31 + ch.charCodeAt(0)) >>> 0
+    const windows = Math.ceil(ids.length / ROTATE)
+    const turn = seed % windows
+    const rotated = []
+    for (let k = 0; k < ROTATE; k++) rotated.push(ids[(turn * ROTATE + k) % ids.length])
+    out(`[stability] window ${turn + 1} of ${windows} by the head's own hash: ${rotated.join(', ')}`)
+    ids = rotated
+  }
   if (FIRST > 0) ids = ids.slice(0, FIRST)
   out(`[stability] ${ids.length} station(s) of ${state.stationIds.length}`)
 
   const params = { w: stage.w, h: stage.h, tile: TILE, coplanar: COPLANAR_M, lightStep: LIGHT_STEP }
   let flip = null
+  for (let sweep = 0; sweep < RUNS; sweep++)
   for (let i = 0; i < ids.length; i++) {
     const id = ids[i]
     const took = await page.evaluate((s) => window.__forge.station(s), id)
@@ -526,6 +551,8 @@ try {
     await waitFrames(page, 90)
     await setStep(page, 0)
     const pose = await readPose(page, `station ${id}`, { ...params, flip })
+    pose.station = id
+    pose.sweep = sweep
     flip ??= pose.flip
     poses.push(pose)
     out(
@@ -611,6 +638,107 @@ const table = [...ranked.values()]
   }))
   .sort((a, b) => b.pixels - a.pixels)
 
+/* ---- THE RATCHET ------------------------------------------------------- */
+/* THE PICTURE MAY ONLY GET CALMER. What this instrument measures splits in
+   two, and only one half can carry a gate.
+     NOT FIT TO GATE: the per-million counts. They move by up to three times
+     between two sessions at an outdoor station, because a count is a count
+     of pixels that crossed a threshold and the threshold sits in the noise.
+     They are recorded for the reader and never compared.
+     FIT TO GATE: the SET of bodies the classes name, and the step in levels
+     at a boundary. Two sweeps of one station read the same step to within a
+     few percent, and a pair of bodies fighting over one depth either exists
+     in the wing or does not. A new name in either set is a new defect; a
+     station whose step climbs past its own measured spread is a regression.
+   The baseline never rewrites itself: a seat that improves a station writes
+   it with `--write-base` in the same commit, and the diff shows what moved. */
+const BASE_FILE = join(APP_ROOT, 'forge', 'STABILITY-BASE.json')
+/** a body enters a set only above this many pixels in one pose: under it a
+    row is one tile of noise and would make the set flutter run to run */
+const SET_FLOOR = 200
+/** how far past its own worst measured run a station's step may climb */
+const STEP_SLACK = 1.25
+
+function setsOf(poses) {
+  const one = new Set()
+  const two = new Set()
+  for (const pose of poses) {
+    for (const row of pose.table ?? []) {
+      if (row.pixels < SET_FLOOR) continue
+      const name = row.bodies.join(' + ')
+      if (row.cls === 1) one.add(name)
+      else if (row.cls === 2) two.add(name)
+    }
+  }
+  return { class1Pairs: [...one].sort(), class2Bodies: [...two].sort() }
+}
+
+function stationsOf(poses) {
+  const byStation = {}
+  for (const pose of poses) {
+    if (!pose.station) continue
+    const row = (byStation[pose.station] ??= { step: [], perMpx: { 1: [], 2: [], 3: [] } })
+    row.step.push(pose.edgeJump)
+    for (const cls of [1, 2, 3]) row.perMpx[cls].push(per(pose, cls))
+  }
+  const out = {}
+  for (const [id, row] of Object.entries(byStation)) {
+    out[id] = {
+      stepLevels: { min: Math.min(...row.step), max: Math.max(...row.step), runs: row.step.length, read: row.step },
+      perMpx: Object.fromEntries([1, 2, 3].map((c) => [c, { min: Math.min(...row.perMpx[c]), max: Math.max(...row.perMpx[c]) }])),
+    }
+  }
+  return out
+}
+
+if (WRITE_BASE && !faults.length) {
+  const base = {
+    note: 'the stability ratchet. The sets and the step levels are gated; the per-million counts are recorded and are not.',
+    head: headHere(), measured: new Date().toISOString().slice(0, 10),
+    viewport: MOBILE ? 'mobile' : 'desktop', deviceScaleFactor: VP.deviceScaleFactor, tier: TIER,
+    stage, samples: sampleState, runs: RUNS, setFloorPx: SET_FLOOR, stepSlack: STEP_SLACK,
+    ...setsOf(poses), stations: stationsOf(poses),
+  }
+  writeFileSync(BASE_FILE, JSON.stringify(base, null, 1) + '\n')
+  out(`[stability] baseline written: ${Object.keys(base.stations).length} station(s), ` +
+    `${base.class1Pairs.length} class 1 pair(s), ${base.class2Bodies.length} class 2 body/bodies`)
+}
+
+let ratchet = null
+if (VERIFY) {
+  let base = null
+  try {
+    base = JSON.parse(readFileSync(BASE_FILE, 'utf8'))
+  } catch (err) {
+    faults.push(`the baseline could not be read: ${err.message}`)
+  }
+  if (base) {
+    const mine = setsOf(poses)
+    const seen = stationsOf(poses)
+    const newPairs = mine.class1Pairs.filter((name) => !base.class1Pairs.includes(name))
+    const newBodies = mine.class2Bodies.filter((name) => !base.class2Bodies.includes(name))
+    const risen = []
+    for (const [id, row] of Object.entries(seen)) {
+      const was = base.stations[id]
+      if (!was) continue // a station the baseline never read is not a regression
+      const ceiling = was.stepLevels.max * STEP_SLACK
+      if (row.stepLevels.max > ceiling)
+        risen.push(`${id} ${row.stepLevels.max} levels over ${+ceiling.toFixed(2)} (baseline ${was.stepLevels.min} to ${was.stepLevels.max})`)
+    }
+    ratchet = {
+      base: base.head, measured: base.measured, stations: Object.keys(seen),
+      newClass1Pairs: newPairs, newClass2Bodies: newBodies, risenSteps: risen,
+      ok: !newPairs.length && !newBodies.length && !risen.length,
+    }
+    for (const name of newPairs) faults.push(`RATCHET: a class 1 pair the baseline does not carry: ${name}`)
+    for (const name of newBodies) faults.push(`RATCHET: a class 2 body the baseline does not carry: ${name}`)
+    for (const line of risen) faults.push(`RATCHET: the step rose at ${line}`)
+    out(ratchet.ok
+      ? `[stability] RATCHET ok against ${base.head.slice(0, 7)}: no new named body, no station past its spread`
+      : `[stability] RATCHET RED: ${newPairs.length} new pair(s), ${newBodies.length} new body/bodies, ${risen.length} station(s) risen`)
+  }
+}
+
 const report = {
   wing: SLUG,
   viewport: MOBILE ? 'mobile' : 'desktop',
@@ -628,6 +756,8 @@ const report = {
   stagePixels: stage ? stage.w * stage.h : 0,
   poses: poses.map((p) => ({
     name: p.name,
+    station: p.station ?? null,
+    sweep: p.sweep ?? 0,
     flaggedTiles: p.flaggedTiles,
     perMpx: { 1: per(p, 1), 2: per(p, 2), 3: per(p, 3) },
     lightLevels: { 1: light(p, 1), 2: light(p, 2), 3: light(p, 3) },
@@ -641,6 +771,7 @@ const report = {
     table: p.table,
   })),
   table: table.slice(0, 60),
+  ratchet,
   faults,
   ok: faults.length === 0,
 }
