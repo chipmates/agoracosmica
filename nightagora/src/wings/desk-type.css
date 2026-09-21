@@ -1,0 +1,246 @@
+/* THE TYPE FLOOR OF THE WIDE STAGE. Nothing a visitor reads stands under
+   14 px, and the small capitals buy their line with letter spacing and never
+   with a smaller size. One override per rule of the shipped chrome that sits
+   below the floor today; the rules themselves are listed in this seat's
+   STATUS with their file and line. Generated from those files, by hand kept. */
+
+/* src/styles/wing.css:40 · 9.5px */
+#wing[data-desk~='type14'] .wing-plate-kicker { font-size: 0.875rem; letter-spacing: 0.14em; text-indent: 0.14em; }
+/* src/styles/wing.css:126 · 10px */
+#wing[data-desk~='type14'] .wing-door { font-size: 0.875rem; letter-spacing: 0.14em; text-indent: 0.14em; }
+/* src/styles/wing.css:149 · 9.5px */
+#wing[data-desk~='type14'] .wing-note { font-size: 0.875rem; }
+/* src/styles/wing.css:161 · 10px */
+#wing[data-desk~='type14'] .wing-lobby { font-size: 0.875rem; letter-spacing: 0.14em; text-indent: 0.14em; }
+/* src/wings/vinci/wing.css:8 · 9px */
+#wing[data-desk~='type14'][data-wing='vinci'] .wing-note { font-size: 0.875rem; }
+/* src/wings/vinci/wing.css:12 · 9px */
+#wing[data-desk~='type14'][data-wing='vinci'] .wing-rail-group .wing-lobby { font-size: 0.875rem; }
+/* src/wings/vinci/wing.css:15 · 10px */
+#wing[data-desk~='type14'] .vinci-kicker { font-size: 0.875rem; letter-spacing: 0.14em; }
+/* src/wings/vinci/wing.css:19 · 10px */
+#wing[data-desk~='type14'] .vinci-status { font-size: 0.875rem; }
+/* src/wings/vinci/wing.css:21 · 13px */
+#wing[data-desk~='type14'] .vinci-threshold { font-size: 0.875rem; }
+/* src/wings/vinci/wing.css:22 · 10px */
+#wing[data-desk~='type14'] .vinci-source { font-size: 0.875rem; }
+/* src/wings/vinci/wing.css:30 · 10px */
+#wing[data-desk~='type14'] .vinci-certainty { font-size: 0.875rem; }
+/* src/wings/vinci/wing.css:34 · 9px */
+#wing[data-desk~='type14'] .vinci-certainty-word { font-size: 0.875rem; }
+/* src/wings/vinci/wing.css:41 · 10px */
+#wing[data-desk~='type14'] .vinci-citation { font-size: 0.875rem; }
+/* src/wings/vinci/wing.css:43 · 10px */
+#wing[data-desk~='type14'] .vinci-hour { font-size: 0.875rem; }
+/* src/wings/vinci/wing.css:44 · 12px */
+#wing[data-desk~='type14'] .vinci-arithmetic { font-size: 0.875rem; }
+/* src/wings/vinci/wing.css:67 · 9px */
+#wing[data-desk~='type14'][data-wing='vinci'] .wing-rail-group .vinci-source { font-size: 0.875rem; }
+/* src/wings/vinci/wing.css:72 · 10px */
+#wing[data-desk~='type14'] .vinci-insertion { font-size: 0.875rem; }
+/* src/wings/vinci/wing.css:74 · 12px */
+#wing[data-desk~='type14'] .vinci-record-toggle { font-size: 0.875rem; }
+/* src/wings/vinci/wing.css:77 · 12px */
+#wing[data-desk~='type14'] .vinci-record .vinci-statement { font-size: 0.875rem; }
+/* src/wings/vinci/wing.css:78 · 12px */
+#wing[data-desk~='type14'] .vinci-record .picture-policy-label { font-size: 0.875rem; }
+/* src/wings/vinci/wing.css:82 · 12px */
+#wing[data-desk~='type14'] .vinci-hour { font-size: 0.875rem; }
+/* src/wings/vinci/wing.css:84 · 12px */
+#wing[data-desk~='type14'] .vinci-human-source { font-size: 0.875rem; }
+/* src/wings/vinci/wing.css:180 · 12px */
+#wing[data-desk~='type14'] .vinci-sources-toolbar button { font-size: 0.875rem; }
+/* src/wings/vinci/wing.css:186 · 12px */
+#wing[data-desk~='type14'] .vinci-certainty-legend { font-size: 0.875rem; }
+/* src/wings/vinci/wing.css:189 · 13px */
+#wing[data-desk~='type14'] .vinci-door-disclosure { font-size: 0.875rem; }
+/* src/wings/vinci/wing.css:208 · 13px */
+#wing[data-desk~='type14'] .vinci-room-list,
+#wing[data-desk~='type14'] .vinci-absence-list { font-size: 0.875rem; }
+/* src/wings/vinci/wing.css:228 · 12px */
+#wing[data-desk~='type14'] .vinci-record-fold > summary { font-size: 0.875rem; }
+/* src/wings/vinci/wing.css:314 · 9px */
+#wing[data-desk~='type14'] .vinci-strip-place { font-size: 0.875rem; }
+/* src/wings/vinci/wing.css:315 · 9px */
+#wing[data-desk~='type14'] .vinci-strip-whole { font-size: 0.875rem; }
+/* src/wings/vinci/wing.css:385 · 13px */
+#wing[data-desk~='type14'] .vinci-quiet-name { font-size: 0.875rem; }
+/* src/wings/vinci/wing.css:386 · 9px */
+#wing[data-desk~='type14'] .vinci-quiet-year { font-size: 0.875rem; }
+/* src/wings/vinci/wing.css:433 · 9px */
+#wing[data-desk~='type14'][data-wing='vinci'] .wing-pace-name { font-size: 0.875rem; }
+/* src/wings/vinci/wing.css:434 · 9px */
+#wing[data-desk~='type14'][data-wing='vinci'] .wing-pace-step { font-size: 0.875rem; }
+/* src/wings/plan/plan.css:3 · 9px */
+#wing[data-desk~='type14'] .wing-plan-open { font-size: 0.875rem; }
+/* src/wings/plan/plan.css:44 · 10px */
+#wing[data-desk~='type14'] .wing-plan-north-letter { font-size: 0.875rem; }
+/* src/wings/plan/plan.css:58 · 9px */
+#wing[data-desk~='type14'] .wing-plan-number { font-size: 0.875rem; }
+/* src/wings/plan/plan.css:71 · 10px */
+#wing[data-desk~='type14'] .wing-plan-entry-number { font-size: 0.875rem; }
+/* src/wings/plan/plan.css:77 · 13px */
+#wing[data-desk~='type14'] .wing-plan-work { font-size: 0.875rem; }
+/* src/wings/plan/plan.css:83 · 12px */
+#wing[data-desk~='type14'] .wing-plan-close { font-size: 0.875rem; }
+/* src/wings/plan/plan.css:89 · 12px */
+#wing[data-desk~='type14'] .wing-plan-foot .wing-life-door { font-size: 0.875rem; }
+/* src/wings/plan/plan.css:108 · 13px */
+#wing[data-desk~='type14'] .wing-plan[data-narrow='true'] .wing-plan-entry { font-size: 0.875rem; }
+/* src/wings/plan/plan.css:109 · 12px */
+#wing[data-desk~='type14'] .wing-plan[data-narrow='true'] .wing-plan-work { font-size: 0.875rem; }
+/* src/wings/plan/plan.css:117 · 10px */
+#wing[data-desk~='type14'] .wing-recap-heading { font-size: 0.875rem; }
+/* src/wings/plan/plan.css:118 · 13px */
+#wing[data-desk~='type14'] .wing-recap-prompt,
+#wing[data-desk~='type14'] .wing-recap-empty { font-size: 0.875rem; }
+/* src/wings/plan/plan.css:125 · 13px */
+#wing[data-desk~='type14'] .wing-recap-line { font-size: 0.875rem; }
+/* src/wings/plan/plan.css:127 · 11px */
+#wing[data-desk~='type14'] .wing-recap-privacy { font-size: 0.875rem; }
+/* src/wings/plan/plan.css:128 · 11px */
+#wing[data-desk~='type14'] .wing-recap-forget { font-size: 0.875rem; }
+/* src/wings/plan/plan.css:130 · 12px */
+#wing[data-desk~='type14'] .wing-recap-door { font-size: 0.875rem; }
+/* src/wings/life/life.css:4 · 9px */
+#wing[data-desk~='type14'] .wing-life-open { font-size: 0.875rem; }
+/* src/wings/life/life.css:11 · 11px */
+#wing[data-desk~='type14'] .wing-life-door { font-size: 0.875rem; }
+/* src/wings/life/life.css:66 · 9px */
+#wing[data-desk~='type14'] .wing-life-after-word { font-size: 0.875rem; }
+/* src/wings/life/life.css:67 · 9px */
+#wing[data-desk~='type14'] .wing-life-after-year { font-size: 0.875rem; }
+/* src/wings/life/life.css:68 · 13px */
+#wing[data-desk~='type14'] .wing-life-nothing { font-size: 0.875rem; }
+/* src/wings/life/life.css:72 · 13px */
+#wing[data-desk~='type14'] .wing-life-second { font-size: 0.875rem; }
+/* src/wings/life/life.css:73 · 11px */
+#wing[data-desk~='type14'] .wing-life-caption { font-size: 0.875rem; }
+/* src/wings/life/life.css:86 · 13px */
+#wing[data-desk~='type14'] .wing-life-item[data-undated='true'] .wing-life-item-title { font-size: 0.875rem; }
+/* src/wings/life/life.css:93 · 9px */
+#wing[data-desk~='type14'] .wing-life-item-count { font-size: 0.875rem; }
+/* src/wings/life/life.css:98 · 13px */
+#wing[data-desk~='type14'] .wing-life-period-line { font-size: 0.875rem; }
+/* src/wings/life/life.css:102 · 13px */
+#wing[data-desk~='type14'] .wing-life-date-name { font-size: 0.875rem; }
+/* src/wings/life/life.css:108 · 10px */
+#wing[data-desk~='type14'] .wing-life-date-here { font-size: 0.875rem; }
+/* src/wings/life/life.css:118 · 11px */
+#wing[data-desk~='type14'] .wing-life-date-age { font-size: 0.875rem; }
+/* src/wings/life/life.css:119 · 9px */
+#wing[data-desk~='type14'] .wing-life-date-sure { font-size: 0.875rem; }
+/* src/wings/life/life.css:120 · 13px */
+#wing[data-desk~='type14'] .wing-life-date-line { font-size: 0.875rem; }
+/* src/wings/life/life.css:121 · 11px */
+#wing[data-desk~='type14'] .wing-life-date-source { font-size: 0.875rem; }
+/* src/wings/life/life.css:123 · 12px */
+#wing[data-desk~='type14'] .wing-life-date-record { font-size: 0.875rem; }
+/* src/wings/life/life.css:127 · 11px */
+#wing[data-desk~='type14'] .wing-life-date-cut { font-size: 0.875rem; }
+/* src/wings/life/life.css:131 · 11px */
+#wing[data-desk~='type14'] .wing-life-gap-line { font-size: 0.875rem; }
+/* src/wings/life/life.css:135 · 10px */
+#wing[data-desk~='type14'] .wing-life-row-name { font-size: 0.875rem; }
+/* src/wings/life/life.css:136 · 12px */
+#wing[data-desk~='type14'] .wing-life-empty { font-size: 0.875rem; }
+/* src/wings/life/life.css:138 · 12px */
+#wing[data-desk~='type14'] .wing-life-work-item { font-size: 0.875rem; }
+/* src/wings/life/life.css:147 · 11px */
+#wing[data-desk~='type14'] .wing-life-work-door { font-size: 0.875rem; }
+/* src/wings/life/life.css:151 · 11px */
+#wing[data-desk~='type14'] .wing-life-work-count { font-size: 0.875rem; }
+/* src/wings/life/life.css:153 · 13px */
+#wing[data-desk~='type14'] .wing-life-person-name { font-size: 0.875rem; }
+/* src/wings/life/life.css:154 · 12px */
+#wing[data-desk~='type14'] .wing-life-person-role { font-size: 0.875rem; }
+/* src/wings/life/life.css:155 · 9px */
+#wing[data-desk~='type14'] .wing-life-person-sure { font-size: 0.875rem; }
+/* src/wings/life/life.css:161 · 12px */
+#wing[data-desk~='type14'] .wing-life-ask-control { font-size: 0.875rem; }
+/* src/wings/life/life.css:163 · 11px */
+#wing[data-desk~='type14'] .wing-life-ask-note { font-size: 0.875rem; }
+/* src/wings/life/life.css:173 · 11px */
+#wing[data-desk~='type14'] .wing-life-count,
+#wing[data-desk~='type14'] .wing-life-honesty { font-size: 0.875rem; }
+/* src/wings/life/life.css:176 · 12px */
+#wing[data-desk~='type14'] .wing-life-close { font-size: 0.875rem; }
+/* src/wings/life/life.css:185 · 11.5px */
+#wing[data-desk~='type14'] .wing-life[data-narrow='true'] .wing-life-second { font-size: 0.875rem; }
+/* src/wings/life/life.css:186 · 10px */
+#wing[data-desk~='type14'] .wing-life[data-narrow='true'] .wing-life-caption { font-size: 0.875rem; }
+/* src/wings/life/life.css:226 · 10px */
+#wing[data-desk~='type14'] .wing-life[data-narrow='true'] .wing-life-count,
+#wing[data-desk~='type14'] .wing-life[data-narrow='true'] .wing-life-honesty { font-size: 0.875rem; }
+/* src/wings/vitrine/vitrine.css:39 · 12px */
+#wing[data-desk~='type14'] .vitrine-words .picture-holder,
+#wing[data-desk~='type14'] .vitrine-words .picture-source-reading,
+#wing[data-desk~='type14'] .vitrine-words .picture-column-note,
+#wing[data-desk~='type14'] .vitrine-meta { font-size: 0.875rem; }
+/* src/wings/vitrine/vitrine.css:40 · 12px */
+#wing[data-desk~='type14'] .vitrine-words .picture-label-more,
+#wing[data-desk~='type14'] .vitrine-more { font-size: 0.875rem; }
+/* src/wings/vitrine/vitrine.css:41 · 11px */
+#wing[data-desk~='type14'] .vitrine-certainty { font-size: 0.875rem; }
+/* src/wings/vitrine/vitrine.css:45 · 12px */
+#wing[data-desk~='type14'] .vitrine-control { font-size: 0.875rem; }
+/* src/wings/vitrine/vitrine.css:146 · 11px */
+#wing[data-desk~='type14'] .vitrine-folio { font-size: 0.875rem; }
+/* src/wings/vitrine/vitrine.css:177 · 13px */
+#wing[data-desk~='type14'] .vitrine-source-text { font-size: 0.875rem; }
+/* src/wings/vitrine/vitrine.css:183 · 12px */
+#wing[data-desk~='type14'] .vitrine-reader-shelf .vt-codex-body { font-size: 0.875rem; }
+/* src/wings/vitrine/reader.css:24 · 11px */
+#wing[data-desk~='type14'] .reader-page { font-size: 0.875rem; }
+/* src/wings/vitrine/reader.css:34 · 11px */
+#wing[data-desk~='type14'] .reader-absence p { font-size: 0.875rem; }
+/* src/wings/vitrine/deep-plate.css:23 · 11px */
+#wing[data-desk~='type14'] .deep-rule-label { font-size: 0.875rem; }
+/* src/wings/vitrine/deep-plate.css:31 · 12px */
+#wing[data-desk~='type14'] .deep-stand p { font-size: 0.875rem; }
+/* src/wings/vinci/table/panel.css:20 · 11px */
+#wing[data-desk~='type14'] .vt-kicker { font-size: 0.875rem; }
+/* src/wings/vinci/table/panel.css:23 · 12px */
+#wing[data-desk~='type14'] .vt-provenance { font-size: 0.875rem; }
+/* src/wings/vinci/table/panel.css:25 · 13px */
+#wing[data-desk~='type14'] .vt-browse > .vt-description { font-size: 0.875rem; }
+/* src/wings/vinci/table/panel.css:26 · 11px */
+#wing[data-desk~='type14'] .vt-folio-certainty { font-size: 0.875rem; }
+/* src/wings/vinci/table/panel.css:29 · 11px */
+#wing[data-desk~='type14'] .vt-small-label { font-size: 0.875rem; }
+/* src/wings/vinci/table/panel.css:30 · 13px */
+#wing[data-desk~='type14'] .vt-select,
+#wing[data-desk~='type14'] .vt-language-select { font-size: 0.875rem; }
+/* src/wings/vinci/table/panel.css:53 · 11px */
+#wing[data-desk~='type14'] .vt-relation { font-size: 0.875rem; }
+/* src/wings/vinci/table/panel.css:56 · 11px */
+#wing[data-desk~='type14'] .vt-text-caption { font-size: 0.875rem; }
+/* src/wings/vinci/table/panel.css:60 · 12px */
+#wing[data-desk~='type14'] .vt-ocr-note { font-size: 0.875rem; }
+/* src/wings/vinci/table/panel.css:61 · 13px */
+#wing[data-desk~='type14'] .vt-source-summary { font-size: 0.875rem; }
+/* src/wings/vinci/table/panel.css:62 · 12px */
+#wing[data-desk~='type14'] .vt-source-note,
+#wing[data-desk~='type14'] .vt-licence { font-size: 0.875rem; }
+/* src/wings/vinci/table/panel.css:63 · 13px */
+#wing[data-desk~='type14'] .vt-source-link { font-size: 0.875rem; }
+/* src/wings/vinci/table/panel.css:77 · 10px */
+#wing[data-desk~='type14'] .vt-shelf-related { font-size: 0.875rem; }
+/* src/wings/vinci/table/panel.css:79 · 10px */
+#wing[data-desk~='type14'] .vt-absence-status { font-size: 0.875rem; }
+/* src/wings/vinci/table/panel.css:82 · 12px */
+#wing[data-desk~='type14'] .vt-absence-holder { font-size: 0.875rem; }
+/* src/wings/vinci/table/panel.css:84 · 11px */
+#wing[data-desk~='type14'] .vt-shelf-source { font-size: 0.875rem; }
+/* src/wings/vinci/table/panel.css:87 · 10px */
+#wing[data-desk~='type14'] .vt-codex-group { font-size: 0.875rem; }
+/* src/wings/vinci/table/panel.css:97 · 12px */
+#wing[data-desk~='type14'] .vt-codex-holder { font-size: 0.875rem; }
+/* src/wings/vinci/table/panel.css:98 · 11px */
+#wing[data-desk~='type14'] .vt-codex-class { font-size: 0.875rem; }
+/* src/wings/vinci/table/panel.css:99 · 12px */
+#wing[data-desk~='type14'] .vt-codex-count { font-size: 0.875rem; }
+/* src/wings/vinci/table/panel.css:100 · 10px */
+#wing[data-desk~='type14'] .vt-codex-state { font-size: 0.875rem; }
+/* src/wings/vinci/table/panel.css:112 · 12px */
+#wing[data-desk~='type14'] .vt-inscription-citation { font-size: 0.875rem; }
