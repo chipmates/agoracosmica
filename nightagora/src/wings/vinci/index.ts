@@ -630,8 +630,12 @@ export function createWing():VinciWingModule {
     const left=hosts.world.stack.materials.pending()
     setsAsked=Math.max(setsAsked,setsUp+left)
     setsUp=Math.max(setsUp,setsAsked-left)
+    // A SET IS TENS OF MEGABYTES ON A PHONE, and counted whole it is a line
+    // that cannot move until the file lands. What is already over the wire
+    // counts too, in sets, so the wait is measured rather than waited out.
+    const wire=hosts.world.stack.materials.paid?.()??0
     const bodies=exhibits?.bodies()??{done:0,total:0}
-    const done=bodies.done+setsUp+posesUp+houseUp
+    const done=bodies.done+setsUp+wire+posesUp+houseUp
     const asked=bodies.total+setsAsked+posesAsked+HOUSE_STEPS
     shareUp=Math.max(shareUp,Math.min(1,asked>0?done/asked:0))
     // the poses hold at their last one until every body stands, so the stage

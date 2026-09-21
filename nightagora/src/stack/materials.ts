@@ -411,6 +411,11 @@ export interface MaterialLibrary {
       frame drawn while a set is in flight is a DIFFERENT frame, so the rig
       waits on this rather than on a guessed delay */
   pending: () => number
+  /** how much of those pending sets is already over the wire, in sets: the
+      entry's own line counts whole sets, and one set is tens of megabytes on
+      a phone, which is a line that stands still for half a minute. Optional:
+      a private library that manages its own textures reports none. */
+  paid?: () => number
   setTier: (tier: Tier) => void
   dispose: () => void
 }
@@ -468,9 +473,13 @@ type EncodedEntry = ManifestEntry & {
    the encoder wrote; a tier that holds a smaller side drops the chain's top
    levels instead of resizing, because blocks cannot be resampled. What it
    costs is the bytes it holds. */
-async function compressed(url: string, size: number): Promise<{ texture: Texture; bytes: number; width: number }> {
+async function compressed(
+  url: string,
+  size: number,
+  onWire?: (loaded: number, total: number) => void
+): Promise<{ texture: Texture; bytes: number; width: number }> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const loaded = (await ktx2.loadAsync(url)) as any
+  const loaded = (await ktx2.loadAsync(url, (event: ProgressEvent) => onWire?.(event.loaded, event.total))) as any
   const chain = loaded.mipmaps as Array<{ data: ArrayBufferView; width: number; height: number }>
   let mips = chain
   while (mips.length > 1 && mips[0]!.width > size) mips = mips.slice(1)
@@ -513,6 +522,9 @@ export function createMaterialLibrary(tier: Tier, options: MaterialLibraryOption
   let budget = texturesFor(tier)
   let bytes = 0
   const uploaded = new Map<string, { size: number; maps: number; MB: number; encoded: number }>()
+  /** what is on the wire right now, per set, so a wait of tens of megabytes
+      is a line that moves and not a count that cannot change until it lands */
+  const flight = new Map<string, { loaded: number; total: number }>()
   /** one resolution per set: the first request's budget decides its maps, and
       a second request while the first is in flight waits for it */
   const resolving = new Map<string, Promise<void>>()
@@ -728,11 +740,23 @@ export function createMaterialLibrary(tier: Tier, options: MaterialLibraryOption
       // the side the set really stands at: a pack encoded smaller than the
       // tier's ceiling is what the ledger and the cost meter must report
       let onDevice = 0, encoded = 0, side = 0
+      const wire = { loaded: 0, total: 0 }
+      const perMap = new Map<MapName, { loaded: number; total: number }>()
+      flight.set(name, wire)
+      const overWire = (map: MapName) => (loaded: number, total: number): void => {
+        perMap.set(map, { loaded, total })
+        wire.loaded = 0
+        wire.total = 0
+        for (const row of perMap.values()) {
+          wire.loaded += row.loaded
+          wire.total += row.total
+        }
+      }
       await Promise.all(wanted.map(async (map) => {
         const pack = want.pack === 'calm' && !PRESENT_ONLY ? entry.ktx2_calm?.[map] ?? entry.ktx2?.[map] : entry.ktx2?.[map]
         const record = options.compressed && compressedReady() ? pack : undefined
         if (record) {
-          const made = await compressed(`${ASSET_BASE}${entry.wing}/${record.path}`, want.size)
+          const made = await compressed(`${ASSET_BASE}${entry.wing}/${record.path}`, want.size, overWire(map))
           const placeholder = maps[map]
           maps[map] = made.texture
           for (const node of users[map]) node.value = made.texture
@@ -745,7 +769,7 @@ export function createMaterialLibrary(tier: Tier, options: MaterialLibraryOption
         await fill(maps[map], url(`${map}.${map === 'albedo' ? 'jpg' : 'png'}`), want.size)
         onDevice += textureBytes(want.size)
         side = Math.max(side, want.size)
-      }))
+      })).finally(() => flight.delete(name))
       maps.size = side || want.size
       bytes += onDevice
       uploaded.set(name, { size: maps.size, maps: wanted.length, MB: onDevice / 1048576, encoded })
@@ -816,6 +840,8 @@ export function createMaterialLibrary(tier: Tier, options: MaterialLibraryOption
       [...uploaded].map(([name, u]) => ({ name: u.encoded ? `${name} ktx2 ${u.encoded}` : name, size: u.size, maps: u.maps, MB: u.MB })),
     missing: () => [...missing].map(([name, reason]) => ({ name, reason })),
     pending: () => [...sets.values()].filter((set) => !set.ready.value && !missing.has(set.entry.id.replace(/^library\//, ''))).length,
+    paid: () =>
+      [...flight.values()].reduce((sum, w) => sum + (w.total > 0 ? Math.min(1, w.loaded / w.total) : 0), 0),
     setTier(next) {
       budget = texturesFor(next)
     },
