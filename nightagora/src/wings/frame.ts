@@ -21,6 +21,7 @@ import { DISCLOSURES } from '../content/disclosures'
 import { LOBBY_TEXT } from '../content/lobby'
 import plateCss from './title-plate.css?inline'
 import { windowOwnsTheScreen } from './window-chrome'
+import { deskAny } from './desk-switches'
 import { gaitPace, setGaitPace, type GaitPaceName } from './vinci/gait'
 import type { WingEntry } from './registry'
 import type { Stack } from '../stack'
@@ -466,7 +467,7 @@ export function createWingFrame(
   function doorStandsAlone(): void {
     if (disclosure.open) document.documentElement.dataset['naPlate'] = 'open'
     else delete document.documentElement.dataset['naPlate']
-    windowOwnsTheScreen(document, disclosure.open && narrowStage())
+    windowOwnsTheScreen(document, disclosure.open && (narrowStage() || deskAny()), narrowStage() ? 'phone' : 'desk')
   }
   /** True once the visitor has gone through the door: the plate says what is
       behind it, so it stands on every press until it has been passed. */
