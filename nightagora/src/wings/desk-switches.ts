@@ -9,20 +9,24 @@
    below are the default: flipping one to true makes that step the picture
    main ships, and `?desk=none` is then the way back to today. */
 
-export type DeskStep = 'type14' | 'words' | 'ways'
+export type DeskStep = 'type14' | 'words' | 'ways' | 'freearea' | 'drawer'
 
 /** the steps this chrome knows, in the design's own build order */
-export const DESK_STEPS: readonly DeskStep[] = ['type14', 'words', 'ways']
+export const DESK_STEPS: readonly DeskStep[] = ['type14', 'words', 'ways', 'freearea', 'drawer']
 
 /* ONE CONSTANT PER STEP. Off today: the address is the only way to see them. */
 export const DESK_TYPE14 = false
 export const DESK_WORDS = false
 export const DESK_WAYS = false
+export const DESK_FREEAREA = false
+export const DESK_DRAWER = false
 
 const DEFAULT: Readonly<Record<DeskStep, boolean>> = {
   type14: DESK_TYPE14,
   words: DESK_WORDS,
   ways: DESK_WAYS,
+  freearea: DESK_FREEAREA,
+  drawer: DESK_DRAWER,
 }
 
 function fromAddress(): Record<DeskStep, boolean> {

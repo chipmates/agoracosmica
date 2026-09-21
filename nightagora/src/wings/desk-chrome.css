@@ -39,7 +39,7 @@
   gap: 40px;
   pointer-events: none;
 }
-.desk-low button { pointer-events: auto; }
+.desk-low button, .desk-low a { pointer-events: auto; }
 /* THE DUSK IS A GRADIENT AND NEVER A PANEL, and it is sized by the text: it
    reaches .80 before the first text pixel and .93 at the foot, so the worst
    ground this museum owns still reads at 4.5 to 1. Nothing at rest is opaque. */
@@ -72,6 +72,82 @@
     color-mix(in srgb, var(--na-abyss) 0%, transparent)
   );
 }
+
+/* ---- the thread: one segment a stop, the count in digits ---- */
+.desk-thread {
+  position: fixed;
+  left: 50%;
+  top: 76px;
+  transform: translateX(-50%);
+  z-index: 3;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.desk-thread[hidden] { display: none; }
+.desk-thread-count {
+  margin-right: 14px;
+  font: 500 0.875rem/1 var(--sans);
+  letter-spacing: 0.08em;
+  color: var(--na-starlight);
+  font-variant-numeric: tabular-nums;
+  text-shadow: var(--ink-night);
+}
+/* A SEGMENT IS A 44 PX TARGET and a hairline of ink: the ruler stays quiet
+   while the hand it answers stays whole. */
+.desk-seg {
+  width: 26px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.desk-seg[data-quiet='true'] { width: 13px; }
+.desk-seg-bar {
+  display: block;
+  width: 100%;
+  height: 2px;
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--na-starlight) 36%, transparent);
+}
+.desk-seg[data-stood='true'] .desk-seg-bar { background: color-mix(in srgb, var(--na-starlight) 92%, transparent); }
+.desk-seg[data-quiet='true'][data-stood='true'] .desk-seg-bar { background: color-mix(in srgb, var(--na-starlight) 78%, transparent); }
+.desk-seg[data-here='true'] .desk-seg-bar { height: 4px; border-radius: 2px; background: var(--na-gold); }
+.desk-seg[data-here='true'][data-walking='true'] .desk-seg-bar {
+  background: linear-gradient(90deg, var(--na-gold) var(--desk-leg, 0%),
+    color-mix(in srgb, var(--na-starlight) 36%, transparent) var(--desk-leg, 0%));
+}
+.desk-seg:hover .desk-seg-bar { background: var(--na-starlight); }
+.desk-seg:focus-visible { outline: 2px solid var(--na-gold); outline-offset: -6px; }
+.desk-cut {
+  display: block;
+  width: 1px;
+  height: 14px;
+  margin: 0 6px;
+  background: color-mix(in srgb, var(--na-gold) 80%, transparent);
+}
+/* the word a pointer or a focus brings, under the segment it names */
+.desk-chip {
+  position: absolute;
+  top: 44px;
+  transform: translateX(-50%);
+  height: 36px;
+  padding: 0 13px;
+  display: flex;
+  align-items: center;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--na-abyss) 90%, transparent);
+  box-shadow: inset 0 0 0 1px var(--desk-edge);
+  font: 500 0.9375rem/1 var(--sans);
+  color: var(--desk-title);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.desk-chip[hidden] { display: none; }
 
 .desk-name { display: flex; align-items: center; gap: 11px; min-height: 32px; margin: 0 0 6px; }
 .desk-mark { flex: none; width: 18px; height: 18px; display: block; overflow: visible; }
@@ -297,3 +373,81 @@ body.forge .desk-cap, body.forge .desk-on { transition: none !important; }
   max-width: 44ch;
   text-wrap: pretty;
 }
+
+/* ---- THE TOP ROW, once the ways stand ----
+   The way home, the thread, then the two other ways through this wing. The
+   rail's own row of unnamed steps stands down: the thread is the index now,
+   and every word in the row keeps the group's own target. */
+#wing[data-desk~='ways'] .wing-rail-group {
+  left: var(--desk-g) !important;
+  right: var(--desk-g);
+  width: auto;
+  max-width: none !important;
+  gap: 4px;
+  /* nothing is opaque at rest: the top dusk is the only backing up here */
+  padding: 0;
+  background: none;
+  border: 0;
+}
+#wing[data-desk~='ways'] .wing-rail { display: none; }
+#wing[data-desk~='ways'] .wing-rail-group > .vinci-source { margin-left: auto; }
+/* the cells of the old bar were told apart by hairlines; words on a dusk are
+   told apart by their own space, so the rules go with the plate */
+#wing[data-desk~='ways'] .wing-rail-group :is(.wing-lobby, .vinci-source, .wing-plan-open, .wing-life-open) {
+  position: static;
+  flex: 0 0 auto;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  border: 0;
+  background: none;
+  font: 500 0.875rem/1 var(--sans);
+  letter-spacing: 0.14em;
+  text-indent: 0.14em;
+  text-transform: uppercase;
+  color: var(--na-starlight);
+  text-shadow: var(--ink-night);
+  white-space: nowrap;
+}
+#wing[data-desk~='ways'] .wing-lobby { padding-left: 0; }
+#wing[data-desk~='ways'] .wing-rail-group :is(.wing-lobby, .vinci-source, .wing-plan-open, .wing-life-open):hover,
+#wing[data-desk~='ways'] .wing-rail-group :is(.wing-lobby, .vinci-source, .wing-plan-open, .wing-life-open):focus-visible {
+  color: var(--na-gold);
+}
+/* the way home reads as a way back: one chevron, drawn and not fetched */
+#wing[data-desk~='ways'] .wing-lobby::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  margin-right: 10px;
+  border: solid currentColor;
+  border-width: 1.6px 0 0 1.6px;
+  transform: rotate(-45deg);
+}
+/* THE QUESTION LEAVES THE PICTURE with this step, and the door keeps its
+   place in the words' foot row until the drawer's own foot takes it. */
+#wing[data-desk~='ways'] .wing-doorblock { display: none; }
+#wing[data-desk~='ways'] .desk-foot .wing-door {
+  position: static;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px var(--rule);
+  font: 600 0.875rem/1 var(--sans);
+  letter-spacing: 0.12em;
+  text-indent: 0.12em;
+  color: var(--na-gold);
+}
+#wing[data-desk~='ways'] .desk-foot .wing-door:hover,
+#wing[data-desk~='ways'] .desk-foot .wing-door:focus-visible {
+  box-shadow: inset 0 0 0 1px var(--na-gold);
+  color: var(--na-starlight);
+}
+#wing[data-desk~='ways'] .desk-foot .wing-door:focus-visible { outline: 2px solid var(--na-gold); outline-offset: 3px; }
+/* the thread goes with the words while a leg runs: it stays, at full
+   strength, because it is where the walker is */
+#wing[data-walking][data-desk~='ways'] .desk-thread { opacity: 1; }

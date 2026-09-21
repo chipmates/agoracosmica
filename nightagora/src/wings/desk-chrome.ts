@@ -12,7 +12,7 @@
    after it in the order the rail walks, and the words of both. */
 
 import { deskOn } from './desk-switches'
-import { deskStoryStop } from './desk-story'
+import { deskCutBetween, deskStoryStop } from './desk-story'
 import type { VinciCertainty, VinciText } from './vinci/content'
 
 export interface DeskStation {
@@ -32,12 +32,21 @@ export interface DeskChromeHost {
   standing: () => DeskStation
   /** the station the way on leads to, or null at the end of the walk */
   next: () => DeskStation | null
+  /** every stop the walk takes, by id, in the order it takes them */
+  order: () => readonly string[]
+  /** the stops of this visit the walker has stood at, as the plan reads them */
+  stood: () => readonly string[]
   /** a stop the story layer does not carry falls back to the wing's name */
   name: (id: string) => VinciText
+  /** the frame's own way out of the museum, which the words' foot row takes
+      in while the bar stands down */
+  door: () => HTMLElement | null
   /** the words of the controls the frame and the wing already carry */
   words: {
     next: VinciText
     back: VinciText
+    /** the name the frame gives the walk itself */
+    rail: VinciText
   }
   go: (index: number) => void
   /** how much of the leg under way is walked, 0 to 1, or null at rest */
@@ -185,12 +194,93 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
   on.append(onWords, onArrow)
   waysRow.append(back, on)
 
+  /* THE THREAD. One segment a stop, in the order the walk takes them: the
+     quiet stops short, the chapter cuts as uprights, the count in digits for
+     a visitor who does not point. A segment is a 44 px target that names its
+     own stop, on the pointer and on focus alike, and a press walks there. */
+  const thread = make('nav', 'desk-thread')
+  thread.hidden = !ways
+  const threadCount = make('span', 'desk-thread-count')
+  const chip = make('span', 'desk-chip')
+  chip.hidden = true
+  /** every segment, by the stop it stands for, in the walk's own order */
+  let segments: HTMLButtonElement[] = []
+
+  /** the stop's number, its chapter and its clock, which is the segment's own
+      name and the word the pointer brings */
+  function segmentName(id: string, place: number): string {
+    const stop = deskStoryStop(id)
+    const age = stop?.age ? ` · ${say(stop.age)}` : ''
+    return `${place} · ${say(titleOf(id))}${age}`
+  }
+
+  function buildThread(): void {
+    const ids = host.order()
+    thread.textContent = ''
+    segments = []
+    thread.append(threadCount)
+    ids.forEach((id, index) => {
+      const cut = index > 0 ? deskCutBetween(ids[index - 1]!, id) : null
+      if (cut) {
+        const upright = make('span', 'desk-cut')
+        upright.title = say(cut)
+        thread.append(upright)
+      }
+      const segment = make('button', 'desk-seg')
+      segment.type = 'button'
+      segment.dataset['stop'] = id
+      if (deskStoryStop(id)?.quiet) segment.dataset['quiet'] = 'true'
+      segment.append(make('i', 'desk-seg-bar'))
+      segment.addEventListener('click', () => host.go(index))
+      segment.addEventListener('pointerenter', () => nameSegment(segment))
+      segment.addEventListener('pointerleave', () => hideChip())
+      segment.addEventListener('focus', () => nameSegment(segment))
+      segment.addEventListener('blur', () => hideChip())
+      segments.push(segment)
+      thread.append(segment)
+    })
+    thread.append(chip)
+  }
+
+  /** the word a pointer brings is the control's own name, and it shows on
+      focus too: nothing here lives on a rollover alone */
+  function nameSegment(segment: HTMLButtonElement): void {
+    chip.textContent = segment.getAttribute('aria-label') ?? ''
+    chip.hidden = false
+    chip.style.left = `${segment.offsetLeft + segment.offsetWidth / 2}px`
+  }
+  function hideChip(): void { chip.hidden = true }
+
+  /* THE THREAD IS ONE STOP IN THE TAB ORDER, and the arrows walk inside it:
+     sixteen stops in the order would bury the two controls behind it. */
+  thread.addEventListener('keydown', event => {
+    const at = segments.indexOf(document.activeElement as HTMLButtonElement)
+    if (at < 0) return
+    const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0
+    let to = -1
+    if (step) to = Math.max(0, Math.min(segments.length - 1, at + step))
+    else if (event.key === 'Home') to = 0
+    else if (event.key === 'End') to = segments.length - 1
+    if (to < 0) return
+    event.preventDefault()
+    event.stopPropagation()
+    segments[to]?.focus()
+  })
+
   if (words) band.append(cap)
   else band.append(make('span', 'desk-nothing'))
   if (ways) band.append(waysRow)
   /* The top dusk goes in first, so the bar and the door block stand on it. */
   const top = make('div', 'desk-top')
-  host.stage.append(top, band)
+  host.stage.append(top, thread, band)
+
+  /* THE WAY OUT OF THE MUSEUM STAYS ONE PRESS AWAY. The bar stands down with
+     this step, so the door it carried moves into the words' foot row until
+     the drawer's own foot takes it. It is the frame's node, kept whole with
+     its word, its address and its plate, and put back where it stood. */
+  const doorNode = ways && words ? host.door() : null
+  const doorNext = doorNode?.nextElementSibling ?? null
+  const doorNest = doorNode?.parentElement ?? null
 
   back.addEventListener('click', () => {
     const at = host.standing()
@@ -222,6 +312,9 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
       clock.textContent = age ? say(age) : ''
       clock.hidden = !age
       count.textContent = `${at.index + 1} / ${at.count}`
+      // the thread carries the count where it stands; in the name row it
+      // would be the same number twice
+      count.hidden = ways
       line.textContent = stop ? say(stop.line) : ''
       line.hidden = !stop
       foot.textContent = ''
@@ -230,8 +323,10 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
       tell.textContent = ''
       tell.append(icon(PLAY), document.createTextNode(say(DESK_WORDS.tell)))
       foot.append(more, tell)
+      if (doorNode) foot.append(doorNode)
     }
     if (ways) {
+      paintThread()
       const to = host.next()
       onKicker.textContent = say(to ? host.words.next : DESK_WORDS.end)
       onTitle.textContent = to ? say(titleOf(to.id)) : ''
@@ -242,6 +337,27 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
       back.disabled = at.index === 0
     }
     measure()
+  }
+
+  /** the thread against the walk: where the visitor stands, where he has
+      stood, and which stops are quiet */
+  function paintThread(): void {
+    const at = host.standing()
+    if (segments.length !== host.order().length) buildThread()
+    thread.setAttribute('aria-label', say(host.words.rail))
+    threadCount.textContent = `${at.index + 1} / ${at.count}`
+    const stood = new Set(host.stood())
+    segments.forEach((segment, index) => {
+      const id = segment.dataset['stop'] ?? ''
+      const here = index === at.index
+      segment.dataset['here'] = String(here)
+      segment.dataset['stood'] = String(stood.has(id) && !here)
+      segment.tabIndex = here ? 0 : -1
+      segment.setAttribute('aria-label', segmentName(id, index + 1))
+      if (here) segment.setAttribute('aria-current', 'true')
+      else segment.removeAttribute('aria-current')
+    })
+    hideChip()
   }
 
   /* WHAT THE BAND TAKES AT THE FOOT, published for the parts that stood
@@ -275,6 +391,12 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
     if (Math.abs(at - walked) < 0.01) return
     walked = at
     ringLine.setAttribute('stroke-dasharray', `${(RING * at).toFixed(1)} ${RING.toFixed(1)}`)
+    /* THE THREAD STAYS WHILE A LEG RUNS, and the segment the leg leads to
+       fills with it: the walk's own count, never a clock. */
+    const here = segments[host.standing().index]
+    if (!here) return
+    here.dataset['walking'] = String(running)
+    here.style.setProperty('--desk-leg', `${(at * 100).toFixed(1)}%`)
   }
 
   function key(event: KeyboardEvent): boolean {
@@ -297,8 +419,11 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
     update,
     key,
     dispose() {
+      // the frame's door goes home before the band that borrowed it is struck
+      if (doorNode && doorNest) doorNest.insertBefore(doorNode, doorNext)
       band.remove()
       top.remove()
+      thread.remove()
       host.wing.style.removeProperty('--desk-foot-clear')
     },
   }

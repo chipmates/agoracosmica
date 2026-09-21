@@ -22,6 +22,8 @@ export interface DeskStoryStop {
   chapter: VinciText
   age: VinciText | null
   line: VinciText
+  /** what the drawer says about this place, one sentence a row */
+  drawer: VinciText | null
   /** the least sure claim of the line, which is what the mark shows */
   certainty: VinciCertainty
 }
@@ -64,6 +66,7 @@ export const deskStory: readonly DeskStoryStop[] = vinciStory
     chapter: stop.chapter,
     age: clock(stop.age),
     line: stop.line,
+    drawer: stop.drawer,
     certainty: sureness(stop.certainty),
   }))
 
@@ -71,4 +74,16 @@ const byId = new Map(deskStory.map(stop => [stop.id, stop]))
 
 export function deskStoryStop(id: string): DeskStoryStop | undefined {
   return byId.get(id)
+}
+
+/* THE CHAPTER CUTS, READ FROM THE SAME LIST AS THE STOPS. A cut stands on the
+   thread between two stops the walk takes one after the other, and only when
+   the walk runs the story's way between them: an order that is not the
+   story's crosses no chapter boundary, so it draws no upright. */
+export function deskCutBetween(from: string, to: string): VinciText | null {
+  const a = byId.get(from), b = byId.get(to)
+  if (!a || !b || b.order <= a.order) return null
+  const between = vinciStory.filter(stop => stop.order > a.order && stop.order < b.order)
+  if (!between.length || between.some(stop => stop.kind !== 'cut')) return null
+  return between[between.length - 1]!.chapter
 }

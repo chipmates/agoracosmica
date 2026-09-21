@@ -434,8 +434,11 @@ export function createWing():VinciWingModule {
       stage:h.stage,wing,lang,
       standing:()=>deskStationAt(card),
       next:()=>card+1<vinciContent.length?deskStationAt(card+1):null,
+      order:()=>vinciContent.map(s=>s.id),
+      stood:()=>visit?.stood??[],
       name:id=>vinciContent.find(s=>s.id===id)?.name??{en:'',de:''},
-      words:{next:LIFE_CARDS.controls.date.next,back:LIFE_CARDS.controls.date.previous},
+      door:()=>wing.querySelector<HTMLElement>('.wing-door'),
+      words:{next:LIFE_CARDS.controls.date.next,back:LIFE_CARDS.controls.date.previous,rail:WING_TEXT.rail},
       go:index=>h.navigate(index),
       leg:()=>{const nav=standing?rail.navigation:undefined;return nav?.active?nav.legWalked:null},
       hurry:()=>{if(standing)rail.stride(1)}})
