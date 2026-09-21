@@ -86,8 +86,15 @@
 //
 // AND IT CAN BE AIMED. `--soffit` keeps, in each frame, only the tiles the
 // gate passage's own ceiling prism projects onto; `--region` takes any world
-// box. A whole-frame reading of a walk through a passage is mostly street and
-// court, and the owner's sighting is on the ceiling.
+// box; `--aim <place>` takes one of the named places below. A whole-frame
+// reading of a walk through a passage is mostly street and court, and the
+// owner's sighting is on the ceiling.
+//
+// AND THE SURFACE MAY COUNT FOR ITSELF. When the page publishes
+// `window.__naShadow` (a flat object of counters), it is read on the same
+// animation frame as the pose, and the report says what the break did on the
+// frames each counter moved on against the frames it did not. A replay from
+// the outside guesses which frames a mechanism fired on; this asks.
 import { chromium } from 'playwright'
 import { spawn } from 'node:child_process'
 import { createHash } from 'node:crypto'
@@ -280,13 +287,33 @@ async function installEvenClock(page, step) {
    it with any world box; `--mask-frame` paints the mask over a frame, which
    is how it is checked by eye rather than by this comment. */
 const SOFFIT_PRISM = { quad: [[14.996, 18.043], [17.461, 16.443], [18.928, 18.59], [16.463, 20.191]], y: [3.2, 3.36] }
+/* THE THREE PLACES THE OWNER NAMED, as world boxes in the app's own
+   coordinates, so a run names its place rather than carrying six numbers
+   somebody typed. Each is projected per frame, so the rectangle follows its
+   target through the leg.
+   `grave-shadow`: the gallery's east return, inner face, where the cast edge
+   crosses it behind the grave. `supper-block`: the light block at the foot of
+   the glazed north front, the box the court seat read the same place with.
+   `line-floor`: the line station's floor, the band ahead of the eye that
+   stands clear of the card and the row. */
+const PLACES = {
+  'grave-shadow': { name: "the grave's shadow edge", box: [-61.2, -4.6, 16.05, -50, -0.35, 16.45] },
+  'supper-block': { name: 'the block at the foot of the glazed front', box: [-45, -6.6, 33.6, -30, -6.2, 34.3] },
+  'line-floor': { name: "the line station's floor", box: [-34.5, -6.36, 44, -25.5, -6.26, 59] },
+}
+const PLACE = value('aim', '')
+if (PLACE && !PLACES[PLACE]) throw new Error(`no such aim: ${PLACE}. One of ${Object.keys(PLACES).join(', ')}`)
+const boxAim = (name, box) => ({
+  name,
+  quad: [[box[0], box[2]], [box[3], box[2]], [box[3], box[5]], [box[0], box[5]]],
+  y: [box[1], box[4]],
+  box,
+})
 const AIM =
   REGION.length === 6
-    ? {
-        name: `world box ${REGION.join(',')}`,
-        quad: [[REGION[0], REGION[2]], [REGION[3], REGION[2]], [REGION[3], REGION[5]], [REGION[0], REGION[5]]],
-        y: [REGION[1], REGION[4]],
-      }
+    ? boxAim(`world box ${REGION.join(',')}`, REGION)
+    : PLACE
+    ? boxAim(PLACES[PLACE].name, PLACES[PLACE].box)
     : SOFFIT
     ? { name: 'the gate passage ceiling', ...SOFFIT_PRISM }
     : null
@@ -464,11 +491,18 @@ function castToDisk(page, client, dir) {
  * clock, because that is what the cast stamps its frames with; the even
  * clock's own frame number rides beside it as the axis the reading is taken
  * along. */
+/* AND WHATEVER THE SURFACE ITSELF COUNTS. A page that publishes
+   `window.__naShadow` as a flat object of numbers (a refocus counter, a
+   shadow-map invalidation counter, a re-weld counter, a caster count) has
+   that object read on the same animation frame as the pose, so the frames a
+   mechanism fired on are named by the app rather than replayed from the
+   outside. Absent, nothing changes. */
 async function startRecorder(page) {
   await page.evaluate(() => {
     const w = window
     const real = w.__even ? w.__even.realNow : performance.now.bind(performance)
-    w.__walk = { origin: performance.timeOrigin, samples: [] }
+    const probe = w.__naShadow && typeof w.__naShadow === 'object' ? Object.keys(w.__naShadow).sort() : null
+    w.__walk = { origin: performance.timeOrigin, samples: [], probeKeys: probe }
     const tick = () => {
       const s = w.__forge?.state?.()
       const c = s?.cam
@@ -476,6 +510,7 @@ async function startRecorder(page) {
         w.__walk.samples.push([
           real(), c.p[0], c.p[1], c.p[2], c.r[0], c.r[1], c.r[2], c.fov, s.draws, s.tris,
           w.__even ? w.__even.frames : null,
+          probe ? probe.map((k) => Number(w.__naShadow[k])) : null,
         ])
       w.__walk.raf = requestAnimationFrame(tick)
     }
@@ -488,8 +523,8 @@ async function stopRecorder(page) {
     const w = window
     cancelAnimationFrame(w.__walk.raf)
     const held = w.__walk
-    w.__walk = { origin: held.origin, samples: [] }
-    return { origin: held.origin, samples: held.samples }
+    w.__walk = { origin: held.origin, samples: [], probeKeys: held.probeKeys }
+    return { origin: held.origin, samples: held.samples, probeKeys: held.probeKeys }
   })
 }
 
@@ -649,7 +684,7 @@ function replayRefocus(samples) {
  * One captured run, read whole: the spread per tile, the events, and the
  * worst three frame pairs written out beside the report.
  */
-async function readRun(name, dir, allTimes, samples, origin, keepPairs, heldFrom = null) {
+async function readRun(name, dir, allTimes, samples, origin, keepPairs, heldFrom = null, probeKeys = null) {
   const all = readdirSync(dir).filter((f) => f.endsWith('.png')).sort()
   if (all.length < 6) return { error: `the screencast handed back ${all.length} frames` }
   /* A REPEATED SURFACE IS NOT A FRAME, and on a walk it is a defect in the
@@ -729,7 +764,8 @@ async function readRun(name, dir, allTimes, samples, origin, keepPairs, heldFrom
     if (!b) return a
     const span = poseEpoch[i + 1] - poseEpoch[i]
     const k = span > 0 ? Math.max(0, Math.min(1, (t - poseEpoch[i]) / span)) : 0
-    return a.map((v, j) => v + (b[j] - v) * k)
+    // the counters ride at the end of a sample and are counts, never a ramp
+    return a.map((v, j) => (typeof v === 'number' && typeof b[j] === 'number' ? v + (b[j] - v) * k : v))
   }
   for (let n = 0; n < N; n++) pose[n] = poseAt(times[n]) ?? pose[n]
   /* AND WHERE THE CAST HELD THE REINS ONE FRAME AT A TIME, THE POSE IS NOT
@@ -771,6 +807,24 @@ async function readRun(name, dir, allTimes, samples, origin, keepPairs, heldFrom
   for (const i of fired) {
     const n = poseIndex.findIndex((k) => k >= i)
     if (n > 0) refocusFrames.add(n)
+  }
+  /* AND THE FRAMES THE SURFACE ITSELF SAYS A MECHANISM FIRED ON. Each counter
+     is read once a frame; a captured frame whose value differs from the
+     previous captured frame's is a frame that mechanism ran on. */
+  const probeChanged = {}
+  if (probeKeys) {
+    for (const [j, key] of probeKeys.entries()) {
+      const fires = new Set()
+      let previous = null
+      for (let n = 0; n < N; n++) {
+        const row = pose[n]?.[11]
+        if (!Array.isArray(row)) continue
+        const v = row[j]
+        if (previous !== null && v !== previous) fires.add(n)
+        previous = v
+      }
+      probeChanged[key] = fires
+    }
   }
 
   /* the window: the frames the reading is taken over */
@@ -869,6 +923,21 @@ async function readRun(name, dir, allTimes, samples, origin, keepPairs, heldFrom
       turnedDeg: a && b ? +((Math.abs(b[5] - a[5]) + Math.abs(b[4] - a[4])) * (180 / Math.PI)).toFixed(3) : null,
     })
   }
+  /* THE TABLE THE MECHANISM IS NAMED IN: for every counter, the frames it
+     moved on against the frames it did not, read on the same series. */
+  const probeTest = {}
+  for (const key of Object.keys(probeChanged)) {
+    const on = breakSeries.filter((s) => probeChanged[key].has(s.n))
+    const off = breakSeries.filter((s) => !probeChanged[key].has(s.n))
+    probeTest[key] = {
+      frames: on.length,
+      tilesOverOn: +median(on.map((s) => s.over)).toFixed(1),
+      tilesOverOff: +median(off.map((s) => s.over)).toFixed(1),
+      meanBreakOn: +median(on.map((s) => s.mean)).toFixed(3),
+      meanBreakOff: +median(off.map((s) => s.mean)).toFixed(3),
+      worstOn: Math.max(0, ...on.map((s) => s.over)),
+    }
+  }
   const onRefocus = breakSeries.filter((s) => s.refocus)
   const offRefocus = breakSeries.filter((s) => !s.refocus)
   const cascadeTest = {
@@ -927,6 +996,7 @@ async function readRun(name, dir, allTimes, samples, origin, keepPairs, heldFrom
         withinStride: moved === null ? null : moved <= STRIDE_M,
         eye: a ? [+a[1].toFixed(2), +a[2].toFixed(2), +a[3].toFixed(2)] : null,
         refocus: refocusFrames.has(n),
+        fired: Object.keys(probeChanged).filter((key) => probeChanged[key].has(n)),
       })
     }
   }
@@ -1057,6 +1127,7 @@ async function readRun(name, dir, allTimes, samples, origin, keepPairs, heldFrom
        doing, and the capture rate beside it is what changed instead. */
     virtualFrames: even ? Math.round(pose[last][10] - pose[first][10]) : null,
     regions,
+    probe: probeKeys ? { keys: probeKeys, test: probeTest } : null,
     events: events.length,
     /* THE COUNT DIVIDED BY WHAT IT WAS COUNTED OVER. An event count is a
        count over captured frames, so it rises with the capture alone; the
@@ -1146,7 +1217,7 @@ async function walkLeg(page, client, from, to, name, keepPairs) {
   const { times, even, heldFrom, stale } = await cast.stop()
   const rec = await stopRecorder(page)
   const seconds = +((Date.now() - began) / 1000).toFixed(2)
-  const run = await readRun(name, join(RAW, name), times, rec.samples, rec.origin, keepPairs, heldFrom)
+  const run = await readRun(name, join(RAW, name), times, rec.samples, rec.origin, keepPairs, heldFrom, rec.probeKeys)
   return { leg: `${from} to ${to}`, name, stoodAt, seconds, gate: even, staleEmissions: stale, ...run }
 }
 
@@ -1176,7 +1247,7 @@ async function holdControl(page, client, at, name, view = '') {
   while (cast.count < HOLD_FRAMES && Date.now() < until) await page.waitForTimeout(40)
   const { times, even, heldFrom, stale } = await cast.stop()
   const rec = await stopRecorder(page)
-  const run = await readRun(name, join(RAW, name), times, rec.samples, rec.origin, null, heldFrom)
+  const run = await readRun(name, join(RAW, name), times, rec.samples, rec.origin, null, heldFrom, rec.probeKeys)
   return { hold: at, name, gate: even, staleEmissions: stale, ...run }
 }
 
@@ -1275,6 +1346,11 @@ try {
         `    · break per frame: ${run.cascadeTest.tilesOverOnRefocus} tile(s) over ${D2_ABS} levels on a refocus frame ` +
           `against ${run.cascadeTest.tilesOverOffRefocus} off one, mean ${run.cascadeTest.meanBreakOnRefocus} against ${run.cascadeTest.meanBreakOffRefocus}`
       )
+      for (const [key, t] of Object.entries(run.probe?.test ?? {}))
+        say(
+          `    · ${key} moved on ${t.frames} frame(s): ${t.tilesOverOn} tile(s) over ${D2_ABS} levels against ` +
+            `${t.tilesOverOff} off, mean ${t.meanBreakOn} against ${t.meanBreakOff}, worst ${t.worstOn}`
+        )
       for (const e of run.worst.slice(0, 3))
         say(
           `    · frame ${e.frame}: ${e.tiles} tiles at [${e.at}] box [${e.box}], peak ${e.peak}, ` +
