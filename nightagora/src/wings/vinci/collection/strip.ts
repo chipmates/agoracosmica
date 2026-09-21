@@ -65,10 +65,19 @@ export interface VinciStripEntry {
   title: string
   /** The certainty colour of this object, which is a fact, not a style. */
   colour: string
-  /** The plate at rest, where the record carries one. */
+  /** The plate at rest. An entry without one is not a cell. */
   preview: string | null
   openable: boolean
 }
+
+/** THE CELLS OF A ROW: the entries that carry a picture of what they open.
+ * A cell exists to show that picture, so a tile with only a word or a year
+ * in it is not one, and a station whose exhibits have no plates stands with
+ * no row at all rather than with a line of bare tiles. Its dates are chosen
+ * where they already are, on the floor itself and in the life. Every row of
+ * this wing is painted from this one predicate. */
+export const vinciStripCells = (entries: readonly VinciStripEntry[]): VinciStripEntry[] =>
+  entries.filter(entry => entry.preview !== null)
 
 /** What a row standing at a WALL is: the whole hang, and the way off it. */
 export interface VinciStripWall {
@@ -245,17 +254,6 @@ export function createVinciHangStrip(options: {
       button.setAttribute('aria-label', entry.title)
       button.disabled = !entry.openable
       button.tabIndex = -1
-      // A DATE IS AN EXHIBIT WITHOUT A PICTURE. Its own year stands in the
-      // cell, read off the date its record names, and the button keeps the
-      // whole date as its name.
-      const year = entry.preview === null ? /\d{4}/.exec(entry.title)?.[0] : undefined
-      if (year !== undefined && entry.id.startsWith('stud/')) {
-        const stamp = document.createElement('span')
-        stamp.className = 'vinci-strip-year'
-        stamp.textContent = year
-        stamp.setAttribute('aria-hidden', 'true')
-        button.append(stamp)
-      }
       if (entry.preview) {
         const thumb = document.createElement('img')
         thumb.className = 'vinci-strip-thumb'
@@ -358,9 +356,10 @@ export function createVinciHangStrip(options: {
     get count() { return entries.length },
     setEntries(next, label) {
       if (disposed) return
-      const same = next.length === entries.length
-        && next.every((entry, at) => entry.id === entries[at]!.id && entry.title === entries[at]!.title)
-      entries = next
+      const cells = vinciStripCells(next)
+      const same = cells.length === entries.length
+        && cells.every((entry, at) => entry.id === entries[at]!.id && entry.title === entries[at]!.title)
+      entries = cells
       named = label
       paintLabel()
       if (!same) paint()
