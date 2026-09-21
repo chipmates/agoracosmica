@@ -381,9 +381,17 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
       /** where on the wall the eye stands, and the eye a run will land on: the
        * room's one full plate is streamed against that eye and not against the
        * body, so a run past every work carries a single request */
-      wall:wallAt, wallId:wallOn?.id, running:active?.wall!==undefined, aimEye:active?.wall!==undefined?active.pose.eye:undefined } },
-    set(id:VinciStationId,pose:Pose,instant=false,phone=camera.aspect<=.9) {
-      const request={id,pose:{eye:pose.eye.clone(),at:pose.at.clone(),fov:pose.fov},phone}
+      wall:wallAt, wallId:wallOn?.id, running:active?.wall!==undefined, aimEye:active?.wall!==undefined?active.pose.eye:undefined,
+      /** the vertex the leg under way is walking to, so a surface can name
+       *  the stop being arrived at before the eye stands on it */
+      wallTo:active?.wall } },
+    /** A target that names a vertex of a wall is walked on that wall's own
+     * line, so a stop of the walk may stand at a certified vertex without
+     * being a station with a route of its own. */
+    set(id:VinciStationId,pose:Pose,instant=false,phone=camera.aspect<=.9,vertex?:number) {
+      const onWall=vertex!==undefined?wallOfStation(id):undefined
+      const request:Request={id,pose:{eye:pose.eye.clone(),at:pose.at.clone(),fov:pose.fov},phone,
+        ...(onWall?{wall:vertex,wallOn:onWall}:{})}
       // Initial/named placement, explicit inspection return and resize are
       // deliberate placement boundaries, including during reduced motion.
       if(instant||!completed){pending=undefined;placeEndpoint(request);placementNeedsFrame=true;return}
@@ -405,8 +413,9 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
       if(viewing)wantsReturn=true
       // ON THE WALL THE WAY OFF IT IS THE WALL. A stop is a vertex of one
       // certified line whose ends are the room's two stations, so the eye
-      // runs to the nearer of them and the walk goes on from there.
-      if(wallOn&&wallAt!==undefined&&!vinciWallIsEnd(wallOn,wallAt)){wantsReturn=false;wallReturn=vinciWallEndVertex(wallOn,vinciWallNearerEnd(wallOn,wallAt))}
+      // runs to the nearer of them and the walk goes on from there. A target
+      // on the same line is not a way off it: that run is the line itself.
+      if(wallOn&&wallAt!==undefined&&!vinciWallIsEnd(wallOn,wallAt)&&request.wall===undefined){wantsReturn=false;wallReturn=vinciWallEndVertex(wallOn,vinciWallNearerEnd(wallOn,wallAt))}
     },
     /** A RUN ALONG THE WALL, from the vertex the eye stands on to another. A
      * second press while one runs is queued, not cut: it leaves in the update
