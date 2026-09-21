@@ -100,6 +100,12 @@ export interface VinciHangStrip {
   /** The wall this row is the instrument of, or null where it is only a row. */
   setWall(wall: VinciStripWall | null): void
   setHidden(hidden: boolean): void
+  /** ONE SELECTOR PER VIEW. A view that brings its own way through the same
+   * set, the reader's strip of sides, silences the row while it stands: two
+   * selectors for one set is a choice a visitor has to make twice. A view
+   * that brings none, a work in the vitrine or a machine on its turntable,
+   * keeps the row and takes it under its own words. */
+  setViewSelector(brings: boolean): void
   /** Where the row stands: along the foot of the wide stage, at a rectangle
    * under the station card, inline inside a card that holds it, or null for
    * the narrow stage's own place. */
@@ -159,7 +165,7 @@ export function createVinciHangStrip(options: {
 
   let entries: readonly VinciStripEntry[] = []
   let docked = ''
-  let open: string | null = null, hidden = false, disposed = false
+  let open: string | null = null, hidden = false, ownSelector = false, disposed = false
   const buttons: HTMLButtonElement[] = []
   const arrive = (address: string, thumb: string): void => {
     for (const image of row.querySelectorAll<HTMLImageElement>('img.vinci-strip-thumb'))
@@ -341,6 +347,13 @@ export function createVinciHangStrip(options: {
       : WALL_WORDS.place[lang()].replace('{n}', String(stop)).replace('{total}', String(total))
     foot.hidden = !place.textContent && whole.hidden
   }
+  /** The row stands unless something stands for it. */
+  function stand(): void {
+    const was = frame.hidden
+    frame.hidden = hidden || ownSelector || entries.length < 2
+    if (was && !frame.hidden) { paintScale(); reveal() }
+    paintPlace()
+  }
   function rowPlace(): number {
     if (!buttons.length || frame.hidden) return 0
     const held = buttons.findIndex(button => button === document.activeElement)
@@ -363,7 +376,7 @@ export function createVinciHangStrip(options: {
       named = label
       paintLabel()
       if (!same) paint()
-      frame.hidden = hidden || entries.length < 2
+      stand()
       paintPlace()
     },
     setOpen(id) {
@@ -379,10 +392,11 @@ export function createVinciHangStrip(options: {
     },
     setHidden(next) {
       hidden = next
-      const was = frame.hidden
-      frame.hidden = hidden || entries.length < 2
-      if (was && !frame.hidden) { paintScale(); reveal() }
-      paintPlace()
+      stand()
+    },
+    setViewSelector(brings) {
+      ownSelector = brings
+      stand()
     },
     dock(place_, parent) {
       const key = place_ === null ? 'narrow' : typeof place_ === 'string' ? place_

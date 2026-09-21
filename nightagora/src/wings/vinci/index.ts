@@ -1157,6 +1157,10 @@ export function createWing():VinciWingModule {
     strip.setWall(at===undefined||!stops.length?null:{place:onWallStop()&&at<=stops.length?at:0,total:stops.length,
       hang:wallOn()?.id===VINCI_PICTURE_WALL,whole:()=>wholeWall()})
     strip.setHidden(mode===2||(narrow()&&Boolean(open)))
+    // ONE SELECTOR PER VIEW. A leaf opens in the reader, which brings its own
+    // strip of the same set of sides; the one reader that stands without a
+    // strip opens at a station that holds no row of its own.
+    strip.setViewSelector(Boolean(open?.endsWith(LEAF_DOOR)))
     // THE ROW NEVER STANDS OVER A WORK. On the wide stage it runs along the
     // foot of the frame above the bar, which is where a row of twenty five
     // can be large enough to recognise; while a vitrine holds the stage at an
