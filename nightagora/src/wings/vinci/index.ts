@@ -1363,7 +1363,9 @@ export function createWing():VinciWingModule {
    * one. The boxes are taken fresh each frame, so a mark returns the moment
    * its panel leaves. */
   function standingPanels(reading:VinciLabelRect|null):VinciLabelRect[] {
-    const panels:VinciLabelRect[]=reading?[reading]:[]
+    // the words are a panel too, once the free area is a contract: no mark of
+    // either kind may stand under them
+    const panels:VinciLabelRect[]=reading?[reading,...(desk?.panels()??[])]:[...(desk?.panels()??[])]
     for(const node of [header,strip?.element,barEl]){
       if(!node||node.hidden)continue
       const box=node.getBoundingClientRect()

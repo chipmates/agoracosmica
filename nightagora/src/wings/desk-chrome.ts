@@ -59,6 +59,9 @@ export interface DeskChrome {
   /** The first pixel down the screen the chrome owns: where a panel that used
       to stop above the bar now stops. Null while neither step stands. */
   floor(): number | null
+  /** The boxes the words hold, for the layer that places the marks: no mark
+      of either kind may stand under the words or under the drawer. */
+  panels(): { left: number; top: number; right: number; bottom: number }[]
   /** the station changed, or the language did */
   paint(): void
   /** one frame: the counted ring and nothing else */
@@ -138,6 +141,14 @@ function make<K extends keyof HTMLElementTagNameMap>(
 
 /** the whole circumference of the counted ring, in user units */
 const RING = 2 * Math.PI * 20.5
+
+/* THE FIRST OF THE THREE REMEDIES, station by station. The words never move
+   to clear a subject; where the wide measure covers one and the narrow one
+   does not, the station takes the narrow measure and keeps the same margin
+   and the same foot line. This list is the machine's, not a judgement:
+   `forge/free-area.mjs` names every station it holds and every station it
+   cannot clear, which is the rail seat's list to re-aim. */
+const NARROW_STATIONS: readonly string[] = ['works']
 
 export function createDeskChrome(host: DeskChromeHost): DeskChrome {
   const words = deskOn('words')
@@ -303,6 +314,8 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
   function paint(): void {
     const at = host.standing()
     const stop = deskStoryStop(at.id)
+    if (deskOn('freearea') && NARROW_STATIONS.includes(at.id)) host.wing.dataset['measure'] = 'narrow'
+    else delete host.wing.dataset['measure']
     if (words) {
       nameRow.textContent = ''
       const sure: VinciCertainty = stop?.certainty ?? 'reconstructed'
@@ -409,6 +422,16 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
   }
 
   return {
+    panels: () => {
+      if (!words || !deskOn('freearea')) return []
+      const out: { left: number; top: number; right: number; bottom: number }[] = []
+      for (const node of [cap as HTMLElement]) {
+        const box = node.getBoundingClientRect()
+        if (box.width > 0 && box.height > 0)
+          out.push({ left: box.left, top: box.top, right: box.right, bottom: box.bottom })
+      }
+      return out
+    },
     floor: () => {
       const box = band.getBoundingClientRect()
       // the padding above the words is the dusk, not the words: a panel may
