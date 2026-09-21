@@ -73,7 +73,7 @@ export interface SurfaceTerms {
 }
 
 export function surfaceTerms(o: SurfaceTermsOptions): SurfaceTerms {
-  const { float, floor, fract, mix, normalWorldGeometry, positionWorld } = TSL as unknown as Record<string, TSLNode>
+  const { float, floor, fract, mix, normalWorldGeometry, positionWorld, smoothstep } = TSL as unknown as Record<string, TSLNode>
   const P = o.at ?? positionWorld, n = o.normal ?? normalWorldGeometry
   const detail = surfaceDetail({
     scales: fitScales(o.scales, o.extent), figure: o.figure ?? [.16, .105, .075],
@@ -88,16 +88,28 @@ export function surfaceTerms(o: SurfaceTermsOptions): SurfaceTerms {
   const acrossFace = n.x.abs().greaterThan(n.z.abs())
   const along = acrossFace.select(P.z, P.x), alongPixel = acrossFace.select(north, east)
   const upright = n.y.abs().lessThan(.5)
-  const thin = upright.select(P.y, east.lessThan(north).select(P.x, P.z))
+  /** WHICH AXIS IS THE THIN ONE IS NOT A DECISION. Taken as a comparison of
+   * two screen derivatives it draws a hard line across every floor where the
+   * two are equal, and that line moves with the eye: either side of it the
+   * band and the block are cut from a different coordinate, so a walking
+   * visitor sees a whole region change tone and gloss between two frames.
+   * The two are laid instead and crossed on how thin the pixel actually is,
+   * so no fragment ever jumps from one to the other. */
+  const thinX = upright.select(P.y, P.x), thinZ = upright.select(P.y, P.z)
   const thinPixel = upright.select(up, east.min(north))
+  const towardX = upright.select(float(1), smoothstep(-.35, .35, north.sub(east).div(north.add(east).max(1e-6))))
   // Two octaves, because a float lays laps inside laps and because one octave
   // over the few cells a frame holds does not average to zero.
-  const lapT = thin.div(o.lapM)
-  const lap = bands(lapT, 23.7).mul(.62).add(bands(lapT.mul(2.37).add(1.7), 9.41).mul(.38))
-    .mul(resolved(o.lapM, thinPixel)).toVar()
+  const laid = (coordinate: TSLNode): TSLNode => {
+    const t = coordinate.div(o.lapM)
+    return bands(t, 23.7).mul(.62).add(bands(t.mul(2.37).add(1.7), 9.41).mul(.38))
+  }
+  const lap = mix(laid(thinZ), laid(thinX), towardX).mul(resolved(o.lapM, thinPixel)).toVar()
   const drift = bands(along.div(o.driftM), 5.13).mul(resolved(o.driftM, alongPixel)).toVar()
+  const block = (coordinate: TSLNode): TSLNode =>
+    hashOf(floor(along.div(o.cellM![0])).add(floor(coordinate.div(o.cellM![1])).mul(5.73)), 17.31)
   const cell = o.cellM
-    ? hashOf(floor(along.div(o.cellM[0])).add(floor(thin.div(o.cellM[1])).mul(5.73)), 17.31)
+    ? mix(block(thinZ), block(thinX), towardX)
       .mul(resolved(o.cellM[0], alongPixel)).mul(resolved(o.cellM[1], thinPixel)).toVar()
     : float(0)
   return {
