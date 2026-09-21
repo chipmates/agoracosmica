@@ -9,7 +9,7 @@
    one slow compile does not colour the whole reading. */
 
 import { Vector2, type WebGPURenderer } from 'three/webgpu'
-import { samplesFor } from './post'
+import { allocatedSamples, samplesFor } from './post'
 import type { Tier, TierName } from './tier'
 
 export interface CostReading {
@@ -56,7 +56,8 @@ const DEPTH = 4
 
 export function frameBytes(tier: Tier, width: number, height: number, pixelRatio: number): number {
   const px = width * height
-  const s = samplesFor(tier, pixelRatio)
+  // what the backend keeps, never what the pass asked for
+  const s = allocatedSamples(samplesFor(tier, pixelRatio))
   // colour: the resolve target always, plus the multisampled attachment
   let bytes = px * RGBA16F * (s > 0 ? s + 1 : 1)
   bytes += px * DEPTH * (s > 0 ? s : 1)

@@ -230,6 +230,14 @@ export function samplesFor(tier: Tier, pixelRatio = 1): number {
   return pixelRatio > 1 ? Math.max(2, Math.round(tier.samples / 2)) : tier.samples
 }
 
+/**
+ * What the backend ALLOCATES for a request. Any count under four comes back
+ * as a single sample with no second attachment at all, so a meter that
+ * charges the request pays for coverage the picture never had.
+ */
+export function allocatedSamples(asked: number): number {
+  return asked >= 4 ? 4 : 0
+}
 
 export function createPost(
   renderer: WebGPURenderer,
