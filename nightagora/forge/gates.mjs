@@ -116,6 +116,8 @@ const SLUG = WING ? (args[2] ?? SPEC?.wing ?? process.env['FORGE_SLUG'] ?? 'vinc
 const SPEC_CONES = WING && SPEC?.coneCorners && typeof SPEC.coneCorners === 'object' ? SPEC.coneCorners : null
 
 const say = (line) => process.stderr.write(`${line}\n`)
+/** the retina reading walks to four stations and reads six frames at each */
+const RETINA_MS = 900000
 const lines = []
 const gate = (name, ok, detail) => {
   lines.push({ name, ok, detail })
@@ -771,6 +773,40 @@ let flicker = null
   else gate('flicker', flicker?.state === 'PASS', detail)
 }
 
+/* AND THE SAME STATIONS AT THE RATIO THE VISITOR HAS. Every instrument
+   above shoots the desktop at a device ratio of one, where the backend
+   keeps four samples of the scene pass; a retina screen has ratio two,
+   where it keeps one, and the same edge then steps several times as far.
+   This line reads the step in levels at that ratio and prints it beside
+   the ratio-one reading. It is measured and never decides a run. */
+let retina = null
+if (SURFACE === 'wing' && SLUG) {
+  const four = SPEC_CONES ? Object.keys(SPEC_CONES).slice(0, 4) : []
+  if (!(await freePort())) {
+    retina = { error: `port ${PORT} never freed, the retina reading was not taken` }
+  } else {
+    say("  the stability audit, at the visitor's device ratio")
+    const run = await json(
+      'node',
+      ['forge/stability-audit.mjs', String(PORT), SLUG, '--json', '--dpr', '2', '--no-maps',
+       ...(four.length ? ['--stations', four.join(',')] : [])],
+      {},
+      RETINA_MS
+    )
+    retina = run.parsed ?? { error: 'the stability audit did not answer JSON', raw: run.raw }
+  }
+}
+{
+  const poses = retina?.poses ?? []
+  const said = poses
+    .map((p) => `${p.name.replace(/^station /, '')} step ${p.edgeJump} levels, class 1/2/3 ${p.perMpx['1']}/${p.perMpx['2']}/${p.perMpx['3']} per million`)
+    .join(' | ')
+  const stage = retina?.samples
+    ? `ratio ${retina.samples.pixelRatio}, ${retina.samples.allocated} sample(s) allocated of ${retina.samples.asked} asked`
+    : 'the stage was not read'
+  warn('retina flicker', poses.length > 0 && !retina?.error, retina?.error ? retina.error : `${stage} | ${said || 'no pose was read'}`)
+}
+
 /* THE HONESTY WALK, THE STATIONS ONLY. Opening every close look reads ten
    times the labels and takes about forty minutes, which no gate run can
    carry, so `--looks` is the card walk's own run and is not asked for here. */
@@ -861,6 +897,7 @@ const report = {
   cones: coneReport,
   leak: leakReport,
   flicker,
+  retina,
   gates: lines,
   ok: failed.length === 0,
   failed,
