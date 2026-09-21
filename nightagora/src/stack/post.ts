@@ -203,17 +203,15 @@ function dialsOf(asked: Grade | null | undefined): Dials {
  * depth: a pass that carries any of the three carries no MSAA, and the tier
  * table is written so the lobby never asks for both.
  *
- * And a tier's sample count is what it asks for at a pixel ratio of one. A
- * retina buffer already holds four device pixels per pixel the visitor sees,
- * so the count halves above ratio one and never falls under two. Without
- * that rule the hero tier on a 2x display holds eight subsamples of a
- * half-float frame per visible pixel, which is a quarter of a gigabyte of
- * buffers for coverage the display cannot show.
+ * And a tier asks for its own count at EVERY ratio. The count used to halve
+ * above ratio one, on the reasoning that a retina buffer already holds four
+ * device pixels per pixel the visitor sees. The backend rounds any request
+ * under four down to one, so that halving did not buy half the coverage, it
+ * bought none: every display above ratio one drew with a single sample. The
+ * buffer is capped under the display instead (`tier.pixelRatio`), which is
+ * where the memory is actually saved.
  *
- * `?samples=<n>` overrides the second rule for a measured run. The backend
- * rounds any request under four down to one, so the halving above costs the
- * whole of the multisampling on every display with a ratio over one; the
- * switch is how that is read against a count the backend keeps.
+ * `?samples=<n>` asks for a count of its own, for a measured run.
  */
 export function samplesFor(tier: Tier, pixelRatio = 1): number {
   const readsDepth = tier.ao.on || tier.dof || tier.aa === 'taa'
@@ -221,13 +219,8 @@ export function samplesFor(tier: Tier, pixelRatio = 1): number {
   const said = new URLSearchParams(location.search).get('samples')
   const asked = said === null ? NaN : Number(said)
   if (Number.isFinite(asked) && asked >= 0) return asked
-  if (tier.samples === 0) return 0
-  /* THE CALM TIER KEEPS ITS FOUR AT EVERY RATIO. The backend rounds any
-     request under four down to one, so halving four does not buy half the
-     coverage, it buys none. On this tier the whole of it is seventeen
-     megabytes of buffers and under a millisecond, measured. */
-  if (tier.name === 'calm') return tier.samples
-  return pixelRatio > 1 ? Math.max(2, Math.round(tier.samples / 2)) : tier.samples
+  void pixelRatio
+  return tier.samples
 }
 
 /**
