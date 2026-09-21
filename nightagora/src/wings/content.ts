@@ -74,7 +74,7 @@ export const WING_TEXT = {
   },
   doorTerms: {
     en: 'Nonprofit and open source. It opens in a new tab, with free turns every day and no key needed.',
-    de: 'Gemeinnützig und Open Source. Öffnet in einem neuen Tab, mit freien Gesprächsrunden an jedem Tag und ohne Schlüssel.',
+    de: 'Non-Profit und Open Source. Öffnet in einem neuen Tab, mit freien Gesprächsrunden an jedem Tag und ohne Schlüssel.',
   },
   /** the plate's way in, which carries the station's own question */
   doorAsk: {
