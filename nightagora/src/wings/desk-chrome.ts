@@ -157,6 +157,17 @@ const RING = 2 * Math.PI * 20.5
    cannot clear, which is the rail seat's list to re-aim. */
 const NARROW_STATIONS: readonly string[] = ['works']
 
+/* THE THREAD IS NOT MOUNTED. A row of unlabelled dashes is a sign where this
+   museum uses words, and the count in the name row already says where the
+   visitor stands. The part stands built and unused: where the visitor jumps
+   from will be the plan, the life and the story's index page. */
+const DESK_THREAD = false
+
+/* THE GUIDED VISIT IS NOT OFFERED HERE. Its control named itself and refused,
+   which reads as a control that does nothing; its way in is the title wall,
+   with the step that builds it. The part stands built and unused. */
+const DESK_TELL = false
+
 export function createDeskChrome(host: DeskChromeHost): DeskChrome {
   const words = deskOn('words')
   const ways = deskOn('ways')
@@ -226,7 +237,7 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
      a visitor who does not point. A segment is a 44 px target that names its
      own stop, on the pointer and on focus alike, and a press walks there. */
   const thread = make('nav', 'desk-thread')
-  thread.hidden = !ways
+  thread.hidden = !ways || !DESK_THREAD
   const threadCount = make('span', 'desk-thread-count')
   const chip = make('span', 'desk-chip')
   chip.hidden = true
@@ -439,10 +450,9 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
       const age = stop?.age ?? null
       clock.textContent = age ? say(age) : ''
       clock.hidden = !age
+      // THE COUNT COUNTS THE WALK THE WING IS ON, whichever order that is.
+      // It is plain text until the story's index page gives it a press.
       count.textContent = `${at.index + 1} / ${at.count}`
-      // the thread carries the count where it stands; in the name row it
-      // would be the same number twice
-      count.hidden = ways
       line.textContent = stop ? say(stop.line) : ''
       line.hidden = !stop
       foot.textContent = ''
@@ -450,13 +460,14 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
       more.append(document.createTextNode(say(DESK_WORDS.more)), make('span', 'desk-key', '↓'))
       tell.textContent = ''
       tell.append(icon(PLAY), document.createTextNode(say(DESK_WORDS.tell)))
-      foot.append(more, tell)
+      foot.append(more)
+      if (DESK_TELL) foot.append(tell)
       // the door stands in this row until the drawer's own foot takes it
       if (doorNode && !drawer) foot.append(doorNode)
       paintDrawer()
     }
     if (ways) {
-      paintThread()
+      if (DESK_THREAD) paintThread()
       const to = host.next()
       onKicker.textContent = say(to ? host.words.next : DESK_WORDS.end)
       onTitle.textContent = to ? say(titleOf(to.id)) : ''

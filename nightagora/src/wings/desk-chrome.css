@@ -40,37 +40,65 @@
   pointer-events: none;
 }
 .desk-low button, .desk-low a { pointer-events: auto; }
-/* THE DUSK IS A GRADIENT AND NEVER A PANEL, and it is sized by the text: it
-   reaches .80 before the first text pixel and .93 at the foot, so the worst
-   ground this museum owns still reads at 4.5 to 1. Nothing at rest is opaque. */
-.desk-low {
-  background: linear-gradient(
-    color-mix(in srgb, var(--na-abyss) 0%, transparent),
-    color-mix(in srgb, var(--na-abyss) 42%, transparent) 52px,
-    color-mix(in srgb, var(--na-abyss) 80%, transparent) 96px,
-    color-mix(in srgb, var(--na-abyss) 93%, transparent)
-  );
-}
 
-.desk-cap { flex: 0 1 var(--desk-read); max-width: var(--desk-read); min-width: 0; }
+.desk-cap { position: relative; flex: 0 1 var(--desk-read); max-width: var(--desk-read); min-width: 0; }
 .desk-nothing { flex: 0 1 var(--desk-read); }
 
-/* THE TOP DUSK, so the words on the top edge keep their line over a noon sky.
-   It holds .62 under the top row and is gone before the picture's middle. */
+/* THE DUSK IS THE WORDS' OWN BACKING, not a band across the picture. It is a
+   gradient and never a panel, it is sized by the text (it reaches .80 before
+   the first text pixel and .93 at the foot, so the worst ground this museum
+   owns still reads at 4.5 to 1), it holds full strength to the last glyph of
+   the longest German row and fades past it, and because it belongs to the
+   words it leaves with them the moment a leg starts. The ways need none: the
+   gold control and the way back carry their own glass. */
+.desk-cap::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: calc(var(--desk-g) * -1);
+  right: -340px;
+  top: -88px;
+  bottom: calc(var(--desk-foot) * -1);
+  pointer-events: none;
+  background: linear-gradient(
+    color-mix(in srgb, var(--na-abyss) 0%, transparent),
+    color-mix(in srgb, var(--na-abyss) 46%, transparent) 56px,
+    color-mix(in srgb, var(--na-abyss) 82%, transparent) 100px,
+    color-mix(in srgb, var(--na-abyss) 93%, transparent)
+  );
+  mask-image: linear-gradient(to right, #000 0 calc(100% - 340px), transparent 100%);
+}
+
+/* THE TOP BACKING, so the words on the top edge keep their line over a noon
+   sky: one at each end, and the picture's own width between them. */
 .desk-top {
   position: fixed;
   left: 0;
   right: 0;
   top: 0;
-  height: 240px;
+  height: 170px;
   pointer-events: none;
   /* it begins under the museum's own masthead, which keeps its full strength */
   background: linear-gradient(
     color-mix(in srgb, var(--na-abyss) 0%, transparent) 56px,
-    color-mix(in srgb, var(--na-abyss) 70%, transparent) 104px,
-    color-mix(in srgb, var(--na-abyss) 62%, transparent) 184px,
-    color-mix(in srgb, var(--na-abyss) 0%, transparent)
+    color-mix(in srgb, var(--na-abyss) 66%, transparent) 100px,
+    color-mix(in srgb, var(--na-abyss) 0%, transparent) 166px
   );
+  mask-image: linear-gradient(to right, #000 0 200px, transparent 380px,
+    transparent calc(100% - 480px), #000 calc(100% - 300px));
+}
+
+/* ---- WHILE ANOTHER SURFACE OWNS THE STAGE, THIS CHROME IS OUT ----
+   A close look, a sheet, a plate or a chapter cut owns the screen on a desk
+   as it does on a phone. The resting chrome does not dim under it, it goes:
+   hidden by visibility, so every part keeps its place and comes back whole,
+   and inert while it is away. The attribute is the museum's own. */
+:root[data-na-window='desk'] #wing[data-desk] :is(.desk-low, .desk-top, .desk-thread),
+:root[data-na-window='desk'] #wing[data-desk] :is(.wing-rail-group, .wing-doorblock),
+#wing[data-desk]:has(> .vinci-cut:not([hidden])) :is(.desk-low, .desk-top, .desk-thread),
+#wing[data-desk]:has(> .vinci-cut:not([hidden])) :is(.wing-rail-group, .wing-doorblock) {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 /* ---- the thread: one segment a stop, the count in digits ---- */
@@ -328,7 +356,6 @@
 /* ONE TEXT AT A TIME. While the drawer stands, the line it replaces is at
    nothing and the dusk under it goes: the plate is the backing now. */
 #wing[data-drawer='open'] .desk-cap { opacity: 0; pointer-events: none; }
-#wing[data-drawer='open'] .desk-low { background: none; }
 
 /* ---- the ways: one corner, two controls, neither ever moves ---- */
 .desk-ways { flex: none; display: flex; align-items: center; gap: 12px; }
@@ -491,7 +518,9 @@ body.forge .desk-cap, body.forge .desk-on { transition: none !important; }
   border: 0;
 }
 #wing[data-desk~='ways'] .wing-rail { display: none; }
-#wing[data-desk~='ways'] .wing-rail-group > .vinci-source { margin-left: auto; }
+/* the way home holds the left end; every other word of the row goes right,
+   whichever of them the steps below have moved elsewhere */
+#wing[data-desk~='ways'] .wing-rail-group > .wing-lobby { margin-right: auto; }
 /* the cells of the old bar were told apart by hairlines; words on a dusk are
    told apart by their own space, so the rules go with the plate */
 #wing[data-desk~='ways'] .wing-rail-group :is(.wing-lobby, .vinci-source, .wing-plan-open, .wing-life-open) {
