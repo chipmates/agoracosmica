@@ -746,8 +746,8 @@ export function createWing():VinciWingModule {
     window.addEventListener('resize',()=>{placeCanonicalStation();paintDock()},options)
     standing=true
     card=station
-    const s=hereContent()
-    aimPrint(s.id);exposureAt=s.id;rail.set(s.id,stationPose(s.id,narrow()),true,narrow());paintHeader();paintDock();standHere()
+    const stop=stopAt(card),s=stationOf(stop.station)
+    aimPrint(s.id);exposureAt=s.id;rail.set(s.id,vinciWalkPose(stop,narrow()),true,narrow(),walkVertex(stop));paintHeader();paintDock();standHere()
     if(pendingView){const id=pendingView;pendingView='';showView(id)}
     announceBuilt()
   }
@@ -1110,7 +1110,7 @@ export function createWing():VinciWingModule {
     const id=contentAt(index).id
     hosts.navigate(index)
     exhibits?.warm()
-    rail.set(id,stationPose(id,narrow()),true,narrow())
+    rail.set(id,vinciWalkPose(stopAt(index),narrow()),true,narrow(),walkVertex(stopAt(index)))
     station=card=index;activeView='';aimPrint(id);exposureAt=id;paintHeader();paintHeaderVisibility();paintDock();paintQuestion()
   }
   /** True once the rail's own geometry proof has resolved: before that the
@@ -1989,9 +1989,9 @@ export function createWing():VinciWingModule {
     stack.setScene(scene,camera,{...PRINT,exposure:STATION_EXPOSURE[id]??PRINT.exposure})
   }
   function placeCanonicalStation() {
-    const id=hereContent().id
+    const stop=stopAt(card),id=stationOf(stop.station).id
     activeView='';measurement.hide();header.querySelector('.vinci-insertion')?.remove();titleForView('')
-    rail.set(id,stationPose(id,narrow()),true,narrow())
+    rail.set(id,vinciWalkPose(stop,narrow()),true,narrow(),walkVertex(stop))
   }
   function endInspection() { if(activeView)placeCanonicalStation() }
   function appendRecord(value:VinciText,citation:string,certainty?:VinciCertainty,anchorId?:string,anchorClass?:'GENERATED'|'procedural'):[HTMLElement,HTMLElement] {

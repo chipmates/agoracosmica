@@ -107,8 +107,11 @@ export function vinciWalk(life: boolean): VinciWalk {
  * box at the lower left of the frame, so the portrait is carried into the
  * clear half and the wall it hangs on is read with it.
  */
-const LISA_SWING_M = { desktop: .47, phone: .2 }, LISA_RISE_M = { desktop: .1, phone: .34 }
-const LISA_FOV = { desktop: 54, phone: 74 }
+/** Measured against the frozen desktop design's words: at 1440 by 900 the box
+ * runs to x 824, and the portrait's own left edge lands at 847. On the phone
+ * the card takes the middle band, so the portrait stands above it. */
+const LISA_SWING_M = { desktop: .5, phone: 0 }, LISA_RISE_M = { desktop: .06, phone: .3 }
+const LISA_FOV = { desktop: 66, phone: 82 }
 export function vinciLisaPose(narrow: boolean): Pose {
   const viewport = narrow ? 'phone' : 'desktop'
   const eye = vinciApproachPose(LISA_EXHIBIT, narrow)?.eye
