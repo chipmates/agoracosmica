@@ -11,7 +11,7 @@
 // what a slow glide through a static room COSTS at a quality that holds, and a
 // fixed rate would decide that answer in advance. The measured rate of each
 // encode is in the table.
-import { execFileSync } from 'node:child_process'
+import { spawnSync } from 'node:child_process'
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { createHash } from 'node:crypto'
@@ -41,7 +41,10 @@ const LADDER = {
 
 const mb = (n) => Math.round((n / 1024 / 1024) * 100) / 100
 const sha = (f) => createHash('sha256').update(readFileSync(f)).digest('hex')
-const ff = (args) => execFileSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', ...args], { stdio: ['ignore', 'pipe', 'pipe'] })
+function ff(args) {
+  const r = spawnSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', ...args], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 })
+  if (r.status !== 0) throw new Error(`ffmpeg ${r.status}: ${String(r.stderr ?? '').slice(0, 400)}`)
+}
 
 function encodeClip(dir, frames, width, height, crf, out) {
   ff([
@@ -67,16 +70,17 @@ function encodeClip(dir, frames, width, height, crf, out) {
 }
 
 /** what the encode gave back, against the frames it was made from */
-function psnr(dir, frames, width, height, clip) {
-  const line = execFileSync(
+function psnr(dir, width, height, clip) {
+  const r = spawnSync(
     'ffmpeg',
     ['-hide_banner', '-loglevel', 'info', '-framerate', String(FPS), '-start_number', '0',
-      '-i', join(dir, 'f%05d.png'), '-frames:v', String(frames), '-vf', `scale=${width}:${height}:flags=lanczos`,
-      '-i', clip, '-lavfi', '[0:v][1:v]psnr', '-f', 'null', '-'],
-    { stdio: ['ignore', 'pipe', 'pipe'] }
+      '-i', join(dir, 'f%05d.png'), '-i', clip,
+      '-lavfi', `[0:v]scale=${width}:${height}:flags=lanczos[a];[a][1:v]psnr=shortest=1:repeatlast=0`,
+      '-f', 'null', '-'],
+    { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }
   )
-  const said = /PSNR.*average:([0-9.]+)/.exec(String(line)) ?? /average:([0-9.]+)/.exec(String(line))
-  return said ? Number(said[1]) : null
+  const hit = /average:([0-9.]+)/.exec(String(r.stderr ?? ''))
+  return hit ? Number(hit[1]) : null
 }
 
 /** how far the picture still travels after the walk has stopped */
@@ -122,7 +126,7 @@ for (const framing of Object.keys(LADDER)) {
     const bytes = encodeClip(dir, clipFrames, w, h, CRF, join(OUT, 'media', name))
     const altName = `leg-${framing}-${lines}-crf${ALT}.mp4`
     const altBytes = encodeClip(dir, clipFrames, w, h, ALT, join(OUT, 'media', altName))
-    const q = psnr(dir, clipFrames, w, h, join(OUT, 'media', name))
+    const q = psnr(dir, w, h, join(OUT, 'media', name))
     entry.sizes.push({ lines, width: w, height: h, file: `media/${name}`, bytes, altBytes })
     table.push({
       framing, lines, w, h, seconds: entry.seconds,
