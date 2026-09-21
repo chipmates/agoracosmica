@@ -201,7 +201,7 @@ export const heroEntries: HeroEntry[] = [
 
 // Slot 4 of the ask contract: the poem pages' door question. It names no
 // teaching, so it carries no seed.
-const POEM_ENTRY_FIGURES = new Set(['dickinson', 'rumi', 'blake']);
+const POEM_ENTRY_FIGURES = new Set(['dickinson', 'rumi', 'blake', 'shakespeare']);
 const POEM_ENTRY_QUESTION_EN =
   'I just read one of your poems and it stayed with me. Can we talk about it?';
 const POEM_ENTRY_QUESTION_DE =

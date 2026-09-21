@@ -330,7 +330,7 @@ describe('ask tags', () => {
     expect(resolveAskPrefill('f:jung:3', null, 'en')).toEqual({ kind: 'text', text: hero });
   });
 
-  it.each(['dickinson', 'rumi', 'blake'])('slot 4 is the poem question for %s', (figureId) => {
+  it.each(['dickinson', 'rumi', 'blake', 'shakespeare'])('slot 4 is the poem question for %s', (figureId) => {
     expect(resolveAskPrefill(`f:${figureId}:4`, null, 'en')).toEqual({
       kind: 'text',
       text: 'I just read one of your poems and it stayed with me. Can we talk about it?',
@@ -353,7 +353,7 @@ describe('ask tags', () => {
     });
   });
 
-  it.each(['dickinson', 'rumi', 'blake'])('the poem door anchors no seed for %s', (figureId) => {
+  it.each(['dickinson', 'rumi', 'blake', 'shakespeare'])('the poem door anchors no seed for %s', (figureId) => {
     // A visitor asking about a poem gets plain Free Talk, not the teaching
     // behind the hero question.
     expect(resolveAnchorSeedId(figureId, `f:${figureId}:4`)).toBeNull();
