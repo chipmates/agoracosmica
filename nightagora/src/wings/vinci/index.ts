@@ -433,10 +433,13 @@ export function createWing():VinciWingModule {
     if(deskOn('words')||deskOn('ways'))desk=createDeskChrome({
       stage:h.stage,wing,lang,
       standing:()=>deskStationAt(card),
-      next:()=>card+1<vinciContent.length?deskStationAt(card+1):null,
-      order:()=>vinciContent.map(s=>s.id),
+      next:()=>card+1<WALK.stops.length?deskStationAt(card+1):null,
+      order:()=>WALK.stops.map(stop=>stop.id),
       stood:()=>visit?.stood??[],
-      name:id=>vinciContent.find(s=>s.id===id)?.name??{en:'',de:''},
+      // a stop of a wall carries the work's own name; a station carries its
+      // room's, which is what the walk list already decided
+      name:id=>WALK.stops.find(stop=>stop.id===id)?.name
+        ??vinciContent.find(s=>s.id===id)?.name??{en:'',de:''},
       door:()=>wing.querySelector<HTMLElement>('.wing-door'),
       sources:()=>source??null,
       question:()=>vinciContent[card]?.door[lang()]??'',
@@ -1995,10 +1998,12 @@ export function createWing():VinciWingModule {
     const away=Boolean(nav?.exhibit??nav?.approaching)
     kicker.textContent=away||activeView?viewKicker():stationKicker()
   }
-  /** A station as the desktop's chrome addresses it: its id and its place in
-   * the order the rail walks today. The story's own order is Phase 4a's. */
+  /** A STOP AS THE DESKTOP'S CHROME ADDRESSES IT: the walk's own id, never
+   * the station's place in the order the rooms were built. Under the life's
+   * order the two differ at every stop, and the words would read the wrong
+   * station's chapter, line and clock. */
   const deskStationAt=(index:number):DeskStation=>
-    ({id:vinciContent[index]!.id,index,count:vinciContent.length})
+    ({id:stopAt(index).id,index,count:WALK.stops.length})
   const stationNumber=()=>String(card+1).padStart(2,'0')
   const stationKicker=()=>`CLOS LUCÉ, 1517 · ${stationNumber()} / ${WALK.stops.length}`
   const viewKicker=()=>`CLOS LUCÉ, 1517 · ${lang()==='de'?'BLICK VON STATION':'A VIEW FROM STATION'} ${stationNumber()}`
