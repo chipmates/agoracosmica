@@ -11,14 +11,26 @@ import { publicUrl, stripLangPrefix } from '../lib/urls';
 interface Props {
   lang: Lang;
   currentPath: string;
+  /** The page declares no twin in the other language (same flag as noHreflang). */
+  noTwin?: boolean;
+  /** Cross-slug twins (lang-prefixed paths), for pages whose EN/DE slugs differ. */
+  altEn?: string;
+  altDe?: string;
 }
 
-const { lang, currentPath } = Astro.props;
+const { lang, currentPath, noTwin = false, altEn, altDe } = Astro.props;
 const t = getT(lang);
 
-const basePath = stripLangPrefix(currentPath);
 const otherLang: Lang = lang === 'de' ? 'en' : 'de';
-const langSwitchUrl = otherLang === 'de' ? `/de${basePath}` : basePath;
+// The switch may only point at a page that exists: a cross-slug page keeps its
+// declared twin, a page without one falls back to the other language's home,
+// and everything else mirrors the path across the /de prefix.
+const crossSlugTwin = altEn && altDe ? (otherLang === 'de' ? altDe : altEn) : null;
+const langSwitchUrl = crossSlugTwin
+  ? (crossSlugTwin.endsWith('/') ? crossSlugTwin : `${crossSlugTwin}/`)
+  : noTwin
+    ? (otherLang === 'de' ? '/de/' : '/')
+    : publicUrl(otherLang, stripLangPrefix(currentPath));
 
 const navLinks = [
   { to: publicUrl(lang, '/figures'), label: t('nav.figures') },

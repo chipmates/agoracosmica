@@ -71,7 +71,13 @@ const revealSticky = isHome || props.heroReveal === true;
       {props.lang === 'de' ? 'Zum Inhalt springen' : 'Skip to content'}
     </a>
     <div class="public-page">
-      <Navbar lang={props.lang} currentPath={currentPath} />
+      <Navbar
+        lang={props.lang}
+        currentPath={currentPath}
+        noTwin={props.noHreflang === true}
+        altEn={props.altEn}
+        altDe={props.altDe}
+      />
       <main class="pub-main" id="main-content">
         <slot />
       </main>
