@@ -43,7 +43,7 @@
 // number is read by eye and never fails a run.
 import { chromium } from 'playwright'
 import { spawn } from 'node:child_process'
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { basename, join, resolve } from 'node:path'
 import { arrive, steadyCost, warmScene } from './settle.mjs'
 import {
@@ -491,6 +491,29 @@ let stationIds = []
 let stationCost = {}
 const missedStations = []
 const walkProblems = []
+/* THE GATE READS THE BUNDLE, NOT THE CHECKOUT. `pnpm preview` serves dist/,
+   and the whoami check compares the checkout's HEAD with its own, which is
+   the same number on both sides: a bundle built before the last source change
+   is measured in silence, and every number of such a run belongs to another
+   build. */
+const newestUnder = (path) =>
+  !existsSync(path) ? 0
+  : statSync(path).isDirectory()
+    ? readdirSync(path).reduce((newest, name) => Math.max(newest, newestUnder(join(path, name))), 0)
+    : statSync(path).mtimeMs
+const bundleAt = newestUnder(join(APP_ROOT, 'dist'))
+const sourceAt = Math.max(
+  newestUnder(join(APP_ROOT, 'src')),
+  newestUnder(join(APP_ROOT, 'assets')),
+  newestUnder(join(APP_ROOT, 'index.html'))
+)
+const clock = (ms) => new Date(ms).toISOString().slice(0, 19).replace('T', ' ')
+if (!bundleAt || sourceAt > bundleAt) {
+  say(`FAIL  the bundle  ${bundleAt
+    ? `the bundle is older than the source (dist ${clock(bundleAt)}, source ${clock(sourceAt)})`
+    : 'there is no dist'}: run pnpm build, then this gate`)
+  process.exit(1)
+}
 const server = spawn('pnpm', ['preview', '--port', String(PORT), '--strictPort'], { stdio: 'ignore', cwd: APP_ROOT })
 try {
   await waitForServer(BASE)

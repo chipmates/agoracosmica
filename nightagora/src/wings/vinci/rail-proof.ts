@@ -222,9 +222,12 @@ export function createRailGeometryAuthority(roots: readonly Object3D[]) {
     }
     proof = exact ? 'hash' : 'signature'
     status = 'verified'
-    // one line, so a walk that cannot be proved is read and not guessed at
-    if (exact) console.log('rail proof: the exact geometry hash')
-    else if (canHash) console.log('rail proof: the certified signature, inside its tolerance')
+    // One line, so a walk that cannot be proved is read and not guessed at.
+    // It goes to the warning channel because the offline checkers run this
+    // module in Node and write their report to stdout: a line printed there
+    // is a line inside their JSON.
+    if (exact) console.warn('rail proof: the exact geometry hash')
+    else if (canHash) console.warn('rail proof: the certified signature, inside its tolerance')
     else console.warn('rail proof: the certified signature, inside its tolerance. This page is not secure, so it has no way to hash the geometry (that needs https or localhost). The strict hash on a secure page is unchanged.')
   }).catch(error => {
     status = 'failed'; failure = String(error); proof = 'none'
