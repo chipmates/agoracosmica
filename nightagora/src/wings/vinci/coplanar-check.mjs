@@ -6,7 +6,15 @@
  * a renderer: every pair of faces within 2 mm of one plane whose plan areas
  * overlap by more than a stated area, over the wing's BUILT geometry.
  *
- *   node src/wings/vinci/coplanar-check.mjs [--all] [--area 0.01]
+ *   node src/wings/vinci/coplanar-check.mjs [--all] [--area 0.01] [--self]
+ *
+ * TWO PASSES, BOTH IN THE DEFAULT RUN. The first groups a plane's faces by
+ * the mesh NAME and finds two bodies sharing a plane. The second groups by
+ * the mesh ITSELF and finds a body fighting itself: a module that welds one
+ * batch per material gives every batch the same name, so a pale run ending
+ * on a dark run's end plane inside one body is invisible to the first. Each
+ * pass carries its own allow list, and each rule names its planes and its
+ * reason. `--self` runs the second alone.
  *
  * What it does not cover, and says so rather than implying otherwise: the sown
  * bodies (vegetation, ground dressing, terrain grass) are cards on a slope,
@@ -14,25 +22,14 @@
  * no claim about which face wins, only that the question is open.
  */
 import assert from 'node:assert/strict'
-import fs from 'node:fs'
-import path from 'node:path'
-import vm from 'node:vm'
-import { fileURLToPath } from 'node:url'
-import ts from 'typescript'
 import * as THREE from 'three/webgpu'
-import * as TSL from 'three/tsl'
+import { buildBodies, facesOf } from './build-in-node.mjs'
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..')
 const args = process.argv.slice(2)
 const ALL = args.includes('--all')
-/* TWO FACES OF ONE BODY FIGHT EACH OTHER TOO. The scan groups a plane's
-   faces by the mesh NAME, and a module that welds one batch per material
-   gives every batch the same name, so a pale run ending on a dark run's end
-   plane inside one body is invisible to it. `--self` groups by the mesh
-   itself, which is the reading that finds a run's own end. */
+/** the self pass alone, for a focused reading of one body */
 const SELF = args.includes('--self')
 const AREA_MIN = Number(args[args.indexOf('--area') + 1]) || 0.01
-/** a plane is one plane when two faces lie within this of it */
 /* AND NEARLY ONE PLANE IS THE SAME DEFECT AT A DISTANCE. Two faces two
    millimetres apart share a plane here; two faces twenty millimetres apart
    share one on the SCREEN as soon as the depth buffer cannot separate them,
@@ -42,104 +39,9 @@ const AREA_MIN = Number(args[args.indexOf('--area') + 1]) || 0.01
    with the exactly shared case. */
 const NEAR_MM = Number(args[args.indexOf('--near') + 1]) || 0
 const BED = NEAR_MM > 0 ? NEAR_MM / 1000 : 0.002
-const source = relative => fs.readFileSync(path.join(root, relative), 'utf8')
-/** Every three.js addon the wing's own sources import, resolved once up front:
- * the module loader below is synchronous and cannot await one. */
-const addons = new Map()
-for (const dir of ['src/wings/vinci', 'src/stack', 'src/wings/vitrine', 'src']) {
-  const walk = at => fs.readdirSync(at, { withFileTypes: true }).flatMap(entry =>
-    entry.isDirectory() ? (entry.name === 'node_modules' ? [] : walk(path.join(at, entry.name)))
-      : /\.(ts|mjs)$/.test(entry.name) ? [path.join(at, entry.name)] : [])
-  for (const file of walk(path.join(root, dir)))
-    for (const hit of fs.readFileSync(file, 'utf8').matchAll(/from '(three\/addons\/[^']+)'/g))
-      addons.set(hit[1], null)
-}
-for (const specifier of [...addons.keys()]) addons.set(specifier, await import(specifier))
-const cache = new Map()
-/** A data file read through an ES default import as the bundler gives it. */
-const asJson = relative => { const value = JSON.parse(source(relative)); return { ...value, default: value } }
-function load(relative) {
-  if (cache.has(relative)) return cache.get(relative)
-  const module = { exports: {} }
-  cache.set(relative, module.exports)
-  const compiled = ts.transpileModule(source(relative), {
-    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
-  }).outputText
-  const require = specifier => {
-    if (specifier === 'three/tsl') return TSL
-    if (specifier === 'three' || specifier === 'three/webgpu') return THREE
-    if (addons.has(specifier)) return addons.get(specifier)
-    if (!specifier.startsWith('.')) throw new Error(`Unexpected import: ${specifier}`)
-    const resolved = path.posix.normalize(path.posix.join(path.posix.dirname(relative), specifier))
-    if (resolved.endsWith('?raw')) return { default: source(resolved.slice(0, -4)) }
-    if (resolved.endsWith('.json')) return asJson(resolved)
-    const file = fs.existsSync(path.join(root, resolved + '.ts')) ? resolved + '.ts'
-      : fs.existsSync(path.join(root, resolved + '.json')) ? resolved + '.json' : resolved + '/index.ts'
-    if (file.endsWith('.json')) return asJson(file)
-    return load(file)
-  }
-  vm.runInNewContext(compiled, { module, exports: module.exports, require, console,
-    matchMedia: () => ({ matches: false }), performance, URL, URLSearchParams,
-    location: { search: '' }, crypto: globalThis.crypto, TextEncoder: globalThis.TextEncoder },
-  { filename: relative })
-  return module.exports
-}
 
-/* ---- the wing's built geometry, in the frame it is mounted in ---- */
-const stone = () => new THREE.MeshStandardMaterial()
-const exhibitMaterials = { stone: stone(), plaster: stone(), bronze: stone(), ink: stone(), dark: stone(), tuffeau: stone() }
-const { COURT, GRAVE_ORIGIN } = load('src/wings/vinci/collection/layout.ts')
-const bodies = []
-const add = (name, group) => { if (group) bodies.push({ name, group }) }
-add('collection', load('src/wings/vinci/collection.ts').createCollection())
-add('collection-access', load('src/wings/vinci/collection-access.ts').createCollectionAccess())
-add('shell', load('src/wings/vinci/shell.ts').createShell({ name: 'hero' }))
-add('gate-passage', load('src/wings/vinci/gate-passage.ts').createGatePassage('hero'))
-add('entry-passage', load('src/wings/vinci/entry-passage.ts').createEntryPassage('hero'))
-{
-  // The grave carries the court's gallery: its own walls, returns and kerbs.
-  // The exhibit host mounts it turned a quarter turn, and clips its floor to
-  // the court's reservation first, so this stands it exactly as the wing does.
-  const { createGrave } = load('src/wings/vinci/grave/index.ts')
-  const { fitCollectionExhibitFloor } = load('src/wings/vinci/collection/line-floor.ts')
-  const grave = createGrave(exhibitMaterials, 'en')
-  fitCollectionExhibitFloor(grave.group, exhibitMaterials, 'grave')
-  grave.group.rotation.y = Math.PI / 2
-  grave.group.position.set(GRAVE_ORIGIN.east, COURT.level + .035, -GRAVE_ORIGIN.north)
-  add('grave', grave.group)
-}
-
-/* ---- every triangle, in world metres, with its own plane ---- */
-const faces = []
-for (const { name, group } of bodies) {
-  group.updateMatrixWorld(true)
-  group.traverse(object => {
-    if (!object.isMesh || !object.geometry) return
-    const position = object.geometry.getAttribute('position')
-    if (!position) return
-    const index = object.geometry.getIndex()
-    const count = index ? index.count : position.count
-    const matrix = object.matrixWorld
-    const mesh = SELF ? `${object.name || name}#${object.id}` : object.name || name
-    for (let at = 0; at + 2 < count; at += 3) {
-      const v = [0, 1, 2].map(corner => {
-        const i = index ? index.getX(at + corner) : at + corner
-        return new THREE.Vector3(position.getX(i), position.getY(i), position.getZ(i)).applyMatrix4(matrix)
-      })
-      const u = v[1].clone().sub(v[0]), t = v[2].clone().sub(v[0])
-      const n = u.clone().cross(t)
-      const twice = n.length()
-      if (twice < 1e-9) continue
-      n.divideScalar(twice)
-      // one plane, whichever way its two faces look: the larger component is
-      // made positive so a butt joint lands in the same bucket as its partner.
-      const major = Math.abs(n.x) >= Math.abs(n.y) && Math.abs(n.x) >= Math.abs(n.z) ? n.x
-        : Math.abs(n.y) >= Math.abs(n.z) ? n.y : n.z
-      if (major < 0) n.negate()
-      faces.push({ body: name, mesh, n, d: n.dot(v[0]), v, area: twice / 2 })
-    }
-  })
-}
+const bodies = buildBodies()
+const faces = facesOf(bodies, { self: SELF })
 
 /* WHAT STANDS HERE. A defect is reported as a place before it is reported as
    a pair, and a place is six numbers. `--at x0,y0,z0,x1,y1,z1` names every
@@ -170,13 +72,6 @@ if (AT.length === 6) {
   process.exit(0)
 }
 
-/* ---- buckets: one normal to a degree, then offsets clustered at 2 mm ---- */
-const groups = new Map()
-for (const face of faces) {
-  const key = [face.n.x, face.n.y, face.n.z].map(c => (Math.round(c * 100) / 100).toFixed(2)).join(',')
-  if (!groups.has(key)) groups.set(key, [])
-  groups.get(key).push(face)
-}
 /** the shared plan area of two face sets, measured in the plane's own axes */
 function shared(a, b, n) {
   const helper = Math.abs(n.y) < .9 ? new THREE.Vector3(0, 1, 0) : new THREE.Vector3(1, 0, 0)
@@ -215,43 +110,50 @@ function shared(a, b, n) {
   return { area: both * CELL * CELL, cell: +CELL.toFixed(3) }
 }
 
-const found = []
-for (const [, set] of groups) {
-  set.sort((a, b) => a.d - b.d)
-  let run = []
-  const close = () => {
-    if (run.length > 1) plane(run)
-    run = []
+/* ---- buckets: one normal to a degree, then offsets clustered at 2 mm ---- */
+function scan(faces) {
+  const groups = new Map()
+  const found = []
+  for (const face of faces) {
+    const key = [face.n.x, face.n.y, face.n.z].map(c => (Math.round(c * 100) / 100).toFixed(2)).join(',')
+    if (!groups.has(key)) groups.set(key, [])
+    groups.get(key).push(face)
   }
-  for (const face of set) {
-    if (run.length && face.d - run[0].d > BED) close()
-    run.push(face)
+  function plane(run) {
+    const byMesh = new Map()
+    for (const face of run) {
+      if (!byMesh.has(face.mesh)) byMesh.set(face.mesh, [])
+      byMesh.get(face.mesh).push(face)
+    }
+    const meshes = [...byMesh.keys()]
+    for (let i = 0; i < meshes.length; i++) for (let j = i + 1; j < meshes.length; j++) {
+      const a = byMesh.get(meshes[i]), b = byMesh.get(meshes[j])
+      const overlap = shared(a, b, run[0].n)
+      if (overlap === null || overlap.area < AREA_MIN) continue
+      const all = [...a, ...b].flatMap(f => f.v)
+      const span = pick => [+Math.min(...all.map(pick)).toFixed(2), +Math.max(...all.map(pick)).toFixed(2)]
+      found.push({ a: meshes[i], b: meshes[j], area: +overlap.area.toFixed(3), cell: overlap.cell,
+        n: [run[0].n.x, run[0].n.y, run[0].n.z].map(c => +c.toFixed(3)),
+        d: +run[0].d.toFixed(3), spread: +(run[run.length - 1].d - run[0].d).toFixed(4),
+        east: span(q => q.x), height: span(q => q.y), north: span(q => -q.z) })
+    }
   }
-  close()
-}
-function plane(run) {
-  const byMesh = new Map()
-  for (const face of run) {
-    if (!byMesh.has(face.mesh)) byMesh.set(face.mesh, [])
-    byMesh.get(face.mesh).push(face)
+  for (const [, set] of groups) {
+    set.sort((a, b) => a.d - b.d)
+    let run = []
+    const close = () => {
+      if (run.length > 1) plane(run)
+      run = []
+    }
+    for (const face of set) {
+      if (run.length && face.d - run[0].d > BED) close()
+      run.push(face)
+    }
+    close()
   }
-  const meshes = [...byMesh.keys()]
-  for (let i = 0; i < meshes.length; i++) for (let j = i + 1; j < meshes.length; j++) {
-    const a = byMesh.get(meshes[i]), b = byMesh.get(meshes[j])
-    const overlap = shared(a, b, run[0].n)
-    if (overlap === null || overlap.area < AREA_MIN) continue
-    const all = [...a, ...b].flatMap(f => f.v)
-    const span = pick => [+Math.min(...all.map(pick)).toFixed(2), +Math.max(...all.map(pick)).toFixed(2)]
-    found.push({ a: meshes[i], b: meshes[j], area: +overlap.area.toFixed(3), cell: overlap.cell,
-      n: [run[0].n.x, run[0].n.y, run[0].n.z].map(c => +c.toFixed(3)),
-      d: +run[0].d.toFixed(3), spread: +(run[run.length - 1].d - run[0].d).toFixed(4),
-      east: span(q => q.x), height: span(q => q.y), north: span(q => -q.z) })
-  }
+  return found
 }
 
-/** PAIRS THAT ARE MEANT. Each one is a plane two bodies share on purpose, with
- * the reason it cannot break up: a face the other body's own solid covers, or
- * a surface no certified pose can see. Anything not on this list is a defect. */
 const ALLOWED = [
   // THE PAVILION AND ITS ROOMS. Envelope, slab, partitions and the linings
   // built into them were drawn to the same faces long before this checker
@@ -314,20 +216,54 @@ const ALLOWED = [
   { a: 'vinci/shell/brick', b: 'vinci/shell/oak', n: [0.84, 0, 0.55], why: 'a frame built into the brick around it' },
   { a: 'vinci/shell/lead', b: 'vinci/shell/stone', n: [0.55, 0, 0.84], why: 'lead flashing dressed onto the stone it weathers' },
 ]
+
+/** PAIRS A BODY IS MEANT TO SHARE A PLANE WITH ITSELF. A run that ends inside
+ * another run of the same batch, a face a solid of the same body covers, or a
+ * plane no certified pose can see. Same shape as the list above and the same
+ * law: a rule names its planes, never a body. */
+const ALLOWED_SELF = [
+  { a: 'vinci-grave-made-surface', b: 'vinci-grave-made-surface', n: [0, 1, 0],
+    why: 'the exhibition floor slabs on their own bed, half a millimetre apart, which the buffer resolves thirty times over at that range' },
+  { a: 'vinci-grave-made-surface', b: 'vinci-grave-made-surface', n: [1, 0, 0], d: [-61.15],
+    why: 'the gallery back wall end, buried inside the backdrop own 0.30 m thickness (it spans -61.31 to -61.01) and reachable by no certified eye' },
+  { a: 'vinci-grave-made-surface', b: 'vinci-grave-made-surface', n: [1, 0, 0], d: [-56.769, -56.745, -54.06],
+    why: 'three run ends inside the grave own furniture, each under a quarter of a square metre and standing behind the piece it belongs to' },
+  { a: 'vinci-grave-made-surface', b: 'vinci-grave-made-surface', n: [0.426, 0.905, 0], d: [19.389],
+    why: 'the sloped face of the same furniture, two millimetres of spread over 0.09 m2' },
+]
+
 /** A rule that names planes allows THOSE planes and no others: a pair of
  * bodies that are meant to meet on one line is not licence to meet on a new
- * one, which is how the court's three defects hid behind the pavilion's. */
-const allowed = pair => ALLOWED.find(rule => ((rule.a === pair.a && rule.b === pair.b) || (rule.a === pair.b && rule.b === pair.a))
+ * one, which is how the court\'s three defects hid behind the pavilion\'s.
+ * A mesh carries its own object number in the self pass; a rule names the
+ * body, never the number, because a number moves when anything upstream is
+ * built one step earlier. */
+const bare = name => String(name).replace(/#\d+$/, '')
+const allowedIn = (list, pair) => list.find(rule =>
+  ((rule.a === bare(pair.a) && rule.b === bare(pair.b)) || (rule.a === bare(pair.b) && rule.b === bare(pair.a)))
   && rule.n.every((c, i) => Math.abs(c - Math.abs(pair.n[i])) < .02 || Math.abs(c - pair.n[i]) < .02)
   && (!rule.d || rule.d.some(value => Math.abs(value - pair.d) < .005)))
 
-found.sort((x, y) => y.area - x.area)
-const offences = found.filter(pair => !allowed(pair))
+const byName = SELF ? [] : scan(faces)
+/* THE SELF PASS IS ITS OWN CLASS. Every pair of two DIFFERENT bodies is in
+   the first pass already, so the second keeps only what the first cannot
+   see: one body against itself. */
+const bySelf = (SELF ? scan(faces) : scan(facesOf(bodies, { self: true })))
+  .filter(pair => bare(pair.a) === bare(pair.b))
+
+byName.sort((x, y) => y.area - x.area)
+bySelf.sort((x, y) => y.area - x.area)
+const nameOffences = byName.filter(pair => !allowedIn(ALLOWED, pair))
+const selfOffences = bySelf.filter(pair => !allowedIn(ALLOWED_SELF, pair))
+const offences = [...nameOffences, ...selfOffences]
 const report = {
   checker: 'vinci-coplanar', bodies: bodies.map(b => b.name), faces: faces.length,
-  bed: BED, areaFloor: AREA_MIN, pairs: found.length, allowed: found.length - offences.length,
-  offences: (ALL ? found : offences).map(pair => ({ ...pair, meant: Boolean(allowed(pair)) })),
+  bed: BED, areaFloor: AREA_MIN,
+  pairs: byName.length, allowed: byName.length - nameOffences.length,
+  selfPairs: bySelf.length, selfAllowed: bySelf.length - selfOffences.length,
+  offences: (ALL ? byName : nameOffences).map(pair => ({ ...pair, meant: Boolean(allowedIn(ALLOWED, pair)) })),
+  selfOffences: (ALL ? bySelf : selfOffences).map(pair => ({ ...pair, meant: Boolean(allowedIn(ALLOWED_SELF, pair)) })),
 }
 console.log(JSON.stringify(report, null, 1))
 assert.equal(offences.length, 0,
-  `${offences.length} pair(s) of faces share a plane: ${offences.slice(0, 4).map(p => `${p.a} + ${p.b} ${p.area} m2 at ${p.at}`).join(' | ')}`)
+  `${offences.length} pair(s) of faces share a plane: ${offences.slice(0, 4).map(p => `${p.a} + ${p.b} ${p.area} m2`).join(' | ')}`)
