@@ -237,10 +237,13 @@ export function createWing():VinciWingModule {
   const CUT_CARD_WAITS_FOR_PRESS=false
   const CUT_DIP_SECONDS=.45
   let cutCard:HTMLElement|undefined, cutTimers:ReturnType<typeof setTimeout>[]=[], cutPress:(()=>void)|undefined
+  const wingElement=():HTMLElement|undefined=>hosts?.stage.parentElement??undefined
   function endChapterCard():void {
     for(const timer of cutTimers)clearTimeout(timer)
     cutTimers=[]
     if(cutPress){window.removeEventListener('pointerdown',cutPress,true);window.removeEventListener('keydown',cutPress,true);cutPress=undefined}
+    const wing=wingElement()
+    if(wing)delete wing.dataset['cut']
     if(cutCard){delete cutCard.dataset['on'];cutCard.hidden=true;cutCard.textContent=''}
   }
   function crossChapter(to:number):void {
@@ -254,7 +257,14 @@ export function createWing():VinciWingModule {
     cutCard.textContent=''
     if(title)cutCard.append(make('p','vinci-cut-title',title))
     cutCard.hidden=false
-    hosts.labels.append(cutCard)
+    // OVER THE WING'S OWN WORDS, UNDER THE BAR: the room's card, its row and
+    // its question go with the picture, and the way out stays where it is,
+    // which is what standing the dip before the bar in the page does.
+    const wingEl=hosts.stage.parentElement
+    if(wingEl&&barEl&&barEl.parentElement===wingEl)wingEl.insertBefore(cutCard,barEl)
+    else wingEl?.append(cutCard)
+    const wing=wingElement()
+    if(wing)wing.dataset['cut']=''
     // the element is in the page before the dip is asked for, so the dip is a
     // transition and not a jump
     void cutCard.offsetWidth
@@ -272,6 +282,8 @@ export function createWing():VinciWingModule {
       cutTimers=[]
       if(cutPress){window.removeEventListener('pointerdown',cutPress,true);window.removeEventListener('keydown',cutPress,true);cutPress=undefined}
       if(cutCard)delete cutCard.dataset['on']
+      const wing=wingElement()
+      if(wing)delete wing.dataset['cut']
       cutTimers.push(setTimeout(()=>{if(cutCard){cutCard.hidden=true;cutCard.textContent=''}},dip))
     }
     if(dip)cutTimers.push(setTimeout(land,dip)); else land()
