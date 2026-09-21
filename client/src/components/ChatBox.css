@@ -320,6 +320,11 @@
   opacity: 1;
   letter-spacing: 0.18em;
   text-transform: uppercase;
+  /* The app-wide justify block in index.css reaches every div inside
+     .main-content and outranks any practical class selector here. A tracked
+     two-word kicker would tear into stretched gaps at phone width. */
+  text-align: left !important;
+  hyphens: none !important;
 }
 
 .message.assistant .message-header {

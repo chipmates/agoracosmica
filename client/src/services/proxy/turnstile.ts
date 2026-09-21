@@ -65,6 +65,30 @@ function emit(eventName: string): void {
 // The gate's mobile breakpoint. Below it the primary controls (consent button,
 // composer) sit at the bottom edge, where the challenge box would land.
 const NARROW_VIEWPORT_PX = 768;
+// Bottom-edge chat controls the box must clear. Measured, not assumed:
+// neither has a fixed offset.
+const BOTTOM_CONTROL_SELECTOR = '.unified-input-container, .stop-voice-pill';
+// The 'normal' widget, plus the air kept between it and whatever it clears.
+const CHALLENGE_BOX_PX = 72;
+const CLEARANCE_GAP_PX = 12;
+
+/**
+ * How far above the bottom edge the escalated box has to sit: clear of every
+ * bottom control on screen, never past the top of the viewport.
+ */
+function bottomClearancePx(): number {
+  const floor = window.innerWidth <= NARROW_VIEWPORT_PX ? 96 : 16;
+  let lift = floor;
+  document.querySelectorAll<HTMLElement>(BOTTOM_CONTROL_SELECTOR).forEach((el) => {
+    const rect = el.getBoundingClientRect();
+    const onScreen = rect.height > 0 && rect.bottom > 0 && rect.top < window.innerHeight;
+    if (!onScreen) return;
+    lift = Math.max(lift, window.innerHeight - rect.top + CLEARANCE_GAP_PX);
+  });
+  const ceiling = window.innerHeight - CHALLENGE_BOX_PX - CLEARANCE_GAP_PX;
+  // Ceil: a fractional rect must never leave the box a sliver short of clear.
+  return Math.ceil(Math.max(floor, Math.min(lift, ceiling)));
+}
 
 /**
  * Nothing is being asked of the visitor here, so the box must not take taps:
@@ -82,17 +106,32 @@ function placeInCorner(el: HTMLElement): void {
 
 /**
  * Interactive: a box nobody finds is a dead request, so it moves into view and
- * takes taps again, lifted clear of the bottom controls on narrow screens.
+ * takes taps again, lifted clear of the bottom controls at every width.
  */
 function placeInCenter(el: HTMLElement): void {
   el.style.position = 'fixed';
-  // Read at call time: re-applied on every render and every interactive start.
-  el.style.bottom = window.innerWidth <= NARROW_VIEWPORT_PX ? '96px' : '16px';
+  el.style.bottom = `${bottomClearancePx()}px`;
   el.style.left = '50%';
   el.style.right = '';
   el.style.transform = 'translateX(-50%)';
   el.style.zIndex = '100000';
   el.style.pointerEvents = 'auto';
+}
+
+// The composer mounts after the challenge escalates and grows with typing,
+// so the lift is re-measured while the box is asking.
+const PLACEMENT_RECHECK_MS = 400;
+let placementTimer: ReturnType<typeof setInterval> | null = null;
+
+function trackPlacement(el: HTMLElement): void {
+  stopTrackingPlacement();
+  placementTimer = setInterval(() => placeInCenter(el), PLACEMENT_RECHECK_MS);
+}
+
+function stopTrackingPlacement(): void {
+  if (placementTimer === null) return;
+  clearInterval(placementTimer);
+  placementTimer = null;
 }
 
 /**
@@ -103,6 +142,7 @@ function placeInCenter(el: HTMLElement): void {
  */
 function resetTurnstileState(): void {
   // The widget this challenge belonged to is being torn down.
+  stopTrackingPlacement();
   if (challengeState === 'interactive') emit(TURNSTILE_INTERACTIVE_END_EVENT);
   challengeState = 'idle';
   if (widgetId !== null) {
@@ -254,7 +294,9 @@ export async function getTurnstileToken(): Promise<string> {
     // session refreshes (Turnstile's iframe can't communicate from a hidden
     // parent and times out at TURNSTILE_TIMEOUT_MS).
     container.style.display = '';
-    // Re-applied every call: a previous interactive challenge left it centered.
+    // Re-applied every call: a previous interactive challenge left it centered
+    // and may still be re-measuring its lift.
+    stopTrackingPlacement();
     placeInCorner(container);
 
     const startedAtMs = Date.now();
@@ -269,6 +311,7 @@ export async function getTurnstileToken(): Promise<string> {
     const endInteractive = (): void => {
       if (!interactive) return;
       interactive = false;
+      stopTrackingPlacement();
       if (container) placeInCorner(container);
       emit(TURNSTILE_INTERACTIVE_END_EVENT);
     };
@@ -314,7 +357,10 @@ export async function getTurnstileToken(): Promise<string> {
           onTimeout,
           Math.max(0, TURNSTILE_INTERACTIVE_TIMEOUT_MS - (Date.now() - startedAtMs)),
         );
-        if (container) placeInCenter(container);
+        if (container) {
+          placeInCenter(container);
+          trackPlacement(container);
+        }
         emit(TURNSTILE_INTERACTIVE_START_EVENT);
         sendFunnelBeacon('turnstile_interactive');
       },
