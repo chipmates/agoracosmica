@@ -222,8 +222,14 @@ export function samplesFor(tier: Tier, pixelRatio = 1): number {
   const asked = said === null ? NaN : Number(said)
   if (Number.isFinite(asked) && asked >= 0) return asked
   if (tier.samples === 0) return 0
+  /* THE CALM TIER KEEPS ITS FOUR AT EVERY RATIO. The backend rounds any
+     request under four down to one, so halving four does not buy half the
+     coverage, it buys none. On this tier the whole of it is seventeen
+     megabytes of buffers and under a millisecond, measured. */
+  if (tier.name === 'calm') return tier.samples
   return pixelRatio > 1 ? Math.max(2, Math.round(tier.samples / 2)) : tier.samples
 }
+
 
 export function createPost(
   renderer: WebGPURenderer,
