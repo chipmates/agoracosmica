@@ -19,7 +19,7 @@ import { createHash } from 'node:crypto'
 import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { APP_ROOT, assertServer, browserArgs, FRAME_TIME_FLAGS, waitForServer, wingStanding } from '../rig.mjs'
-import { CHROME_OFF, installVirtualClock } from './clock.mjs'
+import { BARE, CHROME_OFF, installVirtualClock } from './clock.mjs'
 
 const argv = process.argv.slice(2)
 const flags = new Map()
@@ -45,6 +45,8 @@ const CAP = Number(flag('cap', 1400))
 /** the film reseeds per frame by design; a bit-identity proof holds it still */
 const GRAIN = flag('grain', PROOF ? 'off' : 'on') !== 'off'
 const OUT_ROOT = String(flag('out', resolve(APP_ROOT, '..', 'capture')))
+/** frames kept a second time with the wing's own chrome on, as evidence */
+const WITNESS = String(flag('witness', '0,150,300')).split(',').filter(Boolean).map(Number)
 
 const FRAMINGS = {
   landscape: { width: 1920, height: 1080 },
@@ -152,7 +154,20 @@ async function oneCapture(browser, dir, limit) {
   await page.waitForTimeout(4000)
   if (!GRAIN) await page.evaluate(() => window.__forge.grain(false))
   await page.addStyleTag({ content: CHROME_OFF })
+  await page.evaluate((c) => document.documentElement.classList.add(c), BARE)
   await page.waitForTimeout(600)
+  /* A WITNESS FRAME carries the wing's own chrome: the card, the bar and the
+     marks that stand over the works. It is not part of the clip. It is the
+     evidence for what a clip cannot hold, and it is taken between two steps,
+     so the scene behind it is the same scene. */
+  const witness = async (i) => {
+    if (!WITNESS.includes(i)) return
+    await page.evaluate((c) => document.documentElement.classList.remove(c), BARE)
+    await page.evaluate(() => window.__pre.raw())
+    await page.screenshot({ path: join(dir, `witness-${String(i).padStart(5, '0')}.png`), type: 'png' })
+    await page.evaluate((c) => document.documentElement.classList.add(c), BARE)
+    await page.evaluate(() => window.__pre.raw())
+  }
 
   await page.evaluate((fps) => window.__pre.arm(fps), FPS)
   armed = true
@@ -165,9 +180,29 @@ async function oneCapture(browser, dir, limit) {
   /* the round trip that makes the frame history the same in every run */
   const settleSteps = [await silentWalk(page, TO), await silentWalk(page, FROM)]
   const frames = []
+  /** frames whose shot had to be retried, and why the retry exists */
+  const stalls = []
+  /* A BRAKING WALK STOPS DAMAGING THE SURFACE. Over the last metre the eye
+     moves by fractions of a pixel, and a compositor that sees no damage
+     commits no frame, so the shot waits for a frame that will never come. The
+     retry paints a layer the canvas covers, which costs no visible pixel and
+     gives the compositor something to commit. */
   const shoot = async (i) => {
     const file = join(dir, `f${String(i).padStart(5, '0')}.png`)
-    const buf = await page.screenshot({ path: file, type: 'png', animations: 'allow', caret: 'initial' })
+    let buf
+    for (let attempt = 0; ; attempt++) {
+      try {
+        buf = await page.screenshot({ path: file, type: 'png', animations: 'allow', caret: 'initial', timeout: 20000 })
+        break
+      } catch (err) {
+        if (attempt >= 3) throw err
+        stalls.push(i)
+        await page.evaluate((n) => {
+          document.body.style.backgroundColor = n % 2 ? '#000000' : '#000001'
+        }, attempt)
+        await page.evaluate(() => window.__pre.raw())
+      }
+    }
     const s = await page.evaluate(() => {
       const st = window.__forge.state()
       return {
@@ -186,6 +221,7 @@ async function oneCapture(browser, dir, limit) {
      the clip's own first frame: the press cuts into nothing */
   await page.evaluate(() => window.__pre.raw())
   await shoot(0)
+  await witness(0)
   /* the frame asks for the station and the rail takes it up through promises
      of its own: the first step waits for those to have settled, or the leg
      begins one frame later in one run than in the other */
@@ -202,7 +238,9 @@ async function oneCapture(browser, dir, limit) {
   let arrivedAt = -1
   let idle = 0
   let i = 1
+  let broke = null
   const cap = limit || CAP
+  try {
   while (i < cap) {
     await page.evaluate(() => window.__pre.step())
     await page.evaluate(() => window.__pre.raw())
@@ -215,9 +253,14 @@ async function oneCapture(browser, dir, limit) {
       began = true
     }
     const s = await shoot(i)
+    await witness(i)
     if (!s.walking && arrivedAt < 0) arrivedAt = i
     if (arrivedAt >= 0 && i >= arrivedAt + TAIL) break
     i++
+  }
+  } catch (err) {
+    broke = String(err.message).slice(0, 200)
+    console.error(`the walk stopped at frame ${i}: ${broke}`)
   }
   const queued = await page.evaluate(() => window.__pre.queued())
   const starved = await page.evaluate(() => window.__pre.starved())
@@ -239,6 +282,8 @@ async function oneCapture(browser, dir, limit) {
     frames,
     lateRequests,
     errors,
+    stalls,
+    broke,
     queuedAtEnd: queued,
     starved,
     standingSeconds: round((Date.now() - t0) / 1000, 1),

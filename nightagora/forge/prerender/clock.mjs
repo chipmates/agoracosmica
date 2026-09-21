@@ -72,4 +72,6 @@ export function installVirtualClock() {
     its compositions around the card and the bar, and a display change would
     reframe the picture this test is about. */
 export const CHROME_OFF =
-  'body *{visibility:hidden!important}canvas{visibility:visible!important}'
+  'html.na-bare body *{visibility:hidden!important}html.na-bare canvas{visibility:visible!important}'
+/** the class the rule above hangs on, so bare and dressed is one toggle */
+export const BARE = 'na-bare'
