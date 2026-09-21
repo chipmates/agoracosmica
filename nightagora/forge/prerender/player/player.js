@@ -32,10 +32,11 @@
     if (c.saveData) return ladder[0]
     const kind = c.effectiveType || '4g'
     if (kind === 'slow-2g' || kind === '2g' || kind === '3g') return ladder[0]
+    /* the smallest rung that still carries the frame's short side, within a
+       tenth: a phone 780 device pixels wide reads 720 lines and 1080 lines the
+       same, and pays twice for the second */
     const short = Math.min(innerWidth, innerHeight) * (devicePixelRatio || 1)
-    let want = ladder[0]
-    for (const l of ladder) if (short >= l * 0.62) want = l
-    return want
+    return ladder.find((l) => l >= short * 0.9) ?? ladder[ladder.length - 1]
   }
 
   const sized = (list) => list.find((s) => s.lines === state.lines) || list[list.length - 1]
