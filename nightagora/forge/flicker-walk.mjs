@@ -122,9 +122,16 @@ const BASE = `http://localhost:${PORT}`
    read with: 1440 by 900 and 390 by 844. The held gate stands at 1512 by 950
    and both are in the report, so a number from one is never quoted as the
    other's. */
+/* AND THE RATIO IS PART OF THE READING. A desktop shot at one device pixel
+   per css pixel is not the picture a visitor on a Retina screen is shown:
+   the tier's own sample policy turns on the ratio, so a defect that only
+   appears above ratio 1 is invisible to a rig that never leaves it.
+   `--ratio 2` shoots the owner's own screen; the cell should be doubled with
+   it so a tile covers the same solid angle. */
+const RATIO = Math.max(1, Number(value('ratio', '')) || 0) || (MOBILE ? 2 : 1)
 const VP = MOBILE
-  ? { width: 390, height: 844, deviceScaleFactor: 2 }
-  : { width: 1440, height: 900, deviceScaleFactor: 1 }
+  ? { width: 390, height: 844, deviceScaleFactor: RATIO }
+  : { width: 1440, height: 900, deviceScaleFactor: RATIO }
 /* THE PASSAGE, NOT THE WHOLE LEG. `--near x,z,r` keeps only the frames whose
    eye stands within r metres of (x, z) in the app's own coordinates, so the
    spread map is of the place the owner named and not of seventeen metres of
@@ -144,7 +151,7 @@ const EVEN = !flag('wall-clock')
 const MASK_FRAME = flag('mask-frame')
 const OUT = join(APP_ROOT, 'forge', 'shots', 'flicker-walk')
 const RAW = join(OUT, 'raw')
-const TAG = `${MOBILE ? 'phone' : 'desktop'}-${TIER}`
+const TAG = `${MOBILE ? 'phone' : 'desktop'}-${TIER}${RATIO > 1 && !MOBILE ? `-r${RATIO}` : ''}`
 
 const say = (line) => process.stderr.write(`${line}\n`)
 
@@ -498,7 +505,16 @@ function castToDisk(page, client, dir, lockstep = AHEAD_FRAMES === 1) {
         window.__even?.hold()
         return window.__even ? window.__even.frames : null
       })
-      await client.send('Page.startScreencast', { format: 'png', everyNthFrame: 1 })
+      /* AND THE CAST IS ASKED FOR THE DEVICE'S OWN PIXELS. Without a size it
+         hands back the surface at its css size, so a page shot at two device
+         pixels per css pixel is READ at one and the ratio never reaches the
+         reading: the defect a Retina screen shows is averaged away before the
+         arithmetic sees it. */
+      await client.send('Page.startScreencast', {
+        format: 'png', everyNthFrame: 1,
+        maxWidth: Math.round(VP.width * VP.deviceScaleFactor),
+        maxHeight: Math.round(VP.height * VP.deviceScaleFactor),
+      })
     },
     async stop() {
       stopped = true
