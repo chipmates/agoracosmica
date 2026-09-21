@@ -972,7 +972,7 @@ export function createWing():VinciWingModule {
     hosts.navigate(index)
     exhibits?.warm()
     rail.set(id,stationPose(id,narrow()),true,narrow())
-    station=card=index;activeView='';aimPrint(id);exposureAt=id;paintHeader();paintDock();paintQuestion()
+    station=card=index;activeView='';aimPrint(id);exposureAt=id;paintHeader();paintHeaderVisibility();paintDock();paintQuestion()
   }
   /** True once the rail's own geometry proof has resolved: before that the
    * rail cannot walk a certified route, so a station is placed instead. */
@@ -1022,7 +1022,7 @@ export function createWing():VinciWingModule {
       if(inspectCost)measurement.show(`${s.id} / ${id}`)
       return
     }if(id==='scene')endInspection();if(id==='scene'||id.startsWith('audit-'))rail.look(0,0);if(id==='scene'||id==='audit-cost'){mode=1;paintDock()}if(id==='audit-cost')measurement.show(s.id);if(id==='audit-ui'){mode=1;paintDock();measurement.show(s.id,'ui')}if(id==='audit-ui-labels'){mode=2;paintDock();measurement.show(s.id,'ui')}if(id.startsWith('collection-room')||id.startsWith('collection-hang'))exhibits?.warm()
-    const pose=namedPose(id,narrow())??collectionView(id,narrow());if(pose){activeView=id;mode=1;paintDock();rail.set(s.id,pose,true,narrow());header.querySelector('.vinci-insertion')?.remove();titleForView(id);if(id.startsWith('collection')&&!s.built&&!vinciStandsInRoom(s.id))header.append(make('p','vinci-insertion',lang()==='de'?'Museumseinbau der Gegenwart · Räume im Bau':'Modern museum insertion · Rooms in construction'))}const cone=/(?:^|-)cone-(ul|ur|dl|dr)$/.exec(id);if(cone){placeCanonicalStation();rail.look(cone[1]!.includes('l')?.6:-.6,cone[1]!.startsWith('u')?.32:-.32)}if(id==='labels'||id==='hour'||id==='record'){sources.select(id==='hour'?'wing':'station');mode=2;paintDock();if(id==='record'){if(record.hidden)dock.querySelector<HTMLButtonElement>('.vinci-record-toggle')?.click();dock.scrollTop=record.offsetTop-(dock.querySelector('.vinci-sources-toolbar')?.getBoundingClientRect().height??0)-18}}if(inspectCost&&(pose||cone))measurement.show(`${s.id} / ${id}`)
+    const pose=namedPose(id,narrow())??collectionView(id,narrow());if(pose){activeView=id;mode=1;paintDock();paintHeaderVisibility();rail.set(s.id,pose,true,narrow());header.querySelector('.vinci-insertion')?.remove();titleForView(id);if(id.startsWith('collection')&&!s.built&&!vinciStandsInRoom(s.id))header.append(make('p','vinci-insertion',lang()==='de'?'Museumseinbau der Gegenwart · Räume im Bau':'Modern museum insertion · Rooms in construction'))}const cone=/(?:^|-)cone-(ul|ur|dl|dr)$/.exec(id);if(cone){placeCanonicalStation();rail.look(cone[1]!.includes('l')?.6:-.6,cone[1]!.startsWith('u')?.32:-.32)}if(id==='labels'||id==='hour'||id==='record'){sources.select(id==='hour'?'wing':'station');mode=2;paintDock();if(id==='record'){if(record.hidden)dock.querySelector<HTMLButtonElement>('.vinci-record-toggle')?.click();dock.scrollTop=record.offsetTop-(dock.querySelector('.vinci-sources-toolbar')?.getBoundingClientRect().height??0)-18}}if(inspectCost&&(pose||cone))measurement.show(`${s.id} / ${id}`)
   }
   /** ONE ENTRY PER EXHIBIT ID. One exhibit of this museum can stand as more
    * than one body in the scene, and the registry is what the row, the marks
@@ -1810,7 +1810,14 @@ export function createWing():VinciWingModule {
    * exhibit's on the wide one and would cover it on the phone. */
   function paintHeaderVisibility():void {
     if(!header)return
-    header.hidden=mode===2||Boolean(closeLook?.id)
+    // A CARD THAT SAYS A ROOM IS NOT OPEN CANNOT STAND WHILE THE VISITOR IS
+    // INSIDE IT. An approach and a named view both leave the station's frame,
+    // which is the frame every word of this card is about, so at a station
+    // whose room is not built the card stands down while the eye is away and
+    // comes back with it.
+    const nav=standing?rail.navigation:undefined
+    const away=Boolean(nav?.exhibit??nav?.approaching)||Boolean(activeView)
+    header.hidden=mode===2||Boolean(closeLook?.id)||(away&&!vinciContent[card]!.built)
     paintSheet()
   }
   /** AN APPROACH EYE IS NEVER A STATION. It stands in the station's own room
@@ -2211,7 +2218,7 @@ export function createWing():VinciWingModule {
       }
       // The kicker follows the body: it says a view only while the eye stands
       // away from its station.
-      if(closeLook?.id||exhibitAway!==Boolean(nav.exhibit??nav.approaching)){exhibitAway=Boolean(nav.exhibit??nav.approaching);paintExhibitTitle()}
+      if(closeLook?.id||exhibitAway!==Boolean(nav.exhibit??nav.approaching)){exhibitAway=Boolean(nav.exhibit??nav.approaching);paintExhibitTitle();paintHeaderVisibility()}
       focusNearCascade();shadowBody?.update();shadowCache?.update();sky.position.copy(hosts.world.camera.position)
       // A REMOUNTED PLATE IS A NEW MESH. The registry is a read, so it is
       // taken again when a tier change has replaced what it read.
