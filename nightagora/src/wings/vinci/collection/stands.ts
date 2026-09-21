@@ -37,9 +37,12 @@ export interface Stand {
  * the crane that was built outdoors, and the two weather instruments on one
  * plinth. The hall keeps the workshop, one aisle wide, with the camera
  * obscura in the dark bay its image needs and the gun apart at the far end.
- * The compass stands in the house, where its own ledge will be.
+ *
+ * ONE MACHINE OF THE CATALOGUE HAS NO STAND: the proportional compass stands
+ * on the hall's own ledge, which the house builds, so it is not stood on a
+ * plinth of the exhibition's furniture as well.
  */
-export const STANDS: Record<MachineSlug, Stand> = {
+export const STANDS: Partial<Record<MachineSlug, Stand>> = {
   // THE COURT. The parachute is 10.34 m tall and the tallest room in the
   // insertion is 6.61 m, so it stands outside on its own four uprights. It
   // stands north of the display wall's own frame: nothing of it enters the
@@ -69,13 +72,14 @@ export const STANDS: Record<MachineSlug, Stand> = {
   'ball-bearing': { east: -40.6, north: -46.6, bearing: 0, plinth: .62, ground: 'hall' },
   'camera-obscura': { east: -45.6, north: -52.6, bearing: 0, plinth: .3, ground: 'hall' },
   'multi-barrel-gun': { east: -41.3, north: -50.8, bearing: 0, plinth: 0, ground: 'hall' },
-  // THE HOUSE. The proportional compass is 140 mm across and belongs where a
-  // visitor can reach it: it stands on a plinth in the court the four house
-  // stations stand in, three and a half metres into their own frame and clear
-  // of both the card and the bar. Their gaze rises to the facade, which is
-  // why the plinth is a lectern's height and not a case's. The hall's
-  // contemporary ledge takes it when that window builds it.
-  'proportional-compass': { east: 4.77, north: -19.77, bearing: 6, plinth: 1.15, ground: 'house' },
+}
+
+/** A machine's own stand. A slug the exhibition gives no stand is a machine
+ * some other body carries, and asking for its plinth is a fault, not a case. */
+export function standOf(slug: MachineSlug): Stand {
+  const stand = STANDS[slug]
+  if (!stand) throw new Error(`No stand for ${slug}`)
+  return stand
 }
 
 export const standLevel = (ground: StandGround): number =>
@@ -101,7 +105,7 @@ function envelope(slug: MachineSlug): { min: [number, number, number]; size: [nu
 
 /** The plan footprint a plinth has to cover, in east and north. */
 function footprint(slug: MachineSlug): { east: number; north: number; width: number; depth: number } {
-  const stand = STANDS[slug], { min, size } = envelope(slug)
+  const stand = standOf(slug), { min, size } = envelope(slug)
   const angle = stand.bearing * Math.PI / 180, cos = Math.cos(angle), sin = Math.sin(angle)
   const centre = [min[0] + size[0] / 2, min[1] + size[1] / 2, min[2] + size[2] / 2] as const
   return {
@@ -121,7 +125,7 @@ export function standBoxes(): StandBox[] {
   const boxes: StandBox[] = []
   const groups = new Map<string, MachineSlug[]>()
   for (const slug of Object.keys(STANDS) as MachineSlug[]) {
-    const stand = STANDS[slug]
+    const stand = standOf(slug)
     const level = standLevel(stand.ground)
     const angle = stand.bearing * Math.PI / 180, cos = Math.cos(angle), sin = Math.sin(angle)
     // The modern hardware belongs to the exhibition and not to the dossier,
@@ -150,7 +154,7 @@ export function standBoxes(): StandBox[] {
     const east = Math.max(...prints.map(p => p.east + p.width / 2))
     const south = Math.min(...prints.map(p => p.north - p.depth / 2))
     const north = Math.max(...prints.map(p => p.north + p.depth / 2))
-    const stand = STANDS[shared[0]!]
+    const stand = standOf(shared[0]!)
     boxes.push(...plinth({ east: (west + east) / 2, north: (south + north) / 2, width: east - west, depth: north - south },
       standLevel(stand.ground), stand.plinth))
   }
@@ -174,7 +178,7 @@ function plinth(print: { east: number; north: number; width: number; depth: numb
  * through a plain double three centimetres inside it, which the cloth hides.
  */
 export function parachuteCloth(): { corners: [number, number, number][]; top: [number, number, number] } {
-  const stand = STANDS['parachute'], level = standLevel(stand.ground) + stand.plinth
+  const stand = standOf('parachute'), level = standLevel(stand.ground) + stand.plinth
   const angle = stand.bearing * Math.PI / 180, cos = Math.cos(angle), sin = Math.sin(angle)
   const cloth = 6.86, sill = 3.32, apex = 10.24
   const corner = (sx: number, sz: number): [number, number, number] => {

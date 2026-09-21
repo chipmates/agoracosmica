@@ -17,7 +17,7 @@ import { GRAVE_DEATHBED, GRAVE_FRAME, GRAVE_SLAB } from '../grave/placement'
 import { LINE_STUDS } from '../line/studs'
 import { hangPlacements } from './hang'
 import { COURT, FLOOR, GRAVE_ORIGIN, OPENING, SUPPER_WALL } from './layout'
-import { STANDS, standLevel } from './stands'
+import { STANDS, standOf, standLevel } from './stands'
 import { dossiers, MACHINE_SLUGS, type MachineSlug } from '../machines/catalog'
 import { bodyWallOrder } from './wall'
 import { hallLedge } from '../entry-passage'
@@ -263,7 +263,7 @@ const MACHINE_EYES: Record<Exclude<MachineSlug, 'proportional-compass'>, { stati
 }
 
 function machinePose(slug: keyof typeof MACHINE_EYES, narrow: boolean): ApproachPose {
-  const stand = STANDS[slug], { x, y, z } = dossiers[slug].scale_m
+  const stand = standOf(slug), { x, y, z } = dossiers[slug].scale_m
   const level = standLevel(stand.ground), eye = MACHINE_EYES[slug]
   // The aim stands at the body's own middle, never higher than a person looks
   // up at a nine metre screw from the aisle.

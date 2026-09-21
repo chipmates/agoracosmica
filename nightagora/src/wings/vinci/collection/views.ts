@@ -8,7 +8,7 @@ import { world } from '../site'
 import { VINCI_READING_TABLE } from './approaches'
 import { hangPlacements } from './hang'
 import { COURT, FACE, FLOOR, GRAVE_ORIGIN, HANG_DATUM, LINE_ORIGIN, LINE_SLAB, SUPPER_WALL } from './layout'
-import { STANDS } from './stands'
+import { standOf } from './stands'
 
 export interface RoomPose { eye: Vector3; at: Vector3; fov: number }
 const EYE = FLOOR + 1.62
@@ -172,7 +172,7 @@ export function collectionView(id: string, narrow: boolean): RoomPose | undefine
     case 'collection-room-parachute': {
       // Ten metres of cloth cannot be read from under it: this eye stands off
       // the court's south edge, where the whole pyramid clears the frame.
-      const stand = STANDS['parachute']
+      const stand = standOf('parachute')
       return pose(stand.east, -32.6, COURT.level + 1.62,
         stand.east, stand.north, COURT.level + 4.6, narrow ? 86 : 68, 2.1)
     }

@@ -20,7 +20,7 @@ import { lang } from '../../content'
 import { stamp } from './build'
 import { collectionExhibitMaterials, collectionInteriorMaterial, collectionProceduralStack } from './materials'
 import { COURT, FLOOR, GRAVE_ORIGIN, LINE_ORIGIN } from './layout'
-import { createCollectionStandSolids, standLevel, STANDS, type StandGround } from './stands'
+import { createCollectionStandSolids, standLevel, STANDS, standOf, type StandGround } from './stands'
 import { mountCollectionPlates, type CollectionPictureSource } from './plates'
 import { VINCI_READING_TABLE } from './approaches'
 import type { BodySheetSource } from './body-wall'
@@ -100,7 +100,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   }
 
   function stand(slug: MachineSlug): ReadyMachineBuild {
-    const spot = STANDS[slug], level = standLevel(spot.ground)
+    const spot = standOf(slug), level = standLevel(spot.ground)
     const machine = buildMachine(slug, spot.ground === 'court' && slug === 'parachute' ? courtStack : stack)
     machine.object.rotation.y = spot.bearing * Math.PI / 180
     machine.object.position.set(spot.east, level + spot.plinth - machine.bounds.min.y, -spot.north)
@@ -193,7 +193,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
     const work = court.then(() => seed(['bronze-dark', 'leather-worn', 'parchment-laid', 'limestone-pale'])).then(async () => {
       for (const slug of MACHINE_SLUGS) {
         if (!live) return
-        if (slug === 'parachute' || STANDS[slug].ground !== ground) continue
+        if (slug === 'parachute' || STANDS[slug]?.ground !== ground) continue
         stand(slug)
         await new Promise(resolve => setTimeout(resolve, 0))
       }
