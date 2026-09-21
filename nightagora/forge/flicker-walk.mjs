@@ -101,7 +101,7 @@ import { createHash } from 'node:crypto'
 import { copyFileSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { APP_ROOT, assertAdapter, assertBackend, assertServer, browserArgs, waitForServer, wingStanding } from './rig.mjs'
-import { decodeGrey, pngSize, reader, TILE, writePng } from './flicker-frames.mjs'
+import { decodeGrey, pngSize, reader, setTile, TILE, writePng } from './flicker-frames.mjs'
 
 const argv = process.argv.slice(2)
 const plain = argv.filter((a) => !a.startsWith('--'))
@@ -137,6 +137,9 @@ const REGION = (value('region', '') || '').split(',').map(Number).filter((n) => 
 const SOFFIT = flag('soffit')
 /* how many times each leg is walked: the even clock's own proof */
 const RUNS = Math.max(1, Number(value('runs', '1')) || 1)
+/* the cell the reading averages over: 32 px reads a surface, a smaller one
+   reads an edge that moves by a pixel (`--tile 8`) */
+if (value('tile', '')) setTile(Number(value('tile', '32')))
 const EVEN = !flag('wall-clock')
 const MASK_FRAME = flag('mask-frame')
 const OUT = join(APP_ROOT, 'forge', 'shots', 'flicker-walk')
@@ -298,6 +301,9 @@ const SOFFIT_PRISM = { quad: [[14.996, 18.043], [17.461, 16.443], [18.928, 18.59
    stands clear of the card and the row. */
 const PLACES = {
   'grave-shadow': { name: "the grave's shadow edge", box: [-61.2, -4.6, 16.05, -50, -0.35, 16.45] },
+  /* the two metres of that wall the cast edge actually crosses, for a reading
+     that is the edge and almost nothing else */
+  'grave-edge': { name: "the grave's shadow edge, close", box: [-57, -2.3, 16.05, -55, -1.3, 16.45] },
   'supper-block': { name: 'the block at the foot of the glazed front', box: [-45, -6.6, 33.6, -30, -6.2, 34.3] },
   'line-floor': { name: "the line station's floor", box: [-34.5, -6.36, 44, -25.5, -6.26, 59] },
 }
@@ -410,12 +416,16 @@ function regionMask(pose, region, w, h, cols, rows, out) {
    a desktop frame is over a megabyte of PNG: held in an array that is a
    gigabyte of heap for arithmetic that only ever looks at three frames at a
    time. So the cast writes as it receives and keeps the timestamps only. */
-function castToDisk(page, client, dir) {
+/* `lockstep` false lets a repeat buy a frame anyway, which is what a HOLD
+   needs: a still page emits the same surface for ever, so in lockstep the
+   cast stalls on its own watchdog and the control comes back with one frame
+   and no control at all. */
+function castToDisk(page, client, dir, lockstep = AHEAD_FRAMES === 1) {
   rmSync(dir, { recursive: true, force: true })
   mkdirSync(dir, { recursive: true })
   const times = []
   const drawn = []
-  const strict = AHEAD_FRAMES === 1
+  const strict = lockstep
   let n = 0
   let stopped = false
   /* THE HANDLER WRITES BEFORE IT AWAITS ANYTHING. Awaiting inside it let two
@@ -708,7 +718,16 @@ async function readRun(name, dir, allTimes, samples, origin, keepPairs, heldFrom
     kept.push(i)
   }
   const times = kept.map((i) => allTimes[i])
-  if (files.length < 6) return { error: `only ${files.length} of ${all.length} frames were new` }
+  /* A HOLD WHOSE PICTURE NEVER CHANGES CANNOT BE READ, AND THAT IS THE
+     CONTROL. Six frames are the least the residual needs; under it the
+     honest number is how many emissions came back and how many of them were
+     the same surface to the bit. */
+  if (files.length < 6)
+    return {
+      error: `only ${files.length} of ${all.length} frames were new`,
+      framesCast: all.length, distinct: files.length, repeatedFrames: repeats,
+      stood: files.length <= 1 ? 'the picture stood bit for bit' : null,
+    }
   const { w, h } = pngSize(readFileSync(join(dir, files[0])))
   for (const [i, f] of all.entries()) if (!kept.includes(i)) rmSync(join(dir, f), { force: true })
   /* ffmpeg reads the folder by its numbering, so the kept frames are renamed
@@ -1128,6 +1147,14 @@ async function readRun(name, dir, allTimes, samples, origin, keepPairs, heldFrom
     virtualFrames: even ? Math.round(pose[last][10] - pose[first][10]) : null,
     regions,
     probe: probeKeys ? { keys: probeKeys, test: probeTest } : null,
+    /* THE SERIES ITSELF, so a reading can be taken again off the run rather
+       than by walking the leg again: one row a frame with what the frame
+       broke by and which counters moved on it. */
+    series: breakSeries.map((s) => ({
+      n: s.n, over: s.over, tiles: s.tilesRead, mean: s.mean, refocus: s.refocus,
+      fired: Object.keys(probeChanged).filter((key) => probeChanged[key].has(s.n) && key !== 'checks'),
+      movedMm: s.movedMm, turnedDeg: s.turnedDeg,
+    })),
     events: events.length,
     /* THE COUNT DIVIDED BY WHAT IT WAS COUNTED OVER. An event count is a
        count over captured frames, so it rises with the capture alone; the
@@ -1240,7 +1267,7 @@ async function holdControl(page, client, at, name, view = '') {
   await page.waitForTimeout(ARRIVED_SETTLE_MS)
   await page.evaluate(() => window.__forge.grain?.(false))
   await page.waitForTimeout(300)
-  const cast = castToDisk(page, client, join(RAW, name))
+  const cast = castToDisk(page, client, join(RAW, name), false)
   await startRecorder(page)
   await cast.start()
   const until = Date.now() + 12000
@@ -1296,7 +1323,8 @@ try {
   runs.push(control)
   say(
     control.error
-      ? `  hold ${control.hold}: ${control.error}`
+      ? `  hold ${control.hold}: ${control.stood ?? control.error}` +
+        `${control.framesCast ? ` (${control.framesCast} emission(s), ${control.distinct} distinct, ${control.repeatedFrames} the same surface)` : ''}`
       : `  hold at ${control.hold}: ${control.frames} frames of ${control.gate?.frames ?? '?'} drawn, ` +
         `${control.events} event(s), spread p99 ${control.spread.p99}, ${control.aim ? `${control.aim.tilesPerFrame.median} tile(s) aimed` : 'whole frame'}`
   )
@@ -1381,6 +1409,13 @@ writeFileSync(
   JSON.stringify(runs.filter((r) => r.trace).map((r) => ({ name: r.name, leg: r.leg ?? r.hold, pass: r.pass ?? null, trace: r.trace })))
 )
 for (const r of runs) delete r.trace
+/* the per-frame series is the same size as the trace and belongs beside it */
+const seriesFile = join(OUT, `${TAG}${PLACE ? `-${PLACE}` : ''}${process.env['FLICKER_QUERY'] ? `-${process.env['FLICKER_QUERY']}` : ''}-series.json`)
+writeFileSync(
+  seriesFile,
+  JSON.stringify(runs.filter((r) => r.series).map((r) => ({ name: r.name, leg: r.leg ?? r.hold, pass: r.pass ?? null, series: r.series })))
+)
+for (const r of runs) delete r.series
 const report = {
   instrument: 'flicker-walk',
   surface: `wing/${SLUG}`,
@@ -1397,6 +1432,7 @@ const report = {
   events: walks.reduce((s, r) => s + r.events, 0),
   dir: 'forge/shots/flicker-walk',
   traces: traceFile,
+  seriesFile,
   flags,
 }
 report.ok = flags.length === 0

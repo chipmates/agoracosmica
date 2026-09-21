@@ -10,8 +10,15 @@ import { join } from 'node:path'
 
 /** a pixel is unstable when its temporal sd over the frames is over this */
 export const SD_LEVELS = 6
-/** the side of the cell a tile reading averages over */
-export const TILE = 32
+/** the side of the cell a tile reading averages over. A surface flickers as a
+    surface and 32 px is the cell that reads one; an EDGE that wobbles by a
+    pixel moves a 32 px cell by a thirtieth of its contrast and hides in it, so
+    an instrument aimed at an edge may set its own. The held gate never does. */
+export let TILE = 32
+export function setTile(side) {
+  TILE = Math.max(2, Math.round(side))
+  return TILE
+}
 
 /* ---- PNG, ffmpeg, and the arithmetic over the frames --------------------- */
 
