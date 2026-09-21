@@ -172,23 +172,23 @@
 /* src/wings/life/life.css:226 · 10px */
 #wing[data-desk~='type14'] .wing-life[data-narrow='true'] .wing-life-count,
 #wing[data-desk~='type14'] .wing-life[data-narrow='true'] .wing-life-honesty { font-size: 0.875rem; }
-/* src/wings/vitrine/vitrine.css:39 · 12px */
+/* src/wings/vitrine/vitrine.css:48 · 12px */
 #wing[data-desk~='type14'] .vitrine-words .picture-holder,
 #wing[data-desk~='type14'] .vitrine-words .picture-source-reading,
 #wing[data-desk~='type14'] .vitrine-words .picture-column-note,
 #wing[data-desk~='type14'] .vitrine-meta { font-size: 0.875rem; }
-/* src/wings/vitrine/vitrine.css:40 · 12px */
+/* src/wings/vitrine/vitrine.css:49 · 12px */
 #wing[data-desk~='type14'] .vitrine-words .picture-label-more,
 #wing[data-desk~='type14'] .vitrine-more { font-size: 0.875rem; }
-/* src/wings/vitrine/vitrine.css:41 · 11px */
+/* src/wings/vitrine/vitrine.css:50 · 11px */
 #wing[data-desk~='type14'] .vitrine-certainty { font-size: 0.875rem; }
-/* src/wings/vitrine/vitrine.css:45 · 12px */
+/* src/wings/vitrine/vitrine.css:54 · 12px */
 #wing[data-desk~='type14'] .vitrine-control { font-size: 0.875rem; }
-/* src/wings/vitrine/vitrine.css:146 · 11px */
+/* src/wings/vitrine/vitrine.css:156 · 11px */
 #wing[data-desk~='type14'] .vitrine-folio { font-size: 0.875rem; }
-/* src/wings/vitrine/vitrine.css:177 · 13px */
+/* src/wings/vitrine/vitrine.css:187 · 13px */
 #wing[data-desk~='type14'] .vitrine-source-text { font-size: 0.875rem; }
-/* src/wings/vitrine/vitrine.css:183 · 12px */
+/* src/wings/vitrine/vitrine.css:193 · 12px */
 #wing[data-desk~='type14'] .vitrine-reader-shelf .vt-codex-body { font-size: 0.875rem; }
 /* src/wings/vitrine/reader.css:24 · 11px */
 #wing[data-desk~='type14'] .reader-page { font-size: 0.875rem; }
