@@ -23,7 +23,7 @@
       "prompt": "Bilinear IGN ground from 165 retained samples; explicit A-SITE court, terrace and assumed street cut; three scales of earth and grass; mapped stream. Conjectural exposed-soil clods, erosion variation and shallow normal relief dress declared vertical cut faces without changing their outlines or heights. Exposed-earth library colour uses two continuous world projections blended by face orientation, preserving the cut geometry and avoiding local strip UV restarts. Reuse the already licensed earth-packed map in the exact street corridors with restrained grey-beige mineral drift, compacted wheel bands, filtered aggregate and fine grit. Keep all actual sampled heights and ground outside the road.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "9999f29a5e6730d8b0b2215cc08537c574b8e578663e5deb19539a07abe9e9a1",
+      "sha256": "7f7495405c66a36ad82617c80faf8affddf421273000ec8a38d168b2ac72416f",
       "note": "IGN Licence Ouverte 2.0; OSM contributors ODbL 1.0; src/wings/vinci/data/terrain.json; recipe_file=src/wings/vinci/ground.ts"
     },
     {
@@ -127,7 +127,7 @@
       "prompt": "Derivative-filtered original brick, tuffeau, slate and member-local oak finishes on the retained nominal courses, apertures and measured geometry. Brick and pale limestone retain finite pores and restrained broad variation, with continuous overlapping quadratic-spline grain at explicit nominal physical intervals and assumed ranges. Pore colour contrast is reduced; pore depths remain. Slate keeps staggered tile IDs, overlap geometry, palette and fine grain; two broad finite layers and four small finite flakes replace infinite periodic cleft bands. Exact counts, scales, relief ranges, filtering approximations and uncalibrated appearance basis are disclosed EN/DE. The accepted R27b continuous oak body, finite fibres and shallow elongated pores retain their actual member UVs/seeds, worn colour, knots, checks and end grain. All roughness and normal-slope bounds remain. No reference image is sampled, no bitmap is added and no material relief displaces geometry.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "bca990ab3e77beeb396d70093e00c8c2e93c731f65b3815946a3781c43edd11b",
+      "sha256": "650f117b2012896aa832fb69204ce850b2bfc3b7c04a290bea8b364d25d78f71",
       "note": "Text-declared procedural recipe; recipe_file=src/wings/vinci/surface.ts; A-MATERIAL A-MASONRY materials.csv Q124 Q130; mineralSurfaceProvenance contains EN/DE physical scale and amplitude intervals; closeSurfaceProvenance contains EN/DE slate and oak intervals; microstructure_recipe=src/wings/vinci/mineral-microstructure.ts; microstructure_sha256=92c93ba37e7dd89f36690a45e6d785e4548cae5b4c4c27b669ba6a144a136cf2; oak_finish_recipe=src/wings/vinci/oak-microstructure.ts; oak_finish_sha256=2d3a05ee3a15da07c6170e5ba05d8c1100d36e26d560af6a1c7e67c4a9847dc3; dense_mineral_body_recipe=src/wings/vinci/dense-mineral-body.ts; dense_mineral_body_sha256=69c67887495d8d36846c296b7c6e5c52234bf02445895d38f6268f4331b881ea; slate_microstructure_recipe=src/wings/vinci/slate-microstructure.ts; slate_microstructure_sha256=dc1f439cd1964a8705e735e9e8e223d05a0f8e3a16739312101e4f0a888c3af1"
     },
     {
