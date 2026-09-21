@@ -6,12 +6,18 @@
 // manifest law: a new record per file with its hash, its source's hash and
 // the recipe that made it, and a pointer on the set the runtime reads.
 //
-//   node forge/encode-library-ktx2.mjs [set ...] [--go]
+//   node forge/encode-library-ktx2.mjs [set ...] [--maps albedo,normal] [--calm] [--go]
 //
 // Without `--go` it encodes into the scratch folder and prints the scores,
 // and the store is not touched. The encoder is the store's own gltfpack
 // (`internal/night-agora/tools/bin/gltfpack`), UASTC for every class, the
 // rows flipped to match the decoded photograph the library uploads.
+//
+// THE CALM PACK (`--calm`) is the same recipe over a smaller photograph. The
+// calm tier never uploads a map above 1024 (`texturesFor` in stack/materials),
+// and the phone downloads the whole 2048 file to throw most of it away. The
+// sizes in CALM_SIZE are the ones the phone can resolve at the distances the
+// rail allows, measured off the mounted geometry and the certified poses.
 import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { copyFileSync, existsSync, mkdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs'
@@ -24,9 +30,21 @@ import { APP_ROOT, STORE } from './vite-na-assets.mjs'
 const require = createRequire(import.meta.url)
 const args = process.argv.slice(2)
 const GO = args.includes('--go')
+const CALM = args.includes('--calm')
 const DEFAULT_SETS = ['limestone-pale', 'marble-lapis', 'stone-tuffeau', 'bronze-dark', 'earth-packed', 'grass-short',
   'iron-forged', 'linen', 'leather-worn', 'parchment-laid', 'oak-beams', 'rope']
-const SETS = args.filter((a) => !a.startsWith('--')).length ? args.filter((a) => !a.startsWith('--')) : DEFAULT_SETS
+const flag = (name) => (args.includes(name) ? args[args.indexOf(name) + 1] : null)
+const WORDS = args.filter((a, i) => !a.startsWith('--') && !args[i - 1]?.startsWith('--'))
+const SETS = WORDS.length ? WORDS : DEFAULT_SETS
+const ONLY_MAPS = flag('--maps')?.split(',') ?? null
+/* the side each set's calm pack is encoded at, one tile of the photograph
+   against one pixel of a 390 by 844 phone at the calm tier's own pixel ratio,
+   at the nearest the certified poses bring the eye to a surface that wears it.
+   1024 is the ceiling in any case: the tier uploads no more than that. */
+const CALM_SIZE = {
+  'grass-short': 512, 'stone-tuffeau': 512,
+  'earth-packed': 1024, 'bronze-dark': 1024, 'limestone-pale': 1024, 'marble-lapis': 1024,
+}
 const GLTFPACK = resolve(STORE, '..', 'tools', 'bin', 'gltfpack')
 const RECIPE = ['-tc', '-tu', '-tfy', '-tj', '4']
 const LIBRARY = join(STORE, 'library')
@@ -90,6 +108,7 @@ async function transcoder() {
     source's own pixels, rows flipped as the library uploads them */
 function score(source, decoded) {
   const raw = execFileSync('magick', [source, '-flip', '-depth', '8', 'rgb:-'], { maxBuffer: 1 << 30 })
+  if (raw.length !== decoded.width * decoded.height * 3) throw new Error(`${source}: the score reads a different size than the encode`)
   let sum = 0, worst = 0
   for (let p = 0, q = 0; p < raw.length; p++, q++) {
     if ((q & 3) === 3) q++
@@ -111,47 +130,57 @@ for (const set of SETS) {
   const entry = read().assets.find((a) => a.id === `library/${set}`)
   if (!entry) throw new Error(`no library record for ${set}`)
   for (const map of entry.maps ?? []) {
+    if (ONLY_MAPS && !ONLY_MAPS.includes(map)) continue
+    const size = CALM ? CALM_SIZE[set] : 0
+    if (CALM && !size) throw new Error(`no measured calm size for ${set}`)
     const ext = map === 'albedo' ? 'jpg' : 'png'
     const source = join(LIBRARY, entry.path, `${map}.${ext}`)
-    const dir = join(WORK, set, map)
+    const dir = join(WORK, CALM ? `${set}-calm` : set, map)
     rmSync(dir, { recursive: true, force: true })
     mkdirSync(dir, { recursive: true })
-    copyFileSync(source, join(dir, `${map}.${ext}`))
-    writeFileSync(join(dir, 'quad.gltf'), JSON.stringify(quad(`${map}.${ext}`, map)))
+    /* the photograph is resized ONCE, here, and the same resized file is what
+       the score reads back: the reading is then the encoder's own error and
+       not the resampler's */
+    const laid = join(dir, `${map}.${CALM ? 'png' : ext}`)
+    if (CALM) execFileSync('magick', [source, '-filter', 'Lanczos', '-resize', `${size}x${size}!`, '-strip', laid])
+    else copyFileSync(source, laid)
+    writeFileSync(join(dir, 'quad.gltf'), JSON.stringify(quad(`${map}.${CALM ? 'png' : ext}`, map)))
     const began = Date.now()
     execFileSync(GLTFPACK, ['-i', 'quad.gltf', '-o', 'out.gltf', ...RECIPE], { cwd: dir, stdio: 'ignore' })
     const file = join(dir, `${map}.ktx2`)
     if (!existsSync(file)) throw new Error(`gltfpack wrote no ${map}.ktx2 for ${set}`)
     const back = decode(file)
-    const reading = score(source, back)
+    const reading = score(laid, back)
     const row = { set, map, seconds: (Date.now() - began) / 1000, sourceBytes: statSync(source).size, bytes: statSync(file).size,
       width: back.width, height: back.height, levels: back.levels, uastc: back.uastc, ...reading }
     made.push(row)
     console.log(`${set.padEnd(16)}${map.padEnd(8)} ${String(row.sourceBytes).padStart(9)} -> ${String(row.bytes).padStart(8)} B  ` +
       `${row.width}x${row.height} ${row.levels} levels  PSNR ${row.psnr} dB  max ${row.maxError}  ${row.seconds} s`)
     if (!GO) continue
-    const target = join(LIBRARY, entry.path, `${map}.ktx2`)
+    const file_ = CALM ? `${map}.calm.ktx2` : `${map}.ktx2`
+    const target = join(LIBRARY, entry.path, file_)
     copyFileSync(file, `${target}.part`)
     renameSync(`${target}.part`, target)
     // the manifest is read fresh before every write, and written whole
     const doc = read()
     const set_ = doc.assets.find((a) => a.id === `library/${set}`)
     const sourceRecord = doc.assets.find((a) => a.id === `library/${set}-${map}`)
-    const id = `library/${set}-${map}-ktx2`
+    const id = `library/${set}-${map}${CALM ? '-calm' : ''}-ktx2`
     const record = {
-      id, path: `${entry.path}${map}.ktx2`, class: set_.class, licence: set_.licence, holder: set_.holder,
+      id, path: `${entry.path}${file_}`, class: set_.class, licence: set_.licence, holder: set_.holder,
       source_url: set_.source_url, sha256: sha(target), bytes: statSync(target).size, pixels: row.width * row.height,
       wing: 'library', display: true,
       derived_from: sourceRecord?.id ?? `${entry.path}${map}.${ext}`, source_sha256: sha(source),
-      recipe: `gltfpack 1.2 ${RECIPE.join(' ')} (one textured quad, ${map === 'albedo' ? 'baseColorTexture' : map === 'normal' ? 'normalTexture' : 'metallicRoughnessTexture'})`,
+      recipe: `${CALM ? `magick -filter Lanczos -resize ${size}x${size}! -strip, then ` : ''}gltfpack 1.2 ${RECIPE.join(' ')} (one textured quad, ${map === 'albedo' ? 'baseColorTexture' : map === 'normal' ? 'normalTexture' : 'metallicRoughnessTexture'})`,
       recipe_sha256: encoderSha,
       measured: { psnr_db: row.psnr, max_error: row.maxError, levels: row.levels },
-      note: `${map} map of ${set} as Basis UASTC in KTX2, rows flipped to the library's upload orientation`,
+      note: `${map} map of ${set} as Basis UASTC in KTX2, rows flipped to the library's upload orientation${CALM ? `, at the ${size} px side the calm tier can resolve` : ''}`,
     }
     doc.assets = doc.assets.filter((a) => a.id !== id)
     const at = doc.assets.findIndex((a) => a.id === `library/${set}`)
     doc.assets.splice(at, 0, record)
-    set_.ktx2 = { ...(set_.ktx2 ?? {}), [map]: { path: record.path, sha256: record.sha256, bytes: record.bytes,
+    const pointer = CALM ? 'ktx2_calm' : 'ktx2'
+    set_[pointer] = { ...(set_[pointer] ?? {}), [map]: { path: record.path, sha256: record.sha256, bytes: record.bytes,
       width: row.width, height: row.height, source_sha256: record.source_sha256 } }
     writeFileSync(`${manifestPath}.part`, `${JSON.stringify(doc, null, 2)}\n`)
     renameSync(`${manifestPath}.part`, manifestPath)
