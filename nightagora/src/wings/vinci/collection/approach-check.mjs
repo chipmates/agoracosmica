@@ -98,8 +98,16 @@ assert.equal(certificate.format, 'vinci-rail-clearance-v2')
 const records = vinciExhibitRecords()
 const kinds = {}
 for (const record of records) kinds[record.kind] = (kinds[record.kind] ?? 0) + 1
-assert.equal(JSON.stringify(kinds), JSON.stringify({ picture: 26, mural: 1, sheet: 29, machine: 13, place: 3, manuscript: 1 }),
-  'the hang, the Ingres, the mural, the body wall\'s sheets, thirteen machines, three places and the book')
+/* The census of what a visitor can walk up to, by kind. The order the kinds
+   are declared in is the registry's own business, so this reads them by name:
+   the hang and the deathbed painting, the wall in Milan, the body wall's
+   sheets, the machine hall's thirteen and the compass on the hall's ledge,
+   the plaque and the two of the grave court, the codex and the study's
+   leaf. */
+const CENSUS = { picture: 26, mural: 1, sheet: 29, machine: 14, place: 3, manuscript: 2 }
+const named = kinds_ => Object.keys(kinds_).sort().map(kind => `${kind} ${kinds_[kind]}`).join(', ')
+assert.equal(named(kinds), named(CENSUS),
+  'the hang and the deathbed painting, the mural, the body wall\'s sheets, thirteen machines and the ledge\'s compass, three places, the codex and the study\'s leaf')
 assert.equal(new Set(records.map(record => record.id)).size, records.length, 'an exhibit is declared once')
 assert.equal(certificate.approaches.length, records.length * 2)
 const hang = records.filter(record => record.station === 'picture-room')

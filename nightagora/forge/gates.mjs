@@ -678,6 +678,14 @@ if (WING) {
   const checkers = existsSync(join(APP_ROOT, wingDir))
     ? [
         ...readdirSync(join(APP_ROOT, wingDir)).filter((f) => f.endsWith('-check.mjs')).sort(),
+        /* A ROOM'S OWN CHECKERS ARE THE WING'S. The collection's four prove
+           the viewing eyes, the plates, the floor's dates and the table
+           against the same modules the wing ships, and they ran only when
+           someone remembered them. */
+        ...(existsSync(join(APP_ROOT, wingDir, 'collection'))
+          ? readdirSync(join(APP_ROOT, wingDir, 'collection')).filter((f) => f.endsWith('-check.mjs')).sort()
+            .map((f) => join('collection', f))
+          : []),
         'tiles-check.mjs',
         'lines-check.mjs',
         ...(existsSync(join(APP_ROOT, wingDir, 'story.ts')) ? ['story-check.mjs'] : []),
