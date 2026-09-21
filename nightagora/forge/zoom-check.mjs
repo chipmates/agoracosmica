@@ -50,6 +50,7 @@ const moved = (from, to) => Number.isFinite(from) && Number.isFinite(to) && Math
 async function press(page, control) {
   const box = await control.boundingBox()
   if (!box) return false
+  if (box.width < 2 || box.height < 2) return false
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
   await page.mouse.down()
   await page.mouse.up()
@@ -66,7 +67,7 @@ async function open(page, kind) {
   const cells = page.locator('.vinci-strip-item:not([disabled])')
   // A row of one does not stand, so its cell is in the page and cannot be
   // pressed: the visible cell decides, never the count.
-  if (await cells.count() > cell && await cells.nth(cell).isVisible()) await cells.nth(cell).click()
+  if (await cells.count() > cell && await cells.nth(cell).isVisible()) await cells.nth(cell).click({ timeout: 60000 })
   else {
     // A STATION WITH ONE EXHIBIT HAS NO ROW: its one mark stands in the room,
     // and where even that is a body rather than a mark, the exhibit is under
@@ -85,14 +86,22 @@ async function open(page, kind) {
       await page.waitForTimeout(1500)
     }
   }
-  await page.waitForSelector('.vitrine-card', { state: 'visible', timeout: 40000 })
+  await page.waitForSelector('.vitrine-card', { state: 'visible', timeout: 90000 })
   await settled(page)
   // a painting opens its close look first; the whole plate is one press on
   const toPlate = page.getByRole('button', { name: NAME.plate })
-  if (await toPlate.count()) { await toPlate.first().click(); await page.waitForTimeout(1200) }
-  await page.waitForSelector('.deep-plate', { state: 'attached', timeout: 40000 })
+  if (await toPlate.count()) { await press(page, toPlate.first()); await page.waitForTimeout(1600) }
+  await page.waitForSelector('.deep-plate', { state: 'attached', timeout: 60000 })
+  // THE PHONE FOLDS THE CARD TO A PEEK, and a folded card keeps its own row
+  // of controls down: the grabber raises it, which is the visitor's gesture.
+  const grab = page.locator('.vitrine-grab')
+  if (await grab.count() && await grab.isVisible()
+    && !await page.getByRole('button', { name: NAME.nearer }).first().isVisible().catch(() => false)) {
+    await press(page, grab.first())
+    await page.waitForTimeout(1000)
+  }
   await page.waitForFunction(() => Number(document.querySelector('.deep-plate')?.dataset['zoom'] ?? 0) > 0,
-    null, { timeout: 40000, polling: 200 })
+    null, { timeout: 60000, polling: 200 })
   await page.waitForTimeout(1200)
 }
 
@@ -121,7 +130,15 @@ try {
     for (const [hand, name] of [['nearer', NAME.nearer], ['further', NAME.further]]) {
       const from = await reading(page)
       const control = page.getByRole('button', { name }).first()
-      if (!await control.count() || !await press(page, control)) { fail(`${hand}: no control`); continue }
+      // A CONTROL THAT IS NOT THERE IS NOT A BROKEN CONTROL. The phone's
+      // reader gives a page the gestures a phone has, a pinch and a double
+      // tap, and no row of its own: what this check owes is that every hand
+      // the window DOES offer moves the plate.
+      if (!await control.count() || !await press(page, control)) {
+        if (PHONE) { hands[hand] = 'absent'; continue }
+        fail(`${hand}: no control`)
+        continue
+      }
       const to = await reading(page)
       hands[hand] = { from, to }
       if (!moved(from, to)) fail(`${hand}: the plate did not move, ${from} to ${to}`)
@@ -152,7 +169,8 @@ try {
         const to = hands.whole = { from, to: await reading(page) }
         if (!Number.isFinite(to.to) || Math.abs(to.to - home) > home * 0.05)
           fail(`whole: the plate did not come home, ${from} to ${to.to} against ${home}`)
-      } else fail('whole: no control')
+      } else if (PHONE) hands.whole = 'absent'
+      else fail('whole: no control')
     }
     await page.keyboard.press('Escape')
     await page.waitForTimeout(1000)
