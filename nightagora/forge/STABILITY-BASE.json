@@ -1,6 +1,6 @@
 {
  "note": "the stability ratchet. The sets and the step levels are gated; the per-million counts are recorded and are not.",
- "head": "9cbf5de34698f4f1d2e83bd8bddc149b342c34d5",
+ "head": "58deba923fa48643d3d8e7a9b7e4ec89e5e22978",
  "measured": "2026-09-21",
  "viewport": "desktop",
  "deviceScaleFactor": 2,
@@ -32,7 +32,6 @@
   "vinci/collection-modern-insertion/vinci/collection/architecture [vinci/collection/three-scale-architecture] + vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces]",
   "vinci/collection-modern-insertion/vinci/collection/architecture [vinci/collection/three-scale-architecture] + vinci/collection-modern-insertion/vinci/collection/cast-concrete [vinci/collection/filtered-cast-concrete]",
   "vinci/collection-modern-insertion/vinci/collection/architecture [vinci/collection/three-scale-architecture] + vinci/collection-modern-insertion/vinci/collection/glazing [vinci/collection/full-height-glazing]",
-  "vinci/collection-modern-insertion/vinci/collection/glazing [vinci/collection/full-height-glazing] + vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces]",
   "vinci/collection-modern-insertion/vinci/parachute/parachute/canopy/canopy:surface [parachute:sealed linen:linen] + vinci/collection-modern-insertion/vinci/parachute/parachute/parachute:rigid-surfaces [parachute:wood:oak-beams]",
   "vinci/registered-shell/vinci/shell/brick [vinci/brick] + vinci/registered-shell/vinci/shell/stone [vinci/stone]",
   "vinci/registered-shell/vinci/shell/iron [vinci/iron] + vinci/registered-shell/vinci/shell/glass [vinci/glass]",
@@ -72,6 +71,7 @@
   "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 19 [vinci October grass and uneven leaf litter] + mesh 1 [NodeMaterial]",
   "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 19 [vinci October grass and uneven leaf litter] + vinci/collection-modern-insertion/vinci/collection/glazing [vinci/collection/full-height-glazing]",
   "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 19 [vinci October grass and uneven leaf litter] + wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass]",
+  "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 19 [vinci October grass and uneven leaf litter] + wing-vinci/terrain/wing-vinci/grass cluster 05 [wing-vinci/grass]",
   "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 20 [vinci October grass and uneven leaf litter] + vinci/collection-modern-insertion/vinci/collection/glazing [vinci/collection/full-height-glazing]",
   "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 20 [vinci October grass and uneven leaf litter] + wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass]",
   "vinci generated conjectural ground dressing/vinci October grass and uneven leaf litter cluster 21 [vinci October grass and uneven leaf litter] + wing-vinci/terrain/wing-vinci/grass cluster 02 [wing-vinci/grass]",
@@ -107,7 +107,6 @@
   "vinci generated road dressing/vinci/road-dressing/straw [MeshStandardNodeMaterial] + wing-vinci/terrain/wing-vinci/earth [wing-vinci/earth]",
   "vinci/collection-modern-insertion/vinci-court-plaque/vinci-court-plaque-made-surface [vinci/collection-rooms/ink] + vinci/collection-modern-insertion/vinci-court-plaque/vinci-court-plaque-made-surface [vinci/collection-rooms/stone]",
   "vinci/collection-modern-insertion/vinci-grave/vinci-grave-made-surface [vinci/collection-rooms/dark] + vinci generated conjectural landscape trees/vinci generated individual leaves and root litter cluster 07 [vinci generated October folded leaves]",
-  "vinci/collection-modern-insertion/vinci-grave/vinci-grave-made-surface [vinci/collection-rooms/dark] + vinci/collection-modern-insertion/vinci-grave/vinci-grave-made-surface [vinci/collection-rooms/stone]",
   "vinci/collection-modern-insertion/vinci/collection-line-floor/vinci/collection-line-floor/vinci/collection-rooms/bronze [vinci/collection-rooms/bronze] + vinci/collection-modern-insertion/vinci/collection-line-floor/vinci/collection-line-floor/vinci/collection-rooms/stone [vinci/collection-rooms/stone]",
   "vinci/collection-modern-insertion/vinci/collection-line-floor/vinci/collection-line-floor/vinci/collection-rooms/ink [vinci/collection-rooms/ink] + vinci/collection-modern-insertion/vinci/collection-line-floor/vinci/collection-line-floor/vinci/collection-rooms/stone [vinci/collection-rooms/stone]",
   "vinci/collection-modern-insertion/vinci/collection-rooms/vinci/collection-rooms/construction [vinci/collection-rooms/surfaces] + vinci/collection-modern-insertion/vinci/collection/cast-concrete [vinci/collection/filtered-cast-concrete]",
@@ -137,105 +136,105 @@
  "stations": {
   "arrival": {
    "stepLevels": {
-    "min": 0.95,
-    "max": 2.02,
-    "runs": 3,
-    "read": [
-     0.95,
-     2.01,
-     2.02
-    ]
-   },
-   "perMpx": {
-    "1": {
-     "min": 730,
-     "max": 3880
-    },
-    "2": {
-     "min": 6493,
-     "max": 10532
-    },
-    "3": {
-     "min": 2581,
-     "max": 12448
-    }
-   }
-  },
-  "courtyard": {
-   "stepLevels": {
-    "min": 1.66,
+    "min": 0.94,
     "max": 2,
     "runs": 3,
     "read": [
-     1.66,
+     0.94,
      1.99,
      2
     ]
    },
    "perMpx": {
     "1": {
-     "min": 163,
-     "max": 330
+     "min": 730,
+     "max": 3884
     },
     "2": {
-     "min": 1958,
+     "min": 6491,
+     "max": 10530
+    },
+    "3": {
+     "min": 2581,
+     "max": 12840
+    }
+   }
+  },
+  "courtyard": {
+   "stepLevels": {
+    "min": 1.65,
+    "max": 1.99,
+    "runs": 3,
+    "read": [
+     1.65,
+     1.99,
+     1.97
+    ]
+   },
+   "perMpx": {
+    "1": {
+     "min": 165,
+     "max": 356
+    },
+    "2": {
+     "min": 1963,
      "max": 4443
     },
     "3": {
-     "min": 8080,
-     "max": 16024
+     "min": 8145,
+     "max": 15807
     }
    }
   },
   "hall": {
    "stepLevels": {
     "min": 0.58,
-    "max": 0.94,
+    "max": 0.93,
     "runs": 3,
     "read": [
      0.58,
-     0.94,
-     0.94
+     0.93,
+     0.92
     ]
    },
    "perMpx": {
     "1": {
-     "min": 743,
-     "max": 1305
+     "min": 736,
+     "max": 1302
     },
     "2": {
-     "min": 876,
-     "max": 6504
+     "min": 874,
+     "max": 6494
     },
     "3": {
-     "min": 268,
-     "max": 2550
+     "min": 289,
+     "max": 2603
     }
    }
   },
   "oratory": {
    "stepLevels": {
     "min": 0.62,
-    "max": 2.63,
+    "max": 2.66,
     "runs": 3,
     "read": [
-     2.63,
+     2.66,
      0.62,
-     0.62
+     0.64
     ]
    },
    "perMpx": {
     "1": {
-     "min": 100,
-     "max": 1513
+     "min": 107,
+     "max": 1539
     },
     "2": {
-     "min": 1540,
-     "max": 2908
+     "min": 1546,
+     "max": 2873
     },
     "3": {
-     "min": 277,
-     "max": 13467
+     "min": 297,
+     "max": 13418
     }
    }
   },
@@ -247,59 +246,59 @@
     "read": [
      1.76,
      3.87,
-     3.87
+     3.83
     ]
    },
    "perMpx": {
     "1": {
      "min": 92,
-     "max": 777
+     "max": 768
     },
     "2": {
-     "min": 947,
-     "max": 2557
+     "min": 930,
+     "max": 2579
     },
     "3": {
-     "min": 5730,
-     "max": 11008
+     "min": 5787,
+     "max": 11071
     }
    }
   },
   "chamber": {
    "stepLevels": {
-    "min": 1.96,
-    "max": 2.55,
+    "min": 1.92,
+    "max": 2.5,
     "runs": 3,
     "read": [
-     2.55,
-     1.96,
-     1.96
+     2.5,
+     1.92,
+     1.93
     ]
    },
    "perMpx": {
     "1": {
-     "min": 620,
-     "max": 909
+     "min": 621,
+     "max": 910
     },
     "2": {
-     "min": 2878,
-     "max": 5996
+     "min": 2879,
+     "max": 5999
     },
     "3": {
-     "min": 10226,
-     "max": 17735
+     "min": 9769,
+     "max": 17492
     }
    }
   },
   "garden": {
    "stepLevels": {
-    "min": 2.35,
-    "max": 2.85,
+    "min": 2.22,
+    "max": 2.84,
     "runs": 3,
     "read": [
-     2.85,
-     2.35,
-     2.35
+     2.84,
+     2.22,
+     2.22
     ]
    },
    "perMpx": {
@@ -309,245 +308,245 @@
     },
     "2": {
      "min": 3672,
-     "max": 4600
+     "max": 4601
     },
     "3": {
-     "min": 7894,
-     "max": 9462
+     "min": 7833,
+     "max": 8998
     }
    }
   },
   "picture-room": {
    "stepLevels": {
-    "min": 1.99,
-    "max": 2.37,
+    "min": 1.98,
+    "max": 2.35,
     "runs": 3,
     "read": [
-     1.99,
-     2.37,
-     2.37
+     1.98,
+     2.35,
+     2.35
     ]
    },
    "perMpx": {
     "1": {
-     "min": 741,
-     "max": 1230
+     "min": 747,
+     "max": 920
     },
     "2": {
-     "min": 8360,
-     "max": 9087
+     "min": 8378,
+     "max": 9092
     },
     "3": {
-     "min": 10720,
-     "max": 12785
+     "min": 10272,
+     "max": 11889
     }
    }
   },
   "picture-room-west": {
    "stepLevels": {
     "min": 1.18,
-    "max": 1.69,
+    "max": 1.68,
     "runs": 3,
     "read": [
      1.18,
-     1.69,
-     1.69
+     1.68,
+     1.68
     ]
    },
    "perMpx": {
     "1": {
-     "min": 803,
+     "min": 736,
      "max": 1268
     },
     "2": {
-     "min": 4949,
-     "max": 7718
+     "min": 4992,
+     "max": 7717
     },
     "3": {
-     "min": 6512,
-     "max": 7656
+     "min": 6486,
+     "max": 7834
     }
    }
   },
   "flight": {
    "stepLevels": {
-    "min": 0.43,
-    "max": 0.58,
+    "min": 0.45,
+    "max": 0.75,
     "runs": 3,
     "read": [
-     0.58,
-     0.43,
-     0.43
+     0.75,
+     0.45,
+     0.45
     ]
    },
    "perMpx": {
     "1": {
-     "min": 269,
-     "max": 321
+     "min": 194,
+     "max": 324
     },
     "2": {
-     "min": 24,
-     "max": 25
+     "min": 25,
+     "max": 28
     },
     "3": {
-     "min": 1391,
-     "max": 1416
+     "min": 883,
+     "max": 973
     }
    }
   },
   "works": {
    "stepLevels": {
-    "min": 1.43,
-    "max": 1.71,
+    "min": 1.64,
+    "max": 2.06,
     "runs": 3,
     "read": [
-     1.43,
-     1.71,
-     1.7
+     1.64,
+     2.06,
+     2.06
     ]
    },
    "perMpx": {
     "1": {
-     "min": 11,
-     "max": 41
+     "min": 29,
+     "max": 70
     },
     "2": {
-     "min": 707,
-     "max": 949
+     "min": 705,
+     "max": 1000
     },
     "3": {
-     "min": 2913,
-     "max": 3275
+     "min": 1991,
+     "max": 2320
     }
    }
   },
   "line-early": {
    "stepLevels": {
-    "min": 0.69,
-    "max": 0.72,
+    "min": 0.64,
+    "max": 0.69,
     "runs": 3,
     "read": [
-     0.72,
      0.69,
-     0.69
+     0.64,
+     0.65
     ]
    },
    "perMpx": {
     "1": {
-     "min": 433,
-     "max": 443
+     "min": 436,
+     "max": 454
     },
     "2": {
-     "min": 235,
-     "max": 245
+     "min": 222,
+     "max": 244
     },
     "3": {
-     "min": 3474,
-     "max": 3553
+     "min": 2277,
+     "max": 2309
     }
    }
   },
   "body": {
    "stepLevels": {
-    "min": 1,
-    "max": 1.08,
+    "min": 0.99,
+    "max": 1.05,
     "runs": 3,
     "read": [
-     1,
-     1.08,
-     1.07
+     0.99,
+     1.05,
+     1.04
     ]
    },
    "perMpx": {
     "1": {
-     "min": 1928,
-     "max": 1985
+     "min": 1898,
+     "max": 2013
     },
     "2": {
-     "min": 3782,
-     "max": 4404
+     "min": 3833,
+     "max": 4411
     },
     "3": {
-     "min": 4811,
-     "max": 5281
+     "min": 4299,
+     "max": 4677
     }
    }
   },
   "reading-table": {
    "stepLevels": {
-    "min": 0.78,
-    "max": 0.84,
+    "min": 0.73,
+    "max": 0.78,
     "runs": 3,
     "read": [
-     0.84,
      0.78,
-     0.78
+     0.73,
+     0.74
     ]
    },
    "perMpx": {
     "1": {
-     "min": 399,
+     "min": 391,
      "max": 415
     },
     "2": {
-     "min": 170,
+     "min": 164,
      "max": 176
     },
     "3": {
-     "min": 1834,
-     "max": 1849
+     "min": 1536,
+     "max": 1581
     }
    }
   },
   "supper-wall": {
    "stepLevels": {
     "min": 0.6,
-    "max": 0.61,
+    "max": 0.62,
     "runs": 3,
     "read": [
      0.6,
      0.6,
-     0.61
+     0.62
     ]
    },
    "perMpx": {
     "1": {
-     "min": 356,
-     "max": 459
+     "min": 429,
+     "max": 616
     },
     "2": {
-     "min": 2845,
-     "max": 2853
+     "min": 2736,
+     "max": 2902
     },
     "3": {
-     "min": 3854,
-     "max": 3984
+     "min": 3685,
+     "max": 3903
     }
    }
   },
   "grave": {
    "stepLevels": {
-    "min": 1.26,
-    "max": 1.31,
+    "min": 1.15,
+    "max": 1.27,
     "runs": 3,
     "read": [
-     1.31,
-     1.26,
-     1.28
+     1.15,
+     1.27,
+     1.25
     ]
    },
    "perMpx": {
     "1": {
-     "min": 845,
+     "min": 882,
      "max": 1027
     },
     "2": {
-     "min": 1434,
-     "max": 1485
+     "min": 1386,
+     "max": 1574
     },
     "3": {
-     "min": 6673,
-     "max": 7072
+     "min": 4807,
+     "max": 4946
     }
    }
   }
