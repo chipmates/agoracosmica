@@ -1,0 +1,123 @@
+/* The museum's own seven colours and its two faces. Nothing here invents a
+   hue: the block is copied from the shell so the test page reads as the
+   museum does on a phone held up to it. */
+:root {
+  --na-abyss: #060b1c;
+  --na-gold: #e0b96a;
+  --na-starlight: #f3efe2;
+  --na-mist: #8d93ad;
+  --serif: Georgia, 'Times New Roman', serif;
+  --sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --ink-night: 0 1px 2px rgba(4, 6, 13, 0.92), 0 2px 26px rgba(4, 6, 13, 0.72);
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--na-abyss);
+  color: var(--na-starlight);
+  font-family: var(--sans);
+  overscroll-behavior: none;
+}
+.stage {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+/* THE PICTURE IS THE PLACE. Still and clip share one box and one fit, so the
+   swap between them moves nothing at all. */
+.picture {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: var(--na-abyss);
+  display: block;
+}
+.veil {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 46%;
+  background: linear-gradient(to top, rgba(4, 6, 13, 0.88) 0%, rgba(4, 6, 13, 0.62) 38%, transparent 100%);
+  pointer-events: none;
+}
+.plate {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(26px + env(safe-area-inset-bottom));
+  padding: 0 24px;
+  text-align: center;
+}
+.line {
+  font-family: var(--serif);
+  font-size: clamp(19px, 2.6vw, 27px);
+  line-height: 1.42;
+  text-wrap: balance;
+  max-width: 34ch;
+  margin: 0 auto 22px;
+  text-shadow: var(--ink-night);
+}
+.ways {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.way {
+  min-height: 44px;
+  padding: 11px 22px;
+  border-radius: 2px;
+  border: 1px solid color-mix(in srgb, var(--na-gold) 52%, transparent);
+  background: color-mix(in srgb, var(--na-abyss) 62%, transparent);
+  color: var(--na-gold);
+  font-family: var(--sans);
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+}
+.way:hover { border-color: var(--na-gold); }
+.way.back {
+  color: var(--na-mist);
+  border-color: color-mix(in srgb, var(--na-mist) 40%, transparent);
+}
+.tongue {
+  position: absolute;
+  top: calc(14px + env(safe-area-inset-top));
+  right: 14px;
+  display: flex;
+  gap: 8px;
+}
+.chip {
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 2px;
+  border: 1px solid color-mix(in srgb, var(--na-mist) 36%, transparent);
+  background: color-mix(in srgb, var(--na-abyss) 58%, transparent);
+  color: var(--na-mist);
+  font-family: var(--sans);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+/* the harness's own readout, not a surface of the museum */
+.readout {
+  position: absolute;
+  top: calc(70px + env(safe-area-inset-top));
+  right: 14px;
+  max-width: 62vw;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--na-mist) 30%, transparent);
+  background: rgba(4, 6, 13, 0.82);
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--na-mist);
+}
+.readout td { padding: 0 6px 0 0; white-space: nowrap; }
+.readout td:last-child { color: var(--na-starlight); text-align: right; }
+@media (prefers-reduced-motion: reduce) {
+  .way { backdrop-filter: none; }
+}

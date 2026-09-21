@@ -1,0 +1,21 @@
+{
+  "note": "Verbatim from program/refs/story-system-2026-09-21/DA-VINCI-STORY-CARD-AND-LINES.md, stations 2 and 4. Nothing here is written by the harness. A way carries the name of the stop it goes to, because this test has no onward word of its own.",
+  "stops": [
+    {
+      "id": "picture-room",
+      "title": { "en": "The pupil's angel", "de": "Der Engel des Schülers" },
+      "line": {
+        "en": "It is said that he painted the angel on the left, as a pupil. His master never touched paint again.",
+        "de": "Er soll den Engel links gemalt haben, noch als Schüler. Sein Meister rührte nie wieder Farbe an."
+      }
+    },
+    {
+      "id": "picture-room-west",
+      "title": { "en": "Forty years of pictures", "de": "Vierzig Jahre Bilder" },
+      "line": {
+        "en": "This wall is his life as a painter, over forty years. Now the story goes back. He is thirty.",
+        "de": "Diese Wand ist sein Leben als Maler, über vierzig Jahre. Jetzt geht die Geschichte zurück. Er ist dreißig."
+      }
+    }
+  ]
+}

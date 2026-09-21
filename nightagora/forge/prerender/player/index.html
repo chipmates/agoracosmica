@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="dark" />
+<title>Night Agora, the pre-render test</title>
+<link rel="stylesheet" href="player.css" />
+</head>
+<body>
+<main class="stage" id="stage">
+  <img class="picture" id="still" alt="" decoding="async" />
+  <video class="picture" id="clip" muted playsinline preload="auto" hidden></video>
+  <div class="veil" aria-hidden="true"></div>
+  <div class="plate">
+    <p class="line" id="line"></p>
+    <nav class="ways">
+      <button type="button" class="way" id="onward"></button>
+      <button type="button" class="way back" id="back" hidden></button>
+    </nav>
+  </div>
+  <div class="tongue">
+    <button type="button" class="chip" id="lang">DE</button>
+    <button type="button" class="chip" id="toggle">i</button>
+  </div>
+  <aside class="readout" id="readout" hidden>
+    <table><tbody id="rows"></tbody></table>
+  </aside>
+</main>
+<script src="player.js"></script>
+</body>
+</html>
