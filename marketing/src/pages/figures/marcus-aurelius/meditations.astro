@@ -1,0 +1,353 @@
+---
+// Marcus Aurelius: thirteen passages from the Meditations, grouped by what they
+// are about. The text is George Long's 1862 translation, public domain, cut
+// from Project Gutenberg ebook 15877 by script and rendered from the data
+// module verbatim, never edited here. Prose, so each passage renders as
+// paragraphs and stays open: they are short enough to be read, not opened.
+// Styles are self-contained, on the poem pages' values: sharing the essay
+// stylesheet would redraw the CSS chunks of the pages this one sits beside.
+// English single page without a DE twin: hreflang points at itself (the
+// validate-seo allowlist is a shared file this build does not touch).
+
+import Public from '../../../layouts/Public.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import PoemDoor from '../../../components/PoemDoor.astro';
+import { figureImage } from '../../../lib/figureImages';
+import { breadcrumbSchema } from '../../../lib/schemas';
+import { canonicalUrl, SITE_URL } from '../../../lib/urls';
+import {
+  MEDITATIONS_PATH,
+  meditationsPassages,
+  passagesByTheme,
+} from '../../../data/texts/aurelius.mjs';
+import { POEM_PAGES_INDEXABLE } from '../../../data/poems/index.mjs';
+
+const lang = 'en' as const;
+// Slot 4 of the app's ask contract is this page's own question: the door skips
+// the mode choice and opens Free Talk about the passage the visitor just read.
+const DOOR_HREF = '/app?figure=marcus-aurelius&lang=en&ask=f:aurelius:4';
+const PAGE_PATH = MEDITATIONS_PATH;
+const PAGE_URL = canonicalUrl(PAGE_PATH);
+
+const metaTitle = "Marcus Aurelius, Meditations in George Long's Translation";
+const metaDescription =
+  "Thirteen passages from the Meditations of Marcus Aurelius in George Long's 1862 translation, grouped by theme and free to read.";
+
+// The page's spine. The theme keys are also the heading ids, and each passage
+// carries its own id, so an ad or a sitelink can land on one passage.
+const THEMES = [
+  {
+    id: 'mornings',
+    title: 'On getting up and meeting the day',
+    framing:
+      'Two notes about mornings. One is about the bed, the other about the people waiting outside it.',
+  },
+  {
+    id: 'power',
+    title: 'On what is up to you',
+    framing:
+      'The idea he returns to most. Things happen, and then there is what you make of them.',
+  },
+  {
+    id: 'people',
+    title: 'On other people',
+    framing:
+      'He governed an empire and still had to remind himself how to deal with one annoying person.',
+  },
+  {
+    id: 'mind',
+    title: 'On the mind as a place to go',
+    framing: 'No country house needed.',
+  },
+  {
+    id: 'time',
+    title: 'On time, and on doing it now',
+    framing: 'He wrote the first of these far from Rome, and signed the place.',
+  },
+];
+
+// One line of introduction per passage, keyed by its reference.
+const INTROS: Record<string, string> = {
+  'V. 1': 'An emperor arguing with himself about staying under the blanket.',
+  'II. 1': 'What he told himself before a day of difficult people.',
+  'VIII. 47': 'Where the pain of a thing actually comes from.',
+  'VII. 8': 'On worrying ahead.',
+  'IV. 49': 'His image for standing firm.',
+  'VI. 6': 'One line on revenge.',
+  'IX. 5': 'Wrong can also be a thing you did not do.',
+  'XII. 4': "Why we trust other people's opinion of us more than our own.",
+  'IV. 3': 'Where to retreat when you cannot leave.',
+  'V. 16': 'Thoughts as dye.',
+  'VII. 59': 'Two sentences about digging.',
+  'II. 17': 'How small a life is, and what can still steer it.',
+  'X. 16': 'The shortest instruction in the book.',
+};
+
+const aurelius = {
+  '@type': 'Person',
+  '@id': `${PAGE_URL}#person`,
+  name: 'Marcus Aurelius',
+  birthDate: '0121-04-26',
+  deathDate: '0180-03-17',
+  sameAs: [
+    'https://en.wikipedia.org/wiki/Marcus_Aurelius',
+    'https://www.wikidata.org/wiki/Q1430',
+  ],
+};
+const translator = { '@type': 'Person', name: 'George Long' };
+const schemas = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: metaTitle,
+    url: PAGE_URL,
+    about: aurelius,
+    inLanguage: 'en',
+    isPartOf: { '@type': 'WebSite', name: 'Agora Cosmica', url: SITE_URL },
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: meditationsPassages.map((p, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        item: {
+          '@type': 'CreativeWork',
+          name: `Meditations, Book ${p.book}, ${p.section}`,
+          url: `${PAGE_URL}#${p.id}`,
+          inLanguage: 'en',
+          author: aurelius,
+          translator,
+        },
+      })),
+    },
+  },
+  breadcrumbSchema([
+    { name: 'Home', url: `${SITE_URL}/` },
+    { name: 'Figures', url: `${SITE_URL}/figures/` },
+    { name: 'Marcus Aurelius', url: `${SITE_URL}/figures/marcus-aurelius/` },
+    { name: 'Meditations', url: PAGE_URL },
+  ]),
+];
+---
+<Public
+  title={metaTitle}
+  fullTitle={metaTitle}
+  ogTitle={`${metaTitle} | Agora Cosmica`}
+  description={metaDescription}
+  canonicalPath={PAGE_PATH}
+  lang={lang}
+  ogType="article"
+  ogImage={figureImage('aurelius', 'main', 1200)}
+  ogImageAlt="AI-generated portrait: Marcus Aurelius"
+  noHreflang={true}
+  noindex={!POEM_PAGES_INDEXABLE}
+  robots="noindex, follow"
+  stickyCta={false}
+  schemas={schemas}
+>
+  <div class="pub-content med">
+    <Breadcrumbs
+      lang={lang}
+      items={[
+        { label: 'Figures', path: '/figures' },
+        { label: 'Marcus Aurelius', path: '/figures/marcus-aurelius' },
+        { label: 'Meditations' },
+      ]}
+    />
+
+    <header class="med-hero">
+      <p class="med-hero__eyebrow">In his own words</p>
+      <h1 class="med-hero__title">Marcus Aurelius</h1>
+      <p class="med-hero__byline">121-180 · Roman emperor</p>
+      <p class="med-hero__lead">
+        Marcus Aurelius was Roman emperor from 161 to 180 and spent years of
+        that on campaign. He wrote these notes in Greek, for himself. It is
+        unlikely he ever meant them to be read. We know them as the
+        Meditations, twelve books of reminders about how to think and act.
+        Here are thirteen passages, grouped by what they are about, in George
+        Long's English translation of 1862.
+      </p>
+    </header>
+
+    <PoemDoor
+      at="hero"
+      href={DOOR_HREF}
+      line="Want to stay with a passage a little longer?"
+      buttonLabel="Ask his Echo about it"
+      figureId="aurelius"
+      shapedBy="his real work"
+      door="text_top"
+    />
+
+    {THEMES.map((theme) => (
+      <section class="med-section" id={theme.id}>
+        <h2 class="med-h2">{theme.title}</h2>
+        <p class="med-p">{theme.framing}</p>
+        <div class="med-list">
+          {passagesByTheme(theme.id).map((p) => (
+            <article class="med-passage" id={p.id}>
+              <h3 class="med-passage__ref">{p.label}</h3>
+              <p class="med-passage__intro">{INTROS[p.ref]}</p>
+              <div class="med-passage__text">{p.text.split('\n\n').map((para) => (<p class="med-passage__para">{para}</p>))}</div>
+            </article>
+          ))}
+        </div>
+      </section>
+    ))}
+
+    <section class="med-section med-section--note">
+      <h2 class="med-h2">About this translation</h2>
+      <p class="med-p">
+        The passages are George Long's translation, first published in 1862 and
+        now in the public domain, taken from the Project Gutenberg edition
+        (eBook 15877, Thoughts of Marcus Aurelius Antoninus). Roman numerals
+        give the book, the number gives the section. Where a passage is marked
+        "From", it starts at the beginning of the section and stops before its
+        end. Nothing inside a passage is cut or changed, with three exceptions
+        that keep the page readable: Long's footnote marks are left out, the
+        square brackets he put around words he supplied are left out and the
+        words kept, and his long dashes are printed as short ones.
+      </p>
+    </section>
+
+    <p class="med-more">
+      <a class="pub-textlink" href="/figures/marcus-aurelius/">Read more about Marcus Aurelius</a>
+    </p>
+  </div>
+</Public>
+
+<style>
+  /* Reading column, hero and section rhythm on the poem pages' values, so the
+     two surfaces read as one family without sharing a stylesheet. */
+  .med {
+    max-width: 46rem;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem 4rem;
+  }
+
+  .med-hero {
+    margin: 1.5rem 0 3rem;
+  }
+  .med-hero__eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: var(--text-xs);
+    color: var(--gold-primary);
+    margin: 0 0 0.4rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  }
+  .med-hero__title {
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: clamp(2rem, 5vw, 2.9rem);
+    line-height: 1.1;
+    margin: 0 0 0.5rem;
+    color: var(--text-primary);
+  }
+  .med-hero__byline {
+    color: var(--text-secondary);
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-sm);
+    letter-spacing: 0.02em;
+    margin: 0 0 1rem;
+  }
+  .med-hero__lead {
+    color: var(--text-secondary);
+    font-size: var(--text-md);
+    line-height: var(--leading-loose);
+    margin: 0;
+    max-width: 38rem;
+  }
+
+  .med-section {
+    margin: 0 0 3rem;
+  }
+  .med-section--note {
+    border-top: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+    padding-top: 2rem;
+  }
+  .med-h2 {
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: clamp(1.4rem, 3.5vw, 1.85rem);
+    color: var(--gold-primary);
+    margin: 0 0 1rem;
+    line-height: 1.25;
+  }
+  .med-p {
+    color: var(--text-secondary);
+    font-size: var(--text-base);
+    line-height: var(--leading-loose);
+    margin: 0 0 1.5rem;
+    max-width: 40rem;
+  }
+
+  .med-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2.4rem;
+  }
+
+  /* The gold left rule is the poem pages' mark for quoted source text, kept
+     here so the two reading surfaces read as one family. The scroll margin
+     clears the sticky header when a link lands on one passage. */
+  .med-passage {
+    border-left: 2px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+    padding-left: 1.5rem;
+    scroll-margin-top: 5.5rem;
+  }
+  .med-passage__ref {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.84rem;
+    font-weight: var(--weight-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--gold-subtle);
+    margin: 0;
+  }
+  .med-passage__intro {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    line-height: var(--leading-relaxed);
+    font-style: italic;
+    margin: 0.55rem 0 0;
+    max-width: 34rem;
+  }
+  /* Prose, not verse: the measure is capped so the long passages stay inside a
+     comfortable line length instead of running the full column. */
+  .med-passage__text {
+    font-family: 'Iowan Old Style', Palatino, Georgia, 'Times New Roman', serif;
+    font-size: 1.16rem;
+    line-height: 1.8;
+    color: var(--text-primary);
+    margin-top: 1rem;
+    max-width: 37rem;
+  }
+  .med-passage__para {
+    margin: 0 0 0.9em;
+  }
+  .med-passage__para:last-child {
+    margin-bottom: 0;
+  }
+
+  .med-more {
+    margin: 0;
+    font-size: var(--text-sm);
+    line-height: 2;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  }
+
+  @media (max-width: 560px) {
+    /* Tighter than the desktop rhythm on purpose: the lead runs long on a
+       phone, and the door has to stay on the first screen with it. */
+    .med {
+      padding-top: 1.25rem;
+    }
+    .med-hero {
+      margin: 0.75rem 0 2rem;
+    }
+    .med-passage {
+      padding-left: 1rem;
+    }
+    .med-passage__text {
+      font-size: 1.05rem;
+    }
+  }
+</style>

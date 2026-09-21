@@ -18,8 +18,10 @@ import {
   shakespeareSourceNote,
 } from './shakespeare.mjs';
 
-/** The one switch for the poem pages' crawl status: the robots meta on every
- *  page and their sitemap membership both read it, so the gate is one line. */
+/** The one switch for the crawl status of the poem pages and of the other
+ *  reading pages that wait with them (the Meditations passages): the robots
+ *  meta on every page and their sitemap membership both read it, so the gate
+ *  is one line. */
 export const POEM_PAGES_INDEXABLE = false;
 
 /** A poem counts as short at or under this many verse lines. */

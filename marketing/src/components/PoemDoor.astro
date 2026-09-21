@@ -15,11 +15,17 @@ interface Props {
   figureId: string;
   /** What the page's own invite says the Echo is shaped by. Omit for the plain line. */
   shapedBy?: string;
+  /** The door's own line. Omit on a page of poems. */
+  line?: string;
+  /** The cta slot this door reports. Omit on a page of poems. */
+  door?: string;
 }
 
 const PLACEMENT: PoemDoorSlot = 'hero';
 
-const { at, href, buttonLabel, figureId, shapedBy } = Astro.props;
+const { at, href, buttonLabel, figureId, shapedBy, line, door } = Astro.props;
+
+const doorLine = line ?? 'Want to stay with a poem a little longer?';
 
 const note = shapedBy
   ? `An AI voice, shaped by ${shapedBy}. 30 free messages a day, no signup.`
@@ -27,13 +33,13 @@ const note = shapedBy
 ---
 {at === PLACEMENT && (
   <aside class:list={['poem-door', at === 'hero' ? 'poem-door--hero' : 'poem-door--inlist']}>
-    <p class="poem-door__line">Want to stay with a poem a little longer?</p>
+    <p class="poem-door__line">{doorLine}</p>
     <a
       class="poem-door__button pub-cta__button"
       href={href}
       data-agc-cta="start-exploring"
       data-agc-figure={figureId}
-      data-agc-door="poem_top"
+      data-agc-door={door ?? 'poem_top'}
     >{buttonLabel}</a>
     <p class="poem-door__note">{note}</p>
   </aside>

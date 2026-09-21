@@ -25,11 +25,12 @@ const TITLE_OVER60_OK = new Set(['de/figures/index.html']);
 const NO_HREFLANG = new Set(['privacy', 'impressum', 'datenschutz', 'cookie-policy', 'nutzungsbedingungen', '404', 'figures/emily-dickinson/poems',
   'figures/william-blake/poems', 'figures/william-shakespeare/sonnets', 'figures/rumi/poems',
   'talk-to-historical-figures', 'de/figures/plato/hoehlengleichnis', 'de/figures/plato/ideenlehre']);
-// Poem, sonnet and poems-index pages have no German twin. Matched by shape
-// so a new poem needs no entry here.
+// Poem, sonnet and poems-index pages have no German twin, and neither does the
+// Meditations reading page. Matched by shape so a new poem needs no entry here.
 const NO_HREFLANG_PATTERNS = [
   /^figures\/(emily-dickinson|william-blake)\/poems\/[^/]+$/,
   /^figures\/william-shakespeare\/sonnets\/[^/]+$/,
+  /^figures\/marcus-aurelius\/meditations$/,
   /^poems$/,
 ];
 
