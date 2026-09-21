@@ -144,6 +144,10 @@ const PRINT={...GRADES['first-station'],name:'clos-luce-1517',exposure:.94,lift:
 const STATION_EXPOSURE:Partial<Record<VinciStationId,number>>={courtyard:1.0,
   'picture-room':1.34,'picture-room-west':1.34,'reading-table':1.5,'line-early':1.3,flight:1.24,works:1.24,body:1.4}
 const SHADOW={nearHalfM:20,nearMapPx:1024,aheadM:10,refocusM:3,lightDistanceM:80} as const
+/** THE SUN'S THREE SWITCHES, off unless an address asks for them. A flicker
+ * is separated by taking one thing away at a time, and a seat that has to
+ * patch the wing to do it measures a tree nobody else can rebuild. */
+const SHADOW_OFF=(name:string):boolean=>typeof location!=='undefined'&&new URLSearchParams(location.search).has(name)
 /** THE WING'S ONE LIGHT RIG, which the vitrine's turntable stands under too:
  * the key and fill of the hour, and the hall's own fittings. */
 const KEY_RIG={
@@ -349,7 +353,7 @@ export function createWing():VinciWingModule {
     key.light.shadow.bias=-.00008;key.light.shadow.normalBias=.012;key.light.shadow.mapSize.setScalar(SHADOW.nearMapPx)
     focusNearCascade(true)
     // r185 implements filterNode; the installed LightShadow type predates it.
-    Object.assign(key.light.shadow,{filterNode:createCollectionReceiverPlaneShadowFilter()})
+    if(!SHADOW_OFF('noplanefilter'))Object.assign(key.light.shadow,{filterNode:createCollectionReceiverPlaneShadowFilter()})
     sky=new SkyMesh();sky.material.fog=false
     const skyRGB=(sky.material.colorNode as ReturnType<typeof vec4>).rgb
     const skyLuma=nodeDot(skyRGB,vec3(.2126,.7152,.0722))
@@ -408,6 +412,8 @@ export function createWing():VinciWingModule {
       for(const group of [shell,entry])group.traverse(o=>{if(o instanceof Mesh)o.castShadow=false})
       scene.add(shadowShell)
       key.light.castShadow=true;key.light.shadow.autoUpdate=true;key.light.shadow.needsUpdate=true
+      if(SHADOW_OFF('nocast'))scene.traverse(o=>{if(o instanceof DirectionalLight)o.castShadow=false})
+      if(SHADOW_OFF('nonormalbias'))key.light.shadow.normalBias=0
     }
     water=createWater(scene,stack);scene.add(water)
     // THE EXHIBITS ARE ASKED FOR IN THE SAME STEP THE RAIL READS THE SCENE
