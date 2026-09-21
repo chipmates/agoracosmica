@@ -209,10 +209,19 @@ function dialsOf(asked: Grade | null | undefined): Dials {
  * that rule the hero tier on a 2x display holds eight subsamples of a
  * half-float frame per visible pixel, which is a quarter of a gigabyte of
  * buffers for coverage the display cannot show.
+ *
+ * `?samples=<n>` overrides the second rule for a measured run. The backend
+ * rounds any request under four down to one, so the halving above costs the
+ * whole of the multisampling on every display with a ratio over one; the
+ * switch is how that is read against a count the backend keeps.
  */
 export function samplesFor(tier: Tier, pixelRatio = 1): number {
   const readsDepth = tier.ao.on || tier.dof || tier.aa === 'taa'
-  if (readsDepth || tier.samples === 0) return 0
+  if (readsDepth) return 0
+  const said = new URLSearchParams(location.search).get('samples')
+  const asked = said === null ? NaN : Number(said)
+  if (Number.isFinite(asked) && asked >= 0) return asked
+  if (tier.samples === 0) return 0
   return pixelRatio > 1 ? Math.max(2, Math.round(tier.samples / 2)) : tier.samples
 }
 
