@@ -150,8 +150,24 @@ const [backDepth] = piece('build\\.box\\(0,height/2,backZ-\\.16,width,height,([\
 const [kerbOffset, kerbDepth] = piece('build\\.box\\(0,\\.105,backZ\\+([\\d.]+),width\\+\\.1,\\.21,([\\d.]+),stone\\)', 'back wall base')
 const [returnMid, returnThick, returnRun] = piece(
   'build\\.box\\(side\\*width/2,height/2,backZ\\+([\\d.]+),([\\d.]+),height,([\\d.]+),backing\\)', 'side returns')
+// THE INSET RUNS STOP SHORT OF THE WALL THEY ARE SET INTO, by a bed the
+// module declares once: four faces on one end plane fought each other and
+// read as a comb of stripes from the court. The bed is read here rather than
+// written here, so a change to it cannot pass this checker unseen.
+const [endBed] = piece('const END=([\\d.]+)', "return runs' end bed")
 const [kerbInset, kerbWidth] = piece(
-  'build\\.box\\(side\\*\\(width/2-([\\d.]+)\\),\\.105,backZ\\+10,([\\d.]+),\\.21,20\\.3,stone\\)', 'return base')
+  'build\\.box\\(side\\*\\(width/2-([\\d.]+)\\),\\.105,backZ\\+10-END,([\\d.]+),\\.21,20\\.3-END\\*2,stone\\)', 'return base')
+// AND THE BED MAY ONLY TAKE THE RUN OFF THE WALL'S END PLANE. Its west end
+// still meets the back wall and its east end stops short of the return's own
+// end, both read off the same two numbers the run is built from.
+{
+  const baseWest = 10 - endBed - (returnRun - endBed * 2) / 2, baseEast = 10 - endBed + (returnRun - endBed * 2) / 2
+  const wallWest = returnMid - returnRun / 2, wallEast = returnMid + returnRun / 2
+  assert.equal(+baseWest.toFixed(6), +wallWest.toFixed(6),
+    `the return's base no longer reaches the back wall: it starts at ${baseWest} against the wall's ${wallWest}`)
+  assert.ok(baseEast < wallEast - 1e-9,
+    `the return's base ends on the wall's own end plane again (${baseEast} against ${wallEast}): four faces at one depth`)
+}
 const gallery = {
   back: +(GRAVE_ORIGIN.east + BACK_Z - .16 - backDepth / 2).toFixed(3),
   backKerb: +(GRAVE_ORIGIN.east + BACK_Z + kerbOffset + kerbDepth / 2).toFixed(3),
