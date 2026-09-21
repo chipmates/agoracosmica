@@ -304,6 +304,9 @@ const PLACES = {
   /* the two metres of that wall the cast edge actually crosses, for a reading
      that is the edge and almost nothing else */
   'grave-edge': { name: "the grave's shadow edge, close", box: [-57, -2.3, 16.05, -55, -1.3, 16.45] },
+  /* the court's own paving between the eye and the grave, which is what a
+     cast shadow falls ON at that station */
+  'grave-paving': { name: "the court paving at the grave", box: [-57, -6.55, 21, -47, -6.35, 29] },
   'supper-block': { name: 'the block at the foot of the glazed front', box: [-45, -6.6, 33.6, -30, -6.2, 34.3] },
   'line-floor': { name: "the line station's floor", box: [-34.5, -6.36, 44, -25.5, -6.26, 59] },
 }
@@ -696,7 +699,16 @@ function replayRefocus(samples) {
  */
 async function readRun(name, dir, allTimes, samples, origin, keepPairs, heldFrom = null, probeKeys = null) {
   const all = readdirSync(dir).filter((f) => f.endsWith('.png')).sort()
-  if (all.length < 6) return { error: `the screencast handed back ${all.length} frames` }
+  /* A STILL PICTURE HANDS BACK ONE SURFACE. The cast writes only frames that
+     differ, so a hold on a page that draws the same pixels for ever comes
+     back with one file: the residual cannot be taken and the control is that
+     count, not a refusal. */
+  if (all.length < 6)
+    return {
+      error: `the screencast handed back ${all.length} frames`,
+      distinct: all.length,
+      stood: all.length <= 1 ? 'the picture stood bit for bit' : null,
+    }
   /* A REPEATED SURFACE IS NOT A FRAME, and on a walk it is a defect in the
      reading. The cast hands the same composited surface back whenever the
      page is slower than the encoder; kept in the series, that repeat breaks
@@ -923,9 +935,15 @@ async function readRun(name, dir, allTimes, samples, origin, keepPairs, heldFrom
     let over = 0
     let sum = 0
     let read = 0
+    /* AND WHAT THE AIMED SURFACE WAS WORTH IN LEVELS, not only what it broke
+       by: a surface that alternates between two shadings every other frame
+       moves its own mean and leaves the residual of that mean behind, which
+       is a reading no tile threshold can swallow. */
+    let lum = 0
     for (let c = 0; c < cells; c++) {
       if (!inAim(n, c)) continue
       read++
+      lum += means[n][c]
       const a = Math.abs(resid[n][c])
       sum += a
       if (a > D2_ABS) over++
@@ -937,6 +955,7 @@ async function readRun(name, dir, allTimes, samples, origin, keepPairs, heldFrom
       over,
       tilesRead: read,
       mean: +(sum / (read || 1)).toFixed(3),
+      lum: +(lum / (read || 1)).toFixed(3),
       refocus: refocusFrames.has(n),
       movedMm: a && b ? +(Math.hypot(b[1] - a[1], b[2] - a[2], b[3] - a[3]) * 1000).toFixed(1) : null,
       turnedDeg: a && b ? +((Math.abs(b[5] - a[5]) + Math.abs(b[4] - a[4])) * (180 / Math.PI)).toFixed(3) : null,
@@ -1151,7 +1170,7 @@ async function readRun(name, dir, allTimes, samples, origin, keepPairs, heldFrom
        than by walking the leg again: one row a frame with what the frame
        broke by and which counters moved on it. */
     series: breakSeries.map((s) => ({
-      n: s.n, over: s.over, tiles: s.tilesRead, mean: s.mean, refocus: s.refocus,
+      n: s.n, over: s.over, tiles: s.tilesRead, mean: s.mean, lum: s.lum, refocus: s.refocus,
       fired: Object.keys(probeChanged).filter((key) => probeChanged[key].has(s.n) && key !== 'checks'),
       movedMm: s.movedMm, turnedDeg: s.turnedDeg,
     })),
@@ -1324,7 +1343,7 @@ try {
   say(
     control.error
       ? `  hold ${control.hold}: ${control.stood ?? control.error}` +
-        `${control.framesCast ? ` (${control.framesCast} emission(s), ${control.distinct} distinct, ${control.repeatedFrames} the same surface)` : ''}`
+        ` (${control.distinct ?? '?'} distinct surface(s), ${control.staleEmissions ?? 0} emission(s) identical to the one before)`
       : `  hold at ${control.hold}: ${control.frames} frames of ${control.gate?.frames ?? '?'} drawn, ` +
         `${control.events} event(s), spread p99 ${control.spread.p99}, ${control.aim ? `${control.aim.tilesPerFrame.median} tile(s) aimed` : 'whole frame'}`
   )
