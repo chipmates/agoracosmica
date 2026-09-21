@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed to a pale grey at 30 per cent. Assumed weather, no observation claimed.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "04f014b8aee69a09aea8d951355a056625b08a39c36f0d535829c81ede136cf0",
+      "sha256": "13cfc620db6901539d02a9dce9a3afb1e5cc0786a7e380ad5d2a1522303711e0",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=80c458f2cb5ccddb7fcedccda5df70e5cdccda7d9ca97d65ebfa6462920f61ef;"
     },
     {
@@ -62,7 +62,7 @@
       "prompt": "Museum camera poses and piecewise exterior circulation in the fixed dossier frame. All poses are exhibition choices. Latest target semantic navigation on measured gate/terrace/stair/apron routes. Bounded physical near-pyramid clearance; measured geometry identity at mount. CSS projection-derived drag with 0.1 second monotone response; explicit inspection entry and return. The active certified leg finishes before a direct certified route to the newest pending target. Static material inspection aliases have separate actual placement audits.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "76c67cf5b558aac80743eec928a9d5edb638dff411302e46ca1a22dc7cd8f405",
+      "sha256": "d016c7e61e23b836ee68cb1df68d69ad28946981beedf5a022d599646786273e",
       "note": "brief/CONCEPT.md; src/wings/vinci/data/closluce.json; recipe_file=src/wings/vinci/rail.ts; companion_file=src/wings/vinci/input.ts; companion_recipe_ids=vinci/rail-smoothing,vinci/rail-proof,vinci/rail-fingerprint,vinci/rail-projection,vinci/projection-drag,vinci/rail-clearance,vinci/rail-waypoints,vinci/rail-solids,vinci/gait"
     },
     {
@@ -257,7 +257,7 @@
       "prompt": "Derived 33.8721 square metre inner court apron closes the literal court to registered facade chain at A-SITE zero nominal. Five clipped threshold steps, procedural wear, gravel and drain; reconstruction with conjectural dressing. Mounted during court refinement with explicit source-card assumptions.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "98cf9361517a605907309f88e4eacadb785ee1008ab2435c1ee13946ac37ba45",
+      "sha256": "b85441b70f021245b9975e397adafdd3211c0709225f15ed344161cbd113ffbf",
       "note": "Q124; A-SITE; recipe_file=src/wings/vinci/inner-court.ts"
     },
     {
@@ -309,7 +309,7 @@
       "prompt": "Unfurnished entrance structure from existing A-LAYOUT entry polygon: outward0.25m partitions retaining side portals, floor+0.8, ceiling underside+4.0 and next floor+4.3m, terracotta, limewash and flush oak ceiling members. Explicit reconstruction/finish assumptions; no furnishings or occupied room claim. Calm retains all three visible materials and copies the complete enclosure into the existing shell shadow draw.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "2af1711166f918bf2592583facdeca042b93e2c19d46978d043ed002f43c26dd",
+      "sha256": "44e8927c21b721c2726057ca6b41be903b6092a20f9b36e87d43184a1e71c2bb",
       "note": "recipe_file=src/wings/vinci/entry-passage.ts"
     },
     {
@@ -439,7 +439,7 @@
       "prompt": "The turns a route takes between two stations, written against the registered gate crossing, the access stair layout and the collection stair.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-11",
-      "sha256": "b8e38cf29bddbd138234ed6eec3296f513f41085c1ab2ba516f736269469ea67",
+      "sha256": "0bda3c15ee440de2fca7f1a6555df4c837458a35c2fd74d21914722484924fcc",
       "note": "recipe_file=src/wings/vinci/rail-waypoints.ts; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail"
     },
     {
@@ -3514,6 +3514,19 @@
       "date": "2026-09-14",
       "sha256": "edac4d494518c3a67d0a74e844193010bd38977e19ecfd10cc3f32e391e72b7a",
       "note": "recipe_file=src/wings/vinci/table/data/codices.json; source=program/rounds/wing-vinci/refs/RECLASS-2026-09-14/codices.json"
+    },
+    {
+      "id": "vinci/entry-passage/ledge",
+      "path": "procedural/entry-passage/ledge/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural reconstruction; source code under the museum repository licence.",
+      "display": true,
+      "prompt": "A plain modern shelf in the entry passage: 1.20 by 0.30 m, 55 mm thick, on two brackets, fixed to the west partition at 0.90 m over the supplied +0.80 m floor. Square, unmoulded and unpainted, in the passage's own limewash surface. A fitting of this museum, not a reconstruction of a 1517 furnishing, and it carries no period claim. Its geometry belongs to the passage, so the rail clearance certificate is written against it and one machine of the collection stands on it.",
+      "model": "Deterministic TypeScript and TSL procedural geometry",
+      "date": "2026-09-20",
+      "sha256": "44e8927c21b721c2726057ca6b41be903b6092a20f9b36e87d43184a1e71c2bb",
+      "note": "A modern museum fitting inside the entrance structure; the machine it carries has its own record. recipe_file=src/wings/vinci/entry-passage.ts"
     }
   ]
 }
