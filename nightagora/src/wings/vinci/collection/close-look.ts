@@ -423,7 +423,6 @@ export function vinciPlaceCard(id: VinciPlaceId, certainty: (key: VinciPlaceCert
       bothLanguages(full, GRAVE_WORDS.presumption)
       full.append(make('p', 'vinci-statement', GRAVE_WORDS.dig))
       bothLanguages(full, GRAVE_WORDS.identification)
-      bothLanguages(full, GRAVE_WORDS.medallion)
       bothLanguages(full, GRAVE_WORDS.medallionRecord)
       for (const key of ['plaque', 'dig', 'transfer'] as const) full.append(make('p', 'vinci-statement', GRAVE_EVIDENCE[key]))
       bothLanguages(full, GRAVE_WORDS.disclosure)

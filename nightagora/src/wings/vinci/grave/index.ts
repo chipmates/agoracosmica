@@ -1,4 +1,4 @@
-import { CylinderGeometry, ExtrudeGeometry, LatheGeometry, Matrix4, Mesh, MeshStandardNodeMaterial, PlaneGeometry, Quaternion, Vector2, Vector3, Path, Shape, type BufferGeometry, type Material, type Texture } from 'three/webgpu'
+import { CylinderGeometry, ExtrudeGeometry, Matrix4, Mesh, MeshStandardNodeMaterial, PlaneGeometry, Quaternion, Vector3, Shape, type BufferGeometry, type Material, type Texture } from 'three/webgpu'
 import { Construction, exhibitionFloor, galleryBackdrop, type ExhibitMaterials, type ExhibitionObject } from '../myths/construction'
 import { lineAdvance } from '../words'
 import words from '../line/data/never-said.json'
@@ -37,8 +37,9 @@ export const GRAVE_WORDS = {
   presumption: { en: 'presumed remains', de: 'mutmaßliche Überreste' },
   dig: '1863',
   identification: { en: 'The identification remains presumed.', de: 'Die Identifizierung bleibt unbewiesen.' },
-  medallion: { en: 'The portrait medallion\nis left empty here.', de: 'Das Porträtmedaillon\nbleibt hier leer.' },
-  /** What the setting on the real slab holds. The bronze is a 2004 sculpture
+  /** What the setting on the real slab holds. An absence is a sentence in
+   * the record and never a piece of furniture, so nothing of it is built.
+   * The bronze is a 2004 sculpture
    * whose copyright runs, so no photograph of it is admissible and the record
    * carries the fact in words. */
   medallionRecord: {
@@ -98,32 +99,18 @@ export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, l
   const centreX = GRAVE_SLAB.x
   const centreZ = GRAVE_SLAB.z
   build.box(centreX, 0.075, centreZ, 2.16, 0.15, 3.74, materials.dark)
-  // The bedding stone stops short of the empty setting on both sides, so the
-  // well under the bezel is a real void and not the course's own top face.
-  const medallionZ = centreZ - 0.7
-  for (const [from, to] of [[centreZ - 1.805, medallionZ - 0.62], [medallionZ + 0.62, centreZ + 1.805]] as [number, number][]) {
-    build.box(centreX, 0.148, (from + to) / 2, 2.04, 0.13, to - from, materials.stone)
-  }
+  // The bedding stone runs the whole length of the slab.
+  build.box(centreX, 0.148, centreZ, 2.04, 0.13, 3.61, materials.stone)
   const slabFace=new Shape();slabFace.moveTo(-.99,-1.775);slabFace.lineTo(.99,-1.775);slabFace.lineTo(.99,1.775);slabFace.lineTo(-.99,1.775);slabFace.closePath()
-  const voidPath=new Path();voidPath.absarc(0,.7,.53,0,Math.PI*2,true);slabFace.holes.push(voidPath)
   const top=new ExtrudeGeometry(slabFace,{depth:.06,bevelEnabled:true,bevelSize:.004,bevelThickness:.004,bevelSegments:2,curveSegments:36})
   top.rotateX(-Math.PI/2);top.translate(centreX,.17,centreZ);build.geometry(top,pale)
 
   // The documented name is the ONLY writing on the slab. The portrait
-  // medallion is omitted from this openly generated study; no face invented.
+  // medallion is not reproduced, and what the real slab carries instead is a
+  // sentence of the record, which is where an absence belongs.
   const slabName = placed(build, { rotationX: -Math.PI / 2, position: [centreX, 0.2348, centreZ + (options.mobile?.76:1.06)] })
   const labelWidth = 1.92
   slabName.text(options.mobile?'LEONARDO\nDA VINCI':GRAVE_EVIDENCE.slab, -labelWidth / 2, 0, 0, options.mobile?.20:.153, labelWidth, materials.ink, 0.003)
-
-  // Beaten bronze inset rings recall the mounting's material without
-  // fabricating the profile carried by the modern tomb photograph.
-  // The setting is empty on purpose: a bronze bezel let 95 mm into the slab,
-  // its skirt reading darker than the stone, over a pale floor. A rim that
-  // stands proud takes the grazing light; the well below it reads as depth.
-  const rimProfile=[[.470,-.095],[.470,-.006],[.481,.010],[.523,.010],[.536,-.006],[.536,-.095],[.470,-.095]].map(([r,y])=>new Vector2(r!,y!)).reverse()
-  const rim=new LatheGeometry(rimProfile,72);rim.translate(centreX,.23,medallionZ);build.geometry(rim,materials.bronze)
-  const cavityFloor=new CylinderGeometry(.470,.470,.030,72)
-  cavityFloor.translate(centreX,.150,medallionZ);build.geometry(cavityFloor,pale)
 
   // A separate low lectern makes "presumed" physically separate as well.
   const plaqueX = options.mobile ? 1.50 : 1.44
@@ -139,24 +126,6 @@ export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, l
   build.text(GRAVE_WORDS.dig, plaqueX - 0.70, options.mobile?0.46:0.68, plaqueZ + 0.05, 0.095, 1.4, materials.bronze)
   if(!options.mobile)build.text(text(GRAVE_WORDS.identification.en,GRAVE_WORDS.identification.de), plaqueX - 0.70, 0.51, plaqueZ + 0.05, 0.070, 1.4)
 
-  // Absence carries a label of its own, on its own carrier, off the pale slab.
-  const noteX=centreX-.30, noteZ=centreZ-1.86
-  const noteWords=text(GRAVE_WORDS.medallion.en,GRAVE_WORDS.medallion.de)
-  if(options.mobile){
-    // The phone reads the same words from a floor-set strip: no standing plate
-    // crowds the slab, and the caption stays inside the narrow stage.
-    const strip=placed(build,{rotationX:-Math.PI/2,position:[centreX+.34,.062,centreZ-2.74]})
-    // Local XY becomes the paving plane once the strip is laid down, so the
-    // plate's thickness is its local Z and its depth is its local Y.
-    strip.box(0,-.30,-.028,2.06,.72,.056,pale)
-    strip.box(0,-.665,-.030,2.10,.05,.060,materials.bronze)
-    strip.text(noteWords,-.94,-.08,.004,.150,1.90)
-  }else{
-    build.box(noteX,.20,noteZ-.09,1.18,.40,.14,materials.dark)
-    build.box(noteX,.43,noteZ,1.56,.56,.07,pale)
-    build.box(noteX,.145,noteZ+.02,1.60,.06,.11,materials.bronze)
-    build.text(noteWords,noteX-.70,.60,noteZ+.04,.112,1.42)
-  }
 
   const gableScale=options.mobile?.84:1, gableShift:[number,number,number]=options.mobile?[-1.26,0,-1.55]:[0,0,0]
   const gableBuild=placed(build,{scale:gableScale,position:gableShift})
@@ -292,8 +261,6 @@ export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, l
     [centreX-0.99,0.24,centreZ-1.775],[centreX+0.99,0.24,centreZ-1.775],
     [plaqueX-0.80,1.12,plaqueZ],[plaqueX+0.80,0.02,plaqueZ+0.10],
     gablePoint(frameX-1.66,0.0,frameZ),gablePoint(frameX+1.66,frameY+1.33,frameZ),
-    options.mobile?[centreX+.34,.12,centreZ-2.74]:[noteX-.78,.72,noteZ],
-    options.mobile?[centreX-.60,.12,centreZ-2.20]:[noteX+.78,.06,noteZ],
   ]
   const metadata = {
     kind: 'grave',
