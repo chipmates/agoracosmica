@@ -25,6 +25,13 @@ const TITLE_OVER60_OK = new Set(['de/figures/index.html']);
 const NO_HREFLANG = new Set(['privacy', 'impressum', 'datenschutz', 'cookie-policy', 'nutzungsbedingungen', '404', 'figures/emily-dickinson/poems',
   'figures/william-blake/poems', 'figures/william-shakespeare/sonnets', 'figures/rumi/poems',
   'talk-to-historical-figures', 'de/figures/plato/hoehlengleichnis', 'de/figures/plato/ideenlehre']);
+// Poem, sonnet and poems-index pages have no German twin. Matched by shape
+// so a new poem needs no entry here.
+const NO_HREFLANG_PATTERNS = [
+  /^figures\/(emily-dickinson|william-blake)\/poems\/[^/]+$/,
+  /^figures\/william-shakespeare\/sonnets\/[^/]+$/,
+  /^poems$/,
+];
 
 function walk(dir) {
   const out = [];
@@ -58,7 +65,7 @@ for (const f of files) {
   const slug = rel.replace(/\/index\.html$/, '').replace(/\.html$/, '');
   const html = readFileSync(f, 'utf8');
   const dhtml = decode(html);
-  const isLegal = NO_HREFLANG.has(slug);
+  const isLegal = NO_HREFLANG.has(slug) || NO_HREFLANG_PATTERNS.some((re) => re.test(slug));
 
   // 1. At most one BreadcrumbList per page (the dup-schema bug).
   const bc = (html.match(/"BreadcrumbList"/g) || []).length;

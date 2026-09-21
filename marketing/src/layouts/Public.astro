@@ -40,6 +40,8 @@ interface Props {
   altDe?: string;
   /** Internal lab/preview pages: emit robots noindex. */
   noindex?: boolean;
+  /** Robots value when noindex is set, eg 'noindex, follow'. */
+  robots?: string;
   /** Set false on pages that render their own dedicated CTA (figure + theme detail). */
   stickyCta?: boolean;
   /** Pages with a full hero (like the homepage): the mobile sticky CTA starts

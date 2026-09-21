@@ -1,0 +1,249 @@
+---
+// The browse page for the poems the site hosts: short, famous, and by what
+// they are about. Every entry links to the poem's own page, which carries the
+// full text. Section ids are stable because ad links point at them.
+
+import Public from '../layouts/Public.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { breadcrumbSchema } from '../lib/schemas';
+import { canonicalUrl, SITE_URL } from '../lib/urls';
+import { poems, poemSections, poets, POEM_PAGES_INDEXABLE } from '../data/poems/index.mjs';
+
+const lang = 'en' as const;
+const PAGE_PATH = '/poems';
+const PAGE_URL = canonicalUrl(PAGE_PATH);
+
+const metaTitle = 'Poems to Read: Short, Famous, by Theme';
+const metaDescription =
+  'Short poems, famous poems, and poems about death, love, nature and hope. Every one complete, free to read, no signup.';
+
+const schemas = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'Poems to read',
+    url: PAGE_URL,
+    inLanguage: 'en',
+    isPartOf: { '@type': 'WebSite', name: 'Agora Cosmica', url: SITE_URL },
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: poems.length,
+      itemListElement: poems.map((poem, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        url: `${SITE_URL}${poem.path}`,
+        item: {
+          '@type': 'CreativeWork',
+          name: poem.title,
+          inLanguage: 'en',
+          author: { '@type': 'Person', name: poets[poem.poet].name },
+        },
+      })),
+    },
+  },
+  breadcrumbSchema([
+    { name: 'Home', url: `${SITE_URL}/` },
+    { name: 'Poems', url: PAGE_URL },
+  ]),
+];
+---
+<Public
+  title={metaTitle}
+  fullTitle={metaTitle}
+  ogTitle={`${metaTitle} | Agora Cosmica`}
+  description={metaDescription}
+  canonicalPath={PAGE_PATH}
+  lang={lang}
+  ogType="article"
+  noHreflang={true}
+  noindex={!POEM_PAGES_INDEXABLE}
+  robots="noindex, follow"
+  stickyCta={false}
+  schemas={schemas}
+>
+  <div class="pub-content pi">
+    <Breadcrumbs lang={lang} items={[{ label: 'Poems' }]} />
+
+    <header class="pi-hero">
+      <p class="pi-hero__eyebrow">In their own words</p>
+      <h1 class="pi-hero__title">Poems to read</h1>
+      <p class="pi-hero__lead">
+        Short poems, famous poems, poems about death, love, nature and hope.
+        Every one is in the public domain and printed the way its author wrote
+        it, free to read here with no signup. Pick one and stay a while.
+      </p>
+    </header>
+
+    <nav class="pi-jump" aria-label="Sections on this page">
+      {poemSections.map(section => (
+        <a class="pi-jump__link" href={`#${section.id}`}>{section.navLabel}</a>
+      ))}
+    </nav>
+
+    {poemSections.map(section => (
+      <section class="pi-section">
+        <h2 class="pi-section__title" id={section.id}>{section.title}</h2>
+        <p class="pi-section__blurb">{section.blurb}</p>
+        <ul class="pi-list">
+          {section.poems.map(poem => (
+            <li class="pi-item">
+              <a class="pi-item__title" href={poem.path}>{poem.title}</a>
+              <span class="pi-item__poet">{poets[poem.poet].name}</span>
+              {poem.firstLine !== poem.title && (
+                <span class="pi-item__line">{poem.firstLine}</span>
+              )}
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+
+    <p class="pi-more">
+      <a class="pub-textlink" href="/figures/">Browse the figures</a>
+    </p>
+  </div>
+</Public>
+
+<style>
+  /* Self-contained on purpose: sharing the essay stylesheet would redraw the
+     CSS chunks of the poem pages this page links to. */
+  .pi {
+    max-width: 46rem;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem 4rem;
+  }
+
+  .pi-hero {
+    margin: 1.25rem 0 1.75rem;
+  }
+  .pi-hero__eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: var(--text-xs);
+    color: var(--gold-primary);
+    margin: 0 0 0.4rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  }
+  .pi-hero__title {
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: clamp(2rem, 5vw, 2.9rem);
+    line-height: 1.1;
+    margin: 0 0 0.75rem;
+    color: var(--text-primary);
+  }
+  .pi-hero__lead {
+    color: var(--text-secondary);
+    font-size: var(--text-md);
+    line-height: var(--leading-loose);
+    margin: 0;
+    max-width: 38rem;
+  }
+
+  .pi-jump {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 1.1rem;
+    margin: 0 0 2.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  }
+  .pi-jump__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-sm);
+    color: var(--gold-primary);
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-primary) 35%, transparent);
+  }
+  .pi-jump__link:hover,
+  .pi-jump__link:focus-visible {
+    color: var(--gold-hover);
+    border-bottom-color: var(--gold-hover);
+  }
+
+  .pi-section {
+    margin: 0 0 3rem;
+    scroll-margin-top: 5rem;
+  }
+  .pi-section__title {
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: clamp(1.4rem, 3.5vw, 1.85rem);
+    color: var(--gold-primary);
+    margin: 0 0 0.5rem;
+    line-height: 1.25;
+    scroll-margin-top: 5rem;
+  }
+  .pi-section__blurb {
+    color: var(--text-secondary);
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    margin: 0 0 1.5rem;
+    max-width: 38rem;
+  }
+
+  /* Two columns where there is room, so a long section stays scannable
+     instead of turning the page into a scroll. */
+  .pi-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0 1.75rem;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 700px) {
+    .pi-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .pi-item {
+    border-left: 2px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+    padding: 0.35rem 0 0.35rem 1.25rem;
+    margin: 0 0 1.15rem;
+  }
+  .pi-item__title {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: var(--text-md);
+    line-height: 1.35;
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+  .pi-item__title:hover,
+  .pi-item__title:focus-visible {
+    color: var(--gold-primary);
+  }
+  .pi-item__poet {
+    display: block;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-xs);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--gold-subtle);
+    margin-top: 0.1rem;
+  }
+  .pi-item__line {
+    display: block;
+    font-family: 'Iowan Old Style', Palatino, Georgia, 'Times New Roman', serif;
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+  }
+
+  .pi-more {
+    margin: 2.5rem 0 0;
+    padding-top: 1.5rem;
+    border-top: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+    font-size: var(--text-sm);
+  }
+
+  @media (max-width: 560px) {
+    .pi-item {
+      padding-left: 1rem;
+    }
+  }
+</style>

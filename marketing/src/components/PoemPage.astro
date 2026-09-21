@@ -1,0 +1,328 @@
+---
+// One hosted poem on a page of its own: the text open at the top, the door in
+// view, everything else quiet underneath. Shared by the Dickinson, Blake and
+// Shakespeare routes, which each pass one record from the poem data module.
+// The texts are quoted primary source: rendered from the data, never edited.
+
+import Public from '../layouts/Public.astro';
+import Breadcrumbs from './Breadcrumbs.astro';
+import PoemDoor from './PoemDoor.astro';
+import { figureImage } from '../lib/figureImages';
+import { breadcrumbSchema } from '../lib/schemas';
+import { canonicalUrl, SITE_URL } from '../lib/urls';
+import { poets, poemsByPoet, POEM_PAGES_INDEXABLE } from '../data/poems/index.mjs';
+
+interface Props {
+  /** One record from the poem data module. */
+  poem: {
+    poet: string;
+    key: string;
+    slug: string;
+    path: string;
+    title: string;
+    metaTitle: string;
+    description: string;
+    firstLine: string;
+    text: string;
+    intro: string;
+    collectionLine: string;
+    lineCount: number;
+    manuscript: { leaves: string[]; repo: string; cite: string } | null;
+  };
+}
+
+const { poem } = Astro.props;
+const poet = poets[poem.poet];
+const lang = 'en' as const;
+
+const PAGE_PATH = poem.path.replace(/\/$/, '');
+const PAGE_URL = canonicalUrl(PAGE_PATH);
+const MS = 'https://media.agoracosmica.org/images/dickinson';
+
+const siblings = poemsByPoet(poem.poet);
+const at = siblings.findIndex((p) => p.slug === poem.slug);
+const previous = at > 0 ? siblings[at - 1] : null;
+const next = at < siblings.length - 1 ? siblings[at + 1] : null;
+
+const person = {
+  '@type': 'Person',
+  '@id': `${PAGE_URL}#person`,
+  name: poet.name,
+  birthDate: poet.birthDate,
+  deathDate: poet.deathDate,
+  sameAs: poet.sameAs,
+};
+const schemas = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWork',
+    '@id': `${PAGE_URL}#poem`,
+    name: poem.title,
+    url: PAGE_URL,
+    inLanguage: 'en',
+    author: person,
+    isPartOf: {
+      '@type': 'CollectionPage',
+      name: `${poet.name}: ${poet.collectionLabel.toLowerCase()}`,
+      url: canonicalUrl(poet.collectionPath.replace(/\/$/, '')),
+    },
+    isAccessibleForFree: true,
+    ...(poem.intro && { description: poem.intro }),
+  },
+  breadcrumbSchema([
+    { name: 'Home', url: `${SITE_URL}/` },
+    { name: 'Figures', url: `${SITE_URL}/figures/` },
+    { name: poet.name, url: `${SITE_URL}${poet.figurePath}` },
+    { name: poet.collectionLabel, url: `${SITE_URL}${poet.collectionPath}` },
+    { name: poem.title, url: PAGE_URL },
+  ]),
+];
+---
+<Public
+  title={poem.metaTitle}
+  fullTitle={poem.metaTitle}
+  ogTitle={`${poem.metaTitle} | Agora Cosmica`}
+  description={poem.description}
+  canonicalPath={PAGE_PATH}
+  lang={lang}
+  ogType="article"
+  ogImage={figureImage(poet.id, 'main', 1200)}
+  ogImageAlt={`AI-generated portrait: ${poet.name}`}
+  noHreflang={true}
+  noindex={!POEM_PAGES_INDEXABLE}
+  robots="noindex, follow"
+  stickyCta={false}
+  schemas={schemas}
+>
+  <div class="pub-content pm">
+    <Breadcrumbs
+      lang={lang}
+      items={[
+        { label: 'Figures', path: '/figures' },
+        { label: poet.name, path: poet.figurePath.replace(/\/$/, '') },
+        { label: poet.collectionLabel, path: poet.collectionPath.replace(/\/$/, '') },
+        { label: poem.title },
+      ]}
+    />
+
+    <header class="pm-hero">
+      <p class="pm-hero__eyebrow">{poet.eyebrow}</p>
+      <h1 class="pm-hero__title">{poem.title}</h1>
+      <p class="pm-hero__byline">
+        {poet.name} · {poet.dates}{poem.collectionLine && <span class="pm-hero__from"> · {poem.collectionLine}</span>}
+      </p>
+    </header>
+
+    <div class="pm-poem">
+      <div class="pm-poem__text">{poem.text.split('\n\n').map(stanza => (<div class="pm-poem__stanza">{stanza.split('\n').map(line => (<span class="pm-poem__line">{line}</span>))}</div>))}</div>
+    </div>
+
+    {poem.intro && <p class="pm-intro">{poem.intro}</p>}
+
+    {poem.manuscript && (
+      <p class="pm-hand">
+        <a
+          class="pub-textlink"
+          href={`${MS}/${poem.manuscript.leaves[0]}.webp`}
+          target="_blank"
+          rel="noopener"
+        >See it in her own hand</a>
+        <span class="pm-hand__credit">
+          {poem.manuscript.repo}{poem.manuscript.leaves.length > 1 ? `, page 1 of ${poem.manuscript.leaves.length}` : ''}
+        </span>
+      </p>
+    )}
+
+    <PoemDoor
+      at="hero"
+      href={poet.door.href}
+      buttonLabel={poet.door.label}
+      figureId={poet.id}
+      shapedBy={poet.door.shapedBy}
+    />
+
+    <nav class="pm-nav" aria-label={`More by ${poet.name}`}>
+      <p class="pm-nav__all">
+        <a class="pub-textlink" href={poet.collectionPath}>{poet.moreLabel}</a>
+      </p>
+      <div class="pm-nav__steps">
+        {previous && (
+          <a class="pm-nav__step" href={previous.path}>
+            <span class="pm-nav__dir">Previous</span>
+            <span class="pm-nav__name">{previous.title}</span>
+          </a>
+        )}
+        {next && (
+          <a class="pm-nav__step pm-nav__step--next" href={next.path}>
+            <span class="pm-nav__dir">Next</span>
+            <span class="pm-nav__name">{next.title}</span>
+          </a>
+        )}
+      </div>
+    </nav>
+
+    <footer class="pm-sources">
+      <p>{poet.sourceNote}</p>
+    </footer>
+  </div>
+</Public>
+
+<style>
+  /* Self-contained on purpose: sharing the essay stylesheet would redraw the
+     CSS chunks of the collection pages this page hangs off. */
+  .pm {
+    max-width: 46rem;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem 4rem;
+  }
+
+  /* The poem is the page: the hero stays small enough that the first verse line
+     is on the first screen of a phone. */
+  .pm-hero {
+    margin: 1.25rem 0 1.75rem;
+  }
+  .pm-hero__eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: var(--text-xs);
+    color: var(--gold-primary);
+    margin: 0 0 0.4rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  }
+  .pm-hero__title {
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: clamp(1.7rem, 4.4vw, 2.4rem);
+    line-height: 1.15;
+    margin: 0 0 0.5rem;
+    color: var(--text-primary);
+  }
+  .pm-hero__byline {
+    color: var(--text-secondary);
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-sm);
+    letter-spacing: 0.02em;
+    margin: 0;
+  }
+  .pm-hero__from {
+    color: var(--text-tertiary);
+  }
+
+  .pm-poem {
+    border-left: 2px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+    padding-left: 1.5rem;
+    margin: 0 0 1.75rem;
+  }
+  .pm-poem__text {
+    font-family: 'Iowan Old Style', Palatino, Georgia, 'Times New Roman', serif;
+    font-size: 1.2rem;
+    line-height: 1.75;
+    color: var(--text-primary);
+  }
+  .pm-poem__stanza {
+    margin: 0 0 1em;
+  }
+  .pm-poem__stanza:last-child {
+    margin-bottom: 0;
+  }
+  /* One block per verse line, with a hanging indent so a wrapped line stays
+     distinct from the next verse line. pre-wrap keeps the edition's own
+     leading spaces. */
+  .pm-poem__line {
+    display: block;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    padding-left: 1.1em;
+    text-indent: -1.1em;
+  }
+
+  .pm-intro {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    line-height: var(--leading-relaxed);
+    font-style: italic;
+    margin: 0 0 1.75rem;
+    padding-left: 1.5rem;
+    max-width: 34rem;
+  }
+
+  .pm-hand {
+    margin: 0 0 2rem;
+    padding-left: 1.5rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-xs);
+    line-height: var(--leading-relaxed);
+  }
+  .pm-hand__credit {
+    display: block;
+    color: var(--text-tertiary);
+    margin-top: 0.3rem;
+  }
+
+  .pm-nav {
+    margin: 2.5rem 0 2.75rem;
+    border-top: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+    padding-top: 1.5rem;
+  }
+  .pm-nav__all {
+    margin: 0 0 1.25rem;
+    font-size: var(--text-sm);
+  }
+  .pm-nav__steps {
+    display: flex;
+    gap: 1.25rem;
+    justify-content: space-between;
+  }
+  .pm-nav__step {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-height: 44px;
+    justify-content: center;
+    max-width: 48%;
+    text-decoration: none;
+    color: var(--text-secondary);
+  }
+  .pm-nav__step--next {
+    text-align: right;
+    margin-left: auto;
+  }
+  .pm-nav__dir {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-xs);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+  .pm-nav__name {
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: var(--text-base);
+    color: var(--gold-primary);
+    line-height: 1.35;
+  }
+  .pm-nav__step:hover .pm-nav__name,
+  .pm-nav__step:focus-visible .pm-nav__name {
+    color: var(--gold-hover);
+  }
+
+  .pm-sources {
+    border-top: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+    padding-top: 1.5rem;
+  }
+  .pm-sources p {
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+    margin: 0;
+  }
+
+  @media (max-width: 560px) {
+    .pm-poem,
+    .pm-intro,
+    .pm-hand {
+      padding-left: 1rem;
+    }
+    .pm-poem__text {
+      font-size: 1.02rem;
+    }
+  }
+</style>

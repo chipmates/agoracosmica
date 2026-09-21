@@ -14,6 +14,16 @@
 import Public from '../../../layouts/Public.astro';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
 import PoemDoor from '../../../components/PoemDoor.astro';
+import {
+  dickinsonPoems as POEMS,
+  dickinsonFacsimileLeaves as FACS_LEAVES,
+  dickinsonFacsimileSources as FACS,
+} from '../../../data/poems/dickinson.mjs';
+import { poemsByPoet } from '../../../data/poems/index.mjs';
+// Where each poem's own page lives, from the same data the pages render from.
+const OWN_PAGE: Record<string, string> = Object.fromEntries(
+  poemsByPoet('dickinson').map((poem) => [poem.key, poem.path]),
+);
 // Slot 4 of the app's ask contract is this page's own question: the door skips
 // the mode choice and opens Free Talk about the poem the visitor just read.
 const DOOR_HREF = '/app?figure=emily-dickinson&lang=en&ask=f:dickinson:4';
@@ -25,392 +35,8 @@ const msUrl = (stem: string) => `${MS}/${stem}.webp`;
 
 const lang = 'en' as const;
 
-// --- Poems: dash-faithful, transcribed from the manuscripts (see header) ---
-const POEMS: Record<string, { firstLine: string; text: string }> = {
-  chariot: {
-    firstLine: 'Because I could not stop for Death',
-    text: `Because I could not stop for Death –
-He kindly stopped for me –
-The Carriage held but just Ourselves –
-And Immortality.
-
-We slowly drove – He knew no haste
-And I had put away
-My labor and my leisure too,
-For His Civility –
-
-We passed the School, where Children strove
-At Recess – in the Ring –
-We passed the Fields of Gazing Grain –
-We passed the Setting Sun –
-
-Or rather – He passed Us –
-The Dews drew quivering and Chill –
-For only Gossamer, my Gown –
-My Tippet – only Tulle –
-
-We paused before a House that seemed
-A Swelling of the Ground –
-The Roof was scarcely visible –
-The Cornice – in the Ground –
-
-Since then – 'tis Centuries – and yet
-Feels shorter than the Day
-I first surmised the Horses Heads
-Were toward Eternity –`,
-  },
-  dying: {
-    firstLine: 'I heard a Fly buzz – when I died',
-    text: `I heard a Fly buzz – when I died –
-The Stillness in the Room
-Was like the Stillness in the Air –
-Between the Heaves of Storm –
-
-The Eyes around – had wrung them dry –
-And Breaths were gathering firm
-For that last Onset – when the King
-Be witnessed – in the Room –
-
-I willed my Keepsakes – Signed away
-What portion of me be
-Assignable – and then it was
-There interposed a Fly –
-
-With Blue – uncertain stumbling Buzz –
-Between the light – and me –
-And then the Windows failed – and then
-I could not see to see –`,
-  },
-  alabaster: {
-    firstLine: 'Safe in their Alabaster Chambers',
-    text: `Safe in their Alabaster Chambers –
-Untouched by Morning – and untouched by Noon –
-Sleep the meek members of the Resurrection –
-Rafter of Satin – and Roof of Stone –
-
-Grand go the Years, in the Crescent – above them –
-Worlds scoop their Arcs – and Firmaments – row –
-Diadems – drop – and Doges – surrender –
-Soundless as Dots, On a Disc of Snow –`,
-  },
-  nobody: {
-    firstLine: "I'm Nobody! Who are you?",
-    text: `I'm Nobody! Who are you?
-Are you – Nobody – too?
-Then there's a pair of us!
-Dont tell! they'd advertise – you know!
-
-How dreary – to be – Somebody!
-How public – like a Frog –
-To tell one's name – the livelong June –
-To an admiring Bog!`,
-  },
-  loadedgun: {
-    firstLine: 'My Life had stood – a Loaded Gun',
-    text: `My Life had stood – a Loaded Gun –
-In Corners – till a Day
-The Owner passed – identified –
-And carried Me away –
-
-And now We roam in Sovereign Woods –
-And now We hunt the Doe –
-And every time I speak for Him
-The Mountains straight reply –
-
-And do I smile, such cordial light
-Opon the Valley glow –
-It is as a Vesuvian face
-Had let it's pleasure through –
-
-And when at Night – Our good Day done –
-I guard My Master's Head –
-'Tis better than the Eider-Duck's
-Deep Pillow – to have shared –
-
-To foe of His – I'm deadly foe –
-None stir the second time –
-On whom I lay a Yellow Eye –
-Or an emphatic Thumb –
-
-Though I than He – may longer live
-He longer must – than I –
-For I have but the power to kill,
-Without – the power to die –`,
-  },
-  exclusion: {
-    firstLine: 'The Soul selects her own Society',
-    text: `The Soul selects her own Society –
-Then – shuts the Door –
-To her divine Majority –
-Present no more –
-
-Unmoved – she notes the Chariots – pausing –
-At her low Gate –
-Unmoved – an Emperor be kneeling
-Upon her Mat –
-
-I've known her – from an ample nation –
-Choose One –
-Then – close the Valves of her attention –
-Like Stone –`,
-  },
-  letter: {
-    firstLine: 'This is my letter to the World',
-    text: `This is my letter to the World
-That never wrote to Me –
-The simple News that Nature told –
-With tender Majesty
-
-Her Message is committed
-To Hands I cannot see –
-For love of Her – Sweet – Countrymen –
-Judge tenderly – of Me`,
-  },
-  hope: {
-    firstLine: '"Hope" is the thing with feathers',
-    text: `"Hope" is the thing with feathers –
-That perches in the soul –
-And sings the tune without the words –
-And never stops – at all –
-
-And sweetest – in the Gale – is heard –
-And sore must be the storm –
-That could abash the little Bird
-That kept so many warm –
-
-I've heard it in the chillest land –
-And on the strangest Sea –
-Yet, never, in Extremity,
-It asked a crumb – of Me.`,
-  },
-  success: {
-    firstLine: 'Success is counted sweetest',
-    text: `Success – is counted sweetest
-By those who ne'er succeed –
-To comprehend a Nectar
-Requires sorest need –
-
-Not one of all the Purple Host
-Who took the Flag – today
-Can tell the Definition
-so clear, of Victory –
-
-As He – defeated – dying –
-On whose forbidden Ear
-The distant strains of triumph
-Burst – agonized – and Clear!`,
-  },
-  slant: {
-    firstLine: "There's a certain Slant of light",
-    text: `There's a certain Slant of light,
-Winter Afternoons –
-That oppresses, like the Heft
-Of Cathedral Tunes –
-
-Heavenly Hurt, it gives us –
-We can find no scar,
-But internal difference
-Where the Meanings, are –
-
-None may teach it – Any –
-'Tis the Seal Despair –
-An imperial affliction
-Sent us of the Air –
-
-When it comes, the Landscape listens –
-Shadows – hold their breath –
-When it goes, 'tis like the Distance
-On the look of Death –`,
-  },
-  funeral: {
-    firstLine: 'I felt a Funeral, in my Brain',
-    text: `I felt a Funeral, in my Brain,
-And Mourners to and fro
-Kept treading – treading – till it seemed
-That Sense was breaking through –
-
-And when they all were seated,
-A Service, like a Drum –
-Kept beating – beating – till I thought
-My Mind was going numb –
-
-And then I heard them lift a Box
-And creak across my Soul
-With those same Boots of Lead, again,
-Then Space – began to toll,
-
-As all the Heavens were a Bell,
-And Being, but an Ear,
-And I, and Silence, some strange Race
-Wrecked, solitary, here –
-
-And then a Plank in Reason, broke,
-And I dropped down, and down –
-And hit a World, at every plunge,
-And Finished knowing – then –`,
-  },
-  snake: {
-    firstLine: 'A narrow Fellow in the Grass',
-    text: `A narrow Fellow in the Grass
-Occasionally rides –
-You may have met him? did you not
-His notice instant is –
-
-The Grass divides as with a Comb –
-A spotted Shaft is seen,
-And then it closes at your feet
-And opens further on –
-
-He likes a Boggy Acre –
-A Floor too cool for Corn –
-But when a Boy and Barefoot
-I more than once at Noon
-
-Have passed I thought a Whip Lash
-Unbraiding in the Sun
-When stooping to secure it
-It wrinkled And was gone –
-
-Several of Nature's People
-I know and they know me
-I feel for them a transport
-Of cordiality –
-
-But never met this Fellow
-Attended or Alone
-Without a tighter Breathing
-And Zero at the Bone.`,
-  },
-  garden: {
-    firstLine: 'A Bird, came down the Walk',
-    text: `A Bird came down the Walk –
-He did not know I saw –
-He bit an Angleworm in halves
-And ate the fellow, raw,
-
-And then he drank a Dew
-From a convenient Grass –
-And then hopped sidewise to the Wall
-To let a Beetle pass –
-
-He glanced with rapid eyes
-That hurried all around –
-They looked like frightened Beads, I thought –
-He stirred his Velvet Head –
-
-Like One in danger, Cautious,
-I offered him a Crumb
-And he unrolled his feathers
-And rowed him softer home –
-
-Than Oars divide the Ocean,
-Too silver for a seam,
-Or Butterflies, off Banks of Noon
-Leap, plashless as they swim.`,
-  },
-  tellslant: {
-    firstLine: 'Tell all the truth but tell it slant',
-    text: `Tell all the truth but tell it slant –
-Success in Circuit lies
-Too bright for our infirm delight
-The truth's superb surprise
-As Lightning to the Children eased
-With explanation kind
-The truth must dazzle gradually
-Or every man be blind –`,
-  },
-  brain: {
-    firstLine: 'The Brain – is wider than the Sky',
-    text: `The Brain – is wider than the Sky –
-For – put them side by side –
-The One the Other will contain
-With ease – and You – beside –
-
-The Brain is deeper than the Sea –
-For – hold them – Blue to Blue –
-The One the Other will absorb –
-As Sponges – Buckets – do –
-
-The Brain is just the weight of God –
-For – Heft them – Pound for Pound –
-And they will differ – if they do –
-As Syllable from Sound –`,
-  },
-  frigate: {
-    firstLine: 'There is no Frigate like a Book',
-    text: `There is no Frigate like a Book
-To take us Lands away
-Nor any Coursers like a Page
-Of prancing Poetry –
-This Traverse may the poorest take
-Without oppress of Toll –
-How frugal is the Chariot
-That bears the Human soul –`,
-  },
-  wildnights: {
-    firstLine: 'Wild nights – Wild nights!',
-    text: `Wild nights – Wild nights!
-Were I with thee
-Wild nights should be
-Our luxury!
-
-Futile – the winds –
-To a Heart in port –
-Done with the Compass –
-Done with the Chart –!
-
-Rowing in Eden –
-Ah! the Sea!
-Might I but moor –
-Tonight –
-In thee!`,
-  },
-};
-
-// --- Facsimile sources (all embedded, rights verified 2026-06-16, see header).
-//     BPL = no known copyright restrictions; Amherst = free for non-commercial /
-//     educational use with attribution; Houghton/Harvard = publication permitted,
-//     no permission or fee. Only wildnights is cited (no scan on disk yet). ---
-const FACS_LEAVES: Record<string, string[]> = {
-  // BPL (no known copyright) / Amherst (non-commercial, with credit)
-  dying: ['fly-buzz'],
-  alabaster: ['safe-alabaster-1', 'safe-alabaster-2'],
-  success: ['success-1', 'success-2'],
-  garden: ['bird-walk-1', 'bird-walk-2', 'bird-walk-3'],
-  tellslant: ['tell-truth'],
-  brain: ['brain-sky'],
-  frigate: ['frigate-book'],
-  // Houghton/Harvard (publication permitted, credit Houghton)
-  chariot: ['chariot-1', 'chariot-2'],
-  nobody: ['nobody'],
-  loadedgun: ['loaded-gun-1', 'loaded-gun-2'],
-  exclusion: ['soul-society'],
-  letter: ['letter-world'],
-  hope: ['hope'],
-  slant: ['slant-light'],
-  funeral: ['funeral-brain-1', 'funeral-brain-2'],
-  snake: ['narrow-fellow-1', 'narrow-fellow-2', 'narrow-fellow-3', 'narrow-fellow-4'],
-  wildnights: ['wildnights'],
-};
-const FACS: Record<string, { repo: string; cite: string }> = {
-  chariot: { repo: 'Houghton Library, Harvard', cite: 'MS Am 1118.3, 165a' },
-  dying: { repo: 'Amherst College, Archives & Special Collections', cite: 'fascicle 84' },
-  alabaster: { repo: 'Boston Public Library', cite: 'Ms. Am. 1093, 2' },
-  nobody: { repo: 'Houghton Library, Harvard', cite: 'MS Am 1118.3, 35a' },
-  loadedgun: { repo: 'Houghton Library, Harvard', cite: 'MS Am 1118.3, 131a' },
-  exclusion: { repo: 'Houghton Library, Harvard', cite: 'MS Am 1118.3, 65c' },
-  letter: { repo: 'Houghton Library, Harvard', cite: 'MS Am 1118.3, 70b' },
-  hope: { repo: 'Houghton Library, Harvard', cite: 'MS Am 1118.3, 46b' },
-  success: { repo: 'Boston Public Library', cite: 'Ms. Am. 1093, 10' },
-  slant: { repo: 'Houghton Library, Harvard', cite: 'MS Am 1118.3, 74d' },
-  funeral: { repo: 'Houghton Library, Harvard', cite: 'MS Am 1118.3, 53c' },
-  snake: { repo: 'Houghton Library, Harvard', cite: 'MS Am 1118.5 (letter to Susan Dickinson)' },
-  garden: { repo: 'Amherst College, Archives & Special Collections', cite: 'Amherst Manuscript #96' },
-  tellslant: { repo: 'Amherst College, Archives & Special Collections', cite: 'Amherst Manuscript #372' },
-  brain: { repo: 'Amherst College, Archives & Special Collections', cite: 'fascicle 84' },
-  frigate: { repo: 'Amherst College, Archives & Special Collections', cite: 'Amherst Manuscript #462' },
-  wildnights: { repo: 'Houghton Library, Harvard', cite: 'MS Am 1118.3, 38b' },
-};
+// --- Poems, manuscript leaves and repositories: one copy in the data module,
+//     shared with the page each poem has of its own ---
 
 // Optional per-poem note (reusable): surfaces a spot where the manuscript reading
 // is kept over a smoothed printed one. Empty for now.
@@ -607,6 +233,9 @@ const schemas = [
                 <div class="ed-poem__body">
                   <div class="ed-poem__text">{POEMS[key].text}</div>
                   {POEM_NOTES[key] && <p class="ed-poem__note">{POEM_NOTES[key]}</p>}
+                  <p class="ed-poem__own">
+                    <a class="pub-textlink" href={OWN_PAGE[key]}>Open this poem on its own page</a>
+                  </p>
                   {FACS_LEAVES[key] ? (
                     FACS_LEAVES[key].length > 1 ? (
                       <figure class="ed-hand">
@@ -901,6 +530,11 @@ const schemas = [
     line-height: 1.75;
     color: var(--text-primary);
     margin-top: 1.05rem;
+  }
+  .ed-poem__own {
+    margin: 1.4rem 0 0;
+    font-size: 0.82rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
   }
   .ed-poem__note {
     margin: 1rem 0 0;

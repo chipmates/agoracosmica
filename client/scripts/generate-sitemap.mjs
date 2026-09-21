@@ -6,6 +6,9 @@
 import { execSync } from 'child_process';
 import { existsSync, writeFileSync } from 'fs';
 import { join } from 'path';
+// The poem pages render from this module, so their routes and their crawl
+// status cannot drift from what the sitemap claims.
+import { POEM_PAGES_INDEXABLE, poemRoutes } from '../../marketing/src/data/poems/index.mjs';
 
 const SITE_URL = 'https://agoracosmica.org';
 const SCRIPTS_DIR = import.meta.dirname;
@@ -211,6 +214,21 @@ urls.push(url('/figures/william-blake/poems', '0.6', gitLastModified('marketing/
 urls.push(url('/figures/william-shakespeare/sonnets', '0.6', gitLastModified('marketing/src/pages/figures/william-shakespeare/sonnets.astro')));
 urls.push(url('/figures/rumi/poems', '0.6', gitLastModified('marketing/src/pages/figures/rumi/poems.astro')));
 urls.push(url('/talk-to-historical-figures', '0.7', gitLastModified('marketing/src/pages/talk-to-historical-figures.astro')));
+
+// Poem pages and the poems index, English only. The flag that puts noindex
+// on them also keeps them out of the sitemap.
+if (POEM_PAGES_INDEXABLE) {
+  const POEM_MOD = gitLastModified(
+    'marketing/src/data/poems/index.mjs',
+    'marketing/src/components/PoemPage.astro',
+    'marketing/src/pages/poems.astro',
+  );
+  for (const route of poemRoutes) {
+    const path = route.replace(/\/$/, '');
+    NO_HREFLANG_PATHS.add(path);
+    urls.push(url(path, '0.5', POEM_MOD));
+  }
+}
 urls.push(url('/de/figures/plato/hoehlengleichnis', '0.6', gitLastModified('marketing/src/pages/de/figures/plato/hoehlengleichnis.astro')));
 urls.push(url('/de/figures/plato/ideenlehre', '0.6', gitLastModified('marketing/src/pages/de/figures/plato/ideenlehre.astro')));
 

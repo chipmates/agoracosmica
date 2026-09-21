@@ -41,6 +41,9 @@ interface Props {
   altDe?: string;
   /** Internal lab/preview pages: ask crawlers to stay out. */
   noindex?: boolean;
+  /** Robots value when noindex is set. Pages that stay out of the index but
+   *  still pass link value on ('noindex, follow') override the default here. */
+  robots?: string;
 }
 
 const {
@@ -60,6 +63,7 @@ const {
   schemas = [],
   noHreflang = false,
   noindex = false,
+  robots,
   altEn,
   altDe,
 } = Astro.props;
@@ -105,7 +109,7 @@ const metaDescription = clampDescription(description);
 <meta name="age-de-meta-label" content="age=16 hash: v=1.0 kind=sl protocol=all" />
 
 <title>{computedFullTitle}</title>
-{noindex && <meta name="robots" content="noindex, nofollow" />}
+{noindex && <meta name="robots" content={robots ?? 'noindex, nofollow'} />}
 <meta name="description" content={metaDescription} />
 <link rel="canonical" href={canonical} />
 {!noHreflang && (

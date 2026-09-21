@@ -1,0 +1,17 @@
+---
+// A page for each Dickinson poem the collection page hosts. The searcher who
+// types a first line lands on that poem and nothing else.
+
+import PoemPage from '../../../../components/PoemPage.astro';
+import { poemsByPoet } from '../../../../data/poems/index.mjs';
+
+export function getStaticPaths() {
+  return poemsByPoet('dickinson').map((poem) => ({
+    params: { poem: poem.slug },
+    props: { poem },
+  }));
+}
+
+const { poem } = Astro.props;
+---
+<PoemPage poem={poem} />
