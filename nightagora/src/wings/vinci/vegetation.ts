@@ -15,10 +15,10 @@ import {
   Quaternion,
   Vector3,
 } from 'three/webgpu'
-import { mix, positionWorld, sin, vec3 } from 'three/tsl'
+import { color, mix, positionWorld, sin, transformedNormalWorld, vec3, vertexColor } from 'three/tsl'
 import { leftOutAtCalm } from './calm-tier'
 import type { TierName } from '../../stack/tier'
-import { dossier, edgeDistance, feature, inside, polygon, type Quantity } from './site'
+import { dossier, edgeDistance, feature, hourKey, inside, polygon, type Quantity } from './site'
 import { collectionExclusions } from './collection'
 import { collectionAccessExclusions } from './collection-access'
 import { getInnerCourtOutlines } from './inner-court'
@@ -45,16 +45,26 @@ const PROVENANCE = {
   assetClass: 'GENERATED',
   certainty: 'conjectural',
   basis: 'Modern garden plates Q119, Q128 and Q178; branching character only. Planting positions and tree dimensions are not period evidence.',
-  recipe: 'Deterministic connected tapering trunks with parallel-transported shared rings, continuous taper normals and one terrain-fitted buttressed collar; unequal rising forks, dense terminal twig sprays and individually folded broad leaves in muted October colours. Four proposed near trees frame the exterior views, six middle-distance trees interrupt the bare northern and western hillside, and up to twenty-four distant trees make open woodland after circulation exclusions. Each planting and every collar toe clears dossier masonry, platforms, water and circulation. Species, positions and dimensions remain conjectural; no tree or root placement is a mapped historical fact. Every same-tier triangle and attribute is retained in two spatial branch clusters plus eight leaf clusters in calm, or four branch clusters plus sixteen leaf clusters in standard/hero. Native per-pass frustum culling uses their bounds; no camera-dependent population or shadow changes.',
+  recipe: 'Deterministic connected tapering trunks with parallel-transported shared rings, continuous taper normals and one terrain-fitted buttressed collar; unequal rising forks, dense terminal twig sprays and individually folded broad leaves in muted October colours. Leaf tone is read off the place a leaf holds in its own crown, a closed shade tone at the core, three greens on the lit shell and an October turn on the outer and upper leaves, and each shading normal is bent toward the crown outward direction, so a crown lights as one body instead of as separate facets; the leaf material adds a transmitted term from the solar direction of the reconstructed hour, so the side turned away from the sun carries light through instead of going black. Four proposed near trees frame the exterior views, six middle-distance trees interrupt the bare northern and western hillside, and up to twenty-four distant trees make open woodland after circulation exclusions. Each planting and every collar toe clears dossier masonry, platforms, water and circulation. Species, positions and dimensions remain conjectural; no tree or root placement is a mapped historical fact. Every same-tier triangle and attribute is retained in two spatial branch clusters plus eight leaf clusters in calm, or four branch clusters plus sixteen leaf clusters in standard/hero. Native per-pass frustum culling uses their bounds; no camera-dependent population or shadow changes.',
   proposedDimensions: { heightsM: [9.3, 22], middleDistanceHeightsM: [10.8, 17.2], middleDistanceCrownReachParameterM: [4.8, 7.2], rootCollarRadiusInTrunkRadii: [1.65, 3.65], rootToeEmbedM: .02, sharedTrunkRingSides: 12 },
 }
 
 const UP = new Vector3(0, 1, 0)
-const LEAF_COLOURS = [
-  '#596335', '#68713e', '#788048', '#877d42', '#9a8448', '#6b6b39', '#456047',
-].map((value) => new Color(value))
+/** The crown is read as one body, so a leaf's tone says where in it it sits:
+    the three greens are the lit shell, the shade tone is the closed inside,
+    and the turn is what October has taken on the outer and upper leaves. */
+const LEAF_GREENS = ['#5e6a38', '#6d7440', '#7c8149'].map((value) => new Color(value))
+const LEAF_SHADE = new Color('#333d26')
+const LEAF_TURN = new Color('#94804a')
+const LITTER = new Color('#7d6746')
 const BARK = new Color('#655f4e')
 const LICHEN = new Color('#77785e')
+/** The wing's own hour, as a direction toward the sun. Same convention as the
+    key light: azimuth from north, x east, y up, z minus north. */
+const SUN_TOWARD = ((azimuth: number, elevation: number) => {
+  const az = (azimuth * Math.PI) / 180, el = (elevation * Math.PI) / 180
+  return new Vector3(Math.sin(az) * Math.cos(el), Math.sin(el), -Math.cos(az) * Math.cos(el)).normalize()
+})(hourKey.sun_azimuth_deg.value, hourKey.sun_elevation_deg.value)
 
 function randomSource(seed: number): () => number {
   let state = seed >>> 0
@@ -74,8 +84,11 @@ function vertex(target: GeometryBatch, p: Vector3, n: Vector3, colour: Color): v
   target.colours.push(colour.r, colour.g, colour.b)
 }
 
-function triangle(target: GeometryBatch, a: Vector3, b: Vector3, c: Vector3, colour: Color): void {
+function triangle(target: GeometryBatch, a: Vector3, b: Vector3, c: Vector3, colour: Color, shading?: Vector3): void {
   const n = b.clone().sub(a).cross(c.clone().sub(a)).normalize()
+  // A crown lights as one volume, not as a thousand facets: the leaf keeps a
+  // quarter of its own facing and takes the rest from the crown's outward.
+  if (shading) n.lerp(shading, LEAF_NORMAL_BEND).normalize()
   vertex(target, a, n, colour)
   vertex(target, b, n, colour)
   vertex(target, c, n, colour)
@@ -138,6 +151,9 @@ function limb(target: GeometryBatch, start: Vector3, finish: Vector3,
   sweep(target, [start, finish], [radius0, radius1], sides, seed)
 }
 
+/** how much of a leaf's shading normal comes from the crown's own volume */
+const LEAF_NORMAL_BEND = .62
+
 /** A leaf is a shallow folded kite with a real pointed silhouette, two
     triangular faces and an actual midrib crease. There is no alpha card. */
 function leaf(
@@ -147,6 +163,7 @@ function leaf(
   angle: number,
   tilt: number,
   colour: Color,
+  shading?: Vector3,
 ): void {
   const along = new Vector3(Math.sin(angle) * Math.cos(tilt), Math.sin(tilt), Math.cos(angle) * Math.cos(tilt))
   const across = new Vector3(Math.cos(angle), 0, -Math.sin(angle))
@@ -154,8 +171,8 @@ function leaf(
   const tip = centre.clone().addScaledVector(along, length * 0.52)
   const left = centre.clone().addScaledVector(across, length * 0.30).addScaledVector(UP, -length * 0.08)
   const right = centre.clone().addScaledVector(across, -length * 0.30).addScaledVector(UP, -length * 0.09)
-  triangle(target, start, left, tip, colour)
-  triangle(target, start, tip, right, colour.clone().multiplyScalar(0.91))
+  triangle(target, start, left, tip, colour, shading)
+  triangle(target, start, tip, right, colour.clone().multiplyScalar(0.91), shading)
 }
 
 function geometry(source: GeometryBatch): BufferGeometry {
@@ -325,6 +342,12 @@ function* grow(
       return point
     } : undefined)
 
+    // The crown's own centre and reach, read off the same trunk and spread
+    // the branches are grown from: every leaf's tone and shading normal is
+    // taken from where it sits in this body.
+    const crownCentre = trunkAt(.56).addScaledVector(UP, plan.height * .06)
+    const crownReach = Math.max(plan.spread * .92, plan.height * .22)
+    const crownRise = plan.height * .40
     const crownTurn = random() * Math.PI * 2
     const leaders = plan.near ? 12 : 7
     for (let branch = 0; branch < leaders; branch++) {
@@ -362,10 +385,19 @@ function* grow(
             const spray = (0.15 + Math.sin(along * Math.PI) * 0.50) * (plan.near ? 1 : 1.65)
             const point = twigStart.clone().lerp(tip, along)
               .add(new Vector3(Math.cos(curl) * spray, (leafRandom() - 0.5) * spray * 0.9, Math.sin(curl) * spray))
-            const palette = LEAF_COLOURS[Math.floor(leafRandom() * LEAF_COLOURS.length)] ?? LEAF_COLOURS[0]!
-            const leafColour = palette.clone().multiplyScalar(0.73 + 0.30 * along + leafRandom() * 0.18)
+            // Where the leaf sits in the crown, as the two things an eye
+            // reads: how far out of the body it is and how high in it.
+            const out = point.clone().sub(crownCentre)
+            const shell = Math.min(1, Math.hypot(out.x, out.z) / crownReach)
+            const lift = Math.min(1, Math.max(0, out.y / crownRise * .5 + .5))
+            const exposure = Math.min(1, shell * .64 + lift * .36)
+            const green = LEAF_GREENS[Math.floor(leafRandom() * LEAF_GREENS.length)] ?? LEAF_GREENS[0]!
+            const leafColour = LEAF_SHADE.clone().lerp(green, .26 + .74 * exposure)
+              .lerp(LEAF_TURN, exposure * exposure * (.06 + .30 * leafRandom()))
+              .multiplyScalar(.72 + .18 * exposure + .14 * along)
             const size = (plan.near ? 0.18 : 0.20) * (0.7 + leafRandom() * 0.65)
-            leaf(foliage, point, size, curl, (leafRandom() - 0.45) * 1.55, leafColour)
+            leaf(foliage, point, size, curl, (leafRandom() - 0.45) * 1.55, leafColour,
+              out.lengthSq() > 1e-6 ? out.normalize() : UP)
           }
         }
       }
@@ -380,8 +412,9 @@ function* grow(
         const x = plan.east + Math.cos(angle) * radius
         const north = plan.north + Math.sin(angle) * radius
         if (!clearGround(x, north, 0.18)) continue
+        // Litter lies on the ground and is lit by the sky, not by the crown.
         leaf(foliage, new Vector3(x, heightAt(x, north) + 0.035, -north), 0.16 + random() * 0.09,
-          angle, 0.05, new Color('#796447').multiplyScalar(0.8 + random() * 0.4))
+          angle, 0.05, LITTER.clone().lerp(LEAF_TURN, .22).multiplyScalar(0.8 + random() * 0.4), UP)
       }
     }
   }
@@ -395,9 +428,16 @@ function* grow(
   const ridge = sin(positionWorld.x.mul(39).add(sin(positionWorld.y.mul(0.7)).mul(2.2)).add(positionWorld.z.mul(32))).mul(0.5).add(0.5)
   const tooth = sin(positionWorld.x.mul(147).add(positionWorld.y.mul(213)).add(positionWorld.z.mul(171))).mul(0.035).add(0.965)
   bark.colorNode = vec3(1).mul(broad).mul(mix(0.78, 1.03, ridge)).mul(tooth)
-  const leafMaterial = new MeshStandardNodeMaterial({ vertexColors: true, roughness: 0.88, side: DoubleSide })
+  const leafMaterial = new MeshStandardNodeMaterial({ vertexColors: true, roughness: 0.86, side: DoubleSide })
   leafMaterial.name = 'vinci generated October folded leaves'
   leafMaterial.userData = { ...PROVENANCE }
+  // A leaf is thin. The side turned away from the sun carries light through
+  // it instead of going black, which is what a crown seen from under it is.
+  // The direction is the wing's own hour, taken from the same ephemeris the
+  // key light stands on; the shading normal is the one the face is drawn
+  // with, so a leaf lights as transmitted exactly when the sun is behind it.
+  const through = transformedNormalWorld.dot(vec3(SUN_TOWARD.x, SUN_TOWARD.y, SUN_TOWARD.z)).negate().max(0).pow(1.35)
+  leafMaterial.emissiveNode = vertexColor().mul(color('#c8c887')).mul(through).mul(0.55)
 
   const branches = new Mesh(geometry(wood), bark)
   branches.name = 'vinci generated trunks roots and branching limbs'
