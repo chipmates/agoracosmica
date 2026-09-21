@@ -36,7 +36,7 @@
       "prompt": "Deterministic tapering trunks, unequal forks, terminal sprays and folded October leaves. Placement and size conjectural; no photograph sampled. Add six fixed conjectural middle-distance trees on the northern and western hillside at the six EN positions declared in the planting record, retaining all original near/distant planting and excluding mapped water as well as construction and circulation. All tiers retain the same proposed tree positions; this is scenic modern-garden character, not a period planting map. Connect the existing trunks and knee forks with shared parallel-transported rings and continuous taper normals. The four near trees receive one buttressed collar each, with individually sampled embedded toes. Root shapes and dimensions remain conjectural; all current tree positions and leaf materials are retained. Every same-tier triangle and attribute is retained in two spatial branch clusters plus eight leaf clusters in calm, or four branch clusters plus sixteen leaf clusters in standard/hero. Native per-pass frustum culling uses their bounds; no camera-dependent population or shadow changes.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-10",
-      "sha256": "25f680699ba15c5400c4ee896c0f9d49fc018c6c551d7f0b8d357f099c1af445",
+      "sha256": "808121ac5015f8632b38d2aa4c6143b52bd0649d357292e8c9f5b8d2d44e82b8",
       "note": "Q119 Q128 Q178 modern planting as character reference; recipe_file=src/wings/vinci/vegetation.ts; connected_trunk_and_knee_rings=parallel_transport; near_trunk_ring_sides=12; near_root_collars=4; root_collar_radius_in_trunk_radii=1.65..3.65; root_toe_embed_m=0.02; next_collar_ring_min_clearance_m=0.20; root_micropositions_shapes_dimensions=conjectural; partition_recipe=src/wings/vinci/dressing-partition.ts; partition_sha256=bd799c2eae138b44b709ec350dbdfb858932421ca3ba4f1407e16a9a42dad3a8; branch_clusters_calm_standard_hero=2,4,4; leaf_clusters_calm_standard_hero=8,16,16; partition_preserves=all_same_tier_attributes_winding_material_transforms_shadows"
     },
     {
@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed to a pale grey at 30 per cent. Assumed weather, no observation claimed.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "cd6c3c8474e66ca5c26bbd985f0468bdcfd761ab8e6dc230d96c471868ea306a",
+      "sha256": "d290962d9030525625690a14029c4c2449b1731742d99a7a2a2e3114db4c3492",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=80c458f2cb5ccddb7fcedccda5df70e5cdccda7d9ca97d65ebfa6462920f61ef;"
     },
     {
@@ -62,7 +62,7 @@
       "prompt": "Museum camera poses and piecewise exterior circulation in the fixed dossier frame. All poses are exhibition choices. Latest target semantic navigation on measured gate/terrace/stair/apron routes. Bounded physical near-pyramid clearance; measured geometry identity at mount. CSS projection-derived drag with 0.1 second monotone response; explicit inspection entry and return. The active certified leg finishes before a direct certified route to the newest pending target. Static material inspection aliases have separate actual placement audits.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "d016c7e61e23b836ee68cb1df68d69ad28946981beedf5a022d599646786273e",
+      "sha256": "a1874f60c01993e47aec02c9c0407a87b168c7c628cd8b7b9fae1e4a0dff9a69",
       "note": "brief/CONCEPT.md; src/wings/vinci/data/closluce.json; recipe_file=src/wings/vinci/rail.ts; companion_file=src/wings/vinci/input.ts; companion_recipe_ids=vinci/rail-smoothing,vinci/rail-proof,vinci/rail-fingerprint,vinci/rail-projection,vinci/projection-drag,vinci/rail-clearance,vinci/rail-waypoints,vinci/rail-solids,vinci/gait"
     },
     {
@@ -413,7 +413,7 @@
       "prompt": "Regenerable actual geometry certificate for40 directed routes across five pose families and two viewport families. Includes foundation, entry, vegetation and all dressing; no sky, DOM or shadow-only duplicate.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-10",
-      "sha256": "549c9fecc957004b3110ce7e664b3cd194182049e018aeea111f7689c8c1da95",
+      "sha256": "57668b0e60236ddb47907490fe6239432e2710c2746d3f2fd9aecba3a6f57f0b",
       "note": "recipe_file=src/wings/vinci/data/rail-clearance.json; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail; companion_file=src/wings/vinci/collection/approaches.ts"
     },
     {
@@ -2743,7 +2743,7 @@
       "prompt": "Interpretive museum slab with name only, an empty bronze bezel with its own note, a separate presumed plaque on a footed base and based on a sourced account, and a constructed framed gable relief for the computed sun under a raked reading ledge. No bones or invented historical plaque facsimile.",
       "model": "Deterministic TypeScript geometry and TSL materials",
       "date": "2026-09-10",
-      "sha256": "9c63dd5dfa75a656554747c87784a19cddb5fe818cb842c98f2d3deebca668d1",
+      "sha256": "2f19e846f64d5fa4c568241ddf01c1e57e6446e3d9420b4ba33571e7ebfa6b52",
       "note": "recipe_file=src/wings/vinci/grave/index.ts"
     },
     {
