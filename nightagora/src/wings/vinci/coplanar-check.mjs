@@ -25,6 +25,12 @@ import * as TSL from 'three/tsl'
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..')
 const args = process.argv.slice(2)
 const ALL = args.includes('--all')
+/* TWO FACES OF ONE BODY FIGHT EACH OTHER TOO. The scan groups a plane's
+   faces by the mesh NAME, and a module that welds one batch per material
+   gives every batch the same name, so a pale run ending on a dark run's end
+   plane inside one body is invisible to it. `--self` groups by the mesh
+   itself, which is the reading that finds a run's own end. */
+const SELF = args.includes('--self')
 const AREA_MIN = Number(args[args.indexOf('--area') + 1]) || 0.01
 /** a plane is one plane when two faces lie within this of it */
 /* AND NEARLY ONE PLANE IS THE SAME DEFECT AT A DISTANCE. Two faces two
@@ -114,7 +120,7 @@ for (const { name, group } of bodies) {
     const index = object.geometry.getIndex()
     const count = index ? index.count : position.count
     const matrix = object.matrixWorld
-    const mesh = object.name || name
+    const mesh = SELF ? `${object.name || name}#${object.id}` : object.name || name
     for (let at = 0; at + 2 < count; at += 3) {
       const v = [0, 1, 2].map(corner => {
         const i = index ? index.getX(at + corner) : at + corner
@@ -133,6 +139,35 @@ for (const { name, group } of bodies) {
       faces.push({ body: name, mesh, n, d: n.dot(v[0]), v, area: twice / 2 })
     }
   })
+}
+
+/* WHAT STANDS HERE. A defect is reported as a place before it is reported as
+   a pair, and a place is six numbers. `--at x0,y0,z0,x1,y1,z1` names every
+   mesh with a face inside that box, with its plane and its own extent, which
+   is how a sighting in a frame becomes a body in a file. */
+const AT = (args[args.indexOf('--at') + 1] ?? '').split(',').map(Number).filter(Number.isFinite)
+if (AT.length === 6) {
+  const box = { x: [Math.min(AT[0], AT[3]), Math.max(AT[0], AT[3])], y: [Math.min(AT[1], AT[4]), Math.max(AT[1], AT[4])], z: [Math.min(AT[2], AT[5]), Math.max(AT[2], AT[5])] }
+  const inside = v => v.x >= box.x[0] && v.x <= box.x[1] && v.y >= box.y[0] && v.y <= box.y[1] && v.z >= box.z[0] && v.z <= box.z[1]
+  const here = new Map()
+  for (const face of faces) {
+    if (!face.v.some(inside)) continue
+    const key = `${face.body} | ${face.mesh} | n=${[face.n.x, face.n.y, face.n.z].map(c => c.toFixed(2)).join(',')} | d=${face.d.toFixed(4)}`
+    const seen = here.get(key) ?? { faces: 0, area: 0, x: [Infinity, -Infinity], y: [Infinity, -Infinity], z: [Infinity, -Infinity] }
+    seen.faces++; seen.area += face.area
+    for (const v of face.v) {
+      seen.x = [Math.min(seen.x[0], v.x), Math.max(seen.x[1], v.x)]
+      seen.y = [Math.min(seen.y[0], v.y), Math.max(seen.y[1], v.y)]
+      seen.z = [Math.min(seen.z[0], v.z), Math.max(seen.z[1], v.z)]
+    }
+    here.set(key, seen)
+  }
+  const rows = [...here].sort((a, b) => b[1].area - a[1].area).map(([key, s]) => ({
+    what: key, faces: s.faces, area: +s.area.toFixed(4),
+    east: s.x.map(v => +v.toFixed(4)), height: s.y.map(v => +v.toFixed(4)), north: s.z.map(v => +(-v).toFixed(4)),
+  }))
+  process.stdout.write(JSON.stringify({ checker: 'vinci-coplanar', at: AT, planes: rows.length, rows }, null, 1) + '\n')
+  process.exit(0)
 }
 
 /* ---- buckets: one normal to a degree, then offsets clustered at 2 mm ---- */
