@@ -15,11 +15,15 @@ import Public from '../../../layouts/Public.astro';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
 import EssayStyles from '../../../components/EssayStyles.astro';
 import EssayInvite from '../../../components/EssayInvite.astro';
+import PoemDoor from '../../../components/PoemDoor.astro';
 import { figureImage } from '../../../lib/figureImages';
 import { breadcrumbSchema } from '../../../lib/schemas';
 import { canonicalUrl, SITE_URL } from '../../../lib/urls';
 
 const lang = 'en' as const;
+// Slot 4 of the app's ask contract is this page's own question: the door skips
+// the mode choice and opens Free Talk about the poem the visitor just read.
+const DOOR_HREF = '/app?figure=rumi&lang=en&ask=f:rumi:4';
 const PAGE_PATH = '/figures/rumi/poems';
 const PAGE_URL = canonicalUrl(PAGE_PATH);
 
@@ -208,6 +212,14 @@ const schemas = [
       </p>
     </header>
 
+    <PoemDoor
+      at="hero"
+      href={DOOR_HREF}
+      buttonLabel="Ask his Echo about it"
+      figureId="rumi"
+      shapedBy="his real work"
+    />
+
     <section class="esy-section">
       <h2 class="esy-h2">About this translation</h2>
       <p class="esy-p">
@@ -231,11 +243,22 @@ const schemas = [
       <h2 class="esy-h2">Eight passages from the Masnavi</h2>
       <div class="esy-poemlist">
         {PASSAGES.map((p, i) => (
-          <details class="esy-poem" open={i === 0}>
-            <summary class="esy-poem__summary">{p.title}</summary>
-            <p class="esy-poem__intro">{p.intro}</p>
-            <div class="esy-poem__text">{POEMS[p.key].text.split('\n\n').map(stanza => (<div class="esy-poem__stanza">{stanza.split('\n').map(line => (<span class="esy-poem__line">{line}</span>))}</div>))}</div>
-          </details>
+          <Fragment>
+            <details class="esy-poem" open={i === 0}>
+              <summary class="esy-poem__summary">{p.title}</summary>
+              <p class="esy-poem__intro">{p.intro}</p>
+              <div class="esy-poem__text">{POEMS[p.key].text.split('\n\n').map(stanza => (<div class="esy-poem__stanza">{stanza.split('\n').map(line => (<span class="esy-poem__line">{line}</span>))}</div>))}</div>
+            </details>
+            {i === 0 && (
+              <PoemDoor
+                at="after-first-poem"
+                href={DOOR_HREF}
+                buttonLabel="Ask his Echo about it"
+                figureId="rumi"
+                shapedBy="his real work"
+              />
+            )}
+          </Fragment>
         ))}
       </div>
     </section>

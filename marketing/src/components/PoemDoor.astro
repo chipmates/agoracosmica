@@ -1,0 +1,78 @@
+---
+// One quiet app door near the top of a poem reading page. These pages run
+// without the sticky bar and their own invite sits thousands of pixels down, so
+// on a phone this is the only door an arrival sees without scrolling.
+// The pages render both slots; the placement constant decides which one appears.
+
+type PoemDoorSlot = 'hero' | 'after-first-poem';
+
+interface Props {
+  /** Which slot this instance sits in. Only the active placement renders. */
+  at: PoemDoorSlot;
+  href: string;
+  buttonLabel: string;
+  /** Internal figure id for the conversion metadata, as the page's invite uses it. */
+  figureId: string;
+  /** What the page's own invite says the Echo is shaped by. Omit for the plain line. */
+  shapedBy?: string;
+}
+
+const PLACEMENT: PoemDoorSlot = 'hero';
+
+const { at, href, buttonLabel, figureId, shapedBy } = Astro.props;
+
+const note = shapedBy
+  ? `An AI voice, shaped by ${shapedBy}. 30 free messages a day, no signup.`
+  : 'An AI voice. 30 free messages a day, no signup.';
+---
+{at === PLACEMENT && (
+  <aside class:list={['poem-door', at === 'hero' ? 'poem-door--hero' : 'poem-door--inlist']}>
+    <p class="poem-door__line">Want to stay with a poem a little longer?</p>
+    <a
+      class="poem-door__button pub-cta__button"
+      href={href}
+      data-agc-cta="start-exploring"
+      data-agc-figure={figureId}
+      data-agc-door="poem_top"
+    >{buttonLabel}</a>
+    <p class="poem-door__note">{note}</p>
+  </aside>
+)}
+
+<style>
+  /* The left rule is the poem blocks' own mark, so the door reads as part of
+     the reading column rather than a banner dropped into it. */
+  .poem-door {
+    padding-left: 1.5rem;
+    border-left: 2px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  }
+  .poem-door--hero {
+    margin: 0 0 3rem;
+  }
+  .poem-door--inlist {
+    margin: 0.4rem 0;
+  }
+  .poem-door__line {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--text-primary);
+    margin: 0 0 1.1rem;
+    max-width: 30rem;
+  }
+  .poem-door__button {
+    display: inline-flex;
+  }
+  .poem-door__note {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-xs);
+    line-height: var(--leading-relaxed);
+    color: var(--text-tertiary);
+    margin: 0.85rem 0 0;
+    max-width: 33rem;
+  }
+  @media (max-width: 560px) {
+    .poem-door {
+      padding-left: 1rem;
+    }
+  }
+</style>
