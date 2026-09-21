@@ -1,0 +1,299 @@
+/* THE WORDS AND THE WAYS, the frozen desktop design's first two steps. Every
+   rule here is gated on the step's own switch, so with the switches off the
+   wing is today's picture at every station, to the pixel. */
+
+#wing[data-desk] {
+  /* one margin, one foot line, one measure, shared by every word the museum
+     will show: the wall, the drawer, the record and the index take these */
+  --desk-g: max(64px, (100vw - 1680px) / 2);
+  --desk-foot: clamp(48px, 7.1vh, 72px);
+  --desk-read: clamp(560px, 53vw, 780px);
+  --desk-title: #fff5e3;
+  --desk-clock: #ecd09a;
+  --desk-quiet: #b9bdc9;
+  /* the wing's own four, cut for the certainty classes it already carries */
+  --desk-sure-documented: #8cba8b;
+  --desk-sure-reconstructed: #d2a557;
+  --desk-sure-conjectural: #df9385;
+  --desk-sure-unknown: #a8b3b7;
+  --desk-glass: color-mix(in srgb, var(--na-abyss) 74%, transparent);
+  --desk-edge: color-mix(in srgb, var(--na-starlight) 32%, transparent);
+  --desk-press: 90ms;
+  --desk-release: 160ms;
+}
+/* THE NARROW MEASURE, the first and cheapest of the three remedies for a
+   station whose subject the words would otherwise cover. */
+#wing[data-desk][data-measure='narrow'] { --desk-read: 560px; }
+
+/* ---- the low band: words left, ways right, one foot line ---- */
+.desk-low {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  padding: 110px var(--desk-g) var(--desk-foot);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 40px;
+  pointer-events: none;
+}
+.desk-low button { pointer-events: auto; }
+/* THE DUSK IS A GRADIENT AND NEVER A PANEL, and it is sized by the text: it
+   reaches .80 before the first text pixel and .93 at the foot, so the worst
+   ground this museum owns still reads at 4.5 to 1. Nothing at rest is opaque. */
+.desk-low {
+  background: linear-gradient(
+    color-mix(in srgb, var(--na-abyss) 0%, transparent),
+    color-mix(in srgb, var(--na-abyss) 42%, transparent) 52px,
+    color-mix(in srgb, var(--na-abyss) 80%, transparent) 96px,
+    color-mix(in srgb, var(--na-abyss) 93%, transparent)
+  );
+}
+
+.desk-cap { flex: 0 1 var(--desk-read); max-width: var(--desk-read); min-width: 0; }
+.desk-nothing { flex: 0 1 var(--desk-read); }
+
+/* THE TOP DUSK, so the words on the top edge keep their line over a noon sky.
+   It holds .62 under the top row and is gone before the picture's middle. */
+.desk-top {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 240px;
+  pointer-events: none;
+  /* it begins under the museum's own masthead, which keeps its full strength */
+  background: linear-gradient(
+    color-mix(in srgb, var(--na-abyss) 0%, transparent) 56px,
+    color-mix(in srgb, var(--na-abyss) 70%, transparent) 104px,
+    color-mix(in srgb, var(--na-abyss) 62%, transparent) 184px,
+    color-mix(in srgb, var(--na-abyss) 0%, transparent)
+  );
+}
+
+.desk-name { display: flex; align-items: center; gap: 11px; min-height: 32px; margin: 0 0 6px; }
+.desk-mark { flex: none; width: 18px; height: 18px; display: block; overflow: visible; }
+.desk-mark-full { fill: var(--desk-sure-documented); stroke: var(--desk-title); stroke-width: 1.5; }
+.desk-mark-ring { fill: var(--na-abyss); stroke: var(--desk-sure-reconstructed); stroke-width: 1.8; }
+.desk-mark-half { fill: var(--desk-sure-reconstructed); }
+.desk-mark-open { fill: var(--na-abyss); stroke: var(--desk-sure-conjectural); stroke-width: 2.4; }
+.desk-mark-broken {
+  fill: var(--na-abyss);
+  stroke: var(--desk-sure-unknown);
+  stroke-width: 2.2;
+  stroke-dasharray: 3.2 2.6;
+}
+.desk-chapter {
+  font: 400 1.25rem/1.625rem var(--serif);
+  color: var(--desk-title);
+  text-shadow: var(--ink-night);
+}
+.desk-clock, .desk-count {
+  font: 500 0.9375rem/1.625rem var(--sans);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  text-shadow: var(--ink-night);
+}
+.desk-clock { color: var(--desk-clock); }
+.desk-count {
+  font-size: 0.875rem;
+  color: var(--desk-quiet);
+  font-variant-numeric: tabular-nums;
+}
+.desk-clock::before, .desk-count::before {
+  content: '\00b7';
+  margin-right: 11px;
+  color: color-mix(in srgb, var(--na-starlight) 60%, transparent);
+}
+.desk-clock[hidden] { display: none; }
+
+/* THE LINE: at most three rows in this measure, in every language. */
+.desk-line {
+  margin: 0;
+  font: 400 clamp(1.375rem, 0.95rem + 1vw, 1.875rem) / 1.334 var(--serif);
+  color: var(--desk-title);
+  text-wrap: pretty;
+  text-shadow: var(--ink-night);
+}
+.desk-line[hidden] { display: none; }
+
+.desk-foot { display: flex; align-items: center; gap: 10px; margin: 12px 0 0; flex-wrap: wrap; }
+.desk-word-control {
+  height: 44px;
+  min-width: 44px;
+  padding: 0 14px 0 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  border: 0;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--na-abyss) 55%, transparent);
+  box-shadow: inset 0 0 0 1px var(--desk-edge);
+  font: 500 0.9375rem/1 var(--sans);
+  color: var(--na-starlight);
+  white-space: nowrap;
+  cursor: pointer;
+}
+/* A CONTROL WHOSE OWN STEP HAS NOT LANDED names itself and refuses: it is
+   inert, not missing, so the row the owner walks is the row he will keep. */
+.desk-word-control[aria-disabled='true'] { opacity: 0.55; cursor: default; }
+.desk-key {
+  display: inline-block;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--na-starlight) 34%, transparent);
+  font: 500 0.875rem/20px var(--sans);
+  color: var(--desk-quiet);
+  text-align: center;
+}
+.desk-ic { width: 16px; height: 16px; display: block; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.desk-tell .desk-ic { fill: currentColor; stroke: none; }
+
+/* ---- the ways: one corner, two controls, neither ever moves ---- */
+.desk-ways { flex: none; display: flex; align-items: center; gap: 12px; }
+.desk-back {
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--desk-glass);
+  box-shadow: inset 0 0 0 1px var(--desk-edge);
+  display: grid;
+  place-items: center;
+  color: var(--na-starlight);
+  cursor: pointer;
+}
+.desk-back:disabled { opacity: 0.45; cursor: default; }
+/* ONE BOX AT EVERY STATION. The longest German chapter title of the set
+   sizes the control, so it never moves when the words inside it change. */
+.desk-on {
+  min-height: 64px;
+  min-width: 360px;
+  padding: 9px 10px 9px 22px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border: 0;
+  border-radius: 3px;
+  background:
+    linear-gradient(color-mix(in srgb, var(--na-gold) 17%, transparent), color-mix(in srgb, var(--na-gold) 17%, transparent)),
+    color-mix(in srgb, var(--na-abyss) 80%, transparent);
+  box-shadow: inset 0 0 0 1px var(--na-gold);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--desk-release) ease, transform var(--desk-release) ease;
+}
+.desk-on-words { display: block; flex: 1 1 auto; min-width: 0; }
+.desk-on-kicker {
+  display: block;
+  font: 600 0.875rem/1.125rem var(--sans);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--na-gold);
+}
+.desk-on-title {
+  display: block;
+  font: 400 1.1875rem/1.5rem var(--serif);
+  color: var(--desk-title);
+  max-width: 264px;
+}
+.desk-on-title[hidden] { display: none; }
+.desk-on-arrow {
+  position: relative;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--na-gold);
+  display: grid;
+  place-items: center;
+  color: var(--na-gold);
+}
+.desk-on-arrow .desk-ic { width: 18px; height: 18px; stroke-width: 1.8; }
+.desk-on:hover { background: linear-gradient(color-mix(in srgb, var(--na-gold) 27%, transparent), color-mix(in srgb, var(--na-gold) 27%, transparent)), color-mix(in srgb, var(--na-abyss) 80%, transparent); }
+.desk-on:active {
+  transform: scale(0.98);
+  background: linear-gradient(color-mix(in srgb, var(--na-gold) 36%, transparent), color-mix(in srgb, var(--na-gold) 36%, transparent)), color-mix(in srgb, var(--na-abyss) 80%, transparent);
+  transition-duration: var(--desk-press);
+}
+.desk-on:disabled { opacity: 0.45; cursor: default; }
+/* THE LEG IS THE RING, counted and never timed. */
+.desk-on-ring { position: absolute; inset: 0; width: 44px; height: 44px; transform: rotate(-90deg); }
+.desk-on-ring circle { fill: none; stroke: var(--na-gold); stroke-width: 3; stroke-dasharray: 0 129; }
+.desk-on[data-leg='false'] .desk-on-ring { display: none; }
+
+.desk-low :is(button):focus-visible { outline: 2px solid var(--na-gold); outline-offset: 3px; }
+
+/* ---- WHAT EVERY CONTROL DOES WHILE THE CAMERA MOVES ----
+   Nothing is told while walking: the words and their two controls go, the
+   ways stay. The way back stays at half strength and still answers. */
+.desk-cap { transition: opacity 240ms cubic-bezier(.22,.61,.36,1) 500ms, transform 240ms cubic-bezier(.22,.61,.36,1) 500ms; }
+#wing[data-walking] .desk-cap {
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition-duration: 160ms;
+  transition-delay: 0ms;
+}
+#wing[data-walking] .desk-back { opacity: 0.45; }
+
+@media (prefers-reduced-motion: reduce) {
+  /* THE EYE IS PLACED, so there is no leg to be quiet during: the words
+     stand at full strength at once and no ring is drawn. */
+  .desk-cap, .desk-on { transition: none; }
+  #wing[data-walking] .desk-cap { opacity: 1; transform: none; pointer-events: auto; }
+  .desk-on-ring { display: none; }
+}
+body.forge .desk-cap, body.forge .desk-on { transition: none !important; }
+
+/* ---- THE PARTS THESE TWO STEPS REPLACE, MEANWHILE ----
+   The station card stands down where the words speak. The bar and the door
+   block keep every word, every target and every key, and take the top band,
+   which is where the design's own top row stands: the way home, the thread
+   and the side doors. Their final places are desk.sheet's and desk.drawer's. */
+#wing[data-desk~='words'] .vinci-heading { display: none; }
+#wing[data-desk~='words'], #wing[data-desk~='ways'] {
+  /* the row and the sources window clear the words instead of standing in
+     them: one number, published by the band that knows its own height */
+  --wing-rail-bottom: calc(var(--desk-foot-clear, 260px) + 16px);
+}
+/* The frame places its own bar with an inline rule, which only a loud one
+   can move: this is the one place a step overrules the frame. */
+#wing[data-desk~='words'] .wing-rail-group,
+#wing[data-desk~='ways'] .wing-rail-group {
+  top: 76px !important;
+  bottom: auto !important;
+  left: var(--desk-g) !important;
+  transform: none !important;
+  max-width: calc(100vw - var(--desk-g) * 2) !important;
+}
+/* The door keeps its own glass over the live picture, because a top dusk
+   alone leaves an italic question at 3.3 to 1 over a white wall. */
+#wing[data-desk~='words'] .wing-doorblock,
+#wing[data-desk~='ways'] .wing-doorblock {
+  top: 130px;
+  bottom: auto;
+  left: var(--desk-g);
+  right: auto;
+  width: fit-content;
+  max-width: calc(100vw - var(--desk-g) * 2);
+  padding: 8px 14px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--na-abyss) 55%, transparent);
+  box-shadow: inset 0 0 0 1px var(--desk-edge);
+  justify-content: flex-start;
+  text-align: left;
+}
+/* The question keeps its own measure so the door stands beside it and not a
+   screen away: a balanced two row question left a hand's width of nothing. */
+#wing[data-desk~='words'] .wing-doorblock .wing-question,
+#wing[data-desk~='ways'] .wing-doorblock .wing-question {
+  text-align: left;
+  max-width: 44ch;
+  text-wrap: pretty;
+}

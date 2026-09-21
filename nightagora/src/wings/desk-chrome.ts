@@ -1,0 +1,305 @@
+/* THE DESKTOP'S WORDS AND WAYS. Two steps of the frozen design, each behind
+   its own switch and each able to stand without the other.
+
+   THE WORDS stand on one margin in the lower left: the name row with the
+   certainty mark, the chapter title, the age clock and the chapter count,
+   then the line, then the two worded controls. THE WAYS stand in the lower
+   right: the way back, and one gold control that always means go on and
+   names the chapter it goes to. Both hang from one foot line, and neither
+   ever moves.
+
+   Nothing here knows da Vinci. The host hands the standing station, the one
+   after it in the order the rail walks, and the words of both. */
+
+import { deskOn } from './desk-switches'
+import { deskStoryStop } from './desk-story'
+import type { VinciCertainty, VinciText } from './vinci/content'
+
+export interface DeskStation {
+  id: string
+  /** the station's place in the order the rail walks today, from zero */
+  index: number
+  /** how many the rail walks today */
+  count: number
+}
+
+export interface DeskChromeHost {
+  /** the wing's own stage: the band hangs in it and takes no pointer */
+  stage: HTMLElement
+  /** `#wing`, where the switches and the walking attribute are written */
+  wing: HTMLElement
+  lang: () => 'en' | 'de'
+  standing: () => DeskStation
+  /** the station the way on leads to, or null at the end of the walk */
+  next: () => DeskStation | null
+  /** a stop the story layer does not carry falls back to the wing's name */
+  name: (id: string) => VinciText
+  /** the words of the controls the frame and the wing already carry */
+  words: {
+    next: VinciText
+    back: VinciText
+  }
+  go: (index: number) => void
+  /** how much of the leg under way is walked, 0 to 1, or null at rest */
+  leg: () => number | null
+  /** a second press on the gold control while a leg runs */
+  hurry: () => void
+}
+
+export interface DeskChrome {
+  /** The first pixel down the screen the chrome owns: where a panel that used
+      to stop above the bar now stops. Null while neither step stands. */
+  floor(): number | null
+  /** the station changed, or the language did */
+  paint(): void
+  /** one frame: the counted ring and nothing else */
+  update(): void
+  /** True when the key was the ways'. */
+  key(event: KeyboardEvent): boolean
+  dispose(): void
+}
+
+/* THE WORDS THE DESIGN NEEDS AND THE WING DOES NOT CARRY YET. Verbatim from
+   the frozen design's own list; every one is in the STATUS for the text
+   owner, and none of them is invented here. */
+const DESK_WORDS: Readonly<Record<'more' | 'tell' | 'end' | 'walking' | 'faster', VinciText>> = {
+  more: { en: 'More about this place', de: 'Mehr über diesen Ort' },
+  tell: { en: 'Tell me the story', de: 'Erzähl mir die Geschichte' },
+  end: { en: 'The end', de: 'Das Ende' },
+  walking: { en: 'Walking', de: 'Unterwegs' },
+  faster: { en: 'Walk faster', de: 'Schneller gehen' },
+}
+
+const SVG = 'http://www.w3.org/2000/svg'
+
+function icon(path: string): SVGSVGElement {
+  const svg = document.createElementNS(SVG, 'svg')
+  svg.setAttribute('viewBox', '0 0 16 16')
+  svg.setAttribute('class', 'desk-ic')
+  svg.setAttribute('aria-hidden', 'true')
+  const line = document.createElementNS(SVG, 'path')
+  line.setAttribute('d', path)
+  svg.append(line)
+  return svg
+}
+
+const ARROW_ON = 'M3 8h10M9 4l4 4-4 4'
+const ARROW_BACK = 'M13 8H3M7 4L3 8l4 4'
+const PLAY = 'M5 3l8 5-8 5z'
+
+/* SHAPE CARRIES THE CLASS, so the mark survives a grey print and a colour
+   blind eye, and the colour reinforces it: a full disc, a half disc, an open
+   ring, a broken ring. The four colours are the wing's own. */
+function mark(certainty: VinciCertainty): SVGSVGElement {
+  const svg = document.createElementNS(SVG, 'svg')
+  svg.setAttribute('viewBox', '0 0 18 18')
+  svg.setAttribute('class', 'desk-mark')
+  svg.dataset['certainty'] = certainty
+  svg.setAttribute('aria-hidden', 'true')
+  const ring = document.createElementNS(SVG, 'circle')
+  ring.setAttribute('cx', '9')
+  ring.setAttribute('cy', '9')
+  if (certainty === 'documented') {
+    ring.setAttribute('r', '6.2')
+    ring.setAttribute('class', 'desk-mark-full')
+  } else if (certainty === 'reconstructed') {
+    ring.setAttribute('r', '6.2')
+    ring.setAttribute('class', 'desk-mark-ring')
+    const half = document.createElementNS(SVG, 'path')
+    half.setAttribute('d', 'M9 2.8a6.2 6.2 0 0 0 0 12.4z')
+    half.setAttribute('class', 'desk-mark-half')
+    svg.append(ring, half)
+    return svg
+  } else {
+    ring.setAttribute('r', '5.8')
+    ring.setAttribute('class', certainty === 'unknown' ? 'desk-mark-broken' : 'desk-mark-open')
+  }
+  svg.append(ring)
+  return svg
+}
+
+function make<K extends keyof HTMLElementTagNameMap>(
+  tag: K, cls: string, text?: string
+): HTMLElementTagNameMap[K] {
+  const node = document.createElement(tag)
+  node.className = cls
+  if (text !== undefined) node.textContent = text
+  return node
+}
+
+/** the whole circumference of the counted ring, in user units */
+const RING = 2 * Math.PI * 20.5
+
+export function createDeskChrome(host: DeskChromeHost): DeskChrome {
+  const words = deskOn('words')
+  const ways = deskOn('ways')
+  const say = (value: VinciText): string => value[host.lang()]
+
+  const band = make('div', 'desk-low')
+  band.dataset['words'] = String(words)
+  band.dataset['ways'] = String(ways)
+
+  /* THE WORDS. One margin, one measure, hung from the foot line. */
+  const cap = make('div', 'desk-cap')
+  const nameRow = make('div', 'desk-name')
+  const chapter = make('span', 'desk-chapter')
+  const clock = make('span', 'desk-clock')
+  const count = make('span', 'desk-count')
+  const line = make('p', 'desk-line')
+  const foot = make('div', 'desk-foot')
+  const more = make('button', 'desk-word-control desk-more')
+  more.type = 'button'
+  const tell = make('button', 'desk-word-control desk-tell')
+  tell.type = 'button'
+  /* THE TWO WAYS DEEPER FROM A STATION stand in their place from this step
+     on, and answer from their own steps: the drawer is desk.drawer and the
+     guided visit is desk.opening. Until then each names itself and refuses. */
+  for (const control of [more, tell]) {
+    control.setAttribute('aria-disabled', 'true')
+    control.addEventListener('click', event => event.preventDefault())
+  }
+  cap.append(nameRow, line, foot)
+
+  /* THE WAYS. One gold control, the way back beside it, neither ever moves. */
+  const waysRow = make('div', 'desk-ways')
+  const back = make('button', 'desk-back')
+  back.type = 'button'
+  back.append(icon(ARROW_BACK))
+  const on = make('button', 'desk-on')
+  on.type = 'button'
+  const onWords = make('span', 'desk-on-words')
+  const onKicker = make('span', 'desk-on-kicker')
+  const onTitle = make('span', 'desk-on-title')
+  onWords.append(onKicker, onTitle)
+  const onArrow = make('span', 'desk-on-arrow')
+  const ring = document.createElementNS(SVG, 'svg')
+  ring.setAttribute('viewBox', '0 0 44 44')
+  ring.setAttribute('class', 'desk-on-ring')
+  ring.setAttribute('aria-hidden', 'true')
+  const ringLine = document.createElementNS(SVG, 'circle')
+  ringLine.setAttribute('cx', '22')
+  ringLine.setAttribute('cy', '22')
+  ringLine.setAttribute('r', '20.5')
+  ring.append(ringLine)
+  onArrow.append(ring, icon(ARROW_ON))
+  on.append(onWords, onArrow)
+  waysRow.append(back, on)
+
+  if (words) band.append(cap)
+  else band.append(make('span', 'desk-nothing'))
+  if (ways) band.append(waysRow)
+  /* The top dusk goes in first, so the bar and the door block stand on it. */
+  const top = make('div', 'desk-top')
+  host.stage.append(top, band)
+
+  back.addEventListener('click', () => {
+    const at = host.standing()
+    if (at.index > 0) host.go(at.index - 1)
+  })
+  on.addEventListener('click', () => pressOn())
+
+  function pressOn(): void {
+    if (host.leg() !== null) { host.hurry(); return }
+    const to = host.next()
+    if (to) host.go(to.index)
+  }
+
+  /** the chapter title of a stop, or the wing's own name where the story
+      layer does not carry that stop yet */
+  function titleOf(id: string): VinciText {
+    return deskStoryStop(id)?.chapter ?? host.name(id)
+  }
+
+  function paint(): void {
+    const at = host.standing()
+    const stop = deskStoryStop(at.id)
+    if (words) {
+      nameRow.textContent = ''
+      const sure: VinciCertainty = stop?.certainty ?? 'reconstructed'
+      nameRow.append(mark(sure), chapter, clock, count)
+      chapter.textContent = say(titleOf(at.id))
+      const age = stop?.age ?? null
+      clock.textContent = age ? say(age) : ''
+      clock.hidden = !age
+      count.textContent = `${at.index + 1} / ${at.count}`
+      line.textContent = stop ? say(stop.line) : ''
+      line.hidden = !stop
+      foot.textContent = ''
+      more.textContent = ''
+      more.append(document.createTextNode(say(DESK_WORDS.more)), make('span', 'desk-key', '↓'))
+      tell.textContent = ''
+      tell.append(icon(PLAY), document.createTextNode(say(DESK_WORDS.tell)))
+      foot.append(more, tell)
+    }
+    if (ways) {
+      const to = host.next()
+      onKicker.textContent = say(to ? host.words.next : DESK_WORDS.end)
+      onTitle.textContent = to ? say(titleOf(to.id)) : ''
+      onTitle.hidden = !to
+      on.setAttribute('aria-label', `${onKicker.textContent}${to ? ` · ${onTitle.textContent}` : ''}`)
+      on.disabled = !to
+      back.setAttribute('aria-label', say(host.words.back))
+      back.disabled = at.index === 0
+    }
+    measure()
+  }
+
+  /* WHAT THE BAND TAKES AT THE FOOT, published for the parts that stood
+     above the bar: the row and the sources window clear the words instead of
+     standing under them. */
+  function measure(): void {
+    if (!words) return
+    requestAnimationFrame(() => {
+      const box = cap.getBoundingClientRect()
+      if (box.height < 1) return
+      host.wing.style.setProperty('--desk-foot-clear', `${Math.round(innerHeight - box.top)}px`)
+    })
+  }
+
+  let walked = -1
+  function update(): void {
+    if (!ways) return
+    const share = host.leg()
+    const running = share !== null
+    if (on.dataset['leg'] !== String(running)) {
+      on.dataset['leg'] = String(running)
+      /* ONE CONTROL, ONE MEANING: while a leg runs it says where the walker
+         is and what a second press does, and the ring is the leg itself. */
+      const to = host.next()
+      onKicker.textContent = say(running ? DESK_WORDS.walking : to ? host.words.next : DESK_WORDS.end)
+      onTitle.textContent = running ? say(DESK_WORDS.faster) : to ? say(titleOf(to.id)) : ''
+      onTitle.hidden = !running && !to
+      on.setAttribute('aria-label', `${onKicker.textContent}${onTitle.hidden ? '' : ` · ${onTitle.textContent}`}`)
+    }
+    const at = running ? Math.max(0, Math.min(1, share)) : 0
+    if (Math.abs(at - walked) < 0.01) return
+    walked = at
+    ringLine.setAttribute('stroke-dasharray', `${(RING * at).toFixed(1)} ${RING.toFixed(1)}`)
+  }
+
+  function key(event: KeyboardEvent): boolean {
+    if (!ways) return false
+    const target = event.target instanceof Element ? event.target : null
+    // a control under the hand answers its own key: the browser presses it
+    if (target?.closest('button,a,[role="button"]')) return false
+    if (event.key === ' ' || event.key === 'Spacebar') { pressOn(); return true }
+    return false
+  }
+
+  return {
+    floor: () => {
+      const box = band.getBoundingClientRect()
+      // the padding above the words is the dusk, not the words: a panel may
+      // stand in it, and stopping at the band's own top would waste it
+      return box.height > 0 ? Math.round(box.bottom - box.height + 110) : null
+    },
+    paint,
+    update,
+    key,
+    dispose() {
+      band.remove()
+      top.remove()
+      host.wing.style.removeProperty('--desk-foot-clear')
+    },
+  }
+}
