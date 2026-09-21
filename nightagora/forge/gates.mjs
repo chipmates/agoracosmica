@@ -672,8 +672,13 @@ if (WING) {
      `*-check.mjs` in the wing's folder is run here, and its exit code is a
      gate line. */
   const wingDir = join('src', 'wings', SLUG)
+  // a wing that carries a story layer owes the story law its check as well
   const checkers = existsSync(join(APP_ROOT, wingDir))
-    ? [...readdirSync(join(APP_ROOT, wingDir)).filter((f) => f.endsWith('-check.mjs')).sort(), 'tiles-check.mjs']
+    ? [
+        ...readdirSync(join(APP_ROOT, wingDir)).filter((f) => f.endsWith('-check.mjs')).sort(),
+        'tiles-check.mjs',
+        ...(existsSync(join(APP_ROOT, wingDir, 'story.ts')) ? ['story-check.mjs'] : []),
+      ]
     : []
   const ran = {}
   for (const f of checkers) {
