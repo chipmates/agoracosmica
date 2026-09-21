@@ -104,6 +104,7 @@ function sweep(
   sides: number,
   seed: number,
   shape?: (point: Vector3, row: number, radial: Vector3) => Vector3,
+  paint?: (normal: Vector3, row: number, index: number) => Color,
 ): void {
   const tangents = centres.map((centre, row) =>
     centres[Math.min(row + 1, centres.length - 1)]!.clone()
@@ -133,8 +134,9 @@ function sweep(
   }))
   const emit = (row: number, index: number): void => {
     const normal = normals[row]![index]!
-    const colour = BARK.clone().lerp(LICHEN, Math.max(0, -normal.z) * .42)
-      .multiplyScalar(.80 + .18 * Math.sin(seed + index * 2.8) ** 2)
+    const colour = paint ? paint(normal, row, index)
+      : BARK.clone().lerp(LICHEN, Math.max(0, -normal.z) * .42)
+        .multiplyScalar(.80 + .18 * Math.sin(seed + index * 2.8) ** 2)
     vertex(target, rings[row]![index]!, normal, colour)
   }
   for (let row = 0; row < rings.length - 1; row++) for (let index = 0; index < sides; index++) {
@@ -153,6 +155,32 @@ function limb(target: GeometryBatch, start: Vector3, finish: Vector3,
 
 /** how much of a leaf's shading normal comes from the crown's own volume */
 const LEAF_NORMAL_BEND = .62
+
+/** THE CLOSED PART OF A CROWN. Leaves alone cover about a quarter of what
+ * they are sprayed through, so the sky stands behind every one of them. One
+ * soft body per fork carries the mass the leaves then break, which is what a
+ * crown is: a closed inside with a leafy edge. It is deliberately cheap, and
+ * the leaf count pays for it. */
+function crownMass(
+  target: GeometryBatch,
+  from: Vector3,
+  to: Vector3,
+  radius: number,
+  sides: number,
+  seed: number,
+  tone: Color,
+): void {
+  const axis = to.clone().sub(from)
+  const centres = [
+    from.clone().addScaledVector(axis, -.10),
+    from.clone().addScaledVector(axis, .30),
+    from.clone().addScaledVector(axis, .72),
+    from.clone().addScaledVector(axis, 1.18),
+  ]
+  const radii = [radius * .20, radius, radius * .88, radius * .18]
+  sweep(target, centres, radii, sides, seed, undefined, (normal) =>
+    tone.clone().multiplyScalar(.80 + .26 * Math.max(0, normal.y)))
+}
 
 /** A leaf is a shallow folded kite with a real pointed silhouette, two
     triangular faces and an actual midrib crease. There is no alpha card. */
@@ -306,6 +334,7 @@ function* grow(
     if (bank < TREE_BANKS && grown >= retainedPlans.length * bank / TREE_BANKS) { bank++; yield }
     const random = randomSource(plan.seed)
     const leafRandom = randomSource(plan.seed + 98873)
+    const massRandom = randomSource(plan.seed + 20707)
     const base = new Vector3(plan.east, heightAt(plan.east, plan.north) - 0.06, -plan.north)
     const trunkRadius = plan.height * (plan.near ? 0.028 : 0.023)
     const lean = new Vector3((random() - 0.5) * 1.3, 0, (random() - 0.5) * 1.3)
@@ -370,19 +399,27 @@ function* grow(
         const bough = new Vector3(Math.cos(direction), 0.22 + random() * 0.58, Math.sin(direction))
         const twigEnd = source.clone().addScaledVector(bough, plan.spread * (0.22 + random() * 0.15))
         limb(wood, source, twigEnd, radius * 0.25, 0.012, plan.near ? 4 : 3, fork + branch)
+        {
+          const middle = source.clone().lerp(twigEnd, .5).sub(crownCentre)
+          const at = Math.min(1, Math.max(0, Math.hypot(middle.x, middle.z) / crownReach * .64
+            + (middle.y / crownRise * .5 + .5) * .36))
+          crownMass(foliage, source, twigEnd, plan.spread * (plan.near ? .108 : .150) * (.86 + massRandom() * .30),
+            plan.near ? 5 : 4, branch * 7 + fork,
+            LEAF_SHADE.clone().lerp(LEAF_GREENS[1]!, .12 + .40 * at))
+        }
         const twigs = plan.near ? 3 : 2
         for (let twig = 0; twig < twigs; twig++) {
           const twigStart = source.clone().lerp(twigEnd, 0.36 + twig * 0.24)
           const twigAngle = direction + (twig % 2 ? 0.82 : -0.78)
           const tip = twigStart.clone().add(new Vector3(Math.cos(twigAngle) * 0.78, 0.21 + random() * 0.51, Math.sin(twigAngle) * 0.78))
           if (plan.near) limb(wood, twigStart, tip, 0.019, 0.004, 3, twig)
-          const count = plan.near ? (calm ? 42 : 84) : (calm ? 36 : 72)
+          const count = plan.near ? (calm ? 34 : 68) : (calm ? 29 : 58)
           for (let i = 0; i < count; i++) {
             // An elongated spray follows the twig. Its uneven edges and
             // unfilled centre leave the branch hierarchy legible from afar.
             const along = leafRandom()
             const curl = i * 2.39996 + leafRandom() * 0.5
-            const spray = (0.15 + Math.sin(along * Math.PI) * 0.50) * (plan.near ? 1 : 1.65)
+            const spray = (0.11 + Math.sin(along * Math.PI) * 0.30) * (plan.near ? 1 : 1.32)
             const point = twigStart.clone().lerp(tip, along)
               .add(new Vector3(Math.cos(curl) * spray, (leafRandom() - 0.5) * spray * 0.9, Math.sin(curl) * spray))
             // Where the leaf sits in the crown, as the two things an eye
