@@ -12,7 +12,8 @@ import * as TSL from 'three/tsl'
 import type { Stack } from '../../../stack'
 import type { GrainRecipe, MaterialClass, MaterialSet } from '../../../stack/materials'
 import {
-  anisotropicFootprint, applyDetail, axisFootprint, fitScales, reliefNormal, resolved, surfaceDetail,
+  anisotropicFootprint, applyDetail, axisFootprint, fitScales, lineCoverage, reliefNormal, resolved,
+  specularAA, surfaceDetail,
 } from '../../../stack/detail'
 import { COLLECTION_PAVING_ORIGIN, FACE, FLOOR, LINE_SLAB } from './layout'
 
@@ -66,6 +67,8 @@ export interface SurfaceTerms {
   lap: TSLNode
   drift: TSLNode
   cell: TSLNode
+  /** the slope the gates took away, for `specularAA` */
+  lost: TSLNode
   /** the pixel, and the run this face is read along */
   pixel: TSLNode
   along: TSLNode
@@ -102,9 +105,12 @@ export function surfaceTerms(o: SurfaceTermsOptions): SurfaceTerms {
   // over the few cells a frame holds does not average to zero.
   const laid = (coordinate: TSLNode): TSLNode => {
     const t = coordinate.div(o.lapM)
-    return bands(t, 23.7).mul(.62).add(bands(t.mul(2.37).add(1.7), 9.41).mul(.38))
+    // the second lap is laid inside the first and is 2.37 times finer, so it
+    // is gated on ITS period: one gate on the coarse one left it standing
+    return bands(t, 23.7).mul(.62).mul(resolved(o.lapM, thinPixel))
+      .add(bands(t.mul(2.37).add(1.7), 9.41).mul(.38).mul(resolved(o.lapM / 2.37, thinPixel)))
   }
-  const lap = mix(laid(thinZ), laid(thinX), towardX).mul(resolved(o.lapM, thinPixel)).toVar()
+  const lap = mix(laid(thinZ), laid(thinX), towardX).toVar()
   const drift = bands(along.div(o.driftM), 5.13).mul(resolved(o.driftM, alongPixel)).toVar()
   const block = (coordinate: TSLNode): TSLNode =>
     hashOf(floor(along.div(o.cellM![0])).add(floor(coordinate.div(o.cellM![1])).mul(5.73)), 17.31)
@@ -114,7 +120,7 @@ export function surfaceTerms(o: SurfaceTermsOptions): SurfaceTerms {
     : float(0)
   return {
     tone: detail.tone, rough: detail.rough, heightM: detail.heightM,
-    lap, drift, cell, pixel: detail.pixel, along, alongPixel,
+    lap, drift, cell, lost: detail.lost, pixel: detail.pixel, along, alongPixel,
   }
 }
 
@@ -270,12 +276,13 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
   // line far thinner than its own pixel and it broke into dashes from about
   // eight metres. Each coordinate is now filtered on its own derivative.
   const { east: pixelEast, up: pixelUp, north: pixelNorth } = axisFootprint(P)
-  // A joint is a groove, and a groove has to survive the pixel it lands in:
-  // every line below fades to its own area mean instead of shimmering.
+  // A joint is a groove, and a groove has to survive the pixel it lands in.
+  // Widening its edges by the pixel keeps FULL contrast at its centre, so a
+  // 8 mm joint under a 40 mm pixel drew an 80 mm black band that swam with
+  // the eye. What the pixel sees of it is the share of itself it covers.
   const line = (coordinate: TSLNode, spacing: number, offset: number, width: number, axis: TSLNode) => {
     const f = fract(coordinate.sub(offset).div(spacing)), edge = f.min(float(1).sub(f)).mul(spacing)
-    return float(1).sub(smoothstep(float(width).sub(axis.mul(.5)).max(0), float(width).add(axis.mul(.5)), edge))
-      .mul(smoothstep(2, 4, float(spacing).div(axis)))
+    return lineCoverage(edge, width, spacing, axis)
   }
   const hashOf = (index: TSLNode, salt: number): TSLNode => fract(index.mul(salt).sin().mul(4371.13)).sub(.5)
   /** value noise in ONE axis, so a feature can be laid across the axis a
@@ -350,8 +357,8 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
   // zero: its own mean is what moves that frame's exposure.
   const lapM = byRole([.11, .115, .034, .05, .19, .12])
   const lapT = thin.div(lapM)
-  const lap = bands(lapT, 23.7).mul(.62).add(bands(lapT.mul(2.37).add(1.7), 9.41).mul(.38))
-    .mul(resolved(lapM, thinPixel)).toVar()
+  const lap = bands(lapT, 23.7).mul(.62).mul(resolved(lapM, thinPixel))
+    .add(bands(lapT.mul(2.37).add(1.7), 9.41).mul(.38).mul(resolved(lapM.div(2.37), thinPixel))).toVar()
   // And the room-scale drift above the part: damp, handling and years of
   // light do not stop at a board's edge. Metres wide, so it survives any
   // pixel a station stands at, which the part's own macro cannot. Its weight
@@ -400,7 +407,10 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
   const albedo = base.mul(figure.add(1)).mul(float(1).sub(cut))
     .mul(float(1).add(walked.mul(.08)).sub(grime.mul(.13)).sub(handled.mul(.035))).toVar()
   m.colorNode = albedo
-  m.roughnessNode = isSteel.select(float(.42).add(stroke.mul(.09)).sub(handled.mul(.06)),
+  // A RELIEF FILTERED AWAY LEAVES A SMOOTHER PLANE THAN WAS AUTHORED, and a
+  // smoother plane is a shinier one: the slope the gates took goes into the
+  // distribution instead, or the stone sparkles where its tone has gone calm.
+  m.roughnessNode = specularAA(isSteel.select(float(.42).add(stroke.mul(.09)).sub(handled.mul(.06)),
     // STONE TO STONE IN THE SHEEN, not only in the tone. These rooms are lit
     // almost wholly by an indirect term, where a change of albedo is worth two
     // or three levels and a change of gloss is worth the whole grazing
@@ -408,7 +418,7 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
     isFloor.select(float(.62).add(detail.rough).add(cell.mul(.16)).add(lap.mul(.06))
       .add(slabJoint.mul(.15)).sub(walked.mul(.22)).add(grime.mul(.07)),
       isOutdoor.select(float(.88).add(detail.rough).add(cell.mul(.14)).add(lap.mul(.05)).sub(walked.mul(.18)),
-        float(.88).add(detail.rough).add(cell.mul(.1)).add(lap.mul(.07)).add(formBoard.mul(.05)).sub(handled.mul(.09))))).clamp(.30, .97)
+        float(.88).add(detail.rough).add(cell.mul(.1)).add(lap.mul(.07)).add(formBoard.mul(.05)).sub(handled.mul(.09))))).clamp(.30, .97), detail.lost)
   m.metalnessNode = isSteel.select(float(.72), float(.02))
   // A sawn slab keeps a shallow relief of its own; at the room's drift it had
   // none, so nothing on it ever caught a raking light.
@@ -490,7 +500,8 @@ export function collectionExhibitMaterials(): {
       .add(t.lap.mul(part.lap).mul(density)).add(t.drift.mul(part.drift)).add(t.cell.mul(part.cell))
     m.colorNode = vec3(c.r, c.g, c.b).mul(figure.add(1))
     // Gloss carries further than tone where the light is nearly all indirect.
-    m.roughnessNode = float(roughness).add(t.rough).add(t.cell.mul(.13)).add(t.lap.mul(.06)).clamp(.08, .98)
+    m.roughnessNode = specularAA(
+      float(roughness).add(t.rough).add(t.cell.mul(.13)).add(t.lap.mul(.06)).clamp(.08, .98), t.lost)
     m.normalNode = reliefNormal(n.transformDirection(cameraViewMatrix),
       t.heightM.add(t.lap.mul(part.relief * .5)), .18)
     m.userData = { manifestId: collectionRoomsProvenance.manifestId, assetClass: 'GENERATED', certainty: 'reconstructed' }
