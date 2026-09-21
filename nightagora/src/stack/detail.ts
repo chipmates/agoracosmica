@@ -120,6 +120,72 @@ export function resolved(metres: number | N, footprint: N): N {
   return smoothstep(2, 4, (typeof metres === 'number' ? float(metres) : metres).div(footprint))
 }
 
+/* ── THE OCTAVE LADDER ──────────────────────────────────────────────────────
+   A fractal is not one frequency. Gated on its coarsest pitch alone, its
+   finest octave still carries full amplitude where the pixel is eight times
+   too wide for it, and THAT octave is what crawls. Each rung is therefore
+   faded on its OWN period, so the field loses the ladder one rung at a time
+   and settles on its own mean. Where the pixel holds every rung the sum is
+   the stock fractal term for term: the same taps, the same amplitudes. */
+
+/** the same sum `mx_fractal_noise_float` makes, with every octave gated on
+    the period that octave actually has. `at` is in units of the first
+    octave's period, `period` that period in metres. */
+export function fractalField(
+  at: N,
+  period: number | N,
+  footprint: N,
+  octaves = 3,
+  lacunarity = 2,
+  diminish = 0.55
+): N {
+  const first = typeof period === 'number' ? float(period) : period
+  let sum: N = null
+  for (let i = 0; i < octaves; i++) {
+    const step = lacunarity ** i
+    const term = mx_noise_float(at.mul(step))
+      .mul(diminish ** i)
+      .mul(resolved(first.div(step), footprint))
+    sum = sum === null ? term : sum.add(term)
+  }
+  return sum ?? float(0)
+}
+
+/* ── A LINE UNDER ITS OWN PIXEL ─────────────────────────────────────────────
+   A joint drawn as a smoothstep whose edges are widened by the pixel keeps
+   FULL contrast at its centre however wide the pixel grows, so an 8 mm joint
+   read by a 40 mm pixel draws an 80 mm black band where the true reading is
+   a fifth of a level of tone. The band then swims by a pixel with the eye,
+   which is a floor of joints crawling. What a pixel sees of a line is the
+   share of itself the line covers, and that share has a closed form. */
+
+/** the share of a pixel a periodic line covers, integrated over the pixel's
+    own footprint: the drawn line where the pixel is finer than it, and the
+    line's own area mean where it is not */
+export function lineCoverage(
+  distance: N,
+  halfWidth: number | N,
+  period: number | N,
+  pixel: N
+): N {
+  const h = typeof halfWidth === 'number' ? float(halfWidth) : halfWidth
+  const p = (typeof period === 'number' ? float(period) : period).max(1e-6)
+  const box = pixel.max(1e-6).toVar()
+  // the exact box integral of one stripe, clamped by how much of the stripe
+  // there is to find at all
+  const one = h.add(box.mul(0.5)).sub(distance.abs()).clamp(float(0), h.mul(2).min(box)).div(box)
+  // and once the pixel reaches the spacing, its neighbours are inside it too
+  return mix(one, h.mul(2).div(p).min(1), smoothstep(0.5, 1, box.div(p)))
+}
+
+/** Roughness that already carries the slope this pixel can no longer hold. A
+    relief filtered away without it leaves a surface SMOOTHER than it was
+    authored, which is a mirror where a stone was: the removed slope variance
+    goes into the distribution instead (alpha squared adds). */
+export function specularAA(roughness: N, lostSlope: N): N {
+  return clamp(roughness.pow(4).add(lostSlope.mul(lostSlope).mul(2)).pow(0.25), 0.02, 1)
+}
+
 /* ── THE COURSES ────────────────────────────────────────────────────────────
    A laid surface is the one case where the mid scale is not noise but a
    construction: a hand-set wall keeps its bed joints level and lets
@@ -204,20 +270,15 @@ export function courses(
   const wander = mx_noise_float(vec2(U.x.mul(7.3), U.y.mul(11.7))).mul(r.wanderM).mul(wanderHeld)
   const bedHeld = smoothstep(1.3, 2.8, float(r.courseM).div(acrossCourses))
   const headHeld = smoothstep(1.3, 2.8, length_.div(alongCourses))
-  // A joint narrower than the pixel fades back into the wall, never into a
-  // half-covered grey across the whole face.
-  const line = (distance: N, pixel: N, held: N): N =>
-    float(1)
-      .sub(
-        smoothstep(
-          float(r.jointM * 0.5).sub(pixel).max(0),
-          float(r.jointM * 0.5).add(pixel),
-          distance
-        )
-      )
-      .mul(held)
-  const joint = line(bedM.add(wander).max(0), acrossCourses, bedHeld).max(
-    line(headM.add(wander).max(0), alongCourses, headHeld)
+  // The bed's local spacing is the phase's own slope inverted, in metres; the
+  // head's is the block this row was cut to. Each joint is integrated over
+  // the pixel that covers it, so a joint under the pixel is its own mean tone
+  // and never a wider band at full contrast.
+  const bedPeriod = float(1).div(slope)
+  const bedFrom = bedM.add(wander).max(0).toVar()
+  const headFrom = headM.add(wander).max(0).toVar()
+  const joint = lineCoverage(bedFrom, r.jointM * 0.5, bedPeriod, acrossCourses).max(
+    lineCoverage(headFrom, r.jointM * 0.5, length_, alongCourses)
   )
   const column = floor(head)
   // Where the heads compress under a pixel the block tone would alias, so the
@@ -230,10 +291,14 @@ export function courses(
     .sub(0.5)
     .mul(1.2 * r.faceSwing)
   const face = mix(courseTone.mul(bedHeld), blockTone, headHeld)
-  // The arris of a hand-dressed block is never quite sharp.
-  const arris = smoothstep(r.jointM * 0.5, r.jointM * 2.6, bedM.min(headM).add(wander).max(0))
+  // The arris of a hand-dressed block is never quite sharp. It is a band
+  // three joint widths across, so it is integrated on the same footprint as
+  // the joint: a fixed world-space ramp is a sub-pixel line at any distance.
+  const arris = lineCoverage(bedFrom, r.jointM * 1.55, bedPeriod, acrossCourses).max(
+    lineCoverage(headFrom, r.jointM * 1.55, length_, alongCourses)
+  )
   return {
-    tone: float(1).add(face).sub(mix(float(0.035), float(0), arris).mul(bedHeld.max(headHeld))),
+    tone: float(1).add(face).sub(arris.mul(0.035)),
     joint,
     depthM: joint.mul(-r.jointM * 0.22),
     cell: hash(row, column, r.seed + 7.7),
@@ -281,8 +346,22 @@ export function reliefNormal(base: N, heightM: N, maxSlope = 0.2): N {
    u axis runs where the photograph's own does. */
 
 const N3 = (r: N, sx: number, sy: number): N => vec3(r.x.mul(sx), 0, r.y.mul(sy))
-const streaks = (r: N, sx: number, sy: number, oct: number): N =>
-  mx_fractal_noise_float(N3(r, sx, sy), oct, 2.0, 0.55, 1.0)
+/* A streak field varies in both axes at once, so the period that decides
+   whether it is resolved is the SHORTER of the two: a fold metres long across
+   a centimetre is gone as a field when the centimetre is gone. */
+const streaks = (r: N, sx: number, sy: number, oct: number, footprint: N | null): N => {
+  if (!footprint) return mx_fractal_noise_float(N3(r, sx, sy), oct, 2.0, 0.55, 1.0)
+  const short = 1 / Math.max(sx, sy)
+  let sum: N = null
+  for (let i = 0; i < oct; i++) {
+    const step = 2 ** i
+    const term = mx_noise_float(N3(r, sx * step, sy * step))
+      .mul(0.55 ** i)
+      .mul(resolved(short / step, footprint))
+    sum = sum === null ? term : sum.add(term)
+  }
+  return sum
+}
 const ripple = (t: N): N => sin(t.mul(Math.PI * 2))
 const ridged = (n: N, sharp: number): N =>
   float(1).sub(abs(n)).pow(sharp).mul(2).sub(1)
@@ -296,42 +375,42 @@ const ridged = (n: N, sharp: number): N =>
    anywhere except the one place a ruler is true. */
 
 /** the field's own height at one place, in the set's own frame */
-function grainHeight(g: GrainRecipe, r: N): N {
+function grainHeight(g: GrainRecipe, r: N, fp: N | null): N {
   const p = 1 / g.pitch
   if (g.kind === 'knit') {
     // heavy cloth hangs in soft columns; the courses only band it, and they
     // band it unevenly, because a hand knit's rows are not a ruler either
-    return streaks(r, p, p / 4.5, 2)
+    return streaks(r, p, p / 4.5, 2, fp)
       .mul(0.86)
-      .add(streaks(r, p / 3.4, p / 0.5, 2).mul(0.18))
+      .add(streaks(r, p / 3.4, p / 0.5, 2, fp).mul(0.18))
   }
   if (g.kind === 'creases') {
     // a worn hide does not drape, it creases: narrow lines over a wear path
-    return ridged(streaks(r, p, p, 4), 3)
+    return ridged(streaks(r, p, p, 4, fp), 3)
       .mul(-0.24)
-      .add(streaks(r, p / 4.5, p / 4.5, 2).mul(0.7))
+      .add(streaks(r, p / 4.5, p / 4.5, 2, fp).mul(0.7))
   }
   if (g.kind === 'laid') {
     // a sheet cockles rather than folds, and the chain lines are its ruler
-    return streaks(r, p / 6, p / 4.2, 3)
+    return streaks(r, p / 6, p / 4.2, 3, fp)
       .mul(0.88)
       .add(ripple(r.x.mul(p)).mul(0.12))
   }
   if (g.kind === 'wave') {
     // timber: early and late wood as long lines, wandering slowly across
-    return ridged(streaks(r, p, p / 7, 4), 2)
+    return ridged(streaks(r, p, p / 7, 4, fp), 2)
       .mul(0.5)
-      .add(streaks(r, p / 2.4, p / 0.8, 2).mul(0.34))
+      .add(streaks(r, p / 2.4, p / 0.8, 2, fp).mul(0.34))
   }
   if (g.kind === 'grit') {
     // a quarried stone's grain: no direction in it at all
-    return streaks(r, p, p, 3)
+    return streaks(r, p, p, 3, fp)
   }
   // ridges: a hanging cloth. Folds down the drop, and a slub run across
   // them, uneven, because a slub is a thick thread and not a rule
-  return streaks(r, p, p / 6, 2)
+  return streaks(r, p, p / 6, 2, fp)
     .mul(0.88)
-    .add(streaks(r, p / 2.6, p / 0.9, 2).mul(0.2))
+    .add(streaks(r, p / 2.6, p / 0.9, 2, fp).mul(0.2))
 }
 
 interface GrainNodes {
@@ -341,6 +420,8 @@ interface GrainNodes {
   shade: N
   /** and to the roughness, as an offset */
   rough: N
+  /** the slope the fade took away, for the roughness to carry instead */
+  lost: N
 }
 
 /**
@@ -349,27 +430,27 @@ interface GrainNodes {
  * never the normal: a one-centimetre feature is two pixels at wall distance,
  * and a normal that fine is an alias rather than a surface.
  */
-function grainNodes(g: GrainRecipe, place: N, density: N, count: number): GrainNodes {
+function grainNodes(g: GrainRecipe, place: N, density: N, count: number, fp: N | null): GrainNodes {
   const ca = Math.cos(g.angle)
   const sa = Math.sin(g.angle)
   const r = g.angle
     ? vec2(place.x.mul(ca).sub(place.y.mul(sa)), place.x.mul(sa).add(place.y.mul(ca)))
     : place
 
-  let h = grainHeight(g, r)
+  let h = grainHeight(g, r, fp)
   if (g.fold > 0) {
     const f = 1 / g.fold
-    h = h.add(streaks(r, f, f / 2.6, 2).mul(1.15))
+    h = h.add(streaks(r, f, f / 2.6, 2, fp).mul(1.15))
   }
   /* one step for the whole field, taken at the mid feature's own size. A
      coarser term genuinely has a gentler slope at that step, which is what a
      fold is; the sines are what the step must not be finer than. */
   const e = g.pitch * 0.3
   const at = (dx: number, dy: number): N => {
-    let k = grainHeight(g, r.add(vec2(dx, dy)))
+    let k = grainHeight(g, r.add(vec2(dx, dy)), fp)
     if (g.fold > 0) {
       const f = 1 / g.fold
-      k = k.add(streaks(r.add(vec2(dx, dy)), f, f / 2.6, 2).mul(1.15))
+      k = k.add(streaks(r.add(vec2(dx, dy)), f, f / 2.6, 2, fp).mul(1.15))
     }
     return k
   }
@@ -379,11 +460,16 @@ function grainNodes(g: GrainRecipe, place: N, density: N, count: number): GrainN
     ? vec2(slope.x.mul(ca).add(slope.y.mul(sa)), slope.y.mul(ca).sub(slope.x.mul(sa)))
     : slope
 
+  /* THE TOOTH IS NOT THE FOLD. It is ten to twenty times finer than the
+     pitch the whole field was gated on, so gated there it kept its amplitude
+     where the pixel covered twenty of its threads. It carries its own gate
+     now, one per octave, and it dies where its own thread dies. */
   const tooth =
-    count >= 3 && g.tooth > 0 ? streaks(r, 1 / g.tooth, 1 / (g.tooth * 1.8), 2) : float(0)
+    count >= 3 && g.tooth > 0 ? streaks(r, 1 / g.tooth, 1 / (g.tooth * 1.8), 2, fp) : float(0)
 
   return {
     slope: world.mul(density.mul(g.relief * 1.4)),
+    lost: world.length().mul(density.oneMinus().max(0).mul(g.relief * 1.4)),
     shade: h.mul(g.shade * 0.155).add(tooth.mul(g.shade * 0.36)).mul(density),
     rough: h
       .mul(-g.sheen * 0.3)
@@ -453,7 +539,13 @@ export function detailNodes(set: MaterialSet, opts: DetailScales = {}): DetailNo
   const microAmt = opts.micro ?? set.detail.micro
   const mapAmt = opts.maps ?? 1
   const P = opts.at ?? positionWorld
-  const footprint = opts.filter === 'footprint' ? anisotropicFootprint(P).toVar() : null
+  /* THE PIXEL IS READ WHATEVER THE CALLER ASKED FOR. `filter` decides what
+     thins a whole SCALE, the distance or the pixel; it never decides whether
+     an octave inside a scale may stand where the pixel cannot hold it. Two
+     derivatives, one min and one max: a caller on the distance policy pays
+     for band-limiting and keeps its own falloff. */
+  const pixel = anisotropicFootprint(P).toVar()
+  const footprint = opts.filter === 'footprint' ? pixel : null
   /* WHERE THE PIXEL DECIDES, THE DISTANCE HAS ONE JOB LEFT: to give the
      surface to the air at the far end. So it begins where the museum's own
      fade ends (46 m of the set's own falloff) and runs to 140, and every
@@ -489,7 +581,7 @@ export function detailNodes(set: MaterialSet, opts: DetailScales = {}): DetailNo
   //     lean is a change of colour and never a change of exposure. (Written
   //     the naive way, variation/albedo, a deep blue stone with a pale vein
   //     multiplies itself by seven and the night turns to daylight.)
-  const macro = mx_fractal_noise_float(P.div(s[0]), 3, 2.0, 0.55, 1.0).mul(0.5).add(0.5)
+  const macro = fractalField(P.div(s[0]), s[0], pixel, 3).mul(0.5).add(0.5)
   const lum = (c: { r: number; g: number; b: number }): number =>
     Math.max(1e-4, 0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b)
   const la = lum(set.albedo)
@@ -518,8 +610,16 @@ export function detailNodes(set: MaterialSet, opts: DetailScales = {}): DetailNo
      keeps only the relief its own photograph carries. */
   const scatter =
     (1 - set.metalness) * Math.min(1, Math.max(0, (set.roughness - 0.12) / 0.28))
-  const relief = midBand ? heldMid.mul(midAmt * set.normalStrength * scatter) : float(0)
+  const full = midAmt * set.normalStrength * scatter
+  const relief = midBand ? heldMid.mul(full) : float(0)
   let normal: N = normalize(vec3(dx.mul(relief), dz.mul(relief), float(1)))
+  /* AND WHAT THE FADE TOOK OFF THE NORMAL GOES ON THE ROUGHNESS. A relief
+     removed and nothing put in its place leaves the surface smoother than it
+     was authored, so a stone that has gone calm in its albedo starts to
+     sparkle instead. The removed slope is added to the distribution. */
+  let lostSlope: N = midBand
+    ? vec2(dx, dz).length().mul(float(full).sub(relief).max(0))
+    : float(0)
 
   // 3 · micro: not visible as shape, only as the way the light sits
   const micro =
@@ -589,11 +689,14 @@ export function detailNodes(set: MaterialSet, opts: DetailScales = {}): DetailNo
         offset: [0.41, 0.77],
         metres: [set.scale[0] * 1.37, set.scale[1] * 1.37],
       })
+      // a threshold on an unresolved field is a per-pixel coin toss between
+      // two different photographs, so the mask holds still once its own cell
+      // is under the pixel
       const k = smoothstep(
         0.4,
         0.6,
         mx_noise_float(N3(set.place(where), 1 / set.detile, 1 / set.detile))
-          .mul(0.5)
+          .mul(resolved(set.detile, pixel).mul(0.5))
           .add(0.5)
       )
       grand = {
@@ -631,13 +734,20 @@ export function detailNodes(set: MaterialSet, opts: DetailScales = {}): DetailNo
      not carry at this size. Its slope adds to the slopes already there and
      the whole is renormalised once. A set that declares none pays nothing. */
   if (set.grain && count >= 2) {
-    const g = grainNodes(set.grain, set.place(where), held(set.grain.pitch), count)
+    const g = grainNodes(set.grain, set.place(where), held(set.grain.pitch), count, pixel)
     if (set.grain.shade > 0) albedo = albedo.mul(float(1).add(g.shade))
     if (set.grain.sheen > 0) roughness = roughness.add(g.rough)
     normal = normalize(vec3(normal.xy.add(g.slope), normal.z))
+    lostSlope = lostSlope.add(g.lost)
   }
 
-  return { albedo, normal, roughness: clamp(roughness, 0.02, 1), occlusion, density }
+  return {
+    albedo,
+    normal,
+    roughness: specularAA(clamp(roughness, 0.02, 1), lostSlope),
+    occlusion,
+    density,
+  }
 }
 
 /* A NodeMaterial with the usual slots. Only a LIT one gets the normal and the
@@ -777,6 +887,8 @@ export interface SurfaceNodes {
   cell: N
   /** what the pixel holds of each of the three scales */
   held: [N, N, N]
+  /** the slope the three gates took away, for `specularAA` */
+  lost: N
   /** the pixel itself, for a caller laying its own lines */
   pixel: N
 }
@@ -849,5 +961,16 @@ export function surfaceDetail(o: SurfaceDetail): SurfaceNodes {
     cell = c.cell
   }
 
-  return { tone, rough, heightM, joint, cell, held, pixel }
+  /* WHAT THE GATES TOOK OFF THE RELIEF. Each rung's slope is its own height
+     over its own period; a rung under the pixel leaves the plane flatter
+     than it was authored, and a flatter plane is a shinier one. */
+  const metres = (m: Metres): N =>
+    typeof m === 'number' ? float(Math.max(m, 1e-6)) : m.max(1e-6)
+  const lostOf = (m: Metres, weight: number, hold: N, on: boolean): N =>
+    on ? float(relief * weight).div(metres(m)).mul(hold.oneMinus().max(0)) : float(0)
+  const lost = lostOf(s[0], 1, held[0], true)
+    .add(lostOf(s[1], 0.4, held[1], count >= 2))
+    .add(lostOf(s[2], 0.15, held[2], count >= 3))
+
+  return { tone, rough, heightM, joint, cell, held, lost, pixel }
 }
