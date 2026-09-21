@@ -199,13 +199,25 @@ export const heroEntries: HeroEntry[] = [
   },
 ];
 
-// Slot 4 of the ask contract: the poem pages' door question. It names no
-// teaching, so it carries no seed.
-const POEM_ENTRY_FIGURES = new Set(['dickinson', 'rumi', 'blake', 'shakespeare']);
-const POEM_ENTRY_QUESTION_EN =
-  'I just read one of your poems and it stayed with me. Can we talk about it?';
-const POEM_ENTRY_QUESTION_DE =
-  'Ich habe gerade eines deiner Gedichte gelesen, und es lässt mich nicht los. Können wir darüber reden?';
+// Slot 4 of the ask contract: the door on a page of the figure's own words.
+// It asks about the text just read, not a teaching, so it carries no seed.
+const READING_ENTRY_POEM = {
+  en: 'I just read one of your poems and it stayed with me. Can we talk about it?',
+  de: 'Ich habe gerade eines deiner Gedichte gelesen, und es lässt mich nicht los. Können wir darüber reden?',
+};
+const readingEntryQuestions = new Map<string, { en: string; de: string }>([
+  ['dickinson', READING_ENTRY_POEM],
+  ['rumi', READING_ENTRY_POEM],
+  ['blake', READING_ENTRY_POEM],
+  ['shakespeare', READING_ENTRY_POEM],
+  [
+    'aurelius',
+    {
+      en: 'I just read a passage from your Meditations and it stayed with me. Can we talk about it?',
+      de: 'Ich habe gerade eine Stelle aus deinen Selbstbetrachtungen gelesen, und sie lässt mich nicht los. Können wir darüber reden?',
+    },
+  ],
+]);
 
 // Map lookups run against untrusted URL input, so membership is answered by a
 // Set. A plain object would report inherited keys ("constructor") as present.
@@ -232,17 +244,18 @@ export const getHeroEntryQuestion = (
 export const getHeroEntrySeedId = (figureId: string | null | undefined): number | null =>
   getHeroEntry(figureId)?.seedId ?? null;
 
-/** True only for a figure whose poems have a public page. */
-export const hasPoemEntry = (figureId: string | null | undefined): boolean =>
-  !!figureId && POEM_ENTRY_FIGURES.has(figureId);
+/** True only for a figure whose own words have a public reading page. */
+export const hasReadingEntry = (figureId: string | null | undefined): boolean =>
+  !!figureId && readingEntryQuestions.has(figureId);
 
-/** The figure's poem-page question, or null when that figure has no poem page. */
-export const getPoemEntryQuestion = (
+/** The figure's reading-page question, or null when that figure has no such page. */
+export const getReadingEntryQuestion = (
   figureId: string | null | undefined,
   lang: string
 ): string | null => {
-  if (!hasPoemEntry(figureId)) return null;
-  return lang === 'de' ? POEM_ENTRY_QUESTION_DE : POEM_ENTRY_QUESTION_EN;
+  const entry = (figureId && readingEntryQuestions.get(figureId)) || null;
+  if (!entry) return null;
+  return lang === 'de' ? entry.de : entry.en;
 };
 
 // Same shape as entryIntent's ask-tag pattern. Duplicated rather than imported
@@ -259,10 +272,9 @@ const FIGURE_ASK_TAG = /^f:([a-z]+):([1-4])$/;
 export const resolveAnchorSeedId = (figureId: string, tag: string): string | null => {
   const match = FIGURE_ASK_TAG.exec(tag);
   if (match) {
-    // Slot 4 is the poem door: it asks about a poem, so it opens plain Free
-    // Talk. Only its fallback to the hero question brings that question's
-    // anchor along, so text and grounding never come from different slots.
-    if (match[2] === '4' && hasPoemEntry(match[1])) return null;
+    // Slot 4 opens plain Free Talk. Only its fallback to the hero question
+    // keeps that question's anchor, so text and grounding never split.
+    if (match[2] === '4' && hasReadingEntry(match[1])) return null;
     // Slot 2 is the figure page's idea question, the rest the hero one.
     const seedId = match[2] === '2'
       ? getIdeaSeedId(match[1])

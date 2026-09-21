@@ -11,7 +11,7 @@ import { AUDIO_LIBRARY_ENTRY } from '../../config/features';
 import { sendFunnelBeaconOnce } from '../funnelBeacon';
 import { LocalStorageAdapter } from '../../storage/localAdapter';
 import { figureSlugToId } from '../../data/public/slugMap';
-import { getHeroEntryQuestion, getPoemEntryQuestion, hasHeroEntry } from '../../data/public/heroEntry';
+import { getHeroEntryQuestion, getReadingEntryQuestion, hasHeroEntry } from '../../data/public/heroEntry';
 import { getFigurePageContent } from '../../data/public/figurePageContent';
 
 const SS_FIGURE_KEY = 'agc_intended_figure';
@@ -33,7 +33,7 @@ const SS_TEXT_FIRST_KEY = 'agc_entry_text_first';
 //                     links and cached marketing pages upgrade themselves.
 //   f:{figure}:{slot} the figure's landing question. Slot 1 is the hero
 //                     question, slot 2 the figure page's idea question, slot 4
-//                     the poem page's question. Slots 2 and 4 fall back to slot
+//                     the reading page's question. Slots 2 and 4 fall back to slot
 //                     1 for a figure that has no such question, and so does
 //                     slot 3 (the council door prefills through its own rail).
 //   life              the one question that belongs to no figure.
@@ -71,16 +71,16 @@ export function resolveAskPrefill(
 
   const match = FIGURE_ASK_TAG.exec(tag);
   if (match) {
-    // Slot 2 is the figure page's idea question, slot 4 the poem page's. Both
-    // fall back to the hero question when the figure has none, as does slot 3
-    // (the council door, which prefills via its own rail).
+    // Slot 2 is the figure page's idea question, slot 4 the reading page's.
+    // Both fall back to the hero question when the figure has none, as does
+    // slot 3 (the council door, which prefills via its own rail).
     if (match[2] === '2') {
       const idea = getFigurePageContent(match[1], lang)?.ideaQuestion;
       if (idea) return { kind: 'text', text: idea };
     }
     if (match[2] === '4') {
-      const poem = getPoemEntryQuestion(match[1], lang);
-      if (poem) return { kind: 'text', text: poem };
+      const reading = getReadingEntryQuestion(match[1], lang);
+      if (reading) return { kind: 'text', text: reading };
     }
     const text = getHeroEntryQuestion(match[1], lang);
     return text ? { kind: 'text', text } : null;

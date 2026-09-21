@@ -341,29 +341,44 @@ describe('ask tags', () => {
     });
   });
 
-  it('slot 4 falls back to the hero question for a figure without a poem page', () => {
-    const aurelius = getHeroEntry('aurelius')!;
+  it('slot 4 names the Meditations for aurelius, and stays his own page', () => {
     expect(resolveAskPrefill('f:aurelius:4', null, 'en')).toEqual({
       kind: 'text',
-      text: aurelius.questionEn,
+      text: 'I just read a passage from your Meditations and it stayed with me. Can we talk about it?',
     });
     expect(resolveAskPrefill('f:aurelius:4', null, 'de')).toEqual({
       kind: 'text',
-      text: aurelius.questionDe,
+      text: 'Ich habe gerade eine Stelle aus deinen Selbstbetrachtungen gelesen, und sie lässt mich nicht los. Können wir darüber reden?',
+    });
+    // The passage question is his alone: the poets keep the poem wording.
+    expect(resolveAskPrefill('f:blake:4', null, 'en')).not.toEqual(
+      resolveAskPrefill('f:aurelius:4', null, 'en')
+    );
+  });
+
+  it('slot 4 falls back to the hero question for a figure without a reading page', () => {
+    const jung = getHeroEntry('jung')!;
+    expect(resolveAskPrefill('f:jung:4', null, 'en')).toEqual({
+      kind: 'text',
+      text: jung.questionEn,
+    });
+    expect(resolveAskPrefill('f:jung:4', null, 'de')).toEqual({
+      kind: 'text',
+      text: jung.questionDe,
     });
   });
 
-  it.each(['dickinson', 'rumi', 'blake', 'shakespeare'])('the poem door anchors no seed for %s', (figureId) => {
-    // A visitor asking about a poem gets plain Free Talk, not the teaching
-    // behind the hero question.
+  it.each(['dickinson', 'rumi', 'blake', 'shakespeare', 'aurelius'])('the reading door anchors no seed for %s', (figureId) => {
+    // A visitor asking about the text they just read gets plain Free Talk, not
+    // the teaching behind the hero question.
     expect(resolveAnchorSeedId(figureId, `f:${figureId}:4`)).toBeNull();
     expect(resolveAnchorSeedId(figureId, `f:${figureId}:1`))
       .toBe(String(getHeroEntry(figureId)!.seedId));
   });
 
   it('slot 4 keeps the hero anchor where it falls back to the hero question', () => {
-    expect(resolveAnchorSeedId('aurelius', 'f:aurelius:4'))
-      .toBe(String(getHeroEntry('aurelius')!.seedId));
+    expect(resolveAnchorSeedId('jung', 'f:jung:4'))
+      .toBe(String(getHeroEntry('jung')!.seedId));
   });
 
   it('the legacy tag keys off the selected figure, and falls back when there is none', () => {
