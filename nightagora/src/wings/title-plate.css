@@ -29,6 +29,17 @@
     color-mix(in srgb, var(--na-abyss) 72%, transparent));
 }
 
+/* ONE TEXT AT A TIME. While the entrance sheet stands, the station's card,
+   the bar and the door's question stand down at BOTH stages: two texts at
+   once is the clutter this plate exists to end. Hidden by visibility, so
+   every one of them keeps its place and comes back without a jump. The rule
+   lives here and not in the shared window stylesheet, which is mounted only
+   while a sheet stands on a narrow stage. */
+:root[data-na-plate='open'] .wing-stage > *:not(style),
+:root[data-na-plate='open'] .wing-labels > *:not(dialog),
+:root[data-na-plate='open'] .wing-rail-group,
+:root[data-na-plate='open'] .wing-doorblock { visibility: hidden; pointer-events: none; }
+
 .na-plate-grab { display: none; }
 
 .na-plate-wall { flex: 0 0 auto; padding: 22px 26px 0; }

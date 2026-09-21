@@ -281,14 +281,21 @@ export function createTitlePlate(host: HTMLElement, parts: PlateParts): TitlePla
     tabs[next]!.focus({ preventScroll: true })
   }
 
-  /* THE SHEET OWNS THE PHONE, the museum's one rule for a window on a narrow
-     stage: the station's chrome stands down while the plate stands. */
-  const standDown = (): void => windowOwnsTheScreen(document_, dialog.open && narrow.matches)
+  /* ONE TEXT AT A TIME. An entrance sheet is the only text on the screen, so
+     the whole wing's chrome stands down behind it at both stages, by
+     visibility, and comes back in its place. The narrow stage keeps the
+     museum's own window rule on top of it. */
+  const standDown = (): void => {
+    if (dialog.open) document_.documentElement.dataset['naPlate'] = 'open'
+    else delete document_.documentElement.dataset['naPlate']
+    windowOwnsTheScreen(document_, dialog.open && narrow.matches)
+  }
 
   // Escape enters: the plate is a welcome and not a question, so cancelling
   // it is the same as pressing the way in.
   dialog.addEventListener('cancel', event => { event.preventDefault(); dialog.close() })
   dialog.addEventListener('close', () => {
+    delete document_.documentElement.dataset['naPlate']
     windowOwnsTheScreen(document_, false)
     if (live) parts.onClose()
   })
@@ -313,6 +320,7 @@ export function createTitlePlate(host: HTMLElement, parts: PlateParts): TitlePla
     dispose() {
       live = false
       narrow.removeEventListener('change', answerStage)
+      delete document_.documentElement.dataset['naPlate']
       windowOwnsTheScreen(document_, false)
       if (dialog.open) dialog.close()
       dialog.remove()
