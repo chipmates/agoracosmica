@@ -121,6 +121,19 @@ try {
     deviceScaleFactor: VP.deviceScaleFactor,
     recordVideo: { dir: OUT, size: { width: VP.width, height: VP.height } },
   })
+  /* THE ENTRANCE SHEET IS NOT THE WALK. This eye opens the wing's own
+     address, where a wing shows its welcome once per visit, and the sheet's
+     paragraphs and their selection highlight read as an oscillating image.
+     The flag the sheet itself keeps is set before the first navigation, so
+     the scan measures rooms. A store that refuses keeps the sheet shut by
+     the sheet's own rule. */
+  await ctx.addInitScript((flag) => {
+    try {
+      sessionStorage.setItem(flag, '1')
+    } catch {
+      /* a refused store already counts as seen */
+    }
+  }, `${SLUG}-welcome`)
   const page = await ctx.newPage()
   if (INTRUDE) {
     const [from, to] = INTRUDE.split('=>')
