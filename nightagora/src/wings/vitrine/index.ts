@@ -112,13 +112,23 @@ export function createVitrine(options: {
   card.tabIndex = -1
   card.setAttribute('role', 'group')
   setRegister(card, 'drawer')
+  /** THE PANEL SAYS WHAT THE THING IS CALLED, FIRST. Every caller already
+   * hands the window the exhibit's own name in the page's language; the card
+   * reads it at its head and takes it as its accessible name. */
+  const naming = make('h2', 'vitrine-name')
+  naming.id = `${options.id}-name`
+  setRegister(naming, 'label')
+  const namingDot = make('span', 'vitrine-name-dot')
+  namingDot.setAttribute('aria-hidden', 'true')
+  const namingText = make('span', 'vitrine-name-text')
+  naming.append(namingDot, namingText)
   const line = make('p', 'vitrine-line')
   setRegister(line, 'label')
   const body = make('div', 'vitrine-body')
   const words = make('div', 'vitrine-words')
   const aside = make('div', 'vitrine-aside')
   const after = make('div', 'vitrine-words vitrine-after')
-  body.append(line, words, aside, after)
+  body.append(naming, line, words, aside, after)
   const controls = make('div', 'vitrine-controls')
   const foot = make('div', 'vitrine-foot')
   /** THE CARD IS A SHEET ON THE PHONE. The grabber raises it over the work
@@ -245,6 +255,26 @@ export function createVitrine(options: {
     exhibit?.payload?.layout?.()
   }
 
+  /** The name at the head of the card, and the card's accessible name with
+   * it: a window that named itself twice would be read twice. The mark
+   * before it carries the exhibit's certainty where the payload has one. */
+  function nameIt(title: string, certainty?: string | null): void {
+    const said = title.trim()
+    namingText.textContent = said
+    naming.hidden = !said
+    naming.lang = options.lang()
+    namingDot.hidden = !certainty
+    if (certainty) namingDot.style.setProperty('--certainty', certainty)
+    else namingDot.style.removeProperty('--certainty')
+    if (said) {
+      card.setAttribute('aria-labelledby', naming.id)
+      card.removeAttribute('aria-label')
+      return
+    }
+    card.setAttribute('aria-label', title)
+    card.removeAttribute('aria-labelledby')
+  }
+
   /** The grabber says which way it goes, in the payload's own words where
    * it has them. */
   function nameTheGrabber(): void {
@@ -276,8 +306,8 @@ export function createVitrine(options: {
     describe: text => payloadEl.setAttribute('aria-label', text),
     raise: open => setRaised(open),
     peeked: () => !raised,
-    rename: (title, head) => {
-      card.setAttribute('aria-label', title)
+    rename: (title, head, certainty) => {
+      nameIt(title, certainty)
       if (head === undefined) return
       line.textContent = head ?? ''
       line.hidden = !head
@@ -391,7 +421,7 @@ export function createVitrine(options: {
       if (!advancing) invoker = from
       root.dataset['exhibit'] = next.id
       card.dataset['exhibit'] = next.id
-      card.setAttribute('aria-label', next.title)
+      nameIt(next.title)
       line.textContent = next.line ?? ''
       line.hidden = !next.line
       line.lang = options.lang()
