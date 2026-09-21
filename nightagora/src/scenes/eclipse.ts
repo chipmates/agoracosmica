@@ -135,13 +135,15 @@ export function createEclipse(scene: Scene) {
 
   /* THE SKY BEHIND THE MARK, BEHIND A SWITCH. The door already holds the
      night's own firmament, very low. An address may ask for a little more
-     of it and for nothing else: read once, never stored, default off. Both
+     of it and for nothing else: read once, never stored. The stronger of the two
+     is the default, and `?sky=plain` asks for the door without it. Both
      strengths stay under the master the meteors wake at, so no shooting
      star ever crosses the mark. */
-  const SKY_PUSH: Record<string, number> = { pushed: 1.9, pushed2: 2.7 }
+  const SKY_PUSH: Record<string, number> = { plain: 1, pushed: 1.9, pushed2: 2.7 }
+  const SKY_DEFAULT = SKY_PUSH['pushed2'] ?? 1
   const skyPush =
-    typeof window === 'undefined' ? 1
-    : (SKY_PUSH[new URLSearchParams(window.location.search).get('sky') ?? ''] ?? 1)
+    typeof window === 'undefined' ? SKY_DEFAULT
+    : (SKY_PUSH[new URLSearchParams(window.location.search).get('sky') ?? ''] ?? SKY_DEFAULT)
 
   // ---------------------------------------------------------- the uniforms
   const uTime = uniform(0)

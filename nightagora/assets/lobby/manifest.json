@@ -23,7 +23,7 @@
       "prompt": "Retain the eclipse silhouette and partial-phase exposure. Add faint seeded middle-scale stone provinces between the broad mare and fine grain in the shadow disc; scenic relief, not a lunar surface map.",
       "model": "Codex GPT-6; deterministic TypeScript and TSL source recipe",
       "date": "2026-09-10",
-      "sha256": "554c94a846a615272909e773c598559947dd2a00340bb1bf930d826c2abdba76",
+      "sha256": "b35a0f08a2355a21a636f37590316131756f982a59e47f22e5b10ec421a24bda",
       "note": "Lobby polish commission; recipe_file=src/scenes/eclipse.ts. Hash covers the source file; only the commissioned surface was changed."
     },
     {
