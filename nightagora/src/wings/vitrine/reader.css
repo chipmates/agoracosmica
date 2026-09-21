@@ -55,15 +55,12 @@
 .reader-zoom {display:flex;gap:6px;}
 .reader-zoom .vitrine-control {flex:0 0 auto;}
 
-/* AT THE PEEK the card is the page's name and the one control that raises
-   the rest of the words over it. */
-.vitrine[data-peek='true'] .reader-place,
-.vitrine[data-peek='true'] .reader-words > *:nth-child(n+3) {display:none;}
+/* AT THE PEEK the card is the page's name, which the window's own heading
+   carries, and the one control that raises the rest of the words over it. */
+.vitrine[data-peek='true'] .reader-words {display:none;}
 
-/* THE CARD: the side's own name, where it stands in the book, what is on it,
-   who holds it, and the witnesses one deliberate press away. */
-.reader-folio {display:flex;align-items:center;gap:9px;margin:0 0 4px;font:400 19px/1.3 var(--serif);color:#f4ead6;}
-.reader-folio-dot {flex:0 0 8px;width:8px;height:8px;border-radius:50%;background:var(--certainty,#d2a557);}
+/* THE CARD: where the side stands in the book, what is on it, who holds it,
+   and the witnesses one deliberate press away. Its name is the window's. */
 .reader-place {margin:0 0 8px;}
 .reader-named {color:#f0e4cc;}
 .reader-raise {width:100%;}
@@ -80,6 +77,5 @@
   .reader-absence p {font-size:10px;}
   .reader-row {gap:4px;width:100%;}
   .reader-row[data-ways='0'] .vitrine-step {flex:1 1 0;}
-  .reader-folio {font-size:16px;margin-bottom:2px;}
   .reader-zoom {display:none;}
 }

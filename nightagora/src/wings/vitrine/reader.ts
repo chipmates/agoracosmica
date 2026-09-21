@@ -276,9 +276,9 @@ export function createReaderPayload(options: {
     plate.stand([folio, shows])
   }
 
-  /** THE WORDS OF ONE SIDE, in the card: its name with its certainty, where
-   * it stands in the book, what is on it, the holder, and the witnesses one
-   * deliberate press away. */
+  /** THE WORDS OF ONE SIDE, in the card: where it stands in the book, what
+   * is on it, the holder, and the witnesses one deliberate press away. The
+   * side's own name is the window's heading, which every kind is named in. */
   function paintWords(): void {
     if (!host || !book) return
     const here = side()
@@ -287,15 +287,6 @@ export function createReaderPayload(options: {
     aside.textContent = ''
     const block = make('section', 'reader-words')
     block.lang = host.lang
-    const title = make('h3', 'reader-folio')
-    if (here.colour) {
-      const dot = make('span', 'reader-folio-dot')
-      dot.style.setProperty('--certainty', here.colour)
-      dot.setAttribute('aria-hidden', 'true')
-      title.append(dot)
-    }
-    title.append(make('span', '', here.label))
-    block.append(title)
     // WHERE THE SIDE STANDS IN ITS BOOK, which a book of one side has no
     // need to say.
     const inside = volume(), place = inside.indexOf(at)
@@ -308,7 +299,7 @@ export function createReaderPayload(options: {
     block.append(make('p', 'vitrine-meta', here.holder ?? book.holder))
     // THE CARD IS THE SIDE'S, not the side the window opened at: a wall of
     // sheets renames its card as the hand walks it.
-    host.rename?.(here.label, here.head)
+    host.rename?.(here.label, here.head, here.colour ?? null)
     if (witnesses().length) {
       const texts = make('div', 'vitrine-description reader-texts')
       texts.id = 'vitrine-reader-texts'
