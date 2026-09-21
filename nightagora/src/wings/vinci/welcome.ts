@@ -1,6 +1,6 @@
-/* THE ENTRANCE PANEL. One sheet at the door of the wing, over the arrival
-   frame, shown ONCE PER VISIT and never again: the four blocks, one control
-   to enter and one that goes straight to the collection.
+/* THE ENTRANCE PANEL. The wing's title wall at its door, over the arrival
+   frame, shown ONCE PER VISIT and never again: the name, the one sentence,
+   one way in, and the leaflet's five words under them.
 
    Three rules live here.
 
@@ -17,7 +17,12 @@
 
 import { lang } from '../content'
 import { LIFE_WORDS } from '../life/words'
-import { vinciCertaintyWords, vinciThroughLine, vinciWelcomeBlocks, vinciWelcomeText, type VinciText } from './content'
+import { createTitlePlate, plateGroups, type PlateGroup, type PlateLeaf } from '../title-plate'
+import { loadManifest, type ManifestEntry } from '../../manifest'
+import {
+  vinciCertaintyWords, vinciSourceGroups, vinciSourceScopes, vinciThroughLine,
+  vinciWelcomeBlocks, vinciWelcomeText, type VinciText,
+} from './content'
 
 const FLAG = 'vinci-welcome'
 
@@ -50,103 +55,139 @@ export function createVinciWelcome(
 ): VinciWelcome {
   const text = (value: VinciText): string => value[lang()]
   const document_ = host.ownerDocument
-  const phone = () => innerWidth / innerHeight <= 0.9
+  const phone = (): boolean => innerWidth / innerHeight <= 0.9
   const make = <K extends keyof HTMLElementTagNameMap>(tag: K, cls: string, words = ''): HTMLElementTagNameMap[K] => {
     const node = document_.createElement(tag)
-    node.className = cls
+    if (cls) node.className = cls
     if (words) node.textContent = words
     return node
   }
-  const dialog = document_.createElement('dialog')
-  dialog.className = 'vinci-welcome'
-  dialog.id = 'vinci-welcome'
-  dialog.setAttribute('aria-label', text(vinciWelcomeText.label))
-  const sheet = make('div', 'vinci-welcome-sheet')
-  // The controls stand outside the scrolling surface: the way in is never
-  // below the fold, at either viewport.
-  const foot = make('div', 'vinci-welcome-foot')
-  dialog.append(sheet, foot)
-  let live = true
   let route: 'house' | 'collection' | 'life' = 'house'
+  /* A LEAF PAINTED FROM THE STORE FILLS WHEN THE STORE ANSWERS, and a plate
+     repainted meanwhile must not be written into: each paint carries a
+     number, and a late answer for an older number is dropped. */
+  let painting = 0
 
-  function paint(): void {
-    sheet.textContent = ''
-    foot.textContent = ''
-    sheet.append(
-      make('p', 'vinci-kicker', text(vinciWelcomeText.kicker)),
-      make('h1', 'vinci-welcome-title', text(vinciWelcomeText.title)),
-      // The wing's one sentence, the same one the recap carries at the exit.
-      make('p', 'vinci-promise', text(vinciThroughLine))
-    )
+  /** The block as the plate opened it: the sentences and their certainty
+   *  words, in one column, exactly as the wing records them. */
+  function renderBlock(host_: HTMLElement, index: number): void {
+    const block = vinciWelcomeBlocks[index]
+    if (!block) return
     const narrow = phone()
-    const blocks = make('div', 'vinci-welcome-blocks')
-    for (const block of vinciWelcomeBlocks) {
-      const section = make('section', 'vinci-welcome-block')
-      section.append(make('h2', '', text(block.heading)))
-      for (const line of block.lines) {
-        if (line.only === 'phone' && !narrow) continue
-        if (line.only === 'desktop' && narrow) continue
-        const paragraph = make('p', 'vinci-statement')
-        if (line.certainty) {
-          paragraph.dataset['certainty'] = line.certainty
-          paragraph.append(make('span', 'vinci-certainty-word', text(vinciCertaintyWords[line.certainty])))
-        }
-        paragraph.append(document_.createTextNode(text(line.text)))
-        section.append(paragraph)
+    for (const line of block.lines) {
+      if (line.only === 'phone' && !narrow) continue
+      if (line.only === 'desktop' && narrow) continue
+      const paragraph = make('p', 'vinci-statement')
+      if (line.certainty) {
+        paragraph.dataset['certainty'] = line.certainty
+        paragraph.append(make('span', 'vinci-certainty-word', text(vinciCertaintyWords[line.certainty])))
       }
-      blocks.append(section)
+      paragraph.append(document_.createTextNode(text(line.text)))
+      host_.append(paragraph)
     }
-    sheet.append(blocks)
-    foot.append(make('p', 'vinci-welcome-route', text(vinciWelcomeText.route)))
-    const controls = make('div', 'vinci-welcome-controls')
-    const enter = make('button', 'vinci-welcome-enter', text(vinciWelcomeText.enter))
-    enter.type = 'button'
-    enter.addEventListener('click', () => { route = 'house'; dialog.close() })
-    const collection = make('button', 'vinci-welcome-collection', text(vinciWelcomeText.collection))
-    collection.type = 'button'
-    collection.addEventListener('click', () => { route = 'collection'; dialog.close() })
-    controls.append(enter, collection)
-    foot.append(controls)
-    /* THE THIRD DOOR IS NOT A THIRD WAY IN. The two controls above choose
-       where the visitor arrives; this one opens the years over the house they
-       arrive in, so it stands under them and carries less weight. */
-    const life = make('button', 'wing-life-door', text(LIFE_WORDS.life))
-    life.type = 'button'
-    life.setAttribute('aria-controls', 'wing-life')
-    life.addEventListener('click', () => { route = 'life'; dialog.close() })
-    foot.append(life)
   }
 
-  // Escape enters: the panel is a welcome and not a question, so cancelling
-  // it is the same as pressing Enter.
-  dialog.addEventListener('cancel', event => {
-    event.preventDefault()
-    route = 'house'
-    dialog.close()
+  /* THE SOURCES ARE COUNTED, NEVER RESTATED. Every group is the store's own
+     records, grouped by the role each one declares and named by the holder it
+     names, or by its licence line where it names no holder. A group the
+     records do not fill is left out. */
+  function sourceRows(entries: readonly ManifestEntry[]): PlateGroup[] {
+    const own = new Set<string>(vinciSourceScopes.own)
+    const shared = new Set<string>(vinciSourceScopes.shared)
+    const mine = entries.filter(entry =>
+      own.has(entry.wing ?? '') || shared.has(entry.id.split('/')[0] ?? ''))
+    const groups: PlateGroup[] = []
+    for (const group of vinciSourceGroups) {
+      const family = new Set(group.roles)
+      const held = mine.filter(entry => {
+        const head = (entry.role ?? '').split('-')[0] ?? ''
+        const named = vinciSourceGroups.some(other => other.roles.includes(head))
+        return group.rest ? !named : family.has(head)
+      })
+      const names = new Map<string, number>()
+      for (const entry of held) {
+        const named = entry.holder ?? entry.licence
+        names.set(named, (names.get(named) ?? 0) + 1)
+      }
+      if (!names.size) continue
+      const sorted = [...names].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+      groups.push({
+        id: group.id,
+        name: text(group.name),
+        count: sorted.length,
+        render(into) {
+          const list = make('ul', 'vinci-welcome-sources')
+          for (const [named] of sorted) list.append(make('li', '', named))
+          into.append(list)
+        },
+      })
+    }
+    return groups
+  }
+
+  function renderSources(host_: HTMLElement): void {
+    const mine = ++painting
+    /* The record register: holders and licence lines are the store's own
+       wording, complete, and they are read on purpose. */
+    host_.dataset['register'] = 'record'
+    // The store answers in the same tick once it is read, while the leaf is
+    // still off the page: only the paint number may decide.
+    void loadManifest().then(index => {
+      if (mine === painting) plateGroups(host_, sourceRows(index.all))
+    })
+  }
+
+  function leaves(): PlateLeaf[] {
+    const list: PlateLeaf[] = vinciWelcomeBlocks.map((block, index) => ({
+      id: block.id,
+      tab: text(block.tab),
+      name: text(block.heading),
+      render: (into: HTMLElement) => renderBlock(into, index),
+    }))
+    list.push({ id: 'sources', tab: text(vinciWelcomeText.sources), render: renderSources })
+    return list
+  }
+
+  const plate = createTitlePlate(host, {
+    id: 'vinci-welcome',
+    className: 'vinci-welcome',
+    words: () => ({
+      label: text(vinciWelcomeText.label),
+      kicker: text(vinciWelcomeText.kicker),
+      title: text(vinciWelcomeText.title),
+      // The wing's one sentence, the same one the recap carries at the exit.
+      line: text(vinciThroughLine),
+      leaflet: text(vinciWelcomeText.leaflet),
+      handle: text(vinciWelcomeText.handle),
+    }),
+    leaves,
+    controls: () => [
+      { word: text(vinciWelcomeText.enter), rank: 'primary', press: () => { route = 'house' } },
+      { word: text(vinciWelcomeText.collection), rank: 'second', press: () => { route = 'collection' } },
+      /* THE THIRD DOOR IS NOT A THIRD WAY IN. The two controls above choose
+         where the visitor arrives; this one opens the years over the house
+         they arrive in, so it stands under them and carries less weight. */
+      {
+        word: text(LIFE_WORDS.life), rank: 'third', className: 'wing-life-door',
+        attributes: { 'aria-controls': 'wing-life' }, press: () => { route = 'life' },
+      },
+    ],
+    onClose() {
+      markSeen()
+      onEnter(route)
+    },
   })
-  dialog.addEventListener('close', () => {
-    if (!live) return
-    markSeen()
-    onEnter(route)
-  })
-  host.append(dialog)
 
   return {
-    element: dialog,
+    element: plate.element,
     open() {
-      if (!live) return
-      // Painted on every open, so a language or a viewport that changed while
-      // the sheet stood open is answered by the next open and not remembered.
       route = 'house'
-      paint()
-      if (!dialog.open) dialog.showModal()
-      dialog.querySelector<HTMLButtonElement>('.vinci-welcome-enter')?.focus({ preventScroll: true })
-      dialog.scrollTop = 0
+      painting++
+      plate.open()
     },
     dispose() {
-      live = false
-      if (dialog.open) dialog.close()
-      dialog.remove()
+      painting++
+      plate.dispose()
     },
   }
 }

@@ -594,12 +594,18 @@ export interface VinciWelcomeLine {
   only?: 'phone' | 'desktop'
 }
 export interface VinciWelcomeBlock {
+  /** the block's own id, so the leaflet can name its leaf */
+  id: string
+  /** the heading shortened to the one word that stands in the leaflet's row */
+  tab: VinciText
   heading: VinciText
   lines: readonly VinciWelcomeLine[]
 }
 
 export const vinciWelcomeBlocks: readonly VinciWelcomeBlock[] = [
   {
+    id: 'who',
+    tab: { en: 'Who and where', de: 'Wer, und wo' },
     heading: { en: 'Who, and where', de: 'Wer, und wo' },
     lines: [
       {
@@ -626,6 +632,8 @@ export const vinciWelcomeBlocks: readonly VinciWelcomeBlock[] = [
     ],
   },
   {
+    id: 'hour',
+    tab: { en: 'The hour', de: 'Die Stunde' },
     heading: { en: 'The hour you are in', de: 'Die Stunde, in der du stehst' },
     lines: [
       {
@@ -652,6 +660,8 @@ export const vinciWelcomeBlocks: readonly VinciWelcomeBlock[] = [
     ],
   },
   {
+    id: 'find',
+    tab: { en: 'What you find', de: 'Was du findest' },
     heading: { en: 'What you can find', de: 'Was du findest' },
     lines: [
       { text: { en: 'The house and its garden, seven stations in the hour above.', de: 'Das Haus und sein Garten, sieben Stationen in der Stunde von oben.' } },
@@ -663,6 +673,8 @@ export const vinciWelcomeBlocks: readonly VinciWelcomeBlock[] = [
     ],
   },
   {
+    id: 'move',
+    tab: { en: 'How to move', de: 'Wie du dich bewegst' },
     heading: { en: 'How to move', de: 'Wie du dich bewegst' },
     lines: [
       { only: 'desktop', text: { en: 'Walk with the arrow keys, or press a mark on the bar below.', de: 'Geh mit den Pfeiltasten, oder drück eine Marke auf der Leiste unten.' } },
@@ -682,7 +694,36 @@ export const vinciWelcomeText = {
   route: { en: 'Walk the house from the street, or go straight to the collection.', de: 'Geh vom Hoftor durch das Haus, oder geh direkt zur Sammlung.' },
   enter: { en: 'Enter', de: 'Eintreten' },
   collection: { en: 'Go to the collection', de: 'Zur Sammlung' },
+  /* THE RACK AND ITS HANDLE, said for a screen reader and never displayed:
+     the row of five is what a sighted visitor reads instead. */
+  leaflet: { en: 'What this wing is, in five parts', de: 'Was dieser Flügel ist, in fünf Teilen' },
+  handle: { en: 'Open the five parts', de: 'Die fünf Teile öffnen' },
+  sources: { en: 'Sources', de: 'Quellen' },
 } satisfies Record<string, VinciText>
+
+/* THE WING'S SOURCES, GROUPED. The records are the asset store's own: every
+   picture, leaf, model and material the museum shows carries its holder and
+   its licence line there, so this file groups them and never restates them.
+   A record falls into the first group whose role family names it, and what
+   no family names falls into the group marked `rest`. */
+export interface VinciSourceGroup {
+  id: string
+  name: VinciText
+  /** the head of a record's declared role, before its first dash */
+  roles: readonly string[]
+  rest?: true
+}
+
+export const vinciSourceGroups: readonly VinciSourceGroup[] = [
+  { id: 'documents', name: { en: 'Documents', de: 'Dokumente' }, roles: ['codex', 'ms', 'folio', 'leaf'] },
+  { id: 'pictures', name: { en: 'Pictures and sheets', de: 'Bilder und Blätter' }, roles: ['painting', 'sheet', 'life', 'deep', 'exhibit'] },
+  { id: 'place', name: { en: 'The place', de: 'Der Ort' }, roles: ['place', 'site'] },
+  { id: 'models', name: { en: 'Models and materials', de: 'Modelle und Materialien' }, roles: [], rest: true },
+]
+
+/** The store scopes this wing's sources stand in: its own record, and the
+ *  two shared stores every wing is built out of. */
+export const vinciSourceScopes = { own: ['vinci', 'wing-vinci'], shared: ['library', 'models'] } as const
 
 /* ABSENCE IS A SENTENCE. A work this museum cannot show holds no frame, no
    outline and no reserved rectangle: it is named here, in the sources, with
