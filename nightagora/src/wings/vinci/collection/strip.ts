@@ -230,13 +230,16 @@ export function createVinciHangStrip(options: {
   }
   function paintScale(): void {
     foot.hidden = wall === null
-    whole.hidden = wall === null
     scale.hidden = wall === null || wall.total < 2
-    if (wall === null) return
+    if (wall === null) { whole.hidden = true; return }
     const at = Math.max(0, Math.min(wall.total, wall.place))
     mark.style.setProperty('--along', `${wall.total < 2 ? 0 : (at - 1) / (wall.total - 1) * 100}%`)
     mark.hidden = at < 1
     place.textContent = at < 1 ? '' : WALL_WORDS.place[lang()].replace('{n}', String(at)).replace('{total}', String(wall.total))
+    // THE WAY OFF THE WALL STANDS ONLY WHERE IT LEADS OFF IT. At an end
+    // station the eye is already off the wall, and the control resolved to
+    // the station the visitor was standing at: a word that did nothing.
+    whole.hidden = at < 1
     whole.textContent = WALL_WORDS.whole_wall[lang()]
   }
   return {
