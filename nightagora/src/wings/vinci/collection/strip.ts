@@ -297,10 +297,14 @@ export function createVinciHangStrip(options: {
    * centre it. Only the row scrolls, never the page. */
   function reveal(): void {
     const current = buttons.find(button => button.dataset['exhibit'] === open && open !== null)
-    if (!current || frame.hidden || !row.isConnected) return
-    const cell = current.getBoundingClientRect(), rail = row.getBoundingClientRect()
-    const target = row.scrollLeft + (cell.left - rail.left) - (rail.width - cell.width) / 2
-    row.scrollLeft = Math.max(0, Math.min(row.scrollWidth - row.clientWidth, target))
+    // The ends and the line are repainted even where nothing stands open: a
+    // row that was painted while it was still hidden has no width yet, and
+    // both of its ends would stay down at a row that can be walked.
+    if (current && !frame.hidden && row.isConnected) {
+      const cell = current.getBoundingClientRect(), rail = row.getBoundingClientRect()
+      const target = row.scrollLeft + (cell.left - rail.left) - (rail.width - cell.width) / 2
+      row.scrollLeft = Math.max(0, Math.min(row.scrollWidth - row.clientWidth, target))
+    }
     paintEnds()
     paintPlace()
   }
@@ -351,8 +355,8 @@ export function createVinciHangStrip(options: {
   function stand(): void {
     const was = frame.hidden
     frame.hidden = hidden || ownSelector || entries.length < 2
-    if (was && !frame.hidden) { paintScale(); reveal() }
-    paintPlace()
+    if (was && !frame.hidden) paintScale()
+    reveal()
   }
   function rowPlace(): number {
     if (!buttons.length || frame.hidden) return 0
