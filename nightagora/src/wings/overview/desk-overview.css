@@ -1,0 +1,161 @@
+/* THE WHOLE SET AS ITS OWN VIEW. Everything here is gated on the step's own
+   switch through the view's own element, which is built only when the switch
+   stands, so with the switch off not one rule below paints. */
+
+/* ---- the one word in the band's foot row ---- */
+/* a control the room has no set for is not there at all, and the row's own
+   display would otherwise beat the hidden attribute */
+.desk-ov-open[hidden] { display: none; }
+
+/* ---- the view: it owns the window, so it covers nothing ---- */
+.desk-ov {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  max-height: 100%;
+  margin: 0;
+  padding: 16px var(--desk-g) 14px;
+  border: 0;
+  background: var(--na-abyss);
+  color: var(--na-starlight);
+  display: grid;
+  grid-template-rows: auto auto auto 1fr auto;
+  row-gap: 0;
+  overflow: hidden;
+}
+.desk-ov::backdrop { background: var(--na-abyss); }
+.desk-ov button:focus-visible { outline: 2px solid var(--na-gold); outline-offset: 3px; }
+
+/* THE ONE STEP BACK carries the room's own name, as it does under a work. */
+.desk-ov-back {
+  justify-self: start;
+  height: 44px;
+  padding: 0 14px 0 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  border: 0;
+  background: none;
+  font: 500 0.9375rem/1 var(--sans);
+  letter-spacing: 0.02em;
+  color: var(--desk-quiet);
+  cursor: pointer;
+}
+.desk-ov-back:hover { color: var(--desk-title); }
+.desk-ov-shut {
+  position: absolute;
+  right: calc(var(--desk-g) - 10px);
+  top: 16px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  display: grid;
+  place-items: center;
+  color: var(--desk-quiet);
+  cursor: pointer;
+}
+.desk-ov-shut:hover { color: var(--desk-title); }
+
+.desk-ov-title {
+  margin: 6px 0 0;
+  font: 400 1.875rem/2.375rem var(--serif);
+  color: var(--desk-title);
+}
+.desk-ov-sub {
+  margin: 4px 0 0;
+  font: 400 1rem/1.5rem var(--sans);
+  color: var(--desk-quiet);
+}
+
+/* ---- the grid: seven columns at every count ---- */
+.desk-ov-grid {
+  margin: 18px 0 0;
+  padding: 0 0 2px;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 172px));
+  justify-content: center;
+  align-content: center;
+  gap: 16px 18px;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: color-mix(in srgb, var(--na-gold) 42%, transparent) transparent;
+}
+/* a set that outgrows its box scrolls and wears its bar, and the rows then
+   start at the top instead of standing in the middle of a taller box */
+.desk-ov-grid[data-scrolls='true'] { align-content: start; }
+
+.desk-ov-cell {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  display: block;
+  text-align: center;
+  cursor: pointer;
+  color: inherit;
+}
+.desk-ov-cell:disabled { opacity: 0.5; cursor: default; }
+.desk-ov-plate {
+  height: var(--desk-ov-picture, 106px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.desk-ov-thumb {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  box-shadow: 0 1px 4px color-mix(in srgb, var(--na-abyss) 70%, transparent);
+}
+/* THE NAME UNDER THE PICTURE, two rows at most, with the museum's own mark
+   for how sure the object is standing in front of it. */
+.desk-ov-cellname {
+  margin-top: 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font: 400 0.875rem/1.125rem var(--sans);
+  color: var(--na-mist);
+  text-wrap: pretty;
+}
+.desk-ov-cellname .desk-mark {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+  vertical-align: -1px;
+}
+.desk-ov-cell[aria-current='true'] .desk-ov-thumb {
+  box-shadow: 0 0 0 2px var(--na-gold), 0 0 0 6px color-mix(in srgb, var(--na-gold) 18%, transparent);
+}
+.desk-ov-cell[aria-current='true'] .desk-ov-cellname { color: var(--desk-title); }
+.desk-ov-cell:hover:not(:disabled) .desk-ov-thumb { box-shadow: 0 0 0 2px var(--desk-title); }
+
+/* ---- the foot: the selected work in full, and the one gold control ---- */
+.desk-ov-foot {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+}
+.desk-ov-named { min-width: 0; }
+.desk-ov-said {
+  font: 400 1.5rem/2rem var(--serif);
+  color: var(--desk-title);
+}
+.desk-ov-place {
+  margin-top: 2px;
+  font: 400 1rem/1.5rem var(--sans);
+  color: var(--desk-quiet);
+  font-variant-numeric: tabular-nums;
+}
+.desk-ov-on { flex: none; }

@@ -23,6 +23,7 @@ import type { VinciCertainty, VinciText } from './vinci/content'
 // desk.marks: its imports stand here, and nowhere else in this list
 
 // desk.overview: its imports stand here, and nowhere else in this list
+import { createDeskOverview, type DeskOverview, type DeskOverviewCell } from './overview'
 
 // desk.sheet: its imports stand here, and nowhere else in this list
 
@@ -77,6 +78,13 @@ export interface DeskChromeHost {
   // desk.marks: the host fields its step needs stand here
 
   // desk.overview: the host fields its step needs stand here
+  /** the set the standing station holds, the room's own name, and the one
+      press that walks to a work of it. A station with no set hands none. */
+  overview?: {
+    cells: () => readonly DeskOverviewCell[]
+    open: (id: string) => void
+    room: () => string
+  }
 
   // desk.sheet: the host fields its step needs stand here
 
@@ -621,7 +629,33 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
 
   // desk.overview: the whole set as its own view
   if (deskOn('overview')) {
-    // filled by its own seat, empty until its step stands
+    const set = host.overview
+    if (words && set) {
+      let overview: DeskOverview | null = createDeskOverview({
+        lang: host.lang, cells: set.cells, open: set.open, room: set.room, mark: deskMark,
+      })
+      host.stage.append(overview.element)
+      /* THE FOOT ROW IS BUILT AGAIN AT EVERY PAINT, so the one word joins it
+         again each time and that row needs to know nothing about this step. */
+      const joinFoot = (): void => {
+        if (!overview) return
+        overview.paint()
+        if (foot.lastElementChild !== overview.control) foot.append(overview.control)
+      }
+      const joining = new MutationObserver(joinFoot)
+      joining.observe(foot, { childList: true })
+      joinFoot()
+      /* THE VIEW GOES WITH THE BAND. The chrome's own dispose is one return
+         statement below and belongs to no step, so this one reads the band. */
+      const watching = new MutationObserver(() => {
+        if (band.isConnected) return
+        watching.disconnect()
+        joining.disconnect()
+        overview?.dispose()
+        overview = null
+      })
+      watching.observe(host.stage, { childList: true })
+    }
   }
 
 

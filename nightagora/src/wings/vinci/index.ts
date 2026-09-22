@@ -99,6 +99,7 @@ import deskMarksCss from '../desk-marks.css?inline'
 import { deskControl } from '../desk-story'
 
 // desk.overview: its stylesheet import stands here
+import deskOverviewCss from '../overview/desk-overview.css?inline'
 
 // desk.sheet: its stylesheet import stands here
 
@@ -454,7 +455,7 @@ export function createWing():VinciWingModule {
       deskMarksCss,
 
       // desk.overview
-      '',
+      deskOverviewCss,
 
       // desk.sheet
       '',
@@ -484,6 +485,10 @@ export function createWing():VinciWingModule {
       // desk.marks: its host fields
 
       // desk.overview: its host fields
+      overview:{cells:()=>stationExhibits().map(cell=>({id:cell.id,title:cell.title,openable:cell.openable,
+        certainty:pictureCertainty(cell.colour),kind:picks.find(pick=>pick.id===cell.id)?.kind??'picture',
+        preview:cell.preview===null?null:strip?.thumb(cell.preview)??cell.preview})),
+        open:id=>openExhibit(id,null),room:()=>text(hereContent().name)},
 
       // desk.sheet: its host fields
 
