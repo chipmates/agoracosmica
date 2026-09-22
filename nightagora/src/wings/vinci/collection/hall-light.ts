@@ -12,6 +12,8 @@ import { FACE, FLOOR } from './layout'
 
 /** The hall's roof falls south from its clerestory; its beams follow it. */
 const hallSoffit = (north: number): number => 1.05 - .75 * (-42.5 - north) / 22.2
+/** What the hall's five point fittings give once the eye stands in the hall. */
+export const HALL_FILL = 1.4
 /** Where a spot hangs under a beam: the beam's soffit less its own depth. */
 const underBeam = (north: number): number => hallSoffit(north) - .34 - .29 - .18
 

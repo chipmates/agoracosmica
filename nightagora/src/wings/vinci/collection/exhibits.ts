@@ -22,7 +22,7 @@ import { collectionExhibitMaterials, collectionInteriorMaterial, collectionProce
 import { COURT, FLOOR, GRAVE_ORIGIN, LINE_ORIGIN } from './layout'
 import { createCollectionStandSolids, standLevel, STANDS, standOf, type StandGround } from './stands'
 import { mountCollectionPlates, type CollectionPictureSource } from './plates'
-import { mountHallLight } from './hall-light'
+import { HALL_FILL, mountHallLight } from './hall-light'
 import { VINCI_READING_TABLE } from './approaches'
 import type { BodySheetSource } from './body-wall'
 
@@ -263,7 +263,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
     // no opening in this room reaches them, so the luminaires on the beams
     // are lights here and not a term on a surface.
     ...[[-51, -44], [-47.2, -45.6], [-56.2, -51.4], [-46.4, -51.2], [-51.4, -58.6]]
-      .map(([east, north]) => ['hall-fitting', east!, north!, FLOOR + 4.6, 1.4, 15, '#f4e6cc'] as [string, number, number, number, number, number, string]),
+      .map(([east, north]) => ['hall-fitting', east!, north!, FLOOR + 4.6, 9.5, 15, '#f4e6cc'] as [string, number, number, number, number, number, string]),
     // The reading lamp on the table is emissive geometry: it shows that it
     // is lit, it does not light the book. The room's own fitting over the
     // table does that, because the object under it is not this module's to shade.
@@ -274,8 +274,10 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       .map(([east, north, reach]) => ['gallery-fitting', east!, north!, FLOOR + 3.9, 7.4, reach!, '#f4e6cc'] as [string, number, number, number, number, number, string]),
   ]
   // None casts a shadow: the one shadowing light in this scene is the measured sun.
+  const hallFittings: PointLight[] = []
   for (const [name, east, north, height, intensity, reach, colour] of FITTINGS) {
     const fitting = new PointLight(colour, intensity, reach, 2)
+    if (name === 'hall-fitting') hallFittings.push(fitting)
     fitting.position.set(east, height, -north)
     fitting.castShadow = false
     fitting.name = `vinci/collection-rooms/${name}`
@@ -360,6 +362,13 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       // between a walk and a frame that draws the whole ground at once.
       const inHall = eye.x > -62.4 && eye.x < -38.6 && eye.z > 41.8 && eye.z < 64.2 && eye.y < -1.9
       hallLight.update(inHall)
+      // THE HALL'S OWN FITTINGS GO DOWN TO A FILL ONCE THE EYE IS IN THE HALL,
+      // where its spots take over. They reach the rooms beside it unshadowed,
+      // so from outside the hall they keep their full level, and the change
+      // runs over the first metres past a door instead of at its line.
+      const inside = Math.min(eye.x + 61.66, -39.02 - eye.x, eye.z - 42.04, 63.66 - eye.z)
+      const t = Math.min(1, Math.max(0, inside / 2.5)), dim = t * t * (3 - 2 * t)
+      for (const fitting of hallFittings) fitting.intensity = 9.5 + (HALL_FILL - 9.5) * dim
       for (const machine of machines) {
         const reach = eye.distanceToSquared(machine.at) < machine.reach * machine.reach
         const visible = machine.ground === 'hall' ? inHall && reach
