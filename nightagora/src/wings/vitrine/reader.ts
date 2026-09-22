@@ -289,9 +289,9 @@ export function createReaderPayload(options: {
     const block = make('section', 'reader-words')
     block.lang = host.lang
     // WHERE THE SIDE STANDS IN ITS BOOK, which a book of one side has no
-    // need to say.
+    // need to say, and a label in the band already says in its name row.
     const inside = volume(), place = inside.indexOf(at)
-    if (inside.length > 1) block.append(make('p', 'vitrine-meta reader-place',
+    if (inside.length > 1 && !host.banded) block.append(make('p', 'vitrine-meta reader-place',
       options.words.place.replace('{n}', String(place + 1)).replace('{total}', String(inside.length))))
     if (here.shows) block.append(make('p', '', here.shows))
     if (here.named) block.append(make('p', 'reader-named', here.named))
