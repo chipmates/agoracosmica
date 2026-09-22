@@ -21,7 +21,7 @@ import { DISCLOSURES } from '../content/disclosures'
 import { LOBBY_TEXT } from '../content/lobby'
 import plateCss from './title-plate.css?inline'
 import { windowOwnsTheScreen } from './window-chrome'
-import { deskAny } from './desk-switches'
+import { deskAny, deskOn } from './desk-switches'
 import { deskStageHeight, setDeskBand } from './desk-stage'
 import { gaitPace, setGaitPace, type GaitPaceName } from './vinci/gait'
 import type { WingEntry } from './registry'
@@ -454,19 +454,25 @@ export function createWingFrame(
   doorTitle.id = 'wing-door-title'
   disclosure.setAttribute('aria-labelledby', doorTitle.id)
   const doorWall = el('div', 'na-plate-wall')
-  doorWall.append(doorTitle)
+  /* ON A WIDE STAGE THE PLATE IS THE BAND GROWN. It opens in the place the
+     visitor was already reading, so it carries his own question, verbatim
+     from the wing's data, where the centred plate carries a heading. */
+  const doorAsked = el('p', 'wing-door-asked')
+  doorAsked.id = 'wing-door-asked'
+  doorAsked.hidden = true
+  doorWall.append(doorTitle, doorAsked)
   /* THE PLATE'S WORDS ARE A DRAWER, and a drawer carries an id so the control
      that opens it can name it. The register is declared while a wing stands
      and taken back when it closes: a frame with no wing shows no words, and a
      drawer nothing can open would be read as unopened rather than as absent. */
   const doorWords = el('div', 'wing-door-words')
   doorWords.id = 'wing-door-words'
-  const doorLead = el('p', 'wing-door-word')
+  const doorLead = el('p', 'wing-door-word wing-door-lead')
   /* THE CANON'S OWN SENTENCE, never a second telling of it: the museum says
      once what an Echo is, and the honesty check reads this one against it. */
   const doorEcho = el('p', 'wing-door-word')
   doorEcho.dataset['naDisclosure'] = 'stone'
-  const doorTerms = el('p', 'wing-door-word')
+  const doorTerms = el('p', 'wing-door-word wing-door-terms')
   doorWords.append(doorLead, doorEcho, doorTerms)
   const continueDoor = el('a', 'na-plate-primary')
   continueDoor.target = '_blank'; continueDoor.rel = 'noopener'
@@ -480,6 +486,12 @@ export function createWingFrame(
 
   /** the plate's words, read again on every open and on a language change */
   function paintDoorPlate(): void {
+    const band = disclosure.dataset['form'] === 'band'
+    doorAsked.hidden = !band
+    doorAsked.textContent = band ? question.textContent ?? '' : ''
+    // the plate is named by what it carries: the question on a band, the
+    // heading in the centred plate
+    disclosure.setAttribute('aria-labelledby', band ? doorAsked.id : doorTitle.id)
     doorTitle.textContent = say(WING_TEXT.doorTitle).replace('{name}', entry?.name ?? '')
     doorLead.textContent = say(WING_TEXT.doorLead)
     doorEcho.textContent = say(DISCLOSURES.stone)
@@ -505,18 +517,25 @@ export function createWingFrame(
     if (wing?.doorDisclosure !== 'first-press' || doorPassed) return
     event.preventDefault()
     continueDoor.href = door.href
+    /* THE PLATE GROWS FROM THE BAND where the band stands: no centred plate
+       over a dimmed room, and the room above it stays the room. */
+    if (deskOn('panel') && !narrowStage()) disclosure.dataset['form'] = 'band'
+    else delete disclosure.dataset['form']
     paintDoorPlate()
     disclosure.showModal()
     door.setAttribute('aria-expanded', 'true')
     doorStandsAlone()
     disclosure.scrollTop = 0
     continueDoor.focus({ preventScroll: true })
+    // the ways belong to the surface that owns the foot of the screen
+    dispatchEvent(new CustomEvent('na-wing-plate', { detail: { open: true } }))
   })
   continueDoor.addEventListener('click', () => { doorPassed = true; disclosure.close() })
   closeDisclosure.addEventListener('click', () => disclosure.close())
   disclosure.addEventListener('close', () => {
     door.setAttribute('aria-expanded', 'false')
     doorStandsAlone()
+    dispatchEvent(new CustomEvent('na-wing-plate', { detail: { open: false } }))
     if (!host.hidden) door.focus({ preventScroll: true })
   })
 
