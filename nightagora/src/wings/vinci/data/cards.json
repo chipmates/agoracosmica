@@ -135,6 +135,8 @@
       "previous": { "en": "Previous", "de": "Zurück" },
       "age": { "en": "age {years}", "de": "mit {years} Jahren" },
       "age_about": { "en": "age about {years}", "de": "mit etwa {years} Jahren" },
+      "age_near": { "en": "age near {years}", "de": "mit fast {years} Jahren" },
+      "age_birth": { "en": "age 0", "de": "Geburt" },
       "next": { "en": "Next", "de": "Weiter" }
     }
   }

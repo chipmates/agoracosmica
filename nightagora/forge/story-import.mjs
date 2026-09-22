@@ -147,15 +147,18 @@ for (const block of blocks) {
   const idMatch = (segments[1] ?? '').match(/`([a-z-]+)`/)
   if (!idMatch) { refuse('station-id', block.heading, 'the heading carries no station id in backticks'); continue }
   const id = /NEW wall station/.test(segments[1]) ? NEW_STATION_ID : idMatch[1]
-  const clock = segments.slice(3).find((s) => CLOCK.test(s)) ?? ''
-  if (segments.length > 3 && !clock) notes.push(`${id}: the heading's third segment is not an age clock`)
+  /* The clock segment carries both languages, `en | de`: the German age is a
+     sentence of its own and never the English words with the number kept. */
+  const clockSegment = segments.slice(3).find((s) => CLOCK.test(s.split(' | ')[0].trim())) ?? ''
+  const [clockEn = '', clockDe = ''] = clockSegment.split(' | ').map((s) => s.trim())
+  if (segments.length > 3 && !clockEn) notes.push(`${id}: the heading's third segment is not an age clock`)
   const pointer = field(block.body, 'POINTER')
   const certaintyLine = field(block.body, 'CERTAINTY').toLowerCase()
   const certainty = CLASSES.find((c) => certaintyLine.includes(c))
     ?? (/not known|unknown/.test(certaintyLine) ? 'unknown' : '')
   stops.push({
     kind, id, beat: quiet ? null : Number(segments[0]), quiet, chapter,
-    age: clock ? { en: clock, de: clock } : null,
+    age: clockEn ? { en: clockEn, de: clockDe } : null,
     line: { en: field(block.body, 'EN'), de: field(block.body, 'DE') },
     drawer: null,
     certainty,
@@ -275,7 +278,8 @@ for (const [index, stop] of stops.entries()) {
 
 for (const stop of stops) {
   const at = stop.id || stop.chapter.en
-  for (const [name, text] of [['chapter', stop.chapter], ['line', stop.line]]) {
+  for (const [name, text] of [['chapter', stop.chapter], ['line', stop.line],
+    ...(stop.age ? [['age', stop.age]] : [])]) {
     for (const language of ['en', 'de']) {
       if (!text?.[language]?.trim()) refuse('language', at, `${name} has no ${language}`)
       else if (/\*\*|`|\[v\d/.test(text[language])) refuse('markup', at, `${name} ${language} still carries markup`)
