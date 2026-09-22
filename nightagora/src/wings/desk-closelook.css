@@ -1,0 +1,303 @@
+/* THE CLOSE LOOK IN VARIANT B: the work alone on the stage, the museum in the
+   band under it. Every rule here is gated on `desk.closelook`, so with the
+   switch off the window is today's card beside the work, to the pixel. */
+
+#wing[data-desk~='closelook'] {
+  /* THE LADDER A CLOSE LOOK IS SIZED BY: air, the step back to the room, the
+     name row, two rows of the line, the reading row. One row more than a
+     station's, which is the step back, so 224 against 192. */
+  --desk-clb-air: 10px;
+  --desk-clb-step: 28px;
+  --desk-clb-gap: 18px;
+  --desk-clb-foot: 9px;
+  --desk-clb-line: 2.25rem;
+  /* the measure is narrower than a station's: the work's own instruments
+     stand at the right of the same row */
+  --desk-clb-read: 640px;
+  --desk-clb-drawer: 355px;
+}
+
+/* ---- the band ---- */
+#wing[data-desk~='closelook'] .desk-clb {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  padding: var(--desk-clb-air) var(--desk-g) var(--desk-clb-foot);
+  display: grid;
+  grid-template-columns: minmax(0, var(--desk-clb-read)) 1fr;
+  grid-template-rows: var(--desk-clb-step) auto;
+  column-gap: 24px;
+  row-gap: var(--desk-clb-gap);
+  align-items: start;
+  background: var(--na-abyss);
+  /* the band is wall, not glass: a hand that lands on it never moves the eye */
+  pointer-events: auto;
+  /* the one ornament: on a dark work the picture's foot would vanish into
+     the band, and this edge is what keeps it legible */
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--na-gold) 34%, transparent);
+  color: var(--na-starlight);
+}
+
+/* ---- the one step back, above the work's own name ---- */
+#wing[data-desk~='closelook'] .desk-clb-step {
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: start;
+  min-height: 44px;
+  margin: -8px 0 -8px -2px;
+  padding: 0 2px;
+  border: 0;
+  background: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font: 500 0.875rem/1 var(--sans);
+  letter-spacing: 0.14em;
+  text-indent: 0.14em;
+  text-transform: uppercase;
+  color: var(--na-starlight);
+  white-space: nowrap;
+  cursor: pointer;
+}
+#wing[data-desk~='closelook'] .desk-clb-step:hover,
+#wing[data-desk~='closelook'] .desk-clb-step:focus-visible { color: var(--na-gold); }
+
+/* ---- the words: the name row, the line, the reading row ---- */
+#wing[data-desk~='closelook'] .desk-clb-cap {
+  grid-column: 1;
+  grid-row: 2;
+  min-width: 0;
+}
+#wing[data-desk~='closelook'] .desk-clb .desk-name { margin-bottom: 6px; }
+#wing[data-desk~='closelook'] .desk-clb :is(.desk-chapter, .desk-clock, .desk-count, .desk-line) { text-shadow: none; }
+#wing[data-desk~='closelook'] .desk-clb .desk-count {
+  position: relative;
+  margin-left: 24px;
+  padding-left: 25px;
+}
+#wing[data-desk~='closelook'] .desk-clb .desk-count::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  margin: 0;
+  background: color-mix(in srgb, var(--na-starlight) 30%, transparent);
+}
+#wing[data-desk~='closelook'] .desk-clb .desk-count[hidden] { display: none; }
+/* THE LINE HOLDS TWO ROWS FREE in every language and takes a third where a
+   language needs one: the band grows by that one row and the stage gives it
+   back, which is the only case in which a close look moves the picture. */
+#wing[data-desk~='closelook'] .desk-clb-line {
+  min-height: calc(var(--desk-clb-line) * 2);
+  margin: 0;
+  font: 400 1.625rem/var(--desk-clb-line) var(--serif);
+  color: var(--desk-title);
+  text-wrap: pretty;
+}
+#wing[data-desk~='closelook'] .desk-clb-foot {
+  margin-top: 5px;
+  gap: 30px;
+  flex-wrap: nowrap;
+}
+/* A WORDED CONTROL IS A WORD on solid ground: a hairline under it, and the
+   fill comes back only as a state. */
+#wing[data-desk~='closelook'] .desk-clb :is(.desk-word-control, .vitrine-control) {
+  position: relative;
+  flex: none;
+  height: 44px;
+  min-width: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  text-shadow: none;
+  letter-spacing: normal;
+  text-indent: 0;
+  text-transform: none;
+  font: 500 0.9375rem/1 var(--sans);
+  color: var(--na-starlight);
+  white-space: nowrap;
+  cursor: pointer;
+}
+#wing[data-desk~='closelook'] .desk-clb :is(.desk-word-control, .vitrine-control)::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 10px;
+  height: 1px;
+  background: color-mix(in srgb, var(--na-starlight) 44%, transparent);
+}
+#wing[data-desk~='closelook'] .desk-clb :is(.desk-word-control, .vitrine-control):hover::after,
+#wing[data-desk~='closelook'] .desk-clb :is(.desk-word-control, .vitrine-control):focus-visible::after {
+  height: 1.5px;
+  background: var(--na-starlight);
+}
+#wing[data-desk~='closelook'] .desk-clb-foot .vitrine-control { color: var(--desk-clock); }
+#wing[data-desk~='closelook'] .desk-clb-foot .vitrine-control::after {
+  background: color-mix(in srgb, var(--desk-clock) 50%, transparent);
+}
+#wing[data-desk~='closelook'] .desk-clb .desk-word-control[aria-disabled='true'] { opacity: .55; cursor: default; }
+
+/* ---- the drawer: the band grown, never a second plate ---- */
+#wing[data-desk~='closelook'] .desk-clb-drawer {
+  grid-column: 1;
+  grid-row: 2;
+  min-width: 0;
+  max-height: var(--desk-clb-drawer);
+  overflow: hidden;
+}
+#wing[data-desk~='closelook'] .desk-clb-drawer[hidden] { display: none; }
+#wing[data-desk~='closelook'] .desk-clb-drawer:focus,
+#wing[data-desk~='closelook'] .desk-clb-drawer:focus-visible { outline: none; }
+/* ONE TEXT AT A TIME: the line's whole column leaves the flow while the
+   drawer stands, which is what lets the band take the drawer's height. */
+#wing[data-desk~='closelook'] .desk-clb[data-drawer='open'] .desk-clb-cap { display: none; }
+#wing[data-desk~='closelook'] .desk-clb-drawer-name { margin-bottom: 12px; }
+#wing[data-desk~='closelook'] .desk-clb-words > * { margin: 0 0 5px; }
+#wing[data-desk~='closelook'] .desk-clb-words :is(p, li) {
+  margin: 0 0 5px;
+  font: 400 1.1875rem/1.875rem var(--serif);
+  color: color-mix(in srgb, var(--na-starlight) 92%, var(--na-mist));
+  text-wrap: pretty;
+}
+/* the quiet facts under the sentences keep their own size and their mark */
+#wing[data-desk~='closelook'] .desk-clb-words :is(.vitrine-meta, .picture-holder, .picture-source-reading, .picture-column-note) {
+  font: 400 0.875rem/1.5 var(--sans);
+  color: var(--desk-quiet);
+}
+#wing[data-desk~='closelook'] .desk-clb-words .vitrine-certainty {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 10px 0 4px;
+  font: 500 0.875rem/1.4 var(--sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--desk-quiet);
+}
+#wing[data-desk~='closelook'] .desk-clb-words .vitrine-description { display: block; }
+#wing[data-desk~='closelook'] .desk-clb-drawer-foot {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid color-mix(in srgb, var(--na-starlight) 16%, transparent);
+}
+
+/* ---- the right column: the kind's instruments over the two ways ---- */
+#wing[data-desk~='closelook'] .desk-clb-right {
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+  min-height: 159px;
+  padding: 14px 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+#wing[data-desk~='closelook'] .desk-clb-inst {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  min-height: 44px;
+  max-width: 100%;
+}
+#wing[data-desk~='closelook'] .desk-clb-inst:empty { display: none; }
+/* THE PAYLOAD'S OWN ROW STANDS HERE, in the band and never on the work: its
+   fixed place under the picture is undone and the row is laid in the flow. */
+#wing[data-desk~='closelook'] .desk-clb-inst .vitrine-payload-controls {
+  position: static;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 0;
+  pointer-events: auto;
+}
+#wing[data-desk~='closelook'] .desk-clb-inst .vitrine-control {
+  position: relative;
+  flex: none;
+  min-height: 38px;
+  height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 2px;
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--desk-edge);
+  font: 500 0.9375rem/1 var(--sans);
+  color: color-mix(in srgb, var(--na-starlight) 88%, var(--na-mist));
+  white-space: nowrap;
+}
+#wing[data-desk~='closelook'] .desk-clb-inst .vitrine-control::after { content: none; }
+#wing[data-desk~='closelook'] .desk-clb-inst .vitrine-control[aria-pressed='true'] {
+  background: color-mix(in srgb, var(--na-gold) 18%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--na-gold) 34%, transparent);
+  color: var(--desk-title);
+}
+#wing[data-desk~='closelook'] .desk-clb-inst .vitrine-control[disabled] { opacity: .38; cursor: default; }
+/* THE CLOCK IS AN INSTRUMENT and it reads first, as the design draws it: the
+   run and its track, then the versions of the work beside them. */
+#wing[data-desk~='closelook'] .desk-clb-inst .vitrine-views { gap: 0; order: 2; }
+#wing[data-desk~='closelook'] .desk-clb-inst .vitrine-clock { flex: 0 1 300px; gap: 12px; order: 1; }
+#wing[data-desk~='closelook'] .desk-clb-inst .vitrine-play { min-width: 96px; }
+#wing[data-desk~='closelook'] .desk-clb-inst :is(.reader-row, .reader-zoom, .vitrine-reader-row) {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+/* a machine's folio and a reader's strip belong to the work, not to the band */
+#wing[data-desk~='closelook'] .desk-clb-inst .vitrine-folio { position: static; }
+
+#wing[data-desk~='closelook'] .desk-clb-ways {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 9px;
+}
+#wing[data-desk~='closelook'] .desk-clb-on { min-width: 320px; }
+#wing[data-desk~='closelook'] .desk-clb :is(button):focus-visible { outline: 2px solid var(--na-gold); outline-offset: 3px; }
+
+/* ---- WHAT THE BAND REPLACES WHILE IT STANDS ----
+   One band owns the foot of the screen. The station's own band is the wall a
+   visitor left to come here, so it goes whole, and the card, the row of
+   plates and the payload's fixed row go with it: nothing stands on the work. */
+#wing[data-desk~='closelook'] .vitrine[data-narrow='false'] :is(.vitrine-card, .vitrine-sheet) { display: none; }
+:root[data-na-window='desk'] #wing[data-desk~='closelook']:has(.desk-clb) .desk-low { visibility: hidden; }
+
+/* WHILE A SURFACE THE VISITOR ASKED FOR STANDS OVER THE LABEL, the band goes
+   and comes back whole: the record, the plan and the life each own the screen
+   while they stand, which is the rule the station's own band already keeps. */
+body:has(dialog[open]) #wing[data-desk~='closelook'] .desk-clb {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* THE WORK OWNS THE STAGE. The viewport is the whole picture box and the
+   payload stands in it; the caption is the one line under the work and it
+   keeps the band clear. */
+#wing[data-desk~='closelook'] .vitrine[data-narrow='false'] .vitrine-caption {
+  bottom: 12px;
+  max-width: 760px;
+  font: 400 1rem/1.45 var(--serif);
+}
+/* A PAGE IS READ WHOLE. Its strip of sides is the count in the name row now,
+   and its own row of versions stands in the band, so the leaf keeps the box.
+   The viewer's own ground goes with them: on a stage of its own the leaf
+   stands on the room, not on a black plate laid over it. */
+#wing[data-desk~='closelook'] .vitrine[data-narrow='false'] .deep-plate[data-seated='true'] { background: transparent; }
+/* the corner that named the side on the glass is the band's name row now */
+#wing[data-desk~='closelook'] .vitrine[data-narrow='false'] .deep-stand { display: none; }
+#wing[data-desk~='closelook'] .vitrine[data-narrow='false'] .reader-shelf { display: none; }
+#wing[data-desk~='closelook'] .vitrine[data-narrow='false'] :is(.reader-ground, .reader-stage) {
+  bottom: 44px;
+  right: 0;
+}

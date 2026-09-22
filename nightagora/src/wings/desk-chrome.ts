@@ -109,7 +109,7 @@ const PLAY = 'M5 3l8 5-8 5z'
 /* SHAPE CARRIES THE CLASS, so the mark survives a grey print and a colour
    blind eye, and the colour reinforces it: a full disc, a half disc, an open
    ring, a broken ring. The four colours are the wing's own. */
-function mark(certainty: VinciCertainty): SVGSVGElement {
+export function deskMark(certainty: VinciCertainty): SVGSVGElement {
   const svg = document.createElementNS(SVG, 'svg')
   svg.setAttribute('viewBox', '0 0 18 18')
   svg.setAttribute('class', 'desk-mark')
@@ -411,7 +411,7 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
     const said = stop?.drawer ? say(stop.drawer) : ''
     plateName.textContent = ''
     // the same name row the line carried, so the eye keeps the place it read
-    plateName.append(mark(stop?.certainty ?? 'reconstructed'), plateChapter, plateClock, plateCount)
+    plateName.append(deskMark(stop?.certainty ?? 'reconstructed'), plateChapter, plateClock, plateCount)
     plateChapter.textContent = say(titleOf(at.id))
     plateClock.textContent = stop?.age ? say(stop.age) : ''
     plateClock.hidden = !stop?.age
@@ -463,7 +463,7 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
     if (words) {
       nameRow.textContent = ''
       const sure: VinciCertainty = stop?.certainty ?? 'reconstructed'
-      nameRow.append(mark(sure), chapter, clock, count)
+      nameRow.append(deskMark(sure), chapter, clock, count)
       chapter.textContent = say(titleOf(at.id))
       const age = stop?.age ?? null
       clock.textContent = age ? say(age) : ''
