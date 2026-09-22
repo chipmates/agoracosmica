@@ -298,7 +298,7 @@ export function createVinciExhibitDots(options: {
   const settleMs = 80
 
   function hide(): void {
-    for (const dot of buttons) { dot.hidden = true; pressed.delete(dot) }
+    for (const dot of buttons) { dot.hidden = true; pressed.delete(dot); delete dot.dataset['exhibit'] }
   }
 
   function invalidate(): void {
@@ -379,8 +379,10 @@ export function createVinciExhibitDots(options: {
       shown.sort((a, b) => a.x - b.x)
       for (let i = 0; i < buttons.length; i++) {
         const dot = buttons[i]!, entry = shown[i]
-        if (!entry) { dot.hidden = true; pressed.delete(dot); continue }
+        // the mark carries the exhibit it opens, so an export can name it
+        if (!entry) { dot.hidden = true; pressed.delete(dot); delete dot.dataset['exhibit']; continue }
         dot.hidden = false
+        dot.dataset['exhibit'] = entry.mark.id
         dot.style.left = `${entry.x}px`
         dot.style.top = `${entry.y}px`
         dot.style.setProperty('--certainty', entry.mark.colour)
