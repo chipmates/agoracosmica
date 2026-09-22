@@ -721,6 +721,11 @@ export function createWing():VinciWingModule {
         if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();stepExhibit(-1)}
         return
       }
+      // THE DEEPEST SURFACE ANSWERS ESCAPE FIRST. The desktop's drawer is one
+      // step back from wherever the hand is inside it, and it stands under
+      // the reader, which is why it is asked after the reader and before the
+      // room's own three answers.
+      if(e.key==='Escape'&&desk?.key(e)){e.preventDefault();return}
       if(e.key==='Escape'&&sheetOpen&&narrow()){e.preventDefault();sheetOpen=false;paintSheet();return}
       // ESCAPE CLOSES THE CARD FIRST (above), then stands the visitor off the
       // wall at the nearer of the room's two ends.
