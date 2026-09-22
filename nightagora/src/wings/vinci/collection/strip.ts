@@ -22,6 +22,7 @@
  * many is in view, so a row that can be moved says that it can.
  */
 import { lang } from '../../content'
+import { deskOn } from '../../desk-switches'
 import cardsRaw from '../data/cards.json?raw'
 
 type Words = { en: string; de: string }
@@ -51,6 +52,11 @@ const waiting = new Set<(address: string, thumb: string) => void>()
 export function registerVinciStripThumb(address: string, thumb: string): void {
   thumbs.set(address, thumb)
   for (const tell of waiting) tell(address, thumb)
+}
+/** THE SMALL COPY MADE FOR A PLATE, where one exists. A second view of the
+ * same set reads the row's own copy instead of decoding the file again. */
+export function vinciStripThumb(address: string): string {
+  return thumbs.get(address) ?? address
 }
 export function releaseVinciStripThumb(address: string): void {
   const thumb = thumbs.get(address)
@@ -100,6 +106,8 @@ export interface VinciHangStrip {
   /** The wall this row is the instrument of, or null where it is only a row. */
   setWall(wall: VinciStripWall | null): void
   setHidden(hidden: boolean): void
+  /** the row's own small copy of a plate, for a view that shows the same set */
+  thumb(address: string): string
   /** ONE SELECTOR PER VIEW. A view that brings its own way through the same
    * set, the reader's strip of sides, silences the row while it stands: two
    * selectors for one set is a choice a visitor has to make twice. A view
@@ -115,6 +123,12 @@ export interface VinciHangStrip {
 
 /** A drag this far is a drag; a shorter one is the press it looks like. */
 const DRAG_SLOP = 6
+
+/* WHERE THE WHOLE SET HAS A VIEW OF ITS OWN, THIS ROW STANDS DOWN, at rest
+ * and under a close look alike: one selector per set, and the overview is
+ * that one. The reader's own strip of sides stays, because it is the page's
+ * instrument and not a second way through the same set. */
+const rowStandsDown = (): boolean => deskOn('overview')
 
 export function createVinciHangStrip(options: {
   host: HTMLElement
@@ -251,7 +265,9 @@ export function createVinciHangStrip(options: {
   function paint(): void {
     row.textContent = ''
     buttons.length = 0
-    for (const entry of entries) {
+    // a row that stands down builds no cell: nothing of it is in the tab
+    // order, and a hand coming back from a work is never sent to a hidden one
+    for (const entry of rowStandsDown() ? [] : entries) {
       const item = document.createElement('li')
       const button = document.createElement('button')
       button.type = 'button'
@@ -354,7 +370,7 @@ export function createVinciHangStrip(options: {
   /** The row stands unless something stands for it. */
   function stand(): void {
     const was = frame.hidden
-    frame.hidden = hidden || ownSelector || entries.length < 2
+    frame.hidden = hidden || ownSelector || rowStandsDown() || entries.length < 2
     if (was && !frame.hidden) paintScale()
     reveal()
   }
@@ -398,6 +414,7 @@ export function createVinciHangStrip(options: {
       hidden = next
       stand()
     },
+    thumb: address => vinciStripThumb(address),
     setViewSelector(brings) {
       ownSelector = brings
       stand()
