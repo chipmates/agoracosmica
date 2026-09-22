@@ -75,6 +75,8 @@ const SHUT = 'M4 4l8 8M12 4l-8 8'
    which the view scrolls and wears its bar. */
 const COLUMNS = 7
 const GAP_ROW = 16
+/** the room fills its set after the station stands, and says so with this */
+export const DESK_SET_CHANGED = 'na-exhibit-set'
 /** the name under a picture: two rows at 14 / 18 and the air above them */
 const NAME_BLOCK = 42
 const PICTURE_MOST = 200
@@ -166,6 +168,9 @@ export function createDeskOverview(host: DeskOverviewHost): DeskOverview {
   const leaving = new AbortController()
   window_.addEventListener('popstate', () => close(false), { signal: leaving.signal })
   window_.addEventListener('resize', () => layout(), { signal: leaving.signal })
+  // the count is the set's own, and a room that has just finished building it
+  // says so: the word is never a count of what had arrived by the first paint
+  window_.addEventListener(DESK_SET_CHANGED, () => paint(), { signal: leaving.signal })
 
   /** THE CELLS ARE THE ONES WITH A PICTURE. No picture, no cell: a date or an
       absence never gets a tile here, and the count says the same. */
@@ -238,8 +243,17 @@ export function createDeskOverview(host: DeskOverviewHost): DeskOverview {
       const box = grid.getBoundingClientRect()
       if (box.height < 1) return
       const free = (box.height - (rows - 1) * GAP_ROW) / rows - NAME_BLOCK
-      const tall = Math.round(Math.max(PICTURE_LEAST, Math.min(PICTURE_MOST, free)))
+      let tall = Math.round(Math.max(PICTURE_LEAST, Math.min(PICTURE_MOST, free)))
       view.style.setProperty('--desk-ov-picture', `${tall}px`)
+      /* THE NAME'S OWN HEIGHT IS THE LANGUAGE'S, so the fit is measured and
+         corrected and never assumed: a row of German titles takes the second
+         row more often, and the picture gives those pixels back. */
+      for (let pass = 0; pass < 3 && tall > PICTURE_LEAST; pass++) {
+        const over = grid.scrollHeight - grid.clientHeight
+        if (over <= 1) break
+        tall = Math.max(PICTURE_LEAST, tall - Math.ceil(over / rows))
+        view.style.setProperty('--desk-ov-picture', `${tall}px`)
+      }
       // a set that outgrows its box says so, and its rows start at the top
       grid.dataset['scrolls'] = String(grid.scrollHeight > grid.clientHeight + 1)
     })
@@ -274,7 +288,28 @@ export function createDeskOverview(host: DeskOverviewHost): DeskOverview {
     const cell = shown[index]
     if (!cell?.openable) return
     close(false)
+    holdTheHand()
     host.open(cell.id)
+  }
+
+  /* AND THE HAND COMES BACK FROM THE WORK THE VIEW SENT IT TO. The view is
+     unmounted while that work stands, so the way back is the word that opened
+     it, and the museum's own window attribute says when the work is done. */
+  let letGo: (() => void) | null = null
+  function holdTheHand(): void {
+    letGo?.()
+    const root = document.documentElement
+    let stood = false
+    const watch = new MutationObserver(() => {
+      if (root.dataset['naWindow']) { stood = true; return }
+      if (!stood) return
+      letGo?.()
+      if (control.isConnected && !control.hidden) control.focus({ preventScroll: true })
+    })
+    // a press that opens no window of its own lets the hand go where it fell
+    const patience = window_.setTimeout(() => { if (!stood) letGo?.() }, 3000)
+    letGo = () => { watch.disconnect(); window_.clearTimeout(patience); letGo = null }
+    watch.observe(root, { attributes: true, attributeFilter: ['data-na-window'] })
   }
 
   function step(by: number): void {
@@ -319,6 +354,7 @@ export function createDeskOverview(host: DeskOverviewHost): DeskOverview {
     close: () => close(true),
     dispose() {
       close(false)
+      letGo?.()
       leaving.abort()
       view.remove()
       control.remove()

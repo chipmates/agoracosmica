@@ -23,6 +23,7 @@
  */
 import { lang } from '../../content'
 import { deskOn } from '../../desk-switches'
+import { DESK_SET_CHANGED } from '../../overview'
 import cardsRaw from '../data/cards.json?raw'
 
 type Words = { en: string; de: string }
@@ -395,7 +396,9 @@ export function createVinciHangStrip(options: {
       entries = cells
       named = label
       paintLabel()
-      if (!same) paint()
+      // THE ROOM FILLS ITS SET AFTER THE STATION STANDS, so the row says when
+      // the set changed and a word that counts it is never a stale count.
+      if (!same) { paint(); frame.dispatchEvent(new CustomEvent(DESK_SET_CHANGED, { bubbles: true })) }
       stand()
       paintPlace()
     },

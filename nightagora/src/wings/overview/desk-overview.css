@@ -25,6 +25,9 @@
   row-gap: 0;
   overflow: hidden;
 }
+/* a view that is not standing paints nothing: the display above would
+   otherwise beat the closed dialog's own rule and cover the room */
+.desk-ov:not([open]) { display: none; }
 .desk-ov::backdrop { background: var(--na-abyss); }
 .desk-ov button:focus-visible { outline: 2px solid var(--na-gold); outline-offset: 3px; }
 
@@ -85,8 +88,9 @@
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
-  scrollbar-color: color-mix(in srgb, var(--na-gold) 42%, transparent) transparent;
 }
+/* A set that does not fit scrolls, and it wears the museum's own bar: the
+   house sets one scrollbar law for every panel and this view keeps it. */
 /* a set that outgrows its box scrolls and wears its bar, and the rows then
    start at the top instead of standing in the middle of a taller box */
 .desk-ov-grid[data-scrolls='true'] { align-content: start; }
@@ -133,7 +137,11 @@
   margin-right: 6px;
   vertical-align: -1px;
 }
-.desk-ov-cell[aria-current='true'] .desk-ov-thumb {
+/* ONE GOLD MARK PER CELL. The hand and the selector are the same thing here,
+   so the ring around the picture is both the selection and the focus. */
+.desk-ov .desk-ov-cell:focus-visible { outline: none; }
+.desk-ov-cell[aria-current='true'] .desk-ov-thumb,
+.desk-ov-cell:focus-visible .desk-ov-thumb {
   box-shadow: 0 0 0 2px var(--na-gold), 0 0 0 6px color-mix(in srgb, var(--na-gold) 18%, transparent);
 }
 .desk-ov-cell[aria-current='true'] .desk-ov-cellname { color: var(--desk-title); }
@@ -148,9 +156,14 @@
   gap: 40px;
 }
 .desk-ov-named { min-width: 0; }
+/* the foot keeps one row for the name and one for the place, so the grid
+   above it never moves when the selector does */
 .desk-ov-said {
   font: 400 1.5rem/2rem var(--serif);
   color: var(--desk-title);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .desk-ov-place {
   margin-top: 2px;
@@ -158,4 +171,13 @@
   color: var(--desk-quiet);
   font-variant-numeric: tabular-nums;
 }
+/* ONE BOX, WHATEVER THE NAME. The whole title stands in the foot line and is
+   the control's own name; the control keeps one row of it, so a long sheet
+   name never grows the one control the view has. */
 .desk-ov-on { flex: none; }
+.desk-ov-on .desk-on-title {
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
