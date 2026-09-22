@@ -450,87 +450,87 @@
       "certainty": "documented"
     },
     "machine/aerial-screw": {
-      "en": "A spiral of starched linen on a mast, meant to screw itself upward through the air. No flight in his lifetime is recorded, so here it only turns.",
-      "de": "Eine Spirale aus gestärktem Leinen an einem Mast, die sich durch die Luft nach oben schrauben sollte. Ein Flug zu seinen Lebzeiten ist nicht belegt, hier dreht sie sich nur.",
-      "source": "machines/data/aerial-screw.json, folio Manuscript B 83v; machines/data/records.json, the locked label and the folio section",
+      "en": "It was meant to screw itself up into the air. No flight of it was ever written down.",
+      "de": "Sie sollte sich in die Luft hinaufschrauben. Von einem Flug ist nichts aufgeschrieben.",
+      "source": "machines/data/aerial-screw.json, folio Manuscript B 83v; machines/data/records.json, the purpose and build sections",
       "certainty": "reconstructed"
     },
     "machine/parachute": {
-      "en": "Four sealed linen faces over an open square, each about seven metres. People have jumped under modern versions of it, in 2000 and in 2008.",
-      "de": "Vier abgedichtete Leinenflächen über einem offenen Quadrat, jede etwa sieben Meter. Unter modernen Nachbauten sind Menschen gesprungen, 2000 und 2008.",
-      "source": "machines/data/parachute.json, folio Codex Atlanticus 1058v; machines/data/records.json, the folio and test sections",
+      "en": "He claimed that a person could fall from any height under it. No jump in his lifetime is written down.",
+      "de": "Ein Mensch könne damit aus jeder Höhe fallen, schrieb er. Ein Sprung zu seinen Lebzeiten ist nicht aufgeschrieben.",
+      "source": "machines/data/parachute.json, folio Codex Atlanticus 1058v; machines/data/records.json, the purpose and build sections",
       "certainty": "reconstructed"
     },
     "machine/anemometer": {
-      "en": "The wind pushes a hinged plate out of the upright and a curved scale shows how far. Alberti had described a plate like it in 1450.",
-      "de": "Der Wind drückt eine aufgehängte Platte aus der Senkrechten, eine gebogene Skala zeigt, wie weit. Alberti hatte eine ähnliche Platte schon 1450 beschrieben.",
-      "source": "machines/data/anemometer.json, folio Codex Atlanticus 675r; machines/data/records.json, the mechanism and myth sections",
+      "en": "This plate was to show how hard the wind blows. The wind pushes it along a curved scale.",
+      "de": "Die Platte sollte zeigen, wie stark der Wind weht. Der Wind drückt sie an einer gebogenen Skala entlang.",
+      "source": "machines/data/anemometer.json, folio Codex Atlanticus 675r; machines/data/records.json, the purpose and mechanism sections",
       "certainty": "reconstructed"
     },
     "machine/inclinometer": {
-      "en": "A weight hangs over a marked circle to tell a pilot whether he is flying level. The sheet says to shield it from the wind and records no test.",
-      "de": "Ein Gewicht hängt über einem markierten Kreis und soll dem Piloten zeigen, ob er waagerecht fliegt. Das Blatt sagt, man solle es vor Wind schützen, und nennt keinen Versuch.",
-      "source": "machines/data/inclinometer.json, folio Codex Atlanticus 1058r; machines/data/records.json, the folio and test sections",
+      "en": "It was meant to tell a pilot whether he was flying level. A weight hangs over a marked circle.",
+      "de": "Es sollte einem Piloten zeigen, ob er waagerecht fliegt. Ein Gewicht hängt über einem gezeichneten Kreis.",
+      "source": "machines/data/inclinometer.json, folio Codex Atlanticus 1058r; machines/data/records.json, the purpose and mechanism sections",
       "certainty": "reconstructed"
     },
     "machine/multi-barrel-gun": {
-      "en": "Thirty three barrels in three banks, eleven fired at a time, then a hand turns the frame to bring the next bank up. Nothing here fires.",
-      "de": "Dreiunddreißig Rohre in drei Reihen, elf werden zugleich abgefeuert, dann dreht eine Hand den Rahmen zur nächsten Reihe. Hier feuert nichts.",
-      "source": "machines/data/multi-barrel-gun.json, folio Codex Atlanticus 157r; machines/data/records.json, the locked label and the folio section",
+      "en": "Eleven shots at once was the idea. Then a hand turns the next bank of barrels up.",
+      "de": "Elf Schüsse auf einmal, das war die Idee. Dann dreht eine Hand die nächste Reihe nach oben.",
+      "source": "machines/data/multi-barrel-gun.json, folio Codex Atlanticus 157r; machines/data/records.json, the folio, purpose and mechanism sections",
       "certainty": "reconstructed"
     },
     "machine/rolling-mill": {
-      "en": "A crank turns the upper bronze roller, and the gap under it can be set, so that tin comes out thinner and more even.",
-      "de": "Eine Kurbel dreht die obere Bronzewalze, der Spalt darunter lässt sich einstellen, damit Zinn dünner und gleichmäßiger herauskommt.",
-      "source": "machines/data/rolling-mill.json, folio Manuscript I 48v; machines/data/records.json, the locked label and the mechanism section",
+      "en": "The rollers were meant to press tin thinner and more even. A crank turns the top one.",
+      "de": "Die Walzen sollten Zinn dünner und gleichmäßiger machen. Eine Kurbel dreht die obere.",
+      "source": "machines/data/rolling-mill.json, folio Manuscript I 48v; machines/data/records.json, the purpose and mechanism sections",
       "certainty": "reconstructed"
     },
     "machine/ball-bearing": {
-      "en": "Eight wooden balls between two plates, each kept off its neighbour by a small pivoted wheel, so a load turns by rolling instead of rubbing.",
-      "de": "Acht Holzkugeln zwischen zwei Platten, jede durch ein kleines gelagertes Rädchen von der nächsten getrennt, damit eine Last rollt statt zu reiben.",
-      "source": "machines/data/ball-bearing.json, folio Codex Madrid I 20v; machines/data/records.json, the locked label and the mechanism section",
+      "en": "A heavy load rubs as it turns. Eight wooden balls between the plates were to let it roll instead.",
+      "de": "Eine schwere Last reibt beim Drehen. Acht Holzkugeln zwischen den Platten sollten sie rollen lassen.",
+      "source": "machines/data/ball-bearing.json, folio Codex Madrid I 20v; machines/data/records.json, the purpose and mechanism sections",
       "certainty": "reconstructed"
     },
     "machine/flywheel": {
-      "en": "The sheet asks which arrangement of turning weights runs best. The four weights on spokes here are a modern answer, and a person keeps them going.",
-      "de": "Das Blatt fragt, welche Anordnung drehender Gewichte am besten läuft. Die vier Gewichte an Speichen hier sind eine heutige Antwort, und ein Mensch hält sie in Gang.",
-      "source": "machines/data/flywheel.json, folio Codex Madrid I 114r; machines/data/records.json, the folio and mechanism sections",
+      "en": "A heavy wheel like this keeps an uneven machine running steadily. His sheet only asks which weights run best.",
+      "de": "Ein schweres Rad hält eine ungleichmäßige Maschine ruhig am Laufen. Sein Blatt fragt nur, welche Gewichte am besten laufen.",
+      "source": "machines/data/flywheel.json, folio Codex Madrid I 114r; machines/data/records.json, the folio and purpose sections",
       "certainty": "reconstructed"
     },
     "machine/revolving-crane": {
-      "en": "A hand crank winds the rope over two pulleys and the load rises. The pawl stays clear, so whoever cranks has to keep holding it at the top.",
-      "de": "Eine Handkurbel wickelt das Seil über zwei Rollen, und die Last steigt. Die Sperrklinke bleibt ausgerückt, wer kurbelt, muss oben also weiter festhalten.",
-      "source": "machines/data/revolving-crane.json, folio Manuscript B 49r; machines/data/records.json, the mechanism section and the final hold",
+      "en": "A load no one could carry had to go up. A hand crank winds the rope over two pulleys.",
+      "de": "Eine Last, die niemand tragen kann, musste nach oben. Eine Handkurbel wickelt das Seil über zwei Rollen.",
+      "source": "machines/data/revolving-crane.json, folio Manuscript B 49r; machines/data/records.json, the purpose and mechanism sections",
       "certainty": "reconstructed"
     },
     "machine/lathe": {
-      "en": "A foot pulls a rope round the spindle, a bent bow pulls it back, and the drill turns one way and then the other, four seconds for each stroke.",
-      "de": "Ein Fuß zieht ein Seil um die Spindel, ein gebogener Bogen zieht es zurück, und der Bohrer dreht sich hin und her, vier Sekunden je Hub.",
-      "source": "machines/data/lathe.json, folio Codex Atlanticus 108r; machines/data/records.json, the mechanism and arithmetic sections",
+      "en": "The tool was meant to drill a hole. A foot pulls the rope down, a bent bow pulls it back.",
+      "de": "Das Werkzeug sollte ein Loch bohren. Ein Fuß zieht das Seil nach unten, ein gebogener Bogen zieht es zurück.",
+      "source": "machines/data/lathe.json, folio Codex Atlanticus 108r; machines/data/records.json, the purpose and mechanism sections",
       "certainty": "reconstructed"
     },
     "machine/miter-lock-gates": {
-      "en": "Two leaves meet at an angle, and the water itself presses them shut. The lock in Milan was real, and how much of it was his is not settled.",
-      "de": "Zwei Flügel treffen im Winkel aufeinander, und das Wasser drückt sie von selbst zu. Die Schleuse in Mailand gab es wirklich, wie viel davon seins war, ist offen.",
-      "source": "machines/data/miter-lock-gates.json, folio Codex Atlanticus 656r; machines/data/records.json, the mechanism and build sections",
+      "en": "They let a boat climb from low water to high. The water itself presses the two leaves shut.",
+      "de": "Ein Boot kam damit von niedrigem zu hohem Wasser. Das Wasser selbst drückt die beiden Flügel zu.",
+      "source": "machines/data/miter-lock-gates.json, folio Codex Atlanticus 656r; machines/data/records.json, the purpose and mechanism sections",
       "certainty": "reconstructed"
     },
     "machine/water-lifting-screw": {
-      "en": "A crank turns a tube wound round a shaft, and water climbs its turns. Vitruvius had described the screw long before him.",
-      "de": "Eine Kurbel dreht ein um eine Welle gewickeltes Rohr, und das Wasser steigt in seinen Windungen. Vitruv hatte die Schnecke lange vor ihm beschrieben.",
-      "source": "machines/data/water-lifting-screw.json, folio Codex Atlanticus 6r; machines/data/records.json, the mechanism and build sections",
+      "en": "Water had to reach a higher channel. A crank turns a tube wound round a shaft, and the water climbs.",
+      "de": "Wasser musste in eine höhere Rinne. Eine Kurbel dreht ein Rohr um eine Welle, und das Wasser steigt.",
+      "source": "machines/data/water-lifting-screw.json, folio Codex Atlanticus 6r; machines/data/records.json, the purpose and mechanism sections",
       "certainty": "reconstructed"
     },
     "machine/proportional-compass": {
-      "en": "Two legs cross at one pivot. The long points always stand twice as far apart as the short ones, so a drawing can be halved or doubled.",
-      "de": "Zwei Schenkel kreuzen sich in einem Drehpunkt. Die langen Spitzen stehen immer doppelt so weit auseinander wie die kurzen, so lässt sich eine Zeichnung halbieren oder verdoppeln.",
-      "source": "machines/data/proportional-compass.json, folio Codex Forster I 4r; machines/data/records.json, the mechanism and arithmetic sections",
+      "en": "A drawing had to be copied larger or smaller. The long points open twice as far as the short ones.",
+      "de": "Eine Zeichnung sollte größer oder kleiner werden. Die langen Spitzen öffnen sich doppelt so weit wie die kurzen.",
+      "source": "machines/data/proportional-compass.json, folio Codex Forster I 4r; machines/data/records.json, the purpose and mechanism sections",
       "certainty": "reconstructed"
     },
     "machine/camera-obscura": {
-      "en": "A small round hole in a thin iron plate, a dark room, a sheet of white paper. What arrives on the paper stands upside down.",
-      "de": "Ein kleines rundes Loch in einer dünnen Eisenplatte, ein dunkler Raum, ein Blatt weißes Papier. Was auf dem Papier ankommt, steht auf dem Kopf.",
-      "source": "machines/data/camera-obscura.json, folio Paris Manuscript D 8r; machines/data/records.json, the folio and mechanism sections",
+      "en": "The experiment was to make the crossing of light visible. What lands on the paper stands upside down.",
+      "de": "Der Versuch sollte sichtbar machen, wie sich das Licht kreuzt. Was auf dem Papier ankommt, steht auf dem Kopf.",
+      "source": "machines/data/camera-obscura.json, folio Paris Manuscript D 8r; machines/data/records.json, the purpose and mechanism sections",
       "certainty": "reconstructed"
     },
     "grave": {
