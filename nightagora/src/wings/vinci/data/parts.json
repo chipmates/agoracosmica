@@ -1088,6 +1088,30 @@
       "upper-wall-back": {
         "en": "Wall of the upper trough",
         "de": "Wand der oberen Rinne"
+      },
+      "lower-bearing-collar-front": {
+        "en": "Collar of the lower bearing",
+        "de": "Ring am unteren Lager"
+      },
+      "upper-bearing-collar-back": {
+        "en": "Collar of the upper bearing",
+        "de": "Ring am oberen Lager"
+      },
+      "upper-bearing-collar-front": {
+        "en": "Collar of the upper bearing",
+        "de": "Ring am oberen Lager"
+      },
+      "upper-wall-back-collar-back": {
+        "en": "Collar of the upper trough",
+        "de": "Ring an der oberen Rinne"
+      },
+      "upper-wall-back-collar-front": {
+        "en": "Collar of the upper trough",
+        "de": "Ring an der oberen Rinne"
+      },
+      "crank-shaft-collar": {
+        "en": "Crank hub",
+        "de": "Kurbelnabe"
       }
     },
     "proportional-compass": {
