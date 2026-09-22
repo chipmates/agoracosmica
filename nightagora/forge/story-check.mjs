@@ -61,13 +61,7 @@ const DRAWER_WORDS = [40, 60]
  *  leaves this list when its words are written again from its catalogue fact,
  *  and an id whose line is already inside the band is refused, so the list can
  *  only ever shrink. */
-const BAND_DEBT = new Set([
-  'sheet/rcin-919000', 'sheet/rcin-919001', 'sheet/rcin-919002', 'sheet/rcin-919003', 'sheet/rcin-919004',
-  'sheet/rcin-919005', 'sheet/rcin-919006', 'sheet/rcin-919007', 'sheet/rcin-919008', 'sheet/rcin-919009',
-  'sheet/rcin-919011', 'sheet/rcin-919012', 'sheet/rcin-919013', 'sheet/rcin-919014', 'sheet/rcin-919015',
-  'sheet/rcin-919017', 'sheet/rcin-919019', 'sheet/rcin-919057', 'sheet/rcin-919058', 'sheet/rcin-919082',
-  'sheet/rcin-919101', 'sheet/rcin-919102', 'sheet/rcin-919116',
-])
+const BAND_DEBT = new Set([])
 const CLASSES = new Set(['documented', 'reconstructed', 'conjectural', 'unknown', 'inferred', 'tradition', 'disputed'])
 /** a pointer that is not a canon key names its family and its own id */
 const FOREIGN_POINTER = /^(?:BD|TL|SRC|XC|REC|KEY|D-[A-Z]+):.+$/
