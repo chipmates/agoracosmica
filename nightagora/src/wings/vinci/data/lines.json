@@ -396,20 +396,20 @@
       "certainty": "documented"
     },
     "codex/paris-B": {
-      "en": "This is the volume on the table, and the one you can leaf. What you turn is a facsimile printed in 1883, not the manuscript.",
-      "de": "Das ist der Band auf dem Tisch, und der, den du blättern kannst. Was du umblätterst, ist ein Faksimile von 1883, nicht die Handschrift.",
+      "en": "The book on the table is the one you may leaf. A printed copy of 1883, not his own.",
+      "de": "Das Buch auf dem Tisch darfst du blättern. Ein Druck von 1883, nicht die Handschrift.",
       "source": "table/data/codices.json, the entry for Paris manuscript B",
       "certainty": "documented"
     },
     "codex/paris-D": {
-      "en": "Only twenty sides, bound into the same volume of 1883 behind manuscript B. The camera obscura in the machine hall is read from one of them.",
-      "de": "Nur zwanzig Seiten, im selben Band von 1883 hinter Manuskript B gebunden. Die Camera obscura in der Maschinenhalle wird von einer davon gelesen.",
+      "en": "Twenty pages only. The camera obscura in the machine hall is read from one of them.",
+      "de": "Nur zwanzig Seiten. Die Camera obscura in der Maschinenhalle stammt von einer davon.",
       "source": "table/data/codices.json, the entry for Paris manuscript D; machines/data/camera-obscura.json, folio Paris Manuscript D 8r",
       "certainty": "documented"
     },
     "codex/madrid-I": {
-      "en": "The library in Madrid scanned it whole, 384 pages with the covers and the blanks. Two of the machines in the hall are read from it.",
-      "de": "Die Bibliothek in Madrid hat ihn ganz gescannt, 384 Seiten mit Deckeln und Leerseiten. Zwei der Maschinen in der Halle werden daraus gelesen.",
+      "en": "The ball bearing and the flywheel in the machine hall come from two of its pages.",
+      "de": "Das Kugellager und das Schwungrad in der Maschinenhalle stammen von zwei seiner Seiten.",
       "source": "table/data/codices.json, the entry for Codex Madrid I; machines/data/ball-bearing.json and flywheel.json, folios Madrid I 20v and 114r",
       "certainty": "documented"
     },
@@ -426,26 +426,26 @@
       "certainty": "documented"
     },
     "codex/trivulzianus": {
-      "en": "What the museum holds is the facsimile printed in 1891, 324 scans of which 94 are plates.",
-      "de": "Was das Museum hat, ist das 1891 gedruckte Faksimile, 324 Scans, davon 94 Tafeln.",
+      "en": "What the museum has is a copy printed in 1891, not the book itself.",
+      "de": "Das Museum hat einen Druck von 1891, nicht den Band selbst.",
       "source": "table/data/codices.json, the entry for the Codex Trivulzianus",
       "certainty": "documented"
     },
     "codex/paris-A": {
-      "en": "Fifteen faces, not the volume. A monochrome reproduction is all the museum may show of manuscript A.",
-      "de": "Fünfzehn Seiten, nicht der Band. Eine Schwarz-Weiß-Reproduktion ist alles, was das Museum von Manuskript A zeigen darf.",
+      "en": "Fifteen pages of it, not the whole book. The only scan of them is black and white.",
+      "de": "Fünfzehn Seiten, nicht der ganze Band. Den einzigen Scan gibt es nur in Schwarz-Weiß.",
       "source": "table/data/codices.json, the entry for Paris manuscript A",
       "certainty": "documented"
     },
     "codex/atlanticus": {
-      "en": "Seven of the fourteen machines here come from its sheets. From the codex itself the museum may show 45 files, pages and details, not a run of folios.",
-      "de": "Sieben der vierzehn Maschinen hier stammen von seinen Blättern. Vom Kodex selbst darf das Museum 45 Dateien zeigen, Seiten und Ausschnitte, keine Folge von Blättern.",
+      "en": "Seven machines in the hall come from this book, more than from any other.",
+      "de": "Sieben Maschinen der Halle stammen aus diesem Band, mehr als aus jedem anderen.",
       "source": "table/data/codices.json, the entry for the Codex Atlanticus; machines/catalog.ts, the folios of the fourteen dossiers",
       "certainty": "documented"
     },
     "codex/arundel": {
-      "en": "The printed facsimile came out in two parts and never in three. Folios 117 to 220 have no admitted plate, so the museum cannot show them.",
-      "de": "Das gedruckte Faksimile erschien in zwei Teilen und nie in dreien. Für die Blätter 117 bis 220 gibt es keine zugelassene Tafel, das Museum kann sie nicht zeigen.",
+      "en": "The middle part of the printed copy never appeared. The museum cannot show those pages.",
+      "de": "Der mittlere Teil des Drucks erschien nie. Diese Seiten kann das Museum nicht zeigen.",
       "source": "table/data/codices.json, the entry for the Codex Arundel and the absence entry for its middle part",
       "certainty": "documented"
     },

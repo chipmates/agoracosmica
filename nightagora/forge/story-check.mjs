@@ -62,7 +62,6 @@ const DRAWER_WORDS = [40, 60]
  *  and an id whose line is already inside the band is refused, so the list can
  *  only ever shrink. */
 const BAND_DEBT = new Set([
-  'codex/arundel', 'codex/atlanticus', 'codex/madrid-I', 'codex/paris-A', 'codex/paris-B', 'codex/paris-D',
   'grave', 'grave-diagram',
   'sheet/rcin-919000', 'sheet/rcin-919001', 'sheet/rcin-919002', 'sheet/rcin-919003', 'sheet/rcin-919004',
   'sheet/rcin-919005', 'sheet/rcin-919006', 'sheet/rcin-919007', 'sheet/rcin-919008', 'sheet/rcin-919009',
