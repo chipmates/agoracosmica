@@ -19,7 +19,7 @@ export const COLLECTIONS = [
     // certainty apart, every reading in a disputed label, the calendar-style and editor notes,
     // named source links and German gap sentences. The sealed original does not.
     originalSHA256: '01d568f9f6ddb2c1534d2cd73e061f07624b8eda484d718e84be57782b66ee1d',
-    normalizedSHA256: '98adb90ccd9bbd0490492c44f722bf63aa2dd325510b2733a138de1cbbff6cc4',
+    normalizedSHA256: 'e955004745ef7fd7477652e899f9e7ee6cd45f5e0de15e74159cad75dee6fd82',
     expected: { studs: 56 },
   },
   {
