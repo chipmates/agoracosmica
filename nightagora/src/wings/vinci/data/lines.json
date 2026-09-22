@@ -24,7 +24,7 @@
       }
     },
     "picture/annunciation/front": {
-      "en": "It reached the Uffizi in 1867 as a Ghirlandaio. Two years later it became his.",
+      "en": "It reached the Uffizi in 1867 as a Ghirlandaio. Two years later it was given to him.",
       "de": "1867 kam sie als Ghirlandaio in die Uffizien. Zwei Jahre später galt sie als seine.",
       "source": "MINING-CATALOG-PAINTINGS, the Annunciation, provenance",
       "certainty": "documented"
@@ -58,7 +58,7 @@
       }
     },
     "picture/madonna-of-the-carnation/front": {
-      "en": "Madonna mit der Nelke is what the museum that owns it calls this picture.",
+      "en": "The museum that owns it calls this picture Madonna mit der Nelke.",
       "de": "Madonna mit der Nelke nennt sie das Museum, dem sie gehört.",
       "source": "MINING-CATALOG-PAINTINGS, Madonna of the Carnation, label fact; the holder's own record",
       "certainty": "documented"
@@ -116,7 +116,7 @@
       }
     },
     "picture/lady-with-an-ermine/front": {
-      "en": "The black behind her is not his. It went on in the 1700s, over a bluish grey.",
+      "en": "The black behind her is not his. Someone brushed it on in the 1700s, over a bluish grey.",
       "de": "Das Schwarz hinter ihr ist nicht von ihm. Es kam im 18. Jahrhundert über ein Blaugrau.",
       "source": "MINING-CATALOG-PAINTINGS, Lady with an Ermine, condition",
       "certainty": "documented",
@@ -172,7 +172,7 @@
       "certainty": "documented"
     },
     "picture/virgin-of-the-rocks-london/front": {
-      "en": "The other one hangs in Paris. They probably first stood side by side in 2011.",
+      "en": "Paris has the other one. They probably first stood side by side in 2011.",
       "de": "Die andere Fassung hängt in Paris. 2011 standen sie wohl erstmals nebeneinander.",
       "source": "MINING-CATALOG-PAINTINGS, Virgin of the Rocks, National Gallery version, label fact",
       "certainty": "documented"
@@ -208,8 +208,8 @@
       "certainty": "documented"
     },
     "picture/last-supper/front": {
-      "en": "Someone cut a door through the bottom of this wall. It took the feet of Christ.",
-      "de": "Jemand brach unten eine Tür durch diese Wand. Sie nahm die Füße von Christus mit.",
+      "en": "A doorway was cut through the bottom of this wall. It took the feet of Christ.",
+      "de": "Unten brach man eine Tür durch diese Wand. Sie nahm die Füße von Christus mit.",
       "source": "MINING-CATALOG-PAINTINGS, the Last Supper's wall, room history",
       "certainty": "documented",
       "detail": {
