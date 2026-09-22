@@ -122,33 +122,44 @@ export function createCloseLookBand(options: {
   stepBack.type = 'button'
   stepBack.addEventListener('click', () => options.back())
 
+  const left = make('div', 'desk-clb-left')
   const cap = make('div', 'desk-clb-cap')
   const nameRow = make('div', 'desk-name')
   const title = make('span', 'desk-chapter')
   const clock = make('span', 'desk-clock')
   const count = make('span', 'desk-count')
   const line = make('p', 'desk-line desk-clb-line')
+  /* THE FOOT ROW STANDS UNDER BOTH TEXTS, the line and the drawer, so the
+     word that opened the drawer is the word that closes it, in the place the
+     hand already is. */
   const foot = make('div', 'desk-foot desk-clb-foot')
   const more = make('button', 'desk-word-control desk-clb-more')
   more.type = 'button'
   more.setAttribute('aria-expanded', 'false')
-  cap.append(nameRow, line, foot)
+  cap.append(nameRow, line)
 
   /* THE DRAWER IS THE BAND GROWN, as it is at a station: the same wall, the
-     same margin, and the name row kept so the eye keeps the place it read. */
+     same margin, and the name row kept so the eye keeps the place it read.
+     The band stops at its top height; what the drawer holds beyond it
+     scrolls inside its own box, and a fade at that box's foot says more
+     lies below. */
   const drawer = make('div', 'desk-clb-drawer')
   drawer.id = 'desk-closelook-drawer'
   drawer.hidden = true
-  drawer.tabIndex = -1
   const drawerName = make('div', 'desk-name desk-clb-drawer-name')
   const drawerTitle = make('span', 'desk-chapter')
   const drawerCount = make('span', 'desk-count')
+  const well = make('div', 'desk-clb-well')
+  const scroll = make('div', 'desk-clb-scroll')
+  scroll.setAttribute('role', 'region')
   const drawerWords = make('div', 'desk-clb-words')
   setRegister(drawerWords, 'drawer')
-  const drawerFoot = make('div', 'desk-clb-drawer-foot')
-  const drawerClose = make('button', 'desk-word-control desk-clb-close')
-  drawerClose.type = 'button'
-  drawer.append(drawerName, drawerWords, drawerFoot)
+  const fade = make('div', 'desk-clb-fade')
+  fade.setAttribute('aria-hidden', 'true')
+  scroll.append(drawerWords)
+  well.append(scroll, fade)
+  drawer.append(drawerName, well)
+  left.append(cap, drawer, foot)
   more.setAttribute('aria-controls', drawer.id)
 
   /* THE KIND'S OWN INSTRUMENTS, at the band's right above the ways: the
@@ -170,7 +181,7 @@ export function createCloseLookBand(options: {
   on.append(onWords, onArrow)
   ways.append(backWay, on)
   rightColumn.append(instruments, ways)
-  root.append(stepBack, cap, drawer, rightColumn)
+  root.append(stepBack, left, rightColumn)
 
   let view: CloseLookView | null = null
   /** the run a machine has not had yet, which is what the gold control asks
@@ -197,18 +208,65 @@ export function createCloseLookBand(options: {
     press(view?.on ?? null)
   })
   more.addEventListener('click', () => openDrawer(drawer.hidden))
-  drawerClose.addEventListener('click', () => openDrawer(false))
 
   function openDrawer(open: boolean): void {
     if (open && !drawerWords.childElementCount) return
     drawer.hidden = !open
-    more.setAttribute('aria-expanded', String(open))
     if (open) root.dataset['drawer'] = 'open'
     else delete root.dataset['drawer']
+    paintMore()
+    scroll.scrollTop = 0
     measure()
-    if (open) drawer.focus({ preventScroll: true })
+    if (open) scroll.focus({ preventScroll: true })
     else more.focus({ preventScroll: true })
   }
+
+  /** Read more at rest; Close with its key while the drawer stands, in the
+      same place, so the way back is where the hand already is. */
+  function paintMore(): void {
+    const open = !drawer.hidden
+    more.textContent = ''
+    more.setAttribute('aria-expanded', String(open))
+    if (!open) {
+      more.textContent = say(WORD.more())
+      more.removeAttribute('aria-keyshortcuts')
+      return
+    }
+    const hint = make('span', 'desk-key', 'Esc')
+    hint.setAttribute('aria-hidden', 'true')
+    more.append(document.createTextNode(say(WORD.close())), hint)
+    more.setAttribute('aria-keyshortcuts', 'Escape')
+  }
+
+  /** The fade stands only while more lies below the drawer's visible foot,
+      and the box takes the keyboard only when it has somewhere to go. */
+  function paintFade(): void {
+    // a few pixels of rounding are not "more"
+    const over = scroll.scrollHeight - scroll.clientHeight
+    const below = !drawer.hidden && over > 3 && scroll.scrollTop < over - 3
+    if (below) drawer.dataset['more'] = 'true'
+    else delete drawer.dataset['more']
+    scroll.tabIndex = !drawer.hidden && over > 3 ? 0 : -1
+  }
+  scroll.addEventListener('scroll', paintFade, { passive: true })
+  const sized = new ResizeObserver(() => paintFade())
+  sized.observe(scroll)
+  sized.observe(drawerWords)
+
+  /* THE BOX SCROLLS BY ITS OWN KEYS while it has the focus: the arrows here
+     read on down the text, and never walk the set behind it. */
+  const ROW = 40
+  scroll.addEventListener('keydown', event => {
+    if (event.ctrlKey || event.metaKey || event.altKey) return
+    const page = Math.max(ROW, scroll.clientHeight - ROW)
+    const by = event.key === 'ArrowDown' ? ROW : event.key === 'ArrowUp' ? -ROW
+      : event.key === 'PageDown' ? page : event.key === 'PageUp' ? -page : 0
+    if (by) scroll.scrollBy({ top: by })
+    else if (event.key === 'Home') scroll.scrollTop = 0
+    else if (event.key === 'End') scroll.scrollTop = scroll.scrollHeight
+    else return
+    event.preventDefault()
+  })
 
   /** the gold control's two states at a machine, and its one everywhere else */
   function paintWays(): void {
@@ -244,6 +302,9 @@ export function createCloseLookBand(options: {
     height: () => measured,
     show(next) {
       const language = options.lang()
+      // a page turned inside the same work keeps an open drawer open: the
+      // reader asked to read, and the next side's words take the same place
+      const keep = next.id === view?.id && !drawer.hidden
       if (next.id !== view?.id) ran = false
       view = next
       root.lang = language
@@ -267,10 +328,13 @@ export function createCloseLookBand(options: {
       // the name and the line; everything the module wrote about the work is
       // one press away, which is what keeps the label a label.
       drawerWords.replaceChildren(...next.words)
-      drawer.hidden = true
-      delete root.dataset['drawer']
-      more.textContent = say(WORD.more())
-      more.setAttribute('aria-expanded', 'false')
+      const held = keep && drawerWords.childElementCount > 0
+      drawer.hidden = !held
+      if (held) root.dataset['drawer'] = 'open'
+      else delete root.dataset['drawer']
+      scroll.scrollTop = 0
+      scroll.setAttribute('aria-label', next.title)
+      paintMore()
       more.setAttribute('aria-disabled', String(!drawerWords.childElementCount))
       foot.textContent = ''
       foot.append(more)
@@ -280,11 +344,8 @@ export function createCloseLookBand(options: {
       drawerTitle.textContent = next.title
       drawerCount.textContent = place
       drawerCount.hidden = !place
-      drawerClose.textContent = ''
-      drawerClose.append(document.createTextNode(say(WORD.close())), make('span', 'desk-key', 'Esc'))
-      drawerFoot.textContent = ''
-      drawerFoot.append(drawerClose)
       paintWays()
+      paintFade()
       measure()
     },
     step(at, of) {
@@ -305,6 +366,7 @@ export function createCloseLookBand(options: {
       measured = 0
       drawer.hidden = true
       delete root.dataset['drawer']
+      delete drawer.dataset['more']
       drawerWords.textContent = ''
       foot.textContent = ''
       setCloseLookBand(null)
@@ -321,6 +383,7 @@ export function createCloseLookBand(options: {
       return false
     },
     dispose() {
+      sized.disconnect()
       setCloseLookBand(null)
       root.remove()
     },

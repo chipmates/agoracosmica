@@ -14,7 +14,9 @@
   /* the measure is narrower than a station's: the work's own instruments
      stand at the right of the same row */
   --desk-clb-read: 640px;
-  --desk-clb-drawer: 355px;
+  /* the drawer's column at the band's top height of 420: the band less its
+     air, the step back, the gap and the foot's own padding */
+  --desk-clb-drawer: calc(420px - var(--desk-clb-air) - var(--desk-clb-step) - var(--desk-clb-gap) - var(--desk-clb-foot));
 }
 
 /* ---- the band ---- */
@@ -65,11 +67,14 @@
 #wing[data-desk~='closelook'] .desk-clb-step:focus-visible { color: var(--na-gold); }
 
 /* ---- the words: the name row, the line, the reading row ---- */
-#wing[data-desk~='closelook'] .desk-clb-cap {
+#wing[data-desk~='closelook'] .desk-clb-left {
   grid-column: 1;
   grid-row: 2;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
+#wing[data-desk~='closelook'] .desk-clb-cap { min-width: 0; }
 #wing[data-desk~='closelook'] .desk-clb .desk-name { margin-bottom: 6px; }
 #wing[data-desk~='closelook'] .desk-clb :is(.desk-chapter, .desk-clock, .desk-count, .desk-line) { text-shadow: none; }
 #wing[data-desk~='closelook'] .desk-clb .desk-count {
@@ -145,21 +150,73 @@
 #wing[data-desk~='closelook'] .desk-clb .desk-word-control[aria-disabled='true'] { opacity: .55; cursor: default; }
 
 /* ---- the drawer: the band grown, never a second plate ---- */
+/* THE BAND STOPS AT 420. The drawer's column is held to what that leaves,
+   the name row and the foot keep their height, and the words between them
+   take the rest and scroll inside it. */
+#wing[data-desk~='closelook'] .desk-clb[data-drawer='open'] .desk-clb-left { max-height: var(--desk-clb-drawer); }
 #wing[data-desk~='closelook'] .desk-clb-drawer {
-  grid-column: 1;
-  grid-row: 2;
   min-width: 0;
-  max-height: var(--desk-clb-drawer);
-  overflow: hidden;
+  min-height: 0;
+  flex: 0 1 auto;
+  display: flex;
+  flex-direction: column;
 }
 #wing[data-desk~='closelook'] .desk-clb-drawer[hidden] { display: none; }
-#wing[data-desk~='closelook'] .desk-clb-drawer:focus,
-#wing[data-desk~='closelook'] .desk-clb-drawer:focus-visible { outline: none; }
 /* ONE TEXT AT A TIME: the line's whole column leaves the flow while the
    drawer stands, which is what lets the band take the drawer's height. */
 #wing[data-desk~='closelook'] .desk-clb[data-drawer='open'] .desk-clb-cap { display: none; }
-#wing[data-desk~='closelook'] .desk-clb-drawer-name { margin-bottom: 12px; }
+#wing[data-desk~='closelook'] .desk-clb-drawer-name { flex: none; margin-bottom: 12px; }
+#wing[data-desk~='closelook'] .desk-clb-well {
+  position: relative;
+  min-height: 0;
+  flex: 0 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+#wing[data-desk~='closelook'] .desk-clb-scroll {
+  min-height: 0;
+  flex: 0 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--na-starlight) 30%, transparent) transparent;
+  /* the words keep off the bar, and a focus ring has room inside the box */
+  padding: 0 14px 0 0;
+}
+#wing[data-desk~='closelook'] .desk-clb-scroll:focus { outline: none; }
+#wing[data-desk~='closelook'] .desk-clb-scroll:focus-visible {
+  outline: 2px solid var(--na-gold);
+  outline-offset: 5px;
+}
+/* THE SIGN OF MORE: the words sink into the wall at the box's foot while
+   more lies below, and the wall is clean again at the end. */
+#wing[data-desk~='closelook'] .desk-clb-fade {
+  position: absolute;
+  left: 0;
+  right: 14px;
+  bottom: 0;
+  height: 64px;
+  pointer-events: none;
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--na-abyss) 0%, transparent), var(--na-abyss) 92%);
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+#wing[data-desk~='closelook'] .desk-clb-drawer[data-more='true'] .desk-clb-fade { opacity: 1; }
+/* while the drawer stands the foot is its floor: a hairline over it, the
+   way back in the place the word that opened it stood */
+#wing[data-desk~='closelook'] .desk-clb[data-drawer='open'] .desk-clb-foot {
+  flex: none;
+  margin-top: 10px;
+  border-top: 1px solid color-mix(in srgb, var(--na-starlight) 16%, transparent);
+}
+@media (prefers-reduced-motion: reduce) {
+  #wing[data-desk~='closelook'] .desk-clb-fade { transition: none; }
+}
 #wing[data-desk~='closelook'] .desk-clb-words > * { margin: 0 0 5px; }
+/* the last row's air is the foot's hairline, so a drawer that fits does not
+   scroll by the width of a margin */
+#wing[data-desk~='closelook'] .desk-clb-words > :last-child,
+#wing[data-desk~='closelook'] .desk-clb-words > :last-child > :last-child { margin-bottom: 0; }
 #wing[data-desk~='closelook'] .desk-clb-words :is(p, li) {
   margin: 0 0 5px;
   font: 400 1.1875rem/1.875rem var(--serif);
@@ -182,14 +239,7 @@
   color: var(--desk-quiet);
 }
 #wing[data-desk~='closelook'] .desk-clb-words .vitrine-description { display: block; }
-#wing[data-desk~='closelook'] .desk-clb-drawer-foot {
-  display: flex;
-  align-items: center;
-  gap: 30px;
-  margin-top: 16px;
-  padding-top: 12px;
-  border-top: 1px solid color-mix(in srgb, var(--na-starlight) 16%, transparent);
-}
+#wing[data-desk~='closelook'] .desk-clb-more .desk-key { margin-left: 10px; }
 
 /* ---- the right column: the kind's instruments over the two ways ---- */
 #wing[data-desk~='closelook'] .desk-clb-right {
