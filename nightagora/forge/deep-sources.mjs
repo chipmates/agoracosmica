@@ -63,6 +63,21 @@ const SOURCES = [
       + 'licence page refuses a plain client, so the deep bytes are taken from the record URL instead. Kept byte '
       + 'for byte, no resize and no re-encode. Held on this machine; what ships is its pyramid.',
   },
+  {
+    id: 'vinci/painting-deep/mona-lisa-c2rmf',
+    beside: 'vinci/painting-plate/mona-lisa-c2rmf__2748x4096',
+    role: 'painting-deep',
+    // the original of the file page the plate's own record names
+    url: 'https://upload.wikimedia.org/wikipedia/commons/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg',
+    sha1: '4ba2f28c16b265bcde00336a8e0b1251e4a258da',
+    folder: 'paintings/mona-lisa',
+    name: 'mona-lisa-c2rmf-deep',
+    read: '2026-09-22',
+    note: 'The unbounded original of the file the wall\'s plate was prepared from, from the source page that plate\'s '
+      + 'record already names. The file page read 2026-09-22 gives usage terms "Public domain", attribution not '
+      + 'required, 7479 x 11146, 94310471 bytes, and this version\'s SHA-1, which the bytes here match. Kept byte for '
+      + 'byte, no resize and no re-encode. Held on this machine; what ships is its pyramid.',
+  },
 ]
 
 const { assets } = mergeManifests()
@@ -82,6 +97,9 @@ for (const source of SOURCES) {
   }
   if (!file) {
     const bytes = await fetchSource(source.url)
+    // A source whose file page names its hash is refused before it is written.
+    if (source.sha1 && createHash('sha1').update(bytes).digest('hex') !== source.sha1)
+      throw new Error(`${source.url}: the bytes are not the version the file page names (${source.sha1})`)
     const size = await sharp(bytes, { limitInputPixels: 700e6 }).metadata()
     file = `${target}__${size.width}x${size.height}.jpg`
     mkdirSync(dirname(join(STORE, 'wing-vinci', file)), { recursive: true })
@@ -90,6 +108,8 @@ for (const source of SOURCES) {
   }
   const path = join(STORE, 'wing-vinci', file)
   const bytes = readFileSync(path)
+  if (source.sha1 && createHash('sha1').update(bytes).digest('hex') !== source.sha1)
+    throw new Error(`wing-vinci/${file}: the bytes are not the version the file page names (${source.sha1})`)
   const size = await sharp(bytes, { limitInputPixels: 700e6 }).metadata()
   const record = {
     id: source.id,
@@ -98,6 +118,7 @@ for (const source of SOURCES) {
     licence: beside.licence,
     ...(beside.holder === undefined ? {} : { holder: beside.holder }),
     source_url: source.url,
+    ...(source.sha1 ? { source_sha1: source.sha1 } : {}),
     sha256: createHash('sha256').update(bytes).digest('hex'),
     bytes: statSync(path).size,
     pixels: size.width * size.height,
@@ -112,7 +133,7 @@ for (const source of SOURCES) {
     ...(beside.work_id === undefined ? {} : { work_id: beside.work_id }),
     ...(beside.plate_id === undefined ? {} : { plate_id: beside.plate_id }),
     stands_beside: beside.id,
-    note: `${source.note} Read from the source 2026-09-18.`,
+    note: `${source.note} Read from the source ${source.read ?? '2026-09-18'}.`,
   }
   splice(record)
   written.push({ id: record.id, path: record.path, bytes: record.bytes, width: size.width, height: size.height,
