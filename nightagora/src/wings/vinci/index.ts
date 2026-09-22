@@ -905,12 +905,16 @@ export function createWing():VinciWingModule {
     if(pick.kind==='place'||pick.workId===DEATHBED_WORK){const named=namedExhibit(pick);return named?{en:named.title,de:named.title}:null}
     const found=(exhibits?.pictureSources()??[]).find(source=>source.work.id===pick.workId)
     if(!found)return null
-    // TWO FACES OF ONE PANEL ARE TWO EXHIBITS. The register carries one title
-    // for the work and the hung face on the pick, so a list that holds both
-    // says which face rather than the same name twice.
-    return pick.face==='reverse'
-      ?{en:`${found.work.title_en}, the reverse`,de:`${found.work.title_de}, die Rückseite`}
-      :{en:found.work.title_en,de:found.work.title_de}
+    return workTitle(found.work,pick.face)
+  }
+  /** TWO FACES OF ONE PANEL ARE TWO EXHIBITS, and the register names the
+   * reverse as its own, so a list that holds both never says one name twice.
+   * A short name stands where a cell has two rows for it. */
+  interface WorkNames {title_en:string;title_de:string;short_title_en?:string;short_title_de?:string
+    reverse_title_en?:string;reverse_title_de?:string;reverse_short_title_en?:string;reverse_short_title_de?:string}
+  function workTitle(work:WorkNames,face:'front'|'reverse'|null|undefined):VinciText {
+    if(face!=='reverse')return {en:work.title_en,de:work.title_de}
+    return {en:work.reverse_title_en??work.title_en,de:work.reverse_title_de??work.title_de}
   }
   /** THE WORKS THE PLAN OFFERS: the registry's own openable exhibits, each
    * under the station it hangs in, in that wall's own order. */
@@ -1580,7 +1584,7 @@ export function createWing():VinciWingModule {
         if(!found)continue
         const entries=pictures.filter(source=>source.work.id===pick.workId).map(source=>source.entry)
         row.push({order:pick.order,entry:{id:pick.id,openable:pick.openable,
-          title:lang()==='de'?found.work.title_de:found.work.title_en,
+          title:text(workTitle(found.work,pick.face)),
           colour:policyLabelText(found.work,entries).colour,
           preview:assetAddress(validatePaintingRecord(found.entry.preview,'painting-preview').entry)}})
       }else if(pick.kind==='sheet'){
@@ -1991,7 +1995,7 @@ export function createWing():VinciWingModule {
       controls.push(whole)
     }
     controls.push(control(VINCI_VITRINE_WORDS.provenance,()=>showExhibitRecord(id,work,entries)),shut)
-    const title=lang()==='de'?work.title_de:work.title_en
+    const title=text(workTitle(work,entry.face))
     // The room cuts its plate to the source's approved display window, and
     // the payload shows the same share of the same file.
     const registration=plate?pictureDisplayWindow(plate.plate):null
