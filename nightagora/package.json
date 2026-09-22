@@ -16,7 +16,7 @@
   "devDependencies": {
     "@types/three": "^0.185.1",
     "playwright": "^1.61.1",
-    "sharp": "^0.34.4",
+    "sharp": "^0.35.4",
     "typescript": "^5.9.3",
     "vite": "^8.1.5"
   },
@@ -24,5 +24,6 @@
     "overrides": {
       "postcss": "^8.5.23"
     }
-  }
+  },
+  "packageManager": "pnpm@8.15.5"
 }
