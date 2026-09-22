@@ -4,6 +4,7 @@
  */
 import { BufferGeometry, Float32BufferAttribute, Group, Mesh, type Material } from 'three/webgpu'
 import { createLine, STUDS, STUD_SPACING, type LineMaterials } from '../line'
+import { EXHIBITION_STAGE_LEVELS } from '../myths/construction'
 import { LINE_FIELD, LINE_ORIGIN, LINE_SLAB, ROOMS } from './layout'
 
 export const COLLECTION_LINE_SECTIONS = [
@@ -80,9 +81,8 @@ export function fitCollectionExhibitFloor(group: Group, materials: Pick<LineMate
       })
       // Exact native stage levels distinguish paving from any low plinth or
       // downward face of the wall. All other triangles pass through intact.
-      const floor = vertices.every(vertex => stone
-        ? near(vertex[1]!, -.215) || near(vertex[1]!, -.015)
-        : near(vertex[1]!, -.2155) || near(vertex[1]!, -.0155))
+      const floor = vertices.every(vertex =>
+        EXHIBITION_STAGE_LEVELS[stone ? 'stone' : 'bed'].some(level => near(vertex[1]!, level)))
       let polygon = vertices
       if (floor) {
         touched = true

@@ -123,11 +123,24 @@ export function plasterWall(build: Construction, width: number, height: number, 
  * display. It is laid at the size it is given: a host that stands the floor in
  * a built room cuts it to that room's footprint, so a minimum here would be a
  * slab running through the walls around it. */
+/** How far the bed lies under the slabs it carries. Half a millimetre leaves
+ * the depth test to pick the floor's material per pixel at a distance; deeper
+ * than a few millimetres and the joint shows a lit slab side instead of the
+ * dark bed, which is the floor's own line. */
+const FLOOR_BED_UNDER_M = .004
+const BED_UNDERSIDE = -0.2155 - FLOOR_BED_UNDER_M, BED_TOP = -0.0155 - FLOOR_BED_UNDER_M
+/** The exact horizontal planes of each stage sheet. A host that cuts this
+ * floor to its own room tells paving from a plinth or a wall foot by them, so
+ * they are a recorded prior: a sheet that moves moves its levels with it. */
+export const EXHIBITION_STAGE_LEVELS = {
+  stone: [-0.215, -0.015],
+  bed: [BED_UNDERSIDE, BED_TOP],
+} as const
 export function exhibitionFloor(build: Construction, width = 13, depth = 12): void {
   const { stone, dark } = build.materials
   // Each joint is the open interval between complete slabs over a mortar bed.
   // No overlaid subpixel strokes or freestanding diagonal chips.
-  build.box(0, -0.1155, 2.5, width, 0.20, depth, dark)
+  build.box(0, (BED_UNDERSIDE + BED_TOP) / 2, 2.5, width, BED_TOP - BED_UNDERSIDE, depth, dark)
   const minZ = 2.5 - depth / 2
   for (let row = 0; row < Math.ceil(depth / 1.4); row++) {
     const z0 = minZ + row * 1.4

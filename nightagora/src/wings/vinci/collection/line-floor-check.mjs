@@ -48,6 +48,7 @@ const { fittedRailFov } = await load(path.join(HERE, '../rail-projection.ts'))
 const { createCollection } = await load(path.join(HERE, '../collection.ts'))
 const { createGrave } = await load(path.join(HERE, '../grave/index.ts'))
 const { createMythDeathbed, createMythQuotes } = await load(path.join(HERE, '../myths/index.ts'))
+const { EXHIBITION_STAGE_LEVELS } = await load(path.join(HERE, '../myths/construction.ts'))
 const failures = [], reports = []
 const expect = (condition, detail) => { if (!condition) failures.push(detail) }
 const expectedIds = ['life-01', 'life-02', 'life-04', 'life-03', 'life-29', 'life-30', 'life-31', 'life-32', 'life-39', 'life-40', 'life-41', 'life-42']
@@ -172,7 +173,7 @@ function stageFloorBounds(group, materials) {
     const position = mesh.geometry.getAttribute('position'), index = mesh.geometry.index
     for (let i = 0; i < (index?.count ?? position.count); i += 3) {
       const corners = [0, 1, 2].map(corner => index ? index.getX(i + corner) : i + corner)
-      const levels = stone ? [-.215, -.015] : [-.2155, -.0155]
+      const levels = EXHIBITION_STAGE_LEVELS[stone ? 'stone' : 'bed']
       if (!corners.every(corner => levels.some(level => Math.abs(position.getY(corner) - level) < .00002))) continue
       for (const corner of corners) bounds.expandByPoint(point.fromBufferAttribute(position, corner).applyMatrix4(mesh.matrixWorld))
     }
