@@ -937,6 +937,12 @@
           "text_de": "Der Louvre verzeichnet die Übertragung von Holz auf Leinwand.",
           "source_url": "https://collections.louvre.fr/en/ark:/53355/cl010062373",
           "certainty": "documented"
+        },
+        {
+          "text_en": "The contract was signed on 25 April 1483 and named 8 December 1483 as the day the work was due.",
+          "text_de": "Der Vertrag wurde am 25. April 1483 geschlossen und nannte den 8. Dezember 1483 als Termin.",
+          "source_url": "https://en.wikipedia.org/wiki/Virgin_of_the_Rocks",
+          "certainty": "documented"
         }
       ],
       "sources": [
@@ -1154,6 +1160,12 @@
         {
           "text_en": "Cleaning in 1904 and 1905 revealed the hand holding a sheet of music.",
           "text_de": "Die Reinigung von 1904 und 1905 legte die Hand mit dem Notenblatt frei.",
+          "source_url": "https://en.wikipedia.org/wiki/Portrait_of_a_Musician",
+          "certainty": "documented"
+        },
+        {
+          "text_en": "That sheet of music is why the sitter is read as a musician and not as Ludovico Sforza, duke of Milan.",
+          "text_de": "Wegen dieses Notenblatts gilt der Dargestellte als Musiker und nicht als Ludovico Sforza, Herzog von Mailand.",
           "source_url": "https://en.wikipedia.org/wiki/Portrait_of_a_Musician",
           "certainty": "documented"
         }
@@ -2702,6 +2714,12 @@
         {
           "text_en": "The cartoon consists of eight joined sheets mounted on canvas.",
           "text_de": "Der Karton besteht aus acht zusammengefügten Blättern auf Leinwand.",
+          "source_url": "https://en.wikipedia.org/wiki/The_Virgin_and_Child_with_Saint_Anne_and_Saint_John_the_Baptist",
+          "certainty": "documented"
+        },
+        {
+          "text_en": "In 1987 a man fired a shotgun at it from about seven feet, a little over two metres. The protective glass took most of the blast, and the sheet has since been restored.",
+          "text_de": "1987 schoss ein Mann aus etwa sieben Fuß, gut zwei Metern, mit einer Schrotflinte darauf. Das Schutzglas fing den größten Teil ab, das Blatt wurde später restauriert.",
           "source_url": "https://en.wikipedia.org/wiki/The_Virgin_and_Child_with_Saint_Anne_and_Saint_John_the_Baptist",
           "certainty": "documented"
         }
