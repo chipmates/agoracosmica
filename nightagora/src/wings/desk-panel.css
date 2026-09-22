@@ -33,8 +33,17 @@
   letter-spacing: .065em;
   color: var(--press-white);
   text-shadow: none;
+  transition: opacity 240ms cubic-bezier(.22, .61, .36, 1) 500ms, color .3s ease;
 }
 :root[data-na-panel='open'] #rail-instruments { color: var(--na-starlight); }
+/* NOTHING CALLS A VISITOR OUT OF THE WALK. The museum's control leaves with
+   the words and comes back with them, so a leg has the gold control and the
+   way back and nothing else. */
+:root:has(#wing[data-walking][data-desk~='panel']) #rail-instruments {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms cubic-bezier(.22, .61, .36, 1);
+}
 /* THE CONTROL STANDS WHERE THE MUSEUM'S OWN LABEL STANDS, and stands down
    while a surface grows over that label: the drawer and the door's plate. */
 :root[data-na-plate='open'] #rail-instruments,
