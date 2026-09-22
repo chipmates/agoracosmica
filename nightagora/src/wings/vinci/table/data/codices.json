@@ -69,6 +69,9 @@
    "count_en": "330 scan pages, of which 69 leaves carry no writing.",
    "count_de": "330 Scanseiten, davon 69 Blätter ohne Schrift.",
    "map": "madrid-ii-pages.json",
+   "history_en": "In the royal library in Madrid from 1712, shelved in the wrong place and identified again in 1965 and 1966.",
+   "history_de": "Seit 1712 in der königlichen Bibliothek in Madrid, am falschen Platz eingestellt und 1965 und 1966 wiedererkannt.",
+   "history_source": "program/rounds/wing-vinci/refs/MINING-CATALOG-MANUSCRIPTS.md section 1.4, the Madrid codices: in the royal library from 1712, mis-shelved and lost until identified in 1965 and 1966",
    "plate": "codices/madrid-ii/thumb.jpg",
    "plate_w": 259,
    "plate_h": 360
@@ -87,6 +90,9 @@
    "count_en": "All 36 numbered faces, folio 1 recto to folio 18 verso.",
    "count_de": "Alle 36 nummerierten Seiten, Blatt 1 recto bis Blatt 18 verso.",
    "map": "birds-pages.json",
+   "history_en": "Stolen from the Institut de France between 1841 and 1844 and split up. Deposited in the Biblioteca Reale in Turin in December 1893, still missing four pages.",
+   "history_de": "Zwischen 1841 und 1844 aus dem Institut de France gestohlen und zerteilt. Im Dezember 1893 in der Biblioteca Reale in Turin hinterlegt, noch ohne vier Seiten.",
+   "history_source": "program/rounds/wing-vinci/refs/MINING-CATALOG-MANUSCRIPTS.md section 1.9, the Codex on the Flight of Birds: stolen from the Institut between 1841 and 1844 and split, deposited in the Biblioteca Reale, Turin, in December 1893, still missing four pages",
    "plate": "codices/birds/thumb.jpg",
    "plate_w": 295,
    "plate_h": 360
