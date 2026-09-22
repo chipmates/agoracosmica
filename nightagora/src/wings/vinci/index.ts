@@ -164,7 +164,11 @@ const PRINT={...GRADES['first-station'],name:'clos-luce-1517',exposure:.94,lift:
  * stop and a half under. The eye opens at the door, as a camera does. */
 const STATION_EXPOSURE:Partial<Record<VinciStationId,number>>={courtyard:1.0,
   'picture-room':1.34,'picture-room-west':1.34,'reading-table':1.5,'line-early':1.3,flight:1.36,works:1.36,body:1.4}
+/** THE HALL IS PRINTED ON A SHOULDER: its spots are the hottest light in the
+ * wing, and a linear print clips a lit sail to one flat white. */
+const STATION_SHOULDER:Partial<Record<VinciStationId,number>>={flight:1,works:1}
 const exposureOf=(id?:string):number=>STATION_EXPOSURE[id as VinciStationId]??PRINT.exposure
+const shoulderOf=(id?:string):number=>STATION_SHOULDER[id as VinciStationId]??0
 /** THE EYE OPENS OVER THE LAST THIRD OF A LEG, so the leg lands on the
  * station's own print: a stop has one picture whichever way it was reached,
  * live and filmed, and no ease is left to run after the arrival. */
@@ -174,6 +178,13 @@ function legExposure(nav:{completed?:string,active?:string,legWalked:number}):nu
   if(!nav.active)return from
   const t=Math.max(0,Math.min(1,(nav.legWalked-EXPOSURE_OPENS)/(1-EXPOSURE_OPENS)))
   return from+(exposureOf(nav.active)-from)*t*t*(3-2*t)
+}
+/** The shoulder rolls in on the same third of the leg as the exposure. */
+function legShoulder(nav:{completed?:string,active?:string,legWalked:number}):number {
+  const from=shoulderOf(nav.completed)
+  if(!nav.active)return from
+  const t=Math.max(0,Math.min(1,(nav.legWalked-EXPOSURE_OPENS)/(1-EXPOSURE_OPENS)))
+  return from+(shoulderOf(nav.active)-from)*t*t*(3-2*t)
 }
 const SHADOW={nearHalfM:20,nearMapPx:1024,aheadM:10,refocusM:3,lightDistanceM:80} as const
 /** THE SUN'S THREE SWITCHES, off unless an address asks for them. A flicker
@@ -364,7 +375,7 @@ export function createWing():VinciWingModule {
   let shadowBody:WingShadowBody|undefined
   /** The share of a leg after which the card names the station ahead. */
   const CARD_HANDOVER=.5
-  let exposureAt:VinciStationId|undefined, exposureShown=Number.NaN
+  let exposureAt:VinciStationId|undefined, exposureShown=Number.NaN, shoulderShown=Number.NaN
   let exhibits:CollectionExhibits|undefined, exhibitClock=0
   /** THE CLOSE LOOK. The registry is a read over the collection's own group,
    * the dots live in the label layer, and one owner holds the open exhibit. */
@@ -2185,12 +2196,12 @@ export function createWing():VinciWingModule {
   const stationKicker=()=>`CLOS LUCÉ, 1517 · ${stationNumber()} / ${WALK.stops.length}`
   const viewKicker=()=>`CLOS LUCÉ, 1517 · ${lang()==='de'?'BLICK VON STATION':'A VIEW FROM STATION'} ${stationNumber()}`
   /** THE PRINT STANDS AT ITS EXPOSURE AT ONCE: the walk eases it itself
-   * (`legExposure`), and a cut is a cut. */
-  function aimPrint(id:VinciStationId,exposure=exposureOf(id)):void {
+   * (`legExposure`, `legShoulder`), and a cut is a cut. */
+  function aimPrint(id:VinciStationId,exposure=exposureOf(id),shoulder=shoulderOf(id)):void {
     if(!hosts)return
     const {scene,camera,stack}=hosts.world
-    exposureShown=exposure
-    stack.setScene(scene,camera,{...PRINT,exposure},true)
+    exposureShown=exposure;shoulderShown=shoulder
+    stack.setScene(scene,camera,{...PRINT,exposure,shoulder},true)
   }
   function placeCanonicalStation() {
     const stop=stopAt(card),id=stationOf(stop.station).id
@@ -2577,8 +2588,8 @@ export function createWing():VinciWingModule {
       const arrived=here?walkIndexAt(here,arriving?nav.wallTo:nav.wall):-1
       if(arrived>=0&&arrived!==card&&!activeView){card=arrived;dock.scrollTop=0;paintHeader();paintDock();paintQuestion();standHere()}
       if(nav.completed&&nav.completed!==exposureAt)exposureAt=nav.completed
-      const opening=legExposure(nav)
-      if(nav.completed&&opening!==exposureShown)aimPrint(nav.completed,opening)
+      const opening=legExposure(nav), rolling=legShoulder(nav)
+      if(nav.completed&&(opening!==exposureShown||rolling!==shoulderShown))aimPrint(nav.completed,opening,rolling)
       // A JOURNEY ONTO A WALL IS TWO LEGS AND ONE ASKING: the run along the
       // wall leaves as soon as the leg to its end has landed.
       if(walkOnwards>=0&&!nav.active&&!nav.exhibit&&!nav.approaching){

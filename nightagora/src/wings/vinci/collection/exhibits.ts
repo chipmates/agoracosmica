@@ -5,7 +5,7 @@
  * `grave/` by their own factories. This module owns where they stand, what
  * they stand on and which way they face, and nothing else.
  */
-import { Group, Mesh, PointLight, Vector3, type Material, type PlaneGeometry } from 'three/webgpu'
+import { Group, Mesh, PointLight, Vector3, type Material, type Object3D, type PlaneGeometry, type Scene } from 'three/webgpu'
 import type { Stack } from '../../../stack'
 import { buildMachine, MACHINE_SLUGS, type MachineSlug } from '../machines'
 import type { ReadyMachineBuild } from '../machines/runtime'
@@ -23,6 +23,7 @@ import { COURT, FLOOR, GRAVE_ORIGIN, LINE_ORIGIN } from './layout'
 import { createCollectionStandSolids, standLevel, STANDS, standOf, type StandGround } from './stands'
 import { mountCollectionPlates, type CollectionPictureSource } from './plates'
 import { HALL_FILL, mountHallLight } from './hall-light'
+import { mountHallFabric } from './hall-fabric'
 import { VINCI_READING_TABLE } from './approaches'
 import type { BodySheetSource } from './body-wall'
 
@@ -67,6 +68,19 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   const pictures = mountCollectionPlates(host, stack)
   let live = true
   let demonstrating: MachineSlug | null = null
+  /** the hall's rig, once it stands; a machine is only ever ready after it */
+  let hallRig: { adopt(surface: Material): void; release(surface: Material): void } | undefined
+  /** which hall machines are lit by the hall's rig right now */
+  const hallLit = new Map<ReadyMachineBuild, boolean>()
+  function lightHallMachine(machine: ReadyMachineBuild, inHall: boolean): void {
+    machine.object.traverse(child => {
+      if (!(child instanceof Mesh)) return
+      for (const surface of Array.isArray(child.material) ? child.material : [child.material]) {
+        if (inHall) hallRig?.adopt(surface)
+        else hallRig?.release(surface)
+      }
+    })
+  }
   const warmed = new Set<StandGround>()
   /* Counted, never timed: each of these rises once and never falls, and a
      body whose own build FAILED still counts as settled, or the count would
@@ -127,6 +141,9 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
     // The hall's machines keep their casts: its own spots draw their maps, and
     // the sun cannot reach inside the hall to be re-rendered for them.
     if (spot.ground !== 'hall') void machine.ready.then(() => machine.object.traverse(child => { child.castShadow = false }))
+    // A machine in the hall is lit by the hall's own rig while it stands in
+    // the hall; `update` hands it back while the close look borrows it.
+    else void machine.ready.then(() => { hallLit.set(machine, true); lightHallMachine(machine, true) })
     void machine.ready.then(machineUp, machineUp)
     return machine
   }
@@ -284,9 +301,27 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
     host.add(fitting)
     teardown.push(() => { fitting.removeFromParent(); fitting.dispose() })
   }
-  const hallLight = mountHallLight(host)
+  // THE HALL IS LIT BY ITS OWN RIG: its spots and the room's own bounce. The
+  // sun's two cascades, the sky's flat fill and the unshadowed fittings stay
+  // with the rest of the wing.
+  let root: Object3D = host
+  while (root.parent) root = root.parent
+  const hallLight = mountHallLight(host, [], stack.renderer, root as Scene)
+  hallRig = hallLight
   teardown.push(() => { hallLight.dispose() })
+  // The hall's finish rides with the rooms, so it is drawn when they are.
+  const hallFabric = mountHallFabric(stack, hallLight.adopt)
+  ;(rooms ?? host).add(hallFabric.group)
+  teardown.push(() => { hallFabric.group.removeFromParent(); hallFabric.dispose() })
   warmHall()
+  /* THE ROOM'S BOUNCE IS TAKEN ONCE THE HALL STANDS: every machine in it
+     built and dressed and the finish's photographs on the GPU. Twice, so the
+     bounce carries a bounce of its own. */
+  let bakes = 0
+  const hallStands = (): void => { bakes = 2 }
+  void Promise.all([hall, hallFabric.ready.catch(() => undefined)])
+    .then(() => Promise.allSettled(machines.filter(machine => machine.ground === 'hall').map(machine => machine.build.ready)))
+    .then(hallStands, hallStands)
   const house = warmGround('house')
   warmTable()
   /** Every body the walk can show, standing with its materials resolved. */
@@ -369,6 +404,12 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       const t = Math.min(1, Math.max(0, inside / 2.5)), dim = t * t * (3 - 2 * t)
       for (const fitting of hallFittings) fitting.intensity = 9.5 + (HALL_FILL - 9.5) * dim
       for (const machine of machines) {
+        // lent to the close look's table, a machine takes that table's light
+        const lit = hallLit.get(machine.build)
+        if (lit !== undefined && lit !== (machine.build.object.parent === host)) {
+          hallLit.set(machine.build, !lit)
+          lightHallMachine(machine.build, !lit)
+        }
         const reach = eye.distanceToSquared(machine.at) < machine.reach * machine.reach
         const visible = machine.ground === 'hall' ? inHall && reach
           : machine.ground === 'house' ? reach
@@ -378,6 +419,20 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
         // been asked for. Everything else stands in its rest pose, which is
         // what lets the walk keep one shadow map and one certificate.
         if (visible && machine.slug === demonstrating) machine.build.animate(now, step)
+      }
+      if (bakes > 0) {
+        bakes--
+        // the hall drawn whole for the length of the take, wherever the eye is
+        const shown = machines.filter(machine => machine.ground === 'hall' && !machine.build.object.visible && machine.build.object.parent === host)
+        const roomsHidden = rooms !== undefined && !rooms.visible
+        for (const machine of shown) machine.build.object.visible = true
+        if (roomsHidden) rooms.visible = true
+        const levels = hallFittings.map(fitting => fitting.intensity)
+        for (const fitting of hallFittings) fitting.intensity = HALL_FILL
+        hallLight.bake()
+        hallFittings.forEach((fitting, i) => { fitting.intensity = levels[i]! })
+        for (const machine of shown) machine.build.object.visible = false
+        if (roomsHidden) rooms.visible = false
       }
       reading?.update(now * 1000)
     },
