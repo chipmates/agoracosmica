@@ -204,7 +204,7 @@
   opacity: 0;
   transition: opacity 160ms ease;
 }
-#wing[data-desk~='closelook'] .desk-clb-drawer[data-more='true'] .desk-clb-fade { opacity: 1; }
+#wing[data-desk~='closelook'] .desk-clb-drawer[data-more='true'] .desk-clb-fade:not(.desk-clb-fade-top) { opacity: 1; }
 /* and a shorter one at its head once the words have moved up, so no row is
    cut in half at the name row's feet */
 #wing[data-desk~='closelook'] .desk-clb-fade-top {
