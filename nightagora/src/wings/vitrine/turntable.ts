@@ -19,6 +19,7 @@ import {
   advancePlayback, initialPlayback, type PlaybackSchedule, type PlaybackState,
 } from '../vinci/machines/bench/playback'
 import { LOOK_RULE } from '../vinci/input'
+import { deskStageHeight } from '../desk-stage'
 import type { VitrinePayload, VitrinePayloadHost } from './types'
 
 export interface TurntableBody {
@@ -237,12 +238,13 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
   // ---- the eye on its bounded orbit
   function viewportFit(): { left: number; top: number; width: number; height: number } {
     const rect = host!.viewport()
-    // The caption and the row under the work take the viewport's foot.
-    const foot = host!.narrow ? 34 : 118
+    // The caption and the row under the work take the viewport's foot. Where
+    // the label carries the row, the caption alone is what has to stay clear.
+    const foot = host!.narrow ? 34 : host!.banded ? 52 : 118
     return { left: rect.left, top: rect.top, width: rect.width, height: Math.max(80, rect.height - foot) }
   }
   function fitDistance(r: number): number {
-    const fit = viewportFit(), w = innerWidth, h = innerHeight
+    const fit = viewportFit(), w = innerWidth, h = deskStageHeight()
     const tanY = Math.tan(camera!.fov * DEG / 2) * fit.height / h
     const tanX = Math.tan(camera!.fov * DEG / 2) * (w / h) * fit.width / w
     return r / Math.sin(Math.atan(Math.min(tanX, tanY))) * 1.02
@@ -251,9 +253,26 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
    * stands inside the viewport from the whole view's own bearing, which a
    * sphere cannot do for a tall crane or a flat gate. */
   let rest = new Box3()
+  /** How many moments of the run the fitted box is measured over. */
+  const RUN_SAMPLES = 8
+  /** THE BOX THE RUN NEEDS. A machine's rest pose is not its widest moment:
+   * the legs open, the arm swings. Where the work owns the stage it is fitted
+   * to the box the whole run stands in, so no step of it is ever cut. */
+  function runBox(from: Box3): Box3 {
+    if (!period) return from
+    const union = from.clone(), sample = new Box3()
+    for (let i = 1; i < RUN_SAMPLES; i++) {
+      body.animate(period * i / RUN_SAMPLES, 0)
+      body.object.updateMatrixWorld(true)
+      union.union(sample.setFromObject(body.object, true))
+    }
+    body.animate(0, 0)
+    body.object.updateMatrixWorld(true)
+    return union
+  }
   function wholeDistance(): number {
     if (rest.isEmpty()) return fitDistance(radius) * WHOLE_FIT
-    const fit = viewportFit(), w = innerWidth, h = innerHeight
+    const fit = viewportFit(), w = innerWidth, h = deskStageHeight()
     const tanY = Math.tan(camera!.fov * DEG / 2) * fit.height / h
     const tanX = Math.tan(camera!.fov * DEG / 2) * (w / h) * fit.width / w
     const cos = Math.cos(WHOLE.pitch)
@@ -324,7 +343,7 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
     camera.position.set(Math.sin(view.yaw) * cos, Math.sin(view.pitch), Math.cos(view.yaw) * cos)
       .multiplyScalar(view.distance).add(view.target)
     camera.lookAt(view.target)
-    const w = innerWidth, h = innerHeight, fit = viewportFit()
+    const w = innerWidth, h = deskStageHeight(), fit = viewportFit()
     // The work stands in the middle of its own viewport, not of the stage.
     camera.aspect = w / h
     camera.setViewOffset(w, h, w / 2 - (fit.left + fit.width / 2), h / 2 - (fit.top + fit.height / 2), w, h)
@@ -349,6 +368,9 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
       const step = steps[at]
       host.caption.textContent = step?.text ?? ''
       host.caption.lang = host.lang
+      // THE RUN'S CAPTIONS, ONE AT A TIME, and the clock that counts them:
+      // the label reads which step is under way, never a second hand.
+      host.step?.(at, steps.length)
       stepButtons.forEach((button, i) => { if (i === at) button.setAttribute('aria-current', 'step'); else button.removeAttribute('aria-current') })
       light(step?.part ?? null)
       host.describe(step ? `${options.title}. ${step.text}` : options.title)
@@ -359,7 +381,7 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
     if (!leader || !leaderLine || !leaderText || !camera || !host) return
     if (!tapped) { leader.style.display = 'none'; leaderText.hidden = true; return }
     const point = tapped.node.localToWorld(tapped.local.clone()).project(camera)
-    const x = (point.x * .5 + .5) * innerWidth, y = (-point.y * .5 + .5) * innerHeight
+    const x = (point.x * .5 + .5) * innerWidth, y = (-point.y * .5 + .5) * deskStageHeight()
     const rect = host.viewport()
     const box = leaderText.getBoundingClientRect()
     // The name stands at the viewport's upper corner on the far side of the
@@ -404,7 +426,7 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
   }
   function tap(x: number, y: number): void {
     if (!camera) return
-    ray.setFromCamera(new Vector2(x / innerWidth * 2 - 1, -(y / innerHeight) * 2 + 1), camera)
+    ray.setFromCamera(new Vector2(x / innerWidth * 2 - 1, -(y / deskStageHeight()) * 2 + 1), camera)
     const hit = ray.intersectObject(body.object, true).find(h => drawn(h.object))
     tapped = null
     if (hit) {
@@ -616,7 +638,7 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
     scene.background = new Color('#1a2026')
     const backdrop = createBenchBackdrop()
     scene.backgroundNode = backdrop
-    camera = new PerspectiveCamera(host.narrow ? 40 : 34, innerWidth / innerHeight, .01, 1000)
+    camera = new PerspectiveCamera(host.narrow ? 40 : 34, innerWidth / deskStageHeight(), .01, 1000)
     const table = new Group()
     table.name = 'vitrine/turntable'
     scene.add(table)
@@ -638,6 +660,11 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
     rest = new Box3().setFromObject(object, true)
     radius = Math.max(.05, box.getBoundingSphere(new Sphere()).radius)
     centre = new Vector3(0, size.y / 2, 0)
+    if (host.banded) {
+      rest = runBox(rest)
+      centre.setY((rest.min.y + rest.max.y) / 2)
+      radius = Math.max(radius, rest.getBoundingSphere(new Sphere()).radius)
+    }
     const span = Math.max(size.x, size.y, size.z)
     object.traverse(child => {
       if (!(child instanceof Mesh) || child.userData['vitrineOverlay']) return

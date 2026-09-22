@@ -216,6 +216,7 @@ export function createReaderPayload(options: {
       lang: outer.lang,
       narrow: outer.narrow,
       reducedMotion: outer.reducedMotion,
+      banded: outer.banded,
       // The viewer seats itself in the box it actually stands in, which is
       // the viewport less the strip under the page.
       viewport: () => {
@@ -299,7 +300,10 @@ export function createReaderPayload(options: {
     block.append(make('p', 'vitrine-meta', here.holder ?? book.holder))
     // THE CARD IS THE SIDE'S, not the side the window opened at: a wall of
     // sheets renames its card as the hand walks it.
-    host.rename?.(here.label, here.head, here.colour ?? null)
+    // where the side stands in its book goes with the name: a label that
+    // counts the volumes of a room would count the wrong thing here
+    host.rename?.(here.label, here.head, here.colour ?? null,
+      inside.length > 1 ? { at: place + 1, of: inside.length } : null)
     if (witnesses().length) {
       const texts = make('div', 'vitrine-description reader-texts')
       texts.id = 'vitrine-reader-texts'

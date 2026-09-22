@@ -25,6 +25,9 @@ export interface VitrinePayloadHost {
   readonly lang: 'en' | 'de'
   readonly narrow: boolean
   readonly reducedMotion: boolean
+  /** True while the label under the work carries the payload's own row, so
+   * the viewport keeps no foot for it. */
+  readonly banded?: boolean
   /** The viewport's rectangle on the stage. */
   viewport(): VitrineRect
   /** The work's own rectangle on the frame the room stands at, where the
@@ -37,6 +40,9 @@ export interface VitrinePayloadHost {
   /** Raise the card over the work, or put it back to its peek. Only the
    * narrow stage folds a card, so a wide window ignores it. */
   raise?(open: boolean): void
+  /** A payload that runs in steps counts them here, from zero: a label that
+   * shows a clock shows which step is under way, never a second hand. */
+  step?(at: number, of: number): void
   /** True while a folded card stands at its peek, false while it is raised,
    * and undefined on a stage that folds no card. */
   peeked?(): boolean
@@ -45,7 +51,8 @@ export interface VitrinePayloadHost {
    * one, and the colour of the mark before the name where the work it walks
    * to has its own certainty. The words are the caller's, as every word
    * here is. */
-  rename?(title: string, head?: string | null, certainty?: string | null): void
+  rename?(title: string, head?: string | null, certainty?: string | null,
+    place?: { at: number; of: number } | null): void
 }
 
 export interface VitrinePayload {
@@ -84,6 +91,10 @@ export interface VitrineExhibit {
   controls: readonly HTMLElement[]
   /** The two that walk the station's own row, at the card's two ends. */
   walk?: readonly HTMLElement[]
+  /** Where the work stands in the set it belongs to, counted from one. */
+  set?: { at: number; of: number } | null
+  /** The museum's own four marks, for the label that carries one. */
+  certainty?: 'documented' | 'reconstructed' | 'conjectural' | 'unknown' | null
   payload: VitrinePayload | null
   /** The work's rectangle at the frame the room stands at. */
   work?: () => VitrineRect | null

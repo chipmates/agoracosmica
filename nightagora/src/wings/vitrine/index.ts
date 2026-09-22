@@ -11,7 +11,8 @@
  * every control are the caller's, already in the page's language.
  */
 import { setRegister } from '../frame'
-import { deskAny } from '../desk-switches'
+import { deskAny, deskOn } from '../desk-switches'
+import { createCloseLookBand, type CloseLookBand } from '../desk-closelook'
 import { noteOpened } from '../visit'
 import css from './vitrine.css?inline'
 import type { VitrineExhibit, VitrinePayloadHost, VitrineRect, VitrineSurface } from './types'
@@ -64,6 +65,9 @@ const PEEK_MOST = .42
 /** A drag on the grabber this far decides; a shorter one is a press. */
 const GRAB_PX = 24
 const GRAB_SLOP = 8
+/** THE WORK OWNS THE STAGE: it fills this share of the stage's limiting side,
+ * and the rest is the air every hung thing needs around it. */
+const WORK_SHARE = .92
 
 export function createVitrine(options: {
   host: HTMLElement
@@ -86,6 +90,8 @@ export function createVitrine(options: {
   closeLabel?(): string
   /** The word for the grabber that raises a folded card. */
   raiseLabel?(): string
+  /** The room a close look's one step back leads to, in the page's language. */
+  room?(): string
 }): Vitrine {
   const { host, onOpen, onClose } = options
   const document = host.ownerDocument
@@ -146,6 +152,19 @@ export function createVitrine(options: {
   // the viewport and its controls follow it in the tab order.
   root.append(style, scrim, hole, sheet, card, stage, payloadControls, shutMark)
 
+  /* THE CLOSE LOOK IN VARIANT B. On a wide stage, behind its own switch, the
+   * work takes the whole picture box and every word about it stands in one
+   * band under it; the card, the plates and the payload's fixed row stand
+   * down. With the switch off not one line below this changes. */
+  const inBand = (): boolean => deskOn('closelook') && !options.narrow()
+  let band: CloseLookBand | null = null
+  function theBand(): CloseLookBand {
+    if (band) return band
+    band = createCloseLookBand({ lang: options.lang, back: () => shut(), resized: () => layout() })
+    root.append(band.element)
+    return band
+  }
+
   let open: string | null = null, invoker: HTMLElement | null = null
   let marked = false, popping = false, disposed = false
   let exhibit: VitrineExhibit | null = null
@@ -162,7 +181,9 @@ export function createVitrine(options: {
   /** THE ROOM DIMS AROUND THE WORK, never over it. Held on a work the room
    * shows, the scrim leaves the work's own rectangle clear. */
   function paintHole(): void {
-    const work = surface === 'hold' ? exhibit?.work?.() ?? null : null
+    // In the band the work is fitted to the stage's box and no longer stands
+    // in its own rectangle on the room's frame, so there is no hole to cut.
+    const work = surface === 'hold' && !inBand() ? exhibit?.work?.() ?? null : null
     hole.hidden = !work
     scrim.hidden = surface !== 'hold' || Boolean(work)
     if (!work) return
@@ -189,7 +210,7 @@ export function createVitrine(options: {
     if (laidNarrow !== narrow) {
       laidNarrow = narrow
       if (narrow) card.insertBefore(payloadControls, controls)
-      else root.append(payloadControls)
+      else if (!inBand()) root.append(payloadControls)
     }
     if (narrow) {
       // THE WINDOW OWNS THE PHONE. The station's chrome stands down while a
@@ -228,6 +249,30 @@ export function createVitrine(options: {
       root.style.setProperty('--vitrine-peek', `${fill ? peek : 0}px`)
       grab.hidden = !fill
       shutMark.hidden = false
+    } else if (inBand()) {
+      // THE WORK OWNS THE STAGE. The picture's box is the window less the
+      // band, and the work is fitted inside it: nothing of the museum stands
+      // on the work, and the work stands on nothing of the museum.
+      const low = theBand().height()
+      const box = { width, height: Math.max(1, height - low) }
+      rects.view = {
+        left: Math.round(box.width * (1 - WORK_SHARE) / 2),
+        top: Math.round(box.height * (1 - WORK_SHARE) / 2),
+        width: Math.round(box.width * WORK_SHARE),
+        height: Math.round(box.height * WORK_SHARE),
+      }
+      place(stage, rects.view)
+      sheet.style.cssText = ''
+      delete root.dataset['fill']
+      delete root.dataset['peek']
+      root.style.removeProperty('--vitrine-peek')
+      grab.hidden = true
+      shutMark.hidden = true
+      // the payload's own row is an instrument of the kind, so it stands in
+      // the band's own place for one and keeps none of its fixed geometry
+      payloadControls.style.cssText = ''
+      const slot = theBand().instruments
+      if (payloadControls.parentElement !== slot) slot.append(payloadControls)
     } else {
       const cardWidth = Math.round(Math.min(380, Math.max(320, width * .26)))
       const top = 84, bottom = floor - 16, right = width - 28
@@ -302,19 +347,71 @@ export function createVitrine(options: {
     lang: options.lang(),
     narrow: options.narrow(),
     reducedMotion: reducedMotion.matches,
+    banded: inBand(),
     viewport: () => ({ ...rects.view }),
-    work: () => exhibit?.work?.() ?? null,
+    work: () => (inBand() ? null : exhibit?.work?.() ?? null),
     surface: setSurface,
     describe: text => payloadEl.setAttribute('aria-label', text),
     raise: open => setRaised(open),
     peeked: () => !raised,
-    rename: (title, head, certainty) => {
+    step: (at, of) => band?.step(at, of),
+    rename: (title, head, certainty, place) => {
       nameIt(title, certainty)
-      if (head === undefined) return
-      line.textContent = head ?? ''
-      line.hidden = !head
+      if (head !== undefined) {
+        line.textContent = head ?? ''
+        line.hidden = !head
+      }
+      if (exhibit && inBand()) showInBand({ ...exhibit, title, line: head ?? exhibit.line, set: place ?? exhibit.set })
     },
   })
+
+  /** THE LABEL UNDER THE WORK, composed of what the window already has: the
+   * name, the line, the module's own sentences behind one word, and the
+   * wing's own control nodes, each under the role the wing gave it. */
+  function showInBand(next: VitrineExhibit): void {
+    const slot = theBand().instruments
+    // the slot is the band's, and the kind's: what the exhibit before it lent
+    // there goes back with it
+    for (const old of [...slot.children]) if (old !== payloadControls) old.remove()
+    const roles = new Map<string, HTMLElement>()
+    for (const node of next.controls) {
+      const role = node.dataset['role'] ?? ''
+      if (role && !roles.has(role)) roles.set(role, node)
+    }
+    // A PAINTING'S ONE INSTRUMENT IS ITS ZOOM: the way into the whole plate
+    // is the kind's own control, so it stands where instruments stand.
+    const zoom = roles.get('zoom')
+    if (zoom) slot.prepend(zoom)
+    const walk = next.walk ?? []
+    const live = (node?: HTMLElement | null): HTMLElement | null =>
+      node && !(node as HTMLButtonElement).disabled ? node : null
+    // A SET THE STATION CANNOT WALK IS WALKED BY THE PAYLOAD: a book steps
+    // its own sides where the row holds one volume.
+    const steps = payloadControls.querySelectorAll<HTMLElement>('.vitrine-step')
+    const on = live(walk[1]) ?? live(steps[1]) ?? walk[1] ?? null
+    const back = live(walk[0]) ?? live(steps[0]) ?? walk[0] ?? null
+    // A MACHINE'S STEPS ARE THE RUN'S CAPTIONS, one at a time under the work,
+    // so the list of them does not stand in the label as well.
+    const paged = next.payload?.kind !== 'machine'
+    theBand().show({
+      id: next.id,
+      // the name and the line the card is showing now, which a payload that
+      // walks its own sides has already renamed
+      title: namingText.textContent || next.title,
+      line: line.textContent || next.line,
+      kind: next.payload?.kind ?? '',
+      certainty: next.certainty ?? null,
+      set: next.set ?? null,
+      room: options.room?.() ?? '',
+      words: [...next.card, ...(paged ? [aside] : []), ...(next.after ?? [])],
+      record: roles.get('record') ?? null,
+      back,
+      on,
+      // the work the way on leads to, where the set knows its name
+      onTitle: on && walk.includes(on) ? on.getAttribute('aria-label') : null,
+      run: payloadControls.querySelector<HTMLElement>('.vitrine-play'),
+    })
+  }
 
   /** Our own entry, so a visitor's Back dismisses the exhibit and nothing
    * else. The address does not change: an exhibit is a place inside a
@@ -351,6 +448,10 @@ export function createVitrine(options: {
     open = null
     unmountPayload()
     exhibit = null
+    // the picture takes the whole window back with the band, and the row the
+    // band borrowed goes home before the window is struck
+    band?.clear()
+    if (payloadControls.parentElement !== root) root.append(payloadControls)
     root.hidden = true
     root.remove()
     delete document.documentElement.dataset['naWindow']
@@ -446,6 +547,9 @@ export function createVitrine(options: {
       // a visitor did not open.
       noteOpened(next.id)
       next.payload?.mount(payloadHost())
+      // The label is composed after the payload has built its own row, so the
+      // band takes the kind's instruments as they really are.
+      if (inBand()) showInBand(next)
       layout()
       const row = [...controls.children]
       const back = held < 0 ? null : row[Math.min(held, row.length - 1)]
@@ -462,15 +566,19 @@ export function createVitrine(options: {
       return open !== null && target !== null && (card.contains(target) || stage.contains(target) || payloadControls.contains(target))
     },
     key(event) {
-      if (!open || !exhibit?.payload?.key) return false
-      return exhibit.payload.key(event)
+      if (!open) return false
+      // THE PAYLOAD TAKES ITS OWN KEYS FIRST, then the label: the band's two
+      // are the ones no payload claims, Escape out of the drawer and Space.
+      if (exhibit?.payload?.key?.(event)) return true
+      return inBand() ? Boolean(band?.key(event)) : false
     },
     held() {
       return open !== null && surface === 'hold' && resizeFrames === 0
     },
     reading() {
       if (!open) return null
-      const box = options.narrow() ? sheet.getBoundingClientRect() : card.getBoundingClientRect()
+      const reader = inBand() ? theBand().element : options.narrow() ? sheet : card
+      const box = reader.getBoundingClientRect()
       return { left: box.left, top: box.top, width: box.width, height: box.height }
     },
     update(dt) {
@@ -482,6 +590,8 @@ export function createVitrine(options: {
     dispose() {
       disposed = true
       if (open) { unmountPayload(); open = null; exhibit = null }
+      band?.dispose()
+      band = null
       leaving.abort()
       delete document.documentElement.dataset['naWindow']
       root.remove()

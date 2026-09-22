@@ -279,8 +279,10 @@ export function createDeepPlatePayload(options: {
     const wide = bounds.width * (1 + margin * 2), high = bounds.height * (1 + margin * 2)
     const box = new library.Rect(bounds.x - bounds.width * margin, bounds.y - bounds.height * margin, wide, high)
     const container = root.clientHeight
+    // where the label carries the row, nothing of the museum stands over the
+    // plate and the caption alone is what the detail is lifted clear of
     const foot = host.caption.getBoundingClientRect().height
-      + (host.narrow ? 0 : host.controls.getBoundingClientRect().height + 16)
+      + (host.narrow || host.banded ? 0 : host.controls.getBoundingClientRect().height + 16)
     framed = detail
     viewer.viewport.fitBoundsWithConstraints(box, host.reducedMotion)
     // The detail is lifted by half the band the words take, in the units the
