@@ -20,6 +20,7 @@ import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { APP_ROOT, assertServer, browserArgs, FRAME_TIME_FLAGS, waitForServer, wingStanding } from '../rig.mjs'
 import { BARE, CHROME_OFF, installVirtualClock } from './clock.mjs'
+import { restingPending } from './pending.mjs'
 
 const argv = process.argv.slice(2)
 const flags = new Map()
@@ -70,7 +71,8 @@ async function standWarm(page, id) {
     id,
     { timeout: 180000 }
   )
-  await page.waitForFunction(() => window.__forge.state().texturesPending === 0, null, { timeout: 180000 })
+  /* the count does not always come to rest at zero: see pending.mjs */
+  return restingPending(page)
 }
 
 /**
@@ -139,7 +141,7 @@ async function oneCapture(browser, dir, limit) {
   const t0 = Date.now()
   await page.goto(url, { waitUntil: 'load' })
   if (!(await wingStanding(page))) throw new Error('the wing never stood')
-  await page.waitForFunction(() => window.__forge.state().texturesPending === 0, null, { timeout: 180000 })
+  const pendingAtRest = await restingPending(page)
   const backend = await page.evaluate(() => ({
     backend: document.body.dataset.backend,
     tier: document.body.dataset.tier,
@@ -276,6 +278,7 @@ async function oneCapture(browser, dir, limit) {
     from: FROM,
     to: TO,
     backend,
+    pendingAtRest,
     arrivedAt,
     settleSteps,
     tail: TAIL,
