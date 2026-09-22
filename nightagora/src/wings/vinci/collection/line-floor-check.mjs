@@ -40,7 +40,7 @@ async function load(file) {
   }, { timeout: 20000 })
   return exports
 }
-const { createCollectionLineFloor, collectionLineStuds, COLLECTION_LINE_SECTIONS, fitCollectionExhibitFloor } = await load(path.join(HERE, 'line-floor.ts'))
+const { createCollectionLineFloor, collectionLineStuds, COLLECTION_LINE_SECTIONS, fitCollectionExhibitFloor, EXHIBITION_STAGE_LEVELS: FITTER_LEVELS } = await load(path.join(HERE, 'line-floor.ts'))
 const { FLOOR, LINE_ORIGIN, LINE_FIELD, FACE, ROOMS, COURT, GRAVE_ORIGIN, COLLECTION_PAVING_ORIGIN } = await load(path.join(HERE, 'layout.ts'))
 const { STUDS, createLine } = await load(path.join(HERE, '../line/index.ts'))
 const { collectionView } = await load(path.join(HERE, 'views.ts'))
@@ -51,6 +51,12 @@ const { createMythDeathbed, createMythQuotes } = await load(path.join(HERE, '../
 const { EXHIBITION_STAGE_LEVELS } = await load(path.join(HERE, '../myths/construction.ts'))
 const failures = [], reports = []
 const expect = (condition, detail) => { if (!condition) failures.push(detail) }
+// The fitter repeats the builder's stage levels because its own callers take
+// only relative imports. Prove the two have not drifted apart.
+for (const sheet of ['stone', 'bed']) {
+  expect(EXHIBITION_STAGE_LEVELS[sheet].every((level, at) => Math.abs(level - FITTER_LEVELS[sheet][at]) < 1e-9),
+    'the fitted floor no longer stands at the built floor levels: ' + sheet)
+}
 const expectedIds = ['life-01', 'life-02', 'life-04', 'life-03', 'life-29', 'life-30', 'life-31', 'life-32', 'life-39', 'life-40', 'life-41', 'life-42']
 expect(collectionLineStuds.length === 12, 'The gallery must carry twelve distinct date sockets')
 expect(new Set(collectionLineStuds.map(stud => stud.id)).size === 12, 'A date socket is duplicated')

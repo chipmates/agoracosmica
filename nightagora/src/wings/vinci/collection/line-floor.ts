@@ -4,8 +4,16 @@
  */
 import { BufferGeometry, Float32BufferAttribute, Group, Mesh, type Material } from 'three/webgpu'
 import { createLine, STUDS, STUD_SPACING, type LineMaterials } from '../line'
-import { EXHIBITION_STAGE_LEVELS } from '../myths/construction'
 import { LINE_FIELD, LINE_ORIGIN, LINE_SLAB, ROOMS } from './layout'
+
+/** The exact horizontal planes of each sheet of the shared exhibition floor.
+ * They are the builder's own numbers, repeated here because the offline
+ * checkers that read this file take only relative imports and the builder
+ * carries a merge helper. `line-floor-check` proves the two still agree. */
+export const EXHIBITION_STAGE_LEVELS = {
+  stone: [-.215, -.015],
+  bed: [-.2195, -.0195],
+} as const
 
 export const COLLECTION_LINE_SECTIONS = [
   { station: 'line-early', selected: 0, row: 0 },
