@@ -797,7 +797,9 @@ try {
               viewport: f.css,
               deviceScaleFactor: f.dsf,
             },
-            encoder: { library: 'sharp', webpEffort: 6, avifEffort: 3, leadByteLine: LEAD_BYTES },
+            /* the codec versions belong to the record: the same quality dial
+               on another libvips is another file */
+            encoder: { library: 'sharp', versions: sharp.versions, webpEffort: 6, avifEffort: 3, leadByteLine: LEAD_BYTES },
             madeAt: new Date().toISOString(),
           }
           writeFileSync(join(dir, `${s.id}.sidecar.json`), JSON.stringify(sidecar, null, 1))
