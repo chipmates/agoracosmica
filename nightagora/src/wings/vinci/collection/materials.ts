@@ -138,6 +138,21 @@ const PALETTE = {
   ceiling: '#b0ab9e', paving: '#a6a393',
 }
 
+/** The mechanism hall's own stones: a warmer, deeper floor and lining than
+ * the rooms beside it, so its machines stand in their own light. */
+const HALL = {
+  floor: '#625a4f', plaster: '#9a9386', ceiling: '#958f83', bay: '#56514a',
+  floorRough: .5, wash: .55,
+}
+
+/** One on the hall's own faces and zero on every other room's, with no ramp
+ * between: a room beside the hall keeps every value it had. */
+function hallInterior(P: TSLNode): TSLNode {
+  const { float } = TSL as unknown as Record<string, TSLNode>
+  return P.x.greaterThan(-61.8).and(P.x.lessThan(-38.9)).and(P.z.greaterThan(41.92)).and(P.z.lessThan(63.8))
+    .select(float(1), float(0))
+}
+
 /** The sky each interior surface can still see, opening by opening. */
 function interiorDaylight(P: TSLNode, n: TSLNode): TSLNode {
   const { exp, float, smoothstep } = TSL
@@ -372,6 +387,13 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
       isDark.select(colourOf('dark'),
         isSteel.select(colourOf('steel'),
           isCeiling.select(colourOf('ceiling'), colourOf('paving'))))))
+  const hall = hallInterior(P).toVar()
+  const hallColour = (hex: string) => { const c = new Color(hex); return vec3(c.r, c.g, c.b) }
+  // The camera obscura's bay is lined dark: its walls are there to keep light out.
+  const inBay = P.x.greaterThan(-47.55).and(P.x.lessThan(-43.65)).and(P.z.greaterThan(51.35)).and(P.z.lessThan(54.45))
+  const hallPlaster = inBay.select(hallColour(HALL.bay), hallColour(HALL.plaster))
+  const tone = mix(base, isFloor.select(hallColour(HALL.floor), isPlaster.select(hallPlaster,
+    isCeiling.select(hallColour(HALL.ceiling), base))), hall)
   // A DENSITY GRADIENT, NOT A UNIFORM FIELD. How mottled a surface is varies
   // stone by stone, which is the one gradient a laid floor really carries.
   const cell = isFloor.select(slabCell, isPlaster.select(boardCell, isDark.select(stoneCell,
@@ -404,7 +426,7 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
   // reaches, a share of the pixel carried no material at all and the figure
   // read at a fraction of the contrast it was authored at. The wash itself is
   // untouched: what a lamp puts on a stone is still the stone.
-  const albedo = base.mul(figure.add(1)).mul(float(1).sub(cut))
+  const albedo = tone.mul(figure.add(1)).mul(float(1).sub(cut))
     .mul(float(1).add(walked.mul(.08)).sub(grime.mul(.13)).sub(handled.mul(.035))).toVar()
   m.colorNode = albedo
   // A RELIEF FILTERED AWAY LEAVES A SMOOTHER PLANE THAN WAS AUTHORED, and a
@@ -415,7 +437,7 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
     // almost wholly by an indirect term, where a change of albedo is worth two
     // or three levels and a change of gloss is worth the whole grazing
     // highlight: which slab catches the north light is what reads as stone.
-    isFloor.select(float(.62).add(detail.rough).add(cell.mul(.16)).add(lap.mul(.06))
+    isFloor.select(mix(float(.62), float(HALL.floorRough), hall).add(detail.rough).add(cell.mul(.16)).add(lap.mul(.06))
       .add(slabJoint.mul(.15)).sub(walked.mul(.22)).add(grime.mul(.07)),
       isOutdoor.select(float(.88).add(detail.rough).add(cell.mul(.14)).add(lap.mul(.05)).sub(walked.mul(.18)),
         float(.88).add(detail.rough).add(cell.mul(.1)).add(lap.mul(.07)).add(formBoard.mul(.05)).sub(handled.mul(.09))))).clamp(.30, .97), detail.lost)
@@ -440,7 +462,7 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
   // coffers are modelled as the irradiance they put on the surfaces they
   // face. They add no second shadow-casting light, and they never touch the
   // measured sun.
-  const wash = fittingWash(P, n).mul(isOutdoor.select(float(0), float(1)))
+  const wash = fittingWash(P, n).mul(isOutdoor.select(float(0), float(1))).mul(mix(float(1), float(HALL.wash), hall))
   m.emissiveNode = albedo.mul(wash)
   m.name = 'vinci/collection-rooms/surfaces'
   m.userData = {
