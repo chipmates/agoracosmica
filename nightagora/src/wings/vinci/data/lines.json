@@ -534,14 +534,14 @@
       "certainty": "reconstructed"
     },
     "grave": {
-      "en": "The slab carries his name and nothing else. An excavation of 1863 reported a skeleton here, and that it is his has never been proved.",
-      "de": "Die Platte trägt seinen Namen und sonst nichts. Eine Ausgrabung von 1863 meldete hier ein Skelett, dass es seines ist, wurde nie bewiesen.",
+      "en": "The slab carries his name and nothing else. Nobody is sure the bones below are his.",
+      "de": "Auf der Platte steht nur sein Name. Ob die Knochen darunter seine sind, weiß niemand.",
       "source": "grave/README.md, the slab and the lectern; line/bench/visitor-sources.ts GRAVE_SOURCE",
       "certainty": "documented"
     },
     "grave-diagram": {
-      "en": "This is a study of the light, not a picture of the chapel. The date is documented, the evening minute was chosen by the museum.",
-      "de": "Das ist eine Studie zum Licht, kein Bild der Kapelle. Das Datum ist belegt, die Abendminute hat das Museum gewählt.",
+      "en": "This is a study of the light, not the chapel. The day is written down, the hour is ours.",
+      "de": "Eine Studie zum Licht, kein Bild der Kapelle. Der Tag ist belegt, die Stunde wählten wir.",
       "source": "line/bench/visitor-sources.ts GRAVE_DIAGRAM; grave/README.md, the chosen minute",
       "certainty": "reconstructed"
     }
