@@ -595,6 +595,9 @@ body.forge .desk-cap, body.forge .desk-on { transition: none !important; }
   padding: var(--desk-band-air) var(--desk-g) var(--desk-band-foot);
   gap: 24px;
   background: var(--na-abyss);
+  /* the band is wall, not glass: a hand that lands on it is not a hand on
+     the picture, so a drag here never moves the eye */
+  pointer-events: auto;
   /* the one ornament of the design: on a dark station the picture's foot
      would vanish into the band, and this edge is what keeps it legible */
   box-shadow: inset 0 1px 0 color-mix(in srgb, var(--na-gold) 34%, transparent);
@@ -679,7 +682,7 @@ body.forge .desk-cap, body.forge .desk-on { transition: none !important; }
    clear of both the name row at the left and the ways below them. */
 #wing[data-desk~='stage'][data-desk~='ways'] .wing-rail-group {
   top: auto !important;
-  bottom: calc(var(--desk-foot-clear, 192px) - 38px) !important;
+  bottom: calc(var(--desk-foot-clear, 192px) - 44px) !important;
   left: auto !important;
   right: var(--desk-g);
   width: auto;
@@ -688,12 +691,25 @@ body.forge .desk-cap, body.forge .desk-on { transition: none !important; }
   gap: 0;
 }
 #wing[data-desk~='stage'][data-desk~='ways'] .wing-rail-group > .wing-lobby { margin-right: 0; }
+/* the row reads as 28 px of type and answers as a 44 px target: the box is
+   the hand's, the words are the eye's */
 #wing[data-desk~='stage'][data-desk~='ways'] .wing-rail-group :is(.wing-lobby, .vinci-source, .wing-plan-open, .wing-life-open) {
-  min-height: 28px;
+  min-height: 44px;
   padding: 0 0 0 26px;
   text-shadow: none;
 }
 #wing[data-desk~='stage'][data-desk~='ways'] .wing-lobby { padding-left: 0; }
+/* NOTHING IS TOLD WHILE WALKING, and nothing calls a visitor out of the walk
+   either: the ways through the wing leave with the words and come back with
+   them, so a leg has the gold control and the way back and nothing else. */
+#wing[data-walking][data-desk~='stage'][data-desk~='ways'] .wing-rail-group {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms cubic-bezier(.22,.61,.36,1);
+}
+#wing[data-desk~='stage'][data-desk~='ways'] .wing-rail-group {
+  transition: opacity 240ms cubic-bezier(.22,.61,.36,1) 500ms;
+}
 
 /* ---- THE DRAWER IS THE BAND GROWN, not a second plate ----
    One ground in the whole museum: the same wall the line stood on, taller,
