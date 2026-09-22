@@ -316,7 +316,8 @@ export function createCloseLookBand(options: {
       title.lang = language
       clock.textContent = ''
       clock.hidden = true
-      const place = next.set
+      // A COUNT OF ONE IS NOISE: a work alone in its set carries no count
+      const place = next.set && next.set.of > 1
         ? say(WORD.place()).replace('{n}', String(next.set.at)).replace('{total}', String(next.set.of))
         : ''
       count.textContent = place
@@ -351,7 +352,8 @@ export function createCloseLookBand(options: {
     step(at, of) {
       // THE CLOCK COUNTS THE STEP, because a machine's time is its steps and
       // a visitor reads which one he is looking at, never a second hand.
-      const said = of > 0 && at >= 0
+      // and a run of one step has nothing to count
+      const said = of > 1 && at >= 0
         ? say(WORD.step()).replace('{n}', String(at + 1)).replace('{total}', String(of))
         : ''
       clock.textContent = said
