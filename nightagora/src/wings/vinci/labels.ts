@@ -477,7 +477,10 @@ export function createVinciExhibitDots(options: {
         if (now - answeredAt > ANSWER_MS) release()
         else {
           setLeg(answering, Math.max(0, Math.min(1, options.leg?.() ?? 0)))
-          if (named === answering) placeChip(answering)
+          // the word belongs to the answer while the answer stands, whatever
+          // the hand and the focus have done since the press
+          named = answering
+          placeChip(answering)
         }
       }
       if (disposed || mode === 0 || !marks.length || limit === 0) { hide(); return }
@@ -523,7 +526,14 @@ export function createVinciExhibitDots(options: {
       // Tab order is reading order: the marks are placed left to right, so a
       // hand and a keyboard meet them in the same sequence.
       shown.sort((a, b) => a.x - b.x)
-      // the mark that is answering its own press keeps the slot it stands in
+      /* THE MARK THAT IS ANSWERING ITS OWN PRESS KEEPS THE SLOT IT STANDS IN,
+         and its exhibit is not handed to a second button: two marks on one
+         object would be the loudest thing in the room for half a second. */
+      const held = answering?.dataset['exhibit']
+      if (held) {
+        const at = shown.findIndex(candidate => candidate.mark.id === held)
+        if (at >= 0) shown.splice(at, 1)
+      }
       const free = buttons.filter(dot => dot !== answering)
       for (let i = 0; i < free.length; i++) {
         const dot = free[i]!, entry = shown[i]
