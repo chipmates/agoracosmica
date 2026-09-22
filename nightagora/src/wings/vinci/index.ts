@@ -1855,8 +1855,12 @@ export function createWing():VinciWingModule {
     if(!entry||!hosts||!closeLook)return
     if(!entry.openable)return
     const here=hereContent().id
-    if(entry.station!==here&&!(entry.kind==='machine'&&vinciMachineRoom(entry.station).includes(here))
-      &&!sameWall(here,entry.station))return
+    /* A WORK OF ANOTHER STATION, SEEN FROM HERE, OPENS HERE. Its mark stands
+       in this room's picture, and no leg leaves from here to it, so its label
+       opens where the visitor stands; it is not in this room's set, so it
+       carries no count and its certainty is its own register's. */
+    const stand=exhibitStand(id)
+    const own=(certainty:VinciCertainty|null)=>stand.set?stand:{set:null,certainty:stand.certainty??certainty}
     const walk=[stepControl('\u2039',exhibitStep(id,-1)),stepControl('\u203a',exhibitStep(id,1))]
     const how_=closeLook.id&&closeLook.id!==id?'advance':'enter'
     const shut=control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())
@@ -1879,15 +1883,19 @@ export function createWing():VinciWingModule {
       // THE WALK TO THE PLINTH IS DRAWN BY THE ROOM; the turntable takes the
       // stage once the eye stands, and on the phone that is at once.
       const payload=createVinciMachinePayload({stack:hosts.world.stack,slug,body,
-        grade:{...PRINT,exposure:STATION_EXPOSURE[here]??PRINT.exposure},light:KEY_RIG,restore:restoreRoom,openRecord,
+        grade:{...PRINT,exposure:STATION_EXPOSURE[here]??PRINT.exposure},light:KEY_RIG,openRecord,
+        // THE STATION'S OWN MARK stands down while a machine holds the stage:
+        // the frame that places it rests until the room is handed back
+        restore:()=>{restoreRoom();labels.setMode(mode)},
         // THE FOLIO BESIDE THE MODEL IS A DOOR: the leaf the machine was read
         // from opens in the reader, and Back stands the machine up again.
         openFolio:theBook()?.pages.some(page=>page.page_kind==='facsimile'&&page.machine_slugs.includes(slug))
           ?()=>openFolioDoor(slug,id,()=>openExhibit(id,null)):undefined,
         standing:()=>{const nav=rail.navigation;return !nav.active&&!nav.approaching}})
+      labels.setMode(0)
       openMode=how
       closeLook.open({id,title,line:vinciLine(id),card:words.card,after:words.after,payload,
-        controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),shut],walk,...vinciLimits(id),...exhibitStand(id)},from,how_)
+        controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),shut],walk,...vinciLimits(id),...own('reconstructed')},from,how_)
       openMode='auto'
       return
     }
@@ -1921,7 +1929,7 @@ export function createWing():VinciWingModule {
       leafAt=null
       openMode=how
       closeLook.open({id,title,line:vinciLine(id),card:[],payload:reader,
-        controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),shut],walk,...vinciLimits(id),...exhibitStand(id),
+        controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),shut],walk,...vinciLimits(id),...own('documented'),
         work:()=>{const nav=rail.navigation;return nav.exhibit===id&&!nav.active?sphereRect(entry.centre,entry.radiusM):null}},from,how_)
       openMode='auto'
       return
@@ -1946,7 +1954,7 @@ export function createWing():VinciWingModule {
           pixels:()=>{const map=(plate?.material as {map?:{image?:unknown}}|undefined)?.map?.image;return map instanceof HTMLImageElement||map instanceof ImageBitmap||map instanceof HTMLCanvasElement?map:null}})
       openMode=how
       closeLook.open({id,title:place.title,line:vinciLine(id),card:place.card,after:place.after,payload,
-        controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),shut],walk,...vinciLimits(id),...exhibitStand(id),
+        controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),shut],walk,...vinciLimits(id),...own(pictureCertainty(namedExhibit(entry)?.colour??'')),
         work:entry.kind==='place'?()=>{const nav=rail.navigation;return nav.exhibit===id&&!nav.active?sphereRect(entry.centre,entry.radiusM):null}:undefined},from,how_)
       openMode='auto'
       return
@@ -1988,7 +1996,7 @@ export function createWing():VinciWingModule {
       description:vinciPlateDescription(id),aspect:plate.pixels.width/plate.pixels.height,window:cut,
       standing:()=>{const nav=rail.navigation;return !nav.active&&!nav.approaching}}):null
     openMode=how
-    closeLook.open({id,title,line:vinciLine(id),card:[label],payload,controls,walk,...vinciLimits(id),...exhibitStand(id),
+    closeLook.open({id,title,line:vinciLine(id),card:[label],payload,controls,walk,...vinciLimits(id),...own(pictureCertainty(policyLabelText(work,entries).colour)),
       work:workRectNow},from,how_)
     openMode='auto'
   }
