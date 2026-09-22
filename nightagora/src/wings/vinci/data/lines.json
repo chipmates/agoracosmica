@@ -414,15 +414,15 @@
       "certainty": "documented"
     },
     "codex/madrid-II": {
-      "en": "Of its 330 scanned pages, 69 leaves carry nothing at all.",
-      "de": "Von seinen 330 gescannten Seiten tragen 69 Blätter überhaupt nichts.",
-      "source": "table/data/codices.json, the entry for Codex Madrid II",
+      "en": "It stood in the wrong place in a royal library. Nobody found it again until the 1960s.",
+      "de": "Er stand am falschen Platz in der Königsbibliothek. Erst in den 1960ern fand man ihn.",
+      "source": "MINING-CATALOG-MANUSCRIPTS, the Madrid codices, in the royal library from 1712, mis-shelved and identified again in 1965 and 1966; table/data/codices.json, the entry for Codex Madrid II",
       "certainty": "documented"
     },
     "codex/birds": {
-      "en": "Eighteen leaves on the flight of birds, and the museum can show every one of the 36 faces.",
-      "de": "Achtzehn Blätter über den Vogelflug, und das Museum kann jede der 36 Seiten zeigen.",
-      "source": "table/data/codices.json, the entry for the Codex on the Flight of Birds",
+      "en": "It was stolen in the 1840s and split up. Four pages were missing when it reached Turin.",
+      "de": "In den 1840ern gestohlen und zerteilt. Vier Seiten fehlten, als er nach Turin kam.",
+      "source": "MINING-CATALOG-MANUSCRIPTS 1.9, the Codex on the Flight of Birds, the theft of 1841 to 1844 and the Turin deposit of December 1893; table/data/codices.json, the entry for the Codex on the Flight of Birds",
       "certainty": "documented"
     },
     "codex/trivulzianus": {
