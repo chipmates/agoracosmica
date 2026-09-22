@@ -156,8 +156,10 @@ export function createCloseLookBand(options: {
   setRegister(drawerWords, 'drawer')
   const fade = make('div', 'desk-clb-fade')
   fade.setAttribute('aria-hidden', 'true')
+  const fadeTop = make('div', 'desk-clb-fade desk-clb-fade-top')
+  fadeTop.setAttribute('aria-hidden', 'true')
   scroll.append(drawerWords)
-  well.append(scroll, fade)
+  well.append(scroll, fadeTop, fade)
   drawer.append(drawerName, well)
   left.append(cap, drawer, foot)
   more.setAttribute('aria-controls', drawer.id)
@@ -246,6 +248,8 @@ export function createCloseLookBand(options: {
     const below = !drawer.hidden && over > 3 && scroll.scrollTop < over - 3
     if (below) drawer.dataset['more'] = 'true'
     else delete drawer.dataset['more']
+    if (!drawer.hidden && scroll.scrollTop > 3) drawer.dataset['read'] = 'true'
+    else delete drawer.dataset['read']
     scroll.tabIndex = !drawer.hidden && over > 3 ? 0 : -1
   }
   scroll.addEventListener('scroll', paintFade, { passive: true })
@@ -369,6 +373,7 @@ export function createCloseLookBand(options: {
       drawer.hidden = true
       delete root.dataset['drawer']
       delete drawer.dataset['more']
+      delete drawer.dataset['read']
       drawerWords.textContent = ''
       foot.textContent = ''
       setCloseLookBand(null)

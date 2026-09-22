@@ -186,7 +186,7 @@
 #wing[data-desk~='closelook'] .desk-clb-scroll:focus { outline: none; }
 #wing[data-desk~='closelook'] .desk-clb-scroll:focus-visible {
   outline: 2px solid var(--na-gold);
-  outline-offset: 5px;
+  outline-offset: 3px;
 }
 /* THE SIGN OF MORE: the words sink into the wall at the box's foot while
    more lies below, and the wall is clean again at the end. */
@@ -202,6 +202,15 @@
   transition: opacity 160ms ease;
 }
 #wing[data-desk~='closelook'] .desk-clb-drawer[data-more='true'] .desk-clb-fade { opacity: 1; }
+/* and a shorter one at its head once the words have moved up, so no row is
+   cut in half at the name row's feet */
+#wing[data-desk~='closelook'] .desk-clb-fade-top {
+  top: 0;
+  bottom: auto;
+  height: 24px;
+  background: linear-gradient(to top, color-mix(in srgb, var(--na-abyss) 0%, transparent), var(--na-abyss));
+}
+#wing[data-desk~='closelook'] .desk-clb-drawer[data-read='true'] .desk-clb-fade-top { opacity: 1; }
 /* while the drawer stands the foot is its floor: a hairline over it, the
    way back in the place the word that opened it stood */
 #wing[data-desk~='closelook'] .desk-clb[data-drawer='open'] .desk-clb-foot {
