@@ -143,6 +143,7 @@
       "play": { "en": "Play", "de": "Abspielen" },
       "pause": { "en": "Pause", "de": "Pause" },
       "clock": { "en": "The machine's clock", "de": "Der Takt der Maschine" },
+      "step": { "en": "step {n} of {total}", "de": "Schritt {n} von {total}" },
       "viewpoints": [
         { "id": "whole", "en": "Whole", "de": "Ganz" },
         { "id": "drive", "en": "The drive", "de": "Der Antrieb" },

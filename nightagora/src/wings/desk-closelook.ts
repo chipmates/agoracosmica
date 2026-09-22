@@ -97,6 +97,7 @@ const WORD = {
   machine: () => deskControl('walk', 'next_machine'),
   run: () => deskControl('walk', 'run_it'),
   place: () => deskControl('picture', 'place'),
+  step: () => deskControl('machine', 'step'),
   close: () => LOBBY_TEXT.close,
 }
 
@@ -290,7 +291,7 @@ export function createCloseLookBand(options: {
       // THE CLOCK COUNTS THE STEP, because a machine's time is its steps and
       // a visitor reads which one he is looking at, never a second hand.
       const said = of > 0 && at >= 0
-        ? say(WORD.place()).replace('{n}', String(at + 1)).replace('{total}', String(of))
+        ? say(WORD.step()).replace('{n}', String(at + 1)).replace('{total}', String(of))
         : ''
       clock.textContent = said
       clock.hidden = !said
