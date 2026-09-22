@@ -107,9 +107,12 @@ for (const [framing, record] of Object.entries(run.framings ?? {})) {
     /* THE STALE TEST. A scene revision changes the source tree or the mounted
        geometry, and every still made before it is then a picture of a museum
        that has moved on. */
+    /* a hash may be one string or a list of them, one per tier: compared as
+       text, so a list never reads as changed just for being a new array */
+    const same = (a, b) => JSON.stringify(a) === JSON.stringify(b)
     for (const key of SCENE_KEYS) {
       if (!here[key] || !sidecar.scene[key]) continue
-      if (sidecar.scene[key] !== here[key]) stale.add(`${id}: ${key}`)
+      if (!same(sidecar.scene[key], here[key])) stale.add(`${id}: ${key}`)
     }
     if (sidecar.scene.dirty) notes.push(`${id}: made on a tree with uncommitted work, so HEAD does not describe it`)
     /* THE CHROME. Not a reading of the pixels: the run counted, in the page and
