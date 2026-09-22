@@ -142,7 +142,7 @@ const PALETTE = {
  * the rooms beside it, so its machines stand in their own light. */
 const HALL = {
   floor: '#625a4f', plaster: '#9a9386', ceiling: '#958f83', bay: '#56514a',
-  floorRough: .5, wash: .55,
+  floorRough: .44, slabStep: .2, wash: .55,
 }
 
 /** One on the hall's own faces and zero on every other room's, with no ramp
@@ -416,6 +416,9 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
     .add(lap.mul(byRole([.24, .26, .19, .05, .21, .23])).mul(density))
     .add(drift.mul(byRole([.075, .03, .07, .02, .03, .085])))
     .add(stroke.mul(byRole([.075, .09, .26, .06, .09, .1])))
+    // The hall's darker stone shows its slabs apart: a deeper floor holds the
+    // same mottle at less contrast, so its stone-to-stone step is widened.
+    .add(cell.mul(hall.mul(isFloor.select(float(HALL.slabStep), float(0)))))
   const silted = walked.mul(.34).oneMinus()
   const cut = isFloor.select(slabJoint.mul(.34).mul(silted),
     isPlaster.select(boardJoint.mul(.16).max(formLift.mul(.06)).max(formBoard.mul(.045)),
