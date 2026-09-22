@@ -22,6 +22,7 @@ import { collectionExhibitMaterials, collectionInteriorMaterial, collectionProce
 import { COURT, FLOOR, GRAVE_ORIGIN, LINE_ORIGIN } from './layout'
 import { createCollectionStandSolids, standLevel, STANDS, standOf, type StandGround } from './stands'
 import { mountCollectionPlates, type CollectionPictureSource } from './plates'
+import { mountHallLight } from './hall-light'
 import { VINCI_READING_TABLE } from './approaches'
 import type { BodySheetSource } from './body-wall'
 
@@ -123,7 +124,9 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
     // STATIC RE-RENDERS THE WHOLE SHADOW MAP ON EVERY FRAME OF THE WALK, and
     // a machine's own graph is not one of those. The court's cloth casts
     // through a plain double three centimetres inside it, which it hides.
-    void machine.ready.then(() => machine.object.traverse(child => { child.castShadow = false }))
+    // The hall's machines keep their casts: its own spots draw their maps, and
+    // the sun cannot reach inside the hall to be re-rendered for them.
+    if (spot.ground !== 'hall') void machine.ready.then(() => machine.object.traverse(child => { child.castShadow = false }))
     void machine.ready.then(machineUp, machineUp)
     return machine
   }
@@ -260,7 +263,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
     // no opening in this room reaches them, so the luminaires on the beams
     // are lights here and not a term on a surface.
     ...[[-51, -44], [-47.2, -45.6], [-56.2, -51.4], [-46.4, -51.2], [-51.4, -58.6]]
-      .map(([east, north]) => ['hall-fitting', east!, north!, FLOOR + 4.6, 9.5, 15, '#f4e6cc'] as [string, number, number, number, number, number, string]),
+      .map(([east, north]) => ['hall-fitting', east!, north!, FLOOR + 4.6, 1.4, 15, '#f4e6cc'] as [string, number, number, number, number, number, string]),
     // The reading lamp on the table is emissive geometry: it shows that it
     // is lit, it does not light the book. The room's own fitting over the
     // table does that, because the object under it is not this module's to shade.
@@ -279,6 +282,8 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
     host.add(fitting)
     teardown.push(() => { fitting.removeFromParent(); fitting.dispose() })
   }
+  const hallLight = mountHallLight(host)
+  teardown.push(() => { hallLight.dispose() })
   warmHall()
   const house = warmGround('house')
   warmTable()
@@ -354,6 +359,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       // now stands stations inside these rooms, so this is the difference
       // between a walk and a frame that draws the whole ground at once.
       const inHall = eye.x > -62.4 && eye.x < -38.6 && eye.z > 41.8 && eye.z < 64.2 && eye.y < -1.9
+      hallLight.update(inHall)
       for (const machine of machines) {
         const reach = eye.distanceToSquared(machine.at) < machine.reach * machine.reach
         const visible = machine.ground === 'hall' ? inHall && reach
