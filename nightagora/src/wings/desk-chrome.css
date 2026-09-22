@@ -277,6 +277,9 @@
   pointer-events: auto;
 }
 .desk-drawer[hidden] { display: none; }
+/* the plate takes the hand when it opens, as a surface and not as a control:
+   the ring belongs to the controls inside it */
+.desk-drawer:focus, .desk-drawer:focus-visible { outline: none; }
 .desk-drawer-name { margin-bottom: 12px; padding-right: 44px; }
 .desk-drawer-name :is(.desk-chapter, .desk-clock) { text-shadow: none; }
 .desk-drawer-close {
