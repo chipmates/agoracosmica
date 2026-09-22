@@ -4,6 +4,7 @@
     "scope": "The text fields of the four card models of the close look, as data. The line stands first and the description that exists today becomes the second paragraph. Everything below the description is composed from the registers by the modules named here and is never retyped, so a card cannot drift from the record it stands on.",
     "rule": "Two to four sentences on a card. The record keeps the rest and is one deliberate control away.",
     "written_here": "The line (data/lines.json), the steps (data/steps.json), the honesty variants, the zoom ceiling's sentence, the rule labels, the floor's honesty line and every control's words. A machine whose viewpoint is not the shared one names it under controls.machine.viewpoint_labels, keyed by the machine slug and the viewpoint id.",
+    "controls_for_the_new_chrome": "The walk, visit, overview, reader and ways groups are the frozen desktop design's control words, confirmed in both languages by the text seat and read by no surface yet. A build seat quotes the key instead of typing the words. Words the museum already ships keep their one home and are not copied here: Whole (controls.machine.viewpoints), Where it comes from (controls.machine.provenance), Lobby, The plan, Life, Instruments and the three paces (the lobby and the frame).",
     "prepared": "2026-09-15"
   },
   "models": {
@@ -96,7 +97,38 @@
     "shared": {
       "back": { "en": "Back", "de": "Zurück" },
       "record": { "en": "The full record", "de": "Der ganze Nachweis" },
-      "more": { "en": "More", "de": "Mehr" }
+      "more": { "en": "More", "de": "Mehr" },
+      "read_more": { "en": "Read more", "de": "Mehr lesen" },
+      "ask_figure": { "en": "Ask {figure}", "de": "Frag {figure}" }
+    },
+    "walk": {
+      "walk_in": { "en": "Walk in", "de": "Hineingehen" },
+      "walking": { "en": "Walking", "de": "Unterwegs" },
+      "walk_faster": { "en": "Walk faster", "de": "Schneller gehen" },
+      "walk_there": { "en": "Walk there", "de": "Hingehen" },
+      "next_work": { "en": "Next work", "de": "Nächstes Werk" },
+      "next_page": { "en": "Next page", "de": "Nächste Seite" },
+      "next_machine": { "en": "Next machine", "de": "Nächste Maschine" },
+      "run_it": { "en": "Run it", "de": "Laufen lassen" },
+      "the_end": { "en": "The end", "de": "Das Ende" },
+      "look_up": { "en": "Look up", "de": "Nach oben schauen" }
+    },
+    "visit": {
+      "tell_the_story": { "en": "Tell me the story", "de": "Erzähl mir die Geschichte" },
+      "go_on": { "en": "Go on", "de": "Weiter erzählen" },
+      "go_on_alone": { "en": "Walk on alone", "de": "Selbst weitergehen" }
+    },
+    "overview": {
+      "things_to_see": { "en": "{n} things to see", "de": "{n} Dinge zu sehen" },
+      "whole_wall": { "en": "The whole wall", "de": "Die ganze Wand" },
+      "whole_book": { "en": "The whole book", "de": "Das ganze Buch" },
+      "whole_hall": { "en": "The whole hall", "de": "Die ganze Halle" }
+    },
+    "reader": {
+      "side_by_side": { "en": "Side by side", "de": "Nebeneinander" }
+    },
+    "ways": {
+      "chapters": { "en": "Chapters", "de": "Kapitel" }
     },
     "picture": {
       "whole_plate": { "en": "The whole plate", "de": "Die ganze Tafel" },
