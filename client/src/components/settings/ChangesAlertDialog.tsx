@@ -42,11 +42,11 @@ const ChangesAlertDialog: FC<ChangesAlertDialogProps> = ({
 
   return (
     <div className="settings-alert-overlay">
-      <div ref={trapRef} className="settings-alert" role="alertdialog" aria-modal="true" tabIndex={-1}>
+      <div ref={trapRef} className="settings-alert" role="alertdialog" aria-modal="true" aria-labelledby="unsaved-changes-title" tabIndex={-1}>
         <div className="settings-alert-icon">
           <Warning size={32} />
         </div>
-        <CosmicHeading level={3}>
+        <CosmicHeading level={3} id="unsaved-changes-title">
           {tNode('settings.unsavedChanges.title')}
         </CosmicHeading>
         <CosmicText>
