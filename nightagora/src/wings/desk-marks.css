@@ -1,0 +1,149 @@
+/* THE MARKS ON THE PICTURE, the desktop design's own step. Two kinds of mark
+   and no third: a mark that MOVES you wears a gold ring with the walk glyph,
+   a mark that TELLS you something keeps its certainty bead. Gold moves, a
+   certainty colour names, and nothing else in the room is gold and round.
+
+   Every rule is gated on the step's switch, so with it off the wing is
+   today's picture to the pixel; the two lines outside the gate only keep the
+   parts this step adds out of the frame until it stands. */
+
+.vinci-mark-ring { display: none; }
+.vinci-mark-chip { display: none; }
+
+/* ---- the two shapes ---- */
+
+/* A FILL IS A STATE, NOT A SKIN. At rest a bead of the certainty colour in a
+   hairline of starlight, with the scrim that holds it on a bright picture and
+   on a dark one alike. No drop shadow: the mark is a sign, not an object
+   lying on the room. */
+#wing[data-desk~='marks'] .vinci-dot::after,
+#wing[data-desk~='marks'] .vinci-exhibit-dot::after {
+  width: 12px;
+  height: 12px;
+  border: 0;
+  background: var(--certainty, var(--na-gold));
+  box-shadow:
+    0 0 0 1.5px color-mix(in srgb, var(--na-starlight) 92%, transparent),
+    0 0 0 7px color-mix(in srgb, var(--na-abyss) 34%, transparent);
+  transition: width var(--desk-release) ease, height var(--desk-release) ease;
+}
+#wing[data-desk~='marks'] .vinci-dot:hover::after,
+#wing[data-desk~='marks'] .vinci-dot:focus-visible::after,
+#wing[data-desk~='marks'] .vinci-exhibit-dot:hover::after,
+#wing[data-desk~='marks'] .vinci-exhibit-dot:focus-visible::after {
+  width: 16px;
+  height: 16px;
+  box-shadow:
+    0 0 0 2px var(--na-starlight),
+    0 0 0 8px color-mix(in srgb, var(--na-abyss) 40%, transparent);
+}
+
+/* THE WALKING MARK: 34 px of gold ring inside the same 44 px target, so a
+   hand and a finger reach both kinds the same way and the eye never has to
+   ask which one it is looking at. */
+#wing[data-desk~='marks'] .vinci-exhibit-dot[data-mark='walk']::after { display: none; }
+#wing[data-desk~='marks'] .vinci-exhibit-dot[data-mark='walk'] .vinci-mark-ring {
+  display: block;
+  width: 34px;
+  height: 34px;
+  margin: auto;
+  border-radius: 50%;
+  overflow: visible;
+  box-shadow:
+    inset 0 0 0 1.5px var(--na-gold),
+    0 0 0 6px color-mix(in srgb, var(--na-abyss) 26%, transparent);
+  transition: background var(--desk-press) ease, box-shadow var(--desk-release) ease;
+}
+#wing[data-desk~='marks'] .vinci-exhibit-dot[data-mark='walk']:hover .vinci-mark-ring,
+#wing[data-desk~='marks'] .vinci-exhibit-dot[data-mark='walk']:focus-visible .vinci-mark-ring {
+  background: color-mix(in srgb, var(--na-gold) 16%, transparent);
+  box-shadow:
+    inset 0 0 0 1.5px var(--na-gold),
+    0 0 0 8px color-mix(in srgb, var(--na-abyss) 34%, transparent);
+}
+#wing[data-desk~='marks'] .vinci-exhibit-dot[data-mark='walk']:active .vinci-mark-ring,
+#wing[data-desk~='marks'] .vinci-exhibit-dot[data-state='walking'] .vinci-mark-ring {
+  background: color-mix(in srgb, var(--na-gold) 26%, transparent);
+}
+#wing[data-desk~='marks'] .vinci-mark-glyph {
+  fill: none;
+  stroke: var(--na-gold);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* THE RING IS THE LEG, counted from the walk's own share and never timed. */
+#wing[data-desk~='marks'] .vinci-mark-leg {
+  fill: none;
+  stroke: var(--na-gold);
+  stroke-width: 3;
+  transform: rotate(-90deg);
+  transform-box: view-box;
+  transform-origin: 17px 17px;
+}
+
+/* ---- the word the mark carries ---- */
+
+/* NOTHING LIVES ON A ROLLOVER. The word comes with the pointer and with the
+   keyboard's focus, it is the mark's accessible name as well, and it takes no
+   press of its own. */
+#wing[data-desk~='marks'] .vinci-mark-chip {
+  display: flex;
+  position: fixed;
+  z-index: 3;
+  align-items: center;
+  gap: 9px;
+  height: 36px;
+  padding: 0 13px;
+  border-radius: 3px;
+  background: var(--na-abyss);
+  box-shadow: inset 0 0 0 1px var(--desk-edge);
+  font: 500 0.9375rem/1 var(--sans);
+  color: var(--desk-title);
+  white-space: nowrap;
+  pointer-events: none;
+}
+#wing[data-desk~='marks'] .vinci-mark-chip[hidden] { display: none; }
+#wing[data-desk~='marks'] .vinci-mark-chip[data-mark='walk'] {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--na-gold) 60%, transparent);
+}
+#wing[data-desk~='marks'] .vinci-mark-chip-word { color: var(--na-gold); }
+#wing[data-desk~='marks'] .vinci-mark-chip-word[hidden] { display: none; }
+#wing[data-desk~='marks'] .vinci-mark-chip-name {
+  font: 400 0.875rem/1 var(--sans);
+  color: var(--desk-quiet);
+}
+#wing[data-desk~='marks'] .vinci-mark-chip-word:not([hidden]) + .vinci-mark-chip-name::before {
+  content: '· ';
+}
+
+/* ---- the walking state ---- */
+
+/* WHILE A LEG RUNS THE ROOM HAS NOTHING TO PRESS. Every mark of either kind
+   fades in the release, and the one that was pressed holds long enough to be
+   read as the answer it is before it goes with the rest. */
+#wing[data-desk~='marks'] .vinci-dot,
+#wing[data-desk~='marks'] .vinci-exhibit-dot,
+#wing[data-desk~='marks'] .vinci-mark-chip {
+  transition: opacity var(--desk-release) cubic-bezier(.22,.61,.36,1);
+}
+#wing[data-desk~='marks'][data-walking] .vinci-dot,
+#wing[data-desk~='marks'][data-walking] .vinci-exhibit-dot,
+#wing[data-desk~='marks'][data-walking] .vinci-mark-chip {
+  opacity: 0;
+  pointer-events: none;
+}
+#wing[data-desk~='marks'][data-walking] .vinci-exhibit-dot[data-state='walking'],
+#wing[data-desk~='marks'][data-walking] .vinci-mark-chip[data-mark='walk'] {
+  transition-delay: var(--desk-press);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* THE EYE IS PLACED, so there is no leg to be quiet during and no fade. */
+  #wing[data-desk~='marks'] .vinci-dot,
+  #wing[data-desk~='marks'] .vinci-exhibit-dot,
+  #wing[data-desk~='marks'] .vinci-mark-chip { transition: none; }
+  #wing[data-desk~='marks'][data-walking] .vinci-dot,
+  #wing[data-desk~='marks'][data-walking] .vinci-exhibit-dot { opacity: 1; pointer-events: auto; }
+}
+

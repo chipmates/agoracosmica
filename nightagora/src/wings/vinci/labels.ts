@@ -108,6 +108,9 @@ export function createVinciLabelAnchor(options: {
   dot.className = 'vinci-dot'
   dot.type = 'button'
   dot.hidden = true
+  // the station's own mark opens a label where the visitor stands: the other
+  // kind, and it says so
+  dot.dataset['mark'] = 'detail'
   dot.style.width = dot.style.height = '44px'
   dot.dataset['naClaim'] = 'inferred'
   dot.dataset['naAnchorClass'] = 'GENERATED'
@@ -228,7 +231,40 @@ export interface VinciExhibitMark {
   colour: string
   /** The object itself: a mark stands only while its exhibit is drawn. */
   object: Object3D
+  /** TWO KINDS OF MARK, AND THE SHAPE SAYS WHICH. A press that moves the
+   * body wears the ring and the walk glyph; a press that opens a label where
+   * the visitor stands keeps the certainty bead. The wing decides, because
+   * only the wing knows whether the rail will run. */
+  walks?: boolean
+  /** The walking mark's word at rest, from the card data by key. */
+  word?: string
 }
+
+const MARK_SVG = 'http://www.w3.org/2000/svg'
+/** the whole circumference of the walking mark's counted ring, in user units */
+const MARK_RING = 2 * Math.PI * 15.5
+
+/** THE WALKING MARK'S BODY: a gold ring of 34 px inside the 44 px target,
+ * the walk glyph in it, and the counted arc that fills on press. The arc is
+ * the leg itself, never a timer. */
+function walkingRing(document: Document): SVGSVGElement {
+  const svg = document.createElementNS(MARK_SVG, 'svg')
+  svg.setAttribute('viewBox', '0 0 34 34')
+  svg.setAttribute('class', 'vinci-mark-ring')
+  svg.setAttribute('aria-hidden', 'true')
+  const leg = document.createElementNS(MARK_SVG, 'circle')
+  leg.setAttribute('cx', '17')
+  leg.setAttribute('cy', '17')
+  leg.setAttribute('r', '15.5')
+  leg.setAttribute('class', 'vinci-mark-leg')
+  leg.setAttribute('stroke-dasharray', `0 ${MARK_RING.toFixed(1)}`)
+  const glyph = document.createElementNS(MARK_SVG, 'path')
+  glyph.setAttribute('d', 'M17 22V10M12 15l5-5 5 5')
+  glyph.setAttribute('class', 'vinci-mark-glyph')
+  svg.append(leg, glyph)
+  return svg
+}
+
 
 /** THE BAND A MARK MAY STAND IN. The head is the brand line and the bar at
  * the top of the frame; the foot was written as a fixed 220 px for a room
@@ -268,6 +304,10 @@ export function createVinciExhibitDots(options: {
   /** The drawer every mark opens, named on the mark itself. */
   controls: string
   limit?: number
+  /** The word a pressed walking mark takes, from the card data by key. */
+  pressedWord?: () => string
+  /** How much of the leg under way is walked, 0 to 1, or null at rest. */
+  leg?: () => number | null
 }): VinciExhibitDots {
   const { host, camera, occluders, onOpen } = options
   const document = host.ownerDocument
@@ -275,15 +315,97 @@ export function createVinciExhibitDots(options: {
   const POOL = 8
   const buttons: HTMLButtonElement[] = []
   const pressed = new Map<HTMLButtonElement, string>()
+  /* THE MARK'S OWN WORD, beside it on the pointer and on focus alike, so
+     nothing here lives on a rollover. One chip for the layer: one mark is
+     under the hand or under the focus at a time. It is aria-hidden because
+     the same words are the mark's accessible name. */
+  const chip = document.createElement('span')
+  chip.className = 'vinci-mark-chip'
+  chip.hidden = true
+  chip.setAttribute('aria-hidden', 'true')
+  const chipWord = document.createElement('span')
+  chipWord.className = 'vinci-mark-chip-word'
+  const chipName = document.createElement('span')
+  chipName.className = 'vinci-mark-chip-name'
+  chip.append(chipWord, chipName)
+  host.append(chip)
+  /* THE ANSWER THE PRESS OWES. The wing empties the pool in the same frame a
+     mark is pressed, so the mark the hand pressed would be gone before the
+     browser paints. The pressed walking mark is held out of every sweep for
+     the length of its answer and takes its leave with the walking state. */
+  const ANSWER_MS = 600
+  let answering: HTMLButtonElement | null = null, answeredAt = 0
+  let named: HTMLButtonElement | null = null
+  const forge = (): boolean => document.body.classList.contains('forge')
+
+  function placeChip(dot: HTMLButtonElement): void {
+    const word = dot.dataset['word'] ?? ''
+    chipWord.textContent = word
+    chipWord.hidden = !word
+    chipName.textContent = dot.dataset['name'] ?? ''
+    chip.dataset['mark'] = dot.dataset['mark'] ?? 'detail'
+    chip.hidden = false
+    const x = parseFloat(dot.style.left) || 0, y = parseFloat(dot.style.top) || 0
+    const width = chip.offsetWidth, stage = view.innerWidth
+    const right = x + 26 + width <= stage - 22
+    chip.dataset['side'] = right ? 'right' : 'left'
+    chip.style.left = `${right ? x + 26 : x - 26 - width}px`
+    chip.style.top = `${y - 18}px`
+  }
+  function nameMark(dot: HTMLButtonElement): void {
+    if (dot.hidden || !pressed.has(dot)) return
+    named = dot
+    placeChip(dot)
+  }
+  function hushMark(dot: HTMLButtonElement): void {
+    if (named !== dot || dot === answering) return
+    named = null
+    chip.hidden = true
+  }
+  /** The mark answers before the camera moves: its state, its word and its
+   * ring are written now and the walk is asked for after that paint. */
+  function answer(dot: HTMLButtonElement): void {
+    answering = dot
+    answeredAt = view.performance.now()
+    dot.dataset['state'] = 'walking'
+    dot.dataset['word'] = options.pressedWord?.() ?? dot.dataset['word'] ?? ''
+    setLeg(dot, 0)
+    placeChip(dot)
+  }
+  function setLeg(dot: HTMLButtonElement, share: number): void {
+    const arc = dot.querySelector<SVGCircleElement>('.vinci-mark-leg')
+    arc?.setAttribute('stroke-dasharray', `${(MARK_RING * share).toFixed(1)} ${MARK_RING.toFixed(1)}`)
+  }
+  function release(): void {
+    if (!answering) return
+    delete answering.dataset['state']
+    setLeg(answering, 0)
+    if (named === answering) { named = null; chip.hidden = true }
+    answering = null
+  }
   for (let i = 0; i < POOL; i++) {
     const dot = document.createElement('button')
     dot.className = 'vinci-dot vinci-exhibit-dot'
     dot.type = 'button'
     dot.hidden = true
+    dot.dataset['mark'] = 'detail'
     dot.style.width = dot.style.height = '44px'
     dot.setAttribute('aria-controls', options.controls)
     dot.setAttribute('aria-expanded', 'false')
-    dot.addEventListener('click', () => { const id = pressed.get(dot); if (id) onOpen(id, dot) })
+    dot.append(walkingRing(document))
+    dot.addEventListener('click', () => {
+      const id = pressed.get(dot)
+      if (!id) return
+      if (dot.dataset['mark'] !== 'walk' || forge()) { onOpen(id, dot); return }
+      // the answer is painted first, then the walk is asked for: two frames
+      // at 60 Hz, which is inside the tenth of a second the mark owes
+      answer(dot)
+      view.requestAnimationFrame(() => view.requestAnimationFrame(() => onOpen(id, dot)))
+    })
+    dot.addEventListener('pointerenter', () => nameMark(dot))
+    dot.addEventListener('pointerleave', () => hushMark(dot))
+    dot.addEventListener('focus', () => nameMark(dot))
+    dot.addEventListener('blur', () => hushMark(dot))
     buttons.push(dot)
     host.append(dot)
   }
@@ -298,7 +420,13 @@ export function createVinciExhibitDots(options: {
   const settleMs = 80
 
   function hide(): void {
-    for (const dot of buttons) { dot.hidden = true; pressed.delete(dot); delete dot.dataset['exhibit'] }
+    for (const dot of buttons) {
+      if (dot === answering) continue
+      dot.hidden = true
+      pressed.delete(dot)
+      delete dot.dataset['exhibit']
+    }
+    if (!answering) { chip.hidden = true; named = null }
   }
 
   function invalidate(): void {
@@ -334,6 +462,15 @@ export function createVinciExhibitDots(options: {
       invalidate()
     },
     update(panels = null, now = view.performance.now()) {
+      // THE PRESSED MARK KEEPS ITS PLACE while it answers, and its ring is
+      // the leg itself: the walk's own share, never a clock.
+      if (answering) {
+        if (now - answeredAt > ANSWER_MS) release()
+        else {
+          setLeg(answering, Math.max(0, Math.min(1, options.leg?.() ?? 0)))
+          if (named === answering) placeChip(answering)
+        }
+      }
       if (disposed || mode === 0 || !marks.length || limit === 0) { hide(); return }
       camera.updateWorldMatrix(true, false)
       camera.getWorldPosition(eye)
@@ -377,24 +514,40 @@ export function createVinciExhibitDots(options: {
       // Tab order is reading order: the marks are placed left to right, so a
       // hand and a keyboard meet them in the same sequence.
       shown.sort((a, b) => a.x - b.x)
-      for (let i = 0; i < buttons.length; i++) {
-        const dot = buttons[i]!, entry = shown[i]
+      // the mark that is answering its own press keeps the slot it stands in
+      const free = buttons.filter(dot => dot !== answering)
+      for (let i = 0; i < free.length; i++) {
+        const dot = free[i]!, entry = shown[i]
         // the mark carries the exhibit it opens, so an export can name it
-        if (!entry) { dot.hidden = true; pressed.delete(dot); delete dot.dataset['exhibit']; continue }
+        if (!entry) {
+          dot.hidden = true; pressed.delete(dot); delete dot.dataset['exhibit']
+          hushMark(dot); continue
+        }
         dot.hidden = false
         dot.dataset['exhibit'] = entry.mark.id
         dot.style.left = `${entry.x}px`
         dot.style.top = `${entry.y}px`
         dot.style.setProperty('--certainty', entry.mark.colour)
-        if (dot.getAttribute('aria-label') !== entry.mark.label) dot.setAttribute('aria-label', entry.mark.label)
+        /* THE SHAPE SAYS WHAT THE PRESS DOES, and the word says it in words:
+           gold moves you, a certainty colour tells you something. */
+        dot.dataset['mark'] = entry.mark.walks ? 'walk' : 'detail'
+        dot.dataset['name'] = entry.mark.label
+        dot.dataset['word'] = entry.mark.walks ? entry.mark.word ?? '' : ''
+        const name = entry.mark.walks && entry.mark.word
+          ? `${entry.mark.word} · ${entry.mark.label}` : entry.mark.label
+        if (dot.getAttribute('aria-label') !== name) dot.setAttribute('aria-label', name)
         pressed.set(dot, entry.mark.id)
         dot.setAttribute('aria-expanded', String(entry.mark.id === opened))
+        if (named === dot) placeChip(dot)
       }
     },
     invalidate,
     dispose() {
       disposed = true
+      answering = null
+      named = null
       for (const dot of buttons) dot.remove()
+      chip.remove()
       buttons.length = 0
       pressed.clear()
       hits.length = 0

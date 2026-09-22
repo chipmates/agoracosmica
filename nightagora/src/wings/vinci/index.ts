@@ -95,6 +95,8 @@ import deskCloseLookCss from '../desk-closelook.css?inline'
 // desk.panel: its stylesheet import stands here
 
 // desk.marks: its stylesheet import stands here
+import deskMarksCss from '../desk-marks.css?inline'
+import { deskControl } from '../desk-story'
 
 // desk.overview: its stylesheet import stands here
 
@@ -363,6 +365,9 @@ export function createWing():VinciWingModule {
   /** The vertex the eye last stood at, so the marks and the row are taken
    * again the moment it arrives at another stop. */
   let wallWas:number|undefined
+  /** Whether the body stood still when the marks were last taken: the sign a
+   * mark wears is about the body, so it is taken again when that changes. */
+  let marksStill=false
   /** Whether a leg is under way, so the frame's one attribute is written on
    * the edge and not in every frame. */
   let legUnderWay=false
@@ -446,7 +451,7 @@ export function createWing():VinciWingModule {
       '',
 
       // desk.marks
-      '',
+      deskMarksCss,
 
       // desk.overview
       '',
@@ -674,7 +679,10 @@ export function createWing():VinciWingModule {
       scene.add(houseRoot)
     }
     dots=createVinciExhibitDots({host:h.labels,camera,occluders,limit:DOTS_PER_TIER[stack.tierName()]??6,controls:VINCI_EXHIBIT_CARD,
-      onOpen:(id,dot)=>openExhibit(id,dot)})
+      onOpen:(id,dot)=>openExhibit(id,dot),
+      // the word a pressed walking mark takes, and the leg its ring counts
+      pressedWord:()=>text(deskControl('walk','walking')),
+      leg:()=>{const nav=standing?rail.navigation:undefined;return nav?.active?nav.legWalked:null}})
     closeLook=createVinciCloseLook({host:h.labels,narrow,
       // the one step back of a close look names the room it goes back to
       room:()=>text(hereContent().name),
@@ -1267,11 +1275,33 @@ export function createWing():VinciWingModule {
     pendingDate=null
     openLife(at)
   }
+  /** WHAT A PRESS ON THIS MARK DOES TO THE BODY, asked of the same two
+   * answers the close look asks at the press itself, so a mark can never
+   * promise a walk the rail then refuses: a run along the hang to a frame the
+   * eye does not stand at, or a certified approach from the standing station.
+   * Where neither holds, the press opens a label where the visitor stands. */
+  function markWalks(id:string):boolean {
+    if(isWholePlate(id)||isLeafDoor(id)||activeView||!railReady())return false
+    const wall=vinciWallOfExhibit(id), at=wallAt()
+    if(wall&&wall===wallOn()&&at!==undefined&&vinciWallVertex(wall,id)!==undefined){
+      const stops=wallRow()
+      return !(onWallStop()&&at>0&&at<=stops.length&&stops[at-1]!.exhibit===id)
+    }
+    return vinciApproachStation(id)===hereContent().id&&Boolean(vinciApproachPose(id,narrow()))&&exhibitWalks()
+  }
+  /** THE WALKING MARK'S OWN WORD, from the card data by key: a walk that
+   * crosses into another place is walked into, a walk inside the room the
+   * visitor stands in is walked to. */
+  const markWord=(station:string|null):string=>
+    text(deskControl('walk',station===hereContent().id?'walk_there':'walk_in'))
   /** What each exhibit's mark says and what colour it carries: its own name
    * and its own certainty, both off the picture module's register. */
   function paintExhibitMarks():void {
     const sources=exhibits?.pictureSources()??[]
     const marks:VinciExhibitMark[]=[]
+    // the two kinds of mark, decided per exhibit and never by colour alone
+    const sign=(entry:{id:string;station:string|null}):{walks:boolean;word:string}=>
+      ({walks:markWalks(entry.id),word:markWord(entry.station)})
     for(const entry of picks){
       if(!entry.openable)continue
       /* ONE MARK FOR THE WHOLE LINE. Twelve dots over eighteen metres of floor
@@ -1280,17 +1310,17 @@ export function createWing():VinciWingModule {
       if(entry.kind==='stud'&&entry.id!==LINE_FLOOR_PICK)continue
       if(entry.kind==='machine'){
         const slug=entry.id.slice('machine/'.length)
-        if(isMachineSlug(slug))marks.push({id:entry.id,anchor:entry.anchor,object:entry.object,label:machineCatalog[slug].title[lang()],colour:PICTURE_CERTAINTY_KEY[2]!.colour})
+        if(isMachineSlug(slug))marks.push({id:entry.id,anchor:entry.anchor,object:entry.object,label:machineCatalog[slug].title[lang()],colour:PICTURE_CERTAINTY_KEY[2]!.colour,...sign(entry)})
         continue
       }
       const named=namedExhibit(entry)
-      if(named){marks.push({id:entry.id,anchor:entry.anchor,object:entry.object,label:named.title,colour:named.colour});continue}
+      if(named){marks.push({id:entry.id,anchor:entry.anchor,object:entry.object,label:named.title,colour:named.colour,...sign(entry)});continue}
       const found=sources.find(source=>source.work.id===entry.workId)
       if(!found)continue
       const entries=sources.filter(source=>source.work.id===entry.workId).map(source=>source.entry)
       marks.push({id:entry.id,anchor:entry.anchor,object:entry.object,
         label:lang()==='de'?found.work.title_de:found.work.title_en,
-        colour:policyLabelText(found.work,entries).colour})
+        colour:policyLabelText(found.work,entries).colour,...sign(entry)})
     }
     // THREE MARKS AT A STOP, AND WHICH THREE: this work and its two
     // neighbours. Standing in front of one painting, what a hand wants is the
@@ -2485,6 +2515,11 @@ export function createWing():VinciWingModule {
       // are taken again the moment it arrives at another one.
       const atWall=wallAt()
       if(atWall!==wallWas){wallWas=atWall;paintExhibitMarks();paintStrip()}
+      // A MARK PROMISES WHAT THE BODY WILL DO, so its kind is taken again the
+      // moment the body's own state changes: at a viewing eye a press opens
+      // where the visitor stands, at a station it walks.
+      const still=!nav.active&&!nav.exhibit&&!nav.approaching
+      if(still!==marksStill){marksStill=still;paintExhibitMarks()}
       const reading=readingRect()
       const panels=standingPanels(reading)
       labels.update(panels,reading)
