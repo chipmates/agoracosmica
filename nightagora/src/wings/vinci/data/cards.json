@@ -3,7 +3,7 @@
   "provenance": {
     "scope": "The text fields of the four card models of the close look, as data. The line stands first and the description that exists today becomes the second paragraph. Everything below the description is composed from the registers by the modules named here and is never retyped, so a card cannot drift from the record it stands on.",
     "rule": "Two to four sentences on a card. The record keeps the rest and is one deliberate control away.",
-    "written_here": "The line (data/lines.json), the steps (data/steps.json), the honesty variants, the zoom ceiling's sentence, the rule labels, the floor's honesty line and every control's words. A machine whose viewpoint is not the shared one names it under controls.machine.viewpoint_labels, keyed by the machine slug and the viewpoint id.",
+    "written_here": "The line (data/lines.json), the steps (data/steps.json), the honesty variants, the zoom ceiling's sentence, the rule labels, the floor's honesty line, the short room name per station (station_short_names, at most 24 characters, for the one step back in a close look and in the overview, where the full station name runs to 493 px uppercase) and every control's words. A machine whose viewpoint is not the shared one names it under controls.machine.viewpoint_labels, keyed by the machine slug and the viewpoint id.",
     "controls_for_the_new_chrome": "The walk, visit, overview, reader and ways groups are the frozen desktop design's control words, confirmed in both languages by the text seat and read by no surface yet. A build seat quotes the key instead of typing the words. Words the museum already ships keep their one home and are not copied here: Whole (controls.machine.viewpoints), Where it comes from (controls.machine.provenance), Lobby, The plan, Life, Instruments and the three paces (the lobby and the frame).",
     "prepared": "2026-09-15"
   },
@@ -92,6 +92,24 @@
   "floor_honesty": {
     "en": "Twelve of the fifty-six dates are cut into this floor. All fifty-six are in the record.",
     "de": "Zwölf der sechsundfünfzig Daten sind in diesen Boden geschnitten. Alle sechsundfünfzig stehen im Nachweis."
+  },
+  "station_short_names": {
+    "arrival": { "en": "The street", "de": "Die Straße" },
+    "courtyard": { "en": "DIEV AVANT TOVT", "de": "DIEV AVANT TOVT" },
+    "hall": { "en": "The great hall", "de": "Großer Saal" },
+    "oratory": { "en": "The oratory", "de": "Das Oratorium" },
+    "study": { "en": "The study", "de": "Das Studierzimmer" },
+    "chamber": { "en": "The north room", "de": "Das Nordzimmer" },
+    "garden": { "en": "The garden front", "de": "Die Gartenfront" },
+    "line-early": { "en": "The life in the floor", "de": "Das Leben im Boden" },
+    "picture-room": { "en": "The picture room", "de": "Der Bildersaal" },
+    "picture-room-west": { "en": "Where the wall ends", "de": "Wo die Wand endet" },
+    "supper-wall": { "en": "The missing wall", "de": "Die fehlende Wand" },
+    "reading-table": { "en": "The reading table", "de": "Der Lesetisch" },
+    "flight": { "en": "The mechanism hall", "de": "Die Maschinenhalle" },
+    "works": { "en": "The mechanism hall", "de": "Die Maschinenhalle" },
+    "body": { "en": "The body wall", "de": "Die Wand des Körpers" },
+    "grave": { "en": "The grave", "de": "Das Grab" }
   },
   "controls": {
     "shared": {
