@@ -9,6 +9,17 @@ import { fileURLToPath } from 'node:url'
 import { createHash } from 'node:crypto'
 import ts from 'typescript'
 
+/** the store's address helper as the app has it, so a mocked base still
+    forms the address the app forms, query and all */
+const mockMaterials = base => ({
+  ASSET_BASE: base,
+  assetAddress: (record, part) => `${base}${record.wing}/${record.path}${part ?? ''}`
+    + (/^[0-9a-f]{12}/.test(record.sha256 ?? record.tree_sha256 ?? '')
+      ? `?v=${(record.sha256 ?? record.tree_sha256).slice(0, 12)}` : ''),
+})
+
+const address = mockMaterials('/catalogue-assets/').assetAddress
+
 const root = fileURLToPath(new URL('../../../../../', import.meta.url)), sourceHashes = {}
 const read = relative => {
   const file = path.resolve(root, relative)
@@ -27,7 +38,7 @@ function load(relative) {
   const js = ts.transpileModule(read(relative), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText
   vm.runInNewContext(js, { exports, URL, require(specifier) {
     if (specifier.endsWith('paintings.json?raw')) return { default: registerRaw }
-    if (specifier === '../../../../stack/materials') return { ASSET_BASE: '/catalogue-assets/' }
+    if (specifier === '../../../../stack/materials') return mockMaterials('/catalogue-assets/')
     assert(specifier.startsWith('.'), `Unexpected runtime dependency: ${specifier}`)
     return load(path.normalize(path.join(path.dirname(relative), `${specifier}.ts`)))
   } }, { filename: relative, timeout: 2000 })
@@ -83,7 +94,7 @@ test('All 35 surviving identities resolve once, including two supplements and th
 
 test('Every source renders supplied bilingual honesty and licence literally, with complete manifested images and pixel extents', () => {
   const h = dom(), panel = catalogue.createSourceCatalogue(manifest, { document: h.document })
-  const allowed = new Set(panel.records.flatMap(record => [record.source.preview, record.source.plate]).map(entry => `/catalogue-assets/${entry.wing}/${entry.path}`))
+  const allowed = new Set(panel.records.flatMap(record => [record.source.preview, record.source.plate]).map(entry => address(entry)))
   assert.equal(descendants(panel.root).filter(node => node.tagName === 'OPTION').length, 35)
   for (const record of panel.records) {
     assert(panel.select(record.identity)); assert.equal(panel.selected(), record.identity)
@@ -98,7 +109,7 @@ test('Every source renders supplied bilingual honesty and licence literally, wit
     assert.equal(byClass(panel.root, 'picture-source-catalogue-licence')[0].textContent, record.source.plate.licence)
     const image = byClass(panel.root, 'picture-source-catalogue-main-image')[0]
     const preview = policy.validatePaintingRecord(record.source.preview)
-    assert.equal(image.src, `/catalogue-assets/${preview.path}`)
+    assert.equal(image.src, address(preview.entry))
     assert.equal(image.width, preview.pixels.width); assert.equal(image.height, preview.pixels.height)
     assert.equal(image.dataset.sourceSha256, record.source.preview.sha256)
     h.complete(panel); assert.equal(panel.measure().imagesPending, 0); assert.equal(panel.measure().errors.length, 0)
@@ -106,7 +117,7 @@ test('Every source renders supplied bilingual honesty and licence literally, wit
     assert.equal(panel.measure().decodedRGBABytes, [...decoded.values()].reduce((sum, bytes) => sum + bytes, 0))
     assert.equal(panel.measure().decodedImageCount, decoded.size)
     const original = byClass(panel.root, 'picture-source-catalogue-original')[0]
-    assert.equal(original.href, `/catalogue-assets/${record.source.plate.wing}/${record.source.plate.path}`)
+    assert.equal(original.href, address(record.source.plate))
     assert.equal(original.target, '_blank')
   }
   assert(h.requests.every(url => allowed.has(url)), 'A source page or held filename supplied image bytes')
@@ -119,7 +130,7 @@ test('A full source retains its independent pixel dimensions and provenance; unk
   const selected = panel.records.find(record => record.identity === panel.selected())
   byClass(panel.root, 'picture-source-catalogue-resolution')[0].click()
   const image = byClass(panel.root, 'picture-source-catalogue-main-image')[0]
-  assert.equal(image.src, `/catalogue-assets/${selected.source.plate.wing}/${selected.source.plate.path}`)
+  assert.equal(image.src, address(selected.source.plate))
   assert.equal(image.width, selected.source.pixels.width); assert.equal(image.height, selected.source.pixels.height)
   assert.equal(image.dataset.sourceSha256, selected.source.plate.sha256)
   assert.equal(panel.measure().fullImage, true)

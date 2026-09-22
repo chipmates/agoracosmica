@@ -779,7 +779,13 @@ export function createMaterialLibrary(tier: Tier, options: MaterialLibraryOption
     async function attach(entry: EncodedEntry, want: TextureBudget): Promise<void> {
       if (entry.class === 'GENERATED') return
       const has = (m: string): boolean => (entry.maps ?? []).includes(m)
-      const url = (file: string): string => `${ASSET_BASE}${entry.wing}/${entry.path}${file}`
+      /* A SET IS A FOLDER, AND A FOLDER HAS NO DIGEST OF ITS OWN. Each map
+         stands in the store under its own record, named by the set's id and
+         the map, and that record is what versions this address. */
+      const url = (map: MapName): string => {
+        const own = remote?.get(`${entry.id}-${map}`)
+        return own ? assetAddress(own) : assetAddress(entry, `${map}.${map === 'albedo' ? 'jpg' : 'png'}`)
+      }
       const wanted: MapName[] = ['albedo', ...(['normal', 'surface'] as const).filter((m) => has(m) && want.maps.includes(m))]
       // the side the set really stands at: a pack encoded smaller than the
       // tier's ceiling is what the ledger and the cost meter must report
@@ -800,7 +806,7 @@ export function createMaterialLibrary(tier: Tier, options: MaterialLibraryOption
         const pack = want.pack === 'calm' && !PRESENT_ONLY ? entry.ktx2_calm?.[map] ?? entry.ktx2?.[map] : entry.ktx2?.[map]
         const record = options.compressed && compressedReady() ? pack : undefined
         if (record) {
-          const made = await compressed(`${ASSET_BASE}${entry.wing}/${record.path}`, want.size, overWire(map))
+          const made = await compressed(assetAddress({ ...record, wing: entry.wing }), want.size, overWire(map))
           const placeholder = maps[map]
           maps[map] = made.texture
           for (const node of users[map]) node.value = made.texture
@@ -810,7 +816,7 @@ export function createMaterialLibrary(tier: Tier, options: MaterialLibraryOption
           encoded++
           return
         }
-        await fill(maps[map], url(`${map}.${map === 'albedo' ? 'jpg' : 'png'}`), want.size)
+        await fill(maps[map], url(map), want.size)
         onDevice += textureBytes(want.size)
         side = Math.max(side, want.size)
       })).finally(() => flight.delete(name))

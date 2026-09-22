@@ -15,7 +15,7 @@ import {
 } from 'three/webgpu'
 import { mix, texture, uniform } from 'three/tsl'
 import type { ManifestEntry } from '../../../manifest'
-import { ASSET_BASE } from '../../../stack/materials'
+import { assetAddress } from '../../../stack/materials'
 import { validatePaintingRecord } from './policy'
 import { validateSheetRecord } from './sheet-record'
 import type { SheetManifestEntry } from './sheet-record'
@@ -101,11 +101,11 @@ function validate(entry: ManifestEntry, family: PlateFamily, preview: boolean): 
   if (family === 'sheet') {
     const sheet = validateSheetRecord(entry, preview ? 'sheet-thumb' : 'sheet-page')
     return { entry: sheet.entry, width: sheet.pixels.width, height: sheet.pixels.height,
-      face: sheet.identity, subject: sheet.entry.sheet, url: `${ASSET_BASE}${sheet.path}` }
+      face: sheet.identity, subject: sheet.entry.sheet, url: assetAddress(sheet.entry) }
   }
   const record = validatePaintingRecord(entry, preview ? 'painting-preview' : 'painting-plate')
   return { entry: record.entry, width: record.pixels.width, height: record.pixels.height,
-    face: record.identity, subject: record.entry.work_id, url: `${ASSET_BASE}${record.path}` }
+    face: record.identity, subject: record.entry.work_id, url: assetAddress(record.entry) }
 }
 
 /** Exact RGBA8 allocation of the actual non-square mip pyramid. */

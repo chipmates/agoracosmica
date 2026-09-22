@@ -7,7 +7,7 @@
  * it, the sentence at the ceiling, and the rule's own numerals.
  */
 import { lang } from '../../content'
-import { ASSET_BASE } from '../../../stack/materials'
+import { assetAddress, assetPyramidBase } from '../../../stack/materials'
 import { loadManifest, type ManifestEntry, type ManifestIndex } from '../../../manifest'
 import { createDeepPlatePayload, type DeepPlateDetail, type DeepPlateSource, type DeepPlateTier } from '../../vitrine/deep-plate'
 import type { DeepTilePyramid } from '../../vitrine/deep-viewer'
@@ -110,7 +110,7 @@ export function vinciDeepPlate(plate: ResolvedPicturePlate):
   if (!source || source.stands_beside !== plate.plate.id || source.sha256 !== tiles.source_sha256) return null
   if (source.licence !== plate.plate.licence || source.class !== plate.plate.class) return null
   return {
-    pyramid: { base: `${ASSET_BASE}${tiles.wing}/${tiles.path}`.slice(0, -1), width: tiles.width,
+    pyramid: { base: assetPyramidBase(tiles), width: tiles.width,
       height: tiles.height, tileSize: tiles.tile_size, scaleFactors: tiles.scale_factors },
     width: tiles.width,
     height: tiles.height,
@@ -127,9 +127,9 @@ export async function vinciPlatePyramid(plate: ResolvedPicturePlate): Promise<De
   if (tiles.derived_from !== plate.plate.id || tiles.source_sha256 !== plate.plate.sha256) return null
   if (tiles.width !== plate.pixels.width || tiles.height !== plate.pixels.height) return null
   if (!tiles.tile_size || !tiles.scale_factors?.length || !tiles.path.endsWith('/')) return null
-  // Not assetUrl: a pyramid's source_url is the plate's own source page, the
-  // provenance line, and never a place to fetch a tile from.
-  return { base: `${ASSET_BASE}${tiles.wing}/${tiles.path}`.slice(0, -1), width: tiles.width,
+  // A pyramid's source_url is the plate's own source page, the provenance
+  // line, and never a place to fetch a tile from.
+  return { base: assetPyramidBase(tiles), width: tiles.width,
     height: tiles.height, tileSize: tiles.tile_size, scaleFactors: tiles.scale_factors }
 }
 
@@ -161,7 +161,7 @@ export function vinciLeafSource(index: ManifestIndex, page: string,
   const source = index.byId.get(tiles.derived_from ?? '')
   if (!source || !tiles.source_sha256 || source.sha256 !== tiles.source_sha256) return { pyramid: null, ...scan }
   return {
-    pyramid: { base: `${ASSET_BASE}${tiles.wing}/${tiles.path}`.slice(0, -1), width: tiles.width,
+    pyramid: { base: assetPyramidBase(tiles), width: tiles.width,
       height: tiles.height, tileSize: tiles.tile_size, scaleFactors: tiles.scale_factors },
     file: scan.file,
     width: tiles.width,
@@ -229,7 +229,7 @@ export function createVinciWholePlate(options: {
     window: cut ? { left: cut.left, top: cut.top, right: cut.right, bottom: cut.bottom } : null,
     source: {
       pyramid: deep ? deep.pyramid : vinciPlatePyramid(options.plate),
-      file: ASSET_BASE + validatePaintingRecord(options.plate.plate, 'painting-plate').path,
+      file: assetAddress(validatePaintingRecord(options.plate.plate, 'painting-plate').entry),
       width: deep ? deep.width : options.plate.pixels.width,
       height: deep ? deep.height : options.plate.pixels.height,
     },

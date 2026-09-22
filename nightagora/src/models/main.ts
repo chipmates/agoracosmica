@@ -37,7 +37,7 @@ import * as TSL from 'three/tsl'
 import { createStack, type Stack } from '../stack'
 import { GRADES, type Grade } from '../stack/grade'
 import { isTierName, type TierName } from '../stack/tier'
-import { ASSET_BASE } from '../stack/materials'
+import { assetAddress } from '../stack/materials'
 import type { ModelAsset, ModelPlacement } from '../stack/models'
 import type { SkyProbe } from '../stack/hdri'
 import { loadManifest, type ManifestEntry } from '../manifest'
@@ -360,7 +360,10 @@ async function show(slug: string): Promise<void> {
     `${dressed} · ${cost.textureMB.toFixed(1)} MB held · ` +
     `the ruler is ${metre}, banded at ${band}, the grid one metre · ` +
     `${PROBE}, sun turned to ${KEY.azimuth}°`
-  plateImg.src = `${ASSET_BASE}${entry.wing}/${entry.path}reference.jpg`
+  // the folder's record carries no digest of its own, the preview's own
+  // record does, and it is the only thing that may name that file
+  const reference = (await loadManifest()).byId.get(`${entry.id}-reference`)
+  plateImg.src = reference ? assetAddress(reference) : ''
   plateCap.textContent = "the source's own preview render"
   document.title = `${slug} · model library`
 }

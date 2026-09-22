@@ -41,7 +41,7 @@ import { createStack, type Stack } from '../stack'
 import { GRADES, type Grade } from '../stack/grade'
 import { isTierName, type TierName } from '../stack/tier'
 import type { MaterialSet } from '../stack/materials'
-import { ASSET_BASE } from '../stack/materials'
+import { assetAddress } from '../stack/materials'
 import type { SkyProbe } from '../stack/hdri'
 import { loadManifest } from '../manifest'
 
@@ -340,7 +340,10 @@ async function showSet(name: string): Promise<void> {
     `${set.detile ? ` · tiling broken at ${Math.round(set.detile * 100)} cm` : ''} · ` +
     `exposure ${exposureFor(wanted, metal).toFixed(2)} · ` +
     `${cost.textureMB.toFixed(1)} MB held · ${readUnder}`
-  plateImg.src = `${ASSET_BASE}${entry.wing}/${entry.path}reference.jpg`
+  // the set's folder carries no digest of its own, the preview's own record
+  // does, and it is the only thing that may name that file
+  const reference = (await loadManifest()).byId.get(`${entry.id}-reference`)
+  plateImg.src = reference ? assetAddress(reference) : ''
   plateCap.textContent = "the source's own preview render"
 }
 
@@ -382,7 +385,7 @@ async function showSky(name: string): Promise<void> {
     'a mirror ball and a matte ball, and the sky itself behind them'
   const index = await loadManifest()
   const ref = index.byId.get(`library/${name}-reference`)
-  plateImg.src = ref ? `${ASSET_BASE}${ref.wing}/${ref.path}` : ''
+  plateImg.src = ref ? assetAddress(ref) : ''
   plateCap.textContent = "the source's own preview render"
 }
 

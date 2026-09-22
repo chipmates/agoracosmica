@@ -36,7 +36,7 @@ import { MACHINE_SLUGS, machineCatalog } from './machines/catalog'
 import { validatePaintingRecord } from './pictures/policy'
 import { validateSheetRecord } from './pictures/sheet-record'
 import { pictureDisplayUV, pictureDisplayWindow } from './pictures/registration'
-import { ASSET_BASE } from '../../stack/materials'
+import { assetAddress } from '../../stack/materials'
 import { createCollectionReceiverPlaneShadowFilter } from './receiver-plane-shadow'
 import { createCollectionAccess, collectionAccessPoint, collectionAccessProvenance } from './collection-access'
 import { createRoadDressing, roadDressingProvenance } from './road-dressing'
@@ -73,7 +73,7 @@ import { SOURCE_READINGS } from './line/bench/visitor-sources'
 import cardsSource from './data/cards.json?raw'
 import { CERTAINTY as LINE_CERTAINTY } from './line'
 import { GRAVE_DEATHBED } from './grave/placement'
-import { assetUrl, loadManifest, type ManifestIndex } from '../../manifest'
+import { loadManifest, type ManifestIndex } from '../../manifest'
 import { createPlatePayload } from '../vitrine/picture'
 import { createVinciWholePlate, isWholePlate, vinciPlateDescription } from './collection/deep-plate'
 import type { VitrineRect } from '../vitrine'
@@ -1486,14 +1486,14 @@ export function createWing():VinciWingModule {
         row.push({order:pick.order,entry:{id:pick.id,openable:pick.openable,
           title:lang()==='de'?found.work.title_de:found.work.title_en,
           colour:policyLabelText(found.work,entries).colour,
-          preview:ASSET_BASE+validatePaintingRecord(found.entry.preview,'painting-preview').path}})
+          preview:assetAddress(validatePaintingRecord(found.entry.preview,'painting-preview').entry)}})
       }else if(pick.kind==='sheet'){
         const found=sheets.find(source=>`sheet/${source.sheet.id}`===pick.id)
         if(!found)continue
         row.push({order:pick.order,entry:{id:pick.id,openable:true,
           title:vinciSheetTitle(lang()==='de'?found.page.honesty_de:found.page.honesty_en),
           colour:PICTURE_CERTAINTY_KEY[0]!.colour,
-          preview:ASSET_BASE+validateSheetRecord(found.preview,'sheet-thumb').path}})
+          preview:assetAddress(validateSheetRecord(found.preview,'sheet-thumb').entry)}})
       }else if(pick.kind==='machine'){
         const slug=pick.id.slice('machine/'.length)
         if(!isMachineSlug(slug))continue
@@ -1509,7 +1509,7 @@ export function createWing():VinciWingModule {
         // picture the other nameless kinds take.
         const numeral=pick.kind==='stud'&&pick.id!==LINE_FLOOR_PICK
         if(named)row.push({order:pick.order,entry:{id:pick.id,openable:pick.openable,title:named.title,colour:named.colour,
-          preview:numeral?null:plate?ASSET_BASE+validatePaintingRecord(plate.entry.preview,'painting-preview').path:exhibitPreview(pick)}})
+          preview:numeral?null:plate?assetAddress(validatePaintingRecord(plate.entry.preview,'painting-preview').entry):exhibitPreview(pick)}})
       }
     }
     return row.sort((a,b)=>a.order-b.order).map(item=>item.entry)
@@ -1525,11 +1525,11 @@ export function createWing():VinciWingModule {
       // The store's own file, not the record's source: that address is the
       // holder's page for the sheet and not the picture of it.
       const folio=assets?.byId.get(`vinci/folio-thumb/${pick.id.slice('leaf/'.length).toLowerCase()}`)
-      if(folio)return `${ASSET_BASE}${folio.wing}/${folio.path}`
+      if(folio)return assetAddress(folio)
     }
     const name=pick.id.startsWith(`${pick.kind}/`)?pick.id.slice(pick.kind.length+1):pick.id
     const entry=assets?.byId.get(`vinci/exhibit-preview/${pick.kind}/${name.replace(/\//g,'-')}`)
-    return entry?assetUrl(ASSET_BASE,entry):null
+    return entry?assetAddress(entry):null
   }
   /** The next or the previous work of this wall, skipping what the spine
    * cannot open yet. The ends are ends: a wall does not wrap. */
@@ -1668,7 +1668,7 @@ export function createWing():VinciWingModule {
     const named=FAMOUS_FOLIOS.find(folio=>folio.folio==='83v')
     const title=lang()==='de'?named?.de??'':named?.en??''
     const shows=lang()==='de'?leaf.what_it_shows_de:leaf.what_it_shows_en
-    const source=vinciLeafSource(assets,leaf.file,{file:ASSET_BASE+near.path,
+    const source=vinciLeafSource(assets,leaf.file,{file:assetAddress(near),
       width:scan.width??0,height:scan.height??0})
     const door=`${VINCI_STUDY_LEAF}${LEAF_DOOR}`
     const openRecord=()=>{
@@ -1681,7 +1681,7 @@ export function createWing():VinciWingModule {
     }
     const reader=createVitrineReaderPayload({
       book:Promise.resolve({sides:[{id:'study-leaf',label:title,shows,source,
-        thumb:thumb?ASSET_BASE+thumb.path:null,ways:[],colour:certaintyColour('documented'),
+        thumb:thumb?assetAddress(thumb):null,ways:[],colour:certaintyColour('documented'),
         head:null,holder:''}],
         stripLabel:()=>text(hereContent().name),holder:'',honesty:text(VINCI_PAGE_HONESTY)}),
       start:'study-leaf',words:vinciManuscriptWords(),
@@ -1724,8 +1724,8 @@ export function createWing():VinciWingModule {
       const thumb=validateSheetRecord(source.preview,'sheet-thumb')
       const record=source.page as typeof source.page&{holder?:string}
       return {id:source.sheet.id,label:named(source),shows:'',head:vinciLine(`sheet/${source.sheet.id}`),
-        source:{pyramid:null,file:ASSET_BASE+page.path,width:page.pixels.width,height:page.pixels.height},
-        thumb:ASSET_BASE+thumb.path,ways:[],colour:certaintyColour('documented'),holder:record.holder??''}
+        source:{pyramid:null,file:assetAddress(page.entry),width:page.pixels.width,height:page.pixels.height},
+        thumb:assetAddress(thumb.entry),ways:[],colour:certaintyColour('documented'),holder:record.holder??''}
     })
     reader=createVitrineReaderPayload({
       book:Promise.resolve({sides,
@@ -1877,7 +1877,7 @@ export function createWing():VinciWingModule {
     // the payload shows the same share of the same file.
     const registration=plate?pictureDisplayWindow(plate.plate):null
     const cut=registration?pictureDisplayUV(registration):null
-    const payload=plate?createPlatePayload({src:ASSET_BASE+validatePaintingRecord(plate.preview,'painting-preview').path,title,
+    const payload=plate?createPlatePayload({src:assetAddress(validatePaintingRecord(plate.preview,'painting-preview').entry),title,
       description:vinciPlateDescription(id),aspect:plate.pixels.width/plate.pixels.height,window:cut,
       standing:()=>{const nav=rail.navigation;return !nav.active&&!nav.approaching}}):null
     openMode=how
@@ -2189,7 +2189,7 @@ export function createWing():VinciWingModule {
           const complete=make('a','vinci-picture-source',lang()==='de'
             ? entry.face==='reverse'?'Vollständige Reproduktion der Rückseite öffnen':'Vollständige Reproduktion öffnen'
             : entry.face==='reverse'?'Open the complete reverse reproduction':'Open the complete reproduction')
-          complete.href=ASSET_BASE+validatePaintingRecord(entry.plate,'painting-plate').path
+          complete.href=assetAddress(validatePaintingRecord(entry.plate,'painting-plate').entry)
           complete.target='_blank';complete.rel='noopener'
           label.append(complete)
         }

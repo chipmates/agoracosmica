@@ -260,7 +260,9 @@ function harness(initial = '/', { segments = SEGMENTS, nearPlate = false, paired
   } }, { filename: readingRulerFile, timeout: 2000 })
   const modules = {
     'three/webgpu': Three, '../../../../stack/grade': { IDENTITY: {} },
-    '../../../../stack/materials': { ASSET_BASE: '/mock-assets/' }, '../registration': registration,
+    '../../../../stack/materials': { ASSET_BASE: '/mock-assets/',
+      assetAddress: (record, part) => `/mock-assets/${record.wing}/${record.path}${part ?? ''}`
+        + (record.sha256 ? `?v=${record.sha256.slice(0, 12)}` : '') }, '../registration': registration,
     '../policy-label': policyLabel,
     '../visitor-copy': visitorCopy,
     '../signature-label': signatureLabel,

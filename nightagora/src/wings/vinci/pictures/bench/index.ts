@@ -5,7 +5,7 @@ import type { PictureBilingual } from '../policy-label'
 import { IDENTITY } from '../../../../stack/grade'
 import { loadManifest } from '../../../../manifest'
 import { readLabels } from '../../../../core/labels'
-import { ASSET_BASE } from '../../../../stack/materials'
+import { assetAddress } from '../../../../stack/materials'
 import { createPictureCertaintyKey, createPictureRecord, readingLevels, setRegister } from '../policy-label'
 import { createSignatureLabel, SIGNATURE_NOTE } from '../signature-label'
 import { visitorHolder, visitorNote, visitorSource } from '../visitor-copy'
@@ -415,7 +415,7 @@ export async function createPictureBench(stack: Stack, onLobby: () => void): Pro
         sourceImage.alt = `${selected.work.title_en} · complete source reproduction`
         sourceImage.loading = 'lazy'
         sourceImage.dataset['manifestId'] = card.entry.preview.id
-        source.ontoggle = () => { if (source.open && !sourceImage.hasAttribute('src')) sourceImage.src = `${ASSET_BASE}${card.entry.preview.wing}/${card.entry.preview.path}` }
+        source.ontoggle = () => { if (source.open && !sourceImage.hasAttribute('src')) sourceImage.src = assetAddress(card.entry.preview) }
         const window = pictureDisplayWindow(card.entry.plate)
         source.append(sourceImage)
         if (window?.approvedForDisplayCrop) source.append(element('p', 'picture-source-note', window.note))

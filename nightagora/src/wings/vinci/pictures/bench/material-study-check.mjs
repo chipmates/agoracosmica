@@ -220,7 +220,9 @@ function harness({ width = 1512, height = 950, controller = inputs.controller.te
   }
   const controllerModules = {
     'three/webgpu': Three, '../../../../stack/grade': { IDENTITY: {} }, '../../../../manifest': { loadManifest: async () => manifest },
-    '../../../../stack/materials': { ASSET_BASE: '/mock-assets/' }, '../registration': registration,
+    '../../../../stack/materials': { ASSET_BASE: '/mock-assets/',
+      assetAddress: (record, part) => `/mock-assets/${record.wing}/${record.path}${part ?? ''}`
+        + (record.sha256 ? `?v=${record.sha256.slice(0, 12)}` : '') }, '../registration': registration,
     '../policy-label': policyLabel,
     '../visitor-copy': visitorCopy,
     '../signature-label': signatureLabel,

@@ -5,18 +5,21 @@
    the record's own label, verbatim, with the Tier 2 honesty sentence and the
    Italian code line as its second line where the record carries them.
 
-   Only ASSET_BASE plus the scope plus the file path ever forms an image URL.
+   Only the store's own address helper ever forms an image URL here.
    `source_url` in a record cites the holder's page and is never fetched. */
 
 import { loadManifest, type ManifestEntry } from '../manifest'
-import { ASSET_BASE } from '../stack/materials'
+import { assetAddress } from '../stack/materials'
 import type { Lang } from '../wings/content'
 
-/** one measured file of a record: the original, a preview, a crop */
+/** one measured file of a record: the original, a preview, a crop. Each file
+    is hashed on its own, so a preview re-encoded at the same size still
+    changes the address the pane hangs. */
 export interface LikenessFile {
   path: string
   width: number
   height: number
+  sha256?: string
 }
 
 /** a likeness record as the store writes it. The rights fields the pane
@@ -92,7 +95,7 @@ export function paneLikeness(record: LikenessRecord, language: Lang): PaneLikene
   const previews = previewsOf(record)
   const hang = previews[previews.length - 1]
   if (!hang) return null
-  const url = (file: LikenessFile): string => `${ASSET_BASE}${record.wing}/${file.path}`
+  const url = (file: LikenessFile): string => assetAddress({ ...file, wing: record.wing })
   const { credit, note } = likenessCredit(record, language)
   return {
     id: record.id,

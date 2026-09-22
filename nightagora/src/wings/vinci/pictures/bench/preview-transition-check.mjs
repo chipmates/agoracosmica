@@ -12,6 +12,15 @@ import vm from 'node:vm'
 import ts from 'typescript'
 import * as Three from 'three/webgpu'
 
+/** the store's address helper as the app has it, so a mocked base still
+    forms the address the app forms, query and all */
+const mockMaterials = base => ({
+  ASSET_BASE: base,
+  assetAddress: (record, part) => `${base}${record.wing}/${record.path}${part ?? ''}`
+    + (/^[0-9a-f]{12}/.test(record.sha256 ?? record.tree_sha256 ?? '')
+      ? `?v=${(record.sha256 ?? record.tree_sha256).slice(0, 12)}` : ''),
+})
+
 const file = fileURLToPath(new URL('../stream.ts', import.meta.url))
 const source = readFileSync(file, 'utf8')
 const policyFile = fileURLToPath(new URL('../policy.ts', import.meta.url))
@@ -77,10 +86,11 @@ function harness(reducedMotion = false) {
     constructor() { this.userData = {}; this.opacity = 1; this.transparent = false; this.disposals = 0; materials.push(this) }
     dispose() { this.disposals++ }
   }
+  const address = mockMaterials('/mock-assets/').assetAddress
   async function fetch(url, { signal }) {
-    const entry = url.endsWith(preview.path) ? preview : url.endsWith(plate.path) ? plate : null
+    const entry = url === address(preview) ? preview : url === address(plate) ? plate : null
     assert.ok(entry, `Unexpected requested URL: ${url}`)
-    assert.equal(url, `/mock-assets/${entry.wing}/${entry.path}`)
+    assert.equal(url, address(entry))
     requests.push({ entry, signal })
     signal.throwIfAborted()
     if (entry === preview) await previewGate.promise
@@ -114,7 +124,7 @@ function harness(reducedMotion = false) {
         texture: value => node({ kind: 'texture', value }), uniform: value => node({ kind: 'uniform', value }),
         mix: (a, b, blend) => node({ kind: 'mix', a, b, blend }),
       }
-      if (name === '../../../stack/materials') return { ASSET_BASE: '/mock-assets/' }
+      if (name === '../../../stack/materials') return mockMaterials('/mock-assets/')
       if (name === './policy') return policy
       if (name === './sheet-record') return sheetRecord
       throw new Error(`Unmocked dependency ${name}`)

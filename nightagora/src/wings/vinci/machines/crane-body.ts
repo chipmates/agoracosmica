@@ -33,7 +33,7 @@ import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js'
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js'
 import * as TSL from 'three/tsl'
 import { loadManifest, type ManifestEntry } from '../../../manifest'
-import { ASSET_BASE } from '../../../stack/materials'
+import { assetAddress } from '../../../stack/materials'
 import type { Stack, TierName } from '../../../stack'
 import { machineCatalog } from './catalog'
 import { jointValuesAt, type JointValues } from './motion'
@@ -128,7 +128,7 @@ async function standFromStore(stack: Stack, host: Group): Promise<CraneJoints> {
   if (!entry.display || entry.class === 'REFERENCE-ONLY') throw new Error(`${id} may not be displayed`)
   const file = entry.gltf?.file
   if (!file) throw new Error(`${id} names no document`)
-  const document = await gltf(stack).loadAsync(`${ASSET_BASE}${entry.wing}/${entry.path}${file}`)
+  const document = await gltf(stack).loadAsync(assetAddress(entry, file))
   const body = document.scene as unknown as Object3D
   const swapped = new Map<Material, MeshStandardNodeMaterial>()
   let triangles = 0, meshes = 0

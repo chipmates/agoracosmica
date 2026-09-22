@@ -2,7 +2,7 @@
  * outside the measured picture register. This view invents no object size,
  * date, crop or registration. The caller owns its route and containing layer. */
 import type { ManifestIndex } from '../../../../manifest'
-import { ASSET_BASE } from '../../../../stack/materials'
+import { assetAddress } from '../../../../stack/materials'
 import { REGISTER, type PictureWork } from '../register'
 import { resolveManifestWorkPlates, resolvePicturePolicy, validatePaintingRecord,
   type PolicyPaintingEntry, type PolicyPicturePlate } from '../policy'
@@ -185,7 +185,7 @@ export function createSourceCatalogue(manifest: ManifestIndex, options: SourceCa
       if (status) status.textContent = 'Image unavailable / Bild nicht verfügbar'
     }
     // source_url cites a page. Only the validated store path supplies pixels.
-    image.src = `${ASSET_BASE}${valid.path}`
+    image.src = assetAddress(valid.entry)
     return image
   }
   function renderMain() {
@@ -204,7 +204,7 @@ export function createSourceCatalogue(manifest: ManifestIndex, options: SourceCa
     resolutionButton = resolution
     resolution.onclick = () => { if (!live) return; full = !full; renderMain(); resolutionButton?.focus() }
     const open = node('a', 'picture-source-catalogue-original', 'Open original image / Originalbild öffnen')
-    open.href = `${ASSET_BASE}${validatePaintingRecord(record.source.plate).path}`; open.target = '_blank'; open.rel = 'noopener'
+    open.href = assetAddress(validatePaintingRecord(record.source.plate).entry); open.target = '_blank'; open.rel = 'noopener'
     figure.append(image, caption, status, resolution, open)
     const copy = node('div', 'picture-source-catalogue-copy')
     const languageControls = node('div', 'picture-source-catalogue-language-switch')

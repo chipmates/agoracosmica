@@ -13,6 +13,17 @@ import vm from 'node:vm'
 import ts from 'typescript'
 import * as Three from 'three/webgpu'
 
+/** the store's address helper as the app has it, so a mocked base still
+    forms the address the app forms, query and all */
+const mockMaterials = base => ({
+  ASSET_BASE: base,
+  assetAddress: (record, file) => `${base}${record.wing}/${record.path}${file ?? ''}`
+    + (/^[0-9a-f]{12}/.test(record.sha256 ?? record.tree_sha256 ?? '')
+      ? `?v=${(record.sha256 ?? record.tree_sha256).slice(0, 12)}` : ''),
+})
+
+const address = mockMaterials('/mock-assets/').assetAddress
+
 const sourcePaths = ['stream', 'index', 'policy', 'register', 'policy-label', 'scale', 'registration', 'arch-mask', 'visitor-copy', 'aperture', 'sheet-record']
   .map(name => `../${name}.ts`)
 const sources = sourcePaths.map(path => {
@@ -121,7 +132,7 @@ function harness({ previewMaxEdge = 1024 } = {}) {
       })])
       signal.throwIfAborted()
     }
-    const match = /__(\d+)x(\d+)\.jpg$/.exec(url)
+    const match = /__(\d+)x(\d+)\.jpg(?:\?v=[0-9a-f]{12})?$/.exec(url)
     assert.ok(match, 'The source requested a non-display filename')
     return { ok: !plan.status, status: plan.status ?? 200, blob: async () => ({
       url, plan, width: Number(match[1]), height: Number(match[2]),
@@ -182,7 +193,7 @@ function harness({ previewMaxEdge = 1024 } = {}) {
   const scale = evaluate(sources[5], {})
   const aperture = evaluate(sources[9], {})
   const sheetRecord = evaluate(sources[10], {})
-  const stream = evaluate(sources[0], { '../../../stack/materials': { ASSET_BASE: '/mock-assets/' },
+  const stream = evaluate(sources[0], { '../../../stack/materials': mockMaterials('/mock-assets/'),
     './policy': policy, './sheet-record': sheetRecord })
   const hang = evaluate(sources[1], {
     // Keep each scheduler fixture's upload policy explicit while executing
@@ -205,7 +216,7 @@ function harness({ previewMaxEdge = 1024 } = {}) {
       return hang.buildHang({ tierName: () => 'standard', cost: () => cost, detail() {}, materials: {
       sync: () => ({ albedo: { r: 1, g: 1, b: 1 }, material: () => new Material() }),
     } }, works, makeIndex(records)) },
-    url(work, full = true) { return `/mock-assets/wing-vinci/${work.entries[0][full ? 'plate' : 'preview'].path}` },
+    url(work, full = true) { return address(work.entries[0][full ? 'plate' : 'preview']) },
     async advance(ms = 800) {
       now += ms
       for (const [id, timer] of [...timers]) if (timer.due <= now) { timers.delete(id); timer.callback() }

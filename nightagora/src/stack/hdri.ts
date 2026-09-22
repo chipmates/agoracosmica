@@ -14,7 +14,7 @@ import { DataUtils, EquirectangularReflectionMapping, type Texture } from 'three
 import { HDRLoader } from 'three/addons/loaders/HDRLoader.js'
 import { loadManifest, type ManifestEntry } from '../manifest'
 import { kelvinToColour } from './light'
-import { ASSET_BASE } from './materials'
+import { assetAddress } from './materials'
 
 const loader = new HDRLoader()
 const held = new Map<string, Promise<Texture>>()
@@ -48,7 +48,7 @@ export async function loadHDRI(name: string): Promise<SkyProbe> {
   if (!entry.display || entry.class === 'REFERENCE-ONLY') {
     throw new Error(`the sky "${name}" may not be displayed`)
   }
-  const url = `${ASSET_BASE}${entry.wing}/${entry.path}`
+  const url = assetAddress(entry)
   let pending = held.get(url)
   if (!pending) {
     pending = loader.loadAsync(url).then((tex) => {

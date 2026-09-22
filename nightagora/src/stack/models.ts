@@ -71,7 +71,7 @@ import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js'
 import * as TSL from 'three/tsl'
 import { detailNodes } from './detail'
 import { loadManifest, type ManifestEntry } from '../manifest'
-import { ASSET_BASE, textureBytes, type MaterialLibrary } from './materials'
+import { assetAddress, textureBytes, type MaterialLibrary } from './materials'
 import type { Tier } from './tier'
 
 /** where a body is put, and how it meets the point it is given */
@@ -183,7 +183,11 @@ export function createModelLibrary(
        a model with no record */
     const file = entry.gltf?.file
     if (!file) throw new Error(`the model "${slug}" names no document`)
-    const gltf = await loader.loadAsync(`${ASSET_BASE}${entry.wing}/${entry.path}${file}`)
+    /* a folder whose record carries the document's own digest versions the
+       address itself; a folder that holds several files names each of them in
+       its own record, and the document's is what this address must carry */
+    const named = entry.sha256 ? null : index.byId.get(`${entry.id}-${file.replace(/\.[^.]*$/, '')}`)
+    const gltf = await loader.loadAsync(named ? assetAddress(named) : assetAddress(entry, file))
     const prototype = gltf.scene as unknown as Object3D
     const measured = dress(prototype, entry)
     const box = new Box3().setFromObject(prototype as never)

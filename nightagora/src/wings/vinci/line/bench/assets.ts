@@ -1,6 +1,6 @@
 import { TextureLoader, SRGBColorSpace, Texture } from 'three/webgpu'
 import { loadManifest, displayable, type ManifestEntry } from '../../../../manifest'
-import { ASSET_BASE } from '../../../../stack/materials'
+import { assetAddress } from '../../../../stack/materials'
 
 export const PLATES={
   vespucci:'vinci/life-plate/vespucci-note-1503-heidelberg__ub-heidelberg__2500x750',
@@ -11,7 +11,7 @@ export interface LoadedPlate { texture:Texture; entry:ManifestEntry; textureMB:n
 export async function loadPlate(id:string,tier:'hero'|'standard'|'calm'='standard'):Promise<LoadedPlate>{
   const entry=(await loadManifest()).byId.get(id)
   if(!entry||!displayable(entry))throw new Error(`Plate is not admitted: ${id}`)
-  let texture:Texture=await new TextureLoader().loadAsync(`${ASSET_BASE}${entry.wing}/${entry.path}`)
+  let texture:Texture=await new TextureLoader().loadAsync(assetAddress(entry))
   const original=texture.image as HTMLImageElement
   if(tier==='calm'&&Math.max(original.width,original.height)>2048){
     const ratio=2048/Math.max(original.width,original.height)

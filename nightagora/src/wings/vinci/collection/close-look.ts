@@ -12,8 +12,8 @@ import type { ReaderWords } from '../../vitrine/reader'
 import { lang } from '../../content'
 import { FURTHER, NEARER } from './deep-plate'
 import type { Grade, Stack } from '../../../stack'
-import { ASSET_BASE } from '../../../stack/materials'
-import { assetUrl, loadManifest } from '../../../manifest'
+import { assetAddress } from '../../../stack/materials'
+import { loadManifest } from '../../../manifest'
 import { dossiers, machineCatalog, type MachineSlug } from '../machines/catalog'
 import type { ReadyMachineBuild } from '../machines/runtime'
 import { playbackSchedule } from '../machines/bench/playback'
@@ -301,7 +301,9 @@ export function createVinciMachinePayload(options: {
     light: options.light,
     grade: options.grade,
     sheet: {
-      src: thumb ? loadManifest().then(index => { const entry = index.byId.get(thumb); return entry?.display ? assetUrl(ASSET_BASE, entry) : null }) : null,
+      // the store's own file, never the record's source_url: that address is
+      // the holder's page for the sheet and not the picture of it
+      src: thumb ? loadManifest().then(index => { const entry = index.byId.get(thumb); return entry?.display ? assetAddress(entry) : null }) : null,
       label: sheetLabel,
       open: options.openFolio ?? options.openRecord,
     },
