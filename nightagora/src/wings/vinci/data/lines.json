@@ -462,8 +462,8 @@
       "certainty": "reconstructed"
     },
     "machine/anemometer": {
-      "en": "This plate was to show how hard the wind blows. The wind pushes it along a curved scale.",
-      "de": "Sie sollte zeigen, wie stark der Wind weht. Der Wind drückt sie an einer Skala entlang.",
+      "en": "Nobody can see how hard the wind blows. This plate tips, and a curved scale shows it.",
+      "de": "Wie stark der Wind weht, sieht niemand. Die Platte kippt, ein Bogen zeigt es an.",
       "source": "machines/data/anemometer.json, folio Codex Atlanticus 675r; machines/data/records.json, the purpose and mechanism sections",
       "certainty": "reconstructed"
     },
@@ -528,8 +528,8 @@
       "certainty": "reconstructed"
     },
     "machine/camera-obscura": {
-      "en": "The experiment made the crossing of light visible. What lands on the paper is upside down.",
-      "de": "Der Versuch machte sichtbar, wie sich das Licht kreuzt. Was ankommt, steht auf dem Kopf.",
+      "en": "He was studying how the eye sees. One small hole puts the picture on paper, upside down.",
+      "de": "Er untersuchte, wie das Auge sieht. Ein Loch wirft das Bild verkehrt herum aufs Papier.",
       "source": "machines/data/camera-obscura.json, folio Paris Manuscript D 8r; machines/data/records.json, the purpose and mechanism sections",
       "certainty": "reconstructed"
     },
