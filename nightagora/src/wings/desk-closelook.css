@@ -28,7 +28,10 @@
   z-index: 3;
   padding: var(--desk-clb-air) var(--desk-g) var(--desk-clb-foot);
   display: grid;
-  grid-template-columns: minmax(0, var(--desk-clb-read)) 1fr;
+  /* the instruments' row keeps its whole width and the text's measure gives
+     way to it: a page's versions in German run wider than their column, and
+     a row that overflows to the left stands on the words */
+  grid-template-columns: minmax(0, var(--desk-clb-read)) minmax(max-content, 1fr);
   grid-template-rows: var(--desk-clb-step) auto;
   column-gap: 24px;
   row-gap: var(--desk-clb-gap);
