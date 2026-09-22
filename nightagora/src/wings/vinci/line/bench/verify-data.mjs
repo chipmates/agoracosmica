@@ -15,8 +15,11 @@ const sourceRoot = 'program/rounds/wing-vinci'
 export const COLLECTIONS = [
   {
     name: 'timeline', file: 'src/wings/vinci/line/data/timeline.json',
+    // The public copy carries the life view's record corrections: the event's and the date's
+    // certainty apart, every reading in a disputed label, the calendar-style and editor notes,
+    // named source links and German gap sentences. The sealed original does not.
     originalSHA256: '01d568f9f6ddb2c1534d2cd73e061f07624b8eda484d718e84be57782b66ee1d',
-    normalizedSHA256: '50ea7f7d43d6d8153e11c2704f1805c42a5ac9d51548732d6947206bd6c08d30',
+    normalizedSHA256: '98adb90ccd9bbd0490492c44f722bf63aa2dd325510b2733a138de1cbbff6cc4',
     expected: { studs: 56 },
   },
   {

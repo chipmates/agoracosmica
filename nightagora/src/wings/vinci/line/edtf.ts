@@ -26,7 +26,8 @@ function span(date: string): { from: string; to: string } {
   if (month) return { from: `${year}-${month}-01`, to: `${year}-${month}-${String(lastDay(+year!, +month)).padStart(2, '0')}` }
   return { from: `${year}-01-01`, to: `${year}-12-31` }
 }
-const qualifier = (stud: Stud): string => stud.certainty === 'documented' ? '' : '?'
+// The qualifier is the date's: a documented event can stand on an inferred date.
+const qualifier = (stud: Stud): string => (stud.date_certainty ?? stud.certainty) === 'documented' ? '' : '?'
 const season = (stud: Stud): (typeof SEASONS)[string] | undefined =>
   SEASONS[stud.date_label_en.split(' ')[0]!.toLowerCase()]
 
@@ -38,14 +39,19 @@ export function studEdtf(stud: Stud): string {
     case 'disputed': return `[${[stud.date, ...stud.date_alternatives.map(entry => entry.date)].join(',')}]`
     case 'after': return `[${stud.date}..]`
     case 'before_or_on': return `[..${stud.date}]`
+    // one moment inside the span, not the span: a month whose name is half lost
+    case 'within': return `[${stud.date}..${stud.date_end}]`
     case 'season': { const s = season(stud); return s ? `${stud.date}-${s.code}${q}` : `${stud.date}${q}` }
     default: return `${stud.date}${q}`
   }
 }
 
+/** THE SPAN THE LABEL NAMES, which the drawing, the order and the age read:
+ * "about 1482" stands at 1482. The widened bounds a catalogue searches by are
+ * `studLimits`. */
 export function studBounds(stud: Stud): DateBounds {
   switch (stud.date_precision) {
-    case 'circa': case 'range': return { earliest: span(stud.date).from, latest: span(stud.date_end ?? stud.date).to }
+    case 'circa': case 'range': case 'within': return { earliest: span(stud.date).from, latest: span(stud.date_end ?? stud.date).to }
     case 'disputed': {
       const all = [stud.date, ...stud.date_alternatives.map(entry => entry.date)].map(span)
       return { earliest: all.map(entry => entry.from).sort()[0]!, latest: all.map(entry => entry.to).sort().at(-1)! }
@@ -55,6 +61,19 @@ export function studBounds(stud: Stud): DateBounds {
     case 'season': { const s = season(stud); return s ? { earliest: `${stud.date}-${s.from}`, latest: `${stud.date}-${s.to}` } : { earliest: span(stud.date).from, latest: span(stud.date).to } }
     default: { const s = span(stud.date); return { earliest: s.from, latest: s.to } }
   }
+}
+
+/** HOW FAR "ABOUT" REACHES, in years each side. The width is the museum's
+ * convention, not the source's, and it is printed beside the bounds. */
+export const CIRCA_YEARS = 2
+
+/** THE EARLIEST AND LATEST DAY FOR RETRIEVAL: an approximate date widens by
+ * `CIRCA_YEARS` on each side, everything else is the named span. */
+export function studLimits(stud: Stud): DateBounds {
+  const named = studBounds(stud)
+  if (stud.date_precision !== 'circa' || !named.earliest || !named.latest) return named
+  const shift = (day: string, years: number): string => `${Number(day.slice(0, 4)) + years}${day.slice(4)}`
+  return { earliest: shift(named.earliest, -CIRCA_YEARS), latest: shift(named.latest, CIRCA_YEARS) }
 }
 
 /** Whole years from one day to another, both in the same calendar. */
