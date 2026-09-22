@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed to a pale grey at 30 per cent. Assumed weather, no observation claimed.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "f3a09c305bf204782e77f17c7ae5fc53f1288656a34b55bfae3905edb08c541f",
+      "sha256": "1136f0accf4b83eaa48b7ea0af9dea9ef031794b638f393b6a8b5e0db6cd9787",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=80c458f2cb5ccddb7fcedccda5df70e5cdccda7d9ca97d65ebfa6462920f61ef;"
     },
     {
@@ -2535,7 +2535,7 @@
       "prompt": "English and German visitor interface, verified local folio names and the codex shelf copy. Historical transcription and French are displayed verbatim from the locked collection. Handedness documented, reasons hypotheses, own reason unknown.",
       "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
       "date": "2026-09-14",
-      "sha256": "065c0106225f77ae98dfb80e09895ef9cfd43869de3a3021e57e8afebd2652fc",
+      "sha256": "5ce8f61299736f0030bbe9c1efce4e54bb50ec9ecf1d0795085fdb1e8ca96ddd",
       "note": "recipe_file=src/wings/vinci/table/content.ts; output_source=src/wings/vinci/table/content.ts; modern exhibition design, not documentary reconstruction"
     },
     {
@@ -3512,7 +3512,7 @@
       "prompt": "The shelf's register, built from the cross-checked codex classes of 2026-09-14 and the prepared page maps. Counts are scans or edition pages, never manuscript folio totals.",
       "model": "Deterministic build from the codex register and the page maps; authored with Opus 5",
       "date": "2026-09-14",
-      "sha256": "edac4d494518c3a67d0a74e844193010bd38977e19ecfd10cc3f32e391e72b7a",
+      "sha256": "c201fe7bf35fdaa8adb17972b945c51b41c4ee709bf4795927e3c1bd1df9ea7d",
       "note": "recipe_file=src/wings/vinci/table/data/codices.json; source=program/rounds/wing-vinci/refs/RECLASS-2026-09-14/codices.json"
     },
     {
