@@ -13,6 +13,7 @@
 
 import { dateYears, type LifeGap, type LifeScale } from './scale'
 import type { Bi, LifeBand, LifeRecord } from './types'
+import { fill } from './words'
 
 const NS = 'http://www.w3.org/2000/svg'
 
@@ -21,15 +22,17 @@ export const PLATE = {
   /** the room the standing ring keeps over the ribbon */
   ring: { wide: 8, narrow: 6 },
   /** the painted height of one period */
-  strip: { wide: 26, narrow: 18 },
+  strip: { wide: 26, narrow: 22 },
   /** the blank between two periods, in pixels */
   gutter: 6,
   /** the ticks of every date, under the periods */
   ticks: { normal: 5, floor: 9, gap: 5 },
   /** the afterlife, on its own scale, under a blank */
-  after: { gap: 10, height: 8, years: 10 },
+  after: { gap: 36, height: 8 },
+  /** the baseline of the life's two years under its ticks */
+  years: 16,
   least: 3,
-  name: { wide: 11, narrow: 9, floor: 7.5, margin: 6 },
+  name: { wide: 15, narrow: 14, floor: 14, margin: 6 },
   /** the tracking the ribbon's names carry, which the ruler adds back */
   tracking: .02,
 } as const
@@ -107,7 +110,8 @@ export function drawLifePlate(options: {
   /** the date being read, where the marker stands */
   at: string | null
   /** the museum's word for the strip under the blank */
-  afterWord: string
+  /** the museum's words for the strip under the blank, with {from} and {to} */
+  afterWords: string
 }): LifePlate {
   const { record, scale, language, narrow, open } = options
   const width = Math.max(240, Math.round(options.area.width))
@@ -119,8 +123,10 @@ export function drawLifePlate(options: {
   const pad = narrow ? PLATE.pad.narrow : PLATE.pad.wide
   const top = pad + (narrow ? PLATE.ring.narrow : PLATE.ring.wide)
   const ticksTop = top + stripHeight + 3
-  const afterTop = ticksTop + PLATE.ticks.floor + PLATE.after.gap
-  const height = (hasAfter ? afterTop + PLATE.after.height + PLATE.after.years : ticksTop + PLATE.ticks.floor) + pad
+  // the life's own two years stand under its ticks, one row of type
+  const lifeYears = ticksTop + PLATE.ticks.floor + PLATE.years
+  const afterTop = lifeYears + PLATE.after.gap
+  const height = (hasAfter ? afterTop + PLATE.after.height : lifeYears + 4) + pad
 
   const svg = document.createElementNS(NS, 'svg')
   svg.setAttribute('class', 'wing-life-plate')
@@ -231,20 +237,25 @@ export function drawLifePlate(options: {
   if (markerAt === undefined) marker.setAttribute('opacity', '0')
   else marker.setAttribute('transform', `translate(${markerAt.toFixed(1)},0)`)
 
+  /* EACH STRIP SAYS ITS OWN YEARS. The life's first and last year stand
+     under its own ends, so the afterlife's years under it can never be read
+     as the scale of the life above. */
+  for (const [year, anchor] of [[record.span.from, 'start'], [record.span.to, 'end']] as const) {
+    const node = add('text', { class: 'wing-life-life-year', x: anchor === 'start' ? left : left + span, y: lifeYears, 'text-anchor': anchor })
+    node.textContent = String(year)
+  }
+
   /* WHAT HAPPENED TO THE PAPERS AFTER IS NOT A PERIOD OF A LIFE: it stands
-     apart, dimmer, on its own clock, and says both of its years. */
+     apart, dimmer, on its own clock, and its one label says both of its years
+     and that the clock is its own. */
   if (hasAfter && after) {
     const clock = afterScale(afterYears)
-    const label = add('text', { class: 'wing-life-after-word', x: left, y: afterTop - 4 })
-    label.textContent = options.afterWord
+    const label = add('text', { class: 'wing-life-after-word', x: left, y: afterTop - 7 })
+    label.textContent = fill(options.afterWords, { from: clock.from, to: clock.to })
     add('rect', { class: 'wing-life-after', x: left, y: afterTop, width: span, height: PLATE.after.height, rx: 1 })
     for (const year of afterYears) {
       const place = left + clock.at(year) * span
       add('line', { class: 'wing-life-tick wing-life-tick-after', x1: place, y1: afterTop, x2: place, y2: afterTop + PLATE.after.height })
-    }
-    for (const [year, anchor] of [[clock.from, 'start'], [clock.to, 'end']] as const) {
-      const node = add('text', { class: 'wing-life-after-year', x: anchor === 'start' ? left : left + span, y: afterTop + PLATE.after.height + 11, 'text-anchor': anchor })
-      node.textContent = String(year)
     }
   }
 

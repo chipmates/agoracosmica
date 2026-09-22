@@ -9,7 +9,7 @@
    the controls that choose a way in, quieter than they are, because it opens
    a sheet and does not decide where the visitor arrives. */
 .wing-life-door {display:block;margin-top:10px;min-height:44px;padding:10px 0 0;border:0;background:none;color:#c6bda8;
-  font:11px var(--sans);letter-spacing:.14em;text-transform:uppercase;text-decoration:underline;text-underline-offset:5px;cursor:pointer;}
+  font:.875rem var(--sans);letter-spacing:.04em;text-decoration:underline;text-underline-offset:5px;cursor:pointer;}
 .wing-life-door:hover {color:#edcc8c;}
 .wing-life-door:focus-visible {outline:1px solid #edcc8c;outline-offset:3px;}
 
@@ -17,13 +17,13 @@
    life drawn as a ribbon across the top, the places listed under it, and one
    of them open beside the list. */
 .wing-life {position:fixed;box-sizing:border-box;flex-direction:column;margin:0;padding:0;max-width:none;max-height:none;
-  background:#101d27f2;border:1px solid #a9977355;color:#eae1d1;overflow:hidden;}
+  background:#101d27;border:1px solid #a9977355;color:#eae1d1;overflow:hidden;}
 .wing-life[open] {display:flex;pointer-events:auto;}
 .wing-life:not([open]) {display:none;}
 .wing-life::backdrop {background:#081016b3;}
 
 .wing-life-head {flex:0 0 auto;padding:16px 20px 4px;}
-.wing-life-through {margin:0;font:400 21px/1.28 var(--serif);color:#fff5e3;text-wrap:pretty;}
+.wing-life-through {margin:0;font:400 1.3125rem/1.28 var(--serif);color:#fff5e3;text-wrap:pretty;}
 .wing-life-body {position:relative;flex:1 1 auto;display:flex;flex-direction:column;min-height:0;padding:0 20px;}
 /* What the live region says is for the screen reader alone. */
 .wing-life-live {position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap;}
@@ -63,14 +63,14 @@
 .wing-life-marker-back {stroke:#101d27;stroke-width:4.5;}
 .wing-life-marker-core {stroke:#edcc8c;stroke-width:1.8;}
 .wing-life-after {fill:#a99773;opacity:.3;}
-.wing-life-after-word {fill:#a8b3b7;font:9px var(--sans);letter-spacing:.14em;text-transform:uppercase;}
-.wing-life-after-year {fill:#cfc6b499;font:9px var(--sans);letter-spacing:.04em;}
-.wing-life-nothing {margin:14px 0;font:13px/1.5 var(--serif);color:#cfc6b4;}
+.wing-life-after-word {fill:#a8b3b7;font:.875rem var(--sans);letter-spacing:.02em;}
+.wing-life-life-year {fill:#cfc6b4;font:.875rem var(--sans);letter-spacing:.02em;}
+.wing-life-nothing {margin:14px 0;font:.9375rem/1.5 var(--serif);color:#cfc6b4;}
 
 /* Under the ribbon: what the wing says about this life, and why an empty
    stretch is drawn narrower than the years it holds. */
-.wing-life-second {margin:6px 0 0;font:13px/1.5 var(--sans);color:#b6bcae;text-wrap:pretty;}
-.wing-life-caption {margin:3px 0 6px;font:11px/1.45 var(--sans);color:#8f9a9e;text-wrap:pretty;}
+.wing-life-second {margin:6px 0 0;font:.9375rem/1.5 var(--sans);color:#b6bcae;text-wrap:pretty;}
+.wing-life-caption {margin:3px 0 6px;font:.875rem/1.45 var(--sans);color:#8f9a9e;text-wrap:pretty;}
 .wing-life-caption[hidden] {display:none;}
 
 /* THE READING: the places on the left, always all of them, and the one that
@@ -83,60 +83,63 @@
 .wing-life-item {margin:0;padding:0;border-bottom:1px solid #a9977322;}
 .wing-life-item[data-afterlife='true'],.wing-life-item[data-undated='true'] {margin-top:5px;border-top:1px solid #a9977355;}
 /* The one item that is not a period of a life reads quieter than the places. */
-.wing-life-item[data-undated='true'] .wing-life-item-title {color:#b6bcae;font-size:13px;}
+.wing-life-item[data-undated='true'] .wing-life-item-title {color:#b6bcae;font-size:.9375rem;}
 .wing-life-item-name {display:flex;flex-direction:column;gap:1px;width:100%;min-height:44px;padding:5px 8px 5px 10px;text-align:left;
-  background:none;border:0;border-left:2px solid transparent;color:#cfc6b4;font:14px/1.3 var(--serif);cursor:pointer;
+  background:none;border:0;border-left:2px solid transparent;color:#cfc6b4;font:1rem/1.3 var(--serif);cursor:pointer;
   transition:color 160ms linear,border-color 160ms linear,background-color 160ms linear;}
 .wing-life-item-name:hover {color:#fff5e3;border-left-color:#a99773;}
 .wing-life-item-name[aria-current='true'] {border-left-color:#edcc8c;background:#edcc8c0f;color:#fff5e3;}
 .wing-life-item-title {display:block;text-wrap:pretty;}
-.wing-life-item-count {font:9px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:#8f9a9e;}
+.wing-life-item-count {font:.875rem var(--sans);color:#8f9a9e;}
 .wing-life-item-name[aria-current='true'] .wing-life-item-count {color:#c2a86f;}
 
 /* THE OPEN PERIOD, and everything the record holds about it. */
-.wing-life-period-name {margin:0;font:400 18px/1.3 var(--serif);color:#fff5e3;text-wrap:pretty;}
-.wing-life-period-line {margin:5px 0 10px;font:13px/1.5 var(--serif);color:#cfc6b4;text-wrap:pretty;}
+.wing-life-period-name {margin:0;font:400 1.1875rem/1.3 var(--serif);color:#fff5e3;text-wrap:pretty;}
+.wing-life-period-line {margin:5px 0 10px;font:1rem/1.5 var(--serif);color:#cfc6b4;text-wrap:pretty;}
 .wing-life-dates {margin:0;padding:0;list-style:none;}
 .wing-life-date {margin:0;padding:0;border-bottom:1px solid #a9977318;}
-.wing-life-dot {flex:0 0 8px;width:8px;height:8px;border-radius:50%;}
-.wing-life-date-name {display:flex;align-items:center;gap:9px;width:100%;min-height:44px;padding:6px 4px;text-align:left;
-  background:none;border:0;color:#e6d6b8;font:13px/1.4 var(--sans);cursor:pointer;}
+.wing-life-dot {flex:0 0 9px;width:9px;height:9px;border-radius:50%;}
+.wing-life-date-name {display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 14px;width:100%;min-height:44px;padding:6px 4px;text-align:left;
+  background:none;border:0;color:#e6d6b8;font:1rem/1.4 var(--sans);cursor:pointer;}
 .wing-life-date-name:hover {color:#fff5e3;}
 .wing-life-date-name[aria-expanded='true'] {color:#fff5e3;}
-.wing-life-date-label {min-width:0;}
+.wing-life-date-label {min-width:0;flex:0 1 auto;}
 /* The one date the wing's own hour stands on, said where that date is read. */
-.wing-life-date-here {flex:1 1 auto;min-width:0;font:10px/1.35 var(--sans);letter-spacing:.06em;color:#c2a86f;text-wrap:pretty;}
+.wing-life-date-here {flex:1 1 100%;min-width:0;font:.875rem/1.35 var(--sans);color:#c2a86f;text-wrap:pretty;}
 .wing-life[data-narrow='true'] .wing-life-date-name {flex-wrap:wrap;}
-.wing-life[data-narrow='true'] .wing-life-date-here {flex:1 1 100%;padding-left:17px;}
+.wing-life[data-narrow='true'] .wing-life-date-here {flex:1 1 100%;}
 /* ONE DATE UNFOLDS WHERE IT STANDS, on its own rows, so nothing above it
    moves and the eye stays where the finger was. */
 .wing-life-date-body {display:grid;grid-template-rows:0fr;transition:grid-template-rows 220ms ease-out;}
 .wing-life-date-body[data-open='true'] {grid-template-rows:1fr;}
-.wing-life-date-inner {overflow:hidden;padding:0 4px 0 21px;opacity:0;transition:opacity 160ms linear 60ms;}
+.wing-life-date-inner {overflow:hidden;padding:0 4px 0 14px;opacity:0;transition:opacity 160ms linear 60ms;}
 .wing-life-date-body[data-open='true'] .wing-life-date-inner {opacity:1;padding-bottom:10px;}
 .wing-life-date-head {display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;}
-.wing-life-date-age {font:11px var(--sans);color:#a8b3b7;}
-.wing-life-date-sure {font:9px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--certainty,#a8b3b7);}
-.wing-life-date-line {margin:6px 0 0;font:13px/1.5 var(--serif);color:#eae1d1;text-wrap:pretty;}
-.wing-life-date-source {margin:7px 0 0;font:11px/1.5 var(--sans);color:#a8b3b7;text-wrap:pretty;}
+.wing-life-date-age {font:.875rem/1.4 var(--sans);color:#b6bcae;}
+.wing-life-date-sure {display:inline-flex;align-items:center;gap:7px;margin-left:auto;font:.875rem/1.4 var(--sans);color:var(--certainty,#a8b3b7);}
+.wing-life-date-sure .wing-life-dot {align-self:center;}
+.wing-life-date-doubt {font:.875rem/1.45 var(--sans);color:var(--certainty,#cfc6b4);}
+.wing-life-date-note {margin:7px 0 0;padding-left:10px;border-left:1px solid #a9977355;font:.875rem/1.5 var(--sans);color:#cfc6b4;text-wrap:pretty;}
+.wing-life-date-line {margin:6px 0 0;font:1.0625rem/1.5 var(--serif);color:#eae1d1;text-wrap:pretty;}
+.wing-life-date-source {margin:8px 0 0;font:.875rem/1.5 var(--sans);color:#a8b3b7;text-wrap:pretty;}
 .wing-life-date-foot {display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:9px;}
 .wing-life-date-record {flex:0 1 auto;min-height:44px;padding:10px 12px;background:transparent;border:1px solid #a9977344;
-  color:#b6bcae;font:12px var(--sans);cursor:pointer;}
+  color:#b6bcae;font:.875rem var(--sans);cursor:pointer;}
 /* A DATE THE FLOOR CARRIES IS MARKED, NOT WALKED TO: the visitor is already
    standing on it, so the line reads and takes no press. */
-.wing-life-date-cut {flex:0 1 auto;align-self:center;margin:0;font:11px/1.45 var(--sans);color:#c2a86f;text-wrap:pretty;}
+.wing-life-date-cut {flex:0 1 auto;align-self:center;margin:0;font:.875rem/1.45 var(--sans);color:#c2a86f;text-wrap:pretty;}
 /* AN EMPTY STRETCH KEEPS ITS PLACE IN THE READING: the years are there and
    the record is not. */
 .wing-life-gap-note {margin:2px 0;padding:0;}
-.wing-life-gap-line {margin:0;padding:7px 0 7px 14px;border-left:1px dashed #a9977366;font:11px/1.4 var(--sans);color:#a8b3b7;}
+.wing-life-gap-line {margin:0;padding:7px 0 7px 14px;border-left:1px dashed #a9977366;font:.875rem/1.4 var(--sans);color:#a8b3b7;}
 
 /* WHAT WAS MADE IN THESE YEARS, and who the record names in them. */
 .wing-life-section {margin-top:16px;}
-.wing-life-row-name {margin:0 0 6px;font:10px var(--sans);letter-spacing:.18em;text-transform:uppercase;color:#d2a557;}
-.wing-life-empty {margin:0;font:12px/1.5 var(--sans);color:#a8b3b7;text-wrap:pretty;}
+.wing-life-row-name {margin:0 0 6px;font:.875rem var(--sans);letter-spacing:.1em;text-transform:uppercase;color:#d2a557;}
+.wing-life-empty {margin:0;font:.875rem/1.5 var(--sans);color:#a8b3b7;text-wrap:pretty;}
 .wing-life-works,.wing-life-people {margin:0;padding:0;list-style:none;}
 .wing-life-work-item {display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;padding:5px 0;border-bottom:1px solid #a9977318;
-  font:12px/1.4 var(--sans);color:#cfc6b4;}
+  font:.875rem/1.4 var(--sans);color:#cfc6b4;}
 .wing-life-work-date {flex:0 0 auto;color:#a8b3b7;}
 .wing-life-work-title {min-width:0;}
 .wing-life-work-item::before {content:'';flex:0 0 3px;align-self:stretch;min-height:14px;background:#c9b07d;}
@@ -145,45 +148,47 @@
 .wing-life-work-item[data-domain='codex']::before {background:#9ab48f;}
 .wing-life-work-item[data-domain='building']::before {background:#a2a2ac;}
 .wing-life-work-door {flex:0 0 auto;min-height:44px;margin-left:auto;padding:8px 10px;background:transparent;border:1px solid #a9977344;
-  color:#b6bcae;font:11px var(--sans);cursor:pointer;}
+  color:#b6bcae;font:.875rem var(--sans);cursor:pointer;}
 .wing-life-work-door:hover {color:#edcc8c;border-color:#a9977399;}
 .wing-life-work-door:focus-visible {outline:1px solid #edcc8c;outline-offset:-2px;}
-.wing-life-work-count {margin:7px 0 0;font:11px/1.5 var(--sans);color:#a8b3b7;text-wrap:pretty;}
+.wing-life-work-count {margin:7px 0 0;font:.875rem/1.5 var(--sans);color:#a8b3b7;text-wrap:pretty;}
 .wing-life-person {display:flex;flex-wrap:wrap;gap:5px 8px;padding:6px 0;border-bottom:1px solid #a9977318;}
-.wing-life-person-name {flex:0 0 auto;font:13px/1.4 var(--serif);color:#e6d6b8;}
-.wing-life-person-role {flex:1 1 100%;font:12px/1.45 var(--sans);color:#b6bcae;text-wrap:pretty;}
-.wing-life-person-sure {flex:0 0 auto;font:9px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:#a8b3b7;padding-top:3px;}
+.wing-life-person-name {flex:0 0 auto;font:.9375rem/1.4 var(--serif);color:#e6d6b8;}
+.wing-life-person-role {flex:1 1 100%;font:.875rem/1.45 var(--sans);color:#b6bcae;text-wrap:pretty;}
+.wing-life-person-sure {flex:0 0 auto;font:.875rem var(--sans);color:#a8b3b7;}
 
 /* ONE QUESTION, ONCE, at the foot of the period being read. */
 .wing-life-ask {margin:18px 0 4px;padding:10px 12px;background:#edcc8c0f;border:1px solid #a9977344;}
-.wing-life-ask-line {margin:0 0 8px;font:15px/1.35 var(--serif);color:#fff5e3;}
+.wing-life-ask-line {margin:0 0 8px;font:1rem/1.35 var(--serif);color:#fff5e3;}
 .wing-life-ask-row {display:flex;gap:8px;}
 .wing-life-ask-control {flex:1 1 0;min-height:44px;padding:8px 10px;background:transparent;border:1px solid #a9977366;color:#e6d6b8;
-  font:12px var(--sans);cursor:pointer;}
-.wing-life-ask-note {margin:8px 0 0;font:11px/1.45 var(--sans);color:#a8b3b7;}
+  font:.875rem var(--sans);cursor:pointer;}
+.wing-life-ask-note {margin:8px 0 0;font:.875rem/1.45 var(--sans);color:#a8b3b7;}
 
 .wing-life-item-name:focus-visible,.wing-life-date-name:focus-visible,.wing-life-close:focus-visible,
 .wing-life-ask-control:focus-visible,.wing-life-date-record:focus-visible
   {outline:1px solid #edcc8c;outline-offset:-2px;}
 
-.wing-life-foot {flex:0 0 auto;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;padding:9px 20px;
+/* The counts read at the end of the reading, so the foot holds Close alone. */
+.wing-life-period-body > .wing-life-counts {columns:1;margin-top:18px;padding-top:10px;border-top:1px solid #a9977344;}
+.wing-life-foot {flex:0 0 auto;display:flex;align-items:center;justify-content:flex-end;gap:16px;padding:6px 20px;
   border-top:1px solid #a9977344;}
 /* The four counts read as one block and not as a paragraph. */
 .wing-life-counts {min-width:0;columns:2;column-gap:22px;}
-.wing-life-count,.wing-life-honesty {margin:0;font:11px/1.45 var(--sans);color:#a8b3b7;text-wrap:pretty;
+.wing-life-count,.wing-life-honesty {margin:0;font:.875rem/1.45 var(--sans);color:#a8b3b7;text-wrap:pretty;
   break-inside:avoid;padding-bottom:3px;}
 .wing-life-honesty {color:#cfc6b4;}
 .wing-life-close {flex:0 0 auto;min-width:120px;min-height:44px;padding:10px 16px;background:transparent;border:1px solid #a9977366;
-  color:#e6d6b8;font:12px/1.2 var(--sans);cursor:pointer;}
+  color:#e6d6b8;font:.875rem/1.2 var(--sans);cursor:pointer;}
 
 /* THE NARROW STAGE: one column, the ribbon inert, the places a chip row.
    No viewport height anywhere: the sheet is given its box by the frame, and
    everything inside it scrolls in that box. */
 .wing-life[data-narrow='true'] .wing-life-head {padding:10px 12px 0;}
-.wing-life[data-narrow='true'] .wing-life-through {font-size:15px;line-height:1.24;}
+.wing-life[data-narrow='true'] .wing-life-through {font-size:1rem;line-height:1.26;}
 .wing-life[data-narrow='true'] .wing-life-drawing {padding:4px 0 0;}
-.wing-life[data-narrow='true'] .wing-life-second {font-size:11.5px;line-height:1.4;margin-top:3px;}
-.wing-life[data-narrow='true'] .wing-life-caption {font-size:10px;line-height:1.35;margin:2px 0 5px;}
+.wing-life[data-narrow='true'] .wing-life-second {font-size:.875rem;line-height:1.4;margin-top:3px;}
+.wing-life[data-narrow='true'] .wing-life-caption {font-size:.875rem;line-height:1.35;margin:2px 0 5px;}
 .wing-life[data-narrow='true'] .wing-life-reading {padding-bottom:4px;}
 .wing-life[data-narrow='true'] .wing-life-body {padding:0 12px;}
 .wing-life[data-narrow='true'] .wing-life-reading {flex-direction:column;gap:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;}
@@ -204,7 +209,7 @@
   padding:6px 12px;white-space:nowrap;border:1px solid #a9977333;border-left:1px solid #a9977333;background:#ffffff08;}
 .wing-life[data-narrow='true'] .wing-life-item-name:hover {border-color:#a99773;}
 .wing-life[data-narrow='true'] .wing-life-item-name[aria-current='true'] {border-color:#edcc8c;background:#edcc8c1f;color:#fff5e3;}
-.wing-life[data-narrow='true'] .wing-life-item[data-undated='true'] .wing-life-item-title {font-size:14px;}
+.wing-life[data-narrow='true'] .wing-life-item[data-undated='true'] .wing-life-item-title {font-size:.9375rem;}
 /* THE COUNT IS READ AND NOT SHOWN on a chip: eight chips with a count each
    would be two rows of scrolling, and the open place counts its own dates. */
 .wing-life[data-narrow='true'] .wing-life-item-count {position:absolute;width:1px;height:1px;margin:-1px;padding:0;
@@ -217,19 +222,19 @@
 /* The counts stand at the end of the one column, not pinned over it. */
 .wing-life[data-narrow='true'] .wing-life-reading > .wing-life-counts {flex:0 0 auto;margin-top:14px;padding-top:10px;
   border-top:1px solid #a9977344;}
-.wing-life[data-narrow='true'] .wing-life-item-name {font-size:14px;}
+.wing-life[data-narrow='true'] .wing-life-item-name {font-size:.9375rem;}
 /* THE FOOT STANDS DOWN ON THE PHONE. Its counts already read at the end of
    the list, and its Close is one mark at the corner, so a pinned row at the
    foot would be a second Close over the reading. */
 .wing-life[data-narrow='true'] .wing-life-foot {display:none;}
 .wing-life[data-narrow='true'] .wing-life-counts {columns:1;}
-.wing-life[data-narrow='true'] .wing-life-count,.wing-life[data-narrow='true'] .wing-life-honesty {font-size:10px;}
+.wing-life[data-narrow='true'] .wing-life-count,.wing-life[data-narrow='true'] .wing-life-honesty {font-size:.875rem;}
 
 /* ONE MARK DISMISSES THE SHEET, at the corner, the close look's own grammar.
    The head keeps its room clear of it. */
 .wing-life-shut {position:absolute;z-index:3;top:6px;right:6px;display:none;align-items:center;justify-content:center;
   box-sizing:border-box;min-width:44px;min-height:44px;padding:0;background:#101d27d9;border:1px solid #a9977366;
-  color:#e6d6b8;font:15px/1 var(--sans);cursor:pointer;}
+  color:#e6d6b8;font:.9375rem/1 var(--sans);cursor:pointer;}
 .wing-life[data-narrow='true'] .wing-life-shut {display:flex;}
 .wing-life-shut:focus-visible {outline:1px solid #edcc8c;outline-offset:2px;}
 /* The through line flows AROUND the mark instead of under a reserved column:

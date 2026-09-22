@@ -46,6 +46,40 @@ export function dateYears(date: { earliest: string | null; latest: string | null
   return Number.isFinite(from) && Number.isFinite(to) ? { from: Math.min(from, to), to: Math.max(from, to) } : null
 }
 
+/** THE ORDER OF A LIST OF DATES: by the first day each can mean, then by the
+ * last, and a tie keeps the order the record gives it. A date open at its
+ * start sorts by its end. */
+export function chronological<T extends { date: { earliest: string | null; latest: string | null } }>(events: readonly T[]): T[] {
+  const key = (event: T): string => event.date.earliest ?? event.date.latest ?? '9999'
+  return events.map((event, index) => ({ event, index })).sort((a, b) =>
+    key(a.event).localeCompare(key(b.event))
+    || (a.event.date.latest ?? '9999').localeCompare(b.event.date.latest ?? '9999')
+    || a.index - b.index).map(entry => entry.event)
+}
+
+/** A Julian day as the proleptic Gregorian day HTML asks a machine date to
+ * be. The label keeps the Julian day the document gives. */
+function julianToGregorian(day: string): string {
+  const [y, m, d] = day.split('-').map(Number) as [number, number, number]
+  const a = Math.floor((14 - m) / 12), year = y + 4800 - a, month = m + 12 * a - 3
+  const julianDay = d + Math.floor((153 * month + 2) / 5) + 365 * year + Math.floor(year / 4) - 32083
+  return new Date((julianDay - 2440588) * 864e5).toISOString().slice(0, 10)
+}
+
+/** THE MACHINE FORM OF ONE DATE for a `time` element, or null where HTML has
+ * no form for it: a day, a month or a year, never an approximate, disputed
+ * or open date, and a Julian day converted as HTML requires. */
+export function machineDate(date: { earliest: string | null; latest: string | null; calendar: string; approximate?: boolean; disputed?: boolean }): string | null {
+  const { earliest, latest } = date
+  if (!earliest || !latest || date.approximate || date.disputed) return null
+  if (earliest === latest) return date.calendar === 'Julian' ? julianToGregorian(earliest) : earliest
+  const [ey, em, ed] = earliest.split('-'), [ly, lm] = latest.split('-')
+  if (ey !== ly || ed !== '01') return null
+  if (em === '01' && latest.endsWith('-12-31')) return ey!
+  const last = new Date(Date.UTC(Number(ly), Number(lm), 0)).getUTCDate()
+  return em === lm && latest === `${ly}-${lm}-${String(last).padStart(2, '0')}` ? `${ey}-${em}` : null
+}
+
 /** THE YEARS A WORK IS PLACED BETWEEN, or nothing. A register may date a work
  * to a century, and a bar from 1500 to 1599 laid over a life that ended in
  * 1519 claims the whole of it. A span wider than the life is therefore read

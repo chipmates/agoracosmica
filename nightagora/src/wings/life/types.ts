@@ -38,7 +38,17 @@ export interface MuseumDate {
   latest: string | null
   /** the record's own written date, in its own words */
   label: Bi
+  /** HOW SURE THE DATE IS, which is not how sure the event is: a documented
+   * birth date can carry a birthplace held by tradition. */
   certainty: Sure
+  /** "about": the label names a span the date may fall around, not in */
+  approximate?: boolean
+  /** the sources give two or more readings, and the label names each */
+  disputed?: boolean
+  /** the widened bounds a catalogue searches by, where they differ */
+  limits?: { earliest: string | null; latest: string | null }
+  /** who set the year or the style it is counted in, where not the source */
+  note?: Bi
 }
 
 export interface LifeBand {

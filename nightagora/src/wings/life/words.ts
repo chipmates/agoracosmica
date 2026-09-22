@@ -38,11 +38,17 @@ export const LIFE_WORDS = {
   /** The strip under the blank, on its own clock: what happened to the work
    * after the life is not a period of that life. */
   after: { en: 'Afterwards', de: 'Danach' },
+  /** The same strip's one label, with its own two years: it has its own scale. */
+  afterSpan: { en: 'Afterwards, {from} to {to}, on its own scale', de: 'Danach, {from} bis {to}, in eigenem Maßstab' },
   /** THE EIGHTH ITEM OF THE SPINE: what the register cannot put on a year at
    * all. It is not a period of a life, so it stands after the afterlife, and
    * its works are counted in the wing's own word for what that row carries. */
   undated: { en: 'Without a year', de: 'Ohne Jahreszahl' },
   undatedCount: { en: '{n} {row}', de: '{n} {row}' },
+  /** Where the date is surer or less sure than the event it dates. */
+  dateSure: { en: 'The date: {word}', de: 'Das Datum: {word}' },
+  /** Where the sources give more than one reading, all of them in the label. */
+  disputed: { en: 'The readings differ', de: 'Die Lesarten weichen ab' },
   ask: { en: 'What came next?', de: 'Was kam danach?' },
   askShow: { en: 'Show me', de: 'Zeig es mir' },
   askSkip: { en: 'Skip', de: 'Überspringen' },
@@ -112,12 +118,24 @@ export const LIFE_COUNTS = {
     en: '{empty} of the {span} years from {from} to {to} hold no event in this record. The longest stretch is {longest} years.',
     de: '{empty} der {span} Jahre von {from} bis {to} tragen kein Ereignis in diesem Verzeichnis. Die längste Strecke ist {longest} Jahre lang.',
   },
+  /** SAID ONCE, where a record keeps an older calendar: every date is shown
+   * in the calendar of its own document and none is converted. */
+  calendar: {
+    en: 'Dates up to {last} are in the {calendar} calendar their documents use. None is converted.',
+    de: 'Daten bis {last} stehen im {calendar} Kalender ihrer Dokumente. Keines ist umgerechnet.',
+  },
   /** A stretch of empty years, shrunk to one mark that says what it holds. */
   gap: {
     en: '{years} years with nothing in this record.',
     de: '{years} Jahre, zu denen dieses Verzeichnis nichts hat.',
   },
 } satisfies Record<string, Bi>
+
+/** A calendar a record names, as the calendar sentence says it. A name not
+ * listed stands as the record writes it. */
+export const LIFE_CALENDARS: Record<string, Bi> = {
+  Julian: { en: 'Julian', de: 'julianischen' },
+}
 
 /** THE COUNTED CERTAINTIES, in the record's own order and its own words. A
  * key no date stands under is left out rather than counted as none. */

@@ -11,7 +11,7 @@
  * because the count at the foot of the view already says how many are cut.
  */
 
-import { fill } from './words'
+import { LIFE_WORDS, fill } from './words'
 import type { LifeEvent, LifeRecord } from './types'
 
 export interface LifeDateHost {
@@ -34,20 +34,20 @@ export function renderLifeDate(options: LifeDateHost): void {
   }
   host.replaceChildren()
 
+  /* The age and the event's certainty stand on the heading above. What the
+     body adds is the date's own doubt, where it is not the event's. */
   const head = make('div', 'wing-life-date-head')
-  if (event.age !== null) {
-    const words = record.words.age
-    head.append(make('span', 'wing-life-date-age',
-      fill((event.ageApproximate ? words.about : words.exact)[language], { years: event.age })))
-  }
-  const sure = record.sure[event.certainty]
-  if (sure) {
-    const word = make('span', 'wing-life-date-sure', sure.word[language])
-    word.style.setProperty('--certainty', sure.colour)
+  const dateSure = record.sure[event.date.certainty]
+  if (event.date.certainty !== event.certainty && dateSure) {
+    const word = make('span', 'wing-life-date-doubt', fill(LIFE_WORDS.dateSure[language], { word: dateSure.word[language] }))
+    word.style.setProperty('--certainty', dateSure.colour)
     head.append(word)
   }
+  if (event.date.disputed) head.append(make('span', 'wing-life-date-doubt', LIFE_WORDS.disputed[language]))
   if (head.childElementCount) host.append(head)
   host.append(make('p', 'wing-life-date-line', event.line[language]))
+  // Who set the year, or the style it is counted in, travels with the date.
+  if (event.date.note) host.append(make('p', 'wing-life-date-note', event.date.note[language]))
 
   if (event.source) {
     const source = make('p', 'wing-life-date-source', event.source[language])

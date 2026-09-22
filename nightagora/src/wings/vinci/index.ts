@@ -14,7 +14,7 @@ import { PLAN_WORDS } from '../plan/words'
 import { createWingRecap } from '../plan/recap'
 import type { PlanHighlight, PlanPoint, PlanRoom, PlanShape, PlanSite, PlanStation } from '../plan/types'
 import { createWingLife, type WingLife } from '../life'
-import { LIFE_WORDS } from '../life/words'
+import { LIFE_WORDS, capitalise, fill, spokenCount } from '../life/words'
 import type { LifeBand, LifeEvent, LifePerson, LifeRecord, LifeWork, MuseumDate, Sure } from '../life/types'
 import { dateYears } from '../life/scale'
 import { constructionRecords, evidenceWords } from './evidence-copy'
@@ -68,7 +68,7 @@ import studyPageMap from './table/data/msb-pages.json?raw'
 import { createReaderPayload, type ReaderPayload } from './table/reader'
 import { createReaderPayload as createVitrineReaderPayload, type ReaderPayload as ReaderPayloadOfWall } from '../vitrine/reader'
 import { LINE_SECTIONS, LINE_STUDS, type Stud } from './line/studs'
-import { ageAt, studBounds, studEdtf } from './line/edtf'
+import { CIRCA_YEARS, ageAt, studBounds, studEdtf, studLimits } from './line/edtf'
 import { SOURCE_READINGS } from './line/bench/visitor-sources'
 import cardsSource from './data/cards.json?raw'
 import { CERTAINTY as LINE_CERTAINTY } from './line'
@@ -83,7 +83,7 @@ import { vinciWallById, vinciWallEndVertex, vinciWallIsEnd, vinciWallOrderOf, VI
 import { pathSpecifications } from './paths'
 import { roadGradeProvenance } from './road-grade'
 import { apronProvenance } from './apron'
-import { vinciContent, vinciPlanRooms, vinciThroughLine, vinciLifeBands, vinciLifePeople, vinciLifeSecondLine, vinciLifeCut, vinciLifeWorksRow, vinciLifeWorksCount, vinciLifeWorksEmpty, vinciLifeCertaintyCounted, vinciLifeHourMark, vinciHourValues, vinciWelcomeText, vinciLegacyStationIds, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, vinciAbsences, vinciGrounds, vinciRightsPolicy, vinciWingCounts, vinciSourcesHeadings, type VinciCertainty, type VinciStatement, type VinciStationContent, type VinciStationId, type VinciText } from './content'
+import { vinciContent, vinciPlanRooms, vinciThroughLine, vinciLifeBands, vinciLifePeople, vinciLifeSecondLine, vinciLifeCut, vinciLifeWorksRow, vinciLifeWorksCount, vinciLifeWorksEmpty, vinciLifeCertaintyCounted, vinciLifeHourMark, vinciLifeFloorCount, vinciHourValues, vinciWelcomeText, vinciLegacyStationIds, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, vinciAbsences, vinciGrounds, vinciRightsPolicy, vinciWingCounts, vinciSourcesHeadings, type VinciCertainty, type VinciStatement, type VinciStationContent, type VinciStationId, type VinciText } from './content'
 import wingCss from './wing.css?inline'
 import { applyDeskSteps, deskOn } from '../desk-switches'
 import { deskStageHeight } from '../desk-stage'
@@ -1047,23 +1047,34 @@ export function createWing():VinciWingModule {
    * stand side by side until that reader retires with the four stations. */
   function renderLifeRecord(stud:Stud,host:HTMLElement):void {
     const page=host.ownerDocument,here=lang()
+    /* THE HEADING SAYS HOW SURE THIS DATE'S EVENT IS, in the word the floor
+       and the life view use: the window's own four classes are the house's,
+       and a timeline row is none of them. */
+    const heading=host.querySelector<HTMLElement>('.vinci-certainty')
+    const sure=LINE_CERTAINTY[stud.certainty as keyof typeof LINE_CERTAINTY]
+    if(heading&&sure){heading.textContent=sure[here];heading.dataset['certainty']=stud.certainty;heading.style.color=sure.colour}
     const full=page.createElement('div');full.className='vinci-record';full.dataset['register']='record'
     const add=(text:string|null|undefined):void=>{
       if(!text)return
       const line=page.createElement('p');line.className='vinci-statement';line.textContent=text;full.append(line)}
     add(here==='de'?stud.date_label_de:stud.date_label_en)
+    add(here==='de'?stud.date_note_de:stud.date_note_en)
     add(SOURCE_READINGS[stud.id]?.[here])
     add(stud.document);add(stud.holder)
     add(here==='de'?stud.qualifications_de:stud.qualifications_en)
-    for(const gap of stud.gaps)add(gap)
+    for(const gap of here==='de'?stud.gaps_de:stud.gaps)add(gap)
+    // A link names the source as a person would, never the field it filled.
     for(const source of stud.sources){
       const link=page.createElement('a');link.className='vinci-picture-source'
-      link.href=source.url;link.target='_blank';link.rel='noopener noreferrer';link.textContent=source.supports
+      link.href=source.url;link.target='_blank';link.rel='noopener noreferrer';link.textContent=here==='de'?source.name_de:source.name_en
       full.append(link)}
     add(stud.licence_line)
+    const limits=studLimits(stud)
     const data=page.createElement('pre');data.className='vinci-arithmetic'
-    data.textContent=JSON.stringify({edtf:studEdtf(stud),calendar:stud.calendar,date_original:stud.date_original,
-      date_alternatives:stud.date_alternatives,document_status:stud.document_status},null,1)
+    data.textContent=JSON.stringify({edtf:studEdtf(stud),calendar:stud.calendar,earliest:limits.earliest,latest:limits.latest,
+      ...(stud.date_precision==='circa'?{about_years:CIRCA_YEARS}:{}),date_original:stud.date_original,
+      date_certainty:stud.date_certainty??stud.certainty,date_alternatives:stud.date_alternatives,
+      date_note_source:stud.date_note_source,document_status:stud.document_status},null,1)
     full.append(data)
     host.append(full)
   }
@@ -1073,7 +1084,10 @@ export function createWing():VinciWingModule {
   function openLifeRecord(event:LifeEvent,back:()=>void):void {
     const stud=LINE_STUDS.find(entry=>entry.id===event.id)
     if(!stud||!sources)return
-    exhibitSources={id:`stud/${stud.id}`,title:{en:stud.date_label_en,de:stud.date_label_de},certainty:'documented',
+    // The window's type admits only its own classes; the heading is rewritten
+    // in the row's own word as the record renders.
+    exhibitSources={id:`stud/${stud.id}`,title:{en:stud.date_label_en,de:stud.date_label_de},
+      certainty:stud.certainty==='documented'?'documented':'conjectural',
       renderStation(host){renderLifeRecord(stud,host)}}
     sources.resetScroll();sources.select('station');mode=2;paintDock()
     sources.element.addEventListener('close',()=>{exhibitSources=null;paintDock();back()},{once:true})
@@ -1082,12 +1096,10 @@ export function createWing():VinciWingModule {
    * these twelve carry the walk and the other forty four say so instead. */
   const LIFE_CUT=new Set(LINE_SECTIONS.flatMap(section=>[0,1,2,3].map(offset=>LINE_STUDS[section.selected+offset]?.id??'')))
   const LIFE_BIRTH=LINE_STUDS.find(stud=>stud.id==='life-01')!,LIFE_DEATH=LINE_STUDS.find(stud=>stud.id==='life-41')!
-  /** The floor's honesty line and both age forms come from the card models,
-   * so the reader that stands at a date and this view say them from one
-   * place and neither keeps a copy. */
+  /** Both age forms come from the card models, so the reader that stands at a
+   * date and this view say them from one place and neither keeps a copy. */
   const LIFE_CARDS=JSON.parse(cardsSource) as {floor_honesty:VinciText
     controls:{shared:{back:VinciText};date:{age:VinciText;age_about:VinciText;next:VinciText;previous:VinciText}}}
-  const LIFE_HONESTY=LIFE_CARDS.floor_honesty
   /** THE ROOM'S SHORT NAME, for a control that names the room it leads back
    * to: the full name is a chapter title and runs too long for one. */
   const ROOM_SHORT=(JSON.parse(cardsSource) as {station_short_names?:Record<string,VinciText>}).station_short_names??{}
@@ -1100,9 +1112,14 @@ export function createWing():VinciWingModule {
    * said about. */
   const LIFE_YEAR_MS=366*864e5
   function lifeDate(stud:Stud):MuseumDate {
-    const bounds=studBounds(stud)
+    const bounds=studBounds(stud),limits=studLimits(stud)
     return {edtf:studEdtf(stud),calendar:stud.calendar,earliest:bounds.earliest,latest:bounds.latest,
-      label:{en:stud.date_label_en,de:stud.date_label_de},certainty:stud.certainty as Sure}
+      label:{en:stud.date_label_en,de:stud.date_label_de},
+      // the date's own certainty, where the record says it differs from the event's
+      certainty:(stud.date_certainty??stud.certainty) as Sure,
+      ...(stud.date_precision==='circa'?{approximate:true,limits}:{}),
+      ...(stud.date_precision==='disputed'?{disputed:true}:{}),
+      ...(stud.date_note_en&&stud.date_note_de?{note:{en:stud.date_note_en,de:stud.date_note_de}}:{})}
   }
   /** THE AGE BESIDE A YEAR. Exact where every day the date can mean gives the
    * same one. About where the date is a year or a season and the two ends
@@ -1160,12 +1177,18 @@ export function createWing():VinciWingModule {
     const sure=Object.fromEntries((Object.keys(vinciLifeCertaintyCounted) as (keyof typeof vinciLifeCertaintyCounted)[]).map(key=>
       [key,{word:{en:LINE_CERTAINTY[key].en,de:LINE_CERTAINTY[key].de},
         counted:vinciLifeCertaintyCounted[key],colour:LINE_CERTAINTY[key].colour}])) as LifeRecord['sure']
+    const span={from:Number(LIFE_BIRTH.date.slice(0,4)),to:Number(LIFE_DEATH.date.slice(0,4))}
+    /* THE FLOOR'S COUNT IS READ FROM THE FLOOR, and names the room it stands
+       in, because the sheet opens from every station and not only there. */
+    const counted=(language:'en'|'de'):string=>capitalise(fill(vinciLifeFloorCount[language],
+      {cut:spokenCount(LIFE_CUT.size,language),total:spokenCount(LINE_STUDS.length,language)}))
     return {bands,events,works:lifeWorks(),people,sure,
       here:LINE_STUDS.find(stud=>stud.date===vinciHourValues.julianDate)?.id,
-      words:{throughLine:vinciThroughLine,secondLine:vinciLifeSecondLine,honesty:LIFE_HONESTY,cut:vinciLifeCut,
+      words:{throughLine:vinciThroughLine,secondLine:{en:fill(vinciLifeSecondLine.en,span),de:fill(vinciLifeSecondLine.de,span)},
+        honesty:{en:counted('en'),de:counted('de')},cut:vinciLifeCut,
         worksRow:vinciLifeWorksRow,worksCount:vinciLifeWorksCount,worksEmpty:vinciLifeWorksEmpty,age:LIFE_AGE_WORDS,back:LIFE_CARDS.controls.shared.back,
         provenance:VINCI_VITRINE_WORDS.provenance,hour:vinciLifeHourMark},
-      span:{from:Number(LIFE_BIRTH.date.slice(0,4)),to:Number(LIFE_DEATH.date.slice(0,4))}}
+      span}
   }
   /** THE WORKS ROW. The register dates its paintings to a span of years and
    * says how sure that span is; the three it cannot date at all stand apart

@@ -24,8 +24,8 @@ import { windowOwnsTheScreen } from '../window-chrome'
 import { deskAny } from '../desk-switches'
 import { renderLifeDate } from './card'
 import { drawLifePlate, type LifePlate } from './plate'
-import { dateYears, lifeCounts, lifeScale, workYears, type LifeGap } from './scale'
-import { LIFE_BAND_WORDS, LIFE_COUNTS, LIFE_ROW_WORDS, LIFE_WORDS, LIFE_WORKS_COUNT, capitalise, countedCertainties, fill, spokenCount } from './words'
+import { chronological, dateYears, lifeCounts, lifeScale, machineDate, workYears, type LifeGap } from './scale'
+import { LIFE_BAND_WORDS, LIFE_CALENDARS, LIFE_COUNTS, LIFE_ROW_WORDS, LIFE_WORDS, LIFE_WORKS_COUNT, capitalise, countedCertainties, fill, spokenCount } from './words'
 import type { Bi, LifeBand, LifeEvent, LifeRecord, LifeWork } from './types'
 
 export type { LifeBand, LifeCounts, LifeEvent, LifePerson, LifeRecord, LifeWork, LifeWingWords, MuseumDate, Sure } from './types'
@@ -178,7 +178,6 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     dialog.setAttribute('aria-label', say(record.words.throughLine))
     through.textContent = say(record.words.throughLine)
     second.textContent = say(record.words.secondLine)
-    caption.textContent = LIFE_WORDS.caption[language]
     close.textContent = say(LIFE_WORDS.close)
     shutMark.setAttribute('aria-label', say(LIFE_WORDS.close))
     spine.setAttribute('aria-label', LIFE_ROW_WORDS.places[language])
@@ -190,7 +189,7 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     const drawn = record.events.some(event => dateYears(event.date))
     plate = drawn
       ? drawLifePlate({ record, scale, area: { width: area }, language, narrow, open: band, at,
-        afterWord: LIFE_WORDS.after[language] })
+        afterWords: LIFE_WORDS.afterSpan[language] })
       : undefined
     presses.replaceChildren()
     drawing.replaceChildren(...(plate ? [plate.element] : []), presses)
@@ -205,7 +204,16 @@ export function createWingLife(options: WingLifeOptions): WingLife {
       drawing.style.removeProperty('--life-full')
       drawing.style.removeProperty('--life-fold')
     }
-    caption.hidden = !plate || !scale.gaps.length
+    /* THE CALENDAR IS NAMED ONCE, and only by a record that keeps one other
+       than the Gregorian: the last year it reaches is read from the dates. It
+       reads on the caption's row, the other note about how the life is drawn. */
+    const older = record.events.filter(event => event.date.calendar && event.date.calendar !== 'Gregorian')
+    const kept = older[0]?.date.calendar
+    const last = Math.max(...older.filter(event => event.date.calendar === kept).map(event => dateYears(event.date)?.to ?? -Infinity))
+    const notes = [plate && scale.gaps.length ? LIFE_WORDS.caption[language] : '',
+      kept && Number.isFinite(last) ? fill(LIFE_COUNTS.calendar[language], { last, calendar: LIFE_CALENDARS[kept]?.[language] ?? kept }) : '']
+    caption.textContent = notes.filter(Boolean).join(' ')
+    caption.hidden = !caption.textContent
     if (plate && !narrow) for (const segment of plate.bands) {
       const press = make('button', 'wing-life-press')
       press.type = 'button'
@@ -238,10 +246,7 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     if (narrow) { if (spine.parentElement !== body) body.insertBefore(spine, reading) }
     else if (spine.parentElement !== reading) reading.insertBefore(spine, periodBody)
 
-    /* ON A PHONE THE COUNTS READ AT THE END OF THE LIST, where a pinned
-       ledger of four sentences took a third of the sheet from the reading. */
-    if (narrow) reading.append(counts)
-    else if (counts.parentElement !== foot) foot.prepend(counts)
+    placeCounts()
 
     /* THE ABSENCES STAND BESIDE WHAT IS SHOWN, counted from the record and
        never written down beside it. */
@@ -272,6 +277,14 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     }))), counts.lastElementChild)
   }
 
+  /** THE COUNTS READ AT THE END OF THE READING, on both stages: a pinned
+   * ledger of five sentences at 14 px took a third of a desktop sheet from the
+   * dates it counts. The period is rebuilt on every choice, so they follow. */
+  function placeCounts(): void {
+    if (options.narrow()) reading.append(counts)
+    else periodBody.append(counts)
+  }
+
   /** THE VIEW OPENS ON THE HOUR THE WING STANDS IN: the museum's premise is
    * that the visitor is standing on one documented afternoon, and a view that
    * opens there says so without a word. A life whose record names no such
@@ -285,8 +298,10 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     return record.bands.find(entry => entry.id === id)
   }
 
+  /** A period's dates in the order of time, read from their bounds and never
+   * from the order a record was typed in. */
   function eventsOf(record: LifeRecord, id: string | null): LifeEvent[] {
-    return record.events.filter(event => event.band === id)
+    return chronological(record.events.filter(event => event.band === id))
   }
 
   /** THE SPINE: the seven places, always all of them, each with what it
@@ -423,13 +438,29 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     press.type = 'button'
     press.dataset['event'] = event.id
     press.setAttribute('aria-expanded', String(event.id === at))
-    const dot = make('span', 'wing-life-dot')
-    dot.style.background = record.sure[event.certainty]?.colour ?? ''
-    dot.setAttribute('aria-hidden', 'true')
-    const time = make('time', 'wing-life-date-label', event.date.label[language])
-    if (event.date.earliest) time.dateTime = event.date.earliest
-    time.dataset['edtf'] = event.date.edtf
-    press.append(dot, time)
+    /* A DATE HTML CAN STATE IS A `time`; an approximate, disputed or open one
+       keeps its words and its EDTF, and publishes no machine date it is not. */
+    const machine = machineDate(event.date)
+    const label = make(machine ? 'time' : 'span', 'wing-life-date-label', event.date.label[language])
+    if (machine) label.setAttribute('datetime', machine)
+    label.dataset['edtf'] = event.date.edtf
+    label.dataset['calendar'] = event.date.calendar
+    press.append(label)
+    /* THE AGE AND HOW SURE, in words, before anything is opened. The colour
+       rides on the word and never on the date, because the certainty is the
+       event's and a date can be surer than what happened on it. */
+    if (event.age !== null) press.append(make('span', 'wing-life-date-age',
+      fill((event.ageApproximate ? record.words.age.about : record.words.age.exact)[language], { years: event.age })))
+    const sure = record.sure[event.certainty]
+    if (sure) {
+      const word = make('span', 'wing-life-date-sure')
+      const dot = make('span', 'wing-life-dot')
+      dot.style.background = sure.colour
+      dot.setAttribute('aria-hidden', 'true')
+      word.style.setProperty('--certainty', sure.colour)
+      word.append(dot, document_.createTextNode(sure.word[language]))
+      press.append(word)
+    }
     // THE HOUR THE VISITOR IS STANDING IN is one of these dates, and the wing
     // says so in its own words beside it.
     if (record.here === event.id && record.words.hour)
@@ -591,6 +622,7 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     moveMarker(null)
     paintSpine(record, options.lang())
     paintPeriod(record, lifeScale(record.events, record.span).gaps, options.lang())
+    placeCounts()
     const entry = bandOf(record, id)
     if (entry) announce(`${entry.name[options.lang()]}. ${dateCount(eventsOf(record, id).length, options.lang())}`)
     else if (id === UNDATED) announce(LIFE_WORDS.undated[options.lang()])
