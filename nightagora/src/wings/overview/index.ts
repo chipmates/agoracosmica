@@ -37,6 +37,8 @@ export interface DeskOverviewHost {
   open: (id: string) => void
   /** the room's own name, which the one step back carries */
   room: () => string
+  /** the set's own measure where the room has one, `{n}` its count */
+  measure?: () => VinciText | null
   /** the museum's certainty mark, handed in so this view draws the same one */
   mark: (certainty: VinciCertainty) => SVGSVGElement
 }
@@ -191,9 +193,10 @@ export function createDeskOverview(host: DeskOverviewHost): DeskOverview {
     at = Math.max(0, shown.findIndex(cell => cell.id === held))
     const name = setName(shown)
     title.textContent = say(name)
-    // the set's own count stands under its name until the room's measure has
-    // a sentence of its own in the card data
-    sub.textContent = say(WORD.count()).replace('{n}', String(shown.length))
+    // THE SET'S MEASURE STANDS UNDER ITS NAME, and it carries the count, so
+    // the count stands alone only where a room has no measure of its own
+    const measure = host.measure?.() ?? null
+    sub.textContent = say(measure ?? WORD.count()).replace('{n}', String(shown.length))
     view.setAttribute('aria-label', `${say(name)} · ${host.room()}`)
     stepBack.textContent = ''
     stepBack.append(icon(STEP_BACK), document.createTextNode(host.room()))

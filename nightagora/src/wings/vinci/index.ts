@@ -488,7 +488,13 @@ export function createWing():VinciWingModule {
       overview:{cells:()=>stationExhibits().map(cell=>({id:cell.id,title:cell.title,short:exhibitShort(cell.id),openable:cell.openable,
         certainty:pictureCertainty(cell.colour),kind:picks.find(pick=>pick.id===cell.id)?.kind??'picture',
         preview:cell.preview===null?null:strip?.thumb(cell.preview)??cell.preview})),
-        open:id=>openExhibit(id,null),room:roomName},
+        open:id=>openExhibit(id,null),room:roomName,
+        // the three rooms whose set the card data measures: the hang, the
+        // machine hall, and the leaves
+        measure:()=>{const here=hereContent().id
+          const key=here==='picture-room'||here==='picture-room-west'?'measure_wall'
+            :here==='flight'||here==='works'?'measure_hall':here==='body'||here==='reading-table'?'measure_book':''
+          return key?deskControl('overview',key):null}},
 
       // desk.sheet: its host fields
 
