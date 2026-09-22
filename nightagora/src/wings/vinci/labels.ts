@@ -109,7 +109,8 @@ export function createVinciLabelAnchor(options: {
   dot.type = 'button'
   dot.hidden = true
   // the station's own mark opens a label where the visitor stands: the other
-  // kind, and it says so
+  // kind, and it says so under a name an export can ask for
+  dot.id = 'vinci-mark-station'
   dot.dataset['mark'] = 'detail'
   dot.style.width = dot.style.height = '44px'
   dot.dataset['naClaim'] = 'inferred'
@@ -247,6 +248,12 @@ const MARK_RING = 2 * Math.PI * 15.5
 /** THE WALKING MARK'S BODY: a gold ring of 34 px inside the 44 px target,
  * the walk glyph in it, and the counted arc that fills on press. The arc is
  * the leg itself, never a timer. */
+/** A mark's own name in the DOM, keyed by the exhibit and not by the pool
+ * slot it happens to take, so an export and a test name the same mark after
+ * a rebuild. */
+export const vinciMarkDomId = (exhibit: string): string =>
+  `vinci-mark-${exhibit.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`
+
 function walkingRing(document: Document): SVGSVGElement {
   const svg = document.createElementNS(MARK_SVG, 'svg')
   svg.setAttribute('viewBox', '0 0 34 34')
@@ -425,6 +432,7 @@ export function createVinciExhibitDots(options: {
       dot.hidden = true
       pressed.delete(dot)
       delete dot.dataset['exhibit']
+      dot.removeAttribute('id')
     }
     if (!answering) { chip.hidden = true; named = null }
   }
@@ -521,10 +529,12 @@ export function createVinciExhibitDots(options: {
         // the mark carries the exhibit it opens, so an export can name it
         if (!entry) {
           dot.hidden = true; pressed.delete(dot); delete dot.dataset['exhibit']
-          hushMark(dot); continue
+          dot.removeAttribute('id'); hushMark(dot); continue
         }
         dot.hidden = false
         dot.dataset['exhibit'] = entry.mark.id
+        // a name of the exhibit's own, not of the pool slot it took
+        dot.id = vinciMarkDomId(entry.mark.id)
         dot.style.left = `${entry.x}px`
         dot.style.top = `${entry.y}px`
         dot.style.setProperty('--certainty', entry.mark.colour)
