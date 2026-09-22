@@ -187,6 +187,50 @@ export const ASSET_BASE: string =
   (import.meta.env['VITE_NA_ASSET_BASE'] as string | undefined) ??
   (import.meta.env.DEV || LOCAL ? '/na-assets/' : 'https://media.agoracosmica.org/night/')
 
+/* WHAT RIDES ON A STORE ADDRESS BESIDES ITS PATH. The media origin holds the
+   store for a year as immutable and none of its names is hashed, so a
+   re-encoded plate, a re-generated model or a corrected sheet under the same
+   name would sit in every cache until that year is out. The record's own
+   digest of the bytes goes on the address as a query: the address moves the
+   moment the bytes move, and nothing else about it changes. A dev server and
+   a preview server serve the store off disk and ignore the query. */
+
+/** what an address needs from a store record: where the bytes stand, and the
+    digest of what the address returns */
+export interface StoreRecord {
+  wing: string
+  path: string
+  /** of the file on disk, or of the one document a folder record names */
+  sha256?: string
+  /** of every file under a folder the record covers whole */
+  tree_sha256?: string
+}
+
+const DIGEST = /^[0-9a-f]{12}/
+
+/** twelve hex of what the record's digest covers, or null when it carries
+    none: the address then goes out unversioned and the checker names it
+    rather than letting it pass in silence. */
+export function assetVersion(record: StoreRecord): string | null {
+  const digest = record.sha256 ?? record.tree_sha256 ?? ''
+  return DIGEST.test(digest) ? digest.slice(0, 12) : null
+}
+
+/** THE ONE PLACE AN ADDRESS IN THE STORE IS FORMED. `file` is for a folder
+    record that names its own document; a record of a single file needs none. */
+export function assetAddress(record: StoreRecord, file?: string): string {
+  const version = assetVersion(record)
+  return `${ASSET_BASE}${record.wing}/${record.path}${file ?? ''}${version ? `?v=${version}` : ''}`
+}
+
+/** A TILE PYRAMID'S FOLDER, AND NO QUERY ON IT. A level-0 viewer joins its own
+    region, size and rotation onto this address, so a query here would land in
+    the middle of every tile's path. These folders are named by twelve hex of
+    the source's own digest instead, which is what moves them. */
+export function assetPyramidBase(record: StoreRecord): string {
+  return `${ASSET_BASE}${record.wing}/${record.path}`.replace(/\/+$/, '')
+}
+
 /* WHAT THE HELPER MAY LAY OVER A CLASS. The macro variation is invisible on
    quarried stone and it is the whole surface on a weave: a 7 to 10 cm mottle
    at full contrast reads as mould on linen, as camouflage on iron and as
