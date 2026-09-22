@@ -47,8 +47,8 @@ export const viewId = (exhibit) => `view:${exhibit}`
 export const clipStem = (edgeId) => edgeId.replace(/[:/]/g, (c) => (c === ':' ? '-' : '.')).replace('>', '--')
 
 /** The wing's modules, loaded once, and what the graph and the replay read off them. */
-export async function openWing({ rev = '', stand = {} } = {}) {
-  const loader = await createLoader({ rev, stand })
+export async function openWing({ rev = '', stand = {}, overlay = {} } = {}) {
+  const loader = await createLoader({ rev, stand, overlay })
   const gait = loader.load(`${WING_DIR}/gait.ts`)
   const walls = loader.load(`${WING_DIR}/collection/wall.ts`)
   const approaches = loader.load(`${WING_DIR}/collection/approaches.ts`)

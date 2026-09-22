@@ -17,6 +17,10 @@ import * as TSL from 'three/tsl'
 
 export const APP_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const sha256 = (text) => createHash('sha256').update(text).digest('hex')
+const HOST_ARRAYS = {
+  ArrayBuffer, DataView, Float32Array, Float64Array, Int8Array, Int16Array, Int32Array,
+  Uint8Array, Uint8ClampedArray, Uint16Array, Uint32Array,
+}
 
 /** Every three.js addon the app's sources name, resolved up front: the module
     loader below is synchronous and cannot await one. */
@@ -35,8 +39,19 @@ async function loadAddons() {
   return addons
 }
 
-/** The app's files at one revision, read through git; the working tree when none is named. */
-function sourceReader(rev) {
+/** The app's files at one revision, read through git; the working tree when none is named.
+    An overlay's texts stand in for the files it names, so a change can be
+    planted and measured without writing the tree. */
+function sourceReader(rev, overlay = {}) {
+  const base = baseReader(rev)
+  if (!Object.keys(overlay).length) return base
+  return {
+    exists: (relative) => relative in overlay || base.exists(relative),
+    read: (relative) => (relative in overlay ? overlay[relative] : base.read(relative)),
+    label: `${base.label} with ${Object.keys(overlay).length} planted`,
+  }
+}
+function baseReader(rev) {
   if (!rev) {
     return {
       exists: (relative) => fs.existsSync(path.join(APP_ROOT, relative)),
@@ -61,10 +76,11 @@ function sourceReader(rev) {
  *   rev        a git revision to read the sources at (default: the working tree)
  *   stand      { 'src/.../module.ts': exportsObject } modules stood in for, by path
  *   quiet      drop the modules' console.warn lines (the rail proof reports on it)
+ *   overlay    { 'src/...': text } files read as these texts instead
  */
-export async function createLoader({ rev = '', stand = {}, quiet = true } = {}) {
+export async function createLoader({ rev = '', stand = {}, quiet = true, overlay = {} } = {}) {
   const known = await loadAddons()
-  const reader = sourceReader(rev)
+  const reader = sourceReader(rev, overlay)
   const cache = new Map()
   const opened = new Map()
   const source = (relative) => {
@@ -100,6 +116,8 @@ export async function createLoader({ rev = '', stand = {}, quiet = true } = {}) 
       module, exports: module.exports, require, console: consoleOut,
       matchMedia: () => ({ matches: false }), performance, URL, URLSearchParams,
       location: { search: '' }, crypto: globalThis.crypto, TextEncoder: globalThis.TextEncoder,
+      // three.js tests typed arrays by the host realm's constructors
+      ...HOST_ARRAYS,
     }, { filename: relative })
     return module.exports
   }

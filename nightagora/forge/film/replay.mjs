@@ -39,7 +39,7 @@ export function trackKey({ aspect, fps, pace, prints }) {
 }
 
 /** The rail with its authority, standing on the certificate. */
-export async function openReplay({ rev = '' } = {}) {
+export async function openReplay({ rev = '', overlay = {} } = {}) {
   let certified = ''
   // The mounted geometry is the certificate's by stipulation: the replay walks
   // the certified paths, the certifier proves they clear the geometry.
@@ -49,7 +49,7 @@ export async function openReplay({ rev = '' } = {}) {
     railGeometrySignature: () => [],
     sameRailGeometrySignature: () => false,
   }
-  const wing = await openWing({ rev, stand: { [`${WING_DIR}/rail-fingerprint.ts`]: fingerprint } })
+  const wing = await openWing({ rev, overlay, stand: { [`${WING_DIR}/rail-fingerprint.ts`]: fingerprint } })
   certified = wing.certificate.geometrySha256[0]
   const proof = wing.loader.load(`${WING_DIR}/rail-proof.ts`)
   const authority = proof.createRailGeometryAuthority([])
@@ -78,7 +78,12 @@ export function walkClip(replay, { aspect, phone, place, request, fps = FPS, tai
   place(rail)
   rail.update()
   const still = camPrint(camera)
+  /* the station the wing counts the eye as standing at: it names the exposure */
+  const departed = rail.navigation.completed
   const prints = [still]
+  /* the same frames unrounded (eye, quaternion, lens), for rates the four-decimal print cannot carry */
+  const sample = () => [...camera.position.toArray(), ...camera.quaternion.toArray(), camera.fov]
+  const samples = [sample()]
   if (request(rail) === false) throw new Error('the rail refused the request')
   /* the capture drops a leading frame that still repeats the still, so both
      runners open on the same instant of the leg */
@@ -96,13 +101,13 @@ export function walkClip(replay, { aspect, phone, place, request, fps = FPS, tai
       }
       began = true
     }
-    if (arrivedAt < 0) prints.push(print)
+    if (arrivedAt < 0) { prints.push(print); samples.push(sample()) }
     else tailPrints.push(print)
     if (!walking && arrivedAt < 0) arrivedAt = prints.length - 1
     if (arrivedAt >= 0 && tailPrints.length >= tail) break
   }
   if (arrivedAt < 0) throw new Error('the leg never arrived')
-  return { prints, tail: tailPrints, arrivedAt, key: trackKey({ aspect: round(aspect, 6), fps, pace: FILM_PACE, prints }) }
+  return { prints, samples, departed, completed: rail.navigation.completed, tail: tailPrints, arrivedAt, key: trackKey({ aspect: round(aspect, 6), fps, pace: FILM_PACE, prints }) }
 }
 
 /** How the wing stands the eye at a node, and how it asks for one. */
