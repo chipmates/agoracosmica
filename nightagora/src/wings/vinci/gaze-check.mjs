@@ -44,6 +44,10 @@ const SEE_THROUGH = /glazing|glassSky|\/glass|water/
  * can be separated into a gaze still leaving its composition and a gaze led
  * round a corner. It mirrors `GAZE_AHEAD_M` in the rail. */
 const GAZE_AHEAD_M = 6
+/** A STRETCH WALKED TWICE. Two places on one leg this near each other, with
+ * this much walking between them, are the same stretch seen a second time:
+ * the visitor's own reading of it is that the walk repeated itself. */
+const DOUBLED_NEAR_M = 2, DOUBLED_APART_M = 5
 
 const modules = new Map()
 const media = { reduced: false }
@@ -210,7 +214,7 @@ function readBox(camera) {
   }
 }
 
-const report = { checker: 'vinci-gaze', near: NEAR_M, run: RUN, box: BOX, rays: BOX_RAYS * BOX_RAYS, legs: [], flat: [], refused: [] }
+const report = { checker: 'vinci-gaze', near: NEAR_M, run: RUN, box: BOX, rays: BOX_RAYS * BOX_RAYS, legs: [], flat: [], twice: [], refused: [] }
 for (const phone of VIEWPORTS) {
   for (const order of ORDERS) {
     const stops = vinciWalk(order === 'life').stops
@@ -303,20 +307,38 @@ for (const phone of VIEWPORTS) {
         else close()
       }
       close()
+      // A STRETCH WALKED TWICE. The walked distance between two samples is
+      // read along the leg, so a pair that stands near each other with real
+      // walking between them is the same ground covered a second time.
+      const walkedTo = [0]
+      for (let i = 1; i < samples.length; i++) walkedTo.push(walkedTo[i - 1] + samples[i - 1].at.distanceTo(samples[i].at))
+      const doubled = []
+      for (let i = 0; i < samples.length; i++) for (let j = i + 1; j < samples.length; j++) {
+        if (walkedTo[j] - walkedTo[i] < DOUBLED_APART_M) continue
+        const apart = samples[i].at.distanceTo(samples[j].at)
+        if (apart > DOUBLED_NEAR_M) continue
+        const last = doubled[doubled.length - 1]
+        if (last && samples[i].share - last.first <= .2) { last.second = samples[j].share; last.apart = Math.min(last.apart, +apart.toFixed(2)); continue }
+        doubled.push({ first: samples[i].share, second: samples[j].share, apart: +apart.toFixed(2), walked: +(walkedTo[j] - walkedTo[i]).toFixed(2) })
+      }
       const leg = {
         viewport: phone ? 'phone' : 'desktop', order,
         from, to: move.id,
         seconds: +seconds.toFixed(2),
+        metres: +walkedTo[walkedTo.length - 1].toFixed(2),
+        doubled,
         nearest: Math.min(...samples.map(entry => entry.nearest)),
         oneBodyFrames: samples.filter(entry => entry.bodies === 1).length,
         flat,
       }
       report.legs.push(leg)
       if (flat.length) report.flat.push(leg)
+      if (doubled.length) report.twice.push(leg)
     }
   }
 }
-report.ok = report.flat.length === 0
+report.ok = report.flat.length === 0 && report.twice.length === 0
 report.flatLegs = report.flat.length
+report.twiceLegs = report.twice.length
 console.log(JSON.stringify(report, null, 1))
 process.exitCode = report.ok ? 0 : 1
