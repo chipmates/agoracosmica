@@ -383,6 +383,12 @@ export function collectionConcreteMaterial(closedCaster = false): MeshStandardNo
     .map(([east, north]) => smoothstep(.04, .70, length(vec2(P.x.sub(east!), P.z.add(north!)))).mul(.66).add(.34))
     .reduce((a, b) => a.mul(b))
   m.aoNode = mix(float(1), bounce, downward).mul(mix(footPool, float(1), downward))
+  // THE HALL'S SOFFIT TAKES WHAT ITS LIGHT SHELF THROWS UP: bright over the
+  // shelf, falling away south. Gated on the hall's own roof, the one soffit
+  // above -1.2 m, so no other surface of the envelope moves.
+  const hallRoof = P.x.greaterThan(-61.7).and(P.x.lessThan(-39.1)).and(P.z.greaterThan(42.1)).and(P.z.lessThan(63.6))
+    .and(P.y.greaterThan(-1.2)).select(float(1), float(0))
+  m.emissiveNode = m.colorNode.mul(hallRoof.mul(downward).mul(exp(P.z.sub(42.3).div(-4.5)).mul(.3)))
   m.name = 'vinci/collection/filtered-cast-concrete'
   m.userData = { manifestId: collectionProvenance.manifestId, assetClass: 'GENERATED', certainty: 'reconstructed',
     recipe: 'Original museum concrete: filtered 3.2 m weather drift, 0.10 m aggregate and 4.5 mm pores; continuous 1.2 × 0.6 m form panels, restrained 0.15 m board lines, 4 mm finish joints and 24 mm tie recesses on a 0.6 m grid. Combined derivative relief is bounded to a 0.24 normal gradient. No textures or historical concrete claim.',
