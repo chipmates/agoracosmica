@@ -5,6 +5,7 @@
     "rule": "Two to four sentences on a card. The record keeps the rest and is one deliberate control away.",
     "written_here": "The line (data/lines.json), the steps (data/steps.json), the honesty variants, the zoom ceiling's sentence, the rule labels, the floor's honesty line, the short room name per station (station_short_names, at most 24 characters, for the one step back in a close look and in the overview, where the full station name runs to 493 px uppercase) and every control's words. A machine whose viewpoint is not the shared one names it under controls.machine.viewpoint_labels, keyed by the machine slug and the viewpoint id.",
     "controls_for_the_new_chrome": "The walk, visit, overview, reader and ways groups are the frozen desktop design's control words, confirmed in both languages by the text seat and read by no surface yet. A build seat quotes the key instead of typing the words. Words the museum already ships keep their one home and are not copied here: Whole (controls.machine.viewpoints), Where it comes from (controls.machine.provenance), Lobby, The plan, Life, Instruments and the three paces (the lobby and the frame).",
+    "measures": "The overview's three measure sentences take the count from the set itself, through {n}. The metres are read once from the rooms' own modules: the hang's span of 34.6 m from collection/hang.ts, and the mechanism hall's 22.64 by 21.62 m from the faces in collection/layout.ts. A set of leaves carries no measure of its own yet, so its sentence names none.",
     "prepared": "2026-09-15"
   },
   "models": {
@@ -140,7 +141,19 @@
       "things_to_see": { "en": "{n} things to see", "de": "{n} Dinge zu sehen" },
       "whole_wall": { "en": "The whole wall", "de": "Die ganze Wand" },
       "whole_book": { "en": "The whole book", "de": "Das ganze Buch" },
-      "whole_hall": { "en": "The whole hall", "de": "Die ganze Halle" }
+      "whole_hall": { "en": "The whole hall", "de": "Die ganze Halle" },
+      "measure_wall": {
+        "en": "{n} pictures at their own size, over thirty-four metres of wall.",
+        "de": "{n} Bilder in ihrer wahren Größe, über vierunddreißig Meter Wand."
+      },
+      "measure_hall": {
+        "en": "{n} machines built from the sheets, in a hall about twenty-two metres across.",
+        "de": "{n} Maschinen, nach den Blättern gebaut, in einer Halle von etwa zweiundzwanzig Metern."
+      },
+      "measure_book": {
+        "en": "{n} pages, every one a reproduction. The originals are in their own collections.",
+        "de": "{n} Seiten, jede eine Wiedergabe. Die Originale liegen in ihren Sammlungen."
+      }
     },
     "reader": {
       "side_by_side": { "en": "Side by side", "de": "Nebeneinander" }
