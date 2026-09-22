@@ -8,8 +8,8 @@
         "de": "Luftschraube"
       },
       "label": {
-        "en": "Reconstructed from Ms B f. 83v. No lifetime flight is documented.",
-        "de": "Rekonstruktion nach Ms B, Blatt 83v. Ein Flug zu Lebzeiten ist nicht belegt."
+        "en": "The sheet asks whether a turning surface can bite into air the way a screw bites into wood.",
+        "de": "Das Blatt fragt, ob sich eine drehende Fläche in die Luft schraubt wie eine Schraube ins Holz."
       },
       "arithmetic": {
         "en": "The text gives 8 braccia from rim to centre. At 0.5836 m per braccio, the radius is 4.6688 m. Assume 400 kg and air density 1.225 kg/m³. Ideal hover power is (mg)^(3/2)/sqrt(2ρA), about 19 kW. Four exceptional cyclists give about 2.04 kW for one hour. The published figure for one rider is an estimated 509.5 W. The Milan catalogue instead describes a base of about 5 m. Using 5 m as diameter raises the ideal power to 35 kW. [1,3,4,6]",
@@ -27,7 +27,7 @@
           },
           {
             "title": "The mechanism",
-            "body": "A central mast turns the spiral. The four push bars and plain bearing here are assumed. They show rotation while the platform stays on the floor."
+            "body": "A mast in the middle turns the spiral, and the platform under it stays on the floor. The push bars and the bearing are the museum’s, and every size but the radius is our choice."
           },
           {
             "title": "Purpose",
@@ -61,7 +61,7 @@
           },
           {
             "title": "Der Mechanismus",
-            "body": "Eine senkrechte Welle dreht die Fläche. Die vier Schubstangen und das Gleitlager sind hier ergänzt. Die Plattform bleibt am Boden."
+            "body": "Eine Welle in der Mitte dreht die Wendel, die Plattform darunter bleibt am Boden. Schubstangen und Lager sind unsere, und jedes Maß außer dem Radius ist unsere Wahl."
           },
           {
             "title": "Der Zweck",
@@ -128,8 +128,8 @@
         "de": "Windmesser mit Klappplatte"
       },
       "label": {
-        "en": "Reconstructed from Codex Atlanticus f. 675r. The plate indicates wind force.",
-        "de": "Rekonstruktion nach Codex Atlanticus, Blatt 675r. Die Platte zeigt die Windkraft an."
+        "en": "The sheet wants the force of the wind read off a scale instead of guessed.",
+        "de": "Das Blatt will die Windkraft an einer Skala ablesen statt sie zu schätzen."
       },
       "arithmetic": {
         "en": "Assume a 0.12 kg plate of 0.06 m². Balance normal wind torque against gravity. With air density 1.225 kg/m³ and assumed Cd 1.2, 30 degrees corresponds to 4.2 m/s. The angle is not proportional to wind speed. [5]",
@@ -147,7 +147,7 @@
           },
           {
             "title": "The mechanism",
-            "body": "Wind pushes a hinged plate away from vertical. A curved scale shows the angle. All sizes and scale marks here are assumptions."
+            "body": "Wind pushes the hinged plate out of the upright, and the higher it rides, the harder the wind. No speeds stand on the scale: the marks, the frame and every size here are the museum’s."
           },
           {
             "title": "Purpose",
@@ -181,7 +181,7 @@
           },
           {
             "title": "Der Mechanismus",
-            "body": "Der Wind hebt eine Klappplatte aus der Senkrechten. Ein Kreisbogen zeigt den Winkel. Alle Maße und Teilstriche sind hier angenommen."
+            "body": "Der Wind drückt die Klappplatte aus der Senkrechten, und je höher sie steht, desto stärker weht er. Geschwindigkeiten stehen nicht darauf: Teilstriche, Gestell und alle Maße sind unsere."
           },
           {
             "title": "Der Zweck",
@@ -248,8 +248,8 @@
         "de": "Axialkugellager"
       },
       "label": {
-        "en": "From Madrid I 20v. Eight wooden balls are kept apart by eight pivoted wheels.",
-        "de": "Nach Madrid I 20v. Acht Holzkugeln werden durch acht gelagerte Rollen getrennt."
+        "en": "The sheet looks for a way to carry a turning load with less rubbing.",
+        "de": "Das Blatt sucht einen Weg, eine drehende Last mit weniger Reibung zu tragen."
       },
       "arithmetic": {
         "en": "Our ball radius is 0.075 m. The circle through their centres has radius 0.30 m. At 0.833 top-plate revolutions per minute, ball centres move at half that rate. The balls spin at 0.175 rad/s. This assumes no slip against the plates.",
@@ -267,7 +267,7 @@
           },
           {
             "title": "The mechanism",
-            "body": "The balls roll between two plates. Separators prevent neighbouring balls from rubbing directly. The plate sizes and separator profiles shown here are modern choices."
+            "body": "The balls run between two plates, and small rollers keep each ball from touching its neighbour. Their shapes are how the museum reads the sheet, not how a workshop made them."
           },
           {
             "title": "What it was for",
@@ -301,7 +301,7 @@
           },
           {
             "title": "Der Mechanismus",
-            "body": "Kugeln rollen zwischen zwei Platten. Rollen halten die Kugeln voneinander getrennt. Plattengrößen und Rollenprofile sind hier heutige Annahmen."
+            "body": "Die Kugeln laufen zwischen zwei Platten, kleine Rollen halten jede von der nächsten fern. Ihre Form ist die Lesart des Museums, nicht die einer Werkstatt."
           },
           {
             "title": "Wofür es gedacht war",
@@ -366,8 +366,8 @@
         "de": "Notizen zur Camera obscura"
       },
       "label": {
-        "en": "A modern chamber illustrates the experiment in Manuscript D 8r. Leonardo da Vinci described an inverted image on paper.",
-        "de": "Eine heutige Kammer zeigt den Versuch aus Manuskript D 8r. Leonardo da Vinci beschrieb ein umgekehrtes Bild auf Papier."
+        "en": "The note sets up a dark room to watch what light does on its way into an eye.",
+        "de": "Die Notiz baut einen dunklen Raum, um zu sehen, was das Licht auf dem Weg ins Auge tut."
       },
       "arithmetic": {
         "en": "Assume an object 3 m from the hole and paper 0.5 m behind it. Magnification is −0.5 / 3 = −1/6. An object 1.8 m high makes an inverted image 0.30 m high. The assumed 2 mm opening gives about 2.3 mm of geometric blur. Diffraction is omitted.",
@@ -385,7 +385,7 @@
           },
           {
             "title": "The mechanism",
-            "body": "Light travels through the hole and crosses. The top of an object appears at the bottom of the paper. This compact chamber is a modern illustration. Its walls and distances were chosen for the exhibit. [1]"
+            "body": "The rays cross in the hole, so what stands high outside lands low on the paper. This small chamber is the museum’s own: the note gives no room depth and no size for the hole."
           },
           {
             "title": "What it was for",
@@ -419,7 +419,7 @@
           },
           {
             "title": "Der Mechanismus",
-            "body": "Die Lichtstrahlen kreuzen sich im Loch. Was draußen oben ist, erscheint auf dem Papier unten. Diese kleine Kammer ist eine heutige Veranschaulichung. Ihre Wände und Abstände wurden für die Ausstellung gewählt. [1]"
+            "body": "Im Loch kreuzen sich die Strahlen, und was draußen oben steht, liegt auf dem Papier unten. Diese kleine Kammer ist unsere: Die Notiz nennt weder Raumtiefe noch die Größe des Lochs."
           },
           {
             "title": "Wozu es dienen sollte",
@@ -486,8 +486,8 @@
         "de": "Studie eines ausgewuchteten Schwungrads"
       },
       "label": {
-        "en": "After Madrid I 114r. This modern flywheel demonstration stores energy supplied by a person.",
-        "de": "Nach Madrid I 114r. Dieses heutige Schwungradmodell speichert Energie, die ein Mensch zuführt."
+        "en": "The sheet works on a wheel that stores movement and gives it back when the drive falters.",
+        "de": "Das Blatt arbeitet an einem Rad, das Bewegung speichert und zurückgibt, wenn der Antrieb stockt."
       },
       "arithmetic": {
         "en": "Four 3.5 kg weights at 0.6 m give 5.04 kg m² of inertia if treated as points. At 5 rpm they store about 0.69 J. The shaft and spokes would add energy.",
@@ -505,7 +505,7 @@
           },
           {
             "title": "The mechanism",
-            "body": "Our model has four equal weights on rigid spokes. A person keeps the shaft turning. This arrangement and its dimensions are modern explanatory choices."
+            "body": "Weights on the spokes carry the store, and a person at the shaft keeps the wheel turning. Four equal weights on rigid spokes are the museum’s pick from the several the sheet asks about."
           },
           {
             "title": "What it was for",
@@ -539,7 +539,7 @@
           },
           {
             "title": "Der Mechanismus",
-            "body": "Unser Modell trägt vier gleiche Gewichte an starren Speichen. Ein Mensch hält die Welle in Bewegung. Anordnung und Abmessungen wurden für diese Erklärung gewählt."
+            "body": "Gewichte an den Speichen tragen den Vorrat, ein Mensch an der Welle hält das Rad in Gang. Vier gleiche Gewichte an starren Speichen sind unsere Wahl aus den mehreren des Blattes."
           },
           {
             "title": "Wofür es gedacht war",
@@ -604,8 +604,8 @@
         "de": "Neigungsmesser mit Lot"
       },
       "label": {
-        "en": "Reconstructed from Codex Atlanticus f. 1058r. A plumb line indicates tilt in steady conditions.",
-        "de": "Rekonstruktion nach Codex Atlanticus, Blatt 1058r. Ein Lot zeigt die Neigung bei ruhiger Bewegung."
+        "en": "The note wants a flier to tell level travel from a tilt.",
+        "de": "Die Notiz will, dass ein Flieger waagerechte Fahrt von geneigter unterscheiden kann."
       },
       "arithmetic": {
         "en": "For an assumed 0.24 m pendulum, T=2πsqrt(L/g) gives a free period of 0.98 s. A 10 degree tilt gives about 42 mm relative displacement. A horizontal acceleration of 2 m/s² tilts apparent gravity by atan(2/9.81), about 11.5 degrees.",
@@ -623,7 +623,7 @@
           },
           {
             "title": "The mechanism",
-            "body": "A suspended weight hangs over a circular reference. This display adds a glass cover and a slowly tilting support. Every size is assumed."
+            "body": "The hanging weight keeps still while the craft leans, so the circle behind it reads the lean. The glass hood, the tilting stand and every size are the museum’s: the sheet gives none."
           },
           {
             "title": "Purpose",
@@ -657,7 +657,7 @@
           },
           {
             "title": "Der Mechanismus",
-            "body": "Ein Gewicht hängt über einer kreisförmigen Markierung. Dieses Modell ergänzt eine Glashaube und eine langsam neigbare Unterlage. Alle Maße sind angenommen."
+            "body": "Das Gewicht hängt ruhig, während sich das Gerät neigt, und der Kreis dahinter zeigt die Neigung. Glashaube, kippbare Unterlage und alle Maße sind unsere, das Blatt nennt keine."
           },
           {
             "title": "Der Zweck",
@@ -725,8 +725,8 @@
         "de": "Bohrmaschine mit wechselnder Drehrichtung"
       },
       "label": {
-        "en": "After Codex Atlanticus 108r. This modern drilling demonstration reverses on each return stroke.",
-        "de": "Nach Codex Atlanticus 108r. Diese heutige Bohrvorführung kehrt beim Rückhub die Drehrichtung um."
+        "en": "Without a motor the drill needs a drive a body can give, down and back, over and over.",
+        "de": "Ohne Motor braucht der Bohrer einen Antrieb, den ein Körper geben kann, hinab und zurück."
       },
       "arithmetic": {
         "en": "A 0.10 m rope stroke turns the spindle about 2.50 radians, or 0.40 revolution. We use a 0.04 m rope radius and a 0.005 m helical pitch. The effective payout radius is 0.040008 m. Small sideways slip is allowed. One cycle takes 4 seconds and includes the reverse stroke. An assumed spring stiffness of 1000 N/m stores 5 J at the full stroke. These are modern demonstration values.",
@@ -744,7 +744,7 @@
           },
           {
             "title": "The mechanism",
-            "body": "A foot stroke pulls a rope around the spindle. A flexible bow returns it. Our guided footbar and spool dimensions are modern choices."
+            "body": "The rope is wound round the spindle, so the foot stroke turns it one way and the bow turns it back. The bow, the guided foot bar and the spool are the museum’s, and the drill is not fed in."
           },
           {
             "title": "What it was for",
@@ -778,7 +778,7 @@
           },
           {
             "title": "Der Mechanismus",
-            "body": "Ein Fußhub zieht ein Seil um die Welle. Ein elastischer Bogen holt es zurück. Fußführung und Spulenmaße sind hier heutige Annahmen."
+            "body": "Das Seil ist um die Welle gewickelt: Der Tritt dreht sie in die eine Richtung, der Bogen zurück. Bogen, Fußstange und Spule sind unsere, und der Bohrer wird nicht vorgeschoben."
           },
           {
             "title": "Wofür es gedacht war",
@@ -843,8 +843,8 @@
         "de": "Stemmtore einer Schleuse"
       },
       "label": {
-        "en": "Reconstructed from Codex Atlanticus 656r. Leonardo da Vinci recorded a real lock. His exact contribution is uncertain.",
-        "de": "Rekonstruktion nach Codex Atlanticus 656r. Leonardo da Vinci zeichnete eine wirkliche Schleuse. Sein genauer Beitrag ist ungewiss."
+        "en": "A canal that climbs needs a chamber where a boat waits while the water is raised under it.",
+        "de": "Ein steigender Kanal braucht eine Kammer, in der ein Boot wartet, während das Wasser steigt."
       },
       "arithmetic": {
         "en": "Assume water density 1000 kg/m³, gravity 9.81 m/s², a leaf 2.06 m wide and water depths of 2 m and 1 m. F = 1000 × 9.81 × 2.06 × (2² − 1²) / 2 ≈ 30 kN per leaf. At equal depths this net pressure load is zero. Friction remains.",
@@ -862,7 +862,7 @@
           },
           {
             "title": "The mechanism",
-            "body": "Two leaves meet at an angle. Water pressure presses them against their supports. A small door lets water through before the main leaves move. This model shows the main leaves moving at equal water levels. Its dimensions are modern assumptions. [1,2]"
+            "body": "The two leaves meet at an angle against the higher water, which wedges them shut. A small door in one leaf lets water through before they move. Here they swing at one level, and every size is the museum’s."
           },
           {
             "title": "What it was for",
@@ -896,7 +896,7 @@
           },
           {
             "title": "Der Mechanismus",
-            "body": "Zwei Torflügel treffen schräg aufeinander. Der Wasserdruck presst sie gegen ihre Auflager. Durch eine kleine Tür kann Wasser fließen, bevor das große Tor geöffnet wird. Hier bewegen sich die Flügel bei gleichem Wasserstand. Die Maße sind heutige Modellannahmen. [1,2]"
+            "body": "Die beiden Flügel treffen sich im Winkel gegen das Oberwasser, das sie zusammenpresst. Eine kleine Tür im Flügel lässt vorher Wasser durch. Hier schwingen sie bei gleichem Stand, und alle Maße sind unsere."
           },
           {
             "title": "Wozu es dienen sollte",
@@ -963,8 +963,8 @@
         "de": "Orgelgeschütz mit drei Rohrreihen"
       },
       "label": {
-        "en": "Three-bank gun study, Codex Atlanticus 157 r. The note specifies 33 barrels and 11 shots at a time.",
-        "de": "Geschützstudie mit drei Rohrreihen, Codex Atlanticus 157 r. Die Notiz nennt 33 Rohre und 11 Schüsse zugleich."
+        "en": "The sheet groups its shots so a fresh row is ready as soon as the last one is spent.",
+        "de": "Das Blatt bündelt die Schüsse, damit eine frische Reihe bereitsteht, sobald die letzte leer ist."
       },
       "arithmetic": {
         "en": "33 divided by 11 gives 3 banks. Each index is 120 degrees. Our display assigns a 6 second pause before each 12 second turn. Three turns and their pauses take 54 seconds. The peak speed is 2.5 rpm. These are presentation timings. [1]",
@@ -982,7 +982,7 @@
           },
           {
             "title": "The mechanism",
-            "body": "Three banks share a rotating frame. The display turns that frame by hand. The barrels remain inert. Its sizes and turning speed are declared modern choices."
+            "body": "Three rows sit on one frame, and turning the frame brings the next row to the top. Nothing fires here: the barrels are solid, and the carriage’s sizes and its speed are the museum’s."
           },
           {
             "title": "What it was for",
@@ -1016,7 +1016,7 @@
           },
           {
             "title": "Die Mechanik",
-            "body": "Drei Rohrreihen sitzen auf einem drehbaren Gestell. In der Darstellung wird es von Hand bewegt. Die Rohre bleiben ohne Funktion. Maße und Drehgeschwindigkeit sind ausdrücklich moderne Festlegungen."
+            "body": "Drei Reihen sitzen auf einem Gestell, und beim Drehen kommt die nächste nach oben. Hier wird nicht geschossen: Die Rohre sind massiv, Maße und Tempo des Wagens sind unsere."
           },
           {
             "title": "Der Zweck",
@@ -1077,8 +1077,8 @@
         "de": "Pyramidenfallschirm"
       },
       "label": {
-        "en": "Reconstructed from Codex Atlanticus f. 1058v. Modern versions descended in 2000 and 2008.",
-        "de": "Rekonstruktion nach Codex Atlanticus, Blatt 1058v. Moderne Fassungen wurden 2000 und 2008 erprobt."
+        "en": "The sheet wants a cloth roof big enough to hold a falling body up on the air.",
+        "de": "Das Blatt will ein Tuchdach, groß genug, um einen fallenden Körper in der Luft zu halten."
       },
       "arithmetic": {
         "en": "Use v=sqrt(2 mg/(ρCdA)). For 100 kg, 49 m², 1.225 kg/m³ and assumed Cd 1.2, the result is 5.2 m/s. With Cd 0.8 to 1.6 it is 6.4 to 4.5 m/s. At 165 kg it is 6.7 m/s. These are descent estimates, not safe landing speeds. [7]",
@@ -1096,7 +1096,7 @@
           },
           {
             "title": "The mechanism",
-            "body": "Four cloth faces meet above an open square. This model adds explicit frame sizes, ropes and a harness ring. These construction details are assumptions."
+            "body": "Four cloth faces rise from an open square to a point, and the ropes carry a person under it. The frame, the ropes and the ring are the museum’s: the sheet gives no thickness and no length."
           },
           {
             "title": "Purpose",
@@ -1130,7 +1130,7 @@
           },
           {
             "title": "Der Mechanismus",
-            "body": "Vier Stoffflächen treffen sich über einem offenen Quadrat. Rahmenstärken, Seile und Tragering sind für dieses Modell festgelegt. Diese Baudetails sind Annahmen."
+            "body": "Vier Tuchflächen steigen von einem offenen Quadrat zu einer Spitze, die Seile tragen darunter. Rahmen, Seile und Tragering sind unsere: Das Blatt nennt weder Stärken noch Längen."
           },
           {
             "title": "Der Zweck",
@@ -1198,8 +1198,8 @@
         "de": "Proportionalzirkel"
       },
       "label": {
-        "en": "Reconstructed from Forster I 4r. This model uses assumed dimensions and a fixed 2:1 ratio.",
-        "de": "Rekonstruktion nach Forster I 4r. Dieses Modell hat angenommene Maße und ein festes Verhältnis von 2:1."
+        "en": "The instrument carries a distance across at a chosen proportion, which is how a drawing changes size.",
+        "de": "Das Gerät überträgt eine Strecke in einem gewählten Verhältnis, so ändert eine Zeichnung ihre Größe."
       },
       "arithmetic": {
         "en": "For an included angle of 0.5 rad, the long gap is 2 × 0.4 × sin(0.25) = 0.198 m. The short gap is 0.099 m. Both lengths are assumptions. The ratio remains 2:1 as the legs move.",
@@ -1217,7 +1217,7 @@
           },
           {
             "title": "The mechanism",
-            "body": "The short points and the long points open together. Their distances from the pivot set the reduction ratio. The screw fixes the pivot. Here the long distance is 0.4 m and the short distance 0.2 m. These are modern assumptions. [2,3]"
+            "body": "Both pairs of points open together, and how far each pair stands from the pivot sets the proportion. The screw holds the pivot where the museum set it, and the sheet’s own setting is not established."
           },
           {
             "title": "What it was for",
@@ -1251,7 +1251,7 @@
           },
           {
             "title": "Der Mechanismus",
-            "body": "Die kurzen und die langen Spitzen öffnen sich gemeinsam. Ihr Abstand vom Gelenk bestimmt das Verkleinerungsverhältnis. Die Schraube fixiert den Drehpunkt. Hier beträgt der lange Abstand 0,4 m und der kurze 0,2 m. Diese Maße sind heutige Annahmen. [2,3]"
+            "body": "Beide Spitzenpaare öffnen sich zugleich, und ihr Abstand vom Drehpunkt bestimmt das Verhältnis. Die Schraube hält den Drehpunkt dort, wo das Museum ihn setzte, das Blatt gibt keinen an."
           },
           {
             "title": "Wozu es dienen sollte",
@@ -1318,8 +1318,8 @@
         "de": "Drehkran"
       },
       "label": {
-        "en": "Reconstructed from Manuscript B 49r with modern dimensions. A hand crank raises the load.",
-        "de": "Nach Manuskript B 49r mit heutigen Maßannahmen rekonstruiert. Eine Handkurbel hebt die Last."
+        "en": "The crane on the sheet lifts material and carries it round to where it is wanted.",
+        "de": "Der Kran des Blattes hebt Material und schwenkt es dorthin, wo es gebraucht wird."
       },
       "arithmetic": {
         "en": "With a 0.08 m drum turning at 0.25 rad/s, rope speed is 0.02 m/s. The load rises 0.24 m in 12 seconds. A chosen 20 kg load requires 15.7 Nm ideal drum torque. These are modern demonstration values.",
@@ -1337,7 +1337,7 @@
           },
           {
             "title": "The mechanism",
-            "body": "A rope passes over two pulleys. Turning the drum raises the load. The platform can rotate, but stays locked during this lift. The pawl stays clear. The operator must keep holding the crank after the lift."
+            "body": "Turning the drum shortens the rope, and the jib can swing the load round, though not while it rises. The counterweight, the supports and every size are the museum’s, and a hand must hold the crank at the top."
           },
           {
             "title": "What it was for",
@@ -1371,7 +1371,7 @@
           },
           {
             "title": "Der Mechanismus",
-            "body": "Ein Seil läuft über zwei Rollen. Eine Trommel zieht die Last hoch. Die Plattform kann sich drehen, bleibt beim gezeigten Hub aber verriegelt. Die Sperrklinke bleibt ausgerückt. Nach dem Hub muss die Kurbel weiter festgehalten werden."
+            "body": "Die Trommel verkürzt das Seil, der Ausleger kann die Last schwenken, aber nicht während sie steigt. Gegengewicht, Stützen und alle Maße sind unsere, und oben muss eine Hand die Kurbel halten."
           },
           {
             "title": "Wofür es gedacht war",
@@ -1436,8 +1436,8 @@
         "de": "Walzwerk für Zinn"
       },
       "label": {
-        "en": "From Manuscript I 48v. Leonardo specified bronze rollers and a tin sheet about half a braccio wide.",
-        "de": "Nach Manuskript I 48v. Leonardo nennt Bronzewalzen und ein etwa einen halben Braccio breites Zinnblech."
+        "en": "The sheet wants tin that comes out the same thickness all the way along.",
+        "de": "Das Blatt will Zinn, das über die ganze Länge gleich dick herauskommt."
       },
       "arithmetic": {
         "en": "A 20 tooth pinion turns a 60 tooth wheel. At 5 crank turns per minute, each 0.075 m roller turns 1.67 times per minute. Its surface travels 13 mm/s. These are modern choices. Half a Florentine braccio is 0.2918 m. The local unit remains uncertain.",
@@ -1455,7 +1455,7 @@
           },
           {
             "title": "The mechanism",
-            "body": "A crank turns the upper roller. The lower roller can be set to change the gap. Our unloaded demonstration holds that setting. [3]"
+            "body": "A crank drives the upper roller, and moving the lower one changes the gap the metal goes through. Nothing is rolled here: the gap stays where it is set, and the gearing is the museum’s own."
           },
           {
             "title": "What it was for",
@@ -1489,7 +1489,7 @@
           },
           {
             "title": "Der Mechanismus",
-            "body": "Eine Kurbel treibt die obere Walze an. Die untere Walze lässt sich zur Einstellung des Spalts versetzen. Unsere Vorführung ohne Werkstück behält einen festen Spalt. [3]"
+            "body": "Eine Kurbel treibt die obere Walze, und die untere verstellt den Spalt für das Metall. Hier wird nichts gewalzt: Der Spalt bleibt, wie er steht, und die Verzahnung ist unsere."
           },
           {
             "title": "Wofür es gedacht war",
@@ -1554,8 +1554,8 @@
         "de": "Wasserschnecke und Wasserhebung"
       },
       "label": {
-        "en": "Interpretation of a water screw on Codex Atlanticus 6r. Dimensions and operating rate are modern assumptions.",
-        "de": "Deutung einer Wasserschnecke auf Codex Atlanticus 6r. Maße und Drehzahl sind heutige Annahmen."
+        "en": "The sheet raises water to a channel or a cistern standing above the water it comes from.",
+        "de": "Das Blatt hebt Wasser in eine Rinne oder einen Speicher, die höher liegen als das Wasser selbst."
       },
       "arithmetic": {
         "en": "Assume 0.5 litres per turn and 5 turns per minute. Delivery is 2.5 litres per minute. Lifting it 1.2 m takes 0.49 W in the water. At an assumed 35 percent efficiency, the crank needs 1.4 W. These are illustrative inputs, not a measured output.",
@@ -1573,7 +1573,7 @@
           },
           {
             "title": "The mechanism",
-            "body": "The crank turns an inclined tube wound around a shaft. Water collects in its lower turns and moves towards the outlet. This model selects one manually driven screw. Its size, supports and direct crank are modern assumptions. [5]"
+            "body": "Water gathers in the lower turns of the tube, and each turn of the shaft walks it up to the mouth. The sheet carries no writing at all, so the size, the supports and the crank are the museum’s."
           },
           {
             "title": "What it was for",
@@ -1607,7 +1607,7 @@
           },
           {
             "title": "Der Mechanismus",
-            "body": "Die Kurbel dreht ein schräges Rohr, das um eine Welle gewunden ist. In den unteren Windungen sammelt sich Wasser und wandert zum Auslauf. Dieses Modell zeigt eine von Hand gedrehte Schnecke. Maße, Lager und direkter Kurbelantrieb sind heutige Annahmen. [5]"
+            "body": "In den unteren Windungen sammelt sich Wasser, und jede Drehung der Welle trägt es zum Auslauf. Auf dem Blatt steht kein Wort, also sind Größe, Lager und Kurbel unsere."
           },
           {
             "title": "Wozu es dienen sollte",
