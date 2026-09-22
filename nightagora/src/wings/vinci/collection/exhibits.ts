@@ -361,7 +361,6 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       // now stands stations inside these rooms, so this is the difference
       // between a walk and a frame that draws the whole ground at once.
       const inHall = eye.x > -62.4 && eye.x < -38.6 && eye.z > 41.8 && eye.z < 64.2 && eye.y < -1.9
-      hallLight.update(inHall)
       // THE HALL'S OWN FITTINGS GO DOWN TO A FILL ONCE THE EYE IS IN THE HALL,
       // where its spots take over. They reach the rooms beside it unshadowed,
       // so from outside the hall they keep their full level, and the change
