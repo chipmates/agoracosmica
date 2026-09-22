@@ -90,6 +90,7 @@ import { deskStageHeight } from '../desk-stage'
 import { createDeskChrome, type DeskChrome, type DeskStation } from '../desk-chrome'
 import deskCss from '../desk-chrome.css?inline'
 import deskTypeCss from '../desk-type.css?inline'
+import deskCloseLookCss from '../desk-closelook.css?inline'
 
 const text=(value:VinciText):string=>value[lang()]
 /** The painting at the grave: read by its own record, not the hang's register. */
@@ -430,7 +431,7 @@ export function createWing():VinciWingModule {
     /* HOW FAR DOWN A PANEL MAY STAND. Today that is the top of the bar; where
        the desktop's words stand, it is the top of their own band. */
     panelFloor=()=>desk?.floor()??wing.querySelector('.wing-rail-group')?.getBoundingClientRect().top??deskStageHeight()
-    const deskStyle=make('style','');deskStyle.textContent=`${deskTypeCss}\n${deskCss}`;h.stage.append(deskStyle)
+    const deskStyle=make('style','');deskStyle.textContent=`${deskTypeCss}\n${deskCss}\n${deskCloseLookCss}`;h.stage.append(deskStyle)
     if(deskOn('words')||deskOn('ways'))desk=createDeskChrome({
       stage:h.stage,wing,lang,
       standing:()=>deskStationAt(card),
@@ -640,6 +641,8 @@ export function createWing():VinciWingModule {
     dots=createVinciExhibitDots({host:h.labels,camera,occluders,limit:DOTS_PER_TIER[stack.tierName()]??6,controls:VINCI_EXHIBIT_CARD,
       onOpen:(id,dot)=>openExhibit(id,dot)})
     closeLook=createVinciCloseLook({host:h.labels,narrow,
+      // the one step back of a close look names the room it goes back to
+      room:()=>text(hereContent().name),
       // A mark stands down while its exhibit is open, so the hand comes back
       // to the row's own button for it, or to the bar.
       returnFocus:id=>strip?.element.querySelector<HTMLElement>(`[data-exhibit="${id}"]`)??hosts?.stage.parentElement?.querySelector<HTMLElement>('.wing-step[aria-current="true"]')??null,
@@ -714,6 +717,9 @@ export function createWing():VinciWingModule {
       // THE READER OWNS ITS OWN KEYS. Nothing typed inside an open exhibit
       // walks the rail or cycles the label layer, and Escape is one step back.
       if(closeLook?.id&&(e.key==='Escape'||e.key.startsWith('Arrow')||closeLook.owns(target))){
+        // ONE SURFACE BACK, EXACTLY ONE. The record a close look opened stands
+        // over its label, so Escape puts the record away before the window.
+        if(e.key==='Escape'&&deskOn('closelook')&&mode===2&&exhibitSources){e.preventDefault();mode=1;paintDock();return}
         if(e.key==='Escape'){e.preventDefault();closeLook.close();return}
         // THE ARROWS WALK THE WALL while an exhibit stands: the station rail
         // is what the visitor left to come here.
@@ -1577,7 +1583,21 @@ export function createWing():VinciWingModule {
     const button=make('button','vitrine-control',text(words))
     button.type='button'
     button.addEventListener('click',run)
+    // WHAT A CONTROL IS FOR, not what it says: a label that stands the
+    // controls in places of its own asks for the role and never for the word.
+    const role=words===VINCI_VITRINE_WORDS.provenance?'record'
+      :words===VINCI_VITRINE_WORDS.close?'close'
+      :words===VINCI_VITRINE_WORDS.wholePlate?'zoom'
+      :words===VINCI_VITRINE_WORDS.back?'back':''
+    if(role)button.dataset['role']=role
     return button
+  }
+  /** WHERE A WORK STANDS IN THE SET ITS STATION HOLDS, and the museum's own
+   * mark for it: both are the row's, so the label and the row cannot drift. */
+  function exhibitStand(id:string):{set:{at:number;of:number}|null;certainty:VinciCertainty|null} {
+    const row=stationExhibits(), at=row.findIndex(item=>item.id===id)
+    if(at<0)return {set:null,certainty:null}
+    return {set:{at:at+1,of:row.length},certainty:pictureCertainty(row[at]!.colour)}
   }
   /** WHERE A WORK STANDS ON THE FRAME the room holds: its own plate's
    * corners through the camera, so a payload can stand exactly on it. */
@@ -1668,7 +1688,7 @@ export function createWing():VinciWingModule {
       changed:()=>{if(exhibitSources?.id===id&&mode===2)paintDock()}})
     closeLook.open({id,title:lang()==='de'?codex?.de??'':codex?.en??'',line:null,card:[],payload:reader,
       controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),control(VINCI_VITRINE_WORDS.back,back),
-        control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())]},null,'advance')
+        control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())],...exhibitStand(base)},null,'advance')
   }
   /** THE PAGE ON THE SUPPORT, OPENED WHERE THE VISITOR STANDS. One side, the
    * admitted leaf's own, read from its pyramid where the store has cut one.
@@ -1703,7 +1723,8 @@ export function createWing():VinciWingModule {
       start:'study-leaf',words:vinciManuscriptWords(),
       tier:()=>hosts?.world.stack.tierName()??'standard'})
     closeLook.open({id:door,title,line:null,card:[],payload:reader,
-      controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())]},from,how)
+      controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())],
+      ...exhibitStand(VINCI_STUDY_LEAF)},from,how)
   }
   /** THE BODY WALL IS ONE BOOK. A press on any sheet opens the whole wall in
    * the reader at that sheet, in the order the wall hangs them: the arrows,
@@ -1754,7 +1775,7 @@ export function createWing():VinciWingModule {
       changed:()=>{if(exhibitSources?.id===door&&mode===2){record();paintDock()}}})
     closeLook.open({id:door,title:named(opened),line:vinciLine(id),card:[],payload:reader,
       controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())],
-      ...vinciLimits(id)},from,how)
+      ...vinciLimits(id),...exhibitStand(id)},from,how)
   }
   /** THE VITRINE, for every kind this wing can open: the line at its head,
    * the module's own card in the page's language only, the payload, the
@@ -1796,7 +1817,7 @@ export function createWing():VinciWingModule {
         standing:()=>{const nav=rail.navigation;return !nav.active&&!nav.approaching}})
       openMode=how
       closeLook.open({id,title,line:vinciLine(id),card:words.card,after:words.after,payload,
-        controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),shut],walk,...vinciLimits(id)},from,how_)
+        controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),shut],walk,...vinciLimits(id),...exhibitStand(id)},from,how_)
       openMode='auto'
       return
     }
@@ -1830,7 +1851,7 @@ export function createWing():VinciWingModule {
       leafAt=null
       openMode=how
       closeLook.open({id,title,line:vinciLine(id),card:[],payload:reader,
-        controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),shut],walk,...vinciLimits(id),
+        controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),shut],walk,...vinciLimits(id),...exhibitStand(id),
         work:()=>{const nav=rail.navigation;return nav.exhibit===id&&!nav.active?sphereRect(entry.centre,entry.radiusM):null}},from,how_)
       openMode='auto'
       return
@@ -1855,7 +1876,7 @@ export function createWing():VinciWingModule {
           pixels:()=>{const map=(plate?.material as {map?:{image?:unknown}}|undefined)?.map?.image;return map instanceof HTMLImageElement||map instanceof ImageBitmap||map instanceof HTMLCanvasElement?map:null}})
       openMode=how
       closeLook.open({id,title:place.title,line:vinciLine(id),card:place.card,after:place.after,payload,
-        controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),shut],walk,...vinciLimits(id),
+        controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),shut],walk,...vinciLimits(id),...exhibitStand(id),
         work:entry.kind==='place'?()=>{const nav=rail.navigation;return nav.exhibit===id&&!nav.active?sphereRect(entry.centre,entry.radiusM):null}:undefined},from,how_)
       openMode='auto'
       return
@@ -1897,7 +1918,7 @@ export function createWing():VinciWingModule {
       description:vinciPlateDescription(id),aspect:plate.pixels.width/plate.pixels.height,window:cut,
       standing:()=>{const nav=rail.navigation;return !nav.active&&!nav.approaching}}):null
     openMode=how
-    closeLook.open({id,title,line:vinciLine(id),card:[label],payload,controls,walk,...vinciLimits(id),
+    closeLook.open({id,title,line:vinciLine(id),card:[label],payload,controls,walk,...vinciLimits(id),...exhibitStand(id),
       work:workRectNow},from,how_)
     openMode='auto'
   }

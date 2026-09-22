@@ -19,6 +19,7 @@ import type { ReadyMachineBuild } from '../machines/runtime'
 import { playbackSchedule } from '../machines/bench/playback'
 import { BENCH_ABSENCE } from '../machines/bench/registers'
 import { setRegister } from '../../frame'
+import { deskOn } from '../../desk-switches'
 import { GRAVE_EVIDENCE, GRAVE_HOUR, GRAVE_WORDS } from '../grave'
 import { GRAVE_DEATHBED } from '../grave/placement'
 import { GRAVE_DIAGRAM, GRAVE_SOURCE, INGRES_SOURCE } from '../line/bench/visitor-sources'
@@ -44,6 +45,9 @@ export function createVinciCloseLook(options: {
   /** The top of the wing's bar, which the window stands clear of. */
   floor(): number
   returnFocus?(id: string): HTMLElement | null
+  /** The room the one step back of a close look leads to, in the page's
+   * language, which is the station the visitor is standing in. */
+  room?(): string
 }): VinciCloseLook {
   // The window owns no words: the mark that dismisses it and the grabber
   // that raises its card take the wing's own, in the page's language.
@@ -204,6 +208,12 @@ export function vinciMachineCard(slug: MachineSlug, narrow: boolean, certainty: 
   // away on the wide stage, and the whole description is on the phone, so the
   // steps stand beside the model where the hand is.
   if (narrow) description.prepend(label)
+  /* ONE READ MORE, NOT TWO. Where the label under the work carries its own,
+     the description stands open behind it and needs no control of its own. */
+  if (deskOn('closelook') && !narrow) {
+    description.prepend(label)
+    return { card: [description], after: machineAfter(slug, certainty, language) }
+  }
   if (description.childElementCount) {
     description.hidden = true
     const more = make('button', 'vitrine-more', VINCI_VITRINE_WORDS.more[language])
@@ -216,6 +226,12 @@ export function vinciMachineCard(slug: MachineSlug, narrow: boolean, certainty: 
     })
     card.push(more, description)
   }
+  return { card, after: machineAfter(slug, certainty, language) }
+}
+
+/** What the card carries after the description: how sure the model is, the
+ * size said in one plain sentence, and what the museum added or left out. */
+function machineAfter(slug: MachineSlug, certainty: { word: string; colour: string }, language: 'en' | 'de'): HTMLElement[] {
   const after: HTMLElement[] = []
   const word = make('p', 'vitrine-certainty', certainty.word)
   word.style.setProperty('--certainty', certainty.colour)
@@ -224,7 +240,7 @@ export function vinciMachineCard(slug: MachineSlug, narrow: boolean, certainty: 
   after.push(make('p', 'vitrine-meta', said ?? machineEnvelope(slug, language)))
   const absence = BENCH_ABSENCE[slug]
   if (absence) after.push(make('p', 'vitrine-meta', absence[language]))
-  return { card, after }
+  return after
 }
 
 /** The envelope's three numerals, in the page's own separator. */
