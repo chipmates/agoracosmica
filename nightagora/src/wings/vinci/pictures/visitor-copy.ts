@@ -137,9 +137,18 @@ const NOTES: Readonly<Record<string, PictureBilingual>> = {
   },
 }
 
+const IN_THE_RECORD: PictureBilingual = {
+  en: 'The history of this work is available in the record.',
+  de: 'Die Geschichte dieses Werkes steht im Nachweis.',
+}
+/** The Mona Lisa's reading describes the historical print, so it is read only
+ * where the print is the image the label stands under. */
+const PRINTED = /print|druk|imprim/i
+
 /** A source change must not inherit a statement about a different image. */
 export function visitorNote(work: PictureWork, entries: readonly ResolvedPicturePlate[] = []): PictureBilingual {
   const first = entries[0]?.plate as PolicyPaintingEntry | undefined
+  if (work.id === 'mona-lisa' && first && !PRINTED.test(first.honesty_en ?? '')) return IN_THE_RECORD
   if (work.id === 'salvator-mundi' && first?.plate_id === 'salvator-mundi:print-1844') return {
     en: 'The 1844 engraving is a separate image after Leonardo. It cannot establish the Cook painting’s earlier condition.',
     de: 'Der Stich von 1844 ist ein eigenständiges Bild nach Leonardo. Er kann den früheren Zustand des Cook-Gemäldes nicht belegen.',
@@ -156,10 +165,7 @@ export function visitorNote(work: PictureWork, entries: readonly ResolvedPicture
     en: 'No reproduction of this work is available here. Its history is preserved in the record.',
     de: 'Hier ist keine Reproduktion dieses Werkes verfügbar. Seine Geschichte ist im Nachweis festgehalten.',
   }
-  return NOTES[work.id] ?? {
-    en: 'The history of this work is available in the record.',
-    de: 'Die Geschichte dieses Werkes steht im Nachweis.',
-  }
+  return NOTES[work.id] ?? IN_THE_RECORD
 }
 
 const HOLDERS: Readonly<Record<string, PictureBilingual>> = {

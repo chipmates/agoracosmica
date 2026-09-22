@@ -72,7 +72,12 @@ function load(name) {
 const pictures = load(resolve(pictureDir, 'index.ts'))
 const registration = load(resolve(pictureDir, 'registration.ts'))
 const { createReadingRuler } = load('src/wings/vinci/pictures/bench/reading-ruler.ts')
+// The signature absence needs a work whose only admitted image is a printed
+// document; the store's one such print hangs only without the capture chosen
+// over it, so that choice is set aside here. Every field is the same either way.
+const chosen = JSON.parse(read('public/na-manifest.json')).assets.filter(entry => entry.chosen_over?.length)
 const rawManifest = JSON.parse(read('public/na-manifest.json')).assets
+  .filter(entry => !chosen.some(choice => choice.work_id === entry.work_id && choice.plate_id === entry.plate_id))
 const manifest = { all: rawManifest, byId: new Map(rawManifest.map(entry => [entry.id, entry])) }
 const lockedBefore = JSON.stringify(pictures.REGISTER)
 const sharedTexture = new Three.Texture()

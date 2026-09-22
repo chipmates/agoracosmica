@@ -23,7 +23,12 @@ function read(name) {
 }
 const rawRegister = read('src/wings/vinci/pictures/data/paintings.json')
 const works = JSON.parse(rawRegister).works
+// The bench's signature segment presents a printed document; the store's one
+// such print hangs only without the capture chosen over it, so that choice is
+// set aside here.
+const chosen = JSON.parse(read('public/na-manifest.json')).assets.filter(entry => entry.chosen_over?.length)
 const rawManifest = JSON.parse(read('public/na-manifest.json')).assets
+  .filter(entry => !chosen.some(choice => choice.work_id === entry.work_id && choice.plate_id === entry.plate_id))
 const manifest = { all: rawManifest, byId: new Map(rawManifest.map(entry => [entry.id, entry])) }
 const immutableBefore = JSON.stringify({ works, rawManifest })
 function test(name, check) {

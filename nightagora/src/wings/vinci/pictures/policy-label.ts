@@ -71,9 +71,12 @@ function exhibitNote(work: PictureWork, entries: readonly ResolvedPicturePlate[]
       en: 'The original painted field is 113 cm wide. The enlarged support is 130 cm wide.',
       de: 'Das ursprüngliche Bildfeld ist 113 cm breit. Der erweiterte Bildträger ist 130 cm breit.',
     }
-    case 'mona-lisa': return {
+    case 'mona-lisa': return entries.some(entry => /print|druk|imprim/i.test((entry.plate as PolicyPaintingEntry).honesty_en ?? '')) ? {
       en: 'The painting measures 79.4 × 53.4 cm. This image is a historical printed reproduction.',
       de: 'Das Gemälde misst 79,4 × 53,4 cm. Dieses Bild ist eine historische Druckreproduktion.',
+    } : {
+      en: `The painting measures 79.4 × 53.4 cm. ${GENERIC_NOTE.en}`,
+      de: `Das Gemälde misst 79,4 × 53,4 cm. ${GENERIC_NOTE.de}`,
     }
     case 'isabella-deste-cartoon': if (current) return {
       en: 'The selected reproduction shows the complete sheet. Its resolution is limited.',
@@ -199,8 +202,12 @@ export function appendLater(column: HTMLElement, language: 'en' | 'de',
 }
 
 export function createPolicyWorkLabel(work: PictureWork, entries: readonly ResolvedPicturePlate[] = [], expanded = false,
-  columnNotes: readonly PictureBilingual[] = [], twoLevels = false): HTMLElement {
+  columnNotes: readonly PictureBilingual[] = [], twoLevels = false,
+  evidence: readonly ResolvedPicturePlate[] = []): HTMLElement {
   const text = policyLabelText(work, entries)
+  // The plates the hung one was chosen over keep their own lines in the
+  // record, after the hung plate's, and never set the label's certainty.
+  const kept = expanded ? policyLabelText(work, evidence).sources : []
   const label = node('article', 'picture-label picture-policy-label')
   label.dataset['workId'] = work.id
   label.style.setProperty('--certainty', text.colour)
@@ -251,11 +258,12 @@ export function createPolicyWorkLabel(work: PictureWork, entries: readonly Resol
       node('p', 'picture-record', text.record[language]),
       node('p', 'picture-holder', `${work.holder}${work.inventory ? ` · ${work.inventory}` : ''}`),
       node('p', language === 'en' ? 'picture-reason' : 'picture-reason-de', text.note[language]))
-    for (const source of text.sources) {
+    for (const source of [...text.sources, ...kept]) {
       if (source.honesty) {
         const honesty = node('p', 'picture-honesty', source.honesty[language])
         honesty.dataset['manifestId'] = source.id
         if (source.tier) honesty.dataset['rightsTier'] = source.tier
+        if (kept.includes(source)) honesty.dataset['evidence'] = 'true'
         column.append(honesty)
       }
     }
@@ -268,7 +276,7 @@ export function createPolicyWorkLabel(work: PictureWork, entries: readonly Resol
   }
   // One source licence line per displayed plate, spanning the two columns.
   const sourceLines = node('div', 'picture-label-licences')
-  for (const source of text.sources) {
+  for (const source of [...text.sources, ...kept]) {
     const licence = node('p', 'picture-licence', source.licence)
     licence.dataset['manifestId'] = source.id
     sourceLines.append(licence)
@@ -281,7 +289,7 @@ export function createPolicyWorkLabel(work: PictureWork, entries: readonly Resol
       const de = node('p', 'picture-fact', fact.text_de); de.lang = 'de'
       evidence.append(en, de)
     }
-    for (const source of text.sources) {
+    for (const source of [...text.sources, ...kept]) {
       if (source.url) {
         const link = node('a', 'picture-source-link', source.url)
         link.href = source.url; link.target = '_blank'; link.rel = 'noopener'
@@ -364,17 +372,20 @@ export function setRegister(el: HTMLElement, register: 'label' | 'drawer' | 'rec
 }
 
 /** A complete source record, deliberately opened after the plain drawer. */
-export function createPictureRecord(work: PictureWork, entries: readonly ResolvedPicturePlate[]): HTMLElement {
+export function createPictureRecord(work: PictureWork, entries: readonly ResolvedPicturePlate[],
+  evidence: readonly ResolvedPicturePlate[] = []): HTMLElement {
   const root = node('section', 'picture-full-record')
   root.id = `picture-record-${work.id}`
   setRegister(root, 'record')
   root.hidden = true
-  root.append(createPolicyWorkLabel(work, entries, true))
+  root.append(createPolicyWorkLabel(work, entries, true, [], false, evidence))
   const machine = node('details', 'picture-machine-chain')
   machine.append(node('summary', '', 'Complete data / Vollständige Daten'))
+  const chain = (entry: ResolvedPicturePlate) => ({ plate: entry.plate, preview: entry.preview, displayWindow: pictureDisplayWindow(entry.plate) })
   machine.append(node('pre', 'picture-source-hash', JSON.stringify({
     collection: work,
-    sources: entries.map(entry => ({ plate: entry.plate, preview: entry.preview, displayWindow: pictureDisplayWindow(entry.plate) })),
+    sources: entries.map(chain),
+    ...(evidence.length ? { evidence: evidence.map(chain) } : {}),
   }, null, 2)))
   root.append(machine)
   return root

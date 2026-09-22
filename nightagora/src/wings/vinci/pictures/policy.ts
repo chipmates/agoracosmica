@@ -14,6 +14,9 @@ export interface PolicyPaintingEntry extends PaintingManifestEntry {
   readonly state_note?: string
   readonly plate_id?: string
   readonly supersedes?: readonly string[]
+  /** A per-work owner decision: this plate hangs before the named plates,
+   * which stay admitted as evidence in the record and are never superseded. */
+  readonly chosen_over?: readonly string[]
   readonly width?: number
   readonly height?: number
   readonly licence_url?: string
@@ -39,6 +42,8 @@ export interface PicturePolicySelection {
   readonly mainPlates: readonly PolicyPicturePlate[]
   readonly alternatives: readonly PolicyPicturePlate[]
   readonly all: readonly PolicyPicturePlate[]
+  /** The plates the primary was chosen over, shown in its record. */
+  readonly evidence: readonly PolicyPicturePlate[]
 }
 const DISPLAY_CLASSES = new Set(['CAPTURED', 'CC0', 'CC-BY', 'CC-BY-SA', 'PD-ART'])
 /** A source that is itself a print after the painting is a document ABOUT the
@@ -96,9 +101,11 @@ export function validatePaintingRecord(entry: ManifestEntry, expectedRole?: Pain
 
 /** A deterministic, source-first ordering. Explicit store supersession is
  * applied before this ranking. Alternative documentary states stay distinct.
+ * A plate another surviving plate was chosen over ranks behind every tier.
  */
-function rank(plate: PolicyPicturePlate): number {
-  const tier = plate.policyTier === 'TIER1' ? 0 : plate.policyTier === 'TIER2' ? 10 : 20
+function rank(plate: PolicyPicturePlate, outranked: ReadonlySet<string>): number {
+  const tier = outranked.has(plate.plate.id) ? 30
+    : plate.policyTier === 'TIER1' ? 0 : plate.policyTier === 'TIER2' ? 10 : 20
   const relationship = plate.relationship === 'primary' ? 0 : plate.relationship === 'reverse' ? 100
     : plate.relationship === 'historical-photograph' ? 200 : 300
   return tier + relationship
@@ -131,6 +138,17 @@ export function resolveManifestWorkPlates(workId: string, manifest: ManifestInde
   }
   const surviving = full.filter(record => !superseded.has(record.entry.id))
   if (full.length && !surviving.length) throw new Error(`Cyclic painting supersession: ${workId}`)
+  // A choice names a surviving plate of the same work and is itself tiered;
+  // two plates choosing each other would leave no order to hang by.
+  const outranked = new Set<string>()
+  for (const record of surviving) for (const id of record.entry.chosen_over ?? []) {
+    const target = surviving.find(candidate => candidate.entry.id === id)
+    if (!record.entry.tier || !target || id === record.entry.id
+      || (target.entry.chosen_over ?? []).includes(record.entry.id)) {
+      throw new Error(`Invalid painting choice: ${record.entry.id} -> ${id}`)
+    }
+    outranked.add(id)
+  }
   return surviving.map(record => {
     const matches = records.filter(candidate => candidate.entry.role === 'painting-preview'
       && candidate.identity === record.identity
@@ -156,7 +174,7 @@ export function resolveManifestWorkPlates(workId: string, manifest: ManifestInde
       plateFile: record.entry.path, pixels: record.pixels, licenceLine: record.entry.licence,
       preview: preview.entry, plate: record.entry, identity: record.identity,
       policyTier: record.entry.tier ?? null, relationship }
-  }).sort((a, b) => rank(a) - rank(b) || a.plate.id.localeCompare(b.plate.id))
+  }).sort((a, b) => rank(a, outranked) - rank(b, outranked) || a.plate.id.localeCompare(b.plate.id))
 }
 
 /** Drop-in policy selection for the hang. The reverse belongs to Ginevra's
@@ -171,5 +189,7 @@ export function resolvePicturePolicy(work: PictureWork, manifest: ManifestIndex)
   const primary = admitted.find(entry => entry.relationship === 'primary') ?? null
   const mainPlates = primary ? [primary, ...admitted.filter(entry => entry.relationship === 'reverse')] : []
   const mainIds = new Set(mainPlates.map(entry => entry.plate.id))
-  return { primary, mainPlates, alternatives: admitted.filter(entry => !mainIds.has(entry.plate.id)), all: admitted }
+  const chosenOver = new Set(primary?.plate.chosen_over ?? [])
+  return { primary, mainPlates, alternatives: admitted.filter(entry => !mainIds.has(entry.plate.id)), all: admitted,
+    evidence: admitted.filter(entry => chosenOver.has(entry.plate.id)) }
 }

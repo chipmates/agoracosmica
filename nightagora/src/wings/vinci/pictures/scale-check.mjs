@@ -206,13 +206,13 @@ test('Historical twelve DG files remain locked while the current source policy a
 test('All current primary and alternate sources are unique policy-validated pairs; superseded files stay unselected', () => {
   const policy = load(path.join(pictureRoot, 'policy.ts'));
   const selections = register.REGISTER.flatMap(work => policy.resolvePicturePolicy(work, manifest).all);
-  assert.equal(selections.length, 33);
+  assert.equal(selections.length, 34);
   const joinedEntries = selections.flatMap(plate => [plate.preview, plate.plate]);
-  assert.equal(new Set(joinedEntries.map(e => e.id)).size, 66);
-  assert.equal(new Set(joinedEntries.map(e => `${e.wing}/${e.path}`)).size, 66);
+  assert.equal(new Set(joinedEntries.map(e => e.id)).size, 68);
+  assert.equal(new Set(joinedEntries.map(e => `${e.wing}/${e.path}`)).size, 68);
   const manifested = rawManifest.assets.filter(e => e.wing === 'wing-vinci' && ['painting-preview', 'painting-plate'].includes(e.role));
-  assert.equal(manifested.length, 94);
-  assert.equal(manifested.filter(e => e.role === 'painting-plate' && e.tier).length, 35);
+  assert.equal(manifested.length, 96);
+  assert.equal(manifested.filter(e => e.role === 'painting-plate' && e.tier).length, 36);
   manifested.forEach(entry => policy.validatePaintingRecord(entry));
   const superseded = new Set(manifested.flatMap(e => e.supersedes ?? []));
   assert(selections.every(e => !superseded.has(e.plate.id)));

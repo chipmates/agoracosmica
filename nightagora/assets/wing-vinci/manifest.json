@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed to a pale grey at 30 per cent. Assumed weather, no observation claimed.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "2a732f0a5551f14623386dbc135a77455a212e3f45a59fbc1bdeac2872b9f8f6",
+      "sha256": "ad1aac6cbb7468cd7d545eaf43b7995a63d1e10f33e7a1b56bfabd7481945233",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=80c458f2cb5ccddb7fcedccda5df70e5cdccda7d9ca97d65ebfa6462920f61ef;"
     },
     {
@@ -3149,7 +3149,7 @@
       "prompt": "Resolve the selected reproduction from the public store manifest under the 9 September 2026 source policy. Honor explicit supersession and source tiers, pair previews by stable plate identity, and distinguish panel faces, historical photographs and independent prints. Do not infer physical dimensions or admit reference-only content.",
       "model": "Deterministic TypeScript source selection",
       "note": "Museum source selection, not documentary imagery. recipe_file=src/wings/vinci/pictures/policy.ts",
-      "sha256": "673825801b225f925ffe3964440221d1641c530cbf6d5e5ae4d902b548d607f5"
+      "sha256": "7f199e18127d7a95928b1f17b472d9b5bd196e284a80f6c163fcbf9fd78c3378"
     },
     {
       "wing": "vinci",
@@ -3162,7 +3162,7 @@
       "prompt": "Compose bilingual museum labels and the four-colour certainty key. Keep labels to a certainty word and title, and reading paragraphs to ordinary bilingual museum language. A close look carries the same label with the certainty word alone on its first line, because the window names the work above it. Preserve each selected source honesty line and licence verbatim in the deliberately opened record, together with immutable collection data and superseded wording. Generated typesetting carries no documentary artwork claim.",
       "model": "Deterministic TypeScript DOM composition",
       "note": "Museum typesetting, not documentary imagery. recipe_file=src/wings/vinci/pictures/policy-label.ts production_files=src/wings/vinci/pictures/policy.ts",
-      "sha256": "594006d09a2ac311f2f9cb441b4ca68e4f04c5b71fe8dcdab41aff89897a81dd"
+      "sha256": "ee179463e019518281cad781b7465a52666ff12f3d6e7f1144bf928494d742e7"
     },
     {
       "wing": "vinci",
@@ -3240,7 +3240,7 @@
       "prompt": "Bilingual museum readings of the supplied collection and admitted source records. Keep attribution and photographic uncertainty explicit, name collections plainly, and keep exact measurements, licence lines, file identifiers and machine evidence in the deliberately opened complete record. No additional historical claim from generated imagery.",
       "model": "Human-readable text composition from supplied records",
       "note": "Museum wording authorized by window 3. recipe_file=src/wings/vinci/pictures/visitor-copy.ts",
-      "sha256": "fcf25ebe6bdbd418e7d22ece2de0f7759470fbdcf0ec55831ae50115be66fb2f"
+      "sha256": "1acefc6e7d16bd9d38b2c70c8d8e60651d2ca2b46422493d14a06632daca5589"
     },
     {
       "wing": "vinci",
@@ -3278,7 +3278,7 @@
       "prompt": "Place the picture module sources on every field of the room's holder-sized wall, including the paired panel reverse, and hang the body wall's admitted Windsor sheets each at the size its holder records, the three without a recorded size at a constant area. No field is withheld: the store's register is the only admission decision, and a work it does not admit leaves the wall. The current holder measurement for the Lansdowne Yarnwinder is 37.1 by 49.5 cm while its earlier layout slot preserves neighbouring placements. Place the admitted Last Supper source within the existing 8.8 by 4.6 metre mural field. Source admission, windows, arch shoulders, decoding and transitions are imported unchanged from the picture module. The room openings and fittings supply the light. All previews remain present: 512 pixel uploads at calm and standard, 1024 at hero, one distance-earned full source outside calm across both walls. Source pixels are never copied into this repository.",
       "model": "Deterministic TypeScript and TSL exhibition placement",
       "date": "2026-09-14",
-      "sha256": "009800eff0bbd9b05bfc64fde72bdedbe6de3512927db69f22bad60100d21cfa",
+      "sha256": "763e9e8f02c3b99d2d9125560e539321644c0134cd5f988521ac145c7aff017d",
       "note": "Modern exhibition supports, no historical room claim. recipe_file=src/wings/vinci/collection/plates.ts wall_register=src/wings/vinci/collection/body-wall.ts; streaming bytes and displayed licences resolve through the store manifest.",
       "recipe_files": [
         {

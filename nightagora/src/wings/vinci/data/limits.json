@@ -225,11 +225,7 @@
         "de": "Ein Besucher sah 1517 in diesem Haus das Bildnis einer Florentinerin, doch dass er diese Tafel meinte, ist erschlossen, nicht belegt.",
         "source": "pictures/data/paintings.json, mona-lisa, de_beatis with identification_certainty inferred"
       },
-      "visual_note": {
-        "en": "The image is a historical printed reproduction of unverified date, cropped to the print, and it shows neither the panel's present colour nor its exact edges.",
-        "de": "Die Abbildung ist eine historische Druckreproduktion unbestätigten Datums, auf den Druck beschnitten, und zeigt weder die heutige Farbigkeit der Tafel noch ihre genauen Kanten.",
-        "source": "store manifest, vinci/painting-plate/mona-lisa, state_note; pictures/registration.ts, the mona-lisa window note"
-      }
+      "visual_note": null
     },
     "picture/virgin-of-the-rocks-london/front": {
       "limit": {

@@ -250,6 +250,28 @@ test('Supersession cannot silently remove a different work or revive an old excl
   const legacyOnly = audit.records.filter(e => e.work_id === fake.id && !e.tier)
   assert.equal(policy.resolvePicturePolicy(fake, makeIndex(legacyOnly)).primary, null)
 })
+test('A per-work choice hangs its plate and keeps the chosen-over plate as evidence, never superseded', () => {
+  const records = cloneRecords()
+  const print = records.find(e => e.id === 'vinci/painting-plate/mona-lisa')
+  const printPreview = records.find(e => e.id === 'vinci/painting-preview/mona-lisa')
+  assert.equal(policy.resolvePicturePolicy(work('mona-lisa'), makeIndex(records)).primary.plate.id, print.id)
+  const capture = { ...print, id: 'vinci/painting-plate/mona-lisa-choice__3203x4096', path: 'paintings/mona-lisa/mona-lisa-choice__3203x4096.jpg',
+    tier: 'TIER2', plate_id: 'mona-lisa:choice', source_url: 'https://commons.wikimedia.org/wiki/File:Choice.jpg', chosen_over: [print.id] }
+  const preview = { ...printPreview, id: 'vinci/painting-preview/mona-lisa-choice__801x1024', path: 'paintings/mona-lisa/mona-lisa-choice__801x1024.jpg',
+    tier: 'TIER2', plate_id: 'mona-lisa:choice', source_url: capture.source_url }
+  const chosen = policy.resolvePicturePolicy(work('mona-lisa'), makeIndex([...records, capture, preview]))
+  assert.equal(chosen.primary.plate.id, capture.id)
+  assert.deepEqual(Array.from(chosen.mainPlates, e => e.plate.id), [capture.id])
+  assert.deepEqual(Array.from(chosen.evidence, e => e.plate.id), [print.id])
+  assert(chosen.all.some(e => e.plate.id === print.id), 'The chosen-over plate was dropped')
+  const record = labels.createPictureRecord(work('mona-lisa'), chosen.mainPlates, chosen.evidence)
+  const kept = descendants(record).filter(node => node.dataset.evidence === 'true')
+  assert.deepEqual([...new Set(kept.map(node => node.dataset.manifestId))], [print.id])
+  const across = { ...capture, chosen_over: ['vinci/painting-plate/lady-with-an-ermine__2936x4000'] }
+  assert.throws(() => policy.resolvePicturePolicy(work('mona-lisa'), makeIndex([...records, across, preview])), /Invalid painting choice/)
+  const mutual = records.map(e => e.id === print.id ? { ...e, tier: 'TIER1', chosen_over: [capture.id] } : e)
+  assert.throws(() => policy.resolvePicturePolicy(work('mona-lisa'), makeIndex([...mutual, capture, preview])), /Invalid painting choice/)
+})
 test('Explicit records preserve the original bilingual first lines without mutating the register', () => {
   for (const w of works) {
     const element = labels.createPictureRecord(w, policy.resolvePicturePolicy(w, manifest).mainPlates)

@@ -1518,8 +1518,9 @@ export function createWing():VinciWingModule {
   }
   /** The record is opened on purpose, into the window the wing already has for
    * a source: one sources window, never a second one over the card. */
-  function showExhibitRecord(id:string,work:Parameters<typeof createPictureRecord>[0],entries:Parameters<typeof createPictureRecord>[1]):void {
-    const record=createPictureRecord(work,entries)
+  function showExhibitRecord(id:string,work:Parameters<typeof createPictureRecord>[0],entries:Parameters<typeof createPictureRecord>[1],
+    evidence:Parameters<typeof createPictureRecord>[1]=[]):void {
+    const record=createPictureRecord(work,entries,evidence)
     record.hidden=false
     exhibitSources={id,title:{en:work.title_en,de:work.title_de},
       certainty:pictureCertainty(policyLabelText(work,entries).colour),
@@ -2010,6 +2011,7 @@ export function createWing():VinciWingModule {
     if(!found)return
     const work=found.work
     const entries=sources_.filter(source=>source.work.id===entry.workId).map(source=>source.entry)
+    const evidence=sources_.filter(source=>source.work.id===entry.workId).flatMap(source=>source.evidence??[])
     const plate=entries.find(source=>source.face===entry.face)??entries[0]
     // THE PAGE'S LANGUAGE ONLY. The module writes both columns for the wall's
     // own record; the vitrine keeps the one the visitor reads.
@@ -2025,14 +2027,14 @@ export function createWing():VinciWingModule {
         if(!closeLook||!plate)return
         const seat=workRectNow()
         closeLook.open(createVinciWholePlate({id,title,line:vinciLine(id),work,entries,plate,...vinciLimits(id),
-          controls:[control(VINCI_VITRINE_WORDS.provenance,()=>showExhibitRecord(id,work,entries)),
+          controls:[control(VINCI_VITRINE_WORDS.provenance,()=>showExhibitRecord(id,work,entries,evidence)),
             control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())],
           back:()=>openExhibit(id,null),from:()=>seat,narrow:narrow(),
           tier:()=>hosts?.world.stack.tierName()??'standard'}),whole,'advance')
       })
       controls.push(whole)
     }
-    controls.push(control(VINCI_VITRINE_WORDS.provenance,()=>showExhibitRecord(id,work,entries)),shut)
+    controls.push(control(VINCI_VITRINE_WORDS.provenance,()=>showExhibitRecord(id,work,entries,evidence)),shut)
     const title=text(workTitle(work,entry.face))
     // The room cuts its plate to the source's approved display window, and
     // the payload shows the same share of the same file.
@@ -2287,7 +2289,8 @@ export function createWing():VinciWingModule {
       const sources=exhibits?.pictureSources()??[]
       if(id==='picture-room'||id==='supper-wall'){
         const works=new Map(sources.filter(({work})=>(work.id==='last-supper')===(id==='supper-wall')).map(({work})=>[work.id,work]))
-        for(const work of works.values())full.append(createPolicyWorkLabel(work,sources.filter(source=>source.work.id===work.id).map(source=>source.entry),true))
+        for(const work of works.values()){const own=sources.filter(source=>source.work.id===work.id)
+          full.append(createPolicyWorkLabel(work,own.map(source=>source.entry),true,[],false,own.flatMap(source=>source.evidence??[])))}
       }
       appendRoomExhibits(section,id);appendAbsences(section,id);foldRecord(section,full);panel.append(section)
     }
@@ -2346,7 +2349,7 @@ export function createWing():VinciWingModule {
       const works=new Map(sources.filter(({work})=>(work.id==='last-supper')===(s.id==='supper-wall')).map(({work})=>[work.id,work]))
       for(const work of works.values()){
         const entries=sources.filter(source=>source.work.id===work.id).map(source=>source.entry)
-        const label=createPolicyWorkLabel(work,entries,true)
+        const label=createPolicyWorkLabel(work,entries,true,[],false,sources.filter(source=>source.work.id===work.id).flatMap(source=>source.evidence??[]))
         setRegister(label,'record')
         for(const entry of entries){
           const complete=make('a','vinci-picture-source',lang()==='de'

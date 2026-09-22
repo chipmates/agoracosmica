@@ -208,6 +208,11 @@ export interface ResolvedPicturePlate extends DisplayPicturePlate {
 export function findPlateEntries(work: PictureWork, manifest: ManifestIndex): readonly ResolvedPicturePlate[] {
   return resolvePicturePolicy(work, manifest).mainPlates;
 }
+/** The admitted plates the hung one was chosen over: evidence for the record,
+ * never a face on the wall. */
+export function findEvidencePlates(work: PictureWork, manifest: ManifestIndex): readonly ResolvedPicturePlate[] {
+  return resolvePicturePolicy(work, manifest).evidence;
+}
 
 /** Unregistered reproduction cards are display furniture. Their dimensions
  * never substitute for the work's measured aperture in a scale report. */

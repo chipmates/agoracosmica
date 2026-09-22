@@ -43,7 +43,9 @@ function load(file){
   return exports
 }
 const pictures=load('src/wings/vinci/pictures/index.ts'),frameModule=load('src/wings/vinci/pictures/frame.ts')
-const all=JSON.parse(read('public/na-manifest.json')).assets,manifest={all,byId:new Map(all.map(e=>[e.id,e]))}
+// The signature print hangs only without the capture chosen over it, so that choice is set aside here.
+const chosen=JSON.parse(read('public/na-manifest.json')).assets.filter(e=>e.chosen_over?.length)
+const all=JSON.parse(read('public/na-manifest.json')).assets.filter(e=>!chosen.some(c=>c.work_id===e.work_id&&c.plate_id===e.plate_id)),manifest={all,byId:new Map(all.map(e=>[e.id,e]))}
 const benchSource=read('src/wings/vinci/pictures/bench/index.ts')
 const gap=Number(benchSource.match(/completeHang \? \{ gapM: ([\d.]+) \}/)?.[1]);assert.equal(gap,2)
 const config=JSON.parse(read('src/wings/vinci/pictures/bench/gi-config.json')).segments.find(r=>r.segment==='complete-hang')

@@ -8,7 +8,7 @@ import {
 } from 'three/webgpu'
 import { loadManifest, type ManifestIndex } from '../../../manifest'
 import type { Stack, TierName } from '../../../stack'
-import { findPlateEntries, getWork, reproductionCardSize, type PictureWork, type ResolvedPicturePlate } from '../pictures/register'
+import { findEvidencePlates, findPlateEntries, getWork, reproductionCardSize, type PictureWork, type ResolvedPicturePlate } from '../pictures/register'
 import { trueScale } from '../pictures/scale'
 import { pictureDisplayUV, pictureDisplayWindow } from '../pictures/registration'
 import { ARCH_MASK_MANIFEST_ID, buildArchShoulderGeometry, pictureArchMask } from '../pictures/arch-mask'
@@ -23,6 +23,8 @@ import { collectionInteriorMaterial, collectionPlateTone } from './materials'
 export interface CollectionPictureSource {
   readonly work: PictureWork
   readonly entry: ResolvedPicturePlate
+  /** The plates the hung one was chosen over, which the record keeps. */
+  readonly evidence?: readonly ResolvedPicturePlate[]
 }
 interface Placement extends CollectionPictureSource {
   readonly width: number
@@ -69,8 +71,10 @@ function placements(manifest: ManifestIndex): readonly Placement[] {
       throw new Error(`Room field disagrees with the holder's dimensions: ${work.id}`)
     const entry = findPlateEntries(work, manifest).find(source => source.face === field.face)
     if (!entry) throw new Error(`Room field has no admitted ${field.face} source: ${work.id}`)
+    const evidence = field.face === 'front' ? findEvidencePlates(work, manifest) : []
     placed.push({ work, entry, width: field.width, height: field.height,
-      position: [field.east, field.datum, -field.north], bearing: Math.PI })
+      position: [field.east, field.datum, -field.north], bearing: Math.PI,
+      ...(evidence.length ? { evidence } : {}) })
   }
   // The mural uses the same policy and the existing court wall. If its source
   // is absent, the wall's original measured outline remains untouched.
