@@ -28,9 +28,19 @@ export interface DeskStoryStop {
   certainty: VinciCertainty
 }
 
-const AGE_WORDS = (JSON.parse(cardsSource) as {
-  controls: { date: { age: VinciText; age_about: VinciText } }
-}).controls.date
+/* EVERY WORD THE CHROME DISPLAYS COMES FROM THE CARD DATA BY KEY. The keys
+   are the one home of those words; nothing here writes one. */
+const CARDS = JSON.parse(cardsSource) as {
+  controls: {
+    date: { age: VinciText; age_about: VinciText; age_near: VinciText; age_birth: VinciText }
+    [group: string]: Record<string, VinciText>
+  }
+}
+const AGE_WORDS = CARDS.controls.date
+
+export function deskControl(group: string, key: string): VinciText {
+  return CARDS.controls[group]?.[key] ?? { en: '', de: '' }
+}
 
 /** The four the museum's marks carry, from the seven the story classes in. */
 function sureness(said: VinciStoryCertainty): VinciCertainty {
@@ -42,15 +52,16 @@ function sureness(said: VinciStoryCertainty): VinciCertainty {
   }
 }
 
-/* The clock's words are the wing's, the number is the story's. A stop whose
-   clock the wing has no words for shows none: at the birth there is no age a
-   German sentence would give, and the line says the year itself. */
+/* The clock's words are the card data's, the number is the story's, and the
+   three forms the story uses each have their own key: the plain age, the
+   about, the near, and the birth, which carries no number at all. */
 function clock(said: VinciText | null): VinciText | null {
   const years = /-?\d+/.exec(said?.en ?? '')
   if (!said || !years) return null
   const value = Number(years[0])
-  if (value <= 0) return null
-  const pattern = /\babout\b|\bnear\b/.test(said.en) ? AGE_WORDS.age_about : AGE_WORDS.age
+  if (value <= 0) return AGE_WORDS.age_birth
+  const pattern = /\bnear\b/.test(said.en) ? AGE_WORDS.age_near
+    : /\babout\b/.test(said.en) ? AGE_WORDS.age_about : AGE_WORDS.age
   return {
     en: pattern.en.replace('{years}', String(value)),
     de: pattern.de.replace('{years}', String(value)),

@@ -13,7 +13,7 @@
 
 import { deskOn } from './desk-switches'
 import { setDeskBand } from './desk-stage'
-import { deskCutBetween, deskStoryStop } from './desk-story'
+import { deskControl, deskCutBetween, deskStoryStop } from './desk-story'
 import { setRegister } from './frame'
 import { LOBBY_TEXT } from '../content/lobby'
 import type { VinciCertainty, VinciText } from './vinci/content'
@@ -79,15 +79,14 @@ export interface DeskChrome {
   dispose(): void
 }
 
-/* THE WORDS THE DESIGN NEEDS AND THE WING DOES NOT CARRY YET. Verbatim from
-   the frozen design's own list; every one is in the STATUS for the text
-   owner, and none of them is invented here. */
-const DESK_WORDS: Readonly<Record<'more' | 'tell' | 'end' | 'walking' | 'faster', VinciText>> = {
-  more: { en: 'More about this place', de: 'Mehr über diesen Ort' },
-  tell: { en: 'Tell me the story', de: 'Erzähl mir die Geschichte' },
-  end: { en: 'The end', de: 'Das Ende' },
-  walking: { en: 'Walking', de: 'Unterwegs' },
-  faster: { en: 'Walk faster', de: 'Schneller gehen' },
+/* EVERY DISPLAYED WORD OF THIS CHROME IS THE CARD DATA'S, by key. Nothing
+   here is written, and a word that changes changes in one file. */
+const WORD = {
+  more: () => deskControl('shared', 'read_more'),
+  tell: () => deskControl('visit', 'tell_the_story'),
+  end: () => deskControl('walk', 'the_end'),
+  walking: () => deskControl('walk', 'walking'),
+  faster: () => deskControl('walk', 'walk_faster'),
 }
 
 const SVG = 'http://www.w3.org/2000/svg'
@@ -455,7 +454,9 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
   function paint(): void {
     const at = host.standing()
     const stop = deskStoryStop(at.id)
-    if (deskOn('freearea') && NARROW_STATIONS.includes(at.id)) host.wing.dataset['measure'] = 'narrow'
+    // WHERE THE PICTURE HAS ITS OWN BOX THE FREE AREA IS THAT BOX, so the
+    // narrow measure has nothing left to clear and the words keep one measure
+    if (!stage && deskOn('freearea') && NARROW_STATIONS.includes(at.id)) host.wing.dataset['measure'] = 'narrow'
     else delete host.wing.dataset['measure']
     // one text at a time: a drawer belongs to the place it was opened in
     openDrawer(false, on)
@@ -474,9 +475,9 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
       line.hidden = !stop
       foot.textContent = ''
       more.textContent = ''
-      more.append(document.createTextNode(say(DESK_WORDS.more)), make('span', 'desk-key', '↓'))
+      more.append(document.createTextNode(say(WORD.more())), make('span', 'desk-key', '↓'))
       tell.textContent = ''
-      tell.append(icon(PLAY), document.createTextNode(say(DESK_WORDS.tell)))
+      tell.append(icon(PLAY), document.createTextNode(say(WORD.tell())))
       foot.append(more)
       if (DESK_TELL) foot.append(tell)
       // the door stands in this row until the drawer's own foot takes it
@@ -486,7 +487,7 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
     if (ways) {
       if (DESK_THREAD) paintThread()
       const to = host.next()
-      onKicker.textContent = say(to ? host.words.next : DESK_WORDS.end)
+      onKicker.textContent = say(to ? host.words.next : WORD.end())
       onTitle.textContent = to ? say(titleOf(to.id)) : ''
       onTitle.hidden = !to
       on.setAttribute('aria-label', `${onKicker.textContent}${to ? ` · ${onTitle.textContent}` : ''}`)
@@ -552,8 +553,8 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
       /* ONE CONTROL, ONE MEANING: while a leg runs it says where the walker
          is and what a second press does, and the ring is the leg itself. */
       const to = host.next()
-      onKicker.textContent = say(running ? DESK_WORDS.walking : to ? host.words.next : DESK_WORDS.end)
-      onTitle.textContent = running ? say(DESK_WORDS.faster) : to ? say(titleOf(to.id)) : ''
+      onKicker.textContent = say(running ? WORD.walking() : to ? host.words.next : WORD.end())
+      onTitle.textContent = running ? say(WORD.faster()) : to ? say(titleOf(to.id)) : ''
       onTitle.hidden = !running && !to
       on.setAttribute('aria-label', `${onKicker.textContent}${onTitle.hidden ? '' : ` · ${onTitle.textContent}`}`)
     }
