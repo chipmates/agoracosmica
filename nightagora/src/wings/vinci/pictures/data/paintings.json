@@ -148,8 +148,8 @@
       "de_beatis": null,
       "facts": [
         {
-          "text_en": "The Uffizi record gives dimensions that conflict with those used in the concept.",
-          "text_de": "Die Maßangaben der Uffizien weichen von den Maßen im Ausstellungskonzept ab.",
+          "text_en": "The Uffizi record gives a size that differs from the one this wall hangs the panel at.",
+          "text_de": "Die Uffizien nennen ein Maß, das von dem abweicht, in dem diese Wand die Tafel zeigt.",
           "source_url": "https://www.uffizi.it/en/artworks/annunciation",
           "certainty": "documented"
         }

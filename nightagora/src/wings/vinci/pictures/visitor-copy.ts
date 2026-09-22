@@ -12,28 +12,28 @@ const NOTES: Readonly<Record<string, PictureBilingual>> = {
     de: 'Ein Gemälde aus Verrocchios Werkstatt mit einem kleinen Beitrag des jungen Leonardo. Der Umfang von Leonardos Anteil ist umstritten.',
   },
   annunciation: {
-    en: 'An early painting by Leonardo. The Uffizi’s published measurements differ from the dimensions used here.',
-    de: 'Ein frühes Gemälde Leonardos. Die veröffentlichten Maße der Uffizien weichen von den hier verwendeten Maßen ab.',
+    en: 'An early painting by Leonardo. The size this wall hangs it at differs a little from the holder’s own.',
+    de: 'Ein frühes Gemälde Leonardos. Das Maß dieser Wand weicht etwas vom Maß der Sammlung ab.',
   },
   'annunciation-predella': {
-    en: 'This small altar panel is only 16 cm high. Its attribution to Leonardo or Lorenzo di Credi remains disputed.',
-    de: 'Diese kleine Altartafel ist nur 16 cm hoch. Ihre Zuschreibung an Leonardo oder Lorenzo di Credi bleibt umstritten.',
+    en: 'This panel is a predella, a step from the foot of an altarpiece.',
+    de: 'Diese Tafel ist eine Predella, eine Stufe vom Fuß eines Altarbildes.',
   },
   'madonna-of-the-carnation': {
     en: 'An early Madonna by Leonardo, painted in oil on poplar wood.',
     de: 'Eine frühe Madonna Leonardos, in Öl auf Pappelholz gemalt.',
   },
   'ginevra-de-benci': {
-    en: 'These are the two faces of Leonardo’s small panel. The wreath belongs to the reverse of Ginevra’s portrait. The bottom of the panel was cut away at some point, and her arms and hands are believed lost with it.',
-    de: 'Dies sind die beiden Seiten von Leonardos kleiner Tafel. Der Kranz gehört zur Rückseite von Ginevras Porträt. Der untere Rand der Tafel wurde irgendwann abgeschnitten, ihre Arme und Hände gelten seither als verloren.',
+    en: 'These are the two faces of one small panel by Leonardo. The wreath belongs to the back.',
+    de: 'Das sind die beiden Seiten einer kleinen Tafel Leonardos. Der Kranz gehört zur Rückseite.',
   },
   'benois-madonna': {
-    en: 'Leonardo’s Madonna was transferred from wood to canvas. The available photograph shows the Hermitage painting.',
-    de: 'Leonardos Madonna wurde von Holz auf Leinwand übertragen. Die verfügbare Fotografie zeigt das Gemälde der Eremitage.',
+    en: 'Leonardo’s Madonna was moved from its wood panel onto canvas.',
+    de: 'Leonardos Madonna wurde von der Holztafel auf Leinwand übertragen.',
   },
   'adoration-of-the-magi': {
-    en: 'Leonardo left this painting unfinished. What hangs here is a monochrome facsimile printed in 1901, long before the Uffizi’s restoration.',
-    de: 'Leonardo ließ dieses Gemälde unvollendet. Hier hängt ein einfarbiges Faksimile, gedruckt 1901, lange vor der Restaurierung in den Uffizien.',
+    en: 'What hangs here is a black and white copy printed in 1901. The painting itself was cleaned long after that.',
+    de: 'Hier hängt eine Schwarz-Weiß-Wiedergabe von 1901. Das Gemälde selbst wurde erst lange danach gereinigt.',
   },
   'saint-jerome': {
     en: 'Leonardo left this walnut panel unfinished. The date of this photograph has not been verified.',
@@ -44,20 +44,20 @@ const NOTES: Readonly<Record<string, PictureBilingual>> = {
     de: 'Leonardos Pariser Fassung wurde von Holz auf Leinwand übertragen. Die Pariser und die Londoner Fassung sind eigenständige Gemälde.',
   },
   'virgin-of-the-rocks-london': {
-    en: 'Leonardo’s London version is a separate painting from the one in Paris. The extent of workshop participation remains debated.',
-    de: 'Leonardos Londoner Fassung ist ein eigenständiges Gemälde neben der Pariser Fassung. Der Umfang der Werkstattbeteiligung bleibt umstritten.',
+    en: 'How much of this version came from his workshop is still argued.',
+    de: 'Wie viel an dieser Fassung aus seiner Werkstatt kam, wird noch gestritten.',
   },
   'portrait-of-a-musician': {
-    en: 'Attributed to Leonardo. The torso’s authorship is debated. Removing later paint revealed the hand and its sheet of music.',
-    de: 'Leonardo zugeschrieben. Die Urheberschaft des Oberkörpers ist umstritten. Unter späteren Übermalungen kamen die Hand und das Notenblatt zum Vorschein.',
+    en: 'Attributed to Leonardo. Whether the body below the head is his is still argued.',
+    de: 'Leonardo zugeschrieben. Ob der Körper unter dem Kopf von ihm ist, wird bis heute gestritten.',
   },
   'lady-with-an-ermine': {
-    en: 'Leonardo’s portrait retains a later black repaint behind the sitter. Published measurements of the panel differ.',
-    de: 'Leonardos Porträt zeigt hinter der Dargestellten eine spätere schwarze Übermalung. Die veröffentlichten Maße der Tafel weichen voneinander ab.',
+    en: 'Published measurements of this panel differ from one another. Poland bought it with a whole private collection in 2016.',
+    de: 'Die veröffentlichten Maße dieser Tafel weichen voneinander ab. Polen kaufte sie 2016 mit einer ganzen Privatsammlung.',
   },
   'la-belle-ferronniere': {
-    en: 'A portrait by Leonardo. The Louvre regards its familiar title as mistaken. The sitter’s identity remains uncertain.',
-    de: 'Ein Porträt Leonardos. Der Louvre bezeichnet den geläufigen Titel als Irrtum. Die Identität der Dargestellten bleibt ungewiss.',
+    en: 'A portrait by Leonardo. Nobody is sure who the woman is.',
+    de: 'Ein Porträt Leonardos. Wer die Frau ist, weiß niemand sicher.',
   },
   'last-supper': {
     en: 'Leonardo painted this work on dry plaster. The photograph shows surviving paint, losses and restoration.',
@@ -72,44 +72,44 @@ const NOTES: Readonly<Record<string, PictureBilingual>> = {
     de: 'Leonardos ursprüngliches Bildfeld ist 113 cm breit. Die Holztafel wurde später auf 130 cm verbreitert, und dieser Raum zeigt das ursprüngliche Bildfeld.',
   },
   'mona-lisa': {
-    en: 'This is a historical printed reproduction, not the painting. Its publication date is uncertain, and it cannot establish the painting’s colour. The panel itself belongs to the Louvre collection.',
-    de: 'Dies ist eine historische Druckreproduktion, nicht das Gemälde. Ihr Erscheinungsdatum ist ungewiss, und sie kann die Farbigkeit des Gemäldes nicht belegen. Die Tafel selbst gehört zur Sammlung des Louvre.',
+    en: 'This is a historical printed reproduction, not the painting. Its date is uncertain, and it cannot show the painting’s colour.',
+    de: 'Dies ist eine alte Druckwiedergabe, nicht das Gemälde. Ihr Datum ist ungewiss, und die Farben zeigt sie nicht.',
   },
   'saint-john-the-baptist': {
     en: 'A late painting by Leonardo on walnut. The photograph was taken at the Louvre Abu Dhabi.',
     de: 'Ein spätes Gemälde Leonardos auf Nussbaumholz. Die Fotografie entstand im Louvre Abu Dhabi.',
   },
   bacchus: {
-    en: 'A painting from Leonardo’s workshop, also associated with Francesco Melzi. The figure was later changed from Saint John into Bacchus.',
-    de: 'Ein Gemälde aus Leonardos Werkstatt, auch mit Francesco Melzi verbunden. Die Figur wurde später von Johannes dem Täufer zu Bacchus verändert.',
+    en: 'A painting from Leonardo’s workshop, also linked with Francesco Melzi.',
+    de: 'Ein Gemälde aus Leonardos Werkstatt, auch mit Francesco Melzi verbunden.',
   },
   'la-scapigliata': {
     en: 'An unfinished head attributed to Leonardo. It is painted in umber and lead white on poplar.',
     de: 'Ein unvollendeter Kopf, Leonardo zugeschrieben. Er ist mit Umbra und Bleiweiß auf Pappelholz gemalt.',
   },
   'madonna-litta': {
-    en: 'The Hermitage names Leonardo. Boltraffio and Marco d’Oggiono have also been proposed. The attribution remains disputed.',
-    de: 'Die Eremitage nennt Leonardo. Auch Boltraffio und Marco d’Oggiono wurden vorgeschlagen. Die Zuschreibung bleibt umstritten.',
+    en: 'The Hermitage names Leonardo. Boltraffio and Marco d’Oggiono have been proposed too.',
+    de: 'Die Eremitage nennt Leonardo. Auch Boltraffio und Marco d’Oggiono wurden vorgeschlagen.',
   },
   'salvator-mundi': {
     en: 'The attribution to Leonardo remains disputed. Extensive restoration shapes the surviving painting. Its present location is unconfirmed.',
     de: 'Die Zuschreibung an Leonardo bleibt umstritten. Umfangreiche Restaurierungen prägen das erhaltene Gemälde. Sein heutiger Aufenthaltsort ist unbestätigt.',
   },
   'yarnwinder-buccleuch': {
-    en: 'Leonardo and his workshop made this version of the Madonna with a yarnwinder. The painting was stolen and later recovered.',
-    de: 'Leonardo und seine Werkstatt schufen diese Fassung der Madonna mit der Spindel. Das Gemälde wurde gestohlen und später wiedergefunden.',
+    en: 'A yarnwinder is the tool a spinner winds thread on. Two versions of this picture hang here.',
+    de: 'Eine Spindel ist das Gerät, auf das ein Spinner Garn wickelt. Zwei Fassungen hängen hier.',
   },
   'yarnwinder-lansdowne': {
-    en: 'The Met attributes this version to Leonardo and his workshop. The paint was transferred from walnut to another support.',
-    de: 'Das Metropolitan Museum schreibt diese Fassung Leonardo und seiner Werkstatt zu. Die Malerei wurde von Nussbaumholz auf einen anderen Bildträger übertragen.',
+    en: 'The paint was moved off its walnut panel onto another support.',
+    de: 'Die Malerei wurde vom Nussbaumholz auf einen anderen Träger übertragen.',
   },
   'burlington-house-cartoon': {
     en: 'Leonardo’s large drawing joins eight sheets of paper mounted on canvas.',
     de: 'Leonardos große Zeichnung besteht aus acht zusammengefügten Papierblättern auf Leinwand.',
   },
   'anghiari-copy': {
-    en: 'A later Italian copy preserves Leonardo’s lost battle scene. It was reworked, perhaps by Rubens, and enlarged with added paper strips.',
-    de: 'Eine spätere italienische Kopie bewahrt Leonardos verlorene Schlachtenszene. Sie wurde überarbeitet, möglicherweise von Rubens, und durch angesetzte Papierstreifen vergrößert.',
+    en: 'Four strips of paper were added round the sheet to make it bigger.',
+    de: 'Vier Papierstreifen wurden rundum angesetzt, um das Blatt zu vergrößern.',
   },
   'tavola-doria': {
     en: 'This copy preserves the central struggle in Leonardo’s lost Battle of Anghiari. Its maker and date remain uncertain.',
