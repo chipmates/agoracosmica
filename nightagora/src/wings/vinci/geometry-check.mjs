@@ -21,7 +21,8 @@ const SHELL_CLEARANCE = .25, TERRAIN_CLEARANCE = .3;
 // step is chosen so the spacing stays near two centimetres at that pace.
 // The longest leg the rail walks is capped at the gait's own ceiling, and
 // this window has to outlast it or the checker stops watching mid-walk.
-const STEP_SECONDS = 1 / 60, TRANSITION_SECONDS = 30;
+// A leg is watched until it lands: a calm leg that turns far is slowed past half a minute.
+const STEP_SECONDS = 1 / 60, TRANSITION_SECONDS = 30, TRANSITION_CEILING_SECONDS = 120;
 const errors = [], notes = [], loaded = new Map(), modules = new Map();
 const report = {
   checker: 'vinci-offline-geometry', replacesEyes: false,
@@ -407,7 +408,7 @@ await section('actual camera rail against actual triangles', async () => {
       let lastTested = null, pathGrade = Infinity, pathMesh = Infinity, pathShell = SHELL_CLEARANCE, pathStep = 0, pathRoll = 0, tested = 0;
       const steps = beat ? Math.ceil(TRANSITION_SECONDS / STEP_SECONDS) : 1;
       let arrived = false;
-      for (let sample = 0; sample <= steps && !arrived; sample++) {
+      for (let sample = 0; (sample <= steps || (beat && rail.navigation.active && sample * STEP_SECONDS < TRANSITION_CEILING_SECONDS)) && !arrived; sample++) {
         clock = startTime + sample * STEP_SECONDS;
         rail.update(); totalSamples++;
         // the whole leg is walked, and nothing past its arrival is sampled
