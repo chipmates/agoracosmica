@@ -255,9 +255,11 @@ test('A per-work choice hangs its plate and keeps the chosen-over plate as evide
   const print = records.find(e => e.id === 'vinci/painting-plate/mona-lisa')
   const printPreview = records.find(e => e.id === 'vinci/painting-preview/mona-lisa')
   assert.equal(policy.resolvePicturePolicy(work('mona-lisa'), makeIndex(records)).primary.plate.id, print.id)
-  const capture = { ...print, id: 'vinci/painting-plate/mona-lisa-choice__3203x4096', path: 'paintings/mona-lisa/mona-lisa-choice__3203x4096.jpg',
-    tier: 'TIER2', plate_id: 'mona-lisa:choice', source_url: 'https://commons.wikimedia.org/wiki/File:Choice.jpg', chosen_over: [print.id] }
-  const preview = { ...printPreview, id: 'vinci/painting-preview/mona-lisa-choice__801x1024', path: 'paintings/mona-lisa/mona-lisa-choice__801x1024.jpg',
+  // A second face of the same work, named off the print's own record.
+  const choice = path => path.replace('/mona-lisa__', '/mona-lisa-choice__')
+  const capture = { ...print, id: 'vinci/painting-plate/mona-lisa-choice__3203x4096', path: choice(print.path),
+    tier: 'TIER2', plate_id: 'mona-lisa:choice', source_url: `${print.source_url}#choice`, chosen_over: [print.id] }
+  const preview = { ...printPreview, id: 'vinci/painting-preview/mona-lisa-choice__801x1024', path: choice(printPreview.path),
     tier: 'TIER2', plate_id: 'mona-lisa:choice', source_url: capture.source_url }
   const chosen = policy.resolvePicturePolicy(work('mona-lisa'), makeIndex([...records, capture, preview]))
   assert.equal(chosen.primary.plate.id, capture.id)
