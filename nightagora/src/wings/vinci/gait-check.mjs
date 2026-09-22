@@ -55,9 +55,11 @@ ensure(gaitPace() === 'walk' && gaitMetresPerSecond() === 2.4, 'The walk a visit
 for (const [name, speed] of Object.entries(GAIT_PACES)) {
   setGaitPace(name)
   ensure(gaitLeg(speed * 25).rhythm === 1, `The ${name} cruise loses its step rhythm`)
-  ensure(Math.abs(gaitLeg(speed * 26.171875).rhythm - .5) < 1e-9, `The ${name} rhythm does not fade over its own band`)
+  // A traverse eases in proportion to its cruise, so the middle of the band
+  // reads a little under half; it has to be neither walked nor traversed.
+  ensure(gaitLeg(speed * 26.171875).rhythm > .3 && gaitLeg(speed * 26.171875).rhythm < .7, `The ${name} rhythm does not fade over its own band`)
   ensure(gaitLeg(speed * 27.34375).rhythm === 0, `A traverse past the ${name} band still carries a step rhythm`)
-  ensure(gaitLeg(0).seconds === 1.1 && gaitLeg(1000).seconds === 26, 'The walking duration limits changed')
+  ensure(gaitLeg(0).seconds === 2.2 && gaitLeg(1000).seconds === 27.2, 'The walking duration limits changed')
 }
 setGaitPace('walk')
 
@@ -148,8 +150,10 @@ function walkTrace(metres, reduced) {
   rail.update()
   rail.set('courtyard', to, false, false)
   const leg = gaitLeg(metres), samples = []
+  rail.update()
+  const seconds = rail.navigation.legSeconds
   for (let i = 0; i <= 1200; i++) {
-    now = leg.seconds * i / 1200
+    now = seconds * i / 1200
     rail.update()
     samples.push({ seconds: now, east: camera.position.x, height: camera.position.y, north: -camera.position.z })
   }
@@ -162,7 +166,7 @@ function walkTrace(metres, reduced) {
     metres, reducedMotion: reduced,
     heightAmplitudeMM: +(Math.max(...height.map(Math.abs)) * 1000).toFixed(2),
     swayAmplitudeMM: +(Math.max(...sway.map(Math.abs)) * 1000).toFixed(2),
-    riseAndFallPerSecond: +(crossings / 2 / leg.seconds).toFixed(2),
+    riseAndFallPerSecond: +(crossings / 2 / seconds).toFixed(2),
     endHeightErrorMM: +(Math.abs(height.at(-1)) * 1000).toFixed(6),
     endEastErrorMM: +(Math.abs(samples.at(-1).east - (base.x + metres)) * 1000).toFixed(6),
   }
@@ -172,9 +176,9 @@ ensure(traces[0].heightAmplitudeMM > 6 && traces[0].heightAmplitudeMM < 10, 'The
 // THE CADENCE FOLLOWS THE PACE, it is not set: the measured rise and fall of
 // the trace is the leg's own cadence, whichever pace the visitor walks at.
 const walkedCadence = gaitLeg(17.369497651827334).cadenceStepsPerSecond
-// The trace carries the two ramps as well as the cruise, so it runs a tenth
+// The trace carries the two eases as well as the cruise, so it runs about a fifth
 // under the cruise cadence and may not run over it.
-ensure(traces[0].riseAndFallPerSecond > walkedCadence * .85 && traces[0].riseAndFallPerSecond <= walkedCadence + 1e-9,
+ensure(traces[0].riseAndFallPerSecond > walkedCadence * .7 && traces[0].riseAndFallPerSecond <= walkedCadence + 1e-9,
   `The measured cadence ${traces[0].riseAndFallPerSecond} is not the leg's own ${walkedCadence.toFixed(2)}`)
 ensure(traces[1].heightAmplitudeMM === 0 && traces[1].swayAmplitudeMM === 0, 'Reduced motion still carries a step rhythm on the camera')
 ensure(traces.every(trace => trace.endHeightErrorMM < 1e-6 && trace.endEastErrorMM < 1e-6), 'A walk does not land on its own certified eye')

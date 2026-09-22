@@ -29,14 +29,16 @@ export function setGaitPace(next: GaitPaceName): void {
   pace = next
   try { localStorage.setItem(PACE_KEY, next) } catch { /* a refused store forgets */ }
 }
-/** Getting under way and stopping. A walker reaches a stroll in about a
- * second and gives the stop a little longer, because a stop is a choice. */
-const ACCEL_SECONDS = .9, BRAKE_SECONDS = 1.1
+/** Getting under way and stopping, eased as a dolly is: at the walk's own
+ * pace the start stays under 1.8 m/s² and the stop under 1.5, where a lurch
+ * reads in the film. The stop is the longer, because a stop is a choice. */
+const ACCEL_SECONDS = 2, BRAKE_SECONDS = 2.4
 /** A leg never cuts, and a mark on the far side of the museum is a traverse
  * rather than a claim about anyone's pace: past the ceiling the cruise rises.
  * The ceiling is what lets the longest room in the insertion still be walked
- * at a stroll: forty metres is the longest leg that keeps one. */
-const MIN_SECONDS = 1.1, MAX_SECONDS = 26
+ * at a stroll: forty metres is the longest leg that keeps one. A leg whose
+ * turning asks for longer (`rail-gaze.ts`) is slowed past it. */
+const MIN_SECONDS = 1.1, MAX_SECONDS = 27.2
 /** One step at this pace. The cadence follows from the speed, it is not set. */
 export const stepMetres = .68
 /** The rhythm a walker feels in the eye and never notices: 18 mm of rise and
@@ -75,15 +77,20 @@ export interface GaitLeg {
   rhythm: number
 }
 
-/** The timing of one leg, from its length alone. */
-export function gaitLeg(lengthM: number): GaitLeg {
+/** The timing of one leg, from its length, and at least the seconds its
+ * turning asks for. */
+export function gaitLeg(lengthM: number, atLeastSeconds = 0): GaitLeg {
   const length = Math.max(0, Number.isFinite(lengthM) ? lengthM : 0)
   const walk = gaitMetresPerSecond()
   const full = walk, none = walk * RHYTHM_NONE_SHARE
   const ramps = ACCEL_SECONDS + BRAKE_SECONDS
-  const seconds = Math.max(MIN_SECONDS, Math.min(MAX_SECONDS, ramps / 2 + length / walk))
+  const seconds = Math.max(MIN_SECONDS, Math.min(MAX_SECONDS, ramps / 2 + length / walk),
+    Number.isFinite(atLeastSeconds) ? atLeastSeconds : 0)
   // A leg too short for both ramps keeps their proportion and loses its cruise.
-  const scale = Math.min(1, seconds / ramps)
+  // A traverse past the ceiling cruises faster, so it eases in proportion.
+  const shortScale = Math.min(1, seconds / ramps)
+  const traverse = Math.max(1, length / (seconds - ramps * shortScale / 2) / walk)
+  const scale = Math.min(seconds / ramps, shortScale * traverse)
   const accelSeconds = ACCEL_SECONDS * scale, brakeSeconds = BRAKE_SECONDS * scale
   const cruiseMetresPerSecond = length / (seconds - (accelSeconds + brakeSeconds) / 2)
   return {
@@ -101,6 +108,20 @@ export function gaitAt(leg: GaitLeg, seconds: number): { metres: number; metresP
   if (t <= total - brake) return { metres: cruise * (accel / 2 + (t - accel)), metresPerSecond: cruise }
   const u = brake > 0 ? (total - t) / brake : 0
   return { metres: lengthM - cruise * brake * shapeArea(u), metresPerSecond: cruise * shape(u) }
+}
+
+/** When the body reaches a distance along the leg: the inverse of `gaitAt`,
+ * which only ever walks forward. A stride taken by hand runs the body ahead
+ * of the leg's clock, and the view is read where the body is. */
+export function gaitSecondsAt(leg: GaitLeg, metres: number): number {
+  if (!(metres > 0)) return 0
+  if (metres >= leg.lengthM) return leg.seconds
+  let low = 0, high = leg.seconds
+  for (let i = 0; i < 48 && high - low > 1e-9; i++) {
+    const mid = (low + high) / 2
+    if (gaitAt(leg, mid).metres < metres) low = mid; else high = mid
+  }
+  return (low + high) / 2
 }
 
 /** The step rhythm at one point along the leg: a rise and fall at the step
