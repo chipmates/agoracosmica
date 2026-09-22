@@ -403,10 +403,11 @@ export function createVinciExhibitDots(options: {
     dot.addEventListener('click', () => {
       const id = pressed.get(dot)
       if (!id) return
-      if (dot.dataset['mark'] !== 'walk' || forge()) { onOpen(id, dot); return }
+      if (dot.dataset['mark'] === 'walk') answer(dot)
       // the answer is painted first, then the walk is asked for: two frames
-      // at 60 Hz, which is inside the tenth of a second the mark owes
-      answer(dot)
+      // at 60 Hz, which is inside the tenth of a second the mark owes. A rig
+      // composes one moment at a time, so there it opens in the same tick.
+      if (dot.dataset['mark'] !== 'walk' || forge()) { onOpen(id, dot); return }
       view.requestAnimationFrame(() => view.requestAnimationFrame(() => onOpen(id, dot)))
     })
     dot.addEventListener('pointerenter', () => nameMark(dot))
