@@ -240,10 +240,12 @@ export const railMoveDurationSeconds = 20
  * and turns into the new composition over the last third. The look-ahead is
  * what keeps a corner from filling the frame: the eye is already round it
  * while the body is still passing the jamb. */
-/** A leg shorter than this is one step of a walk, not a walk: the visitor is
- * already looking at what they are arriving at, and leading the gaze down a
- * six-metre path only turns it into the wall the path runs at. */
-const GAZE_LEAVES = .16, GAZE_ARRIVES = .66, GAZE_AHEAD_M = 6, WALKED_LEG_M = 10
+/** A leg this short is one step, not a walk: there is no way to lead a gaze
+ * down and the visitor is already looking at what they are arriving at. Above
+ * it every leg leads its own way, because a gaze that swings from the eye it
+ * leaves to the eye it arrives at crosses whatever stands between them, and
+ * what stands between two rooms is a wall. */
+const GAZE_LEAVES = .16, GAZE_ARRIVES = .66, GAZE_AHEAD_M = 6, WALKED_LEG_M = 3
 /** How far the line of sight may stand off the way it leads down, how short
  * the lead may be pulled, and in what steps. Half a metre is inside the
  * envelope the certificate proves around the path, so a chord that holds it
