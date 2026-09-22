@@ -10,8 +10,8 @@
   },
   "lines": {
     "picture/baptism-of-christ/front": {
-      "en": "Vasari's story, which the Uffizi still repeats, has the young Leonardo painting the angel at the left so well that his master Verrocchio was upset by it.",
-      "de": "Vasaris Geschichte, die die Uffizien bis heute wiedergeben, lässt den jungen Leonardo den Engel links so gut malen, dass sein Lehrer Verrocchio darüber verstimmt war.",
+      "en": "The story goes that the angel at the left upset his master. The panel is by them both.",
+      "de": "Der Engel links soll den Meister verstimmt haben. Die Tafel stammt von beiden.",
       "source": "MINING-CATALOG-PAINTINGS, the Baptism of Christ, label fact from the holder's own entry",
       "certainty": "tradition",
       "detail": {
@@ -24,14 +24,14 @@
       }
     },
     "picture/annunciation/front": {
-      "en": "The panel came to the Uffizi in 1867 catalogued as a Ghirlandaio. It was given to Leonardo two years later.",
-      "de": "Die Tafel kam 1867 als Ghirlandaio in die Uffizien. Zwei Jahre später wurde sie Leonardo zugeschrieben.",
+      "en": "It reached the Uffizi in 1867 as a Ghirlandaio. Two years later it became his.",
+      "de": "1867 kam sie als Ghirlandaio in die Uffizien. Zwei Jahre später galt sie als seine.",
       "source": "MINING-CATALOG-PAINTINGS, the Annunciation, provenance",
       "certainty": "documented"
     },
     "picture/ginevra-de-benci/front": {
-      "en": "The bottom of the panel was cut away at some point, and her arms and hands are believed lost with it.",
-      "de": "Der untere Rand der Tafel wurde irgendwann abgeschnitten, ihre Arme und Hände gelten seitdem als verloren.",
+      "en": "Someone cut the bottom off this panel. Her arms and hands probably went with it.",
+      "de": "Jemand hat den unteren Rand abgeschnitten. Arme und Hände gingen wohl mit.",
       "source": "MINING-CATALOG-PAINTINGS, Ginevra de' Benci, condition",
       "certainty": "documented",
       "detail": {
@@ -44,8 +44,8 @@
       }
     },
     "picture/ginevra-de-benci/reverse": {
-      "en": "The back of the same panel carries a juniper sprig in a wreath of laurel and palm, with the scroll VIRTVTEM FORMA DECORAT.",
-      "de": "Die Rückseite derselben Tafel trägt einen Wacholderzweig in einem Kranz aus Lorbeer und Palme, dazu das Schriftband VIRTVTEM FORMA DECORAT.",
+      "en": "This side carries a juniper sprig and the words VIRTVTEM FORMA DECORAT.",
+      "de": "Diese Seite trägt einen Wacholderzweig und die Worte VIRTVTEM FORMA DECORAT.",
       "source": "MINING-CATALOG-PAINTINGS, Ginevra de' Benci, reverse",
       "certainty": "documented",
       "detail": {
@@ -58,20 +58,20 @@
       }
     },
     "picture/madonna-of-the-carnation/front": {
-      "en": "This is the one painting in the room whose German name comes from the museum that owns it, Madonna mit der Nelke.",
-      "de": "Das ist das einzige Bild im Raum, dessen deutscher Name vom besitzenden Museum selbst stammt, Madonna mit der Nelke.",
+      "en": "Madonna mit der Nelke is what the museum that owns it calls this picture.",
+      "de": "Madonna mit der Nelke nennt sie das Museum, dem sie gehört.",
       "source": "MINING-CATALOG-PAINTINGS, Madonna of the Carnation, label fact; the holder's own record",
       "certainty": "documented"
     },
     "picture/benois-madonna/front": {
-      "en": "The Hermitage bought it from the Benois family in 1914 and went on paying the instalments after the revolution of 1917.",
-      "de": "Die Eremitage kaufte sie 1914 von der Familie Benois und zahlte die Raten auch nach der Revolution von 1917 weiter.",
+      "en": "The Hermitage bought it in 1914, by instalments. It kept paying through the revolution.",
+      "de": "Die Eremitage kaufte sie 1914 auf Raten. Auch durch die Revolution zahlte sie weiter.",
       "source": "MINING-CATALOG-PAINTINGS, Benois Madonna, label fact",
       "certainty": "documented"
     },
     "picture/saint-jerome/front": {
-      "en": "A dealer cut the panel up so that the head could be sold on its own. Head and body were bought back separately and rejoined.",
-      "de": "Ein Händler zersägte die Tafel, damit der Kopf einzeln verkauft werden konnte. Kopf und Körper wurden getrennt zurückgekauft und wieder zusammengefügt.",
+      "en": "A dealer sawed this panel up to sell the head alone. The pieces were joined again.",
+      "de": "Ein Händler zersägte die Tafel, um den Kopf zu verkaufen. Die Teile kamen zurück.",
       "source": "MINING-CATALOG-PAINTINGS, Saint Jerome in the Wilderness, label fact",
       "certainty": "documented",
       "detail": {
@@ -84,26 +84,26 @@
       }
     },
     "picture/adoration-of-the-magi/front": {
-      "en": "He left it unfinished in 1482 when he went to Milan, and the Uffizi still records its medium as a drawing in charcoal, ink and oil on wood.",
-      "de": "Er ließ sie 1482 unvollendet zurück, als er nach Mailand ging, und die Uffizien verzeichnen das Material bis heute als Zeichnung in Kohle, Tinte und Öl auf Holz.",
+      "en": "He left it unfinished in 1482 and went to Milan. The charcoal drawing is still visible.",
+      "de": "1482 ließ er sie unvollendet und ging nach Mailand. Die Kohlezeichnung ist sichtbar.",
       "source": "MINING-CATALOG-PAINTINGS, Adoration of the Magi, commission and the holder's record",
       "certainty": "documented"
     },
     "picture/annunciation-predella/front": {
-      "en": "This altar step is sixteen centimetres high, and who painted it, Leonardo or Lorenzo di Credi, is still argued.",
-      "de": "Diese Predella ist sechzehn Zentimeter hoch, und wer sie gemalt hat, Leonardo oder Lorenzo di Credi, ist bis heute strittig.",
+      "en": "This altar step is sixteen centimetres high. Whose hand painted it is still argued.",
+      "de": "Die Tafel unter dem Altarbild ist sechzehn Zentimeter hoch. Wer sie malte, ist strittig.",
       "source": "MINING-CATALOG-PAINTINGS, the predella panel, holder's record and attribution",
       "certainty": "documented"
     },
     "picture/virgin-of-the-rocks-louvre/front": {
-      "en": "The confraternity contracted it on 25 April 1483 and wanted it delivered on 8 December of the same year.",
-      "de": "Die Bruderschaft gab es am 25. April 1483 in Auftrag und wollte es am 8. Dezember desselben Jahres geliefert haben.",
+      "en": "A brotherhood ordered it in April 1483 and wanted it by that December.",
+      "de": "Eine Bruderschaft bestellte es im April 1483 und wollte es im Dezember haben.",
       "source": "MINING-CATALOG-PAINTINGS, Virgin of the Rocks, Louvre version, commission",
       "certainty": "documented"
     },
     "picture/portrait-of-a-musician/front": {
-      "en": "A cleaning in 1904 took off later paint and uncovered the hand with its sheet of music. Until then the sitter was taken for the duke of Milan.",
-      "de": "Eine Reinigung von 1904 entfernte spätere Farbe und legte die Hand mit dem Notenblatt frei. Bis dahin galt der Dargestellte als der Herzog von Mailand.",
+      "en": "A cleaning in 1904 uncovered the hand and its music. He had been taken for a duke.",
+      "de": "Eine Reinigung legte 1904 die Hand mit dem Notenblatt frei. Zuvor galt er als Herzog.",
       "source": "MINING-CATALOG-PAINTINGS, Portrait of a Musician, label fact",
       "certainty": "documented",
       "detail": {
@@ -116,8 +116,8 @@
       }
     },
     "picture/lady-with-an-ermine/front": {
-      "en": "The black behind her is not Leonardo's. Someone repainted the background in the eighteenth century, over a bluish grey.",
-      "de": "Das Schwarz hinter ihr stammt nicht von Leonardo. Jemand übermalte den Hintergrund im 18. Jahrhundert, über einem bläulichen Grau.",
+      "en": "The black behind her is not his. It went on in the 1700s, over a bluish grey.",
+      "de": "Das Schwarz hinter ihr ist nicht von ihm. Es kam im 18. Jahrhundert über ein Blaugrau.",
       "source": "MINING-CATALOG-PAINTINGS, Lady with an Ermine, condition",
       "certainty": "documented",
       "detail": {
@@ -130,38 +130,38 @@
       }
     },
     "picture/la-belle-ferronniere/front": {
-      "en": "The Louvre's own title calls the familiar name a mistake: portrait of a woman, wrongly called La Belle Ferronniere.",
-      "de": "Der Louvre nennt den geläufigen Namen im eigenen Titel einen Irrtum: Bildnis einer Frau, fälschlich La Belle Ferronnière genannt.",
+      "en": "The Louvre's own title calls the name La Belle Ferronniere a mistake.",
+      "de": "Der Louvre nennt den Namen La Belle Ferronnière im eigenen Titel einen Irrtum.",
       "source": "MINING-CATALOG-PAINTINGS, La Belle Ferronniere, the holder's title",
       "certainty": "documented"
     },
     "picture/madonna-litta/front": {
-      "en": "It carries the name of the Milanese count who sold it to the tsar in 1865, and several scholars give the painting to Boltraffio rather than to Leonardo.",
-      "de": "Sie trägt den Namen des Mailänder Grafen, der sie 1865 an den Zaren verkaufte, und mehrere Fachleute schreiben das Bild eher Boltraffio zu als Leonardo.",
+      "en": "The count who sold it in 1865 gave it its name. Whether it is his is argued.",
+      "de": "Den Namen gab ihr der Graf, der sie 1865 verkaufte. Ob sie von ihm stammt, ist strittig.",
       "source": "MINING-CATALOG-PAINTINGS, Madonna Litta, label fact and attribution",
       "certainty": "documented"
     },
     "picture/burlington-house-cartoon/front": {
-      "en": "In 1987 a man fired a shotgun at it from about seven feet. The glass took most of it, and the sheet has since been restored.",
-      "de": "1987 schoss ein Mann aus gut zwei Metern mit einer Flinte darauf. Das Glas fing das meiste ab, und das Blatt ist seither restauriert.",
+      "en": "In 1987 someone fired a shotgun at it. The glass took the blast, and it was restored.",
+      "de": "1987 schoss jemand mit einer Flinte darauf. Das Glas hielt es ab, es ist restauriert.",
       "source": "MINING-CATALOG-PAINTINGS, the Burlington House Cartoon, second label fact",
       "certainty": "documented"
     },
     "picture/yarnwinder-buccleuch/front": {
-      "en": "Stolen from a Scottish castle in 2003 and found again in Glasgow four years later. The thieves were never caught.",
-      "de": "2003 aus einem schottischen Schloss gestohlen und vier Jahre später in Glasgow wiedergefunden. Die Diebe wurden nie gefasst.",
+      "en": "Thieves took it from a Scottish castle in 2003. Nobody ever caught them.",
+      "de": "Diebe holten sie 2003 aus einem schottischen Schloss. Gefasst wurde nie jemand.",
       "source": "MINING-CATALOG-PAINTINGS, Madonna of the Yarnwinder, Buccleuch version, label fact",
       "certainty": "documented"
     },
     "picture/yarnwinder-lansdowne/front": {
-      "en": "The two yarnwinders in this room are not copies of one another. Both carry the same underdrawing, so both came out of his workshop.",
-      "de": "Die beiden Garnhaspel-Bilder in diesem Raum sind keine Kopien voneinander. Beide tragen dieselbe Unterzeichnung, beide kamen aus seiner Werkstatt.",
+      "en": "The same drawing lies under both of them. Both came out of his workshop.",
+      "de": "Unter beiden liegt dieselbe Zeichnung. Beide kamen aus seiner Werkstatt.",
       "source": "MINING-CATALOG-PAINTINGS, Madonna of the Yarnwinder, Lansdowne version, attribution",
       "certainty": "documented"
     },
     "picture/anghiari-copy/front": {
-      "en": "The mural is lost. This sheet is a sixteenth century copy of the cartoon, worked over later by several hands, one of them Rubens.",
-      "de": "Das Wandbild ist verloren. Dieses Blatt ist eine Kopie des Kartons aus dem 16. Jahrhundert, später von mehreren Händen überarbeitet, eine davon Rubens.",
+      "en": "The wall painting is lost. This sheet is a copy, worked over by several later hands.",
+      "de": "Das Wandbild ist verloren. Dieses Blatt ist eine Kopie, später von mehreren überarbeitet.",
       "source": "MINING-CATALOG-PAINTINGS, the Battle of Anghiari, the holder's reading of the sheet",
       "certainty": "documented"
     },
@@ -172,44 +172,44 @@
       "certainty": "documented"
     },
     "picture/virgin-of-the-rocks-london/front": {
-      "en": "There are two versions of this picture, one in Paris and this one in London. As far as the record goes, they first stood side by side in 2011.",
-      "de": "Von diesem Bild gibt es zwei Fassungen, eine in Paris und diese in London. Soweit bekannt, standen sie 2011 zum ersten Mal nebeneinander.",
+      "en": "The other one hangs in Paris. They probably first stood side by side in 2011.",
+      "de": "Die andere Fassung hängt in Paris. 2011 standen sie wohl erstmals nebeneinander.",
       "source": "MINING-CATALOG-PAINTINGS, Virgin of the Rocks, National Gallery version, label fact",
       "certainty": "documented"
     },
     "picture/virgin-and-child-with-st-anne/front": {
-      "en": "Two members of the advisory committee resigned over the cleaning of 2010 to 2012. They held that the picture had been made brighter than the painter wanted it.",
-      "de": "Zwei Mitglieder des Beratergremiums traten wegen der Reinigung von 2010 bis 2012 zurück. Sie hielten das Bild danach für heller, als der Maler es wollte.",
+      "en": "Two advisers resigned over the cleaning. They said it had been made too bright.",
+      "de": "Zwei Berater traten wegen der Reinigung zurück. Sie sei zu hell geworden, sagten sie.",
       "source": "MINING-CATALOG-PAINTINGS, The Virgin and Child with Saint Anne, condition",
       "certainty": "documented"
     },
     "picture/salvator-mundi/front": {
-      "en": "Bought at a New Orleans auction in 2005 for 1,175 dollars and sold in New York in 2017 for 450 million with the fees.",
-      "de": "2005 bei einer Auktion in New Orleans für 1175 Dollar gekauft und 2017 in New York für 450 Millionen mit Aufgeld verkauft.",
+      "en": "In 2005 it sold for 1,175 dollars. In 2017 it made 450 million.",
+      "de": "2005 kostete es 1175 Dollar. 2017 brachte es 450 Millionen.",
       "source": "MINING-CATALOG-PAINTINGS, Salvator Mundi, sale",
       "certainty": "documented"
     },
     "picture/saint-john-the-baptist/front": {
-      "en": "A visitor wrote on 10 October 1517 that he was shown a young Saint John the Baptist in this house. Whether he meant this panel is not established.",
-      "de": "Ein Besucher hielt am 10. Oktober 1517 fest, dass man ihm in diesem Haus einen jungen Johannes den Täufer zeigte. Ob er diese Tafel meinte, ist nicht gesichert.",
+      "en": "A visitor saw a young Saint John in this house in 1517. Nobody knows if it was this one.",
+      "de": "1517 sah ein Besucher hier einen jungen Johannes. Ob es dieser war, weiß niemand.",
       "source": "pictures/data/paintings.json, saint-john-the-baptist, the de Beatis entry with its inferred identification",
       "certainty": "conjectural"
     },
     "picture/la-scapigliata/front": {
-      "en": "An inventory of 1627 lists it as the head of a dishevelled woman by Leonardo da Vinci. It is the smallest panel of the group attributed to him.",
-      "de": "Ein Inventar von 1627 führt sie als Kopf einer zerzausten Frau von Leonardo da Vinci. Sie ist die kleinste Tafel der ihm zugeschriebenen Gruppe.",
+      "en": "An inventory of 1627 calls it a dishevelled woman's head. It is the smallest of them.",
+      "de": "Ein Inventar von 1627 nennt sie den Kopf einer zerzausten Frau. Sie ist die kleinste.",
       "source": "MINING-CATALOG-PAINTINGS, La Scapigliata, label fact and dimensions",
       "certainty": "documented"
     },
     "picture/bacchus/front": {
-      "en": "It left the workshop as a Saint John. Between 1683 and 1693 someone repainted it into a Bacchus, and the inventory title changed with it.",
-      "de": "Es verließ die Werkstatt als Johannes der Täufer. Zwischen 1683 und 1693 malte es jemand zu einem Bacchus um, und der Inventartitel änderte sich mit.",
+      "en": "It left the workshop as a Saint John. Someone later painted it into a Bacchus.",
+      "de": "Es verließ die Werkstatt als Johannes. Später malte es jemand zu einem Bacchus um.",
       "source": "MINING-CATALOG-PAINTINGS, Bacchus, label fact",
       "certainty": "documented"
     },
     "picture/last-supper/front": {
-      "en": "In the seventeenth century a door was cut through the bottom of the wall. It took the feet of Christ with it.",
-      "de": "Im 17. Jahrhundert brach man eine Tür durch den unteren Teil der Wand. Sie nahm die Füße von Christus mit.",
+      "en": "Someone cut a door through the bottom of this wall. It took the feet of Christ.",
+      "de": "Jemand brach unten eine Tür durch diese Wand. Sie nahm die Füße von Christus mit.",
       "source": "MINING-CATALOG-PAINTINGS, the Last Supper's wall, room history",
       "certainty": "documented",
       "detail": {
