@@ -289,6 +289,12 @@ body:has(dialog[open]) #wing[data-desk~='closelook'] .desk-clb {
   max-width: 760px;
   font: 400 1rem/1.45 var(--serif);
 }
+/* ---- THE WORDMARK LEAVES THE WING ----
+   Nothing of the museum stands on the picture at rest. The museum's name is
+   the front door's, so it stays in the lobby and the page's own title carries
+   it inside a wing. */
+:root:has(#wing[data-desk~='closelook']:not([hidden])) .brand { visibility: hidden; }
+
 /* A PAGE IS READ WHOLE. Its strip of sides is the count in the name row now,
    and its own row of versions stands in the band, so the leaf keeps the box.
    The viewer's own ground goes with them: on a stage of its own the leaf
