@@ -115,6 +115,33 @@
       "source": "geometry"
     },
     {
+      "id": "lower-bearing-collar-front",
+      "parent": "lower-bearing",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.008
+      },
+      "position_m": [
+        0,
+        0.051961524227066,
+        0.093
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Solid face collar; no bore."
+    },
+    {
       "id": "upper-bearing",
       "parent": "world",
       "shape": "box",
@@ -140,6 +167,60 @@
       },
       "certainty": "C",
       "source": "geometry"
+    },
+    {
+      "id": "upper-bearing-collar-back",
+      "parent": "upper-bearing",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.008
+      },
+      "position_m": [
+        0,
+        -0.052227664851024,
+        -0.093
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Solid face collar; no bore."
+    },
+    {
+      "id": "upper-bearing-collar-front",
+      "parent": "upper-bearing",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.008
+      },
+      "position_m": [
+        0,
+        0.051695383603109,
+        0.093
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Solid face collar; no bore."
     },
     {
       "id": "support",
@@ -273,6 +354,33 @@
       },
       "certainty": "C",
       "source": "geometry"
+    },
+    {
+      "id": "crank-shaft-collar",
+      "parent": "crank",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.028
+      },
+      "position_m": [
+        -0.18,
+        -0.0115,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Fixed hub; masks shaft end."
     },
     {
       "id": "handle",
@@ -1567,6 +1675,60 @@
       },
       "certainty": "C",
       "source": "geometry"
+    },
+    {
+      "id": "upper-wall-back-collar-back",
+      "parent": "upper-wall-back",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.008
+      },
+      "position_m": [
+        0,
+        0.028815965698053,
+        -0.023
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Solid face collar; no bore."
+    },
+    {
+      "id": "upper-wall-back-collar-front",
+      "parent": "upper-wall-back",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.008
+      },
+      "position_m": [
+        0,
+        0.051909976465638,
+        0.023
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Solid face collar; no bore."
     }
   ],
   "joints": [
