@@ -348,7 +348,7 @@ export const vinciStoryExit: VinciStoryExit = {
     { en: "He died in France in 1519. Nobody is sure where he lies.", de: "Er starb 1519 in Frankreich. Wo er liegt, weiß niemand sicher." },
   ],
   doors: [
-    { en: "Ask him yourself", de: "Frag ihn selbst" },
+    { en: "Ask Leonardo", de: "Frag Leonardo" },
     { en: "Another life", de: "Ein anderes Leben" },
   ],
 };
