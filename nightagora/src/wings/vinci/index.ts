@@ -86,6 +86,7 @@ import { apronProvenance } from './apron'
 import { vinciContent, vinciPlanRooms, vinciThroughLine, vinciLifeBands, vinciLifePeople, vinciLifeSecondLine, vinciLifeCut, vinciLifeWorksRow, vinciLifeWorksCount, vinciLifeWorksEmpty, vinciLifeCertaintyCounted, vinciLifeHourMark, vinciHourValues, vinciWelcomeText, vinciLegacyStationIds, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, vinciAbsences, vinciGrounds, vinciRightsPolicy, vinciWingCounts, vinciSourcesHeadings, type VinciCertainty, type VinciStatement, type VinciStationContent, type VinciStationId, type VinciText } from './content'
 import wingCss from './wing.css?inline'
 import { applyDeskSteps, deskOn } from '../desk-switches'
+import { deskStageHeight } from '../desk-stage'
 import { createDeskChrome, type DeskChrome, type DeskStation } from '../desk-chrome'
 import deskCss from '../desk-chrome.css?inline'
 import deskTypeCss from '../desk-type.css?inline'
@@ -428,7 +429,7 @@ export function createWing():VinciWingModule {
     applyDeskSteps(wing)
     /* HOW FAR DOWN A PANEL MAY STAND. Today that is the top of the bar; where
        the desktop's words stand, it is the top of their own band. */
-    panelFloor=()=>desk?.floor()??wing.querySelector('.wing-rail-group')?.getBoundingClientRect().top??innerHeight
+    panelFloor=()=>desk?.floor()??wing.querySelector('.wing-rail-group')?.getBoundingClientRect().top??deskStageHeight()
     const deskStyle=make('style','');deskStyle.textContent=`${deskTypeCss}\n${deskCss}`;h.stage.append(deskStyle)
     if(deskOn('words')||deskOn('ways'))desk=createDeskChrome({
       stage:h.stage,wing,lang,
@@ -1295,7 +1296,7 @@ export function createWing():VinciWingModule {
    * and the marks are held above it. */
   function markFloor():number {
     const row=strip?.element.getBoundingClientRect()
-    return row&&row.height>0?row.top:innerHeight
+    return row&&row.height>0?row.top:deskStageHeight()
   }
   /** THE ROW UNDER THE CARD. It stands wherever a station holds more than
    * one exhibit: docked under the station card on the wide stage, above the
@@ -1582,7 +1583,7 @@ export function createWing():VinciWingModule {
     for(const x of [box.min.x,box.max.x])for(const y of [box.min.y,box.max.y])for(const z of [box.min.z,box.max.z]){
       corner.set(x,y,z).project(camera)
       if(corner.z<=-1||corner.z>=1)return null
-      const px=(corner.x*.5+.5)*innerWidth,py=(-corner.y*.5+.5)*innerHeight
+      const px=(corner.x*.5+.5)*innerWidth,py=(-corner.y*.5+.5)*deskStageHeight()
       left=Math.min(left,px);right=Math.max(right,px);top=Math.min(top,py);bottom=Math.max(bottom,py)
     }
     return {left,top,width:right-left,height:bottom-top}
@@ -1595,7 +1596,7 @@ export function createWing():VinciWingModule {
     for(const x of [-1,1])for(const y of [-1,1])for(const z of [-1,1]){
       corner.set(centre.x+x*radius,centre.y+y*radius,centre.z+z*radius).project(camera)
       if(corner.z<=-1||corner.z>=1)return null
-      const px=(corner.x*.5+.5)*innerWidth,py=(-corner.y*.5+.5)*innerHeight
+      const px=(corner.x*.5+.5)*innerWidth,py=(-corner.y*.5+.5)*deskStageHeight()
       left=Math.min(left,px);right=Math.max(right,px);top=Math.min(top,py);bottom=Math.max(bottom,py)
     }
     return {left,top,width:right-left,height:bottom-top}
@@ -2432,7 +2433,7 @@ export function createWing():VinciWingModule {
       // THE MARKS STAND ABOVE WHAT THE FOOT OF THE FRAME CARRIES. At a
       // viewing eye a work fills the frame and its own mark hangs under it,
       // so the reserve is the row's own top edge and not a fixed band.
-      dots?.setFoot(Math.max(0,innerHeight-markFloor()+12))
+      dots?.setFoot(Math.max(0,deskStageHeight()-markFloor()+12))
       dots?.setLimit(closeLook?.id?0:onWallStop()?3:DOTS_PER_TIER[hosts.world.stack.tierName()]??6)
       dots?.update(panels)},
     stop(){desk?.dispose();desk=undefined;visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;life?.dispose();life=undefined;lifeControl?.remove();lifeControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;house=undefined;houseUp=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},

@@ -12,8 +12,10 @@
    after it in the order the rail walks, and the words of both. */
 
 import { deskOn } from './desk-switches'
+import { setDeskBand } from './desk-stage'
 import { deskCutBetween, deskStoryStop } from './desk-story'
 import { setRegister } from './frame'
+import { LOBBY_TEXT } from '../content/lobby'
 import type { VinciCertainty, VinciText } from './vinci/content'
 
 export interface DeskStation {
@@ -104,7 +106,6 @@ function icon(path: string): SVGSVGElement {
 const ARROW_ON = 'M3 8h10M9 4l4 4-4 4'
 const ARROW_BACK = 'M13 8H3M7 4L3 8l4 4'
 const PLAY = 'M5 3l8 5-8 5z'
-const CLOSE = 'M4 4l8 8M12 4l-8 8'
 
 /* SHAPE CARRIES THE CLASS, so the mark survives a grey print and a colour
    blind eye, and the colour reinforces it: a full disc, a half disc, an open
@@ -171,6 +172,11 @@ const DESK_TELL = false
 export function createDeskChrome(host: DeskChromeHost): DeskChrome {
   const words = deskOn('words')
   const ways = deskOn('ways')
+  /* THE STAGE AND THE LABEL. The picture keeps its own box and the museum
+     stands under it on solid night: the band's height is the type's ladder,
+     the stage is the window less that height, and nothing of the museum ever
+     stands on the picture. */
+  const stage = deskOn('stage')
   const say = (value: VinciText): string => value[host.lang()]
 
   const band = make('div', 'desk-low')
@@ -334,15 +340,17 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
   const plateName = make('div', 'desk-name desk-drawer-name')
   const plateChapter = make('span', 'desk-chapter')
   const plateClock = make('span', 'desk-clock')
+  const plateCount = make('span', 'desk-count')
   const plateWords = make('div', 'desk-drawer-words')
   plateWords.id = 'desk-drawer-words'
   setRegister(plateWords, 'drawer')
   const plateFoot = make('div', 'desk-drawer-foot')
   const plateQuestion = make('p', 'desk-drawer-question')
-  const plateClose = make('button', 'desk-drawer-close')
+  /* THE WAY BACK OUT IS A WORD in the drawer's own foot, beside the two side
+     paths, and it says which key does the same thing. */
+  const plateClose = make('button', 'desk-word-control desk-drawer-close')
   plateClose.type = 'button'
-  plateClose.append(icon(CLOSE))
-  plate.append(plateClose, plateName, plateWords, plateFoot)
+  plate.append(plateName, plateWords, plateFoot)
   /* the wing's own way to the sources keeps its word, its key and its window
      until the one sheet takes them: it is borrowed, not rebuilt. The wing
      builds it a frame or two after this chrome stands, so it is taken at the
@@ -360,6 +368,8 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
   }
   if (drawer) band.append(plate)
 
+  plateClose.addEventListener('click', () => openDrawer(false))
+
   function openDrawer(open: boolean, back: HTMLElement = more): void {
     if (!drawer) return
     const held = plate.contains(document.activeElement)
@@ -367,6 +377,8 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
     more.setAttribute('aria-expanded', String(open))
     if (open) host.wing.dataset['drawer'] = 'open'
     else delete host.wing.dataset['drawer']
+    // the band grew or folded, so the stage under it changed in the same breath
+    measure()
     // Escape steps exactly one surface back, and the hand comes back to the
     // control that opened it
     if (open) plate.focus({ preventScroll: true })
@@ -399,10 +411,12 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
     const stop = deskStoryStop(at.id)
     const said = stop?.drawer ? say(stop.drawer) : ''
     plateName.textContent = ''
-    plateName.append(mark(stop?.certainty ?? 'reconstructed'), plateChapter, plateClock)
+    // the same name row the line carried, so the eye keeps the place it read
+    plateName.append(mark(stop?.certainty ?? 'reconstructed'), plateChapter, plateClock, plateCount)
     plateChapter.textContent = say(titleOf(at.id))
     plateClock.textContent = stop?.age ? say(stop.age) : ''
     plateClock.hidden = !stop?.age
+    plateCount.textContent = `${at.index + 1} / ${at.count}`
     plateWords.textContent = ''
     for (const line of sentences(said)) plateWords.append(make('p', '', line))
     plateFoot.textContent = ''
@@ -410,6 +424,9 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
     plateQuestion.textContent = host.question()
     plateFoot.append(plateQuestion)
     if (doorNode) plateFoot.append(doorNode)
+    plateClose.textContent = ''
+    plateClose.append(document.createTextNode(say(LOBBY_TEXT.close)), make('span', 'desk-key', 'Esc'))
+    plateFoot.append(plateClose)
     // a stop the story gives no drawer keeps the control, named and inert
     const has = said.length > 0
     more.setAttribute('aria-disabled', String(!has))
@@ -507,6 +524,16 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
   function measure(): void {
     if (!words) return
     requestAnimationFrame(() => {
+      /* THE BAND'S OWN HEIGHT IS THE STAGE'S PRICE, so it is measured and
+         never assumed: a third row of a long language grows the band by one
+         row here and the picture gives that row back in the same frame. */
+      if (stage) {
+        const low = band.getBoundingClientRect()
+        if (low.height < 1) return
+        setDeskBand(low.height)
+        host.wing.style.setProperty('--desk-foot-clear', `${Math.round(low.height)}px`)
+        return
+      }
       const box = cap.getBoundingClientRect()
       if (box.height < 1) return
       host.wing.style.setProperty('--desk-foot-clear', `${Math.round(innerHeight - box.top)}px`)
@@ -558,6 +585,9 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
 
   return {
     panels: () => {
+      // where the band stands under the picture no word of the museum can
+      // cover a subject, so there is nothing for the marks to avoid
+      if (stage) return []
       if (!words || !deskOn('freearea')) return []
       const out: { left: number; top: number; right: number; bottom: number }[] = []
       for (const node of plate.hidden ? [cap as HTMLElement] : [cap as HTMLElement, plate]) {
@@ -569,14 +599,20 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
     },
     floor: () => {
       const box = band.getBoundingClientRect()
+      if (box.height <= 0) return null
+      // the band's own top edge is the picture's foot: nothing of the museum
+      // stands below it and nothing of the picture above it
+      if (stage) return Math.round(box.top)
       // the padding above the words is the dusk, not the words: a panel may
       // stand in it, and stopping at the band's own top would waste it
-      return box.height > 0 ? Math.round(box.bottom - box.height + 110) : null
+      return Math.round(box.bottom - box.height + 110)
     },
     paint,
     update,
     key,
     dispose() {
+      // the picture takes the whole window back with the band
+      setDeskBand(0)
       // the frame's door and the wing's own sources go home before the band
       // that borrowed them is struck
       if (doorNode && doorNest) doorNest.insertBefore(doorNode, doorNext)

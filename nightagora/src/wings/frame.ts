@@ -22,6 +22,7 @@ import { LOBBY_TEXT } from '../content/lobby'
 import plateCss from './title-plate.css?inline'
 import { windowOwnsTheScreen } from './window-chrome'
 import { deskAny } from './desk-switches'
+import { deskStageHeight, setDeskBand } from './desk-stage'
 import { gaitPace, setGaitPace, type GaitPaceName } from './vinci/gait'
 import type { WingEntry } from './registry'
 import type { Stack } from '../stack'
@@ -253,9 +254,31 @@ export function createWingFrame(
 ): WingFrame {
   const world: WingWorld = {
     scene: new Scene(),
-    camera: new PerspectiveCamera(46, innerWidth / innerHeight, 0.08, 1100),
+    camera: new PerspectiveCamera(46, innerWidth / deskStageHeight(), 0.08, 1100),
     stack,
     clock,
+  }
+
+  /* THE PICTURE'S OWN BOX. Where a label band stands under the picture the
+     canvas is shorter than the window, so the buffer, the lens and every
+     projected point take the stage's height and not the window's. With no
+     band the two are the same number and nothing below changes. */
+  let sized = ''
+  function fitTheStage(): void {
+    const height = deskStageHeight()
+    const box = `${innerWidth}x${height}`
+    if (box !== sized) {
+      sized = box
+      stack.setSize(innerWidth, height)
+    }
+    world.camera.aspect = innerWidth / height
+    world.camera.updateProjectionMatrix()
+  }
+  /** the window is the stage again the moment the wing's band is struck */
+  function releaseStage(): void {
+    setDeskBand(0)
+    sized = ''
+    stack.setSize(innerWidth, innerHeight)
   }
   const labels = el('div', 'wing-labels')
   labels.setAttribute('aria-hidden', 'true')
@@ -396,7 +419,9 @@ export function createWingFrame(
     if (drop > 0) railGroup.style.bottom = `calc(${BAR_BOTTOM} - ${drop}px)`
   }
   new MutationObserver(() => { trackWords(); placeChrome(); fitTheBar() }).observe(railGroup, { childList: true })
-  addEventListener('resize', () => { placeChrome(); fitTheBar(); doorStandsAlone() })
+  // the shell sizes the buffer to the window on a resize: the stage takes it
+  // back on the next frame, whatever the band's height did in the same breath
+  addEventListener('resize', () => { sized = ''; placeChrome(); fitTheBar(); doorStandsAlone() })
 
   const question = el('p', 'wing-question')
   const door = el('a', 'wing-door', say(WING_TEXT.door))
@@ -728,6 +753,7 @@ export function createWingFrame(
       delete doorWords.dataset['register']
       releaseWords()
       wing?.stop()
+      releaseStage()
       wing = null
       entry = null
       labels.textContent = ''
@@ -748,8 +774,7 @@ export function createWingFrame(
       question: question.textContent ?? '',
     }),
     update(dt) {
-      world.camera.aspect = innerWidth / innerHeight
-      world.camera.updateProjectionMatrix()
+      fitTheStage()
       wing?.update?.(dt)
       paintNavigation()
       /* A STILL OF THE STATION, not of a stride: the copy is asked for only

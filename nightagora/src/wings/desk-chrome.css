@@ -282,20 +282,9 @@
 .desk-drawer:focus, .desk-drawer:focus-visible { outline: none; }
 .desk-drawer-name { margin-bottom: 12px; padding-right: 44px; }
 .desk-drawer-name :is(.desk-chapter, .desk-clock) { text-shadow: none; }
-.desk-drawer-close {
-  position: absolute;
-  right: 6px;
-  top: 6px;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 0;
-  background: none;
-  display: grid;
-  place-items: center;
-  color: var(--na-starlight);
-  cursor: pointer;
-}
+/* the way back out of the drawer is a word in its own foot, and it names the
+   key that does the same thing */
+.desk-drawer-close { flex: none; }
 .desk-drawer-words p {
   margin: 0 0 5px;
   font: 400 1.1875rem/1.875rem var(--serif);
@@ -584,3 +573,172 @@ body.forge .desk-cap, body.forge .desk-on { transition: none !important; }
 /* the thread goes with the words while a leg runs: it stays, at full
    strength, because it is where the walker is */
 #wing[data-walking][data-desk~='ways'] .desk-thread { opacity: 1; }
+
+/* ================= THE STAGE AND THE LABEL BAND =========================
+   The picture keeps a box of its own and the museum stands under it: the
+   canvas is the window less the band, and the band is solid night with one
+   gold hairline at its top edge. Nothing of the museum is laid over the
+   picture here, so this block draws no ground, no glass and no shade. */
+#wing[data-desk~='stage'] {
+  /* THE LADDER THE BAND IS SIZED BY: air, the name row, two rows of the line
+     held free in every language, the reading row. A line that takes a third
+     row grows the band by exactly one row and the picture gives that row
+     back, which is the only case in which the stage moves. */
+  --desk-band-air: 16px;
+  --desk-band-foot: 9px;
+  --desk-line-row: 2.5rem;
+  /* the ways' own box and the one gutter between it and the words */
+  --desk-ways-box: 452px;
+  --desk-read: clamp(560px, calc(100vw - var(--desk-g) * 2 - var(--desk-ways-box)), 860px);
+}
+#wing[data-desk~='stage'] .desk-low {
+  padding: var(--desk-band-air) var(--desk-g) var(--desk-band-foot);
+  gap: 24px;
+  background: var(--na-abyss);
+  /* the one ornament of the design: on a dark station the picture's foot
+     would vanish into the band, and this edge is what keeps it legible */
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--na-gold) 34%, transparent);
+}
+#wing[data-desk~='stage'] .desk-line { min-height: calc(var(--desk-line-row) * 2); }
+#wing[data-desk~='stage'] .desk-foot { margin-top: 5px; }
+#wing[data-desk~='stage'] .desk-ways { margin-bottom: 9px; }
+/* NOTHING TRANSLUCENT ANYWHERE. The words stand on the wall, so the backing
+   they carried over a live picture goes with the picture under them. */
+#wing[data-desk~='stage'] .desk-cap::before { content: none; }
+#wing[data-desk~='stage'] .desk-top { display: none; }
+#wing[data-desk~='stage'] :is(.desk-chapter, .desk-clock, .desk-count, .desk-line) { text-shadow: none; }
+/* the count is told from the clock by a rule, which is quieter than a dot
+   and reads as the start of a second fact */
+#wing[data-desk~='stage'] .desk-count {
+  position: relative;
+  margin-left: 24px;
+  padding-left: 25px;
+}
+#wing[data-desk~='stage'] .desk-count::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  margin: 0;
+  background: color-mix(in srgb, var(--na-starlight) 30%, transparent);
+}
+/* A WORDED CONTROL IS A WORD on solid ground: no filled rectangle, a
+   hairline under it instead, and the fill comes back only as a state. */
+#wing[data-desk~='stage'] :is(.desk-foot, .desk-drawer-foot) .desk-word-control,
+#wing[data-desk~='stage'][data-desk~='ways'] .desk-foot .wing-door,
+#wing[data-desk~='stage'][data-desk~='drawer'] .desk-drawer-foot .wing-door {
+  position: relative;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  text-shadow: none;
+  letter-spacing: normal;
+  text-indent: 0;
+  text-transform: none;
+  font: 500 0.9375rem/1 var(--sans);
+  color: var(--na-starlight);
+}
+#wing[data-desk~='stage'] :is(.desk-foot, .desk-drawer-foot) .desk-word-control::after,
+#wing[data-desk~='stage'][data-desk~='ways'] .desk-foot .wing-door::after,
+#wing[data-desk~='stage'][data-desk~='drawer'] .desk-drawer-foot .wing-door::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 10px;
+  height: 1px;
+  background: color-mix(in srgb, var(--na-starlight) 44%, transparent);
+}
+#wing[data-desk~='stage'][data-desk~='ways'] .desk-foot .wing-door,
+#wing[data-desk~='stage'][data-desk~='drawer'] .desk-drawer-foot .wing-door,
+#wing[data-desk~='stage'][data-desk~='drawer'] .desk-drawer-foot .vinci-source { color: var(--desk-clock); }
+#wing[data-desk~='stage'][data-desk~='ways'] .desk-foot .wing-door::after,
+#wing[data-desk~='stage'][data-desk~='drawer'] .desk-drawer-foot .wing-door::after {
+  background: color-mix(in srgb, var(--desk-clock) 50%, transparent);
+}
+/* the way to what a station rests on is a word and not a heading: the row
+   reads left to right as the visitor meets the layers */
+#wing[data-desk~='stage'][data-desk~='drawer'] .desk-drawer-foot .vinci-source {
+  text-transform: none;
+  letter-spacing: normal;
+  text-indent: 0;
+  font: 500 0.9375rem/1 var(--sans);
+}
+#wing[data-desk~='stage'] :is(.desk-foot, .desk-drawer-foot) :is(.desk-word-control, .wing-door):hover::after,
+#wing[data-desk~='stage'] :is(.desk-foot, .desk-drawer-foot) :is(.desk-word-control, .wing-door):focus-visible::after {
+  height: 1.5px;
+  background: var(--na-starlight);
+}
+#wing[data-desk~='stage'] .desk-foot { gap: 30px; }
+
+/* THE WAYS THROUGH THIS WING KEEP THE BAND'S TOP RIGHT until the museum's
+   own control takes them into its panel. Off the picture, on the wall, and
+   clear of both the name row at the left and the ways below them. */
+#wing[data-desk~='stage'][data-desk~='ways'] .wing-rail-group {
+  top: auto !important;
+  bottom: calc(var(--desk-foot-clear, 192px) - 38px) !important;
+  left: auto !important;
+  right: var(--desk-g);
+  width: auto;
+  max-width: calc(100vw - var(--desk-g) * 2 - var(--desk-read)) !important;
+  justify-content: flex-end;
+  gap: 0;
+}
+#wing[data-desk~='stage'][data-desk~='ways'] .wing-rail-group > .wing-lobby { margin-right: 0; }
+#wing[data-desk~='stage'][data-desk~='ways'] .wing-rail-group :is(.wing-lobby, .vinci-source, .wing-plan-open, .wing-life-open) {
+  min-height: 28px;
+  padding: 0 0 0 26px;
+  text-shadow: none;
+}
+#wing[data-desk~='stage'][data-desk~='ways'] .wing-lobby { padding-left: 0; }
+
+/* ---- THE DRAWER IS THE BAND GROWN, not a second plate ----
+   One ground in the whole museum: the same wall the line stood on, taller,
+   with the name row in its place so the eye keeps the place it read. */
+#wing[data-desk~='stage'][data-desk~='drawer'] .desk-drawer {
+  position: static;
+  /* it stands where the line stood, on the same margin and in the same
+     measure: the eye keeps the place it was reading */
+  order: -1;
+  flex: 0 1 var(--desk-read);
+  width: auto;
+  max-width: var(--desk-read);
+  max-height: calc(420px - var(--desk-band-air) - var(--desk-band-foot));
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  overflow: hidden;
+}
+#wing[data-desk~='stage'][data-desk~='drawer'] .desk-drawer-name { padding-right: 0; }
+#wing[data-desk~='stage'][data-desk~='drawer'] .desk-drawer-words { margin-top: 8px; }
+#wing[data-desk~='stage'][data-desk~='drawer'] .desk-drawer-foot {
+  margin-top: 16px;
+  gap: 30px;
+  border-top-color: color-mix(in srgb, var(--na-starlight) 16%, transparent);
+}
+/* the two side paths and the way back out keep their whole word, and the
+   question takes whatever the row has left */
+#wing[data-desk~='stage'] .desk-drawer-question { flex: 1 1 auto; min-width: 0; }
+#wing[data-desk~='stage'] .desk-drawer-foot > :not(.desk-drawer-question) { flex: none; }
+/* ONE TEXT AT A TIME: the line's whole column leaves the flow while the
+   drawer stands, which is what lets the band take the drawer's height. */
+#wing[data-desk~='stage'][data-drawer='open'] .desk-cap { display: none; }
+
+/* ---- WHILE A SURFACE THE VISITOR ASKED FOR OWNS THE STAGE ----
+   The band stays: at the left of an open sheet it is quiet wall, which is
+   what the museum looks like when nothing is being told. Its words and its
+   ways stand down, and they come back whole. */
+:root[data-na-window='desk'] #wing[data-desk~='stage'] .desk-low,
+#wing[data-desk~='stage']:has(> .vinci-cut:not([hidden])) .desk-low {
+  visibility: visible;
+}
+:root[data-na-window='desk'] #wing[data-desk~='stage'] :is(.desk-cap, .desk-ways, .desk-drawer),
+#wing[data-desk~='stage']:has(> .vinci-cut:not([hidden])) :is(.desk-cap, .desk-ways, .desk-drawer) {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}

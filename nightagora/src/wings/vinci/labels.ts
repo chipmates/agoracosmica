@@ -2,6 +2,7 @@ import {
   Mesh, Raycaster, Vector3,
   type Intersection, type Material, type Object3D, type PerspectiveCamera,
 } from 'three/webgpu'
+import { deskStageHeight } from '../desk-stage'
 
 export type VinciLabelMode = 0 | 1 | 2
 export interface VinciLabelRect {
@@ -184,7 +185,8 @@ export function createVinciLabelAnchor(options: {
         dirty = false
       }
       projected.copy(anchor).project(camera)
-      const width = view.innerWidth, height = view.innerHeight
+      // the picture's own box, which is the window where no band stands
+      const width = view.innerWidth, height = deskStageHeight()
       const x = (projected.x * 0.5 + 0.5) * width
       const y = (-projected.y * 0.5 + 0.5) * height
       const visible = !occluded && !underPanel(x, y, panels) && projected.z > -1 && projected.z < 1
@@ -348,7 +350,8 @@ export function createVinciExhibitDots(options: {
         if (now - changedAt < settleMs) { hide(); return }
         dirty = false
       }
-      const width = view.innerWidth, height = view.innerHeight
+      // the picture's own box, which is the window where no band stands
+      const width = view.innerWidth, height = deskStageHeight()
       const centreX = width / 2, centreY = height / 2
       const candidates: { mark: VinciExhibitMark; x: number; y: number; from: number }[] = []
       for (const mark of marks) {
