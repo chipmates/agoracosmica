@@ -18,6 +18,8 @@ export interface DeskOverviewCell {
   id: string
   /** the work's own name, already in the page's language */
   title: string
+  /** the name the cell has two rows for, where the work's own runs longer */
+  short?: string | null
   /** the museum's own mark for this object, which is a fact and not a style */
   certainty: VinciCertainty
   /** the kind the room gave it, which is what names the set */
@@ -216,7 +218,7 @@ export function createDeskOverview(host: DeskOverviewHost): DeskOverview {
       thumb.src = cell.preview ?? ''
       plate.append(thumb)
       const word = make('span', 'desk-ov-cellname')
-      word.append(host.mark(cell.certainty), document.createTextNode(cell.title))
+      word.append(host.mark(cell.certainty), document.createTextNode(cell.short ?? cell.title))
       button.append(plate, word)
       button.addEventListener('click', () => walk(index))
       // ONE SELECTOR IN THE VIEW, moved by both hands: the pointer and the

@@ -485,7 +485,7 @@ export function createWing():VinciWingModule {
       // desk.marks: its host fields
 
       // desk.overview: its host fields
-      overview:{cells:()=>stationExhibits().map(cell=>({id:cell.id,title:cell.title,openable:cell.openable,
+      overview:{cells:()=>stationExhibits().map(cell=>({id:cell.id,title:cell.title,short:exhibitShort(cell.id),openable:cell.openable,
         certainty:pictureCertainty(cell.colour),kind:picks.find(pick=>pick.id===cell.id)?.kind??'picture',
         preview:cell.preview===null?null:strip?.thumb(cell.preview)??cell.preview})),
         open:id=>openExhibit(id,null),room:roomName},
@@ -915,6 +915,15 @@ export function createWing():VinciWingModule {
   function workTitle(work:WorkNames,face:'front'|'reverse'|null|undefined):VinciText {
     if(face!=='reverse')return {en:work.title_en,de:work.title_de}
     return {en:work.reverse_title_en??work.title_en,de:work.reverse_title_de??work.title_de}
+  }
+  function exhibitShort(id:string):string|null {
+    const pick=picks.find(entry=>entry.id===id)
+    const work=pick?.workId?(exhibits?.pictureSources()??[]).find(source=>source.work.id===pick.workId)?.work:undefined
+    if(!pick||!work)return null
+    const names:WorkNames=work
+    const short=pick.face==='reverse'?{en:names.reverse_short_title_en,de:names.reverse_short_title_de}
+      :{en:names.short_title_en,de:names.short_title_de}
+    return short.en&&short.de?text({en:short.en,de:short.de}):null
   }
   /** THE WORKS THE PLAN OFFERS: the registry's own openable exhibits, each
    * under the station it hangs in, in that wall's own order. */
