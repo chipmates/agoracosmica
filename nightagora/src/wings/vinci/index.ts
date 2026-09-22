@@ -488,7 +488,7 @@ export function createWing():VinciWingModule {
       overview:{cells:()=>stationExhibits().map(cell=>({id:cell.id,title:cell.title,openable:cell.openable,
         certainty:pictureCertainty(cell.colour),kind:picks.find(pick=>pick.id===cell.id)?.kind??'picture',
         preview:cell.preview===null?null:strip?.thumb(cell.preview)??cell.preview})),
-        open:id=>openExhibit(id,null),room:()=>text(hereContent().name)},
+        open:id=>openExhibit(id,null),room:roomName},
 
       // desk.sheet: its host fields
 
@@ -690,7 +690,7 @@ export function createWing():VinciWingModule {
       leg:()=>{const nav=standing?rail.navigation:undefined;return nav?.active?nav.legWalked:null}})
     closeLook=createVinciCloseLook({host:h.labels,narrow,
       // the one step back of a close look names the room it goes back to
-      room:()=>text(hereContent().name),
+      room:roomName,
       // A mark stands down while its exhibit is open, so the hand comes back
       // to the row's own button for it, or to the bar.
       returnFocus:id=>strip?.element.querySelector<HTMLElement>(`[data-exhibit="${id}"]`)??hosts?.stage.parentElement?.querySelector<HTMLElement>('.wing-step[aria-current="true"]')??null,
@@ -1069,6 +1069,10 @@ export function createWing():VinciWingModule {
   const LIFE_CARDS=JSON.parse(cardsSource) as {floor_honesty:VinciText
     controls:{shared:{back:VinciText};date:{age:VinciText;age_about:VinciText;next:VinciText;previous:VinciText}}}
   const LIFE_HONESTY=LIFE_CARDS.floor_honesty
+  /** THE ROOM'S SHORT NAME, for a control that names the room it leads back
+   * to: the full name is a chapter title and runs too long for one. */
+  const ROOM_SHORT=(JSON.parse(cardsSource) as {station_short_names?:Record<string,VinciText>}).station_short_names??{}
+  const roomName=():string=>{const here=hereContent();return text(ROOM_SHORT[here.id]??here.name)}
   const LIFE_AGE_WORDS={exact:LIFE_CARDS.controls.date.age,about:LIFE_CARDS.controls.date.age_about}
   const SURE_RANK:Record<string,number>={documented:2,inferred:1,tradition:0}
   /** A key the wing does not rank stands under every one it does. */
