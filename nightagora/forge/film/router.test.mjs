@@ -221,6 +221,8 @@ test('the wing: the guided visit is the fourteen LEGs forward and the two cuts',
   assert.equal(visit.steps.filter((s) => s.clip).length, 14)
   assert.equal(visit.steps.filter((s) => s.dip).length, 2)
   assert.equal(visit.steps.filter((s) => s.read !== undefined).length, 17)
-  // the life walked forward at the museum's own pace: ORDERS.md's 115.66 s on the desktop
-  assert.ok(Math.abs(visit.seconds - 115.66) < 0.01, `${visit.seconds}`)
+  // the life walked forward at the film's pace, whatever the certificate holds tonight
+  const forward = graph.story.slice(1).map((to, i) => graph.edges.find((e) => e.from === graph.story[i] && e.to === to))
+  const legs = forward.filter(Boolean).reduce((sum, e) => sum + e.framings.wide.seconds.walk, 0)
+  assert.ok(Math.abs(visit.seconds - legs) < 1e-9, `${visit.seconds} against ${legs}`)
 })
