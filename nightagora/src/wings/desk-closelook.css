@@ -271,7 +271,10 @@
    visitor left to come here, so it goes whole, and the card, the row of
    plates and the payload's fixed row go with it: nothing stands on the work. */
 #wing[data-desk~='closelook'] .vitrine[data-narrow='false'] :is(.vitrine-card, .vitrine-sheet) { display: none; }
-:root[data-na-window='desk'] #wing[data-desk~='closelook']:has(.desk-clb) .desk-low { visibility: hidden; }
+/* The rule is the band's own standing, not the museum's window attribute: a
+   record that closes over a close look puts that attribute down, and two
+   bands would come up at the foot of one screen. */
+:root #wing[data-desk~='closelook']:has(.desk-clb) .desk-low { visibility: hidden; }
 
 /* WHILE A SURFACE THE VISITOR ASKED FOR STANDS OVER THE LABEL, the band goes
    and comes back whole: the record, the plan and the life each own the screen
