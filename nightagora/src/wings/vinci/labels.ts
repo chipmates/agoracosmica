@@ -245,15 +245,15 @@ const MARK_SVG = 'http://www.w3.org/2000/svg'
 /** the whole circumference of the walking mark's counted ring, in user units */
 const MARK_RING = 2 * Math.PI * 15.5
 
-/** THE WALKING MARK'S BODY: a gold ring of 34 px inside the 44 px target,
- * the walk glyph in it, and the counted arc that fills on press. The arc is
- * the leg itself, never a timer. */
 /** A mark's own name in the DOM, keyed by the exhibit and not by the pool
  * slot it happens to take, so an export and a test name the same mark after
  * a rebuild. */
 export const vinciMarkDomId = (exhibit: string): string =>
   `vinci-mark-${exhibit.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`
 
+/** THE WALKING MARK'S BODY: a gold ring of 34 px inside the 44 px target,
+ * the walk glyph in it, and the counted arc that fills on press. The arc is
+ * the leg itself, never a timer. */
 function walkingRing(document: Document): SVGSVGElement {
   const svg = document.createElementNS(MARK_SVG, 'svg')
   svg.setAttribute('viewBox', '0 0 34 34')
