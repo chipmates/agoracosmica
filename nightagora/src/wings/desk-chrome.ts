@@ -18,7 +18,7 @@ import { setRegister } from './frame'
 import { LOBBY_TEXT } from '../content/lobby'
 import type { VinciCertainty, VinciText } from './vinci/content'
 
-// desk.panel: its imports stand here, and nowhere else in this list
+import { createDeskPanel } from './desk-panel'
 
 // desk.marks: its imports stand here, and nowhere else in this list
 
@@ -617,7 +617,18 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
 
   // desk.panel: the instruments control and its sheet
   if (deskOn('panel')) {
-    // filled by its own seat, empty until its step stands
+    createDeskPanel({
+      wing: host.wing,
+      band,
+      ways: waysRow,
+      back,
+      on,
+      kicker: onKicker,
+      title: onTitle,
+      arrow: onArrow,
+      standing: host.standing,
+      next: host.next,
+    })
   }
 
 

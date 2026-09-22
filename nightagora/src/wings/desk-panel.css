@@ -1,0 +1,279 @@
+/* THE INSTRUMENTS CONTROL AND ITS PANEL INSIDE A WING, the desktop design's
+   `desk.panel` step. Everything the museum can do about itself stands behind
+   one control at the band's top right, and the panel it opens is the lobby's
+   own, grown to a full height sheet at the frame's right edge.
+
+   Every rule is gated on the step's switch or on the root attribute the shell
+   writes while a wing stands, so with the switch off nothing here paints. */
+
+/* ---- the control, at the band's top right ---- */
+/* the rail's own bar is the lobby's: inside a wing it carries the museum's
+   control alone, at the wing's margin and ten pixels under the band's edge */
+:root[data-na-panel] #rail-sound { display: none; }
+:root[data-na-panel] #rail-instruments {
+  left: auto;
+  right: var(--desk-panel-g, 64px);
+  bottom: calc(var(--desk-band-h, 192px) - 54px);
+  min-height: 44px;
+  padding: 0;
+  gap: 12px;
+  /* the same control stands in two places, and the rail's own rules reach it
+     in only one of them: its look is stated here for both */
+  display: inline-flex;
+  align-items: center;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font-family: var(--press-ui);
+  text-transform: none;
+  text-indent: 0;
+  /* the museum's own floor: the rail's 13 px is under it, so the word is
+     raised wherever a wing stands */
+  font-size: 15px;
+  letter-spacing: .065em;
+  color: var(--press-white);
+  text-shadow: none;
+}
+:root[data-na-panel='open'] #rail-instruments { color: var(--na-starlight); }
+/* THE CONTROL STANDS WHERE THE MUSEUM'S OWN LABEL STANDS, and stands down
+   while a surface grows over that label: the drawer and the door's plate. */
+:root[data-na-plate='open'] #rail-instruments,
+:root:has(#wing[data-drawer='open']) #rail-instruments { display: none; }
+
+/* The three worded ways through the wing and the bar's own way home stand
+   down: their rows are inside the panel now. The frame places its own bar
+   with an inline rule, which only a loud one can move. */
+#wing[data-desk~='panel'] .wing-rail-group { display: none !important; }
+
+/* ---- the panel as a full height sheet ---- */
+:root[data-na-panel='open'] #instruments {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: auto;
+  width: 420px;
+  max-width: 100%;
+  max-height: none;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  box-shadow: inset 0 1px 0 var(--rule), inset 1px 0 0 var(--press-hairline);
+}
+/* the kicker, the handle and Close do not move: only the rows between them
+   scroll, so the way out is on the screen the whole time */
+:root[data-na-panel='open'] #instruments .inst-kicker {
+  position: absolute;
+  left: 30px;
+  right: var(--desk-panel-g, 64px);
+  top: 86px;
+  margin: 0;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--press-hairline);
+}
+:root[data-na-panel='open'] #instruments .inst-kicker::after { content: none; }
+:root[data-na-panel='open'] #instruments > #rail-instruments {
+  position: absolute;
+  right: var(--desk-panel-g, 64px);
+  top: 30px;
+  bottom: auto;
+  z-index: 1;
+}
+:root[data-na-panel='open'] #instruments .inst-links {
+  position: absolute;
+  left: 30px;
+  right: var(--desk-panel-g, 64px);
+  top: 182px;
+  bottom: 69px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--na-gold) 42%, transparent) transparent;
+}
+:root[data-na-panel='open'] #instruments .inst-close {
+  position: absolute;
+  right: var(--desk-panel-g, 64px);
+  bottom: 9px;
+  margin: 0;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  letter-spacing: .015em;
+}
+/* the rows read at the museum's own floor inside a wing */
+:root[data-na-panel='open'] #instruments :is(.inst-links button, .inst-links a, .inst-links summary) {
+  font-size: 15px;
+  gap: 18px;
+}
+:root[data-na-panel='open'] #instruments .inst-setting legend,
+:root[data-na-panel='open'] #instruments .inst-tiers small,
+:root[data-na-panel='open'] #instruments .inst-labels p { font-size: 14px; }
+:root[data-na-panel='open'] #instruments :is(.inst-options, .inst-pace) button {
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px var(--press-hairline);
+}
+:root[data-na-panel='open'] #instruments :is(.inst-options, .inst-pace) button[aria-pressed='true'] {
+  box-shadow: inset 0 0 0 1px var(--rule);
+  background: color-mix(in srgb, var(--na-gold) 12%, transparent);
+}
+/* THE PACE IS A CHOICE OF ONE WORD, like the language: three cells in a row
+   and not three lines, with its one cost line under them. */
+:root[data-na-panel='open'] #instruments .inst-pace {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  /* room for the cost line under the cells, at the two rows German takes */
+  padding-bottom: 50px;
+}
+:root[data-na-panel='open'] #instruments .inst-pace button {
+  display: inline-flex;
+  width: auto;
+  min-width: 60px;
+  justify-content: center;
+  padding: 0 14px;
+  /* the cost line belongs to the row and not to the cell it is written in */
+  position: static;
+}
+:root[data-na-panel='open'] #instruments .inst-pace small {
+  position: absolute;
+  left: 0;
+  bottom: 4px;
+  width: 100%;
+  margin: 0;
+}
+/* the sound row and the lobby's own plan row are absent while a wing stands:
+   the wing plays no sound, and the plan is one of the five rows above */
+:root[data-na-panel] #inst-sound,
+:root[data-na-panel] #inst-plan { display: none; }
+
+/* ---- the wing's own five rows, at the panel's head ---- */
+.inst-wing[hidden] { display: none; }
+.inst-wing {
+  display: block;
+  /* the one seam in the panel: above it the wing, below it the museum */
+  margin-bottom: 8px;
+  padding-bottom: 14px;
+  box-shadow: inset 0 -1px 0 var(--press-hairline);
+}
+.inst-wing button {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 0;
+  border: 0;
+  background: none;
+  font-family: var(--press-ui);
+  font-size: 15px;
+  line-height: 1.5;
+  letter-spacing: .015em;
+  text-align: left;
+  color: var(--press-white);
+  cursor: pointer;
+}
+.inst-wing button[aria-disabled='true'] { color: var(--press-muted); cursor: default; }
+.inst-wing button:not([aria-disabled='true']):hover { color: var(--na-gold); }
+.inst-wing button:focus-visible { outline: 1px solid var(--na-gold); outline-offset: 4px; }
+.inst-row-count {
+  margin-left: auto;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  color: var(--press-muted);
+}
+.inst-row-mark { flex: none; width: 15px; height: 15px; }
+
+/* ---- while the panel stands ---- */
+/* the band stays as quiet wall at the left of the sheet, and the words and
+   the ways on it stand down, which is the close look's own law */
+:root[data-na-panel='open'] #wing[data-desk~='panel'] :is(.desk-cap, .desk-ways, .desk-drawer, .desk-thread) {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* ---- the way out, named at the first station ---- */
+.desk-panel-out {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 4px 0 0;
+  font: 500 .875rem/1 var(--sans);
+  letter-spacing: .14em;
+  text-indent: .14em;
+  text-transform: uppercase;
+  color: var(--na-starlight);
+  white-space: nowrap;
+}
+.desk-panel-out[hidden] { display: none; }
+
+/* ---- the door's plate as the band grown ----
+   One ground in the whole museum at four heights: the plate is the same wall
+   the line stood on, taller, and the way on keeps its place inside it. */
+#wing[data-desk~='panel'] .wing-door-plate[data-form='band'] {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: auto;
+  width: auto;
+  max-width: none;
+  min-height: 316px;
+  max-height: none;
+  margin: 0;
+  padding: 26px var(--desk-panel-g, 64px) 9px;
+  border: 0;
+  border-radius: 0;
+  background: var(--na-abyss);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--na-gold) 34%, transparent);
+  backdrop-filter: none;
+  overflow: visible;
+}
+/* no dimmed picture: the room above the plate is the room */
+#wing[data-desk~='panel'] .wing-door-plate[data-form='band']::backdrop { background: none; }
+#wing[data-desk~='panel'] .wing-door-plate[data-form='band'] .na-plate-wall,
+#wing[data-desk~='panel'] .wing-door-plate[data-form='band'] .wing-door-words,
+#wing[data-desk~='panel'] .wing-door-plate[data-form='band'] .na-plate-foot {
+  padding: 0;
+  border: 0;
+  max-width: 860px;
+}
+#wing[data-desk~='panel'] .wing-door-plate[data-form='band'] :is(.na-plate-title, .wing-door-lead) { display: none; }
+.wing-door-asked {
+  margin: 0;
+  max-width: 860px;
+  font: 400 28px/38px var(--serif);
+  letter-spacing: .01em;
+  color: var(--desk-title, #fff5e3);
+}
+#wing[data-desk~='panel'] .wing-door-plate[data-form='band'] .wing-door-word {
+  margin: 0;
+  max-width: 860px;
+  font: 400 19px/30px var(--serif);
+  color: var(--na-starlight);
+}
+#wing[data-desk~='panel'] .wing-door-plate[data-form='band'] .wing-door-words { margin-top: 10px; }
+#wing[data-desk~='panel'] .wing-door-plate[data-form='band'] .wing-door-terms {
+  margin-top: 8px;
+  font: 400 15px/22px var(--sans);
+  color: var(--press-muted);
+}
+#wing[data-desk~='panel'] .wing-door-plate[data-form='band'] .na-plate-foot { margin-top: 16px; }
+#wing[data-desk~='panel'] .wing-door-plate[data-form='band'] :is(.na-plate-primary, .na-plate-second) {
+  min-height: 52px;
+  border-color: var(--press-hairline);
+}
+/* the way on keeps its place and its meaning while the plate stands, so a
+   press on go on still goes on */
+#wing[data-desk~='panel'] .wing-door-plate[data-form='band'] .desk-ways {
+  position: absolute;
+  right: var(--desk-panel-g, 64px);
+  bottom: 9px;
+}
+:root[data-na-window='desk'] #wing[data-desk~='panel'] .wing-door-plate .desk-ways,
+:root[data-na-plate='open'] #wing[data-desk~='panel'] .wing-door-plate .desk-ways {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}

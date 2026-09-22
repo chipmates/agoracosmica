@@ -1155,6 +1155,9 @@ body.forge #door-measure .door-fill { transition: none !important; }
   <div id="instruments" role="dialog" aria-modal="true" aria-labelledby="instruments-title" data-register="drawer" hidden>
     <p id="instruments-title" class="inst-kicker" data-lobby="instrumentsTitle">The instruments of the museum</p>
     <div class="inst-links">
+      <!-- the wing standing fills this with its own rows and takes them back
+           with it: the panel itself knows no wing -->
+      <div class="inst-wing" hidden></div>
       <button id="inst-sound" type="button" aria-pressed="false">Sound · Off</button>
       <fieldset class="inst-setting">
         <legend data-lobby="language">Language</legend>

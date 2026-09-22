@@ -15,6 +15,8 @@ import { createStack } from './stack'
 import type { GradeName } from './stack/grade'
 import { isTierName, type TierName } from './stack/tier'
 import { createWingFrame, stationFromHash } from './wings/frame'
+import { deskOn } from './wings/desk-switches'
+import type { DeskPanelRow } from './wings/desk-panel'
 import { readLabels, type ForgeLabel } from './core/labels'
 import { DISCLOSURES } from './content/disclosures'
 import { WINGS, wingBySlug, wingsOpen, wingsPreparing } from './wings/registry'
@@ -1075,23 +1077,116 @@ function toggleSound(): void {
 railSound?.addEventListener('click', toggleSound)
 instSound?.addEventListener('click', toggleSound)
 
+/** THE PANEL IS A SHEET INSIDE A WING. The museum's own control stands on the
+    wing's band, the panel it opens takes the frame's whole height, and the
+    picture beside it stays visible, so a press on it gives the room back. */
+const panelIsSheet = (): boolean => phase === 'wing' && deskOn('panel')
+
+/** where the museum's control stands, and what the sheet's rules key on */
+function markPanel(): void {
+  const sheet = panelIsSheet()
+  if (sheet) document.documentElement.dataset['naPanel'] = instrumentsEl.hidden ? 'wing' : 'open'
+  else delete document.documentElement.dataset['naPanel']
+  if (sheet) return
+  if (wingRows.length) { wingRows = []; paintWingRows() }
+  for (const name of ['--desk-band-h', '--desk-panel-g'])
+    document.documentElement.style.removeProperty(name)
+}
+
+/** a press outside the sheet gives the picture back, as Escape and Close do */
+function pressOutside(event: Event): void {
+  const target = event.target
+  if (!(target instanceof Node)) return
+  if (instrumentsEl.contains(target) || railInstruments?.contains(target)) return
+  setInstruments(false)
+}
+
 function setInstruments(open: boolean, focus = true): void {
+  const sheet = panelIsSheet()
   instrumentsEl.hidden = !open
   if (instPlan) instPlan.disabled = phase !== 'wing'
   railInstruments?.setAttribute('aria-expanded', String(open))
   if (open) {
-    for (const el of Array.from(document.body.children)) {
+    /* THE HANDLE IS THE CONTROL, RISEN. Inside a wing the same element moves
+       to the sheet's head, so the hand that opened it closes it without
+       moving and the sheet keeps one tab order. */
+    if (sheet && railInstruments) instrumentsEl.prepend(railInstruments)
+    // the sheet leaves the room reachable on purpose: a press on the picture
+    // is the third way out of it
+    if (!sheet) for (const el of Array.from(document.body.children)) {
       if (!(el instanceof HTMLElement) || el === instrumentsEl || el.matches('script, style')) continue
       if (!inertBefore.has(el)) inertBefore.set(el, el.inert)
       el.inert = true
     }
-    if (focus) instSound?.focus()
+    if (sheet) addEventListener('pointerdown', pressOutside, true)
+    if (focus) {
+      const first = sheet ? instrumentsEl.querySelector<HTMLElement>('.inst-wing button, .inst-links button') : instSound
+      first?.focus()
+    }
   } else {
+    if (railInstruments && railInstruments.parentElement === instrumentsEl) railEl.append(railInstruments)
+    removeEventListener('pointerdown', pressOutside, true)
     for (const [el, inert] of inertBefore) el.inert = inert
     inertBefore.clear()
     if (focus) railInstruments?.focus()
   }
+  markPanel()
 }
+
+/* ---- THE FIVE ROWS A WING ADDS AT THE PANEL'S HEAD ----
+   The panel is the museum's and knows no wing. The wing standing says which
+   rows it adds and what each is called in the page's language, and a press
+   here says which row it was: the wing answers with its own control. No word
+   of a wing is written in this file. */
+let wingRows: DeskPanelRow[] = []
+const instWing = instrumentsEl.querySelector<HTMLElement>('.inst-wing')
+/** the way out of the wing, drawn and not fetched */
+function rowMark(): SVGSVGElement {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+  svg.setAttribute('viewBox', '0 0 16 16')
+  svg.setAttribute('class', 'inst-row-mark')
+  svg.setAttribute('fill', 'none')
+  svg.setAttribute('stroke', 'currentColor')
+  svg.setAttribute('stroke-width', '1.4')
+  svg.setAttribute('aria-hidden', 'true')
+  const line = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+  line.setAttribute('d', 'M13 8H3M7 4L3 8l4 4')
+  svg.append(line)
+  return svg
+}
+
+function paintWingRows(): void {
+  if (!instWing) return
+  instWing.textContent = ''
+  instWing.hidden = wingRows.length === 0
+  for (const row of wingRows) {
+    const control = document.createElement('button')
+    control.type = 'button'
+    control.dataset['row'] = row.id
+    if (row.mark === 'back') control.append(rowMark())
+    control.append(document.createTextNode(row.label))
+    if (row.count) {
+      const count = document.createElement('span')
+      count.className = 'inst-row-count'
+      count.textContent = row.count
+      control.append(count)
+    }
+    // a row whose own surface is not built names itself and refuses
+    if (row.disabled) control.setAttribute('aria-disabled', 'true')
+    control.addEventListener('click', () => {
+      if (control.getAttribute('aria-disabled') === 'true') return
+      setInstruments(false, false)
+      dispatchEvent(new CustomEvent('na-wing-instrument', { detail: { row: row.id } }))
+    })
+    instWing.append(control)
+  }
+}
+
+addEventListener('na-wing-instruments', event => {
+  const rows = (event as CustomEvent<{ rows?: DeskPanelRow[] }>).detail?.rows
+  wingRows = Array.isArray(rows) ? rows : []
+  paintWingRows()
+})
 railInstruments?.addEventListener('click', () => setInstruments(instrumentsEl.hidden))
 instrumentsEl.querySelector('.inst-close')?.addEventListener('click', () => setInstruments(false))
 instrumentsEl.addEventListener('keydown', (event) => {
@@ -1158,7 +1253,7 @@ for (const control of instrumentsEl.querySelectorAll<HTMLButtonElement>('[data-l
    row is built here rather than in the page, so the wing that owns the walk
    owns its three numbers and the shell only stands them. */
 const paceRow = document.createElement('fieldset')
-paceRow.className = 'inst-setting inst-tiers'
+paceRow.className = 'inst-setting inst-tiers inst-pace'
 const paceLegend = document.createElement('legend')
 paceLegend.dataset['lobby'] = 'pace'
 paceLegend.textContent = say(LOBBY_TEXT.pace)
@@ -1465,7 +1560,7 @@ window.__forge = {
     }
     if (p !== 'agora' && p !== 'wheel' && p !== 'descent')
       camera.rotation.set(0, 0, 0)
-    railEl.hidden = p === 'transit' || p === 'held' || p === 'breath' || p === 'wing'
+    railEl.hidden = p === 'transit' || p === 'held' || p === 'breath' || (p === 'wing' && !deskOn('panel'))
     // the rig's front door is the door as it STANDS. The frame where it is
     // still waiting is shot by navigating to it, never by a jump: a frozen
     // eye would hold that frame for as long as it looked.
@@ -1654,10 +1749,14 @@ function setPhase(next: Phase): void {
   if (next === 'breath' || next === 'wing' || next === 'bench') {
     setStatus('')
     verseEl.classList.remove('lit') // the cut carries no letterpress
-    railEl.hidden = true
+    /* THE MUSEUM'S CONTROL STANDS INSIDE A WING. The rail carries it alone
+       there: a wing plays no sound in the first product, and a control that
+       does nothing does not stand. */
+    railEl.hidden = !(next === 'wing' && deskOn('panel'))
   } else if (railAwake) {
     railEl.hidden = false
   }
+  markPanel()
   if (next !== 'wing' && wingSlug) {
     wingSlug = ''
     wingFrame.close()

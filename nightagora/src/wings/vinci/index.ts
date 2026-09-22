@@ -92,7 +92,7 @@ import deskCss from '../desk-chrome.css?inline'
 import deskTypeCss from '../desk-type.css?inline'
 import deskCloseLookCss from '../desk-closelook.css?inline'
 
-// desk.panel: its stylesheet import stands here
+import deskPanelCss from '../desk-panel.css?inline'
 
 // desk.marks: its stylesheet import stands here
 import deskMarksCss from '../desk-marks.css?inline'
@@ -449,7 +449,7 @@ export function createWing():VinciWingModule {
     panelFloor=()=>desk?.floor()??wing.querySelector('.wing-rail-group')?.getBoundingClientRect().top??deskStageHeight()
     const deskStyle=make('style','');deskStyle.textContent=[deskTypeCss,deskCss,deskCloseLookCss,
       // desk.panel
-      '',
+      deskPanelCss,
 
       // desk.marks
       deskMarksCss,
