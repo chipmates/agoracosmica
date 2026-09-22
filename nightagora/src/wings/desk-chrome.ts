@@ -18,6 +18,16 @@ import { setRegister } from './frame'
 import { LOBBY_TEXT } from '../content/lobby'
 import type { VinciCertainty, VinciText } from './vinci/content'
 
+// desk.panel: its imports stand here, and nowhere else in this list
+
+// desk.marks: its imports stand here, and nowhere else in this list
+
+// desk.overview: its imports stand here, and nowhere else in this list
+
+// desk.sheet: its imports stand here, and nowhere else in this list
+
+// desk.opening: its imports stand here, and nowhere else in this list
+
 export interface DeskStation {
   id: string
   /** the station's place in the order the rail walks today, from zero */
@@ -61,6 +71,16 @@ export interface DeskChromeHost {
   leg: () => number | null
   /** a second press on the gold control while a leg runs */
   hurry: () => void
+
+  // desk.panel: the host fields its step needs stand here
+
+  // desk.marks: the host fields its step needs stand here
+
+  // desk.overview: the host fields its step needs stand here
+
+  // desk.sheet: the host fields its step needs stand here
+
+  // desk.opening: the host fields its step needs stand here
 }
 
 export interface DeskChrome {
@@ -582,6 +602,38 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
     if (!ways || onControl) return false
     if (event.key === ' ' || event.key === 'Spacebar') { pressOn(); return true }
     return false
+  }
+
+  /* THE SEAM. Each step still to land has one hook here and each seat
+     fills only its own; a hook stays empty until its step stands. */
+
+  // desk.panel: the instruments control and its sheet
+  if (deskOn('panel')) {
+    // filled by its own seat, empty until its step stands
+  }
+
+
+  // desk.marks: the two kinds of mark on the picture
+  if (deskOn('marks')) {
+    // filled by its own seat, empty until its step stands
+  }
+
+
+  // desk.overview: the whole set as its own view
+  if (deskOn('overview')) {
+    // filled by its own seat, empty until its step stands
+  }
+
+
+  // desk.sheet: the one reading sheet
+  if (deskOn('sheet')) {
+    // filled by its own seat, empty until its step stands
+  }
+
+
+  // desk.opening: the guided visit
+  if (deskOn('opening')) {
+    // filled by its own seat, empty until its step stands
   }
 
   return {

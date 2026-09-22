@@ -10,9 +10,11 @@
    main ships, and `?desk=none` is then the way back to today. */
 
 export type DeskStep = 'type14' | 'words' | 'ways' | 'freearea' | 'stage' | 'drawer' | 'closelook'
+  | 'panel' | 'marks' | 'overview' | 'sheet' | 'opening'
 
 /** the steps this chrome knows, in the design's own build order */
-export const DESK_STEPS: readonly DeskStep[] = ['type14', 'words', 'ways', 'freearea', 'stage', 'drawer', 'closelook']
+export const DESK_STEPS: readonly DeskStep[] = ['type14', 'words', 'ways', 'freearea', 'stage', 'drawer', 'closelook',
+  'panel', 'marks', 'overview', 'sheet', 'opening']
 
 /* ONE CONSTANT PER STEP. Off today: the address is the only way to see them. */
 export const DESK_TYPE14 = false
@@ -22,6 +24,11 @@ export const DESK_FREEAREA = false
 export const DESK_STAGE = false
 export const DESK_DRAWER = false
 export const DESK_CLOSELOOK = false
+export const DESK_PANEL = false
+export const DESK_MARKS = false
+export const DESK_OVERVIEW = false
+export const DESK_SHEET = false
+export const DESK_OPENING = false
 
 const DEFAULT: Readonly<Record<DeskStep, boolean>> = {
   type14: DESK_TYPE14,
@@ -31,6 +38,11 @@ const DEFAULT: Readonly<Record<DeskStep, boolean>> = {
   stage: DESK_STAGE,
   drawer: DESK_DRAWER,
   closelook: DESK_CLOSELOOK,
+  panel: DESK_PANEL,
+  marks: DESK_MARKS,
+  overview: DESK_OVERVIEW,
+  sheet: DESK_SHEET,
+  opening: DESK_OPENING,
 }
 
 function fromAddress(): Record<DeskStep, boolean> {

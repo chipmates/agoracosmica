@@ -92,6 +92,16 @@ import deskCss from '../desk-chrome.css?inline'
 import deskTypeCss from '../desk-type.css?inline'
 import deskCloseLookCss from '../desk-closelook.css?inline'
 
+// desk.panel: its stylesheet import stands here
+
+// desk.marks: its stylesheet import stands here
+
+// desk.overview: its stylesheet import stands here
+
+// desk.sheet: its stylesheet import stands here
+
+// desk.opening: its stylesheet import stands here
+
 const text=(value:VinciText):string=>value[lang()]
 /** The painting at the grave: read by its own record, not the hang's register. */
 const DEATHBED_WORK='deathbed-painting', GRAVE_PAINTING_ASPECT=GRAVE_DEATHBED.imageWidth/GRAVE_DEATHBED.imageHeight
@@ -431,7 +441,22 @@ export function createWing():VinciWingModule {
     /* HOW FAR DOWN A PANEL MAY STAND. Today that is the top of the bar; where
        the desktop's words stand, it is the top of their own band. */
     panelFloor=()=>desk?.floor()??wing.querySelector('.wing-rail-group')?.getBoundingClientRect().top??deskStageHeight()
-    const deskStyle=make('style','');deskStyle.textContent=`${deskTypeCss}\n${deskCss}\n${deskCloseLookCss}`;h.stage.append(deskStyle)
+    const deskStyle=make('style','');deskStyle.textContent=[deskTypeCss,deskCss,deskCloseLookCss,
+      // desk.panel
+      '',
+
+      // desk.marks
+      '',
+
+      // desk.overview
+      '',
+
+      // desk.sheet
+      '',
+
+      // desk.opening
+      '',
+    ].filter(Boolean).join('\n');h.stage.append(deskStyle)
     if(deskOn('words')||deskOn('ways'))desk=createDeskChrome({
       stage:h.stage,wing,lang,
       standing:()=>deskStationAt(card),
@@ -448,6 +473,16 @@ export function createWing():VinciWingModule {
       words:{next:LIFE_CARDS.controls.date.next,back:LIFE_CARDS.controls.date.previous,rail:WING_TEXT.rail},
       go:index=>h.navigate(index),
       leg:()=>{const nav=standing?rail.navigation:undefined;return nav?.active?nav.legWalked:null},
+
+      // desk.panel: its host fields
+
+      // desk.marks: its host fields
+
+      // desk.overview: its host fields
+
+      // desk.sheet: its host fields
+
+      // desk.opening: its host fields
       hurry:()=>{if(standing)rail.stride(1)}})
     header=make('div','vinci-heading');header.id='vinci-station-card';h.stage.append(header)
     // THE NAME UNDER THE PAINTING. Standing at a stop with no card, the work
