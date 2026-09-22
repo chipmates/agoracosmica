@@ -166,9 +166,9 @@
       "certainty": "documented"
     },
     "picture/mona-lisa/front": {
-      "en": "It was stolen in 1911 by a Louvre workman who had helped build its glass case. He was caught two years later trying to sell it in Florence.",
-      "de": "1911 stahl sie ein Louvre-Arbeiter, der zuvor beim Bau ihres Glaskastens geholfen hatte. Zwei Jahre später wurde er beim Verkaufsversuch in Florenz gefasst.",
-      "source": "MINING-CATALOG-PAINTINGS, Mona Lisa, label fact",
+      "en": "It was stolen from the Louvre in 1911. Two years later it was found in a Florence hotel room.",
+      "de": "1911 wurde sie aus dem Louvre gestohlen. Zwei Jahre später fand man sie in einem Hotelzimmer in Florenz.",
+      "source": "STAR-SOURCES §1, the taking of 21 August 1911 in the holder's 2021 dossier; the Florence state archive's records of December 1913, the police report of 13 December c. 2r and the declaration of the same day c. 22r",
       "certainty": "documented"
     },
     "picture/virgin-of-the-rocks-london/front": {
