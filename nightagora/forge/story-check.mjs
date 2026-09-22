@@ -21,13 +21,25 @@ import ts from 'typescript'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const STORY = 'src/wings/vinci/story.ts'
+const EXHIBITS = 'src/wings/vinci/data/lines.json'
+
+/* THE TWO BANDS, named here once and nowhere else. A station's line stands in
+   the label band under the picture, two rows of the serif at 30 on 40 over an
+   860 px measure. A work's, a machine's or a page's line stands at the close
+   look, on a 640 px measure with the kind's instruments beside it. Both
+   numbers are measured on the wing's own drawings and hold in either
+   language, because German runs longer in characters than English here. */
+const STATION_LINE_CHARS = 120
+const EXHIBIT_LINE_CHARS = 90
 
 /** the rule, the section it stands on, and what it says in the report */
 const RULES = {
   'line-words': ['§5', 'a line runs to at most twenty words'],
   'line-sentence': ['§5', 'no sentence of a line runs over fourteen words'],
-  'line-chars-en': ['§5', 'the English line holds 118 characters, so the other languages fit the same box'],
-  'line-chars-de': ['§6', 'the German line holds 128 characters, the ratio measured in this wing'],
+  'line-chars-en': ['§5', `a station line holds ${STATION_LINE_CHARS} characters, the English included`],
+  'line-chars-de': ['§6', `a station line holds ${STATION_LINE_CHARS} characters, the German included`],
+  'exhibit-chars': ['§5', `an exhibit line holds ${EXHIBIT_LINE_CHARS} characters at the close look`],
+  'exhibit-debt': ['§5', 'a line inside the band has no place on the re-authoring list'],
   'drawer-words': ['§5', 'a drawer runs 40 to 60 words'],
   'drawer-sentence': ['§5', 'no sentence of a drawer runs over fourteen words'],
   'dash': ['§13', 'the path carries no em dash and no en dash'],
@@ -43,8 +55,21 @@ const RULES = {
 
 const LINE_WORDS = 20
 const SENTENCE_WORDS = 14
-const LINE_CHARS = { en: 118, de: 128 }
+const LINE_CHARS = { en: STATION_LINE_CHARS, de: STATION_LINE_CHARS }
 const DRAWER_WORDS = [40, 60]
+/** The exhibit lines still waiting for their own re-authoring window. A line
+ *  leaves this list when its words are written again from its catalogue fact,
+ *  and an id whose line is already inside the band is refused, so the list can
+ *  only ever shrink. */
+const BAND_DEBT = new Set([
+  'codex/arundel', 'codex/atlanticus', 'codex/madrid-I', 'codex/paris-A', 'codex/paris-B', 'codex/paris-D',
+  'grave', 'grave-diagram',
+  'sheet/rcin-919000', 'sheet/rcin-919001', 'sheet/rcin-919002', 'sheet/rcin-919003', 'sheet/rcin-919004',
+  'sheet/rcin-919005', 'sheet/rcin-919006', 'sheet/rcin-919007', 'sheet/rcin-919008', 'sheet/rcin-919009',
+  'sheet/rcin-919011', 'sheet/rcin-919012', 'sheet/rcin-919013', 'sheet/rcin-919014', 'sheet/rcin-919015',
+  'sheet/rcin-919017', 'sheet/rcin-919019', 'sheet/rcin-919057', 'sheet/rcin-919058', 'sheet/rcin-919082',
+  'sheet/rcin-919101', 'sheet/rcin-919102', 'sheet/rcin-919116',
+])
 const CLASSES = new Set(['documented', 'reconstructed', 'conjectural', 'unknown', 'inferred', 'tradition', 'disputed'])
 /** a pointer that is not a canon key names its family and its own id */
 const FOREIGN_POINTER = /^(?:BD|TL|SRC|XC|REC|KEY|D-[A-Z]+):.+$/
@@ -115,6 +140,22 @@ export function judgeStop(stop, canonKeys) {
   }
   if (!CLASSES.has(stop.certainty)) refuse('certainty', 'certainty', String(stop.certainty))
   if (stop.kind === 'station' && !String(stop.sees ?? '').trim()) refuse('sees', 'sees', 'empty')
+  return out
+}
+
+/** THE OTHER BAND. A work's, a machine's or a page's line is read at the close
+ *  look and stands on its own measure, so it is judged apart from the stops. */
+export function judgeExhibit(id, line, debt) {
+  const out = []
+  let over = false
+  for (const language of ['en', 'de']) {
+    const said = line?.[language]
+    if (typeof said !== 'string' || !said.trim()) { out.push(['language', `${id}.${language}`, 'empty']); continue }
+    if (characters(said) <= EXHIBIT_LINE_CHARS) continue
+    over = true
+    if (!debt.has(id)) out.push(['exhibit-chars', `${id}.${language}`, `${characters(said)} characters`])
+  }
+  if (debt.has(id) && !over) out.push(['exhibit-debt', id, 'inside the band and still on the list'])
   return out
 }
 
@@ -205,6 +246,16 @@ function run() {
     }
   }
 
+  /* the exhibit lines, read from the wing's own data file: no surface of the
+     story layer carries them, and they stand in the narrower band */
+  const exhibits = JSON.parse(fs.readFileSync(path.join(ROOT, EXHIBITS), 'utf8')).lines ?? {}
+  let overBand = 0
+  for (const [id, line] of Object.entries(exhibits)) {
+    const said = judgeExhibit(id, line, BAND_DEBT)
+    for (const [rule, at, measured] of said) refuse(rule, at, measured, id)
+    if (Math.max(characters(line.en ?? ''), characters(line.de ?? '')) > EXHIBIT_LINE_CHARS) overBand++
+  }
+
   const from = process.argv[process.argv.indexOf('--from') + 1]
   let cardCanon = null
   if (process.argv.includes('--from') && from) {
@@ -220,7 +271,11 @@ function run() {
     cuts: (story.vinciStory ?? []).filter((s) => s.kind === 'cut').length,
     built: (story.vinciStory ?? []).filter((s) => s.built).length,
     canon: { rows: canonKeys.size, fromCard: cardCanon ? cardCanon.length : null },
-    limits: { lineWords: LINE_WORDS, sentenceWords: SENTENCE_WORDS, lineCharacters: LINE_CHARS, drawerWords: DRAWER_WORDS },
+    limits: {
+      lineWords: LINE_WORDS, sentenceWords: SENTENCE_WORDS, drawerWords: DRAWER_WORDS,
+      stationLineCharacters: STATION_LINE_CHARS, exhibitLineCharacters: EXHIBIT_LINE_CHARS,
+    },
+    exhibits: { read: Object.keys(exhibits).length, overBand, waiting: BAND_DEBT.size },
     titleWall: story.vinciStoryTitleWall ? { buttons: story.vinciStoryTitleWall.buttons.length } : null,
     exit: story.vinciStoryExit ? { things: story.vinciStoryExit.things.length, doors: story.vinciStoryExit.doors.length } : null,
     table,
@@ -255,6 +310,8 @@ const CASES = [
   ['a line over twenty words', broken({ line: { en: LONG_EN, de: WHOLE.line.de } }), ['line-words']],
   ['a sentence of a line over fourteen words',
     broken({ line: { en: 'He drew the water and the birds and the faces and the bones by hand.', de: WHOLE.line.de } }), ['line-sentence']],
+  ['an English line at the station band',
+    broken({ line: { en: 'He drew the waterwheels, the windmills and the riverbanks. He measured the shoulderblades and the collarbones afterward.', de: WHOLE.line.de } }), []],
   ['an English line over its characters',
     broken({ line: { en: 'He drew the waterwheels, the windmills and the riverbanks. He measured the shoulderblades and the collarbones afterwards.', de: WHOLE.line.de } }), ['line-chars-en']],
   ['a German line over its characters',
@@ -275,6 +332,27 @@ const CASES = [
   ['a line whose frame names no object', broken({ sees: '' }), ['sees']],
 ]
 
+/* THE OTHER BAND, one line each way in either language. Each case declares the
+   character count its own strings must have, so a typo in a literal cannot
+   quietly move a case off the edge it is there to sit on. */
+const AT_BAND = {
+  en: 'A dealer sawed this panel up to sell the head alone. The pieces were joined again at last.',
+  de: 'Ein Händler zerteilte die Tafel, um den Kopf zu verkaufen. Die Teile kamen am Ende zurück.',
+}
+const OVER = {
+  en: 'A dealer sawed this panel up so the head could be sold alone. The pieces were joined again.',
+  de: 'Ein Händler zersägte die Tafel, um den Kopf zu verkaufen. Die Teile kehrten am Ende zurück.',
+}
+const EXHIBIT_CASES = [
+  ['an exhibit line at the band', 'picture/case/front', AT_BAND, false, [90, 90], []],
+  ['an English exhibit line one character over', 'picture/case/front',
+    { en: OVER.en, de: AT_BAND.de }, false, [91, 90], ['exhibit-chars']],
+  ['a German exhibit line one character over', 'picture/case/front',
+    { en: AT_BAND.en, de: OVER.de }, false, [90, 91], ['exhibit-chars']],
+  ['a line still waiting for its window', 'sheet/rcin-919006', OVER, true, [91, 91], []],
+  ['a waiting line that is now inside the band', 'sheet/rcin-919006', AT_BAND, true, [90, 90], ['exhibit-debt']],
+]
+
 function selftest() {
   const canonKeys = new Set(['C00', 'C01'])
   const bad = []
@@ -282,12 +360,19 @@ function selftest() {
     const got = judgeStop(stop, canonKeys).map(([rule]) => rule)
     if (got.join(',') !== want.join(',')) bad.push(`${said}: expected ${want.join(', ') || 'nothing'}, got ${got.join(', ') || 'nothing'}`)
   }
+  for (const [said, id, line, waiting, lengths, want] of EXHIBIT_CASES) {
+    const measured = [characters(line.en), characters(line.de)]
+    if (measured.join(',') !== lengths.join(',')) bad.push(`${said}: the case reads ${measured.join(' and ')} characters, not ${lengths.join(' and ')}`)
+    const got = judgeExhibit(id, line, waiting ? new Set([id]) : new Set()).map(([rule]) => rule)
+    if (got.join(',') !== want.join(',')) bad.push(`${said}: expected ${want.join(', ') || 'nothing'}, got ${got.join(', ') || 'nothing'}`)
+  }
   const wing = run()
   for (const line of bad) console.log(` · ${line}`)
   if (!wing.ok) for (const error of wing.errors) console.log(` · the wing: ${error.stop} ${error.at} ${error.rule} (${error.measured})`)
+  const cases = CASES.length + EXHIBIT_CASES.length
   console.log(bad.length || !wing.ok
-    ? `SELFTEST FAILED: ${bad.length} of ${CASES.length} cases, the wing ${wing.ok ? 'passes' : 'is refused'}`
-    : `selftest: ${CASES.length} cases as written, and the wing's own ${wing.stops} stops pass`)
+    ? `SELFTEST FAILED: ${bad.length} of ${cases} cases, the wing ${wing.ok ? 'passes' : 'is refused'}`
+    : `selftest: ${cases} cases as written, and the wing's own ${wing.stops} stops and ${wing.exhibits.read} exhibit lines pass`)
   process.exitCode = bad.length || !wing.ok ? 1 : 0
 }
 
