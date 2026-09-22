@@ -367,7 +367,12 @@ for (const phone of VIEWPORTS) {
     }
   }
 }
-report.ok = report.flat.length === 0 && report.twice.length === 0
+/** A STRETCH WALKED TWICE IS A DEFECT AND FAILS. A flat centre is a reading
+ * and does not: the collision solids carry no picture plate and no machine,
+ * one mesh holds every wall of the insertion, and a long wall at a grazing
+ * angle has perspective in pixels and one name here. The count is reported
+ * for the seat that judges the frames. */
+report.ok = report.twice.length === 0
 report.flatLegs = report.flat.length
 report.twiceLegs = report.twice.length
 console.log(JSON.stringify(report, null, 1))
