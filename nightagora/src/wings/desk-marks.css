@@ -147,3 +147,30 @@
   #wing[data-desk~='marks'][data-walking] .vinci-exhibit-dot { opacity: 1; pointer-events: auto; }
 }
 
+/* ---- the same law in the band ---- */
+
+/* The two controls of the ways carry a hairline at rest and take their tint
+   on the pointer and on the press, which is the same sentence as the marks'.
+   The night under the gold control stays: it is what holds its words on a
+   bright picture, and it is not the gold skin this step takes off. */
+#wing[data-desk~='marks'] .desk-on {
+  background: color-mix(in srgb, var(--na-abyss) 80%, transparent);
+}
+#wing[data-desk~='marks'] .desk-on:hover {
+  background:
+    linear-gradient(color-mix(in srgb, var(--na-gold) 17%, transparent), color-mix(in srgb, var(--na-gold) 17%, transparent)),
+    color-mix(in srgb, var(--na-abyss) 80%, transparent);
+}
+#wing[data-desk~='marks'] .desk-on:active {
+  background:
+    linear-gradient(color-mix(in srgb, var(--na-gold) 27%, transparent), color-mix(in srgb, var(--na-gold) 27%, transparent)),
+    color-mix(in srgb, var(--na-abyss) 80%, transparent);
+}
+#wing[data-desk~='marks'] .desk-back { background: none; }
+#wing[data-desk~='marks'] .desk-back:hover,
+#wing[data-desk~='marks'] .desk-back:focus-visible { background: var(--desk-glass); }
+#wing[data-desk~='marks'] .desk-back:active {
+  background: color-mix(in srgb, var(--na-starlight) 12%, transparent);
+}
+
+
