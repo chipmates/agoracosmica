@@ -159,7 +159,7 @@ function makeIndex(data) {
 }
 const data = trianglesOf(solids)
 const bins = makeIndex(data)
-const ta = new THREE.Vector3(), tb = new THREE.Vector3(), tc = new THREE.Vector3(), hit = new THREE.Vector3()
+const ta = new THREE.Vector3(), tb = new THREE.Vector3(), tc = new THREE.Vector3(), hit = new THREE.Vector3(), normal = new THREE.Vector3()
 const ray = new THREE.Ray()
 /** The first solid along a ray, marched cell band by cell band so a long ray
  * never asks for the whole world at once. */
@@ -171,7 +171,7 @@ function firstHit(origin, direction) {
     const to = [origin.x + direction.x * end, origin.y + direction.y * end, origin.z + direction.z * end]
     const low = [0, 1, 2].map(axis => Math.floor(Math.min(from[axis], to[axis]) / CELL))
     const high = [0, 1, 2].map(axis => Math.floor(Math.max(from[axis], to[axis]) / CELL))
-    let best = Infinity, name = null
+    let best = Infinity, name = null, face = -1, level = null
     const seen = new Set()
     for (let x = low[0]; x <= high[0]; x++) for (let y = low[1]; y <= high[1]; y++) for (let z = low[2]; z <= high[2]; z++) {
       for (const i of bins.get(x + ',' + y + ',' + z) ?? []) {
@@ -181,17 +181,41 @@ function firstHit(origin, direction) {
         ta.fromArray(data.values, at); tb.fromArray(data.values, at + 3); tc.fromArray(data.values, at + 6)
         if (!ray.intersectTriangle(ta, tb, tc, false, hit)) continue
         const distance = hit.distanceTo(origin)
-        if (distance < best) { best = distance; name = data.names[i] }
+        if (distance < best) { best = distance; name = data.names[i]; face = i; level = hit.y }
       }
     }
-    if (best <= end + 1e-9) return { distance: best, name }
+    if (best <= end + 1e-9) {
+      const at = face * 9
+      ta.fromArray(data.values, at); tb.fromArray(data.values, at + 3); tc.fromArray(data.values, at + 6)
+      normal.crossVectors(tb.sub(ta), tc.sub(ta)).normalize()
+      return { distance: best, name, up: Math.abs(normal.y), level }
+    }
   }
-  return { distance: Infinity, name: null }
+  return { distance: Infinity, name: null, up: 0, level: null }
 }
 
 /* ---- the walk ---- */
 const inverse = new THREE.Matrix4(), corner = new THREE.Vector3(), forward = new THREE.Vector3()
 const travel = new THREE.Vector3(), look = new THREE.Vector3(), chord = new THREE.Vector3()
+/** WHAT THE WHOLE FRAME HOLDS, not only its centre. A narrow frame carries a
+ * much taller field for the same aim, so the share of it that is floor says
+ * whether a pose composed for a stop still composes while walking. */
+const FRAME_RAYS = 7
+function readFrame(camera) {
+  camera.updateMatrixWorld(true)
+  camera.updateProjectionMatrix()
+  inverse.copy(camera.projectionMatrix).invert()
+  let floor = 0, open = 0
+  for (let row = 0; row < FRAME_RAYS; row++) for (let column = 0; column < FRAME_RAYS; column++) {
+    corner.set((column + .5) / FRAME_RAYS * 2 - 1, 1 - (row + .5) / FRAME_RAYS * 2, .5).applyMatrix4(inverse)
+    forward.copy(corner).normalize().applyQuaternion(camera.quaternion)
+    const found = firstHit(camera.position, forward)
+    if (!found.name) { open++; continue }
+    if (found.up > .8 && found.level !== null && found.level < camera.position.y - .3) floor++
+  }
+  const rays = FRAME_RAYS * FRAME_RAYS
+  return { floorShare: +(floor / rays).toFixed(3), openShare: +(open / rays).toFixed(3) }
+}
 function readBox(camera) {
   camera.updateMatrixWorld(true)
   camera.updateProjectionMatrix()
@@ -246,7 +270,8 @@ for (const phone of VIEWPORTS) {
           now = step * seconds / STEPS
           rail.update()
           assertRailProjection(camera)
-          samples.push({ share: +(step / STEPS).toFixed(3), at: camera.position.clone(), q: camera.quaternion.clone(), ...readBox(camera) })
+          const frame = step % 4 === 0 && step / STEPS >= WALKED.from && step / STEPS <= WALKED.to ? readFrame(camera) : {}
+          samples.push({ share: +(step / STEPS).toFixed(3), at: camera.position.clone(), q: camera.quaternion.clone(), ...readBox(camera), ...frame })
         }
         // WHERE THE BODY IS GOING, beside where the eye is looking. The step
         // between two samples is the direction of travel, and one ray along
@@ -330,6 +355,11 @@ for (const phone of VIEWPORTS) {
         nearest: Math.min(...samples.map(entry => entry.nearest)),
         oneBodyFrames: samples.filter(entry => entry.bodies === 1).length,
         flat,
+      }
+      const framed = samples.filter(entry => entry.floorShare !== undefined)
+      if (framed.length) {
+        leg.floorShare = +(framed.reduce((sum, entry) => sum + entry.floorShare, 0) / framed.length).toFixed(3)
+        leg.openShare = +(framed.reduce((sum, entry) => sum + entry.openShare, 0) / framed.length).toFixed(3)
       }
       report.legs.push(leg)
       if (flat.length) report.flat.push(leg)
