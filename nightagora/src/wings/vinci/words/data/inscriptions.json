@@ -1171,10 +1171,10 @@
     {
       "id": "richter-1150",
       "richter_number": 1150,
-      "folio_siglum": "S. K. M. III. 80a",
-      "folio_siglum_catalogue": "S. K. M. III. 80a",
-      "folio_certainty": "C",
-      "folio_notes": "Richter gives Forster III 80a, Herzfeld’s printed page 142 gives 80v.",
+      "folio_siglum": "S. K. M. III. 80b (Forster III f. 80v)",
+      "folio_siglum_catalogue": "S. K. M. III. 80b (Forster III f. 80v)",
+      "folio_certainty": "A",
+      "folio_notes": "Richter prints the passage at §1150, vol. II p. 288, with the siglum S. K. M. III. 80b, the third South Kensington notebook, today Codex Forster III f. 80v at the Victoria and Albert Museum. Read on the page image. Herzfeld's printed page 142 carries the same passage. The folio 14r that circulates on quote sites has no source behind it.",
       "text_en": "Wisdom is the daughter of experience.",
       "text_de": "Die Weisheit ist eine Tochter der Erfahrung.",
       "de_status": "source translation",
@@ -1213,7 +1213,8 @@
       "display_ready_en": false,
       "display_ready_de": false,
       "gaps": [
-        "Folio identification remains uncertain. Display the uncertainty with any quotation."
+        "Richter's own footnote ends on the note breaking off, so the sentence is unfinished in the notebook. Say so with any quotation.",
+        "The notebook spells it sapietia and sperietia, with the nasal marks of its own hand. A modern spelling shown anywhere is modernised and says so."
       ]
     },
     {
