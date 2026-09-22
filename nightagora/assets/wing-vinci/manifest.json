@@ -231,7 +231,7 @@
       "prompt": "Original procedural modern museum insertion at the fixed maquette envelope. Low post-grid pavilions, shallow slate roofs, full-height glazed enclosure, concrete apron and garden stair. Exact modern approach grade cuts, supported landings and continuous concrete cheek ownership. Museum design, not a claim about1517. Share the existing pale cast-concrete finish across all four roof soffits; keep their downward normals and the sole measured sun. Derive both entrance post heads from the retained inclined canopy underside; keep their centres and buried feet. Provide continuous derived structural support beneath the existing stair cheeks and both landing heads. Keep the maquette walking widths and every finish level.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "682976b62aa9cc0367dd110ae8820426a27681977c241afc828f9925de06f60f",
+      "sha256": "741bf57b9eb787765ec9156d99518db9cbd02fdd0d4058be086ecac1a3fa7036",
       "note": "recipe_file=src/wings/vinci/collection.ts"
     },
     {
