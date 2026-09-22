@@ -244,6 +244,11 @@ export const railMoveDurationSeconds = 20
  * already looking at what they are arriving at, and leading the gaze down a
  * six-metre path only turns it into the wall the path runs at. */
 const GAZE_LEAVES = .16, GAZE_ARRIVES = .66, GAZE_AHEAD_M = 6, WALKED_LEG_M = 10
+/** How far the line of sight may stand off the way it leads down, how short
+ * the lead may be pulled, and in what steps. Half a metre is inside the
+ * envelope the certificate proves around the path, so a chord that holds it
+ * runs where the body itself is about to go. */
+const GAZE_CORRIDOR_M = .5, GAZE_AHEAD_LEAST_M = 1.5, GAZE_AHEAD_STEP_M = .75, GAZE_CHORD_SAMPLES = 4
 /** How many stations of the walk lie between two of them. A visitor pressing
  * on asks for one further along; a visitor changing their mind asks for one
  * the same distance off. */
@@ -289,7 +294,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
   const fromQ=new Quaternion(), toQ=new Quaternion()
   let fromFov=49,targetFov=49
   let fromHeading=0,fromElevation=0,toHeading=0,toElevation=0,walked=false
-  const ahead=new Vector3(), behind=new Vector3()
+  const ahead=new Vector3(), behind=new Vector3(), lead=new Vector3(), probe=new Vector3(), span=new Vector3()
   const reducedMotion=()=>matchMedia('(prefers-reduced-motion: reduce)').matches
   const look=createRailLookSmoother(clock,reducedMotion,.1)
   const base=new Quaternion(), euler=new Euler(0,0,0,'YXZ'), forward=new Vector3()
@@ -304,6 +309,34 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
    * from the body to the place it is walking to, which settles through a bend
    * instead of swinging with it. Under half a metre of chord the path has run
    * out and the tangent at the body is all there is. */
+  /** HOW FAR OFF THE WAY A CHORD RUNS. The certificate proves the path, not
+   * the line of sight over it, so a chord that leaves the way the body walks
+   * is a chord through whatever the way turns around. */
+  function chordLeavesTheWay(at:number,aheadMetres:number):boolean {
+    const total=path!.length
+    path!.pointAtDistance(at,behind);path!.pointAtDistance(Math.min(total,at+aheadMetres),lead)
+    span.subVectors(lead,behind)
+    const length=span.lengthSq()
+    if(length<1e-9)return false
+    for(let sample=1;sample<GAZE_CHORD_SAMPLES;sample++){
+      path!.pointAtDistance(Math.min(total,at+aheadMetres*sample/GAZE_CHORD_SAMPLES),probe)
+      probe.sub(behind)
+      const along=Math.max(0,Math.min(1,probe.dot(span)/length))
+      if(probe.addScaledVector(span,-along).lengthSq()>GAZE_CORRIDOR_M*GAZE_CORRIDOR_M)return true
+    }
+    return false
+  }
+  /** THE LOOK AHEAD FOLLOWS THE WAY IT LEADS. Six metres on is the place the
+   * walk is going only while the way runs straight at it; through a bend that
+   * chord cuts the corner, and the corner is a wall. The lead is pulled back
+   * to the last chord the way itself still lies under. */
+  function leadMetres(bodyMetres:number):number {
+    const room=Math.max(0,path!.length-bodyMetres)
+    for(let metres=Math.min(GAZE_AHEAD_M,room);metres>GAZE_AHEAD_LEAST_M;metres-=GAZE_AHEAD_STEP_M){
+      if(!chordLeavesTheWay(bodyMetres,metres))return metres
+    }
+    return Math.min(GAZE_AHEAD_LEAST_M,room)
+  }
   function pathAngles(bodyMetres:number,aheadMetres:number):{heading:number;elevation:number} {
     const total=path!.length,at=Math.max(0,Math.min(total,bodyMetres))
     path!.pointAtDistance(at,behind);path!.pointAtDistance(Math.min(total,at+aheadMetres),ahead)
@@ -554,7 +587,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
         // what stands over the way, and turns into the next station's
         // composition only on arrival.
         const leaves=walked?ramp(0,GAZE_LEAVES,s):0,arrives=walked?ramp(GAZE_ARRIVES,1,s):s
-        const along=walked?pathAngles(metres,GAZE_AHEAD_M):{heading:toHeading,elevation:toElevation}
+        const along=walked?pathAngles(metres,leadMetres(metres)):{heading:toHeading,elevation:toElevation}
         const heading=turn(turn(fromHeading,along.heading,leaves),toHeading,arrives)
         const lift=walked?gaitHeadLift(headLifts,camera.position.x,-camera.position.z):0
         const led=fromElevation+(along.elevation+lift-fromElevation)*leaves
