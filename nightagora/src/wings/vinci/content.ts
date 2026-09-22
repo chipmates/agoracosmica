@@ -898,10 +898,18 @@ export const vinciPlanRooms = {
   'long-gallery': { en: 'The long gallery', de: 'Die lange Galerie' },
 } satisfies Record<string, VinciText>;
 
-/** THE LIFE VIEW'S OWN SECOND LINE, under the wing's through line. */
+/** THE LIFE VIEW'S OWN SECOND LINE, under the wing's through line. The two
+ * years are filled from the record's first and last date of the life. */
 export const vinciLifeSecondLine: VinciText = {
-  en: 'The whole life, 1452 to 1519, and where the papers went after.',
-  de: 'Das ganze Leben, 1452 bis 1519, und wohin die Blätter danach gingen.',
+  en: 'The whole life, {from} to {to}, and what was left after.',
+  de: 'Das ganze Leben, {from} bis {to}, und was danach blieb.',
+};
+
+/** THE FLOOR'S COUNT, filled from the floor and the record. It names the room,
+ * because the life view opens from every station of the wing. */
+export const vinciLifeFloorCount: VinciText = {
+  en: '{cut} of the {total} dates are cut into the floor of the long gallery. All {total} are in the record.',
+  de: '{cut} der {total} Daten sind in den Boden der langen Galerie geschnitten. Alle {total} stehen im Nachweis.',
 };
 
 /** THE MIDDLE ROW OF THE LIFE VIEW, named for what stands on it. This wing's
@@ -937,8 +945,8 @@ export const vinciLifeWorksEmpty: VinciText = {
  * the dates the floor does not carry say nothing, because the count at the
  * foot of the view already says how many of the fifty-six are cut. */
 export const vinciLifeCut: VinciText = {
-  en: 'Cut into this floor.',
-  de: 'In diesen Boden geschnitten.',
+  en: 'Cut into the floor of the long gallery.',
+  de: 'In den Boden der langen Galerie geschnitten.',
 };
 
 /** THE SEVEN PERIODS, named by place and by the years the period runs
@@ -958,8 +966,8 @@ export const vinciLifeBands: readonly {
     place: { en: 'Vinci and Florence', de: 'Vinci und Florenz' },
     years: { from: 1452, to: 1481 },
     line: {
-      en: 'He is born near Vinci and learns his trade in Florence, in Verrocchio’s workshop.',
-      de: 'Er wird bei Vinci geboren und lernt sein Handwerk in Florenz, in Verrocchios Werkstatt.',
+      en: 'He is said to be born near Vinci. He probably learns his trade in Florence, in Verrocchio’s workshop.',
+      de: 'Er soll bei Vinci geboren sein. Wahrscheinlich lernt er sein Handwerk in Florenz, in Verrocchios Werkstatt.',
     },
   },
   {
@@ -968,8 +976,8 @@ export const vinciLifeBands: readonly {
     place: { en: 'Milan', de: 'Mailand' },
     years: { from: 1482, to: 1499 },
     line: {
-      en: 'Seventeen years at the Sforza court, with the horse, the Last Supper and the first machines.',
-      de: 'Siebzehn Jahre am Hof der Sforza, mit dem Pferd, dem Abendmahl und den ersten Maschinen.',
+      en: 'About seventeen years at the Sforza court, with the horse, the Last Supper and the first machines.',
+      de: 'Etwa siebzehn Jahre am Hof der Sforza, mit dem Pferd, dem Abendmahl und den ersten Maschinen.',
     },
   },
   {
@@ -978,8 +986,8 @@ export const vinciLifeBands: readonly {
     place: { en: 'Venice and the Romagna', de: 'Venedig und die Romagna' },
     years: { from: 1500, to: 1506 },
     line: {
-      en: 'He moves from city to city, works for Cesare Borgia, and begins the portrait of Lisa del Giocondo.',
-      de: 'Er zieht von Stadt zu Stadt, arbeitet für Cesare Borgia und beginnt das Bildnis der Lisa del Giocondo.',
+      en: 'He moves from city to city, works for Cesare Borgia, and works on the portrait of Lisa del Giocondo.',
+      de: 'Er zieht von Stadt zu Stadt, arbeitet für Cesare Borgia und am Bildnis der Lisa del Giocondo.',
     },
   },
   {
@@ -988,8 +996,8 @@ export const vinciLifeBands: readonly {
     place: { en: 'Milan again', de: 'Wieder Mailand' },
     years: { from: 1506, to: 1513 },
     line: {
-      en: 'Back under French rule, with the anatomy sheets and a second horse that stayed a plan.',
-      de: 'Zurück unter französischer Herrschaft, mit den anatomischen Blättern und einem zweiten Pferd, das ein Plan blieb.',
+      en: 'Back under French rule, probably with the anatomy sheets and the plans for a second horse.',
+      de: 'Zurück unter französischer Herrschaft, wohl mit den anatomischen Blättern und den Plänen für ein zweites Pferd.',
     },
   },
   {
@@ -1014,7 +1022,7 @@ export const vinciLifeBands: readonly {
   },
   {
     id: 'after', from: 'life-43', to: 'life-56', afterlife: true,
-    name: { en: 'After 1519, where the papers went', de: 'Nach 1519, wohin die Blätter gingen' },
+    name: { en: 'After 1519, what was left', de: 'Nach 1519, was blieb' },
     place: { en: 'After 1519', de: 'Nach 1519' },
     line: {
       en: 'Five hundred years of heirs, sales and thefts, from Melzi’s house to an exhibition at the Louvre.',
@@ -1027,8 +1035,8 @@ export const vinciLifeBands: readonly {
  * stands on. The wing already says this sentence inside its own station card;
  * the life view says it beside that date. */
 export const vinciLifeHourMark: VinciText = {
-  en: 'The hour you are standing in.',
-  de: 'Die Stunde, in der du stehst.',
+  en: 'The hour you are standing in. The day is written down, the hour is the museum’s choice.',
+  de: 'Die Stunde, in der du stehst. Der Tag ist aufgeschrieben, die Stunde hat das Museum gewählt.',
 };
 
 /** THE PEOPLE OF THIS LIFE, authored from the dates the record already holds
