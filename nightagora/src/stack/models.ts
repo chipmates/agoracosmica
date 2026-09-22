@@ -53,6 +53,7 @@ import {
   Color,
   Euler,
   InstancedMesh,
+  LoadingManager,
   Matrix4,
   Mesh,
   MeshStandardNodeMaterial,
@@ -143,7 +144,15 @@ export function modelTextureSide(tier: Tier): number {
    the maps as ETC1S inside KTX2; a bare GLTFLoader refuses both and the
    whole document fails, not just its textures. The KTX2 loader is the
    stack's one (`./ktx2`). */
-const loader = new GLTFLoader().setKTX2Loader(ktx2).setMeshoptDecoder(MeshoptDecoder)
+/* WHAT A DOCUMENT ASKS FOR BY ITSELF. A glTF names its buffer and its maps
+   relative to its own folder, and three resolves those against the folder,
+   where a query on the document cannot reach. Every sub-request passes the
+   loading manager, so the address each of those files gets is the one the
+   store's own record for it forms, versioned like any other. */
+const byFolder = new Map<string, string>()
+const documents = new LoadingManager()
+documents.setURLModifier((url) => byFolder.get(url) ?? url)
+const loader = new GLTFLoader(documents).setKTX2Loader(ktx2).setMeshoptDecoder(MeshoptDecoder)
 
 /* the density under which a source's own maps stop carrying the room-scale
    band. Measured, not chosen by eye: at 400 texels per metre one texel is
@@ -187,6 +196,12 @@ export function createModelLibrary(
        address itself; a folder that holds several files names each of them in
        its own record, and the document's is what this address must carry */
     const named = entry.sha256 ? null : index.byId.get(`${entry.id}-${file.replace(/\.[^.]*$/, '')}`)
+    for (const beside of index.all) {
+      if (beside.wing !== entry.wing || beside === entry) continue
+      if (!beside.path.startsWith(entry.path) || beside.path.endsWith('/')) continue
+      const address = assetAddress(beside)
+      if (address.includes('?v=')) byFolder.set(address.slice(0, address.indexOf('?')), address)
+    }
     const gltf = await loader.loadAsync(named ? assetAddress(named) : assetAddress(entry, file))
     const prototype = gltf.scene as unknown as Object3D
     const measured = dress(prototype, entry)

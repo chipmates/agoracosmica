@@ -14,6 +14,7 @@
  */
 import { lang } from '../../content'
 import type { ManifestEntry, ManifestIndex } from '../../../manifest'
+import { assetAddress } from '../../../stack/materials'
 import type { DeepPlateSource, DeepPlateTier } from '../../vitrine/deep-plate'
 import { createReaderPayload as createReader, type ReaderBook, type ReaderSide } from '../../vitrine/reader'
 import type { VitrinePayload } from '../../vitrine/types'
@@ -79,7 +80,7 @@ export function createReaderPayload(options: {
     return index?.all.find(entry => (entry as ManifestEntry & { page?: string }).page === page.file
       && (entry as ManifestEntry & { role?: string }).role === role)
   }
-  const url = (entry: ManifestEntry | undefined): string | null => entry ? `/na-assets/${entry.wing}/${entry.path}` : null
+  const url = (entry: ManifestEntry | undefined): string | null => entry ? assetAddress(entry) : null
 
   /** The pixels of one record's own scan, with the plate's rectangle on it
    * where the forge could read one. */

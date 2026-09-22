@@ -1,4 +1,6 @@
 import shelfText from './data/codices.json?raw'
+import { loadManifest, type ManifestEntry } from '../../../manifest'
+import { assetAddress } from '../../../stack/materials'
 import { TABLE_UI, type Language } from './content'
 
 /** The shelf's register of codices. Counts are scans or edition pages, never
@@ -51,13 +53,20 @@ function node<K extends keyof HTMLElementTagNameMap>(
   return element
 }
 
-/** The store serves the shelf plate through the local asset route; the record
- * that carries its licence is the page it was cut from. */
+/* The shelf is built the moment the table opens, so the record is held here
+   rather than awaited in the middle of a list. */
+let RECORDS: Map<string, ManifestEntry> | null = null
+void loadManifest().then(index => { RECORDS = new Map(index.all.map(e => [e.path, e])) })
+
+/** The store's own record is what serves the shelf plate and what carries its
+ * licence: the page it was cut from. A plate with no record is no plate. */
 function plate(entry: CodexEntry): HTMLImageElement | null {
   if (!entry.plate) return null
+  const record = RECORDS?.get(entry.plate)
+  if (!record) return null
   const image = document.createElement('img')
   image.className = 'vt-codex-plate'
-  image.src = `/na-assets/wing-vinci/${entry.plate}`
+  image.src = assetAddress(record)
   if (entry.plate_w && entry.plate_h) { image.width = entry.plate_w; image.height = entry.plate_h }
   image.loading = 'lazy'
   image.decoding = 'async'

@@ -6,6 +6,7 @@ import {
   Texture,
 } from 'three/webgpu'
 import type { ManifestEntry, ManifestIndex } from '../../../manifest'
+import { assetAddress } from '../../../stack/materials'
 
 export interface PageEntry extends ManifestEntry {
   page?: string
@@ -152,7 +153,7 @@ export function createPageStream(manifest: ManifestIndex): PageStream {
     const result = (async (): Promise<Texture> => {
       let bitmap: ImageBitmap | undefined
       try {
-        const response = await fetch(`/na-assets/${entry.wing}/${entry.path}`, { signal: controller.signal })
+        const response = await fetch(assetAddress(entry), { signal: controller.signal })
         if (!response.ok) throw new Error(`${entry.id}: HTTP ${response.status}`)
         const blob = await response.blob()
         const digest = await crypto.subtle.digest('SHA-256', await blob.arrayBuffer())

@@ -3,6 +3,7 @@ import type { Stack, KeyLight } from '../../../../stack';
 import { float, fog, positionWorld, rangeFogFactor, smoothstep, uv, vec3 } from 'three/tsl';
 import { IDENTITY } from '../../../../stack/grade';
 import { loadManifest, type ManifestEntry } from '../../../../manifest';
+import { assetAddress } from '../../../../stack/materials';
 import { loadMachineMaterial } from '../parts';
 import { buildMachine, type ReadyMachineBuild } from '..';
 import type { StoreCrane, StoreCraneReading } from '../crane-body';
@@ -286,7 +287,7 @@ export function createBench(stack: Stack, onExit: () => void) {
     return; const entry = manifest.byId.get(id[slug] ?? ''); folioEntry = entry?.display && entry.class !== 'REFERENCE-ONLY' ? entry : undefined; folio.replaceChildren(); const cap = el('figcaption', ''); const folioName = record.folio.map(f => `${f.codex} ${localText(lang, 'f.', 'Blatt')} ${f.folio}`).join(', '); if (folioEntry) {
     const img = el('img', '');
     img.alt = folioName;
-    img.src = `/na-assets/wing-vinci/${folioEntry.path}`;
+    img.src = assetAddress(folioEntry);
     folio.append(img);
     imageReady = img.decode().catch(() => { });
     cap.textContent = `${folioName}\n${localText(lang, '1883 historical facsimile', 'Historisches Faksimile von 1883')}`;

@@ -2172,7 +2172,7 @@
         },
         {
           "path": "src/wings/vinci/machines/bench/index.ts",
-          "sha256": "40496c0d337f83ec3250111360db639a9b000808d904502d1b5a3026d278fe06"
+          "sha256": "4805a2d19c8817ae97c90ec648af7efeaa5e00816b137e1fc8c148b2a4f52450"
         },
         {
           "path": "src/wings/vinci/machines/bench/metrics.ts",
@@ -2238,7 +2238,7 @@
         },
         {
           "path": "src/wings/vinci/machines/bench/index.ts",
-          "sha256": "40496c0d337f83ec3250111360db639a9b000808d904502d1b5a3026d278fe06"
+          "sha256": "4805a2d19c8817ae97c90ec648af7efeaa5e00816b137e1fc8c148b2a4f52450"
         }
       ],
       "note": "Procedural modern hall geometry only. The stone material set remains a separately manifested CC0 library asset. No machine's own hall is claimed or reconstructed here.",
@@ -2254,7 +2254,7 @@
       "prompt": "The da Vinci machine bench. Restrained museum typography, folio mounts, named absence panels, certainty marks, navigation, finite-demonstration status and evidence reading furniture, plus an optional diagnostic card displaying observed runtime measurements. Reuse the locked bilingual pages verbatim. No unapproved folio or reconstruction photograph is displayed. Window 5: three registers of text. The label speaks the hour (15:19 by the sun, 10 October 1517) and says the day is documented and the hour chosen, and it names what the bench does not show; the drawer explains without bracket citations; the record behind Read the evidence carries the arithmetic, the place, the method and the sources. The same computed 10 October 1517 Julian 15:19:00 LAT hour and geographic sun A=231.9005 degrees h=17.3882 degrees drive the bench key. The hour is chosen, not historical observation. Window 6: the phone drops the footer's top rule so one line closes the reading column; the compass is staged as an object (three-quarter view, full frame height on the wide frame, .35 on the phone) and every machine is fitted at .80 of the half height and .70 of the half width, .31 on the phone; a close state frames the working end of a machine alone. No locked copy changed.",
       "model": "GPT-6 Codex, with a Claude Opus 5 harvest seat",
       "date": "2026-09-11",
-      "sha256": "40496c0d337f83ec3250111360db639a9b000808d904502d1b5a3026d278fe06",
+      "sha256": "4805a2d19c8817ae97c90ec648af7efeaa5e00816b137e1fc8c148b2a4f52450",
       "recipe_files": [
         {
           "path": "src/wings/vinci/machines/bench/bench.css",
@@ -2274,7 +2274,7 @@
         },
         {
           "path": "src/wings/vinci/machines/bench/index.ts",
-          "sha256": "40496c0d337f83ec3250111360db639a9b000808d904502d1b5a3026d278fe06"
+          "sha256": "4805a2d19c8817ae97c90ec648af7efeaa5e00816b137e1fc8c148b2a4f52450"
         },
         {
           "path": "src/wings/vinci/machines/bench/metrics.ts",
@@ -3499,7 +3499,7 @@
       "prompt": "The reading table's codex selector: every codex the rights policy admits, with its holder, its class and what part of it is recorded, plus one line for each named absence.",
       "model": "Deterministic TypeScript and CSS; authored with Opus 5",
       "date": "2026-09-14",
-      "sha256": "2f3a3a4c2d4bbfd3b39a1c75c4bd69f3d2b8f8b3eebcdc22da8601ac6e42a142",
+      "sha256": "92ed4e9f6e557bbfd0c4653fb3aa4a727234f6b8954c53d70f61b793c3ecba20",
       "note": "recipe_file=src/wings/vinci/table/codex-shelf.ts; output_source=src/wings/vinci/table/codex-shelf.ts; the shelf names what is recorded and never changes what the reader reads"
     },
     {

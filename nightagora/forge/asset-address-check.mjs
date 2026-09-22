@@ -6,9 +6,11 @@
 //   node forge/asset-address-check.mjs [--json]
 //
 //   1 AN ADDRESS FORMED BY HAND. ASSET_BASE lives in one module and is read
-//     nowhere else; `assetUrl` may not be called at all, because it answers
-//     with a record's source_url, which is the holder's page and not a file
-//     in the store.
+//     nowhere else; the dev route and the media origin are written in that
+//     module alone, because a hand-written `/na-assets/` is a file the built
+//     museum asks its own origin for and never finds; and `assetUrl` may not
+//     be called at all, because it answers with a record's source_url, which
+//     is the holder's page and not a file in the store.
 //   2 AN ADDRESS WITHOUT A VERSION. Every record the loader can address is
 //     run through the helper's own rule; one that yields no twelve hex is
 //     named. A tile pyramid is the one exception and it is checked instead:
@@ -53,17 +55,24 @@ function sources(dir) {
    or the identifier used in a template or a concatenation. */
 const files = sources(SRC)
 let readsOfBase = 0
+let prefixesByHand = 0
 let callsOfAssetUrl = 0
 for (const file of files) {
   const text = readFileSync(file, 'utf8')
   const here = relative(APP_ROOT, file)
   if (file !== HOME) {
     for (const line of text.split('\n')) {
-      if (!line.includes('ASSET_BASE')) continue
       // a double's own table of module exports is a fixture, not an address
-      if (/ASSET_BASE\s*:/.test(line)) continue
-      readsOfBase++
-      fail('address-by-hand', `ASSET_BASE is read outside the module it lives in: ${line.trim().slice(0, 96)}`, here)
+      if (line.includes('ASSET_BASE') && !/ASSET_BASE\s*:/.test(line)) {
+        readsOfBase++
+        fail('address-by-hand', `ASSET_BASE is read outside the module it lives in: ${line.trim().slice(0, 96)}`, here)
+      }
+      // the dev route and the media origin are the base, written out by hand
+      if (/['"`][^'"`]*\/na-assets\/|media\.agoracosmica\.org\/night/.test(line)
+        && !/mock|fixture|catalogue-assets/.test(line) && !/ASSET_BASE\s*:/.test(line)) {
+        prefixesByHand++
+        fail('prefix-by-hand', `the store's prefix is written out instead of taken from the base: ${line.trim().slice(0, 96)}`, here)
+      }
     }
   }
   for (const line of text.split('\n')) {
@@ -149,6 +158,7 @@ const report = {
   home: relative(APP_ROOT, HOME),
   sourceFiles: files.length,
   readsOfBaseOutsideItsModule: readsOfBase,
+  prefixesWrittenByHand: prefixesByHand,
   callsOfAssetUrl,
   records: { addressedFiles: counted.files, namedDocuments: counted.documents,
     pyramids: counted.pyramids, mapSets: counted.sets, scopes: [...OURS] },
