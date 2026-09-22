@@ -56,6 +56,7 @@ const {
   luminance,
   mix,
   mrt,
+  neutralToneMapping,
   output,
   pass,
   pow,
@@ -165,6 +166,7 @@ interface Dials {
   dofFocus: number
   dofFocal: number
   dofBokeh: number
+  shoulder: number
 }
 
 /* A grade may arrive from outside this module (a route, a rig state, a phase
@@ -194,6 +196,7 @@ function dialsOf(asked: Grade | null | undefined): Dials {
     dofFocus: g.dof?.focus ?? 100,
     dofFocal: g.dof?.focal ?? 1000,
     dofBokeh: g.dof?.bokeh ?? 0,
+    shoulder: g.shoulder ?? 0,
   }
 }
 
@@ -264,6 +267,7 @@ export function createPost(
     dofFocus: uniform(d.dofFocus),
     dofFocal: uniform(d.dofFocal),
     dofBokeh: uniform(d.dofBokeh),
+    shoulder: uniform(d.shoulder),
     /* the grain is reseeded every frame, so a still is one draw from the
        hash and a walk is never the same field twice */
     grainSeed: uniform(0),
@@ -337,6 +341,9 @@ export function createPost(
   const splitTint = mix(u.cool, u.warm, clamp(lum.mul(1.6), 0, 1))
   c = mix(c, c.mul(splitTint), u.split)
   c = mix(vec3(lum, lum, lum), c, u.saturation)
+  // the shoulder, selected rather than mixed so a grade without one prints
+  // exactly the pixels it always printed
+  c = u.shoulder.greaterThan(0).select(mix(c, neutralToneMapping(c, float(1)), u.shoulder), c)
 
   // 6 · the vignette
   const r = length(screenUV.sub(0.5))
@@ -401,6 +408,7 @@ export function createPost(
     d.dofFocus = ease(d.dofFocus, target.dofFocus, k)
     d.dofFocal = ease(d.dofFocal, target.dofFocal, k)
     d.dofBokeh = ease(d.dofBokeh, target.dofBokeh, k)
+    d.shoulder = ease(d.shoulder, target.shoulder, k)
 
     u.exposure.value = d.exposure
     u.lift.value.set(...d.lift)
@@ -418,6 +426,8 @@ export function createPost(
     u.dofFocus.value = d.dofFocus
     u.dofFocal.value = d.dofFocal
     u.dofBokeh.value = d.dofBokeh
+    // an ease never lands on zero by itself, and zero is the identity print
+    u.shoulder.value = d.shoulder < 1e-4 && target.shoulder === 0 ? 0 : d.shoulder
     u.bloomStrength.value = d.bloomStrength
     u.bloomThreshold.value = d.bloomThreshold
     if (bloomPass) {

@@ -39,6 +39,9 @@ export interface Grade {
   bloom: BloomGrade
   ao: { intensity: number; distance: number; thickness: number }
   dof: DofGrade | null
+  /** 0 prints the frame as it is; 1 rolls the highlights off the Khronos
+      neutral shoulder, for a room lit hot enough that its sources clip */
+  shoulder?: number
 }
 
 /* IDENTITY — the print that changes nothing.
