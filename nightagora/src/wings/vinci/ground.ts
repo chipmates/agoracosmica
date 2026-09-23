@@ -1,4 +1,4 @@
-import { Group, Mesh, MeshStandardNodeMaterial, Color, DoubleSide } from 'three/webgpu'
+import { BufferGeometry, Float32BufferAttribute, Group, Mesh, MeshStandardNodeMaterial, Color, DoubleSide } from 'three/webgpu'
 import * as TSL from 'three/tsl'
 import { buildTerrainMeshes } from './terrain-mesh'
 import type { MaterialLibrary } from '../../stack/materials'
@@ -13,8 +13,21 @@ import { fractalField, resolved, specularAA } from '../../stack/detail'
 import { applyYardFinish } from './ground-finish'
 
 // TSL graphs retain three independent scales, even on calm's complete ground.
-const { positionWorld, positionView, normalWorldGeometry, cameraViewMatrix, mx_noise_float, mix, vec3, float, smoothstep, length, cameraPosition, normalMap, vec2, uv, fract, floor, dot, sin, cos } = TSL
+const { attribute, positionWorld, positionView, normalWorldGeometry, cameraViewMatrix, mx_noise_float, mix, vec3, float, smoothstep, length, cameraPosition, normalMap, vec2, uv, fract, floor, dot, sin, cos } = TSL
 function rgb(hex:string) { const c=new Color(hex); return vec3(c.r,c.g,c.b) }
+/** WHERE ON ITS OWN FACE a retaining triangle lies: metres above the face's
+ * foot and metres below its head. A wall weathers from its own foot and its
+ * own coping, whatever level it stands at; a face that lies flat reads as
+ * far from both. */
+function faceSpans(geometry:BufferGeometry):void {
+  const p=geometry.getAttribute('position'),n=geometry.getAttribute('normal'),span=new Float32Array(p.count*2)
+  for(let i=0;i+2<p.count;i+=3){
+    const ys=[p.getY(i),p.getY(i+1),p.getY(i+2)],lo=Math.min(...ys),hi=Math.max(...ys)
+    const flat=Math.abs(n.getY(i))>.5
+    for(let c=0;c<3;c++){span[(i+c)*2]=flat?9:ys[c]!-lo;span[(i+c)*2+1]=flat?9:hi-ys[c]!}
+  }
+  geometry.setAttribute('faceSpan',new Float32BufferAttribute(span,2))
+}
 /** Where a slender member meets the ground it takes the sky away from the
  * grass around its foot. Without it a post reads as standing in mid air,
  * whatever the geometry says. Indirect term only. */
@@ -115,12 +128,28 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
       .mul(worked.mul(.72).add(.28)).mul(shows(.0115))
     const chatter=mx_noise_float(vec3(U.x.mul(41),U.y.mul(7.7),laid.cell.mul(19))).mul(shows(.024))
     const shells=smoothstep(.80,.93,mx_noise_float(P.mul(52).add(vec3(7.3,1.9,4.4)))).mul(shows(.021))
-    const damp=float(1).sub(smoothstep(1.02,1.85,P.y)).mul(mx_noise_float(P.mul(vec3(1.2,.7,1.2))).mul(shows(1/1.2)).mul(.3).add(.7))
+    // Each face is weathered from its own foot and its own coping: the terrace
+    // stands two metres below the court, and a height taken from the court's
+    // level made every term on it one flat value.
+    const span=attribute('faceSpan','vec2') as unknown as ReturnType<typeof vec2>,aboveFoot=span.x,belowHead=span.y
+    const damp=float(1).sub(smoothstep(1.02,1.85,aboveFoot)).mul(mx_noise_float(P.mul(vec3(1.2,.7,1.2))).mul(shows(1/1.2)).mul(.3).add(.7))
     // A capped tuffeau wall weathers in metre-scale bands: rain washes it in
     // vertical streaks and the foot greens. These survive a grazing angle,
     // where the courses themselves compress below one pixel.
     const streak=mx_noise_float(vec3(U.x.mul(3.1),U.y.mul(.22),0)).mul(smoothstep(.7,2.4,float(.42).div(footprint)))
-    const foot=float(1).sub(smoothstep(.35,2.2,P.y.sub(-.2))).mul(mx_noise_float(P.mul(vec3(.9,2.2,.9))).mul(shows(1/2.2)).mul(.35).add(.65))
+    // rising damp to a wandering tide line a hand under a metre up
+    const tide=mx_noise_float(vec3(U.x.mul(.7),0,2.9)).mul(.32).add(.95).add(mx_noise_float(P.mul(7)).mul(.05).mul(shows(1/7)))
+    const foot=float(1).sub(smoothstep(tide.sub(.10),tide.add(.06),aboveFoot)).mul(mx_noise_float(P.mul(vec3(.9,2.2,.9))).mul(shows(1/2.2)).mul(.3).add(.7))
+    // rain off the coping runs down the face in separate runs, each its own
+    // length, over a general darkening just under the coping's drip
+    const runCol=smoothstep(.40,.60,mx_noise_float(vec3(U.x.mul(3.3),0,1.7)).add(mx_noise_float(vec3(U.x.mul(9.1),0,4.4)).mul(.5)).mul(.5).add(.5))
+    const runLength=mx_noise_float(vec3(U.x.mul(.9),0,5.2)).mul(.5).add(.5).mul(1.6).add(.5)
+    const fibre=mx_noise_float(vec3(U.x.mul(23),U.y.mul(.8),3.3)).mul(shows(1/23)).mul(.35).add(.65)
+    const coping=belowHead.div(runLength).negate().exp().mul(runCol).mul(fibre).add(belowHead.div(.25).negate().exp().mul(.45)).min(1).mul(vertical)
+    // a wall of this length has patches of its own: a metre-scale patina
+    const patina=mx_noise_float(P.mul(vec3(.42,.8,.42)).add(vec3(3.7,1.3,8.1))).mul(shows(1/.42))
+    // and the court's splash is a speckle of grit in the lowest hand of it
+    const splashed=float(1).sub(smoothstep(.06,.30,aboveFoot)).mul(smoothstep(.45,.8,mx_noise_float(P.mul(42)).mul(.5).add(.5)).mul(shows(.024)).mul(.6).add(.4)).mul(vertical)
     // ONE STONE IS NOT THE NEXT. The block tone was reaching the face at
     // nine tenths of a per cent, so a coursed wall read as one tone with
     // lines on it. A quarry sends beds of different colour and a few stones
@@ -136,13 +165,24 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     // face; it is colour, and it never becomes a pattern.
     const lichen=smoothstep(.30,.74,mx_noise_float(P.mul(vec3(2.6,1.4,2.6)).add(vec3(2.1,6.7,3.3))).mul(shows(1/2.6)))
       .mul(smoothstep(.45,.78,mx_noise_float(P.mul(9.4)).mul(shows(1/9.4)).mul(.5).add(.5)))
-      .mul(float(1).sub(smoothstep(.55,1.9,P.y.sub(-.1))).mul(.55).add(.45))
+      .mul(float(1).sub(smoothstep(.55,1.9,aboveFoot)).mul(.55).add(.45))
     stone=mix(stone,rgb('#8d8f72'),lichen.mul(.34).mul(vertical))
-    stone=mix(stone,rgb('#7d8168'),foot.mul(.26).mul(vertical))
+    stone=mix(stone,rgb('#6d7458'),foot.mul(.60).mul(vertical))
+    stone=mix(stone,stone.mul(vec3(.55,.55,.54)),coping.mul(.72)).mul(patina.mul(.16).mul(vertical).add(1))
+    stone=mix(stone,stone.mul(vec3(.66,.62,.56)),splashed.mul(.5))
+    // A STEP IS WORN where feet cross it: the nosing of a low riser paler and
+    // smoother down the middle of its flight, a toe-scuff at its foot.
+    const riser=float(1).sub(smoothstep(.26,.36,aboveFoot.add(belowHead))).mul(vertical)
+    const middle=smoothstep(-.2,.6,mx_noise_float(vec3(U.x.mul(1.7),0,6.3)))
+    const nosing=float(1).sub(smoothstep(.012,.045,belowHead)).mul(riser).mul(middle)
+    const toe=float(1).sub(smoothstep(.02,.07,aboveFoot)).mul(riser).mul(middle)
+    stone=mix(stone,stone.mul(vec3(1.12,1.11,1.07)),nosing.mul(.75))
+    stone=stone.mul(float(1).sub(toe.mul(.25)))
     if(library){const maps=library.sync('stone-tuffeau').sample({uv:U,metres:.19,turn:.37});stone=stone.mul(mix(float(1),maps.albedo.clamp(.78,1.22),shows(.03).mul(.40)))}
     m.colorNode=mix(stone,rgb('#8c826d').mul(laid.cell.mul(.26).add(.87)),seam.mul(.58)).mul(float(1).sub(damp.mul(.15)))
     // Recessed joints and the damp foot see less sky than the block faces.
     m.aoNode=foundationVisibility().mul(float(1).sub(seam.mul(.45)).sub(foot.mul(.12).mul(vertical)))
+      .mul(float(1).sub(belowHead.div(.07).negate().exp().mul(.35).mul(vertical)))
     m.roughnessNode=specularAA(float(.89).add(cleft.mul(.035)).sub(damp.mul(.06)).clamp(.78,1),
       lost(.0007,.0045).add(lost(.00085,.0115)).add(lost(.0009,.024)).add(lost(.0009,.0625)))
     const height=cleft.mul(.0009).sub(pores.mul(.0007)).add(grooves.mul(.00085)).add(chatter.mul(.0009)).add(laid.depthM).toVar()
@@ -291,6 +331,7 @@ export function createGround(tier:TierName,library?:MaterialLibrary):Group {
   const batches=buildTerrainMeshes(tier)
   for(const [name,geometry] of Object.entries(batches)) {
     const kind=name==='retaining'?'stone':name==='grass'?'grass':'earth'
+    if(kind==='stone')faceSpans(geometry)
     const modern=name==='collectionRetaining'
     const mesh=new Mesh(geometry,modern?collectionConcreteMaterial():groundMaterial(kind,library));mesh.receiveShadow=true;mesh.castShadow=name==='retaining'||modern;mesh.name=`wing-vinci/${name}`
     if(modern){mesh.userData={manifestId:collectionProvenance.manifestId,assetClass:'GENERATED',certainty:'reconstructed',component:'collection-cut-and-fill-lining',label:collectionProvenance.approachLabel,accessLabel:collectionAccessProvenance.label};geometry.userData.basis=collectionProvenance.recipe+' '+collectionAccessProvenance.recipe}
