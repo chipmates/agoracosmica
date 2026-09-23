@@ -2031,7 +2031,7 @@
       "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "water-lifting-screw, Codex Atlanticus f. 6r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. The tube keeps its dossier centreline and lies bedded in pitch on a turned oak core, bound to it by iron bands with nailed feet and ringed with iron at both mouths; the core's ends are hooped and nailed and carry iron pivots that turn in iron-lined seats, the period type Vitruvius 10.6 describes; the frame is jointed with through tenons, wedges, pegs and braces, the troughs are boarded, nailed and pitched inside, the base is planked on sleepers. Oak: the library's CC0 oak veneer set at the tier's full map budget under a generated planed oak tint #897a66 (the turned core #82715d, the grip #5f4a37), the veneer's colour at a third and its contrast at 0.62 (0.9 on the core), each timber its own texture phase and a vertex tone of value 0.9 to 1.08 and warmth of 3 percent either way, end grain marked in the UVs and darkened to 0.52 with roughness 0.9. Hide: the library's CC0 leather under a generated pitch-dark tint #3d2e23, its variation held to 0.3, a 2.2 cm crinkle at relief 0.14, roughness 0.46 to 0.66. Pitch: a generated #1d1713 at a 0.08 variation, roughness 0.52 to 0.7, no relief. Forged iron: the library's CC0 iron read at a 0.3 m tile, normal strength 0.3, a generated #3f3a35 tint at a 0.25 mottle, metalness 0.5, roughness 0.5 to 0.82. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "prompt": "water-lifting-screw, Codex Atlanticus f. 6r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. The tube keeps its dossier centreline and lies bedded in pitch on a turned oak core, bound to it by iron bands with nailed feet and ringed with iron at both mouths; the core's ends are hooped and nailed and carry iron pivots that turn in iron-lined seats, the period type Vitruvius 10.6 describes; the frame is jointed with through tenons, wedges, pegs and braces, the troughs are boarded, nailed and pitched inside, the base is planked on sleepers; every nail head is a four-sided rose head. Oak: the library's CC0 oak veneer set at the tier's full map budget under a generated planed oak tint #897a66 (the turned core #82715d, the grip #5f4a37), the veneer's colour at a third and its contrast at 0.62 (0.9 on the core), each timber its own texture phase; a vertex colour carries each timber's tone (value 0.86 to 1.10, warmth 5 percent either way) and its end grain at 0.42. Hide: the library's CC0 leather under a generated pitch-dark tint #3d2e23, its variation held to 0.3, normal strength 0.1, a 2.2 cm crinkle at relief 0.1, roughness 0.46 to 0.66. Pitch: a generated #1d1713 bedding and a #33271e lining at a 0.08 variation, roughness 0.52 to 0.72, no relief. Forged iron: the library's CC0 iron read at a 0.3 m tile, normal strength 0.3, a generated #3f3a35 tint at a 0.25 mottle, metalness 0.5, roughness 0.5 to 0.82. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
       "model": "Claude Opus 5.5",
       "date": "2026-09-23",
       "sha256": "06f8b4efb2bf4b00f9a4ae9b13ab2d85f7552308789d37958e5596003cdf7023",
@@ -2046,11 +2046,11 @@
         },
         {
           "path": "src/wings/vinci/machines/data/water-lifting-screw.json",
-          "sha256": "d90cf6e730488f10135ebbed00ab8b9355fe402774ab2b817f97da1fcdf91ccd"
+          "sha256": "8312e9a5d1ac5f6fc1427959efb9087636caed2115361533a40014b7a6496d3e"
         },
         {
           "path": "src/wings/vinci/machines/geometry.ts",
-          "sha256": "ec6c2c4f5104265c11f9bde8c7efacfbef13c08c625aac2557022d483aa3c030"
+          "sha256": "8a856578f1f16c6c28a0ad1afc7fcda56f11f09969182c8927e49f3f022e9ac3"
         },
         {
           "path": "src/wings/vinci/machines/motion.ts",
@@ -2058,7 +2058,7 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "09b2966aef7e8fe3eccc765f0e54067a14a3013cdb57bed1b883542e3a9377d1"
+          "sha256": "e840bbc9580e539144f88e9c84c23cf9660e5fcc5305387848272412b95fa585"
         },
         {
           "path": "src/wings/vinci/machines/runtime.ts",
