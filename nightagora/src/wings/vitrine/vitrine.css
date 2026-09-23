@@ -168,7 +168,8 @@
   .vitrine-clock {flex:1 1 100%;max-width:none;gap:6px;}
   .vitrine-play {flex:0 0 auto !important;min-width:84px;}
   .vitrine-step-item {font-size:13px;min-height:44px;padding:7px 2px;}
-  .vitrine-folio {top:0;bottom:auto;max-width:84px;}
+  /* beside the close mark, which stands 44 px square 6 px inside the corner */
+  .vitrine-folio {top:6px;right:56px;bottom:auto;max-width:84px;}
   .vitrine-folio-thumb {width:64px;}
   .vitrine-part-name {max-width:200px;font-size:13px;}
 }
