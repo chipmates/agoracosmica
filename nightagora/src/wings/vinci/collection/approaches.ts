@@ -297,10 +297,11 @@ export const VINCI_READING_TABLE = (() => {
 const READING_TABLE = VINCI_READING_TABLE
 /** The supplied entry floor of the house, which the hall's ledge stands on. */
 const FLOOR_HOUSE=.8
-/** WHERE THE LEDGE IS READ FROM: on the entrance door's own clear axis, two
- * and a fifth metres inside its face, which is a stride and a quarter off the
- * shelf and the one line through that door a near envelope fits. */
-export const HALL_LEDGE_EYE={east:1.3707,north:-10.4668,height:FLOOR_HOUSE+1.65} as const
+/** WHERE THE LEDGE IS READ FROM: on the axis of the passage's side door and
+ * the hall's own door, a metre and a quarter in from the partition the shelf
+ * is fixed to, so the leg out from the hall's eye runs straight down that axis
+ * through both doors. The shelf stands a stride and two thirds off it. */
+export const HALL_LEDGE_EYE={east:.2062,north:-8.2126,height:FLOOR_HOUSE+1.65} as const
 /** Half the compass's own height, where the eye is aimed. */
 const COMPASS_MIDDLE_M=.335
 
@@ -340,11 +341,9 @@ function otherKinds(): Placed[] {
     if (slug === 'proportional-compass') continue
     add(`machine/${slug}`, 'machine', MACHINE_EYES[slug].station, narrow => machinePose(slug, narrow))
   }
-  // THE HOUSE'S ONE PIECE OF THE COLLECTION, on the hall's own ledge. The eye
-  // stands on the entrance door's clear axis, which is what lets a visitor be
-  // walked INTO the passage at all: an approach is proved against its own two
-  // eyes, and those two are 0.38 m of envelope against the door's 0.50 m of
-  // clear line, where a station pair of the whole wing would need 0.56 m.
+  // THE HOUSE'S ONE PIECE OF THE COLLECTION, on the hall's own ledge. The leg
+  // to it runs back from the hall's door along the axis of the three doors,
+  // whose 0.50 m of clear line carries its 0.36 m of envelope.
   add('machine/proportional-compass', 'machine', 'hall', narrow =>
     pose([HALL_LEDGE_EYE.east, HALL_LEDGE_EYE.north, HALL_LEDGE_EYE.height],
       [hallLedge.stand.east, hallLedge.stand.north, hallLedge.top + COMPASS_MIDDLE_M], 44, narrow))

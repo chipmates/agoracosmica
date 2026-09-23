@@ -43,21 +43,25 @@ const NARROW_LENS=1.26, NARROW_AIM_SHARE=.21
 /** The phone stage the narrow poses are composed against, 390 by 844 px. */
 const PHONE_STAGE=390/844
 /** THE HALL IS STAGED FOR THE PHONE, NOT CROPPED FROM ITS WIDE VIEW. A 390 px
- * stage holds the screw's lower sail, 4.7 m off its mast, only at eighty-eight
- * degrees, so the flight station turns six degrees toward that sail and lifts
- * twelve, which stands the whole screw on the card with the clerestory over
- * it. The works station turns four degrees north onto its gear machine, which
- * then stands whole at the frame's right. Both keep the room's own eye.
- * Heading from north and pitch, in degrees. */
+ * stage has under half the wide frame's width, so the aerial screw's sail is
+ * centred by yaw before anything else: the flight station turns four and a
+ * half degrees south of its room's aim and holds the screw level, which
+ * stands the whole sail inside the frame with a tenth of it spare either
+ * side. The works station turns eight degrees north of its own aim and looks
+ * fourteen down, so the water screw owns the frame and the rolling mill stands
+ * whole at its right. Both keep the room's own eye. Heading from north and
+ * pitch, in degrees. */
 const HALL_PHONE:Partial<Record<VinciStationId,{heading:number;pitch:number;fov:number}>>={
-  flight:{heading:-79.05,pitch:12,fov:88},
-  works:{heading:-91,pitch:-12,fov:90},
+  flight:{heading:-77.7994,pitch:.5488,fov:78.12},
+  works:{heading:-62.4499,pitch:-14.396,fov:83.16},
 }
 function aimedFrom(pose:Pose,heading:number,pitch:number,fov:number):Pose {
   const h=heading*Math.PI/180,t=pitch*Math.PI/180
   const along=new Vector3(Math.sin(h)*Math.cos(t),Math.sin(t),-Math.cos(h)*Math.cos(t))
   return {eye:pose.eye.clone(),at:pose.eye.clone().addScaledVector(along,10),fov}
 }
+/** The eye in the great hall's door, on the axis of the three doors. */
+const HALL_DOOR=p(-4.2388,-11.0992,2.45,-4.2388,-11.0992,2.45)
 function narrowRoomPose(pose:Pose,share=NARROW_AIM_SHARE):Pose {
   const fov=Math.min(104,pose.fov*NARROW_LENS)
   const reach=pose.eye.distanceTo(pose.at)
@@ -86,13 +90,15 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // degrees the cone's right half fell between the court corner and the east
   // range's windows and held neither.
   if(id==='courtyard') return narrow?p(10,-21,1.7,2.6,-12.5,4.8,80):p(10,-21,1.7,2.6,-12.5,4.3,60)
-  // THE FOUR HOUSE ROOMS ARE NOT OPEN, so each station stands on built ground
-  // at the one thing of its room a visitor can actually see: the open door of
-  // the house at the hall's threshold, the chapel's window, the court under
-  // the study's window, and the court's west end on the castle's own line.
-  // The entrance door leaves 0.50 m at its widest line and the rail is proved
-  // with 0.563 m, so the hall's eye stands on the landing and not inside.
-  if(id==='hall') return narrow?p(3.0959,-13.0423,2.45,-1.301,-6.4787,.72,72):p(3.0959,-13.0423,2.45,-1.301,-6.4787,2.25,46)
+  // THE FOUR HOUSE ROOMS ARE NOT OPEN, so three of the stations stand on built
+  // ground at the one thing of their room a visitor can see from outside: the
+  // chapel's window, the court under the study's window, and the court's west
+  // end on the castle's own line. THE HALL IS SEEN FROM ITS OWN DOOR. The
+  // passage's side door, the service passage and the hall's door stand on one
+  // axis, and the eye stands forty centimetres inside the last of them, looking
+  // down it at the west windows the hour's sun comes through; the wide frame
+  // turns four degrees onto the table and holds the whole west wall.
+  if(id==='hall') return narrow?aimedFrom(HALL_DOOR,-123,-11,74):aimedFrom(HALL_DOOR,-119,-4,52)
   if(id==='oratory') return narrow?p(5.6,-21.3,1.65,3.053,-18.288,1.98,60):p(5.6,-21.3,1.65,3.053,-18.288,2.9,46)
   // The study holds two things at once now: the window of the room the visit
   // was written in, and the support under it the page is read at. The phone
@@ -102,9 +108,15 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // The royal château stands 590 m away on a bearing of 308.84 degrees, which
   // from this end of the court runs over the house's west corner and down the
   // valley. The aim is that bearing; nothing of the castle is built.
-  if(id==='chamber') return narrow?p(-4.2,-32.4,1.65,-21.33,-18.59,-4.65,88):p(-4.2,-32.4,1.65,-21.33,-18.59,.6,46)
+  // The phone turns twenty degrees onto the house and looks up eleven: on the
+  // castle's own line its narrow frame kept a sliver of the west face at its
+  // margin, and the face now runs from the corner to the north end whole.
+  if(id==='chamber') return narrow?p(-4.2,-32.4,1.65,-9.4018,-24.0753,3.5581,92):p(-4.2,-32.4,1.65,-21.33,-18.59,.6,46)
   // R19 accepted: actual apron paving +1.65 m; all eight principal windows clear vegetation.
-  if(id==='garden') return p(-24.5,-31.2,-4.790000057220459,-8.7,-16.6,narrow?4.2:6.2,narrow?96:62)
+  // The phone looks up eleven degrees, not twenty-three: a third of its frame
+  // was sky and the house stood low, where the card is. The lens is opened
+  // until the whole front stands clear of both edges.
+  if(id==='garden') return narrow?p(-24.5,-31.2,-4.790000057220459,-17.1936,-24.6444,-2.8819,92):p(-24.5,-31.2,-4.790000057220459,-8.7,-16.6,6.2,62)
   // THE COLLECTION'S NINE STAND IN THEIR OWN ROOMS, at the eye the module's
   // own room views were composed from. A room is entered through its door and
   // seen from where a visitor would stand to read it.
@@ -170,11 +182,12 @@ export function namedPose(id:string,narrow:boolean):Pose|undefined {
   // Superseded garden pair: phone exposes the north gable/gap; desktop has window foliage.
   if(id==='composition-garden-clear')return narrow?p(-24,-6,groundHeight(-24,-6)+1.65,-5.5,-14.3,9.2,100):p(-28,-30,groundHeight(-28,-30)+1.65,-8,-17.5,5.4,56)
   // The house stations' trials, kept reproducible beside the eyes that were
-  // taken. The hall was composed twice: at the door on the landing, which is
-  // the eye it stands at, and back at the foot of the steps, which holds the
-  // whole opening and the carving over it but repeats the court's own subject.
+  // taken. The hall was composed from outside twice before it was built: at
+  // the door on the landing, where it stood until then, and back at the foot
+  // of the steps, which holds the whole opening and the carving over it but
+  // repeats the court's own subject.
   if(id==='composition-hall-steps')return p(4.212,-14.942,1.65,2.487,-12.367,2.05,narrow?70:55)
-  if(id==='composition-hall-door')return stationPose('hall',narrow)
+  if(id==='composition-hall-door')return narrow?p(3.0959,-13.0423,2.45,-1.301,-6.4787,.72,72):p(3.0959,-13.0423,2.45,-1.301,-6.4787,2.25,46)
   // The two the house walks up to, from the eyes their approaches certify.
   if(id==='composition-hall-ledge')return p(1.3707,-10.4668,2.45,.2059,-9.8828,2.035,narrow?56:44)
   if(id==='composition-study-support')return p(-.67,-24.737,1.65,-1.283,-23.824,1.04,narrow?58:46)

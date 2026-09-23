@@ -137,11 +137,13 @@ export function collectionView(id: string, narrow: boolean): RoomPose | undefine
       return pose(-24.9, -37.9, EYE, -58, -39.9, HANG_DATUM + .3, narrow ? 78 : 62, .6)
     case 'collection-hang-near':
       return pose(-45.3, -38.4, HANG_DATUM + .05, -45.3, -41.8, HANG_DATUM, narrow ? 52 : 40, .12)
-    // THE MECHANISM HALL HAS ONE AISLE, and both of its stations stand on it,
-    // so the walk between them and the walk in from the door are the same
-    // line and every machine keeps its room around it.
+    // THE WORKS ARE READ FROM SOUTH OF THE AISLE. On the aisle's own line the
+    // water screw stood within five degrees of the aerial screw behind it, and
+    // its coil crossed the lit sail; 2.6 m south the coil runs under the sail
+    // against the shaded wall, and the frame turns three degrees south of the
+    // screw so the lathe leaves its edge instead of being sliced by it.
     case 'collection-room-hall':
-      return pose(-42.9, -45.5, EYE + .7, -50.5, -46.2, FLOOR + 2.2, narrow ? 84 : 66, 1.3)
+      return pose(-42.9, -48.1, EYE + .7, -50.631, -45.801, FLOOR + 2.0, narrow ? 84 : 66, 1.3)
     case 'collection-room-hall-screw':
       return pose(-46.5, -48.8, EYE, -54.5, -46.4, FLOOR + 3.1, narrow ? 78 : 62, 1.5)
     // The long gallery, down the line.

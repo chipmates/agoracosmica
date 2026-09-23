@@ -105,14 +105,14 @@ const COURT_LANE_WEST: RailWaypoint = [-49.5, -20.6, COURT.level + railEyeHeight
 
 /** Where a station stands. The house keeps its three sides; the collection
  * ground is its rooms, because a room is entered through its door. */
-export type RailSide = 'street' | 'court' | 'entry-landing' | 'terrace' | 'apron'
+export type RailSide = 'street' | 'court' | 'great-hall' | 'terrace' | 'apron'
   | 'picture-room' | 'long-gallery' | 'mechanism-hall' | 'exhibit-court' | 'grave-court'
 
 export function railSide(stationId: string): RailSide {
   if (stationId === 'arrival') return 'street'
-  // The hall's eye stands at the house's own door, one storey above the court
-  // and behind the threshold steps: it is reached over them and not across.
-  if (stationId === 'hall') return 'entry-landing'
+  // The hall's eye stands in the great hall's own door, one storey above the
+  // court: it is reached over the threshold steps and through the passage.
+  if (stationId === 'hall') return 'great-hall'
   if (['courtyard', 'oratory', 'study', 'chamber'].includes(stationId)) return 'court'
   // The garden eye stands on the apron itself (apron.height + the eye), so it
   // is routed from there: routed as a terrace station it climbed to the stair
@@ -142,12 +142,23 @@ const NOT_A_CORRIDOR: readonly RailSide[] = ['mechanism-hall']
  * to the house door leaves from; the second is the foot of the five treads,
  * on the door's own axis, so the eye goes up them and not across their cheek.
  */
+/** Two authored turns on the machine hall's open floor: the north aisle east
+ * of the sail's lowest reach, and the gap between the two screws. */
+const HALL_NORTH_AISLE: RailWaypoint = [-52.6, -43.4, INSIDE]
+const BETWEEN_THE_SCREWS: RailWaypoint = [-51.2, -47.3, INSIDE]
 const COURT_OPEN: RailWaypoint = [8, -21, railEyeHeightM]
 const THRESHOLD_FOOT: RailWaypoint = [4.834, -14.329, railEyeHeightM]
+/** THE HOUSE DOOR AND THE ENFILADE. The entrance's best clear line runs 0.47 m
+ * off both jambs, so the walk crosses the landing onto it and goes straight in;
+ * it turns where that line meets the axis of the passage's side door, the
+ * service passage and the hall's door, and walks down the axis to the hall. */
+const HOUSE_FLOOR_EYE = .8 + railEyeHeightM
+const HOUSE_LANDING: RailWaypoint = [3.0682, -13.0604, HOUSE_FLOOR_EYE]
+const ENFILADE_TURN: RailWaypoint = [.0049, -8.3434, HOUSE_FLOOR_EYE]
 
 const LINKS: readonly { from: RailSide; to: RailSide; via: readonly RailWaypoint[] }[] = [
   { from: 'street', to: 'court', via: railGateWaypoints },
-  { from: 'court', to: 'entry-landing', via: [COURT_OPEN, THRESHOLD_FOOT] },
+  { from: 'court', to: 'great-hall', via: [COURT_OPEN, THRESHOLD_FOOT, HOUSE_LANDING, ENFILADE_TURN] },
   { from: 'court', to: 'terrace', via: railAccessWaypoints },
   { from: 'terrace', to: 'apron', via: railCollectionStairWaypoints },
   { from: 'apron', to: 'picture-room', via: [APRON_CORNER, ENTRANCE_OUT, ENTRANCE_IN] },
@@ -158,9 +169,13 @@ const LINKS: readonly { from: RailSide; to: RailSide; via: readonly RailWaypoint
   { from: 'picture-room', to: 'long-gallery',
     via: [[PICTURE_TO_GALLERY, FACE.pictureWallNorth + 1.4, INSIDE], [PICTURE_TO_GALLERY, FACE.pictureWallSouth - 1.4, INSIDE]] },
   // The picture room's west door. The hall's side of it stands north of the
-  // machine bay, so the walk leaves the door before it meets a plinth.
+  // machine bay, so the walk leaves the door before it meets a plinth, keeps
+  // to the north wall past the aerial screw's sail, and turns south between
+  // the two screws: the works' eye stands south of the water screw's raised
+  // end, and a straight line to it ran through that end's support.
   { from: 'picture-room', to: 'mechanism-hall',
-    via: [[PICTURE_TO_HALL, FACE.pictureWallNorth + 1.4, INSIDE], [PICTURE_TO_HALL, FACE.pictureWallSouth - 1, INSIDE]] },
+    via: [[PICTURE_TO_HALL, FACE.pictureWallNorth + 1.4, INSIDE], [PICTURE_TO_HALL, FACE.pictureWallSouth - 1, INSIDE],
+      HALL_NORTH_AISLE, BETWEEN_THE_SCREWS] },
   // The gallery's side of the hall door stands clear of the alcove the
   // reading table brings its own back wall for: at a metre and a half off the
   // partition the walk went by that wall at arm's length.
