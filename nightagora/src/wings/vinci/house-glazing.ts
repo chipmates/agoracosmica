@@ -17,7 +17,7 @@ import { hourKey } from './site'
 // TSL's composable overloads are typed once at this boundary.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type N = any
-const { attribute, clamp, dFdx, dFdy, float, fract, mix, mx_fractal_noise_float, mx_noise_float, normalMap, normalView, positionViewDirection,
+const { attribute, clamp, dFdx, dFdy, float, floor, fract, max, mix, mx_fractal_noise_float, mx_noise_float, normalMap, normalView, positionViewDirection,
   reflectVector, smoothstep, uv, vec2, vec3 } = TSL as unknown as Record<string, N>
 /** The hour's sun, for the side of the sky it warms. */
 const SUN_AZ = hourKey.sun_azimuth_deg.value * Math.PI / 180
@@ -141,10 +141,15 @@ function lattice(light: GlazedLight): { pieces: V2[][]; lines: [V2, V2][] } {
   return { pieces, lines }
 }
 
+/** A glass triangle's three edges, as the distance in metres from each
+ * corner to each edge's line; an edge that is not a quarry's edge reads a
+ * full metre everywhere, so no lead is drawn along it. */
+const NO_RIM: V3 = [1, 1, 1]
 class Sink {
-  positions: number[] = []; normals: number[] = []; uvs: number[] = []; extra: number[] = []
-  vertex(p: V3, n: V3, t: V2, e: [number, number], rim = 0, border = 0): void {
-    this.positions.push(p[0], p[2], -p[1]); this.normals.push(n[0], n[2], -n[1]); this.uvs.push(t[0], t[1]); this.extra.push(e[0], e[1], rim, border)
+  positions: number[] = []; normals: number[] = []; uvs: number[] = []; extra: number[] = []; rims: number[] = []
+  vertex(p: V3, n: V3, t: V2, e: [number, number], rims: V3 = NO_RIM, borders = 0): void {
+    this.positions.push(p[0], p[2], -p[1]); this.normals.push(n[0], n[2], -n[1]); this.uvs.push(t[0], t[1]); this.extra.push(e[0], e[1], borders, 0)
+    this.rims.push(rims[0], rims[1], rims[2])
   }
   /** A flat triangle wound to face along `n`, whatever order it came in. */
   tri(a: V3, b: V3, c: V3, n: V3, e: [number, number]): void {
@@ -159,6 +164,7 @@ class Sink {
     g.setAttribute('normal', new Float32BufferAttribute(this.normals, 3))
     g.setAttribute('uv', new Float32BufferAttribute(this.uvs, 2))
     g.setAttribute('glazing', new Float32BufferAttribute(this.extra, 4))
+    g.setAttribute('rims', new Float32BufferAttribute(this.rims, 3))
     g.computeBoundingSphere()
     return g
   }
@@ -169,13 +175,16 @@ class Sink {
  * framebuffer takes reflection + room * transmission. */
 function glassMaterial(drawn: boolean): MeshPhysicalNodeMaterial {
   const m = new MeshPhysicalNodeMaterial({ metalness: 0, roughness: .06, ior: 1.52, specularIntensity: 1, transparent: true, depthWrite: false })
-  const info = attribute('glazing', 'vec4'), seed = info.x, sill = info.y, rim = info.z, border = info.w
-  // Where no came is built, the leading is drawn: `rim` is the distance in
-  // metres to the quarry's edge, and its screen gradient is the metres a
+  const info = attribute('glazing', 'vec4'), seed = info.x, sill = info.y, borders = info.z, rims = attribute('rims', 'vec3')
+  // Where no came is built, the leading is drawn: each rim value is the
+  // distance in metres to one edge, and its screen gradient is the metres a
   // pixel spans across the came, so the line holds its width at any angle.
-  const pixel = vec2(dFdx(rim), dFdy(rim)).length().max(1e-7)
-  const half = mix(float(CAME_M / 2), float(BORDER_CAME_M / 2), border)
-  const drawnLead = drawn ? float(1).sub(smoothstep(half.sub(pixel.mul(.75)), half.add(pixel.mul(.75)), rim)) : float(0)
+  const leadAt = (d: N, bit: number): N => {
+    const pixel = vec2(dFdx(d), dFdy(d)).length().max(1e-7)
+    const half = mix(float(CAME_M / 2), float(BORDER_CAME_M / 2), floor(borders.div(bit)).mod(2))
+    return float(1).sub(smoothstep(half.sub(pixel.mul(.75)), half.add(pixel.mul(.75)), d))
+  }
+  const drawnLead = drawn ? max(leadAt(rims.x, 1), max(leadAt(rims.y, 2), leadAt(rims.z, 4))) : float(0)
   const U = uv()
   // Cylinder glass is drawn thin and flattened while soft: a slow ripple
   // runs through each quarry, a few centimetres long, a fraction of a degree.
@@ -258,22 +267,33 @@ export function createHouseGlazing(lights: readonly GlazedLight[], detail: 1 | 2
       const ta = (rand(seed, 1.7) - .5) * .028, tb = (rand(seed, 2.9) - .5) * .028
       const set = (rand(seed, 4.3) - .5) * .0003, bow = detail === 2 ? (rand(seed, 6.1) > .5 ? 1 : -1) * (.0003 + rand(seed, 8.2) * .0005) : 0
       const R2 = Math.max(...piece.map(p => (p[0] - c[0]) ** 2 + (p[1] - c[1]) ** 2), 1e-6)
-      const vertex = (p: V2, centre: boolean, rim: number, border: number): void => {
+      const vertex = (p: V2, centre: boolean, rims: V3, borders: number): void => {
         const du = p[0] - c[0], dv = p[1] - c[1]
         const h = light.out + set + (centre ? bow : 0)
         const gu = ta - (centre ? 0 : 2 * bow * du / R2), gv = tb - (centre ? 0 : 2 * bow * dv / R2)
         const n: V3 = [outward[0] - gu * along[0], outward[1] - gu * along[1], -gv]
         const l = Math.hypot(...n)
-        glass.vertex(at(p[0], p[1], h), [n[0] / l, n[1] / l, n[2] / l], p, [seed, p[1] - v0], rim, border)
+        glass.vertex(at(p[0], p[1], h), [n[0] / l, n[1] / l, n[2] / l], p, [seed, p[1] - v0], rims, borders)
       }
-      // A fan from the centre: it carries the bow, and each triangle's rim
-      // value, the metres to its own edge, draws the leading there.
-      for (let k = 0; k < piece.length; k++) {
-        const p = piece[k]!, q = piece[(k + 1) % piece.length]!, l = Math.hypot(q[0] - p[0], q[1] - p[1])
-        const apex = l > 1e-9 ? Math.abs((q[0] - p[0]) * (c[1] - p[1]) - (q[1] - p[1]) * (c[0] - p[0])) / l : 0
-        const border = onOutline(p, q, outline) ? 1 : 0
-        vertex(c, true, apex, border); vertex(p, false, 0, border); vertex(q, false, 0, border)
+      const reach = (p: V2, a: V2, b: V2): number => {
+        const l = Math.hypot(b[0] - a[0], b[1] - a[1])
+        return l > 1e-9 ? Math.abs((b[0] - a[0]) * (p[1] - a[1]) - (b[1] - a[1]) * (p[0] - a[0])) / l : 0
       }
+      /** One triangle a-b-c; `ab`, `bc`, `ca` name which of its edges are
+       * the quarry's own, where the lead runs. */
+      const face = (a: V2, b: V2, cc: V2, ab: boolean, bc: boolean, ca: boolean, centreA: boolean): void => {
+        const edge = (p: V2, q: V2, rim: boolean): number => rim && onOutline(p, q, outline) ? 1 : 0
+        const borders = edge(a, b, ab) + 2 * edge(b, cc, bc) + 4 * edge(cc, a, ca)
+        const far = (rim: boolean, d: number): number => rim ? d : 1, on = (rim: boolean): number => rim ? 0 : 1
+        vertex(a, centreA, [on(ab), far(bc, reach(a, b, cc)), on(ca)], borders)
+        vertex(b, false, [on(ab), on(bc), far(ca, reach(b, cc, a))], borders)
+        vertex(cc, false, [far(ab, reach(cc, a, b)), on(bc), on(ca)], borders)
+      }
+      // At hero a fan from the centre carries the bow; the lighter tier
+      // fans from a corner, half the triangles, the same drawn leading.
+      const n = piece.length
+      if (detail === 2) for (let k = 0; k < n; k++) face(c, piece[k]!, piece[(k + 1) % n]!, false, true, false, true)
+      else for (let k = 1; k < n - 1; k++) face(piece[0]!, piece[k]!, piece[k + 1]!, k === 1, true, k === n - 2, false)
     }
     if (detail < 2) continue
     // THE CAMES stand proud of the glass on its outer face: a flattened

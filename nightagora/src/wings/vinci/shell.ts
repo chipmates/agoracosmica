@@ -543,7 +543,7 @@ export function createShell(tier:Tier,library?:MaterialLibrary):Group {
   // afford it get the leaded glazing, the rooms behind it and the carving;
   // calm keeps the flat panes and dark backs it was budgeted with.
   const full=tier!=='calm'
-  const rooms=full?createHouseRooms():null
+  const rooms=full?createHouseRooms(tier==='hero'?.45:.9):null
   // The carving is one more draw; standard stands at its draw ceiling.
   house={glaze:full,carve:tier==='hero',openBacks:rooms?.openedBacks??new Set(),lights:[],tracery:[],sills:[]}
   const faces=roofFaces(),valleys=roofValleys(faces)

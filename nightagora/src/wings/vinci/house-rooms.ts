@@ -198,8 +198,9 @@ function formFactor(p: V3, n: V3, polygon: V3[], normal: V3, steps: number): num
 
 export interface HouseRooms { group: Group; rooms: string[]; openedBacks: Set<string>; triangles: number }
 
-/** Build every room with a glazed window except those named above. */
-export function createHouseRooms(): HouseRooms {
+/** Build every room with a glazed window except those named above. `cell`
+ * is the grid the light is baked on; a lighter tier asks for a coarser one. */
+export function createHouseRooms(cell = CELL): HouseRooms {
   const sink = new Sink(), builds: RoomBuild[] = [], openedBacks = new Set<string>()
   for (const floor of spec.floors) for (const room of floor.rooms) {
     if (NOT_HERE.has(room.id) || room.polygon.length !== 4) continue
@@ -222,7 +223,7 @@ export function createHouseRooms(): HouseRooms {
     const patches = apertures.map(ap => sunPatch(ap, level, polygon2)).filter((p): p is V3[] => p !== null)
     const start = sink.pending.length
     const ceilingZ = level + height
-    buildRoom(sink, room, edges, level, ceilingZ, vault)
+    buildRoom(sink, room, edges, level, ceilingZ, vault, cell)
     builds.push({ id: room.id, level, edges, apertures, patches, ceilingZ, vault, start, end: sink.pending.length })
   }
   // BAKE, once: what each vertex sees of the windows of its own room, and
@@ -274,7 +275,7 @@ export function createHouseRooms(): HouseRooms {
 }
 
 const CELL = .45
-function buildRoom(sink: Sink, room: DossierRoom, edges: WallEdge[], level: number, ceilingZ: number, vault: boolean): void {
+function buildRoom(sink: Sink, room: DossierRoom, edges: WallEdge[], level: number, ceilingZ: number, vault: boolean, cell: number): void {
   const seed = rand(room.polygon[0]![0], room.polygon[0]![1])
   const poly = edges.map(e => e.a)
   const e0 = edges[0]!, u: V2 = [e0.b[0] - e0.a[0], e0.b[1] - e0.a[1]], ul = Math.hypot(u[0], u[1]), ud: V2 = [u[0] / ul, u[1] / ul], vd: V2 = [-ud[1], ud[0]]
@@ -289,7 +290,7 @@ function buildRoom(sink: Sink, room: DossierRoom, edges: WallEdge[], level: numb
   const floorOutline = grow(loc, .03)
   const us = floorOutline.map(p => p[0]), vs = floorOutline.map(p => p[1])
   // cells that divide the extent exactly, so no strip is left at the far edge
-  const steps = (lo: number, hi: number): number[] => { const n = Math.max(1, Math.ceil((hi - lo) / CELL)); return Array.from({ length: n + 1 }, (_, i) => lo + (hi - lo) * i / n) }
+  const steps = (lo: number, hi: number): number[] => { const n = Math.max(1, Math.ceil((hi - lo) / cell)); return Array.from({ length: n + 1 }, (_, i) => lo + (hi - lo) * i / n) }
   const plane = (z: number, normalUp: boolean, kind: number): void => {
     const xs = steps(Math.min(...us), Math.max(...us)), ys = steps(Math.min(...vs), Math.max(...vs))
     for (let i = 0; i < xs.length - 1; i++) for (let j = 0; j < ys.length - 1; j++) {
@@ -322,7 +323,7 @@ function buildRoom(sink: Sink, room: DossierRoom, edges: WallEdge[], level: numb
     const breaks = (lo: number, hi: number, cuts: number[]): number[] => {
       const keep = [...new Set([lo, hi, ...cuts.filter(c => c > lo + .02 && c < hi - .02)])].sort((a, b) => a - b)
       const out: number[] = [keep[0]!]
-      for (let k = 1; k < keep.length; k++) { const a = keep[k - 1]!, b = keep[k]!, n = Math.max(1, Math.ceil((b - a) / CELL)); for (let i = 1; i <= n; i++) out.push(a + (b - a) * i / n) }
+      for (let k = 1; k < keep.length; k++) { const a = keep[k - 1]!, b = keep[k]!, n = Math.max(1, Math.ceil((b - a) / cell)); for (let i = 1; i <= n; i++) out.push(a + (b - a) * i / n) }
       return out
     }
     const ss = breaks(0, l, holes.flatMap(h => [h[0], h[1]])), zs = breaks(level, top, holes.flatMap(h => [h[2], h[3]]))
@@ -484,5 +485,5 @@ export const houseRoomsProvenance = {
   manifestId: 'vinci/house-rooms',
   assetClass: 'GENERATED',
   certainty: 'assumed',
-  recipe: 'The dossier\'s proposed rooms (A-LAYOUT) behind every glazed window except the great hall and the entrance passage: their plans, floor levels, clear heights, 220 mm terracotta tiles with 8 mm joints, limewashed walls, oak joists 0.18 by 0.23 m at 0.60 m, a main beam where a span passes 5.5 m, and the oratory\'s quadripartite vault springing at 2.65 m with 120 mm ribs. Fabric only, no furnishing. Exterior edges stand on the shell\'s inner wall faces with the registered apertures cut. Indirect light baked per vertex once: window form factors and the hour\'s sun patches on each floor.',
+  recipe: 'The dossier\'s proposed rooms (A-LAYOUT) behind every glazed window except the great hall and the entrance passage: their plans, floor levels, clear heights, 220 mm terracotta tiles with 8 mm joints, limewashed walls, oak joists 0.18 by 0.23 m at 0.60 m, a main beam where a span passes 5.5 m, and the oratory\'s quadripartite vault springing at 2.65 m with 120 mm ribs. Fabric only, no furnishing. Exterior edges stand on the shell\'s inner wall faces with the registered apertures cut. Indirect light baked per vertex once: window form factors and the hour\'s sun patches on each floor, on a 0.45 m grid at hero and a 0.9 m grid at standard.',
 } as const

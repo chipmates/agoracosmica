@@ -10,7 +10,7 @@
       "prompt": "Thin brick relief, tuffeau quoins and registered cut apertures, intersecting roofs, dormers, chimneys, turret and separate gallery/watchtower. Dossier nominal dimensions with original certainty ranges. No photograph sampled. Shallow 55 mm rebate within declared 35–90 mm assumption; split upper sky reflection and lower dark-room glazing. Existing roughness .18–.23 remains inside dossier interval; no screen-space transmission. Duplicated upper tower shell now shares registered aperture cuts. Connected F16/F17 masonry below the unchanged −2.20 m base: 0.60 m inward thickness [0.45–0.80], actual standard/calm ground boundary lower envelope embedded 50 mm [25–100], full joined miter volume and inherited stone coursing. No surveyed height or opening changes.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "6e6afba835a49f1b18494d624fec3853fd90653a19f3318cb167f5478999b5ae",
+      "sha256": "173f2ee2fcf2aec9aecbefeff2536a1e18cd499f465fa3eb2afd67e7d826583b",
       "note": "Q001 Q015 Q019 Q124 Q127 Q131 Q134 Q175; src/wings/vinci/data/closluce.json; recipe_file=src/wings/vinci/shell.ts; geometry_dependency=vinci/foundation-plinth"
     },
     {
@@ -3642,7 +3642,7 @@
       "prompt": "Every glazed light of the registered shell as leaded glass: 155 mm diamond quarries on a 45 degree lattice centred on each light, each quarry its own piece, its face tilted up to 1 degree and bowed up to 0.8 mm with its edge held in the lead, a slow ripple in its surface and its own faint cast; 7 mm lead cames and a 14 mm border lead standing about 2 mm proud as geometry in the film (tier max) and drawn in the glass at their true width at the live tiers; iron saddle bars set behind the glass. The glass reflects by its Fresnel term and transmits the rest, so the room behind shows. The shell's flat panes stay certified and leave the colour pass. Hero and standard tiers; calm keeps the flat panes.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "71a5ca07500ae232667af3a47a2e47a4fba764185d537e5f8cd227e986a37299",
+      "sha256": "212cdeb93e83b87b1ae8001f30a635f5c831320ea7463199e5cca75869aa4541",
       "note": "recipe_file=src/wings/vinci/house-glazing.ts; geometry_dependency=vinci/shell; rail_collision=false; engine_terms=sky reflection in the glass (the film reflects the real sky)"
     },
     {
@@ -3652,10 +3652,10 @@
       "class": "GENERATED",
       "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
-      "prompt": "The dossier's proposed rooms (A-LAYOUT, A-HEIGHT, A-MASONRY) behind every glazed window except the great hall and the entrance passage, fabric only: floor levels and clear heights as registered, 220 mm terracotta tiles with 8 mm joints, limewashed walls, oak joists 0.18 by 0.23 m at 0.60 m with a main beam past a 5.5 m span, the oratory's quadripartite vault springing at 2.65 m with 120 mm ribs. Exterior edges stand on the shell's inner wall faces with the registered apertures cut. No furnishing. Indirect light baked per vertex once at the fixed hour from window form factors and the sun patches on each floor; the warm bounce is an engine-only term flagged engineBounce.",
+      "prompt": "The dossier's proposed rooms (A-LAYOUT, A-HEIGHT, A-MASONRY) behind every glazed window except the great hall and the entrance passage, fabric only: floor levels and clear heights as registered, 220 mm terracotta tiles with 8 mm joints, limewashed walls, oak joists 0.18 by 0.23 m at 0.60 m with a main beam past a 5.5 m span, the oratory's quadripartite vault springing at 2.65 m with 120 mm ribs. Exterior edges stand on the shell's inner wall faces with the registered apertures cut. No furnishing. Indirect light baked per vertex once at the fixed hour from window form factors and the sun patches on each floor, on a 0.45 m grid at hero and a 0.9 m grid at standard; the warm bounce is an engine-only term flagged engineBounce.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "272810f3022ba8468ab3f12c2dcd1e8e51f834a11c763cc59a3c7e7d47830644",
+      "sha256": "ec429b92970124e397319dbb596adeffb9e7386fc7e10a98501fecd6ef20f097",
       "note": "recipe_file=src/wings/vinci/house-rooms.ts; source=A-LAYOUT A-HEIGHT A-MASONRY; rail_collision=false; engine_terms=engineBounce"
     },
     {
