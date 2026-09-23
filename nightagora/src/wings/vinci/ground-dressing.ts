@@ -30,7 +30,7 @@ const PROVENANCE = {
   assetClass: 'GENERATED',
   certainty: 'conjectural',
   basis: 'A-SITE and A-LAYOUT terrain and exclusions. Modern garden photographs inform surface character only. Grass, gravel and fallen-leaf positions are a proposed October dressing, not period evidence.',
-  recipe: 'The meadow sown from the stops: seed 15171013 sows, for every outdoor stop, clumps of four to nine curved opaque three-triangle blades (3 to 10 mm wide, 5 to 40 cm) and dry seed stalks, their density falling as one over (1 + (r / 4 m)^2) from the stop eye within 42 m and 60 degrees of its look, hidden places behind the house refused; blades green at the foot and gone to straw at the tip on dry ones, shorter within 1.3 m of a walked edge. Seed 15171041 adds crossed tuft cards from a tuft atlas drawn in code (30 to 40 blades each, green, mixed, seeding and bent kinds), one over (1 + (r / 8 m)^2) within 46 m, larger with distance; their normals stand up with the sward. Seed 15171042 lays short grass and weeds along the foot of the house and its annexes, never in a doorway or the gate. Path-edge gravel is bedded round-shaded river pebbles of 15 to 65 mm. Moss and ivy carry their own records. Masonry, platforms, gate circulation and retained water cuts exclude every blade; every contact samples the shared grade. Dimensions, species mix and positions are exhibition assumptions, not a record of 1517.',
+  recipe: 'The meadow sown from the stops: seed 15171013 sows, for every outdoor stop, clumps of four to nine curved opaque three-triangle blades (3 to 10 mm wide, 5 to 40 cm) and dry seed stalks, their density falling as one over (1 + (r / 4 m)^2) from the stop eye within 20 m and 60 degrees of its look, hidden places behind the house refused; blades green at the foot and gone to straw at the tip on dry ones, shorter within 1.3 m of a walked edge. Seed 15171041 adds crossed tuft cards from a tuft atlas drawn in code (30 to 40 blades each, green, mixed, seeding and bent kinds), one over (1 + (r / 8 m)^2) within 46 m, larger with distance; their normals stand up with the sward. Seed 15171042 lays short grass and weeds along the foot of the house and its annexes, never in a doorway or the gate. Path-edge gravel is bedded round-shaded river pebbles of 15 to 65 mm. Moss and ivy carry their own records. Masonry, platforms, gate circulation and retained water cuts exclude every blade; every contact samples the shared grade. Dimensions, species mix and positions are exhibition assumptions, not a record of 1517.',
 }
 
 const PATCHES: readonly Patch[] = [
@@ -277,9 +277,11 @@ function* sow(group: Group, heightAt: HeightAt, tier: TierName): Generator<void,
   const meadowRandom = randomSource(15171013)
   // each stop sows its own view, densest a few metres before its eye and
   // thinning as one over the square of the distance past four metres
-  const perStop = calm ? 900 : tier === 'standard' ? 2600 : 5200
+  const perStop = calm ? 620 : tier === 'standard' ? 1800 : 3600
   const clumpTarget = perStop * STOP_EYES.length
-  const reach = 42, scale = 4, logSpan = Math.log(1 + (reach / scale) ** 2)
+  // past twenty metres a blade is under a pixel and the tuft cards carry
+  // the sward, so the blades stop there at the same density before the eye
+  const reach = 20, scale = 4, logSpan = Math.log(1 + (reach / scale) ** 2)
   let clumps = 0, blades = 0, seedStalks = 0, seam = 1
   for (let attempt = 0; attempt < clumpTarget; attempt++) {
     if (seam < TUFT_SLICES && attempt >= clumpTarget * seam / TUFT_SLICES) { seam++; yield }
