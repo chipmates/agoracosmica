@@ -10,6 +10,7 @@ import { collectionConcreteMaterial, collectionProvenance } from './collection'
 import { collectionAccessProvenance } from './collection-access'
 import { anisotropicFootprint, coursedFace, dressedTuffeau } from './masonry-courses'
 import { fractalField, resolved, specularAA } from '../../stack/detail'
+import { applyYardFinish } from './ground-finish'
 
 // TSL graphs retain three independent scales, even on calm's complete ground.
 const { positionWorld, positionView, normalWorldGeometry, cameraViewMatrix, mx_noise_float, mix, vec3, float, smoothstep, length, cameraPosition, normalMap, vec2, uv, fract, floor, dot, sin, cos } = TSL
@@ -278,6 +279,8 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     // road lies in the wall's own shade, which is most of this street.
     m.aoNode=float(1).sub(road.wear.mul(.34).mul(mask)).mul(float(1).sub(channel.mul(.26)))
     m.userData['roadAppearance']='GENERATED conjectural grey-beige compacted earth and mineral finish; existing library/earth-packed albedo and normals, retained 1.4 m map projection, 2.8 m compaction variation, 7 cm aggregate and 6 mm grit. Existing mapped corridor mask, wheel-track spacing and depth retained. Surface normals only, gradient bounded .25; no displaced terrain or new paving.'
+    // the terrace's gravel walk and the court's cobbles
+    applyYardFinish(m,shows)
   }
   m.name=`wing-vinci/${kind}`
   return m
