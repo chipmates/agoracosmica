@@ -49,7 +49,7 @@ export const READING_ROOM = {
   /** the panelling: battens, then the veneered board */
   batten: .012, panel: .024,
   /** the shadow gaps: under the panels, over them, and between them */
-  baseGap: .03, headGap: .03, joint: .006,
+  baseGap: .03, headGap: .03, joint: .01,
   /** seven panels, one of them centred on the book */
   panels: 7,
 } as const
@@ -59,12 +59,13 @@ const R = READING_ROOM
  * page, from which its candela follows. A modern warm reading lamp. */
 export const READING_LAMP = {
   east: T.east, north: T.north,
-  /** the shade's rim, sixty centimetres over the table top */
-  rim: T.top + .61,
+  /** the shade's rim, a little over half a metre above the table top: low
+   * enough that the phone's frame holds the whole shade under its top edge */
+  rim: T.top + .52,
   /** a 2700 K lamp as the print shows it, balanced like the sun outdoors */
   colour: '#ffd3a0',
   /** at the page, in lux; the stack reads one hundred lux as one */
-  lux: 315,
+  lux: 133,
   /** an opal disc under a dome: a cosine lobe, cut at the rim */
   angle: 1.45, penumbra: 1, reach: 4.5,
   mapPx: 2048, soft: 2.5,
@@ -74,7 +75,7 @@ export const READING_LAMP = {
 export const READING_SHADOW_LAYER = 4
 
 /** The shade, in its own metres: radius and height over the rim. */
-export const SHADE = { radius: .165, height: .17, fitter: .026 }
+export const SHADE = { radius: .15, height: .155, fitter: .024 }
 
 export const v3 = (e: number, n: number, h: number): Vector3 => new Vector3(e, h, -n)
 
@@ -165,36 +166,51 @@ export function toned(base: string, i: number, salt: number, swing = .09): [numb
  * by its light, not by its wood, so the walls still hold an eighth of the
  * page's brightness under one lamp. */
 export const OAK = { wall: '#8a6846', canopy: '#7f6042', chair: '#7a5a3b' }
+/** How far the photograph of the oak runs across and along its grain before
+ * it repeats, in metres: drawn out along the grain, so a leaf's height holds
+ * one figure. */
+export const OAK_READ = [1.83, 2.9] as const
+/** the return's outer slats: their face and the gap between them */
+const SLAT = { width: .045, gap: .012 } as const
+/** the reveal between the dado and the niche's own lipping */
+const DADO_REVEAL = .02
+/** the joints' and the gaps' backing: the wall's oak, stained dark */
+const REVEAL = linear(OAK.wall).map(c => c * .3) as [number, number, number]
 
 export function oakPieces(): { oak: Piece[]; dark: Piece[]; bronze: Piece[]; floor: Piece[] } {
   const oak: Piece[] = [], dark: Piece[] = [], bronze: Piece[] = [], floor: Piece[] = []
   const faceE = R.wall + R.batten + R.panel
-  // THE PANELS. Seven book-matched leaves of one flitch; the pitch is set so
-  // the leaf behind the book is centred on it, and its joints frame the page.
+  // THE PANELS. Seven slip-matched leaves of one flitch, each its own part of
+  // the photograph and its own tone, so no leaf repeats its neighbour; the
+  // pitch is set so the leaf behind the book is centred on it, and its joints
+  // frame the page.
   const width = (R.north - R.south) / R.panels
   const bottom = R.floor + R.baseGap, top = R.ceiling - R.headGap
-  const leaf = (i: number, s: number, n: number, top: number): Piece => {
-    // a leaf and its neighbour share their read, mirrored across the joint
-    const pair = Math.floor(i / 2), w = n - s + R.joint
-    return {
-      box: [R.wall + R.batten, s, bottom, faceE, n, top], grain: 'up',
-      offset: [hash(pair, 1) * 1.83 - (i % 2 === 1 ? w : 0), hash(pair, 2) * 1.83], mirror: i % 2 === 1,
-      tone: toned(OAK.wall, pair, 3, .05),
-    }
-  }
+  const leaf = (i: number, s: number, n: number, top: number): Piece => ({
+    box: [R.wall + R.batten, s, bottom, faceE, n, top], grain: 'up',
+    offset: [hash(i, 1) * OAK_READ[0], hash(i, 2) * OAK_READ[1]],
+    tone: toned(OAK.wall, i, 3, .08),
+  })
   for (let i = 0; i < R.panels; i++)
     oak.push(leaf(i, R.south + i * width + R.joint / 2, R.south + (i + 1) * width - R.joint / 2, top))
-  // the dado: two more leaves of the flitch, at the dado's own height
-  const dadoWidth = (R.south - R.dadoSouth) / 2
+  // the dado: two more leaves of the flitch, at the dado's own height, parted
+  // from the niche's lipping by a reveal, so the dado reads as its own piece
+  // set against the niche and not as the niche's wall run on
+  const dadoEnd = R.south - .012 - DADO_REVEAL, dadoWidth = (dadoEnd - R.dadoSouth) / 2
   for (let i = 0; i < 2; i++)
     oak.push(leaf(R.panels + 1 + i, R.dadoSouth + i * dadoWidth + R.joint / 2, R.dadoSouth + (i + 1) * dadoWidth - R.joint / 2, R.dadoTop))
-  // the backing the joints and the gaps read against, run a bed into the lining
-  dark.push({ box: [R.wall - BED, R.south, FLOOR - BED, R.wall + R.batten, R.north, R.ceiling + .01], grain: 'up', offset: [0, 0], tone: [1, 1, 1] })
-  dark.push({ box: [R.wall - BED, R.dadoSouth, FLOOR - BED, R.wall + R.batten, R.south, R.dadoTop], grain: 'up', offset: [0, 0], tone: [1, 1, 1] })
+  // the backing the joints and the gaps read against, run a bed into the
+  // lining: the same oak stained dark, so a joint is a shadowed reveal with a
+  // lit edge and a dark cheek, not a drawn black line
+  dark.push({ box: [R.wall - BED, R.south, FLOOR - BED, R.wall + R.batten, R.north, R.ceiling + .01], grain: 'up', offset: [.7, .1], tone: REVEAL })
+  dark.push({ box: [R.wall - BED, R.dadoSouth, FLOOR - BED, R.wall + R.batten, R.south, R.dadoTop], grain: 'up', offset: [1.1, .4], tone: REVEAL })
   // OAK LIPPINGS close the panelling's open ends, so no end shows its layers
   const lip = .012
   oak.push({ box: [R.wall - BED, R.south - lip, R.floor, faceE, R.south, R.ceiling], grain: 'up', offset: [.3, .2], tone: toned(OAK.wall, 9, 3, 0) })
   oak.push({ box: [R.wall - BED, R.dadoSouth - lip, R.floor, faceE, R.dadoSouth, R.dadoTop], grain: 'up', offset: [.6, .5], tone: toned(OAK.wall, 9, 3, 0) })
+  // THE DADO'S CAP: a capping rail on its top, proud of the leaves by a
+  // finger, which draws its line into the niche's full-height lipping
+  oak.push({ box: [R.wall - BED, R.dadoSouth - lip - .012, R.dadoTop, faceE + .018, dadoEnd, R.dadoTop + .024], grain: 'north', offset: [.35, .15], tone: toned(OAK.wall, 16, 3, 0) })
   // THE NORTH RETURN closes the niche against the hall door: three leaves of
   // the flitch on its inner face, oak on its outer, its end lipped.
   const retS = R.north - R.returnWall, returnLength = R.front - faceE
@@ -203,9 +219,19 @@ export function oakPieces(): { oak: Piece[]; dark: Piece[]; bronze: Piece[]; flo
     oak.push({ box: [w, retS, R.floor + R.baseGap, e, retS + R.panel, R.ceiling - R.headGap], grain: 'up',
       offset: [hash(i, 41) * 1.83, hash(i, 42) * 1.83], mirror: i % 2 === 1, tone: toned(OAK.wall, 10 + i, 3, .05) })
   }
-  // its dark core shows in the joints and gaps; its outer skin is one board
-  dark.push({ box: [faceE - BED, retS + R.panel - BED, R.floor - BED, R.front - lip, R.north - .012 + BED, R.ceiling + BED], grain: 'up', offset: [0, 0], tone: [1, 1, 1] })
-  oak.push({ box: [faceE - BED, R.north - .012, R.floor - BED, R.front - lip, R.north, R.ceiling + BED], grain: 'up', offset: [.9, .3], tone: toned(OAK.wall, 14, 3, 0) })
+  // its dark core shows in the joints and gaps. ITS OUTER FACE is a screen of
+  // oak slats, the mechanism hall's own language, facing the hall door: the
+  // walk out of that door passes it at arm's length, and a plain board there
+  // filled the phone's picture with one flat surface.
+  dark.push({ box: [faceE - BED, retS + R.panel - BED, R.floor - BED, R.front - lip, R.north - .012 + BED, R.ceiling + BED], grain: 'up', offset: [.2, .8], tone: REVEAL })
+  {
+    const from = faceE - BED, to = R.front - lip, count = Math.round((to - from + SLAT.gap) / (SLAT.width + SLAT.gap))
+    const pitch = (to - from + SLAT.gap) / count
+    for (let i = 0; i < count; i++) oak.push({
+      box: [from + i * pitch, R.north - .012, R.floor - BED, from + i * pitch + pitch - SLAT.gap, R.north, R.ceiling + BED], grain: 'up',
+      offset: [hash(i, 71) * OAK_READ[0], hash(i, 72) * OAK_READ[1]], tone: toned(OAK.wall, 30 + i, 3, .07),
+    })
+  }
   oak.push({ box: [R.front - lip, retS, R.floor - BED, R.front - .002, R.north, R.ceiling - .06 + BED], grain: 'up', offset: [1.2, .7], tone: toned(OAK.wall, 15, 3, 0) })
   // THE FLOOR is the building's own, the mechanism hall's sealed concrete in
   // its bays, laid a few millimetres over the old stone; the room's oak stands
@@ -217,17 +243,13 @@ export function oakPieces(): { oak: Piece[]; dark: Piece[]; bronze: Piece[]; flo
   bronze.push({ box: [R.wall - BED, R.dadoSouth - .026, FLOOR - BED, R.front, R.dadoSouth, R.floor + .002], grain: 'east', offset: [0, 0], tone: [1, 1, 1] })
   bronze.push({ box: [R.wall - BED, R.north, FLOOR - BED, R.front + .026, R.north + .026, R.floor + .002], grain: 'east', offset: [0, 0], tone: [1, 1, 1] })
   // THE CANOPY. The ceiling the lamp hangs from, veneered underneath in the
-  // wall's own flitch; its two open edges carry a downstand fascia, and the
-  // north return carries its third.
+  // wall's own flitch, carried by the panelled wall and the north return
+  // alone: nothing hangs it from the gallery's soffit. Its two open edges
+  // carry a downstand fascia, and the north return carries its third.
   const slab = .05, fascia = .11, band = .03
   oak.push({ box: [R.wall - BED, R.south + band, R.ceiling, R.front - band, R.north + BED, R.ceiling + slab], grain: 'east', offset: [.4, .9], tone: toned(OAK.canopy, 0, 21, 0) })
   oak.push({ box: [R.front - band, R.south, R.ceiling + slab - fascia, R.front, R.north + BED, R.ceiling + slab], grain: 'north', offset: [.2, 1.1], tone: toned(OAK.canopy, 1, 21, .03) })
   oak.push({ box: [faceE, R.south, R.ceiling + slab - fascia, R.front - band, R.south + band, R.ceiling + slab], grain: 'east', offset: [1.1, .3], tone: toned(OAK.canopy, 2, 21, .03) })
-  // four bronze rods hang the canopy's front from the gallery's own soffit
-  const soffit = -1.95
-  for (const n of [R.south + .25, R.north - .25]) for (const e of [R.front - .18, (R.wall + R.front) / 2]) {
-    bronze.push({ box: [e - .006, n - .006, R.ceiling + slab, e + .006, n + .006, soffit + BED], grain: 'up', offset: [0, 0], tone: [1, 1, 1] })
-  }
   return { oak, dark, bronze, floor }
 }
 
@@ -248,6 +270,49 @@ const RAIL_ENDS = ((): number => {
   const end = Math.asin((CHAIR.width / 2 - CHAIR.leg.inset + .02) / radius)
   return radius - (radius - thickness) * Math.cos(end) + .003
 })()
+
+/** THE BOOKCASE on the north return's inner face: a low open case of the
+ * wall's oak, its two shelves holding the reference volumes a reading room
+ * keeps beside a facsimile. Modern bindings, no titles and no period claim. */
+export const BOOKCASE = {
+  west: -38.05, east: -36.85,
+  /** its back a bed into the return's inner face */
+  north: R.north - R.returnWall + BED, depth: .3,
+  height: .8, board: .025, plinth: .06, shelves: [.08, .43],
+} as const
+
+/** Cloth and leather bindings, linear, muted under one warm lamp. */
+const BINDINGS = ['#5a2a22', '#33402f', '#4b3625', '#7a5c32', '#2a3038', '#6b4a36', '#8f7d5c', '#40302a']
+
+export function bookcasePieces(): { oak: Piece[]; books: Piece[] } {
+  const B = BOOKCASE, oak: Piece[] = [], books: Piece[] = []
+  const s = B.north - B.depth, floor = R.floor, top = floor + B.height
+  const board = (box: Piece['box'], grain: Grain, i: number): void => {
+    oak.push({ box, grain, offset: [hash(i, 51) * 1.83, hash(i, 52) * 1.83], tone: toned(OAK.wall, 20 + i, 3, .04) })
+  }
+  // the carcass: two ends, a top, the shelves, a plinth set back
+  board([B.west, s, floor + B.plinth, B.west + B.board, B.north, top - B.board], 'up', 0)
+  board([B.east - B.board, s, floor + B.plinth, B.east, B.north, top - B.board], 'up', 1)
+  board([B.west, s, top - B.board, B.east, B.north, top], 'east', 2)
+  B.shelves.forEach((level, i) => board([B.west + B.board, s, floor + level, B.east - B.board, B.north, floor + level + B.board], 'east', 3 + i))
+  board([B.west + .03, s + .04, floor, B.east - .03, B.north, floor + B.plinth], 'east', 5)
+  // THE VOLUMES, set a finger back from the shelf's edge, a gap here and there
+  B.shelves.forEach((level, shelf) => {
+    const base = floor + level + B.board, room = (shelf === 0 ? B.shelves[1]! : B.height - B.board) - level - B.board
+    let e = B.west + B.board + .01, i = 0
+    while (true) {
+      const k = shelf * 97 + i++
+      const thick = .018 + hash(k, 61) * .034, tall = Math.min(room - .012, .2 + hash(k, 62) * .12)
+      if (e + thick > B.east - B.board - .01) break
+      if (hash(k, 63) < .07) { e += .04 + hash(k, 64) * .08; continue }
+      const deep = .15 + hash(k, 65) * .07, front = s + .015 + hash(k, 66) * .01
+      books.push({ box: [e, front, base, e + thick, front + deep, base + tall], grain: 'up', offset: [hash(k, 67), -base],
+        tone: toned(BINDINGS[Math.floor(hash(k, 68) * BINDINGS.length)]!, k, 69, .08) })
+      e += thick + .0015
+    }
+  })
+  return { oak, books }
+}
 
 /** THE READER'S CHAIR, drawn up to the book: oak, a leather seat, a bent
  * crest rail. It stands as a chair pushed in stands: the rail stops a finger
@@ -347,11 +412,14 @@ export function chairParts(): { oak: BufferGeometry[]; leather: BufferGeometry[]
 /** The rectangle every solid of the room stands in, for the certificate's
  * supplement: [west, south, bottom, east, north, top] per box. */
 export function readingRoomSolids(): { name: string; box: [number, number, number, number, number, number] }[] {
-  const { oak, dark, bronze, floor } = oakPieces()
+  const { oak, dark, bronze, floor } = oakPieces(), shelf = bookcasePieces()
   const out = [...oak, ...dark, ...bronze, ...floor].map((q, i) => ({ name: `piece-${i}`, box: q.box }))
+  shelf.oak.forEach((q, i) => out.push({ name: `bookcase-${i}`, box: q.box }))
+  shelf.books.forEach((q, i) => out.push({ name: `book-${i}`, box: q.box }))
   const r = SHADE.radius + .004
   out.push({ name: 'pendant-shade', box: [READING_LAMP.east - r, READING_LAMP.north - r, READING_LAMP.rim - .004, READING_LAMP.east + r, READING_LAMP.north + r, READING_LAMP.rim + SHADE.height + .05] })
   out.push({ name: 'pendant-cord', box: [READING_LAMP.east - .01, READING_LAMP.north - .01, READING_LAMP.rim + SHADE.height, READING_LAMP.east + .01, READING_LAMP.north + .01, R.ceiling] })
+  out.push({ name: 'pendant-cup', box: [READING_LAMP.east - .06, READING_LAMP.north - .06, R.ceiling - .038, READING_LAMP.east + .06, READING_LAMP.north + .06, R.ceiling] })
   chairParts().boxes.forEach((box, i) => out.push({ name: `chair-${i}`, box }))
   return out
 }

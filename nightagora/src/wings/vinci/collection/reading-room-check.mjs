@@ -160,7 +160,7 @@ const failures = [...room.failures, ...chairFailures]
 if (control.failures.length === 0) failures.push('The control post on the walk to the hall door was not refused')
 const bounds = solids.reduce((b, { box }) => [Math.min(b[0], box[0]), Math.min(b[1], box[1]), Math.min(b[2], box[2]), Math.max(b[3], box[3]), Math.max(b[4], box[4]), Math.max(b[5], box[5])], [Infinity, Infinity, Infinity, -Infinity, -Infinity, -Infinity])
 console.log(JSON.stringify({ checker: 'vinci-collection-reading-room', ok: failures.length === 0,
-  scope: 'The reading room plan as the runtime builds it: panelling, dado, north return, canopy and rods, floor and its bronze edges, the pendant and its cord, the chair, and the chair pushed in against the table top. Every certificate route, approach, leg and wall span at its saved near and gait envelope plus a margin, every recorded corner ball, every station eye and viewing eye at its own near radius. The room stands outside the rail construction fingerprint.',
+  scope: 'The reading room plan as the runtime builds it: panelling, dado, north return, canopy, floor and its bronze edges, the pendant and its cord, the chair, and the chair pushed in against the table top. Every certificate route, approach, leg and wall span at its saved near and gait envelope plus a margin, every recorded corner ball, every station eye and viewing eye at its own near radius. The room stands outside the rail construction fingerprint.',
   marginM: MARGIN_M, bounds, room: { ...room, failures: room.failures.slice(0, 12) },
   control: { failures: control.failures.length, worst: control.worst },
   chair: { edgeGapM: +edgeGap.toFixed(4), seatUnderTopM: seatUnder, legsOnFloor: onFloor, failures: chairFailures }, failures: failures.slice(0, 20) }, null, 2))

@@ -165,7 +165,14 @@ export function buildFurniture(stack: Stack) {
   // about 0.66 on the open page, 0.22 at the table's near edge, 0.12 a metre out:
   // the last term is the room's own bounce, and without it the far boards go
   // to flat black and take their grain with them
-  const pool = lampFall.mul(2.4).min(0.95).add(0.10)
+  /* THE TERM STANDS IN FOR A LAMP THE SCENE LACKS, laid out about the origin
+     the table is built at. A room that lights the table with a lamp of its own
+     sets `userData.lampStandIn` to 0: its light carries the falloff, and this
+     term, read in world space far from that origin, would dim every carrier
+     to a tenth a second time. */
+  const lampStandIn = uniform(1)
+  object.userData['lampStandIn'] = lampStandIn
+  const pool = mix(float(1), lampFall.mul(2.4).min(0.95).add(0.10), lampStandIn)
 
   const wood = new MeshStandardNodeMaterial({ color: '#65503a', roughness: 0.72 })
   wood.colorNode = color('#57472f')

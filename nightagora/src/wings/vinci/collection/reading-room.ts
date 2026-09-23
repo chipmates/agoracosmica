@@ -26,13 +26,16 @@ import type { Stack } from '../../../stack'
 import { axisFootprint, lineCoverage } from '../../../stack/detail'
 import { COLLECTION_PAVING_ORIGIN, FLOOR } from './layout'
 import {
-  Batch, chairParts, linear, oakPieces, READING_LAMP, READING_ROOM, READING_ROOM_PROVENANCE,
+  Batch, bookcasePieces, chairParts, linear, OAK_READ, oakPieces, READING_LAMP, READING_ROOM, READING_ROOM_PROVENANCE,
   READING_SHADOW_LAYER, SHADE, T, v3, type Piece,
 } from './reading-room-plan'
 
 export { READING_CHAIR, READING_LAMP, READING_ROOM, READING_ROOM_PROVENANCE, READING_SHADOW_LAYER, readingRoomSolids } from './reading-room-plan'
 
 const R = READING_ROOM
+/** The calm tier's bounce, in the probes' own linear units: set so its walls
+ * and floor stand where the hero tier's probes put them. */
+const CALM_FILL = { deep: [.08, .066, .05], open: [.11, .09, .07] } as const
 
 // The node overload boundary stays local to this file.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -45,7 +48,7 @@ const {
 export interface ReadingRoom {
   group: Group
   /** Light the table and everything it carries by this room's lamp and bounce,
-   * and let its top and its lamp throw their shadows. */
+   * and let its top throw its shadow; its desk lamp is taken off. */
   embrace(table: Object3D): void
   /** Take the room's bounce again. The caller makes the room visible for the
    * length of the call. */
@@ -111,15 +114,22 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
   // really holds: the lit page, the dark oak, the gallery beyond the opening.
   // It is read through the scene's own environment turn, so the cube is taken
   // turned by the same amount; and it is re-taken into the same target, so no
-  // surface that reads it is ever rebuilt. Two are taken: one deep in the
+  // surface that reads it is ever rebuilt. Three are taken: one deep in the
   // niche, between the table and the canopy, where the back wall and the book
   // see the gallery through the opening; one out on the dado's floor, which
-  // stands in the open gallery, and the surfaces south of the niche read it.
-  const PROBES = [v3(T.east - .28, T.north + .42, T.top + .8), v3(R.wall + 1, (R.south + R.dadoSouth) / 2 - .05, FLOOR + 1.3)]
+  // stands in the open gallery, and the surfaces south of the niche read it;
+  // one low at the niche's open front, beside the chair, where the floor and
+  // the table's near edge see the lit gallery under the canopy's fascia, which
+  // a probe over the table sees only at the horizon.
+  const PROBES = [
+    v3(T.east - .28, T.north + .42, T.top + .8),
+    v3(R.wall + 1, (R.south + R.dadoSouth) / 2 - .05, FLOOR + 1.3),
+    v3(R.front - .15, T.north - .75, FLOOR + .3),
+  ]
   let generator: PMREMGenerator | undefined
   const probes: { camera: CubeCamera; target: CubeRenderTarget; pmrem: RenderTarget }[] = []
   const gain = 1 / Math.max(.01, scene.environmentIntensity)
-  let env: N
+  let env: N, floorEnv: N
   if (tier !== 'calm') {
     const size = full ? 256 : 128
     generator = new PMREMGenerator(stack.renderer)
@@ -131,12 +141,21 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
       camera.updateMatrixWorld(true)
       probes.push({ camera, target, pmrem: generator.fromCubemap(target.texture) })
     }
-    // south of the niche's own south edge the open gallery's probe takes over
-    const out = smoothstep(-R.south - .05, -R.south + .35, positionWorld.z)
-    env = pmremTexture(probes[0]!.pmrem.texture).mul(out.oneMinus()).add(pmremTexture(probes[1]!.pmrem.texture).mul(out)).mul(gain)
+    // the front probe from the table's middle to the open front, the gallery's
+    // south of the niche's own south edge
+    const front = smoothstep(T.east + .3, R.front - .1, positionWorld.x)
+    const south = smoothstep(-R.south - .05, -R.south + .35, positionWorld.z)
+    const [deep, gallery, open] = probes.map(probe => pmremTexture(probe.pmrem.texture))
+    env = mix(mix(deep, open, front), gallery, south).mul(gain)
+    // the floor under the table sees out under its edge, not up at the canopy:
+    // it reads the open front's probe from under the table's back third on
+    floorEnv = mix(mix(deep, open, smoothstep(T.east - .7, T.east + .5, positionWorld.x)), gallery, south).mul(gain)
   } else {
-    // the calm tier takes no probe: a dim warm room, read as one colour
-    env = vec3(.035, .029, .022).mul(gain)
+    // the calm tier takes no probe: the hero's measured bounce as two warm
+    // levels, the niche's and the open front's, laid as the probes are laid
+    const deep = vec3(...CALM_FILL.deep), open = vec3(...CALM_FILL.open)
+    env = mix(deep, open, smoothstep(T.east + .3, R.front - .1, positionWorld.x)).mul(gain)
+    floorEnv = mix(deep, open, smoothstep(T.east - .7, T.east + .5, positionWorld.x)).mul(gain)
   }
 
   /** Engine-only terms (the table's occlusion of the floor): the film's own
@@ -172,10 +191,11 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
   })()
 
   // THE OAK
-  const { oak, dark, bronze, floor } = oakPieces()
+  const { oak, dark, bronze, floor } = oakPieces(), shelf = bookcasePieces()
+  oak.push(...dark, ...shelf.oak)
   const oakMaterial = new MeshStandardNodeMaterial({ roughness: .55, metalness: 0 })
   {
-    const read = oakSet.sample({ uv: uv(), metres: [1.83, 1.83] })
+    const read = oakSet.sample({ uv: uv(), metres: [...OAK_READ] })
     const tone = attribute('pieceTone', 'vec3')
     // the figure held a little under the photograph's own: the page is the hero
     oakMaterial.colorNode = tone.mul(read.albedo.sub(1).mul(.72).add(1))
@@ -215,21 +235,20 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
   }
   floorMaterial.name = 'vinci/collection-reading-room/floor'
 
-  const darkMaterial = new MeshStandardNodeMaterial({ color: '#141312', roughness: .82, metalness: 0 })
-  darkMaterial.name = 'vinci/collection-reading-room/backing'
   const bronzeMaterial = new MeshStandardNodeMaterial({ color: '#6b5537', roughness: .34, metalness: 1 })
   bronzeMaterial.roughnessNode = float(.32).add(mx_noise_float(positionWorld.mul(vec3(90, 900, 90))).mul(.05))
   bronzeMaterial.name = 'vinci/collection-reading-room/bronze'
 
   // THE PENDANT: a spun brass dome, white inside, an opal disc across its
   // mouth, hung on a black cord from a brass rose in the canopy.
-  const brass = new MeshStandardNodeMaterial({ color: '#b08a4f', roughness: .3, metalness: 1 })
+  // Darkened brass: polished, it mirrored the lit table and outshone the page.
+  const brass = new MeshStandardNodeMaterial({ color: '#6e5638', roughness: .4, metalness: 1 })
   {
     const radius = positionLocal.xz.length()
     // the spinning tool's rings, in the gloss and a touch in the tone
     const rings = sin(radius.mul(2400)).mul(.5).add(sin(radius.mul(830)).mul(.5))
-    brass.roughnessNode = float(.26).add(rings.mul(.03)).add(mx_noise_float(positionLocal.mul(60)).mul(.04))
-    brass.colorNode = vec3(...linear('#b08a4f')).mul(rings.mul(.02).add(mx_noise_float(positionLocal.mul(9)).mul(.05)).add(1))
+    brass.roughnessNode = float(.38).add(rings.mul(.03)).add(mx_noise_float(positionLocal.mul(60)).mul(.05))
+    brass.colorNode = vec3(...linear('#6e5638')).mul(rings.mul(.02).add(mx_noise_float(positionLocal.mul(9)).mul(.06)).add(1))
   }
   brass.name = 'vinci/collection-reading-room/brass'
   const enamel = new MeshStandardNodeMaterial({ color: '#e9e3d6', roughness: .45, metalness: 0, side: BackSide })
@@ -249,7 +268,17 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
     leatherMaterial.roughnessNode = float(.5).add(mx_noise_float(P.mul(vec3(90, 90, 90))).mul(.08))
   }
   leatherMaterial.name = 'vinci/collection-reading-room/leather'
-  for (const m of [oakMaterial, floorMaterial, darkMaterial, bronzeMaterial, brass, enamel, cordMaterial, leatherMaterial]) { adopt(m); materials.push(m) }
+  // THE BINDINGS: each volume its own cloth or leather, darker at its foot
+  const bindings = new MeshStandardNodeMaterial({ roughness: .72, metalness: 0 })
+  {
+    const tone = attribute('pieceTone', 'vec3'), along = uv().y
+    const wear = mx_noise_float(positionWorld.mul(vec3(60, 140, 60))).mul(.07).add(mx_noise_float(positionWorld.mul(900)).mul(.03))
+    bindings.colorNode = tone.mul(wear.add(1)).mul(smoothstep(.0, .012, along).mul(.25).add(.75))
+    bindings.roughnessNode = float(.66).add(wear.mul(.8))
+  }
+  bindings.name = 'vinci/collection-reading-room/bindings'
+  for (const m of [oakMaterial, floorMaterial, bronzeMaterial, brass, enamel, cordMaterial, leatherMaterial, bindings]) { adopt(m); materials.push(m) }
+  floorMaterial.envNode = floorEnv
   materials.push(glow)
 
   const stampMesh = (mesh: Mesh, name: string): Mesh => {
@@ -263,8 +292,8 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
   const batch = (pieces: Piece[]): BufferGeometry => { const b = new Batch(); for (const q of pieces) b.piece(q); return b.geometry() }
   stampMesh(new Mesh(batch(oak), oakMaterial), 'oak')
   stampMesh(new Mesh(batch(floor), floorMaterial), 'floor')
-  stampMesh(new Mesh(batch(dark), darkMaterial), 'backing')
   stampMesh(new Mesh(batch(bronze), bronzeMaterial), 'bronze')
+  stampMesh(new Mesh(batch(shelf.books), bindings), 'books')
 
   {
     const rim = L.rim, h = SHADE.height, r = SHADE.radius, f = SHADE.fitter
@@ -278,8 +307,9 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
     // the fitter and the rose are the same spun brass: one body with the shade
     const fitter = new CylinderGeometry(f, f * 1.08, .045, 32)
     fitter.translate(L.east, rim + h + .02, -L.north)
-    const rose = new CylinderGeometry(.055, .05, .018, 48)
-    rose.translate(L.east, R.ceiling - .009, -L.north)
+    // the ceiling cup the cord runs up into, set against the canopy
+    const rose = new LatheGeometry([[0, -.034], [.012, -.034], [.02, -.032], [.046, -.022], [.056, -.01], [.058, 0]].map(([x, y]) => new Vector2(x!, y!)), 48)
+    rose.translate(L.east, R.ceiling - .002, -L.north)
     stampMesh(new Mesh(mergeGeometries([shell, fitter, rose], false)!, brass), 'shade')
     for (const g of [shell, fitter, rose]) g.dispose()
     // Inside the shade: its white lining and the opal disc, seen only from
@@ -295,7 +325,7 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
       diffuser.receiveShadow = false
       diffuser.userData['labelOccluder'] = false
     }
-    const cordLength = R.ceiling - (rim + h + .04)
+    const cordLength = R.ceiling - .03 - (rim + h + .04)
     const cord = new CylinderGeometry(.0035, .0035, cordLength, 10)
     cord.translate(L.east, rim + h + .04 + cordLength / 2, -L.north)
     stampMesh(new Mesh(cord, cordMaterial), 'cord').userData['labelOccluder'] = false
@@ -353,6 +383,9 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
     engineOnly(on) { engineTerms.value = on ? 1 : 0 },
     embrace(table) {
       table.updateMatrixWorld(true)
+      // the table's own stand-in for a lamp gives way to this room's lamp
+      const standIn = table.userData['lampStandIn'] as { value: number } | undefined
+      if (standIn) standIn.value = 0
       const seen = new Set<Material>()
       let top: Mesh | undefined, lampHead: Mesh | undefined
       table.traverse(child => {
@@ -364,11 +397,10 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
         if (child.name === 'oak-tabletop') top = child
         if (child.geometry.getAttribute('shadeInterior')) lampHead = child
       })
-      const casters: Mesh[] = []
-      if (top) casters.push(top)
-      // the lamp on the table: its head and whatever stands in the same group
-      if (lampHead?.parent) lampHead.parent.traverse(child => { if (child instanceof Mesh) casters.push(child) })
-      for (const caster of casters) doubles.push(double(caster))
+      // THE DESK LAMP GOES: the pendant is the reading light here, and a
+      // second lamp lit on the table turns its glow to the visitor
+      if (lampHead?.parent) lampHead.parent.visible = false
+      if (top) doubles.push(double(top))
       // THE FLOOR UNDER THE TABLE: the top's own footprint and underside, read
       // off the body that stands there
       if (top) {
