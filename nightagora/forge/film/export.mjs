@@ -440,6 +440,31 @@ async function exportStill(session, inbox, node, out, opts) {
   }
 }
 
+/** the camera as the replay prints it: eye, rotation and lens to four decimals */
+const printOf = (cam) => [...cam.p.map((v) => round(v)), ...cam.r.map((v) => round(v)), round(cam.fov)].join(',')
+
+/** A CLIP WALKED ONCE UNDER THE CLOCK, KEEPING NOTHING: a room is dressed in
+    slices and a machine is built as the eye walks up, so every body a clip can
+    show is built before the first still is kept (the capture's round trip). */
+async function silentWalk(page, from, to, motion) {
+  await page.evaluate((n) => window.__naFilm.place(n), from)
+  await page.evaluate(() => { for (let k = 0; k < 3; k++) window.__pre.step() })
+  const asked = await page.evaluate(([a, b, m]) => window.__naFilm.walk(a, b, m), [from, to, motion])
+  if (!asked) throw new Error(`${from.id} to ${to.id}: the rail refused the silent walk`)
+  return page.evaluate(async () => {
+    let n = 0, began = false
+    for (; n < 4000; n++) {
+      window.__pre.step()
+      const walking = window.__naFilm.state().walking
+      if (walking) began = true
+      if (began && !walking) break
+      if (n % 30 === 29) await new Promise((r) => setTimeout(r, 0))
+    }
+    for (let k = 0; k < 10; k++) window.__pre.step()
+    return n
+  })
+}
+
 /** THE CLIP: rest at the departure, the leg on its own clock, rest at the arrival. */
 async function exportClip(session, inbox, edge, nodes, track, out, opts) {
   const { page, framing, stage } = session
@@ -468,8 +493,7 @@ async function exportClip(session, inbox, edge, nodes, track, out, opts) {
     await encoder.write(Buffer.from(res.frame.rgb.buffer, res.frame.rgb.byteOffset, res.frame.rgb.byteLength))
     const fc = frameCells(cells, res.frame)
     floorCeilingMax = Math.max(floorCeilingMax, fc.floorCeiling)
-    const cam = res.report.cam
-    const print = [...cam.p.map((v) => round(v)), ...cam.r.map((v) => round(v)), round(cam.fov)].join(',')
+    const print = printOf(res.report.cam)
     const nearM = nearDepth(res.frame)
     frames.push({ i, sha256: sha256(res.frame.rgb), print, draws: res.report.drawn, walking: res.report.walking, mounted: res.report.mounted, ms: res.report.ms, nearM, floorCeiling: round(fc.floorCeiling, 4), ...meta })
     if (opts.keep.has(i) || i === 0) await savePng(res.frame.rgb, stage.width, stage.height, join(opts.frameDir, `${stem}-${framing}-f${String(i).padStart(4, '0')}.png`))
@@ -486,14 +510,24 @@ async function exportClip(session, inbox, edge, nodes, track, out, opts) {
     return { t: window.__pre.virtualTime(), walking: window.__naFilm.state().walking }
   })
   if (!origin.walking) throw new Error(`${tag}: the leg never began`)
-  let last = -1
-  for (let i = 1; i < predicted + 12; i++) {
-    const m = motionOf(track.prints, Math.min(i, track.arrivedAt), stage.height, nearM)
+  /* THE CLIP STARTS WHERE THE EYE STARTS MOVING, by the replay's own rule: a
+     leading frame whose print still repeats the still's is not kept (a walk
+     easing in moves less than the print's last digit), so both runners
+     number the same instant of the leg alike */
+  const stillPrint = frames[0].print
+  let last = -1, j = 0, idle = 0
+  for (let i = 1; i < predicted + 60; i++) {
+    const m = motionOf(track.prints, Math.min(j + 1, track.arrivedAt), stage.height, nearM)
     const { n, over } = drawsFor(m.px)
     const t = Date.now()
-    const res = await renderFrame(session, inbox, { tag, i, times: shutterTimes(origin.t, i, n), jitter: jitterOf(n), anchor: n / 2, ids: true, send: true, grain: opts.grain, seed: i })
-    nearM = await put(i, res, { motion: round(m.px, 2), turnPx: round(m.turn, 2), walkPx: round(m.walk, 2), over, wall: Date.now() - t })
-    if (res.report.walking.every((w) => !w)) { last = i; break }
+    const res = await renderFrame(session, inbox, { tag, i, times: shutterTimes(origin.t, i, n), jitter: jitterOf(n), anchor: n / 2, ids: true, send: true, grain: opts.grain, seed: j + 1 })
+    if (j === 0 && printOf(res.report.cam) === stillPrint) {
+      if (++idle > 40) throw new Error(`${tag}: the leg never got under way`)
+      continue
+    }
+    j++
+    nearM = await put(j, res, { motion: round(m.px, 2), turnPx: round(m.turn, 2), walkPx: round(m.walk, 2), over, wall: Date.now() - t, legFrame: i })
+    if (res.report.walking.every((w) => !w)) { last = j; break }
   }
   if (last < 0) throw new Error(`${tag}: the leg never came to rest`)
   await encoder.close()
@@ -563,10 +597,13 @@ async function gateKeys(results, log) {
   const tree = await treeKeys({ log: (s) => log(`  keys: ${s}`), seenOf: undefined })
   // the ID pass's cells replace the frustum where this export saw them
   const { pictureKey } = await import(pathToFileURL(file).href)
+  /* the gate recomputes the picture from its own frustum today, so the key it
+     holds is that one; the ID pass's key rides beside it for the day the gate
+     reads the seen set a sidecar records */
   const out = new Map()
   for (const [at, c] of tree.clips) {
     const cells = mine.get(at)
-    out.set(at, { motion: c.motion, picture: cells ? pictureKey(cells, tree.world.cells.hashes, c.exposure) : c.picture, global: tree.global.key, delivery: tree.delivery.key })
+    out.set(at, { motion: c.motion, picture: c.picture, global: tree.global.key, delivery: tree.delivery.key, ...(cells ? { pictureSeen: pictureKey(cells, tree.world.cells.hashes, c.exposure), seenCells: cells.length, frustumCells: c.seen } : {}) })
   }
   return { tree, keys: out }
 }
@@ -620,6 +657,11 @@ async function main() {
         for (const framing of framings) {
           const session = await openSession(browser, framing, { base: BASE, scale, sink, warmNodes, log })
           const opts = { grain, keep, frameDir, force: flags.has('force') }
+          const before = await session.page.evaluate(() => window.__naExport.mounted().meshes)
+          const walked = []
+          for (const edge of edges) walked.push(await silentWalk(session.page, nodes.get(edge.from), nodes.get(edge.to), edge.motion))
+          const after = await session.page.evaluate(() => window.__naExport.mounted().meshes)
+          log(`  ${framing}: every clip walked once under the clock (${walked.join(', ')} steps); meshes mounted ${before} before, ${after} after`)
           for (const node of warmNodes) {
             const s = await exportStill(session, inbox, node, runDir, opts)
             stills.push(s)
@@ -673,6 +715,28 @@ async function main() {
     }
     mkdirSync(join(first.dir, 'sidecars', r.framing), { recursive: true })
     writeFileSync(join(first.dir, 'sidecars', r.framing, `${r.stem}.json`), JSON.stringify(sidecar, null, 1))
+  }
+  /* THE RELEASE THE GATE READS (`film-check.mjs --release=<dir>`), where the
+     gate stands in the tree: every clip and still with its four keys */
+  if (gate.tree) {
+    const keysOf = (at, table) => { const k = table.get(at); return k ? { motion: k.motion, picture: k.picture, global: gate.tree.global.key, delivery: gate.tree.delivery.key } : null }
+    const stillKeys = new Map([...gate.tree.stills].map(([at, s]) => [at, s]))
+    const release = { format: 'vinci-film-release-v1', keysFormat: gate.tree.format, wing: 'vinci', revision: headHere(), renderer: `chromium ${first.version} webgpu, tier max`, fps: FPS, pace: 'walk', global: gate.tree.global.key, delivery: gate.tree.delivery.key, clips: [], stills: [], sampledJoins: [] }
+    for (const s of first.stills) {
+      const stem = s.node.replace(/[:/]/g, (c) => (c === ':' ? '-' : '.'))
+      const sidecar = `sidecars/${s.framing}/stills/${stem}.json`
+      const keys = keysOf(`${s.node} ${s.framing}`, stillKeys)
+      const rel = (f) => ({ file: f.file.slice(first.dir.length + 1), bytes: f.bytes, sha256: f.sha256 })
+      mkdirSync(join(first.dir, 'sidecars', s.framing, 'stills'), { recursive: true })
+      writeFileSync(join(first.dir, sidecar), JSON.stringify({ format: 'vinci-film-sidecar-v1', node: s.node, framing: s.framing, renderer: release.renderer, keys, raw: s.raw, pendingAtRest: s.pendingAtRest, pageErrors: 0, paintedOverCanvas: s.paintedOverCanvas }, null, 1))
+      release.stills.push({ node: s.node, framing: s.framing, keys, files: { [STILL_RUNG[s.framing].join('x')]: rel(s.rung) }, sidecar })
+    }
+    for (const r of first.results) {
+      if (!r.files) continue
+      const files = Object.fromEntries(Object.entries(r.files).map(([rung, f]) => [rung, { file: f.file.slice(first.dir.length + 1), bytes: f.bytes, sha256: f.sha256 }]))
+      release.clips.push({ clip: r.clip, framing: r.framing, keys: gate.keys.get(`${r.clip} ${r.framing}`), frames: r.frames, seconds: r.frames / FPS, files, sidecar: `sidecars/${r.framing}/${r.stem}.json` })
+    }
+    writeFileSync(join(first.dir, 'release.json'), JSON.stringify(release, null, 1))
   }
   const summary = {
     format: EXPORT_FORMAT, head: headHere(), recipe, stages: STAGES, rungs: RUNGS, x264: X264, chromium: first.version,
