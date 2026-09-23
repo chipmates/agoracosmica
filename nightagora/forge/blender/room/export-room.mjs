@@ -41,9 +41,20 @@ const OUT = resolve(String(flag('out', 'room-export')))
 /** `engine` lays each set with the maps the engine really sampled; `full`
  * gives every set all of its store maps (a what-if, reported as such) */
 const MAPS = String(flag('maps', 'engine'))
+/** the tier the room is read at: `max` is the film's (every machine set with
+ * its whole maps), `hero` the live desktop's */
+const TIER = String(flag('tier', 'hero'))
 const room = ROOMS[ROOM]
 if (!room) throw new Error(`no room called ${ROOM}; known: ${Object.keys(ROOMS).join(', ')}`)
 const sha = (b) => createHash('sha256').update(b).digest('hex')
+/** a number the room takes from the source, `{ file, constant }`, or as written */
+function sourceConstant(v) {
+  if (typeof v === 'number') return v
+  const src = readFileSync(join(APP_ROOT, v.file), 'utf8')
+  const m = new RegExp(`const ${v.constant} = ([\\d.]+)`).exec(src)
+  if (!m) throw new Error(`no ${v.constant} in ${v.file}`)
+  return Number(m[1])
+}
 
 async function openRoom(browser, stop) {
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 })
@@ -53,7 +64,9 @@ async function openRoom(browser, stop) {
   const errors = []
   page.on('pageerror', (e) => errors.push(e.message.slice(0, 200)))
   page.on('console', (m) => { if (m.type() === 'error') errors.push(`console: ${m.text().slice(0, 200)}`) })
-  await page.goto(`${BASE}/w/${room.wing}?probe=1&tier=hero&samples=4#s=${stop}`, { waitUntil: 'load' })
+  await page.goto(`${BASE}/w/${room.wing}?probe=1&tier=${TIER}&samples=4#s=${stop}`, { waitUntil: 'load' })
+  const said = await page.evaluate(() => document.body.dataset.tier)
+  if (said !== TIER) throw new Error(`the page stands at tier ${said}, not ${TIER}`)
   if (!(await wingStanding(page))) throw new Error('the wing never stood')
   await standAt(page, stop)
   const pending = await restingPending(page)
@@ -235,7 +248,7 @@ async function main() {
     const lite = { family: r.family, kind: r.kind, variant: r.variant ?? null, set: r.set?.set ?? null, uv: r.uv ?? null, base: r.base ?? null,
       rough: r.rough ?? null, metal: r.metal ?? 0, normalScale: r.normalScale ?? 0, tone: r.tone ?? null, coat: r.coat ?? null, cloth: r.cloth ?? null,
       opacity: r.opacity ?? null, grazing: r.grazing ?? null, emission: r.emission ?? null,
-      hideFromShadow: r.hideFromShadow ?? false, doubleSided: Boolean(r.doubleSided), vertexColour: r.base?.mode === 'vertex',
+      hideFromShadow: r.hideFromShadow ?? false, doubleSided: Boolean(r.doubleSided), vertexColour: r.base?.mode === 'vertex', vertexTone: Boolean(r.vertexTone),
       maps: m ? { albedo: m.albedo?.file ?? null, albedoFactor: m.albedo?.factor ?? null, orm: m.orm?.file ?? null, roughnessFactor: m.roughnessFactor, normal: m.normal?.file ?? null } : null }
     def.extras = { na: lite }
     sidecar[name] = { ...lite, engineName: r.name, uuid: r.uuid, translated: r.translated, lost: r.lost }
@@ -252,9 +265,9 @@ async function main() {
   const poses = certifiedPoses(liveCams)
   writeFileSync(join(OUT, 'poses.json'), JSON.stringify(poses.doc, null, 1))
   const skyInfo = writeSky(sky, join(OUT, 'sky.hdr'))
-  const air = room.air
+  const air = { ...room.air, density: sourceConstant(room.air.density) }
   writeFileSync(join(OUT, 'air.json'), JSON.stringify({
-    ...air, box: { min: [air.west + air.inset, air.floor + air.inset, -air.north + air.inset], max: [air.east - air.inset, air.top - air.inset, -air.south - air.inset] },
+    ...air, densitySource: room.air.density, box: { min: [air.west + air.inset, air.floor + air.inset, -air.north + air.inset], max: [air.east - air.inset, air.top - air.inset, -air.south - air.inset] },
     scattering_per_m: 4 * Math.PI * 0.01 * air.density,
     law: 'engine: in-scatter per metre = 0.01 x density x profile x (the sum of the spots\' lit, shadowed irradiance), added over the room (additive: nothing behind it is dimmed). Cycles: an isotropic scattering medium of coefficient 4 pi x 0.01 x density x profile per metre, the same single-scattered light, extinguished as a real medium extinguishes it.',
     profile: 'density x ((1 - smoothstep(floor, top, y)) x 0.8 + 0.2) x (noise(p x 0.23) x 0.35 + 1)',
@@ -267,7 +280,7 @@ async function main() {
   const families = {}
   for (const p of placed) families[p.family] = (families[p.family] ?? 0) + 1
   const report = {
-    room: ROOM, title: room.title, maps: MAPS, head: headHere(), srcDirty: Boolean(dirty), server: BASE, madeAt: new Date().toISOString(),
+    room: ROOM, title: room.title, maps: MAPS, tier: TIER, head: headHere(), srcDirty: Boolean(dirty), server: BASE, madeAt: new Date().toISOString(),
     standing: scan.standing, texturesPendingAtRest: scan.pending, pageErrors: scan.errors,
     gltf: written, families, placed: placed.length,
     drawnAt: Object.fromEntries(Object.entries(visibleAt).map(([k, v]) => [k, v.length])),

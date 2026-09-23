@@ -187,7 +187,7 @@ export function assemble(gltf, scan, geoms, recipes, materialDef) {
             let uv = null
             if (recipe.uv?.mode === 'world-face') uv = worldFaceUV(prim.position, prim.normal, recipe)
             else if (recipe.uv) uv = attributeUV(base.uv, recipe)
-            const colour = recipe.base?.mode === 'vertex' && base.colour ? base.colour : null
+            const colour = (recipe.base?.mode === 'vertex' || recipe.vertexTone) && base.colour ? base.colour : null
             prims.push({ position: prim.position, normal: prim.normal, uv: uv ?? undefined, colour: colour ?? undefined, index: prim.index ?? undefined, material: materialDef(recipe) })
           }
           meshIndex = gltf.mesh(`${m.name || m.path.at(-1)}`, prims)

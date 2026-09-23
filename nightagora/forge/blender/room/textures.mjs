@@ -49,7 +49,7 @@ export async function mapsFor(recipe, storeRoot, outDir, cache) {
     if (!existsSync(join(outDir, name))) copyFileSync(albedoSrc, join(outDir, name))
     out.albedo = { file: name, factor: b.tint }
   } else {
-    const spec = { set: s.set, mode: b.mode, tint: b.tint, a: b.a, b: b.b, ao: b.ao, mean: s.mean }
+    const spec = { set: s.set, mode: b.mode, tint: b.tint, a: b.a, b: b.b, spread: b.spread, k: b.k, ao: b.ao, mean: s.mean }
     const name = `${s.set}-albedo-${key(spec)}.jpg`
     if (!cache.has(name)) {
       cache.set(name, (async () => {
@@ -63,7 +63,17 @@ export async function mapsFor(recipe, storeRoot, outDir, cache) {
           let c
           if (b.mode === 'photo') c = [r * b.tint[0], g * b.tint[1], bl * b.tint[2]]
           else if (b.mode === 'ratio') c = [b.tint[0] * r / M[0], b.tint[1] * g / M[1], b.tint[2] * bl / M[2]]
-          else {
+          else if (b.mode === 'pitch') {
+            // parts.ts: the ratio's luminance over the set mean's own luminance
+            const lum = 0.2126 * (r / M[0]) + 0.7152 * (g / M[1]) + 0.0722 * (bl / M[2])
+            const lm = Math.max(0.2126 * M[0] + 0.7152 * M[1] + 0.0722 * M[2], 0.001)
+            const k = Math.min(1.4, Math.max(0.5, (lum / lm) * b.spread + 1 - b.spread))
+            c = [b.tint[0] * k, b.tint[1] * k, b.tint[2] * k]
+          } else if (b.mode === 'new-oak') {
+            const q = [r / M[0], g / M[1], bl / M[2]]
+            const lum = 0.2126 * q[0] + 0.7152 * q[1] + 0.0722 * q[2]
+            c = q.map((v, j) => b.tint[j] * ((lum + (v - lum) * 0.35 - 1) * b.k + 1))
+          } else {
             const lum = 0.2126 * (r / M[0]) + 0.7152 * (g / M[1]) + 0.0722 * (bl / M[2])
             const k = lum * b.a + b.b
             c = [b.tint[0] * k, b.tint[1] * k, b.tint[2] * k]
@@ -92,6 +102,7 @@ export async function mapsFor(recipe, storeRoot, outDir, cache) {
           let r = r0
           if (rr.mode === 'remap') r = rr.lo + (rr.hi - rr.lo) * (S.data[i * S.channels] / 255)
           else if (rr.mode === 'clamp') r = Math.min(rr.hi, Math.max(rr.lo, r0 * rr.mul))
+          else if (rr.mode === 'affine') r = Math.min(rr.hi, Math.max(rr.lo, r0 * rr.mul + rr.add))
           o[i * 3] = 255; o[i * 3 + 1] = Math.round(Math.min(1, Math.max(0.02, r)) * 255); o[i * 3 + 2] = 255
         }
         await sharp(o, { raw: { width: S.width, height: S.height, channels: 3 } }).png({ compressionLevel: 9 }).toFile(join(outDir, name))

@@ -34,8 +34,9 @@ export const ROOMS = {
     skyEye: [-50.4, 0.6, 43.0],
     // THE AIR (hall-air.ts, exhibits.ts HALL_AIR_DENSITY): a box over the
     // hall's plan from the floor to 1.0 m, 3 cm in from every face, marched
-    // in 88 steps; densest low down, never quite even, lit by the five spots
-    air: { name: 'vinci/collection-hall-air', density: 0.12, top: 1.0, inset: 0.03, floor: -6.3, steps: 88,
+    // in 88 steps; densest low down, never quite even, lit by the five spots.
+    // The density is read from its source at export time.
+    air: { name: 'vinci/collection-hall-air', density: { file: 'src/wings/vinci/collection/exhibits.ts', constant: 'HALL_AIR_DENSITY' }, top: 1.0, inset: 0.03, floor: -6.3, steps: 88,
       low: [0.8, 0.2], drift: { frequency: 0.23, amount: 0.35 }, litBy: 'the five spots, never the clerestory',
       west: -61.66, east: -39.02, south: -63.66, north: -42.04 },
     // THE ROOM'S BOUNCE (hall-light.ts): the probe the engine takes at the

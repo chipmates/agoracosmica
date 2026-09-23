@@ -191,6 +191,10 @@ def build_material(mat, recipe, tex_dir):
         rgb = _node(nt, "ShaderNodeRGB", -900, 300)
         rgb.outputs[0].default_value = (*base.get("tint", [0.5, 0.5, 0.5])[:3], 1)
         colour = rgb.outputs[0]
+    if recipe.get("vertexTone"):
+        # the piece's own tone rides in the vertex colour, as in the engine
+        vt = _node(nt, "ShaderNodeVertexColor", -900, 100)
+        colour = _mul_colour(nt, colour, vt.outputs["Color"], -450, 250)
     tone = recipe.get("tone")
     joint = None
     if tone:

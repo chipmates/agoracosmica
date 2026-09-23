@@ -70,6 +70,20 @@ export const MACHINE_VARIANTS = [
   { id: 'hemp-crane', hex: '#ad9367', base: { mode: 'lum', a: 0.45, b: 0.55 }, rough: { mode: 'const', value: 0.86 }, normalStrength: 0 },
   { id: 'paper', lin: [0.69, 0.65, 0.55], base: { mode: 'ratio' } },
 ]
+/** parts.ts's rules for new work, pitch and forged iron, applied by the
+ * part's material name: recognised by that name and by the tint the colour
+ * graph multiplies by. `pitch` = tint x clamp(lum(photo/mean) / lum(mean) x
+ * spread + 1 - spread, .5, 1.4) x occlusion; `new-oak` = tint x ((mix(lum,
+ * photo/mean, .35) - 1) x k + 1) x occlusion x the vertex colour. */
+const NAMED_VARIANTS = [
+  { id: 'pitched-bedding', test: /:pitched bedding:/, hex: '#1d1713', base: { mode: 'pitch', spread: 0.08 }, rough: { mode: 'affine', mul: 0.3, add: 0.5, lo: 0.52, hi: 0.72 }, normalStrength: 0 },
+  { id: 'pitched-lining', test: /:pitched lining:/, hex: '#33271e', base: { mode: 'pitch', spread: 0.08 }, rough: { mode: 'affine', mul: 0.3, add: 0.5, lo: 0.52, hi: 0.72 }, normalStrength: 0 },
+  { id: 'pitched-hide', test: /:[^:]*pitched[^:]*:/, hex: '#3d2e23', base: { mode: 'pitch', spread: 0.3 }, rough: { mode: 'clamp', mul: 0.75, lo: 0.46, hi: 0.66 }, normalStrength: 0.1 },
+  { id: 'oak-grip', test: /oak grip/, hex: '#5f4a37', base: { mode: 'new-oak', k: 0.62 }, rough: { mode: 'clamp', mul: 0.8, lo: 0.32, hi: 0.6 }, vertexTone: true },
+  { id: 'turned-oak', test: /turned oak/, hex: '#82715d', base: { mode: 'new-oak', k: 0.9 }, rough: { mode: 'clamp', mul: 1, lo: 0.5, hi: 0.85 }, vertexTone: true },
+  { id: 'planed-oak', test: /planed oak|oak peg/, hex: '#897a66', base: { mode: 'new-oak', k: 0.62 }, rough: { mode: 'clamp', mul: 1, lo: 0.5, hi: 0.85 }, vertexTone: true },
+  { id: 'forged-iron', test: /iron, forged/, hex: '#3f3a35', base: { mode: 'lum', a: 0.25, b: 0.8 }, rough: { mode: 'clamp', mul: 0.9, lo: 0.5, hi: 0.82 }, normalStrength: 0.3 },
+]
 /** per-slug surface rules parts.ts applies by name, not by tint */
 const SLUG_RULES = [
   { test: /^camera-obscura:.*:oak-beams$/, rough: { mode: 'clamp', mul: 1, lo: 0.66, hi: 0.96 } },
@@ -148,7 +162,8 @@ export function translateMaterials(scan, store, appRoot, MAPS = 'engine') {
   const PLACEHOLDER_ROUGH = 128 / 255
   const roughAt = (rule, r0) => rule.mode === 'const' ? rule.value
     : rule.mode === 'remap' ? rule.lo + (rule.hi - rule.lo) * r0
-      : rule.mode === 'clamp' ? Math.min(rule.hi, Math.max(rule.lo, r0 * rule.mul)) : r0
+      : rule.mode === 'clamp' ? Math.min(rule.hi, Math.max(rule.lo, r0 * rule.mul))
+        : rule.mode === 'affine' ? Math.min(rule.hi, Math.max(rule.lo, r0 * rule.mul + rule.add)) : r0
   const firstColour = (graph) => {
     for (const c of graph?.colorNode?.consts ?? []) if (Array.isArray(c) && (c[0] === 'v3' || c[0] === 'c')) return c.slice(1)
     return null
@@ -189,6 +204,7 @@ export function translateMaterials(scan, store, appRoot, MAPS = 'engine') {
         const want = v.lin ?? lin(v.hex)
         if (near(tint, want)) { variant = v; break }
       }
+      if (!variant) variant = NAMED_VARIANTS.find((v) => v.test.test(name) && near(tint, lin(v.hex))) ?? null
       const isDefault = !variant && s.mean && near(tint, s.mean)
       const attrs = graph?.colorNode?.attributes ?? []
       const turned = attrs.includes('position') && !attrs.includes('uv')
@@ -205,7 +221,9 @@ export function translateMaterials(scan, store, appRoot, MAPS = 'engine') {
         family: 'machine', slug, cls, kind: 'pbr', set: s, variant: variant?.id ?? (isDefault ? 'photo' : 'unrecognised'),
         uv: turned ? { mode: 'box', metres: s.metres, turn: s.turn } : { mode: 'attribute', metres: s.metres, turn: setName === 'oak-beams' ? 0 : s.turn },
         base, rough, metal: m.metalness ?? 0, normalScale: 2 * strength * maps,
+        ...(variant?.vertexTone ? { vertexTone: true } : {}),
       })
+      if (variant?.vertexTone) r.translated.push('the piece\'s own tone and its darker end grain, which ride in the vertex colour, multiplied in as the engine does')
       const loaded = loadedMaps(graph, setName)
       r.engineMaps = loaded
       if (MAPS === 'engine' && !loaded.surface) {
