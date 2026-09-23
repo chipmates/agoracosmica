@@ -9,13 +9,13 @@
  */
 import {
   BufferGeometry, Float32BufferAttribute, FrontSide, Group, Mesh, MeshStandardNodeMaterial,
-  PlaneGeometry, Vector3, type Material,
+  PlaneGeometry, Vector2, Vector3, type Material,
 } from 'three/webgpu'
 import * as TSL from 'three/tsl'
 import type { Stack } from '../../../stack'
 import type { MaterialSet } from '../../../stack/materials'
 import { axisFootprint, lineCoverage } from '../../../stack/detail'
-import { COLLECTION_PAVING_ORIGIN, FACE, FLOOR, OPENING, ROOMS } from './layout'
+import { COLLECTION_PAVING_ORIGIN, DARK_BAY, FACE, FLOOR, HALL_CEILING_SOUTH, OPENING, ROOMS } from './layout'
 import { standBoxes } from './stands'
 
 // The node overload boundary stays local to this file.
@@ -114,9 +114,10 @@ function skins(): { walls: Skin; overhead: Skin; floor: Skin; plinths: Skin; sla
   const low = FLOOR + GAP
   const lintel = -2.5 + .26
   const roofAt = (north: number): number => hallSoffit(north) - .012
-  // THE SHADOW GAP IS DARK. Behind it stood the old lining's base band, which
-  // the hall's own light never reaches, and it read as a pale line.
-  const recess = .02, gapTop = (): number => low + .004
+  // THE SHADOW GAP IS DARK. Behind it stands the old lining's base band,
+  // 36 mm off the wall, which the hall's own light never reaches and which
+  // read as a pale line: the backing stands in front of it, 6 mm back.
+  const recess = .006, gapTop = (): number => low + .004
   // the west wall and the south wall run whole, up to the roof
   walls.northSouth(H.west + PROUD, 1, H.south, H.north, low, roofAt)
   backing.northSouth(H.west + PROUD - recess, 1, H.south, H.north, FLOOR, gapTop)
@@ -175,8 +176,8 @@ function skins(): { walls: Skin; overhead: Skin; floor: Skin; plinths: Skin; sla
   return { walls, overhead, floor, plinths, slats, backing }
 }
 
-const { abs, cameraPosition, cameraViewMatrix, cross, dot, float, floor: floorOf, fract, mix, mx_noise_float, normalWorldGeometry,
-  positionWorld, pow, select, smoothstep, vec2, vec3 } = TSL as unknown as Record<string, N>
+const { abs, cameraPosition, cameraViewMatrix, cross, dot, float, floor: floorOf, fract, log2, mix,
+  mx_noise_float, normalWorldGeometry, positionWorld, pow, screenUV, select, smoothstep, uniform, vec2, vec3 } = TSL as unknown as Record<string, N>
 
 /** the tangent frame a world-aligned face is photographed in: u runs along
     the face, v up it (a floor's v runs north) */
@@ -249,6 +250,87 @@ function fabricMaterial(set: MaterialSet, look: Look, name: string, bays: boolea
   return m
 }
 
+/** The planar pass is drawn at this share of the frame. */
+const REFLECTION_SCALE = .5
+/** The drawing camera's vertical focal factor, 1 / tan(half its field). */
+const FOCAL = uniform(1).onRenderUpdate(({ camera }: { camera: { projectionMatrix: { elements: number[] } } }) => camera.projectionMatrix.elements[5])
+/** The planar pass's height in texels: a share of the drawing buffer, which
+ * the pass itself is sized from. */
+const drawn = new Vector2()
+const PASS_HEIGHT = uniform(1).onRenderUpdate(({ renderer }: { renderer: { getDrawingBufferSize(v: Vector2): Vector2 } }) =>
+  Math.max(1, Math.round(renderer.getDrawingBufferSize(drawn).y * REFLECTION_SCALE)))
+
+/** What the floor meets, as boxes in the scene's frame (x east, y up, z
+ * south): the plinths and the dark bay's walls. */
+function standing(): { min: [number, number, number]; max: [number, number, number] }[] {
+  const H = ROOMS.hall, out: { min: [number, number, number]; max: [number, number, number] }[] = []
+  const add = (east: number, north: number, height: number, width: number, depth: number, tall: number): void => {
+    out.push({ min: [east - width / 2, height - tall / 2, -(north + depth / 2)], max: [east + width / 2, height + tall / 2, -(north - depth / 2)] })
+  }
+  for (const b of standBoxes()) {
+    if (b.east < H.west || b.east > H.east || b.north < H.south || b.north > H.north) continue
+    if (b.height - b.tall / 2 > FLOOR + .05) continue
+    add(b.east, b.north, b.height, b.width, b.depth, b.tall)
+  }
+  const B = DARK_BAY
+  for (const [w, s, e, n] of [
+    [B.west - B.wall, B.south - B.wall, B.west, B.north],
+    [B.east, B.south - B.wall, B.east + B.wall, B.north],
+    [B.west - B.wall, B.south - B.wall, B.east + B.wall, B.south],
+  ] as const) add((w + e) / 2, (s + n) / 2, FLOOR + B.height / 2, e - w, n - s, B.height)
+  return out
+}
+
+/** THE FLOOR'S REFLECTION, AS A GLOSSY FLOOR GIVES IT. A rough floor blurs
+ * what it reflects by the distance to it: sharp where a wall or a plinth
+ * stands on the floor, softer the farther off, and drawn out along the view.
+ * One blur for the whole floor pulled the pass's pixels from behind the walls
+ * into a pale seam at every wall's foot, and spread the lit screw across the
+ * floor as a patch no caster makes. The distance is read off the hall's own
+ * box, its plinths and the dark bay; the spread never reaches past the foot
+ * of what is reflected. */
+function glossyReflection(reflection: N, rough: N): N {
+  const H = ROOMS.hall, P = positionWorld
+  const view = P.sub(cameraPosition).normalize()
+  const r = vec3(view.x, view.y.negate().max(1e-3), view.z)
+  const safe = (c: N): N => c.abs().max(1e-4).mul(select(c.lessThan(0), float(-1), float(1)))
+  const inv = vec3(1).div(vec3(safe(r.x), r.y, safe(r.z)))
+  // leaving the room: its walls and the lowest line of its roof
+  const lo = vec3(H.west + PROUD, FLOOR - 1, -(H.north - PROUD)), hi = vec3(H.east - PROUD, HALL_CEILING_SOUTH, -(H.south + PROUD))
+  // a select takes one condition, so each axis picks its own wall
+  const wall = vec3(select(r.x.greaterThan(0), hi.x, lo.x), hi.y, select(r.z.greaterThan(0), hi.z, lo.z))
+  const far = wall.sub(P).mul(inv)
+  let d: N = far.x.min(far.y).min(far.z)
+  for (const box of standing()) {
+    const a = vec3(...box.min).sub(P).mul(inv), b = vec3(...box.max).sub(P).mul(inv)
+    const near = a.min(b), out = a.max(b)
+    const enter = near.x.max(near.y).max(near.z).max(0), leave = out.x.min(out.y).min(out.z)
+    d = select(leave.greaterThan(enter), d.min(enter), d)
+  }
+  d = d.max(0)
+  const foot = P.y.add(r.y.mul(d)).sub(FLOOR).max(0)
+  const spread = rough.mul(rough).mul(.45)
+  const along = spread.mul(d).min(foot.mul(.85))
+  const across = spread.mul(d).mul(r.y)
+  // radians per texel of the pass, and metres per texel at the reflected point
+  const texel = float(2).div(FOCAL.mul(PASS_HEIGHT))
+  const metre = cameraPosition.sub(P).length().add(d).mul(texel)
+  const taps = [-2, -1, 0, 1, 2], weights = [1, 4, 6, 4, 1]
+  const alongPx = along.div(metre), acrossPx = across.div(metre)
+  const level = log2(acrossPx.max(alongPx.div(taps.length - 1)).max(1)).min(6)
+  const stride = alongPx.div(2).div(PASS_HEIGHT)
+  const uv = screenUV.flipX()
+  let sum: N = vec3(0)
+  taps.forEach((tap, i) => {
+    sum = sum.add(reflection.sample(uv.add(vec2(0, stride.mul(tap)))).level(level).rgb.mul(weights[i]! / 16))
+  })
+  // the last texels before a foot hold the pass's view behind it, as a
+  // stair of pale dashes along the seam: what stands there is the dark
+  // reveal, so the reflection goes out over those texels
+  sum = sum.mul(smoothstep(float(.75), float(2.5), foot.div(metre)))
+  return sum
+}
+
 export interface HallFabric {
   group: Group
   /** the photographs are on the GPU */
@@ -289,7 +371,7 @@ export function mountHallFabric(stack: Stack, adopt: (material: Material) => voi
   plane.rotation.x = -Math.PI / 2
   plane.position.set((ROOMS.hall.west + ROOMS.hall.east) / 2, FLOOR + .003, -(ROOMS.hall.south + ROOMS.hall.north) / 2)
   plane.updateMatrixWorld(true)
-  const reflection = stack.reflector(plane, { resolutionScale: .5, generateMipmaps: true })
+  const reflection = stack.reflector(plane, { resolutionScale: REFLECTION_SCALE, generateMipmaps: true })
   {
     const P = positionWorld
     const view = cameraPosition.sub(P).normalize()
@@ -297,8 +379,8 @@ export function mountHallFabric(stack: Stack, adopt: (material: Material) => voi
     const fresnel = float(.04).add(float(.96).mul(pow(float(1).sub(facing), 5)))
     // held under the sky's own level, so the clerestory's glass reflects as
     // a soft brightening and not as a white smear across the bays
-    const blur = reflection.node.level(float(4.2))
-    floorMaterial.emissiveNode = blur.rgb.min(vec3(1.2, 1.2, 1.2)).mul(fresnel).mul(.7)
+    const seen = glossyReflection(reflection.node, floorMaterial.roughnessNode)
+    floorMaterial.emissiveNode = seen.min(vec3(1.2, 1.2, 1.2)).mul(fresnel).mul(.7)
   }
   const make = (skin: Skin, material: MeshStandardNodeMaterial, name: string): Mesh => {
     const mesh = new Mesh(skin.geometry(), material)

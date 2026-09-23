@@ -3577,7 +3577,7 @@
       "prompt": "The mechanism hall's finish over its certified construction: a sealed concrete floor cut into 3.2 by 3.3 m bays, each read from its own part of a CC0 photograph, with saw cuts between them and a reflection of the room blurred by the floor's own roughness; cast concrete walls with their formwork joints and tie holes, stopped over the floor by a shadow gap; the same concrete on the beams and the light shelf; between the beams 90 mm oak slats on a 150 mm pitch over a dark backing; the plinths in a dark honed stone. Photographs: library/concrete-floor-polished, library/concrete-wall-formed and library/oak-veneer-light, all CC0 from Poly Haven; the bays, joints, slats, tint and drift are procedural. A modern room; no 1517 claim.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-22",
-      "sha256": "eec8cff628cf22b4f0469fea3230baf41d6b5482ef370a32c093697f97af8910",
+      "sha256": "0c97e2ff81ce1a95f98fc9a5ae9eecb17c173d8a21d2183a352da6c3ee6229e1",
       "note": "Modern museum insertion, the mechanism hall only; no 1517 claim. recipe_file=src/wings/vinci/collection/hall-fabric.ts"
     },
     {
