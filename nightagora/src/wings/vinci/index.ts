@@ -61,9 +61,10 @@ import { LINE_FLOOR_PICK, VINCI_STUDY_LEAF, vinciApproachPose, vinciApproachStat
 import { createVinciCloseLook, createVinciMachinePayload, fillVinciLimitSlots, renderVinciMachineRecord, vinciDeathbedCard, vinciLimits, vinciLine, vinciMachineCard, vinciPlaceCard, vinciPlaceTitle, vinciManuscriptWords, VINCI_EXHIBIT_CARD, VINCI_PAGE_HONESTY, VINCI_VITRINE_WORDS, type VinciPlaceCard, type VinciPlaceCertainty, type VinciPlaceId } from './collection/close-look'
 import { createPlacePayload } from '../vitrine/place'
 import { readingTableOf } from './table'
-import { CODEX_ENTRIES } from './table/codex-shelf'
+import { CODEX_ABSENCES, CODEX_ENTRIES, EDITION_EXHIBIT, SHELF_BOOKS, isCollectionBook, shelfBook, shelfPlate } from './table/codex-shelf'
+import { createCodexReaderPayload, type CodexReaderPayload } from './table/codex-reader'
 import type { ReadingTable } from './table'
-import { FAMOUS_FOLIOS, type PageRecord } from './table/content'
+import { FAMOUS_FOLIOS, SHELF_UI, TABLE_UI, type PageRecord } from './table/content'
 import { vinciLeafSource } from './collection/deep-plate'
 import studyPageMap from './table/data/msb-pages.json?raw'
 import { createReaderPayload, type ReaderPayload } from './table/reader'
@@ -410,6 +411,10 @@ export function createWing():VinciWingModule {
   /** THE LEAF A DOOR NAMES. A folio beside a machine opens the reading at
    * that side rather than at the leaf the book lies open on. */
   let leafAt:string|null=null
+  /** A BOOK CHOSEN FROM THE RECORD OPENS WITH ITS OWN RECORD: the reading of
+   * the sources goes on with the book the visitor turned to. */
+  let recordNext=false
+  const openFromRecord=(id:string):void=>{recordNext=mode===2;openExhibit(id,null)}
   /** THE STATION CARD IS A SHEET ON THE PHONE. Peeked or opened belongs to
    * the walk, so it is held here and never written down. */
   let sheetOpen=false
@@ -514,14 +519,22 @@ export function createWing():VinciWingModule {
 
       // desk.overview: its host fields
       overview:{cells:()=>stationExhibits().map(cell=>({id:cell.id,title:cell.title,short:exhibitShort(cell.id),openable:cell.openable,
+        sub:shelfBook(cell.id)?text(shelfBook(cell.id)!.official):null,
         certainty:pictureCertainty(cell.colour),kind:picks.find(pick=>pick.id===cell.id)?.kind??'picture',
         preview:cell.preview===null?null:strip?.thumb(cell.preview)??cell.preview})),
         open:id=>openExhibit(id,null),room:roomName,
+        // THE SHELF NAMES ITSELF, and the books it cannot show stand on it by
+        // name with the reason, never opened
+        name:()=>hereContent().id==='reading-table'?{en:SHELF_UI.en.shelf,de:SHELF_UI.de.shelf}:null,
+        absent:()=>hereContent().id!=='reading-table'?null:{heading:TABLE_UI[lang()].absent,
+          items:CODEX_ABSENCES.map(absence=>({title:lang()==='de'?absence.de:absence.en,
+            reason:lang()==='de'?absence.reason_de:absence.reason_en}))},
         // the three rooms whose set the card data measures: the hang, the
         // machine hall, and the leaves
         measure:()=>{const here=hereContent().id
           const key=here==='picture-room'||here==='picture-room-west'?'measure_wall'
-            :here==='flight'||here==='works'?'measure_hall':here==='body'||here==='reading-table'?'measure_book':''
+            :here==='flight'||here==='works'?'measure_hall':here==='body'?'measure_book':''
+          if(here==='reading-table')return {en:SHELF_UI.en.measure,de:SHELF_UI.de.measure}
           return key?deskControl('overview',key):null}},
 
       // desk.sheet: its host fields
@@ -1476,7 +1489,7 @@ export function createWing():VinciWingModule {
     // ONE SELECTOR PER VIEW. A leaf opens in the reader, which brings its own
     // strip of the same set of sides; the one reader that stands without a
     // strip opens at a station that holds no row of its own.
-    strip.setViewSelector(Boolean(open?.endsWith(LEAF_DOOR)))
+    strip.setViewSelector(Boolean(open?.endsWith(LEAF_DOOR)||open?.startsWith('codex/')))
     // THE ROW NEVER STANDS OVER A WORK. On the wide stage it runs along the
     // foot of the frame above the bar, which is where a row of twenty five
     // can be large enough to recognise; while a window holds the stage the
@@ -1686,6 +1699,17 @@ export function createWing():VinciWingModule {
           preview:numeral?null:plate?assetAddress(validatePaintingRecord(plate.entry.preview,'painting-preview').entry):exhibitPreview(pick)}})
       }
     }
+    // THE SHELF IS THE READING TABLE'S SET: the volume on the table under its
+    // plain title, then every book of the collection, each opened on the table
+    if(here==='reading-table')for(const [at,book] of SHELF_BOOKS.entries()){
+      // the volume stands on the shelf by the page it lies open at, as every
+      // other book there stands by one of its pages
+      const own=row.find(item=>item.entry.id===book.id), cover=studyLeafPage()
+      const thumb=cover?assets?.byId.get(`vinci/ms-thumb/${leafStem(cover)}`):undefined
+      if(own){own.entry={...own.entry,title:text(book.title),preview:thumb?assetAddress(thumb):own.entry.preview};continue}
+      if(book.entry)row.push({order:1+at,entry:{id:book.id,openable:true,title:text(book.title),
+        colour:certaintyColour('documented'),preview:shelfPlate(book.entry)}})
+    }
     return row.sort((a,b)=>a.order-b.order).map(item=>item.entry)
   }
   /** THE PLATE AT REST FOR AN EXHIBIT THAT HAS NO PLATE OF ITS OWN: a machine,
@@ -1842,6 +1866,32 @@ export function createWing():VinciWingModule {
       controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),control(VINCI_VITRINE_WORDS.back,back),
         control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())],...exhibitStand(base)},null,'advance')
   }
+  /** A BOOK OF THE SHELF, OPENED ON THE TABLE in the reader where the visitor
+   * stands: no walk, the reader takes the window at once, and the record
+   * holds the whole shelf. */
+  function openCodexBook(id:string,from:HTMLElement|null,how:'auto'|'walk'|'cut'):void {
+    const book=shelfBook(id)
+    if(!book?.entry||!closeLook||!hosts)return
+    let reader:CodexReaderPayload|undefined
+    const openRecord=()=>{
+      exhibitSources={id,title:{en:book.title.en,de:book.title.de},certainty:'documented',renderStation(host){reader?.renderRecord(host)}}
+      sources.resetScroll();sources.select('station');mode=2;paintDock()
+    }
+    reader=createCodexReaderPayload({book,manifest:loadManifest(),words:vinciManuscriptWords(),
+      more:text(VINCI_VITRINE_WORDS.more),colour:certaintyColour('documented'),
+      tier:()=>hosts?.world.stack.tierName()??'standard',
+      changed:()=>{if(exhibitSources?.id===id&&mode===2)paintDock()},
+      openBook:openFromRecord,openLeaf:key=>{leafAt=key;openFromRecord(EDITION_EXHIBIT)}})
+    const how_=closeLook.id&&closeLook.id!==id?'advance':'enter'
+    openMode=how
+    // the name row carries the book's official name and the side; the line
+    // under it is the shelf's plain title, what the book is about
+    closeLook.open({id,title:text(book.title),line:text(book.title),card:[],payload:reader,
+      controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())],
+      ...exhibitStand(id)},from,how_)
+    openMode='auto'
+    if(recordNext){recordNext=false;openRecord()}
+  }
   /** THE PAGE ON THE SUPPORT, OPENED WHERE THE VISITOR STANDS. One side, the
    * admitted leaf's own, read from its pyramid where the store has cut one.
    * Its words are the edition's own record and the sheet's licence line. */
@@ -1933,6 +1983,7 @@ export function createWing():VinciWingModule {
    * the module's own card in the page's language only, the payload, the
    * record behind one control, Close, and the wall walked from inside it. */
   function openExhibit(id:string,from:HTMLElement|null,how:'auto'|'walk'|'cut'='auto'):void {
+    if(isCollectionBook(id)){openCodexBook(id,from,how);return}
     const entry=picks.find(pick=>pick.id===id)
     if(!entry||!hosts||!closeLook)return
     if(!entry.openable)return
@@ -2007,13 +2058,16 @@ export function createWing():VinciWingModule {
         more:text(VINCI_VITRINE_WORDS.more),honesty:text(VINCI_PAGE_HONESTY),
         words:vinciManuscriptWords(),colour:certaintyColour('documented'),
         tier:()=>hosts?.world.stack.tierName()??'standard',start:leafAt??undefined,
-        changed:()=>{if(exhibitSources?.id===id&&mode===2)paintDock()}})
+        changed:()=>{if(exhibitSources?.id===id&&mode===2)paintDock()},openBook:openFromRecord})
       leafAt=null
       openMode=how
+      // A BOOK TURNS ITS OWN PAGES: the shelf is chosen at the table, so the
+      // band's two ways stay the book's own steps and never walk the shelf
       closeLook.open({id,title,line:vinciLine(id),card:[],payload:reader,
-        controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),shut],walk,...vinciLimits(id),...own('documented'),
+        controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),shut],...vinciLimits(id),...own('documented'),
         work:()=>{const nav=rail.navigation;return nav.exhibit===id&&!nav.active?sphereRect(entry.centre,entry.radiusM):null}},from,how_)
       openMode='auto'
+      if(recordNext){recordNext=false;openRecord()}
       return
     }
     if(entry.kind==='place'||entry.workId===DEATHBED_WORK){

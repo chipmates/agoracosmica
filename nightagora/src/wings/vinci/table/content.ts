@@ -102,6 +102,37 @@ export const TABLE_UI = {
   },
 } as const;
 
+/** THE SHELF'S TITLES: a plain name for each book from what is inside it,
+ * with the register's official name beneath it for honesty and for search.
+ * The sources each was checked against are named by the seat that drafted it. */
+export const CODEX_TITLES: Readonly<Record<string, { en: string; de: string }>> = {
+  edition: { en: 'Flying machines, the ideal city and the eye', de: 'Flugmaschinen, die ideale Stadt und das Auge' },
+  'paris-B': { en: 'Flying machines and the ideal city', de: 'Flugmaschinen und die ideale Stadt' },
+  'paris-D': { en: 'The eye', de: 'Das Auge' },
+  'madrid-I': { en: 'The book of machines', de: 'Das Buch der Maschinen' },
+  'madrid-II': { en: 'Fortresses, maps and geometry', de: 'Festungen, Karten und Geometrie' },
+  birds: { en: 'The flight of birds', de: 'Der Vogelflug' },
+  trivulzianus: { en: 'Learning words', de: 'Wörter lernen' },
+  'paris-A': { en: 'Perspective', de: 'Perspektive' },
+  atlanticus: { en: 'The largest collection', de: 'Die größte Sammlung' },
+  arundel: { en: 'Notes from forty years', de: 'Notizen aus vierzig Jahren' },
+}
+
+/** The shelf's own words: the set's name, its measure, and the official name
+ * of the one volume that binds two manuscripts. */
+export const SHELF_UI = {
+  en: {
+    shelf: 'The shelf',
+    measure: '{n} books, every page a reproduction. The originals are in their own collections.',
+    edition: 'Paris manuscripts B and D',
+  },
+  de: {
+    shelf: 'Das Regal',
+    measure: '{n} Bücher, jede Seite eine Wiedergabe. Die Originale liegen in ihren Sammlungen.',
+    edition: 'Pariser Manuskripte B und D',
+  },
+} as const
+
 /** English names follow CONCEPT-GPT6's verified-leaf register and page descriptions.
  * German names are interface translations, never translations of the manuscript. */
 export const FAMOUS_FOLIOS = [

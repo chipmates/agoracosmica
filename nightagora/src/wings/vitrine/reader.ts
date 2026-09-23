@@ -69,6 +69,12 @@ export interface ReaderSide {
   /** THE STRIP IS ONE VOLUME. A wing whose book is several volumes names
    * each side's own, and the strip holds the sides of the one open now. */
   volume?: string
+  /** THE PART OF A VOLUME a side belongs to, where one volume binds several
+   * manuscripts: the count runs through the volume, and the strip and the
+   * step that crosses show where the next one begins. */
+  part?: string
+  /** What this side's own reproduction is, where the book's line is not it. */
+  honesty?: string
 }
 
 /** A cell in the strip that is not a page. Absence shown as absence: it
@@ -91,6 +97,8 @@ export interface ReaderBook {
   holderInRecord?: boolean
   /** What this reproduction is, said under every side. */
   honesty: string
+  /** The words that stand in the strip where a part of the volume begins. */
+  partLabel?(part: string): readonly string[]
 }
 
 export interface ReaderWords {
@@ -370,7 +378,7 @@ export function createReaderPayload(options: {
       }, { signal: listening.signal })
       block.append(more, texts)
     }
-    block.append(make('p', 'vitrine-meta', book.honesty))
+    block.append(make('p', 'vitrine-meta', here.honesty ?? book.honesty))
     aside.append(block)
     // THE PHONE FOLDS THE CARD TO A PEEK. What stands on it is the page's
     // own name and the one control that brings the rest of the words up.
@@ -403,11 +411,11 @@ export function createReaderPayload(options: {
     steps.previous?.parentElement?.setAttribute('data-ways', String(shown.length))
     if (steps.previous) steps.previous.disabled = at <= 0
     if (steps.next) steps.next.disabled = !book || at >= book.sides.length - 1
-    // A STEP THAT CROSSES INTO ANOTHER VOLUME NAMES WHERE IT LANDS, so the
-    // way on says the book changes before the count starts again at one.
+    // A STEP THAT CROSSES INTO ANOTHER VOLUME OR PART NAMES WHERE IT LANDS, so
+    // the way on says the book changes before the next side stands.
     for (const [step, to] of [[steps.previous, at - 1], [steps.next, at + 1]] as const) {
-      const there = book?.sides[to]
-      if (step && there && there.volume !== side()?.volume) step.dataset['title'] = there.label
+      const there = book?.sides[to], here = side()
+      if (step && there && (there.volume !== here?.volume || there.part !== here?.part)) step.dataset['title'] = there.label
       else if (step) delete step.dataset['title']
     }
   }
@@ -472,8 +480,21 @@ export function createReaderPayload(options: {
     if (single) return
     shelf.setAttribute('aria-label', book.stripLabel(side()?.volume, inside.length))
     const gaps = new Map((book.gaps ?? []).map(gap => [gap.after, gap.text]))
+    // WHERE A PART OF THE VOLUME BEGINS, the strip says so in a cell of its
+    // own: one count through the book, and the place the next one starts.
+    const parts = new Set(inside.map(index => book?.sides[index]?.part).filter(Boolean))
+    let part: string | undefined
     for (const index of inside) {
       const entry = book.sides[index]!
+      if (parts.size > 1 && entry.part && entry.part !== part && book.partLabel) {
+        const mark = make('li', 'reader-cell reader-part')
+        mark.lang = host?.lang ?? 'en'
+        mark.setAttribute('aria-hidden', 'true')
+        for (const [line, words] of book.partLabel(entry.part).entries())
+          mark.append(make('p', line ? 'reader-part-sub' : 'reader-part-name', words))
+        shelf.append(mark)
+      }
+      part = entry.part
       const item = make('li', 'reader-cell')
       const button = make('button', 'reader-page')
       button.type = 'button'

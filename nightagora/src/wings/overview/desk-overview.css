@@ -21,7 +21,7 @@
   background: var(--na-abyss);
   color: var(--na-starlight);
   display: grid;
-  grid-template-rows: auto auto auto 1fr auto;
+  grid-template-rows: auto auto auto 1fr auto auto;
   row-gap: 0;
   overflow: hidden;
 }
@@ -130,6 +130,18 @@
   color: var(--na-mist);
   text-wrap: pretty;
 }
+/* A SECOND NAME BENEATH, where the room gives a work two: the shelf's plain
+   title above, the book's official name under it, quieter, two rows at most. */
+.desk-ov-cellsub {
+  margin-top: 2px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font: 400 0.875rem/1.125rem var(--sans);
+  color: var(--na-mist);
+  text-wrap: pretty;
+}
 .desk-ov-cellname .desk-mark {
   display: inline-block;
   width: 12px;
@@ -181,3 +193,31 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* ---- what the set names and cannot show: said after the cells, never a cell ---- */
+.desk-ov-absent[hidden] { display: none; }
+.desk-ov-absent {
+  justify-self: center;
+  width: min(100%, calc(7 * 172px + 6 * 18px));
+  margin-top: 14px;
+}
+.desk-ov-absent-head {
+  margin: 0 0 6px;
+  font: 500 0.875rem/1.25rem var(--sans);
+  letter-spacing: 0.02em;
+  color: var(--desk-quiet);
+}
+.desk-ov-absent-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 32px;
+}
+.desk-ov-absent-item {
+  font: 400 0.875rem/1.25rem var(--sans);
+  color: var(--na-mist);
+}
+/* the book's name reads before the reason it is not here */
+.desk-ov-absent-name { margin-right: 8px; color: var(--desk-quiet); }

@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed to a pale grey at 30 per cent. Assumed weather, no observation claimed.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "5ae83f7b7790dc705a908099e453fab1dc43aeef007e57d7d24aba4de06b6892",
+      "sha256": "3fb832fa2e623249a51ed3318b410b8eb3615e38b8ed2e5e870060c0d95423aa",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=80c458f2cb5ccddb7fcedccda5df70e5cdccda7d9ca97d65ebfa6462920f61ef;"
     },
     {
@@ -2535,7 +2535,7 @@
       "prompt": "English and German visitor interface, verified local folio names and the codex shelf copy. Historical transcription and French are displayed verbatim from the locked collection. Handedness documented, reasons hypotheses, own reason unknown.",
       "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
       "date": "2026-09-14",
-      "sha256": "bcf92bcc577b7df356ba7658f966ad147829e411aa7336a5eec73de60549b857",
+      "sha256": "9a888ad603be6c71745f0055f887554b62b76f653af79a33dbbe462d7bd10a0c",
       "note": "recipe_file=src/wings/vinci/table/content.ts; output_source=src/wings/vinci/table/content.ts; modern exhibition design, not documentary reconstruction"
     },
     {
@@ -3496,11 +3496,11 @@
       "class": "GENERATED",
       "licence": "Original procedural exhibition design; source code under the museum repository licence.",
       "display": true,
-      "prompt": "The reading table's codex selector: every codex the rights policy admits, with its holder, its class and what part of it is recorded, plus one line for each named absence.",
+      "prompt": "The reading table's shelf: the volume on the table, which binds manuscripts B and D, then every codex the rights policy admits, each opened on the table in the reader under a plain title with its official name beneath, plus one line for each named absence.",
       "model": "Deterministic TypeScript and CSS; authored with Opus 5",
-      "date": "2026-09-14",
-      "sha256": "92ed4e9f6e557bbfd0c4653fb3aa4a727234f6b8954c53d70f61b793c3ecba20",
-      "note": "recipe_file=src/wings/vinci/table/codex-shelf.ts; output_source=src/wings/vinci/table/codex-shelf.ts; the shelf names what is recorded and never changes what the reader reads"
+      "date": "2026-09-23",
+      "sha256": "7b0b94ef0a4a749a4fcbfd87d409a0a3113babe33919cb61d083a9d0cb311fb7",
+      "note": "recipe_file=src/wings/vinci/table/codex-shelf.ts; output_source=src/wings/vinci/table/codex-shelf.ts; the shelf opens every book it can show and names the ones it cannot"
     },
     {
       "id": "vinci/table-codex-register",
@@ -3683,6 +3683,32 @@
       "date": "2026-09-23",
       "sha256": "075b0c2a0bd374a5ffc80a6ae4b594c24c7c90457a83ba52ccd01707011bede6",
       "note": "Modern museum furniture and lighting, no 1517 claim. recipe_file=src/wings/vinci/collection/reading-room.ts; companion_file=src/wings/vinci/collection/reading-room-plan.ts; library_sets=library/oak-veneer-light,library/concrete-floor-polished"
+    },
+    {
+      "id": "vinci/table-codex-reader",
+      "path": "procedural/table-codex-reader/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural exhibition design; source code under the museum repository licence.",
+      "display": true,
+      "prompt": "One book of the shelf read in the museum's reader: its sides in the order the table read them off the scans, each from its pyramid where one is cut and from the scan itself where none is, each under its own record's honesty line; a book reopens where it was left within one visit.",
+      "model": "Deterministic TypeScript; authored with Opus 5.5",
+      "date": "2026-09-23",
+      "sha256": "26760978c066781ccd37e423902ed20f509f3c4786f4229a2e0a55415904317d",
+      "note": "recipe_file=src/wings/vinci/table/codex-reader.ts; output_source=src/wings/vinci/table/codex-reader.ts; a scan the store does not admit for display is not a side"
+    },
+    {
+      "id": "vinci/table-codex-sides",
+      "path": "procedural/table-codex-sides/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural exhibition design; source code under the museum repository licence.",
+      "display": true,
+      "prompt": "Which scan is which side of each codex on the shelf, read from the scans themselves over the page maps' measured kinds; the Arundel folios read from the header each transcription page of its facsimile prints; the printed plates' windows measured by forge/codex-windows.mjs.",
+      "model": "Read by eye from contact sheets and by OCR checked by eye; authored with Opus 5.5",
+      "date": "2026-09-23",
+      "sha256": "43df5d48bc05ce92e55bc3f2beb7bb69f847b8691710e1df07990299c993e58f",
+      "note": "recipe_file=src/wings/vinci/table/data/codex-sides.json; source=the store's codices/ scans and the page maps beside the register; sides are never folio totals"
     }
   ]
 }

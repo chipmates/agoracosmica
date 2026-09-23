@@ -8,9 +8,10 @@
  * it cannot show.
  *
  * The edition is 438 printed sheets and the manuscript inside it is 188
- * sides, 168 of B and 20 of D. The strip holds the sides of the manuscript
- * open now; the 250 printed sheets are one way away and the record reaches
- * every one of the 438 by name.
+ * sides, 168 of B and 20 of D. The strip holds all 188 in one run and one
+ * count, marks where D begins, and names each side with its manuscript; the
+ * 250 printed sheets are one way away and the record reaches every one of
+ * the 438 by name.
  */
 import { lang } from '../../content'
 import type { ManifestEntry, ManifestIndex } from '../../../manifest'
@@ -20,7 +21,7 @@ import { createReaderPayload as createReader, type ReaderBook, type ReaderSide }
 import type { VitrinePayload } from '../../vitrine/types'
 import { vinciLeafSource } from '../collection/deep-plate'
 import { CODEX_ENTRIES, buildAbsences, buildCodexList } from './codex-shelf'
-import { FAMOUS_FOLIOS, MIRROR_EXPLANATION, TABLE_UI, folioKey, folioProvenance, hasItalian, type Language, type PageRecord } from './content'
+import { CODEX_TITLES, FAMOUS_FOLIOS, MIRROR_EXPLANATION, SHELF_UI, TABLE_UI, folioKey, folioProvenance, hasItalian, type Language, type PageRecord } from './content'
 import type { ReadingTable } from './index'
 import windowsRaw from './data/leaf-windows.json?raw'
 
@@ -64,6 +65,8 @@ export function createReaderPayload(options: {
   start?: string
   /** The record changed page: the sources window repaints if it is open. */
   changed(): void
+  /** Open another book of the shelf, from the record's list of codices. */
+  openBook?(id: string): void
 }): ReaderPayload {
   const { table } = options
   const pages = table.pages
@@ -127,14 +130,14 @@ export function createReaderPayload(options: {
     ]
   }
 
-  /* A BOOK OF TWO MANUSCRIPTS NAMES THE ONE A SIDE BELONGS TO. The count in
-     the name row is the manuscript's own, so without the name a reader who
-     turns past the last side of one reads the other's count as the book's. */
+  /* A BOOK OF TWO MANUSCRIPTS NAMES THE ONE A SIDE BELONGS TO. The count
+     runs through the volume, so the name is what says which manuscript a
+     side is, and where the second one begins. */
   const volumes = new Set(pages.filter(page => page.page_kind === 'facsimile').map(page => page.codex))
-  const codexName = (page: PageRecord): string =>
-    CODEX_ENTRIES.find(entry => entry.id === `paris-${page.codex}`)?.[language] ?? ''
+  const codexName = (letter: string | null): string =>
+    CODEX_ENTRIES.find(entry => entry.id === `paris-${letter}`)?.[language] ?? ''
   const sideName = (page: PageRecord): string => {
-    const name = volumes.size > 1 ? codexName(page) : ''
+    const name = volumes.size > 1 ? codexName(page.codex) : ''
     return name ? `${name}, ${identity(page)}` : identity(page)
   }
 
@@ -155,14 +158,17 @@ export function createReaderPayload(options: {
         ways: ways(page),
         colour: options.colour,
         named: named ? named[language] : null,
-        volume: page.codex ?? undefined,
+        // ONE VOLUME, ONE COUNT: the book on the table counts its 188 sides
+        // in one run, and the manuscript a side belongs to is its part
+        volume: 'edition',
+        part: page.codex ?? undefined,
       })
     }
     return {
       sides,
       gaps: gapAfter(sides),
-      stripLabel: (volume, count) => options.words.leaves.replace('{codex}', volume ?? '')
-        .replace('{total}', String(count)),
+      stripLabel: () => SHELF_UI[language].edition,
+      partLabel: part => [codexName(part), CODEX_TITLES[`paris-${part}`]?.[language] ?? ''],
       holder,
       // the edition's credit stands in the record's licence line and its
       // provenance sentence, so the band's drawer leaves it there
@@ -303,7 +309,7 @@ export function createReaderPayload(options: {
       // the ones it cannot show, and the eight studies this wing is built
       // from: the full chain, opened on purpose.
       add(copy.codices, 'h4')
-      full.append(buildCodexList(language, folioKey(page), key => payload.open(sideOf(key))))
+      full.append(buildCodexList(language, folioKey(page), key => payload.open(sideOf(key)), options.openBook))
       add(copy.famous, 'h4')
       const leaves = document.createElement('ol')
       leaves.className = 'vitrine-reader-leaves'

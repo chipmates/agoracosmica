@@ -20,6 +20,8 @@ export interface DeskOverviewCell {
   title: string
   /** the name the cell has two rows for, where the work's own runs longer */
   short?: string | null
+  /** a second, smaller name beneath it, where the room gives a work two */
+  sub?: string | null
   /** the museum's own mark for this object, which is a fact and not a style */
   certainty: VinciCertainty
   /** the kind the room gave it, which is what names the set */
@@ -39,6 +41,11 @@ export interface DeskOverviewHost {
   room: () => string
   /** the set's own measure where the room has one, `{n}` its count */
   measure?: () => VinciText | null
+  /** the set's own name where the room gives it one */
+  name?: () => VinciText | null
+  /** what the set names and cannot show: each by name with its reason,
+      after the cells, never a cell and never counted */
+  absent?: () => { heading: string; items: readonly { title: string; reason: string }[] } | null
   /** the museum's certainty mark, handed in so this view draws the same one */
   mark: (certainty: VinciCertainty) => SVGSVGElement
 }
@@ -138,6 +145,8 @@ export function createDeskOverview(host: DeskOverviewHost): DeskOverview {
   const sub = make('p', 'desk-ov-sub')
   const grid = make('ul', 'desk-ov-grid')
   grid.setAttribute('role', 'list')
+  const absent = make('section', 'desk-ov-absent')
+  absent.hidden = true
   const foot = make('div', 'desk-ov-foot')
   const named = make('div', 'desk-ov-named')
   const said = make('div', 'desk-ov-said')
@@ -153,7 +162,7 @@ export function createDeskOverview(host: DeskOverviewHost): DeskOverview {
   onArrow.append(icon(ARROW_ON))
   on.append(onWords, onArrow)
   foot.append(named, on)
-  view.append(stepBack, shut, title, sub, grid, foot)
+  view.append(stepBack, shut, title, sub, grid, absent, foot)
 
   let shown: DeskOverviewCell[] = []
   let buttons: HTMLButtonElement[] = []
@@ -191,7 +200,7 @@ export function createDeskOverview(host: DeskOverviewHost): DeskOverview {
     const held = shown[at]?.id
     shown = set
     at = Math.max(0, shown.findIndex(cell => cell.id === held))
-    const name = setName(shown)
+    const name = host.name?.() ?? setName(shown)
     title.textContent = say(name)
     // THE SET'S MEASURE STANDS UNDER ITS NAME, and it carries the count, so
     // the count stands alone only where a room has no measure of its own
@@ -223,6 +232,10 @@ export function createDeskOverview(host: DeskOverviewHost): DeskOverview {
       const word = make('span', 'desk-ov-cellname')
       word.append(host.mark(cell.certainty), document.createTextNode(cell.short ?? cell.title))
       button.append(plate, word)
+      if (cell.sub) {
+        button.append(make('span', 'desk-ov-cellsub', cell.sub))
+        button.setAttribute('aria-label', `${cell.title}, ${cell.sub}`)
+      }
       button.addEventListener('click', () => walk(index))
       // ONE SELECTOR IN THE VIEW, moved by both hands: the pointer and the
       // arrows each move the foot line one work at a time.
@@ -232,8 +245,26 @@ export function createDeskOverview(host: DeskOverviewHost): DeskOverview {
       item.append(button)
       grid.append(item)
     })
+    fillAbsent()
     select(at, false)
     layout()
+  }
+
+  /** THE NAMES OF WHAT IS NOT HERE stand after the cells, each with its
+      reason: an absence is said, never drawn as a tile and never counted. */
+  function fillAbsent(): void {
+    const said_ = host.absent?.() ?? null
+    absent.textContent = ''
+    absent.hidden = !said_?.items.length
+    if (!said_?.items.length) return
+    absent.append(make('h3', 'desk-ov-absent-head', said_.heading))
+    const list = make('ul', 'desk-ov-absent-list')
+    for (const item of said_.items) {
+      const row = make('li', 'desk-ov-absent-item')
+      row.append(make('span', 'desk-ov-absent-name', item.title), make('span', 'desk-ov-absent-reason', item.reason))
+      list.append(row)
+    }
+    absent.append(list)
   }
 
   /** THE PICTURE TAKES THE HEIGHT THE COUNT LEAVES IT. The columns never
@@ -253,7 +284,9 @@ export function createDeskOverview(host: DeskOverviewHost): DeskOverview {
       /* THE NAME'S OWN HEIGHT IS THE LANGUAGE'S, so the fit is measured and
          corrected and never assumed: a row of German titles takes the second
          row more often, and the picture gives those pixels back. */
-      for (let pass = 0; pass < 3 && tall > PICTURE_LEAST; pass++) {
+      // a cell with a second name beneath takes more rows, so the fit may need
+      // a few more steps before it settles
+      for (let pass = 0; pass < 6 && tall > PICTURE_LEAST; pass++) {
         const over = grid.scrollHeight - grid.clientHeight
         if (over <= 1) break
         tall = Math.max(PICTURE_LEAST, tall - Math.ceil(over / rows))

@@ -32,6 +32,13 @@
 .reader-absence {flex:0 0 auto;display:flex;align-items:center;box-sizing:border-box;width:150px;height:84px;
   padding:6px 8px;border:1px dashed #a9977355;}
 .reader-absence p {margin:0;font:11px/1.35 var(--sans);color:#b6bcae;}
+/* WHERE A PART OF THE VOLUME BEGINS: a cell of words before its first side,
+   so a book that binds two manuscripts shows where the second one starts. */
+.reader-part {flex:0 0 auto;display:flex;flex-direction:column;justify-content:center;box-sizing:border-box;
+  width:120px;height:84px;padding:4px 8px;border-left:2px solid #edcc8c;}
+.reader-part p {margin:0;font:14px/18px var(--sans);}
+.reader-part-name {color:#f0e4cc;}
+.reader-part-sub {color:#b6bcae;}
 
 /* THE STRIP BESIDE THE LEAF. A portrait page is fitted by its height, so
    the band under it is paid for in page, and the width beside it is not.
@@ -44,6 +51,8 @@
   touch-action:pan-y;padding:2px 0;}
 .reader[data-dock='side'] .reader-page {width:100%;height:84px;}
 .reader[data-dock='side'] .reader-absence {width:100%;height:auto;min-height:60px;}
+.reader[data-dock='side'] .reader-part {width:100%;height:auto;min-height:60px;padding:6px 4px;
+  border-left:0;border-top:2px solid #edcc8c;}
 
 /* THE ROW A HAND MEETS: the two that step one side with the ways between,
    and the viewer's own steps beside them where there is a wheel. One line:
@@ -75,6 +84,7 @@
   .reader-page {width:48px;height:72px;}
   .reader-absence {width:126px;height:72px;padding:4px 6px;}
   .reader-absence p {font-size:10px;}
+  .reader-part {width:104px;height:72px;padding:2px 6px;}
   .reader-row {gap:4px;width:100%;}
   .reader-row[data-ways='0'] .vitrine-step {flex:1 1 0;}
   .reader-zoom {display:none;}
