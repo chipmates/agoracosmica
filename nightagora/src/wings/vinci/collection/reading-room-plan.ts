@@ -231,15 +231,33 @@ export function oakPieces(): { oak: Piece[]; dark: Piece[]; bronze: Piece[]; flo
   return { oak, dark, bronze, floor }
 }
 
-/** THE READER'S CHAIR, drawn up to the book: oak, a leather seat, a bent
- * crest rail, pushed in until its back touches the table's edge. A modern
- * chair of the museum's own. */
-export const READING_CHAIR = {
-  north: T.north,
-  /** the crest rail's outer face, a finger clear of the table's edge */
-  back: T.east + 1.025 + .023,
+/** THE TABLE'S TOP as the table builds it (2.8 by 2 m, 45 mm thick, centred
+ * 25 mm toward the visitor and 27 mm under the table's datum), turned so its
+ * depth runs east: [west, south, bottom, east, north, top]. */
+export const TABLE_TOP = [T.east - .975, T.north - 1.4, T.top - .0495, T.east + 1.025, T.north + 1.4, T.top - .0045] as const
+
+const CHAIR = {
   width: .46, depth: .42, seat: .44, cushion: .05, rail: { bottom: .69, height: .075, radius: .55, thickness: .022 },
   leg: { foot: .013, top: .018, inset: .025 },
+} as const
+/** The crest rail is bent with its hollow to the sitter, so its two ends reach
+ * this far toward the table past its crown (the bevel included): they are
+ * what meets the table's edge when the chair is pushed in. */
+const RAIL_ENDS = ((): number => {
+  const { radius, thickness } = CHAIR.rail
+  const end = Math.asin((CHAIR.width / 2 - CHAIR.leg.inset + .02) / radius)
+  return radius - (radius - thickness) * Math.cos(end) + .003
+})()
+
+/** THE READER'S CHAIR, drawn up to the book: oak, a leather seat, a bent
+ * crest rail. It stands as a chair pushed in stands: the rail stops a finger
+ * short of the top's edge, which it rises past, and the seat runs on under
+ * the top. A modern chair of the museum's own. */
+export const READING_CHAIR = {
+  north: T.north,
+  /** the crest rail's crown, its ends a finger clear of the table's edge */
+  back: TABLE_TOP[3] + .012 + RAIL_ENDS,
+  ...CHAIR,
 } as const
 
 /** The chair's parts, each a geometry already in the wing's place, with the

@@ -139,11 +139,29 @@ const room = audit(solids)
 // THE CONTROL: a post stood on the walk from the reading table to the hall
 // door, where a refusal is certain, proves the audit can see.
 const control = audit([{ name: 'control-post', box: [-35.75, -45.0, -6.3, -35.6, -44.85, -3.8] }])
-const failures = [...room.failures]
+// THE CHAIR STANDS AS A CHAIR PUSHED IN: no part of it inside the table's
+// top and every part that rises past the top a finger clear of its edge, the
+// seat run on under the top, four legs on the room's floor.
+const top = plan.TABLE_TOP, chairBoxes = plan.chairParts().boxes
+const overlaps = (a, b) => a[0] < b[3] && a[3] > b[0] && a[1] < b[4] && a[4] > b[1] && a[2] < b[5] && a[5] > b[2]
+const chairFailures = []
+let edgeGap = Infinity
+chairBoxes.forEach((box, i) => {
+  if (overlaps(box, top)) chairFailures.push(`chair-${i} stands inside the table's top`)
+  if (box[5] > top[2] && box[1] < top[4] && box[4] > top[1]) edgeGap = Math.min(edgeGap, box[0] - top[3])
+})
+if (edgeGap < .008) chairFailures.push(`the chair's back stands ${edgeGap.toFixed(4)} m off the top's edge, under 0.008 m`)
+const floorLevel = plan.READING_ROOM.floor, onFloor = chairBoxes.filter(box => Math.abs(box[2] - floorLevel) < 1e-6).length
+if (onFloor !== 4) chairFailures.push(`${onFloor} chair legs stand on the floor, not 4`)
+const seat = chairBoxes.find(box => Math.abs(box[2] - (floorLevel + plan.READING_CHAIR.seat)) < 1e-6)
+const seatUnder = seat ? +(top[3] - seat[0]).toFixed(4) : null
+if (!seat || seat[5] >= top[2] || seatUnder < .2) chairFailures.push('the seat does not run on under the table top')
+const failures = [...room.failures, ...chairFailures]
 if (control.failures.length === 0) failures.push('The control post on the walk to the hall door was not refused')
 const bounds = solids.reduce((b, { box }) => [Math.min(b[0], box[0]), Math.min(b[1], box[1]), Math.min(b[2], box[2]), Math.max(b[3], box[3]), Math.max(b[4], box[4]), Math.max(b[5], box[5])], [Infinity, Infinity, Infinity, -Infinity, -Infinity, -Infinity])
 console.log(JSON.stringify({ checker: 'vinci-collection-reading-room', ok: failures.length === 0,
-  scope: 'The reading room plan as the runtime builds it: panelling, dado, north return, canopy and rods, floor and its bronze edges, the pendant and its cord, the chair. Every certificate route, approach, leg and wall span at its saved near and gait envelope plus a margin, every recorded corner ball, every station eye and viewing eye at its own near radius. The room stands outside the rail construction fingerprint.',
+  scope: 'The reading room plan as the runtime builds it: panelling, dado, north return, canopy and rods, floor and its bronze edges, the pendant and its cord, the chair, and the chair pushed in against the table top. Every certificate route, approach, leg and wall span at its saved near and gait envelope plus a margin, every recorded corner ball, every station eye and viewing eye at its own near radius. The room stands outside the rail construction fingerprint.',
   marginM: MARGIN_M, bounds, room: { ...room, failures: room.failures.slice(0, 12) },
-  control: { failures: control.failures.length, worst: control.worst }, failures: failures.slice(0, 20) }, null, 2))
+  control: { failures: control.failures.length, worst: control.worst },
+  chair: { edgeGapM: +edgeGap.toFixed(4), seatUnderTopM: seatUnder, legsOnFloor: onFloor, failures: chairFailures }, failures: failures.slice(0, 20) }, null, 2))
 process.exitCode = failures.length ? 1 : 0
