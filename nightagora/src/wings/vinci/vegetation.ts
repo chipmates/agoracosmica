@@ -471,8 +471,9 @@ function* grow(group: Group, heightAt: (east: number, north: number) => number, 
   const onGraveFloor = (e: number, n: number): boolean => e > GRAVE_FLOOR.west && e < GRAVE_FLOOR.east && n > GRAVE_FLOOR.south && n < GRAVE_FLOOR.north
   const floorAt = (e: number, n: number): number =>
     inCourt(e, n) ? COURT.level + (onGraveFloor(e, n) ? GRAVE_FLOOR_RISE : 0) : terrainFloor(e, n)
-  // the darkening under a leaf on stone is drawn wherever the tier draws the sun
-  const drawn = fallBodies(tier !== 'calm')
+  // the darkening under a leaf on stone is the film's and the desktop's; a
+  // phone's tier keeps its draws for the walk
+  const drawn = fallBodies(tier === 'hero')
   const blocks = courtBlocks()
   const fall = layLitter({
     results, tier, floorAt,
@@ -480,7 +481,7 @@ function* grow(group: Group, heightAt: (east: number, north: number) => number, 
     walked: (e, n) => onWalk(e, n) || inCourt(e, n),
     grass: (e, n) => !onWalk(e, n) && !inCourt(e, n),
     walls: drawnFaces(), blocks,
-    bodyAt: bodiesAt(drawn, tier !== 'calm'),
+    bodyAt: bodiesAt(drawn, tier === 'hero'),
     lane,
     court: { floor: COURT_GROUND, toWall: (e, n) => Math.min(toWall(e, n), ...blocks.map(b => Math.hypot(Math.max(0, b.west - e, e - b.east), Math.max(0, b.south - n, n - b.north)))) },
   })

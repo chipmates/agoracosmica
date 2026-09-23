@@ -311,7 +311,7 @@ export function layLitter(plan: LitterPlan): LitterCounts {
     // a walled court all that comes over the walls ends at a foot
     const walledIn = underFloor(mid) ? 3.4 : 1
     const perMetre = (15 + 40 * here.amount) * facing * tall * stage * stage * walledIn
-    const count = Math.round(perMetre * span * keep * 1.5 * mean / Math.max(1e-6, peak) * 1.6)
+    const count = Math.round(perMetre * span * keep * 1.2 * mean / Math.max(1e-6, peak) * 1.6)
     const depthOf = clamp01(perMetre / 90)
     const band = (riser ? .045 + .05 * depthOf : .14 + .3 * depthOf) * width
     for (let k = 0; k < count; k++) {
@@ -579,7 +579,7 @@ function lay(target: Target, leaf: Leaf): void {
   // the blade's own outline, softened, drawn on the stone under it wherever
   // a stop can see the leaf
   const contact = target.contact
-  if (contact && leaf.hard && !leaf.leanTo && stopDistance(leaf.east, leaf.north) < 30 && stageWeight(leaf.east, leaf.north) > .1) {
+  if (contact && leaf.hard && !leaf.leanTo && stopDistance(leaf.east, leaf.north) < 20 && stageWeight(leaf.east, leaf.north) > .15) {
     const c0 = contact.vertices, pad = CONTACT_PAD
     // the halo's card is the leaf's own card grown by the pad on every side,
     // lying flat on the stone under the blade
