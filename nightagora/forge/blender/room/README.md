@@ -7,6 +7,11 @@ printed the way the museum prints.
 ```
 export-room.mjs   the live room -> glTF + lights + cameras + sky + air + print + report
 cycles_room.py    the export -> Cycles frames (EXR, and PNG in the engine's print)
+tools.py          Blender's own surface tools, switched on by cycles_room.py's flags
+heights.mjs       each set's height (surface.png's displacement channel) beside an export
+expose.py         a frame printed at the exposure that meets a reference print's median
+print_engine.py   the engine's print, shared by cycles_room.py and expose.py
+film-poses.mjs    a filmed clip's cameras (a film export's sidecar) as poses for Cycles
 air-probe.mjs     the engine's own air at a stop: with, without, and the difference
 rooms.mjs         the rooms it knows: box, stops, machines, exclusions, air, print
 ```
@@ -23,7 +28,9 @@ FORGE_PORT=5437 node forge/blender/room/export-room.mjs --room=hall --out=<dir>
 
 `--stage=list` stops after the inventory. `--maps=full` lays every set with all
 of its store maps instead of the maps the engine really sampled (a what-if,
-recorded as such in the report). About two minutes for the hall.
+recorded as such in the report). `--tier=max` reads the room at the film's tier
+(every machine set with its whole maps); the default is the live desktop's
+`hero`. About four minutes for the hall.
 
 The page is read through three's own devtools hook (every `Scene` and renderer
 announces itself to `window.__THREE_DEVTOOLS__`), so nothing under `src/`
@@ -60,6 +67,26 @@ half the stage, `--no-air`, `--fittings`, `--no-reach-window`, `--adaptive 0.01`
 and `--device` are there for studies. Output: `<out>/linear/<framing>/<stop>.exr`
 (scene-linear), `<out>/stills/rooms/<framing>/<stop>.png` (the names the stills
 use) and `<out>/render-log.json` with the seconds per frame.
+
+`--crops <json>` renders boxes of the whole stage at full size after each
+frame (`{"wide/flight": [[left, top, width, height], ...]}`), printed with the
+vignette where the whole frame has it; `--no-frame` renders only the boxes.
+`--poses <file> --print-stop <stop>` renders other cameras (a film clip's, from
+`film-poses.mjs`) at a stop's print.
+
+**Blender's own tools** (`tools.py`), off unless asked, so the plain
+translation stays reproducible: `--bevel` (the Bevel shader node, 2 to 15 mm by
+what the part is and how large), `--displace` (true displacement on adaptive
+subdivision from the set's own height, where the set carries one: the floor's
+concrete and the machines' timber; run `heights.mjs --export=<dir>` first),
+`--grime` (local-AO grime in the hollows and wear on the arrises, only on
+weathered sets and never on a machine its source makes new). None adds an
+object, a word or a light.
+
+**A photographer's exposure.** `expose.py --render <out> --print <export>/print.json
+--reference <stills/rooms> --out <stills/rooms>` prints each EXR at the gain that
+puts its median luma where the reference print has it, writes the gain per
+frame (`exposure.json`) and prints the frame's crops at the same gain.
 
 ## What is translated, and how
 

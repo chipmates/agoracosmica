@@ -18,6 +18,9 @@ import time
 import bpy
 from mathutils import Matrix, Vector
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from print_engine import engine_print  # noqa: E402  the engine's print, shared with expose.py
+
 THREADS = 4
 SAMPLES = 256
 SEED = 23
@@ -49,6 +52,17 @@ def arguments(argv):
     p.add_argument("--adaptive", type=float, default=0.0, help="adaptive sampling threshold; 0 renders every sample")
     p.add_argument("--border", type=float, nargs=4, metavar=("X0", "Y0", "X1", "Y1"),
                    help="render only this share of the frame (0..1, y up) for a study; the print's vignette is then the crop's")
+    # Blender's own surface tools (tools.py); without them the render is the plain translation
+    p.add_argument("--bevel", action="store_true", help="rounded edges: the Bevel shader node")
+    p.add_argument("--displace", nargs="?", const="floor,timber", default=None,
+                   help="true displacement from the sets' own height (heights.mjs) on adaptive subdivision: floor, timber")
+    p.add_argument("--grime", action="store_true", help="cavity grime and arris wear where the set is weathered")
+    p.add_argument("--dicing-rate", type=float, default=1.0, help="adaptive subdivision's size of a diced facet, in pixels")
+    # a film's frames: poses other than the export's stops, printed at a stop's dials
+    p.add_argument("--poses", type=Path, help="a museum-poses-v1 file to render instead of the export's stops")
+    p.add_argument("--print-stop", help="the stop whose print dials a --poses frame takes")
+    p.add_argument("--crops", type=Path, help="JSON {pose id: [[left, top, width, height], ...]} in the whole stage's pixels: each box rendered at full size")
+    p.add_argument("--no-frame", action="store_true", help="render only the --crops, not the frames")
     return p.parse_args(argv)
 
 
@@ -440,45 +454,12 @@ def build_world(scene, export):
 
 # ---------------------------------------------------------------- the print
 
-def engine_print(rgb, dials, stop):
-    """stack/post.ts step 5 to 7, on the linear frame, then sRGB"""
-    import numpy as np
-    c = rgb * dials["exposure"][stop]
-    lum = lambda x: x[..., 0] * 0.2126 + x[..., 1] * 0.7152 + x[..., 2] * 0.0722
-    c = c + np.asarray(dials["lift"]) * np.clip(1 - lum(c), 0, 1)[..., None]
-    c = np.power(np.clip(c, 0, 8), 1 / np.asarray(dials["gamma"])) * np.asarray(dials["gain"])
-    l = lum(c)[..., None]
-    tint = np.asarray(dials["cool"]) + (np.asarray(dials["warm"]) - np.asarray(dials["cool"])) * np.clip(l * 1.6, 0, 1)
-    c = c + (c * tint - c) * dials["split"]
-    c = l + (c - l) * dials["saturation"]
-    if dials["shoulder"][stop] > 0:
-        start, desat = 0.8 - 0.04, 0.15
-        x = c.min(axis=-1, keepdims=True)
-        c = c - np.where(x < 0.08, x - 6.25 * x * x, 0.04)
-        peak = c.max(axis=-1, keepdims=True)
-        d = 1 - start
-        new_peak = 1 - d * d / (peak + d - start)
-        g = 1 - 1 / (desat * (peak - new_peak) + 1)
-        comp = c * (new_peak / np.maximum(peak, 1e-9))
-        comp = comp + (new_peak - comp) * g
-        n = np.where(peak < start, c, comp)
-        c = c + (n - c) * dials["shoulder"][stop]
-    h, w = c.shape[:2]
-    yy, xx = np.mgrid[0:h, 0:w]
-    u, v = (xx + 0.5) / w - 0.5, (yy + 0.5) / h - 0.5
-    r = np.sqrt(u * u + v * v)
-    t = np.clip((r - 0.34) / (0.86 - 0.34), 0, 1)
-    c = c * (1 - t * t * (3 - 2 * t) * dials["vignette"])[..., None]
-    c = np.clip(c, 0, 1)
-    return np.where(c <= 0.0031308, c * 12.92, 1.055 * np.power(c, 1 / 2.4) - 0.055)
-
-
-def print_frame(exr, png, dials, stop):
+def print_frame(exr, png, dials, stop, frame=None):
     import numpy as np
     import OpenImageIO as oiio
     buf = oiio.ImageBuf(str(exr))
     px = buf.get_pixels(oiio.FLOAT)[..., :3]
-    out = engine_print(px.astype(np.float64), dials, stop)
+    out = engine_print(px.astype(np.float64), dials, stop, frame)
     spec = oiio.ImageSpec(out.shape[1], out.shape[0], 3, oiio.UINT8)
     img = oiio.ImageBuf(spec)
     img.set_pixels(oiio.ROI(), (out * 255 + 0.5).astype(np.uint8))
@@ -496,7 +477,7 @@ def main():
     from cameras import load_poses, create_cameras, configure_camera_projection
     from render import select_device
     export = args.export.resolve()
-    poses = load_poses(export / "poses.json")
+    poses = load_poses(args.poses.resolve() if args.poses else export / "poses.json")
     dials = json.loads((export / "print.json").read_text())
     imported = import_room(export / "room.gltf")
     scene = bpy.context.scene
@@ -505,6 +486,10 @@ def main():
             obj.hide_render = True
     report = {"blender": bpy.app.version_string, "export": str(export), "imported": {k: imported[k] for k in ("meshes", "bounding_box_gltf_m")}}
     report["materials"] = build_materials(export)
+    if args.bevel or args.displace or args.grime:
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        from tools import apply_tools
+        report["tools"] = apply_tools(scene, export, args)
     report["lights"] = build_lights(scene, export, args.fittings, args.reach_window)
     if args.air:
         air = build_air(scene, export)
@@ -552,6 +537,7 @@ def main():
         bpy.ops.wm.save_as_mainfile(filepath=str(args.save_blend.resolve()))
     args.output.mkdir(parents=True, exist_ok=True)
     report["frames"] = []
+    crops = json.loads(args.crops.read_text()) if args.crops else {}
     log = args.output / "render-log.json"
     for cam in cameras:
         pose = json.loads(cam["pose_json"])
@@ -559,20 +545,42 @@ def main():
         h = max(1, round(pose["stage"]["height"] * args.scale))
         projection = configure_camera_projection(scene, cam, w, h)
         framing, stop = cam.name.split("/")
-        scene.view_settings.exposure = math.log2(dials["exposure"][stop])
+        dial_stop = args.print_stop or stop
+        scene.view_settings.exposure = math.log2(dials["exposure"][dial_stop])
         exr = args.output / "linear" / framing / f"{stop}.exr"
         png = args.output / "stills" / "rooms" / framing / f"{stop}.png"
         exr.parent.mkdir(parents=True, exist_ok=True)
         png.parent.mkdir(parents=True, exist_ok=True)
-        scene.render.filepath = str(exr)
-        t0 = time.perf_counter()
-        bpy.ops.render.render(write_still=True)
-        seconds = time.perf_counter() - t0
-        stats = print_frame(exr, png, dials, stop)
-        report["frames"].append({"camera": cam.name, "width": w, "height": h, "seconds": round(seconds, 2), "png": str(png), "exr": str(exr),
-                                 "print": stats, "vertical_fov": projection["vertical_fov"]})
-        log.write_text(json.dumps(report, indent=1) + "\n")
-        print(f"FRAME {cam.name} {w}x{h}: {seconds:.1f} s")
+        if not args.no_frame:
+            scene.render.filepath = str(exr)
+            t0 = time.perf_counter()
+            bpy.ops.render.render(write_still=True)
+            seconds = time.perf_counter() - t0
+            stats = print_frame(exr, png, dials, dial_stop)
+            report["frames"].append({"camera": cam.name, "width": w, "height": h, "seconds": round(seconds, 2), "png": str(png), "exr": str(exr),
+                                     "print": stats, "vertical_fov": projection["vertical_fov"]})
+            log.write_text(json.dumps(report, indent=1) + "\n")
+            print(f"FRAME {cam.name} {w}x{h}: {seconds:.1f} s")
+        # THE CROPS: boxes of the whole stage at full size, each its own border
+        for k, (left, top, cw, ch) in enumerate(crops.get(cam.name, [])):
+            fw, fh = pose["stage"]["width"], pose["stage"]["height"]
+            configure_camera_projection(scene, cam, fw, fh)
+            scene.render.use_border = True
+            scene.render.use_crop_to_border = True
+            scene.render.border_min_x, scene.render.border_max_x = left / fw, (left + cw) / fw
+            scene.render.border_min_y, scene.render.border_max_y = 1 - (top + ch) / fh, 1 - top / fh
+            cexr = args.output / "linear" / framing / f"{stop}-crop{k + 1}.exr"
+            cpng = args.output / "crops" / framing / f"{stop}-crop{k + 1}.png"
+            cpng.parent.mkdir(parents=True, exist_ok=True)
+            scene.render.filepath = str(cexr)
+            t0 = time.perf_counter()
+            bpy.ops.render.render(write_still=True)
+            seconds = time.perf_counter() - t0
+            stats = print_frame(cexr, cpng, dials, dial_stop, (fw, fh, left, top))
+            report.setdefault("crops", []).append({"camera": cam.name, "box": [left, top, cw, ch], "stage": [fw, fh], "seconds": round(seconds, 2), "png": str(cpng), "exr": str(cexr), "print": stats})
+            log.write_text(json.dumps(report, indent=1) + "\n")
+            print(f"CROP {cam.name} {k + 1} {cw}x{ch}: {seconds:.1f} s")
+            scene.render.use_border = bool(args.border)
     report["total_seconds"] = round(time.perf_counter() - started, 1)
     log.write_text(json.dumps(report, indent=1) + "\n")
 
