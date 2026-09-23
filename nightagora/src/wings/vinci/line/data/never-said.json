@@ -75,12 +75,12 @@
     "station": "grave",
     "title_en": "The king at the bedside",
     "title_de": "Der König am Sterbebett",
-    "label_en": "A French painter imagined this scene in 1818, three hundred years after the death it shows. Vasari told the story in 1568, fifty years after it, and gave his age as seventy-five when he was sixty-seven. The letter that announced the death says nothing about the king being there.",
-    "label_de": "Ein französischer Maler stellte sich diese Szene 1818 vor, dreihundert Jahre nach dem Tod, den sie zeigt. Vasari erzählte die Geschichte 1568, fünfzig Jahre danach, und nannte sein Alter mit fünfundsiebzig, dabei war er siebenundsechzig. Der Brief, der den Tod ankündigte, sagt nichts davon, dass der König dabei war.",
-    "record_en": "Not disproved and supported by no record. A royal act was issued at Saint-Germain-en-Laye on 3 May 1519, the day after the death, and a chancellor could sign in the king's absence, so the act alone settles nothing. A painter had already made the scene a subject in 1781.",
-    "record_de": "Nicht widerlegt und durch keine Quelle gestützt. Am 3. Mai 1519, dem Tag nach dem Tod, wurde in Saint-Germain-en-Laye eine königliche Urkunde ausgestellt, und ein Kanzler konnte in Abwesenheit des Königs unterschreiben, die Urkunde allein entscheidet also nichts. Ein Maler hatte die Szene schon 1781 zum Thema gemacht.",
-    "last_words_en": "The last words quoted as his are a modern paraphrase of Vasari's story. No spoken words of his last day are established.",
-    "last_words_de": "Die als seine letzten Worte zitierten Sätze sind eine moderne Umschreibung der Erzählung Vasaris. Kein gesprochenes Wort seines letzten Tages ist belegt.",
+    "label_en": "A French painter imagined this scene in 1818, three hundred years after the death it shows. Vasari told the story in 1568, but the letter that announced the death says nothing about the king being there.",
+    "label_de": "Ein französischer Maler stellte sich diese Szene 1818 vor, dreihundert Jahre nach dem Tod, den sie zeigt. Vasari erzählte die Geschichte 1568, doch der Brief, der den Tod ankündigte, sagt nichts davon, dass der König dabei war.",
+    "record_en": "Not disproved and supported by no record. A royal act was issued at Saint-Germain-en-Laye on 3 May 1519, the day after the death, and a chancellor could sign in the king's absence, so the act alone settles nothing. A painter had already made the scene a subject in 1781. Vasari told the story in 1568, almost fifty years after the death, and gave his age as seventy-five when he was sixty-seven.",
+    "record_de": "Nicht widerlegt und durch keine Quelle gestützt. Am 3. Mai 1519, dem Tag nach dem Tod, wurde in Saint-Germain-en-Laye eine königliche Urkunde ausgestellt, und ein Kanzler konnte in Abwesenheit des Königs unterschreiben, die Urkunde allein entscheidet also nichts. Ein Maler hatte die Szene schon 1781 zum Thema gemacht. Vasari erzählte die Geschichte 1568, fast fünfzig Jahre nach dem Tod, und nannte sein Alter mit fünfundsiebzig, dabei war er siebenundsechzig.",
+    "last_words_en": "The last words quoted as his are a modern retelling of Vasari's story, and nobody knows what he said that day.",
+    "last_words_de": "Die als seine letzten Worte zitierten Sätze sind eine moderne Nacherzählung von Vasaris Geschichte, und was er an diesem Tag sagte, weiß niemand.",
     "certainty": "conjectural"
   }
 }

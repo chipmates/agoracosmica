@@ -92,8 +92,8 @@ const NOTES: Readonly<Record<string, PictureBilingual>> = {
     de: 'Die Eremitage nennt Leonardo. Auch Boltraffio und Marco d’Oggiono wurden vorgeschlagen.',
   },
   'salvator-mundi': {
-    en: 'The attribution to Leonardo remains disputed. Extensive restoration shapes the surviving painting. Its present location is unconfirmed.',
-    de: 'Die Zuschreibung an Leonardo bleibt umstritten. Umfangreiche Restaurierungen prägen das erhaltene Gemälde. Sein heutiger Aufenthaltsort ist unbestätigt.',
+    en: 'Whether Leonardo painted it is still argued, and an extensive restoration shapes much of what you see.',
+    de: 'Ob Leonardo es gemalt hat, ist bis heute umstritten, und eine umfangreiche Restaurierung prägt vieles, was zu sehen ist.',
   },
   'yarnwinder-buccleuch': {
     en: 'A yarnwinder is the tool a spinner winds thread on. Two versions of this picture hang here.',
@@ -220,8 +220,8 @@ export function visitorSource(entries: readonly ResolvedPicturePlate[]): Picture
     de: entries.length === 1 ? 'Gemeinfreie Reproduktion aus Wikimedia Commons.' : 'Gemeinfreie Reproduktionen aus Wikimedia Commons.',
   }
   if (commons) return {
-    en: 'Reproduction from Wikimedia Commons. The image credit and reuse terms are in the record.',
-    de: 'Reproduktion aus Wikimedia Commons. Bildnachweis und Nutzungsbedingungen stehen im Verzeichnis.',
+    en: 'Reproduction from Wikimedia Commons, with its credit and reuse terms in the record.',
+    de: 'Reproduktion aus Wikimedia Commons, mit Urheber und Nutzungsbedingungen im Nachweis.',
   }
   return {
     en: 'The image source, credit and reuse terms are in the record.',
