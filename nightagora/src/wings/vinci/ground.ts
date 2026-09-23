@@ -272,7 +272,7 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     const h=road.height.sub(channel.mul(.028)).add(kerb.mul(.022)).toVar(),n=normalWorldGeometry.transformDirection(cameraViewMatrix)
     const sx=positionView.dFdx(),sy=positionView.dFdy(),rx=sy.cross(n),ry=n.cross(sx),det=sx.dot(rx)
     const gradient=rx.mul(h.dFdx()).add(ry.mul(h.dFdy())).mul(det.sign()).div(det.abs().max(1e-10))
-    const base=m.normalNode! as ReturnType<typeof vec3>,bounded=gradient.div(length(gradient).div(.25).max(1))
+    const base=m.normalNode! as ReturnType<typeof vec3>,bounded=gradient.div(length(gradient).div(.42).max(1))
     m.normalNode=mix(base,base.sub(bounded).normalize(),mask).normalize()
     // A rut is a groove: it sees less of the sky than the crown beside it.
     // Occlusion on the indirect term is what lets the tracks read where the

@@ -39,7 +39,7 @@ export function groundPixel(p:ReturnType<typeof vec2>){
   const area=dx.x.mul(dy.y).sub(dx.y.mul(dy.x)).abs()
   return area.sqrt().max(length(dx).add(length(dy)).mul(.14)).max(.00001)
 }
-export function roadWearNode(){
+export function roadWearNode(side=0){
   const p=vec2(positionWorld.x,positionWorld.z.negate()),pixel=groundPixel(p)
   let wear:Node<'float'>=float(0)
   for(let i=1;i<road.length;i++){
@@ -47,7 +47,7 @@ export function roadWearNode(){
     const v=p.sub(vec2(...a)),along=v.dot(vec2(dx/span,dn/span)),across=v.dot(vec2(-dn/span,dx/span))
     const ends=smoothstep(0,.3,along).mul(float(1).sub(smoothstep(span-.3,span,along)))
     const wander=mx_noise_float(vec3(along.mul(.32),float(i),0)).mul(.028)
-    const distance=across.sub(wander).abs().sub(.70).abs(),sigma=pixel.mul(.5).add(.12)
+    const distance=across.sub(wander).abs().sub(.70).abs().sub(side).abs(),sigma=pixel.mul(.5).add(side?.07:.12)
     const rut=distance.div(sigma).pow(2).negate().exp().mul(ends).mul(smoothstep(.7,2,float(.18).div(pixel)))
     wear=wear.max(rut)
   }
@@ -58,7 +58,7 @@ export function roadWearNode(){
   const crossing=roadGradeProvenance.crossing
   const centre=vec2(crossing[0]-.8468*TURN_RADIUS_M,crossing[1]-.5317*TURN_RADIUS_M)
   const radius=length(p.sub(centre))
-  const arc=radius.sub(TURN_RADIUS_M).abs().sub(.70).abs()
+  const arc=radius.sub(TURN_RADIUS_M).abs().sub(.70).abs().sub(side).abs()
   const sigma=pixel.mul(.5).add(.13)
   const near=smoothstep(9,3,length(p.sub(vec2(crossing[0],crossing[1]))))
   wear=wear.max(arc.div(sigma).pow(2).negate().exp().mul(near).mul(smoothstep(.7,2,float(.18).div(pixel))))
@@ -113,9 +113,12 @@ export function roadSurfaceNode(){
   // dried crown. They were four per cent apart, which is why it read as one
   // grey; a road that is walked and carted is not one tone.
   const dark=new Color('#7e7159'),pale=new Color('#bcae92')
+  // A RUT HOLDS WATER AND FINES. Its floor is darker and smoother than the
+  // crown beside it, and the wheels have pressed a low lip up at its sides.
+  const lip=roadWearNode(.22).mul(float(1).sub(wear)).mul(.6)
   const colour=mix(vec3(dark.r,dark.g,dark.b),vec3(pale.r,pale.g,pale.b),drift.mul(.42).add(.5).sub(foot.mul(.24)))
-    .mul(packed.mul(.20).add(aggregate.mul(.15)).add(chips.mul(.11)).mul(float(1).sub(wear.mul(.65))).add(grit.mul(.035)).add(1)).mul(float(1).sub(wear.mul(.34))).mul(float(1).sub(churn.mul(.30))).mul(float(1).sub(foot.mul(.22)))
-  return {mask,colour,wear,height:aggregate.mul(.00065).add(chips.mul(.00042)).add(grit.mul(.00012)).sub(wear.mul(.008)).sub(churn.mul(.004)).sub(foot.mul(.010)).clamp(-.014,.002),
+    .mul(packed.mul(.20).add(aggregate.mul(.15)).add(chips.mul(.11)).mul(float(1).sub(wear.mul(.65))).add(grit.mul(.035)).add(1)).mul(float(1).sub(wear.mul(.48))).mul(float(1).sub(churn.mul(.30))).mul(float(1).sub(foot.mul(.22))).mul(lip.mul(.06).add(1))
+  return {mask,colour,wear,height:aggregate.mul(.00065).add(chips.mul(.00042)).add(grit.mul(.00012)).sub(wear.mul(.024)).add(lip.mul(.008)).sub(churn.mul(.004)).sub(foot.mul(.010)).clamp(-.03,.01),
     roughness:float(.94).sub(wear.mul(.10)).sub(churn.mul(.22)).add(grit.mul(.02)).add(foot.mul(.03)).clamp(.62,.99)}
 }
 interface Batch {p:number[];c:number[]}

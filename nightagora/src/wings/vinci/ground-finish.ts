@@ -147,14 +147,14 @@ export function applyYardFinish(m: N, shows: (metres: number) => N): void {
   const joint = mix(rgb('#817661').mul(sandGrain), rgb('#505c30'), moss.mul(.85))
   const paved = mix(joint, cobble.mul(walked.mul(.06).add(1)), stone.mul(shown).add(float(1).sub(shown).mul(.7)))
   m.colorNode = mix(m.colorNode, paved, onCourt)
-  const cobbleHeight = dome.mul(stone).mul(.016).mul(shown).mul(onCourt)
+  const cobbleHeight = dome.mul(stone).mul(.012).mul(shown).mul(onCourt)
 
   // ─── relief, occlusion and sheen of both ─────────────────────────────────
   const height = gravelHeight.add(cobbleHeight).toVar()
   const n = normalWorldGeometry.transformDirection(cameraViewMatrix)
   const sx = positionView.dFdx(), sy = positionView.dFdy(), rx = sy.cross(n), ry = n.cross(sx), det = sx.dot(rx)
   const gradient = rx.mul(height.dFdx()).add(ry.mul(height.dFdy())).mul(det.sign()).div(det.abs().max(1e-10))
-  const bounded = gradient.div(length(gradient).div(.75).max(1))
+  const bounded = gradient.div(length(gradient).div(.6).max(1))
   const finished = onTerrace.max(onCourt)
   m.normalNode = mix(m.normalNode, n.sub(bounded).normalize(), finished).normalize()
   const gaps = float(1).sub(fineStone).mul(onTerrace).mul(.28).add(float(1).sub(stone).mul(shown).mul(onCourt).mul(.35))

@@ -114,6 +114,8 @@ export function createMoss(tier: TierName): Group {
 
   // ─── the joints of the court's paving near its walls ───────────────────
   const strips = batch()
+  // moss in a joint keeps wet longest and stays the brightest green
+  const jointMoss = (): V3 => { const c = colourAt(0); return [c[0] * 1.35, c[1] * 1.45, c[2] * 1.15] }
   if (!calm) {
     const walls = [
       (e: number, n: number): number => Math.abs(e - GALLERY.backKerb),
@@ -124,16 +126,20 @@ export function createMoss(tier: TierName): Group {
     const nearWall = (e: number, n: number): number => Math.min(...walls.map(w => w(e, n)))
     const ribbon = (a: [number, number], b: [number, number], width: number, colour: V3): void => {
       const dx = b[0] - a[0], dn = b[1] - a[1], span = Math.hypot(dx, dn), px = -dn / span, pn = dx / span
-      const steps = Math.max(1, Math.round(span / .06))
+      const steps = Math.max(1, Math.round(span / .05))
+      // the moss fills its joint and creeps a little over the edges, its
+      // width wandering smoothly, thinning out at both ends
+      const phase = random() * 6.28, phase2 = random() * 6.28
+      const half = (t: number): number => width * (.55 + .3 * Math.sin(t * span * 9 + phase) + .15 * Math.sin(t * span * 23 + phase2)) *
+        Math.min(1, t * span / .12, (1 - t) * span / .12)
+      const p = (t: number, side: number): V3 => {
+        const w = half(t) * side, e = a[0] + dx * t + px * w, n = a[1] + dn * t + pn * w
+        return [e, groundAt(e, n) + .0025, -n]
+      }
+      const up: V3 = [0, 1, 0]
       for (let i = 0; i < steps; i++) {
         const t0 = i / steps, t1 = (i + 1) / steps
-        const w0 = width * (.6 + .8 * random()), w1 = width * (.6 + .8 * random())
-        const p = (t: number, w: number, side: number): V3 => {
-          const e = a[0] + dx * t + px * w * side, n = a[1] + dn * t + pn * w * side
-          return [e, groundAt(e, n) + .0025, -n]
-        }
-        const q0 = p(t0, w0, -1), q1 = p(t1, w1, -1), q2 = p(t1, w1, 1), q3 = p(t0, w0, 1)
-        const up: V3 = [0, 1, 0]
+        const q0 = p(t0, -1), q1 = p(t1, -1), q2 = p(t1, 1), q3 = p(t0, 1)
         into(strips)(q0, q2, q1, up, up, up, colour); into(strips)(q0, q3, q2, up, up, up, colour)
       }
     }
@@ -144,7 +150,7 @@ export function createMoss(tier: TierName): Group {
       // a strip runs part of a joint
       const share = .35 + random() * .65, start = random() * (1 - share)
       ribbon([a[0] + (b[0] - a[0]) * start, a[1] + (b[1] - a[1]) * start],
-        [a[0] + (b[0] - a[0]) * (start + share), a[1] + (b[1] - a[1]) * (start + share)], .006 + random() * .01, colourAt(.3))
+        [a[0] + (b[0] - a[0]) * (start + share), a[1] + (b[1] - a[1]) * (start + share)], .006 + random() * .006, jointMoss())
     }
     // the grave's own floor: 1.8 by 1.4 m slabs in running bond, its rows
     // along the court's length, mounted at the grave's origin

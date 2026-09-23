@@ -17,7 +17,8 @@ import { getApronOutlines } from './apron'
 import { pebble, stoneColour, type Emit } from './pebbles'
 import { createMoss } from './moss'
 import { createCreepers } from './creepers'
-import { hidden, STOP_EYES, stopDistance } from './leaf-litter'
+import { hidden, stageWeight, STOP_EYES, stopDistance } from './leaf-litter'
+import { builtFaces } from './ground-walls'
 import { GRASS_CELLS, grassAtlas, grassCellUV } from './grass-maps'
 
 interface Batch { positions: number[]; normals: number[]; colours: number[] }
@@ -29,7 +30,7 @@ const PROVENANCE = {
   assetClass: 'GENERATED',
   certainty: 'conjectural',
   basis: 'A-SITE and A-LAYOUT terrain and exclusions. Modern garden photographs inform surface character only. Grass, gravel and fallen-leaf positions are a proposed October dressing, not period evidence.',
-  recipe: 'Seed 15171010. Weighted elliptical fields concentrate unequal tuft clusters in the arrival slope and garden foreground. Dense narrow three-triangle curved opaque grass blades, 4–15 mm base width, in uneven clumps, folded fallen leaves and four-face limestone chips. Independent seed 15171013 adds 800 calm or 2800 standard/hero foreground clumps, with 3–5 attempted blades per clump, 4–19 mm base widths, 0.045–0.31 m nominal stature and per-blade stature factor 0.58–1.22. Proposed dry seed stalks use eight opaque triangles each, 0.19–0.48 m high, capped at 0.22 m within 1.3 m of a circulation edge. Foreground blade projected base, knee and tip and seed-head envelope each retain all existing cut clearances. Foreground populations remain fixed in world space and complete at every view. These dimensions and seed-head forms are exhibition assumptions, not species identification or 1517 measurements. Gravel collects beside literal path corridors. Masonry, platforms, gate circulation and retained water cuts exclude all dressing. Every contact samples the shared gradeAt through heightAt. Calm retains every same-tier triangle and attribute in two spatial grass/leaf clusters plus one gravel batch. Standard/hero retain every same-tier triangle and attribute in twenty-four spatial grass/leaf clusters plus one gravel batch; native per-pass frustum culling uses their bounds. No textures, alpha, billboard orientation or shadow dither.',
+  recipe: 'The meadow sown from the stops: seed 15171013 sows, for every outdoor stop, clumps of four to nine curved opaque three-triangle blades (3 to 10 mm wide, 5 to 40 cm) and dry seed stalks, their density falling as one over (1 + (r / 4 m)^2) from the stop eye within 42 m and 60 degrees of its look, hidden places behind the house refused; blades green at the foot and gone to straw at the tip on dry ones, shorter within 1.3 m of a walked edge. Seed 15171041 adds crossed tuft cards from a tuft atlas drawn in code (30 to 40 blades each, green, mixed, seeding and bent kinds), one over (1 + (r / 8 m)^2) within 46 m, larger with distance; their normals stand up with the sward. Seed 15171042 lays short grass and weeds along the foot of the house and its annexes, never in a doorway or the gate. Path-edge gravel is bedded round-shaded river pebbles of 15 to 65 mm. Moss and ivy carry their own records. Masonry, platforms, gate circulation and retained water cuts exclude every blade; every contact samples the shared grade. Dimensions, species mix and positions are exhibition assumptions, not a record of 1517.',
 }
 
 const PATCHES: readonly Patch[] = [
@@ -42,15 +43,9 @@ const PATCHES: readonly Patch[] = [
   { east: -52, north: -14, radiusEast: 12, radiusNorth: 26, weight: 1 },
   { east: -17, north: -61, radiusEast: 18, radiusNorth: 12, weight: 1 },
 ]
-const FOREGROUND_PATCHES: readonly Patch[] = [
-  { east: -23.7, north: -30.7, radiusEast: 6.8, radiusNorth: 6.4, weight: 3 },
-  { east: -29.3, north: -37.8, radiusEast: 8.2, radiusNorth: 5.6, weight: 2 },
-]
-const WEIGHTED_FOREGROUND = FOREGROUND_PATCHES.flatMap(patch => Array.from({ length: patch.weight }, () => patch))
 const WEIGHTED_PATCHES = PATCHES.flatMap(patch => Array.from({ length: patch.weight }, () => patch))
 const GRASS = ['#5b6440', '#697249', '#747c4c', '#626943', '#788050', '#858458'].map(c => new Color(c))
 const STRAW = ['#9a9260', '#a99b6d', '#b3a577', '#8f8358', '#7d6e52'].map(c => new Color(c))
-const LEAVES = ['#806143', '#96754b', '#a28b58', '#726048', '#766b42'].map(c => new Color(c))
 
 function randomSource(seed: number): () => number {
   let value = seed >>> 0
@@ -167,21 +162,6 @@ function seedStalk(batch: Batch, heightAt: HeightAt, east: number, north: number
   }
 }
 
-function fallenLeaf(batch: Batch, heightAt: HeightAt, east: number, north: number, length: number, azimuth: number, colour: Color): void {
-  const alongEast = Math.cos(azimuth), alongNorth = Math.sin(azimuth)
-  const point = (along: number, across: number, lift: number): Vector3 => {
-    const e = east + alongEast * along - alongNorth * across
-    const n = north + alongNorth * along + alongEast * across
-    return new Vector3(e, heightAt(e, n) + lift, -n)
-  }
-  const start = point(-length * 0.48, 0, 0.021)
-  const tip = point(length * 0.52, 0, 0.035)
-  const left = point(-length * 0.05, -length * 0.25, 0.012)
-  const right = point(length * 0.03, length * 0.28, 0.014)
-  face(batch, start, left, tip, colour)
-  face(batch, start, tip, right, colour.clone().multiplyScalar(0.87))
-}
-
 /** Loose stone into a batch, with the stone's own rounded normals. */
 function stoneInto(batch: Batch): Emit {
   return (a, b, c, na, nb, nc, colour) => {
@@ -215,8 +195,8 @@ function meshFrom(batch: Batch, name: string): Mesh {
  * frame, and the count is fixed before the first one so a total never grows.
  */
 export const GROUND_DRESSING_STEPS = 14
-/** how many seams the two long sowings are cut at */
-const TUFT_SLICES = 6, FOREGROUND_SLICES = 4
+/** how many seams the meadow's sowing is cut at */
+const TUFT_SLICES = 6
 
 export interface DressingPlan { group: Group; steps: readonly (() => void)[] }
 
@@ -341,6 +321,35 @@ function* sow(group: Group, heightAt: HeightAt, tier: TierName): Generator<void,
   while (seam < TUFT_SLICES) { seam++; yield }
   yield
 
+  // THE WALL FOOT: where no wheel and no foot goes, a strip of grass and
+  // weeds stands along the foot of the house and its annexes, never in a
+  // doorway or the gate; the museum's own walls keep theirs clean
+  const verge = randomSource(15171042)
+  const openings = [[16.1, -18.9], [3.85, -12.8], [18.3, -17.5], [15.9, -19.0]]
+  let footTufts = 0
+  for (const face of builtFaces()) {
+    if (face.height !== 6 && face.height !== 3) continue
+    const dx = face.to[0] - face.from[0], dn = face.to[1] - face.from[1], span = Math.hypot(dx, dn)
+    const mid = [(face.from[0] + face.to[0]) / 2, (face.from[1] + face.to[1]) / 2]
+    const seen = stageWeight(mid[0]! + face.low[0] * .3, mid[1]! + face.low[1] * .3)
+    if (seen < .15) continue
+    const count = Math.round(span * (calm ? 2 : 7) * seen)
+    for (let k = 0; k < count; k++) {
+      const t = verge(), off = .04 + verge() ** 1.6 * .3
+      const east = face.from[0] + dx * t + face.low[0] * off, north = face.from[1] + dn * t + face.low[1] * off
+      if (openings.some(([e, n]) => Math.hypot(east - e!, north - n!) < 1.4)) continue
+      if (buildings.some(p => inside(east, north, p)) || water.some(p => inside(east, north, p))) continue
+      const tall = (.05 + verge() ** 1.4 * .16) * (1 - off * 1.2)
+      const blades = 3 + Math.floor(verge() * 4), angle = verge() * Math.PI * 2
+      for (let b = 0; b < blades; b++) {
+        const colour = (verge() < .3 ? STRAW : GRASS)[Math.floor(verge() * 5)]!.clone().multiplyScalar(.78 + verge() * .2)
+        tuftBlade(plantBatch, heightAt, east + (verge() - .5) * .04, north + (verge() - .5) * .04, tall * (.6 + verge() * .6),
+          angle + b * 2.1 + verge() * .5, .003 + verge() * .006, colour)
+      }
+      footTufts++
+    }
+  }
+
   // THE SWARD'S TUFTS as cards: the cover a meadow has, which single blades
   // cannot give past a few metres; larger with distance so the far sward
   // keeps its cover
@@ -417,9 +426,8 @@ function* sow(group: Group, heightAt: HeightAt, tier: TierName): Generator<void,
   group.add(createCreepers(tier, (e, n) => routes.some(p => inside(e, n, p) || edgeDistance(e, n, p) < 1)))
   group.userData['draws'] = group.children.length
   group.userData['triangles'] = (plantBatch.positions.length + mineralBatch.positions.length) / 9
-  group.userData['counts'] = { clumps, blades, seedStalks, chips, tufted }
+  group.userData['counts'] = { clumps, blades, seedStalks, chips, tufted, footTufts }
   group.userData['tier'] = tier
   group.userData['patches'] = PATCHES.map(p => ({ ...p }))
-  group.userData['foregroundPatches'] = FOREGROUND_PATCHES.map(p => ({ ...p }))
   group.userData['excluded'] = ['cadastre', 'build envelope', 'mapped annexes', 'courtyard', 'terrace', 'street', 'street grade', 'house-side apron', 'gate approach', 'gate steps', 'garden descent', 'retained water cuts']
 }
