@@ -31,7 +31,7 @@ import type { BodySheetSource } from './body-wall'
 import { mountReadingRoom, type ReadingRoom } from './reading-room'
 
 /** How thick the hall's air is: a haze a spot's shaft is seen in, no more. */
-const HALL_AIR_DENSITY = .12
+const HALL_AIR_DENSITY = .085
 
 /** Which ground each machine is built with. Every ground is built at entry,
  * the court's first because it is seen from every station on this ground. */

@@ -1,6 +1,6 @@
-/** THE HALL'S AIR, FOR THE FILM: a thin haze that the clerestory's light and
- * the spots are seen through, each shaft carved by the shadows its own map
- * holds. Marched through the hall's box and stopped at the room's depth.
+/** THE HALL'S AIR, FOR THE FILM: a thin haze that the spots are seen
+ * through, each shaft carved by the shadows its own map holds. Marched
+ * through the hall's box and stopped at the room's depth.
  *
  * The room's depth is the air's own: the scene's pass is multisampled, and a
  * multisampled depth cannot be read, so a depth pass without samples is drawn
@@ -67,6 +67,18 @@ class RoomDepth extends TextureNode {
   }
 }
 
+/** THE AIR TAKES ITS OWN LIGHTS. Three's volume model gathers its lights
+ * inside its march loop, and that loop is built after the material's own
+ * lights node has handed the builder back the scene's: the air was lit by
+ * the scene's unshadowed fittings, not by the spots it is given. So the
+ * builder is held on the air's own lights for the whole of its build. */
+class HallAirMaterial extends VolumeNodeMaterial {
+  override setupLightingModel(builder?: N): ReturnType<VolumeNodeMaterial['setupLightingModel']> {
+    if (builder && this.lightsNode) builder.lightsNode = this.lightsNode
+    return super.setupLightingModel()
+  }
+}
+
 export interface HallAir {
   mesh: Mesh
   dispose(): void
@@ -80,7 +92,7 @@ export function mountHallAir(scene: Scene, lit: readonly Light[], density: numbe
   geometry.translate((H.west + H.east) / 2, (FLOOR + top) / 2, -(H.south + H.north) / 2)
   // enough steps that the dither which breaks the banding is finer than the
   // eye can hold as a pattern, even around a lamp
-  const material = new VolumeNodeMaterial({ steps: 88 })
+  const material = new HallAirMaterial({ steps: 88 })
   material.name = 'vinci/collection-hall-air'
   material.side = BackSide
   material.blending = AdditiveBlending
