@@ -472,7 +472,7 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
       // dried pitch is a dull skin: a flat one with a sheen reads as standing water
       const spread = /bedding/.test(name) ? .08 : .3
       material.colorNode = vec3(pitch.r, pitch.g, pitch.b).mul(fibres.mul(spread).add(1 - spread).clamp(.5, 1.4)).mul(detail.occlusion)
-      material.roughnessNode = /bedding/.test(name) ? detail.roughness.mul(.3).add(.5).clamp(.52, .7) : detail.roughness.mul(.75).clamp(.4, .64)
+      material.roughnessNode = /bedding/.test(name) ? detail.roughness.mul(.3).add(.5).clamp(.52, .7) : detail.roughness.mul(.75).clamp(.46, .66)
       if (/bedding/.test(name)) material.normalNode = null
     }
     if (/planed oak|turned oak|oak peg|oak grip/.test(name)) {
@@ -481,7 +481,8 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
       // little over half its contrast; the grip is darkened by the hand.
       const oak = new Color(/grip/.test(name) ? '#5f4a37' : /turned/.test(name) ? '#82715d' : '#897a66')
       const lum = detail.albedo.dot(vec3(.2126, .7152, .0722))
-      const grain = mix(vec3(lum, lum, lum), detail.albedo, .35).sub(1).mul(.62).add(1)
+      // the turned core is the largest face on the machine and shows its run of grain
+      const grain = mix(vec3(lum, lum, lum), detail.albedo, .35).sub(1).mul(/turned/.test(name) ? .9 : .62).add(1)
       // an end face drinks the light: darker and rougher than the side grain
       const end = step(END_GRAIN_U / 2, uv().x)
       material.colorNode = vec3(oak.r, oak.g, oak.b).mul(grain).mul(detail.occlusion).mul(end.mul(-.48).add(1))
