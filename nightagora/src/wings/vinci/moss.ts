@@ -145,7 +145,9 @@ export function createMoss(tier: TierName): Group {
     }
     const lay = (a: [number, number], b: [number, number]): void => {
       const m: [number, number] = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]
-      const p = Math.exp(-nearWall(m[0], m[1]) / 2.4) * .9
+      // every joint of a court the sun cannot reach holds a little moss; the
+      // joints nearer the damp walls hold the most
+      const p = .28 + .62 * Math.exp(-nearWall(m[0], m[1]) / 2.4)
       if (random() > p) return
       // a strip runs part of a joint
       const share = .35 + random() * .65, start = random() * (1 - share)

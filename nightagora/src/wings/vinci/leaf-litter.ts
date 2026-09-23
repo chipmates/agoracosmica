@@ -332,12 +332,12 @@ export function layLitter(plan: LitterPlan): LitterCounts {
     const random = mulberry(15171025)
     for (const g of plan.court.floor) {
       const area = (g.east - g.west) * (g.north - g.south)
-      const tries = Math.round(area * 3.2 * keep)
+      const tries = Math.round(area * 4.5 * keep)
       for (let k = 0; k < tries; k++) {
         const e = g.west + random() * (g.east - g.west), n = g.south + random() * (g.north - g.south)
         const s1 = random(), s2 = random(), s3 = random(), s4 = random()
         const lee = Math.exp(-plan.court.toWall(e, n) / 3.5)
-        if (random() > (.22 + .78 * lee) * stageWeight(e, n) || plan.refused(e, n)) continue
+        if (random() > (.42 + .58 * lee) * stageWeight(e, n) || plan.refused(e, n)) continue
         const here = supply(e, n), species = s3 < .7 ? here.species : here.second
         lay(plan.bodyAt(e, n), {
           species, east: e, north: n, y: plan.floorAt(e, n) + .002 + s2 * .004, angle: s1 * Math.PI * 2,
