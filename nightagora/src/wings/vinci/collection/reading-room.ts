@@ -1,47 +1,50 @@
-/** THE READING ROOM: an oak niche set against the long gallery's west wall
- * round the table the page of Manuscript B lies open on. Modern exhibition
- * architecture, furniture and lighting; nothing here claims a room, a lamp or
- * a piece of furniture of 1517.
+/** THE READING ROOM: a studiolo of modern oak joinery standing on its own
+ * plinth against the long gallery's west wall, round the table the page of
+ * Manuscript B lies open on. Modern exhibition architecture, furniture and
+ * lighting in the manner of a Renaissance scholar's panelled study; nothing
+ * here claims a room, a lamp or a piece of furniture of 1517.
  *
- * ONE LAMP LIGHTS IT. A brass pendant over the book is the only light the
- * room's surfaces and the table take; everything else they receive is the
- * room's own bounce, read from a probe taken inside the room once it stands.
- * The sun, the sky's flat fill and the gallery's unshadowed fittings stay with
- * the rest of the wing: this is a room for works on paper, dark, and the page
- * is the brightest thing in it.
+ * INSIDE, A BRASS PENDANT OVER THE BOOK IS THE READING LIGHT, and a warm cove
+ * on the cornice lays its light on the coffered ceiling, so the room is lit
+ * by what the ceiling sends back and glows through its doorway. OUTSIDE, the
+ * room takes the gallery's daylight through the east glass and the gallery's
+ * bounce; the doorway's own light onto the gallery floor is the gallery's
+ * (`line-gallery-plan.ts`, the opening as data).
  *
- * The lamp is not a scene light. A scene light is sampled by every lit
+ * The lights are not scene lights. A scene light is sampled by every lit
  * surface of the wing, shadow map by shadow map, in a stage that holds sixteen
- * samplers, so it is hidden from the scene's own list and handed only to the
- * surfaces this module adopts.
+ * samplers, so each is hidden from the scene's own list and handed only to
+ * the surfaces this module adopts.
  */
 import {
   BackSide, BufferGeometry, Color, CubeCamera, CubeRenderTarget, CylinderGeometry, DoubleSide,
   Group, HalfFloatType, LatheGeometry, Mesh, MeshBasicNodeMaterial, MeshStandardNodeMaterial, Object3D,
-  PMREMGenerator, SpotLight, Vector2, type Material, type RenderTarget, type Scene,
+  PMREMGenerator, Quaternion, RectAreaLight, SpotLight, Vector2, Vector3, type Light, type Material, type RenderTarget, type Scene,
 } from 'three/webgpu'
 import * as TSL from 'three/tsl'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
 import type { Stack } from '../../../stack'
-import { axisFootprint, lineCoverage } from '../../../stack/detail'
-import { COLLECTION_PAVING_ORIGIN, FLOOR } from './layout'
+import { kelvinToColour } from '../../../stack/light'
+import { FLOOR } from './layout'
+import { GALLERY_LIGHTS } from './line-gallery-plan'
 import {
-  Batch, bookcasePieces, chairParts, linear, OAK_READ, oakPieces, READING_LAMP, READING_ROOM, READING_ROOM_PROVENANCE,
-  READING_SHADOW_LAYER, SHADE, T, v3, type Piece,
+  Batch, bookcasePieces, chairParts, linear, OAK_READ, PLANES, READING_COVE, READING_LAMP, READING_ROOM, READING_ROOM_PROVENANCE, READING_THRESHOLD, READING_WASH,
+  READING_SHADOW_LAYER, SHADE, studioloParts, T, v3, type Piece,
 } from './reading-room-plan'
 
 export { READING_CHAIR, READING_LAMP, READING_ROOM, READING_ROOM_PROVENANCE, READING_SHADOW_LAYER, readingRoomSolids } from './reading-room-plan'
 
-const R = READING_ROOM
+const R = READING_ROOM, Pl = PLANES
 /** The calm tier's bounce, in the probes' own linear units: set so its walls
- * and floor stand where the hero tier's probes put them. */
-const CALM_FILL = { deep: [.08, .066, .05], open: [.11, .09, .07], front: .35 } as const
+ * and floor stand where the hero tier's probes put them. Inside, the warm
+ * room; outside, the gallery's own measured fill. */
+const CALM_FILL = { inside: [.2, .15, .1], low: [.13, .1, .07], up: [.36, .34, .31], down: [.21, .2, .2], window: [.3, .32, .35] } as const
 
 // The node overload boundary stays local to this file.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type N = any
 const {
-  atan, attribute, cameraViewMatrix, float, floor: floorOf, fract, lights: lightsOf, mix, mx_noise_float, normalMap, normalWorldGeometry,
+  atan, attribute, float, lights: lightsOf, mix, mx_noise_float, normalMap, normalWorldGeometry,
   pmremTexture, positionLocal, positionWorld, sin, smoothstep, sqrt, uniform, uv, vec2, vec3, vec4,
 } = TSL as unknown as Record<string, N>
 
@@ -75,14 +78,22 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
   group.userData = { ...READING_ROOM_PROVENANCE }
   const owned: { geometry: BufferGeometry }[] = []
   const materials: Material[] = []
+  const lights: Light[] = []
 
-  // THE PHOTOGRAPHS are the building's own sets from the wing's one library,
-  // so a set the hall already holds is never uploaded twice.
-  const oakSet = stack.materials.sync('oak-veneer-light'), groundSet = stack.materials.sync('concrete-floor-polished')
-  const ownSets = [oakSet, groundSet]
+  // THE PHOTOGRAPH is the building's own oak from the wing's one library, so
+  // a set the hall already holds is never uploaded twice.
+  const oakSet = stack.materials.sync('oak-veneer-light')
+  const ownSets = [oakSet]
   const waiting = (): number => {
     const gone = new Set(stack.materials.missing().map(set => set.name))
     return ownSets.filter(set => !set.ready.value && !gone.has(set.name)).length
+  }
+  /** a light in the graph for its matrices, hidden from the scene's own list */
+  const keep = (light: Light, name: string): void => {
+    light.name = `vinci/collection-reading-room/${name}`
+    light.visible = false
+    group.add(light)
+    lights.push(light)
   }
 
   // THE LAMP
@@ -90,7 +101,6 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
   const lampAt = v3(L.east, L.north, L.rim + .014), aim = v3(L.east, L.north, T.top)
   const throwM = lampAt.distanceTo(aim)
   const lamp = new SpotLight(new Color(L.colour), L.lux / 100 * throwM * throwM, L.reach, L.angle, L.penumbra, 2)
-  lamp.name = 'vinci/collection-reading-room/lamp'
   lamp.position.copy(lampAt)
   const target = new Object3D()
   target.position.copy(aim)
@@ -106,30 +116,70 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
   lamp.shadow.normalBias = .008
   lamp.shadow.radius = L.soft
   lamp.shadow.camera.layers.enable(READING_SHADOW_LAYER)
-  // hidden from the scene's own list, still in the graph so its matrices follow
-  lamp.visible = false
-  group.add(lamp, target)
+  keep(lamp, 'lamp')
+  group.add(target)
+
+  // THE COVE: a warm plane on the cornice's top facing up, the size of the
+  // room, so the ceiling takes its light and nothing under it does
+  const cove = new RectAreaLight(kelvinToColour(READING_COVE.kelvin), READING_COVE.intensity, Pl.frontInner - Pl.back, Pl.northInner - Pl.southInner)
+  cove.position.copy(v3((Pl.back + Pl.frontInner) / 2, (Pl.southInner + Pl.northInner) / 2, READING_COVE.height))
+  // a light looks down its own -z: turned a quarter about east, it looks up
+  cove.rotation.set(Math.PI / 2, 0, 0)
+  keep(cove, 'cove')
+
+  // THE BACK WALL'S LIGHT: a head over the doorway inside, aimed at the
+  // panelling above the book
+  const WA = READING_WASH
+  const wash = new SpotLight(kelvinToColour(WA.kelvin), WA.candela, WA.reach, WA.angle, WA.penumbra, 2)
+  wash.position.copy(v3(...WA.at))
+  const washAim = new Object3D()
+  washAim.position.copy(v3(...WA.aim))
+  wash.target = washAim
+  wash.castShadow = false
+  keep(wash, 'wash')
+  group.add(washAim)
+
+  // THE THRESHOLD'S DOWNLIGHT, in the doorway's head: the sill, the floor
+  // inside the door and what stands there take it; the gallery lights its own
+  // floor from the same numbers
+  const TH = READING_THRESHOLD
+  const threshold = new SpotLight(kelvinToColour(TH.kelvin), TH.candela, TH.reach, TH.angle, TH.penumbra, 2)
+  threshold.position.copy(v3(...TH.at))
+  const thresholdAim = new Object3D()
+  thresholdAim.position.copy(v3(...TH.aim))
+  threshold.target = thresholdAim
+  threshold.castShadow = false
+  keep(threshold, 'threshold')
+  group.add(thresholdAim)
+
+  // THE GALLERY'S DAYLIGHT on the room's outside: the east glazing as the
+  // gallery's own table has it, one opening read by two rooms
+  const glazing = GALLERY_LIGHTS.find(light => light.name === 'window')
+  let daylight: RectAreaLight | undefined
+  if (glazing) {
+    daylight = new RectAreaLight(kelvinToColour(glazing.kelvin), glazing.intensity, glazing.width!, glazing.height!)
+    daylight.position.copy(v3(...glazing.at))
+    daylight.lookAt(v3(...glazing.aim))
+    keep(daylight, 'daylight')
+  }
 
   // THE ROOM'S BOUNCE. A probe taken inside the room is the light the room
-  // really holds: the lit page, the dark oak, the gallery beyond the opening.
-  // It is read through the scene's own environment turn, so the cube is taken
-  // turned by the same amount; and it is re-taken into the same target, so no
-  // surface that reads it is ever rebuilt. Three are taken: one deep in the
-  // niche, between the table and the canopy, where the back wall and the book
-  // see the gallery through the opening; one out on the dado's floor, which
-  // stands in the open gallery, and the surfaces south of the niche read it;
-  // one low at the niche's open front, beside the chair, where the floor and
-  // the table's near edge see the lit gallery under the canopy's fascia, which
-  // a probe over the table sees only at the horizon.
+  // really holds: the lit ceiling and page, the oak, the gallery through the
+  // doorway. It is read through the scene's own environment turn, so the
+  // cube is taken turned by the same amount; and it is re-taken into the
+  // same target, so no surface that reads it is ever rebuilt. Three are
+  // taken: one in the room's middle at head height, one low inside the
+  // doorway for the floor and what stands on it, and one out in the gallery
+  // before the doorway for the room's outside.
   const PROBES = [
-    v3(T.east - .28, T.north + .42, T.top + .8),
-    v3(R.wall + 1, (R.south + R.dadoSouth) / 2 - .05, FLOOR + 1.3),
-    v3(R.front - .15, T.north - .75, FLOOR + .3),
+    v3(-37.45, T.north + .65, FLOOR + 1.75),
+    v3(Pl.frontInner - .12, T.north + .72, R.floor + .45),
+    v3(R.front + 1.1, T.north, FLOOR + 1.5),
   ]
   let generator: PMREMGenerator | undefined
   const probes: { camera: CubeCamera; target: CubeRenderTarget; pmrem: RenderTarget }[] = []
   const gain = 1 / Math.max(.01, scene.environmentIntensity)
-  let env: N, floorEnv: N
+  let envIn: N, envOut: N
   if (tier !== 'calm') {
     const size = full ? 256 : 128
     generator = new PMREMGenerator(stack.renderer)
@@ -141,24 +191,18 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
       camera.updateMatrixWorld(true)
       probes.push({ camera, target, pmrem: generator.fromCubemap(target.texture) })
     }
-    // the front probe from the table's middle to the open front, the gallery's
-    // south of the niche's own south edge
-    const front = smoothstep(T.east + .3, R.front - .1, positionWorld.x)
-    const south = smoothstep(-R.south - .05, -R.south + .35, positionWorld.z)
-    const [deep, gallery, open] = probes.map(probe => pmremTexture(probe.pmrem.texture))
-    env = mix(mix(deep, open, front), gallery, south).mul(gain)
-    // the floor under the table sees out under its edge, not up at the canopy:
-    // it reads the open front's probe from under the table's back third on
-    floorEnv = mix(mix(deep, open, smoothstep(T.east - .7, T.east + .5, positionWorld.x)), gallery, south).mul(gain)
+    const [middle, low, gallery] = probes.map(probe => pmremTexture(probe.pmrem.texture))
+    // a surface near the floor reads the low probe, which sees out under
+    // the table's edge and through the doorway
+    envIn = mix(middle, low, smoothstep(.75, .2, positionWorld.y.sub(R.floor))).mul(gain)
+    envOut = gallery.mul(gain)
   } else {
-    // the calm tier takes no probe: the hero's measured bounce as two warm
-    // levels, the niche's and the open front's, laid as the probes are laid,
-    // and stronger on a face turned to the open front than on one turned
-    // from it, or every face of a slat or a shelf reads as one flat value
-    const deep = vec3(...CALM_FILL.deep), open = vec3(...CALM_FILL.open)
-    const toFront = normalWorldGeometry.x.mul(CALM_FILL.front).add(1)
-    env = mix(deep, open, smoothstep(T.east + .3, R.front - .1, positionWorld.x)).mul(toFront).mul(gain)
-    floorEnv = mix(deep, open, smoothstep(T.east - .7, T.east + .5, positionWorld.x)).mul(gain)
+    // the calm tier takes no probe: the hero's measured bounce as levels,
+    // warm inside, the gallery's fill outside, stronger toward the doorway
+    const toDoor = normalWorldGeometry.x.mul(.35).add(1)
+    envIn = mix(vec3(...CALM_FILL.inside), vec3(...CALM_FILL.low), smoothstep(.75, .2, positionWorld.y.sub(R.floor))).mul(toDoor).mul(gain)
+    const n = normalWorldGeometry
+    envOut = mix(vec3(...CALM_FILL.down), vec3(...CALM_FILL.up), n.y.mul(.5).add(.5)).add(vec3(...CALM_FILL.window).mul(n.x.max(0))).mul(gain)
   }
 
   /** Engine-only terms (the table's occlusion of the floor): the film's own
@@ -167,10 +211,10 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
   /** the table top's footprint in three's x and z, and its underside */
   const tableRect = uniform(vec4(0, 0, 0, 0)), tableUnder = uniform(0)
 
-  function adopt(material: Material): void {
+  function adopt(material: Material, rig: readonly Light[], env: N): void {
     const lit = material as Material & { lightsNode?: unknown; envNode?: unknown; lights?: boolean; isNodeMaterial?: boolean }
     if (!lit.isNodeMaterial || lit.lights !== true) return
-    lit.lightsNode = lightsOf([lamp])
+    lit.lightsNode = lightsOf([...rig])
     lit.envNode = env
     material.needsUpdate = true
   }
@@ -190,60 +234,35 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
     const covered = corner(x1, z1).sub(corner(x0, z1)).sub(corner(x1, z0)).add(corner(x0, z0)).abs()
     const facingUp = smoothstep(.5, .9, normalWorldGeometry.y)
     const under = P.y.lessThan(tableUnder).select(float(1), float(0))
-    return float(1).sub(covered.mul(facingUp).mul(under).mul(engineTerms)).clamp(.05, 1)
+    return float(1).sub(covered.mul(facingUp).mul(under).mul(engineTerms)).clamp(.3, 1)
   })()
 
-  // THE OAK
-  const { oak, dark, bronze, floor } = oakPieces(), shelf = bookcasePieces()
-  oak.push(...dark, ...shelf.oak)
-  const oakMaterial = new MeshStandardNodeMaterial({ roughness: .55, metalness: 0 })
-  {
+  /** OILED OAK: the photograph read along each piece's grain in metres, each
+   * piece's own tone, the figure held a little under the photograph's own */
+  const oak = (name: string, figure: number, occluded: boolean, colour = .75): MeshStandardNodeMaterial => {
+    const m = new MeshStandardNodeMaterial({ roughness: .55, metalness: 0 })
     const read = oakSet.sample({ uv: uv(), metres: [...OAK_READ] })
     const tone = attribute('pieceTone', 'vec3')
-    // the figure held a little under the photograph's own: the page is the hero
-    oakMaterial.colorNode = tone.mul(read.albedo.sub(1).mul(.72).add(1))
+    // the photograph's own red held back a little: oiled oak reads golden
+    const figured = read.albedo.sub(1).mul(figure).add(1)
+    m.colorNode = tone.mul(mix(vec3(figured.dot(vec3(.3, .5, .2))), figured, colour))
     // oiled, so smoother along the grain than the photograph's raw board
-    oakMaterial.roughnessNode = read.roughness.mul(.8).add(.12).clamp(.3, .85)
-    oakMaterial.normalNode = normalMap(read.normal.mul(.5).add(.5), vec2(.65, .65))
-    oakMaterial.aoNode = underTable
+    m.roughnessNode = read.roughness.mul(.8).add(.12).clamp(.3, .85)
+    m.normalNode = normalMap(read.normal.mul(.5).add(.5), vec2(.65, .65))
+    if (occluded) m.aoNode = underTable
+    m.name = `vinci/collection-reading-room/${name}`
+    return m
   }
-  oakMaterial.name = 'vinci/collection-reading-room/oak'
-
-  // THE BUILDING'S FLOOR, as the mechanism hall lays it: the same sealed
-  // concrete photograph in bays of 3.2 by 3.3 m on the paving datum, each bay
-  // read from its own part of it, the same tint, gloss, tone and 3 mm saw cuts.
-  const floorMaterial = new MeshStandardNodeMaterial({ roughness: .6, metalness: 0 })
-  {
-    const P = positionWorld
-    const bay = { east: 3.2, north: 3.3 }
-    const east = P.x.sub(COLLECTION_PAVING_ORIGIN.east), north = P.z.negate().sub(COLLECTION_PAVING_ORIGIN.north)
-    const cellE = floorOf(east.div(bay.east)), cellN = floorOf(north.div(bay.north))
-    const cellHash = (salt: number): N => fract(cellE.mul(12.9898).add(cellN.mul(78.233)).add(salt).sin().mul(43758.5453))
-    const h1 = cellHash(3.7), h2 = cellHash(11.3)
-    const read = groundSet.sample({ uv: vec2(P.x, P.z.negate()).add(vec2(h1, h2).mul(23.7)), metres: 3 })
-    const drift = mx_noise_float(P.mul(.11)).mul(.09).add(mx_noise_float(P.mul(.37)).mul(.045))
-    const tone = float(1).add(h1.sub(.5).mul(.18)).add(drift)
-    const { east: pe, north: pn } = axisFootprint(P)
-    const cut = (c: N, period: number, pixel: N): N => {
-      const f = fract(c.div(period)), edge = f.min(float(1).sub(f)).mul(period)
-      return lineCoverage(edge, .003, period, pixel)
-    }
-    const joint = cut(east, bay.east, pe).max(cut(north, bay.north, pn))
-    floorMaterial.colorNode = read.colour.mul(vec3(.82, .8, .77)).mul(tone).mul(float(1).sub(joint.mul(.55)))
-    floorMaterial.roughnessNode = mix(float(.4), float(.72), read.roughness).add(joint.mul(.3)).clamp(.05, 1)
-    // the photograph's relief, laid on a face whose tangent runs east and bitangent north
-    const bent = vec3(read.normal.x.mul(.6), read.normal.z, read.normal.y.mul(-.6)).normalize()
-    floorMaterial.normalNode = bent.transformDirection(cameraViewMatrix)
-    floorMaterial.aoNode = read.occlusion.mul(underTable)
-  }
-  floorMaterial.name = 'vinci/collection-reading-room/floor'
+  const oakIn = oak('oak', .72, true), oakCeiling = oak('ceiling', .6, false), oakOut = oak('oak-outside', .8, false, .9)
+  const darkIn = new MeshStandardNodeMaterial({ color: '#171412', roughness: .8, metalness: 0 })
+  darkIn.name = 'vinci/collection-reading-room/ground'
 
   const bronzeMaterial = new MeshStandardNodeMaterial({ color: '#6b5537', roughness: .34, metalness: 1 })
-  bronzeMaterial.roughnessNode = float(.32).add(mx_noise_float(positionWorld.mul(vec3(90, 900, 90))).mul(.05))
+  bronzeMaterial.roughnessNode = float(.34).add(mx_noise_float(positionWorld.mul(vec3(90, 900, 90))).mul(.05))
   bronzeMaterial.name = 'vinci/collection-reading-room/bronze'
 
   // THE PENDANT: a spun brass dome, white inside, an opal disc across its
-  // mouth, hung on a black cord from a brass rose in the canopy.
+  // mouth, hung on a black cord from a brass cup in the ceiling.
   // Darkened brass: polished, it mirrored the lit table and outshone the page.
   const brass = new MeshStandardNodeMaterial({ color: '#6e5638', roughness: .4, metalness: 1 })
   {
@@ -280,9 +299,13 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
     bindings.roughnessNode = float(.66).add(wear.mul(.8))
   }
   bindings.name = 'vinci/collection-reading-room/bindings'
-  for (const m of [oakMaterial, floorMaterial, bronzeMaterial, brass, enamel, cordMaterial, leatherMaterial, bindings]) { adopt(m); materials.push(m) }
-  floorMaterial.envNode = floorEnv
-  materials.push(glow)
+  const outsideRig = daylight ? [daylight] : []
+  for (const m of [oakIn, darkIn, leatherMaterial]) adopt(m, [lamp, threshold, wash], envIn)
+  for (const m of [brass, enamel, cordMaterial, bindings]) adopt(m, [lamp], envIn)
+  adopt(oakCeiling, [lamp, cove], envIn)
+  adopt(oakOut, outsideRig, envOut)
+  adopt(bronzeMaterial, [...outsideRig, threshold], envOut)
+  materials.push(oakIn, oakCeiling, oakOut, darkIn, bronzeMaterial, brass, enamel, cordMaterial, leatherMaterial, bindings, glow)
 
   const stampMesh = (mesh: Mesh, name: string): Mesh => {
     mesh.name = `vinci/collection-reading-room/${name}`
@@ -293,10 +316,31 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
     return mesh
   }
   const batch = (pieces: Piece[]): BufferGeometry => { const b = new Batch(); for (const q of pieces) b.piece(q); return b.geometry() }
-  stampMesh(new Mesh(batch(oak), oakMaterial), 'oak')
-  stampMesh(new Mesh(batch(floor), floorMaterial), 'floor')
-  stampMesh(new Mesh(batch(bronze), bronzeMaterial), 'bronze')
+  // THE BODY: the oak inside with the bookcase, the ceiling, the oak outside,
+  // the ground and the threshold's bronze
+  const body = studioloParts(), shelf = bookcasePieces()
+  for (const q of shelf.oak) body.inside.piece(q)
+  stampMesh(new Mesh(body.inside.geometry(), oakIn), 'oak')
+  stampMesh(new Mesh(body.ceiling.geometry(), oakCeiling), 'ceiling')
+  stampMesh(new Mesh(body.outside.geometry(), oakOut), 'oak-outside')
+  stampMesh(new Mesh(body.dark.geometry(), darkIn), 'ground')
+  stampMesh(new Mesh(body.bronze.geometry(), bronzeMaterial), 'bronze')
   stampMesh(new Mesh(batch(shelf.books), bindings), 'books')
+  {
+    const can = new CylinderGeometry(.034, .03, .09, 20, 1)
+    const from = v3(...WA.at), dirTo = v3(...WA.aim).sub(from).normalize()
+    can.applyQuaternion(new Quaternion().setFromUnitVectors(new Vector3(0, 1, 0), dirTo))
+    can.translate(from.x - dirTo.x * .045, from.y - dirTo.y * .045, from.z - dirTo.z * .045)
+    stampMesh(new Mesh(can, cordMaterial), 'wash-head').userData['labelOccluder'] = false
+  }
+  {
+    const slot = new Batch(), w = TH.slot.width / 2, l = TH.slot.length / 2, [e, n, h] = TH.at
+    slot.piece({ box: [e - w, n - l, h - .002, e + w, n + l, h + .004], grain: 'north', offset: [0, 0], tone: [1, 1, 1] })
+    const lens = new MeshBasicNodeMaterial({ color: kelvinToColour(TH.kelvin).multiplyScalar(1.6) })
+    lens.name = 'vinci/collection-reading-room/threshold-lens'
+    materials.push(lens)
+    stampMesh(new Mesh(slot.geometry(), lens), 'threshold-lens').receiveShadow = false
+  }
 
   {
     const rim = L.rim, h = SHADE.height, r = SHADE.radius, f = SHADE.fitter
@@ -307,14 +351,14 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
     ].map(([x, y]) => new Vector2(x!, y!))
     const shell = new LatheGeometry(outer, 96)
     shell.translate(L.east, rim, -L.north)
-    // the fitter and the rose are the same spun brass: one body with the shade
+    // the fitter and the cup are the same spun brass: one body with the shade
     const fitter = new CylinderGeometry(f, f * 1.08, .045, 32)
     fitter.translate(L.east, rim + h + .02, -L.north)
-    // the ceiling cup the cord runs up into, set against the canopy
-    const rose = new LatheGeometry([[0, -.034], [.012, -.034], [.02, -.032], [.046, -.022], [.056, -.01], [.058, 0]].map(([x, y]) => new Vector2(x!, y!)), 48)
-    rose.translate(L.east, R.ceiling - .002, -L.north)
-    stampMesh(new Mesh(mergeGeometries([shell, fitter, rose], false)!, brass), 'shade')
-    for (const g of [shell, fitter, rose]) g.dispose()
+    // the ceiling cup the cord runs up into, set against the coffered ceiling
+    const cup = new LatheGeometry([[0, -.034], [.012, -.034], [.02, -.032], [.046, -.022], [.056, -.01], [.058, 0]].map(([x, y]) => new Vector2(x!, y!)), 48)
+    cup.translate(L.east, R.ceiling - .002, -L.north)
+    stampMesh(new Mesh(mergeGeometries([shell, fitter, cup], false)!, brass), 'shade')
+    for (const g of [shell, fitter, cup]) g.dispose()
     // Inside the shade: its white lining and the opal disc, seen only from
     // under it, which no stop is; the calm tier leaves them out.
     if (tier !== 'calm') {
@@ -334,8 +378,8 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
     stampMesh(new Mesh(cord, cordMaterial), 'cord').userData['labelOccluder'] = false
   }
 
-  // THE TABLE'S SHADOWS. Its top and its lamp cast into this lamp's map from
-  // doubles on the room's own layer; the table itself is left as it stands.
+  // THE TABLE'S SHADOWS. Its top casts into this lamp's map from a double
+  // on the room's own layer; the table itself is left as it stands.
   const doubleMaterial = new MeshBasicNodeMaterial({ colorWrite: false, depthWrite: false, side: DoubleSide })
   doubleMaterial.shadowSide = BackSide
   doubleMaterial.name = 'vinci/collection-reading-room/shadow-double'
@@ -367,10 +411,22 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
       merged.computeBoundingBox(); merged.computeBoundingSphere()
       return merged
     }
-    const wood = stampMesh(new Mesh(flat(parts.oak), oakMaterial), 'chair')
+    const wood = stampMesh(new Mesh(flat(parts.oak), oakIn), 'chair')
     const seat = stampMesh(new Mesh(flat(parts.leather), leatherMaterial), 'chair-seat')
     ownDoubles.push(double(wood), double(seat))
     chairBodies.push(wood, seat, ...ownDoubles)
+  }
+
+  // `?roomrig` hands an instrument the room's lights, to lean on a standing
+  // frame instead of rebuilding the page for each value
+  let rebake = 0
+  if (typeof location !== 'undefined' && new URLSearchParams(location.search).has('roomrig')) {
+    ;(window as unknown as Record<string, unknown>)['__roomRig'] = {
+      lamp, cove, daylight, threshold, wash,
+      /** the lamp's level at the page, in lux */
+      lux(value: number) { lamp.intensity = value / 100 * throwM * throwM },
+      bake: () => { rebake = 2 },
+    }
   }
 
   let live = true
@@ -395,7 +451,7 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
         if (!(child instanceof Mesh)) return
         for (const surface of Array.isArray(child.material) ? child.material : [child.material]) {
           if (seen.has(surface)) continue
-          seen.add(surface); adopt(surface)
+          seen.add(surface); adopt(surface, [lamp, threshold], envIn)
         }
         if (child.name === 'oak-tabletop') top = child
         if (child.geometry.getAttribute('shadeInterior')) lampHead = child
@@ -429,13 +485,15 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
     },
     update(tableShown) {
       for (const d of [...doubles, ...chairBodies]) if (d.visible !== tableShown) d.visible = tableShown
+      if (rebake > 0) { rebake--; this.bake() }
     },
     dispose() {
       live = false
       for (const o of owned) o.geometry.dispose()
       for (const d of [...doubles, ...ownDoubles]) d.removeFromParent()
       for (const m of materials) m.dispose()
-      lamp.shadow.dispose(); lamp.dispose()
+      lamp.shadow.dispose()
+      for (const light of lights) light.dispose()
       for (const probe of probes) { probe.pmrem.dispose(); probe.target.dispose() }
       generator?.dispose()
       group.removeFromParent()

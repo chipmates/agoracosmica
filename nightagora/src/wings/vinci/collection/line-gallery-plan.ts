@@ -9,6 +9,7 @@ import { BoxGeometry, BufferGeometry, CylinderGeometry, Float32BufferAttribute, 
 import { FACE, FLOOR, LINE_FIELD, LINE_ORIGIN, OPENING, ROOMS } from './layout'
 import { lineCutStuds } from '../line/studs'
 import { bodyMounts } from './body-wall'
+import { READING_ROOM_DOOR, READING_ROOM_FOOTPRINT, READING_THRESHOLD } from './reading-room-plan'
 
 export const LINE_GALLERY_PROVENANCE = {
   manifestId: 'vinci/collection-line-gallery',
@@ -58,9 +59,9 @@ export const GALLERY = {
  * building's concrete round it. */
 export const FIELD = { west: LINE_FIELD.west, east: LINE_FIELD.east, north: LINE_FIELD.north, south: G.south } as const
 
-/** THE READING ROOM'S FLOOR, laid by its own module over this patch: the
- * gallery's finish leaves the patch to it once that room stands. */
-export const READING_ROOM_FLOOR = { west: G.west, east: -36.35, south: -49.45, north: -44.22 } as const
+/** THE READING ROOM'S FLOOR, its plinth, laid by its own module over this
+ * patch: the gallery's finish leaves the patch to it once that room stands. */
+export const READING_ROOM_FLOOR = { west: G.west, east: READING_ROOM_FOOTPRINT.east, south: READING_ROOM_FOOTPRINT.south, north: READING_ROOM_FOOTPRINT.north } as const
 
 /** THE WINDOW, as an opening: the glazed east wall between the dark sill and
  * the soffit, facing west into the room. */
@@ -180,6 +181,23 @@ export const GALLERY_LIGHTS: readonly GalleryLight[] = [
     name: 'end', kind: 'spot', head: true, receivers: 'room',
     at: overDate(TRACK_END), aim: [LINE_ORIGIN.east, G.north, FLOOR + 1.15],
     kelvin: 3400, intensity: 22, angle: .42, penumbra: .9, reach: 6,
+  },
+  {
+    // THE READING ROOM'S DOORWAY AS AN OPENING: the lit room seen through it
+    // lays its warm light on the floor before it, as the glass lays the day's
+    name: 'reading-door', kind: 'area', head: false, receivers: 'floor',
+    at: [READING_ROOM_DOOR.east + .004, READING_ROOM_DOOR.north, (READING_ROOM_DOOR.bottom + READING_ROOM_DOOR.top) / 2],
+    aim: [READING_ROOM_DOOR.east + 10, READING_ROOM_DOOR.north, (READING_ROOM_DOOR.bottom + READING_ROOM_DOOR.top) / 2],
+    width: READING_ROOM_DOOR.width, height: READING_ROOM_DOOR.height,
+    kelvin: 2900, intensity: .35,
+  },
+  {
+    // THE READING ROOM'S THRESHOLD: the downlight in its doorway's head (the
+    // room builds the fitting) pools on the floor before the door
+    name: 'reading-threshold', kind: 'spot', head: false, receivers: 'floor',
+    at: READING_THRESHOLD.at, aim: READING_THRESHOLD.aim,
+    kelvin: READING_THRESHOLD.kelvin, intensity: READING_THRESHOLD.candela,
+    angle: READING_THRESHOLD.angle, penumbra: READING_THRESHOLD.penumbra, reach: READING_THRESHOLD.reach,
   },
   {
     name: 'wash', kind: 'area', head: false, receivers: 'room',
