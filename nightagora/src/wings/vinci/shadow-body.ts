@@ -15,7 +15,7 @@ import { SHADOW_ONLY_LAYER } from '../../stack/light'
  * move, and a moving caster belongs to itself.
  */
 const STATIC_BODIES: ReadonlySet<string> = new Set([
-  'vinci/shell-shadow', 'vinci/terrain', 'vinci/terrain-mesh', 'vinci/vegetation',
+  'vinci/shell-shadow', 'vinci/terrain', 'vinci/terrain-mesh', 'vinci/vegetation', 'vinci/fallen-leaves',
   'vinci/gate-passage', 'vinci/entry-passage', 'vinci/inner-court',
   'vinci/road-dressing', 'vinci/ground-dressing',
   'vinci/collection', 'vinci/collection-rooms', 'vinci/collection-access',

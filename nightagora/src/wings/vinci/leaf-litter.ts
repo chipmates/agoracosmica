@@ -139,7 +139,7 @@ export function layLitter(plan: LitterPlan): LitterCounts {
   const keep = hero ? 1 : plan.tier === 'standard' ? .2 : .07
   const grow = hero ? 1 : plan.tier === 'standard' ? 1.4 : 1.9
   // within this reach of a stop a leaf is drawn folded along its midrib
-  const foldReach = hero ? 16 : 12
+  const foldReach = 12
   let laid = 0
   const blocks = plan.blocks ?? []
   const blockAt = (e: number, n: number): Block | undefined => blocks.find(b => e > b.west && e < b.east && n > b.south && n < b.north)
@@ -579,7 +579,7 @@ function lay(target: Target, leaf: Leaf): void {
   // the blade's own outline, softened, drawn on the stone under it wherever
   // a stop can see the leaf
   const contact = target.contact
-  if (contact && leaf.hard && !leaf.leanTo && stageWeight(leaf.east, leaf.north) > .04) {
+  if (contact && leaf.hard && !leaf.leanTo && stopDistance(leaf.east, leaf.north) < 30 && stageWeight(leaf.east, leaf.north) > .1) {
     const c0 = contact.vertices, pad = CONTACT_PAD
     // the halo's card is the leaf's own card grown by the pad on every side,
     // lying flat on the stone under the blade

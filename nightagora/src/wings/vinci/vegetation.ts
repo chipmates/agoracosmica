@@ -505,7 +505,8 @@ function* grow(group: Group, heightAt: (east: number, north: number) => number, 
     const m = meshOf(body, mats.litter, `vinci generated fallen leaves cluster ${String(c + 1).padStart(2, '0')}`, false)
     if (m) { m.layers.set(RETIRED_LAYER); retired.push(m) }
     const shadow = certified.shadows[c]
-    const s = shadow ? meshOf(shadow, mats.shade, `vinci generated fallen leaf shadows cluster ${String(c + 1).padStart(2, '0')}`, true) : null
+    // it casts nothing: the shadow body folds every caster of this record
+    const s = shadow ? meshOf(shadow, mats.shade, `vinci generated fallen leaf shadows cluster ${String(c + 1).padStart(2, '0')}`, false) : null
     if (s) { s.receiveShadow = false; s.layers.set(RETIRED_LAYER); retired.push(s) }
   }
   for (const [c, body] of drawn.bodies.entries()) {
