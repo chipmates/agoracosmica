@@ -32,7 +32,7 @@ const args = process.argv.slice(2)
 const positional = args.filter((a) => !a.startsWith('--'))
 const flag = (name) => args.find((a) => a.startsWith(`--${name}=`))?.slice(name.length + 3)
 const PORT = Number(positional[0] ?? process.env['FORGE_PORT'] ?? 5199)
-const BASE = `http://127.0.0.1:${PORT}`
+const BASE = `http://localhost:${PORT}`
 const OUT = flag('out') ? resolve(flag('out')) : null
 const ONLY_VIEWPORTS = flag('viewports')?.split(',') ?? null
 const ONLY_MACHINES = flag('machines')?.split(',') ?? null
