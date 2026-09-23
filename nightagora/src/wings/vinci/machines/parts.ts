@@ -469,14 +469,14 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
     if (/pitched/.test(name)) {
       // GENERATED pitch-dark hide tint over the CC0 leather's own luminance,
       // its variation held to a third so the skin reads whole.
-      const pitch = new Color(/bedding/.test(name) ? '#1d1713' : '#3d2e23')
+      const pitch = new Color(/bedding/.test(name) ? '#1d1713' : /lining/.test(name) ? '#33271e' : '#3d2e23')
       const lum = set.albedo.r * .2126 + set.albedo.g * .7152 + set.albedo.b * .0722
       const fibres = detail.albedo.dot(vec3(.2126, .7152, .0722)).div(Math.max(lum, .001))
       // dried pitch is a dull skin: a flat one with a sheen reads as standing water
-      const spread = /bedding/.test(name) ? .08 : .3
+      const spread = /bedding|lining/.test(name) ? .08 : .3
       material.colorNode = vec3(pitch.r, pitch.g, pitch.b).mul(fibres.mul(spread).add(1 - spread).clamp(.5, 1.4)).mul(detail.occlusion)
-      material.roughnessNode = /bedding/.test(name) ? detail.roughness.mul(.3).add(.5).clamp(.52, .7) : detail.roughness.mul(.75).clamp(.46, .66)
-      if (/bedding/.test(name)) material.normalNode = null
+      material.roughnessNode = /bedding|lining/.test(name) ? detail.roughness.mul(.3).add(.5).clamp(.52, .72) : detail.roughness.mul(.75).clamp(.46, .66)
+      if (/bedding|lining/.test(name)) material.normalNode = null
     }
     if (/planed oak|turned oak|oak peg|oak grip/.test(name)) {
       // GENERATED tint: new planed oak, paler and greyer than the museum's
@@ -521,7 +521,7 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
     return material
   }
   await Promise.all(names.map(async name => {
-    const key = /ink|glass|water|lead|paper|oak peg|turned oak|oak grip|bedding/.test(name) ? name : libraryName(name)
+    const key = /ink|glass|water|lead|paper|oak peg|turned oak|oak grip|bedding|lining/.test(name) ? name : libraryName(name)
     let surface = surfaceCache.get(key)
     if (!surface) { surface = makeSurface(name); surfaceCache.set(key, surface) }
     materials.set(name, await surface)

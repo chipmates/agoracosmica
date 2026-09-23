@@ -2602,7 +2602,7 @@
         0.0
       ],
       "material": {
-        "class": "pitched bedding",
+        "class": "pitched lining",
         "basis": "assumed",
         "source": "geometry"
       },
@@ -2630,7 +2630,7 @@
         0.0
       ],
       "material": {
-        "class": "pitched bedding",
+        "class": "pitched lining",
         "basis": "assumed",
         "source": "geometry"
       },
@@ -2658,7 +2658,7 @@
         0.0
       ],
       "material": {
-        "class": "pitched bedding",
+        "class": "pitched lining",
         "basis": "assumed",
         "source": "geometry"
       },
@@ -2686,7 +2686,7 @@
         0.0
       ],
       "material": {
-        "class": "pitched bedding",
+        "class": "pitched lining",
         "basis": "assumed",
         "source": "geometry"
       },
@@ -2714,7 +2714,7 @@
         0.0
       ],
       "material": {
-        "class": "pitched bedding",
+        "class": "pitched lining",
         "basis": "assumed",
         "source": "geometry"
       },
@@ -4509,7 +4509,7 @@
         0.0
       ],
       "material": {
-        "class": "pitched bedding",
+        "class": "pitched lining",
         "basis": "assumed",
         "source": "geometry"
       },
@@ -4537,7 +4537,7 @@
         0.0
       ],
       "material": {
-        "class": "pitched bedding",
+        "class": "pitched lining",
         "basis": "assumed",
         "source": "geometry"
       },
@@ -4565,7 +4565,7 @@
         0.0
       ],
       "material": {
-        "class": "pitched bedding",
+        "class": "pitched lining",
         "basis": "assumed",
         "source": "geometry"
       },
@@ -4593,7 +4593,7 @@
         0.0
       ],
       "material": {
-        "class": "pitched bedding",
+        "class": "pitched lining",
         "basis": "assumed",
         "source": "geometry"
       },
@@ -4621,7 +4621,7 @@
         0.0
       ],
       "material": {
-        "class": "pitched bedding",
+        "class": "pitched lining",
         "basis": "assumed",
         "source": "geometry"
       },
