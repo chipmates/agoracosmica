@@ -413,6 +413,36 @@ function* grow(group: Group, heightAt: (east: number, north: number) => number, 
       lay(body, which < .7 ? 'poplar' : 'alder', e, n, palette.colours, palette.weights, random)
     }
   }
+  // THE COURTYARD: its long axis runs with the wind, so what the south-west
+  // trees drop travels up it, lies along both long walls and piles at the
+  // north-east end; only its level paving takes a leaf
+  {
+    const court = polygon('courtyard')
+    const [a, b, , d] = court as [number[], number[], number[], number[]]
+    const along = [b[0]! - a[0]!, b[1]! - a[1]!], across = [d[0]! - a[0]!, d[1]! - a[1]!]
+    const length = Math.hypot(along[0]!, along[1]!), width = Math.hypot(across[0]!, across[1]!)
+    const level = heightAt(a[0]! + (along[0]! + across[0]!) / 2, a[1]! + (along[1]! + across[1]!) / 2)
+    const random = mulberry(15171018)
+    const maple = fallenPalette('maple'), walnut = fallenPalette('walnut')
+    const count = Math.round(420 * share)
+    const body = litterBodies[0]!
+    for (let k = 0; k < count; k++) {
+      const where = random(), r1 = random(), r2 = random(), which = random()
+      let s: number, t: number
+      if (where < .45) {
+        const off = (.12 + r1 * r1 * 1.1) / width
+        s = r2; t = random() < .5 ? off : 1 - off
+      } else if (where < .75) {
+        s = 1 - (.15 + r1 * r1 * 1.6) / length; t = r2
+      } else {
+        s = Math.sqrt(r1); t = .1 + r2 * .8
+      }
+      const e = a[0]! + along[0]! * s + across[0]! * t, n = a[1]! + along[1]! * s + across[1]! * t
+      if (onBuilding(e, n) || Math.abs(heightAt(e, n) - level) > .01) continue
+      const palette = which < .6 ? maple : walnut
+      lay(body, which < .6 ? 'maple' : 'walnut', e, n, palette.colours, palette.weights, random)
+    }
+  }
   yield
   const wind = windWanted()
   const mats = materials(wind)
