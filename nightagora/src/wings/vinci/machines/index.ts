@@ -18,7 +18,7 @@ import { build as camera_obscura } from './camera-obscura'
 
 export * from './catalog'
 export type { ReadyMachineBuild, MachinesStanding, MachineStanding } from './runtime'
-export { machineBuildOf, machinesStanding } from './runtime'
+export { machineBuildOf, machinesStanding, onMachineStanding } from './runtime'
 export type { Dossier, MachineBuild, Certainty } from './types'
 
 export const builders: Record<MachineSlug, (stack: Stack) => ReadyMachineBuild> = {

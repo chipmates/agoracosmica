@@ -78,7 +78,7 @@ import { loadManifest, type ManifestIndex } from '../../manifest'
 import { createPlatePayload } from '../vitrine/picture'
 import { createVinciWholePlate, isWholePlate, vinciPlateDescription } from './collection/deep-plate'
 import type { VitrineRect } from '../vitrine'
-import { buildMachine, machineBuildOf, machinesStanding } from './machines'
+import { buildMachine, machineBuildOf, machinesStanding, onMachineStanding } from './machines'
 import { createVinciHangStrip, vinciSheetTitle, type VinciStripEntry } from './collection/strip'
 import { vinciWallById, vinciWallEndVertex, vinciWallIsEnd, vinciWallOrderOf, VINCI_PICTURE_WALL, vinciWallNearerEnd, vinciWallOfExhibit, vinciWallOfStation, vinciWallStops, vinciWallVertex, VINCI_WALL_ENDS, type VinciWall } from './collection/wall'
 import { pathSpecifications } from './paths'
@@ -765,6 +765,11 @@ export function createWing():VinciWingModule {
     void exhibits?.ready.then(()=>{if(hosts&&standing)refreshExhibits()})
     welcome=createVinciWelcome(h.labels,route=>{if(route==='life'){openLife();return}if(route==='collection')enterCollection();focusTheBar()})
     controller=new AbortController();const options={signal:controller.signal}
+    // A MACHINE'S MARK IS READ OFF ITS PARTS, and they land after the room
+    // does: the registry is read again each time a machine stands.
+    let marksQueued=0
+    const offMachines=onMachineStanding(()=>{if(marksQueued)return;marksQueued=window.setTimeout(()=>{marksQueued=0;if(hosts&&standing)refreshExhibits()},60)})
+    controller.signal.addEventListener('abort',()=>{offMachines();clearTimeout(marksQueued)})
     const wheelStep=createWheelStepper(()=>performance.now())
     // A notch asks for the next station AND walks a stride along the leg that
     // is under way, so a visitor who keeps scrolling keeps moving instead of

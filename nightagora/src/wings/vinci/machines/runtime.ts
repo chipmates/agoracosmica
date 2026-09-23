@@ -52,13 +52,24 @@ export interface MachinesStanding {
 const builds = new WeakMap<Object3D, ReadyMachineBuild>()
 /** The live machines of the page, until each is disposed. */
 const live = new Map<ReadyMachineBuild, { settled: boolean; error: string | null }>()
+const standingListeners = new Set<(build: ReadyMachineBuild) => void>()
+
+/** Told once per machine, the moment its parts stand: anything read off a
+ * machine's own geometry before then was read off an empty group. */
+export function onMachineStanding(listener: (build: ReadyMachineBuild) => void): () => void {
+  standingListeners.add(listener)
+  return () => { standingListeners.delete(listener) }
+}
 
 export function registerMachineBuild(build: ReadyMachineBuild): ReadyMachineBuild {
   builds.set(build.object, build)
   const record = { settled: false, error: null as string | null }
   live.set(build, record)
   build.ready.then(
-    () => { record.settled = true },
+    () => {
+      record.settled = true
+      if (live.has(build)) for (const listener of [...standingListeners]) listener(build)
+    },
     (error: unknown) => { record.settled = true; record.error = error instanceof Error ? error.message : String(error) },
   )
   const dispose = build.dispose
