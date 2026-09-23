@@ -45,6 +45,7 @@ import { createGatePassage, gatePassageProvenance } from './gate-passage'
 import { createEntryPassage, entryPassageProvenance, hallLedge, hallLedgeProvenance } from './entry-passage'
 import { createGround } from './ground'
 import { planVegetation, VEGETATION_STEPS } from './vegetation'
+import { windClock } from './wind'
 import { createRail, stationPose, namedPose, vinciStandsInRoom } from './rail'
 import { vinciWalk, vinciLifeOrderAsked, vinciWalkPose, vinciReadingSeconds, type VinciWalkCut, type VinciWalkStop } from './walk'
 import { collectRailSolids, createRailGeometryAuthority } from './rail-proof'
@@ -2538,6 +2539,8 @@ export function createWing():VinciWingModule {
         if(at-toldAt>=100){toldAt=at;tell(entryShare())}
       }
       if(!standing)return
+      // the trees' wind runs on the wing's own clock, which a film's harness owns
+      windClock.value=hosts.world.clock()
       // THE WARM UP OWNS THE EYE. While it steps through the walk's poses
       // the rail may not put the camera back, or half the walk is compiled
       // from the seat of one station, and nothing is being looked at yet.
