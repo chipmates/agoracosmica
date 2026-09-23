@@ -15,6 +15,7 @@
 //   · a mark band that a player's crop would cut
 //   · a lead picture over the search plan's byte line
 //   · a still whose own record does not prove the chrome was struck
+//   · a still shot while something was still in flight (`texturesPending`)
 //
 // Exit 1 on any refusal. With no export on disk it exits 0 and says so: the
 // pictures do not live in the repo, so this stands with the rig, not with the
@@ -118,6 +119,10 @@ for (const [framing, record] of Object.entries(run.framings ?? {})) {
     /* THE CHROME. Not a reading of the pixels: the run counted, in the page and
        at the moment of the shot, every element the browser was still painting.
        One canvas and nothing else is a frame no glyph can be in. */
+    /* NOTHING IN FLIGHT. The count is the page's own, read at the moment of
+       the shot; above zero the still shows a surface that was not dressed. */
+    const inFlight = sidecar.picture.texturesPending
+    if (typeof inFlight === 'number' && inFlight !== 0) refuse(id, `shot with ${inFlight} still in flight`)
     const chrome = sidecar.picture.chromeProof
     if (!chrome) refuse(id, 'the run kept no proof that the chrome was struck')
     else if (chrome.painted !== 0) refuse(id, `${chrome.painted} painted element(s) over the picture: ${(chrome.what ?? []).join(', ')}`)
