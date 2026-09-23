@@ -10,7 +10,7 @@
       "prompt": "Thin brick relief, tuffeau quoins and registered cut apertures, intersecting roofs, dormers, chimneys, turret and separate gallery/watchtower. Dossier nominal dimensions with original certainty ranges. No photograph sampled. Shallow 55 mm rebate within declared 35–90 mm assumption; split upper sky reflection and lower dark-room glazing. Existing roughness .18–.23 remains inside dossier interval; no screen-space transmission. Duplicated upper tower shell now shares registered aperture cuts. Connected F16/F17 masonry below the unchanged −2.20 m base: 0.60 m inward thickness [0.45–0.80], actual standard/calm ground boundary lower envelope embedded 50 mm [25–100], full joined miter volume and inherited stone coursing. No surveyed height or opening changes.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "83119196dedfb3abe85a6bbf8a24db8bb21cfe895f82b4ea43d92aed2bcdea39",
+      "sha256": "f0eb58b9980d65eb2c109826fe7b04ac0a6562eb3575b59e8a5976d2e8216f71",
       "note": "Q001 Q015 Q019 Q124 Q127 Q131 Q134 Q175; src/wings/vinci/data/closluce.json; recipe_file=src/wings/vinci/shell.ts; geometry_dependency=vinci/foundation-plinth"
     },
     {
@@ -127,8 +127,8 @@
       "prompt": "Derivative-filtered original brick, tuffeau, slate and member-local oak finishes on the retained nominal courses, apertures and measured geometry. Brick and pale limestone retain finite pores and restrained broad variation, with continuous overlapping quadratic-spline grain at explicit nominal physical intervals and assumed ranges. Pore colour contrast is reduced; pore depths remain. Slate keeps staggered tile IDs, overlap geometry, palette and fine grain; two broad finite layers and four small finite flakes replace infinite periodic cleft bands. Exact counts, scales, relief ranges, filtering approximations and uncalibrated appearance basis are disclosed EN/DE. The accepted R27b continuous oak body, finite fibres and shallow elongated pores retain their actual member UVs/seeds, worn colour, knots, checks and end grain. All roughness and normal-slope bounds remain. No reference image is sampled, no bitmap is added and no material relief displaces geometry.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "650f117b2012896aa832fb69204ce850b2bfc3b7c04a290bea8b364d25d78f71",
-      "note": "Text-declared procedural recipe; recipe_file=src/wings/vinci/surface.ts; A-MATERIAL A-MASONRY materials.csv Q124 Q130; mineralSurfaceProvenance contains EN/DE physical scale and amplitude intervals; closeSurfaceProvenance contains EN/DE slate and oak intervals; microstructure_recipe=src/wings/vinci/mineral-microstructure.ts; microstructure_sha256=92c93ba37e7dd89f36690a45e6d785e4548cae5b4c4c27b669ba6a144a136cf2; oak_finish_recipe=src/wings/vinci/oak-microstructure.ts; oak_finish_sha256=2d3a05ee3a15da07c6170e5ba05d8c1100d36e26d560af6a1c7e67c4a9847dc3; dense_mineral_body_recipe=src/wings/vinci/dense-mineral-body.ts; dense_mineral_body_sha256=69c67887495d8d36846c296b7c6e5c52234bf02445895d38f6268f4331b881ea; slate_microstructure_recipe=src/wings/vinci/slate-microstructure.ts; slate_microstructure_sha256=dc1f439cd1964a8705e735e9e8e223d05a0f8e3a16739312101e4f0a888c3af1"
+      "sha256": "5363a28058ec39b603c357759cba9b7cde68f75a18e0e0328e878bb3a6f2138b",
+      "note": "Text-declared procedural recipe; recipe_file=src/wings/vinci/surface.ts; A-MATERIAL A-MASONRY materials.csv Q124 Q130; mineralSurfaceProvenance contains EN/DE physical scale and amplitude intervals; closeSurfaceProvenance contains EN/DE slate and oak intervals; microstructure_recipe=src/wings/vinci/mineral-microstructure.ts; microstructure_sha256=92c93ba37e7dd89f36690a45e6d785e4548cae5b4c4c27b669ba6a144a136cf2; oak_finish_recipe=src/wings/vinci/oak-microstructure.ts; oak_finish_sha256=2d3a05ee3a15da07c6170e5ba05d8c1100d36e26d560af6a1c7e67c4a9847dc3; dense_mineral_body_recipe=src/wings/vinci/dense-mineral-body.ts; dense_mineral_body_sha256=69c67887495d8d36846c296b7c6e5c52234bf02445895d38f6268f4331b881ea; slate_microstructure_recipe=src/wings/vinci/slate-microstructure.ts; slate_microstructure_sha256=dc1f439cd1964a8705e735e9e8e223d05a0f8e3a16739312101e4f0a888c3af1; weather_recipe=src/wings/vinci/house-weather.ts; weather_sha256=2aa3961f237a29fd02b7dd6a8cd7f82e5683c9502ca06c7512a3edbf060a8fb1"
     },
     {
       "id": "vinci/measurement",
@@ -205,7 +205,7 @@
       "prompt": "Silent calm shadow double extracted from actual registered shell geometry, preserving cut apertures and main roof unions within 3000 triangles. No photographed surface. The complete 516-triangle A-LAYOUT entrance enclosure is copied at actual transforms into the existing calm caster, separately counted; vinci/entry-passage supplies geometry and provenance. All actual foundation structural triangles are appended unchanged to the existing caster; a separate 1000-triangle growth guard preserves the original 3000 shell and 600 entry limits.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "fba4adb2c088166f7b557e3e6a8eb42bdbea8f8bf70d275bf2d1a1f168594f70",
+      "sha256": "0c1457b38f36a11ecda3f124e580a6246b2d8bf5c9a7c9085b0bf3f966183b96",
       "note": "recipe_file=src/wings/vinci/shadow-shell.ts; geometry_dependency=vinci/entry-passage; geometry_dependency=vinci/foundation-plinth"
     },
     {
@@ -3631,6 +3631,45 @@
       "date": "2026-09-23",
       "sha256": "830d4fcc87ecad7c9bd6ef53c0a5dc9a8a045d567e326d007afd67debe40f8d5",
       "note": "A-SITE; deterministic museum dressing; recipe_file=src/wings/vinci/vegetation.ts"
+    },
+    {
+      "id": "vinci/house-glazing",
+      "path": "procedural/house-glazing/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
+      "display": true,
+      "prompt": "Every glazed light of the registered shell as leaded glass: 155 mm diamond quarries on a 45 degree lattice centred on each light, each quarry its own piece tilted up to 1 degree and bowed up to 0.8 mm, a slow ripple in its surface and its own faint cast; 7 mm lead cames and a 10 mm border lead standing 2 mm proud; iron saddle bars set behind the glass. The glass reflects by its Fresnel term and transmits the rest, so the room behind shows. The shell's flat panes stay certified and leave the colour pass. Hero and standard tiers; calm keeps the flat panes.",
+      "model": "Deterministic TypeScript and TSL procedural geometry",
+      "date": "2026-09-23",
+      "sha256": "7699e19e4bda0b483e9f180e8ca93d1b267a85dee13ca92148dd2119d3294c47",
+      "note": "recipe_file=src/wings/vinci/house-glazing.ts; geometry_dependency=vinci/shell; rail_collision=false; engine_terms=sky reflection in the glass (the film reflects the real sky)"
+    },
+    {
+      "id": "vinci/house-rooms",
+      "path": "procedural/house-rooms/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
+      "display": true,
+      "prompt": "The dossier's proposed rooms (A-LAYOUT, A-HEIGHT, A-MASONRY) behind every glazed window except the great hall and the entrance passage, fabric only: floor levels and clear heights as registered, 220 mm terracotta tiles with 8 mm joints, limewashed walls, oak joists 0.18 by 0.23 m at 0.60 m with a main beam past a 5.5 m span, the oratory's quadripartite vault springing at 2.65 m with 120 mm ribs. Exterior edges stand on the shell's inner wall faces with the registered apertures cut. No furnishing. Indirect light baked per vertex once at the fixed hour from window form factors and the sun patches on each floor; the warm bounce is an engine-only term flagged engineBounce.",
+      "model": "Deterministic TypeScript and TSL procedural geometry",
+      "date": "2026-09-23",
+      "sha256": "272810f3022ba8468ab3f12c2dcd1e8e51f834a11c763cc59a3c7e7d47830644",
+      "note": "recipe_file=src/wings/vinci/house-rooms.ts; source=A-LAYOUT A-HEIGHT A-MASONRY; rail_collision=false; engine_terms=engineBounce"
+    },
+    {
+      "id": "vinci/house-tracery",
+      "path": "procedural/house-tracery/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
+      "display": true,
+      "prompt": "The traceried windows (Q175: two pointed lancets, central mullion, quadrilobe tympan) cut as one tuffeau panel on the wall plane inside the registered opening, every lancet and lobe chamfered 35 mm at 45 degrees back to the shell's own glass line, the reveal running 140 mm behind. Every window sill recut as a weathered stone with a 12 degree top, a 100 mm projection and a 12 mm drip channel; door thresholds unchanged. Outlines, lancet height and lobe radius are the shell's; chamfer, panel depth and sill section are proposals. The shell's flat tracery pieces and slab sills stay certified and leave the colour pass. Hero tier.",
+      "model": "Deterministic TypeScript and TSL procedural geometry",
+      "date": "2026-09-23",
+      "sha256": "f3b6c9a73735595f84b06d99568654070e97a9360fee11454e339c64e0b47b03",
+      "note": "recipe_file=src/wings/vinci/house-tracery.ts; source=Q175 ARVIVA-0 A-OPENING; geometry_dependency=vinci/shell; rail_collision=false"
     }
   ]
 }

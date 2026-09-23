@@ -12,13 +12,16 @@ import { createShellSurface, prepareSurfaceGeometry, type ShellSurfaceKind } fro
 import { timberFaceCoordinates, timberPanelFrame } from './timber'
 import { gatePassageProvenance } from './gate-passage'
 import { foundationPlinthFaces, foundationPlinthProvenance } from './foundation-plinth'
+import { createHouseGlazing, houseGlazingProvenance, type GlazedLight } from './house-glazing'
+import { createHouseRooms, houseRoomsProvenance } from './house-rooms'
+import { createHouseTracery, houseTraceryProvenance, type SillSpec, type TraceryWindow } from './house-tracery'
 import dossierText from './data/closluce.json?raw'
 
 // TSL's composable overload graph is represented once at this boundary.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type N = any
 const { attribute, cameraPosition, clamp, float, floor, fract, length, mix, mx_noise_float,
-  normalMap, positionWorld, smoothstep, uv, vec2, vec3 } = TSL as unknown as Record<string, N>
+  normalMap, positionLocal, positionWorld, smoothstep, uv, vec2, vec3 } = TSL as unknown as Record<string, N>
 type V2 = [number, number]
 type V3 = [number, number, number]
 type Tier = 'hero' | 'standard' | 'calm'
@@ -86,9 +89,13 @@ function surface(kind:MatKey,library?:MaterialLibrary,valleys:readonly [V3,V3][]
 class Batch {
   constructor(readonly timber=false) {}
   positions:number[]=[]; uvs:number[]=[]; tones:number[]=[]; roles:number[]=[]; oakSeeds:number[]=[]; surfaceRole=0
+  /** Emissions made while `retire` holds stay certified solids and leave the
+   * colour pass: their replacement is drawn by the house's own modules. */
+  retired:number[]=[]; retire=false
   tri(a:V3,b:V3,c:V3,ta:V2=[a[0],a[2]],tb:V2=[b[0],b[2]],tc:V2=[c[0],c[2]],tone=1,oakSeed=NaN):void {
     if(Math.hypot(...cross(sub(b,a),sub(c,a)))<1e-9)return
     for(const p of [a,b,c])this.positions.push(...world(p));this.uvs.push(...ta,...tb,...tc);this.tones.push(tone,tone,tone);this.roles.push(this.surfaceRole,this.surfaceRole,this.surfaceRole)
+    const r=this.retire?1:0;this.retired.push(r,r,r)
     if(this.timber)this.oakSeeds.push(oakSeed,oakSeed,oakSeed)
   }
   quad(a:V3,b:V3,c:V3,d:V3,ta:V2=[a[0],a[2]],tb:V2=[b[0],b[2]],tc:V2=[c[0],c[2]],td:V2=[d[0],d[2]],tone=1):void {
@@ -103,7 +110,11 @@ class Batch {
   }
   polygon(p:V3[],tex?:(p:V3)=>V2,tone=1,oakSeed=NaN):void { for(let i=1;i<p.length-1;i++)this.tri(p[0]!,p[i]!,p[i+1]!,tex?.(p[0]!),tex?.(p[i]!),tex?.(p[i+1]!),tone,oakSeed) }
   mesh(material:MeshStandardNodeMaterial):Mesh {
-    const geo=new BufferGeometry();geo.setAttribute('position',new Float32BufferAttribute(this.positions,3));geo.setAttribute('uv',new Float32BufferAttribute(this.uvs,2));geo.setAttribute('tone',new Float32BufferAttribute(this.tones,1));geo.computeVertexNormals();geo.computeBoundingSphere();const kind=material.userData['surfaceKind'] as ShellSurfaceKind|undefined;if(kind)prepareSurfaceGeometry(geo,kind,this.roles,this.oakSeeds);const m=new Mesh(geo,material);m.castShadow=true;m.receiveShadow=true;return m
+    const geo=new BufferGeometry();geo.setAttribute('position',new Float32BufferAttribute(this.positions,3));geo.setAttribute('uv',new Float32BufferAttribute(this.uvs,2));geo.setAttribute('tone',new Float32BufferAttribute(this.tones,1));geo.computeVertexNormals();geo.computeBoundingSphere();const kind=material.userData['surfaceKind'] as ShellSurfaceKind|undefined;if(kind)prepareSurfaceGeometry(geo,kind,this.roles,this.oakSeeds)
+    geo.setAttribute('retired',new Float32BufferAttribute(this.retired,1))
+    // A retired vertex collapses in the vertex stage; the buffer keeps it.
+    if(this.retired.some(r=>r>0)&&!material.positionNode)material.positionNode=attribute('retired','float').greaterThan(.5).select(vec3(0,0,0),positionLocal)
+    const m=new Mesh(geo,material);m.castShadow=true;m.receiveShadow=true;return m
   }
 }
 type Batches=Record<MatKey,Batch>
@@ -199,6 +210,19 @@ function clipGableBacking(poly:V3[],faces:RoofFace[]):V3[][] {
   return[...retained,...pending]
 }
 
+/** What one createShell call hands the house's own modules: the lights to
+ * glaze, the traceried windows to carve, the window backs a room opens. */
+interface HouseBuild { glaze:boolean; carve:boolean; openBacks:ReadonlySet<string>; lights:GlazedLight[]; tracery:TraceryWindow[]; sills:SillSpec[] }
+let house:HouseBuild|null=null
+/** The new glass stands 5 mm proud of the retired pane's face, so the two
+ * never share a plane even where a quarry tilts back. */
+const GLASS_OUT=-.050
+/** A layer no camera renders; the shadow cameras render 0 and 1 only. */
+export const RETIRED_LAYER=30
+function lightOf(f:Facade,id:string,outline:V2[],out:number,kind:GlazedLight['kind'],bars:number[]):GlazedLight {
+  const lo=Math.min(...outline.map(p=>p[1])),hi=Math.max(...outline.map(p=>p[1]))
+  return {id,from:f.from,to:f.to,length:f.length_m,outline,out,kind,bars:bars.filter(z=>z>lo+.05&&z<hi-.05)}
+}
 function facadePoint(f:Facade,x:number,z:number,out=0):V3 {
   const dx=(f.to[0]-f.from[0])/f.length_m,dy=(f.to[1]-f.from[1])/f.length_m
   return [f.from[0]+dx*x+dy*out,f.from[1]+dy*x-dx*out,z]
@@ -293,8 +317,14 @@ function drawOpening(f:Facade,o:Opening,thickness:number,b:Batches):void {
   faceBox(surround,f,x+w+jamb/2,z+h/2,jamb,h+jamb,thickness+.11,.09)
   faceBox(surround,f,x+w/2,z+h+jamb/2,w+jamb*2,jamb,thickness+.11,.09)
   if(!open) {
+    // A window's slab sill gives way to a weathered one cut with a drip;
+    // a door's stays: it is the threshold a foot crosses.
+    const recut=Boolean(house?.carve)&&o.type!=='door'
+    b.stone.retire=recut
     faceBox(b.stone,f,x+w/2,z-.05,w+.40,.12,thickness+.24,.20,.88)
     faceBox(b.stone,f,x+w/2,z-.13,w+.29,.05,.22,.16,.82)
+    b.stone.retire=false
+    if(recut)house!.sills.push({from:f.from,to:f.to,length:f.length_m,x,w,z})
   }
   if(open){if(wooden){faceBox(b.oak,f,x+w/2,z+.64,w,.13,.17,.11);const left=facadePoint(f,x+.03,z+.08,.08),right=facadePoint(f,x+w-.03,z+.61,.08);beam(b.oak,left,right,.09);beam(b.oak,facadePoint(f,x+w-.03,z+.08,.08),facadePoint(f,x+.03,z+.61,.08),.09)}return}
   if(o.type==='door') {
@@ -312,32 +342,57 @@ function drawOpening(f:Facade,o:Opening,thickness:number,b:Batches):void {
     const spring=tip-(panes===2?.46:.40), contours:V3[][]=[]
     const pane=(poly:V3[],batch:Batch,out:number,tone:number):void=>batch.polygon(poly.map(v=>facadePoint(f,v[0],v[2],out)),v=>[
       (v[0]-f.from[0])*(f.to[0]-f.from[0])/f.length_m+(v[1]-f.from[1])*(f.to[1]-f.from[1])/f.length_m,v[2]],tone)
+    // The carved tracery replaces the flat pieces below in the colour pass;
+    // they stay in the buffer as the certified solids they always were.
+    const carve=Boolean(house?.carve),glaze=Boolean(house?.glaze)
+    b.dark.retire=Boolean(house?.openBacks.has(o.id))
     faceBox(b.dark,f,x+w/2,z+h/2,w,h,.025,-thickness-.24,.55)
+    b.dark.retire=false
+    const lancets:V2[][]=[],barLines:number[]=[]
     for(let i=0;i<panes;i++){
       const pw=w/panes-.10,px=x+i*w/panes+.05,mid=px+pw/2
       const contour:V3[]=[[px,0,z+.015],[px+pw,0,z+.015],[px+pw,0,spring]]
       // Twelve chords follow each pointed head, tangent to its upright.
       for(let j=1;j<=12;j++){const t=j/12;contour.push([px+pw-pw*.5*t*t,0,spring+(tip-spring)*t])}
       for(let j=11;j>=0;j--){const t=j/12;contour.push([px+pw*.5*t*t,0,spring+(tip-spring)*t])}
-      contours.push(contour)
+      contours.push(contour);lancets.push(contour.map(p=>[p[0],p[2]] as V2))
       const transom=z+(tip-z)*.63
       pane(clip(contour,p=>transom-p[2]),b.glass,-.055,.78)
       pane(clip(contour,p=>p[2]-transom),b.glassSky,-.055,.78)
       const arch=contour.slice(2)
+      b.stone.retire=carve
       for(let j=0;j<arch.length-1;j++)beam(b.stone,facadePoint(f,arch[j]![0],arch[j]![2],.04),facadePoint(f,arch[j+1]![0],arch[j+1]![2],.04),.065)
       if(i>0)faceBox(b.stone,f,px-.05,z+(spring-z)/2,.10,spring-z,.15,.015)
+      b.stone.retire=false
       const topAt=(u:number):number=>spring+(tip-spring)*Math.sqrt(Math.max(0,1-Math.abs(u-mid)/(pw/2)))
+      b.iron.retire=glaze
       for(let j=1;j<3;j++){const u=px+j*pw/3,top=topAt(u);faceBox(b.iron,f,u,(z+.015+top)/2,.012,top-z-.015,.019,-.042,.75)}
-      for(let v=z+.30;v<tip-.10;v+=.30){const t=Math.max(0,(v-spring)/(tip-spring)),inset=pw*.5*t*t;faceBox(b.iron,f,mid,v,pw-2*inset,.013,.019,-.042,.75)}
+      for(let v=z+.30;v<tip-.10;v+=.30){const t=Math.max(0,(v-spring)/(tip-spring)),inset=pw*.5*t*t;faceBox(b.iron,f,mid,v,pw-2*inset,.013,.019,-.042,.75);if(i===0)barLines.push(v)}
+      b.iron.retire=false
     }
+    const lobes:{centre:V2;radius:number}|null=panes===2?{centre:[x+w/2,z+h-.20],radius:.085}:null
     if(panes===2)for(let i=0;i<4;i++){
       const a=i*Math.PI/2,cx=x+w/2+Math.cos(a)*.085,cy=z+h-.20+Math.sin(a)*.085,disc:V3[]=[]
+      b.stone.retire=carve
       for(let j=0;j<24;j++){const t=j*Math.PI/12,q=(j+1)*Math.PI/12;disc.push([cx+Math.cos(t)*.085,0,cy+Math.sin(t)*.085]);beam(b.stone,facadePoint(f,cx+Math.cos(t)*.094,cy+Math.sin(t)*.094,.04),facadePoint(f,cx+Math.cos(q)*.094,cy+Math.sin(q)*.094,.04),.024)}
+      b.stone.retire=false
       contours.push(disc);pane(disc,b.glassSky,-.055,.78)
     }
     let spandrels:V3[][]=[[[x,0,z],[x+w,0,z],[x+w,0,z+h],[x,0,z+h]]]
     for(const contour of contours){const planes=contour.map((p,i)=>{const q=contour[(i+1)%contour.length]!;return{fn:(v:V3)=>(q[0]-p[0])*(v[2]-p[2])-(q[2]-p[2])*(v[0]-p[0])}});spandrels=spandrels.flatMap(poly=>subtract(poly,planes))}
+    b.stone.retire=carve
     for(const poly of spandrels)pane(poly,b.stone,.005,.96)
+    b.stone.retire=false
+    if(house&&glaze){
+      for(const [i,outline] of lancets.entries())house.lights.push(lightOf(f,`${o.id}-${i}`,outline,GLASS_OUT,'lancet',barLines))
+      if(lobes)for(let i=0;i<4;i++){
+        // Four convex pieces, one per lobe, parted along the cusps' diagonals.
+        const a=i*Math.PI/2,c:V2=[lobes.centre[0]+Math.cos(a)*lobes.radius,lobes.centre[1]+Math.sin(a)*lobes.radius],piece:V2[]=[lobes.centre]
+        for(let j=0;j<=12;j++){const t=a-Math.PI/2+j*Math.PI/12;piece.push([c[0]+Math.cos(t)*lobes.radius,c[1]+Math.sin(t)*lobes.radius])}
+        house.lights.push(lightOf(f,`${o.id}-lobe-${i}`,piece,GLASS_OUT,'lobe',[]))
+      }
+    }
+    if(house&&carve)house.tracery.push({id:o.id,from:f.from,to:f.to,length:f.length_m,x,z,w,h,thickness,lancets,mullions:lancets.slice(1).map((_,i)=>x+(i+1)*w/panes),lobes,glassOut:GLASS_OUT})
   } else {
     const mullion=h>1.6&&w>1?.12:.055;const transom=z+h*.63
     // A shallow 55 mm rebate remains visible under the street's raking view.
@@ -345,14 +400,27 @@ function drawOpening(f:Facade,o:Opening,thickness:number,b:Batches):void {
     // dark room's response without screen-space transmission artefacts.
     faceBox(b.glass,f,x+w/2,z+h*.315,w-.07,h*.63-.035,.009,-.055,.78)
     faceBox(b.glassSky,f,x+w/2,z+h*.815,w-.07,h*.37-.035,.009,-.055,.78)
-    // A dark inner reveal is spatial depth behind reflective small panes.
+    // A dark inner reveal is spatial depth behind reflective small panes,
+    // until a room is built behind the window.
+    b.dark.retire=Boolean(house?.openBacks.has(o.id))
     faceBox(b.dark,f,x+w/2,z+h/2,w,h,.025,-thickness-.24,.55)
+    b.dark.retire=false
     faceBox(b.stone,f,x+w/2,z+h/2,mullion,h,.19,-.02,.91)
     if(h>1.6)faceBox(b.stone,f,x+w/2,transom,w,.105,.20,-.005,.95)
     // Iron saddle bars hold the leaded panels; the quarries themselves are
     // in the glass, where a 7 mm came filters instead of aliasing.
     const bars=Math.max(2,Math.round(h/.44))
+    b.iron.retire=Boolean(house?.glaze)
     for(let i=1;i<bars;i++)faceBox(b.iron,f,x+w/2,z+i*h/bars,w,.013,.02,-.040,.77)
+    b.iron.retire=false
+    if(house?.glaze){
+      // The lights between jambs, mullion and transom, in the facade's frame.
+      const barLines=Array.from({length:bars-1},(_,i)=>z+(i+1)*h/bars)
+      const columns:[number,number][]=[[x,x+w/2-mullion/2],[x+w/2+mullion/2,x+w]]
+      const rows:[number,number][]=h>1.6?[[z+.01,transom-.0525],[transom+.0525,z+h]]:[[z+.01,z+h]]
+      for(const [ci,[u0,u1]] of columns.entries())for(const [ri,[v0,v1]] of rows.entries())
+        house.lights.push(lightOf(f,`${o.id}-${ci}${ri}`,[[u0,v0],[u1,v0],[u1,v1],[u0,v1]],GLASS_OUT,'window',barLines))
+    }
     // Small moulding steps and tooth stones produce edge shadows at two scales.
     for(const offset of [.035,.085]) {
       faceBox(b.stone,f,x-offset,z+h/2,.025,h+.05,.065,.095+offset/2)
@@ -450,6 +518,8 @@ function drawDormer(d:Detail,b:Batches):void {
   faceBox(b.oak,f,w/2,base+h*.36,.065,h*.71,.095,.05)
   faceBox(b.oak,f,w/2,base+h*.37,w,.065,.095,.06)
   faceBox(b.oak,f,w/2,base-.01,w+.14,.10,.18,.08)
+  // A dormer's pane stands behind its own dark front panel and is never
+  // seen, so the dormers keep their joinery and bars as they are.
   for(let i=1;i<4;i++)faceBox(b.iron,f,w/2,base+i*h*.17,w-.16,.018,.014,.025)
 }
 function drawChimney(d:Detail,b:Batches,faces:RoofFace[]):void {
@@ -468,6 +538,13 @@ function drawChimney(d:Detail,b:Batches,faces:RoofFace[]):void {
 /** One metre remains one metre; the group may be added directly to the site. */
 export function createShell(tier:Tier,library?:MaterialLibrary):Group {
   const b: Batches={brick:new Batch(),stone:new Batch(),slate:new Batch(),oak:new Batch(true),iron:new Batch(),lead:new Batch(),glass:new Batch(),glassSky:new Batch(),dark:new Batch(),clay:new Batch()}
+  // THE HOUSE'S OWN LAYER above the certified shell: live tiers that can
+  // afford it get the leaded glazing, the rooms behind it and the carving;
+  // calm keeps the flat panes and dark backs it was budgeted with.
+  const full=tier!=='calm'
+  const rooms=full?createHouseRooms():null
+  // The carving is one more draw; standard stands at its draw ceiling.
+  house={glaze:full,carve:tier==='hero',openBacks:rooms?.openedBacks??new Set(),lights:[],tracery:[],sills:[]}
   const faces=roofFaces(),valleys=roofValleys(faces)
   const facades=spec.facades.filter(f=>f.render).map(f=>({...f,openings:f.openings.map(o=>({...o}))}))
   // One through-gateway is cut in both exterior faces of the covered way.
@@ -512,11 +589,20 @@ export function createShell(tier:Tier,library?:MaterialLibrary):Group {
   const foundationRange={startVertex:foundationStart,structuralVertices:foundationStructuralVertices,allVertices:b.stone.positions.length/3-foundationStart,provenance:foundationPlinthProvenance}
   const group=new Group();group.name='vinci/registered-shell';group.userData['asset']='vinci/registered-shell';group.userData['certainty']='reconstructed'
   const unweld=typeof location!=='undefined'&&new URLSearchParams(location.search).has('noweld')
+  const built=house;house=null
   for(const [name,batch] of Object.entries(b) as [MatKey,Batch][]){if(!batch.positions.length)continue;const mesh=batch.mesh(surface(name,library,name==='slate'?valleys:[]));mesh.name=`vinci/shell/${name}`;mesh.userData['asset']=`vinci/shell-${name}`;if(name==='stone')mesh.userData['foundationPlinth']=foundationRange;if(name==='glass'||name==='glassSky')mesh.castShadow=false
+    // The flat panes stay certified and leave the camera's layer.
+    if((name==='glass'||name==='glassSky')&&built?.glaze)mesh.layers.set(RETIRED_LAYER)
     if(unweld){ // A/B preserves the exact same geometry and shading.
-      const stride=18000;for(let start=0;start<batch.positions.length;start+=stride){const piece=new Batch();piece.positions=batch.positions.slice(start,start+stride);piece.uvs=batch.uvs.slice(start/3*2,(start+stride)/3*2);piece.tones=batch.tones.slice(start/3,(start+stride)/3);piece.roles=batch.roles.slice(start/3,(start+stride)/3);piece.oakSeeds=batch.oakSeeds.slice(start/3,(start+stride)/3);const part=piece.mesh(mesh.material as MeshStandardNodeMaterial);part.name=mesh.name;if(name==='stone'){const a=Math.max(start/3,foundationRange.startVertex),z=Math.min((start+stride)/3,foundationRange.startVertex+foundationRange.allVertices);if(z>a)part.userData['foundationPlinth']={...foundationRange,startVertex:a-start/3,structuralVertices:Math.max(0,Math.min(z,foundationRange.startVertex+foundationRange.structuralVertices)-a),allVertices:z-a}}group.add(part)}mesh.geometry.dispose()
+      const stride=18000;for(let start=0;start<batch.positions.length;start+=stride){const piece=new Batch();piece.positions=batch.positions.slice(start,start+stride);piece.uvs=batch.uvs.slice(start/3*2,(start+stride)/3*2);piece.tones=batch.tones.slice(start/3,(start+stride)/3);piece.roles=batch.roles.slice(start/3,(start+stride)/3);piece.retired=batch.retired.slice(start/3,(start+stride)/3);piece.oakSeeds=batch.oakSeeds.slice(start/3,(start+stride)/3);const part=piece.mesh(mesh.material as MeshStandardNodeMaterial);part.name=mesh.name;if(name==='stone'){const a=Math.max(start/3,foundationRange.startVertex),z=Math.min((start+stride)/3,foundationRange.startVertex+foundationRange.allVertices);if(z>a)part.userData['foundationPlinth']={...foundationRange,startVertex:a-start/3,structuralVertices:Math.max(0,Math.min(z,foundationRange.startVertex+foundationRange.structuralVertices)-a),allVertices:z-a}}group.add(part)}mesh.geometry.dispose()
     }else group.add(mesh)
   }
+  // The house's own meshes join the shell as siblings of its batches, each
+  // under its own manifest id, so the certified set is exactly what it was.
+  const adopt=(g:Group):void=>{for(const child of [...g.children])group.add(child)}
+  if(built?.glaze){const glazing=createHouseGlazing(built.lights,tier==='hero'?2:1);adopt(glazing.group);group.userData['glazing']={lights:built.lights.length,quarries:glazing.quarries,cames:glazing.cames,triangles:glazing.triangles,provenance:houseGlazingProvenance}}
+  if(rooms){adopt(rooms.group);group.userData['rooms']={rooms:rooms.rooms,openedBacks:[...rooms.openedBacks],triangles:rooms.triangles,provenance:houseRoomsProvenance}}
+  if(built?.carve&&(built.tracery.length||built.sills.length)){const tracery=createHouseTracery(built.tracery,tier,library,built.sills);adopt(tracery.group);group.userData['tracery']={windows:built.tracery.length,sills:built.sills.length,triangles:tracery.triangles,provenance:houseTraceryProvenance}}
   group.userData['foundationPlinth']=foundationPlinthProvenance
   group.userData['northValleys']=valleys
   group.userData['triangles']=Object.values(b).reduce((n,batch)=>n+batch.positions.length/9,0)

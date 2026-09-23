@@ -42,7 +42,7 @@ export function createShellShadowDouble(shell:Group,entry?:Group):Group {
     if(!(object instanceof Mesh))return
     const kind=object.name.split('/').at(-1)??''
     if(!['stone','slate','brick','oak','dark','clay'].includes(kind))return
-    const p=object.geometry.getAttribute('position'),tones=object.geometry.getAttribute('tone')
+    const p=object.geometry.getAttribute('position'),tones=object.geometry.getAttribute('tone'),retired=object.geometry.getAttribute('retired')
     if(!p||!tones)return
     const index=object.geometry.getIndex(),count=index?.count??p.count
     const plinth=object.userData['foundationPlinth'] as {startVertex:number;structuralVertices:number;allVertices:number}|undefined
@@ -60,6 +60,9 @@ export function createShellShadowDouble(shell:Group,entry?:Group):Group {
         continue
       }
       if(area<1e-10)continue
+      // A window back a room has replaced no longer stops the sun: the
+      // room behind the glass takes it through the registered aperture.
+      if(kind==='dark'&&retired&&retired.getX(i)>.5)continue
       let keep=false,secondary=false
       if(kind==='stone')keep=toneIs(tone,.76)
       if(kind==='slate')keep=!toneIs(tone,.83)&&(!toneIs(tone,1)||area>.07)
