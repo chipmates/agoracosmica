@@ -36,7 +36,7 @@
       "prompt": "Trees and hedge shrubs of 10 October 1517 (our 20 October) grown per species habit, every species and its state that week taken from the flora card (refs FLORA.md section 6) as a TYPE of the period, none documented at Cloux: walnut, field elm, oak, field maple, wild cherry, hornbeam, alder, pollard white willow, black poplar, pear, and the hedge shrubs hawthorn and blackthorn. A trunk that runs or forks into leaders, scaffold limbs that fork toward the crown the species makes, second-order branches and twigs, each grown segment by segment and stopped at the crown skin or at a refused place; a refused fork is tried once bent upward, a limb carrying no leaf below it is taken off, a limb left without a fork tapers to a tip. Near crowns carry every leaf as its own card; further crowns carry spray cards; a mid tree a stop sees within 32 m draws every twig at hero. Each species turns at one stage for the week (a third to two thirds; oak and alder greener), each leaf by its exposure, with a small turn by limb and by tree. The grave's tree over its west wall stands 15 m, drawn leaf by leaf. The week's fall lies as a carpet under each crown dropping it, as drifts against every riser, wall foot and retaining face across the south-west wind (clumped, piled in corners, stacked, leaning on the face), as a clumped scatter, in the lane's ruts and gutters and over the walled court's floor, densest where the stops see it; leaves off their floor cast through one opaque triangle within 12 m of a stop. Leaf and bark maps drawn from recipes in code, no photograph sampled. No leaf or limb inside a building, within 3.2 m above a certified walk, or inside the grave court below its walls' top. Wind only on an address that asks for it.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "830d4fcc87ecad7c9bd6ef53c0a5dc9a8a045d567e326d007afd67debe40f8d5",
+      "sha256": "b168da80da17a8af376ae1ba8dbe6837bacfce42eb0904d441c1a32d77fa95d6",
       "note": "FLORA.md section 6 species and autumn states as types; Q119 Q128 Q178 modern planting as branching character only; recipe_file=src/wings/vinci/vegetation.ts; companion_file=src/wings/vinci/tree-growth.ts; companion_sha256=a173009b55fe61d9cb8964b5caf4433101aa10caa102e23534469832c3ce8cc2; companion_file=src/wings/vinci/leaf-maps.ts; companion_sha256=30ff0932adcfd8b1a5ac030349f43c93896b3fa43b21d3cd03e56b055a4174ae; companion_file=src/wings/vinci/wind.ts; companion_sha256=e1d0da0b23efb5c92171462c8c127ea0f2cb6975a2e97cfcc7dfa4dc2f7ccb98; clusters_near_far_hero=6,3; clusters_near_far_standard_calm=3,1; far_clusters_cast_no_shadow=true; walk_clearance_m=3.2; walk_margin_m=1.0; building_margin_m=0.45; wind=address_only"
     },
     {
@@ -101,7 +101,7 @@
       "prompt": "The meadow of late October sown from the outdoor stops, each by what its frame shows of the meadow (the garden and the chamber most, the supper wall and the grave, which look at walls, not at all): clumps of curved three-triangle blades and dry seed stalks densest before each stop eye, falling as one over (1 + (r / 4 m)^2) within 20 m, and crossed tuft cards from a tuft atlas drawn in code (green, mixed, seeding and bent tufts), one over (1 + (r / 8 m)^2) within 46 m, larger with distance, normals standing with the sward; places the house hides from a stop are not sown for it. Short grass and weeds along the foot of the house and its annexes, never in a doorway or the gate. Path-edge gravel as bedded, round-shaded river pebbles 15 to 65 mm. Coping stones 0.55 to 0.95 m long on the heads of the retaining walls of the court, the terrace and the garden square that a stop sees, 14 mm proud and overhanging 40 mm with a chamfered arris; a kerb of long stones on the court's edge before the house where both sides lie level. Every blade keeps the masonry, platform, circulation and water exclusions and samples the retained grade. Dimensions, mix and positions are exhibition assumptions, not a record of 1517. Moss (vinci/moss) and ivy (vinci/creepers) stand in this group under their own records.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "c29168e7da2d861de40e372a9ce90131565e3e65d754787da8a140a5ece830d2",
+      "sha256": "52c6c1fb621cbbd1333e3bf7ddd3bc2b44b42ccdfcad1cca9aed2c424159242c",
       "note": "A-SITE; deterministic museum dressing; recipe_file=src/wings/vinci/ground-dressing.ts partition_recipe=src/wings/vinci/dressing-partition.ts; partition_sha256=bd799c2eae138b44b709ec350dbdfb858932421ca3ba4f1407e16a9a42dad3a8; foreground_EN_m=(-23.7,-30.7),(-29.3,-37.8); foreground_ellipse_radii_EN_m=(6.8,6.4),(8.2,5.6); foreground_weights=3,2; blade_height_nominal_m=0.015138..0.3782; blade_base_width_m=0.004..0.019; seed_stalk_height_m=0.19..0.48; seed_stalk_near_circulation_cap_m=0.22; circulation_reduction_distance_m=1.3; foreground_blades_calm_standard=3161,11102; seed_stalks_calm_standard=277,979; full_ground_triangles_calm_standard=87099,317438; root_embed_m=0.008; all_planting_dimensions=conjectural; plant_clusters_calm_standard_hero=2,24,24; gravel_batches=1"
     },
     {
@@ -256,8 +256,8 @@
       "display": true,
       "prompt": "Derived 33.8721 square metre inner court apron closes the literal court to registered facade chain at A-SITE zero nominal. Five clipped threshold steps, procedural wear, bedded river pebbles and drain; reconstruction with conjectural dressing. Mounted during court refinement with explicit source-card assumptions.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
-      "date": "2026-09-24",
-      "sha256": "30a30689df7a9559ec2954c47b4b475d016155119e5a00594e671f24af4e8c8a",
+      "date": "2026-09-23",
+      "sha256": "f71720e70a34c2a8309fea67600e6efeccfca5f8d07f07a13f5f91fe326b6d2d",
       "note": "Q124; A-SITE; recipe_file=src/wings/vinci/inner-court.ts"
     },
     {
@@ -283,7 +283,7 @@
       "prompt": "Original road surface proposal: mapped alignment Gaussian wheel wear, deterministic sparse gravel and straw, stone gutter at actual F01/F02 foot; no change to retained grades, conjectural dimensions and basis disclosed EN/DE. Distribute fixed gravel candidates in proportion to retained road segment length; grey mineral chips cluster at shoulders and disperse through the compacted earth. Embed every corner in the common grade and reject grade seams. No new paving or drainage alignment. Refine the mapped road material with a boundary-only union mask, removing internal miter seams without altering grade or width; add conjectural 24 cm compacted-mineral variation and warmer grey-beige albedo, quieter in existing wheel bands. Preserve all mounted chips, gutter geometry, physical dimensions and light.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "85832e1a993a64373d9df71f9a81035cda6ca2a87919761e53608d105a81509e",
+      "sha256": "4b206c692c38e86f9934e045a5faf0c3b2e4497d545472ea2f507580c237f871",
       "note": "Q019; Q134; OSM-AREA; A-SITE; recipe_file=src/wings/vinci/road-dressing.ts"
     },
     {
@@ -3615,8 +3615,8 @@
       "display": true,
       "prompt": "Moss as a type of the period where a house forty-six years old in a river valley keeps it: low cushions 30 to 120 mm across in patches at the foot of every wall and retaining face a stop sees, most on the north feet and inside the grave court, a little in the back corners of stair treads, and thin continuous strips in the court paving joints within a few metres of its walls, following the grave floor's own running bond and the court's own grid. Colour and relief from a recipe in code. Positions and amounts are an exhibition reading of the damp, not a record.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
-      "date": "2026-09-24",
-      "sha256": "f29fd049e44079871234cd3187b3cd8c2b518c9945578f290e6b203a5ba9ac95",
+      "date": "2026-09-23",
+      "sha256": "6a6d4a4bf23c098936b0e6539ba7bc263abae28992ed976506b303010e036bc7",
       "note": "A-SITE; deterministic museum dressing; recipe_file=src/wings/vinci/moss.ts"
     },
     {
@@ -3626,10 +3626,10 @@
       "class": "GENERATED",
       "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
-      "prompt": "A soft dark halo under each fallen leaf lying on stone or gravel within 10 m of a stop, at hero, a little larger than the blade, standing for the sky the leaf takes from the stone under and around it. An engine term only: the film export does not build it and its renderer finds the occlusion itself. Outside the walk's solids and the shadow body.",
+      "prompt": "Under each fallen leaf lying on stone, gravel or earth wherever a stop can see it, the blade's own outline softened on the stone: a tight dark rim at its edge and a faint skirt beyond, hollow under the blade's middle, standing for the sky the leaf takes from the stone under and around it. Drawn at hero and standard, the film's export included, since its occlusion cannot find a leaf two millimetres thick. Outside the walk's solids and the shadow body.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "830d4fcc87ecad7c9bd6ef53c0a5dc9a8a045d567e326d007afd67debe40f8d5",
+      "sha256": "b168da80da17a8af376ae1ba8dbe6837bacfce42eb0904d441c1a32d77fa95d6",
       "note": "A-SITE; deterministic museum dressing; recipe_file=src/wings/vinci/vegetation.ts"
     },
     {
@@ -3735,6 +3735,19 @@
       "date": "2026-09-23",
       "sha256": "a16982b5fd5998c9d76cfc3de327eb6fbe9e550ceb82f6b67731b74a48cdf029",
       "note": "recipe_file=src/wings/vinci/house-hall.ts; source=A-LAYOUT A-HEIGHT A-MASONRY A-FURNITURE Q144 MADE-THINGS; rail_collision=false; library_sets=stone-tuffeau (already loaded by the shell); engine_terms=engineBounce engineWindowShade engineVolume"
+    },
+    {
+      "id": "vinci/fallen-leaves",
+      "path": "procedural/fallen-leaves/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
+      "display": true,
+      "prompt": "The week's fall of the planted trees as dry leaf cards of each species' outline, cupped and folded as drying leaves curl, coloured from each tree's own fall: a carpet under every crown dropping it, carried north-east by the south-west wind; drifts against every riser, wall foot, kerb, retaining face, the chapel's bay, the grave's tomb and lectern and the supper wall's sill, each run heaped in its own places and some treads swept nearly bare; a clumped scatter, the lane's ruts and gutters, and the walled court's floor in small rafts, most of it in the lee of the walls. Densest where the stops see it. A type of one October week, not a record. Dressing a few centimetres deep on the floors, outside the walk's solids like the moss; the fall the rail certificate was written with is still built, leaf for leaf, on a layer no camera draws, until the next certificate.",
+      "model": "Deterministic TypeScript and TSL procedural geometry",
+      "date": "2026-09-23",
+      "sha256": "b168da80da17a8af376ae1ba8dbe6837bacfce42eb0904d441c1a32d77fa95d6",
+      "note": "A-SITE; FLORA.md; deterministic museum dressing; recipe_file=src/wings/vinci/vegetation.ts"
     }
   ]
 }
