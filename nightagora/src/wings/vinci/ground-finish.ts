@@ -15,6 +15,7 @@ import { Color } from 'three/webgpu'
 import { polygon } from './site'
 import { facadeDistance } from './foundation'
 import { anisotropicFootprint } from './masonry-courses'
+import { specularAA } from '../../stack/detail'
 
 // TSL's overload types cannot follow graphs built from helpers; the cast is
 // made once here and the nodes below stay readable.
@@ -29,7 +30,7 @@ const rgb = (hex: string): N => { const c = new Color(hex); return vec3(c.r, c.g
 export const groundFinishProvenance = {
   manifestId: 'vinci/terrain',
   terrace: 'Conjectural terrace walk: fine river gravel 15 to 30 mm in cells, a sparse coarse stone of 50 to 90 mm, sand in the gaps, packed earth showing through in worn patches and along the walked middle. Surface recipe only; no height, outline or level of the dossier moves.',
-  court: 'Conjectural cobbled court: Loire river cobbles about 50 to 60 mm across, of their own sizes, set in sand and standing up to 11 mm proud, worn flatter along the way from the gate to the door; limestone, sandstone and flint in colour; moss in the joints toward the damp wall feet. Beyond a kerb on the court\'s north-west edge, the walk before the house is flagged with pale limestone slabs about 0.9 by 0.6 m. Types of the period; surface recipes only; no height, outline or level moves.',
+  court: 'Conjectural cobbled court: Loire river cobbles about 40 to 65 mm across, of their own sizes, set in sand and standing up to 11 mm proud, worn flatter along the way from the gate to the door; limestone, sandstone and flint in colour; moss in the joints toward the damp wall feet. Beyond a kerb on the court\'s north-west edge, the walk before the house is flagged with pale limestone slabs about 0.9 by 0.6 m. Types of the period; surface recipes only; no height, outline or level moves.',
 } as const
 
 /** Signed distance to a convex outline given as (east, north) points,
@@ -85,28 +86,45 @@ export function applyYardFinish(m: N, shows: (metres: number) => N): void {
   // each finish only on its own level: the court at 0, the terrace at -1.9
   const onTerrace = smoothstep(-.02, .12, terrace).mul(float(1).sub(smoothstep(.03, .08, P.y.add(1.9).abs()))).mul(flat)
   const onCourt = smoothstep(-3.6, -3.2, court).mul(float(1).sub(smoothstep(.02, .05, P.y.abs()))).mul(flat)
+  // A STONE IS ROUND, SO IT IS RESOLVED ONLY WHEN THE PIXEL'S LONG AXIS HOLDS
+  // IT. A ground running away from the eye has a pixel metres long in depth
+  // and centimetres across; gated on the short axis, a field of stones is
+  // drawn at full strength where every pixel spans several of them in depth,
+  // and that is what glitters as the eye moves. Pattern and relief of the
+  // round scales are gated on the long axis, the relief later than the tone.
+  const long = length(P.dFdx()).max(length(P.dFdy())).max(1e-5)
+  const held = (metres: number | N, from: number, to: number): N => smoothstep(from, to, (typeof metres === 'number' ? float(metres) : metres).div(long))
+  const drawn = (metres: number): N => held(metres, 2, 4.5)
+  const raised = (metres: number): N => held(metres, 4, 9)
 
   // ─── the terrace's gravel ────────────────────────────────────────────────
   const fine = mx_worley_noise_vec2(vec2(P.x, P.z).mul(1 / .021))
-  const fineStone = smoothstep(.03, .38, fine.y.sub(fine.x)).mul(shows(.021))
+  // where the pixel cannot hold a stone the field keeps its own mean
+  const fineStone = mix(float(.55), smoothstep(.03, .38, fine.y.sub(fine.x)), drawn(.021))
+  const fineRaised = raised(.021)
   const fineDome = float(1).sub(fine.x.mul(fine.x)).clamp(0, 1)
   const coarse = mx_worley_noise_vec2(vec2(P.x, P.z).mul(1 / .068).add(vec2(13.1, 7.7)))
   const coarseLot = smoothstep(.62, .78, mx_noise_float(vec3(P.x, P.z, 3.7).mul(1 / .068 * .55)))
-  const coarseStone = smoothstep(.04, .3, coarse.y.sub(coarse.x)).mul(coarseLot).mul(shows(.068))
+  const coarseStone = smoothstep(.04, .3, coarse.y.sub(coarse.x)).mul(coarseLot).mul(drawn(.068))
   const coarseDome = float(1).sub(coarse.x.mul(coarse.x)).clamp(0, 1)
   // worn back to the earth in patches and along the walk's middle
   const worn = smoothstep(.35, .8, mx_noise_float(vec3(P.x, P.z, 1.3).mul(.55))).mul(shows(1.8)).mul(.55)
   const middle = float(1).sub(smoothstep(.6, 1.6, terrace.sub(2.6).abs()))
   const bare = worn.add(middle.mul(.35)).clamp(0, .8)
-  const tone = mx_noise_float(vec3(P.x, P.z, 9.1).mul(1 / .021 * .7)).mul(.5).add(.5)
+  const tone = mix(float(.5), mx_noise_float(vec3(P.x, P.z, 9.1).mul(1 / .021 * .7)).mul(.5).add(.5), drawn(.021))
   const stoneColour = mix(mix(rgb('#b1a68f'), rgb('#8f887b'), smoothstep(.35, .65, tone)), rgb('#9d8664'),
-    smoothstep(.72, .9, mx_noise_float(vec3(P.x, P.z, 5.5).mul(1 / .021 * .45))))
+    smoothstep(.72, .9, mx_noise_float(vec3(P.x, P.z, 5.5).mul(1 / .021 * .45))).mul(drawn(.03)))
   const sand = rgb('#76695a')
-  let gravel: N = mix(sand, stoneColour, fineStone.mul(.85).add(.15))
+  // what the eye reads of a gravel walk beyond arm's length is not the stones
+  // but their lie: raked into faint ridges, thicker and thinner in drifts a
+  // hand to a stride across, a scale every pixel of the walk still holds
+  const lie = mx_noise_float(vec3(P.x, P.z, 6.1).mul(1 / .22)).mul(drawn(.22))
+  const ridges = mx_noise_float(vec3(P.x.mul(1 / .05), P.z.mul(1 / .6), 2.8)).mul(held(.05, 2, 4)).mul(.5)
+  let gravel: N = mix(sand, stoneColour, fineStone.mul(.85).add(.15).add(lie.mul(.12)).add(ridges.mul(.08)).clamp(0, 1))
   gravel = mix(gravel, rgb('#a59b86').mul(tone.mul(.2).add(.9)), coarseStone.mul(.8))
   const gravelled = onTerrace.mul(float(1).sub(bare))
   m.colorNode = mix(m.colorNode, gravel, gravelled.mul(.92))
-  const gravelHeight = fineDome.mul(fineStone).mul(.004).add(coarseDome.mul(coarseStone).mul(.009)).mul(gravelled)
+  const gravelHeight = fineDome.mul(fineStone).mul(.004).mul(fineRaised).add(coarseDome.mul(coarseStone).mul(.009).mul(raised(.068))).mul(gravelled)
 
   // ─── the court's cobbles, and the flags of the walk before the house ────
   // stones set a little longer along the court than across it
@@ -119,22 +137,28 @@ export function applyYardFinish(m: N, shows: (metres: number) => N): void {
   // the flagged walk lies beyond the kerb on the court's north-west edge
   const onFlags = onCourt.mul(float(1).sub(smoothstep(-.14, -.1, court)))
   const onCobbles = onCourt.mul(smoothstep(.1, .14, court))
-  // set stones are more even than a random scatter; about 58 by 46 mm
+  // SET BY HAND, NOT ON A GRID. About 58 by 46 mm a cell, the rows wandering
+  // as a paver's rows wander, each stone packed against its neighbours with
+  // its own long axis, its own turn and its own size: about 40 to 65 mm.
   const cellU = .058, cellV = .046
-  const set = setStones(vec2(u.div(cellU), v.div(cellV)), .8)
-  const cob = vec2(set.f1, set.f2)
-  // a stone's edge is as sharp as the pixel lets it be: one pixel wide near
-  // the eye, its own mean far off
-  const edge = float(pixelOf(P)).div(cellV).mul(1.2).max(.015)
-  // stones are not all one size: each its own radius, the sand between them
-  // wider where a small one sits
-  const radius = set.a.mul(.12).add(.44)
-  const round = float(1).sub(smoothstep(radius.sub(edge), radius.add(edge), cob.x))
-  const parted = smoothstep(edge.mul(.5), edge.mul(.5).add(.08), cob.y.sub(cob.x))
-  const stone = round.mul(parted)
-  const shown = shows(.05)
-  const r = cob.x.div(radius).clamp(0, 1)
-  // each stone set at its own height, its cap tipped a little its own way;
+  const drift = vec2(mx_noise_float(vec3(u.mul(1.1), v.mul(1.1), 2.3)), mx_noise_float(vec3(u.mul(1.1), v.mul(1.1), 8.9))).mul(.45)
+  const set = setStones(vec2(u.div(cellU), v.div(cellV)).add(drift), .78)
+  const turn = set.b.mul(6.2832), squash = set.a.mul(.32).add(.82)
+  const ct = TSL.cos(turn), st = TSL.sin(turn)
+  const ox = set.offset.x.mul(ct).add(set.offset.y.mul(st)), oy = set.offset.y.mul(ct).sub(set.offset.x.mul(st))
+  const radius = set.a.mul(.12).add(.52)
+  const reach = length(vec2(ox.div(squash), oy.mul(squash)))
+  // how far inside its stone a point stands, in cells: the smaller of the
+  // stone's own round and the half-way line to the next stone, less a joint
+  const inside = radius.sub(reach).min(set.f2.sub(set.f1).mul(.5).sub(.035)).sub(reach.mul(reach).mul(.06))
+  // a stone's edge is as sharp as the pixel lets it be
+  const edge = long.div(cellV).mul(.7).max(.012)
+  const stoneShape = smoothstep(edge.negate(), edge, inside)
+  const shown = drawn(.05)
+  // where the pixel cannot hold a stone the court keeps its stones' share
+  const stone = mix(float(.8), stoneShape, shown)
+  const relief = raised(.05)
+  // each stone domed from its own edge, its cap tipped a little its own way;
   // along the walked way the caps are worn flatter
   const toWall = facadeDistance()
   // from the gate to the foot of the door's steps
@@ -143,56 +167,75 @@ export function applyYardFinish(m: N, shows: (metres: number) => N): void {
   const t = ground.sub(door).dot(way).div(wayLength.mul(wayLength)).clamp(0, 1)
   const offWay = length(ground.sub(door.add(way.mul(t))))
   const walked = float(1).sub(smoothstep(.6, 1.7, offWay))
-  const tip = set.offset.dot(vec2(set.a.sub(.5), set.b.sub(.5))).mul(.55)
-  const dome = float(1).sub(r.mul(r)).sqrt().mul(set.b.mul(.5).add(.6)).add(tip).max(0)
-  const capped = dome.min(float(.72).sub(walked.mul(.22)))
+  const rise = inside.div(radius.mul(.55)).clamp(0, 1)
+  const tip = set.offset.dot(vec2(set.a.sub(.5), set.b.sub(.5))).mul(.35)
+  const dome = float(1).sub(float(1).sub(rise).pow(2)).mul(set.b.mul(.45).add(.65)).add(tip.mul(rise)).max(0)
+  const capped = dome.min(float(.8).sub(walked.mul(.25)))
   // one colour draw per stone, held close: Loire gravel, not a mosaic
   const pick = set.a, pick2 = set.b
   let cobble: N = mix(rgb('#958e7e'), rgb('#8d7a5f'), smoothstep(.5, .56, pick))
   cobble = mix(cobble, rgb('#6f6d69'), smoothstep(.78, .82, pick2))
   cobble = mix(cobble, rgb('#a9a191'), smoothstep(.94, .97, pick))
   cobble = cobble.mul(pick2.mul(.12).add(.94))
-  // at arm's length a stone is not smooth: pits, grain, a darker lower ring
-  // where the sand stains it
-  const pits = smoothstep(.55, .8, mx_noise_float(vec3(P.x, P.z, 4.4).mul(220))).mul(shows(.004))
-  const grainNear = mx_noise_float(vec3(P.x, P.z, 2.2).mul(130)).mul(shows(.008))
-  const stain = smoothstep(.55, .95, r).mul(.14)
-  cobble = cobble.mul(grainNear.mul(.08).add(1)).mul(float(1).sub(pits.mul(.2))).mul(float(1).sub(stain))
-  // the joints: sand, greened toward the wall feet, bare where walked
+  // at arm's length a stone is not smooth: pits, grain, a limestone's vein,
+  // a darker foot where the sand stains it
+  const pits = smoothstep(.55, .8, mx_noise_float(vec3(P.x, P.z, 4.4).mul(220))).mul(drawn(.004))
+  const grainNear = mx_noise_float(vec3(P.x, P.z, 2.2).mul(130)).mul(drawn(.008))
+  const veinAt = vec2(ox, oy).dot(vec2(TSL.cos(set.a.mul(9.1)), TSL.sin(set.a.mul(9.1))))
+  const vein = float(1).sub(smoothstep(.0, .035, mx_noise_float(vec3(veinAt.mul(9), set.b.mul(40), 1.7)).abs()))
+    .mul(smoothstep(.6, .7, pick2)).mul(drawn(.004))
+  const stain = float(1).sub(rise).pow(2).mul(.34)
+  cobble = cobble.mul(grainNear.mul(.08).add(1)).mul(float(1).sub(pits.mul(.2))).mul(float(1).sub(stain.mul(shown)))
+    .mul(float(1).sub(vein.mul(.14)))
+  // the joints: sand, darker down between the stones, greened toward the
+  // wall feet, bare where walked
   const damp = float(1).sub(smoothstep(.3, 2.4, toWall)).mul(float(1).sub(walked.mul(.8)))
   const moss = smoothstep(.2, .7, mx_noise_float(vec3(P.x, P.z, 6.6).mul(3.1)).add(damp.mul(.9))).mul(damp)
-  const sandGrain = mx_noise_float(vec3(P.x, P.z, 7.3).mul(140)).mul(.1).mul(shows(.008)).add(1)
-  const joint = mix(rgb('#7b705c').mul(sandGrain), rgb('#505c30'), moss.mul(.85))
-  const paved = mix(joint, cobble.mul(walked.mul(.05).add(1)), stone.mul(shown).add(float(1).sub(shown).mul(.72)))
+  const sandGrain = mx_noise_float(vec3(P.x, P.z, 7.3).mul(140)).mul(.1).mul(drawn(.008)).add(1)
+  const deep = smoothstep(.08, 0, inside.negate()).mul(shown)
+  const joint = mix(rgb('#7b705c').mul(sandGrain), rgb('#505c30'), moss.mul(.85)).mul(float(1).sub(deep.mul(.35)))
+  const paved = mix(joint, cobble.mul(walked.mul(.05).add(1)), stone)
   m.colorNode = mix(m.colorNode, paved, onCobbles)
-  const cobbleHeight = capped.mul(stone).mul(.011).mul(shown).mul(onCobbles)
+  const cobbleHeight = capped.mul(stoneShape).mul(.014).mul(relief).mul(onCobbles)
 
   // the flags: pale limestone slabs about 0.9 by 0.6 m in courses along the
-  // house, each its own tone, their joints sanded and green near the walls
+  // house, each its own tone and its own bed of grain, worn on the walk to
+  // the door and at the arrises, their joints sanded and green near the walls
   const fu = u.div(.9), fv = v.div(.6)
   const course = floor(fv), shiftU = fract(course.mul(.5)).mul(.9)
   const slab = floor(fu.add(shiftU))
   const inU = fract(fu.add(shiftU)), inV = fract(fv)
-  const jointW = float(.008).div(.6).add(float(pixelOf(P)).div(.6))
+  const pixelOfP = pixelOf(P)
+  const jointW = float(.008).div(.6).add(float(pixelOfP).div(.6))
   const flagJoint = float(1).sub(smoothstep(jointW.mul(.5), jointW, inU.min(inU.oneMinus()).mul(.6 / .9)).mul(smoothstep(jointW.mul(.5), jointW, inV.min(inV.oneMinus()))))
   const flagTone = fract(sin(slab.mul(12.9898).add(course.mul(78.233))).mul(43758.5453))
+  const flagTurn = fract(sin(slab.mul(39.3468).add(course.mul(11.135))).mul(24634.6345)).mul(3.1416)
+  // the bedding of the stone: a fine banding at the slab's own angle
+  const bedAt = u.mul(TSL.cos(flagTurn)).add(v.mul(TSL.sin(flagTurn)))
+  const bedding = mx_noise_float(vec3(bedAt.mul(38), bedAt.mul(3.1), flagTone.mul(17))).mul(held(.012, 2, 4))
+  const arris = float(1).sub(smoothstep(0, .07, inU.min(inU.oneMinus()).mul(.9).min(inV.min(inV.oneMinus()).mul(.6)))).mul(held(.05, 2, 4))
   let flag: N = mix(rgb('#a79f8c'), rgb('#9a9180'), flagTone).mul(mx_noise_float(vec3(P.x, P.z, 1.1).mul(3.5)).mul(.06).add(1))
-  flag = flag.mul(grainNear.mul(.05).add(1)).mul(float(1).sub(pits.mul(.12)))
+  flag = flag.mul(grainNear.mul(.05).add(1)).mul(float(1).sub(pits.mul(.12))).mul(bedding.mul(.07).add(1))
+    .mul(float(1).add(walked.mul(.05))).mul(float(1).sub(arris.mul(.08)))
   const flagJointColour = mix(rgb('#6f6553'), rgb('#4c5830'), moss.mul(.9))
   m.colorNode = mix(m.colorNode, mix(flag, flagJointColour, flagJoint.mul(shows(.02))), onFlags)
-  const flagHeight = flagJoint.mul(-.004).mul(shows(.02)).mul(onFlags)
+  const flagHeight = flagJoint.mul(-.004).mul(shows(.02)).add(arris.mul(-.0015)).mul(onFlags)
 
   // ─── relief, occlusion and sheen of both ─────────────────────────────────
   const height = gravelHeight.add(cobbleHeight).add(flagHeight).toVar()
   const n = normalWorldGeometry.transformDirection(cameraViewMatrix)
   const sx = positionView.dFdx(), sy = positionView.dFdy(), rx = sy.cross(n), ry = n.cross(sx), det = sx.dot(rx)
   const gradient = rx.mul(height.dFdx()).add(ry.mul(height.dFdy())).mul(det.sign()).div(det.abs().max(1e-10))
-  const bounded = gradient.div(length(gradient).div(.6).max(1))
+  const bounded = gradient.div(length(gradient).div(.6).max(1)).toVar()
   const finished = onTerrace.max(onCourt)
   m.normalNode = mix(m.normalNode, n.sub(bounded).normalize(), finished).normalize()
-  const gaps = float(1).sub(fineStone).mul(onTerrace).mul(.28).add(float(1).sub(stone).mul(shown).mul(onCobbles).mul(.35)).add(flagJoint.mul(onFlags).mul(.3))
+  const gaps = float(1).sub(fineStone).mul(onTerrace).mul(.28).add(float(1).sub(stone).mul(onCobbles).mul(.35)).add(flagJoint.mul(onFlags).mul(.3))
   m.aoNode = m.aoNode.mul(float(1).sub(gaps))
-  const polished = walked.mul(stone).mul(onCobbles).mul(.2)
-  m.roughnessNode = m.roughnessNode.sub(polished).sub(fineStone.mul(onTerrace).mul(.05))
+  const polished = walked.mul(stone).mul(onCobbles).mul(.2).mul(relief)
+  // THE SHEEN FOLLOWS THE RELIEF IT LOST: where a stone's slope is under the
+  // pixel, its highlight is spread over the pixel instead of flashing in it
+  const lostSlope = float(1).sub(relief).mul(onCobbles).mul(.5).add(float(1).sub(fineRaised).mul(onTerrace).mul(.4))
+    .add(length(bounded).mul(.35))
+  m.roughnessNode = specularAA(m.roughnessNode.sub(polished).sub(fineStone.mul(onTerrace).mul(.05)).clamp(.05, 1), lostSlope.mul(finished))
   m.userData['yardFinish'] = groundFinishProvenance
 }
