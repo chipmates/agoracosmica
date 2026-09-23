@@ -426,7 +426,7 @@ function* grow(group: Group, heightAt: (east: number, north: number) => number, 
     }
     return { leaves: litterBodies[i]!, shadow: litterShadows[i]! }
   }
-  const laid = layLitter({
+  const fall = layLitter({
     results, tier, floorAt,
     refused: (e, n) => onBuilding(e, n) || onWater(e, n),
     walked: (e, n) => onWalk(e, n) || inCourt(e, n),
@@ -483,7 +483,7 @@ function* grow(group: Group, heightAt: (east: number, north: number) => number, 
   group.userData['triangles'] = triangles
   group.userData['draws'] = meshes.filter(m => !m.layers.isEnabled(SHADOW_ONLY_LAYER) || m.layers.isEnabled(0)).length
   group.userData['leaves'] = results.reduce((a, r) => a + r.leaves, 0)
-  group.userData['fallenLeaves'] = laid
+  group.userData['fallenLeaves'] = fall
   group.userData['treePlans'] = results.map(r => ({ id: r.spec.id, species: r.spec.species, east: r.spec.east, north: r.spec.north, height: r.spec.height, spread: r.crown.radius, detail: r.spec.detail, seed: r.spec.seed }))
   group.userData['perTree'] = results.map(r => ({ id: r.spec.id, leaves: r.leaves, leafTriangles: r.leafTriangles, barkTriangles: r.barkTriangles }))
   group.userData['excluded'] = ['cadastre', 'build envelope', 'mapped annexes', 'the insertion', `walks below ${WALK_CLEAR_M} m`, 'retained water cuts']

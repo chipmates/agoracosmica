@@ -16,7 +16,7 @@
    a record. The drifts are densest where the walk's stops look; the carpet
    is laid wherever a crown drops it. */
 import { cellUV, LEAF_RECIPES, leafCell } from './leaf-maps'
-import { Body, fallenPalette, HABITS, leafLengthOf, mulberry, type Species, type TreeResult, type TreeTier } from './tree-growth'
+import { Body, fallenPalette, leafLengthOf, mulberry, type Species, type TreeResult, type TreeTier } from './tree-growth'
 import { terrainSteps } from './terrain-mesh'
 import { dossier, type Quantity } from './site'
 
@@ -109,12 +109,13 @@ export interface LitterPlan {
 
 interface Source { species: Species; e: number; n: number; reach: number; fallen: number }
 
-/** What was laid, by where it lies. */
-export const litterCounts = { carpet: 0, drifts: 0, scatter: 0, lane: 0 }
-export const litterFaces: { mid: V2; span: number; height: number; count: number }[] = []
 
-/** Lay the week's fall. Returns the count of leaves laid. */
-export function layLitter(plan: LitterPlan): number {
+/** What was laid, by where it lies. */
+export interface LitterCounts { carpet: number; drifts: number; scatter: number; lane: number; court: number }
+
+/** Lay the week's fall, and say how many leaves lie where. */
+export function layLitter(plan: LitterPlan): LitterCounts {
+  const counts: LitterCounts = { carpet: 0, drifts: 0, scatter: 0, lane: 0, court: 0 }
   const hero = plan.tier === 'hero', calm = plan.tier === 'calm'
   const keep = hero ? 1 : plan.tier === 'standard' ? .2 : .07
   const grow = hero ? 1 : plan.tier === 'standard' ? 1.4 : 1.9
@@ -200,7 +201,7 @@ export function layLitter(plan: LitterPlan): number {
     }
   }
 
-  litterCounts.carpet = laid
+  counts.carpet = laid
   // ─── THE DRIFTS against every face across the wind ──────────────────────
   const catchers: Catcher[] = [
     ...terrainSteps().map(s => ({ from: s.from as V2, to: s.to as V2, low: s.low as V2, height: s.height })),
@@ -221,7 +222,6 @@ export function layLitter(plan: LitterPlan): number {
     // a drift is laid in full where a stop sees it close, thinly beyond
     const perMetre = (15 + 40 * here.amount) * facing * tall * stage * stage
     const count = Math.round(perMetre * span * keep * 1.6)
-    litterFaces.push({ mid, span, height: c.height, count })
     // a deep drift is wider and higher; a stair's riser holds a strip at the
     // back of the tread below it, a wall a bank at its foot
     const depth = clamp01(perMetre / 90)
@@ -259,7 +259,7 @@ export function layLitter(plan: LitterPlan): number {
     }
   }
 
-  litterCounts.drifts = laid - litterCounts.carpet
+  counts.drifts = laid - counts.carpet
   // ─── THE BLOWN SCATTER over the ground the stops see ────────────────────
   // what the wind has not yet laid against anything lies about in small
   // clumps, thinner on what is walked
@@ -293,7 +293,7 @@ export function layLitter(plan: LitterPlan): number {
       }
     }
   }
-  litterCounts.scatter = laid - litterCounts.carpet - litterCounts.drifts
+  counts.scatter = laid - counts.carpet - counts.drifts
   // ─── THE LANE: a carted road holds its leaves in its two wheel ruts and
   // in the gutters at its edges, where the wheels and the rain put them
   if (plan.lane) {
@@ -325,7 +325,7 @@ export function layLitter(plan: LitterPlan): number {
       }
     }
   }
-  litterCounts.lane = laid - litterCounts.carpet - litterCounts.drifts - litterCounts.scatter
+  counts.lane = laid - counts.carpet - counts.drifts - counts.scatter
   // ─── THE WALLED COURT: what comes over its walls lies about its floor,
   // thickest in the lee of the walls it came over
   if (plan.court) {
@@ -348,7 +348,8 @@ export function layLitter(plan: LitterPlan): number {
       }
     }
   }
-  return laid
+  counts.court = laid - counts.carpet - counts.drifts - counts.scatter - counts.lane
+  return counts
 }
 
 /** a standard normal draw from two uniforms */
@@ -448,5 +449,3 @@ function lay(target: { leaves: Body; shadow: Body | null }, leaf: Leaf): void {
 function norm(v: V3): V3 { const l = Math.hypot(v[0], v[1], v[2]) || 1; return [v[0] / l, v[1] / l, v[2] / l] }
 function cross(a: V3, b: V3): V3 { return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]] }
 
-/** The species of the fall a surface sees most of, for a checker. */
-export const LITTER_SPECIES: readonly Species[] = Object.keys(HABITS) as Species[]
