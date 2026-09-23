@@ -2535,7 +2535,7 @@
       "prompt": "English and German visitor interface, verified local folio names and the codex shelf copy. Historical transcription and French are displayed verbatim from the locked collection. Handedness documented, reasons hypotheses, own reason unknown.",
       "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
       "date": "2026-09-14",
-      "sha256": "5ce8f61299736f0030bbe9c1efce4e54bb50ec9ecf1d0795085fdb1e8ca96ddd",
+      "sha256": "bcf92bcc577b7df356ba7658f966ad147829e411aa7336a5eec73de60549b857",
       "note": "recipe_file=src/wings/vinci/table/content.ts; output_source=src/wings/vinci/table/content.ts; modern exhibition design, not documentary reconstruction"
     },
     {

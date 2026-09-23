@@ -19,7 +19,7 @@ import type { DeepPlateSource, DeepPlateTier } from '../../vitrine/deep-plate'
 import { createReaderPayload as createReader, type ReaderBook, type ReaderSide } from '../../vitrine/reader'
 import type { VitrinePayload } from '../../vitrine/types'
 import { vinciLeafSource } from '../collection/deep-plate'
-import { buildAbsences, buildCodexList } from './codex-shelf'
+import { CODEX_ENTRIES, buildAbsences, buildCodexList } from './codex-shelf'
 import { FAMOUS_FOLIOS, MIRROR_EXPLANATION, TABLE_UI, folioKey, folioProvenance, hasItalian, type Language, type PageRecord } from './content'
 import type { ReadingTable } from './index'
 import windowsRaw from './data/leaf-windows.json?raw'
@@ -109,9 +109,10 @@ export function createReaderPayload(options: {
     return labels[page.page_kind] ?? copy.editionMatter
   }
 
-  /** THE THREE WAYS OF READING ONE LEAF: as he wrote it, reversed so it
-   * reads left to right, and the editor's own page printed facing it. A
-   * side whose facing sheet the store does not hold declares two. */
+  /** THE WAYS OF READING ONE LEAF: as he wrote it, reversed so it reads left
+   * to right, the editor's own page printed facing it, and the edition's
+   * transcription beside the leaf. A side whose facing sheet the store does
+   * not hold declares no print. */
   function ways(page: PageRecord): ReaderSide['ways'] {
     const facing = pages.find(entry => entry.file === page.paired_file)
     const printed = facing ? scan(facing) : null
@@ -121,7 +122,20 @@ export function createReaderPayload(options: {
       { id: 'mirror', label: options.words.mirror, mirrored: true, line: MIRROR_EXPLANATION[language].documented, ...own },
       ...(printed && facing ? [{ id: 'print', label: options.words.print, line: copy.printedPage,
         source: source(facing, printed), ...own }] : []),
+      // the leaf as he wrote it, and the words the edition read off it
+      { id: 'transcription', label: copy.transcription, beside: () => witnessesOf(page), ...own },
     ]
+  }
+
+  /* A BOOK OF TWO MANUSCRIPTS NAMES THE ONE A SIDE BELONGS TO. The count in
+     the name row is the manuscript's own, so without the name a reader who
+     turns past the last side of one reads the other's count as the book's. */
+  const volumes = new Set(pages.filter(page => page.page_kind === 'facsimile').map(page => page.codex))
+  const codexName = (page: PageRecord): string =>
+    CODEX_ENTRIES.find(entry => entry.id === `paris-${page.codex}`)?.[language] ?? ''
+  const sideName = (page: PageRecord): string => {
+    const name = volumes.size > 1 ? codexName(page) : ''
+    return name ? `${name}, ${identity(page)}` : identity(page)
   }
 
   function buildBook(): ReaderBook {
@@ -133,7 +147,7 @@ export function createReaderPayload(options: {
       const named = FAMOUS_FOLIOS.find(entry => folioKey(page) === `B:${entry.folio}`)
       sides.push({
         id: folioKey(page),
-        label: identity(page),
+        label: sideName(page),
         shows: language === 'en' ? page.what_it_shows_en : page.what_it_shows_de,
         source: source(page, read),
         window: windowOf(page),
@@ -150,6 +164,9 @@ export function createReaderPayload(options: {
       stripLabel: (volume, count) => options.words.leaves.replace('{codex}', volume ?? '')
         .replace('{total}', String(count)),
       holder,
+      // the edition's credit stands in the record's licence line and its
+      // provenance sentence, so the band's drawer leaves it there
+      holderInRecord: true,
       honesty: options.honesty,
     }
   }
@@ -172,21 +189,26 @@ export function createReaderPayload(options: {
    * away from every leaf. */
   function witnesses(side: ReaderSide): readonly HTMLElement[] {
     const page = pages.find(entry => folioKey(entry) === side.id)
-    if (!page) return []
+    return page ? witnessesOf(page) : []
+  }
+  function witnessesOf(page: PageRecord): readonly HTMLElement[] {
     const make = <K extends keyof HTMLElementTagNameMap>(tag: K, cls: string, text?: string): HTMLElementTagNameMap[K] => {
       const node = document.createElement(tag); node.className = cls
       if (text !== undefined) node.textContent = text
       return node
     }
+    // the printed lines stay the edition's; only the runs of empty lines the
+    // scan left between them close to one
+    const printed = (text: string): string => text.replace(/[ \t]+\n/g, '\n').replace(/\n(?:[ \t]*\n)+/g, '\n\n').trim()
     const italian = make('section', '')
     italian.append(make('h4', 'vitrine-meta', copy.italian), make('p', 'vitrine-meta', copy.italianDetail))
-    const it = make('p', 'vitrine-source-text', hasItalian(page) ? page.transcription_it ?? '' : copy.unavailable)
+    const it = make('p', 'vitrine-source-text', hasItalian(page) ? printed(page.transcription_it ?? '') : copy.unavailable)
     if (hasItalian(page)) it.lang = 'it'
     if (page.ocr_confidence === 'low') italian.append(make('p', 'vitrine-meta', copy.lowOcr))
     italian.append(it)
     const french = make('section', '')
     french.append(make('h4', 'vitrine-meta', copy.french), make('p', 'vitrine-meta', copy.frenchDetail))
-    const fr = make('p', 'vitrine-source-text', page.translation_fr ?? copy.frenchUnavailable)
+    const fr = make('p', 'vitrine-source-text', page.translation_fr ? printed(page.translation_fr) : copy.frenchUnavailable)
     if (page.translation_fr) fr.lang = 'fr'
     french.append(fr)
     return [italian, french]
@@ -263,11 +285,15 @@ export function createReaderPayload(options: {
       add(copy.reproduction)
       add(folioProvenance(page, language, identity(page)))
       if (page.ocr_note_en) add(language === 'en' ? page.ocr_note_en : page.ocr_note_de ?? page.ocr_note_en)
+      // each link on a line of its own, or two of them read as one name
       const link = (label: string, url: string): void => {
         const a = document.createElement('a')
         a.className = 'vinci-picture-source'; a.textContent = label; a.href = url
         a.target = '_blank'; a.rel = 'noopener noreferrer'
-        full.append(a)
+        const line = document.createElement('p')
+        line.className = 'vinci-statement'
+        line.append(a)
+        full.append(line)
       }
       link(copy.sourceImage, page.source_url)
       const folioUrl = page.machine_sources.find(source => source.folio_source_url)?.folio_source_url

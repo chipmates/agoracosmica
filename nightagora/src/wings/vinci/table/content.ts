@@ -67,6 +67,8 @@ export const TABLE_UI = {
     englishWitness: 'Richter’s English translation. The supplied text follows the 1888 edition, with numbering from 1883.',
     germanWitness: 'Marie Herzfeld’s source translation, 1906, pp. XCVII–XCVIII.',
     previous: 'Previous page', next: 'Next page', mirror: 'Mirror hand',
+    // the fourth way of reading a leaf: the page with the edition's words beside it
+    transcription: 'Transcription',
     printedPage: 'The editor’s own page, printed facing the leaf in 1883.',
     close: 'Close', openBook: 'Open the book', readingCopy: 'Mirrored reading copy',
     imageUnavailable: 'The page image could not be loaded. The edition text remains available below.',
@@ -93,6 +95,7 @@ export const TABLE_UI = {
     englishWitness: 'Richters englische Übersetzung. Der bereitgestellte Text folgt der Ausgabe von 1888 mit der Nummerierung von 1883.',
     germanWitness: 'Quellenübersetzung von Marie Herzfeld, 1906, S. XCVII–XCVIII.',
     previous: 'Vorherige Seite', next: 'Nächste Seite', mirror: 'Spiegelschrift',
+    transcription: 'Umschrift',
     printedPage: 'Die Seite des Herausgebers, 1883 dem Blatt gegenüber gedruckt.',
     close: 'Schließen', openBook: 'Buch öffnen', readingCopy: 'Gespiegelte Lesekopie',
     imageUnavailable: 'Das Seitenbild konnte nicht geladen werden. Der Text der Ausgabe bleibt unten zugänglich.',

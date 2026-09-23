@@ -35,6 +35,11 @@ export interface ReaderWay {
   line?: string | null
   /** What the view says at the ceiling of this way's source. */
   ceiling?: string
+  /** A WAY THAT READS BESIDE THE PAGE: its words stand in a tall column at
+   * the page's right, one scroll of their own, while the page keeps the
+   * left. Only a label in the band leaves that side free, so a narrow stage
+   * and the card beside the work never offer it. */
+  beside?(): readonly HTMLElement[]
 }
 
 export interface ReaderSide {
@@ -81,6 +86,9 @@ export interface ReaderBook {
   stripLabel(volume: string | undefined, sides: number): string
   /** Who holds the original, in the page's language. */
   holder: string
+  /** True where the holder line is an edition's credit that the record
+   * carries: a label in the band then leaves it to the record. */
+  holderInRecord?: boolean
   /** What this reproduction is, said under every side. */
   honesty: string
 }
@@ -150,6 +158,7 @@ export function createReaderPayload(options: {
   let at = 0, way = 0
   let root: HTMLDivElement | undefined, stage: HTMLDivElement | undefined
   let ground: HTMLImageElement | undefined, shelf: HTMLOListElement | undefined
+  let beside: HTMLElement | undefined
   let plate: DeepPlatePayload | undefined
   let moreOpen = false, settled = 0, live = false
   const cells: HTMLButtonElement[] = []
@@ -173,7 +182,11 @@ export function createReaderPayload(options: {
     return book.sides.map((entry, index) => ({ entry, index }))
       .filter(item => item.entry.volume === here?.volume).map(item => item.index)
   }
-  const chosen = (): ReaderWay | undefined => side()?.ways[way] ?? side()?.ways[0]
+  /** The ways this stage can show of one side: a way that reads beside the
+   * page stands only where the label is in the band. */
+  const waysOf = (entry: ReaderSide | undefined): readonly ReaderWay[] =>
+    entry ? entry.ways.filter(item => !item.beside || Boolean(host?.banded)) : []
+  const chosen = (): ReaderWay | undefined => waysOf(side())[way] ?? waysOf(side())[0]
 
   /** The room draws while the eye walks to the book. Once it stands, the
    * viewer takes the window and the room holds its last frame. */
@@ -242,19 +255,49 @@ export function createReaderPayload(options: {
   /** The side standing now, in the viewer that is already up. */
   function showSide(first: boolean): void {
     const here = side(), view = chosen()
+    const moved = paintBeside()
     if (!here || !plate) return
     if (!first) {
-      plate.show({
+      const next = {
         source: view?.source ?? here.source,
         window: windowOf(here),
         title: here.label,
         description: here.shows,
         ceiling: view?.ceiling ?? options.words.ceiling,
         flipped: Boolean(view?.mirrored),
-      })
+      }
+      // A NEW BOX IS FITTED ONCE THE VIEWER HAS SEEN IT: a page fitted into
+      // the box it is leaving keeps that box's width and shows the whole
+      // sheet in the new one, so the page waits two frames for its box.
+      if (moved) {
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          if (live && plate && side() === here && chosen() === view) plate.show(next)
+        }))
+      } else plate.show(next)
     }
     dockShelf()
     paintStand()
+  }
+
+  /** THE COLUMN BESIDE THE PAGE, for a way that reads there: the page keeps
+   * the left of the stage, the words the right, and the viewer seats itself
+   * again in what is left to it. True when the column came or went. */
+  function paintBeside(): boolean {
+    if (!root || !beside) return false
+    const view = chosen()
+    const words = view?.beside && host?.banded ? view.beside() : []
+    const open = words.length > 0
+    const was = root.dataset['beside'] === 'true'
+    beside.replaceChildren(...words)
+    beside.hidden = !open
+    beside.scrollTop = 0
+    if (open) {
+      root.dataset['beside'] = 'true'
+      beside.setAttribute('aria-label', view?.label ?? '')
+    } else delete root.dataset['beside']
+    if (open === was) return false
+    plate?.layout?.()
+    return true
   }
 
   /** The folio and its line, on the glass, in the corner the rule would
@@ -297,14 +340,21 @@ export function createReaderPayload(options: {
     if (here.named) block.append(make('p', 'reader-named', here.named))
     const line = chosen()?.line
     if (line) block.append(make('p', '', line))
-    block.append(make('p', 'vitrine-meta', here.holder ?? book.holder))
+    // THE BAND'S DRAWER HOLDS A FEW SENTENCES AND NEVER SCROLLS: an edition's
+    // credit is the record's, and the witnesses are a way of reading the page
+    const banded = Boolean(host.banded)
+    if (!(banded && book.holderInRecord)) block.append(make('p', 'vitrine-meta', here.holder ?? book.holder))
+    // The two that step the book are painted before the label reads them,
+    // or the band would take the last side's state for this one's.
+    paintControls()
     // THE CARD IS THE SIDE'S, not the side the window opened at: a wall of
     // sheets renames its card as the hand walks it.
     // where the side stands in its book goes with the name: a label that
     // counts the volumes of a room would count the wrong thing here
     host.rename?.(here.label, here.head, here.colour ?? null,
       inside.length > 1 ? { at: place + 1, of: inside.length } : null)
-    if (witnesses().length) {
+    const readBeside = banded && here.ways.some(item => item.beside)
+    if (witnesses().length && !readBeside) {
       const texts = make('div', 'vitrine-description reader-texts')
       texts.id = 'vitrine-reader-texts'
       texts.hidden = !moreOpen
@@ -330,7 +380,6 @@ export function createReaderPayload(options: {
       raise.addEventListener('click', () => host?.raise?.(true), { signal: listening.signal })
       aside.append(raise)
     }
-    paintControls()
   }
 
   function witnesses(): readonly HTMLElement[] {
@@ -340,19 +389,27 @@ export function createReaderPayload(options: {
 
   /** The ways as one segmented control, and the two that step one side. */
   function paintControls(): void {
+    const shown = waysOf(side())
     for (const [index, button] of ways.entries()) {
-      const label = side()?.ways[index]
+      const label = shown[index]
       if (!label || !button) continue
       button.textContent = label.label
       button.setAttribute('aria-pressed', String(index === way))
       button.hidden = false
     }
-    for (let index = side()?.ways.length ?? 0; index < ways.length; index++) ways[index]!.hidden = true
+    for (let index = shown.length; index < ways.length; index++) ways[index]!.hidden = true
     // A PAGE WITH ONE WAY HAS NO SEGMENTS, and the two that step the book
     // take the row rather than standing in a corner of it.
-    steps.previous?.parentElement?.setAttribute('data-ways', String(side()?.ways.length ?? 0))
+    steps.previous?.parentElement?.setAttribute('data-ways', String(shown.length))
     if (steps.previous) steps.previous.disabled = at <= 0
     if (steps.next) steps.next.disabled = !book || at >= book.sides.length - 1
+    // A STEP THAT CROSSES INTO ANOTHER VOLUME NAMES WHERE IT LANDS, so the
+    // way on says the book changes before the count starts again at one.
+    for (const [step, to] of [[steps.previous, at - 1], [steps.next, at + 1]] as const) {
+      const there = book?.sides[to]
+      if (step && there && there.volume !== side()?.volume) step.dataset['title'] = there.label
+      else if (step) delete step.dataset['title']
+    }
   }
 
   function control(cls: string, label: string, run: () => void, name?: string): HTMLButtonElement {
@@ -471,9 +528,12 @@ export function createReaderPayload(options: {
     const bounded = Math.max(0, Math.min(book.sides.length - 1, next))
     if (bounded === at) return
     const wasVolume = side()?.volume
+    // A READING BESIDE THE PAGE GOES ON WITH THE PAGE: the next side opens in
+    // the same way where it has one, and every other way starts at the hand.
+    const reading = chosen()?.beside ? chosen()?.id : undefined
     at = bounded
     if (side()?.volume !== wasVolume) paintShelf()
-    way = 0
+    way = Math.max(0, reading ? waysOf(side()).findIndex(item => item.id === reading) : 0)
     const here = side()
     if (here) {
       if (ground && here.thumb) { ground.src = here.thumb; ground.hidden = Boolean(plate?.drawn()) }
@@ -486,7 +546,7 @@ export function createReaderPayload(options: {
   }
 
   function chooseWay(index: number): void {
-    if (index === way || !side()?.ways[index]) return
+    if (index === way || !waysOf(side())[index]) return
     way = index
     showSide(false)
     paintWords()
@@ -539,7 +599,29 @@ export function createReaderPayload(options: {
       stage = make('div', 'reader-stage')
       shelf = make('ol', 'reader-shelf')
       shelf.setAttribute('role', 'list')
-      root.append(style, ground, stage, shelf)
+      beside = make('section', 'reader-beside')
+      beside.hidden = true
+      beside.tabIndex = 0
+      beside.setAttribute('role', 'region')
+      beside.lang = next.lang
+      // THE COLUMN IS ITS OWN SCROLL: the keys that read on down it move it
+      // the same way in every engine, and never walk the set or turn the page
+      const ROW = 40
+      beside.addEventListener('keydown', event => {
+        const column = beside
+        if (!column || event.ctrlKey || event.metaKey || event.altKey) return
+        const page = Math.max(ROW, column.clientHeight - ROW)
+        const by = event.key === 'ArrowDown' ? ROW : event.key === 'ArrowUp' ? -ROW
+          : event.key === 'PageDown' || (event.key === ' ' && !event.shiftKey) ? page
+            : event.key === 'PageUp' || (event.key === ' ' && event.shiftKey) ? -page : 0
+        if (by) column.scrollTop += by
+        else if (event.key === 'Home') column.scrollTop = 0
+        else if (event.key === 'End') column.scrollTop = column.scrollHeight
+        else return
+        event.preventDefault()
+        event.stopPropagation()
+      }, { signal: listening.signal })
+      root.append(style, ground, stage, beside, shelf)
       next.element.append(root)
       next.surface('room')
       // The row a hand meets: the two that step one side with the ways
@@ -615,6 +697,10 @@ export function createReaderPayload(options: {
       if (event.key === '.') { go(at + 1); return true }
       if (event.key === 'Home' && book) { go(0); return true }
       if (event.key === 'End' && book) { go(book.sides.length - 1); return true }
+      // LEFT AND RIGHT TURN THE PAGE where there is nothing to pan, the rule
+      // the swipe keeps: at the page's own fit an arrow is a hand turning it.
+      const turn = event.key === 'ArrowLeft' ? -1 : event.key === 'ArrowRight' ? 1 : 0
+      if (turn && !event.shiftKey && (!plate || plate.home())) { go(at + turn); return true }
       return plate?.key?.(event) ?? false
     },
     unmount() {
@@ -624,7 +710,7 @@ export function createReaderPayload(options: {
       plate = undefined
       options.room?.leave()
       root?.remove()
-      root = undefined; stage = undefined; ground = undefined; shelf = undefined
+      root = undefined; stage = undefined; ground = undefined; shelf = undefined; beside = undefined
       cells.length = 0
       ways.length = 0
       host = undefined
