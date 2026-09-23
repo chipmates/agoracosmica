@@ -93,7 +93,7 @@ function looks() {
     oakTint: uniform(new Color(.78, .74, .7)),
     darkTint: uniform(new Color(.55, .53, .51)),
     /** the film on the glass: how much of a pane it covers at its foot */
-    glassFilm: uniform(.07),
+    glassFilm: uniform(.3),
     glassFilmColour: uniform(new Color(.5, .5, .47)),
     /** the probe read at the scene's own level; the lift is the room's */
     envGain: uniform(1),
