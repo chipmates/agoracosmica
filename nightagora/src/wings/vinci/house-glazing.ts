@@ -3,7 +3,8 @@
  * of its light and slightly bowed, so the sky and the court come back in
  * broken pieces. The saddle bars behind the glass are geometry; the lead
  * cames are geometry in the film and drawn in the glass at the live tiers,
- * where a 7 mm came is under two pixels at every stop.
+ * where a 7 mm came is under two pixels at every stop; the film draws them
+ * too wherever its built came is thinner than its pixel.
  * The lights' outlines are the shell's own apertures; nothing is surveyed.
  */
 import {
@@ -17,8 +18,8 @@ import { hourKey } from './site'
 // TSL's composable overloads are typed once at this boundary.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type N = any
-const { attribute, clamp, dFdx, dFdy, float, floor, fract, max, mix, mx_fractal_noise_float, mx_noise_float, normalMap, normalView, positionViewDirection,
-  reflectVector, smoothstep, uv, vec2, vec3 } = TSL as unknown as Record<string, N>
+const { attribute, clamp, dFdx, dFdy, float, floor, fract, max, mix, mx_fractal_noise_float, mx_noise_float, normalMap, normalView, output, positionViewDirection,
+  reflectVector, smoothstep, uv, vec2, vec3, vec4 } = TSL as unknown as Record<string, N>
 /** The hour's sun, for the side of the sky it warms. */
 const SUN_AZ = hourKey.sun_azimuth_deg.value * Math.PI / 180
 const SUN_EAST = Math.sin(SUN_AZ), SUN_NORTH = Math.cos(SUN_AZ)
@@ -44,6 +45,10 @@ export interface GlazedLight {
 export const QUARRY_SIDE_M = .155
 const STEP = QUARRY_SIDE_M * Math.SQRT2
 const CAME_M = .007, BORDER_CAME_M = .014
+/** THE GLINT'S CEILING, in linear luminance before the print: a quarry that
+ * mirrors the sun rolls off above the knee toward the cap, which sits under
+ * the sunlit stone of the wall that holds it. */
+export const GLINT_KNEE = .16, GLINT_CAP = .34
 /** A came's edges sink this far behind the glass it holds, so no piece of
  * glass ever shows in front of its own lead. */
 const CAME_TUCK_M = .0008
@@ -173,18 +178,21 @@ class Sink {
 /** Leaded glass that reflects the sky and lets the room behind it through.
  * Colour is what the glass reflects; alpha is what it transmits, so the
  * framebuffer takes reflection + room * transmission. */
-function glassMaterial(drawn: boolean): MeshPhysicalNodeMaterial {
+function glassMaterial(cames: boolean): MeshPhysicalNodeMaterial {
   const m = new MeshPhysicalNodeMaterial({ metalness: 0, roughness: .06, ior: 1.52, specularIntensity: 1, transparent: true, depthWrite: false })
   const info = attribute('glazing', 'vec4'), seed = info.x, sill = info.y, borders = info.z, rims = attribute('rims', 'vec3')
-  // Where no came is built, the leading is drawn: each rim value is the
+  // The leading drawn in the glass: each rim value is the
   // distance in metres to one edge, and its screen gradient is the metres a
   // pixel spans across the came, so the line holds its width at any angle.
   const leadAt = (d: N, bit: number): N => {
     const pixel = vec2(dFdx(d), dFdy(d)).length().max(1e-7)
     const half = mix(float(CAME_M / 2), float(BORDER_CAME_M / 2), floor(borders.div(bit)).mod(2))
-    return float(1).sub(smoothstep(half.sub(pixel.mul(.75)), half.add(pixel.mul(.75)), d))
+    const line = float(1).sub(smoothstep(half.sub(pixel.mul(.75)), half.add(pixel.mul(.75)), d))
+    // Where the film builds its cames, the drawn line stands in only for a
+    // came too thin for its pixel and yields as the built lead resolves.
+    return cames ? line.mul(float(1).sub(smoothstep(1.2, 2.6, half.mul(2).div(pixel)))) : line
   }
-  const drawnLead = drawn ? max(leadAt(rims.x, 1), max(leadAt(rims.y, 2), leadAt(rims.z, 4))) : float(0)
+  const drawnLead = max(leadAt(rims.x, 1), max(leadAt(rims.y, 2), leadAt(rims.z, 4)))
   const U = uv()
   // Cylinder glass is drawn thin and flattened while soft: a slow ripple
   // runs through each quarry, a few centimetres long, a fraction of a degree.
@@ -221,6 +229,13 @@ function glassMaterial(drawn: boolean): MeshPhysicalNodeMaterial {
   // Old glass is faintly green and not quite clear; each quarry its own melt.
   const clear = mix(float(.62), float(.90), seed.mul(seed)).sub(dust.mul(2.4))
   m.opacityNode = clamp(clear.mul(float(1).sub(fresnel)).mul(float(1).sub(drawnLead)), 0, 1)
+  // The sun in one quarry is thousands of times the sky in the next; left
+  // alone it prints white and swallows the lead round it. Rolled off, the
+  // quarries still disagree and every came between them still reads.
+  const lit = output.rgb, lum = lit.dot(vec3(.2126, .7152, .0722)).max(1e-5)
+  const over = lum.sub(GLINT_KNEE).max(0)
+  const held = lum.min(GLINT_KNEE).add(over.div(float(1).add(over.div(GLINT_CAP - GLINT_KNEE))))
+  m.outputNode = vec4(lit.mul(held.div(lum)), output.a)
   m.blending = CustomBlending
   m.blendEquation = AddEquation
   m.blendSrc = OneFactor
@@ -341,7 +356,7 @@ export function createHouseGlazing(lights: readonly GlazedLight[], detail: 1 | 2
   const group = new Group(); group.name = 'vinci/house-glazing'
   const meshes: Mesh[] = []
   if (glass.positions.length) {
-    const mesh = new Mesh(glass.geometry(), glassMaterial(!built)); mesh.name = 'vinci/house-glazing/glass'
+    const mesh = new Mesh(glass.geometry(), glassMaterial(Boolean(built))); mesh.name = 'vinci/house-glazing/glass'
     mesh.castShadow = false; mesh.receiveShadow = true; mesh.renderOrder = 2; meshes.push(mesh)
   }
   if (lead.positions.length) {
@@ -364,5 +379,5 @@ export const houseGlazingProvenance = {
   manifestId: 'vinci/house-glazing',
   assetClass: 'GENERATED',
   certainty: 'conjectural',
-  recipe: 'Every glazed light of the registered shell holds 155 mm diamond quarries on a 45 degree lattice centred on the light. Each quarry is its own piece, its face tilted up to 1 degree and bowed up to 0.8 mm, with a slow ripple in its surface, its edge held in the lead; 7 mm lead cames and a 14 mm border lead stand about 2 mm proud as geometry in the film and are drawn in the glass at the live tiers; iron saddle bars sit behind the glass. The glass reflects by its Fresnel term and transmits the rest, so the room behind shows through.',
+  recipe: 'Every glazed light of the registered shell holds 155 mm diamond quarries on a 45 degree lattice centred on the light. Each quarry is its own piece, its face tilted up to 1 degree and bowed up to 0.8 mm, with a slow ripple in its surface, its edge held in the lead; 7 mm lead cames and a 14 mm border lead stand about 2 mm proud as geometry in the film and are drawn in the glass at the live tiers; iron saddle bars sit behind the glass. The glass reflects by its Fresnel term and transmits the rest, so the room behind shows through; a quarry mirroring the sun rolls off toward a ceiling under the sunlit stone round it, and the film draws the leading too wherever its built came is thinner than its pixel.',
 } as const
