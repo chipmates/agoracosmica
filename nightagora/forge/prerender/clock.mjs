@@ -43,7 +43,18 @@ export function installVirtualClock() {
     },
     /** one app frame, exactly 1/30 s of the app's own time later */
     step() {
-      s.t += s.dt
+      return window.__pre.advance(s.dt)
+    },
+    /** one app frame, `ms` of the app's own time later: a shutter's draws
+        are steps of their own spacing, and a zero step lets the rail take a
+        request at the instant it was asked */
+    advance(ms) {
+      return window.__pre.at(s.t + ms)
+    },
+    /** one app frame at an app time named outright, so a long run of short
+        steps carries no rounding of its own into the walk */
+    at(t) {
+      s.t = t
       const due = s.queue.splice(0, s.queue.length)
       if (!due.length) s.starved++
       for (const q of due) {
