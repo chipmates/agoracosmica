@@ -47,7 +47,7 @@ const BLOCK = 0.86
 
 /** the wall's own surface: the wing's stone, coursed, with three scales on it
  * and a density that thins with distance, so the plane is never flat colour. */
-export function backPlaneMaterial(stack: Stack, stone: MaterialSet): MeshStandardNodeMaterial {
+export function backPlaneMaterial(stack: Stack, stone: MaterialSet, height = BACK_PLANE_HEIGHT): MeshStandardNodeMaterial {
   const material = new MeshStandardNodeMaterial({ roughness: stone.roughness, metalness: 0 })
   material.name = 'vinci/bench/back-plane'
   material.side = DoubleSide
@@ -73,7 +73,11 @@ export function backPlaneMaterial(stack: Stack, stone: MaterialSet): MeshStandar
   const cut = mx_noise_float(vec3(block.floor().mul(.37), course.mul(.71), 2.13)).clamp(-1, 1)
   const face = float(1).add(cut.mul(.06)).mul(float(1).sub(joint.mul(.34)))
   const foot = float(1).sub(smoothstep(0, .55, up)).mul(.5)
-  const albedo = detail.albedo.mul(face).mul(float(1).sub(foot.mul(.42)))
+  // THE TOP OF THE WALL IS NOT A RULED LINE. Its upper third goes into the
+  // same dark as the air beyond it, so the frame keeps the wall's height as
+  // a measure without drawing a horizon across the picture.
+  const crown = float(1).sub(smoothstep(height * .62, height, up))
+  const albedo = detail.albedo.mul(face).mul(float(1).sub(foot.mul(.42))).mul(crown)
   // A hall's wall at twelve metres is not the subject. It is held a full
   // stop under the object it stands behind, so the frame keeps one hero.
   material.colorNode = vec3(stone.albedo.r * WALL_VALUE, stone.albedo.g * WALL_VALUE, stone.albedo.b * WALL_VALUE).mul(albedo).mul(detail.occlusion)

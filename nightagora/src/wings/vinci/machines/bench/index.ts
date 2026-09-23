@@ -1,4 +1,4 @@
-import { Box3, type BufferGeometry, Color, Fog, Group, Mesh, MeshStandardNodeMaterial, PerspectiveCamera, Scene, Vector3 } from 'three/webgpu';
+import { Box3, type BufferGeometry, Color, Fog, Group, Mesh, MeshStandardNodeMaterial, PerspectiveCamera, type PlaneGeometry, Scene, Vector3 } from 'three/webgpu';
 import type { Stack, KeyLight, MaterialSet } from '../../../../stack';
 import { float, fog, positionWorld, rangeFogFactor, smoothstep, uv, vec3 } from 'three/tsl';
 import { IDENTITY } from '../../../../stack/grade';
@@ -468,7 +468,7 @@ export function createBench(stack: Stack, onExit: () => void) {
       const tuffeau = await loadMachineMaterial(stack, 'stone-tuffeau');
       if (mine !== serial) { wall.geometry.dispose(); return; }
       supportSets.push(tuffeau);
-      const wallMaterial = backPlaneMaterial(stack, tuffeau);
+      const wallMaterial = backPlaneMaterial(stack, tuffeau, (wall.geometry as PlaneGeometry).parameters.height);
       wall.mesh.material = wallMaterial;
       supportMaterials.push(wallMaterial);
       supportGeometries.push(wall.geometry);

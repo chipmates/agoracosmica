@@ -2230,7 +2230,7 @@
       "prompt": "The machine bench's second plane. A modern hall wall for one object: the wing's stone, coursed at 42 cm with 86 cm blocks and staggered perpends, standing 12 metres behind the platform's centre on the bench's own floor, square to the eye, 3.2 metres high or as high as the frame's own top edge reaches at that bearing and never above 4.4, lit by the bench's own key and standing in the bench's own air. Its surface carries the library set's photograph at a reduced weight under three procedural scales with a density that thins with distance, a per-block value so no two blocks are the same, a joint that darkens and roughens rather than being drawn, and a closed ambient at its foot where the floor meets it. It is held a stop under the object it stands behind, so the frame keeps one hero. The wall is exhibition dressing and claims nothing about where any machine stood; it is reached through one constant and this bench is the only surface that sets it.",
       "model": "Opus 5 build seat",
       "date": "2026-09-12",
-      "sha256": "5c7163b4df3275eed3c9284e573be7cbbca53f2da854da0c40566bc8ef4e3faa",
+      "sha256": "215257f410eb6cc27b66be9668c9c6d3e0d2629ae86b6efc762dd5e99bf30c27",
       "recipe_files": [
         {
           "path": "src/wings/vinci/machines/bench/back-plane.ts",
@@ -2238,7 +2238,7 @@
         },
         {
           "path": "src/wings/vinci/machines/bench/index.ts",
-          "sha256": "043a12c6ca6f3058ebb5ab2b872237f2e2ee9ab519f127982c27e51a34b0ecd7"
+          "sha256": "4805a2d19c8817ae97c90ec648af7efeaa5e00816b137e1fc8c148b2a4f52450"
         }
       ],
       "note": "Procedural modern hall geometry only. The stone material set remains a separately manifested CC0 library asset. No machine's own hall is claimed or reconstructed here.",
@@ -2254,7 +2254,7 @@
       "prompt": "The da Vinci machine bench. Restrained museum typography, folio mounts, named absence panels, certainty marks, navigation, finite-demonstration status and evidence reading furniture, plus an optional diagnostic card displaying observed runtime measurements. Reuse the locked bilingual pages verbatim. No unapproved folio or reconstruction photograph is displayed. Window 5: three registers of text. The label speaks the hour (15:19 by the sun, 10 October 1517) and says the day is documented and the hour chosen, and it names what the bench does not show; the drawer explains without bracket citations; the record behind Read the evidence carries the arithmetic, the place, the method and the sources. The same computed 10 October 1517 Julian 15:19:00 LAT hour and geographic sun A=231.9005 degrees h=17.3882 degrees drive the bench key. The hour is chosen, not historical observation. Window 6: the phone drops the footer's top rule so one line closes the reading column; the compass is staged as an object (three-quarter view, full frame height on the wide frame, .35 on the phone) and every machine is fitted at .80 of the half height and .70 of the half width, .31 on the phone; a close state frames the working end of a machine alone. No locked copy changed.",
       "model": "GPT-6 Codex, with a Claude Opus 5 harvest seat",
       "date": "2026-09-11",
-      "sha256": "043a12c6ca6f3058ebb5ab2b872237f2e2ee9ab519f127982c27e51a34b0ecd7",
+      "sha256": "c2a6807750f1e70585378fc4f3f1408a5d736fe3aefef52e3975887d8a968a03",
       "recipe_files": [
         {
           "path": "src/wings/vinci/machines/bench/bench.css",
@@ -2274,7 +2274,7 @@
         },
         {
           "path": "src/wings/vinci/machines/bench/index.ts",
-          "sha256": "043a12c6ca6f3058ebb5ab2b872237f2e2ee9ab519f127982c27e51a34b0ecd7"
+          "sha256": "4805a2d19c8817ae97c90ec648af7efeaa5e00816b137e1fc8c148b2a4f52450"
         },
         {
           "path": "src/wings/vinci/machines/bench/metrics.ts",
