@@ -127,8 +127,8 @@ function lattice(light: GlazedLight): { pieces: V2[][]; lines: [V2, V2][] } {
 
 class Sink {
   positions: number[] = []; normals: number[] = []; uvs: number[] = []; extra: number[] = []
-  vertex(p: V3, n: V3, t: V2, e: [number, number]): void {
-    this.positions.push(p[0], p[2], -p[1]); this.normals.push(n[0], n[2], -n[1]); this.uvs.push(t[0], t[1]); this.extra.push(e[0], e[1])
+  vertex(p: V3, n: V3, t: V2, e: [number, number], rim = 1): void {
+    this.positions.push(p[0], p[2], -p[1]); this.normals.push(n[0], n[2], -n[1]); this.uvs.push(t[0], t[1]); this.extra.push(e[0], e[1], rim)
   }
   /** A flat triangle wound to face along `n`, whatever order it came in. */
   tri(a: V3, b: V3, c: V3, n: V3, e: [number, number]): void {
@@ -142,7 +142,7 @@ class Sink {
     g.setAttribute('position', new Float32BufferAttribute(this.positions, 3))
     g.setAttribute('normal', new Float32BufferAttribute(this.normals, 3))
     g.setAttribute('uv', new Float32BufferAttribute(this.uvs, 2))
-    g.setAttribute('glazing', new Float32BufferAttribute(this.extra, 2))
+    g.setAttribute('glazing', new Float32BufferAttribute(this.extra, 3))
     g.computeBoundingSphere()
     return g
   }
@@ -153,7 +153,12 @@ class Sink {
  * framebuffer takes reflection + room * transmission. */
 function glassMaterial(): MeshPhysicalNodeMaterial {
   const m = new MeshPhysicalNodeMaterial({ metalness: 0, roughness: .06, ior: 1.52, specularIntensity: 1, transparent: true, depthWrite: false })
-  const info = attribute('glazing', 'vec2'), seed = info.x, sill = info.y
+  const info = attribute('glazing', 'vec3'), seed = info.x, sill = info.y, rim = info.z
+  // Where no came is built, the leading is drawn: the rim value falls to
+  // zero at a quarry's edge, so its own gradient gives the pixels to it.
+  const toEdge = rim.div(rim.fwidth().max(1e-6))
+  const halfCame = float(CAME_M / 2).div(uv().x.fwidth().add(uv().y.fwidth()).mul(.5).max(1e-6))
+  const drawnLead = float(1).sub(smoothstep(halfCame.sub(.75), halfCame.add(.75), toEdge)).mul(float(1).sub(rim.greaterThan(.999).select(float(1), float(0))))
   const U = uv()
   // Cylinder glass is drawn thin and flattened while soft: a slow ripple
   // runs through each quarry, a few centimetres long, a fraction of a degree.
@@ -164,7 +169,7 @@ function glassMaterial(): MeshPhysicalNodeMaterial {
   // A fired surface that has stood forty years: a little dust, heavier on
   // the lowest quarries where rain splash and cobweb settle.
   const dust = float(.012).add(seed.mul(.014)).add(float(1).sub(smoothstep(.02, .22, sill)).mul(.022))
-  m.colorNode = vec3(.60, .60, .55).mul(dust)
+  m.colorNode = mix(vec3(.60, .60, .55).mul(dust), vec3(.09, .094, .092), drawnLead)
   m.roughnessNode = clamp(float(.07).add(seed.mul(.05)).add(dust.mul(.8)), .06, .18)
   const nDotV = clamp(normalView.dot(positionViewDirection), 0, 1)
   const fresnel = float(.043).add(float(1 - .043).mul(float(1).sub(nDotV).pow(5)))
@@ -186,10 +191,10 @@ function glassMaterial(): MeshPhysicalNodeMaterial {
   // each melt its own faint cast: greenish, straw or grey
   const melt = fract(seed.mul(7.31))
   const tint = mix(mix(vec3(.90, 1, .90), vec3(1, .97, .84), smoothstep(.3, .7, melt)), vec3(.95, .97, 1), smoothstep(.75, .95, melt))
-  m.emissiveNode = seen.mul(fresnel).mul(float(1).sub(dust.mul(6))).mul(tint)
+  m.emissiveNode = seen.mul(fresnel).mul(float(1).sub(dust.mul(6))).mul(tint).mul(float(1).sub(drawnLead))
   // Old glass is faintly green and not quite clear; each quarry its own melt.
   const clear = mix(float(.62), float(.90), seed.mul(seed)).sub(dust.mul(2.4))
-  m.opacityNode = clamp(clear.mul(float(1).sub(fresnel)), 0, 1)
+  m.opacityNode = clamp(clear.mul(float(1).sub(fresnel)).mul(float(1).sub(drawnLead)), 0, 1)
   m.blending = CustomBlending
   m.blendEquation = AddEquation
   m.blendSrc = OneFactor
@@ -202,7 +207,7 @@ function glassMaterial(): MeshPhysicalNodeMaterial {
 
 function cameMaterial(): MeshStandardNodeMaterial {
   const m = new MeshStandardNodeMaterial({ metalness: 0, roughness: .52 })
-  const info = attribute('glazing', 'vec2'), lead = info.x
+  const info = attribute('glazing', 'vec3'), lead = info.x
   // Weathered lead is a soft grey oxide; the saddle bars are forged iron.
   m.colorNode = mix(vec3(.022, .021, .020), vec3(.090, .094, .092), lead)
   m.roughnessNode = mix(float(.62), float(.48), lead)
@@ -237,10 +242,11 @@ export function createHouseGlazing(lights: readonly GlazedLight[], detail: 1 | 2
         const gu = ta - (centre ? 0 : 2 * bow * du / R2), gv = tb - (centre ? 0 : 2 * bow * dv / R2)
         const n: V3 = [outward[0] - gu * along[0], outward[1] - gu * along[1], -gv]
         const l = Math.hypot(...n)
-        glass.vertex(at(p[0], p[1], h), [n[0] / l, n[1] / l, n[2] / l], p, [seed, p[1] - v0])
+        glass.vertex(at(p[0], p[1], h), [n[0] / l, n[1] / l, n[2] / l], p, [seed, p[1] - v0], detail === 2 || centre ? 1 : 0)
       }
-      if (detail === 2) for (let k = 0; k < piece.length; k++) { vertex(c, true); vertex(piece[k]!, false); vertex(piece[(k + 1) % piece.length]!, false) }
-      else for (let k = 1; k < piece.length - 1; k++) { vertex(piece[0]!, false); vertex(piece[k]!, false); vertex(piece[k + 1]!, false) }
+      // A fan from the centre: at hero it carries the bow, at the lighter
+      // tier its rim value draws the leading where no came is built.
+      for (let k = 0; k < piece.length; k++) { vertex(c, true); vertex(piece[k]!, false); vertex(piece[(k + 1) % piece.length]!, false) }
     }
     if (detail < 2) continue
     // THE CAMES stand a little proud of the glass on its outer face: a

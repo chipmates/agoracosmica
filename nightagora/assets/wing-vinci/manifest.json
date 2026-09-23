@@ -3642,7 +3642,7 @@
       "prompt": "Every glazed light of the registered shell as leaded glass: 155 mm diamond quarries on a 45 degree lattice centred on each light, each quarry its own piece tilted up to 1 degree and bowed up to 0.8 mm, a slow ripple in its surface and its own faint cast; 7 mm lead cames and a 10 mm border lead standing 2 mm proud; iron saddle bars set behind the glass. The glass reflects by its Fresnel term and transmits the rest, so the room behind shows. The shell's flat panes stay certified and leave the colour pass. Hero and standard tiers; calm keeps the flat panes.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "7699e19e4bda0b483e9f180e8ca93d1b267a85dee13ca92148dd2119d3294c47",
+      "sha256": "b18ddac96dbfe6bdb770f1321d05d280da5d4837963e6e3d8640599cdce8fe5c",
       "note": "recipe_file=src/wings/vinci/house-glazing.ts; geometry_dependency=vinci/shell; rail_collision=false; engine_terms=sky reflection in the glass (the film reflects the real sky)"
     },
     {
