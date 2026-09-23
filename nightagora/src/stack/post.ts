@@ -32,7 +32,7 @@
    rebuilding it. Rebuilding costs a shader compile, and a shader compile in
    the middle of a descent is a stutter the visitor reads as a fault. */
 
-import { PostProcessing, type Camera, type Scene, type WebGPURenderer } from 'three/webgpu'
+import { RenderPipeline, type Camera, type Scene, type WebGPURenderer } from 'three/webgpu'
 import * as TSL from 'three/tsl'
 import { ao as gtao } from 'three/addons/tsl/display/GTAONode.js'
 import { bloom } from 'three/addons/tsl/display/BloomNode.js'
@@ -136,7 +136,7 @@ function installGrainSwitch(): void {
 }
 
 export interface PostChain {
-  post: PostProcessing
+  post: RenderPipeline
   /** re-aim the chain at another scene's look; the shader is not rebuilt.
       `snap` stands the dials there at once: a caller that eases a dial
       itself must not have the chain ease it a second time behind it. */
@@ -362,7 +362,7 @@ export function createPost(
   // 9 · the film the print is on
   if (tier.grain) out = vec4(grainNode(out.rgb, u.grain, u.grainSeed), out.a)
 
-  const post = new PostProcessing(renderer)
+  const post = new RenderPipeline(renderer)
   post.outputColorTransform = false
   post.outputNode = out
 
