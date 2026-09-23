@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed to a pale grey at 30 per cent. Assumed weather, no observation claimed.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "50486001d08a6177ec4ea6f4ecde01a1d35ee729b26e596cf712990213be1cda",
+      "sha256": "5ae83f7b7790dc705a908099e453fab1dc43aeef007e57d7d24aba4de06b6892",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=80c458f2cb5ccddb7fcedccda5df70e5cdccda7d9ca97d65ebfa6462920f61ef;"
     },
     {
@@ -2496,7 +2496,7 @@
       "prompt": "A modern oak reading table, reading lamp and linen cradle. Three scales of detail and a restrained lamp pool. Exhibition dressing, no surviving original furniture or binding claimed. Compact 1K library carrier maps with procedural detail.",
       "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6, revised with Claude Opus 5",
       "date": "2026-09-10",
-      "sha256": "546e4059f06b26200723f35cd0d9b51e71257025630b42295a9e5ec114bdfdde",
+      "sha256": "f867b7f46eaf3625d122a9ce646237d310623378666d28847d8c7caffe5f94e7",
       "note": "recipe_file=src/wings/vinci/table/geometry.ts; output_source=src/wings/vinci/table/geometry.ts; modern exhibition design, not documentary reconstruction"
     },
     {
@@ -2509,7 +2509,7 @@
       "prompt": "A modern facsimile binding with leather boards, hollow gutter and uneven leaf section. Approximate 23 by 16 cm reference from the commission; physical original dimensions are absent from the supplied map. Constant arc-length bent sheet, silent one-second turn.",
       "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6, revised with Claude Opus 5",
       "date": "2026-09-10",
-      "sha256": "546e4059f06b26200723f35cd0d9b51e71257025630b42295a9e5ec114bdfdde",
+      "sha256": "f867b7f46eaf3625d122a9ce646237d310623378666d28847d8c7caffe5f94e7",
       "note": "recipe_file=src/wings/vinci/table/geometry.ts; output_source=src/wings/vinci/table/geometry.ts; modern exhibition design, not documentary reconstruction"
     },
     {
@@ -3678,10 +3678,10 @@
       "class": "GENERATED",
       "licence": "Original procedural construction; source code under the museum repository licence.",
       "display": true,
-      "prompt": "The reading room round the reading table: an oak niche set against the long gallery's west wall, its back panelled in seven book-matched leaves of veneered oak on battens with shadow joints, a lower dado of the same flitch carried south under the body wall's standing sheet, a north return closing it against the hall door, a veneered oak canopy with a downstand fascia hung on four bronze rods, the building's sealed concrete floor in its bays with saw cuts, edged in bronze, a spun brass pendant with an opal disc over the book, and a modern oak chair with a leather seat drawn up to the table. One 2700 K lamp lights it; the room's own bounce is read from two probes taken inside it and beside it. The oak and the floor are the library's CC0 photographs, laid as the mechanism hall lays them; everything else is procedural. Modern exhibition architecture and furniture; no period claim.",
+      "prompt": "The reading room round the reading table: an oak niche set against the long gallery's west wall, its back panelled in seven slip-matched leaves of veneered oak on battens with shadow joints over a dark-stained backing, a lower dado of the same flitch, capped and parted from the niche by a reveal, carried south under the body wall's standing sheet, a north return closing it against the hall door with a low open bookcase of modern bound volumes on its inner face, a veneered oak canopy with a downstand fascia carried by the wall and the return, the building's sealed concrete floor in its bays with saw cuts, edged in bronze, a darkened spun brass pendant with an opal disc hung low over the book from a ceiling cup, and a modern oak chair with a leather seat pushed in at the table. One 2700 K lamp lights the room and the table, whose own lamp stand-in it switches off and whose desk lamp it takes away; the room's own bounce is read from three probes taken inside it, beside it and at its open front. The oak and the floor are the library's CC0 photographs, laid as the mechanism hall lays them; everything else is procedural. Modern exhibition architecture and furniture; no period claim.",
       "model": "Deterministic TypeScript geometry and TSL materials",
       "date": "2026-09-23",
-      "sha256": "d2f267475eae7c31e37334e81f5e02f8395ba173713ad43102e03d4d160c074b",
+      "sha256": "eec543c140638e1d3221e237494fba1136a56e21761baf668a377deef8adc116",
       "note": "Modern museum furniture and lighting, no 1517 claim. recipe_file=src/wings/vinci/collection/reading-room.ts; companion_file=src/wings/vinci/collection/reading-room-plan.ts; library_sets=library/oak-veneer-light,library/concrete-floor-polished"
     }
   ]
