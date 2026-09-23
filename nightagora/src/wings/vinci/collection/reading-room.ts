@@ -24,7 +24,8 @@ import * as TSL from 'three/tsl'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
 import type { Stack } from '../../../stack'
 import { createMaterialLibrary } from '../../../stack/materials'
-import { FLOOR } from './layout'
+import { axisFootprint, lineCoverage } from '../../../stack/detail'
+import { COLLECTION_PAVING_ORIGIN, FLOOR } from './layout'
 import {
   Batch, chairParts, linear, oakPieces, READING_LAMP, READING_ROOM, READING_ROOM_PROVENANCE,
   READING_SHADOW_LAYER, SHADE, T, v3, type Piece,
@@ -38,7 +39,7 @@ const R = READING_ROOM
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type N = any
 const {
-  atan, attribute, float, lights: lightsOf, mx_noise_float, normalMap, normalWorldGeometry,
+  atan, attribute, cameraViewMatrix, float, floor: floorOf, fract, lights: lightsOf, mix, mx_noise_float, normalMap, normalWorldGeometry,
   pmremTexture, positionLocal, positionWorld, sin, smoothstep, sqrt, uniform, uv, vec2, vec3, vec4,
 } = TSL as unknown as Record<string, N>
 
@@ -76,7 +77,7 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
   // THE PHOTOGRAPH comes through a library of the room's own, so its bytes
   // never stand in the queue the machines' materials wait on.
   const library = createMaterialLibrary(stack.tierConfig())
-  const oakSet = library.sync('oak-veneer-light')
+  const oakSet = library.sync('oak-veneer-light'), groundSet = library.sync('concrete-floor-polished')
   const unregister = stack.registerTextureMemory(() => library.textureMB(), 'reading room oak')
 
   // THE LAMP
@@ -150,20 +151,10 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
     material.needsUpdate = true
   }
 
-  // THE OAK
-  const { oak, dark, bronze } = oakPieces()
-  const oakMaterial = new MeshStandardNodeMaterial({ roughness: .55, metalness: 0 })
-  {
-    const read = oakSet.sample({ uv: uv(), metres: [1.83, 1.83] })
-    const tone = attribute('pieceTone', 'vec3')
-    // the figure held a little under the photograph's own: the page is the hero
-    oakMaterial.colorNode = tone.mul(read.albedo.sub(1).mul(.72).add(1))
-    // oiled, so smoother along the grain than the photograph's raw board
-    oakMaterial.roughnessNode = read.roughness.mul(.8).add(.12).clamp(.3, .85)
-    oakMaterial.normalNode = normalMap(read.normal.mul(.5).add(.5), vec2(.65, .65))
-    // THE TABLE SHADES THE FLOOR UNDER IT. The form factor of its underside
-    // seen from a point on the floor, by four corners (the corner formula is
-    // odd in both sides, so the signed sum is exact).
+  // THE TABLE SHADES WHAT STANDS UNDER IT. The form factor of its underside
+  // seen from a point below it that faces up, by four corners (the corner
+  // formula is odd in both sides, so the signed sum is exact).
+  const underTable = ((): N => {
     const P = positionWorld
     const c = tableUnder.sub(P.y).max(.02)
     const corner = (a: N, b: N): N => {
@@ -175,9 +166,52 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
     const covered = corner(x1, z1).sub(corner(x0, z1)).sub(corner(x1, z0)).add(corner(x0, z0)).abs()
     const facingUp = smoothstep(.5, .9, normalWorldGeometry.y)
     const under = P.y.lessThan(tableUnder).select(float(1), float(0))
-    oakMaterial.aoNode = float(1).sub(covered.mul(facingUp).mul(under).mul(engineTerms)).clamp(.05, 1)
+    return float(1).sub(covered.mul(facingUp).mul(under).mul(engineTerms)).clamp(.05, 1)
+  })()
+
+  // THE OAK
+  const { oak, dark, bronze, floor } = oakPieces()
+  const oakMaterial = new MeshStandardNodeMaterial({ roughness: .55, metalness: 0 })
+  {
+    const read = oakSet.sample({ uv: uv(), metres: [1.83, 1.83] })
+    const tone = attribute('pieceTone', 'vec3')
+    // the figure held a little under the photograph's own: the page is the hero
+    oakMaterial.colorNode = tone.mul(read.albedo.sub(1).mul(.72).add(1))
+    // oiled, so smoother along the grain than the photograph's raw board
+    oakMaterial.roughnessNode = read.roughness.mul(.8).add(.12).clamp(.3, .85)
+    oakMaterial.normalNode = normalMap(read.normal.mul(.5).add(.5), vec2(.65, .65))
+    oakMaterial.aoNode = underTable
   }
   oakMaterial.name = 'vinci/collection-reading-room/oak'
+
+  // THE BUILDING'S FLOOR, as the mechanism hall lays it: the same sealed
+  // concrete photograph in bays of 3.2 by 3.3 m on the paving datum, each bay
+  // read from its own part of it, the same tint, gloss, tone and 3 mm saw cuts.
+  const floorMaterial = new MeshStandardNodeMaterial({ roughness: .6, metalness: 0 })
+  {
+    const P = positionWorld
+    const bay = { east: 3.2, north: 3.3 }
+    const east = P.x.sub(COLLECTION_PAVING_ORIGIN.east), north = P.z.negate().sub(COLLECTION_PAVING_ORIGIN.north)
+    const cellE = floorOf(east.div(bay.east)), cellN = floorOf(north.div(bay.north))
+    const cellHash = (salt: number): N => fract(cellE.mul(12.9898).add(cellN.mul(78.233)).add(salt).sin().mul(43758.5453))
+    const h1 = cellHash(3.7), h2 = cellHash(11.3)
+    const read = groundSet.sample({ uv: vec2(P.x, P.z.negate()).add(vec2(h1, h2).mul(23.7)), metres: 3 })
+    const drift = mx_noise_float(P.mul(.11)).mul(.09).add(mx_noise_float(P.mul(.37)).mul(.045))
+    const tone = float(1).add(h1.sub(.5).mul(.18)).add(drift)
+    const { east: pe, north: pn } = axisFootprint(P)
+    const cut = (c: N, period: number, pixel: N): N => {
+      const f = fract(c.div(period)), edge = f.min(float(1).sub(f)).mul(period)
+      return lineCoverage(edge, .003, period, pixel)
+    }
+    const joint = cut(east, bay.east, pe).max(cut(north, bay.north, pn))
+    floorMaterial.colorNode = read.colour.mul(vec3(.82, .8, .77)).mul(tone).mul(float(1).sub(joint.mul(.55)))
+    floorMaterial.roughnessNode = mix(float(.4), float(.72), read.roughness).add(joint.mul(.3)).clamp(.05, 1)
+    // the photograph's relief, laid on a face whose tangent runs east and bitangent north
+    const bent = vec3(read.normal.x.mul(.6), read.normal.z, read.normal.y.mul(-.6)).normalize()
+    floorMaterial.normalNode = bent.transformDirection(cameraViewMatrix)
+    floorMaterial.aoNode = read.occlusion.mul(underTable)
+  }
+  floorMaterial.name = 'vinci/collection-reading-room/floor'
 
   const darkMaterial = new MeshStandardNodeMaterial({ color: '#141312', roughness: .82, metalness: 0 })
   darkMaterial.name = 'vinci/collection-reading-room/backing'
@@ -213,7 +247,7 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
     leatherMaterial.roughnessNode = float(.5).add(mx_noise_float(P.mul(vec3(90, 90, 90))).mul(.08))
   }
   leatherMaterial.name = 'vinci/collection-reading-room/leather'
-  for (const m of [oakMaterial, darkMaterial, bronzeMaterial, brass, enamel, cordMaterial, leatherMaterial]) { adopt(m); materials.push(m) }
+  for (const m of [oakMaterial, floorMaterial, darkMaterial, bronzeMaterial, brass, enamel, cordMaterial, leatherMaterial]) { adopt(m); materials.push(m) }
   materials.push(glow)
 
   const stampMesh = (mesh: Mesh, name: string): Mesh => {
@@ -226,6 +260,7 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
   }
   const batch = (pieces: Piece[]): BufferGeometry => { const b = new Batch(); for (const q of pieces) b.piece(q); return b.geometry() }
   stampMesh(new Mesh(batch(oak), oakMaterial), 'oak')
+  stampMesh(new Mesh(batch(floor), floorMaterial), 'floor')
   stampMesh(new Mesh(batch(dark), darkMaterial), 'backing')
   stampMesh(new Mesh(batch(bronze), bronzeMaterial), 'bronze')
 
