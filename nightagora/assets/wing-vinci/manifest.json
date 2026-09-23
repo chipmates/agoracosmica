@@ -33,11 +33,11 @@
       "class": "GENERATED",
       "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
-      "prompt": "Deterministic tapering trunks, unequal forks, terminal sprays and folded October leaves. Placement and size conjectural; no photograph sampled. Add six fixed conjectural middle-distance trees on the northern and western hillside at the six EN positions declared in the planting record, retaining all original near/distant planting and excluding mapped water as well as construction and circulation. All tiers retain the same proposed tree positions; this is scenic modern-garden character, not a period planting map. Connect the existing trunks and knee forks with shared parallel-transported rings and continuous taper normals. The four near trees receive one buttressed collar each, with individually sampled embedded toes. Root shapes and dimensions remain conjectural; all current tree positions and leaf materials are retained. Every same-tier triangle and attribute is retained in two spatial branch clusters plus eight leaf clusters in calm, or four branch clusters plus sixteen leaf clusters in standard/hero. Native per-pass frustum culling uses their bounds; no camera-dependent population or shadow changes.",
+      "prompt": "Trees of 10 October 1517 (our 20 October) grown per species habit, every species and its state that week taken from the flora card (refs FLORA.md section 6) as a TYPE of the period, none documented at Cloux: walnut, field elm, field maple, hornbeam, wild cherry, alder, pollard white willow, black poplar, oak and pear. A trunk that runs or forks into leaders, scaffold limbs that fork toward the crown the species makes, second-order branches and twigs, each grown segment by segment and stopped at the crown skin or at a refused place. Every leaf of a near crown is its own card of its species outline (a compound leaf for walnut); a crown further off is carried by spray cards of the same leaf; the count follows the crown skin and the share the week has taken. Leaf and bark maps drawn from recipes in code, no photograph sampled. Leaves carry the key light through themselves and cast through one opaque triangle inside each outline, folded into the wing shadow body. Fallen leaves under and downwind of each crown, a third kept on walked pads, and along the north and west walls of the insertion court. No leaf or limb inside a building or within 3.2 m above a certified walking surface. Positions, sizes and planting are conjectural exhibition choices, not a period planting map.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
-      "date": "2026-09-10",
-      "sha256": "5559ff1c6a6bcfda3bdbb0de61a188df87b84294439777721934dd0993c9f6c9",
-      "note": "Q119 Q128 Q178 modern planting as character reference; recipe_file=src/wings/vinci/vegetation.ts; connected_trunk_and_knee_rings=parallel_transport; near_trunk_ring_sides=12; near_root_collars=4; root_collar_radius_in_trunk_radii=1.65..3.65; root_toe_embed_m=0.02; next_collar_ring_min_clearance_m=0.20; root_micropositions_shapes_dimensions=conjectural; partition_recipe=src/wings/vinci/dressing-partition.ts; partition_sha256=bd799c2eae138b44b709ec350dbdfb858932421ca3ba4f1407e16a9a42dad3a8; branch_clusters_calm_standard_hero=2,4,4; leaf_clusters_calm_standard_hero=8,16,16; partition_preserves=all_same_tier_attributes_winding_material_transforms_shadows"
+      "date": "2026-09-23",
+      "sha256": "a956e7915c6007faaa4cd492d7eeffa72420ee72f5f79a8b5020fad5cae8cae5",
+      "note": "FLORA.md section 6 species and autumn states as types; Q119 Q128 Q178 modern planting as branching character only; recipe_file=src/wings/vinci/vegetation.ts; companion_file=src/wings/vinci/tree-growth.ts; companion_sha256=432f9a4115ee62096ddf6c2a3525465e6098835fe4b4bf741b3f498fd35fe52f; companion_file=src/wings/vinci/leaf-maps.ts; companion_sha256=30ff0932adcfd8b1a5ac030349f43c93896b3fa43b21d3cd03e56b055a4174ae; companion_file=src/wings/vinci/wind.ts; companion_sha256=e1d0da0b23efb5c92171462c8c127ea0f2cb6975a2e97cfcc7dfa4dc2f7ccb98; clusters_near_far_hero_standard=6,3; clusters_near_far_calm=3,1; far_clusters_cast_no_shadow=true; walk_clearance_m=3.2; walk_margin_m=1.0; building_margin_m=0.45; wind=address_only"
     },
     {
       "id": "vinci/sky",
@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed to a pale grey at 30 per cent. Assumed weather, no observation claimed.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "ee6fdbc35c39cc6c795b5b3c2c2c5a2fff26720ef5b9de03bddc0be5398cc2ba",
+      "sha256": "aed573538b01b83baa7290682228d7ff80b9f058124de8e2e7b6e2ee92a5d71a",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=80c458f2cb5ccddb7fcedccda5df70e5cdccda7d9ca97d65ebfa6462920f61ef;"
     },
     {
@@ -3540,6 +3540,19 @@
       "date": "2026-09-21",
       "sha256": "1364940e73ca528ca77cfcde9b22def20f12e33c602cad5ea6caeb1895a2c254",
       "note": "The words are the story card's, the structure is this file's. No surface reads this layer yet. recipe_file=src/wings/vinci/story.ts"
+    },
+    {
+      "id": "vinci/wind",
+      "path": "procedural/wind/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
+      "display": true,
+      "prompt": "The wind of the hour as data on the wing clock: a light south-west breeze (assumed weather, as the sky label says) in harmonics of a 12 s loop, so any 12 s of it loops without a seam. It sways crowns, limbs and leaves by at most 0.16 m from their rest pose, and sends a few leaves from the near crowns to the ground inside each loop. Built only on an address that asks for the wind (the film); every live walk and every gate sees the rest pose. The falling leaves are not a rail solid and cast no shadow.",
+      "model": "Deterministic TypeScript and TSL procedural geometry",
+      "date": "2026-09-23",
+      "sha256": "e1d0da0b23efb5c92171462c8c127ea0f2cb6975a2e97cfcc7dfa4dc2f7ccb98",
+      "note": "recipe_file=src/wings/vinci/wind.ts; loop_s=12; max_sway_m=0.16; address=wind=1 or export"
     }
   ]
 }
