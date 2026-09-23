@@ -1,0 +1,6363 @@
+{
+ "schema_version": "1.0",
+ "provenance": {
+  "read": "2026-09-23",
+  "basis": "Which scan is which side, read from the scans themselves over each page map's measured kind: every scan of every codex seen in contact sheets, boards, guard leaves, printed matter and blanks outside the manuscript left out.",
+  "scope": "The sides the museum can show of each codex, in the order the reader turns them. Never a folio total of the manuscript.",
+  "windows": "The printed plate's rectangle on each page of the Arundel and Trivulzianus facsimiles, measured by forge/codex-windows.mjs with the reading of forge/leaf-windows.mjs; a reading under 0.88 of the book's median plate opens the whole page. No physical registration is claimed."
+ },
+ "codices": {
+  "madrid-I": {
+   "rule": "Scans 12 to 379, the manuscript from its first written face to its last. Scans 1 and 384 are the boards; 2 to 11 and 380 to 383 are guard leaves and the library title page, which the measured rule had read as faces.",
+   "sides": [
+    {
+     "file": "codices/madrid-i/p0012.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0013.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0014.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0015.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0016.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0017.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0018.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0019.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0020.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0021.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0022.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0023.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0024.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0025.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0026.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0027.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0028.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0029.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0030.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0031.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0032.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0033.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0034.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0035.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0036.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0037.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0038.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0039.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0040.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0041.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0042.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0043.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0044.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0045.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0046.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0047.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0048.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0049.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0050.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0051.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0052.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0053.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0054.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0055.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0056.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0057.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0058.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0059.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0060.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0061.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0062.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0063.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0064.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0065.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0066.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0067.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0068.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0069.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0070.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0071.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0072.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0073.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0074.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0075.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0076.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0077.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0078.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0079.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0080.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0081.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0082.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0083.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0084.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0085.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0086.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0087.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0088.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0089.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0090.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0091.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0092.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0093.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0094.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0095.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0096.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0097.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0098.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0099.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0100.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0101.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0102.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0103.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0104.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0105.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0106.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0107.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0108.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0109.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0110.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0111.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0112.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0113.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0114.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0115.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0116.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0117.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0118.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0119.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0120.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0121.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0122.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0123.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0124.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0125.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0126.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0127.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0128.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0129.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0130.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0131.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0132.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0133.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0134.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0135.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0136.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0137.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0138.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0139.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0140.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0141.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0142.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0143.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0144.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0145.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0146.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0147.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0148.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0149.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0150.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0151.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0152.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0153.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0154.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0155.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0156.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0157.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0158.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0159.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0160.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0161.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0162.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0163.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0164.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0165.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0166.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0167.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0168.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0169.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0170.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0171.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0172.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0173.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0174.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0175.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0176.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0177.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0178.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0179.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0180.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0181.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0182.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0183.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0184.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0185.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0186.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0187.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0188.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0189.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0190.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0191.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0192.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0193.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0194.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0195.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0196.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0197.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0198.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0199.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0200.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0201.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0202.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0203.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0204.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0205.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0206.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0207.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0208.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0209.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0210.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0211.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0212.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0213.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0214.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0215.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0216.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0217.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0218.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0219.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0220.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0221.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0222.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0223.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0224.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0225.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0226.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0227.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0228.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0229.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0230.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0231.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0232.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0233.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0234.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0235.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0236.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0237.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0238.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0239.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0240.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0241.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0242.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0243.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0244.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0245.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0246.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0247.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0248.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0249.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0250.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0251.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0252.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0253.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0254.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0255.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0256.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0257.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0258.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0259.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0260.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0261.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0262.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0263.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0264.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0265.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0266.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0267.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0268.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0269.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0270.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0271.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0272.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0273.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0274.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0275.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0276.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0277.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0278.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0279.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0280.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0281.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0282.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0283.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0284.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0285.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0286.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0287.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0288.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0289.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0290.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0291.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0292.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0293.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0294.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0295.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0296.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0297.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0298.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0299.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0300.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0301.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0302.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0303.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0304.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0305.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0306.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0307.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0308.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0309.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0310.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0311.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0312.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0313.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0314.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0315.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0316.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0317.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0318.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0319.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0320.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0321.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0322.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0323.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0324.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0325.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0326.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0327.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0328.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0329.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0330.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0331.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0332.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0333.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0334.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0335.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0336.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0337.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0338.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0339.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0340.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0341.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0342.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0343.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0344.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0345.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0346.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0347.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0348.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0349.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0350.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0351.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0352.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0353.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0354.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0355.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0356.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0357.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0358.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0359.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0360.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0361.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0362.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0363.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0364.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0365.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0366.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0367.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0368.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0369.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0370.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0371.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0372.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0373.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0374.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0375.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0376.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0377.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0378.jpg"
+    },
+    {
+     "file": "codices/madrid-i/p0379.jpg"
+    }
+   ]
+  },
+  "madrid-II": {
+   "rule": "Scans 9 to 324, the manuscript from its first face to its last, blank leaves of the manuscript kept in place. Scans 1 to 8 are guard leaves and the library title page, 325 to 330 guard leaves.",
+   "sides": [
+    {
+     "file": "codices/madrid-ii/p0009.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0010.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0011.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0012.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0013.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0014.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0015.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0016.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0017.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0018.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0019.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0020.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0021.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0022.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0023.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0024.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0025.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0026.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0027.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0028.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0029.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0030.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0031.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0032.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0033.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0034.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0035.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0036.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0037.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0038.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0039.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0040.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0041.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0042.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0043.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0044.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0045.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0046.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0047.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0048.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0049.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0050.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0051.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0052.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0053.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0054.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0055.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0056.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0057.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0058.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0059.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0060.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0061.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0062.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0063.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0064.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0065.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0066.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0067.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0068.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0069.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0070.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0071.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0072.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0073.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0074.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0075.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0076.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0077.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0078.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0079.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0080.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0081.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0082.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0083.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0084.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0085.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0086.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0087.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0088.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0089.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0090.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0091.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0092.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0093.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0094.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0095.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0096.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0097.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0098.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0099.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0100.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0101.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0102.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0103.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0104.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0105.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0106.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0107.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0108.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0109.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0110.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0111.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0112.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0113.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0114.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0115.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0116.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0117.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0118.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0119.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0120.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0121.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0122.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0123.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0124.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0125.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0126.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0127.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0128.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0129.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0130.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0131.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0132.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0133.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0134.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0135.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0136.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0137.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0138.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0139.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0140.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0141.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0142.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0143.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0144.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0145.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0146.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0147.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0148.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0149.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0150.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0151.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0152.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0153.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0154.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0155.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0156.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0157.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0158.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0159.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0160.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0161.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0162.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0163.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0164.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0165.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0166.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0167.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0168.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0169.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0170.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0171.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0172.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0173.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0174.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0175.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0176.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0177.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0178.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0179.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0180.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0181.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0182.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0183.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0184.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0185.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0186.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0187.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0188.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0189.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0190.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0191.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0192.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0193.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0194.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0195.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0196.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0197.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0198.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0199.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0200.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0201.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0202.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0203.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0204.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0205.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0206.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0207.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0208.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0209.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0210.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0211.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0212.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0213.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0214.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0215.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0216.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0217.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0218.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0219.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0220.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0221.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0222.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0223.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0224.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0225.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0226.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0227.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0228.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0229.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0230.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0231.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0232.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0233.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0234.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0235.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0236.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0237.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0238.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0239.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0240.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0241.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0242.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0243.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0244.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0245.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0246.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0247.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0248.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0249.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0250.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0251.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0252.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0253.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0254.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0255.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0256.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0257.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0258.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0259.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0260.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0261.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0262.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0263.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0264.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0265.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0266.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0267.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0268.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0269.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0270.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0271.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0272.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0273.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0274.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0275.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0276.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0277.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0278.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0279.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0280.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0281.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0282.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0283.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0284.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0285.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0286.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0287.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0288.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0289.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0290.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0291.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0292.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0293.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0294.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0295.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0296.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0297.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0298.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0299.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0300.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0301.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0302.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0303.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0304.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0305.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0306.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0307.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0308.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0309.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0310.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0311.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0312.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0313.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0314.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0315.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0316.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0317.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0318.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0319.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0320.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0321.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0322.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0323.jpg"
+    },
+    {
+     "file": "codices/madrid-ii/p0324.jpg"
+    }
+   ]
+  },
+  "birds": {
+   "rule": "All 36 numbered faces, folio 1 recto to 18 verso, as the map names them.",
+   "sides": [
+    {
+     "file": "codices/birds/p0001.jpg",
+     "folio": "1r"
+    },
+    {
+     "file": "codices/birds/p0002.jpg",
+     "folio": "1v"
+    },
+    {
+     "file": "codices/birds/p0003.jpg",
+     "folio": "2r"
+    },
+    {
+     "file": "codices/birds/p0004.jpg",
+     "folio": "2v"
+    },
+    {
+     "file": "codices/birds/p0005.jpg",
+     "folio": "3r"
+    },
+    {
+     "file": "codices/birds/p0006.jpg",
+     "folio": "3v"
+    },
+    {
+     "file": "codices/birds/p0007.jpg",
+     "folio": "4r"
+    },
+    {
+     "file": "codices/birds/p0008.jpg",
+     "folio": "4v"
+    },
+    {
+     "file": "codices/birds/p0009.jpg",
+     "folio": "5r"
+    },
+    {
+     "file": "codices/birds/p0010.jpg",
+     "folio": "5v"
+    },
+    {
+     "file": "codices/birds/p0011.jpg",
+     "folio": "6r"
+    },
+    {
+     "file": "codices/birds/p0012.jpg",
+     "folio": "6v"
+    },
+    {
+     "file": "codices/birds/p0013.jpg",
+     "folio": "7r"
+    },
+    {
+     "file": "codices/birds/p0014.jpg",
+     "folio": "7v"
+    },
+    {
+     "file": "codices/birds/p0015.jpg",
+     "folio": "8r"
+    },
+    {
+     "file": "codices/birds/p0016.jpg",
+     "folio": "8v"
+    },
+    {
+     "file": "codices/birds/p0017.jpg",
+     "folio": "9r"
+    },
+    {
+     "file": "codices/birds/p0018.jpg",
+     "folio": "9v"
+    },
+    {
+     "file": "codices/birds/p0019.jpg",
+     "folio": "10r"
+    },
+    {
+     "file": "codices/birds/p0020.jpg",
+     "folio": "10v"
+    },
+    {
+     "file": "codices/birds/p0021.jpg",
+     "folio": "11r"
+    },
+    {
+     "file": "codices/birds/p0022.jpg",
+     "folio": "11v"
+    },
+    {
+     "file": "codices/birds/p0023.jpg",
+     "folio": "12r"
+    },
+    {
+     "file": "codices/birds/p0024.jpg",
+     "folio": "12v"
+    },
+    {
+     "file": "codices/birds/p0025.jpg",
+     "folio": "13r"
+    },
+    {
+     "file": "codices/birds/p0026.jpg",
+     "folio": "13v"
+    },
+    {
+     "file": "codices/birds/p0027.jpg",
+     "folio": "14r"
+    },
+    {
+     "file": "codices/birds/p0028.jpg",
+     "folio": "14v"
+    },
+    {
+     "file": "codices/birds/p0029.jpg",
+     "folio": "15r"
+    },
+    {
+     "file": "codices/birds/p0030.jpg",
+     "folio": "15v"
+    },
+    {
+     "file": "codices/birds/p0031.jpg",
+     "folio": "16r"
+    },
+    {
+     "file": "codices/birds/p0032.jpg",
+     "folio": "16v"
+    },
+    {
+     "file": "codices/birds/p0033.jpg",
+     "folio": "17r"
+    },
+    {
+     "file": "codices/birds/p0034.jpg",
+     "folio": "17v"
+    },
+    {
+     "file": "codices/birds/p0035.jpg",
+     "folio": "18r"
+    },
+    {
+     "file": "codices/birds/p0036.jpg",
+     "folio": "18v"
+    }
+   ]
+  },
+  "trivulzianus": {
+   "rule": "The 94 heliographic plates of the 1891 facsimile, in the volume's order: every scan the library labels [1r] to [94r] (it gives no [45r]), and scan 194, a plate it labels [59v]. Scans 70 and 88 are plates the measured rule had read as text; 262 and 304 are printed pages it had read as plates. No folio is inferred: the library's labels count plates.",
+   "sides": [
+    {
+     "file": "codices/trivulzianus/p0022.jpg",
+     "window": {
+      "left": 0.261,
+      "top": 0.1844,
+      "right": 0.869,
+      "bottom": 0.8228
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0025.jpg",
+     "window": {
+      "left": 0.126,
+      "top": 0.1665,
+      "right": 0.724,
+      "bottom": 0.8146
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0028.jpg"
+    },
+    {
+     "file": "codices/trivulzianus/p0031.jpg",
+     "window": {
+      "left": 0.106,
+      "top": 0.1665,
+      "right": 0.709,
+      "bottom": 0.8146
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0034.jpg",
+     "window": {
+      "left": 0.256,
+      "top": 0.1699,
+      "right": 0.869,
+      "bottom": 0.8011
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0037.jpg",
+     "window": {
+      "left": 0.101,
+      "top": 0.1589,
+      "right": 0.714,
+      "bottom": 0.8108
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0039.jpg",
+     "window": {
+      "left": 0.251,
+      "top": 0.1699,
+      "right": 0.864,
+      "bottom": 0.8083
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0043.jpg",
+     "window": {
+      "left": 0.101,
+      "top": 0.1551,
+      "right": 0.699,
+      "bottom": 0.8032
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0046.jpg",
+     "window": {
+      "left": 0.246,
+      "top": 0.1772,
+      "right": 0.869,
+      "bottom": 0.8156
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0049.jpg",
+     "window": {
+      "left": 0.106,
+      "top": 0.174,
+      "right": 0.709,
+      "bottom": 0.8222
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0052.jpg",
+     "window": {
+      "left": 0.261,
+      "top": 0.1844,
+      "right": 0.874,
+      "bottom": 0.8192
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0055.jpg",
+     "window": {
+      "left": 0.106,
+      "top": 0.174,
+      "right": 0.699,
+      "bottom": 0.8146
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0058.jpg",
+     "window": {
+      "left": 0.266,
+      "top": 0.1844,
+      "right": 0.884,
+      "bottom": 0.8192
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0061.jpg",
+     "window": {
+      "left": 0.116,
+      "top": 0.193,
+      "right": 0.714,
+      "bottom": 0.8373
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0064.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.1775,
+      "right": 0.889,
+      "bottom": 0.8262
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0067.jpg",
+     "window": {
+      "left": 0.301,
+      "top": 0.1702,
+      "right": 0.894,
+      "bottom": 0.8146
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0070.jpg"
+    },
+    {
+     "file": "codices/trivulzianus/p0073.jpg",
+     "window": {
+      "left": 0.301,
+      "top": 0.174,
+      "right": 0.894,
+      "bottom": 0.8108
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0076.jpg",
+     "window": {
+      "left": 0.266,
+      "top": 0.1812,
+      "right": 0.874,
+      "bottom": 0.8299
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0079.jpg"
+    },
+    {
+     "file": "codices/trivulzianus/p0082.jpg",
+     "window": {
+      "left": 0.301,
+      "top": 0.1812,
+      "right": 0.899,
+      "bottom": 0.8299
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0085.jpg"
+    },
+    {
+     "file": "codices/trivulzianus/p0088.jpg"
+    },
+    {
+     "file": "codices/trivulzianus/p0091.jpg",
+     "window": {
+      "left": 0.126,
+      "top": 0.1768,
+      "right": 0.704,
+      "bottom": 0.8271
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0094.jpg",
+     "window": {
+      "left": 0.291,
+      "top": 0.1701,
+      "right": 0.894,
+      "bottom": 0.8188
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0097.jpg",
+     "window": {
+      "left": 0.096,
+      "top": 0.1729,
+      "right": 0.679,
+      "bottom": 0.8232
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0100.jpg",
+     "window": {
+      "left": 0.281,
+      "top": 0.1701,
+      "right": 0.879,
+      "bottom": 0.8114
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0103.jpg",
+     "window": {
+      "left": 0.111,
+      "top": 0.1806,
+      "right": 0.699,
+      "bottom": 0.8309
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0106.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.1701,
+      "right": 0.889,
+      "bottom": 0.8151
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0109.jpg",
+     "window": {
+      "left": 0.126,
+      "top": 0.1768,
+      "right": 0.709,
+      "bottom": 0.8271
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0112.jpg",
+     "window": {
+      "left": 0.101,
+      "top": 0.1819,
+      "right": 0.704,
+      "bottom": 0.8293
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0115.jpg",
+     "window": {
+      "left": 0.106,
+      "top": 0.1768,
+      "right": 0.694,
+      "bottom": 0.8309
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0118.jpg",
+     "window": {
+      "left": 0.301,
+      "top": 0.1707,
+      "right": 0.889,
+      "bottom": 0.8144
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0121.jpg",
+     "window": {
+      "left": 0.106,
+      "top": 0.1729,
+      "right": 0.689,
+      "bottom": 0.8271
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0124.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.1744,
+      "right": 0.879,
+      "bottom": 0.8181
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0127.jpg",
+     "window": {
+      "left": 0.101,
+      "top": 0.1652,
+      "right": 0.679,
+      "bottom": 0.8155
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0130.jpg",
+     "window": {
+      "left": 0.281,
+      "top": 0.1707,
+      "right": 0.884,
+      "bottom": 0.8107
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0133.jpg",
+     "window": {
+      "left": 0.111,
+      "top": 0.1845,
+      "right": 0.699,
+      "bottom": 0.8348
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0136.jpg",
+     "window": {
+      "left": 0.281,
+      "top": 0.1758,
+      "right": 0.884,
+      "bottom": 1
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0139.jpg"
+    },
+    {
+     "file": "codices/trivulzianus/p0142.jpg",
+     "window": {
+      "left": 0.291,
+      "top": 0.1833,
+      "right": 0.879,
+      "bottom": 1
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0145.jpg",
+     "window": {
+      "left": 0.121,
+      "top": 0.1702,
+      "right": 0.704,
+      "bottom": 0.8108
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0148.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.1833,
+      "right": 0.879,
+      "bottom": 1
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0151.jpg",
+     "window": {
+      "left": 0.096,
+      "top": 0.1816,
+      "right": 0.689,
+      "bottom": 0.8222
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0154.jpg",
+     "window": {
+      "left": 0.291,
+      "top": 0.1734,
+      "right": 0.884,
+      "bottom": 1
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0157.jpg",
+     "window": {
+      "left": 0.106,
+      "top": 0.1854,
+      "right": 0.704,
+      "bottom": 0.8298
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0160.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.1809,
+      "right": 0.879,
+      "bottom": 0.8229
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0163.jpg",
+     "window": {
+      "left": 0.101,
+      "top": 0.1816,
+      "right": 0.699,
+      "bottom": 1
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0166.jpg",
+     "window": {
+      "left": 0.301,
+      "top": 0.1771,
+      "right": 0.899,
+      "bottom": 0.8266
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0169.jpg",
+     "window": {
+      "left": 0.111,
+      "top": 0.1854,
+      "right": 0.704,
+      "bottom": 1
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0172.jpg",
+     "window": {
+      "left": 0.116,
+      "top": 0,
+      "right": 0.714,
+      "bottom": 0.8153
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0175.jpg",
+     "window": {
+      "left": 0.126,
+      "top": 0.1816,
+      "right": 0.719,
+      "bottom": 0.8222
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0178.jpg",
+     "window": {
+      "left": 0.131,
+      "top": 0.1734,
+      "right": 0.724,
+      "bottom": 0.8191
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0181.jpg",
+     "window": {
+      "left": 0.146,
+      "top": 0.1816,
+      "right": 0.739,
+      "bottom": 1
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0184.jpg",
+     "window": {
+      "left": 0.251,
+      "top": 0.1771,
+      "right": 0.839,
+      "bottom": 1
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0187.jpg",
+     "window": {
+      "left": 0.161,
+      "top": 0.1702,
+      "right": 0.749,
+      "bottom": 0.8108
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0190.jpg",
+     "window": {
+      "left": 0.271,
+      "top": 0.1809,
+      "right": 0.864,
+      "bottom": 1
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0193.jpg",
+     "window": {
+      "left": 0.141,
+      "top": 0.1854,
+      "right": 0.729,
+      "bottom": 0.8298
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0194.jpg",
+     "window": {
+      "left": 0.296,
+      "top": 0.1922,
+      "right": 0.884,
+      "bottom": 0.838
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0197.jpg",
+     "window": {
+      "left": 0.131,
+      "top": 0.174,
+      "right": 0.724,
+      "bottom": 1
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0200.jpg",
+     "window": {
+      "left": 0.261,
+      "top": 0.1823,
+      "right": 0.844,
+      "bottom": 1
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0203.jpg",
+     "window": {
+      "left": 0.121,
+      "top": 0.1854,
+      "right": 0.709,
+      "bottom": 0.8222
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0206.jpg",
+     "window": {
+      "left": 0.281,
+      "top": 0.1796,
+      "right": 1,
+      "bottom": 1
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0209.jpg",
+     "window": {
+      "left": 0.126,
+      "top": 0.1892,
+      "right": 0.719,
+      "bottom": 1
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0212.jpg",
+     "window": {
+      "left": 0.301,
+      "top": 0.1757,
+      "right": 0.869,
+      "bottom": 0.8204
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0215.jpg",
+     "window": {
+      "left": 0.116,
+      "top": 0.1795,
+      "right": 0.709,
+      "bottom": 1
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0218.jpg",
+     "window": {
+      "left": 0.291,
+      "top": 0.1796,
+      "right": 0.854,
+      "bottom": 1
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0221.jpg"
+    },
+    {
+     "file": "codices/trivulzianus/p0224.jpg",
+     "window": {
+      "left": 0.291,
+      "top": 0.1835,
+      "right": 0.849,
+      "bottom": 0.8321
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0227.jpg",
+     "window": {
+      "left": 0.141,
+      "top": 0.1795,
+      "right": 0.729,
+      "bottom": 0.8205
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0230.jpg",
+     "window": {
+      "left": 0.291,
+      "top": 0.1796,
+      "right": 0.859,
+      "bottom": 1
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0233.jpg"
+    },
+    {
+     "file": "codices/trivulzianus/p0236.jpg",
+     "window": {
+      "left": 0.306,
+      "top": 0.1796,
+      "right": 0.874,
+      "bottom": 1
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0239.jpg",
+     "window": {
+      "left": 0.131,
+      "top": 0.1833,
+      "right": 0.714,
+      "bottom": 0.828
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0242.jpg",
+     "window": {
+      "left": 0.306,
+      "top": 0.1796,
+      "right": 0.879,
+      "bottom": 0.8321
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0245.jpg",
+     "window": {
+      "left": 0.141,
+      "top": 0.1795,
+      "right": 0.719,
+      "bottom": 0.8242
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0248.jpg",
+     "window": {
+      "left": 0.311,
+      "top": 0.1757,
+      "right": 0.879,
+      "bottom": 0.8243
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0251.jpg",
+     "window": {
+      "left": 0.131,
+      "top": 0.19,
+      "right": 0.724,
+      "bottom": 0.8361
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0254.jpg",
+     "window": {
+      "left": 0.301,
+      "top": 0.1835,
+      "right": 0.874,
+      "bottom": 0.836
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0257.jpg"
+    },
+    {
+     "file": "codices/trivulzianus/p0260.jpg",
+     "window": {
+      "left": 0.311,
+      "top": 0.1757,
+      "right": 1,
+      "bottom": 1
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0263.jpg",
+     "window": {
+      "left": 0,
+      "top": 0.187,
+      "right": 0.724,
+      "bottom": 1
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0266.jpg",
+     "window": {
+      "left": 0.316,
+      "top": 0.1757,
+      "right": 0.884,
+      "bottom": 0.8321
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0269.jpg",
+     "window": {
+      "left": 0.131,
+      "top": 0.1908,
+      "right": 0.714,
+      "bottom": 0.8355
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0272.jpg",
+     "window": {
+      "left": 0.311,
+      "top": 0.1796,
+      "right": 0.879,
+      "bottom": 0.8282
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0275.jpg",
+     "window": {
+      "left": 0.136,
+      "top": 0.1908,
+      "right": 0.719,
+      "bottom": 1
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0278.jpg",
+     "window": {
+      "left": 0.306,
+      "top": 0.1796,
+      "right": 0.879,
+      "bottom": 1
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0281.jpg",
+     "window": {
+      "left": 0,
+      "top": 0.1908,
+      "right": 0.724,
+      "bottom": 1
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0284.jpg",
+     "window": {
+      "left": 0.316,
+      "top": 0.1796,
+      "right": 0.889,
+      "bottom": 0.836
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0287.jpg",
+     "window": {
+      "left": 0.156,
+      "top": 0.1908,
+      "right": 0.739,
+      "bottom": 0.8355
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0290.jpg",
+     "window": {
+      "left": 0.311,
+      "top": 0.1796,
+      "right": 0.884,
+      "bottom": 0.8321
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0293.jpg",
+     "window": {
+      "left": 0.136,
+      "top": 0.187,
+      "right": 0.729,
+      "bottom": 1
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0296.jpg",
+     "window": {
+      "left": 0.306,
+      "top": 0.1718,
+      "right": 0.874,
+      "bottom": 0.8282
+     }
+    },
+    {
+     "file": "codices/trivulzianus/p0301.jpg"
+    }
+   ]
+  },
+  "paris-A": {
+   "rule": "The fifteen named faces, in the order the register lists them.",
+   "sides": [
+    {
+     "file": "codices/paris-a/p0001.jpg",
+     "folio": "36r",
+     "shows_en": "Paris manuscript A, folio 36r. One of fifteen faces here, and the book itself is not on the table.",
+     "shows_de": "Pariser Manuskript A, Blatt 36r. Eines von fünfzehn Blättern, der Band selbst liegt nicht hier."
+    },
+    {
+     "file": "codices/paris-a/p0002.jpg",
+     "folio": "37r",
+     "shows_en": "Paris manuscript A, folio 37r. One of fifteen faces here, and the book itself is not on the table.",
+     "shows_de": "Pariser Manuskript A, Blatt 37r. Eines von fünfzehn Blättern, der Band selbst liegt nicht hier."
+    },
+    {
+     "file": "codices/paris-a/p0003.jpg",
+     "folio": "37v",
+     "shows_en": "Paris manuscript A, folio 37v. One of fifteen faces here, and the book itself is not on the table.",
+     "shows_de": "Pariser Manuskript A, Blatt 37v. Eines von fünfzehn Blättern, der Band selbst liegt nicht hier."
+    },
+    {
+     "file": "codices/paris-a/p0004.jpg",
+     "folio": "38r",
+     "shows_en": "Paris manuscript A, folio 38r. One of fifteen faces here, and the book itself is not on the table.",
+     "shows_de": "Pariser Manuskript A, Blatt 38r. Eines von fünfzehn Blättern, der Band selbst liegt nicht hier."
+    },
+    {
+     "file": "codices/paris-a/p0005.jpg",
+     "folio": "38v",
+     "shows_en": "Paris manuscript A, folio 38v. One of fifteen faces here, and the book itself is not on the table.",
+     "shows_de": "Pariser Manuskript A, Blatt 38v. Eines von fünfzehn Blättern, der Band selbst liegt nicht hier."
+    },
+    {
+     "file": "codices/paris-a/p0006.jpg",
+     "folio": "39r",
+     "shows_en": "Paris manuscript A, folio 39r. One of fifteen faces here, and the book itself is not on the table.",
+     "shows_de": "Pariser Manuskript A, Blatt 39r. Eines von fünfzehn Blättern, der Band selbst liegt nicht hier."
+    },
+    {
+     "file": "codices/paris-a/p0007.jpg",
+     "folio": "39v",
+     "shows_en": "Paris manuscript A, folio 39v. One of fifteen faces here, and the book itself is not on the table.",
+     "shows_de": "Pariser Manuskript A, Blatt 39v. Eines von fünfzehn Blättern, der Band selbst liegt nicht hier."
+    },
+    {
+     "file": "codices/paris-a/p0008.jpg",
+     "folio": "40r",
+     "shows_en": "Paris manuscript A, folio 40r. One of fifteen faces here, and the book itself is not on the table.",
+     "shows_de": "Pariser Manuskript A, Blatt 40r. Eines von fünfzehn Blättern, der Band selbst liegt nicht hier."
+    },
+    {
+     "file": "codices/paris-a/p0009.jpg",
+     "folio": "40v",
+     "shows_en": "Paris manuscript A, folio 40v. One of fifteen faces here, and the book itself is not on the table.",
+     "shows_de": "Pariser Manuskript A, Blatt 40v. Eines von fünfzehn Blättern, der Band selbst liegt nicht hier."
+    },
+    {
+     "file": "codices/paris-a/p0010.jpg",
+     "folio": "41r",
+     "shows_en": "Paris manuscript A, folio 41r. One of fifteen faces here, and the book itself is not on the table.",
+     "shows_de": "Pariser Manuskript A, Blatt 41r. Eines von fünfzehn Blättern, der Band selbst liegt nicht hier."
+    },
+    {
+     "file": "codices/paris-a/p0011.jpg",
+     "folio": "42r",
+     "shows_en": "Paris manuscript A, folio 42r. One of fifteen faces here, and the book itself is not on the table.",
+     "shows_de": "Pariser Manuskript A, Blatt 42r. Eines von fünfzehn Blättern, der Band selbst liegt nicht hier."
+    },
+    {
+     "file": "codices/paris-a/p0012.jpg",
+     "folio": "3r",
+     "shows_en": "Paris manuscript A, folio 3r. One of fifteen faces here, and the book itself is not on the table.",
+     "shows_de": "Pariser Manuskript A, Blatt 3r. Eines von fünfzehn Blättern, der Band selbst liegt nicht hier."
+    },
+    {
+     "file": "codices/paris-a/p0013.jpg",
+     "folio": "10r",
+     "shows_en": "Paris manuscript A, folio 10r. One of fifteen faces here, and the book itself is not on the table.",
+     "shows_de": "Pariser Manuskript A, Blatt 10r. Eines von fünfzehn Blättern, der Band selbst liegt nicht hier."
+    },
+    {
+     "file": "codices/paris-a/p0014.jpg",
+     "folio": "41v",
+     "shows_en": "Paris manuscript A, folio 41v. One of fifteen faces here, and the book itself is not on the table.",
+     "shows_de": "Pariser Manuskript A, Blatt 41v. Eines von fünfzehn Blättern, der Band selbst liegt nicht hier."
+    },
+    {
+     "file": "codices/paris-a/p0015.jpg",
+     "folio": "42v",
+     "shows_en": "Paris manuscript A, folio 42v. One of fifteen faces here, and the book itself is not on the table.",
+     "shows_de": "Pariser Manuskript A, Blatt 42v. Eines von fünfzehn Blättern, der Band selbst liegt nicht hier."
+    }
+   ]
+  },
+  "atlanticus": {
+   "rule": "The 44 of the 45 files the store admits for display, pages and details, in the register's order; the folio where the file's own record names one. File 5 is a photograph through glass inside a modern mount and is not displayed. An English line stands only where the record wrote one for this museum.",
+   "sides": [
+    {
+     "file": "codices/atlanticus/p0001.jpg",
+     "folio": "844",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0002.jpg",
+     "folio": "858r",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0003.jpg",
+     "folio": "153r",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0004.jpg",
+     "folio": "1069r",
+     "shows_en": "Codex Atlanticus. A device for breathing under water, and machines that raise and pump water.",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0006.jpg",
+     "folio": "1r",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0007.jpg",
+     "folio": "1006v",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0008.jpg",
+     "folio": "104r",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0009.jpg",
+     "folio": "1058v",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0010.jpg",
+     "folio": "1069r",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0011.jpg",
+     "folio": "116r",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0012.jpg",
+     "folio": "117r",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0013.jpg",
+     "folio": "12r",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0014.jpg",
+     "folio": "139r",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0015.jpg",
+     "folio": "149r",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0016.jpg",
+     "folio": "199v",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0017.jpg",
+     "folio": "21r",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0018.jpg",
+     "folio": "26v",
+     "shows_en": "Codex Atlanticus. On the left a water lifting machine, on the right a pump for a well inside a building.",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0019.jpg",
+     "folio": "272v",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0020.jpg",
+     "folio": "29r",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0021.jpg",
+     "folio": "3r",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0022.jpg",
+     "folio": "307v",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0023.jpg",
+     "folio": "33r",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0024.jpg",
+     "folio": "4r",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0025.jpg",
+     "folio": "455r",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0026.jpg",
+     "folio": "49r",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0027.jpg",
+     "folio": "5r",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0028.jpg",
+     "folio": "663r",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0029.jpg",
+     "folio": "71r",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0030.jpg",
+     "folio": "719r",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0031.jpg",
+     "folio": "72r",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0032.jpg",
+     "folio": "812r",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0033.jpg",
+     "folio": "844r",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0034.jpg",
+     "folio": "845r",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0035.jpg",
+     "folio": "851r",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0036.jpg",
+     "folio": "858r",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0037.jpg",
+     "folio": "860r",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0038.jpg",
+     "folio": "873r",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0039.jpg",
+     "folio": "909v",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0040.jpg",
+     "folio": "145",
+     "shows_en": "Codex Atlanticus. Huge sling to throw stones.",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0041.jpg",
+     "folio": null,
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0042.jpg",
+     "folio": null,
+     "shows_en": "Codex Atlanticus. Studies for the dome of Milan Cathedral.",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0043.jpg",
+     "folio": "33",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0044.jpg",
+     "folio": "1070",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    },
+    {
+     "file": "codices/atlanticus/p0045.jpg",
+     "folio": "159",
+     "shows_de": "Codex Atlanticus. Blatt oder Ausschnitt aus der Handschrift."
+    }
+   ]
+  },
+  "arundel": {
+   "rule": "The plates of parts 1 and 3 of the printed facsimile: part 1 scans 33 to 399 and part 3 scans 19 to 219, every other scan, each followed by the page that prints its transcription. The folio of each plate is the one that transcription page prints above its text, read by OCR and checked by eye. Scans 117 and 119 of part 3 are plates on coloured paper the measured rule had read as text; scan 266 of part 1 is a printed page it had read as a plate.",
+   "sides": [
+    {
+     "file": "codices/arundel-1/p0033.jpg",
+     "folio": "1r",
+     "print": "codices/arundel-1/p0034.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.2002,
+      "right": 0.819,
+      "bottom": 0.7445
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0035.jpg",
+     "folio": "1v",
+     "print": "codices/arundel-1/p0036.jpg",
+     "window": {
+      "left": 0.281,
+      "top": 0.2417,
+      "right": 0.814,
+      "bottom": 0.7825
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0037.jpg",
+     "folio": "2r",
+     "print": "codices/arundel-1/p0038.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.214,
+      "right": 0.824,
+      "bottom": 0.7652
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0039.jpg",
+     "folio": "2v",
+     "print": "codices/arundel-1/p0040.jpg",
+     "window": {
+      "left": 0.296,
+      "top": 0.214,
+      "right": 0.829,
+      "bottom": 0.7618
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0041.jpg",
+     "folio": "3r",
+     "print": "codices/arundel-1/p0042.jpg",
+     "window": {
+      "left": 0.276,
+      "top": 0.2451,
+      "right": 0.814,
+      "bottom": 0.7964
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0043.jpg",
+     "folio": "3v",
+     "print": "codices/arundel-1/p0044.jpg"
+    },
+    {
+     "file": "codices/arundel-1/p0045.jpg",
+     "folio": "4r",
+     "print": "codices/arundel-1/p0046.jpg",
+     "window": {
+      "left": 0.296,
+      "top": 0.2036,
+      "right": 0.829,
+      "bottom": 0.7549
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0047.jpg",
+     "folio": "4v",
+     "print": "codices/arundel-1/p0048.jpg"
+    },
+    {
+     "file": "codices/arundel-1/p0049.jpg",
+     "folio": "5r",
+     "print": "codices/arundel-1/p0050.jpg",
+     "window": {
+      "left": 0.291,
+      "top": 0.214,
+      "right": 0.824,
+      "bottom": 0.7652
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0051.jpg",
+     "folio": "5v",
+     "print": "codices/arundel-1/p0052.jpg",
+     "window": {
+      "left": 0.276,
+      "top": 0.2071,
+      "right": 0.809,
+      "bottom": 0.7549
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0053.jpg",
+     "folio": "6r",
+     "print": "codices/arundel-1/p0054.jpg",
+     "window": {
+      "left": 0.261,
+      "top": 0.2071,
+      "right": 0.794,
+      "bottom": 0.7618
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0055.jpg",
+     "folio": "6v",
+     "print": "codices/arundel-1/p0056.jpg",
+     "window": {
+      "left": 0.291,
+      "top": 0.2105,
+      "right": 0.794,
+      "bottom": 0.7514
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0057.jpg",
+     "folio": "7r",
+     "print": "codices/arundel-1/p0058.jpg",
+     "window": {
+      "left": 0.256,
+      "top": 0.1967,
+      "right": 0.789,
+      "bottom": 0.7479
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0059.jpg",
+     "folio": "7v",
+     "print": "codices/arundel-1/p0060.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.2036,
+      "right": 0.809,
+      "bottom": 0.7514
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0061.jpg",
+     "folio": "8r",
+     "print": "codices/arundel-1/p0062.jpg",
+     "window": {
+      "left": 0.266,
+      "top": 0.2175,
+      "right": 0.794,
+      "bottom": 0.7722
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0063.jpg",
+     "folio": "8v",
+     "print": "codices/arundel-1/p0064.jpg",
+     "window": {
+      "left": 0.281,
+      "top": 0.2105,
+      "right": 0.804,
+      "bottom": 0.7583
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0065.jpg",
+     "folio": "9r",
+     "print": "codices/arundel-1/p0066.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.2105,
+      "right": 0.809,
+      "bottom": 0.7583
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0067.jpg",
+     "folio": "9v",
+     "print": "codices/arundel-1/p0068.jpg",
+     "window": {
+      "left": 0.281,
+      "top": 0.2036,
+      "right": 0.804,
+      "bottom": 0.7479
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0069.jpg",
+     "folio": "10r",
+     "print": "codices/arundel-1/p0070.jpg",
+     "window": {
+      "left": 0.276,
+      "top": 0.2002,
+      "right": 0.804,
+      "bottom": 0.7514
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0071.jpg",
+     "folio": "10v",
+     "print": "codices/arundel-1/p0072.jpg"
+    },
+    {
+     "file": "codices/arundel-1/p0073.jpg",
+     "folio": "11r",
+     "print": "codices/arundel-1/p0074.jpg",
+     "window": {
+      "left": 0.291,
+      "top": 0.2036,
+      "right": 0.819,
+      "bottom": 0.7549
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0075.jpg",
+     "folio": "11v",
+     "print": "codices/arundel-1/p0076.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.2002,
+      "right": 0.809,
+      "bottom": 0.7479
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0077.jpg",
+     "folio": "12r",
+     "print": "codices/arundel-1/p0078.jpg",
+     "window": {
+      "left": 0.281,
+      "top": 0.1932,
+      "right": 0.804,
+      "bottom": 0.7445
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0079.jpg",
+     "folio": "12v",
+     "print": "codices/arundel-1/p0080.jpg"
+    },
+    {
+     "file": "codices/arundel-1/p0081.jpg",
+     "folio": "13r",
+     "print": "codices/arundel-1/p0082.jpg",
+     "window": {
+      "left": 0.311,
+      "top": 0.2002,
+      "right": 0.834,
+      "bottom": 0.7479
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0083.jpg",
+     "folio": "16r",
+     "print": "codices/arundel-1/p0084.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.2036,
+      "right": 0.834,
+      "bottom": 0.7549
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0085.jpg",
+     "folio": "16v",
+     "print": "codices/arundel-1/p0086.jpg",
+     "window": {
+      "left": 0.281,
+      "top": 0.1967,
+      "right": 0.824,
+      "bottom": 0.7479
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0087.jpg",
+     "folio": "17r",
+     "print": "codices/arundel-1/p0088.jpg",
+     "window": {
+      "left": 0.276,
+      "top": 0.2036,
+      "right": 0.824,
+      "bottom": 0.7514
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0089.jpg",
+     "folio": "17v",
+     "print": "codices/arundel-1/p0090.jpg",
+     "window": {
+      "left": 0.306,
+      "top": 0.1967,
+      "right": 0.834,
+      "bottom": 0.7479
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0091.jpg",
+     "folio": "18r",
+     "print": "codices/arundel-1/p0092.jpg",
+     "window": {
+      "left": 0.316,
+      "top": 0.1967,
+      "right": 0.824,
+      "bottom": 0.7341
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0093.jpg",
+     "folio": "18v",
+     "print": "codices/arundel-1/p0094.jpg",
+     "window": {
+      "left": 0.316,
+      "top": 0.1967,
+      "right": 0.824,
+      "bottom": 0.7445
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0095.jpg",
+     "folio": "19r",
+     "print": "codices/arundel-1/p0096.jpg",
+     "window": {
+      "left": 0.316,
+      "top": 0.1967,
+      "right": 0.819,
+      "bottom": 0.7445
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0097.jpg",
+     "folio": "19v",
+     "print": "codices/arundel-1/p0098.jpg",
+     "window": {
+      "left": 0.301,
+      "top": 0.1932,
+      "right": 0.839,
+      "bottom": 0.741
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0099.jpg",
+     "folio": "20r",
+     "print": "codices/arundel-1/p0100.jpg",
+     "window": {
+      "left": 0.301,
+      "top": 0.1863,
+      "right": 0.834,
+      "bottom": 0.7341
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0101.jpg",
+     "folio": "20v",
+     "print": "codices/arundel-1/p0102.jpg",
+     "window": {
+      "left": 0.316,
+      "top": 0.1898,
+      "right": 0.829,
+      "bottom": 0.7341
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0103.jpg",
+     "folio": "23v",
+     "print": "codices/arundel-1/p0104.jpg",
+     "window": {
+      "left": 0.296,
+      "top": 0.1898,
+      "right": 0.829,
+      "bottom": 0.741
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0105.jpg",
+     "folio": "24r",
+     "print": "codices/arundel-1/p0106.jpg",
+     "window": {
+      "left": 0.316,
+      "top": 0.1863,
+      "right": 0.839,
+      "bottom": 0.7341
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0107.jpg",
+     "folio": "24v",
+     "print": "codices/arundel-1/p0108.jpg",
+     "window": {
+      "left": 0.301,
+      "top": 0.2002,
+      "right": 0.819,
+      "bottom": 0.7479
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0109.jpg",
+     "folio": "25r",
+     "print": "codices/arundel-1/p0110.jpg",
+     "window": {
+      "left": 0.291,
+      "top": 0.2071,
+      "right": 0.804,
+      "bottom": 0.7514
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0111.jpg",
+     "folio": "25v",
+     "print": "codices/arundel-1/p0112.jpg",
+     "window": {
+      "left": 0.271,
+      "top": 0.1932,
+      "right": 0.809,
+      "bottom": 0.741
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0113.jpg",
+     "folio": "26r",
+     "print": "codices/arundel-1/p0114.jpg",
+     "window": {
+      "left": 0.281,
+      "top": 0.1967,
+      "right": 0.819,
+      "bottom": 0.7445
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0115.jpg",
+     "folio": "26v",
+     "print": "codices/arundel-1/p0116.jpg",
+     "window": {
+      "left": 0.276,
+      "top": 0.1932,
+      "right": 0.814,
+      "bottom": 0.741
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0117.jpg",
+     "folio": "27r",
+     "print": "codices/arundel-1/p0118.jpg",
+     "window": {
+      "left": 0.261,
+      "top": 0.1898,
+      "right": 0.799,
+      "bottom": 0.7376
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0119.jpg",
+     "folio": "28r",
+     "print": "codices/arundel-1/p0120.jpg",
+     "window": {
+      "left": 0.261,
+      "top": 0.1898,
+      "right": 0.794,
+      "bottom": 0.7376
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0121.jpg",
+     "folio": "28v",
+     "print": "codices/arundel-1/p0122.jpg",
+     "window": {
+      "left": 0.271,
+      "top": 0.1967,
+      "right": 0.809,
+      "bottom": 0.7445
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0123.jpg",
+     "folio": "29r",
+     "print": "codices/arundel-1/p0124.jpg",
+     "window": {
+      "left": 0.261,
+      "top": 0.1967,
+      "right": 0.809,
+      "bottom": 0.741
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0125.jpg",
+     "folio": "29v",
+     "print": "codices/arundel-1/p0126.jpg"
+    },
+    {
+     "file": "codices/arundel-1/p0127.jpg",
+     "folio": "30r",
+     "print": "codices/arundel-1/p0128.jpg",
+     "window": {
+      "left": 0.261,
+      "top": 0.2105,
+      "right": 0.804,
+      "bottom": 0.7583
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0129.jpg",
+     "folio": "30v",
+     "print": "codices/arundel-1/p0130.jpg",
+     "window": {
+      "left": 0.246,
+      "top": 0.2071,
+      "right": 0.809,
+      "bottom": 0.7514
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0131.jpg",
+     "folio": "31r",
+     "print": "codices/arundel-1/p0132.jpg",
+     "window": {
+      "left": 0.251,
+      "top": 0.1967,
+      "right": 0.814,
+      "bottom": 0.7687
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0133.jpg",
+     "folio": "31v",
+     "print": "codices/arundel-1/p0134.jpg",
+     "window": {
+      "left": 0.241,
+      "top": 0.2002,
+      "right": 0.804,
+      "bottom": 0.7756
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0135.jpg",
+     "folio": "32r",
+     "print": "codices/arundel-1/p0136.jpg",
+     "window": {
+      "left": 0.246,
+      "top": 0.2002,
+      "right": 0.804,
+      "bottom": 0.7687
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0137.jpg",
+     "folio": "32v",
+     "print": "codices/arundel-1/p0138.jpg",
+     "window": {
+      "left": 0.251,
+      "top": 0.1967,
+      "right": 0.814,
+      "bottom": 0.7652
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0139.jpg",
+     "folio": "33r",
+     "print": "codices/arundel-1/p0140.jpg",
+     "window": {
+      "left": 0.146,
+      "top": 0.1379,
+      "right": 0.919,
+      "bottom": 0.8725
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0141.jpg",
+     "folio": "33v",
+     "print": "codices/arundel-1/p0142.jpg",
+     "window": {
+      "left": 0.136,
+      "top": 0.1413,
+      "right": 0.909,
+      "bottom": 0.8864
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0143.jpg",
+     "folio": "34v",
+     "print": "codices/arundel-1/p0144.jpg",
+     "window": {
+      "left": 0.266,
+      "top": 0.1967,
+      "right": 0.809,
+      "bottom": 0.7687
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0145.jpg",
+     "folio": "35r",
+     "print": "codices/arundel-1/p0146.jpg",
+     "window": {
+      "left": 0.271,
+      "top": 0.2002,
+      "right": 0.809,
+      "bottom": 0.7722
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0147.jpg",
+     "folio": "35v",
+     "print": "codices/arundel-1/p0148.jpg",
+     "window": {
+      "left": 0.256,
+      "top": 0.2002,
+      "right": 0.799,
+      "bottom": 0.7687
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0149.jpg",
+     "folio": "36r",
+     "print": "codices/arundel-1/p0150.jpg",
+     "window": {
+      "left": 0.241,
+      "top": 0.2071,
+      "right": 0.804,
+      "bottom": 0.7652
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0151.jpg",
+     "folio": "37r",
+     "print": "codices/arundel-1/p0152.jpg",
+     "window": {
+      "left": 0.256,
+      "top": 0.2036,
+      "right": 0.814,
+      "bottom": 0.7445
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0153.jpg",
+     "folio": "37v",
+     "print": "codices/arundel-1/p0154.jpg",
+     "window": {
+      "left": 0.256,
+      "top": 0.2002,
+      "right": 0.809,
+      "bottom": 0.741
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0155.jpg",
+     "folio": "38r",
+     "print": "codices/arundel-1/p0156.jpg",
+     "window": {
+      "left": 0.271,
+      "top": 0.1932,
+      "right": 0.834,
+      "bottom": 0.7583
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0157.jpg",
+     "folio": "38v",
+     "print": "codices/arundel-1/p0158.jpg",
+     "window": {
+      "left": 0.266,
+      "top": 0.2244,
+      "right": 0.814,
+      "bottom": 0.7687
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0159.jpg",
+     "folio": "39v",
+     "print": "codices/arundel-1/p0160.jpg",
+     "window": {
+      "left": 0.256,
+      "top": 0.2071,
+      "right": 0.824,
+      "bottom": 0.7618
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0161.jpg",
+     "folio": "40r",
+     "print": "codices/arundel-1/p0162.jpg",
+     "window": {
+      "left": 0.266,
+      "top": 0.2071,
+      "right": 0.849,
+      "bottom": 0.7791
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0163.jpg",
+     "folio": "40v 41r",
+     "print": "codices/arundel-1/p0164.jpg",
+     "window": {
+      "left": 0.111,
+      "top": 0.1171,
+      "right": 0.934,
+      "bottom": 0.8864
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0165.jpg",
+     "folio": "41v",
+     "print": "codices/arundel-1/p0166.jpg",
+     "window": {
+      "left": 0.256,
+      "top": 0.2002,
+      "right": 0.804,
+      "bottom": 0.7722
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0167.jpg",
+     "folio": "42r",
+     "print": "codices/arundel-1/p0168.jpg",
+     "window": {
+      "left": 0.251,
+      "top": 0.2002,
+      "right": 0.809,
+      "bottom": 0.7583
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0169.jpg",
+     "folio": "42v",
+     "print": "codices/arundel-1/p0170.jpg",
+     "window": {
+      "left": 0.306,
+      "top": 0.1967,
+      "right": 0.839,
+      "bottom": 0.7514
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0171.jpg",
+     "folio": "43r",
+     "print": "codices/arundel-1/p0172.jpg",
+     "window": {
+      "left": 0.281,
+      "top": 0.1898,
+      "right": 0.824,
+      "bottom": 0.7514
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0173.jpg",
+     "folio": "43v",
+     "print": "codices/arundel-1/p0174.jpg",
+     "window": {
+      "left": 0.266,
+      "top": 0.1967,
+      "right": 0.819,
+      "bottom": 0.7549
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0175.jpg",
+     "folio": "44r",
+     "print": "codices/arundel-1/p0176.jpg",
+     "window": {
+      "left": 0.271,
+      "top": 0.1967,
+      "right": 0.819,
+      "bottom": 0.7549
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0177.jpg",
+     "folio": "44v",
+     "print": "codices/arundel-1/p0178.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.1967,
+      "right": 0.834,
+      "bottom": 0.7479
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0179.jpg",
+     "folio": "45r",
+     "print": "codices/arundel-1/p0180.jpg",
+     "window": {
+      "left": 0.261,
+      "top": 0.2002,
+      "right": 0.819,
+      "bottom": 0.7549
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0181.jpg",
+     "folio": "45v",
+     "print": "codices/arundel-1/p0182.jpg",
+     "window": {
+      "left": 0.266,
+      "top": 0.2002,
+      "right": 0.814,
+      "bottom": 0.7514
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0183.jpg",
+     "folio": "46v",
+     "print": "codices/arundel-1/p0184.jpg",
+     "window": {
+      "left": 0.271,
+      "top": 0.1932,
+      "right": 0.824,
+      "bottom": 0.7445
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0185.jpg",
+     "folio": "47r",
+     "print": "codices/arundel-1/p0186.jpg",
+     "window": {
+      "left": 0.271,
+      "top": 0.1932,
+      "right": 0.834,
+      "bottom": 0.7514
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0187.jpg",
+     "folio": "47v",
+     "print": "codices/arundel-1/p0188.jpg",
+     "window": {
+      "left": 0.271,
+      "top": 0.1898,
+      "right": 0.819,
+      "bottom": 0.741
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0189.jpg",
+     "folio": "48r",
+     "print": "codices/arundel-1/p0190.jpg"
+    },
+    {
+     "file": "codices/arundel-1/p0191.jpg",
+     "folio": "48v",
+     "print": "codices/arundel-1/p0192.jpg"
+    },
+    {
+     "file": "codices/arundel-1/p0193.jpg",
+     "folio": "49v",
+     "print": "codices/arundel-1/p0194.jpg",
+     "window": {
+      "left": 0.271,
+      "top": 0.1967,
+      "right": 0.819,
+      "bottom": 0.7479
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0195.jpg",
+     "folio": "50r",
+     "print": "codices/arundel-1/p0196.jpg",
+     "window": {
+      "left": 0.261,
+      "top": 0.1898,
+      "right": 0.819,
+      "bottom": 0.741
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0197.jpg",
+     "folio": "50v",
+     "print": "codices/arundel-1/p0198.jpg"
+    },
+    {
+     "file": "codices/arundel-1/p0199.jpg",
+     "folio": "52v",
+     "print": "codices/arundel-1/p0200.jpg",
+     "window": {
+      "left": 0.266,
+      "top": 0.1967,
+      "right": 0.809,
+      "bottom": 0.7445
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0201.jpg",
+     "folio": "53v",
+     "print": "codices/arundel-1/p0202.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.2002,
+      "right": 0.829,
+      "bottom": 0.7583
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0203.jpg",
+     "folio": "54r",
+     "print": "codices/arundel-1/p0204.jpg",
+     "window": {
+      "left": 0.261,
+      "top": 0.1967,
+      "right": 0.824,
+      "bottom": 0.7549
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0205.jpg",
+     "folio": "56v",
+     "print": "codices/arundel-1/p0206.jpg",
+     "window": {
+      "left": 0.271,
+      "top": 0.1932,
+      "right": 0.824,
+      "bottom": 0.7479
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0207.jpg",
+     "folio": "57r",
+     "print": "codices/arundel-1/p0208.jpg",
+     "window": {
+      "left": 0.266,
+      "top": 0.2002,
+      "right": 0.814,
+      "bottom": 0.7549
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0209.jpg",
+     "folio": "57v",
+     "print": "codices/arundel-1/p0210.jpg",
+     "window": {
+      "left": 0.281,
+      "top": 0.1932,
+      "right": 0.829,
+      "bottom": 0.7445
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0211.jpg",
+     "folio": "58r",
+     "print": "codices/arundel-1/p0212.jpg",
+     "window": {
+      "left": 0.276,
+      "top": 0.1898,
+      "right": 0.834,
+      "bottom": 0.7479
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0213.jpg",
+     "folio": "58v",
+     "print": "codices/arundel-1/p0214.jpg",
+     "window": {
+      "left": 0.276,
+      "top": 0.1898,
+      "right": 0.824,
+      "bottom": 0.741
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0215.jpg",
+     "folio": "59r",
+     "print": "codices/arundel-1/p0216.jpg",
+     "window": {
+      "left": 0.266,
+      "top": 0.1898,
+      "right": 0.814,
+      "bottom": 0.7445
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0217.jpg",
+     "folio": "59v",
+     "print": "codices/arundel-1/p0218.jpg",
+     "window": {
+      "left": 0.281,
+      "top": 0.2002,
+      "right": 0.819,
+      "bottom": 0.7514
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0219.jpg",
+     "folio": "60r",
+     "print": "codices/arundel-1/p0220.jpg",
+     "window": {
+      "left": 0.276,
+      "top": 0.1898,
+      "right": 0.824,
+      "bottom": 0.7583
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0221.jpg",
+     "folio": "61r",
+     "print": "codices/arundel-1/p0222.jpg",
+     "window": {
+      "left": 0.276,
+      "top": 0.1967,
+      "right": 0.814,
+      "bottom": 0.7376
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0223.jpg",
+     "folio": "61v",
+     "print": "codices/arundel-1/p0224.jpg",
+     "window": {
+      "left": 0.281,
+      "top": 0.1967,
+      "right": 0.814,
+      "bottom": 0.7376
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0225.jpg",
+     "folio": "62r",
+     "print": "codices/arundel-1/p0226.jpg",
+     "window": {
+      "left": 0.291,
+      "top": 0.1863,
+      "right": 0.829,
+      "bottom": 0.7306
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0227.jpg",
+     "folio": "62v",
+     "print": "codices/arundel-1/p0228.jpg",
+     "window": {
+      "left": 0.301,
+      "top": 0.1898,
+      "right": 0.834,
+      "bottom": 0.7341
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0229.jpg",
+     "folio": "63v",
+     "print": "codices/arundel-1/p0230.jpg",
+     "window": {
+      "left": 0.266,
+      "top": 0.1932,
+      "right": 0.819,
+      "bottom": 0.7583
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0231.jpg",
+     "folio": "64r",
+     "print": "codices/arundel-1/p0232.jpg",
+     "window": {
+      "left": 0.196,
+      "top": 0.1621,
+      "right": 0.859,
+      "bottom": 0.8102
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0233.jpg",
+     "folio": "64v",
+     "print": "codices/arundel-1/p0234.jpg",
+     "window": {
+      "left": 0.211,
+      "top": 0.1413,
+      "right": 0.874,
+      "bottom": 0.7929
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0235.jpg",
+     "folio": "65r",
+     "print": "codices/arundel-1/p0236.jpg",
+     "window": {
+      "left": 0.271,
+      "top": 0.1829,
+      "right": 0.819,
+      "bottom": 0.7618
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0237.jpg",
+     "folio": "66r",
+     "print": "codices/arundel-1/p0238.jpg",
+     "window": {
+      "left": 0.246,
+      "top": 0.1863,
+      "right": 0.809,
+      "bottom": 0.7652
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0239.jpg",
+     "folio": "66v",
+     "print": "codices/arundel-1/p0240.jpg",
+     "window": {
+      "left": 0.261,
+      "top": 0.1863,
+      "right": 0.819,
+      "bottom": 0.7583
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0241.jpg",
+     "folio": "67r",
+     "print": "codices/arundel-1/p0242.jpg",
+     "window": {
+      "left": 0.261,
+      "top": 0.1863,
+      "right": 0.819,
+      "bottom": 0.7687
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0243.jpg",
+     "folio": "67v",
+     "print": "codices/arundel-1/p0244.jpg",
+     "window": {
+      "left": 0.241,
+      "top": 0.1898,
+      "right": 0.804,
+      "bottom": 0.7652
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0245.jpg",
+     "folio": "68v",
+     "print": "codices/arundel-1/p0246.jpg",
+     "window": {
+      "left": 0.271,
+      "top": 0.1829,
+      "right": 0.789,
+      "bottom": 0.7549
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0247.jpg",
+     "folio": "69r",
+     "print": "codices/arundel-1/p0248.jpg",
+     "window": {
+      "left": 0.281,
+      "top": 0.1932,
+      "right": 0.799,
+      "bottom": 0.7479
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0249.jpg",
+     "folio": "70r",
+     "print": "codices/arundel-1/p0250.jpg",
+     "window": {
+      "left": 0.261,
+      "top": 0.2036,
+      "right": 0.824,
+      "bottom": 0.741
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0251.jpg",
+     "folio": "70v",
+     "print": "codices/arundel-1/p0252.jpg",
+     "window": {
+      "left": 0.251,
+      "top": 0.2036,
+      "right": 0.804,
+      "bottom": 0.7376
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0253.jpg",
+     "folio": "71r",
+     "print": "codices/arundel-1/p0254.jpg",
+     "window": {
+      "left": 0.261,
+      "top": 0.1967,
+      "right": 0.819,
+      "bottom": 0.7376
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0255.jpg",
+     "folio": "71v",
+     "print": "codices/arundel-1/p0256.jpg",
+     "window": {
+      "left": 0.261,
+      "top": 0.2071,
+      "right": 0.814,
+      "bottom": 0.741
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0257.jpg",
+     "folio": "72v",
+     "print": "codices/arundel-1/p0258.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.2002,
+      "right": 0.819,
+      "bottom": 0.7479
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0259.jpg",
+     "folio": "73r",
+     "print": "codices/arundel-1/p0260.jpg",
+     "window": {
+      "left": 0.261,
+      "top": 0.1967,
+      "right": 0.814,
+      "bottom": 0.7514
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0261.jpg",
+     "folio": "74r",
+     "print": "codices/arundel-1/p0262.jpg",
+     "window": {
+      "left": 0.276,
+      "top": 0.1863,
+      "right": 0.819,
+      "bottom": 0.7479
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0263.jpg",
+     "folio": "75r",
+     "print": "codices/arundel-1/p0264.jpg",
+     "window": {
+      "left": 0.276,
+      "top": 0.1967,
+      "right": 0.819,
+      "bottom": 0.7652
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0265.jpg",
+     "folio": "76v",
+     "print": "codices/arundel-1/p0266.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.2036,
+      "right": 0.834,
+      "bottom": 0.7652
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0267.jpg",
+     "folio": "77r",
+     "print": "codices/arundel-1/p0268.jpg",
+     "window": {
+      "left": 0.281,
+      "top": 0.1898,
+      "right": 0.824,
+      "bottom": 0.7514
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0269.jpg",
+     "folio": "77v",
+     "print": "codices/arundel-1/p0270.jpg",
+     "window": {
+      "left": 0.266,
+      "top": 0.2002,
+      "right": 0.814,
+      "bottom": 0.7583
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0271.jpg",
+     "folio": "78v",
+     "print": "codices/arundel-1/p0272.jpg",
+     "window": {
+      "left": 0.271,
+      "top": 0.1932,
+      "right": 0.824,
+      "bottom": 0.7376
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0273.jpg",
+     "folio": "79r",
+     "print": "codices/arundel-1/p0274.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.1967,
+      "right": 0.824,
+      "bottom": 0.7618
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0275.jpg",
+     "folio": "79v",
+     "print": "codices/arundel-1/p0276.jpg",
+     "window": {
+      "left": 0.271,
+      "top": 0.1863,
+      "right": 0.814,
+      "bottom": 0.7549
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0277.jpg",
+     "folio": "80r",
+     "print": "codices/arundel-1/p0278.jpg",
+     "window": {
+      "left": 0.271,
+      "top": 0.1967,
+      "right": 0.809,
+      "bottom": 0.7583
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0279.jpg",
+     "folio": "80v",
+     "print": "codices/arundel-1/p0280.jpg",
+     "window": {
+      "left": 0.271,
+      "top": 0.1863,
+      "right": 0.809,
+      "bottom": 0.7445
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0281.jpg",
+     "folio": "81r",
+     "print": "codices/arundel-1/p0282.jpg",
+     "window": {
+      "left": 0.281,
+      "top": 0.1898,
+      "right": 0.819,
+      "bottom": 0.7583
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0283.jpg",
+     "folio": "81v",
+     "print": "codices/arundel-1/p0284.jpg",
+     "window": {
+      "left": 0.281,
+      "top": 0.1932,
+      "right": 0.814,
+      "bottom": 0.7618
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0285.jpg",
+     "folio": "82r",
+     "print": "codices/arundel-1/p0286.jpg",
+     "window": {
+      "left": 0.306,
+      "top": 0.2451,
+      "right": 0.814,
+      "bottom": 0.7514
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0287.jpg",
+     "folio": "82v",
+     "print": "codices/arundel-1/p0288.jpg",
+     "window": {
+      "left": 0.261,
+      "top": 0.1898,
+      "right": 0.804,
+      "bottom": 0.7514
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0289.jpg",
+     "folio": "83v",
+     "print": "codices/arundel-1/p0290.jpg",
+     "window": {
+      "left": 0.261,
+      "top": 0.1898,
+      "right": 0.804,
+      "bottom": 0.7549
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0291.jpg",
+     "folio": "84r",
+     "print": "codices/arundel-1/p0292.jpg",
+     "window": {
+      "left": 0.261,
+      "top": 0.1898,
+      "right": 0.804,
+      "bottom": 0.7618
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0293.jpg",
+     "folio": "84v",
+     "print": "codices/arundel-1/p0294.jpg",
+     "window": {
+      "left": 0.261,
+      "top": 0.1863,
+      "right": 0.809,
+      "bottom": 0.7583
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0295.jpg",
+     "folio": "85r",
+     "print": "codices/arundel-1/p0296.jpg",
+     "window": {
+      "left": 0.261,
+      "top": 0.1898,
+      "right": 0.804,
+      "bottom": 0.7583
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0297.jpg",
+     "folio": "85v",
+     "print": "codices/arundel-1/p0298.jpg",
+     "window": {
+      "left": 0.271,
+      "top": 0.1898,
+      "right": 0.804,
+      "bottom": 0.7549
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0299.jpg",
+     "folio": "86r",
+     "print": "codices/arundel-1/p0300.jpg",
+     "window": {
+      "left": 0.271,
+      "top": 0.1863,
+      "right": 0.809,
+      "bottom": 0.7549
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0301.jpg",
+     "folio": "86v",
+     "print": "codices/arundel-1/p0302.jpg",
+     "window": {
+      "left": 0.276,
+      "top": 0.1829,
+      "right": 0.809,
+      "bottom": 0.7514
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0303.jpg",
+     "folio": "87r",
+     "print": "codices/arundel-1/p0304.jpg",
+     "window": {
+      "left": 0.276,
+      "top": 0.1829,
+      "right": 0.814,
+      "bottom": 0.7514
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0305.jpg",
+     "folio": "87v",
+     "print": "codices/arundel-1/p0306.jpg",
+     "window": {
+      "left": 0.266,
+      "top": 0.1967,
+      "right": 0.809,
+      "bottom": 0.7652
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0307.jpg",
+     "folio": "88r",
+     "print": "codices/arundel-1/p0308.jpg",
+     "window": {
+      "left": 0.261,
+      "top": 0.1932,
+      "right": 0.804,
+      "bottom": 0.7618
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0309.jpg",
+     "folio": "89r",
+     "print": "codices/arundel-1/p0310.jpg",
+     "window": {
+      "left": 0.276,
+      "top": 0.1967,
+      "right": 0.814,
+      "bottom": 0.7583
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0311.jpg",
+     "folio": "90r",
+     "print": "codices/arundel-1/p0312.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.1829,
+      "right": 0.804,
+      "bottom": 0.7514
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0313.jpg",
+     "folio": "90v",
+     "print": "codices/arundel-1/p0314.jpg",
+     "window": {
+      "left": 0.281,
+      "top": 0.1829,
+      "right": 0.819,
+      "bottom": 0.7479
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0315.jpg",
+     "folio": "91r",
+     "print": "codices/arundel-1/p0316.jpg",
+     "window": {
+      "left": 0.271,
+      "top": 0.1829,
+      "right": 0.804,
+      "bottom": 0.7514
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0317.jpg",
+     "folio": "92r",
+     "print": "codices/arundel-1/p0318.jpg",
+     "window": {
+      "left": 0.266,
+      "top": 0.1829,
+      "right": 0.794,
+      "bottom": 0.7479
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0319.jpg",
+     "folio": "92v",
+     "print": "codices/arundel-1/p0320.jpg",
+     "window": {
+      "left": 0.261,
+      "top": 0.1794,
+      "right": 0.799,
+      "bottom": 0.7479
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0321.jpg",
+     "folio": "93r",
+     "print": "codices/arundel-1/p0322.jpg",
+     "window": {
+      "left": 0.276,
+      "top": 0.1863,
+      "right": 0.804,
+      "bottom": 0.7514
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0323.jpg",
+     "folio": "93v",
+     "print": "codices/arundel-1/p0324.jpg",
+     "window": {
+      "left": 0.261,
+      "top": 0.1829,
+      "right": 0.789,
+      "bottom": 0.7479
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0325.jpg",
+     "folio": "94r",
+     "print": "codices/arundel-1/p0326.jpg",
+     "window": {
+      "left": 0.261,
+      "top": 0.1863,
+      "right": 0.794,
+      "bottom": 0.7445
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0327.jpg",
+     "folio": "94v",
+     "print": "codices/arundel-1/p0328.jpg",
+     "window": {
+      "left": 0.251,
+      "top": 0.1863,
+      "right": 0.789,
+      "bottom": 0.7445
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0329.jpg",
+     "folio": "95r",
+     "print": "codices/arundel-1/p0330.jpg",
+     "window": {
+      "left": 0.291,
+      "top": 0.1863,
+      "right": 0.804,
+      "bottom": 0.7514
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0331.jpg",
+     "folio": "95v",
+     "print": "codices/arundel-1/p0332.jpg",
+     "window": {
+      "left": 0.231,
+      "top": 0.1863,
+      "right": 0.799,
+      "bottom": 0.7514
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0333.jpg",
+     "folio": "96r",
+     "print": "codices/arundel-1/p0334.jpg",
+     "window": {
+      "left": 0.216,
+      "top": 0.1829,
+      "right": 0.794,
+      "bottom": 0.7514
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0335.jpg",
+     "folio": "96v",
+     "print": "codices/arundel-1/p0336.jpg",
+     "window": {
+      "left": 0.211,
+      "top": 0.1863,
+      "right": 0.789,
+      "bottom": 0.7514
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0337.jpg",
+     "folio": "97r",
+     "print": "codices/arundel-1/p0338.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.1863,
+      "right": 0.829,
+      "bottom": 0.7376
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0339.jpg",
+     "folio": "98v",
+     "print": "codices/arundel-1/p0340.jpg",
+     "window": {
+      "left": 0.261,
+      "top": 0.1794,
+      "right": 0.824,
+      "bottom": 0.7306
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0341.jpg",
+     "folio": "99r",
+     "print": "codices/arundel-1/p0342.jpg",
+     "window": {
+      "left": 0.256,
+      "top": 0.1863,
+      "right": 0.814,
+      "bottom": 0.7445
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0343.jpg",
+     "folio": "100r",
+     "print": "codices/arundel-1/p0344.jpg",
+     "window": {
+      "left": 0.246,
+      "top": 0.1863,
+      "right": 0.814,
+      "bottom": 0.7376
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0345.jpg",
+     "folio": "100*v",
+     "print": "codices/arundel-1/p0346.jpg",
+     "window": {
+      "left": 0.276,
+      "top": 0.1898,
+      "right": 0.829,
+      "bottom": 0.7341
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0347.jpg",
+     "folio": "101r",
+     "print": "codices/arundel-1/p0348.jpg",
+     "window": {
+      "left": 0.266,
+      "top": 0.1829,
+      "right": 0.824,
+      "bottom": 0.7237
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0349.jpg",
+     "folio": "101v",
+     "print": "codices/arundel-1/p0350.jpg",
+     "window": {
+      "left": 0.256,
+      "top": 0.1898,
+      "right": 0.814,
+      "bottom": 0.7306
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0351.jpg",
+     "folio": "101*r",
+     "print": "codices/arundel-1/p0352.jpg",
+     "window": {
+      "left": 0.266,
+      "top": 0.1932,
+      "right": 0.809,
+      "bottom": 0.741
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0353.jpg",
+     "folio": "101*v",
+     "print": "codices/arundel-1/p0354.jpg",
+     "window": {
+      "left": 0.256,
+      "top": 0.1932,
+      "right": 0.809,
+      "bottom": 0.741
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0355.jpg",
+     "folio": "103r",
+     "print": "codices/arundel-1/p0356.jpg",
+     "window": {
+      "left": 0.256,
+      "top": 0.1932,
+      "right": 0.809,
+      "bottom": 0.741
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0357.jpg",
+     "folio": "103v",
+     "print": "codices/arundel-1/p0358.jpg",
+     "window": {
+      "left": 0.236,
+      "top": 0.1898,
+      "right": 0.799,
+      "bottom": 0.7376
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0359.jpg",
+     "folio": "104r",
+     "print": "codices/arundel-1/p0360.jpg",
+     "window": {
+      "left": 0.256,
+      "top": 0.1898,
+      "right": 0.804,
+      "bottom": 0.7618
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0361.jpg",
+     "folio": "104v",
+     "print": "codices/arundel-1/p0362.jpg",
+     "window": {
+      "left": 0.276,
+      "top": 0.1898,
+      "right": 0.814,
+      "bottom": 0.7583
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0363.jpg",
+     "folio": "105r",
+     "print": "codices/arundel-1/p0364.jpg",
+     "window": {
+      "left": 0.246,
+      "top": 0.1863,
+      "right": 0.809,
+      "bottom": 0.7203
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0365.jpg",
+     "folio": "105v",
+     "print": "codices/arundel-1/p0366.jpg",
+     "window": {
+      "left": 0.256,
+      "top": 0.1898,
+      "right": 0.804,
+      "bottom": 0.7203
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0367.jpg",
+     "folio": "106r",
+     "print": "codices/arundel-1/p0368.jpg",
+     "window": {
+      "left": 0.241,
+      "top": 0.1898,
+      "right": 0.794,
+      "bottom": 0.7237
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0369.jpg",
+     "folio": "106v",
+     "print": "codices/arundel-1/p0370.jpg",
+     "window": {
+      "left": 0.251,
+      "top": 0.1898,
+      "right": 0.809,
+      "bottom": 0.7237
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0371.jpg",
+     "folio": "107r",
+     "print": "codices/arundel-1/p0372.jpg",
+     "window": {
+      "left": 0.246,
+      "top": 0.1932,
+      "right": 0.804,
+      "bottom": 0.7652
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0373.jpg",
+     "folio": "107v",
+     "print": "codices/arundel-1/p0374.jpg",
+     "window": {
+      "left": 0.236,
+      "top": 0.1932,
+      "right": 0.799,
+      "bottom": 0.7618
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0375.jpg",
+     "folio": "108r",
+     "print": "codices/arundel-1/p0376.jpg",
+     "window": {
+      "left": 0.246,
+      "top": 0.1932,
+      "right": 0.794,
+      "bottom": 0.741
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0377.jpg",
+     "folio": "109r",
+     "print": "codices/arundel-1/p0378.jpg",
+     "window": {
+      "left": 0.236,
+      "top": 0.1932,
+      "right": 0.809,
+      "bottom": 0.7722
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0379.jpg",
+     "folio": "109v",
+     "print": "codices/arundel-1/p0380.jpg",
+     "window": {
+      "left": 0.266,
+      "top": 0.1932,
+      "right": 0.809,
+      "bottom": 0.7618
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0381.jpg",
+     "folio": "110r",
+     "print": "codices/arundel-1/p0382.jpg",
+     "window": {
+      "left": 0.221,
+      "top": 0.1863,
+      "right": 0.799,
+      "bottom": 0.7583
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0383.jpg",
+     "folio": "110v",
+     "print": "codices/arundel-1/p0384.jpg",
+     "window": {
+      "left": 0.221,
+      "top": 0.1898,
+      "right": 0.794,
+      "bottom": 0.7583
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0385.jpg",
+     "folio": "111v",
+     "print": "codices/arundel-1/p0386.jpg",
+     "window": {
+      "left": 0.271,
+      "top": 0.1932,
+      "right": 0.804,
+      "bottom": 0.7341
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0387.jpg",
+     "folio": "112r",
+     "print": "codices/arundel-1/p0388.jpg",
+     "window": {
+      "left": 0.236,
+      "top": 0.1898,
+      "right": 0.799,
+      "bottom": 0.7376
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0389.jpg",
+     "folio": "113v",
+     "print": "codices/arundel-1/p0390.jpg",
+     "window": {
+      "left": 0.246,
+      "top": 0.1898,
+      "right": 0.799,
+      "bottom": 0.7272
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0391.jpg",
+     "folio": "114r",
+     "print": "codices/arundel-1/p0392.jpg",
+     "window": {
+      "left": 0.256,
+      "top": 0.1932,
+      "right": 0.794,
+      "bottom": 0.7237
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0393.jpg",
+     "folio": "114v",
+     "print": "codices/arundel-1/p0394.jpg",
+     "window": {
+      "left": 0.246,
+      "top": 0.1898,
+      "right": 0.804,
+      "bottom": 0.7168
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0395.jpg",
+     "folio": "115v",
+     "print": "codices/arundel-1/p0396.jpg",
+     "window": {
+      "left": 0.261,
+      "top": 0.1863,
+      "right": 0.809,
+      "bottom": 0.741
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0397.jpg",
+     "folio": "116r",
+     "print": "codices/arundel-1/p0398.jpg",
+     "window": {
+      "left": 0.281,
+      "top": 0.1967,
+      "right": 0.799,
+      "bottom": 0.6891
+     }
+    },
+    {
+     "file": "codices/arundel-1/p0399.jpg",
+     "folio": "116v",
+     "print": "codices/arundel-1/p0400.jpg",
+     "window": {
+      "left": 0.276,
+      "top": 0.1932,
+      "right": 0.799,
+      "bottom": 0.6891
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0019.jpg",
+     "folio": "221r",
+     "print": "codices/arundel-3/p0020.jpg",
+     "window": {
+      "left": 0.311,
+      "top": 0.2244,
+      "right": 0.849,
+      "bottom": 0.7964
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0021.jpg",
+     "folio": "221v",
+     "print": "codices/arundel-3/p0022.jpg",
+     "window": {
+      "left": 0.321,
+      "top": 0.2002,
+      "right": 0.859,
+      "bottom": 0.7825
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0023.jpg",
+     "folio": "222v",
+     "print": "codices/arundel-3/p0024.jpg",
+     "window": {
+      "left": 0.291,
+      "top": 0.1898,
+      "right": 0.844,
+      "bottom": 0.7687
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0025.jpg",
+     "folio": "223r",
+     "print": "codices/arundel-3/p0026.jpg"
+    },
+    {
+     "file": "codices/arundel-3/p0027.jpg",
+     "folio": "223v",
+     "print": "codices/arundel-3/p0028.jpg",
+     "window": {
+      "left": 0.111,
+      "top": 0.1206,
+      "right": 0.939,
+      "bottom": 0.658
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0029.jpg",
+     "folio": "224r",
+     "print": "codices/arundel-3/p0030.jpg",
+     "window": {
+      "left": 0.281,
+      "top": 0.2175,
+      "right": 0.839,
+      "bottom": 0.7756
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0031.jpg",
+     "folio": "225r",
+     "print": "codices/arundel-3/p0032.jpg",
+     "window": {
+      "left": 0.311,
+      "top": 0.214,
+      "right": 0.849,
+      "bottom": 0.7756
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0033.jpg",
+     "folio": "225v",
+     "print": "codices/arundel-3/p0034.jpg",
+     "window": {
+      "left": 0.301,
+      "top": 0.2002,
+      "right": 0.854,
+      "bottom": 0.7549
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0035.jpg",
+     "folio": "226r",
+     "print": "codices/arundel-3/p0036.jpg",
+     "window": {
+      "left": 0.296,
+      "top": 0.2175,
+      "right": 0.839,
+      "bottom": 0.7756
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0037.jpg",
+     "folio": "226v",
+     "print": "codices/arundel-3/p0038.jpg",
+     "window": {
+      "left": 0.291,
+      "top": 0.2071,
+      "right": 0.844,
+      "bottom": 0.7791
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0039.jpg",
+     "folio": "227r",
+     "print": "codices/arundel-3/p0040.jpg",
+     "window": {
+      "left": 0.311,
+      "top": 0.2175,
+      "right": 0.854,
+      "bottom": 0.7514
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0041.jpg",
+     "folio": "227v",
+     "print": "codices/arundel-3/p0042.jpg",
+     "window": {
+      "left": 0.326,
+      "top": 0.2071,
+      "right": 0.869,
+      "bottom": 0.7341
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0043.jpg",
+     "folio": "228r",
+     "print": "codices/arundel-3/p0044.jpg",
+     "window": {
+      "left": 0.306,
+      "top": 0.2071,
+      "right": 0.869,
+      "bottom": 0.7341
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0045.jpg",
+     "folio": "228v",
+     "print": "codices/arundel-3/p0046.jpg",
+     "window": {
+      "left": 0.291,
+      "top": 0.2105,
+      "right": 0.829,
+      "bottom": 0.7964
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0047.jpg",
+     "folio": "229v",
+     "print": "codices/arundel-3/p0048.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.2209,
+      "right": 0.819,
+      "bottom": 0.7825
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0049.jpg",
+     "folio": "230r",
+     "print": "codices/arundel-3/p0050.jpg",
+     "window": {
+      "left": 0.271,
+      "top": 0.2071,
+      "right": 0.814,
+      "bottom": 0.7756
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0051.jpg",
+     "folio": "230v",
+     "print": "codices/arundel-3/p0052.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.2036,
+      "right": 0.834,
+      "bottom": 0.7514
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0053.jpg",
+     "folio": "231v",
+     "print": "codices/arundel-3/p0054.jpg",
+     "window": {
+      "left": 0.256,
+      "top": 0.2002,
+      "right": 0.809,
+      "bottom": 0.7687
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0055.jpg",
+     "folio": "232r",
+     "print": "codices/arundel-3/p0056.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.214,
+      "right": 0.829,
+      "bottom": 0.7549
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0057.jpg",
+     "folio": "232v",
+     "print": "codices/arundel-3/p0058.jpg"
+    },
+    {
+     "file": "codices/arundel-3/p0059.jpg",
+     "folio": "233r",
+     "print": "codices/arundel-3/p0060.jpg",
+     "window": {
+      "left": 0.281,
+      "top": 0.2278,
+      "right": 0.849,
+      "bottom": 0.786
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0061.jpg",
+     "folio": "233v",
+     "print": "codices/arundel-3/p0062.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.2209,
+      "right": 0.839,
+      "bottom": 0.786
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0063.jpg",
+     "folio": "234r",
+     "print": "codices/arundel-3/p0064.jpg",
+     "window": {
+      "left": 0.281,
+      "top": 0.2175,
+      "right": 0.839,
+      "bottom": 0.7791
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0065.jpg",
+     "folio": "234v",
+     "print": "codices/arundel-3/p0066.jpg",
+     "window": {
+      "left": 0.281,
+      "top": 0.2278,
+      "right": 0.834,
+      "bottom": 0.7929
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0067.jpg",
+     "folio": "235r",
+     "print": "codices/arundel-3/p0068.jpg",
+     "window": {
+      "left": 0.291,
+      "top": 0.214,
+      "right": 0.839,
+      "bottom": 0.7722
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0069.jpg",
+     "folio": "235v",
+     "print": "codices/arundel-3/p0070.jpg",
+     "window": {
+      "left": 0.276,
+      "top": 0.2278,
+      "right": 0.824,
+      "bottom": 0.7929
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0071.jpg",
+     "folio": "236v",
+     "print": "codices/arundel-3/p0072.jpg",
+     "window": {
+      "left": 0.276,
+      "top": 0.2209,
+      "right": 0.824,
+      "bottom": 0.7756
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0073.jpg",
+     "folio": "238r",
+     "print": "codices/arundel-3/p0074.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.2175,
+      "right": 0.849,
+      "bottom": 0.7549
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0075.jpg",
+     "folio": "239r",
+     "print": "codices/arundel-3/p0076.jpg",
+     "window": {
+      "left": 0.281,
+      "top": 0.2175,
+      "right": 0.834,
+      "bottom": 0.7549
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0077.jpg",
+     "folio": "239v",
+     "print": "codices/arundel-3/p0078.jpg",
+     "window": {
+      "left": 0.291,
+      "top": 0.2278,
+      "right": 0.834,
+      "bottom": 0.7791
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0079.jpg",
+     "folio": "240r",
+     "print": "codices/arundel-3/p0080.jpg"
+    },
+    {
+     "file": "codices/arundel-3/p0081.jpg",
+     "folio": "240v",
+     "print": "codices/arundel-3/p0082.jpg",
+     "window": {
+      "left": 0.301,
+      "top": 0.214,
+      "right": 0.839,
+      "bottom": 0.7583
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0083.jpg",
+     "folio": "241r",
+     "print": "codices/arundel-3/p0084.jpg",
+     "window": {
+      "left": 0.291,
+      "top": 0.2209,
+      "right": 0.844,
+      "bottom": 0.7756
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0085.jpg",
+     "folio": "241v",
+     "print": "codices/arundel-3/p0086.jpg"
+    },
+    {
+     "file": "codices/arundel-3/p0087.jpg",
+     "folio": "242v",
+     "print": "codices/arundel-3/p0088.jpg"
+    },
+    {
+     "file": "codices/arundel-3/p0089.jpg",
+     "folio": "243r",
+     "print": "codices/arundel-3/p0090.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.2105,
+      "right": 0.849,
+      "bottom": 0.7825
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0091.jpg",
+     "folio": "244r",
+     "print": "codices/arundel-3/p0092.jpg",
+     "window": {
+      "left": 0.266,
+      "top": 0.2175,
+      "right": 0.829,
+      "bottom": 0.7791
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0093.jpg",
+     "folio": "245r",
+     "print": "codices/arundel-3/p0094.jpg",
+     "window": {
+      "left": 0.301,
+      "top": 0.2313,
+      "right": 0.844,
+      "bottom": 0.7791
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0095.jpg",
+     "folio": "245v",
+     "print": "codices/arundel-3/p0096.jpg",
+     "window": {
+      "left": 0.306,
+      "top": 0.2244,
+      "right": 0.844,
+      "bottom": 0.7722
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0097.jpg",
+     "folio": "246r",
+     "print": "codices/arundel-3/p0098.jpg",
+     "window": {
+      "left": 0.291,
+      "top": 0.2105,
+      "right": 0.834,
+      "bottom": 0.7514
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0099.jpg",
+     "folio": "246v",
+     "print": "codices/arundel-3/p0100.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.2071,
+      "right": 0.839,
+      "bottom": 0.7722
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0101.jpg",
+     "folio": "247v",
+     "print": "codices/arundel-3/p0102.jpg",
+     "window": {
+      "left": 0.291,
+      "top": 0.2278,
+      "right": 0.854,
+      "bottom": 0.7583
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0103.jpg",
+     "folio": "248v",
+     "print": "codices/arundel-3/p0104.jpg",
+     "window": {
+      "left": 0.271,
+      "top": 0.2071,
+      "right": 0.829,
+      "bottom": 0.7825
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0105.jpg",
+     "folio": "249r",
+     "print": "codices/arundel-3/p0106.jpg",
+     "window": {
+      "left": 0.311,
+      "top": 0.2105,
+      "right": 0.849,
+      "bottom": 0.7722
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0107.jpg",
+     "folio": "250r",
+     "print": "codices/arundel-3/p0108.jpg",
+     "window": {
+      "left": 0.296,
+      "top": 0.2002,
+      "right": 0.844,
+      "bottom": 0.7618
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0109.jpg",
+     "folio": "251v",
+     "print": "codices/arundel-3/p0110.jpg",
+     "window": {
+      "left": 0.301,
+      "top": 0.2244,
+      "right": 0.849,
+      "bottom": 0.7583
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0111.jpg",
+     "folio": "252v",
+     "print": "codices/arundel-3/p0112.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.2105,
+      "right": 0.829,
+      "bottom": 0.7618
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0113.jpg",
+     "folio": "253r",
+     "print": "codices/arundel-3/p0114.jpg",
+     "window": {
+      "left": 0.291,
+      "top": 0.2002,
+      "right": 0.844,
+      "bottom": 0.7722
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0115.jpg",
+     "folio": "253v",
+     "print": "codices/arundel-3/p0116.jpg",
+     "window": {
+      "left": 0.251,
+      "top": 0.2175,
+      "right": 0.824,
+      "bottom": 0.7895
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0117.jpg",
+     "folio": "254r",
+     "print": "codices/arundel-3/p0118.jpg",
+     "window": {
+      "left": 0.301,
+      "top": 0.214,
+      "right": 0.824,
+      "bottom": 0.7722
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0119.jpg",
+     "folio": "255v",
+     "print": "codices/arundel-3/p0120.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.2244,
+      "right": 0.834,
+      "bottom": 0.7722
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0121.jpg",
+     "folio": "256r",
+     "print": "codices/arundel-3/p0122.jpg",
+     "window": {
+      "left": 0.296,
+      "top": 0.2105,
+      "right": 0.834,
+      "bottom": 0.7791
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0123.jpg",
+     "folio": "256v",
+     "print": "codices/arundel-3/p0124.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.214,
+      "right": 0.829,
+      "bottom": 1
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0125.jpg",
+     "folio": "257r",
+     "print": "codices/arundel-3/p0126.jpg",
+     "window": {
+      "left": 0.291,
+      "top": 0.214,
+      "right": 0.834,
+      "bottom": 0.7549
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0127.jpg",
+     "folio": "257v",
+     "print": "codices/arundel-3/p0128.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.214,
+      "right": 0.819,
+      "bottom": 0.7618
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0129.jpg",
+     "folio": "258r",
+     "print": "codices/arundel-3/p0130.jpg",
+     "window": {
+      "left": 0.281,
+      "top": 0.2071,
+      "right": 0.829,
+      "bottom": 0.7687
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0131.jpg",
+     "folio": "258v",
+     "print": "codices/arundel-3/p0132.jpg",
+     "window": {
+      "left": 0.291,
+      "top": 0.2036,
+      "right": 0.834,
+      "bottom": 0.7687
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0133.jpg",
+     "folio": "259r",
+     "print": "codices/arundel-3/p0134.jpg",
+     "window": {
+      "left": 0.281,
+      "top": 0.214,
+      "right": 0.824,
+      "bottom": 0.7722
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0135.jpg",
+     "folio": "259v",
+     "print": "codices/arundel-3/p0136.jpg",
+     "window": {
+      "left": 0.296,
+      "top": 0.2348,
+      "right": 0.839,
+      "bottom": 0.7929
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0137.jpg",
+     "folio": "260r",
+     "print": "codices/arundel-3/p0138.jpg",
+     "window": {
+      "left": 0.301,
+      "top": 0.214,
+      "right": 0.849,
+      "bottom": 0.7722
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0139.jpg",
+     "folio": "260v",
+     "print": "codices/arundel-3/p0140.jpg",
+     "window": {
+      "left": 0.301,
+      "top": 0.2036,
+      "right": 0.844,
+      "bottom": 0.7618
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0141.jpg",
+     "folio": "261r",
+     "print": "codices/arundel-3/p0142.jpg",
+     "window": {
+      "left": 0.301,
+      "top": 0.1932,
+      "right": 0.839,
+      "bottom": 0.7549
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0143.jpg",
+     "folio": "261v",
+     "print": "codices/arundel-3/p0144.jpg"
+    },
+    {
+     "file": "codices/arundel-3/p0145.jpg",
+     "folio": "262r",
+     "print": "codices/arundel-3/p0146.jpg"
+    },
+    {
+     "file": "codices/arundel-3/p0147.jpg",
+     "folio": "262v",
+     "print": "codices/arundel-3/p0148.jpg",
+     "window": {
+      "left": 0.301,
+      "top": 0.2175,
+      "right": 0.824,
+      "bottom": 0.7618
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0149.jpg",
+     "folio": "263r",
+     "print": "codices/arundel-3/p0150.jpg",
+     "window": {
+      "left": 0.291,
+      "top": 0.2071,
+      "right": 0.814,
+      "bottom": 0.7549
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0151.jpg",
+     "folio": "263v",
+     "print": "codices/arundel-3/p0152.jpg",
+     "window": {
+      "left": 0.296,
+      "top": 0.2244,
+      "right": 0.844,
+      "bottom": 0.7964
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0153.jpg",
+     "folio": "264r",
+     "print": "codices/arundel-3/p0154.jpg",
+     "window": {
+      "left": 0.296,
+      "top": 0.2071,
+      "right": 0.814,
+      "bottom": 0.7687
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0155.jpg",
+     "folio": "264v",
+     "print": "codices/arundel-3/p0156.jpg",
+     "window": {
+      "left": 0.321,
+      "top": 0.2105,
+      "right": 0.834,
+      "bottom": 0.7341
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0157.jpg",
+     "folio": "265r",
+     "print": "codices/arundel-3/p0158.jpg",
+     "window": {
+      "left": 0.296,
+      "top": 0.2105,
+      "right": 0.839,
+      "bottom": 0.7549
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0159.jpg",
+     "folio": "266r",
+     "print": "codices/arundel-3/p0160.jpg",
+     "window": {
+      "left": 0.276,
+      "top": 0.2071,
+      "right": 0.839,
+      "bottom": 0.7825
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0161.jpg",
+     "folio": "266v",
+     "print": "codices/arundel-3/p0162.jpg",
+     "window": {
+      "left": 0.291,
+      "top": 0.2002,
+      "right": 0.859,
+      "bottom": 0.7722
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0163.jpg",
+     "folio": "267r",
+     "print": "codices/arundel-3/p0164.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.1967,
+      "right": 0.874,
+      "bottom": 0.7895
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0165.jpg",
+     "folio": "267v",
+     "print": "codices/arundel-3/p0166.jpg"
+    },
+    {
+     "file": "codices/arundel-3/p0167.jpg",
+     "folio": "268v",
+     "print": "codices/arundel-3/p0168.jpg",
+     "window": {
+      "left": 0.291,
+      "top": 0.1932,
+      "right": 0.834,
+      "bottom": 0.7722
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0169.jpg",
+     "folio": "269r",
+     "print": "codices/arundel-3/p0170.jpg",
+     "window": {
+      "left": 0.301,
+      "top": 0.2036,
+      "right": 0.829,
+      "bottom": 0.7306
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0171.jpg",
+     "folio": "269v",
+     "print": "codices/arundel-3/p0172.jpg",
+     "window": {
+      "left": 0.291,
+      "top": 0.2002,
+      "right": 0.819,
+      "bottom": 0.7514
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0173.jpg",
+     "folio": "270r",
+     "print": "codices/arundel-3/p0174.jpg"
+    },
+    {
+     "file": "codices/arundel-3/p0175.jpg",
+     "folio": "270v",
+     "print": "codices/arundel-3/p0176.jpg",
+     "window": {
+      "left": 0.296,
+      "top": 0.1967,
+      "right": 0.809,
+      "bottom": 0.7479
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0177.jpg",
+     "folio": "271r",
+     "print": "codices/arundel-3/p0178.jpg",
+     "window": {
+      "left": 0.306,
+      "top": 0.2071,
+      "right": 0.834,
+      "bottom": 0.7687
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0179.jpg",
+     "folio": "271v",
+     "print": "codices/arundel-3/p0180.jpg",
+     "window": {
+      "left": 0.296,
+      "top": 0.1898,
+      "right": 0.829,
+      "bottom": 0.7618
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0181.jpg",
+     "folio": "272r",
+     "print": "codices/arundel-3/p0182.jpg",
+     "window": {
+      "left": 0.291,
+      "top": 0.2036,
+      "right": 0.834,
+      "bottom": 0.7618
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0183.jpg",
+     "folio": "272v",
+     "print": "codices/arundel-3/p0184.jpg"
+    },
+    {
+     "file": "codices/arundel-3/p0185.jpg",
+     "folio": "273r",
+     "print": "codices/arundel-3/p0186.jpg",
+     "window": {
+      "left": 0.281,
+      "top": 0.2105,
+      "right": 0.824,
+      "bottom": 0.7687
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0187.jpg",
+     "folio": "273v",
+     "print": "codices/arundel-3/p0188.jpg",
+     "window": {
+      "left": 0.276,
+      "top": 0.214,
+      "right": 0.814,
+      "bottom": 0.7722
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0189.jpg",
+     "folio": "274r",
+     "print": "codices/arundel-3/p0190.jpg",
+     "window": {
+      "left": 0.266,
+      "top": 0.2071,
+      "right": 0.809,
+      "bottom": 0.7618
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0191.jpg",
+     "folio": "275v",
+     "print": "codices/arundel-3/p0192.jpg",
+     "window": {
+      "left": 0.271,
+      "top": 0.2071,
+      "right": 0.814,
+      "bottom": 0.7618
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0193.jpg",
+     "folio": "276r",
+     "print": "codices/arundel-3/p0194.jpg",
+     "window": {
+      "left": 0.291,
+      "top": 0.214,
+      "right": 0.844,
+      "bottom": 0.7756
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0195.jpg",
+     "folio": "276v",
+     "print": "codices/arundel-3/p0196.jpg",
+     "window": {
+      "left": 0.266,
+      "top": 0.2036,
+      "right": 0.809,
+      "bottom": 0.7652
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0197.jpg",
+     "folio": "277r",
+     "print": "codices/arundel-3/p0198.jpg",
+     "window": {
+      "left": 0.276,
+      "top": 0.2036,
+      "right": 0.819,
+      "bottom": 0.7722
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0199.jpg",
+     "folio": "277v",
+     "print": "codices/arundel-3/p0200.jpg"
+    },
+    {
+     "file": "codices/arundel-3/p0201.jpg",
+     "folio": "278r",
+     "print": "codices/arundel-3/p0202.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.2105,
+      "right": 0.829,
+      "bottom": 0.7756
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0203.jpg",
+     "folio": "278v",
+     "print": "codices/arundel-3/p0204.jpg",
+     "window": {
+      "left": 0.301,
+      "top": 0.2036,
+      "right": 0.819,
+      "bottom": 0.7722
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0205.jpg",
+     "folio": "279r",
+     "print": "codices/arundel-3/p0206.jpg",
+     "window": {
+      "left": 0.276,
+      "top": 0.2036,
+      "right": 0.844,
+      "bottom": 0.7791
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0207.jpg",
+     "folio": "279v",
+     "print": "codices/arundel-3/p0208.jpg",
+     "window": {
+      "left": 0.286,
+      "top": 0.2002,
+      "right": 0.849,
+      "bottom": 0.7687
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0209.jpg",
+     "folio": "280r",
+     "print": "codices/arundel-3/p0210.jpg",
+     "window": {
+      "left": 0.291,
+      "top": 0.1967,
+      "right": 0.859,
+      "bottom": 0.7687
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0211.jpg",
+     "folio": "280v",
+     "print": "codices/arundel-3/p0212.jpg",
+     "window": {
+      "left": 0.281,
+      "top": 0.2002,
+      "right": 0.824,
+      "bottom": 0.7756
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0213.jpg",
+     "folio": "281r",
+     "print": "codices/arundel-3/p0214.jpg",
+     "window": {
+      "left": 0.296,
+      "top": 0.1932,
+      "right": 0.844,
+      "bottom": 0.7583
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0215.jpg",
+     "folio": "281v",
+     "print": "codices/arundel-3/p0216.jpg",
+     "window": {
+      "left": 0.306,
+      "top": 0.2105,
+      "right": 0.834,
+      "bottom": 0.7618
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0217.jpg",
+     "folio": "282r",
+     "print": "codices/arundel-3/p0218.jpg",
+     "window": {
+      "left": 0.311,
+      "top": 0.2105,
+      "right": 0.904,
+      "bottom": 0.786
+     }
+    },
+    {
+     "file": "codices/arundel-3/p0219.jpg",
+     "folio": "283v",
+     "print": "codices/arundel-3/p0220.jpg",
+     "window": {
+      "left": 0.311,
+      "top": 0.2071,
+      "right": 0.839,
+      "bottom": 0.7791
+     }
+    }
+   ]
+  }
+ }
+}

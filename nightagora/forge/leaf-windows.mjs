@@ -48,7 +48,7 @@ const LEAST = .25
    window this much under the edition's own median is refused, and that page
    opens at the whole sheet, which is honest, where a tight window would cut
    the leaf. */
-const AGAINST_THE_EDITION = .88
+export const AGAINST_THE_EDITION = .88
 /* The plate's edge is soft, so the window keeps this much of the sheet
    around it rather than cutting into the facsimile's own paper. */
 const MARGIN = .004
@@ -57,7 +57,7 @@ const median = (values) => {
   const sorted = [...values].sort((a, b) => a - b)
   return sorted[sorted.length >> 1]
 }
-const quantile = (values, share) => {
+export const quantile = (values, share) => {
   const sorted = [...values].sort((a, b) => a - b)
   return sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * share))]
 }
@@ -89,7 +89,9 @@ function run(profile) {
     Math.min(1, (best.to + 1) / profile.length + MARGIN)]
 }
 
-async function measure(file) {
+/** The plate's rectangle on one printed sheet, in fractions of the scan, or
+ * null where no plate stands out of the sheet's white. */
+export async function measure(file) {
   const meta = await sharp(file).metadata()
   const { data, info } = await sharp(file).resize({ width: SAMPLE }).greyscale().raw()
     .toBuffer({ resolveWithObject: true })
@@ -187,4 +189,5 @@ async function main() {
   console.log(`written ${OUT}`)
 }
 
-await main()
+// the codex shelf measures its own printed plates by the same reading
+if (import.meta.url === `file://${process.argv[1]}`) await main()
