@@ -136,8 +136,10 @@ function installGrainSwitch(): void {
 
 export interface PostChain {
   post: PostProcessing
-  /** re-aim the chain at another scene's look; the shader is not rebuilt */
-  setGrade: (g: Grade | null | undefined) => void
+  /** re-aim the chain at another scene's look; the shader is not rebuilt.
+      `snap` stands the dials there at once: a caller that eases a dial
+      itself must not have the chain ease it a second time behind it. */
+  setGrade: (g: Grade | null | undefined, snap?: boolean) => void
   /** ease the dials toward the last grade asked for */
   update: (dt: number) => void
   dispose: () => void
@@ -357,9 +359,10 @@ export function createPost(
   post.outputColorTransform = false
   post.outputNode = out
 
-  function setGrade(asked: Grade | null | undefined): void {
+  function setGrade(asked: Grade | null | undefined, snap = false): void {
     const g = asked ?? IDENTITY
     Object.assign(target, dialsOf(g))
+    if (snap) Object.assign(d, dialsOf(g))
     if (aoPass) {
       aoPass.radius.value = g.ao.distance
       aoPass.thickness.value = g.ao.thickness
