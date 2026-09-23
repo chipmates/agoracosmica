@@ -164,11 +164,11 @@ const PRINT={...GRADES['first-station'],name:'clos-luce-1517',exposure:.94,lift:
 /** A ROOM IS NOT THE STREET. The stations in the insertion stand indoors,
  * under a clerestory and two fittings, and the outdoor exposure left them a
  * stop and a half under. The eye opens at the door, as a camera does. */
-const STATION_EXPOSURE:Partial<Record<VinciStationId,number>>={courtyard:1.0,oratory:1.5,hall:1.3,
+const STATION_EXPOSURE:Partial<Record<VinciStationId,number>>={courtyard:1.0,oratory:1.5,hall:2.2,
   'picture-room':1.34,'picture-room-west':1.34,'reading-table':0.9,'line-early':1.3,flight:1.55,works:1.55,body:1.4}
 /** THE HALL IS PRINTED ON A SHOULDER: its spots are the hottest light in the
  * wing, and a linear print clips a lit sail to one flat white. */
-const STATION_SHOULDER:Partial<Record<VinciStationId,number>>={flight:1,works:1}
+const STATION_SHOULDER:Partial<Record<VinciStationId,number>>={flight:1,works:1,hall:1}
 const exposureOf=(id?:string):number=>STATION_EXPOSURE[id as VinciStationId]??PRINT.exposure
 /** THE EYE THAT STEPS INTO A ROOM OF THE HOUSE opens as it does at a door:
  * the house's close looks stand indoors, a stop over the landing's print. */
