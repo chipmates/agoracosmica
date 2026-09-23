@@ -10,7 +10,7 @@
       "prompt": "Thin brick relief, tuffeau quoins and registered cut apertures, intersecting roofs, dormers, chimneys, turret and separate gallery/watchtower. Dossier nominal dimensions with original certainty ranges. No photograph sampled. Shallow 55 mm rebate within declared 35–90 mm assumption; split upper sky reflection and lower dark-room glazing. Existing roughness .18–.23 remains inside dossier interval; no screen-space transmission. Duplicated upper tower shell now shares registered aperture cuts. Connected F16/F17 masonry below the unchanged −2.20 m base: 0.60 m inward thickness [0.45–0.80], actual standard/calm ground boundary lower envelope embedded 50 mm [25–100], full joined miter volume and inherited stone coursing. No surveyed height or opening changes.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "a01ad01be9e990042fa1ffb359e3969191f4c2a621e7b2598b837aa21aad6ccf",
+      "sha256": "2dccb717798453827af72682b47e87999dd44bc7e9d5baa3188ae2038347bd68",
       "note": "Q001 Q015 Q019 Q124 Q127 Q131 Q134 Q175; src/wings/vinci/data/closluce.json; recipe_file=src/wings/vinci/shell.ts; geometry_dependency=vinci/foundation-plinth"
     },
     {
@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed to a pale grey at 30 per cent. Assumed weather, no observation claimed.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "d46077fadd74a19be652a5497dfc08f97a61ee647a250927c612ac827368c4c5",
+      "sha256": "4076e88ad92d0fba59bbb07c33a38c69fb86ef4a31faefeb5caacb9dd61823f7",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=80c458f2cb5ccddb7fcedccda5df70e5cdccda7d9ca97d65ebfa6462920f61ef;"
     },
     {
@@ -62,7 +62,7 @@
       "prompt": "Museum camera poses and piecewise exterior circulation in the fixed dossier frame. All poses are exhibition choices. Latest target semantic navigation on measured gate/terrace/stair/apron routes. Bounded physical near-pyramid clearance; measured geometry identity at mount. CSS projection-derived drag with 0.1 second monotone response; explicit inspection entry and return. The active certified leg finishes before a direct certified route to the newest pending target. Static material inspection aliases have separate actual placement audits.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "9938545f58bb0cefb569fc42bbd448fecaa829cc6daa9a17119bd397f0714264",
+      "sha256": "2ba4ecbc7c04499faa9d0f78e07abf47eb2d317ed4b21b65beccf5723693e7db",
       "note": "brief/CONCEPT.md; src/wings/vinci/data/closluce.json; recipe_file=src/wings/vinci/rail.ts; companion_file=src/wings/vinci/input.ts; companion_recipe_ids=vinci/rail-smoothing,vinci/rail-proof,vinci/rail-fingerprint,vinci/rail-projection,vinci/projection-drag,vinci/rail-clearance,vinci/rail-waypoints,vinci/rail-solids,vinci/gait"
     },
     {
