@@ -1388,7 +1388,7 @@ export function createWing():VinciWingModule {
       if(!found)continue
       const entries=sources.filter(source=>source.work.id===entry.workId).map(source=>source.entry)
       marks.push({id:entry.id,anchor:entry.anchor,object:entry.object,
-        label:lang()==='de'?found.work.title_de:found.work.title_en,
+        label:text(workTitle(found.work,entry.face)),
         colour:policyLabelText(found.work,entries).colour,...sign(entry)})
     }
     // THREE MARKS AT A STOP, AND WHICH THREE: this work and its two
@@ -1425,7 +1425,7 @@ export function createWing():VinciWingModule {
     }else{
     if(!found)return
     const entries=sources.filter(source=>source.work.id===found.work.id).map(source=>source.entry)
-    quietName.textContent=lang()==='de'?found.work.title_de:found.work.title_en
+    quietName.textContent=text(workTitle(found.work,found.entry.face))
     quietYear.textContent=lang()==='de'?found.work.date_label_de:found.work.date_label_en
     quietDot.style.setProperty('--certainty',policyLabelText(found.work,entries).colour)
     }
