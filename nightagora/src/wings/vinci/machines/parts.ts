@@ -2,13 +2,13 @@ import {
   Color, DoubleSide, FrontSide, Group, InstancedMesh, Matrix4, Mesh, MeshPhysicalNodeMaterial, MeshStandardNodeMaterial,
   type BufferGeometry,
 } from 'three/webgpu'
-import { cameraPosition, float, normalGeometry, normalMap, normalWorld, positionGeometry, positionWorld, uv, vec2, vec3 } from 'three/tsl'
+import { cameraPosition, float, mix, normalGeometry, normalMap, normalWorld, positionGeometry, positionWorld, step, uv, vec2, vec3 } from 'three/tsl'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
 import type { MaterialSet, Stack } from '../../../stack'
 import type { DetailNodes } from '../../../stack/detail'
 import { createGlassSeatMaterial } from './glass-seat'
 import { createFlywheelSpokeArms } from './flywheel-overlap'
-import { createMutableSweep, geometryForPart, type MutableSweep } from './geometry'
+import { createMutableSweep, END_GRAIN_U, geometryForPart, type MutableSweep } from './geometry'
 import { benchKeyDirection } from './key'
 import type { Assembly, Dossier, PartSpec } from './types'
 export type { Assembly } from './types'
@@ -63,6 +63,12 @@ function keyRim(strength: number): any {
   const lit = normalWorld.dot(vec3(key.x, key.y, key.z)).mul(.5).add(.5).pow(1.5)
   return grazing.mul(lit).mul(strength)
 }
+
+/** Sets a machine asks for at the tier's whole budget. The planed oak is the
+ * hall's own soffit set, so a narrowed copy must never be cached ahead of it. */
+const FULL_BUDGET = new Set(['linen', 'iron-forged', 'oak-veneer-light'])
+/** The oak sets whose rectangular timbers each read their own part of the photograph. */
+const PHASED_OAK = new Set(['oak-beams', 'oak-veneer-light'])
 
 const materialLoads = new WeakMap<Stack, Map<string, Promise<MaterialSet>>>()
 const materialQueues = new WeakMap<Stack, Promise<void>>()
@@ -137,7 +143,7 @@ export function loadMachineMaterial(stack: Stack, name: string): Promise<Materia
     // The narrowed budget is held only across the request itself, so no
     // other caller's set can be asked for while it stands.
     const tier = stack.tierConfig()
-    stack.materials.setTier(name === 'linen' || name === 'iron-forged' ? tier : {...tier, detail: 1})
+    stack.materials.setTier(FULL_BUDGET.has(name) ? tier : {...tier, detail: 1})
     let request: Promise<MaterialSet>
     try {
       request = stack.materials.load(name)
@@ -168,6 +174,10 @@ export function loadMachineMaterial(stack: Stack, name: string): Promise<Materia
 }
 
 const libraryName = (material: string): string => {
+  // new work in planed and turned oak, not weathered timber
+  if (/planed oak|turned oak|oak peg|oak grip/.test(material)) return 'oak-veneer-light'
+  // a hide sealed with pitch, and the pitch the tube is bedded in
+  if (/pitched/.test(material)) return 'leather-worn'
   if (/thread/.test(material)) return 'rope'
   if (/linen/.test(material)) return 'linen'
   if (/hemp|rope/.test(material)) return 'rope'
@@ -201,6 +211,7 @@ function phaseTimber(geometry: BufferGeometry, identity: string): void {
  * Circular plates, pulleys and other profiles keep the library's original UVs. */
 const isTimber = (slug: string, part: PartSpec): boolean =>
   part.shape === 'box' || (slug === 'rolling-mill' && (part.id === 'left-post' || part.id === 'right-post'))
+  || (typeof part.shape !== 'string' && part.shape.type !== 'mesh' && /planed oak/.test(part.material.class))
 
 /** Construct only the admitted numerical parts. Library sets and shader grain
  * are GENERATED dressing over that metre geometry, never replica textures. */
@@ -285,6 +296,11 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
       // finds them. A dressed stone at arm's length is not a smooth sphere.
       ...set, scale: [.05, .05], scales: [.046, .013, .0016], normalStrength: .62,
       detail: {...set.detail, macro: .046, macroContrast: .55, mid: .8, micro: .55},
+    } : /pitched/.test(name) ? {
+      // A hide sewn into a hose and sealed with pitch: a close crinkle over a
+      // smooth skin, not an upholstery's creases, which read as links.
+      ...set, normalStrength: .2, scales: [.35, .04, .0011],
+      grain: set.grain ? {...set.grain, pitch: .022, relief: .14, shade: .12, sheen: .32, fold: .3, tooth: .006} : null,
     } : /leather/.test(name) ? {
       // A hide wound round a shaft creases along the wrap; without that band
       // the coil is a smooth tube and reads as hose.
@@ -428,11 +444,42 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
       material.colorNode = vec3(stone.r, stone.g, stone.b).mul(body.mul(1.05).add(.02)).mul(detail.occlusion)
       material.roughnessNode = detail.roughness.clamp(.62, .95)
     }
-    if (/leather/.test(name)) {
+    if (/leather/.test(name) && !/pitched/.test(name)) {
       const hide = new Color('#5c4331')
       const fibres = detail.albedo.dot(vec3(.2126, .7152, .0722))
       material.colorNode = vec3(hide.r, hide.g, hide.b).mul(fibres.mul(.8).add(.3)).mul(detail.occlusion)
       material.roughnessNode = detail.roughness.clamp(.58, .92)
+    }
+    if (/pitched/.test(name)) {
+      // GENERATED pitch-dark hide tint over the CC0 leather's own luminance,
+      // its variation held to a third so the skin reads whole.
+      const pitch = new Color(/bedding/.test(name) ? '#1d1713' : '#3d2e23')
+      const lum = set.albedo.r * .2126 + set.albedo.g * .7152 + set.albedo.b * .0722
+      const fibres = detail.albedo.dot(vec3(.2126, .7152, .0722)).div(Math.max(lum, .001))
+      material.colorNode = vec3(pitch.r, pitch.g, pitch.b).mul(fibres.mul(.3).add(.7).clamp(.5, 1.4)).mul(detail.occlusion)
+      material.roughnessNode = /bedding/.test(name) ? detail.roughness.mul(.5).clamp(.22, .4) : detail.roughness.mul(.75).clamp(.4, .64)
+    }
+    if (/planed oak|turned oak|oak peg|oak grip/.test(name)) {
+      // GENERATED tint: new planed oak, paler and greyer than the museum's
+      // oiled oak, over the CC0 veneer's own grain at half its colour and a
+      // little over half its contrast; the grip is darkened by the hand.
+      const oak = new Color(/grip/.test(name) ? '#5f4a37' : /turned/.test(name) ? '#86715a' : '#8d7a62')
+      const lum = detail.albedo.dot(vec3(.2126, .7152, .0722))
+      const grain = mix(vec3(lum, lum, lum), detail.albedo, .5).sub(1).mul(.6).add(1)
+      // an end face drinks the light: darker and rougher than the side grain
+      const end = step(END_GRAIN_U / 2, uv().x)
+      material.colorNode = vec3(oak.r, oak.g, oak.b).mul(grain).mul(detail.occlusion).mul(end.mul(-.48).add(1))
+      material.roughnessNode = /grip/.test(name) ? detail.roughness.mul(.8).clamp(.32, .6)
+        : mix(detail.roughness.clamp(.5, .85), float(.9), end)
+    }
+    if (/iron, forged/.test(name)) {
+      // GENERATED tint: blacksmith's iron, dark off the hammer with a faint
+      // warm scale, over the CC0 set's own mottle.
+      material.metalness = .5
+      const scale = new Color('#3f3a35')
+      const mottle = detail.albedo.dot(vec3(.2126, .7152, .0722))
+      material.colorNode = vec3(scale.r, scale.g, scale.b).mul(mottle.mul(.5).add(.55)).mul(detail.occlusion)
+      material.roughnessNode = detail.roughness.mul(.9).clamp(.5, .82)
     }
     if (dossier.slug === 'camera-obscura' && set.name === 'oak-beams') {
       // The one flat lid on the bench that the key strikes near square. A
@@ -456,7 +503,7 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
     return material
   }
   await Promise.all(names.map(async name => {
-    const key = /ink|glass|water|lead|paper/.test(name) ? name : libraryName(name)
+    const key = /ink|glass|water|lead|paper|oak peg|turned oak|oak grip|bedding/.test(name) ? name : libraryName(name)
     let surface = surfaceCache.get(key)
     if (!surface) { surface = makeSurface(name); surfaceCache.set(key, surface) }
     materials.set(name, await surface)
@@ -620,7 +667,7 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
       if (noweld) {
         for (const source of sources) {
           const part = specById.get(source.userData['partId'] as string)!
-          if (!isTimber(dossier.slug, part) || libraryName(part.material.class) !== 'oak-beams') continue
+          if (!isTimber(dossier.slug, part) || !PHASED_OAK.has(libraryName(part.material.class))) continue
           const geometry = source.geometry.clone()
           phaseTimber(geometry, `${dossier.slug}:${part.id}`)
           geometries.add(geometry)
@@ -632,7 +679,7 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
       const pieces = sources.map(source => {
         let geometry = source.geometry.clone()
         const part = specById.get(source.userData['partId'] as string)!
-        if (isTimber(dossier.slug, part) && libraryName(part.material.class) === 'oak-beams') phaseTimber(geometry, `${dossier.slug}:${part.id}`)
+        if (isTimber(dossier.slug, part) && PHASED_OAK.has(libraryName(part.material.class))) phaseTimber(geometry, `${dossier.slug}:${part.id}`)
         geometry.applyMatrix4(new Matrix4().multiplyMatrices(inverse, source.matrixWorld))
         // Extrusions are unindexed, procedural meshes indexed. A common
         // layout allows welding without altering any numerical surface.

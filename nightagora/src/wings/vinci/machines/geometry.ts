@@ -193,7 +193,7 @@ function extrudeProfile(part: PartSpec, tier: TierName): BufferGeometry {
   geometry.translate(0, 0, d.extrusion_min ?? -depth / 2)
   if (plane === 'XZ') geometry.rotateX(-Math.PI / 2)
   else if (plane === 'YZ') geometry.applyMatrix4(new Matrix4().set(0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1))
-  metricPlanarUV(geometry, /wood|oak|ash|cane/.test(part.material.class))
+  metricPlanarUV(geometry, /wood|oak|ash|cane/.test(part.material.class), endGrainClass(part.material.class))
   return geometry
 }
 
@@ -302,8 +302,14 @@ function exactMesh(part: PartSpec, helical = false, tier: TierName = 'standard')
   return geometry
 }
 
+/** An end-grain face carries its U this far out, so a material can tell the
+ * end of a timber from its side; a tiled map repeats and never sees it. */
+export const END_GRAIN_U = 64
+/** The classes whose timbers show their end grain. */
+const endGrainClass = (material: string): boolean => /planed oak|turned oak|oak peg/.test(material)
+
 /** UVs are metres so the library's grain cannot swell with the machine. */
-export function metricPlanarUV(geometry: BufferGeometry, alongMember = false): void {
+export function metricPlanarUV(geometry: BufferGeometry, alongMember = false, markEnds = false): void {
   const p = geometry.getAttribute('position'), n = geometry.getAttribute('normal')
   geometry.computeBoundingBox()
   const size = geometry.boundingBox!.getSize(new Vector3())
@@ -319,19 +325,22 @@ export function metricPlanarUV(geometry: BufferGeometry, alongMember = false): v
     // to its longest member axis, so a horizontal rail is not cross-grained.
     if (alongMember && sizes[a]! > sizes[b]!) [a, b] = [b, a]
     const coordinates = [p.getX(i), p.getY(i), p.getZ(i)]
-    uv.push(coordinates[a]!, coordinates[b]!)
+    // a face square to the member's own length is the timber's end
+    const along = sizes.indexOf(Math.max(...sizes))
+    const end = markEnds && Math.abs([n?.getX(i) ?? 0, n?.getY(i) ?? 1, n?.getZ(i) ?? 0][along]!) > .95
+    uv.push(coordinates[a]! + (end ? END_GRAIN_U : 0), coordinates[b]!)
   }
   geometry.setAttribute('uv', new Float32BufferAttribute(uv, 2))
 }
 
-function metricCylinderUV(geometry: BufferGeometry, radius: number, height: number): void {
+function metricCylinderUV(geometry: BufferGeometry, radius: number, height: number, markEnds = false): void {
   const uv = geometry.getAttribute('uv'), p = geometry.getAttribute('position'), n = geometry.getAttribute('normal')
   // A plate is not a post. Where the wall is shorter than its own radius the
   // library's long grain runs around the circumference; mapped up a four
   // centimetre rim instead it stretches one slice of plank into a comb.
   const plate = height < radius
   for (let i = 0; i < uv.count; i++) {
-    if (Math.abs(n.getY(i)) > 0.5) { uv.setXY(i, p.getX(i), p.getZ(i)); continue }
+    if (Math.abs(n.getY(i)) > 0.5) { uv.setXY(i, p.getX(i) + (markEnds ? END_GRAIN_U : 0), p.getZ(i)); continue }
     const around = uv.getX(i) * TAU * radius, along = uv.getY(i) * height
     if (plate) uv.setXY(i, along, around)
     else uv.setXY(i, around, along)
@@ -411,12 +420,12 @@ export function geometryForPart(part: PartSpec, tier: TierName = 'standard', slu
   switch (kind) {
     case 'box':
       geometry = new BoxGeometry(required(d.x, 'x'), required(d.y, 'y'), required(d.z, 'z'))
-      metricPlanarUV(geometry, /wood|oak|ash|cane/.test(part.material.class))
+      metricPlanarUV(geometry, /wood|oak|ash|cane/.test(part.material.class), endGrainClass(part.material.class))
       break
     case 'cylinder': case 'cone': {
       const radius = d.radius ?? required(d.radius_bottom, 'radius_bottom'), height = required(d.height, 'height')
       geometry = new CylinderGeometry(d.radius_top ?? radius, radius, height, count(tier, 64, 48, 32))
-      metricCylinderUV(geometry, radius, height)
+      metricCylinderUV(geometry, radius, height, endGrainClass(part.material.class))
       break
     }
     case 'sphere': {

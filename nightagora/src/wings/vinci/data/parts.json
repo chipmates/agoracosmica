@@ -1009,45 +1009,253 @@
       }
     },
     "water-lifting-screw": {
+      "base-sleeper-0": {
+        "en": "Sleeper of the base",
+        "de": "Schwelle des Sockels"
+      },
+      "base-sleeper-1": {
+        "en": "Sleeper of the base",
+        "de": "Schwelle des Sockels"
+      },
+      "base-sleeper-2": {
+        "en": "Sleeper of the base",
+        "de": "Schwelle des Sockels"
+      },
+      "base-sleeper-3": {
+        "en": "Sleeper of the base",
+        "de": "Schwelle des Sockels"
+      },
+      "base-sleeper-4": {
+        "en": "Sleeper of the base",
+        "de": "Schwelle des Sockels"
+      },
+      "base-sleeper-5": {
+        "en": "Sleeper of the base",
+        "de": "Schwelle des Sockels"
+      },
       "base": {
         "en": "Base",
         "de": "Sockel"
+      },
+      "base-plank-1": {
+        "en": "Base",
+        "de": "Sockel"
+      },
+      "base-plank-2": {
+        "en": "Base",
+        "de": "Sockel"
+      },
+      "base-plank-3": {
+        "en": "Base",
+        "de": "Sockel"
+      },
+      "base-plank-4": {
+        "en": "Base",
+        "de": "Sockel"
+      },
+      "base-plank-5": {
+        "en": "Base",
+        "de": "Sockel"
+      },
+      "base-plank-6": {
+        "en": "Base",
+        "de": "Sockel"
+      },
+      "base-peg-0-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-0-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-0-2": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-0-3": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-0-4": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-0-5": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-1-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-1-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-1-2": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-1-3": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-1-4": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-1-5": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-2-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-2-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-2-2": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-2-3": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-2-4": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-2-5": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-3-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-3-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-3-2": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-3-3": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-3-4": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-3-5": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-4-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-4-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-4-2": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-4-3": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-4-4": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-4-5": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-5-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-5-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-5-2": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-5-3": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-5-4": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-5-5": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-6-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-6-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-6-2": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-6-3": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-6-4": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "base-peg-6-5": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
       },
       "lower-bearing": {
         "en": "Lower bearing",
         "de": "Unteres Lager"
       },
-      "upper-bearing": {
-        "en": "Upper bearing",
-        "de": "Oberes Lager"
+      "lower-bearing-plate": {
+        "en": "Iron plate of the lower bearing",
+        "de": "Eisenplatte am unteren Lager"
       },
-      "support": {
-        "en": "Support",
-        "de": "Stütze"
+      "lower-bearing-collar-front": {
+        "en": "Collar of the lower bearing",
+        "de": "Ring am unteren Lager"
       },
-      "support2": {
-        "en": "Support",
-        "de": "Stütze"
+      "lower-bearing-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
       },
-      "rotor": {
-        "en": "Shaft hub",
-        "de": "Wellennabe"
+      "lower-bearing-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
       },
-      "shaft": {
-        "en": "Shaft",
-        "de": "Welle"
+      "lower-bearing-nail-2": {
+        "en": "Nail",
+        "de": "Nagel"
       },
-      "crank": {
-        "en": "Crank",
-        "de": "Kurbel"
-      },
-      "handle": {
-        "en": "Crank handle",
-        "de": "Kurbelgriff"
-      },
-      "helical-tube": {
-        "en": "Helical tube",
-        "de": "Gewundenes Rohr"
+      "lower-bearing-nail-3": {
+        "en": "Nail",
+        "de": "Nagel"
       },
       "lower-trough-base": {
         "en": "Lower trough",
@@ -1069,6 +1277,158 @@
         "en": "Wall of the lower trough",
         "de": "Wand der unteren Rinne"
       },
+      "lower-trough-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "lower-trough-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "lower-trough-nail-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "lower-trough-nail-3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "lower-trough-nail-4": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "lower-trough-nail-5": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "lower-trough-nail-6": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "lower-trough-nail-7": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "lower-trough-nail-8": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "lower-trough-nail-9": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "lower-trough-nail-10": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "lower-trough-nail-11": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "support": {
+        "en": "Support",
+        "de": "Stütze"
+      },
+      "support2": {
+        "en": "Support",
+        "de": "Stütze"
+      },
+      "support-tenon": {
+        "en": "Tenon of the support",
+        "de": "Zapfen der Stütze"
+      },
+      "support-wedge-0": {
+        "en": "Wedge",
+        "de": "Keil"
+      },
+      "support-wedge-1": {
+        "en": "Wedge",
+        "de": "Keil"
+      },
+      "support-peg": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "support2-tenon": {
+        "en": "Tenon of the support",
+        "de": "Zapfen der Stütze"
+      },
+      "support2-wedge-0": {
+        "en": "Wedge",
+        "de": "Keil"
+      },
+      "support2-wedge-1": {
+        "en": "Wedge",
+        "de": "Keil"
+      },
+      "support2-peg": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "upper-bearing": {
+        "en": "Upper bearing",
+        "de": "Oberes Lager"
+      },
+      "upper-bearing-plate": {
+        "en": "Iron plate of the upper bearing",
+        "de": "Eisenplatte am oberen Lager"
+      },
+      "upper-bearing-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "upper-bearing-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "upper-bearing-nail-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "upper-bearing-nail-3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "upper-bearing-collar-back": {
+        "en": "Collar of the upper bearing",
+        "de": "Ring am oberen Lager"
+      },
+      "upper-bearing-collar-front": {
+        "en": "Collar of the upper bearing",
+        "de": "Ring am oberen Lager"
+      },
+      "support-brace-fore": {
+        "en": "Brace",
+        "de": "Strebe"
+      },
+      "support-brace-fore-peg": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "support-brace-aft": {
+        "en": "Brace",
+        "de": "Strebe"
+      },
+      "support-brace-aft-peg": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "support2-brace-fore": {
+        "en": "Brace",
+        "de": "Strebe"
+      },
+      "support2-brace-fore-peg": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "support2-brace-aft": {
+        "en": "Brace",
+        "de": "Strebe"
+      },
+      "support2-brace-aft-peg": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
       "upper-trough-base": {
         "en": "Upper trough",
         "de": "Obere Rinne"
@@ -1089,21 +1449,393 @@
         "en": "Wall of the upper trough",
         "de": "Wand der oberen Rinne"
       },
-      "lower-bearing-collar-front": {
-        "en": "Collar of the lower bearing",
-        "de": "Ring am unteren Lager"
+      "upper-trough-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
       },
-      "upper-bearing-collar-back": {
-        "en": "Collar of the upper bearing",
-        "de": "Ring am oberen Lager"
+      "upper-trough-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
       },
-      "upper-bearing-collar-front": {
-        "en": "Collar of the upper bearing",
-        "de": "Ring am oberen Lager"
+      "upper-trough-nail-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "upper-trough-nail-3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "upper-trough-nail-4": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "upper-trough-nail-5": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "upper-trough-nail-6": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "upper-trough-nail-7": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "upper-trough-nail-8": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "upper-trough-nail-9": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "upper-trough-nail-10": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "upper-trough-nail-11": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "basin-rail": {
+        "en": "Rail under the upper trough",
+        "de": "Riegel unter der oberen Rinne"
+      },
+      "basin-leg-0": {
+        "en": "Leg of the upper trough",
+        "de": "Bein der oberen Rinne"
+      },
+      "basin-leg-1": {
+        "en": "Leg of the upper trough",
+        "de": "Bein der oberen Rinne"
+      },
+      "rotor": {
+        "en": "Shaft hub",
+        "de": "Wellennabe"
+      },
+      "shaft": {
+        "en": "Shaft",
+        "de": "Welle"
+      },
+      "pivot-lower": {
+        "en": "Lower pivot",
+        "de": "Unterer Drehzapfen"
+      },
+      "pivot-upper": {
+        "en": "Upper pivot",
+        "de": "Oberer Drehzapfen"
+      },
+      "shaft-hoop-lower": {
+        "en": "Iron hoop",
+        "de": "Eisenreif"
+      },
+      "shaft-hoop-lower-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "shaft-hoop-lower-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "shaft-hoop-lower-nail-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "shaft-hoop-lower-nail-3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "shaft-hoop-lower-nail-4": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "shaft-hoop-lower-nail-5": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "shaft-hoop-upper": {
+        "en": "Iron hoop",
+        "de": "Eisenreif"
+      },
+      "shaft-hoop-upper-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "shaft-hoop-upper-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "shaft-hoop-upper-nail-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "shaft-hoop-upper-nail-3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "shaft-hoop-upper-nail-4": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "shaft-hoop-upper-nail-5": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "shaft-plate-lower": {
+        "en": "Iron cross on the end of the shaft",
+        "de": "Eisenkreuz am Ende der Welle"
+      },
+      "shaft-plate-upper": {
+        "en": "Iron cross on the end of the shaft",
+        "de": "Eisenkreuz am Ende der Welle"
+      },
+      "helical-tube": {
+        "en": "Helical tube",
+        "de": "Gewundenes Rohr"
+      },
+      "tube-bedding-0": {
+        "en": "Pitch bedding the tube",
+        "de": "Pech unter dem Rohr"
+      },
+      "tube-bedding-1": {
+        "en": "Pitch bedding the tube",
+        "de": "Pech unter dem Rohr"
+      },
+      "tube-band-0": {
+        "en": "Iron band",
+        "de": "Eisenband"
+      },
+      "tube-band-0-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-0-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-1": {
+        "en": "Iron band",
+        "de": "Eisenband"
+      },
+      "tube-band-1-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-1-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-2": {
+        "en": "Iron band",
+        "de": "Eisenband"
+      },
+      "tube-band-2-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-2-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-3": {
+        "en": "Iron band",
+        "de": "Eisenband"
+      },
+      "tube-band-3-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-3-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-4": {
+        "en": "Iron band",
+        "de": "Eisenband"
+      },
+      "tube-band-4-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-4-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-5": {
+        "en": "Iron band",
+        "de": "Eisenband"
+      },
+      "tube-band-5-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-5-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-6": {
+        "en": "Iron band",
+        "de": "Eisenband"
+      },
+      "tube-band-6-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-6-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-7": {
+        "en": "Iron band",
+        "de": "Eisenband"
+      },
+      "tube-band-7-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-7-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-8": {
+        "en": "Iron band",
+        "de": "Eisenband"
+      },
+      "tube-band-8-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-8-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-9": {
+        "en": "Iron band",
+        "de": "Eisenband"
+      },
+      "tube-band-9-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-9-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-10": {
+        "en": "Iron band",
+        "de": "Eisenband"
+      },
+      "tube-band-10-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-10-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-11": {
+        "en": "Iron band",
+        "de": "Eisenband"
+      },
+      "tube-band-11-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-11-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-12": {
+        "en": "Iron band",
+        "de": "Eisenband"
+      },
+      "tube-band-12-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-12-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-13": {
+        "en": "Iron band",
+        "de": "Eisenband"
+      },
+      "tube-band-13-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-13-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-14": {
+        "en": "Iron band",
+        "de": "Eisenband"
+      },
+      "tube-band-14-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-14-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-15": {
+        "en": "Iron band",
+        "de": "Eisenband"
+      },
+      "tube-band-15-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-15-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-16": {
+        "en": "Iron band",
+        "de": "Eisenband"
+      },
+      "tube-band-16-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-16-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-17": {
+        "en": "Iron band",
+        "de": "Eisenband"
+      },
+      "tube-band-17-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "tube-band-17-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "crank": {
+        "en": "Crank",
+        "de": "Kurbel"
       },
       "crank-shaft-collar": {
         "en": "Crank hub",
         "de": "Kurbelnabe"
+      },
+      "crank-key": {
+        "en": "Key of the crank",
+        "de": "Keil der Kurbel"
+      },
+      "handle": {
+        "en": "Crank handle",
+        "de": "Kurbelgriff"
+      },
+      "handle-cap": {
+        "en": "Head of the handle pin",
+        "de": "Kopf des Griffstifts"
       }
     },
     "proportional-compass": {
