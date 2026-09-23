@@ -27,7 +27,7 @@ const rgb=(hex:string):N=>{const c=new Color(hex);return vec3(c.r,c.g,c.b)}
 const SUN_AZ=hourKey.sun_azimuth_deg.value*Math.PI/180,SUN_EL=hourKey.sun_elevation_deg.value*Math.PI/180
 const SUN_UP=Math.sin(SUN_EL),SUN=vec3(Math.sin(SUN_AZ)*Math.cos(SUN_EL),SUN_UP,-Math.cos(SUN_AZ)*Math.cos(SUN_EL))
 interface Facade { from:[number,number];to:[number,number];length_m:number;render:boolean;
-  id:string;pattern:{field:string};openings:{base_m:number;width_m:number;from_m:number;render:boolean}[] }
+  id:string;pattern:{field:string};openings:{base_m:number;width_m:number;from_m:number;render:boolean;type:string}[] }
 interface Wall {facade_id:string;base_m:number;height_m:number;render:boolean}
 function unwrap(x:unknown):unknown {
   if(!x||typeof x!=='object')return x
@@ -43,6 +43,13 @@ const facades=dossier.facades.filter(f=>f.render).map(f=>{
     minE:Math.min(f.from[0],f.to[0])-.8,maxE:Math.max(f.from[0],f.to[0])+.8,
     minN:Math.min(f.from[1],f.to[1])-.8,maxN:Math.max(f.from[1],f.to[1])+.8}
 })
+
+/** Every door's threshold stone: its middle, the facade's direction, its
+ * half width and its top, where feet have crossed for forty-six years. */
+const thresholds=facades.flatMap(f=>f.openings.filter(o=>o.render&&o.type==='door').map(o=>{
+  const mid=o.from_m+o.width_m/2
+  return{e:f.from[0]+f.dx*mid,n:f.from[1]+f.dn*mid,dx:f.dx,dn:f.dn,half:o.width_m/2,top:o.base_m+.01}
+}))
 
 /** Recover a stable face origin from its metre UV frame. Each triangle gets
  * one seed; splitting a batch cannot change it. This is variation in proposed
@@ -475,15 +482,18 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
     // takes the splash at its foot: a darker, greener band with a wandering
     // top edge, half a metre up and strongest at the courses just above the
     // base. The largest plane in the arrival frame had no weathering at all.
+    // A face the weather map does not reach keeps a splash band at the
+    // court's own level; every mapped face takes its foot from the map.
+    const at=attribute('weatherUV','vec4')
     const splashEdge=P.y.sub(mx_noise_float(vec3(P.x.mul(1.9),P.y.mul(.5),P.z.mul(1.9))).mul(.07))
-    const splash=float(1).sub(smoothstep(.11,.47,splashEdge)).mul(smoothstep(-.05,.06,splashEdge))
+    const splash=float(1).sub(smoothstep(.11,.47,splashEdge)).mul(smoothstep(-.05,.06,splashEdge)).mul(float(1).sub(at.z))
     m.colorNode=mix(m.colorNode as N,(m.colorNode as N).mul(vec3(.87,.885,.845)),splash.mul(.55))
     m.roughnessNode=clamp((m.roughnessNode as N).add(splash.mul(.03)),roughRange[0],roughRange[1])
     // WEATHER WITH CAUSES, read from the baked map of every facade: dark
     // streaks under the sills and courses, damp at the foot, lichen where a
     // face looks north, a broad grime. A fine vertical fibre breaks each
     // streak into the runs water actually takes; it fades before it aliases.
-    const at=attribute('weatherUV','vec4'),weather=texture(weatherAtlas().texture,at.xy).mul(at.z)
+    const weather=texture(weatherAtlas().texture,at.xy).mul(at.z)
     const fibreHeld=resolvedAt(.03)
     const fibre=mix(float(.5),mx_noise_float(vec3(U.x.mul(34),U.y.mul(1.3),3.7)).mul(.5).add(.5),fibreHeld)
     const streak=weather.x.mul(fibre.mul(.7).add(.3))
@@ -495,8 +505,9 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
     c=mix(c,vec3(grey).mul(vec3(.92,.90,.86)),streak.mul(.35)).mul(float(1).sub(streak.mul(soil)))
     // UNDERSIDES THE RAIN NEVER WASHES keep a dark crust: the soffits of
     // quoins, courses and sills, which the court's light would show brown.
+    // (a crust, not a void: the head of a window seen from below is stone)
     const soffit=normalWorldGeometry.y.negate().max(0).mul(float(1).sub(smoothstep(.2,.6,horizontalLength)))
-    c=mix(c,rgb('#4a4741').mul(c.dot(vec3(.33,.33,.33)).mul(1.6).add(.4)),soffit.mul(.55))
+    c=mix(c,rgb('#4a4741').mul(c.dot(vec3(.33,.33,.33)).mul(1.6).add(.4)),soffit.mul(.30))
     // TOPS HOLD WHAT THE RAIN BRINGS: copings, sills and courses carry grime
     // in their pores and a skin of lichen, never the clean edge of new work.
     // (a course's own lip leans out a quarter and stays the sun's)
@@ -504,19 +515,42 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
     const top=normalWorldGeometry.y.max(0).mul(float(1).sub(smoothstep(.08,options.tops??.2,horizontalLength)))
     const skin=smoothstep(.3,.75,mx_noise_float(P.mul(9).add(vec3(5.3,1.1,7.9))).mul(.5).add(.5))
     c=mix(c,mix(c.mul(vec3(.66,.64,.58)),rgb('#8e9474'),skin.mul(.45)),top.mul(.7))
-    c=c.mul(float(1).sub(weather.y.mul(.2))).mul(mix(vec3(1,1,1),vec3(.93,.97,.90),weather.y))
+    // THE FOOT, measured from the ground each wall stands in: rising damp
+    // to a tide line (the map's half), the splash of rain off the paving in
+    // the lowest part of it as a speckle of grit, grime tailing off above.
+    const footMap=weather.y,tide=smoothstep(.44,.56,footMap),splashed=smoothstep(.78,.96,footMap)
+    const speckHeld=resolvedAt(.024)
+    const speck=mix(float(.4),smoothstep(.45,.8,mx_noise_float(P.mul(42).add(vec3(2.3,.7,5.1))).mul(.5).add(.5)),speckHeld)
+    c=c.mul(float(1).sub(tide.mul(.22))).mul(mix(vec3(1,1,1),vec3(.90,.95,.86),tide))
+    c=mix(c,c.mul(vec3(.58,.54,.48)),splashed.mul(speck.mul(.62).add(.3)))
+    // the last hand's breadth, where the paving's dirt lies against it
+    c=c.mul(float(1).sub(smoothstep(.95,.995,footMap).mul(.3)))
     const lichenMask=smoothstep(.38,.72,mx_noise_float(P.mul(22).add(vec3(1.7,4.1,2.3))).mul(.5).add(.5).mul(resolvedAt(.05)).add(float(1).sub(resolvedAt(.05)).mul(.5)))
     c=mix(c,rgb('#9ba07c').mul(mottled.mul(.2).add(.9)),weather.z.mul(lichenMask).mul(.62))
     // a broad grime, heavier low on the wall where hands and splash reach
-    const grime=mx_noise_float(P.mul(.35).add(vec3(3.1,7.7,1.3))).mul(.5).add(.5).mul(float(1).sub(smoothstep(.5,3,P.y)).mul(.5).add(.5))
-    c=c.mul(float(1).sub(grime.mul(.14).mul(at.z)))
+    const grime=mx_noise_float(P.mul(.35).add(vec3(3.1,7.7,1.3))).mul(.5).add(.5).mul(footMap.mul(.8).add(.2))
+    c=c.mul(float(1).sub(grime.mul(.18).mul(at.z)))
+    // A THRESHOLD IS WORN where feet cross it: a paler, smoother hollow down
+    // its middle, the court's dirt pushed to its two ends.
+    let worn:N=float(0)
+    if(kind==='stone')for(const d of thresholds){
+      const re=P.x.sub(d.e),rn=P.z.negate().sub(d.n)
+      const across=re.mul(d.dx).add(rn.mul(d.dn)),out=re.mul(d.dn).sub(rn.mul(d.dx))
+      const onTop=smoothstep(.75,.95,normalWorldGeometry.y).mul(float(1).sub(smoothstep(.02,.05,P.y.sub(d.top).abs())))
+      const within=smoothstep(-.75,-.6,out).mul(float(1).sub(smoothstep(.2,.26,out)))
+      const feet=across.div(d.half*.62).pow(2).negate().exp().mul(onTop).mul(within)
+      const pushed=smoothstep(.55,.95,across.abs().div(d.half)).mul(onTop).mul(within)
+      c=mix(c,c.mul(vec3(1.10,1.09,1.06)),feet.mul(.7)).mul(float(1).sub(pushed.mul(.22)))
+      worn=worn.max(feet)
+    }
     m.colorNode=c
     // THE COURT'S SUN, SENT BACK: a wall in shade takes warm light from the
     // sunlit ground it faces, baked per place from that ground's own sun.
     // Engine-only (`engineBounce`); the film's path tracer bounces for real.
     m.emissiveNode=c.mul(vec3(1,.73,.545)).mul(weather.w.mul(.5*.073*1.4))
     m.userData['engineBounce']=true
-    m.roughnessNode=clamp((m.roughnessNode as N).add(streak.mul(.05)).add(weather.z.mul(lichenMask).mul(.08)),roughRange[0],roughRange[1])
+    m.roughnessNode=clamp((m.roughnessNode as N).add(streak.mul(.05)).add(weather.z.mul(lichenMask).mul(.08)).add(splashed.mul(.04)).sub(tide.mul(.05)).sub(worn.mul(.16)),roughRange[0]!-.12,roughRange[1])
+    m.normalNode=mix(m.normalNode as N,filteredView,worn.mul(.65)).normalize()
     // THE JOINTS IN RAKING LIGHT. A recessed joint takes the sun only where
     // the brick beside it does not shade it; the fraction follows from the
     // sun's angle to this very wall. Engine-only light term: the film's

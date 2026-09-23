@@ -131,11 +131,14 @@ export function weatherAtlas(): Atlas {
       const v = (i: number, j: number): number => bounceGrid[j * gu + i]!
       return (v(x0, y0) * (1 - fx) + v(x0 + 1, y0) * fx) * (1 - fy) + (v(x0, y0 + 1) * (1 - fx) + v(x0 + 1, y0 + 1) * fx) * fy
     }
-    // per column: the sills whose water can reach it, and its own wander
+    // per column: the sills whose water can reach it, its own wander, and
+    // the ground its foot actually stands in (a wall's base can lie metres
+    // below the court it rises from)
     const columns = Array.from({ length: r.width + PAD * 2 }, (_, c) => {
       const u = Math.min(f.length_m, Math.max(0, (c - PAD + .5) / WEATHER_TEXELS_PER_M))
+      const ground = Math.max(base, groundHeight(f.from[0] + dx * u + out[0] * .08, f.from[1] + dy * u + out[1] * .08))
       return {
-        u, reach: 1.1 + .5 * noise(u * 3, 1, seed), course: .6 + .4 * noise(u * 6, 2, seed), dampEdge: .25 + .3 * fbm(u * .8, 0, seed),
+        u, ground, reach: 1.1 + .5 * noise(u * 3, 1, seed), course: .6 + .4 * noise(u * 6, 2, seed), dampEdge: .35 + .5 * fbm(u * .8, 0, seed),
         sills: sills.filter(o => u > o.from_m - .45 && u < o.from_m + o.width_m + .45).map(o => {
           const x0 = o.from_m - .2, x1 = o.from_m + o.width_m + .2, mid = o.from_m + o.width_m / 2
           const ends = Math.exp(-(((u - x0) / .09) ** 2)) + Math.exp(-(((u - x1) / .09) ** 2))
@@ -157,17 +160,20 @@ export function weatherAtlas(): Atlas {
         if (drop < 0 || drop > 3.2) continue
         streak += s.weight * Math.exp(-drop / col.reach) * Math.min(1, drop / .04)
       }
-      // under the plinth course and the eaves course, a lighter curtain
+      // under the plinth course and the eaves course, a curtain of runs
       for (const course of [.69, top - .12]) {
         const drop = course - .09 - z
-        if (drop > 0 && drop < 1.4) streak += .20 * Math.exp(-drop / .45) * col.course
+        if (drop > 0 && drop < 1.6) streak += (course < 1 ? .34 : .20) * Math.exp(-drop / .55) * col.course * (.55 + .9 * noise(u * 11, 5, seed))
       }
       // the wall head under the eaves stays dry, the drip line below it not
       const eave = top - z
       if (eave > 0 && eave < .5) streak += .18 * (1 - eave / .5)
-      // DAMP AT THE FOOT: splash and rising damp, a wandering upper edge
-      const foot = z - base
-      const damp = foot < 0 || foot > 1.1 ? 0 : (1 - smooth(col.dampEdge, .9, foot)) * .8
+      // THE FOOT, measured from the ground it stands in: rising damp to a
+      // wandering tide line (the channel crosses one half there), splash in
+      // the lowest part of it, and grime tailing off above to about 1.6 m.
+      const foot = z - col.ground
+      const edge = col.dampEdge + .06 * (noise(u * 9, z * 4, seed + 9) - .5)
+      const damp = foot <= 0 ? 1 : foot < edge ? 1 - .45 * foot / edge : .17 * (1 - smooth(edge, edge + .05, foot)) + .38 * (1 - smooth(edge, 1.6, foot))
       // LICHEN: patches where a face looks north, most on dressed stone
       // and toward the wall head, never a sheet
       const patch = fbm(u * 1.3, z * 1.3, seed + 3)
@@ -200,5 +206,5 @@ export function weatherUV(facade: string, along: number, z: number): V2 | null {
 
 export const houseWeatherProvenance = {
   class: 'GENERATED',
-  recipe: 'One 1024 square map at 16 texels a metre over every rendered facade, baked in code from the registered openings and courses: rain streaks off both ends of every sill and a curtain off its front, fading over 1.1 to 1.6 m; a lighter curtain under the plinth and eaves courses; damp at the wall foot to about 0.9 m with a wandering edge; lichen in patches on faces within 70 degrees of north, most on dressed stone and toward the wall head; a broad grime field. Channels: streak, damp, lichen, grime. Assumed weathering of a kept house forty-six years old, not a survey.',
+  recipe: 'One 1024 square map at 16 texels a metre over every rendered facade, baked in code from the registered openings and courses: rain streaks off both ends of every sill and a curtain off its front, fading over 1.1 to 1.6 m; a curtain of runs under the plinth and eaves courses; the foot measured from the ground each wall stands in, rising damp to a wandering tide line 0.35 to 0.85 m up, splash below it and grime tailing off to about 1.6 m; lichen in patches on faces within 70 degrees of north, most on dressed stone and toward the wall head; a broad grime field. Channels: streak, damp, lichen, grime. Assumed weathering of a kept house forty-six years old, not a survey.',
 } as const
