@@ -188,6 +188,19 @@ export function naAssets() {
       createReadStream(file).pipe(res)
     })
   }
+  /* THE RECORD BY NAME in dev. A fresh checkout writes it while the server
+     starts, after vite has listed public/, and until a restart the list
+     answers its address with the page: the museum then draws without its
+     store and says so in red. */
+  const serveRecord = (server) => {
+    server.middlewares.use('/na-manifest.json', (req, res, next) => {
+      if (!existsSync(MERGED)) return next()
+      res.setHeader('content-type', 'application/json')
+      res.setHeader('cache-control', 'no-store')
+      createReadStream(MERGED).pipe(res)
+    })
+    serve(server)
+  }
   return {
     name: 'na-assets',
     // the record is written before anything reads it, in dev and in build
@@ -195,7 +208,7 @@ export function naAssets() {
       const { problems } = writeMerged()
       for (const p of problems) this.warn(p)
     },
-    configureServer: serve,
+    configureServer: serveRecord,
     configurePreviewServer: serve,
   }
 }
