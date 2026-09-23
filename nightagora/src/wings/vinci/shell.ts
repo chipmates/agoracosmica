@@ -286,8 +286,10 @@ function drawFacade(f:Facade,wall:Wall,b:Batches,tier:Tier,faces:RoofFace[]):voi
   // every joint it meets: both stay certified and leave the colour pass.
   const corner=(x:number):void=>{for(let z=.7,n=0;z<heightAt(x)-.2;z+=.28,n++){const w=n%2?.38:.58;b.stone.retire=stoneField||z<base;faceBox(b.stone,f,x===0?w/2:f.length_m-w/2,z+.133,w,.262,.10,.055,.91+hash(n,f.length_m)*.10)}b.stone.retire=false}
   if(f.length_m>2.5){corner(0);corner(f.length_m)}
+  // The plinth course marks a brick wall's stone foot; on coursed ashlar it
+  // lies half a course off the beds and its sky-lit top reads as a ribbon.
   for(const z of [.69,top-.12]){
-    b.stone.retire=z<base
+    b.stone.retire=z<base||(stoneField&&z<1)
     let runs:[number,number][]=[[0,f.length_m]]
     for(const o of f.openings){
       if(!o.render||o.type==='blind-recess'||o.base_m>=z+.085||o.base_m+o.height_m<=z-.085)continue

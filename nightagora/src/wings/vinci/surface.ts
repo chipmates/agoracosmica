@@ -114,8 +114,11 @@ export function prepareSurfaceGeometry(geometry:BufferGeometry,kind:ShellSurface
     // North damp is shared per fragment below. Only local eave/sill marks
     // belong here: a whole backing panel cannot interpolate their footprint
     // the same way as the small physical course faces.
+    // Where the weather map reaches, it carries the sill and eave marks; a
+    // per-vertex copy spreads them over whole course faces as flat quads.
+    const w=nearest?weatherUV(nearest.id,along,z):null
     let weather=0
-    if(nearest&&z<nearest.top){
+    if(nearest&&!w&&z<nearest.top){
       const beneathEave=nearest.top-z
       if(beneathEave<.42)weather+=.18*(1-beneathEave/.42)
       for(const o of nearest.openings)if(o.render){
@@ -128,7 +131,6 @@ export function prepareSurfaceGeometry(geometry:BufferGeometry,kind:ShellSurface
     }
     info[i*3]=kind==='oak'&&roles?.[i]===3?1:mortar;info[i*3+1]=period;info[i*3+2]=Math.min(.4,Math.max(0,weather))
     // Where this place sits in the weather map, if it lies on a facade.
-    const w=nearest?weatherUV(nearest.id,along,z):null
     weatherAt[i*4]=w?.[0]??0;weatherAt[i*4+1]=w?.[1]??0;weatherAt[i*4+2]=w?1:0;weatherAt[i*4+3]=kind==='stone'&&roles?.[i]===2?1:0
   }
   geometry.setAttribute('surfaceInfo',new Float32BufferAttribute(info,3))
@@ -242,11 +244,19 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
   const stone=rgb('#d2c3a6'),clay=rgb('#a46951'),mortar=rgb('#aa9e87'),slate=rgb('#464c55'),oak=rgb('#72513b')
   // Below resolved geometric courses, integrate the same laid module over
   // its actual pixel footprint. A two-pixel brick must not become flat paint.
+  // Where this place lies in the weather maps: the joints' wetness is part
+  // of the laid field itself, so it holds from one metre to fifty.
+  const mineralKind=kind==='brick'||kind==='stone'
+  const at=attribute('weatherUV','vec4')
+  const weather:N=mineralKind?texture(weatherAtlas().texture,at.xy).mul(at.z):null
+  const joints:N=mineralKind?texture(weatherAtlas().joints,at.xy).mul(at.z):null
+  // a wet joint goes darker and a little cooler
+  const mortarTone:N=mineralKind?mortar.mul(.82).mul(float(1).sub(joints.x.mul(.5))).mul(mix(vec3(1,1,1),vec3(.93,.955,.98),joints.x)):mortar.mul(.82)
   const brickFraction=.24*.045/(.252*.057)
   // The geometric chunk tone is uniform on [.91,1.05] (expectation .98).
   // The backing tone .76 has always been clamped to .82. Include these
   // physical colour factors in the average instead of brightening the far wall.
-  const brickMean=mix(mortar.mul(.82),clay.mul(.98),brickFraction)
+  const brickMean=mix(mortarTone,clay.mul(.98),brickFraction)
   let filteredBrick:N=brickMean,brickCoverage:N=float(brickFraction)
   if(kind==='brick'||kind==='stone'){
     const cellUV=U.div(vec2(.252,.057)),row=floor(cellUV.y)
@@ -273,7 +283,7 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
     // is no competing narrow/partial-colour near seam. Only the brick chunks'
     // zero-mean tone departure returns as their physical course resolves.
     const chunkDeparture=kind==='brick'?tone.sub(.98).mul(detail):float(0)
-    const field=mortar.mul(.82).mul(float(1).sub(clayCoverage))
+    const field=mortarTone.mul(float(1).sub(clayCoverage))
       .add(clay.mul(firedCoverage).mul(chunkDeparture.add(.98)))
     filteredBrick=mix(brickMean,field,support);brickCoverage=mix(float(brickFraction),clayCoverage,support)
   }
@@ -484,7 +494,6 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
     // base. The largest plane in the arrival frame had no weathering at all.
     // A face the weather map does not reach keeps a splash band at the
     // court's own level; every mapped face takes its foot from the map.
-    const at=attribute('weatherUV','vec4')
     const splashEdge=P.y.sub(mx_noise_float(vec3(P.x.mul(1.9),P.y.mul(.5),P.z.mul(1.9))).mul(.07))
     const splash=float(1).sub(smoothstep(.11,.47,splashEdge)).mul(smoothstep(-.05,.06,splashEdge)).mul(float(1).sub(at.z))
     m.colorNode=mix(m.colorNode as N,(m.colorNode as N).mul(vec3(.87,.885,.845)),splash.mul(.55))
@@ -493,16 +502,19 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
     // streaks under the sills and courses, damp at the foot, lichen where a
     // face looks north, a broad grime. A fine vertical fibre breaks each
     // streak into the runs water actually takes; it fades before it aliases.
-    const weather=texture(weatherAtlas().texture,at.xy).mul(at.z)
     const fibreHeld=resolvedAt(.03)
     const fibre=mix(float(.5),mx_noise_float(vec3(U.x.mul(34),U.y.mul(1.3),3.7)).mul(.5).add(.5),fibreHeld)
-    const streak=weather.x.mul(fibre.mul(.7).add(.3))
+    // on pale stone the runs part more clearly than on the brick
+    const streak=weather.x.mul(kind==='stone'?fibre.mul(.9).add(.1):fibre.mul(.7).add(.3))
     let c:N=m.colorNode as N
     const grey=c.dot(vec3(.2126,.7152,.0722))
     // Pale stone shows its soiling more than fired brick does (AD-2: the
     // soiled tuffeau under a drip is about half the weathered face).
     const soil=kind==='stone'?float(.5):float(.36)
     c=mix(c,vec3(grey).mul(vec3(.92,.90,.86)),streak.mul(.35)).mul(float(1).sub(streak.mul(soil)))
+    // the brick's broad soiling drifts, greyer and darker than the clay
+    const soiled=joints.y.mul(clayWeight).mul(fibre.mul(.4).add(.6))
+    c=mix(c,mix(c,vec3(grey).mul(vec3(.86,.83,.80)),.4).mul(.64),soiled.mul(.85))
     // UNDERSIDES THE RAIN NEVER WASHES keep a dark crust: the soffits of
     // quoins, courses and sills, which the court's light would show brown.
     // (a crust, not a void: the head of a window seen from below is stone)
@@ -518,11 +530,12 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
     // THE FOOT, measured from the ground each wall stands in: rising damp
     // to a tide line (the map's half), the splash of rain off the paving in
     // the lowest part of it as a speckle of grit, grime tailing off above.
-    const footMap=weather.y,tide=smoothstep(.44,.56,footMap),splashed=smoothstep(.78,.96,footMap)
+    // (the tide line soft enough to read as damp, not as a laid-over sheet)
+    const footMap=weather.y,tide=smoothstep(.40,.62,footMap),splashed=smoothstep(.78,.96,footMap)
     const speckHeld=resolvedAt(.024)
-    const speck=mix(float(.4),smoothstep(.45,.8,mx_noise_float(P.mul(42).add(vec3(2.3,.7,5.1))).mul(.5).add(.5)),speckHeld)
-    c=c.mul(float(1).sub(tide.mul(.22))).mul(mix(vec3(1,1,1),vec3(.90,.95,.86),tide))
-    c=mix(c,c.mul(vec3(.58,.54,.48)),splashed.mul(speck.mul(.62).add(.3)))
+    const speck=mix(float(.4),smoothstep(.45,.8,mx_noise_float(P.mul(71).add(vec3(2.3,.7,5.1))).mul(.5).add(.5)),speckHeld)
+    c=c.mul(float(1).sub(tide.mul(.22))).mul(mix(vec3(1,1,1),vec3(.93,.95,.90),tide))
+    c=mix(c,c.mul(vec3(.62,.58,.52)),splashed.mul(speck.mul(.42).add(.4)))
     // the last hand's breadth, where the paving's dirt lies against it
     c=c.mul(float(1).sub(smoothstep(.95,.995,footMap).mul(.3)))
     const lichenMask=smoothstep(.38,.72,mx_noise_float(P.mul(22).add(vec3(1.7,4.1,2.3))).mul(.5).add(.5).mul(resolvedAt(.05)).add(float(1).sub(resolvedAt(.05)).mul(.5)))

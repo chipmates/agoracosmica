@@ -42,7 +42,11 @@ function noise(x: number, y: number, seed: number): number {
 }
 const fbm = (x: number, y: number, seed: number): number => noise(x, y, seed) * .55 + noise(x * 2.1, y * 2.1, seed + 7) * .3 + noise(x * 4.3, y * 4.3, seed + 13) * .15
 
-interface Atlas { texture: DataTexture; rects: Map<string, WeatherRect>; texels: number; bakeMs: number }
+/** A second map beside it: how wet a face's joints stay (R) and the soiling
+ * the weather leaves in broad drifts on the brick (G). */
+interface Atlas { texture: DataTexture; joints: DataTexture; rects: Map<string, WeatherRect>; texels: number; bakeMs: number }
+/** The prevailing weather comes up the valley from the west-south-west. */
+export const WEATHER_FROM_DEG = 245
 let atlas: Atlas | null = null
 
 /** The hour's sun, toward it: east, north, and its rise per metre run. */
@@ -86,7 +90,7 @@ function groundSeen(e: number, n: number, z: number, out: V2, along: V2): number
 export function weatherAtlas(): Atlas {
   if (atlas) return atlas
   const began = typeof performance !== 'undefined' ? performance.now() : 0
-  const data = new Uint8Array(SIZE * SIZE * 4)
+  const data = new Uint8Array(SIZE * SIZE * 4), data2 = new Uint8Array(SIZE * SIZE * 4)
   const rects = new Map<string, WeatherRect>()
   const facades = spec.facades.filter(f => f.render)
   // each facade's own height range: its wall from foot to head, a gable to its ridge
@@ -114,6 +118,8 @@ export function weatherAtlas(): Atlas {
     const bearing = (Math.atan2(dy, -dx) * 180 / Math.PI + 360) % 360
     const northness = Math.max(0, Math.cos((bearing) * Math.PI / 180))
     const tuffeau = f.pattern.field === 'tuffeau'
+    // a face turned to the driving rain wets deepest; every face takes some
+    const windward = .35 + .65 * Math.max(0, Math.cos((bearing - WEATHER_FROM_DEG) * Math.PI / 180))
     const sills = f.openings.filter(o => o.render && o.type !== 'door' && o.type !== 'gate' && o.type !== 'open-arcade' && o.type !== 'blind-recess')
     const seed = rand(f.from[0], f.from[1]) * 100
     // THE SUNLIT GROUND EACH PLACE SEES, on a half-metre grid: it is the
@@ -158,10 +164,11 @@ export function weatherAtlas(): Atlas {
       for (const s of col.sills) {
         const drop = s.sill - z
         if (drop < 0 || drop > 3.2) continue
-        streak += s.weight * Math.exp(-drop / col.reach) * Math.min(1, drop / .04)
+        streak += s.weight * (tuffeau ? 1 : 1.3) * Math.exp(-drop / col.reach) * Math.min(1, drop / .04)
       }
       // under the plinth course and the eaves course, a curtain of runs
-      for (const course of [.69, top - .12]) {
+      // (coursed ashlar has no plinth course)
+      for (const course of tuffeau ? [top - .12] : [.69, top - .12]) {
         const drop = course - .09 - z
         if (drop > 0 && drop < 1.6) streak += (course < 1 ? .34 : .20) * Math.exp(-drop / .55) * col.course * (.55 + .9 * noise(u * 11, 5, seed))
       }
@@ -183,6 +190,23 @@ export function weatherAtlas(): Atlas {
       data[k + 1] = Math.round(Math.min(1, damp) * 255)
       data[k + 2] = Math.round(Math.min(1, lichen) * 255)
       data[k + 3] = Math.round(Math.min(1, bounceAt(u, z) * 2) * 255)
+      // THE JOINTS HOLD THE WET where rain reaches a face most: toward its two
+      // ends, where the wind wraps round the corner, at the damp foot and in
+      // every run under a sill, and all of it more on the weather side.
+      const corner = Math.exp(-Math.min(u, f.length_m - u) / .9)
+      const wet = .30 + windward * (.25 + .55 * corner) + .5 * Math.min(1, damp) + .45 * Math.min(1, streak)
+      // SOILING DRIFTS WITH THE WEATHER: rain washes a brick face in broad
+      // vertical drifts and the soot and dust stay between them, most on a
+      // face turned from the weather and toward its head.
+      let soiling = 0
+      if (!tuffeau) {
+        const wander = noise(u * .35, z * .28, seed + 31) * 1.1
+        const drift = fbm(u * 1.05 + wander, z * .19, seed + 23)
+        const head = Math.min(1, Math.max(0, (z - col.ground) / Math.max(1, top - col.ground)))
+        soiling = smooth(.34, .66, drift) * (.5 + .5 * head) * (1.3 - .5 * windward)
+      }
+      data2[k] = Math.round(Math.min(1, wet) * 255)
+      data2[k + 1] = Math.round(Math.min(1, soiling) * 255)
       texels++
     }
   }
@@ -191,7 +215,12 @@ export function weatherAtlas(): Atlas {
   texture.magFilter = LinearFilter; texture.minFilter = LinearMipmapLinearFilter; texture.generateMipmaps = true
   texture.needsUpdate = true
   texture.name = 'vinci/house-weather'
-  atlas = { texture, rects, texels, bakeMs: typeof performance !== 'undefined' ? Math.round(performance.now() - began) : 0 }
+  const joints = new DataTexture(data2, SIZE, SIZE, RGBAFormat, UnsignedByteType)
+  joints.wrapS = joints.wrapT = ClampToEdgeWrapping
+  joints.magFilter = LinearFilter; joints.minFilter = LinearMipmapLinearFilter; joints.generateMipmaps = true
+  joints.needsUpdate = true
+  joints.name = 'vinci/house-weather-joints'
+  atlas = { texture, joints, rects, texels, bakeMs: typeof performance !== 'undefined' ? Math.round(performance.now() - began) : 0 }
   return atlas
 }
 function smooth(e0: number, e1: number, x: number): number { const t = Math.min(1, Math.max(0, (x - e0) / (e1 - e0))); return t * t * (3 - 2 * t) }
@@ -206,5 +235,5 @@ export function weatherUV(facade: string, along: number, z: number): V2 | null {
 
 export const houseWeatherProvenance = {
   class: 'GENERATED',
-  recipe: 'One 1024 square map at 16 texels a metre over every rendered facade, baked in code from the registered openings and courses: rain streaks off both ends of every sill and a curtain off its front, fading over 1.1 to 1.6 m; a curtain of runs under the plinth and eaves courses; the foot measured from the ground each wall stands in, rising damp to a wandering tide line 0.35 to 0.85 m up, splash below it and grime tailing off to about 1.6 m; lichen in patches on faces within 70 degrees of north, most on dressed stone and toward the wall head; a broad grime field. Channels: streak, damp, lichen, grime. Assumed weathering of a kept house forty-six years old, not a survey.',
+  recipe: 'One 1024 square map at 16 texels a metre over every rendered facade, baked in code from the registered openings and courses: rain streaks off both ends of every sill and a curtain off its front, fading over 1.1 to 1.6 m; a curtain of runs under the plinth and eaves courses; the foot measured from the ground each wall stands in, rising damp to a wandering tide line 0.35 to 0.85 m up, splash below it and grime tailing off to about 1.6 m; lichen in patches on faces within 70 degrees of north, most on dressed stone and toward the wall head; a broad grime field. Channels: streak, damp, lichen, bounce. A second map: joint wetness (toward the two ends of a face, at its foot and under its sills, more on faces turned to the west-south-west weather) and a soiling drift on the brick (broad vertical drifts, heavier toward the wall head and on faces turned from the weather). Assumed weathering of a kept house forty-six years old, not a survey.',
 } as const
