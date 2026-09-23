@@ -9,7 +9,7 @@
  */
 import {
   AdditiveBlending, BackSide, BoxGeometry, DepthTexture, FloatType, Mesh, MeshBasicNodeMaterial, NodeUpdateType,
-  RenderTarget, TextureNode, Vector2, VolumeNodeMaterial, type Light, type Scene,
+  RenderTarget, TextureNode, Vector2, VolumeNodeMaterial, type Camera, type Light, type Scene,
 } from 'three/webgpu'
 import * as TSL from 'three/tsl'
 import { FLOOR, ROOMS } from './layout'
@@ -23,7 +23,10 @@ export const HALL_AIR_PROVENANCE = {
 } as const
 
 /** The depth of whatever the camera drawing the air sees, taken just before
- * the air is drawn, at half the frame's size. */
+ * the air is drawn, at half the frame's size. It is drawn through an eye of
+ * its own: the renderer keeps one list per scene and camera, and through the
+ * frame's own camera this pass rebuilt the list that frame was still walking,
+ * so whatever sorted after the air fell off its end. */
 class RoomDepth extends TextureNode {
   private target: RenderTarget
   private scene: Scene
@@ -31,6 +34,7 @@ class RoomDepth extends TextureNode {
   private override = new MeshBasicNodeMaterial({ colorWrite: false })
   private drawn = new Vector2()
   private busy = false
+  private eyes = new WeakMap<Camera, Camera>()
   constructor(scene: Scene, air: Mesh) {
     const target = new RenderTarget(2, 2, { depthBuffer: true })
     target.depthTexture = new DepthTexture(2, 2, FloatType)
@@ -50,15 +54,31 @@ class RoomDepth extends TextureNode {
     const target = renderer.getRenderTarget(), mrt = renderer.getMRT(), override = this.scene.overrideMaterial
     this.air.visible = false
     this.scene.overrideMaterial = this.override
-    renderer.setMRT(null)
-    renderer.setRenderTarget(this.target)
-    renderer.render(this.scene, camera)
-    renderer.setRenderTarget(target)
-    renderer.setMRT(mrt)
-    this.scene.overrideMaterial = override
-    this.air.visible = true
-    this.busy = false
+    // a pass that fails still hands the scene back, or every later frame of
+    // the hall would be drawn under the depth's own material
+    try {
+      renderer.setMRT(null)
+      renderer.setRenderTarget(this.target)
+      renderer.render(this.scene, this.eye(camera))
+    } finally {
+      renderer.setRenderTarget(target)
+      renderer.setMRT(mrt)
+      this.scene.overrideMaterial = override
+      this.air.visible = true
+      this.busy = false
+    }
     return undefined
+  }
+  private eye(camera: Camera): Camera {
+    let eye = this.eyes.get(camera)
+    if (!eye) { eye = new (camera.constructor as new () => Camera)(); this.eyes.set(camera, eye) }
+    eye.copy(camera, false)
+    // the camera may hang in a rig, so its world matrix is taken as it stands,
+    // and the depth convention travels with it, or the renderer would rebuild
+    // a projection the reflection has bent to its plane
+    eye.matrixWorldAutoUpdate = false
+    ;(eye as unknown as { _reversedDepth: boolean })._reversedDepth = camera.reversedDepth
+    return eye
   }
   override dispose(): void {
     this.target.dispose()
