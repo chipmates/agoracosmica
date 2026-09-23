@@ -14,9 +14,6 @@
   /* the measure is narrower than a station's: the work's own instruments
      stand at the right of the same row */
   --desk-clb-read: 640px;
-  /* the drawer's column at the band's top height of 420: the band less its
-     air, the step back, the gap and the foot's own padding */
-  --desk-clb-drawer: calc(420px - var(--desk-clb-air) - var(--desk-clb-step) - var(--desk-clb-gap) - var(--desk-clb-foot));
 }
 
 /* ---- the band ---- */
@@ -153,80 +150,19 @@
 #wing[data-desk~='closelook'] .desk-clb .desk-word-control[aria-disabled='true'] { opacity: .55; cursor: default; }
 
 /* ---- the drawer: the band grown, never a second plate ---- */
-/* THE BAND STOPS AT 420. The drawer's column is held to what that leaves,
-   the name row and the foot keep their height, and the words between them
-   take the rest and scroll inside it. */
-#wing[data-desk~='closelook'] .desk-clb[data-drawer='open'] .desk-clb-left { max-height: var(--desk-clb-drawer); }
-#wing[data-desk~='closelook'] .desk-clb-drawer {
-  min-width: 0;
-  min-height: 0;
-  flex: 0 1 auto;
-  display: flex;
-  flex-direction: column;
-}
-#wing[data-desk~='closelook'] .desk-clb-drawer[hidden] { display: none; }
-/* ONE TEXT AT A TIME: the line's whole column leaves the flow while the
-   drawer stands, which is what lets the band take the drawer's height. */
-#wing[data-desk~='closelook'] .desk-clb[data-drawer='open'] .desk-clb-cap { display: none; }
-#wing[data-desk~='closelook'] .desk-clb-drawer-name { flex: none; margin-bottom: 12px; }
-#wing[data-desk~='closelook'] .desk-clb-well {
-  position: relative;
-  min-height: 0;
-  flex: 0 1 auto;
-  display: flex;
-  flex-direction: column;
-}
-#wing[data-desk~='closelook'] .desk-clb-scroll {
-  min-height: 0;
-  flex: 0 1 auto;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--na-starlight) 30%, transparent) transparent;
-  /* the words keep off the bar, and a focus ring has room inside the box */
-  padding: 0 14px 0 0;
-}
-#wing[data-desk~='closelook'] .desk-clb-scroll:focus { outline: none; }
-#wing[data-desk~='closelook'] .desk-clb-scroll:focus-visible {
-  outline: 2px solid var(--na-gold);
-  outline-offset: 3px;
-}
-/* THE SIGN OF MORE: the words sink into the wall at the box's foot while
-   more lies below, and the wall is clean again at the end. */
-#wing[data-desk~='closelook'] .desk-clb-fade {
-  position: absolute;
-  left: 0;
-  right: 14px;
-  bottom: 0;
-  height: 64px;
-  pointer-events: none;
-  background: linear-gradient(to bottom, color-mix(in srgb, var(--na-abyss) 0%, transparent), var(--na-abyss) 92%);
-  opacity: 0;
-  transition: opacity 160ms ease;
-}
-#wing[data-desk~='closelook'] .desk-clb-drawer[data-more='true'] .desk-clb-fade:not(.desk-clb-fade-top) { opacity: 1; }
-/* and a shorter one at its head once the words have moved up, so no row is
-   cut in half at the name row's feet */
-#wing[data-desk~='closelook'] .desk-clb-fade-top {
-  top: 0;
-  bottom: auto;
-  height: 24px;
-  background: linear-gradient(to top, color-mix(in srgb, var(--na-abyss) 0%, transparent), var(--na-abyss));
-}
-#wing[data-desk~='closelook'] .desk-clb-drawer[data-read='true'] .desk-clb-fade-top { opacity: 1; }
+/* ONE TEXT AT A TIME UNDER ONE NAME ROW: the drawer's words take the line's
+   place and the band grows by their height. Nothing here scrolls, so no
+   height is capped: the drawer's law is a few short sentences. */
+#wing[data-desk~='closelook'] .desk-clb-drawer { min-width: 0; }
+#wing[data-desk~='closelook'] .desk-clb-drawer[hidden],
+#wing[data-desk~='closelook'] .desk-clb[data-drawer='open'] .desk-clb-line { display: none; }
 /* while the drawer stands the foot is its floor: a hairline over it, the
    way back in the place the word that opened it stood */
 #wing[data-desk~='closelook'] .desk-clb[data-drawer='open'] .desk-clb-foot {
-  flex: none;
   margin-top: 10px;
   border-top: 1px solid color-mix(in srgb, var(--na-starlight) 16%, transparent);
 }
-@media (prefers-reduced-motion: reduce) {
-  #wing[data-desk~='closelook'] .desk-clb-fade { transition: none; }
-}
 #wing[data-desk~='closelook'] .desk-clb-words > * { margin: 0 0 5px; }
-/* the last row's air is the foot's hairline, so a drawer that fits does not
-   scroll by the width of a margin */
 #wing[data-desk~='closelook'] .desk-clb-words > :last-child,
 #wing[data-desk~='closelook'] .desk-clb-words > :last-child > :last-child { margin-bottom: 0; }
 #wing[data-desk~='closelook'] .desk-clb-words :is(p, li) {
@@ -372,3 +308,115 @@ body:has(dialog[open]) #wing[data-desk~='closelook'] .desk-clb {
   bottom: 44px;
   right: 0;
 }
+
+/* A BOOK'S INSTRUMENTS STAND IN TWO ROWS: its ways of reading the page on
+   top, the viewer's three steps of distance beside the way on under them, so
+   a fourth way never pushes the words into a narrower column. */
+#wing[data-desk~='closelook'] .vitrine[data-payload='manuscript'] .desk-clb-right {
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-areas: 'inst inst' 'zoom ways';
+  justify-content: end;
+  align-content: space-between;
+  column-gap: 24px;
+  row-gap: 12px;
+}
+#wing[data-desk~='closelook'] .vitrine[data-payload='manuscript'] :is(.desk-clb-inst, .desk-clb-inst .vitrine-payload-controls) { display: contents; }
+#wing[data-desk~='closelook'] .vitrine[data-payload='manuscript'] .desk-clb-inst .reader-row { grid-area: inst; justify-self: end; }
+#wing[data-desk~='closelook'] .vitrine[data-payload='manuscript'] .desk-clb-inst .reader-zoom { grid-area: zoom; align-self: center; margin-bottom: 9px; }
+#wing[data-desk~='closelook'] .vitrine[data-payload='manuscript'] .desk-clb-ways { grid-area: ways; }
+
+/* THE PAGE AND ITS WORDS SIDE BY SIDE. A way that reads beside the leaf gives
+   the right of the stage to a tall column with one scroll of its own, and the
+   leaf seats itself in what is left: the parallel view of an edition. */
+#wing[data-desk~='closelook'] .vitrine[data-narrow='false'] .reader[data-beside='true'] {
+  --reader-beside: clamp(380px, 46%, 680px);
+}
+#wing[data-desk~='closelook'] .vitrine[data-narrow='false'] .reader[data-beside='true'] :is(.reader-ground, .reader-stage) {
+  right: calc(var(--reader-beside) + 32px);
+}
+#wing[data-desk~='closelook'] .reader-beside {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 44px;
+  width: var(--reader-beside);
+  box-sizing: border-box;
+  padding: 26px 32px 32px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--na-starlight) 30%, transparent) transparent;
+  background: color-mix(in srgb, var(--na-abyss) 94%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--na-starlight) 14%, transparent);
+  color: var(--na-starlight);
+  pointer-events: auto;
+  touch-action: pan-y;
+  user-select: text;
+}
+#wing[data-desk~='closelook'] .reader-beside[hidden] { display: none; }
+#wing[data-desk~='closelook'] .reader-beside:focus { outline: none; }
+#wing[data-desk~='closelook'] .reader-beside:focus-visible { outline: 2px solid var(--na-gold); outline-offset: -2px; }
+#wing[data-desk~='closelook'] .reader-beside section + section {
+  margin-top: 30px;
+  padding-top: 24px;
+  border-top: 1px solid color-mix(in srgb, var(--na-starlight) 16%, transparent);
+}
+#wing[data-desk~='closelook'] .reader-beside h4.vitrine-meta {
+  margin: 0 0 4px;
+  font: 500 0.875rem/1.4 var(--sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--desk-clock);
+}
+#wing[data-desk~='closelook'] .reader-beside .vitrine-meta {
+  margin: 0 0 14px;
+  font: 400 0.875rem/1.5 var(--sans);
+  color: var(--desk-quiet);
+}
+/* the edition's own lines, kept as it printed them */
+#wing[data-desk~='closelook'] .reader-beside .vitrine-source-text {
+  margin: 0;
+  /* a printed line of the edition is about seventy characters, and at this
+     size it keeps its own row in the column */
+  font: 400 1.0625rem/1.75rem var(--serif);
+  color: color-mix(in srgb, var(--na-starlight) 92%, var(--na-mist));
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+/* a transcription the museum withholds says so, quietly, in the museum's voice */
+#wing[data-desk~='closelook'] .reader-beside .vitrine-source-text:not([lang]) {
+  font: italic 400 1.0625rem/1.6 var(--serif);
+  color: var(--desk-quiet);
+}
+
+/* "WHERE IT COMES FROM" OVER A CLOSE LOOK IS A READING SHEET OF ITS OWN: it
+   runs the screen's height, scrolls in one place under its own head, and
+   closes on its word, its key or Escape back to the band and the work. */
+#wing[data-desk~='closelook']:has(.vitrine .desk-clb) .vinci-dock {
+  top: 24px;
+  bottom: 24px;
+  height: auto;
+  width: min(780px, calc(100vw - 56px));
+  padding: 0 40px 40px;
+}
+#wing[data-desk~='closelook']:has(.vitrine .desk-clb) .vinci-sources-toolbar {
+  padding: 14px 0;
+  background: var(--na-abyss);
+}
+#wing[data-desk~='closelook']:has(.vitrine .desk-clb) .vinci-dock { background: var(--na-abyss); }
+#wing[data-desk~='closelook']:has(.vitrine .desk-clb) .vinci-sources-close {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  border-color: var(--desk-edge);
+  border-radius: 2px;
+  font: 500 0.9375rem/1 var(--sans);
+  color: var(--desk-title);
+}
+#wing[data-desk~='closelook']:has(.vitrine .desk-clb) .vinci-sources-close:hover { border-color: var(--desk-title); }
+/* the key beside Close is the sheet's alone; every other window keeps its word */
+.vinci-sources-close .desk-key { display: none; }
+#wing[data-desk~='closelook']:has(.vitrine .desk-clb) .vinci-sources-close .desk-key { display: inline-block; }
