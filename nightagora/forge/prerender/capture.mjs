@@ -19,7 +19,7 @@ import { createHash } from 'node:crypto'
 import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { APP_ROOT, assertServer, browserArgs, FRAME_TIME_FLAGS, waitForServer, wingStanding } from '../rig.mjs'
-import { BARE, CHROME_OFF, installVirtualClock } from './clock.mjs'
+import { BARE, CHROME_OFF, STILL_DESK, installVirtualClock } from './clock.mjs'
 import { restingPending } from './pending.mjs'
 
 const argv = process.argv.slice(2)
@@ -137,7 +137,8 @@ async function oneCapture(browser, dir, limit) {
     if (armed) lateRequests.push(r.url().replace(BASE, ''))
   })
 
-  const url = `${BASE}/w/${WING}?probe=1&tier=${TIER}&samples=${SAMPLES}#s=${FROM}`
+  // the same address as the stills, so a clip's tail and a still are one picture
+  const url = `${BASE}/w/${WING}?probe=1&tier=${TIER}&samples=${SAMPLES}&desk=${STILL_DESK}#s=${FROM}`
   const t0 = Date.now()
   await page.goto(url, { waitUntil: 'load' })
   if (!(await wingStanding(page))) throw new Error('the wing never stood')

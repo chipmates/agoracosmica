@@ -35,7 +35,7 @@ import vm from 'node:vm'
 import ts from 'typescript'
 import sharp from 'sharp'
 import { APP_ROOT, assertServer, browserArgs, FRAME_TIME_FLAGS, headHere, waitForServer, wingStanding } from '../rig.mjs'
-import { BARE, CHROME_OFF, installVirtualClock } from './clock.mjs'
+import { BARE, CHROME_OFF, STILL_DESK, installVirtualClock } from './clock.mjs'
 import { restingPending } from './pending.mjs'
 
 const argv = process.argv.slice(2)
@@ -448,7 +448,7 @@ async function openStage(browser, view, dsf, url) {
 }
 
 const address = (from, lang) =>
-  `${BASE}/w/${WING}?probe=1&tier=${TIER}&samples=${SAMPLES}${ORDER === 'life' ? '&order=life' : ''}${lang ? `&lang=${lang}` : ''}#s=${from}`
+  `${BASE}/w/${WING}?probe=1&tier=${TIER}&samples=${SAMPLES}&desk=${STILL_DESK}${ORDER === 'life' ? '&order=life' : ''}${lang ? `&lang=${lang}` : ''}#s=${from}`
 
 /** THE STOPS THIS RUN EXPORTS, out of the list the wing itself carries. */
 function resolveStops(all, want, limit) {

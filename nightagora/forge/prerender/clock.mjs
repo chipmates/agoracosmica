@@ -86,3 +86,7 @@ export const CHROME_OFF =
   'html.na-bare body *{visibility:hidden!important}html.na-bare canvas{visibility:visible!important}'
 /** the class the rule above hangs on, so bare and dressed is one toggle */
 export const BARE = 'na-bare'
+/* THE PICTURE IS THE WHOLE AUTHORED FRAME. The desktop's stage step stands a
+   band under the picture and shortens the canvas; the band is chrome, so a
+   still and a clip ask for every desktop step but that one. */
+export const STILL_DESK = 'none,type14,words,ways,freearea,drawer,closelook,panel,marks,overview,sheet,opening'
