@@ -2230,7 +2230,7 @@
       "prompt": "The machine bench's second plane. A modern hall wall for one object: the wing's stone, coursed at 42 cm with 86 cm blocks and staggered perpends, standing 12 metres behind the platform's centre on the bench's own floor, square to the eye, 3.2 metres high or as high as the frame's own top edge reaches at that bearing and never above 4.4, lit by the bench's own key and standing in the bench's own air. Its surface carries the library set's photograph at a reduced weight under three procedural scales with a density that thins with distance, a per-block value so no two blocks are the same, a joint that darkens and roughens rather than being drawn, and a closed ambient at its foot where the floor meets it. It is held a stop under the object it stands behind, so the frame keeps one hero. The wall is exhibition dressing and claims nothing about where any machine stood; it is reached through one constant and this bench is the only surface that sets it.",
       "model": "Opus 5 build seat",
       "date": "2026-09-12",
-      "sha256": "215257f410eb6cc27b66be9668c9c6d3e0d2629ae86b6efc762dd5e99bf30c27",
+      "sha256": "94c05ca497b44625fc53e3993b3136525d032a3784981dcbc727c541120287b0",
       "recipe_files": [
         {
           "path": "src/wings/vinci/machines/bench/back-plane.ts",

@@ -77,7 +77,11 @@ export function backPlaneMaterial(stack: Stack, stone: MaterialSet, height = BAC
   // same dark as the air beyond it, so the frame keeps the wall's height as
   // a measure without drawing a horizon across the picture.
   const crown = float(1).sub(smoothstep(height * .62, height, up))
-  const albedo = detail.albedo.mul(face).mul(float(1).sub(foot.mul(.42))).mul(crown)
+  const albedo = detail.albedo.mul(face).mul(float(1).sub(foot.mul(.42)))
+  // faded by its cover, not by its colour: a wall darkened to black still
+  // stands darker than the air above it, which is only another edge
+  material.transparent = true
+  material.opacityNode = crown
   // A hall's wall at twelve metres is not the subject. It is held a full
   // stop under the object it stands behind, so the frame keeps one hero.
   material.colorNode = vec3(stone.albedo.r * WALL_VALUE, stone.albedo.g * WALL_VALUE, stone.albedo.b * WALL_VALUE).mul(albedo).mul(detail.occlusion)
