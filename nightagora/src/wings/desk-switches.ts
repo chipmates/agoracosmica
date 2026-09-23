@@ -1,13 +1,15 @@
 /* THE DESKTOP'S NEW CHROME, ONE STEP AT A TIME. Each step of the frozen
-   desktop design lands alone behind its own switch, so main keeps today's
-   picture at every station until the owner has walked the new one and said
-   yes. A switch is read from the address once per visit and written onto
-   `#wing` as one data attribute, so the stylesheet and the code branch on the
-   same word and nothing can drift between them.
+   desktop design landed alone behind its own switch, and every switch is now
+   on by default: the new chrome is the picture main ships on the desktop. A
+   switch is read from the address once per visit and written onto `#wing` as
+   one data attribute, so the stylesheet and the code branch on the same word
+   and nothing can drift between them.
 
    `?desk=words`, `?desk=words,ways`, `?desk=all`, `?desk=none`. The constants
-   below are the default: flipping one to true makes that step the picture
-   main ships, and `?desk=none` is then the way back to today. */
+   below are the default, and `?desk=none` is the way back to the chrome from
+   before these steps. The switches know nothing of the stage: each step keeps
+   itself off a narrow stage at its own cause, so the phone's picture is the
+   one it was before the switches turned. */
 
 export type DeskStep = 'type14' | 'words' | 'ways' | 'freearea' | 'stage' | 'drawer' | 'closelook'
   | 'panel' | 'marks' | 'overview' | 'sheet' | 'opening'
@@ -16,19 +18,19 @@ export type DeskStep = 'type14' | 'words' | 'ways' | 'freearea' | 'stage' | 'dra
 export const DESK_STEPS: readonly DeskStep[] = ['type14', 'words', 'ways', 'freearea', 'stage', 'drawer', 'closelook',
   'panel', 'marks', 'overview', 'sheet', 'opening']
 
-/* ONE CONSTANT PER STEP. Off today: the address is the only way to see them. */
-export const DESK_TYPE14 = false
-export const DESK_WORDS = false
-export const DESK_WAYS = false
-export const DESK_FREEAREA = false
-export const DESK_STAGE = false
-export const DESK_DRAWER = false
-export const DESK_CLOSELOOK = false
-export const DESK_PANEL = false
-export const DESK_MARKS = false
-export const DESK_OVERVIEW = false
-export const DESK_SHEET = false
-export const DESK_OPENING = false
+/* ONE CONSTANT PER STEP. On: `?desk=none` turns every one off for a visit. */
+export const DESK_TYPE14 = true
+export const DESK_WORDS = true
+export const DESK_WAYS = true
+export const DESK_FREEAREA = true
+export const DESK_STAGE = true
+export const DESK_DRAWER = true
+export const DESK_CLOSELOOK = true
+export const DESK_PANEL = true
+export const DESK_MARKS = true
+export const DESK_OVERVIEW = true
+export const DESK_SHEET = true
+export const DESK_OPENING = true
 
 const DEFAULT: Readonly<Record<DeskStep, boolean>> = {
   type14: DESK_TYPE14,
