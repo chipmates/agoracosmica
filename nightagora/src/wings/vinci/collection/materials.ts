@@ -15,7 +15,8 @@ import {
   anisotropicFootprint, applyDetail, axisFootprint, fitScales, lineCoverage, reliefNormal, resolved,
   specularAA, surfaceDetail,
 } from '../../../stack/detail'
-import { COLLECTION_PAVING_ORIGIN, FACE, FLOOR, LINE_SLAB } from './layout'
+import { COLLECTION_PAVING_ORIGIN, COURT, FACE, FLOOR, GRAVE_ORIGIN, LINE_SLAB } from './layout'
+import { distanceToBoxes, flagFace } from '../court-flags'
 
 /** floor stone, wall plaster, dark stone, steel, ceiling, outdoor paving */
 export type CollectionRole = 0 | 1 | 2 | 3 | 4 | 5
@@ -428,7 +429,12 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
   // untouched: what a lamp puts on a stone is still the stone.
   const albedo = tone.mul(figure.add(1)).mul(float(1).sub(cut))
     .mul(float(1).add(walked.mul(.08)).sub(grime.mul(.13)).sub(handled.mul(.035))).toVar()
-  m.colorNode = albedo
+  // THE COURT'S FLAGS ARE STONES OF THEIR OWN: a tone, a grain and wear per
+  // slab on the paving's top face, outdoors only
+  const courtTop = isOutdoor.select(smoothstep(.9, .97, n.y).mul(float(1).sub(smoothstep(.006, .016, P.y.sub(COURT.level).abs()))), float(0))
+  const flags = flagFace({ east: COLLECTION_PAVING_ORIGIN.east, north: COLLECTION_PAVING_ORIGIN.north, pitchEast: LINE_SLAB.pitchEast, pitchNorth: LINE_SLAB.pitchNorth, bond: 0 },
+    walked, float(.3))
+  m.colorNode = mix(albedo, albedo.mul(flags.tone), courtTop)
   // A RELIEF FILTERED AWAY LEAVES A SMOOTHER PLANE THAN WAS AUTHORED, and a
   // smoother plane is a shinier one: the slope the gates took goes into the
   // distribution instead, or the stone sparkles where its tone has gone calm.
@@ -439,7 +445,7 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
     // highlight: which slab catches the north light is what reads as stone.
     isFloor.select(mix(float(.62), float(HALL.floorRough), hall).add(detail.rough).add(cell.mul(.16)).add(lap.mul(.06))
       .add(slabJoint.mul(.15)).sub(walked.mul(.22)).add(grime.mul(.07)),
-      isOutdoor.select(float(.88).add(detail.rough).add(cell.mul(.14)).add(lap.mul(.05)).sub(walked.mul(.18)),
+      isOutdoor.select(float(.88).add(detail.rough).add(cell.mul(.14)).add(lap.mul(.05)).sub(walked.mul(.18)).add(flags.rough.mul(courtTop)),
         float(.88).add(detail.rough).add(cell.mul(.1)).add(lap.mul(.07)).add(formBoard.mul(.05)).sub(handled.mul(.09))))).clamp(.30, .97), detail.lost)
   m.metalnessNode = isSteel.select(float(.72), float(.02))
   // A sawn slab keeps a shallow relief of its own; at the room's drift it had
@@ -535,6 +541,22 @@ export function collectionExhibitMaterials(): {
   const stone = make(PALETTE.floor, .66, .02, {
     scales: [.31, .05, .002], extent: .62, lapM: .1, driftM: 2.6, cellM: [1.8, 1.4],
     figure: 1.2, lap: .24, drift: .1, cell: .34, relief: .0028 })
+  {
+    // THE GRAVE'S FLOOR IS FLAGS IN A SHADED COURT, 1.8 by 1.4 m in running
+    // bond as the grave lays them: each its own stone, worn round the tomb,
+    // green-black at the joints under the gallery's walls. Only the floor's
+    // top face, two centimetres over the court's paving.
+    const { smoothstep: step, mix: blend } = TSL as unknown as Record<string, TSLNode>
+    const P = positionWorld, n = normalWorldGeometry
+    const top = step(.9, .97, n.y).mul(float(1).sub(step(.004, .012, P.y.sub(COURT.level + .02).abs())))
+    const tomb = [{ west: GRAVE_ORIGIN.east + .65 - 1.87, east: GRAVE_ORIGIN.east + .65 + 1.87, south: GRAVE_ORIGIN.north - .95 - 1.08, north: GRAVE_ORIGIN.north - .95 + 1.08 }]
+    const walls = [{ west: -61.4, east: -60.49, south: COURT.south, north: -15.8 }, { west: -61.4, east: -40.85, south: -16.48, north: -15.8 }]
+    const walked = float(1).sub(step(.3, 2.4, distanceToBoxes(tomb))).mul(.8)
+    const damp = float(.45).add(float(1).sub(step(.4, 3.5, distanceToBoxes(walls))).mul(.55))
+    const face = flagFace({ east: GRAVE_ORIGIN.east - 4, north: GRAVE_ORIGIN.north, pitchEast: 1.4, pitchNorth: 1.8, bond: .9 }, walked, damp)
+    stone.colorNode = (stone.colorNode as TSLNode).mul(blend(float(1), face.tone, top))
+    stone.roughnessNode = (stone.roughnessNode as TSLNode).add(face.rough.mul(top))
+  }
   const plaster = make(PALETTE.plaster, .9, .01, {
     scales: [.3, .05, .0025], extent: .6, lapM: .15, driftM: 2.4,
     figure: 1, lap: .13, drift: .06, cell: 0, relief: .0022 })
