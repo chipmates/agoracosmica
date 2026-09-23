@@ -69,11 +69,14 @@ const hung = (beam: number, east: number): [number, number, number] => [east, be
 
 /** THE CLERESTORY IS A WINDOW, NOT A LAMP: the north sky through the whole
  * glazed band, as one area source. A point source there put its own glint on
- * the sealed floor as a white blot; a window's glint is a long soft band. */
+ * the sealed floor as a white blot; a window's glint is a long soft band.
+ * It stands in the glazing, facing due south, just inside the mullions: the
+ * glass runs from 61.9 to 39.1 m west and from 1.45 m under to 1.03 m over
+ * the datum, at 42.53 m south. */
 const CLERESTORY = {
-  centre: [-50.4, -42.62, -.25] as [number, number, number],
-  aim: [-50.4, -49.5, FLOOR + .4] as [number, number, number],
-  width: 22.2, height: 2.3, kelvin: 6400, luminance: 1.5,
+  centre: [-50.5, -42.59, -.21] as [number, number, number],
+  aim: [-50.5, -49.5, -.21] as [number, number, number],
+  width: 22.8, height: 2.48, kelvin: 6400, luminance: 1.8,
 }
 
 export const HALL_SPOTS: readonly HallSpot[] = [
