@@ -90,7 +90,15 @@ async function open(page, kind) {
   await settled(page)
   // a painting opens its close look first; the whole plate is one press on
   const toPlate = page.getByRole('button', { name: NAME.plate })
-  if (await toPlate.count()) { await press(page, toPlate.first()); await page.waitForTimeout(1600) }
+  if (await toPlate.count()) {
+    // THE PRESS WAITS FOR THE EYE TO STAND AT THE WORK. The card is mounted
+    // at the cell's press and the walk is written a frame later, so on slow
+    // frames `settled` reads a leg that has not begun; a press during the
+    // walk opens nothing. The picture holds only once the eye stands.
+    await page.waitForSelector(".vitrine[data-surface='hold']", { state: 'attached', timeout: 90000 }).catch(() => {})
+    await press(page, toPlate.first())
+    await page.waitForTimeout(1600)
+  }
   await page.waitForSelector('.deep-plate', { state: 'attached', timeout: 60000 })
   // THE PHONE FOLDS THE CARD TO A PEEK, and a folded card keeps its own row
   // of controls down: the grabber raises it, which is the visitor's gesture.
@@ -125,7 +133,15 @@ try {
   for (const kind of KINDS) {
     const hands = said.kinds[kind] = {}
     const fail = why => said.failures.push(`${kind}: ${why}`)
-    try { await open(page, kind) } catch (error) { fail(`no close view (${String(error.message).slice(0, 60)})`); continue }
+    try { await open(page, kind) } catch (error) {
+      fail(`no close view (${String(error.message).slice(0, 60)})`)
+      // a window left open is the next kind's failure too
+      await page.keyboard.press('Escape')
+      await page.waitForTimeout(1000)
+      await page.keyboard.press('Escape')
+      await settled(page)
+      continue
+    }
     const home = hands.home = await reading(page)
     for (const [hand, name] of [['nearer', NAME.nearer], ['further', NAME.further]]) {
       const from = await reading(page)
