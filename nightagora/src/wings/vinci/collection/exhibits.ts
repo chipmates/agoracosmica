@@ -26,6 +26,7 @@ import { mountCollectionPlates, type CollectionPictureSource } from './plates'
 import { HALL_FILL, mountHallLight } from './hall-light'
 import { mountHallFabric } from './hall-fabric'
 import { mountHallAir } from './hall-air'
+import { mountLineGallery } from './line-gallery'
 import { VINCI_READING_TABLE } from './approaches'
 import type { BodySheetSource } from './body-wall'
 import { mountReadingRoom, type ReadingRoom } from './reading-room'
@@ -186,7 +187,14 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   // procedural stones, so they cost the page no library and are visible
   // through the window wall from every station outside.
   const exhibitStones = collectionExhibitMaterials()
-  const line = createCollectionLineFloor(exhibitStones, lang())
+  // THE LINE IS CUT FROM ITS GALLERY'S OWN STONES, and the gallery round it
+  // is finished, furnished and lit by its own module.
+  const gallery = mountLineGallery(stack)
+  ;(host.getObjectByName('vinci/collection-rooms') ?? host).add(gallery.group)
+  stack.hold(gallery.ready)
+  teardown.push(() => { gallery.dispose() })
+  const line = createCollectionLineFloor(gallery.stones, lang())
+  gallery.adoptLine(line)
   line.position.set(LINE_ORIGIN.east, FLOOR + .01, -LINE_ORIGIN.north)
   stamp(line, 'vinci/collection-line-floor')
   host.add(line)
@@ -418,6 +426,9 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
     update(now, step, eye) {
       if (!live) return
       pictures.update(step, eye)
+      // the gallery's bounce is taken with its rooms and its line standing
+      gallery.update()
+      gallery.tick(rooms ? [rooms, line] : [line])
       // A ROOM THE CAMERA IS NOT IN IS NOT DRAWN.
       // The envelope itself, not the ground around it: the garden station
       // stands on the apron three metres north of the north elevation, and a
