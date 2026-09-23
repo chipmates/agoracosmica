@@ -460,14 +460,14 @@ export function handFor(detail: TreeDetail, tier: TreeTier): Hand {
       far: { branches: .7, twigs: 0, leaves: 1, sides: [6, 3, 0, 0], stride: 3 },
     },
     standard: {
-      near: { branches: .7, twigs: 0, leaves: .5, sides: [8, 5, 3, 0], stride: 2 },
-      mid: { branches: .6, twigs: 0, leaves: .5, sides: [6, 4, 0, 0], stride: 3 },
-      far: { branches: .5, twigs: 0, leaves: .45, sides: [5, 0, 0, 0], stride: 4 },
+      near: { branches: .35, twigs: 0, leaves: .35, sides: [8, 4, 3, 0], stride: 2 },
+      mid: { branches: .5, twigs: 0, leaves: .22, sides: [6, 3, 0, 0], stride: 3 },
+      far: { branches: .4, twigs: 0, leaves: .12, sides: [4, 0, 0, 0], stride: 4 },
     },
     calm: {
-      near: { branches: .5, twigs: 0, leaves: .22, sides: [5, 3, 0, 0], stride: 3 },
-      mid: { branches: .4, twigs: 0, leaves: .2, sides: [4, 3, 0, 0], stride: 4 },
-      far: { branches: .3, twigs: 0, leaves: .18, sides: [4, 0, 0, 0], stride: 4 },
+      near: { branches: .4, twigs: 0, leaves: .15, sides: [5, 3, 0, 0], stride: 3 },
+      mid: { branches: .3, twigs: 0, leaves: .12, sides: [4, 0, 0, 0], stride: 4 },
+      far: { branches: .3, twigs: 0, leaves: .12, sides: [4, 0, 0, 0], stride: 4 },
     },
   }
   return table[tier][detail]
@@ -795,8 +795,10 @@ export function growTree(spec: TreeSpec, tier: TreeTier, heightAt: (east: number
   const weights = habit.palette.map(([, w]) => w)
   const wood = (): number => bark.triangles + (fine === bark ? 0 : fine.triangles)
   const barkBefore = wood(), leafBefore = leaves.triangles
-  // the wood: every tier walks the same stems and keeps its own share;
-  // branches and twigs go to `fine`, trunk and limbs to `bark`
+  // the wood: every tier walks the same stems and keeps its own share; the
+  // wood that casts goes to `bark` (trunk and limbs at hero, the trunk and
+  // its leaders on a live tier), the rest to `fine`
+  const casts = tier === 'hero' ? 2 : 1
   const bearing: { stem: Stem; from: number }[] = []
   for (const stem of grown.stems) {
     const keep = pick()
@@ -804,7 +806,10 @@ export function growTree(spec: TreeSpec, tier: TreeTier, heightAt: (east: number
     if (stem.level === 2 && keep > hand.branches) continue
     if (stem.level === 3 && keep > hand.twigs) continue
     const sides = hand.sides[Math.min(3, stem.level)]!
-    if (sides) tube(stem.level >= 2 ? fine : bark, stem, sides, stem.level === 0 ? 1 : hand.stride, barkColour, lichen, grown.crown, spec, heightAt, random)
+    // a near trunk keeps every ring for its bends and its flared foot; a far
+    // one is seen from seventy metres and more
+    const stride = stem.level === 0 && spec.detail !== 'far' ? 1 : hand.stride
+    if (sides) tube(stem.level >= casts ? fine : bark, stem, sides, stride, barkColour, lichen, grown.crown, spec, heightAt, random)
   }
   // THE LEAVES: a crown's count from its own skin, dealt to the twigs by how
   // much of the crown's outer shell each one stands in
@@ -841,9 +846,9 @@ export function growTree(spec: TreeSpec, tier: TreeTier, heightAt: (east: number
     }
   }
   let placed = 0
-  // single leaves cast in pairs: every second one carries a shadow twice
-  // the size, the crown's shadow the same, the sun's passes half the work
-  const shade = (k: number): number => spraying ? 1 : k % 2 === 0 ? Math.SQRT2 : 0
+  // single leaves, and the sprays of a lighter tier, cast in pairs: every
+  // second card carries a shadow twice the size, the crown's shadow the same
+  const shade = (k: number): number => spraying && tier === 'hero' ? 1 : k % 2 === 0 ? Math.SQRT2 : 0
   if (slots.length && count > 0) {
     const leaflets = spraying ? 1 : habit.leaf.leaflets ?? 1
     const units = Math.max(1, Math.round(count / leaflets))

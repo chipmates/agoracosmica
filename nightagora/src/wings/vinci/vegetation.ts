@@ -324,7 +324,8 @@ function* grow(group: Group, heightAt: (east: number, north: number) => number, 
   // could see (it falls a hundred metres off, outside every cascade)
   const nearIds = planted.map((spec, i) => spec.detail === 'far' ? -1 : i).filter(i => i >= 0)
   const farIds = planted.map((spec, i) => spec.detail === 'far' ? i : -1).filter(i => i >= 0)
-  const nearClusters = tier === 'calm' ? 3 : 6, farClusters = tier === 'calm' ? 1 : 3
+  // a live tier pays in draws, so it deals the trees into fewer clusters
+  const nearClusters = tier === 'hero' ? 6 : 3, farClusters = tier === 'hero' ? 3 : 1
   const clusters = nearClusters + farClusters
   const clusterOf = new Array<number>(planted.length).fill(0)
   clusterTrees(nearIds.map(i => planted[i]!), nearClusters).forEach((c, k) => { clusterOf[nearIds[k]!] = c })
@@ -350,7 +351,7 @@ function* grow(group: Group, heightAt: (east: number, north: number) => number, 
 
   // THE FALLEN LEAVES: under each crown and pushed downwind of it, fewer on
   // the paths and pads where feet and wheels move them to the edges
-  const litterClusters = tier === 'calm' ? 2 : 4
+  const litterClusters = tier === 'hero' ? 4 : 2
   const litterBodies = Array.from({ length: litterClusters }, () => new Body())
   const litterOf = clusterTrees(planted, litterClusters)
   const share = tier === 'hero' ? 1 : tier === 'standard' ? .45 : .22
