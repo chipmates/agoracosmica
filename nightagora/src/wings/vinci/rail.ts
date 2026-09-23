@@ -41,12 +41,22 @@ const p=(e:number,n:number,h:number,te:number,tn:number,th:number,fov=49):Pose=>
 const NARROW_LENS=1.26, NARROW_AIM_SHARE=.21
 /** The phone stage the narrow poses are composed against, 390 by 844 px. */
 const PHONE_STAGE=390/844
-/** THE HALL'S TWO STATIONS STAND OVER PAVING AND NOTHING ELSE. The full drop
- * lifts every machine clear of the card and leaves bare floor under it, so
- * these two aim less far down and the nearest deck stands under the card.
- * The flight station keeps more of the drop, which is what holds its screw
- * whole above the card. */
-const NARROW_AIM_STATION:Partial<Record<VinciStationId,number>>={works:.15,flight:.18}
+/** THE HALL IS STAGED FOR THE PHONE, NOT CROPPED FROM ITS WIDE VIEW. A 390 px
+ * stage holds the screw's lower sail, 4.7 m off its mast, only at eighty-eight
+ * degrees, so the flight station turns six degrees toward that sail and lifts
+ * twelve, which stands the whole screw on the card with the clerestory over
+ * it. The works station turns four degrees north onto its gear machine, which
+ * then stands whole at the frame's right. Both keep the room's own eye.
+ * Heading from north and pitch, in degrees. */
+const HALL_PHONE:Partial<Record<VinciStationId,{heading:number;pitch:number;fov:number}>>={
+  flight:{heading:-79.05,pitch:12,fov:88},
+  works:{heading:-91,pitch:-12,fov:90},
+}
+function aimedFrom(pose:Pose,heading:number,pitch:number,fov:number):Pose {
+  const h=heading*Math.PI/180,t=pitch*Math.PI/180
+  const along=new Vector3(Math.sin(h)*Math.cos(t),Math.sin(t),-Math.cos(h)*Math.cos(t))
+  return {eye:pose.eye.clone(),at:pose.eye.clone().addScaledVector(along,10),fov}
+}
 function narrowRoomPose(pose:Pose,share=NARROW_AIM_SHARE):Pose {
   const fov=Math.min(104,pose.fov*NARROW_LENS)
   const reach=pose.eye.distanceTo(pose.at)
@@ -67,7 +77,10 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // 0.86 m off it, out toward the middle of the road. The phone's lens came
   // down from 116 degrees: at that width the top of its frame looked 68
   // degrees above the gaze and nothing but sky can stand there.
-  if(id==='arrival') return narrow?p(24.98,-16.13,groundHeight(24.98,-16.13)+1.65,5.032039226453499,-12.212873321666777,2.709826421638899,100):p(24.98,-16.13,groundHeight(24.98,-16.13)+1.65,8,-13.5,5,70)
+  // The phone turns eight degrees up the street and lifts thirteen: level at
+  // a hundred degrees, the lower half of its frame was the road. The walnut
+  // over the street now takes the sky's corner.
+  if(id==='arrival') return narrow?p(24.98,-16.13,groundHeight(24.98,-16.13)+1.65,6.5664,-9.7504,7.2049,88):p(24.98,-16.13,groundHeight(24.98,-16.13)+1.65,8,-13.5,5,70)
   // The phone keeps its gaze on the door and opens the lens instead: at 70
   // degrees the cone's right half fell between the court corner and the east
   // range's windows and held neither.
@@ -81,8 +94,10 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   if(id==='hall') return narrow?p(3.0959,-13.0423,2.45,-1.301,-6.4787,.72,72):p(3.0959,-13.0423,2.45,-1.301,-6.4787,2.25,46)
   if(id==='oratory') return narrow?p(5.6,-21.3,1.65,3.053,-18.288,1.98,60):p(5.6,-21.3,1.65,3.053,-18.288,2.9,46)
   // The study holds two things at once now: the window of the room the visit
-  // was written in, and the support under it the page is read at.
-  if(id==='study') return narrow?p(2.4,-29.3,1.65,-1.94,-22.848,3.3,76):p(2.4,-29.3,1.65,-1.94,-22.848,2.74,60)
+  // was written in, and the support under it the page is read at. The phone
+  // stands 2.8 m east of the desktop's eye, where its frame holds the whole
+  // gable and the trees past the house's west corner instead of brick alone.
+  if(id==='study') return narrow?p(5.2,-29.8,1.65,-3.183,-24.914,4.0692,90):p(2.4,-29.3,1.65,-1.94,-22.848,2.74,60)
   // The royal château stands 590 m away on a bearing of 308.84 degrees, which
   // from this end of the court runs over the house's west corner and down the
   // valley. The aim is that bearing; nothing of the castle is built.
@@ -113,8 +128,8 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // of their own; the generic room adjustment below is for upright exhibits
   // and architecture, and a subject that runs away from the eye is neither.
   if(room?.startsWith('collection-room-line')||room?.startsWith('collection-room-picture')){const pose=collectionView(room,narrow);if(pose)return pose}
-  if(room){const pose=collectionView(room,false)
-    if(pose)return narrow?narrowRoomPose(pose,NARROW_AIM_STATION[id]??NARROW_AIM_SHARE):pose}
+  if(room){const pose=collectionView(room,false),hall=HALL_PHONE[id]
+    if(pose)return narrow?hall?aimedFrom(pose,hall.heading,hall.pitch,hall.fov):narrowRoomPose(pose):pose}
   // A future station without a room keeps the held terrace composition.
   return p(-12.4,-21.6,groundHeight(-12.4,-21.6)+1.65,-38,-44,-4.2,narrow?74:58)
 }

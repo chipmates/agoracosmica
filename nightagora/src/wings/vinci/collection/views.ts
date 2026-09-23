@@ -82,13 +82,14 @@ export function collectionView(id: string, narrow: boolean): RoomPose | undefine
     // all the room the cross wall leaves, and the aim comes down two and a
     // half metres ahead: that is the pitch that holds the near socket inside
     // the frame's foot and still lifts 1452 to the middle of it. The phone
-    // takes a wider lens and a shallower drop, which stands the run of them
-    // above its card.
+    // looks straight down the line, 38 degrees under the level: the birth's own
+    // numeral lies under the visitor's feet, so the frame's foot has to stand
+    // between it and its socket, or the year is cut at the edge.
     case 'collection-room-line':
       return {
         eye: world(LINE_ORIGIN.east + .3, LINE_ORIGIN.north - 2.24 * LINE_SLAB.pitchNorth, FLOOR + 1.66),
-        at: world(LINE_ORIGIN.east, narrow ? -60.8 : -59.8, FLOOR + .01),
-        fov: narrow ? 104 : 88,
+        at: narrow ? world(LINE_ORIGIN.east + .3, -60.08, FLOOR + .01) : world(LINE_ORIGIN.east, -59.8, FLOOR + .01),
+        fov: 88,
       }
     // Three fixed excerpts of the bench's date course, kept as the named
     // inspections the excerpt stations were composed from. The life runs away
