@@ -202,14 +202,11 @@ function fittingWash(P: TSLNode, n: TSLNode): TSLNode {
   const bodyWall = smoothstep(-6.1, -3.4, P.y).mul(smoothstep(-4.6, -3.4, P.y.negate().negate()).oneMinus().add(.55).clamp(0, 1))
     .mul(near(P.x.add(38.75), .3, 1.4)).mul(facing(n.x)).mul(galleryGate)
   const galleryFloor = smoothstep(-6.6, -6.2, P.y).mul(facing(n.y)).mul(galleryGate).mul(.55)
-  // The reading alcove has a lamp on its table and a downlight over it; the
-  // pool they make on the floor and the panelling is the room's, not the
-  // table's, so the room carries it.
-  const alcove = near(P.x.add(36.6), 1.4, 4.2).mul(near(P.z.sub(45.4), 1.6, 4.6))
-    .mul(smoothstep(-6.6, -5.2, P.y)).mul(smoothstep(-2.4, -3.6, P.y).add(.35).clamp(0, 1)).mul(galleryGate)
+  // The reading room carries no wash here: its own lamp is a light
+  // (`reading-room.ts`), and its pool lies on its own oak.
   return coveWall.mul(.46).add(coveSoffit.mul(.30)).add(coveFloor.mul(.20))
     .add(hallUp.mul(.34)).add(hallFloor.mul(.16))
-    .add(gallery.mul(.30)).add(galleryFloor.mul(.18)).add(bodyWall.mul(.40)).add(alcove.mul(.26))
+    .add(gallery.mul(.30)).add(galleryFloor.mul(.18)).add(bodyWall.mul(.40))
     .clamp(0, .62)
 }
 

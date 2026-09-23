@@ -28,6 +28,7 @@ import { mountHallFabric } from './hall-fabric'
 import { mountHallAir } from './hall-air'
 import { VINCI_READING_TABLE } from './approaches'
 import type { BodySheetSource } from './body-wall'
+import { mountReadingRoom, type ReadingRoom } from './reading-room'
 
 /** How thick the hall's air is: a haze a spot's shaft is seen in, no more. */
 const HALL_AIR_DENSITY = .12
@@ -98,6 +99,9 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   let machinesUp = 0, tableUp = 0, deathbedUp = 0, picturesAsked = 0, picturesUp = 0
   const machineUp = (): void => { machinesUp++ }
   let reading: ReturnType<typeof buildTable> | undefined
+  /** The room round the reading table, and how many takes of its bounce are
+   * still owed: a take is drawn in a frame of its own, never in a build. */
+  let readingRoom: ReadingRoom | undefined, roomBakes = 0
   const teardown: (() => void)[] = []
   // The court's exhibit stands outdoors and is seen from every station on
   // this ground, so it is built at once and dressed from this module's own
@@ -188,6 +192,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   const graveNear = new Vector3(-42, FLOOR, 46)
   /** Where the reading table stands, for the distance it is drawn at. */
   const TABLE_AT = new Vector3(VINCI_READING_TABLE.east, VINCI_READING_TABLE.top, -VINCI_READING_TABLE.north)
+  const tableReach = stack.tierName() === 'hero' ? 18.5 : 16
   const rooms = host.getObjectByName('vinci/collection-rooms')
   // The bench's phone restaging moves the diagram frame in front of the
   // deathbed painting hung on this backdrop, so the wing keeps the one
@@ -284,12 +289,26 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       if (!(backWall instanceof Mesh)) throw new Error('The reading table has no back wall')
       backWall.scale.x = VINCI_READING_TABLE.panelWidthM / (backWall.geometry as PlaneGeometry).parameters.width
       backWall.position.x = 0
+      // The reading room brings the wall now: the table's own panel stands
+      // behind the room's panelling, out of sight.
+      backWall.visible = false
       built.object.rotation.y = Math.PI / 2
       built.object.position.set(VINCI_READING_TABLE.east, VINCI_READING_TABLE.top, -VINCI_READING_TABLE.north)
       stamp(built.object, 'vinci/table-furniture')
       host.add(built.object)
       reading = built
       teardown.push(() => { built.dispose() })
+      // THE READING ROOM stands round the table the moment the table does, and
+      // lights it: its lamp, its bounce and the shadows of its top.
+      const room = mountReadingRoom(stack, host)
+      ;(rooms ?? host).add(room.group)
+      room.embrace(built.object)
+      readingRoom = room
+      roomBakes = 1
+      teardown.push(() => { room.dispose() })
+      // the bounce is read again once its oak and the page have arrived, twice,
+      // so the bounce carries a bounce of its own
+      void Promise.all([room.ready, built.ready()]).then(() => { if (live) roomBakes = 2 }, () => { if (live) roomBakes = 2 })
     })
     const settled = (): void => { tableUp = 1 }
     void table.then(settled, settled)
@@ -310,10 +329,6 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
     // are lights here and not a term on a surface.
     ...[[-51, -44], [-47.2, -45.6], [-56.2, -51.4], [-46.4, -51.2], [-51.4, -58.6]]
       .map(([east, north]) => ['hall-fitting', east!, north!, FLOOR + 4.6, 9.5, 15, '#f4e6cc'] as [string, number, number, number, number, number, string]),
-    // The reading lamp on the table is emissive geometry: it shows that it
-    // is lit, it does not light the book. The room's own fitting over the
-    // table does that, because the object under it is not this module's to shade.
-    ['reading-lamp', VINCI_READING_TABLE.east + .17, VINCI_READING_TABLE.north + .1, FLOOR + 1.34, 5.2, 5.4, '#ffcf92'],
     // THE GALLERY HAS ITS OWN FITTINGS TOO, or the alcove and the wall of
     // sheets stand a stop and a half under the rest of the insertion.
     ...[[-35.6, -47, 13], [-32.4, -50.6, 12], [-31.6, -58.4, 13]]
@@ -360,7 +375,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   warmTable()
   /** Every body the walk can show, standing with its materials resolved. */
   const standing = Promise.all([courtGround, hall, house, table]).then(() =>
-    Promise.all([...machines.map(machine => machine.build.ready), reading?.ready(), deathbed, pictures.ready]))
+    Promise.all([...machines.map(machine => machine.build.ready), reading?.ready(), deathbed, pictures.ready, readingRoom?.ready]))
   stack.hold(standing)
   for (const body of [rooms, line, grave.group, plaque.group]) if (body) body.userData['naWarm'] = true
 
@@ -385,7 +400,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       }
     },
     ready: Promise.all([court.then(() => courtGround).then(() => hall ?? Promise.resolve()).then(() => table ?? Promise.resolve()), pictures.ready]).then(() => undefined),
-    pending: () => building.size + pictures.pending(),
+    pending: () => building.size + pictures.pending() + (readingRoom?.pending() ?? 0) + roomBakes,
     pictureSources: pictures.sources,
     sheetSources: pictures.sheets,
     pictureErrors: () => [...pictures.errors(), ...groundErrors],
@@ -418,9 +433,10 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       if (line.visible !== near) line.visible = near
       if (grave.group.visible !== near) grave.group.visible = near
       if (plaque.group.visible !== near) plaque.group.visible = near
-      // The reading table is read at the table, not from the next room.
+      // The reading table is read at the table, not from the next room. At the
+      // top tier it is drawn from the line's own stop too, down the same room.
       const toTable = eye.distanceToSquared(TABLE_AT)
-      const atTable = near && toTable < 16 * 16
+      const atTable = near && toTable < tableReach * tableReach
       if (reading && reading.object.visible !== atTable) reading.object.visible = atTable
       // A MACHINE IS DRAWN WHERE IT CAN BE SEEN AND READ. The hall's fourteen
       // are behind the hanging wall and two closed elevations: from the
@@ -473,6 +489,18 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
         if (roomsHidden) rooms.visible = false
       }
       reading?.update(now * 1000)
+      if (readingRoom) {
+        readingRoom.update(atTable)
+        if (roomBakes > 0) {
+          roomBakes--
+          // the room's bounce is read with the gallery standing round it,
+          // wherever the eye happens to be when it is taken
+          const bodies = [rooms, line, reading?.object].filter((body): body is NonNullable<typeof rooms> => body !== undefined)
+          const shown = bodies.map(body => body.visible)
+          for (const body of bodies) body.visible = true
+          try { readingRoom.bake() } finally { bodies.forEach((body, i) => { body.visible = shown[i]! }) }
+        }
+      }
     },
     dispose() {
       live = false

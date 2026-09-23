@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed to a pale grey at 30 per cent. Assumed weather, no observation claimed.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "83d2a7169d078c0649dbed577ee534bda595691d6c270314a88ed74cf1116a1a",
+      "sha256": "a89c989ce528714d1d60a1cb7a467c27f4d9f36ffa7a0de2bc6c93da14c5ccbe",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=80c458f2cb5ccddb7fcedccda5df70e5cdccda7d9ca97d65ebfa6462920f61ef;"
     },
     {
@@ -3670,6 +3670,19 @@
       "date": "2026-09-23",
       "sha256": "f3b6c9a73735595f84b06d99568654070e97a9360fee11454e339c64e0b47b03",
       "note": "recipe_file=src/wings/vinci/house-tracery.ts; source=Q175 ARVIVA-0 A-OPENING; geometry_dependency=vinci/shell; rail_collision=false"
+    },
+    {
+      "id": "vinci/collection-reading-room",
+      "path": "procedural/collection-reading-room/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural construction; source code under the museum repository licence.",
+      "display": true,
+      "prompt": "The reading room round the reading table: an oak niche set against the long gallery's west wall, its back panelled in seven book-matched leaves of veneered oak on battens with shadow joints, a lower dado of the same flitch carried south under the body wall's standing sheet, a north return closing it against the hall door, a veneered oak canopy with a downstand fascia hung on four bronze rods, an oiled oak board floor edged in bronze, a spun brass pendant with an opal disc over the book, and a modern oak chair with a leather seat drawn up to the table. One 2700 K lamp lights it; the room's own bounce is read from a probe taken inside it. The veneer is the library's CC0 oak photograph; everything else is procedural. Modern exhibition architecture and furniture; no period claim.",
+      "model": "Deterministic TypeScript geometry and TSL materials",
+      "date": "2026-09-23",
+      "sha256": "d29041409a6737f1ecc4faf30f54c93138988920664a6b4351e35d878650d307",
+      "note": "Modern museum furniture and lighting, no 1517 claim. recipe_file=src/wings/vinci/collection/reading-room.ts; library_set=library/oak-veneer-light"
     }
   ]
 }
