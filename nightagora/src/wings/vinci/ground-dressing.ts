@@ -14,7 +14,7 @@ import { collectionExclusions } from './collection'
 import { collectionAccessExclusions } from './collection-access'
 import { getInnerCourtOutlines } from './inner-court'
 import { getApronOutlines } from './apron'
-import { pebble, stoneColour, type Emit } from './pebbles'
+import { fadeUnderPixel, pebble, stoneColour, type Emit } from './pebbles'
 import { createMoss } from './moss'
 import { createCreepers } from './creepers'
 import { createCopings } from './copings'
@@ -433,7 +433,10 @@ function* sow(group: Group, heightAt: HeightAt, tier: TierName): Generator<void,
   const plants = meshFrom(plantBatch, 'vinci October meadow')
   if (cards.position.length) group.add(...partitionGroundDressing(cardMesh(cards, 'vinci October meadow tufts'), tier === 'hero' ? 3 : 1))
   group.add(...partitionGroundDressing(plants, calm ? 1 : tier === 'standard' ? 2 : 4, tier === 'hero' ? 8 : 0))
-  group.add(meshFrom(mineralBatch, 'vinci pale mineral path-edge gravel'))
+  const gravel = meshFrom(mineralBatch, 'vinci pale mineral path-edge gravel')
+  // a pebble smaller than the pixel keeps the stones' mean and a flat face
+  fadeUnderPixel(gravel.material as MeshStandardNodeMaterial, .03)
+  group.add(gravel)
   if (!calm) group.add(createMoss(tier))
   group.add(createCopings(tier))
   group.add(createCreepers(tier, (e, n) => routes.some(p => inside(e, n, p) || edgeDistance(e, n, p) < 1)))

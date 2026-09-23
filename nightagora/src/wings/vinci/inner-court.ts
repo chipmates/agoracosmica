@@ -10,7 +10,7 @@ import { cameraPosition, float, length, mx_noise_float, positionWorld, smoothste
 import type { TierName } from '../../stack/tier'
 import { dossier, edgeDistance, feature, inside, polygon, type Feature, type Quantity } from './site'
 import { anisotropicFootprint } from './masonry-courses'
-import { pebble, stoneColour } from './pebbles'
+import { fadeUnderPixel, pebble, stoneColour } from './pebbles'
 
 export type CourtPoint = [east:number,north:number]
 export interface InnerCourtRegion {
@@ -336,7 +336,11 @@ export function createInnerCourtDressing(heightAt:HeightAt,tier:TierName):Group 
   const group=new Group();group.name='vinci generated inner court dressing'
   group.userData={...courtDressingProvenance,triangles:(stone.positions.length+chips.positions.length+wear.positions.length)/9,placedChips:placed}
   for(const [source,name]of[[stone,'tread stone'],[chips,'court gravel'],[wear,'court wear and drainage']] as const){
-    if(source.positions.length)group.add(meshOf(source,`vinci/inner-court/${name}`))
+    if(!source.positions.length)continue
+    const mesh=meshOf(source,`vinci/inner-court/${name}`)
+    // the court's loose gravel keeps still where it is smaller than the pixel
+    if(source===chips)fadeUnderPixel(mesh.material as MeshStandardNodeMaterial,.03)
+    group.add(mesh)
   }
   // THE READING SUPPORT, in the same stone the treads are dressed with: one
   // post, one raked board, built here so the certificate covers it.

@@ -1,7 +1,7 @@
 /** Original proposed road wear. The mapped alignment and common grade own
  * every contact; chips and straw describe use, never period evidence. */
 import { BufferGeometry, Color, DoubleSide, Float32BufferAttribute, Group, Mesh, MeshStandardNodeMaterial, Vector3 } from 'three/webgpu'
-import { float, length, mix, mx_noise_float, positionWorld, smoothstep, step, vec2, vec3 } from 'three/tsl'
+import { float, length, mix, mx_noise_float, mx_worley_noise_vec2, positionWorld, smoothstep, step, vec2, vec3 } from 'three/tsl'
 import { dossier, feature, inside, polygon, type Quantity } from './site'
 import { roadGradeProvenance } from './road-grade'
 import { getPathCorridors } from './paths'
@@ -116,9 +116,22 @@ export function roadSurfaceNode(){
   // A RUT HOLDS WATER AND FINES. Its floor is darker and smoother than the
   // crown beside it, and the wheels have pressed a low lip up at its sides.
   const lip=roadWearNode(.22).mul(float(1).sub(wear)).mul(.6)
+  // WHAT THE LEAVES LIE ON. The crown holds stones the wheels have bedded;
+  // the ruts and the gutters, where the week's leaves lie wet, hold its
+  // mould and the stains of leaves already gone. A stone is round, so it is
+  // drawn only where the pixel's long axis holds it.
+  const long=length(P.dFdx()).max(length(P.dFdy())).max(.00001)
+  const heldLong=(metres:number)=>smoothstep(2,4.5,float(metres).div(long))
+  const bed=mx_worley_noise_vec2(p.mul(1/.034))
+  const bedded=smoothstep(.05,.3,bed.y.sub(bed.x)).mul(smoothstep(.5,.78,mx_noise_float(vec3(p.mul(1/.034*.35),5.2))))
+    .mul(float(1).sub(wear.mul(.7))).mul(heldLong(.034))
+  const stoneTone=mx_noise_float(vec3(p.mul(1/.034),1.3))
+  const wet=smoothstep(.25,.85,wear.mul(.9).add(foot).add(mx_noise_float(P.mul(2.3)).mul(.35))).mul(mx_noise_float(P.mul(.9)).mul(.3).add(.7))
+  const ghost=mx_worley_noise_vec2(vec2(p.x.mul(1/.05),p.y.mul(1/.085)).add(vec2(3.7,1.1)))
+  const stains=smoothstep(.34,.12,ghost.x).mul(smoothstep(.45,.7,mx_noise_float(vec3(p.mul(3.1),8.8)))).mul(wet).mul(heldLong(.05))
   const colour=mix(vec3(dark.r,dark.g,dark.b),vec3(pale.r,pale.g,pale.b),drift.mul(.42).add(.5).sub(foot.mul(.24)))
-    .mul(packed.mul(.20).add(aggregate.mul(.15)).add(chips.mul(.11)).mul(float(1).sub(wear.mul(.65))).add(grit.mul(.035)).add(1)).mul(float(1).sub(wear.mul(.48))).mul(float(1).sub(churn.mul(.30))).mul(float(1).sub(foot.mul(.22))).mul(lip.mul(.06).add(1))
-  return {mask,colour,wear,height:aggregate.mul(.00065).add(chips.mul(.00042)).add(grit.mul(.00012)).sub(wear.mul(.024)).add(lip.mul(.008)).sub(churn.mul(.004)).sub(foot.mul(.010)).clamp(-.03,.01),
+    .mul(packed.mul(.20).add(aggregate.mul(.15)).add(chips.mul(.11)).mul(float(1).sub(wear.mul(.65))).add(grit.mul(.035)).add(1)).mul(float(1).sub(wear.mul(.48))).mul(float(1).sub(churn.mul(.30))).mul(float(1).sub(foot.mul(.22))).mul(lip.mul(.06).add(1)).mul(bedded.mul(stoneTone.mul(.22).add(.06)).add(1)).mul(float(1).sub(wet.mul(.16))).mul(float(1).sub(stains.mul(.2)))
+  return {mask,colour,wear,height:aggregate.mul(.00065).add(bedded.mul(.0016).mul(heldLong(.08))).add(chips.mul(.00042)).add(grit.mul(.00012)).sub(wear.mul(.024)).add(lip.mul(.008)).sub(churn.mul(.004)).sub(foot.mul(.010)).clamp(-.03,.01),
     roughness:float(.94).sub(wear.mul(.10)).sub(churn.mul(.22)).add(grit.mul(.02)).add(foot.mul(.03)).clamp(.62,.99)}
 }
 interface Batch {p:number[];c:number[]}

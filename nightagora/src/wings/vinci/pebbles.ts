@@ -7,6 +7,9 @@
    curvature, not its facets), in stone colours inside the albedo range of the
    art direction. The pebble is a type, never a record of a stone. */
 
+import type { MeshStandardNodeMaterial } from 'three/webgpu'
+import { attribute, cameraViewMatrix, float, length, mix, normalView, positionWorld, smoothstep, vec3 } from 'three/tsl'
+
 export type V3 = [number, number, number]
 /** one triangle with its three corner normals and one colour */
 export type Emit = (a: V3, b: V3, c: V3, na: V3, nb: V3, nc: V3, colour: V3) => void
@@ -23,6 +26,29 @@ const linear = (hex: string): V3 => {
 }
 const STONE_COLOURS = STONES.map(([hex]) => linear(hex))
 const STONE_TOTAL = STONES.reduce((a, [, w]) => a + w, 0)
+
+/** the mean of the stones, as a field of them too small to part reads */
+const STONE_MEAN: V3 = STONES.reduce((sum, [, w], i) => {
+  const c = STONE_COLOURS[i]!
+  return [sum[0] + c[0] * w / STONE_TOTAL, sum[1] + c[1] * w / STONE_TOTAL, sum[2] + c[2] * w / STONE_TOTAL] as V3
+}, [0, 0, 0] as V3)
+
+/** A STONE UNDER THE PIXEL DOES NOT BLINK. Where a pixel's long axis spans
+    more than a fraction of a pebble, the pebble keeps the mean colour of the
+    stones and a flat face, so its coverage coming and going as the eye moves
+    changes nothing a visitor can see; near, it is its own stone, round-shaded.
+    `metres` is the stone's size; the colour keeps whatever the material
+    already multiplies it by. */
+export function fadeUnderPixel(m: MeshStandardNodeMaterial, metres: number): void {
+  const P = positionWorld
+  const long = length(P.dFdx()).max(length(P.dFdy())).max(1e-5)
+  const held = smoothstep(2, 6, float(metres).div(long))
+  const own = mix(vec3(STONE_MEAN[0], STONE_MEAN[1], STONE_MEAN[2]), attribute<'vec3'>('color', 'vec3'), held)
+  m.vertexColors = false
+  m.colorNode = m.colorNode ? (m.colorNode as ReturnType<typeof vec3>).mul(own) : own
+  const up = vec3(0, 1, 0).transformDirection(cameraViewMatrix)
+  m.normalNode = mix(up, normalView, held).normalize()
+}
 
 /** A stone colour, a little varied, from one draw in 0..1 and one in 0..1. */
 export function stoneColour(pick: number, tone: number): V3 {
