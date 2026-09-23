@@ -90,7 +90,7 @@ const PLANTING: readonly TreeSpec[] = [
   // a field elm drawn up among the Amasse's trees, its crown high on a long
   // bole: from the supper wall its trunk stands above the pavilion's roof,
   // and from the grave it stands behind the grave's own poplar
-  { id: 'amasse-tall-elm', species: 'elm', east: -65.5, north: -15.5, height: 27, seed: 4409, detail: 'mid', crownBase: .72, bole: .74, lean: [.4, .3] },
+  { id: 'amasse-tall-elm', species: 'elm', east: -65.5, north: -15.5, height: 27, seed: 4409, detail: 'mid', crownBase: .72, bole: .74, lean: [.4, .3], leafCap: 5200 },
   { id: 'amasse-willow-2', species: 'willow', east: -70, north: 3, height: 6.8, seed: 4406, detail: 'mid', pollard: true },
   { id: 'amasse-elm', species: 'elm', east: -62, north: 18, height: 21, seed: 4407, detail: 'mid' },
   { id: 'amasse-alder-3', species: 'alder', east: -66.5, north: -58, height: 13.5, seed: 4408, detail: 'far' },
@@ -442,7 +442,7 @@ function* grow(group: Group, heightAt: (east: number, north: number) => number, 
       if (litterBodies.length < litterCap) {
         i = litterBodies.length
         litterBodies.push(new Body()); litterShadows.push(tier === 'hero' ? new Body() : null)
-        litterContacts.push(tier !== 'calm' && ENGINE_TERMS ? new Body() : null)
+        litterContacts.push(tier === 'hero' && ENGINE_TERMS ? new Body() : null)
       } else i = Math.abs(Math.floor(e / litterCell) * 7 + Math.floor(n / litterCell) * 13) % litterCap
       litterIndex.set(key, i)
     }

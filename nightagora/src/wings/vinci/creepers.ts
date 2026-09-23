@@ -182,24 +182,24 @@ export function createCreepers(tier: TierName, onWalk: (e: number, n: number) =>
       const aim = centre + (k / Math.max(1, mains - 1) - .5) * width * .6 + (random() - .5) * .2
       const goal = top * (.5 + random() * .4)
       const line: { s: number; h: number; r: number }[] = []
-      for (let i = 0; i < 80 && h < goal; i++) {
-        const lean = (aim - s) * .08 + (random() - .5) * .05
-        s += lean; h += .06
+      for (let i = 0; i < 40 && h < goal; i++) {
+        const lean = (aim - s) * .16 + (random() - .5) * .07
+        s += lean; h += .12
         if (s < .05 || s > span - .05) break
         line.push({ s, h, r: .02 * (1 - h / (top + .3) * .7) })
       }
       if (line.length > 2) stems.push(line)
       // forks off the main stem, thinner, reaching sideways and up
       for (const [i, p] of line.entries()) {
-        if (i < 4 || random() > .12) continue
+        if (i < 2 || random() > .24) continue
         let fs = p.s, fh = p.h
         const dir = random() < .5 ? -1 : 1, fork: { s: number; h: number; r: number }[] = [{ s: fs, h: fh, r: p.r * .6 }]
-        for (let j = 0; j < 14; j++) {
+        for (let j = 0; j < 7; j++) {
           // a fork keeps inside the mat it feeds
-          fs += dir * (.03 + random() * .02); fh += .03 + random() * .04
+          fs += dir * (.06 + random() * .04); fh += .06 + random() * .08
           const half = width / 2 * (.3 + .7 * Math.pow(Math.min(1, fh / Math.max(top, .1)), .55)) * .85
           if (fs < .05 || fs > span - .05 || fh > top * .95 || Math.abs(fs - centre) > half) break
-          fork.push({ s: fs, h: fh, r: p.r * .6 * (1 - j / 16) })
+          fork.push({ s: fs, h: fh, r: p.r * .6 * (1 - j / 8) })
         }
         if (fork.length > 2) stems.push(fork)
       }
@@ -208,7 +208,7 @@ export function createCreepers(tier: TierName, onWalk: (e: number, n: number) =>
     // THE MAT: leaves layered off the stone, a fan that widens as it climbs
     // from the root and frays at its edge
     const lobes = [random() * 6.28, random() * 6.28, random() * 6.28]
-    const count = Math.round(width * top * 640)
+    const count = Math.round(width * top * 470)
     for (let k = 0; k < count; k++) {
       const v = Math.pow(random(), .8), u = (random() - .5) * 2
       const h = v * top
@@ -226,7 +226,7 @@ export function createCreepers(tier: TierName, onWalk: (e: number, n: number) =>
     }
   }
   function tube(line: { s: number; h: number; r: number }[], run: Run, ux: number, un: number, out: V3): void {
-    const sides = 4
+    const sides = 3
     const rings = line.map(p => {
       const c = point(run, ux, un, p.s, p.h, p.r + .004)
       return { c, r: p.r }
@@ -279,8 +279,9 @@ export function createCreepers(tier: TierName, onWalk: (e: number, n: number) =>
     const corners = [corner(-1, 0), corner(1, 0), corner(1, 1), corner(-1, 1)]
     quad(leaves, corners, [fx, fy, fz], tint, cell)
     leafCount++
-    // its shadow on the stone: one opaque triangle inside its outline
-    for (const [cu, cv] of [[0, .08], [.62, .72], [-.62, .72]] as const) {
+    // its shadow on the stone: every second leaf throws one opaque triangle
+    // of twice the area, so the mat's shadow keeps its weight
+    if (leafCount % 2 === 0) for (const [cu, cv] of [[0, -.05], [.88, .9], [-.88, .9]] as const) {
       const v = corner(cu, cv)
       shade.push(v[0], v[1], v[2]); shadeNormal.push(fx, fy, fz)
     }

@@ -478,7 +478,7 @@ function lay(target: Target, leaf: Leaf): void {
   // on a hard floor the stone under and around a lying leaf sees less sky:
   // a soft halo a little larger than the blade, drawn under it
   const contact = target.contact
-  if (contact && leaf.hard && !leaf.leanTo && stopDistance(leaf.east, leaf.north) < 16) {
+  if (contact && leaf.hard && !leaf.leanTo && stopDistance(leaf.east, leaf.north) < 10) {
     // the halo's dark rim falls at the blade's own outline and fades a
     // third of a blade beyond it
     const c0 = contact.vertices, hl = L * .78, hwc = L * Math.max(.34, hw * 1.45)

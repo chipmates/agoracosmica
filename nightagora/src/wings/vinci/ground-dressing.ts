@@ -279,14 +279,20 @@ function* sow(group: Group, heightAt: HeightAt, tier: TierName): Generator<void,
   // each stop sows its own view, densest a few metres before its eye and
   // thinning as one over the square of the distance past four metres
   const perStop = calm ? 620 : tier === 'standard' ? 1800 : 3600
-  const clumpTarget = perStop * STOP_EYES.length
+  // what each stop's frame shows of the meadow (the eyes in STOP_EYES'
+  // order: arrival, courtyard, oratory, study, chamber, garden, supper wall,
+  // grave); the supper wall and the grave look at walls
+  const MEADOW_SHARE = [.4, .3, .3, .5, 1.25, 1.35, 0, 0]
+  const shares = MEADOW_SHARE.map(w => Math.round(perStop * w))
+  const clumpTarget = shares.reduce((a, b) => a + b, 0)
+  const stopOf = (attempt: number): number => { let i = 0, at = attempt; while (i < shares.length - 1 && at >= shares[i]!) { at -= shares[i]!; i++ } return i }
   // past twenty metres a blade is under a pixel and the tuft cards carry
   // the sward, so the blades stop there at the same density before the eye
   const reach = 20, scale = 4, logSpan = Math.log(1 + (reach / scale) ** 2)
   let clumps = 0, blades = 0, seedStalks = 0, seam = 1
   for (let attempt = 0; attempt < clumpTarget; attempt++) {
     if (seam < TUFT_SLICES && attempt >= clumpTarget * seam / TUFT_SLICES) { seam++; yield }
-    const stop = STOP_EYES[Math.floor(attempt / perStop)]!
+    const stop = STOP_EYES[stopOf(attempt)]!
     const r = scale * Math.sqrt(Math.exp(meadowRandom() * logSpan) - 1)
     const look = Math.atan2(stop.look[1], stop.look[0]), turn = (meadowRandom() - .5) * 2.1
     const east = stop.at[0] + Math.cos(look + turn) * r, north = stop.at[1] + Math.sin(look + turn) * r
@@ -359,10 +365,13 @@ function* sow(group: Group, heightAt: HeightAt, tier: TierName): Generator<void,
   const cards: CardBatch = { position: [], normal: [], colour: [], uv: [] }
   const cardRandom = randomSource(15171041)
   const cardsPerStop = calm ? 0 : tier === 'standard' ? 1500 : 2600
+  const cardShares = MEADOW_SHARE.map(w => Math.round(cardsPerStop * Math.min(1.2, w + .15)))
+  const cardTarget = cardShares.reduce((a, b) => a + b, 0)
+  const cardStop = (attempt: number): number => { let i = 0, at = attempt; while (i < cardShares.length - 1 && at >= cardShares[i]!) { at -= cardShares[i]!; i++ } return i }
   const cardReach = 46, cardScale = 8, cardSpan = Math.log(1 + (cardReach / cardScale) ** 2)
   let tufted = 0
-  for (let attempt = 0; attempt < cardsPerStop * STOP_EYES.length; attempt++) {
-    const stop = STOP_EYES[Math.floor(attempt / cardsPerStop)]!
+  for (let attempt = 0; attempt < cardTarget; attempt++) {
+    const stop = STOP_EYES[cardStop(attempt)]!
     const r = cardScale * Math.sqrt(Math.exp(cardRandom() * cardSpan) - 1)
     const look = Math.atan2(stop.look[1], stop.look[0]), turn = (cardRandom() - .5) * 2.1
     const east = stop.at[0] + Math.cos(look + turn) * r, north = stop.at[1] + Math.sin(look + turn) * r
