@@ -47,6 +47,8 @@ def arguments(argv):
                    help="three's (1 - (d/reach)^4)^2 window on each spot")
     p.add_argument("--save-blend", type=Path)
     p.add_argument("--adaptive", type=float, default=0.0, help="adaptive sampling threshold; 0 renders every sample")
+    p.add_argument("--border", type=float, nargs=4, metavar=("X0", "Y0", "X1", "Y1"),
+                   help="render only this share of the frame (0..1, y up) for a study; the print's vignette is then the crop's")
     return p.parse_args(argv)
 
 
@@ -534,6 +536,10 @@ def main():
     scene.render.image_settings.color_depth = "32"
     scene.render.image_settings.exr_codec = "ZIP"
     scene.render.use_compositing = False
+    if args.border:
+        scene.render.use_border = True
+        scene.render.use_crop_to_border = True
+        (scene.render.border_min_x, scene.render.border_min_y, scene.render.border_max_x, scene.render.border_max_y) = args.border
     scene.render.use_persistent_data = True
     report["device"] = select_device(scene, args.device)
     report["settings"] = {"samples": args.samples, "denoise": args.denoise, "adaptive": args.adaptive, "threads": args.threads, "bounces": BOUNCES,
