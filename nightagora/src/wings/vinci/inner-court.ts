@@ -10,6 +10,7 @@ import { cameraPosition, float, length, mx_noise_float, normalMap, positionWorld
 import type { TierName } from '../../stack/tier'
 import { dossier, edgeDistance, feature, inside, polygon, type Feature, type Quantity } from './site'
 import { anisotropicFootprint } from './masonry-courses'
+import { pebble, stoneColour } from './pebbles'
 
 export type CourtPoint = [east:number,north:number]
 export interface InnerCourtRegion {
@@ -193,7 +194,7 @@ export function createCourtObjects(heightAt:HeightAt,models:ModelPlacer):Group {
 }
 
 type HeightAt=(east:number,north:number)=>number
-interface Batch {positions:number[];colours:number[]}
+interface Batch {positions:number[];colours:number[];normals?:number[]}
 const batch=():Batch=>({positions:[],colours:[]})
 function tri(target:Batch,a:Vector3,b:Vector3,c:Vector3,colour:Color):void {
   for(const p of[a,b,c]){target.positions.push(p.x,p.y,p.z);target.colours.push(colour.r,colour.g,colour.b)}
@@ -226,7 +227,9 @@ function meshOf(source:Batch,name:string):Mesh {
   const geometry=new BufferGeometry()
   geometry.setAttribute('position',new Float32BufferAttribute(source.positions,3))
   geometry.setAttribute('color',new Float32BufferAttribute(source.colours,3))
-  geometry.computeVertexNormals();geometry.computeBoundingSphere()
+  if(source.normals)geometry.setAttribute('normal',new Float32BufferAttribute(source.normals,3))
+  else geometry.computeVertexNormals()
+  geometry.computeBoundingSphere()
   const mesh=new Mesh(geometry,material());mesh.name=name;mesh.receiveShadow=true;mesh.castShadow=false
   mesh.userData['manifestId']='vinci/inner-court';mesh.userData['labelOccluder']=false
   return mesh
@@ -268,7 +271,7 @@ export const studySupportProvenance={
  * getInnerCourtRegions through the caller's single shared grade sampler.
  */
 export function createInnerCourtDressing(heightAt:HeightAt,tier:TierName):Group {
-  const stone=batch(),chips=batch(),wear=batch(),stoneColour=new Color('#a99f89')
+  const stone=batch(),chips:Batch={positions:[],colours:[],normals:[]},wear=batch(),treadColour=new Color('#a99f89')
   let seed=171019
   const random=():number=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296}
   const ground=(p:CourtPoint,lift=.008):Vector3=>world(p,heightAt(...p)+lift)
@@ -284,7 +287,7 @@ export function createInnerCourtDressing(heightAt:HeightAt,tier:TierName):Group 
     for(let i=0;i<region.points.length;i++){
       const a=region.points[i]!,b=region.points[(i+1)%region.points.length]!,count=Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/.10)
       const at=(t:number):CourtPoint=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t]
-      for(let j=0;j<count;j++)tri(stone,stonePoint(at(j/count),region.height),stonePoint(at((j+1)/count),region.height),stonePoint(centre,region.height),stoneColour)
+      for(let j=0;j<count;j++)tri(stone,stonePoint(at(j/count),region.height),stonePoint(at((j+1)/count),region.height),stonePoint(centre,region.height),treadColour)
     }
   }
   const envelope=dossier.site.build_envelope.map(p=>p.value)
@@ -299,14 +302,11 @@ export function createInnerCourtDressing(heightAt:HeightAt,tier:TierName):Group 
     if(!hardGround(p))continue
     const edge=Math.min(edgeDistance(...p,court),edgeDistance(...p,outline))
     if(random()>.20+.65*Math.exp(-edge/1.3))continue
-    const size=.025+random()*.05,angle=random()*Math.PI*2
-    const corners=Array.from({length:4},(_,i):CourtPoint=>{
-      const a=angle+i*Math.PI/2,r=size*(i%2?.40:.65)
-      return[p[0]+Math.cos(a)*r,p[1]+Math.sin(a)*r]
-    })
-    if(corners.some(c=>!hardGround(c)))continue
-    const top=ground(p,size*.28),colour=new Color('#b4aa94').multiplyScalar(.78+random()*.35)
-    for(let i=0;i<4;i++)tri(chips,ground(corners[i]!),ground(corners[(i+1)%4]!),top,colour.clone().multiplyScalar(.86+i*.04))
+    // worn river gravel swept to the court's edges, bedded in its sand
+    const size=.016+random()**2*.045
+    if(!pebble((a,b,c,na,nb,nc,colour)=>{for(const [q,m] of[[a,na],[b,nb],[c,nc]] as const){
+      chips.positions.push(q[0],q[1],q[2]);chips.normals!.push(m[0],m[1],m[2]);chips.colours.push(colour[0],colour[1],colour[2])}},
+      heightAt,p[0],p[1],size,.28+random()*.14,random()*Math.PI*2,5,size*.07,stoneColour(random(),random()),random,(e,n)=>hardGround([e,n])))continue
     placed++
   }
   function ribbon(from:CourtPoint,to:CourtPoint,width:number,colour:Color,segments:number):void {
