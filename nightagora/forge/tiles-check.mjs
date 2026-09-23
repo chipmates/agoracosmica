@@ -46,6 +46,10 @@ export const DEEP_ROLE = 'deep-tiles'
 const DEEP_ID = /^vinci\/deep-tiles\/[a-z0-9-]+$/
 const DEEP_PATH = /^paintings\/([a-z0-9-]+)\/deep\/([a-f0-9]{12})\/$/
 const DEEP_SOURCE_ID = /^vinci\/painting-deep\/([a-z0-9-]+)$/
+export const CODEX_ROLE = 'codex-tiles'
+const CODEX_ID = /^vinci\/codex-tiles\/([a-z0-9-]+)__p(\d{4})$/
+const CODEX_PATH = /^codices\/([a-z0-9-]+)\/tiles\/([a-f0-9]{12})\/$/
+const CODEX_FILE = /^codices\/([a-z0-9-]+)\/p(\d{4})\.jpg$/
 
 /** THE THREE FAMILIES, and the source role each is cut from. A hung face's
  * plate carries its pixels in its path and its name among the faces of its
@@ -56,6 +60,8 @@ export const FAMILIES = {
   [TILES_ROLE]: { prefix: 'vinci/painting-tiles/', from: ['painting-plate'] },
   [LEAF_ROLE]: { prefix: 'vinci/leaf-tiles/', from: ['ms-page', 'ms-page-near'] },
   [DEEP_ROLE]: { prefix: 'vinci/deep-tiles/', from: ['painting-deep'] },
+  // a side of a codex on the shelf: the scan the library or the facsimile gave
+  [CODEX_ROLE]: { prefix: 'vinci/codex-tiles/', from: ['codex-page'] },
 }
 
 /** Which family a source record's pyramid belongs to, or nothing when no
@@ -184,9 +190,15 @@ export function checkTiles() {
     const say = message => errors.push(`${record.id}: ${message}`)
     const leaf = record.id.startsWith(FAMILIES[LEAF_ROLE].prefix)
     const deep = record.id.startsWith(FAMILIES[DEEP_ROLE].prefix)
-    const mine = leaf ? LEAF_ROLE : deep ? DEEP_ROLE : TILES_ROLE
-    const path = (leaf ? LEAF_PATH : deep ? DEEP_PATH : TILES_PATH).exec(record.path ?? '')
-    if (leaf) {
+    const codex = record.id.startsWith(FAMILIES[CODEX_ROLE].prefix)
+    // a leaf and a codex side are both scans measured by their own header
+    const scanned = leaf || codex
+    const mine = leaf ? LEAF_ROLE : deep ? DEEP_ROLE : codex ? CODEX_ROLE : TILES_ROLE
+    const path = (leaf ? LEAF_PATH : deep ? DEEP_PATH : codex ? CODEX_PATH : TILES_PATH).exec(record.path ?? '')
+    if (codex) {
+      if (!CODEX_ID.test(record.id)) { say('an id is vinci/codex-tiles/<folder>__p<scan>'); continue }
+      if (!path) { say('a path is codices/<folder>/tiles/<twelve of the source hash>/'); continue }
+    } else if (leaf) {
       if (!LEAF_ID.test(record.id)) { say('an id is vinci/leaf-tiles/<the scan\'s own file name>'); continue }
       if (!path) { say('a path is msb/tiles/<twelve of the source hash>/'); continue }
     } else if (deep) {
@@ -201,7 +213,16 @@ export function checkTiles() {
     const family = familyOfSource(plate)
     if (family !== mine) say(`derived_from is a ${plate.role ?? 'record with no role'}, which this family is not cut from`)
     if (record.role !== mine) say(`a pyramid of this family carries role ${mine}`)
-    if (deep) {
+    if (codex) {
+      const named = CODEX_FILE.exec(plate.path ?? '')
+      if (!named) say(`the source ${plate.id} does not stand at codices/<folder>/p<scan>.jpg`)
+      else {
+        if (record.id !== `vinci/codex-tiles/${named[1]}__p${named[2]}`) say(`the id does not name the scan, which is ${named[1]} ${named[2]}`)
+        if (named[1] !== path[1]) say(`the folder says ${path[1]}, the scan stands in ${named[1]}`)
+      }
+      if ((record.page ?? null) !== (plate.page ?? null)) say('page is not the source\'s own page, verbatim')
+      if (plate.display !== true) say('derived_from is not a displayed scan')
+    } else if (deep) {
       const named = DEEP_SOURCE_ID.exec(plate.id ?? '')
       if (!named) say(`the source ${plate.id} is not a vinci/painting-deep record`)
       else if (record.id !== `vinci/deep-tiles/${named[1]}`) say(`the id does not name the deep source, which is ${named[1]}`)
@@ -231,7 +252,7 @@ export function checkTiles() {
     // THE DEEPEST LEVEL IS THE SOURCE'S OWN PIXELS. A pyramid cut from a
     // resized copy would make the ceiling sentence false. A plate names its
     // pixels in its path; a leaf's scan is asked for its own frame header.
-    if (leaf) {
+    if (scanned) {
       const file = join(STORE, 'wing-vinci', plate.path ?? '')
       const size = existsSync(file) ? jpegSize(file) : null
       if (!size) say(`the scan at wing-vinci/${plate.path} cannot be measured`)
@@ -269,7 +290,7 @@ export function checkTiles() {
     if (!record.recipe?.trim()) say('a pyramid carries the recipe it was cut by')
     else if (record.recipe_sha256 !== createHash('sha256').update(record.recipe).digest('hex'))
       say('recipe_sha256 does not match the recipe')
-    checked.push({ id: record.id, family: mine, work: leaf ? (plate.page ?? plate.path) : path[1],
+    checked.push({ id: record.id, family: mine, work: scanned ? (plate.page ?? plate.path) : path[1],
       tiles, levels: factors.length, bytes, pixels: record.width * record.height, source: plate.id })
   }
   return { pyramids: pyramids.length, checked, errors }
@@ -284,7 +305,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     }
     const count = family => report.checked.filter(row => row.family === family).length
     console.log(`${report.pyramids} pyramid(s) checked: ${count(TILES_ROLE)} plate(s), `
-      + `${count(LEAF_ROLE)} leaf/leaves, ${count(DEEP_ROLE)} deep`)
+      + `${count(LEAF_ROLE)} leaf/leaves, ${count(DEEP_ROLE)} deep, ${count(CODEX_ROLE)} codex side(s)`)
     if (report.errors.length) {
       console.log('TILES CHECK FAILED:')
       for (const error of report.errors) console.log(' ·', error)
