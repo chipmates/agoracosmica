@@ -300,15 +300,20 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       teardown.push(() => { built.dispose() })
       // THE READING ROOM stands round the table the moment the table does, and
       // lights it: its lamp, its bounce and the shadows of its top.
-      const room = mountReadingRoom(stack, host)
-      ;(rooms ?? host).add(room.group)
-      room.embrace(built.object)
-      readingRoom = room
-      roomBakes = 1
-      teardown.push(() => { room.dispose() })
-      // the bounce is read again once its oak and the page have arrived, twice,
-      // so the bounce carries a bounce of its own
-      void Promise.all([room.ready, built.ready()]).then(() => { if (live) roomBakes = 2 }, () => { if (live) roomBakes = 2 })
+      // A room that cannot stand says so and leaves the table standing.
+      try {
+        const room = mountReadingRoom(stack, host)
+        ;(rooms ?? host).add(room.group)
+        room.embrace(built.object)
+        readingRoom = room
+        roomBakes = 1
+        teardown.push(() => { room.dispose() })
+        // the bounce is read again once its oak and the page have arrived,
+        // twice, so the bounce carries a bounce of its own
+        void Promise.all([room.ready, built.ready()]).then(() => { if (live) roomBakes = 2 }, () => { if (live) roomBakes = 2 })
+      } catch (error) {
+        console.error(`The reading room did not stand: ${String(error)}`)
+      }
     })
     const settled = (): void => { tableUp = 1 }
     void table.then(settled, settled)

@@ -24,6 +24,7 @@ import * as TSL from 'three/tsl'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
 import type { Stack } from '../../../stack'
 import { createMaterialLibrary } from '../../../stack/materials'
+import { FLOOR } from './layout'
 import {
   Batch, chairParts, linear, oakPieces, READING_LAMP, READING_ROOM, READING_ROOM_PROVENANCE,
   READING_SHADOW_LAYER, SHADE, T, v3, type Piece,
@@ -53,6 +54,9 @@ export interface ReadingRoom {
   update(tableShown: boolean): void
   /** How many of the room's photographs are still on their way. */
   pending(): number
+  /** The engine's own stand-ins (the table's occlusion of the floor) on or
+   * off: a renderer that computes them itself turns them off. */
+  engineOnly(on: boolean): void
   ready: Promise<void>
   dispose(): void
 }
@@ -85,8 +89,10 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
   const target = new Object3D()
   target.position.copy(aim)
   lamp.target = target
-  lamp.castShadow = full || tier === 'standard'
-  const mapPx = full ? L.mapPx : 1024
+  // the one shadow map the room owns stands at every tier, the calm one small:
+  // without it the pool falls through the table onto the floor
+  lamp.castShadow = true
+  const mapPx = full ? L.mapPx : tier === 'standard' ? 1024 : 512
   lamp.shadow.mapSize.set(mapPx, mapPx)
   lamp.shadow.camera.near = .04
   lamp.shadow.camera.far = L.reach
@@ -102,25 +108,29 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
   // really holds: the lit page, the dark oak, the gallery beyond the opening.
   // It is read through the scene's own environment turn, so the cube is taken
   // turned by the same amount; and it is re-taken into the same target, so no
-  // surface that reads it is ever rebuilt.
-  // Deep in the niche, between the table and the canopy: the back wall and
-  // the book see the gallery through the opening as it does from here.
-  const PROBE_AT = v3(T.east - .28, T.north + .42, T.top + .8)
-  let generator: PMREMGenerator | undefined, probe: RenderTarget | undefined
-  let cube: { camera: CubeCamera; target: CubeRenderTarget } | undefined
+  // surface that reads it is ever rebuilt. Two are taken: one deep in the
+  // niche, between the table and the canopy, where the back wall and the book
+  // see the gallery through the opening; one out on the dado's floor, which
+  // stands in the open gallery, and the surfaces south of the niche read it.
+  const PROBES = [v3(T.east - .28, T.north + .42, T.top + .8), v3(R.wall + 1, (R.south + R.dadoSouth) / 2 - .05, FLOOR + 1.3)]
+  let generator: PMREMGenerator | undefined
+  const probes: { camera: CubeCamera; target: CubeRenderTarget; pmrem: RenderTarget }[] = []
   const gain = 1 / Math.max(.01, scene.environmentIntensity)
   let env: N
   if (tier !== 'calm') {
     const size = full ? 256 : 128
-    const target = new CubeRenderTarget(size, { type: HalfFloatType })
-    const camera = new CubeCamera(.05, 2400, target)
-    camera.position.copy(PROBE_AT)
-    camera.rotation.copy(scene.environmentRotation)
-    camera.updateMatrixWorld(true)
-    cube = { camera, target }
     generator = new PMREMGenerator(stack.renderer)
-    probe = generator.fromCubemap(target.texture)
-    env = pmremTexture(probe.texture).mul(gain)
+    for (const at of PROBES) {
+      const target = new CubeRenderTarget(size, { type: HalfFloatType })
+      const camera = new CubeCamera(.05, 2400, target)
+      camera.position.copy(at)
+      camera.rotation.copy(scene.environmentRotation)
+      camera.updateMatrixWorld(true)
+      probes.push({ camera, target, pmrem: generator.fromCubemap(target.texture) })
+    }
+    // south of the niche's own south edge the open gallery's probe takes over
+    const out = smoothstep(-R.south - .05, -R.south + .35, positionWorld.z)
+    env = pmremTexture(probes[0]!.pmrem.texture).mul(out.oneMinus()).add(pmremTexture(probes[1]!.pmrem.texture).mul(out)).mul(gain)
   } else {
     // the calm tier takes no probe: a dim warm room, read as one colour
     env = vec3(.035, .029, .022).mul(gain)
@@ -228,24 +238,26 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
     ].map(([x, y]) => new Vector2(x!, y!))
     const shell = new LatheGeometry(outer, 96)
     shell.translate(L.east, rim, -L.north)
-    stampMesh(new Mesh(shell, brass), 'shade')
-    const inner = outer.slice(1, -1).map(p => new Vector2(p.x - .0025, p.y + .001))
-    const lining = new LatheGeometry(inner, 96)
-    lining.translate(L.east, rim, -L.north)
-    stampMesh(new Mesh(lining, enamel), 'shade-lining')
-    // the opal disc, a centimetre inside the rim
-    const disc = new CylinderGeometry(r - .012, r - .012, .004, 64)
-    disc.translate(L.east, rim + .012, -L.north)
-    const diffuser = stampMesh(new Mesh(disc, glow), 'diffuser')
-    diffuser.receiveShadow = false
-    diffuser.userData['labelOccluder'] = false
-    // the fitter, the cord and the rose
+    // the fitter and the rose are the same spun brass: one body with the shade
     const fitter = new CylinderGeometry(f, f * 1.08, .045, 32)
     fitter.translate(L.east, rim + h + .02, -L.north)
-    stampMesh(new Mesh(fitter, brass), 'fitter')
     const rose = new CylinderGeometry(.055, .05, .018, 48)
     rose.translate(L.east, R.ceiling - .009, -L.north)
-    stampMesh(new Mesh(rose, brass), 'rose')
+    stampMesh(new Mesh(mergeGeometries([shell, fitter, rose], false)!, brass), 'shade')
+    for (const g of [shell, fitter, rose]) g.dispose()
+    // Inside the shade: its white lining and the opal disc, seen only from
+    // under it, which no stop is; the calm tier leaves them out.
+    if (tier !== 'calm') {
+      const inner = outer.slice(1, -1).map(p => new Vector2(p.x - .0025, p.y + .001))
+      const lining = new LatheGeometry(inner, 96)
+      lining.translate(L.east, rim, -L.north)
+      stampMesh(new Mesh(lining, enamel), 'shade-lining')
+      const disc = new CylinderGeometry(r - .012, r - .012, .004, 64)
+      disc.translate(L.east, rim + .012, -L.north)
+      const diffuser = stampMesh(new Mesh(disc, glow), 'diffuser')
+      diffuser.receiveShadow = false
+      diffuser.userData['labelOccluder'] = false
+    }
     const cordLength = R.ceiling - (rim + h + .04)
     const cord = new CylinderGeometry(.0035, .0035, cordLength, 10)
     cord.translate(L.east, rim + h + .04 + cordLength / 2, -L.north)
@@ -301,6 +313,7 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
     group,
     ready,
     pending: () => library.pending(),
+    engineOnly(on) { engineTerms.value = on ? 1 : 0 },
     embrace(table) {
       table.updateMatrixWorld(true)
       const seen = new Set<Material>()
@@ -329,18 +342,18 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
       }
     },
     bake() {
-      if (!generator || !probe || !cube) return
+      if (!generator) return
       // the shade cannot see itself: it is out of the room while the room is read
-      const shade = ['shade', 'shade-lining', 'diffuser', 'fitter']
+      const shade = ['shade', 'shade-lining', 'diffuser']
         .map(name => group.getObjectByName(`vinci/collection-reading-room/${name}`))
         .filter((o): o is Object3D => Boolean(o))
       const shownBodies = [...doubles, ...chairBodies], doublesShown = shownBodies.map(d => d.visible)
       for (const o of shade) o.visible = false
       for (const d of shownBodies) d.visible = true
-      cube.camera.update(stack.renderer, scene)
+      for (const probe of probes) probe.camera.update(stack.renderer, scene)
       for (const o of shade) o.visible = true
       shownBodies.forEach((d, i) => { d.visible = doublesShown[i]! })
-      generator.fromCubemap(cube.target.texture, probe)
+      for (const probe of probes) generator.fromCubemap(probe.target.texture, probe.pmrem)
     },
     update(tableShown) {
       for (const d of [...doubles, ...chairBodies]) if (d.visible !== tableShown) d.visible = tableShown
@@ -352,7 +365,8 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
       for (const d of [...doubles, ...ownDoubles]) d.removeFromParent()
       for (const m of materials) m.dispose()
       lamp.shadow.dispose(); lamp.dispose()
-      probe?.dispose(); cube?.target.dispose(); generator?.dispose()
+      for (const probe of probes) { probe.pmrem.dispose(); probe.target.dispose() }
+      generator?.dispose()
       library.dispose()
       group.removeFromParent()
     },

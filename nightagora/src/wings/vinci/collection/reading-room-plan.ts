@@ -64,7 +64,7 @@ export const READING_LAMP = {
   /** a 2700 K lamp as the print shows it, balanced like the sun outdoors */
   colour: '#ffd3a0',
   /** at the page, in lux; the stack reads one hundred lux as one */
-  lux: 210,
+  lux: 315,
   /** an opal disc under a dome: a cosine lobe, cut at the rim */
   angle: 1.45, penumbra: 1, reach: 4.5,
   mapPx: 2048, soft: 2.5,
@@ -161,10 +161,10 @@ export function toned(base: string, i: number, salt: number, swing = .09): [numb
   return [r * k * (1 + warm), g * k, b * k * (1 - warm)]
 }
 
-/** THE OAK, oiled, the museum's own (an albedo near 0.12): the room is dark
+/** THE OAK, oiled, the museum's own (the walls near 0.17): the room is dark
  * by its light, not by its wood, so the walls still hold an eighth of the
  * page's brightness under one lamp. */
-export const OAK = { wall: '#76573c', canopy: '#6e5139', floor: '#6f5238', chair: '#7a5a3b' }
+export const OAK = { wall: '#8a6846', canopy: '#7f6042', floor: '#6f5238', chair: '#7a5a3b' }
 
 export function oakPieces(): { oak: Piece[]; dark: Piece[]; bronze: Piece[] } {
   const oak: Piece[] = [], dark: Piece[] = [], bronze: Piece[] = []
