@@ -3626,7 +3626,7 @@
       "class": "GENERATED",
       "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
-      "prompt": "Under each fallen leaf lying on stone, gravel or earth within 20 m of a stop that sees it, the blade's own outline softened on the stone: a tight dark rim at its edge and a faint skirt beyond, hollow under the blade's middle, standing for the sky the leaf takes from the stone under and around it. Drawn at hero, the film's export included, since its occlusion cannot find a leaf two millimetres thick. Outside the walk's solids and the shadow body.",
+      "prompt": "Under each fallen leaf lying on stone, gravel or earth within 14 m of a stop that sees it, the blade's own outline softened on the stone: a tight dark rim at its edge and a faint skirt beyond, hollow under the blade's middle, standing for the sky the leaf takes from the stone under and around it. Drawn at hero, the film's export included, since its occlusion cannot find a leaf two millimetres thick. Outside the walk's solids and the shadow body.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
       "sha256": "525b2dff31851eb7d6813452ba1050f8cbb46af8b59cc952fa2e0d0628b0f8d1",
