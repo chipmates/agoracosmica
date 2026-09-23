@@ -163,6 +163,17 @@ const PRINT={...GRADES['first-station'],name:'clos-luce-1517',exposure:.94,lift:
  * stop and a half under. The eye opens at the door, as a camera does. */
 const STATION_EXPOSURE:Partial<Record<VinciStationId,number>>={courtyard:1.0,
   'picture-room':1.34,'picture-room-west':1.34,'reading-table':1.5,'line-early':1.3,flight:1.24,works:1.24,body:1.4}
+const exposureOf=(id?:string):number=>STATION_EXPOSURE[id as VinciStationId]??PRINT.exposure
+/** THE EYE OPENS OVER THE LAST THIRD OF A LEG, so the leg lands on the
+ * station's own print: a stop has one picture whichever way it was reached,
+ * live and filmed, and no ease is left to run after the arrival. */
+const EXPOSURE_OPENS=2/3
+function legExposure(nav:{completed?:string,active?:string,legWalked:number}):number {
+  const from=exposureOf(nav.completed)
+  if(!nav.active)return from
+  const t=Math.max(0,Math.min(1,(nav.legWalked-EXPOSURE_OPENS)/(1-EXPOSURE_OPENS)))
+  return from+(exposureOf(nav.active)-from)*t*t*(3-2*t)
+}
 const SHADOW={nearHalfM:20,nearMapPx:1024,aheadM:10,refocusM:3,lightDistanceM:80} as const
 /** THE SUN'S THREE SWITCHES, off unless an address asks for them. A flicker
  * is separated by taking one thing away at a time, and a seat that has to
@@ -352,7 +363,7 @@ export function createWing():VinciWingModule {
   let shadowBody:WingShadowBody|undefined
   /** The share of a leg after which the card names the station ahead. */
   const CARD_HANDOVER=.5
-  let exposureAt:VinciStationId|undefined
+  let exposureAt:VinciStationId|undefined, exposureShown=Number.NaN
   let exhibits:CollectionExhibits|undefined, exhibitClock=0
   /** THE CLOSE LOOK. The registry is a read over the collection's own group,
    * the dots live in the label layer, and one owner holds the open exhibit. */
@@ -407,9 +418,10 @@ export function createWing():VinciWingModule {
    * of flicker on a wall a visitor is walking past. Snapping the focus to the
    * map's own grid, in the plane the light looks down, keeps the pattern on
    * the same texels whatever the eye does. */
-  const SHADOW_TEXEL_M=2*SHADOW.nearHalfM/SHADOW.nearMapPx
   const lightUp=new Vector3(0,1,0), lightX=new Vector3(), lightY=new Vector3(), lightZ=new Vector3()
   function snapToShadowTexel(point:Vector3):void {
+    // the texel of the map standing now: the film's tier draws a finer one
+    const texel=2*SHADOW.nearHalfM/key.light.shadow.mapSize.x
     lightZ.copy(key.direction).normalize()
     lightX.crossVectors(lightUp,lightZ)
     // a sun straight overhead leaves no horizontal axis to snap along
@@ -417,15 +429,19 @@ export function createWing():VinciWingModule {
     lightX.normalize();lightY.crossVectors(lightZ,lightX)
     for(const axis of [lightX,lightY]){
       const along=point.dot(axis)
-      point.addScaledVector(axis,Math.round(along/SHADOW_TEXEL_M)*SHADOW_TEXEL_M-along)
+      point.addScaledVector(axis,Math.round(along/texel)*texel-along)
     }
   }
+  /** THE FILM HAS NO WAY IN. Under the export the near box follows the eye in
+   * every frame, so the shadow a stop shows is a function of its pose and
+   * never of the leg that reached it; the live walk keeps its three metres. */
+  const FILM_EXPORT=typeof location!=='undefined'&&new URLSearchParams(location.search).has('export')
   function focusNearCascade(force=false):void {
     if(!hosts)return
     const camera=hosts.world.camera
     camera.getWorldDirection(focusAhead)
     focusAhead.multiplyScalar(SHADOW.aheadM).add(camera.position)
-    if(!force&&focusAhead.distanceToSquared(shadowFocus)<SHADOW.refocusM*SHADOW.refocusM)return
+    if(!force&&!FILM_EXPORT&&focusAhead.distanceToSquared(shadowFocus)<SHADOW.refocusM*SHADOW.refocusM)return
     snapToShadowTexel(focusAhead)
     shadowFocus.copy(focusAhead)
     key.light.target.position.copy(shadowFocus)
@@ -550,7 +566,7 @@ export function createWing():VinciWingModule {
     const priorEnvironmentRotation=scene.environmentRotation.clone()
     restoreEnvironmentRotation=()=>{scene.environmentRotation.copy(priorEnvironmentRotation)}
     scene.environmentRotation.set(0,-Math.PI/2,0)
-    key.light.shadow.bias=-.00008;key.light.shadow.normalBias=.012;key.light.shadow.mapSize.setScalar(SHADOW.nearMapPx)
+    key.light.shadow.bias=-.00008;key.light.shadow.normalBias=.012;key.light.shadow.mapSize.setScalar(stack.film?stack.tierConfig().shadow.mapSize:SHADOW.nearMapPx)
     focusNearCascade(true)
     // r185 implements filterNode; the installed LightShadow type predates it.
     if(!SHADOW_OFF('noplanefilter'))Object.assign(key.light.shadow,{filterNode:createCollectionReceiverPlaneShadowFilter()})
@@ -637,6 +653,8 @@ export function createWing():VinciWingModule {
     shadowBody=createWingShadowBody(scene);scene.add(shadowBody.group)
     authority=createRailGeometryAuthority(collectRailSolids(scene))
     rail=createRail(camera,clock,authority);measurement=createMeasurement(h.labels,stack)
+    // the film's hand on the rail, fetched only by the export's own address
+    if(FILM_EXPORT)void import('./film').then(m=>m.installFilm({rail:()=>rail,walk:WALK,narrow,walkPose:vinciWalkPose,approachPose:vinciApproachPose}))
     yield
     source=make('button','vinci-source',sourcesWord());source.type='button';source.setAttribute('aria-keyshortcuts','l');source.setAttribute('aria-controls','vinci-source-card');source.addEventListener('click',()=>{mode=mode===2?1:2;paintDock()});barEl=h.stage.parentElement!.querySelector('.wing-rail-group');barEl!.append(source)
     // THE PLAN STANDS IN THE BAR'S OWN GROUP, beside the sources of the
@@ -2160,10 +2178,13 @@ export function createWing():VinciWingModule {
   const stationNumber=()=>String(card+1).padStart(2,'0')
   const stationKicker=()=>`CLOS LUCÉ, 1517 · ${stationNumber()} / ${WALK.stops.length}`
   const viewKicker=()=>`CLOS LUCÉ, 1517 · ${lang()==='de'?'BLICK VON STATION':'A VIEW FROM STATION'} ${stationNumber()}`
-  function aimPrint(id:VinciStationId):void {
+  /** THE PRINT STANDS AT ITS EXPOSURE AT ONCE: the walk eases it itself
+   * (`legExposure`), and a cut is a cut. */
+  function aimPrint(id:VinciStationId,exposure=exposureOf(id)):void {
     if(!hosts)return
     const {scene,camera,stack}=hosts.world
-    stack.setScene(scene,camera,{...PRINT,exposure:STATION_EXPOSURE[id]??PRINT.exposure})
+    exposureShown=exposure
+    stack.setScene(scene,camera,{...PRINT,exposure},true)
   }
   function placeCanonicalStation() {
     const stop=stopAt(card),id=stationOf(stop.station).id
@@ -2546,7 +2567,9 @@ export function createWing():VinciWingModule {
       const here=arriving?nav.active:nav.completed
       const arrived=here?walkIndexAt(here,arriving?nav.wallTo:nav.wall):-1
       if(arrived>=0&&arrived!==card&&!activeView){card=arrived;dock.scrollTop=0;paintHeader();paintDock();paintQuestion();standHere()}
-      if(nav.completed&&nav.completed!==exposureAt){exposureAt=nav.completed;aimPrint(nav.completed)}
+      if(nav.completed&&nav.completed!==exposureAt)exposureAt=nav.completed
+      const opening=legExposure(nav)
+      if(nav.completed&&opening!==exposureShown)aimPrint(nav.completed,opening)
       // A JOURNEY ONTO A WALL IS TWO LEGS AND ONE ASKING: the run along the
       // wall leaves as soon as the leg to its end has landed.
       if(walkOnwards>=0&&!nav.active&&!nav.exhibit&&!nav.approaching){
