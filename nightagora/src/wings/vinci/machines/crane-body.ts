@@ -29,11 +29,11 @@ import {
   type Material, type MeshStandardMaterial, type Texture,
 } from 'three/webgpu'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
-import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js'
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js'
 import * as TSL from 'three/tsl'
 import { loadManifest, type ManifestEntry } from '../../../manifest'
 import { assetAddress } from '../../../stack/materials'
+import { compressedReady, detectCompressedSupport, ktx2 } from '../../../stack/ktx2'
 import type { Stack, TierName } from '../../../stack'
 import { machineCatalog } from './catalog'
 import { jointValuesAt, type JointValues } from './motion'
@@ -50,15 +50,12 @@ const RECORD: Record<TierName, string> = {
 }
 
 /* The packed body carries meshopt geometry and ETC1S maps inside KTX2, and a
-   bare loader refuses both. The transcoder is FETCHED rather than imported, so
-   the two files stand in `public/basis/` outside the bundle graph. Which GPU
-   format they become is a fact about the machine and is read off the renderer,
-   never assumed. */
+   bare loader refuses both. The KTX2 loader is the stack's one (`stack/ktx2`):
+   a second instance starts a second transcoder pool beside the first. */
 let reader: GLTFLoader | null = null
 function gltf(stack: Stack): GLTFLoader {
   if (reader) return reader
-  const ktx2 = new KTX2Loader().setTranscoderPath(`${import.meta.env.BASE_URL}basis/`)
-  ktx2.detectSupport(stack.renderer)
+  if (!compressedReady()) detectCompressedSupport(stack.renderer)
   reader = new GLTFLoader().setKTX2Loader(ktx2).setMeshoptDecoder(MeshoptDecoder)
   return reader
 }
