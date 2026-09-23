@@ -397,13 +397,32 @@ async function readHere(page, where, lang) {
   await page.evaluate(setDrawers, true)
   await page.waitForTimeout(SETTLE_MS)
   const after = await page.evaluate(readDrawers)
-  for (const d of after)
-    if (!d.open)
+  collect(`${where} (open)`, lang, await page.evaluate(readPage, MIN_PX))
+  /* ONE SURFACE AT A TIME ON THE DESKTOP. A window that owns the desk hides
+     the band's own drawer, so a drawer that stayed shut beside the others is
+     opened again alone and read alone before it is called shut. */
+  for (const d of after) {
+    if (d.open) continue
+    let alone = false
+    if (d.id && d.hasControl) {
+      await page.evaluate(setDrawers, false)
+      await page.waitForTimeout(SETTLE_MS)
+      // shutting the window over it can leave it standing open: its control
+      // is a toggle, so it is pressed only while the drawer is still shut
+      const isOpen = async () => (await page.evaluate(readDrawers)).some((x) => x.id === d.id && x.open)
+      if (!(await isOpen())) {
+        await page.evaluate((id) => document.querySelector(`[aria-controls="${CSS.escape(id)}"]`)?.click(), d.id)
+        await page.waitForTimeout(SETTLE_MS)
+      }
+      alone = await isOpen()
+      if (alone) collect(`${where} (open ${d.id})`, lang, await page.evaluate(readPage, MIN_PX))
+    }
+    if (!alone)
       errors.push(
         `${where}: the drawer ${d.id || '(no id)'} never opened, its text was not read` +
           (d.hasControl ? '' : ' (no control names it with aria-controls)')
       )
-  collect(`${where} (open)`, lang, await page.evaluate(readPage, MIN_PX))
+  }
 }
 
 async function walk() {

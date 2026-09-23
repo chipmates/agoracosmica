@@ -62,9 +62,16 @@ async function open(page, kind) {
   const [station, cell] = WHERE[kind]
   await page.evaluate(id => window.__forge.jump('wing', { slug: 'vinci', station: id }), station)
   await settled(page)
-  await page.waitForFunction(() => document.querySelectorAll('.vinci-strip-item, .vinci-exhibit-dot').length > 0,
+  await page.waitForFunction(() => document.querySelectorAll('.vinci-strip-item, .vinci-exhibit-dot, .desk-ov-open').length > 0,
     null, { timeout: 60000 }).catch(() => {})
-  const cells = page.locator('.vinci-strip-item:not([disabled])')
+  // THE DESKTOP'S SET IS ITS OWN VIEW: where the overview's word stands, the
+  // row stands down and the same cell is pressed in the view it opens.
+  const overview = page.locator('.desk-ov-open')
+  if (await overview.count() && await overview.first().isVisible()) {
+    await overview.first().click({ timeout: 60000 })
+    await page.waitForSelector('.desk-ov', { state: 'visible', timeout: 30000 }).catch(() => {})
+  }
+  const cells = page.locator('.desk-ov:visible .desk-ov-cell:not([disabled]), .vinci-strip-item:not([disabled])')
   // A row of one does not stand, so its cell is in the page and cannot be
   // pressed: the visible cell decides, never the count.
   if (await cells.count() > cell && await cells.nth(cell).isVisible()) await cells.nth(cell).click({ timeout: 60000 })
@@ -86,7 +93,8 @@ async function open(page, kind) {
       await page.waitForTimeout(1500)
     }
   }
-  await page.waitForSelector('.vitrine-card', { state: 'visible', timeout: 90000 })
+  // the phone's card, or the desktop's band, which stands in the card's place
+  await page.waitForSelector(".vitrine-card, #wing[data-desk~='closelook'] .vitrine[data-narrow='false']", { state: 'visible', timeout: 90000 })
   await settled(page)
   // a painting opens its close look first; the whole plate is one press on
   const toPlate = page.getByRole('button', { name: NAME.plate })
