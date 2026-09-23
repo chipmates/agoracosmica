@@ -2031,9 +2031,9 @@
       "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "water-lifting-screw, Codex Atlanticus f. 6r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled. Forged-iron detail retains its library maps and three bands across a 12–100m density fade. The gun solid end faces receive only a restrained normal-direction finish difference; no bore or functional firing geometry is invented. Rounded oak parts and inclinometer journal posts use a local quiet library variant: all three bands, 85percent map contribution, normal strength .12, restrained grain relief/shade/sheen and #847967 luminance tint (80percent density contrast retained). The exact 22mm journal post remains wood, not frayed cord. All oak detail now uses the same 12–100m density fade as cloth and iron, preserving physical UV scale, all three bands and library maps at distant phone camera positions. No extra map, geometry or material variant is added by this range correction. Window 6: every sphere reads the library through three local projections blended by the surface normal, so a turned ball has no pole where the grain converges; a cylinder shorter than its own radius runs the long grain around its rim instead of up its wall. Stone parts take a generated #7c7669 luminance tint (95percent density plus .12) with roughness .62-.95, and the flywheel weights use 85mm mottle, 16mm relief and normal strength .26. Leather parts take a generated #5c4331 tint with a .085m crease band, relief .5, shade .3 and normal strength .55. Forged iron now carries metalness .45 with a generated #787e80 luminance response and roughness .38-.70; the gun's barrels use metalness .42 with #5d6265, the camera obscura's aperture plate metalness .5 with #43474a, and the compass legs metalness .38 with #3e434a, roughness .36-.66, over a dressing set that declares a scattering surface so hammer pitting reaches the normal. Linen keeps its fold band in the albedo as well as the normal (shade .36, fold .9).",
-      "model": "GPT-6 Codex",
-      "date": "2026-09-10",
+      "prompt": "water-lifting-screw, Codex Atlanticus f. 6r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. The tube keeps its dossier centreline and lies bedded in pitch on a turned oak core, bound to it by iron bands with nailed feet and ringed with iron at both mouths; the core's ends are hooped and nailed and carry iron pivots that turn in iron-lined seats, the period type Vitruvius 10.6 describes; the frame is jointed with through tenons, wedges, pegs and braces, the troughs are boarded, nailed and pitched inside, the base is planked on sleepers. Oak: the library's CC0 oak veneer set at the tier's full map budget under a generated planed oak tint #897a66 (the turned core #82715d, the grip #5f4a37), the veneer's colour at a third and its contrast at 0.62 (0.9 on the core), each timber its own texture phase and a vertex tone of value 0.9 to 1.08 and warmth of 3 percent either way, end grain marked in the UVs and darkened to 0.52 with roughness 0.9. Hide: the library's CC0 leather under a generated pitch-dark tint #3d2e23, its variation held to 0.3, a 2.2 cm crinkle at relief 0.14, roughness 0.46 to 0.66. Pitch: a generated #1d1713 at a 0.08 variation, roughness 0.52 to 0.7, no relief. Forged iron: the library's CC0 iron read at a 0.3 m tile, normal strength 0.3, a generated #3f3a35 tint at a 0.25 mottle, metalness 0.5, roughness 0.5 to 0.82. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "model": "Claude Opus 5.5",
+      "date": "2026-09-23",
       "sha256": "06f8b4efb2bf4b00f9a4ae9b13ab2d85f7552308789d37958e5596003cdf7023",
       "recipe_files": [
         {
@@ -2042,15 +2042,15 @@
         },
         {
           "path": "src/wings/vinci/machines/data/records.json",
-          "sha256": "6ff6aa842a31fd17e68e62363fd85456a01c0fe66aa637c636a12034b839778f"
+          "sha256": "2dfa819dbb23659a9cd949cd30b79681e3f3c3c62b6c603efbd38f15516ce525"
         },
         {
           "path": "src/wings/vinci/machines/data/water-lifting-screw.json",
-          "sha256": "ce9009e8ad154a6247c62ef8004bfce50ebdf2688a0a5f1abe3d55777448f64c"
+          "sha256": "d90cf6e730488f10135ebbed00ab8b9355fe402774ab2b817f97da1fcdf91ccd"
         },
         {
           "path": "src/wings/vinci/machines/geometry.ts",
-          "sha256": "09f722d7bc6cfb25a3945aa1c22552cbf427cdf4b5e32a4e2dde43290cec2b7b"
+          "sha256": "ec6c2c4f5104265c11f9bde8c7efacfbef13c08c625aac2557022d483aa3c030"
         },
         {
           "path": "src/wings/vinci/machines/motion.ts",
@@ -2058,11 +2058,11 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "22101cc596e78ee072adc1f24ddbef954c1f5c602a41fd2182694c8613ba3f41"
+          "sha256": "09b2966aef7e8fe3eccc765f0e54067a14a3013cdb57bed1b883542e3a9377d1"
         },
         {
           "path": "src/wings/vinci/machines/runtime.ts",
-          "sha256": "32eac04aa934d02334a668b0eed15811d8e063a2c35e5e44c3147a7d363abd45"
+          "sha256": "ac92bb06b605944ebefb7c7dc96f8eee83a1ac498786723d746fd6bb36d48d6b"
         },
         {
           "path": "src/wings/vinci/machines/types.ts",
