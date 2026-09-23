@@ -325,8 +325,12 @@ const PASSAGE_DOOR: { corners: V3[]; inward: V3 } = (() => {
 /** THE ENTRANCE PASSAGE'S LIGHT, baked once: what a point sees of the court
  * through the open door and the window beside it, and of the warm light the
  * great hall sends through the service passage's door. */
+/** How far a point stands out past the entrance's outer face, in metres:
+ * the reveal's outer lip belongs to the court's light, not the passage's. */
+const outPast = (at: V3): number => { const fr = frame(ENTRY_F); return (at[0] - ENTRY_F.from[0]) * fr.out[0] + (at[1] - ENTRY_F.from[1]) * fr.out[1] }
 export function passageLight(at: V3, n: V3): [number, number] {
-  const court = formFactor(at, n, COURT_DOOR.corners, COURT_DOOR.inward, 3) + formFactor(at, n, COURT_WINDOW.corners, COURT_WINDOW.inward, 2) * TRANSMIT
+  const lip = Math.min(1, Math.max(0, (outPast(at) + .12) / .17))
+  const court = Math.max(lip * .32, formFactor(at, n, COURT_DOOR.corners, COURT_DOOR.inward, 3) + formFactor(at, n, COURT_WINDOW.corners, COURT_WINDOW.inward, 2) * TRANSMIT)
   const hall = formFactor(at, n, PASSAGE_DOOR.corners, PASSAGE_DOOR.inward, 2)
   return [Math.min(1, .03 + court * 2.2), hall * .9 + court * .12]
 }
@@ -344,7 +348,10 @@ export function applyPassageLight(m: MeshStandardNodeMaterial, perPixel = true):
 /** The same light as `passageLight`, per point of the surface. */
 function passageLightNode(): N {
   const inside: V3 = (() => { const p = ENTRY_ROOM.polygon as V2[]; return [p.reduce((a, q) => a + q[0], 0) / 4, p.reduce((a, q) => a + q[1], 0) / 4, FLOOR_Z + 1.5] })()
-  const court = formFactorNode(COURT_DOOR.corners, inside).add(formFactorNode(COURT_WINDOW.corners, inside).mul(TRANSMIT))
+  const fr = frame(ENTRY_F), P = positionWorld
+  const outside = P.x.sub(ENTRY_F.from[0]).mul(fr.out[0]).sub(P.z.add(ENTRY_F.from[1]).mul(fr.out[1]))
+  const lip = smoothstep(-.12, .05, outside)
+  const court = max(lip.mul(.32), formFactorNode(COURT_DOOR.corners, inside).add(formFactorNode(COURT_WINDOW.corners, inside).mul(TRANSMIT)))
   const hall = formFactorNode(PASSAGE_DOOR.corners, inside)
   return vec2(min(float(1), court.mul(2.2).add(.03)), hall.mul(.9).add(court.mul(.12)))
 }
