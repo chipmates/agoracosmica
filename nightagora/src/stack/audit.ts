@@ -77,7 +77,7 @@ const ID_NODE = TSL.vec4(TSL.materialColor.r, TSL.positionView.z.negate(), TSL.f
 /** a leaf's cut, one node per atlas rather than one per body */
 const CUTS = new WeakMap<object, unknown>()
 
-function idMaterial(source: Material, index: number): MeshBasicNodeMaterial {
+export function idMaterial(source: Material, index: number): MeshBasicNodeMaterial {
   const src = source as Material & {
     map?: { isTexture?: boolean } | null
     side?: number

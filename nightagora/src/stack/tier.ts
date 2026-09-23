@@ -121,6 +121,29 @@ export const TIERS: Record<TierName, Tier> = {
   },
 }
 
+/* THE FILM'S TIER, asked for as `?tier=max` and never picked for a visitor.
+   It IS hero for every body and every behaviour, so its name stays hero and
+   the geometry the rail certificate hashes does not move; only the frame's
+   recipe changes. What hero gives up for its MSAA comes back (occlusion, the
+   full reflection, the finer shadow maps), because the export's jittered
+   sub-frames are the anti-aliasing. The key keeps its two cascades: the
+   scene's ceiling of shadow-casting lights counts them. */
+export const TIER_MAX: Tier = {
+  ...TIERS.hero,
+  pixelRatio: 2,
+  samples: 0,
+  shadow: { on: true, mapSize: 4096, cascades: 2, maxFar: 60 },
+  ao: { on: true, scale: 1 },
+  aa: 'none',
+  dof: false,
+  reflection: { on: true, scale: 1 },
+}
+
+/** `?tier=max`: the film's recipe over hero's geometry. */
+export function maxFromQuery(): boolean {
+  return new URLSearchParams(location.search).get('tier') === 'max'
+}
+
 export function isTierName(v: string | null | undefined): v is TierName {
   return v === 'hero' || v === 'standard' || v === 'calm'
 }
@@ -194,5 +217,6 @@ export function pickTier(adapter: AdapterReading | null): TierName {
 /** `?tier=hero|standard|calm` is the rig's and the owner's own override. */
 export function tierFromQuery(): TierName | null {
   const asked = new URLSearchParams(location.search).get('tier')
+  if (asked === 'max') return 'hero'
   return isTierName(asked) ? asked : null
 }

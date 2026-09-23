@@ -35,7 +35,7 @@ import { createPost, samplesFor, type PostChain } from './post'
 import { createReflector, type Reflection, type ReflectorOptions } from './reflector'
 import { loadBakedGI, type BakedGI } from './gi'
 import { planVolumetrics, type Volumetrics, type VolumetricOptions } from './volumetric'
-import { pickTier, readAdapter, TIERS, tierFromQuery, type Tier, type TierName } from './tier'
+import { maxFromQuery, pickTier, readAdapter, TIER_MAX, TIERS, tierFromQuery, type Tier, type TierName } from './tier'
 
 export type { Tier, TierName } from './tier'
 export type { Grade, GradeName } from './grade'
@@ -65,7 +65,10 @@ export interface Stack {
   backend: 'webgpu' | 'webgl2'
   /** what the adapter called the hardware; 'swiftshader' means the CPU */
   architecture: string
-  setScene: (scene: Scene, camera: Camera, grade: GradeName | Grade | null | undefined) => void
+  /** `snap` stands the print at the grade at once instead of easing to it */
+  setScene: (scene: Scene, camera: Camera, grade: GradeName | Grade | null | undefined, snap?: boolean) => void
+  /** true under the film's tier (`?tier=max`): hero's bodies, the film's frame */
+  film: boolean
   light: (opts: StackLightOptions) => KeyLight
   /** how many key rigs are installed right now (the leak gate reads this) */
   lights: () => number
@@ -135,7 +138,8 @@ export interface Stack {
 export async function createStack(opts: StackOptions = {}): Promise<Stack> {
   const adapter = await readAdapter()
   let tierName: TierName = opts.tier ?? tierFromQuery() ?? pickTier(adapter)
-  let tier = TIERS[tierName]
+  const film = opts.tier === undefined && maxFromQuery()
+  let tier = film ? TIER_MAX : TIERS[tierName]
 
   /* THE DEPTH SWITCH, off unless a query asks. The shipped picture is the
      default path and stays it; these are the arms an instrument measures the
@@ -230,6 +234,20 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
       })
     )
   }
+  /* THE FILM'S EXPORT, the audit's sibling and fetched the same way: only
+     `?export=1` loads it. It holds the draw's pair for itself, so an address
+     that asks for both instruments gets the export's. */
+  if (new URLSearchParams(location.search).has('export')) {
+    void import('./export').then((m) =>
+      m.installExport({
+        renderer,
+        scene: () => scene,
+        camera: () => camera,
+        onFrame: (run) => { afterFrame = run },
+        aroundDraw: (before, after) => { beforeDraw = before; afterDraw = after },
+      })
+    )
+  }
 
   /* ---- the lost context, and the still that stands in for it ---- */
   /** a still this wide is under a millisecond to copy and still reads as the
@@ -283,10 +301,10 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
     still = keep
   }
 
-  document.body.dataset['tier'] = tierName
+  document.body.dataset['tier'] = film ? 'max' : tierName
   document.body.dataset['backend'] = backend
   // the rig asserts on this line, so it is one line and it never moves
-  console.log(`backend=${backend} tier=${tierName} adapter=${architecture}`)
+  console.log(`backend=${backend} tier=${film ? 'max' : tierName} adapter=${architecture}`)
 
   function textures(): Array<{ owner: string; MB: number }> {
     const round = (mb: number): number => Math.round(mb * 100) / 100
@@ -306,7 +324,8 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
   function setScene(
     nextScene: Scene,
     nextCamera: Camera,
-    grade: GradeName | Grade | null | undefined
+    grade: GradeName | Grade | null | undefined,
+    snap = false
   ): void {
     look = resolveGrade(grade)
     const same = nextScene === scene && nextCamera === camera
@@ -320,7 +339,7 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
     for (const l of lights) l.setCamera(nextCamera)
     // the same scene under a new look only re-aims the dials: a rebuild here
     // is a shader compile, and a shader compile mid-descent is a stutter
-    if (same && chain) chain.setGrade(look)
+    if (same && chain) chain.setGrade(look, snap)
     else build()
   }
 
@@ -330,6 +349,7 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
     architecture,
 
     setScene,
+    film,
 
     light(o) {
       if (!scene) throw new Error('setScene before light: the key belongs to a scene')
