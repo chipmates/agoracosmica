@@ -256,8 +256,8 @@
       "display": true,
       "prompt": "Derived 33.8721 square metre inner court apron closes the literal court to registered facade chain at A-SITE zero nominal. Five clipped threshold steps, procedural wear, bedded river pebbles and drain; reconstruction with conjectural dressing. Mounted during court refinement with explicit source-card assumptions.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
-      "date": "2026-09-23",
-      "sha256": "ffea0b13511256c5b62e6edd8c132bc14aa3fc8fe5820cef3946e98d2906ddf6",
+      "date": "2026-09-24",
+      "sha256": "30a30689df7a9559ec2954c47b4b475d016155119e5a00594e671f24af4e8c8a",
       "note": "Q124; A-SITE; recipe_file=src/wings/vinci/inner-court.ts"
     },
     {
@@ -3615,8 +3615,8 @@
       "display": true,
       "prompt": "Moss as a type of the period where a house forty-six years old in a river valley keeps it: low cushions 30 to 120 mm across in patches at the foot of every wall and retaining face a stop sees, most on the north feet and inside the grave court, a little in the back corners of stair treads, and thin continuous strips in the court paving joints within a few metres of its walls, following the grave floor's own running bond and the court's own grid. Colour and relief from a recipe in code. Positions and amounts are an exhibition reading of the damp, not a record.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
-      "date": "2026-09-23",
-      "sha256": "e4a1ee8dd9e1781304f50ac0e25ee9e079f0d73f17660cdb2b4c3bca1bb9e4b7",
+      "date": "2026-09-24",
+      "sha256": "f29fd049e44079871234cd3187b3cd8c2b518c9945578f290e6b203a5ba9ac95",
       "note": "A-SITE; deterministic museum dressing; recipe_file=src/wings/vinci/moss.ts"
     },
     {

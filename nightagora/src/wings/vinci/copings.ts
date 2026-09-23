@@ -9,7 +9,7 @@
    the period, laid by this exhibition along the dossier's own edges; no
    coping or kerb of 1517 survives. */
 import { BufferGeometry, Color, Float32BufferAttribute, Group, Mesh, MeshStandardNodeMaterial } from 'three/webgpu'
-import { float, mix, mx_noise_float, normalMap, positionWorld, smoothstep, vec2, vec3 } from 'three/tsl'
+import { float, mix, mx_noise_float, positionWorld, smoothstep, vec3 } from 'three/tsl'
 import type { TierName } from '../../stack/tier'
 import { anisotropicFootprint } from './masonry-courses'
 import { gradeAt, terrainSteps } from './terrain-mesh'
@@ -161,11 +161,10 @@ function stoneMaterial(): MeshStandardNodeMaterial {
   const shows = (metres: number) => smoothstep(1.2, 3, float(metres).div(pixel))
   const wash = mx_noise_float(P.mul(1.7)).mul(shows(.6))
   const grain = mx_noise_float(P.mul(90)).mul(shows(.011))
-  const tooth = mx_noise_float(vec3(P.x.mul(160), P.y.mul(40), P.z.mul(160))).mul(shows(.006))
   const lichen = smoothstep(.35, .75, mx_noise_float(P.mul(6.5).add(vec3(3.1, 1.7, 5.3)))).mul(shows(.15))
   const base = vec3(1, 1, 1).mul(wash.mul(.08).add(1)).mul(grain.mul(.07).add(1))
   m.colorNode = mix(base, vec3(.62, .66, .52), lichen.mul(.45))
-  m.normalNode = normalMap(vec3(grain.mul(.16).add(.5), tooth.mul(.12).add(.5), 1), vec2(.5, .5))
+  // no normal map: these faces carry no uv, and a tangent-space map takes its frame from one
   m.roughnessNode = float(.9).add(grain.mul(.03)).sub(lichen.mul(.05))
   m.name = 'vinci generated coping stone'
   return m

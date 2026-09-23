@@ -6,7 +6,7 @@ import {
   BufferGeometry, Color, DoubleSide, Float32BufferAttribute, Group, Mesh,
   MeshStandardNodeMaterial, type Object3D, ShapeUtils, Vector2, Vector3,
 } from 'three/webgpu'
-import { cameraPosition, float, length, mx_noise_float, normalMap, positionWorld, smoothstep, vec2, vec3 } from 'three/tsl'
+import { cameraPosition, float, length, mx_noise_float, positionWorld, smoothstep, vec3 } from 'three/tsl'
 import type { TierName } from '../../stack/tier'
 import { dossier, edgeDistance, feature, inside, polygon, type Feature, type Quantity } from './site'
 import { anisotropicFootprint } from './masonry-courses'
@@ -220,7 +220,7 @@ function material():MeshStandardNodeMaterial {
     .mul(sweep.mul(.055).add(1)).mul(worn.mul(.075).add(.968)).mul(loose.mul(.05).add(1))
     .mul(mid.mul(density).mul(.12).add(1)).mul(fine.mul(density).mul(.07).add(1))
   result.roughnessNode=mid.mul(.055).add(.91).sub(worn.mul(.045)).add(loose.mul(.03))
-  result.normalNode=normalMap(vec3(mid.mul(.024).add(.5),fine.mul(.012).add(.5),1),vec2(.35,.35))
+  // no normal map: these faces carry no uv, and a tangent-space map takes its frame from one
   return result
 }
 function meshOf(source:Batch,name:string):Mesh {

@@ -8,7 +8,7 @@
    between them. Positions and amounts are this exhibition's reading of the
    damp, never a record; the moss is a type. */
 import { BufferGeometry, DoubleSide, Float32BufferAttribute, Group, Mesh, MeshStandardNodeMaterial } from 'three/webgpu'
-import { float, mix, mx_noise_float, normalMap, positionWorld, smoothstep, vec2, vec3 } from 'three/tsl'
+import { float, mix, mx_noise_float, positionWorld, smoothstep, vec3 } from 'three/tsl'
 import type { TierName } from '../../stack/tier'
 import { anisotropicFootprint } from './masonry-courses'
 import { floorAt, terrainSteps } from './terrain-mesh'
@@ -213,7 +213,7 @@ function mossMaterial(): MeshStandardNodeMaterial {
   const shoots = mx_noise_float(P.mul(260)).mul(shows(.004))
   const tufts = mx_noise_float(P.mul(48).add(vec3(3.1, 7.7, 1.9))).mul(shows(.02))
   m.colorNode = vec3(1, 1, 1).mul(shoots.mul(.22).add(1)).mul(mix(float(.86), float(1.1), tufts.mul(.5).add(.5)))
-  m.normalNode = normalMap(vec3(shoots.mul(.3).add(.5), tufts.mul(.25).add(.5), 1), vec2(.6, .6))
+  // no normal map: these faces carry no uv, and a tangent-space map takes its frame from one
   m.name = 'vinci generated moss'
   m.userData = { ...mossProvenance }
   return m
