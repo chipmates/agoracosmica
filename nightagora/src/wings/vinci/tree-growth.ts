@@ -475,7 +475,7 @@ export function handFor(detail: TreeDetail, tier: TreeTier): Hand {
 
 /** The leaves a crown carries at hero, capped by how near it is drawn, and
     the share of a real leaf's size each one is drawn at. */
-const LEAF_CAP: Record<TreeDetail, number> = { near: 70000, mid: 8000, far: 3500 }
+const LEAF_CAP: Record<TreeDetail, number> = { near: 50000, mid: 8000, far: 3500 }
 const LEAF_SCALE: Record<TreeDetail, number> = { near: 1.45, mid: 1.3, far: 1.9 }
 /** how far a leaf or a spray may grow past its drawn size when a crown's cap
     binds, so a big crown keeps its cover instead of thinning */
@@ -600,8 +600,10 @@ function skeleton(spec: TreeSpec, habit: Habit, groundY: number, refuse: Refuse)
       if (branch) stems.push(branch)
     }
   }
-  // THE TWIGS the leaves stand on, along the branches and the short limbs
-  const seconds = stems.filter(stem => stem.level === 2 || (stem.level === 1 && stem.s[stem.s.length - 1]! < 1.5))
+  // THE TWIGS the leaves stand on, along the branches and the short limbs;
+  // a far tree draws none at any tier, its sprays hang from its branches
+  const seconds = spec.detail === 'far' ? []
+    : stems.filter(stem => stem.level === 2 || (stem.level === 1 && stem.s[stem.s.length - 1]! < 1.5))
   for (const parent of seconds) {
     const length = parent.s[parent.s.length - 1]!
     const count = Math.max(1, Math.round(length * habit.twigPerM))
@@ -710,7 +712,8 @@ interface LeafData {
     the blade out along `dir`, its face `face`. The card's normals lean with
     the blade's cup and droop, and the card's own shadow is one triangle in
     `shadow`, opaque, inside its outline. */
-function card(body: Body, shadow: Body | null, at: V3, dir: V3, face: V3, length: number, species: Species, data: LeafData, spray = false): void {
+function card(body: Body, shadow: Body | null, at: V3, dir: V3, face: V3, length: number, species: Species, data: LeafData, spray = false,
+  shade = 1): void {
   const across = norm(cross(face, dir))
   const recipe = LEAF_RECIPES[species]
   // a single leaf's card is cut to its blade's width; a spray's is square
@@ -733,10 +736,14 @@ function card(body: Body, shadow: Body | null, at: V3, dir: V3, face: V3, length
   corner(1, -hw, -.35, .45, 1)
   body.index.push3(first, first + 2, first + 1)
   body.index.push3(first, first + 3, first + 2)
-  if (shadow) {
+  // `shade` scales the shadow triangle about the blade's middle, so one
+  // triangle can stand for its neighbour's too
+  if (shadow && shade > 0) {
     const s0 = shadow.vertices
     const w = spray ? .6 : recipe.width * .55
-    for (const [u, v] of [[.06, 0], [spray ? .82 : .92, w * .5], [spray ? .82 : .92, -w * .5]] as const) {
+    const tip = spray ? .82 : .92
+    for (const [u0, v0] of [[.06, 0], [tip, w * .5], [tip, -w * .5]] as const) {
+      const u = .5 + (u0 - .5) * shade, v = v0 * shade
       shadow.position.push3(at[0] + dir[0] * u * length + across[0] * v * length, at[1] + dir[1] * u * length + across[1] * v * length, at[2] + dir[2] * u * length + across[2] * v * length)
       shadow.normal.push3(face[0], face[1], face[2])
       shadow.wind.push4(byte(data.phase), byte(data.leafPhase), byte(u), byte(data.flex))
@@ -776,7 +783,7 @@ export interface TreeResult {
 
 /** Grow one tree into the bark, leaf and leaf-shadow bodies of its cluster. */
 export function growTree(spec: TreeSpec, tier: TreeTier, heightAt: (east: number, north: number) => number,
-  refuse: Refuse, bark: Body, leaves: Body, shadows: Body | null): TreeResult {
+  refuse: Refuse, bark: Body, fine: Body, leaves: Body, shadows: Body | null): TreeResult {
   const habit = HABITS[spec.species]
   const hand = handFor(spec.detail, tier)
   const groundY = heightAt(spec.east, spec.north)
@@ -786,8 +793,10 @@ export function growTree(spec: TreeSpec, tier: TreeTier, heightAt: (east: number
   const barkColour = hexToLinear(habit.bark.colour), lichen = hexToLinear(habit.bark.lichen)
   const palette = habit.palette.map(([hex]) => hexToLinear(hex))
   const weights = habit.palette.map(([, w]) => w)
-  const barkBefore = bark.triangles, leafBefore = leaves.triangles
-  // the wood: every tier walks the same stems and keeps its own share
+  const wood = (): number => bark.triangles + (fine === bark ? 0 : fine.triangles)
+  const barkBefore = wood(), leafBefore = leaves.triangles
+  // the wood: every tier walks the same stems and keeps its own share;
+  // branches and twigs go to `fine`, trunk and limbs to `bark`
   const bearing: { stem: Stem; from: number }[] = []
   for (const stem of grown.stems) {
     const keep = pick()
@@ -795,7 +804,7 @@ export function growTree(spec: TreeSpec, tier: TreeTier, heightAt: (east: number
     if (stem.level === 2 && keep > hand.branches) continue
     if (stem.level === 3 && keep > hand.twigs) continue
     const sides = hand.sides[Math.min(3, stem.level)]!
-    if (sides) tube(bark, stem, sides, stem.level === 0 ? 1 : hand.stride, barkColour, lichen, grown.crown, spec, heightAt, random)
+    if (sides) tube(stem.level >= 2 ? fine : bark, stem, sides, stem.level === 0 ? 1 : hand.stride, barkColour, lichen, grown.crown, spec, heightAt, random)
   }
   // THE LEAVES: a crown's count from its own skin, dealt to the twigs by how
   // much of the crown's outer shell each one stands in
@@ -832,6 +841,9 @@ export function growTree(spec: TreeSpec, tier: TreeTier, heightAt: (east: number
     }
   }
   let placed = 0
+  // single leaves cast in pairs: every second one carries a shadow twice
+  // the size, the crown's shadow the same, the sun's passes half the work
+  const shade = (k: number): number => spraying ? 1 : k % 2 === 0 ? Math.SQRT2 : 0
   if (slots.length && count > 0) {
     const leaflets = spraying ? 1 : habit.leaf.leaflets ?? 1
     const units = Math.max(1, Math.round(count / leaflets))
@@ -875,23 +887,23 @@ export function growTree(spec: TreeSpec, tier: TreeTier, heightAt: (east: number
             const size = leafLength * (p === pairs ? 1.1 : .78 + .25 * p / Math.max(1, pairs))
             const px = base[0] + dir[0] * rachis * t, py = base[1] + dir[1] * rachis * t - .06 * t * t * rachis, pz = base[2] + dir[2] * rachis * t
             if (refuse(px, py, pz)) continue
-            if (p === pairs) { card(leaves, shadows, [px, py, pz], dir, face, size, spec.species, data); placed++ }
+            if (p === pairs) { card(leaves, shadows, [px, py, pz], dir, face, size, spec.species, data, false, shade(placed)); placed++ }
             else for (const s of [-1, 1]) {
               const lateral = norm([dir[0] * .45 + side[0] * s, dir[1] * .45 + side[1] * s - .15, dir[2] * .45 + side[2] * s])
-              card(leaves, shadows, [px, py, pz], lateral, face, size, spec.species, data); placed++
+              card(leaves, shadows, [px, py, pz], lateral, face, size, spec.species, data, false, shade(placed)); placed++
             }
           }
         } else {
           const tip: V3 = [base[0] + dir[0] * leafLength, base[1] + dir[1] * leafLength, base[2] + dir[2] * leafLength]
           if (refuse(base[0], base[1], base[2]) || refuse(tip[0], tip[1], tip[2])) continue
-          card(leaves, shadows, base, dir, face, leafLength * (.8 + .4 * u), spec.species, data, spraying); placed++
+          card(leaves, shadows, base, dir, face, leafLength * (.8 + .4 * u), spec.species, data, spraying, shade(placed)); placed++
         }
       }
     }
   }
   return {
     spec, leaves: placed,
-    leafTriangles: leaves.triangles - leafBefore, barkTriangles: bark.triangles - barkBefore,
+    leafTriangles: leaves.triangles - leafBefore, barkTriangles: wood() - barkBefore,
     crown: { cx: c.cx, cz: c.cz, radius: c.radius, y0: c.y0, y1: c.y1 },
     fallen: habit.fallen,
   }

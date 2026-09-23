@@ -31,7 +31,7 @@ import { getPathCorridors } from './paths'
 import { gateApproachRoute } from './terrain-mesh'
 import {
   Body, fallenLeaf, fallenPalette, growTree, leafLengthOf, mulberry,
-  type Species, type TreeDetail, type TreeResult, type TreeSpec, type TreeTier,
+  type Refuse, type Species, type TreeDetail, type TreeResult, type TreeSpec, type TreeTier,
 } from './tree-growth'
 import { createFallingLeaves, windPosition, windWanted, type FallSource } from './wind'
 
@@ -152,13 +152,29 @@ function refusals(heightAt: (east: number, north: number) => number) {
     if (near(court, e, n, WALK_MARGIN_M) && y < COURT.level + WALK_CLEAR_M + .4) return true
     return false
   }
+  /** the same refusal over only the regions a tree of this reach can meet,
+      so a tree far from the house pays nothing; a point beyond the reach
+      asks the whole site, so the answer never differs */
+  const around = (e0: number, n0: number, reach: number): Refuse => {
+    const meets = (r: Region, m: number): boolean =>
+      r.maxE + m > e0 - reach && r.minE - m < e0 + reach && r.maxN + m > n0 - reach && r.minN - m < n0 + reach
+    const b = buildings.filter(r => meets(r, BUILDING_MARGIN_M)), w = walks.filter(r => meets(r, WALK_MARGIN_M))
+    const c = meets(court, WALK_MARGIN_M)
+    return (x, y, z) => {
+      const e = x, n = -z
+      if (Math.abs(e - e0) > reach || Math.abs(n - n0) > reach) return refuse(x, y, z)
+      if (b.some(r => near(r, e, n, BUILDING_MARGIN_M))) return true
+      if (w.some(r => near(r, e, n, WALK_MARGIN_M)) && y < heightAt(e, n) + WALK_CLEAR_M) return true
+      return c && near(court, e, n, WALK_MARGIN_M) && y < COURT.level + WALK_CLEAR_M + .4
+    }
+  }
   /** a trunk or a fallen leaf on open ground */
   const openGround = (e: number, n: number, margin: number): boolean =>
     !buildings.some(r => near(r, e, n, margin)) && !walks.some(r => near(r, e, n, margin)) && !water.some(r => near(r, e, n, margin * .5))
   const onBuilding = (e: number, n: number): boolean => buildings.some(r => near(r, e, n, .05))
   const onWater = (e: number, n: number): boolean => water.some(r => near(r, e, n, .1))
   const onWalk = (e: number, n: number): boolean => walks.some(r => near(r, e, n, 0))
-  return { refuse, openGround, onBuilding, onWater, onWalk, walks, buildings }
+  return { refuse, around, openGround, onBuilding, onWater, onWalk, walks, buildings }
 }
 
 /* ─── the clusters ─────────────────────────────────────────────────────── */
@@ -301,7 +317,7 @@ export function planVegetation(heightAt: (east: number, north: number) => number
 }
 
 function* grow(group: Group, heightAt: (east: number, north: number) => number, tier: TreeTier): Generator<void, void, void> {
-  const { refuse, openGround, onBuilding, onWater, onWalk } = refusals(heightAt)
+  const { around, openGround, onBuilding, onWater, onWalk } = refusals(heightAt)
   const planted = [...PLANTING, ...distantPlanting()].filter(spec => openGround(spec.east, spec.north, Math.max(.8, spec.height * .03)))
   // the house's own trees and the valley's woods are dealt apart, so a view
   // of the house refuses the woods whole; the woods cast no shadow the walk
@@ -315,6 +331,9 @@ function* grow(group: Group, heightAt: (east: number, north: number) => number, 
   clusterTrees(farIds.map(i => planted[i]!), farClusters).forEach((c, k) => { clusterOf[farIds[k]!] = nearClusters + c })
   const casting = (c: number): boolean => tier !== 'calm' && c < nearClusters
   const bark = Array.from({ length: clusters }, () => new Body())
+  // a casting cluster keeps its fine wood apart: a twig's shadow is under a
+  // texel of the sun's map and inside its crown's leaf shadow
+  const fine = Array.from({ length: clusters }, (_, c) => casting(c) ? new Body() : null)
   const leaves = Array.from({ length: clusters }, () => new Body())
   // calm draws no sun shadows, so it carries no leaf shadows either
   const shadows = Array.from({ length: clusters }, (_, c) => casting(c) ? new Body() : null)
@@ -324,7 +343,8 @@ function* grow(group: Group, heightAt: (east: number, north: number) => number, 
   for (const [i, spec] of planted.entries()) {
     if (bank < TREE_BANKS && i >= planted.length * bank / TREE_BANKS) { bank++; yield }
     const c = clusterOf[i]!
-    results.push(growTree(spec, tier, heightAt, refuse, bark[c]!, leaves[c]!, shadows[c]!))
+    const refuse = around(spec.east, spec.north, spec.height * 1.3 + 4)
+    results.push(growTree(spec, tier, heightAt, refuse, bark[c]!, fine[c] ?? bark[c]!, leaves[c]!, shadows[c]!))
   }
   while (bank < TREE_BANKS) { bank++; yield }
 
@@ -400,8 +420,10 @@ function* grow(group: Group, heightAt: (east: number, north: number) => number, 
   const meshes: Mesh[] = []
   for (let c = 0; c < clusters; c++) {
     const b = meshOf(bark[c]!, mats.bark, `vinci generated trunks and limbs cluster ${String(c + 1).padStart(2, '0')}`, casts && casting(c))
+    const f = fine[c] ? meshOf(fine[c]!, mats.bark, `vinci generated branches and twigs cluster ${String(c + 1).padStart(2, '0')}`, false) : null
     const l = meshOf(leaves[c]!, mats.leaves, `vinci generated leaves cluster ${String(c + 1).padStart(2, '0')}`, false)
     if (b) meshes.push(b)
+    if (f) meshes.push(f)
     if (l) meshes.push(l)
     const s = shadows[c] ? meshOf(shadows[c]!, mats.shade, `vinci generated leaf shadows cluster ${String(c + 1).padStart(2, '0')}`, true) : null
     if (s) { s.receiveShadow = false; s.layers.set(SHADOW_ONLY_LAYER); meshes.push(s) }
