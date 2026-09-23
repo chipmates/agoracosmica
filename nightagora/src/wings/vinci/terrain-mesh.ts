@@ -185,6 +185,18 @@ export function gradeAt(e: number, n: number): number {
   return regionAt(e, n)?.levelAt(e,n) ?? survey
 }
 
+/** The top of what a visitor sees underfoot: the grade itself, or the
+    finish laid on it where one is (the museum's paving stands 0.06 m over its
+    cut, the court threshold's dressed treads a centimetre over theirs). */
+export function floorAt(e: number, n: number): number {
+  const grade = gradeAt(e, n)
+  if (waterBedAt(e, n) !== undefined || inHouse(e, n)) return grade
+  const id = regionAt(e, n)?.id ?? ''
+  if (id.startsWith('collection-')) return grade + .06
+  if (id.startsWith('inner-court-tread') || id.startsWith('inner-court-landing')) return grade + .012
+  return grade
+}
+
 function clean(points: Point[]): Point[] {
   const result = points.filter((p, i) => {
     const before = points[(i + points.length - 1) % points.length]!
@@ -333,6 +345,50 @@ function gradeRoots(d0:number,dm:number,d1:number):number[] {
     if(discriminant>=0){const q=-.5*(b+(b<0?-1:1)*Math.sqrt(discriminant));roots=Math.abs(q)>EPS?[q/a,c/q]:[-b/(2*a)]}
   }
   return[0,...roots.filter(t=>t>EPS&&t<1-EPS),1].sort((a,b)=>a-b).filter((t,i,values)=>i===0||t-values[i-1]!>EPS)
+}
+
+/** One face where the ground steps: a riser, a retaining face, a cut bank.
+    `low` is the unit normal (east, north) from the face into the side that
+    lies low, where what the wind carries comes to rest. */
+export interface TerrainStep { from: Point; to: Point; low: Point; height: number; lowLevel: number; highLevel: number; modern: boolean }
+let steps: TerrainStep[] | undefined
+/** Every face the terrain builds between two levels, read by the same walk
+    that builds them and building nothing. */
+export function terrainSteps(): readonly TerrainStep[] {
+  if (steps) return steps
+  steps = []
+  for (let i = 0; i < regions.length; i++) {
+    const region = regions[i]!
+    const later: Cutter[] = [...regions.slice(i + 1), ...footprintTriangles, ...waterCutters]
+    for (const piece of subtractAll(region.points, later)) for (let edge = 0; edge < piece.length; edge++) {
+      const start = piece[edge]!, end = piece[(edge + 1) % piece.length]!
+      if(region.id.startsWith('inner-court-')&&isInnerCourtFacadeEdge(start,end))continue
+      if(region.id.startsWith('apron-')&&isApronFacadeEdge(start,end))continue
+      const dx = end[0] - start[0], dn = end[1] - start[1], distance = Math.hypot(dx, dn)
+      if (distance < EPS) continue
+      const unit: Point = [dn / distance, -dx / distance], outward: Point = [unit[0] * 0.002, unit[1] * 0.002]
+      const breaks = edgeBreaks(start, end)
+      for (let part = 0; part < breaks.length - 1; part++) {
+        const a = lerp(start, end, breaks[part]!), b = lerp(start, end, breaks[part + 1]!), mid = lerp(a, b, 0.5)
+        const inner: Point = [mid[0] - outward[0], mid[1] - outward[1]], outer: Point = [mid[0] + outward[0], mid[1] + outward[1]]
+        if (inHouse(...inner) || inHouse(...outer) || waterBedAt(...inner)!==undefined || waterBedAt(...outer)!==undefined || regionAt(...inner)?.id !== region.id) continue
+        const neighbour = regionAt(...outer)
+        const otherAt=(p:Point):number=>neighbour?.levelAt(...p)??surveyedHeight(...p)
+        const differenceAt=(p:Point):number=>region.levelAt(...p)-otherAt(p)
+        const roots=gradeRoots(differenceAt(a),differenceAt(mid),differenceAt(b))
+        for(let section=0;section<roots.length-1;section++){
+          const from=lerp(a,b,roots[section]!),to=lerp(a,b,roots[section+1]!),centre=lerp(from,to,.5)
+          const difference=differenceAt(centre)
+          if(Math.abs(difference)<.04||(neighbour&&difference<0))continue
+          const lowOutside=difference>0
+          const modern=region.id.startsWith('collection-')||Boolean(neighbour?.id.startsWith('collection-'))
+          steps.push({from,to,low:lowOutside?unit:[-unit[0],-unit[1]],height:Math.abs(difference),
+            lowLevel:lowOutside?otherAt(centre):region.levelAt(...centre),highLevel:lowOutside?region.levelAt(...centre):otherAt(centre),modern})
+        }
+      }
+    }
+  }
+  return steps
 }
 
 export function buildTerrainMeshes(tier: TierName): { earth: BufferGeometry; grass: BufferGeometry; retaining: BufferGeometry; collectionRetaining: BufferGeometry } {

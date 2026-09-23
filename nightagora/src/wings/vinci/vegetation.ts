@@ -24,16 +24,19 @@ import { dossier, edgeDistance, feature, hourKey, inside, polygon, type Quantity
 import { collectionExclusions } from './collection'
 import { collectionAccessExclusions } from './collection-access'
 import { COURT, SUPPER_WALL } from './collection/layout'
+import { COURT_GROUND, GALLERY } from './collection/rooms'
 import { getInnerCourtOutlines } from './inner-court'
 import { getApronOutlines } from './apron'
 import { getWaterCuts } from './water'
 import { getPathCorridors } from './paths'
-import { gateApproachRoute } from './terrain-mesh'
+import { floorAt as terrainFloor, gateApproachRoute } from './terrain-mesh'
 import {
-  Body, fallenLeaf, fallenPalette, growTree, leafLengthOf, mulberry,
+  Body, fallenPalette, growTree, mulberry,
   type Refuse, type Species, type TreeDetail, type TreeResult, type TreeSpec, type TreeTier,
 } from './tree-growth'
 import { createFallingLeaves, windPosition, windWanted, type FallSource } from './wind'
+import { layLitter, stopDistance } from './leaf-litter'
+import { builtFaces } from './ground-walls'
 
 const PROVENANCE = {
   manifestId: 'vinci/vegetation',
@@ -72,7 +75,9 @@ const PLANTING: readonly TreeSpec[] = [
   { id: 'amasse-poplar-1', species: 'poplar', east: -64.5, north: -46, height: 23, seed: 4401, detail: 'mid' },
   { id: 'amasse-alder-1', species: 'alder', east: -68.5, north: -33, height: 14, seed: 4402, detail: 'mid' },
   { id: 'amasse-willow-1', species: 'willow', east: -70.5, north: -24.5, height: 7.2, seed: 4403, detail: 'mid', pollard: true },
-  { id: 'amasse-poplar-2', species: 'poplar', east: -63.5, north: -17, height: 24.5, seed: 4404, detail: 'mid' },
+  // the grave's own tree, over its west wall: drawn leaf by leaf, and no
+  // taller than the supper wall hides from that wall's own eye
+  { id: 'amasse-poplar-2', species: 'poplar', east: -63.5, north: -17, height: 15, seed: 4404, detail: 'near', leafCap: 22000 },
   { id: 'amasse-alder-2', species: 'alder', east: -69.5, north: -7, height: 13, seed: 4405, detail: 'mid' },
   { id: 'amasse-willow-2', species: 'willow', east: -70, north: 3, height: 6.8, seed: 4406, detail: 'mid', pollard: true },
   { id: 'amasse-elm', species: 'elm', east: -62, north: 18, height: 21, seed: 4407, detail: 'mid' },
@@ -144,12 +149,18 @@ function refusals(heightAt: (east: number, north: number) => number) {
   const water = getWaterCuts().map(c => region(c.points))
   // the insertion's open court carries its own floor, not the hill's grade
   const court = region([[COURT.west, COURT.south], [COURT.east, COURT.south], [COURT.east, COURT.north], [COURT.west, COURT.north]])
+  // the grave's gallery walls the west of that court in to about six metres
+  // over its floor: a crown may reach over them, never hang down inside them
+  const enclosure = region([[GALLERY.back - .5, COURT.south - 3.5], [GALLERY.returnEast + .5, COURT.south - 3.5],
+    [GALLERY.returnEast + .5, GALLERY.north + .5], [GALLERY.back - .5, GALLERY.north + .5]])
+  const ENCLOSURE_TOP = COURT.level + 6.25
   /** a crown point: refused inside a building or low over a walk */
   const refuse = (x: number, y: number, z: number): boolean => {
     const e = x, n = -z
     if (buildings.some(r => near(r, e, n, BUILDING_MARGIN_M))) return true
     if (walks.some(r => near(r, e, n, WALK_MARGIN_M)) && y < heightAt(e, n) + WALK_CLEAR_M) return true
     if (near(court, e, n, WALK_MARGIN_M) && y < COURT.level + WALK_CLEAR_M + .4) return true
+    if (y < ENCLOSURE_TOP && near(enclosure, e, n, 0)) return true
     return false
   }
   /** the same refusal over only the regions a tree of this reach can meet,
@@ -159,12 +170,13 @@ function refusals(heightAt: (east: number, north: number) => number) {
     const meets = (r: Region, m: number): boolean =>
       r.maxE + m > e0 - reach && r.minE - m < e0 + reach && r.maxN + m > n0 - reach && r.minN - m < n0 + reach
     const b = buildings.filter(r => meets(r, BUILDING_MARGIN_M)), w = walks.filter(r => meets(r, WALK_MARGIN_M))
-    const c = meets(court, WALK_MARGIN_M)
+    const c = meets(court, WALK_MARGIN_M), g = meets(enclosure, 0)
     return (x, y, z) => {
       const e = x, n = -z
       if (Math.abs(e - e0) > reach || Math.abs(n - n0) > reach) return refuse(x, y, z)
       if (b.some(r => near(r, e, n, BUILDING_MARGIN_M))) return true
       if (w.some(r => near(r, e, n, WALK_MARGIN_M)) && y < heightAt(e, n) + WALK_CLEAR_M) return true
+      if (g && y < ENCLOSURE_TOP && near(enclosure, e, n, 0)) return true
       return c && near(court, e, n, WALK_MARGIN_M) && y < COURT.level + WALK_CLEAR_M + .4
     }
   }
@@ -319,6 +331,7 @@ export function planVegetation(heightAt: (east: number, north: number) => number
 function* grow(group: Group, heightAt: (east: number, north: number) => number, tier: TreeTier): Generator<void, void, void> {
   const { around, openGround, onBuilding, onWater, onWalk } = refusals(heightAt)
   const planted = [...PLANTING, ...distantPlanting()].filter(spec => openGround(spec.east, spec.north, Math.max(.8, spec.height * .03)))
+    .map(spec => spec.detail === 'mid' && stopDistance(spec.east, spec.north) < 32 ? { ...spec, close: true } : spec)
   // the house's own trees and the valley's woods are dealt apart, so a view
   // of the house refuses the woods whole; the woods cast no shadow the walk
   // could see (it falls a hundred metres off, outside every cascade)
@@ -349,101 +362,42 @@ function* grow(group: Group, heightAt: (east: number, north: number) => number, 
   }
   while (bank < TREE_BANKS) { bank++; yield }
 
-  // THE FALLEN LEAVES: under each crown and pushed downwind of it, fewer on
-  // the paths and pads where feet and wheels move them to the edges
-  const litterClusters = tier === 'hero' ? 4 : 2
-  const litterBodies = Array.from({ length: litterClusters }, () => new Body())
-  const litterOf = clusterTrees(planted, litterClusters)
-  const share = tier === 'hero' ? 1 : tier === 'standard' ? .45 : .22
-  const grow = tier === 'hero' ? 1 : tier === 'standard' ? 1.35 : 1.8
+  // THE FALLEN LEAVES, AS GROUND: the carpet under every crown dropping it
+  // and the drifts against every face across the week's wind, dealt into
+  // bodies by place so a view refuses what it cannot see
+  // every rectangle of made ground inside the court's walls
   const inCourt = (e: number, n: number): boolean =>
-    e > COURT.west + .5 && e < COURT.east - .5 && n > COURT.south + .5 && n < COURT.north - .5
+    COURT_GROUND.some(g => e > g.west + .02 && e < g.east - .02 && n > g.south + .02 && n < g.north - .02)
   /** the floor a fallen leaf lies on: the court's own paving inside the
       insertion's court (its grave half a step up), the shared grade elsewhere */
   const floorAt = (e: number, n: number): number =>
-    inCourt(e, n) ? COURT.level + (e < SUPPER_WALL.east ? .035 : 0) : heightAt(e, n)
-  const lay = (body: Body, species: Species, e: number, n: number, colours: readonly (readonly [number, number, number])[], weights: readonly number[],
-    random: () => number): void => {
-    const total = weights.reduce((a, b) => a + b, 0)
-    const pick = random(), turn = random(), curl = random(), size = random()
-    let w = pick * total, ci = 0
-    while (ci < weights.length - 1 && w > weights[ci]!) { w -= weights[ci]!; ci++ }
-    const base = colours[ci]!, lift = .78 + turn * .38
-    fallenLeaf(body, species, e, n, floorAt(e, n), turn * Math.PI * 2, leafLengthOf(species) * 1.1 * grow * (.8 + size * .45),
-      [base[0] * lift, base[1] * lift, base[2] * lift], .06 + curl * .22)
-  }
-  for (const [i, result] of results.entries()) {
-    const spec = result.spec
-    if (spec.detail === 'far') continue
-    const random = mulberry(spec.seed ^ 0x9e3779b9)
-    const { colours, weights } = fallenPalette(spec.species)
-    const radius = result.crown.radius
-    // the heaviest fall is under the early droppers (FLORA §1)
-    const count = Math.round((spec.detail === 'near' ? 5200 : 1500) * (.12 + result.fallen) * 1.6 * Math.min(1.8, radius / 5))
-    const body = litterBodies[litterOf[i]!]!
-    // under the crown, which leans with its tree, and pushed north-east by
-    // the week's south-west wind
-    const cx = result.crown.cx + Math.sin(52 * Math.PI / 180) * radius * .3
-    const cn = -result.crown.cz + Math.cos(52 * Math.PI / 180) * radius * .3
-    for (let k = 0; k < count; k++) {
-      const a = random() * Math.PI * 2, rr = radius * 1.3 * Math.sqrt(random()), keep = random(), walked = random()
-      if (keep > share) continue
-      const e = cx + Math.cos(a) * rr, n = cn + Math.sin(a) * rr
-      if (onBuilding(e, n) || onWater(e, n)) continue
-      // a walked surface keeps a third of what falls on it; a court keeps it
-      // at its walls, where the wind leaves it
-      if (onWalk(e, n) && walked > .33) continue
-      if (inCourt(e, n) && walked > .5) continue
-      lay(body, spec.species, e, n, colours, weights, random)
+    inCourt(e, n) ? COURT.level + (e < SUPPER_WALL.east ? .035 : 0) : terrainFloor(e, n)
+  const litterCell = 22
+  const litterIndex = new Map<string, number>()
+  const litterBodies: Body[] = [], litterShadows: (Body | null)[] = []
+  const litterCap = tier === 'hero' ? 18 : tier === 'standard' ? 4 : 2
+  const bodyAt = (e: number, n: number): { leaves: Body; shadow: Body | null } => {
+    const key = `${Math.floor(e / litterCell)},${Math.floor(n / litterCell)}`
+    let i = litterIndex.get(key)
+    if (i === undefined) {
+      // past the cap a new place joins the nearest body already open
+      if (litterBodies.length < litterCap) {
+        i = litterBodies.length
+        litterBodies.push(new Body()); litterShadows.push(tier === 'hero' ? new Body() : null)
+      } else i = Math.abs(Math.floor(e / litterCell) * 7 + Math.floor(n / litterCell) * 13) % litterCap
+      litterIndex.set(key, i)
     }
+    return { leaves: litterBodies[i]!, shadow: litterShadows[i]! }
   }
-  // THE COURT'S WALL FOOT: what the wind has carried over the insertion's
-  // west wall from the Amasse's poplars and alders lies along its north and
-  // west walls, clear of every stand in the court
-  {
-    const random = mulberry(15171020)
-    const poplar = fallenPalette('poplar'), alder = fallenPalette('alder')
-    const count = Math.round(520 * share)
-    const body = litterBodies[0]!
-    for (let k = 0; k < count; k++) {
-      const u = random(), v = random(), which = random()
-      const alongNorth = u < .62
-      const e = alongNorth ? COURT.west + .7 + v * (COURT.east - COURT.west - 1.4) : COURT.west + .6 + Math.pow(random(), 2) * 1.4
-      const n = alongNorth ? COURT.north - .6 - Math.pow(random(), 2) * 1.5 : COURT.south + .8 + v * (COURT.north - COURT.south - 1.6)
-      const palette = which < .7 ? poplar : alder
-      lay(body, which < .7 ? 'poplar' : 'alder', e, n, palette.colours, palette.weights, random)
-    }
-  }
-  // THE COURTYARD: its long axis runs with the wind, so what the south-west
-  // trees drop travels up it, lies along both long walls and piles at the
-  // north-east end; only its level paving takes a leaf
-  {
-    const court = polygon('courtyard')
-    const [a, b, , d] = court as [number[], number[], number[], number[]]
-    const along = [b[0]! - a[0]!, b[1]! - a[1]!], across = [d[0]! - a[0]!, d[1]! - a[1]!]
-    const length = Math.hypot(along[0]!, along[1]!), width = Math.hypot(across[0]!, across[1]!)
-    const level = heightAt(a[0]! + (along[0]! + across[0]!) / 2, a[1]! + (along[1]! + across[1]!) / 2)
-    const random = mulberry(15171018)
-    const maple = fallenPalette('maple'), walnut = fallenPalette('walnut')
-    const count = Math.round(420 * share)
-    const body = litterBodies[0]!
-    for (let k = 0; k < count; k++) {
-      const where = random(), r1 = random(), r2 = random(), which = random()
-      let s: number, t: number
-      if (where < .45) {
-        const off = (.12 + r1 * r1 * 1.1) / width
-        s = r2; t = random() < .5 ? off : 1 - off
-      } else if (where < .75) {
-        s = 1 - (.15 + r1 * r1 * 1.6) / length; t = r2
-      } else {
-        s = Math.sqrt(r1); t = .1 + r2 * .8
-      }
-      const e = a[0]! + along[0]! * s + across[0]! * t, n = a[1]! + along[1]! * s + across[1]! * t
-      if (onBuilding(e, n) || Math.abs(heightAt(e, n) - level) > .01) continue
-      const palette = which < .6 ? maple : walnut
-      lay(body, which < .6 ? 'maple' : 'walnut', e, n, palette.colours, palette.weights, random)
-    }
-  }
+  const laid = layLitter({
+    results, tier, floorAt,
+    refused: (e, n) => onBuilding(e, n) || onWater(e, n),
+    walked: (e, n) => onWalk(e, n) || inCourt(e, n),
+    grass: (e, n) => !onWalk(e, n) && !inCourt(e, n),
+    walls: builtFaces(),
+    bodyAt,
+    lane: { centre: polygon('street').slice(0, 6).map(p => [p[0]!, p[1]!] as [number, number]), width: feature('street').width_m!.value },
+  })
   yield
   const wind = windWanted()
   const mats = materials(wind)
@@ -459,9 +413,12 @@ function* grow(group: Group, heightAt: (east: number, north: number) => number, 
     const s = shadows[c] ? meshOf(shadows[c]!, mats.shade, `vinci generated leaf shadows cluster ${String(c + 1).padStart(2, '0')}`, true) : null
     if (s) { s.receiveShadow = false; s.layers.set(SHADOW_ONLY_LAYER); meshes.push(s) }
   }
-  for (let c = 0; c < litterClusters; c++) {
-    const m = meshOf(litterBodies[c]!, mats.litter, `vinci generated fallen leaves cluster ${String(c + 1).padStart(2, '0')}`, false)
+  for (const [c, body] of litterBodies.entries()) {
+    const m = meshOf(body, mats.litter, `vinci generated fallen leaves cluster ${String(c + 1).padStart(2, '0')}`, false)
     if (m) meshes.push(m)
+    const shadow = litterShadows[c]
+    const s = shadow ? meshOf(shadow, mats.shade, `vinci generated fallen leaf shadows cluster ${String(c + 1).padStart(2, '0')}`, true) : null
+    if (s) { s.receiveShadow = false; s.layers.set(SHADOW_ONLY_LAYER); meshes.push(s) }
   }
   group.add(...meshes)
   // THE FILM'S FEW FALLING LEAVES, from the outer crowns of the trees the walk
@@ -488,6 +445,7 @@ function* grow(group: Group, heightAt: (east: number, north: number) => number, 
   group.userData['triangles'] = triangles
   group.userData['draws'] = meshes.filter(m => !m.layers.isEnabled(SHADOW_ONLY_LAYER) || m.layers.isEnabled(0)).length
   group.userData['leaves'] = results.reduce((a, r) => a + r.leaves, 0)
+  group.userData['fallenLeaves'] = laid
   group.userData['treePlans'] = results.map(r => ({ id: r.spec.id, species: r.spec.species, east: r.spec.east, north: r.spec.north, height: r.spec.height, spread: r.crown.radius, detail: r.spec.detail, seed: r.spec.seed }))
   group.userData['perTree'] = results.map(r => ({ id: r.spec.id, leaves: r.leaves, leafTriangles: r.leafTriangles, barkTriangles: r.barkTriangles }))
   group.userData['excluded'] = ['cadastre', 'build envelope', 'mapped annexes', 'the insertion', `walks below ${WALK_CLEAR_M} m`, 'retained water cuts']
