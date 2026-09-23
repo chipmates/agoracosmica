@@ -14,6 +14,7 @@ import * as TSL from 'three/tsl'
 import { Color } from 'three/webgpu'
 import { polygon } from './site'
 import { facadeDistance } from './foundation'
+import { anisotropicFootprint } from './masonry-courses'
 
 // TSL's overload types cannot follow graphs built from helpers; the cast is
 // made once here and the nodes below stay readable.
@@ -21,12 +22,14 @@ import { facadeDistance } from './foundation'
 type N = any
 const { float, floor, fract, length, mix, mx_noise_float, mx_worley_noise_vec2, normalWorldGeometry, positionWorld,
   positionView, cameraViewMatrix, sin, smoothstep, vec2, vec3 } = TSL as unknown as Record<string, N>
+/** the ground's own pixel, in metres */
+const pixelOf = (P: N): N => anisotropicFootprint(P)
 const rgb = (hex: string): N => { const c = new Color(hex); return vec3(c.r, c.g, c.b) }
 
 export const groundFinishProvenance = {
   manifestId: 'vinci/terrain',
   terrace: 'Conjectural terrace walk: fine river gravel 15 to 30 mm in cells, a sparse coarse stone of 50 to 90 mm, sand in the gaps, packed earth showing through in worn patches and along the walked middle. Surface recipe only; no height, outline or level of the dossier moves.',
-  court: 'Conjectural cobbled court: Loire river cobbles about 100 mm across, set in sand and standing up to 20 mm proud; limestone, sandstone, flint and a little quartz in colour; moss in the joints toward the damp wall feet; the way from the gate to the door worn smooth. A type of the period; surface recipe only; no height, outline or level moves.',
+  court: 'Conjectural cobbled court: Loire river cobbles about 50 to 60 mm across, of their own sizes, set in sand and standing up to 11 mm proud, worn flatter along the way from the gate to the door; limestone, sandstone and flint in colour; moss in the joints toward the damp wall feet. Beyond a kerb on the court\'s north-west edge, the walk before the house is flagged with pale limestone slabs about 0.9 by 0.6 m. Types of the period; surface recipes only; no height, outline or level moves.',
 } as const
 
 /** Signed distance to a convex outline given as (east, north) points,
@@ -105,7 +108,7 @@ export function applyYardFinish(m: N, shows: (metres: number) => N): void {
   m.colorNode = mix(m.colorNode, gravel, gravelled.mul(.92))
   const gravelHeight = fineDome.mul(fineStone).mul(.004).add(coarseDome.mul(coarseStone).mul(.009)).mul(gravelled)
 
-  // ─── the court's cobbles ─────────────────────────────────────────────────
+  // ─── the court's cobbles, and the flags of the walk before the house ────
   // stones set a little longer along the court than across it
   const axis = polygon('courtyard'), a0 = axis[0]!, a1 = axis[1]!
   const along = Math.atan2(a1[1]! - a0[1]!, a1[0]! - a0[0]!)
@@ -113,27 +116,26 @@ export function applyYardFinish(m: N, shows: (metres: number) => N): void {
   const centre = axis.reduce((sum, q) => [sum[0]! + q[0]! / axis.length, sum[1]! + q[1]! / axis.length], [0, 0])
   const local = ground.sub(vec2(centre[0]!, centre[1]!))
   const u = local.x.mul(ca).add(local.y.mul(sa)), v = local.x.mul(-sa).add(local.y.mul(ca))
-  // set stones are more even than a random scatter
-  const set = setStones(vec2(u.div(.11), v.div(.085)), .8)
+  // the flagged walk lies beyond the kerb on the court's north-west edge
+  const onFlags = onCourt.mul(float(1).sub(smoothstep(-.14, -.1, court)))
+  const onCobbles = onCourt.mul(smoothstep(.1, .14, court))
+  // set stones are more even than a random scatter; about 58 by 46 mm
+  const cellU = .058, cellV = .046
+  const set = setStones(vec2(u.div(cellU), v.div(cellV)), .8)
   const cob = vec2(set.f1, set.f2)
-  // a worn river stone is round: its body is the distance to its own centre,
-  // its edge where it meets its neighbour, the sand wherever it is neither
-  const round = float(1).sub(smoothstep(.36, .56, cob.x))
-  const parted = smoothstep(.015, .11, cob.y.sub(cob.x))
+  // a stone's edge is as sharp as the pixel lets it be: one pixel wide near
+  // the eye, its own mean far off
+  const edge = float(pixelOf(P)).div(cellV).mul(1.2).max(.015)
+  // stones are not all one size: each its own radius, the sand between them
+  // wider where a small one sits
+  const radius = set.a.mul(.12).add(.44)
+  const round = float(1).sub(smoothstep(radius.sub(edge), radius.add(edge), cob.x))
+  const parted = smoothstep(edge.mul(.5), edge.mul(.5).add(.08), cob.y.sub(cob.x))
   const stone = round.mul(parted)
-  const shown = shows(.1)
-  const r = cob.x.div(.56).clamp(0, 1)
-  // each stone set at its own height, its cap tipped a little its own way
-  const tip = set.offset.dot(vec2(set.a.sub(.5), set.b.sub(.5))).mul(.55)
-  const dome = float(1).sub(r.mul(r)).sqrt().mul(set.b.mul(.55).add(.62)).add(tip).max(0)
-  // one colour draw per stone
-  const pick = set.a, pick2 = set.b
-  let cobble: N = mix(rgb('#a39c8b'), rgb('#9b8566'), smoothstep(.5, .56, pick))
-  cobble = mix(cobble, rgb('#76746f'), smoothstep(.78, .82, pick2))
-  cobble = mix(cobble, rgb('#bdb5a3'), smoothstep(.93, .96, pick))
-  cobble = cobble.mul(pick2.mul(.18).add(.91))
-  cobble = cobble.mul(mx_noise_float(vec3(P.x, P.z, 2.2).mul(90)).mul(.07).mul(shows(.012)).add(1))
-  // the joints: sand, greened toward the wall feet, bare where walked
+  const shown = shows(.05)
+  const r = cob.x.div(radius).clamp(0, 1)
+  // each stone set at its own height, its cap tipped a little its own way;
+  // along the walked way the caps are worn flatter
   const toWall = facadeDistance()
   // from the gate to the foot of the door's steps
   const door = vec2(4.66, -14.06), gate = vec2(16.1, -18.9)
@@ -141,25 +143,56 @@ export function applyYardFinish(m: N, shows: (metres: number) => N): void {
   const t = ground.sub(door).dot(way).div(wayLength.mul(wayLength)).clamp(0, 1)
   const offWay = length(ground.sub(door.add(way.mul(t))))
   const walked = float(1).sub(smoothstep(.6, 1.7, offWay))
+  const tip = set.offset.dot(vec2(set.a.sub(.5), set.b.sub(.5))).mul(.55)
+  const dome = float(1).sub(r.mul(r)).sqrt().mul(set.b.mul(.5).add(.6)).add(tip).max(0)
+  const capped = dome.min(float(.72).sub(walked.mul(.22)))
+  // one colour draw per stone, held close: Loire gravel, not a mosaic
+  const pick = set.a, pick2 = set.b
+  let cobble: N = mix(rgb('#958e7e'), rgb('#8d7a5f'), smoothstep(.5, .56, pick))
+  cobble = mix(cobble, rgb('#6f6d69'), smoothstep(.78, .82, pick2))
+  cobble = mix(cobble, rgb('#a9a191'), smoothstep(.94, .97, pick))
+  cobble = cobble.mul(pick2.mul(.12).add(.94))
+  // at arm's length a stone is not smooth: pits, grain, a darker lower ring
+  // where the sand stains it
+  const pits = smoothstep(.55, .8, mx_noise_float(vec3(P.x, P.z, 4.4).mul(220))).mul(shows(.004))
+  const grainNear = mx_noise_float(vec3(P.x, P.z, 2.2).mul(130)).mul(shows(.008))
+  const stain = smoothstep(.55, .95, r).mul(.14)
+  cobble = cobble.mul(grainNear.mul(.08).add(1)).mul(float(1).sub(pits.mul(.2))).mul(float(1).sub(stain))
+  // the joints: sand, greened toward the wall feet, bare where walked
   const damp = float(1).sub(smoothstep(.3, 2.4, toWall)).mul(float(1).sub(walked.mul(.8)))
   const moss = smoothstep(.2, .7, mx_noise_float(vec3(P.x, P.z, 6.6).mul(3.1)).add(damp.mul(.9))).mul(damp)
   const sandGrain = mx_noise_float(vec3(P.x, P.z, 7.3).mul(140)).mul(.1).mul(shows(.008)).add(1)
-  const joint = mix(rgb('#817661').mul(sandGrain), rgb('#505c30'), moss.mul(.85))
-  const paved = mix(joint, cobble.mul(walked.mul(.06).add(1)), stone.mul(shown).add(float(1).sub(shown).mul(.7)))
-  m.colorNode = mix(m.colorNode, paved, onCourt)
-  const cobbleHeight = dome.mul(stone).mul(.012).mul(shown).mul(onCourt)
+  const joint = mix(rgb('#7b705c').mul(sandGrain), rgb('#505c30'), moss.mul(.85))
+  const paved = mix(joint, cobble.mul(walked.mul(.05).add(1)), stone.mul(shown).add(float(1).sub(shown).mul(.72)))
+  m.colorNode = mix(m.colorNode, paved, onCobbles)
+  const cobbleHeight = capped.mul(stone).mul(.011).mul(shown).mul(onCobbles)
+
+  // the flags: pale limestone slabs about 0.9 by 0.6 m in courses along the
+  // house, each its own tone, their joints sanded and green near the walls
+  const fu = u.div(.9), fv = v.div(.6)
+  const course = floor(fv), shiftU = fract(course.mul(.5)).mul(.9)
+  const slab = floor(fu.add(shiftU))
+  const inU = fract(fu.add(shiftU)), inV = fract(fv)
+  const jointW = float(.008).div(.6).add(float(pixelOf(P)).div(.6))
+  const flagJoint = float(1).sub(smoothstep(jointW.mul(.5), jointW, inU.min(inU.oneMinus()).mul(.6 / .9)).mul(smoothstep(jointW.mul(.5), jointW, inV.min(inV.oneMinus()))))
+  const flagTone = fract(sin(slab.mul(12.9898).add(course.mul(78.233))).mul(43758.5453))
+  let flag: N = mix(rgb('#a79f8c'), rgb('#9a9180'), flagTone).mul(mx_noise_float(vec3(P.x, P.z, 1.1).mul(3.5)).mul(.06).add(1))
+  flag = flag.mul(grainNear.mul(.05).add(1)).mul(float(1).sub(pits.mul(.12)))
+  const flagJointColour = mix(rgb('#6f6553'), rgb('#4c5830'), moss.mul(.9))
+  m.colorNode = mix(m.colorNode, mix(flag, flagJointColour, flagJoint.mul(shows(.02))), onFlags)
+  const flagHeight = flagJoint.mul(-.004).mul(shows(.02)).mul(onFlags)
 
   // ─── relief, occlusion and sheen of both ─────────────────────────────────
-  const height = gravelHeight.add(cobbleHeight).toVar()
+  const height = gravelHeight.add(cobbleHeight).add(flagHeight).toVar()
   const n = normalWorldGeometry.transformDirection(cameraViewMatrix)
   const sx = positionView.dFdx(), sy = positionView.dFdy(), rx = sy.cross(n), ry = n.cross(sx), det = sx.dot(rx)
   const gradient = rx.mul(height.dFdx()).add(ry.mul(height.dFdy())).mul(det.sign()).div(det.abs().max(1e-10))
   const bounded = gradient.div(length(gradient).div(.6).max(1))
   const finished = onTerrace.max(onCourt)
   m.normalNode = mix(m.normalNode, n.sub(bounded).normalize(), finished).normalize()
-  const gaps = float(1).sub(fineStone).mul(onTerrace).mul(.28).add(float(1).sub(stone).mul(shown).mul(onCourt).mul(.35))
+  const gaps = float(1).sub(fineStone).mul(onTerrace).mul(.28).add(float(1).sub(stone).mul(shown).mul(onCobbles).mul(.35)).add(flagJoint.mul(onFlags).mul(.3))
   m.aoNode = m.aoNode.mul(float(1).sub(gaps))
-  const polished = walked.mul(stone).mul(onCourt).mul(.2)
+  const polished = walked.mul(stone).mul(onCobbles).mul(.2)
   m.roughnessNode = m.roughnessNode.sub(polished).sub(fineStone.mul(onTerrace).mul(.05))
   m.userData['yardFinish'] = groundFinishProvenance
 }

@@ -10,8 +10,9 @@
    type of the period on a wall of this kind, its patches this exhibition's
    placing. */
 import {
-  BufferGeometry, DataTexture, DoubleSide, Float32BufferAttribute, Group, Mesh, MeshStandardNodeMaterial, RGBAFormat, SRGBColorSpace,
+  BufferGeometry, DataTexture, DoubleSide, Float32BufferAttribute, Group, Mesh, MeshBasicNodeMaterial, MeshStandardNodeMaterial, RGBAFormat, SRGBColorSpace,
 } from 'three/webgpu'
+import { SHADOW_ONLY_LAYER } from '../../stack/light'
 import { texture, uv } from 'three/tsl'
 import type { TierName } from '../../stack/tier'
 import { floorAt, terrainSteps } from './terrain-mesh'
@@ -137,14 +138,16 @@ export function createCreepers(tier: TierName, onWalk: (e: number, n: number) =>
   if (tier !== 'hero') return group
   const runs = gardenRuns(onWalk)
   const random = mulberry(15171051)
-  const stems = batch(), leaves = batch()
+  const wood = batch(), leaves = batch()
+  const shade: number[] = [], shadeNormal: number[] = []
   const stemColour = lin('#6d6557')
+  let leafCount = 0
   for (const run of runs) {
     const dx = run.to[0] - run.from[0], dn = run.to[1] - run.from[1], span = Math.hypot(dx, dn)
     const ux = dx / span, un = dn / span
     let at = .8 + random() * 3
     while (at < span - .8) {
-      const width = Math.min(span - at, 1.6 + random() * 2.8), reach = .45 + random() * .5
+      const width = Math.min(span - at, 1.6 + random() * 2.8), reach = .5 + random() * .45
       const e = run.from[0] + ux * (at + width / 2) + run.low[0] * 1.2, n = run.from[1] + un * (at + width / 2) + run.low[1] * 1.2
       if (!onWalk(e, n) && stageWeight(e, n) > .2 && foot(run, at + width / 2, ux, un).height > 1) growPatch(run, at + width / 2, width, reach, ux, un, span)
       at += width + 1.2 + random() * 4
@@ -157,98 +160,132 @@ export function createCreepers(tier: TierName, onWalk: (e: number, n: number) =>
     const base = floorAt(e, n)
     return { base, height: run.top - base }
   }
-  function growPatch(run: Run, along: number, width: number, reach: number, ux: number, un: number, span: number): void {
-    const out: V3 = [run.low[0], 0, -run.low[1]]
-    // THE MAT: an old patch is a solid mass of leaf, densest in its core and
-    // ragged at its edge, spreading as it climbs
-    const lobes = [random() * 6.28, random() * 6.28, random() * 6.28]
-    const centreH = foot(run, along, ux, un).height * reach * .5
-    const matCount = Math.round(width * foot(run, along, ux, un).height * reach * 450)
-    for (let k = 0; k < matCount; k++) {
-      const u = (random() - .5) * 2, v = random()
-      const s = along + u * width / 2
-      if (s < .05 || s > span - .05) continue
-      const here = foot(run, s, ux, un)
-      const h = v * here.height * reach * (.75 + .5 * random())
-      if (h > here.height - .08) continue
-      // a ragged outline: a lobed ellipse, wider toward the top of the patch
-      const ang = Math.atan2(h - centreH, u * width / 2)
-      const edge = .8 + .12 * Math.sin(ang * 3 + lobes[0]!) + .08 * Math.sin(ang * 5 + lobes[1]!)
-      const rr = Math.hypot(u * (.85 + .3 * v), (v - .5) * 2)
-      if (rr > edge || random() > 1.15 - rr * rr) continue
-      leaf(run, ux, un, s, h, out, random() < .5 ? 1 : -1, h > here.height - .45 && random() < .6)
-    }
-    const roots = Math.max(3, Math.round(width / .5))
-    for (let k = 0; k < roots; k++) {
-      let s = along - width / 2 + (k + random()) * width / roots
-      let h = 0
-      const here = foot(run, s, ux, un)
-      const top = here.height * reach * (.7 + random() * .5)
-      let drift = (random() - .5) * .6, branchIn = .3 + random() * .3
-      const stemWidth = .004 + random() * .005
-      let leafIn = random() * .06, side = 1
-      for (let step = 0; step < 140 && h < Math.min(here.height - .06, top); step++) {
-        const s0 = s, h0 = h
-        drift = Math.max(-.9, Math.min(.9, drift + (random() - .5) * .35))
-        s += drift * .03; h += .045
-        if (s < 0 || s > span) break
-        // the stem is laid every second step: at a stop's distance a 9 cm
-        // chord of a wandering stem is still its curve
-        if (step % 2 === 1) ribbon(point(run, ux, un, s0 - drift * .03, h0 - .045, .012), point(run, ux, un, s, h, .012), stemWidth * (1 - h / (here.height + .2) * .5), out)
-        branchIn -= .045
-        if (branchIn <= 0) { sideShoot(run, ux, un, s, h, span, out, top, here.height); branchIn = .3 + random() * .3 }
-        leafIn -= .045
-        if (leafIn <= 0) { side = -side; leaf(run, ux, un, s, h, out, side, h > top * .82 || h > here.height - .3); leafIn = .05 + random() * .04 }
-      }
-    }
-  }
-  function sideShoot(run: Run, ux: number, un: number, s0: number, h0: number, span: number, out: V3, top: number, height: number): void {
-    let s = s0, h = h0, leafIn = .04, side = 1
-    const dir = random() < .5 ? -1 : 1, length = .3 + random() * .9
-    for (let t = 0; t < length && s > 0 && s < span && h < Math.min(height - .08, top * 1.05); t += .08) {
-      const a = point(run, ux, un, s, h, .014)
-      s += dir * .07; h += .024 + random() * .04
-      ribbon(a, point(run, ux, un, s, h, .014), .005, out)
-      leafIn -= .08
-      if (leafIn <= 0) { side = -side; leaf(run, ux, un, s, h, out, side, h > top * .85); leafIn = .06 + random() * .05 }
-    }
-  }
-  /** a point on the wall's face: along it by s, up from the meadow by h */
+  /** a point on the wall's face: along it by s, up from the meadow by h, off it by `off` */
   function point(run: Run, ux: number, un: number, s: number, h: number, off: number): V3 {
     const e = run.from[0] + ux * s + run.low[0] * off, n = run.from[1] + un * s + run.low[1] * off
     return [e, foot(run, s, ux, un).base + h, -n]
   }
-  function ribbon(a: V3, b: V3, w: number, out: V3): void {
-    const dx = b[0] - a[0], dy = b[1] - a[1], dz = b[2] - a[2]
-    // across the stem, in the wall's plane
-    const cx = dy * out[2] - dz * out[1], cy = dz * out[0] - dx * out[2], cz = dx * out[1] - dy * out[0], cl = Math.hypot(cx, cy, cz) || 1
-    const px = cx / cl * w / 2, py = cy / cl * w / 2, pz = cz / cl * w / 2
-    const k = .85 + random() * .3
-    quad(stems, [[a[0] - px, a[1] - py, a[2] - pz], [a[0] + px, a[1] + py, a[2] + pz], [b[0] + px, b[1] + py, b[2] + pz], [b[0] - px, b[1] - py, b[2] - pz]],
-      out, [stemColour[0] * k, stemColour[1] * k, stemColour[2] * k], 0)
+
+  /** ONE PLANT: a root cluster at the wall's foot, woody stems fanning up the
+      stone and forking, and a mat of leaves held off the wall in layers,
+      densest and darkest in its middle, larger toward its top. */
+  function growPatch(run: Run, centre: number, width: number, reach: number, ux: number, un: number, span: number): void {
+    const out: V3 = [run.low[0], 0, -run.low[1]]
+    const here = foot(run, centre, ux, un)
+    const top = Math.min(here.height - .08, here.height * reach)
+    // the stems, as polylines on the face: (s, h, radius)
+    const stems: { s: number; h: number; r: number }[][] = []
+    const mains = 3 + Math.floor(random() * 4)
+    for (let k = 0; k < mains; k++) {
+      // they leave the ground within a hand's breadth of each other and fan out
+      let s = centre + (random() - .5) * .3, h = -.02
+      const aim = centre + (k / Math.max(1, mains - 1) - .5) * width * .6 + (random() - .5) * .2
+      const goal = top * (.5 + random() * .4)
+      const line: { s: number; h: number; r: number }[] = []
+      for (let i = 0; i < 80 && h < goal; i++) {
+        const lean = (aim - s) * .08 + (random() - .5) * .05
+        s += lean; h += .06
+        if (s < .05 || s > span - .05) break
+        line.push({ s, h, r: .02 * (1 - h / (top + .3) * .7) })
+      }
+      if (line.length > 2) stems.push(line)
+      // forks off the main stem, thinner, reaching sideways and up
+      for (const [i, p] of line.entries()) {
+        if (i < 4 || random() > .12) continue
+        let fs = p.s, fh = p.h
+        const dir = random() < .5 ? -1 : 1, fork: { s: number; h: number; r: number }[] = [{ s: fs, h: fh, r: p.r * .6 }]
+        for (let j = 0; j < 14; j++) {
+          // a fork keeps inside the mat it feeds
+          fs += dir * (.03 + random() * .02); fh += .03 + random() * .04
+          const half = width / 2 * (.3 + .7 * Math.pow(Math.min(1, fh / Math.max(top, .1)), .55)) * .85
+          if (fs < .05 || fs > span - .05 || fh > top * .95 || Math.abs(fs - centre) > half) break
+          fork.push({ s: fs, h: fh, r: p.r * .6 * (1 - j / 16) })
+        }
+        if (fork.length > 2) stems.push(fork)
+      }
+    }
+    for (const line of stems) tube(line, run, ux, un, out)
+    // THE MAT: leaves layered off the stone, a fan that widens as it climbs
+    // from the root and frays at its edge
+    const lobes = [random() * 6.28, random() * 6.28, random() * 6.28]
+    const count = Math.round(width * top * 640)
+    for (let k = 0; k < count; k++) {
+      const v = Math.pow(random(), .8), u = (random() - .5) * 2
+      const h = v * top
+      // the fan's half width at this height, ragged by slow lobes
+      const fan = (.3 + .7 * Math.pow(v, .55)) * (.86 + .09 * Math.sin(v * 9 + lobes[0]!) + .05 * Math.sin(u * 7 + lobes[1]!))
+      if (Math.abs(u) > fan) continue
+      const s = centre + u * width / 2
+      if (s < .05 || s > span - .05) continue
+      const rim = Math.abs(u) / fan, crown = v > .88 ? (v - .88) / .12 : 0
+      if (random() < rim * rim * .7 + crown * .6) continue
+      const core = (1 - rim) * (1 - crown)
+      const off = .012 + core * random() * .11 + random() * .014
+      const old = v > .55 && random() < .55
+      leaf(run, ux, un, s, h, off, core, old, out)
+    }
   }
-  function leaf(run: Run, ux: number, un: number, s: number, h: number, out: V3, side: number, old: boolean): void {
-    // the petiole holds the blade off the stone, up and to one side
-    const off = .02 + random() * .06, size = (old ? .085 : .075) + random() * .065
-    const base = point(run, ux, un, s + side * .02, h + .01, off)
+  function tube(line: { s: number; h: number; r: number }[], run: Run, ux: number, un: number, out: V3): void {
+    const sides = 4
+    const rings = line.map(p => {
+      const c = point(run, ux, un, p.s, p.h, p.r + .004)
+      return { c, r: p.r }
+    })
+    for (let i = 0; i < rings.length - 1; i++) {
+      const a = rings[i]!, b = rings[i + 1]!
+      const d: V3 = [b.c[0] - a.c[0], b.c[1] - a.c[1], b.c[2] - a.c[2]]
+      // the ring's frame: out of the wall, and across the stem in the wall
+      const across: V3 = [d[1] * out[2] - d[2] * out[1], d[2] * out[0] - d[0] * out[2], d[0] * out[1] - d[1] * out[0]]
+      const al = Math.hypot(across[0], across[1], across[2]) || 1
+      const k = .85 + random() * .25
+      const colour: V3 = [stemColour[0] * k, stemColour[1] * k, stemColour[2] * k]
+      for (let j = 0; j < sides; j++) {
+        const a0 = j / sides * Math.PI * 2, a1 = (j + 1) / sides * Math.PI * 2
+        const dir = (t: number): V3 => [out[0] * Math.cos(t) + across[0] / al * Math.sin(t), out[1] * Math.cos(t) + across[1] / al * Math.sin(t), out[2] * Math.cos(t) + across[2] / al * Math.sin(t)]
+        const p = (c: V3, r: number, t: number): V3 => { const n = dir(t); return [c[0] + n[0] * r, c[1] + n[1] * r, c[2] + n[2] * r] }
+        const n0 = dir((a0 + a1) / 2)
+        const q = [p(a.c, a.r, a0), p(a.c, a.r, a1), p(b.c, b.r, a1), p(b.c, b.r, a0)]
+        for (const idx of [0, 1, 2, 0, 2, 3]) {
+          const v = q[idx]!
+          wood.position.push(v[0], v[1], v[2]); wood.normal.push(n0[0], n0[1], n0[2]); wood.colour.push(colour[0], colour[1], colour[2]); wood.uv.push(0, 0)
+        }
+      }
+    }
+  }
+  function leaf(run: Run, ux: number, un: number, s: number, h: number, off: number, core: number, old: boolean, out: V3): void {
+    const size = (old ? .085 : .07) + random() * .06 + core * .03
+    const base = point(run, ux, un, s, h, off)
+    const side = random() < .5 ? 1 : -1
     const along: V3 = [ux * side, 0, -un * side]
-    // the blade faces out and a little up, tipped to its own side
-    const up = .05 + random() * .35
-    let fx = out[0] + along[0] * (random() - .5) * .5, fy = up, fz = out[2] + along[2] * (random() - .5) * .5
+    // the blade looks out from the wall, a little up to the light, lying
+    // over the one below it like a shingle
+    const up = .05 + random() * .25
+    let fx = out[0] + along[0] * (random() - .5) * .35, fy = up, fz = out[2] + along[2] * (random() - .5) * .35
     const fl = Math.hypot(fx, fy, fz); fx /= fl; fy /= fl; fz /= fl
-    // the blade's own up: along the wall and upward, at right angles to its face
-    let bx = along[0] * .4, by = 1, bz = along[2] * .4
+    let bx = along[0] * .4 * (random() - .5), by = 1, bz = along[2] * .4 * (random() - .5)
     const dot = bx * fx + by * fy + bz * fz
     bx -= fx * dot; by -= fy * dot; bz -= fz * dot
     const bl = Math.hypot(bx, by, bz); bx /= bl; by /= bl; bz /= bl
     const rx = by * fz - bz * fy, ry = bz * fx - bx * fz, rz = bx * fy - by * fx
     const half = size / 2
-    const corner = (u: number, v: number): V3 => [base[0] + rx * u * half + bx * v * size, base[1] + ry * u * half + by * v * size, base[2] + rz * u * half + bz * v * size]
+    // hanging from its stalk: the blade's base a little above its middle
+    const corner = (cu: number, cv: number): V3 => [base[0] + rx * cu * half + bx * (cv - .35) * size, base[1] + ry * cu * half + by * (cv - .35) * size, base[2] + rz * cu * half + bz * (cv - .35) * size]
     const cell = old ? 2 : random() < .6 ? 0 : 1
-    const k = .82 + random() * .3
-    quad(leaves, [corner(-1, 0), corner(1, 0), corner(1, 1), corner(-1, 1)], [fx, fy, fz], [k, k * (.98 + random() * .06), k], cell)
-    // October: the old growth at the top carries its flower heads
-    if (old && random() < .28) {
+    // deeper in the mat less sky reaches a leaf; a few in the sun go bronze
+    const depth = 1 - Math.min(1, off / .18)
+    const k = (.62 + .38 * (1 - depth * core)) * (.9 + random() * .2)
+    const bronze = random() < .06
+    const tint: V3 = bronze ? [k * 1.25, k * .85, k * .7] : [k, k * (.98 + random() * .06), k * (.95 + random() * .06)]
+    const corners = [corner(-1, 0), corner(1, 0), corner(1, 1), corner(-1, 1)]
+    quad(leaves, corners, [fx, fy, fz], tint, cell)
+    leafCount++
+    // its shadow on the stone: one opaque triangle inside its outline
+    for (const [cu, cv] of [[0, .08], [.62, .72], [-.62, .72]] as const) {
+      const v = corner(cu, cv)
+      shade.push(v[0], v[1], v[2]); shadeNormal.push(fx, fy, fz)
+    }
+    // October: the old growth carries its flower heads
+    if (old && random() < .22) {
       const head = point(run, ux, un, s - side * .02, h + .05, off + .03)
       const hs = .05 + random() * .025
       quad(leaves, [[head[0] - rx * hs, head[1] - ry * hs, head[2] - rz * hs], [head[0] + rx * hs, head[1] + ry * hs, head[2] + rz * hs],
@@ -257,25 +294,43 @@ export function createCreepers(tier: TierName, onWalk: (e: number, n: number) =>
     }
   }
 
-  for (const [b, name, glossy] of [[stems, 'vinci generated ivy stems', false], [leaves, 'vinci generated ivy leaves', true]] as const) {
-    if (!b.position.length) continue
+  const make = (b: Batch, name: string, material: MeshStandardNodeMaterial, casts: boolean): void => {
+    if (!b.position.length) return
     const geometry = new BufferGeometry()
     geometry.setAttribute('position', new Float32BufferAttribute(b.position, 3))
     geometry.setAttribute('normal', new Float32BufferAttribute(b.normal, 3))
     geometry.setAttribute('color', new Float32BufferAttribute(b.colour, 3))
     geometry.setAttribute('uv', new Float32BufferAttribute(b.uv, 2))
     geometry.computeBoundingSphere()
-    const material = new MeshStandardNodeMaterial({ vertexColors: true, roughness: glossy ? .48 : .9, side: DoubleSide, alphaTest: glossy ? .45 : 0 })
-    if (glossy) { material.alphaToCoverage = true; material.colorNode = texture(ivyAtlas(), uv()) }
     material.name = name
     material.userData = { ...creepersProvenance }
     const mesh = new Mesh(geometry, material)
     mesh.name = name
     mesh.receiveShadow = true
-    mesh.castShadow = false
+    mesh.castShadow = casts
     mesh.userData = { manifestId: creepersProvenance.manifestId, labelOccluder: false }
     group.add(mesh)
   }
-  group.userData['leaves'] = leaves.position.length / 18
+  make(wood, 'vinci generated ivy stems', new MeshStandardNodeMaterial({ vertexColors: true, roughness: .9 }), true)
+  const leafMaterial = new MeshStandardNodeMaterial({ vertexColors: true, roughness: .45, side: DoubleSide, alphaTest: .45 })
+  leafMaterial.alphaToCoverage = true
+  leafMaterial.colorNode = texture(ivyAtlas(), uv())
+  make(leaves, 'vinci generated ivy leaves', leafMaterial, false)
+  if (shade.length) {
+    const geometry = new BufferGeometry()
+    geometry.setAttribute('position', new Float32BufferAttribute(shade, 3))
+    geometry.setAttribute('normal', new Float32BufferAttribute(shadeNormal, 3))
+    geometry.computeBoundingSphere()
+    const material = new MeshBasicNodeMaterial({ colorWrite: false, depthWrite: false, side: DoubleSide })
+    material.shadowSide = DoubleSide
+    const mesh = new Mesh(geometry, material)
+    mesh.name = 'vinci generated ivy shadows'
+    mesh.castShadow = true
+    mesh.receiveShadow = false
+    mesh.layers.set(SHADOW_ONLY_LAYER)
+    mesh.userData = { manifestId: creepersProvenance.manifestId, labelOccluder: false }
+    group.add(mesh)
+  }
+  group.userData['leaves'] = leafCount
   return group
 }

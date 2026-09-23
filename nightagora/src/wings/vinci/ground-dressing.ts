@@ -17,6 +17,7 @@ import { getApronOutlines } from './apron'
 import { pebble, stoneColour, type Emit } from './pebbles'
 import { createMoss } from './moss'
 import { createCreepers } from './creepers'
+import { createCopings } from './copings'
 import { hidden, stageWeight, STOP_EYES, stopDistance } from './leaf-litter'
 import { builtFaces } from './ground-walls'
 import { GRASS_CELLS, grassAtlas, grassCellUV } from './grass-maps'
@@ -425,6 +426,7 @@ function* sow(group: Group, heightAt: HeightAt, tier: TierName): Generator<void,
   group.add(...partitionGroundDressing(plants, calm ? 1 : tier === 'standard' ? 2 : 4, tier === 'hero' ? 8 : 0))
   group.add(meshFrom(mineralBatch, 'vinci pale mineral path-edge gravel'))
   if (!calm) group.add(createMoss(tier))
+  group.add(createCopings(tier))
   group.add(createCreepers(tier, (e, n) => routes.some(p => inside(e, n, p) || edgeDistance(e, n, p) < 1)))
   group.userData['draws'] = group.children.length
   group.userData['triangles'] = (plantBatch.positions.length + mineralBatch.positions.length) / 9
