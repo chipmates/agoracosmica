@@ -45,7 +45,10 @@ export function createEntryMineralSurface(kind:'plaster'|'terracotta',
     const jointU=coverage(U.x.div(size),pixelU),jointV=coverage(U.y.div(size),pixelV)
     const jointArea=float(1).sub(float(1).sub(jointU).mul(float(1).sub(jointV)))
     const edge=part.min(float(1).sub(part)).mul(size),edgeDistance=edge.x.min(edge.y)
-    const body=albedo.mul(seed.mul(.12).mul(tileFade).add(clay.mul(.065)).add(grain.mul(.018)).add(1))
+    // each tile its own firing: lighter, darker, a shade toward brown or salmon
+    const firing=noise(vec3(cell.x.mul(1.7),cell.y.mul(2.3),9.31))
+    const body=albedo.mul(seed.mul(.22).mul(tileFade).add(clay.mul(.075)).add(grain.mul(.018)).add(1))
+      .mul(mix(vec3(1,1,1),mix(vec3(.9,.95,1.05),vec3(1.08,.96,.9),firing.mul(.5).add(.5)),tileFade.mul(firing.abs())))
     const jointColour=vec3(colour.r*.64,colour.g*.69,colour.b*.74)
     albedo=mix(body,jointColour,jointArea)
     const dish=float(1).sub(part.x.mul(2).sub(1).pow(2)).mul(float(1).sub(part.y.mul(2).sub(1).pow(2)))
@@ -56,8 +59,25 @@ export function createEntryMineralSurface(kind:'plaster'|'terracotta',
       {height:groove.mul(-.0012),resolution:resolve(.004)})
     roughness=roughness.add(seed.mul(.025).mul(tileFade)).add(clay.mul(.035)).add(grain.mul(.035)).add(jointArea.mul(.035))
   }
-  material.colorNode=albedo.mul(attribute('tone','float'))
-  material.roughnessNode=clamp(roughness,kind==='plaster'?.78:.74,kind==='plaster'?1:.96)
+  const tone=attribute('tone','float')
+  if(kind==='plaster'){
+    // Forty-six years on the passage's limewash: smoke gathered under the
+    // boards, hands and brooms at the foot, the lime warmed by both.
+    const age=smoothstep(3.3,4.0,P.y).mul(.16).add(float(1).sub(smoothstep(.82,1.25,P.y)).mul(.10))
+    albedo=albedo.mul(vec3(.97,.94,.88)).mul(float(1).sub(age))
+  }else{
+    // The path from the door, worn paler and smoother down the passage.
+    // from the door's inner face to the side door and on down the passage
+    const seg=(ax:number,az:number,bx:number,bz:number,half:number):N=>{
+      const px=P.x.sub(ax),pz=P.z.sub(az),dx=bx-ax,dz=bz-az
+      const t=clamp(px.mul(dx).add(pz.mul(dz)).div(dx*dx+dz*dz),0,1)
+      return float(1).sub(smoothstep(half*.4,half,vec2(px.sub(t.mul(dx)),pz.sub(t.mul(dz))).length()))}
+    const path=seg(2.153,11.869,-.80,8.87,.62).max(seg(2.153,11.869,-.91,7.30,.55).mul(.6))
+    albedo=albedo.mul(path.mul(.08).add(1))
+    roughness=roughness.sub(path.mul(.10))
+  }
+  material.colorNode=albedo.mul(tone)
+  material.roughnessNode=clamp(roughness,kind==='plaster'?.78:.62,kind==='plaster'?1:.96)
   // Convert a height field in metres into a physical view-space gradient.
   // There is no tangent normal map, face-diagonal or UV-orientation shortcut.
   const Nview=normalWorldGeometry.transformDirection(cameraViewMatrix),sx=positionView.dFdx(),sy=positionView.dFdy()

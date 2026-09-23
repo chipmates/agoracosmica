@@ -3,11 +3,15 @@
  * identity, fittings and occupation are not reconstructed by this module.
  */
 import { BufferGeometry, Float32BufferAttribute, Group, Mesh, MeshStandardNodeMaterial } from 'three/webgpu'
+import * as TSL from 'three/tsl'
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const {attribute,float,mx_noise_float,positionWorld,vec3}=TSL as unknown as Record<string,any>
 import { createEntryMineralSurface } from './entry-mineral-surface'
 import type { TierName } from '../../stack/tier'
 import { dossier, type Quantity } from './site'
 import { createShellSurface, prepareSurfaceGeometry } from './surface'
 import { timberFaceCoordinates } from './timber'
+import { applyPassageLight, passageLight } from './house-hall'
 
 type Point = [east:number,north:number]
 type Point3 = [east:number,north:number,height:number]
@@ -71,7 +75,7 @@ export const entryPassageProvenance={
 } as const
 
 class Batch {
-  positions:number[]=[];uvs:number[]=[];tones:number[]=[];roles:number[]=[]
+  positions:number[]=[];uvs:number[]=[];tones:number[]=[];roles:number[]=[];light:number[]=[]
   constructor(readonly kind:'plaster'|'terracotta'|'oak'){}
   quad(points:Point3[],normal:Point3,axis?:Point3):void {
     const a=points[0]!,b=points[1]!,c=points[2]!
@@ -87,7 +91,7 @@ class Batch {
         (-(p[0]-frontA[0])*dn+(p[1]-frontA[1])*dx)/length])
     }else coordinates=points.map(p=>[p[0]*normal[1]-p[1]*normal[0],p[2]])
     for(const i of[0,1,2,0,2,3]){const p=points[i]!;this.positions.push(p[0],p[2],-p[1]);
-      this.uvs.push(...coordinates[i]!);this.tones.push(1);this.roles.push(role)}
+      this.uvs.push(...coordinates[i]!);this.tones.push(1);this.roles.push(role);this.light.push(...passageLight(p,normal))}
   }
 }
 function prism(batch:Batch,polygon:Point[],bottom:number,top:number,axis?:Point3):void {
@@ -157,8 +161,8 @@ export const hallLedge={
 export const hallLedgeProvenance={
   manifestId:'vinci/entry-passage/ledge',assetClass:'GENERATED',certainty:'assumed',
   source:['A-LAYOUT','modern museum fitting'],
-  recipe:'A 1.20 by 0.30 m shelf, 55 mm thick, on two brackets, fixed to the entry passage\u2019s west partition at 0.90 m over the supplied +0.80 m floor. Square, unmoulded and unpainted: a fitting of this museum and of no other century.',
-  recipeDe:'Ein Brett von 1,20 mal 0,30 m, 55 mm stark, auf zwei Konsolen, an der Westwand des Eingangsgangs 0,90 m \u00fcber dem vorgegebenen Boden auf +0,80 m. Rechtwinklig, ohne Profil und ohne Fassung: ein Einbau dieses Museums und keines anderen Jahrhunderts.',
+  recipe:'A 1.20 by 0.30 m shelf of oiled oak, 55 mm thick, on two blackened steel brackets, fixed to the entry passage\u2019s west partition at 0.90 m over the supplied +0.80 m floor. Square, unmoulded and unpainted: a fitting of this museum and of no other century.',
+  recipeDe:'Ein Brett aus ge\u00f6lter Eiche von 1,20 mal 0,30 m, 55 mm stark, auf zwei geschw\u00e4rzten Stahlkonsolen, an der Westwand des Eingangsgangs 0,90 m \u00fcber dem vorgegebenen Boden auf +0,80 m. Rechtwinklig, ohne Profil und ohne Fassung: ein Einbau dieses Museums und keines anderen Jahrhunderts.',
 } as const
 
 function ledgeBody(batch:Batch):void {
@@ -173,6 +177,51 @@ function ledgeBody(batch:Batch):void {
       corner(u+LEDGE.bracket.width/2,LEDGE.bracket.depth),corner(u-LEDGE.bracket.width/2,LEDGE.bracket.depth)],
     top-LEDGE.thickness-LEDGE.bracket.drop,top-LEDGE.thickness)
   }
+}
+/** THE LEDGE AS THE MUSEUM MADE IT: an oiled oak board on blackened steel,
+ * a hair proud of the certified shelf, which stays the solid it always was
+ * inside it. Its own mesh under the ledge's own record. */
+function ledgeFinish(perPixel:boolean):Mesh {
+  const {point,along,inward}=ledgeAxis
+  // three millimetres proud on every face the room sees; none against the wall
+  const half=LEDGE.length/2+.003,top=floorZ+LEDGE.top+.003,e=.003
+  const positions:number[]=[],finish:number[]=[],light:number[]=[]
+  const box=(u0:number,u1:number,v0:number,v1:number,z0:number,z1:number,kind:number):void=>{
+    const c=(u:number,v:number,z:number):Point3=>[point[0]+along[0]*u+inward[0]*v,point[1]+along[1]*u+inward[1]*v,z]
+    const faces:[Point3[],Point3][]=[
+      [[c(u0,v0,z1),c(u1,v0,z1),c(u1,v1,z1),c(u0,v1,z1)],[0,0,1]],[[c(u0,v0,z0),c(u0,v1,z0),c(u1,v1,z0),c(u1,v0,z0)],[0,0,-1]],
+      [[c(u0,v1,z0),c(u0,v1,z1),c(u1,v1,z1),c(u1,v1,z0)],[inward[0],inward[1],0]],[[c(u0,v0,z0),c(u1,v0,z0),c(u1,v0,z1),c(u0,v0,z1)],[-inward[0],-inward[1],0]],
+      [[c(u0,v0,z0),c(u0,v0,z1),c(u0,v1,z1),c(u0,v1,z0)],[-along[0],-along[1],0]],[[c(u1,v0,z0),c(u1,v1,z0),c(u1,v1,z1),c(u1,v0,z1)],[along[0],along[1],0]],
+    ]
+    for(const [q,n] of faces.filter((_,k)=>k!==3)){
+      const a=q[0]!,b=q[1]!,d=q[2]!
+      const g=[(b[1]-a[1])*(d[2]-a[2])-(b[2]-a[2])*(d[1]-a[1]),(b[2]-a[2])*(d[0]-a[0])-(b[0]-a[0])*(d[2]-a[2]),(b[0]-a[0])*(d[1]-a[1])-(b[1]-a[1])*(d[0]-a[0])]
+      const pts=g[0]!*n[0]+g[1]!*n[1]+g[2]!*n[2]<0?[...q].reverse():q
+      for(const i of[0,1,2,0,2,3]){const p=pts[i]!;positions.push(p[0],p[2],-p[1]);finish.push(kind);light.push(...passageLight(p,n))}
+    }
+  }
+  box(-half,half,e,LEDGE.depth+e,top-LEDGE.thickness-e*2,top,0)
+  // each bracket where the certified one stands, a centimetre fuller all round
+  for(const side of[-1,1]){
+    const u=side*(LEDGE.length/2-.14)
+    box(u-LEDGE.bracket.width/2-.01,u+LEDGE.bracket.width/2+.01,e,LEDGE.bracket.depth+.01,top-LEDGE.thickness-LEDGE.bracket.drop-.013,top-LEDGE.thickness-e*2,1)
+  }
+  const geometry=new BufferGeometry()
+  geometry.setAttribute('position',new Float32BufferAttribute(positions,3))
+  geometry.setAttribute('finish',new Float32BufferAttribute(finish,1))
+  geometry.setAttribute('passage',new Float32BufferAttribute(light,2))
+  geometry.computeVertexNormals();geometry.computeBoundingSphere()
+  const m=new MeshStandardNodeMaterial({metalness:0,roughness:.7})
+  const kind=attribute('finish','float'),grain=mx_noise_float(vec3(positionWorld.x.mul(40),positionWorld.y.mul(4),positionWorld.z.mul(40))).mul(.1).add(1)
+  m.colorNode=kind.lessThan(.5).select(vec3(.52,.30,.15).mul(grain),vec3(.03,.029,.027))
+  m.roughnessNode=kind.lessThan(.5).select(float(.68),float(.46))
+  m.metalnessNode=kind.lessThan(.5).select(float(0),float(.55))
+  applyPassageLight(m,perPixel)
+  m.name='vinci/entry-passage/ledge-finish'
+  const mesh=new Mesh(geometry,m);mesh.name='wing-vinci/entry-passage/ledge-finish'
+  mesh.castShadow=false;mesh.receiveShadow=true
+  mesh.userData={manifestId:hallLedgeProvenance.manifestId,labelOccluder:true}
+  return mesh
 }
 
 export function createEntryPassage(tier:TierName):Group {
@@ -222,15 +271,18 @@ export function createEntryPassage(tier:TierName):Group {
     geometry.setAttribute('position',new Float32BufferAttribute(batch.positions,3))
     geometry.setAttribute('uv',new Float32BufferAttribute(batch.uvs,2))
     geometry.setAttribute('tone',new Float32BufferAttribute(batch.tones,1))
+    geometry.setAttribute('passage',new Float32BufferAttribute(batch.light,2))
     geometry.computeVertexNormals();geometry.computeBoundingSphere()
     if(batch.kind==='oak')prepareSurfaceGeometry(geometry,'oak',batch.roles)
     const material=batch.kind==='oak'?createShellSurface('oak'):mineralSurface(batch.kind)
+    applyPassageLight(material,tier!=='calm')
     const mesh=new Mesh(geometry,material);mesh.name=`wing-vinci/entry-passage/${batch.kind}`
     // Calm copies these same triangles into the already existing single
     // shell caster. The three visible materials and complete geometry stay.
     mesh.castShadow=tier!=='calm';mesh.receiveShadow=true;mesh.userData={manifestId:'vinci/entry-passage',labelOccluder:true}
     group.add(mesh)
   }
+  group.add(ledgeFinish(tier!=='calm'))
   group.userData={...entryPassageProvenance,tier,triangles:[plaster,tile,oak].reduce((n,b)=>n+b.positions.length/9,0)}
   return group
 }

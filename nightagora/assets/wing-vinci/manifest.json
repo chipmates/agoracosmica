@@ -7,10 +7,10 @@
       "class": "GENERATED",
       "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
-      "prompt": "Thin brick relief, tuffeau quoins and registered cut apertures, intersecting roofs, dormers, chimneys, turret and separate gallery/watchtower. Dossier nominal dimensions with original certainty ranges. No photograph sampled. Shallow 55 mm rebate within declared 35–90 mm assumption; split upper sky reflection and lower dark-room glazing. Existing roughness .18–.23 remains inside dossier interval; no screen-space transmission. Duplicated upper tower shell now shares registered aperture cuts. Connected F16/F17 masonry below the unchanged −2.20 m base: 0.60 m inward thickness [0.45–0.80], actual standard/calm ground boundary lower envelope embedded 50 mm [25–100], full joined miter volume and inherited stone coursing. No surveyed height or opening changes. Dressings that stood below a wall's own foot, quoins laid half a course off the coursed ashlar faces and the loose jamb fillets of the windows stay certified and leave the colour pass.",
+      "prompt": "Thin brick relief, tuffeau quoins and registered cut apertures, intersecting roofs, dormers, chimneys, turret and separate gallery/watchtower. Dossier nominal dimensions with original certainty ranges. No photograph sampled. Shallow 55 mm rebate within declared 35–90 mm assumption; split upper sky reflection and lower dark-room glazing. Existing roughness .18–.23 remains inside dossier interval; no screen-space transmission. Duplicated upper tower shell now shares registered aperture cuts. Connected F16/F17 masonry below the unchanged −2.20 m base: 0.60 m inward thickness [0.45–0.80], actual standard/calm ground boundary lower envelope embedded 50 mm [25–100], full joined miter volume and inherited stone coursing. No surveyed height or opening changes.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "cb78177b562e268195332c8b96cce06e6754498c1439dc7397832ddf73908d02",
+      "sha256": "a01ad01be9e990042fa1ffb359e3969191f4c2a621e7b2598b837aa21aad6ccf",
       "note": "Q001 Q015 Q019 Q124 Q127 Q131 Q134 Q175; src/wings/vinci/data/closluce.json; recipe_file=src/wings/vinci/shell.ts; geometry_dependency=vinci/foundation-plinth"
     },
     {
@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed to a pale grey at 30 per cent. Assumed weather, no observation claimed.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "86909ce176198d18bfd0af24f82d3050be85f9d3db9664d1df3597b40c1479eb",
+      "sha256": "d46077fadd74a19be652a5497dfc08f97a61ee647a250927c612ac827368c4c5",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=80c458f2cb5ccddb7fcedccda5df70e5cdccda7d9ca97d65ebfa6462920f61ef;"
     },
     {
@@ -62,7 +62,7 @@
       "prompt": "Museum camera poses and piecewise exterior circulation in the fixed dossier frame. All poses are exhibition choices. Latest target semantic navigation on measured gate/terrace/stair/apron routes. Bounded physical near-pyramid clearance; measured geometry identity at mount. CSS projection-derived drag with 0.1 second monotone response; explicit inspection entry and return. The active certified leg finishes before a direct certified route to the newest pending target. Static material inspection aliases have separate actual placement audits.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "fa3be909c1dd0bf86253eeb28472433ba2094af410560e4f3609a58f57f1d842",
+      "sha256": "9938545f58bb0cefb569fc42bbd448fecaa829cc6daa9a17119bd397f0714264",
       "note": "brief/CONCEPT.md; src/wings/vinci/data/closluce.json; recipe_file=src/wings/vinci/rail.ts; companion_file=src/wings/vinci/input.ts; companion_recipe_ids=vinci/rail-smoothing,vinci/rail-proof,vinci/rail-fingerprint,vinci/rail-projection,vinci/projection-drag,vinci/rail-clearance,vinci/rail-waypoints,vinci/rail-solids,vinci/gait"
     },
     {
@@ -309,7 +309,7 @@
       "prompt": "Unfurnished entrance structure from existing A-LAYOUT entry polygon: outward0.25m partitions retaining side portals, floor+0.8, ceiling underside+4.0 and next floor+4.3m, terracotta, limewash and flush oak ceiling members. Explicit reconstruction/finish assumptions; no furnishings or occupied room claim. Calm retains all three visible materials and copies the complete enclosure into the existing shell shadow draw.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "44e8927c21b721c2726057ca6b41be903b6092a20f9b36e87d43184a1e71c2bb",
+      "sha256": "7576b9f99792ae08781ec515304d2e92cd011e21ed1e58b2a6edf762481bb3e8",
       "note": "recipe_file=src/wings/vinci/entry-passage.ts"
     },
     {
@@ -465,7 +465,7 @@
       "prompt": "Original limewash wash/application/grain and terracotta tile/body/grain finish in physical metre coordinates. Derivative height gradients are filtered after differentiation; actual tile joints have analytic footprint area coverage. All unmeasured scale and relief intervals are in EN/DE entryMineralSurfaceProvenance. No geometry displacement or reference photograph sampling.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-10",
-      "sha256": "fa55e640a4cccd0eabe404105891264c8b761ef3fcda32bcb833e9ae91825bc3",
+      "sha256": "24281e8a21d8dc9963f87932669d7ecdae32c9b514ecbab3aa2beeed3e7f35ed",
       "note": "recipe_file=src/wings/vinci/entry-mineral-surface.ts; A-MATERIAL A-MASONRY materials.csv; microstructure_recipe=src/wings/vinci/mineral-microstructure.ts; microstructure_sha256=92c93ba37e7dd89f36690a45e6d785e4548cae5b4c4c27b669ba6a144a136cf2"
     },
     {
@@ -3522,10 +3522,10 @@
       "class": "GENERATED",
       "licence": "Original procedural reconstruction; source code under the museum repository licence.",
       "display": true,
-      "prompt": "A plain modern shelf in the entry passage: 1.20 by 0.30 m, 55 mm thick, on two brackets, fixed to the west partition at 0.90 m over the supplied +0.80 m floor. Square, unmoulded and unpainted, in the passage's own limewash surface. A fitting of this museum, not a reconstruction of a 1517 furnishing, and it carries no period claim. Its geometry belongs to the passage, so the rail clearance certificate is written against it and one machine of the collection stands on it.",
+      "prompt": "A plain modern shelf in the entry passage: 1.20 by 0.30 m, 55 mm thick, on two brackets, fixed to the west partition at 0.90 m over the supplied +0.80 m floor. Square, unmoulded and unpainted: an oiled oak board on two blackened steel brackets, drawn a hair proud of the certified shelf, which stays the solid inside it. A fitting of this museum, not a reconstruction of a 1517 furnishing, and it carries no period claim. Its geometry belongs to the passage, so the rail clearance certificate is written against it and one machine of the collection stands on it.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-20",
-      "sha256": "44e8927c21b721c2726057ca6b41be903b6092a20f9b36e87d43184a1e71c2bb",
+      "sha256": "7576b9f99792ae08781ec515304d2e92cd011e21ed1e58b2a6edf762481bb3e8",
       "note": "A modern museum fitting inside the entrance structure; the machine it carries has its own record. recipe_file=src/wings/vinci/entry-passage.ts"
     },
     {
@@ -3722,6 +3722,19 @@
       "date": "2026-09-23",
       "sha256": "8b5ed214c674c18053bbdd465ed9d59ef6f131a46309b8eb82aacc465fd0e95f",
       "note": "Modern museum insertion, the long gallery only; no 1517 claim. recipe_file=src/wings/vinci/collection/line-gallery.ts; companion_file=src/wings/vinci/collection/line-gallery-plan.ts; library_sets=library/limestone-pale,library/concrete-wall-formed,library/concrete-floor-polished,library/oak-veneer-light"
+    },
+    {
+      "id": "vinci/house-hall",
+      "path": "procedural/house-hall/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
+      "display": true,
+      "prompt": "The dossier's great hall (A-LAYOUT room hall, 8.65 by 8.05 m, floor +0.80 m, clear height 3.20 m) and the inner service passage beside it. Terracotta tiles of 0.22 m with 8 mm joints laid at 45 degrees (read from Q144) inside a square border row, each tile its own firing, bed and fraction of tilt; limewash with its age; oak joists 0.18 by 0.23 m at 0.60 m on a 0.34 by 0.38 m main beam carried by two tuffeau corbels; window seats; the room's face of each stone cross; the chimneypiece in A-FURNITURE's envelope at its place as the Loire type of about 1500, with a brick fireback, a banked fire's ash, charred ends and andirons of a generic type. Types of the period after museum objects, none documented at Cloux: A-FURNITURE's trestle table and bench, a chest after V&A W.38-1938 with linenfold and a lock plate after V&A 1319-1901, a box chair after V&A 740-1895, two stools after V&A 968-1897, two brass candlesticks after V&A M.435-1926 (unlit), a jug after V&A C.185-1909. The leaded lights as the room sees them. The entrance's leaf drawn again in the certified leaf's volume (planked, strap hinges, clout nails, ring, lock plate) and its two reveals faced in coursed tuffeau. Light at the fixed hour: the sun through the two west windows by the key light; the windows' cross, bars and leads read analytically in the sun patches; the room's return and the shafts of lit dust computed per point.",
+      "model": "Deterministic TypeScript and TSL procedural geometry",
+      "date": "2026-09-23",
+      "sha256": "449201db77ce0014eea0fa7993f61703343cdd80d049a0fbbcc705957c12d2c0",
+      "note": "recipe_file=src/wings/vinci/house-hall.ts; source=A-LAYOUT A-HEIGHT A-MASONRY A-FURNITURE Q144 MADE-THINGS; rail_collision=false; library_sets=stone-tuffeau (already loaded by the shell); engine_terms=engineBounce engineWindowShade engineVolume"
     }
   ]
 }

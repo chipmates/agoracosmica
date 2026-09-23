@@ -208,6 +208,10 @@ const ALLOWED = [
   // THE TWO PASSAGES.
   { mesh: 'wing-vinci/gate-passage/gate ironwork', why: 'known, 2026-09-21: the gate straps and studs, 16 faces' },
   { mesh: 'wing-vinci/entry-passage/plaster', why: 'known, 2026-09-21: four faces of the passage plaster at one far eye' },
+  // THE GREAT HALL: its furniture and the entrance leaf's ironwork are made
+  // things at their real size, read from the walk only through the west
+  // windows' glass and the open entrance door
+  { mesh: 'house-hall', why: 'known, 2026-09-23: the furniture and the leaf ironwork, 803 faces, thinnest 0.019 px at 20 m' },
 ]
 const allowed = row => ALLOWED.find(rule => rule.mesh === row.mesh || rule.mesh === row.body)
 

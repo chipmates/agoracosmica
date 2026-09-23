@@ -14,6 +14,7 @@ import { gatePassageProvenance } from './gate-passage'
 import { foundationPlinthFaces, foundationPlinthProvenance } from './foundation-plinth'
 import { createHouseGlazing, houseGlazingProvenance, type GlazedLight } from './house-glazing'
 import { createHouseRooms, houseRoomsProvenance } from './house-rooms'
+import { HALL_WINDOWS } from './house-hall'
 import { createHouseTracery, houseTraceryProvenance, type SillSpec, type TraceryWindow } from './house-tracery'
 import dossierText from './data/closluce.json?raw'
 
@@ -336,8 +337,13 @@ function drawOpening(f:Facade,o:Opening,thickness:number,b:Batches):void {
   if(o.type==='door') {
     // The door is held open into the passage; the threshold remains traversable.
     const leaf=facadePoint(f,x+.02,z+h/2,-thickness-.43)
+    // The entrance's leaf is drawn again, planked and ironed, by the great
+    // hall's module inside this same volume; this one stays the certified solid.
+    const redrawn=Boolean(house?.glaze)&&o.id==='entrance-door'
+    b.oak.retire=redrawn;b.iron.retire=redrawn
     solid(b.oak,leaf,[.085,w*.91,h-.07],Math.atan2(f.to[1]-f.from[1],f.to[0]-f.from[0]),.72)
     for(let i=0;i<7;i++){const y=(i-3)*w*.12;solid(b.iron,[leaf[0]+y*(f.to[1]-f.from[1])/f.length_m,leaf[1]-y*(f.to[0]-f.from[0])/f.length_m,leaf[2]],[.025,.025,h-.14])}
+    b.oak.retire=false;b.iron.retire=false
     drawPortal(f,x,z,w,h,b);return
   }
   if(o.type==='traceried-window') {
@@ -554,7 +560,8 @@ export function createShell(tier:Tier,library?:MaterialLibrary):Group {
   const full=tier!=='calm'
   const rooms=full?createHouseRooms(tier==='hero'?.45:.9):null
   // The carving is one more draw; standard stands at its draw ceiling.
-  house={glaze:full,carve:tier==='hero',openBacks:rooms?.openedBacks??new Set(),lights:[],tracery:[],sills:[]}
+  // The great hall is its own module's room; its four windows open too.
+  house={glaze:full,carve:tier==='hero',openBacks:new Set([...(rooms?.openedBacks??[]),...(full?HALL_WINDOWS:[])]),lights:[],tracery:[],sills:[]}
   const faces=roofFaces(),valleys=roofValleys(faces)
   const facades=spec.facades.filter(f=>f.render).map(f=>({...f,openings:f.openings.map(o=>({...o}))}))
   // One through-gateway is cut in both exterior faces of the covered way.

@@ -14,6 +14,7 @@ import { vinciApproachesAreNeighbours } from './collection/approaches'
 import { COURT, SUPPER_WALL } from './collection/layout'
 import { fittedRailFov, assertRailProjection } from './rail-projection'
 import type { RailGeometryAuthority } from './rail-proof'
+import { hallView } from './house-hall'
 
 export interface Pose { eye: Vector3; at: Vector3; fov: number }
 /** Which room view each collection station stands in. The rooms are built by
@@ -139,12 +140,13 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
  * look is an AUTHORED VIEW and never a pickable object: there is no body to
  * press, only a composition to be stood in. */
 export const HOUSE_CLOSE_LOOKS:Partial<Record<VinciStationId,readonly string[]>>={
-  hall:['motto','threshold','entry-terracotta','entry-plaster','step-wear'],
+  hall:['motto','threshold','entry-terracotta','entry-plaster','step-wear','great-hall','great-hall-door'],
   oratory:['lancet','material-stone-close'],
   study:['masonry','gutter'],
   chamber:['material-brick-sunlit','slate-clear'],
 }
 export function namedPose(id:string,narrow:boolean):Pose|undefined {
+  if(id==='great-hall'||id==='great-hall-door'){const v=hallView(id,narrow);return p(v.eye[0],v.eye[1],v.eye[2],v.at[0],v.at[1],v.at[2],v.fov)}
   // Independent static material inspections; return explicitly to the rail.
   if(id==='material-brick-sunlit')return p(-14.34996788180643,-15.446032508323484,3.005,-13.560321684541906,-14.9178669252478,3.005,narrow?56:48)
   if(id==='material-stone-sunlit')return p(-14.34996788180643,-15.446032508323484,-0.04,-13.560321684541906,-14.9178669252478,-0.04,narrow?56:48)

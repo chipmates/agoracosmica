@@ -75,6 +75,8 @@ export function buildBodies() {
   add('shell', load('src/wings/vinci/shell.ts').createShell({ name: 'hero' }))
   add('gate-passage', load('src/wings/vinci/gate-passage.ts').createGatePassage('hero'))
   add('entry-passage', load('src/wings/vinci/entry-passage.ts').createEntryPassage('hero'))
+  // the great hall and its passage, mounted beside the shell as the wing mounts them
+  add('house-hall', load('src/wings/vinci/house-hall.ts').createHouseHall('hero').group)
   {
     // The grave carries the court's gallery: its own walls, returns and kerbs.
     // The exhibit host mounts it turned a quarter turn, and clips its floor to

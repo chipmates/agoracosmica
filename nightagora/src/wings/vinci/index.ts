@@ -23,6 +23,7 @@ import { createVinciSourcesWindow, type VinciSourcesTab, type VinciExhibitSource
 import { createVinciWelcome, vinciWelcomeSeen } from './welcome'
 import { GRADES } from '../../stack/grade'
 import { createShell } from './shell'
+import { createHouseHall, houseHallProvenance } from './house-hall'
 import { createShellShadowDouble } from './shadow-shell'
 import { createWingShadowBody, type WingShadowBody } from './shadow-body'
 import { createCollection, collectionProvenance } from './collection'
@@ -163,12 +164,15 @@ const PRINT={...GRADES['first-station'],name:'clos-luce-1517',exposure:.94,lift:
 /** A ROOM IS NOT THE STREET. The stations in the insertion stand indoors,
  * under a clerestory and two fittings, and the outdoor exposure left them a
  * stop and a half under. The eye opens at the door, as a camera does. */
-const STATION_EXPOSURE:Partial<Record<VinciStationId,number>>={courtyard:1.0,
+const STATION_EXPOSURE:Partial<Record<VinciStationId,number>>={courtyard:1.0,hall:1.3,
   'picture-room':1.34,'picture-room-west':1.34,'reading-table':2.4,'line-early':1.3,flight:1.55,works:1.55,body:1.4}
 /** THE HALL IS PRINTED ON A SHOULDER: its spots are the hottest light in the
  * wing, and a linear print clips a lit sail to one flat white. */
 const STATION_SHOULDER:Partial<Record<VinciStationId,number>>={flight:1,works:1}
 const exposureOf=(id?:string):number=>STATION_EXPOSURE[id as VinciStationId]??PRINT.exposure
+/** THE EYE THAT STEPS INTO A ROOM OF THE HOUSE opens as it does at a door:
+ * the house's close looks stand indoors, a stop over the landing's print. */
+const VIEW_EXPOSURE:Readonly<Record<string,number>>={'great-hall':1.9,'great-hall-door':1.9}
 const shoulderOf=(id?:string):number=>STATION_SHOULDER[id as VinciStationId]??0
 /** THE EYE OPENS OVER THE LAST THIRD OF A LEG, so the leg lands on the
  * station's own print: a stop has one picture whichever way it was reached,
@@ -626,6 +630,8 @@ export function createWing():VinciWingModule {
     yield
     const entry=createEntryPassage(stack.tierName())
     shell=createShell(stack.tierName(),stack.materials)
+    // The great hall and its passage stand behind the shell's opened windows.
+    const greatHall=stack.tierName()==='calm'?null:createHouseHall(stack.tierName(),stack.materials)
     yield
     const ground=createGround(stack.tierName(),stack.materials)
     yield
@@ -640,6 +646,7 @@ export function createWing():VinciWingModule {
     const dressing=planGroundDressing(groundHeight,stack.tierName())
     const courtDressing=createInnerCourtDressing(groundHeight,stack.tierName())
     courtRoot=courtDressing
+    if(greatHall)scene.add(greatHall.group)
     scene.add(ground,shell,entry,createGatePassage(stack.tierName()),courtDressing,createCourtObjects(groundHeight,stack.models),createRoadDressing(groundHeight,stack.tierName()),collection,createCollectionAccess(),wood.group,dressing.group)
     yield
     for(const step of wood.steps){step();yield}
@@ -2510,6 +2517,11 @@ export function createWing():VinciWingModule {
       appendEvidence('entryFinish',entryMineralSurfaceProvenance.label,'reconstructed','vinci/entry-mineral-surface',entryMineralSurfaceProvenance.source.join(' · '))
       appendRecord({en:hallLedgeProvenance.recipe,de:hallLedgeProvenance.recipeDe},hallLedgeProvenance.source.join(' · '),'reconstructed',hallLedgeProvenance.manifestId,'GENERATED')
     }
+    // The great hall behind the passage, and the few things of the period in it.
+    if(s.id==='hall'&&hosts?.world.stack.tierName()!=='calm'){
+      appendEvidence('greatHall',houseHallProvenance.record,'reconstructed',houseHallProvenance.manifestId,houseHallProvenance.source.join(' · '))
+      appendEvidence('hallThings',houseHallProvenance.thingsRecord,'conjectural',houseHallProvenance.manifestId,houseHallProvenance.source.join(' · '))
+    }
     if(s.id==='arrival'){
       appendEvidence('road',roadDressingProvenance.label,'conjectural','vinci/road-dressing',roadDressingProvenance.source.join(' · '))
       appendEvidence('court',innerCourtProvenance.label,'reconstructed','vinci/inner-court',innerCourtProvenance.source.join(' · '))
@@ -2654,7 +2666,7 @@ export function createWing():VinciWingModule {
       const arrived=here?walkIndexAt(here,arriving?nav.wallTo:nav.wall):-1
       if(arrived>=0&&arrived!==card&&!activeView){card=arrived;dock.scrollTop=0;paintHeader();paintDock();paintQuestion();standHere()}
       if(nav.completed&&nav.completed!==exposureAt)exposureAt=nav.completed
-      const opening=legExposure(nav), rolling=legShoulder(nav)
+      const opening=activeView&&VIEW_EXPOSURE[activeView]!==undefined?VIEW_EXPOSURE[activeView]!:legExposure(nav), rolling=legShoulder(nav)
       if(nav.completed&&(opening!==exposureShown||rolling!==shoulderShown))aimPrint(nav.completed,opening,rolling)
       // A JOURNEY ONTO A WALL IS TWO LEGS AND ONE ASKING: the run along the
       // wall leaves as soon as the leg to its end has landed.
