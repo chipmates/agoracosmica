@@ -296,6 +296,11 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
       // finds them. A dressed stone at arm's length is not a smooth sphere.
       ...set, scale: [.05, .05], scales: [.046, .013, .0016], normalStrength: .62,
       detail: {...set.detail, macro: .046, macroContrast: .55, mid: .8, micro: .55},
+    } : /iron, forged/.test(name) ? {
+      // Iron off the smith's hammer: a smooth dark skin with soft facets, not
+      // the set's cast pits, which read as concrete on a crank's face.
+      ...set, normalStrength: .3, scale: [.3, .3], scales: [.25, .045, .0012],
+      detail: {...set.detail, macro: .25, macroContrast: .2, mid: .45, micro: .2},
     } : /pitched/.test(name) ? {
       // A hide sewn into a hose and sealed with pitch: a close crinkle over a
       // smooth skin, not an upholstery's creases, which read as links.
@@ -478,7 +483,7 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
       material.metalness = .5
       const scale = new Color('#3f3a35')
       const mottle = detail.albedo.dot(vec3(.2126, .7152, .0722))
-      material.colorNode = vec3(scale.r, scale.g, scale.b).mul(mottle.mul(.5).add(.55)).mul(detail.occlusion)
+      material.colorNode = vec3(scale.r, scale.g, scale.b).mul(mottle.mul(.25).add(.8)).mul(detail.occlusion)
       material.roughnessNode = detail.roughness.mul(.9).clamp(.5, .82)
     }
     if (dossier.slug === 'camera-obscura' && set.name === 'oak-beams') {

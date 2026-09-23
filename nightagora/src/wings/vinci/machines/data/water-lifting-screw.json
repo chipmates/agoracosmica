@@ -37,7 +37,7 @@
     "z": 3.6,
     "certainty": "C",
     "source": "geometry",
-    "note": "Conservative swept envelope x +/-0.7 m, y0 to2.15 m, z -1.6 to2 m. The hand crank sweeps above the tube. Numerical sampling over61 poses found max y2.11357 m."
+    "note": "Conservative swept envelope x +/-0.7 m, y 0 to 2.15 m, z -1.6 to 2 m. The hand crank sweeps above the tube. Numerical sampling of every part over 144 poses found max y 2.14256 m."
   },
   "frame": {
     "handedness": "right",
@@ -1571,11 +1571,11 @@
           ],
           [
             -0.112,
-            0.180133284
+            0.133945262
           ],
           [
             0.112,
-            0.050806824
+            0.004618802
           ],
           [
             0.112,
@@ -1614,8 +1614,8 @@
       },
       "position_m": [
         0.0,
-        0.0515,
-        0.089200617
+        0.0315,
+        0.0545596
       ],
       "orientation_rad": [
         1.047197551,
@@ -1641,8 +1641,8 @@
       },
       "position_m": [
         0.0,
-        0.055,
-        0.095262794
+        0.035,
+        0.060621778
       ],
       "orientation_rad": [
         1.047197551,
@@ -1693,8 +1693,8 @@
       },
       "position_m": [
         -0.05,
-        0.09630127,
-        0.066798693
+        0.07630127,
+        0.032157677
       ],
       "orientation_rad": [
         1.047197551,
@@ -1745,8 +1745,8 @@
       },
       "position_m": [
         0.05,
-        0.09630127,
-        0.066798693
+        0.07630127,
+        0.032157677
       ],
       "orientation_rad": [
         1.047197551,
@@ -1797,8 +1797,8 @@
       },
       "position_m": [
         0.05,
-        0.00969873,
-        0.116798693
+        -0.01030127,
+        0.082157677
       ],
       "orientation_rad": [
         1.047197551,
@@ -1849,8 +1849,8 @@
       },
       "position_m": [
         -0.05,
-        0.00969873,
-        0.116798693
+        -0.01030127,
+        0.082157677
       ],
       "orientation_rad": [
         1.047197551,
@@ -4519,11 +4519,11 @@
       "shape": "cylinder",
       "dimensions_m": {
         "radius": 0.024,
-        "height": 0.352
+        "height": 0.367
       },
       "position_m": [
         0.0,
-        1.371,
+        1.3785,
         0.0
       ],
       "orientation_rad": [
@@ -17861,7 +17861,7 @@
       },
       "position_m": [
         0.18,
-        2.928,
+        2.943,
         0.0
       ],
       "orientation_rad": [
