@@ -5,7 +5,7 @@
  * concrete, the walls and the coffered soffit are its board-formed concrete,
  * and oiled oak benches stand at the glass. North-east daylight through the
  * glazed wall is the key; every date stands in a warm pool from a head on a
- * track over the line; washers lay a warm wash down the far wall.
+ * track over the line; a slot in the soffit washes the far wall warm.
  *
  * ONLY THE GALLERY'S SURFACES TAKE THESE LIGHTS (`lightsNode`): the wing's
  * other surfaces sample nothing new. The finish lies over the certified
@@ -73,7 +73,7 @@ function looks() {
     stoneRough: uniform(.46),
     /** how far the walk along the dates has polished its band */
     stoneWalk: uniform(.08),
-    stoneTone: uniform(.11),
+    stoneTone: uniform(.16),
     stoneNormal: uniform(.3),
     groutColour: uniform(new Color('#5f574c')),
     bronzeColour: uniform(new Color(.26, .2, .13)),
@@ -82,8 +82,8 @@ function looks() {
     // the hall's photographs, poured paler here: a daylit room's concrete
     // stands near AD-2's 0.33, its sealed floor near 0.19
     wallTint: uniform(new Color(1.26, 1.33, 1.7)),
-    soffitTint: uniform(new Color(1.24, 1.36, 1.95)),
-    floorTint: uniform(new Color(2.0, 1.95, 1.85)),
+    soffitTint: uniform(new Color(1.15, 1.34, 1.95)),
+    floorTint: uniform(new Color(2.4, 2.34, 2.22)),
     oakTint: uniform(new Color(.78, .74, .7)),
     darkTint: uniform(new Color(.55, .53, .51)),
     /** the probe read at the scene's own level; the lift is the room's */
@@ -252,7 +252,7 @@ export interface LineGallery {
 
 /** The calm tier takes no probe: the hero tier's measured bounce as a fill,
  * warmer from the floor and cooler from the window side. */
-const CALM_FILL = { up: [.34, .33, .31], down: [.2, .2, .21], window: [.3, .33, .38] } as const
+const CALM_FILL = { up: [.36, .34, .31], down: [.21, .2, .2], window: [.3, .32, .35] } as const
 
 export function mountLineGallery(stack: Stack): LineGallery {
   const tier = stack.tierName(), calm = tier === 'calm'
@@ -437,7 +437,10 @@ export function mountLineGallery(stack: Stack): LineGallery {
       // once a second is enough to learn that the reading room stands: it
       // rides with the rooms, as this gallery does
       if (!patchMesh.visible || ++patchChecked % 60) return
-      if (group.parent?.getObjectByName('vinci/collection-reading-room')) patchMesh.visible = false
+      if (!group.parent?.getObjectByName('vinci/collection-reading-room')) return
+      patchMesh.visible = false
+      // the room it stands in is read again with that room in it
+      owed = Math.max(owed, 2)
     },
     dispose() {
       live = false

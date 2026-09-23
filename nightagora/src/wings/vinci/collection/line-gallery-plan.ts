@@ -90,7 +90,7 @@ const DROP = .3
 /** THE FAR WALL'S WASH: a linear slot let into the soffit a little off the
  * wall, its lens flush with the concrete, the whole run of the wall that
  * the line points at. */
-export const WASH_SLOT = { north: G.north - .34, west: -37.9, east: -25.1, width: .09 } as const
+export const WASH_SLOT = { north: G.north - .72, west: -37.9, east: -25.1, width: .09 } as const
 
 export type GalleryLightKind = 'spot' | 'area'
 /** Which surfaces take a light: the line's own stones, or the room too. */
@@ -140,7 +140,7 @@ export const GALLERY_LIGHTS: readonly GalleryLight[] = [
     at: [(WASH_SLOT.west + WASH_SLOT.east) / 2, WASH_SLOT.north, GALLERY.soffit - .012],
     aim: [(WASH_SLOT.west + WASH_SLOT.east) / 2, G.north + .3, FLOOR + 1],
     width: WASH_SLOT.east - WASH_SLOT.west, height: WASH_SLOT.width,
-    kelvin: 3200, intensity: 32,
+    kelvin: 3200, intensity: 46,
   },
 ]
 
