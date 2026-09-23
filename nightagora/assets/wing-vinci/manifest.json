@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed to a pale grey at 30 per cent. Assumed weather, no observation claimed.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "4076e88ad92d0fba59bbb07c33a38c69fb86ef4a31faefeb5caacb9dd61823f7",
+      "sha256": "84a9ce4806ab9d080437eca19151944ee0b0058f48db6aa96406e50ef0e301cc",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=80c458f2cb5ccddb7fcedccda5df70e5cdccda7d9ca97d65ebfa6462920f61ef;"
     },
     {
@@ -309,7 +309,7 @@
       "prompt": "Unfurnished entrance structure from existing A-LAYOUT entry polygon: outward0.25m partitions retaining side portals, floor+0.8, ceiling underside+4.0 and next floor+4.3m, terracotta, limewash and flush oak ceiling members. Explicit reconstruction/finish assumptions; no furnishings or occupied room claim. Calm retains all three visible materials and copies the complete enclosure into the existing shell shadow draw.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "7576b9f99792ae08781ec515304d2e92cd011e21ed1e58b2a6edf762481bb3e8",
+      "sha256": "9248a3072faa9c2553ad64d91507c040b1dfe485948edd6daf1eacebc63e9ed4",
       "note": "recipe_file=src/wings/vinci/entry-passage.ts"
     },
     {
@@ -465,7 +465,7 @@
       "prompt": "Original limewash wash/application/grain and terracotta tile/body/grain finish in physical metre coordinates. Derivative height gradients are filtered after differentiation; actual tile joints have analytic footprint area coverage. All unmeasured scale and relief intervals are in EN/DE entryMineralSurfaceProvenance. No geometry displacement or reference photograph sampling.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-10",
-      "sha256": "24281e8a21d8dc9963f87932669d7ecdae32c9b514ecbab3aa2beeed3e7f35ed",
+      "sha256": "7925377173853bd313a521b7486fb81a316e6e6798904452cea31a3b3fb17b8a",
       "note": "recipe_file=src/wings/vinci/entry-mineral-surface.ts; A-MATERIAL A-MASONRY materials.csv; microstructure_recipe=src/wings/vinci/mineral-microstructure.ts; microstructure_sha256=92c93ba37e7dd89f36690a45e6d785e4548cae5b4c4c27b669ba6a144a136cf2"
     },
     {
@@ -3525,7 +3525,7 @@
       "prompt": "A plain modern shelf in the entry passage: 1.20 by 0.30 m, 55 mm thick, on two brackets, fixed to the west partition at 0.90 m over the supplied +0.80 m floor. Square, unmoulded and unpainted: an oiled oak board on two blackened steel brackets, drawn a hair proud of the certified shelf, which stays the solid inside it. A fitting of this museum, not a reconstruction of a 1517 furnishing, and it carries no period claim. Its geometry belongs to the passage, so the rail clearance certificate is written against it and one machine of the collection stands on it.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-20",
-      "sha256": "7576b9f99792ae08781ec515304d2e92cd011e21ed1e58b2a6edf762481bb3e8",
+      "sha256": "9248a3072faa9c2553ad64d91507c040b1dfe485948edd6daf1eacebc63e9ed4",
       "note": "A modern museum fitting inside the entrance structure; the machine it carries has its own record. recipe_file=src/wings/vinci/entry-passage.ts"
     },
     {
@@ -3733,7 +3733,7 @@
       "prompt": "The dossier's great hall (A-LAYOUT room hall, 8.65 by 8.05 m, floor +0.80 m, clear height 3.20 m) and the inner service passage beside it. Terracotta tiles of 0.22 m with 8 mm joints laid at 45 degrees (read from Q144) inside a square border row, each tile its own firing, bed and fraction of tilt; limewash with its age; oak joists 0.18 by 0.23 m at 0.60 m on a 0.34 by 0.38 m main beam carried by two tuffeau corbels; window seats; the room's face of each stone cross; the chimneypiece in A-FURNITURE's envelope at its place as the Loire type of about 1500, with a brick fireback, a banked fire's ash, charred ends and andirons of a generic type. Types of the period after museum objects, none documented at Cloux: A-FURNITURE's trestle table and bench, a chest after V&A W.38-1938 with linenfold and a lock plate after V&A 1319-1901, a box chair after V&A 740-1895, two stools after V&A 968-1897, two brass candlesticks after V&A M.435-1926 (unlit), a jug after V&A C.185-1909. The leaded lights as the room sees them. The entrance's leaf drawn again in the certified leaf's volume (planked, strap hinges, clout nails, ring, lock plate) and its two reveals faced in coursed tuffeau. Light at the fixed hour: the sun through the two west windows by the key light; the windows' cross, bars and leads read analytically in the sun patches; the room's return and the shafts of lit dust computed per point.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "3382d4ac9e562aba5db8ebbce69090626366617bf1af5d6b9c6a758f7b67173d",
+      "sha256": "a16982b5fd5998c9d76cfc3de327eb6fbe9e550ceb82f6b67731b74a48cdf029",
       "note": "recipe_file=src/wings/vinci/house-hall.ts; source=A-LAYOUT A-HEIGHT A-MASONRY A-FURNITURE Q144 MADE-THINGS; rail_collision=false; library_sets=stone-tuffeau (already loaded by the shell); engine_terms=engineBounce engineWindowShade engineVolume"
     }
   ]

@@ -120,7 +120,7 @@ function wallPiece(batch:Batch,a:Point,b:Point,thickness:number,bottom:number,to
 function mineralSurface(kind:'plaster'|'terracotta'):MeshStandardNodeMaterial {
   const source=spec.materials.find(m=>m.id===kind)!
   return createEntryMineralSurface(kind,{colour:source.colour_srgb,
-    roughness:source.roughness.value,tile:tileSize,joint:tileJoint})
+    roughness:source.roughness.value,tile:tileSize,joint:tileJoint,floor:floorZ})
 }
 
 /** THE HALL'S CONTEMPORARY LEDGE. A plain modern shelf against the wall the
@@ -213,8 +213,9 @@ function ledgeFinish(perPixel:boolean):Mesh {
   geometry.computeVertexNormals();geometry.computeBoundingSphere()
   const m=new MeshStandardNodeMaterial({metalness:0,roughness:.7})
   const kind=attribute('finish','float'),grain=mx_noise_float(vec3(positionWorld.x.mul(40),positionWorld.y.mul(4),positionWorld.z.mul(40))).mul(.1).add(1)
-  m.colorNode=kind.lessThan(.5).select(vec3(.52,.30,.15).mul(grain),vec3(.03,.029,.027))
-  m.roughnessNode=kind.lessThan(.5).select(float(.68),float(.46))
+  // blackened steel is a dark grey with a satin face, not a void
+  m.colorNode=kind.lessThan(.5).select(vec3(.52,.30,.15).mul(grain),vec3(.058,.055,.051))
+  m.roughnessNode=kind.lessThan(.5).select(float(.68),float(.4))
   m.metalnessNode=kind.lessThan(.5).select(float(0),float(.55))
   applyPassageLight(m,perPixel)
   m.name='vinci/entry-passage/ledge-finish'

@@ -172,7 +172,12 @@ const STATION_SHOULDER:Partial<Record<VinciStationId,number>>={flight:1,works:1}
 const exposureOf=(id?:string):number=>STATION_EXPOSURE[id as VinciStationId]??PRINT.exposure
 /** THE EYE THAT STEPS INTO A ROOM OF THE HOUSE opens as it does at a door:
  * the house's close looks stand indoors, a stop over the landing's print. */
-const VIEW_EXPOSURE:Readonly<Record<string,number>>={'great-hall':1.9,'great-hall-door':1.9}
+const VIEW_EXPOSURE:Readonly<Record<string,number>>={'great-hall':2.2,'great-hall-door':2.2}
+/** and prints on the shoulder: the sun's patch and the lit glass stand four
+ * stops over the room, and a linear print clips them to one flat white; the
+ * shoulder's toe takes a little from the mid-tones, which the exposure gives
+ * back */
+const VIEW_SHOULDER:Readonly<Record<string,number>>={'great-hall':1,'great-hall-door':1}
 const shoulderOf=(id?:string):number=>STATION_SHOULDER[id as VinciStationId]??0
 /** THE EYE OPENS OVER THE LAST THIRD OF A LEG, so the leg lands on the
  * station's own print: a stop has one picture whichever way it was reached,
@@ -2666,7 +2671,7 @@ export function createWing():VinciWingModule {
       const arrived=here?walkIndexAt(here,arriving?nav.wallTo:nav.wall):-1
       if(arrived>=0&&arrived!==card&&!activeView){card=arrived;dock.scrollTop=0;paintHeader();paintDock();paintQuestion();standHere()}
       if(nav.completed&&nav.completed!==exposureAt)exposureAt=nav.completed
-      const opening=activeView&&VIEW_EXPOSURE[activeView]!==undefined?VIEW_EXPOSURE[activeView]!:legExposure(nav), rolling=legShoulder(nav)
+      const opening=activeView&&VIEW_EXPOSURE[activeView]!==undefined?VIEW_EXPOSURE[activeView]!:legExposure(nav), rolling=activeView&&VIEW_SHOULDER[activeView]!==undefined?VIEW_SHOULDER[activeView]!:legShoulder(nav)
       if(nav.completed&&(opening!==exposureShown||rolling!==shoulderShown))aimPrint(nav.completed,opening,rolling)
       // A JOURNEY ONTO A WALL IS TWO LEGS AND ONE ASKING: the run along the
       // wall leaves as soon as the leg to its end has landed.

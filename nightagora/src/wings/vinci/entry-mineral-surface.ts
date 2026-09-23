@@ -4,13 +4,14 @@
 import { Color, MeshStandardNodeMaterial } from 'three/webgpu'
 import * as TSL from 'three/tsl'
 import {aggregateField} from './mineral-microstructure'
+import {doorWear,limewashOverBrick} from './house-hall'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type N=any
 const {attribute,cameraViewMatrix,clamp,float,floor,fract,length,mix,mx_noise_float,
   normalWorldGeometry,positionView,positionWorld,smoothstep,uv,vec2,vec3}=TSL as unknown as Record<string,N>
 
 export function createEntryMineralSurface(kind:'plaster'|'terracotta',
-  parameters:{colour:string;roughness:number;tile:number;joint:number}):MeshStandardNodeMaterial {
+  parameters:{colour:string;roughness:number;tile:number;joint:number;floor:number}):MeshStandardNodeMaterial {
   const material=new MeshStandardNodeMaterial({roughness:parameters.roughness,metalness:0})
   const colour=new Color(parameters.colour),P=positionWorld,U=uv()
   const rho=length(U.dFdx()).max(length(U.dFdy())).max(1e-6)
@@ -24,7 +25,9 @@ export function createEntryMineralSurface(kind:'plaster'|'terracotta',
     const trowel=aggregateField(U,footprint,{cell:.070,radius:[.16,.22],aspect:.35,probability:.70,seed:3.729,signed:true})
     const grain=aggregateField(U,footprint,{cell:.005,radius:[.12,.22],probability:1,seed:9.113,signed:true})
     const pores=aggregateField(U,footprint,{cell:.018,radius:[.04,.08],probability:.24,seed:13.731})
-    albedo=albedo.mul(wash.mul(.11).add(trowel.value.mul(.035)).add(grain.value.mul(.15)).sub(pores.value.mul(.25)).add(1))
+    // the wash over the partitions' brick, worn at the foot and the jambs
+    albedo=limewashOverBrick(U,parameters.floor,albedo,4.3,doorWear(P),{thin:.22,contrast:2,tide:.5}).albedo
+      .mul(wash.mul(.11).add(trowel.value.mul(.035)).add(grain.value.mul(.15)).sub(pores.value.mul(.25)).add(1))
     heightBands.push({height:washRaw.mul(.00030),resolution:resolve(.60)})
     uvGradients.push(trowel.gradient.mul(.00016).add(grain.gradient.mul(.000050)).sub(pores.gradient.mul(.00018)))
     roughness=roughness.add(wash.mul(.015)).add(trowel.value.mul(.025)).add(grain.value.mul(.035)).add(pores.value.mul(.040))
@@ -63,7 +66,8 @@ export function createEntryMineralSurface(kind:'plaster'|'terracotta',
   if(kind==='plaster'){
     // Forty-six years on the passage's limewash: smoke gathered under the
     // boards, hands and brooms at the foot, the lime warmed by both.
-    const age=smoothstep(3.3,4.0,P.y).mul(.16).add(float(1).sub(smoothstep(.82,1.25,P.y)).mul(.10))
+    const smoke=mx_noise_float(vec3(P.x.mul(.9),P.y.mul(1.6),P.z.mul(.9))).mul(.35).add(.8)
+    const age=smoothstep(2.5,4.0,P.y).mul(.22).mul(smoke).add(float(1).sub(smoothstep(.82,1.25,P.y)).mul(.10))
     albedo=albedo.mul(vec3(.97,.94,.88)).mul(float(1).sub(age))
   }else{
     // The path from the door, worn paler and smoother down the passage.

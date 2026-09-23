@@ -211,7 +211,7 @@ const ALLOWED = [
   // THE GREAT HALL: its furniture and the entrance leaf's ironwork are made
   // things at their real size, read from the walk only through the west
   // windows' glass and the open entrance door
-  { mesh: 'house-hall', why: 'known, 2026-09-23: the furniture and the leaf ironwork, 803 faces, thinnest 0.019 px at 20 m' },
+  { mesh: 'house-hall', why: 'known, 2026-09-24: the furniture with the stools\' joinery and the leaf ironwork, 1097 faces, thinnest 0.019 px at 20 m' },
 ]
 const allowed = row => ALLOWED.find(rule => rule.mesh === row.mesh || rule.mesh === row.body)
 

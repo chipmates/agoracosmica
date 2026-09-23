@@ -19,7 +19,7 @@ import type { MaterialLibrary } from '../../stack/materials'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type N = any
-const { Fn, abs, acos, attribute, cameraPosition, clamp, float, floor, fract, max, min, mix, mx_noise_float, normalWorld, positionWorld, smoothstep, uv, vec2, vec3 } = TSL as unknown as Record<string, N>
+const { Fn, abs, acos, attribute, cameraPosition, clamp, exp, float, floor, fract, max, min, mix, mx_noise_float, normalWorld, normalWorldGeometry, positionWorld, smoothstep, uv, vec2, vec3 } = TSL as unknown as Record<string, N>
 
 type V2 = [number, number]
 type V3 = [number, number, number]
@@ -149,7 +149,7 @@ const DOOR_H = Math.max(KITCHEN_DOOR.height_m, LINK_DOOR.height_m)
 /* ---- the sink: one mesh, every surface a kind the material reads ---- */
 
 /** Surface kinds, read by the material. */
-export const K = { TILE: 0, JOINT: 1, PLASTER: 2, OAK: 3, STONE: 4, BRICK: 5, IRON: 6, BRASS: 7, GLAZE: 8, ASH: 9, CHAR: 10, WAX: 11, WEATHERED: 12 } as const
+export const K = { TILE: 0, JOINT: 1, PLASTER: 2, OAK: 3, STONE: 4, BRICK: 5, IRON: 6, BRASS: 7, GLAZE: 8, ASH: 9, CHAR: 10, WAX: 11, WEATHERED: 12, REVEAL: 13 } as const
 interface Vertex { p: V3; n: V3; t: V2; kind: number; seed: number; wear: number; soot: number; lit: number; cast: boolean; fixed?: [number, number] }
 class Sink {
   v: Vertex[] = []
@@ -212,6 +212,28 @@ class Sink {
       })
       this.quad(pts[0]!, pts[1]!, pts[2]!, pts[3]!, n, uvs[0]!, uvs[1]!, uvs[2]!, uvs[3]!, kind, seed)
     }
+  }
+  /** A member of one convex section from a to b. The section is in metres
+   * along `side` and `up`; uv runs along the member first, so grain follows
+   * it. Edges listed in `hide` (by index from each point to the next) and the
+   * caps can be left out where the member meets masonry. */
+  extrude(a: V3, b: V3, side: V3, up: V3, section: V2[], kind: number, seed: number, hide: number[] = [], caps: [boolean, boolean] = [true, true]): void {
+    const at = (c: V3, q: V2): V3 => add(add(c, scale(side, q[0])), scale(up, q[1]))
+    const axis = unit(sub(b, a)), l = len(sub(b, a)), n = section.length
+    const cx = section.reduce((t, q) => t + q[0], 0) / n, cy = section.reduce((t, q) => t + q[1], 0) / n
+    let run = 0
+    for (let i = 0; i < n; i++) {
+      const p = section[i]!, q = section[(i + 1) % n]!, w = Math.hypot(q[0] - p[0], q[1] - p[1])
+      if (!hide.includes(i)) {
+        let e: V2 = [q[1] - p[1], p[0] - q[0]]
+        if (e[0] * ((p[0] + q[0]) / 2 - cx) + e[1] * ((p[1] + q[1]) / 2 - cy) < 0) e = [-e[0], -e[1]]
+        const normal = unit(add(scale(side, e[0]), scale(up, e[1])))
+        this.quad(at(a, p), at(b, p), at(b, q), at(a, q), normal, [0, run], [l, run], [l, run + w], [0, run + w], kind, seed)
+      }
+      run += w
+    }
+    for (const [k, c, nrm] of [[0, a, scale(axis, -1)], [1, b, axis]] as [number, V3, V3][])
+      if (caps[k]) this.poly(section.map(q => at(c, q)), nrm, p => [dot(sub(p, c), side), dot(sub(p, c), up)], kind, seed)
   }
 }
 
@@ -294,8 +316,10 @@ function formFactor(p: V3, n: V3, polygon: V3[], normal: V3, steps: number): num
 export function hallView(id: 'great-hall' | 'great-hall-door', narrow: boolean): { eye: V3; at: V3; fov: number } {
   const eyeZ = FLOOR_Z + 1.62
   if (id === 'great-hall-door') {
-    const v = (linkDoorV[0] + linkDoorV[1]) / 2, e = fromUV(HALL_W + 1.25, v), a = fromUV(0, v - .35)
-    return { eye: [e[0], e[1], eyeZ], at: [a[0], a[1], FLOOR_Z + (narrow ? .95 : 1.3)], fov: narrow ? 74 : 52 }
+    // the wide eye stands at the passage's face of the partition, so the
+    // doorway's reveals take a narrow margin of the frame, not half of it
+    const v = (linkDoorV[0] + linkDoorV[1]) / 2, e = fromUV(HALL_W + (narrow ? 1.25 : .92), v), a = fromUV(0, v - .35)
+    return { eye: [e[0], e[1], eyeZ], at: [a[0], a[1], FLOOR_Z + (narrow ? 1.15 : 1.3)], fov: narrow ? 74 : 52 }
   }
   const u = (kitchenDoorU[0] + kitchenDoorU[1]) / 2, e = fromUV(u, -.26), a = fromUV(u + 1.1, HALL_D * .86)
   return { eye: [e[0], e[1], eyeZ], at: [a[0], a[1], FLOOR_Z + (narrow ? .8 : 1.15)], fov: narrow ? 78 : 58 }
@@ -322,6 +346,13 @@ const PASSAGE_DOOR: { corners: V3[]; inward: V3 } = (() => {
   const z0 = FLOOR_Z, z1 = FLOOR_Z + o.height_m
   return { corners: [at(o.from_m, z0), at(o.from_m + o.width_m, z0), at(o.from_m + o.width_m, z1), at(o.from_m, z1)], inward: [-d[1], d[0], 0] }
 })()
+/** the jambs of the passage's other side door, to the workshop */
+const WORKSHOP_JAMBS: V2[] = (() => {
+  const o = ENTRY_ROOM.openings.find(x => x.connects_to === 'workshop-reference')
+  if (!o) return []
+  const p = ENTRY_ROOM.polygon as V2[], a = p[1]!, b = p[2]!, l = Math.hypot(b[0] - a[0], b[1] - a[1])
+  return [o.from_m, o.from_m + o.width_m].map(t => [a[0] + (b[0] - a[0]) * t / l, a[1] + (b[1] - a[1]) * t / l] as V2)
+})()
 /** THE ENTRANCE PASSAGE'S LIGHT, baked once: what a point sees of the court
  * through the open door and the window beside it, and of the warm light the
  * great hall sends through the service passage's door. */
@@ -340,10 +371,30 @@ export function passageLight(at: V3, n: V3): [number, number] {
  * light of the hall arriving through the side door. `engineBounce`. */
 export function applyPassageLight(m: MeshStandardNodeMaterial, perPixel = true): void {
   const light = perPixel ? passageLightNode() : attribute('passage', 'vec2')
-  m.aoNode = clamp(light.x, 0, 1)
+  const corners = perPixel ? passageCorners() : float(1)
+  m.aoNode = clamp(light.x, 0, 1).mul(corners)
   const base = m.colorNode ?? vec3(.5, .5, .5)
-  m.emissiveNode = base.mul(vec3(1, .74, .52).mul(light.y.mul(.9)).add(vec3(.16, .14, .115).mul(light.x)))
+  m.emissiveNode = base.mul(vec3(1, .74, .52).mul(light.y.mul(.9)).add(vec3(.16, .14, .115).mul(light.x))).mul(corners)
   m.userData['engineBounce'] = true
+}
+/** THE PASSAGE'S CORNERS: where two of its faces meet, each hides half the
+ * other's view of the door, so a corner holds less of the court's light than
+ * an open face. Every face is weighed by how square it stands to the point's
+ * own. An engine term with the rest of the passage's light. */
+function passageCorners(): N {
+  const outline = ENTRY_ROOM.polygon as V2[], z0 = FLOOR_Z, z1 = FLOOR_Z + ENTRY_ROOM.height_m
+  const cx = outline.reduce((a, q) => a + q[0], 0) / outline.length, cy = outline.reduce((a, q) => a + q[1], 0) / outline.length
+  const Pw = positionWorld, Nw = normalWorldGeometry, north = Pw.z.negate()
+  const near = (dist: N, weight: N): N => float(1).sub(exp(dist.max(0).div(-.32)).mul(weight).mul(.42))
+  let occ: N = near(Pw.y.sub(z0), float(1).sub(Nw.y.abs())).mul(near(float(z1).sub(Pw.y), float(1).sub(Nw.y.abs())))
+  for (let i = 0; i < outline.length; i++) {
+    const a = outline[i]!, b = outline[(i + 1) % outline.length]!, l = Math.hypot(b[0] - a[0], b[1] - a[1])
+    let n: V2 = [-(b[1] - a[1]) / l, (b[0] - a[0]) / l]
+    if ((cx - a[0]) * n[0] + (cy - a[1]) * n[1] < 0) n = [-n[0], -n[1]]
+    const dist = Pw.x.sub(a[0]).mul(n[0]).add(north.sub(a[1]).mul(n[1]))
+    occ = occ.mul(near(dist, float(1).sub(Nw.x.mul(n[0]).sub(Nw.z.mul(n[1])).abs())))
+  }
+  return occ
 }
 /** The same light as `passageLight`, per point of the surface. */
 function passageLightNode(): N {
@@ -437,6 +488,67 @@ function formFactorNode(poly: V3[], front: V3): N {
     sum = sum.add(acos(clamp(a.dot(b), -.9999, .9999)).mul(Nw.dot(g.div(g.length().max(1e-6)))))
   }
   return sum.div(2 * Math.PI).max(0)
+}
+
+/** LIMEWASH OVER BRICK, as forty-six years leave it: the finish of the house's
+ * brick walls and partitions in three scales. Metres: the coats lie thicker
+ * and thinner in patches, and yellow unevenly. Decimetres: the brick's
+ * courses read through the wash, each brick its own tone, and where the wash
+ * has come away the brick and its joints are bare. Millimetres: the lime's
+ * own grain. The wear is densest at the foot (brooms, damp, splashes) and
+ * wherever `wear` says hands and shoulders pass. `T` is the surface's uv in
+ * metres (along the wall, height), `floorZ` the floor's height; every
+ * feature fades out before a pixel can hold less than a sixth of it. */
+export function limewashOverBrick(T: N, floorZ: number, base: N, seed: number, wear: N = float(0), o: { thin?: number; contrast?: number; tide?: number } = {}): { albedo: N; bare: N } {
+  const thinBias = o.thin ?? 0, k = o.contrast ?? 1
+  const rho = T.dFdx().length().max(T.dFdy().length()).max(1e-6)
+  const fade = (L: number): N => float(1).sub(smoothstep(L / 6, L / 2.5, rho))
+  const h = T.y.sub(floorZ)
+  // the bond: thin Loire bricks, 0.225 m with 10 mm joints, courses of 66 mm
+  const courseH = .066, brickL = .235, jw = .005
+  // each course set out by hand: its own offset, its joints not quite plumb
+  const row = floor(T.y.div(courseH)), fr = fract(T.y.div(courseH))
+  const rowShift = fract(row.mul(.5)).add(fract(row.mul(7.13).sin().mul(311.7)).sub(.5).mul(.3))
+  const bx = T.x.div(brickL).add(rowShift).add(mx_noise_float(vec3(T.x.mul(2.1), row.mul(.37), seed + 17)).mul(.06)), col = floor(bx), fc = fract(bx)
+  const id = fract(row.mul(12.9898).add(col.mul(78.233)).add(seed).sin().mul(43758.5453))
+  const d = min(fr.min(float(1).sub(fr)).mul(courseH), fc.min(float(1).sub(fc)).mul(brickL))
+  const joint = float(1).sub(smoothstep(rho.negate().add(jw), rho.add(jw), d)).mul(fade(.04))
+  const n = (sx: number, sy: number, k: number): N => mx_noise_float(vec3(T.x.div(sx), T.y.div(sy), seed + k))
+  const nL = n(1.3, .9, 0), nP = n(.55, .4, 5).mul(fade(.4)), nM = n(.16, .12, 3).mul(fade(.12)), nS = n(.03, .025, 7).mul(fade(.025)), nF = n(.006, .005, 11).mul(fade(.005))
+  // the foot: 1 at the floor, gone by knee height, its upper edge ragged
+  const foot = float(1).sub(smoothstep(.1, .8, h.add(nL.mul(.2)).add(nM.mul(.07))))
+  const thin = clamp(nL.mul(.45).add(.16 + thinBias).add(nP.mul(.25)).add(foot.mul(.4)).add(wear.mul(.12)), 0, 1)
+  // bare: a ragged band along the floor where brooms and damp have taken the
+  // wash, and here and there a larger scar where it has come away in a sheet
+  const band = float(1).sub(smoothstep(.04, .2, h.add(nM.mul(.1)).add(nS.mul(.035)).add(nL.mul(.05))))
+  const scar = smoothstep(.48, .56, nP.mul(.8).add(nM.mul(.2)).add(nS.mul(.05)).add(foot.mul(.12)))
+  const bare = max(band, scar).mul(fade(.06))
+  // the brick under it, each its own firing, and the mortar between
+  const brick = mix(vec3(.40, .17, .10), vec3(.29, .13, .10), smoothstep(.82, .9, id)).mul(id.sub(.5).mul(.34).add(1)).mul(nS.mul(.12).add(1))
+  const under = mix(brick, vec3(.50, .45, .38), joint)
+  // the coats: tone at three scales, yellowed in patches
+  const coat = base.mul(nL.mul(.12 * k).add(nP.mul(.07 * k)).add(nM.mul(.04 * k)).add(nS.mul(.035)).add(nF.mul(.045)).add(1))
+    .mul(mix(vec3(1, 1, 1), vec3(1.035, 1, .92), smoothstep(-.2, .4, nL)))
+  // through the wash: the brick's warmth where it is thin, each brick's tone,
+  // the joints a shade darker where the lime sits in them
+  const through = coat.mul(mix(vec3(1, 1, 1), vec3(1.10, .94, .86), thin.mul(.8)))
+    .mul(id.sub(.5).mul(thin.mul(.11).add(.018)).mul(fade(.06)).add(1))
+    .mul(float(1).sub(joint.mul(thin.mul(.08).add(.022))))
+  // a scar's edge: the wash's own thickness, a lighter lip
+  const washed = mix(through, under, bare.mul(.85))
+  // splashes and dirt at the foot; the grey of hands at the jambs
+  const grime = foot.mul(nM.mul(.35).add(.65)).mul(.13).add(wear.mul(nS.mul(.3).add(.7)).mul(.16))
+  // the damp the wall draws up from the ground: a greyed zone to a wavering
+  // height, its salts left as a darker tide line along the top
+  const tideH = nL.mul(.12).add(nM.mul(.05)).add(o.tide ?? .34)
+  const damp = float(1).sub(smoothstep(tideH.sub(.14), tideH, h))
+  const tide = exp(h.sub(tideH).div(.022).pow(2).negate()).mul(fade(.05))
+  // knocks and rubs from things carried past, long and low
+  const scuff = smoothstep(.5, .78, mx_noise_float(vec3(T.x.div(.42), T.y.div(.035), seed + 13))).mul(fade(.035))
+    .mul(smoothstep(.22, .4, h)).mul(float(1).sub(smoothstep(.9, 1.25, h)))
+  const aged = mix(washed, washed.mul(vec3(.78, .76, .74)), grime.min(1).mul(1.8).min(1)).mul(float(1).sub(grime.mul(.35)))
+    .mul(mix(vec3(1, 1, 1), vec3(1 - .2 * k, 1 - .19 * k, 1 - .22 * k), damp.mul(float(1).sub(bare)))).mul(float(1).sub(tide.mul(.14 * k)).sub(scuff.mul(.09 * k)))
+  return { albedo: aged, bare }
 }
 
 export const houseHallProvenance = {
@@ -573,6 +685,21 @@ function flatFloor(s: Sink, outline: V2[], z: number, cell: number): void {
   }
 }
 
+/** A floor of square tiles on their lime bed, laid along the room's walls,
+ * as the passages are paved. */
+function squareFloor(s: Sink, outline: V2[], z: number): void {
+  // the edge tiles run a hand under the linings, so no joint opens at a wall
+  const room = inset(outline.map(toUV), -.01)
+  s.poly(room.map(q => P(q[0], q[1], z - .006)), [0, 0, 1], p => toUV([p[0], p[1]]), K.JOINT, .6)
+  const pitch = TILE_M + JOINT_M, us = room.map(q => q[0]), vs = room.map(q => q[1])
+  const u0 = Math.min(...us), u1 = Math.max(...us), v0 = Math.min(...vs), v1 = Math.max(...vs)
+  for (let i = 0; u0 + i * pitch < u1; i++) for (let j = 0; v0 + j * pitch < v1; j++) {
+    const a = u0 + i * pitch + JOINT_M / 2, b = v0 + j * pitch + JOINT_M / 2
+    const c = clipConvex([[a, b], [a + TILE_M, b], [a + TILE_M, b + TILE_M], [a, b + TILE_M]], room)
+    if (c.length >= 3 && Math.abs(signedArea(c)) > TILE_M * TILE_M * .12) tile(s, c, z, rand(i, j, 5.9))
+  }
+}
+
 /** The tiled floor: a square border row and the diagonal field, each tile a
  * low prism with a worn arris, standing on its lime bed. */
 function tiledFloor(s: Sink, outline: V2[], z: number): void {
@@ -621,7 +748,7 @@ function tile(s: Sink, poly: V2[], z: number, seed: number): void {
   const c: V2 = [poly.reduce((a, p) => a + p[0], 0) / n, poly.reduce((a, p) => a + p[1], 0) / n]
   // none is laid under the hearthstone
   const hs = HEARTH.width / 2 + .05 + .16, hd = HEARTH.depth + .42 + .012 + .16
-  if (c[0] > HALL_W - hd && Math.abs(c[1] - HEARTH.v) < hs) return
+  if (c[0] > HALL_W - hd && c[0] < HALL_W && Math.abs(c[1] - HEARTH.v) < hs) return
   const top = z + (rand(seed, 1) - .6) * .0016
   const tiltU = (rand(seed, 2) - .5) * .006, tiltV = (rand(seed, 3) - .5) * .006
   const h = (q: V2): number => top + (q[0] - c[0]) * tiltU + (q[1] - c[1]) * tiltV
@@ -659,15 +786,26 @@ function ceiling(s: Sink): void {
     const cA = P(u, (v0 + v1) / 2, CEIL_Z + JOIST_D / 2 + sag)
     s.box(cA, [U[0] * JOIST_W / 2, U[1] * JOIST_W / 2, 0], [V[0] * (v1 - v0) / 2, V[1] * (v1 - v0) / 2, 0], [0, 0, JOIST_D / 2], K.OAK, seed, '+z+y-y')
   }
-  // the main beam, across the joists at mid-span
-  const MB_W = .34, MB_D = .38, vm = HALL_D / 2
+  // the main beam, across the joists near mid-span, set off the chimney: a
+  // beam bears on plain wall, never on the hood or into the flue's masonry
+  const MB_W = .34, MB_D = .38, vm = mainBeamV()
   s.box(P(HALL_W / 2, vm, CEIL_Z - MB_D / 2), [U[0] * HALL_W / 2, U[1] * HALL_W / 2, 0], [V[0] * MB_W / 2, V[1] * MB_W / 2, 0], [0, 0, MB_D / 2], K.OAK, 7.7, '+z+x-x')
-  // its two corbels, stepped tuffeau blocks built into the walls
+  // its two corbels: one tuffeau block each, cut in a quarter round below a
+  // fillet and tailed into the wall
+  const D = .30, H = .44, f = .07, tail = .03
+  const section: V2[] = [[-tail, 0], [D, 0], [D, -f]]
+  for (let k = 1; k < 7; k++) { const t = k / 7 * Math.PI / 2; section.push([D * Math.cos(t), -f - (H - f) * Math.sin(t)]) }
+  section.push([0, -H], [-tail, -H])
   for (const [u, dirU] of [[0, 1], [HALL_W, -1]] as [number, number][]) {
-    for (const [depth, height, zTop] of [[.34, .22, CEIL_Z - MB_D], [.22, .18, CEIL_Z - MB_D - .22]] as [number, number, number][]) {
-      s.box(P(u + dirU * depth / 2, vm, zTop - height / 2), [U[0] * depth / 2, U[1] * depth / 2, 0], [V[0] * (MB_W + .06) / 2, V[1] * (MB_W + .06) / 2, 0], [0, 0, height / 2], K.STONE, 11 + u, dirU > 0 ? '-x' : '+x')
-    }
+    const w = (MB_W + .06) / 2, side: V3 = [U[0] * dirU, U[1] * dirU, 0]
+    s.extrude(P(u, vm - w, CEIL_Z - MB_D), P(u, vm + w, CEIL_Z - MB_D), side, [0, 0, 1], section, K.STONE, 11 + u, [0, section.length - 2, section.length - 1])
   }
+}
+/** Where the main beam crosses: mid-span, unless that lands its corbel within
+ * a hand's breadth and more of the chimneypiece's shelf. */
+function mainBeamV(): number {
+  const shelfEnd = HEARTH.v - HEARTH.width / 2 - .06
+  return Math.min(HALL_D / 2, shelfEnd - .45 - (.34 + .06) / 2)
 }
 
 /** WHERE FEET HAVE GONE for forty-six years: from each door to the table's
@@ -831,15 +969,57 @@ function boxChair(s: Sink): void {
   cbox(-W / 2 + st, W / 2 - st, D / 2 - st, D / 2, seat + .22, seat + .27, K.WAX, 136)
 }
 /** A STOOL OF THE PERIOD, to V&A 968-1897 (oak, Normandy, late fifteenth
- * century, 0.455 m): a board on two slab ends with an apron. */
+ * century, 0.455 m): a board stool, joined. A top with its upper arrises
+ * chamfered on two splayed slab ends, each cut with a round arch between its
+ * feet, tied under the top by two aprons whose tenons run through the ends
+ * and are wedged outside. */
 function stool(s: Sink, u: number, v: number, turn: number, seed: number): void {
   const ca = Math.cos(turn), sa = Math.sin(turn)
-  const X: V2 = [U[0] * ca + V[0] * sa, U[1] * ca + V[1] * sa], Y: V2 = [-U[0] * sa + V[0] * ca, -U[1] * sa + V[1] * ca]
-  const at = (x: number, y: number, z: number): V3 => { const q = fromUV(u, v); return [q[0] + X[0] * x + Y[0] * y, q[1] + X[1] * x + Y[1] * y, FLOOR_Z + z] }
-  const b = (x: number, y: number, z: number, hx: number, hy: number, hz: number): void => s.box(at(x, y, z), [X[0] * hx, X[1] * hx, 0], [Y[0] * hy, Y[1] * hy, 0], [0, 0, hz], K.WAX, seed)
-  b(0, 0, .435, .21, .14, .02)
-  for (const x of [-.15, .15]) { b(x, -.07, .2, .018, .045, .2); b(x, .07, .2, .018, .045, .2); b(x, 0, .3, .018, .12, .09) }
-  for (const y of [-.12, .12]) b(0, y, .37, .17, .012, .035)
+  const X: V3 = [U[0] * ca + V[0] * sa, U[1] * ca + V[1] * sa, 0], Y: V3 = [-U[0] * sa + V[0] * ca, -U[1] * sa + V[1] * ca, 0], Z: V3 = [0, 0, 1]
+  const o = fromUV(u, v)
+  const at = (x: number, y: number, z: number): V3 => add(add(add([o[0], o[1], FLOOR_Z], scale(X, x)), scale(Y, y)), scale(Z, z))
+  const H = .455, topT = .032, L = .46, W = .28, ch = .01
+  // the top
+  s.extrude(at(-L / 2, 0, H - topT), at(L / 2, 0, H - topT), Y, Z, [[-W / 2, 0], [W / 2, 0], [W / 2, topT - ch], [W / 2 - ch, topT], [-W / 2 + ch, topT], [-W / 2, topT - ch]], K.WAX, seed)
+  // the two ends, leaning out a tenth toward their feet
+  const splay = .1, th = .03, endTop = H - topT, inset = .17, halfTop = .105, halfFoot = .128, archR = .07, archH = .105
+  const aprons: [number, number] = [endTop - .085, endTop]
+  for (const sign of [-1, 1]) {
+    const mid = (z: number): number => sign * (inset + (endTop - z) * splay)
+    const half = (z: number): number => halfFoot + (halfTop - halfFoot) * z / endTop
+    const Pt = (xn: number, z: number, t: number): V3 => at(mid(z) + t * sign, xn * half(z), z)
+    const bottom = (xn: number): number => { const r = archR / halfFoot, a = Math.abs(xn) / r; return a < 1 ? archH * Math.sqrt(1 - a * a) : 0 }
+    const out = unit(add(scale(X, sign), scale(Z, splay))), inw = scale(out, -1)
+    const cols = [-1, -.8, -.6]
+    for (let k = 0; k <= 10; k++) cols.push(-archR / halfFoot + 2 * archR / halfFoot * k / 10)
+    cols.push(.6, .8, 1)
+    for (let i = 0; i < cols.length - 1; i++) {
+      const a = cols[i]!, b = cols[i + 1]!, za = bottom(a), zb = bottom(b)
+      for (const [t, n] of [[th / 2, out], [-th / 2, inw]] as [number, V3][])
+        s.quad(Pt(a, za, t), Pt(b, zb, t), Pt(b, endTop, t), Pt(a, endTop, t), n, [za, a * .12], [zb, b * .12], [endTop, b * .12], [endTop, a * .12], K.WAX, seed + .1)
+      // the arch's cut face, where there is one
+      if (za > 1e-4 || zb > 1e-4) {
+        const e = sub(Pt(b, zb, 0), Pt(a, za, 0)), n = unit(cross(e, out))
+        s.quad(Pt(a, za, th / 2), Pt(b, zb, th / 2), Pt(b, zb, -th / 2), Pt(a, za, -th / 2), n[2] < 0 ? n : scale(n, -1), [0, 0], [1, 0], [1, th], [0, th], K.WAX, seed + .2)
+      }
+    }
+    // the ends' edges
+    for (const xn of [-1, 1]) {
+      const e = sub(Pt(xn, endTop, 0), Pt(xn, 0, 0)), n0 = unit(cross(e, out)), side = dot(n0, Y) * xn > 0 ? n0 : scale(n0, -1)
+      s.quad(Pt(xn, 0, th / 2), Pt(xn, endTop, th / 2), Pt(xn, endTop, -th / 2), Pt(xn, 0, -th / 2), side, [0, 0], [endTop, 0], [endTop, th], [0, th], K.WAX, seed + .3)
+    }
+    // the aprons' tenons come through here, a wedge driven in each
+    for (const y of [-1, 1]) {
+      const yc = y * (W / 2 - .045), zc = (aprons[0] + aprons[1]) / 2, x0 = mid(zc) + sign * th / 2
+      s.box(at(x0 + sign * .012, yc, zc), scale(X, .012), scale(Y, .009), scale(Z, .03), K.WAX, seed + .4)
+      s.box(at(x0 + sign * .02, yc, zc), scale(X, .005), scale(Y, .012), scale(Z, .006), K.WAX, seed + .5)
+    }
+  }
+  // the aprons, between the ends, their lower edge eased
+  for (const y of [-1, 1]) {
+    const yc = y * (W / 2 - .045), xa = inset + (endTop - (aprons[0] + aprons[1]) / 2) * splay
+    s.extrude(at(-xa, yc, aprons[0]), at(xa, yc, aprons[0]), Y, Z, [[-.009, .012], [-.005, 0], [.005, 0], [.009, .012], [.009, aprons[1] - aprons[0] - .001], [-.009, aprons[1] - aprons[0] - .001]], K.WAX, seed + .6, [4], [false, false])
+  }
 }
 /** A BRASS CANDLESTICK OF THE PERIOD, after V&A M.435-1926 (Flemish, late
  * fifteenth to early sixteenth century): a spreading foot, a stem of five
@@ -896,7 +1076,8 @@ function hearth(s: Sink, hero: boolean): void {
     const x0 = side < 0 ? -W2 : open, x1 = side < 0 ? -open : W2
     box(x0 - .025, x1 + .025, 0, depth + .03, .028, .17, K.STONE, 52, '-z')
     s.soot = .18
-    box(x0, x1, 0, depth, .17, jambTop - .16, K.STONE, 53, '-z+z')
+    // the face toward the fire is the brick cheek's, which lines the jamb
+    box(x0, x1, 0, depth, .17, jambTop - .16, K.STONE, 53, side < 0 ? '-z+z+x' : '-z+z-x')
     s.soot = 0
     box(x0 - .02, x1 + .02, 0, depth + .035, jambTop - .16, jambTop - .07, K.STONE, 54, '-z')
     box(x0 - .04, x1 + .04, 0, depth + .06, jambTop - .07, jambTop, K.STONE, 55, '-z')
@@ -904,7 +1085,8 @@ function hearth(s: Sink, hero: boolean): void {
   // the lintel, its lower front arris taken off in a broad chamfer
   const ch = .07
   s.soot = .55
-  box(-W2, W2, 0, depth - ch, jambTop, jambTop + ch, K.STONE, 56, '+z+x-x')
+  // its soffit over the opening is the throat's, drawn below with the firebox
+  box(-W2, W2, 0, depth - ch, jambTop, jambTop + ch, K.STONE, 56, '+z+x-x-z')
   s.soot = .2
   box(-W2, W2, 0, depth, jambTop + ch, lintelTop, K.STONE, 56, '-z')
   s.soot = 0
@@ -943,7 +1125,7 @@ function hearth(s: Sink, hero: boolean): void {
     s.quad(p0, p1, p2, p3, [X[0] * -side, X[1] * -side, 0], [0, 0], [depth, 0], [depth, jambTop], [0, jambTop], K.BRICK, 62)
   }
   s.soot = .95
-  s.quad(L(-open, back, jambTop), L(open, back, jambTop), L(open, depth - .02, jambTop), L(-open, depth - .02, jambTop), [0, 0, -1], [0, 0], [1, 0], [1, 1], [0, 1], K.BRICK, 63)
+  s.quad(L(-open, back, jambTop), L(open, back, jambTop), L(open, depth - ch, jambTop), L(-open, depth - ch, jambTop), [0, 0, -1], [0, 0], [1, 0], [1, 1], [0, 1], K.BRICK, 63)
   s.soot = 0
   // the banked fire: an ash bed, two charred ends on the andirons
   const ash: V2[] = []
@@ -1031,14 +1213,18 @@ function doorReveal(s: Sink, to: 'kitchen' | 'service-link'): void {
   const P3 = (p: V2, z: number): V3 => [p[0], p[1], z]
   const n = (x: V2): V3 => [x[0], x[1], 0]
   const seed = 31 + (to === 'kitchen' ? 0 : 1)
+  // the service passage's doorway takes the light the hall sends through it,
+  // strongest at the hall's face and falling off into the passage
+  const lit = s.lit, cheek = to === 'service-link' ? K.REVEAL : K.PLASTER
+  if (to === 'service-link') s.lit = 0
   // cheeks face each other across the opening, limewashed like the walls
-  s.quad(P3(a, z0), P3(far(a), z0), P3(far(a), z1), P3(a, z1), n(dir), [0, z0], [depth, z0], [depth, z1], [0, z1], K.PLASTER, seed)
-  s.quad(P3(far(b), z0), P3(b, z0), P3(b, z1), P3(far(b), z1), n([-dir[0], -dir[1]]), [0, z0], [depth, z0], [depth, z1], [0, z1], K.PLASTER, seed)
-  // soffit, under an oak lintel's face
-  s.quad(P3(a, z1), P3(far(a), z1), P3(far(b), z1), P3(b, z1), [0, 0, -1], [0, 0], [depth, 0], [depth, 1], [0, 1], K.OAK, seed)
+  s.quad(P3(a, z0), P3(far(a), z0), P3(far(a), z1), P3(a, z1), n(dir), [0, z0], [depth, z0], [depth, z1], [0, z1], cheek, seed)
+  s.quad(P3(far(b), z0), P3(b, z0), P3(b, z1), P3(far(b), z1), n([-dir[0], -dir[1]]), [0, z0], [depth, z0], [depth, z1], [0, z1], cheek, seed)
+  s.lit = lit
+  // soffit, under an oak lintel's face, its grain across the opening
+  s.quad(P3(a, z1), P3(far(a), z1), P3(far(b), z1), P3(b, z1), [0, 0, -1], [0, 0], [0, depth], [hall.width_m, depth], [hall.width_m, 0], K.OAK, seed)
   // threshold, a worn tuffeau slab; the sun's patch ends at the wall's line,
   // so the slab takes the passage's light, not the key's
-  const lit = s.lit
   s.lit = 0
   s.quad(P3(a, z0 + .004), P3(b, z0 + .004), P3(far(b), z0 + .004), P3(far(a), z0 + .004), [0, 0, 1], [0, 0], [1, 0], [1, depth], [0, depth], K.STONE, seed + .5)
   s.lit = lit
@@ -1193,7 +1379,8 @@ function dustBeams(): Mesh | null {
 function buildLink(s: Sink, hero: boolean): void {
   s.lit = 0
   const room = LINK_OUTLINE
-  flatFloor(s, room, FLOOR_Z, hero ? .45 : .9)
+  if (hero) squareFloor(s, room, FLOOR_Z)
+  else flatFloor(s, room, FLOOR_Z, .9)
   const cell = hero ? .4 : .9
   for (let e = 0; e < room.length; e++) {
     const a = room[e]!, b = room[(e + 1) % room.length]!
@@ -1208,6 +1395,10 @@ function buildLink(s: Sink, hero: boolean): void {
     }
     lining(s, a, b, FLOOR_Z, BOARD_Z, holes, cell, K.PLASTER, .71)
   }
+  // THE SIDE DOOR FROM THE ENTRANCE: its opening runs on through the space
+  // between the entrance's partition and this passage's own face, so it takes
+  // cheeks, a soffit and a threshold of its own, like the hall's doorway
+  sideDoorReveal(s)
   // ceiling boards and joists across the passage's short span
   s.cast = true
   const flat = room
@@ -1224,6 +1415,34 @@ function buildLink(s: Sink, hero: boolean): void {
   }
   s.cast = false
   s.lit = 1
+}
+
+function sideDoorReveal(s: Sink): void {
+  const [c0, c1] = [PASSAGE_DOOR.corners[0]!, PASSAGE_DOOR.corners[1]!]
+  const out: V2 = [-PASSAGE_DOOR.inward[0], -PASSAGE_DOOR.inward[1]]
+  // from the entrance partition's far face to the passage's own lining, the
+  // edge of its outline that runs along the door, nearest it
+  const wallT = .25
+  const faces = LINK_OUTLINE.map((q, i) => [q, LINK_OUTLINE[(i + 1) % LINK_OUTLINE.length]!] as [V2, V2])
+    .filter(([q, b]) => Math.abs((b[0] - q[0]) * out[0] + (b[1] - q[1]) * out[1]) < .05 * Math.hypot(b[0] - q[0], b[1] - q[1]))
+    .map(([q]) => (q[0] - c0[0]) * out[0] + (q[1] - c0[1]) * out[1]).filter(d => d > 0)
+  if (!faces.length) return
+  const d0 = wallT + .002, d1 = Math.min(...faces)
+  if (d1 - d0 < .02) return
+  const at = (c: V3, d: number, z: number): V3 => [c[0] + out[0] * d, c[1] + out[1] * d, z]
+  const along: V2 = (() => { const l = Math.hypot(c1[0] - c0[0], c1[1] - c0[1]); return [(c1[0] - c0[0]) / l, (c1[1] - c0[1]) / l] })()
+  const z0 = FLOOR_Z, z1 = PASSAGE_DOOR.corners[2]![2]
+  const lit = s.lit
+  s.lit = 0
+  // cheeks, facing each other across the opening
+  s.quad(at(c0, d0, z0), at(c0, d1, z0), at(c0, d1, z1), at(c0, d0, z1), [along[0], along[1], 0], [d0, z0], [d1, z0], [d1, z1], [d0, z1], K.REVEAL, 33)
+  s.quad(at(c1, d1, z0), at(c1, d0, z0), at(c1, d0, z1), at(c1, d1, z1), [-along[0], -along[1], 0], [d1, z0], [d0, z0], [d0, z1], [d1, z1], K.REVEAL, 33)
+  // soffit, an oak lintel's face, its grain across the opening
+  const w = Math.hypot(c1[0] - c0[0], c1[1] - c0[1])
+  s.quad(at(c0, d0, z1), at(c1, d0, z1), at(c1, d1, z1), at(c0, d1, z1), [0, 0, -1], [0, d0], [w, d0], [w, d1], [0, d1], K.OAK, 33)
+  // threshold, a worn tuffeau slab from the entrance's floor to the passage's
+  s.quad(at(c0, 0, z0 + .004), at(c1, 0, z0 + .004), at(c1, d1, z0 + .004), at(c0, d1, z0 + .004), [0, 0, 1], [0, 0], [w, 0], [w, d1], [0, d1], K.STONE, 33.5)
+  s.lit = lit
 }
 
 /* ---- the bake ---- */
@@ -1244,15 +1463,25 @@ function bakePoint(at: V3, n: V3, hall: boolean): [number, number] {
     bounce += ROOM_FILL
   } else {
     // the passage sees the hall's sunlit threshold through the hall door
-    const f = formFactor(at, n, linkDoorAp, [U[0], U[1], 0], 2)
-    bounce += f * 2.2
-    sky += f * .3
+    const f = formFactor(at, n, linkDoorAp, [U[0], U[1], 0], 2), g = formFactor(at, n, PASSAGE_DOOR.corners, [-U[0], -U[1], 0], 2)
+    bounce += f * LINK_DOOR_GAIN + g * LINK_SIDE_GAIN + LINK_FILL
+    sky += f * .3 + g * .2 + .02
   }
   return [Math.min(1, .02 + sky * 2.4), bounce]
 }
 /** The room's second bounce, in the patches' own units: what a surface
  * receives from the lit walls and ceiling rather than from the floor. */
 const ROOM_FILL = .05
+/** THE SERVICE PASSAGE'S LIGHT, in the same units: the hall seen through its
+ * door is the room's average, about a sun patch's brightness where the patch
+ * is in view and less where it is not; the entrance passage through the side
+ * door is a dim court's return; and the passage's own faces send back a
+ * little of both, so no face of it stands in the dark. */
+const LINK_DOOR_GAIN = 1.1, LINK_SIDE_GAIN = .45, LINK_FILL = .05
+/** A cheek of the hall's doorway sees the room only at a graze and only its
+ * dim near part, never the sun's patches deep in it: a fraction of what the
+ * door sends into the passage. */
+const REVEAL_GAIN = .2
 
 function bake(s: Sink, cast: boolean): BufferGeometry {
   const positions: number[] = [], normals: number[] = [], uvs: number[] = [], a: number[] = [], b: number[] = []
@@ -1326,10 +1555,32 @@ function windowShade(): N {
 
 /* ---- the material ---- */
 
+/** A world point in the hall's own frame (u, v), in the shader. */
+function hallUVNode(Wp: N): [N, N] {
+  const e = Wp.x.sub(SW[0]), nn = Wp.z.negate().sub(SW[1])
+  return [e.mul(U[0]).add(nn.mul(U[1])), e.mul(V[0]).add(nn.mul(V[1]))]
+}
+/** Where hands and shoulders have rubbed the wash: the jambs of the hall's
+ * two doors on both faces of their partitions, and of the service passage's
+ * door from the entrance, from knee to above the head. */
+export function doorWear(Wp: N): N {
+  const jambs: V2[] = [fromUV(kitchenDoorU[0], 0), fromUV(kitchenDoorU[1], 0), fromUV(kitchenDoorU[0], -.55), fromUV(kitchenDoorU[1], -.55),
+    fromUV(HALL_W, linkDoorV[0]), fromUV(HALL_W, linkDoorV[1]), fromUV(HALL_W + .75, linkDoorV[0]), fromUV(HALL_W + .75, linkDoorV[1]),
+    [PASSAGE_DOOR.corners[0]![0], PASSAGE_DOOR.corners[0]![1]], [PASSAGE_DOOR.corners[1]![0], PASSAGE_DOOR.corners[1]![1]], ...WORKSHOP_JAMBS]
+  let w: N = float(0)
+  for (const j of jambs) {
+    const d = vec2(Wp.x.sub(j[0]), Wp.z.add(j[1])).length()
+    w = max(w, float(1).sub(smoothstep(.12, .7, d)))
+  }
+  const h = Wp.y.sub(FLOOR_Z)
+  return w.mul(smoothstep(.4, .9, h)).mul(float(1).sub(smoothstep(1.7, 2.2, h)))
+}
+
 function hallMaterial(perPixel: boolean, library?: MaterialLibrary): MeshStandardNodeMaterial {
   const m = new MeshStandardNodeMaterial({ metalness: 0, roughness: .85 })
   const A = attribute('hallA', 'vec4'), B = attribute('hallB', 'vec4')
   const kind = A.x, seed = A.w, wear = B.x, soot = B.y, lit = B.z, inHallShade = B.w
+  const is = (k: number): N => float(1).sub(smoothstep(.2, .45, kind.sub(k).abs()))
   let ambient: N = A.y, bounce: N = A.z, westSky: N = A.y.mul(.6)
   if (perPixel) {
     // the same light as the vertex bake, per point: the hall's windows and
@@ -1343,14 +1594,14 @@ function hallMaterial(perPixel: boolean, library?: MaterialLibrary): MeshStandar
     }
     for (const patch of PATCHES) sun = sun.add(formFactorNode(patch, add(patch[0]!, [0, 0, 1.5])))
     const linkCentre: V3 = [LINK_OUTLINE.reduce((a, q) => a + q[0], 0) / 4, LINK_OUTLINE.reduce((a, q) => a + q[1], 0) / 4, FLOOR_Z + 1.5]
-    const door = formFactorNode(linkDoorAp, linkCentre)
+    const side = formFactorNode(PASSAGE_DOOR.corners, linkCentre)
+    const door = formFactorNode(linkDoorAp, linkCentre).mul(mix(float(1), float(REVEAL_GAIN), is(K.REVEAL)))
     const entrance = passageLightNode()
     const isLink = float(1).sub(lit), isEntrance = lit.mul(float(1).sub(inHallShade))
-    ambient = min(float(1), sky.mul(2.4).add(.02)).mul(inHallShade).add(door.mul(.3 * 2.4).add(.02).mul(isLink)).add(entrance.x.mul(isEntrance))
+    ambient = min(float(1), sky.mul(2.4).add(.02)).mul(inHallShade).add(door.mul(.3 * 2.4).add(side.mul(.2 * 2.4)).add(.07).mul(isLink)).add(entrance.x.mul(isEntrance))
     westSky = westSky.mul(2.4).mul(inHallShade)
-    bounce = sun.mul(inHallShade).add(door.mul(2.2).mul(isLink)).add(entrance.y.mul(3.2).mul(isEntrance))
+    bounce = sun.mul(inHallShade).add(door.mul(LINK_DOOR_GAIN).add(side.mul(LINK_SIDE_GAIN)).add(LINK_FILL).mul(isLink)).add(entrance.y.mul(3.2).mul(isEntrance))
   }
-  const is = (k: number): N => float(1).sub(smoothstep(.2, .45, kind.sub(k).abs()))
   const Wp = positionWorld, T = uv()
   // along the passage wall, in metres: what the hearth's courses run along
   const alongWall = Wp.x.mul(V[0]).sub(Wp.z.mul(V[1]))
@@ -1363,14 +1614,15 @@ function hallMaterial(perPixel: boolean, library?: MaterialLibrary): MeshStandar
   const joint = vec3(.19, .165, .13).mul(mx_noise_float(Wp.mul(9)).mul(.12).add(1))
   // limewash: a broad wash, a trowel's drag, the brick's courses ghosting
   // through, the smoke of forty-six winters darkening its upper reach
-  const wash = mx_noise_float(vec3(Wp.x.mul(1.4), Wp.y.mul(1.1), Wp.z.mul(1.4))).mul(.06)
-  const trowel = mx_noise_float(vec3(Wp.x.mul(11), Wp.y.mul(4), Wp.z.mul(11))).mul(.025)
-  const course = smoothstep(.40, .5, fract(Wp.y.div(.068)).sub(.5).abs()).mul(.018)
-  const age = smoothstep(2.6, 4.2, Wp.y).mul(.10).add(float(1).sub(smoothstep(.8, 1.6, Wp.y)).mul(.06))
-  const plaster = vec3(.60, .55, .46).mul(wash.add(trowel).sub(course).add(1)).mul(float(1).sub(age))
+  // the smoke gathers under the boards and climbs over the hearth; hands and
+  // shoulders wear the wash at the doors' jambs
+  const [hu, hv] = hallUVNode(Wp)
+  const overHearth = float(1).sub(smoothstep(.2, 1.2, float(HALL_W).sub(hu).abs())).mul(float(1).sub(smoothstep(HEARTH.width * .4, HEARTH.width * .8, hv.sub(HEARTH.v).abs())))
+  const age = smoothstep(FLOOR_Z + 2.1, FLOOR_Z + 3.3, Wp.y).mul(float(.11).add(overHearth.mul(.16)))
+  const plaster = limewashOverBrick(T, FLOOR_Z, vec3(.60, .55, .46), 1.7, doorWear(Wp)).albedo.mul(float(1).sub(age))
   // oak: grain along the member
   const grain = mx_noise_float(vec3(T.x.mul(2.2), T.y.mul(38), seed.mul(13))).mul(.14).add(mx_noise_float(vec3(T.x.mul(9), T.y.mul(120), seed)).mul(.05))
-  const oak = vec3(.108, .066, .038).mul(grain.add(1)).mul(fract(seed.mul(7.31)).mul(.18).add(.91))
+  const oak = vec3(.125, .078, .045).mul(grain.add(1)).mul(fract(seed.mul(7.31)).mul(.18).add(.91))
   // tuffeau in ashlar courses of about 0.30 m, each block its own cream
   const courseN = floor(Wp.y.div(.30)), inCourse = fract(Wp.y.div(.30))
   const blockN = floor(alongWall.div(.46).add(courseN.mul(.5)))
@@ -1402,7 +1654,7 @@ function hallMaterial(perPixel: boolean, library?: MaterialLibrary): MeshStandar
   const glaze = mix(vec3(.030, .075, .024), vec3(.045, .10, .035), mx_noise_float(Wp.mul(35)).mul(.5).add(.5))
   // oak the weather has silvered, its grain opened
   const silvered = vec3(.20, .175, .145).mul(grain.mul(2.2).add(1)).mul(mx_noise_float(vec3(Wp.y.mul(.8), seed.mul(5.1), 1.7)).mul(.16).add(1)).mul(fract(seed.mul(9.13)).mul(.22).add(.86))
-  const clean = silvered.mul(is(K.WEATHERED)).add(wax.mul(is(K.WAX))).add(brass.mul(is(K.BRASS))).add(glaze.mul(is(K.GLAZE))).add(tileColour.mul(is(K.TILE))).add(joint.mul(is(K.JOINT))).add(plaster.mul(is(K.PLASTER))).add(oak.mul(is(K.OAK)))
+  const clean = silvered.mul(is(K.WEATHERED)).add(wax.mul(is(K.WAX))).add(brass.mul(is(K.BRASS))).add(glaze.mul(is(K.GLAZE))).add(tileColour.mul(is(K.TILE))).add(joint.mul(is(K.JOINT))).add(plaster.mul(is(K.PLASTER).add(is(K.REVEAL)))).add(oak.mul(is(K.OAK)))
     .add(tuffJ.mul(is(K.STONE))).add(brick.mul(is(K.BRICK))).add(iron.mul(is(K.IRON))).add(ashC.mul(is(K.ASH))).add(charC.mul(is(K.CHAR)))
   // soot: carried by the surface, gathered in blotches and rising streaks
   const sootField = soot.mul(mx_noise_float(vec3(Wp.x.mul(3), Wp.y.mul(1.2), Wp.z.mul(3))).mul(.35).add(.8)).clamp(0, 1)
