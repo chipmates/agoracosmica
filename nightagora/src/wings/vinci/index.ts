@@ -1476,6 +1476,15 @@ export function createWing():VinciWingModule {
     const row=strip?.element.getBoundingClientRect()
     return row&&row.height>0?row.top:deskStageHeight()
   }
+  /** THE BAND EVERY WINDOW KEEPS. A window wider than the picture crops its
+   * top and foot, down to 21:9, and the old chrome's row held every mark
+   * above that crop's foot. Where the desktop's chrome stands, a mark's
+   * whole target stays inside what that crop keeps. */
+  function markSafeFoot():number {
+    if(!desk)return 0
+    const height=deskStageHeight(), kept=Math.min(height,innerWidth/(21/9))
+    return Math.ceil((height-kept)/2)+22
+  }
   /** THE ROW UNDER THE CARD. It stands wherever a station holds more than
    * one exhibit: docked under the station card on the wide stage, above the
    * bar on the narrow one, and down while a card covers that row. */
@@ -2691,7 +2700,7 @@ export function createWing():VinciWingModule {
       // THE MARKS STAND ABOVE WHAT THE FOOT OF THE FRAME CARRIES. At a
       // viewing eye a work fills the frame and its own mark hangs under it,
       // so the reserve is the row's own top edge and not a fixed band.
-      dots?.setFoot(Math.max(0,deskStageHeight()-markFloor()+12))
+      dots?.setFoot(Math.max(0,deskStageHeight()-markFloor()+12,markSafeFoot()))
       dots?.setLimit(closeLook?.id?0:onWallStop()?3:DOTS_PER_TIER[hosts.world.stack.tierName()]??6)
       dots?.update(panels)},
     stop(){desk?.dispose();desk=undefined;visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;life?.dispose();life=undefined;lifeControl?.remove();lifeControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;house=undefined;houseUp=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
