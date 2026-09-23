@@ -18572,7 +18572,8 @@
     "identification": "[folio] CA6r, Ambrosiana. The digital edition marks the sheet as without writing.",
     "sheet_vs_reconstruction": [
       "[sheet-description] Helical water-raising tubes occur among different pumps on the sheet.",
-      "[geometry] This original procedural screw selects a2.4 m helical tube axis, six turns and direct manual drive. It does not reproduce a museum model. [galileo]1068v is a separate attempted self-powered system."
+      "[geometry] This original procedural screw selects a2.4 m helical tube axis, six turns and direct manual drive. It does not reproduce a museum model. [galileo]1068v is a separate attempted self-powered system.",
+      "[folio] The sheet draws the tube wound close round a thick round core. [ancient] The core, its hooped ends with iron pivots, and the frame of posts and cross pieces with iron-lined holes follow the construction Vitruvius 10.6.3 describes. [geometry] The bands, the pitch, the joinery, the troughs and the base are the museum's reconstruction of the type."
     ],
     "dimensions": {
       "leonardo_wording": null,
