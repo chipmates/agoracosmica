@@ -88,7 +88,8 @@ const { railGeometryFingerprint, railGeometrySignature } = await load(path.join(
 const { collectRailSolids } = await load(path.join(WING, 'rail-solids.ts'))
 const { createCertifiedRailPath, railNearRectangleRadius } = await load(path.join(WING, 'rail-smoothing.ts'))
 const { fittedRailFov } = await load(path.join(WING, 'rail-projection.ts'))
-const { gaitEnvelopeM } = await load(path.join(WING, 'gait.ts'))
+const { gaitEnvelopeM, gaitLeg, gaitSecondsAt, setGaitPace, GAIT_PACES } = await load(path.join(WING, 'gait.ts'))
+const { planCalmGaze } = await load(path.join(WING, 'rail-gaze.ts'))
 const { railSide, railWaypointsBetween, railGateWaypoints, railTerraceWaypoints } = await load(path.join(WING, 'rail-waypoints.ts'))
 const { railExhibitStands, railExhibitLevel } = await load(path.join(WING, 'rail-solids.ts'))
 const { createCollectionStandSolids } = await load(path.join(WING, 'collection/stands.ts'))
@@ -171,7 +172,28 @@ function restPoseSolids(tier) {
   return meshes
 }
 
+/* ---- the house's rooms behind the entrance passage ----
+ *
+ * The great hall and the service passage to it are drawn by their own module
+ * at the two tiers that build them. They are not rail solids at mount, so the
+ * runtime's fingerprint does not carry them; the walk that stands in their
+ * doorway is proved against their actual fabric here, as the machines' rest
+ * poses are, and the module is hashed in the sources above. */
+const HOUSE_ROOM_TIERS = ['hero', 'standard']
+async function houseRoomSolids(tier) {
+  const { createHouseHall } = await load(path.join(WING, 'house-hall.ts'))
+  const hall = createHouseHall(tier).group
+  hall.updateMatrixWorld(true)
+  const meshes = []
+  hall.traverse(object => {
+    if (object.isMesh && (object.name === 'vinci/house-hall/fabric' || object.name === 'vinci/house-hall/things')) meshes.push(object)
+  })
+  if (meshes.length !== 2) throw new Error(`house-hall at ${tier}: expected its fabric and its things, found ${meshes.length} meshes`)
+  return meshes
+}
+
 const geometry = [], geometrySignatures = [], solidSets = [], restSets = []
+for (const tier of HOUSE_ROOM_TIERS) restSets.push({ tier: `house-${tier}`, solids: await houseRoomSolids(tier) })
 for (const tier of ['hero', 'standard', 'calm']) {
   const scene = await mount(tier)
   const solids = collectRailSolids(scene)
@@ -301,6 +323,63 @@ function segmentClearance(start, end, limit) {
   return { distance: Math.sqrt(best), mesh }
 }
 
+/* ---- the lens a walk holds where the body is ----
+ *
+ * A leg eases its lens from the pose it leaves to the pose it arrives in as
+ * `smooth(t / T)` of its own clock (`rail-gaze.ts`), and the body stands at
+ * `gaitAt(leg, t)`: once a leg's timing is fixed, the place fixes the lens.
+ * The timing is not fixed: the visitor's pace and the gaze's stretch choose
+ * it. Every timing the gait takes is one normalised profile, and at every
+ * share of the way the share of the clock lies between two extremes, the even
+ * walk and the leg that is all ramp. So each straight span of a route is
+ * proved with the widest lens the walk can hold anywhere on it, at any pace
+ * and any stretch. The corners keep the route's widest lens. */
+const smoothLens = u => { const x = Math.max(0, Math.min(1, u)); return x * x * x * (10 + x * (6 * x - 15)) }
+// the plan's own lens, read back: a change there is refused here
+for (const course of [null, () => ({ heading: .1, elevation: 0, weight: 1 })]) {
+  const plan = planCalmGaze({ from: { heading: 0, elevation: 0 }, to: { heading: .6, elevation: -.1 }, zoom: .4,
+    timed: seconds => gaitLeg(12, seconds), course, lengthM: 12, lensPixels: 900 })
+  for (let i = 0; i <= 64; i++) {
+    const t = plan.leg.seconds * i / 64
+    if (Math.abs(plan.lens(t) - smoothLens(t / plan.leg.seconds)) > 1e-12) throw new Error('The rail\'s lens no longer eases as smooth(t / T); the walked-lens proof does not hold')
+  }
+}
+/** The leg that is all ramp: a leg too short to cruise keeps the ramps' own
+ * proportion, and so does every one of them. */
+const ALL_RAMP = gaitLeg(.5)
+if (Math.abs(ALL_RAMP.accelSeconds + ALL_RAMP.brakeSeconds - ALL_RAMP.seconds) > 1e-9) throw new Error('The gait\'s short leg is not all ramp')
+const rampClock = share => gaitSecondsAt(ALL_RAMP, share * ALL_RAMP.lengthM) / ALL_RAMP.seconds
+const clockLow = share => Math.max(0, Math.min(share, rampClock(share)) - 1e-6)
+const clockHigh = share => Math.min(1, Math.max(share, rampClock(share)) + 1e-6)
+// every pace, lengths from half a metre to a traverse, stretches to eight
+// times a leg's own seconds: the share of the clock stays inside the two
+{
+  const walkPace = Object.keys(GAIT_PACES).find(name => GAIT_PACES[name] === GAIT_PACES.walk)
+  let worst = 0
+  for (const pace of Object.keys(GAIT_PACES)) {
+    setGaitPace(pace)
+    for (const lengthM of [.3, 1, 2.5, 6, 14, 30, 45, 66, 90, 130, 200]) {
+      const natural = gaitLeg(lengthM).seconds
+      for (const stretch of [0, 1.01, 1.2, 1.5, 2, 3, 5, 8]) {
+        const leg = gaitLeg(lengthM, natural * stretch)
+        for (let i = 0; i <= 400; i++) {
+          const share = i / 400, clock = gaitSecondsAt(leg, share * lengthM) / leg.seconds
+          worst = Math.max(worst, clockLow(share) - clock, clock - clockHigh(share))
+        }
+      }
+    }
+  }
+  setGaitPace(walkPace)
+  if (worst > 0) throw new Error(`A gait timing leaves the walked-lens envelope by ${worst} of its clock`)
+}
+/** The near envelope of the widest lens a walk from one pose to another can
+ * hold while its body is between two shares of the way. */
+function walkedNearRadius(fromFov, toFov, shareFrom, shareTo, viewport) {
+  const change = toFov - fromFov
+  const blend = change < 0 ? smoothLens(clockLow(shareFrom)) : change > 0 ? smoothLens(clockHigh(shareTo)) : 0
+  return railNearRectangleRadius(NEAR_M, fittedRailFov(fromFov + change * blend, viewport.aspect, viewport.phone), viewport.aspect)
+}
+
 /* ---- the stations ---- */
 
 const ids = vinciContent.map(station => station.id)
@@ -395,29 +474,35 @@ for (const { viewport, seen } of families) {
         collect(x, left, middle, remaining - 1); collect(middle, right, z, remaining - 1)
       }
     }
-    // Every unrounded span of the finished path, proved end to end.
+    // Every unrounded span of the finished path, proved end to end with the
+    // widest lens the walk can hold on it, and where on the way it lies.
     const spans = []
-    let cursor = points[0]
+    let cursor = points[0], along = 0
+    const line = end => { const length = cursor.distanceTo(end); spans.push({ start: cursor, end, from: along, to: along + length }); along += length; cursor = end }
     for (let i = 1; i < points.length - 1; i++) {
       const trim = trims.get(i)
-      if (trim === undefined) { spans.push([cursor, points[i]]); cursor = points[i]; continue }
+      if (trim === undefined) { line(points[i]); continue }
       const vertex = points[i]
       const incoming = vertex.clone().sub(points[i - 1]).normalize(), outgoing = points[i + 1].clone().sub(vertex).normalize()
-      spans.push([cursor, vertex.clone().addScaledVector(incoming, -trim)])
-      cursor = vertex.clone().addScaledVector(outgoing, trim)
+      const a = vertex.clone().addScaledVector(incoming, -trim), b = vertex.clone().addScaledVector(outgoing, trim)
+      line(a)
+      along += quadraticLength(a, vertex, b)
+      cursor = b
     }
-    spans.push([cursor, points.at(-1)])
-    let worst = Infinity, worstMesh = null
-    for (const [start, end] of spans) {
-      if (start.distanceToSquared(end) < 1e-18) continue
-      const reading = segmentClearance(start, end, Math.min(worst, clearance))
-      if (reading.distance < worst) { worst = reading.distance; worstMesh = reading.mesh }
+    line(points.at(-1))
+    if (Math.abs(along - path.length) > 1e-6) throw new Error(`${viewport.name} ${from.id} to ${to.id}: the spans measure ${along} m of a ${path.length} m path`)
+    let worstMargin = Infinity, worst = Infinity, worstMesh = null, worstRequired = clearance
+    for (const span of spans) {
+      if (span.start.distanceToSquared(span.end) < 1e-18) continue
+      const required = walkedNearRadius(from.pose.fov, to.pose.fov, span.from / path.length, span.to / path.length, viewport) + (NO_GAIT ? 0 : gaitEnvelopeM)
+      const reading = segmentClearance(span.start, span.end, required)
+      if (reading.distance - required < worstMargin) { worstMargin = reading.distance - required; worst = reading.distance; worstMesh = reading.mesh; worstRequired = required }
     }
     readings.push({
       viewport: viewport.name, from: from.id, to: to.id, lengthM: +path.length.toFixed(4),
-      spanClearanceM: +(worst === Infinity ? clearance : worst).toFixed(4), spanMesh: worstMesh,
-      requiredM: +clearance.toFixed(4), corners: path.corners.map(corner => corner.result),
-      clear: worst > clearance - 1e-9 || worst === Infinity,
+      spanClearanceM: +(worst === Infinity ? worstRequired : worst).toFixed(4), spanMesh: worstMesh,
+      requiredM: +worstRequired.toFixed(4), cornerRequiredM: +clearance.toFixed(4), corners: path.corners.map(corner => corner.result),
+      clear: worstMargin > -1e-9 || worstMargin === Infinity,
     })
     routes.push({
       viewport: viewport.name, from: from.id, to: to.id,
@@ -685,13 +770,15 @@ const certificate = {
   geometry,
   geometrySignatures,
   coordinateFrame: 'points ENH; poses and balls Three XYZ',
-  scope: 'Actual mounted foundation-bearing shell, gate passage, inner court, collection, collection access, entry passage, whole ground, water, vegetation, every spatially partitioned road/ground dressing triangle, the fixed plinths and bases under the exhibits, and every machine in the pose its own schedule holds at t=0. Union of every tier; a tier is accepted by equal actual geometry fingerprint.',
+  scope: 'Actual mounted foundation-bearing shell, gate passage, inner court, collection, collection access, entry passage, whole ground, water, vegetation, every spatially partitioned road/ground dressing triangle, the fixed plinths and bases under the exhibits, every machine in the pose its own schedule holds at t=0, and the great hall\'s and the service passage\'s fabric and furnishings. Union of every tier; a tier is accepted by equal actual geometry fingerprint.',
   limits: [
     'No eyes, renderer, shader or browser input test. This certificate is regenerated against actual currently mounted factory geometry.',
     'DOM plates, atmosphere and shadow-only caster copies are excluded; all actual visible mesh solids including leaves and dressing are included.',
     'Every machine stands in its rest pose for the whole walk, and its actual rest geometry at every tier is proved against every route and every station envelope here. A machine is built as the visitor walks up to it, so it is not a mounted mesh when the runtime hashes the scene and is not part of the geometry fingerprint; the placement table it is certified from is hashed in the sources above.',
     `The ${NEAR_M} m near distance, both authored viewport aspect ratios and the authored endpoint FOV are used. The authored aspect gives the largest near rectangle, so a wider or narrower canvas is inside it.`,
     `Every straight span of the finished path is proved end to end by exact segment/triangle distance; every rounded corner is proved by closed balls over its control hull, and those balls are what the runtime replays. Stored balls reserve ${BALL_RESERVE_M * 1e6} µm beyond the requested radius; runtime matching of quantized geometry consumes at most ${GEOMETRY_TOLERANCE_M * 1e6} µm of it.`,
+    'A route eases its lens from the leaving pose to the arriving one as smooth(t / T) of its own clock, and the body stands where the gait has carried it at t. A straight span of a route between two stations is proved with the widest lens the walk can hold anywhere on it: the share of the clock at a share of the way lies between the even walk and the all-ramp leg for every pace and every stretch the gaze asks for, which this program checks each time it runs, and the lens is read at that bound. Rounded corners, approaches, links and walls keep the larger of their two ends\' lenses.',
+    'The great hall and the service passage to it are not mounted rail solids. Their actual fabric and furnishings, at the two tiers that build them, are proved against every route and envelope here, outside the geometry fingerprint, as the machines\' rest poses are.',
     `The walk carries a step rhythm of at most ${(gaitEnvelopeM * 1000).toFixed(2)} mm off the certified line, and that envelope is added to the clearance radius every span and every corner above is proved against.`,
     'An approach is one straight leg from a station eye to one exhibit\'s viewing eye and back, proved by the same exact segment/triangle distance and the same near rectangle plus gait envelope as a route. It is reachable from that station only, it is not addressable by the station rail, and the table is linear: two entries per exhibit, never the product of poses. The exhibits are the hang\'s plates, the mural, the machines, the grave\'s three, the plaque, the book and the twelve cut dates.',
     'A wall is one polyline through every stop of it, with its declared station eyes as its ends. Every span is proved WHOLE, end to end and untrimmed, and every interior corner by the same closed balls a route uses, so a run from any stop to any other is the sub-path between those two vertices and needs no proof of its own: the trim at an interior vertex depends only on its two adjoining spans and is identical in every sub-path holding it, and the ends of a sub-path take no corner. The table is linear in the stops, never their product, and no viewing eye moves to be on it.',
