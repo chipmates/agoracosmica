@@ -2,6 +2,7 @@ import { setRegister } from '../frame'
 import { windowOwnsTheScreen } from '../window-chrome'
 import { deskAny } from '../desk-switches'
 import { lang } from '../content'
+import { LOBBY_TEXT } from '../../content/lobby'
 import type { VinciCertainty, VinciText } from './content'
 
 export type VinciSourcesTab = 'station' | 'room' | 'wing'
@@ -40,7 +41,14 @@ export function createVinciSourcesWindow(host: HTMLElement, control: HTMLButtonE
   const close = document.createElement('button')
   close.className = 'vinci-sources-close'
   close.type = 'button'
-  close.textContent = lang() === 'de' ? 'Schließen' : 'Close'
+  // the lobby's own word for Close, and the key that does the same, which a
+  // sheet over a close look shows beside it
+  const key = document.createElement('span')
+  key.className = 'desk-key'
+  key.setAttribute('aria-hidden', 'true')
+  key.textContent = 'Esc'
+  close.append(LOBBY_TEXT.close[lang()], key)
+  close.setAttribute('aria-keyshortcuts', 'Escape')
   close.addEventListener('click', () => dialog.close())
   // A press on the backdrop closes: on the phone the thumb is already below the window.
   dialog.addEventListener('click', event => {
@@ -104,15 +112,29 @@ export function createVinciSourcesWindow(host: HTMLElement, control: HTMLButtonE
      while this window stands on a narrow stage the station's chrome stands
      down, so the reading runs to the foot of the screen. */
   const phone = matchMedia('(max-aspect-ratio: 9/10)')
-  const standDown = (): void =>
-    windowOwnsTheScreen(document, dialog.open && (phone.matches || deskAny()), phone.matches ? 'phone' : 'desk')
+  /* A SHEET OPENED OVER A CLOSE LOOK CLOSES BACK TO IT: the window that
+     stood under the sheet keeps the screen it owned, and the hand returns to
+     the control that asked for the sheet. */
+  let under: string | undefined
+  let opener: HTMLElement | null = null
+  const standDown = (): void => {
+    if (dialog.open && (phone.matches || deskAny())) windowOwnsTheScreen(document, true, phone.matches ? 'phone' : 'desk')
+    else if (under) document.documentElement.dataset['naWindow'] = under
+    else windowOwnsTheScreen(document, false)
+  }
   phone.addEventListener('change', standDown)
   dialog.addEventListener('close', () => {
-    windowOwnsTheScreen(document, false)
-    if (!live || dialog.open) return
+    standDown()
+    const over = under, back = opener
+    opener = null
+    if (!live || dialog.open) { under = undefined; return }
     control.setAttribute('aria-expanded', 'false')
+    // the wing repaints behind the sheet here and asks for the screen again,
+    // so what stood under the sheet is forgotten only after it
     onClose()
-    if (control.isConnected) control.focus({ preventScroll: true })
+    under = undefined
+    if (over && back?.isConnected && back.getClientRects().length) back.focus({ preventScroll: true })
+    else if (control.isConnected) control.focus({ preventScroll: true })
   })
   dialog.addEventListener('keydown', event => {
     if (event.key.toLowerCase() === 'l' && !event.repeat && !event.ctrlKey && !event.metaKey && !event.altKey
@@ -131,7 +153,12 @@ export function createVinciSourcesWindow(host: HTMLElement, control: HTMLButtonE
     select,
     resetScroll() { for (const id of order) scroll[id] = 0; dialog.scrollTop = 0 },
     setOpen(open: boolean): void {
-      if (open && !dialog.open) { dialog.showModal(); buttons[selected].focus({ preventScroll: true }) }
+      if (open && !dialog.open) {
+        under = document.documentElement.dataset['naWindow']
+        const active = document.activeElement
+        opener = active instanceof HTMLElement && active !== document.body ? active : null
+        dialog.showModal(); buttons[selected].focus({ preventScroll: true })
+      }
       else if (!open && dialog.open) dialog.close()
       control.setAttribute('aria-expanded', String(open))
       standDown()
