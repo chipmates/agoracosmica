@@ -9,11 +9,12 @@
    the period, laid by this exhibition along the dossier's own edges; no
    coping or kerb of 1517 survives. */
 import { BufferGeometry, Color, Float32BufferAttribute, Group, Mesh, MeshStandardNodeMaterial } from 'three/webgpu'
-import { float, mix, mx_noise_float, positionWorld, smoothstep, vec3 } from 'three/tsl'
+import { cameraViewMatrix, float, max, mix, mx_noise_float, normalWorld, normalWorldGeometry, positionWorld, smoothstep, vec3 } from 'three/tsl'
+import { reliefNormal } from '../../stack/detail'
 import type { TierName } from '../../stack/tier'
 import { anisotropicFootprint } from './masonry-courses'
 import { gradeAt, terrainSteps } from './terrain-mesh'
-import { polygon } from './site'
+import { hourKey, polygon } from './site'
 import { stageWeight } from './leaf-litter'
 import { mulberry } from './tree-growth'
 
@@ -28,6 +29,12 @@ interface Batch { position: number[]; normal: number[]; colour: number[] }
 
 
 const STONE = ['#b3a88f', '#a89d86', '#bcb199', '#9f957f', '#aea38b'].map(hex => new Color(hex))
+/** toward the sun of the hour */
+const SUN_TOWARD = ((azimuth: number, elevation: number) => {
+  const az = azimuth * Math.PI / 180, el = elevation * Math.PI / 180
+  return [Math.sin(az) * Math.cos(el), Math.sin(el), -Math.cos(az) * Math.cos(el)] as const
+})(hourKey.sun_azimuth_deg.value, hourKey.sun_elevation_deg.value)
+const MEAN = STONE.reduce((sum, c) => sum.add(c), new Color(0, 0, 0)).multiplyScalar(1 / STONE.length)
 
 /** A run of one wall's head: its ends, the side the drop is on, its level. */
 interface Run { from: P2; to: P2; out: P2; level: number }
@@ -98,7 +105,8 @@ function lay(batch: Batch, from: P2, to: P2, out: P2, level: number, inner: numb
     const e0 = s + .004, e1 = s + length - .004
     if (e1 - e0 > .05) {
       const a: P2 = [from[0] + dx * e0 / span, from[1] + dn * e0 / span], b: P2 = [from[0] + dx * e1 / span, from[1] + dn * e1 / span]
-      const c = STONE[Math.floor(random() * STONE.length)]!.clone().multiplyScalar(.88 + random() * .2)
+      // stones of one quarry: their tones close, never a checker
+      const c = STONE[Math.floor(random() * STONE.length)]!.clone().lerp(MEAN, .55).multiplyScalar(.95 + random() * .07)
       // each stone set a hair off its neighbours
       stone(batch, a, b, out, level + (random() - .5) * .006, inner, outer, proud, depth, chamfer, both, c)
       laid++
@@ -153,19 +161,35 @@ export function createCopings(tier: TierName): Group {
 }
 
 /** Dressed limestone weathered on its head: a fine tooled grain, a broader
-    wash, lichen in patches on the upper faces. Each scale drawn only where a
-    pixel holds it. */
+    wash, and the lichens a coping forty years in the weather carries: pale
+    grey-green crusts across the head, small orange rosettes where birds sit,
+    black specks along the drip. Each scale drawn only where a pixel holds it. */
 function stoneMaterial(): MeshStandardNodeMaterial {
   const m = new MeshStandardNodeMaterial({ vertexColors: true, roughness: .9 })
   const P = positionWorld, pixel = anisotropicFootprint(P)
   const shows = (metres: number) => smoothstep(1.2, 3, float(metres).div(pixel))
   const wash = mx_noise_float(P.mul(1.7)).mul(shows(.6))
   const grain = mx_noise_float(P.mul(90)).mul(shows(.011))
-  const lichen = smoothstep(.35, .75, mx_noise_float(P.mul(6.5).add(vec3(3.1, 1.7, 5.3)))).mul(shows(.15))
+  const tooth = mx_noise_float(vec3(P.x.mul(160), P.y.mul(40), P.z.mul(160))).mul(shows(.006))
+  // the head and the chamfer face the sky and hold the lichen; the front
+  // face under the drip keeps only the dark specks
+  const up = smoothstep(.35, .9, normalWorld.y)
+  const crust = smoothstep(.42, .62, mx_noise_float(P.mul(4.2).add(vec3(3.1, 1.7, 5.3)))
+    .add(mx_noise_float(P.mul(17).add(vec3(.4, 2.2, 7.1))).mul(.35))).mul(up).mul(shows(.08))
+  const rosette = smoothstep(.68, .8, mx_noise_float(P.mul(11).add(vec3(9.4, 3.3, .8)))).mul(up).mul(shows(.03))
+  const specks = smoothstep(.72, .86, mx_noise_float(P.mul(38).add(vec3(1.9, 6.1, 4.4))))
+    .mul(max(float(1).sub(up), float(.35))).mul(shows(.012))
   const base = vec3(1, 1, 1).mul(wash.mul(.08).add(1)).mul(grain.mul(.07).add(1))
-  m.colorNode = mix(base, vec3(.62, .66, .52), lichen.mul(.45))
-  // no normal map: these faces carry no uv, and a tangent-space map takes its frame from one
-  m.roughnessNode = float(.9).add(grain.mul(.03)).sub(lichen.mul(.05))
+  let colour = mix(base, vec3(.72, .76, .62), crust.mul(.55))
+  colour = mix(colour, vec3(1.02, .62, .22), rosette.mul(.55))
+  colour = mix(colour, vec3(.16, .16, .15), specks.mul(.6))
+  m.colorNode = colour
+  // the tooling's relief from its own height, the stone having no map coordinates
+  m.normalNode = reliefNormal(normalWorldGeometry.transformDirection(cameraViewMatrix), grain.mul(.0004).add(tooth.mul(.00025)).sub(crust.mul(.0003)), .15)
+  m.roughnessNode = float(.9).add(grain.mul(.03)).add(crust.mul(.05))
+  // a head lit at a grazing sun reads the shadow body it is folded into a
+  // hair off its own face: the lookup stands a little out along the normal
+  m.receivedShadowPositionNode = P.add(normalWorld.mul(.02)).add(vec3(SUN_TOWARD[0], SUN_TOWARD[1], SUN_TOWARD[2]).mul(.05))
   m.name = 'vinci generated coping stone'
   return m
 }
