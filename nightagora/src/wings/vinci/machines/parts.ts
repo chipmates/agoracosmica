@@ -117,7 +117,8 @@ export function materialFailure(set: MaterialSet): string | null {
 
 /** Share one library request between machine parts and their bench supports.
  * Linen and forged iron retain the tier's complete map budget; other new
- * sets use the library's 1024px albedo budget plus three procedural scales.
+ * sets use the library's 1024px albedo budget plus three procedural scales,
+ * except under the film's tier, where every set keeps the complete budget.
  * Existing cached sets retain their original maps. Requests are serial, so
  * machine decodes follow one another. The promise never rejects: a set the
  * library cannot dress is reported and handed over undressed, so every part
@@ -143,7 +144,7 @@ export function loadMachineMaterial(stack: Stack, name: string): Promise<Materia
     // The narrowed budget is held only across the request itself, so no
     // other caller's set can be asked for while it stands.
     const tier = stack.tierConfig()
-    stack.materials.setTier(FULL_BUDGET.has(name) ? tier : {...tier, detail: 1})
+    stack.materials.setTier(FULL_BUDGET.has(name) || stack.film ? tier : {...tier, detail: 1})
     let request: Promise<MaterialSet>
     try {
       request = stack.materials.load(name)

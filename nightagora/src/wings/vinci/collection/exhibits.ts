@@ -118,12 +118,13 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
    * asked for at the smallest size the library offers before any machine asks
    * for it at the tier's, because a cached set keeps the maps it was loaded
    * with. The wait at the head is the house's own loads: they must finish at
-   * their full size before this one narrows the budget. */
+   * their full size before this one narrows the budget. The film's tier is
+   * not narrowed: its frame takes every set whole. */
   async function seed(names: string[]): Promise<void> {
     const deadline = Date.now() + 20000
     while (stack.materials.pending() > 0 && Date.now() < deadline) await new Promise(resolve => setTimeout(resolve, 20))
     if (!live) return
-    stack.materials.setTier({ ...stack.tierConfig(), detail: 1 })
+    stack.materials.setTier(stack.film ? stack.tierConfig() : { ...stack.tierConfig(), detail: 1 })
     try { await Promise.allSettled(names.map(name => stack.materials.load(name))) }
     finally { stack.materials.setTier(stack.tierConfig()) }
   }
