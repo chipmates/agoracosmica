@@ -1566,12 +1566,12 @@
         "plane": "YZ",
         "coordinates_yz": [
           [
-            -0.112,
+            -0.117,
             -0.09
           ],
           [
-            -0.112,
-            0.133945262
+            -0.117,
+            0.136832014
           ],
           [
             0.112,
@@ -1872,12 +1872,12 @@
       "shape": "box",
       "dimensions_m": {
         "x": 1.14,
-        "y": 0.03,
+        "y": 0.025,
         "z": 0.94
       },
       "position_m": [
         0.0,
-        0.115,
+        0.1125,
         -1.05
       ],
       "orientation_rad": [
@@ -1900,7 +1900,7 @@
       "shape": "box",
       "dimensions_m": {
         "x": 0.04,
-        "y": 0.16,
+        "y": 0.165,
         "z": 0.86
       },
       "position_m": [
@@ -1928,7 +1928,7 @@
       "shape": "box",
       "dimensions_m": {
         "x": 0.04,
-        "y": 0.16,
+        "y": 0.165,
         "z": 0.86
       },
       "position_m": [
@@ -1956,7 +1956,7 @@
       "shape": "box",
       "dimensions_m": {
         "x": 1.14,
-        "y": 0.16,
+        "y": 0.165,
         "z": 0.04
       },
       "position_m": [
@@ -1984,7 +1984,7 @@
       "shape": "box",
       "dimensions_m": {
         "x": 1.14,
-        "y": 0.16,
+        "y": 0.165,
         "z": 0.04
       },
       "position_m": [
@@ -2037,7 +2037,7 @@
       },
       "position_m": [
         -0.55,
-        0.06,
+        0.0575,
         0.47
       ],
       "orientation_rad": [
@@ -2085,7 +2085,7 @@
       },
       "position_m": [
         -0.55,
-        0.11,
+        0.1075,
         0.47
       ],
       "orientation_rad": [
@@ -2133,7 +2133,7 @@
       },
       "position_m": [
         -0.55,
-        0.16,
+        0.1575,
         0.47
       ],
       "orientation_rad": [
@@ -2181,7 +2181,7 @@
       },
       "position_m": [
         0.55,
-        0.06,
+        0.0575,
         0.47
       ],
       "orientation_rad": [
@@ -2229,7 +2229,7 @@
       },
       "position_m": [
         0.55,
-        0.11,
+        0.1075,
         0.47
       ],
       "orientation_rad": [
@@ -2277,7 +2277,7 @@
       },
       "position_m": [
         0.55,
-        0.16,
+        0.1575,
         0.47
       ],
       "orientation_rad": [
@@ -2325,7 +2325,7 @@
       },
       "position_m": [
         -0.55,
-        0.06,
+        0.0575,
         -0.47
       ],
       "orientation_rad": [
@@ -2373,7 +2373,7 @@
       },
       "position_m": [
         -0.55,
-        0.11,
+        0.1075,
         -0.47
       ],
       "orientation_rad": [
@@ -2421,7 +2421,7 @@
       },
       "position_m": [
         -0.55,
-        0.16,
+        0.1575,
         -0.47
       ],
       "orientation_rad": [
@@ -2469,7 +2469,7 @@
       },
       "position_m": [
         0.55,
-        0.06,
+        0.0575,
         -0.47
       ],
       "orientation_rad": [
@@ -2517,7 +2517,7 @@
       },
       "position_m": [
         0.55,
-        0.11,
+        0.1075,
         -0.47
       ],
       "orientation_rad": [
@@ -2565,7 +2565,7 @@
       },
       "position_m": [
         0.55,
-        0.16,
+        0.1575,
         -0.47
       ],
       "orientation_rad": [
@@ -2581,6 +2581,146 @@
       "certainty": "C",
       "source": "geometry",
       "notes": "[geometry] Nail through the end board into a side board."
+    },
+    {
+      "id": "lower-trough-lining-floor",
+      "parent": "lower-trough-base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 1.059,
+        "y": 0.002,
+        "z": 0.859
+      },
+      "position_m": [
+        0.0,
+        0.014,
+        0.0
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "pitched bedding",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Pitch run over the floor inside, sealing it."
+    },
+    {
+      "id": "lower-trough-lining-l",
+      "parent": "lower-trough-base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.002,
+        "y": 0.1495,
+        "z": 0.855
+      },
+      "position_m": [
+        -0.5285,
+        0.08775,
+        0.0
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "pitched bedding",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Pitch run over the boards inside, stopping short of the rim."
+    },
+    {
+      "id": "lower-trough-lining-r",
+      "parent": "lower-trough-base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.002,
+        "y": 0.1495,
+        "z": 0.855
+      },
+      "position_m": [
+        0.5285,
+        0.08775,
+        0.0
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "pitched bedding",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Pitch run over the boards inside, stopping short of the rim."
+    },
+    {
+      "id": "lower-trough-lining-front",
+      "parent": "lower-trough-base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 1.059,
+        "y": 0.1495,
+        "z": 0.002
+      },
+      "position_m": [
+        0.0,
+        0.08775,
+        0.4285
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "pitched bedding",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Pitch run over the boards inside, stopping short of the rim."
+    },
+    {
+      "id": "lower-trough-lining-back",
+      "parent": "lower-trough-base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 1.059,
+        "y": 0.1495,
+        "z": 0.002
+      },
+      "position_m": [
+        0.0,
+        0.08775,
+        -0.4285
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "pitched bedding",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Pitch run over the boards inside, stopping short of the rim."
     },
     {
       "id": "support",
@@ -4348,6 +4488,146 @@
       "certainty": "C",
       "source": "geometry",
       "notes": "[geometry] Nail through the end board into a side board."
+    },
+    {
+      "id": "upper-trough-lining-floor",
+      "parent": "upper-trough-base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.659,
+        "y": 0.002,
+        "z": 0.519
+      },
+      "position_m": [
+        0.0,
+        0.024,
+        0.0
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "pitched bedding",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Pitch run over the floor inside, sealing it."
+    },
+    {
+      "id": "upper-trough-lining-l",
+      "parent": "upper-trough-base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.002,
+        "y": 0.1505,
+        "z": 0.515
+      },
+      "position_m": [
+        -0.3285,
+        0.09825,
+        0.0
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "pitched bedding",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Pitch run over the boards inside, stopping short of the rim."
+    },
+    {
+      "id": "upper-trough-lining-r",
+      "parent": "upper-trough-base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.002,
+        "y": 0.1505,
+        "z": 0.515
+      },
+      "position_m": [
+        0.3285,
+        0.09825,
+        0.0
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "pitched bedding",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Pitch run over the boards inside, stopping short of the rim."
+    },
+    {
+      "id": "upper-trough-lining-front",
+      "parent": "upper-trough-base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.659,
+        "y": 0.1505,
+        "z": 0.002
+      },
+      "position_m": [
+        0.0,
+        0.09825,
+        0.2585
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "pitched bedding",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Pitch run over the boards inside, stopping short of the rim."
+    },
+    {
+      "id": "upper-trough-lining-back",
+      "parent": "upper-trough-base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.659,
+        "y": 0.1505,
+        "z": 0.002
+      },
+      "position_m": [
+        0.0,
+        0.09825,
+        -0.2585
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "pitched bedding",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Pitch run over the boards inside, stopping short of the rim."
     },
     {
       "id": "basin-rail",
@@ -8308,6 +8588,110 @@
       "certainty": "C",
       "source": "geometry",
       "notes": "[geometry] Pitch run into the crease between the tube and the core along its whole length, bedding it."
+    },
+    {
+      "id": "tube-mouth-lower",
+      "parent": "helical-tube",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [
+            -0.021,
+            0.0434
+          ],
+          [
+            -0.021,
+            0.0482
+          ],
+          [
+            -0.019,
+            0.0488
+          ],
+          [
+            0.0,
+            0.0488
+          ],
+          [
+            0.0015,
+            0.0476
+          ],
+          [
+            0.0015,
+            0.0434
+          ]
+        ],
+        "segments": 48
+      },
+      "position_m": [
+        0.18,
+        0.196,
+        0.0
+      ],
+      "orientation_rad": [
+        -1.900594103,
+        0.13048684,
+        -0.093318882
+      ],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Iron ring round the open mouth of the tube, keeping the hide round."
+    },
+    {
+      "id": "tube-mouth-upper",
+      "parent": "helical-tube",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [
+            -0.021,
+            0.0434
+          ],
+          [
+            -0.021,
+            0.0482
+          ],
+          [
+            -0.019,
+            0.0488
+          ],
+          [
+            0.0,
+            0.0488
+          ],
+          [
+            0.0015,
+            0.0476
+          ],
+          [
+            0.0015,
+            0.0434
+          ]
+        ],
+        "segments": 48
+      },
+      "position_m": [
+        0.18,
+        2.596,
+        0.0
+      ],
+      "orientation_rad": [
+        1.222779848,
+        -0.06501928,
+        -0.092719745
+      ],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Iron ring round the open mouth of the tube, keeping the hide round."
     },
     {
       "id": "tube-band-0",

@@ -468,6 +468,11 @@ export function geometryForPart(part: PartSpec, tier: TierName = 'standard', slu
     default: throw new Error(`Unsupported numerical dossier shape: ${String(kind)} (${part.id})`)
   }
   geometry.clearGroups()
+  // Each oak piece carries its own tone in a vertex colour, white until the
+  // part's own phase is laid on it, so every piece of a welded draw has one.
+  if (endGrainClass(part.material.class) || /oak grip/.test(part.material.class)) {
+    geometry.setAttribute('color', new Float32BufferAttribute(new Float32Array(geometry.getAttribute('position').count * 3).fill(1), 3))
+  }
   geometry.computeBoundingBox()
   geometry.computeBoundingSphere()
   geometry.name = `${part.id}:dossier-surface`

@@ -2,7 +2,7 @@ import {
   Color, DoubleSide, FrontSide, Group, InstancedMesh, Matrix4, Mesh, MeshPhysicalNodeMaterial, MeshStandardNodeMaterial,
   type BufferGeometry,
 } from 'three/webgpu'
-import { cameraPosition, float, mix, normalGeometry, normalMap, normalWorld, positionGeometry, positionWorld, step, uv, vec2, vec3 } from 'three/tsl'
+import { attribute, cameraPosition, float, mix, normalGeometry, normalMap, normalWorld, positionGeometry, positionWorld, step, uv, vec2, vec3 } from 'three/tsl'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
 import type { MaterialSet, Stack } from '../../../stack'
 import type { DetailNodes } from '../../../stack/detail'
@@ -204,6 +204,14 @@ function phaseTimber(geometry: BufferGeometry, identity: string): void {
   const coordinates = geometry.getAttribute('uv')
   for (let i = 0; i < coordinates.count; i++) {
     coordinates.setXY(i, coordinates.getX(i) + offsetU, coordinates.getY(i) + offsetV)
+  }
+  // No two pieces of one tree are one tone: a timber that carries a colour
+  // takes its own, a little lighter or darker, a little warmer or cooler.
+  const colour = geometry.getAttribute('color')
+  if (colour) {
+    const value = 0.9 + ((hash >>> 5) & 0xff) / 255 * 0.18
+    const warmth = (((hash >>> 13) & 0xff) / 255 - 0.5) * 0.06
+    for (let i = 0; i < colour.count; i++) colour.setXYZ(i, value * (1 + warmth), value, value * (1 - warmth))
   }
 }
 
@@ -461,8 +469,11 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
       const pitch = new Color(/bedding/.test(name) ? '#1d1713' : '#3d2e23')
       const lum = set.albedo.r * .2126 + set.albedo.g * .7152 + set.albedo.b * .0722
       const fibres = detail.albedo.dot(vec3(.2126, .7152, .0722)).div(Math.max(lum, .001))
-      material.colorNode = vec3(pitch.r, pitch.g, pitch.b).mul(fibres.mul(.3).add(.7).clamp(.5, 1.4)).mul(detail.occlusion)
-      material.roughnessNode = /bedding/.test(name) ? detail.roughness.mul(.5).clamp(.22, .4) : detail.roughness.mul(.75).clamp(.4, .64)
+      // dried pitch is a dull skin: a flat one with a sheen reads as standing water
+      const spread = /bedding/.test(name) ? .08 : .3
+      material.colorNode = vec3(pitch.r, pitch.g, pitch.b).mul(fibres.mul(spread).add(1 - spread).clamp(.5, 1.4)).mul(detail.occlusion)
+      material.roughnessNode = /bedding/.test(name) ? detail.roughness.mul(.3).add(.5).clamp(.52, .7) : detail.roughness.mul(.75).clamp(.4, .64)
+      if (/bedding/.test(name)) material.normalNode = null
     }
     if (/planed oak|turned oak|oak peg|oak grip/.test(name)) {
       // GENERATED tint: new planed oak, paler and greyer than the museum's
@@ -474,6 +485,7 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
       // an end face drinks the light: darker and rougher than the side grain
       const end = step(END_GRAIN_U / 2, uv().x)
       material.colorNode = vec3(oak.r, oak.g, oak.b).mul(grain).mul(detail.occlusion).mul(end.mul(-.48).add(1))
+        .mul(attribute('color', 'vec3'))
       material.roughnessNode = /grip/.test(name) ? detail.roughness.mul(.8).clamp(.32, .6)
         : mix(detail.roughness.clamp(.5, .85), float(.9), end)
     }

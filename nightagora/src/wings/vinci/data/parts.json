@@ -1325,6 +1325,26 @@
         "en": "Nail",
         "de": "Nagel"
       },
+      "lower-trough-lining-floor": {
+        "en": "Pitch lining",
+        "de": "Pechauskleidung"
+      },
+      "lower-trough-lining-l": {
+        "en": "Pitch lining",
+        "de": "Pechauskleidung"
+      },
+      "lower-trough-lining-r": {
+        "en": "Pitch lining",
+        "de": "Pechauskleidung"
+      },
+      "lower-trough-lining-front": {
+        "en": "Pitch lining",
+        "de": "Pechauskleidung"
+      },
+      "lower-trough-lining-back": {
+        "en": "Pitch lining",
+        "de": "Pechauskleidung"
+      },
       "support": {
         "en": "Support",
         "de": "Stütze"
@@ -1497,6 +1517,26 @@
         "en": "Nail",
         "de": "Nagel"
       },
+      "upper-trough-lining-floor": {
+        "en": "Pitch lining",
+        "de": "Pechauskleidung"
+      },
+      "upper-trough-lining-l": {
+        "en": "Pitch lining",
+        "de": "Pechauskleidung"
+      },
+      "upper-trough-lining-r": {
+        "en": "Pitch lining",
+        "de": "Pechauskleidung"
+      },
+      "upper-trough-lining-front": {
+        "en": "Pitch lining",
+        "de": "Pechauskleidung"
+      },
+      "upper-trough-lining-back": {
+        "en": "Pitch lining",
+        "de": "Pechauskleidung"
+      },
       "basin-rail": {
         "en": "Rail under the upper trough",
         "de": "Riegel unter der oberen Rinne"
@@ -1600,6 +1640,14 @@
       "tube-bedding-1": {
         "en": "Pitch bedding the tube",
         "de": "Pech unter dem Rohr"
+      },
+      "tube-mouth-lower": {
+        "en": "Iron ring at the mouth",
+        "de": "Eisenring an der Mündung"
+      },
+      "tube-mouth-upper": {
+        "en": "Iron ring at the mouth",
+        "de": "Eisenring an der Mündung"
       },
       "tube-band-0": {
         "en": "Iron band",
