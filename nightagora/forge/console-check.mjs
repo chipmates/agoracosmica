@@ -12,11 +12,12 @@
 //   node forge/console-check.mjs 5479 --viewports=phone --langs=en,de --measure --out=<dir>
 //   node forge/console-check.mjs 5479 --order=life --stops=picture-room-lisa --report=<file>
 //
-// --looks=kinds (the default) opens the first close look of each kind a stop
-// offers (a machine, a work, a sheet, a leaf, a codex...) at every stop:
-// every kind's own module is loaded and drawn from every place it is opened
-// from, in the time a landing sweep can give. --looks=all opens every one at
-// every stop, which takes about an hour.
+// --looks=kinds (the default) opens the first close look of each kind (a
+// machine, a work, a sheet, a leaf, a codex...) once per viewport: every
+// kind's own module is loaded and drawn, in the time a landing sweep can
+// give. --looks=all opens every one at every stop that offers it (a card
+// opens differently from each, the eye walks from where it stands), which
+// takes about an hour.
 // --measure reads the phone close look's layout at each look: whatever stands
 // under the close mark, a label whose words leave its chip, and a line of
 // the card's words sliced by the edge its scroll box ends at.
@@ -418,12 +419,9 @@ async function walkOrder(page, vp, lang, order, skip, kindsSeen) {
     const looks = await offered(page, first ? DRESSED_MS : ROW_MS)
     first = false
     for (const look of looks) {
-      /* A CARD OPENS DIFFERENTLY FROM EACH STOP THAT OFFERS IT (the eye walks
-         from where it stands), so the kinds are taken once per stop */
       if (LOOKS === 'kinds') {
-        const key = `${id}|${kindOf(look)}`
-        if (kindsSeen.has(key)) continue
-        kindsSeen.add(key)
+        if (kindsSeen.has(kindOf(look))) continue
+        kindsSeen.add(kindOf(look))
       }
       await lookAt(page, vp, lang, id, look)
       if (!(await standAt(page, id))) {
