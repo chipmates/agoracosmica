@@ -14,6 +14,7 @@
    green or turning); everything else here is a type of the period and a
    reading, never a record of a tree that stood at Cloux. */
 import { cellUV, LEAF_RECIPES, leafCell, SPRAY_LEAF, sprayCell } from './leaf-maps'
+import { hourKey } from './site'
 
 export type Species =
   | 'walnut' | 'elm' | 'oak' | 'maple' | 'cherry' | 'hornbeam'
@@ -61,15 +62,27 @@ interface Habit {
   /** the trunk's radius against the height, and the bark */
   girth: number
   bark: { kind: BarkKind; colour: string; lichen: string }
-  /** the week's state: share already fallen, and the leaf colours with
-      their weights, green first, most turned last */
+  /** the week's state: share already fallen; the share of the standing
+      crown that has turned (one number per species, so a species reads the
+      same at every stop); the green it still holds and the colours it turns
+      through, each with its weight, least turned first */
   fallen: number
-  palette: readonly (readonly [string, number])[]
-  /** how much the turn follows the light: outer and upper leaves first */
+  stage: number
+  green: readonly (readonly [string, number])[]
+  turned: readonly (readonly [string, number])[]
+  /** how much the turn follows the light: outer, upper and sunward leaves
+      first */
   exposureTurn: number
 }
 
 export type BarkKind = 'furrowed' | 'smooth' | 'banded' | 'plated'
+
+/** Toward the sun of the hour on the ground plane (x east, z south): the
+    side of a crown the afternoon light has worked on longest. */
+const SUN_HORIZONTAL = ((azimuth: number): readonly [number, number] => {
+  const a = azimuth * Math.PI / 180
+  return [Math.sin(a), -Math.cos(a)]
+})(hourKey.sun_azimuth_deg.value)
 
 /* The species of the flora card (FLORA.md §6), each in its state of about 20
    October. Where the card has no colour (elm) the colour is our reading. */
@@ -82,8 +95,9 @@ export const HABITS: Record<Species, Habit> = {
     leafGather: .55,
     leaf: { outline: 'elliptic', length: .11, width: .42, leaflets: 7, droop: .55 },
     girth: .030, bark: { kind: 'furrowed', colour: '#a29e93', lichen: '#959a82' },
-    fallen: .2,
-    palette: [['#6f7440', 1], ['#9a9444', 1.4], ['#b39a45', 2.2], ['#a98b3d', 1.6], ['#8a6a38', 1.1], ['#6d5434', .5]],
+    fallen: .2, stage: .6,
+    green: [['#6a7040', 1], ['#7d8044', 1]],
+    turned: [['#a39544', 1], ['#b39a45', 1.6], ['#a98b3d', 1.4], ['#8a6a38', 1], ['#6d5434', .4]],
     exposureTurn: .55,
   },
   elm: {
@@ -94,8 +108,9 @@ export const HABITS: Record<Species, Habit> = {
     leafGather: .15,
     leaf: { outline: 'ovate', length: .075, width: .58, droop: .35 },
     girth: .024, bark: { kind: 'furrowed', colour: '#6d6457', lichen: '#7f8269' },
-    fallen: .1,
-    palette: [['#56623a', 1.3], ['#6f7843', 1.6], ['#8e9146', 1.4], ['#a99d48', 1.1], ['#b09550', .6], ['#7d6440', .25]],
+    fallen: .1, stage: .4,
+    green: [['#56623a', 1.2], ['#6a7443', 1]],
+    turned: [['#8e9146', 1], ['#a99d48', 1.2], ['#b09550', .8], ['#7d6440', .3]],
     exposureTurn: .6,
   },
   oak: {
@@ -106,8 +121,9 @@ export const HABITS: Record<Species, Habit> = {
     leafGather: .7,
     leaf: { outline: 'lobed', length: .10, width: .55, droop: .25 },
     girth: .032, bark: { kind: 'furrowed', colour: '#6b665c', lichen: '#848a70' },
-    fallen: .03,
-    palette: [['#4e5a33', 1.4], ['#5f6639', 1.8], ['#6f6b3c', 1.8], ['#80743f', 1.0], ['#8d7440', .5], ['#6e5836', .2]],
+    fallen: .03, stage: .3,
+    green: [['#4e5a33', 1], ['#5f6639', 1.2]],
+    turned: [['#6f6b3c', 1.2], ['#80743f', 1], ['#8d7440', .6], ['#6e5836', .3]],
     exposureTurn: .45,
   },
   maple: {
@@ -118,8 +134,9 @@ export const HABITS: Record<Species, Habit> = {
     leafGather: .45,
     leaf: { outline: 'palmate', length: .07, width: 1.0, droop: .3 },
     girth: .028, bark: { kind: 'plated', colour: '#7a6c5a', lichen: '#86896f' },
-    fallen: .15,
-    palette: [['#7f8143', .5], ['#a8983e', 1.2], ['#c29a37', 2.0], ['#caa23e', 1.6], ['#bf7a35', .9], ['#a9583a', .45]],
+    fallen: .15, stage: .62,
+    green: [['#6f7640', 1], ['#7f8143', .8]],
+    turned: [['#a8983e', .9], ['#c29a37', 1.6], ['#caa23e', 1.3], ['#bf7a35', .8], ['#a9583a', .35]],
     exposureTurn: .5,
   },
   cherry: {
@@ -130,8 +147,9 @@ export const HABITS: Record<Species, Habit> = {
     leafGather: .75,
     leaf: { outline: 'obovate', length: .10, width: .46, droop: .75 },
     girth: .024, bark: { kind: 'banded', colour: '#6a4f45', lichen: '#7e8069' },
-    fallen: .3,
-    palette: [['#8a8646', .5], ['#b58c3c', 1.2], ['#c0703a', 1.6], ['#b0503a', 1.4], ['#8e3f36', .9], ['#6f4a38', .3]],
+    fallen: .3, stage: .62,
+    green: [['#6e7340', 1], ['#8a8646', .9]],
+    turned: [['#b58c3c', 1.2], ['#c0703a', 1.3], ['#b0503a', 1], ['#8e3f36', .6], ['#6f4a38', .25]],
     exposureTurn: .6,
   },
   hornbeam: {
@@ -142,8 +160,9 @@ export const HABITS: Record<Species, Habit> = {
     leafGather: .2,
     leaf: { outline: 'ovate', length: .08, width: .5, droop: .3 },
     girth: .024, bark: { kind: 'smooth', colour: '#7d7c74', lichen: '#8c9178' },
-    fallen: .12,
-    palette: [['#65703d', 1.2], ['#8a8a42', 1.3], ['#ad9c44', 1.4], ['#b3843e', .9], ['#8f6538', .6]],
+    fallen: .12, stage: .45,
+    green: [['#5a6838', 1], ['#65703d', 1]],
+    turned: [['#8a8a42', 1], ['#ad9c44', 1.3], ['#b3843e', .8], ['#8f6538', .5]],
     exposureTurn: .55,
   },
   alder: {
@@ -154,8 +173,9 @@ export const HABITS: Record<Species, Habit> = {
     leafGather: .35,
     leaf: { outline: 'round', length: .075, width: .85, droop: .3 },
     girth: .022, bark: { kind: 'furrowed', colour: '#56514a', lichen: '#7c8068' },
-    fallen: .05,
-    palette: [['#3b4a2e', 1.6], ['#45552f', 1.8], ['#556233', 1.0], ['#7c7a3d', .35], ['#6b5a37', .15]],
+    fallen: .05, stage: .12,
+    green: [['#3b4a2e', 1.2], ['#45552f', 1.2], ['#556233', .8]],
+    turned: [['#7c7a3d', 1], ['#6b5a37', .6]],
     exposureTurn: .3,
   },
   willow: {
@@ -166,8 +186,9 @@ export const HABITS: Record<Species, Habit> = {
     leafGather: .2,
     leaf: { outline: 'lanceolate', length: .09, width: .2, droop: .5 },
     girth: .05, bark: { kind: 'furrowed', colour: '#77736a', lichen: '#8a8f78' },
-    fallen: .1,
-    palette: [['#6f7a5c', 1.6], ['#7f8a6a', 1.3], ['#8f9a78', 1.0], ['#a39d56', .6], ['#8b7c48', .25]],
+    fallen: .1, stage: .25,
+    green: [['#6f7a5c', 1.2], ['#7f8a6a', 1], ['#8f9a78', .8]],
+    turned: [['#a39d56', 1], ['#8b7c48', .5]],
     exposureTurn: .4,
   },
   poplar: {
@@ -178,8 +199,9 @@ export const HABITS: Record<Species, Habit> = {
     leafGather: .35,
     leaf: { outline: 'deltoid', length: .085, width: .85, droop: .45 },
     girth: .026, bark: { kind: 'furrowed', colour: '#6a665f', lichen: '#7e836c' },
-    fallen: .2,
-    palette: [['#7d8340', .7], ['#a9a043', 1.3], ['#c2a63e', 2.0], ['#c9ab47', 1.4], ['#9c7a3a', .5]],
+    fallen: .2, stage: .5,
+    green: [['#6f7a3e', 1], ['#7d8340', 1]],
+    turned: [['#a9a043', 1], ['#c2a63e', 1.6], ['#c9ab47', 1.2], ['#9c7a3a', .5]],
     exposureTurn: .5,
   },
   pear: {
@@ -190,8 +212,9 @@ export const HABITS: Record<Species, Habit> = {
     leafGather: .5,
     leaf: { outline: 'ovate', length: .065, width: .62, droop: .35 },
     girth: .026, bark: { kind: 'plated', colour: '#5f574e', lichen: '#7f836c' },
-    fallen: .18,
-    palette: [['#5c6a36', .9], ['#8b8a3e', 1.1], ['#b79a3c', 1.2], ['#b8743a', 1.0], ['#8e4034', .8], ['#6a3a33', .3]],
+    fallen: .18, stage: .55,
+    green: [['#5c6a36', 1], ['#6d7539', .8]],
+    turned: [['#8b8a3e', .7], ['#b79a3c', 1], ['#b8743a', 1], ['#8e4034', .8], ['#6a3a33', .3]],
     exposureTurn: .55,
   },
 }
@@ -211,6 +234,10 @@ export interface TreeSpec {
   spread?: number
   /** a pollard carries a short knuckled trunk and a head of rods */
   pollard?: boolean
+  /** a mid tree a stop sees within thirty metres draws its twigs at hero */
+  close?: boolean
+  /** at most this many leaves, each drawn larger so the crown keeps cover */
+  leafCap?: number
 }
 
 /** A point is refused to growth where a wall or a certified walk stands. */
@@ -363,6 +390,9 @@ interface Stem {
   /** the wind's flex at the stem's base, and what a metre of it adds */
   flex0: number
   flexPerM: number
+  /** the stem it grows out of, and how far along that stem it starts */
+  parent?: Stem
+  attach?: number
 }
 
 interface Grown {
@@ -452,7 +482,7 @@ interface Hand {
   /** every how many rings of a limb are drawn */
   stride: number
 }
-export function handFor(detail: TreeDetail, tier: TreeTier): Hand {
+export function handFor(detail: TreeDetail, tier: TreeTier, close = false): Hand {
   const table: Record<TreeTier, Record<TreeDetail, Hand>> = {
     hero: {
       near: { branches: 1, twigs: 1, leaves: 1, sides: [12, 7, 4, 3], stride: 1 },
@@ -470,6 +500,9 @@ export function handFor(detail: TreeDetail, tier: TreeTier): Hand {
       far: { branches: .3, twigs: 0, leaves: .12, sides: [4, 0, 0, 0], stride: 4 },
     },
   }
+  // a mid tree seen close draws every stem that bears a leaf: at twenty
+  // metres a spray on an undrawn twig reads as floating
+  if (tier === 'hero' && detail === 'mid' && close) return { branches: 1, twigs: 1, leaves: 1, sides: [8, 5, 3, 3], stride: 2 }
   return table[tier][detail]
 }
 
@@ -542,24 +575,33 @@ function skeleton(spec: TreeSpec, habit: Habit, groundY: number, refuse: Refuse)
   const golden = 2.39996
   let spin = random() * Math.PI * 2
   const forkDepth = H > 9 ? 2 : 1
-  const limb = (start: V3, dir: V3, reach: number, r0: number, id: number, flex0: number, depth: number): void => {
-    const firstShare = depth > 0 ? .4 + random() * .22 : 1
+  // a fork refused where it would grow is tried once more bent upward, as a
+  // limb over a path grows up and away from it; the second try draws on its
+  // own numbers so every limb after it keeps the shape it had
+  const retry = mulberry(spec.seed ^ 0x3c6ef372)
+  const limb = (start: V3, dir: V3, reach: number, r0: number, id: number, flex0: number, depth: number,
+    parent: Stem | undefined, attach: number, rnd: () => number): Stem | null => {
+    const firstShare = depth > 0 ? .4 + rnd() * .22 : 1
     const piece = growStem({ start, dir, length: reach * firstShare, r0, r1: depth > 0 ? r0 * .8 : .012, seg: seg * .8,
       curve: habit.curve, tropism: habit.tropism, outward: .22, stopAtCrown: true,
-      level: 1, scaffold: id, flex0, flexPerM: .3 / Math.max(1.5, reach) }, crown, random, refuse)
-    if (!piece) return
+      level: 1, scaffold: id, flex0, flexPerM: .3 / Math.max(1.5, reach) }, crown, rnd, refuse)
+    if (!piece) return null
+    piece.parent = parent; piece.attach = attach
     stems.push(piece)
     const grew = piece.s[piece.s.length - 1]!
-    if (depth <= 0 || grew < reach * firstShare * .9) return
+    if (depth <= 0 || grew < reach * firstShare * .9) return piece
     const end = along(piece, 1)
-    const forks = random() < .28 ? 3 : 2
-    const turn = random() * Math.PI * 2
+    const forks = rnd() < .28 ? 3 : 2
+    const turn = rnd() * Math.PI * 2
     for (let f = 0; f < forks; f++) {
       const axis = rotate(perpendicular(end.d), end.d, turn + f * Math.PI * 2 / forks)
-      const d = norm(rotate(end.d, norm(cross(end.d, axis)), .3 + random() * .4))
-      limb(end.p, d, (reach - grew) * (.95 + random() * .3), end.r * (forks === 2 ? .8 : .7), id,
-        flex0 + piece.flexPerM * grew, depth - 1)
+      const d = norm(rotate(end.d, norm(cross(end.d, axis)), .3 + rnd() * .4))
+      const childReach = (reach - grew) * (.95 + rnd() * .3), childR = end.r * (forks === 2 ? .8 : .7)
+      const child = limb(end.p, d, childReach, childR, id, flex0 + piece.flexPerM * grew, depth - 1, piece, grew, rnd)
+      if (!child) limb(end.p, norm([d[0] * .55, Math.abs(d[1]) * .55 + .85, d[2] * .55]), childReach * .8, childR, id,
+        flex0 + piece.flexPerM * grew, depth - 1, piece, grew, retry)
     }
+    return piece
   }
   for (const bearer of bearers) {
     const length = bearer.s[bearer.s.length - 1]!
@@ -575,7 +617,7 @@ function skeleton(spec: TreeSpec, habit: Habit, groundY: number, refuse: Refuse)
       const dir = norm(rotate(at.d, norm(cross(at.d, azimuthal)), angle * (.85 + random() * .3)))
       const reach = crown.radius * (1.25 - .35 * h) * (.75 + random() * .45)
       const r0 = Math.min(at.r * .72, trunkR * (.3 + .2 * (1 - h)))
-      limb(at.p, dir, reach, r0, scaffoldId++, .12 + .15 * h, forkDepth)
+      limb(at.p, dir, reach, r0, scaffoldId++, .12 + .15 * h, forkDepth, bearer, share * length, random)
     }
   }
   // THE BRANCHES: second-order limbs along every scaffold and leader
@@ -597,7 +639,7 @@ function skeleton(spec: TreeSpec, habit: Habit, groundY: number, refuse: Refuse)
         curve: habit.curve * 1.3, tropism: habit.branchTropism, outward: .35, stopAtCrown: true,
         level: 2, scaffold: parent.scaffold < 0 ? Math.floor(random() * 997) : parent.scaffold,
         flex0: parent.flex0 + parent.flexPerM * share * length, flexPerM: .32 / Math.max(.8, reach) }, crown, random, refuse)
-      if (branch) stems.push(branch)
+      if (branch) { branch.parent = parent; branch.attach = share * length; stems.push(branch) }
     }
   }
   // THE TWIGS the leaves stand on, along the branches and the short limbs;
@@ -615,10 +657,53 @@ function skeleton(spec: TreeSpec, habit: Habit, groundY: number, refuse: Refuse)
       const twig = growStem({ start: at.p, dir, length: habit.twigLength * (.6 + random() * .8), r0: Math.min(at.r * .6, .012), r1: .003,
         seg: habit.twigLength / 3, curve: habit.curve * 2, tropism: habit.twigTropism, outward: .5, stopAtCrown: false,
         level: 3, scaffold: parent.scaffold, flex0: parent.flex0 + parent.flexPerM * share * length, flexPerM: .5 / habit.twigLength }, crown, random, refuse)
-      if (twig) stems.push(twig)
+      if (twig) { twig.parent = parent; twig.attach = share * length; stems.push(twig) }
     }
   }
-  return { stems, crown, baseY: groundY }
+  return { stems: pruned(stems), crown, baseY: groundY }
+}
+
+/** A limb that carries no leaf anywhere below it is taken off: a scaffold
+    whose forks and branches were all refused (over a walk, at a wall) would
+    stand as a bare pole among the leafwork, and a gardener takes such a limb.
+    A limb left with no fork at its end tapers to a tip over its last half,
+    never thinner than a branch it still carries. */
+function pruned(stems: Stem[]): Stem[] {
+  const children = new Map<Stem, Stem[]>()
+  for (const stem of stems) if (stem.parent) {
+    const list = children.get(stem.parent) ?? []
+    list.push(stem); children.set(stem.parent, list)
+  }
+  const bears = new Map<Stem, boolean>()
+  const leafy = (stem: Stem): boolean => {
+    const known = bears.get(stem)
+    if (known !== undefined) return known
+    const yes = stem.level >= 2 || (children.get(stem) ?? []).some(leafy)
+    bears.set(stem, yes)
+    return yes
+  }
+  const gone = new Set<Stem>()
+  const drop = (stem: Stem): void => { gone.add(stem); for (const child of children.get(stem) ?? []) drop(child) }
+  for (const stem of stems) if (stem.level === 1 && !leafy(stem)) drop(stem)
+  const kept = stems.filter(stem => !gone.has(stem))
+  for (const stem of kept) {
+    if (stem.level !== 1) continue
+    const own = (children.get(stem) ?? []).filter(child => !gone.has(child))
+    if (own.some(child => child.level === 1)) continue
+    const last = stem.x.length - 1, total = stem.s[last]!
+    if (last < 2 || stem.r[last]! <= .014) continue
+    const from = total * .5, r0 = stem.r[0]!
+    for (let i = 1; i <= last; i++) {
+      const at = stem.s[i]!
+      if (at <= from) continue
+      const t = (at - from) / Math.max(1e-6, total - from)
+      const rFrom = r0 + (stem.r[last]! - r0) * .5
+      let r = rFrom + (.012 - rFrom) * Math.pow(t, .8)
+      for (const child of own) if ((child.attach ?? 0) >= at - .05) r = Math.max(r, child.r[0]! * 1.15)
+      stem.r[i] = Math.min(stem.r[i]!, r)
+    }
+  }
+  return kept
 }
 
 /* ─── the bark ─────────────────────────────────────────────────────────── */
@@ -752,18 +837,41 @@ function card(body: Body, shadow: Body | null, at: V3, dir: V3, face: V3, length
   }
 }
 
-/** a leaf's colour out of the tree's palette by how far it has turned */
-function paletteColour(palette: readonly V3[], weights: readonly number[], turn: number, random: () => number): V3 {
-  const total = weights.reduce((a, b) => a + b, 0)
-  let target = clamp01(turn + (random() - .5) * .3) * total
-  let i = 0
-  while (i < weights.length - 1 && target > weights[i]!) { target -= weights[i]!; i++ }
-  const next = Math.min(palette.length - 1, i + 1)
-  const t = clamp01(target / weights[i]!) * .5
-  const a = palette[i]!, b = palette[next]!
+/** A ramp of colours with weights, read at a share 0..1 of its weight. */
+interface Ramp { colours: readonly V3[]; weights: readonly number[]; total: number }
+function ramp(entries: readonly (readonly [string, number])[]): Ramp {
+  const weights = entries.map(([, w]) => w)
+  return { colours: entries.map(([hex]) => hexToLinear(hex)), weights, total: weights.reduce((a, b) => a + b, 0) }
+}
+function rampAt(r: Ramp, share: number): V3 {
+  let target = clamp01(share) * r.total, i = 0
+  while (i < r.weights.length - 1 && target > r.weights[i]!) { target -= r.weights[i]!; i++ }
+  const next = Math.min(r.colours.length - 1, i + 1)
+  const t = clamp01(target / r.weights[i]!) * .5
+  const a = r.colours[i]!, b = r.colours[next]!
+  return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]
+}
+export interface SpeciesRamps { green: Ramp; turned: Ramp }
+const rampsOf = new Map<Species, SpeciesRamps>()
+export function speciesRamps(species: Species): SpeciesRamps {
+  let r = rampsOf.get(species)
+  if (!r) { r = { green: ramp(HABITS[species].green), turned: ramp(HABITS[species].turned) }; rampsOf.set(species, r) }
+  return r
+}
+
+/** A leaf's colour. Whether it has turned follows the species' stage, moved
+    by how exposed the leaf stands (outer, upper, sunward first) and by its
+    limb; how far it has turned follows the same exposure. Two draws, so the
+    leaves after it keep their places whatever the stage is. */
+function leafColour(habit: Habit, ramps: SpeciesRamps, exposure: number, bias: number, random: () => number): V3 {
+  const r = random()
+  const p = clamp01(habit.stage + (exposure - .62) * habit.exposureTurn * 1.1 + bias)
+  const colour = r < p
+    ? rampAt(ramps.turned, clamp01(r / Math.max(p, 1e-6) * .75 + exposure * .25))
+    : rampAt(ramps.green, (r - p) / Math.max(1 - p, 1e-6))
   // the map's blade is a little under white: the colour carries it back
   const lift = (.92 + random() * .2) / .84
-  return [(a[0] + (b[0] - a[0]) * t) * lift, (a[1] + (b[1] - a[1]) * t) * lift, (a[2] + (b[2] - a[2]) * t) * lift]
+  return [colour[0] * lift, colour[1] * lift, colour[2] * lift]
 }
 
 /** the area of an ellipsoid's skin, Thomsen's form */
@@ -785,14 +893,15 @@ export interface TreeResult {
 export function growTree(spec: TreeSpec, tier: TreeTier, heightAt: (east: number, north: number) => number,
   refuse: Refuse, bark: Body, fine: Body, leaves: Body, shadows: Body | null): TreeResult {
   const habit = HABITS[spec.species]
-  const hand = handFor(spec.detail, tier)
+  const hand = handFor(spec.detail, tier, spec.close)
   const groundY = heightAt(spec.east, spec.north)
   const grown = skeleton(spec, habit, groundY, refuse)
   const random = mulberry(spec.seed ^ 0x5bd1e995)
   const pick = mulberry(spec.seed ^ 0x27d4eb2f)
   const barkColour = hexToLinear(habit.bark.colour), lichen = hexToLinear(habit.bark.lichen)
-  const palette = habit.palette.map(([hex]) => hexToLinear(hex))
-  const weights = habit.palette.map(([, w]) => w)
+  const ramps = speciesRamps(spec.species)
+  // one tree against another of its species: a few days, never a season
+  const treeBias = (mulberry(spec.seed ^ 0x2545f491)() - .5) * .08
   const wood = (): number => bark.triangles + (fine === bark ? 0 : fine.triangles)
   const barkBefore = wood(), leafBefore = leaves.triangles
   // the wood: every tier walks the same stems and keeps its own share; the
@@ -822,7 +931,7 @@ export function growTree(spec: TreeSpec, tier: TreeTier, heightAt: (east: number
   const share = spraying ? SPRAY_COVER : Math.PI / 4 * habit.leaf.width
   const skin = skinArea(c.radius, c.radius, (c.y1 - c.y0) / 2)
   const needed = COVER * skin * (1 - habit.fallen * .85)
-  const cap = LEAF_CAP[spec.detail]
+  const cap = spec.leafCap ?? LEAF_CAP[spec.detail]
   const unit = needed / (drawn * drawn * share) > cap
     ? Math.min(drawn * LEAF_GROW[spec.detail], Math.sqrt(needed / (cap * share))) : drawn
   const count = Math.round(Math.min(cap, needed / (unit * unit * share)) * hand.leaves)
@@ -865,10 +974,12 @@ export function growTree(spec: TreeSpec, tier: TreeTier, heightAt: (east: number
         const depth = c.depth(at.p[0], at.p[1], at.p[2])
         const h = clamp01(c.heightShare(at.p[1]))
         let bias = turnBias.get(slot.stem.scaffold)
-        if (bias === undefined) { bias = (pick() - .5) * .45; turnBias.set(slot.stem.scaffold, bias) }
-        const exposure = clamp01(.55 * clamp01(depth) + .45 * h)
-        const turn = clamp01((1 - habit.exposureTurn) * w + habit.exposureTurn * exposure * (.6 + .6 * w) + bias)
-        const colour = paletteColour(palette, weights, turn, random)
+        // a limb turns a little ahead of or behind its neighbours
+        if (bias === undefined) { bias = (pick() - .5) * .2 + treeBias; turnBias.set(slot.stem.scaffold, bias) }
+        const outH = Math.hypot(out[0], out[2]) || 1
+        const sunward = clamp01(.5 + .5 * (out[0] * SUN_HORIZONTAL[0] + out[2] * SUN_HORIZONTAL[1]) / outH)
+        const exposure = clamp01(.45 * clamp01(depth) + .35 * h + .2 * sunward)
+        const colour = leafColour(habit, ramps, exposure, bias, random)
         const phase = ((slot.stem.scaffold * .618034 + spec.seed * 1e-4) % 1 + 1) % 1
         const flex = clamp01(slot.stem.flex0 + slot.stem.flexPerM * slot.stem.s[slot.stem.s.length - 1]! * slot.share)
         const data: LeafData = { colour, ao: .36 + .64 * Math.pow(clamp01(depth), 1.3) * (.72 + .28 * h), phase, leafPhase: q, flex }
@@ -928,12 +1039,16 @@ export function fallenLeaf(body: Body, species: Species, east: number, north: nu
 
 export function leafLengthOf(species: Species): number { return HABITS[species].leaf.length }
 export function fallenPalette(species: Species): { colours: V3[]; weights: number[] } {
-  const habit = HABITS[species]
-  const colours = habit.palette.map(([hex]) => hexToLinear(hex))
-  // what lies on the ground is what turned: the ramp's far end, and browner
-  const start = Math.max(0, colours.length - 4)
-  return {
-    colours: colours.slice(start).map(c => [c[0] * .92 / .84, c[1] * .84 / .84, c[2] * .78 / .84] as V3),
-    weights: habit.palette.slice(start).map(([, w]) => w),
+  const turned = HABITS[species].turned
+  // what lies on the ground is what turned, drying browner the longer it
+  // lies: the fresh fall keeps its colour, the older fall has lost it
+  const colours: V3[] = [], weights: number[] = []
+  for (const [i, [hex, w]] of turned.entries()) {
+    const c = hexToLinear(hex), age = i / Math.max(1, turned.length - 1)
+    colours.push([c[0] * .98, c[1] * .9, c[2] * .8])
+    weights.push(w * (.7 + .6 * age))
+    colours.push([c[0] * .78, c[1] * .64, c[2] * .52])
+    weights.push(w * (.35 + .5 * age))
   }
+  return { colours, weights }
 }
