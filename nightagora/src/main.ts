@@ -1080,7 +1080,13 @@ instSound?.addEventListener('click', toggleSound)
 /** THE PANEL IS A SHEET INSIDE A WING. The museum's own control stands on the
     wing's band, the panel it opens takes the frame's whole height, and the
     picture beside it stays visible, so a press on it gives the room back. */
-const panelIsSheet = (): boolean => phase === 'wing' && deskOn('panel')
+const panelIsSheet = (): boolean => phase === 'wing' && deskPanel()
+
+/** The instruments stand on the desktop's band only where that band stands:
+    a narrow stage keeps the phone's own way to them. */
+function deskPanel(): boolean {
+  return deskOn('panel') && innerWidth / innerHeight > 0.9
+}
 
 /** where the museum's control stands, and what the sheet's rules key on */
 function markPanel(): void {
@@ -1560,7 +1566,7 @@ window.__forge = {
     }
     if (p !== 'agora' && p !== 'wheel' && p !== 'descent')
       camera.rotation.set(0, 0, 0)
-    railEl.hidden = p === 'transit' || p === 'held' || p === 'breath' || (p === 'wing' && !deskOn('panel'))
+    railEl.hidden = p === 'transit' || p === 'held' || p === 'breath' || (p === 'wing' && !deskPanel())
     // the rig's front door is the door as it STANDS. The frame where it is
     // still waiting is shot by navigating to it, never by a jump: a frozen
     // eye would hold that frame for as long as it looked.
@@ -1753,7 +1759,7 @@ function setPhase(next: Phase): void {
     /* THE MUSEUM'S CONTROL STANDS INSIDE A WING. The rail carries it alone
        there: a wing plays no sound in the first product, and a control that
        does nothing does not stand. */
-    railEl.hidden = !(next === 'wing' && deskOn('panel'))
+    railEl.hidden = !(next === 'wing' && deskPanel())
   } else if (railAwake) {
     railEl.hidden = false
   }

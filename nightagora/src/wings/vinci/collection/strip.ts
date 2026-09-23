@@ -128,8 +128,10 @@ const DRAG_SLOP = 6
 /* WHERE THE WHOLE SET HAS A VIEW OF ITS OWN, THIS ROW STANDS DOWN, at rest
  * and under a close look alike: one selector per set, and the overview is
  * that one. The reader's own strip of sides stays, because it is the page's
- * instrument and not a second way through the same set. */
-const rowStandsDown = (): boolean => deskOn('overview')
+ * instrument and not a second way through the same set. The word the wing
+ * wrote says whether the view stands: a narrow stage never gets one. */
+const rowStandsDown = (): boolean =>
+  deskOn('overview') && (document.getElementById('wing')?.dataset['desk'] ?? '').split(' ').includes('overview')
 
 export function createVinciHangStrip(options: {
   host: HTMLElement

@@ -476,7 +476,10 @@ export function createWing():VinciWingModule {
     // written once and the stylesheet branches on it, so with every switch
     // off nothing below this line paints.
     const wing=h.stage.parentElement!
-    applyDeskSteps(wing)
+    // THE PHONE KEEPS ITS OWN CHROME. The desktop's steps stand only on a stage
+    // that is wide when the visit begins, and the word stays off a narrow one.
+    const deskStage=!narrow()
+    if(deskStage)applyDeskSteps(wing);else delete wing.dataset['desk']
     /* HOW FAR DOWN A PANEL MAY STAND. Today that is the top of the bar; where
        the desktop's words stand, it is the top of their own band. */
     panelFloor=()=>desk?.floor()??wing.querySelector('.wing-rail-group')?.getBoundingClientRect().top??deskStageHeight()
@@ -496,7 +499,7 @@ export function createWing():VinciWingModule {
       // desk.opening
       '',
     ].filter(Boolean).join('\n');h.stage.append(deskStyle)
-    if(deskOn('words')||deskOn('ways'))desk=createDeskChrome({
+    if(deskStage&&(deskOn('words')||deskOn('ways')))desk=createDeskChrome({
       stage:h.stage,wing,lang,
       standing:()=>deskStationAt(card),
       next:()=>card+1<WALK.stops.length?deskStationAt(card+1):null,
@@ -821,7 +824,7 @@ export function createWing():VinciWingModule {
       if(closeLook?.id&&(e.key==='Escape'||e.key.startsWith('Arrow')||closeLook.owns(target))){
         // ONE SURFACE BACK, EXACTLY ONE. The record a close look opened stands
         // over its label, so Escape puts the record away before the window.
-        if(e.key==='Escape'&&deskOn('closelook')&&mode===2&&exhibitSources){e.preventDefault();mode=1;paintDock();return}
+        if(e.key==='Escape'&&deskOn('closelook')&&!narrow()&&mode===2&&exhibitSources){e.preventDefault();mode=1;paintDock();return}
         if(e.key==='Escape'){e.preventDefault();closeLook.close();return}
         // THE ARROWS WALK THE WALL while an exhibit stands: the station rail
         // is what the visitor left to come here.
