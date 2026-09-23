@@ -300,7 +300,37 @@ export function createVitrine(options: {
     else delete document.documentElement.dataset['naWindow']
     paintHole()
     exhibit?.payload?.layout?.()
+    trimWords()
   }
+
+  /** NO LINE OF THE WORDS IS SLICED WHERE THEIR SCROLL BOX ENDS. On the phone
+   * the box ends where the controls begin, which can fall inside a line: the
+   * box is shortened to the last line it shows whole, and the rest scrolls. */
+  function trimWords(): void {
+    body.style.marginBottom = ''
+    if (!open || !options.narrow() || body.scrollHeight <= body.clientHeight + 1) return
+    const top = body.getBoundingClientRect().top + body.clientTop
+    const floor = top + body.clientHeight
+    const lines: DOMRect[] = []
+    const range = document.createRange()
+    const text = document.createTreeWalker(body, NodeFilter.SHOW_TEXT)
+    for (let node = text.nextNode(); node; node = text.nextNode()) {
+      if (!node.textContent?.trim()) continue
+      range.selectNodeContents(node)
+      for (const rect of range.getClientRects()) if (rect.height > 0) lines.push(rect)
+    }
+    // a line moved above the edge can leave a taller neighbour across it
+    let edge = floor
+    for (let moved = true; moved;) {
+      moved = false
+      for (const r of lines) if (r.top > top + .5 && r.top < edge - .5 && r.bottom > edge + .5) { edge = r.top; moved = true }
+    }
+    if (floor - edge > .5) body.style.marginBottom = `${Math.ceil(floor - edge)}px`
+  }
+  /* the words change after the layout that placed them: a payload lays in its
+     steps, a label opens, a face arrives */
+  const wordsResized = new ResizeObserver(() => { if (open) trimWords() })
+  for (const part of [naming, line, words, aside, after]) wordsResized.observe(part)
 
   /** The name at the head of the card, and the card's accessible name with
    * it: a window that named itself twice would be read twice. The mark
@@ -592,6 +622,7 @@ export function createVitrine(options: {
       if (open) { unmountPayload(); open = null; exhibit = null }
       band?.dispose()
       band = null
+      wordsResized.disconnect()
       leaving.abort()
       delete document.documentElement.dataset['naWindow']
       root.remove()
