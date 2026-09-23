@@ -3589,8 +3589,8 @@
       "display": true,
       "prompt": "The mechanism hall's air: a thin haze marched through the hall's box, lit by the hall's own shadowed sources so each shaft of the clerestory's light and of a spot is carved by the shadows its map holds, denser low and drifting slowly; stopped at the room's depth, which the air draws for itself. A modern room's air; no 1517 claim.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
-      "date": "2026-09-22",
-      "sha256": "fae0432bb52dd77d3ab0b3502111d507c0fe1eb6ce0fb6dad0213ebec8dffb82",
+      "date": "2026-09-23",
+      "sha256": "e48469603ae85fe0d67a9b74680ff4494a970f7974c8e6a437c90a88c5e7c3ee",
       "note": "Modern museum insertion, the mechanism hall only; no 1517 claim. recipe_file=src/wings/vinci/collection/hall-air.ts"
     },
     {
