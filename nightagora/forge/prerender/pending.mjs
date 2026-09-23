@@ -4,11 +4,11 @@
 // surface that is not dressed yet, so every rig here waits for the count to
 // come to rest before it keeps a frame.
 //
-// It does not always come to rest at ZERO. A set whose fetch is aborted stays
-// neither ready nor missing, and the count then holds at one for the life of
-// the page: a rig that waits for zero waits forever. So the wait is for a
-// RESTING count, the number is handed back, and every instrument records it
-// beside its frames instead of tuning it away.
+// The wait is for a RESTING count, zero included, so a stop is stood at for
+// the same seconds whatever the count reads: what the count does not see (a
+// room dressed in slices, a pipeline compiled on first sight) finishes inside
+// them too. A count that rests above zero is something still out, so the
+// number is handed back and every instrument records it beside its frames.
 
 /** Resolves with the resting count, or the last one read at the cap. */
 export async function restingPending(page, ms = 60000, still = 6, step = 500) {
@@ -16,7 +16,6 @@ export async function restingPending(page, ms = 60000, still = 6, step = 500) {
   let same = 0
   for (let waited = 0; waited < ms; waited += step) {
     const now = await page.evaluate(() => window.__forge.state().texturesPending)
-    if (now === 0) return 0
     same = now === last ? same + 1 : 0
     last = now
     if (same >= still) return now

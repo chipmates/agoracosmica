@@ -61,6 +61,7 @@ export interface CollectionExhibits {
   pictureSources(): readonly CollectionPictureSource[]
   /** The body wall's own records, for the row that names every sheet. */
   sheetSources(): readonly BodySheetSource[]
+  /** What can no longer arrive: a picture, or a ground whose own build failed. */
   pictureErrors(): readonly string[]
   /** The room's own sources, separately from the whole ground: the close
    * look's registry is a read over these meshes. */
@@ -86,7 +87,11 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       }
     })
   }
-  const warmed = new Set<StandGround>()
+  /* A GROUND IS IN FLIGHT UNTIL ITS OWN BUILD HAS SETTLED, not until a
+     machine stands on it: the house is warmed and carries no machine. Each
+     machine it asked for is counted by the machine registry from then on. */
+  const building = new Set<StandGround>()
+  const groundErrors: string[] = []
   /* Counted, never timed: each of these rises once and never falls, and a
      body whose own build FAILED still counts as settled, or the count would
      stand short of its total for the rest of the entry. */
@@ -219,13 +224,12 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   // set, so there is no wait at the head of the page and the walk's one
   // shadow snapshot is taken with the exhibit already standing.
   const court = stand('parachute').ready
-  warmed.add('court')
   /** One promise per ground, so a ground is built once and in its own turn. */
   const built = new Map<StandGround, Promise<void>>()
   function warmGround(ground: StandGround): Promise<void> {
     const already = built.get(ground)
     if (already) return already
-    warmed.add(ground)
+    building.add(ground)
     // ONE MACHINE PER TURN. Nine of them in a single tick is half a minute of
     // frozen frame; behind the entry's field it is a wait, never a stall.
     const work = court.then(() => seed(['bronze-dark', 'leather-worn', 'parchment-laid', 'limestone-pale'])).then(async () => {
@@ -237,6 +241,13 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       }
     })
     built.set(ground, work)
+    // A build that fails is settled and named, never a count that hangs.
+    void work.then(() => { building.delete(ground) }, (error: unknown) => {
+      building.delete(ground)
+      const said = `ground ${ground}: ${error instanceof Error ? error.message : String(error)}`
+      groundErrors.push(said)
+      console.error(`The ${ground}'s exhibits were not all stood: ${said}`)
+    })
     return work
   }
   // THE COURT IS BUILT WITH THE PAGE. Its three exhibits stand under the open
@@ -374,10 +385,10 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       }
     },
     ready: Promise.all([court.then(() => courtGround).then(() => hall ?? Promise.resolve()).then(() => table ?? Promise.resolve()), pictures.ready]).then(() => undefined),
-    pending: () => [...warmed].filter(ground => !machines.some(machine => machine.ground === ground)).length + pictures.pending(),
+    pending: () => building.size + pictures.pending(),
     pictureSources: pictures.sources,
     sheetSources: pictures.sheets,
-    pictureErrors: pictures.errors,
+    pictureErrors: () => [...pictures.errors(), ...groundErrors],
     picturesReady: pictures.ready,
     warm: warmHall,
     demonstrate(slug) { demonstrating = slug },

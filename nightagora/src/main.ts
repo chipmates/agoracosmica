@@ -1676,7 +1676,8 @@ window.__forge = {
       stationIds: stand ? stand.stationIds : wingFrame.stationIds(),
       door: wingFrame.doorHere(),
       texturesPending: stack.materials.pending() + (stand?.texturesPending ?? 0) + wingFrame.pending(),
-      textureErrors: wingFrame.errors(),
+      // a library set that failed has left the count above, so it is named here
+      textureErrors: [...wingFrame.errors(), ...stack.materials.missing().map(({ name, reason }) => `library/${name}: ${reason}`)],
       // what the last frame actually cost: the rig quotes this instead of
       // guessing from a software-rasterizer fps number
       draws: renderer.info.render.drawCalls,
