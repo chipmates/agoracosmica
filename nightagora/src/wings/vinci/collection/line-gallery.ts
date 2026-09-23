@@ -29,7 +29,7 @@ import { axisFootprint, lineCoverage } from '../../../stack/detail'
 import type { LineMaterials } from '../line'
 import { COLLECTION_PAVING_ORIGIN, LINE_ORIGIN, LINE_SLAB } from './layout'
 import {
-  benches, ceilingSkin, fittings, floorSkins, GALLERY_LIGHTS, LINE_GALLERY_PROVENANCE, PROBE_AT, v3, wallSkins,
+  benches, ceilingSkin, DATE_MIDDLE_EAST, fittings, floorSkins, GALLERY_LIGHTS, LINE_GALLERY_PROVENANCE, PROBE_AT, v3, wallSkins,
   type GalleryLight, type Skin, type Solid,
 } from './line-gallery-plan'
 
@@ -39,7 +39,7 @@ type N = any
 
 const {
   abs, attribute, cameraViewMatrix, cross, dot, float, floor: floorOf, fract, mix, mx_noise_float, normalWorldGeometry,
-  positionWorld, select, uniform, vec2, vec3,
+  positionWorld, select, smoothstep, uniform, vec2, vec3,
 } = TSL as unknown as Record<string, N>
 
 /** The sets the gallery is dressed from, all CC0 and already in the store. */
@@ -71,6 +71,8 @@ function looks() {
     /** how much of the photograph's own banding the honed face keeps */
     stoneBand: uniform(.45),
     stoneRough: uniform(.46),
+    /** how far the walk along the dates has polished its band */
+    stoneWalk: uniform(.08),
     stoneTone: uniform(.11),
     stoneNormal: uniform(.3),
     groutColour: uniform(new Color('#5f574c')),
@@ -195,10 +197,15 @@ function limestoneMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial
   // a slab's edge stands in its fifteen millimetre joint, where the engine
   // casts no shadow: the joint is read dark as the grout it opens onto
   const inJoint = select(level, float(0), float(.78)).mul(L.engineTerms)
-  m.colorNode = sample.colour.mul(calmed).mul(L.stoneTint).mul(tone).mul(float(1).sub(inJoint))
+  // WHERE THE DATES ARE READ THE STONE IS WALKED: a band along the line a
+  // little finer in its polish, with the dust of the walk at its edges
+  const fromLine = abs(east.sub(DATE_MIDDLE_EAST - .25)), band = smoothstep(1.35, .55, fromLine)
+  const edge = smoothstep(.45, 1.1, fromLine).mul(smoothstep(1.7, 1.15, fromLine))
+  const walked = float(1).sub(edge.mul(L.stoneWalk.mul(.35))).add(band.mul(L.stoneWalk.mul(.12)))
+  m.colorNode = sample.colour.mul(calmed).mul(L.stoneTint).mul(tone).mul(walked).mul(float(1).sub(inJoint))
   // honed: the photograph's own veins a touch rougher than the ground
   const vein = float(1).sub(sample.albedo.g).clamp(-.3, .3)
-  m.roughnessNode = L.stoneRough.add(h2.sub(.5).mul(.06)).add(vein.mul(.12)).clamp(.2, .9)
+  m.roughnessNode = L.stoneRough.add(h2.sub(.5).mul(.06)).add(vein.mul(.12)).sub(band.mul(L.stoneWalk)).clamp(.2, .9)
   const t = vec3(0, 0, -1).mul(turn), b = vec3(-1, 0, 0).mul(turn)
   m.normalNode = select(level, bend(t, b, n, sample.normal, L.stoneNormal), n.transformDirection(cameraViewMatrix))
   m.name = 'vinci/collection-line-gallery/limestone'
