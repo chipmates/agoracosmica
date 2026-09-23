@@ -39,6 +39,8 @@ async function load(file) {
 }
 
 const plan = await load(path.join(HERE, 'reading-room-plan.ts'))
+const { FACE } = await load(path.join(HERE, 'layout.ts'))
+const FACE_WEST = FACE.hallPartitionEast
 const certificate = JSON.parse(fs.readFileSync(path.join(HERE, '../data/rail-clearance.json'), 'utf8'))
 /** a hair over the saved envelope, so a box that only grazes it is refused */
 const MARGIN_M = .02
@@ -156,12 +158,64 @@ if (onFloor !== 4) chairFailures.push(`${onFloor} chair legs stand on the floor,
 const seat = chairBoxes.find(box => Math.abs(box[2] - (floorLevel + plan.READING_CHAIR.seat)) < 1e-6)
 const seatUnder = seat ? +(top[3] - seat[0]).toFixed(4) : null
 if (!seat || seat[5] >= top[2] || seatUnder < .2) chairFailures.push('the seat does not run on under the table top')
-const failures = [...room.failures, ...chairFailures]
+// THE BODY'S OWN TRIANGLES. The boxes above are the room's declared solids;
+// here every triangle the room's batches actually build is held to the
+// footprint and, near the room, to every certified envelope, so a moulding
+// that runs past its box cannot pass unseen.
+const body = plan.studioloParts()
+const R = plan.READING_ROOM
+const tris = []
+for (const batch of [body.inside, body.outside, body.ceiling, body.dark, body.bronze]) {
+  const pos = batch.geometry().getAttribute('position')
+  for (let i = 0; i + 2 < pos.count; i += 3) tris.push([0, 1, 2].map(k => new THREE.Vector3(pos.getX(i + k), pos.getY(i + k), pos.getZ(i + k))))
+}
+const mesh = { triangles: tris.length, outside: 0, near: 0, worst: null }
+const meshFailures = []
+const lo = new THREE.Vector3(FACE_WEST - .006, R.floor - .1, -R.north), hi = new THREE.Vector3(R.front + 1e-4, R.top + 1e-4, -R.south)
+for (const t of tris) for (const v of t) if (v.x < lo.x || v.x > hi.x || v.z < lo.z - 1e-4 || v.z > hi.z + 1e-4 || v.y > hi.y) mesh.outside++
+if (mesh.outside) meshFailures.push(`${mesh.outside} vertices of the room's body stand outside its footprint`)
+const roomBox = new THREE.Box3(new THREE.Vector3(lo.x, lo.y, lo.z), new THREE.Vector3(hi.x, hi.y, hi.z))
+const triBoxes = tris.map(t => new THREE.Box3().setFromPoints(t))
+const noteMesh = (label, clearance, required) => {
+  const margin = clearance - required
+  if (!mesh.worst || margin < mesh.worst.marginM) mesh.worst = { label, clearanceM: +clearance.toFixed(4), requiredM: +required.toFixed(4), marginM: +margin.toFixed(4) }
+  if (margin < MARGIN_M) meshFailures.push(`${label}: the body's mesh stands ${clearance.toFixed(4)} m off, inside ${required.toFixed(4)} m and the ${MARGIN_M} m margin`)
+}
+const allRuns = [...certificate.routes, ...(certificate.approaches ?? []), ...(certificate.links ?? []), ...(certificate.walls ?? [])]
+for (const entry of allRuns) {
+  const points = entry.points.map(([east, north, height]) => new THREE.Vector3(east, height, -north))
+  const reach = entry.maxNearRadius + MARGIN_M
+  for (let i = 1; i < points.length; i++) {
+    const span = new THREE.Box3().setFromPoints([points[i - 1], points[i]]).expandByScalar(reach)
+    if (!span.intersectsBox(roomBox)) continue
+    let best = Infinity
+    tris.forEach((t, k) => { if (span.intersectsBox(triBoxes[k])) best = Math.min(best, segmentTriangleDistance(points[i - 1], points[i], t)) })
+    if (best < Infinity) { mesh.near++; noteMesh(`${entry.viewport} ${entry.from ?? entry.station ?? entry.id} to ${entry.to ?? entry.exhibit ?? ''} span ${i - 1}`, best, entry.maxNearRadius) }
+  }
+  for (const ball of entry.certifiedBalls ?? []) {
+    const centre = new THREE.Vector3().fromArray(ball.centre)
+    const reachBox = new THREE.Box3().setFromCenterAndSize(centre, new THREE.Vector3(1, 1, 1).multiplyScalar(2 * (ball.radiusM + MARGIN_M)))
+    if (!reachBox.intersectsBox(roomBox)) continue
+    let best = Infinity
+    tris.forEach((t, k) => { if (reachBox.intersectsBox(triBoxes[k])) best = Math.min(best, segmentTriangleDistance(centre, centre, t)) })
+    if (best < Infinity) { mesh.near++; noteMesh(`ball of ${entry.viewport} ${entry.from ?? entry.station ?? entry.id}`, best, ball.radiusM) }
+  }
+}
+for (const approach of certificate.approaches ?? []) {
+  const eye = new THREE.Vector3().fromArray(approach.toPose.eye)
+  const reachBox = new THREE.Box3().setFromCenterAndSize(eye, new THREE.Vector3(1, 1, 1).multiplyScalar(2 * (approach.maxNearRadius + MARGIN_M)))
+  if (!reachBox.intersectsBox(roomBox)) continue
+  let best = Infinity
+  tris.forEach((t, k) => { if (reachBox.intersectsBox(triBoxes[k])) best = Math.min(best, segmentTriangleDistance(eye, eye, t)) })
+  if (best < Infinity) { mesh.near++; noteMesh(`viewing eye ${approach.viewport} ${approach.exhibit}`, best, approach.maxNearRadius) }
+}
+const failures = [...room.failures, ...chairFailures, ...meshFailures]
 if (control.failures.length === 0) failures.push('The control post on the walk to the hall door was not refused')
 const bounds = solids.reduce((b, { box }) => [Math.min(b[0], box[0]), Math.min(b[1], box[1]), Math.min(b[2], box[2]), Math.max(b[3], box[3]), Math.max(b[4], box[4]), Math.max(b[5], box[5])], [Infinity, Infinity, Infinity, -Infinity, -Infinity, -Infinity])
 console.log(JSON.stringify({ checker: 'vinci-collection-reading-room', ok: failures.length === 0,
-  scope: 'The reading room plan as the runtime builds it: panelling, dado, north return, canopy, floor and its bronze edges, the pendant and its cord, the chair, and the chair pushed in against the table top. Every certificate route, approach, leg and wall span at its saved near and gait envelope plus a margin, every recorded corner ball, every station eye and viewing eye at its own near radius. The room stands outside the rail construction fingerprint.',
+  scope: 'The reading room plan as the runtime builds it: the studiolo plinth, walls, doorway, window, panelling, coffered ceiling and corniced lid as declared solids and as its own triangles, the bookcase and its volumes, the pendant and its cord, the chair, and the chair pushed in against the table top. Every certificate route, approach, leg and wall span at its saved near and gait envelope plus a margin, every recorded corner ball, every station eye and viewing eye at its own near radius. The room stands outside the rail construction fingerprint.',
   marginM: MARGIN_M, bounds, room: { ...room, failures: room.failures.slice(0, 12) },
   control: { failures: control.failures.length, worst: control.worst },
-  chair: { edgeGapM: +edgeGap.toFixed(4), seatUnderTopM: seatUnder, legsOnFloor: onFloor, failures: chairFailures }, failures: failures.slice(0, 20) }, null, 2))
+  chair: { edgeGapM: +edgeGap.toFixed(4), seatUnderTopM: seatUnder, legsOnFloor: onFloor, failures: chairFailures },
+  mesh: { ...mesh, failures: meshFailures.slice(0, 12) }, failures: failures.slice(0, 20) }, null, 2))
 process.exitCode = failures.length ? 1 : 0
