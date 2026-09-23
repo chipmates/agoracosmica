@@ -302,11 +302,13 @@ function exactMesh(part: PartSpec, helical = false, tier: TierName = 'standard')
   return geometry
 }
 
-/** An end-grain face carries its U this far out, so a material can tell the
- * end of a timber from its side; a tiled map repeats and never sees it. */
-export const END_GRAIN_U = 64
+/** End grain drinks the light: its vertex colour, against one for side grain.
+ * A colour and not a shader branch, so a baked or exported surface keeps it. */
+export const END_GRAIN_TONE = .42
 /** The classes whose timbers show their end grain. */
 const endGrainClass = (material: string): boolean => /planed oak|turned oak|oak peg/.test(material)
+const toneAttribute = (tones: number[]): Float32BufferAttribute =>
+  new Float32BufferAttribute(Float32Array.from(tones.flatMap(t => [t, t, t])), 3)
 
 /** UVs are metres so the library's grain cannot swell with the machine. */
 export function metricPlanarUV(geometry: BufferGeometry, alongMember = false, markEnds = false): void {
@@ -314,7 +316,7 @@ export function metricPlanarUV(geometry: BufferGeometry, alongMember = false, ma
   geometry.computeBoundingBox()
   const size = geometry.boundingBox!.getSize(new Vector3())
   const sizes = [size.x, size.y, size.z]
-  const uv: number[] = []
+  const uv: number[] = [], tones: number[] = []
   for (let i = 0; i < p.count; i++) {
     const nx = Math.abs(n?.getX(i) ?? 0), ny = Math.abs(n?.getY(i) ?? 1), nz = Math.abs(n?.getZ(i) ?? 0)
     let a: number, b: number
@@ -328,9 +330,11 @@ export function metricPlanarUV(geometry: BufferGeometry, alongMember = false, ma
     // a face square to the member's own length is the timber's end
     const along = sizes.indexOf(Math.max(...sizes))
     const end = markEnds && Math.abs([n?.getX(i) ?? 0, n?.getY(i) ?? 1, n?.getZ(i) ?? 0][along]!) > .95
-    uv.push(coordinates[a]! + (end ? END_GRAIN_U : 0), coordinates[b]!)
+    uv.push(coordinates[a]!, coordinates[b]!)
+    tones.push(end ? END_GRAIN_TONE : 1)
   }
   geometry.setAttribute('uv', new Float32BufferAttribute(uv, 2))
+  if (markEnds) geometry.setAttribute('color', toneAttribute(tones))
 }
 
 function metricCylinderUV(geometry: BufferGeometry, radius: number, height: number, markEnds = false): void {
@@ -339,12 +343,15 @@ function metricCylinderUV(geometry: BufferGeometry, radius: number, height: numb
   // library's long grain runs around the circumference; mapped up a four
   // centimetre rim instead it stretches one slice of plank into a comb.
   const plate = height < radius
+  const tones: number[] = []
   for (let i = 0; i < uv.count; i++) {
-    if (Math.abs(n.getY(i)) > 0.5) { uv.setXY(i, p.getX(i) + (markEnds ? END_GRAIN_U : 0), p.getZ(i)); continue }
+    tones.push(Math.abs(n.getY(i)) > 0.5 ? END_GRAIN_TONE : 1)
+    if (Math.abs(n.getY(i)) > 0.5) { uv.setXY(i, p.getX(i), p.getZ(i)); continue }
     const around = uv.getX(i) * TAU * radius, along = uv.getY(i) * height
     if (plate) uv.setXY(i, along, around)
     else uv.setXY(i, around, along)
   }
+  if (markEnds) geometry.setAttribute('color', toneAttribute(tones))
 }
 
 /** A REVOLVED BODY, BUILT THE WAY IT IS TURNED. three's lathe averages the
@@ -470,8 +477,8 @@ export function geometryForPart(part: PartSpec, tier: TierName = 'standard', slu
   geometry.clearGroups()
   // Each oak piece carries its own tone in a vertex colour, white until the
   // part's own phase is laid on it, so every piece of a welded draw has one.
-  if (endGrainClass(part.material.class) || /oak grip/.test(part.material.class)) {
-    geometry.setAttribute('color', new Float32BufferAttribute(new Float32Array(geometry.getAttribute('position').count * 3).fill(1), 3))
+  if ((endGrainClass(part.material.class) || /oak grip/.test(part.material.class)) && !geometry.getAttribute('color')) {
+    geometry.setAttribute('color', toneAttribute(new Array<number>(geometry.getAttribute('position').count).fill(1)))
   }
   geometry.computeBoundingBox()
   geometry.computeBoundingSphere()

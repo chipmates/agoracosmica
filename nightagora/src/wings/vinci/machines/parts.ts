@@ -2,13 +2,13 @@ import {
   Color, DoubleSide, FrontSide, Group, InstancedMesh, Matrix4, Mesh, MeshPhysicalNodeMaterial, MeshStandardNodeMaterial,
   type BufferGeometry,
 } from 'three/webgpu'
-import { attribute, cameraPosition, float, mix, normalGeometry, normalMap, normalWorld, positionGeometry, positionWorld, step, uv, vec2, vec3 } from 'three/tsl'
+import { attribute, cameraPosition, float, mix, normalGeometry, normalMap, normalWorld, positionGeometry, positionWorld, uv, vec2, vec3 } from 'three/tsl'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
 import type { MaterialSet, Stack } from '../../../stack'
 import type { DetailNodes } from '../../../stack/detail'
 import { createGlassSeatMaterial } from './glass-seat'
 import { createFlywheelSpokeArms } from './flywheel-overlap'
-import { createMutableSweep, END_GRAIN_U, geometryForPart, type MutableSweep } from './geometry'
+import { createMutableSweep, geometryForPart, type MutableSweep } from './geometry'
 import { benchKeyDirection } from './key'
 import type { Assembly, Dossier, PartSpec } from './types'
 export type { Assembly } from './types'
@@ -209,9 +209,12 @@ function phaseTimber(geometry: BufferGeometry, identity: string): void {
   // takes its own, a little lighter or darker, a little warmer or cooler.
   const colour = geometry.getAttribute('color')
   if (colour) {
-    const value = 0.9 + ((hash >>> 5) & 0xff) / 255 * 0.18
-    const warmth = (((hash >>> 13) & 0xff) / 255 - 0.5) * 0.06
-    for (let i = 0; i < colour.count; i++) colour.setXYZ(i, value * (1 + warmth), value, value * (1 - warmth))
+    const value = 0.86 + ((hash >>> 5) & 0xff) / 255 * 0.24
+    const warmth = (((hash >>> 13) & 0xff) / 255 - 0.5) * 0.1
+    for (let i = 0; i < colour.count; i++) {
+      const tone = colour.getY(i)
+      colour.setXYZ(i, tone * value * (1 + warmth), tone * value, tone * value * (1 - warmth))
+    }
   }
 }
 
@@ -483,12 +486,9 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
       const lum = detail.albedo.dot(vec3(.2126, .7152, .0722))
       // the turned core is the largest face on the machine and shows its run of grain
       const grain = mix(vec3(lum, lum, lum), detail.albedo, .35).sub(1).mul(/turned/.test(name) ? .9 : .62).add(1)
-      // an end face drinks the light: darker and rougher than the side grain
-      const end = step(END_GRAIN_U / 2, uv().x)
-      material.colorNode = vec3(oak.r, oak.g, oak.b).mul(grain).mul(detail.occlusion).mul(end.mul(-.48).add(1))
-        .mul(attribute('color', 'vec3'))
-      material.roughnessNode = /grip/.test(name) ? detail.roughness.mul(.8).clamp(.32, .6)
-        : mix(detail.roughness.clamp(.5, .85), float(.9), end)
+      // the piece's own tone and its darker end grain ride in the vertex colour
+      material.colorNode = vec3(oak.r, oak.g, oak.b).mul(grain).mul(detail.occlusion).mul(attribute('color', 'vec3'))
+      material.roughnessNode = /grip/.test(name) ? detail.roughness.mul(.8).clamp(.32, .6) : detail.roughness.clamp(.5, .85)
     }
     if (/iron, forged/.test(name)) {
       // GENERATED tint: blacksmith's iron, dark off the hammer with a faint
