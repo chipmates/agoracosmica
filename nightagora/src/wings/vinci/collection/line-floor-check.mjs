@@ -71,7 +71,7 @@ const triangleKey = vertices => vertices.map(vertex => vertex.toArray().map(valu
 function readingViews(floor, materials, language) {
   const actualFaces = new Set(), actualTriangles = [], reports = []
   floor.traverse(mesh => {
-    if (!(mesh instanceof THREE.Mesh) || mesh.material !== materials.bronze) return
+    if (!(mesh instanceof THREE.Mesh) || mesh.material !== materials.year) return
     const position = mesh.geometry.getAttribute('position'), normal = mesh.geometry.getAttribute('normal')
     for (let i = 0; i < position.count; i += 3) {
       if (![i, i + 1, i + 2].every(corner => normal.getY(corner) > .9)) continue
@@ -88,12 +88,12 @@ function readingViews(floor, materials, language) {
     // The factory's own comparison flag preserves its original glyph meshes
     // before welding; the mounted floor above still uses production welding.
     benchLocation.search = '?noweld'
-    const source = createLine(materials, section.selected, language, false)
+    const source = createLine(materials, section.selected, language, false, section.lettering)
     benchLocation.search = ''
     source.updateMatrixWorld(true)
     const sourceYear = STUDS[section.selected + offset].date.slice(0, 4)
-    // The year is cut a fifth of a metre south of its own socket, or nearer
-    // where that socket also carries an event.
+    // The year is cut a fifth of a metre south of its own socket, its word
+    // and any event beside it on the same row.
     const socketZ = -offset * 1.65
     let numeral
     source.traverse(mesh => {
@@ -195,7 +195,7 @@ for (const [i, stud] of collectionLineStuds.entries()) {
   if (i) expect(Math.abs(stud.north - collectionLineStuds[i - 1].north - 1.65) < 1e-9, 'The date grid has a gap or overlap before ' + stud.id)
 }
 for (const language of ['en', 'de']) {
-  const materials = Object.fromEntries(['stone', 'bronze', 'ink', 'dark', 'plaster'].map(name => {
+  const materials = Object.fromEntries(['stone', 'bronze', 'year', 'ink', 'dark', 'plaster'].map(name => {
     const material = new THREE.MeshStandardNodeMaterial(); material.name = name
     return [name, material]
   }))
@@ -213,7 +213,7 @@ for (const language of ['en', 'de']) {
     const uvs = mesh.geometry.getAttribute('uv')
     triangles += (mesh.geometry.index?.count ?? positions.count) / 3
     vertices += positions.count
-    if (mesh.material === materials.bronze) {
+    if (mesh.material === materials.year) {
       for (let i = 0; i < positions.count; i += 3) {
         const corners = [i, i + 1, i + 2]
         if (!corners.every(corner => positions.getX(corner) >= .305 && positions.getY(corner) > 0 && normals.getY(corner) > .9)) continue

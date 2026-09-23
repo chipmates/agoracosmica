@@ -8,6 +8,7 @@
 import { BoxGeometry, BufferGeometry, CylinderGeometry, Float32BufferAttribute, Matrix4, Quaternion, Vector3 } from 'three/webgpu'
 import { FACE, FLOOR, LINE_FIELD, LINE_ORIGIN, OPENING, ROOMS } from './layout'
 import { lineCutStuds } from '../line/studs'
+import { bodyMounts } from './body-wall'
 
 export const LINE_GALLERY_PROVENANCE = {
   manifestId: 'vinci/collection-line-gallery',
@@ -81,9 +82,11 @@ export const DATE_MIDDLE_EAST = LINE_ORIGIN.east + .5
 export const TRACK = {
   east: LINE_ORIGIN.east + 1.25,
   south: DATES[0]!.north - .6,
-  north: DATES[DATES.length - 1]!.north + .55,
+  north: DATES[DATES.length - 1]!.north + .75,
   width: .034, depth: .036,
 } as const
+/** where the last head hangs, at the track's north end */
+const TRACK_END = TRACK.north - .1
 /** A head's lamp face stands this far under its track. */
 const DROP = .3
 
@@ -92,9 +95,14 @@ const DROP = .3
  * the line points at. */
 export const WASH_SLOT = { north: G.north - .72, west: -37.9, east: -25.1, width: .09 } as const
 
-export type GalleryLightKind = 'spot' | 'area'
-/** Which surfaces take a light: the line's own stones, or the room too. */
-export type GalleryReceivers = 'line' | 'room'
+/** The layer only the gallery's shadowed lights draw their maps from: no eye
+ * sees it, and no other light's map is drawn from it. */
+export const GALLERY_SHADOW_LAYER = 5
+
+export type GalleryLightKind = 'spot' | 'area' | 'sky'
+/** Which surfaces take a light: the line's own stones, the floor and what
+ * stands on it as well, or the whole room. */
+export type GalleryReceivers = 'line' | 'floor' | 'room'
 export interface GalleryLight {
   name: string
   kind: GalleryLightKind
@@ -113,10 +121,31 @@ export interface GalleryLight {
   /** hung from a track head; an opening has none */
   head: boolean
   receivers: GalleryReceivers
+  /** a map drawn from the gallery's own casters: its size, the filter's
+   * radius in texels, and for daylight the half-extent it covers (m) */
+  shadow?: { mapPx: number; soft: number; span?: [number, number] }
 }
 
 /** A head on the line's track, hung over a date. */
 const overDate = (north: number): P3 => [TRACK.east, north, GALLERY.ribFoot - TRACK.depth - DROP]
+
+/** THE DRAWINGS WALL'S TRACK: a short black channel a stride off the west
+ * wall, so its heads graze the concrete and every carrier and the ledge
+ * throw their shadows down it. */
+export const WALL_TRACK = { east: GALLERY.west + GALLERY.proud + .85, south: -55.6, north: -49.6 } as const
+const overWall = (north: number): P3 => [WALL_TRACK.east, north, GALLERY.ribFoot - TRACK.depth - DROP]
+/** where the drawings hang: the middle of the four courses */
+const WALL_AIM = { east: GALLERY.west + GALLERY.proud, height: FLOOR + 1.8 } as const
+
+/** THE DAYLIGHT THROUGH THE GLASS: the bright sky and the sunlit house to
+ * the east, read as one parallel source low over the garden, so the glazing
+ * lays a patch on the floor cut by its posts, its sill and the benches. */
+const SKY = { elevation: 48, fromSouth: 24, on: [-24.6, -52.9] as [number, number], distance: 40 } as const
+const skyFrom = (): P3 => {
+  const e = SKY.elevation * Math.PI / 180, a = SKY.fromSouth * Math.PI / 180
+  const [east, north] = SKY.on
+  return [east + Math.cos(e) * Math.cos(a) * SKY.distance, north - Math.cos(e) * Math.sin(a) * SKY.distance, FLOOR + Math.sin(e) * SKY.distance]
+}
 
 /** THE GALLERY'S LIGHT, AS DATA: one table builds both the fittings and the
  * lights. North daylight through the east glass is the key; each date stands
@@ -135,6 +164,23 @@ export const GALLERY_LIGHTS: readonly GalleryLight[] = [
     at: overDate(date.north), aim: [DATE_MIDDLE_EAST, date.north, FLOOR],
     kelvin: 3400, intensity: 22, angle: .2, penumbra: .55, reach: 7,
   })),
+  {
+    name: 'sky', kind: 'sky', head: false, receivers: 'floor',
+    at: skyFrom(), aim: [SKY.on[0], SKY.on[1], FLOOR],
+    kelvin: 5600, intensity: 1.5, shadow: { mapPx: 2048, soft: 10, span: [20, 14] },
+  },
+  ...[-53.45, -51.75].map((north, i): GalleryLight => ({
+    name: `graze-${i + 1}`, kind: 'spot', head: true, receivers: 'room',
+    at: overWall(north), aim: [WALL_AIM.east, north, WALL_AIM.height],
+    kelvin: 3300, intensity: 12, angle: .66, penumbra: .95, reach: 7, shadow: { mapPx: 1024, soft: 2 },
+  })),
+  {
+    // THE LINE'S LAST HEAD TURNS TO THE WALL: the end of the walk is a warm
+    // pool over the bench on the line's own axis, lit from the line's track
+    name: 'end', kind: 'spot', head: true, receivers: 'room',
+    at: overDate(TRACK_END), aim: [LINE_ORIGIN.east, G.north, FLOOR + 1.15],
+    kelvin: 3400, intensity: 22, angle: .42, penumbra: .9, reach: 6,
+  },
   {
     name: 'wash', kind: 'area', head: false, receivers: 'room',
     at: [(WASH_SLOT.west + WASH_SLOT.east) / 2, WASH_SLOT.north, GALLERY.soffit - .012],
@@ -378,6 +424,13 @@ export function fittings(): { metal: Solid; lenses: Solid } {
     if (X.ribsNorth.some(r => Math.abs(r - n) < .5)) continue
     metal.rod([TRACK.east, n, X.soffit], [TRACK.east, n, X.ribFoot], .005, 8)
   }
+  // the drawings wall's own short track, on rods from the soffit
+  const T = WALL_TRACK
+  metal.box([T.east - TRACK.width / 2, T.south, trackFoot, T.east + TRACK.width / 2, T.north, X.ribFoot])
+  for (const n of [T.south + .4, (T.south + T.north) / 2, T.north - .4]) {
+    if (X.ribsNorth.some(r => Math.abs(r - n) < .5)) continue
+    metal.rod([T.east, n, X.soffit], [T.east, n, X.ribFoot], .005, 8)
+  }
   // the wash's slot: a dark housing a hand wide, its lens a hair under the soffit
   const W = WASH_SLOT
   metal.box([W.west - .02, W.north - W.width / 2 - .02, X.soffit - .012, W.east + .02, W.north + W.width / 2 + .02, X.soffit + .001])
@@ -403,6 +456,45 @@ export function benches(): { oak: Solid; base: Solid } {
     oak.box([r.west, r.south, B.seat - B.top, r.east, r.north, B.seat], !alongNorth)
   }
   return { oak, base }
+}
+
+/** THE PANES OF THE GLAZED WALL, as seen from the room: the glass between
+ * the posts, from the sill to the soffit, a hair inside the envelope's own. */
+export const GLAZING = {
+  east: FACE.glazingEast + .006,
+  posts: [-60, -56, -52, -48, -44] as readonly number[],
+  post: .14,
+  south: FACE.southStripNorth, north: G.north,
+  bottom: FLOOR + .42, top: -1.95,
+} as const
+export function glazingPanes(): Rect[] {
+  const edges = [GLAZING.south, ...GLAZING.posts.flatMap(n => [n - GLAZING.post / 2, n + GLAZING.post / 2]), GLAZING.north]
+  const out: Rect[] = []
+  for (let i = 0; i < edges.length; i += 2) out.push({ west: GLAZING.east, south: edges[i]!, east: GLAZING.east, north: edges[i + 1]! })
+  return out
+}
+
+/** WHAT THE GALLERY'S SHADOWED LIGHTS SEE: the room's soffit and its south
+ * cross wall, the glazing's posts and sill, the benches, and on the drawings
+ * wall every carrier and the reading ledge, doubled on the gallery's shadow
+ * layer. The ledge is the body wall's, at the numbers `hang.ts` builds it with. */
+export function shadowCasters(): Solid {
+  const c = new Solid(), g = GLAZING, h = GLAZING.post / 2, X = GALLERY
+  c.box([X.west, X.south, X.soffit, FACE.glazingEast, X.north, X.soffit + .2])
+  c.box([X.west, X.crossNorth - .2, FLOOR, X.crossEast, X.crossNorth, X.soffit])
+  for (const n of g.posts) c.box([FACE.glazingEast, n - h, FLOOR, FACE.glazingEast + .14, n + h, GALLERY.soffit])
+  c.box([FACE.glazingEast, g.south, FLOOR, FACE.glazingEast + .26, g.north, g.bottom])
+  const { oak, base } = benches()
+  for (const b of [...oak.bounds, ...base.bounds]) c.box(b)
+  const wall = FACE.hallPartitionEast + .033
+  for (const m of bodyMounts()) {
+    const w = m.width / 2 + .056, t = m.height / 2 + .056
+    c.box([wall, m.north - w, m.datum - t, wall + .047, m.north + w, m.datum + t])
+  }
+  const centre = -52.6
+  c.box([wall, centre - 2.7, FLOOR + .895, wall + .6, centre + 2.7, FLOOR + .945])
+  for (const n of [centre - 2.4, centre, centre + 2.4]) c.box([wall + .245, n - .035, FLOOR, wall + .315, n + .035, FLOOR + .92])
+  return c
 }
 
 /** Every solid this room raises, by name, for the certificate's supplement. */

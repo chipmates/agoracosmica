@@ -15,7 +15,17 @@ export const STUDS = [...timeline.studs].sort((a,b)=>stationOrder.indexOf(a.stat
 export const SPACING = timeline.design.spacing
 export const AFTERLIFE = timeline.design.afterlife
 export const STUD_SPACING = 1.65
-export interface LineMaterials { stone:Material; bronze:Material; ink:Material; dark:Material }
+export interface LineMaterials {
+  stone:Material; bronze:Material; ink:Material; dark:Material
+  /** the numerals' own finish; the fittings' bronze when a host gives none */
+  year?:Material
+}
+/** How a date's lettering lies beside its socket. `stacked`: the word north
+ * of the socket, the year and any event south of it. `row`: the year where
+ * `stacked` cuts it, its word and any event beside it on the year's own row,
+ * so a date read far down a floor stays one line of lettering with open stone
+ * before the next. */
+export type LineLettering = 'stacked' | 'row'
 
 /** Merge only static meshes. Keep an honest noweld comparison for the bench. */
 export function weld(group:Group):void {
@@ -33,7 +43,7 @@ export function weld(group:Group):void {
 }
 
 /** A selected date is one of 56 physical floor sockets, never an interval scale. */
-export function createLine(materials:LineMaterials, selected=0, language:'en'|'de'='en', phone=false):Group {
+export function createLine(materials:LineMaterials, selected=0, language:'en'|'de'='en', phone=false, lettering:LineLettering='stacked'):Group {
   const group=new Group();group.name='56 dates, bronze let into limestone'
   const box=(w:number,h:number,d:number,x:number,y:number,z:number,mat:Material)=>{const m=new Mesh(new BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.receiveShadow=true;group.add(m);return m}
   const ashlar=(width:number,height:number,depth:number,x:number,y:number,z:number)=>{
@@ -119,12 +129,22 @@ export function createLine(materials:LineMaterials, selected=0, language:'en'|'d
     // numeral runs from 0.5 mm under it to 2 mm over: it crosses the floor
     // surface and takes the room's light as metal does, with no gap beneath.
     // The words beside it stay painted, 1.6 mm proud.
-    const
-year=createText(stud.date.slice(0,4),{embedded:true,size:n===selected?.38:phone?.27:.23,depth:.005,maxWidth:1.4,material:materials.bronze});year.mesh.rotation.x=-Math.PI/2;year.mesh.position.set(.31,.0005,z+(cue?.08:.23));group.add(year.mesh)
-    const
-word=createText(language==='en'?stud.certainty:fact.de,{embedded:true,size:phone?.115:.087,depth:.0038,maxWidth:1.5,material:materials.ink});word.mesh.rotation.x=-Math.PI/2;word.mesh.position.set(.33,.0010,z-.22);group.add(word.mesh)
-    if(cue){const
-event=createText(cue,{embedded:true,size:phone?.115:.095,depth:.0038,maxWidth:1.48,material:materials.ink});event.mesh.rotation.x=-Math.PI/2;event.mesh.position.set(.33,.0010,z+.60);group.add(event.mesh)}
+    const year=createText(stud.date.slice(0,4),{embedded:true,size:n===selected?.38:phone?.27:.23,depth:.005,maxWidth:1.4,material:materials.year??materials.bronze})
+    const word=createText(language==='en'?stud.certainty:fact.de,{embedded:true,size:phone?.115:.087,depth:.0038,maxWidth:1.5,material:materials.ink})
+    const event=cue?createText(cue,{embedded:true,size:phone?.115:.095,depth:.0038,maxWidth:1.48,material:materials.ink}):undefined
+    // A text's anchor is its top-left corner, and it runs south from there.
+    if(lettering==='row'){
+      const top=z+.23,beside=.31+year.width+.1
+      year.mesh.position.set(.31,.0005,top)
+      // the word shares the year's foot; with an event, the word its head
+      word.mesh.position.set(beside,.0010,event?top:top+year.height-word.height)
+      event?.mesh.position.set(beside,.0010,top+year.height-event.height)
+    }else{
+      year.mesh.position.set(.31,.0005,z+(cue?.08:.23))
+      word.mesh.position.set(.33,.0010,z-.22)
+      event?.mesh.position.set(.33,.0010,z+.60)
+    }
+    for(const text of [year,word,event])if(text){text.mesh.rotation.x=-Math.PI/2;group.add(text.mesh)}
     box(.021,.008,1.635,-.3,.002,z,materials.bronze)
     if(n===selected){box(.022,.009,1.50,-.62,.002,z,materials.bronze);box(.95,.009,.016,-.16,.002,z+.64,materials.bronze);box(.95,.009,.016,-.16,.002,z-.64,materials.bronze)}
   }

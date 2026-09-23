@@ -14,9 +14,9 @@
  * A modern room; no light or building of 1517 is claimed.
  */
 import {
-  Color, CubeCamera, CubeRenderTarget, FrontSide, Group, HalfFloatType, Mesh, MeshBasicNodeMaterial,
-  MeshStandardNodeMaterial, Object3D, PMREMGenerator, RectAreaLight, RectAreaLightNode, SpotLight,
-  type BufferGeometry, type Light, type Material, type RenderTarget, type Scene,
+  Color, CubeCamera, CubeRenderTarget, CustomBlending, DirectionalLight, DoubleSide, FrontSide, Group, HalfFloatType, Mesh,
+  MeshBasicNodeMaterial, MeshStandardNodeMaterial, Object3D, OneFactor, OneMinusSrcAlphaFactor, PMREMGenerator, RectAreaLight,
+  RectAreaLightNode, SpotLight, type BufferGeometry, type Light, type Material, type RenderTarget, type Scene,
 } from 'three/webgpu'
 import * as TSL from 'three/tsl'
 import { lights as lightsOf, pmremTexture } from 'three/tsl'
@@ -29,8 +29,8 @@ import { axisFootprint, lineCoverage } from '../../../stack/detail'
 import type { LineMaterials } from '../line'
 import { COLLECTION_PAVING_ORIGIN, LINE_ORIGIN, LINE_SLAB } from './layout'
 import {
-  benches, ceilingSkin, DATE_MIDDLE_EAST, fittings, floorSkins, GALLERY_LIGHTS, LINE_GALLERY_PROVENANCE, PROBE_AT, v3, wallSkins,
-  type GalleryLight, type Skin, type Solid,
+  benches, ceilingSkin, DATE_MIDDLE_EAST, fittings, floorSkins, GALLERY_LIGHTS, GALLERY_SHADOW_LAYER, GLAZING, glazingPanes,
+  LINE_GALLERY_PROVENANCE, PROBE_AT, shadowCasters, Skin, v3, wallSkins, type GalleryLight, type Solid,
 } from './line-gallery-plan'
 
 // The node overload boundary stays local to this file.
@@ -38,8 +38,8 @@ import {
 type N = any
 
 const {
-  abs, attribute, cameraViewMatrix, cross, dot, float, floor: floorOf, fract, mix, mx_noise_float, normalWorldGeometry,
-  positionWorld, select, smoothstep, uniform, vec2, vec3,
+  abs, attribute, cameraViewMatrix, cross, dot, float, floor: floorOf, fract, mix, mx_noise_float, normalView, normalWorldGeometry,
+  positionViewDirection, positionWorld, select, smoothstep, uniform, vec2, vec3,
 } = TSL as unknown as Record<string, N>
 
 /** The sets the gallery is dressed from, all CC0 and already in the store. */
@@ -78,6 +78,12 @@ function looks() {
     groutColour: uniform(new Color('#5f574c')),
     bronzeColour: uniform(new Color(.26, .2, .13)),
     bronzeRough: uniform(.26),
+    /** the numerals' statuary finish: the same bronze under a dark waxed
+     * patina, so a lamp overhead lays a sheen on a year and no mirror */
+    yearColour: uniform(new Color(.26, .2, .13)),
+    yearPatina: uniform(.3),
+    yearRough: uniform(.62),
+    yearMetal: uniform(.45),
     inkColour: uniform(new Color('#2a2724')),
     // the hall's photographs, poured paler here: a daylit room's concrete
     // stands near AD-2's 0.33, its sealed floor near 0.19
@@ -86,6 +92,9 @@ function looks() {
     floorTint: uniform(new Color(2.4, 2.34, 2.22)),
     oakTint: uniform(new Color(.78, .74, .7)),
     darkTint: uniform(new Color(.55, .53, .51)),
+    /** the film on the glass: how much of a pane it covers at its foot */
+    glassFilm: uniform(.07),
+    glassFilmColour: uniform(new Color(.5, .5, .47)),
     /** the probe read at the scene's own level; the lift is the room's */
     envGain: uniform(1),
     envLift: uniform(1.25),
@@ -213,9 +222,36 @@ function limestoneMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial
   return m
 }
 
-/** The line's other three surfaces: the grout its slabs are bedded in, the
- * bronze its years are cast in, the ink its words are painted in. */
-function lineSurfaces(L: Looks): { grout: MeshStandardNodeMaterial; bronze: MeshStandardNodeMaterial; ink: MeshStandardNodeMaterial } {
+/** THE GLASS OF THE GLAZED WALL, from the room: the room's own bounce seen
+ * in it, strongest where the eye meets the glass obliquely, and a film of
+ * weather thickest at each pane's foot. Drawn over the envelope's panes: it
+ * adds what it reflects and holds back what its film and reflection take. */
+function glassMaterial(L: Looks): MeshStandardNodeMaterial {
+  const m = new MeshStandardNodeMaterial({ roughness: .05, metalness: 0, transparent: true, depthWrite: false, side: FrontSide })
+  m.blending = CustomBlending
+  m.blendSrc = OneFactor
+  m.blendDst = OneMinusSrcAlphaFactor
+  const P = positionWorld
+  const up = P.y.sub(GLAZING.bottom).div(GLAZING.top - GLAZING.bottom).clamp(0, 1)
+  const drift = mx_noise_float(vec3(P.z.mul(.7), P.y.mul(1.9), 3.3)).mul(.5).add(.5)
+  const streak = mx_noise_float(vec3(P.z.mul(9), P.y.mul(.35), 8.1)).mul(.5).add(.5)
+  const film = float(1).sub(up).pow(2.2).mul(drift.mul(.7).add(streak.mul(.3))).add(drift.mul(.25)).mul(L.glassFilm)
+  const facing = normalView.dot(positionViewDirection).abs().clamp(0, 1)
+  const fresnel = float(1).sub(facing).pow(5).mul(.96).add(.04)
+  m.colorNode = L.glassFilmColour.mul(film)
+  m.roughnessNode = float(.05).add(film.mul(2))
+  m.opacityNode = film.add(fresnel).clamp(0, .9)
+  m.name = 'vinci/collection-line-gallery/glass'
+  m.userData = { ...LINE_GALLERY_PROVENANCE }
+  return m
+}
+
+/** The line's other surfaces: the grout its slabs are bedded in, the bronze
+ * of its fittings, the patinated bronze its years are cast in, the ink its
+ * words are painted in. */
+function lineSurfaces(L: Looks): {
+  grout: MeshStandardNodeMaterial; bronze: MeshStandardNodeMaterial; year: MeshStandardNodeMaterial; ink: MeshStandardNodeMaterial
+} {
   const P = positionWorld
   const grout = new MeshStandardNodeMaterial({ roughness: .9, metalness: 0 })
   grout.colorNode = L.groutColour.mul(mx_noise_float(P.mul(3.1)).mul(.08).add(1))
@@ -226,17 +262,24 @@ function lineSurfaces(L: Looks): { grout: MeshStandardNodeMaterial; bronze: Mesh
   bronze.colorNode = L.bronzeColour.mul(worn.mul(.18).add(.91))
   bronze.roughnessNode = L.bronzeRough.add(worn.mul(.1).sub(.05))
   bronze.name = 'vinci/collection-line-gallery/bronze'
+  // A YEAR IS READ, A FITTING IS SEEN: a polished numeral at the visitor's
+  // feet mirrors its own head as a pale blot, so the years alone are patinated
+  const year = new MeshStandardNodeMaterial({ roughness: .62, metalness: .45 })
+  year.colorNode = L.yearColour.mul(L.yearPatina)
+  year.roughnessNode = L.yearRough.add(mx_noise_float(P.mul(9.1)).mul(.05))
+  year.metalnessNode = L.yearMetal
+  year.name = 'vinci/collection-line-gallery/year'
   const ink = new MeshStandardNodeMaterial({ roughness: .86, metalness: 0 })
   ink.colorNode = L.inkColour
   ink.name = 'vinci/collection-line-gallery/ink'
-  for (const m of [grout, bronze, ink]) m.userData = { ...LINE_GALLERY_PROVENANCE }
-  return { grout, bronze, ink }
+  for (const m of [grout, bronze, year, ink]) m.userData = { ...LINE_GALLERY_PROVENANCE }
+  return { grout, bronze, year, ink }
 }
 
 export interface LineGallery {
   /** the finish, the benches and the fittings, to ride with the rooms */
   group: Group
-  /** what the line is cut from: its limestone, bronze, ink and grout */
+  /** what the line is cut from: its limestone, bronze, years, ink and grout */
   stones: LineMaterials
   /** light the line's own surfaces, the certainty discs among them */
   adoptLine(line: Object3D): void
@@ -267,9 +310,20 @@ export function mountLineGallery(stack: Stack): LineGallery {
   const solo = typeof location === 'undefined' ? null : new URLSearchParams(location.search).get('gallerysolo')
   const built: { light: Light; spec: GalleryLight }[] = [], targets: Object3D[] = []
   for (const spec of GALLERY_LIGHTS) {
+    // the calm tier draws no map: a light that needs its shadows stays off
+    if (calm && spec.shadow) continue
     const level = solo && !spec.name.startsWith(solo) ? 0 : spec.intensity
     let light: Light
-    if (spec.kind === 'area') {
+    if (spec.kind === 'sky') {
+      const sky = new DirectionalLight(kelvinToColour(spec.kelvin), level)
+      sky.position.copy(v3(...spec.at))
+      const target = new Object3D()
+      target.position.copy(v3(...spec.aim))
+      sky.target = target
+      targets.push(target)
+      group.add(target)
+      light = sky
+    } else if (spec.kind === 'area') {
       const area = new RectAreaLight(kelvinToColour(spec.kelvin), level, spec.width!, spec.height!)
       area.position.copy(v3(...spec.at))
       area.lookAt(v3(...spec.aim))
@@ -285,6 +339,24 @@ export function mountLineGallery(stack: Stack): LineGallery {
       group.add(target)
       light = spot
     }
+    if (spec.shadow) {
+      const shadowed = light as SpotLight | DirectionalLight, map = spec.shadow
+      const px = tier === 'hero' ? map.mapPx : Math.max(512, map.mapPx / 2)
+      shadowed.castShadow = true
+      shadowed.shadow.mapSize.set(px, px)
+      const camera = shadowed.shadow.camera
+      if ('left' in camera && map.span) {
+        const [across, up] = map.span
+        Object.assign(camera, { left: -across, right: across, top: up, bottom: -up, near: 1, far: 80 })
+      } else Object.assign(camera, { near: .2, far: spec.reach ?? 10 })
+      camera.updateProjectionMatrix()
+      shadowed.shadow.bias = -.0003
+      shadowed.shadow.normalBias = .02
+      shadowed.shadow.radius = map.soft
+      // the map is drawn from the gallery's own casters alone: the envelope's
+      // glass and every other body of the wing stay out of it
+      camera.layers.set(GALLERY_SHADOW_LAYER)
+    }
     light.name = `vinci/collection-line-gallery/${spec.name}`
     light.userData = { ...LINE_GALLERY_PROVENANCE }
     // hidden from the scene's own list, which every other surface reads;
@@ -294,6 +366,7 @@ export function mountLineGallery(stack: Stack): LineGallery {
     built.push({ light, spec })
   }
   const roomLights = built.filter(({ spec }) => spec.receivers === 'room').map(({ light }) => light)
+  const floorLights = built.filter(({ spec }) => spec.receivers !== 'line').map(({ light }) => light)
   const lineLights = built.map(({ light }) => light)
 
   // THE ROOM'S BOUNCE: a probe at the gallery's middle, taken turned by the
@@ -328,10 +401,11 @@ export function mountLineGallery(stack: Stack): LineGallery {
   const dark = darkMaterial(floorSet!, L)
   const oak = oakMaterial(oakSet!, L)
   const limestone = limestoneMaterial(stoneSet!, L)
-  const { grout, bronze, ink } = lineSurfaces(L)
-  for (const m of [concrete, floor, dark, oak]) adopt(m, roomLights)
-  for (const m of [limestone, grout, bronze, ink]) adopt(m, lineLights)
-  materials.push(concrete, floor, dark, oak, limestone, grout, bronze, ink)
+  const { grout, bronze, year, ink } = lineSurfaces(L)
+  adopt(concrete, roomLights)
+  for (const m of [floor, dark, oak]) adopt(m, floorLights)
+  for (const m of [limestone, grout, bronze, year, ink]) adopt(m, lineLights)
+  materials.push(concrete, floor, dark, oak, limestone, grout, bronze, year, ink)
 
   const make = (geometry: BufferGeometry, material: Material, name: string, occludes = false): Mesh => {
     geometry.computeBoundingBox(); geometry.computeBoundingSphere()
@@ -374,6 +448,26 @@ export function mountLineGallery(stack: Stack): LineGallery {
     make(solidParts(lenses), glow, 'lamp-faces')
   }
 
+  if (!calm) {
+    // THE CASTERS, seen only by the gallery's shadowed lights
+    const hidden = new MeshBasicNodeMaterial({ colorWrite: false, depthWrite: false, side: DoubleSide })
+    hidden.shadowSide = DoubleSide
+    hidden.name = 'vinci/collection-line-gallery/shadow-double'
+    materials.push(hidden)
+    const casters = make(solidParts(shadowCasters()), hidden, 'shadow-double')
+    casters.layers.set(GALLERY_SHADOW_LAYER)
+    casters.castShadow = true; casters.receiveShadow = false
+    // THE PANES, as glass seen from the room
+    const panes = new Skin()
+    for (const r of glazingPanes()) panes.northSouth(GLAZING.east, -1, r.south, r.north, GLAZING.bottom, GLAZING.top)
+    const glass = glassMaterial(L)
+    adopt(glass, roomLights)
+    materials.push(glass)
+    const pane = make(skinParts(panes), glass, 'glass')
+    pane.receiveShadow = false
+    pane.renderOrder = 1
+  }
+
   // `?galleryrig` hands an instrument the rig's levels and the looks, to lean
   // on a standing frame instead of rebuilding the page for each value
   if (typeof location !== 'undefined' && new URLSearchParams(location.search).has('galleryrig')) {
@@ -390,6 +484,7 @@ export function mountLineGallery(stack: Stack): LineGallery {
         for (const { light, spec } of built) if (spec.name.startsWith(name)) light.color.copy(kelvinToColour(value))
       },
       looks: L,
+      lights: Object.fromEntries(built.map(({ light, spec }) => [spec.name, light])),
       bake: () => { owed = 3 },
     }
   }
@@ -417,7 +512,7 @@ export function mountLineGallery(stack: Stack): LineGallery {
   let patchChecked = 0
   return {
     group,
-    stones: { stone: limestone, bronze, ink, dark: grout },
+    stones: { stone: limestone, bronze, ink, dark: grout, year },
     adoptLine(line) {
       line.traverse(child => {
         if (!(child instanceof Mesh)) return

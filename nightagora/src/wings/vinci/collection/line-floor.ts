@@ -15,10 +15,14 @@ export const EXHIBITION_STAGE_LEVELS = {
   bed: [-.2195, -.0195],
 } as const
 
+/** HOW EACH EXCERPT IS LETTERED: the first is read standing over it, each
+ * word beside its socket and each year at the visitor's feet; the two down
+ * the room are read from its south end, where a stacked date runs into the
+ * next, so each of their dates is laid as one row. */
 export const COLLECTION_LINE_SECTIONS = [
-  { station: 'line-early', selected: 0, row: 0 },
-  { station: 'line-late', selected: 28, row: 4 },
-  { station: 'line-amboise', selected: 38, row: 8 },
+  { station: 'line-early', selected: 0, row: 0, lettering: 'stacked' },
+  { station: 'line-late', selected: 28, row: 4, lettering: 'row' },
+  { station: 'line-amboise', selected: 38, row: 8, lettering: 'row' },
 ] as const
 /** THE LIFE RUNS AWAY FROM THE VISITOR. The one station stands at the south
  * end, where every numeral reads upright, so the birth is the date at the
@@ -167,7 +171,7 @@ export function createCollectionLineFloor(materials: LineMaterials, language: 'e
     }
   }
   for (const section of COLLECTION_LINE_SECTIONS) {
-    const source = createLine(materials, section.selected, language, false)
+    const source = createLine(materials, section.selected, language, false, section.lettering)
     source.updateMatrixWorld(true)
     source.traverse(object => {
       if (!(object instanceof Mesh) || Array.isArray(object.material)) return
@@ -207,12 +211,13 @@ export function createCollectionLineFloor(materials: LineMaterials, language: 'e
             append(material, polygon)
           }
         }
-        // All four dates are copied whole. Lettering is left-aligned beside
-        // the socket and reaches beyond the centre slab into the next course.
+        // All four dates are copied whole. Each row starts beside its socket
+        // and reaches beyond the centre slab into the next course.
         const socketStone = material === materials.stone
-        const socketDetail = material === materials.bronze || material === materials.ink || material.userData['owned'] === true
+        const socketDetail = material === materials.bronze || material === materials.year || material === materials.ink
+          || material.userData['owned'] === true
         if (!socketStone && !socketDetail) continue
-        const right = socketStone ? .801 : 1.9
+        const right = socketStone ? .801 : 2.0
         if (!vertices.every(vertex => vertex[0]! >= -.801 && vertex[0]! <= right
           && vertex[2]! >= -3 * STUD_SPACING - .82 && vertex[2]! <= .82)) continue
         // The visitor reads from the south end, and the excerpt already runs
