@@ -214,9 +214,10 @@ function clipGableBacking(poly:V3[],faces:RoofFace[]):V3[][] {
  * glaze, the traceried windows to carve, the window backs a room opens. */
 interface HouseBuild { glaze:boolean; carve:boolean; openBacks:ReadonlySet<string>; lights:GlazedLight[]; tracery:TraceryWindow[]; sills:SillSpec[] }
 let house:HouseBuild|null=null
-/** The new glass stands 5 mm proud of the retired pane's face, so the two
- * never share a plane even where a quarry tilts back. */
-const GLASS_OUT=-.050
+/** The new glass stands in front of every retired pane and saddle bar (the
+ * bars' faces reach -40 mm), so no retired piece can win a pixel over it
+ * in a pass that draws the buffer as built. */
+const GLASS_OUT=-.038
 /** A layer no camera renders; the shadow cameras render 0 and 1 only. */
 export const RETIRED_LAYER=30
 function lightOf(f:Facade,id:string,outline:V2[],out:number,kind:GlazedLight['kind'],bars:number[]):GlazedLight {

@@ -10,7 +10,7 @@
       "prompt": "Thin brick relief, tuffeau quoins and registered cut apertures, intersecting roofs, dormers, chimneys, turret and separate gallery/watchtower. Dossier nominal dimensions with original certainty ranges. No photograph sampled. Shallow 55 mm rebate within declared 35–90 mm assumption; split upper sky reflection and lower dark-room glazing. Existing roughness .18–.23 remains inside dossier interval; no screen-space transmission. Duplicated upper tower shell now shares registered aperture cuts. Connected F16/F17 masonry below the unchanged −2.20 m base: 0.60 m inward thickness [0.45–0.80], actual standard/calm ground boundary lower envelope embedded 50 mm [25–100], full joined miter volume and inherited stone coursing. No surveyed height or opening changes.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "f0eb58b9980d65eb2c109826fe7b04ac0a6562eb3575b59e8a5976d2e8216f71",
+      "sha256": "6e6afba835a49f1b18494d624fec3853fd90653a19f3318cb167f5478999b5ae",
       "note": "Q001 Q015 Q019 Q124 Q127 Q131 Q134 Q175; src/wings/vinci/data/closluce.json; recipe_file=src/wings/vinci/shell.ts; geometry_dependency=vinci/foundation-plinth"
     },
     {
@@ -3639,10 +3639,10 @@
       "class": "GENERATED",
       "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
-      "prompt": "Every glazed light of the registered shell as leaded glass: 155 mm diamond quarries on a 45 degree lattice centred on each light, each quarry its own piece tilted up to 1 degree and bowed up to 0.8 mm, a slow ripple in its surface and its own faint cast; 7 mm lead cames and a 10 mm border lead standing 2 mm proud; iron saddle bars set behind the glass. The glass reflects by its Fresnel term and transmits the rest, so the room behind shows. The shell's flat panes stay certified and leave the colour pass. Hero and standard tiers; calm keeps the flat panes.",
+      "prompt": "Every glazed light of the registered shell as leaded glass: 155 mm diamond quarries on a 45 degree lattice centred on each light, each quarry its own piece, its face tilted up to 1 degree and bowed up to 0.8 mm with its edge held in the lead, a slow ripple in its surface and its own faint cast; 7 mm lead cames and a 14 mm border lead standing about 2 mm proud as geometry in the film (tier max) and drawn in the glass at their true width at the live tiers; iron saddle bars set behind the glass. The glass reflects by its Fresnel term and transmits the rest, so the room behind shows. The shell's flat panes stay certified and leave the colour pass. Hero and standard tiers; calm keeps the flat panes.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "b18ddac96dbfe6bdb770f1321d05d280da5d4837963e6e3d8640599cdce8fe5c",
+      "sha256": "71a5ca07500ae232667af3a47a2e47a4fba764185d537e5f8cd227e986a37299",
       "note": "recipe_file=src/wings/vinci/house-glazing.ts; geometry_dependency=vinci/shell; rail_collision=false; engine_terms=sky reflection in the glass (the film reflects the real sky)"
     },
     {
