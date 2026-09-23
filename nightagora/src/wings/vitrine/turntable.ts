@@ -8,11 +8,11 @@
  * tap on the model names the part it lands on.
  */
 import {
-  AdditiveBlending, Box3, BoxGeometry, CircleGeometry, Color, Group, Mesh, MeshBasicNodeMaterial,
-  MeshStandardNodeMaterial, PerspectiveCamera, PointLight, Raycaster, Scene, Sphere, Vector2, Vector3,
-  type BufferGeometry, type Object3D,
+  AdditiveBlending, Box3, BoxGeometry, CircleGeometry, Color, CustomBlending, DstColorFactor, Group, Mesh,
+  MeshBasicNodeMaterial, MeshStandardNodeMaterial, OneFactor, PerspectiveCamera, PointLight, Raycaster, Scene,
+  Sphere, Vector2, Vector3, ZeroFactor, type BufferGeometry, type Object3D,
 } from 'three/webgpu'
-import { float, fog, rangeFogFactor } from 'three/tsl'
+import { float, fog, normalView, positionViewDirection, rangeFogFactor, vec3 } from 'three/tsl'
 import type { Grade, KeyLight, Stack, StackLightOptions } from '../../stack'
 import { createBenchBackdrop } from '../vinci/machines/bench/backdrop'
 import {
@@ -85,6 +85,12 @@ const DRAG_PERIODS = 1
 /** An arrow key turns the crank by this share of the period. */
 const KEY_SHARE = 1 / 24
 const OVERLAY = { color: '#f2c77a', opacity: .3 }
+/** A LIT PART KEEPS ITS OWN SURFACE. The light on a named part raises what is
+ * already drawn there by this share of the warm colour, so grain, shade and
+ * shadow stay where they were; an added flat colour paints the part over.
+ * A dark part has little to raise, so a thin warm edge is added where its
+ * surface turns from the eye, with a trace of warmth on its face. */
+const LIFT = { face: .45, rim: .75, edge: .7, trace: .03 }
 /** The border that marks a screen: a share of its shorter side, never thinner
  * than this, and standing a little proud of the sheet so it reads from both
  * faces of something as thin as paper. */
@@ -115,11 +121,27 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
   const overlays = new Map<string, Mesh[]>()
   /** Geometry the overlay built itself, which it owns and gives back. */
   const owned = new Set<BufferGeometry>()
+  // The border of a screen stands off the sheet over whatever lies behind it,
+  // so it keeps a colour of its own.
   const overlayMaterial = new MeshBasicNodeMaterial({ color: new Color(OVERLAY.color), transparent: true,
     opacity: OVERLAY.opacity, depthWrite: false, blending: AdditiveBlending, fog: false })
-  overlayMaterial.polygonOffset = true
-  overlayMaterial.polygonOffsetFactor = -2
-  overlayMaterial.polygonOffsetUnits = -2
+  const warm = new Color(OVERLAY.color)
+  const grazing = float(1).sub(normalView.dot(positionViewDirection).abs()).clamp(0, 1).pow(2)
+  const liftMaterial = new MeshBasicNodeMaterial({ transparent: true, depthWrite: false, fog: false })
+  liftMaterial.colorNode = vec3(warm.r, warm.g, warm.b).mul(grazing.mul(LIFT.rim).add(LIFT.face))
+  // drawn = drawn + drawn * lift: a multiple of the surface under it, alpha kept
+  liftMaterial.blending = CustomBlending
+  liftMaterial.blendSrc = DstColorFactor
+  liftMaterial.blendDst = OneFactor
+  liftMaterial.blendSrcAlpha = ZeroFactor
+  liftMaterial.blendDstAlpha = OneFactor
+  const edgeMaterial = new MeshBasicNodeMaterial({ transparent: true, depthWrite: false, blending: AdditiveBlending, fog: false })
+  edgeMaterial.colorNode = vec3(warm.r, warm.g, warm.b).mul(grazing.pow(1.5).mul(LIFT.edge).add(LIFT.trace))
+  for (const material of [overlayMaterial, liftMaterial, edgeMaterial]) {
+    material.polygonOffset = true
+    material.polygonOffsetFactor = -2
+    material.polygonOffsetUnits = -2
+  }
   const ray = new Raycaster()
   let tapped: { node: Object3D; local: Vector3; text: string } | null = null
 
@@ -224,12 +246,14 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
       const screen = options.screens?.has((node.userData['partId'] as string | undefined) ?? part) === true
       for (const shape of screen ? border(geometry) : [geometry]) {
         if (screen) owned.add(shape)
-        const mesh = new Mesh(shape, overlayMaterial)
-        mesh.userData['vitrineOverlay'] = true
-        mesh.renderOrder = 10
-        mesh.frustumCulled = false
-        node.add(mesh)
-        meshes.push(mesh)
+        for (const [material, order] of screen ? [[overlayMaterial, 10] as const] : [[liftMaterial, 10] as const, [edgeMaterial, 11] as const]) {
+          const mesh = new Mesh(shape, material)
+          mesh.userData['vitrineOverlay'] = true
+          mesh.renderOrder = order
+          mesh.frustumCulled = false
+          node.add(mesh)
+          meshes.push(mesh)
+        }
       }
     }
     overlays.set(id, meshes)
@@ -753,6 +777,8 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
       for (const shape of owned) shape.dispose()
       owned.clear()
       overlayMaterial.dispose()
+      liftMaterial.dispose()
+      edgeMaterial.dispose()
       if (lent) {
         // BACK TO THE ROOM AT REST, where it stood and as it stood.
         const object = body.object
