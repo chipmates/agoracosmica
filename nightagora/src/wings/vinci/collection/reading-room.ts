@@ -23,7 +23,6 @@ import {
 import * as TSL from 'three/tsl'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
 import type { Stack } from '../../../stack'
-import { createMaterialLibrary } from '../../../stack/materials'
 import { axisFootprint, lineCoverage } from '../../../stack/detail'
 import { COLLECTION_PAVING_ORIGIN, FLOOR } from './layout'
 import {
@@ -74,11 +73,14 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
   const owned: { geometry: BufferGeometry }[] = []
   const materials: Material[] = []
 
-  // THE PHOTOGRAPH comes through a library of the room's own, so its bytes
-  // never stand in the queue the machines' materials wait on.
-  const library = createMaterialLibrary(stack.tierConfig())
-  const oakSet = library.sync('oak-veneer-light'), groundSet = library.sync('concrete-floor-polished')
-  const unregister = stack.registerTextureMemory(() => library.textureMB(), 'reading room oak')
+  // THE PHOTOGRAPHS are the building's own sets from the wing's one library,
+  // so a set the hall already holds is never uploaded twice.
+  const oakSet = stack.materials.sync('oak-veneer-light'), groundSet = stack.materials.sync('concrete-floor-polished')
+  const ownSets = [oakSet, groundSet]
+  const waiting = (): number => {
+    const gone = new Set(stack.materials.missing().map(set => set.name))
+    return ownSets.filter(set => !set.ready.value && !gone.has(set.name)).length
+  }
 
   // THE LAMP
   const L = READING_LAMP
@@ -340,14 +342,14 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
 
   let live = true
   const ready = new Promise<void>(resolve => {
-    const poll = (): void => { if (oakSet.ready.value || library.missing().length || !live) resolve(); else setTimeout(poll, 50) }
+    const poll = (): void => { if (!waiting() || !live) resolve(); else setTimeout(poll, 50) }
     poll()
   })
 
   return {
     group,
     ready,
-    pending: () => library.pending(),
+    pending: waiting,
     engineOnly(on) { engineTerms.value = on ? 1 : 0 },
     embrace(table) {
       table.updateMatrixWorld(true)
@@ -395,14 +397,12 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
     },
     dispose() {
       live = false
-      unregister()
       for (const o of owned) o.geometry.dispose()
       for (const d of [...doubles, ...ownDoubles]) d.removeFromParent()
       for (const m of materials) m.dispose()
       lamp.shadow.dispose(); lamp.dispose()
       for (const probe of probes) { probe.pmrem.dispose(); probe.target.dispose() }
       generator?.dispose()
-      library.dispose()
       group.removeFromParent()
     },
   }
