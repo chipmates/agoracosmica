@@ -280,9 +280,13 @@ function drawFacade(f:Facade,wall:Wall,b:Batches,tier:Tier,faces:RoofFace[]):voi
     }
   }
   // Alternating dressed quoins are kept off almost collinear cadastral joins.
-  const corner=(x:number):void=>{for(let z=.7,n=0;z<heightAt(x)-.2;z+=.28,n++){const w=n%2?.38:.58;faceBox(b.stone,f,x===0?w/2:f.length_m-w/2,z+.133,w,.262,.10,.055,.91+hash(n,f.length_m)*.10)}}
+  // A dressing below a wall's own foot stands on a wall that is not there,
+  // and on coursed ashlar a quoin laid half a course off the beds breaks
+  // every joint it meets: both stay certified and leave the colour pass.
+  const corner=(x:number):void=>{for(let z=.7,n=0;z<heightAt(x)-.2;z+=.28,n++){const w=n%2?.38:.58;b.stone.retire=stoneField||z<base;faceBox(b.stone,f,x===0?w/2:f.length_m-w/2,z+.133,w,.262,.10,.055,.91+hash(n,f.length_m)*.10)}b.stone.retire=false}
   if(f.length_m>2.5){corner(0);corner(f.length_m)}
   for(const z of [.69,top-.12]){
+    b.stone.retire=z<base
     let runs:[number,number][]=[[0,f.length_m]]
     for(const o of f.openings){
       if(!o.render||o.type==='blind-recess'||o.base_m>=z+.085||o.base_m+o.height_m<=z-.085)continue
@@ -294,6 +298,7 @@ function drawFacade(f:Facade,wall:Wall,b:Batches,tier:Tier,faces:RoofFace[]):voi
       })
     }
     for(const [a,c]of runs)if(c-a>.001)faceBox(b.stone,f,(a+c)/2,z,c-a,.17,.16,.07,.95)
+    b.stone.retire=false
   }
   // Every reveal, sill, mullion and transom stands in the real wall aperture.
   if(!f.id.startsWith('tower-crown-'))for(const o of f.openings)if(o.render)drawOpening(f,o,wall.thickness_m,b)
@@ -422,12 +427,16 @@ function drawOpening(f:Facade,o:Opening,thickness:number,b:Batches):void {
       for(const [ci,[u0,u1]] of columns.entries())for(const [ri,[v0,v1]] of rows.entries())
         house.lights.push(lightOf(f,`${o.id}-${ci}${ri}`,[[u0,v0],[u1,v0],[u1,v1],[u0,v1]],GLASS_OUT,'window',barLines))
     }
-    // Small moulding steps and tooth stones produce edge shadows at two scales.
+    // Two loose 25 mm fillets once stood proud of each jamb and never met
+    // their head: from the court they read as a doubled jamb. They stay
+    // certified and leave the colour pass.
+    b.stone.retire=true
     for(const offset of [.035,.085]) {
       faceBox(b.stone,f,x-offset,z+h/2,.025,h+.05,.065,.095+offset/2)
       faceBox(b.stone,f,x+w+offset,z+h/2,.025,h+.05,.065,.095+offset/2)
       faceBox(b.stone,f,x+w/2,z+h+offset,w+offset*2,.025,.065,.095+offset/2)
     }
+    b.stone.retire=false
     for(let j=0;j<h/.28;j++){const len=j%2?.10:.23;for(const side of [-1,1])faceBox(b.stone,f,side<0?x-.16-len/2:x+w+.16+len/2,z+.14+j*.28,len,.255,.065,.035,.91+hash(j,x)*.09)}
   }
 }
