@@ -12,15 +12,20 @@ import {denseMineralBody,denseMineralProvenance} from './dense-mineral-body'
 import {slateFiniteFinish,slateFiniteProvenance} from './slate-microstructure'
 import {oakFiniteFinish,oakFiniteProvenance} from './oak-microstructure'
 import { anisotropicFootprint, coursedFace, dressedTuffeau } from './masonry-courses'
+import { weatherAtlas, weatherUV } from './house-weather'
+import { hourKey } from './site'
 
 export type ShellSurfaceKind = 'brick' | 'stone' | 'slate' | 'oak'
 // TSL overloads are composed at this one boundary, as in the shared stack.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type N = any
-const { attribute, cameraPosition, cameraViewMatrix, clamp, float, floor, fract, length,
+const { Fn, attribute, cameraPosition, cameraViewMatrix, clamp, float, floor, fract, length,
   mix, mx_noise_float, normalMap, normalWorldGeometry, positionView, positionWorld, smoothstep,
-  uv, vec2, vec3 } = TSL as unknown as Record<string,N>
+  texture, uv, vec2, vec3 } = TSL as unknown as Record<string,N>
 const rgb=(hex:string):N=>{const c=new Color(hex);return vec3(c.r,c.g,c.b)}
+/** The hour's sun, toward it, in three's frame (x east, y up, z south). */
+const SUN_AZ=hourKey.sun_azimuth_deg.value*Math.PI/180,SUN_EL=hourKey.sun_elevation_deg.value*Math.PI/180
+const SUN_UP=Math.sin(SUN_EL),SUN=vec3(Math.sin(SUN_AZ)*Math.cos(SUN_EL),SUN_UP,-Math.cos(SUN_AZ)*Math.cos(SUN_EL))
 interface Facade { from:[number,number];to:[number,number];length_m:number;render:boolean;
   id:string;pattern:{field:string};openings:{base_m:number;width_m:number;from_m:number;render:boolean}[] }
 interface Wall {facade_id:string;base_m:number;height_m:number;render:boolean}
@@ -84,7 +89,7 @@ function prepareOakSeeds(geometry:BufferGeometry,panelSeeds?:readonly number[]):
  */
 export function prepareSurfaceGeometry(geometry:BufferGeometry,kind:ShellSurfaceKind,roles?:readonly number[],panelSeeds?:readonly number[]):void {
   const p=geometry.getAttribute('position'),normals=geometry.getAttribute('normal'),tone=geometry.getAttribute('tone')
-  const info=new Float32Array(p.count*3)
+  const info=new Float32Array(p.count*3),weatherAt=new Float32Array(p.count*4)
   for(let i=0;i<p.count;i++){
     const e=p.getX(i),n=-p.getZ(i),z=p.getY(i),nx=normals.getX(i),nz=normals.getZ(i),h=Math.hypot(nx,nz)
     let nearest:typeof facades[number]|undefined,best=.8,along=0
@@ -115,8 +120,12 @@ export function prepareSurfaceGeometry(geometry:BufferGeometry,kind:ShellSurface
       }
     }
     info[i*3]=kind==='oak'&&roles?.[i]===3?1:mortar;info[i*3+1]=period;info[i*3+2]=Math.min(.4,Math.max(0,weather))
+    // Where this place sits in the weather map, if it lies on a facade.
+    const w=nearest?weatherUV(nearest.id,along,z):null
+    weatherAt[i*4]=w?.[0]??0;weatherAt[i*4+1]=w?.[1]??0;weatherAt[i*4+2]=w?1:0;weatherAt[i*4+3]=kind==='stone'&&roles?.[i]===2?1:0
   }
   geometry.setAttribute('surfaceInfo',new Float32BufferAttribute(info,3))
+  geometry.setAttribute('weatherUV',new Float32BufferAttribute(weatherAt,4))
   if(kind==='oak')prepareOakSeeds(geometry,panelSeeds)
 }
 
@@ -126,7 +135,7 @@ export function prepareSurfaceGeometry(geometry:BufferGeometry,kind:ShellSurface
  * per-band derivative fade is applied AFTER differentiation, so a changing
  * screen footprint cannot itself become an invented ridge in the surface.
  */
-function mineralFinish(kind:ShellSurfaceKind,clayWeight:N,baseNormal:N,regional:N,worldPixel:N):{normal:N;colour:N;roughness:N} {
+function mineralFinish(kind:ShellSurfaceKind,clayWeight:N,baseNormal:N,regional:N,worldPixel:N,slopeUV?:N):{normal:N;colour:N;roughness:N} {
   const P=positionWorld,U=uv(),footprint=U.dFdx().abs().add(U.dFdy().abs())
   const n=normalWorldGeometry.transformDirection(cameraViewMatrix)
   const sx=positionView.dFdx(),sy=positionView.dFdy(),rx=sy.cross(n),ry=n.cross(sx),det=sx.dot(rx)
@@ -145,6 +154,8 @@ function mineralFinish(kind:ShellSurfaceKind,clayWeight:N,baseNormal:N,regional:
   }
   const brick=recipe(true),stone=kind==='brick'?brick:recipe(false)
   let gradient=mix(stone.gradient,brick.gradient,clayWeight)
+  // A laid unit sits a fraction off the wall plane: a slope in its own UV.
+  if(slopeUV)gradient=gradient.add(fromUV(slopeUV))
   gradient=gradient.sub(baseNormal.mul(gradient.dot(baseNormal)))
   gradient=gradient.mul(float(.22).div(length(gradient).max(.22)))
   return{normal:baseNormal.sub(gradient).normalize(),colour:float(1).add(mix(stone.colour,brick.colour,clayWeight)),roughness:mix(stone.roughness,brick.roughness,clayWeight)}
@@ -176,7 +187,7 @@ export const closeSurfaceProvenance={
  * faces and their mortar backing converge to the SAME area-weighted colour
  * and normal below resolution; retained geometry remains visible and complete.
  */
-export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrary,valleys:readonly [[number,number,number],[number,number,number]][]=[]):MeshStandardNodeMaterial {
+export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrary,valleys:readonly [[number,number,number],[number,number,number]][]=[],options:{coursing?:boolean;tops?:number}={}):MeshStandardNodeMaterial {
   const m=new MeshStandardNodeMaterial({metalness:0,roughness:kind==='slate'?.74:kind==='oak'?.79:.88})
   const P=positionWorld,U=uv(),info=attribute('surfaceInfo','vec3'),tone=attribute('tone','float')
   const lowBase=float(1).sub(smoothstep(.65,.73,P.y))
@@ -229,7 +240,7 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
   // The backing tone .76 has always been clamped to .82. Include these
   // physical colour factors in the average instead of brightening the far wall.
   const brickMean=mix(mortar.mul(.82),clay.mul(.98),brickFraction)
-  let filteredBrick:N=brickMean
+  let filteredBrick:N=brickMean,brickCoverage:N=float(brickFraction)
   if(kind==='brick'||kind==='stone'){
     const cellUV=U.div(vec2(.252,.057)),row=floor(cellUV.y)
     const footprint=U.dFdx().abs().add(U.dFdy().abs()).div(vec2(.252,.057)).max(vec2(.00001,.00001))
@@ -257,7 +268,7 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
     const chunkDeparture=kind==='brick'?tone.sub(.98).mul(detail):float(0)
     const field=mortar.mul(.82).mul(float(1).sub(clayCoverage))
       .add(clay.mul(firedCoverage).mul(chunkDeparture.add(.98)))
-    filteredBrick=mix(brickMean,field,support)
+    filteredBrick=mix(brickMean,field,support);brickCoverage=mix(float(brickFraction),clayCoverage,support)
   }
   const acrossPixel=U.x.dFdx().abs().add(U.x.dFdy().abs()).max(.00001)
   const acrossResolved=smoothstep(2,4.2,float(kind==='brick'?.252:.24).div(acrossPixel))
@@ -424,24 +435,40 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
   const filteredWorld=mix(geometric,wallNormal,wallCourse.mul(float(1).sub(detail))).normalize()
   const filteredView=filteredWorld.transformDirection(cameraViewMatrix)
   if(kind==='brick'||kind==='stone'){
-    const mineral=mineralFinish(kind,clayWeight,filteredView,regional,worldPixel)
+    // EVERY BRICK SITS A LITTLE OFF THE PLANE, which is what a raking sun
+    // finds: up to 1.4 degrees each way, faded where a brick is sub-pixel.
+    let slope:N|undefined
+    if(kind==='brick'){
+      const cellUV=U.div(vec2(.252,.057)),row=floor(cellUV.y),column=floor(cellUV.x.add(fract(row.mul(.5))))
+      const cellFoot=U.dFdx().abs().add(U.dFdy().abs()).div(vec2(.252,.057))
+      const held=float(1).sub(smoothstep(.9,1.8,cellFoot.x.max(cellFoot.y)))
+      const hx=fract(column.mul(12.9898).add(row.mul(78.233)).sin().mul(43758.5453)).sub(.5)
+      const hy=fract(column.mul(39.3468).add(row.mul(11.1351)).sin().mul(24634.6345)).sub(.5)
+      slope=vec2(hx,hy).mul(.05).mul(held)
+    }
+    const mineral=mineralFinish(kind,clayWeight,filteredView,regional,worldPixel,slope)
     m.colorNode=(m.colorNode as N).mul(mineral.colour)
     m.roughnessNode=clamp((m.roughnessNode as N).add(mineral.roughness),roughRange[0],roughRange[1])
     m.normalNode=mineral.normal
-    if(kind==='stone'){
+    // Carved work is cut from a few large stones: it takes no laid coursing.
+    if(kind==='stone'&&options.coursing!==false){
       // ONE STONE IS NOT THE NEXT, on the house as on the garden wall. The
       // dressed faces carried a continuous stain and a course line and
       // nothing from block to block, so the chapel's ashlar, the largest
       // pale plane in the wing, read as one tone with lines on it. A quarry
       // sends beds of different colour and a few stones drink and stay dark.
       // Colour only, keyed to each block's own number, never a pattern.
-      const laid=coursedFace(U,{...dressedTuffeau,courseM:.31,blockM:.74,jointM:.012,faceSwing:.052,seed:4.63})
+      const laid=coursedFace(U,{...dressedTuffeau,courseM:.28,courseSwing:0,blockM:.66,jointM:.012,faceSwing:.052,seed:4.63})
       const face=float(1).sub(info.x.mul(float(1).sub(lowBase)))
       const bed=laid.cell.sub(.5).mul(laid.held)
       const soaked=smoothstep(.76,.97,laid.cell).mul(laid.held)
       const dressed=laid.tone.mul(mix(float(1),float(.88),laid.joint))
-        .mul(bed.mul(.27).add(1)).mul(float(1).sub(soaked.mul(.12)))
-      m.colorNode=(m.colorNode as N).mul(mix(float(1),dressed,face))
+        .mul(bed.mul(.34).add(1)).mul(float(1).sub(soaked.mul(.16)))
+      // Beds of one quarry differ in hue as well: some blocks lean to the
+      // yellow of fresh tuffeau, some to the grey of a harder bed.
+      const hue=fract(laid.cell.mul(91.7)).sub(.5).mul(laid.held)
+      const tint=mix(vec3(1,1,1),vec3(1.035,1.0,.93),hue.max(0).mul(2)).mul(mix(vec3(1,1,1),vec3(.96,.985,1.02),hue.negate().max(0).mul(2)))
+      m.colorNode=(m.colorNode as N).mul(mix(vec3(1,1,1),dressed.mul(tint),face))
       m.roughnessNode=clamp((m.roughnessNode as N).add(laid.joint.mul(.03).mul(face)),roughRange[0],roughRange[1])
     }
     // RAIN COMES BACK OFF THE GROUND. A wall under a slate roof with no gutter
@@ -452,6 +479,59 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
     const splash=float(1).sub(smoothstep(.11,.47,splashEdge)).mul(smoothstep(-.05,.06,splashEdge))
     m.colorNode=mix(m.colorNode as N,(m.colorNode as N).mul(vec3(.87,.885,.845)),splash.mul(.55))
     m.roughnessNode=clamp((m.roughnessNode as N).add(splash.mul(.03)),roughRange[0],roughRange[1])
+    // WEATHER WITH CAUSES, read from the baked map of every facade: dark
+    // streaks under the sills and courses, damp at the foot, lichen where a
+    // face looks north, a broad grime. A fine vertical fibre breaks each
+    // streak into the runs water actually takes; it fades before it aliases.
+    const at=attribute('weatherUV','vec4'),weather=texture(weatherAtlas().texture,at.xy).mul(at.z)
+    const fibreHeld=resolvedAt(.03)
+    const fibre=mix(float(.5),mx_noise_float(vec3(U.x.mul(34),U.y.mul(1.3),3.7)).mul(.5).add(.5),fibreHeld)
+    const streak=weather.x.mul(fibre.mul(.7).add(.3))
+    let c:N=m.colorNode as N
+    const grey=c.dot(vec3(.2126,.7152,.0722))
+    // Pale stone shows its soiling more than fired brick does (AD-2: the
+    // soiled tuffeau under a drip is about half the weathered face).
+    const soil=kind==='stone'?float(.5):float(.36)
+    c=mix(c,vec3(grey).mul(vec3(.92,.90,.86)),streak.mul(.35)).mul(float(1).sub(streak.mul(soil)))
+    // UNDERSIDES THE RAIN NEVER WASHES keep a dark crust: the soffits of
+    // quoins, courses and sills, which the court's light would show brown.
+    const soffit=normalWorldGeometry.y.negate().max(0).mul(float(1).sub(smoothstep(.2,.6,horizontalLength)))
+    c=mix(c,rgb('#4a4741').mul(c.dot(vec3(.33,.33,.33)).mul(1.6).add(.4)),soffit.mul(.55))
+    // TOPS HOLD WHAT THE RAIN BRINGS: copings, sills and courses carry grime
+    // in their pores and a skin of lichen, never the clean edge of new work.
+    // (a course's own lip leans out a quarter and stays the sun's)
+    // (carved work with no course lips may count its weathered slopes too)
+    const top=normalWorldGeometry.y.max(0).mul(float(1).sub(smoothstep(.08,options.tops??.2,horizontalLength)))
+    const skin=smoothstep(.3,.75,mx_noise_float(P.mul(9).add(vec3(5.3,1.1,7.9))).mul(.5).add(.5))
+    c=mix(c,mix(c.mul(vec3(.66,.64,.58)),rgb('#8e9474'),skin.mul(.45)),top.mul(.7))
+    c=c.mul(float(1).sub(weather.y.mul(.2))).mul(mix(vec3(1,1,1),vec3(.93,.97,.90),weather.y))
+    const lichenMask=smoothstep(.38,.72,mx_noise_float(P.mul(22).add(vec3(1.7,4.1,2.3))).mul(.5).add(.5).mul(resolvedAt(.05)).add(float(1).sub(resolvedAt(.05)).mul(.5)))
+    c=mix(c,rgb('#9ba07c').mul(mottled.mul(.2).add(.9)),weather.z.mul(lichenMask).mul(.62))
+    // a broad grime, heavier low on the wall where hands and splash reach
+    const grime=mx_noise_float(P.mul(.35).add(vec3(3.1,7.7,1.3))).mul(.5).add(.5).mul(float(1).sub(smoothstep(.5,3,P.y)).mul(.5).add(.5))
+    c=c.mul(float(1).sub(grime.mul(.14).mul(at.z)))
+    m.colorNode=c
+    // THE COURT'S SUN, SENT BACK: a wall in shade takes warm light from the
+    // sunlit ground it faces, baked per place from that ground's own sun.
+    // Engine-only (`engineBounce`); the film's path tracer bounces for real.
+    m.emissiveNode=c.mul(vec3(1,.73,.545)).mul(weather.w.mul(.5*.073*1.4))
+    m.userData['engineBounce']=true
+    m.roughnessNode=clamp((m.roughnessNode as N).add(streak.mul(.05)).add(weather.z.mul(lichenMask).mul(.08)),roughRange[0],roughRange[1])
+    // THE JOINTS IN RAKING LIGHT. A recessed joint takes the sun only where
+    // the brick beside it does not shade it; the fraction follows from the
+    // sun's angle to this very wall. Engine-only light term: the film's
+    // geometry casts this itself (`engineJointShadow`).
+    const wallN=vec3(wallNormal.x,0,wallNormal.z),sunN=clamp(wallN.dot(SUN),.015,1)
+    const sunAlong=float(1).sub(SUN_UP*SUN_UP).sub(sunN.mul(sunN)).max(0).sqrt()
+    const bedShade=clamp(float(.015*SUN_UP).div(sunN).div(.012),0,1)
+    const headShade=clamp(sunAlong.mul(.008).div(sunN).div(.012),0,1)
+    // a stone field's backing is the floor of its own bed joints too
+    const isBacking=kind==='stone'?info.x.mul(float(1).sub(lowBase)).max(at.w):float(0)
+    const headJoint=kind==='brick'?float(1).sub(brickCoverage).mul(detail):float(0)
+    const shaded=isBacking.mul(bedShade).add(headJoint.mul(headShade)).clamp(0,1)
+    m.receivedShadowNode=Fn(([shadow]:N[])=>shadow.mul(float(1).sub(shaded)))
+    m.aoNode=float(1).sub(isBacking.mul(.32)).sub(headJoint.mul(.22))
+    m.userData['engineJointShadow']=true
   }else if(kind==='slate'){
     const n=normalWorldGeometry.transformDirection(cameraViewMatrix),sx=positionView.dFdx(),sy=positionView.dFdy()
     const rx=sy.cross(n),ry=n.cross(sx),det=sx.dot(rx)
