@@ -102,13 +102,18 @@ export function facesOf(bodies, { self = false } = {}) {
     group.updateMatrixWorld(true)
     group.traverse(object => {
       if (!object.isMesh || !object.geometry) return
+      // a mesh on no camera's layer and no shadow camera's is drawn by no pass
+      if (!(object.layers.mask & 3)) return
       const position = object.geometry.getAttribute('position')
       if (!position) return
+      // a retired triangle collapses in the vertex stage and is drawn nowhere
+      const retired = object.geometry.getAttribute('retired')
       const index = object.geometry.getIndex()
       const count = index ? index.count : position.count
       const matrix = object.matrixWorld
       const mesh = self ? `${object.name || name}#${object.id}` : object.name || name
       for (let at = 0; at + 2 < count; at += 3) {
+        if (retired && retired.getX(index ? index.getX(at) : at) > .5) continue
         const v = [0, 1, 2].map(corner => {
           const i = index ? index.getX(at + corner) : at + corner
           return new THREE.Vector3(position.getX(i), position.getY(i), position.getZ(i)).applyMatrix4(matrix)

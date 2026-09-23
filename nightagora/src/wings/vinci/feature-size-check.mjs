@@ -193,8 +193,12 @@ const ALLOWED = [
   { mesh: 'vinci/shell/oak', why: 'known, 2026-09-21: the window frames, 465 faces' },
   { mesh: 'vinci/shell/iron', why: 'known, 2026-09-21: the casement ironwork, 1670 faces' },
   { mesh: 'vinci/shell/dark', why: 'known, 2026-09-21: the dark joinery, 634 faces' },
-  { mesh: 'vinci/shell/glass', why: 'known, 2026-09-21: the quarries in their leading, 391 faces' },
-  { mesh: 'vinci/shell/glassSky', why: 'known, 2026-09-21: the same quarries reflecting the sky, 408 faces' },
+  // the shell's flat panes left the colour pass; their quarries are now
+  // pieces of glass of their own, one continuous surface per light
+  { mesh: 'vinci/house-glazing/glass', why: 'known, 2026-09-23: the quarries in their leading, 3808 faces, thinnest 0.041 px at 28 m' },
+  // the rooms seen through the windows: a continuous vault and floor
+  // tessellation, read only through glass from the far route eyes
+  { mesh: 'vinci/house-rooms/fabric', why: 'known, 2026-09-23: the chapel vault cells and one floor cell, 32 faces, thinnest 0.813 px at 29 m' },
   { mesh: 'vinci/shell/lead', why: 'known, 2026-09-21: the flashings, 114 faces, thinnest 0.79 px' },
   { mesh: 'vinci/shell/clay', why: 'known, 2026-09-21: the ridge and hip tiles, 16 faces' },
   // THE COURT AND THE MODERN INSERTION.
