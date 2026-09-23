@@ -288,6 +288,14 @@ export function createCloseLookBand(options: {
     backWay.setAttribute('aria-label', back?.getAttribute('aria-label') ?? '')
   }
 
+  /* the museum's control stands outside the wing, on this band's first row,
+     so the band's height is copied where that control can read it */
+  function publish(height: number | null): void {
+    const style = document.documentElement.style
+    if (height === null) style.removeProperty('--desk-clb-h')
+    else if (style.getPropertyValue('--desk-clb-h') !== `${height}px`) style.setProperty('--desk-clb-h', `${height}px`)
+  }
+
   function measure(): void {
     requestAnimationFrame(() => {
       const box = root.getBoundingClientRect()
@@ -296,6 +304,7 @@ export function createCloseLookBand(options: {
       if (height === measured) return
       measured = height
       setCloseLookBand(height)
+      publish(height)
       options.resized()
     })
   }
@@ -377,6 +386,7 @@ export function createCloseLookBand(options: {
       drawerWords.textContent = ''
       foot.textContent = ''
       setCloseLookBand(null)
+      publish(null)
     },
     measure,
     key(event) {
@@ -392,6 +402,7 @@ export function createCloseLookBand(options: {
     dispose() {
       sized.disconnect()
       setCloseLookBand(null)
+      publish(null)
       root.remove()
     },
   }

@@ -36,6 +36,12 @@
   transition: opacity 240ms cubic-bezier(.22, .61, .36, 1) 500ms, color .3s ease;
 }
 :root[data-na-panel='open'] #rail-instruments { color: var(--na-starlight); }
+/* IN A CLOSE LOOK THE CONTROL STANDS ON THE BAND'S FIRST ROW, at the right of
+   the step back and in its box: the kind's instruments own the row under it,
+   so each has one place at every height the band takes */
+:root[data-na-panel='wing']:has(#wing[data-desk~='closelook'] .desk-clb) #rail-instruments {
+  bottom: calc(var(--desk-clb-h, 224px) - 46px);
+}
 /* NOTHING CALLS A VISITOR OUT OF THE WALK. The museum's control leaves with
    the words and comes back with them, so a leg has the gold control and the
    way back and nothing else. */
@@ -47,7 +53,8 @@
 /* THE CONTROL STANDS WHERE THE MUSEUM'S OWN LABEL STANDS, and stands down
    while a surface grows over that label: the drawer and the door's plate. */
 :root[data-na-plate='open'] #rail-instruments,
-:root:has(#wing[data-drawer='open']) #rail-instruments { display: none; }
+:root:has(#wing[data-drawer='open']) #rail-instruments,
+:root:has(#wing[data-desk~='closelook'] .desk-clb[data-drawer='open']) #rail-instruments { display: none; }
 
 /* The three worded ways through the wing and the bar's own way home stand
    down: their rows are inside the panel now. The frame places its own bar
