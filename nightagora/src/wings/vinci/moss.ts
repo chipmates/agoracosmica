@@ -8,11 +8,12 @@
    between them. Positions and amounts are this exhibition's reading of the
    damp, never a record; the moss is a type. */
 import { BufferGeometry, DoubleSide, Float32BufferAttribute, Group, Mesh, MeshStandardNodeMaterial } from 'three/webgpu'
-import { float, mix, mx_noise_float, positionWorld, smoothstep, vec3 } from 'three/tsl'
+import { cameraViewMatrix, float, mix, mx_noise_float, normalWorldGeometry, positionWorld, smoothstep, vec3 } from 'three/tsl'
+import { reliefNormal } from '../../stack/detail'
 import type { TierName } from '../../stack/tier'
 import { anisotropicFootprint } from './masonry-courses'
 import { floorAt, terrainSteps } from './terrain-mesh'
-import { builtFaces, type Catcher } from './ground-walls'
+import { drawnFaces, GRAVE_FLOOR, GRAVE_FLOOR_RISE, type Catcher } from './ground-walls'
 import { stageWeight } from './leaf-litter'
 import { mulberry } from './tree-growth'
 import { pebble, type Emit, type V3 } from './pebbles'
@@ -41,13 +42,21 @@ const into = (b: Batch): Emit => (a, c, d, na, nc, nd, colour) => {
   }
 }
 
-/** the made floor of the insertion's court, or the ground's own */
+/** the made floor of the insertion's court (the grave's own floor a little
+    over its paving), or the ground's own */
 function groundAt(e: number, n: number): number {
   for (const g of COURT_GROUND) if (e > g.west && e < g.east && n > g.south && n < g.north)
-    return COURT.level + (e < SUPPER_WALL.east ? .035 : 0)
+    return COURT.level + (e > GRAVE_FLOOR.west && e < GRAVE_FLOOR.east && n > GRAVE_FLOOR.south && n < GRAVE_FLOOR.north ? GRAVE_FLOOR_RISE : 0)
   return floorAt(e, n)
 }
 const inCourt = (e: number, n: number): boolean => COURT_GROUND.some(g => e > g.west && e < g.east && n > g.south && n < g.north)
+/** A step in the grade is a face only where its foot is the grade itself:
+    under the court's paving and the museum's floors it is buried. */
+function exposed(s: { from: readonly number[]; to: readonly number[]; low: readonly number[]; lowLevel: number }): boolean {
+  const m: [number, number] = [(s.from[0]! + s.to[0]!) / 2, (s.from[1]! + s.to[1]!) / 2]
+  const under = COURT_GROUND.some(g => m[0] > g.west - .6 && m[0] < g.east + .6 && m[1] > g.south - .6 && m[1] < g.north + .6)
+  return !under && Math.abs(groundAt(m[0] + s.low[0]! * .15, m[1] + s.low[1]! * .15) - s.lowLevel) < .08
+}
 
 export function createMoss(tier: TierName): Group {
   const group = new Group()
@@ -79,7 +88,7 @@ export function createMoss(tier: TierName): Group {
   }
 
   // ─── the foot of every wall and retaining face a stop sees ─────────────
-  const faces: Catcher[] = [...builtFaces(), ...terrainSteps().filter(s => s.height >= .3)
+  const faces: Catcher[] = [...drawnFaces(), ...terrainSteps().filter(s => s.height >= .3 && exposed(s))
     .map(s => ({ from: s.from as [number, number], to: s.to as [number, number], low: s.low as [number, number], height: s.height }))]
   for (const f of faces) {
     const dx = f.to[0] - f.from[0], dn = f.to[1] - f.from[1], span = Math.hypot(dx, dn)
@@ -87,18 +96,22 @@ export function createMoss(tier: TierName): Group {
     const mid: [number, number] = [(f.from[0] + f.to[0]) / 2, (f.from[1] + f.to[1]) / 2]
     const stage = stageWeight(mid[0], mid[1])
     if (stage <= .05) continue
-    // a foot facing north stays damp; the grave court is in shade all day
-    const damp = inCourt(mid[0], mid[1]) ? .9 : .25 + .75 * Math.max(0, f.low[1])
+    // a foot facing north stays damp; the grave court is in shade all day;
+    // a house's own foot takes the splash off its roof on every side
+    const house = f.height >= 5.5 && !inCourt(mid[0], mid[1])
+    const damp = inCourt(mid[0], mid[1]) ? .9 : Math.max(house ? .6 : 0, .25 + .75 * Math.max(0, f.low[1]))
     const patches = Math.round(span * 1.6 * damp * stage * keep)
     for (let k = 0; k < patches; k++) {
-      const t = random(), off = .015 + random() * random() * .12
+      // the corners where two faces meet hold the wet longest
+      const u = random(), t = u < .35 ? (random() < .5 ? random() * .12 : 1 - random() * .12) : random()
+      const off = .015 + random() * random() * .12
       patch(f.from[0] + dx * t + f.low[0] * off, f.from[1] + dn * t + f.low[1] * off, f.low, .05 + random() * .12, damp)
     }
   }
 
   // ─── the back corners of stair treads, under the riser's shade ─────────
   for (const s of terrainSteps()) {
-    if (s.height >= .3 || s.height < .08) continue
+    if (s.height >= .3 || s.height < .08 || !exposed(s)) continue
     const dx = s.to[0] - s.from[0], dn = s.to[1] - s.from[1], span = Math.hypot(dx, dn)
     const mid: [number, number] = [(s.from[0] + s.to[0]) / 2, (s.from[1] + s.to[1]) / 2]
     const stage = stageWeight(mid[0], mid[1])
@@ -213,7 +226,8 @@ function mossMaterial(): MeshStandardNodeMaterial {
   const shoots = mx_noise_float(P.mul(260)).mul(shows(.004))
   const tufts = mx_noise_float(P.mul(48).add(vec3(3.1, 7.7, 1.9))).mul(shows(.02))
   m.colorNode = vec3(1, 1, 1).mul(shoots.mul(.22).add(1)).mul(mix(float(.86), float(1.1), tufts.mul(.5).add(.5)))
-  // no normal map: these faces carry no uv, and a tangent-space map takes its frame from one
+  // the felt's relief from its own height: the cushions carry no map coordinates
+  m.normalNode = reliefNormal(normalWorldGeometry.transformDirection(cameraViewMatrix), shoots.mul(.0008).add(tufts.mul(.002)), .35)
   m.name = 'vinci generated moss'
   m.userData = { ...mossProvenance }
   return m
