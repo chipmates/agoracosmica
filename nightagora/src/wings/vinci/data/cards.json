@@ -6,7 +6,8 @@
     "written_here": "The line (data/lines.json), the steps (data/steps.json), the honesty variants, the zoom ceiling's sentence, the rule labels, the floor's honesty line, the short room name per station (station_short_names, at most 24 characters, for the one step back in a close look and in the overview, where the full station name runs to 493 px uppercase) and every control's words. A machine whose viewpoint is not the shared one names it under controls.machine.viewpoint_labels, keyed by the machine slug and the viewpoint id.",
     "controls_for_the_new_chrome": "The walk, visit, overview, reader and ways groups are the frozen desktop design's control words, confirmed in both languages by the text seat and read by no surface yet. A build seat quotes the key instead of typing the words. Words the museum already ships keep their one home and are not copied here: Whole (controls.machine.viewpoints), Where it comes from (controls.machine.provenance), Lobby, The plan, Life, Instruments and the three paces (the lobby and the frame).",
     "measures": "The overview's three measure sentences take the count from the set itself, through {n}. The metres are read once from the rooms' own modules: the hang's span of 34.6 m from collection/hang.ts, and the mechanism hall's 22.64 by 21.62 m from the faces in collection/layout.ts. A set of leaves carries no measure of its own yet, so its sentence names none.",
-    "prepared": "2026-09-15"
+    "prepared": "2026-09-15",
+    "transcription_way": "controls.manuscript.transcription names the fourth way of reading a leaf, the page with the edition's words beside it, offered in the desktop band only. The reader reads the same two words from table/content.ts TABLE_UI.transcription today and takes them from here once vinciManuscriptWords reads this key."
   },
   "models": {
     "picture": {
@@ -42,9 +43,9 @@
         { "id": "honesty", "from": "honesty_variants.page", "register": "label" }
       ],
       "honesty_variant": "page",
-      "behind_more": ["the transcription", "the French"],
-      "behind_its_own_control": ["the mirror hand, from table/content.ts MIRROR_EXPLANATION"],
-      "record": "the holder, the folio, the edition and what the page map cannot certify"
+      "behind_more": ["the transcription and the French, on the phone and on the card without the desktop band"],
+      "behind_its_own_control": ["the mirror hand, from table/content.ts MIRROR_EXPLANATION", "the transcription and the French in the desktop band: the Transcription way (controls.manuscript.transcription), the page on the left and the edition's words in a column beside it, or the sentence that says they are withheld"],
+      "record": "the holder, the folio, the edition's credit (in the desktop band it stands in the record, not in the drawer) and what the page map cannot certify"
     },
     "date": {
       "fields": [
@@ -190,6 +191,7 @@
       "hand": { "en": "His hand", "de": "Seine Handschrift" },
       "mirror": { "en": "In a mirror", "de": "Im Spiegel" },
       "print": { "en": "In print", "de": "Im Druck" },
+      "transcription": { "en": "Transcription", "de": "Umschrift" },
       "back_to_leaf": { "en": "Back to the leaf", "de": "Zurück zum Blatt" },
       "place": { "en": "{n} of {total}", "de": "{n} von {total}" },
       "leaves": { "en": "The leaves of manuscript {codex}, {total} sides", "de": "Die Blätter des Manuskripts {codex}, {total} Seiten" },
