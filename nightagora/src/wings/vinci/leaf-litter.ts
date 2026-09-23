@@ -98,8 +98,10 @@ export interface LitterPlan {
   grass: (east: number, north: number) => boolean
   /** faces besides the terrain's own steps: walls of houses and courts */
   walls: readonly Catcher[]
-  /** the body a leaf at (east, north) is written into, and its shadow body */
-  bodyAt: (east: number, north: number) => { leaves: Body; shadow: Body | null }
+  /** the body a leaf at (east, north) is written into, its shadow body, and
+      the body of the soft darkening it leaves on a hard floor (none where the
+      renderer finds its own occlusion) */
+  bodyAt: (east: number, north: number) => Target
   /** a carted road: its centre line and its width */
   lane?: { centre: readonly V2[]; width: number }
   /** a walled court the wind blows leaves into over its walls: its made
@@ -108,6 +110,7 @@ export interface LitterPlan {
 }
 
 interface Source { species: Species; e: number; n: number; reach: number; fallen: number }
+export interface Target { leaves: Body; shadow: Body | null; contact: Body | null }
 
 
 /** What was laid, by where it lies. */
@@ -127,10 +130,12 @@ export function layLitter(plan: LitterPlan): LitterCounts {
     e: r.crown.cx + TOWARD[0] * r.crown.radius * .3, n: -r.crown.cz + TOWARD[1] * r.crown.radius * .3,
     reach: r.crown.radius, fallen: r.fallen,
   }))
-  /** how much blown fall reaches a place, and whose it mostly is */
-  const supply = (e: number, n: number): { amount: number; species: Species; second: Species } => {
+  /** how much blown fall reaches a place, whose it mostly is, and the whole
+      mix of trees it comes from, so a blown drift is never one species */
+  const supply = (e: number, n: number): { amount: number; species: Species; second: Species; pick: (u: number) => Species } => {
     // the lane's hedges and the fields beyond send some to every place
     let amount = .45, best = 0, bestSpecies: Species = 'walnut', second: Species = 'walnut', secondBest = 0
+    const mix = new Map<Species, number>()
     for (const s of sources) {
       const sigma = s.reach + 14
       // what blows travels mostly downwind; a calm day of the week drops some
@@ -139,10 +144,17 @@ export function layLitter(plan: LitterPlan): LitterCounts {
       const reach = Math.exp(-(de * de + dn * dn) / (2 * sigma * sigma)) * (along > 0 ? 1 : Math.exp(along / 14))
       const v = reach * s.fallen / .2 * Math.min(1.6, s.reach / 5)
       amount += v
+      mix.set(s.species, (mix.get(s.species) ?? 0) + v)
       if (v > best) { secondBest = best; second = bestSpecies; best = v; bestSpecies = s.species }
       else if (v > secondBest) { secondBest = v; second = s.species }
     }
-    return { amount: Math.min(2.2, amount), species: bestSpecies, second: secondBest > best * .25 ? second : bestSpecies }
+    const entries = [...mix.entries()].filter(([, w]) => w > best * .06), total = entries.reduce((a, [, w]) => a + w, 0)
+    const pick = (u: number): Species => {
+      let at = u * total
+      for (const [species, w] of entries) { if (at < w) return species; at -= w }
+      return bestSpecies
+    }
+    return { amount: Math.min(2.2, amount), species: bestSpecies, second: secondBest > best * .25 ? second : bestSpecies, pick }
   }
 
   const palettes = new Map<Species, ReturnType<typeof fallenPalette>>()
@@ -151,14 +163,18 @@ export function layLitter(plan: LitterPlan): LitterCounts {
     if (!p) { p = fallenPalette(species); palettes.set(species, p) }
     return p
   }
-  const colourOf = (species: Species, pick: number, age: number): V3 => {
+  const colourOf = (species: Species, pick: number, age: number, hard = false): V3 => {
     const { colours, weights } = paletteOf(species)
-    // the older the layer, the further down the palette's dried end
+    // the older the layer, the further down the palette's dried end; what the
+    // wind carries onto stone is the dry fall, browner and duller than what
+    // still lies on the grass it fell on
     const total = weights.reduce((a, b) => a + b, 0)
-    let at = clamp01(pick * .75 + age * .25) * total, i = 0
+    let at = clamp01(pick * .75 + Math.max(age, hard ? .7 : 0) * .25) * total, i = 0
     while (i < weights.length - 1 && at > weights[i]!) { at -= weights[i]!; i++ }
     const c = colours[i]!
-    return [c[0], c[1], c[2]]
+    if (!hard) return [c[0], c[1], c[2]]
+    const grey = .2126 * c[0] + .7152 * c[1] + .0722 * c[2]
+    return [(c[0] + (grey - c[0]) * .32) * 1.02, (c[1] + (grey - c[1]) * .32) * .97, (c[2] + (grey - c[2]) * .32) * .9]
   }
 
   // ─── THE CARPET under every crown that is dropping it ───────────────────
@@ -193,9 +209,9 @@ export function layLitter(plan: LitterPlan): LitterCounts {
       const folded = !calm && stopDistance(e, n) < 12
       lay(plan.bodyAt(e, n), {
         species: r.spec.species, east: e, north: n, y: plan.floorAt(e, n) + (onGrass ? .004 + s2 * s2 * .028 : .002),
-        angle: s3 * Math.PI * 2, length: length * (1.05 + s1 * .45) * size, colour: colourOf(r.spec.species, s2, s1 * .5),
-        fold: onGrass ? .12 + s1 * .3 : .06 + s1 * .2, folded, tilt: onGrass ? (s4 - .5) * .7 : (s4 - .5) * .15,
-        ao: .78 + s2 * .18, casts: folded && onGrass,
+        angle: s3 * Math.PI * 2, length: length * (1.05 + s1 * .45) * size, colour: colourOf(r.spec.species, s2, s1 * .5, !onGrass),
+        fold: onGrass ? .12 + s1 * .3 : .14 + s1 * .3, folded, tilt: onGrass ? (s4 - .5) * .7 : (s4 - .5) * .15,
+        ao: .78 + s2 * .18, casts: folded && onGrass, hard: !onGrass, floor: plan.floorAt(e, n),
       })
       laid++
     }
@@ -203,8 +219,17 @@ export function layLitter(plan: LitterPlan): LitterCounts {
 
   counts.carpet = laid
   // ─── THE DRIFTS against every face across the wind ──────────────────────
+  // a step in the grade under a made floor is no face at all: the court's
+  // paving and the museum's floors run over it, so a step is only a face
+  // where a leaf on its low side would lie on the grade itself
+  const underFloor = (p: V2): boolean => (plan.court?.floor ?? []).some(g => p[0] > g.west - .6 && p[0] < g.east + .6 && p[1] > g.south - .6 && p[1] < g.north + .6)
+  const exposed = (s: { from: readonly number[]; to: readonly number[]; low: readonly number[]; lowLevel: number }): boolean => {
+    const m: V2 = [(s.from[0]! + s.to[0]!) / 2, (s.from[1]! + s.to[1]!) / 2]
+    const foot: V2 = [m[0] + s.low[0]! * .15, m[1] + s.low[1]! * .15]
+    return !underFloor(m) && Math.abs(plan.floorAt(foot[0], foot[1]) - s.lowLevel) < .08
+  }
   const catchers: Catcher[] = [
-    ...terrainSteps().map(s => ({ from: s.from as V2, to: s.to as V2, low: s.low as V2, height: s.height })),
+    ...terrainSteps().filter(exposed).map(s => ({ from: s.from as V2, to: s.to as V2, low: s.low as V2, height: s.height })),
     ...plan.walls,
   ]
   const random = mulberry(15171021)
@@ -239,7 +264,7 @@ export function layLitter(plan: LitterPlan): LitterCounts {
       const off = Math.min(band * 2.4, g * band) + .012
       const e = c.from[0] + dx * t + c.low[0] * off, n = c.from[1] + dn * t + c.low[1] * off
       if (plan.refused(e, n)) continue
-      const species = s5 < .72 ? here.species : here.second
+      const species = here.pick(s5)
       const layer = Math.floor(s1 * s1 * (1 + depth * 3.2 + corner * 2) * Math.exp(-off / (band * 1.4)))
       const lift = .003 + layer * .007 + s2 * .003
       const length = leafLengthOf(species) * (1 + s3 * .4) * grow
@@ -250,10 +275,10 @@ export function layLitter(plan: LitterPlan): LitterCounts {
       lay(plan.bodyAt(e, n), {
         species, east: leaning ? c.from[0] + dx * t + c.low[0] * .03 : e, north: leaning ? c.from[1] + dn * t + c.low[1] * .03 : n,
         y: plan.floorAt(e, n) + (leaning ? .002 : lift + (onGrass ? .012 : 0)), angle: along, length,
-        colour: colourOf(species, s2, clamp01(1 - layer / 3)),
+        colour: colourOf(species, s2, clamp01(1 - layer / 3), !onGrass),
         fold: .1 + s1 * .32, folded: !calm && (leaning || stopDistance(e, n) < 12), tilt: leaning ? s3 : (s4 - .5) * .35,
         ao: clamp01(.52 + .1 * layer + .3 * clamp01(off / band) + s5 * .1), leanTo: leaning ? c.low : undefined,
-        casts: leaning || layer > 0,
+        casts: leaning || layer > 0, hard: !onGrass && layer === 0, floor: plan.floorAt(e, n),
       })
       laid++
     }
@@ -286,8 +311,9 @@ export function layLitter(plan: LitterPlan): LitterCounts {
         lay(plan.bodyAt(e, n), {
           species, east: e, north: n, y: plan.floorAt(e, n) + (onGrass ? .005 + s2 * s2 * .025 : .002 + j * .004),
           angle: s1 * Math.PI * 2, length: leafLengthOf(species) * (1 + s2 * .45) * grow,
-          colour: colourOf(species, s2, s1 * .4), fold: .08 + s1 * .3, folded: !calm && stopDistance(e, n) < 12,
+          colour: colourOf(species, s2, s1 * .4, !onGrass), fold: onGrass ? .08 + s1 * .3 : .14 + s1 * .3, folded: !calm && stopDistance(e, n) < 12,
           tilt: onGrass ? (s4 - .5) * .6 : (s4 - .5) * .15, ao: .74 + s2 * .2, casts: onGrass && j === 0,
+          hard: !onGrass && j === 0, floor: plan.floorAt(e, n),
         })
         laid++
       }
@@ -318,8 +344,8 @@ export function layLitter(plan: LitterPlan): LitterCounts {
         lay(plan.bodyAt(e, n), {
           species, east: e, north: n, y: plan.floorAt(e, n) + .002 + s2 * .004,
           angle: Math.atan2(dn, dx) + (s1 - .5) * 2.6, length: leafLengthOf(species) * (1 + s2 * .4) * grow,
-          colour: colourOf(species, s2, .3 + s1 * .5), fold: .06 + s1 * .22, folded: !calm && stopDistance(e, n) < 20,
-          tilt: (s3 - .5) * .12, ao: .7 + s2 * .2, casts: false,
+          colour: colourOf(species, s2, .3 + s1 * .5, true), fold: .1 + s1 * .26, folded: !calm && stopDistance(e, n) < 20,
+          tilt: (s3 - .5) * .12, ao: .7 + s2 * .2, casts: false, hard: true, floor: plan.floorAt(e, n),
         })
         laid++
       }
@@ -338,11 +364,12 @@ export function layLitter(plan: LitterPlan): LitterCounts {
         const s1 = random(), s2 = random(), s3 = random(), s4 = random()
         const lee = Math.exp(-plan.court.toWall(e, n) / 3.5)
         if (random() > (.42 + .58 * lee) * stageWeight(e, n) || plan.refused(e, n)) continue
-        const here = supply(e, n), species = s3 < .7 ? here.species : here.second
+        const here = supply(e, n), species = here.pick(s3)
         lay(plan.bodyAt(e, n), {
           species, east: e, north: n, y: plan.floorAt(e, n) + .002 + s2 * .004, angle: s1 * Math.PI * 2,
-          length: leafLengthOf(species) * (1 + s2 * .4) * grow, colour: colourOf(species, s2, s1 * .5),
-          fold: .1 + s1 * .3, folded: !calm && stopDistance(e, n) < 12, tilt: (s4 - .5) * .15, ao: .76 + s2 * .18, casts: false,
+          length: leafLengthOf(species) * (1 + s2 * .4) * grow, colour: colourOf(species, s2, s1 * .5, true),
+          fold: .16 + s1 * .32, folded: !calm && stopDistance(e, n) < 12, tilt: (s4 - .5) * .15, ao: .76 + s2 * .18, casts: false,
+          hard: true, floor: plan.floorAt(e, n),
         })
         laid++
       }
@@ -370,12 +397,16 @@ interface Leaf {
   /** the face's own normal when the leaf leans on it */
   leanTo?: V2
   casts: boolean
+  /** lying on stone, gravel or earth rather than on the sward, and the
+      floor's own height there */
+  hard?: boolean
+  floor: number
 }
 
 /** One fallen leaf, lying on its floor or leaning on a face: a card of its
     species' outline, folded along the midrib as a drying leaf folds, its tip
     curling up a little. */
-function lay(target: { leaves: Body; shadow: Body | null }, leaf: Leaf): void {
+function lay(target: Target, leaf: Leaf): void {
   const body = target.leaves
   const recipe = LEAF_RECIPES[leaf.species]
   const hw = Math.min(.5, .5 * recipe.width * 1.08 + .02)
@@ -443,6 +474,23 @@ function lay(target: { leaves: Body; shadow: Body | null }, leaf: Leaf): void {
       shadow.wind.push4(0, 0, 0, 0)
     }
     shadow.index.push3(s0, s0 + 2, s0 + 1)
+  }
+  // on a hard floor the stone under and around a lying leaf sees less sky:
+  // a soft halo a little larger than the blade, drawn under it
+  const contact = target.contact
+  if (contact && leaf.hard && !leaf.leanTo && stopDistance(leaf.east, leaf.north) < 16) {
+    // the halo's dark rim falls at the blade's own outline and fades a
+    // third of a blade beyond it
+    const c0 = contact.vertices, hl = L * .78, hwc = L * Math.max(.34, hw * 1.45)
+    const ce = leaf.east, cn = leaf.north, ca = Math.cos(leaf.angle), sa = Math.sin(leaf.angle)
+    for (const [u, v] of [[-1, -1], [1, -1], [1, 1], [-1, 1]] as const) {
+      const e = ce + ca * u * hl - sa * v * hwc, n = cn + sa * u * hl + ca * v * hwc
+      contact.position.push3(e, leaf.floor + .0012, -n)
+      contact.normal.push3(0, 1, 0)
+      contact.uv.push2((u + 1) / 2, (v + 1) / 2)
+      contact.wind.push4(0, 0, 0, 0)
+    }
+    contact.index.push3(c0, c0 + 2, c0 + 1); contact.index.push3(c0, c0 + 3, c0 + 2)
   }
 }
 

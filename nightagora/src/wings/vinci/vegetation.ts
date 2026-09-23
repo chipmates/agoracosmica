@@ -15,10 +15,10 @@ import {
   BufferAttribute, BufferGeometry, DoubleSide, Float32BufferAttribute, Group, Mesh, MeshBasicNodeMaterial,
   MeshStandardNodeMaterial, PhysicalLightingModel, Uint32BufferAttribute,
 } from 'three/webgpu'
-import { attribute, diffuseColor, normalMap, normalView, positionWorld, texture, uv, vec2, vec3 } from 'three/tsl'
+import { attribute, diffuseColor, float, normalMap, normalView, positionWorld, smoothstep, texture, uv, vec2, vec3 } from 'three/tsl'
 import { SHADOW_ONLY_LAYER } from '../../stack/light'
 import { leftOutAtCalm } from './calm-tier'
-import { barkMaps, cellUV, leafAtlas, leafCell } from './leaf-maps'
+import { barkMaps, cellUV, leafAtlas, leafCell, litterAtlas } from './leaf-maps'
 import type { TierName } from '../../stack/tier'
 import { dossier, edgeDistance, feature, hourKey, inside, polygon, type Quantity } from './site'
 import { collectionExclusions } from './collection'
@@ -35,7 +35,7 @@ import {
   type Refuse, type Species, type TreeDetail, type TreeResult, type TreeSpec, type TreeTier,
 } from './tree-growth'
 import { createFallingLeaves, windPosition, windWanted, type FallSource } from './wind'
-import { layLitter, stageWeight, stopDistance } from './leaf-litter'
+import { layLitter, stageWeight, stopDistance, type Target } from './leaf-litter'
 import { builtFaces } from './ground-walls'
 
 const PROVENANCE = {
@@ -45,6 +45,14 @@ const PROVENANCE = {
   basis: 'Flora card FLORA.md §6 (species and their state about 20 October, all types for Cloux, none documented there); modern garden plates Q119, Q128 and Q178 for the branching character only. Planting positions and tree dimensions are not period evidence.',
   recipe: 'Deterministic trees and hedge shrubs grown per species habit (types of the flora card): a trunk that runs or forks into leaders, scaffold limbs that fork toward the crown the species makes, second-order branches and twigs, each grown segment by segment and stopped at the crown skin or at a refused place; a refused fork is tried once bent upward, a limb that carries no leaf anywhere below it is taken off, and a limb left without a fork tapers to a tip. Every leaf of a near crown is its own card of its species outline (a compound leaf for walnut); a crown further off is carried by spray cards of the same leaf, and a mid tree a stop sees within 32 m draws every twig that bears one. Each species turns at one stage for the week (a third to two thirds of the crown; oak and alder greener), each leaf by how exposed it stands (outer, upper, sunward), with a small turn by limb and by tree. Hawthorn and blackthorn stand single over the meadows and in short rows on field lines. Bark as tubes with shared rings and a flared foot sunk into the sampled ground. Leaf and bark maps are drawn from recipes in code. Leaves carry the key light through themselves and cast through one opaque triangle inside each outline. The week\'s fall lies as a carpet under each crown dropping it, as drifts against every riser, wall foot and retaining face across the south-west wind, as a clumped scatter, in the lane\'s ruts and gutters and over the walled court\'s floor, densest where the stops see it. No leaf or limb stands inside a building, within 3.2 m above a certified walking surface, or inside the grave court below its walls\' top. Wind only on an address that asks for it.',
 }
+
+/** The soft halo under a leaf lying on stone is its own record: an engine
+    term the film turns off, outside the walk's solids. */
+const leafContactProvenance = {
+  manifestId: 'vinci/leaf-contact',
+  assetClass: 'GENERATED',
+  certainty: 'conjectural',
+} as const
 
 /* ─── the planting ─────────────────────────────────────────────────────── */
 
@@ -79,6 +87,10 @@ const PLANTING: readonly TreeSpec[] = [
   // taller than the supper wall hides from that wall's own eye
   { id: 'amasse-poplar-2', species: 'poplar', east: -63.5, north: -17, height: 15, seed: 4404, detail: 'near', leafCap: 22000 },
   { id: 'amasse-alder-2', species: 'alder', east: -69.5, north: -7, height: 13, seed: 4405, detail: 'mid' },
+  // a field elm drawn up among the Amasse's trees, its crown high on a long
+  // bole: from the supper wall its trunk stands above the pavilion's roof,
+  // and from the grave it stands behind the grave's own poplar
+  { id: 'amasse-tall-elm', species: 'elm', east: -65.5, north: -15.5, height: 27, seed: 4409, detail: 'mid', crownBase: .72, bole: .74, lean: [.4, .3] },
   { id: 'amasse-willow-2', species: 'willow', east: -70, north: 3, height: 6.8, seed: 4406, detail: 'mid', pollard: true },
   { id: 'amasse-elm', species: 'elm', east: -62, north: 18, height: 21, seed: 4407, detail: 'mid' },
   { id: 'amasse-alder-3', species: 'alder', east: -66.5, north: -58, height: 13.5, seed: 4408, detail: 'far' },
@@ -291,11 +303,13 @@ function materials(wind: boolean) {
   leaves.normalNode = normalMap(texture(leafSet.normal, uv()), vec2(.6, .6))
   if (ENGINE_TERMS) leaves.aoNode = attribute('ao', 'float')
   leaves.receivedShadowPositionNode = positionWorld.add(vec3(SUN_TOWARD[0], SUN_TOWARD[1], SUN_TOWARD[2]).mul(.06))
+  const drySet = litterAtlas()
   const litter = new MeshStandardNodeMaterial({ vertexColors: true, roughness: .88, side: DoubleSide, alphaTest: .42 })
   litter.alphaToCoverage = true
   litter.name = 'vinci generated fallen leaves'
   litter.userData = { ...PROVENANCE }
-  litter.colorNode = texture(leafSet.albedo, uv())
+  litter.colorNode = texture(drySet.albedo, uv())
+  litter.normalNode = normalMap(texture(drySet.normal, uv()), vec2(.7, .7))
   if (ENGINE_TERMS) litter.aoNode = attribute('ao', 'float')
   // the leaf's shadow is an opaque triangle inside its outline, drawn only in
   // the sun's own pass, so the leaves fold into the wing's one shadow body
@@ -309,7 +323,14 @@ function materials(wind: boolean) {
     shade.positionNode = moved
     shade.castShadowPositionNode = moved
   }
-  return { bark, leaves, litter, shade }
+  // the stone round a lying leaf sees less sky: a soft dark halo, an engine
+  // term only, which the film's renderer finds for itself
+  const contact = new MeshBasicNodeMaterial({ transparent: true, depthWrite: false, side: DoubleSide })
+  contact.name = 'vinci generated fallen leaf contact'
+  contact.colorNode = vec3(0, 0, 0)
+  const r = uv().sub(.5).mul(2).length()
+  contact.opacityNode = float(1).sub(smoothstep(.55, 1, r)).mul(.5)
+  return { bark, leaves, litter, shade, contact }
 }
 
 function meshOf(body: Body, material: MeshStandardNodeMaterial | MeshBasicNodeMaterial, name: string, casts: boolean): Mesh | null {
@@ -411,9 +432,9 @@ function* grow(group: Group, heightAt: (east: number, north: number) => number, 
     inCourt(e, n) ? COURT.level + (e < SUPPER_WALL.east ? .035 : 0) : terrainFloor(e, n)
   const litterCell = 22
   const litterIndex = new Map<string, number>()
-  const litterBodies: Body[] = [], litterShadows: (Body | null)[] = []
+  const litterBodies: Body[] = [], litterShadows: (Body | null)[] = [], litterContacts: (Body | null)[] = []
   const litterCap = tier === 'hero' ? 18 : tier === 'standard' ? 4 : 2
-  const bodyAt = (e: number, n: number): { leaves: Body; shadow: Body | null } => {
+  const bodyAt = (e: number, n: number): Target => {
     const key = `${Math.floor(e / litterCell)},${Math.floor(n / litterCell)}`
     let i = litterIndex.get(key)
     if (i === undefined) {
@@ -421,10 +442,11 @@ function* grow(group: Group, heightAt: (east: number, north: number) => number, 
       if (litterBodies.length < litterCap) {
         i = litterBodies.length
         litterBodies.push(new Body()); litterShadows.push(tier === 'hero' ? new Body() : null)
+        litterContacts.push(tier !== 'calm' && ENGINE_TERMS ? new Body() : null)
       } else i = Math.abs(Math.floor(e / litterCell) * 7 + Math.floor(n / litterCell) * 13) % litterCap
       litterIndex.set(key, i)
     }
-    return { leaves: litterBodies[i]!, shadow: litterShadows[i]! }
+    return { leaves: litterBodies[i]!, shadow: litterShadows[i]!, contact: litterContacts[i]! }
   }
   const fall = layLitter({
     results, tier, floorAt,
@@ -457,6 +479,9 @@ function* grow(group: Group, heightAt: (east: number, north: number) => number, 
     const shadow = litterShadows[c]
     const s = shadow ? meshOf(shadow, mats.shade, `vinci generated fallen leaf shadows cluster ${String(c + 1).padStart(2, '0')}`, true) : null
     if (s) { s.receiveShadow = false; s.layers.set(SHADOW_ONLY_LAYER); meshes.push(s) }
+    const contact = litterContacts[c]
+    const k = contact ? meshOf(contact, mats.contact, `vinci generated fallen leaf contact cluster ${String(c + 1).padStart(2, '0')}`, false) : null
+    if (k) { k.receiveShadow = false; k.renderOrder = 1; k.userData = { ...leafContactProvenance }; meshes.push(k) }
   }
   group.add(...meshes)
   // THE FILM'S FEW FALLING LEAVES, from the outer crowns of the trees the walk

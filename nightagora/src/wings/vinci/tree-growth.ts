@@ -268,6 +268,10 @@ export interface TreeSpec {
   close?: boolean
   /** at most this many leaves, each drawn larger so the crown keeps cover */
   leafCap?: number
+  /** a tree drawn up among others: its crown starts this share of its height
+      up, on a bole running this share before it forks */
+  crownBase?: number
+  bole?: number
 }
 
 /** A point is refused to growth where a wall or a certified walk stands. */
@@ -558,9 +562,10 @@ function skeleton(spec: TreeSpec, habit: Habit, groundY: number, refuse: Refuse)
   const lean = spec.lean ?? [0, 0]
   const spread = (spec.spread ?? 1) * habit.spread
   const lobes = [.05 + random() * .1, random() * 6.283, .04 + random() * .08, random() * 6.283, .02 + random() * .05, random() * 6.283]
-  const crown = new Crown(x0 + lean[0] * habit.crownBase, z0 - lean[1] * habit.crownBase,
-    groundY + H * habit.crownBase, groundY + H, H * spread / 2, habit.widest, habit.blunt,
-    lean[0] * (1 - habit.crownBase), -lean[1] * (1 - habit.crownBase), lobes)
+  const crownBase = spec.crownBase ?? habit.crownBase, trunkShare = spec.bole ?? habit.trunkShare
+  let crown = new Crown(x0 + lean[0] * crownBase, z0 - lean[1] * crownBase,
+    groundY + H * crownBase, groundY + H, H * spread / 2, habit.widest, habit.blunt,
+    lean[0] * (1 - crownBase), -lean[1] * (1 - crownBase), lobes)
   const stems: Stem[] = []
   const trunkR = H * habit.girth
   const seg = Math.max(.25, H / 40)
@@ -568,10 +573,16 @@ function skeleton(spec: TreeSpec, habit: Habit, groundY: number, refuse: Refuse)
   // THE TRUNK: straight enough to stand, bent enough to have grown
   const trunkDir = norm([lean[0] / H * .6 + (random() - .5) * .06, 1, -lean[1] / H * .6 + (random() - .5) * .06])
   const trunkTopR = trunkR * (excurrent ? .14 : .78)
-  const trunk = growStem({ start: [x0, groundY - .05, z0], dir: trunkDir, length: H * habit.trunkShare, r0: trunkR,
-    r1: trunkTopR, seg, curve: .035, tropism: 0, outward: 0, stopAtCrown: false,
-    level: 0, scaffold: -1, flex0: 0, flexPerM: .1 / Math.max(1, H * habit.trunkShare) }, crown, random, () => false)!
+  const trunk = growStem({ start: [x0, groundY - .05, z0], dir: trunkDir, length: H * trunkShare, r0: trunkR,
+    r1: trunkTopR, seg, curve: spec.bole ? .012 : .035, tropism: 0, outward: 0, stopAtCrown: false,
+    level: 0, scaffold: -1, flex0: 0, flexPerM: .1 / Math.max(1, H * trunkShare) }, crown, random, () => false)!
   stems.push(trunk)
+  // a tree drawn up among others carries its crown from where its bole ends
+  if (spec.bole) {
+    const forkY = trunk.y[trunk.y.length - 1]! - .6
+    if (forkY < crown.y0) crown = new Crown(crown.cx, crown.cz, forkY, crown.y1, crown.radius, habit.widest, habit.blunt,
+      lean[0] * (1 - crownBase), -lean[1] * (1 - crownBase), lobes)
+  }
   const bearers: Stem[] = [trunk]
   const top = along(trunk, 1)
   if (!excurrent) {

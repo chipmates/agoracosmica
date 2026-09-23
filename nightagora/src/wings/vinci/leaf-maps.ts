@@ -160,30 +160,64 @@ function placeholder(): DataTexture {
 }
 
 let atlas: { albedo: DataTexture; normal: DataTexture } | undefined
+let dryAtlas: { albedo: DataTexture; normal: DataTexture } | undefined
 /** The leaf atlas: albedo with coverage in alpha, and relief. */
 export function leafAtlas(): { albedo: DataTexture; normal: DataTexture } {
-  if (atlas) return atlas
-  if (!drawn) return (atlas = { albedo: placeholder(), normal: placeholder() })
+  if (!atlas) atlas = drawAtlas(false)
+  return atlas
+}
+/** The same outlines as they lie on the ground a week later: the margin
+    browned and curled darker, blotches where the blade has started to rot,
+    the midrib and veins standing paler. Singles only; the fall has no sprays. */
+export function litterAtlas(): { albedo: DataTexture; normal: DataTexture } {
+  if (!dryAtlas) dryAtlas = drawAtlas(true)
+  return dryAtlas
+}
+
+function drawAtlas(dry: boolean): { albedo: DataTexture; normal: DataTexture } {
+  if (!drawn) return { albedo: placeholder(), normal: placeholder() }
   const W = CELL * ATLAS_COLUMNS, H = CELL * ATLAS_ROWS
   const albedo = new Uint8Array(W * H * 4), normal = new Uint8Array(W * H * 4)
   const heights = new Float32Array(W * H)
+  const spot = mulberry(dry ? 20171012 : 20171011)
   for (const species of ORDER) {
     const recipe = LEAF_RECIPES[species]
-    for (const [cell, draw] of [[leafCell(species), leafAt], [sprayCell(species), sprayAt]] as const) {
+    const cells: [number, typeof leafAt][] = dry ? [[leafCell(species), leafAt]] : [[leafCell(species), leafAt], [sprayCell(species), sprayAt]]
+    // blotches a dry blade carries, in the cell's own coordinates
+    const blotches = Array.from({ length: dry ? 9 : 0 }, () => ({ s: (spot() - .5) * .5, t: .2 + spot() * .75, r: .02 + spot() * spot() * .07, k: .55 + spot() * .3 }))
+    for (const [cell, draw] of cells) {
       const ox = (cell % ATLAS_COLUMNS) * CELL, oy = Math.floor(cell / ATLAS_COLUMNS) * CELL
       for (let y = 0; y < CELL; y++) for (let x = 0; x < CELL; x++) {
         // four samples a texel for a clean outline
-        let cover = 0, vein = 0, tone = 0
+        let cover = 0, vein = 0, tone = 0, edge = 0
         for (let sy = 0; sy < 2; sy++) for (let sx = 0; sx < 2; sx++) {
           const s = (x + .25 + sx * .5) / CELL - .5, t = (y + .25 + sy * .5) / CELL
           const at = draw(recipe, s, t, 1 / CELL)
           cover += at.cover / 4; vein += at.vein / 4; tone += at.tone / 4
+          // how near the blade's margin this sample stands, 0 inside, 1 at it
+          if (dry && at.cover > 0) {
+            const inward = draw(recipe, s * .82, t * .94 + .03, 1 / CELL).cover
+            edge += (1 - inward) / 4
+          }
         }
         const i = (oy + y) * W + ox + x
         heights[i] = vein * .6 * cover
-        // a neutral blade, the veins a little paler, the margin a little darker
-        const lum = (.78 + .12 * vein) * tone
-        albedo[i * 4] = srgb(lum); albedo[i * 4 + 1] = srgb(lum); albedo[i * 4 + 2] = srgb(lum * .97)
+        let r: number, g: number, b: number
+        if (!dry) {
+          // a neutral blade, the veins a little paler, the margin a little darker
+          const lum = (.78 + .12 * vein) * tone
+          r = lum; g = lum; b = lum * .97
+        } else {
+          const s = (x + .5) / CELL - .5, t = (y + .5) / CELL
+          let blot = 1
+          for (const d of blotches) { const q = Math.hypot(s - d.s, t - d.t) / d.r; if (q < 1) blot = Math.min(blot, d.k + (1 - d.k) * q * q) }
+          // the margin dries first and goes brown; the blade's middle keeps
+          // more of the colour it fell with
+          const brown = Math.min(1, edge * 1.6)
+          const lum = (.8 + .12 * vein) * tone * blot * (1 - .2 * brown)
+          r = lum * (1 - .02 * brown); g = lum * (1 - .16 * brown); b = lum * (1 - .3 * brown) * .96
+        }
+        albedo[i * 4] = srgb(r); albedo[i * 4 + 1] = srgb(g); albedo[i * 4 + 2] = srgb(b)
         albedo[i * 4 + 3] = Math.round(Math.min(1, cover) * 255)
       }
     }
@@ -197,12 +231,12 @@ export function leafAtlas(): { albedo: DataTexture; normal: DataTexture } {
     normal[i * 4] = Math.round((nx * .5 + .5) * 255); normal[i * 4 + 1] = Math.round((ny * .5 + .5) * 255)
     normal[i * 4 + 2] = Math.round((nz * .5 + .5) * 255); normal[i * 4 + 3] = 255
   }
-  atlas = { albedo: withMips(albedo, W, H, true), normal: withMips(normal, W, H, false) }
-  atlas.albedo.colorSpace = SRGBColorSpace
-  atlas.normal.colorSpace = NoColorSpace
-  atlas.albedo.name = 'vinci generated leaf atlas'
-  atlas.normal.name = 'vinci generated leaf relief'
-  return atlas
+  const made = { albedo: withMips(albedo, W, H, true), normal: withMips(normal, W, H, false) }
+  made.albedo.colorSpace = SRGBColorSpace
+  made.normal.colorSpace = NoColorSpace
+  made.albedo.name = dry ? 'vinci generated fallen leaf atlas' : 'vinci generated leaf atlas'
+  made.normal.name = dry ? 'vinci generated fallen leaf relief' : 'vinci generated leaf relief'
+  return made
 }
 
 /** A box-filtered mip chain; for coverage, each level keeps each cell's share

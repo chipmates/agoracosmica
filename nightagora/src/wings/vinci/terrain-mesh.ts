@@ -350,7 +350,12 @@ function gradeRoots(d0:number,dm:number,d1:number):number[] {
 /** One face where the ground steps: a riser, a retaining face, a cut bank.
     `low` is the unit normal (east, north) from the face into the side that
     lies low, where what the wind carries comes to rest. */
-export interface TerrainStep { from: Point; to: Point; low: Point; height: number; lowLevel: number; highLevel: number; modern: boolean }
+export interface TerrainStep {
+  from: Point; to: Point; low: Point; height: number; lowLevel: number; highLevel: number; modern: boolean
+  /** the face holds a platform up (a retaining wall), rather than being the
+      bank a lower platform is cut into */
+  retaining: boolean; region: string
+}
 let steps: TerrainStep[] | undefined
 /** Every face the terrain builds between two levels, read by the same walk
     that builds them and building nothing. */
@@ -383,7 +388,8 @@ export function terrainSteps(): readonly TerrainStep[] {
           const lowOutside=difference>0
           const modern=region.id.startsWith('collection-')||Boolean(neighbour?.id.startsWith('collection-'))
           steps.push({from,to,low:lowOutside?unit:[-unit[0],-unit[1]],height:Math.abs(difference),
-            lowLevel:lowOutside?otherAt(centre):region.levelAt(...centre),highLevel:lowOutside?region.levelAt(...centre):otherAt(centre),modern})
+            lowLevel:lowOutside?otherAt(centre):region.levelAt(...centre),highLevel:lowOutside?region.levelAt(...centre):otherAt(centre),modern,
+            retaining:lowOutside,region:region.id})
         }
       }
     }
