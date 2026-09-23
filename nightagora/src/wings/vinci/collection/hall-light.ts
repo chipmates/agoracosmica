@@ -302,8 +302,10 @@ export function mountHallLight(host: Group, shared: readonly Light[], renderer: 
   const probeNode = pmremTexture(probe.texture)
   const bounce = probeNode.mul(PROBE_GAIN / Math.max(.01, scene.environmentIntensity))
   const adopt = (material: Material): void => {
-    const lit = material as Material & { lightsNode?: unknown; envNode?: unknown; lights?: boolean; isNodeMaterial?: boolean }
-    if (!lit.isNodeMaterial || lit.lights !== true) return
+    const lit = material as Material & { lightsNode?: unknown; envNode?: unknown; lights?: boolean; isNodeMaterial?: boolean; isMeshBasicNodeMaterial?: boolean }
+    // an unlit surface takes no bounce, and three's basic environment path
+    // reads only a texture, so a node handed to it fails its shader build
+    if (!lit.isNodeMaterial || lit.lights !== true || lit.isMeshBasicNodeMaterial) return
     lit.lightsNode = lightsOf(rig)
     lit.envNode = bounce
     material.needsUpdate = true
