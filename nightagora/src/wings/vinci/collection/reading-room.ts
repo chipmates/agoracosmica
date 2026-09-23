@@ -35,7 +35,7 @@ export { READING_CHAIR, READING_LAMP, READING_ROOM, READING_ROOM_PROVENANCE, REA
 const R = READING_ROOM
 /** The calm tier's bounce, in the probes' own linear units: set so its walls
  * and floor stand where the hero tier's probes put them. */
-const CALM_FILL = { deep: [.08, .066, .05], open: [.11, .09, .07] } as const
+const CALM_FILL = { deep: [.08, .066, .05], open: [.11, .09, .07], front: .35 } as const
 
 // The node overload boundary stays local to this file.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -152,9 +152,12 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
     floorEnv = mix(mix(deep, open, smoothstep(T.east - .7, T.east + .5, positionWorld.x)), gallery, south).mul(gain)
   } else {
     // the calm tier takes no probe: the hero's measured bounce as two warm
-    // levels, the niche's and the open front's, laid as the probes are laid
+    // levels, the niche's and the open front's, laid as the probes are laid,
+    // and stronger on a face turned to the open front than on one turned
+    // from it, or every face of a slat or a shelf reads as one flat value
     const deep = vec3(...CALM_FILL.deep), open = vec3(...CALM_FILL.open)
-    env = mix(deep, open, smoothstep(T.east + .3, R.front - .1, positionWorld.x)).mul(gain)
+    const toFront = normalWorldGeometry.x.mul(CALM_FILL.front).add(1)
+    env = mix(deep, open, smoothstep(T.east + .3, R.front - .1, positionWorld.x)).mul(toFront).mul(gain)
     floorEnv = mix(deep, open, smoothstep(T.east - .7, T.east + .5, positionWorld.x)).mul(gain)
   }
 

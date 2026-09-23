@@ -3681,7 +3681,7 @@
       "prompt": "The reading room round the reading table: an oak niche set against the long gallery's west wall, its back panelled in seven slip-matched leaves of veneered oak on battens with shadow joints over a dark-stained backing, a lower dado of the same flitch, capped and parted from the niche by a reveal, carried south under the body wall's standing sheet, a north return closing it against the hall door with a low open bookcase of modern bound volumes on its inner face, a veneered oak canopy with a downstand fascia carried by the wall and the return, the building's sealed concrete floor in its bays with saw cuts, edged in bronze, a darkened spun brass pendant with an opal disc hung low over the book from a ceiling cup, and a modern oak chair with a leather seat pushed in at the table. One 2700 K lamp lights the room and the table, whose own lamp stand-in it switches off and whose desk lamp it takes away; the room's own bounce is read from three probes taken inside it, beside it and at its open front. The oak and the floor are the library's CC0 photographs, laid as the mechanism hall lays them; everything else is procedural. Modern exhibition architecture and furniture; no period claim.",
       "model": "Deterministic TypeScript geometry and TSL materials",
       "date": "2026-09-23",
-      "sha256": "eec543c140638e1d3221e237494fba1136a56e21761baf668a377deef8adc116",
+      "sha256": "075b0c2a0bd374a5ffc80a6ae4b594c24c7c90457a83ba52ccd01707011bede6",
       "note": "Modern museum furniture and lighting, no 1517 claim. recipe_file=src/wings/vinci/collection/reading-room.ts; companion_file=src/wings/vinci/collection/reading-room-plan.ts; library_sets=library/oak-veneer-light,library/concrete-floor-polished"
     }
   ]
