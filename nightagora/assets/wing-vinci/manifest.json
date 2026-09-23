@@ -360,8 +360,8 @@
       "display": true,
       "prompt": "Runtime exact canonical pose and actual mounted geometry identity guard for all40 directed physical routes. Applies conservative complete near-camera certificates; fails if stale.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
-      "date": "2026-09-10",
-      "sha256": "62eb9dc4a171e455fc2f38b5fc4232a04f817afa5351d6e186100cedfc270ad5",
+      "date": "2026-09-24",
+      "sha256": "2503fafac506c1283443b5aff3b688803e3c90c0b8520089805c1d9b6f09ee18",
       "note": "recipe_file=src/wings/vinci/rail-proof.ts; source_generator=forge/results/final-rail-route-proof.mjs; runtime dependency of vinci/rail; companion_file=src/wings/vinci/collection/pick.ts; companion_file=src/wings/vinci/collection/wall.ts"
     },
     {
