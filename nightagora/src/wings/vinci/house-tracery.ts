@@ -11,7 +11,7 @@ import { createShellSurface, prepareSurfaceGeometry } from './surface'
 // TSL's composable overloads are typed once at this boundary.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type N = any
-const { attribute, float } = TSL as unknown as Record<string, N>
+const { attribute, float, mix, mx_noise_float, positionWorld, smoothstep, vec3 } = TSL as unknown as Record<string, N>
 type V2 = [number, number]
 type V3 = [number, number, number]
 export interface TraceryWindow {
@@ -398,6 +398,12 @@ export function createHouseTracery(windows: readonly TraceryWindow[], tier: 'her
   const material = createShellSurface('stone', library, [], { coursing: false, tops: .45 })
   // the sky a carved hollow sees is its own; the orders keep their shadow
   material.aoNode = ((material.aoNode as N) ?? float(1)).mul(attribute('cavity', 'float'))
+  // SOOT HOLDS WHERE THE RAIN NEVER WASHES: the hollows of the orders and
+  // the lobes' cusps keep a dark crust in patches; the faces rain reaches
+  // stay pale.
+  const hollow = float(1).sub(attribute('cavity', 'float')).mul(3.2).clamp(0, 1)
+  const crust = smoothstep(.2, .7, mx_noise_float(positionWorld.mul(7.3).add(vec3(2.7, 8.1, 4.4))).mul(.5).add(.5))
+  material.colorNode = mix(material.colorNode as N, (material.colorNode as N).mul(vec3(.38, .36, .34)), hollow.mul(crust.mul(.5).add(.42)))
   const mesh = new Mesh(geometry, material)
   mesh.name = 'vinci/house-tracery/stone'
   mesh.castShadow = tier === 'hero'; mesh.receiveShadow = true
