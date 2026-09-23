@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed to a pale grey at 30 per cent. Assumed weather, no observation claimed.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "5080d5e72b619c1ad3a4156605084ce031e26e6d915f532e16c22d5e10332bc2",
+      "sha256": "83d2a7169d078c0649dbed577ee534bda595691d6c270314a88ed74cf1116a1a",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=80c458f2cb5ccddb7fcedccda5df70e5cdccda7d9ca97d65ebfa6462920f61ef;"
     },
     {
@@ -3564,7 +3564,7 @@
       "prompt": "Modern exhibition lighting of the mechanism hall: two broad daylight sources under the north clerestory and warm spots hung from black track heads on the beams, every one casting a shadow drawn from a double of the hall's own walls, roof, beams, light shelf, dark bay and plinths; the rig stands only while the eye is in the hall. A lighting design choice; no light of 1517 is claimed. No texture asset, no reference image sampled.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-22",
-      "sha256": "28fd9f7729e6012a5e01740ef52486772e177f4a6575005062e0c19eef3ff121",
+      "sha256": "54f53e7937e14af689e591b5d7f4c95f1d93fb9fca62ffd8f187793f84098349",
       "note": "Modern museum insertion, the mechanism hall only; no 1517 claim. recipe_file=src/wings/vinci/collection/hall-light.ts"
     },
     {
@@ -3574,11 +3574,24 @@
       "class": "GENERATED",
       "licence": "Original procedural construction; source code under the museum repository licence.",
       "display": true,
-      "prompt": "The mechanism hall's finish over its certified construction: a sealed concrete floor cut into 3.2 by 3.3 m bays, each read from its own part of a CC0 photograph, with saw cuts between them and a reflection of the room blurred by the floor's own roughness; cast concrete walls with their formwork joints and tie holes, stopped over the floor by a shadow gap; the same concrete on the soffit, the beams and the light shelf. Photographs: library/concrete-floor-polished and library/concrete-wall-formed, both CC0 from Poly Haven; the bays, joints, tint and drift are procedural. A modern room; no 1517 claim.",
+      "prompt": "The mechanism hall's finish over its certified construction: a sealed concrete floor cut into 3.2 by 3.3 m bays, each read from its own part of a CC0 photograph, with saw cuts between them and a reflection of the room blurred by the floor's own roughness; cast concrete walls with their formwork joints and tie holes, stopped over the floor by a shadow gap; the same concrete on the beams and the light shelf; between the beams 90 mm oak slats on a 150 mm pitch over a dark backing; the plinths in a dark honed stone. Photographs: library/concrete-floor-polished, library/concrete-wall-formed and library/oak-veneer-light, all CC0 from Poly Haven; the bays, joints, slats, tint and drift are procedural. A modern room; no 1517 claim.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-22",
-      "sha256": "64b20f7772df9cf116e5fbe3cfd5580558118f3a43bc73386a44b7e5af962889",
+      "sha256": "eec8cff628cf22b4f0469fea3230baf41d6b5482ef370a32c093697f97af8910",
       "note": "Modern museum insertion, the mechanism hall only; no 1517 claim. recipe_file=src/wings/vinci/collection/hall-fabric.ts"
+    },
+    {
+      "id": "vinci/collection-hall-air",
+      "path": "procedural/collection-hall-air/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural construction; source code under the museum repository licence.",
+      "display": true,
+      "prompt": "The mechanism hall's air: a thin haze marched through the hall's box, lit by the hall's own shadowed sources so each shaft of the clerestory's light and of a spot is carved by the shadows its map holds, denser low and drifting slowly; stopped at the room's depth, which the air draws for itself. A modern room's air; no 1517 claim.",
+      "model": "Deterministic TypeScript and TSL procedural geometry",
+      "date": "2026-09-22",
+      "sha256": "0cb60cd1369d15c85f541a371aa3aef1ee7ae967a2a87d02cb7a72d015fa771a",
+      "note": "Modern museum insertion, the mechanism hall only; no 1517 claim. recipe_file=src/wings/vinci/collection/hall-air.ts"
     }
   ]
 }

@@ -5,7 +5,8 @@
  * `grave/` by their own factories. This module owns where they stand, what
  * they stand on and which way they face, and nothing else.
  */
-import { Group, Mesh, PointLight, Vector3, type Material, type Object3D, type PlaneGeometry, type Scene } from 'three/webgpu'
+import { Group, Mesh, MeshStandardNodeMaterial, PointLight, Vector3, type Material, type Object3D, type PlaneGeometry, type Scene } from 'three/webgpu'
+import { translucentCloth } from './hall-cloth'
 import type { Stack } from '../../../stack'
 import { buildMachine, MACHINE_SLUGS, type MachineSlug } from '../machines'
 import type { ReadyMachineBuild } from '../machines/runtime'
@@ -24,8 +25,12 @@ import { createCollectionStandSolids, standLevel, STANDS, standOf, type StandGro
 import { mountCollectionPlates, type CollectionPictureSource } from './plates'
 import { HALL_FILL, mountHallLight } from './hall-light'
 import { mountHallFabric } from './hall-fabric'
+import { mountHallAir } from './hall-air'
 import { VINCI_READING_TABLE } from './approaches'
 import type { BodySheetSource } from './body-wall'
+
+/** How thick the hall's air is: a haze a spot's shaft is seen in, no more. */
+const HALL_AIR_DENSITY = .12
 
 /** Which ground each machine is built with. Every ground is built at entry,
  * the court's first because it is seen from every station on this ground. */
@@ -143,7 +148,20 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
     if (spot.ground !== 'hall') void machine.ready.then(() => machine.object.traverse(child => { child.castShadow = false }))
     // A machine in the hall is lit by the hall's own rig while it stands in
     // the hall; `update` hands it back while the close look borrows it.
-    else void machine.ready.then(() => { hallLit.set(machine, true); lightHallMachine(machine, true) })
+    else void machine.ready.then(() => {
+      // the screw's sail is a thin cloth: a light behind it shows through it
+      if (slug === 'aerial-screw') machine.object.traverse(child => {
+        if (!(child instanceof Mesh) || Array.isArray(child.material)) return
+        if (/linen/.test(child.material.name) && !/thread/.test(child.material.name) && child.material instanceof MeshStandardNodeMaterial) {
+          const thick = child.material
+          child.material = translucentCloth(thick)
+          teardown.push(() => { child.material.dispose(); thick.dispose() })
+          if (new URLSearchParams(location.search).has('hallrig')) console.warn(`hall cloth: ${thick.name} made thin`)
+        }
+      })
+      hallLit.set(machine, true)
+      lightHallMachine(machine, true)
+    })
     void machine.ready.then(machineUp, machineUp)
     return machine
   }
@@ -313,6 +331,11 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   const hallFabric = mountHallFabric(stack, hallLight.adopt)
   ;(rooms ?? host).add(hallFabric.group)
   teardown.push(() => { hallFabric.group.removeFromParent(); hallFabric.dispose() })
+  // The hall's air is drawn only while the eye stands in the hall.
+  const hallAir = mountHallAir(root as Scene, hallLight.shadowed.filter(light => !/clerestory/.test(light.name)), HALL_AIR_DENSITY)
+  hallAir.mesh.visible = false
+  host.add(hallAir.mesh)
+  teardown.push(() => { hallAir.mesh.removeFromParent(); hallAir.dispose() })
   warmHall()
   /* THE ROOM'S BOUNCE IS TAKEN ONCE THE HALL STANDS: every machine in it
      built and dressed and the finish's photographs on the GPU. Twice, so the
@@ -403,6 +426,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       const inside = Math.min(eye.x + 61.66, -39.02 - eye.x, eye.z - 42.04, 63.66 - eye.z)
       const t = Math.min(1, Math.max(0, inside / 2.5)), dim = t * t * (3 - 2 * t)
       for (const fitting of hallFittings) fitting.intensity = 9.5 + (HALL_FILL - 9.5) * dim
+      if (hallAir.mesh.visible !== inHall) hallAir.mesh.visible = inHall
       for (const machine of machines) {
         // lent to the close look's table, a machine takes that table's light
         const lit = hallLit.get(machine.build)
@@ -429,7 +453,10 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
         if (roomsHidden) rooms.visible = true
         const levels = hallFittings.map(fitting => fitting.intensity)
         for (const fitting of hallFittings) fitting.intensity = HALL_FILL
+        const air = hallAir.mesh.visible
+        hallAir.mesh.visible = false
         hallLight.bake()
+        hallAir.mesh.visible = air
         hallFittings.forEach((fitting, i) => { fitting.intensity = levels[i]! })
         for (const machine of shown) machine.build.object.visible = false
         if (roomsHidden) rooms.visible = false

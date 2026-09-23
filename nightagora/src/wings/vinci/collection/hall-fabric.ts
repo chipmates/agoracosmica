@@ -1,6 +1,7 @@
 /** THE MECHANISM HALL'S FABRIC, FOR THE FILM: a sealed concrete floor cut into
- * bays, cast concrete walls with their formwork joints and tie holes, and the
- * same concrete overhead and on the beams. Laid as a finish over the hall's
+ * bays, cast concrete walls with their formwork joints and tie holes, the same
+ * concrete on the beams, and between them oak slats over a dark backing, which
+ * the clerestory's sky runs along. Laid as a finish over the hall's
  * certified construction, which stays exactly where and what it was: nothing
  * here is a rail solid, a caster for the sun, or any other room's surface.
  * The photographs are CC0 library sets; the bays, the joints, the tint and the
@@ -34,6 +35,9 @@ const PROUD = .045
 const GAP = .055
 /** The floor is cut into bays of two museum stones each way. */
 const BAY = { east: 3.2, north: 3.3 } as const
+/** The ceiling's slats: wide enough apart that twenty metres off they are
+ * still lines and not a moire. */
+const SLAT = { width: .09, depth: .055, pitch: .15 } as const
 
 type P3 = [number, number, number]
 
@@ -96,10 +100,12 @@ function runs(from: number, to: number, gaps: [number, number][]): [number, numb
 }
 
 /** THE FOUR WALLS, THE SOFFIT AND THE BEAMS as skins: walls, overhead, floor,
- * and the plinths under the hall's machines. Doors are left open to their
- * reveals and lintels. */
-function skins(): { walls: Skin; overhead: Skin; floor: Skin; plinths: Skin } {
+ * the plinths under the hall's machines, and between the beams a ceiling of
+ * oak slats over a dark backing. Doors are left open to their reveals and
+ * lintels. */
+function skins(): { walls: Skin; overhead: Skin; floor: Skin; plinths: Skin; slats: Skin; backing: Skin } {
   const H = ROOMS.hall, walls = new Skin(), overhead = new Skin(), floor = new Skin(), plinths = new Skin()
+  const slats = new Skin(), backing = new Skin()
   for (const b of standBoxes()) {
     if (b.east < H.west || b.east > H.east || b.north < H.south || b.north > H.north) continue
     // the top slab stands over a shadow gap, so its underside is seen
@@ -108,23 +114,48 @@ function skins(): { walls: Skin; overhead: Skin; floor: Skin; plinths: Skin } {
   const low = FLOOR + GAP
   const lintel = -2.5 + .26
   const roofAt = (north: number): number => hallSoffit(north) - .012
+  // THE SHADOW GAP IS DARK. Behind it stood the old lining's base band, which
+  // the hall's own light never reaches, and it read as a pale line.
+  const recess = .02, gapTop = (): number => low + .004
   // the west wall and the south wall run whole, up to the roof
   walls.northSouth(H.west + PROUD, 1, H.south, H.north, low, roofAt)
+  backing.northSouth(H.west + PROUD - recess, 1, H.south, H.north, FLOOR, gapTop)
   walls.eastWest(H.south + PROUD, 1, H.west, H.east, low, () => roofAt(H.south))
+  backing.eastWest(H.south + PROUD - recess, 1, H.west, H.east, FLOOR, gapTop)
   // the partition to the gallery, open at its two doors up to their lintels
   const east = H.east - PROUD
   const gallery: [number, number] = [OPENING.hallToGallery.north[0], OPENING.hallToGallery.north[1] - .1]
   const south: [number, number] = [OPENING.hallToSouth.north[0] + .1, OPENING.hallToSouth.north[1]]
-  for (const [a, b] of runs(H.south, H.north, [gallery, south])) walls.northSouth(east, -1, a, b, low, roofAt)
+  for (const [a, b] of runs(H.south, H.north, [gallery, south])) {
+    walls.northSouth(east, -1, a, b, low, roofAt)
+    backing.northSouth(east + recess, -1, a, b, FLOOR, gapTop)
+  }
   for (const [a, b] of [gallery, south]) walls.northSouth(east, -1, a, b, lintel, roofAt)
   // the hanging wall's back, open at the picture room's door, up to the shelf
   const north = H.north - PROUD, door: [number, number] = [OPENING.pictureToHall.east[0], OPENING.pictureToHall.east[1]]
-  for (const [a, b] of runs(H.west, H.east, [door])) walls.eastWest(north, -1, a, b, low, () => -1.66)
+  for (const [a, b] of runs(H.west, H.east, [door])) {
+    walls.eastWest(north, -1, a, b, low, () => -1.66)
+    backing.eastWest(north + recess, -1, a, b, FLOOR, gapTop)
+  }
   walls.eastWest(north, -1, door[0], door[1], lintel, () => -1.66)
-  // the soffit between the clerestory and the south wall
+  // the soffit between the clerestory and the south wall, a dark backing,
+  // and the slats under it in every bay between two beams: 90 mm oak on a
+  // 150 mm pitch, running with the beams
   const glazing = -42.53
-  overhead.quad([H.west, glazing, roofAt(glazing)], [H.east, glazing, roofAt(glazing)],
+  backing.quad([H.west, glazing, roofAt(glazing)], [H.east, glazing, roofAt(glazing)],
     [H.east, H.south, roofAt(H.south)], [H.west, H.south, roofAt(H.south)], [0, 0, -1])
+  const bays: [number, number][] = []
+  let bayNorth = glazing
+  for (const beam of BEAMS) { bays.push([beam + .18, bayNorth]); bayNorth = beam - .18 }
+  bays.push([H.south, bayNorth])
+  for (const [bayS, bayN] of bays) {
+    const count = Math.floor((bayN - bayS - .06) / SLAT.pitch)
+    const start = (bayN + bayS) / 2 + (count - 1) * SLAT.pitch / 2
+    for (let i = 0; i < count; i++) {
+      const n = start - i * SLAT.pitch
+      slats.box((H.west + H.east) / 2, n, roofAt(n) - .025 - SLAT.depth / 2, H.east - H.west, SLAT.width, SLAT.depth, 0, true)
+    }
+  }
   // each beam clad on its two faces and its underside, a centimetre proud
   for (const beam of BEAMS) {
     const top = hallSoffit(beam) - .05, foot = hallSoffit(beam) - .64
@@ -141,7 +172,7 @@ function skins(): { walls: Skin; overhead: Skin; floor: Skin; plinths: Skin } {
   // the floor, a few millimetres over the construction's own
   floor.quad([H.west, H.south, FLOOR + .003], [H.east, H.south, FLOOR + .003],
     [H.east, H.north, FLOOR + .003], [H.west, H.north, FLOOR + .003], [0, 0, 1])
-  return { walls, overhead, floor, plinths }
+  return { walls, overhead, floor, plinths, slats, backing }
 }
 
 const { abs, cameraPosition, cameraViewMatrix, cross, dot, float, floor: floorOf, fract, mix, mx_noise_float, normalWorldGeometry,
@@ -173,12 +204,15 @@ interface Look {
   drift: number
   /** what the light shelf throws up at a face that looks down, at the shelf */
   shelf?: number
+  /** the photograph laid a quarter turn round, so a board's grain runs east */
+  turn?: boolean
 }
 
 function fabricMaterial(set: MaterialSet, look: Look, name: string, bays: boolean): MeshStandardNodeMaterial {
   const m = new MeshStandardNodeMaterial({ roughness: .7, metalness: 0, side: FrontSide })
   const P = positionWorld, n = normalWorldGeometry
-  const { t, b } = faceFrame(n)
+  const frame = faceFrame(n)
+  const t = look.turn ? frame.b : frame.t, b = look.turn ? frame.t : frame.b
   const u = dot(P, t), v = dot(P, b)
   // THE FLOOR IS CUT INTO BAYS, and each bay is read from its own part of the
   // photograph, so no two bays repeat each other. A wall is read whole.
@@ -225,21 +259,29 @@ export interface HallFabric {
 /** The hall's finish, its materials and the floor's reflection, each surface
  * lit by the hall's own rig through `adopt`. */
 export function mountHallFabric(stack: Stack, adopt: (material: Material) => void): HallFabric {
-  const { walls, overhead, floor, plinths } = skins()
+  const { walls, overhead, floor, plinths, slats, backing } = skins()
   const concrete = stack.materials.sync('concrete-wall-formed')
   const ground = stack.materials.sync('concrete-floor-polished')
+  const oak = stack.materials.sync('oak-veneer-light')
+  // The ceiling between the beams: oiled oak slats, the clerestory's sky
+  // thrown along them, over a backing dark enough that the gaps read as gaps.
+  const slatLook: Look = { metres: 1.83, tint: [.5, .45, .4], rough: [.45, .75], normal: .7, cell: 0, drift: .08, shelf: .34, turn: true }
+  const backingLook: Look = { metres: 2.71, tint: [.1, .095, .09], rough: [.85, 1], normal: .3, cell: 0, drift: .02 }
+  const slatMaterial = fabricMaterial(oak, slatLook, 'slats', false)
+  const backingMaterial = fabricMaterial(concrete, backingLook, 'backing', false)
   // The formwork photograph is a khaki concrete; the hall's is a warm grey,
   // so its blue is lifted back to the photograph's red.
   const wallLook: Look = { metres: 2.71, tint: [.92, .97, 1.25], rough: [.62, .95], normal: 1, cell: 0, drift: .06 }
   const overheadLook: Look = { metres: 2.71, tint: [.84, .88, 1.1], rough: [.7, .98], normal: .8, cell: 0, drift: .05, shelf: .36 }
-  const floorLook: Look = { metres: 3, tint: [.82, .8, .77], rough: [.24, .6], normal: .6, cell: .1, drift: .05 }
+  const floorLook: Look = { metres: 3, tint: [.82, .8, .77], rough: [.4, .72], normal: .6, cell: .18, drift: .09 }
   const wallMaterial = fabricMaterial(concrete, wallLook, 'walls', false)
   const overheadMaterial = fabricMaterial(concrete, overheadLook, 'overhead', false)
   const floorMaterial = fabricMaterial(ground, floorLook, 'floor', true)
   // A plinth is a dark honed stone, so the machine on it is the lighter thing.
   const plinthLook: Look = { metres: 1.5, tint: [.36, .35, .34], rough: [.32, .62], normal: .5, cell: 0, drift: .04 }
   const plinthMaterial = fabricMaterial(ground, plinthLook, 'plinths', false)
-  for (const material of [wallMaterial, overheadMaterial, floorMaterial, plinthMaterial]) adopt(material)
+  const materials = [wallMaterial, overheadMaterial, floorMaterial, plinthMaterial, slatMaterial, backingMaterial]
+  for (const material of materials) adopt(material)
   // THE FLOOR IS SEALED, and a sealed floor carries what stands on it: the
   // room drawn once more from under the plane, blurred by the floor's own
   // roughness and weighted by the angle it is seen at.
@@ -253,8 +295,10 @@ export function mountHallFabric(stack: Stack, adopt: (material: Material) => voi
     const view = cameraPosition.sub(P).normalize()
     const facing = view.y.clamp(0, 1)
     const fresnel = float(.04).add(float(.96).mul(pow(float(1).sub(facing), 5)))
-    const blur = reflection.node.level(float(2.2))
-    floorMaterial.emissiveNode = blur.rgb.mul(fresnel).mul(.35)
+    // held under the sky's own level, so the clerestory's glass reflects as
+    // a soft brightening and not as a white smear across the bays
+    const blur = reflection.node.level(float(4.2))
+    floorMaterial.emissiveNode = blur.rgb.min(vec3(1.2, 1.2, 1.2)).mul(fresnel).mul(.7)
   }
   const make = (skin: Skin, material: MeshStandardNodeMaterial, name: string): Mesh => {
     const mesh = new Mesh(skin.geometry(), material)
@@ -267,8 +311,8 @@ export function mountHallFabric(stack: Stack, adopt: (material: Material) => voi
   group.name = 'vinci/collection-hall-fabric'
   group.userData = { ...HALL_FABRIC_PROVENANCE }
   group.add(make(walls, wallMaterial, 'walls'), make(overhead, overheadMaterial, 'overhead'), make(floor, floorMaterial, 'floor'),
-    make(plinths, plinthMaterial, 'plinths'))
-  const ready = Promise.all([concrete, ground].map(set => stack.materials.load(set.name))).then(() => undefined)
+    make(plinths, plinthMaterial, 'plinths'), make(slats, slatMaterial, 'slats'), make(backing, backingMaterial, 'backing'))
+  const ready = Promise.all([concrete, ground, oak].map(set => stack.materials.load(set.name))).then(() => undefined)
   return {
     group,
     ready,
@@ -276,7 +320,7 @@ export function mountHallFabric(stack: Stack, adopt: (material: Material) => voi
       reflection.dispose()
       plane.geometry.dispose()
       group.traverse(o => { if (o instanceof Mesh) o.geometry.dispose() })
-      for (const m of [wallMaterial, overheadMaterial, floorMaterial, plinthMaterial]) m.dispose()
+      for (const m of materials) m.dispose()
     },
   }
 }

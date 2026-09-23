@@ -13,11 +13,12 @@
  */
 import {
   BoxGeometry, BufferGeometry, Color, CylinderGeometry, DoubleSide, Group, Matrix4, Mesh,
-  MeshBasicNodeMaterial, MeshStandardNodeMaterial, Object3D, PMREMGenerator, Quaternion, SpotLight, Vector3,
-  type Light, type Material, type Scene, type WebGPURenderer,
+  MeshBasicNodeMaterial, MeshStandardNodeMaterial, Object3D, PMREMGenerator, Quaternion, RectAreaLight,
+  RectAreaLightNode, SpotLight, Vector3, type Light, type Material, type Scene, type WebGPURenderer,
 } from 'three/webgpu'
 import { lights as lightsOf, pmremTexture } from 'three/tsl'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
+import { RectAreaLightTexturesLib } from 'three/addons/lights/RectAreaLightTexturesLib.js'
 import { kelvinToColour } from '../../../stack/light'
 import { DARK_BAY, FLOOR, OPENING, ROOMS } from './layout'
 import { standBoxes } from './stands'
@@ -60,20 +61,22 @@ interface HallSpot {
 
 export const HALL_LIGHT_PROVENANCE = {
   manifestId: 'vinci/collection-hall-light', assetClass: 'GENERATED', certainty: 'reconstructed',
-  recipe: 'Modern exhibition lighting of the mechanism hall: two broad 6800 K sources under the north clerestory and five 3000 to 3200 K spots hung from track heads on the beams, every one casting a shadow; black track under three beams. A lighting design choice; no light of 1517 is claimed.',
+  recipe: 'Modern exhibition lighting of the mechanism hall: the north clerestory as one 6400 K area source the width of its glazing, and five 3300 to 3400 K spots hung from track heads on the beams, every one casting a shadow; black track under three beams; the room\'s own bounce taken from the middle of the hall. A lighting design choice; no light of 1517 is claimed.',
 } as const
 
 /** A head hung from the track under a beam. */
 const hung = (beam: number, east: number): [number, number, number] => [east, beam, beamFoot(beam) - DROP]
 
+/** THE CLERESTORY IS A WINDOW, NOT A LAMP: the north sky through the whole
+ * glazed band, as one area source. A point source there put its own glint on
+ * the sealed floor as a white blot; a window's glint is a long soft band. */
+const CLERESTORY = {
+  centre: [-50.4, -42.62, -.25] as [number, number, number],
+  aim: [-50.4, -49.5, FLOOR + .4] as [number, number, number],
+  width: 22.2, height: 2.3, kelvin: 6400, luminance: 1.5,
+}
+
 export const HALL_SPOTS: readonly HallSpot[] = [
-  // THE CLERESTORY. Two broad sources just inside the north glazing, falling
-  // south across the floor. A sky is a large source: its maps are filtered
-  // wide, so its shadows are soft.
-  { name: 'clerestory-west', at: [-55.6, -42.75, -.35], aim: [-56.4, -50.2, FLOOR], kelvin: 6800,
-    intensity: 26, angle: .92, penumbra: 1, decay: 1, reach: 30, mapPx: 1024, soft: 5, head: false },
-  { name: 'clerestory-east', at: [-45.8, -42.75, -.35], aim: [-46.6, -51, FLOOR], kelvin: 6800,
-    intensity: 18, angle: .92, penumbra: 1, decay: 1, reach: 30, mapPx: 1024, soft: 5, head: false },
   // THE SPOTS. The screw from the aisle side, far enough off that its spiral
   // is thrown onto the north and west walls; the water screw, the gates, the
   // mill and lathe, and the three machines south of the aisle.
@@ -83,8 +86,8 @@ export const HALL_SPOTS: readonly HallSpot[] = [
     intensity: 190, angle: .42, penumbra: .7, decay: 2, reach: 16, mapPx: 2048, soft: 1.5, head: true },
   { name: 'key-gates', at: hung(-54, -51.4), aim: [-55.5, -51.3, FLOOR + 1.2], kelvin: 3300,
     intensity: 170, angle: .5, penumbra: .7, decay: 2, reach: 14, mapPx: 2048, soft: 1.5, head: true },
-  { name: 'key-mill', at: hung(-46, -44.2), aim: [-45.4, -43.9, FLOOR + 1.0], kelvin: 3400,
-    intensity: 90, angle: .34, penumbra: .75, decay: 2, reach: 12, mapPx: 2048, soft: 1.5, head: true },
+  { name: 'key-mill', at: hung(-50, -45.2), aim: [-46.1, -44.1, FLOOR + .9], kelvin: 3400,
+    intensity: 170, angle: .42, penumbra: .75, decay: 2, reach: 14, mapPx: 2048, soft: 1.5, head: true },
   { name: 'key-south', at: hung(-50, -43.4), aim: [-42.6, -49.6, FLOOR + .8], kelvin: 3300,
     intensity: 120, angle: .55, penumbra: .75, decay: 2, reach: 12, mapPx: 2048, soft: 1.5, head: true },
 ]
@@ -233,6 +236,8 @@ export interface HallLight {
   /** Take the room's bounce again, from the middle of the hall, as it now
    * stands. The caller makes the hall visible for the length of the call. */
   bake(): void
+  /** the spots that throw a shadow, which the air is lit by */
+  shadowed: readonly SpotLight[]
   dispose(): void
 }
 
@@ -241,7 +246,7 @@ const PROBE_AT = v3(-50.3, -52.85, FLOOR + 2.1)
 /** THE ROOM'S BOUNCE AT ITS OWN LEVEL. A probe is the radiance the room
  * really holds, so it is read at one, whatever the wing's outdoor probe is
  * turned down to. */
-const PROBE_GAIN = 1
+const PROBE_GAIN = 1.35
 
 /** The hall's lights, their fixtures and the shell their maps are drawn from.
  * `shared` are the scene's lights a surface in the hall keeps. The spots are
@@ -276,7 +281,15 @@ export function mountHallLight(host: Group, shared: readonly Light[], renderer: 
     host.add(light, target)
     lights.push({ light, spec }); targets.push(target)
   }
-  const rig: Light[] = [...shared, ...lights.map(({ light }) => light)]
+  RectAreaLightNode.setLTC(RectAreaLightTexturesLib.init())
+  const sky = new RectAreaLight(kelvinToColour(CLERESTORY.kelvin), solo && solo !== 'clerestory' ? 0 : CLERESTORY.luminance, CLERESTORY.width, CLERESTORY.height)
+  sky.name = 'vinci/collection-hall-light/clerestory'
+  sky.userData = { ...HALL_LIGHT_PROVENANCE }
+  sky.position.copy(v3(...CLERESTORY.centre))
+  sky.lookAt(v3(...CLERESTORY.aim))
+  sky.visible = false
+  host.add(sky)
+  const rig: Light[] = [...shared, sky, ...lights.map(({ light }) => light)]
   // THE ROOM'S BOUNCE. Taken once now, before any surface reads it, so the
   // node has a texture from its first frame; `bake` takes it again, into a
   // second target, while the surfaces still read the first.
@@ -298,13 +311,17 @@ export function mountHallLight(host: Group, shared: readonly Light[], renderer: 
   if (typeof location !== 'undefined' && new URLSearchParams(location.search).has('hallrig')) {
     const full = new Map(lights.map(({ light, spec }) => [light, spec.intensity]))
     ;(window as unknown as Record<string, unknown>)['__hallRig'] = {
-      names: HALL_SPOTS.map(spec => spec.name),
-      solo(name: string | null) { for (const { light, spec } of lights) light.intensity = name === null || spec.name === name ? full.get(light)! : 0 },
+      names: ['clerestory', ...HALL_SPOTS.map(spec => spec.name)],
+      solo(name: string | null) {
+        for (const { light, spec } of lights) light.intensity = name === null || spec.name === name ? full.get(light)! : 0
+        sky.intensity = name === null || name === 'clerestory' ? CLERESTORY.luminance : 0
+      },
       level(name: string, value: number) { for (const { light, spec } of lights) if (spec.name === name) light.intensity = value },
     }
   }
   return {
     adopt,
+    shadowed: lights.filter(({ spec }) => spec.mapPx > 0).map(({ light }) => light),
     release(material) {
       const lit = material as Material & { lightsNode?: unknown; envNode?: unknown }
       if (!lit.lightsNode) return
@@ -321,6 +338,7 @@ export function mountHallLight(host: Group, shared: readonly Light[], renderer: 
     dispose() {
       probe.dispose()
       generator.dispose()
+      sky.removeFromParent(); sky.dispose()
       for (const { light } of lights) { light.removeFromParent(); light.shadow.dispose(); light.dispose() }
       for (const target of targets) target.removeFromParent()
       for (const mesh of [shell, metal, lenses]) {

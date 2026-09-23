@@ -163,7 +163,7 @@ const PRINT={...GRADES['first-station'],name:'clos-luce-1517',exposure:.94,lift:
  * under a clerestory and two fittings, and the outdoor exposure left them a
  * stop and a half under. The eye opens at the door, as a camera does. */
 const STATION_EXPOSURE:Partial<Record<VinciStationId,number>>={courtyard:1.0,
-  'picture-room':1.34,'picture-room-west':1.34,'reading-table':1.5,'line-early':1.3,flight:1.36,works:1.36,body:1.4}
+  'picture-room':1.34,'picture-room-west':1.34,'reading-table':1.5,'line-early':1.3,flight:1.55,works:1.55,body:1.4}
 /** THE HALL IS PRINTED ON A SHOULDER: its spots are the hottest light in the
  * wing, and a linear print clips a lit sail to one flat white. */
 const STATION_SHOULDER:Partial<Record<VinciStationId,number>>={flight:1,works:1}
