@@ -43,6 +43,14 @@ interface LeafRecipe {
 const ovate = (t: number): number => Math.pow(Math.sin(Math.PI * Math.pow(t, .8)), .9) * .5
 const elliptic = (t: number): number => Math.pow(Math.sin(Math.PI * t), .8) * .5
 const obovate = (t: number): number => Math.pow(Math.sin(Math.PI * Math.pow(t, 1.35)), .8) * .5
+/** rhombic to deltoid: a rounded truncate base, convex sides and a long
+    acuminate tip, never a straight-sided triangle */
+const poplarBlade = (t: number): number => {
+  const shoulder = Math.pow(Math.sin(Math.PI / 2 * Math.min(1, t / .3)), .6)
+  const side = Math.min(1, Math.pow(Math.max(0, 1 - t) / .7, .55))
+  const tip = 1 - .55 * Math.pow(Math.max(0, t - .65) / .35, 1.3)
+  return .5 * shoulder * side * tip
+}
 const acuminate = (t: number): number => Math.pow(Math.sin(Math.PI * Math.pow(t, .9)), .75) * .5 * (1 - .35 * Math.pow(Math.max(0, t - .7) / .3, 1.5))
 
 export const LEAF_RECIPES: Record<Species, LeafRecipe> = {
@@ -54,7 +62,8 @@ export const LEAF_RECIPES: Record<Species, LeafRecipe> = {
   hornbeam: { profile: ovate, width: .5, teeth: { count: 30, depth: .045 }, stalk: .05, veins: 12, spray: { leaves: 9, angle: .8 } },
   alder: { profile: obovate, width: .82, teeth: { count: 22, depth: .03 }, notch: true, stalk: .1, veins: 7, spray: { leaves: 7, angle: .8 } },
   willow: { profile: (t: number) => Math.pow(Math.sin(Math.PI * Math.pow(t, .9)), 1.1) * .5, width: .2, teeth: { count: 40, depth: .02 }, stalk: .04, veins: 14, spray: { leaves: 11, angle: .45 } },
-  poplar: { profile: (t: number) => (t < .2 ? .5 * Math.sin(Math.PI / 2 * t / .2) : .5 * Math.pow((1 - t) / .8, .85)), width: .9, teeth: { count: 20, depth: .03 }, stalk: .22, veins: 6, spray: { leaves: 6, angle: .85 } },
+  // black poplar: a broad rounded base, the sides bellied, the tip drawn out
+  poplar: { profile: poplarBlade, width: .9, teeth: { count: 20, depth: .045 }, stalk: .22, veins: 6, spray: { leaves: 6, angle: .85 } },
   pear: { profile: ovate, width: .64, teeth: { count: 30, depth: .015 }, stalk: .2, veins: 8, spray: { leaves: 7, angle: .7 } },
   hawthorn: { profile: obovate, width: .7, lobes: { count: 2.5, depth: .45 }, stalk: .12, veins: 4, spray: { leaves: 9, angle: .8 } },
   blackthorn: { profile: elliptic, width: .45, teeth: { count: 24, depth: .03 }, stalk: .06, veins: 6, spray: { leaves: 10, angle: .7 } },
@@ -174,6 +183,64 @@ export function litterAtlas(): { albedo: DataTexture; normal: DataTexture } {
   return dryAtlas
 }
 
+/** The share of a leaf's own length the contact map pads it by on every side. */
+export const CONTACT_PAD = .24
+let contactMap: DataTexture | undefined
+/** Where a fallen leaf lies on stone the stone round it sees less of the
+    sky: each species' outline, padded and softened twice, a tight dark rim
+    at the blade's edge and a faint skirt beyond it, in alpha. Same cells as
+    the leaf atlas. */
+export function contactAtlas(): DataTexture {
+  if (contactMap) return contactMap
+  if (!drawn) return (contactMap = placeholder())
+  const C = 64, W = C * ATLAS_COLUMNS, H = C * ATLAS_ROWS
+  const data = new Uint8Array(W * H * 4)
+  const span = 1 + 2 * CONTACT_PAD
+  for (const species of ORDER) {
+    const recipe = LEAF_RECIPES[species], cell = leafCell(species)
+    const ox = (cell % ATLAS_COLUMNS) * C, oy = Math.floor(cell / ATLAS_COLUMNS) * C
+    const cover = new Float32Array(C * C)
+    for (let y = 0; y < C; y++) for (let x = 0; x < C; x++) {
+      const s = -.5 - CONTACT_PAD + (x + .5) / C * span, t = -CONTACT_PAD + (y + .5) / C * span
+      cover[y * C + x] = leafAt(recipe, s, t, span / C).cover
+    }
+    const blur = (source: Float32Array, radius: number, passes: number): Float32Array => {
+      let a = source
+      for (let p = 0; p < passes; p++) for (const horizontal of [true, false]) {
+        const b = new Float32Array(C * C)
+        for (let y = 0; y < C; y++) for (let x = 0; x < C; x++) {
+          let sum = 0
+          for (let k = -radius; k <= radius; k++) {
+            const xx = horizontal ? x + k : x, yy = horizontal ? y : y + k
+            if (xx >= 0 && xx < C && yy >= 0 && yy < C) sum += a[yy * C + xx]!
+          }
+          b[y * C + x] = sum / (2 * radius + 1)
+        }
+        a = b
+      }
+      return a
+    }
+    const rim = blur(cover, 1, 2), skirt = blur(cover, 4, 3)
+    for (let y = 0; y < C; y++) for (let x = 0; x < C; x++) {
+      // hollow under the blade's middle: where the depth test cannot part
+      // the stone's darkening from the leaf a hair above it, the leaf keeps
+      // its own colour and only its margin darkens
+      const r = rim[y * C + x]!, deep = Math.min(1, Math.max(0, (r - .7) / .28))
+      const v = Math.min(1, r * 1.9 + skirt[y * C + x]! * .75) * (1 - .85 * deep * deep)
+      data[((oy + y) * W + ox + x) * 4 + 3] = Math.round(v * 255)
+    }
+  }
+  const map = new DataTexture(data, W, H, RGBAFormat)
+  map.wrapS = map.wrapT = ClampToEdgeWrapping
+  map.magFilter = LinearFilter
+  map.minFilter = LinearMipmapLinearFilter
+  map.generateMipmaps = true
+  map.colorSpace = NoColorSpace
+  map.name = 'vinci generated fallen leaf contact'
+  map.needsUpdate = true
+  return (contactMap = map)
+}
+
 function drawAtlas(dry: boolean): { albedo: DataTexture; normal: DataTexture } {
   if (!drawn) return { albedo: placeholder(), normal: placeholder() }
   const W = CELL * ATLAS_COLUMNS, H = CELL * ATLAS_ROWS
@@ -184,7 +251,7 @@ function drawAtlas(dry: boolean): { albedo: DataTexture; normal: DataTexture } {
     const recipe = LEAF_RECIPES[species]
     const cells: [number, typeof leafAt][] = dry ? [[leafCell(species), leafAt]] : [[leafCell(species), leafAt], [sprayCell(species), sprayAt]]
     // blotches a dry blade carries, in the cell's own coordinates
-    const blotches = Array.from({ length: dry ? 9 : 0 }, () => ({ s: (spot() - .5) * .5, t: .2 + spot() * .75, r: .02 + spot() * spot() * .07, k: .55 + spot() * .3 }))
+    const blotches = Array.from({ length: dry ? 11 : 0 }, () => ({ s: (spot() - .5) * .5, t: .2 + spot() * .75, r: .02 + spot() * spot() * .08, k: .42 + spot() * .36 }))
     for (const [cell, draw] of cells) {
       const ox = (cell % ATLAS_COLUMNS) * CELL, oy = Math.floor(cell / ATLAS_COLUMNS) * CELL
       for (let y = 0; y < CELL; y++) for (let x = 0; x < CELL; x++) {
@@ -201,7 +268,9 @@ function drawAtlas(dry: boolean): { albedo: DataTexture; normal: DataTexture } {
           }
         }
         const i = (oy + y) * W + ox + x
-        heights[i] = vein * .6 * cover
+        // a drying blade's margin curls up off the stone: the relief rises
+        // toward the edge, so a lying leaf shades as a cupped one
+        heights[i] = (vein * .6 + (dry ? edge * 1.1 : 0)) * cover
         let r: number, g: number, b: number
         if (!dry) {
           // a neutral blade, the veins a little paler, the margin a little darker
@@ -214,8 +283,10 @@ function drawAtlas(dry: boolean): { albedo: DataTexture; normal: DataTexture } {
           // the margin dries first and goes brown; the blade's middle keeps
           // more of the colour it fell with
           const brown = Math.min(1, edge * 1.6)
-          const lum = (.8 + .12 * vein) * tone * blot * (1 - .2 * brown)
-          r = lum * (1 - .02 * brown); g = lum * (1 - .16 * brown); b = lum * (1 - .3 * brown) * .96
+          // the blade's own fine mottle, a texel's grain of drying
+          const mottle = .92 + .16 * spot()
+          const lum = (.78 + .22 * vein) * tone * blot * mottle * (1 - .3 * brown)
+          r = lum * (1 - .02 * brown); g = lum * (1 - .2 * brown); b = lum * (1 - .36 * brown) * .96
         }
         albedo[i * 4] = srgb(r); albedo[i * 4 + 1] = srgb(g); albedo[i * 4 + 2] = srgb(b)
         albedo[i * 4 + 3] = Math.round(Math.min(1, cover) * 255)

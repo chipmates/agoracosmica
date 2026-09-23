@@ -15,10 +15,10 @@ import {
   BufferAttribute, BufferGeometry, DoubleSide, Float32BufferAttribute, Group, Mesh, MeshBasicNodeMaterial,
   MeshStandardNodeMaterial, PhysicalLightingModel, Uint32BufferAttribute,
 } from 'three/webgpu'
-import { attribute, diffuseColor, float, normalMap, normalView, positionWorld, smoothstep, texture, uv, vec2, vec3 } from 'three/tsl'
+import { attribute, diffuseColor, normalMap, normalView, positionWorld, texture, uv, vec2, vec3 } from 'three/tsl'
 import { SHADOW_ONLY_LAYER } from '../../stack/light'
 import { leftOutAtCalm } from './calm-tier'
-import { barkMaps, cellUV, leafAtlas, leafCell, litterAtlas } from './leaf-maps'
+import { barkMaps, cellUV, contactAtlas, leafAtlas, leafCell, litterAtlas } from './leaf-maps'
 import type { TierName } from '../../stack/tier'
 import { dossier, edgeDistance, feature, hourKey, inside, polygon, type Quantity } from './site'
 import { collectionExclusions } from './collection'
@@ -36,7 +36,9 @@ import {
 } from './tree-growth'
 import { createFallingLeaves, windPosition, windWanted, type FallSource } from './wind'
 import { layLitter, stageWeight, stopDistance, type Target } from './leaf-litter'
-import { builtFaces } from './ground-walls'
+import { layCertifiedFall } from './leaf-litter-certified'
+import { builtFaces, courtBlocks, drawnFaces, GRAVE_FLOOR, GRAVE_FLOOR_RISE } from './ground-walls'
+import { RETIRED_LAYER } from './shell'
 
 const PROVENANCE = {
   manifestId: 'vinci/vegetation',
@@ -46,12 +48,20 @@ const PROVENANCE = {
   recipe: 'Deterministic trees and hedge shrubs grown per species habit (types of the flora card): a trunk that runs or forks into leaders, scaffold limbs that fork toward the crown the species makes, second-order branches and twigs, each grown segment by segment and stopped at the crown skin or at a refused place; a refused fork is tried once bent upward, a limb that carries no leaf anywhere below it is taken off, and a limb left without a fork tapers to a tip. Every leaf of a near crown is its own card of its species outline (a compound leaf for walnut); a crown further off is carried by spray cards of the same leaf, and a mid tree a stop sees within 32 m draws every twig that bears one. Each species turns at one stage for the week (a third to two thirds of the crown; oak and alder greener), each leaf by how exposed it stands (outer, upper, sunward), with a small turn by limb and by tree. Hawthorn and blackthorn stand single over the meadows and in short rows on field lines. Bark as tubes with shared rings and a flared foot sunk into the sampled ground. Leaf and bark maps are drawn from recipes in code. Leaves carry the key light through themselves and cast through one opaque triangle inside each outline. The week\'s fall lies as a carpet under each crown dropping it, as drifts against every riser, wall foot and retaining face across the south-west wind, as a clumped scatter, in the lane\'s ruts and gutters and over the walled court\'s floor, densest where the stops see it. No leaf or limb stands inside a building, within 3.2 m above a certified walking surface, or inside the grave court below its walls\' top. Wind only on an address that asks for it.',
 }
 
-/** The soft halo under a leaf lying on stone is its own record: an engine
-    term the film turns off, outside the walk's solids. */
+/** The darkening under a leaf lying on stone is its own record, outside the
+    walk's solids. */
 const leafContactProvenance = {
   manifestId: 'vinci/leaf-contact',
   assetClass: 'GENERATED',
   certainty: 'conjectural',
+} as const
+/** The week's fall as it is drawn: dressing a few centimetres deep on the
+    floors, outside the walk's solids like the moss. */
+export const fallenLeavesProvenance = {
+  manifestId: 'vinci/fallen-leaves',
+  assetClass: 'GENERATED',
+  certainty: 'conjectural',
+  recipe: 'The week\'s fall of the planted trees as dry leaf cards of each species\' outline, cupped and folded as drying leaves curl, coloured from each tree\'s own fall: a carpet under every crown dropping it, carried north-east by the south-west wind; drifts against every riser, wall foot, kerb, retaining face, the grave\'s tomb and lectern and the supper wall\'s sill, each run heaped in its own places and some treads swept nearly bare; a clumped scatter, the lane\'s ruts and gutters, and the walled court\'s floor, most of it in the lee of the walls. Densest where the stops see it. A type of one October week, not a record.',
 } as const
 
 /* ─── the planting ─────────────────────────────────────────────────────── */
@@ -91,7 +101,6 @@ const PLANTING: readonly TreeSpec[] = [
   // bole: from the supper wall its trunk stands above the pavilion's roof,
   // and from the grave it stands behind the grave's own poplar
   { id: 'amasse-tall-elm', species: 'elm', east: -65.5, north: -15.5, height: 27, seed: 4409, detail: 'mid', crownBase: .72, bole: .74, lean: [.4, .3], leafCap: 5200 },
-  { id: 'amasse-willow-2', species: 'willow', east: -70, north: 3, height: 6.8, seed: 4406, detail: 'mid', pollard: true },
   { id: 'amasse-elm', species: 'elm', east: -62, north: 18, height: 21, seed: 4407, detail: 'mid' },
   { id: 'amasse-alder-3', species: 'alder', east: -66.5, north: -58, height: 13.5, seed: 4408, detail: 'far' },
   // the six trees of the middle distance, at the positions the planting
@@ -323,13 +332,13 @@ function materials(wind: boolean) {
     shade.positionNode = moved
     shade.castShadowPositionNode = moved
   }
-  // the stone round a lying leaf sees less sky: a soft dark halo, an engine
-  // term only, which the film's renderer finds for itself
+  // the stone round a lying leaf sees less sky: the blade's own outline,
+  // softened, a tight rim at its edge and a faint skirt beyond; the film's
+  // occlusion cannot find a leaf two millimetres thick, so it draws this too
   const contact = new MeshBasicNodeMaterial({ transparent: true, depthWrite: false, side: DoubleSide })
   contact.name = 'vinci generated fallen leaf contact'
   contact.colorNode = vec3(0, 0, 0)
-  const r = uv().sub(.5).mul(2).length()
-  contact.opacityNode = float(1).sub(smoothstep(.55, 1, r)).mul(.5)
+  contact.opacityNode = texture(contactAtlas(), uv()).a.mul(attribute<'vec4'>('color', 'vec4').w)
   return { bark, leaves, litter, shade, contact }
 }
 
@@ -426,37 +435,54 @@ function* grow(group: Group, heightAt: (east: number, north: number) => number, 
   // every rectangle of made ground inside the court's walls
   const inCourt = (e: number, n: number): boolean =>
     COURT_GROUND.some(g => e > g.west + .02 && e < g.east - .02 && n > g.south + .02 && n < g.north - .02)
-  /** the floor a fallen leaf lies on: the court's own paving inside the
-      insertion's court (its grave half a step up), the shared grade elsewhere */
-  const floorAt = (e: number, n: number): number =>
-    inCourt(e, n) ? COURT.level + (e < SUPPER_WALL.east ? .035 : 0) : terrainFloor(e, n)
   const litterCell = 22
-  const litterIndex = new Map<string, number>()
-  const litterBodies: Body[] = [], litterShadows: (Body | null)[] = [], litterContacts: (Body | null)[] = []
   const litterCap = tier === 'hero' ? 18 : tier === 'standard' ? 4 : 2
-  const bodyAt = (e: number, n: number): Target => {
+  interface Fall { bodies: Body[]; shadows: (Body | null)[]; contacts: (Body | null)[]; index: Map<string, number> }
+  const fallBodies = (contacts: boolean): Fall => ({ bodies: [], shadows: [], contacts: contacts ? [] : [], index: new Map() })
+  const bodiesAt = (fall: Fall, contacts: boolean) => (e: number, n: number): Target => {
     const key = `${Math.floor(e / litterCell)},${Math.floor(n / litterCell)}`
-    let i = litterIndex.get(key)
+    let i = fall.index.get(key)
     if (i === undefined) {
       // past the cap a new place joins the nearest body already open
-      if (litterBodies.length < litterCap) {
-        i = litterBodies.length
-        litterBodies.push(new Body()); litterShadows.push(tier === 'hero' ? new Body() : null)
-        litterContacts.push(tier === 'hero' && ENGINE_TERMS ? new Body() : null)
+      if (fall.bodies.length < litterCap) {
+        i = fall.bodies.length
+        fall.bodies.push(new Body()); fall.shadows.push(tier === 'hero' ? new Body() : null)
+        fall.contacts.push(contacts ? new Body() : null)
       } else i = Math.abs(Math.floor(e / litterCell) * 7 + Math.floor(n / litterCell) * 13) % litterCap
-      litterIndex.set(key, i)
+      fall.index.set(key, i)
     }
-    return { leaves: litterBodies[i]!, shadow: litterShadows[i]!, contact: litterContacts[i]! }
+    return { leaves: fall.bodies[i]!, shadow: fall.shadows[i]!, contact: fall.contacts[i]! }
   }
+  const lane = { centre: polygon('street').slice(0, 6).map(p => [p[0]!, p[1]!] as [number, number]), width: feature('street').width_m!.value }
+  const toWall = (e: number, n: number): number => Math.min(Math.abs(e - GALLERY.backKerb), Math.abs(n - GALLERY.northKerb) + (e > GALLERY.returnEast ? 99 : 0))
+  // THE FALL AS THE CERTIFICATE HOLDS IT, leaf for leaf, drawn by no camera
+  // (see leaf-litter-certified.ts); its floor keeps the height it was
+  // certified at
+  const certified = fallBodies(false)
+  const certifiedFall = layCertifiedFall({
+    results, tier, floorAt: (e, n) => inCourt(e, n) ? COURT.level + (e < SUPPER_WALL.east ? .035 : 0) : terrainFloor(e, n),
+    refused: (e, n) => onBuilding(e, n) || onWater(e, n),
+    walked: (e, n) => onWalk(e, n) || inCourt(e, n),
+    grass: (e, n) => !onWalk(e, n) && !inCourt(e, n),
+    walls: builtFaces(), bodyAt: bodiesAt(certified, false), lane, court: { floor: COURT_GROUND, toWall },
+  })
+  // THE FALL AS IT IS DRAWN. The grave's floor stands two centimetres over
+  // the court's paving; a leaf lies on the floor it lands on.
+  const onGraveFloor = (e: number, n: number): boolean => e > GRAVE_FLOOR.west && e < GRAVE_FLOOR.east && n > GRAVE_FLOOR.south && n < GRAVE_FLOOR.north
+  const floorAt = (e: number, n: number): number =>
+    inCourt(e, n) ? COURT.level + (onGraveFloor(e, n) ? GRAVE_FLOOR_RISE : 0) : terrainFloor(e, n)
+  // the darkening under a leaf on stone is drawn wherever the tier draws the sun
+  const drawn = fallBodies(tier !== 'calm')
+  const blocks = courtBlocks()
   const fall = layLitter({
     results, tier, floorAt,
     refused: (e, n) => onBuilding(e, n) || onWater(e, n),
     walked: (e, n) => onWalk(e, n) || inCourt(e, n),
     grass: (e, n) => !onWalk(e, n) && !inCourt(e, n),
-    walls: builtFaces(),
-    bodyAt,
-    lane: { centre: polygon('street').slice(0, 6).map(p => [p[0]!, p[1]!] as [number, number]), width: feature('street').width_m!.value },
-    court: { floor: COURT_GROUND, toWall: (e, n) => Math.min(Math.abs(e - GALLERY.backKerb), Math.abs(n - GALLERY.northKerb) + (e > GALLERY.returnEast ? 99 : 0)) },
+    walls: drawnFaces(), blocks,
+    bodyAt: bodiesAt(drawn, tier !== 'calm'),
+    lane,
+    court: { floor: COURT_GROUND, toWall: (e, n) => Math.min(toWall(e, n), ...blocks.map(b => Math.hypot(Math.max(0, b.west - e, e - b.east), Math.max(0, b.south - n, n - b.north)))) },
   })
   yield
   const wind = windWanted()
@@ -473,16 +499,27 @@ function* grow(group: Group, heightAt: (east: number, north: number) => number, 
     const s = shadows[c] ? meshOf(shadows[c]!, mats.shade, `vinci generated leaf shadows cluster ${String(c + 1).padStart(2, '0')}`, true) : null
     if (s) { s.receiveShadow = false; s.layers.set(SHADOW_ONLY_LAYER); meshes.push(s) }
   }
-  for (const [c, body] of litterBodies.entries()) {
+  // the certified fall stands on a layer no camera and no shadow renders
+  const retired: Mesh[] = []
+  for (const [c, body] of certified.bodies.entries()) {
     const m = meshOf(body, mats.litter, `vinci generated fallen leaves cluster ${String(c + 1).padStart(2, '0')}`, false)
-    if (m) meshes.push(m)
-    const shadow = litterShadows[c]
+    if (m) { m.layers.set(RETIRED_LAYER); retired.push(m) }
+    const shadow = certified.shadows[c]
     const s = shadow ? meshOf(shadow, mats.shade, `vinci generated fallen leaf shadows cluster ${String(c + 1).padStart(2, '0')}`, true) : null
-    if (s) { s.receiveShadow = false; s.layers.set(SHADOW_ONLY_LAYER); meshes.push(s) }
-    const contact = litterContacts[c]
-    const k = contact ? meshOf(contact, mats.contact, `vinci generated fallen leaf contact cluster ${String(c + 1).padStart(2, '0')}`, false) : null
+    if (s) { s.receiveShadow = false; s.layers.set(RETIRED_LAYER); retired.push(s) }
+  }
+  for (const [c, body] of drawn.bodies.entries()) {
+    const tag = String(c + 1).padStart(2, '0')
+    const m = meshOf(body, mats.litter, `vinci fallen leaves cluster ${tag}`, false)
+    if (m) { m.userData = { ...fallenLeavesProvenance }; meshes.push(m) }
+    const shadow = drawn.shadows[c]
+    const s = shadow ? meshOf(shadow, mats.shade, `vinci fallen leaf shadows cluster ${tag}`, true) : null
+    if (s) { s.receiveShadow = false; s.layers.set(SHADOW_ONLY_LAYER); s.userData = { ...fallenLeavesProvenance }; meshes.push(s) }
+    const contact = drawn.contacts[c]
+    const k = contact ? meshOf(contact, mats.contact, `vinci fallen leaf contact cluster ${tag}`, false) : null
     if (k) { k.receiveShadow = false; k.renderOrder = 1; k.userData = { ...leafContactProvenance }; meshes.push(k) }
   }
+  group.add(...retired)
   group.add(...meshes)
   // THE FILM'S FEW FALLING LEAVES, from the outer crowns of the trees the walk
   // stands near, landing downwind of them; only a page with the wind has them
@@ -509,6 +546,7 @@ function* grow(group: Group, heightAt: (east: number, north: number) => number, 
   group.userData['draws'] = meshes.filter(m => !m.layers.isEnabled(SHADOW_ONLY_LAYER) || m.layers.isEnabled(0)).length
   group.userData['leaves'] = results.reduce((a, r) => a + r.leaves, 0)
   group.userData['fallenLeaves'] = fall
+  group.userData['certifiedFall'] = certifiedFall
   group.userData['treePlans'] = results.map(r => ({ id: r.spec.id, species: r.spec.species, east: r.spec.east, north: r.spec.north, height: r.spec.height, spread: r.crown.radius, detail: r.spec.detail, seed: r.spec.seed }))
   group.userData['perTree'] = results.map(r => ({ id: r.spec.id, leaves: r.leaves, leafTriangles: r.leafTriangles, barkTriangles: r.barkTriangles }))
   group.userData['excluded'] = ['cadastre', 'build envelope', 'mapped annexes', 'the insertion', `walks below ${WALK_CLEAR_M} m`, 'retained water cuts']
