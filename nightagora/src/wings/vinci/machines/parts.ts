@@ -12,6 +12,10 @@ import { createMutableSweep, geometryForPart, type MutableSweep } from './geomet
 import { benchKeyDirection } from './key'
 import type { Assembly, Dossier, PartSpec } from './types'
 export type { Assembly } from './types'
+/** An assembly with every library set its surfaces were built from. */
+export interface DressedAssembly extends Assembly {
+  readonly sets: ReadonlySet<MaterialSet>
+}
 
 type Surface = MeshStandardNodeMaterial | MeshPhysicalNodeMaterial
 /** A turned ball has no pole, so its material cannot have one either. The
@@ -62,15 +66,16 @@ function keyRim(strength: number): any {
 
 const materialLoads = new WeakMap<Stack, Map<string, Promise<MaterialSet>>>()
 const materialQueues = new WeakMap<Stack, Promise<void>>()
+/** Page loads one machine request has already stood back for in full. */
+const outlived = new WeakMap<Stack, Set<string>>()
+/** Why a set a machine asked for stands without its maps. */
+const failures = new WeakMap<MaterialSet, string>()
 
-/** Share one library request between machine parts and their bench supports.
- * Linen and forged iron retain the tier's complete map budget; other new
- * sets use the library's 1024px albedo budget plus three procedural scales.
- * Existing cached sets retain their original maps. All requests are serial
- * because the public library budget applies to every in-flight decode.
- * Measure tiers on fresh pages; live tier changes during decoding cannot be
- * isolated through this API. The current rendering tier is never changed.
- */
+/** How long one request stands back for the page's own loads. A courtesy to
+ * their decodes, never a condition: the library takes the budget at the
+ * moment of asking, so a request that goes ahead cannot resize their sets. */
+const COURTESY_MS = 30_000
+
 /** Which sets the shared library is still holding open, by name. A set whose
  * manifest entry is absent never resolves and never fails, so a stall has to
  * be able to name itself. */
@@ -80,6 +85,39 @@ function unsettled(stack: Stack): string[] {
     .filter(setName => !stack.materials.sync(setName).ready.value)
 }
 
+/** The page's loads still in flight that a machine request stands back for. */
+function inFlight(stack: Stack): string[] {
+  if (stack.materials.pending() === 0) return []
+  const failed = new Set(stack.materials.missing().map(set => set.name))
+  const skip = outlived.get(stack)
+  return unsettled(stack).filter(setName => !failed.has(setName) && !skip?.has(setName))
+}
+
+function outlive(stack: Stack, names: readonly string[]): void {
+  const skip = outlived.get(stack) ?? new Set<string>()
+  for (const setName of names) skip.add(setName)
+  outlived.set(stack, skip)
+}
+
+/** True once the set's own maps are on the surfaces that use it. */
+export function materialDressed(set: MaterialSet): boolean {
+  return Boolean(set.ready.value)
+}
+
+/** Why a machine set stands undressed, or null when it is dressed or still coming. */
+export function materialFailure(set: MaterialSet): string | null {
+  return failures.get(set) ?? null
+}
+
+/** Share one library request between machine parts and their bench supports.
+ * Linen and forged iron retain the tier's complete map budget; other new
+ * sets use the library's 1024px albedo budget plus three procedural scales.
+ * Existing cached sets retain their original maps. Requests are serial, so
+ * machine decodes follow one another. The promise never rejects: a set the
+ * library cannot dress is reported and handed over undressed, so every part
+ * is built and the failure is read through `materialFailure`. The current
+ * rendering tier is never changed.
+ */
 export function loadMachineMaterial(stack: Stack, name: string): Promise<MaterialSet> {
   let cache = materialLoads.get(stack)
   if (!cache) { cache = new Map(); materialLoads.set(stack, cache) }
@@ -87,23 +125,39 @@ export function loadMachineMaterial(stack: Stack, name: string): Promise<Materia
   if (existing) return existing
   const previous = materialQueues.get(stack) ?? Promise.resolve()
   const pending = previous.then(async () => {
-    // The lobby may already be decoding shared stone and bronze. Wait before
-    // touching its public budget, without invoking a duplicate load. A bad
-    // inherited manifest must report failure rather than hold readiness forever.
-    const deadline = Date.now() + 30_000
-    while (stack.materials.pending() > 0) {
-      if (Date.now() >= deadline) throw new Error(`Inherited material loads did not settle before ${name}: ${unsettled(stack).join(', ') || 'none named'}`)
+    const until = Date.now() + COURTESY_MS
+    for (let busy = inFlight(stack); busy.length > 0; busy = inFlight(stack)) {
+      if (Date.now() >= until) {
+        outlive(stack, busy)
+        console.warn(`Machine set ${name} goes ahead of page loads still in flight: ${busy.join(', ')}`)
+        break
+      }
       await new Promise<void>(resolve => setTimeout(resolve, 25))
     }
+    // The narrowed budget is held only across the request itself, so no
+    // other caller's set can be asked for while it stands.
     const tier = stack.tierConfig()
     stack.materials.setTier(name === 'linen' || name === 'iron-forged' ? tier : {...tier, detail: 1})
+    let request: Promise<MaterialSet>
     try {
-      const set = await stack.materials.load(name)
-      if (!set.ready.value) throw new Error(`Material ${name} resolved without displayable maps`)
-      return set
+      request = stack.materials.load(name)
     } finally {
       stack.materials.setTier(stack.tierConfig())
     }
+    let set: MaterialSet, reason: string | null = null
+    try {
+      set = await request
+      if (!materialDressed(set)) reason = 'the library resolved it without displayable maps'
+    } catch (error: unknown) {
+      set = stack.materials.sync(name)
+      reason = error instanceof Error ? error.message : String(error)
+    }
+    if (reason !== null) {
+      failures.set(set, reason)
+      outlive(stack, [name])
+      console.error(`Machine material ${name} is not dressed, its parts stand without its maps: ${reason}`)
+    }
+    return set
   }).catch((error: unknown) => {
     if (cache.get(name) === pending) cache.delete(name)
     throw error
@@ -150,7 +204,7 @@ const isTimber = (slug: string, part: PartSpec): boolean =>
 
 /** Construct only the admitted numerical parts. Library sets and shader grain
  * are GENERATED dressing over that metre geometry, never replica textures. */
-export async function buildParts(stack: Stack, dossier: Dossier): Promise<Assembly> {
+export async function buildParts(stack: Stack, dossier: Dossier): Promise<DressedAssembly> {
   if (dossier.status !== 'complete') throw new Error(`${dossier.slug} has no admitted complete geometry`)
   const object = new Group()
   object.name = dossier.slug
@@ -173,8 +227,10 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Assemb
     ? ['roof', 'right-wall', 'left-wall', 'front-left', 'back-wall'] : [])
   const names = [...new Set(dossier.parts.map(p => p.material.class))]
   const surfaceCache = new Map<string, Promise<Surface>>()
+  const sets = new Set<MaterialSet>()
   const makeSurface = async (name: string, quietBank = false, quietWood = false, turned = false, burnished = false, geared = false): Promise<Surface> => {
     const set = await loadMachineMaterial(stack, libraryName(name))
+    sets.add(set)
     const glass = /glass/.test(name), water = /water/.test(name)
     const material: Surface = glass || water
       ? new MeshPhysicalNodeMaterial({metalness: 0, roughness: glass ? 0.1 : 0.16, transparent: true, opacity: glass ? 0.18 : 0.52, depthWrite: false})
@@ -616,7 +672,7 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Assemb
   }
   sync()
   return {
-    object, parts, meshes, sync,
+    object, parts, meshes, sync, sets,
     updateTube(id, points) {
       const sweep = mutableSweeps.get(id)
       if (!sweep) throw new Error(`Unknown moving tube ${id}`)

@@ -78,7 +78,7 @@ import { loadManifest, type ManifestIndex } from '../../manifest'
 import { createPlatePayload } from '../vitrine/picture'
 import { createVinciWholePlate, isWholePlate, vinciPlateDescription } from './collection/deep-plate'
 import type { VitrineRect } from '../vitrine'
-import { buildMachine, machineBuildOf } from './machines'
+import { buildMachine, machineBuildOf, machinesStanding } from './machines'
 import { createVinciHangStrip, vinciSheetTitle, type VinciStripEntry } from './collection/strip'
 import { vinciWallById, vinciWallEndVertex, vinciWallIsEnd, vinciWallOrderOf, VINCI_PICTURE_WALL, vinciWallNearerEnd, vinciWallOfExhibit, vinciWallOfStation, vinciWallStops, vinciWallVertex, VINCI_WALL_ENDS, type VinciWall } from './collection/wall'
 import { pathSpecifications } from './paths'
@@ -2475,8 +2475,9 @@ export function createWing():VinciWingModule {
       const nav=standing?rail.navigation:undefined
       return {completed:nav?.completed??hereContent().id,target:nav?.queued[0]??nav?.active,question:text(hereContent().door)}
     },
-    pending:()=>exhibits?.pending()??0,
-    errors:()=>exhibits?.pictureErrors()??[],
+    // A MACHINE NOT YET WHOLE IS STILL IN FLIGHT, and one that cannot be is an error.
+    pending:()=>(exhibits?.pending()??0)+machinesStanding().outstanding,
+    errors:()=>[...(exhibits?.pictureErrors()??[]),...machinesStanding().errors],
     manifest:()=>[...new Map((exhibits?.pictureSources()??[]).flatMap(({entry})=>[entry.preview,entry.plate]).map(entry=>[entry.id,entry])).values()],
     /* EVERY WORD OF THIS WING, READ AGAIN. The frame hands the language over
        before it repaints its own chrome, so the rail's names are the wing's

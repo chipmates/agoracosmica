@@ -1,10 +1,10 @@
 import { Box3, type BufferGeometry, Color, Fog, Group, Mesh, MeshStandardNodeMaterial, PerspectiveCamera, Scene, Vector3 } from 'three/webgpu';
-import type { Stack, KeyLight } from '../../../../stack';
+import type { Stack, KeyLight, MaterialSet } from '../../../../stack';
 import { float, fog, positionWorld, rangeFogFactor, smoothstep, uv, vec3 } from 'three/tsl';
 import { IDENTITY } from '../../../../stack/grade';
 import { loadManifest, type ManifestEntry } from '../../../../manifest';
 import { assetAddress } from '../../../../stack/materials';
-import { loadMachineMaterial } from '../parts';
+import { loadMachineMaterial, materialDressed, materialFailure } from '../parts';
 import { buildMachine, type ReadyMachineBuild } from '..';
 import type { StoreCrane, StoreCraneReading } from '../crane-body';
 import { MACHINE_SLUGS, isMachineSlug, machineCatalog, partialCatalog, type Language, type MachineSlug, type EvidenceRecord } from '../catalog';
@@ -183,7 +183,7 @@ export function createBench(stack: Stack, onExit: () => void) {
   let active = false, serial = 0, slug: MachineSlug = 'aerial-screw', lang: Language = controlLanguage(location.search), machine: ReadyMachineBuild | null = null, key: KeyLight | null = null, ready = false, lastWall = performance.now(), folioEntry: ManifestEntry | undefined, evidenceRecord: EvidenceRecord | null = null, sectionEnabled = false, lastPlaybackPaint = 0;
   let schedule = playbackSchedule(machineCatalog[slug].dossier);
   let playbackState = initialPlayback(schedule, { fixed: true });
-  const supportGeometries: BufferGeometry[] = [], supportMaterials: MeshStandardNodeMaterial[] = [];
+  const supportGeometries: BufferGeometry[] = [], supportMaterials: MeshStandardNodeMaterial[] = [], supportSets: MaterialSet[] = [];
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const evidence = createEvidenceDialog({
     host, source, page, closeButton: sourceClose, partialRecords: partialCatalog,
@@ -195,7 +195,7 @@ export function createBench(stack: Stack, onExit: () => void) {
   let storeCrane: StoreCraneReading | null = null;
   function clearDisplay() { storeCrane = null; ropeExperiment?.restore(); ropeExperiment = null; metrics?.close(); machine?.dispose(); machine = null; display.clear(); for (const g of supportGeometries)
     g.dispose(); for (const m of supportMaterials)
-    m.dispose(); supportGeometries.length = 0; supportMaterials.length = 0; }
+    m.dispose(); supportGeometries.length = 0; supportMaterials.length = 0; supportSets.length = 0; }
   function reading(record: EvidenceRecord) {
     evidenceRecord = record;
     page.replaceChildren();
@@ -399,6 +399,7 @@ export function createBench(stack: Stack, onExit: () => void) {
       loadMachineMaterial(stack, 'iron-forged'),
     ]);
     if (mine !== serial) return;
+    supportSets.push(stone, iron);
     const groundMat = new MeshStandardNodeMaterial({ roughness: stone.roughness, metalness: stone.metalness });
     groundMat.colorNode = vec3(stone.albedo.r * .025, stone.albedo.g * .025, stone.albedo.b * .025);
     // A metre-scale band was tried here when the air began to reach the wall
@@ -466,12 +467,19 @@ export function createBench(stack: Stack, onExit: () => void) {
       });
       const tuffeau = await loadMachineMaterial(stack, 'stone-tuffeau');
       if (mine !== serial) { wall.geometry.dispose(); return; }
+      supportSets.push(tuffeau);
       const wallMaterial = backPlaneMaterial(stack, tuffeau);
       wall.mesh.material = wallMaterial;
       supportMaterials.push(wallMaterial);
       supportGeometries.push(wall.geometry);
       display.add(wall.mesh);
     }
+  }
+  /** The standing machine and its supports: mounted, and dressed with their own sets. */
+  function parts() {
+    const state = machine?.standing?.() ?? { mounted: ready, dressed: ready, error: null };
+    const bare = supportSets.filter(set => !materialDressed(set)).map(set => `${set.name} undressed (${materialFailure(set) ?? 'no maps yet'})`);
+    return { mounted: state.mounted, dressed: state.dressed && bare.length === 0, error: [state.error, ...bare].filter(Boolean).join('; ') || null };
   }
   function lightBench() {
     const scale = machineCatalog[slug].dossier.scale_m, span = Math.max(scale.x, scale.y, scale.z);
@@ -596,9 +604,9 @@ export function createBench(stack: Stack, onExit: () => void) {
     }
   }, machine() {
     if (!machine) return null;
-    const snapshot = { slug, body: storeCrane ?? undefined, period: machineCatalog[slug].dossier.motion.period_s, period_s: machineCatalog[slug].dossier.motion.period_s, t: playbackState.clock, joints: machine.joints(), bounds: machine.bounds.getSize(new Vector3()).toArray(), occupied: new Box3().setFromObject(machine.object).getSize(new Vector3()).toArray(), ready: ready && (metrics?.ready() ?? true), playing: playbackState.playing, section: sectionEnabled, evidence: { open: evidence.isOpen(), recordSlug: evidence.isOpen() ? evidenceRecord?.slug ?? null : null } };
+    const snapshot = { slug, body: storeCrane ?? undefined, period: machineCatalog[slug].dossier.motion.period_s, period_s: machineCatalog[slug].dossier.motion.period_s, t: playbackState.clock, joints: machine.joints(), bounds: machine.bounds.getSize(new Vector3()).toArray(), occupied: new Box3().setFromObject(machine.object).getSize(new Vector3()).toArray(), ready: ready && parts().dressed && (metrics?.ready() ?? true), parts: parts(), playing: playbackState.playing, section: sectionEnabled, evidence: { open: evidence.isOpen(), recordSlug: evidence.isOpen() ? evidenceRecord?.slug ?? null : null } };
     return metrics ? { ...snapshot, metrics: metrics.reading() } : snapshot;
   }, slug: () => slug, ids: () => MACHINE_SLUGS, station(id: string) { if (!isMachineSlug(id))
       return false; void open({ slug: id }); return true; }, manifest() { return [folioEntry, storeCrane?.entry].filter((entry): entry is ManifestEntry => Boolean(entry)); }, relight() { if (active) {
-      lightBench(); metrics?.reset(); } }, freeze(t: number) { playbackState = freezePlayback(t); machine?.animate(playbackState.clock, 0); if (active) metrics?.reset(); }, ready: () => ready && (metrics?.ready() ?? true) };
+      lightBench(); metrics?.reset(); } }, freeze(t: number) { playbackState = freezePlayback(t); machine?.animate(playbackState.clock, 0); if (active) metrics?.reset(); }, ready: () => ready && parts().dressed && (metrics?.ready() ?? true) };
 }

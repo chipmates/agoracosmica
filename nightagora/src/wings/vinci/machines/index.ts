@@ -17,8 +17,8 @@ import { build as proportional_compass } from './proportional-compass'
 import { build as camera_obscura } from './camera-obscura'
 
 export * from './catalog'
-export type { ReadyMachineBuild } from './runtime'
-export { machineBuildOf } from './runtime'
+export type { ReadyMachineBuild, MachinesStanding, MachineStanding } from './runtime'
+export { machineBuildOf, machinesStanding } from './runtime'
 export type { Dossier, MachineBuild, Certainty } from './types'
 
 export const builders: Record<MachineSlug, (stack: Stack) => ReadyMachineBuild> = {

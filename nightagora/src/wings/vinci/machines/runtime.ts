@@ -1,9 +1,19 @@
 import { Box3, Group, Vector3, type BufferGeometry, type Object3D } from 'three/webgpu'
 import type { Stack } from '../../../stack'
-import { buildParts } from './parts'
+import { buildParts, materialDressed, materialFailure, type DressedAssembly } from './parts'
 import { applyMotion, jointValuesAt } from './motion'
 import type { MachineRecord, MachineSlug } from './catalog'
-import type { Assembly, MachineBuild } from './types'
+import type { MachineBuild } from './types'
+
+/** Where one machine's parts stand. */
+export interface MachineStanding {
+  /** every part of the dossier is built and attached */
+  readonly mounted: boolean
+  /** and every surface carries its library set's own maps */
+  readonly dressed: boolean
+  /** what can no longer arrive, or null while the machine is whole or still coming */
+  readonly error: string | null
+}
 
 export interface ReadyMachineBuild extends MachineBuild {
   readonly slug: MachineSlug
@@ -18,18 +28,65 @@ export interface ReadyMachineBuild extends MachineBuild {
    * surface it was built with, which stays whole even where the part is
    * welded or instanced into a shared draw. */
   part?(id: string): { node: Object3D; geometry: BufferGeometry } | null
+  /** Mounted and dressed, read at this moment. A build without it is read
+   * from its `ready` alone. */
+  standing?(): MachineStanding
+}
+
+/** Every machine the page holds, and whether each is whole. */
+export interface MachinesStanding {
+  readonly machines: number
+  readonly mounted: number
+  readonly dressed: number
+  /** machines not yet mounted and dressed, failed ones included */
+  readonly outstanding: number
+  /** slugs still being built or dressed */
+  readonly waiting: readonly string[]
+  readonly errors: readonly string[]
+  /** every part of every machine is mounted and dressed */
+  readonly complete: boolean
 }
 
 /** THE ROOM'S MACHINE IS THE VITRINE'S MACHINE. A close look lends the one
  * body the room built, with its clock, and never builds a second one. */
 const builds = new WeakMap<Object3D, ReadyMachineBuild>()
+/** The live machines of the page, until each is disposed. */
+const live = new Map<ReadyMachineBuild, { settled: boolean; error: string | null }>()
+
 export function registerMachineBuild(build: ReadyMachineBuild): ReadyMachineBuild {
   builds.set(build.object, build)
+  const record = { settled: false, error: null as string | null }
+  live.set(build, record)
+  build.ready.then(
+    () => { record.settled = true },
+    (error: unknown) => { record.settled = true; record.error = error instanceof Error ? error.message : String(error) },
+  )
+  const dispose = build.dispose
+  build.dispose = () => { live.delete(build); dispose.call(build) }
   return build
 }
 export function machineBuildOf(object: Object3D): ReadyMachineBuild | undefined {
   return builds.get(object)
 }
+
+/** The page's one reading of its machines: what the export and the rigs wait on. */
+export function machinesStanding(): MachinesStanding {
+  let mounted = 0, dressed = 0
+  const waiting: string[] = [], errors: string[] = []
+  for (const [build, record] of live) {
+    const state: MachineStanding = build.standing?.()
+      ?? { mounted: record.settled && !record.error, dressed: record.settled && !record.error, error: record.error }
+    if (state.mounted) mounted++
+    if (state.mounted && state.dressed) dressed++
+    else if (state.error) errors.push(`machine ${build.slug}: ${state.error}`)
+    else waiting.push(build.slug)
+  }
+  const outstanding = live.size - dressed
+  return { machines: live.size, mounted, dressed, outstanding, waiting, errors, complete: outstanding === 0 }
+}
+
+// The rigs and the export read the same reading off the page.
+if (typeof window !== 'undefined') (window as unknown as Record<string, unknown>)['__naMachines'] = machinesStanding
 
 /** The schema specifies conservative swept envelopes, with their own origins. */
 function dossierBounds(record: MachineRecord): Box3 {
@@ -53,7 +110,8 @@ export function makeMachine(stack: Stack, record: MachineRecord): ReadyMachineBu
   object.userData['manifestId'] = `vinci/machine/${record.slug}`
   object.userData['dossier'] = record.sourcePath
   object.userData['certainty'] = 'C'
-  let assembly: Assembly | undefined
+  let assembly: DressedAssembly | undefined
+  let failure: string | null = null
   let disposed = false
   let sectionEnabled = false
   let time = 0
@@ -76,6 +134,11 @@ export function makeMachine(stack: Stack, record: MachineRecord): ReadyMachineBu
     object.add(built.object)
     values = applyMotion(record.dossier, built, time)
     applySection()
+  }, (error: unknown) => {
+    // A machine that cannot be built is said aloud, never left as an empty group.
+    failure = error instanceof Error ? error.message : String(error)
+    console.error(`The machine ${record.slug} was not built: ${failure}`)
+    throw error
   })
 
   return {
@@ -105,6 +168,12 @@ export function makeMachine(stack: Stack, record: MachineRecord): ReadyMachineBu
     part(id) {
       const node = assembly?.parts.get(id), mesh = assembly?.meshes.get(id)
       return node && mesh ? { node, geometry: mesh.geometry } : null
+    },
+    standing() {
+      if (!assembly || disposed) return { mounted: false, dressed: false, error: failure }
+      const bare = [...assembly.sets].filter(set => !materialDressed(set))
+      const reasons = bare.flatMap(set => { const why = materialFailure(set); return why ? [`${set.name} undressed (${why})`] : [] })
+      return { mounted: true, dressed: bare.length === 0, error: reasons.length ? reasons.join('; ') : null }
     },
     dispose() {
       if (disposed) return

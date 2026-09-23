@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed to a pale grey at 30 per cent. Assumed weather, no observation claimed.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "1a2029c8f6e026db62550cf2508536328adf8549626c584b598cdf0affba0b6e",
+      "sha256": "91f1fa01de34772cf31ccb364fd10dce6234368021506c54d04a83bf58b2200e",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=80c458f2cb5ccddb7fcedccda5df70e5cdccda7d9ca97d65ebfa6462920f61ef;"
     },
     {
@@ -943,11 +943,11 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "7e5761cafd96b753026d355e19c2ff7f2a0d4f0e967e1f4ea13a7b33ec2bf77f"
+          "sha256": "92b8be9995f065aac841deb070ae041d92dece36ee9af3b133d198143aaa9604"
         },
         {
           "path": "src/wings/vinci/machines/runtime.ts",
-          "sha256": "53b9e39d99b2e83a156bd5b7be3b9ccb5cb1336db83c1a9e8c40e187fc328f6c"
+          "sha256": "a0ad69eb81ce30e70e5c11df01cf325c069d2c774adfcc67b8838e96e3a14b6a"
         },
         {
           "path": "src/wings/vinci/machines/types.ts",
@@ -2172,7 +2172,7 @@
         },
         {
           "path": "src/wings/vinci/machines/bench/index.ts",
-          "sha256": "4805a2d19c8817ae97c90ec648af7efeaa5e00816b137e1fc8c148b2a4f52450"
+          "sha256": "043a12c6ca6f3058ebb5ab2b872237f2e2ee9ab519f127982c27e51a34b0ecd7"
         },
         {
           "path": "src/wings/vinci/machines/bench/metrics.ts",
@@ -2238,7 +2238,7 @@
         },
         {
           "path": "src/wings/vinci/machines/bench/index.ts",
-          "sha256": "4805a2d19c8817ae97c90ec648af7efeaa5e00816b137e1fc8c148b2a4f52450"
+          "sha256": "043a12c6ca6f3058ebb5ab2b872237f2e2ee9ab519f127982c27e51a34b0ecd7"
         }
       ],
       "note": "Procedural modern hall geometry only. The stone material set remains a separately manifested CC0 library asset. No machine's own hall is claimed or reconstructed here.",
@@ -2254,7 +2254,7 @@
       "prompt": "The da Vinci machine bench. Restrained museum typography, folio mounts, named absence panels, certainty marks, navigation, finite-demonstration status and evidence reading furniture, plus an optional diagnostic card displaying observed runtime measurements. Reuse the locked bilingual pages verbatim. No unapproved folio or reconstruction photograph is displayed. Window 5: three registers of text. The label speaks the hour (15:19 by the sun, 10 October 1517) and says the day is documented and the hour chosen, and it names what the bench does not show; the drawer explains without bracket citations; the record behind Read the evidence carries the arithmetic, the place, the method and the sources. The same computed 10 October 1517 Julian 15:19:00 LAT hour and geographic sun A=231.9005 degrees h=17.3882 degrees drive the bench key. The hour is chosen, not historical observation. Window 6: the phone drops the footer's top rule so one line closes the reading column; the compass is staged as an object (three-quarter view, full frame height on the wide frame, .35 on the phone) and every machine is fitted at .80 of the half height and .70 of the half width, .31 on the phone; a close state frames the working end of a machine alone. No locked copy changed.",
       "model": "GPT-6 Codex, with a Claude Opus 5 harvest seat",
       "date": "2026-09-11",
-      "sha256": "4805a2d19c8817ae97c90ec648af7efeaa5e00816b137e1fc8c148b2a4f52450",
+      "sha256": "043a12c6ca6f3058ebb5ab2b872237f2e2ee9ab519f127982c27e51a34b0ecd7",
       "recipe_files": [
         {
           "path": "src/wings/vinci/machines/bench/bench.css",
@@ -2274,7 +2274,7 @@
         },
         {
           "path": "src/wings/vinci/machines/bench/index.ts",
-          "sha256": "4805a2d19c8817ae97c90ec648af7efeaa5e00816b137e1fc8c148b2a4f52450"
+          "sha256": "043a12c6ca6f3058ebb5ab2b872237f2e2ee9ab519f127982c27e51a34b0ecd7"
         },
         {
           "path": "src/wings/vinci/machines/bench/metrics.ts",
