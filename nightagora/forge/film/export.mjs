@@ -317,14 +317,20 @@ async function openSession(browser, framing, { base, scale, sink, warmNodes, log
   await ctx.addInitScript(() => { try { sessionStorage.setItem('vinci-welcome', '1') } catch { /* seen */ } })
   await ctx.addInitScript(installVirtualClock)
   const page = await ctx.newPage()
-  const record = { errors: [], projection: [], late: [], aborted: [] }
+  const record = { errors: [], projection: [], late: [], chrome: [], aborted: [] }
   let armed = false
   page.on('pageerror', (e) => record.errors.push(e.message.slice(0, 160)))
   // an aborted set is neither ready nor missing: its request names it
   page.on('requestfailed', (r) => record.aborted.push(`${r.failure()?.errorText} ${r.url().replace(base, '')}`))
   page.on('response', (r) => { if (r.status() >= 400) record.aborted.push(`${r.status()} ${r.url().replace(base, '')}`) })
   page.on('console', (m) => { const t = m.text(); if (/Rail projection|frame threw/.test(t)) record.projection.push(t.slice(0, 160)) })
-  page.on('request', (r) => { if (armed && !r.url().startsWith('blob:') && !r.url().startsWith('data:')) record.late.push(r.url().replace(base, '')) })
+  /* A FILE AFTER THE CLOCK IS A FRAME THAT WAITED FOR IT, unless the page
+     asked for it as an image of its own chrome, which is struck and draws no
+     pixel of the canvas: those are counted apart */
+  page.on('request', (r) => {
+    if (!armed || r.url().startsWith('blob:') || r.url().startsWith('data:')) return
+    ;(r.resourceType() === 'image' ? record.chrome : record.late).push(r.url().replace(base, ''))
+  })
   const first = warmNodes[0]
   await page.goto(`${base}/w/vinci?probe=1&tier=max&export=1&order=life&pr=${scale}#s=${first.station}`, { waitUntil: 'load' })
   if (!(await wingStanding(page))) throw new Error('the wing never stood')
@@ -439,7 +445,8 @@ async function exportClip(session, inbox, edge, nodes, track, out, opts) {
   const { page, framing, stage } = session
   const from = nodes.get(edge.from), to = nodes.get(edge.to)
   const tag = `${edge.id} ${framing}`
-  const lateBefore = session.record.late.length, errorsBefore = session.record.errors.length, projectionBefore = session.record.projection.length
+  const lateBefore = session.record.late.length, chromeBefore = session.record.chrome.length
+  const errorsBefore = session.record.errors.length, projectionBefore = session.record.projection.length
   const starvedBefore = await page.evaluate(() => window.__pre.starved())
   const t0 = await standAt(page, from)
   const armed = await page.evaluate(() => window.__naExport.arm())
@@ -516,6 +523,8 @@ async function exportClip(session, inbox, edge, nodes, track, out, opts) {
     track: { maxDeviation: round(maxDeviation, 6) },
     projectionThrows: session.record.projection.length - projectionBefore,
     requestsAfterClock: late.length, lateRequests: late.slice(0, 6),
+    chromeImagesAfterClock: session.record.chrome.length - chromeBefore,
+    mountedChanges: frames.filter((f) => f.mounted.changed).map((f) => ({ i: f.i, meshes: f.mounted.meshes, ...f.mounted.changed })),
     starvedSteps: starved, pageErrors: session.record.errors.length - errorsBefore,
     pendingAtRest, paintedOverCanvas, mountedSetChanges: signatures.size - 1, casters: armed.casters, bodies: armed.bodies,
     floorCeilingMax: round(floorCeilingMax, 4), refused: refusal,
@@ -655,11 +664,12 @@ async function main() {
       frames: r.frames, joins: r.joins, track: r.track, projectionThrows: r.projectionThrows,
       requestsAfterClock: r.requestsAfterClock, starvedSteps: r.starvedSteps, pageErrors: r.pageErrors, pendingAtRest: r.pendingAtRest,
       paintedOverCanvas: r.paintedOverCanvas, mountedSetChanges: r.mountedSetChanges, casters: r.casters,
+      chromeImagesAfterClock: r.chromeImagesAfterClock, lateRequests: r.lateRequests, mountedChanges: r.mountedChanges,
       ...(r.framing === 'upright' ? { floorCeilingMax: r.floorCeilingMax } : {}),
       plateTexelNote: 'not measured by the export: the texel line waits for a plate hook',
       seen: r.seen,
       refused: r.refused,
-      files: r.files, perFrame: r.frameRecords.map((f) => ({ i: f.i, sha256: f.sha256, draws: f.draws, motion: f.motion ?? 0, turnPx: f.turnPx ?? 0, walkPx: f.walkPx ?? 0, nearM: round(f.nearM ?? 0, 3), floorCeiling: f.floorCeiling, wallMs: f.wall, ms: f.ms, print: f.print })),
+      files: r.files, perFrame: r.frameRecords.map((f) => ({ i: f.i, sha256: f.sha256, draws: f.draws, motion: f.motion ?? 0, turnPx: f.turnPx ?? 0, walkPx: f.walkPx ?? 0, nearM: round(f.nearM ?? 0, 3), floorCeiling: f.floorCeiling, meshes: f.mounted?.meshes, wallMs: f.wall, ms: f.ms, print: f.print })),
     }
     mkdirSync(join(first.dir, 'sidecars', r.framing), { recursive: true })
     writeFileSync(join(first.dir, 'sidecars', r.framing, `${r.stem}.json`), JSON.stringify(sidecar, null, 1))

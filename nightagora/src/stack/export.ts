@@ -146,6 +146,7 @@ export function installExport(parts: ExportParts): void {
      clip; the harness refuses a clip whose mounted set changes inside it. */
   function armIds(): { bodies: number; casters: number } {
     const scene = parts.scene()
+    lastMounted = null
     for (const s of swaps) s.mesh.material = s.was
     swaps = []
     bodies = []
@@ -168,18 +169,34 @@ export function installExport(parts: ExportParts): void {
   }
 
   /** what is mounted and drawn now, as one number: a body built, dropped or
-      hidden inside a clip turns it */
-  function mounted(): { meshes: number; signature: number } {
+      hidden inside a clip turns it, and the bodies that did are named */
+  let lastMounted: Map<number, Mesh> | null = null
+  let lastSignature = 0
+  const pathOf = (mesh: Mesh): string => {
+    const names: string[] = []
+    for (let o: Mesh['parent'] | Mesh = mesh; o; o = o.parent) if (o.name) names.push(o.name)
+    return names.reverse().join('/') || `mesh ${mesh.id}`
+  }
+  function mounted(): { meshes: number; signature: number; changed?: { added: string[]; removed: string[]; addedCount: number; removedCount: number } } {
     const scene = parts.scene()
-    let meshes = 0
+    const ids = new Map<number, Mesh>()
     let hash = 2166136261
     scene?.traverseVisible((object) => {
       const mesh = object as Mesh
       if (!mesh.isMesh) return
-      meshes++
+      ids.set(mesh.id, mesh)
       hash = Math.imul(hash ^ mesh.id, 16777619) >>> 0
     })
-    return { meshes, signature: hash }
+    let changed
+    if (lastMounted && hash !== lastSignature) {
+      const was = lastMounted
+      const added = [...ids].filter(([id]) => !was.has(id))
+      const removed = [...was].filter(([id]) => !ids.has(id))
+      changed = { added: added.slice(0, 6).map(([, m]) => pathOf(m)), removed: removed.slice(0, 6).map(([, m]) => pathOf(m)), addedCount: added.length, removedCount: removed.length }
+    }
+    lastMounted = ids
+    lastSignature = hash
+    return { meshes: ids.size, signature: hash, ...(changed ? { changed } : {}) }
   }
 
   function idPass(): void {
@@ -327,7 +344,7 @@ export function installExport(parts: ExportParts): void {
       if (!pre?.at) throw new Error('the harness clock is not installed')
       const walking: boolean[] = []
       let cam: { p: number[]; q: number[]; r: number[]; fov: number; proj: number[]; world: number[] } | null = null
-      let set = mounted()
+      let set: ReturnType<typeof mounted> | null = null
       for (let k = 0; k < plan.times.length; k++) {
         jitter = plan.jitter[k] ?? [0, 0]
         idDue = plan.ids && k === plan.anchor
@@ -352,7 +369,8 @@ export function installExport(parts: ExportParts): void {
       }
       jitter = [0, 0]
       const t1 = performance.now()
-      const rgb = resolve(drawn, plan.grain, plan.seed)
+      // a frame at rest carries the still's own film, so a join holds with the grain baked in
+      const rgb = resolve(drawn, plan.grain, walking.every((w) => !w) ? 0 : plan.seed)
       const t2 = performance.now()
       let depth = new Float32Array(0)
       let ids = new Uint32Array(0)
