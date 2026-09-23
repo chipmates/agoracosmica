@@ -1036,8 +1036,12 @@ function doorReveal(s: Sink, to: 'kitchen' | 'service-link'): void {
   s.quad(P3(far(b), z0), P3(b, z0), P3(b, z1), P3(far(b), z1), n([-dir[0], -dir[1]]), [0, z0], [depth, z0], [depth, z1], [0, z1], K.PLASTER, seed)
   // soffit, under an oak lintel's face
   s.quad(P3(a, z1), P3(far(a), z1), P3(far(b), z1), P3(b, z1), [0, 0, -1], [0, 0], [depth, 0], [depth, 1], [0, 1], K.OAK, seed)
-  // threshold, a worn tuffeau slab
+  // threshold, a worn tuffeau slab; the sun's patch ends at the wall's line,
+  // so the slab takes the passage's light, not the key's
+  const lit = s.lit
+  s.lit = 0
   s.quad(P3(a, z0 + .004), P3(b, z0 + .004), P3(far(b), z0 + .004), P3(far(a), z0 + .004), [0, 0, 1], [0, 0], [1, 0], [1, depth], [0, depth], K.STONE, seed + .5)
+  s.lit = lit
 }
 
 /* ---- the glass, from inside ---- */
