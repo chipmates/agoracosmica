@@ -56,9 +56,11 @@ export const LEAF_RECIPES: Record<Species, LeafRecipe> = {
   willow: { profile: (t: number) => Math.pow(Math.sin(Math.PI * Math.pow(t, .9)), 1.1) * .5, width: .2, teeth: { count: 40, depth: .02 }, stalk: .04, veins: 14, spray: { leaves: 11, angle: .45 } },
   poplar: { profile: (t: number) => (t < .2 ? .5 * Math.sin(Math.PI / 2 * t / .2) : .5 * Math.pow((1 - t) / .8, .85)), width: .9, teeth: { count: 20, depth: .03 }, stalk: .22, veins: 6, spray: { leaves: 6, angle: .85 } },
   pear: { profile: ovate, width: .64, teeth: { count: 30, depth: .015 }, stalk: .2, veins: 8, spray: { leaves: 7, angle: .7 } },
+  hawthorn: { profile: obovate, width: .7, lobes: { count: 2.5, depth: .45 }, stalk: .12, veins: 4, spray: { leaves: 9, angle: .8 } },
+  blackthorn: { profile: elliptic, width: .45, teeth: { count: 24, depth: .03 }, stalk: .06, veins: 6, spray: { leaves: 10, angle: .7 } },
 }
 
-const ORDER: readonly Species[] = ['walnut', 'elm', 'oak', 'maple', 'cherry', 'hornbeam', 'alder', 'willow', 'poplar', 'pear']
+const ORDER: readonly Species[] = ['walnut', 'elm', 'oak', 'maple', 'cherry', 'hornbeam', 'alder', 'willow', 'poplar', 'pear', 'hawthorn', 'blackthorn']
 /** the atlas cell of a species' single leaf, and of its spray */
 export const leafCell = (species: Species): number => ORDER.indexOf(species)
 export const sprayCell = (species: Species): number => 16 + ORDER.indexOf(species)

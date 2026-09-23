@@ -35,7 +35,7 @@ import {
   type Refuse, type Species, type TreeDetail, type TreeResult, type TreeSpec, type TreeTier,
 } from './tree-growth'
 import { createFallingLeaves, windPosition, windWanted, type FallSource } from './wind'
-import { layLitter, stopDistance } from './leaf-litter'
+import { layLitter, stageWeight, stopDistance } from './leaf-litter'
 import { builtFaces } from './ground-walls'
 
 const PROVENANCE = {
@@ -43,7 +43,7 @@ const PROVENANCE = {
   assetClass: 'GENERATED',
   certainty: 'conjectural',
   basis: 'Flora card FLORA.md §6 (species and their state about 20 October, all types for Cloux, none documented there); modern garden plates Q119, Q128 and Q178 for the branching character only. Planting positions and tree dimensions are not period evidence.',
-  recipe: 'Deterministic trees grown per species habit (types of the flora card): a trunk that runs or forks into leaders, scaffold limbs that fork toward the crown the species makes, second-order branches and twigs, each grown segment by segment and stopped at the crown skin or at a refused place. Every leaf of a near crown is its own card of its species outline (a compound leaf for walnut); a crown further off is carried by spray cards of the same leaf; the count follows the crown skin and the share the week has taken; each leaf turns its face to the light out of the crown and takes its colour from the species palette of the week by how far it has turned. Bark as tubes with shared rings and a flared foot sunk into the sampled ground. Leaf and bark maps are drawn from recipes in code. Leaves carry the key light through themselves and cast through one opaque triangle inside each outline. Fallen leaves lie under and downwind of each crown, a third kept on walked pads, and along the north and west walls of the insertion court. No leaf or limb stands inside a building or within 3.2 m above a certified walking surface. Wind only on an address that asks for it.',
+  recipe: 'Deterministic trees and hedge shrubs grown per species habit (types of the flora card): a trunk that runs or forks into leaders, scaffold limbs that fork toward the crown the species makes, second-order branches and twigs, each grown segment by segment and stopped at the crown skin or at a refused place; a refused fork is tried once bent upward, a limb that carries no leaf anywhere below it is taken off, and a limb left without a fork tapers to a tip. Every leaf of a near crown is its own card of its species outline (a compound leaf for walnut); a crown further off is carried by spray cards of the same leaf, and a mid tree a stop sees within 32 m draws every twig that bears one. Each species turns at one stage for the week (a third to two thirds of the crown; oak and alder greener), each leaf by how exposed it stands (outer, upper, sunward), with a small turn by limb and by tree. Hawthorn and blackthorn stand single over the meadows and in short rows on field lines. Bark as tubes with shared rings and a flared foot sunk into the sampled ground. Leaf and bark maps are drawn from recipes in code. Leaves carry the key light through themselves and cast through one opaque triangle inside each outline. The week\'s fall lies as a carpet under each crown dropping it, as drifts against every riser, wall foot and retaining face across the south-west wind, as a clumped scatter, in the lane\'s ruts and gutters and over the walled court\'s floor, densest where the stops see it. No leaf or limb stands inside a building, within 3.2 m above a certified walking surface, or inside the grave court below its walls\' top. Wind only on an address that asks for it.',
 }
 
 /* ─── the planting ─────────────────────────────────────────────────────── */
@@ -104,6 +104,40 @@ function distantPlanting(): TreeSpec[] {
     const north = bank === 2 ? -148 - place() * 66 : -135 + place() * 255
     const species = woods[Math.floor(place() * woods.length)]!
     plans.push({ id: `distant-${i + 1}`, species, east, north, height: 11.5 + place() * 9.5, seed: 2103 + i * 347, detail: 'far' })
+  }
+  return plans
+}
+
+/** The meadow's shrubs: hawthorn and blackthorn, the hedge plants of the
+    flora card, standing single over the grazed slopes the chamber and the
+    garden look across and in a few short rows on the field lines. Types of
+    the period; every place is this exhibition's choice. */
+function shrubPlanting(taken: readonly TreeSpec[]): TreeSpec[] {
+  const place = mulberry(15171061)
+  const plans: TreeSpec[] = []
+  const clear = (e: number, n: number): boolean =>
+    taken.every(t => Math.hypot(t.east - e, t.north - n) > 7) && plans.every(t => Math.hypot(t.east - e, t.north - n) > 3.5)
+  const shrub = (e: number, n: number, i: number, row = false): void => {
+    const species: Species = place() < .6 ? 'hawthorn' : 'blackthorn'
+    plans.push({ id: `${row ? 'hedge' : 'shrub'}-${i}`, species, east: e, north: n, height: (row ? 2.6 : 2.4) + place() * 2.2,
+      seed: 5101 + i * 211, detail: 'far', leafCap: 340, lean: [(place() - .5) * .6, (place() - .5) * .6] })
+  }
+  // single shrubs over the meadows each stop looks across
+  let i = 0
+  for (let k = 0; k < 900 && i < 14; k++) {
+    const e = -110 + place() * 150, n = -75 + place() * 130
+    const seen = stageWeight(e, n), eye = stopDistance(e, n)
+    if (seen < .15 || eye < 22 || eye > 100 || !clear(e, n)) continue
+    shrub(e, n, i++)
+  }
+  // three short rows on field lines, as hedges stand on the slopes
+  const rows: readonly [number, number, number, number][] = [[-84, -6, -70, 12], [-58, 30, -38, 44], [-96, 26, -80, 46]]
+  for (const [e0, n0, e1, n1] of rows) {
+    const span = Math.hypot(e1 - e0, n1 - n0), count = Math.round(span / 2.1)
+    for (let k = 0; k <= count; k++) {
+      const t = k / count, e = e0 + (e1 - e0) * t + (place() - .5) * .8, n = n0 + (n1 - n0) * t + (place() - .5) * .8
+      if (taken.every(tr => Math.hypot(tr.east - e, tr.north - n) > 5)) shrub(e, n, i++, true)
+    }
   }
   return plans
 }
@@ -330,7 +364,8 @@ export function planVegetation(heightAt: (east: number, north: number) => number
 
 function* grow(group: Group, heightAt: (east: number, north: number) => number, tier: TreeTier): Generator<void, void, void> {
   const { around, openGround, onBuilding, onWater, onWalk } = refusals(heightAt)
-  const planted = [...PLANTING, ...distantPlanting()].filter(spec => openGround(spec.east, spec.north, Math.max(.8, spec.height * .03)))
+  const trees = [...PLANTING, ...distantPlanting()]
+  const planted = [...trees, ...shrubPlanting(trees)].filter(spec => openGround(spec.east, spec.north, Math.max(.8, spec.height * .03)))
     .map(spec => spec.detail === 'mid' && stopDistance(spec.east, spec.north) < 32 ? { ...spec, close: true } : spec)
   // the house's own trees and the valley's woods are dealt apart, so a view
   // of the house refuses the woods whole; the woods cast no shadow the walk
@@ -397,6 +432,7 @@ function* grow(group: Group, heightAt: (east: number, north: number) => number, 
     walls: builtFaces(),
     bodyAt,
     lane: { centre: polygon('street').slice(0, 6).map(p => [p[0]!, p[1]!] as [number, number]), width: feature('street').width_m!.value },
+    court: { floor: COURT_GROUND, toWall: (e, n) => Math.min(Math.abs(e - GALLERY.backKerb), Math.abs(n - GALLERY.northKerb) + (e > GALLERY.returnEast ? 99 : 0)) },
   })
   yield
   const wind = windWanted()

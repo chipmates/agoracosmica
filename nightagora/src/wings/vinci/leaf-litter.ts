@@ -102,6 +102,9 @@ export interface LitterPlan {
   bodyAt: (east: number, north: number) => { leaves: Body; shadow: Body | null }
   /** a carted road: its centre line and its width */
   lane?: { centre: readonly V2[]; width: number }
+  /** a walled court the wind blows leaves into over its walls: its made
+      floor's rectangles and how near a place is to the walls they come over */
+  court?: { floor: readonly { west: number; south: number; east: number; north: number }[]; toWall: (east: number, north: number) => number }
 }
 
 interface Source { species: Species; e: number; n: number; reach: number; fallen: number }
@@ -300,7 +303,7 @@ export function layLitter(plan: LitterPlan): number {
       const a = centre[i - 1]!, b = centre[i]!, dx = b[0] - a[0], dn = b[1] - a[1], span = Math.hypot(dx, dn)
       if (span < .1) continue
       const ux = dx / span, un = dn / span, px = -un, pn = ux
-      const count = Math.round(span * width * 4.5 * keep)
+      const count = Math.round(span * width * 11 * keep)
       for (let k = 0; k < count; k++) {
         const t = random(), lane = random(), g = gauss(random), s1 = random(), s2 = random(), s3 = random()
         // two ruts 1.4 m apart, two gutters at the edges, a little between
@@ -323,6 +326,28 @@ export function layLitter(plan: LitterPlan): number {
     }
   }
   litterCounts.lane = laid - litterCounts.carpet - litterCounts.drifts - litterCounts.scatter
+  // ─── THE WALLED COURT: what comes over its walls lies about its floor,
+  // thickest in the lee of the walls it came over
+  if (plan.court) {
+    const random = mulberry(15171025)
+    for (const g of plan.court.floor) {
+      const area = (g.east - g.west) * (g.north - g.south)
+      const tries = Math.round(area * 3.2 * keep)
+      for (let k = 0; k < tries; k++) {
+        const e = g.west + random() * (g.east - g.west), n = g.south + random() * (g.north - g.south)
+        const s1 = random(), s2 = random(), s3 = random(), s4 = random()
+        const lee = Math.exp(-plan.court.toWall(e, n) / 3.5)
+        if (random() > (.22 + .78 * lee) * stageWeight(e, n) || plan.refused(e, n)) continue
+        const here = supply(e, n), species = s3 < .7 ? here.species : here.second
+        lay(plan.bodyAt(e, n), {
+          species, east: e, north: n, y: plan.floorAt(e, n) + .002 + s2 * .004, angle: s1 * Math.PI * 2,
+          length: leafLengthOf(species) * (1 + s2 * .4) * grow, colour: colourOf(species, s2, s1 * .5),
+          fold: .1 + s1 * .3, folded: !calm && stopDistance(e, n) < 12, tilt: (s4 - .5) * .15, ao: .76 + s2 * .18, casts: false,
+        })
+        laid++
+      }
+    }
+  }
   return laid
 }
 

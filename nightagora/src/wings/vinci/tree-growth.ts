@@ -19,6 +19,7 @@ import { hourKey } from './site'
 export type Species =
   | 'walnut' | 'elm' | 'oak' | 'maple' | 'cherry' | 'hornbeam'
   | 'alder' | 'willow' | 'poplar' | 'pear'
+  | 'hawthorn' | 'blackthorn'
 export type TreeDetail = 'near' | 'mid' | 'far'
 export type TreeTier = 'hero' | 'standard' | 'calm'
 
@@ -216,6 +217,35 @@ export const HABITS: Record<Species, Habit> = {
     green: [['#5c6a36', 1], ['#6d7539', .8]],
     turned: [['#8b8a3e', .7], ['#b79a3c', 1], ['#b8743a', 1], ['#8e4034', .8], ['#6a3a33', .3]],
     exposureTurn: .55,
+  },
+  // the hedge shrubs of the flora card: many stems from the ground, a dense
+  // twiggy head; hawthorn turning russet and red, blackthorn holding its
+  // green longer and going yellow
+  hawthorn: {
+    trunkShare: .08, leaders: [4, 6], leaderAngle: .5, crownBase: .12, spread: 1.05, widest: .5, blunt: 1.1,
+    scaffoldPerM: 1.6, scaffoldAngle: [1.0, .6], curve: .25, tropism: .02,
+    branchPerM: 2.6, branchAngle: .7, branchReach: .5, branchTropism: .0,
+    twigPerM: 4, twigLength: .22, twigTropism: .05,
+    leafGather: .4,
+    leaf: { outline: 'lobed', length: .045, width: .7, droop: .2 },
+    girth: .035, bark: { kind: 'furrowed', colour: '#5d574e', lichen: '#7b8068' },
+    fallen: .2, stage: .5,
+    green: [['#4d5a30', 1], ['#5a6634', 1]],
+    turned: [['#8b7a3c', 1], ['#9c5a32', 1.2], ['#7a3a2e', 1], ['#5e4a33', .5]],
+    exposureTurn: .6,
+  },
+  blackthorn: {
+    trunkShare: .06, leaders: [5, 7], leaderAngle: .45, crownBase: .1, spread: .95, widest: .45, blunt: 1.3,
+    scaffoldPerM: 1.8, scaffoldAngle: [1.05, .6], curve: .3, tropism: .0,
+    branchPerM: 2.8, branchAngle: .75, branchReach: .45, branchTropism: -.02,
+    twigPerM: 4.2, twigLength: .2, twigTropism: .0,
+    leafGather: .35,
+    leaf: { outline: 'elliptic', length: .038, width: .45, droop: .25 },
+    girth: .03, bark: { kind: 'smooth', colour: '#3f3b38', lichen: '#6f7563' },
+    fallen: .12, stage: .35,
+    green: [['#3f4b2a', 1], ['#4b5830', 1]],
+    turned: [['#8e8a45', 1], ['#a38f47', 1], ['#6e5a36', .5]],
+    exposureTurn: .5,
   },
 }
 
@@ -1047,7 +1077,7 @@ export function fallenPalette(species: Species): { colours: V3[]; weights: numbe
     const c = hexToLinear(hex), age = i / Math.max(1, turned.length - 1)
     colours.push([c[0] * .98, c[1] * .9, c[2] * .8])
     weights.push(w * (.7 + .6 * age))
-    colours.push([c[0] * .78, c[1] * .64, c[2] * .52])
+    colours.push([c[0] * .86, c[1] * .72, c[2] * .6])
     weights.push(w * (.35 + .5 * age))
   }
   return { colours, weights }
