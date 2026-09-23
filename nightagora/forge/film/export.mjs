@@ -24,7 +24,7 @@ import { pathToFileURL } from 'node:url'
 import { gunzipSync, gzipSync } from 'node:zlib'
 import sharp from 'sharp'
 import { APP_ROOT, assertServer, browserArgs, FRAME_TIME_FLAGS, headHere, waitForServer, wingStanding } from '../rig.mjs'
-import { BARE, CHROME_OFF, installVirtualClock } from '../prerender/clock.mjs'
+import { BARE, CHROME_OFF, STILL_DESK, installVirtualClock } from '../prerender/clock.mjs'
 import { restingPending } from '../prerender/pending.mjs'
 import { FPS, FRAMINGS, buildGraph } from './graph.mjs'
 import { camPrint as nodePrint, openReplay, replayEdge } from './replay.mjs'
@@ -332,7 +332,8 @@ async function openSession(browser, framing, { base, scale, sink, warmNodes, log
     ;(r.resourceType() === 'image' ? record.chrome : record.late).push(r.url().replace(base, ''))
   })
   const first = warmNodes[0]
-  await page.goto(`${base}/w/vinci?probe=1&tier=max&export=1&order=life&pr=${scale}#s=${first.station}`, { waitUntil: 'load' })
+  // the stills' own address: the desktop's band is chrome, and the film's frame is the whole canvas
+  await page.goto(`${base}/w/vinci?probe=1&tier=max&export=1&order=life&pr=${scale}&desk=${STILL_DESK}#s=${first.station}`, { waitUntil: 'load' })
   if (!(await wingStanding(page))) throw new Error('the wing never stood')
   const said = await page.evaluate(() => ({ backend: document.body.dataset.backend, tier: document.body.dataset.tier }))
   if (said.backend !== 'webgpu' || said.tier !== 'max') throw new Error(`backend ${said.backend}, tier ${said.tier}: the film wants webgpu at max`)
