@@ -78,7 +78,9 @@ export function mountHallAir(scene: Scene, lit: readonly Light[], density: numbe
   const top = 1.0, inset = .03
   const geometry = new BoxGeometry(H.east - H.west - 2 * inset, top - FLOOR - 2 * inset, H.north - H.south - 2 * inset)
   geometry.translate((H.west + H.east) / 2, (FLOOR + top) / 2, -(H.south + H.north) / 2)
-  const material = new VolumeNodeMaterial({ steps: 40 })
+  // enough steps that the dither which breaks the banding is finer than the
+  // eye can hold as a pattern, even around a lamp
+  const material = new VolumeNodeMaterial({ steps: 88 })
   material.name = 'vinci/collection-hall-air'
   material.side = BackSide
   material.blending = AdditiveBlending
@@ -95,7 +97,7 @@ export function mountHallAir(scene: Scene, lit: readonly Light[], density: numbe
   // the air is densest low down and thins toward the roof, and it is never
   // quite even: a slow drift, metres across, so no two shafts read the same
   const scattering = ({ positionRay }: { positionRay: N }): N => {
-    const low = float(1).sub(smoothstep(float(FLOOR), float(top), positionRay.y)).mul(.55).add(.45)
+    const low = float(1).sub(smoothstep(float(FLOOR), float(top), positionRay.y)).mul(.8).add(.2)
     const drift = mx_noise_float(positionRay.mul(.23)).mul(.35).add(1)
     return low.mul(drift).mul(density)
   }
