@@ -75,7 +75,7 @@
       "prompt": "Spoken bilingual museum labels with unchanged station names and canonical door questions. Plain source explanations and a separately opened complete record retain the original source chain, dimensional ranges, uncertainty and identical computed-hour arithmetic.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "1b35c0c9e0496218f2ecfdb46dcec80be2e66f8286fb8545e41b74c976486219",
+      "sha256": "40e6f4204a6f01afa809acbef67cc3c93c7977d585091205b1c4e0541d6ef53d",
       "note": "brief/CONCEPT-OPUS.md; brief/CONCEPT-GPT6.md; src/wings/vinci/data/doors.json; recipe_file=src/wings/vinci/content.ts; visitor_evidence_recipe=src/wings/vinci/evidence-copy.ts; visitor_evidence_sha256=1154b783a9a2b7bddd75d4d1294475ae82dbe74006e4b6ff5c0eb2df9247ed00"
     },
     {
@@ -257,7 +257,7 @@
       "prompt": "Derived 33.8721 square metre inner court apron closes the literal court to registered facade chain at A-SITE zero nominal. Five clipped threshold steps, procedural wear, bedded river pebbles and drain; reconstruction with conjectural dressing. Mounted during court refinement with explicit source-card assumptions.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "46a78ea61bb3229a0bf30079b66973d7aa40498c7e18305a54b3b0519e6fe60b",
+      "sha256": "ffea0b13511256c5b62e6edd8c132bc14aa3fc8fe5820cef3946e98d2906ddf6",
       "note": "Q124; A-SITE; recipe_file=src/wings/vinci/inner-court.ts"
     },
     {
@@ -283,7 +283,7 @@
       "prompt": "Original road surface proposal: mapped alignment Gaussian wheel wear, deterministic sparse gravel and straw, stone gutter at actual F01/F02 foot; no change to retained grades, conjectural dimensions and basis disclosed EN/DE. Distribute fixed gravel candidates in proportion to retained road segment length; grey mineral chips cluster at shoulders and disperse through the compacted earth. Embed every corner in the common grade and reject grade seams. No new paving or drainage alignment. Refine the mapped road material with a boundary-only union mask, removing internal miter seams without altering grade or width; add conjectural 24 cm compacted-mineral variation and warmer grey-beige albedo, quieter in existing wheel bands. Preserve all mounted chips, gutter geometry, physical dimensions and light.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "a14364c699933b91b4bd5fa0945001035a1ee3be5ef574ff4b9ddc0b9710c6e6",
+      "sha256": "85832e1a993a64373d9df71f9a81035cda6ca2a87919761e53608d105a81509e",
       "note": "Q019; Q134; OSM-AREA; A-SITE; recipe_file=src/wings/vinci/road-dressing.ts"
     },
     {
@@ -3240,7 +3240,7 @@
       "prompt": "Bilingual museum readings of the supplied collection and admitted source records. Keep attribution and photographic uncertainty explicit, name collections plainly, and keep exact measurements, licence lines, file identifiers and machine evidence in the deliberately opened complete record. No additional historical claim from generated imagery.",
       "model": "Human-readable text composition from supplied records",
       "note": "Museum wording authorized by window 3. recipe_file=src/wings/vinci/pictures/visitor-copy.ts",
-      "sha256": "1acefc6e7d16bd9d38b2c70c8d8e60651d2ca2b46422493d14a06632daca5589"
+      "sha256": "2be0ff498b5d8a03f66fa5cc68611c44ff2a6d1b4a5e50d24ac3498748ef094f"
     },
     {
       "wing": "vinci",
