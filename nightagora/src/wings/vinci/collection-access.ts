@@ -2,7 +2,8 @@
  * The literal platform outlines/levels and all raw IGN samples are retained;
  * only these exact landing/tread footprints receive an authored grade cut.
  */
-import { BufferGeometry, Float32BufferAttribute, Group, Mesh } from 'three/webgpu'
+import { BufferGeometry, Float32BufferAttribute, Group, Mesh, type MeshStandardNodeMaterial } from 'three/webgpu'
+import * as TSL from 'three/tsl'
 import { polygon, world } from './site'
 import { collectionConcreteMaterial, type CollectionGradeRegion } from './collection'
 
@@ -74,15 +75,52 @@ export const collectionAccessProvenance = {
   date: '2026-09-10',
 } as const
 
+// TSL's composable overloads are held at this one boundary.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type N = any
+/** A modern stair a few years out of doors: rain runs off the kerb tops, the
+ * shaded feet green, the court's grit lies against the kerbs and the treads
+ * wear pale down their middle. Colour and roughness over the shared cast
+ * concrete; `faceSpan` (metres over a face's foot, under its head) is read. */
+export function weatherCourtConcrete(m: MeshStandardNodeMaterial): MeshStandardNodeMaterial {
+  const { attribute, exp, float, floor, fract, mix, mx_noise_float, normalWorldGeometry, positionWorld, smoothstep, vec3 } = TSL as unknown as Record<string, N>
+  const P = positionWorld, n = normalWorldGeometry, span = attribute('faceSpan', 'vec2')
+  const vertical = float(1).sub(smoothstep(.4, .8, n.y.abs())), up = smoothstep(.8, .95, n.y)
+  const col = smoothstep(.3, .7, mx_noise_float(vec3(P.x.mul(8.5), P.y.mul(.6), P.z.mul(8.5))).mul(.5).add(.5))
+  const runs = exp(span.y.div(col.mul(.45).add(.12)).negate()).mul(col.mul(.7).add(.3)).mul(vertical)
+  const patchy = mx_noise_float(P.mul(2.1).add(vec3(4.2, 1.7, 3.9))).mul(.5).add(.5)
+  const foot = float(1).sub(smoothstep(.02, .3, span.x)).mul(vertical).mul(patchy.mul(.6).add(.4))
+  // each 150 mm board of the formwork took the pour a little differently
+  const board = fract(floor(P.y.div(.15)).mul(12.9898).sin().mul(43758.5453)).sub(.5).mul(vertical)
+  const across = P.x.sub(crossing[0]).mul(tangent[0]).add(P.z.negate().sub(crossing[1]).mul(tangent[1])).abs()
+  const worn = exp(across.div(.5).pow(2).negate()).mul(up).mul(float(1).sub(smoothstep(.9, 1, across)))
+  const grit = smoothstep(.72, .98, across).mul(float(1).sub(smoothstep(.99, 1.01, across))).mul(up)
+  const pores = smoothstep(.55, .85, mx_noise_float(P.mul(38)).mul(.5).add(.5)).mul(up)
+  let c: N = m.colorNode
+  c = c.mul(board.mul(.13).add(1))
+  c = mix(c, c.mul(vec3(.58, .57, .54)), runs.mul(.8))
+  c = mix(c, c.mul(vec3(.50, .56, .45)), foot.mul(.8))
+  // a kerb's top keeps the court's dirt and a skin of lichen in its pores
+  const kerb = up.mul(float(1).sub(worn)).mul(float(1).sub(grit))
+  c = mix(c, mix(c.mul(vec3(.70, .69, .64)), c.mul(vec3(.66, .72, .58)), patchy), kerb.mul(.55))
+  c = c.mul(float(1).sub(pores.mul(.14))).mul(float(1).sub(grit.mul(.32)))
+  c = mix(c, c.mul(vec3(1.07, 1.065, 1.05)), worn.mul(.6))
+  c = c.mul(patchy.sub(.5).mul(.12).add(1))
+  m.colorNode = c
+  m.roughnessNode = (m.roughnessNode as N).sub(worn.mul(.08)).add(runs.mul(.03)).clamp(.72, .98)
+  return m
+}
+
 export function createCollectionAccess(): Group {
-  const position: number[] = [], normal: number[] = [], uv: number[] = []
+  const position: number[] = [], normal: number[] = [], uv: number[] = [], span: number[] = []
   const quad = (a: Point3, b: Point3, c: Point3, d: Point3, facing: Point3) => {
     const points = [a, b, c, d].map(p => world(...p))
     const n = points[1]!.clone().sub(points[0]!).cross(points[2]!.clone().sub(points[0]!)).normalize()
     // Retain the original diagonal, vertices and world UVs exactly.
     const reverse = n.dot(world(...facing)) < 0
     if (reverse) n.negate()
-    for (const i of reverse ? [0, 2, 1, 0, 3, 2] : [0, 1, 2, 0, 2, 3]) { const p = points[i]!; position.push(p.x, p.y, p.z); normal.push(n.x, n.y, n.z); uv.push(p.x, p.z) }
+    const lo = Math.min(a[2], b[2], c[2], d[2]), hi = Math.max(a[2], b[2], c[2], d[2]), flat = Math.abs(n.y) > .5
+    for (const i of reverse ? [0, 2, 1, 0, 3, 2] : [0, 1, 2, 0, 2, 3]) { const p = points[i]!; position.push(p.x, p.y, p.z); normal.push(n.x, n.y, n.z); uv.push(p.x, p.z); span.push(flat ? 9 : p.y - lo, flat ? 9 : hi - p.y) }
   }
   const faceAlong = (sign: number): Point3 => [outward[0] * sign, outward[1] * sign, 0]
   const faceAcross = (sign: number): Point3 => [tangent[0] * sign, tangent[1] * sign, 0]
@@ -115,9 +153,10 @@ export function createCollectionAccess(): Group {
   }
   const geometry = new BufferGeometry()
   geometry.setAttribute('position', new Float32BufferAttribute(position, 3)); geometry.setAttribute('normal', new Float32BufferAttribute(normal, 3)); geometry.setAttribute('uv', new Float32BufferAttribute(uv, 2))
+  geometry.setAttribute('faceSpan', new Float32BufferAttribute(span, 2))
   geometry.computeBoundingBox(); geometry.computeBoundingSphere()
   geometry.userData = { basis: collectionAccessProvenance.recipe, triangles: position.length / 9 }
-  const mesh = new Mesh(geometry, collectionConcreteMaterial(true)); mesh.name = 'vinci/collection-access/concrete'
+  const mesh = new Mesh(geometry, weatherCourtConcrete(collectionConcreteMaterial(true))); mesh.name = 'vinci/collection-access/concrete'
   mesh.castShadow = true; mesh.receiveShadow = true; mesh.userData = { ...collectionAccessProvenance }
   const group = new Group(); group.name = 'vinci/collection-court-terrace-access'; group.userData = { ...collectionAccessProvenance, layout: L, meshes: 1, triangles: position.length / 9 }
   group.add(mesh); return group

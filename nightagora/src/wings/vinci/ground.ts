@@ -7,7 +7,7 @@ import { roadSurfaceNode } from './road-dressing'
 import { facadeDistance, foundationVisibility } from './foundation'
 import { partitionDressing } from './dressing-partition'
 import { collectionConcreteMaterial, collectionProvenance } from './collection'
-import { collectionAccessProvenance } from './collection-access'
+import { collectionAccessProvenance, weatherCourtConcrete } from './collection-access'
 import { anisotropicFootprint, coursedFace, dressedTuffeau } from './masonry-courses'
 import { fractalField, resolved, specularAA } from '../../stack/detail'
 import { applyYardFinish } from './ground-finish'
@@ -156,11 +156,14 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     // drink and stay dark; both are stone to stone, not a pattern.
     const bed=laid.cell.sub(.5).mul(laid.held)
     const soaked=smoothstep(.72,.96,laid.cell).mul(laid.held)
-    let stone=rgb('#b8aa8e').mul(block.mul(1.25).add(1)).mul(drift.mul(.20).add(1))
-      .mul(bed.mul(.30).add(1)).mul(float(1).sub(soaked.mul(.17)))
+    let stone=rgb('#b8aa8e').mul(block.mul(2.1).add(1)).mul(drift.mul(.20).add(1))
+      .mul(bed.mul(.46).add(1)).mul(float(1).sub(soaked.mul(.26)))
       .mul(streak.mul(.13).add(1)).mul(cleft.mul(.09).add(1)).mul(float(1).sub(pores.mul(.22)))
       .mul(grooves.mul(.032).add(1)).mul(chatter.mul(.085).add(1)).mul(shells.mul(.19).add(1))
     stone=mix(stone,rgb('#9d9784'),bed.add(.5).mul(.34).mul(laid.held))
+    // beds of one quarry lean yellow or grey, stone by stone
+    const hue=fract(laid.cell.mul(91.7)).sub(.5).mul(laid.held)
+    stone=stone.mul(vec3(.05,0,-.1).mul(hue.max(0).mul(2)).add(1)).mul(vec3(-.06,-.025,.02).mul(hue.negate().max(0).mul(2)).add(1))
     // Lichen takes a coping and the shaded foot of a wall before it takes the
     // face; it is colour, and it never becomes a pattern.
     const lichen=smoothstep(.30,.74,mx_noise_float(P.mul(vec3(2.6,1.4,2.6)).add(vec3(2.1,6.7,3.3))).mul(shows(1/2.6)))
@@ -178,6 +181,12 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     const toe=float(1).sub(smoothstep(.02,.07,aboveFoot)).mul(riser).mul(middle)
     stone=mix(stone,stone.mul(vec3(1.12,1.11,1.07)),nosing.mul(.75))
     stone=stone.mul(float(1).sub(toe.mul(.25)))
+    // THE DAMP LINE WHERE A WALL MEETS THE GRASS: the sward holds the wet
+    // against the foot, a dark band a hand over the blades, its top wandering.
+    const tall=smoothstep(.34,.5,aboveFoot.add(belowHead))
+    const sward=mx_noise_float(vec3(U.x.mul(1.3),0,8.3)).mul(.13).add(.44).add(mx_noise_float(vec3(U.x.mul(5.9),0,2.2)).mul(.045).mul(shows(1/5.9)))
+    const wetFoot=float(1).sub(smoothstep(sward.sub(.14),sward.add(.03),aboveFoot)).mul(vertical).mul(tall)
+    stone=mix(stone,stone.mul(vec3(.60,.62,.54)),wetFoot.mul(.72))
     if(library){const maps=library.sync('stone-tuffeau').sample({uv:U,metres:.19,turn:.37});stone=stone.mul(mix(float(1),maps.albedo.clamp(.78,1.22),shows(.03).mul(.40)))}
     m.colorNode=mix(stone,rgb('#8c826d').mul(laid.cell.mul(.26).add(.87)),seam.mul(.58)).mul(float(1).sub(damp.mul(.15)))
     // Recessed joints and the damp foot see less sky than the block faces.
@@ -331,9 +340,9 @@ export function createGround(tier:TierName,library?:MaterialLibrary):Group {
   const batches=buildTerrainMeshes(tier)
   for(const [name,geometry] of Object.entries(batches)) {
     const kind=name==='retaining'?'stone':name==='grass'?'grass':'earth'
-    if(kind==='stone')faceSpans(geometry)
     const modern=name==='collectionRetaining'
-    const mesh=new Mesh(geometry,modern?collectionConcreteMaterial():groundMaterial(kind,library));mesh.receiveShadow=true;mesh.castShadow=name==='retaining'||modern;mesh.name=`wing-vinci/${name}`
+    if(kind==='stone'||modern)faceSpans(geometry)
+    const mesh=new Mesh(geometry,modern?weatherCourtConcrete(collectionConcreteMaterial()):groundMaterial(kind,library));mesh.receiveShadow=true;mesh.castShadow=name==='retaining'||modern;mesh.name=`wing-vinci/${name}`
     if(modern){mesh.userData={manifestId:collectionProvenance.manifestId,assetClass:'GENERATED',certainty:'reconstructed',component:'collection-cut-and-fill-lining',label:collectionProvenance.approachLabel,accessLabel:collectionAccessProvenance.label};geometry.userData.basis=collectionProvenance.recipe+' '+collectionAccessProvenance.recipe}
     // The sward is one body two hundred metres across, so every frame drew
     // all of it, court or valley. Partitioned it is the same triangles in
