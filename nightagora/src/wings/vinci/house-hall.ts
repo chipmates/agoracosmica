@@ -453,8 +453,12 @@ export const houseHallProvenance = {
 export interface HouseHall { group: Group; triangles: number; patches: number }
 
 /** Build the hall. `cell` is the lining grid the light is baked on. */
+/** The vertex bake is what the lighter tier reads; the hero tier lights every
+ * point in the shader and skips it. */
+let bakeVertices = true
 export function createHouseHall(tier: TierName, library?: MaterialLibrary): HouseHall {
   const hero = tier === 'hero'
+  bakeVertices = !hero
   const s = new Sink()
   buildHallShell(s, hero)
   buildLink(s, hero)
@@ -616,7 +620,7 @@ function tile(s: Sink, poly: V2[], z: number, seed: number): void {
   const h = (q: V2): number => top + (q[0] - c[0]) * tiltU + (q[1] - c[1]) * tiltV
   const P3 = (q: V2, zz: number): V3 => P(q[0], q[1], zz)
   const uvOf = (p: V3): V2 => toUV([p[0], p[1]])
-  s.fixed = bakePoint(P3(c, z + .01), [0, 0, 1], true)
+  s.fixed = bakeVertices ? bakePoint(P3(c, z + .01), [0, 0, 1], true) : [0, 0]
   s.wear = floorWear(c)
   // one face per tile: an eased arris would stand under a pixel from the walk
   const facePts = poly.map(q => P3(q, h(q)))
@@ -1249,7 +1253,7 @@ function bake(s: Sink, cast: boolean): BufferGeometry {
     if (!light) {
       const key = `${v.p[0].toFixed(3)},${v.p[1].toFixed(3)},${v.p[2].toFixed(3)},${v.n[0].toFixed(2)},${v.n[1].toFixed(2)},${v.n[2].toFixed(2)}`
       light = baked.get(key)
-      if (!light) { light = v.lit === 2 ? passageLight(v.p, v.n) : bakePoint(v.p, v.n, inHall(v.p) && v.lit > 0); baked.set(key, light) }
+      if (!light) { light = !bakeVertices ? [0, 0] : v.lit === 2 ? passageLight(v.p, v.n) : bakePoint(v.p, v.n, inHall(v.p) && v.lit > 0); baked.set(key, light) }
     }
     positions.push(v.p[0], v.p[2], -v.p[1]); normals.push(v.n[0], v.n[2], -v.n[1]); uvs.push(v.t[0], v.t[1])
     a.push(v.kind, light[0], light[1], v.seed)
@@ -1369,12 +1373,13 @@ function hallMaterial(perPixel: boolean, library?: MaterialLibrary): MeshStandar
   // the shell's own tuffeau set, already loaded for the house: its fine grain
   if (library) {
     const maps = library.sync('stone-tuffeau').sample({ uv: T, metres: .19, turn: .37 })
-    tuffJ = tuffJ.mul(mix(float(1), maps.albedo.clamp(.8, 1.2), .55))
+    tuffJ = tuffJ.mul(mix(float(1), maps.albedo.clamp(.88, 1.12), .22))
   }
   // brick of the fireback: thin Loire bricks in courses
-  const bCourse = floor(Wp.y.div(.066)), bIn = fract(Wp.y.div(.066)), bAlong = fract(alongWall.div(.23).add(bCourse.mul(.5)))
+  // along each face's own horizontal metres, so a cheek square to the wall courses as the back does
+  const bCourse = floor(Wp.y.div(.066)), bIn = fract(Wp.y.div(.066)), bAlong = fract(T.x.div(.23).add(bCourse.mul(.5)))
   const bJoint = max(float(1).sub(smoothstep(.08, .16, bIn.min(float(1).sub(bIn)))), float(1).sub(smoothstep(.025, .05, bAlong.min(float(1).sub(bAlong)))))
-  const brickHue = fract(bCourse.mul(3.7).add(floor(alongWall.div(.23).add(bCourse.mul(.5))).mul(9.1)).sin().mul(4375.5)).sub(.5)
+  const brickHue = fract(bCourse.mul(3.7).add(floor(T.x.div(.23).add(bCourse.mul(.5))).mul(9.1)).sin().mul(4375.5)).sub(.5)
   const brick = mix(vec3(.17, .066, .040).mul(brickHue.mul(.3).add(1)), vec3(.13, .115, .10), bJoint)
   // iron, forged and dark; ash; char
   const iron = vec3(.040, .038, .035).mul(mx_noise_float(Wp.mul(40)).mul(.25).add(1))
