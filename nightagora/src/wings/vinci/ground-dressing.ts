@@ -3,6 +3,7 @@ import {
   BufferGeometry, Color, DoubleSide, Float32BufferAttribute,
   Group, Mesh, MeshStandardNodeMaterial, Vector3,
 } from 'three/webgpu'
+import { cameraViewMatrix, normalWorldGeometry, normalize, texture, uv } from 'three/tsl'
 import { leftOutAtCalm } from './calm-tier'
 import type { TierName } from '../../stack/tier'
 import { dossier, edgeDistance, feature, inside, polygon, type Quantity } from './site'
@@ -13,6 +14,11 @@ import { collectionExclusions } from './collection'
 import { collectionAccessExclusions } from './collection-access'
 import { getInnerCourtOutlines } from './inner-court'
 import { getApronOutlines } from './apron'
+import { pebble, stoneColour, type Emit } from './pebbles'
+import { createMoss } from './moss'
+import { createCreepers } from './creepers'
+import { hidden, STOP_EYES, stopDistance } from './leaf-litter'
+import { GRASS_CELLS, grassAtlas, grassCellUV } from './grass-maps'
 
 interface Batch { positions: number[]; normals: number[]; colours: number[] }
 interface Patch { east: number; north: number; radiusEast: number; radiusNorth: number; weight: number }
@@ -42,9 +48,9 @@ const FOREGROUND_PATCHES: readonly Patch[] = [
 ]
 const WEIGHTED_FOREGROUND = FOREGROUND_PATCHES.flatMap(patch => Array.from({ length: patch.weight }, () => patch))
 const WEIGHTED_PATCHES = PATCHES.flatMap(patch => Array.from({ length: patch.weight }, () => patch))
-const GRASS = ['#626943', '#788050', '#858458', '#9a9260', '#a99b6d', '#697048'].map(c => new Color(c))
+const GRASS = ['#5b6440', '#697249', '#747c4c', '#626943', '#788050', '#858458'].map(c => new Color(c))
+const STRAW = ['#9a9260', '#a99b6d', '#b3a577', '#8f8358', '#7d6e52'].map(c => new Color(c))
 const LEAVES = ['#806143', '#96754b', '#a28b58', '#726048', '#766b42'].map(c => new Color(c))
-const CHIPS = ['#a69e87', '#b7ac92', '#c2b69d', '#988f7b', '#867f6c'].map(c => new Color(c))
 
 function randomSource(seed: number): () => number {
   let value = seed >>> 0
@@ -87,6 +93,56 @@ function tuftBlade(batch: Batch, heightAt: HeightAt, east: number, north: number
   face(batch, middleLeft, middleRight, tip, dry)
 }
 
+interface CardBatch { position: number[]; normal: number[]; colour: number[]; uv: number[] }
+/** One tuft of the sward as two crossed cards of the tuft atlas, standing on
+ * its crown, leaning a little with the week's wind. Their normals stand up
+ * with the sward, so a tuft shades as the ground it grows from. */
+function tuftCards(batch: CardBatch, heightAt: HeightAt, east: number, north: number, width: number, height: number,
+  turn: number, cell: number, tint: [number, number, number], lean: number): void {
+  const { u0, v0, du, dv } = grassCellUV(cell)
+  const ground = heightAt(east, north) - .012
+  const lx = Math.sin(232 * Math.PI / 180 + Math.PI) * lean, ln = Math.cos(232 * Math.PI / 180 + Math.PI) * lean
+  for (const extra of [0, Math.PI / 2]) {
+    const a = turn + extra, ce = Math.cos(a) * width / 2, cn = Math.sin(a) * width / 2
+    const corners: [number, number, number, number, number][] = [
+      [east - ce, north - cn, ground, u0, v0 + dv], [east + ce, north + cn, ground, u0 + du, v0 + dv],
+      [east + ce + lx, north + cn + ln, ground + height, u0 + du, v0], [east - ce + lx, north - cn + ln, ground + height, u0, v0],
+    ]
+    // the card's face turned a little into the normal, so its two sides are lit alike
+    const fx = -Math.sin(a) * .3, fz = -Math.cos(a) * .3
+    for (const i of [0, 1, 2, 0, 2, 3]) {
+      const [e, n, y, u, v] = corners[i]!
+      batch.position.push(e, y, -n)
+      const l = Math.hypot(fx, 1, fz)
+      batch.normal.push(fx / l, 1 / l, fz / l)
+      batch.colour.push(tint[0], tint[1], tint[2])
+      batch.uv.push(u, v)
+    }
+  }
+}
+
+function cardMesh(batch: CardBatch, name: string): Mesh {
+  const geometry = new BufferGeometry()
+  geometry.setAttribute('position', new Float32BufferAttribute(batch.position, 3))
+  geometry.setAttribute('normal', new Float32BufferAttribute(batch.normal, 3))
+  geometry.setAttribute('color', new Float32BufferAttribute(batch.colour, 3))
+  geometry.setAttribute('uv', new Float32BufferAttribute(batch.uv, 2))
+  geometry.computeBoundingSphere()
+  const material = new MeshStandardNodeMaterial({ vertexColors: true, roughness: .92, side: DoubleSide, alphaTest: .45 })
+  material.alphaToCoverage = true
+  material.colorNode = texture(grassAtlas(), uv())
+  // both faces take the sward's own upward normal
+  material.normalNode = normalize(normalWorldGeometry.transformDirection(cameraViewMatrix))
+  material.name = name
+  material.userData = { ...PROVENANCE }
+  const mesh = new Mesh(geometry, material)
+  mesh.name = name
+  mesh.receiveShadow = true
+  mesh.castShadow = false
+  mesh.userData = { ...PROVENANCE }
+  return mesh
+}
+
 /** A proposed dry panicle, not an identified species. Each stalk joins the
  * ground; six small opposing bracts break the silhouette without alpha. */
 function seedStalk(batch: Batch, heightAt: HeightAt, east: number, north: number, height: number, azimuth: number, colour: Color): void {
@@ -126,18 +182,14 @@ function fallenLeaf(batch: Batch, heightAt: HeightAt, east: number, north: numbe
   face(batch, start, tip, right, colour.clone().multiplyScalar(0.87))
 }
 
-function chip(batch: Batch, heightAt: HeightAt, east: number, north: number, size: number, angle: number, colour: Color): void {
-  const base: Vector3[] = []
-  for (let i = 0; i < 4; i++) {
-    const a = angle + i * Math.PI * 0.5
-    const radius = size * (i % 2 ? 0.56 : 0.82)
-    const e = east + Math.cos(a) * radius, n = north + Math.sin(a) * radius
-    base.push(new Vector3(e, heightAt(e, n) + 0.008, -n))
+/** Loose stone into a batch, with the stone's own rounded normals. */
+function stoneInto(batch: Batch): Emit {
+  return (a, b, c, na, nb, nc, colour) => {
+    for (const [p, q] of [[a, na], [b, nb], [c, nc]] as const) {
+      batch.positions.push(p[0], p[1], p[2]); batch.normals.push(q[0], q[1], q[2]); batch.colours.push(colour[0], colour[1], colour[2])
+    }
   }
-  const top = new Vector3(east + size * 0.13, heightAt(east, north) + size * 0.32, -north + size * 0.08)
-  for (let i = 0; i < 4; i++) face(batch, base[i]!, base[(i + 1) % 4]!, top, colour.clone().multiplyScalar(0.91 + i * 0.035))
 }
-
 function meshFrom(batch: Batch, name: string): Mesh {
   const geometry = new BufferGeometry()
   geometry.setAttribute('position', new Float32BufferAttribute(batch.positions, 3))
@@ -237,38 +289,86 @@ function* sow(group: Group, heightAt: HeightAt, tier: TierName): Generator<void,
 
   yield
 
-  const tuftTarget = calm ? 8000 : 30000
-  let tufts = 0, tuftSeam = 1
-  for (let attempt = 0; tufts < tuftTarget && attempt < tuftTarget * 18; attempt++) {
-    if (tuftSeam < TUFT_SLICES && tufts >= tuftTarget * tuftSeam / TUFT_SLICES) { tuftSeam++; yield }
-    const [east, north, density] = sample(attempt)
-    if (!clear(east, north) || random() > density) continue
+  // THE MEADOW, sown where the stops see it: a clump of blades every few
+  // hand-widths near an eye, thinning with distance and behind the house.
+  // Late October's sward is green below and straw above: blades greened at
+  // the foot, seed stalks standing among them, shorter along every walked
+  // edge where feet and scythes keep it down.
+  const meadowRandom = randomSource(15171013)
+  // each stop sows its own view, densest a few metres before its eye and
+  // thinning as one over the square of the distance past four metres
+  const perStop = calm ? 900 : tier === 'standard' ? 2600 : 5200
+  const clumpTarget = perStop * STOP_EYES.length
+  const reach = 42, scale = 4, logSpan = Math.log(1 + (reach / scale) ** 2)
+  let clumps = 0, blades = 0, seedStalks = 0, seam = 1
+  for (let attempt = 0; attempt < clumpTarget; attempt++) {
+    if (seam < TUFT_SLICES && attempt >= clumpTarget * seam / TUFT_SLICES) { seam++; yield }
+    const stop = STOP_EYES[Math.floor(attempt / perStop)]!
+    const r = scale * Math.sqrt(Math.exp(meadowRandom() * logSpan) - 1)
+    const look = Math.atan2(stop.look[1], stop.look[0]), turn = (meadowRandom() - .5) * 2.1
+    const east = stop.at[0] + Math.cos(look + turn) * r, north = stop.at[1] + Math.sin(look + turn) * r
+    if (r < .9 || hidden(stop.at, [east, north])) continue
+    if (!clear(east, north)) continue
+    const eye = stopDistance(east, north)
     const edge = pathDistance(east, north)
-    const stature = (0.07 + random() * 0.18) * (edge < 1.3 ? 0.72 : 1)
-    const colour = GRASS[Math.floor(random() * GRASS.length)]!.clone().multiplyScalar(0.84 + density * 0.19)
-    const angle = random() * Math.PI * 2
-    for (let blade = 0; blade < 3; blade++) {
-      const e = east + (random() - 0.5) * 0.055, n = north + (random() - 0.5) * 0.055
-      tuftBlade(plantBatch, heightAt, e, n, stature * (0.66 + random() * 0.70),
-        angle + blade * 2.13 + random() * 0.4, 0.004 + random() ** 1.4 * 0.011, colour)
+    // rough where nothing walks: taller and straw-headed; low by the paths
+    const rough = .5 + .5 * Math.sin(east * .83 + Math.sin(north * .37) * 2.1) * Math.cos(north * .71 - east * .23)
+    const stature = (.09 + meadowRandom() ** .8 * .24) * (.7 + .6 * rough) * (edge < 1.3 ? .6 : 1)
+    const angle = meadowRandom() * Math.PI * 2
+    const count = 4 + Math.floor(meadowRandom() * 4) + (eye < 9 ? 2 : 0)
+    const spread = .025 + meadowRandom() * .05
+    for (let blade = 0; blade < count; blade++) {
+      const a = meadowRandom() * Math.PI * 2, r = Math.sqrt(meadowRandom()) * spread
+      const e = east + Math.cos(a) * r, n = north + Math.sin(a) * r
+      const height = stature * (.55 + meadowRandom() * .75)
+      const direction = angle + (meadowRandom() - .5) * 2.6
+      const width = .003 + meadowRandom() ** 1.5 * .007
+      const dry = meadowRandom() < .22 + .3 * rough
+      const colour = dry ? STRAW[Math.floor(meadowRandom() * STRAW.length)]!.clone().multiplyScalar(.86 + meadowRandom() * .2)
+        : GRASS[Math.floor(meadowRandom() * GRASS.length)]!.clone().multiplyScalar(.8 + meadowRandom() * .24)
+      tuftBlade(plantBatch, heightAt, e, n, height, direction, width, colour)
+      blades++
     }
-    tufts++
+    if (edge > 1.3 && meadowRandom() < .1 + .12 * rough) {
+      const height = .22 + meadowRandom() * .3
+      if (clear(east, north, height * .1 + .016)) {
+        seedStalk(plantBatch, heightAt, east, north, height, angle, STRAW[1]!.clone().multiplyScalar(.9 + meadowRandom() * .18))
+        seedStalks++
+      }
+    }
+    clumps++
   }
-  while (tuftSeam < TUFT_SLICES) { tuftSeam++; yield }
+  while (seam < TUFT_SLICES) { seam++; yield }
   yield
 
-  const leafTarget = calm ? 900 : 1450
-  let leaves = 0
-  for (let attempt = 0; leaves < leafTarget && attempt < leafTarget * 16; attempt++) {
-    const [east, north, density] = sample(attempt)
-    if (!clear(east, north) || random() > density * 1.45) continue
-    const colour = LEAVES[Math.floor(random() * LEAVES.length)]!.clone().multiplyScalar(0.82 + random() * 0.25)
-    fallenLeaf(plantBatch, heightAt, east, north, 0.065 + random() * 0.07, random() * Math.PI * 2, colour)
-    leaves++
+  // THE SWARD'S TUFTS as cards: the cover a meadow has, which single blades
+  // cannot give past a few metres; larger with distance so the far sward
+  // keeps its cover
+  const cards: CardBatch = { position: [], normal: [], colour: [], uv: [] }
+  const cardRandom = randomSource(15171041)
+  const cardsPerStop = calm ? 0 : tier === 'standard' ? 1500 : 2600
+  const cardReach = 46, cardScale = 8, cardSpan = Math.log(1 + (cardReach / cardScale) ** 2)
+  let tufted = 0
+  for (let attempt = 0; attempt < cardsPerStop * STOP_EYES.length; attempt++) {
+    const stop = STOP_EYES[Math.floor(attempt / cardsPerStop)]!
+    const r = cardScale * Math.sqrt(Math.exp(cardRandom() * cardSpan) - 1)
+    const look = Math.atan2(stop.look[1], stop.look[0]), turn = (cardRandom() - .5) * 2.1
+    const east = stop.at[0] + Math.cos(look + turn) * r, north = stop.at[1] + Math.sin(look + turn) * r
+    const pick = cardRandom(), size = cardRandom(), tone = cardRandom(), spin = cardRandom()
+    if (r < 1.2 || hidden(stop.at, [east, north]) || !clear(east, north, .12)) continue
+    const edge = pathDistance(east, north)
+    const rough = .5 + .5 * Math.sin(east * .83 + Math.sin(north * .37) * 2.1) * Math.cos(north * .71 - east * .23)
+    const set = edge < 1.3 ? GRASS_CELLS.bent : rough > .62 && pick < .7 ? GRASS_CELLS.seeding : pick < .45 ? GRASS_CELLS.green : GRASS_CELLS.mixed
+    const cell = set[Math.floor(cardRandom() * set.length)]!
+    const grow = 1 + r / 20
+    const width = (.24 + size * .2) * grow, height = (.17 + size * .2) * (edge < 1.3 ? .7 : .8 + .4 * rough) * (1 + r / 32)
+    const k = .86 + tone * .26
+    tuftCards(cards, heightAt, east, north, width, height, spin * Math.PI, cell, [k, k * (1.01 + rough * .03), k * .97], height * (.08 + tone * .12))
+    tufted++
   }
   yield
 
-  const chipTarget = calm ? 400 : 850
+  const chipTarget = calm ? 500 : 1400
   const gravelSegments = pathSpecifications.flatMap(path => path.centreline.slice(1).map((b, i) => {
     const a = path.centreline[i]!, length = Math.hypot(b[0] - a[0], b[1] - a[1])
     return { a, b, length, width: path.width.value }
@@ -300,63 +400,24 @@ function* sow(group: Group, heightAt: HeightAt, tier: TierName): Generator<void,
     const edge = pathDistance(east, north)
     const probability = edge < 2 ? 0.88 : 0.06 * (1 - density)
     if (random() > probability) continue
-    chip(mineralBatch, heightAt, east, north, 0.028 + random() ** 2 * 0.075,
-      random() * Math.PI * 2, CHIPS[Math.floor(random() * CHIPS.length)]!)
+    // worn river gravel of 15 to 65 mm, lying flat and bedded in the earth
+    const size = 0.015 + random() ** 2 * 0.05
+    if (!pebble(stoneInto(mineralBatch), heightAt, east, north, size, 0.28 + random() * 0.16, random() * Math.PI * 2,
+      5, size * 0.07, stoneColour(random(), random()), random, (e, n) => clear(e, n))) continue
     chips++
   }
 
-  // A separate deterministic stream leaves all inherited clump centres,
-  // leaf positions and gravel positions unchanged. The added density follows
-  // two fixed garden fields, never a camera position or a visibility decision.
-  const foregroundRandom = randomSource(15171013)
-  const foregroundTarget = calm ? 800 : 2800
-  let foregroundTufts = 0, foregroundBlades = 0, seedStalks = 0, foregroundSeam = 1
-  for (let attempt = 0; foregroundTufts < foregroundTarget && attempt < foregroundTarget * 24; attempt++) {
-    if (foregroundSeam < FOREGROUND_SLICES && foregroundTufts >= foregroundTarget * foregroundSeam / FOREGROUND_SLICES) { foregroundSeam++; yield }
-    const patch = WEIGHTED_FOREGROUND[attempt % WEIGHTED_FOREGROUND.length]!
-    const theta = foregroundRandom() * Math.PI * 2, radius = Math.sqrt(foregroundRandom())
-    const east = patch.east + Math.cos(theta) * patch.radiusEast * radius
-    const north = patch.north + Math.sin(theta) * patch.radiusNorth * radius
-    const clump = 0.5 + 0.5 * Math.sin(east * 2.7 + Math.sin(north * 0.81)) * Math.cos(north * 1.93 - east * 0.37)
-    const density = (0.35 + 0.65 * (1 - radius * radius)) * (0.24 + 0.76 * clump)
-    if (!clear(east, north) || foregroundRandom() > density) continue
-    const edge = pathDistance(east, north)
-    const stature = (0.045 + foregroundRandom() ** 0.7 * 0.265) * (edge < 1.3 ? 0.58 : 1)
-    const colour = GRASS[Math.floor(foregroundRandom() * GRASS.length)]!.clone().multiplyScalar(0.82 + density * 0.22)
-    const angle = foregroundRandom() * Math.PI * 2
-    const bladeCount = 3 + Math.floor(foregroundRandom() * 3)
-    for (let blade = 0; blade < bladeCount; blade++) {
-      const e = east + (foregroundRandom() - 0.5) * 0.09
-      const n = north + (foregroundRandom() - 0.5) * 0.09
-      const height = stature * (0.58 + foregroundRandom() * 0.64)
-      const direction = angle + blade * 2.13 + foregroundRandom() * 0.72
-      const width = 0.004 + foregroundRandom() ** 1.6 * 0.015
-      // Check the complete projected ribbon against the same retained cuts.
-      const footprint = [[0, -0.5], [0, 0.5], [0.17, -0.29], [0.17, 0.29], [0.66, 0]]
-      if (footprint.some(([lean, side]) => !clear(e - Math.sin(direction) * height * lean! + Math.cos(direction) * width * side!,
-        n - Math.cos(direction) * height * lean! - Math.sin(direction) * width * side!))) continue
-      tuftBlade(plantBatch, heightAt, e, n, height, direction, width, colour)
-      foregroundBlades++
-    }
-    if (foregroundRandom() < 0.35) {
-      const height = Math.min(0.19 + foregroundRandom() * 0.29, edge < 1.3 ? 0.22 : 0.48)
-      const reach = height * 0.10 + 0.016
-      if (clear(east, north, reach)) {
-        seedStalk(plantBatch, heightAt, east, north, height, angle, LEAVES[2]!.clone().multiplyScalar(0.88 + foregroundRandom() * 0.18))
-        seedStalks++
-      }
-    }
-    foregroundTufts++
-  }
-  while (foregroundSeam < FOREGROUND_SLICES) { foregroundSeam++; yield }
   yield
 
-  const plants = meshFrom(plantBatch, 'vinci October grass and uneven leaf litter')
-  group.add(...partitionGroundDressing(plants, calm ? 1 : 4, calm ? 0 : 8))
+  const plants = meshFrom(plantBatch, 'vinci October meadow')
+  if (cards.position.length) group.add(...partitionGroundDressing(cardMesh(cards, 'vinci October meadow tufts'), tier === 'hero' ? 3 : 1))
+  group.add(...partitionGroundDressing(plants, calm ? 1 : tier === 'standard' ? 2 : 4, tier === 'hero' ? 8 : 0))
   group.add(meshFrom(mineralBatch, 'vinci pale mineral path-edge gravel'))
+  if (!calm) group.add(createMoss(tier))
+  group.add(createCreepers(tier, (e, n) => routes.some(p => inside(e, n, p) || edgeDistance(e, n, p) < 1)))
   group.userData['draws'] = group.children.length
   group.userData['triangles'] = (plantBatch.positions.length + mineralBatch.positions.length) / 9
-  group.userData['counts'] = { tufts: tufts + foregroundTufts, grassBlades: tufts * 3 + foregroundBlades, foregroundTufts, foregroundBlades, seedStalks, leaves, chips }
+  group.userData['counts'] = { clumps, blades, seedStalks, chips, tufted }
   group.userData['tier'] = tier
   group.userData['patches'] = PATCHES.map(p => ({ ...p }))
   group.userData['foregroundPatches'] = FOREGROUND_PATCHES.map(p => ({ ...p }))
