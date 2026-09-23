@@ -10,6 +10,7 @@ import { createGlassSeatMaterial } from './glass-seat'
 import { createFlywheelSpokeArms } from './flywheel-overlap'
 import { createMutableSweep, geometryForPart, type MutableSweep } from './geometry'
 import { benchKeyDirection } from './key'
+import { wearFor, wornSurface } from './wear'
 import type { Assembly, Dossier, PartSpec } from './types'
 export type { Assembly } from './types'
 /** An assembly with every library set its surfaces were built from. */
@@ -175,8 +176,8 @@ export function loadMachineMaterial(stack: Stack, name: string): Promise<Materia
 }
 
 const libraryName = (material: string): string => {
-  // new work in planed and turned oak, not weathered timber
-  if (/planed oak|turned oak|oak peg|oak grip/.test(material)) return 'oak-veneer-light'
+  // new work in planed and hewn oak, not weathered timber
+  if (/planed oak|hewn oak|oak peg|oak grip/.test(material)) return 'oak-veneer-light'
   // a hide sealed with pitch, and the pitch the tube is bedded in
   if (/pitched/.test(material)) return 'leather-worn'
   if (/thread/.test(material)) return 'rope'
@@ -213,8 +214,7 @@ function phaseTimber(geometry: BufferGeometry, identity: string): void {
     const value = 0.86 + ((hash >>> 5) & 0xff) / 255 * 0.24
     const warmth = (((hash >>> 13) & 0xff) / 255 - 0.5) * 0.1
     for (let i = 0; i < colour.count; i++) {
-      const tone = colour.getY(i)
-      colour.setXYZ(i, tone * value * (1 + warmth), tone * value, tone * value * (1 - warmth))
+      colour.setXYZ(i, colour.getX(i) * value * (1 + warmth), colour.getY(i) * value, colour.getZ(i) * value * (1 - warmth))
     }
   }
 }
@@ -470,35 +470,40 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
     if (/pitched/.test(name)) {
       // GENERATED pitch-dark hide tint over the CC0 leather's own luminance,
       // its variation held to a third so the skin reads whole.
-      const pitch = new Color(/bedding/.test(name) ? '#1d1713' : /lining/.test(name) ? '#33271e' : '#3d2e23')
+      const pitch = new Color(/bedding/.test(name) ? '#1d1713' : /lining/.test(name) ? '#33271e' : '#3a2b21')
       const lum = set.albedo.r * .2126 + set.albedo.g * .7152 + set.albedo.b * .0722
       const fibres = detail.albedo.dot(vec3(.2126, .7152, .0722)).div(Math.max(lum, .001))
       // dried pitch is a dull skin: a flat one with a sheen reads as standing water
       const spread = /bedding|lining/.test(name) ? .08 : .3
-      material.colorNode = vec3(pitch.r, pitch.g, pitch.b).mul(fibres.mul(spread).add(1 - spread).clamp(.5, 1.4)).mul(detail.occlusion)
+      // the hide's round takes the key's edge, so each turn stands off the core behind it
+      const edge = /bedding|lining/.test(name) ? float(0) : keyRim(1.3)
+      material.colorNode = vec3(pitch.r, pitch.g, pitch.b).mul(fibres.mul(spread).add(1 - spread).clamp(.5, 1.4)).mul(detail.occlusion).mul(edge.add(1))
       material.roughnessNode = /bedding|lining/.test(name) ? detail.roughness.mul(.3).add(.5).clamp(.52, .72) : detail.roughness.mul(.75).clamp(.46, .66)
       if (/bedding|lining/.test(name)) material.normalNode = null
     }
-    if (/planed oak|turned oak|oak peg|oak grip/.test(name)) {
+    if (/planed oak|hewn oak|oak peg|oak grip/.test(name)) {
       // GENERATED tint: new planed oak, paler and greyer than the museum's
       // oiled oak, over the CC0 veneer's own grain at half its colour and a
       // little over half its contrast; the grip is darkened by the hand.
-      const oak = new Color(/grip/.test(name) ? '#5f4a37' : /turned/.test(name) ? '#82715d' : '#897a66')
+      const oak = new Color(/grip/.test(name) ? '#5f4a37' : /hewn/.test(name) ? '#8f7c64' : '#897a66')
       const lum = detail.albedo.dot(vec3(.2126, .7152, .0722))
-      // the turned core is the largest face on the machine and shows its run of grain
-      const grain = mix(vec3(lum, lum, lum), detail.albedo, .35).sub(1).mul(/turned/.test(name) ? .9 : .62).add(1)
+      // the hewn core is the largest face on the machine and shows its run of grain
+      const grain = mix(vec3(lum, lum, lum), detail.albedo, .35).sub(1).mul(/hewn/.test(name) ? .9 : .62).add(1)
       // the piece's own tone and its darker end grain ride in the vertex colour
       material.colorNode = vec3(oak.r, oak.g, oak.b).mul(grain).mul(detail.occlusion).mul(attribute('color', 'vec3'))
-      material.roughnessNode = /grip/.test(name) ? detail.roughness.mul(.8).clamp(.32, .6) : detail.roughness.clamp(.5, .85)
+      // a grip the hand has turned for years is polished by it
+      material.roughnessNode = /grip/.test(name) ? detail.roughness.mul(.5).clamp(.2, .34) : detail.roughness.clamp(.5, .85)
     }
     if (/iron, forged/.test(name)) {
       // GENERATED tint: blacksmith's iron, dark off the hammer with a faint
       // warm scale, over the CC0 set's own mottle.
-      material.metalness = .5
-      const scale = new Color('#3f3a35')
+      // where the water runs over it every turn the scale is scoured off
+      const scoured = /scoured/.test(name)
+      material.metalness = scoured ? .62 : .5
+      const scale = new Color(scoured ? '#6b655d' : '#3f3a35')
       const mottle = detail.albedo.dot(vec3(.2126, .7152, .0722))
-      material.colorNode = vec3(scale.r, scale.g, scale.b).mul(mottle.mul(.25).add(.8)).mul(detail.occlusion)
-      material.roughnessNode = detail.roughness.mul(.9).clamp(.5, .82)
+      material.colorNode = vec3(scale.r, scale.g, scale.b).mul(mottle.mul(.25).add(.8)).mul(detail.occlusion).mul(scoured ? keyRim(1.2).add(1) : float(1))
+      material.roughnessNode = scoured ? detail.roughness.mul(.5).clamp(.26, .42) : detail.roughness.mul(.9).clamp(.5, .82)
     }
     if (dossier.slug === 'camera-obscura' && set.name === 'oak-beams') {
       // The one flat lid on the bench that the key strikes near square. A
@@ -522,7 +527,7 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
     return material
   }
   await Promise.all(names.map(async name => {
-    const key = /ink|glass|water|lead|paper|oak peg|turned oak|oak grip|bedding|lining/.test(name) ? name : libraryName(name)
+    const key = /ink|glass|water|lead|paper|oak peg|hewn oak|oak grip|bedding|lining|scoured/.test(name) ? name : libraryName(name)
     let surface = surfaceCache.get(key)
     if (!surface) { surface = makeSurface(name); surfaceCache.set(key, surface) }
     materials.set(name, await surface)
@@ -615,6 +620,23 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
   }
   object.updateMatrixWorld(true)
 
+  // Wear is laid on each worn part's own copy of its surface, in the
+  // machine's rest frame, before any copy is shared or welded.
+  const wear = wearFor(dossier.slug)
+  const worn = new Set<string>()
+  if (wear.length) {
+    const toMachine = new Matrix4(), root = object.matrixWorld.clone().invert()
+    for (const part of dossier.parts) {
+      const rules = wear.filter(rule => rule.parts(part.id))
+      const mesh = meshes.get(part.id)
+      if (!rules.length || !mesh || dynamic.has(part.id)) continue
+      toMachine.multiplyMatrices(root, mesh.matrixWorld)
+      mesh.geometry = wornSurface(mesh.geometry, toMachine, rules)
+      geometries.add(mesh.geometry)
+      worn.add(part.id)
+    }
+  }
+
   const instances: {mesh: InstancedMesh; parts: Group[]}[] = []
   // A joint explicitly locked at zero is a rigid connection. Its node stays
   // in the hierarchy for inspection, but it cannot split a static draw.
@@ -636,7 +658,7 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
     // from those nodes after motion, so spin and parent motion occur once.
     const repeats = new Map<string, PartSpec[]>()
     for (const part of dossier.parts) {
-      if (dynamic.has(part.id) || sectionParts.has(part.id)) continue
+      if (dynamic.has(part.id) || sectionParts.has(part.id) || worn.has(part.id)) continue
       const key = `${(meshes.get(part.id)!.material as Surface).uuid}:${signatures.get(part.id)}`
       const list = repeats.get(key) ?? []
       list.push(part); repeats.set(key, list)

@@ -1325,25 +1325,69 @@
         "en": "Nail",
         "de": "Nagel"
       },
-      "lower-trough-lining-floor": {
-        "en": "Pitch lining",
-        "de": "Pechauskleidung"
+      "lower-trough-board-0": {
+        "en": "Floor board of the lower trough",
+        "de": "Bodenbrett der unteren Rinne"
       },
-      "lower-trough-lining-l": {
-        "en": "Pitch lining",
-        "de": "Pechauskleidung"
+      "lower-trough-board-1": {
+        "en": "Floor board of the lower trough",
+        "de": "Bodenbrett der unteren Rinne"
       },
-      "lower-trough-lining-r": {
-        "en": "Pitch lining",
-        "de": "Pechauskleidung"
+      "lower-trough-board-2": {
+        "en": "Floor board of the lower trough",
+        "de": "Bodenbrett der unteren Rinne"
       },
-      "lower-trough-lining-front": {
-        "en": "Pitch lining",
-        "de": "Pechauskleidung"
+      "lower-trough-board-3": {
+        "en": "Floor board of the lower trough",
+        "de": "Bodenbrett der unteren Rinne"
       },
-      "lower-trough-lining-back": {
-        "en": "Pitch lining",
-        "de": "Pechauskleidung"
+      "lower-trough-seam-0": {
+        "en": "Pitch in the seam",
+        "de": "Pech in der Fuge"
+      },
+      "lower-trough-seam-1": {
+        "en": "Pitch in the seam",
+        "de": "Pech in der Fuge"
+      },
+      "lower-trough-seam-2": {
+        "en": "Pitch in the seam",
+        "de": "Pech in der Fuge"
+      },
+      "lower-trough-seam-3": {
+        "en": "Pitch in the seam",
+        "de": "Pech in der Fuge"
+      },
+      "lower-trough-bead-0": {
+        "en": "Pitch in the seam",
+        "de": "Pech in der Fuge"
+      },
+      "lower-trough-bead-1": {
+        "en": "Pitch in the seam",
+        "de": "Pech in der Fuge"
+      },
+      "lower-trough-bead-2": {
+        "en": "Pitch in the seam",
+        "de": "Pech in der Fuge"
+      },
+      "lower-trough-bead-3": {
+        "en": "Pitch in the seam",
+        "de": "Pech in der Fuge"
+      },
+      "lower-trough-corner-0": {
+        "en": "Pitch in the seam",
+        "de": "Pech in der Fuge"
+      },
+      "lower-trough-corner-1": {
+        "en": "Pitch in the seam",
+        "de": "Pech in der Fuge"
+      },
+      "lower-trough-corner-2": {
+        "en": "Pitch in the seam",
+        "de": "Pech in der Fuge"
+      },
+      "lower-trough-corner-3": {
+        "en": "Pitch in the seam",
+        "de": "Pech in der Fuge"
       },
       "support": {
         "en": "Support",
@@ -1517,25 +1561,53 @@
         "en": "Nail",
         "de": "Nagel"
       },
-      "upper-trough-lining-floor": {
-        "en": "Pitch lining",
-        "de": "Pechauskleidung"
+      "upper-trough-board-0": {
+        "en": "Floor board of the upper trough",
+        "de": "Bodenbrett der oberen Rinne"
       },
-      "upper-trough-lining-l": {
-        "en": "Pitch lining",
-        "de": "Pechauskleidung"
+      "upper-trough-board-1": {
+        "en": "Floor board of the upper trough",
+        "de": "Bodenbrett der oberen Rinne"
       },
-      "upper-trough-lining-r": {
-        "en": "Pitch lining",
-        "de": "Pechauskleidung"
+      "upper-trough-seam-0": {
+        "en": "Pitch in the seam",
+        "de": "Pech in der Fuge"
       },
-      "upper-trough-lining-front": {
-        "en": "Pitch lining",
-        "de": "Pechauskleidung"
+      "upper-trough-seam-1": {
+        "en": "Pitch in the seam",
+        "de": "Pech in der Fuge"
       },
-      "upper-trough-lining-back": {
-        "en": "Pitch lining",
-        "de": "Pechauskleidung"
+      "upper-trough-bead-0": {
+        "en": "Pitch in the seam",
+        "de": "Pech in der Fuge"
+      },
+      "upper-trough-bead-1": {
+        "en": "Pitch in the seam",
+        "de": "Pech in der Fuge"
+      },
+      "upper-trough-bead-2": {
+        "en": "Pitch in the seam",
+        "de": "Pech in der Fuge"
+      },
+      "upper-trough-bead-3": {
+        "en": "Pitch in the seam",
+        "de": "Pech in der Fuge"
+      },
+      "upper-trough-corner-0": {
+        "en": "Pitch in the seam",
+        "de": "Pech in der Fuge"
+      },
+      "upper-trough-corner-1": {
+        "en": "Pitch in the seam",
+        "de": "Pech in der Fuge"
+      },
+      "upper-trough-corner-2": {
+        "en": "Pitch in the seam",
+        "de": "Pech in der Fuge"
+      },
+      "upper-trough-corner-3": {
+        "en": "Pitch in the seam",
+        "de": "Pech in der Fuge"
       },
       "basin-rail": {
         "en": "Rail under the upper trough",

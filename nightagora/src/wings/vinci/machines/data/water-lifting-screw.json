@@ -1873,7 +1873,7 @@
       "dimensions_m": {
         "x": 1.14,
         "y": 0.025,
-        "z": 0.94
+        "z": 0.1848
       },
       "position_m": [
         0.0,
@@ -1892,7 +1892,7 @@
       },
       "certainty": "C",
       "source": "geometry",
-      "notes": "[geometry] Floor of the sump, a plank on the base; the walls stand on it. The tube's lower mouth dips into the sump and turns clear of this floor."
+      "notes": "[geometry] Middle board of the sump's floor, on the base; the walls stand on the floor. The tube's lower mouth dips into the sump and turns clear of this floor."
     },
     {
       "id": "lower-wall-l",
@@ -2583,18 +2583,18 @@
       "notes": "[geometry] Nail through the end board into a side board."
     },
     {
-      "id": "lower-trough-lining-floor",
+      "id": "lower-trough-board-0",
       "parent": "lower-trough-base",
       "shape": "box",
       "dimensions_m": {
-        "x": 1.059,
-        "y": 0.002,
-        "z": 0.859
+        "x": 1.14,
+        "y": 0.025,
+        "z": 0.1848
       },
       "position_m": [
         0.0,
-        0.014,
-        0.0
+        0.0,
+        -0.3776
       ],
       "orientation_rad": [
         0.0,
@@ -2602,27 +2602,27 @@
         0.0
       ],
       "material": {
-        "class": "pitched lining",
+        "class": "wood, planed oak",
         "basis": "assumed",
         "source": "geometry"
       },
       "certainty": "C",
       "source": "geometry",
-      "notes": "[geometry] Pitch run over the floor inside, sealing it."
+      "notes": "[geometry] Floor board of the sump, laid beside its neighbours with a caulked seam."
     },
     {
-      "id": "lower-trough-lining-l",
+      "id": "lower-trough-board-1",
       "parent": "lower-trough-base",
       "shape": "box",
       "dimensions_m": {
-        "x": 0.002,
-        "y": 0.1495,
-        "z": 0.855
+        "x": 1.14,
+        "y": 0.025,
+        "z": 0.1848
       },
       "position_m": [
-        -0.5285,
-        0.08775,
-        0.0
+        0.0,
+        0.0,
+        -0.1888
       ],
       "orientation_rad": [
         0.0,
@@ -2630,27 +2630,27 @@
         0.0
       ],
       "material": {
-        "class": "pitched lining",
+        "class": "wood, planed oak",
         "basis": "assumed",
         "source": "geometry"
       },
       "certainty": "C",
       "source": "geometry",
-      "notes": "[geometry] Pitch run over the boards inside, stopping short of the rim."
+      "notes": "[geometry] Floor board of the sump, laid beside its neighbours with a caulked seam."
     },
     {
-      "id": "lower-trough-lining-r",
+      "id": "lower-trough-board-2",
       "parent": "lower-trough-base",
       "shape": "box",
       "dimensions_m": {
-        "x": 0.002,
-        "y": 0.1495,
-        "z": 0.855
+        "x": 1.14,
+        "y": 0.025,
+        "z": 0.1848
       },
       "position_m": [
-        0.5285,
-        0.08775,
-        0.0
+        0.0,
+        0.0,
+        0.1888
       ],
       "orientation_rad": [
         0.0,
@@ -2658,27 +2658,27 @@
         0.0
       ],
       "material": {
-        "class": "pitched lining",
+        "class": "wood, planed oak",
         "basis": "assumed",
         "source": "geometry"
       },
       "certainty": "C",
       "source": "geometry",
-      "notes": "[geometry] Pitch run over the boards inside, stopping short of the rim."
+      "notes": "[geometry] Floor board of the sump, laid beside its neighbours with a caulked seam."
     },
     {
-      "id": "lower-trough-lining-front",
+      "id": "lower-trough-board-3",
       "parent": "lower-trough-base",
       "shape": "box",
       "dimensions_m": {
-        "x": 1.059,
-        "y": 0.1495,
-        "z": 0.002
+        "x": 1.14,
+        "y": 0.025,
+        "z": 0.1848
       },
       "position_m": [
         0.0,
-        0.08775,
-        0.4285
+        0.0,
+        0.3776
       ],
       "orientation_rad": [
         0.0,
@@ -2686,27 +2686,27 @@
         0.0
       ],
       "material": {
-        "class": "pitched lining",
+        "class": "wood, planed oak",
         "basis": "assumed",
         "source": "geometry"
       },
       "certainty": "C",
       "source": "geometry",
-      "notes": "[geometry] Pitch run over the boards inside, stopping short of the rim."
+      "notes": "[geometry] Floor board of the sump, laid beside its neighbours with a caulked seam."
     },
     {
-      "id": "lower-trough-lining-back",
+      "id": "lower-trough-seam-0",
       "parent": "lower-trough-base",
       "shape": "box",
       "dimensions_m": {
-        "x": 1.059,
-        "y": 0.1495,
-        "z": 0.002
+        "x": 1.06,
+        "y": 0.021,
+        "z": 0.0034
       },
       "position_m": [
         0.0,
-        0.08775,
-        -0.4285
+        -0.0028,
+        -0.2832
       ],
       "orientation_rad": [
         0.0,
@@ -2714,13 +2714,321 @@
         0.0
       ],
       "material": {
-        "class": "pitched lining",
+        "class": "pitched bedding",
         "basis": "assumed",
         "source": "geometry"
       },
       "certainty": "C",
       "source": "geometry",
-      "notes": "[geometry] Pitch run over the boards inside, stopping short of the rim."
+      "notes": "[geometry] Pitch driven into the seam between two floor boards."
+    },
+    {
+      "id": "lower-trough-seam-1",
+      "parent": "lower-trough-base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 1.06,
+        "y": 0.021,
+        "z": 0.0034
+      },
+      "position_m": [
+        0.0,
+        -0.0028,
+        -0.0944
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "pitched bedding",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Pitch driven into the seam between two floor boards."
+    },
+    {
+      "id": "lower-trough-seam-2",
+      "parent": "lower-trough-base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 1.06,
+        "y": 0.021,
+        "z": 0.0034
+      },
+      "position_m": [
+        0.0,
+        -0.0028,
+        0.0944
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "pitched bedding",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Pitch driven into the seam between two floor boards."
+    },
+    {
+      "id": "lower-trough-seam-3",
+      "parent": "lower-trough-base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 1.06,
+        "y": 0.021,
+        "z": 0.0034
+      },
+      "position_m": [
+        0.0,
+        -0.0028,
+        0.2832
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "pitched bedding",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Pitch driven into the seam between two floor boards."
+    },
+    {
+      "id": "lower-trough-bead-0",
+      "parent": "lower-trough-base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 1.06,
+        "y": 0.006,
+        "z": 0.009
+      },
+      "position_m": [
+        0.0,
+        0.0135,
+        0.43
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "pitched bedding",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Pitch run along the inside corner of floor and wall."
+    },
+    {
+      "id": "lower-trough-bead-1",
+      "parent": "lower-trough-base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 1.06,
+        "y": 0.006,
+        "z": 0.009
+      },
+      "position_m": [
+        0.0,
+        0.0135,
+        -0.43
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "pitched bedding",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Pitch run along the inside corner of floor and wall."
+    },
+    {
+      "id": "lower-trough-bead-2",
+      "parent": "lower-trough-base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.009,
+        "y": 0.006,
+        "z": 0.86
+      },
+      "position_m": [
+        0.53,
+        0.0135,
+        0.0
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "pitched bedding",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Pitch run along the inside corner of floor and wall."
+    },
+    {
+      "id": "lower-trough-bead-3",
+      "parent": "lower-trough-base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.009,
+        "y": 0.006,
+        "z": 0.86
+      },
+      "position_m": [
+        -0.53,
+        0.0135,
+        0.0
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "pitched bedding",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Pitch run along the inside corner of floor and wall."
+    },
+    {
+      "id": "lower-trough-corner-0",
+      "parent": "lower-trough-base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.007,
+        "y": 0.145,
+        "z": 0.007
+      },
+      "position_m": [
+        0.53,
+        0.085,
+        0.43
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "pitched bedding",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Pitch run up the inside corner where a side board meets an end board."
+    },
+    {
+      "id": "lower-trough-corner-1",
+      "parent": "lower-trough-base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.007,
+        "y": 0.145,
+        "z": 0.007
+      },
+      "position_m": [
+        -0.53,
+        0.085,
+        0.43
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "pitched bedding",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Pitch run up the inside corner where a side board meets an end board."
+    },
+    {
+      "id": "lower-trough-corner-2",
+      "parent": "lower-trough-base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.007,
+        "y": 0.145,
+        "z": 0.007
+      },
+      "position_m": [
+        0.53,
+        0.085,
+        -0.43
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "pitched bedding",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Pitch run up the inside corner where a side board meets an end board."
+    },
+    {
+      "id": "lower-trough-corner-3",
+      "parent": "lower-trough-base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.007,
+        "y": 0.145,
+        "z": 0.007
+      },
+      "position_m": [
+        -0.53,
+        0.085,
+        -0.43
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "pitched bedding",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Pitch run up the inside corner where a side board meets an end board."
     },
     {
       "id": "support",
@@ -3780,7 +4088,7 @@
       "dimensions_m": {
         "x": 0.74,
         "y": 0.045,
-        "z": 0.6
+        "z": 0.197333333
       },
       "position_m": [
         0.0,
@@ -3799,7 +4107,7 @@
       },
       "certainty": "C",
       "source": "geometry",
-      "notes": "[geometry] Floor of the basin under the tube's upper mouth, on a rail between the posts and two legs in front."
+      "notes": "[geometry] Middle board of the basin's floor under the tube's upper mouth; the floor lies on a rail between the posts and two legs in front."
     },
     {
       "id": "upper-wall-l",
@@ -4490,18 +4798,18 @@
       "notes": "[geometry] Nail through the end board into a side board."
     },
     {
-      "id": "upper-trough-lining-floor",
+      "id": "upper-trough-board-0",
       "parent": "upper-trough-base",
       "shape": "box",
       "dimensions_m": {
-        "x": 0.659,
-        "y": 0.002,
-        "z": 0.519
+        "x": 0.74,
+        "y": 0.045,
+        "z": 0.197333333
       },
       "position_m": [
         0.0,
-        0.024,
-        0.0
+        0.0,
+        -0.201333333
       ],
       "orientation_rad": [
         0.0,
@@ -4509,27 +4817,27 @@
         0.0
       ],
       "material": {
-        "class": "pitched lining",
+        "class": "wood, planed oak",
         "basis": "assumed",
         "source": "geometry"
       },
       "certainty": "C",
       "source": "geometry",
-      "notes": "[geometry] Pitch run over the floor inside, sealing it."
+      "notes": "[geometry] Floor board of the basin, laid beside its neighbours with a caulked seam."
     },
     {
-      "id": "upper-trough-lining-l",
+      "id": "upper-trough-board-1",
       "parent": "upper-trough-base",
       "shape": "box",
       "dimensions_m": {
-        "x": 0.002,
-        "y": 0.1505,
-        "z": 0.515
+        "x": 0.74,
+        "y": 0.045,
+        "z": 0.197333333
       },
       "position_m": [
-        -0.3285,
-        0.09825,
-        0.0
+        0.0,
+        0.0,
+        0.201333333
       ],
       "orientation_rad": [
         0.0,
@@ -4537,27 +4845,27 @@
         0.0
       ],
       "material": {
-        "class": "pitched lining",
+        "class": "wood, planed oak",
         "basis": "assumed",
         "source": "geometry"
       },
       "certainty": "C",
       "source": "geometry",
-      "notes": "[geometry] Pitch run over the boards inside, stopping short of the rim."
+      "notes": "[geometry] Floor board of the basin, laid beside its neighbours with a caulked seam."
     },
     {
-      "id": "upper-trough-lining-r",
+      "id": "upper-trough-seam-0",
       "parent": "upper-trough-base",
       "shape": "box",
       "dimensions_m": {
-        "x": 0.002,
-        "y": 0.1505,
-        "z": 0.515
+        "x": 0.66,
+        "y": 0.041,
+        "z": 0.0034
       },
       "position_m": [
-        0.3285,
-        0.09825,
-        0.0
+        0.0,
+        -0.0028,
+        -0.100666667
       ],
       "orientation_rad": [
         0.0,
@@ -4565,27 +4873,27 @@
         0.0
       ],
       "material": {
-        "class": "pitched lining",
+        "class": "pitched bedding",
         "basis": "assumed",
         "source": "geometry"
       },
       "certainty": "C",
       "source": "geometry",
-      "notes": "[geometry] Pitch run over the boards inside, stopping short of the rim."
+      "notes": "[geometry] Pitch driven into the seam between two floor boards."
     },
     {
-      "id": "upper-trough-lining-front",
+      "id": "upper-trough-seam-1",
       "parent": "upper-trough-base",
       "shape": "box",
       "dimensions_m": {
-        "x": 0.659,
-        "y": 0.1505,
-        "z": 0.002
+        "x": 0.66,
+        "y": 0.041,
+        "z": 0.0034
       },
       "position_m": [
         0.0,
-        0.09825,
-        0.2585
+        -0.0028,
+        0.100666667
       ],
       "orientation_rad": [
         0.0,
@@ -4593,27 +4901,27 @@
         0.0
       ],
       "material": {
-        "class": "pitched lining",
+        "class": "pitched bedding",
         "basis": "assumed",
         "source": "geometry"
       },
       "certainty": "C",
       "source": "geometry",
-      "notes": "[geometry] Pitch run over the boards inside, stopping short of the rim."
+      "notes": "[geometry] Pitch driven into the seam between two floor boards."
     },
     {
-      "id": "upper-trough-lining-back",
+      "id": "upper-trough-bead-0",
       "parent": "upper-trough-base",
       "shape": "box",
       "dimensions_m": {
-        "x": 0.659,
-        "y": 0.1505,
-        "z": 0.002
+        "x": 0.66,
+        "y": 0.006,
+        "z": 0.009
       },
       "position_m": [
         0.0,
-        0.09825,
-        -0.2585
+        0.0235,
+        0.26
       ],
       "orientation_rad": [
         0.0,
@@ -4621,13 +4929,209 @@
         0.0
       ],
       "material": {
-        "class": "pitched lining",
+        "class": "pitched bedding",
         "basis": "assumed",
         "source": "geometry"
       },
       "certainty": "C",
       "source": "geometry",
-      "notes": "[geometry] Pitch run over the boards inside, stopping short of the rim."
+      "notes": "[geometry] Pitch run along the inside corner of floor and wall."
+    },
+    {
+      "id": "upper-trough-bead-1",
+      "parent": "upper-trough-base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.66,
+        "y": 0.006,
+        "z": 0.009
+      },
+      "position_m": [
+        0.0,
+        0.0235,
+        -0.26
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "pitched bedding",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Pitch run along the inside corner of floor and wall."
+    },
+    {
+      "id": "upper-trough-bead-2",
+      "parent": "upper-trough-base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.009,
+        "y": 0.006,
+        "z": 0.52
+      },
+      "position_m": [
+        0.33,
+        0.0235,
+        0.0
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "pitched bedding",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Pitch run along the inside corner of floor and wall."
+    },
+    {
+      "id": "upper-trough-bead-3",
+      "parent": "upper-trough-base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.009,
+        "y": 0.006,
+        "z": 0.52
+      },
+      "position_m": [
+        -0.33,
+        0.0235,
+        0.0
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "pitched bedding",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Pitch run along the inside corner of floor and wall."
+    },
+    {
+      "id": "upper-trough-corner-0",
+      "parent": "upper-trough-base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.007,
+        "y": 0.145,
+        "z": 0.007
+      },
+      "position_m": [
+        0.33,
+        0.095,
+        0.26
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "pitched bedding",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Pitch run up the inside corner where a side board meets an end board."
+    },
+    {
+      "id": "upper-trough-corner-1",
+      "parent": "upper-trough-base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.007,
+        "y": 0.145,
+        "z": 0.007
+      },
+      "position_m": [
+        -0.33,
+        0.095,
+        0.26
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "pitched bedding",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Pitch run up the inside corner where a side board meets an end board."
+    },
+    {
+      "id": "upper-trough-corner-2",
+      "parent": "upper-trough-base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.007,
+        "y": 0.145,
+        "z": 0.007
+      },
+      "position_m": [
+        0.33,
+        0.095,
+        -0.26
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "pitched bedding",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Pitch run up the inside corner where a side board meets an end board."
+    },
+    {
+      "id": "upper-trough-corner-3",
+      "parent": "upper-trough-base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.007,
+        "y": 0.145,
+        "z": 0.007
+      },
+      "position_m": [
+        -0.33,
+        0.095,
+        -0.26
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "pitched bedding",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] Pitch run up the inside corner where a side board meets an end board."
     },
     {
       "id": "basin-rail",
@@ -4732,7 +5236,7 @@
         0
       ],
       "material": {
-        "class": "wood, turned oak",
+        "class": "wood, hewn oak",
         "basis": "assumed",
         "source": "geometry"
       },
@@ -4742,10 +5246,136 @@
     {
       "id": "shaft",
       "parent": "rotor",
-      "shape": "cylinder",
+      "shape": "profile",
       "dimensions_m": {
-        "radius": 0.14,
-        "height": 2.53
+        "plane": "XZ",
+        "coordinates_xz": [
+          [
+            0.140075101,
+            -0.005798275
+          ],
+          [
+            0.133562932,
+            0.042767117
+          ],
+          [
+            0.121973052,
+            0.069398342
+          ],
+          [
+            0.099087769,
+            0.099554631
+          ],
+          [
+            0.081062956,
+            0.111448418
+          ],
+          [
+            0.069412958,
+            0.099966365
+          ],
+          [
+            0.076388835,
+            0.114532667
+          ],
+          [
+            0.053839162,
+            0.129412213
+          ],
+          [
+            0.028511744,
+            0.137193116
+          ],
+          [
+            -0.016722909,
+            0.139538886
+          ],
+          [
+            -0.053623451,
+            0.129838554
+          ],
+          [
+            -0.094096478,
+            0.103788535
+          ],
+          [
+            -0.118584147,
+            0.075048192
+          ],
+          [
+            -0.136502777,
+            0.033151033
+          ],
+          [
+            -0.138335069,
+            0.017889199
+          ],
+          [
+            -0.126825912,
+            0.013083026
+          ],
+          [
+            -0.139002596,
+            0.012329126
+          ],
+          [
+            -0.14011287,
+            0.003081249
+          ],
+          [
+            -0.132362493,
+            -0.046528852
+          ],
+          [
+            -0.116991349,
+            -0.077731034
+          ],
+          [
+            -0.086747485,
+            -0.110144607
+          ],
+          [
+            -0.050413561,
+            -0.130928096
+          ],
+          [
+            -0.01426252,
+            -0.139533058
+          ],
+          [
+            0.022738166,
+            -0.138269967
+          ],
+          [
+            0.035074507,
+            -0.134115701
+          ],
+          [
+            0.033828741,
+            -0.119762719
+          ],
+          [
+            0.040381668,
+            -0.132328513
+          ],
+          [
+            0.065566512,
+            -0.123847508
+          ],
+          [
+            0.09279078,
+            -0.105230957
+          ],
+          [
+            0.12161618,
+            -0.069661775
+          ],
+          [
+            0.133693863,
+            -0.042235615
+          ]
+        ],
+        "extrusion_depth": 2.53
       },
       "position_m": [
         0.0,
@@ -4758,13 +5388,13 @@
         0.0
       ],
       "material": {
-        "class": "wood, turned oak",
+        "class": "wood, hewn oak",
         "basis": "assumed",
         "source": "geometry"
       },
       "certainty": "C",
       "source": "folio",
-      "notes": "[folio] The sheet draws the tube wound close round a thick round core. [ancient] Vitruvius builds the screw on a rounded beam. [geometry] The core is turned oak, 28 cm across; the tube lies in it for its whole length."
+      "notes": "[folio] The sheet draws the tube wound close round a thick round core. [ancient] Vitruvius builds the screw on a beam made round. [geometry] The core is oak hewn round by the adze, 28 cm across, its faces left as the tool cut them and opened by a few drying checks; the tube lies in it for its whole length."
     },
     {
       "id": "pivot-lower",
@@ -8648,27 +9278,51 @@
       "dimensions_m": {
         "closed_axial_radial_profile": [
           [
-            -0.021,
+            -0.034,
             0.0434
           ],
           [
-            -0.021,
-            0.0482
+            -0.034,
+            0.0485
           ],
           [
-            -0.019,
-            0.0488
+            -0.031,
+            0.0495
+          ],
+          [
+            -0.008,
+            0.0495
+          ],
+          [
+            0.004,
+            0.053
+          ],
+          [
+            0.013,
+            0.0595
+          ],
+          [
+            0.017,
+            0.0625
+          ],
+          [
+            0.0195,
+            0.0615
+          ],
+          [
+            0.0185,
+            0.0575
+          ],
+          [
+            0.011,
+            0.053
+          ],
+          [
+            0.002,
+            0.0465
           ],
           [
             0.0,
-            0.0488
-          ],
-          [
-            0.0015,
-            0.0476
-          ],
-          [
-            0.0015,
             0.0434
           ]
         ],
@@ -8685,13 +9339,13 @@
         -0.092719745
       ],
       "material": {
-        "class": "iron, forged",
+        "class": "iron, forged, scoured",
         "basis": "assumed",
         "source": "geometry"
       },
       "certainty": "C",
       "source": "geometry",
-      "notes": "[geometry] Iron ring round the open mouth of the tube, keeping the hide round."
+      "notes": "[geometry] Iron ferrule on the outlet, a sleeve over the hide flared to a rolled lip, so the water leaves clear of the tube; its lip is scoured bright by the water."
     },
     {
       "id": "tube-band-0",

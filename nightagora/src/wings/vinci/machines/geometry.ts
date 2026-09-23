@@ -306,7 +306,7 @@ function exactMesh(part: PartSpec, helical = false, tier: TierName = 'standard')
  * A colour and not a shader branch, so a baked or exported surface keeps it. */
 export const END_GRAIN_TONE = .42
 /** The classes whose timbers show their end grain. */
-const endGrainClass = (material: string): boolean => /planed oak|turned oak|oak peg/.test(material)
+const endGrainClass = (material: string): boolean => /planed oak|hewn oak|oak peg/.test(material)
 const toneAttribute = (tones: number[]): Float32BufferAttribute =>
   new Float32BufferAttribute(Float32Array.from(tones.flatMap(t => [t, t, t])), 3)
 
