@@ -8,6 +8,8 @@
 //   node forge/film/export.mjs --clips=six --runs=2            the same clips twice, compared
 //   node forge/film/export.mjs --framings=wide --scale=2       four times the pixels
 //   node forge/film/export.mjs --grain=0.007                   the film baked into the frames
+//   node forge/film/export.mjs --stills=stop:flight,stop:works --stage=stills
+//                                                              stills only, on the stills' stage
 //
 // Every clip starts and ends at rest. Its first frame is the departure node's
 // still and its last the arrival's, rendered by the same program, and the
@@ -47,6 +49,10 @@ export const STAGES = { wide: { width: 1920, height: 1080 }, upright: { width: 7
 /** the rungs (design §6), written in one pass of one encoder */
 export const RUNGS = { wide: [[1920, 1080], [1280, 720], [854, 480]], upright: [[720, 1558], [480, 1038]] }
 export const STILL_RUNG = { wide: [1920, 1080], upright: [720, 1558] }
+/** THE STILLS' STAGE (`--stage=stills`): the framings `stills.mjs` shoots, a
+    CSS stage at 1.5 device pixels, drawn and delivered one to one, so the
+    film's recipe can be set beside a still of the same pixels */
+export const STILL_STAGES = { wide: { css: { width: 1600, height: 900 }, dsf: 1.5 }, upright: { css: { width: 780, height: 1688 }, dsf: 1.5 } }
 export const X264 = { preset: 'medium', crf: 23, endsCrf: 12, endsFrames: 3, keyint: FPS, aq: 3, threads: 8 }
 /** the ceiling of the world's own motion the joins may carry, of 255 */
 const SKY_REACH_M = 800
@@ -242,8 +248,8 @@ function walkRay(cells, from, to) {
 
 /* ---- the encoder ---- */
 /** one ffmpeg for a clip, every rung in one pass, the ends near lossless */
-function openEncoder(framing, frames, dir, stem) {
-  const [w, h] = [STAGES[framing].width, STAGES[framing].height]
+function openEncoder(framing, frames, dir, stem, stage = STAGES[framing]) {
+  const [w, h] = [stage.width, stage.height]
   const rungs = RUNGS[framing]
   const last = frames - 1
   const zones = `zones=0,${X264.endsFrames - 1},crf=${X264.endsCrf}/${Math.max(X264.endsFrames, last - X264.endsFrames + 1)},${last},crf=${X264.endsCrf}`
@@ -311,9 +317,12 @@ function assertBuildFresh() {
 }
 
 /** One framing's session: a stage, the wing standing, the export and the clock armed. */
-async function openSession(browser, framing, { base, scale, sink, warmNodes, log }) {
-  const stage = STAGES[framing]
-  const ctx = await browser.newContext({ viewport: stage, deviceScaleFactor: scale })
+async function openSession(browser, framing, { base, scale, sink, warmNodes, log, view = null }) {
+  const at = view?.[framing]
+  if (at && scale !== 1) throw new Error('the stills\' stage is drawn one to one: --scale must be 1')
+  const stage = at ? { width: at.css.width * at.dsf, height: at.css.height * at.dsf } : STAGES[framing]
+  const ratio = at ? at.dsf : scale
+  const ctx = await browser.newContext({ viewport: at ? at.css : stage, deviceScaleFactor: ratio })
   await ctx.addInitScript(() => { try { sessionStorage.setItem('vinci-welcome', '1') } catch { /* seen */ } })
   await ctx.addInitScript(installVirtualClock)
   const page = await ctx.newPage()
@@ -333,7 +342,7 @@ async function openSession(browser, framing, { base, scale, sink, warmNodes, log
   })
   const first = warmNodes[0]
   // the stills' own address: the desktop's band is chrome, and the film's frame is the whole canvas
-  await page.goto(`${base}/w/vinci?probe=1&tier=max&export=1&order=life&pr=${scale}&desk=${STILL_DESK}#s=${first.station}`, { waitUntil: 'load' })
+  await page.goto(`${base}/w/vinci?probe=1&tier=max&export=1&order=life&pr=${ratio}&desk=${STILL_DESK}#s=${first.station}`, { waitUntil: 'load' })
   if (!(await wingStanding(page))) throw new Error('the wing never stood')
   const said = await page.evaluate(() => ({ backend: document.body.dataset.backend, tier: document.body.dataset.tier }))
   if (said.backend !== 'webgpu' || said.tier !== 'max') throw new Error(`backend ${said.backend}, tier ${said.tier}: the film wants webgpu at max`)
@@ -353,7 +362,7 @@ async function openSession(browser, framing, { base, scale, sink, warmNodes, log
   await page.evaluate((fps) => window.__pre.arm(fps), FPS)
   await page.waitForFunction(() => window.__pre.queued() > 0, null, { timeout: 10000 })
   armed = true
-  const opened = await page.evaluate((o) => window.__naExport.open(o), { width: stage.width, height: stage.height, scale, idDiv: ID_DIV, socket: sink.url })
+  const opened = await page.evaluate((o) => window.__naExport.open(o), { width: stage.width, height: stage.height, scale: at ? 1 : scale, idDiv: ID_DIV, socket: sink.url })
   log(`  ${framing}: canvas ${opened.canvas.join('x')} at ratio ${opened.ratio}; in flight at rest ${await page.evaluate(() => window.__forge.state().texturesPending)}; failed requests ${record.aborted.length ? record.aborted.slice(0, 6).join(' | ') : 'none'}`)
   return { ctx, page, record, stage, framing }
 }
@@ -414,6 +423,9 @@ async function exportStill(session, inbox, node, out, opts) {
   const pending = await session.page.evaluate(() => window.__forge.state().texturesPending)
   const tag = `still ${node.id} ${session.framing}`
   const a = await restFrame(session, inbox, tag, 0, t, opts)
+  // what the frame drew: a still shot while the machine is loaded can come
+  // out with fewer bodies built, which these counts give away
+  const drew = await session.page.evaluate(() => ({ ...(({ draws, tris }) => ({ draws, tris }))(window.__forge.state()), meshes: window.__naExport.mounted().meshes }))
   const t2 = await session.page.evaluate(() => { for (let k = 0; k < 30; k++) window.__pre.step(); return window.__pre.virtualTime() })
   const b = await restFrame(session, inbox, `${tag} later`, 0, t2, opts)
   let moved = 0, sum = 0, max = 0
@@ -434,7 +446,7 @@ async function exportStill(session, inbox, node, out, opts) {
   const rungFile = join(rungDir, `${stem}.part.png`)
   await sharp(master.file).resize(rw, rh, { fit: 'fill', kernel: 'lanczos3' }).png({ compressionLevel: 9 }).toFile(rungFile)
   return {
-    node: node.id, framing: session.framing, raw: sha256(a.frame.rgb), pendingAtRest: pending,
+    node: node.id, framing: session.framing, raw: sha256(a.frame.rgb), pendingAtRest: pending, drew, size: [width, height],
     cam: a.report.cam, master, rung: address(rungFile, 'png'),
     aSecondLater: { share: round((100 * moved) / a.frame.rgb.length, 4), mean: moved ? round(sum / moved, 2) : 0, max },
     paintedOverCanvas: await session.page.evaluate(chromeProof),
@@ -485,7 +497,7 @@ async function exportClip(session, inbox, edge, nodes, track, out, opts) {
   const predicted = track.arrivedAt + 2
   const stem = edge.stem
   const dir = join(out, framing)
-  const encoder = openEncoder(framing, predicted, dir, stem)
+  const encoder = openEncoder(framing, predicted, dir, stem, stage)
   const frames = []
   const cells = cellSet()
   let floorCeilingMax = 0
@@ -496,7 +508,9 @@ async function exportClip(session, inbox, edge, nodes, track, out, opts) {
     floorCeilingMax = Math.max(floorCeilingMax, fc.floorCeiling)
     const print = printOf(res.report.cam)
     const nearM = nearDepth(res.frame)
-    frames.push({ i, sha256: sha256(res.frame.rgb), print, draws: res.report.drawn, walking: res.report.walking, mounted: res.report.mounted, ms: res.report.ms, nearM, floorCeiling: round(fc.floorCeiling, 4), ...meta })
+    // the camera at full precision beside its print: another renderer can take the same eye
+    const cam = { p: res.report.cam.p, q: res.report.cam.q, fov: res.report.cam.fov }
+    frames.push({ i, sha256: sha256(res.frame.rgb), print, cam, draws: res.report.drawn, walking: res.report.walking, mounted: res.report.mounted, ms: res.report.ms, nearM, floorCeiling: round(fc.floorCeiling, 4), ...meta })
     if (opts.keep.has(i) || i === 0) await savePng(res.frame.rgb, stage.width, stage.height, join(opts.frameDir, `${stem}-${framing}-f${String(i).padStart(4, '0')}.png`))
     return nearM
   }
@@ -619,6 +633,15 @@ async function main() {
   const framings = String(flags.get('framings') ?? 'wide,upright').split(',').filter(Boolean)
   const wanted = String(flags.get('clips') ?? 'six')
   const out = resolve(String(flags.get('out') ?? resolve(APP_ROOT, '..', 'film-export')))
+  /* `--stage=stills` the stills' own stage; `--stage=stills@0.5` the same
+     framings at a share of its size, still at 1.5 device pixels */
+  const stageFlag = /^stills(?:@([\d.]+))?$/.exec(String(flags.get('stage') ?? ''))
+  const view = stageFlag ? Object.fromEntries(Object.entries(STILL_STAGES).map(([k, v]) => {
+    const f = Number(stageFlag[1] ?? 1)
+    return [k, { css: { width: Math.round(v.css.width * f), height: Math.round(v.css.height * f) }, dsf: v.dsf }]
+  })) : null
+  /* stills only: the named nodes stood at once and shot, no clip walked */
+  const stillsOnly = flags.has('stills') ? String(flags.get('stills')).split(',').map((s) => s.trim()).filter(Boolean) : null
   const keep = new Set(String(flags.get('keep') ?? '').split(',').filter(Boolean).map(Number))
   const log = (s) => console.error(s)
   assertBuildFresh()
@@ -626,7 +649,7 @@ async function main() {
   const replay = await openReplay()
   const graph = buildGraph(replay.wing)
   const nodes = new Map(graph.nodes.map((n) => [n.id, n]))
-  const ids = wanted === 'six' ? SIX : wanted.split(',').map((s) => s.trim()).filter(Boolean)
+  const ids = stillsOnly ? [] : wanted === 'six' ? SIX : wanted.split(',').map((s) => s.trim()).filter(Boolean)
   const edges = ids.map((id) => {
     const e = graph.edges.find((x) => x.id === id)
     if (!e) throw new Error(`the graph has no clip ${id}`)
@@ -634,7 +657,10 @@ async function main() {
   })
   const tracks = new Map()
   for (const e of edges) for (const f of framings) tracks.set(`${e.id} ${f}`, replayEdge(replay, graph, e, f, { tail: 2 }))
-  const warmNodes = [...new Set(edges.flatMap((e) => [e.from, e.to]))].map((id) => nodes.get(id))
+  const warmNodes = [...new Set(stillsOnly ?? edges.flatMap((e) => [e.from, e.to]))].map((id) => {
+    if (!nodes.has(id)) throw new Error(`the graph has no node ${id}`)
+    return nodes.get(id)
+  })
   log(`${edges.length} clips, ${framings.join(' and ')}, scale ${scale}, ${runs} run(s); the replay at ${replay.wing.loader.revision}`)
 
   const server = spawn('pnpm', ['preview', '--port', String(PORT), '--strictPort', '--host', '127.0.0.1'], { stdio: 'ignore', cwd: APP_ROOT })
@@ -656,7 +682,7 @@ async function main() {
       const stills = []
       try {
         for (const framing of framings) {
-          const session = await openSession(browser, framing, { base: BASE, scale, sink, warmNodes, log })
+          const session = await openSession(browser, framing, { base: BASE, scale, sink, warmNodes, log, view })
           const opts = { grain, keep, frameDir, force: flags.has('force') }
           const before = await session.page.evaluate(() => window.__naExport.mounted().meshes)
           const walked = []
@@ -696,8 +722,8 @@ async function main() {
 
   // ---- the record ----
   const first = all[0]
-  const gate = await gateKeys(first.results, log).catch((err) => ({ note: `the gate's keys failed: ${String(err.message).slice(0, 200)}` }))
-  const recipe = { tier: 'max', geometry: 'hero', scale, minDraws: MIN_DRAWS, maxDraws: MAX_DRAWS, shutter: SHUTTER, jitter: 'halton-2-3', average: 'linear light of the display print, one quantisation', grain: grain ? `baked ${grain}, seeded by the frame, the rest frames seed 0` : 'held (laid by the player)', fps: FPS }
+  const gate = stillsOnly ? { note: 'stills only: no clip, no keys' } : await gateKeys(first.results, log).catch((err) => ({ note: `the gate's keys failed: ${String(err.message).slice(0, 200)}` }))
+  const recipe = { tier: 'max', geometry: 'hero', scale, stage: view ? `stills: ${Object.entries(view).map(([k, v]) => `${k} ${v.css.width}x${v.css.height} CSS at ${v.dsf}`).join(', ')}` : 'film', minDraws: MIN_DRAWS, maxDraws: MAX_DRAWS, shutter: SHUTTER, jitter: 'halton-2-3', average: 'linear light of the display print, one quantisation', grain: grain ? `baked ${grain}, seeded by the frame, the rest frames seed 0` : 'held (laid by the player)', fps: FPS }
   for (const r of first.results) {
     if (!r.files) continue
     const keys = gate.keys?.get(`${r.clip} ${r.framing}`) ?? { motion: r.replay.key, picture: null, global: null, delivery: null }
@@ -712,7 +738,7 @@ async function main() {
       plateTexelNote: 'not measured by the export: the texel line waits for a plate hook',
       seen: r.seen,
       refused: r.refused,
-      files: r.files, perFrame: r.frameRecords.map((f) => ({ i: f.i, sha256: f.sha256, draws: f.draws, motion: f.motion ?? 0, turnPx: f.turnPx ?? 0, walkPx: f.walkPx ?? 0, nearM: round(f.nearM ?? 0, 3), floorCeiling: f.floorCeiling, meshes: f.mounted?.meshes, wallMs: f.wall, ms: f.ms, print: f.print })),
+      files: r.files, perFrame: r.frameRecords.map((f) => ({ i: f.i, sha256: f.sha256, draws: f.draws, motion: f.motion ?? 0, turnPx: f.turnPx ?? 0, walkPx: f.walkPx ?? 0, nearM: round(f.nearM ?? 0, 3), floorCeiling: f.floorCeiling, meshes: f.mounted?.meshes, wallMs: f.wall, ms: f.ms, print: f.print, cam: f.cam })),
     }
     mkdirSync(join(first.dir, 'sidecars', r.framing), { recursive: true })
     writeFileSync(join(first.dir, 'sidecars', r.framing, `${r.stem}.json`), JSON.stringify(sidecar, null, 1))
