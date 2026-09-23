@@ -116,7 +116,7 @@ export const litterFaces: { mid: V2; span: number; height: number; count: number
 /** Lay the week's fall. Returns the count of leaves laid. */
 export function layLitter(plan: LitterPlan): number {
   const hero = plan.tier === 'hero', calm = plan.tier === 'calm'
-  const keep = hero ? 1 : plan.tier === 'standard' ? .35 : .12
+  const keep = hero ? 1 : plan.tier === 'standard' ? .2 : .07
   const grow = hero ? 1 : plan.tier === 'standard' ? 1.4 : 1.9
   let laid = 0
   // where the fall comes from: every tree that stands near enough to drop

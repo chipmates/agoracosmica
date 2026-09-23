@@ -365,7 +365,9 @@ export function planVegetation(heightAt: (east: number, north: number) => number
 function* grow(group: Group, heightAt: (east: number, north: number) => number, tier: TreeTier): Generator<void, void, void> {
   const { around, openGround, onBuilding, onWater, onWalk } = refusals(heightAt)
   const trees = [...PLANTING, ...distantPlanting()]
-  const planted = [...trees, ...shrubPlanting(trees)].filter(spec => openGround(spec.east, spec.north, Math.max(.8, spec.height * .03)))
+  // the meadow's shrubs are the film's: a live tier keeps its budget for the
+  // trees the walk passes under
+  const planted = [...trees, ...(tier === 'hero' ? shrubPlanting(trees) : [])].filter(spec => openGround(spec.east, spec.north, Math.max(.8, spec.height * .03)))
     .map(spec => spec.detail === 'mid' && stopDistance(spec.east, spec.north) < 32 ? { ...spec, close: true } : spec)
   // the house's own trees and the valley's woods are dealt apart, so a view
   // of the house refuses the woods whole; the woods cast no shadow the walk
