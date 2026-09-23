@@ -315,8 +315,8 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
     } : /pitched/.test(name) ? {
       // A hide sewn into a hose and sealed with pitch: a close crinkle over a
       // smooth skin, not an upholstery's creases, which read as links.
-      ...set, normalStrength: .2, scales: [.35, .04, .0011],
-      grain: set.grain ? {...set.grain, pitch: .022, relief: .14, shade: .12, sheen: .32, fold: .3, tooth: .006} : null,
+      ...set, normalStrength: .1, scales: [.35, .04, .0011],
+      grain: set.grain ? {...set.grain, pitch: .022, relief: .1, shade: .1, sheen: .28, fold: .3, tooth: .006} : null,
     } : /leather/.test(name) ? {
       // A hide wound round a shaft creases along the wrap; without that band
       // the coil is a smooth tube and reads as hose.
