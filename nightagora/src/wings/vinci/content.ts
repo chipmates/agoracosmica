@@ -21,6 +21,8 @@ export interface VinciStatement extends VinciText {
   humanSource?: VinciText;
   record?: VinciText;
   germanProvenance: 'supplied' | 'museum translation';
+  /** the built object a carrier statement stands on, where it is not the house */
+  carrier?: string;
 }
 
 export interface VinciDoor extends VinciText {
@@ -228,6 +230,12 @@ const visitorWords: Record<string, VisitorWords> = {
     sourceEn: 'Charles Ravaisson-Mollien’s printed facsimile of Manuscript B.',
     sourceDe: 'Charles Ravaisson-Molliens gedrucktes Faksimile von Manuskript B.',
   },
+  'reading-room': {
+    en: 'This small oak room is new, built for the museum like a scholar\u2019s study of his time. Nothing in it was his.',
+    de: 'Dieser kleine Raum aus Eiche ist neu, für das Museum gebaut wie das Studierzimmer eines Gelehrten seiner Zeit. Nichts darin gehörte ihm.',
+    sourceEn: 'Panelling of his time, as types: linenfold, raised panels, pilasters and a coffered ceiling. No single room is copied.',
+    sourceDe: 'Täfelung seiner Zeit, als Typen: Faltwerk, erhabene Füllungen, Pilaster und eine Kassettendecke. Kein einzelner Raum ist kopiert.',
+  },
   'surviving-notebooks': {
     en: 'The surviving notebooks are held in collections around the world.',
     de: 'Die erhaltenen Notizbücher befinden sich in Sammlungen auf der ganzen Welt.',
@@ -414,6 +422,13 @@ const readingTable = statement('facsimile-record',
   'Manuscript B, folio 83 verso, in an 1883 photolithographic facsimile.',
   'Manuskript B, Blatt 83 verso, in einem photolithografischen Faksimile von 1883.',
   'documented', 'document', 'brief/CONCEPT-GPT6.md Station 10; brief/collection/msb-pages.json');
+const readingRoom: VinciStatement = {
+  ...statement('reading-room',
+    'The reading room is a studiolo, the small panelled room in which a scholar of the Renaissance read and wrote, built new in oak for this museum. It fills a bay of the long gallery, between the gallery wall and the edge of the line of dates. Its door stands on the joint between the courses of 23 April 1519 and 2 May 1519. Its panelling follows types of the period: a linenfold dado, raised panels in two tiers, pilasters, a frieze of small panels and a coffered ceiling. It copies no room, and none of it was Leonardo\u2019s. The chair, the shelf and the lamp are modern.',
+    'Das Lesezimmer ist ein Studiolo, der kleine getäfelte Raum, in dem ein Gelehrter der Renaissance las und schrieb, für dieses Museum neu in Eiche gebaut. Es füllt einen Abschnitt der langen Galerie, zwischen der Galeriewand und dem Rand der Datenlinie. Seine Tür steht auf der Fuge zwischen den Platten des 23. April 1519 und des 2. Mai 1519. Die Täfelung folgt Typen der Zeit: ein Sockel mit Faltwerk, erhabene Füllungen in zwei Reihen, Pilaster, ein Fries aus kleinen Füllungen und eine Kassettendecke. Es kopiert keinen Raum, und nichts davon gehörte Leonardo. Stuhl, Regal und Lampe sind modern.',
+    'reconstructed', 'carrier', 'collection/reading-room-plan.ts, the studiolo and its place in the gallery bay; collection/layout.ts, VINCI_READING_TABLE on the joint of the line\u2019s field'),
+  carrier: 'vinci/collection-reading-room',
+};
 const scattered = statement('surviving-notebooks',
   'These are the notebooks that survive, and where they are tonight.',
   'Dies sind die erhaltenen Notizbücher und die Orte, an denen sie heute Abend liegen.',
@@ -573,7 +588,7 @@ const seeds: readonly StationSeed[] = [
   seed('body', { en: 'The body as a machine', de: 'Der Körper als Maschine' }, body,
     [body], 'brief/CONCEPT-OPUS.md §3 S17'),
   seed('reading-table', { en: 'The reading table', de: 'Der Lesetisch' }, readingTable,
-    [readingTable], 'brief/CONCEPT-GPT6.md Station 10; brief/CONCEPT-OPUS.md §3 S13'),
+    [readingTable, readingRoom], 'brief/CONCEPT-GPT6.md Station 10; brief/CONCEPT-OPUS.md §3 S13'),
   seed('supper-wall', { en: 'The wall that is not here', de: 'Die Wand, die nicht hier ist' },
     { en: `${statementRecord(supper).en} ${statementRecord(supperAbsence).en}`, de: `${statementRecord(supper).de} ${statementRecord(supperAbsence).de}` },
     [supper, supperAbsence], 'brief/CONCEPT-OPUS.md §3 S12'),

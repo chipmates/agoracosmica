@@ -2351,7 +2351,7 @@ export function createWing():VinciWingModule {
     appendStatement(evidenceWords[key]!,certainty,anchorId,'GENERATED',citation,value)
   }
   function appendLabel(label:VinciStatement):void {
-    const carrier=label.id==='planting-assumptions'?'vinci/vegetation':label.id==='weather-assumptions'?'vinci/sky':'vinci/shell'
+    const carrier=label.carrier??(label.id==='planting-assumptions'?'vinci/vegetation':label.id==='weather-assumptions'?'vinci/sky':'vinci/shell')
     appendStatement(label,label.certainty,label.target==='carrier'?carrier:`vinci/source/${label.id}`,label.target==='carrier'?'GENERATED':'procedural',label.source,label.record??label,label.humanSource)
   }
   /** The spoken half stands on the surface, the machine chain goes to the
