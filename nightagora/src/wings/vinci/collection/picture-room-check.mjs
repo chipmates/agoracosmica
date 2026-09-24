@@ -151,20 +151,26 @@ if (control.failures.length === 0) failures.push('The control post on the walk d
 // 12 to 74 mm off the lining, its lip inside that; the pale field from 0
 // to 16 mm. Every point of the section over the moulding stands a bed clear.
 const BED = .002, MOULDING = .08, MOULD_BACK = .012, MOULD_FRONT = .074
-const section = plan.SECTION
-const outerR = Math.max(...section.map(p => p.r))
-if (outerR < MOULDING + BED) failures.push(`the frame's side stands ${outerR} m out, inside the moulding's 0.08 m and a bed`)
-for (let i = 0; i + 1 < section.length; i++) {
-  const a = section[i], b = section[i + 1]
-  // a face over the moulding's run (0 < r < 0.08) must stand in front of it
-  for (const t of [0, .25, .5, .75, 1]) {
-    const r = a.r + (b.r - a.r) * t, z = a.z + (b.z - a.z) * t
-    if (r > 1e-6 && r < MOULDING + BED && z < MOULD_FRONT + BED) failures.push(`section point ${r.toFixed(4)}, ${z.toFixed(4)} lies inside the construction's moulding`)
+for (const { style, points: section, seat } of Object.values(plan.SECTIONS)) {
+  const outerR = Math.max(...section.map(p => p.r))
+  if (outerR < MOULDING + BED) failures.push(`the ${style} frame's side stands ${outerR} m out, inside the moulding's 0.08 m and a bed`)
+  for (let i = 0; i + 1 < section.length; i++) {
+    const a = section[i], b = section[i + 1]
+    // a face over the moulding's run (0 < r < 0.08) must stand in front of it
+    for (const t of [0, .25, .5, .75, 1]) {
+      const r = a.r + (b.r - a.r) * t, z = a.z + (b.z - a.z) * t
+      if (r > 1e-6 && r < MOULDING + BED && z < MOULD_FRONT + BED) failures.push(`${style} section point ${r.toFixed(4)}, ${z.toFixed(4)} lies inside the construction's moulding`)
+    }
   }
+  const back = Math.min(...section.filter(p => p.r >= outerR - 1e-9).map(p => p.z))
+  if (back > MOULD_BACK - .0005) failures.push(`the ${style} frame's back at ${back} m does not reach behind the moulding's back`)
+  if (section.some(p => p.r < 0)) failures.push(`a ${style} section reaches over its canvas`)
+  // the number is cast on a flat: the section stands level under the figure
+  const under = section.filter(p => p.r >= seat.r - seat.figure / 2 - 1e-9 && p.r <= seat.r + seat.figure / 2 + 1e-9)
+  const flat = section.some((p, i) => i + 1 < section.length && p.r <= seat.r - seat.figure / 2 + 1e-9
+    && section[i + 1].r >= seat.r + seat.figure / 2 - 1e-9 && Math.abs(p.z - seat.z) < 1e-9 && Math.abs(section[i + 1].z - seat.z) < 1e-9)
+  if (!flat || under.some(p => Math.abs(p.z - seat.z) > 1e-9)) failures.push(`the ${style} number's seat is not a flat of its section`)
 }
-const back = Math.min(...section.filter(p => p.r >= outerR - 1e-9).map(p => p.z))
-if (back > MOULD_BACK - .0005) failures.push(`the frame's back at ${back} m does not reach behind the moulding's back`)
-if (section.some(p => p.r < 0)) failures.push('a frame section reaches over its canvas')
 if (!(plan.CANVAS_Z >= MOULD_FRONT + BED - 1e-9)) failures.push(`the canvas at ${plan.CANVAS_Z} m stands inside the construction's moulding`)
 if (!(plan.CANVAS_Z < plan.SLIP_Z)) failures.push('the canvas stands in front of its own slip')
 if (!(plan.WALL_FACE + plan.CANVAS_Z < plan.ROOM.finish + .1)) failures.push('the canvas stands off its wall')
@@ -175,6 +181,12 @@ for (let i = 1; i < frames.length; i++) {
   const gap = frames[i - 1].outer.west - frames[i].outer.east
   if (gap < .2) failures.push(`${frames[i - 1].key} and ${frames[i].key} stand ${gap.toFixed(3)} m apart`)
 }
+// THE NUMBERS: one to twenty five in the hang's order, each on its own rail
+frames.forEach((f, i) => {
+  if (f.number !== i + 1) failures.push(`${f.key} carries the number ${f.number}, not ${i + 1}`)
+  const seat = plan.numberSeat(f)
+  if (seat.east < f.east - f.width / 2 - 1e-9 || seat.east > f.east + f.width / 2 + 1e-9) failures.push(`${f.key}'s number stands off its bottom rail`)
+})
 for (const f of frames) {
   if (f.outer.high > plan.ROOM.friezeFoot - .02) failures.push(`${f.key} reaches into the frieze`)
   if (f.outer.low < -6.3 + plan.ROOM.gap + .05) failures.push(`${f.key} reaches into the shadow gap`)

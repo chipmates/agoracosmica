@@ -18,7 +18,7 @@
 import { Color, Vector4 } from 'three/webgpu'
 import * as TSL from 'three/tsl'
 import {
-  BEAM_KEEP, CANVAS_Z, FRAME_BACK_Z, FRAME_FRONT_Z, HANG_LIGHT_FIELDS, hangFrames, hangLightTable, LAMP_COLOUR, ROOM, SLIP_Z,
+  BEAM_KEEP, CANVAS_Z, FRAME_BACK_Z, FRAME_FRONT_Z, FRAME_SHADOW_Z, HANG_LIGHT_FIELDS, hangFrames, hangLightTable, LAMP_COLOUR, ROOM, SLIP_Z,
   WALL_FACE, type HangLightData,
 } from './picture-room-plan'
 
@@ -44,10 +44,28 @@ export function pictureLooks() {
     lampColour: uniform(linear(LAMP_COLOUR)),
     /** the head's radius as a source: how soft a frame's shadow falls */
     lampRadius: uniform(.16),
-    /** THE POOL each head throws, shaped to its frame: how far past the
-     * frame its full light runs, and how soft its edge is, both in metres */
+    /** THE POOL each head throws on the canvas, shaped to its frame: how far
+     * past the frame its full light runs, and how soft its edge is, in metres */
     poolMargin: uniform(.2),
     poolSoft: uniform(.22),
+    /** THE BEAM'S FOOTPRINT on the wall: a crisp top a little over the frame,
+     * the sides a little outside it and opening as the beam falls, no floor
+     * to it (it falls down the wall onto the boards); in metres */
+    beamTop: uniform(.16),
+    beamTopSoft: uniform(.085),
+    beamSide: uniform(.12),
+    beamSideSoft: uniform(.14),
+    beamOpen: uniform(.12),
+    /** how far the foot runs past the frame, and how soft it grows as it falls */
+    beamTail: uniform(1.2),
+    beamTailSoft: uniform(.55),
+    /** how much of the physical falloff down the wall the beam keeps: at one
+     * the pool is brightest where the head is nearest, high on the wall */
+    beamKeep: uniform(.78),
+    /** the beam's field past its cone, as a share of its axis: the spill
+     * that reaches the lower wall and the boards, and its half angle's cosine */
+    spill: uniform(.27),
+    spillField: uniform(Math.cos(45 * Math.PI / 180)),
     /** the room's own light on a reproduction apart from its heads: the
      * north glazing and the room's bounce, as the wall beside it reads them */
     fill: uniform(new Color(.07, .077, .092)),
@@ -156,23 +174,64 @@ function boxVisibilityOf(P: N, L: N, x0: N, x1: N, y0: N, y1: N, back: number, f
   return float(1).sub(cover.mul(behind.select(float(1), float(0))))
 }
 
+/** THE BEAM'S FOOTPRINT, read where the ray from the head through the point
+ * meets the wall's plane: the oblique cone's own shape, a short crisp top
+ * over the frame with its corners rounded, and below the work a long foot
+ * that fades down the wall. Its brightness is the head's own falloff. */
+function footprint(x: N, y: N, west: N, east: N, low: N, high: N, looks: PictureLooks): N {
+  const cx = west.add(east).mul(.5), cy = low.add(high).mul(.5)
+  const below = cy.sub(y).max(0)
+  const hw = east.sub(west).mul(.5).add(looks.beamSide).add(below.mul(looks.beamOpen))
+  const up = high.sub(cy).add(looks.beamTop), down = cy.sub(low).add(looks.beamTail)
+  const over = y.greaterThan(cy)
+  const dx = x.sub(cx).abs().div(hw), dy = y.sub(cy).abs().div(over.select(up, down))
+  // the top a rounded square (a lens's cut), the foot an ellipse
+  const dx2 = dx.mul(dx), dy2 = dy.mul(dy)
+  const e = over.select(sqrt(sqrt(dx2.mul(dx2).add(dy2.mul(dy2)))), sqrt(dx2.add(dy2)))
+  // the edge's softness runs on from the sides into the top and the foot, so
+  // the two halves meet without a seam at the work's middle
+  const side = looks.beamSideSoft.div(hw)
+  const soft = over.select(mix(side, looks.beamTopSoft.div(up), smoothstep(0, 1, dy)),
+    side.max(dy.mul(dy).mul(looks.beamTailSoft).min(.6)))
+  return float(1).sub(smoothstep(float(1).sub(soft), float(1).add(soft), e))
+}
+
 /** ONE HEAD ON A POINT OF THE ROOM facing `n`: its irradiance there (candela,
- * cone, distance, incidence, its lens and its pool or its cut), past its own
- * frame and the frieze, and the unit vector toward it. */
-function headOnSurface(P: N, n: N, lamp: N, aim: N, inner: N, level: N, row: Record<keyof HangLightData, N>, looks: PictureLooks): { irradiance: N; toward: N } {
+ * cone, distance, incidence, its footprint or its cut, and the field it
+ * spills past its cone), past its own frame and the frieze, and the unit
+ * vector toward it. `shadows` false for the boards, which no frame reaches. */
+function headOnSurface(P: N, n: N, lamp: N, aim: N, inner: N, level: N, row: Record<keyof HangLightData, N>, looks: PictureLooks, shadows = true): { irradiance: N; toward: N } {
   const L = lamp.xyz, v = L.sub(P), d = length(v), dir = v.div(d)
-  const spot = smoothstep(aim.w, inner, dir.dot(aim.xyz.negate()))
+  const axis = dir.dot(aim.xyz.negate())
+  const spot = smoothstep(aim.w, inner, axis)
   const incidence = n.dot(dir).max(0)
   const o = row.outer, u = row.shutter
   const dL = float(WALL_Z).sub(L.z), p = float(WALL_Z).sub(P.z)
-  const cutT = dL.sub(FRAME_FRONT_Z).div(dL.sub(p).max(1e-3))
+  const reach = dL.sub(p).max(1e-3)
+  const cutT = dL.sub(FRAME_FRONT_Z).div(reach)
   const cx = L.x.add(P.x.sub(L.x).mul(cutT)), cy = L.y.add(P.y.sub(L.y).mul(cutT))
-  const cut = u.y.sub(u.x).greaterThan(.001).select(boxCover(cx, cy, u.x, u.y, u.z, u.w, float(.05)), poolMask(P, L, o.x, o.y, o.z, o.w, looks))
-  const frame = boxVisibilityOf(P, L, o.x, o.y, o.z, o.w, FRAME_BACK_Z, FRAME_FRONT_Z, looks.lampRadius)
-  const frieze = boxVisibilityOf(P, L, float(ROOM.west - 1), float(ROOM.east + 1), float(ROOM.friezeFoot), float(ROOM.bulkheadFoot),
-    ROOM.finish - WALL_FACE, ROOM.frieze - WALL_FACE, looks.lampRadius)
-  const shadow = mix(float(1), frame.mul(frieze), looks.engineTerms)
-  const irradiance = lamp.w.mul(spot).mul(incidence).div(d.mul(d).max(.01)).mul(beam(d, level)).mul(cut).mul(shadow)
+  const wallT = dL.sub(ROOM.finish - WALL_FACE).div(reach)
+  const wx = L.x.add(P.x.sub(L.x).mul(wallT)), wy = L.y.add(P.y.sub(L.y).mul(wallT))
+  const cut = u.y.sub(u.x).greaterThan(.001).select(boxCover(cx, cy, u.x, u.y, u.z, u.w, float(.05)),
+    footprint(wx, wy, o.x, o.y, o.z, o.w, looks))
+  // the field past the cone: what a lens lets by, falling down the wall to the
+  // boards under its own work and never past the next one, which is as far as
+  // a point of the room reads its neighbours
+  const field = smoothstep(looks.spillField, float(1), axis)
+  const half = o.y.sub(o.x).mul(.5), aside = P.x.sub(o.x.add(o.y).mul(.5)).abs()
+  const lateral = float(1).sub(smoothstep(half, half.add(.5), aside))
+  // it falls: over the work's middle it gives way to the beam's own top
+  const falling = float(1).sub(smoothstep(o.z.add(o.w).mul(.5), o.w.add(.2), P.y))
+  const shape = spot.mul(cut).add(pow(field, 1.25).mul(looks.spill).mul(lateral).mul(falling))
+  let shadow: N = float(1)
+  if (shadows) {
+    const frame = boxVisibilityOf(P, L, o.x, o.y, o.z, o.w, FRAME_BACK_Z, FRAME_SHADOW_Z, looks.lampRadius)
+    const frieze = boxVisibilityOf(P, L, float(ROOM.west - 1), float(ROOM.east + 1), float(ROOM.friezeFoot), float(ROOM.bulkheadFoot),
+      ROOM.finish - WALL_FACE, ROOM.frieze - WALL_FACE, looks.lampRadius)
+    shadow = mix(float(1), frame.mul(frieze), looks.engineTerms)
+  }
+  const falloff = pow(d.div(level).max(.2), float(3).mul(float(1).sub(looks.beamKeep))).clamp(.35, 4)
+  const irradiance = lamp.w.mul(shape).mul(incidence).div(d.mul(d).max(.01)).mul(falloff).mul(shadow)
   return { irradiance, toward: dir }
 }
 
@@ -194,8 +253,9 @@ function lobe(n: N, V: N, toward: N, roughness: N, F0: N): N {
  * and a lobe. A physical spot per head stands in the scene as data; the page
  * evaluates only the heads a point can see, because every surface lit by
  * all twenty eight at once cost the room seventy milliseconds a frame. */
-export function hangSurfaceLight(albedo: N, roughness: N, metalness: N, looks: PictureLooks = PICTURE_LOOKS): N {
-  const P = positionWorld, n = TSL.normalWorld, V = normalize(cameraPosition.sub(P))
+export function hangSurfaceLight(albedo: N, roughness: N, metalness: N, looks: PictureLooks = PICTURE_LOOKS, shadows = true, normal: N = null): N {
+  // the surface's own relief, in the world, where the material bends one
+  const P = positionWorld, n = normal ?? TSL.normalWorld, V = normalize(cameraPosition.sub(P))
   const { own, other, apart } = slotsAt(P.x)
   const F0 = mix(vec3(.04, .04, .04), albedo, metalness)
   const diffuse = albedo.mul(float(1).sub(metalness)).div(Math.PI)
@@ -203,7 +263,7 @@ export function hangSurfaceLight(albedo: N, roughness: N, metalness: N, looks: P
   for (const [slot, weight] of [[own, float(1)], [other, apart]] as const) {
     const row = hangRow(slot)
     for (const [lamp, aim, inner, level] of [[row.lampA, row.aimA, row.cone.x, row.cone.z], [row.lampB, row.aimB, row.cone.y, row.cone.w]] as const) {
-      const head = headOnSurface(P, n, lamp, aim, inner, level, row, looks)
+      const head = headOnSurface(P, n, lamp, aim, inner, level, row, looks, shadows)
       sum = sum.add(diffuse.add(lobe(n, V, head.toward, roughness, F0)).mul(head.irradiance.mul(weight)))
     }
   }

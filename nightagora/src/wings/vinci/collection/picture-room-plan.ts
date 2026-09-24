@@ -9,6 +9,7 @@
 import { BoxGeometry, BufferGeometry, CylinderGeometry, Float32BufferAttribute, Matrix4, Quaternion, Vector3 } from 'three/webgpu'
 import { FACE, FLOOR, HANG_DATUM, OPENING, ROOMS } from './layout'
 import { hangPlacements } from './hang'
+import { numberRelief, numberWidth, type Relief } from './picture-numerals'
 
 export const PICTURE_ROOM_PROVENANCE = {
   manifestId: 'vinci/collection-picture-room',
@@ -89,13 +90,20 @@ export const SLIP_Z = .0872
 export const FRAME_FRONT_Z = .097
 export const FRAME_OUTER_R = .088
 export const FRAME_BACK_Z = .011
-export const SECTION: readonly SectionPoint[] = [
+/** the bronze slip at the sight edge, the same in every section, so every
+ * canvas stands in the same rebate under the same edge */
+const SLIP: readonly SectionPoint[] = [
   { r: 0, z: CANVAS_Z, finish: 'bronze' },
   { r: 0, z: .083, finish: 'bronze' },
   { r: .0018, z: .0862, finish: 'bronze', smooth: true },
   { r: .0055, z: SLIP_Z, finish: 'bronze' },
   // a quirk: the oak starts a hair under the slip, which reads as a line
   { r: .0068, z: .0858, finish: 'oak' },
+]
+const side = (r: number): SectionPoint[] => [{ r, z: FRAME_BACK_Z, finish: 'oak' }]
+/** THE COVE: a cove rising to a broad flat face, rolled over a bead. */
+export const SECTION: readonly SectionPoint[] = [
+  ...SLIP,
   { r: .0105, z: .0876, finish: 'oak', smooth: true },
   { r: .017, z: .0918, finish: 'oak', smooth: true },
   { r: .026, z: .0952, finish: 'oak', smooth: true },
@@ -105,8 +113,79 @@ export const SECTION: readonly SectionPoint[] = [
   { r: .0825, z: .0937, finish: 'oak', smooth: true },
   { r: .0866, z: .0895, finish: 'oak', smooth: true },
   { r: FRAME_OUTER_R, z: .0845, finish: 'oak' },
-  { r: FRAME_OUTER_R, z: FRAME_BACK_Z, finish: 'oak' },
+  ...side(FRAME_OUTER_R),
 ]
+/** THE CASSETTA, for the altarpieces and the large panels: a broad sunk
+ * frieze between a small ovolo at the sight and a heavy moulding at the
+ * outer edge, the frame deepest at its outside. */
+const CASSETTA: readonly SectionPoint[] = [
+  ...SLIP,
+  { r: .009, z: .0898, finish: 'oak', smooth: true },
+  { r: .013, z: .0942, finish: 'oak', smooth: true },
+  { r: .018, z: .096, finish: 'oak', smooth: true },
+  { r: .023, z: .0944, finish: 'oak', smooth: true },
+  { r: .026, z: .0908, finish: 'oak' },
+  { r: .0272, z: .0885, finish: 'oak' },
+  { r: .085, z: .0885, finish: 'oak' },
+  { r: .087, z: .0925, finish: 'oak', smooth: true },
+  { r: .091, z: .0978, finish: 'oak', smooth: true },
+  { r: .097, z: .1014, finish: 'oak', smooth: true },
+  { r: .104, z: .1025, finish: 'oak', smooth: true },
+  { r: .11, z: .1003, finish: 'oak', smooth: true },
+  { r: .1148, z: .0958, finish: 'oak', smooth: true },
+  { r: .1175, z: .0902, finish: 'oak' },
+  { r: .118, z: .0862, finish: 'oak' },
+  ...side(.118),
+]
+/** THE BOLECTION, for the small panels: a lip standing proud at the sight,
+ * an ogee falling to a narrow flat, a bead at the outer edge. */
+const BOLECTION: readonly SectionPoint[] = [
+  ...SLIP,
+  { r: .008, z: .0905, finish: 'oak', smooth: true },
+  { r: .0105, z: .0955, finish: 'oak', smooth: true },
+  { r: .014, z: .0985, finish: 'oak', smooth: true },
+  { r: .019, z: .0995, finish: 'oak', smooth: true },
+  { r: .024, z: .0976, finish: 'oak', smooth: true },
+  { r: .028, z: .0942, finish: 'oak', smooth: true },
+  { r: .033, z: .0906, finish: 'oak', smooth: true },
+  { r: .039, z: .0884, finish: 'oak', smooth: true },
+  { r: .046, z: .0876, finish: 'oak' },
+  { r: .069, z: .0876, finish: 'oak' },
+  { r: .072, z: .0896, finish: 'oak', smooth: true },
+  { r: .0762, z: .092, finish: 'oak', smooth: true },
+  { r: .0802, z: .0914, finish: 'oak', smooth: true },
+  { r: .0836, z: .0884, finish: 'oak', smooth: true },
+  { r: .0848, z: .0852, finish: 'oak' },
+  { r: .085, z: .0835, finish: 'oak' },
+  ...side(.085),
+]
+export type FrameStyle = 'cove' | 'cassetta' | 'bolection'
+/** A section and where its number is cast: the flat of the bottom member it
+ * sits on (its middle, its height off the lining) and the figure's height. */
+export interface FrameSection {
+  style: FrameStyle
+  points: readonly SectionPoint[]
+  outer: number
+  front: number
+  seat: { r: number; z: number; figure: number }
+}
+const framed = (style: FrameStyle, points: readonly SectionPoint[], seat: FrameSection['seat']): FrameSection =>
+  ({ style, points, outer: Math.max(...points.map(p => p.r)), front: Math.max(...points.map(p => p.z)), seat })
+export const SECTIONS: Readonly<Record<FrameStyle, FrameSection>> = {
+  cove: framed('cove', SECTION, { r: .0535, z: FRAME_FRONT_Z, figure: .027 }),
+  cassetta: framed('cassetta', CASSETTA, { r: .0561, z: .0885, figure: .042 }),
+  bolection: framed('bolection', BOLECTION, { r: .0575, z: .0876, figure: .019 }),
+}
+/** the deepest face of any section: the box a frame's shadow is cast from */
+export const FRAME_SHADOW_Z = Math.max(...Object.values(SECTIONS).map(s => s.front))
+/** WHICH SECTION A WORK TAKES, by its size: the altarpieces and the large
+ * panels in the cassetta, the small panels in the bolection, the rest in the
+ * cove. The portrait keeps the cove her projector is cut to. */
+export function frameStyle(width: number, height: number): FrameStyle {
+  if (width > 1 || height > 1.3) return 'cassetta'
+  if (width < .42 && height < .52) return 'bolection'
+  return 'cove'
+}
 
 /** One work on the wall: its panel, where it hangs and the frame round it. */
 export interface HangFrame {
@@ -122,20 +201,32 @@ export interface HangFrame {
   canvasNorth: number
   /** the frame's outer edge, east and height */
   outer: { west: number; east: number; low: number; high: number }
+  /** its section, and its number on the wall: the hang's order from the
+   * east door, counted from one */
+  section: FrameSection
+  number: number
 }
 export const frameKey = (id: string, face: string): string => `${id}/${face}`
 
 export function hangFrames(): HangFrame[] {
-  return hangPlacements().map(work => {
+  return hangPlacements().map((work, index) => {
     const west = work.east - work.width / 2, east = work.east + work.width / 2
     const low = work.datum - work.height / 2, high = work.datum + work.height / 2
+    const key = frameKey(work.id, work.face)
+    const section = SECTIONS[key === PROJECTOR.key ? 'cove' : frameStyle(work.width, work.height)]
+    const R = section.outer
     return {
-      key: frameKey(work.id, work.face), id: work.id, face: work.face,
+      key, id: work.id, face: work.face,
       east: work.east, datum: work.datum, width: work.width, height: work.height,
       canvasNorth: WALL_FACE + CANVAS_Z,
-      outer: { west: west - FRAME_OUTER_R, east: east + FRAME_OUTER_R, low: low - FRAME_OUTER_R, high: high + FRAME_OUTER_R },
+      outer: { west: west - R, east: east + R, low: low - R, high: high + R },
+      section, number: index + 1,
     }
   })
+}
+/** THE NUMBER OF A WORK ON THE WALL, by its exhibit key (`id/face`). */
+export function hangNumber(key: string): number | null {
+  return hangFrames().find(frame => frame.key === key)?.number ?? null
 }
 /** How far a reproduction stands in front of the field the construction
  * prepared for it: the canvas sits in the frame's rebate, a centimetre under
@@ -381,7 +472,14 @@ export class Solid {
     }
     g.translate((w + e) / 2, (lo + hi) / 2, -(s + n) / 2)
     const flat = g.toNonIndexed(); g.dispose()
-    if (this.grained) flat.setAttribute('grain', new Float32BufferAttribute(new Float32Array(flat.getAttribute('position').count).fill(grainEast ? 1 : 0), 1))
+    if (this.grained) {
+      const count = flat.getAttribute('position').count
+      flat.setAttribute('grain', new Float32BufferAttribute(new Float32Array(count).fill(grainEast ? 1 : 0), 1))
+      // the heart of the log the board was sawn from: under it and a little
+      // to one side, so its end shows the rings as arcs
+      const heart = v3((w + e) / 2, (s + n) / 2 + .09, lo - .26)
+      flat.setAttribute('heart', new Float32BufferAttribute(new Float32Array(count * 3).map((_, i) => [heart.x, heart.y, heart.z][i % 3]!), 3))
+    }
     this.parts.push(flat)
     this.bounds.push(b)
   }
@@ -393,7 +491,10 @@ export class Solid {
     const turn = new Quaternion().setFromUnitVectors(new Vector3(0, 1, 0), axis.clone().normalize())
     g.applyMatrix4(new Matrix4().compose(A.clone().add(B).multiplyScalar(.5), turn, new Vector3(1, 1, 1)))
     const flat = g.index ? g.toNonIndexed() : g
-    if (this.grained) flat.setAttribute('grain', new Float32BufferAttribute(new Float32Array(flat.getAttribute('position').count), 1))
+    if (this.grained) {
+      flat.setAttribute('grain', new Float32BufferAttribute(new Float32Array(flat.getAttribute('position').count), 1))
+      flat.setAttribute('heart', new Float32BufferAttribute(new Float32Array(flat.getAttribute('position').count * 3), 3))
+    }
     this.parts.push(flat)
     const r = Math.max(radius, radiusB)
     this.bounds.push([Math.min(a[0], b[0]) - r, Math.min(a[1], b[1]) - r, Math.min(a[2], b[2]) - r,
@@ -405,28 +506,50 @@ export class Solid {
 /** THE FRAMES, swept: one geometry per finish, UVs in metres with `u` along
  * each member (the grain) and `v` round the section, each member read from
  * its own piece of the photograph. */
-export function frameGeometry(frames: readonly HangFrame[] = hangFrames()): { oak: BufferGeometry; bronze: BufferGeometry; bounds: Box[] } {
-  const out = { oak: [] as number[][], bronze: [] as number[][] }
-  const bounds: Box[] = []
-  // the section's own normals, flat per segment and averaged at a smooth joint
-  const segs = SECTION.length - 1
+/** a section's own normals, flat per segment and averaged at a smooth joint,
+ * and the distance run round it to each point */
+function sectionFrame(points: readonly SectionPoint[]): { normal: (i: number, seg: number) => [number, number]; arcAt: number[] } {
+  const segs = points.length - 1
   const segNormal: [number, number][] = []
   for (let i = 0; i < segs; i++) {
-    const a = SECTION[i]!, b = SECTION[i + 1]!
+    const a = points[i]!, b = points[i + 1]!
     const dr = b.r - a.r, dz = b.z - a.z, l = Math.hypot(dr, dz) || 1
     segNormal.push([-dz / l, dr / l])
   }
-  const pointNormal = (i: number, seg: number): [number, number] => {
-    const p = SECTION[i]!
-    if (!p.smooth) return segNormal[seg]!
+  const normal = (i: number, seg: number): [number, number] => {
+    if (!points[i]!.smooth) return segNormal[seg]!
     const a = segNormal[Math.max(0, i - 1)]!, b = segNormal[Math.min(segs - 1, i)]!
     const x = a[0] + b[0], y = a[1] + b[1], l = Math.hypot(x, y) || 1
     return [x / l, y / l]
   }
   let arc = 0
   const arcAt: number[] = [0]
-  for (let i = 0; i < segs; i++) { arc += Math.hypot(SECTION[i + 1]!.r - SECTION[i]!.r, SECTION[i + 1]!.z - SECTION[i]!.z); arcAt.push(arc) }
+  for (let i = 0; i < segs; i++) { arc += Math.hypot(points[i + 1]!.r - points[i]!.r, points[i + 1]!.z - points[i]!.z); arcAt.push(arc) }
+  return { normal, arcAt }
+}
+
+/** HOW FAR A NUMBER STANDS PROUD of its rail, and where on the rail it sits:
+ * on the bottom member's flat, its right edge under the sight edge's west end
+ * (the lower right corner of the work as the room sees it), clear of the mark
+ * and the name the page lays under the middle of the work. `east` is the
+ * number's middle. */
+export const NUMBER_RELIEF = .0011
+export function numberSeat(f: HangFrame): { east: number; height: number; z: number; figure: number } {
+  const { seat } = f.section
+  const width = numberWidth(String(f.number).length, seat.figure)
+  return { east: f.east - f.width / 2 + width / 2 + seat.figure * .15, height: f.datum - f.height / 2 - seat.r, z: seat.z, figure: seat.figure }
+}
+
+export function frameGeometry(frames: readonly HangFrame[] = hangFrames()): { oak: BufferGeometry; bronze: BufferGeometry; numbers: BufferGeometry; bounds: Box[] } {
+  const out = { oak: [] as number[][], bronze: [] as number[][] }
+  const numbers: Relief = { position: [], normal: [], uv: [] }
+  const bounds: Box[] = []
+  const frameOf = new Map<FrameStyle, ReturnType<typeof sectionFrame>>()
   frames.forEach((f, index) => {
+    const SECTION = f.section.points, segs = SECTION.length - 1
+    const shape = frameOf.get(f.section.style) ?? sectionFrame(SECTION)
+    frameOf.set(f.section.style, shape)
+    const { normal: pointNormal, arcAt } = shape
     const x0 = f.east - f.width / 2, x1 = f.east + f.width / 2, y0 = f.datum - f.height / 2, y1 = f.datum + f.height / 2
     // the four members: an edge, its outward direction and its run
     const members: { o: [number, number]; from: [number, number]; to: [number, number]; salt: number }[] = [
@@ -459,21 +582,39 @@ export function frameGeometry(frames: readonly HangFrame[] = hangFrames()): { oa
           const [e, h, z] = quad[k]!
           const [nr, nz] = normals[k]!
           // world: east is x, height is y, north is -z; depth z runs north
-          target.push([e, h, -(WALL_FACE + z), m.o[0] * nr, m.o[1] * nr, -nz, us[k]!, vs[k]!])
+          target.push([e, h, -(WALL_FACE + z), m.o[0] * nr, m.o[1] * nr, -nz, us[k]!, vs[k]!, along[0], along[1]])
         }
       }
     }
-    bounds.push([f.outer.west, WALL_FACE + FRAME_BACK_Z, f.outer.low, f.outer.east, WALL_FACE + FRAME_FRONT_Z, f.outer.high])
+    // THE NUMBER, cast on the bottom member's flat and sunk a hair into it.
+    // The room faces the wall looking south, so the figures read westward:
+    // the face's `u` runs west, `v` up, `w` out of the frame into the room
+    const seat = numberSeat(f)
+    const relief = numberRelief(String(f.number), seat.figure, NUMBER_RELIEF)
+    for (let i = 0; i < relief.position.length; i += 3) {
+      numbers.position.push(seat.east - relief.position[i]!, seat.height + relief.position[i + 1]!, -(WALL_FACE + seat.z + relief.position[i + 2]!))
+      numbers.normal.push(-relief.normal[i]!, relief.normal[i + 1]!, -relief.normal[i + 2]!)
+    }
+    numbers.uv.push(...relief.uv)
+    bounds.push([f.outer.west, WALL_FACE + FRAME_BACK_Z, f.outer.low, f.outer.east, WALL_FACE + f.section.front, f.outer.high])
   })
   const build = (rows: number[][]): BufferGeometry => {
     const g = new BufferGeometry()
     g.setAttribute('position', new Float32BufferAttribute(rows.flatMap(r => [r[0]!, r[1]!, r[2]!]), 3))
     g.setAttribute('normal', new Float32BufferAttribute(rows.flatMap(r => [r[3]!, r[4]!, r[5]!]), 3))
     g.setAttribute('uv', new Float32BufferAttribute(rows.flatMap(r => [r[6]!, r[7]!]), 2))
+    // the member's run, which is the way its grain runs
+    g.setAttribute('along', new Float32BufferAttribute(rows.flatMap(r => [r[8]!, r[9]!, 0]), 3))
     g.computeBoundingBox(); g.computeBoundingSphere()
     return g
   }
-  return { oak: build(out.oak), bronze: build(out.bronze), bounds }
+  const cast = new BufferGeometry()
+  cast.setAttribute('position', new Float32BufferAttribute(numbers.position, 3))
+  cast.setAttribute('normal', new Float32BufferAttribute(numbers.normal, 3))
+  cast.setAttribute('uv', new Float32BufferAttribute(numbers.uv, 2))
+  cast.setAttribute('along', new Float32BufferAttribute(new Float32Array(numbers.position.length).map((_, i) => i % 3 === 0 ? 1 : 0), 3))
+  cast.computeBoundingBox(); cast.computeBoundingSphere()
+  return { oak: build(out.oak), bronze: build(out.bronze), numbers: cast, bounds }
 }
 
 /** Is the wall seen at this east and height, or is a frame standing on it? */
@@ -622,8 +763,15 @@ function head(metal: Solid, lens: Solid, at: P3, aim: P3, trackFoot: number, pro
   metal.rod(along(-.095), along(.095), .058, 24)
   metal.rod(along(-.16), along(-.095), .05, 24)
   for (let fin = 0; fin < 3; fin++) metal.rod(along(-.108 - fin * .018), along(-.104 - fin * .018), .056, 24)
-  metal.rod(along(.095), along(.155), .06, 24, .066, true)
-  lens.rod(along(.096), along(.1), .05, 24)
+  // a short snoot, so the lit lens is seen from the room and not only from the wall
+  metal.rod(along(.095), along(.128), .06, 24, .064, true)
+  lens.rod(along(.1), along(.106), .053, 24)
+}
+/** WHERE A HEAD'S LENS IS, and the way it throws: its face and its axis. */
+export function lensOf(lamp: HangLamp): { at: Vector3; axis: Vector3 } {
+  const face = v3(...lamp.at), axis = v3(...lamp.aim).sub(face).normalize()
+  const pivot = face.clone().addScaledVector(axis, lamp.shutter ? -.16 : -.1)
+  return { at: pivot.addScaledVector(axis, lamp.shutter ? .216 : .106), axis }
 }
 
 /** THE FITTINGS: the hang's track under its rib, every head on it, and the

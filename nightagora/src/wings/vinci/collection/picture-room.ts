@@ -18,9 +18,9 @@
  * light or building of 1517 is claimed.
  */
 import {
-  AdditiveBlending, Color, CubeCamera, CubeRenderTarget, DirectionalLight, DoubleSide, Float32BufferAttribute, FrontSide,
-  Group, HalfFloatType, Mesh, MeshBasicNodeMaterial, MeshStandardNodeMaterial, Object3D, PMREMGenerator, PlaneGeometry,
-  RectAreaLight, RectAreaLightNode, SpotLight, type BufferGeometry, type Light, type Material, type RenderTarget, type Scene,
+  AdditiveBlending, Color, CubeCamera, CubeRenderTarget, CylinderGeometry, DirectionalLight, DoubleSide, Float32BufferAttribute, FrontSide,
+  Group, HalfFloatType, Matrix4, Mesh, MeshBasicNodeMaterial, MeshStandardNodeMaterial, Object3D, PMREMGenerator, PlaneGeometry,
+  Quaternion, RectAreaLight, RectAreaLightNode, SpotLight, Vector3, type BufferGeometry, type Light, type Material, type RenderTarget, type Scene,
 } from 'three/webgpu'
 import * as TSL from 'three/tsl'
 import { lights as lightsOf, output, pmremTexture } from 'three/tsl'
@@ -30,7 +30,7 @@ import type { Stack } from '../../../stack'
 import type { MaterialSet } from '../../../stack/materials'
 import { axisFootprint, lineCoverage } from '../../../stack/detail'
 import {
-  benches, ceilingSkin, fittings, floorSkins, frameGeometry, hangFrames, hangLamps, LAMP_COLOUR,
+  benches, ceilingSkin, fittings, floorSkins, frameGeometry, hangFrames, hangLamps, LAMP_COLOUR, lensOf,
   PICTURE_ROOM_PROVENANCE, PICTURE_SHADOW_LAYER, PROBE_AT, ROOM, ROOM_LIGHTS, shadowCasters, stampHangLight, v3,
   wallSkins, WINDOW, type HangLamp, type RoomLight, type Skin, type Solid,
 } from './picture-room-plan'
@@ -41,9 +41,12 @@ import { hangSurfaceLight, PICTURE_LOOKS, varnishFilm, withRoomAir } from './pic
 type N = any
 
 const {
-  abs, attribute, cameraPosition, cameraViewMatrix, cross, dot, float, floor: floorOf, fract, max, min, mix, mx_noise_float,
+  abs, attribute, cameraPosition, cameraViewMatrix, cross, dot, float, floor: floorOf, fract, length, max, min, mix, mx_noise_float,
   normalWorldGeometry, positionWorld, pow, select, smoothstep, uniform, uv, vec2, vec3,
 } = TSL as unknown as Record<string, N>
+
+/** how far along each beam the air's glow is drawn, in metres */
+const GLOW_REACH = .85
 
 /** The sets the room is dressed from, all CC0 and already in the store. */
 const SETS = ['concrete-wall-formed', 'oak-veneer-light', 'concrete-floor-polished'] as const
@@ -59,9 +62,12 @@ function faceFrame(n: N): { t: N; b: N } {
   return { t, b }
 }
 
-/** a tangent-space normal from a set, bent into the world and handed over in view space */
+/** a tangent-space normal from a set, bent into the world */
+const bendWorld = (t: N, b: N, n: N, tangent: N, strength: number | N): N =>
+  t.mul(tangent.x.mul(strength)).add(b.mul(tangent.y.mul(strength))).add(n.mul(tangent.z)).normalize()
+/** the same, handed over in view space */
 const bend = (t: N, b: N, n: N, tangent: N, strength: number | N): N =>
-  t.mul(tangent.x.mul(strength)).add(b.mul(tangent.y.mul(strength))).add(n.mul(tangent.z)).normalize().transformDirection(cameraViewMatrix)
+  bendWorld(t, b, n, tangent, strength).transformDirection(cameraViewMatrix)
 
 const luminance = (c: N): N => dot(c, vec3(.2126, .7152, .0722))
 
@@ -75,6 +81,13 @@ function looks() {
     plasterCloud: uniform(.36),
     plasterRough: uniform(.62),
     plasterNormal: uniform(.2),
+    /** THE TOOTH: the same photograph laid at a hand's width, read for its
+     * relief and a breath of its tone, so the trowelled face has a grain at
+     * the distance a label is read from */
+    plasterTooth: uniform(.55),
+    plasterToothTone: uniform(.1),
+    plasterSand: uniform(.17),
+    plasterSandTone: uniform(.035),
     /** the building's concrete, poured a shade cooler than the gallery's */
     concreteTint: uniform(new Color(.9, .95, 1.12)),
     soffitTint: uniform(new Color(.84, .9, 1.1)),
@@ -83,8 +96,11 @@ function looks() {
     floorWear: uniform(.22),
     floorRough: uniform(.42),
     /** the frames' dark oiled oak and the benches' lighter oiled oak */
-    frameTint: uniform(new Color(.078, .05, .031)),
+    frameTint: uniform(new Color(.064, .041, .026)),
     frameRough: uniform(.72),
+    /** metres the oak is laid at on the frames, and how far its figure bends the light */
+    frameGrain: .95,
+    frameRelief: uniform(.42),
     benchTint: uniform(new Color(.74, .66, .58)),
     /** a dark honed stone: the glazing's band, the thresholds, the gaps' backs */
     darkTint: uniform(new Color(.4, .39, .38)),
@@ -96,6 +112,9 @@ function looks() {
      * where the reflected ray meets the room's own walls */
     floorMirror: uniform(.8),
     floorGloss: uniform(.3),
+    /** the lit lens of every head, and the air it lights in front of it */
+    lens: uniform(18),
+    glow: uniform(.045),
   }
 }
 type Looks = ReturnType<typeof looks>
@@ -112,16 +131,29 @@ function plasterMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial {
   const sample = set.sample({ uv: at, metres: 1.4 })
   // a second, larger lay of the same photograph so no tile repeats down 39 m
   const wide = set.sample({ uv: at.mul(.37).add(vec2(11.3, 4.1)), metres: 1.4 })
+  const tooth = set.sample({ uv: at, metres: .21, turn: .83, offset: [3.7, 1.3] })
+  // THE SAND IN THE LIME: a grain of a few millimetres the heads rake across,
+  // faded where a pixel holds more than a grain
+  const sand = at.mul(310), fine = at.mul(720)
+  const sandFade = float(1).sub(smoothstep(.35, .9, TSL.fwidth(sand.x)))
+  const fineFade = float(1).sub(smoothstep(.35, .9, TSL.fwidth(fine.x)))
+  const grit = vec2(mx_noise_float(vec3(sand, 1.3)), mx_noise_float(vec3(sand, 7.1))).mul(sandFade)
+    .add(vec2(mx_noise_float(vec3(fine, 3.7)), mx_noise_float(vec3(fine, 9.9))).mul(fineFade.mul(.5)))
   const cloud = luminance(sample.albedo).mul(.6).add(luminance(wide.albedo).mul(.4))
   const drift = mx_noise_float(P.mul(.21)).mul(.05).add(mx_noise_float(P.mul(.73)).mul(.025))
-  const tone = mix(float(1), cloud, L.plasterCloud).add(drift)
+  const grain = luminance(tooth.albedo).sub(1).mul(L.plasterToothTone).add(mx_noise_float(vec3(sand, 4.4)).mul(sandFade).mul(L.plasterSandTone))
+  const tone = mix(float(1), cloud, L.plasterCloud).add(drift).add(grain)
   const albedo = L.plaster.mul(tone).toVar()
-  const rough = mix(L.plasterRough.sub(.1), L.plasterRough.add(.14), sample.roughness).clamp(.3, .95).toVar()
+  const rough = mix(L.plasterRough.sub(.1), L.plasterRough.add(.14), sample.roughness.mul(.6).add(tooth.roughness.mul(.4))).clamp(.3, .95).toVar()
+  // the broad trowel and the fine tooth, one relief: the heads read it too
+  const relief = vec3(sample.normal.x.mul(L.plasterNormal).add(tooth.normal.x.mul(L.plasterTooth)).add(grit.x.mul(L.plasterSand)),
+    sample.normal.y.mul(L.plasterNormal).add(tooth.normal.y.mul(L.plasterTooth)).add(grit.y.mul(L.plasterSand)), 1)
+  const world = bendWorld(t, b, n, relief, 1).toVar()
   m.colorNode = albedo
   m.roughnessNode = rough
-  m.normalNode = bend(t, b, n, sample.normal, L.plasterNormal)
+  m.normalNode = world.transformDirection(cameraViewMatrix)
   m.aoNode = sample.occlusion
-  m.emissiveNode = hangSurfaceLight(albedo, rough, float(0))
+  m.emissiveNode = hangSurfaceLight(albedo, rough, float(0), PICTURE_LOOKS, true, world)
   m.outputNode = withRoomAir(output)
   m.name = 'vinci/collection-picture-room/plaster'
   m.userData = { ...PICTURE_ROOM_PROVENANCE, set: set.name }
@@ -178,9 +210,13 @@ function floorMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial {
   const wear = walked.max(doors).mul(L.floorWear)
   const dust = walked.mul(walked.oneMinus()).mul(4).mul(L.floorWear.mul(.3))
   const tone = float(1).add(h1.sub(.5).mul(.16))
-  m.colorNode = sample.colour.mul(L.floorTint).mul(tone).mul(float(1).add(wear.mul(.55)))
-    .mul(float(1).sub(dust.mul(.25))).mul(float(1).sub(joint.mul(.6)))
-  m.roughnessNode = L.floorRough.add(sample.roughness.sub(.5).mul(.2)).add(wear.mul(.5)).add(joint.mul(.25)).clamp(.18, .95)
+  const albedo = sample.colour.mul(L.floorTint).mul(tone).mul(float(1).add(wear.mul(.55)))
+    .mul(float(1).sub(dust.mul(.25))).mul(float(1).sub(joint.mul(.6))).toVar()
+  const rough = L.floorRough.add(sample.roughness.sub(.5).mul(.2)).add(wear.mul(.5)).add(joint.mul(.25)).clamp(.18, .95).toVar()
+  m.colorNode = albedo
+  m.roughnessNode = rough
+  // the heads' beams fall down the wall and onto the boards in front of it
+  m.emissiveNode = hangSurfaceLight(albedo, rough, float(0), PICTURE_LOOKS, false)
   m.normalNode = bend(vec3(0, 0, -1), vec3(1, 0, 0), n, sample.normal, .45)
   m.aoNode = sample.occlusion
   m.outputNode = withRoomAir(output)
@@ -209,18 +245,23 @@ function darkMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial {
 function frameOakMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial {
   const m = new MeshStandardNodeMaterial({ roughness: .4, metalness: 0, side: FrontSide })
   const n = normalWorldGeometry, at = uv()
-  const sample = set.sample({ uv: vec2(at.y, at.x), metres: 1.83 })
+  // the oak laid a size under the veneer's own, so its grain holds at the
+  // distance a label is read from; its figure bent along each member
+  const sample = set.sample({ uv: vec2(at.y, at.x), metres: L.frameGrain })
   // the slip at the sight edge is bronze, carried on the same mesh
   const metal = attribute('metal', 'float').greaterThan(.5)
   const worn = mx_noise_float(positionWorld.mul(9.3)).mul(.5).add(.5)
   const albedo = select(metal, L.bronze.mul(worn.mul(.2).add(.9)), sample.colour.mul(L.frameTint)).toVar()
-  const rough = select(metal, float(.3).add(worn.mul(.12)), mix(L.frameRough.sub(.1), L.frameRough.add(.1), sample.roughness).clamp(.2, .98)).toVar()
+  const rough = select(metal, float(.3).add(worn.mul(.12)), mix(L.frameRough.sub(.14), L.frameRough.add(.1), sample.roughness).clamp(.2, .98)).toVar()
   const metalness = select(metal, float(1), float(0)).toVar()
+  const along = attribute('along', 'vec3')
+  const round = cross(along, n).normalize()
+  const world = select(metal, n, bendWorld(round, along, n, sample.normal, L.frameRelief)).toVar()
   m.colorNode = albedo
   m.roughnessNode = rough
   m.metalnessNode = metalness
-  m.emissiveNode = hangSurfaceLight(albedo, rough, metalness)
-  m.normalNode = n.transformDirection(cameraViewMatrix)
+  m.emissiveNode = hangSurfaceLight(albedo, rough, metalness, PICTURE_LOOKS, true, world)
+  m.normalNode = world.transformDirection(cameraViewMatrix)
   // an oiled frame takes the room's light as a sheen, not as a grey film
   m.envMapIntensity = .45
   m.outputNode = withRoomAir(output)
@@ -235,13 +276,28 @@ function benchOakMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial 
   const P = positionWorld, n = normalWorldGeometry
   const east = attribute('grain', 'float').greaterThan(.5)
   const along = select(east, vec3(1, 0, 0), vec3(0, 1, 0))
-  const grain = select(abs(dot(n, along)).greaterThan(.5), vec3(0, 0, -1), along)
+  const end = abs(dot(n, along)).greaterThan(.5)
+  const grain = select(end, vec3(0, 0, -1), along)
   const t = cross(grain, n).normalize()
   const sample = set.sample({ uv: vec2(dot(P, t), dot(P, grain)), metres: 1.83 })
+  // THE END OF A BOARD SHOWS ITS RINGS: arcs round a heart that lies under
+  // and beside the board, the late wood dark, the rays across them, the cut
+  // end drinking the oil darker than the face
+  const off = P.sub(attribute('heart', 'vec3'))
+  const radial = off.sub(along.mul(dot(off, along)))
+  const wobble = mx_noise_float(P.mul(9)).mul(.0014)
+  const r = length(radial).add(wobble)
+  const ring = fract(r.div(.0045))
+  // a ring finer than the pixel it falls in is read as its average, not as a moiré
+  const resolved = float(1).sub(smoothstep(.25, .7, TSL.fwidth(r).div(.0045)))
+  const late = smoothstep(.55, .9, ring).mul(float(1).sub(smoothstep(.9, 1, ring))).sub(.19).mul(resolved).add(.19)
+  const turn = TSL.atan(dot(radial, t), dot(radial, cross(along, t)))
+  const ray = smoothstep(.8, .97, mx_noise_float(vec3(turn.mul(260), length(radial).mul(40), 1.7)).mul(.5).add(.5))
+  const endGrain = sample.colour.mul(L.benchTint).mul(float(.6).sub(late.mul(.2)).add(ray.mul(.12)))
   // the shoes under the legs are dark bronze, carried on the same mesh
   const metal = attribute('metal', 'float').greaterThan(.5)
-  m.colorNode = select(metal, L.bronze.mul(.55), sample.colour.mul(L.benchTint))
-  m.roughnessNode = select(metal, float(.42), mix(float(.4), float(.66), sample.roughness))
+  m.colorNode = select(metal, L.bronze.mul(.55), select(end, endGrain, sample.colour.mul(L.benchTint)))
+  m.roughnessNode = select(metal, float(.42), select(end, float(.72), mix(float(.4), float(.66), sample.roughness)))
   m.metalnessNode = select(metal, float(1), float(0))
   m.normalNode = select(metal, n.transformDirection(cameraViewMatrix), bend(t, grain, n, sample.normal, .7))
   m.aoNode = select(metal, float(1), sample.occlusion)
@@ -424,7 +480,7 @@ export function mountPictureRoom(stack: Stack): PictureRoom {
   const plaster = plasterMaterial(stoneSet!, L)
   const concrete = concreteMaterial(concreteSet!, L)
   const floor = floorMaterial(oakSet!, L)
-  if (reflection) floor.emissiveNode = boxReflection(reflection, PROBE_AT, L.floorGloss).mul(L.floorMirror)
+  if (reflection) floor.emissiveNode = (floor.emissiveNode as N).add(boxReflection(reflection, PROBE_AT, L.floorGloss).mul(L.floorMirror))
   const dark = darkMaterial(stoneSet!, L)
   const frameOak = frameOakMaterial(oakSet!, L)
   const benchOak = benchOakMaterial(oakSet!, L)
@@ -468,19 +524,50 @@ export function mountPictureRoom(stack: Stack): PictureRoom {
     return g
   }
   const frameParts = frameGeometry(frames)
-  make(merged([flag(frameParts.oak, 'metal', 0), flag(frameParts.bronze, 'metal', 1)]), frameOak, 'frames')
+  // the numbers are cast in the slip's bronze and ride on the frames' mesh
+  make(merged([flag(frameParts.oak, 'metal', 0), flag(frameParts.bronze, 'metal', 1), flag(frameParts.numbers, 'metal', 1)]), frameOak, 'frames')
   const bench = benches()
-  make(merged([...bench.oak.parts.map(g => flag(g, 'metal', 0)), ...bench.bronze.parts.map(g => flag(flag(g, 'grain', 0), 'metal', 1))]), benchOak, 'benches')
+  const hearted = (g: BufferGeometry): BufferGeometry => {
+    g.setAttribute('heart', new Float32BufferAttribute(new Float32Array(g.getAttribute('position').count * 3), 3))
+    return g
+  }
+  make(merged([...bench.oak.parts.map(g => flag(g, 'metal', 0)), ...bench.bronze.parts.map(g => hearted(flag(flag(g, 'grain', 0), 'metal', 1)))]), benchOak, 'benches')
   {
     const { metal, lenses } = fittings()
     const anodised = new MeshStandardNodeMaterial({ roughness: .38, metalness: .8 })
     const lit = attribute('lens', 'float').greaterThan(.5)
     anodised.colorNode = select(lit, vec3(0, 0, 0), vec3(.0085, .009, .01))
-    anodised.emissiveNode = select(lit, vec3(new Color(LAMP_COLOUR).r, new Color(LAMP_COLOUR).g, new Color(LAMP_COLOUR).b).mul(9), vec3(0, 0, 0))
+    anodised.emissiveNode = select(lit, vec3(new Color(LAMP_COLOUR).r, new Color(LAMP_COLOUR).g, new Color(LAMP_COLOUR).b).mul(L.lens), vec3(0, 0, 0))
     anodised.name = 'vinci/collection-picture-room/fixtures'
     adopt(anodised, rig.ceiling)
     materials.push(anodised)
     make(merged([...metal.parts.map(g => flag(g, 'lens', 0)), ...lenses.parts.map(g => flag(g, 'lens', 1))]), anodised, 'fixtures', false)
+  }
+
+  // THE BEAMS IN THE AIR: a faint glow of the room's air the first
+  // metre of every beam, brightest at the lens, an engine term like the air
+  {
+    const cones: BufferGeometry[] = []
+    for (const lamp of lamps) {
+      const { at, axis } = lensOf(lamp)
+      const reach = GLOW_REACH, wide = Math.tan(lamp.angle * (1 - lamp.penumbra)) * reach
+      const g = new CylinderGeometry(wide, .045, reach, 28, 1, true)
+      g.applyMatrix4(new Matrix4().compose(at.clone().addScaledVector(axis, reach / 2),
+        new Quaternion().setFromUnitVectors(new Vector3(0, 1, 0), axis), new Vector3(1, 1, 1)))
+      cones.push(g.toNonIndexed())
+      g.dispose()
+    }
+    const air = new MeshBasicNodeMaterial({ transparent: true, depthWrite: false, side: DoubleSide })
+    // the air lit along the beam: thicker where the eye looks through it,
+    // fading from the lens over the first metre
+    const along = uv().y, facing = abs(dot(normalWorldGeometry, cameraPosition.sub(positionWorld).normalize()))
+    air.colorNode = H.lampColour.mul(L.glow).mul(pow(facing, 3)).mul(pow(float(1).sub(along), 2.2))
+      .mul(TSL.exp(along.mul(-2.2))).mul(H.engineTerms)
+    air.blending = AdditiveBlending
+    air.name = 'vinci/collection-picture-room/beam-air'
+    materials.push(air)
+    const mesh = make(merged(cones), air, 'beam-air', false)
+    mesh.renderOrder = 3
   }
 
   // THE VARNISH: one film over every reproduction, a hair in front of it,
