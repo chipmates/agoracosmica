@@ -287,9 +287,9 @@ export function upperEndWall(): Body {
  * bed into it, and rises to the bay's roof and to the nave's. */
 export function southWall(): Body {
   const b = new Body()
-  // the bay's: a thin leaf before the glazing up to the collection's roof,
-  // the collection's overhang passing through it, then the wall to the roof
-  b.box([ROOM.west - .06, ROOM.baySouth - .03, ROOM.floor - .02, GRAVE_BACKDROP_END + .05, ROOM.baySouth, ENVELOPE_NORTH.soffit], ['t'])
+  // the bay's: a thin leaf before the glazing up to the collection's roof
+  // (whose overhang is cut back over the bay), then the wall to the roof
+  b.box([ROOM.west - .06, ROOM.baySouth - .03, ROOM.floor - .02, ROOM.step + .02, ROOM.baySouth, ENVELOPE_NORTH.top - .008], ['t'])
   b.box([ROOM.west - .5, ROOM.south - .4, ENVELOPE_NORTH.top - .012, ROOM.step, ROOM.baySouth, ROOM.bayTop])
   b.box([ROOM.step, ROOM.south - .4, ENVELOPE_NORTH.top - .012, ROOM.east + ROOM.eastWall, ROOM.south, ROOM.naveTop], ['w'])
   return b
@@ -326,6 +326,9 @@ export function frame(): Body {
   b.box([ROOM.west - .5, ROOM.north - D, BEAMS.bayFoot, ROOM.step, ROOM.north, ROOM.baySoffit + .002], ['t'])
   // the nave's north beam, from the step to the east wall
   b.box([ROOM.step + ROOM.stepWall, ROOM.naveNorth, BEAMS.naveFoot, ROOM.east, ROOM.naveNorth + D, ROOM.naveSoffit + .002], ['t'])
+  // THE STEP'S SOUTH PILASTER: the jamb of the way into the bay, which the
+  // collection's overhang, running along the nave over the fins, dies into
+  b.box([ROOM.step, ROOM.baySouth - .03, ROOM.floor + FLOOR_RISE - .004, GRAVE_BACKDROP_END + .05, ENVELOPE_NORTH.overhang + .05, ROOM.naveSoffit + .002], ['t'])
   // the east wall, closed but for the door the walk leaves by
   const E = ROOM.east, W = ROOM.eastWall, top = ROOM.naveSoffit + .002
   b.box([E, ROOM.south, ROOM.floor - .02, E + W, DOOR.south, top], ['t'])
