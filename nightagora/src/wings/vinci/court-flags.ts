@@ -119,9 +119,13 @@ export function flagFace(grid: FlagGrid, walked: N, damp: N, opts: FlagOptions =
   const bandM = dressed ? .042 : .021
   const bandAt = across.div(bandM).add(mx_noise_float(vec3(lengthwise.mul(6), hash(19.7).mul(17), 2.2)).mul(dressed ? .35 : .15))
   const band = fract(sin(floor(bandAt).mul(41.37).add(hash(19.9).mul(91))).mul(24634.6345)).sub(.5)
-  const teeth = sin(across.div(dressed ? .0055 : .0024).mul(6.2832)).mul(resolved(dressed ? .0055 : .0024, pixel))
+  // the teeth's grooves wander as a hand-held chisel wanders, and each band
+  // is struck a little off the last
+  const teethAt = across.div(dressed ? .0055 : .0024).add(mx_noise_float(vec3(lengthwise.mul(3), across.mul(3), hash(19.5).mul(7))).mul(1.6))
+    .add(floor(bandAt).mul(.37))
+  const teeth = sin(teethAt.mul(6.2832)).mul(resolved(dressed ? .0055 : .0024, pixel))
   const kept = float(1).sub(walked.mul(.85))
-  const tooling = band.mul(resolved(bandM, pixel)).mul(dressed ? .075 : .03).add(teeth.mul(dressed ? .035 : .012)).mul(kept)
+  const tooling = band.mul(resolved(bandM, pixel)).mul(dressed ? .075 : .03).add(teeth.mul(dressed ? .014 : .008)).mul(kept)
   // shell in some beds: a fragment's section a centimetre or two across, a
   // pale calcite rim; in others a vein of calcite or a dark stylolite seam
   const shellCell = vec2(east, north).div(.055), sc = floor(shellCell), sf = fract(shellCell)
