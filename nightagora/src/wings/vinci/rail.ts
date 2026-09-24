@@ -109,16 +109,22 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // stands 2.8 m east of the desktop's eye, where its frame holds the whole
   // gable and the trees past the house's west corner instead of brick alone,
   // turned onto the gable and lifted so the house stands in the middle of the
-  // frame rather than high at its right over a third of cobble.
-  if(id==='study') return narrow?p(5.2,-29.8,1.65,-2.3955,-24.0764,4.7402,86):p(2.4,-29.3,1.65,-1.94,-22.848,2.74,60)
+  // frame rather than high at its right over a third of cobble. The desktop
+  // steps down off the terrace's edge, twelve metres from the gable, which is
+  // as far back as a straight walk in from the gate stays clear of the raised
+  // lawn east of it: the whole gable to its finial, the support under it.
+  if(id==='study') return narrow?p(5.2,-29.8,1.65,-2.3955,-24.0764,4.7402,86):p(.5,-34,groundHeight(.5,-34)+1.65,-1.4344,-24.8991,4.84,62)
   // The royal château stands 590 m away on a bearing of 308.84 degrees, which
   // from this end of the court runs over the house's west corner and down the
   // valley; nothing of the castle is built, and its line stays in both frames.
-  // Both turn onto the house and look up: on the castle's own line the frame
-  // kept a sliver of the west face at its margin, and the face now runs from
-  // the corner to the north end whole. The desktop stops short of the mural's
-  // pavilion on its left and of the gable's windows on its right.
-  if(id==='chamber') return narrow?p(-4.2,-32.4,1.65,-9.4018,-24.0753,3.5581,92):p(-4.2,-32.4,1.65,-9.4453,-24.1027,3.5581,43)
+  // The phone turns onto the house and looks up: on the castle's own line its
+  // frame kept a sliver of the west face at its margin, and the face now runs
+  // from the corner to the north end whole. The desktop holds what this end of
+  // the terrace looks at: the Last Supper's wall whole in its court below on
+  // the left, the west face to its cornice at the corner on the right. The
+  // gable over that corner stands seven metres off, too steep for any frame
+  // that also looks down into the court.
+  if(id==='chamber') return narrow?p(-4.2,-32.4,1.65,-9.4018,-24.0753,3.5581,92):p(-4.2,-32.4,1.65,-11.7406,-26.2937,4.0692,70)
   // R19 accepted: actual apron paving +1.65 m; all eight principal windows clear vegetation.
   // The phone looks up eleven degrees, not twenty-three: a third of its frame
   // was sky and the house stood low, where the card is. The lens is opened
