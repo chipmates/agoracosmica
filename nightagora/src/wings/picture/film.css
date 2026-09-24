@@ -1,0 +1,66 @@
+/* THE PICTURE IS THE PLACE. Still, cross-fade and clips share one box and one
+   fit, so a swap between them moves nothing at all; the museum's night stands
+   behind them where no picture has come yet. */
+.na-film {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--na-abyss);
+  pointer-events: none;
+}
+.na-film.veiled { visibility: hidden; }
+.na-film > img,
+.na-film > video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+  display: block;
+}
+/* a video is painted only once its first frame is presented, and leaves by
+   the end dissolve; until then the still under it is the picture */
+.na-film > video { opacity: 0; }
+.na-film > video.shown { opacity: 1; }
+.na-film > video.shown.leaving { opacity: 0; transition: opacity 120ms linear; }
+.na-film > .na-film-cross { opacity: 0; }
+.na-film > .na-film-cross.shown { opacity: 1; transition: opacity 200ms linear; }
+.na-film > .na-film-cross:not([src]) { display: none; }
+/* THE JUMP'S DARK is the museum's own, as the wing's chapter cut */
+.na-film-dark {
+  position: absolute;
+  inset: 0;
+  background: #0b141b;
+  opacity: 0;
+  transition: opacity 450ms ease;
+}
+.na-film-dark.shown { opacity: 1; }
+/* THE WAIT stands under the door's own hairline: one gold line, counted */
+.na-film-wait {
+  position: absolute;
+  left: 50%;
+  bottom: 28px;
+  width: 132px;
+  height: 1px;
+  margin-left: -66px;
+  background: var(--rule-faint, color-mix(in srgb, var(--na-starlight, #f3efe2) 18%, transparent));
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+.na-film-wait.shown { opacity: 1; }
+.na-film-wait-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--na-gold);
+  transform: scaleX(0);
+  transform-origin: 50% 50%;
+  transition: transform 200ms ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .na-film-dark, .na-film-wait, .na-film-wait-fill { transition: none; }
+}
