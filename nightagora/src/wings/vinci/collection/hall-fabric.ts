@@ -421,7 +421,8 @@ function glossyReflection(reflection: N, rough: N): N {
   }
   d = d.max(0)
   const foot = P.y.add(r.y.mul(d)).sub(FLOOR).max(0)
-  const spread = rough.mul(rough).mul(.45)
+  // measured against a path-traced still of the hall: a lobe of this width
+  const spread = rough.mul(rough).mul(.8)
   const along = spread.mul(d).min(foot.mul(.85))
   const across = spread.mul(d).mul(r.y)
   // radians per texel of the pass, and metres per texel at the reflected point
