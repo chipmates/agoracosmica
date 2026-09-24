@@ -13,6 +13,7 @@ import {slateFiniteFinish,slateFiniteProvenance} from './slate-microstructure'
 import {oakFiniteFinish,oakFiniteProvenance} from './oak-microstructure'
 import { anisotropicFootprint, coursedFace, dressedTuffeau } from './masonry-courses'
 import { weatherAtlas, weatherUV } from './house-weather'
+import { DRESSING_H_MIN, DRESSING_H_SPAN, dressingAtlas, dressingSky, dressingUV } from './house-sun'
 import { hourKey } from './site'
 
 export type ShellSurfaceKind = 'brick' | 'stone' | 'slate' | 'oak'
@@ -96,15 +97,33 @@ function prepareOakSeeds(geometry:BufferGeometry,panelSeeds?:readonly number[]):
  */
 export function prepareSurfaceGeometry(geometry:BufferGeometry,kind:ShellSurfaceKind,roles?:readonly number[],panelSeeds?:readonly number[]):void {
   const p=geometry.getAttribute('position'),normals=geometry.getAttribute('normal'),tone=geometry.getAttribute('tone')
-  const info=new Float32Array(p.count*3),weatherAt=new Float32Array(p.count*4)
-  for(let i=0;i<p.count;i++){
-    const e=p.getX(i),n=-p.getZ(i),z=p.getY(i),nx=normals.getX(i),nz=normals.getZ(i),h=Math.hypot(nx,nz)
-    let nearest:typeof facades[number]|undefined,best=.8,along=0
+  const info=new Float32Array(p.count*3),weatherAt=new Float32Array(p.count*4),dressingAt=new Float32Array(p.count*4)
+  const facadeAt=(e:number,n:number,nx:number,nz:number):typeof facades[number]|undefined=>{
+    const h=Math.hypot(nx,nz)
+    let nearest:typeof facades[number]|undefined,best=.8
     if((kind==='brick'||kind==='stone')&&h>.02)for(const f of facades){
       if(e<f.minE||e>f.maxE||n<f.minN||n>f.maxN||(nx*f.dn+nz*f.dx)/h<.7)continue
       const off=Math.abs((e-f.from[0])*f.dn-(n-f.from[1])*f.dx),x=(e-f.from[0])*f.dx+(n-f.from[1])*f.dn
-      if(off<best&&x>=-.7&&x<=f.length_m+.7){nearest=f;best=off;along=x}
+      if(off<best&&x>=-.7&&x<=f.length_m+.7){nearest=f;best=off}
     }
+    return nearest
+  }
+  // ONE FACADE PER TRIANGLE. Where two facades meet in one plane, a corner
+  // vertex belongs to both; picked per vertex, a triangle's map coordinates
+  // ran from one facade's rect to the other's and swept every texel between
+  // them, a dark smear down the join.
+  const perTriangle=!geometry.getIndex()&&p.count%3===0
+  let held:typeof facades[number]|undefined
+  for(let i=0;i<p.count;i++){
+    const e=p.getX(i),n=-p.getZ(i),z=p.getY(i)
+    if(!perTriangle)held=facadeAt(e,n,normals.getX(i),normals.getZ(i))
+    else if(i%3===0){
+      const ce=(e+p.getX(i+1)+p.getX(i+2))/3,cn=-(p.getZ(i)+p.getZ(i+1)+p.getZ(i+2))/3
+      held=facadeAt(ce,cn,normals.getX(i)+normals.getX(i+1)+normals.getX(i+2),normals.getZ(i)+normals.getZ(i+1)+normals.getZ(i+2))
+    }
+    const nearest=held
+    const along=nearest?(e-nearest.from[0])*nearest.dx+(n-nearest.from[1])*nearest.dn:0
+    const proud=nearest?(e-nearest.from[0])*nearest.dn-(n-nearest.from[1])*nearest.dx:0
     const t=tone?.getX(i)??1,brickWall=nearest?.pattern.field==='brick'
     // shell.ts's mortar backing has tone .76; dressed stones retain their own role.
     // The backing polygon spans the whole wall. Its role must be constant
@@ -132,9 +151,13 @@ export function prepareSurfaceGeometry(geometry:BufferGeometry,kind:ShellSurface
     info[i*3]=kind==='oak'&&roles?.[i]===3?1:mortar;info[i*3+1]=period;info[i*3+2]=Math.min(.4,Math.max(0,weather))
     // Where this place sits in the weather map, if it lies on a facade.
     weatherAt[i*4]=w?.[0]??0;weatherAt[i*4+1]=w?.[1]??0;weatherAt[i*4+2]=w?1:0;weatherAt[i*4+3]=kind==='stone'&&roles?.[i]===2?1:0
+    // where the sun's dressing map reaches, and how far this face stands proud
+    const d=nearest?dressingUV(nearest.id,along,z):null
+    dressingAt[i*4]=d?.[0]??0;dressingAt[i*4+1]=d?.[1]??0;dressingAt[i*4+2]=proud;dressingAt[i*4+3]=d?1:0
   }
   geometry.setAttribute('surfaceInfo',new Float32BufferAttribute(info,3))
   geometry.setAttribute('weatherUV',new Float32BufferAttribute(weatherAt,4))
+  geometry.setAttribute('dressingAt',new Float32BufferAttribute(dressingAt,4))
   if(kind==='oak')prepareOakSeeds(geometry,panelSeeds)
 }
 
@@ -250,8 +273,9 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
   const at=attribute('weatherUV','vec4')
   const weather:N=mineralKind?texture(weatherAtlas().texture,at.xy).mul(at.z):null
   const joints:N=mineralKind?texture(weatherAtlas().joints,at.xy).mul(at.z):null
-  // a wet joint goes darker and a little cooler
-  const mortarTone:N=mineralKind?mortar.mul(.82).mul(float(1).sub(joints.x.mul(.5))).mul(mix(vec3(1,1,1),vec3(.93,.955,.98),joints.x)):mortar.mul(.82)
+  // a wet joint goes darker and a little cooler; a dry lime joint stays
+  // paler than the brick it binds, which is how courses read in the shade
+  const mortarTone:N=mineralKind?mortar.mul(.90).mul(float(1).sub(joints.x.mul(.28))).mul(mix(vec3(1,1,1),vec3(.94,.96,.98),joints.x)):mortar.mul(.90)
   const brickFraction=.24*.045/(.252*.057)
   // The geometric chunk tone is uniform on [.91,1.05] (expectation .98).
   // The backing tone .76 has always been clamped to .82. Include these
@@ -282,9 +306,10 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
     // The 12 mm joint is a complete mortar colour at every resolution; there
     // is no competing narrow/partial-colour near seam. Only the brick chunks'
     // zero-mean tone departure returns as their physical course resolves.
-    const chunkDeparture=kind==='brick'?tone.sub(.98).mul(detail):float(0)
+    // Each brick carries its own firing; a whole course run of one tone is
+    // a stripe no wall has, and in raking view it stacks into bands.
     const field=mortarTone.mul(float(1).sub(clayCoverage))
-      .add(clay.mul(firedCoverage).mul(chunkDeparture.add(.98)))
+      .add(clay.mul(firedCoverage).mul(.98))
     filteredBrick=mix(brickMean,field,support);brickCoverage=mix(float(brickFraction),clayCoverage,support)
   }
   const acrossPixel=U.x.dFdx().abs().add(U.x.dFdy().abs()).max(.00001)
@@ -480,19 +505,27 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
       const hy=fract(column.mul(39.3468).add(row.mul(11.1351)).sin().mul(24634.6345)).sub(.5)
       slope=vec2(hx,hy).mul(.05).mul(held)
     }
+    // AN ASHLAR BLOCK IS SET BY HAND, a fraction of a degree off its
+    // neighbours: under the low sun raking the face, each one takes it
+    // differently, which is how a coursed wall reads as cut stone.
+    const coursed=kind==='stone'&&options.coursing!==false
+    const laid=coursed?coursedFace(U,{...dressedTuffeau,courseM:.28,courseSwing:0,blockM:.66,jointM:.012,faceSwing:.052,seed:4.63}):null
+    if(laid){
+      const block=float(1).sub(info.x.mul(float(1).sub(lowBase))).mul(laid.held)
+      slope=vec2(laid.cell.sub(.5),fract(laid.cell.mul(37.13)).sub(.5)).mul(vec2(.034,.022)).mul(block)
+    }
     const mineral=mineralFinish(kind,clayWeight,filteredView,regional,worldPixel,slope)
     m.colorNode=(m.colorNode as N).mul(mineral.colour)
     m.roughnessNode=clamp((m.roughnessNode as N).add(mineral.roughness),roughRange[0],roughRange[1])
     m.normalNode=mineral.normal
     // Carved work is cut from a few large stones: it takes no laid coursing.
-    if(kind==='stone'&&options.coursing!==false){
+    if(laid){
       // ONE STONE IS NOT THE NEXT, on the house as on the garden wall. The
       // dressed faces carried a continuous stain and a course line and
       // nothing from block to block, so the chapel's ashlar, the largest
       // pale plane in the wing, read as one tone with lines on it. A quarry
       // sends beds of different colour and a few stones drink and stay dark.
       // Colour only, keyed to each block's own number, never a pattern.
-      const laid=coursedFace(U,{...dressedTuffeau,courseM:.28,courseSwing:0,blockM:.66,jointM:.012,faceSwing:.052,seed:4.63})
       const face=float(1).sub(info.x.mul(float(1).sub(lowBase)))
       const bed=laid.cell.sub(.5).mul(laid.held)
       const soaked=smoothstep(.76,.97,laid.cell).mul(laid.held)
@@ -551,14 +584,27 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
     const footMap=weather.y,tide=smoothstep(.40,.62,footMap),splashed=smoothstep(.78,.96,footMap)
     const speckHeld=resolvedAt(.024)
     const speck=mix(float(.4),smoothstep(.45,.8,mx_noise_float(P.mul(71).add(vec3(2.3,.7,5.1))).mul(.5).add(.5)),speckHeld)
-    c=c.mul(float(1).sub(tide.mul(.22))).mul(mix(vec3(1,1,1),vec3(.93,.95,.90),tide))
+    // THE DAMP IS NEVER A SHEET: it rises in blotches a hand across, and the
+    // splash leaves grains, dark soil and pale sand, a few millimetres each.
+    // Every darkening of the foot carries both, so the band keeps its grain.
+    const blotch=smoothstep(-.35,.45,mx_noise_float(P.mul(vec3(9,5,9)).add(vec3(1.3,6.1,3.7)))
+      .add(mx_noise_float(P.mul(23).add(vec3(7.7,2.2,9.1))).mul(.45).mul(resolvedAt(.04))))
+    const grit=mx_noise_float(P.mul(173).add(vec3(4.1,1.9,.3))).mul(resolvedAt(.012))
+    const contactBand=smoothstep(.70,.95,footMap).mul(at.z)
+    c=c.mul(float(1).sub(tide.mul(.22).mul(blotch.mul(.7).add(.6)))).mul(mix(vec3(1,1,1),vec3(.93,.95,.90),tide))
     c=mix(c,c.mul(vec3(.62,.58,.52)),splashed.mul(speck.mul(.42).add(.4)))
+    c=c.mul(float(1).add(grit.mul(splashed.mul(.7).add(contactBand.mul(.3))).mul(.42)))
+    // where the damp dries, its salts bloom pale along the tide line
+    const saltLine=smoothstep(.38,.45,footMap).mul(float(1).sub(smoothstep(.52,.60,footMap))).mul(at.z)
+    const bloom=smoothstep(.15,.75,mx_noise_float(P.mul(vec3(14,30,14)).add(vec3(3.3,8.8,1.4))).mul(.5).add(.5).add(grit.mul(.25)))
+    const cLum=c.dot(vec3(.2126,.7152,.0722))
+    c=mix(c,vec3(cLum.mul(1.3).add(.018)).mul(vec3(1,.985,.95)),saltLine.mul(bloom).mul(.34))
     // the last hand's breadth, where the paving's dirt lies against it
-    c=c.mul(float(1).sub(smoothstep(.95,.995,footMap).mul(.3)))
+    c=c.mul(float(1).sub(smoothstep(.95,.995,footMap).mul(.3).mul(blotch.mul(.6).add(.55))))
     // THE WALL STANDS IN ITS GROUND, NOT ON IT: the lowest course is darker
     // and wetter than the one above, and splash greys it a little higher.
     const contact=smoothstep(.84,.99,footMap).mul(at.z)
-    c=mix(c,c.mul(vec3(.70,.70,.66)),contact.mul(.55))
+    c=mix(c,c.mul(vec3(.70,.70,.66)),contact.mul(blotch.mul(.45).add(.22)))
     const lichenMask=smoothstep(.38,.72,mx_noise_float(P.mul(22).add(vec3(1.7,4.1,2.3))).mul(.5).add(.5).mul(resolvedAt(.05)).add(float(1).sub(resolvedAt(.05)).mul(.5)))
     c=mix(c,rgb('#9ba07c').mul(mottled.mul(.2).add(.9)),weather.z.mul(lichenMask).mul(.62))
     // a broad grime, heavier low on the wall where hands and splash reach
@@ -581,7 +627,7 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
     // THE COURT'S SUN, SENT BACK: a wall in shade takes warm light from the
     // sunlit ground it faces, baked per place from that ground's own sun.
     // Engine-only (`engineBounce`); the film's path tracer bounces for real.
-    m.emissiveNode=c.mul(vec3(1,.73,.545)).mul(weather.w.mul(.5*.073*1.4))
+    m.emissiveNode=c.mul(vec3(1,.73,.545)).mul(weather.w.mul(.5*.073*2.3))
     m.userData['engineBounce']=true
     m.roughnessNode=clamp((m.roughnessNode as N).add(streak.mul(.05)).add(weather.z.mul(lichenMask).mul(.08)).add(splashed.mul(.04)).sub(tide.mul(.05)).sub(worn.mul(.16)),roughRange[0]!-.12,roughRange[1])
     m.normalNode=mix(m.normalNode as N,filteredView,worn.mul(.65)).normalize()
@@ -593,14 +639,46 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
     const sunAlong=float(1).sub(SUN_UP*SUN_UP).sub(sunN.mul(sunN)).max(0).sqrt()
     const bedShade=clamp(float(.015*SUN_UP).div(sunN).div(.012),0,1)
     const headShade=clamp(sunAlong.mul(.008).div(sunN).div(.012),0,1)
+    // THE COURSE AS THE PIXEL SEES IT. A bed joint, recessed, and the top
+    // arris of the brick above it are bands of the laid module, box-filtered
+    // over the pixel's own height: brick face and mortar backing read the same
+    // bands, so whichever surface a sample lands on, the courses converge to
+    // their mean instead of stacking into bands. Where the course resolves,
+    // the backing seen under a brick is the recess it is.
+    const brickZone=kind==='brick'?float(1):info.x.mul(float(1).sub(lowBase))
+    const band=(phase:N,width:N,a:number,b:number):N=>{
+      const F=(x:N):N=>floor(x).mul(b-a).add(fract(x).sub(a).clamp(0,b-a))
+      return F(phase.add(width.mul(.5))).sub(F(phase.sub(width.mul(.5)))).div(width)
+    }
+    const courseY=U.y.div(.057).add(.105),courseW=pixel.div(.057).max(.0001)
+    // a course lip is its own geometry where it resolves
+    const lip=smoothstep(.3,.6,normalWorldGeometry.y).mul(detail)
+    const own=brickZone.mul(float(1).sub(lip))
+    const jointBand=band(courseY,courseW,0,.21).mul(own),arrisBand=band(courseY,courseW,.895,1).mul(own)
+    const brickBacking=kind==='stone'?info.x.mul(float(1).sub(lowBase)):float(0)
     // a stone field's backing is the floor of its own bed joints too
-    const isBacking=kind==='stone'?info.x.mul(float(1).sub(lowBase)).max(at.w):float(0)
+    const stoneBacking=kind==='stone'?at.w.mul(float(1).sub(brickBacking)):float(0)
+    const joint=mix(jointBand,jointBand.max(brickBacking),detail).add(stoneBacking.mul(mix(float(.05),float(1),detail))).clamp(0,1)
     const headJoint=kind==='brick'?float(1).sub(brickCoverage).mul(detail):float(0)
-    const shaded=isBacking.mul(bedShade).add(headJoint.mul(headShade)).clamp(0,1)
-    m.receivedShadowNode=Fn(([shadow]:N[])=>shadow.mul(float(1).sub(shaded)))
+    // the arris, turned half to the sky, takes the raking sun the face misses
+    const sunSigned=wallN.dot(SUN)
+    const arrisGain=sunSigned.add(SUN_UP).mul(Math.SQRT1_2).max(0).div(sunSigned.max(.015))
+    const shaded=joint.mul(bedShade).add(headJoint.mul(headShade)).clamp(0,1)
+    // THE DRESSINGS' OWN SHADOWS: every quoin, jamb, sill and course throws
+    // one across the face the sun rakes (`house-sun.ts`). Engine-only, as the
+    // joints are: the film's geometry casts them.
+    const da=attribute('dressingAt','vec4')
+    const dressingH=texture(dressingAtlas().texture,da.xy).r.mul(DRESSING_H_SPAN).add(DRESSING_H_MIN)
+    const dressingLit=mix(float(1),smoothstep(-.007,-.002,da.z.sub(dressingH)),da.w)
+    m.receivedShadowNode=Fn(([shadow]:N[])=>shadow.mul(float(1).sub(shaded)).mul(float(1).add(arrisBand.mul(arrisGain.sub(1)))).mul(dressingLit))
     // the ground beside the foot takes most of its sky away
-    m.aoNode=float(1).sub(isBacking.mul(.32)).sub(headJoint.mul(.22)).mul(float(1).sub(smoothstep(.80,.99,weather.y).mul(at.z).mul(.45)))
-    m.userData['engineJointShadow']=true
+    // the sky a sill, course or jamb hides from the wall below and beside it
+    // (the map is the wall's; a dressing's own face stands clear of it)
+    const skyHidden=float(1).sub(texture(dressingSky(),at.xy).r).mul(at.z).mul(float(1).sub(smoothstep(.02,.05,da.z)))
+    // the sky the court leaves: a wall's foot in a corner sees a slot of it
+    const courtSky=mix(float(1),joints.z.mul(.4).add(.6),at.z)
+    m.aoNode=float(1).sub(joint.mul(.30)).sub(headJoint.mul(.22)).add(arrisBand.mul(.25)).mul(float(1).sub(smoothstep(.80,.99,weather.y).mul(at.z).mul(.28))).mul(float(1).sub(skyHidden)).mul(courtSky)
+    m.userData['engineJointShadow']=true;m.userData['engineDressingShadow']=true
   }else if(kind==='slate'){
     const n=normalWorldGeometry.transformDirection(cameraViewMatrix),sx=positionView.dFdx(),sy=positionView.dFdy()
     const rx=sy.cross(n),ry=n.cross(sx),det=sx.dot(rx)

@@ -206,7 +206,9 @@ function glassMaterial(cames: boolean): MeshPhysicalNodeMaterial {
   m.colorNode = mix(vec3(.60, .60, .55).mul(dust), vec3(.09, .094, .092), drawnLead)
   m.roughnessNode = mix(clamp(float(.07).add(seed.mul(.05)).add(dust.mul(.8)), .06, .18), float(.55), drawnLead)
   const nDotV = clamp(normalView.dot(positionViewDirection), 0, 1)
-  const fresnel = float(.043).add(float(1 - .043).mul(float(1).sub(nDotV).pow(5)))
+  // A pane has two faces and old glass sends back from both: about 8 per
+  // cent head on, not the 4 of one face, which is why a window takes the sky.
+  const fresnel = float(.083).add(float(1 - .083).mul(float(1).sub(nDotV).pow(5)))
   // THE SKY IN THE GLASS. The scene's probe lights surfaces at a fraction of
   // the sky a visitor sees, so the glass adds what a mirror of that sky
   // returns: a hazy horizon, warmer toward the sun, a blue zenith, the
@@ -225,7 +227,9 @@ function glassMaterial(cames: boolean): MeshPhysicalNodeMaterial {
   // each melt its own faint cast: greenish, straw or grey
   const melt = fract(seed.mul(7.31))
   const tint = mix(mix(vec3(.90, 1, .90), vec3(1, .97, .84), smoothstep(.3, .7, melt)), vec3(.95, .97, 1), smoothstep(.75, .95, melt))
-  m.emissiveNode = seen.mul(fresnel).mul(float(1).sub(dust.mul(6))).mul(tint).mul(float(1).sub(drawnLead))
+  // a bowed quarry gathers or spreads what it mirrors: each its own strength
+  const gather = fract(seed.mul(13.7)).mul(.7).add(.65)
+  m.emissiveNode = seen.mul(fresnel).mul(gather).mul(float(1).sub(dust.mul(6))).mul(tint).mul(float(1).sub(drawnLead))
   // Old glass is faintly green and not quite clear; each quarry its own melt.
   const clear = mix(float(.62), float(.90), seed.mul(seed)).sub(dust.mul(2.4))
   m.opacityNode = clamp(clear.mul(float(1).sub(fresnel)).mul(float(1).sub(drawnLead)), 0, 1)
@@ -279,7 +283,7 @@ export function createHouseGlazing(lights: readonly GlazedLight[], detail: 1 | 2
       // A quarry's face is set a fraction of a degree off its neighbours and
       // bows by well under a millimetre, enough to break a reflected line;
       // its edge stays in the came's channel, so the tilt lives in the normal.
-      const ta = (rand(seed, 1.7) - .5) * .028, tb = (rand(seed, 2.9) - .5) * .028
+      const ta = (rand(seed, 1.7) - .5) * .05, tb = (rand(seed, 2.9) - .5) * .05
       const set = (rand(seed, 4.3) - .5) * .0003, bow = detail === 2 ? (rand(seed, 6.1) > .5 ? 1 : -1) * (.0003 + rand(seed, 8.2) * .0005) : 0
       const R2 = Math.max(...piece.map(p => (p[0] - c[0]) ** 2 + (p[1] - c[1]) ** 2), 1e-6)
       const vertex = (p: V2, centre: boolean, rims: V3, borders: number): void => {
@@ -379,5 +383,5 @@ export const houseGlazingProvenance = {
   manifestId: 'vinci/house-glazing',
   assetClass: 'GENERATED',
   certainty: 'conjectural',
-  recipe: 'Every glazed light of the registered shell holds 155 mm diamond quarries on a 45 degree lattice centred on the light. Each quarry is its own piece, its face tilted up to 1 degree and bowed up to 0.8 mm, with a slow ripple in its surface, its edge held in the lead; 7 mm lead cames and a 14 mm border lead stand about 2 mm proud as geometry in the film and are drawn in the glass at the live tiers; iron saddle bars sit behind the glass. The glass reflects by its Fresnel term and transmits the rest, so the room behind shows through; a quarry mirroring the sun rolls off toward a ceiling under the sunlit stone round it, and the film draws the leading too wherever its built came is thinner than its pixel.',
+  recipe: 'Every glazed light of the registered shell holds 155 mm diamond quarries on a 45 degree lattice centred on the light. Each quarry is its own piece, its face tilted up to 1.5 degrees and bowed up to 0.8 mm, sending back the sky from both faces of the pane and each gathering or spreading it by its own bow, with a slow ripple in its surface, its edge held in the lead; 7 mm lead cames and a 14 mm border lead stand about 2 mm proud as geometry in the film and are drawn in the glass at the live tiers; iron saddle bars sit behind the glass. The glass reflects by its Fresnel term and transmits the rest, so the room behind shows through; a quarry mirroring the sun rolls off toward a ceiling under the sunlit stone round it, and the film draws the leading too wherever its built came is thinner than its pixel.',
 } as const

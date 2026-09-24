@@ -16,6 +16,7 @@ import { createHouseGlazing, houseGlazingProvenance, type GlazedLight } from './
 import { createDormerRooms, createHouseRooms, houseRoomsProvenance, type DormerRoom } from './house-rooms'
 import { HALL_WINDOWS } from './house-hall'
 import { createHouseTracery, houseTraceryProvenance, type SillSpec, type TraceryWindow } from './house-tracery'
+import { bakeDressingShadows, bakeDressingSky, type DressingBox } from './house-sun'
 import dossierText from './data/closluce.json?raw'
 
 // TSL's composable overload graph is represented once at this boundary.
@@ -213,7 +214,9 @@ function clipGableBacking(poly:V3[],faces:RoofFace[]):V3[][] {
 
 /** What one createShell call hands the house's own modules: the lights to
  * glaze, the traceried windows to carve, the window backs a room opens. */
-interface HouseBuild { glaze:boolean; carve:boolean; openBacks:ReadonlySet<string>; lights:GlazedLight[]; tracery:TraceryWindow[]; sills:SillSpec[]; dormers:DormerRoom[] }
+interface HouseBuild { glaze:boolean; carve:boolean; openBacks:ReadonlySet<string>; lights:GlazedLight[]; tracery:TraceryWindow[]; sills:SillSpec[]; dormers:DormerRoom[]
+  /** every dressing laid proud of a facade, for the shadows it throws on it */
+  dressings:DressingBox[]; casting:ReadonlySet<Batch> }
 let house:HouseBuild|null=null
 /** The new glass stands in front of every retired pane and saddle bar (the
  * bars' faces reach -40 mm), so no retired piece can win a pixel over it
@@ -230,6 +233,7 @@ function facadePoint(f:Facade,x:number,z:number,out=0):V3 {
   return [f.from[0]+dx*x+dy*out,f.from[1]+dy*x-dx*out,z]
 }
 function faceBox(b:Batch,f:Facade,x:number,z:number,w:number,h:number,depth:number,out=0,tone=1):void {
+  if(house?.casting.has(b)&&!b.retire&&out>.004)house.dressings.push({facade:f.id,u0:x-w/2,u1:x+w/2,z0:z-h/2,z1:z+h/2,front:out})
   const p=facadePoint(f,x,z,out-depth/2)
   solid(b,p,[w,depth,h],Math.atan2(f.to[1]-f.from[1],f.to[0]-f.from[0]),tone)
 }
@@ -309,6 +313,9 @@ function drawFacade(f:Facade,wall:Wall,b:Batches,tier:Tier,faces:RoofFace[]):voi
     const p=peak>0.1&&peak<f.length_m-.1?peak:peakOther
     const pa=facadePoint(f,0,heightAt(0)+.06,.05),pb=facadePoint(f,p,heightAt(p)+.09,.05),pc=facadePoint(f,f.length_m,heightAt(f.length_m)+.06,.05)
     beam(b.stone,pa,pb,.20,.24);beam(b.stone,pb,pc,.20,.24)
+    // the raked coping stands 150 mm proud: its shadow is traced as short steps
+    if(house)for(let x=0;x<f.length_m;x+=.16){const mid=Math.min(f.length_m,x+.08),rise=mid<=p?.06+.03*mid/Math.max(p,.01):.06+.03*(f.length_m-mid)/Math.max(f.length_m-p,.01),hc=heightAt(mid)+rise
+      house.dressings.push({facade:f.id,u0:x,u1:Math.min(f.length_m,x+.16),z0:hc-.13,z1:hc+.13,front:.15})}
     // Stepped inner stones follow the sloping coping, as read from Q124.
     for(const [a,c] of [[0,p],[p,f.length_m]] as [number,number][])for(let x=a+.3;x<c-.1;x+=.42)faceBox(b.stone,f,x,heightAt(x)-.20,.43,.42,.10,.042,.92)
     const peakPoint=facadePoint(f,p,heightAt(p)+.28,.05);finial(b,peakPoint,.65)
@@ -333,7 +340,7 @@ function drawOpening(f:Facade,o:Opening,thickness:number,b:Batches):void {
     faceBox(b.stone,f,x+w/2,z-.05,w+.40,.12,thickness+.24,.20,.88)
     faceBox(b.stone,f,x+w/2,z-.13,w+.29,.05,.22,.16,.82)
     b.stone.retire=false
-    if(recut)house!.sills.push({from:f.from,to:f.to,length:f.length_m,x,w,z})
+    if(recut){house!.sills.push({from:f.from,to:f.to,length:f.length_m,x,w,z});house!.dressings.push({facade:f.id,u0:x-.12,u1:x+w+.12,z0:z-.10,z1:z+.012,front:.10})}
   }
   if(open){if(wooden){faceBox(b.oak,f,x+w/2,z+.64,w,.13,.17,.11);const left=facadePoint(f,x+.03,z+.08,.08),right=facadePoint(f,x+w-.03,z+.61,.08);beam(b.oak,left,right,.09);beam(b.oak,facadePoint(f,x+w-.03,z+.08,.08),facadePoint(f,x+.03,z+.61,.08),.09)}return}
   if(o.type==='door') {
@@ -573,7 +580,7 @@ export function createShell(tier:Tier,library?:MaterialLibrary):Group {
   const rooms=full?createHouseRooms(tier==='hero'?.45:.9):null
   // The carving is one more draw; standard stands at its draw ceiling.
   // The great hall is its own module's room; its four windows open too.
-  house={glaze:full,carve:tier==='hero',openBacks:new Set([...(rooms?.openedBacks??[]),...(full?HALL_WINDOWS:[])]),lights:[],tracery:[],sills:[],dormers:[]}
+  house={glaze:full,carve:tier==='hero',openBacks:new Set([...(rooms?.openedBacks??[]),...(full?HALL_WINDOWS:[])]),lights:[],tracery:[],sills:[],dormers:[],dressings:[],casting:new Set([b.stone,b.oak])}
   const faces=roofFaces(),valleys=roofValleys(faces)
   const facades=spec.facades.filter(f=>f.render).map(f=>({...f,openings:f.openings.map(o=>({...o}))}))
   // One through-gateway is cut in both exterior faces of the covered way.
@@ -619,6 +626,8 @@ export function createShell(tier:Tier,library?:MaterialLibrary):Group {
   const group=new Group();group.name='vinci/registered-shell';group.userData['asset']='vinci/registered-shell';group.userData['certainty']='reconstructed'
   const unweld=typeof location!=='undefined'&&new URLSearchParams(location.search).has('noweld')
   const built=house;house=null
+  // before any batch becomes a mesh: the faces read the map as they compile
+  if(built){bakeDressingShadows(built.dressings);bakeDressingSky(built.dressings)}
   for(const [name,batch] of Object.entries(b) as [MatKey,Batch][]){if(!batch.positions.length)continue;const mesh=batch.mesh(surface(name,library,name==='slate'?valleys:[]));mesh.name=`vinci/shell/${name}`;mesh.userData['asset']=`vinci/shell-${name}`;if(name==='stone')mesh.userData['foundationPlinth']=foundationRange;if(name==='glass'||name==='glassSky')mesh.castShadow=false
     // The flat panes stay certified and leave the camera's layer.
     if((name==='glass'||name==='glassSky')&&built?.glaze)mesh.layers.set(RETIRED_LAYER)

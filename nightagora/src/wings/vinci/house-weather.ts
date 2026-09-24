@@ -42,8 +42,8 @@ function noise(x: number, y: number, seed: number): number {
 }
 const fbm = (x: number, y: number, seed: number): number => noise(x, y, seed) * .55 + noise(x * 2.1, y * 2.1, seed + 7) * .3 + noise(x * 4.3, y * 4.3, seed + 13) * .15
 
-/** A second map beside it: how wet a face's joints stay (R) and the soiling
- * the weather leaves in broad drifts on the brick (G). */
+/** A second map beside it: how wet a face's joints stay (R), the soot the
+ * rain leaves on the brick (G), and the share of sky the court leaves (B). */
 interface Atlas { texture: DataTexture; joints: DataTexture; rects: Map<string, WeatherRect>; texels: number; bakeMs: number }
 /** The prevailing weather comes up the valley from the west-south-west. */
 export const WEATHER_FROM_DEG = 245
@@ -61,14 +61,34 @@ const blockers = spec.facades.filter(f => f.render).map(f => {
   return { a: f.from, b: f.to, head: (f as Facade & { gable_segment?: string }).gable_segment ? 13.5 : top + (top > 6 ? 2.9 : 1.1) }
 })
 function sunlit(e: number, n: number, z: number): boolean {
+  return open(e, n, z, SUN_E, SUN_N, SUN_RISE)
+}
+/** Whether a ray from a point, along a compass direction and climbing `rise`
+ * per metre run, clears every wall of the house. */
+function open(e: number, n: number, z: number, de: number, dn: number, rise: number): boolean {
   for (const w of blockers) {
     const ex = w.b[0] - w.a[0], ey = w.b[1] - w.a[1]
-    const det = SUN_E * ey - SUN_N * ex
+    const det = de * ey - dn * ex
     if (Math.abs(det) < 1e-9) continue
-    const t = ((w.a[0] - e) * ey - (w.a[1] - n) * ex) / det, s = ((w.a[0] - e) * SUN_N - (w.a[1] - n) * SUN_E) / det
-    if (t > .05 && s >= 0 && s <= 1 && z + t * SUN_RISE < w.head) return false
+    const t = ((w.a[0] - e) * ey - (w.a[1] - n) * ex) / det, s = ((w.a[0] - e) * dn - (w.a[1] - n) * de) / det
+    if (t > .05 && s >= 0 && s <= 1 && z + t * rise < w.head) return false
   }
   return true
+}
+/** THE SKY A COURT LEAVES A WALL: the share of the upper sky a point sees
+ * past the house's other walls, cosine-weighted over its outward half. The
+ * foot of a wall in a corner sees a slot of it; the head of a street front
+ * nearly all. Engine-only, as the bounce: the film traces the sky itself. */
+const SKY_DIRS = [8, 25, 45, 68].flatMap(el => [-70, -35, 0, 35, 70].map(az => ({ el: el * Math.PI / 180, az: az * Math.PI / 180 })))
+function skySeen(e: number, n: number, z: number, out: V2, along: V2): number {
+  let seen = 0, all = 0
+  for (const d of SKY_DIRS) {
+    const w = Math.cos(d.el) * Math.cos(d.az)
+    const de = out[0] * Math.cos(d.az) + along[0] * Math.sin(d.az), dn = out[1] * Math.cos(d.az) + along[1] * Math.sin(d.az)
+    all += w
+    if (open(e, n, z, de, dn, Math.tan(d.el))) seen += w
+  }
+  return seen / all
 }
 /** How much sunlit ground a wall point sees: a view factor, summed over a
  * fan of ground patches in front of it. Engine-only: the film bounces. */
@@ -126,17 +146,20 @@ export function weatherAtlas(): Atlas {
     // warm light a wall in shade takes from the court in front of it.
     const out: V2 = [dy, -dx], alongDir: V2 = [dx, dy], GRID = .5
     const gu = Math.ceil(f.length_m / GRID) + 1, gz = Math.ceil(r.height / WEATHER_TEXELS_PER_M / GRID) + 1
-    const bounceGrid = new Float32Array(gu * gz)
+    const bounceGrid = new Float32Array(gu * gz), skyGrid = new Float32Array(gu * gz)
     for (let a = 0; a < gu; a++) for (let b = 0; b < gz; b++) {
       const u = Math.min(f.length_m, a * GRID), z = r.bottom + b * GRID
-      bounceGrid[b * gu + a] = groundSeen(f.from[0] + dx * u + out[0] * .03, f.from[1] + dy * u + out[1] * .03, z, out, alongDir)
+      const pe = f.from[0] + dx * u + out[0] * .03, pn = f.from[1] + dy * u + out[1] * .03
+      bounceGrid[b * gu + a] = groundSeen(pe, pn, z, out, alongDir)
+      skyGrid[b * gu + a] = skySeen(pe, pn, z, out, alongDir)
     }
-    const bounceAt = (u: number, z: number): number => {
+    const gridAt = (grid: Float32Array, u: number, z: number): number => {
       const x = Math.min(gu - 1.001, Math.max(0, u / GRID)), y = Math.min(gz - 1.001, Math.max(0, (z - r.bottom) / GRID))
       const x0 = Math.floor(x), y0 = Math.floor(y), fx = x - x0, fy = y - y0
-      const v = (i: number, j: number): number => bounceGrid[j * gu + i]!
+      const v = (i: number, j: number): number => grid[j * gu + i]!
       return (v(x0, y0) * (1 - fx) + v(x0 + 1, y0) * fx) * (1 - fy) + (v(x0, y0 + 1) * (1 - fx) + v(x0 + 1, y0 + 1) * fx) * fy
     }
+    const bounceAt = (u: number, z: number): number => gridAt(bounceGrid, u, z)
     // per column: the sills whose water can reach it, its own wander, and
     // the ground its foot actually stands in (a wall's base can lie metres
     // below the court it rises from)
@@ -195,18 +218,20 @@ export function weatherAtlas(): Atlas {
       // every run under a sill, and all of it more on the weather side.
       const corner = Math.exp(-Math.min(u, f.length_m - u) / .9)
       const wet = .30 + windward * (.25 + .55 * corner) + .5 * Math.min(1, damp) + .45 * Math.min(1, streak)
-      // SOILING DRIFTS WITH THE WEATHER: rain washes a brick face in broad
-      // vertical drifts and the soot and dust stay between them, most on a
-      // face turned from the weather and toward its head.
+      // SOOT STAYS WHERE THE RAIN DOES NOT WASH: in the band the eaves
+      // shelter, and across the middle of a face, since the wind wraps its
+      // rain round a building's corners and washes its ends cleanest; most
+      // on a face turned from the weather. A drift with no cause is out.
       let soiling = 0
       if (!tuffeau) {
-        const wander = noise(u * .35, z * .28, seed + 31) * 1.1
-        const drift = fbm(u * 1.05 + wander, z * .19, seed + 23)
-        const head = Math.min(1, Math.max(0, (z - col.ground) / Math.max(1, top - col.ground)))
-        soiling = smooth(.34, .66, drift) * (.5 + .5 * head) * (1.3 - .5 * windward)
+        const shelter = smooth(top - 1.5, top - .15, z) * (1 - smooth(top + .2, top + 1.2, z))
+        const middle = smooth(.3, 2.6, Math.min(u, f.length_m - u))
+        const patch = smooth(.36, .72, fbm(u * .45, z * .45, seed + 23))
+        soiling = (.50 * shelter + .30 * middle + .22 * patch) * (1.3 - .5 * windward)
       }
       data2[k] = Math.round(Math.min(1, wet) * 255)
       data2[k + 1] = Math.round(Math.min(1, soiling) * 255)
+      data2[k + 2] = Math.round(Math.min(1, gridAt(skyGrid, u, z)) * 255)
       texels++
     }
   }
@@ -235,5 +260,5 @@ export function weatherUV(facade: string, along: number, z: number): V2 | null {
 
 export const houseWeatherProvenance = {
   class: 'GENERATED',
-  recipe: 'One 1024 square map at 16 texels a metre over every rendered facade, baked in code from the registered openings and courses: rain streaks off both ends of every sill and a curtain off its front, fading over 1.1 to 1.6 m; a curtain of runs under the plinth and eaves courses; the foot measured from the ground each wall stands in, rising damp to a wandering tide line 0.35 to 0.85 m up, splash below it and grime tailing off to about 1.6 m; lichen in patches on faces within 70 degrees of north, most on dressed stone and toward the wall head; a broad grime field. Channels: streak, damp, lichen, bounce. A second map: joint wetness (toward the two ends of a face, at its foot and under its sills, more on faces turned to the west-south-west weather) and a soiling drift on the brick (broad vertical drifts, heavier toward the wall head and on faces turned from the weather). Assumed weathering of a kept house forty-six years old, not a survey.',
+  recipe: 'One 1024 square map at 16 texels a metre over every rendered facade, baked in code from the registered openings and courses: rain streaks off both ends of every sill and a curtain off its front, fading over 1.1 to 1.6 m; a curtain of runs under the plinth and eaves courses; the foot measured from the ground each wall stands in, rising damp to a wandering tide line 0.35 to 0.85 m up, splash below it and grime tailing off to about 1.6 m; lichen in patches on faces within 70 degrees of north, most on dressed stone and toward the wall head; a broad grime field. Channels: streak, damp, lichen, bounce. A second map: the share of the upper sky each place sees past the house\'s other walls; joint wetness (toward the two ends of a face, at its foot and under its sills, more on faces turned to the west-south-west weather) and soot on the brick where the rain does not wash it (the band the eaves shelter, broad soft patches, heavier on faces turned from the weather). Assumed weathering of a kept house forty-six years old, not a survey.',
 } as const
