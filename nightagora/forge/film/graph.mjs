@@ -7,13 +7,15 @@
 //   node forge/film/graph.mjs --out=<file>     the whole graph as JSON
 //
 // Nothing here moves: every edge is a leg the live rail itself walks, found in
-// the certificate or refused, and its seconds are the gait's own at each pace.
-// When the certificate changes (a calmer walk, a moved pose) this is re-run and
-// the table says what moved.
+// the certificate or refused, and its seconds are the rail's own at each pace
+// (the gait's leg as the calm gaze stretches it). When the certificate changes
+// (a calmer walk, a moved pose) this is re-run and the table says what moved.
 import { writeFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { pathToFileURL } from 'node:url'
+import * as THREE from 'three/webgpu'
 import { CERTIFICATE_FILE, WING_DIR, createLoader } from './load.mjs'
+import { walkClip } from './replay.mjs'
 
 export const FPS = 30
 export const PACES = ['stroll', 'walk', 'brisk']
@@ -46,37 +48,110 @@ export const viewId = (exhibit) => `view:${exhibit}`
 /** A clip's name on disk: the node ids with their separators made safe. */
 export const clipStem = (edgeId) => edgeId.replace(/[:/]/g, (c) => (c === ':' ? '-' : '.')).replace('>', '--')
 
-/** The wing's modules, loaded once, and what the graph and the replay read off them. */
+const FINGERPRINT = `${WING_DIR}/rail-fingerprint.ts`
+
+/** The wing's modules, loaded once, and what the graph and the replay read off them.
+    The rail is told the mounted geometry is the certificate's, as the replay
+    tells it: the certifier proves the paths clear it, the graph times them. */
 export async function openWing({ rev = '', stand = {}, overlay = {} } = {}) {
-  const loader = await createLoader({ rev, stand, overlay })
+  let certified = ''
+  const stipulated = {
+    railGeometryFingerprint: async () => certified,
+    railGeometryFingerprintBreakdown: async () => ({ meshes: [], sha256: certified }),
+    railGeometrySignature: () => [],
+    sameRailGeometrySignature: () => false,
+  }
+  const loader = await createLoader({ rev, stand: { ...stand, [FINGERPRINT]: stipulated }, overlay })
+  const certificateText = loader.text(CERTIFICATE_FILE)
+  const certificate = JSON.parse(certificateText)
+  certified = certificate.geometrySha256[0]
   const gait = loader.load(`${WING_DIR}/gait.ts`)
   const walls = loader.load(`${WING_DIR}/collection/wall.ts`)
   const approaches = loader.load(`${WING_DIR}/collection/approaches.ts`)
   const rail = loader.load(`${WING_DIR}/rail.ts`)
-  const certificateText = loader.text(CERTIFICATE_FILE)
+  const authority = loader.load(`${WING_DIR}/rail-proof.ts`).createRailGeometryAuthority([])
+  await authority.ready
+  if (authority.status !== 'verified') throw new Error(`the rail refused its certificate: ${authority.failure}`)
   return {
-    loader, gait, walls, approaches, rail, certificate: JSON.parse(certificateText), certificateSha256: sha256(certificateText),
+    loader, gait, walls, approaches, rail, authority, certificate, certificateSha256: sha256(certificateText),
     /* the life's order is read only by the graph: an older revision a route is
        replayed at may predate it */
     get walk() { return loader.load(`${WING_DIR}/walk.ts`) },
   }
 }
 
-/** Seconds of one leg at each pace, by the gait's own rule. */
-function secondsAtEachPace(gait, metres) {
-  const held = gait.gaitPace()
-  const out = {}
-  for (const pace of PACES) {
-    gait.setGaitPace(pace)
-    out[pace] = gait.gaitLeg(metres).seconds
-  }
-  gait.setGaitPace(held)
-  return out
-}
-
 /** The frame the walk lands on at the film's 30 frames a second: the first
     frame whose leg clock has reached the leg's seconds. */
 export const arrivalFrame = (seconds, fps = FPS) => Math.ceil(seconds * fps - 1e-9)
+
+const vec = (a) => new THREE.Vector3(a[0], a[1], a[2])
+const livePose = (s) => ({ eye: vec(s.eye), at: vec(s.at), fov: s.fov })
+
+/** How the wing stands the eye at a node and asks for the next one, as the
+    film's hook does in the page (`film.ts`) and the replay does in node. */
+function legMoves(wing, byId, stationStop, framingName) {
+  const phone = FRAMINGS[framingName].phone
+  const pose = (node) => livePose(node.pose[framingName])
+  const place = (node) => (rail) => {
+    if (node.kind === 'stop') { rail.set(node.station, pose(node), true, phone, node.exhibit ? node.vertex : undefined); return }
+    if (node.wall) { rail.set(node.station, pose(node), true, phone, node.vertex); return }
+    rail.set(node.station, pose(stationStop(node.station)), true, phone)
+    rail.update()
+    if (!rail.approach(node.exhibit, pose(node), phone, true)) throw new Error(`${node.id}: the approach refused an instant placement`)
+  }
+  const request = (edge) => (rail) => {
+    const m = edge.motion, from = byId.get(edge.from), to = byId.get(edge.to)
+    if (m.rail === 'route') return rail.set(to.station, pose(to), false, phone)
+    if (m.rail === 'wall') {
+      if (to.kind === 'stop') return rail.set(to.station, pose(to), false, phone, m.to)
+      return rail.along(m.to, from.station, pose(to), to.exhibit, phone)
+    }
+    if (m.rail === 'approach') return rail.approach(m.exhibit, pose(to), phone, false)
+    if (m.rail === 'return') return rail.returnToStation()
+    if (m.rail === 'link') return rail.chain(m.to, pose(to), phone)
+    throw new Error(`${edge.id}: no motion ${m.rail}`)
+  }
+  return { place, request }
+}
+
+/** THE LEG AS THE RAIL WALKS IT, in one framing: its seconds at each pace as
+    the rail holds them when the leg begins (`navigation.legSeconds`: the
+    gait's leg, stretched where the calm gaze asks for longer), and the frame
+    it lands on at the film's pace by the replay's own count. */
+function railLeg(wing, moves, edge, framingName) {
+  const framing = FRAMINGS[framingName]
+  const aspect = framing.width / framing.height
+  const place = moves.place(wing.byId.get(edge.from)), request = moves.request(edge)
+  const { gait } = wing
+  const held = gait.gaitPace()
+  const seconds = {}
+  try {
+    for (const pace of PACES.filter((p) => p !== FILM_PACE)) {
+      gait.setGaitPace(pace)
+      let frame = 0
+      const camera = new THREE.PerspectiveCamera(50, aspect, 0.25, 4000)
+      const rail = wing.rail.createRail(camera, () => frame / FPS, wing.authority)
+      place(rail)
+      rail.update()
+      if (request(rail) === false) throw new Error(`${edge.id} ${framingName}: the rail refused the leg`)
+      while (!rail.navigation.active && frame < 40) { frame++; rail.update() }
+      if (!rail.navigation.active) throw new Error(`${edge.id} ${framingName}: the leg never began`)
+      seconds[pace] = rail.navigation.legSeconds
+    }
+    // the film's own pace: the seconds read off the walk the frames are counted on
+    gait.setGaitPace(FILM_PACE)
+    const timed = (rail) => {
+      const update = rail.update
+      rail.update = () => { update(); if (seconds[FILM_PACE] === undefined && rail.navigation.active) seconds[FILM_PACE] = rail.navigation.legSeconds }
+      return request(rail)
+    }
+    const walked = walkClip({ createRail: wing.rail.createRail, authority: wing.authority }, { aspect, phone: framing.phone, place, request: timed })
+    if (seconds[FILM_PACE] === undefined) throw new Error(`${edge.id} ${framingName}: the leg never began`)
+    return { seconds: Object.fromEntries(PACES.map((p) => [p, seconds[p]])), frames: walked.arrivedAt, gaitSeconds: gait.gaitLeg(edge.framings[framingName].metres).seconds }
+  } finally {
+    gait.setGaitPace(held)
+  }
+}
 
 /**
  * Build the graph.
@@ -237,12 +312,17 @@ export function buildGraph(wing, { wall: wallRuns = 'both' } = {}) {
     throw new Error(`${e.id}: no motion ${m.rail}`)
   }
   const list = [...edges.values()]
+  const timing = { gait, rail: wing.rail, authority: wing.authority, byId }
+  const moves = Object.fromEntries(Object.keys(FRAMINGS).map((name) => [name, legMoves(wing, byId, stationStop, name)]))
   for (const e of list) {
     e.framings = {}
     for (const name of Object.keys(FRAMINGS)) {
-      const metres = certifiedMetres(e, name)
-      const seconds = secondsAtEachPace(gait, metres)
-      e.framings[name] = { metres, seconds, frames: arrivalFrame(seconds[FILM_PACE]) }
+      e.framings[name] = { metres: certifiedMetres(e, name) }
+      const leg = railLeg(timing, moves[name], e, name)
+      /* the leg's own frames at the film's pace, the leading frames that
+         still print as the departure dropped as the replay drops them; the
+         gait's seconds before the calm gaze stretched them ride beside */
+      Object.assign(e.framings[name], { seconds: leg.seconds, frames: leg.frames, gaitSeconds: leg.gaitSeconds })
     }
     // the nodes a wall run slides past: the router never walks through its target
     e.passes = e.motion.rail !== 'wall' ? [] : nodes
