@@ -2314,7 +2314,7 @@
       "prompt": "The da Vinci machine bench. Restrained museum typography, folio mounts, named absence panels, certainty marks, navigation, finite-demonstration status and evidence reading furniture, plus an optional diagnostic card displaying observed runtime measurements. Reuse the locked bilingual pages verbatim. No unapproved folio or reconstruction photograph is displayed. Window 5: three registers of text. The label speaks the hour (15:19 by the sun, 10 October 1517) and says the day is documented and the hour chosen, and it names what the bench does not show; the drawer explains without bracket citations; the record behind Read the evidence carries the arithmetic, the place, the method and the sources. The same computed 10 October 1517 Julian 15:19:00 LAT hour and geographic sun A=231.9005 degrees h=17.3882 degrees drive the bench key. The hour is chosen, not historical observation. Window 6: the phone drops the footer's top rule so one line closes the reading column; the compass is staged as an object (three-quarter view, full frame height on the wide frame, .35 on the phone) and every machine is fitted at .80 of the half height and .70 of the half width, .31 on the phone; a close state frames the working end of a machine alone. No locked copy changed.",
       "model": "GPT-6 Codex, with a Claude Opus 5 harvest seat",
       "date": "2026-09-11",
-      "sha256": "c2a6807750f1e70585378fc4f3f1408a5d736fe3aefef52e3975887d8a968a03",
+      "sha256": "bf8b12d5f8755fa4b7b014438db20f90a3e3459304cbbf7b52db644fb389e75f",
       "recipe_files": [
         {
           "path": "src/wings/vinci/machines/bench/bench.css",
