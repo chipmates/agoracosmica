@@ -48,7 +48,7 @@
   },
   {
    "file": "src/wings/vinci/collection.ts",
-   "sha256": "c039c00398cff095bd9503f7f55bfdab91942368dd118d0949b2374566a3083d",
+   "sha256": "3ef90ba783c2284a432f89a59fca865f3f03a0f8bc0c7e07efd099dc80c12394",
    "bytes": 48417,
    "unchangedDuringAudit": true
   },
@@ -60,14 +60,14 @@
   },
   {
    "file": "src/wings/vinci/collection/body-wall-light.ts",
-   "sha256": "380cd072c92ac8431cd6644e4554bd0c47448396d55e2318c413f8915e9f2861",
-   "bytes": 3011,
+   "sha256": "b5d202b29a605c33ff599c54559eb15d75b70522886bb06f5668fba788e11a9e",
+   "bytes": 4645,
    "unchangedDuringAudit": true
   },
   {
    "file": "src/wings/vinci/collection/body-wall-plan.ts",
-   "sha256": "a893477daaee7ec4835d1042ee90830f9fabc745fb8137ad47d68fd7808e15ce",
-   "bytes": 32303,
+   "sha256": "d37e4e831a1a806ae6c5969d89d1914d66600abd25a990040059591fd06cd131",
+   "bytes": 37290,
    "unchangedDuringAudit": true
   },
   {
@@ -108,14 +108,20 @@
   },
   {
    "file": "src/wings/vinci/collection/picture-light.ts",
-   "sha256": "4841cfb67376a40a8a824a838af04c70cabf8d2bf0cdc228360b039a4b14abab",
-   "bytes": 16303,
+   "sha256": "fdcb679362f3a6ea2c424176b0e95dc7698ca646b4feb0e2c6b98361a4e5b50f",
+   "bytes": 19876,
+   "unchangedDuringAudit": true
+  },
+  {
+   "file": "src/wings/vinci/collection/picture-numerals.ts",
+   "sha256": "6398ae1c4dba2e53b2c19fb399e92accb2dccfed40c5e75f19bb51ac8ece43f2",
+   "bytes": 11909,
    "unchangedDuringAudit": true
   },
   {
    "file": "src/wings/vinci/collection/picture-room-plan.ts",
-   "sha256": "569a196101f53ccae848b436ef6f03f2f41e755152ccdd8782d6594b17208391",
-   "bytes": 40124,
+   "sha256": "9d437386cf69f560bca01bd6b59a47a97de430b990e15afedef5a7f35263eec5",
+   "bytes": 48146,
    "unchangedDuringAudit": true
   },
   {
@@ -156,8 +162,8 @@
   },
   {
    "file": "src/wings/vinci/copings.ts",
-   "sha256": "0faf4cfae275d47d61af6e5c67059d5b32a28cdf4b391e5bb9cc45610770feee",
-   "bytes": 12063,
+   "sha256": "f565a4e8448261e618c9ff3b84482bf1b9340e6827aa2e0b4666f1b96d86085e",
+   "bytes": 12481,
    "unchangedDuringAudit": true
   },
   {
@@ -300,8 +306,8 @@
   },
   {
    "file": "src/wings/vinci/ground.ts",
-   "sha256": "bf651fb737384c4c4b485071e42bec9d85fac78510dbba94133e90445beea454",
-   "bytes": 32209,
+   "sha256": "646cdec00d66378f9c8af26cb508e1937e130e0dac6db5286a8de746e20c66dc",
+   "bytes": 33433,
    "unchangedDuringAudit": true
   },
   {
@@ -312,8 +318,8 @@
   },
   {
    "file": "src/wings/vinci/house-hall.ts",
-   "sha256": "6e18e16808f008f6739466b0d4e51266d26d8635b8d577d717005b1ca5229a58",
-   "bytes": 136134,
+   "sha256": "539929dc2d2d81f102770871a428d5dc2c16ed562d8dfd29b72d58da05bb5246",
+   "bytes": 158962,
    "unchangedDuringAudit": true
   },
   {
@@ -630,14 +636,20 @@
   },
   {
    "file": "src/wings/vinci/stair-wear.ts",
-   "sha256": "65126293ae7cda4b7af717f2e66e80f2898bc87011c8cbc842f6e424ce014a95",
-   "bytes": 6178,
+   "sha256": "fd1524e27dc3e5593ac9aeb8e8d9f92f115f14625544b506c21dfda688043b5b",
+   "bytes": 8918,
    "unchangedDuringAudit": true
   },
   {
    "file": "src/wings/vinci/surface.ts",
    "sha256": "069c1edb8d96b766e586c6cc26bdb9c7098b3744b0296e37dacc1a9282ec1224",
    "bytes": 53634,
+   "unchangedDuringAudit": true
+  },
+  {
+   "file": "src/wings/vinci/terrace-wall.ts",
+   "sha256": "0af37345a65b32c9a845a3385e25bf9978842ec43094c7587f042d5db036b39f",
+   "bytes": 7258,
    "unchangedDuringAudit": true
   },
   {
