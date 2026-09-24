@@ -21,7 +21,7 @@ import { constructionRecords, evidenceWords } from './evidence-copy'
 import { lang, WING_TEXT } from '../content'
 import { createVinciSourcesWindow, type VinciSourcesTab, type VinciExhibitSources } from './sources'
 import { createVinciWelcome, vinciWelcomeSeen } from './welcome'
-import { GRADES } from '../../stack/grade'
+import { KEY_RIG, PRINT, STATION_EXPOSURE } from './print'
 import { createShell } from './shell'
 import { createHouseHall, houseHallProvenance, type HouseHall } from './house-hall'
 import { createShellShadowDouble } from './shadow-shell'
@@ -55,7 +55,7 @@ import { createRail, stationPose, namedPose, vinciStandsInRoom } from './rail'
 import { vinciWalk, vinciLifeOrderAsked, vinciWalkPose, vinciReadingSeconds, type VinciWalkCut, type VinciWalkStop } from './walk'
 import { collectRailSolids, createRailGeometryAuthority } from './rail-proof'
 import { bindRailPointer, createWheelStepper } from './input'
-import { dossier, world, hourKey, type Quantity } from './site'
+import { dossier, world, type Quantity } from './site'
 import { gradeAt as groundHeight, galleryBankCapProvenance } from './terrain-mesh'
 import { GROUND_DRESSING_STEPS, planGroundDressing } from './ground-dressing'
 import { createWater, type WaterGroup } from './water'
@@ -153,25 +153,8 @@ const entryInspectionAnchors:Record<string,Vector3>={
 /** The near cascade is a tight box, so it has to travel with the visitor:
  * one box over the whole site is a 9 cm texel and it prints its own acne on
  * a stair nosing. The far cascade stays fixed over the site. */
-/** The wing's own print. A court under its own walls at this hour stands
- * two thirds of a stop below the garden front, so the aperture opens where
- * the visitor stands, exactly as a camera's would. No light in the scene
- * moves; this is the print, not the sun. */
-// A COURT UNDER ITS OWN WALLS. Most of this wing stands in the building's own
-// shade at this hour, and an eye standing there opens on the shade, not on the
-// sky. The toe is lifted a little, cool, the way shade is: it is the print, and
-// no light in the scene moves.
-const PRINT={...GRADES['first-station'],name:'clos-luce-1517',exposure:.94,lift:[.012,.014,.018] as [number,number,number],split:.055,saturation:.9,vignette:.15,grain:.007,bloom:{strength:0,radius:.1,threshold:10,warmth:1}}
-// The court used to open two thirds of a stop, which warmed the tuffeau toward
-// grey-gold and lifted the plaster's mottling into view. One print holds the
-// whole wing now, and the court is lit rather than exposed.
-/** A ROOM IS NOT THE STREET. The stations in the insertion stand indoors,
- * under a clerestory and two fittings, and the outdoor exposure left them a
- * stop and a half under. The eye opens at the door, as a camera does. */
-const STATION_EXPOSURE:Partial<Record<VinciStationId,number>>={courtyard:1.0,oratory:1.5,hall:2.2,
-  'picture-room':1.34,'picture-room-west':1.34,'reading-table':0.4,'line-early':1.3,flight:1.55,works:1.55,body:1.4,'supper-wall':1.85,
-  // the grave court stands in its walls' shade: the eye opens on the shade
-  grave:1.36}
+// The print, the station exposures and the light rig live in `print.ts`, one
+// source for the rooms and for the machine island the film opens.
 /** THE HALL IS PRINTED ON A SHOULDER: its spots are the hottest light in the
  * wing, and a linear print clips a lit sail to one flat white. */
 const STATION_SHOULDER:Partial<Record<VinciStationId,number>>={flight:1,works:1,hall:1,'supper-wall':1}
@@ -207,14 +190,6 @@ const SHADOW={nearHalfM:20,nearMapPx:1024,aheadM:10,refocusM:3,lightDistanceM:80
  * is separated by taking one thing away at a time, and a seat that has to
  * patch the wing to do it measures a tree nobody else can rebuild. */
 const SHADOW_OFF=(name:string):boolean=>typeof location!=='undefined'&&new URLSearchParams(location.search).has(name)
-/** THE WING'S ONE LIGHT RIG, which the vitrine's turntable stands under too:
- * the key and fill of the hour, and the hall's own fittings. */
-const KEY_RIG={
-  key:{azimuth:hourKey.sun_azimuth_deg.value,elevation:hourKey.sun_elevation_deg.value,kelvin:4700,lux:320,ambient:.35,sky:{zenith:'#8dabc0',horizon:'#d8cbb1',ground:'#514d3b',stars:0}},
-  fill:{color:'#a5b5bb',groundColor:'#736550',intensity:.48},
-  environmentIntensity:.28,
-  fitting:{color:'#f4e6cc',intensity:9.5,distance:15,decay:2,height:4.6},
-}
 
 export interface VinciWingModule extends WingModule {
   openSources(tab?:VinciSourcesTab):void
