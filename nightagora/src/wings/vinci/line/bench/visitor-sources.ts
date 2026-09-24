@@ -242,8 +242,8 @@ export const GRAVE_SOURCE: SourceReading = {
 }
 
 export const GRAVE_DIAGRAM: SourceReading = {
-  en: 'This is a diagram for studying the light, not a likeness of Saint-Hubert. The evening minute was chosen for the museum. The death date follows the Julian calendar, but no source records the death hour or that evening’s weather.',
-  de: 'Dies ist ein Schaubild zur Betrachtung des Lichts, kein Abbild von Saint-Hubert. Die Abendminute wurde für das Museum gewählt. Das Todesdatum folgt dem julianischen Kalender. Todesstunde und Wetter dieses Abends sind nicht überliefert.',
+  en: 'This model of a stone gable is there to study the light. It is not a copy of Saint-Hubert. Its light comes from where the sun stood at the minute we chose. The sun was just under four degrees above the horizon. The death date follows the Julian calendar. No source records the hour of his death or that evening’s weather.',
+  de: 'Dieses Modell eines Steingiebels dient dazu, das Licht zu betrachten. Es ist kein Abbild von Saint-Hubert. Sein Licht fällt von dort ein, wo die Sonne in der gewählten Minute stand. Sie stand knapp vier Grad über dem Horizont. Das Todesdatum folgt dem julianischen Kalender. Todesstunde und Wetter dieses Abends sind nicht überliefert.',
 }
 
 export const INGRES_SOURCE: SourceReading = {
