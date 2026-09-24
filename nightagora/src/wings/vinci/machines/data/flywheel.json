@@ -34,7 +34,7 @@
     "z": 1.4,
     "certainty": "C",
     "source": "A-GEOM",
-    "note": "Full swept bound. All chosen dimensions are modern explanatory assumptions, never claimed measurements of a historical machine."
+    "note": "Full swept bound. All chosen dimensions are modern explanatory assumptions, never claimed measurements of a historical machine. Measured on the rebuilt stand: the stone balls sweep a radius of 0.67 m, the sills reach 0.65 m, and the crank's handle stands highest at 1.048 m above the base, the ground at -0.05 m."
   },
   "frame": {
     "handedness": "right",
@@ -58,7 +58,7 @@
     },
     {
       "id": "A-DETAIL",
-      "statement": "The fixed support is bored to radius 0.045 m around the radius 0.04 m rotor shaft. Its lower thrust pad ends at y=0.60 m, tangent to the shaft end. Bearing friction is not quantified.",
+      "statement": "The shaft is oak of radius 0.04 m, running in a bore of radius 0.045 m through a turned oak pillar 0.56 m high and standing on an iron pivot in an iron step at the bottom of that bore. The four arms are turned oak in an oak hub; the balls sit on the arms' tenons. The crank on top follows the sheet; its size is ours. Bearing friction is not quantified.",
       "reason": "Complete the numerical modern demonstration without presenting invented details as Leonardo dimensions."
     }
   ],
@@ -66,29 +66,83 @@
     {
       "id": "base",
       "parent": "world",
-      "shape": "box",
+      "shape": "profile",
       "dimensions_m": {
-        "x": 1,
-        "y": 0.1,
-        "z": 1
+        "plane": "YZ",
+        "coordinates_yz": [
+          [-0.05, -0.06],
+          [-0.05, 0.06],
+          [0.038, 0.06],
+          [0.05, 0.048],
+          [0.05, -0.048],
+          [0.038, -0.06]
+        ],
+        "extrusion_depth": 1.3
       },
-      "position_m": [
-        0,
-        0,
-        0
-      ],
-      "orientation_rad": [
-        0,
-        0,
-        0
-      ],
+      "position_m": [0.0, 0.0, 0.0],
+      "orientation_rad": [0.0, 0.0, 0.0],
       "material": {
+        "class": "wood, hewn oak",
         "basis": "assumed",
-        "source": "A-GEOM",
-        "class": "oak"
+        "source": "A-GEOM"
       },
       "certainty": "C",
-      "source": "A-GEOM"
+      "source": "A-GEOM",
+      "notes": "A sill of hewn oak lying on the floor, its upper arrises taken off; the two half sills are tenoned into its sides, so the three make the cross a vertical shaft stands on. [geometry]"
+    },
+    {
+      "id": "sill-z-0",
+      "parent": "base",
+      "shape": "profile",
+      "dimensions_m": {
+        "plane": "YZ",
+        "coordinates_yz": [
+          [-0.05, -0.06],
+          [-0.05, 0.06],
+          [0.038, 0.06],
+          [0.05, 0.048],
+          [0.05, -0.048],
+          [0.038, -0.06]
+        ],
+        "extrusion_depth": 0.59
+      },
+      "position_m": [0.0, 0.0, 0.355],
+      "orientation_rad": [0.0, 1.570796, 0.0],
+      "material": {
+        "class": "wood, hewn oak",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "A sill of hewn oak lying on the floor, its upper arrises taken off; the two half sills are tenoned into its sides, so the three make the cross a vertical shaft stands on. [geometry]"
+    },
+    {
+      "id": "sill-z-1",
+      "parent": "base",
+      "shape": "profile",
+      "dimensions_m": {
+        "plane": "YZ",
+        "coordinates_yz": [
+          [-0.05, -0.06],
+          [-0.05, 0.06],
+          [0.038, 0.06],
+          [0.05, 0.048],
+          [0.05, -0.048],
+          [0.038, -0.06]
+        ],
+        "extrusion_depth": 0.59
+      },
+      "position_m": [0.0, 0.0, -0.355],
+      "orientation_rad": [0.0, 1.570796, 0.0],
+      "material": {
+        "class": "wood, hewn oak",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "A sill of hewn oak lying on the floor, its upper arrises taken off; the two half sills are tenoned into its sides, so the three make the cross a vertical shaft stands on. [geometry]"
     },
     {
       "id": "support",
@@ -96,44 +150,298 @@
       "shape": "profile of revolution",
       "dimensions_m": {
         "closed_axial_radial_profile": [
-          [
-            -0.3,
-            0.045
-          ],
-          [
-            -0.3,
-            0.06
-          ],
-          [
-            0.3,
-            0.06
-          ],
-          [
-            0.3,
-            0.045
-          ]
+          [0.0, 0.045],
+          [0.0, 0.095],
+          [0.034, 0.095],
+          [0.05, 0.083],
+          [0.07, 0.076],
+          [0.49, 0.072],
+          [0.505, 0.08],
+          [0.552, 0.08],
+          [0.56, 0.075],
+          [0.56, 0.045]
         ],
-        "segments": 96,
         "axis": "+Y",
-        "closure": "Close last point to first. Revolve closed section through 2*pi. Ends are annular, bore remains open."
+        "segments": 48
       },
-      "position_m": [
-        0,
-        0.35,
-        0
-      ],
-      "orientation_rad": [
-        0,
-        0,
-        0
-      ],
+      "position_m": [0.0, 0.05, 0.0],
+      "orientation_rad": [0.0, 0.0, 0.0],
       "material": {
+        "class": "wood, planed oak",
         "basis": "assumed",
-        "source": "A-GEOM",
-        "class": "oak"
+        "source": "A-GEOM"
       },
       "certainty": "C",
-      "source": "A-GEOM"
+      "source": "A-GEOM",
+      "notes": "A post of oak turned to a swelling foot and a collar, bored through along its axis to radius 0.045 m for the shaft, which turns in it over its whole height; its tenon stands in the crossing of the sills. [geometry]"
+    },
+    {
+      "id": "support-hoop-0",
+      "parent": "support",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.015, 0.0795],
+          [-0.015, 0.083],
+          [-0.0135, 0.0845],
+          [0.0135, 0.0845],
+          [0.015, 0.083],
+          [0.015, 0.0795]
+        ],
+        "axis": "+Y",
+        "segments": 48
+      },
+      "position_m": [0.0, 0.53, 0.0],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "An iron hoop shrunk on the pillar's collar, so the bore cannot split it. [geometry]"
+    },
+    {
+      "id": "support-hoop-1",
+      "parent": "support",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.013, 0.0945],
+          [-0.013, 0.098],
+          [-0.0115, 0.0995],
+          [0.0115, 0.0995],
+          [0.013, 0.098],
+          [0.013, 0.0945]
+        ],
+        "axis": "+Y",
+        "segments": 48
+      },
+      "position_m": [0.0, 0.017, 0.0],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "An iron hoop round the pillar's foot. [geometry]"
+    },
+    {
+      "id": "brace-0",
+      "parent": "base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.055,
+        "y": 0.561624,
+        "z": 0.055
+      },
+      "position_m": [0.275517, 0.219919, 0.0],
+      "orientation_rad": [-0.0, 0.0, 0.826471],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "A raking brace of oak from the sill to the pillar, birdsmouthed into the one and tenoned into the other, so the pillar cannot rock. [geometry]"
+    },
+    {
+      "id": "brace-peg-0",
+      "parent": "base",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.03, 0.0],
+          [-0.03, 0.00765],
+          [0.0, 0.0085],
+          [0.0024, 0.00782],
+          [0.004, 0.004675],
+          [0.004, 0.0]
+        ],
+        "axis": "+Y",
+        "segments": 10
+      },
+      "position_m": [0.43, 0.018, 0.06],
+      "orientation_rad": [1.570796, 0.0, -0.0],
+      "material": {
+        "class": "wood, oak peg",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "An oak peg through the joint, drawbored, its head left a little proud. [geometry]"
+    },
+    {
+      "id": "brace-1",
+      "parent": "base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.055,
+        "y": 0.561624,
+        "z": 0.055
+      },
+      "position_m": [0.0, 0.219919, 0.275517],
+      "orientation_rad": [-0.826471, -0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "A raking brace of oak from the sill to the pillar, birdsmouthed into the one and tenoned into the other, so the pillar cannot rock. [geometry]"
+    },
+    {
+      "id": "brace-peg-1",
+      "parent": "base",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.03, 0.0],
+          [-0.03, 0.00765],
+          [0.0, 0.0085],
+          [0.0024, 0.00782],
+          [0.004, 0.004675],
+          [0.004, 0.0]
+        ],
+        "axis": "+Y",
+        "segments": 10
+      },
+      "position_m": [-0.06, 0.018, 0.43],
+      "orientation_rad": [0.0, 0.0, 1.570796],
+      "material": {
+        "class": "wood, oak peg",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "An oak peg through the joint, drawbored, its head left a little proud. [geometry]"
+    },
+    {
+      "id": "brace-2",
+      "parent": "base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.055,
+        "y": 0.561624,
+        "z": 0.055
+      },
+      "position_m": [-0.275517, 0.219919, 0.0],
+      "orientation_rad": [-0.0, 0.0, -0.826471],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "A raking brace of oak from the sill to the pillar, birdsmouthed into the one and tenoned into the other, so the pillar cannot rock. [geometry]"
+    },
+    {
+      "id": "brace-peg-2",
+      "parent": "base",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.03, 0.0],
+          [-0.03, 0.00765],
+          [0.0, 0.0085],
+          [0.0024, 0.00782],
+          [0.004, 0.004675],
+          [0.004, 0.0]
+        ],
+        "axis": "+Y",
+        "segments": 10
+      },
+      "position_m": [-0.43, 0.018, -0.06],
+      "orientation_rad": [-1.570796, -0.0, 0.0],
+      "material": {
+        "class": "wood, oak peg",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "An oak peg through the joint, drawbored, its head left a little proud. [geometry]"
+    },
+    {
+      "id": "brace-3",
+      "parent": "base",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.055,
+        "y": 0.561624,
+        "z": 0.055
+      },
+      "position_m": [-0.0, 0.219919, -0.275517],
+      "orientation_rad": [0.826471, -0.0, -0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "A raking brace of oak from the sill to the pillar, birdsmouthed into the one and tenoned into the other, so the pillar cannot rock. [geometry]"
+    },
+    {
+      "id": "brace-peg-3",
+      "parent": "base",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.03, 0.0],
+          [-0.03, 0.00765],
+          [0.0, 0.0085],
+          [0.0024, 0.00782],
+          [0.004, 0.004675],
+          [0.004, 0.0]
+        ],
+        "axis": "+Y",
+        "segments": 10
+      },
+      "position_m": [0.06, 0.018, -0.43],
+      "orientation_rad": [-0.0, 0.0, -1.570796],
+      "material": {
+        "class": "wood, oak peg",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "An oak peg through the joint, drawbored, its head left a little proud. [geometry]"
+    },
+    {
+      "id": "thrust-pad",
+      "parent": "base",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [0.0, 0.0],
+          [0.0, 0.043],
+          [0.025, 0.043],
+          [0.025, 0.018],
+          [0.0165, 0.0]
+        ],
+        "axis": "+Y",
+        "segments": 32
+      },
+      "position_m": [0.0, 0.05, 0.0],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "An iron step set in the bottom of the pillar's bore, its top hollowed to a cone in which the shaft's pivot turns and on which the whole wheel stands. [geometry]"
     },
     {
       "id": "rotor",
@@ -141,79 +449,188 @@
       "shape": "cylinder",
       "dimensions_m": {
         "radius": 0.04,
-        "height": 0.4
+        "height": 0.83
       },
-      "position_m": [
-        0,
-        0.8,
-        0
-      ],
-      "orientation_rad": [
-        0,
-        0,
-        0
-      ],
+      "position_m": [0.0, 0.51, 0.0],
+      "orientation_rad": [0.0, 0.0, 0.0],
       "material": {
+        "class": "wood, planed oak",
         "basis": "assumed",
-        "source": "A-GEOM",
-        "class": "wrought iron"
+        "source": "A-GEOM"
       },
       "certainty": "C",
-      "source": "A-GEOM"
+      "source": "A-GEOM",
+      "notes": "A shaft of oak turned round, radius 0.04 m, running in the pillar's bore with 5 mm to spare; the hub, the arms and the crank are fixed on it. [geometry]"
     },
     {
-      "id": "spoke-x",
+      "id": "gudgeon",
       "parent": "rotor",
-      "shape": "box",
+      "shape": "profile of revolution",
       "dimensions_m": {
-        "x": 1.2,
-        "y": 0.03,
-        "z": 0.04
+        "closed_axial_radial_profile": [
+          [0.0, 0.0],
+          [0.000477, 0.003623],
+          [0.001876, 0.007],
+          [0.004101, 0.009899],
+          [0.007, 0.012124],
+          [0.010377, 0.013523],
+          [0.014, 0.014],
+          [0.045, 0.014],
+          [0.045, 0.0]
+        ],
+        "axis": "+Y",
+        "segments": 24
       },
-      "position_m": [
-        0,
-        0,
-        0
-      ],
-      "orientation_rad": [
-        0,
-        0,
-        0
-      ],
+      "position_m": [0.0, -0.442718, 0.0],
+      "orientation_rad": [0.0, 0.0, 0.0],
       "material": {
+        "class": "iron, forged",
         "basis": "assumed",
-        "source": "A-GEOM",
-        "class": "oak"
+        "source": "A-GEOM"
       },
       "certainty": "C",
-      "source": "A-GEOM"
+      "source": "A-GEOM",
+      "notes": "The shaft's iron pivot, let into its foot and rounded, standing in the step's hollow. [geometry]"
     },
     {
-      "id": "spoke-z",
+      "id": "hub",
       "parent": "rotor",
-      "shape": "box",
+      "shape": "profile of revolution",
       "dimensions_m": {
-        "x": 0.04,
-        "y": 0.03,
-        "z": 1.2
+        "closed_axial_radial_profile": [
+          [-0.065, 0.0395],
+          [-0.065, 0.088],
+          [-0.058, 0.094],
+          [0.058, 0.094],
+          [0.065, 0.088],
+          [0.065, 0.0395]
+        ],
+        "axis": "+Y",
+        "segments": 48
       },
-      "position_m": [
-        0,
-        0,
-        0
-      ],
-      "orientation_rad": [
-        0,
-        0,
-        0
-      ],
+      "position_m": [0.0, 0.19, 0.0],
+      "orientation_rad": [0.0, 0.0, 0.0],
       "material": {
+        "class": "wood, planed oak",
         "basis": "assumed",
-        "source": "A-GEOM",
-        "class": "oak"
+        "source": "A-GEOM"
       },
       "certainty": "C",
-      "source": "A-GEOM"
+      "source": "A-GEOM",
+      "notes": "A hub of oak turned and bored for the shaft, wedged on it; the four arms are mortised into its middle. [geometry]"
+    },
+    {
+      "id": "hub-hoop-0",
+      "parent": "hub",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.01, 0.0935],
+          [-0.01, 0.097],
+          [-0.0085, 0.0985],
+          [0.0085, 0.0985],
+          [0.01, 0.097],
+          [0.01, 0.0935]
+        ],
+        "axis": "+Y",
+        "segments": 48
+      },
+      "position_m": [0.0, -0.047, 0.0],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "An iron hoop shrunk on the hub, above or below the arms' mortises. [geometry]"
+    },
+    {
+      "id": "hub-hoop-1",
+      "parent": "hub",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.01, 0.0935],
+          [-0.01, 0.097],
+          [-0.0085, 0.0985],
+          [0.0085, 0.0985],
+          [0.01, 0.097],
+          [0.01, 0.0935]
+        ],
+        "axis": "+Y",
+        "segments": 48
+      },
+      "position_m": [0.0, 0.047, 0.0],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "An iron hoop shrunk on the hub, above or below the arms' mortises. [geometry]"
+    },
+    {
+      "id": "spoke-0",
+      "parent": "rotor",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [0.0, 0.0],
+          [0.0, 0.022],
+          [0.028, 0.022],
+          [0.028, 0.026],
+          [0.036, 0.027],
+          [0.044, 0.024],
+          [0.44, 0.0185],
+          [0.465, 0.0185],
+          [0.465, 0.015],
+          [0.54, 0.015],
+          [0.54, 0.0]
+        ],
+        "axis": "+Y",
+        "segments": 16
+      },
+      "position_m": [0.06, 0.19, 0.0],
+      "orientation_rad": [0.0, -0.0, -1.570796],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "A rigid arm of oak turned to a taper, tenoned into the hub and into the stone ball, whose centre it reaches at 0.6 m from the axis. [geometry]"
+    },
+    {
+      "id": "ferrule-0",
+      "parent": "spoke-0",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.012, 0.0182],
+          [-0.012, 0.020475],
+          [-0.010775, 0.0217],
+          [0.010775, 0.0217],
+          [0.012, 0.020475],
+          [0.012, 0.0182]
+        ],
+        "axis": "+Y",
+        "segments": 24
+      },
+      "position_m": [0.0, 0.4525, 0.0],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "An iron ferrule on the arm's end, where it enters the stone. [geometry]"
     },
     {
       "id": "weight-0",
@@ -222,23 +639,75 @@
       "dimensions_m": {
         "radius": 0.07
       },
-      "position_m": [
-        0.6,
-        0,
-        0.0
-      ],
-      "orientation_rad": [
-        0,
-        0,
-        0
-      ],
+      "position_m": [0.6, 0.19, 0.0],
+      "orientation_rad": [0, 0, 0],
       "material": {
         "basis": "assumed",
         "source": "A-GEOM",
         "class": "stone"
       },
       "certainty": "C",
-      "source": "A-GEOM"
+      "source": "A-GEOM",
+      "notes": "A ball of dressed stone, radius 0.07 m and 3.5 kg, bored and set on the arm's tenon at 0.6 m from the axis. [geometry]"
+    },
+    {
+      "id": "spoke-1",
+      "parent": "rotor",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [0.0, 0.0],
+          [0.0, 0.022],
+          [0.028, 0.022],
+          [0.028, 0.026],
+          [0.036, 0.027],
+          [0.044, 0.024],
+          [0.44, 0.0185],
+          [0.465, 0.0185],
+          [0.465, 0.015],
+          [0.54, 0.015],
+          [0.54, 0.0]
+        ],
+        "axis": "+Y",
+        "segments": 16
+      },
+      "position_m": [0.0, 0.19, 0.06],
+      "orientation_rad": [0.0, -1.570796, -1.570796],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "A rigid arm of oak turned to a taper, tenoned into the hub and into the stone ball, whose centre it reaches at 0.6 m from the axis. [geometry]"
+    },
+    {
+      "id": "ferrule-1",
+      "parent": "spoke-1",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.012, 0.0182],
+          [-0.012, 0.020475],
+          [-0.010775, 0.0217],
+          [0.010775, 0.0217],
+          [0.012, 0.020475],
+          [0.012, 0.0182]
+        ],
+        "axis": "+Y",
+        "segments": 24
+      },
+      "position_m": [0.0, 0.4525, 0.0],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "An iron ferrule on the arm's end, where it enters the stone. [geometry]"
     },
     {
       "id": "weight-1",
@@ -247,23 +716,75 @@
       "dimensions_m": {
         "radius": 0.07
       },
-      "position_m": [
-        3.6739403974420595e-17,
-        0,
-        0.6
-      ],
-      "orientation_rad": [
-        0,
-        0,
-        0
-      ],
+      "position_m": [0.0, 0.19, 0.6],
+      "orientation_rad": [0, 0, 0],
       "material": {
         "basis": "assumed",
         "source": "A-GEOM",
         "class": "stone"
       },
       "certainty": "C",
-      "source": "A-GEOM"
+      "source": "A-GEOM",
+      "notes": "A ball of dressed stone, radius 0.07 m and 3.5 kg, bored and set on the arm's tenon at 0.6 m from the axis. [geometry]"
+    },
+    {
+      "id": "spoke-2",
+      "parent": "rotor",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [0.0, 0.0],
+          [0.0, 0.022],
+          [0.028, 0.022],
+          [0.028, 0.026],
+          [0.036, 0.027],
+          [0.044, 0.024],
+          [0.44, 0.0185],
+          [0.465, 0.0185],
+          [0.465, 0.015],
+          [0.54, 0.015],
+          [0.54, 0.0]
+        ],
+        "axis": "+Y",
+        "segments": 16
+      },
+      "position_m": [-0.06, 0.19, 0.0],
+      "orientation_rad": [0.0, -3.141593, -1.570796],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "A rigid arm of oak turned to a taper, tenoned into the hub and into the stone ball, whose centre it reaches at 0.6 m from the axis. [geometry]"
+    },
+    {
+      "id": "ferrule-2",
+      "parent": "spoke-2",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.012, 0.0182],
+          [-0.012, 0.020475],
+          [-0.010775, 0.0217],
+          [0.010775, 0.0217],
+          [0.012, 0.020475],
+          [0.012, 0.0182]
+        ],
+        "axis": "+Y",
+        "segments": 24
+      },
+      "position_m": [0.0, 0.4525, 0.0],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "An iron ferrule on the arm's end, where it enters the stone. [geometry]"
     },
     {
       "id": "weight-2",
@@ -272,23 +793,75 @@
       "dimensions_m": {
         "radius": 0.07
       },
-      "position_m": [
-        -0.6,
-        0,
-        7.347880794884119e-17
-      ],
-      "orientation_rad": [
-        0,
-        0,
-        0
-      ],
+      "position_m": [-0.6, 0.19, 0.0],
+      "orientation_rad": [0, 0, 0],
       "material": {
         "basis": "assumed",
         "source": "A-GEOM",
         "class": "stone"
       },
       "certainty": "C",
-      "source": "A-GEOM"
+      "source": "A-GEOM",
+      "notes": "A ball of dressed stone, radius 0.07 m and 3.5 kg, bored and set on the arm's tenon at 0.6 m from the axis. [geometry]"
+    },
+    {
+      "id": "spoke-3",
+      "parent": "rotor",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [0.0, 0.0],
+          [0.0, 0.022],
+          [0.028, 0.022],
+          [0.028, 0.026],
+          [0.036, 0.027],
+          [0.044, 0.024],
+          [0.44, 0.0185],
+          [0.465, 0.0185],
+          [0.465, 0.015],
+          [0.54, 0.015],
+          [0.54, 0.0]
+        ],
+        "axis": "+Y",
+        "segments": 16
+      },
+      "position_m": [-0.0, 0.19, -0.06],
+      "orientation_rad": [0.0, -4.712389, -1.570796],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "A rigid arm of oak turned to a taper, tenoned into the hub and into the stone ball, whose centre it reaches at 0.6 m from the axis. [geometry]"
+    },
+    {
+      "id": "ferrule-3",
+      "parent": "spoke-3",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.012, 0.0182],
+          [-0.012, 0.020475],
+          [-0.010775, 0.0217],
+          [0.010775, 0.0217],
+          [0.012, 0.020475],
+          [0.012, 0.0182]
+        ],
+        "axis": "+Y",
+        "segments": 24
+      },
+      "position_m": [0.0, 0.4525, 0.0],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "An iron ferrule on the arm's end, where it enters the stone. [geometry]"
     },
     {
       "id": "weight-3",
@@ -297,49 +870,156 @@
       "dimensions_m": {
         "radius": 0.07
       },
-      "position_m": [
-        -1.1021821192326178e-16,
-        0,
-        -0.6
-      ],
-      "orientation_rad": [
-        0,
-        0,
-        0
-      ],
+      "position_m": [-0.0, 0.19, -0.6],
+      "orientation_rad": [0, 0, 0],
       "material": {
         "basis": "assumed",
         "source": "A-GEOM",
         "class": "stone"
       },
       "certainty": "C",
-      "source": "A-GEOM"
+      "source": "A-GEOM",
+      "notes": "A ball of dressed stone, radius 0.07 m and 3.5 kg, bored and set on the arm's tenon at 0.6 m from the axis. [geometry]"
     },
     {
-      "id": "thrust-pad",
-      "parent": "base",
-      "shape": "cylinder",
+      "id": "crank-cap",
+      "parent": "rotor",
+      "shape": "profile of revolution",
       "dimensions_m": {
-        "radius": 0.06,
-        "height": 0.04
+        "closed_axial_radial_profile": [
+          [0.0, 0.0],
+          [0.0, 0.0435],
+          [0.04, 0.0435],
+          [0.043, 0.041],
+          [0.045, 0.0]
+        ],
+        "axis": "+Y",
+        "segments": 32
       },
-      "position_m": [
-        0,
-        0.58,
-        0
-      ],
-      "orientation_rad": [
-        0,
-        0,
-        0
-      ],
+      "position_m": [0.0, 0.377, 0.0],
+      "orientation_rad": [0.0, 0.0, 0.0],
       "material": {
-        "class": "wood",
+        "class": "iron, forged",
         "basis": "assumed",
         "source": "A-GEOM"
       },
       "certainty": "C",
-      "source": "A-GEOM"
+      "source": "A-GEOM",
+      "notes": "An iron cap over the shaft's head, the square the crank's eye is fitted on. [geometry]"
+    },
+    {
+      "id": "crank",
+      "parent": "rotor",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.17,
+        "y": 0.018,
+        "z": 0.03
+      },
+      "position_m": [0.060104, 0.431, 0.060104],
+      "orientation_rad": [0.0, -0.785398, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "EL-FLY",
+      "notes": "[folio] The sheet draws a crank on top of every shaft it tries; this one is forged iron, its eye over the shaft's capped head, its size and making are ours. [geometry]"
+    },
+    {
+      "id": "crank-eye",
+      "parent": "crank",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.028,
+        "height": 0.022
+      },
+      "position_m": [-0.085, 0.0, 0.0],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "The crank's eye, forged round over the shaft's head. [geometry]"
+    },
+    {
+      "id": "crank-boss",
+      "parent": "crank",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.02,
+        "height": 0.022
+      },
+      "position_m": [0.085, 0.0, 0.0],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "The boss at the crank's end that carries the handle's pin. [geometry]"
+    },
+    {
+      "id": "crank-pin",
+      "parent": "crank",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [0.0, 0.0],
+          [0.0, 0.007],
+          [0.096, 0.007],
+          [0.096, 0.011],
+          [0.1, 0.0105],
+          [0.104, 0.007],
+          [0.106, 0.0]
+        ],
+        "axis": "+Y",
+        "segments": 16
+      },
+      "position_m": [0.085, -0.006, 0.0],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "The iron pin the handle turns on, its head rounded over. [geometry]"
+    },
+    {
+      "id": "crank-grip",
+      "parent": "crank",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [0.0, 0.0075],
+          [0.0, 0.013],
+          [0.008, 0.0165],
+          [0.04, 0.0185],
+          [0.07, 0.016],
+          [0.078, 0.012],
+          [0.078, 0.0075]
+        ],
+        "axis": "+Y",
+        "segments": 24
+      },
+      "position_m": [0.085, 0.013, 0.0],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, oak grip",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "A turned oak handle on the crank's pin, darkened and polished by the hand that keeps the wheel going. [geometry]"
     }
   ],
   "joints": [
@@ -348,16 +1028,8 @@
       "type": "revolute",
       "parent": "base",
       "child": "rotor",
-      "axis": [
-        0,
-        1,
-        0
-      ],
-      "pivot_m": [
-        0,
-        0.8,
-        0
-      ],
+      "axis": [0, 1, 0],
+      "pivot_m": [0, 0.8, 0],
       "limits": null,
       "ratio": null,
       "source": "A-MOTION",
@@ -487,7 +1159,7 @@
   ],
   "research": {
     "identification": "Madrid I114r [EL-FLY].",
-    "sheet_vs_reconstruction": "Six motion arrangements and the relation between driving and driven bodies are discussed [EL-FLY]. Mario Taddei lists a flywheel reconstruction [FLY-M]. This four-weight stand is independent modern explanatory geometry.",
+    "sheet_vs_reconstruction": "Six motion arrangements and the relation between driving and driven bodies are discussed [EL-FLY]. Mario Taddei lists a flywheel reconstruction [FLY-M]. This four-weight stand is independent modern explanatory geometry. The sheet draws a crank on top of each shaft it tries, and the model has one there. The pillar, the step, the hub, the arms and their joinery are built as a workshop of the period would build them, and are ours.",
     "dimensions": "No explicit physical dimensions or Richter number verified [EL-FLY]. No braccio conversion made.",
     "claims": {
       "claimed_by_leonardo": "Leonardo compares balanced and unbalanced rotating weights and rejects the driven body as its own source [EL-FLY].",

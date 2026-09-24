@@ -94,8 +94,19 @@ export function movingCentreline(
     return rest.map((p, i) => [p[0] ?? 0, (p[1] ?? 0) + (i === rest.length - 1 ? (values['lift'] ?? 0) : 0), p[2] ?? 0])
   }
   if (slug === 'lathe' && part === 'bow') {
+    // A pole clamped at its butt and pulled at its tip bends as s^2(3-s)/2,
+    // s its length from the butt over the whole; the tip moves by u.
     const u = values['foot'] ?? 0
-    return rest.map((p, i) => [p[0] ?? 0, (p[1] ?? 0) + u * i / 3, p[2] ?? 0])
+    const along = [0]
+    for (let i = 1; i < rest.length; i++) {
+      const a = rest[i - 1]!, b = rest[i]!
+      along.push(along[i - 1]! + Math.hypot((b[0] ?? 0) - (a[0] ?? 0), (b[1] ?? 0) - (a[1] ?? 0), (b[2] ?? 0) - (a[2] ?? 0)))
+    }
+    const whole = along[along.length - 1]! || 1
+    return rest.map((p, i) => {
+      const s = along[i]! / whole
+      return [p[0] ?? 0, (p[1] ?? 0) + u * s * s * (3 - s) / 2, p[2] ?? 0]
+    })
   }
   if (slug === 'lathe' && part === 'drive-rope') {
     const u = values['foot'] ?? 0

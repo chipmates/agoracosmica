@@ -8,6 +8,7 @@
 import { Float32BufferAttribute, Matrix3, Matrix4, Vector3, type BufferGeometry } from 'three/webgpu'
 import { instrumentWear } from './instruments'
 import { waterAndWarWear } from './wear-water-war'
+import { WORKSHOP_WEAR } from './workshop-wear'
 
 type Tint = readonly [number, number, number]
 interface Cut {
@@ -156,7 +157,7 @@ const AERIAL_SCREW: WearRule[] = [
 ]
 
 export function wearFor(slug: string): readonly WearRule[] {
-  return slug === 'water-lifting-screw' ? WATER_SCREW : slug === 'aerial-screw' ? AERIAL_SCREW : waterAndWarWear(slug) ?? instrumentWear(slug)
+  return slug === 'water-lifting-screw' ? WATER_SCREW : slug === 'aerial-screw' ? AERIAL_SCREW : waterAndWarWear(slug) ?? WORKSHOP_WEAR[slug] ?? instrumentWear(slug)
 }
 
 /** Cut a flat-listed surface by parallel planes n.p = offset, every

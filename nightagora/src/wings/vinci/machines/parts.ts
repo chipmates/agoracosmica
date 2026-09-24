@@ -312,12 +312,11 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
       detail: {...set.detail, macro: .07, macroContrast: .3, mid: .55, micro: .35},
     } : dossier.slug === 'flywheel' && set.name === 'limestone-pale' ? {
       // A 140 mm ball inside a 150 mm macro cell takes one value and reads as
-      // putty, and one cut to the ball's own diameter is still one cell across
-      // it. The bands are cut to a THIRD of the ball: mottle three times over
-      // it, pits at the size a chisel leaves, and enough relief that the key
-      // finds them. A dressed stone at arm's length is not a smooth sphere.
-      ...set, scale: [.05, .05], scales: [.046, .013, .0016], normalStrength: .62,
-      detail: {...set.detail, macro: .046, macroContrast: .55, mid: .8, micro: .55},
+      // putty; relief cut to a third of it reads as lumps. The mottle stays at
+      // half the ball, in the colour; the relief is the fine peck of a point
+      // chisel, which a dressed sphere keeps under the hall's light.
+      ...set, scale: [.07, .07], scales: [.07, .01, .0014], normalStrength: .3,
+      detail: {...set.detail, macro: .07, macroContrast: .42, mid: .01, micro: .6},
     } : /iron, forged/.test(name) ? {
       // Iron off the smith's hammer: a smooth dark skin with soft facets, not
       // the set's cast pits, which read as concrete on a crank's face.

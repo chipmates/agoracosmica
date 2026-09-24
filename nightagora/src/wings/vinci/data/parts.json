@@ -2391,23 +2391,143 @@
         "en": "Base",
         "de": "Sockel"
       },
+      "base-sill-1": {
+        "en": "Sill",
+        "de": "Schwelle"
+      },
+      "lower-batten-0": {
+        "en": "Batten",
+        "de": "Leiste"
+      },
+      "lower-batten-1": {
+        "en": "Batten",
+        "de": "Leiste"
+      },
       "lower-plate": {
         "en": "Lower plate",
         "de": "Untere Platte"
       },
-      "upper-plate": {
-        "en": "Upper plate",
-        "de": "Obere Platte"
+      "lower-plate-board-0": {
+        "en": "Lower plate",
+        "de": "Untere Platte"
+      },
+      "lower-plate-board-1": {
+        "en": "Lower plate",
+        "de": "Untere Platte"
+      },
+      "central-post": {
+        "en": "Central post",
+        "de": "Mittelzapfen"
+      },
+      "post-washer": {
+        "en": "Washer",
+        "de": "Unterlegscheibe"
+      },
+      "post-forelock": {
+        "en": "Wedge",
+        "de": "Keil"
       },
       "carrier": {
         "en": "Ball carrier",
         "de": "Kugelträger"
       },
+      "cage-inner-0": {
+        "en": "Inner ring of the ball carrier",
+        "de": "Innerer Ring des Kugelträgers"
+      },
+      "cage-outer-0": {
+        "en": "Outer ring of the ball carrier",
+        "de": "Äußerer Ring des Kugelträgers"
+      },
+      "cage-inner-1": {
+        "en": "Inner ring of the ball carrier",
+        "de": "Innerer Ring des Kugelträgers"
+      },
+      "cage-outer-1": {
+        "en": "Outer ring of the ball carrier",
+        "de": "Äußerer Ring des Kugelträgers"
+      },
+      "cage-inner-2": {
+        "en": "Inner ring of the ball carrier",
+        "de": "Innerer Ring des Kugelträgers"
+      },
+      "cage-outer-2": {
+        "en": "Outer ring of the ball carrier",
+        "de": "Äußerer Ring des Kugelträgers"
+      },
+      "cage-inner-3": {
+        "en": "Inner ring of the ball carrier",
+        "de": "Innerer Ring des Kugelträgers"
+      },
+      "cage-outer-3": {
+        "en": "Outer ring of the ball carrier",
+        "de": "Äußerer Ring des Kugelträgers"
+      },
+      "cage-inner-4": {
+        "en": "Inner ring of the ball carrier",
+        "de": "Innerer Ring des Kugelträgers"
+      },
+      "cage-outer-4": {
+        "en": "Outer ring of the ball carrier",
+        "de": "Äußerer Ring des Kugelträgers"
+      },
+      "cage-inner-5": {
+        "en": "Inner ring of the ball carrier",
+        "de": "Innerer Ring des Kugelträgers"
+      },
+      "cage-outer-5": {
+        "en": "Outer ring of the ball carrier",
+        "de": "Äußerer Ring des Kugelträgers"
+      },
+      "cage-inner-6": {
+        "en": "Inner ring of the ball carrier",
+        "de": "Innerer Ring des Kugelträgers"
+      },
+      "cage-outer-6": {
+        "en": "Outer ring of the ball carrier",
+        "de": "Äußerer Ring des Kugelträgers"
+      },
+      "cage-inner-7": {
+        "en": "Inner ring of the ball carrier",
+        "de": "Innerer Ring des Kugelträgers"
+      },
+      "cage-outer-7": {
+        "en": "Outer ring of the ball carrier",
+        "de": "Äußerer Ring des Kugelträgers"
+      },
+      "separator-axle-0": {
+        "en": "Wheel axle",
+        "de": "Achse des Rädchens"
+      },
+      "pin-head-0": {
+        "en": "Wheel axle",
+        "de": "Achse des Rädchens"
+      },
+      "spacer-0": {
+        "en": "Spacer sleeve",
+        "de": "Distanzhülse"
+      },
+      "separator-0": {
+        "en": "Pivoted wheel",
+        "de": "Gelagertes Rädchen"
+      },
       "ball-0": {
         "en": "Wooden ball",
         "de": "Holzkugel"
       },
-      "separator-0": {
+      "separator-axle-1": {
+        "en": "Wheel axle",
+        "de": "Achse des Rädchens"
+      },
+      "pin-head-1": {
+        "en": "Wheel axle",
+        "de": "Achse des Rädchens"
+      },
+      "spacer-1": {
+        "en": "Spacer sleeve",
+        "de": "Distanzhülse"
+      },
+      "separator-1": {
         "en": "Pivoted wheel",
         "de": "Gelagertes Rädchen"
       },
@@ -2415,7 +2535,19 @@
         "en": "Wooden ball",
         "de": "Holzkugel"
       },
-      "separator-1": {
+      "separator-axle-2": {
+        "en": "Wheel axle",
+        "de": "Achse des Rädchens"
+      },
+      "pin-head-2": {
+        "en": "Wheel axle",
+        "de": "Achse des Rädchens"
+      },
+      "spacer-2": {
+        "en": "Spacer sleeve",
+        "de": "Distanzhülse"
+      },
+      "separator-2": {
         "en": "Pivoted wheel",
         "de": "Gelagertes Rädchen"
       },
@@ -2423,7 +2555,19 @@
         "en": "Wooden ball",
         "de": "Holzkugel"
       },
-      "separator-2": {
+      "separator-axle-3": {
+        "en": "Wheel axle",
+        "de": "Achse des Rädchens"
+      },
+      "pin-head-3": {
+        "en": "Wheel axle",
+        "de": "Achse des Rädchens"
+      },
+      "spacer-3": {
+        "en": "Spacer sleeve",
+        "de": "Distanzhülse"
+      },
+      "separator-3": {
         "en": "Pivoted wheel",
         "de": "Gelagertes Rädchen"
       },
@@ -2431,7 +2575,19 @@
         "en": "Wooden ball",
         "de": "Holzkugel"
       },
-      "separator-3": {
+      "separator-axle-4": {
+        "en": "Wheel axle",
+        "de": "Achse des Rädchens"
+      },
+      "pin-head-4": {
+        "en": "Wheel axle",
+        "de": "Achse des Rädchens"
+      },
+      "spacer-4": {
+        "en": "Spacer sleeve",
+        "de": "Distanzhülse"
+      },
+      "separator-4": {
         "en": "Pivoted wheel",
         "de": "Gelagertes Rädchen"
       },
@@ -2439,7 +2595,19 @@
         "en": "Wooden ball",
         "de": "Holzkugel"
       },
-      "separator-4": {
+      "separator-axle-5": {
+        "en": "Wheel axle",
+        "de": "Achse des Rädchens"
+      },
+      "pin-head-5": {
+        "en": "Wheel axle",
+        "de": "Achse des Rädchens"
+      },
+      "spacer-5": {
+        "en": "Spacer sleeve",
+        "de": "Distanzhülse"
+      },
+      "separator-5": {
         "en": "Pivoted wheel",
         "de": "Gelagertes Rädchen"
       },
@@ -2447,7 +2615,19 @@
         "en": "Wooden ball",
         "de": "Holzkugel"
       },
-      "separator-5": {
+      "separator-axle-6": {
+        "en": "Wheel axle",
+        "de": "Achse des Rädchens"
+      },
+      "pin-head-6": {
+        "en": "Wheel axle",
+        "de": "Achse des Rädchens"
+      },
+      "spacer-6": {
+        "en": "Spacer sleeve",
+        "de": "Distanzhülse"
+      },
+      "separator-6": {
         "en": "Pivoted wheel",
         "de": "Gelagertes Rädchen"
       },
@@ -2455,7 +2635,19 @@
         "en": "Wooden ball",
         "de": "Holzkugel"
       },
-      "separator-6": {
+      "separator-axle-7": {
+        "en": "Wheel axle",
+        "de": "Achse des Rädchens"
+      },
+      "pin-head-7": {
+        "en": "Wheel axle",
+        "de": "Achse des Rädchens"
+      },
+      "spacer-7": {
+        "en": "Spacer sleeve",
+        "de": "Distanzhülse"
+      },
+      "separator-7": {
         "en": "Pivoted wheel",
         "de": "Gelagertes Rädchen"
       },
@@ -2463,45 +2655,29 @@
         "en": "Wooden ball",
         "de": "Holzkugel"
       },
-      "separator-7": {
-        "en": "Pivoted wheel",
-        "de": "Gelagertes Rädchen"
+      "upper-plate": {
+        "en": "Upper plate",
+        "de": "Obere Platte"
       },
-      "separator-axle-0": {
-        "en": "Wheel axle",
-        "de": "Achse des Rädchens"
+      "upper-plate-board-0": {
+        "en": "Upper plate",
+        "de": "Obere Platte"
       },
-      "separator-axle-1": {
-        "en": "Wheel axle",
-        "de": "Achse des Rädchens"
+      "upper-plate-board-1": {
+        "en": "Upper plate",
+        "de": "Obere Platte"
       },
-      "separator-axle-2": {
-        "en": "Wheel axle",
-        "de": "Achse des Rädchens"
+      "upper-bush": {
+        "en": "Iron bush",
+        "de": "Eiserne Buchse"
       },
-      "separator-axle-3": {
-        "en": "Wheel axle",
-        "de": "Achse des Rädchens"
+      "upper-grip-0": {
+        "en": "Handle",
+        "de": "Handgriff"
       },
-      "separator-axle-4": {
-        "en": "Wheel axle",
-        "de": "Achse des Rädchens"
-      },
-      "separator-axle-5": {
-        "en": "Wheel axle",
-        "de": "Achse des Rädchens"
-      },
-      "separator-axle-6": {
-        "en": "Wheel axle",
-        "de": "Achse des Rädchens"
-      },
-      "separator-axle-7": {
-        "en": "Wheel axle",
-        "de": "Achse des Rädchens"
-      },
-      "central-post": {
-        "en": "Central post",
-        "de": "Mittelzapfen"
+      "upper-grip-1": {
+        "en": "Handle",
+        "de": "Handgriff"
       }
     },
     "flywheel": {
@@ -2509,41 +2685,153 @@
         "en": "Base",
         "de": "Sockel"
       },
+      "sill-z-0": {
+        "en": "Sill",
+        "de": "Schwelle"
+      },
+      "sill-z-1": {
+        "en": "Sill",
+        "de": "Schwelle"
+      },
       "support": {
         "en": "Bearing stand",
         "de": "Lagerbock"
+      },
+      "support-hoop-0": {
+        "en": "Iron hoop",
+        "de": "Eisenreif"
+      },
+      "support-hoop-1": {
+        "en": "Iron hoop",
+        "de": "Eisenreif"
+      },
+      "brace-0": {
+        "en": "Brace",
+        "de": "Strebe"
+      },
+      "brace-peg-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "brace-1": {
+        "en": "Brace",
+        "de": "Strebe"
+      },
+      "brace-peg-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "brace-2": {
+        "en": "Brace",
+        "de": "Strebe"
+      },
+      "brace-peg-2": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "brace-3": {
+        "en": "Brace",
+        "de": "Strebe"
+      },
+      "brace-peg-3": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "thrust-pad": {
+        "en": "Thrust pad",
+        "de": "Spurlager"
       },
       "rotor": {
         "en": "Shaft",
         "de": "Welle"
       },
-      "spoke-x": {
+      "gudgeon": {
+        "en": "Iron pivot of the shaft",
+        "de": "Eiserner Zapfen der Welle"
+      },
+      "hub": {
+        "en": "Hub",
+        "de": "Nabe"
+      },
+      "hub-hoop-0": {
+        "en": "Iron hoop",
+        "de": "Eisenreif"
+      },
+      "hub-hoop-1": {
+        "en": "Iron hoop",
+        "de": "Eisenreif"
+      },
+      "spoke-0": {
         "en": "Spoke",
         "de": "Speiche"
       },
-      "spoke-z": {
-        "en": "Spoke",
-        "de": "Speiche"
+      "ferrule-0": {
+        "en": "Iron ferrule",
+        "de": "Eiserne Zwinge"
       },
       "weight-0": {
         "en": "Stone weight",
         "de": "Steingewicht"
       },
+      "spoke-1": {
+        "en": "Spoke",
+        "de": "Speiche"
+      },
+      "ferrule-1": {
+        "en": "Iron ferrule",
+        "de": "Eiserne Zwinge"
+      },
       "weight-1": {
         "en": "Stone weight",
         "de": "Steingewicht"
+      },
+      "spoke-2": {
+        "en": "Spoke",
+        "de": "Speiche"
+      },
+      "ferrule-2": {
+        "en": "Iron ferrule",
+        "de": "Eiserne Zwinge"
       },
       "weight-2": {
         "en": "Stone weight",
         "de": "Steingewicht"
       },
+      "spoke-3": {
+        "en": "Spoke",
+        "de": "Speiche"
+      },
+      "ferrule-3": {
+        "en": "Iron ferrule",
+        "de": "Eiserne Zwinge"
+      },
       "weight-3": {
         "en": "Stone weight",
         "de": "Steingewicht"
       },
-      "thrust-pad": {
-        "en": "Thrust pad",
-        "de": "Spurlager"
+      "crank-cap": {
+        "en": "Crank",
+        "de": "Kurbel"
+      },
+      "crank": {
+        "en": "Crank",
+        "de": "Kurbel"
+      },
+      "crank-eye": {
+        "en": "Crank",
+        "de": "Kurbel"
+      },
+      "crank-boss": {
+        "en": "Crank",
+        "de": "Kurbel"
+      },
+      "crank-pin": {
+        "en": "Crank",
+        "de": "Kurbel"
+      },
+      "crank-grip": {
+        "en": "Crank handle",
+        "de": "Kurbelgriff"
       }
     },
     "revolving-crane": {
@@ -3209,25 +3497,185 @@
         "en": "Base",
         "de": "Sockel"
       },
-      "bench": {
-        "en": "Bench",
-        "de": "Werkbank"
+      "left-sole": {
+        "en": "Sole of the trestle",
+        "de": "Schwelle des Bocks"
+      },
+      "left-cap": {
+        "en": "Cap of the trestle",
+        "de": "Kappe des Bocks"
       },
       "left-leg": {
         "en": "Left leg",
         "de": "Linkes Bein"
       },
+      "left-peg-f0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "left-peg-f1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "left-peg-b0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "left-peg-b1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "right-sole": {
+        "en": "Sole of the trestle",
+        "de": "Schwelle des Bocks"
+      },
+      "right-cap": {
+        "en": "Cap of the trestle",
+        "de": "Kappe des Bocks"
+      },
       "right-leg": {
         "en": "Right leg",
         "de": "Rechtes Bein"
+      },
+      "right-back-leg": {
+        "en": "Right leg",
+        "de": "Rechtes Bein"
+      },
+      "right-peg-f0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "right-peg-f1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "right-peg-b0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "right-peg-b1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "bow-post": {
+        "en": "Bow post",
+        "de": "Bogenpfosten"
+      },
+      "bow-wedge": {
+        "en": "Wedge",
+        "de": "Keil"
+      },
+      "stretcher": {
+        "en": "Stretcher",
+        "de": "Querriegel"
+      },
+      "left-stretcher-wedge": {
+        "en": "Wedge",
+        "de": "Keil"
+      },
+      "right-stretcher-wedge": {
+        "en": "Wedge",
+        "de": "Keil"
+      },
+      "bed-rail-front": {
+        "en": "Bed rail",
+        "de": "Bettwange"
+      },
+      "bed-rail-front-peg-l": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "bed-rail-front-peg-r": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "bed-rail-back": {
+        "en": "Bed rail",
+        "de": "Bettwange"
+      },
+      "bed-rail-back-peg-l": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "bed-rail-back-peg-r": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
       },
       "headstock": {
         "en": "Headstock",
         "de": "Spindelstock"
       },
+      "headstock-tenon": {
+        "en": "Tenon",
+        "de": "Zapfen"
+      },
+      "headstock-wedge": {
+        "en": "Wedge",
+        "de": "Keil"
+      },
+      "headstock-bush": {
+        "en": "Iron bush",
+        "de": "Eiserne Buchse"
+      },
       "tailstock": {
         "en": "Tailstock",
         "de": "Reitstock"
+      },
+      "tailstock-tenon": {
+        "en": "Tenon",
+        "de": "Zapfen"
+      },
+      "tailstock-wedge": {
+        "en": "Wedge",
+        "de": "Keil"
+      },
+      "tailstock-bush": {
+        "en": "Iron bush",
+        "de": "Eiserne Buchse"
+      },
+      "nut-post": {
+        "en": "Nut post",
+        "de": "Halter der Mutter"
+      },
+      "nut-post-tenon": {
+        "en": "Tenon",
+        "de": "Zapfen"
+      },
+      "nut-post-wedge": {
+        "en": "Wedge",
+        "de": "Keil"
+      },
+      "foot-guide-left": {
+        "en": "Foot bar guide",
+        "de": "Führung der Fußstange"
+      },
+      "foot-guide-peg-left": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "foot-guide-right": {
+        "en": "Foot bar guide",
+        "de": "Führung der Fußstange"
+      },
+      "foot-guide-peg-right": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "footbar": {
+        "en": "Foot bar",
+        "de": "Fußstange"
+      },
+      "footbar-tenon-0": {
+        "en": "Tenon",
+        "de": "Zapfen"
+      },
+      "footbar-tenon-1": {
+        "en": "Tenon",
+        "de": "Zapfen"
+      },
+      "rope-knot": {
+        "en": "Knot of the rope",
+        "de": "Knoten des Seils"
       },
       "spindle": {
         "en": "Spindle",
@@ -3237,25 +3685,37 @@
         "en": "Rope spool",
         "de": "Seilspule"
       },
-      "footbar": {
-        "en": "Foot bar",
-        "de": "Fußstange"
-      },
-      "bow-post": {
-        "en": "Bow post",
-        "de": "Bogenpfosten"
+      "chuck": {
+        "en": "Drill socket",
+        "de": "Bohrerfutter"
       },
       "drill-bit": {
         "en": "Drill",
         "de": "Bohrer"
       },
+      "drill-spade": {
+        "en": "Drill",
+        "de": "Bohrer"
+      },
+      "drill-tip": {
+        "en": "Drill point",
+        "de": "Bohrerspitze"
+      },
       "feed-screw": {
         "en": "Feed screw",
         "de": "Vorschubschraube"
       },
+      "thread": {
+        "en": "Screw thread",
+        "de": "Gewinde"
+      },
       "nut": {
         "en": "Bronze nut",
         "de": "Bronzemutter"
+      },
+      "feed-handle": {
+        "en": "Tommy bar of the feed screw",
+        "de": "Knebel der Vorschubschraube"
       },
       "bow": {
         "en": "Spring bow",
@@ -3264,26 +3724,6 @@
       "drive-rope": {
         "en": "Drive rope",
         "de": "Zugseil"
-      },
-      "thread": {
-        "en": "Screw thread",
-        "de": "Gewinde"
-      },
-      "nut-post": {
-        "en": "Nut post",
-        "de": "Halter der Mutter"
-      },
-      "drill-tip": {
-        "en": "Drill point",
-        "de": "Bohrerspitze"
-      },
-      "foot-guide-left": {
-        "en": "Foot bar guide",
-        "de": "Führung der Fußstange"
-      },
-      "foot-guide-right": {
-        "en": "Foot bar guide",
-        "de": "Führung der Fußstange"
       }
     },
     "miter-lock-gates": {
