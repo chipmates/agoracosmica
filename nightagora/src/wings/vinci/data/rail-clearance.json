@@ -102,8 +102,8 @@
   },
   {
    "file": "src/wings/vinci/collection/materials.ts",
-   "sha256": "63cee739fb94ffe931ffa6b15e7b2e0d66a94f025e92da90f45c925529f0da87",
-   "bytes": 43773,
+   "sha256": "0b793b967e7c5ea196c1bff272660428e4e2f0fd17db34d0442e75ebb2404a7c",
+   "bytes": 46700,
    "unchangedDuringAudit": true
   },
   {
@@ -168,8 +168,8 @@
   },
   {
    "file": "src/wings/vinci/court-flags.ts",
-   "sha256": "634b444fa45bada2310d2043de44cea20eef4971463ce26ef67df95cd0aefe69",
-   "bytes": 6410,
+   "sha256": "762755a8b8e31b6f888545231b7dbfbea8a804514cf251365ba8e7b3b911f6ca",
+   "bytes": 18234,
    "unchangedDuringAudit": true
   },
   {
@@ -294,8 +294,8 @@
   },
   {
    "file": "src/wings/vinci/ground-finish.ts",
-   "sha256": "2d1da886ea0c79a273d8e10ca568589ad5ff102d8b701299b31cea152fdd2af2",
-   "bytes": 28579,
+   "sha256": "845d650833075d9c5916fd10f852c46f8445e247353e8bd80825d35821987a31",
+   "bytes": 27019,
    "unchangedDuringAudit": true
   },
   {
@@ -306,8 +306,8 @@
   },
   {
    "file": "src/wings/vinci/ground.ts",
-   "sha256": "646cdec00d66378f9c8af26cb508e1937e130e0dac6db5286a8de746e20c66dc",
-   "bytes": 33433,
+   "sha256": "ec8872f2510f7127adf5c6c619c2c47e2dc7c77d6e26860ad70a3124201318f1",
+   "bytes": 34596,
    "unchangedDuringAudit": true
   },
   {
@@ -348,8 +348,8 @@
   },
   {
    "file": "src/wings/vinci/inner-court.ts",
-   "sha256": "70498e5daac24841ca459416cae665f87582c1bee36214f233e03599ccb33f81",
-   "bytes": 30559,
+   "sha256": "c7b34c2e53185c05ebfe0bd2b5520351d99845e1e9ae4db8320aeb173bed0dc4",
+   "bytes": 31288,
    "unchangedDuringAudit": true
   },
   {
@@ -408,8 +408,8 @@
   },
   {
    "file": "src/wings/vinci/machines/data/aerial-screw.json",
-   "sha256": "ec8579212eada69801511495137b47cd13cfcb5751033020c8c8865a2c476159",
-   "bytes": 386188,
+   "sha256": "7073d9886089019b5a4543ab1771cf66630e32b6d9a1a5dc1e1274cd01b2e2e0",
+   "bytes": 447862,
    "unchangedDuringAudit": true
   },
   {
@@ -450,14 +450,14 @@
   },
   {
    "file": "src/wings/vinci/machines/data/miter-lock-gates.json",
-   "sha256": "bc32865809556886ed882197f7befd719e84372cd487e9ccfe002b2f571fe570",
-   "bytes": 23481,
+   "sha256": "a0dc30d4b1f7b6cd6f35cc166188ca0a4c244df9e1fd44afc56108a2c09a87aa",
+   "bytes": 195398,
    "unchangedDuringAudit": true
   },
   {
    "file": "src/wings/vinci/machines/data/multi-barrel-gun.json",
-   "sha256": "a8880985c707d7ded9ae1c26e5ba298d93d84eedf07bd35ca24b1c9c71aab6eb",
-   "bytes": 49168,
+   "sha256": "8403329bac6e20765dd7aa65da97fccad3962c327311f89d1eba24a5d24269db",
+   "bytes": 214483,
    "unchangedDuringAudit": true
   },
   {
@@ -498,8 +498,8 @@
   },
   {
    "file": "src/wings/vinci/machines/geometry.ts",
-   "sha256": "79471916384bc35497c26e1e347a2584a331ecf15f8e5b788e70bf217eb80bc1",
-   "bytes": 24536,
+   "sha256": "b4dd83c038c8733f5c6efd01447f91f0ab37ed9ff2544a0eec193533de30e6e1",
+   "bytes": 25866,
    "unchangedDuringAudit": true
   },
   {
@@ -512,6 +512,12 @@
    "file": "src/wings/vinci/machines/motion.ts",
    "sha256": "b19d6ed2065cfeb26ed5cbb53ad1c2891af27c38c99498aa2ad3e1f13b690aca",
    "bytes": 6717,
+   "unchangedDuringAudit": true
+  },
+  {
+   "file": "src/wings/vinci/machines/sail.ts",
+   "sha256": "ce6d64537ebc42570296ee9cbee577fc1dffb0a0b5378357d9163b2ef09223ea",
+   "bytes": 10823,
    "unchangedDuringAudit": true
   },
   {
@@ -636,8 +642,8 @@
   },
   {
    "file": "src/wings/vinci/stair-wear.ts",
-   "sha256": "fd1524e27dc3e5593ac9aeb8e8d9f92f115f14625544b506c21dfda688043b5b",
-   "bytes": 8918,
+   "sha256": "cb01fe821fc81ae2bcd68a0e17e5d09f36f84b8d2aa3d144e2f409562f5dacb2",
+   "bytes": 15330,
    "unchangedDuringAudit": true
   },
   {
