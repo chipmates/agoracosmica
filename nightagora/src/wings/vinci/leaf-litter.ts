@@ -152,6 +152,7 @@ function placeSeed(e: number, n: number, salt: number): number {
 export function layLitter(plan: LitterPlan): LitterCounts {
   const counts: LitterCounts = { carpet: 0, drifts: 0, scatter: 0, lane: 0, court: 0 }
   const hero = plan.tier === 'hero', calm = plan.tier === 'calm'
+  bladesDrawn = hero
   const keep = hero ? 1 : plan.tier === 'standard' ? .2 : .07
   const grow = hero ? 1 : plan.tier === 'standard' ? 1.4 : 1.9
   // within this reach of a stop a leaf is drawn folded along its midrib
@@ -528,12 +529,15 @@ interface Leaf {
 /** Within this reach of a stop's eye a lying leaf is a blade, not a card:
     rolled at its margins, curled at its tip, lying on its midrib. */
 const BLADE_REACH = 7.5
+/** blades are the film's and the desktop's: a phone's tier keeps the card,
+    which is what its walk was measured to hold still with */
+let bladesDrawn = false
 
 /** One fallen leaf, lying on its floor or leaning on a face: a card of its
     species' outline, folded along the midrib as a drying leaf folds, its tip
     curling up a little. */
 function lay(target: Target, leaf: Leaf): void {
-  if (leaf.folded && !leaf.leanTo && stopDistance(leaf.east, leaf.north) < BLADE_REACH) { nearBlade(target, leaf); return }
+  if (bladesDrawn && leaf.folded && !leaf.leanTo && stopDistance(leaf.east, leaf.north) < BLADE_REACH) { nearBlade(target, leaf); return }
   const body = target.leaves
   const recipe = LEAF_RECIPES[leaf.species]
   const hw = Math.min(.5, .5 * recipe.width * 1.08 + .02)
