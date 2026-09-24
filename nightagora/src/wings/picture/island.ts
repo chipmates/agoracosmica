@@ -3,8 +3,11 @@
    passes the line: its first frame on the glass within two seconds of the
    close look opening, then thirty frames a second. The filmed cycle stands
    everywhere else, and it is a phone's default until a real phone has passed.
-   An island that misses the line hands over to the filmed cycle at the step
-   it stood at, and the device keeps that answer for the rest of its visits. */
+   An island that cannot hold the frame rate hands over to the filmed cycle at
+   the step it stood at, and the device keeps that answer for the rest of its
+   visits. A slow first frame alone is read and said, never handed over: by the
+   time it is known the island is already on the glass, and a cold first visit
+   fetches the island's own code. */
 
 import type { VitrinePayload, VitrinePayloadHost, VitrineSurface } from '../vitrine/types'
 
@@ -116,9 +119,10 @@ export function createIslandPayload(options: {
     if (since < COUNT.settleMs + COUNT.windowMs) return
     reading.fps = Math.round((frames / (COUNT.windowMs / 1000)) * 10) / 10
     reading.worstMs = Math.round(worst)
-    const pass = (reading.openMs ?? Infinity) <= ISLAND_LINE.openMs && reading.fps >= ISLAND_LINE.fps * 0.95
+    const held = reading.fps >= ISLAND_LINE.fps * 0.95
+    const pass = (reading.openMs ?? Infinity) <= ISLAND_LINE.openMs && held
     reading.verdict = pass ? 'pass' : 'miss'
-    if (pass || forced) return
+    if (held || forced) return
     try { localStorage.setItem(KEPT, 'filmed') } catch { /* the answer lives for this visit only */ }
     handOver()
   }
