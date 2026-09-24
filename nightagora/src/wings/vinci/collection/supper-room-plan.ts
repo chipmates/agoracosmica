@@ -385,6 +385,33 @@ export function sillDress(): Body {
   return b
 }
 
+/** THE COPINGS: a folded zinc cap over every outer edge of the two roofs,
+ * standing a little over the roof and a little proud of the wall, so each
+ * roof ends in a drip line and its own shadow under it. The long runs stop a
+ * millimetre short of the returns they meet, so no two faces share a plane. */
+export const COPING = { up: .035, down: .13, proud: .03, over: .26 } as const
+/** the two roofs' outer outlines at their tops: [west, south, east, north, top] */
+export const ROOF_OUTLINES: readonly [number, number, number, number, number][] = [
+  [-45.32, ROOM.south - .4, ROOM.step + ROOM.stepWall, ROOM.north, ROOM.bayTop],
+  [ROOM.step + ROOM.stepWall, ROOM.south - .4, ROOM.east + ROOM.eastWall, ROOM.naveNorth, ROOM.naveTop],
+]
+export function copings(): Body {
+  const b = new Body(), C = COPING, gap = .001
+  ROOF_OUTLINES.forEach(([w, s, e, n, top], index) => {
+    const lo = top - C.down, hi = top + C.up
+    // the nave's west edge stands against the bay's wall: no coping there
+    const westOpen = index === 1
+    // the two long runs, south and north, from outer face to outer face
+    const w0 = westOpen ? w + gap : w - C.proud + gap, e0 = e + C.proud - gap
+    b.box([w0, s - C.proud, lo, e0, s + C.over, hi])
+    b.box([w0, n - C.over, lo, e0, n + C.proud, hi + .002])
+    // the returns between them, a hair higher so their tops never meet the runs'
+    if (!westOpen) b.box([w - C.proud, s + C.over - gap, lo - .002, w + C.over, n - C.over + gap, hi + .004])
+    b.box([e - C.over, s + C.over - gap, lo - .002, e + C.proud, n - C.over + gap, hi + .004])
+  })
+  return b
+}
+
 /** Every solid the room stands, for the clearance proof: the checker builds
  * these bodies and holds their own triangles to the walk. */
 export function supperRoomBodies(): Record<string, Body> {
@@ -392,7 +419,7 @@ export function supperRoomBodies(): Record<string, Body> {
   const { slab, well, diffuser, glass } = roof()
   return {
     'end-wall': plaster, reveal, 'upper-end-wall': upperEndWall(), 'south-wall': southWall(),
-    roof: slab, well, diffuser, glass, frame: frame(), fins: fins(), floor: floor(), sill: sillDress(),
+    roof: slab, well, diffuser, glass, frame: frame(), fins: fins(), floor: floor(), sill: sillDress(), copings: copings(),
   }
 }
 

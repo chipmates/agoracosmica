@@ -23,11 +23,11 @@ import { RectAreaLightTexturesLib } from 'three/addons/lights/RectAreaLightTextu
 import type { Stack } from '../../../stack'
 import type { MaterialSet } from '../../../stack/materials'
 import { kelvinToColour } from '../../../stack/light'
-import { axisFootprint, lineCoverage } from '../../../stack/detail'
+import { axisFootprint, lineCoverage, resolved } from '../../../stack/detail'
 import { setSupperMuralLight } from './supper-light'
 import {
-  END_FACE, FIELD, FINS, FLOOR_RISE, NAVE_PROBE_AT, PROBE_AT, ROOM, SILL, SUPPER_LIGHTS, SUPPER_ROOM_PROVENANCE, TOP_LIGHT, v3,
-  endWall, fins, floor as floorBody, frame, roof, sillDress, southWall, upperEndWall, type Body, type SupperLight,
+  COPING, END_FACE, FIELD, FINS, FLOOR_RISE, NAVE_PROBE_AT, PROBE_AT, ROOF_OUTLINES, ROOM, SILL, SUPPER_LIGHTS, SUPPER_ROOM_PROVENANCE,
+  TOP_LIGHT, v3, copings, endWall, fins, floor as floorBody, frame, roof, sillDress, southWall, upperEndWall, type Body, type SupperLight,
 } from './supper-room-plan'
 
 // The node overload boundary stays local to this file.
@@ -72,6 +72,12 @@ function looks() {
     marbleTone: uniform(.1),
     marbleRough: uniform(.35),
     groutColour: uniform(new Color(.52, .5, .47)),
+    /** the panels' batches, their brass strips, the walked floor and the dust */
+    panelTone: uniform(.12),
+    stripColour: uniform(new Color(.07, .055, .04)),
+    wearClean: uniform(.12),
+    wearPolish: uniform(.17),
+    wallDust: uniform(.12),
     stoneTint: uniform(new Color(.9, .9, .9)),
     /** the diffuser as the eye sees it, over the light it gives the room */
     diffuserGlow: uniform(.72),
@@ -132,12 +138,57 @@ function concreteMaterial(set: MaterialSet, L: Looks, name: string): MeshStandar
   return m
 }
 
+/** THE WEATHER ON THE ROOM'S OUTSIDE: the roofs are laid in lapped strips of
+ * membrane a metre wide, darker where the water stood; the walls under each
+ * coping carry the streaks the rain draws down from it. */
+function weathered(m: MeshStandardNodeMaterial): void {
+  const P = positionWorld, n = normalWorldGeometry
+  const east = P.x, north = P.z.negate()
+  const { east: fe, up: fu, north: fn } = axisFootprint(P)
+  const up = smoothstep(.7, .95, n.y)
+  // the roof: which roof, its strips across it and the water's marks
+  const [bay, nave] = ROOF_OUTLINES
+  const onBay = east.lessThan(bay![2] + .05)
+  const top = select(onBay, float(bay![4]), float(nave![4]))
+  const roofTop = up.mul(smoothstep(.04, .01, abs(P.y.sub(top))))
+  const strip = north.sub(bay![1]).div(1.02)
+  const lap = lineCoverage(abs(fract(strip).sub(.5)).mul(-1).add(.5).mul(1.02), .008, 1.02, fn)
+  const stripTone = float(1).add(hash(floorOf(strip), select(onBay, float(1), float(2)), 6.1).sub(.5).mul(.06))
+  const ponds = smoothstep(.55, .8, mx_noise_float(vec3(east.mul(.45), north.mul(.45), 4.2)).mul(.5).add(.5))
+  const roofMark = stripTone.mul(float(1).sub(lap.mul(.45))).mul(float(1).sub(ponds.mul(.16)))
+  // the walls: streaks from the coping down, fading over two metres
+  const upright = float(1).sub(smoothstep(.3, .6, abs(n.y)))
+  const below = top.sub(COPING.down).sub(P.y).max(0)
+  const along = select(abs(n.x).greaterThan(.5), north, east)
+  const streak = smoothstep(.5, .85, mx_noise_float(vec3(along.mul(3.2), P.y.mul(.18), 8.3)).mul(.5).add(.5))
+    .mul(float(1).sub(smoothstep(.2, 2.4, below))).mul(resolved(.06, fu.max(fe.min(fn))))
+  const wallMark = float(1).sub(streak.mul(.3)).sub(float(1).sub(smoothstep(0, .35, below)).mul(.08))
+  m.colorNode = (m.colorNode as N).mul(mix(float(1), roofMark, roofTop)).mul(mix(float(1), wallMark, upright))
+  m.roughnessNode = (m.roughnessNode as N).add(ponds.mul(roofTop).mul(-.12)).add(lap.mul(roofTop).mul(-.1))
+}
+
+/** THE COPINGS' ZINC: dark, folded, dulled by the weather. */
+function zincMaterial(): MeshStandardNodeMaterial {
+  const m = new MeshStandardNodeMaterial({ roughness: .5, metalness: .55, side: FrontSide })
+  const dull = mx_noise_float(positionWorld.mul(1.3)).mul(.5).add(.5)
+  m.colorNode = vec3(.2, .205, .21).mul(dull.mul(.2).add(.9))
+  m.roughnessNode = float(.42).add(dull.mul(.18))
+  m.name = 'vinci/collection-supper-room/zinc'
+  m.userData = { ...SUPPER_ROOM_PROVENANCE }
+  return m
+}
+
 /** THE FLOOR: two-centimetre tesserae of white marble, each cut from its own
  * piece of the stone, their corners eased, set in a pale grout; the joint is
  * drawn only where a pixel can hold it, and fades to the floor's own tone. */
 const TESSERA = .02, JOINT = .0011
 /** the border's width, and the lines it is laid to */
 const BORDER = .32, FINS_FRONT = FINS.front, SILL_EAST = SILL.east
+/** the panels inside the border, measured from the border's inner corner at
+ * the step, and the brass strip between them */
+const PANEL = { size: 1.2, strip: .008, east: ROOM.step + BORDER, north: FINS.front + BORDER } as const
+/** the line the way in is walked along: the middle of the nave's floor */
+const WALK_NORTH = (FINS.front + ROOM.naveNorth) / 2
 function marbleMaterial(set: MaterialSet, L: Looks, shade: N = float(1)): MeshStandardNodeMaterial {
   const m = new MeshStandardNodeMaterial({ roughness: .34, metalness: 0, side: FrontSide })
   const P = positionWorld
@@ -167,9 +218,29 @@ function marbleMaterial(set: MaterialSet, L: Looks, shade: N = float(1)): MeshSt
   const edge = min(toWall, toEnd)
   const band = smoothstep(BORDER + .004, BORDER - .004, edge)
   const seam = lineCoverage(edge.sub(BORDER), .0016, 1, pixel)
-  const laid = mix(stone, stone.mul(L.borderTone), band)
-  m.colorNode = mix(mix(laid, L.groutColour, joint.mul(.85).mul(float(1).sub(band))), L.groutColour, seam.mul(.9))
-  m.roughnessNode = L.marbleRough.add(h2.sub(.5).mul(.08)).add(joint.mul(.4).mul(float(1).sub(band))).add(band.mul(.08)).clamp(.08, 1)
+  // THE PANELS: the field inside the border is laid in panels a metre and a
+  // bit square, each from its own batch of the stone, parted by a dark bronze strip
+  const ue = east.sub(PANEL.east).div(PANEL.size), un = north.sub(PANEL.north).div(PANEL.size)
+  const panelTone = float(1).add(hash(floorOf(ue), floorOf(un), 3.7).sub(.5).mul(L.panelTone))
+  // each strip is held by the pixel's own reach across it, not the floor's
+  // longest: a strip running away from the eye stays drawn where the ones
+  // across the view have become a tone
+  const toE = min(fract(ue), float(1).sub(fract(ue))).mul(PANEL.size), toN = min(fract(un), float(1).sub(fract(un))).mul(PANEL.size)
+  const strip = lineCoverage(toE, PANEL.strip / 2, PANEL.size, pe).max(lineCoverage(toN, PANEL.strip / 2, PANEL.size, pn))
+    .mul(float(1).sub(band))
+  // THE WEAR: the walk down the way in and the place before the field are
+  // walked smooth and a little cleaner; the floor along the walls keeps dust
+  const walked = select(inBay, smoothstep(SILL_EAST + .15, SILL_EAST + .9, east),
+    smoothstep(1.25, .35, abs(north.sub(WALK_NORTH))))
+  const scuff = mx_noise_float(vec3(east.mul(.8), north.mul(.8), 2.3)).mul(.5).add(.5)
+  const wear = walked.mul(scuff.mul(.5).add(.5)).mul(float(1).sub(band))
+  const dust = smoothstep(BORDER * 1.4, 0, edge).mul(mx_noise_float(vec3(east.mul(3.1), north.mul(3.1), 5.9)).mul(.3).add(.7))
+  const laid = mix(stone.mul(panelTone), stone.mul(L.borderTone), band)
+    .mul(float(1).add(wear.mul(L.wearClean))).mul(float(1).sub(dust.mul(L.wallDust)))
+  const grouted = mix(mix(laid, L.groutColour, joint.mul(.85).mul(float(1).sub(band))), L.groutColour, seam.mul(.9))
+  m.colorNode = mix(grouted, L.stripColour, strip.mul(.9))
+  m.roughnessNode = L.marbleRough.add(h2.sub(.5).mul(.08)).add(joint.mul(.4).mul(float(1).sub(band))).add(band.mul(.08))
+    .sub(wear.mul(L.wearPolish)).add(dust.mul(.1)).mul(float(1).sub(strip.mul(.3))).clamp(.08, 1)
   m.name = 'vinci/collection-supper-room/marble'
   m.userData = { ...SUPPER_ROOM_PROVENANCE, set: set.name }
   return m
@@ -374,6 +445,8 @@ export function mountSupperRoom(stack: Stack): SupperRoom {
     materials.push(family[zone])
   }
   const concreteOut = concreteMaterial(concreteSet!, L, 'concrete-out')
+  weathered(concreteOut)
+  const zinc = zincMaterial()
   const stone = stoneMaterial(stoneSet!, L)
   adopt(stone, 'bay')
   const skirt = new MeshStandardNodeMaterial({ color: '#2a2622', roughness: .45, metalness: .7 })
@@ -394,7 +467,7 @@ export function mountSupperRoom(stack: Stack): SupperRoom {
   diffuser.name = 'vinci/collection-supper-room/diffuser'
   const glass = new MeshStandardNodeMaterial({ color: '#1c2226', roughness: .08, metalness: .1 })
   glass.name = 'vinci/collection-supper-room/skylight'
-  materials.push(concreteOut, stone, skirt, diffuser, glass)
+  materials.push(concreteOut, zinc, stone, skirt, diffuser, glass)
 
   // WHICH VOLUME A FACE LOOKS INTO: a face whose outside lies in the bay's air
   // or the nave's takes that volume's light; every other face is lit by the day
@@ -463,6 +536,7 @@ export function mountSupperRoom(stack: Stack): SupperRoom {
   // the room's outside stands in the day and throws the day's shadow
   make(merged([parts.wall.out, parts.reveal.out, parts.south.out, parts.upper.out, parts.slab.out, parts.frame.out, parts.fins.out, parts.floor.out]),
     concreteOut, 'concrete-out', true)
+  make(copings().geometry(), zinc, 'copings', true)
   make(sillDress().geometry(), stone, 'sill', false)
   make(well.geometry(), skirt, 'diffuser-frame', false)
   const glow = make(panel.geometry(), diffuser, 'diffuser', false)
