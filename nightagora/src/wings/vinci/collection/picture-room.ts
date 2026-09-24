@@ -46,7 +46,7 @@ const {
 } = TSL as unknown as Record<string, N>
 
 /** The sets the room is dressed from, all CC0 and already in the store. */
-const SETS = ['plaster-lime-aged', 'concrete-wall-formed', 'oak-veneer-light', 'concrete-floor-polished'] as const
+const SETS = ['concrete-wall-formed', 'oak-veneer-light', 'concrete-floor-polished'] as const
 
 const hash = (x: N, y: N, salt: number): N => fract(x.mul(12.9898).add(y.mul(78.233)).add(salt).sin().mul(43758.5453))
 
@@ -100,9 +100,10 @@ function looks() {
 }
 type Looks = ReturnType<typeof looks>
 
-/** THE HANG'S DEEP WALL: the lime plaster photograph laid at a wall's
- * scale, its colour taken back to the one lapis-slate and only its cloud
- * and its trowel's relief kept, so the paint is the warm thing on it. */
+/** THE HANG'S DEEP WALL: a burnished plaster, read off a jointless sealed
+ * photograph laid at a wall's scale, its colour taken back to the one
+ * lapis-slate and only its cloud and its fine relief kept, so the paint is
+ * the warm thing on it. */
 function plasterMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial {
   const m = new MeshStandardNodeMaterial({ roughness: .6, metalness: 0, side: FrontSide })
   const P = positionWorld, n = normalWorldGeometry
@@ -417,8 +418,10 @@ export function mountPictureRoom(stack: Stack): PictureRoom {
   }
 
   // THE SURFACES
-  const [plasterSet, concreteSet, oakSet, stoneSet] = SETS.map(name => stack.materials.sync(name))
-  const plaster = plasterMaterial(plasterSet!, L)
+  const [concreteSet, oakSet, stoneSet] = SETS.map(name => stack.materials.sync(name))
+  // the plaster is trowelled over the sealed floor's own photograph: burnished,
+  // jointless, and a set the page already holds
+  const plaster = plasterMaterial(stoneSet!, L)
   const concrete = concreteMaterial(concreteSet!, L)
   const floor = floorMaterial(oakSet!, L)
   if (reflection) floor.emissiveNode = boxReflection(reflection, PROBE_AT, L.floorGloss).mul(L.floorMirror)
