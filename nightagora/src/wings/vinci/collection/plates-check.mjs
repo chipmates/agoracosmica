@@ -54,6 +54,16 @@ function fakeStream(preview, full, options) {
   return api
 }
 
+/** Every three.js addon the wing's sources import, resolved once up front:
+ * the module loader below is synchronous and cannot await one. */
+const addons = new Map()
+for (const dir of ['src/wings/vinci', 'src/stack']) {
+  const walk = at => fs.readdirSync(at, { withFileTypes: true }).flatMap(entry =>
+    entry.isDirectory() ? walk(path.join(at, entry.name)) : /\.(ts|mjs)$/.test(entry.name) ? [path.join(at, entry.name)] : [])
+  for (const file of walk(path.join(root, dir)))
+    for (const hit of fs.readFileSync(file, 'utf8').matchAll(/from '(three\/addons\/[^']+)'/g)) addons.set(hit[1], null)
+}
+for (const specifier of [...addons.keys()]) addons.set(specifier, await import(specifier))
 const cache = new Map()
 const overrides = new Map([
   ['src/manifest/index.ts', { loadManifest: () => Promise.resolve(manifest) }],
@@ -74,6 +84,7 @@ function load(relative) {
   const require = specifier => {
     if (specifier === 'three' || specifier === 'three/webgpu') return THREE
     if (specifier === 'three/tsl') return TSL
+    if (addons.has(specifier)) return addons.get(specifier)
     if (!specifier.startsWith('.')) throw new Error(`Unexpected import: ${specifier}`)
     const resolved = path.posix.normalize(path.posix.join(path.posix.dirname(relative), specifier))
     if (resolved.endsWith('?raw')) return { default: source(resolved.slice(0, -4)) }
