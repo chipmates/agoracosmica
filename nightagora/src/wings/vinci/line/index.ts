@@ -50,6 +50,15 @@ export function weld(group:Group):void {
   }
 }
 
+/** A dated row that shares its year and its certainty with the row beside it
+ * names its day, read from its own date label, so no two rows read alike. */
+function sharedDay(n:number,language:'en'|'de'):string|undefined{
+  const stud=STUDS[n]!
+  if(stud.date_precision!=='day')return undefined
+  const twin=[STUDS[n-1],STUDS[n+1]].some(other=>other&&other.date.slice(0,4)===stud.date.slice(0,4)&&other.certainty===stud.certainty)
+  return twin?(language==='en'?stud.date_label_en:stud.date_label_de).replace(/\s*\d{4}$/,''):undefined
+}
+
 /** A selected date is one of 56 physical floor sockets, never an interval scale. */
 export function createLine(materials:LineMaterials, selected=0, language:'en'|'de'='en', phone=false, lettering:LineLettering='stacked'):Group {
   const group=new Group();group.name='56 dates, bronze let into limestone'
@@ -131,7 +140,7 @@ export function createLine(materials:LineMaterials, selected=0, language:'en'|'d
     let colour=inlayMaterials.get(stud.certainty)
     if(!colour){colour=new MeshStandardNodeMaterial({color:fact.colour,roughness:.65,metalness:.06});colour.name=stud.certainty;colour.userData['owned']=true;inlayMaterials.set(stud.certainty,colour)}
     const inlay=new Mesh(new CylinderGeometry(.061,.061,.009,24),colour);inlay.position.set(0,-.009,z);inlay.userData['studId']=stud.id;group.add(inlay)
-    const cue=stud.id==='life-30'?(language==='en'?'Anghiari contract':'Anghiari-Vertrag'):stud.id==='life-31'?(language==='en'?"Father’s death":'Tod des Vaters'):undefined
+    const cue=stud.id==='life-30'?(language==='en'?'Anghiari contract':'Anghiari-Vertrag'):stud.id==='life-31'?(language==='en'?"Father’s death":'Tod des Vaters'):sharedDay(n,language)
     // The year is bronze set into the paving, not a mark lying on it. The
     // socket course's dressed face is 3 mm over the group's origin, so the
     // numeral runs from 0.5 mm under it to 2 mm over: it crosses the floor

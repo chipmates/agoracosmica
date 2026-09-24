@@ -3389,10 +3389,10 @@
       "class": "GENERATED",
       "licence": "Original procedural museum exhibition. Source code under the museum repository licence.",
       "display": true,
-      "prompt": "Twelve complete date sockets from the unchanged line bench, mounted in three fixed excerpts of four at true scale on the long gallery floor. The sections begin with the recorded birth in1452, the Vespucci note in1503 and the Amboise visit in1517, and end with the1519 will and death. Original bronze numerals, certainty words and colours, two named1504 events and1.65m nonchronological spacing are retained; the first excerpt keeps the bench's stacked lettering, the two read from the far end set each date as one row centred on its socket, year, word and event cut long along the walk as a road's markings are, so each keeps its shape from the south end and open stone before the next. The collection host clips the original paving to its room and excludes the standalone bench walls, rail and threshold continuation, keeping the gallery doors and crossing clear. Modern exhibition composition, no historical building claim.",
+      "prompt": "Twelve complete date sockets from the unchanged line bench, mounted in three fixed excerpts of four at true scale on the long gallery floor. The sections begin with the recorded birth in1452, the Vespucci note in1503 and the Amboise visit in1517, and end with the1519 will and death. Original bronze numerals, certainty words and colours, two named1504 events, the day on each date that shares its year and its certainty word with its neighbour, and1.65m nonchronological spacing are retained; the first excerpt keeps the bench's stacked lettering, the two read from the far end set each date's word and event beside its year on one row. The collection host clips the original paving to its room and excludes the standalone bench walls, rail and threshold continuation, keeping the gallery doors and crossing clear. Modern exhibition composition, no historical building claim.",
       "model": "Deterministic TypeScript geometry derived from the line module",
       "date": "2026-09-14",
-      "sha256": "9dbcc66e49b5b36d585078bc3f9ffd89f071ebc97d0d230286d8abb528aabb4f",
+      "sha256": "73fe58cd51de9ee56acb7fbcd84584c4eeca8850038c17228ef9b3a4b9510939",
       "note": "recipe_file=src/wings/vinci/collection/line-floor.ts; source_module=src/wings/vinci/line/index.ts; source_indices=0..3,28..31,38..41; all56 records remain at the bench address",
       "recipe_files": [
         {
