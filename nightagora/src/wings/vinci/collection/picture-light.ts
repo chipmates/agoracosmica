@@ -15,11 +15,11 @@
  * read off its own vertices; its varnish is drawn apart, additively, as a
  * film over it. Neither ever touches a pixel of the source.
  */
-import { Color, Vector3, Vector4 } from 'three/webgpu'
+import { Color, Vector4 } from 'three/webgpu'
 import * as TSL from 'three/tsl'
 import {
   BEAM_KEEP, CANVAS_Z, FRAME_BACK_Z, FRAME_FRONT_Z, HANG_LIGHT_FIELDS, hangFrames, hangLightTable, LAMP_COLOUR, ROOM, SLIP_Z,
-  WALL_FACE, type HangLamp, type HangLightData,
+  WALL_FACE, type HangLightData,
 } from './picture-room-plan'
 
 // The node overload boundary stays local to this file.
@@ -53,7 +53,7 @@ export function pictureLooks() {
     fill: uniform(new Color(.07, .077, .092)),
     /** the varnish: its roughness and how much of its reflection is drawn */
     varnishRough: uniform(.34),
-    varnish: uniform(1),
+    varnish: uniform(1.6),
     varnishEnv: uniform(.7),
     /** the room's air over its length: the colour it lays down and the
      * distance over which it lays down a little more than half */
@@ -80,37 +80,6 @@ function boxCover(x: N, y: N, x0: N, x1: N, y0: N, y1: N, w: N): N {
   return float(1).sub(smoothstep(w.negate(), w, sd))
 }
 
-/** HOW MUCH OF A HEAD A POINT SEES PAST A BOX standing off the wall: the box
- * [x0, x1] by [y0, y1], from depth `back` to depth `front` off the lining,
- * projected from the head onto the plane parallel to the wall that the point
- * stands in. `L` is the head in world coordinates. */
-export function boxVisibility(P: N, L: Vector3, x0: number, x1: number, y0: number, y1: number, back: number, front: number, radius: N): N {
-  const p = float(WALL_Z).sub(P.z)
-  const dL = WALL_Z - L.z
-  const a = max(float(back), p)
-  const k = (d: N): N => float(dL).sub(p).div(float(dL).sub(d))
-  const ka = k(a), kf = k(float(front))
-  const proj = (v: number, l: number, s: N): N => float(l).add(float(v - l).mul(s))
-  const X0 = min(proj(x0, L.x, ka), proj(x0, L.x, kf)), X1 = max(proj(x1, L.x, ka), proj(x1, L.x, kf))
-  const Y0 = min(proj(y0, L.y, ka), proj(y0, L.y, kf)), Y1 = max(proj(y1, L.y, ka), proj(y1, L.y, kf))
-  const w = radius.mul(float(front).sub(p).max(0)).div(float(dL - front)).add(.002)
-  const cover = boxCover(P.x, P.y, X0, X1, Y0, Y1, w)
-  // a point standing in front of the box is never behind it, and a point on
-  // the box's own footprint is the box's own face (or hidden behind it)
-  const own = P.x.greaterThan(x0 - .003).and(P.x.lessThan(x1 + .003)).and(P.y.greaterThan(y0 - .003)).and(P.y.lessThan(y1 + .003))
-  const behind = p.lessThan(front).and(own.not())
-  return float(1).sub(cover.mul(behind.select(float(1), float(0))))
-}
-
-/** A FRAMING PROJECTOR'S CUT: the share of its beam that passes the
- * rectangle its shutters are set to, in the plane of the frame's face. */
-export function shutterMask(P: N, L: Vector3, rect: { west: number; east: number; low: number; high: number; soft: number }): N {
-  const p = float(WALL_Z).sub(P.z), dL = WALL_Z - L.z
-  const t = float(dL - FRAME_FRONT_Z).div(float(dL).sub(p).max(1e-3))
-  const x = float(L.x).add(P.x.sub(L.x).mul(t)), y = float(L.y).add(P.y.sub(L.y).mul(t))
-  return boxCover(x, y, float(rect.west), float(rect.east), float(rect.low), float(rect.high), float(rect.soft))
-}
-
 /** THE POOL A HEAD THROWS: its lens shapes the beam to a soft rounded
  * rectangle round its frame on the wall, read where the ray from the head
  * through the point meets the wall's plane. */
@@ -130,21 +99,6 @@ function poolMask(P: N, L: N, west: N, east: N, low: N, high: N, looks: PictureL
  * from it, over what it throws at its own aim. */
 function beam(distance: N, level: N): N {
   return pow(distance.div(level).max(.2), float(3 * (1 - BEAM_KEEP))).clamp(.35, 4)
-}
-
-/** WHAT ONE HEAD'S LIGHT PASSES ON ITS WAY TO A POINT OF THE ROOM: its own
- * frame, the frieze over the hang, a projector's cut; and its lens's own
- * distribution. The spot light multiplies its colour by this. */
-export function headShadow(lamp: HangLamp, frame: { west: number; east: number; low: number; high: number }, looks: PictureLooks = PICTURE_LOOKS): N {
-  const P = positionWorld
-  const L = new Vector3(lamp.at[0], lamp.at[2], -lamp.at[1])
-  const own = boxVisibility(P, L, frame.west, frame.east, frame.low, frame.high, FRAME_BACK_Z, FRAME_FRONT_Z, looks.lampRadius)
-  const frieze = boxVisibility(P, L, ROOM.west - 1, ROOM.east + 1, ROOM.friezeFoot, ROOM.bulkheadFoot, ROOM.finish - WALL_FACE, ROOM.frieze - WALL_FACE, looks.lampRadius)
-  const shadow = mix(float(1), own.mul(frieze), looks.engineTerms)
-  const cut = lamp.shutter ? shutterMask(P, L, lamp.shutter)
-    : poolMask(P, vec3(L.x, L.y, L.z), float(frame.west), float(frame.east), float(frame.low), float(frame.high), looks)
-  const distance = length(P.sub(vec3(L.x, L.y, L.z)))
-  return shadow.mul(cut).mul(beam(distance, float(lamp.level)))
 }
 
 /** EVERY WORK'S LIGHT IN ONE TABLE, eight vectors a row: a plane carries
@@ -183,8 +137,10 @@ function slotsAt(x: N): { own: N; other: N; apart: N } {
   return { own, other, apart: other.notEqual(own).select(float(1), float(0)) }
 }
 
-/** A BOX'S SHADOW for a box read out of the table: `boxVisibility` with its
- * rectangle as nodes. */
+/** HOW MUCH OF A HEAD A POINT SEES PAST A BOX standing off the wall: the box
+ * [x0, x1] by [y0, y1], from depth `back` to depth `front` off the lining,
+ * projected from the head onto the plane parallel to the wall that the point
+ * stands in, softened by the head's size. `L` is the head, in the world. */
 function boxVisibilityOf(P: N, L: N, x0: N, x1: N, y0: N, y1: N, back: number, front: number, radius: N): N {
   const p = float(WALL_Z).sub(P.z), dL = float(WALL_Z).sub(L.z)
   const a = max(float(back), p)

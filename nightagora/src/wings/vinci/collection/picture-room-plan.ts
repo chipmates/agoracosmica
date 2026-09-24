@@ -232,15 +232,18 @@ export function hangLamps(): HangLamp[] {
 /** The picture rail's box, which casts its own line under the frieze. */
 export const RAIL_BOX = { low: ROOM.friezeFoot, depth: ROOM.frieze - WALL_FACE } as const
 
-export type RoomLightKind = 'area' | 'sky'
+export type RoomLightKind = 'area' | 'sky' | 'spot'
 export interface RoomLight {
   name: string
   kind: RoomLightKind
   at: P3
   aim: P3
   colour: string
-  /** an opening's luminance, or a parallel source's irradiance */
+  /** an opening's luminance, a parallel source's irradiance, a spot's candela */
   intensity: number
+  /** a spot's half angle and the soft share of it */
+  angle?: number
+  penumbra?: number
   width?: number
   height?: number
   /** which surfaces take it: the whole room, or the floor and what stands on it */
@@ -280,11 +283,13 @@ export const ROOM_LIGHTS: readonly RoomLight[] = [
     at: skyFrom(), aim: [SKY.on[0], SKY.on[1], FLOOR], intensity: .9,
     shadow: { mapPx: 2048, soft: 14, span: [22, 12] },
   },
+  // the next room's daylight through each doorway, as one soft source in the
+  // opening's head throwing its spill across the boards and up the jambs
   ...DOORWAYS.map((door): RoomLight => ({
-    name: door.name, kind: 'area', receivers: 'room', colour: DAYLIGHT_COLOUR,
-    at: [(door.west + door.east) / 2, FACE.pictureWallNorth - .05, (FLOOR + ROOM.friezeFoot) / 2],
-    aim: [(door.west + door.east) / 2, FACE.pictureWallNorth + 10, (FLOOR + ROOM.friezeFoot) / 2],
-    width: door.east - door.west, height: ROOM.friezeFoot - FLOOR, intensity: 1.1,
+    name: door.name, kind: 'spot', receivers: 'room', colour: DAYLIGHT_COLOUR,
+    at: [(door.west + door.east) / 2, FACE.pictureWallSouth, ROOM.friezeFoot - .1],
+    aim: [(door.west + door.east) / 2, FACE.pictureWallNorth + 2.6, FLOOR],
+    intensity: 5.5, angle: 1.2, penumbra: .95,
   })),
 ]
 

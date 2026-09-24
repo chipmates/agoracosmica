@@ -372,6 +372,15 @@ export function mountPictureRoom(stack: Stack): PictureRoom {
         sky.shadow.camera.layers.set(PICTURE_SHADOW_LAYER)
       }
       light = sky
+    } else if (spec.kind === 'spot') {
+      const spot = new SpotLight(new Color(spec.colour), level, 0, spec.angle, spec.penumbra, 2)
+      spot.position.copy(v3(...spec.at))
+      const target = new Object3D()
+      target.position.copy(v3(...spec.aim))
+      spot.target = target
+      targets.push(target)
+      group.add(target)
+      light = spot
     } else {
       const area = new RectAreaLight(new Color(spec.colour), level, spec.width!, spec.height!)
       area.position.copy(v3(...spec.at))
