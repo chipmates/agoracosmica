@@ -23,7 +23,8 @@ const flags = new Map(process.argv.slice(2).filter((a) => a.startsWith('--')).ma
 }))
 /** one export run or several, the later ones winning where two carry the same file */
 const EXPORTS = String(flags.get('export') ?? '').split(',').filter(Boolean).map((d) => resolve(d))
-const MARKS = flags.has('marks') ? resolve(String(flags.get('marks'))) : null
+/** one marks reading or several, merged node by node */
+const MARKS = flags.has('marks') ? String(flags.get('marks')).split(',').filter(Boolean).map((f) => resolve(f)) : []
 const OUT = resolve(String(flags.get('out') ?? ''))
 const QUALITY = Number(flags.get('quality') ?? 90)
 for (const dir of EXPORTS) if (!existsSync(join(dir, 'export.json'))) throw new Error(`no export at ${dir}`)
@@ -43,7 +44,12 @@ const runs = EXPORTS.map((dir) => ({ dir, summary: JSON.parse(readFileSync(join(
 const summary = { head: runs.at(-1).summary.head, heads: runs.map((r) => r.summary.head),
   clips: runs.flatMap((r) => r.summary.clips.map((c) => ({ ...c, dir: r.dir }))),
   stills: runs.flatMap((r) => r.summary.stills.map((s) => ({ ...s, dir: r.dir }))) }
-const marks = MARKS ? JSON.parse(readFileSync(MARKS, 'utf8')) : { nodes: {}, prints: {} }
+const marks = { nodes: {}, prints: {} }
+for (const file of MARKS) {
+  const read = JSON.parse(readFileSync(file, 'utf8'))
+  for (const [node, byFraming] of Object.entries(read.nodes ?? {})) marks.nodes[node] = { ...marks.nodes[node], ...byFraming }
+  for (const [node, byFraming] of Object.entries(read.prints ?? {})) marks.prints[node] = { ...marks.prints[node], ...byFraming }
+}
 const replay = await openReplay()
 const graph = buildGraph(replay.wing)
 const nodeMeta = new Map(graph.nodes.map((n) => [n.id, n]))

@@ -62,7 +62,7 @@ try {
   for (const framing of FRAMINGS) {
     for (const lang of LANGS) {
       const [w, h] = AUTHORED[framing]
-      const ctx = await browser.newContext({ viewport: { width: w, height: framing === 'wide' ? h + 200 : h }, deviceScaleFactor: 1 })
+      const ctx = await browser.newContext({ viewport: { width: w, height: framing === 'wide' ? h + 200 : h }, deviceScaleFactor: 1, ignoreHTTPSErrors: true })
       await ctx.addInitScript(() => { try { sessionStorage.setItem('vinci-welcome', '1'); localStorage.setItem('agc_probe', '1') } catch { /* seen */ } })
       const page = await ctx.newPage()
       const errors = []

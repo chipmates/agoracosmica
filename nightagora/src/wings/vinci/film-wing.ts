@@ -311,6 +311,13 @@ export function createWing(): WingModule {
     sources.select('station')
     sources.setOpen(true)
   }
+  /* ONE TEXT AT A TIME: on the phone the box stands down before a close look
+     opens, so the work takes the whole glass and the vitrine's card is the text */
+  function standDown(down: boolean): void {
+    if (!phone) return
+    phone.root.hidden = down
+    if (down && drawerOpen) setDrawer(false)
+  }
   async function openExhibit(id: string, from: HTMLElement | null): Promise<void> {
     if (!closeLook || !hosts) return
     assets ??= await loadManifest()
@@ -331,6 +338,7 @@ export function createWing(): WingModule {
       const colour = policyLabelText(work, entries).colour
       const order: VinciCertainty[] = ['documented', 'unknown', 'reconstructed', 'conjectural']
       const certainty = order[Math.max(0, PICTURE_CERTAINTY_KEY.findIndex(entry => entry.colour === colour))] ?? 'reconstructed'
+      standDown(true)
       closeLook.open({ id, title, line: vinciLine(id), card: [createWindowWorkLabel(work, entries, lang(), narrow())], payload,
         controls: [control(VINCI_VITRINE_WORDS.provenance, () => openRecord(id, { en: work.title_en, de: work.title_de }, certainty,
           host => host.append(make('p', 'vinci-statement', `${work.holder} · ${text({ en: work.date_label_en, de: work.date_label_de })}`))), 'record'), shut()],
@@ -354,6 +362,7 @@ export function createWing(): WingModule {
         restore: () => { picture?.veil(false); stack.setScene(hosts!.world.scene, hosts!.world.camera, PRINT) },
         standing })
       picture?.veil(true)
+      standDown(true)
       closeLook.open({ id, title, line: vinciLine(id), card: words.card, after: words.after, payload,
         controls: [control(VINCI_VITRINE_WORDS.provenance, record, 'record'), shut()], ...vinciLimits(id), set: null, certainty: 'reconstructed' }, from, 'enter')
       return
@@ -528,8 +537,10 @@ export function createWing(): WingModule {
   function paintGold(): void {
     if (!phone) return
     const s = picture?.state()
-    const walking = s?.kind === 'walk' || s?.kind === 'wait' || s?.kind === 'dip'
+    const walking = s?.kind === 'walk' || s?.kind === 'dip'
     goldWalking = walking
+    // WAITING, the words stay and the gold keeps its name; its ring counts the bytes
+    phone.gold.dataset['wait'] = String(s?.kind === 'wait')
     const to = nextIndex()
     phone.root.dataset['walking'] = String(walking)
     phone.gold.dataset['leg'] = String(walking)
@@ -609,7 +620,8 @@ export function createWing(): WingModule {
       question: () => text(stationOf(LIFE[card]!.station).door),
       words: { next: CARDS.controls.date.next, back: CARDS.controls.date.previous, rail: WING_TEXT.rail },
       go: index => { if (carried(index)) h.navigate(index) },
-      leg: () => { const s = picture?.state(); return s?.kind === 'walk' || s?.kind === 'wait' ? s.share : null },
+      // a wait is not a walk: the words and the way on stand until the clip can play through
+      leg: () => { const s = picture?.state(); return s?.kind === 'walk' ? s.share : null },
       hurry: () => picture?.hurry(),
     })
     if (!wide) {
@@ -631,10 +643,10 @@ export function createWing(): WingModule {
     closeLook = createVinciCloseLook({ host: h.labels, narrow,
       room: () => text(stationOf(LIFE[card]!.station).name),
       returnFocus: () => wing.querySelector<HTMLElement>('.desk-on, .film-gold'),
-      floor: () => desk?.floor() ?? phone?.root.getBoundingClientRect().top ?? deskStageHeight(),
+      floor: () => desk?.floor() ?? (phone && !phone.root.hidden ? phone.root.getBoundingClientRect().top : innerHeight),
       // the film has already walked there: the window opens where the eye stands
       onOpen: () => false,
-      onClose: () => { marksAt = ''; picture?.veil(false) } })
+      onClose: () => { marksAt = ''; picture?.veil(false); standDown(false) } })
     window.addEventListener('keydown', e => {
       if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return
       if (document.querySelector('dialog[open]')) return
@@ -668,7 +680,12 @@ export function createWing(): WingModule {
       return { completed: LIFE[card]!.id, ...(target ? { target } : {}), question: text(stationOf(LIFE[card]!.station).door) }
     },
     show(index, h) {
-      if (!hosts) { card = Math.max(0, Math.min(LIFE.length - 1, index)); loading = mount(h); return }
+      if (!hosts) {
+        card = Math.max(0, Math.min(LIFE.length - 1, index))
+        // a release that cannot be read leaves the entry, never holds it at the gold field
+        loading = mount(h).catch(err => console.error(`the film could not stand: ${String(err)}`))
+        return
+      }
       if (!picture || !carried(index)) return
       closeLook?.close()
       if (drawerOpen) setDrawer(false)
@@ -696,7 +713,7 @@ export function createWing(): WingModule {
         const at = LIFE.findIndex(l => stopNode(l.id) === s.to)
         if (at >= 0 && at !== card) { card = at; paint() }
       }
-      const underWay = s.kind !== 'rest'
+      const underWay = s.kind === 'walk' || s.kind === 'dip'
       if (underWay !== legUnderWay) {
         legUnderWay = underWay
         hosts.walking(underWay)
@@ -704,7 +721,7 @@ export function createWing(): WingModule {
         paintGold()
         marksAt = ''
       }
-      if (phone && goldWalking !== (s.kind !== 'rest')) paintGold()
+      if (phone && (goldWalking !== underWay || phone.gold.dataset['wait'] !== String(s.kind === 'wait'))) paintGold()
       if (phone) {
         const share = s.kind === 'walk' || s.kind === 'wait' ? s.share : 0
         phone.ringLine.setAttribute('stroke-dasharray', `${(RING * share).toFixed(1)} ${RING.toFixed(1)}`)
@@ -715,7 +732,8 @@ export function createWing(): WingModule {
         leg?.setAttribute('stroke-dasharray', `${(2 * Math.PI * 20.5 * share).toFixed(1)} ${(2 * Math.PI * 20.5).toFixed(1)}`)
       }
       desk?.update()
-      if (!underWay) paintMarks()
+      if (s.kind === 'rest') paintMarks()
+      else if (s.kind === 'wait' && dots.length) clearMarks()
     },
     stop() {
       controller.abort()

@@ -14,6 +14,7 @@ import { chromium, firefox, webkit } from 'playwright'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import sharp from 'sharp'
+import { browserArgs } from '../rig.mjs'
 
 const flags = new Map(process.argv.slice(2).filter((a) => a.startsWith('--')).map((a) => {
   const at = a.indexOf('=')
@@ -142,13 +143,48 @@ async function burst(page, dir, name, count, clip) {
     out.push({ at: t, buf, state: await page.evaluate(() => document.querySelector('.na-film')?.dataset.state ?? '') })
   }
   if (!out.length) return null
+  // each frame's mean light and the largest step between two in a row: a flash or a jump is a number
+  const means = await Promise.all(out.map(async (o) => { const st = await sharp(o.buf).stats(); return Math.round(((st.channels[0].mean + st.channels[1].mean + st.channels[2].mean) / 3) * 100) / 100 }))
+  let step = 0
+  for (let k = 1; k < means.length; k++) step = Math.max(step, Math.abs(means[k] - means[k - 1]))
   const w = Math.round(clip.width / 2), h = Math.round(clip.height / 2)
   const tiles = await Promise.all(out.map((o) => sharp(o.buf).resize(w, h).png().toBuffer()))
   const sheet = sharp({ create: { width: w * Math.min(8, tiles.length), height: h * Math.ceil(tiles.length / 8), channels: 3, background: '#000' } })
     .composite(tiles.map((input, i) => ({ input, left: (i % 8) * w, top: Math.floor(i / 8) * h })))
   const file = join(dir, `${name}-strip.png`)
   await sheet.png().toFile(file)
-  return { file, frames: out.length, states: out.map((o) => o.state).join(' '), ms: out.length > 1 ? Math.round((out.at(-1).at - out[0].at) / (out.length - 1)) : 0 }
+  return { file, frames: out.length, states: out.map((o) => o.state).join(' '), means, largestStep: Math.round(step * 100) / 100, ms: out.length > 1 ? Math.round((out.at(-1).at - out[0].at) / (out.length - 1)) : 0 }
+}
+
+async function readJoins(page, dir, phone, record) {
+  {
+      const joins = await page.evaluate(async () => {
+        const film = await (await fetch(new URL('film.json', new URL(`/film/${new URLSearchParams(location.search).get('film')}/`, location.origin)).href)).json()
+        return film
+      })
+      record.joins = []
+      // the join reader is handed into the page as its own source
+      await page.evaluate(`window.joinsIn = ${joinsIn.toString()}`)
+      const framing = phone ? 'upright' : 'wide'
+      for (const e of joins.edges) {
+        const f = e.framings[framing]
+        if (!f) continue
+        const rung = Object.keys(f.files)[0]
+        const [w, h] = rung.split('x').map(Number)
+        const base = `${BASE}/film/${RELEASE}/`
+        const from = joins.nodes[e.from]?.stills[framing]?.[rung], to = joins.nodes[e.to]?.stills[framing]?.[rung]
+        if (!from || !to) continue
+        const got = await page.evaluate(([c, a, b, W, H]) => window.joinsIn(c, a, b, W, H).catch((err) => ({ error: String(err) })),
+          [base + f.files[rung].file, base + from.file, base + to.file, w, h]).catch((err) => ({ error: String(err).slice(0, 200) }))
+        if (got.startStrip) {
+          for (const [k, url] of [['start', got.startStrip], ['end', got.endStrip]]) {
+            await sharp(Buffer.from(url.split(',')[1], 'base64')).resize({ width: Math.min(1800, w * 3) }).png().toFile(join(dir, `join-${e.id.replace(/[:/>]/g, '_')}-${k}.png`))
+          }
+          delete got.startStrip; delete got.endStrip
+        }
+        record.joins.push({ clip: e.id, rung, ...got })
+      }
+    }
 }
 
 async function run(engine, width, lang) {
@@ -156,7 +192,7 @@ async function run(engine, width, lang) {
   const phone = width < 700
   const dir = join(OUT, engine, `${width}-${lang}`)
   mkdirSync(dir, { recursive: true })
-  const browser = await TYPES[engine].launch()
+  const browser = await TYPES[engine].launch(engine === 'chromium' ? { args: browserArgs() } : {})
   const ctxOptions = { viewport: { width, height }, deviceScaleFactor: phone ? 2 : 1, ignoreHTTPSErrors: true, locale: lang === 'de' ? 'de-DE' : 'en-GB',
     ...(phone && engine !== 'firefox' ? { isMobile: true, hasTouch: true } : {}),
     ...(RECORD ? { recordVideo: { dir, size: { width: Math.min(width, 960), height: Math.round(Math.min(width, 960) * height / width) } } } : {}) }
@@ -179,10 +215,36 @@ async function run(engine, width, lang) {
     }, null, { timeout: 120000, polling: 100 }).then(() => true).catch(() => false)
     record.firstPicture = (Date.now() - t0) / 1000
     record.bytesToFirstPicture = await page.evaluate(() => performance.getEntriesByType('resource').reduce((s, r) => s + (r.transferSize || r.encodedBodySize || 0), 0))
+    /* WHOSE BYTES THEY ARE: the film's own (its release and its still), the app's code, and
+       the library sets the museum's shell asks for on every address */
+    record.bytesByKind = await page.evaluate(() => {
+      const kinds = { film: 0, code: 0, library: 0, other: 0 }
+      for (const r of performance.getEntriesByType('resource')) {
+        const n = r.name, b = r.transferSize || r.encodedBodySize || 0
+        if (n.includes('/film/')) kinds.film += b
+        else if (n.includes('/na-assets/library/') || n.includes('/na-assets/')) kinds.library += b
+        else if (n.includes('/assets/') || n.includes('/basis/') || n.includes('na-manifest') || n.endsWith('.js')) kinds.code += b
+        else kinds.other += b
+      }
+      return kinds
+    })
     if (!stood) { record.failed = 'the first picture never stood'; return record }
     await page.waitForTimeout(1200)
     shots.push(await shot(page, dir, '01-rest-lisa'))
     if (WALK === 'none') return record
+    if (WALK === 'legs') {
+      // THE CHAPTERS PLAYED THROUGH: the way on pressed at each stop, as a visitor presses it
+      const on = phone ? '.film-gold' : '.desk-on'
+      for (let leg = 0; leg < 3; leg++) {
+        await page.waitForTimeout(2500)
+        if (!(await press(page, on))) break
+        await waitState(page, 'walk', 20000)
+        await page.waitForFunction(() => document.querySelector('.na-film')?.dataset.state === 'rest' && !document.querySelector('#wing[data-walking]'), null, { timeout: 120000 }).catch(() => null)
+        shots.push(await shot(page, dir, `leg-${leg + 1}`))
+      }
+      await page.waitForTimeout(2500)
+      return record
+    }
     // the drawer, the words' second height
     if (await press(page, phone ? '.film-more' : '.desk-more')) {
       await page.waitForTimeout(500)
@@ -198,20 +260,29 @@ async function run(engine, width, lang) {
     await waitState(page, 'walk', 20000)
     await page.waitForTimeout(2500)
     shots.push(await shot(page, dir, '04-walking'))
+    if (WALK === 'full') {
+      // the arrival: frames from the clip's last half second through the dissolve onto the still
+      const near = await page.waitForFunction(() => { const v = document.querySelector('.na-film-clip.shown'); return v && v.duration > 0 && v.currentTime >= v.duration - 0.5 }, null, { timeout: 60000, polling: 30 }).then(() => true).catch(() => false)
+      if (near) record.arrival = await burst(page, dir, '04b-arrival', 12, box)
+    }
     await waitState(page, 'rest', 60000)
     await page.waitForTimeout(900)
     shots.push(await shot(page, dir, '05-rest-west'))
     if (WALK === 'short') return record
     // a work on the wall, walked to and back
-    const mark = '.film-dot[data-exhibit="picture/saint-john-the-baptist/front"]'
+    // the work both designs mark from the west end, walked to and back; Saint John where it is the one the film carries
+    const walkable = await page.evaluate(() => [...document.querySelectorAll('.film-dot[data-mark="walk"]')].map((d) => d.dataset.exhibit))
+    const work = ['picture/bacchus/front', 'picture/saint-john-the-baptist/front'].find((id) => walkable.includes(id))
+    record.work = work ?? null
+    const mark = work ? `.film-dot[data-exhibit="${work}"]` : '.film-dot[data-mark="walk"]'
     if (await press(page, mark)) {
       await waitState(page, 'walk', 20000)
       await waitState(page, 'rest', 60000)
       await page.waitForTimeout(2500)
-      shots.push(await shot(page, dir, '06-close-saint-john'))
+      shots.push(await shot(page, dir, '06-close-work'))
       await page.keyboard.press('Escape')
       await page.waitForTimeout(800)
-      shots.push(await shot(page, dir, '07-at-saint-john'))
+      shots.push(await shot(page, dir, '07-at-work'))
       // on: back along the wall, a moment at its end, and the leg to the hall
       await press(page, gold)
       await waitState(page, 'walk', 20000)
@@ -219,7 +290,7 @@ async function run(engine, width, lang) {
       await page.waitForFunction(() => document.querySelector('.na-film')?.dataset.state === 'rest', null, { timeout: 60000 }).catch(() => null)
       await page.waitForTimeout(1500)
     } else {
-      record.missing = 'no Saint John mark at the west end'
+      record.missing = 'no walking mark at the west end'
       await press(page, gold)
       await waitState(page, 'walk', 20000)
       await waitState(page, 'rest', 60000)
@@ -252,37 +323,10 @@ async function run(engine, width, lang) {
     await waitState(page, 'rest', 30000)
     await page.waitForTimeout(900)
     shots.push(await shot(page, dir, '13-after-dip'))
-    if (JOINS) {
-      const joins = await page.evaluate(async () => {
-        const film = await (await fetch(new URL('film.json', new URL(`/film/${new URLSearchParams(location.search).get('film')}/`, location.origin)).href)).json()
-        return film
-      })
-      record.joins = []
-      // the join reader is handed into the page as its own source
-      await page.evaluate(`window.joinsIn = ${joinsIn.toString()}`)
-      const framing = phone ? 'upright' : 'wide'
-      for (const e of joins.edges) {
-        const f = e.framings[framing]
-        if (!f) continue
-        const rung = Object.keys(f.files)[0]
-        const [w, h] = rung.split('x').map(Number)
-        const base = `${BASE}/film/${RELEASE}/`
-        const from = joins.nodes[e.from]?.stills[framing]?.[rung], to = joins.nodes[e.to]?.stills[framing]?.[rung]
-        if (!from || !to) continue
-        const got = await page.evaluate(([c, a, b, W, H]) => window.joinsIn(c, a, b, W, H).catch((err) => ({ error: String(err) })),
-          [base + f.files[rung].file, base + from.file, base + to.file, w, h]).catch((err) => ({ error: String(err).slice(0, 200) }))
-        if (got.startStrip) {
-          for (const [k, url] of [['start', got.startStrip], ['end', got.endStrip]]) {
-            await sharp(Buffer.from(url.split(',')[1], 'base64')).resize({ width: Math.min(1800, w * 3) }).png().toFile(join(dir, `join-${e.id.replace(/[:/>]/g, '_')}-${k}.png`))
-          }
-          delete got.startStrip; delete got.endStrip
-        }
-        record.joins.push({ clip: e.id, rung, ...got })
-      }
-    }
   } catch (err) {
     record.failed = String(err.message ?? err).slice(0, 300)
   } finally {
+    if (JOINS && !record.failed) await readJoins(page, dir, phone, record).catch((err) => { record.joinsFailed = String(err).slice(0, 200) })
     record.seconds = (Date.now() - t0) / 1000
     await ctx.close()
     await browser.close()
