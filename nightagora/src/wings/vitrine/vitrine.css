@@ -37,6 +37,11 @@
   background:#101d27f2;border:1px solid #a9977355;color:#eae1d1;pointer-events:auto;user-select:text;}
 .vitrine-card:focus-visible {outline:1px solid #edcc8c;outline-offset:3px;}
 .vitrine-body {flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;}
+/* ON THE PHONE THE DRAWER SCROLLS above the control row: its lower edge fades
+   over the lowest line shown while more waits below (--fade from the host) */
+.vitrine[data-narrow='true'] .vitrine-body {scroll-padding-bottom:16px;}
+.vitrine[data-narrow='true'] .vitrine-body[data-more='true'] {
+  -webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - var(--fade,16px)),transparent);mask-image:linear-gradient(to bottom,#000 calc(100% - var(--fade,16px)),transparent);}
 /* ONE NAME TYPE FOR EVERY KIND. A machine, a work, a sheet and a leaf are
    named in the same place and the same type, so a visitor reads the name
    before the sentence about it. */

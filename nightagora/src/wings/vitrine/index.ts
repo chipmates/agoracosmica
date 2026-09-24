@@ -306,14 +306,22 @@ export function createVitrine(options: {
     else delete document.documentElement.dataset['naWindow']
     paintHole()
     exhibit?.payload?.layout?.()
-    trimWords()
+    fadeWords()
+    markMore()
   }
 
-  /** NO LINE OF THE WORDS IS SLICED WHERE THEIR SCROLL BOX ENDS. On the phone
-   * the box ends where the controls begin, which can fall inside a line: the
-   * box is shortened to the last line it shows whole, and the rest scrolls. */
-  function trimWords(): void {
-    body.style.marginBottom = ''
+  /** The drawer's lower edge fades while more of its words waits below. */
+  function markMore(): void {
+    body.dataset['more'] = String(open && body.scrollHeight - body.scrollTop - body.clientHeight > 1)
+  }
+  body.addEventListener('scroll', markMore, { passive: true })
+
+  /** THE DRAWER'S LAST LINE FADES OUT, IT NEVER BREAKS OFF. On the phone the
+   * words' box ends where the controls begin. While words wait below, the
+   * lower edge fades from the top of the lowest line it shows, so that line
+   * dissolves as the sign of more, and the rest scrolls. */
+  function fadeWords(): void {
+    body.style.removeProperty('--fade')
     if (!open || !options.narrow() || body.scrollHeight <= body.clientHeight + 1) return
     const top = body.getBoundingClientRect().top + body.clientTop
     const floor = top + body.clientHeight
@@ -325,17 +333,19 @@ export function createVitrine(options: {
       range.selectNodeContents(node)
       for (const rect of range.getClientRects()) if (rect.height > 0) lines.push(rect)
     }
-    // a line moved above the edge can leave a taller neighbour across it
-    let edge = floor
-    for (let moved = true; moved;) {
-      moved = false
-      for (const r of lines) if (r.top > top + .5 && r.top < edge - .5 && r.bottom > edge + .5) { edge = r.top; moved = true }
-    }
-    if (floor - edge > .5) body.style.marginBottom = `${Math.ceil(floor - edge)}px`
+    if (!lines.some(r => r.bottom > floor + .5)) return
+    let last = -Infinity
+    for (const r of lines) if (r.top > top + .5 && r.top < floor - 4) last = Math.max(last, r.top)
+    if (last > top) body.style.setProperty('--fade', `${Math.round(Math.min(44, Math.max(16, floor - last)))}px`)
   }
   /* the words change after the layout that placed them: a payload lays in its
-     steps, a label opens, a face arrives */
-  const wordsResized = new ResizeObserver(() => { if (open) trimWords() })
+     steps, a label opens, a face arrives; a peek measured before them is
+     measured again, or its last line stands under the controls */
+  const wordsResized = new ResizeObserver(() => {
+    if (!open) return
+    if (options.narrow() && root.dataset['peek'] === 'true') layout()
+    else { fadeWords(); markMore() }
+  })
   for (const part of [naming, entryRow, line, words, aside, after]) wordsResized.observe(part)
 
   /** The name at the head of the card, and the card's accessible name with
