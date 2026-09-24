@@ -23,6 +23,11 @@ export interface WingEntry {
   load: () => Promise<{ createWing: () => WingModule }>
 }
 
+/** `?film=<release>`: the wing as its film, read once per visit. */
+function filmAsked(): boolean {
+  try { return new URLSearchParams(location.search).has('film') } catch { return false }
+}
+
 export const WINGS: WingEntry[] = [
   {
     slug: 'vinci',
@@ -30,7 +35,10 @@ export const WINGS: WingEntry[] = [
     status: 'preparing',
     publicSlug: 'leonardo-da-vinci',
     askTag: 'f:vinci:1',
-    load: () => import('./vinci/index'),
+    /* THE FILM STANDS BEHIND THE SAME CHROME. An address that names a film
+       release loads the wing that plays it; every other address, the rigs'
+       and the owner's walks among them, loads the live engine. */
+    load: () => (filmAsked() ? import('./vinci/film-wing') : import('./vinci/index')),
   },
 ]
 
