@@ -126,9 +126,31 @@ try {
       return false
     }
     const emitted = new Set()
+    // A member chain with literal keys into an in-file constant object resolves to its value;
+    // anything else (imports, computed keys) stays a declared omission.
+    const member = node => {
+      const path = []
+      let cursor = node
+      while (ts.isPropertyAccessExpression(cursor) || (ts.isElementAccessExpression(cursor) && ts.isStringLiteralLike(cursor.argumentExpression))) {
+        path.unshift(ts.isPropertyAccessExpression(cursor) ? cursor.name.text : cursor.argumentExpression.text)
+        cursor = cursor.expression
+      }
+      if (!path.length || !ts.isIdentifier(cursor) || !constants.has(cursor.text)) return null
+      let value = constants.get(cursor.text)
+      for (const key of path) {
+        while (ts.isAsExpression(value) || ts.isParenthesizedExpression(value) || ts.isSatisfiesExpression(value)) value = value.expression
+        if (!ts.isObjectLiteralExpression(value)) return null
+        const property = value.properties.find(item => ts.isPropertyAssignment(item) && (ts.isIdentifier(item.name) || ts.isStringLiteralLike(item.name)) && item.name.text === key)
+        if (!property) return null
+        value = property.initializer
+      }
+      return { root: cursor.text, value }
+    }
     const extract = (node, language = 'shared', seen = new Set()) => {
       if (!node) return
-      if (ts.isStringLiteralLike(node)) {
+      const resolved = (ts.isPropertyAccessExpression(node) || ts.isElementAccessExpression(node)) ? member(node) : null
+      if (resolved && !seen.has(resolved.root)) extract(resolved.value, language, new Set([...seen, resolved.root]))
+      else if (ts.isStringLiteralLike(node)) {
         const key = `${node.pos}:${language}`
         if (!emitted.has(key)) { emitted.add(key); add(file, `line ${at(node)}`, node.text, language, 'label-or-drawer', 'authored-static-text-sink') }
       } else if (ts.isParenthesizedExpression(node) || ts.isAsExpression(node) || ts.isNonNullExpression(node)) extract(node.expression, language, seen)
