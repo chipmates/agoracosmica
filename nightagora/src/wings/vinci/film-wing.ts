@@ -8,7 +8,9 @@
 import { setRegister, type WingHosts, type WingModule, type WingStation } from '../frame'
 import { lang, WING_TEXT } from '../content'
 import { LOBBY_TEXT } from '../../content/lobby'
-import { vinciContent, vinciCertaintyWords, type VinciCertainty, type VinciText } from './content'
+import { vinciAbsences, vinciCertaintyWords, vinciCollectionThreshold, vinciContent, vinciGrounds, vinciHourArithmetic, vinciHourIntegrity, vinciHourLabel,
+  vinciReconstruction, vinciRightsPolicy, vinciRoomStationIds, vinciSourcesHeadings, vinciWingCounts,
+  type VinciCertainty, type VinciStatement, type VinciStationId, type VinciText } from './content'
 import { vinciStory } from './story'
 import { deskControl, deskStoryStop } from '../desk-story'
 import { applyDeskSteps, deskOn } from '../desk-switches'
@@ -19,6 +21,7 @@ import { createVinciSourcesWindow } from './sources'
 import cardsSource from './data/cards.json?raw'
 import { createFilmSource, loadFilmRelease, LEAN_MS, type FilmRelease } from '../picture/film'
 import type { FilmLook } from './film-look'
+import type { DeskOverviewCell } from '../overview'
 import type { PictureMark, PictureNode, PictureSource, PictureState } from '../picture/seam'
 import wingCss from './wing.css?inline'
 import deskCss from '../desk-chrome.css?inline'
@@ -58,7 +61,7 @@ export function filmReleaseBase(): string {
   return new URL(`/film/${encodeURIComponent(name)}/`, location.origin).href
 }
 
-const CARDS = JSON.parse(cardsSource) as { controls: { date: { next: VinciText; previous: VinciText } } }
+const CARDS = JSON.parse(cardsSource) as { controls: { date: { next: VinciText; previous: VinciText } }; station_short_names?: Record<string, VinciText> }
 /** The share of a leg after which the words name the stop ahead, as live. */
 const CARD_HANDOVER = 0.5
 /** a title on the dark stands one reading at the visitor's pace, and two seconds over */
@@ -293,11 +296,34 @@ export function createWing(): WingModule {
         onClose: () => { marksAt = '' } })
       lookCard = m.FILM_LOOK_CARD
       marksAt = ''
+      refreshCells()
       return look
     })
     return lookLoading
   }
   let lookCard = ''
+  /* THE OVERVIEW'S SET: the room's own works, read by the look once it is loaded.
+     The hall is one room under two stations, and both hold its one row. */
+  let cellsNow: DeskOverviewCell[] = []
+  let cellsFor = ''
+  function setOf(station: string): string[] {
+    const sets = release?.sets ?? {}
+    if (station === 'flight' || station === 'works') return [...(sets['flight'] ?? []), ...(sets['works'] ?? [])]
+    if (station === 'picture-room' || station === 'picture-room-west') return sets['picture-room'] ?? []
+    return sets[station] ?? []
+  }
+  function refreshCells(): void {
+    const station = stationOf(LIFE[card]!.station).id
+    const key = `${station}|${lang()}`
+    if (!look || key === cellsFor) return
+    cellsFor = key
+    void look.cells(setOf(station)).then(cells => { if (cellsFor === key) { cellsNow = cells; paintDesk() } })
+  }
+  function openFromOverview(id: string): void {
+    if (!picture) return
+    if (!routable(id)) { openExhibit(id, null); return }
+    void picture.go(viewNode(id)).then(() => openExhibit(id, null))
+  }
   function openExhibit(id: string, from: HTMLElement | null): void {
     if (!hosts) return
     void lookNow().then(l => l.open(id, from))
@@ -335,6 +361,64 @@ export function createWing(): WingModule {
     full.append(make('p', 'vinci-statement', text(s.record ?? s.promise)), make('small', 'vinci-citation', s.promiseSource))
     panel.append(full)
     panel.append(make('p', 'vinci-door-disclosure', text(WING_TEXT.doorNote)))
+    paintRoomAndWing()
+  }
+  /** a spoken statement with its word of certainty, and its record folded behind it */
+  function statement(host: HTMLElement, label: VinciStatement, into: HTMLElement): void {
+    const p = make('p', 'vinci-statement')
+    p.dataset['certainty'] = label.certainty
+    p.append(make('span', 'vinci-certainty-word', text(vinciCertaintyWords[label.certainty])), document.createTextNode(' ' + text(label)))
+    host.append(p)
+    into.append(make('p', 'vinci-statement', text(label.record ?? label)), make('small', 'vinci-citation', label.source))
+  }
+  function fold(host: HTMLElement, full: HTMLElement): void {
+    const details = make('details', 'vinci-record-fold')
+    const summary = document.createElement('summary')
+    summary.textContent = lang() === 'de' ? 'Vollständiger Nachweis' : 'Full record'
+    details.append(summary, full)
+    host.append(details)
+  }
+  /* THE ROOM'S TAB AND THE WING'S, from the wing's own statements: the words
+     the live window reads from its content, without the scene's own records */
+  function paintRoomAndWing(): void {
+    if (!sources) return
+    const room = sources.panels.room
+    room.textContent = ''
+    for (const id of vinciRoomStationIds(stationOf(LIFE[card]!.station).id as VinciStationId)) {
+      const station = vinciContent.find(s => s.id === id)
+      if (!station) continue
+      const section = make('section', 'vinci-room-source')
+      section.append(make('h2', '', text(station.name)), make('p', 'vinci-promise', text(station.promise)))
+      const full = make('div', 'vinci-record')
+      setRegister(full, 'record')
+      for (const label of station.labels) statement(section, label, full)
+      full.append(make('p', 'vinci-statement', text(station.record ?? station.promise)), make('small', 'vinci-citation', station.promiseSource))
+      const absences = vinciAbsences[id]
+      if (absences?.length) {
+        section.append(make('h3', '', text(vinciSourcesHeadings.elsewhere)))
+        const list = make('ul', 'vinci-absence-list')
+        for (const absence of absences) {
+          const item = make('li', '')
+          item.append(make('span', 'vinci-absence-work', `${text(absence.work)} · ${text(absence.holder)}`), document.createTextNode(' ' + text(absence.reason)))
+          list.append(item)
+        }
+        section.append(list)
+      }
+      fold(section, full)
+      room.append(section)
+    }
+    const wing = sources.panels.wing
+    wing.textContent = ''
+    const full = make('div', 'vinci-record')
+    setRegister(full, 'record')
+    for (const label of [vinciReconstruction, vinciCollectionThreshold, vinciHourLabel, vinciHourIntegrity]) statement(wing, label, full)
+    wing.append(make('h3', '', text(vinciSourcesHeadings.grounds)))
+    for (const ground of vinciGrounds) wing.append(make('p', 'vinci-statement', text(ground)))
+    wing.append(make('h3', '', text(vinciSourcesHeadings.policy)), make('p', 'vinci-statement', text(vinciRightsPolicy)))
+    wing.append(make('h3', '', text(vinciSourcesHeadings.counted)), make('p', 'vinci-statement', text(vinciWingCounts)))
+    full.append(make('pre', 'vinci-arithmetic', text(vinciHourArithmetic)))
+    fold(wing, full)
+    wing.append(make('p', 'vinci-door-disclosure', text(WING_TEXT.doorNote)))
   }
 
   /* ---- the phone's graded box ---- */
@@ -472,11 +556,15 @@ export function createWing(): WingModule {
   }
 
   /* ---- the words of the place, painted where the design stands them ---- */
-  function paint(): void {
+  /** the band painted, and the way back disabled where it leads to a stop this release does not carry */
+  function paintDesk(): void {
     desk?.paint()
-    // the way back leads nowhere this release carries: it stands disabled
     const back = hosts?.stage.querySelector<HTMLButtonElement>('.desk-back')
     if (back && backIndex() === null && card > 0) back.disabled = true
+  }
+  function paint(): void {
+    refreshCells()
+    paintDesk()
     paintPhone()
     paintSources()
     marksAt = ''
@@ -535,6 +623,17 @@ export function createWing(): WingModule {
       // a wait is not a walk: the words and the way on stand until the clip can play through
       leg: () => { const s = picture?.state(); return s?.kind === 'walk' ? s.share : null },
       hurry: () => picture?.hurry(),
+      overview: {
+        cells: () => cellsNow,
+        open: id => openFromOverview(id),
+        room: () => text(CARDS.station_short_names?.[stationOf(LIFE[card]!.station).id] ?? stationOf(LIFE[card]!.station).name),
+        // the three rooms whose set the card data measures: the hang, the machine hall, the leaves
+        measure: () => {
+          const here = stationOf(LIFE[card]!.station).id
+          const key = here === 'picture-room' || here === 'picture-room-west' ? 'measure_wall' : here === 'flight' || here === 'works' ? 'measure_hall' : here === 'body' ? 'measure_book' : ''
+          return key ? deskControl('overview', key) : null
+        },
+      },
     })
     if (!wide) {
       buildPhone(h)

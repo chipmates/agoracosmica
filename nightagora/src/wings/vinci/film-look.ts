@@ -20,6 +20,7 @@ import { FAMOUS_FOLIOS, type PageRecord } from './table/content'
 import studyPageMap from './table/data/msb-pages.json?raw'
 import { assetAddress } from '../../stack/materials'
 import { loadManifest, type ManifestIndex } from '../../manifest'
+import type { DeskOverviewCell } from '../overview'
 
 /** the card every mark names with aria-controls */
 export const FILM_LOOK_CARD = VINCI_EXHIBIT_CARD
@@ -158,7 +159,38 @@ export function createFilmLook(h: FilmLookHost) {
       control(VINCI_VITRINE_WORDS.back, () => void open(machine, null), 'back'), shut()], set: null, certainty: 'documented' }, null, 'advance')
   }
 
+  /** THE OVERVIEW'S CELLS for a set: each work's name, mark and plate at rest,
+      from the registers the live row reads; a cell exists only where a plate resolves */
+  async function cells(exhibits: readonly string[]): Promise<DeskOverviewCell[]> {
+    assets ??= await loadManifest()
+    const out: DeskOverviewCell[] = []
+    for (const id of exhibits) {
+      if (id.startsWith('picture/')) {
+        const [, workId, face] = id.split('/') as [string, string, 'front' | 'reverse']
+        let work
+        try { work = getWork(workId) } catch { continue }
+        const entries = findPlateEntries(work, assets)
+        const plate = entries.find(entry => entry.face === face)
+        if (!plate) continue
+        const names = work as typeof work & { reverse_title_en?: string; reverse_title_de?: string; short_title_en?: string; short_title_de?: string }
+        const colour = policyLabelText(work, entries).colour
+        out.push({ id, kind: 'picture', openable: true,
+          title: text(face === 'reverse' ? { en: names.reverse_title_en ?? work.title_en, de: names.reverse_title_de ?? work.title_de } : { en: work.title_en, de: work.title_de }),
+          short: face === 'front' && names.short_title_en && names.short_title_de ? text({ en: names.short_title_en, de: names.short_title_de }) : null,
+          certainty: ORDER[Math.max(0, PICTURE_CERTAINTY_KEY.findIndex(entry => entry.colour === colour))] ?? 'reconstructed',
+          preview: assetAddress(validatePaintingRecord(plate.preview, 'painting-preview').entry) })
+      } else if (id.startsWith('machine/')) {
+        const slug = id.slice('machine/'.length) as MachineSlug
+        const entry = assets.byId.get(`vinci/exhibit-preview/machine/${slug}`)
+        if (!machineCatalog[slug] || !entry) continue
+        out.push({ id, kind: 'machine', openable: true, title: text(machineCatalog[slug].title), certainty: 'reconstructed', preview: assetAddress(entry) })
+      }
+    }
+    return out
+  }
+
   return {
+    cells,
     get id(): string | null { return closeLook.id },
     get surface() { return closeLook.surface },
     open,

@@ -138,6 +138,11 @@ for (const [id, n] of Object.entries(nodes)) for (const f of Object.keys(n.print
   if (read) projection.push({ node: id, framing: f, same: read === n.print[f], still: n.print[f], marks: read })
 }
 
+/* EACH STATION'S SET, in the order its room holds it, from the graph's own
+   views: what the overview offers where the visitor stands */
+const sets = {}
+for (const n of graph.nodes) if (n.kind === 'view') (sets[n.station] ??= []).push(n.exhibit)
+
 const release = {
   format: FILM_FORMAT,
   wing: 'vinci',
@@ -147,6 +152,7 @@ const release = {
   story: graph.story,
   cuts: graph.cuts,
   opens: graph.opens,
+  sets,
   nodes,
   edges: [...edges.values()].map((e) => ({ ...e, framings: Object.fromEntries(Object.entries(e.framings).map(([f, x]) => [f, { seconds: x.seconds, frames: x.frames, files: x.files, track: x.track }])) })),
 }

@@ -66,6 +66,8 @@ export interface FilmRelease {
   story: PictureNode[]
   cuts: { from: PictureNode; to: PictureNode; title: PictureWords }[]
   opens: [PictureNode, PictureNode][]
+  /** each station's set of exhibits, in the order its room holds them */
+  sets?: Record<string, string[]>
   nodes: Record<PictureNode, FilmNodeRecord>
   edges: FilmEdgeRecord[]
 }
