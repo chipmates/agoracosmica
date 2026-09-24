@@ -110,7 +110,7 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // gable and the trees past the house's west corner instead of brick alone,
   // turned onto the gable and lifted so the house stands in the middle of the
   // frame rather than high at its right over a third of cobble.
-  if(id==='study') return narrow?p(5.2,-29.8,1.65,-2.5911,-24.3447,4.7402,84):p(2.4,-29.3,1.65,-1.94,-22.848,2.74,60)
+  if(id==='study') return narrow?p(5.2,-29.8,1.65,-2.3955,-24.0764,4.7402,86):p(2.4,-29.3,1.65,-1.94,-22.848,2.74,60)
   // The royal château stands 590 m away on a bearing of 308.84 degrees, which
   // from this end of the court runs over the house's west corner and down the
   // valley; nothing of the castle is built, and its line stays in both frames.
@@ -118,7 +118,7 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // kept a sliver of the west face at its margin, and the face now runs from
   // the corner to the north end whole. The desktop stops short of the mural's
   // pavilion on its left and of the gable's windows on its right.
-  if(id==='chamber') return narrow?p(-4.2,-32.4,1.65,-9.4018,-24.0753,3.5581,92):p(-4.2,-32.4,1.65,-9.4915,-24.0941,3.3865,46)
+  if(id==='chamber') return narrow?p(-4.2,-32.4,1.65,-9.4018,-24.0753,3.5581,92):p(-4.2,-32.4,1.65,-9.4453,-24.1027,3.5581,43)
   // R19 accepted: actual apron paving +1.65 m; all eight principal windows clear vegetation.
   // The phone looks up eleven degrees, not twenty-three: a third of its frame
   // was sky and the house stood low, where the card is. The lens is opened
