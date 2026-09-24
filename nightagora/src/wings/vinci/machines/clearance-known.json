@@ -1,15 +1,4 @@
 {
   "note": "Pass-throughs of moving parts that wait for their own window, one machine per window, measured by src/wings/vinci/machine-clearance-check.mjs. The check fails on any pass-through not listed here, on a listed one that grows deeper, and on a listed one that is gone: the window that fixes it removes its lines.",
-  "entries": [
-    {
-      "slug": "revolving-crane",
-      "moving": "ratchet",
-      "other": "drum-journal-right",
-      "otherMoves": false,
-      "depthM": 0.01,
-      "atS": 2.846,
-      "share": 1,
-      "fix": "The ratchet wheel (x 0.19 to 0.21 m along the drum) is sunk into the right journal cheek (x 0.16 to 0.20 m). Move it outboard past the cheek's face with a few millimetres of air, or inboard of the cheek."
-    }
-  ]
+  "entries": []
 }

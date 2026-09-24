@@ -2029,17 +2029,277 @@
       }
     },
     "rolling-mill": {
+      "deck-plank-0": {
+        "en": "Deck plank",
+        "de": "Bodenbrett"
+      },
+      "deck-plank-1": {
+        "en": "Deck plank",
+        "de": "Bodenbrett"
+      },
       "base": {
         "en": "Base",
         "de": "Sockel"
+      },
+      "deck-plank-2": {
+        "en": "Deck plank",
+        "de": "Bodenbrett"
+      },
+      "deck-plank-3": {
+        "en": "Deck plank",
+        "de": "Bodenbrett"
+      },
+      "sleeper-left": {
+        "en": "Sleeper of the base",
+        "de": "Schwelle des Sockels"
+      },
+      "sleeper-right": {
+        "en": "Sleeper of the base",
+        "de": "Schwelle des Sockels"
+      },
+      "deck-peg-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-2": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-3": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-4": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-5": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-6": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-7": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-8": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-9": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-10": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-11": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-12": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-13": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-14": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-15": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
       },
       "left-post": {
         "en": "Left post",
         "de": "Linker Ständer"
       },
+      "left-post-tenon": {
+        "en": "Tenon of the post",
+        "de": "Zapfen des Ständers"
+      },
+      "left-post-tenon-wedge": {
+        "en": "Wedge",
+        "de": "Keil"
+      },
+      "left-post-front": {
+        "en": "Left post",
+        "de": "Linker Ständer"
+      },
+      "left-post-front-tenon": {
+        "en": "Tenon of the post",
+        "de": "Zapfen des Ständers"
+      },
+      "left-post-front-tenon-wedge": {
+        "en": "Wedge",
+        "de": "Keil"
+      },
+      "left-block": {
+        "en": "Block under the bearings",
+        "de": "Klotz unter den Lagern"
+      },
+      "left-block-top": {
+        "en": "Block over the bearings",
+        "de": "Klotz über den Lagern"
+      },
+      "left-wedge-lower": {
+        "en": "Wedge that sets the gap",
+        "de": "Keil, der den Spalt einstellt"
+      },
+      "left-wedge-upper": {
+        "en": "Wedge that sets the gap",
+        "de": "Keil, der den Spalt einstellt"
+      },
+      "left-bearing-lower-bottom": {
+        "en": "Bronze bearing",
+        "de": "Bronzelager"
+      },
+      "left-bearing-lower-top": {
+        "en": "Bronze bearing",
+        "de": "Bronzelager"
+      },
+      "left-bearing-upper-bottom": {
+        "en": "Bronze bearing",
+        "de": "Bronzelager"
+      },
+      "left-bearing-upper-top": {
+        "en": "Bronze bearing",
+        "de": "Bronzelager"
+      },
       "right-post": {
         "en": "Right post",
         "de": "Rechter Ständer"
+      },
+      "right-post-tenon": {
+        "en": "Tenon of the post",
+        "de": "Zapfen des Ständers"
+      },
+      "right-post-tenon-wedge": {
+        "en": "Wedge",
+        "de": "Keil"
+      },
+      "right-post-front": {
+        "en": "Right post",
+        "de": "Rechter Ständer"
+      },
+      "right-post-front-tenon": {
+        "en": "Tenon of the post",
+        "de": "Zapfen des Ständers"
+      },
+      "right-post-front-tenon-wedge": {
+        "en": "Wedge",
+        "de": "Keil"
+      },
+      "right-block": {
+        "en": "Block under the bearings",
+        "de": "Klotz unter den Lagern"
+      },
+      "right-block-top": {
+        "en": "Block over the bearings",
+        "de": "Klotz über den Lagern"
+      },
+      "right-wedge-lower": {
+        "en": "Wedge that sets the gap",
+        "de": "Keil, der den Spalt einstellt"
+      },
+      "right-wedge-upper": {
+        "en": "Wedge that sets the gap",
+        "de": "Keil, der den Spalt einstellt"
+      },
+      "right-bearing-lower-bottom": {
+        "en": "Bronze bearing",
+        "de": "Bronzelager"
+      },
+      "right-bearing-lower-top": {
+        "en": "Bronze bearing",
+        "de": "Bronzelager"
+      },
+      "right-bearing-upper-bottom": {
+        "en": "Bronze bearing",
+        "de": "Bronzelager"
+      },
+      "right-bearing-upper-top": {
+        "en": "Bronze bearing",
+        "de": "Bronzelager"
+      },
+      "head": {
+        "en": "Head beam",
+        "de": "Kopfbalken"
+      },
+      "left-brace-front": {
+        "en": "Brace",
+        "de": "Strebe"
+      },
+      "right-brace-front": {
+        "en": "Brace",
+        "de": "Strebe"
+      },
+      "right-brace-back": {
+        "en": "Brace",
+        "de": "Strebe"
+      },
+      "input-journal-post": {
+        "en": "Bearing post",
+        "de": "Lagerpfosten"
+      },
+      "input-journal": {
+        "en": "Shaft bearing",
+        "de": "Wellenlager"
+      },
+      "input-journal-strap": {
+        "en": "Iron strap of the bearing",
+        "de": "Eisenband des Lagers"
+      },
+      "input-journal-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "input-journal-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "outer-journal-post": {
+        "en": "Bearing post",
+        "de": "Lagerpfosten"
+      },
+      "outer-journal": {
+        "en": "Outer shaft bearing",
+        "de": "Äußeres Wellenlager"
+      },
+      "outer-journal-strap": {
+        "en": "Iron strap of the bearing",
+        "de": "Eisenband des Lagers"
+      },
+      "outer-journal-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "outer-journal-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "outer-journal-foot": {
+        "en": "Foot of the bearing post",
+        "de": "Fuß des Lagerpfostens"
+      },
+      "journal-rail": {
+        "en": "Rail between the bearing posts",
+        "de": "Riegel zwischen den Lagerpfosten"
+      },
+      "journal-girt": {
+        "en": "Rail to the post",
+        "de": "Riegel zum Ständer"
       },
       "upper": {
         "en": "Upper bronze roller",
@@ -2057,6 +2317,22 @@
         "en": "Lower axle",
         "de": "Untere Achse"
       },
+      "upper-collar": {
+        "en": "Iron collar",
+        "de": "Eisenring"
+      },
+      "upper-cotter": {
+        "en": "Cotter",
+        "de": "Splint"
+      },
+      "lower-collar": {
+        "en": "Iron collar",
+        "de": "Eisenring"
+      },
+      "lower-cotter": {
+        "en": "Cotter",
+        "de": "Splint"
+      },
       "driver": {
         "en": "Small gear",
         "de": "Kleines Zahnrad"
@@ -2065,25 +2341,49 @@
         "en": "Large gear",
         "de": "Großes Zahnrad"
       },
-      "crank-arm": {
-        "en": "Crank arm",
-        "de": "Kurbelarm"
+      "driven-hub-outer": {
+        "en": "Iron plate on the hub",
+        "de": "Eisenplatte an der Nabe"
       },
-      "crank-grip": {
-        "en": "Crank handle",
-        "de": "Kurbelgriff"
+      "driven-key": {
+        "en": "Key of the large gear",
+        "de": "Keil des großen Zahnrads"
+      },
+      "driver-boss-outer": {
+        "en": "Iron ring on the small gear",
+        "de": "Eisenring am kleinen Zahnrad"
+      },
+      "driver-boss-inner": {
+        "en": "Iron ring on the small gear",
+        "de": "Eisenring am kleinen Zahnrad"
       },
       "input-shaft": {
         "en": "Crank shaft",
         "de": "Kurbelwelle"
       },
-      "input-journal": {
-        "en": "Shaft bearing",
-        "de": "Wellenlager"
+      "input-collar": {
+        "en": "Iron collar",
+        "de": "Eisenring"
       },
-      "input-journal-post": {
-        "en": "Bearing post",
-        "de": "Lagerpfosten"
+      "crank-arm": {
+        "en": "Crank arm",
+        "de": "Kurbelarm"
+      },
+      "crank-key": {
+        "en": "Key of the crank",
+        "de": "Keil der Kurbel"
+      },
+      "crank-grip": {
+        "en": "Crank handle",
+        "de": "Kurbelgriff"
+      },
+      "crank-pin": {
+        "en": "Pin of the crank handle",
+        "de": "Stift des Kurbelgriffs"
+      },
+      "crank-pin-head": {
+        "en": "Head of the handle pin",
+        "de": "Kopf des Griffstifts"
       }
     },
     "ball-bearing": {
@@ -2251,81 +2551,417 @@
         "en": "Base",
         "de": "Sockel"
       },
+      "base-cross": {
+        "en": "Base",
+        "de": "Sockel"
+      },
+      "turntable-thrust-ring": {
+        "en": "Thrust ring",
+        "de": "Laufring"
+      },
+      "curb-dog-0": {
+        "en": "Iron dog across the joint",
+        "de": "Eisenklammer über der Fuge"
+      },
+      "curb-1": {
+        "en": "Thrust ring",
+        "de": "Laufring"
+      },
+      "curb-dog-1": {
+        "en": "Iron dog across the joint",
+        "de": "Eisenklammer über der Fuge"
+      },
+      "curb-2": {
+        "en": "Thrust ring",
+        "de": "Laufring"
+      },
+      "curb-dog-2": {
+        "en": "Iron dog across the joint",
+        "de": "Eisenklammer über der Fuge"
+      },
+      "curb-3": {
+        "en": "Thrust ring",
+        "de": "Laufring"
+      },
+      "curb-dog-3": {
+        "en": "Iron dog across the joint",
+        "de": "Eisenklammer über der Fuge"
+      },
+      "curb-4": {
+        "en": "Thrust ring",
+        "de": "Laufring"
+      },
+      "curb-dog-4": {
+        "en": "Iron dog across the joint",
+        "de": "Eisenklammer über der Fuge"
+      },
+      "curb-5": {
+        "en": "Thrust ring",
+        "de": "Laufring"
+      },
+      "curb-dog-5": {
+        "en": "Iron dog across the joint",
+        "de": "Eisenklammer über der Fuge"
+      },
+      "curb-6": {
+        "en": "Thrust ring",
+        "de": "Laufring"
+      },
+      "curb-dog-6": {
+        "en": "Iron dog across the joint",
+        "de": "Eisenklammer über der Fuge"
+      },
+      "curb-7": {
+        "en": "Thrust ring",
+        "de": "Laufring"
+      },
+      "curb-dog-7": {
+        "en": "Iron dog across the joint",
+        "de": "Eisenklammer über der Fuge"
+      },
+      "roller-0": {
+        "en": "Roller",
+        "de": "Laufrolle"
+      },
+      "roller-1": {
+        "en": "Roller",
+        "de": "Laufrolle"
+      },
+      "roller-2": {
+        "en": "Roller",
+        "de": "Laufrolle"
+      },
+      "roller-3": {
+        "en": "Roller",
+        "de": "Laufrolle"
+      },
+      "roller-4": {
+        "en": "Roller",
+        "de": "Laufrolle"
+      },
+      "roller-5": {
+        "en": "Roller",
+        "de": "Laufrolle"
+      },
+      "roller-6": {
+        "en": "Roller",
+        "de": "Laufrolle"
+      },
+      "roller-7": {
+        "en": "Roller",
+        "de": "Laufrolle"
+      },
+      "pin-step": {
+        "en": "Step under the hub",
+        "de": "Lagerklotz unter der Nabe"
+      },
+      "slew-pin": {
+        "en": "Pivot pin",
+        "de": "Drehzapfen"
+      },
+      "slew-pin-washer": {
+        "en": "Washer of the pivot pin",
+        "de": "Scheibe des Drehzapfens"
+      },
+      "slew-pin-cotter": {
+        "en": "Cotter",
+        "de": "Splint"
+      },
       "turntable": {
         "en": "Turntable",
         "de": "Drehscheibe"
+      },
+      "bearer-left": {
+        "en": "Bearer under the deck",
+        "de": "Tragbalken unter dem Boden"
+      },
+      "bearer-right": {
+        "en": "Bearer under the deck",
+        "de": "Tragbalken unter dem Boden"
+      },
+      "deck-plank-0": {
+        "en": "Deck plank",
+        "de": "Bodenbrett"
+      },
+      "deck-peg-0-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-0-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-plank-1": {
+        "en": "Deck plank",
+        "de": "Bodenbrett"
+      },
+      "deck-peg-1-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-1-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-plank-2": {
+        "en": "Deck plank",
+        "de": "Bodenbrett"
+      },
+      "deck-peg-2-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-2-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-plank-3": {
+        "en": "Deck plank",
+        "de": "Bodenbrett"
+      },
+      "deck-peg-3-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-3-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-plank-4": {
+        "en": "Deck plank",
+        "de": "Bodenbrett"
+      },
+      "deck-peg-4-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-4-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-plank-5": {
+        "en": "Deck plank",
+        "de": "Bodenbrett"
+      },
+      "deck-peg-5-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-5-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-plank-6": {
+        "en": "Deck plank",
+        "de": "Bodenbrett"
+      },
+      "deck-peg-6-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-6-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-plank-7": {
+        "en": "Deck plank",
+        "de": "Bodenbrett"
+      },
+      "deck-peg-7-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-7-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-plank-8": {
+        "en": "Deck plank",
+        "de": "Bodenbrett"
+      },
+      "deck-peg-8-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-8-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-plank-9": {
+        "en": "Deck plank",
+        "de": "Bodenbrett"
+      },
+      "deck-peg-9-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-9-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "rim-0": {
+        "en": "Rim of the platform",
+        "de": "Rand der Plattform"
+      },
+      "rim-dog-0": {
+        "en": "Iron dog across the joint",
+        "de": "Eisenklammer über der Fuge"
+      },
+      "rim-1": {
+        "en": "Rim of the platform",
+        "de": "Rand der Plattform"
+      },
+      "rim-dog-1": {
+        "en": "Iron dog across the joint",
+        "de": "Eisenklammer über der Fuge"
+      },
+      "rim-2": {
+        "en": "Rim of the platform",
+        "de": "Rand der Plattform"
+      },
+      "rim-dog-2": {
+        "en": "Iron dog across the joint",
+        "de": "Eisenklammer über der Fuge"
+      },
+      "rim-3": {
+        "en": "Rim of the platform",
+        "de": "Rand der Plattform"
+      },
+      "rim-dog-3": {
+        "en": "Iron dog across the joint",
+        "de": "Eisenklammer über der Fuge"
+      },
+      "rim-4": {
+        "en": "Rim of the platform",
+        "de": "Rand der Plattform"
+      },
+      "rim-dog-4": {
+        "en": "Iron dog across the joint",
+        "de": "Eisenklammer über der Fuge"
+      },
+      "rim-5": {
+        "en": "Rim of the platform",
+        "de": "Rand der Plattform"
+      },
+      "rim-dog-5": {
+        "en": "Iron dog across the joint",
+        "de": "Eisenklammer über der Fuge"
+      },
+      "rim-6": {
+        "en": "Rim of the platform",
+        "de": "Rand der Plattform"
+      },
+      "rim-dog-6": {
+        "en": "Iron dog across the joint",
+        "de": "Eisenklammer über der Fuge"
+      },
+      "rim-7": {
+        "en": "Rim of the platform",
+        "de": "Rand der Plattform"
+      },
+      "rim-dog-7": {
+        "en": "Iron dog across the joint",
+        "de": "Eisenklammer über der Fuge"
+      },
+      "lock-pin": {
+        "en": "Pin that locks the platform",
+        "de": "Riegel, der die Plattform sperrt"
+      },
+      "lock-pin-ring": {
+        "en": "Ring of the locking pin",
+        "de": "Ring des Riegels"
+      },
+      "lock-pin-head": {
+        "en": "Head of the locking pin",
+        "de": "Kopf des Riegels"
       },
       "mast": {
         "en": "Mast",
         "de": "Mast"
       },
+      "mast-tongue": {
+        "en": "Head of the mast",
+        "de": "Mastkopf"
+      },
       "jib": {
         "en": "Jib",
         "de": "Ausleger"
       },
-      "counterweight": {
-        "en": "Counterweight",
-        "de": "Gegengewicht"
+      "jib-right": {
+        "en": "Jib",
+        "de": "Ausleger"
       },
-      "drum": {
-        "en": "Drum",
-        "de": "Trommel"
+      "jib-spacer-0": {
+        "en": "Block between the jib beams",
+        "de": "Klotz zwischen den Auslegerbalken"
       },
-      "rear-pulley": {
-        "en": "Pulley at the mast",
-        "de": "Rolle am Mast"
+      "jib-spacer-1": {
+        "en": "Block between the jib beams",
+        "de": "Klotz zwischen den Auslegerbalken"
       },
-      "tip-pulley": {
-        "en": "Pulley at the tip of the jib",
-        "de": "Rolle an der Spitze des Auslegers"
+      "jib-spacer-2": {
+        "en": "Block between the jib beams",
+        "de": "Klotz zwischen den Auslegerbalken"
       },
-      "load": {
-        "en": "Stone load",
-        "de": "Steinlast"
+      "jib-bolt-0": {
+        "en": "Iron bolt",
+        "de": "Eisenbolzen"
       },
-      "handle": {
-        "en": "Crank",
-        "de": "Kurbel"
+      "jib-bolt-0-head-0": {
+        "en": "Head of the bolt",
+        "de": "Bolzenkopf"
       },
-      "brace": {
-        "en": "Brace",
-        "de": "Strebe"
+      "jib-bolt-0-head-1": {
+        "en": "Head of the bolt",
+        "de": "Bolzenkopf"
       },
-      "hoist-rope": {
-        "en": "Hoist rope",
-        "de": "Hubseil"
+      "jib-bolt-1": {
+        "en": "Iron bolt",
+        "de": "Eisenbolzen"
       },
-      "pawl": {
-        "en": "Pawl",
-        "de": "Sperrklinke"
+      "jib-bolt-1-head-0": {
+        "en": "Head of the bolt",
+        "de": "Bolzenkopf"
       },
-      "ratchet": {
-        "en": "Ratchet wheel",
-        "de": "Sperrrad"
+      "jib-bolt-1-head-1": {
+        "en": "Head of the bolt",
+        "de": "Bolzenkopf"
       },
-      "counterweight-bracket": {
-        "en": "Counterweight bracket",
-        "de": "Halter des Gegengewichts"
+      "jib-bolt-2": {
+        "en": "Iron bolt",
+        "de": "Eisenbolzen"
       },
-      "drum-support-crossbar": {
-        "en": "Drum crossbar",
-        "de": "Querholz der Trommel"
+      "jib-bolt-2-head-0": {
+        "en": "Head of the bolt",
+        "de": "Bolzenkopf"
       },
-      "drum-axle": {
-        "en": "Drum axle",
-        "de": "Trommelachse"
+      "jib-bolt-2-head-1": {
+        "en": "Head of the bolt",
+        "de": "Bolzenkopf"
       },
-      "handle-grip": {
-        "en": "Crank handle",
-        "de": "Kurbelgriff"
+      "jib-bolt-3": {
+        "en": "Iron bolt",
+        "de": "Eisenbolzen"
       },
-      "drum-journal-left": {
-        "en": "Left drum bearing",
-        "de": "Linkes Trommellager"
+      "jib-bolt-3-head-0": {
+        "en": "Head of the bolt",
+        "de": "Bolzenkopf"
       },
-      "drum-journal-right": {
-        "en": "Right drum bearing",
-        "de": "Rechtes Trommellager"
+      "jib-bolt-3-head-1": {
+        "en": "Head of the bolt",
+        "de": "Bolzenkopf"
+      },
+      "jib-bolt-4": {
+        "en": "Iron bolt",
+        "de": "Eisenbolzen"
+      },
+      "jib-bolt-4-head-0": {
+        "en": "Head of the bolt",
+        "de": "Bolzenkopf"
+      },
+      "jib-bolt-4-head-1": {
+        "en": "Head of the bolt",
+        "de": "Bolzenkopf"
       },
       "rear-cheek-left": {
         "en": "Cheek of the mast pulley",
@@ -2339,6 +2975,14 @@
         "en": "Axle of the mast pulley",
         "de": "Achse der Rolle am Mast"
       },
+      "rear-axle-head-0": {
+        "en": "Head of the pulley bolt",
+        "de": "Kopf des Rollenbolzens"
+      },
+      "rear-axle-head-1": {
+        "en": "Head of the pulley bolt",
+        "de": "Kopf des Rollenbolzens"
+      },
       "tip-cheek-left": {
         "en": "Cheek of the jib pulley",
         "de": "Wange der Rolle am Ausleger"
@@ -2351,13 +2995,109 @@
         "en": "Axle of the jib pulley",
         "de": "Achse der Rolle am Ausleger"
       },
-      "slew-pin": {
-        "en": "Pivot pin",
-        "de": "Drehzapfen"
+      "tip-axle-head-0": {
+        "en": "Head of the pulley bolt",
+        "de": "Kopf des Rollenbolzens"
       },
-      "turntable-thrust-ring": {
-        "en": "Thrust ring",
-        "de": "Laufring"
+      "tip-axle-head-1": {
+        "en": "Head of the pulley bolt",
+        "de": "Kopf des Rollenbolzens"
+      },
+      "rear-pulley": {
+        "en": "Pulley at the mast",
+        "de": "Rolle am Mast"
+      },
+      "tip-pulley": {
+        "en": "Pulley at the tip of the jib",
+        "de": "Rolle an der Spitze des Auslegers"
+      },
+      "brace": {
+        "en": "Brace",
+        "de": "Strebe"
+      },
+      "mast-knee-left": {
+        "en": "Knee brace",
+        "de": "Kopfband"
+      },
+      "mast-knee-right": {
+        "en": "Knee brace",
+        "de": "Kopfband"
+      },
+      "mast-knee-back": {
+        "en": "Knee brace",
+        "de": "Kopfband"
+      },
+      "drum-journal-left": {
+        "en": "Left drum bearing",
+        "de": "Linkes Trommellager"
+      },
+      "drum-journal-left-plate": {
+        "en": "Iron plate of the bearing",
+        "de": "Eisenplatte am Lager"
+      },
+      "drum-journal-right": {
+        "en": "Right drum bearing",
+        "de": "Rechtes Trommellager"
+      },
+      "drum-journal-right-plate": {
+        "en": "Iron plate of the bearing",
+        "de": "Eisenplatte am Lager"
+      },
+      "drum-support-crossbar": {
+        "en": "Drum crossbar",
+        "de": "Querholz der Trommel"
+      },
+      "crossbar-wedge-0": {
+        "en": "Wedge",
+        "de": "Keil"
+      },
+      "crossbar-wedge-1": {
+        "en": "Wedge",
+        "de": "Keil"
+      },
+      "drum": {
+        "en": "Drum",
+        "de": "Trommel"
+      },
+      "drum-hoop-0": {
+        "en": "Iron hoop",
+        "de": "Eisenreif"
+      },
+      "drum-hoop-1": {
+        "en": "Iron hoop",
+        "de": "Eisenreif"
+      },
+      "drum-axle": {
+        "en": "Drum axle",
+        "de": "Trommelachse"
+      },
+      "ratchet": {
+        "en": "Ratchet wheel",
+        "de": "Sperrrad"
+      },
+      "ratchet-boss": {
+        "en": "Hub of the ratchet wheel",
+        "de": "Nabe des Sperrrads"
+      },
+      "handle": {
+        "en": "Crank",
+        "de": "Kurbel"
+      },
+      "handle-grip": {
+        "en": "Crank handle",
+        "de": "Kurbelgriff"
+      },
+      "handle-pin": {
+        "en": "Pin of the crank handle",
+        "de": "Stift des Kurbelgriffs"
+      },
+      "handle-pin-head": {
+        "en": "Head of the handle pin",
+        "de": "Kopf des Griffstifts"
+      },
+      "handle-key": {
+        "en": "Key of the crank",
+        "de": "Keil der Kurbel"
       },
       "drum-wrap": {
         "en": "Rope on the drum",
@@ -2366,6 +3106,102 @@
       "rope-anchor": {
         "en": "Rope anchor",
         "de": "Seilanker"
+      },
+      "pawl": {
+        "en": "Pawl",
+        "de": "Sperrklinke"
+      },
+      "pawl-pin": {
+        "en": "Pin of the pawl",
+        "de": "Bolzen der Sperrklinke"
+      },
+      "counterweight-box-front": {
+        "en": "Box of the counterweight",
+        "de": "Kasten des Gegengewichts"
+      },
+      "counterweight-box-back": {
+        "en": "Box of the counterweight",
+        "de": "Kasten des Gegengewichts"
+      },
+      "counterweight-box-left": {
+        "en": "Box of the counterweight",
+        "de": "Kasten des Gegengewichts"
+      },
+      "counterweight-box-right": {
+        "en": "Box of the counterweight",
+        "de": "Kasten des Gegengewichts"
+      },
+      "counterweight-band-0": {
+        "en": "Iron band of the box",
+        "de": "Eisenband des Kastens"
+      },
+      "counterweight-band-1": {
+        "en": "Iron band of the box",
+        "de": "Eisenband des Kastens"
+      },
+      "counterweight": {
+        "en": "Counterweight",
+        "de": "Gegengewicht"
+      },
+      "counterweight-stone-0": {
+        "en": "Stone of the counterweight",
+        "de": "Stein des Gegengewichts"
+      },
+      "counterweight-stone-1": {
+        "en": "Stone of the counterweight",
+        "de": "Stein des Gegengewichts"
+      },
+      "counterweight-stone-2": {
+        "en": "Stone of the counterweight",
+        "de": "Stein des Gegengewichts"
+      },
+      "counterweight-stone-3": {
+        "en": "Stone of the counterweight",
+        "de": "Stein des Gegengewichts"
+      },
+      "counterweight-stone-4": {
+        "en": "Stone of the counterweight",
+        "de": "Stein des Gegengewichts"
+      },
+      "counterweight-bracket": {
+        "en": "Counterweight bracket",
+        "de": "Halter des Gegengewichts"
+      },
+      "counterweight-cleat": {
+        "en": "Cleat behind the counterweight",
+        "de": "Leiste hinter dem Gegengewicht"
+      },
+      "counterweight-peg-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "counterweight-peg-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "counterweight-peg-2": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "counterweight-peg-3": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "load": {
+        "en": "Stone load",
+        "de": "Steinlast"
+      },
+      "load-lewis": {
+        "en": "Lewis in the stone",
+        "de": "Wolf im Stein"
+      },
+      "load-ring": {
+        "en": "Iron ring",
+        "de": "Eisenring"
+      },
+      "hoist-rope": {
+        "en": "Hoist rope",
+        "de": "Hubseil"
       }
     },
     "lathe": {

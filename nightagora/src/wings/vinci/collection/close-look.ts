@@ -166,11 +166,9 @@ const VIEWPOINT_PARTS: Record<MachineSlug, { drive: string | null; working: stri
   'camera-obscura': { drive: 'aperture-plate', working: 'screen' },
 }
 
-/** The crane stands out of the store, and its body names its joints its own
- * way: these are the dossier's parts under the names that body gives them. */
+/** A body built outside its record names some parts its own way: these are
+ * the dossier's parts under the names that body gives them. */
 const STORE_NODE_NAMES: Partial<Record<MachineSlug, Record<string, string>>> = {
-  // The crank turns on the drum's own axle, so the body carries it in the drum.
-  'revolving-crane': { 'handle': 'drum', 'hoist-rope': 'rope-fall' },
   /* The chamber's demonstration is built beside the dossier and its shell is
      welded into one body, so its four museum-built names are the nodes the
      body carries: the lit candle, both faces of the image, the mark at the
