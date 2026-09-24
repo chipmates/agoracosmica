@@ -2679,10 +2679,10 @@
       "class": "GENERATED",
       "licence": "Original procedural museum exhibition. Source code under the museum repository licence.",
       "display": true,
-      "prompt": "Museum floor exhibition. Fifty-six data-led dates, equal spacing, carved sockets, bronze inlay, certainty colours, the year in bronze set across the paving face with the certainty word painted beside it, a bronze rail, a coped parapet and a threshold that opens on a continuing walk. Fictional museum carrier, never historical reconstruction testimony.",
+      "prompt": "Museum floor exhibition. Fifty-six data-led dates, equal spacing, carved sockets, bronze inlay, certainty colours, the year in bronze set across the paving face with the certainty word painted beside it, or for a date read from far down the floor one row of year, word and event cut long along the walk, a bronze rail, a coped parapet and a threshold that opens on a continuing walk. Fictional museum carrier, never historical reconstruction testimony.",
       "model": "Deterministic TypeScript geometry and TSL materials",
       "date": "2026-09-10",
-      "sha256": "1f6f7f70697e3a4e84fcf8a54e7669e2b19108a659d222aca04247c17f45c3c4",
+      "sha256": "fcf2d920022f2b4ffbbbe8f74fd3c0b3205e0c6673914b6f758d85fcbe99f1f9",
       "note": "recipe_file=src/wings/vinci/line/index.ts"
     },
     {
@@ -3389,10 +3389,10 @@
       "class": "GENERATED",
       "licence": "Original procedural museum exhibition. Source code under the museum repository licence.",
       "display": true,
-      "prompt": "Twelve complete date sockets from the unchanged line bench, mounted in three fixed excerpts of four at true scale on the long gallery floor. The sections begin with the recorded birth in1452, the Vespucci note in1503 and the Amboise visit in1517, and end with the1519 will and death. Original bronze numerals, certainty words and colours, two named1504 events and1.65m nonchronological spacing are retained; the first excerpt keeps the bench's stacked lettering, the two read from the far end set each date's word and event beside its year on one row. The collection host clips the original paving to its room and excludes the standalone bench walls, rail and threshold continuation, keeping the gallery doors and crossing clear. Modern exhibition composition, no historical building claim.",
+      "prompt": "Twelve complete date sockets from the unchanged line bench, mounted in three fixed excerpts of four at true scale on the long gallery floor. The sections begin with the recorded birth in1452, the Vespucci note in1503 and the Amboise visit in1517, and end with the1519 will and death. Original bronze numerals, certainty words and colours, two named1504 events and1.65m nonchronological spacing are retained; the first excerpt keeps the bench's stacked lettering, the two read from the far end set each date as one row centred on its socket, year, word and event cut long along the walk as a road's markings are, so each keeps its shape from the south end and open stone before the next. The collection host clips the original paving to its room and excludes the standalone bench walls, rail and threshold continuation, keeping the gallery doors and crossing clear. Modern exhibition composition, no historical building claim.",
       "model": "Deterministic TypeScript geometry derived from the line module",
       "date": "2026-09-14",
-      "sha256": "73fe58cd51de9ee56acb7fbcd84584c4eeca8850038c17228ef9b3a4b9510939",
+      "sha256": "9dbcc66e49b5b36d585078bc3f9ffd89f071ebc97d0d230286d8abb528aabb4f",
       "note": "recipe_file=src/wings/vinci/collection/line-floor.ts; source_module=src/wings/vinci/line/index.ts; source_indices=0..3,28..31,38..41; all56 records remain at the bench address",
       "recipe_files": [
         {
@@ -3447,7 +3447,7 @@
       "prompt": "The collection host fits the unchanged grave and corrections modules to their existing museum floor reservations. Only the original native stage paving triangles are clipped: grave 12 by 13 m, deathbed and quote corrections 13 by 12 m, each around local depth centre 2.5 m. The larger independent bench stages remain unchanged at their bench addresses. All upright exhibit geometry and its attributes pass through intact. This prevents the corrections paving from covering the date course or adjoining picture room and keeps one instance of each built exhibit. The shared collection paving coordinates retain their original datum. Authored museum installation, no historical architectural claim.",
       "model": "Deterministic TypeScript clipping of the original native floor triangles",
       "date": "2026-09-14",
-      "sha256": "73fe58cd51de9ee56acb7fbcd84584c4eeca8850038c17228ef9b3a4b9510939",
+      "sha256": "9dbcc66e49b5b36d585078bc3f9ffd89f071ebc97d0d230286d8abb528aabb4f",
       "note": "recipe_file=src/wings/vinci/collection/line-floor.ts; recipe_function=fitCollectionExhibitFloor; source_modules=grave,myths; floor_only=true",
       "recipe_files": [
         {
@@ -3721,10 +3721,10 @@
       "class": "GENERATED",
       "licence": "Original procedural construction; source code under the museum repository licence.",
       "display": true,
-      "prompt": "The long gallery of the life line as a finished room: the line's field of twelve dates in honed pale limestone, each slab read from its own piece of one CC0 photograph, turned end for end on half of them, its bedding laid along the walk, a slab's own tone, a walked band along the dates and its joints read dark; the years in a waxed statuary bronze of their own, the fittings in brighter bronze; the field edged in a bronze flat where it meets the building's sealed concrete floor, laid in the hall's 3.2 by 3.3 m bays with saw cuts; the walls and the coffered soffit in the hall's board-formed concrete, poured paler, a shadow gap with a dark back at every wall's foot and the finish closed over each door; three solid oiled oak benches at the glass and a long one against the far wall where the line ends, each on a recessed dark base; the glazed wall's panes as glass seen from the room, the room's bounce in them and a film of weather at their foot. Its own light, as data: the east glazing as one daylight area source of 6800 K and a parallel 5600 K daylight through it that lays a patch on the floor cut by the posts, the sill and the benches, a 3400 K head on a black track over every date throwing a pool on it and the track's last head turned onto the far wall over the end bench, a warm linear wash slot along the far wall, and the room's bounce read from a probe taken inside it three times; the calm tier reads the bounce as a measured fill and draws no shadow map. Photographs: library/limestone-pale (ambientCG), library/concrete-wall-formed, library/concrete-floor-polished and library/oak-veneer-light (Poly Haven), all CC0; slabs, bays, joints, tints, the walk and every light are procedural. A modern room; no 1517 claim.",
+      "prompt": "The long gallery of the life line as a finished room: the line's field of twelve dates in honed pale limestone, each slab read from its own piece of one CC0 photograph at the photograph's own scale, turned end for end on half of them, its bedding laid along the walk with a trace of its banding kept, a slab's own tone, soft clouds, a sand-fine grain and the shell it was laid down from, fragments dark and pale and the odd larger section, a walked band along the dates and its joints read dark; the years in a waxed statuary bronze of their own, the fittings in brighter bronze; the field edged in a bronze flat where it meets the building's sealed concrete floor, laid in the hall's 3.2 by 3.3 m bays with saw cuts; the walls and the coffered soffit in the hall's board-formed concrete, poured paler, a shadow gap with a dark back at every wall's foot and the finish closed over each door; three solid oiled oak benches at the glass and a long one against the far wall where the line ends, each on a recessed dark base; the glazed wall's panes as glass seen from the room, the room's bounce in them and a film of weather at their foot. Its own light, as data: the east glazing as one daylight area source of 6800 K and a parallel 5600 K daylight through it that lays a patch on the floor cut by the posts, the sill and the benches, a 3400 K head on a black track over every date throwing a pool on it and the track's last head turned onto the far wall over the end bench, a warm linear wash slot along the far wall, and the room's bounce read from a probe taken inside it three times; the calm tier reads the bounce as a measured fill and draws no shadow map. Photographs: library/limestone-pale (ambientCG), library/concrete-wall-formed, library/concrete-floor-polished and library/oak-veneer-light (Poly Haven), all CC0; slabs, bays, joints, tints, the stone's clouds, grain and shell, the walk and every light are procedural. A modern room; no 1517 claim.",
       "model": "Deterministic TypeScript geometry and TSL materials",
       "date": "2026-09-23",
-      "sha256": "8b5ed214c674c18053bbdd465ed9d59ef6f131a46309b8eb82aacc465fd0e95f",
+      "sha256": "95cccf4af6cc68c3b3c57a211e7aaec20c1d204f29c1c383e95e80ab3aee7d1f",
       "note": "Modern museum insertion, the long gallery only; no 1517 claim. recipe_file=src/wings/vinci/collection/line-gallery.ts; companion_file=src/wings/vinci/collection/line-gallery-plan.ts; library_sets=library/limestone-pale,library/concrete-wall-formed,library/concrete-floor-polished,library/oak-veneer-light"
     },
     {

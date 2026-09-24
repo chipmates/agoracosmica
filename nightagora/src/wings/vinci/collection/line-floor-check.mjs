@@ -40,6 +40,9 @@ async function load(file) {
   }, { timeout: 20000 })
   return exports
 }
+// The collection's modules import one another in a ring; the app enters it
+// at the room materials, so every constant read at load is set by then.
+await load(path.join(HERE, 'materials.ts'))
 const { createCollectionLineFloor, collectionLineStuds, COLLECTION_LINE_SECTIONS, fitCollectionExhibitFloor, EXHIBITION_STAGE_LEVELS: FITTER_LEVELS } = await load(path.join(HERE, 'line-floor.ts'))
 const { FLOOR, LINE_ORIGIN, LINE_FIELD, FACE, ROOMS, COURT, GRAVE_ORIGIN, COLLECTION_PAVING_ORIGIN } = await load(path.join(HERE, 'layout.ts'))
 const { STUDS, createLine } = await load(path.join(HERE, '../line/index.ts'))
@@ -92,12 +95,12 @@ function readingViews(floor, materials, language) {
     benchLocation.search = ''
     source.updateMatrixWorld(true)
     const sourceYear = STUDS[section.selected + offset].date.slice(0, 4)
-    // The year is cut a fifth of a metre south of its own socket, its word
-    // and any event beside it on the same row.
+    // The year is cut on its own socket's course: south of the socket when
+    // stacked, on the row centred on it when the excerpt is read from afar.
     const socketZ = -offset * 1.65
     let numeral
     source.traverse(mesh => {
-      if (mesh instanceof THREE.Mesh && mesh.userData.text === sourceYear && Math.abs(mesh.position.z - socketZ - .23) < .2) numeral = mesh
+      if (mesh instanceof THREE.Mesh && mesh.userData.text === sourceYear && Math.abs(mesh.position.z - socketZ) < .8) numeral = mesh
     })
     expect(numeral, language + ': selected source numeral is absent at ' + section.station)
     if (!numeral) continue
@@ -219,7 +222,7 @@ for (const language of ['en', 'de']) {
         if (!corners.every(corner => positions.getX(corner) >= .305 && positions.getY(corner) > 0 && normals.getY(corner) > .9)) continue
         for (const [row, stud] of collectionLineStuds.entries()) {
           const centreZ = LINE_ORIGIN.north - stud.north
-          if (corners.every(corner => positions.getZ(corner) >= centreZ - .05 && positions.getZ(corner) <= centreZ + .75)) yearFaces[row]++
+          if (corners.every(corner => positions.getZ(corner) >= centreZ - .8 && positions.getZ(corner) <= centreZ + .8)) yearFaces[row]++
         }
       }
     }

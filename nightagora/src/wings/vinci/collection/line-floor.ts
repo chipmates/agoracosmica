@@ -212,12 +212,12 @@ export function createCollectionLineFloor(materials: LineMaterials, language: 'e
           }
         }
         // All four dates are copied whole. Each row starts beside its socket
-        // and reaches beyond the centre slab into the next course.
+        // and reaches across the courses east of it.
         const socketStone = material === materials.stone
         const socketDetail = material === materials.bronze || material === materials.year || material === materials.ink
           || material.userData['owned'] === true
         if (!socketStone && !socketDetail) continue
-        const right = socketStone ? .801 : 2.0
+        const right = socketStone ? .801 : 3.6
         if (!vertices.every(vertex => vertex[0]! >= -.801 && vertex[0]! <= right
           && vertex[2]! >= -3 * STUD_SPACING - .82 && vertex[2]! <= .82)) continue
         // The visitor reads from the south end, and the excerpt already runs

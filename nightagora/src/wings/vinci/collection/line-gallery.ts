@@ -25,7 +25,7 @@ import { RectAreaLightTexturesLib } from 'three/addons/lights/RectAreaLightTextu
 import type { Stack } from '../../../stack'
 import type { MaterialSet } from '../../../stack/materials'
 import { kelvinToColour } from '../../../stack/light'
-import { axisFootprint, lineCoverage } from '../../../stack/detail'
+import { anisotropicFootprint, axisFootprint, fractalField, lineCoverage, resolved } from '../../../stack/detail'
 import type { LineMaterials } from '../line'
 import { COLLECTION_PAVING_ORIGIN, LINE_ORIGIN, LINE_SLAB } from './layout'
 import {
@@ -44,6 +44,8 @@ const {
 
 /** The sets the gallery is dressed from, all CC0 and already in the store. */
 const SETS = ['concrete-wall-formed', 'concrete-floor-polished', 'oak-veneer-light', 'limestone-pale'] as const
+/** The limestone photograph's own tile: one repeat is 1.2 m of stone. */
+const STONE_TILE = 1.2
 /** The building's floor bays: two museum stones each way, as in the hall. */
 const BAY = { east: 3.2, north: 3.3 } as const
 
@@ -69,12 +71,17 @@ function looks() {
   return {
     stoneTint: uniform(new Color(.84, .87, .94)),
     /** how much of the photograph's own banding the honed face keeps */
-    stoneBand: uniform(.45),
+    stoneBand: uniform(.15),
     stoneRough: uniform(.46),
     /** how far the walk along the dates has polished its band */
     stoneWalk: uniform(.08),
     stoneTone: uniform(.16),
-    stoneNormal: uniform(.3),
+    stoneNormal: uniform(.22),
+    /** the limestone's own body: its clouds, its grain and its shell */
+    stoneCloud: uniform(.13),
+    stoneGrain: uniform(.2),
+    stoneFleck: uniform(.28),
+    fleckTint: uniform(new Color(.93, .95, 1.02)),
     groutColour: uniform(new Color('#5f574c')),
     bronzeColour: uniform(new Color(.26, .2, .13)),
     bronzeRough: uniform(.26),
@@ -182,11 +189,36 @@ function oakMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial {
   return m
 }
 
+/** A PIECE OF SHELL IN THE STONE, one to a cell at most: `f` is the place in
+ * the cell's own units, centred. Returns how much of the pixel the piece
+ * covers, already faded to its own area mean where the pixel is wider than
+ * the piece, so a floor of flecks settles on a tone instead of crawling. */
+function fleck(f: N, id: N, salt: number, share: number, long: [number, number], slender: [number, number], cellM: number, fp: N): N {
+  const h = (k: number): N => hash(id.x, id.y, salt + k * 1.37)
+  const at = f.sub(vec2(h(1), h(2)).sub(.5).mul(.24))
+  const turn = h(3).mul(Math.PI * 2), c = turn.cos(), s = turn.sin()
+  const length = mix(float(long[0]), float(long[1]), h(4).mul(h(4))), width = length.mul(mix(float(slender[0]), float(slender[1]), h(5)))
+  // a shard, not a grain of rice: bowed like the shell it broke from and
+  // drawn to points, so the outline is a curve with two tips
+  const along = at.x.mul(c).add(at.y.mul(s))
+  const bow = h(7).sub(.5).mul(1.6).mul(along.mul(along)).div(length)
+  const q = vec2(along, at.y.mul(c).sub(at.x.mul(s)).add(bow)).div(vec2(length, width)).abs()
+  const reach = q.x.pow(1.35).add(q.y.pow(1.35)).pow(1 / 1.35)
+  const edge = fp.div(cellM).div(width).add(.04)
+  const drawn = smoothstep(float(1).add(edge), float(1).sub(edge), reach).mul(select(h(6).lessThan(share), float(1), float(0)))
+  const mean = float(share * 3.1).mul(length).mul(width)
+  return mix(mean, drawn, resolved(width.mul(cellM * 2), fp))
+}
+
 /** THE LINE'S LIMESTONE. Each slab of the field is read from its own piece
- * of the photograph, turned end for end on half of them, with its bedding
- * laid along the walk; a slab carries its own tone, and the stone is honed,
- * so it takes the window's light as a soft sheen and never as a mirror. */
-function limestoneMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial {
+ * of the photograph at the photograph's own scale, turned end for end on
+ * half of them, with its bedding laid along the walk and only a trace of its
+ * banding kept; a slab carries its own tone, and the stone is honed, so it
+ * takes the window's light as a soft sheen and never as a mirror. What makes
+ * it limestone and not a veneer is procedural and fades under its own pixel:
+ * soft clouds a hand across, a sand-fine grain, and the shell it was laid
+ * down from, small fragments dark and pale and the odd larger section. */
+function limestoneMaterial(set: MaterialSet, L: Looks, fine: boolean): MeshStandardNodeMaterial {
   const m = new MeshStandardNodeMaterial({ roughness: .46, metalness: 0 })
   const P = positionWorld, n = normalWorldGeometry
   const east = P.x, north = P.z.negate()
@@ -198,7 +230,7 @@ function limestoneMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial
   const level = abs(n.y).greaterThan(.5)
   const across = select(abs(n.x).greaterThan(abs(n.z)), north, east)
   const uv = select(level, vec2(north, east.negate()), vec2(across, P.y)).mul(turn).add(vec2(h1, h2).mul(17.3))
-  const sample = set.sample({ uv, metres: LINE_SLAB.pitchEast })
+  const sample = set.sample({ uv, metres: STONE_TILE })
   const tone = float(1).add(h1.sub(.5).mul(L.stoneTone)).add(h2.sub(.5).mul(L.stoneTone.mul(.5)))
   // the honed face keeps part of the bedding: the photograph's own ratio to
   // its mean is laid back toward that mean
@@ -211,10 +243,36 @@ function limestoneMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial
   const fromLine = abs(east.sub(DATE_MIDDLE_EAST - .25)), band = smoothstep(1.35, .55, fromLine)
   const edge = smoothstep(.45, 1.1, fromLine).mul(smoothstep(1.7, 1.15, fromLine))
   const walked = float(1).sub(edge.mul(L.stoneWalk.mul(.35))).add(band.mul(L.stoneWalk.mul(.12)))
-  m.colorNode = sample.colour.mul(calmed).mul(L.stoneTint).mul(tone).mul(walked).mul(float(1).sub(inJoint))
-  // honed: the photograph's own veins a touch rougher than the ground
+  let body: N = float(1), shell: N = float(0)
+  if (fine) {
+    // each slab its own stretch of the bed: the fields are read from the
+    // slab's own offset so neighbours never share a cloud or a shell
+    const at = vec2(east.sub(LINE_ORIGIN.east), north.sub(LINE_ORIGIN.north)).add(vec2(h2, h3).mul(23.1))
+    const fp = anisotropicFootprint(P)
+    const clouds = fractalField(vec3(at.x.div(.34), at.y.div(.52), h1.mul(5)), .34, fp, 3)
+    const mottle = fractalField(vec3(at.x.div(.07), at.y.div(.09), 6.1), .07, fp, 2)
+    const grain = fractalField(vec3(at.x.div(.004), at.y.div(.004), 2.7), .004, fp, 2)
+    body = float(1).add(clouds.mul(L.stoneCloud)).add(mottle.mul(L.stoneCloud.mul(.5))).add(grain.mul(L.stoneGrain))
+    // the shell: specks of a millimetre or two, fragments up to a centimetre
+    // dark and pale, pieces up to two, and the odd section of a larger shell
+    const layer = (cellM: number, offset: number, salt: number, share: number, long: [number, number], slender: [number, number]): N => {
+      const u = at.div(cellM).add(offset)
+      return fleck(fract(u).sub(.5), floorOf(u), salt, share, long, slender, cellM, fp)
+    }
+    const speck = layer(.012, 0, 1.1, .45, [.14, .34], [.5, .9])
+    const dark = layer(.03, .5, 3.3, .34, [.1, .34], [.35, .7])
+    const pale = layer(.03, 0, 5.3, .2, [.1, .3], [.4, .8])
+    const piece = layer(.1, .75, 7.1, .22, [.08, .22], [.3, .65])
+    const section = layer(.3, .25, 9.7, .07, [.1, .25], [.08, .16])
+    shell = speck.mul(.8).add(dark).add(piece.mul(.9)).add(section.mul(.6)).mul(L.stoneFleck).sub(pale.mul(L.stoneFleck.mul(.5)))
+  }
+  const fossil = float(1).sub(shell)
+  m.colorNode = sample.colour.mul(calmed).mul(L.stoneTint).mul(tone).mul(walked).mul(body).mul(fossil)
+    .mul(mix(vec3(1, 1, 1), L.fleckTint, shell.clamp(0, 1).mul(2).min(1))).mul(float(1).sub(inJoint))
+  // honed: the photograph's own veins a touch rougher than the ground, and a
+  // shell fragment a touch glossier than the lime it sits in
   const vein = float(1).sub(sample.albedo.g).clamp(-.3, .3)
-  m.roughnessNode = L.stoneRough.add(h2.sub(.5).mul(.06)).add(vein.mul(.12)).sub(band.mul(L.stoneWalk)).clamp(.2, .9)
+  m.roughnessNode = L.stoneRough.add(h2.sub(.5).mul(.06)).add(vein.mul(.12)).sub(band.mul(L.stoneWalk)).sub(shell.abs().mul(.25)).clamp(.2, .9)
   const t = vec3(0, 0, -1).mul(turn), b = vec3(-1, 0, 0).mul(turn)
   m.normalNode = select(level, bend(t, b, n, sample.normal, L.stoneNormal), n.transformDirection(cameraViewMatrix))
   m.name = 'vinci/collection-line-gallery/limestone'
@@ -400,7 +458,7 @@ export function mountLineGallery(stack: Stack): LineGallery {
   const floor = floorMaterial(floorSet!, L)
   const dark = darkMaterial(floorSet!, L)
   const oak = oakMaterial(oakSet!, L)
-  const limestone = limestoneMaterial(stoneSet!, L)
+  const limestone = limestoneMaterial(stoneSet!, L, !calm)
   const { grout, bronze, year, ink } = lineSurfaces(L)
   adopt(concrete, roomLights)
   for (const m of [floor, dark, oak]) adopt(m, floorLights)

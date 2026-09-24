@@ -1,7 +1,8 @@
 import { BoxGeometry, Float32BufferAttribute, CylinderGeometry, LatheGeometry, Vector2, ExtrudeGeometry, Group, Mesh, MeshStandardNodeMaterial, Path, Shape, type Material } from 'three/webgpu'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
 import timeline from './data/timeline.json'
-import { createText } from '../words'
+import { createText, lineAdvance } from '../words'
+import { font } from '../words/font'
 
 export type Stud = (typeof timeline.studs)[number]
 export type Certainty = Stud['certainty']
@@ -21,11 +22,18 @@ export interface LineMaterials {
   year?:Material
 }
 /** How a date's lettering lies beside its socket. `stacked`: the word north
- * of the socket, the year and any event south of it. `row`: the year where
- * `stacked` cuts it, its word and any event beside it on the year's own row,
- * so a date read far down a floor stays one line of lettering with open stone
- * before the next. */
+ * of the socket, the year and any event south of it. `row`: one row centred
+ * on the socket, the year then its word and any event beside it, cut long
+ * along the walk as a road's markings are, so a date read from far down the
+ * floor keeps its shape at a grazing eye and open stone before the next. */
 export type LineLettering = 'stacked' | 'row'
+/** A row's measures in metres. `depth` is the year's length along the walk
+ * and `pairDepth` a word and event's together; `wordRise` and `pairRise` are
+ * a word's cap along the walk; the sizes are caps across it, and a word
+ * narrows so its row ends within `reach` of the socket, the phone's frame. */
+export const ROW_LETTERING = { depth: 1.08, pairDepth: 1.2, pairGap: .07, year: .36, selected: .40, word: .24, paired: .15, gap: .14, reach: 2.8, wordRise: .8, pairRise: .47, bold: .05 } as const
+/** a single line's rise over its baseline, in metres, at its cap height */
+function ascent(text:string,size:number):number{let top=0;for(const shape of font.generateShapes(text,size))for(const p of shape.getPoints(2))top=Math.max(top,p.y);return top}
 
 /** Merge only static meshes. Keep an honest noweld comparison for the bench. */
 export function weld(group:Group):void {
@@ -129,22 +137,40 @@ export function createLine(materials:LineMaterials, selected=0, language:'en'|'d
     // numeral runs from 0.5 mm under it to 2 mm over: it crosses the floor
     // surface and takes the room's light as metal does, with no gap beneath.
     // The words beside it stay painted, 1.6 mm proud.
-    const year=createText(stud.date.slice(0,4),{embedded:true,size:n===selected?.38:phone?.27:.23,depth:.005,maxWidth:1.4,material:materials.year??materials.bronze})
-    const word=createText(language==='en'?stud.certainty:fact.de,{embedded:true,size:phone?.115:.087,depth:.0038,maxWidth:1.5,material:materials.ink})
-    const event=cue?createText(cue,{embedded:true,size:phone?.115:.095,depth:.0038,maxWidth:1.48,material:materials.ink}):undefined
+    const row=lettering==='row',R=ROW_LETTERING,yearText=stud.date.slice(0,4),wordText=language==='en'?stud.certainty:fact.de
+    // a row's year keeps its size; its word and event narrow to the row's reach
+    const yearSize=row?(n===selected?R.selected:R.year):n===selected?.38:phone?.27:.23
+    const beside=.31+lineAdvance(yearText,yearSize)+R.gap
+    const fit=(text:string,size:number)=>Math.min(size,size*(R.reach-beside)/lineAdvance(text,size))
+    const year=createText(yearText,{embedded:true,size:yearSize,depth:.005,maxWidth:row?3:1.4,material:materials.year??materials.bronze})
+    const word=row?createText(wordText,{embedded:true,size:fit(wordText,cue?R.paired:R.word),depth:.0038,material:materials.ink})
+      :createText(wordText,{embedded:true,size:phone?.115:.087,depth:.0038,maxWidth:1.5,material:materials.ink})
+    const event=!cue?undefined:row?createText(cue,{embedded:true,size:fit(cue,R.paired),depth:.0038,material:materials.ink})
+      :createText(cue,{embedded:true,size:phone?.115:.095,depth:.0038,maxWidth:1.48,material:materials.ink})
     // A text's anchor is its top-left corner, and it runs south from there.
-    if(lettering==='row'){
-      const top=z+.23,beside=.31+year.width+.1
-      year.mesh.position.set(.31,.0005,top)
-      // the word shares the year's foot; with an event, the word its head
-      word.mesh.position.set(beside,.0010,event?top:top+year.height-word.height)
-      event?.mesh.position.set(beside,.0010,top+year.height-event.height)
+    if(row){
+      // the year fills the row's depth; a lone word stands on its baseline,
+      // a word and its event share the row as two lines
+      const top=z-R.depth/2,stretch=R.depth/year.height,baseline=top+ascent(yearText,year.size)*stretch,x=.31+year.width+R.gap
+      year.mesh.scale.y=stretch;year.mesh.position.set(.31,.0005,top)
+      if(event){
+        const rise=Math.min(R.pairRise,R.pairRise*(R.pairDepth-R.pairGap)/(word.height*R.pairRise/word.size+event.height*R.pairRise/event.size))
+        word.mesh.scale.y=rise/word.size;event.mesh.scale.y=rise/event.size
+        word.mesh.position.set(x,.0010,z-R.pairDepth/2)
+        event.mesh.position.set(x,.0010,z+R.pairDepth/2-event.height*event.mesh.scale.y)
+      }else{
+        word.mesh.scale.y=R.wordRise/word.size
+        word.mesh.position.set(x,.0010,baseline-ascent(wordText,word.size)*word.mesh.scale.y)
+      }
     }else{
       year.mesh.position.set(.31,.0005,z+(cue?.08:.23))
       word.mesh.position.set(.33,.0010,z-.22)
       event?.mesh.position.set(.33,.0010,z+.60)
     }
     for(const text of [year,word,event])if(text){text.mesh.rotation.x=-Math.PI/2;group.add(text.mesh)}
+    // a grazing eye loses the strokes that run across the walk first: a row
+    // cuts each text twice, the second a little south, so those strokes hold
+    if(row)for(const text of [year,word,event])if(text){const bold=text.mesh.clone();bold.position.z+=text===year?R.bold:R.bold*.5;group.add(bold)}
     box(.021,.008,1.635,-.3,.002,z,materials.bronze)
     if(n===selected){box(.022,.009,1.50,-.62,.002,z,materials.bronze);box(.95,.009,.016,-.16,.002,z+.64,materials.bronze);box(.95,.009,.016,-.16,.002,z-.64,materials.bronze)}
   }

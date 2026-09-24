@@ -39,6 +39,9 @@ async function load(file) {
   return exports
 }
 
+// The collection's modules import one another in a ring; the app enters it
+// at the room materials, so every constant read at load is set by then.
+await load(path.join(HERE, 'materials.ts'))
 const plan = await load(path.join(HERE, 'line-gallery-plan.ts'))
 const certificate = JSON.parse(fs.readFileSync(path.join(HERE, '../data/rail-clearance.json'), 'utf8'))
 /** a hair over the saved envelope, so a box that only grazes it is refused */
