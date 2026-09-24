@@ -266,7 +266,7 @@ async function run(engine, width, lang) {
       if (near) record.arrival = await burst(page, dir, '04b-arrival', 12, box)
     }
     await waitState(page, 'rest', 60000)
-    await page.waitForTimeout(900)
+    await page.waitForTimeout(2000)
     shots.push(await shot(page, dir, '05-rest-west'))
     if (WALK === 'short') return record
     // a work on the wall, walked to and back
@@ -294,7 +294,7 @@ async function run(engine, width, lang) {
       await press(page, gold)
       await waitState(page, 'walk', 20000)
       await waitState(page, 'rest', 60000)
-      await page.waitForTimeout(900)
+      await page.waitForTimeout(2000)
     }
     shots.push(await shot(page, dir, '08-rest-flight'))
     // the machine: walked up to, its live island, its folio
@@ -326,7 +326,7 @@ async function run(engine, width, lang) {
     await page.waitForTimeout(700)
     shots.push(await shot(page, dir, '12-dip'))
     await waitState(page, 'rest', 30000)
-    await page.waitForTimeout(900)
+    await page.waitForTimeout(2000)
     shots.push(await shot(page, dir, '13-after-dip'))
   } catch (err) {
     record.failed = String(err.message ?? err).slice(0, 300)

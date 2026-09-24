@@ -563,6 +563,10 @@ export function createWing(): WingModule {
     desk?.paint()
     const back = hosts?.stage.querySelector<HTMLButtonElement>('.desk-back')
     if (back && backIndex() === null && card > 0) back.disabled = true
+    /* A REPAINT IN MID-LEG writes the way on's resting words; the band rewrites
+       its walking words only on the edge of a walk, so the edge is given back */
+    const on = hosts?.stage.querySelector<HTMLElement>('.desk-on')
+    if (on && picture?.state().kind === 'walk') delete on.dataset['leg']
   }
   function paint(): void {
     refreshCells()
