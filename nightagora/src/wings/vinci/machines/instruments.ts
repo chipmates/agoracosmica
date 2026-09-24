@@ -68,8 +68,16 @@ const ANEMOMETER: WearRule[] = [
 // the plate stands in the weather it measures, and has gone grey in it
 ANEMOMETER.push({ parts: id => id === 'vane' || id === 'vane-roll', cuts: [], tint: () => [.74, .72, .69] })
 
+/** The inclinometer's stand is older, darker oak than new work, so it sits
+ * with the deck it carries rather than against it. */
+const INCLINOMETER: WearRule[] = [
+  ...['support', 'cleat-0', 'cleat-1', 'journal-post--1', 'journal-post-1'].map(id => boardTone(id, .14)),
+  { parts: id => id === 'support' || id.startsWith('cleat-') || id.startsWith('journal-post'), cuts: [], tint: () => [.66, .6, .53] },
+]
+
 export function instrumentWear(slug: string): readonly WearRule[] {
-  return slug === 'camera-obscura' ? CAMERA_OBSCURA : slug === 'anemometer' ? ANEMOMETER : []
+  return slug === 'camera-obscura' ? CAMERA_OBSCURA : slug === 'anemometer' ? ANEMOMETER
+    : slug === 'inclinometer' ? INCLINOMETER : []
 }
 
 /** The compass's fittings, burnished by turning against each other: the

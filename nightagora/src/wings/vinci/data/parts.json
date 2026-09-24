@@ -1117,21 +1117,77 @@
         "en": "Support",
         "de": "Gestell"
       },
+      "cleat-0": {
+        "en": "Cleat",
+        "de": "Querleiste"
+      },
+      "cleat-1": {
+        "en": "Cleat",
+        "de": "Querleiste"
+      },
+      "journal-post--1": {
+        "en": "Bearing post",
+        "de": "Lagerpfosten"
+      },
+      "bearing-plate--1": {
+        "en": "Bearing plate",
+        "de": "Lagerplatte"
+      },
+      "journal-eye--1": {
+        "en": "Bearing eye",
+        "de": "Lageröse"
+      },
+      "journal-post-1": {
+        "en": "Bearing post",
+        "de": "Lagerpfosten"
+      },
+      "bearing-plate-1": {
+        "en": "Bearing plate",
+        "de": "Lagerplatte"
+      },
+      "journal-eye-1": {
+        "en": "Bearing eye",
+        "de": "Lageröse"
+      },
       "deck": {
         "en": "Deck",
         "de": "Deck"
       },
+      "deck-moulding": {
+        "en": "Moulded ring",
+        "de": "Profilring"
+      },
+      "roll-shaft": {
+        "en": "Tilt shaft",
+        "de": "Kippachse"
+      },
+      "shaft-ferrule--1": {
+        "en": "Ferrule",
+        "de": "Zwinge"
+      },
+      "shaft-collar--1": {
+        "en": "Collar",
+        "de": "Stellring"
+      },
+      "shaft-pin--1": {
+        "en": "Pin",
+        "de": "Stift"
+      },
+      "shaft-ferrule-1": {
+        "en": "Ferrule",
+        "de": "Zwinge"
+      },
+      "shaft-collar-1": {
+        "en": "Collar",
+        "de": "Stellring"
+      },
+      "shaft-pin-1": {
+        "en": "Pin",
+        "de": "Stift"
+      },
       "wind-shield": {
         "en": "Glass bell",
         "de": "Glashaube"
-      },
-      "pendulum": {
-        "en": "Plumb thread",
-        "de": "Lotfaden"
-      },
-      "bob": {
-        "en": "Lead weight",
-        "de": "Bleigewicht"
       },
       "ring-1": {
         "en": "Marked circle",
@@ -1149,29 +1205,57 @@
         "en": "Marked circle",
         "de": "Markierungskreis"
       },
-      "roll-shaft": {
-        "en": "Tilt shaft",
-        "de": "Kippachse"
+      "cross-x": {
+        "en": "Ruled line",
+        "de": "Leitlinie"
       },
-      "journal-eye--1": {
-        "en": "Bearing eye",
-        "de": "Lageröse"
-      },
-      "journal-post--1": {
-        "en": "Bearing post",
-        "de": "Lagerpfosten"
-      },
-      "journal-eye-1": {
-        "en": "Bearing eye",
-        "de": "Lageröse"
-      },
-      "journal-post-1": {
-        "en": "Bearing post",
-        "de": "Lagerpfosten"
+      "cross-z": {
+        "en": "Ruled line",
+        "de": "Leitlinie"
       },
       "thread-suspension": {
         "en": "Thread hook",
         "de": "Fadenaufhängung"
+      },
+      "pendulum": {
+        "en": "Plumb thread",
+        "de": "Lotfaden"
+      },
+      "bob": {
+        "en": "Lead weight",
+        "de": "Bleigewicht"
+      },
+      "bearing-nail--1-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bearing-nail--1-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bearing-nail--1-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bearing-nail--1-3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bearing-nail-1-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bearing-nail-1-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bearing-nail-1-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bearing-nail-1-3": {
+        "en": "Nail",
+        "de": "Nagel"
       }
     },
     "multi-barrel-gun": {
