@@ -105,6 +105,7 @@ for (const clip of summary.clips) {
 /* ---- the stills, at every rung of their framing ---- */
 const nodes = {}
 const stillRecords = []
+const duplicates = [], rawOf = new Map()
 for (const still of summary.stills) {
   const meta = nodeMeta.get(still.node)
   if (!meta) throw new Error(`${still.node}: not a node of the graph at this tree`)
@@ -115,6 +116,9 @@ for (const still of summary.stills) {
     ...(meta.wall ? { wall: meta.wall, vertex: meta.vertex } : {}),
     stills: {}, print: {}, marks: {},
   }
+  // A NODE HAS ONE PICTURE: where two runs rendered it, the first run's stands, the one most clips were rendered against
+  if (n.stills[still.framing]) { duplicates.push(`${still.node} ${still.framing}: ${still.raw === rawOf.get(`${still.node} ${still.framing}`) ? 'the same bytes' : 'kept the first run'}`); continue }
+  rawOf.set(`${still.node} ${still.framing}`, still.raw)
   n.stills[still.framing] = {}
   for (const [w, h] of RUNGS[still.framing]) {
     const buf = await sharp(master).resize(w, h, { fit: 'fill', kernel: 'lanczos3' })
@@ -159,7 +163,7 @@ const release = {
 writeFileSync(join(OUT, 'film.json'), JSON.stringify(release))
 writeFileSync(join(OUT, 'pack.json'), JSON.stringify({
   format: 'vinci-film-pack-v1', exports: EXPORTS, exportHeads: summary.heads, marks: MARKS, quality: QUALITY,
-  sharp: sharp.versions, refusals, projection, retagged,
+  sharp: sharp.versions, refusals, projection, retagged, duplicates,
   clips: [...edges.values()].map((e) => ({ id: e.id, framings: Object.fromEntries(Object.entries(e.framings).map(([f, x]) => [f, { frames: x.frames, joins: x.joins, mountedSetChanges: x.mountedSetChanges, pendingAtRest: x.pendingAtRest, bytes: Object.fromEntries(Object.entries(x.files).map(([r, v]) => [r, v.bytes])) }])) })),
   stills: stillRecords,
 }, null, 1))
