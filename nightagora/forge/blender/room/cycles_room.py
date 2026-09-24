@@ -158,6 +158,130 @@ def _saw_cuts(nt, pos, bays, x, y):
     return cut
 
 
+def _image_data(nt, tex_dir, file, x, y, extension):
+    """a baked data map: no colour space, its four channels independent"""
+    n = _image(nt, tex_dir, file, False, x, y)
+    n.extension = extension
+    n.image.alpha_mode = "CHANNEL_PACKED"
+    return n
+
+
+def _mix_colour(nt, factor, a, b, x, y):
+    n = nt.nodes.new("ShaderNodeMix")
+    n.data_type = "RGBA"
+    n.blend_type = "MIX"
+    n.location = (x, y)
+    for sock, v in (("Factor", factor), ("A", a), ("B", b)):
+        if isinstance(v, (int, float)):
+            n.inputs[sock].default_value = v
+        elif isinstance(v, (list, tuple)):
+            n.inputs[sock].default_value = (*v[:3], 1.0)
+        else:
+            nt.links.new(v, n.inputs[sock])
+    return n.outputs["Result"]
+
+
+def _smooth(nt, value, lo, hi, x, y):
+    n = nt.nodes.new("ShaderNodeMapRange")
+    n.interpolation_type = "SMOOTHSTEP"
+    n.location = (x, y)
+    n.inputs["From Min"].default_value = lo
+    n.inputs["From Max"].default_value = hi
+    nt.links.new(value, n.inputs["Value"])
+    return n.outputs["Result"]
+
+
+def _floor(nt, recipe, tex_dir, pos, photo, bsdf):
+    """the hall floor's graph, as hall-fabric.ts's floorMaterial combines it:
+    the photograph (already tinted) x the baked map's tone x the tile's
+    aggregate; scuffs and scratches where the sealer is worn; the dust film;
+    the saw cuts, their chipped arrises and their silt. Returns the colour,
+    the roughness and the share of the reflection the dust and cuts hold back."""
+    f = recipe["floor"]
+    F, B, M, T, files = f["finish"], f["bay"], f["map"], f["tile"], f["files"]
+    sep = _node(nt, "ShaderNodeSeparateXYZ", -2400, -1200)
+    nt.links.new(pos, sep.inputs[0])
+    east, north = sep.outputs[0], sep.outputs[1]
+    u = _math(nt, "DIVIDE", _math(nt, "SUBTRACT", east, M["west"], -2200, -1100), M["east"] - M["west"], -2050, -1100)
+    v = _math(nt, "DIVIDE", _math(nt, "SUBTRACT", north, M["south"], -2200, -1250), M["north"] - M["south"], -2050, -1250)
+    at = _node(nt, "ShaderNodeCombineXYZ", -1900, -1150)
+    nt.links.new(u, at.inputs[0])
+    nt.links.new(v, at.inputs[1])
+    fin = _image_data(nt, tex_dir, files["finish"]["file"], -1700, -1150, "EXTEND")
+    nt.links.new(at.outputs[0], fin.inputs["Vector"])
+    fs = _node(nt, "ShaderNodeSeparateColor", -1450, -1150)
+    nt.links.new(fin.outputs["Color"], fs.inputs[0])
+    tone, rough_map, dust_map = _math(nt, "ADD", fs.outputs[0], 0.5, -1250, -1050), fs.outputs[1], fs.outputs[2]
+    # each bay its own quarter turn and shift of the tile
+    e0 = _math(nt, "SUBTRACT", east, B["originEast"], -2200, -1500)
+    n0 = _math(nt, "SUBTRACT", north, B["originNorth"], -2200, -1650)
+    cell = _node(nt, "ShaderNodeCombineXYZ", -1900, -1550)
+    nt.links.new(_math(nt, "FLOOR", _math(nt, "DIVIDE", e0, B["east"], -2050, -1500), None, -1950, -1500), cell.inputs[0])
+    nt.links.new(_math(nt, "FLOOR", _math(nt, "DIVIDE", n0, B["north"], -2050, -1650), None, -1950, -1650), cell.inputs[1])
+    rnd = nt.nodes.new("ShaderNodeTexWhiteNoise")
+    rnd.noise_dimensions = "3D"
+    rnd.location = (-1750, -1550)
+    nt.links.new(cell.outputs[0], rnd.inputs["Vector"])
+    quarter = _math(nt, "FLOOR", _math(nt, "MULTIPLY", rnd.outputs["Value"], 4.0, -1550, -1500), None, -1400, -1500)
+    flat = _node(nt, "ShaderNodeCombineXYZ", -1750, -1750)
+    nt.links.new(east, flat.inputs[0])
+    nt.links.new(north, flat.inputs[1])
+    rot = nt.nodes.new("ShaderNodeVectorRotate")
+    rot.rotation_type = "Z_AXIS"
+    rot.location = (-1250, -1650)
+    nt.links.new(flat.outputs[0], rot.inputs["Vector"])
+    nt.links.new(_math(nt, "MULTIPLY", quarter, math.pi / 2, -1250, -1500), rot.inputs["Angle"])
+    shift = nt.nodes.new("ShaderNodeVectorMath")
+    shift.operation = "MULTIPLY_ADD"
+    shift.location = (-1050, -1650)
+    nt.links.new(rnd.outputs["Color"], shift.inputs[0])
+    shift.inputs[1].default_value = (7.1, 7.1, 0.0)
+    nt.links.new(rot.outputs["Vector"], shift.inputs[2])
+    scale = nt.nodes.new("ShaderNodeVectorMath")
+    scale.operation = "SCALE"
+    scale.location = (-900, -1650)
+    nt.links.new(shift.outputs["Vector"], scale.inputs[0])
+    scale.inputs["Scale"].default_value = 1.0 / T["metres"]
+    tile = _image_data(nt, tex_dir, files["tile"]["file"], -700, -1650, "REPEAT")
+    nt.links.new(scale.outputs["Vector"], tile.inputs["Vector"])
+    ts = _node(nt, "ShaderNodeSeparateColor", -450, -1650)
+    nt.links.new(tile.outputs["Color"], ts.inputs[0])
+    grain = _math(nt, "MULTIPLY", ts.outputs[0], 2.0, -250, -1600)
+    # the photograph, the pour's tone and the aggregate
+    colour = _mul_colour(nt, photo, _scalar_to_colour(nt, tone, -1050, -1000), -850, -900)
+    agg = _math(nt, "ADD", 1.0, _math(nt, "MULTIPLY", _math(nt, "SUBTRACT", grain, 1.0, -100, -1600), F["aggregate"], 50, -1600), 200, -1600)
+    colour = _mul_colour(nt, colour, _scalar_to_colour(nt, agg, 350, -1500), 500, -1000)
+    worn = _smooth(nt, rough_map, F["worn"][0], F["worn"][1], -1250, -1300)
+    scuff = _math(nt, "SUBTRACT", 1.0, _math(nt, "MULTIPLY", _math(nt, "MULTIPLY", ts.outputs[2], worn, -250, -1750), 0.5, -100, -1750), 50, -1750)
+    colour = _mul_colour(nt, colour, _scalar_to_colour(nt, scuff, 200, -1750), 650, -1100)
+    rough = _math(nt, "ADD", rough_map, _math(nt, "MULTIPLY", _math(nt, "SUBTRACT", ts.outputs[1], 0.5, -250, -1900), 0.6, -100, -1900), 50, -1900)
+    haze = _math(nt, "MULTIPLY", tile.outputs["Alpha"], worn, -250, -2050)
+    colour = _mul_colour(nt, colour, _scalar_to_colour(nt, _math(nt, "ADD", 1.0, _math(nt, "MULTIPLY", haze, 0.12, -100, -2150), 50, -2150), 200, -2150), 700, -1200)
+    rough = _math(nt, "ADD", rough, _math(nt, "MULTIPLY", haze, 0.28, -100, -2050), 200, -1950)
+    # the saw cuts: distance to each axis' nearest cut
+    def to_cut(c, period, y):
+        fr = _math(nt, "FRACT", _math(nt, "DIVIDE", c, period, -2050, y), None, -1900, y)
+        return _math(nt, "MULTIPLY", _math(nt, "MINIMUM", fr, _math(nt, "SUBTRACT", 1.0, fr, -1750, y - 60), -1600, y), period, -1450, y)
+    d_e, d_n = to_cut(e0, B["east"], -2300), to_cut(n0, B["north"], -2450)
+    d_min = _math(nt, "MINIMUM", d_e, d_n, -1300, -2350)
+    joint = _math(nt, "LESS_THAN", d_min, B["cutHalf"], -1150, -2300)
+    stone = _smooth(nt, _math(nt, "ABSOLUTE", _math(nt, "SUBTRACT", grain, 1.0, -100, -2200), None, 50, -2200), 0.1, 0.3, 200, -2200)
+    chip = _math(nt, "MULTIPLY", _math(nt, "LESS_THAN", d_min, B["chipHalf"], -1150, -2450), stone, 350, -2400)
+    dust = _math(nt, "MULTIPLY", dust_map, _smooth(nt, d_min, 0.018, 0.034, -1150, -2600), -950, -2550)
+    dust = _math(nt, "MULTIPLY", dust, _math(nt, "ADD", 1.0, _math(nt, "MULTIPLY", _math(nt, "SUBTRACT", grain, 1.0, 400, -2600), 0.8, 550, -2600), 700, -2600), 850, -2550, clamp=True)
+    dust = _math(nt, "MULTIPLY", dust, F["dustCover"], 1000, -2550)
+    colour = _mix_colour(nt, dust, colour, F["dust"], 800, -1100)
+    rough = _math(nt, "ADD", _math(nt, "MULTIPLY", rough, _math(nt, "SUBTRACT", 1.0, dust, 1100, -2000), 1250, -1950), _math(nt, "MULTIPLY", dust, F["dustRough"], 1100, -2100), 1400, -1950)
+    colour = _mul_colour(nt, colour, _scalar_to_colour(nt, _math(nt, "ADD", 1.0, _math(nt, "MULTIPLY", chip, F["chip"], 500, -2450), 650, -2450), 800, -2450), 950, -1150)
+    rough = _math(nt, "MAXIMUM", rough, _math(nt, "MULTIPLY", chip, 0.5, 500, -2550), 1550, -1950)
+    cut_colour = _mix_colour(nt, dust_map, _mul_colour(nt, colour, [F["cutDark"]] * 3, 1000, -1300), F["dust"], 1150, -1300)
+    colour = _mix_colour(nt, joint, colour, cut_colour, 1300, -1150)
+    rough = _math(nt, "ADD", _math(nt, "MULTIPLY", rough, _math(nt, "SUBTRACT", 1.0, joint, 1550, -2100), 1700, -1950), _math(nt, "MULTIPLY", joint, 0.86, 1550, -2200), 1850, -1950)
+    rough = _math(nt, "MAXIMUM", _math(nt, "MINIMUM", rough, 1.0, 2000, -1950), 0.05, 2150, -1950)
+    held = _math(nt, "MAXIMUM", dust, joint, 1300, -2650)
+    return colour, rough, held
+
+
 def build_material(mat, recipe, tex_dir):
     """A Cycles graph from the export's recipe, replacing the importer's."""
     mat.use_nodes = True
@@ -211,6 +335,21 @@ def build_material(mat, recipe, tex_dir):
         colour = _mul_colour(nt, colour, vt.outputs["Color"], -450, 250)
     tone = recipe.get("tone")
     joint = None
+    if recipe.get("floor"):
+        colour, rough, held = _floor(nt, recipe, tex_dir, pos, colour, bsdf)
+        nt.links.new(colour, bsdf.inputs["Base Color"])
+        nt.links.new(rough, bsdf.inputs["Roughness"])
+        if maps.get("normal") and (recipe.get("normalScale") or 0) > 0:
+            nm_img = _image(nt, tex_dir, maps["normal"], False, -900, -600)
+            nm = _node(nt, "ShaderNodeNormalMap", -500, -600, Strength=recipe["normalScale"])
+            nt.links.new(nm_img.outputs["Color"], nm.inputs["Color"])
+            nt.links.new(nm.outputs["Normal"], bsdf.inputs["Normal"])
+        coat = recipe["coat"]
+        nt.links.new(_math(nt, "MULTIPLY", _math(nt, "SUBTRACT", 1.0, held, 1400, -2700), coat["weight"], 1550, -2700), bsdf.inputs["Coat Weight"])
+        nt.links.new(rough, bsdf.inputs["Coat Roughness"])
+        bsdf.inputs["Coat IOR"].default_value = coat.get("ior", 1.5)
+        nt.links.new(bsdf.outputs[0], out.inputs["Surface"])
+        return
     if tone:
         k = None
         if tone.get("bays"):

@@ -62,6 +62,8 @@ export async function mapsFor(recipe, storeRoot, outDir, cache) {
           const ao = b.ao && S ? S.data[i * S.channels + 1] / 255 : 1
           let c
           if (b.mode === 'photo') c = [r * b.tint[0], g * b.tint[1], bl * b.tint[2]]
+          // the photograph pulled toward its own mean by k, as the hall floor keeps it
+          else if (b.mode === 'photo-soft') c = [r, g, bl].map((v, j) => (M[j] + (v - M[j]) * b.k) * b.tint[j])
           else if (b.mode === 'ratio') c = [b.tint[0] * r / M[0], b.tint[1] * g / M[1], b.tint[2] * bl / M[2]]
           else if (b.mode === 'pitch') {
             // parts.ts: the ratio's luminance over the set mean's own luminance

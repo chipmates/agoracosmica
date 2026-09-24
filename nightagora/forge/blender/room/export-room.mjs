@@ -25,6 +25,7 @@ import { assemble } from './assemble.mjs'
 import { Gltf } from './gltf.mjs'
 import { translateLights } from './lights.mjs'
 import { writeSky } from './sky.mjs'
+import sharp from 'sharp'
 
 const flags = new Map()
 for (const a of process.argv.slice(2)) {
@@ -154,6 +155,40 @@ function certifiedPoses(liveCams) {
   }
 }
 
+/** THE HALL FLOOR'S FINISH, as its source states it: the fabric's numbers and
+ * the bake itself, run here from the same code the page runs, so the map and
+ * the tile Cycles reads are the bytes the engine drew. */
+async function hallFloor() {
+  const { load } = await import('../../../src/wings/vinci/build-in-node.mjs')
+  load('src/wings/vinci/collection.ts')
+  const fabric = load('src/wings/vinci/collection/hall-fabric.ts')
+  const floor = load('src/wings/vinci/collection/hall-floor.ts')
+  const began = Date.now()
+  const side = TIER === 'calm' ? 1024 : 2048
+  const baked = floor.bakeHallFloor(floor.hallFloorPlan(), side)
+  const tile = floor.bakeFloorTile(side)
+  return {
+    set: 'concrete-floor-polished', finish: { ...fabric.FLOOR_FINISH }, bay: { ...floor.HALL_FLOOR_BAY },
+    map: { ...floor.HALL_FLOOR_MAP, side: baked.size }, tile: { metres: floor.HALL_FLOOR_TILE, side },
+    bytes: { finish: baked.finish, tile }, bakeSeconds: (Date.now() - began) / 1000,
+  }
+}
+
+/** The floor's map and tile as PNGs, their rows turned so an image's first
+ * row is its north (Blender reads v up from an image's last row). */
+async function writeFloorMaps(source, dir) {
+  mkdirSync(dir, { recursive: true })
+  const out = {}
+  for (const [name, bytes, side] of [['finish', source.bytes.finish, source.map.side], ['tile', source.bytes.tile, source.tile.side]]) {
+    const flipped = Buffer.alloc(bytes.length)
+    for (let y = 0; y < side; y++) flipped.set(bytes.subarray((side - 1 - y) * side * 4, (side - y) * side * 4), y * side * 4)
+    const file = `hall-floor-${name}.png`
+    await sharp(flipped, { raw: { width: side, height: side, channels: 4 } }).png({ compressionLevel: 6 }).toFile(join(dir, file))
+    out[name] = { file, sha256: sha(bytes) }
+  }
+  return out
+}
+
 async function main() {
   await assertServer(BASE)
   mkdirSync(OUT, { recursive: true })
@@ -201,9 +236,11 @@ async function main() {
   const storeManifest = JSON.parse(readFileSync(join(STORE, 'library', 'manifest.json'), 'utf8'))
   const store = {}
   for (const e of storeManifest.assets ?? storeManifest) if (/^library\/[a-z-]+$/.test(e.id)) store[e.id.slice(8)] = e
-  const recipes = translateMaterials(scan, store, APP_ROOT, MAPS)
+  const floorSource = scan.materials && Object.values(scan.materials).some((m) => m.name === 'vinci/collection-hall-fabric/floor') ? await hallFloor() : null
+  const recipes = translateMaterials(scan, store, APP_ROOT, MAPS, floorSource)
   const cache = new Map(), maps = {}
   for (const r of Object.values(recipes)) maps[r.uuid] = await mapsFor(r, STORE, join(OUT, 'textures'), cache)
+  for (const r of Object.values(recipes)) if (r.floor) r.floor.files = await writeFloorMaps(floorSource, join(OUT, 'textures'))
 
   // THE glTF MATERIALS, one per recipe (and one per role of a split surface)
   const gltf = new Gltf(`nightagora forge/blender/room/export-room.mjs @ ${headHere().slice(0, 8)}`)
@@ -247,7 +284,7 @@ async function main() {
     }
     const lite = { family: r.family, kind: r.kind, variant: r.variant ?? null, set: r.set?.set ?? null, uv: r.uv ?? null, base: r.base ?? null,
       rough: r.rough ?? null, metal: r.metal ?? 0, normalScale: r.normalScale ?? 0, tone: r.tone ?? null, coat: r.coat ?? null, cloth: r.cloth ?? null,
-      opacity: r.opacity ?? null, grazing: r.grazing ?? null, emission: r.emission ?? null,
+      opacity: r.opacity ?? null, grazing: r.grazing ?? null, emission: r.emission ?? null, floor: r.floor ?? null,
       hideFromShadow: r.hideFromShadow ?? false, doubleSided: Boolean(r.doubleSided), vertexColour: r.base?.mode === 'vertex', vertexTone: Boolean(r.vertexTone),
       maps: m ? { albedo: m.albedo?.file ?? null, albedoFactor: m.albedo?.factor ?? null, orm: m.orm?.file ?? null, roughnessFactor: m.roughnessFactor, normal: m.normal?.file ?? null } : null }
     def.extras = { na: lite }

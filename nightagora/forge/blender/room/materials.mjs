@@ -14,6 +14,7 @@ import { join } from 'node:path'
 
 export const SOURCES = [
   'src/wings/vinci/collection/hall-fabric.ts',
+  'src/wings/vinci/collection/hall-floor.ts',
   'src/wings/vinci/collection/hall-light.ts',
   'src/wings/vinci/collection/hall-air.ts',
   'src/wings/vinci/collection/hall-cloth.ts',
@@ -44,7 +45,6 @@ const near = (a, b, tol = 2e-3) => a && b && a.length >= 3 && Math.abs(a[0] - b[
 export const FABRIC_LOOKS = {
   walls: { set: 'concrete-wall-formed', metres: 2.71, tint: [0.92, 0.97, 1.25], rough: [0.62, 0.95], normal: 1, cell: 0, drift: 0.06, bays: false },
   overhead: { set: 'concrete-wall-formed', metres: 2.71, tint: [0.84, 0.88, 1.1], rough: [0.7, 0.98], normal: 0.8, cell: 0, drift: 0.05, shelf: 0.36, bays: false },
-  floor: { set: 'concrete-floor-polished', metres: 3, tint: [0.82, 0.8, 0.77], rough: [0.4, 0.72], normal: 0.6, cell: 0.18, drift: 0.09, bays: true },
   plinths: { set: 'concrete-floor-polished', metres: 1.5, tint: [0.36, 0.35, 0.34], rough: [0.32, 0.62], normal: 0.5, cell: 0, drift: 0.04, bays: false },
   slats: { set: 'oak-veneer-light', metres: 1.83, tint: [0.5, 0.45, 0.4], rough: [0.45, 0.75], normal: 0.7, cell: 0, drift: 0.08, shelf: 0.34, turn: true, bays: false },
   backing: { set: 'concrete-wall-formed', metres: 2.71, tint: [0.1, 0.095, 0.09], rough: [0.85, 1], normal: 0.3, cell: 0, drift: 0.02, bays: false },
@@ -126,9 +126,11 @@ export const ENVELOPE = {
 /**
  * Every scanned material, translated. `store` is the library manifest's
  * records by set name; MAPS `engine` lays the maps the engine really sampled,
- * `full` every map the store holds. Returns recipes by material uuid.
+ * `full` every map the store holds; `floor` is the hall floor's finish as its
+ * source states it (hall-fabric.ts FLOOR_FINISH, hall-floor.ts's map, tile and
+ * bays), read by the export. Returns recipes by material uuid.
  */
-export function translateMaterials(scan, store, appRoot, MAPS = 'engine') {
+export function translateMaterials(scan, store, appRoot, MAPS = 'engine', floor = null) {
   const strengths = recipeNormalStrengths(appRoot)
   const recipes = {}
   const setInfo = (name) => {
@@ -174,7 +176,25 @@ export function translateMaterials(scan, store, appRoot, MAPS = 'engine') {
     const r = { uuid: m.uuid, name, doubleSided: m.side === 2, translated: [], lost: [] }
     const fabric = /^vinci\/collection-hall-fabric\/(.+)$/.exec(name)
     const machine = /^([a-z-]+):([^:]+):([a-z-]+)(:thin)?$/.exec(name)
-    if (fabric) {
+    if (fabric && fabric[1] === 'floor') {
+      if (!floor) throw new Error('the hall floor is in the room but its finish was not read')
+      const s = setInfo(floor.set)
+      const F = floor.finish
+      Object.assign(r, {
+        family: 'fabric', kind: 'pbr', set: s,
+        uv: { mode: 'world-floor-bays', metres: [F.metres, F.metres], turn: s.turn, swap: false },
+        base: { mode: 'photo-soft', k: F.photo, tint: F.tint.map((v, i) => v * s.tint[i]), ao: false },
+        rough: { mode: 'floor' }, metal: 0, normalScale: F.normal,
+        tone: { cell: 0, drift: 0, bays: { ...FLOOR_BAYS, east: floor.bay.east, north: floor.bay.north, originEast: floor.bay.originEast, originNorth: floor.bay.originNorth } },
+        coat: { weight: F.reflection, roughness: .2, ior: 1.5, perTexel: true },
+        floor: { finish: F, bay: floor.bay, map: floor.map, tile: floor.tile, files: null },
+      })
+      r.translated.push('the photograph at the engine\'s own world projection and tile, each bay its own read of it; the finish\'s tint and normal strength')
+      r.translated.push('the baked finish map over the hall (the pour\'s tone, the sealer\'s roughness with its trowel arcs and wear, the dust and the silt in the cuts) and the baked tile (the cut aggregate, heel scuffs, hairline scratches), each read at the engine\'s own world projection; the saw cuts, their chipped arrises and their silt as world-position lines, combined as the floor\'s graph combines them')
+      r.lost.push('the planar reflection (a blurred mirror pass added as emission, capped at 1.2, held back by dust and the cuts): replaced by a clear coat at the finish\'s reflection weight, the same hold, and the floor\'s own roughness, so Cycles reflects the room for real')
+      r.lost.push('the finish map\'s contact channel and the clerestory past its shelf (engine stand-ins for occlusion): Cycles occludes for real')
+      r.lost.push('the tile\'s per-bay quarter turn and shift use Blender\'s own random per bay, so a bay reads another part of the same tile')
+    } else if (fabric) {
       const look = FABRIC_LOOKS[fabric[1]]
       if (!look) throw new Error(`no look for ${name}`)
       const s = setInfo(look.set)
