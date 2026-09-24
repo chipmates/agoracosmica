@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed to a pale grey at 30 per cent. Assumed weather, no observation claimed.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "17d2fb862f96c9fdc6ec41ee918613069886cd366fa676a4c27dd1d7e8e3d75f",
+      "sha256": "0b4cd43212646eab06b84d2b931bb3be137638e6faac4fc581b25417da0de87b",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=80c458f2cb5ccddb7fcedccda5df70e5cdccda7d9ca97d65ebfa6462920f61ef;"
     },
     {
@@ -257,7 +257,7 @@
       "prompt": "Derived 33.8721 square metre inner court apron closes the literal court to registered facade chain at A-SITE zero nominal. Five clipped threshold steps, procedural wear, bedded river pebbles and drain; reconstruction with conjectural dressing. Mounted during court refinement with explicit source-card assumptions. The study's reading support is finished as the museum's furniture, an oiled oak board on a bronze post raked low edge to its reader inside the certified solid, and the admitted leaf of Manuscript B folio 83v lies on it at a leaf's size.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "16132e0ff4ab63b5aef06ab8476e8ae7ebab5e7ce3a350d6dca0bc6d4214615a",
+      "sha256": "70498e5daac24841ca459416cae665f87582c1bee36214f233e03599ccb33f81",
       "note": "Q124; A-SITE; recipe_file=src/wings/vinci/inner-court.ts"
     },
     {
@@ -3776,7 +3776,7 @@
       "prompt": "The finish of the study's reading support: an oiled oak board 0.46 by 0.34 m and 28 mm thick, raked 28 degrees low edge to its reader, on a 0.09 m bronze post, standing inside the certified support, which stays the rail's solid and the pick's body. A fitting of this museum, not of 1517.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-24",
-      "sha256": "16132e0ff4ab63b5aef06ab8476e8ae7ebab5e7ce3a350d6dca0bc6d4214615a",
+      "sha256": "70498e5daac24841ca459416cae665f87582c1bee36214f233e03599ccb33f81",
       "note": "recipe_file=src/wings/vinci/inner-court.ts; geometry_dependency=vinci/inner-court; rail_collision=false"
     }
   ]
