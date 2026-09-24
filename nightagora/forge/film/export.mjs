@@ -36,7 +36,7 @@ import sharp from 'sharp'
 import { APP_ROOT, assertServer, browserArgs, FRAME_TIME_FLAGS, headHere, waitForServer, wingStanding } from '../rig.mjs'
 import { BARE, CHROME_OFF, STILL_DESK, installVirtualClock } from '../prerender/clock.mjs'
 import { restingPending } from '../prerender/pending.mjs'
-import { FPS, FRAMINGS, buildGraph } from './graph.mjs'
+import { FPS, FRAMINGS, SHUTTER, buildGraph } from './graph.mjs'
 import { camPrint as nodePrint, openReplay, replayEdge } from './replay.mjs'
 import { openSink, unpack } from './sink.mjs'
 
@@ -46,8 +46,8 @@ export const EXPORT_FORMAT = 'vinci-film-export-v1'
 export const MIN_DRAWS = 8
 /** the most: a frame that would need more is recorded as over, never hidden */
 export const MAX_DRAWS = 48
-/** the open share of a frame's time: a 180 degree shutter */
-export const SHUTTER = 0.5
+/** the open share of a frame's time: a 180 degree shutter (the graph counts a clip's frames by it) */
+export { SHUTTER }
 /** the shadow-casting lights the scene holds before machines vanish (M50) */
 export const CASTER_CEILING = 9
 /** delivered pixels per id pixel, per axis */
@@ -333,7 +333,7 @@ function assertBuildFresh() {
 }
 
 /** One framing's session: a stage, the wing standing, the export and the clock armed. */
-async function openSession(browser, framing, { base, scale, sink, warmNodes, log, view = null }) {
+export async function openSession(browser, framing, { base, scale, sink, warmNodes, log, view = null }) {
   const at = view?.[framing]
   if (at && scale !== 1) throw new Error('the stills\' stage is drawn one to one: --scale must be 1')
   const stage = at ? { width: at.css.width * at.dsf, height: at.css.height * at.dsf } : STAGES[framing]
@@ -384,7 +384,7 @@ async function openSession(browser, framing, { base, scale, sink, warmNodes, log
 }
 
 /** Stand at a node at once and let it settle under the clock. */
-async function standAt(page, node) {
+export async function standAt(page, node) {
   const ok = await page.evaluate((n) => window.__naFilm.place(n), node)
   if (!ok) throw new Error(`${node.id}: the rail refused the placement`)
   return page.evaluate(() => { for (let k = 0; k < 3; k++) window.__pre.step(); return window.__pre.virtualTime() })
@@ -402,7 +402,7 @@ async function renderFrame(session, inbox, plan) {
 }
 
 /** The inbox of frames the sink receives, awaited by tag and index. */
-function inboxOf() {
+export function inboxOf() {
   const held = new Map()
   const waiting = new Map()
   return {
@@ -423,9 +423,26 @@ function inboxOf() {
 }
 
 /** a rest frame: every draw of the shutter at one pose */
-async function restFrame(session, inbox, tag, i, from, { grain }) {
+export async function restFrame(session, inbox, tag, i, from, { grain }) {
   const times = Array.from({ length: MIN_DRAWS }, (_, k) => from + 1 + (k / MIN_DRAWS) * (SHUTTER * 1000) / FPS)
   return renderFrame(session, inbox, { tag, i, times, jitter: jitterOf(MIN_DRAWS), anchor: MIN_DRAWS / 2, ids: true, send: true, grain, seed: 0 })
+}
+
+/** THE SETTLED REST FRAME: a pose cut to from far off can draw its first
+    rest frame a level off in a few pixels, and the same pose drawn once more
+    is the one every later visit draws. Rest frames are drawn until two in a
+    row are the same bytes; the second is kept, and the draws it took are
+    reported. */
+export const SETTLE_TRIES = 4
+async function settledRest(session, inbox, tag, opts) {
+  const now = () => session.page.evaluate(() => window.__pre.virtualTime())
+  let prev = await restFrame(session, inbox, `${tag} settle`, 0, await now(), opts)
+  for (let k = 1; k < SETTLE_TRIES; k++) {
+    const next = await restFrame(session, inbox, `${tag} settle`, k, await now(), opts)
+    if (Buffer.compare(next.frame.rgb, prev.frame.rgb) === 0) return { res: next, frames: k + 1 }
+    prev = next
+  }
+  return { res: prev, frames: -SETTLE_TRIES }
 }
 
 async function savePng(rgb, width, height, file) {
@@ -435,10 +452,10 @@ async function savePng(rgb, width, height, file) {
 /** THE STILL OF A NODE: stood at once, one rest frame; and a second one a second
     of the world later, which is what the joins may have to carry */
 async function exportStill(session, inbox, node, out, opts) {
-  const t = await standAt(session.page, node)
+  await standAt(session.page, node)
   const pending = await session.page.evaluate(() => window.__forge.state().texturesPending)
   const tag = `still ${node.id} ${session.framing}`
-  const a = await restFrame(session, inbox, tag, 0, t, opts)
+  const { res: a, frames: settledIn } = await settledRest(session, inbox, tag, opts)
   // what the frame drew: a still shot while the machine is loaded can come
   // out with fewer bodies built, which these counts give away
   const drew = await session.page.evaluate(() => {
@@ -467,6 +484,7 @@ async function exportStill(session, inbox, node, out, opts) {
   return {
     node: node.id, framing: session.framing, raw: sha256(a.frame.rgb), pendingAtRest: pending, drew, size: [width, height],
     cam: a.report.cam, master, rung: address(rungFile, 'png'),
+    settledIn,
     aSecondLater: { share: round((100 * moved) / a.frame.rgb.length, 4), mean: moved ? round(sum / moved, 2) : 0, max },
     paintedOverCanvas: await session.page.evaluate(chromeProof),
   }
@@ -478,7 +496,7 @@ const printOf = (cam) => [...cam.p.map((v) => round(v)), ...cam.r.map((v) => rou
 /** A CLIP WALKED ONCE UNDER THE CLOCK, KEEPING NOTHING: a room is dressed in
     slices and a machine is built as the eye walks up, so every body a clip can
     show is built before the first still is kept (the capture's round trip). */
-async function silentWalk(page, from, to, motion, take = null) {
+export async function silentWalk(page, from, to, motion, take = null) {
   // THE MOUNT RULE's set: every body a frame of the walk draws, the departure's and the arrival's included
   if (take) await page.evaluate((tag) => window.__naExport.record(tag), take)
   await page.evaluate((n) => window.__naFilm.place(n), from)
@@ -511,7 +529,7 @@ async function exportClip(session, inbox, edge, nodes, track, out, opts) {
   const lateBefore = session.record.late.length, chromeBefore = session.record.chrome.length
   const errorsBefore = session.record.errors.length, projectionBefore = session.record.projection.length
   const starvedBefore = await page.evaluate(() => window.__pre.starved())
-  const t0 = await standAt(page, from)
+  await standAt(page, from)
   const armed = await page.evaluate(() => window.__naExport.arm())
   const pendingAtRest = await page.evaluate(() => window.__forge.state().texturesPending)
   const paintedOverCanvas = await page.evaluate(chromeProof)
@@ -553,7 +571,7 @@ async function exportClip(session, inbox, edge, nodes, track, out, opts) {
     return false
   }
   // frame 0: the departure at rest
-  const f0 = await restFrame(session, inbox, tag, 0, t0, opts)
+  const { res: f0, frames: settledIn } = await settledRest(session, inbox, tag, opts)
   let nearM = await put(0, f0, { motion: 0, over: false, wall: Date.now() - began })
   // the press, and the leg taken at the instant it was asked for
   const asked = await page.evaluate(([a, b, m]) => window.__naFilm.walk(a, b, m), [from, to, edge.motion])
@@ -620,7 +638,7 @@ async function exportClip(session, inbox, edge, nodes, track, out, opts) {
     chromeImagesAfterClock: session.record.chrome.length - chromeBefore,
     mountedChanges: frames.filter((f) => f.mounted.changed).map((f) => ({ i: f.i, meshes: f.mounted.meshes, ...f.mounted.changed })),
     starvedSteps: starved, pageErrors: session.record.errors.length - errorsBefore,
-    pendingAtRest, paintedOverCanvas, mountedSetChanges: signatures.size - 1, casters: armed.casters, bodies: armed.bodies,
+    pendingAtRest, settledIn, paintedOverCanvas, mountedSetChanges: signatures.size - 1, casters: armed.casters, bodies: armed.bodies,
     mount: { rule: opts.mount, held, drawn: frames[0].mounted.meshes, signature: frames[0].mounted.signature, stoodAtFirst: frames[0].mounted.stood, stoodAtLast: frames[frames.length - 1].mounted.stood,
       // a volume the eye enters (the hall's air) is the eye's, not held: the frames it begins and ends being drawn
       volumes: frames.filter((f, k) => k === 0 || f.mounted.volumes !== frames[k - 1].mounted.volumes).map((f) => ({ i: f.i, drawn: f.mounted.volumes })) },
@@ -744,7 +762,7 @@ async function main() {
           for (const node of warmNodes) {
             const s = await exportStill(session, inbox, node, runDir, opts)
             stills.push(s)
-            log(`  still ${node.id} ${framing}: ${s.raw.slice(0, 12)}, a second later ${s.aSecondLater.share}% moved (max ${s.aSecondLater.max})`)
+            log(`  still ${node.id} ${framing}: ${s.raw.slice(0, 12)}, settled in ${s.settledIn} rest frames, a second later ${s.aSecondLater.share}% moved (max ${s.aSecondLater.max})`)
           }
           for (const edge of edges) {
             const track = tracks.get(`${edge.id} ${framing}`)
@@ -758,7 +776,7 @@ async function main() {
             if (r.refused?.length && !r.files) { log(`  REFUSED ${edge.id} ${framing}: ${r.refused.join('; ')}`); continue }
             const sf = (id) => stills.find((s) => s.node === id && s.framing === framing)?.raw
             r.joinsAgree = { first: r.joins.first === sf(edge.from), last: r.joins.last === sf(edge.to) }
-            log(`  ${edge.id} ${framing}: ${r.frames} frames (the graph ${edge.framings[framing].frames + 1}), ${r.draws} draws, ${r.secondsPerFrame} s a frame; joins ${r.joinsAgree.first}/${r.joinsAgree.last}; track ${r.track.maxDeviation}; late ${r.requestsAfterClock}; mounted changes ${r.mountedSetChanges}; held ${r.mount.held}, stood ${r.mount.stoodAtFirst} at the first frame and ${r.mount.stoodAtLast} at the last`)
+            log(`  ${edge.id} ${framing}: ${r.frames} frames (the graph ${edge.framings[framing].frames + edge.framings[framing].restLag + 1}), ${r.draws} draws, ${r.secondsPerFrame} s a frame; settled in ${r.settledIn}; joins ${r.joinsAgree.first}/${r.joinsAgree.last}; track ${r.track.maxDeviation}; late ${r.requestsAfterClock}; mounted changes ${r.mountedSetChanges}; held ${r.mount.held}, stood ${r.mount.stoodAtFirst} at the first frame and ${r.mount.stoodAtLast} at the last`)
           }
           if (mount === 'held') await session.page.evaluate(() => window.__naExport.hold(null))
           const sets = new Set([...stills.filter((x) => x.framing === framing).map((x) => x.drew.signature), ...results.filter((r) => r.framing === framing && r.mount?.signature !== undefined).map((r) => r.mount.signature)])
