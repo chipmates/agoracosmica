@@ -336,8 +336,8 @@
         "de": "Nagel"
       },
       "bearing-band-0": {
-        "en": "Iron band of the bearing",
-        "de": "Eisenband des Lagers"
+        "en": "Iron band of the bearing block",
+        "de": "Eisenband des Lagerblocks"
       },
       "bearing-band-nail-0-0": {
         "en": "Nail",
@@ -356,8 +356,8 @@
         "de": "Nagel"
       },
       "bearing-band-1": {
-        "en": "Iron band of the bearing",
-        "de": "Eisenband des Lagers"
+        "en": "Iron band of the bearing block",
+        "de": "Eisenband des Lagerblocks"
       },
       "bearing-band-nail-1-0": {
         "en": "Nail",
@@ -380,8 +380,8 @@
         "de": "Eiserne Pfanne unter dem Mast"
       },
       "bearing-knee-0": {
-        "en": "Knee of the bearing",
-        "de": "Knie des Lagers"
+        "en": "Brace of the bearing block",
+        "de": "Strebe des Lagerblocks"
       },
       "bearing-knee-peg-0-0": {
         "en": "Oak peg",
@@ -392,8 +392,8 @@
         "de": "Eichennagel"
       },
       "bearing-knee-1": {
-        "en": "Knee of the bearing",
-        "de": "Knie des Lagers"
+        "en": "Brace of the bearing block",
+        "de": "Strebe des Lagerblocks"
       },
       "bearing-knee-peg-1-0": {
         "en": "Oak peg",
@@ -404,8 +404,8 @@
         "de": "Eichennagel"
       },
       "bearing-knee-2": {
-        "en": "Knee of the bearing",
-        "de": "Knie des Lagers"
+        "en": "Brace of the bearing block",
+        "de": "Strebe des Lagerblocks"
       },
       "bearing-knee-peg-2-0": {
         "en": "Oak peg",
@@ -416,8 +416,8 @@
         "de": "Eichennagel"
       },
       "bearing-knee-3": {
-        "en": "Knee of the bearing",
-        "de": "Knie des Lagers"
+        "en": "Brace of the bearing block",
+        "de": "Strebe des Lagerblocks"
       },
       "bearing-knee-peg-3-0": {
         "en": "Oak peg",
