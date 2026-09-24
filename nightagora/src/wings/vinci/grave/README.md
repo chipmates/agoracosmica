@@ -3,9 +3,9 @@
 `createGrave(materials, language = 'en', options = {})` returns
 `{group, metadata, dispose}`. The materials
 are the same `ExhibitMaterials` used by `../myths`: `stone`, `plaster`,
-`bronze`, `ink`, `dark`, plus optional `tuffeau: Material`. The top slab
-facing and separate plaque face use `tuffeau` when supplied, otherwise
-`stone`. `language` is `'en' | 'de'`; `options` is `{mobile?: boolean}` with
+`bronze`, `ink`, `dark`, plus optional `tuffeau: Material`, which the
+grave no longer reads: the slab's facing and the separate plaque are both
+cut from the ledger's own honed limestone (`ledgerStone()`). `language` is `'en' | 'de'`; `options` is `{mobile?: boolean}` with
 mobile disabled by default. The host supplies TSL node materials, camera,
 lighting, accessible reading surface and input. Units are metres, +Y is up,
 and +Z faces the reader. Call `dispose()` on unmount; supplied materials
@@ -36,9 +36,11 @@ The name-only slab's anchor is `(-0.95, 0.24, 0.65)`. Its stone layer is
 2.04 m wide × 3.61 m long × 0.13 m thick, on a 2.16 × 3.74 m base. Its
 top facing is a pale honed limestone 1.98 × 3.55 × 0.064 m, its face at
 y=0.234 (`ledger.ts`). The slab's only writing is **LEONARDO / DA VINCI**
-on two centred lines at 0.27 m cap height, cut into the face by the
-museum's cut-letter method (a stone web round the letters, a mouth splayed
-3.5 mm) and filled nearly flush with the grave's ink; the block's middle
+on two centred lines at 0.27 m cap height, cut into the face along each
+letter's own outline: the union of the font's overlapping strokes is taken
+as a distance field over each line and traced at the letter's edge and at
+a mouth 4 mm outside it (`LEDGER_CUT`); the mouth splays 2.2 mm down to the
+edge, a 0.9 mm wall drops to the filling in the grave's ink; the block's middle
 stands 0.35 m from the slab's middle toward its foot. The ledger casts no
 shadow. The slab stays put at every viewport.
 This is an openly generated exhibition study: its dimensions are not an
@@ -68,7 +70,8 @@ strip beyond the head, at `(-0.61, 0.062, -2.09)` and 0.150 m cap height. A
 host that restages this station must keep one of the two in frame: an unlabelled
 dark disc reads as a hole in the pavement, which is what this exhibit is not.
 
-The separate lectern at `(1.44, 0.9, 1.5)` says **presumed remains** and
+The separate lectern at `(1.44, 0.9, 1.5)`, one block of the ledger's
+limestone on a dark base course, says **presumed remains** and
 dates the excavation to 1863. `GRAVE_EVIDENCE` gives the host the fuller
 reading text: Houssaye reported a skeleton; identification is not proof.
 The separate chapel plaque is known from its account, not from a held

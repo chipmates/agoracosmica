@@ -91,11 +91,11 @@ export function graveSunDirection(): [number, number, number] {
 
 /** A name-only stone study and separate evidential furniture; no invented epitaph. */
 export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, language: 'en' | 'de' = 'en', options:{mobile?:boolean,tier?:'hero'|'standard'|'calm'}={}): ExhibitionObject {
-  const pale=materials.tuffeau??materials.stone
   const text=(en:string,de:string)=>language==='en'?en:de
   const build = new Construction(materials, 'vinci-grave', 'vinci/grave-geometry')
   exhibitionFloor(build, 12, 13)
   galleryBackdrop(build)
+  const ledger = ledgerStone()
   // Low masonry holds the slab in the floor. The narrow stepped reveal makes
   // its weight readable even under the grazing light of the closing room.
   const centreX = GRAVE_SLAB.x
@@ -109,7 +109,6 @@ export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, l
   // where an absence belongs.
   const ledgerFace = cutLedgerFace({ centre: [centreX, centreZ], top: .234, width: 1.98, length: 3.55, depth: .064 })
   // the filling is the grave's own ink, so it welds into the lettering's body
-  const ledger = ledgerStone()
   for (const geometry of ledgerFace.stone) build.geometry(geometry, ledger)
   for (const geometry of ledgerFace.filling) build.geometry(geometry, materials.ink)
 
@@ -118,11 +117,13 @@ export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, l
   const plaqueZ = options.mobile ? 1.62 : 1.45
   // The standing label has a foot: a base course, a cap and a bronze bead, so
   // it stands on the paving instead of meeting it on an edge.
+  // The marker is cut from the slab's own honed limestone, one stone from its
+  // cap to its face: the floor's flag stone carries the flags' own cells, and
+  // a cell's edge across a face reads as a patch laid on it.
   build.box(plaqueX, 0.085, plaqueZ - 0.08, 1.88, 0.17, 0.48, materials.dark)
-  build.box(plaqueX, 0.188, plaqueZ - 0.06, 1.72, 0.05, 0.42, materials.stone)
+  build.box(plaqueX, 0.188, plaqueZ - 0.06, 1.72, 0.05, 0.42, ledger)
   build.box(plaqueX, 0.225, plaqueZ + 0.06, 1.64, 0.028, 0.14, materials.bronze)
-  build.box(plaqueX, 0.62, plaqueZ - 0.11, 1.54, 0.88, 0.20, materials.stone)
-  build.box(plaqueX, 0.66, plaqueZ + 0.014, 1.60, 0.80, 0.065, pale)
+  build.box(plaqueX, 0.62, plaqueZ - 0.08175, 1.60, 0.88, 0.2565, ledger)
   build.text(text(GRAVE_WORDS.presumption.en,GRAVE_WORDS.presumption.de), plaqueX - 0.70, 0.98, plaqueZ + 0.05, options.mobile?(language==='de'?.135:.16):(language === 'de' ? 0.102 : 0.13), 1.40, materials.ink)
   build.text(GRAVE_WORDS.dig, plaqueX - 0.70, options.mobile?0.46:0.68, plaqueZ + 0.05, 0.095, 1.4, materials.bronze)
   if(!options.mobile)build.text(text(GRAVE_WORDS.identification.en,GRAVE_WORDS.identification.de), plaqueX - 0.70, 0.51, plaqueZ + 0.05, 0.070, 1.4)

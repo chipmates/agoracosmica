@@ -30,8 +30,10 @@ const { attribute, cameraViewMatrix, float, mix, mx_noise_float, normalWorldGeom
 export const DIAGRAM_SHADOW_LAYER = 12
 
 /** THE LIGHT AS DATA: its colour temperature, its level against the wing's
- * key (320 lux), and the map it draws. */
-export const DIAGRAM_LIGHT = { kelvin: 3000, intensity: 2.1, mapPx: { hero: 1024, standard: 512 } } as const
+ * key (320 lux), and the map it draws. The box stands in the court's shade
+ * behind the slab: at this level the lit stones stay under the slab's own
+ * brightness, so the name keeps the frame and the model stays a study. */
+export const DIAGRAM_LIGHT = { kelvin: 3000, intensity: .8, mapPx: { hero: 1024, standard: 512 } } as const
 
 const linear = (hex: string): [number, number, number] => { const c = new Color(hex); return [c.r, c.g, c.b] }
 
