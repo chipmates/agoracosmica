@@ -157,9 +157,10 @@ export function createFilmLook(h: FilmLookHost) {
         return cycle
       } : null
       const payload = createIslandPayload({ choice: live ? choice : { mode: 'filmed', why: choice.why }, live: makeLive, filmed: makeFilmed,
+        // the film stands over the canvas until the island's first frame is drawn, never an empty stage
+        stood: () => h.veil(true),
         stepOf: () => Math.max(0, [...h.host.querySelectorAll('.vitrine-step-item')].findIndex(b => b.getAttribute('aria-current') === 'step')), asked })
       machine = { payload, island: () => island, cycle: () => cycle }
-      h.veil(true)
       h.standDown(true)
       closeLook.open({ id, title, line: vinciLine(id), card: words.card, after: words.after, payload,
         controls: [control(VINCI_VITRINE_WORDS.provenance, record, 'record'), shut()], ...vinciLimits(id), set: null, certainty: 'reconstructed' }, from, 'enter')

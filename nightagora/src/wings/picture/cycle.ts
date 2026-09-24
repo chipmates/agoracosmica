@@ -168,6 +168,8 @@ export function createCyclePayload(options: {
     poster = make('img', 'na-cycle-poster')
     poster.alt = ''
     poster.decoding = 'async'
+    // the cycle's ground shows only under a frame of its own, never as an empty box
+    poster.addEventListener('load', () => { if (root) root.dataset['ready'] = 'true' }, { signal })
     video = make('video', 'na-cycle-video')
     video.muted = true
     video.playsInline = true
@@ -197,8 +199,10 @@ export function createCyclePayload(options: {
       if (options.land !== null || reduced) land(options.land ?? 0)
       else run()
     }, { once: true, signal })
-    // an engine that paints a paused first frame without a callback is revealed on its seek
+    // an engine that paints a paused first frame without a callback is revealed on its seek,
+    // and one that skips the callback for a hidden video on its first advance
     video.addEventListener('seeked', () => requestAnimationFrame(() => reveal()), { signal })
+    video.addEventListener('timeupdate', () => { if (video && video.currentTime > 0) requestAnimationFrame(() => reveal()) }, { signal })
 
     const row = next.controls
     const clock = make('div', 'vitrine-clock')
@@ -337,6 +341,6 @@ export function createCyclePayload(options: {
       host = undefined
     },
     landed: () => landed,
-    standing: () => shown,
+    standing: () => shown || root?.dataset['ready'] === 'true',
   }
 }

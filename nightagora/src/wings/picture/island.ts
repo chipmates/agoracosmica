@@ -65,11 +65,19 @@ export interface IslandPayload extends VitrinePayload {
   reading(): IslandReading
 }
 
+/** a filmed payload says when its first frame is on the glass */
+export type FilmedPayload = VitrinePayload & { standing?(): boolean }
+
+/** how long the island's last frame may stand in for a cycle that has not shown its own */
+const HANDOVER_MS = 8000
+
 export function createIslandPayload(options: {
   choice: IslandChoice
   live: () => VitrinePayload
   /** the filmed cycle landed at a step, or null where the release has none */
-  filmed: ((step: number) => VitrinePayload | null) | null
+  filmed: ((step: number) => FilmedPayload | null) | null
+  /** the island's first frame is on the glass: what stood over the canvas may stand aside */
+  stood?: () => void
   /** the step the live island stands at when it misses */
   stepOf: () => number
   /** when the visitor asked for the close look: the island's own code is fetched after it */
@@ -77,22 +85,33 @@ export function createIslandPayload(options: {
 }): IslandPayload {
   const reading: IslandReading = { mode: options.choice.mode, why: options.choice.why, openMs: null, fps: null, worstMs: null,
     verdict: options.choice.mode === 'live' ? 'counting' : null, handedOver: false }
-  let inner: VitrinePayload | null = null
+  let inner: FilmedPayload | null = null
   let host: VitrinePayloadHost | undefined
+  /** the island handed over, still on the glass at its last frame until the cycle shows its own */
+  let leaving: { payload: VitrinePayload; since: number } | null = null
   let opened = 0, own = 0, frames = 0, firstShown = 0, worst = 0, last = 0
   const forced = options.choice.why === 'address'
 
-  function mountInner(payload: VitrinePayload, into: VitrinePayloadHost): void {
+  function mountInner(payload: FilmedPayload, into: VitrinePayloadHost): void {
     inner = payload
     // the island says when it takes the stage: that is the frame the count starts from
-    payload.mount({ ...into, surface: (kind: VitrineSurface) => { if (kind === 'own' && !own) own = performance.now(); into.surface(kind) } })
+    payload.mount({ ...into, surface: (kind: VitrineSurface) => {
+      if (kind === 'own' && !own) { own = performance.now(); options.stood?.() }
+      into.surface(kind)
+    } })
+  }
+  function letGo(): void {
+    leaving?.payload.unmount()
+    leaving = null
   }
   function handOver(): void {
     if (!host || !options.filmed) return
     const step = options.stepOf()
     const next = options.filmed(Math.max(0, step))
     if (!next) return
-    inner?.unmount()
+    // THE ISLAND STAYS ON THE GLASS, held at its last frame, until the cycle
+    // shows its own: the hand-over never passes through an empty stage
+    if (inner) leaving = { payload: inner, since: performance.now() }
     host.element.textContent = ''
     host.controls.textContent = ''
     host.aside.textContent = ''
@@ -144,11 +163,13 @@ export function createIslandPayload(options: {
     },
     update(dt) {
       inner?.update?.(dt)
+      if (leaving && (inner?.standing?.() !== false || performance.now() - leaving.since > HANDOVER_MS)) letGo()
       if (reading.mode === 'live') count(performance.now())
     },
     layout() { inner?.layout?.() },
     key(event) { return inner?.key?.(event) ?? false },
     unmount() {
+      letGo()
       inner?.unmount()
       inner = null
       host = undefined

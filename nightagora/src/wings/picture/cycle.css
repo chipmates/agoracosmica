@@ -6,9 +6,9 @@
   left: 0;
   top: 0;
   overflow: hidden;
-  background: #1a2026;
   pointer-events: none;
 }
+.na-cycle[data-ready='true'] { background: #1a2026; }
 .na-cycle > img,
 .na-cycle > video {
   position: absolute;
