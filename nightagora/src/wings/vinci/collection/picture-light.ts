@@ -18,8 +18,8 @@
 import { Color, Vector3, Vector4 } from 'three/webgpu'
 import * as TSL from 'three/tsl'
 import {
-  BEAM_KEEP, CANVAS_Z, FRAME_BACK_Z, FRAME_FRONT_Z, HANG_LIGHT_FIELDS, hangLightTable, LAMP_COLOUR, ROOM, SLIP_Z, WALL_FACE,
-  type HangLamp, type HangLightData,
+  BEAM_KEEP, CANVAS_Z, FRAME_BACK_Z, FRAME_FRONT_Z, HANG_LIGHT_FIELDS, hangFrames, hangLightTable, LAMP_COLOUR, ROOM, SLIP_Z,
+  WALL_FACE, type HangLamp, type HangLightData,
 } from './picture-room-plan'
 
 // The node overload boundary stays local to this file.
@@ -119,8 +119,9 @@ function poolMask(P: N, L: N, west: N, east: N, low: N, high: N, looks: PictureL
   const t = dL.sub(ROOM.finish - WALL_FACE).div(dL.sub(p).max(1e-3))
   const x = L.x.add(P.x.sub(L.x).mul(t)), y = L.y.add(P.y.sub(L.y).mul(t))
   const ax = east.sub(west).mul(.5).add(looks.poolMargin), ay = high.sub(low).mul(.5).add(looks.poolMargin)
-  const dx = abs(x.sub(west.add(east).mul(.5))).div(ax), dy = abs(y.sub(low.add(high).mul(.5))).div(ay)
-  const e = pow(pow(dx, 4).add(pow(dy, 4)), .25)
+  const dx = x.sub(west.add(east).mul(.5)).div(ax), dy = y.sub(low.add(high).mul(.5)).div(ay)
+  const dx2 = dx.mul(dx), dy2 = dy.mul(dy)
+  const e = sqrt(sqrt(dx2.mul(dx2).add(dy2.mul(dy2))))
   const soft = looks.poolSoft.div(ax.min(ay))
   return float(1).sub(smoothstep(float(1).sub(soft.mul(.5)), float(1).add(soft), e))
 }
@@ -150,12 +151,107 @@ export function headShadow(lamp: HangLamp, frame: { west: number; east: number; 
  * only the slot of its work, because a vertex may carry eight buffers and a
  * work's light is eight vectors on its own. */
 let table: N | undefined
-function hangAttributes(): Record<keyof HangLightData, N> {
+function hangTable(): N {
   table ??= uniformArray(hangLightTable().map(row => new Vector4(row[0], row[1], row[2], row[3])), 'vec4')
-  const base = int(attribute('hangSlot', 'float').add(.5)).mul(HANG_LIGHT_FIELDS.length)
+  return table
+}
+function hangRow(slot: N): Record<keyof HangLightData, N> {
+  const base = slot.mul(HANG_LIGHT_FIELDS.length), rows = hangTable()
   const out = {} as Record<keyof HangLightData, N>
-  HANG_LIGHT_FIELDS.forEach((name, i) => { out[name] = table.element(base.add(i)) })
+  HANG_LIGHT_FIELDS.forEach((name, i) => { out[name] = rows.element(base.add(i)) })
   return out
+}
+function hangAttributes(): Record<keyof HangLightData, N> {
+  return hangRow(int(attribute('hangSlot', 'float').add(.5)))
+}
+
+/** WHICH TWO WORKS A POINT OF THE ROOM STANDS BETWEEN: the work whose share of
+ * the wall it faces, and the neighbour on the side it leans to. A pool never
+ * reaches past its neighbour, so no point of the room sees more than these. */
+function slotsAt(x: N): { own: N; other: N; apart: N } {
+  const frames = hangFrames()
+  let slot: N = int(0)
+  for (let i = 0; i + 1 < frames.length; i++) {
+    const boundary = (frames[i]!.outer.west + frames[i + 1]!.outer.east) / 2
+    slot = slot.add(x.lessThan(boundary).select(int(1), int(0)))
+  }
+  const own = slot.toVar()
+  const sight = hangRow(own).sight
+  const centre = sight.x.add(sight.y).mul(.5)
+  const other = max(min(own.add(x.lessThan(centre).select(int(1), int(-1))), int(frames.length - 1)), int(0))
+  // at either end of the wall the neighbour is the work itself: it counts once
+  return { own, other, apart: other.notEqual(own).select(float(1), float(0)) }
+}
+
+/** A BOX'S SHADOW for a box read out of the table: `boxVisibility` with its
+ * rectangle as nodes. */
+function boxVisibilityOf(P: N, L: N, x0: N, x1: N, y0: N, y1: N, back: number, front: number, radius: N): N {
+  const p = float(WALL_Z).sub(P.z), dL = float(WALL_Z).sub(L.z)
+  const a = max(float(back), p)
+  const k = (d: N): N => dL.sub(p).div(dL.sub(d))
+  const ka = k(a), kf = k(float(front))
+  const proj = (v: N, l: N, s: N): N => l.add(v.sub(l).mul(s))
+  const X0 = min(proj(x0, L.x, ka), proj(x0, L.x, kf)), X1 = max(proj(x1, L.x, ka), proj(x1, L.x, kf))
+  const Y0 = min(proj(y0, L.y, ka), proj(y0, L.y, kf)), Y1 = max(proj(y1, L.y, ka), proj(y1, L.y, kf))
+  const w = radius.mul(float(front).sub(p).max(0)).div(dL.sub(front)).add(.002)
+  const cover = boxCover(P.x, P.y, X0, X1, Y0, Y1, w)
+  const own = P.x.greaterThan(x0.sub(.003)).and(P.x.lessThan(x1.add(.003))).and(P.y.greaterThan(y0.sub(.003))).and(P.y.lessThan(y1.add(.003)))
+  const behind = p.lessThan(front).and(own.not())
+  return float(1).sub(cover.mul(behind.select(float(1), float(0))))
+}
+
+/** ONE HEAD ON A POINT OF THE ROOM facing `n`: its irradiance there (candela,
+ * cone, distance, incidence, its lens and its pool or its cut), past its own
+ * frame and the frieze, and the unit vector toward it. */
+function headOnSurface(P: N, n: N, lamp: N, aim: N, inner: N, level: N, row: Record<keyof HangLightData, N>, looks: PictureLooks): { irradiance: N; toward: N } {
+  const L = lamp.xyz, v = L.sub(P), d = length(v), dir = v.div(d)
+  const spot = smoothstep(aim.w, inner, dir.dot(aim.xyz.negate()))
+  const incidence = n.dot(dir).max(0)
+  const o = row.outer, u = row.shutter
+  const dL = float(WALL_Z).sub(L.z), p = float(WALL_Z).sub(P.z)
+  const cutT = dL.sub(FRAME_FRONT_Z).div(dL.sub(p).max(1e-3))
+  const cx = L.x.add(P.x.sub(L.x).mul(cutT)), cy = L.y.add(P.y.sub(L.y).mul(cutT))
+  const cut = u.y.sub(u.x).greaterThan(.001).select(boxCover(cx, cy, u.x, u.y, u.z, u.w, float(.05)), poolMask(P, L, o.x, o.y, o.z, o.w, looks))
+  const frame = boxVisibilityOf(P, L, o.x, o.y, o.z, o.w, FRAME_BACK_Z, FRAME_FRONT_Z, looks.lampRadius)
+  const frieze = boxVisibilityOf(P, L, float(ROOM.west - 1), float(ROOM.east + 1), float(ROOM.friezeFoot), float(ROOM.bulkheadFoot),
+    ROOM.finish - WALL_FACE, ROOM.frieze - WALL_FACE, looks.lampRadius)
+  const shadow = mix(float(1), frame.mul(frieze), looks.engineTerms)
+  const irradiance = lamp.w.mul(spot).mul(incidence).div(d.mul(d).max(.01)).mul(beam(d, level)).mul(cut).mul(shadow)
+  return { irradiance, toward: dir }
+}
+
+/** A dielectric or metal lobe of one head, for a surface of this roughness. */
+function lobe(n: N, V: N, toward: N, roughness: N, F0: N): N {
+  const alpha = roughness.mul(roughness), a2 = alpha.mul(alpha)
+  const H = normalize(toward.add(V))
+  const NH = n.dot(H).max(0), NL = n.dot(toward).max(0), NV = n.dot(V).max(1e-4), VH = V.dot(H).max(0)
+  const dd = NH.mul(NH).mul(a2.sub(1)).add(1)
+  const D = a2.div(dd.mul(dd).mul(Math.PI).max(1e-6))
+  const G = float(.5).div(NL.mul(sqrt(NV.mul(NV).mul(float(1).sub(a2)).add(a2)))
+    .add(NV.mul(sqrt(NL.mul(NL).mul(float(1).sub(a2)).add(a2)))).max(1e-5))
+  const F = F0.add(float(1).sub(F0).mul(pow(float(1).sub(VH), 5)))
+  return F.mul(G).mul(D)
+}
+
+/** THE HANG'S HEADS ON A SURFACE OF THE ROOM, as the light it sends to the
+ * eye: the two works beside the point, each with its heads, a diffuse share
+ * and a lobe. A physical spot per head stands in the scene as data; the page
+ * evaluates only the heads a point can see, because every surface lit by
+ * all twenty eight at once cost the room seventy milliseconds a frame. */
+export function hangSurfaceLight(albedo: N, roughness: N, metalness: N, looks: PictureLooks = PICTURE_LOOKS): N {
+  const P = positionWorld, n = TSL.normalWorld, V = normalize(cameraPosition.sub(P))
+  const { own, other, apart } = slotsAt(P.x)
+  const F0 = mix(vec3(.04, .04, .04), albedo, metalness)
+  const diffuse = albedo.mul(float(1).sub(metalness)).div(Math.PI)
+  let sum: N = vec3(0, 0, 0)
+  for (const [slot, weight] of [[own, float(1)], [other, apart]] as const) {
+    const row = hangRow(slot)
+    for (const [lamp, aim, inner, level] of [[row.lampA, row.aimA, row.cone.x, row.cone.z], [row.lampB, row.aimB, row.cone.y, row.cone.w]] as const) {
+      const head = headOnSurface(P, n, lamp, aim, inner, level, row, looks)
+      sum = sum.add(diffuse.add(lobe(n, V, head.toward, roughness, F0)).mul(head.irradiance.mul(weight)))
+    }
+  }
+  return sum.mul(looks.lampColour).mul(looks.lampGain)
 }
 
 /** ONE HEAD ON A POINT OF THE CANVAS: its irradiance there (candela, cone,

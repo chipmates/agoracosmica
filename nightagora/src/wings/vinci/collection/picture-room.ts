@@ -34,7 +34,7 @@ import {
   PICTURE_ROOM_PROVENANCE, PICTURE_SHADOW_LAYER, PROBE_AT, ROOM, ROOM_LIGHTS, shadowCasters, stampHangLight, v3,
   wallSkins, WINDOW, type HangLamp, type RoomLight, type Skin, type Solid,
 } from './picture-room-plan'
-import { headShadow, PICTURE_LOOKS, varnishFilm, withRoomAir } from './picture-light'
+import { hangSurfaceLight, PICTURE_LOOKS, varnishFilm, withRoomAir } from './picture-light'
 
 // The node overload boundary stays local to this file.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -114,10 +114,13 @@ function plasterMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial {
   const cloud = luminance(sample.albedo).mul(.6).add(luminance(wide.albedo).mul(.4))
   const drift = mx_noise_float(P.mul(.21)).mul(.05).add(mx_noise_float(P.mul(.73)).mul(.025))
   const tone = mix(float(1), cloud, L.plasterCloud).add(drift)
-  m.colorNode = L.plaster.mul(tone)
-  m.roughnessNode = mix(L.plasterRough.sub(.1), L.plasterRough.add(.14), sample.roughness).clamp(.3, .95)
+  const albedo = L.plaster.mul(tone).toVar()
+  const rough = mix(L.plasterRough.sub(.1), L.plasterRough.add(.14), sample.roughness).clamp(.3, .95).toVar()
+  m.colorNode = albedo
+  m.roughnessNode = rough
   m.normalNode = bend(t, b, n, sample.normal, L.plasterNormal)
   m.aoNode = sample.occlusion
+  m.emissiveNode = hangSurfaceLight(albedo, rough, float(0))
   m.outputNode = withRoomAir(output)
   m.name = 'vinci/collection-picture-room/plaster'
   m.userData = { ...PICTURE_ROOM_PROVENANCE, set: set.name }
@@ -206,8 +209,11 @@ function frameOakMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial 
   const m = new MeshStandardNodeMaterial({ roughness: .4, metalness: 0, side: FrontSide })
   const n = normalWorldGeometry, at = uv()
   const sample = set.sample({ uv: vec2(at.y, at.x), metres: 1.83 })
-  m.colorNode = sample.colour.mul(L.frameTint)
-  m.roughnessNode = mix(L.frameRough.sub(.1), L.frameRough.add(.1), sample.roughness).clamp(.2, .98)
+  const albedo = sample.colour.mul(L.frameTint).toVar()
+  const rough = mix(L.frameRough.sub(.1), L.frameRough.add(.1), sample.roughness).clamp(.2, .98).toVar()
+  m.colorNode = albedo
+  m.roughnessNode = rough
+  m.emissiveNode = hangSurfaceLight(albedo, rough, float(0))
   m.normalNode = n.transformDirection(cameraViewMatrix)
   // an oiled frame takes the room's light as a sheen, not as a grey film
   m.envMapIntensity = .45
@@ -242,8 +248,11 @@ function maskMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial {
   const m = new MeshStandardNodeMaterial({ roughness: .45, metalness: 0, side: DoubleSide })
   const P = positionWorld, n = normalWorldGeometry
   const sample = set.sample({ uv: vec2(P.y, P.x), metres: 1.83 })
-  m.colorNode = sample.colour.mul(L.frameTint)
-  m.roughnessNode = mix(float(.32), float(.58), sample.roughness)
+  const albedo = sample.colour.mul(L.frameTint).toVar()
+  const rough = mix(float(.32), float(.58), sample.roughness).toVar()
+  m.colorNode = albedo
+  m.roughnessNode = rough
+  m.emissiveNode = hangSurfaceLight(albedo, rough, float(0))
   m.normalNode = n.transformDirection(cameraViewMatrix)
   m.outputNode = withRoomAir(output)
   m.name = 'vinci/collection-picture-room/arch-mat'
@@ -256,8 +265,11 @@ function bronzeMaterial(L: Looks): MeshStandardNodeMaterial {
   const m = new MeshStandardNodeMaterial({ roughness: .34, metalness: 1, side: FrontSide })
   const P = positionWorld
   const worn = mx_noise_float(P.mul(vec3(9.3, 9.3, 9.3))).mul(.5).add(.5)
-  m.colorNode = L.bronze.mul(worn.mul(.2).add(.9))
-  m.roughnessNode = float(.3).add(worn.mul(.12))
+  const albedo = L.bronze.mul(worn.mul(.2).add(.9)).toVar()
+  const rough = float(.3).add(worn.mul(.12)).toVar()
+  m.colorNode = albedo
+  m.roughnessNode = rough
+  m.emissiveNode = hangSurfaceLight(albedo, rough, float(1))
   m.outputNode = withRoomAir(output)
   m.name = 'vinci/collection-picture-room/bronze'
   m.userData = { ...PICTURE_ROOM_PROVENANCE }
@@ -321,11 +333,12 @@ export function mountPictureRoom(stack: Stack): PictureRoom {
     const target = new Object3D()
     target.position.copy(v3(...spec.aim))
     light.target = target
-    // the head's frame, the frieze and its own lens: arithmetic, no map
-    light.castShadow = true
-    ;(light.shadow as unknown as { shadowNode: N }).shadowNode = headShadow(spec, frameOf.get(spec.key)!, H)
+    // A PHYSICAL HEAD, AS DATA: the lens's pool round its frame (or the
+    // projector's cut) rides with it for a renderer that traces it. The page
+    // itself evaluates each head only where it can land (`hangSurfaceLight`).
     light.name = `vinci/collection-picture-room/${spec.name}`
-    light.userData = { ...PICTURE_ROOM_PROVENANCE }
+    light.userData = { ...PICTURE_ROOM_PROVENANCE, pool: frameOf.get(spec.key), poolMargin: H.poolMargin.value,
+      poolSoft: H.poolSoft.value, shutter: spec.shutter ?? null, level: spec.level }
     // hidden from the scene's own list, which every other surface reads;
     // still in the graph, so its matrices follow
     light.visible = false
@@ -371,10 +384,9 @@ export function mountPictureRoom(stack: Stack): PictureRoom {
     group.add(light)
     rooms.push({ light, spec })
   }
-  const headLights = heads.map(({ light }) => light)
   const roomAll = rooms.filter(({ spec }) => spec.receivers === 'room').map(({ light }) => light)
   const floorAll = rooms.map(({ light }) => light)
-  const rig = { wall: [...headLights, ...roomAll], floor: [...headLights, ...floorAll], ceiling: roomAll }
+  const rig = { wall: roomAll, floor: floorAll, ceiling: roomAll }
 
   // THE ROOM'S BOUNCE: a probe at the room's middle, taken turned by the
   // scene's own environment turn and re-taken into the same target
