@@ -18,6 +18,9 @@ import { CERTIFICATE_FILE, WING_DIR, createLoader } from './load.mjs'
 import { walkClip } from './replay.mjs'
 
 export const FPS = 30
+/** The export's 180 degree shutter: a delivered frame's draws span this
+    share of a frame, centred on its instant. */
+export const SHUTTER = 0.5
 export const PACES = ['stroll', 'walk', 'brisk']
 /** The rendered pace; the others play the same clip at a rate. */
 export const FILM_PACE = 'walk'
@@ -140,14 +143,40 @@ function railLeg(wing, moves, edge, framingName) {
     }
     // the film's own pace: the seconds read off the walk the frames are counted on
     gait.setGaitPace(FILM_PACE)
+    /* THE CLIP ENDS ON A FRAME WHOSE WHOLE SHUTTER IS AT REST: its earliest
+       draw falls half a shutter before its instant, so an arrival inside that
+       half is one frame later in the film than on the camera's track. A
+       second rail walks the same leg on a clock that lags by that half once
+       the leg has begun; the frames it arrives later are the leg's rest lag,
+       and a clip delivers its still, `frames` and `restLag` frames. */
+    const lag = SHUTTER / 2 / FPS
+    let k = 0, t = 0, arrived = -1, late = -1, shadow = null
+    const stepShadow = () => {
+      const walking = shadow.navigation.active !== undefined
+      t = k / FPS - (walking ? lag : 0)
+      shadow.update()
+      if (walking && late < 0 && !shadow.navigation.active) late = k
+    }
     const timed = (rail) => {
+      shadow = wing.rail.createRail(new THREE.PerspectiveCamera(50, aspect, 0.25, 4000), () => t, wing.authority)
+      place(shadow)
+      shadow.update()
+      if (request(shadow) === false) throw new Error(`${edge.id} ${framingName}: the rail refused the leg`)
       const update = rail.update
-      rail.update = () => { update(); if (seconds[FILM_PACE] === undefined && rail.navigation.active) seconds[FILM_PACE] = rail.navigation.legSeconds }
+      rail.update = () => {
+        update()
+        k++
+        if (seconds[FILM_PACE] === undefined && rail.navigation.active) seconds[FILM_PACE] = rail.navigation.legSeconds
+        if (seconds[FILM_PACE] !== undefined && arrived < 0 && !rail.navigation.active) arrived = k
+        stepShadow()
+      }
       return request(rail)
     }
     const walked = walkClip({ createRail: wing.rail.createRail, authority: wing.authority }, { aspect, phone: framing.phone, place, request: timed })
-    if (seconds[FILM_PACE] === undefined) throw new Error(`${edge.id} ${framingName}: the leg never began`)
-    return { seconds: Object.fromEntries(PACES.map((p) => [p, seconds[p]])), frames: walked.arrivedAt, gaitSeconds: gait.gaitLeg(edge.framings[framingName].metres).seconds }
+    if (seconds[FILM_PACE] === undefined || arrived < 0) throw new Error(`${edge.id} ${framingName}: the leg never began`)
+    while (late < 0 && k < arrived + 3) { k++; stepShadow() }
+    if (late < 0) throw new Error(`${edge.id} ${framingName}: the lagging rail never arrived`)
+    return { seconds: Object.fromEntries(PACES.map((p) => [p, seconds[p]])), frames: walked.arrivedAt, restLag: late - arrived, gaitSeconds: gait.gaitLeg(edge.framings[framingName].metres).seconds }
   } finally {
     gait.setGaitPace(held)
   }
@@ -322,7 +351,7 @@ export function buildGraph(wing, { wall: wallRuns = 'both' } = {}) {
       /* the leg's own frames at the film's pace, the leading frames that
          still print as the departure dropped as the replay drops them; the
          gait's seconds before the calm gaze stretched them ride beside */
-      Object.assign(e.framings[name], { seconds: leg.seconds, frames: leg.frames, gaitSeconds: leg.gaitSeconds })
+      Object.assign(e.framings[name], { seconds: leg.seconds, frames: leg.frames, restLag: leg.restLag, gaitSeconds: leg.gaitSeconds })
     }
     // the nodes a wall run slides past: the router never walks through its target
     e.passes = e.motion.rail !== 'wall' ? [] : nodes
