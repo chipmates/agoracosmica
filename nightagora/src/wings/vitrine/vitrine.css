@@ -201,7 +201,7 @@
   .vitrine-folio {top:6px;right:56px;bottom:auto;max-width:84px;}
   .vitrine-folio-thumb {width:64px;}
   /* THE MACHINE'S FOLIO IS A GLASS in the views' row: the model keeps its box whole */
-  .vitrine-views .vitrine-folio-glass {position:static;flex:0 0 44px;width:44px;height:44px;min-width:44px;max-width:44px;
+  .vitrine-views .vitrine-folio-glass {position:static;flex:0 0 44px;width:44px;height:44px;min-width:44px;max-width:44px;margin-left:auto;
     padding:0;overflow:hidden;border-radius:50%;}
   .vitrine-folio-glass .vitrine-folio-thumb {width:100%;height:100%;object-fit:cover;object-position:50% 30%;}
   .vitrine-folio-leaf {width:20px;height:24px;fill:none;stroke:#edcc8c;stroke-width:1.3;stroke-linejoin:round;stroke-linecap:round;}
