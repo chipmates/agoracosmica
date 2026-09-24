@@ -21,7 +21,7 @@ import { hangPlacements } from './hang'
 import { COURT, SUPPER_WALL } from './layout'
 import { collectionInteriorMaterial, collectionPlateTone } from './materials'
 import { CANVAS_FORWARD, frameKey, stampHangLight } from './picture-room-plan'
-import { supperMuralLight } from './supper-room'
+import { supperMuralLight } from './supper-light'
 import { supperRoomHolds } from './supper-room-plan'
 
 export interface CollectionPictureSource {

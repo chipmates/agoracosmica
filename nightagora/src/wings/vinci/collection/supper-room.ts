@@ -24,6 +24,7 @@ import type { Stack } from '../../../stack'
 import type { MaterialSet } from '../../../stack/materials'
 import { kelvinToColour } from '../../../stack/light'
 import { axisFootprint, lineCoverage } from '../../../stack/detail'
+import { setSupperMuralLight } from './supper-light'
 import {
   END_FACE, FIELD, FINS, NAVE_PROBE_AT, PROBE_AT, ROOM, SILL, SUPPER_LIGHTS, SUPPER_ROOM_PROVENANCE, TOP_LIGHT, v3,
   endWall, fins, floor as floorBody, frame, roof, sillDress, southWall, upperEndWall, type Body, type SupperLight,
@@ -265,12 +266,6 @@ function uprightOpening(spec: SupperLight): { west: number; east: number; north:
   return { west: e - spec.width / 2, east: e + spec.width / 2, north: n, low: h - spec.height / 2, high: h + spec.height / 2 }
 }
 
-/** The field's reproduction takes this in place of the rooms' own tone: the
- * light of the supper room on it. Undefined until the room stands. */
-export function supperMuralLight(): N | undefined {
-  return mural?.node
-}
-
 export interface SupperRoom {
   group: Group
   ready: Promise<void>
@@ -454,6 +449,7 @@ export function mountSupperRoom(stack: Stack): SupperRoom {
   const bayProbe = probes.bay
   const bounce = bayProbe ? pmremTexture(bayProbe.pmrem.texture, look, float(1)) : vec3(...CALM_FILL.bay.side).add(.02)
   mural = buildMuralLight(L, plasterSet!, bounce)
+  setSupperMuralLight(mural.node)
   const syncRadiance = (): void => {
     for (const { light, spec } of built) mural?.radiance.get(spec.name)?.value.copy(light.color).multiplyScalar(light.intensity)
   }
@@ -513,6 +509,7 @@ export function mountSupperRoom(stack: Stack): SupperRoom {
     dispose() {
       live = false
       mural = undefined
+      setSupperMuralLight(undefined)
       for (const mesh of owned) { mesh.removeFromParent(); mesh.geometry.dispose() }
       for (const m of materials) m.dispose()
       for (const { light } of built) { light.removeFromParent(); light.dispose() }
