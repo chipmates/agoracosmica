@@ -4215,47 +4215,163 @@
         "en": "Pivot",
         "de": "Drehpunkt"
       },
+      "washer-mid": {
+        "en": "Washer",
+        "de": "Unterlegscheibe"
+      },
+      "washer-front": {
+        "en": "Washer",
+        "de": "Unterlegscheibe"
+      },
+      "screw-head": {
+        "en": "Screw",
+        "de": "Schraube"
+      },
+      "screw-hub": {
+        "en": "Boss of the wing nut",
+        "de": "Nabe der Flügelmutter"
+      },
       "leg-left": {
         "en": "Leg",
         "de": "Schenkel"
+      },
+      "leg-left-point-long": {
+        "en": "Steel point",
+        "de": "Stahlspitze"
+      },
+      "leg-left-point-short": {
+        "en": "Steel point",
+        "de": "Stahlspitze"
       },
       "leg-right": {
         "en": "Leg",
         "de": "Schenkel"
       },
-      "screw-head": {
-        "en": "Screw",
-        "de": "Schraube"
+      "leg-right-point-long": {
+        "en": "Steel point",
+        "de": "Stahlspitze"
+      },
+      "leg-right-point-short": {
+        "en": "Steel point",
+        "de": "Stahlspitze"
       }
     },
     "camera-obscura": {
+      "floor-board-0": {
+        "en": "Floor board",
+        "de": "Bodenbrett"
+      },
       "floor": {
         "en": "Floor",
         "de": "Boden"
       },
-      "roof": {
-        "en": "Roof",
-        "de": "Decke"
+      "floor-board-2": {
+        "en": "Floor board",
+        "de": "Bodenbrett"
+      },
+      "floor-board-3": {
+        "en": "Floor board",
+        "de": "Bodenbrett"
+      },
+      "corner-post-0": {
+        "en": "Corner post",
+        "de": "Eckpfosten"
+      },
+      "corner-post-1": {
+        "en": "Corner post",
+        "de": "Eckpfosten"
+      },
+      "corner-post-2": {
+        "en": "Corner post",
+        "de": "Eckpfosten"
+      },
+      "corner-post-3": {
+        "en": "Corner post",
+        "de": "Eckpfosten"
       },
       "left-wall": {
         "en": "Left wall",
         "de": "Linke Wand"
       },
+      "left-wall-board-0": {
+        "en": "Board",
+        "de": "Brett"
+      },
+      "left-wall-board-2": {
+        "en": "Board",
+        "de": "Brett"
+      },
+      "left-wall-batten-0": {
+        "en": "Batten",
+        "de": "Leiste"
+      },
+      "left-wall-batten-1": {
+        "en": "Batten",
+        "de": "Leiste"
+      },
       "right-wall": {
         "en": "Right wall",
         "de": "Rechte Wand"
+      },
+      "right-wall-board-0": {
+        "en": "Board",
+        "de": "Brett"
+      },
+      "right-wall-board-2": {
+        "en": "Board",
+        "de": "Brett"
+      },
+      "right-wall-batten-0": {
+        "en": "Batten",
+        "de": "Leiste"
+      },
+      "right-wall-batten-1": {
+        "en": "Batten",
+        "de": "Leiste"
       },
       "back-wall": {
         "en": "Back wall",
         "de": "Rückwand"
       },
+      "back-wall-board-0": {
+        "en": "Board",
+        "de": "Brett"
+      },
+      "back-wall-board-1": {
+        "en": "Board",
+        "de": "Brett"
+      },
+      "back-wall-board-3": {
+        "en": "Board",
+        "de": "Brett"
+      },
+      "back-wall-board-4": {
+        "en": "Board",
+        "de": "Brett"
+      },
+      "back-wall-batten-0": {
+        "en": "Batten",
+        "de": "Leiste"
+      },
+      "back-wall-batten-1": {
+        "en": "Batten",
+        "de": "Leiste"
+      },
       "front-left": {
         "en": "Front wall",
         "de": "Vorderwand"
       },
+      "front-left-board-0": {
+        "en": "Board",
+        "de": "Brett"
+      },
       "front-right": {
         "en": "Front wall",
         "de": "Vorderwand"
+      },
+      "front-right-board-0": {
+        "en": "Board",
+        "de": "Brett"
       },
       "front-bottom": {
         "en": "Front wall",
@@ -4265,14 +4381,382 @@
         "en": "Front wall",
         "de": "Vorderwand"
       },
+      "front-batten-0": {
+        "en": "Batten",
+        "de": "Leiste"
+      },
+      "front-batten-1": {
+        "en": "Batten",
+        "de": "Leiste"
+      },
+      "aperture-plate": {
+        "en": "Iron plate with the hole",
+        "de": "Eisenplatte mit dem Loch"
+      },
+      "roof": {
+        "en": "Roof",
+        "de": "Decke"
+      },
+      "roof-board-0": {
+        "en": "Roof board",
+        "de": "Deckenbrett"
+      },
+      "roof-board-2": {
+        "en": "Roof board",
+        "de": "Deckenbrett"
+      },
+      "roof-board-3": {
+        "en": "Roof board",
+        "de": "Deckenbrett"
+      },
       "screen": {
         "en": "White paper",
         "de": "Weißes Papier",
         "screen": true
       },
-      "aperture-plate": {
-        "en": "Iron plate with the hole",
-        "de": "Eisenplatte mit dem Loch"
+      "screen-frame-top": {
+        "en": "Frame of the paper",
+        "de": "Rahmen des Papiers"
+      },
+      "screen-frame-bottom": {
+        "en": "Frame of the paper",
+        "de": "Rahmen des Papiers"
+      },
+      "screen-frame-left": {
+        "en": "Frame of the paper",
+        "de": "Rahmen des Papiers"
+      },
+      "screen-frame-right": {
+        "en": "Frame of the paper",
+        "de": "Rahmen des Papiers"
+      },
+      "screen-foot-0": {
+        "en": "Block under the frame",
+        "de": "Klotz unter dem Rahmen"
+      },
+      "screen-foot-1": {
+        "en": "Block under the frame",
+        "de": "Klotz unter dem Rahmen"
+      },
+      "left-wall-guide-0": {
+        "en": "Guide of the frame",
+        "de": "Führung des Rahmens"
+      },
+      "left-wall-guide-1": {
+        "en": "Guide of the frame",
+        "de": "Führung des Rahmens"
+      },
+      "right-wall-guide-0": {
+        "en": "Guide of the frame",
+        "de": "Führung des Rahmens"
+      },
+      "right-wall-guide-1": {
+        "en": "Guide of the frame",
+        "de": "Führung des Rahmens"
+      },
+      "left-wall-nail-b00": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "left-wall-nail-b01": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "left-wall-nail-b10": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "left-wall-nail-b11": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "left-wall-nail-b20": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "left-wall-nail-b21": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "left-wall-nail-p00": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "left-wall-nail-p10": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "left-wall-nail-p01": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "left-wall-nail-p11": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "left-wall-nail-p02": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "left-wall-nail-p12": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "left-wall-nail-p03": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "left-wall-nail-p13": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "right-wall-nail-b00": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "right-wall-nail-b01": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "right-wall-nail-b10": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "right-wall-nail-b11": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "right-wall-nail-b20": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "right-wall-nail-b21": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "right-wall-nail-p00": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "right-wall-nail-p10": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "right-wall-nail-p01": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "right-wall-nail-p11": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "right-wall-nail-p02": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "right-wall-nail-p12": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "right-wall-nail-p03": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "right-wall-nail-p13": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "back-wall-nail-b10": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "back-wall-nail-b11": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "back-wall-nail-b20": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "back-wall-nail-b21": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "back-wall-nail-b30": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "back-wall-nail-b31": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "back-wall-nail-p00": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "back-wall-nail-p10": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "back-wall-nail-p01": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "back-wall-nail-p11": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "back-wall-nail-p02": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "back-wall-nail-p12": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "back-wall-nail-p03": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "back-wall-nail-p13": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "front-left-nail-p0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "front-left-nail-p1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "front-left-nail-p2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "front-left-nail-p3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "front-right-nail-p0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "front-right-nail-p1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "front-right-nail-p2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "front-right-nail-p3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "front-nail-b00": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "front-nail-b01": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "front-nail-b10": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "front-nail-b11": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "front-nail-b20": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "front-nail-b21": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "front-nail-b30": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "front-nail-b31": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "front-nail-b40": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "front-nail-b41": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "plate-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "plate-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "plate-nail-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "plate-nail-3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "plate-nail-4": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "plate-nail-5": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "plate-nail-6": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "plate-nail-7": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "roof-nail-00": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "roof-nail-01": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "roof-nail-10": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "roof-nail-11": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "roof-nail-20": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "roof-nail-21": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "roof-nail-30": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "roof-nail-31": {
+        "en": "Nail",
+        "de": "Nagel"
       },
       "candle": {
         "en": "Candle",

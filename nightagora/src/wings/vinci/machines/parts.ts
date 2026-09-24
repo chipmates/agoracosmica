@@ -11,6 +11,7 @@ import { createFlywheelSpokeArms } from './flywheel-overlap'
 import { createMutableSweep, geometryForPart, type MutableSweep } from './geometry'
 import { benchKeyDirection } from './key'
 import { wearFor, wornSurface } from './wear'
+import { compassFitting } from './instruments'
 import type { Assembly, Dossier, PartSpec } from './types'
 export type { Assembly } from './types'
 /** An assembly with every library set its surfaces were built from. */
@@ -247,9 +248,9 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
   const dynamic = new Set(dossier.slug === 'revolving-crane' ? ['hoist-rope', 'drum-wrap'] : dossier.slug === 'lathe' ? ['bow', 'drive-rope'] : [])
   // The complete camera remains closed by default. Its explicitly labelled
   // section view toggles these original part groups without changing geometry.
-  // A welded wall cannot be taken off, so every wall the section may lift
-  // stays its own draw: the near corner and the back, which the close look
-  // opens to show the aperture, the dark interior and the paper.
+  // Every wall the section may lift is a rigid anchor of its own: its boards,
+  // battens and nails weld under it and lift with it. The close look opens the
+  // near corner and the back to show the aperture, the dark interior and the paper.
   const sectionParts = new Set(dossier.slug === 'camera-obscura'
     ? ['roof', 'right-wall', 'left-wall', 'front-left', 'back-wall'] : [])
   const names = [...new Set(dossier.parts.map(p => p.material.class))]
@@ -614,7 +615,7 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
       if (!gear) { gear = await makeSurface(part.material.class, false, true, false, false, true); materials.set('worn-gear', gear) }
       material = gear
     }
-    if (dossier.slug === 'proportional-compass' && (part.id === 'pivot' || part.id === 'screw-head')) {
+    if (dossier.slug === 'proportional-compass' && compassFitting(part.id)) {
       let fitting = materials.get('burnished-fitting')
       if (!fitting) { fitting = await makeSurface(part.material.class, false, false, false, true); materials.set('burnished-fitting', fitting) }
       material = fitting
@@ -674,8 +675,12 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
   const specById = new Map(dossier.parts.map(p => [p.id, p]))
   const rigidAncestor = (part: PartSpec): Group => {
     let ancestor: PartSpec | undefined = part
-    while (ancestor && !moving.has(ancestor.id)) ancestor = specById.get(ancestor.parent)
+    while (ancestor && !moving.has(ancestor.id) && !sectionParts.has(ancestor.id)) ancestor = specById.get(ancestor.parent)
     return ancestor ? parts.get(ancestor.id)! : object
+  }
+  const underSection = (part: PartSpec): boolean => {
+    for (let at: PartSpec | undefined = part; at; at = specById.get(at.parent)) if (sectionParts.has(at.id)) return true
+    return false
   }
   const noweld = typeof location !== 'undefined' && new URLSearchParams(location.search).has('noweld')
   // The unbatched diagnostic evaluates the same policy, so its individual
@@ -686,7 +691,7 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
     // from those nodes after motion, so spin and parent motion occur once.
     const repeats = new Map<string, PartSpec[]>()
     for (const part of dossier.parts) {
-      if (dynamic.has(part.id) || sectionParts.has(part.id) || worn.has(part.id)) continue
+      if (dynamic.has(part.id) || underSection(part) || worn.has(part.id)) continue
       const key = `${(meshes.get(part.id)!.material as Surface).uuid}:${signatures.get(part.id)}`
       const list = repeats.get(key) ?? []
       list.push(part); repeats.set(key, list)
@@ -725,7 +730,7 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
     // Each distinct material stays a draw, and moving nodes remain in place.
     const batches = new Map<string, {anchor: Group; sources: Mesh[]}>()
     for (const part of dossier.parts) {
-      if (dynamic.has(part.id) || sectionParts.has(part.id) || instanced.has(part.id)) continue
+      if (dynamic.has(part.id) || instanced.has(part.id)) continue
       const anchor = rigidAncestor(part)
       const key = `${anchor.uuid}:${(meshes.get(part.id)!.material as Surface).uuid}`
       const batch = batches.get(key) ?? {anchor, sources: []}

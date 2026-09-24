@@ -36,7 +36,7 @@
     "z": 0.64,
     "certainty": "C",
     "source": "geometry",
-    "note": "Chamber bounds x +/-0.62, y0 to1.24, z -0.02 to0.62."
+    "note": "Chamber bounds x +/-0.62, y0 to1.24, z -0.02 to0.62. The front boards are set back to z=-0.0115 between the side walls; the iron plate with the hole stands at z=-0.015, the paper at z=0.5."
   },
   "frame": {
     "handedness": "right",
@@ -60,247 +60,1277 @@
   ],
   "parts": [
     {
-      "id": "floor",
+      "id": "floor-board-0",
       "parent": "world",
-      "shape": "box",
-      "dimensions_m": {
-        "x": 1.24,
-        "y": 0.02,
-        "z": 0.64
+      "shape": {
+        "type": "profile",
+        "plane": "YZ",
+        "vertices_m": [
+          [-0.01, -0.080509],
+          [-0.01, 0.080509],
+          [0.006, 0.080509],
+          [0.01, 0.076509],
+          [0.01, -0.076509],
+          [0.006, -0.080509]
+        ],
+        "extrude_depth_m": 1.234
       },
-      "position_m": [
-        0,
-        0.01,
-        0.3
-      ],
-      "orientation_rad": [
-        0,
-        0,
-        0
-      ],
+      "dimensions_m": {
+        "extrude_depth": 1.234
+      },
+      "position_m": [0.0, 0.01, 0.060509],
+      "orientation_rad": [0.0, 0.0, 0.0],
       "material": {
-        "class": "wood",
+        "class": "wood, planed oak",
         "basis": "assumed",
         "source": "geometry"
       },
       "certainty": "C",
-      "source": "geometry"
+      "source": "geometry",
+      "notes": "[geometry] A floor board, laid across the chamber."
     },
     {
-      "id": "roof",
+      "id": "floor",
       "parent": "world",
-      "shape": "box",
-      "dimensions_m": {
-        "x": 1.24,
-        "y": 0.02,
-        "z": 0.64
+      "shape": {
+        "type": "profile",
+        "plane": "YZ",
+        "vertices_m": [
+          [-0.01, -0.076562],
+          [-0.01, 0.076562],
+          [0.006, 0.076562],
+          [0.01, 0.072562],
+          [0.01, -0.072562],
+          [0.006, -0.076562]
+        ],
+        "extrude_depth_m": 1.234
       },
-      "position_m": [
-        0,
-        1.23,
-        0.3
-      ],
-      "orientation_rad": [
-        0,
-        0,
-        0
-      ],
+      "dimensions_m": {
+        "extrude_depth": 1.234
+      },
+      "position_m": [0.0, 0.01, 0.21838],
+      "orientation_rad": [0.0, 0.0, 0.0],
       "material": {
-        "class": "wood",
+        "class": "wood, planed oak",
         "basis": "assumed",
         "source": "geometry"
       },
       "certainty": "C",
-      "source": "geometry"
+      "source": "geometry",
+      "notes": "[geometry] The middle board of the chamber's floor; the walls stand on it."
+    },
+    {
+      "id": "floor-board-2",
+      "parent": "world",
+      "shape": {
+        "type": "profile",
+        "plane": "YZ",
+        "vertices_m": [
+          [-0.01, -0.082088],
+          [-0.01, 0.082088],
+          [0.006, 0.082088],
+          [0.01, 0.078088],
+          [0.01, -0.078088],
+          [0.006, -0.082088]
+        ],
+        "extrude_depth_m": 1.234
+      },
+      "dimensions_m": {
+        "extrude_depth": 1.234
+      },
+      "position_m": [0.0, 0.01, 0.37783],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A floor board, laid across the chamber."
+    },
+    {
+      "id": "floor-board-3",
+      "parent": "world",
+      "shape": {
+        "type": "profile",
+        "plane": "YZ",
+        "vertices_m": [
+          [-0.01, -0.078141],
+          [-0.01, 0.078141],
+          [0.006, 0.078141],
+          [0.01, 0.074141],
+          [0.01, -0.074141],
+          [0.006, -0.078141]
+        ],
+        "extrude_depth_m": 1.234
+      },
+      "dimensions_m": {
+        "extrude_depth": 1.234
+      },
+      "position_m": [0.0, 0.01, 0.538859],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A floor board, laid across the chamber."
+    },
+    {
+      "id": "corner-post-0",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.04,
+        "y": 1.197,
+        "z": 0.04
+      },
+      "position_m": [-0.577, 0.6185, 0.0285],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A corner post inside the chamber: the boards of two walls are nailed to it."
+    },
+    {
+      "id": "corner-post-1",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.04,
+        "y": 1.197,
+        "z": 0.04
+      },
+      "position_m": [0.577, 0.6185, 0.0285],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A corner post inside the chamber: the boards of two walls are nailed to it."
+    },
+    {
+      "id": "corner-post-2",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.04,
+        "y": 1.197,
+        "z": 0.04
+      },
+      "position_m": [-0.577, 0.6185, 0.577],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A corner post inside the chamber: the boards of two walls are nailed to it."
+    },
+    {
+      "id": "corner-post-3",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.04,
+        "y": 1.197,
+        "z": 0.04
+      },
+      "position_m": [0.577, 0.6185, 0.577],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A corner post inside the chamber: the boards of two walls are nailed to it."
     },
     {
       "id": "left-wall",
       "parent": "world",
-      "shape": "box",
-      "dimensions_m": {
-        "x": 0.02,
-        "y": 1.2,
-        "z": 0.64
+      "shape": {
+        "type": "profile",
+        "plane": "XZ",
+        "vertices_m": [
+          [0.01, -0.103437],
+          [-0.006, -0.103437],
+          [-0.01, -0.099437],
+          [-0.01, 0.099437],
+          [-0.006, 0.103437],
+          [0.01, 0.103437]
+        ],
+        "extrude_depth_m": 1.197
       },
-      "position_m": [
-        -0.61,
-        0.62,
-        0.3
-      ],
-      "orientation_rad": [
-        0,
-        0,
-        0
-      ],
+      "dimensions_m": {
+        "extrude_depth": 1.197
+      },
+      "position_m": [-0.607, 0.6185, 0.301666],
+      "orientation_rad": [0.0, 0.0, 0.0],
       "material": {
-        "class": "wood",
+        "class": "wood, planed oak",
         "basis": "assumed",
         "source": "geometry"
       },
       "certainty": "C",
-      "source": "geometry"
+      "source": "geometry",
+      "notes": "[geometry] The middle board of this wall, nailed to the battens inside."
+    },
+    {
+      "id": "left-wall-board-0",
+      "parent": "left-wall",
+      "shape": {
+        "type": "profile",
+        "plane": "XZ",
+        "vertices_m": [
+          [0.01, -0.108715],
+          [-0.006, -0.108715],
+          [-0.01, -0.104715],
+          [-0.01, 0.104715],
+          [-0.006, 0.108715],
+          [0.01, 0.108715]
+        ],
+        "extrude_depth_m": 1.197
+      },
+      "dimensions_m": {
+        "extrude_depth": 1.197
+      },
+      "position_m": [0.0, 0.0, -0.212952],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A board of the chamber, nailed to the corner posts and to the battens inside; boards meet in rebated joints so no light enters."
+    },
+    {
+      "id": "left-wall-board-2",
+      "parent": "left-wall",
+      "shape": {
+        "type": "profile",
+        "plane": "XZ",
+        "vertices_m": [
+          [0.01, -0.105548],
+          [-0.006, -0.105548],
+          [-0.01, -0.101548],
+          [-0.01, 0.101548],
+          [-0.006, 0.105548],
+          [0.01, 0.105548]
+        ],
+        "extrude_depth_m": 1.197
+      },
+      "dimensions_m": {
+        "extrude_depth": 1.197
+      },
+      "position_m": [0.0, 0.0, 0.209785],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A board of the chamber, nailed to the corner posts and to the battens inside; boards meet in rebated joints so no light enters."
+    },
+    {
+      "id": "left-wall-batten-0",
+      "parent": "left-wall",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.022,
+        "y": 0.07,
+        "z": 0.5045
+      },
+      "position_m": [0.021, -0.4885, 0.001084],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A batten inside the wall, holding its boards together."
+    },
+    {
+      "id": "left-wall-batten-1",
+      "parent": "left-wall",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.022,
+        "y": 0.07,
+        "z": 0.5045
+      },
+      "position_m": [0.021, 0.4915, 0.001084],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A batten inside the wall, holding its boards together."
     },
     {
       "id": "right-wall",
       "parent": "world",
-      "shape": "box",
-      "dimensions_m": {
-        "x": 0.02,
-        "y": 1.2,
-        "z": 0.64
+      "shape": {
+        "type": "profile",
+        "plane": "XZ",
+        "vertices_m": [
+          [-0.01, -0.10977],
+          [-0.01, 0.10977],
+          [0.006, 0.10977],
+          [0.01, 0.10577],
+          [0.01, -0.10577],
+          [0.006, -0.10977]
+        ],
+        "extrude_depth_m": 1.197
       },
-      "position_m": [
-        0.61,
-        0.62,
-        0.3
-      ],
-      "orientation_rad": [
-        0,
-        0,
-        0
-      ],
+      "dimensions_m": {
+        "extrude_depth": 1.197
+      },
+      "position_m": [0.607, 0.6185, 0.299555],
+      "orientation_rad": [0.0, 0.0, 0.0],
       "material": {
-        "class": "wood",
+        "class": "wood, planed oak",
         "basis": "assumed",
         "source": "geometry"
       },
       "certainty": "C",
-      "source": "geometry"
+      "source": "geometry",
+      "notes": "[geometry] The middle board of this wall, nailed to the battens inside."
+    },
+    {
+      "id": "right-wall-board-0",
+      "parent": "right-wall",
+      "shape": {
+        "type": "profile",
+        "plane": "XZ",
+        "vertices_m": [
+          [-0.01, -0.104493],
+          [-0.01, 0.104493],
+          [0.006, 0.104493],
+          [0.01, 0.100493],
+          [0.01, -0.100493],
+          [0.006, -0.104493]
+        ],
+        "extrude_depth_m": 1.197
+      },
+      "dimensions_m": {
+        "extrude_depth": 1.197
+      },
+      "position_m": [0.0, 0.0, -0.215063],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A board of the chamber, nailed to the corner posts and to the battens inside; boards meet in rebated joints so no light enters."
+    },
+    {
+      "id": "right-wall-board-2",
+      "parent": "right-wall",
+      "shape": {
+        "type": "profile",
+        "plane": "XZ",
+        "vertices_m": [
+          [-0.01, -0.103437],
+          [-0.01, 0.103437],
+          [0.006, 0.103437],
+          [0.01, 0.099437],
+          [0.01, -0.099437],
+          [0.006, -0.103437]
+        ],
+        "extrude_depth_m": 1.197
+      },
+      "dimensions_m": {
+        "extrude_depth": 1.197
+      },
+      "position_m": [0.0, 0.0, 0.214007],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A board of the chamber, nailed to the corner posts and to the battens inside; boards meet in rebated joints so no light enters."
+    },
+    {
+      "id": "right-wall-batten-0",
+      "parent": "right-wall",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.022,
+        "y": 0.07,
+        "z": 0.5045
+      },
+      "position_m": [-0.021, -0.4885, 0.003195],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A batten inside the wall, holding its boards together."
+    },
+    {
+      "id": "right-wall-batten-1",
+      "parent": "right-wall",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.022,
+        "y": 0.07,
+        "z": 0.5045
+      },
+      "position_m": [-0.021, 0.4915, 0.003195],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A batten inside the wall, holding its boards together."
     },
     {
       "id": "back-wall",
       "parent": "world",
-      "shape": "box",
-      "dimensions_m": {
-        "x": 1.2,
-        "y": 1.2,
-        "z": 0.02
+      "shape": {
+        "type": "profile",
+        "plane": "XZ",
+        "vertices_m": [
+          [-0.120498, -0.01],
+          [0.120498, -0.01],
+          [0.120498, 0.006],
+          [0.116498, 0.01],
+          [-0.116498, 0.01],
+          [-0.120498, 0.006]
+        ],
+        "extrude_depth_m": 1.197
       },
-      "position_m": [
-        0,
-        0.62,
-        0.61
-      ],
-      "orientation_rad": [
-        0,
-        0,
-        0
-      ],
+      "dimensions_m": {
+        "extrude_depth": 1.197
+      },
+      "position_m": [-0.004725, 0.6185, 0.607],
+      "orientation_rad": [0.0, 0.0, 0.0],
       "material": {
-        "class": "wood",
+        "class": "wood, planed oak",
         "basis": "assumed",
         "source": "geometry"
       },
       "certainty": "C",
-      "source": "geometry"
+      "source": "geometry",
+      "notes": "[geometry] The middle board of the back wall. The back comes off in the close look, where the paper is read from its reverse."
+    },
+    {
+      "id": "back-wall-board-0",
+      "parent": "back-wall",
+      "shape": {
+        "type": "profile",
+        "plane": "XZ",
+        "vertices_m": [
+          [-0.121679, -0.01],
+          [0.121679, -0.01],
+          [0.121679, 0.006],
+          [0.117679, 0.01],
+          [-0.117679, 0.01],
+          [-0.121679, 0.006]
+        ],
+        "extrude_depth_m": 1.197
+      },
+      "dimensions_m": {
+        "extrude_depth": 1.197
+      },
+      "position_m": [-0.470596, 0.0, 0.0],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A board of the chamber, nailed to the corner posts and to the battens inside; boards meet in rebated joints so no light enters."
+    },
+    {
+      "id": "back-wall-board-1",
+      "parent": "back-wall",
+      "shape": {
+        "type": "profile",
+        "plane": "XZ",
+        "vertices_m": [
+          [-0.11341, -0.01],
+          [0.11341, -0.01],
+          [0.11341, 0.006],
+          [0.10941, 0.01],
+          [-0.10941, 0.01],
+          [-0.11341, 0.006]
+        ],
+        "extrude_depth_m": 1.197
+      },
+      "dimensions_m": {
+        "extrude_depth": 1.197
+      },
+      "position_m": [-0.234707, 0.0, 0.0],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A board of the chamber, nailed to the corner posts and to the battens inside; boards meet in rebated joints so no light enters."
+    },
+    {
+      "id": "back-wall-board-3",
+      "parent": "back-wall",
+      "shape": {
+        "type": "profile",
+        "plane": "XZ",
+        "vertices_m": [
+          [-0.124042, -0.01],
+          [0.124042, -0.01],
+          [0.124042, 0.006],
+          [0.120042, 0.01],
+          [-0.120042, 0.01],
+          [-0.124042, 0.006]
+        ],
+        "extrude_depth_m": 1.197
+      },
+      "dimensions_m": {
+        "extrude_depth": 1.197
+      },
+      "position_m": [0.245339, 0.0, 0.0],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A board of the chamber, nailed to the corner posts and to the battens inside; boards meet in rebated joints so no light enters."
+    },
+    {
+      "id": "back-wall-board-4",
+      "parent": "back-wall",
+      "shape": {
+        "type": "profile",
+        "plane": "XZ",
+        "vertices_m": [
+          [-0.115772, -0.01],
+          [0.115772, -0.01],
+          [0.115772, 0.006],
+          [0.111772, 0.01],
+          [-0.111772, 0.01],
+          [-0.115772, 0.006]
+        ],
+        "extrude_depth_m": 1.197
+      },
+      "dimensions_m": {
+        "extrude_depth": 1.197
+      },
+      "position_m": [0.485953, 0.0, 0.0],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A board of the chamber, nailed to the corner posts and to the battens inside; boards meet in rebated joints so no light enters."
+    },
+    {
+      "id": "back-wall-batten-0",
+      "parent": "back-wall",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 1.11,
+        "y": 0.07,
+        "z": 0.022
+      },
+      "position_m": [0.004725, -0.4885, -0.021],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A batten inside the wall, holding its boards together."
+    },
+    {
+      "id": "back-wall-batten-1",
+      "parent": "back-wall",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 1.11,
+        "y": 0.07,
+        "z": 0.022
+      },
+      "position_m": [0.004725, 0.4915, -0.021],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A batten inside the wall, holding its boards together."
     },
     {
       "id": "front-left",
       "parent": "world",
-      "shape": "box",
-      "dimensions_m": {
-        "x": 0.54,
-        "y": 1.2,
-        "z": 0.02
+      "shape": {
+        "type": "profile",
+        "plane": "XZ",
+        "vertices_m": [
+          [-0.134, 0.01],
+          [-0.134, -0.006],
+          [-0.13, -0.01],
+          [0.13, -0.01],
+          [0.134, -0.006],
+          [0.134, 0.01]
+        ],
+        "extrude_depth_m": 1.197
       },
-      "position_m": [
-        -0.33,
-        0.62,
-        -0.01
-      ],
-      "orientation_rad": [
-        0,
-        0,
-        0
-      ],
+      "dimensions_m": {
+        "extrude_depth": 1.197
+      },
+      "position_m": [-0.194, 0.6185, -0.0015],
+      "orientation_rad": [0.0, 0.0, 0.0],
       "material": {
-        "class": "wood",
+        "class": "wood, planed oak",
         "basis": "assumed",
         "source": "geometry"
       },
       "certainty": "C",
-      "source": "geometry"
+      "source": "geometry",
+      "notes": "[geometry] The front board beside the opening, set back between the side walls."
+    },
+    {
+      "id": "front-left-board-0",
+      "parent": "front-left",
+      "shape": {
+        "type": "profile",
+        "plane": "XZ",
+        "vertices_m": [
+          [-0.1341, 0.01],
+          [-0.1341, -0.006],
+          [-0.1301, -0.01],
+          [0.1301, -0.01],
+          [0.1341, -0.006],
+          [0.1341, 0.01]
+        ],
+        "extrude_depth_m": 1.197
+      },
+      "dimensions_m": {
+        "extrude_depth": 1.197
+      },
+      "position_m": [-0.2689, 0.0, 0.0],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A board of the chamber, nailed to the corner posts and to the battens inside; boards meet in rebated joints so no light enters."
     },
     {
       "id": "front-right",
       "parent": "world",
-      "shape": "box",
-      "dimensions_m": {
-        "x": 0.54,
-        "y": 1.2,
-        "z": 0.02
+      "shape": {
+        "type": "profile",
+        "plane": "XZ",
+        "vertices_m": [
+          [-0.136, 0.01],
+          [-0.136, -0.006],
+          [-0.132, -0.01],
+          [0.132, -0.01],
+          [0.136, -0.006],
+          [0.136, 0.01]
+        ],
+        "extrude_depth_m": 1.197
       },
-      "position_m": [
-        0.33,
-        0.62,
-        -0.01
-      ],
-      "orientation_rad": [
-        0,
-        0,
-        0
-      ],
+      "dimensions_m": {
+        "extrude_depth": 1.197
+      },
+      "position_m": [0.196, 0.6185, -0.0015],
+      "orientation_rad": [0.0, 0.0, 0.0],
       "material": {
-        "class": "wood",
+        "class": "wood, planed oak",
         "basis": "assumed",
         "source": "geometry"
       },
       "certainty": "C",
-      "source": "geometry"
+      "source": "geometry",
+      "notes": "[geometry] The front board beside the opening, set back between the side walls."
+    },
+    {
+      "id": "front-right-board-0",
+      "parent": "front-right",
+      "shape": {
+        "type": "profile",
+        "plane": "XZ",
+        "vertices_m": [
+          [-0.1321, 0.01],
+          [-0.1321, -0.006],
+          [-0.1281, -0.01],
+          [0.1281, -0.01],
+          [0.1321, -0.006],
+          [0.1321, 0.01]
+        ],
+        "extrude_depth_m": 1.197
+      },
+      "dimensions_m": {
+        "extrude_depth": 1.197
+      },
+      "position_m": [0.2689, 0.0, 0.0],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A board of the chamber, nailed to the corner posts and to the battens inside; boards meet in rebated joints so no light enters."
     },
     {
       "id": "front-bottom",
       "parent": "world",
-      "shape": "box",
-      "dimensions_m": {
-        "x": 0.12,
-        "y": 0.54,
-        "z": 0.02
+      "shape": {
+        "type": "profile",
+        "plane": "XZ",
+        "vertices_m": [
+          [-0.0592, 0.01],
+          [-0.0592, -0.006],
+          [-0.0552, -0.01],
+          [0.0552, -0.01],
+          [0.0592, -0.006],
+          [0.0592, 0.01]
+        ],
+        "extrude_depth_m": 0.54
       },
-      "position_m": [
-        0,
-        0.29,
-        -0.01
-      ],
-      "orientation_rad": [
-        0,
-        0,
-        0
-      ],
+      "dimensions_m": {
+        "extrude_depth": 0.54
+      },
+      "position_m": [0.0, 0.29, -0.0015],
+      "orientation_rad": [0.0, 0.0, 0.0],
       "material": {
-        "class": "wood",
+        "class": "wood, planed oak",
         "basis": "assumed",
         "source": "geometry"
       },
       "certainty": "C",
-      "source": "geometry"
+      "source": "geometry",
+      "notes": "[geometry] The short board below the opening."
     },
     {
       "id": "front-top",
       "parent": "world",
-      "shape": "box",
-      "dimensions_m": {
-        "x": 0.12,
-        "y": 0.54,
-        "z": 0.02
+      "shape": {
+        "type": "profile",
+        "plane": "XZ",
+        "vertices_m": [
+          [-0.0592, 0.01],
+          [-0.0592, -0.006],
+          [-0.0552, -0.01],
+          [0.0552, -0.01],
+          [0.0592, -0.006],
+          [0.0592, 0.01]
+        ],
+        "extrude_depth_m": 0.537
       },
-      "position_m": [
-        0,
-        0.95,
-        -0.01
-      ],
-      "orientation_rad": [
-        0,
-        0,
-        0
-      ],
+      "dimensions_m": {
+        "extrude_depth": 0.537
+      },
+      "position_m": [0.0, 0.9485, -0.0015],
+      "orientation_rad": [0.0, 0.0, 0.0],
       "material": {
-        "class": "wood",
+        "class": "wood, planed oak",
         "basis": "assumed",
         "source": "geometry"
       },
       "certainty": "C",
-      "source": "geometry"
+      "source": "geometry",
+      "notes": "[geometry] The short board above the opening."
+    },
+    {
+      "id": "front-batten-0",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 1.11,
+        "y": 0.07,
+        "z": 0.022
+      },
+      "position_m": [0.0, 0.13, 0.0195],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A batten inside the front, holding its boards together."
+    },
+    {
+      "id": "front-batten-1",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 1.11,
+        "y": 0.07,
+        "z": 0.022
+      },
+      "position_m": [0.0, 1.11, 0.0195],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A batten inside the front, holding its boards together."
+    },
+    {
+      "id": "aperture-plate",
+      "parent": "world",
+      "shape": {
+        "type": "mesh",
+        "vertices_m": [
+          [0.001, 0, 0],
+          [0.1, 0, 0],
+          [0.000995184726672197, 9.80171403295606e-05, 0],
+          [0.09951847266721969, 0.009801714032956061, 0],
+          [0.0009807852804032304, 0.00019509032201612826, 0],
+          [0.09807852804032305, 0.019509032201612826, 0],
+          [0.0009569403357322088, 0.00029028467725446234, 0],
+          [0.09569403357322089, 0.029028467725446233, 0],
+          [0.0009238795325112868, 0.0003826834323650898, 0],
+          [0.09238795325112868, 0.03826834323650898, 0],
+          [0.0008819212643483551, 0.00047139673682599763, 0],
+          [0.08819212643483551, 0.04713967368259977, 0],
+          [0.0008314696123025453, 0.0005555702330196022, 0],
+          [0.08314696123025453, 0.05555702330196022, 0],
+          [0.000773010453362737, 0.0006343932841636455, 0],
+          [0.0773010453362737, 0.06343932841636456, 0],
+          [0.0007071067811865476, 0.0007071067811865475, 0],
+          [0.07071067811865477, 0.07071067811865475, 0],
+          [0.0006343932841636455, 0.000773010453362737, 0],
+          [0.06343932841636456, 0.0773010453362737, 0],
+          [0.0005555702330196023, 0.0008314696123025453, 0],
+          [0.05555702330196023, 0.08314696123025453, 0],
+          [0.0004713967368259978, 0.000881921264348355, 0],
+          [0.04713967368259978, 0.0881921264348355, 0],
+          [0.00038268343236508984, 0.0009238795325112868, 0],
+          [0.03826834323650899, 0.09238795325112868, 0],
+          [0.00029028467725446234, 0.0009569403357322089, 0],
+          [0.029028467725446233, 0.0956940335732209, 0],
+          [0.00019509032201612834, 0.0009807852804032304, 0],
+          [0.019509032201612833, 0.09807852804032305, 0],
+          [9.801714032956078e-05, 0.000995184726672197, 0],
+          [0.009801714032956078, 0.09951847266721969, 0],
+          [6.123233995736766e-20, 0.001, 0],
+          [6.123233995736766e-18, 0.1, 0],
+          [-9.801714032956064e-05, 0.000995184726672197, 0],
+          [-0.009801714032956065, 0.09951847266721969, 0],
+          [-0.0001950903220161282, 0.0009807852804032304, 0],
+          [-0.01950903220161282, 0.09807852804032305, 0],
+          [-0.0002902846772544622, 0.0009569403357322089, 0],
+          [-0.02902846772544622, 0.0956940335732209, 0],
+          [-0.00038268343236508973, 0.0009238795325112868, 0],
+          [-0.038268343236508975, 0.09238795325112868, 0],
+          [-0.0004713967368259977, 0.0008819212643483551, 0],
+          [-0.047139673682599775, 0.08819212643483551, 0],
+          [-0.000555570233019602, 0.0008314696123025455, 0],
+          [-0.0555570233019602, 0.08314696123025456, 0],
+          [-0.0006343932841636454, 0.0007730104533627371, 0],
+          [-0.06343932841636454, 0.07730104533627372, 0],
+          [-0.0007071067811865475, 0.0007071067811865476, 0],
+          [-0.07071067811865475, 0.07071067811865477, 0],
+          [-0.000773010453362737, 0.0006343932841636455, 0],
+          [-0.0773010453362737, 0.06343932841636456, 0],
+          [-0.0008314696123025454, 0.0005555702330196022, 0],
+          [-0.08314696123025454, 0.05555702330196022, 0],
+          [-0.000881921264348355, 0.00047139673682599785, 0],
+          [-0.0881921264348355, 0.04713967368259979, 0],
+          [-0.0009238795325112868, 0.0003826834323650899, 0],
+          [-0.09238795325112868, 0.03826834323650899, 0],
+          [-0.0009569403357322088, 0.0002902846772544624, 0],
+          [-0.09569403357322089, 0.02902846772544624, 0],
+          [-0.0009807852804032304, 0.0001950903220161286, 0],
+          [-0.09807852804032305, 0.01950903220161286, 0],
+          [-0.000995184726672197, 9.801714032956083e-05, 0],
+          [-0.09951847266721969, 0.009801714032956084, 0],
+          [-0.001, 1.2246467991473531e-19, 0],
+          [-0.1, 1.2246467991473533e-17, 0],
+          [-0.000995184726672197, -9.801714032956059e-05, 0],
+          [-0.09951847266721969, -0.00980171403295606, 0],
+          [-0.0009807852804032304, -0.00019509032201612837, 0],
+          [-0.09807852804032305, -0.019509032201612837, 0],
+          [-0.0009569403357322089, -0.0002902846772544621, 0],
+          [-0.0956940335732209, -0.029028467725446212, 0],
+          [-0.0009238795325112869, -0.0003826834323650897, 0],
+          [-0.0923879532511287, -0.03826834323650897, 0],
+          [-0.0008819212643483551, -0.00047139673682599763, 0],
+          [-0.08819212643483551, -0.04713967368259977, 0],
+          [-0.0008314696123025455, -0.000555570233019602, 0],
+          [-0.08314696123025456, -0.0555570233019602, 0],
+          [-0.0007730104533627371, -0.0006343932841636453, 0],
+          [-0.07730104533627372, -0.06343932841636453, 0],
+          [-0.0007071067811865477, -0.0007071067811865475, 0],
+          [-0.07071067811865477, -0.07071067811865475, 0],
+          [-0.000634393284163646, -0.0007730104533627366, 0],
+          [-0.0634393284163646, -0.07730104533627367, 0],
+          [-0.0005555702330196022, -0.0008314696123025453, 0],
+          [-0.05555702330196022, -0.08314696123025453, 0],
+          [-0.00047139673682599785, -0.000881921264348355, 0],
+          [-0.04713967368259979, -0.0881921264348355, 0],
+          [-0.0003826834323650903, -0.0009238795325112865, 0],
+          [-0.03826834323650904, -0.09238795325112865, 0],
+          [-0.00029028467725446245, -0.0009569403357322088, 0],
+          [-0.029028467725446247, -0.09569403357322089, 0],
+          [-0.00019509032201612866, -0.0009807852804032304, 0],
+          [-0.019509032201612868, -0.09807852804032303, 0],
+          [-9.801714032956045e-05, -0.000995184726672197, 0],
+          [-0.009801714032956045, -0.09951847266721969, 0],
+          [-1.8369701987210298e-19, -0.001, 0],
+          [-1.8369701987210297e-17, -0.1, 0],
+          [9.801714032956009e-05, -0.000995184726672197, 0],
+          [0.009801714032956009, -0.09951847266721969, 0],
+          [0.0001950903220161283, -0.0009807852804032304, 0],
+          [0.019509032201612833, -0.09807852804032305, 0],
+          [0.00029028467725446207, -0.0009569403357322089, 0],
+          [0.029028467725446205, -0.0956940335732209, 0],
+          [0.00038268343236509, -0.0009238795325112866, 0],
+          [0.038268343236509, -0.09238795325112867, 0],
+          [0.0004713967368259976, -0.0008819212643483551, 0],
+          [0.04713967368259976, -0.08819212643483551, 0],
+          [0.0005555702330196019, -0.0008314696123025455, 0],
+          [0.05555702330196019, -0.08314696123025456, 0],
+          [0.0006343932841636457, -0.0007730104533627369, 0],
+          [0.06343932841636456, -0.07730104533627369, 0],
+          [0.0007071067811865474, -0.0007071067811865477, 0],
+          [0.07071067811865474, -0.07071067811865477, 0],
+          [0.0007730104533627366, -0.000634393284163646, 0],
+          [0.07730104533627367, -0.0634393284163646, 0],
+          [0.0008314696123025453, -0.0005555702330196022, 0],
+          [0.08314696123025453, -0.05555702330196022, 0],
+          [0.0008819212643483549, -0.0004713967368259979, 0],
+          [0.08819212643483548, -0.047139673682599796, 0],
+          [0.0009238795325112865, -0.0003826834323650904, 0],
+          [0.09238795325112865, -0.038268343236509045, 0],
+          [0.0009569403357322088, -0.0002902846772544625, 0],
+          [0.09569403357322089, -0.02902846772544625, 0],
+          [0.0009807852804032304, -0.00019509032201612872, 0],
+          [0.09807852804032303, -0.019509032201612875, 0],
+          [0.000995184726672197, -9.80171403295605e-05, 0],
+          [0.09951847266721969, -0.00980171403295605, 0]
+        ],
+        "faces": [
+          [0, 2, 1],
+          [2, 3, 1],
+          [2, 4, 3],
+          [4, 5, 3],
+          [4, 6, 5],
+          [6, 7, 5],
+          [6, 8, 7],
+          [8, 9, 7],
+          [8, 10, 9],
+          [10, 11, 9],
+          [10, 12, 11],
+          [12, 13, 11],
+          [12, 14, 13],
+          [14, 15, 13],
+          [14, 16, 15],
+          [16, 17, 15],
+          [16, 18, 17],
+          [18, 19, 17],
+          [18, 20, 19],
+          [20, 21, 19],
+          [20, 22, 21],
+          [22, 23, 21],
+          [22, 24, 23],
+          [24, 25, 23],
+          [24, 26, 25],
+          [26, 27, 25],
+          [26, 28, 27],
+          [28, 29, 27],
+          [28, 30, 29],
+          [30, 31, 29],
+          [30, 32, 31],
+          [32, 33, 31],
+          [32, 34, 33],
+          [34, 35, 33],
+          [34, 36, 35],
+          [36, 37, 35],
+          [36, 38, 37],
+          [38, 39, 37],
+          [38, 40, 39],
+          [40, 41, 39],
+          [40, 42, 41],
+          [42, 43, 41],
+          [42, 44, 43],
+          [44, 45, 43],
+          [44, 46, 45],
+          [46, 47, 45],
+          [46, 48, 47],
+          [48, 49, 47],
+          [48, 50, 49],
+          [50, 51, 49],
+          [50, 52, 51],
+          [52, 53, 51],
+          [52, 54, 53],
+          [54, 55, 53],
+          [54, 56, 55],
+          [56, 57, 55],
+          [56, 58, 57],
+          [58, 59, 57],
+          [58, 60, 59],
+          [60, 61, 59],
+          [60, 62, 61],
+          [62, 63, 61],
+          [62, 64, 63],
+          [64, 65, 63],
+          [64, 66, 65],
+          [66, 67, 65],
+          [66, 68, 67],
+          [68, 69, 67],
+          [68, 70, 69],
+          [70, 71, 69],
+          [70, 72, 71],
+          [72, 73, 71],
+          [72, 74, 73],
+          [74, 75, 73],
+          [74, 76, 75],
+          [76, 77, 75],
+          [76, 78, 77],
+          [78, 79, 77],
+          [78, 80, 79],
+          [80, 81, 79],
+          [80, 82, 81],
+          [82, 83, 81],
+          [82, 84, 83],
+          [84, 85, 83],
+          [84, 86, 85],
+          [86, 87, 85],
+          [86, 88, 87],
+          [88, 89, 87],
+          [88, 90, 89],
+          [90, 91, 89],
+          [90, 92, 91],
+          [92, 93, 91],
+          [92, 94, 93],
+          [94, 95, 93],
+          [94, 96, 95],
+          [96, 97, 95],
+          [96, 98, 97],
+          [98, 99, 97],
+          [98, 100, 99],
+          [100, 101, 99],
+          [100, 102, 101],
+          [102, 103, 101],
+          [102, 104, 103],
+          [104, 105, 103],
+          [104, 106, 105],
+          [106, 107, 105],
+          [106, 108, 107],
+          [108, 109, 107],
+          [108, 110, 109],
+          [110, 111, 109],
+          [110, 112, 111],
+          [112, 113, 111],
+          [112, 114, 113],
+          [114, 115, 113],
+          [114, 116, 115],
+          [116, 117, 115],
+          [116, 118, 117],
+          [118, 119, 117],
+          [118, 120, 119],
+          [120, 121, 119],
+          [120, 122, 121],
+          [122, 123, 121],
+          [122, 124, 123],
+          [124, 125, 123],
+          [124, 126, 125],
+          [126, 127, 125],
+          [126, 0, 127],
+          [0, 1, 127]
+        ],
+        "thickness_m": 0.0003,
+        "extrude_direction": [0, 0, 1],
+        "note": "Extrude both boundary loops and connect side faces. Inner radius0.001 m. Outer radius0.10 m."
+      },
+      "dimensions_m": {
+        "thickness": 0.0003
+      },
+      "position_m": [0, 0.62, -0.015],
+      "orientation_rad": [0, 0, 0],
+      "material": {
+        "class": "iron",
+        "basis": "documented",
+        "source": "folio"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[folio] The small round hole is made in a very thin plate of iron. [geometry] A disc 0.2 m across and 0.3 mm thick, its hole 2 mm across, nailed over a square opening cut through the front; the plate stands a few millimetres proud of the boards on its nails."
+    },
+    {
+      "id": "roof",
+      "parent": "world",
+      "shape": {
+        "type": "profile",
+        "plane": "YZ",
+        "vertices_m": [
+          [-0.01, -0.082115],
+          [-0.01, 0.082115],
+          [0.006, 0.082115],
+          [0.01, 0.078115],
+          [0.01, -0.078115],
+          [0.006, -0.082115]
+        ],
+        "extrude_depth_m": 1.234
+      },
+      "dimensions_m": {
+        "extrude_depth": 1.234
+      },
+      "position_m": [0.0, 1.227, 0.219174],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A board of the chamber's roof, nailed to the walls' battens and posts."
+    },
+    {
+      "id": "roof-board-0",
+      "parent": "roof",
+      "shape": {
+        "type": "profile",
+        "plane": "YZ",
+        "vertices_m": [
+          [-0.01, -0.078129],
+          [-0.01, 0.078129],
+          [0.006, 0.078129],
+          [0.01, 0.074129],
+          [0.01, -0.074129],
+          [0.006, -0.078129]
+        ],
+        "extrude_depth_m": 1.234
+      },
+      "dimensions_m": {
+        "extrude_depth": 1.234
+      },
+      "position_m": [0.0, 0.0, -0.161044],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A board of the chamber's roof."
+    },
+    {
+      "id": "roof-board-2",
+      "parent": "roof",
+      "shape": {
+        "type": "profile",
+        "plane": "YZ",
+        "vertices_m": [
+          [-0.01, -0.080521],
+          [-0.01, 0.080521],
+          [0.006, 0.080521],
+          [0.01, 0.076521],
+          [0.01, -0.076521],
+          [0.006, -0.080521]
+        ],
+        "extrude_depth_m": 1.234
+      },
+      "dimensions_m": {
+        "extrude_depth": 1.234
+      },
+      "position_m": [0.0, 0.0, 0.163436],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A board of the chamber's roof."
+    },
+    {
+      "id": "roof-board-3",
+      "parent": "roof",
+      "shape": {
+        "type": "profile",
+        "plane": "YZ",
+        "vertices_m": [
+          [-0.01, -0.076535],
+          [-0.01, 0.076535],
+          [0.006, 0.076535],
+          [0.01, 0.072535],
+          [0.01, -0.072535],
+          [0.006, -0.076535]
+        ],
+        "extrude_depth_m": 1.234
+      },
+      "dimensions_m": {
+        "extrude_depth": 1.234
+      },
+      "position_m": [0.0, 0.0, 0.321292],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A board of the chamber's roof."
     },
     {
       "id": "screen",
@@ -311,16 +1341,8 @@
         "y": 1.16,
         "z": 0.0002
       },
-      "position_m": [
-        0,
-        0.62,
-        0.5
-      ],
-      "orientation_rad": [
-        0,
-        0,
-        0
-      ],
+      "position_m": [0, 0.62, 0.5],
+      "orientation_rad": [0, 0, 0],
       "material": {
         "class": "white paper",
         "basis": "documented",
@@ -328,1326 +1350,2259 @@
       },
       "certainty": "C",
       "source": "geometry",
-      "notes": "Material documented. All numerical dimensions remain C assumptions."
+      "notes": "[folio] Thin white paper receives the image and is seen from the reverse. [geometry] The sheet is pasted on a light frame standing 0.5 m behind the plate; the frame slides in guides on the side walls."
     },
     {
-      "id": "aperture-plate",
+      "id": "screen-frame-top",
       "parent": "world",
-      "shape": {
-        "type": "mesh",
-        "vertices_m": [
-          [
-            0.001,
-            0,
-            0
-          ],
-          [
-            0.1,
-            0,
-            0
-          ],
-          [
-            0.000995184726672197,
-            9.80171403295606e-05,
-            0
-          ],
-          [
-            0.09951847266721969,
-            0.009801714032956061,
-            0
-          ],
-          [
-            0.0009807852804032304,
-            0.00019509032201612826,
-            0
-          ],
-          [
-            0.09807852804032305,
-            0.019509032201612826,
-            0
-          ],
-          [
-            0.0009569403357322088,
-            0.00029028467725446234,
-            0
-          ],
-          [
-            0.09569403357322089,
-            0.029028467725446233,
-            0
-          ],
-          [
-            0.0009238795325112868,
-            0.0003826834323650898,
-            0
-          ],
-          [
-            0.09238795325112868,
-            0.03826834323650898,
-            0
-          ],
-          [
-            0.0008819212643483551,
-            0.00047139673682599763,
-            0
-          ],
-          [
-            0.08819212643483551,
-            0.04713967368259977,
-            0
-          ],
-          [
-            0.0008314696123025453,
-            0.0005555702330196022,
-            0
-          ],
-          [
-            0.08314696123025453,
-            0.05555702330196022,
-            0
-          ],
-          [
-            0.000773010453362737,
-            0.0006343932841636455,
-            0
-          ],
-          [
-            0.0773010453362737,
-            0.06343932841636456,
-            0
-          ],
-          [
-            0.0007071067811865476,
-            0.0007071067811865475,
-            0
-          ],
-          [
-            0.07071067811865477,
-            0.07071067811865475,
-            0
-          ],
-          [
-            0.0006343932841636455,
-            0.000773010453362737,
-            0
-          ],
-          [
-            0.06343932841636456,
-            0.0773010453362737,
-            0
-          ],
-          [
-            0.0005555702330196023,
-            0.0008314696123025453,
-            0
-          ],
-          [
-            0.05555702330196023,
-            0.08314696123025453,
-            0
-          ],
-          [
-            0.0004713967368259978,
-            0.000881921264348355,
-            0
-          ],
-          [
-            0.04713967368259978,
-            0.0881921264348355,
-            0
-          ],
-          [
-            0.00038268343236508984,
-            0.0009238795325112868,
-            0
-          ],
-          [
-            0.03826834323650899,
-            0.09238795325112868,
-            0
-          ],
-          [
-            0.00029028467725446234,
-            0.0009569403357322089,
-            0
-          ],
-          [
-            0.029028467725446233,
-            0.0956940335732209,
-            0
-          ],
-          [
-            0.00019509032201612834,
-            0.0009807852804032304,
-            0
-          ],
-          [
-            0.019509032201612833,
-            0.09807852804032305,
-            0
-          ],
-          [
-            9.801714032956078e-05,
-            0.000995184726672197,
-            0
-          ],
-          [
-            0.009801714032956078,
-            0.09951847266721969,
-            0
-          ],
-          [
-            6.123233995736766e-20,
-            0.001,
-            0
-          ],
-          [
-            6.123233995736766e-18,
-            0.1,
-            0
-          ],
-          [
-            -9.801714032956064e-05,
-            0.000995184726672197,
-            0
-          ],
-          [
-            -0.009801714032956065,
-            0.09951847266721969,
-            0
-          ],
-          [
-            -0.0001950903220161282,
-            0.0009807852804032304,
-            0
-          ],
-          [
-            -0.01950903220161282,
-            0.09807852804032305,
-            0
-          ],
-          [
-            -0.0002902846772544622,
-            0.0009569403357322089,
-            0
-          ],
-          [
-            -0.02902846772544622,
-            0.0956940335732209,
-            0
-          ],
-          [
-            -0.00038268343236508973,
-            0.0009238795325112868,
-            0
-          ],
-          [
-            -0.038268343236508975,
-            0.09238795325112868,
-            0
-          ],
-          [
-            -0.0004713967368259977,
-            0.0008819212643483551,
-            0
-          ],
-          [
-            -0.047139673682599775,
-            0.08819212643483551,
-            0
-          ],
-          [
-            -0.000555570233019602,
-            0.0008314696123025455,
-            0
-          ],
-          [
-            -0.0555570233019602,
-            0.08314696123025456,
-            0
-          ],
-          [
-            -0.0006343932841636454,
-            0.0007730104533627371,
-            0
-          ],
-          [
-            -0.06343932841636454,
-            0.07730104533627372,
-            0
-          ],
-          [
-            -0.0007071067811865475,
-            0.0007071067811865476,
-            0
-          ],
-          [
-            -0.07071067811865475,
-            0.07071067811865477,
-            0
-          ],
-          [
-            -0.000773010453362737,
-            0.0006343932841636455,
-            0
-          ],
-          [
-            -0.0773010453362737,
-            0.06343932841636456,
-            0
-          ],
-          [
-            -0.0008314696123025454,
-            0.0005555702330196022,
-            0
-          ],
-          [
-            -0.08314696123025454,
-            0.05555702330196022,
-            0
-          ],
-          [
-            -0.000881921264348355,
-            0.00047139673682599785,
-            0
-          ],
-          [
-            -0.0881921264348355,
-            0.04713967368259979,
-            0
-          ],
-          [
-            -0.0009238795325112868,
-            0.0003826834323650899,
-            0
-          ],
-          [
-            -0.09238795325112868,
-            0.03826834323650899,
-            0
-          ],
-          [
-            -0.0009569403357322088,
-            0.0002902846772544624,
-            0
-          ],
-          [
-            -0.09569403357322089,
-            0.02902846772544624,
-            0
-          ],
-          [
-            -0.0009807852804032304,
-            0.0001950903220161286,
-            0
-          ],
-          [
-            -0.09807852804032305,
-            0.01950903220161286,
-            0
-          ],
-          [
-            -0.000995184726672197,
-            9.801714032956083e-05,
-            0
-          ],
-          [
-            -0.09951847266721969,
-            0.009801714032956084,
-            0
-          ],
-          [
-            -0.001,
-            1.2246467991473531e-19,
-            0
-          ],
-          [
-            -0.1,
-            1.2246467991473533e-17,
-            0
-          ],
-          [
-            -0.000995184726672197,
-            -9.801714032956059e-05,
-            0
-          ],
-          [
-            -0.09951847266721969,
-            -0.00980171403295606,
-            0
-          ],
-          [
-            -0.0009807852804032304,
-            -0.00019509032201612837,
-            0
-          ],
-          [
-            -0.09807852804032305,
-            -0.019509032201612837,
-            0
-          ],
-          [
-            -0.0009569403357322089,
-            -0.0002902846772544621,
-            0
-          ],
-          [
-            -0.0956940335732209,
-            -0.029028467725446212,
-            0
-          ],
-          [
-            -0.0009238795325112869,
-            -0.0003826834323650897,
-            0
-          ],
-          [
-            -0.0923879532511287,
-            -0.03826834323650897,
-            0
-          ],
-          [
-            -0.0008819212643483551,
-            -0.00047139673682599763,
-            0
-          ],
-          [
-            -0.08819212643483551,
-            -0.04713967368259977,
-            0
-          ],
-          [
-            -0.0008314696123025455,
-            -0.000555570233019602,
-            0
-          ],
-          [
-            -0.08314696123025456,
-            -0.0555570233019602,
-            0
-          ],
-          [
-            -0.0007730104533627371,
-            -0.0006343932841636453,
-            0
-          ],
-          [
-            -0.07730104533627372,
-            -0.06343932841636453,
-            0
-          ],
-          [
-            -0.0007071067811865477,
-            -0.0007071067811865475,
-            0
-          ],
-          [
-            -0.07071067811865477,
-            -0.07071067811865475,
-            0
-          ],
-          [
-            -0.000634393284163646,
-            -0.0007730104533627366,
-            0
-          ],
-          [
-            -0.0634393284163646,
-            -0.07730104533627367,
-            0
-          ],
-          [
-            -0.0005555702330196022,
-            -0.0008314696123025453,
-            0
-          ],
-          [
-            -0.05555702330196022,
-            -0.08314696123025453,
-            0
-          ],
-          [
-            -0.00047139673682599785,
-            -0.000881921264348355,
-            0
-          ],
-          [
-            -0.04713967368259979,
-            -0.0881921264348355,
-            0
-          ],
-          [
-            -0.0003826834323650903,
-            -0.0009238795325112865,
-            0
-          ],
-          [
-            -0.03826834323650904,
-            -0.09238795325112865,
-            0
-          ],
-          [
-            -0.00029028467725446245,
-            -0.0009569403357322088,
-            0
-          ],
-          [
-            -0.029028467725446247,
-            -0.09569403357322089,
-            0
-          ],
-          [
-            -0.00019509032201612866,
-            -0.0009807852804032304,
-            0
-          ],
-          [
-            -0.019509032201612868,
-            -0.09807852804032303,
-            0
-          ],
-          [
-            -9.801714032956045e-05,
-            -0.000995184726672197,
-            0
-          ],
-          [
-            -0.009801714032956045,
-            -0.09951847266721969,
-            0
-          ],
-          [
-            -1.8369701987210298e-19,
-            -0.001,
-            0
-          ],
-          [
-            -1.8369701987210297e-17,
-            -0.1,
-            0
-          ],
-          [
-            9.801714032956009e-05,
-            -0.000995184726672197,
-            0
-          ],
-          [
-            0.009801714032956009,
-            -0.09951847266721969,
-            0
-          ],
-          [
-            0.0001950903220161283,
-            -0.0009807852804032304,
-            0
-          ],
-          [
-            0.019509032201612833,
-            -0.09807852804032305,
-            0
-          ],
-          [
-            0.00029028467725446207,
-            -0.0009569403357322089,
-            0
-          ],
-          [
-            0.029028467725446205,
-            -0.0956940335732209,
-            0
-          ],
-          [
-            0.00038268343236509,
-            -0.0009238795325112866,
-            0
-          ],
-          [
-            0.038268343236509,
-            -0.09238795325112867,
-            0
-          ],
-          [
-            0.0004713967368259976,
-            -0.0008819212643483551,
-            0
-          ],
-          [
-            0.04713967368259976,
-            -0.08819212643483551,
-            0
-          ],
-          [
-            0.0005555702330196019,
-            -0.0008314696123025455,
-            0
-          ],
-          [
-            0.05555702330196019,
-            -0.08314696123025456,
-            0
-          ],
-          [
-            0.0006343932841636457,
-            -0.0007730104533627369,
-            0
-          ],
-          [
-            0.06343932841636456,
-            -0.07730104533627369,
-            0
-          ],
-          [
-            0.0007071067811865474,
-            -0.0007071067811865477,
-            0
-          ],
-          [
-            0.07071067811865474,
-            -0.07071067811865477,
-            0
-          ],
-          [
-            0.0007730104533627366,
-            -0.000634393284163646,
-            0
-          ],
-          [
-            0.07730104533627367,
-            -0.0634393284163646,
-            0
-          ],
-          [
-            0.0008314696123025453,
-            -0.0005555702330196022,
-            0
-          ],
-          [
-            0.08314696123025453,
-            -0.05555702330196022,
-            0
-          ],
-          [
-            0.0008819212643483549,
-            -0.0004713967368259979,
-            0
-          ],
-          [
-            0.08819212643483548,
-            -0.047139673682599796,
-            0
-          ],
-          [
-            0.0009238795325112865,
-            -0.0003826834323650904,
-            0
-          ],
-          [
-            0.09238795325112865,
-            -0.038268343236509045,
-            0
-          ],
-          [
-            0.0009569403357322088,
-            -0.0002902846772544625,
-            0
-          ],
-          [
-            0.09569403357322089,
-            -0.02902846772544625,
-            0
-          ],
-          [
-            0.0009807852804032304,
-            -0.00019509032201612872,
-            0
-          ],
-          [
-            0.09807852804032303,
-            -0.019509032201612875,
-            0
-          ],
-          [
-            0.000995184726672197,
-            -9.80171403295605e-05,
-            0
-          ],
-          [
-            0.09951847266721969,
-            -0.00980171403295605,
-            0
-          ]
-        ],
-        "faces": [
-          [
-            0,
-            2,
-            1
-          ],
-          [
-            2,
-            3,
-            1
-          ],
-          [
-            2,
-            4,
-            3
-          ],
-          [
-            4,
-            5,
-            3
-          ],
-          [
-            4,
-            6,
-            5
-          ],
-          [
-            6,
-            7,
-            5
-          ],
-          [
-            6,
-            8,
-            7
-          ],
-          [
-            8,
-            9,
-            7
-          ],
-          [
-            8,
-            10,
-            9
-          ],
-          [
-            10,
-            11,
-            9
-          ],
-          [
-            10,
-            12,
-            11
-          ],
-          [
-            12,
-            13,
-            11
-          ],
-          [
-            12,
-            14,
-            13
-          ],
-          [
-            14,
-            15,
-            13
-          ],
-          [
-            14,
-            16,
-            15
-          ],
-          [
-            16,
-            17,
-            15
-          ],
-          [
-            16,
-            18,
-            17
-          ],
-          [
-            18,
-            19,
-            17
-          ],
-          [
-            18,
-            20,
-            19
-          ],
-          [
-            20,
-            21,
-            19
-          ],
-          [
-            20,
-            22,
-            21
-          ],
-          [
-            22,
-            23,
-            21
-          ],
-          [
-            22,
-            24,
-            23
-          ],
-          [
-            24,
-            25,
-            23
-          ],
-          [
-            24,
-            26,
-            25
-          ],
-          [
-            26,
-            27,
-            25
-          ],
-          [
-            26,
-            28,
-            27
-          ],
-          [
-            28,
-            29,
-            27
-          ],
-          [
-            28,
-            30,
-            29
-          ],
-          [
-            30,
-            31,
-            29
-          ],
-          [
-            30,
-            32,
-            31
-          ],
-          [
-            32,
-            33,
-            31
-          ],
-          [
-            32,
-            34,
-            33
-          ],
-          [
-            34,
-            35,
-            33
-          ],
-          [
-            34,
-            36,
-            35
-          ],
-          [
-            36,
-            37,
-            35
-          ],
-          [
-            36,
-            38,
-            37
-          ],
-          [
-            38,
-            39,
-            37
-          ],
-          [
-            38,
-            40,
-            39
-          ],
-          [
-            40,
-            41,
-            39
-          ],
-          [
-            40,
-            42,
-            41
-          ],
-          [
-            42,
-            43,
-            41
-          ],
-          [
-            42,
-            44,
-            43
-          ],
-          [
-            44,
-            45,
-            43
-          ],
-          [
-            44,
-            46,
-            45
-          ],
-          [
-            46,
-            47,
-            45
-          ],
-          [
-            46,
-            48,
-            47
-          ],
-          [
-            48,
-            49,
-            47
-          ],
-          [
-            48,
-            50,
-            49
-          ],
-          [
-            50,
-            51,
-            49
-          ],
-          [
-            50,
-            52,
-            51
-          ],
-          [
-            52,
-            53,
-            51
-          ],
-          [
-            52,
-            54,
-            53
-          ],
-          [
-            54,
-            55,
-            53
-          ],
-          [
-            54,
-            56,
-            55
-          ],
-          [
-            56,
-            57,
-            55
-          ],
-          [
-            56,
-            58,
-            57
-          ],
-          [
-            58,
-            59,
-            57
-          ],
-          [
-            58,
-            60,
-            59
-          ],
-          [
-            60,
-            61,
-            59
-          ],
-          [
-            60,
-            62,
-            61
-          ],
-          [
-            62,
-            63,
-            61
-          ],
-          [
-            62,
-            64,
-            63
-          ],
-          [
-            64,
-            65,
-            63
-          ],
-          [
-            64,
-            66,
-            65
-          ],
-          [
-            66,
-            67,
-            65
-          ],
-          [
-            66,
-            68,
-            67
-          ],
-          [
-            68,
-            69,
-            67
-          ],
-          [
-            68,
-            70,
-            69
-          ],
-          [
-            70,
-            71,
-            69
-          ],
-          [
-            70,
-            72,
-            71
-          ],
-          [
-            72,
-            73,
-            71
-          ],
-          [
-            72,
-            74,
-            73
-          ],
-          [
-            74,
-            75,
-            73
-          ],
-          [
-            74,
-            76,
-            75
-          ],
-          [
-            76,
-            77,
-            75
-          ],
-          [
-            76,
-            78,
-            77
-          ],
-          [
-            78,
-            79,
-            77
-          ],
-          [
-            78,
-            80,
-            79
-          ],
-          [
-            80,
-            81,
-            79
-          ],
-          [
-            80,
-            82,
-            81
-          ],
-          [
-            82,
-            83,
-            81
-          ],
-          [
-            82,
-            84,
-            83
-          ],
-          [
-            84,
-            85,
-            83
-          ],
-          [
-            84,
-            86,
-            85
-          ],
-          [
-            86,
-            87,
-            85
-          ],
-          [
-            86,
-            88,
-            87
-          ],
-          [
-            88,
-            89,
-            87
-          ],
-          [
-            88,
-            90,
-            89
-          ],
-          [
-            90,
-            91,
-            89
-          ],
-          [
-            90,
-            92,
-            91
-          ],
-          [
-            92,
-            93,
-            91
-          ],
-          [
-            92,
-            94,
-            93
-          ],
-          [
-            94,
-            95,
-            93
-          ],
-          [
-            94,
-            96,
-            95
-          ],
-          [
-            96,
-            97,
-            95
-          ],
-          [
-            96,
-            98,
-            97
-          ],
-          [
-            98,
-            99,
-            97
-          ],
-          [
-            98,
-            100,
-            99
-          ],
-          [
-            100,
-            101,
-            99
-          ],
-          [
-            100,
-            102,
-            101
-          ],
-          [
-            102,
-            103,
-            101
-          ],
-          [
-            102,
-            104,
-            103
-          ],
-          [
-            104,
-            105,
-            103
-          ],
-          [
-            104,
-            106,
-            105
-          ],
-          [
-            106,
-            107,
-            105
-          ],
-          [
-            106,
-            108,
-            107
-          ],
-          [
-            108,
-            109,
-            107
-          ],
-          [
-            108,
-            110,
-            109
-          ],
-          [
-            110,
-            111,
-            109
-          ],
-          [
-            110,
-            112,
-            111
-          ],
-          [
-            112,
-            113,
-            111
-          ],
-          [
-            112,
-            114,
-            113
-          ],
-          [
-            114,
-            115,
-            113
-          ],
-          [
-            114,
-            116,
-            115
-          ],
-          [
-            116,
-            117,
-            115
-          ],
-          [
-            116,
-            118,
-            117
-          ],
-          [
-            118,
-            119,
-            117
-          ],
-          [
-            118,
-            120,
-            119
-          ],
-          [
-            120,
-            121,
-            119
-          ],
-          [
-            120,
-            122,
-            121
-          ],
-          [
-            122,
-            123,
-            121
-          ],
-          [
-            122,
-            124,
-            123
-          ],
-          [
-            124,
-            125,
-            123
-          ],
-          [
-            124,
-            126,
-            125
-          ],
-          [
-            126,
-            127,
-            125
-          ],
-          [
-            126,
-            0,
-            127
-          ],
-          [
-            0,
-            1,
-            127
-          ]
-        ],
-        "thickness_m": 0.0003,
-        "extrude_direction": [
-          0,
-          0,
-          1
-        ],
-        "note": "Extrude both boundary loops and connect side faces. Inner radius0.001 m. Outer radius0.10 m."
-      },
+      "shape": "box",
       "dimensions_m": {
-        "thickness": 0.0003
+        "x": 1.18,
+        "y": 0.024,
+        "z": 0.02
       },
-      "position_m": [
-        0,
-        0.62,
-        -0.015
-      ],
-      "orientation_rad": [
-        0,
-        0,
-        0
-      ],
+      "position_m": [0.0, 1.188, 0.5135],
+      "orientation_rad": [0.0, 0.0, 0.0],
       "material": {
-        "class": "iron",
-        "basis": "documented",
-        "source": "folio"
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
       },
       "certainty": "C",
       "source": "geometry",
-      "notes": "Material documented. All numerical dimensions remain C assumptions."
+      "notes": "[geometry] The light frame the paper is pasted on."
+    },
+    {
+      "id": "screen-frame-bottom",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 1.18,
+        "y": 0.024,
+        "z": 0.02
+      },
+      "position_m": [0.0, 0.052, 0.5135],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] The light frame the paper is pasted on."
+    },
+    {
+      "id": "screen-frame-left",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.024,
+        "y": 1.112,
+        "z": 0.02
+      },
+      "position_m": [-0.578, 0.62, 0.5135],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] The light frame the paper is pasted on."
+    },
+    {
+      "id": "screen-frame-right",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.024,
+        "y": 1.112,
+        "z": 0.02
+      },
+      "position_m": [0.578, 0.62, 0.5135],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] The light frame the paper is pasted on."
+    },
+    {
+      "id": "screen-foot-0",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.06,
+        "y": 0.02,
+        "z": 0.05
+      },
+      "position_m": [-0.4, 0.03, 0.5135],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A block on the floor under the paper's frame."
+    },
+    {
+      "id": "screen-foot-1",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.06,
+        "y": 0.02,
+        "z": 0.05
+      },
+      "position_m": [0.4, 0.03, 0.5135],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A block on the floor under the paper's frame."
+    },
+    {
+      "id": "left-wall-guide-0",
+      "parent": "left-wall",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.018,
+        "y": 0.908,
+        "z": 0.018
+      },
+      "position_m": [0.019, 0.0015, 0.190834],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A guide on the wall, holding the paper's frame upright."
+    },
+    {
+      "id": "left-wall-guide-1",
+      "parent": "left-wall",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.018,
+        "y": 0.908,
+        "z": 0.018
+      },
+      "position_m": [0.019, 0.0015, 0.232834],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A guide on the wall, holding the paper's frame upright."
+    },
+    {
+      "id": "right-wall-guide-0",
+      "parent": "right-wall",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.018,
+        "y": 0.908,
+        "z": 0.018
+      },
+      "position_m": [-0.019, 0.0015, 0.192945],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A guide on the wall, holding the paper's frame upright."
+    },
+    {
+      "id": "right-wall-guide-1",
+      "parent": "right-wall",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.018,
+        "y": 0.908,
+        "z": 0.018
+      },
+      "position_m": [-0.019, 0.0015, 0.234945],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A guide on the wall, holding the paper's frame upright."
+    },
+    {
+      "id": "left-wall-nail-b00",
+      "parent": "left-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.01, -0.4885, -0.212952],
+      "orientation_rad": [0.0, 0.0, 1.570796],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "left-wall-nail-b01",
+      "parent": "left-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.01, 0.4915, -0.212952],
+      "orientation_rad": [0.0, 0.0, 1.570796],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "left-wall-nail-b10",
+      "parent": "left-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.01, -0.4885, 0.0],
+      "orientation_rad": [0.0, 0.0, 1.570796],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "left-wall-nail-b11",
+      "parent": "left-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.01, 0.4915, 0.0],
+      "orientation_rad": [0.0, 0.0, 1.570796],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "left-wall-nail-b20",
+      "parent": "left-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.01, -0.4885, 0.209785],
+      "orientation_rad": [0.0, 0.0, 1.570796],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "left-wall-nail-b21",
+      "parent": "left-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.01, 0.4915, 0.209785],
+      "orientation_rad": [0.0, 0.0, 1.570796],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "left-wall-nail-p00",
+      "parent": "left-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.01, -0.5285, -0.273166],
+      "orientation_rad": [0.0, 0.0, 1.570796],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "left-wall-nail-p10",
+      "parent": "left-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.01, -0.5285, 0.275334],
+      "orientation_rad": [0.0, 0.0, 1.570796],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "left-wall-nail-p01",
+      "parent": "left-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.01, -0.1585, -0.273166],
+      "orientation_rad": [0.0, 0.0, 1.570796],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "left-wall-nail-p11",
+      "parent": "left-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.01, -0.1585, 0.275334],
+      "orientation_rad": [0.0, 0.0, 1.570796],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "left-wall-nail-p02",
+      "parent": "left-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.01, 0.2215, -0.273166],
+      "orientation_rad": [0.0, 0.0, 1.570796],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "left-wall-nail-p12",
+      "parent": "left-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.01, 0.2215, 0.275334],
+      "orientation_rad": [0.0, 0.0, 1.570796],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "left-wall-nail-p03",
+      "parent": "left-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.01, 0.5515, -0.273166],
+      "orientation_rad": [0.0, 0.0, 1.570796],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "left-wall-nail-p13",
+      "parent": "left-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.01, 0.5515, 0.275334],
+      "orientation_rad": [0.0, 0.0, 1.570796],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "right-wall-nail-b00",
+      "parent": "right-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.01, -0.4885, -0.215063],
+      "orientation_rad": [0.0, 0.0, -1.570796],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "right-wall-nail-b01",
+      "parent": "right-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.01, 0.4915, -0.215063],
+      "orientation_rad": [0.0, 0.0, -1.570796],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "right-wall-nail-b10",
+      "parent": "right-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.01, -0.4885, 0.0],
+      "orientation_rad": [0.0, 0.0, -1.570796],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "right-wall-nail-b11",
+      "parent": "right-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.01, 0.4915, 0.0],
+      "orientation_rad": [0.0, 0.0, -1.570796],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "right-wall-nail-b20",
+      "parent": "right-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.01, -0.4885, 0.214007],
+      "orientation_rad": [0.0, 0.0, -1.570796],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "right-wall-nail-b21",
+      "parent": "right-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.01, 0.4915, 0.214007],
+      "orientation_rad": [0.0, 0.0, -1.570796],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "right-wall-nail-p00",
+      "parent": "right-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.01, -0.5285, -0.271055],
+      "orientation_rad": [0.0, 0.0, -1.570796],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "right-wall-nail-p10",
+      "parent": "right-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.01, -0.5285, 0.277445],
+      "orientation_rad": [0.0, 0.0, -1.570796],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "right-wall-nail-p01",
+      "parent": "right-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.01, -0.1585, -0.271055],
+      "orientation_rad": [0.0, 0.0, -1.570796],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "right-wall-nail-p11",
+      "parent": "right-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.01, -0.1585, 0.277445],
+      "orientation_rad": [0.0, 0.0, -1.570796],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "right-wall-nail-p02",
+      "parent": "right-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.01, 0.2215, -0.271055],
+      "orientation_rad": [0.0, 0.0, -1.570796],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "right-wall-nail-p12",
+      "parent": "right-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.01, 0.2215, 0.277445],
+      "orientation_rad": [0.0, 0.0, -1.570796],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "right-wall-nail-p03",
+      "parent": "right-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.01, 0.5515, -0.271055],
+      "orientation_rad": [0.0, 0.0, -1.570796],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "right-wall-nail-p13",
+      "parent": "right-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.01, 0.5515, 0.277445],
+      "orientation_rad": [0.0, 0.0, -1.570796],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "back-wall-nail-b10",
+      "parent": "back-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.234707, -0.4885, 0.01],
+      "orientation_rad": [1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "back-wall-nail-b11",
+      "parent": "back-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.234707, 0.4915, 0.01],
+      "orientation_rad": [1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "back-wall-nail-b20",
+      "parent": "back-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.0, -0.4885, 0.01],
+      "orientation_rad": [1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "back-wall-nail-b21",
+      "parent": "back-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.0, 0.4915, 0.01],
+      "orientation_rad": [1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "back-wall-nail-b30",
+      "parent": "back-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.245339, -0.4885, 0.01],
+      "orientation_rad": [1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "back-wall-nail-b31",
+      "parent": "back-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.245339, 0.4915, 0.01],
+      "orientation_rad": [1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "back-wall-nail-p00",
+      "parent": "back-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.572275, -0.5285, 0.01],
+      "orientation_rad": [1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "back-wall-nail-p10",
+      "parent": "back-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.581725, -0.5285, 0.01],
+      "orientation_rad": [1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "back-wall-nail-p01",
+      "parent": "back-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.572275, -0.1585, 0.01],
+      "orientation_rad": [1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "back-wall-nail-p11",
+      "parent": "back-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.581725, -0.1585, 0.01],
+      "orientation_rad": [1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "back-wall-nail-p02",
+      "parent": "back-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.572275, 0.2215, 0.01],
+      "orientation_rad": [1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "back-wall-nail-p12",
+      "parent": "back-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.581725, 0.2215, 0.01],
+      "orientation_rad": [1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "back-wall-nail-p03",
+      "parent": "back-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.572275, 0.5515, 0.01],
+      "orientation_rad": [1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "back-wall-nail-p13",
+      "parent": "back-wall",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.581725, 0.5515, 0.01],
+      "orientation_rad": [1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "front-left-nail-p0",
+      "parent": "front-left",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.383, -0.5285, -0.01],
+      "orientation_rad": [-1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "front-left-nail-p1",
+      "parent": "front-left",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.383, -0.1585, -0.01],
+      "orientation_rad": [-1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "front-left-nail-p2",
+      "parent": "front-left",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.383, 0.2215, -0.01],
+      "orientation_rad": [-1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "front-left-nail-p3",
+      "parent": "front-left",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.383, 0.5515, -0.01],
+      "orientation_rad": [-1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "front-right-nail-p0",
+      "parent": "front-right",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.381, -0.5285, -0.01],
+      "orientation_rad": [-1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "front-right-nail-p1",
+      "parent": "front-right",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.381, -0.1585, -0.01],
+      "orientation_rad": [-1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "front-right-nail-p2",
+      "parent": "front-right",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.381, 0.2215, -0.01],
+      "orientation_rad": [-1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "front-right-nail-p3",
+      "parent": "front-right",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.381, 0.5515, -0.01],
+      "orientation_rad": [-1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "front-nail-b00",
+      "parent": "world",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.44, 0.13, -0.0115],
+      "orientation_rad": [-1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "front-nail-b01",
+      "parent": "world",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.44, 1.11, -0.0115],
+      "orientation_rad": [-1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "front-nail-b10",
+      "parent": "world",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.195, 0.13, -0.0115],
+      "orientation_rad": [-1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "front-nail-b11",
+      "parent": "world",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.195, 1.11, -0.0115],
+      "orientation_rad": [-1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "front-nail-b20",
+      "parent": "world",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.0, 0.13, -0.0115],
+      "orientation_rad": [-1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "front-nail-b21",
+      "parent": "world",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.0, 1.11, -0.0115],
+      "orientation_rad": [-1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "front-nail-b30",
+      "parent": "world",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.195, 0.13, -0.0115],
+      "orientation_rad": [-1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "front-nail-b31",
+      "parent": "world",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.195, 1.11, -0.0115],
+      "orientation_rad": [-1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "front-nail-b40",
+      "parent": "world",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.44, 0.13, -0.0115],
+      "orientation_rad": [-1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "front-nail-b41",
+      "parent": "world",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.44, 1.11, -0.0115],
+      "orientation_rad": [-1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "plate-nail-0",
+      "parent": "world",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0045],
+          [0.00108, 0.00414],
+          [0.0024, 0.002025],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.07853, 0.652528, -0.015],
+      "orientation_rad": [-1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "plate-nail-1",
+      "parent": "world",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0045],
+          [0.00108, 0.00414],
+          [0.0024, 0.002025],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.032528, 0.69853, -0.015],
+      "orientation_rad": [-1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "plate-nail-2",
+      "parent": "world",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0045],
+          [0.00108, 0.00414],
+          [0.0024, 0.002025],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.032528, 0.69853, -0.015],
+      "orientation_rad": [-1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "plate-nail-3",
+      "parent": "world",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0045],
+          [0.00108, 0.00414],
+          [0.0024, 0.002025],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.07853, 0.652528, -0.015],
+      "orientation_rad": [-1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "plate-nail-4",
+      "parent": "world",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0045],
+          [0.00108, 0.00414],
+          [0.0024, 0.002025],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.07853, 0.587472, -0.015],
+      "orientation_rad": [-1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "plate-nail-5",
+      "parent": "world",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0045],
+          [0.00108, 0.00414],
+          [0.0024, 0.002025],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.032528, 0.54147, -0.015],
+      "orientation_rad": [-1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "plate-nail-6",
+      "parent": "world",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0045],
+          [0.00108, 0.00414],
+          [0.0024, 0.002025],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.032528, 0.54147, -0.015],
+      "orientation_rad": [-1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "plate-nail-7",
+      "parent": "world",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0045],
+          [0.00108, 0.00414],
+          [0.0024, 0.002025],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.07853, 0.587472, -0.015],
+      "orientation_rad": [-1.570796, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "roof-nail-00",
+      "parent": "roof",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.577, 0.01, -0.161044],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "roof-nail-01",
+      "parent": "roof",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.577, 0.01, -0.161044],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "roof-nail-10",
+      "parent": "roof",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.577, 0.01, 0.0],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "roof-nail-11",
+      "parent": "roof",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.577, 0.01, 0.0],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "roof-nail-20",
+      "parent": "roof",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.577, 0.01, 0.163436],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "roof-nail-21",
+      "parent": "roof",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.577, 0.01, 0.163436],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "roof-nail-30",
+      "parent": "roof",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [-0.577, 0.01, 0.321292],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
+    },
+    {
+      "id": "roof-nail-31",
+      "parent": "roof",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [-0.014, 0.0],
+          [-0.014, 0.0011],
+          [-0.001, 0.0022],
+          [0.0, 0.0055],
+          [0.00108, 0.00506],
+          [0.0024, 0.002475],
+          [0.0024, 0.0]
+        ],
+        "segments": 8
+      },
+      "position_m": [0.577, 0.01, 0.321292],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "iron, forged",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "[geometry] A hand-forged nail with a rose head."
     }
   ],
   "joints": [],
@@ -1740,7 +3695,8 @@
     "identification": "[holder,folio] Ms2175(D),8r. Approximate date1508 to1509.",
     "sheet_vs_reconstruction": [
       "[folio] A small round hole in very thin iron admits images into darkness, where thin white paper receives them.",
-      "[geometry] The1.2 m chamber,2 mm hole and0.5 m screen distance are modern assumptions. Leonardo describes a room, not this portable box."
+      "[geometry] The1.2 m chamber,2 mm hole and0.5 m screen distance are modern assumptions. Leonardo describes a room, not this portable box.",
+      "[geometry] The chamber is built the way a joiner of about 1500 would build a dark box: vertical oak boards nailed to four corner posts and to battens inside, a boarded floor and roof, the front set back between the sides, the iron plate nailed over a square opening, and the paper pasted on a light frame sliding in guides. None of this construction is on the sheet."
     ],
     "dimensions": {
       "leonardo_wording": "la qual vol essere sottilissima e veduta da riverscio, e lo spiracolo detto sia fatto in piastra sottilissima di ferro",
