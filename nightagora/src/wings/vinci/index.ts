@@ -2143,9 +2143,9 @@ export function createWing():VinciWingModule {
     const plate=entries.find(source=>source.face===entry.face)??entries[0]
     // THE PAGE'S LANGUAGE ONLY. The module writes both columns for the wall's
     // own record; the vitrine keeps the one the visitor reads.
-    const label=createWindowWorkLabel(work,entries,lang(),narrow())
     // THE NUMBER ON ITS FRAME: a work of the hang is read as its catalogue entry
     const catalogue=hangCatalogue(work,entry.face,entries,lang())
+    const label=createWindowWorkLabel(work,entries,lang(),narrow(),Boolean(catalogue?.kind))
     const controls:HTMLElement[]=[]
     const workRectNow=():VitrineRect|null=>{const nav=rail.navigation;return nav.exhibit===id&&!nav.active?workRect(entry.object):null}
     if(plate){

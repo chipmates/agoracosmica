@@ -3,7 +3,8 @@
  * from the east door; the date and the holder are the register's words; the
  * certainty class is the label's own word, shown where the attribution is
  * not a plain one or the record names more than one hand. The word that says
- * the wall shows a reproduction is the card data's.
+ * the wall shows a reproduction is the card data's. A view that shows the
+ * entry shows the class there only, so the card under it drops its heading.
  */
 import cardsRaw from '../data/cards.json?raw'
 import { JOINT_WORK, policyCertainty } from '../pictures/policy-label'
@@ -19,6 +20,8 @@ export interface HangCatalogue {
   number: string
   date: string
   where: string
+  /** the certainty class the entry names, where it names one */
+  kind: string | null
 }
 
 /** The attribution classes the band names beside the holder. */
@@ -43,5 +46,5 @@ export function hangCatalogue(work: PictureWork, face: 'front' | 'reverse' | nul
     : work.attribution_certainty === 'documented' && namedHands(work) > 1 ? JOINT_WORK[language] : null
   // the holder stays in the language it publishes its name in
   const where = [work.holder, said, kind].filter((part): part is string => Boolean(part)).join(' · ')
-  return { number: String(number), date, where }
+  return { number: String(number), date, where, kind }
 }

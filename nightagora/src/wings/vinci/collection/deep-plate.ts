@@ -14,6 +14,7 @@ import type { DeepTilePyramid } from '../../vitrine/deep-viewer'
 import type { VitrineExhibit, VitrineRect } from '../../vitrine'
 import { validatePaintingRecord } from '../pictures/policy'
 import { createWindowWorkLabel } from '../pictures/policy-label'
+import type { HangCatalogue } from './catalogue'
 import { pictureDisplayUV, pictureDisplayWindow } from '../pictures/registration'
 import type { PictureWork, ResolvedPicturePlate } from '../pictures/register'
 import cardsRaw from '../data/cards.json?raw'
@@ -213,14 +214,14 @@ export function createVinciWholePlate(options: {
   /** The phone folds the card so the viewport takes the sheet. */
   narrow: boolean
   /** the number on the work's frame and its catalogue words, where it hangs under one */
-  catalogue?: VitrineExhibit['catalogue']
+  catalogue?: HangCatalogue | null
 }): VitrineExhibit {
   const language = lang()
   const registration = pictureDisplayWindow(options.plate.plate)
   const cut = registration ? pictureDisplayUV(registration) : null
   // The same label the close look carries, folded where it folds there: the
   // plate is what this window is for, and the words stand beside it.
-  const label = createWindowWorkLabel(options.work, options.entries, language, options.narrow)
+  const label = createWindowWorkLabel(options.work, options.entries, language, options.narrow, Boolean(options.catalogue?.kind))
   // THE DEEP SOURCE WHERE THE STORE HOLDS ONE. Its pixels are the view's
   // ceiling and the rule's own scale, so the centimetres are measured
   // against the source that stands in the window, not the wall's plate.

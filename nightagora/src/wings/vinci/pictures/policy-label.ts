@@ -320,15 +320,17 @@ export function createPolicyWorkLabel(work: PictureWork, entries: readonly Resol
 /** THE LABEL AS A CLOSE LOOK CARRIES IT. The wall writes both language
  * columns; a window keeps the one the visitor reads. Its first line keeps
  * the certainty word with its mark and drops the work's name, which the
- * window's own heading says above it. */
+ * window's own heading says above it. Where the window's catalogue entry
+ * already names the class, the first line goes: a class is said once. */
 export function createWindowWorkLabel(work: PictureWork, entries: readonly ResolvedPicturePlate[],
-  language: 'en' | 'de', twoLevels: boolean): HTMLElement {
+  language: 'en' | 'de', twoLevels: boolean, classAbove = false): HTMLElement {
   const label = createPolicyWorkLabel(work, entries, false, [], twoLevels)
   for (const column of [...label.querySelectorAll<HTMLElement>('.picture-label-language')]) {
     if (column.lang !== language) column.remove()
   }
   const word = policyLabelText(work, entries).certainty[language]
   for (const first of [...label.querySelectorAll<HTMLElement>('.picture-first,.picture-first-de')]) {
+    if (classAbove) { first.remove(); continue }
     for (const node of [...first.childNodes]) if (node.nodeType === Node.TEXT_NODE) node.remove()
     first.append(document.createTextNode(word))
   }
