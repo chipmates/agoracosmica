@@ -462,8 +462,8 @@
   },
   {
    "file": "src/wings/vinci/machines/data/parachute.json",
-   "sha256": "77621c789da9ef5547fec65be3767d0de9705c84cd10ed53ca282a5ba9828656",
-   "bytes": 27206,
+   "sha256": "90cf1c65b985d3a65918a4c40992c5b1eb7cc4c30bdf4a217d02361d1d708706",
+   "bytes": 29009,
    "unchangedDuringAudit": true
   },
   {

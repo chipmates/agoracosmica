@@ -7,6 +7,7 @@
  */
 import { Group, Mesh, MeshStandardNodeMaterial, PointLight, Vector3, type Material, type Object3D, type PlaneGeometry, type Scene } from 'three/webgpu'
 import { translucentCloth } from './hall-cloth'
+import { dressParachuteCloth, hideClothDouble } from './court-linen'
 import type { Stack } from '../../../stack'
 import { buildMachine, MACHINE_SLUGS, type MachineSlug } from '../machines'
 import type { ReadyMachineBuild } from '../machines/runtime'
@@ -122,6 +123,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   // the clearance certificate is written against: it is complete before the
   // first frame and never waits for a machine to finish loading.
   const plinthMesh = createCollectionStandSolids(material)
+  hideClothDouble(material)
   host.add(plinthMesh)
 
   /** The library's budget belongs to the whole page, and this wing arrives at
@@ -167,6 +169,8 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
     // The hall's machines keep their casts: its own spots draw their maps, and
     // the sun cannot reach inside the hall to be re-rendered for them.
     if (spot.ground !== 'hall') void machine.ready.then(() => machine.object.traverse(child => { child.castShadow = false }))
+    // THE COURT'S CLOTH is sealed linen, and thin: its own surface and light
+    if (slug === 'parachute') void machine.ready.then(() => { if (live) teardown.push(dressParachuteCloth(machine.object)) })
     // A machine in the hall is lit by the hall's own rig while it stands in
     // the hall; `update` hands it back while the close look borrows it.
     else void machine.ready.then(() => {

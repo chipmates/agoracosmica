@@ -116,6 +116,21 @@
       "id": "a-part-suspension-3",
       "statement": "C construction of suspension-3: tube. Radius 0.007 m. 2 centreline points, endpoints [-3.5016, 3.3, 3.5016] and [-0.12727922061357855, 0.9, 0.12727922061357855]. Dimensions {\"radius\": 0.007}. Parent-local position [0, 0, 0] m and intrinsic XYZ rotation [0, 0, 0] rad. The part object contains the exact numerical construction and its evidence classification.",
       "reason": "Explicit numerical geometry for suspension-3. Source classification is in the part."
+    },
+    {
+      "id": "a-cloth-make-up",
+      "statement": "Modern assumption, not on the sheet: the canopy's cloth is drawn as cloths of a hand loom's width, about 0.72 m, joined by felled seams at 0.70 m centres running from hem to apex; a 0.045 m tape either side of each ridge; a folded hem 0.07 m deep laced to the frame through eyelets at 0.20 m; a patch with 0.5 m legs at each corner and 0.45 m deep at the apex. Each face gives inward between its three edges, up to 0.24 m at its middle, with a few long folds and rays from the pulled corners; the give, the seams and the edges are drawn in the surface's shading only, so the four faces, every vertex and the envelope stay as specified.",
+      "reason": "The folio names the cloth and its size (pannolino intasato, twelve braccia) and nothing of how it is made up or finished."
+    },
+    {
+      "id": "a-cloth-sealing",
+      "statement": "Modern assumption, not on the sheet: the cloth's pores are stopped by a size brushed into the weave, a glue or starch size assumed, drawn as a matte, slightly uneven coat that lies thicker where it pools along the seams. The cloth is unbleached linen.",
+      "reason": "'Intasato' says the pores are stopped, not with what; the substance of the coat is not named on the sheet."
+    },
+    {
+      "id": "a-cloth-light",
+      "statement": "Modern assumption: one layer of the sized cloth passes about 0.24 of the light diffusely, less through every doubled layer (seams, tape, hem, patches) and where the size lies thick; a face turned from the sun is lit through the faces that take it, so it glows a little with its seams showing as darker lines.",
+      "reason": "No measured transmission for a sized linen of this kind was located; the value sets only how the displayed cloth passes light."
     }
   ],
   "parts": [
