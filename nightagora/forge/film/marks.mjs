@@ -51,7 +51,8 @@ async function settle(page, framing) {
     const now = await page.evaluate(() => JSON.stringify(window.__naPicture.marks('', 'en').map((m) => [m.id, Math.round(m.x), Math.round(m.y)])))
     same = now === last ? same + 1 : 0
     last = now
-    if (same >= 6) return true
+    // an empty list is also what a room reads before its registry has loaded: it must hold ten seconds
+    if (same >= 6 && (now !== '[]' || i >= 40)) return true
   }
   return false
 }

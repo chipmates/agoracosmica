@@ -45,9 +45,18 @@ const summary = { head: runs.at(-1).summary.head, heads: runs.map((r) => r.summa
   clips: runs.flatMap((r) => r.summary.clips.map((c) => ({ ...c, dir: r.dir }))),
   stills: runs.flatMap((r) => r.summary.stills.map((s) => ({ ...s, dir: r.dir }))) }
 const marks = { nodes: {}, prints: {} }
+const emptyReadings = []
 for (const file of MARKS) {
   const read = JSON.parse(readFileSync(file, 'utf8'))
-  for (const [node, byFraming] of Object.entries(read.nodes ?? {})) marks.nodes[node] = { ...marks.nodes[node], ...byFraming }
+  /* LANGUAGE BY LANGUAGE, and an empty reading never replaces a full one: a
+     room reads empty before its registry has loaded, not because it has no marks */
+  for (const [node, byFraming] of Object.entries(read.nodes ?? {})) for (const [framing, byLang] of Object.entries(byFraming)) {
+    const held = ((marks.nodes[node] ??= {})[framing] ??= {})
+    for (const [lang, list] of Object.entries(byLang)) {
+      if (!list.length && held[lang]?.length) { emptyReadings.push(`${node} ${framing} ${lang} (${file.split('/').pop()})`); continue }
+      held[lang] = list
+    }
+  }
   for (const [node, byFraming] of Object.entries(read.prints ?? {})) marks.prints[node] = { ...marks.prints[node], ...byFraming }
 }
 const replay = await openReplay()
@@ -163,7 +172,7 @@ const release = {
 writeFileSync(join(OUT, 'film.json'), JSON.stringify(release))
 writeFileSync(join(OUT, 'pack.json'), JSON.stringify({
   format: 'vinci-film-pack-v1', exports: EXPORTS, exportHeads: summary.heads, marks: MARKS, quality: QUALITY,
-  sharp: sharp.versions, refusals, projection, retagged, duplicates,
+  sharp: sharp.versions, refusals, projection, retagged, duplicates, emptyReadings,
   clips: [...edges.values()].map((e) => ({ id: e.id, framings: Object.fromEntries(Object.entries(e.framings).map(([f, x]) => [f, { frames: x.frames, joins: x.joins, mountedSetChanges: x.mountedSetChanges, pendingAtRest: x.pendingAtRest, bytes: Object.fromEntries(Object.entries(x.files).map(([r, v]) => [r, v.bytes])) }])) })),
   stills: stillRecords,
 }, null, 1))
