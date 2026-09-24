@@ -11,7 +11,7 @@ import { collectionLayout } from './collection'
 import { collectionView } from './collection/views'
 import { vinciWallEndVertex, vinciWallIsEnd, vinciWallNearerEnd, vinciWallOfStation, type VinciWall } from './collection/wall'
 import { vinciApproachesAreNeighbours } from './collection/approaches'
-import { COURT, SUPPER_WALL } from './collection/layout'
+import { COURT, FLOOR, SUPPER_WALL } from './collection/layout'
 import { fittedRailFov, assertRailProjection } from './rail-projection'
 import type { RailGeometryAuthority } from './rail-proof'
 import { hallView } from './house-hall'
@@ -63,6 +63,13 @@ function aimedFrom(pose:Pose,heading:number,pitch:number,fov:number):Pose {
 }
 /** The eye in the great hall's door, on the axis of the three doors. */
 const HALL_DOOR=p(-4.2388,-11.0992,2.45,-4.2388,-11.0992,2.45)
+/** The body wall's phone eye, square on its hang's axis 4.7 m off the linen:
+ * the nearest place a 390 px stage holds the whole recess between its jambs. */
+const BODY_PHONE=p(-34,-52.6,FLOOR+1.62,-34,-52.6,FLOOR+1.62)
+/** The chamber's two eyes at the court's west end, above the terrace's edge.
+ * The desktop's stands 1.6 m further east, short of the terrace's step, where
+ * the lens that holds the house and the pavilion both is narrowest. */
+const CHAMBER_EYE=p(-4.2,-32.4,1.65,-4.2,-32.4,1.65), CHAMBER_DESK=p(-2.6,-32.6,1.65,-2.6,-32.6,1.65)
 function narrowRoomPose(pose:Pose,share=NARROW_AIM_SHARE):Pose {
   const fov=Math.min(104,pose.fov*NARROW_LENS)
   const reach=pose.eye.distanceTo(pose.at)
@@ -117,14 +124,14 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // The royal château stands 590 m away on a bearing of 308.84 degrees, which
   // from this end of the court runs over the house's west corner and down the
   // valley; nothing of the castle is built, and its line stays in both frames.
-  // The phone turns onto the house and looks up: on the castle's own line its
-  // frame kept a sliver of the west face at its margin, and the face now runs
-  // from the corner to the north end whole. The desktop holds what this end of
-  // the terrace looks at: the Last Supper's wall whole in its court below on
-  // the left, the west face to its cornice at the corner on the right. The
-  // gable over that corner stands seven metres off, too steep for any frame
-  // that also looks down into the court.
-  if(id==='chamber') return narrow?p(-4.2,-32.4,1.65,-9.4018,-24.0753,3.5581,92):p(-4.2,-32.4,1.65,-11.7406,-26.2937,4.0692,70)
+  // The pavilion of the Last Supper stands 27 to 41 m off, ninety degrees west
+  // of the house's end: the desktop holds the two whole, the pavilion at the
+  // left and this end of the house to its finial at the right, at the lens
+  // that takes both from this terrace, and the route to the line keeps that
+  // lens clear of the collection's doors. The phone cannot hold both on its
+  // stage and looks down the castle's line with the pavilion whole in the
+  // court below, its left edge short of the collection's glazed corner.
+  if(id==='chamber') return narrow?aimedFrom(CHAMBER_EYE,-66.5,-4,96):aimedFrom(CHAMBER_DESK,-37,17,94.5)
   // R19 accepted: actual apron paving +1.65 m; all eight principal windows clear vegetation.
   // The phone looks up eleven degrees, not twenty-three: a third of its frame
   // was sky and the house stood low, where the card is. The lens is opened
@@ -151,6 +158,11 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
     const fov=Math.atan(SUPPER_WALL.field.width/2*1.16/reach/PHONE_STAGE)*360/Math.PI
     return p(-33.9,SUPPER_WALL.north,COURT.level+1.66,face,SUPPER_WALL.north,COURT.level+.15,fov)
   }
+  // THE BODY WALL'S PHONE STANDS SQUARE ON THE HANG. From the room's own eye
+  // the portrait stage took the recess at its top and bare floor for its
+  // lower half; here the recess spans the stage and the drawers under it end
+  // where the card begins.
+  if(id==='body'&&narrow) return aimedFrom(BODY_PHONE,-90,-8,90)
   const room=COLLECTION_STATION_ROOMS[id]
   // Floor subjects and the wall read end-on have a measured phone composition
   // of their own; the generic room adjustment below is for upright exhibits
