@@ -39,6 +39,12 @@ export const DELIVERY = {
 
 /* ---- what the wing's index file holds for the picture, read by name ---- */
 const INDEX_FILE = `${WING_DIR}/index.ts`
+/** the print, the station exposures and the light rig stand in their own module */
+const PRINT_FILE = `${WING_DIR}/print.ts`
+/** the wing's files a declaration of the picture may stand in, in order */
+const DECLARING_FILES = [INDEX_FILE, PRINT_FILE]
+/** the text the named declarations are read from: every declaring file the tree holds */
+const declaringText = (loader) => DECLARING_FILES.map((f) => { try { return loader.text(f) } catch { return '' } }).join('\n')
 /** The declarations of the wing's index that shape every frame: the print,
     the shadow, the light rig, and the generator that assembles the house. */
 const GLOBAL_DECLARATIONS = ['PRINT', 'SHADOW', 'KEY_RIG', 'buildTheHouse']
@@ -113,8 +119,7 @@ export function globalKey(loader, { library = [], claimed = new Set() } = {}) {
   const parts = {}
   for (const file of closure(loader, 'src/stack/index.ts', 'src/stack/')) parts[file] = short(loader.text(file))
   for (const file of GLOBAL_WING_FILES) parts[file] = short(loader.text(file))
-  const index = loader.text(INDEX_FILE)
-  const held = declarations(index, GLOBAL_DECLARATIONS)
+  const held = declarations(declaringText(loader), GLOBAL_DECLARATIONS)
   for (const name of GLOBAL_DECLARATIONS) {
     if (!held.has(name)) throw new Error(`the wing's index declares no ${name}`)
     parts[`${INDEX_FILE}#${name}`] = short(held.get(name).getText())
@@ -148,7 +153,7 @@ export async function treeKeys({ rev = '', overlay = {}, library, delivery = DEL
   const replay = await openReplay({ rev, overlay })
   const graph = buildGraph(replay.wing)
   const loader = await createLoader({ rev, overlay })
-  const exposure = exposures(loader.text(INDEX_FILE))
+  const exposure = exposures(declaringText(loader))
   const world = await mountWorld({ rev, overlay, library })
   log(`world ${((Date.now() - t0) / 1000).toFixed(1)} s (${world.parts.filter((p) => !p.reused).map((p) => p.id).join(', ') || 'all reused'})`)
   const global = globalKey(loader, { library: world.library, claimed: world.claimed })
