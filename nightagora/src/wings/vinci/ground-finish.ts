@@ -327,7 +327,7 @@ export function applyYardFinish(m: N, shows: (metres: number) => N): void {
   const deep = smoothstep(.08, 0, inside.negate()).mul(shown)
   // grit in the sand: a speck of flint or a crumb of limestone every few mm
   const grit = smoothstep(.55, .75, mx_noise_float(vec3(P.x, P.z, 3.9).mul(260))).mul(drawn(.006))
-  const joint = mix(rgb('#7b705c').mul(sandGrain).mul(grit.mul(.22).add(1)), rgb('#505c30'), moss.mul(.85)).mul(float(1).sub(deep.mul(.38)))
+  const joint = mix(rgb('#7b705c').mul(sandGrain).mul(grit.mul(.22).add(1)), rgb('#505c30'), moss.mul(.85)).mul(float(1).sub(deep.mul(.34)))
   // the sunk and the gutter's stones hold the wet; the walked line is paler
   const paved = mix(joint.mul(lost.mul(.2).add(1)), cobble.mul(walked.mul(.15).add(1)).mul(float(1).sub(sunk.mul(.16)).sub(inGutter.mul(.07))), stone)
   m.colorNode = mix(m.colorNode, paved, onCobbles)
@@ -367,7 +367,7 @@ export function applyYardFinish(m: N, shows: (metres: number) => N): void {
   m.normalNode = mix(m.normalNode, n.sub(bounded).normalize(), onCourt).normalize()
   m.normalNode = mix(m.normalNode, terraceNormal, onTerrace).normalize()
   const gaps = float(1).sub(stoneHeight.div(GRAVEL_HEIGHT_M * .45).clamp(0, 1)).mul(gravelled).mul(.26)
-    .add(rutFloor.mul(onTerrace).mul(.14)).add(rutLee.mul(onTerrace).mul(.2)).add(float(1).sub(stone).mul(onCobbles).mul(.35).add(deep.mul(onCobbles).mul(.15))).add(flagJoint.mul(onFlags).mul(.3))
+    .add(rutFloor.mul(onTerrace).mul(.14)).add(rutLee.mul(onTerrace).mul(.2)).add(float(1).sub(stone).mul(onCobbles).mul(.35).add(deep.mul(onCobbles).mul(.1))).add(flagJoint.mul(onFlags).mul(.3))
   m.aoNode = m.aoNode.mul(float(1).sub(gaps))
   const polished = walked.mul(stone).mul(onCobbles).mul(.2).mul(relief).sub(face.rough.mul(onFlags))
   // THE SHEEN FOLLOWS THE RELIEF IT LOST: where a stone's slope is under the

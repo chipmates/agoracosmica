@@ -125,7 +125,7 @@ export function flagFace(grid: FlagGrid, walked: N, damp: N, opts: FlagOptions =
     .add(floor(bandAt).mul(.37))
   const teeth = sin(teethAt.mul(6.2832)).mul(resolved(dressed ? .0055 : .0024, pixel))
   const kept = float(1).sub(walked.mul(.85))
-  const tooling = band.mul(resolved(bandM, pixel)).mul(dressed ? .075 : .03).add(teeth.mul(dressed ? .014 : .008)).mul(kept)
+  const tooling = band.mul(resolved(bandM, pixel)).mul(dressed ? .075 : .03).add(teeth.mul(dressed ? .006 : .004)).mul(kept)
   // shell in some beds: a fragment's section a centimetre or two across, a
   // pale calcite rim; in others a vein of calcite or a dark stylolite seam
   const shellCell = vec2(east, north).div(.055), sc = floor(shellCell), sf = fract(shellCell)
@@ -229,7 +229,7 @@ export function flagFace(grid: FlagGrid, walked: N, damp: N, opts: FlagOptions =
   tone = mix(tone, vec3(.55, .66, .42), moss.mul(.75))
   const rough = own.mul(.08).add(hash(14.2).sub(.5).mul(.24).mul(seen)).add(grain.mul(.03)).sub(walked.mul(.16)).add(film.mul(.04)).add(chip.mul(.05)).sub(dish.mul(20))
     .add(tooling.abs().mul(.3)).add(spall.mul(.06)).sub(wet.mul(.24)).add(lichen.mul(.06))
-  const toolHeight = teeth.mul(dressed ? .0004 : .0001).mul(kept)
+  const toolHeight = teeth.mul(dressed ? .00015 : .00005).mul(kept)
   const height = plane.sub(dish).sub(chip.mul(.002)).sub(spall.mul(.004)).sub(inJoint.mul(.0008)).add(toolHeight)
   return { tone, rough, height, slope: vec2(tiltE, tiltN).mul(seen), wet }
 }
