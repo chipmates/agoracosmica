@@ -33,6 +33,7 @@ const report = {
     'The water reflector returns an inert TSL node; the actual water geometry and reflector-plane transform still execute.',
     'Rail sampling uses the actual clock-driven implementation at 240 Hz; exact capsule/ray checks cover its sampled chords, not a formal continuous-curve proof.',
     'Terrain clearance is measured vertically at every unique camera sample against actual ground/water triangles and the live gradeAt function.',
+    'Inside the registered footprint on the ground storey, a sample is measured instead against the house floor built under it (shell thresholds, the entrance passage, the great hall and its service passage where the tier mounts them), and a floor below that storey\'s own construction is no floor. Shell clearance there includes the great hall\'s fabric and furnishings.',
     'Shell clearance tests camera-centre capsules against the actual foundation-bearing shell, gate passage, inner-court dressing, entire modern collection, actual entry enclosure, vegetation, road/ground dressing and both complete historic/modern retaining-wall/stair-riser batches. DOM plates and the camera frustum remain excluded from this sampled centre check; the separate saved authority supplies the full continuous near-envelope proof.',
     'Inner-court structural risers are part of the shared ground retaining batch; both retaining batches are included without selecting or reconstructing alternate triangles. Horizontal ground, water and all collection surfaces receive the existing vertical sample tests, so a route under a pavilion roof cannot silently count as an outdoor route.',
   ],
@@ -106,7 +107,7 @@ async function load(filename) {
   return exported;
 }
 
-let site, groundModule, shellModule, gatePassageModule, innerCourtModule, collectionModule, collectionAccessModule, entryPassageModule, roadDressingModule, groundDressingModule, vegetationModule, waterModule, railModule;
+let site, groundModule, shellModule, gatePassageModule, innerCourtModule, collectionModule, collectionAccessModule, entryPassageModule, houseHallModule, roadDressingModule, groundDressingModule, vegetationModule, waterModule, railModule;
 await section('load actual modules', async () => {
   site = await load(`${WING}/site.ts`);
   groundModule = await load(`${WING}/ground.ts`);
@@ -116,6 +117,7 @@ await section('load actual modules', async () => {
   collectionModule = await load(`${WING}/collection.ts`);
   collectionAccessModule = await load(`${WING}/collection-access.ts`);
   entryPassageModule = await load(`${WING}/entry-passage.ts`);
+  houseHallModule = await load(`${WING}/house-hall.ts`);
   roadDressingModule = await load(`${WING}/road-dressing.ts`);
   groundDressingModule = await load(`${WING}/ground-dressing.ts`);
   vegetationModule = await load(`${WING}/vegetation.ts`);
@@ -311,6 +313,22 @@ function groundTop(index, eye) {
   }
   return Number.isFinite(top) ? top : null;
 }
+/** THE FLOOR A CAMERA INDOORS STANDS OVER: the highest near-level face at or
+ * under the eye, read downward from the eye itself so a ceiling over it never
+ * counts. */
+const floorRay = new THREE.Ray(new THREE.Vector3(), new THREE.Vector3(0, -1, 0)), floorPoint = new THREE.Vector3();
+function floorUnder(index, eye) {
+  floorRay.origin.copy(eye);
+  let top = -Infinity;
+  const bucket = index.bins.get(`${Math.floor(eye.x / index.cellSize)},${Math.floor(eye.z / index.cellSize)},0`) ?? [];
+  for (const i of bucket) {
+    const [a, b, c] = index.triangle(i);
+    groundNormal.copy(groundEdgeB.subVectors(c, a).cross(groundEdgeA.subVectors(b, a))).normalize();
+    if (Math.abs(groundNormal.y) < .75) continue;
+    if (floorRay.intersectTriangle(a, b, c, false, floorPoint)) top = Math.max(top, floorPoint.y);
+  }
+  return Number.isFinite(top) ? top : null;
+}
 const coordinate = eye => ({ east: eye.x, north: -eye.z, height: eye.y });
 
 const collisionSets = new Map();
@@ -323,6 +341,8 @@ await section('actual geometry buffers at all tiers', () => {
     const collection = collectionModule.createCollection();
     const collectionAccess = collectionAccessModule.createCollectionAccess();
     const entryPassage = entryPassageModule.createEntryPassage(tier);
+    // The great hall and the service passage to it, at the tiers the wing mounts them (not calm).
+    const houseHall = tier === 'calm' ? null : houseHallModule.createHouseHall(tier).group;
     const vegetation = vegetationModule.createVegetation(gradeModule.gradeAt, tier);
     const roadDressing = roadDressingModule.createRoadDressing(gradeModule.gradeAt, tier);
     const groundDressing = groundDressingModule.createGroundDressing(gradeModule.gradeAt, tier);
@@ -331,8 +351,9 @@ await section('actual geometry buffers at all tiers', () => {
       reflector: () => ({ node: TSL.vec4(0, 0, 0, 1), dispose() {} }),
     });
     for (const [name, group] of [['shell', shell], ['ground', ground], ['gate-passage', gatePassage], ['inner-court', innerCourt], ['collection', collection], ['collection-access', collectionAccess], ['entry-passage', entryPassage], ['vegetation', vegetation], ['road-dressing', roadDressing], ['ground-dressing', groundDressing], ['water', water]]) validateGeometry(name, tier, group);
-    if (tier === 'standard' || tier === 'calm') collisionSets.set(tier, { shell, ground, gatePassage, innerCourt, collection, collectionAccess, entryPassage, vegetation, roadDressing, groundDressing, water });
-    else { dispose(shell); dispose(ground); dispose(gatePassage); dispose(innerCourt); dispose(collection); dispose(collectionAccess); dispose(entryPassage); dispose(vegetation); dispose(roadDressing); dispose(groundDressing); water.dispose(); }
+    if (houseHall) validateGeometry('house-hall', tier, houseHall);
+    if (tier === 'standard' || tier === 'calm') collisionSets.set(tier, { shell, ground, gatePassage, innerCourt, collection, collectionAccess, entryPassage, houseHall, vegetation, roadDressing, groundDressing, water });
+    else { dispose(shell); dispose(ground); dispose(gatePassage); dispose(innerCourt); dispose(collection); dispose(collectionAccess); dispose(entryPassage); if (houseHall) dispose(houseHall); dispose(vegetation); dispose(roadDressing); dispose(groundDressing); water.dispose(); }
   }
 });
 
@@ -349,6 +370,17 @@ await section('actual camera rail against actual triangles', async () => {
   let violationCount = 0, intersectingChords = 0;
   let totalSamples = 0, uniquePositions = 0, maxStepM = 0, maxRoll = 0, maxQuaternionError = 0, maxAimError = 0;
   let minimumGrade = Infinity, minimumMesh = Infinity, minimumShell = SHELL_CLEARANCE, missingGround = 0, indoorSamples = 0;
+  // THE HOUSE'S OWN ROOMS ARE INDOORS TOO. Inside the registered footprint
+  // and between the ground storey's floor and the next storey's, a camera
+  // stands in the house, where the terrain is not cut under it and is not
+  // what it walks on. There it has to stand over the storey's own built floor,
+  // no lower than that floor's construction, and clear it like the ground.
+  const houseFootprint = site.dossier.site.footprint.map(point => point.value);
+  const groundStorey = site.dossier.floors.find(floor => floor.id === 'ground'), nextStorey = site.dossier.floors.find(floor => floor.id === 'first');
+  const houseFloor = groundStorey.level_m.value, houseFloorLowest = houseFloor - groundStorey.slab_m.value, houseCeiling = nextStorey.level_m.value;
+  const inHouse = eye => eye.y > houseFloor && eye.y < houseCeiling && site.inside(eye.x, -eye.z, houseFootprint);
+  let minimumHouseFloor = Infinity, missingHouseFloor = 0, houseSamples = 0;
+  const houseFloorMisses = [], houseMissesByViewport = {};
   const euler = new THREE.Euler(0, 0, 0, 'YXZ');
   for (const narrow of [false, true]) {
     const viewport = narrow ? 'mobile' : 'desktop';
@@ -361,7 +393,7 @@ await section('actual camera rail against actual triangles', async () => {
     // The exhibits' plinths and bases are mounted before the runtime hashes
     // the scene, so this identity and this clearance carry them too.
     const standSolids = createCollectionStandSolids(new THREE.MeshBasicMaterial());
-    const architecture = [geometry.shell, geometry.gatePassage, geometry.innerCourt, geometry.collection, geometry.collectionAccess, geometry.entryPassage, geometry.vegetation, geometry.roadDressing, geometry.groundDressing, retaining, collectionRetaining, standSolids];
+    const architecture = [geometry.shell, geometry.gatePassage, geometry.innerCourt, geometry.collection, geometry.collectionAccess, geometry.entryPassage, ...(geometry.houseHall ? [geometry.houseHall] : []), geometry.vegetation, geometry.roadDressing, geometry.groundDressing, retaining, collectionRetaining, standSolids];
     for (const group of architecture) group.traverse(object => { if (object.isMesh) for (const material of Array.isArray(object.material) ? object.material : [object.material]) material.side = THREE.DoubleSide; });
     const shellIndex = makeIndex(trianglesOf(architecture), 3, 1);
     // THE GROUND IS THE GROUND. A roof over the walk is not a floor under it:
@@ -370,6 +402,9 @@ await section('actual camera rail against actual triangles', async () => {
     // hillside. The built floors are the insertion's own and are read by the
     // indoor rule below; this index is the terrain and the water.
     const groundIndex = makeIndex(trianglesOf([geometry.ground, geometry.water], true), 2, 4);
+    // The house's floors as they are built: the shell's thresholds, the
+    // entrance passage, and the great hall with its service passage.
+    const houseFloorIndex = makeIndex(trianglesOf([geometry.shell, geometry.entryPassage, ...(geometry.houseHall ? [geometry.houseHall] : [])], true), 2, 1);
     const architectureMeshes = new Map();
     for (const name of shellIndex.data.names) architectureMeshes.set(name, (architectureMeshes.get(name) ?? 0) + 1);
     collisionGeometry.push({ viewport, tier, shellTriangles: shellIndex.data.count, groundAndWaterTriangles: groundIndex.data.count,
@@ -434,16 +469,27 @@ await section('actual camera rail against actual triangles', async () => {
           // depth of the building, which is the building and not a fault, so
           // the ground clearance is read where the ground is what a visitor
           // walks on. The shell clearance is read everywhere.
-          const indoors = eye.x > -62.4 && eye.x < -21.6 && eye.z > 18.6 && eye.z < 64.2 && eye.y < -1.9
+          const house = inHouse(eye)
+          const indoors = house || (eye.x > -62.4 && eye.x < -21.6 && eye.z > 18.6 && eye.z < 64.2 && eye.y < -1.9)
           if (indoors) indoorSamples++
+          let houseFloorClearance = null
+          if (house) {
+            houseSamples++
+            const floor = floorUnder(houseFloorIndex, eye)
+            if (floor === null || floor < houseFloorLowest - 1e-6) {
+              missingHouseFloor++; houseMissesByViewport[viewport] = (houseMissesByViewport[viewport] ?? 0) + 1
+              if (houseFloorMisses.length < 12 || houseFloorMisses.every(miss => miss.viewport !== viewport)) houseFloorMisses.push({ viewport, from, to: id, ...coordinate(eye), floor })
+            } else { houseFloorClearance = eye.y - floor; minimumHouseFloor = Math.min(minimumHouseFloor, houseFloorClearance) }
+          }
           if (!indoors) {
             pathGrade = Math.min(pathGrade, gradeClearance)
             if (meshClearance === null) missingGround++; else pathMesh = Math.min(pathMesh, meshClearance)
           }
           pathShell = Math.min(pathShell, shell.lowerBoundM);
-          if ((!indoors && (gradeClearance < TERRAIN_CLEARANCE - 1e-6 || meshClearance === null || meshClearance < TERRAIN_CLEARANCE - 1e-6)) || shell.lowerBoundM < SHELL_CLEARANCE - 1e-6) {
+          if ((!indoors && (gradeClearance < TERRAIN_CLEARANCE - 1e-6 || meshClearance === null || meshClearance < TERRAIN_CLEARANCE - 1e-6))
+            || (house && (houseFloorClearance === null || houseFloorClearance < TERRAIN_CLEARANCE - 1e-6)) || shell.lowerBoundM < SHELL_CLEARANCE - 1e-6) {
             violationCount++;
-            if (violations.length < MAX_VIOLATIONS) violations.push({ viewport, from, to: id, seconds: clock - startTime, ...coordinate(eye), gradeClearanceM: gradeClearance, meshClearanceM: meshClearance, shellClearanceM: shell.lowerBoundM, shellMesh: shell.mesh });
+            if (violations.length < MAX_VIOLATIONS) violations.push({ viewport, from, to: id, seconds: clock - startTime, ...coordinate(eye), gradeClearanceM: gradeClearance, meshClearanceM: meshClearance, houseFloorClearanceM: houseFloorClearance, shellClearanceM: shell.lowerBoundM, shellMesh: shell.mesh });
           }
           lastTested = eye.clone();
         }
@@ -467,6 +513,8 @@ await section('actual camera rail against actual triangles', async () => {
     }
   }
   if (minimumGrade < TERRAIN_CLEARANCE - 1e-6 || minimumMesh < TERRAIN_CLEARANCE - 1e-6 || missingGround) fail('terrain-clearance', 'Camera samples out of doors do not all clear the live grade and rendered ground by 0.3 m.', { minimumGradeM: minimumGrade, minimumMeshM: minimumMesh, missingGround, indoorSamples });
+  if (minimumHouseFloor < TERRAIN_CLEARANCE - 1e-6 || missingHouseFloor) fail('house-floor-clearance', 'Camera samples inside the house do not all stand over its built ground-storey floor and clear it by 0.3 m.', { minimumHouseFloorM: minimumHouseFloor, missingHouseFloor, missingByViewport: houseMissesByViewport, houseSamples, examples: houseFloorMisses });
+  report.house = { footprintVertices: houseFootprint.length, floorM: houseFloor, lowestFloorM: houseFloorLowest, nextFloorM: houseCeiling, samples: houseSamples, minimumFloorClearanceM: Number.isFinite(minimumHouseFloor) ? minimumHouseFloor : null, missingFloorSamples: missingHouseFloor, missingByViewport: houseMissesByViewport };
   if (minimumShell < SHELL_CLEARANCE - 1e-6) fail('shell-clearance', 'A sampled path chord passes within 0.25 m of the actual DoubleSide shell, gate passage, inner court, collection or historic/modern retaining/stair geometry.', { minimumM: minimumShell });
   if (maxRoll > 1e-8 || maxQuaternionError > 1e-10 || maxAimError > 1e-6) fail('camera-orientation', 'YXZ roll, quaternion norm or final target direction exceeds tolerance.', { maxRoll, maxQuaternionError, maxAimError });
   report.rail = { stationIds: ids, viewportCount: 2, adjacentTransitions: 2 * 2 * (ids.length - 1), directPhysicalTransitions: 40, timeStepSeconds: STEP_SECONDS, transitionObservationSeconds: TRANSITION_SECONDS, shellThresholdM: SHELL_CLEARANCE, terrainThresholdM: TERRAIN_CLEARANCE, collisionGeometry, totalCameraSamples: totalSamples, distinctPositionSamples: uniquePositions, maximumSampleStepM: maxStepM, minimumGradeClearanceM: minimumGrade, minimumMeshClearanceM: Number.isFinite(minimumMesh) ? minimumMesh : null, shellClearanceLowerBoundM: minimumShell, intersectingSampleChords: intersectingChords, maximumYXZRollRadians: maxRoll, maximumQuaternionNormError: maxQuaternionError, maximumAimErrorRadians: maxAimError, missingGroundSamples: missingGround, violationCount, violationExamples: violations, violationExamplesCappedAt: MAX_VIOLATIONS, poses, paths };
