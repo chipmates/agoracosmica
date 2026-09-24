@@ -2031,9 +2031,9 @@
       "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "water-lifting-screw, Codex Atlanticus f. 6r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. The tube keeps its dossier centreline and lies bedded in pitch on a turned oak core, bound to it by iron bands with nailed feet and ringed with iron at both mouths; the core's ends are hooped and nailed and carry iron pivots that turn in iron-lined seats, the period type Vitruvius 10.6 describes; the frame is jointed with through tenons, wedges, pegs and braces, the troughs are boarded, nailed and pitched inside, the base is planked on sleepers; every nail head is a four-sided rose head. Oak: the library's CC0 oak veneer set at the tier's full map budget under a generated planed oak tint #897a66 (the turned core #82715d, the grip #5f4a37), the veneer's colour at a third and its contrast at 0.62 (0.9 on the core), each timber its own texture phase; a vertex colour carries each timber's tone (value 0.86 to 1.10, warmth 5 percent either way) and its end grain at 0.42. Hide: the library's CC0 leather under a generated pitch-dark tint #3d2e23, its variation held to 0.3, normal strength 0.1, a 2.2 cm crinkle at relief 0.1, roughness 0.46 to 0.66. Pitch: a generated #1d1713 bedding and a #33271e lining at a 0.08 variation, roughness 0.52 to 0.72, no relief. Forged iron: the library's CC0 iron read at a 0.3 m tile, normal strength 0.3, a generated #3f3a35 tint at a 0.25 mottle, metalness 0.5, roughness 0.5 to 0.82. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "prompt": "water-lifting-screw, Codex Atlanticus f. 6r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. The tube keeps its dossier centreline and lies bedded in pitch on an oak core hewn round by the adze (22 uneven faces, three drying checks), bound to it by iron bands with nailed feet, ringed with iron at its lower mouth, scoured by the sump, and carrying an iron ferrule flared to a rolled lip at its outlet; the core's ends are hooped and nailed and carry iron pivots that turn in iron-lined seats, the period type Vitruvius 10.6 describes; the frame is jointed with through tenons, wedges, pegs and braces; the troughs are floors of boards with pitched seams and pitched inside corners, bare timber inside, walls nailed round them; the base is planked on sleepers; every nail head is a four-sided rose head. Oak: the library's CC0 oak veneer set at the tier's full map budget under a generated planed oak tint #897a66 (the hewn core #8f7c64, the grip #5f4a37), the veneer's colour at a third and its contrast at 0.62 (0.9 on the core), each timber its own texture phase; a vertex colour carries each timber's tone (value 0.86 to 1.10, warmth 5 percent either way), its end grain at 0.42 and its wear: damp below a water line in both troughs with a dark line at the water's edge and silt along the walls' foot, green at the sump's foot, the base darkened round the sump, the core's wet end stained, the grip darkened where the hand closes; the grip polished to a roughness of 0.2 to 0.34. Hide: the library's CC0 leather under a generated pitch-dark tint #3a2b21, its variation held to 0.3, normal strength 0.1, a 2.2 cm crinkle at relief 0.1, roughness 0.46 to 0.66, the bench key's edge on its round. Pitch: a generated #1d1713 at a 0.08 variation, roughness 0.52 to 0.72, no relief. Forged iron: the library's CC0 iron read at a 0.3 m tile, normal strength 0.3, a generated #3f3a35 tint at a 0.25 mottle, metalness 0.5, roughness 0.5 to 0.82; the outlet's lip of the outlet and the ring of the lower mouth scoured to #857e74, metalness 0.35, roughness 0.3 to 0.45. These surface choices and the wear are modern reconstruction dressing, a look and not a claim. No reconstruction photograph is sampled.",
       "model": "Claude Opus 5.5",
-      "date": "2026-09-23",
+      "date": "2026-09-24",
       "sha256": "06f8b4efb2bf4b00f9a4ae9b13ab2d85f7552308789d37958e5596003cdf7023",
       "recipe_files": [
         {
@@ -2042,15 +2042,15 @@
         },
         {
           "path": "src/wings/vinci/machines/data/records.json",
-          "sha256": "2dfa819dbb23659a9cd949cd30b79681e3f3c3c62b6c603efbd38f15516ce525"
+          "sha256": "a59fe96b8b581db0b4bc563447a5fc28f19cb8ab48ad3ccf08b188266ef149ff"
         },
         {
           "path": "src/wings/vinci/machines/data/water-lifting-screw.json",
-          "sha256": "8312e9a5d1ac5f6fc1427959efb9087636caed2115361533a40014b7a6496d3e"
+          "sha256": "b4a7ea08aadf60e9d4f6731ca0de943f40f247e575d536a154e34667fce33354"
         },
         {
           "path": "src/wings/vinci/machines/geometry.ts",
-          "sha256": "8a856578f1f16c6c28a0ad1afc7fcda56f11f09969182c8927e49f3f022e9ac3"
+          "sha256": "79471916384bc35497c26e1e347a2584a331ecf15f8e5b788e70bf217eb80bc1"
         },
         {
           "path": "src/wings/vinci/machines/motion.ts",
@@ -2058,7 +2058,7 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "e840bbc9580e539144f88e9c84c23cf9660e5fcc5305387848272412b95fa585"
+          "sha256": "9226ce7798c131711019e32d2a2c6934cac77fc438045b7afd05dc05cb4d0940"
         },
         {
           "path": "src/wings/vinci/machines/runtime.ts",
@@ -2071,6 +2071,10 @@
         {
           "path": "src/wings/vinci/machines/water-lifting-screw.ts",
           "sha256": "06f8b4efb2bf4b00f9a4ae9b13ab2d85f7552308789d37958e5596003cdf7023"
+        },
+        {
+          "path": "src/wings/vinci/machines/wear.ts",
+          "sha256": "ad30f07fc564189f3cd1a5ea003cecb3e9ef5c66af031829859e1903b86e4afc"
         }
       ],
       "dossier": {
