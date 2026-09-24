@@ -6,6 +6,7 @@
  * or exports the surface keeps it. A line that must read crisp is given
  * vertices of its own by cutting the surface along it. */
 import { Float32BufferAttribute, Matrix3, Matrix4, Vector3, type BufferGeometry } from 'three/webgpu'
+import { waterAndWarWear } from './wear-water-war'
 
 type Tint = readonly [number, number, number]
 interface Cut {
@@ -154,7 +155,7 @@ const AERIAL_SCREW: WearRule[] = [
 ]
 
 export function wearFor(slug: string): readonly WearRule[] {
-  return slug === 'water-lifting-screw' ? WATER_SCREW : slug === 'aerial-screw' ? AERIAL_SCREW : []
+  return slug === 'water-lifting-screw' ? WATER_SCREW : slug === 'aerial-screw' ? AERIAL_SCREW : waterAndWarWear(slug) ?? []
 }
 
 /** Cut a flat-listed surface by parallel planes n.p = offset, every

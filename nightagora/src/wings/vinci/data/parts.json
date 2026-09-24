@@ -979,45 +979,477 @@
       }
     },
     "multi-barrel-gun": {
+      "bed-plank-0": {
+        "en": "Bed plank",
+        "de": "Bettbohle"
+      },
+      "bed-plank-1": {
+        "en": "Bed plank",
+        "de": "Bettbohle"
+      },
       "chassis": {
         "en": "Chassis",
         "de": "Fahrgestell"
       },
-      "trail-left": {
-        "en": "Left trail",
-        "de": "Linker Lafettenholm"
+      "bed-plank-3": {
+        "en": "Bed plank",
+        "de": "Bettbohle"
       },
-      "trail-right": {
-        "en": "Right trail",
-        "de": "Rechter Lafettenholm"
+      "bed-plank-4": {
+        "en": "Bed plank",
+        "de": "Bettbohle"
+      },
+      "bed-peg-0": {
+        "en": "Treenail",
+        "de": "Holznagel"
+      },
+      "bed-peg-1": {
+        "en": "Treenail",
+        "de": "Holznagel"
+      },
+      "bed-peg-2": {
+        "en": "Treenail",
+        "de": "Holznagel"
+      },
+      "bed-peg-3": {
+        "en": "Treenail",
+        "de": "Holznagel"
+      },
+      "bed-peg-4": {
+        "en": "Treenail",
+        "de": "Holznagel"
+      },
+      "bed-peg-5": {
+        "en": "Treenail",
+        "de": "Holznagel"
+      },
+      "bed-peg-6": {
+        "en": "Treenail",
+        "de": "Holznagel"
+      },
+      "bed-peg-7": {
+        "en": "Treenail",
+        "de": "Holznagel"
+      },
+      "bed-peg-8": {
+        "en": "Treenail",
+        "de": "Holznagel"
       },
       "axle": {
         "en": "Axle",
         "de": "Achse"
       },
+      "axle-arm-left": {
+        "en": "Axle arm",
+        "de": "Achsschenkel"
+      },
+      "axle-washer-left": {
+        "en": "Washer",
+        "de": "Unterlegscheibe"
+      },
+      "linchpin-left": {
+        "en": "Linchpin",
+        "de": "Achsnagel"
+      },
+      "linchpin-eye-left": {
+        "en": "Eye of the linchpin",
+        "de": "Öse des Achsnagels"
+      },
+      "axle-arm-right": {
+        "en": "Axle arm",
+        "de": "Achsschenkel"
+      },
+      "axle-washer-right": {
+        "en": "Washer",
+        "de": "Unterlegscheibe"
+      },
+      "linchpin-right": {
+        "en": "Linchpin",
+        "de": "Achsnagel"
+      },
+      "linchpin-eye-right": {
+        "en": "Eye of the linchpin",
+        "de": "Öse des Achsnagels"
+      },
+      "trail-left": {
+        "en": "Left trail",
+        "de": "Linker Lafettenholm"
+      },
+      "trail-shoe-left": {
+        "en": "Iron shoe",
+        "de": "Eisenschuh"
+      },
+      "trail-right": {
+        "en": "Right trail",
+        "de": "Rechter Lafettenholm"
+      },
+      "trail-shoe-right": {
+        "en": "Iron shoe",
+        "de": "Eisenschuh"
+      },
+      "transom": {
+        "en": "Transom",
+        "de": "Riegel"
+      },
       "wheel--1": {
         "en": "Wheel",
         "de": "Rad"
       },
-      "upright--1": {
-        "en": "Upright",
-        "de": "Ständer"
+      "nave-hoop-left-0": {
+        "en": "Nave hoop",
+        "de": "Nabenring"
+      },
+      "nave-hoop-left-1": {
+        "en": "Nave hoop",
+        "de": "Nabenring"
+      },
+      "spoke-left-0": {
+        "en": "Spoke",
+        "de": "Speiche"
+      },
+      "spoke-left-1": {
+        "en": "Spoke",
+        "de": "Speiche"
+      },
+      "spoke-left-2": {
+        "en": "Spoke",
+        "de": "Speiche"
+      },
+      "spoke-left-3": {
+        "en": "Spoke",
+        "de": "Speiche"
+      },
+      "spoke-left-4": {
+        "en": "Spoke",
+        "de": "Speiche"
+      },
+      "spoke-left-5": {
+        "en": "Spoke",
+        "de": "Speiche"
+      },
+      "spoke-left-6": {
+        "en": "Spoke",
+        "de": "Speiche"
+      },
+      "spoke-left-7": {
+        "en": "Spoke",
+        "de": "Speiche"
+      },
+      "spoke-left-8": {
+        "en": "Spoke",
+        "de": "Speiche"
+      },
+      "spoke-left-9": {
+        "en": "Spoke",
+        "de": "Speiche"
+      },
+      "spoke-left-10": {
+        "en": "Spoke",
+        "de": "Speiche"
+      },
+      "spoke-left-11": {
+        "en": "Spoke",
+        "de": "Speiche"
+      },
+      "felloe-left-0": {
+        "en": "Felloe",
+        "de": "Felge"
+      },
+      "strake-left-0": {
+        "en": "Strake",
+        "de": "Radschiene"
+      },
+      "felloe-left-1": {
+        "en": "Felloe",
+        "de": "Felge"
+      },
+      "strake-left-1": {
+        "en": "Strake",
+        "de": "Radschiene"
+      },
+      "felloe-left-2": {
+        "en": "Felloe",
+        "de": "Felge"
+      },
+      "strake-left-2": {
+        "en": "Strake",
+        "de": "Radschiene"
+      },
+      "felloe-left-3": {
+        "en": "Felloe",
+        "de": "Felge"
+      },
+      "strake-left-3": {
+        "en": "Strake",
+        "de": "Radschiene"
+      },
+      "felloe-left-4": {
+        "en": "Felloe",
+        "de": "Felge"
+      },
+      "strake-left-4": {
+        "en": "Strake",
+        "de": "Radschiene"
+      },
+      "felloe-left-5": {
+        "en": "Felloe",
+        "de": "Felge"
+      },
+      "strake-left-5": {
+        "en": "Strake",
+        "de": "Radschiene"
       },
       "wheel-1": {
         "en": "Wheel",
         "de": "Rad"
       },
+      "nave-hoop-right-0": {
+        "en": "Nave hoop",
+        "de": "Nabenring"
+      },
+      "nave-hoop-right-1": {
+        "en": "Nave hoop",
+        "de": "Nabenring"
+      },
+      "spoke-right-0": {
+        "en": "Spoke",
+        "de": "Speiche"
+      },
+      "spoke-right-1": {
+        "en": "Spoke",
+        "de": "Speiche"
+      },
+      "spoke-right-2": {
+        "en": "Spoke",
+        "de": "Speiche"
+      },
+      "spoke-right-3": {
+        "en": "Spoke",
+        "de": "Speiche"
+      },
+      "spoke-right-4": {
+        "en": "Spoke",
+        "de": "Speiche"
+      },
+      "spoke-right-5": {
+        "en": "Spoke",
+        "de": "Speiche"
+      },
+      "spoke-right-6": {
+        "en": "Spoke",
+        "de": "Speiche"
+      },
+      "spoke-right-7": {
+        "en": "Spoke",
+        "de": "Speiche"
+      },
+      "spoke-right-8": {
+        "en": "Spoke",
+        "de": "Speiche"
+      },
+      "spoke-right-9": {
+        "en": "Spoke",
+        "de": "Speiche"
+      },
+      "spoke-right-10": {
+        "en": "Spoke",
+        "de": "Speiche"
+      },
+      "spoke-right-11": {
+        "en": "Spoke",
+        "de": "Speiche"
+      },
+      "felloe-right-0": {
+        "en": "Felloe",
+        "de": "Felge"
+      },
+      "strake-right-0": {
+        "en": "Strake",
+        "de": "Radschiene"
+      },
+      "felloe-right-1": {
+        "en": "Felloe",
+        "de": "Felge"
+      },
+      "strake-right-1": {
+        "en": "Strake",
+        "de": "Radschiene"
+      },
+      "felloe-right-2": {
+        "en": "Felloe",
+        "de": "Felge"
+      },
+      "strake-right-2": {
+        "en": "Strake",
+        "de": "Radschiene"
+      },
+      "felloe-right-3": {
+        "en": "Felloe",
+        "de": "Felge"
+      },
+      "strake-right-3": {
+        "en": "Strake",
+        "de": "Radschiene"
+      },
+      "felloe-right-4": {
+        "en": "Felloe",
+        "de": "Felge"
+      },
+      "strake-right-4": {
+        "en": "Strake",
+        "de": "Radschiene"
+      },
+      "felloe-right-5": {
+        "en": "Felloe",
+        "de": "Felge"
+      },
+      "strake-right-5": {
+        "en": "Strake",
+        "de": "Radschiene"
+      },
+      "upright--1": {
+        "en": "Upright",
+        "de": "Ständer"
+      },
+      "cap-square-left": {
+        "en": "Cap square",
+        "de": "Lagerdeckel"
+      },
+      "cap-pin-left-0": {
+        "en": "Pin",
+        "de": "Stift"
+      },
+      "cap-pin-left-1": {
+        "en": "Pin",
+        "de": "Stift"
+      },
+      "sole-left": {
+        "en": "Sole",
+        "de": "Schwelle"
+      },
+      "sole-peg-left-0": {
+        "en": "Treenail",
+        "de": "Holznagel"
+      },
+      "sole-peg-left-1": {
+        "en": "Treenail",
+        "de": "Holznagel"
+      },
+      "strut-left-0": {
+        "en": "Strut",
+        "de": "Strebe"
+      },
+      "strut-left-1": {
+        "en": "Strut",
+        "de": "Strebe"
+      },
       "upright-1": {
         "en": "Upright",
         "de": "Ständer"
+      },
+      "cap-square-right": {
+        "en": "Cap square",
+        "de": "Lagerdeckel"
+      },
+      "cap-pin-right-0": {
+        "en": "Pin",
+        "de": "Stift"
+      },
+      "cap-pin-right-1": {
+        "en": "Pin",
+        "de": "Stift"
+      },
+      "sole-right": {
+        "en": "Sole",
+        "de": "Schwelle"
+      },
+      "sole-peg-right-0": {
+        "en": "Treenail",
+        "de": "Holznagel"
+      },
+      "sole-peg-right-1": {
+        "en": "Treenail",
+        "de": "Holznagel"
+      },
+      "strut-right-0": {
+        "en": "Strut",
+        "de": "Strebe"
+      },
+      "strut-right-1": {
+        "en": "Strut",
+        "de": "Strebe"
       },
       "drum": {
         "en": "Turning frame",
         "de": "Drehrahmen"
       },
+      "triangle--1": {
+        "en": "Triangular end plate",
+        "de": "Dreieckige Endplatte"
+      },
+      "frame-boss-left": {
+        "en": "Boss",
+        "de": "Nabe"
+      },
+      "triangle-1": {
+        "en": "Triangular end plate",
+        "de": "Dreieckige Endplatte"
+      },
+      "frame-boss-right": {
+        "en": "Boss",
+        "de": "Nabe"
+      },
+      "corner-board-0": {
+        "en": "Corner board",
+        "de": "Eckbrett"
+      },
+      "corner-board-1": {
+        "en": "Corner board",
+        "de": "Eckbrett"
+      },
+      "corner-board-2": {
+        "en": "Corner board",
+        "de": "Eckbrett"
+      },
+      "shaft-collar-left": {
+        "en": "Shaft collar",
+        "de": "Wellenbund"
+      },
+      "shaft-collar-right": {
+        "en": "Shaft collar",
+        "de": "Wellenbund"
+      },
       "bank-0": {
         "en": "Barrel bank",
         "de": "Rohrreihe"
+      },
+      "bank-nail-0-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bank-nail-0-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bank-nail-0-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bank-nail-0-3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bank-nail-0-4": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bank-nail-0-5": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "breech-batten-0": {
+        "en": "Breech batten",
+        "de": "Stoßleiste"
       },
       "barrel-0-0": {
         "en": "Barrel",
@@ -1063,9 +1495,65 @@
         "en": "Barrel",
         "de": "Rohr"
       },
+      "barrel-strap-0-0": {
+        "en": "Barrel strap",
+        "de": "Rohrband"
+      },
+      "strap-nail-0-0-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "strap-nail-0-0-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "strap-nail-0-0-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "barrel-strap-0-1": {
+        "en": "Barrel strap",
+        "de": "Rohrband"
+      },
+      "strap-nail-0-1-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "strap-nail-0-1-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
       "bank-1": {
         "en": "Barrel bank",
         "de": "Rohrreihe"
+      },
+      "bank-nail-1-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bank-nail-1-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bank-nail-1-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bank-nail-1-3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bank-nail-1-4": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bank-nail-1-5": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "breech-batten-1": {
+        "en": "Breech batten",
+        "de": "Stoßleiste"
       },
       "barrel-1-0": {
         "en": "Barrel",
@@ -1111,9 +1599,65 @@
         "en": "Barrel",
         "de": "Rohr"
       },
+      "barrel-strap-1-0": {
+        "en": "Barrel strap",
+        "de": "Rohrband"
+      },
+      "strap-nail-1-0-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "strap-nail-1-0-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "strap-nail-1-0-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "barrel-strap-1-1": {
+        "en": "Barrel strap",
+        "de": "Rohrband"
+      },
+      "strap-nail-1-1-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "strap-nail-1-1-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
       "bank-2": {
         "en": "Barrel bank",
         "de": "Rohrreihe"
+      },
+      "bank-nail-2-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bank-nail-2-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bank-nail-2-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bank-nail-2-3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bank-nail-2-4": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bank-nail-2-5": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "breech-batten-2": {
+        "en": "Breech batten",
+        "de": "Stoßleiste"
       },
       "barrel-2-0": {
         "en": "Barrel",
@@ -1159,17 +1703,49 @@
         "en": "Barrel",
         "de": "Rohr"
       },
-      "triangle--1": {
-        "en": "Triangular end plate",
-        "de": "Dreieckige Endplatte"
+      "barrel-strap-2-0": {
+        "en": "Barrel strap",
+        "de": "Rohrband"
       },
-      "triangle-1": {
-        "en": "Triangular end plate",
-        "de": "Dreieckige Endplatte"
+      "strap-nail-2-0-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "strap-nail-2-0-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "strap-nail-2-0-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "barrel-strap-2-1": {
+        "en": "Barrel strap",
+        "de": "Rohrband"
+      },
+      "strap-nail-2-1-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "strap-nail-2-1-1": {
+        "en": "Nail",
+        "de": "Nagel"
       },
       "handbar": {
         "en": "Hand bar",
         "de": "Handgriff"
+      },
+      "handbar-grip-0": {
+        "en": "Grip",
+        "de": "Griff"
+      },
+      "handbar-grip-1": {
+        "en": "Grip",
+        "de": "Griff"
+      },
+      "handbar-wedge": {
+        "en": "Forelock",
+        "de": "Splint"
       }
     },
     "rolling-mill": {
@@ -1595,97 +2171,1093 @@
       }
     },
     "miter-lock-gates": {
-      "sill": {
-        "en": "Sill",
-        "de": "Schwelle"
+      "slab-0": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-1": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-2": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-3": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-4": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-5": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-6": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-7": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-8": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-9": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-10": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-11": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-12": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-13": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-14": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-15": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-16": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-17": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-18": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-19": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-20": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-21": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-22": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-23": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-24": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-25": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-26": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-27": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-28": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-29": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-30": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-31": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-32": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-33": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-34": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-35": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-36": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-37": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-38": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-39": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-40": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-41": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-42": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-43": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-44": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-45": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-46": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-47": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-48": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-49": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-50": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-51": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-52": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-53": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-54": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "slab-55": {
+        "en": "Floor slab",
+        "de": "Bodenplatte"
+      },
+      "pivot-stone-left": {
+        "en": "Pivot stone",
+        "de": "Drehstein"
+      },
+      "socket-left": {
+        "en": "Socket of the pintle",
+        "de": "Pfanne des Zapfens"
+      },
+      "pivot-stone-right": {
+        "en": "Pivot stone",
+        "de": "Drehstein"
+      },
+      "socket-right": {
+        "en": "Socket of the pintle",
+        "de": "Pfanne des Zapfens"
       },
       "post-left": {
         "en": "Left gate post",
         "de": "Linker Torpfosten"
       },
+      "collar-left": {
+        "en": "Iron collar of the heel post",
+        "de": "Halsband des Wendepfostens"
+      },
+      "collar-strap-left": {
+        "en": "Strap of the collar",
+        "de": "Anker des Halsbands"
+      },
+      "collar-nail-left-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "collar-nail-left-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
       "post-right": {
         "en": "Right gate post",
         "de": "Rechter Torpfosten"
+      },
+      "collar-right": {
+        "en": "Iron collar of the heel post",
+        "de": "Halsband des Wendepfostens"
+      },
+      "collar-strap-right": {
+        "en": "Strap of the collar",
+        "de": "Anker des Halsbands"
+      },
+      "collar-nail-right-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "collar-nail-right-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "sill": {
+        "en": "Sill",
+        "de": "Schwelle"
+      },
+      "sill-right": {
+        "en": "Sill",
+        "de": "Schwelle"
       },
       "leaf-left": {
         "en": "Left leaf",
         "de": "Linker Torflügel"
       },
-      "panel-left": {
-        "en": "Lower planking",
-        "de": "Untere Beplankung"
+      "pintle-left": {
+        "en": "Pintle",
+        "de": "Zapfen"
       },
-      "upper-panel-left": {
-        "en": "Upper planking",
-        "de": "Obere Beplankung"
+      "heel-hoop-left": {
+        "en": "Iron hoop",
+        "de": "Eisenring"
       },
-      "wicket-side-a-left": {
-        "en": "Planking beside the small door",
-        "de": "Beplankung neben der kleinen Tür"
+      "head-hoop-left": {
+        "en": "Iron hoop",
+        "de": "Eisenring"
       },
-      "wicket-side-b-left": {
-        "en": "Planking beside the small door",
-        "de": "Beplankung neben der kleinen Tür"
+      "mitre-post-left": {
+        "en": "Mitre post",
+        "de": "Schlagsäule"
       },
-      "wicket-left": {
-        "en": "Small door",
-        "de": "Kleine Tür"
+      "crossbeam-left-3": {
+        "en": "Crossbeam",
+        "de": "Querbalken"
       },
-      "latch-left": {
-        "en": "Latch",
-        "de": "Riegel"
+      "crossbeam-left-3-strap-mitre": {
+        "en": "Iron strap",
+        "de": "Eisenband"
+      },
+      "crossbeam-left-3-strap-mitre-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "crossbeam-left-3-strap-mitre-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "crossbeam-left-3-strap-heel": {
+        "en": "Iron strap",
+        "de": "Eisenband"
+      },
+      "crossbeam-left-3-strap-heel-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "crossbeam-left-3-strap-heel-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "crossbeam-left-3-peg-0": {
+        "en": "Treenail",
+        "de": "Holznagel"
+      },
+      "crossbeam-left-3-peg-1": {
+        "en": "Treenail",
+        "de": "Holznagel"
       },
       "crossbeam-left-0": {
         "en": "Crossbeam",
         "de": "Querbalken"
       },
+      "crossbeam-left-0-strap-mitre": {
+        "en": "Iron strap",
+        "de": "Eisenband"
+      },
+      "crossbeam-left-0-strap-mitre-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "crossbeam-left-0-strap-mitre-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "crossbeam-left-0-strap-heel": {
+        "en": "Iron strap",
+        "de": "Eisenband"
+      },
+      "crossbeam-left-0-strap-heel-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "crossbeam-left-0-strap-heel-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
       "crossbeam-left-1": {
         "en": "Crossbeam",
         "de": "Querbalken"
+      },
+      "crossbeam-left-1-strap-mitre": {
+        "en": "Iron strap",
+        "de": "Eisenband"
+      },
+      "crossbeam-left-1-strap-mitre-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "crossbeam-left-1-strap-mitre-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "crossbeam-left-1-strap-heel": {
+        "en": "Iron strap",
+        "de": "Eisenband"
+      },
+      "crossbeam-left-1-strap-heel-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "crossbeam-left-1-strap-heel-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
       },
       "crossbeam-left-2": {
         "en": "Crossbeam",
         "de": "Querbalken"
       },
+      "crossbeam-left-2-strap-mitre": {
+        "en": "Iron strap",
+        "de": "Eisenband"
+      },
+      "crossbeam-left-2-strap-mitre-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "crossbeam-left-2-strap-mitre-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "crossbeam-left-2-strap-heel": {
+        "en": "Iron strap",
+        "de": "Eisenband"
+      },
+      "crossbeam-left-2-strap-heel-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "crossbeam-left-2-strap-heel-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "crossbeam-left-2-peg-0": {
+        "en": "Treenail",
+        "de": "Holznagel"
+      },
+      "crossbeam-left-2-peg-1": {
+        "en": "Treenail",
+        "de": "Holznagel"
+      },
+      "brace-left": {
+        "en": "Brace",
+        "de": "Strebe"
+      },
+      "board-left-0": {
+        "en": "Planking",
+        "de": "Beplankung"
+      },
+      "board-left-0-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-left-0-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-left-0-nail-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-left-0-nail-3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-left-1": {
+        "en": "Planking",
+        "de": "Beplankung"
+      },
+      "board-left-1-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-left-1-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-left-1-nail-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-left-1-nail-3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-left-2": {
+        "en": "Planking",
+        "de": "Beplankung"
+      },
+      "board-left-2-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-left-2-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-left-2-nail-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-left-2-nail-3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-left-3": {
+        "en": "Planking",
+        "de": "Beplankung"
+      },
+      "board-left-3-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-left-3-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-left-3-nail-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-left-3-nail-3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "wicket-side-a-left": {
+        "en": "Planking beside the small door",
+        "de": "Beplankung neben der kleinen Tür"
+      },
+      "wicket-side-a-left-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "wicket-side-a-left-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "wicket-side-a-left-nail-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "wicket-side-a-left-nail-3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-left-5": {
+        "en": "Planking",
+        "de": "Beplankung"
+      },
+      "board-left-5-upper": {
+        "en": "Planking",
+        "de": "Beplankung"
+      },
+      "board-left-5-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-left-5-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-left-5-nail-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-left-5-nail-3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-left-6": {
+        "en": "Planking",
+        "de": "Beplankung"
+      },
+      "board-left-6-upper": {
+        "en": "Planking",
+        "de": "Beplankung"
+      },
+      "board-left-6-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-left-6-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-left-6-nail-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-left-6-nail-3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "wicket-side-b-left": {
+        "en": "Planking beside the small door",
+        "de": "Beplankung neben der kleinen Tür"
+      },
+      "wicket-side-b-left-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "wicket-side-b-left-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "wicket-side-b-left-nail-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "wicket-side-b-left-nail-3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "latch-stile-left": {
+        "en": "Upright of the door frame",
+        "de": "Pfosten des Türrahmens"
+      },
+      "hinge-stile-left": {
+        "en": "Upright of the door frame",
+        "de": "Pfosten des Türrahmens"
+      },
+      "wicket-left": {
+        "en": "Small door",
+        "de": "Kleine Tür"
+      },
+      "wicket-board-left": {
+        "en": "Small door",
+        "de": "Kleine Tür"
+      },
+      "wicket-ledge-left-0": {
+        "en": "Ledge of the small door",
+        "de": "Querleiste der kleinen Tür"
+      },
+      "wicket-hinge-left-0": {
+        "en": "Strap hinge",
+        "de": "Langband"
+      },
+      "wicket-knuckle-left-0": {
+        "en": "Hinge eye",
+        "de": "Bandöse"
+      },
+      "wicket-ledge-left-1": {
+        "en": "Ledge of the small door",
+        "de": "Querleiste der kleinen Tür"
+      },
+      "wicket-hinge-left-1": {
+        "en": "Strap hinge",
+        "de": "Langband"
+      },
+      "wicket-knuckle-left-1": {
+        "en": "Hinge eye",
+        "de": "Bandöse"
+      },
+      "latch-left": {
+        "en": "Latch",
+        "de": "Riegel"
+      },
+      "latch-stud-left": {
+        "en": "Stud of the latch",
+        "de": "Drehbolzen des Riegels"
+      },
+      "latch-keeper-left": {
+        "en": "Keeper of the latch",
+        "de": "Riegelhaken"
+      },
+      "latch-rod-left": {
+        "en": "Rod of the latch",
+        "de": "Riegelstange"
+      },
+      "latch-ring-left": {
+        "en": "Ring of the rod",
+        "de": "Ring der Riegelstange"
+      },
+      "latch-staple-left-0": {
+        "en": "Staple",
+        "de": "Krampe"
+      },
+      "latch-staple-left-1": {
+        "en": "Staple",
+        "de": "Krampe"
+      },
+      "latch-staple-left-2": {
+        "en": "Staple",
+        "de": "Krampe"
+      },
+      "haul-bolt-left": {
+        "en": "Eye bolt",
+        "de": "Ösenbolzen"
+      },
+      "haul-ring-left": {
+        "en": "Hauling ring",
+        "de": "Zugring"
+      },
       "leaf-right": {
         "en": "Right leaf",
         "de": "Rechter Torflügel"
       },
-      "panel-right": {
-        "en": "Lower planking",
-        "de": "Untere Beplankung"
+      "pintle-right": {
+        "en": "Pintle",
+        "de": "Zapfen"
       },
-      "upper-panel-right": {
-        "en": "Upper planking",
-        "de": "Obere Beplankung"
+      "heel-hoop-right": {
+        "en": "Iron hoop",
+        "de": "Eisenring"
       },
-      "wicket-side-a-right": {
-        "en": "Planking beside the small door",
-        "de": "Beplankung neben der kleinen Tür"
+      "head-hoop-right": {
+        "en": "Iron hoop",
+        "de": "Eisenring"
       },
-      "wicket-side-b-right": {
-        "en": "Planking beside the small door",
-        "de": "Beplankung neben der kleinen Tür"
+      "mitre-post-right": {
+        "en": "Mitre post",
+        "de": "Schlagsäule"
       },
-      "wicket-right": {
-        "en": "Small door",
-        "de": "Kleine Tür"
+      "crossbeam-right-3": {
+        "en": "Crossbeam",
+        "de": "Querbalken"
       },
-      "latch-right": {
-        "en": "Latch",
-        "de": "Riegel"
+      "crossbeam-right-3-strap-mitre": {
+        "en": "Iron strap",
+        "de": "Eisenband"
+      },
+      "crossbeam-right-3-strap-mitre-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "crossbeam-right-3-strap-mitre-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "crossbeam-right-3-strap-heel": {
+        "en": "Iron strap",
+        "de": "Eisenband"
+      },
+      "crossbeam-right-3-strap-heel-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "crossbeam-right-3-strap-heel-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "crossbeam-right-3-peg-0": {
+        "en": "Treenail",
+        "de": "Holznagel"
+      },
+      "crossbeam-right-3-peg-1": {
+        "en": "Treenail",
+        "de": "Holznagel"
       },
       "crossbeam-right-0": {
         "en": "Crossbeam",
         "de": "Querbalken"
       },
+      "crossbeam-right-0-strap-mitre": {
+        "en": "Iron strap",
+        "de": "Eisenband"
+      },
+      "crossbeam-right-0-strap-mitre-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "crossbeam-right-0-strap-mitre-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "crossbeam-right-0-strap-heel": {
+        "en": "Iron strap",
+        "de": "Eisenband"
+      },
+      "crossbeam-right-0-strap-heel-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "crossbeam-right-0-strap-heel-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
       "crossbeam-right-1": {
         "en": "Crossbeam",
         "de": "Querbalken"
       },
+      "crossbeam-right-1-strap-mitre": {
+        "en": "Iron strap",
+        "de": "Eisenband"
+      },
+      "crossbeam-right-1-strap-mitre-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "crossbeam-right-1-strap-mitre-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "crossbeam-right-1-strap-heel": {
+        "en": "Iron strap",
+        "de": "Eisenband"
+      },
+      "crossbeam-right-1-strap-heel-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "crossbeam-right-1-strap-heel-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
       "crossbeam-right-2": {
         "en": "Crossbeam",
         "de": "Querbalken"
+      },
+      "crossbeam-right-2-strap-mitre": {
+        "en": "Iron strap",
+        "de": "Eisenband"
+      },
+      "crossbeam-right-2-strap-mitre-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "crossbeam-right-2-strap-mitre-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "crossbeam-right-2-strap-heel": {
+        "en": "Iron strap",
+        "de": "Eisenband"
+      },
+      "crossbeam-right-2-strap-heel-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "crossbeam-right-2-strap-heel-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "crossbeam-right-2-peg-0": {
+        "en": "Treenail",
+        "de": "Holznagel"
+      },
+      "crossbeam-right-2-peg-1": {
+        "en": "Treenail",
+        "de": "Holznagel"
+      },
+      "brace-right": {
+        "en": "Brace",
+        "de": "Strebe"
+      },
+      "board-right-0": {
+        "en": "Planking",
+        "de": "Beplankung"
+      },
+      "board-right-0-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-right-0-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-right-0-nail-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-right-0-nail-3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-right-1": {
+        "en": "Planking",
+        "de": "Beplankung"
+      },
+      "board-right-1-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-right-1-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-right-1-nail-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-right-1-nail-3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-right-2": {
+        "en": "Planking",
+        "de": "Beplankung"
+      },
+      "board-right-2-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-right-2-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-right-2-nail-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-right-2-nail-3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-right-3": {
+        "en": "Planking",
+        "de": "Beplankung"
+      },
+      "board-right-3-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-right-3-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-right-3-nail-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-right-3-nail-3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "wicket-side-a-right": {
+        "en": "Planking beside the small door",
+        "de": "Beplankung neben der kleinen Tür"
+      },
+      "wicket-side-a-right-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "wicket-side-a-right-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "wicket-side-a-right-nail-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "wicket-side-a-right-nail-3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-right-5": {
+        "en": "Planking",
+        "de": "Beplankung"
+      },
+      "board-right-5-upper": {
+        "en": "Planking",
+        "de": "Beplankung"
+      },
+      "board-right-5-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-right-5-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-right-5-nail-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-right-5-nail-3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-right-6": {
+        "en": "Planking",
+        "de": "Beplankung"
+      },
+      "board-right-6-upper": {
+        "en": "Planking",
+        "de": "Beplankung"
+      },
+      "board-right-6-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-right-6-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-right-6-nail-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "board-right-6-nail-3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "wicket-side-b-right": {
+        "en": "Planking beside the small door",
+        "de": "Beplankung neben der kleinen Tür"
+      },
+      "wicket-side-b-right-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "wicket-side-b-right-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "wicket-side-b-right-nail-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "wicket-side-b-right-nail-3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "latch-stile-right": {
+        "en": "Upright of the door frame",
+        "de": "Pfosten des Türrahmens"
+      },
+      "hinge-stile-right": {
+        "en": "Upright of the door frame",
+        "de": "Pfosten des Türrahmens"
+      },
+      "wicket-right": {
+        "en": "Small door",
+        "de": "Kleine Tür"
+      },
+      "wicket-board-right": {
+        "en": "Small door",
+        "de": "Kleine Tür"
+      },
+      "wicket-ledge-right-0": {
+        "en": "Ledge of the small door",
+        "de": "Querleiste der kleinen Tür"
+      },
+      "wicket-hinge-right-0": {
+        "en": "Strap hinge",
+        "de": "Langband"
+      },
+      "wicket-knuckle-right-0": {
+        "en": "Hinge eye",
+        "de": "Bandöse"
+      },
+      "wicket-ledge-right-1": {
+        "en": "Ledge of the small door",
+        "de": "Querleiste der kleinen Tür"
+      },
+      "wicket-hinge-right-1": {
+        "en": "Strap hinge",
+        "de": "Langband"
+      },
+      "wicket-knuckle-right-1": {
+        "en": "Hinge eye",
+        "de": "Bandöse"
+      },
+      "latch-right": {
+        "en": "Latch",
+        "de": "Riegel"
+      },
+      "latch-stud-right": {
+        "en": "Stud of the latch",
+        "de": "Drehbolzen des Riegels"
+      },
+      "latch-keeper-right": {
+        "en": "Keeper of the latch",
+        "de": "Riegelhaken"
+      },
+      "latch-rod-right": {
+        "en": "Rod of the latch",
+        "de": "Riegelstange"
+      },
+      "latch-ring-right": {
+        "en": "Ring of the rod",
+        "de": "Ring der Riegelstange"
+      },
+      "latch-staple-right-0": {
+        "en": "Staple",
+        "de": "Krampe"
+      },
+      "latch-staple-right-1": {
+        "en": "Staple",
+        "de": "Krampe"
+      },
+      "latch-staple-right-2": {
+        "en": "Staple",
+        "de": "Krampe"
+      },
+      "haul-bolt-right": {
+        "en": "Eye bolt",
+        "de": "Ösenbolzen"
+      },
+      "haul-ring-right": {
+        "en": "Hauling ring",
+        "de": "Zugring"
       }
     },
     "water-lifting-screw": {
