@@ -159,7 +159,10 @@
   border-radius: 24px;
   background: var(--gold);
   color: var(--gold-ink);
-  display: flex;
+  /* a grid, not a flex box: WebKit leaves a flex button's padding out of its
+     width, and every name then wraps into the twenty pixels it lost */
+  display: grid;
+  grid-auto-flow: column;
   align-items: center;
   gap: 8px;
   padding: 0 6px 0 14px;
@@ -173,6 +176,7 @@
 .film-gold-arrow {
   position: relative;
   flex: 0 0 36px;
+  width: 36px;
   height: 36px;
   border-radius: 50%;
   background: color-mix(in srgb, var(--gold-ink) 12%, transparent);
@@ -223,8 +227,8 @@
 /* THE END OF THE WALK IS A WAY ON: the pill stays lit, says it is the end,
    and names what a press does, as the desktop's control at the same stop */
 .film-gold[data-end='true'] .film-gold-name { display: flex; flex-direction: column; gap: 1px; }
-.film-gold-kicker { font: 400 .75rem/15px var(--sans); letter-spacing: .04em; text-transform: uppercase; color: color-mix(in srgb, var(--gold-ink) 72%, transparent); }
-.film-gold-look { font: 400 .8125rem/17px var(--serif); white-space: nowrap; }
+.film-gold-kicker { font: 400 .875rem/16px var(--sans); letter-spacing: .06em; text-transform: uppercase; color: color-mix(in srgb, var(--gold-ink) 72%, transparent); }
+.film-gold-look { font: 400 .9375rem/18px var(--serif); white-space: nowrap; }
 
 /* THE SHEET'S TALL HEIGHTS on the phone: the record and the panel rise from
    the foot of the glass to 44 px under its top, the full width, one scroll

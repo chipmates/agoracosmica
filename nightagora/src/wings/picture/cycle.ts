@@ -9,6 +9,7 @@ import cycleCss from './cycle.css?inline'
 import type { PictureBox, PictureFraming } from './seam'
 import type { VitrinePayload, VitrinePayloadHost } from '../vitrine/types'
 import { islandFit } from '../vitrine/fit'
+import { paintSlider } from '../vitrine/slider'
 
 export interface CycleFile { file: string; bytes: number }
 
@@ -109,6 +110,7 @@ export function createCyclePayload(options: {
     const frame = Math.min(cycle.frames - 1, Math.floor(video.currentTime * cycle.fps + 1e-3))
     const step = landed ?? stepAtFrame(frame)
     if (slider && !dragging) slider.value = String(Math.round((frame / Math.max(1, cycle.frames)) * 1000))
+    if (slider) paintSlider(slider)
     if (slider) slider.setAttribute('aria-valuetext', `${video.currentTime.toFixed(1)} s / ${cycle.period} s`)
     if (play) {
       const text = video.paused ? options.words.play : options.words.pause

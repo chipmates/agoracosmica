@@ -25,6 +25,7 @@ import { LOOK_RULE } from '../vinci/input'
 import { deskStageHeight } from '../desk-stage'
 import type { VitrinePayload, VitrinePayloadHost } from './types'
 import { islandFit } from './fit'
+import { paintSlider } from './slider'
 
 export interface TurntableBody {
   object: Object3D
@@ -481,6 +482,7 @@ export function createTurntablePayload(options: TurntableOptions): TurntablePayl
     const u = share()
     const at = stepAt(u)
     if (slider && document.activeElement !== slider) slider.value = String(Math.round(u * 1000))
+    if (slider) paintSlider(slider)
     if (slider) slider.setAttribute('aria-valuetext', period ? `${state.clock.toFixed(1)} s / ${period} s` : '')
     if (play) {
       const held = schedule.kind === 'finite' && state.clock >= period
