@@ -263,7 +263,9 @@ function openEncoder(framing, frames, dir, stem, stage = STAGES[framing]) {
     '-filter_complex', `[0:v]split=${rungs.length}${split};${scales}`]
   rungs.forEach((_, k) => {
     args.push('-map', `[o${k}]`, '-c:v', 'libx264', '-preset', X264.preset, '-crf', String(X264.crf), '-profile:v', 'high',
-      '-x264-params', `keyint=${X264.keyint}:min-keyint=${X264.keyint}:scenecut=0:aq-mode=${X264.aq}:threads=${X264.threads}:${zones}`,
+      // the colour goes into the stream's own header: the output options alone leave the transfer
+      // untagged, and WebKit then paints the clip brighter than the still it hands over to
+      '-x264-params', `keyint=${X264.keyint}:min-keyint=${X264.keyint}:scenecut=0:aq-mode=${X264.aq}:threads=${X264.threads}:colorprim=bt709:transfer=iec61966-2-1:colormatrix=bt709:${zones}`,
       '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'iec61966-2-1', '-color_range', 'tv',
       '-an', '-movflags', '+faststart', outs[k])
   })

@@ -9,7 +9,7 @@
 import { execFileSync } from 'node:child_process'
 import { createReadStream, existsSync, mkdirSync, readFileSync, statSync } from 'node:fs'
 import { extname, join, normalize, resolve } from 'node:path'
-import { createServer } from 'vite'
+import { createServer, preview } from 'vite'
 import { APP_ROOT } from '../rig.mjs'
 
 const flags = new Map(process.argv.slice(2).filter((a) => a.startsWith('--')).map((a) => {
@@ -20,6 +20,8 @@ const PORT = Number(flags.get('port') ?? process.env['FORGE_PORT'] ?? 5199)
 const FILM = resolve(String(flags.get('film') ?? ''))
 const CERT = resolve(String(flags.get('cert') ?? join(FILM, '..', 'cert')))
 const HOST = String(flags.get('host') ?? '127.0.0.1')
+/** a built app to preview instead of the dev server: its bytes are the ones a visitor pays */
+const DIST = flags.has('dist') ? resolve(String(flags.get('dist'))) : null
 if (!existsSync(FILM)) throw new Error(`no film folder at ${FILM}`)
 
 /** a certificate of this machine's own, made once and kept beside the film */
@@ -34,13 +36,11 @@ function certificate() {
   return { key: readFileSync(key), cert: readFileSync(cert) }
 }
 
-const TYPES = { '.mp4': 'video/mp4', '.webp': 'image/webp', '.png': 'image/png', '.json': 'application/json' }
+const TYPES = { '.mp4': 'video/mp4', '.webp': 'image/webp', '.png': 'image/png', '.json': 'application/json', '.html': 'text/html; charset=utf-8' }
 
 /** `/film/<release>/<path>` off the folder, with the ranges a video element asks for */
 function filmPlugin() {
-  return {
-    name: 'na-film',
-    configureServer(server) {
+  const serve = (server) => {
       server.middlewares.use((req, res, next) => {
         const url = new URL(req.url ?? '/', 'https://x')
         if (!url.pathname.startsWith('/film/')) return next()
@@ -66,14 +66,18 @@ function filmPlugin() {
         if (req.method === 'HEAD') { res.end(); return }
         createReadStream(file).pipe(res)
       })
-    },
   }
+  return { name: 'na-film', configureServer: serve, configurePreviewServer: serve }
 }
 
-const server = await createServer({
-  root: APP_ROOT,
-  server: { port: PORT, strictPort: true, host: HOST, https: certificate() },
-  plugins: [filmPlugin()],
-})
-await server.listen()
+if (DIST) {
+  await preview({ root: APP_ROOT, build: { outDir: DIST }, preview: { port: PORT, strictPort: true, host: HOST, https: certificate() }, plugins: [filmPlugin()] })
+} else {
+  const server = await createServer({
+    root: APP_ROOT,
+    server: { port: PORT, strictPort: true, host: HOST, https: certificate() },
+    plugins: [filmPlugin()],
+  })
+  await server.listen()
+}
 console.log(`the film on https://${HOST}:${PORT}/w/vinci?film=<release>&order=life (releases in ${FILM})`)

@@ -8,9 +8,10 @@
 // The still at a rung is the master scaled by the same kernel the encoder's
 // rungs are scaled by, so the picture under a clip is the clip's own first
 // frame to within the two codecs.
+import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { existsSync, linkSync, mkdirSync, readFileSync, rmSync, writeFileSync, copyFileSync } from 'node:fs'
-import { basename, dirname, join, relative, resolve } from 'node:path'
+import { copyFileSync, existsSync, linkSync, mkdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { basename, join, relative, resolve, dirname } from 'node:path'
 import sharp from 'sharp'
 import { FPS, buildGraph } from './graph.mjs'
 import { openReplay } from './replay.mjs'
@@ -31,6 +32,11 @@ export const FILM_FORMAT = 'vinci-film-player-v1'
 const MASTER = { wide: [1920, 1080], upright: [780, 1688] }
 const PACE_RATE = { stroll: 0.667, walk: 1, brisk: 1.5 }
 const sha = (buf) => createHash('sha256').update(buf).digest('hex')
+/** the stream header a clip must carry so every engine paints it as the still: BT.709, the sRGB transfer, limited range */
+const SRGB_VUI = 'h264_metadata=colour_primaries=1:transfer_characteristics=13:matrix_coefficients=1:video_full_range_flag=0'
+const tagged = (file) => /color_transfer=iec61966-2-1/.test(execFileSync('ffprobe', ['-v', 'error', '-select_streams', 'v:0',
+  '-show_entries', 'stream=color_transfer', '-of', 'compact', file]).toString())
+const retagged = []
 const stemOf = (node) => node.replace(/[:/]/g, (c) => (c === ':' ? '-' : '.'))
 
 const runs = EXPORTS.map((dir) => ({ dir, summary: JSON.parse(readFileSync(join(dir, 'export.json'), 'utf8')) }))
@@ -65,10 +71,20 @@ for (const clip of summary.clips) {
   const files = {}
   for (const [rung, f] of Object.entries(clip.files)) {
     const from = f.file.startsWith('/') ? f.file : join(clip.dir, f.file)
-    const to = join(OUT, 'clips', clip.framing, rung, basename(from))
-    mkdirSync(dirname(to), { recursive: true })
-    try { linkSync(from, to) } catch { copyFileSync(from, to) }
-    files[rung] = { file: rel(to), bytes: f.bytes }
+    mkdirSync(join(OUT, 'clips', clip.framing, rung), { recursive: true })
+    let to = join(OUT, 'clips', clip.framing, rung, basename(from))
+    if (tagged(from)) {
+      try { linkSync(from, to) } catch { copyFileSync(from, to) }
+    } else {
+      /* A CLIP WHOSE STREAM DOES NOT SAY ITS TRANSFER is tagged here by a stream
+         copy: the pixels are the export's, only the header changes */
+      const part = to.replace(/\.[0-9a-f]{16}\.mp4$/, '.part.mp4')
+      execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', from, '-c', 'copy', '-bsf:v', SRGB_VUI, '-movflags', '+faststart', part])
+      to = part.replace(/\.part\.mp4$/, `.${sha(readFileSync(part)).slice(0, 16)}.mp4`)
+      renameSync(part, to)
+      retagged.push(`${clip.clip} ${clip.framing} ${rung}`)
+    }
+    files[rung] = { file: rel(to), bytes: statSync(to).size }
   }
   const walk = clip.frames / FPS
   const e = edges.get(clip.clip) ?? { id: clip.clip, from: meta.from, to: meta.to, kinds: meta.kinds, passes: meta.passes ?? [], framings: {} }
@@ -131,11 +147,11 @@ const release = {
 writeFileSync(join(OUT, 'film.json'), JSON.stringify(release))
 writeFileSync(join(OUT, 'pack.json'), JSON.stringify({
   format: 'vinci-film-pack-v1', exports: EXPORTS, exportHeads: summary.heads, marks: MARKS, quality: QUALITY,
-  sharp: sharp.versions, refusals, projection,
+  sharp: sharp.versions, refusals, projection, retagged,
   clips: [...edges.values()].map((e) => ({ id: e.id, framings: Object.fromEntries(Object.entries(e.framings).map(([f, x]) => [f, { frames: x.frames, joins: x.joins, mountedSetChanges: x.mountedSetChanges, pendingAtRest: x.pendingAtRest, bytes: Object.fromEntries(Object.entries(x.files).map(([r, v]) => [r, v.bytes])) }])) })),
   stills: stillRecords,
 }, null, 1))
 const kB = (n) => Math.round(n / 1024)
-console.log(`the release: ${Object.keys(nodes).length} nodes, ${edges.size} clips (${refusals.length} refused), ${stillRecords.length} stills (${kB(stillRecords.reduce((s, r) => s + r.bytes, 0))} kB)`)
+console.log(`the release: ${Object.keys(nodes).length} nodes, ${edges.size} clips (${refusals.length} refused, ${retagged.length} rung files tagged sRGB here), ${stillRecords.length} stills (${kB(stillRecords.reduce((s, r) => s + r.bytes, 0))} kB)`)
 for (const p of projection) if (!p.same) console.log(`  PROJECTION ${p.node} ${p.framing}: still ${p.still} · marks ${p.marks}`)
 console.log(`  ${join(OUT, 'film.json')}`)
