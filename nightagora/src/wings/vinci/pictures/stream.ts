@@ -417,6 +417,8 @@ export function createPlateStream(preview: ManifestEntry, full: ManifestEntry, o
       release(previewImage)
       release(fullImage)
       previewImage = null
+      // a handed-over preview is the caller's now; a disposed stream reports no residency
+      previewArrived = false
       fullImage = null
       empty.dispose()
     },
