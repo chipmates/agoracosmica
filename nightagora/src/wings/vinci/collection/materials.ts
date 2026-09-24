@@ -16,7 +16,8 @@ import {
   specularAA, surfaceDetail,
 } from '../../../stack/detail'
 import { COLLECTION_PAVING_ORIGIN, COURT, FACE, FLOOR, GRAVE_ORIGIN, LINE_SLAB } from './layout'
-import { distanceToBoxes, flagFace } from '../court-flags'
+import { distanceToBoxes, distanceToLines, flagFace } from '../court-flags'
+import { COURT_TREES } from '../grave/court-plan'
 import { bodyWallPlateLight, onBodyWall } from './body-wall-light'
 import { hangTone, PICTURE_LOOKS } from './picture-light'
 import { applyCourtLight } from '../grave/court-light'
@@ -443,7 +444,7 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
   // the sunken court stays damp along its walls, drier toward its middle
   const courtEdge = P.x.sub(COURT.west).min(float(COURT.east).sub(P.x)).min(P.z.negate().sub(COURT.south)).min(float(COURT.north).add(P.z))
   const flags = flagFace({ east: COLLECTION_PAVING_ORIGIN.east, north: COLLECTION_PAVING_ORIGIN.north, pitchEast: LINE_SLAB.pitchEast, pitchNorth: LINE_SLAB.pitchNorth, bond: 0 },
-    walked, float(.22).add(float(1).sub(smoothstep(.3, 3, courtEdge)).mul(.62)))
+    walked, float(.22).add(float(1).sub(smoothstep(.3, 3, courtEdge)).mul(.62)), { tooled: 'sawn' })
   m.colorNode = mix(albedo, albedo.mul(flags.tone), courtTop)
   // A RELIEF FILTERED AWAY LEAVES A SMOOTHER PLANE THAN WAS AUTHORED, and a
   // smoother plane is a shinier one: the slope the gates took goes into the
@@ -523,6 +524,7 @@ export function collectionExhibitMaterials(): {
     figure: number; lap: number; drift: number; cell: number
     relief: number
   }
+  const termsOf = new Map<MeshStandardNodeMaterial, ReturnType<typeof surfaceTerms>>()
   const make = (colour: string, roughness: number, metalness: number, part: Part) => {
     const m = new MeshStandardNodeMaterial({ color: colour, roughness, metalness })
     const P = positionWorld, n = normalWorldGeometry
@@ -530,6 +532,7 @@ export function collectionExhibitMaterials(): {
       scales: part.scales, extent: part.extent, relief: part.relief,
       lapM: part.lapM, driftM: part.driftM, cellM: part.cellM ?? null,
     })
+    termsOf.set(m, t)
     const c = new Color(colour)
     // A DENSITY GRADIENT THE BLOCK ITSELF CARRIES: how mottled a stone is
     // varies stone to stone, which is the one gradient a laid floor has.
@@ -561,11 +564,24 @@ export function collectionExhibitMaterials(): {
     const top = step(.9, .97, n.y).mul(float(1).sub(step(.004, .012, P.y.sub(COURT.level + .02).abs())))
     const tomb = [{ west: GRAVE_ORIGIN.east + .65 - 1.87, east: GRAVE_ORIGIN.east + .65 + 1.87, south: GRAVE_ORIGIN.north - .95 - 1.08, north: GRAVE_ORIGIN.north - .95 + 1.08 }]
     const walls = [{ west: -61.4, east: -60.49, south: COURT.south, north: -15.8 }, { west: -61.4, east: -40.85, south: -16.48, north: -15.8 }]
+    // off the walk's end the feet go round the slab, to the bench and back
+    const ways = [[[-52.5, -26.2], [-52.3, -28.7], [-54.9, -30.05]], [[-52.5, -26.2], [-52.3, -23.3], [-56.2, -23.25]]] as const
     const walked = float(1).sub(step(.3, 2.4, distanceToBoxes(tomb))).mul(.8)
+      .max(float(1).sub(step(.25, 1.15, distanceToLines(ways))).mul(.9))
     const damp = float(.45).add(float(1).sub(step(.4, 3.5, distanceToBoxes(walls))).mul(.55))
-    const face = flagFace({ east: GRAVE_ORIGIN.east - 4, north: GRAVE_ORIGIN.north, pitchEast: 1.4, pitchNorth: 1.8, bond: .9 }, walked, damp)
-    stone.colorNode = (stone.colorNode as TSLNode).mul(blend(float(1), face.tone, top))
-    stone.roughnessNode = (stone.roughnessNode as TSLNode).add(face.rough.mul(top))
+    const face = flagFace({ east: GRAVE_ORIGIN.east - 4, north: GRAVE_ORIGIN.north, pitchEast: 1.4, pitchNorth: 1.8, bond: .9 }, walked, damp,
+      { roots: COURT_TREES, tooled: 'sawn' })
+    // the flags carry their own stone: the block, lap and drift of the shared
+    // recipe are laid on world axes and would cut across the slabs, so the
+    // top takes only its mottle, in a limestone's warmth
+    const t = termsOf.get(stone)!, lime = new Color(PALETTE.floor)
+    const flagColour = vec3(lime.r, lime.g, lime.b).mul(vec3(1.05, 1.01, .93)).mul(t.tone.sub(1).mul(1.1).add(1)).mul(face.tone)
+    stone.colorNode = blend(stone.colorNode as TSLNode, flagColour, top)
+    stone.roughnessNode = blend(stone.roughnessNode as TSLNode, specularAA(float(.66).add(t.rough).add(face.rough).clamp(.08, .98), t.lost), top)
+    // each slab's own lie, which the boxes it is drawn on do not have
+    const { cameraViewMatrix: view, normalWorldGeometry: flat } = TSL as unknown as Record<string, TSLNode>
+    const lie = vec3(face.slope.x.negate(), 1, face.slope.y).normalize().transformDirection(view)
+    stone.normalNode = (stone.normalNode as TSLNode).add(lie.sub(flat.transformDirection(view)).mul(top)).normalize()
     // the grave court's sky and the warm light off its sunlit wall head
     applyCourtLight(stone, stone.colorNode as TSLNode, { floorOnly: true })
   }
@@ -583,6 +599,25 @@ export function collectionExhibitMaterials(): {
   const dark = make(PALETTE.dark, .82, .04, {
     scales: [.26, .045, .002], extent: .52, lapM: .095, driftM: 2.2, cellM: [1.2, .6],
     figure: 1.8, lap: .32, drift: .14, cell: .22, relief: .0024 })
+  {
+    // THE GRAVE'S JOINTS ARE POINTED, not a void: where the flags' bed shows
+    // between them it is a lime mortar with the court's grit in it, dirty,
+    // and greened under the gallery walls where the court stays damp
+    const { smoothstep: step, mix: blend, mx_noise_float: noise } = TSL as unknown as Record<string, TSLNode>
+    const P = positionWorld, bedTop = COURT.level + .035 - .0195
+    const pointing = step(.9, .97, normalWorldGeometry.y).mul(float(1).sub(step(.002, .006, P.y.sub(bedTop).abs())))
+      .mul(step(-59.7, -59.5, P.x)).mul(float(1).sub(step(-46.5, -46.3, P.x)))
+      .mul(step(-31.2, -31, P.z.negate())).mul(float(1).sub(step(-19, -18.8, P.z.negate())))
+    const walls = [{ west: -61.4, east: -60.49, south: COURT.south, north: -15.8 }, { west: -61.4, east: -40.85, south: -16.48, north: -15.8 }]
+    const damp = float(1).sub(step(.4, 4, distanceToBoxes(walls)))
+    const grit = noise(vec3(P.x, P.z, 3.3).mul(70)).mul(.12).add(noise(vec3(P.x, P.z, 1.7).mul(9)).mul(.1)).add(1)
+    const moss = step(.2, .6, noise(vec3(P.x.mul(3), P.z.mul(3), 6.4)).add(damp.mul(.6))).mul(damp.mul(.8).add(.2))
+    const mortar = blend(vec3(.3, .285, .25).mul(grit), vec3(.18, .23, .12), moss.mul(.7))
+    dark.colorNode = blend(dark.colorNode as TSLNode, mortar, pointing)
+    // a recess a finger wide sees less of the sky than the flags beside it
+    dark.aoNode = blend(dark.aoNode ? dark.aoNode as TSLNode : float(1), float(.72), pointing)
+    dark.roughnessNode = blend(dark.roughnessNode as TSLNode, float(.95), pointing)
+  }
   for (const [name, material] of Object.entries({ stone, plaster, bronze, ink, dark })) material.name = `vinci/collection-rooms/${name}`
   return { stone, plaster, bronze, ink, dark }
 }
