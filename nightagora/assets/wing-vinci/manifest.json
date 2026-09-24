@@ -1879,30 +1879,30 @@
       "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "revolving-crane, Manuscript B f. 49r. The one machine on this bench that is not built from its dossier at run time: the recorded body out of the store (vinci/revolving-crane-opus-hero, -standard and -calm, one manifest record per tier, built by forge/blender/examples/revolving-crane-opus.py from this same dossier and packed with gltfpack) stands in place of the procedural crane, after a blind test preferred it over the built one. The dossier remains the source: the body arrives at the same metres in the same frame with its floor at the same height, and the bench drives its named joint nodes (turntable, drum, rear-pulley, tip-pulley, rope-fall, load) from the same admitted schedule every other machine runs on, so the drum turns at the drive's own rate and the rope's fall shortens by exactly what the load rises. No baked light crosses: the export names no emissive channel, the occlusion the bake measured travels in the ORM texture and reaches the ambient term alone, and the key in the frame is the bench's own. The body's albedo is multiplied by a single measured factor so its timber stands in the same value as the thirteen machines beside it under this dimmer key. Preserve every modern assumption and locked bilingual page label. No reconstruction photograph is sampled. If the store cannot answer, the procedural crane in this same dossier path stands instead and says so once.",
-      "model": "Opus 5 build seat",
-      "date": "2026-09-12",
-      "sha256": "3a452b1883a18e5ddbd8a566d0db4ded2ce78a48080fa4d0ef93ee2177b2014b",
+      "prompt": "revolving-crane, Manuscript B f. 49r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. The sheet's jib on a mast with a pulley at each end, the strut to the windlass and its toothed wheel, the box on the platform and the platform turning over a braced base are kept; everything else is a reconstruction of how a carpenter and a smith of about 1500 would build them. Two crossed sole beams carry a running ring of eight sawn felloes joined by iron dogs, eight oak rollers half sunk in it and an oak step round an iron king pin with its washer and cotter. The platform is a bored hub, two bearers and ten deck planks pegged to them inside a rim of eight felloes, and an iron pin dropped through the rim into the ring locks it while the load rises. A chamfered mast is tenoned to a tongue clasped between the jib's two beams and bolted through with square-headed iron bolts and three blocks; the two sheaves are turned and grooved and run on iron bolts through iron plates on the beams. A squared strut runs from the mast's foot to the jib, three knee braces stand at the mast's sides and back. The windlass is a turned barrel hooped with iron on an iron axle, running in two bored standards with iron plates and a cross piece wedged through them; the forged crank carries a turned grip loose on a riveted pin, the forged ratchet (30 mm) sits on a boss outside the right standard and the pawl hangs parked on its pin. The counterweight is a joined oak box bound with two forged bands and packed with stones, held by two pegged cleats; the load is a dressed stone with chamfered arrises, lifted by a lewis and an iron ring. The drum's 0.08 m rope radius, the 0.40 m crank, the 1.58 m load arm and the 0.70 m counterweight arm, and the rope's whole path are the dossier's. Oak: the library's weathered oak on every timber, each its own phase; the pegs and wedges under the generated oak peg tint darkened to the timber; the grip under the generated grip tint, polished. Iron: the forged dressing, warmed toward rust by a multiplier. Stone: the library's limestone cooled by a multiplier. Hemp: the generated hemp tint on the three-lobed cord. Wear, a look and not a claim: damp and grime at the foot, the deck scuffed where the hand stands to the crank, the grip darkened by hands. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "model": "Claude Opus 5.5",
+      "date": "2026-09-24",
+      "sha256": "a24952668edb1f34724396c40165d76ed825506b119ea8b0f93e17367002a75d",
       "recipe_files": [
         {
           "path": "src/wings/vinci/machines/catalog.ts",
           "sha256": "3d858f4a271f025ab4a63d6590576aee89119ea1c53ac09df146ebaa585212f5"
         },
         {
-          "path": "src/wings/vinci/machines/crane-body.ts",
-          "sha256": "38d013ef29445fbba3509ade597e729657f59f7b902452a2b89eee8f1c8ff09e"
-        },
-        {
           "path": "src/wings/vinci/machines/data/records.json",
-          "sha256": "6ff6aa842a31fd17e68e62363fd85456a01c0fe66aa637c636a12034b839778f"
+          "sha256": "a59fe96b8b581db0b4bc563447a5fc28f19cb8ab48ad3ccf08b188266ef149ff"
         },
         {
           "path": "src/wings/vinci/machines/data/revolving-crane.json",
-          "sha256": "e761c629f17a209155275295fdc6f4e19b09f78e92e0cc34dc943540cd4de1a8"
+          "sha256": "4c2531d3e7b6c24facc9f84d627648b942adf6353dff667479a57ae7c63c6939"
         },
         {
           "path": "src/wings/vinci/machines/geometry.ts",
-          "sha256": "09f722d7bc6cfb25a3945aa1c22552cbf427cdf4b5e32a4e2dde43290cec2b7b"
+          "sha256": "b4dd83c038c8733f5c6efd01447f91f0ab37ed9ff2544a0eec193533de30e6e1"
+        },
+        {
+          "path": "src/wings/vinci/machines/made-dressing.ts",
+          "sha256": "d05fa7d9b3e4fd4fb8cbe7d92435576ce2af1ff6c8cfc9ac4537be669474e7ef"
         },
         {
           "path": "src/wings/vinci/machines/motion.ts",
@@ -1910,19 +1910,23 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "cebfca93b3cfa804cff081f1b735285b46dcde3285857c789c00ef2a712a96b8"
+          "sha256": "67067e0fa2791b5183d5e4e3fa81cb93d75daef19d814953feea030586417088"
         },
         {
           "path": "src/wings/vinci/machines/revolving-crane.ts",
-          "sha256": "3a452b1883a18e5ddbd8a566d0db4ded2ce78a48080fa4d0ef93ee2177b2014b"
+          "sha256": "a24952668edb1f34724396c40165d76ed825506b119ea8b0f93e17367002a75d"
         },
         {
           "path": "src/wings/vinci/machines/runtime.ts",
-          "sha256": "32eac04aa934d02334a668b0eed15811d8e063a2c35e5e44c3147a7d363abd45"
+          "sha256": "ac92bb06b605944ebefb7c7dc96f8eee83a1ac498786723d746fd6bb36d48d6b"
         },
         {
           "path": "src/wings/vinci/machines/types.ts",
-          "sha256": "f447264c124d573303c5bb5b20b9fc7a206d28620c531534b78fb14a37bff5c4"
+          "sha256": "b676dbd2b4703b0fbf0687f0ff7e2eeda8ad12e5665f468340162e4e6435a646"
+        },
+        {
+          "path": "src/wings/vinci/machines/wear.ts",
+          "sha256": "89e491868b887fec184c5928d38de6127a85ff31a699a9d423780dde4e716b6f"
         }
       ],
       "dossier": {
@@ -1969,7 +1973,7 @@
         }
       ],
       "certainty": "C",
-      "note": "A GENERATED reconstruction carrier. The folio evidence and any documented dimensions are separate facts. Geometry bounds retain the dossier conservative swept envelope. The displayed body is the store's own record at the rendering tier, which carries its own licence, hash and recipe; this record carries the module that stands it. Library materials have their own store records. This record admits no folio image.",
+      "note": "A GENERATED reconstruction carrier. The folio evidence and any documented dimensions are separate facts. Geometry bounds retain the dossier conservative swept envelope. Library materials have their own store records. This record admits no folio image.",
       "recipe_file": "src/wings/vinci/machines/revolving-crane.ts"
     },
     {
@@ -1979,10 +1983,10 @@
       "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "rolling-mill, Manuscript I f. 48v. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled. Forged-iron detail retains its library maps and three bands across a 12–100m density fade. The gun solid end faces receive only a restrained normal-direction finish difference; no bore or functional firing geometry is invented. Rounded oak parts and inclinometer journal posts use a local quiet library variant: all three bands, 85percent map contribution, normal strength .12, restrained grain relief/shade/sheen and #847967 luminance tint (80percent density contrast retained). The exact 22mm journal post remains wood, not frayed cord. All oak detail now uses the same 12–100m density fade as cloth and iron, preserving physical UV scale, all three bands and library maps at distant phone camera positions. No extra map, geometry or material variant is added by this range correction. Window 6: every sphere reads the library through three local projections blended by the surface normal, so a turned ball has no pole where the grain converges; a cylinder shorter than its own radius runs the long grain around its rim instead of up its wall. Stone parts take a generated #7c7669 luminance tint (95percent density plus .12) with roughness .62-.95, and the flywheel weights use 85mm mottle, 16mm relief and normal strength .26. Leather parts take a generated #5c4331 tint with a .085m crease band, relief .5, shade .3 and normal strength .55. Forged iron now carries metalness .45 with a generated #787e80 luminance response and roughness .38-.70; the gun's barrels use metalness .42 with #5d6265, the camera obscura's aperture plate metalness .5 with #43474a, and the compass legs metalness .38 with #3e434a, roughness .36-.66, over a dressing set that declares a scattering surface so hammer pitting reaches the normal. Linen keeps its fold band in the albedo as well as the normal (shade .36, fold .9).",
-      "model": "GPT-6 Codex",
-      "date": "2026-09-10",
-      "sha256": "dfd4f2b86469f4f4824d2380320c45ab14a2b9eef263529c6e8f740718d7ea4c",
+      "prompt": "rolling-mill, Manuscript I f. 48v. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. The sheet's two rollers, their metal and the crank that turns them are kept; everything else is a reconstruction of how a workshop of about 1500 would build them. The deck is five boards on two sleepers, pegged. Each housing is a pair of chamfered posts tenoned through a head beam and wedged above it, a block under the bearings and one over them; each roll's necks run in split bronze chocks with half-round seats, and a pair of folding wedges under the lower chocks sets the gap. Braces stand from the deck to the posts. The rolls are turned bronze with necks, held by iron axles, collars and cotters. The drive shaft runs in two bored standards with iron straps nailed over their bearings, a foot, a rail and a girt; the small gear carries iron rings, the large gear four arms cut in its web, an iron plate on its hub and a key; the forged crank carries a turned grip loose on a riveted pin. The gear teeth, the module and the ratio are the dossier's. Oak: the library's CC0 oak veneer under the generated planed oak tint, each timber its own phase and tone in the vertex colour; the gears in the worn gear finish; the grip under the generated grip tint, polished. Bronze: the library's dark bronze. Iron: the forged dressing. Wear, a look and not a claim: grease run down the blocks under the bearings, the chocks and the necks blackened by it, the rolls' barrels dulled outside the half braccio the tin runs on, the grip darkened by hands. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "model": "Claude Opus 5.5",
+      "date": "2026-09-24",
+      "sha256": "d3fb36b37009c24d5fe7150154d1f55d445b3ed751b92993456823176adb7223",
       "recipe_files": [
         {
           "path": "src/wings/vinci/machines/catalog.ts",
@@ -1990,15 +1994,19 @@
         },
         {
           "path": "src/wings/vinci/machines/data/records.json",
-          "sha256": "6ff6aa842a31fd17e68e62363fd85456a01c0fe66aa637c636a12034b839778f"
+          "sha256": "a59fe96b8b581db0b4bc563447a5fc28f19cb8ab48ad3ccf08b188266ef149ff"
         },
         {
           "path": "src/wings/vinci/machines/data/rolling-mill.json",
-          "sha256": "ed7973908a1ea494aa304fc41c1f134d437adb5990f3ecba528464bfee6f2d40"
+          "sha256": "91e8f8c1233a6238dc94ceb4ec2589a41db405d426f3b59b84799e2a62d2177a"
         },
         {
           "path": "src/wings/vinci/machines/geometry.ts",
-          "sha256": "09f722d7bc6cfb25a3945aa1c22552cbf427cdf4b5e32a4e2dde43290cec2b7b"
+          "sha256": "b4dd83c038c8733f5c6efd01447f91f0ab37ed9ff2544a0eec193533de30e6e1"
+        },
+        {
+          "path": "src/wings/vinci/machines/made-dressing.ts",
+          "sha256": "d05fa7d9b3e4fd4fb8cbe7d92435576ce2af1ff6c8cfc9ac4537be669474e7ef"
         },
         {
           "path": "src/wings/vinci/machines/motion.ts",
@@ -2006,19 +2014,23 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "cebfca93b3cfa804cff081f1b735285b46dcde3285857c789c00ef2a712a96b8"
+          "sha256": "67067e0fa2791b5183d5e4e3fa81cb93d75daef19d814953feea030586417088"
         },
         {
           "path": "src/wings/vinci/machines/rolling-mill.ts",
-          "sha256": "dfd4f2b86469f4f4824d2380320c45ab14a2b9eef263529c6e8f740718d7ea4c"
+          "sha256": "d3fb36b37009c24d5fe7150154d1f55d445b3ed751b92993456823176adb7223"
         },
         {
           "path": "src/wings/vinci/machines/runtime.ts",
-          "sha256": "32eac04aa934d02334a668b0eed15811d8e063a2c35e5e44c3147a7d363abd45"
+          "sha256": "ac92bb06b605944ebefb7c7dc96f8eee83a1ac498786723d746fd6bb36d48d6b"
         },
         {
           "path": "src/wings/vinci/machines/types.ts",
-          "sha256": "f447264c124d573303c5bb5b20b9fc7a206d28620c531534b78fb14a37bff5c4"
+          "sha256": "b676dbd2b4703b0fbf0687f0ff7e2eeda8ad12e5665f468340162e4e6435a646"
+        },
+        {
+          "path": "src/wings/vinci/machines/wear.ts",
+          "sha256": "89e491868b887fec184c5928d38de6127a85ff31a699a9d423780dde4e716b6f"
         }
       ],
       "dossier": {
