@@ -33,6 +33,9 @@ export const PICTURE_CERTAINTY_KEY = Object.freeze([
   { colour: '#b56152', en: 'Disputed or conjectural', de: 'Umstritten oder vermutet' },
 ])
 
+/** The label's word for a documented work of more than one named hand. */
+export const JOINT_WORK: PictureBilingual = Object.freeze({ en: 'Collaborative work', de: 'Gemeinschaftswerk' })
+
 /** Attribution and reproduction permission are independent. A source licence
  * never changes the named work's attribution. Green on a copy documents the
  * stated category, not autograph Leonardo authorship.
@@ -44,7 +47,7 @@ export function policyCertainty(work: PictureWork, available: boolean, entries: 
   if (work.attribution_certainty === 'qualified') return { colour: '#b18b47', word: { en: 'Qualified attribution', de: 'Zuschreibung mit Vorbehalt' } }
   if (work.attribution_certainty === 'workshop') return { colour: '#52735a', word: { en: 'Workshop', de: 'Werkstatt' } }
   if (work.attribution_certainty === 'copy') return { colour: '#52735a', word: { en: 'Later copy', de: 'Spätere Kopie' } }
-  if (work.id === 'baptism-of-christ') return { colour: '#52735a', word: { en: 'Collaborative work', de: 'Gemeinschaftswerk' } }
+  if (work.id === 'baptism-of-christ') return { colour: '#52735a', word: JOINT_WORK }
   return { colour: '#52735a', word: { en: 'Documented', de: 'Belegt' } }
 }
 
