@@ -4,7 +4,7 @@
 import {
   BufferGeometry, ClampToEdgeWrapping, DataArrayTexture, Float32BufferAttribute, Group, LinearFilter,
   LinearMipmapLinearFilter, Matrix3, Mesh, MeshBasicNodeMaterial, PlaneGeometry, RGBAFormat, SRGBColorSpace,
-  TSL as THREE_TSL, UnsignedByteType, Vector3,
+  TSL as THREE_TSL, UnsignedByteType, Vector3, type Material,
 } from 'three/webgpu'
 import { loadManifest, type ManifestIndex } from '../../../manifest'
 import type { Stack, TierName } from '../../../stack'
@@ -20,6 +20,7 @@ import { sheetFace } from './body-wall-plan'
 import { hangPlacements } from './hang'
 import { COURT, SUPPER_WALL } from './layout'
 import { collectionInteriorMaterial, collectionPlateTone } from './materials'
+import { CANVAS_FORWARD, frameKey, stampHangLight } from './picture-room-plan'
 
 export interface CollectionPictureSource {
   readonly work: PictureWork
@@ -73,8 +74,9 @@ function placements(manifest: ManifestIndex): readonly Placement[] {
     const entry = findPlateEntries(work, manifest).find(source => source.face === field.face)
     if (!entry) throw new Error(`Room field has no admitted ${field.face} source: ${work.id}`)
     const evidence = field.face === 'front' ? findEvidencePlates(work, manifest) : []
+    // the canvas sits in its frame's rebate, not at the back of the box
     placed.push({ work, entry, width: field.width, height: field.height,
-      position: [field.east, field.datum, -field.north], bearing: Math.PI,
+      position: [field.east, field.datum, -(field.north + CANVAS_FORWARD)], bearing: Math.PI,
       ...(evidence.length ? { evidence } : {}) })
   }
   // The mural uses the same policy and the existing court wall. If its source
@@ -99,7 +101,12 @@ function containedSize(widthM: number, heightM: number, pixelWidth: number, pixe
   return { widthM: pixelWidth * metresPerPixel, heightM: pixelHeight * metresPerPixel }
 }
 
-export function mountCollectionPlates(host: Group, stack: Stack) {
+export interface CollectionPlateOptions {
+  /** the finish the hang's arch mats take: the room's own, where it stands */
+  hangMask?: Material
+}
+
+export function mountCollectionPlates(host: Group, stack: Stack, options: CollectionPlateOptions = {}) {
   const group = new Group()
   group.name = 'vinci/collection-plates'
   // shown by distance, so the entry's sweep draws it once
@@ -109,6 +116,8 @@ export function mountCollectionPlates(host: Group, stack: Stack) {
   host.add(group)
   const masks = collectionInteriorMaterial()
   const tone = collectionPlateTone()
+  /** the hang's works are lit by their own heads, off their own vertices */
+  const hangTone = collectionPlateTone('hang')
   let live = true, loading = true, epoch = 0, selectedId = ''
   let tier: TierName = stack.tierName()
   let fields: readonly Placement[] = []
@@ -212,6 +221,7 @@ export function mountCollectionPlates(host: Group, stack: Stack) {
     if (!context) throw new Error('No canvas for the plate batch')
     context.imageSmoothingEnabled = false
     const position: number[] = [], normal: number[] = [], coordinates: number[] = [], layer: number[] = [], index: number[] = []
+    const lit = wall === 'paintings', slots: number[] = []
     const point = new Vector3(), facing = new Vector3(), turn = new Matrix3(), centre = new Vector3()
     for (const { card } of taken) centre.add(card.mesh.position)
     centre.divideScalar(taken.length)
@@ -236,6 +246,7 @@ export function mountCollectionPlates(host: Group, stack: Stack) {
         normal.push(facing.x, facing.y, facing.z)
         coordinates.push(t.getX(i) * width / W, t.getY(i) * height / H)
         layer.push(at)
+        if (lit) slots.push(geometry.getAttribute('hangSlot')?.getX(i) ?? -1)
       }
       const order = geometry.getIndex()
       for (let i = 0; i < (order?.count ?? p.count); i++) index.push(base + (order ? order.getX(i) : i))
@@ -260,6 +271,7 @@ export function mountCollectionPlates(host: Group, stack: Stack) {
     geometry.setAttribute('normal', new Float32BufferAttribute(normal, 3))
     geometry.setAttribute('uv', new Float32BufferAttribute(coordinates, 2))
     geometry.setAttribute('plateLayer', new Float32BufferAttribute(layer, 1))
+    if (lit) geometry.setAttribute('hangSlot', new Float32BufferAttribute(slots, 1))
     geometry.setIndex(index)
     geometry.computeBoundingBox()
     geometry.computeBoundingSphere()
@@ -268,7 +280,7 @@ export function mountCollectionPlates(host: Group, stack: Stack) {
     material.name = name
     // the layer index is exact on every vertex; the half keeps the cast off its floor
     const sample = TSL.texture(pages, TSL.uv()).depth(TSL.attribute('plateLayer', 'float').add(.5))
-    material.colorNode = sample.rgb.mul(tone)
+    material.colorNode = sample.rgb.mul(lit ? hangTone : tone)
     material.opacityNode = arrival
     material.transparent = true
     material.depthWrite = false
@@ -309,8 +321,10 @@ export function mountCollectionPlates(host: Group, stack: Stack) {
       }
       // The mural stands alone on its own wall and draws itself.
       const wall: Wall | null = work.id === 'last-supper' ? null : 'paintings'
+      // a work of the hang carries its heads on its own vertices
+      const hung = wall !== null && stampHangLight(geometry, frameKey(work.id, entry.face))
       const stream = createPlateStream(entry.preview, entry.plate,
-        { previewMaxEdge: tier === 'hero' ? 1024 : 512, tone, layered: wall !== null })
+        { previewMaxEdge: tier === 'hero' ? 1024 : 512, tone: hung ? hangTone : tone, layered: wall !== null })
       const mesh = new Mesh(geometry, stream.material)
       mesh.name = `vinci/collection-plates/${entry.id}`
       mesh.position.set(...field.position)
@@ -333,7 +347,7 @@ export function mountCollectionPlates(host: Group, stack: Stack) {
       if (arch) {
         const geometry = buildArchShoulderGeometry(arch, { widthM: size.widthM, heightM: size.heightM, window: window ?? undefined })
         geometry.setAttribute('collectionRoomRole', new Float32BufferAttribute(new Float32Array(geometry.getAttribute('position').count).fill(4), 1))
-        const mask = new Mesh(geometry, masks)
+        const mask = new Mesh(geometry, wall !== null && options.hangMask ? options.hangMask : masks)
         mask.name = `vinci/collection-plates/source-shoulder/${entry.id}`
         mask.position.copy(mesh.position)
         mask.rotation.copy(mesh.rotation)

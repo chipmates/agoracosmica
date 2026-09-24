@@ -18,6 +18,7 @@ import {
 import { COLLECTION_PAVING_ORIGIN, COURT, FACE, FLOOR, GRAVE_ORIGIN, LINE_SLAB } from './layout'
 import { distanceToBoxes, flagFace } from '../court-flags'
 import { bodyWallPlateLight, onBodyWall } from './body-wall-light'
+import { hangTone, PICTURE_LOOKS } from './picture-light'
 
 /** floor stone, wall plaster, dark stone, steel, ceiling, outdoor paving */
 export type CollectionRole = 0 | 1 | 2 | 3 | 4 | 5
@@ -214,9 +215,12 @@ function fittingWash(P: TSLNode, n: TSLNode): TSLNode {
 
 /** Reproductions share the surrounding room's sky visibility and fitting
  * wash. The north apron is open to the sky; it carries no bench aperture.
- * This is the room's declared light on a source, not a change to its pixels. */
-export function collectionPlateTone(): TSLNode {
-  const { normalWorldGeometry, positionWorld, vec3 } = TSL as unknown as Record<string, TSLNode>
+ * This is the room's declared light on a source, not a change to its pixels.
+ * The hang's own works are lit by their heads instead (`picture-light.ts`),
+ * read off the vertices their planes carry. */
+export function collectionPlateTone(kind: 'room' | 'hang' = 'room'): TSLNode {
+  if (kind === 'hang') return hangTone(PICTURE_LOOKS)
+  const { float, normalWorldGeometry, positionWorld, vec3 } = TSL as unknown as Record<string, TSLNode>
   const P = positionWorld, n = normalWorldGeometry
   const room = interiorDaylight(P, n).mul(1.55).add(.10).clamp(.10, 1)
     .add(fittingWash(P, n)).clamp(.10, 1)

@@ -28,6 +28,7 @@ import { mountHallFabric } from './hall-fabric'
 import { mountHallAir } from './hall-air'
 import { mountLineGallery } from './line-gallery'
 import { mountBodyWall } from './body-wall-cabinet'
+import { mountPictureRoom } from './picture-room'
 import { VINCI_READING_TABLE } from './approaches'
 import type { BodySheetSource } from './body-wall'
 import { mountReadingRoom, type ReadingRoom } from './reading-room'
@@ -74,7 +75,10 @@ export interface CollectionExhibits {
 export function mountCollectionExhibits(host: Group, stack: Stack): CollectionExhibits {
   const machines: { build: ReadyMachineBuild; slug: MachineSlug; ground: StandGround; at: Vector3; reach: number }[] = []
   const material = collectionInteriorMaterial()
-  const pictures = mountCollectionPlates(host, stack)
+  // THE PICTURE ROOM is finished, furnished and lit by its own module, and
+  // its hang's arch mats take its frames' oak
+  const pictureRoom = mountPictureRoom(stack)
+  const pictures = mountCollectionPlates(host, stack, { hangMask: pictureRoom.maskMaterial })
   let live = true
   let demonstrating: MachineSlug | null = null
   /** the hall's rig, once it stands; a machine is only ever ready after it */
@@ -192,6 +196,9 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   // is finished, furnished and lit by its own module.
   const gallery = mountLineGallery(stack)
   ;(host.getObjectByName('vinci/collection-rooms') ?? host).add(gallery.group)
+  ;(host.getObjectByName('vinci/collection-rooms') ?? host).add(pictureRoom.group)
+  stack.hold(pictureRoom.ready)
+  teardown.push(() => { pictureRoom.dispose() })
   stack.hold(gallery.ready)
   teardown.push(() => { gallery.dispose() })
   // THE BODY WALL IS A CABINET OF DRAWINGS set into the gallery's west wall,
@@ -437,6 +444,8 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       gallery.update()
       gallery.tick(rooms ? [rooms, line] : [line])
       bodyWall.tick(rooms ? [rooms, line] : [line])
+      const plates = host.getObjectByName('vinci/collection-plates')
+      pictureRoom.tick([rooms, plates].filter((body): body is Object3D => body !== undefined))
       // A ROOM THE CAMERA IS NOT IN IS NOT DRAWN.
       // The envelope itself, not the ground around it: the garden station
       // stands on the apron three metres north of the north elevation, and a
