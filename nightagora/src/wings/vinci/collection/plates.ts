@@ -16,6 +16,7 @@ import { createPlateStream, type PlateStream } from '../pictures/stream'
 import { registerVinciStripThumb, releaseVinciStripThumb } from './strip'
 import { vinciApproachReachMetres } from './approaches'
 import { bodySheetSources, type BodySheetSource } from './body-wall'
+import { sheetFace } from './body-wall-plan'
 import { hangPlacements } from './hang'
 import { COURT, SUPPER_WALL } from './layout'
 import { collectionInteriorMaterial, collectionPlateTone } from './materials'
@@ -358,7 +359,8 @@ export function mountCollectionPlates(host: Group, stack: Stack) {
         { previewMaxEdge: tier === 'hero' ? 1024 : 512, tone, family: 'sheet', layered: true })
       const mesh = new Mesh(geometry, stream.material)
       mesh.name = `vinci/collection-plates/${sheet.id}`
-      mesh.position.set(sheet.east + .004, sheet.datum, -sheet.north)
+      // the face stands in front of the construction's carrier, under its mat
+      mesh.position.set(sheetFace(sheet), sheet.datum, -sheet.north)
       mesh.rotation.y = Math.PI / 2
       mesh.visible = false
       mesh.castShadow = false

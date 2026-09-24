@@ -8,7 +8,6 @@
 import { BoxGeometry, BufferGeometry, CylinderGeometry, Float32BufferAttribute, Matrix4, Quaternion, Vector3 } from 'three/webgpu'
 import { FACE, FLOOR, LINE_FIELD, LINE_ORIGIN, OPENING, ROOMS } from './layout'
 import { lineCutStuds } from '../line/studs'
-import { bodyMounts } from './body-wall'
 import { READING_ROOM_DOOR, READING_ROOM_FOOTPRINT, READING_THRESHOLD } from './reading-room-plan'
 
 export const LINE_GALLERY_PROVENANCE = {
@@ -130,14 +129,6 @@ export interface GalleryLight {
 /** A head on the line's track, hung over a date. */
 const overDate = (north: number): P3 => [TRACK.east, north, GALLERY.ribFoot - TRACK.depth - DROP]
 
-/** THE DRAWINGS WALL'S TRACK: a short black channel a stride off the west
- * wall, so its heads graze the concrete and every carrier and the ledge
- * throw their shadows down it. */
-export const WALL_TRACK = { east: GALLERY.west + GALLERY.proud + .85, south: -55.6, north: -49.6 } as const
-const overWall = (north: number): P3 => [WALL_TRACK.east, north, GALLERY.ribFoot - TRACK.depth - DROP]
-/** where the drawings hang: the middle of the four courses */
-const WALL_AIM = { east: GALLERY.west + GALLERY.proud, height: FLOOR + 1.8 } as const
-
 /** THE DAYLIGHT THROUGH THE GLASS: the bright sky and the sunlit house to
  * the east, read as one parallel source low over the garden, so the glazing
  * lays a patch on the floor cut by its posts, its sill and the benches. */
@@ -170,11 +161,6 @@ export const GALLERY_LIGHTS: readonly GalleryLight[] = [
     at: skyFrom(), aim: [SKY.on[0], SKY.on[1], FLOOR],
     kelvin: 5600, intensity: 1.5, shadow: { mapPx: 2048, soft: 10, span: [20, 14] },
   },
-  ...[-53.45, -51.75].map((north, i): GalleryLight => ({
-    name: `graze-${i + 1}`, kind: 'spot', head: true, receivers: 'room',
-    at: overWall(north), aim: [WALL_AIM.east, north, WALL_AIM.height],
-    kelvin: 3300, intensity: 12, angle: .66, penumbra: .95, reach: 7, shadow: { mapPx: 1024, soft: 2 },
-  })),
   {
     // THE LINE'S LAST HEAD TURNS TO THE WALL: the end of the walk is a warm
     // pool over the bench on the line's own axis, lit from the line's track
@@ -442,13 +428,6 @@ export function fittings(): { metal: Solid; lenses: Solid } {
     if (X.ribsNorth.some(r => Math.abs(r - n) < .5)) continue
     metal.rod([TRACK.east, n, X.soffit], [TRACK.east, n, X.ribFoot], .005, 8)
   }
-  // the drawings wall's own short track, on rods from the soffit
-  const T = WALL_TRACK
-  metal.box([T.east - TRACK.width / 2, T.south, trackFoot, T.east + TRACK.width / 2, T.north, X.ribFoot])
-  for (const n of [T.south + .4, (T.south + T.north) / 2, T.north - .4]) {
-    if (X.ribsNorth.some(r => Math.abs(r - n) < .5)) continue
-    metal.rod([T.east, n, X.soffit], [T.east, n, X.ribFoot], .005, 8)
-  }
   // the wash's slot: a dark housing a hand wide, its lens a hair under the soffit
   const W = WASH_SLOT
   metal.box([W.west - .02, W.north - W.width / 2 - .02, X.soffit - .012, W.east + .02, W.north + W.width / 2 + .02, X.soffit + .001])
@@ -493,9 +472,9 @@ export function glazingPanes(): Rect[] {
 }
 
 /** WHAT THE GALLERY'S SHADOWED LIGHTS SEE: the room's soffit and its south
- * cross wall, the glazing's posts and sill, the benches, and on the drawings
- * wall every carrier and the reading ledge, doubled on the gallery's shadow
- * layer. The ledge is the body wall's, at the numbers `hang.ts` builds it with. */
+ * cross wall, the glazing's posts and sill and the benches, doubled on the
+ * gallery's shadow layer. The drawings wall is its own cabinet's, which
+ * casts for its own lamps (`body-wall-plan.ts`). */
 export function shadowCasters(): Solid {
   const c = new Solid(), g = GLAZING, h = GLAZING.post / 2, X = GALLERY
   c.box([X.west, X.south, X.soffit, FACE.glazingEast, X.north, X.soffit + .2])
@@ -504,14 +483,6 @@ export function shadowCasters(): Solid {
   c.box([FACE.glazingEast, g.south, FLOOR, FACE.glazingEast + .26, g.north, g.bottom])
   const { oak, base } = benches()
   for (const b of [...oak.bounds, ...base.bounds]) c.box(b)
-  const wall = FACE.hallPartitionEast + .033
-  for (const m of bodyMounts()) {
-    const w = m.width / 2 + .056, t = m.height / 2 + .056
-    c.box([wall, m.north - w, m.datum - t, wall + .047, m.north + w, m.datum + t])
-  }
-  const centre = -52.6
-  c.box([wall, centre - 2.7, FLOOR + .895, wall + .6, centre + 2.7, FLOOR + .945])
-  for (const n of [centre - 2.4, centre, centre + 2.4]) c.box([wall + .245, n - .035, FLOOR, wall + .315, n + .035, FLOOR + .92])
   return c
 }
 

@@ -27,6 +27,7 @@ import { HALL_FILL, mountHallLight } from './hall-light'
 import { mountHallFabric } from './hall-fabric'
 import { mountHallAir } from './hall-air'
 import { mountLineGallery } from './line-gallery'
+import { mountBodyWall } from './body-wall-cabinet'
 import { VINCI_READING_TABLE } from './approaches'
 import type { BodySheetSource } from './body-wall'
 import { mountReadingRoom, type ReadingRoom } from './reading-room'
@@ -193,6 +194,12 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   ;(host.getObjectByName('vinci/collection-rooms') ?? host).add(gallery.group)
   stack.hold(gallery.ready)
   teardown.push(() => { gallery.dispose() })
+  // THE BODY WALL IS A CABINET OF DRAWINGS set into the gallery's west wall,
+  // dressed and lit by its own module round the sheets the plates stand
+  const bodyWall = mountBodyWall(stack)
+  ;(host.getObjectByName('vinci/collection-rooms') ?? host).add(bodyWall.group)
+  stack.hold(bodyWall.ready)
+  teardown.push(() => { bodyWall.dispose() })
   const line = createCollectionLineFloor(gallery.stones, lang())
   gallery.adoptLine(line)
   line.position.set(LINE_ORIGIN.east, FLOOR + .01, -LINE_ORIGIN.north)
@@ -429,6 +436,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       // the gallery's bounce is taken with its rooms and its line standing
       gallery.update()
       gallery.tick(rooms ? [rooms, line] : [line])
+      bodyWall.tick(rooms ? [rooms, line] : [line])
       // A ROOM THE CAMERA IS NOT IN IS NOT DRAWN.
       // The envelope itself, not the ground around it: the garden station
       // stands on the apron three metres north of the north elevation, and a

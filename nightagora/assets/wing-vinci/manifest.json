@@ -3282,7 +3282,7 @@
       "prompt": "Place the picture module sources on every field of the room's holder-sized wall, including the paired panel reverse, and hang the body wall's admitted Windsor sheets each at the size its holder records, the three without a recorded size at a constant area. No field is withheld: the store's register is the only admission decision, and a work it does not admit leaves the wall. The current holder measurement for the Lansdowne Yarnwinder is 37.1 by 49.5 cm while its earlier layout slot preserves neighbouring placements. Place the admitted Last Supper source within the existing 8.8 by 4.6 metre mural field. Source admission, windows, arch shoulders, decoding and transitions are imported unchanged from the picture module. The room openings and fittings supply the light. All previews remain present: 512 pixel uploads at calm and standard, 1024 at hero, one distance-earned full source outside calm across both walls. Source pixels are never copied into this repository.",
       "model": "Deterministic TypeScript and TSL exhibition placement",
       "date": "2026-09-14",
-      "sha256": "763e9e8f02c3b99d2d9125560e539321644c0134cd5f988521ac145c7aff017d",
+      "sha256": "e55d2463943d37924614321c9eac772085ebc7ff503ac97a6474c369b2863a4e",
       "note": "Modern exhibition supports, no historical room claim. recipe_file=src/wings/vinci/collection/plates.ts wall_register=src/wings/vinci/collection/body-wall.ts; streaming bytes and displayed licences resolve through the store manifest.",
       "recipe_files": [
         {
@@ -3752,6 +3752,19 @@
       "date": "2026-09-23",
       "sha256": "525b2dff31851eb7d6813452ba1050f8cbb46af8b59cc952fa2e0d0628b0f8d1",
       "note": "A-SITE; FLORA.md; deterministic museum dressing; recipe_file=src/wings/vinci/vegetation.ts"
+    },
+    {
+      "id": "vinci/collection-body-wall",
+      "path": "procedural/collection-body-wall/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural construction; source code under the museum repository licence.",
+      "display": true,
+      "prompt": "The body wall as a cabinet of drawings in the long gallery's west wall: a deep wall of fumed oak panels on shadow joints from the south door to the plan chest's north end, floor to the gallery's head, on a recessed dark toe; the hang set into its thickness in an opening lined with oiled oak reveals, its back a deep charcoal linen; each sheet at the size its holder records, unmoved from its certified place, in a standard mount of the print room (a folio board for every portrait sheet, a large board for the two leg sheets, a landscape board): a pale linen mat whose bevelled window laps only the reproduction's own margin round the paper, in a thin oiled oak frame on true mitres, the sheet a mat's thickness behind its window; before the hang a plan chest of four stacks of six drawers in fumed oak with small bronze pulls, its oiled oak top the reading surface and a round bronze rail on saddles along its front edge at leaning height, enclosing the rooms' own reading ledge; the construction's carriers stand under the mats. Its own light, as data: six small dark-steel wallwasher heads on a black track over the hang, 3100 K, seen in the museum lamps' colour, laying one low even wash, drawn live by one shadowed stand-in for their optics from their mean direction that the film's export leaves out, the chest top's bounce as a second flagged stand-in, a seventh head over the sheet that stands apart, and a probe of the cabinet's own; the sheets' declared light read from the same table, no daylight on them; the calm tier reads the bounce as a measured fill. Photographs: library/oak-veneer-light and library/linen (Poly Haven), both CC0; boards, tones, mats, bevels, joints and every light are procedural. Modern museum furniture and lighting; no 1517 claim.",
+      "model": "Deterministic TypeScript geometry and TSL materials",
+      "date": "2026-09-24",
+      "sha256": "f68d00b0c01a383b74e9703b85bb866efa5bd7083e92d47a9073d46b12bae863",
+      "note": "Modern museum insertion, the body wall's cabinet only; no 1517 claim. recipe_file=src/wings/vinci/collection/body-wall-cabinet.ts; companion_file=src/wings/vinci/collection/body-wall-plan.ts; library_sets=library/oak-veneer-light,library/linen"
     }
   ]
 }
