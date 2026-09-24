@@ -18,9 +18,9 @@
  * light or building of 1517 is claimed.
  */
 import {
-  AdditiveBlending, Color, CubeCamera, CubeRenderTarget, DirectionalLight, DoubleSide, FrontSide, Group, HalfFloatType,
-  Mesh, MeshBasicNodeMaterial, MeshStandardNodeMaterial, Object3D, PMREMGenerator, PlaneGeometry, RectAreaLight,
-  RectAreaLightNode, SpotLight, type BufferGeometry, type Light, type Material, type RenderTarget, type Scene,
+  AdditiveBlending, Color, CubeCamera, CubeRenderTarget, DirectionalLight, DoubleSide, Float32BufferAttribute, FrontSide,
+  Group, HalfFloatType, Mesh, MeshBasicNodeMaterial, MeshStandardNodeMaterial, Object3D, PMREMGenerator, PlaneGeometry,
+  RectAreaLight, RectAreaLightNode, SpotLight, type BufferGeometry, type Light, type Material, type RenderTarget, type Scene,
 } from 'three/webgpu'
 import * as TSL from 'three/tsl'
 import { lights as lightsOf, output, pmremTexture } from 'three/tsl'
@@ -209,11 +209,16 @@ function frameOakMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial 
   const m = new MeshStandardNodeMaterial({ roughness: .4, metalness: 0, side: FrontSide })
   const n = normalWorldGeometry, at = uv()
   const sample = set.sample({ uv: vec2(at.y, at.x), metres: 1.83 })
-  const albedo = sample.colour.mul(L.frameTint).toVar()
-  const rough = mix(L.frameRough.sub(.1), L.frameRough.add(.1), sample.roughness).clamp(.2, .98).toVar()
+  // the slip at the sight edge is bronze, carried on the same mesh
+  const metal = attribute('metal', 'float').greaterThan(.5)
+  const worn = mx_noise_float(positionWorld.mul(9.3)).mul(.5).add(.5)
+  const albedo = select(metal, L.bronze.mul(worn.mul(.2).add(.9)), sample.colour.mul(L.frameTint)).toVar()
+  const rough = select(metal, float(.3).add(worn.mul(.12)), mix(L.frameRough.sub(.1), L.frameRough.add(.1), sample.roughness).clamp(.2, .98)).toVar()
+  const metalness = select(metal, float(1), float(0)).toVar()
   m.colorNode = albedo
   m.roughnessNode = rough
-  m.emissiveNode = hangSurfaceLight(albedo, rough, float(0))
+  m.metalnessNode = metalness
+  m.emissiveNode = hangSurfaceLight(albedo, rough, metalness)
   m.normalNode = n.transformDirection(cameraViewMatrix)
   // an oiled frame takes the room's light as a sheen, not as a grey film
   m.envMapIntensity = .45
@@ -232,10 +237,13 @@ function benchOakMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial 
   const grain = select(abs(dot(n, along)).greaterThan(.5), vec3(0, 0, -1), along)
   const t = cross(grain, n).normalize()
   const sample = set.sample({ uv: vec2(dot(P, t), dot(P, grain)), metres: 1.83 })
-  m.colorNode = sample.colour.mul(L.benchTint)
-  m.roughnessNode = mix(float(.4), float(.66), sample.roughness)
-  m.normalNode = bend(t, grain, n, sample.normal, .7)
-  m.aoNode = sample.occlusion
+  // the shoes under the legs are dark bronze, carried on the same mesh
+  const metal = attribute('metal', 'float').greaterThan(.5)
+  m.colorNode = select(metal, L.bronze.mul(.55), sample.colour.mul(L.benchTint))
+  m.roughnessNode = select(metal, float(.42), mix(float(.4), float(.66), sample.roughness))
+  m.metalnessNode = select(metal, float(1), float(0))
+  m.normalNode = select(metal, n.transformDirection(cameraViewMatrix), bend(t, grain, n, sample.normal, .7))
+  m.aoNode = select(metal, float(1), sample.occlusion)
   m.outputNode = withRoomAir(output)
   m.name = 'vinci/collection-picture-room/bench-oak'
   m.userData = { ...PICTURE_ROOM_PROVENANCE, set: set.name }
@@ -257,22 +265,6 @@ function maskMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial {
   m.outputNode = withRoomAir(output)
   m.name = 'vinci/collection-picture-room/arch-mat'
   m.userData = { ...PICTURE_ROOM_PROVENANCE, set: set.name }
-  return m
-}
-
-/** BRONZE: the frames' slips and the benches' shoes, a worked warm metal. */
-function bronzeMaterial(L: Looks): MeshStandardNodeMaterial {
-  const m = new MeshStandardNodeMaterial({ roughness: .34, metalness: 1, side: FrontSide })
-  const P = positionWorld
-  const worn = mx_noise_float(P.mul(vec3(9.3, 9.3, 9.3))).mul(.5).add(.5)
-  const albedo = L.bronze.mul(worn.mul(.2).add(.9)).toVar()
-  const rough = float(.3).add(worn.mul(.12)).toVar()
-  m.colorNode = albedo
-  m.roughnessNode = rough
-  m.emissiveNode = hangSurfaceLight(albedo, rough, float(1))
-  m.outputNode = withRoomAir(output)
-  m.name = 'vinci/collection-picture-room/bronze'
-  m.userData = { ...PICTURE_ROOM_PROVENANCE }
   return m
 }
 
@@ -433,13 +425,12 @@ export function mountPictureRoom(stack: Stack): PictureRoom {
   const dark = darkMaterial(stoneSet!, L)
   const frameOak = frameOakMaterial(oakSet!, L)
   const benchOak = benchOakMaterial(oakSet!, L)
-  const bronze = bronzeMaterial(L)
   // the arch mats: the frame's own oak, read off the world as a mat is laid
   const mask = maskMaterial(oakSet!, L)
-  for (const m of [plaster, dark, frameOak, bronze, mask]) adopt(m, rig.wall)
+  for (const m of [plaster, dark, frameOak, mask]) adopt(m, rig.wall)
   adopt(concrete, rig.ceiling)
   for (const m of [floor, benchOak]) adopt(m, rig.floor)
-  materials.push(plaster, concrete, floor, dark, frameOak, benchOak, bronze, mask)
+  materials.push(plaster, concrete, floor, dark, frameOak, benchOak, mask)
 
   const make = (geometry: BufferGeometry, material: Material, name: string, receive = true): Mesh => {
     geometry.computeBoundingBox(); geometry.computeBoundingSphere()
@@ -467,21 +458,26 @@ export function mountPictureRoom(stack: Stack): PictureRoom {
   const floors = floorSkins()
   make(skin(floors.oak), floor, 'oak-floor')
   make(merged([skin(floors.stone), skin(walls.backing)]), dark, 'dark-stone')
+  // ONE MESH PER FINISH FAMILY: a bronze part rides with its oak, a lamp's
+  // face with its head, each told apart by a vertex's own flag
+  const flag = (g: BufferGeometry, name: string, value: number): BufferGeometry => {
+    g.setAttribute(name, new Float32BufferAttribute(new Float32Array(g.getAttribute('position').count).fill(value), 1))
+    return g
+  }
   const frameParts = frameGeometry(frames)
-  make(frameParts.oak, frameOak, 'frames')
+  make(merged([flag(frameParts.oak, 'metal', 0), flag(frameParts.bronze, 'metal', 1)]), frameOak, 'frames')
   const bench = benches()
-  make(solid(bench.oak), benchOak, 'benches')
-  make(merged([frameParts.bronze, ...bench.bronze.parts]), bronze, 'bronze')
+  make(merged([...bench.oak.parts.map(g => flag(g, 'metal', 0)), ...bench.bronze.parts.map(g => flag(flag(g, 'grain', 0), 'metal', 1))]), benchOak, 'benches')
   {
     const { metal, lenses } = fittings()
-    const anodised = new MeshStandardNodeMaterial({ color: '#17181a', roughness: .38, metalness: .8 })
+    const anodised = new MeshStandardNodeMaterial({ roughness: .38, metalness: .8 })
+    const lit = attribute('lens', 'float').greaterThan(.5)
+    anodised.colorNode = select(lit, vec3(0, 0, 0), vec3(.0085, .009, .01))
+    anodised.emissiveNode = select(lit, vec3(new Color(LAMP_COLOUR).r, new Color(LAMP_COLOUR).g, new Color(LAMP_COLOUR).b).mul(9), vec3(0, 0, 0))
     anodised.name = 'vinci/collection-picture-room/fixtures'
-    const glow = new MeshBasicNodeMaterial({ color: new Color(LAMP_COLOUR).multiplyScalar(9) })
-    glow.name = 'vinci/collection-picture-room/lamp-faces'
     adopt(anodised, rig.ceiling)
-    materials.push(anodised, glow)
-    make(solid(metal), anodised, 'fixtures', false)
-    make(solid(lenses), glow, 'lamp-faces', false)
+    materials.push(anodised)
+    make(merged([...metal.parts.map(g => flag(g, 'lens', 0)), ...lenses.parts.map(g => flag(g, 'lens', 1))]), anodised, 'fixtures', false)
   }
 
   // THE VARNISH: one film over every reproduction, a hair in front of it,
