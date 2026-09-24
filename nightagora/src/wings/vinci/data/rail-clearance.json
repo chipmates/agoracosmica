@@ -48,8 +48,8 @@
   },
   {
    "file": "src/wings/vinci/collection.ts",
-   "sha256": "3ef90ba783c2284a432f89a59fca865f3f03a0f8bc0c7e07efd099dc80c12394",
-   "bytes": 48417,
+   "sha256": "ce1237211d2f684d3b3a8860d5368c9fb0639f7cbb109d1dc68b3660b3604689",
+   "bytes": 48753,
    "unchangedDuringAudit": true
   },
   {
@@ -60,14 +60,14 @@
   },
   {
    "file": "src/wings/vinci/collection/body-wall-light.ts",
-   "sha256": "a0d8cfebe8a253476f96e27b52f2489bcae6cb8d97230686b2b9911b11b78db7",
-   "bytes": 4754,
+   "sha256": "505cb13fbf3fc96aad65e90cc4a92cfb926ee59da36d6634812ce792371d1f2e",
+   "bytes": 4878,
    "unchangedDuringAudit": true
   },
   {
    "file": "src/wings/vinci/collection/body-wall-plan.ts",
-   "sha256": "76426d98de3a07d5417ad75db31e0f636bc967cfd114b34b4f5edd08112729bb",
-   "bytes": 41836,
+   "sha256": "e330e6cf17b8dae59c6ae0eae9fc6e432045e0253c2acac2d4aea3a175f09e99",
+   "bytes": 42212,
    "unchangedDuringAudit": true
   },
   {
@@ -131,6 +131,12 @@
    "unchangedDuringAudit": true
   },
   {
+   "file": "src/wings/vinci/collection/roofs.ts",
+   "sha256": "d5d84e8fe8735716cafd551ff2af072e70d96f016cf0d211fdea4f8e6f92d0ca",
+   "bytes": 24830,
+   "unchangedDuringAudit": true
+  },
+  {
    "file": "src/wings/vinci/collection/rooms.ts",
    "sha256": "cfbd4b6fb5f692b558b6803ee27c0542461c9ce1591dd3b264815a683872019a",
    "bytes": 23290,
@@ -140,6 +146,12 @@
    "file": "src/wings/vinci/collection/stands.ts",
    "sha256": "59d8e52f6358b07ad98335f102d08c74edcd4961dd2415efbfbbb748771145bf",
    "bytes": 10975,
+   "unchangedDuringAudit": true
+  },
+  {
+   "file": "src/wings/vinci/collection/supper-room-plan.ts",
+   "sha256": "1089d3c6b5644ce75cbd7d90ebfa03b6bb5fcf76aff76ff0934b8e4721f74f0c",
+   "bytes": 28909,
    "unchangedDuringAudit": true
   },
   {
@@ -162,8 +174,8 @@
   },
   {
    "file": "src/wings/vinci/copings.ts",
-   "sha256": "f565a4e8448261e618c9ff3b84482bf1b9340e6827aa2e0b4666f1b96d86085e",
-   "bytes": 12481,
+   "sha256": "6d43a04c4e3c167d2187fffb1b76ffef51934d18b242b61deee44ffcf0c2709d",
+   "bytes": 13899,
    "unchangedDuringAudit": true
   },
   {
@@ -306,8 +318,8 @@
   },
   {
    "file": "src/wings/vinci/ground.ts",
-   "sha256": "ec8872f2510f7127adf5c6c619c2c47e2dc7c77d6e26860ad70a3124201318f1",
-   "bytes": 34596,
+   "sha256": "a5753244a12bcc8ff768c6c0d11b2ed97a5afb0c0c6547e56c0a642a5d2692ff",
+   "bytes": 35821,
    "unchangedDuringAudit": true
   },
   {
@@ -414,8 +426,8 @@
   },
   {
    "file": "src/wings/vinci/machines/data/anemometer.json",
-   "sha256": "221d7baf0b679ea48726e784ab4aa5322055de6494992bee33d016c8e5a9df5c",
-   "bytes": 38850,
+   "sha256": "dc3e76dc4d49e8acff7a3217c02615cadb46652d0478ef9b8d4b77da1fa22692",
+   "bytes": 71225,
    "unchangedDuringAudit": true
   },
   {
@@ -426,8 +438,8 @@
   },
   {
    "file": "src/wings/vinci/machines/data/camera-obscura.json",
-   "sha256": "9234afcd418f470d785b9950f2ca774354bd186222f75e6b990df6e02f0f40fe",
-   "bytes": 38220,
+   "sha256": "0129b0a263cd36ac68e092e7948cd6e302f3af07da8ad6b20b660229d331381d",
+   "bytes": 110678,
    "unchangedDuringAudit": true
   },
   {
@@ -438,8 +450,8 @@
   },
   {
    "file": "src/wings/vinci/machines/data/inclinometer.json",
-   "sha256": "97bf01fcf26ce6ab291a7d17b1e77ab9ab31581476d28935a2936c36a901db6e",
-   "bytes": 359983,
+   "sha256": "61f917cc49ff5e51282ded7ff5eac26c65cb9b6b2bae28c66a9526d7f3cf58f4",
+   "bytes": 276921,
    "unchangedDuringAudit": true
   },
   {
@@ -468,8 +480,8 @@
   },
   {
    "file": "src/wings/vinci/machines/data/proportional-compass.json",
-   "sha256": "99a9253f5ec4635dd6d9a72dd6cfc3f49e16f005c5adaadbcaaf9d3a4b39fac1",
-   "bytes": 13479,
+   "sha256": "fa5197bd1056c79018a330ca82e4dd07e37366a8ca48be617e8b8ee0f7a5b3cc",
+   "bytes": 127708,
    "unchangedDuringAudit": true
   },
   {
@@ -480,14 +492,14 @@
   },
   {
    "file": "src/wings/vinci/machines/data/revolving-crane.json",
-   "sha256": "e761c629f17a209155275295fdc6f4e19b09f78e92e0cc34dc943540cd4de1a8",
-   "bytes": 88104,
+   "sha256": "4c2531d3e7b6c24facc9f84d627648b942adf6353dff667479a57ae7c63c6939",
+   "bytes": 202134,
    "unchangedDuringAudit": true
   },
   {
    "file": "src/wings/vinci/machines/data/rolling-mill.json",
-   "sha256": "ed7973908a1ea494aa304fc41c1f134d437adb5990f3ecba528464bfee6f2d40",
-   "bytes": 499644,
+   "sha256": "91e8f8c1233a6238dc94ceb4ec2589a41db405d426f3b59b84799e2a62d2177a",
+   "bytes": 569234,
    "unchangedDuringAudit": true
   },
   {
