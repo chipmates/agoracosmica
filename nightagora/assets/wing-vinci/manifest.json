@@ -20,10 +20,10 @@
       "class": "GENERATED",
       "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
-      "prompt": "Bilinear IGN ground from 165 retained samples; explicit A-SITE court, terrace and assumed street cut; three scales of earth and grass; mapped stream. Conjectural exposed-soil clods, erosion variation and shallow normal relief dress declared vertical cut faces without changing their outlines or heights. The library earth-packed map in the exact street corridors with grey-beige mineral drift, filtered aggregate and fine grit; the wheel ruts darker and deeper in relief with pressed lips at their sides. The terrace walk as fine river gravel over packed earth, baked into one filtered tile read wider than its pixel (colour, slope and the slope's second moment with their mips), crowned to shed water, two hand-cart tracks with the gravel pushed up on their lips, coarser stones rolled to the kerbs, worn back where walked; the house court paved with Loire river cobbles set in sand, one colour per stone, mossy toward the wall feet and smooth along the way from the gate to the door. Each retaining face weathers from its own foot and its own coping: rising damp to a wandering tide line, a speckle of splash, runs of rain off the coping and a metre-scale patina; step nosings worn paler where feet cross. Surface recipes only; every sampled height and outline kept. The retaining ashlar takes a tone and a lean to yellow or grey stone by stone, and a damp line where it meets the grass; the modern cut lining weathers as the court stair does.",
+      "prompt": "Bilinear IGN ground from 165 retained samples; explicit A-SITE court, terrace and assumed street cut; three scales of earth and grass; mapped stream. Conjectural exposed-soil clods, erosion variation and shallow normal relief dress declared vertical cut faces without changing their outlines or heights. The library earth-packed map in the exact street corridors with grey-beige mineral drift, filtered aggregate and fine grit; the wheel ruts darker and deeper in relief with pressed lips at their sides. The terrace walk as fine river gravel over packed earth, baked into one filtered tile read wider than its pixel (colour, slope and the slope's second moment with their mips), crowned to shed water, two hand-cart tracks swept to damp fines, their walls shading from the low sun and their lips of coarser stone thrown up beside them, coarser stones rolled to the kerbs, worn back where walked; the house court paved with Loire river cobbles set in sand in wandering courses, one colour per stone, a few sunk or lost, falling to a gutter of stones set lengthwise down its middle, mossy toward the wall feet and smooth and paler along the way from the gate to the door; its flags dished where walked, chipped at their arrises, grit and moss in their joints and darker in the damp under the walls; the carted road with stones bedded in its packed fines (the terrace's tile read larger and sparser), none where wheels and feet swept them or in the wall foot's gutter; the sward's photograph read at two sizes and turns handed over by a slow field, with clover cushions and bare scuffs, trodden paler toward the garden flight. Each retaining face weathers from its own foot and its own coping: rising damp to a wandering tide line, a speckle of splash, runs of rain off the coping and a metre-scale patina; step nosings worn paler where feet cross. Surface recipes only; every sampled height and outline kept. The retaining ashlar takes a tone and a lean to yellow or grey stone by stone, and a damp line where it meets the grass; the modern cut lining weathers as the court stair does.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "0b6e2be1821dcfec2e341586e828d9f128d4ad69b7172fa5c706dfe3c8c085e8",
+      "sha256": "bf651fb737384c4c4b485071e42bec9d85fac78510dbba94133e90445beea454",
       "note": "IGN Licence Ouverte 2.0; OSM contributors ODbL 1.0; src/wings/vinci/data/terrain.json; recipe_file=src/wings/vinci/ground.ts"
     },
     {
@@ -36,7 +36,7 @@
       "prompt": "Trees and hedge shrubs of 10 October 1517 (our 20 October) grown per species habit, every species and its state that week taken from the flora card (refs FLORA.md section 6) as a TYPE of the period, none documented at Cloux: walnut, field elm, oak, field maple, wild cherry, hornbeam, alder, pollard white willow, black poplar, pear, and the hedge shrubs hawthorn and blackthorn. A trunk that runs or forks into leaders, scaffold limbs that fork toward the crown the species makes, second-order branches and twigs, each grown segment by segment and stopped at the crown skin or at a refused place; a refused fork is tried once bent upward, a limb carrying no leaf below it is taken off, a limb left without a fork tapers to a tip. Near crowns carry every leaf as its own card; further crowns carry spray cards; a mid tree a stop sees within 32 m draws every twig at hero. Each species turns at one stage for the week (a third to two thirds; oak and alder greener), each leaf by its exposure, with a small turn by limb and by tree. The grave's tree over its west wall stands 15 m, drawn leaf by leaf. The week's fall lies as a carpet under each crown dropping it, as drifts against every riser, wall foot and retaining face across the south-west wind (clumped, piled in corners, stacked, leaning on the face), as a clumped scatter, in the lane's ruts and gutters and over the walled court's floor, densest where the stops see it; leaves off their floor cast through one opaque triangle within 12 m of a stop. Leaf and bark maps drawn from recipes in code, no photograph sampled. No leaf or limb inside a building, within 3.2 m above a certified walk, or inside the grave court below its walls' top. Wind only on an address that asks for it.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "c4be75b5be0621977e2b30cd4ee2356251534d0b69c56bc43830b7d590248507",
+      "sha256": "8e165b8bbc3be5c13d3c54b0af5f3e47e1bc070c6196845efc79c2b935cdb184",
       "note": "FLORA.md section 6 species and autumn states as types; Q119 Q128 Q178 modern planting as branching character only; recipe_file=src/wings/vinci/vegetation.ts; companion_file=src/wings/vinci/tree-growth.ts; companion_sha256=a173009b55fe61d9cb8964b5caf4433101aa10caa102e23534469832c3ce8cc2; companion_file=src/wings/vinci/leaf-maps.ts; companion_sha256=30ff0932adcfd8b1a5ac030349f43c93896b3fa43b21d3cd03e56b055a4174ae; companion_file=src/wings/vinci/wind.ts; companion_sha256=e1d0da0b23efb5c92171462c8c127ea0f2cb6975a2e97cfcc7dfa4dc2f7ccb98; clusters_near_far_hero=6,3; clusters_near_far_standard_calm=3,1; far_clusters_cast_no_shadow=true; walk_clearance_m=3.2; walk_margin_m=1.0; building_margin_m=0.45; wind=address_only"
     },
     {
@@ -228,10 +228,10 @@
       "class": "GENERATED",
       "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
-      "prompt": "Original procedural modern museum insertion at the fixed maquette envelope. Low post-grid pavilions, shallow slate roofs, full-height glazed enclosure, concrete apron and garden stair. Exact modern approach grade cuts, supported landings and continuous concrete cheek ownership. Museum design, not a claim about1517. Share the existing pale cast-concrete finish across all four roof soffits; keep their downward normals and the sole measured sun. Derive both entrance post heads from the retained inclined canopy underside; keep their centres and buried feet. Provide continuous derived structural support beneath the existing stair cheeks and both landing heads. Keep the maquette walking widths and every finish level.",
+      "prompt": "Original procedural modern museum insertion at the fixed maquette envelope. Low post-grid pavilions, shallow slate roofs, full-height glazed enclosure, concrete apron and garden stair. Exact modern approach grade cuts, supported landings and continuous concrete cheek ownership. Museum design, not a claim about1517. Share the existing pale cast-concrete finish across all four roof soffits; keep their downward normals and the sole measured sun. Derive both entrance post heads from the retained inclined canopy underside; keep their centres and buried feet. Provide continuous derived structural support beneath the existing stair cheeks and both landing heads. Keep the maquette walking widths and every finish level. The garden flight's treads worn where feet land: nosings rounded and paler along a wandering walking line, a shallow hollow behind each nosing, each tread laid in two or three stones with its mortar bed under the nosing.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "ecb8b8d1e9220d7ec0a2f1272e2f6af6dd0038abc52bb76726369776ff9f3a7b",
+      "sha256": "c039c00398cff095bd9503f7f55bfdab91942368dd118d0949b2374566a3083d",
       "note": "recipe_file=src/wings/vinci/collection.ts"
     },
     {
@@ -296,7 +296,7 @@
       "prompt": "Original modern museum access from court H0 to terrace H-1.9 along the retained terrace edge. Twelve risers, 0.30m treads, 2m clear width and two0.75m landings with exact grade cuts and continuous concrete cheek ownership. Explicit design ranges and no historic stair claim. Weathered a few years out of doors: runs off the kerb tops, the shaded feet greening, grit and lichen on the kerbs, treads worn paler down their middle. Each form board keeps its grain and a shallow edge, lime blooms pale low on the faces, the arrises are worn, lichen spots the kerbs, and the aggregate reads warm.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-10",
-      "sha256": "40bf6bead01daad7c04c478468a509029b573552d393c84b9828d364c31b7d10",
+      "sha256": "a21748f89bb2d20f7fba53f818a060c6d5ed72c4c528061852ad8cd6b327373f",
       "note": "recipe_file=src/wings/vinci/collection-access.ts"
     },
     {
@@ -3555,7 +3555,7 @@
       "prompt": "The wind of the hour as data on the wing clock: a light south-west breeze (assumed weather, as the sky label says) in harmonics of a 12 s loop, so any 12 s of it loops without a seam. It sways crowns, limbs and leaves by at most 0.16 m from their rest pose, and sends a few leaves from the near crowns to the ground inside each loop. Built only on an address that asks for the wind (the film); every live walk and every gate sees the rest pose. The falling leaves are not a rail solid and cast no shadow.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "e1d0da0b23efb5c92171462c8c127ea0f2cb6975a2e97cfcc7dfa4dc2f7ccb98",
+      "sha256": "5c074baedd02c4d8308ea452d9e6cb190a5a72e7f598ca57dc73c0ed2e785013",
       "note": "recipe_file=src/wings/vinci/wind.ts; loop_s=12; max_sway_m=0.16; address=wind=1 or export"
     },
     {
@@ -3617,10 +3617,10 @@
       "class": "GENERATED",
       "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
-      "prompt": "Moss as a type of the period where a house forty-six years old in a river valley keeps it: low cushions 30 to 120 mm across in patches at the foot of every wall and retaining face a stop sees, most on the north feet and inside the grave court, a little in the back corners of stair treads, and thin continuous strips in the court paving joints within a few metres of its walls, following the grave floor's own running bond and the court's own grid. Colour and relief from a recipe in code. Positions and amounts are an exhibition reading of the damp, not a record.",
+      "prompt": "Moss as a type of the period where a house forty-six years old in a river valley keeps it: cushions 30 to 120 mm across, domed up to a third of their width with smaller cushions crowding their flanks, in patches at the foot of every wall and retaining face a stop sees, most on the north feet and inside the grave court, a little in the back corners of stair treads, and thin continuous strips in the court paving joints within a few metres of its walls, following the grave floor's own running bond and the court's own grid. Colour and relief from a recipe in code. Positions and amounts are an exhibition reading of the damp, not a record.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "6a6d4a4bf23c098936b0e6539ba7bc263abae28992ed976506b303010e036bc7",
+      "sha256": "d817fae91e55f21a838e7f35f6861a3274cb29f6676d82ce2c0e4c85f97f5a5f",
       "note": "A-SITE; deterministic museum dressing; recipe_file=src/wings/vinci/moss.ts"
     },
     {
@@ -3630,10 +3630,10 @@
       "class": "GENERATED",
       "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
-      "prompt": "Under each fallen leaf lying on stone, gravel or earth within 14 m of a stop that sees it, the blade's own outline softened on the stone: a tight dark rim at its edge and a faint skirt beyond, full under the blade so a lifted edge shows shade and not lit stone, standing for the sky the leaf takes from the stone under and around it. Drawn at hero, the film's export included, since its occlusion cannot find a leaf two millimetres thick. Outside the walk's solids and the shadow body.",
+      "prompt": "Under each fallen leaf lying on stone, gravel or earth within 14 m of a stop that sees it, the blade's own outline softened on the stone: a tight dark rim at its edge and a faint skirt beyond, full under the blade so a lifted edge shows shade and not lit stone; within 7.5 m of a stop the outline as the rolled blade lies, narrower and off its axis, softer the more it stands off and shifted down-sun by the height its margins stand at, standing for the sky the leaf takes from the stone under and around it. Drawn at hero, the film's export included, since its occlusion cannot find a leaf two millimetres thick. Outside the walk's solids and the shadow body.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "c4be75b5be0621977e2b30cd4ee2356251534d0b69c56bc43830b7d590248507",
+      "sha256": "8e165b8bbc3be5c13d3c54b0af5f3e47e1bc070c6196845efc79c2b935cdb184",
       "note": "A-SITE; deterministic museum dressing; recipe_file=src/wings/vinci/vegetation.ts"
     },
     {
@@ -3747,10 +3747,10 @@
       "class": "GENERATED",
       "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
-      "prompt": "The week's fall of the planted trees as dry leaf cards of each species' outline, cupped and folded as drying leaves curl, coloured from each tree's own fall: a carpet under every crown dropping it, carried north-east by the south-west wind; drifts against every riser, wall foot, kerb (the court's kerb before the house among them), retaining face, the chapel's bay, the grave's tomb and lectern and the supper wall's sill, each run heaped in its own places with bare stone between and some treads swept nearly bare, the wall feet and the kerb of a walked court holding what feet move off it; a clumped scatter, the lane's ruts and gutters, and the walled court's floor in small rafts, most of it in the lee of the walls. Densest where the stops see it. A type of one October week, not a record. Dressing a few centimetres deep on the floors, outside the walk's solids like the moss; the fall the rail certificate was written with is still built, leaf for leaf, on a layer no camera draws, until the next certificate.",
+      "prompt": "The week's fall of the planted trees as dry leaf cards of each species' outline, cupped and folded as drying leaves curl, and within 7.5 m of a stop (and in the grave court) as blades held near their species' own size: margins rolled up over an arc, some far enough to turn over and show the paler underside, tips curled, stalk ends lifted, resting on the lowest line of that shape, coloured from each tree's own fall: a carpet under every crown dropping it, carried north-east by the south-west wind; drifts against every riser, wall foot, kerb (the court's kerb before the house among them), retaining face, the chapel's bay, the grave's tomb and lectern and the supper wall's sill, each run heaped in its own places with bare stone between and some treads swept nearly bare, the wall feet and the kerb of a walked court holding what feet move off it; a clumped scatter, the lane's ruts and gutters, and the walled court's floor in small rafts, most of it in the lee of the walls. Densest where the stops see it. A type of one October week, not a record. Dressing a few centimetres deep on the floors, outside the walk's solids like the moss; the fall the rail certificate was written with is still built, leaf for leaf, on a layer no camera draws, until the next certificate.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "c4be75b5be0621977e2b30cd4ee2356251534d0b69c56bc43830b7d590248507",
+      "sha256": "8e165b8bbc3be5c13d3c54b0af5f3e47e1bc070c6196845efc79c2b935cdb184",
       "note": "A-SITE; FLORA.md; deterministic museum dressing; recipe_file=src/wings/vinci/vegetation.ts"
     },
     {
@@ -3799,10 +3799,10 @@
       "class": "GENERATED",
       "licence": "Original procedural construction; source code under the museum repository licence.",
       "display": true,
-      "prompt": "The grave court as the museum's own modern architecture: a leaf of long flat light-grey brick laid in front of the gallery's cast core, the back wall raised over it as a filter band of brick laid with open head joints so the western light passes in small slots, a plinth course and a string course of pale limestone, stone copings; an oiled oak walkway on two steel bearers from the court's open side to the foot of the slab, each board its own piece of oak screwed to the bearers and walked pale down the middle, an oak bench on bronze feet, and three field maples of the region in steel-edged beds of earth with their week's fall. The court's sky share and the warm light off its sunlit wall faces are baked once from the walls' boxes and the hour's sun as live-engine terms the film's export turns off, and the band's light on the north wall is handed to the live engine as the soft image of the sun each slot passes, which the film's own sun draws by itself. No figure: no record names one. A modern design, no claim about 1519, Saint-Florentin or Saint-Hubert.",
+      "prompt": "The grave court as the museum's own modern architecture: a leaf of long flat light-grey brick laid in front of the gallery's cast core, the back wall raised over it as a filter band of brick laid with open head joints so the western light passes in small slots, a plinth course and a string course of pale limestone, stone copings; an oiled oak walkway on two steel bearers from the court's open side to the foot of the slab, an oak bench on bronze feet, and three field maples of the region in steel-edged beds of earth with their week's fall. The court's sky share and the warm light off its sunlit wall faces are baked once from the walls' boxes and the hour's sun as live-engine terms the film's export turns off. No figure: no record names one. A modern design, no claim about 1519, Saint-Florentin or Saint-Hubert.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-24",
-      "sha256": "e4bd9aaf54953c0296dc393698f28ee82a4131d24c61522a37c902b4a74ac4a7",
+      "sha256": "dc6641464a851b08f16405040dabede2f9ba0ed7fc73a4ce4eefa541850a0349",
       "note": "Modern museum court; no 1519 claim. recipe_file=src/wings/vinci/grave/court.ts"
     },
     {
@@ -3815,7 +3815,7 @@
       "prompt": "Three field maples, a tree of the region's hedges and a type of the season, planted by the museum in the grave court's steel-edged beds: 7 to 8.1 m, a stem clear to about a third of their height, their crowns grown by the site's own tree growth in sprays with every twig drawn near a stop, turned to their week's stage, and kept a hand past 1.2 m from every certified line through the court and out of its walls, its diagram and its lectern; their week's fall mostly in the beds and the rest carried north-east over the flags. Drawn within 58 m of the court's middle, the twigs and the shadows within 32 m, where the house stands between the court and every stop further off. Conjectural; the museum's modern planting, not a record of 1519.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-24",
-      "sha256": "e4bd9aaf54953c0296dc393698f28ee82a4131d24c61522a37c902b4a74ac4a7",
+      "sha256": "dc6641464a851b08f16405040dabede2f9ba0ed7fc73a4ce4eefa541850a0349",
       "note": "FLORA.md species as a type; the museum's own planting. recipe_file=src/wings/vinci/grave/court.ts"
     },
     {
