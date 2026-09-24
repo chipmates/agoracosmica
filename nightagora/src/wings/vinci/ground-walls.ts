@@ -180,5 +180,19 @@ function facadeFaces(): Catcher[] {
     annexes, the street wall and the court's. */
 export function drawnFaces(): Catcher[] {
   const house = new Set(builtFaces().filter(f => f.height === 6).slice(0, dossier.site.footprint.length))
-  return [...facadeFaces(), ...houseFaces().filter(f => !house.has(f)), ...courtFaces()]
+  return [...facadeFaces(), ...houseFaces().filter(f => !house.has(f)), ...courtFaces(), ...kerbFaces()]
+}
+
+/** The kerb between the court's cobbles and the flagged walk before the
+    house (laid in `copings.ts` along the court's north-west edge, 0.24 m
+    wide): a leaf lodges against either arris, so each side is a low face. */
+function kerbFaces(): Catcher[] {
+  const court = polygon('courtyard')
+  const a = court[3]!, b = court[2]!, dx = b[0]! - a[0]!, dn = b[1]! - a[1]!, span = Math.hypot(dx, dn)
+  const toApron: [number, number] = [-dn / span, dx / span]
+  const at = (p: readonly number[], o: number): [number, number] => [p[0]! + toApron[0] * o, p[1]! + toApron[1] * o]
+  return [
+    { from: at(a, -.24), to: at(b, -.24), low: [-toApron[0], -toApron[1]], height: .16 },
+    { from: at(b, 0), to: at(a, 0), low: toApron, height: .16 },
+  ]
 }

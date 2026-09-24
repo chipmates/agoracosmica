@@ -123,7 +123,7 @@ export interface Target { leaves: Body; shadow: Body | null; contact: Body | nul
 export interface LitterCounts { carpet: number; drifts: number; scatter: number; lane: number; court: number }
 
 /** A run of one face: consecutive pieces of a riser or a wall laid end to end. */
-interface Run extends Catcher { riser: boolean; region?: string; level?: number }
+interface Run extends Catcher { riser: boolean; region?: string; level?: number; built?: boolean }
 
 /** a draw in 0..1 that belongs to a place, so a run keeps its character
     whatever order the faces are found in */
@@ -269,7 +269,7 @@ export function layLitter(plan: LitterPlan): LitterCounts {
     } else runs.push({ from: [s.from[0]!, s.from[1]!], to: [s.to[0]!, s.to[1]!], low: [s.low[0]!, s.low[1]!], height: s.height,
       riser: s.height < .3, region: s.region, level: s.lowLevel })
   }
-  for (const w of plan.walls) runs.push({ ...w, riser: w.height < .3 })
+  for (const w of plan.walls) runs.push({ ...w, riser: w.height < .3, built: true })
   const random = mulberry(15171021)
   for (const c of runs) {
     const dx = c.to[0] - c.from[0], dn = c.to[1] - c.from[1], span = Math.hypot(dx, dn)
@@ -289,18 +289,21 @@ export function layLitter(plan: LitterPlan): LitterCounts {
     // leaves, how clean feet have swept it, how wide its drift lies
     const own = mulberry(placeSeed(mid[0], mid[1], 15171026))
     const riser = c.riser
-    const heaps = Array.from({ length: 1 + Math.floor(own() * (riser ? 2.4 : 1.5 + span / 3.5)) },
-      () => ({ at: own() * span, width: riser ? .12 + own() * own() * .7 : .25 + own() * own() * 1.8, amp: .5 + own() * 1.6 }))
-    // some treads are swept nearly bare, others hold a line or a heap
-    const bare = riser && own() < .3
-    const base = riser ? (bare ? .02 + own() * .04 : .04 + own() * .34) : .25 + own() * .5
-    const swept = riser ? own() * .8 : 0
+    const heaps = Array.from({ length: 1 + Math.floor(own() * (riser ? 3.2 : 1.5 + span / 3.5)) },
+      () => ({ at: own() * span, width: riser ? .07 + own() * own() * .45 : .25 + own() * own() * 1.8, amp: .5 + own() * 1.8 }))
+    // some treads are swept nearly bare, others hold a heap or two with bare
+    // stone between: a riser's line is never one ridge from cheek to cheek
+    const bare = riser && own() < .35
+    const base = riser ? (bare ? own() * .02 : own() * own() * .14) : .25 + own() * .5
+    const swept = riser ? .3 + own() * .65 : 0
     const width = .7 + own() * .75
+    // each end of a run holds its corner or not, and not the same amount
+    const cornerA = riser ? own() * own() * 1.6 : 1.3, cornerB = riser ? own() * own() * 1.6 : 1.3
     const profile = (s: number): number => {
       let v = base
       for (const h of heaps) v += h.amp * Math.exp(-(((s - h.at) / h.width) ** 2)) * (bare ? .25 : 1)
       // the corners where the run meets a cheek or another wall
-      v += 1.3 * (Math.exp(-s / .3) + Math.exp(-(span - s) / .3))
+      v += cornerA * Math.exp(-s / .3) + cornerB * Math.exp(-(span - s) / .3)
       // feet sweep a stair's middle
       if (riser) v *= 1 - swept * (1 - Math.min(1, Math.abs(s / span - .5) * 2.6))
       return v
@@ -310,7 +313,11 @@ export function layLitter(plan: LitterPlan): LitterCounts {
     // a drift is laid in full where a stop sees it close, thinly beyond; in
     // a walled court all that comes over the walls ends at a foot
     const walledIn = underFloor(mid) ? 3.4 : 1
-    const perMetre = (15 + 40 * here.amount) * facing * tall * stage * stage * walledIn
+    // feet move what falls on a walked court to its edges: a wall foot or a
+    // kerb standing on a walked floor holds that too (a stair's own treads
+    // are walked across, not beside)
+    const lee = c.built && plan.walked(mid[0] + c.low[0] * .15, mid[1] + c.low[1] * .15) ? 2.6 : 1
+    const perMetre = (15 + 40 * here.amount) * facing * tall * stage * stage * walledIn * lee
     const count = Math.round(perMetre * span * keep * 1.1 * mean / Math.max(1e-6, peak) * 1.6)
     const depthOf = clamp01(perMetre / 90)
     const band = (riser ? .045 + .05 * depthOf : .14 + .3 * depthOf) * width
