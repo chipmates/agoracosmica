@@ -104,6 +104,31 @@ export const BEAMS = {
   naveFoot: L + 3.2,
 } as const
 
+/** THE OUTSIDE, AS BUILT: each roof closed by a parapet and capped in bronze
+ * that stands proud of the wall and drips clear of it, its deck laid in
+ * pavers, the top light on its own curb under a bronze-framed lid, the roofs
+ * drained east through bronze spouts, the east wall on a stone base course. */
+export const PARAPET = { rise: .35, thick: .25, drip: .1, cap: .025, over: .03, inner: .015 } as const
+export const DECK_RISE = .05
+export const OUTLINE = {
+  nave: { west: ROOM.step + ROOM.stepWall, south: ROOM.south - .4, east: ROOM.east + ROOM.eastWall, north: ROOM.naveNorth + BEAMS.depth, top: ROOM.naveTop },
+  /** west: the upper end wall's own face over the display wall */
+  bay: { west: S.east - S.thickness / 2 - .09, south: ROOM.south - .4, east: ROOM.step + ROOM.stepWall, north: ROOM.north, top: ROOM.bayTop },
+} as const
+/** the top light's curb round its slot, and the lid's bronze frame on it */
+export const LANTERN = { west: TOP_LIGHT.west - .2, east: TOP_LIGHT.east + .2, south: ROOM.baySouth - .2, north: TOP_LIGHT.north + .2, curb: .2, top: ROOM.bayTop + .3 } as const
+export interface Spout { north: number; face: number; top: number }
+/** where the roofs drain: the nave over the court's east edge either side of
+ * the door, the bay onto the nave's deck */
+export const SPOUTS: readonly Spout[] = [
+  { north: -33.5, face: OUTLINE.nave.east, top: ROOM.naveTop },
+  { north: -27.45, face: OUTLINE.nave.east, top: ROOM.naveTop },
+  { north: -33.3, face: OUTLINE.bay.east, top: ROOM.bayTop },
+]
+export const SPOUT = { reach: .35, width: .12, depth: .1, lift: .03 } as const
+/** the base course at the east wall's foot, either side of the door */
+export const BASE = { rise: .36, proud: .03 } as const
+
 /** THE STONE SILL at the field's foot, certified with the display wall. */
 export const SILL = { west: FIELD.face, east: FIELD.face + .84, south: FIELD.south, north: FIELD.north, top: L + .44 } as const
 /** The wall's base course, also the display wall's. */
@@ -310,12 +335,13 @@ export function roof(): { slab: Body; well: Body; diffuser: Body; glass: Body } 
   well.northSouth(T.west, 1, T.south, T.north, T.diffuser, lo)
   well.northSouth(T.east, -1, T.south, T.north, T.diffuser, lo)
   diffuser.level({ west: T.west, south: T.south, east: T.east, north: T.north }, T.diffuser, -1)
-  glass.level({ west: T.west - .05, south: T.south, east: T.east + .05, north: T.north + .05 }, hi + .04, 1)
+  // the lid, on the lantern's curb over the slot
+  glass.level({ west: T.west, south: ROOM.baySouth, east: T.east, north: T.north }, LANTERN.top + .012, 1)
   // THE STEP: the bay's east wall over the nave's roof and across its open
   // north side, down to the nave's soffit
   slab.box([ROOM.step, ROOM.south, ROOM.naveSoffit, ROOM.step + ROOM.stepWall, ROOM.north, lo + .002], ['t'])
-  // the nave
-  slab.box([ROOM.step + ROOM.stepWall, ROOM.south, ROOM.naveSoffit, ROOM.east + ROOM.eastWall, ROOM.naveNorth, ROOM.naveTop], ['w'])
+  // the nave, out over its north beam
+  slab.box([ROOM.step + ROOM.stepWall, ROOM.south, ROOM.naveSoffit, ROOM.east + ROOM.eastWall, ROOM.naveNorth + BEAMS.depth, ROOM.naveTop], ['w'])
   return { slab, well, diffuser, glass }
 }
 
@@ -385,31 +411,69 @@ export function sillDress(): Body {
   return b
 }
 
-/** THE COPINGS: a folded zinc cap over every outer edge of the two roofs,
- * standing a little over the roof and a little proud of the wall, so each
- * roof ends in a drip line and its own shadow under it. The long runs stop a
- * millimetre short of the returns they meet, so no two faces share a plane. */
-export const COPING = { up: .035, down: .13, proud: .03, over: .26 } as const
-/** the two roofs' outer outlines at their tops: [west, south, east, north, top] */
-export const ROOF_OUTLINES: readonly [number, number, number, number, number][] = [
-  [-45.32, ROOM.south - .4, ROOM.step + ROOM.stepWall, ROOM.north, ROOM.bayTop],
-  [ROOM.step + ROOM.stepWall, ROOM.south - .4, ROOM.east + ROOM.eastWall, ROOM.naveNorth, ROOM.naveTop],
-]
-export function copings(): Body {
-  const b = new Body(), C = COPING, gap = .001
-  ROOF_OUTLINES.forEach(([w, s, e, n, top], index) => {
-    const lo = top - C.down, hi = top + C.up
-    // the nave's west edge stands against the bay's wall: no coping there
-    const westOpen = index === 1
-    // the two long runs, south and north, from outer face to outer face
-    const w0 = westOpen ? w + gap : w - C.proud + gap, e0 = e + C.proud - gap
-    b.box([w0, s - C.proud, lo, e0, s + C.over, hi])
-    b.box([w0, n - C.over, lo, e0, n + C.proud, hi + .002])
-    // the returns between them, a hair higher so their tops never meet the runs'
-    if (!westOpen) b.box([w - C.proud, s + C.over - gap, lo - .002, w + C.over, n - C.over + gap, hi + .004])
-    b.box([e - C.over, s + C.over - gap, lo - .002, e + C.proud, n - C.over + gap, hi + .004])
-  })
-  return b
+/** THE OUTSIDE'S OWN BODIES: the parapets and the lantern's curb in the
+ * walls' concrete, the copings, the lid's frame and the spouts in bronze, the
+ * decks in pavers, the base course and the splash stone in limestone. */
+export function outside(): { parapet: Body; bronze: Body; deck: Body; stone: Body } {
+  const parapet = new Body(), bronze = new Body(), deck = new Body(), stone = new Body()
+  const P = PARAPET
+  // THE NAVE: its west side is the bay's own face, which the runs die into
+  {
+    const o = OUTLINE.nave, h1 = o.top + P.rise - P.drip, c1 = o.top + P.rise + P.cap
+    parapet.box([o.east - P.thick, o.south, o.top, o.east, o.north, h1], ['b', 't'])
+    parapet.box([o.west, o.north - P.thick, o.top, o.east - P.thick, o.north, h1], ['b', 't', 'e', 'w'])
+    parapet.box([o.west, o.south, o.top, o.east - P.thick, o.south + P.thick, h1], ['b', 't', 'e', 'w'])
+    // the corner where the nave's south wall stops short of the bay's
+    parapet.box([ROOM.step, o.south, o.top, o.west, ROOM.south, ROOM.bayTop], ['b', 'w', 'n'])
+    bronze.box([o.west, o.north - P.thick - P.inner, h1, o.east + P.over, o.north + P.over, c1], ['w'])
+    // the south run stands out past the corner below it, so it keeps its end
+    bronze.box([o.west, o.south - P.over, h1, o.east + P.over, o.south + P.thick + P.inner, c1])
+    bronze.box([o.east - P.thick - P.inner, o.south + P.thick + P.inner, h1, o.east + P.over, o.north - P.thick - P.inner, c1], ['n', 's'])
+    deck.level({ west: o.west, south: o.south + P.thick, east: o.east - P.thick, north: o.north - P.thick }, o.top + DECK_RISE, 1)
+  }
+  // THE BAY: a ring on all four sides, the lantern standing in its deck
+  {
+    const o = OUTLINE.bay, h1 = o.top + P.rise - P.drip, c1 = o.top + P.rise + P.cap
+    parapet.box([o.west, o.south, o.top, o.west + P.thick, o.north, h1], ['b', 't'])
+    parapet.box([o.east - P.thick, o.south, o.top, o.east, o.north, h1], ['b', 't'])
+    parapet.box([o.west + P.thick, o.north - P.thick, o.top, o.east - P.thick, o.north, h1], ['b', 't', 'e', 'w'])
+    parapet.box([o.west + P.thick, o.south, o.top, o.east - P.thick, o.south + P.thick, h1], ['b', 't', 'e', 'w'])
+    bronze.box([o.west - P.over, o.north - P.thick - P.inner, h1, o.east + P.over, o.north + P.over, c1])
+    bronze.box([o.west - P.over, o.south - P.over, h1, o.east + P.over, o.south + P.thick + P.inner, c1])
+    bronze.box([o.west - P.over, o.south + P.thick + P.inner, h1, o.west + P.thick + P.inner, o.north - P.thick - P.inner, c1], ['n', 's'])
+    bronze.box([o.east - P.thick - P.inner, o.south + P.thick + P.inner, h1, o.east + P.over, o.north - P.thick - P.inner, c1], ['n', 's'])
+    const K = LANTERN, T = TOP_LIGHT, lo = o.top
+    parapet.box([K.west, K.south, lo, K.west + K.curb, K.north, K.top], ['b'])
+    parapet.box([K.east - K.curb, K.south, lo, K.east, K.north, K.top], ['b'])
+    parapet.box([K.west + K.curb, K.south, lo, K.east - K.curb, K.south + K.curb, K.top], ['b', 'e', 'w'])
+    parapet.box([K.west + K.curb, K.north - K.curb, lo, K.east - K.curb, K.north, K.top], ['b', 'e', 'w'])
+    // the lid's frame round the glass and its two bars
+    const f = .07, up = K.top + .05, midN = (ROOM.baySouth + T.north) / 2, midE = (T.west + T.east) / 2
+    bronze.box([T.west - .03, ROOM.baySouth - .03, K.top, T.west + f - .03, T.north + .03, up], ['b'])
+    bronze.box([T.east - f + .03, ROOM.baySouth - .03, K.top, T.east + .03, T.north + .03, up], ['b'])
+    bronze.box([T.west + f - .03, ROOM.baySouth - .03, K.top, T.east - f + .03, ROOM.baySouth + f - .03, up], ['b', 'e', 'w'])
+    bronze.box([T.west + f - .03, T.north - f + .03, K.top, T.east - f + .03, T.north + .03, up], ['b', 'e', 'w'])
+    bronze.box([T.west + f - .03, midN - .025, K.top + .012, T.east - f + .03, midN + .025, up], ['b', 'e', 'w'])
+    bronze.box([midE - .025, ROOM.baySouth + f - .03, K.top + .012, midE + .025, midN - .025, up], ['b', 'n', 's'])
+    bronze.box([midE - .025, midN + .025, K.top + .012, midE + .025, T.north - f + .03, up], ['b', 'n', 's'])
+    const d = lo + DECK_RISE, w = o.west + P.thick, e = o.east - P.thick, s = o.south + P.thick, n = o.north - P.thick
+    deck.level({ west: w, south: K.north, east: e, north: n }, d, 1)
+    deck.level({ west: w, south: s, east: e, north: K.south }, d, 1)
+    deck.level({ west: w, south: K.south, east: K.west, north: K.north }, d, 1)
+    deck.level({ west: K.east, south: K.south, east: e, north: K.north }, d, 1)
+  }
+  // THE SPOUTS, and the stone the bay's spout falls onto
+  for (const s of SPOUTS) {
+    const lo = s.top + SPOUT.lift
+    bronze.box([s.face, s.north - SPOUT.width / 2, lo, s.face + SPOUT.reach, s.north + SPOUT.width / 2, lo + SPOUT.depth], ['w'])
+  }
+  const fall = SPOUTS[2]!, deckTop = OUTLINE.nave.top + DECK_RISE
+  stone.box([fall.face + .06, fall.north - .24, deckTop, fall.face + .54, fall.north + .24, deckTop + .045], ['b'])
+  // THE BASE COURSE, stone at the east wall's foot, stopped at the door
+  const o = OUTLINE.nave
+  stone.box([o.east, ROOM.south, ROOM.floor - .02, o.east + BASE.proud, DOOR.south, ROOM.floor + BASE.rise], ['w', 'b'])
+  stone.box([o.east, DOOR.north, ROOM.floor - .02, o.east + BASE.proud, o.north, ROOM.floor + BASE.rise], ['w', 'b'])
+  return { parapet, bronze, deck, stone }
 }
 
 /** Every solid the room stands, for the clearance proof: the checker builds
@@ -417,9 +481,11 @@ export function copings(): Body {
 export function supperRoomBodies(): Record<string, Body> {
   const { plaster, reveal } = endWall()
   const { slab, well, diffuser, glass } = roof()
+  const out = outside()
   return {
     'end-wall': plaster, reveal, 'upper-end-wall': upperEndWall(), 'south-wall': southWall(),
-    roof: slab, well, diffuser, glass, frame: frame(), fins: fins(), floor: floor(), sill: sillDress(), copings: copings(),
+    roof: slab, well, diffuser, glass, frame: frame(), fins: fins(), floor: floor(), sill: sillDress(),
+    parapet: out.parapet, bronze: out.bronze, deck: out.deck, 'outside-stone': out.stone,
   }
 }
 

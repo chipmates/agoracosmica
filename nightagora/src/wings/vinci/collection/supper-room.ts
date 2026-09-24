@@ -23,11 +23,12 @@ import { RectAreaLightTexturesLib } from 'three/addons/lights/RectAreaLightTextu
 import type { Stack } from '../../../stack'
 import type { MaterialSet } from '../../../stack/materials'
 import { kelvinToColour } from '../../../stack/light'
-import { axisFootprint, lineCoverage, resolved } from '../../../stack/detail'
+import { axisFootprint, lineCoverage } from '../../../stack/detail'
 import { setSupperMuralLight } from './supper-light'
 import {
-  COPING, END_FACE, FIELD, FINS, FLOOR_RISE, NAVE_PROBE_AT, PROBE_AT, ROOF_OUTLINES, ROOM, SILL, SUPPER_LIGHTS, SUPPER_ROOM_PROVENANCE,
-  TOP_LIGHT, v3, copings, endWall, fins, floor as floorBody, frame, roof, sillDress, southWall, upperEndWall, type Body, type SupperLight,
+  DOOR, END_FACE, FIELD, FINS, FLOOR_RISE, NAVE_PROBE_AT, OUTLINE, PARAPET, PROBE_AT, ROOM, SILL, SPOUT, SPOUTS, SUPPER_LIGHTS,
+  SUPPER_ROOM_PROVENANCE, TOP_LIGHT, v3, endWall, fins, floor as floorBody, frame, outside, roof, sillDress, southWall,
+  upperEndWall, type Body, type SupperLight,
 } from './supper-room-plan'
 
 // The node overload boundary stays local to this file.
@@ -96,6 +97,29 @@ function looks() {
     floorGlow: uniform(new Color(.3, .29, .28)),
     /** Engine-only terms: a renderer that shadows the reveal itself sets 0 */
     engineTerms: uniform(1),
+    /** THE OUTSIDE: how much of the photograph the pour keeps, each panel's
+     * own tone, what a joint and a tie hole take, the weather's two stains */
+    /** the pour outside, a warm limestone aggregate a shade paler than the
+     * soffits, so it holds its warmth in the sky's shade (AD-2) */
+    outsideBase: uniform(new Color(.45, .395, .33)),
+    outsideKeep: uniform(.6),
+    outsideNormal: uniform(.7),
+    pourTone: uniform(.16),
+    jointShade: uniform(.5),
+    /** the grey a joint's lost fines leave either side of it */
+    rimShade: uniform(.1),
+    tieShade: uniform(.7),
+    dripShade: uniform(.24),
+    spoutShade: uniform(.45),
+    /** patinated bronze: the metal where it is kept, the skin where it is not */
+    bronze: uniform(new Color(.36, .25, .14)),
+    patina: uniform(new Color(.13, .12, .095)),
+    deckBase: uniform(new Color(.38, .37, .35)),
+    /** the base course, the threshold and the floor's open edges: a hard
+     * grey stone that grounds the pale pour */
+    baseStone: uniform(new Color(.3, .3, .31)),
+    baseGrey: uniform(.75),
+    deckJoint: uniform(.8),
   }
 }
 type Looks = ReturnType<typeof looks>
@@ -135,46 +159,6 @@ function concreteMaterial(set: MaterialSet, L: Looks, name: string): MeshStandar
   m.aoNode = sample.occlusion
   m.name = `vinci/collection-supper-room/${name}`
   m.userData = { ...SUPPER_ROOM_PROVENANCE, set: set.name }
-  return m
-}
-
-/** THE WEATHER ON THE ROOM'S OUTSIDE: the roofs are laid in lapped strips of
- * membrane a metre wide, darker where the water stood; the walls under each
- * coping carry the streaks the rain draws down from it. */
-function weathered(m: MeshStandardNodeMaterial): void {
-  const P = positionWorld, n = normalWorldGeometry
-  const east = P.x, north = P.z.negate()
-  const { east: fe, up: fu, north: fn } = axisFootprint(P)
-  const up = smoothstep(.7, .95, n.y)
-  // the roof: which roof, its strips across it and the water's marks
-  const [bay, nave] = ROOF_OUTLINES
-  const onBay = east.lessThan(bay![2] + .05)
-  const top = select(onBay, float(bay![4]), float(nave![4]))
-  const roofTop = up.mul(smoothstep(.04, .01, abs(P.y.sub(top))))
-  const strip = north.sub(bay![1]).div(1.02)
-  const lap = lineCoverage(abs(fract(strip).sub(.5)).mul(-1).add(.5).mul(1.02), .008, 1.02, fn)
-  const stripTone = float(1).add(hash(floorOf(strip), select(onBay, float(1), float(2)), 6.1).sub(.5).mul(.06))
-  const ponds = smoothstep(.55, .8, mx_noise_float(vec3(east.mul(.45), north.mul(.45), 4.2)).mul(.5).add(.5))
-  const roofMark = stripTone.mul(float(1).sub(lap.mul(.45))).mul(float(1).sub(ponds.mul(.16)))
-  // the walls: streaks from the coping down, fading over two metres
-  const upright = float(1).sub(smoothstep(.3, .6, abs(n.y)))
-  const below = top.sub(COPING.down).sub(P.y).max(0)
-  const along = select(abs(n.x).greaterThan(.5), north, east)
-  const streak = smoothstep(.5, .85, mx_noise_float(vec3(along.mul(3.2), P.y.mul(.18), 8.3)).mul(.5).add(.5))
-    .mul(float(1).sub(smoothstep(.2, 2.4, below))).mul(resolved(.06, fu.max(fe.min(fn))))
-  const wallMark = float(1).sub(streak.mul(.3)).sub(float(1).sub(smoothstep(0, .35, below)).mul(.08))
-  m.colorNode = (m.colorNode as N).mul(mix(float(1), roofMark, roofTop)).mul(mix(float(1), wallMark, upright))
-  m.roughnessNode = (m.roughnessNode as N).add(ponds.mul(roofTop).mul(-.12)).add(lap.mul(roofTop).mul(-.1))
-}
-
-/** THE COPINGS' ZINC: dark, folded, dulled by the weather. */
-function zincMaterial(): MeshStandardNodeMaterial {
-  const m = new MeshStandardNodeMaterial({ roughness: .5, metalness: .55, side: FrontSide })
-  const dull = mx_noise_float(positionWorld.mul(1.3)).mul(.5).add(.5)
-  m.colorNode = vec3(.2, .205, .21).mul(dull.mul(.2).add(.9))
-  m.roughnessNode = float(.42).add(dull.mul(.18))
-  m.name = 'vinci/collection-supper-room/zinc'
-  m.userData = { ...SUPPER_ROOM_PROVENANCE }
   return m
 }
 
@@ -256,6 +240,114 @@ function stoneMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial {
   m.roughnessNode = mix(float(.42), float(.66), sample.roughness)
   m.normalNode = bend(t, b, n, sample.normal, .5)
   m.name = 'vinci/collection-supper-room/limestone'
+  m.userData = { ...SUPPER_ROOM_PROVENANCE, set: set.name }
+  return m
+}
+
+/* ---- the outside --------------------------------------------------------- */
+
+/** The pour the walls are cast in: panels of the building's own size, a tie
+ * hole on a 0.6 m grid inside each, the joints a hand wide at most. */
+const POUR = { u: 2.4, v: 1.2, joint: .005, tie: .6, tieR: .013 } as const
+
+/** THE OUTSIDE'S CONCRETE: the room's own photograph under a pour of panels,
+ * each its own tone, its joints and tie holes drawn only where a pixel holds
+ * them, and the weather where the water runs: a drift of streaks under every
+ * coping, and a darker, greener run under each bronze spout. */
+function outsideMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial {
+  const m = new MeshStandardNodeMaterial({ roughness: .88, metalness: 0, side: FrontSide })
+  const P = positionWorld, n = normalWorldGeometry
+  const { t, b } = faceFrame(n)
+  const u = dot(P, t), v = dot(P, b).sub(ROOM.floor)
+  const sample = set.sample({ uv: vec2(u, v), metres: 2.71 })
+  const pu = u.dFdx().abs().add(u.dFdy().abs()).max(1e-5), pv = v.dFdx().abs().add(v.dFdy().abs()).max(1e-5)
+  const toJoint = (x: N, period: number): N => { const f = fract(x.div(period)); return min(f, float(1).sub(f)).mul(period) }
+  const joint = lineCoverage(toJoint(u, POUR.u), POUR.joint, POUR.u, pu).max(lineCoverage(toJoint(v, POUR.v), POUR.joint, POUR.v, pv))
+  const rim = lineCoverage(toJoint(u, POUR.u), .03, POUR.u, pu).max(lineCoverage(toJoint(v, POUR.v), .03, POUR.v, pv))
+  // a tie hole is a small cone: drawn where the pixel is finer than it, its
+  // own share of the pixel where it is not
+  const tu = fract(u.div(POUR.tie)).sub(.5).mul(POUR.tie), tv = fract(v.div(POUR.tie)).sub(.5).mul(POUR.tie)
+  const px = max(pu, pv), r = float(POUR.tieR)
+  const share = r.mul(2).div(px).min(1)
+  const hole = smoothstep(r.add(px.mul(.5)), r.sub(px.mul(.5)).max(0), vec2(tu, tv).length()).mul(share.mul(share))
+  const salt = n.x.mul(3.1).add(n.z.mul(7.3))
+  const iu = floorOf(u.div(POUR.u)), iv = floorOf(v.div(POUR.v))
+  const tone = float(1).add(hash(iu.add(salt), iv, 2.7).sub(.5).mul(L.pourTone))
+  const drift = mx_noise_float(P.mul(.13)).mul(.04).add(mx_noise_float(P.mul(.47)).mul(.02))
+  // THE WEATHER, on the walls only: under each coping, streaks that fade
+  // over the first metres; under each spout, one run that widens as it falls
+  const wall = float(1).sub(abs(n.y).mul(2).clamp(0, 1))
+  const east = P.x, north = P.z.negate()
+  const copingFoot = select(east.lessThan(OUTLINE.nave.west + .01), float(OUTLINE.bay.top + PARAPET.rise - PARAPET.drip), float(OUTLINE.nave.top + PARAPET.rise - PARAPET.drip))
+  const below = copingFoot.sub(P.y)
+  const streak = smoothstep(.2, .75, mx_noise_float(vec3(u.mul(4.7), P.y.mul(.3), 3.1)).mul(.5).add(.5))
+    .mul(smoothstep(-.01, .05, below)).mul(smoothstep(2.8, .1, below))
+  let run: N = float(0)
+  for (const s of SPOUTS) {
+    const fall = float(s.top + SPOUT.lift).sub(P.y)
+    const width = fall.mul(.07).add(SPOUT.width * .45)
+    const onFace = smoothstep(.04, .01, abs(east.sub(s.face))).mul(smoothstep(.5, .8, n.x))
+    const ragged = mx_noise_float(vec3(north.mul(9), P.y.mul(1.3), 5.7)).mul(.25).add(.85)
+    run = max(run, smoothstep(width, width.mul(.35), abs(north.sub(s.north))).mul(smoothstep(-.02, .08, fall)).mul(smoothstep(4.5, .3, fall)).mul(onFace).mul(ragged))
+  }
+  const stain = mix(vec3(1, 1, 1), vec3(.8, .86, .83), run).mul(float(1).sub(run.mul(L.spoutShade)))
+  const kept = mix(float(1), sample.albedo, L.outsideKeep)
+  m.colorNode = L.outsideBase.mul(kept).mul(tone).mul(drift.add(1))
+    .mul(float(1).sub(joint.mul(L.jointShade))).mul(float(1).sub(rim.mul(L.rimShade))).mul(float(1).sub(hole.mul(L.tieShade)))
+    .mul(float(1).sub(streak.mul(L.dripShade).mul(wall))).mul(mix(vec3(1, 1, 1), stain, wall))
+  m.roughnessNode = mix(float(.8), float(.95), sample.roughness).add(run.mul(-.12))
+  m.normalNode = bend(t, b, n, sample.normal, L.outsideNormal)
+  m.aoNode = sample.occlusion.mul(float(1).sub(joint.mul(.35))).mul(float(1).sub(hole.mul(.5)))
+  m.name = 'vinci/collection-supper-room/concrete-out'
+  m.userData = { ...SUPPER_ROOM_PROVENANCE, set: set.name }
+  return m
+}
+
+/** THE BASE'S STONE: the same honed limestone photograph, greyed and
+ * darkened to a hard stone, so the foot of the wall reads as its own course. */
+function baseStoneMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial {
+  const m = new MeshStandardNodeMaterial({ roughness: .6, metalness: 0, side: FrontSide })
+  const P = positionWorld, n = normalWorldGeometry
+  const { t, b } = faceFrame(n)
+  const sample = set.sample({ uv: vec2(dot(P, t), dot(P, b)), metres: 1.6 })
+  const grey = dot(sample.albedo, vec3(.2126, .7152, .0722))
+  m.colorNode = L.baseStone.mul(mix(sample.albedo, vec3(grey, grey, grey), L.baseGrey))
+  m.roughnessNode = mix(float(.5), float(.72), sample.roughness)
+  m.normalNode = bend(t, b, n, sample.normal, .6)
+  m.name = 'vinci/collection-supper-room/base-stone'
+  m.userData = { ...SUPPER_ROOM_PROVENANCE, set: set.name }
+  return m
+}
+
+/** PATINATED BRONZE, the copings, the spouts, the lid's frame and the door's
+ * lining: the metal kept on the edges, a mineral skin over the rest. */
+function bronzeMaterial(L: Looks): MeshStandardNodeMaterial {
+  const m = new MeshStandardNodeMaterial({ roughness: .5, metalness: .8, side: FrontSide })
+  const P = positionWorld
+  const skin = mx_noise_float(P.mul(1.7)).mul(.5).add(.5).mul(.7).add(mx_noise_float(P.mul(19)).mul(.5).add(.5).mul(.3))
+  m.colorNode = mix(L.bronze, L.patina, skin.mul(.8))
+  m.roughnessNode = float(.34).add(skin.mul(.3))
+  m.metalnessNode = mix(float(.92), float(.45), skin)
+  m.name = 'vinci/collection-supper-room/bronze'
+  m.userData = { ...SUPPER_ROOM_PROVENANCE }
+  return m
+}
+
+/** THE DECKS: pale concrete pavers on pedestals, 0.6 m square, their open
+ * joints dark, each paver cast on its own day. */
+const PAVER = .6
+function deckMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial {
+  const m = new MeshStandardNodeMaterial({ roughness: .9, metalness: 0, side: FrontSide })
+  const P = positionWorld, east = P.x, north = P.z.negate()
+  const sample = set.sample({ uv: vec2(east, north), metres: 2.71 })
+  const { east: pe, north: pn } = axisFootprint(P)
+  const fe = fract(east.div(PAVER)), fn = fract(north.div(PAVER))
+  const de = min(fe, float(1).sub(fe)).mul(PAVER), dn = min(fn, float(1).sub(fn)).mul(PAVER)
+  const joint = lineCoverage(de, .004, PAVER, pe).max(lineCoverage(dn, .004, PAVER, pn))
+  const tone = float(1).add(hash(floorOf(east.div(PAVER)), floorOf(north.div(PAVER)), 6.1).sub(.5).mul(.12))
+  m.colorNode = L.deckBase.mul(mix(float(1), sample.albedo, .7)).mul(tone).mul(float(1).sub(joint.mul(L.deckJoint)))
+  m.roughnessNode = mix(float(.82), float(.96), sample.roughness)
+  m.name = 'vinci/collection-supper-room/deck'
   m.userData = { ...SUPPER_ROOM_PROVENANCE, set: set.name }
   return m
 }
@@ -362,6 +454,43 @@ function uprightOpening(spec: SupperLight): { west: number; east: number; north:
   return { west: e - spec.width / 2, east: e + spec.width / 2, north: n, low: h - spec.height / 2, high: h + spec.height / 2 }
 }
 
+/** A face of the east door's reveal: its jambs and its head, which the
+ * outside reads as the door's bronze lining. */
+function inDoorReveal(c: { e: number; n: number; h: number }, normal: { e: number; n: number; h: number }): boolean {
+  const across = c.e > ROOM.east - .001 && c.e < OUTLINE.nave.east + .001
+  const jamb = Math.abs(normal.n) > .9 && (Math.abs(c.n - DOOR.south) < .01 || Math.abs(c.n - DOOR.north) < .01)
+  const head = normal.h < -.9 && Math.abs(c.h - DOOR.head) < .01 && c.n > DOOR.south && c.n < DOOR.north
+  return across && (jamb || head)
+}
+
+/** One geometry's triangles, parted by a test on each one's centre and facing. */
+function split(g: BufferGeometry, test: (c: { e: number; n: number; h: number }, normal: { e: number; n: number; h: number }) => boolean): [BufferGeometry | null, BufferGeometry | null] {
+  const p = g.getAttribute('position'), nr = g.getAttribute('normal'), uv = g.getAttribute('uv')
+  const lists: [number[], number[]] = [[], []]
+  for (let t = 0; t < p.count; t += 3) {
+    const c = { e: (p.getX(t) + p.getX(t + 1) + p.getX(t + 2)) / 3, h: (p.getY(t) + p.getY(t + 1) + p.getY(t + 2)) / 3, n: -(p.getZ(t) + p.getZ(t + 1) + p.getZ(t + 2)) / 3 }
+    lists[test(c, { e: nr.getX(t), h: nr.getY(t), n: -nr.getZ(t) }) ? 0 : 1].push(t)
+  }
+  const pick = (list: number[]): BufferGeometry | null => {
+    if (!list.length) return null
+    const q: number[] = [], m: number[] = [], w: number[] = []
+    for (const t of list) for (let k = 0; k < 3; k++) {
+      q.push(p.getX(t + k), p.getY(t + k), p.getZ(t + k))
+      m.push(nr.getX(t + k), nr.getY(t + k), nr.getZ(t + k))
+      w.push(uv.getX(t + k), uv.getY(t + k))
+    }
+    const made = new BufferGeometry()
+    made.setAttribute('position', new Float32BufferAttribute(q, 3))
+    made.setAttribute('normal', new Float32BufferAttribute(m, 3))
+    made.setAttribute('uv', new Float32BufferAttribute(w, 2))
+    made.computeBoundingBox(); made.computeBoundingSphere()
+    return made
+  }
+  const out: [BufferGeometry | null, BufferGeometry | null] = [pick(lists[0]), pick(lists[1])]
+  g.dispose()
+  return out
+}
+
 export interface SupperRoom {
   group: Group
   ready: Promise<void>
@@ -444,9 +573,10 @@ export function mountSupperRoom(stack: Stack): SupperRoom {
     family[zone].name += `-${zone}`
     materials.push(family[zone])
   }
-  const concreteOut = concreteMaterial(concreteSet!, L, 'concrete-out')
-  weathered(concreteOut)
-  const zinc = zincMaterial()
+  const concreteOut = outsideMaterial(concreteSet!, L)
+  const bronze = bronzeMaterial(L)
+  const deck = deckMaterial(concreteSet!, L)
+  const stoneOut = baseStoneMaterial(stoneSet!, L)
   const stone = stoneMaterial(stoneSet!, L)
   adopt(stone, 'bay')
   const skirt = new MeshStandardNodeMaterial({ color: '#2a2622', roughness: .45, metalness: .7 })
@@ -467,7 +597,7 @@ export function mountSupperRoom(stack: Stack): SupperRoom {
   diffuser.name = 'vinci/collection-supper-room/diffuser'
   const glass = new MeshStandardNodeMaterial({ color: '#1c2226', roughness: .08, metalness: .1 })
   glass.name = 'vinci/collection-supper-room/skylight'
-  materials.push(concreteOut, zinc, stone, skirt, diffuser, glass)
+  materials.push(concreteOut, bronze, deck, stoneOut, stone, skirt, diffuser, glass)
 
   // WHICH VOLUME A FACE LOOKS INTO: a face whose outside lies in the bay's air
   // or the nave's takes that volume's light; every other face is lit by the day
@@ -533,10 +663,16 @@ export function mountSupperRoom(stack: Stack): SupperRoom {
     make(merged([parts.slab[zone], parts.upper[zone]]), lit.concrete[zone], `concrete-${zone}`, false)
     make(parts.floor[zone], lit.marble[zone], `floor-${zone}`, false)
   }
-  // the room's outside stands in the day and throws the day's shadow
-  make(merged([parts.wall.out, parts.reveal.out, parts.south.out, parts.upper.out, parts.slab.out, parts.frame.out, parts.fins.out, parts.floor.out]),
+  // THE ROOM'S OUTSIDE stands in the day and throws the day's shadow: its
+  // walls and parapets in concrete, the door lined and the roofs capped in
+  // bronze, the decks in pavers, the floor's open edges and the base in stone
+  const shell = outside()
+  const [lining, walls] = parts.frame.out ? split(parts.frame.out, inDoorReveal) : [null, null]
+  make(merged([parts.wall.out, parts.reveal.out, parts.south.out, parts.upper.out, parts.slab.out, walls, parts.fins.out, shell.parapet.geometry()]),
     concreteOut, 'concrete-out', true)
-  make(copings().geometry(), zinc, 'copings', true)
+  make(merged([lining, shell.bronze.geometry()]), bronze, 'bronze', true)
+  make(shell.deck.geometry(), deck, 'deck', false)
+  make(merged([parts.floor.out, shell.stone.geometry()]), stoneOut, 'stone-out', true)
   make(sillDress().geometry(), stone, 'sill', false)
   make(well.geometry(), skirt, 'diffuser-frame', false)
   const glow = make(panel.geometry(), diffuser, 'diffuser', false)
