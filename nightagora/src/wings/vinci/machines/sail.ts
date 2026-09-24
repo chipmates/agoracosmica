@@ -47,8 +47,8 @@ const count = (tier: TierName, hero: number, standard: number, calm: number): nu
 
 /** The stitches at a doubled layer's edge darken the cloth by this much, and
  * the doubled cloth itself a little. */
-const STITCH = .6
-const BODY = .94
+const STITCH = .7
+const BODY = .86
 /** A doubled layer passes this share of the light a single one does. */
 const DOUBLED = .38
 
@@ -107,15 +107,24 @@ export function sailGeometry(h: HelicoidSpec, tier: TierName): BufferGeometry {
     if (n.y < 0) n.negate()
     return { p, n }
   }
-  const push = (p: Vector3, n: Vector3, s: number, t: number, tone: number, pass: number): number => {
+  // each cloth is cut from its own bolt: its weave starts somewhere else and
+  // its unbleached tone is its own
+  const hash = (a: number, b: number): number => {
+    let x = Math.imul(a + 1, 73856093) ^ Math.imul(b + 1, 19349663)
+    x = Math.imul(x ^ (x >>> 13), 1274126177)
+    return ((x ^ (x >>> 16)) >>> 0) / 4294967296
+  }
+  const push = (p: Vector3, n: Vector3, s: number, t: number, tone: readonly number[], pass: number, shift = 0): number => {
     const r = h.r_in + s * (S.rim(t) - h.r_in)
     position.push(p.x, p.y, p.z)
     normal.push(n.x, n.y, n.z)
-    uv.push(r, r * t)
-    colour.push(tone, tone, tone)
+    // the warp runs out from the mast, along each cloth
+    uv.push(r * t + shift, r + shift * .37)
+    colour.push(tone[0]!, tone[1]!, tone[2]!)
     layers.push(pass)
     return position.length / 3 - 1
   }
+  const grey = (v: number): number[] => [v, v, v]
   const grid = (rows: number, cols: number, vertex: (i: number, j: number) => number): void => {
     const ids: number[][] = []
     for (let i = 0; i <= rows; i++) {
@@ -128,33 +137,62 @@ export function sailGeometry(h: HelicoidSpec, tier: TierName): BufferGeometry {
     }
   }
 
-  // THE CLOTH, single, from the mast to the rim wire.
-  grid(nt, ns, (i, j) => {
-    const t = S.span * i / nt, s = j / ns
-    const { p, n } = frame(s, t)
-    return push(p, n, s, t, 1, 1)
-  })
+  /** how many cloths a gore is sewn from: none wider than a bolt at the rim */
+  const panelsOf = (g: number): number => Math.max(1, Math.ceil(S.rim((g + .5) * gore) * gore / h.panel_m))
+
+  // THE CLOTH, single, from the mast to the rim wire, one grid to each cloth
+  // so a cloth's tone stops at its seam.
+  for (let g = 0; g < gores; g++) {
+    const panels = panelsOf(g)
+    const cols = Math.max(2, Math.ceil(perGore / panels))
+    for (let m = 0; m < panels; m++) {
+      const value = .9 + hash(g, m) * .1, warmth = (hash(m, g + 7) - .5) * .05
+      const tone = [value * (1 + warmth), value, value * (1 - warmth)]
+      const shift = hash(g + 3, m + 11) * 7
+      grid(cols, ns, (i, j) => {
+        const t = (g + (m + i / cols) / panels) * gore, s = j / ns
+        const { p, n } = frame(s, t)
+        return push(p, n, s, t, tone, 1, shift)
+      })
+    }
+  }
+  const tAt = (g: number, m: number): number => (g + m / panelsOf(g)) * gore
 
   /** A doubled layer: a ribbon on both faces, `along` rows down its length
    * and columns at `acrossMarks`, shares of its width; a stitched column is
-   * darkened by the row of stitches it carries. */
+   * darkened by the row of stitches it carries and lies lower, where the
+   * stitches pull the layers down, so the welt between catches the light. */
   const ribbon = (
     place: (a: number, b: number) => { s: number; t: number },
     along: number, acrossMarks: readonly number[], stitched: readonly boolean[],
   ): void => {
+    const cols = acrossMarks.length - 1
     for (const side of [1, -1]) {
-      grid(along, acrossMarks.length - 1, (i, j) => {
-        const { s, t } = place(i / along, acrossMarks[j]!)
-        const { p, n } = frame(s, t)
-        p.addScaledVector(n, side * h.layer_m)
-        return push(p, side > 0 ? n : n.clone().negate(), s, t, stitched[j] ? STITCH : BODY, DOUBLED)
+      const rows: { p: Vector3; s: number; t: number }[][] = []
+      for (let i = 0; i <= along; i++) {
+        rows.push([])
+        for (let j = 0; j <= cols; j++) {
+          const { s, t } = place(i / along, acrossMarks[j]!)
+          const { p, n } = frame(s, t)
+          p.addScaledVector(n, side * h.layer_m * (stitched[j] ? .6 : 1))
+          rows[i]!.push({ p, s, t })
+        }
+      }
+      grid(along, cols, (i, j) => {
+        const here = rows[i]![j]!
+        const down = rows[Math.min(along, i + 1)]![j]!.p.clone().sub(rows[Math.max(0, i - 1)]![j]!.p)
+        const across = rows[i]![Math.min(cols, j + 1)]!.p.clone().sub(rows[i]![Math.max(0, j - 1)]!.p)
+        const n = new Vector3().crossVectors(down, across).normalize()
+        const cloth = frame(here.s, here.t).n
+        if (n.dot(cloth) * side < 0) n.negate()
+        return push(here.p, n, here.s, here.t, grey(stitched[j] ? STITCH : BODY), DOUBLED)
       })
     }
   }
   const sAt = (r: number, t: number): number => Math.min(1, Math.max(0, (r - h.r_in) / (S.rim(t) - h.r_in)))
 
   // THE HEM: the cloth folded round the wire, stitched along its inner edge.
-  const hemMarks = [0, .003 / (h.hem_m - h.wire_r), 1]
+  const hemMarks = [0, .005 / (h.hem_m - h.wire_r), 1]
   ribbon((a, b) => {
     const t = S.span * a
     const r = S.rim(t) - h.wire_r - (1 - b) * (h.hem_m - h.wire_r)
@@ -165,22 +203,22 @@ export function sailGeometry(h: HelicoidSpec, tier: TierName): BufferGeometry {
   ribbon((a, b) => {
     const t = S.span * a
     return { s: sAt(h.r_in + b * (h.crown_m - h.r_in), t), t }
-  }, nt, [0, 1 - .004 / (h.crown_m - h.r_in), 1], [false, false, true])
+  }, nt, [0, 1 - .005 / (h.crown_m - h.r_in), 1], [false, false, true])
 
-  // THE SEAMS: radial, between the crown and the hem, as many in a gore as
-  // the rim's width there asks for.
+  // THE SEAMS: radial, between the crown and the hem, between every two
+  // cloths, over every cane and along both ends of the cloth.
   const seamRows = count(tier, 12, 8, 5)
-  for (let g = 0; g < gores; g++) {
-    const width = S.rim((g + .5) * gore) * gore
-    const panels = Math.max(1, Math.ceil(width / h.panel_m))
-    for (let m = 1; m < panels; m++) {
-      const t0 = (g + m / panels) * gore
+  const seams: number[] = []
+  for (let g = 0; g < gores; g++) for (let m = 0; m < panelsOf(g); m++) seams.push(tAt(g, m))
+  seams.push(S.span)
+  for (const t0 of seams) {
+    {
       ribbon((a, b) => {
         const r0 = h.crown_m, r1 = S.rim(t0) - h.hem_m
         const r = r0 + a * (r1 - r0)
-        const t = t0 + ((b - .5) * h.seam_m) / r
+        const t = Math.min(S.span, Math.max(0, t0 + ((b - .5) * h.seam_m) / r))
         return { s: sAt(r, t), t }
-      }, seamRows, [0, .003 / h.seam_m, 1 - .003 / h.seam_m, 1], [true, false, false, true])
+      }, seamRows, [0, .005 / h.seam_m, 1 - .005 / h.seam_m, 1], [true, false, false, true])
     }
   }
 

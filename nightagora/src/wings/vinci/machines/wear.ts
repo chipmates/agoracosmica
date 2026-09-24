@@ -138,10 +138,8 @@ const WATER_SCREW: WearRule[] = [
 const AERIAL_SCREW: WearRule[] = [
   {
     parts: id => id === 'platform' || id.startsWith('deck-plank-'),
-    cuts: [
-      { normal: [1, 0, 0], at: range(-1.5, 1.5, .1), facing: [0, 1, 0] },
-      { normal: [0, 0, 1], at: range(-1.5, 1.5, .1), facing: [0, 1, 0] },
-    ],
+    // each plank's top is already sampled along and across it
+    cuts: [],
     tint: (p, n) => {
       if (n.y < .5) return ONE
       const d = Math.hypot(p.x, p.z)

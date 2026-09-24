@@ -226,6 +226,8 @@ function phaseTimber(geometry: BufferGeometry, identity: string): void {
 const isTimber = (slug: string, part: PartSpec): boolean =>
   part.shape === 'box' || (slug === 'rolling-mill' && (part.id === 'left-post' || part.id === 'right-post'))
   || (typeof part.shape !== 'string' && part.shape.type !== 'mesh' && /planed oak/.test(part.material.class))
+  // the aerial screw's deck planks are meshes, sampled for the wear of feet
+  || (slug === 'aerial-screw' && (part.id === 'platform' || part.id.startsWith('deck-plank-')))
 
 /** Construct only the admitted numerical parts. Library sets and shader grain
  * are GENERATED dressing over that metre geometry, never replica textures. */
@@ -279,6 +281,11 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
       roughness: 0.03, normalStrength: 0.008, scale: [1, 1],
       scales: [0.5, 0.025, 0.0009],
       detail: {macro: 0.5, macroContrast: 0.08, mid: 0.025, micro: 0.06},
+    } : /starched/.test(name) ? {
+      // starch stiffens the cloth: its folds are the panels' own hang, built
+      // in the geometry, so the painted fold is held low
+      ...set, normalStrength: .22,
+      grain: set.grain ? {...set.grain, pitch: .16, relief: .18, shade: .2, sheen: .03, fold: .3, tooth: .008} : null,
     } : /linen/.test(name) && !/thread/.test(name) ? {
       // The shaded face of a canopy is lit by the room, not by the sun, so
       // its folds have to be in the albedo as well as in the normal or the
