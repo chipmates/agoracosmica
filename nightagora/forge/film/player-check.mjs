@@ -307,7 +307,9 @@ async function run(engine, width, lang) {
     if (await press(page, '.film-dot[data-exhibit="machine/aerial-screw"]')) {
       await waitState(page, 'walk', 20000)
       await waitState(page, 'rest', 60000)
-      await page.waitForTimeout(6000)
+      // the close look is shot once its table stands: the desktop walks the eye to the plinth first
+      record.stood = await page.waitForFunction(() => window.__naLook?.readout?.()?.standing === true, null, { timeout: 90000, polling: 100 }).then(() => true).catch(() => false)
+      await page.waitForTimeout(2000)
       shots.push(await shot(page, dir, '09-island'))
       // the record, at the sheet's height, from the close look's own control
       const opened = await page.evaluate(() => { const b = document.querySelector('.vitrine-controls button'); if (!b) return false; b.click(); return true })
