@@ -23,7 +23,7 @@
       "prompt": "Bilinear IGN ground from 165 retained samples; explicit A-SITE court, terrace and assumed street cut; three scales of earth and grass; mapped stream. Conjectural exposed-soil clods, erosion variation and shallow normal relief dress declared vertical cut faces without changing their outlines or heights. The library earth-packed map in the exact street corridors with grey-beige mineral drift, filtered aggregate and fine grit; the wheel ruts darker and deeper in relief with pressed lips at their sides. The terrace walk as fine river gravel over packed earth, baked into one filtered tile read wider than its pixel (colour, slope and the slope's second moment with their mips), crowned to shed water, two hand-cart tracks with the gravel pushed up on their lips, coarser stones rolled to the kerbs, worn back where walked; the house court paved with Loire river cobbles set in sand, one colour per stone, mossy toward the wall feet and smooth along the way from the gate to the door. Each retaining face weathers from its own foot and its own coping: rising damp to a wandering tide line, a speckle of splash, runs of rain off the coping and a metre-scale patina; step nosings worn paler where feet cross. Surface recipes only; every sampled height and outline kept. The retaining ashlar takes a tone and a lean to yellow or grey stone by stone, and a damp line where it meets the grass; the modern cut lining weathers as the court stair does.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "f94c40d5ddb7262077aa073b1bb1cf47c05ed1f04238635ad7f300154e810b6b",
+      "sha256": "0b6e2be1821dcfec2e341586e828d9f128d4ad69b7172fa5c706dfe3c8c085e8",
       "note": "IGN Licence Ouverte 2.0; OSM contributors ODbL 1.0; src/wings/vinci/data/terrain.json; recipe_file=src/wings/vinci/ground.ts"
     },
     {
@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed to a pale grey at 30 per cent. Assumed weather, no observation claimed.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "31abb34541aeb0e5b2c713ea55ec18c628800039d4fb4c2f4bced5331d2a066d",
+      "sha256": "0a9f13d469d77bb9a21051f1b740f2d332beb61758ba0721a7fc3820a983718e",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=80c458f2cb5ccddb7fcedccda5df70e5cdccda7d9ca97d65ebfa6462920f61ef;"
     },
     {
@@ -3282,7 +3282,7 @@
       "prompt": "Place the picture module sources on every field of the room's holder-sized wall, including the paired panel reverse, and hang the body wall's admitted Windsor sheets each at the size its holder records, the three without a recorded size at a constant area. No field is withheld: the store's register is the only admission decision, and a work it does not admit leaves the wall. The current holder measurement for the Lansdowne Yarnwinder is 37.1 by 49.5 cm while its earlier layout slot preserves neighbouring placements. Place the admitted Last Supper source within the existing 8.8 by 4.6 metre mural field. Source admission, windows, arch shoulders, decoding and transitions are imported unchanged from the picture module. The room openings and fittings supply the light; the hang's works take the picture room's own heads through their tone, each plane carrying its work's slot, and stand in their frames' rebates. All previews remain present: 512 pixel uploads at calm and standard, 1024 at hero, one distance-earned full source outside calm across both walls. Source pixels are never copied into this repository.",
       "model": "Deterministic TypeScript and TSL exhibition placement",
       "date": "2026-09-14",
-      "sha256": "14b08f3a4549d52ea088984f5567442df82e4a1f51d86c3d614a7660aa04bc4d",
+      "sha256": "4a50687c2bb13832235390370df143af5e143487c222ad9f9a8a6023e57c4dcd",
       "note": "Modern exhibition supports, no historical room claim. recipe_file=src/wings/vinci/collection/plates.ts wall_register=src/wings/vinci/collection/body-wall.ts; streaming bytes and displayed licences resolve through the store manifest.",
       "recipe_files": [
         {
@@ -3633,7 +3633,7 @@
       "prompt": "Under each fallen leaf lying on stone, gravel or earth within 14 m of a stop that sees it, the blade's own outline softened on the stone: a tight dark rim at its edge and a faint skirt beyond, full under the blade so a lifted edge shows shade and not lit stone, standing for the sky the leaf takes from the stone under and around it. Drawn at hero, the film's export included, since its occlusion cannot find a leaf two millimetres thick. Outside the walk's solids and the shadow body.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "525b2dff31851eb7d6813452ba1050f8cbb46af8b59cc952fa2e0d0628b0f8d1",
+      "sha256": "c4be75b5be0621977e2b30cd4ee2356251534d0b69c56bc43830b7d590248507",
       "note": "A-SITE; deterministic museum dressing; recipe_file=src/wings/vinci/vegetation.ts"
     },
     {
@@ -3750,7 +3750,7 @@
       "prompt": "The week's fall of the planted trees as dry leaf cards of each species' outline, cupped and folded as drying leaves curl, coloured from each tree's own fall: a carpet under every crown dropping it, carried north-east by the south-west wind; drifts against every riser, wall foot, kerb (the court's kerb before the house among them), retaining face, the chapel's bay, the grave's tomb and lectern and the supper wall's sill, each run heaped in its own places with bare stone between and some treads swept nearly bare, the wall feet and the kerb of a walked court holding what feet move off it; a clumped scatter, the lane's ruts and gutters, and the walled court's floor in small rafts, most of it in the lee of the walls. Densest where the stops see it. A type of one October week, not a record. Dressing a few centimetres deep on the floors, outside the walk's solids like the moss; the fall the rail certificate was written with is still built, leaf for leaf, on a layer no camera draws, until the next certificate.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "525b2dff31851eb7d6813452ba1050f8cbb46af8b59cc952fa2e0d0628b0f8d1",
+      "sha256": "c4be75b5be0621977e2b30cd4ee2356251534d0b69c56bc43830b7d590248507",
       "note": "A-SITE; FLORA.md; deterministic museum dressing; recipe_file=src/wings/vinci/vegetation.ts"
     },
     {
