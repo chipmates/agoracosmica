@@ -137,11 +137,12 @@ export function createFallingLeaves(sources: readonly FallSource[], count: numbe
   const across = vec3(-Math.cos(bearing), 0, -Math.sin(bearing))
   // it swings across the wind twice a loop and settles as it lands
   const swing = sin(t.mul(TAU * 4 / LOOP_S).add(b.w.mul(TAU))).mul(.35).mul(f.oneMinus())
-  const centre = vec3(a.x, a.y.sub(a.y.sub(a.w).sub(.03).mul(f.pow(1.15))), a.z)
+  const centre = vec3(a.x, a.y.sub(a.y.sub(a.w).sub(.012).mul(f.pow(1.15))), a.z)
     .add(toward.mul(b.y.mul(f))).add(across.mul(swing))
   // whole turns over the loop, flat once it lies on the ground
   const landed = smoothstep(.92, 1, f)
-  const roll = t.mul(TAU / LOOP_S).mul(b.z).mul(landed.oneMinus()), yaw = t.mul(.9).add(b.w.mul(TAU))
+  // a leaf that has landed lies still: its turn stops where it touched down
+  const roll = t.mul(TAU / LOOP_S).mul(b.z).mul(landed.oneMinus()), yaw = t.min(LOOP_S * FALLING).mul(.9).add(b.w.mul(TAU))
   const local = positionLocal
   const rolled = vec3(local.x, local.z.mul(sin(roll)), local.z.mul(cos(roll)))
   const turned = vec3(rolled.x.mul(cos(yaw)).sub(rolled.z.mul(sin(yaw))), rolled.y, rolled.x.mul(sin(yaw)).add(rolled.z.mul(cos(yaw))))

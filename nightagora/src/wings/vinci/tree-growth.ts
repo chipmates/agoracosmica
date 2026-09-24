@@ -15,6 +15,7 @@
    reading, never a record of a tree that stood at Cloux. */
 import { cellUV, LEAF_RECIPES, leafCell, SPRAY_LEAF, sprayCell } from './leaf-maps'
 import { hourKey } from './site'
+import { layBlade } from './leaf-blade'
 
 export type Species =
   | 'walnut' | 'elm' | 'oak' | 'maple' | 'cherry' | 'hornbeam'
@@ -1070,12 +1071,12 @@ export function growTree(spec: TreeSpec, tier: TreeTier, heightAt: (east: number
 
 /** One fallen leaf lying on its ground as a card, its tip lifted a little as
     a drying leaf curls. */
+/** A leaf lying on a floor 2 mm under `groundY`, as a blade (`leaf-blade.ts`);
+    the stone's darkening under it into `contact` when given. */
 export function fallenLeaf(body: Body, species: Species, east: number, north: number, groundY: number, angle: number,
-  length: number, colour: V3, curl: number): void {
-  const dir: V3 = [Math.cos(angle), curl, -Math.sin(angle)]
-  const at: V3 = [east - Math.cos(angle) * length * .5, groundY + .012, -north + Math.sin(angle) * length * .5]
-  const data: LeafData = { colour, ao: .8, phase: 0, leafPhase: 0, flex: 0 }
-  card(body, null, at, norm(dir), [0, 1, 0], length, species, data)
+  length: number, colour: V3, curl: number, contact: Body | null = null): void {
+  layBlade(body, { species, east, north, floor: groundY - .002, angle, length, own: leafLengthOf(species), colour,
+    fold: .14 + curl * 1.5, tilt: 0, ao: .8 }, null, contact)
 }
 
 export function leafLengthOf(species: Species): number { return HABITS[species].leaf.length }

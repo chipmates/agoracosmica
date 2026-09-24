@@ -15,7 +15,7 @@ import {
   BufferAttribute, BufferGeometry, DoubleSide, Float32BufferAttribute, Group, Mesh, MeshBasicNodeMaterial,
   MeshStandardNodeMaterial, PhysicalLightingModel, Uint32BufferAttribute,
 } from 'three/webgpu'
-import { attribute, diffuseColor, normalMap, normalView, positionWorld, texture, uv, vec2, vec3 } from 'three/tsl'
+import { attribute, diffuseColor, frontFacing, normalMap, normalView, positionWorld, texture, uv, vec2, vec3 } from 'three/tsl'
 import { SHADOW_ONLY_LAYER } from '../../stack/light'
 import { leftOutAtCalm } from './calm-tier'
 import { barkMaps, cellUV, contactAtlas, leafAtlas, leafCell, litterAtlas } from './leaf-maps'
@@ -317,7 +317,9 @@ function materials(wind: boolean) {
   litter.alphaToCoverage = true
   litter.name = 'vinci generated fallen leaves'
   litter.userData = { ...PROVENANCE }
-  litter.colorNode = texture(drySet.albedo, uv())
+  // a dry blade's underside is paler and greyer than its face: what a rolled
+  // margin shows of it is the leaf's thickness
+  litter.colorNode = texture(drySet.albedo, uv()).mul(frontFacing.select(vec3(1, 1, 1), vec3(1.34, 1.24, 1.08)))
   litter.normalNode = normalMap(texture(drySet.normal, uv()), vec2(.7, .7))
   if (ENGINE_TERMS) litter.aoNode = attribute('ao', 'float')
   // the leaf's shadow is an opaque triangle inside its outline, drawn only in
@@ -536,7 +538,7 @@ function* grow(group: Group, heightAt: (east: number, north: number) => number, 
         const x = c.cx + Math.cos(a) * c.radius * .85, z = c.cz + Math.sin(a) * c.radius * .85, y = c.y0 + (c.y1 - c.y0) * h
         const landE = x + 2.2, landN = -z + 1.7
         const colour = colours[Math.floor(random() * colours.length)]!
-        sources.push({ x, y, z, ground: heightAt(landE, landN), colour: [colour[0], colour[1], colour[2]], uv: cellUV(leafCell(result.spec.species)) })
+        sources.push({ x, y, z, ground: floorAt(landE, landN), colour: [colour[0], colour[1], colour[2]], uv: cellUV(leafCell(result.spec.species)) })
       }
     }
     group.add(createFallingLeaves(sources, tier === 'hero' ? 64 : 32, leafAtlas().albedo))

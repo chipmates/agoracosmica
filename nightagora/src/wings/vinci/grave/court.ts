@@ -489,7 +489,7 @@ export function growGraveCourtTrees(tier: TreeTier): GraveCourtTrees {
   }
   // THE WEEK'S FALL under the three: most of it in the beds, the rest carried
   // north-east over the flags by the week's wind, drier the further it went
-  const fall = new Body()
+  const fall = new Body(), touch = new Body()
   const random = mulberry(20260924)
   const { colours, weights } = fallenPalette('maple')
   const total = weights.reduce((a, b) => a + b, 0)
@@ -520,7 +520,7 @@ export function growGraveCourtTrees(tier: TreeTier): GraveCourtTrees {
         if (inOther) continue
       }
       const length = (.075 + random() * .05) * grow
-      fallenLeaf(fall, 'maple', e, n, ground + .002, random() * Math.PI * 2, length, pick(random() * (inBed ? .8 : 1)), .04 + random() * .12)
+      fallenLeaf(fall, 'maple', e, n, ground + .002, random() * Math.PI * 2, length, pick(random() * (inBed ? .8 : 1)), .04 + random() * .12, inBed ? null : touch)
     }
   }
   const meshes: Mesh[] = []
@@ -542,6 +542,10 @@ export function growGraveCourtTrees(tier: TreeTier): GraveCourtTrees {
     if (s) { s.receiveShadow = false; s.layers.set(SHADOW_ONLY_LAYER); add(s) }
   }
   add(vegetationMesh(fall, mats.litter, 'vinci/grave-court/maple fall', false))
+  // the flags' darkening under each lying leaf, drawn over the paving
+  const contact = vegetationMesh(touch, mats.contact, 'vinci/grave-court/maple fall contact', false)
+  if (contact) { contact.receiveShadow = false; contact.renderOrder = 1 }
+  add(contact)
   group.add(...meshes)
   let triangles = 0
   for (const mesh of meshes) triangles += (mesh.geometry.getIndex()?.count ?? 0) / 3

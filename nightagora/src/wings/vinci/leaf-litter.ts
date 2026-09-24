@@ -21,6 +21,7 @@ import { cellUV, CONTACT_PAD, LEAF_RECIPES, leafCell } from './leaf-maps'
 import { Body, fallenPalette, leafLengthOf, mulberry, type Species, type TreeResult, type TreeTier } from './tree-growth'
 import { terrainSteps } from './terrain-mesh'
 import { dossier, polygon, type Quantity } from './site'
+import { layBlade } from './leaf-blade'
 
 type V2 = [number, number]
 type V3 = [number, number, number]
@@ -524,10 +525,15 @@ interface Leaf {
   floor: number
 }
 
+/** Within this reach of a stop's eye a lying leaf is a blade, not a card:
+    rolled at its margins, curled at its tip, lying on its midrib. */
+const BLADE_REACH = 7.5
+
 /** One fallen leaf, lying on its floor or leaning on a face: a card of its
     species' outline, folded along the midrib as a drying leaf folds, its tip
     curling up a little. */
 function lay(target: Target, leaf: Leaf): void {
+  if (leaf.folded && !leaf.leanTo && stopDistance(leaf.east, leaf.north) < BLADE_REACH) { nearBlade(target, leaf); return }
   const body = target.leaves
   const recipe = LEAF_RECIPES[leaf.species]
   const hw = Math.min(.5, .5 * recipe.width * 1.08 + .02)
@@ -622,6 +628,26 @@ function lay(target: Target, leaf: Leaf): void {
       contact.wind.push4(0, 0, 0, 0)
     }
     contact.index.push3(c0, c0 + 2, c0 + 1); contact.index.push3(c0, c0 + 3, c0 + 2)
+  }
+}
+
+/** A leaf near a stop's eye, laid as a blade (`leaf-blade.ts`): its
+    shadow triangle where it casts, its contact where it lies on stone a
+    stop sees. */
+function nearBlade(target: Target, leaf: Leaf): void {
+  const touches = leaf.hard && stageWeight(leaf.east, leaf.north) > .15
+  const own = leafLengthOf(leaf.species)
+  // a card drawn larger than its leaf, to keep a far drift's cover, is laid
+  // near the eye as the leaves of its own size that cover as much
+  const many = Math.max(1, Math.min(3, Math.round(Math.pow(leaf.length / (own * 1.17), 2))))
+  const random = mulberry(placeSeed(leaf.east, leaf.north, 0xb1ade))
+  for (let k = 0; k < many; k++) {
+    const a = random() * Math.PI * 2, r = k === 0 ? 0 : leaf.length * (.35 + random() * .4)
+    const e = leaf.east + Math.cos(a) * r, n = leaf.north + Math.sin(a) * r
+    layBlade(target.leaves, {
+      species: leaf.species, east: e, north: n, floor: leaf.floor, y: leaf.y, angle: k === 0 ? leaf.angle : random() * Math.PI * 2,
+      length: leaf.length, own, colour: leaf.colour, fold: leaf.fold, tilt: leaf.tilt, ao: leaf.ao,
+    }, leaf.casts ? target.shadow : null, touches ? target.contact : null)
   }
 }
 
