@@ -248,6 +248,12 @@ const visitorWords: Record<string, VisitorWords> = {
     sourceEn: 'The Royal Collection’s records and image terms.',
     sourceDe: 'Die Bestandsangaben und Bildrechte der Royal Collection.',
   },
+  'body-wall': {
+    en: 'Museums show drawings in low light, because light harms paper. This oak wall was built new for these copies.',
+    de: 'Museen zeigen Zeichnungen in gedämpftem Licht, denn Licht schadet Papier. Diese Eichenwand wurde neu für diese Kopien gebaut.',
+    sourceEn: 'The Canadian Conservation Institute\u2019s advice on light for works on paper.',
+    sourceDe: 'Die Hinweise des Canadian Conservation Institute zum Licht für Arbeiten auf Papier.',
+  },
   'burial-record': {
     en: 'Accounts place his burial at Saint-Florentin, a church that was later demolished.',
     de: 'Berichte nennen Saint-Florentin als seinen Begräbnisort, eine später abgerissene Kirche.',
@@ -437,6 +443,13 @@ const body = statement('anatomy-absence',
   'About six hundred of his sheets are at Windsor, and twenty-nine of them hang here. Of 538 catalogued sheet groups the rights review admitted a faithful public reproduction for 389 and found none it may show for 149.',
   'Etwa sechshundert seiner Blätter befinden sich in Windsor, neunundzwanzig davon hängen hier. Von 538 verzeichneten Blattgruppen ließ die Rechteprüfung für 389 eine getreue öffentliche Reproduktion zu und fand für 149 keine, die sie zeigen darf.',
   'documented', 'document', 'brief/CONCEPT-OPUS.md §3 S17; the rights review of 2026-09-14');
+const bodyWall: VinciStatement = {
+  ...statement('body-wall',
+    'The cabinet of drawings is modern museum furniture, built new for this museum in oak and linen: a deep panelled wall with the hang set into its thickness, each sheet in a pale linen mat and a thin oak frame, and a plan chest with a bronze rail before it. It holds faithful public reproductions of drawings kept in the Royal Collection at Windsor. Twenty-six sheets hang at the size the holder records, and three whose holder entry is not online hang at a set size. Its lamps are kept low, as museums light works on paper: the Canadian Conservation Institute gives 50 lux for them. Nothing of it claims to be of his time.',
+    'Das Zeichnungskabinett ist ein modernes Museumsmöbel, für dieses Museum neu in Eiche und Leinen gebaut: eine tiefe getäfelte Wand, in deren Stärke die Hängung sitzt, jedes Blatt in einem hellen Passepartout aus Leinen und einem schmalen Eichenrahmen, davor ein Planschrank mit einer Stange aus Bronze. Es zeigt getreue öffentliche Reproduktionen von Zeichnungen aus der Royal Collection in Windsor. Sechsundzwanzig Blätter hängen in der Größe, die ihre Sammlung verzeichnet, drei ohne online verfügbaren Eintrag in einer festen Größe. Die Leuchten sind niedrig gehalten, wie Museen Arbeiten auf Papier beleuchten: das Canadian Conservation Institute nennt dafür 50 Lux. Nichts davon beansprucht, aus seiner Zeit zu stammen.',
+    'reconstructed', 'carrier', 'collection/body-wall-cabinet.ts and body-wall-plan.ts, the cabinet; data/sheet-sizes.json, the three sheets without a size; refs/push-research-2026-09-22/MUSEUM-ARCH.md, the light levels for paper'),
+  carrier: 'vinci/collection-body-wall',
+};
 /* THE PAINTING AT THE GRAVE. The words are the museum's own record of that
    story, so they are read from it rather than written again here. It carries
    no visitor wording of its own: the record IS the plain sentence. */
@@ -586,7 +599,7 @@ const seeds: readonly StationSeed[] = [
       de: 'Sein Großvater verzeichnete die Geburt am 15. April 1452.' },
     [scattered], 'brief/CONCEPT-GPT6.md Station 02; brief/CONCEPT-OPUS.md §3 S8'),
   seed('body', { en: 'The body as a machine', de: 'Der Körper als Maschine' }, body,
-    [body], 'brief/CONCEPT-OPUS.md §3 S17'),
+    [body, bodyWall], 'brief/CONCEPT-OPUS.md §3 S17'),
   seed('reading-table', { en: 'The reading table', de: 'Der Lesetisch' }, readingTable,
     [readingTable, readingRoom], 'brief/CONCEPT-GPT6.md Station 10; brief/CONCEPT-OPUS.md §3 S13'),
   seed('supper-wall', { en: 'The wall that is not here', de: 'Die Wand, die nicht hier ist' },
