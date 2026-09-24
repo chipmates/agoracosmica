@@ -20,10 +20,25 @@
 import { cellUV, CONTACT_PAD, LEAF_RECIPES, leafCell } from './leaf-maps'
 import { Body, fallenPalette, leafLengthOf, mulberry, type Species, type TreeResult, type TreeTier } from './tree-growth'
 import { terrainSteps } from './terrain-mesh'
-import { dossier, type Quantity } from './site'
+import { dossier, polygon, type Quantity } from './site'
 
 type V2 = [number, number]
 type V3 = [number, number, number]
+
+/** inside the house's entrance court or on the flagged walk within 3.6 m
+    beyond its edges, where its kerb and the house's feet stand */
+const COURT = polygon('courtyard') as V2[]
+function nearCourt(p: V2): boolean {
+  let area = 0
+  for (let i = 0; i < COURT.length; i++) { const a = COURT[i]!, b = COURT[(i + 1) % COURT.length]!; area += a[0] * b[1] - b[0] * a[1] }
+  let d = Infinity
+  for (let i = 0; i < COURT.length; i++) {
+    const a = COURT[i]!, b = COURT[(i + 1) % COURT.length]!, dx = b[0] - a[0], dn = b[1] - a[1], span = Math.hypot(dx, dn)
+    const inward: V2 = area > 0 ? [-dn / span, dx / span] : [dn / span, -dx / span]
+    d = Math.min(d, (p[0] - a[0]) * inward[0] + (p[1] - a[1]) * inward[1])
+  }
+  return d > -3.6
+}
 
 /** The eyes of the outdoor stops (east, north) and where each looks: the
     ground is dressed densest where a stop sees it. */
@@ -313,10 +328,12 @@ export function layLitter(plan: LitterPlan): LitterCounts {
     // a drift is laid in full where a stop sees it close, thinly beyond; in
     // a walled court all that comes over the walls ends at a foot
     const walledIn = underFloor(mid) ? 3.4 : 1
-    // feet move what falls on a walked court to its edges: a wall foot or a
-    // kerb standing on a walked floor holds that too (a stair's own treads
-    // are walked across, not beside)
-    const lee = c.built && plan.walked(mid[0] + c.low[0] * .15, mid[1] + c.low[1] * .15) ? 2.6 : 1
+    // feet move what falls on the walked court to its edges: a wall foot or a
+    // kerb standing on it or on the flagged walk beside it holds that too (a
+    // stair's own treads are walked across, not beside; the street keeps its
+    // own drifts, the arrival's budget has no room for more)
+    const foot: V2 = [mid[0] + c.low[0] * .15, mid[1] + c.low[1] * .15]
+    const lee = c.built && plan.walked(foot[0], foot[1]) && nearCourt(foot) ? 2.6 : 1
     const perMetre = (15 + 40 * here.amount) * facing * tall * stage * stage * walledIn * lee
     const count = Math.round(perMetre * span * keep * 1.1 * mean / Math.max(1e-6, peak) * 1.6)
     const depthOf = clamp01(perMetre / 90)
