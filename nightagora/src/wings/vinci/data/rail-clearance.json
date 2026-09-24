@@ -456,8 +456,8 @@
   },
   {
    "file": "src/wings/vinci/machines/data/multi-barrel-gun.json",
-   "sha256": "8403329bac6e20765dd7aa65da97fccad3962c327311f89d1eba24a5d24269db",
-   "bytes": 214483,
+   "sha256": "d2d6e027ee2138a0201b15580cbfed962e176014232a2bc670477c91707c7a9b",
+   "bytes": 214518,
    "unchangedDuringAudit": true
   },
   {

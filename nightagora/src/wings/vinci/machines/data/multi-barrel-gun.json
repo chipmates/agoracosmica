@@ -30,7 +30,7 @@
     "z": 3.2,
     "certainty": "C",
     "source": "A1",
-    "note": "Conservative swept bounds X [-1.25, 1.25], Y [0, 2.55], Z [-2, 1.2]. The widest turning radius about the shaft is the breech battens' outer corner, sqrt(0.605^2+0.49^2)=0.7786 m; it reaches world Y 0.6814, 0.0414 m above the bed. Moving X extent is [-1.17, 1.17], the hand bar sweeping a radius of 0.33 at X [1.078, 1.17]. Strake bottom is Y=0, trails reach Z=-1.98."
+    "note": "Conservative swept bounds X [-1.25, 1.25], Y [0, 2.55], Z [-2, 1.2]. The widest turning radius about the shaft is the breech battens' outer corner, sqrt(0.605^2+0.49^2)=0.7786 m; it reaches world Y 0.6814, 0.0414 m above the bed. Moving X extent is [-1.17, 1.17], the hand bar sweeping a radius of 0.33 at X [1.078, 1.162] and its forelock reaching X 1.172. Strake bottom is Y=0, trails reach Z=-1.98."
   },
   "frame": {
     "handedness": "right",
