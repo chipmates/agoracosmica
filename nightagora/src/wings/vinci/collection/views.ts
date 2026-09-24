@@ -140,10 +140,11 @@ export function collectionView(id: string, narrow: boolean): RoomPose | undefine
     // THE WORKS ARE READ FROM SOUTH OF THE AISLE. On the aisle's own line the
     // water screw stood within five degrees of the aerial screw behind it, and
     // its coil crossed the lit sail; 2.6 m south the coil runs under the sail
-    // against the shaded wall, and the frame turns three degrees south of the
-    // screw so the lathe leaves its edge instead of being sliced by it.
+    // against the shaded wall. The frame closes to 61 degrees and turns north
+    // until the lathe leaves its right edge whole; the rolling mill's plinth
+    // and the lock gates' platform stand inside its two edges.
     case 'collection-room-hall':
-      return pose(-42.9, -48.1, EYE + .7, -50.631, -45.801, FLOOR + 2.0, narrow ? 84 : 66, 1.3)
+      return pose(-42.9, -48.1, EYE + .7, -50.66, -46.2, FLOOR + 1.9, narrow ? 84 : 61, 1.3)
     case 'collection-room-hall-screw':
       return pose(-46.5, -48.8, EYE, -54.5, -46.4, FLOOR + 3.1, narrow ? 78 : 62, 1.5)
     // The long gallery, down the line.

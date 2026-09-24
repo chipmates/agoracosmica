@@ -47,13 +47,14 @@ const PHONE_STAGE=390/844
  * centred by yaw before anything else: the flight station turns four and a
  * half degrees south of its room's aim and holds the screw level, which
  * stands the whole sail inside the frame with a tenth of it spare either
- * side. The works station turns eight degrees north of its own aim and looks
- * fourteen down, so the water screw owns the frame and the rolling mill stands
- * whole at its right. Both keep the room's own eye. Heading from north and
- * pitch, in degrees. */
+ * side. The works station holds the aerial screw's whole sail behind the water
+ * screw: the sail is 9.4 m across and stands seven metres beyond the screw, so
+ * any narrower lens slices it at the left edge or the rolling mill at the
+ * right. Both keep the room's own eye. Heading from north and pitch, in
+ * degrees. */
 const HALL_PHONE:Partial<Record<VinciStationId,{heading:number;pitch:number;fov:number}>>={
   flight:{heading:-77.7994,pitch:.5488,fov:78.12},
-  works:{heading:-62.4499,pitch:-14.396,fov:83.16},
+  works:{heading:-67,pitch:-14,fov:104},
 }
 function aimedFrom(pose:Pose,heading:number,pitch:number,fov:number):Pose {
   const h=heading*Math.PI/180,t=pitch*Math.PI/180
@@ -99,24 +100,32 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // down it at the west windows the hour's sun comes through; the wide frame
   // turns four degrees onto the table and holds the whole west wall.
   if(id==='hall') return narrow?aimedFrom(HALL_DOOR,-123,-11,74):aimedFrom(HALL_DOOR,-119,-4,52)
-  if(id==='oratory') return narrow?p(5.6,-21.3,1.65,3.053,-18.288,1.98,60):p(5.6,-21.3,1.65,3.053,-18.288,2.9,46)
+  // The phone stands 1.5 m further back on the window's own axis: from the
+  // desktop's eye its lower half was bare ashlar, and from here the paving and
+  // the leaves banked at the wall's foot come into the frame under the window.
+  if(id==='oratory') return narrow?p(6.57,-22.45,1.65,3.053,-18.288,1.555,64):p(5.6,-21.3,1.65,3.053,-18.288,2.9,46)
   // The study holds two things at once now: the window of the room the visit
   // was written in, and the support under it the page is read at. The phone
   // stands 2.8 m east of the desktop's eye, where its frame holds the whole
-  // gable and the trees past the house's west corner instead of brick alone.
-  if(id==='study') return narrow?p(5.2,-29.8,1.65,-3.183,-24.914,4.0692,90):p(2.4,-29.3,1.65,-1.94,-22.848,2.74,60)
+  // gable and the trees past the house's west corner instead of brick alone,
+  // turned onto the gable and lifted so the house stands in the middle of the
+  // frame rather than high at its right over a third of cobble.
+  if(id==='study') return narrow?p(5.2,-29.8,1.65,-2.5911,-24.3447,4.7402,84):p(2.4,-29.3,1.65,-1.94,-22.848,2.74,60)
   // The royal château stands 590 m away on a bearing of 308.84 degrees, which
   // from this end of the court runs over the house's west corner and down the
-  // valley. The aim is that bearing; nothing of the castle is built.
-  // The phone turns twenty degrees onto the house and looks up eleven: on the
-  // castle's own line its narrow frame kept a sliver of the west face at its
-  // margin, and the face now runs from the corner to the north end whole.
-  if(id==='chamber') return narrow?p(-4.2,-32.4,1.65,-9.4018,-24.0753,3.5581,92):p(-4.2,-32.4,1.65,-21.33,-18.59,.6,46)
+  // valley; nothing of the castle is built, and its line stays in both frames.
+  // Both turn onto the house and look up: on the castle's own line the frame
+  // kept a sliver of the west face at its margin, and the face now runs from
+  // the corner to the north end whole. The desktop stops short of the mural's
+  // pavilion on its left and of the gable's windows on its right.
+  if(id==='chamber') return narrow?p(-4.2,-32.4,1.65,-9.4018,-24.0753,3.5581,92):p(-4.2,-32.4,1.65,-9.4915,-24.0941,3.3865,46)
   // R19 accepted: actual apron paving +1.65 m; all eight principal windows clear vegetation.
   // The phone looks up eleven degrees, not twenty-three: a third of its frame
   // was sky and the house stood low, where the card is. The lens is opened
-  // until the whole front stands clear of both edges.
-  if(id==='garden') return narrow?p(-24.5,-31.2,-4.790000057220459,-17.1936,-24.6444,-2.8819,92):p(-24.5,-31.2,-4.790000057220459,-8.7,-16.6,6.2,62)
+  // until the whole front stands clear of both edges. The desktop looks up
+  // eighteen, not twenty-seven, so the steps climb into the house and the sky
+  // no longer takes a third of the frame.
+  if(id==='garden') return narrow?p(-24.5,-31.2,-4.790000057220459,-17.1936,-24.6444,-2.8819,92):p(-24.5,-31.2,-4.790000057220459,-17.5105,-24.7503,-1.6998,62)
   // THE COLLECTION'S NINE STAND IN THEIR OWN ROOMS, at the eye the module's
   // own room views were composed from. A room is entered through its door and
   // seen from where a visitor would stand to read it.
