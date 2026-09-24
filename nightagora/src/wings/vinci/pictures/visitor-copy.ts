@@ -72,8 +72,8 @@ const NOTES: Readonly<Record<string, PictureBilingual>> = {
     de: 'Leonardos ursprüngliches Bildfeld ist 113 cm breit. Die Holztafel wurde später auf 130 cm verbreitert, und dieser Raum zeigt das ursprüngliche Bildfeld.',
   },
   'mona-lisa': {
-    en: 'This is a historical printed reproduction, not the painting. Its date is uncertain, and it cannot show the painting’s colour.',
-    de: 'Dies ist eine alte Druckwiedergabe, nicht das Gemälde. Ihr Datum ist ungewiss, und die Farben zeigt sie nicht.',
+    en: 'This is a historical printed reproduction, not the painting. Its publication date is uncertain, and it cannot establish the painting’s colour.',
+    de: 'Dies ist eine alte Druckwiedergabe, nicht das Gemälde. Ihr Erscheinungsdatum ist ungewiss, und die Farben des Gemäldes kann sie nicht belegen.',
   },
   'saint-john-the-baptist': {
     en: 'A late painting by Leonardo on walnut. The photograph was taken at the Louvre Abu Dhabi.',

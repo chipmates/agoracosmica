@@ -383,7 +383,10 @@ test('Signature absence is plain and grey while the available historical print r
   const notes = byClass(printed, 'picture-reason')[0].textContent
   assert.match(notes, /publication date is uncertain/)
   assert.match(notes, /cannot establish the painting’s colour/)
-  assert.match(byClass(printed, 'picture-reason-de')[0].textContent, /Erscheinungsdatum ist ungewiss/)
+  const notesDe = byClass(printed, 'picture-reason-de')[0].textContent
+  assert.match(notesDe, /Erscheinungsdatum ist ungewiss/)
+  // The plate is a colour print: it shows colours, it cannot vouch for the painting's.
+  assert.match(notesDe, /Farb\p{L}* des Gemäldes (?:kann sie )?nicht belegen/u)
 })
 test('Actual signature Sources offers the historical print and preserves its deliberately opened full record', () => {
   const state = mountBenchLabel(mona, monaSources.mainPlates, false, { segmentId: 'signature', documentOnlyIds: ['mona-lisa'] })

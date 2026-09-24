@@ -3260,7 +3260,7 @@
       "prompt": "Bilingual museum readings of the supplied collection and admitted source records. Keep attribution and photographic uncertainty explicit, name collections plainly, and keep exact measurements, licence lines, file identifiers and machine evidence in the deliberately opened complete record. No additional historical claim from generated imagery.",
       "model": "Human-readable text composition from supplied records",
       "note": "Museum wording authorized by window 3. recipe_file=src/wings/vinci/pictures/visitor-copy.ts",
-      "sha256": "2be0ff498b5d8a03f66fa5cc68611c44ff2a6d1b4a5e50d24ac3498748ef094f"
+      "sha256": "2eb21d5877ab85a38e18934755e4e72fc8880e95e004e10bdc9b18019c49c9f1"
     },
     {
       "wing": "vinci",
