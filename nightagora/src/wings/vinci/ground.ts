@@ -6,14 +6,14 @@ import type { TierName } from '../../stack'
 import { roadSurfaceNode } from './road-dressing'
 import { facadeDistance, foundationVisibility } from './foundation'
 import { partitionDressing } from './dressing-partition'
-import { collectionConcreteMaterial, collectionProvenance } from './collection'
+import { collectionConcreteMaterial, collectionLayout, collectionProvenance } from './collection'
 import { collectionAccessProvenance, weatherCourtConcrete } from './collection-access'
 import { anisotropicFootprint, coursedFace, dressedTuffeau } from './masonry-courses'
 import { fractalField, resolved, specularAA } from '../../stack/detail'
-import { applyYardFinish } from './ground-finish'
+import { applyYardFinish, roadChip } from './ground-finish'
 
 // TSL graphs retain three independent scales, even on calm's complete ground.
-const { attribute, positionWorld, positionView, normalWorldGeometry, cameraViewMatrix, mx_noise_float, mix, vec3, float, smoothstep, length, cameraPosition, normalMap, vec2, uv, fract, floor, dot, sin, cos } = TSL
+const { attribute, positionWorld, positionView, normalWorldGeometry, cameraViewMatrix, mx_noise_float, mix, vec3, float, smoothstep, length, cameraPosition, normalMap, vec2, vec4, uv, fract, floor, dot, sin, cos } = TSL
 function rgb(hex:string) { const c=new Color(hex); return vec3(c.r,c.g,c.b) }
 /** WHERE ON ITS OWN FACE a retaining triangle lies: metres above the face's
  * foot and metres below its head. A wall weathers from its own foot and its
@@ -219,7 +219,20 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     m.normalNode=viewNormal.sub(gradient.div(length(gradient).div(.32).max(1))).normalize()
     m.userData['retainingAppearance']='GENERATED reconstruction choice: hand-laid coursing near .62 × .30 m, courses and blocks each varying by a third [.45–.80 × .24–.38], 15 mm joints [8–20], shallow joint relief. Continuous world tangent, block variation, 4m weather drift, 6cm cleft and filtered4.5mm pores. Q001/Q124 masonry character; no measured historic retaining-wall bond or texture.'
   }
-  if(library&&kind==='grass'){const maps=library.sync('grass-short').sample({uv:uv(),metres:1.4,turn:.19});const grain=dot(maps.albedo,vec3(.2126,.7152,.0722)).clamp(.4,1.7);m.colorNode=m.colorNode!.mul(mix(float(1),grain,.62));m.normalNode=normalMap(vec3(maps.normal.xy.mul(.5),1).normalize().mul(.5).add(.5),vec2(.5,.5));m.roughnessNode=specularAA(maps.roughness.mul(.08).add(.87),swardLost)}
+  if(library&&kind==='grass'){
+    // ONE PHOTOGRAPH OF SWARD REPEATS AS ONE STREAK. Two readings of it at
+    // their own sizes and turns, handed over across the ground by a slow
+    // field, so no repeat of either lines up over a lawn
+    const set=library.sync('grass-short')
+    const a=set.sample({uv:uv(),metres:1.4,turn:.19}),b=set.sample({uv:uv(),metres:2.3,turn:1.37,offset:[.37,.61]})
+    const hand=smoothstep(-.25,.25,mx_noise_float(P.mul(vec3(.31,.2,.31)).add(vec3(2.1,7.3,5.5))))
+    const lum=(c:ReturnType<typeof vec3>)=>dot(c,vec3(.2126,.7152,.0722)).clamp(.4,1.7)
+    const grain=mix(lum(a.albedo),lum(b.albedo),hand)
+    m.colorNode=m.colorNode!.mul(mix(float(1),grain,.62))
+    const tilt=mix(a.normal,b.normal,hand) as unknown as ReturnType<typeof vec3>
+    m.normalNode=normalMap(vec3(tilt.x.mul(.5),tilt.y.mul(.5),1).normalize().mul(.5).add(.5),vec2(.5,.5))
+    m.roughnessNode=specularAA(mix(a.roughness,b.roughness,hand).mul(.08).add(.87),swardLost)
+  }
   if(kind==='grass'){
     // October below a manor: rough sward, not a mown lawn. Tussocks at about
     // a metre, bleached dry ground between them, and thin scrapes where the
@@ -233,6 +246,17 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     const clump=mx_noise_float(P.mul(vec3(2.9,1.2,2.9)).add(vec3(3.7,1.9,8.3))).clamp(-1,1).mul(shows(1/2.9))
     m.colorNode=mix(m.colorNode!,rgb('#9d9670'),dry.mul(.42)).mul(float(1).sub(scrape.mul(.10))).mul(clump.mul(.055).add(1))
     m.colorNode=mix(m.colorNode!,rgb('#8a7d63'),scrape.mul(.42))
+    // A THIRD SCALE A STRIDE ACROSS: clover in low dark-green cushions, and
+    // bare scuffs where a heel has turned the sward; both more of them where
+    // the lawn meets the garden flight, which is where it is walked
+    const flight=collectionLayout.stair,toFlight=vec2(P.x.sub(flight.east).abs().sub(flight.width/2+.14).max(0),
+      P.z.negate().sub((flight.north+flight.south)/2).abs().sub((flight.north-flight.south)/2).max(0)).length()
+    const trodden=float(1).sub(smoothstep(.4,4.5,toFlight))
+    const clover=smoothstep(.22,.55,mx_noise_float(P.mul(vec3(3.3,1,3.3)).add(vec3(1.7,4.4,9.1)))).mul(shows(.3))
+    const scuff=smoothstep(.42,.7,mx_noise_float(P.mul(vec3(2.1,1,2.1)).add(vec3(6.3,2.2,.8))).add(trodden.mul(.35))).mul(shows(.45))
+    m.colorNode=mix(m.colorNode!,rgb('#3d6230'),clover.mul(.45).mul(float(1).sub(trodden.mul(.5))))
+    m.colorNode=mix(m.colorNode!,rgb('#806c4f'),scuff.mul(.6))
+    m.colorNode=mix(m.colorNode!,rgb('#8e8a60'),trodden.mul(.3))
     // THE FAR GROUND IS WORKED LAND. A slope above a manor in October is a
     // mosaic of plots at the scale a person walks, divided by banks: without
     // that, distance is one green and the haze does all the work. Conjectural
@@ -331,16 +355,22 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     // Reuse the already sampled CC0 earth set. Its luminance ratio retains
     // real grain without importing the preview's moss colour or new maps.
     const ratio=earthMaps?dot(earthMaps.albedo,vec3(.2126,.7152,.0722)).clamp(.45,1.7):float(1)
-    m.colorNode=mix(m.colorNode!,road.colour.mul(mix(float(1),ratio,.88)),mask)
+    // bedded stones where the wheels and feet have not swept them out; the
+    // wall foot's gutter holds none
+    const chip=roadChip(road.wear.max(channel))
+    m.colorNode=mix(m.colorNode!,road.colour.mul(mix(float(1),ratio,.88)).mul(chip.tone),mask)
     m.colorNode=mix(m.colorNode!,rgb('#4e4a3e').mul(silt.mul(.34).add(.83)),channel.mul(.62))
     m.colorNode=mix(m.colorNode!,rgb('#8f886f').mul(silt.mul(.22).add(.9)),kerb.mul(.5))
-    m.roughnessNode=mix(m.roughnessNode! as ReturnType<typeof float>,road.roughness,mask)
+    m.roughnessNode=mix(m.roughnessNode! as ReturnType<typeof float>,specularAA(road.roughness,chip.variance.mul(.5).sqrt()),mask)
     m.roughnessNode=mix(m.roughnessNode! as ReturnType<typeof float>,float(.62),channel.mul(.45))
     const h=road.height.sub(channel.mul(.028)).add(kerb.mul(.022)).toVar(),n=normalWorldGeometry.transformDirection(cameraViewMatrix)
     const sx=positionView.dFdx(),sy=positionView.dFdy(),rx=sy.cross(n),ry=n.cross(sx),det=sx.dot(rx)
     const gradient=rx.mul(h.dFdx()).add(ry.mul(h.dFdy())).mul(det.sign()).div(det.abs().max(1e-10))
     const base=m.normalNode! as ReturnType<typeof vec3>,bounded=gradient.div(length(gradient).div(.42).max(1))
     m.normalNode=mix(base,base.sub(bounded).normalize(),mask).normalize()
+    // a tilt, not a direction: never normalised, so a flat chip adds nothing
+    const chipTilt=cameraViewMatrix.mul(vec4(chip.slope.x.negate(),0,chip.slope.y.negate(),0)).xyz
+    m.normalNode=(m.normalNode as ReturnType<typeof vec3>).add(chipTilt.mul(mask)).normalize()
     // A rut is a groove: it sees less of the sky than the crown beside it.
     // Occlusion on the indirect term is what lets the tracks read where the
     // road lies in the wall's own shade, which is most of this street.
