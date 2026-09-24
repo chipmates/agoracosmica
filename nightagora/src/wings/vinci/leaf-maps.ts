@@ -222,11 +222,12 @@ export function contactAtlas(): DataTexture {
     }
     const rim = blur(cover, 1, 2), skirt = blur(cover, 4, 3)
     for (let y = 0; y < C; y++) for (let x = 0; x < C; x++) {
-      // hollow under the blade's middle: where the depth test cannot part
-      // the stone's darkening from the leaf a hair above it, the leaf keeps
-      // its own colour and only its margin darkens
-      const r = rim[y * C + x]!, deep = Math.min(1, Math.max(0, (r - .7) / .28))
-      const v = Math.min(1, r * 1.9 + skirt[y * C + x]! * .75) * (1 - .85 * deep * deep)
+      // full under the blade: a lifted or curled blade shows the stone under
+      // its edge, and a hollow there read as a lit crescent under the leaf.
+      // The leaf stands 2 mm or more over this card, which the depth test
+      // parts within the 14 m the card is drawn at.
+      const r = rim[y * C + x]!
+      const v = Math.min(1, r * 1.9 + skirt[y * C + x]! * .75)
       data[((oy + y) * W + ox + x) * 4 + 3] = Math.round(v * 255)
     }
   }
