@@ -185,6 +185,26 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
   /** every hand-over as it happened, for the rigs: how long a press waited for its first
       frame, which frame was on screen when the clip was shown, how the end was handed back */
   const readouts: Record<string, unknown>[] = []
+  /** THE NEXT VIDEO, ARMED: the gold way's clip on the idle element while the visitor
+      reads, so its decoder is running before the press */
+  let armed: { url: string; objectUrl: string; video: HTMLVideoElement } | null = null
+  function arm(url: string, blob: Blob): void {
+    if (busy || playing) return
+    if (armed?.url === url) return
+    disarm()
+    const video = idleVideo()
+    const objectUrl = URL.createObjectURL(blob)
+    video.preload = 'auto'
+    video.src = objectUrl
+    video.dataset['src'] = objectUrl
+    video.load()
+    armed = { url, objectUrl, video }
+  }
+  function disarm(): void {
+    if (!armed) return
+    if (playing?.video !== armed.video) { tearDown(armed.video); URL.revokeObjectURL(armed.objectUrl) }
+    armed = null
+  }
   const listeners = new Map<PictureEvent, Set<(s: PictureState) => void>>()
   const held = new Map<string, Held>()
   const tracks = new Map<string, Promise<CameraPrint[] | null>>()
@@ -382,6 +402,9 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
   async function bytesInTime(edge: FilmEdgeRecord, f: PictureFraming, target: PictureNode): Promise<string | null> {
     const file = clipFile(edge, f)
     if (!file) return null
+    // the armed element already holds these bytes and is decoding them
+    if (armed?.url === file.url) { const src = armed.objectUrl; armed = null; return src }
+    disarm()
     const h = held.get(file.url)
     if (h?.blob) return URL.createObjectURL(h.blob)
     set({ kind: 'wait', from: edge.from, to: edge.to, target, clip: edge.id, share: 0 }, 'wait')
@@ -435,7 +458,10 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
     const arrived = arrival ? decode(arrival) : Promise.resolve()
     const src = await bytesInTime(edge, f, target)
     if (!src || disposed) return false
-    const video = idleVideo()
+    /* THE PRESS IS ANSWERED AT ONCE: the walk begins for the chrome now, and the
+       picture moves when the clip's first frame is presented over its own still */
+    set({ kind: 'walk', from: edge.from, to: edge.to, target, clip: edge.id, share: 0 }, 'depart')
+    const video = [...videos].find(v => v.dataset['src'] === src) ?? idleVideo()
     if (video.src !== src) {
       video.preload = 'auto'
       video.src = src
@@ -455,11 +481,11 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
     watchFrames(video)
     await firstFrame(video)
     video.classList.add('shown')
+    set({ kind: 'walk', from: edge.from, to: edge.to, target, clip: edge.id, share: 0 })
     const record: Record<string, unknown> = { clip: edge.id, framing: f, rung: rungNow(f), src: src.startsWith('blob:') ? 'bytes' : 'network',
       pressToShownMs: Math.round(performance.now() - pressed), shownAtMediaTime: Math.round(video.currentTime * 1000) / 1000,
       stillUnder: still.currentSrc.replace(/^.*\//, '') }
     readouts.push(record)
-    set({ kind: 'walk', from: edge.from, to: edge.to, target, clip: edge.id, share: 0 }, 'depart')
     await new Promise<void>(resolve => {
       // a clip that never says it ended is ended by its own length, and a little air
       const bound = setTimeout(() => done(), ((video.duration || 30) / Math.max(0.25, video.playbackRate) + 3) * 1000)
@@ -623,7 +649,7 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
       for (const node of nodes.slice(0, 2)) {
         const edge = firstClip(node, f)
         const file = edge ? clipFile(edge, f) : null
-        if (file) void fetchWhole(file.url, file.bytes)
+        if (file) void fetchWhole(file.url, file.bytes).then(blob => { if (blob && node === nodes[0]) arm(file.url, blob) })
         const arrival = edge ? stillFile(edge.to, f) : null
         if (arrival) void decode(arrival)
         if (edge) void trackOf(edge, f)
@@ -694,6 +720,7 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
     },
     dispose() {
       disposed = true
+      disarm()
       for (const video of videos) tearDown(video)
       for (const h of held.values()) h.abort?.abort()
       held.clear()
