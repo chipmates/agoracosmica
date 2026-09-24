@@ -13,7 +13,7 @@
  */
 import {
   BoxGeometry, BufferGeometry, Color, DirectionalLight, ExtrudeGeometry, Float32BufferAttribute, Group, Mesh,
-  MeshStandardNodeMaterial, Object3D, Shape, type Material,
+  MeshBasicNodeMaterial, MeshStandardNodeMaterial, Object3D, Shape, type Material,
 } from 'three/webgpu'
 import * as TSL from 'three/tsl'
 import { lights as lightsOf } from 'three/tsl'
@@ -47,6 +47,17 @@ function modelStone(): MeshStandardNodeMaterial {
   m.roughnessNode = specularAA(float(.86).add(d.rough), d.lost)
   m.normalNode = reliefNormal(normalWorldGeometry.transformDirection(cameraViewMatrix), d.heightM, .15)
   m.name = 'vinci/grave/diagram-stone'
+  return m
+}
+/** a part of the box other than its stones and its bronze: its colour and
+ * its roughness, carried on its vertices */
+type Role = { tint: string; rough: number }
+function groundSurface(): MeshStandardNodeMaterial {
+  const m = new MeshStandardNodeMaterial({ roughness: .9, metalness: 0 })
+  const fine = mx_noise_float(positionWorld.mul(90)).mul(.05)
+  m.colorNode = attribute('tint', 'vec3').mul(float(1).add(fine))
+  m.roughnessNode = attribute('rough', 'float')
+  m.name = 'vinci/grave/diagram-ground'
   return m
 }
 function plain(hex: string, roughness: number, metalness: number, name: string, grain = .03): MeshStandardNodeMaterial {
@@ -92,12 +103,14 @@ function beam(ax: number, ay: number, bx: number, by: number, z: number, width: 
 export function createDiagram(o: DiagramOptions): Diagram {
   const { x: X, y: Y, z: Z, width: W, height: H } = o
   const tier = o.tier ?? 'hero'
-  const stone = modelStone(), mortar = plain('#8d8472', .92, 0, 'mortar'), slate = plain('#4a5058', .62, 0, 'slate', .06)
-  const glass = plain('#1d2226', .12, 0, 'glass', 0), lead = plain('#3b3a37', .5, .5, 'lead')
-  const linen = plain('#34302b', .95, 0, 'linen', .08), bronze = plain('#6b5537', .42, .8, 'bronze', .04)
-  const oak = plain('#7a5c3e', .6, 0, 'oak', .07)
-  const parts = new Map<Material, BufferGeometry[]>()
-  const put = (m: Material, g: BufferGeometry): void => { const list = parts.get(m) ?? []; list.push(g); parts.set(m, list) }
+  const stone = modelStone(), bronze = plain('#6b5537', .42, .8, 'bronze', .04), ground = groundSurface()
+  // everything in the box but its stones and its bronze is one body: each
+  // part carries its own colour and roughness on its vertices
+  const mortar: Role = { tint: '#8d8472', rough: .92 }, slate: Role = { tint: '#4a5058', rough: .62 }
+  const glass: Role = { tint: '#1b2024', rough: .14 }, linen: Role = { tint: '#34302b', rough: .95 }
+  const oak: Role = { tint: '#7a5c3e', rough: .6 }
+  const parts = new Map<Material | Role, BufferGeometry[]>()
+  const put = (m: Material | Role, g: BufferGeometry): void => { const list = parts.get(m) ?? []; list.push(g); parts.set(m, list) }
 
   // THE BOX: a linen ground, and mitred bronze strips 0.40 m deep round it
   put(linen, box(W, H, .13, X, Y, Z - .22))
@@ -236,25 +249,50 @@ export function createDiagram(o: DiagramOptions): Diagram {
   }
   const group = new Group()
   group.name = 'vinci/grave/diagram'
-  const materials: Material[] = [stone, mortar, slate, glass, lead, linen, bronze, oak]
+  const materials: Material[] = [stone, bronze, ground]
   const rig = lightsOf([light])
-  for (const [material, list] of parts) {
+  const bodies = new Map<Material, BufferGeometry[]>([[stone, []], [bronze, []], [ground, []]])
+  for (const [key, list] of parts) {
+    if (key === stone || key === bronze) { bodies.get(key)!.push(...list); continue }
+    const role = key as Role, c = new Color(role.tint)
+    for (const g of list) {
+      const n = g.getAttribute('position').count
+      const tint = new Float32Array(n * 3)
+      for (let i = 0; i < n; i++) tint.set([c.r, c.g, c.b], i * 3)
+      g.setAttribute('tint', new Float32BufferAttribute(tint, 3))
+      g.setAttribute('rough', new Float32BufferAttribute(new Float32Array(n).fill(role.rough), 1))
+      bodies.get(ground)!.push(g)
+    }
+  }
+  // the map is drawn from depth-only doubles on the box's own layer, so the
+  // wing's key never draws the box into its cascades
+  const double = new MeshBasicNodeMaterial({ colorWrite: false, depthWrite: false })
+  materials.push(double)
+  const keep: Record<string, string[]> = { stone: ['blockTone'], bronze: [], ground: ['tint', 'rough'] }
+  for (const [material, list] of bodies) {
+    const role = (material as { name: string }).name.split('-').pop()!
     const merged = mergeGeometries(list.map(g => g.index ? g.toNonIndexed() : g).map(g => {
-      for (const name of Object.keys(g.attributes)) if (!['position', 'normal', 'uv', 'blockTone'].includes(name)) g.deleteAttribute(name)
-      if (material === stone && !g.getAttribute('blockTone')) g.setAttribute('blockTone', new Float32BufferAttribute(new Float32Array(g.getAttribute('position').count).fill(1), 1))
-      if (material !== stone && g.getAttribute('blockTone')) g.deleteAttribute('blockTone')
+      for (const name of Object.keys(g.attributes)) if (!['position', 'normal', 'uv', ...keep[role]!].includes(name)) g.deleteAttribute(name)
+      if (role === 'stone' && !g.getAttribute('blockTone')) g.setAttribute('blockTone', new Float32BufferAttribute(new Float32Array(g.getAttribute('position').count).fill(1), 1))
       if (!g.getAttribute('uv')) g.setAttribute('uv', new Float32BufferAttribute(new Float32Array(g.getAttribute('position').count * 2), 2))
       return g
     }), false)
     for (const g of list) g.dispose()
     if (!merged) continue
     const mesh = new Mesh(merged, material)
-    mesh.name = `vinci/grave/diagram/${(material as { name: string }).name.split('-').pop()}`
-    mesh.castShadow = true
+    mesh.name = `vinci/grave/diagram/${role}`
+    mesh.castShadow = false
     mesh.receiveShadow = true
-    mesh.layers.enable(DIAGRAM_SHADOW_LAYER)
     mesh.userData = { manifestClass: 'GENERATED', manifestId: 'vinci/grave-geometry' }
     group.add(mesh)
+    const caster = new Mesh(merged, double)
+    caster.name = `vinci/grave/diagram/${role}-caster`
+    caster.layers.set(DIAGRAM_SHADOW_LAYER)
+    caster.castShadow = true
+    caster.receiveShadow = false
+    caster.raycast = () => {}
+    caster.userData = { manifestClass: 'GENERATED', manifestId: 'vinci/grave-geometry', labelOccluder: false }
+    group.add(caster)
     // the box's own strips take the court's light like everything outside
     // the box; inside it only the chosen light reaches
     if (material !== bronze) (material as Material & { lightsNode?: unknown }).lightsNode = rig

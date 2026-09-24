@@ -3,7 +3,7 @@ import { Construction, exhibitionFloor, galleryBackdrop, type ExhibitMaterials, 
 import { lineAdvance } from '../words'
 import words from '../line/data/never-said.json'
 import { GRAVE_DEATHBED, GRAVE_FRAME, GRAVE_SLAB } from './placement'
-import { cutLedgerFace, ledgerFilling, ledgerStone } from './ledger'
+import { cutLedgerFace, ledgerStone } from './ledger'
 import { createDiagram } from './diagram'
 
 /** Kept from the local computation, not from the later sunset row. */
@@ -108,9 +108,10 @@ export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, l
   // what the real slab carries instead is a sentence of the record, which is
   // where an absence belongs.
   const ledgerFace = cutLedgerFace({ centre: [centreX, centreZ], top: .234, width: 1.98, length: 3.55, depth: .064 })
-  const ledger = ledgerStone(), filling = ledgerFilling()
+  // the filling is the grave's own ink, so it welds into the lettering's body
+  const ledger = ledgerStone()
   for (const geometry of ledgerFace.stone) build.geometry(geometry, ledger)
-  for (const geometry of ledgerFace.filling) build.geometry(geometry, filling)
+  for (const geometry of ledgerFace.filling) build.geometry(geometry, materials.ink)
 
   // A separate low lectern makes "presumed" physically separate as well.
   const plaqueX = options.mobile ? 1.50 : 1.44
@@ -190,7 +191,7 @@ export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, l
     anchors: { slab: [centreX, 0.24, centreZ], plaque: [plaqueX, 0.9, plaqueZ + 0.05], computedFrame: options.mobile?[frameX*.84-1.26,frameY*.84,(frameZ+.1)*.84-1.55]:[frameX, frameY, frameZ + 0.1] },
   }
   build.group.userData.exhibit = metadata
-  return { group: build.group, metadata, dispose: () => { build.dispose(); diagram.dispose(); ledger.dispose(); filling.dispose() } }
+  return { group: build.group, metadata, dispose: () => { build.dispose(); diagram.dispose(); ledger.dispose() } }
 }
 
 /* THE PAINTING OF A DEATH NOBODY WITNESSED, at the grave it belongs to.

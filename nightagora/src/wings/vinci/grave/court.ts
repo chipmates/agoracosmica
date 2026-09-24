@@ -39,7 +39,7 @@ import {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type N = any
 const {
-  abs, cameraViewMatrix, float, mix, mx_noise_float, normalWorldGeometry, positionWorld, smoothstep, vec2, vec3,
+  abs, cameraViewMatrix, float, mix, mx_noise_float, normalWorldGeometry, positionWorld, smoothstep, uv: uvNode, vec2, vec3,
 } = TSL as unknown as Record<string, N>
 
 export const graveCourtProvenance = {
@@ -112,12 +112,14 @@ function stoneSurface(): MeshStandardNodeMaterial {
 
 /** Oiled oak outdoors: the grain runs along `grain` (east, north), the tops
  * a little silvered by the weather. */
-function oakSurface(grain: [number, number], name: string): MeshStandardNodeMaterial {
-  const base = linear('#9a7a57'), silver = linear('#958d80')
+function oakSurface(name: string): MeshStandardNodeMaterial {
+  const base = linear('#8a7257'), silver = linear('#8e887e')
   const m = new MeshStandardNodeMaterial({ roughness: .62, metalness: 0 })
   const P = positionWorld, n = normalWorldGeometry
-  const gx = grain[0], gz = -grain[1]
-  const along = P.x.mul(gx).add(P.z.mul(gz)), across = P.x.mul(-gz).add(P.z.mul(gx))
+  // each board carries its grain's direction, (east, north), as its texture
+  // coordinate, so the walk's boards and the bench's slats are one body
+  const grain = uvNode(), gx = grain.x, gz = grain.y.negate()
+  const along = P.x.mul(gx).add(P.z.mul(gz)), across = P.z.mul(gx).sub(P.x.mul(gz))
   const d = surfaceDetail({ scales: [.4, .05, .003], figure: [.05, .04, .03], relief: .0008 })
   // the figure: long streaks along the grain, a slower wave across it
   const streak = mx_noise_float(vec3(along.mul(.9), across.mul(34), P.y.mul(34))).mul(resolved(.03, d.pixel))
@@ -165,13 +167,12 @@ export interface GraveCourtSurfaces {
   bronze: Material; steel: Material; earth: Material
 }
 export function graveCourtSurfaces(): GraveCourtSurfaces {
-  const [wx, wn] = [WALKWAY.to[0] - WALKWAY.from[0], WALKWAY.to[1] - WALKWAY.from[1]]
-  const len = Math.hypot(wx, wn)
+  // one brick for the whole leaf and its band, one oak for walk and bench:
+  // a body per material is a draw per material
+  const brick = brickSurface(false), oak = oakSurface('oak')
   return {
-    brick: brickSurface(false), open: brickSurface(true), stone: stoneSurface(),
-    // the boards run across the walk
-    walkway: oakSurface([-wn / len, wx / len], 'walkway-oak'),
-    bench: oakSurface([BENCH.facing[1], -BENCH.facing[0]], 'bench-oak'),
+    brick, open: brick, stone: stoneSurface(),
+    walkway: oak, bench: oak,
     bronze: metalSurface('#6b5537', .42, .8, 'bronze'),
     steel: metalSurface('#2d2c2a', .5, .65, 'steel'),
     earth: earthSurface(),
@@ -252,11 +253,19 @@ function buildFilterBand(build: Construction, s: GraveCourtSurfaces): void {
 /** a box turned about the vertical, in the grave's own frame: `along` is its
  * long axis as (x, z) */
 function turnedBox(build: Construction, cx: number, cy: number, cz: number, length: number, height: number, width: number,
-  along: [number, number], material: Material): void {
+  along: [number, number], material: Material, grainOf?: [number, number]): void {
   const geometry = new BoxGeometry(length, height, width)
   geometry.rotateY(Math.atan2(-along[1], along[0]))
   geometry.translate(cx, cy, cz)
+  if (grainOf) grained(geometry, grainOf)
   build.geometry(geometry, material)
+}
+
+/** a board's grain direction in the wing's (east, north), on every vertex */
+function grained(geometry: BoxGeometry, grain: [number, number]): BoxGeometry {
+  const uv = geometry.getAttribute('uv')
+  for (let i = 0; i < uv.count; i++) uv.setXY(i, grain[0], grain[1])
+  return geometry
 }
 
 function buildWalkway(build: Construction, s: GraveCourtSurfaces): void {
@@ -280,7 +289,7 @@ function buildWalkway(build: Construction, s: GraveCourtSurfaces): void {
     const t = start + i * pitch + board.width / 2
     const wander = (random() - .5) * .012
     turnedBox(build, ax + ux * t + across[0] * wander, top - board.thickness / 2, az + uz * t + across[1] * wander,
-      WALKWAY.width - .004 * random(), board.thickness, board.width, across, s.walkway)
+      WALKWAY.width - .004 * random(), board.thickness, board.width, across, s.walkway, [across[1], across[0]])
   }
   // a bronze nosing at the end the visitor steps on from
   turnedBox(build, ax + ux * (start - .012), top - .012, az + uz * (start - .012), WALKWAY.width + .02, .024, .024, across, s.bronze)
@@ -293,7 +302,9 @@ function buildBench(build: Construction, s: GraveCourtSurfaces): void {
   const slat = (BENCH.depth - .05) / 3
   for (let i = 0; i < 3; i++) {
     const x = cx - BENCH.depth / 2 + slat / 2 + i * (slat + .025)
-    span(build, x - slat / 2, seatTop - .045, cz - BENCH.length / 2, x + slat / 2, seatTop, cz + BENCH.length / 2, s.bench)
+    const geometry = grained(new BoxGeometry(slat, .045, BENCH.length), [1, 0])
+    geometry.translate(x, seatTop - .0225, cz)
+    build.geometry(geometry, s.bench)
   }
   // two bronze frames: a rail under the slats and two legs
   for (const at of [-BENCH.length / 2 + .28, BENCH.length / 2 - .28]) {
@@ -356,7 +367,7 @@ export function growGraveCourtTrees(tier: TreeTier): GraveCourtTrees {
   group.name = 'vinci/grave-court/trees'
   group.userData = { ...graveCourtProvenance, certainty: 'conjectural', labelOccluder: false }
   const mats = vegetationMaterials(windWanted())
-  const bark = new Body(), fine = new Body(), leaves = new Body()
+  const bark = new Body(), leaves = new Body()
   const casts = tier !== 'calm'
   const shadows = casts ? new Body() : null
   const bedTop = GRAVE_COURT_LEVEL + .02 + BED.rise
@@ -368,7 +379,9 @@ export function growGraveCourtTrees(tier: TreeTier): GraveCourtTrees {
       id: tree.id, species: 'maple', east: tree.east, north: tree.north, height: tree.height, seed: tree.seed,
       detail: 'near', lean: tree.lean, spread: COURT_TREE_FORM.spread, crownBase: COURT_TREE_FORM.crownBase,
       bole: COURT_TREE_FORM.bole, leafCap: COURT_TREE_FORM.leafCap,
-    }, tier, () => bedTop, refuse, bark, casts ? fine : bark, leaves, shadows)
+    // the twigs weld into the limbs: the shadow body folds their casting, and
+    // a body less is a draw less in every pass that sees the court
+    }, tier, () => bedTop, refuse, bark, bark, leaves, shadows)
     count += result.leaves
     results.push(result)
   }
@@ -383,18 +396,18 @@ export function growGraveCourtTrees(tier: TreeTier): GraveCourtTrees {
     while (i < weights.length - 1 && at > weights[i]!) { at -= weights[i]!; i++ }
     return colours[i]!
   }
-  const perTree = tier === 'hero' ? 260 : tier === 'standard' ? 90 : 40
+  const perTree = tier === 'hero' ? 620 : tier === 'standard' ? 150 : 60
   const grow = tier === 'hero' ? 1 : tier === 'standard' ? 1.4 : 1.9
   for (const tree of COURT_TREES) {
     for (let k = 0; k < perTree; k++) {
-      const inBed = random() < .62
+      const inBed = random() < .42
       let e: number, n: number, ground: number
       if (inBed) {
         e = tree.east + (random() - .5) * 2 * (BED.half - .05)
         n = tree.north + (random() - .5) * 2 * (BED.half - .05)
         ground = bedTop
       } else {
-        const r = BED.half + random() * 2.2, a = (random() - .5) * 2.2 + Math.atan2(.62, .79)
+        const r = BED.half + random() * random() * 4.2, a = (random() - .5) * 2.6 + Math.atan2(.62, .79)
         e = tree.east + Math.cos(a) * r
         n = tree.north + Math.sin(a) * r
         ground = GRAVE_COURT_LEVEL + .02
@@ -416,7 +429,6 @@ export function growGraveCourtTrees(tier: TreeTier): GraveCourtTrees {
     meshes.push(mesh)
   }
   add(vegetationMesh(bark, mats.bark, 'vinci/grave-court/maple trunks and limbs', casts))
-  if (casts) add(vegetationMesh(fine, mats.bark, 'vinci/grave-court/maple branches and twigs', false))
   add(vegetationMesh(leaves, mats.leaves, 'vinci/grave-court/maple leaves', false))
   if (shadows) {
     const s = vegetationMesh(shadows, mats.shade, 'vinci/grave-court/maple leaf shadows', true)
