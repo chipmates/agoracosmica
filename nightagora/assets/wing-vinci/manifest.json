@@ -3581,7 +3581,7 @@
       "prompt": "The mechanism hall's finish over its certified construction: the sealed concrete floor laid by vinci/collection-hall-floor with a reflection of the room blurred by the floor's own roughness; cast concrete walls with their formwork joints and tie holes, stopped over the floor by a shadow gap; the same concrete on the beams and the light shelf; between the beams 90 mm oak slats on a 150 mm pitch over a dark backing; the plinths in a dark honed stone. Photographs: library/concrete-floor-polished, library/concrete-wall-formed and library/oak-veneer-light, all CC0 from Poly Haven; the joints, slats, tint and drift are procedural. A modern room; no 1517 claim.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-24",
-      "sha256": "564ccfad86f8c96c28cfff77bae0bd7f5437e7749c07825d95c5ec3820e1d2c2",
+      "sha256": "fec849c31ed8ea5c3bec20b99f097fcb79edf6626dd8341e15f7ddd1a84fa8e1",
       "note": "Modern museum insertion, the mechanism hall only; no 1517 claim. recipe_file=src/wings/vinci/collection/hall-fabric.ts"
     },
     {
@@ -3841,7 +3841,7 @@
       "prompt": "The mechanism hall's sealed concrete floor, baked in code into one map over the hall and one 1.2 m tile: each 3.2 by 3.3 m bay its own pour a shade apart with a drift across it; clouding one to two metres across; darker, glossier trowel burn; power-trowel arcs burnished into the sealer; wear along the lanes between the three doors, round every plinth and at each door's mouth, rougher and a little lighter, with heel scuffs and hairline scratches; dust under each plinth's overhang, in a line at its foot, at the walls' feet and silted into the 5 mm saw cuts, whose arrises chip where a stone sits; the cut aggregate of sand, fine and coarse stone and pores. The fine grain is the CC0 photograph library/concrete-floor-polished (Poly Haven), pulled toward its own mean. For the engine alone, the contact of the room's light (the form factor of every plinth, the dark bay's walls and the screw's platform) and the clerestory's light past its shelf. A finish specification of a modern room, not a survey; no 1517 claim. No reference image sampled.",
       "model": "Deterministic TypeScript and TSL procedural textures",
       "date": "2026-09-24",
-      "sha256": "b49e1dc105731a1f38d8525629451de47ae07eb547be8d0d41e601ade99c7663",
+      "sha256": "f1a94730bf611dd8b3d0ebca95f8569f14411158857b198ca7e59da45289ec29",
       "note": "Modern museum insertion, the mechanism hall only; no 1517 claim. recipe_file=src/wings/vinci/collection/hall-floor.ts"
     }
   ]

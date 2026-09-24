@@ -303,38 +303,51 @@ export function bakeHallFloor(plan: HallFloorPlan, size = 2048): HallFloorMaps {
     }
     return clamp01((1 - keep) * patch(e, n))
   }
-  const wear = lattice(512, wearAt)
+  const wear = lattice(256, wearAt)
 
   /* THE POUR AND THE SEALER: clouding a metre or two across, darker trowel
      burn where the blades worked longest (darker and glossier), each bay its
      own pour a shade apart with a drift across it. */
   const clouds = lattice(256, (e, n) => .15 * fbm(e / 2.3, n / 2.3, 11, 4) + .05 * fbm(e / .62, n / .62, 13, 2))
-  const burn = lattice(512, (e, n) => smooth(.28, .72, noise(e / .95 + .4 * noise(e / 2.1, n / 2.1, 17), n / .95, 19)))
+  const burn = lattice(256, (e, n) => smooth(.28, .72, noise(e / .95 + .4 * noise(e / 2.1, n / 2.1, 17), n / .95, 19)))
   const gloss = lattice(256, (e, n) => .065 * fbm(e / 1.7 + 11.3, n / 1.7 - 7.1, 23, 3))
   const silt = lattice(256, (e, n) => .45 + .4 * fbm(e / .7, n / .7, 29, 2))
+  // the pour's tone and the sealer's roughness, a lattice each: both are
+  // decimetres across, so a texel need not assemble them from five fields
+  const baseTone = lattice(512, (e, n) => 1 + clouds(e, n) - burn(e, n) * .045 + wear(e, n) * .09)
+  // a denser, darker paste took the sealer thicker and holds its gloss
+  const baseRough = lattice(512, (e, n) => .17 + gloss(e, n) + clouds(e, n) * .25 - burn(e, n) * .04 + wear(e, n) * .32)
 
   const tone = new Float32Array(size * size), rough = new Float32Array(size * size), dust = new Float32Array(size * size)
   const te = W / size, tn = D / size
+  // each column's and row's bay and distance to its cut, once
+  const colCell = new Int32Array(size), colCut = new Float32Array(size), colE = new Float32Array(size)
+  for (let i = 0; i < size; i++) {
+    const e = M.west + (i + .5) * te, f = (e - BAY.originEast) / BAY.east
+    colE[i] = e; colCell[i] = floor(f); colCut[i] = min(f - floor(f), 1 - f + floor(f)) * BAY.east
+  }
+  // each bay's own pour: its shade and the way it was struck off
+  const pour = new Map<number, [number, number, number]>()
+  const pourOf = (ce: number, cn: number): [number, number, number] => {
+    const key = ce * 4096 + cn
+    let p = pour.get(key)
+    if (!p) { const a = hash(ce, cn, 5) * PI * 2; p = [(hash(ce, cn, 3) - .5) * .09, cos(a), sin(a)]; pour.set(key, p) }
+    return p
+  }
   for (let j = 0; j < size; j++) {
     const n = M.south + (j + .5) * tn
-    const cellN = floor((n - BAY.originNorth) / BAY.north)
-    const fn = (n - BAY.originNorth) / BAY.north - cellN, cutN = min(fn, 1 - fn) * BAY.north
+    const fn = (n - BAY.originNorth) / BAY.north, cellN = floor(fn), cutN = min(fn - cellN, 1 - fn + cellN) * BAY.north
+    const dn = n - BAY.originNorth - (cellN + .5) * BAY.north
     for (let i = 0; i < size; i++) {
-      const e = M.west + (i + .5) * te, k = j * size + i
-      const cellE = floor((e - BAY.originEast) / BAY.east)
-      const h1 = hash(cellE, cellN, 3), h2 = hash(cellE, cellN, 5)
-      const a = h2 * PI * 2
-      const across = ((e - BAY.originEast - (cellE + .5) * BAY.east) * cos(a) + (n - BAY.originNorth - (cellN + .5) * BAY.north) * sin(a)) / 1.6
-      const w = wear(e, n), b = burn(e, n)
-      const c = clouds(e, n)
-      tone[k] = 1 + c + (h1 - .5) * .09 + across * .02 - b * .045 + w * .09
-      // a denser, darker paste took the sealer thicker and holds its gloss
-      rough[k] = .17 + gloss(e, n) + c * .25 - b * .04 + w * .32
+      const e = colE[i]!, k = j * size + i, cellE = colCell[i]!
+      const [shade, ca, sa] = pourOf(cellE, cellN)
+      const across = ((e - BAY.originEast - (cellE + .5) * BAY.east) * ca + dn * sa) / 1.6
+      tone[k] = baseTone(e, n) + shade + across * .02
+      rough[k] = baseRough(e, n)
       // a cut holds what the mop pushes into it, least where feet scuff it
       // clean; it rides in the dust, on the cut's own line
-      const fe = (e - BAY.originEast) / BAY.east - cellE, cutE = min(fe, 1 - fe) * BAY.east
-      const toCut = min(cutE, cutN)
-      if (toCut < .02) dust[k] = clamp01(silt(e, n) - w * .45) * exp(-((toCut / .011) ** 2))
+      const toCut = min(colCut[i]!, cutN)
+      if (toCut < .02) dust[k] = clamp01(silt(e, n) - wear(e, n) * .45) * exp(-((toCut / .011) ** 2))
     }
   }
 
@@ -353,7 +366,7 @@ export function bakeHallFloor(plan: HallFloorPlan, size = 2048): HallFloorMaps {
       const dn = M.south + (j + .5) * tn - cn
       for (let i = i0; i <= i1; i++) {
         const de = M.west + (i + .5) * te - ce, r = len2(de, dn)
-        if (r > reach) continue
+        if (abs(r - R + .02) > 3 * sigma + .03) continue
         let off = atan2(dn, de) - from
         off -= floor(off / (PI * 2)) * PI * 2
         const run = off < span ? min(1, off / .3, (span - off) / .3) : 0
@@ -412,8 +425,8 @@ export function bakeHallFloor(plan: HallFloorPlan, size = 2048): HallFloorMaps {
 
   /* THE CONTACT a path tracer finds by itself: how much of the room each
      footing hides from the floor round it, as Lambert's form factor of its
-     faces. Taken at half the map's side; it is centimetres across. */
-  const A = size >> 1, ae = W / A, an = D / A
+     faces. Taken at a quarter of the map's side: it runs over decimetres. */
+  const A = size >> 2, ae = W / A, an = D / A
   const contact = new Float32Array(A * A)
   const reach = (f: Footing): number => min(3, .3 + 2.5 * f.high * f.shade)
   for (let j = 0; j < A; j++) {

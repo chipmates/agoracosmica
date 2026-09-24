@@ -288,9 +288,11 @@ export interface FloorMaps { finish: DataTexture; tile: DataTexture; bakeMs: num
 /** The floor's map and tile, baked once for the hall. */
 function floorMaps(side: number): FloorMaps {
   const baked = bakeHallFloor(hallFloorPlan(), side)
+  // a millimetre a texel is what the nearest floor a stop shows can resolve
+  const tile = side >> 1
   return {
     finish: dataMap(baked.finish, baked.size, false, 'vinci/collection-hall-floor/finish'),
-    tile: dataMap(bakeFloorTile(side), side, true, 'vinci/collection-hall-floor/tile'),
+    tile: dataMap(bakeFloorTile(tile), tile, true, 'vinci/collection-hall-floor/tile'),
     bakeMs: baked.bakeMs,
   }
 }

@@ -166,10 +166,10 @@ async function hallFloor() {
   const began = Date.now()
   const side = TIER === 'calm' ? 1024 : 2048
   const baked = floor.bakeHallFloor(floor.hallFloorPlan(), side)
-  const tile = floor.bakeFloorTile(side)
+  const tile = floor.bakeFloorTile(side >> 1)
   return {
     set: 'concrete-floor-polished', finish: { ...fabric.FLOOR_FINISH }, bay: { ...floor.HALL_FLOOR_BAY },
-    map: { ...floor.HALL_FLOOR_MAP, side: baked.size }, tile: { metres: floor.HALL_FLOOR_TILE, side },
+    map: { ...floor.HALL_FLOOR_MAP, side: baked.size }, tile: { metres: floor.HALL_FLOOR_TILE, side: side >> 1 },
     bytes: { finish: baked.finish, tile }, bakeSeconds: (Date.now() - began) / 1000,
   }
 }
