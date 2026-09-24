@@ -34,7 +34,8 @@ function band(o: WashOptic, height: N, off: N): N {
   const crown = float(o.crown).sub(off.mul(off).mul(o.arc))
   const lit = smoothstep(o.foot - o.footSoft, o.foot, height)
   const foot = exp(min(height.sub(o.foot), 0).div(o.tailFall)).mul(o.tail).mul(float(1).sub(lit)).add(lit)
-  return lateral.mul(float(1).sub(smoothstep(crown.sub(o.crownSoft), crown, height))).mul(foot)
+  const shutter = o.floor === undefined ? float(1) : smoothstep(o.floor - (o.floorSoft ?? 0), o.floor, height)
+  return lateral.mul(float(1).sub(smoothstep(crown.sub(o.crownSoft), crown, height))).mul(foot).mul(shutter)
 }
 
 /** WHAT A WALLWASHER SENDS TOWARD P, as a multiple of its level: the wash

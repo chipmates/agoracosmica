@@ -246,6 +246,9 @@ export interface WashOptic {
    * this far either side of the lamp's line and gone `edgeSoft` further */
   edge?: number
   edgeSoft?: number
+  /** and its bottom shutter: nothing under this height, less `floorSoft` */
+  floor?: number
+  floorSoft?: number
 }
 const smooth = (a: number, b: number, x: number): number => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t) }
 /** The band's share at a height on the plane, `off` metres along the wall
@@ -256,7 +259,8 @@ export function washBand(o: WashOptic, height: number, off: number): number {
   const crown = o.crown - o.arc * off * off
   const lit = smooth(o.foot - o.footSoft, o.foot, height)
   const foot = o.tail * Math.exp(Math.min(height - o.foot, 0) / o.tailFall) * (1 - lit) + lit
-  return lateral * (1 - smooth(crown - o.crownSoft, crown, height)) * foot
+  const shutter = o.floor === undefined ? 1 : smooth(o.floor - (o.floorSoft ?? 0), o.floor, height)
+  return lateral * (1 - smooth(crown - o.crownSoft, crown, height)) * foot * shutter
 }
 
 /** the small dark-steel heads on the track, a stride apart over the hang */
@@ -272,15 +276,16 @@ export const WASH: WashOptic = {
 }
 
 /** THE SHEET THAT STANDS APART is read by one head of its own at the track's
- * north end, a framing optic whose band fills the niche from its sill to its
- * splayed head and stops at its jambs, so no light lies on the oak round it.
- * The level is the wash's own on the pages. */
+ * north end, a framing optic whose band is full from the sheet's frame up to
+ * the splayed head, falls to about two fifths at the sill, and is shuttered at
+ * the jambs and the sill, so the sheet stands in the light and no light lies
+ * on the oak round the niche. The level is the wash's own on the pages. */
 export const VORTEX_HEAD: P3 = [TRACK.east, NICHE.centre, LAMP]
 export const FRAMER: WashOptic = {
   plane: PLANE.linen,
-  foot: NICHE.sill + .06, footSoft: .08, tail: 0, tailFall: .3,
+  foot: APART.frame.bottom, footSoft: .6, tail: .55, tailFall: 2,
   crown: NICHE.back + .12, crownSoft: .1, arc: 0,
-  spread: NICHE_WIDTH / 2, edge: NICHE_WIDTH / 2 - .01, edgeSoft: .05,
+  spread: NICHE_WIDTH / 2, edge: NICHE_WIDTH / 2 - .01, edgeSoft: .05, floor: NICHE.sill + .03, floorSoft: .05,
 }
 
 export const BODY_LIGHTS: readonly BodyLight[] = [
