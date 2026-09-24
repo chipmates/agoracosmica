@@ -534,6 +534,7 @@ export function limewashOverBrick(T: N, floorZ: number, base: N, seed: number, w
   const rho = T.dFdx().length().max(T.dFdy().length()).max(1e-6)
   const fade = (L: number): N => float(1).sub(smoothstep(L / 6, L / 2.5, rho))
   const h = T.y.sub(floorZ)
+  const lineBand = (d: N, w: N, half: N): N => min(d.add(w.mul(.5)), half).sub(max(d.sub(w.mul(.5)), half.negate())).max(0).div(w)
   // the bond: thin Loire bricks, 0.225 m with 10 mm joints, courses of 66 mm
   const courseH = .066, brickL = .235, jw = .005
   // each course set out by hand: its own offset, its joints not quite plumb
@@ -585,25 +586,47 @@ export function limewashOverBrick(T: N, floorZ: number, base: N, seed: number, w
     // at two scales and summed over four, so no two losses share an outline;
     // it fails in zones and at the foot, and its edges step along the joints
     const X = T.x.add(warp.x).add(n(.31, .27, 61).mul(.07).mul(fade(.2))), Y = T.y.add(warp.y).add(n(.29, .33, 67).mul(.05).mul(fade(.2)))
-    const f = (y: N, k: number): N => mx_noise_float(vec3(X.div(.62), y.div(.36), seed + 71)).mul(.5)
+    // each region of the wall tears along its own grain: long losses along
+    // the courses in some, taller ones in others, so no two lie alike
+    const grainMix = smoothstep(-.25, .25, n(2.9, 2.3, 113))
+    const f = (y: N, k: number): N => mix(mx_noise_float(vec3(X.div(.62), y.div(.36), seed + 71)), mx_noise_float(vec3(X.div(.33), y.div(.58), seed + 107)), grainMix).mul(.5)
       .add(mx_noise_float(vec3(X.div(.23), y.div(.14), seed + 73)).mul(.28).mul(fade(.14)))
-      .add(mx_noise_float(vec3(X.div(.085), y.div(.06), seed + 79)).mul(.15).mul(fade(.06)))
-      .add(mx_noise_float(vec3(X.div(.028), y.div(.022), seed + 83)).mul(.045).mul(fade(.022))).add(k)
+      .add(mx_noise_float(vec3(X.div(.085), y.div(.06), seed + 79)).mul(.1).mul(fade(.06)))
+      .add(mx_noise_float(vec3(X.div(.028), y.div(.022), seed + 83)).mul(.03).mul(fade(.022))).add(k)
     const where = smoothstep(-.1, .6, n(3.3, 2.1, 89)).mul(.25).add(foot.mul(.16)).add(wear.mul(.1)).add(joint.mul(.035))
     const lossAt = (dy: number): N => f(Y.add(dy), 0).add(where)
     const v = lossAt(0), vUp = lossAt(.012)
-    const e = rho.mul(3).max(.004)
-    const t1 = float(.5), t2 = float(.585).add(n(.19, .15, 97).mul(.03))
+    // every edge is held to a pixel: the field's own change per pixel, not
+    // the wall's metres, sets how soft an edge is, so a loss never feathers
+    const fw = v.dFdx().abs().add(v.dFdy().abs()).max(1e-5), e = fw.mul(.7)
+    const t1 = float(.5), t2 = float(.56).add(n(.19, .15, 97).mul(.025))
     const finish = smoothstep(t1.sub(e), t1.add(e), v), render = smoothstep(t2.sub(e), t2.add(e), v)
-    // the render: lime and coarse sand, trowelled, a shade warmer than the wash
+    // the render: lime and coarse sand, darker and greyer than the wash
     const sand = mx_noise_float(vec3(T.x.div(.004), T.y.div(.004), seed + 101)).mul(fade(.004))
-    const rendered = vec3(.47, .41, .33).mul(sand.mul(.12).add(nM.mul(.08)).add(1))
-    // the broken edge of the wash, fresh lime, lighter than its face; the
-    // edges above a loss hang over it and shade its top
-    const lip = smoothstep(t1.sub(.035), t1, v).mul(float(1).sub(finish)).mul(fade(.03))
+    const rendered = mix(vec3(.40, .35, .28), coat.mul(.78), .35).mul(sand.mul(.12).add(nM.mul(.08)).add(1))
+    // the broken edge of the wash, a few millimetres of fresh lime, lighter
+    // than its face; the edges above a loss hang over it and shade its top
+    const lipW = fw.mul(.005).div(rho).min(.02)
+    const lip = float(1).sub(smoothstep(lipW, lipW.add(fw), t1.sub(v))).mul(float(1).sub(finish)).mul(fade(.02))
     const shadeUnder = (lo: N, up: N, t: N): N => lo.mul(float(1).sub(smoothstep(t.sub(e), t.add(e), up)))
-    const layered = mix(mix(through.mul(lip.mul(.13).add(1)), rendered, finish), under, render)
-      .mul(float(1).sub(shadeUnder(finish, vUp, t1).mul(.18)).sub(shadeUnder(render, vUp, t2).mul(.34)))
+    // A SETTLEMENT CRACK follows the bond: up a head joint through a course,
+    // along the bed joint to the next head joint, rising across the wall; it
+    // opens widest at its middle and closes to nothing at both ends, and forks
+    const shiftOf = (r: N): N => fract(r.mul(.5)).add(fract(r.mul(7.13).sin().mul(311.7)).sub(.5).mul(.3))
+    const headNear = (r: N, x: N): N => floor(x.div(brickL).add(shiftOf(r)).add(.5)).sub(shiftOf(r)).mul(brickL)
+    const stair = (x0: number, z0: number, slope: number, length: number, open: number): N => {
+      const lineAt = (r: N): N => float(x0).add(r.add(.5).mul(courseH).sub(floorZ + z0).div(slope))
+      const xj = headNear(row, lineAt(row)), xu = headNear(row.add(1), lineAt(row.add(1))), xd = headNear(row.sub(1), lineAt(row.sub(1)))
+      const between = (x: N, a: N, b: N): N => x.greaterThan(min(a, b)).and(x.lessThan(max(a, b))).select(float(1), float(0))
+      const d = min(T.x.sub(xj).abs(), min(mix(float(9), float(1).sub(fr).mul(courseH), between(T.x, xj, xu)), mix(float(9), fr.mul(courseH), between(T.x, xd, xj))))
+      const t = T.y.sub(floorZ + z0).div(length)
+      const half = float(open).mul(t.mul(3.14159).sin().max(0).pow(.7))
+      return lineBand(d, vec2(d.dFdx(), d.dFdy()).length().max(1e-5), half).mul(t.greaterThan(0).and(t.lessThan(1)).select(float(1), float(0)))
+    }
+    const cracks = max(max(stair(4.4, 1.25, 1.9, 1.7, .0016), stair(4.4 + .55 / 1.9 + .3, 1.8, -2.4, .6, .001)), max(max(stair(10.9, .9, -2.1, 2.0, .0017), stair(15.3, 1.5, 1.7, 1.4, .0014)), stair(21.2, 1.1, -1.8, 1.8, .0016)))
+      .mul(fade(.01)).mul(float(1).sub(render))
+    const layered = mix(mix(through.mul(lip.mul(.08).add(1)), rendered, finish), under, render)
+      .mul(float(1).sub(shadeUnder(finish, vUp, t1).mul(.22)).sub(shadeUnder(render, vUp, t2).mul(.4)).sub(cracks.mul(.55)))
     washed = mix(layered, under, band.mul(fade(.06)).mul(.85))
     bare = max(band.mul(fade(.06)), render)
   }
@@ -622,7 +645,7 @@ export function limewashOverBrick(T: N, floorZ: number, base: N, seed: number, w
   // (the field's slope is about two per metre, so half its value is the
   // distance to the line)
   const crackAt = n(.9, 1.2, 53).abs().mul(.5)
-  const crack = float(1).sub(smoothstep(rho.mul(.3), rho.mul(.9).add(.0006), crackAt)).mul(smoothstep(.25, .45, n(2.2, 3.1, 59))).mul(fade(.02))
+  const crack = float(1).sub(smoothstep(rho.mul(.3), rho.mul(.9).add(.0006), crackAt)).mul(smoothstep(.25, .45, n(2.2, 3.1, 59))).mul(fade(.02)).mul(o.layered ? 0 : 1)
   const aged = mix(washed, washed.mul(vec3(.78, .76, .74)), grime.min(1).mul(1.8).min(1)).mul(float(1).sub(grime.mul(.35)))
     .mul(mix(vec3(1, 1, 1), vec3(1 - .2 * k, 1 - .19 * k, 1 - .22 * k), damp.mul(float(1).sub(bare)))).mul(float(1).sub(tide.mul(.14 * k)).sub(scuff.mul(.09 * k)).sub(crack.mul(.35)))
   return { albedo: aged, bare }
@@ -1034,29 +1057,30 @@ function furnish(s: Sink, hero: boolean): void {
   basin(s, P(.34, vc - .3, chestTop), 97)
   ewer(s, P(.3, vc + .18, chestTop), 98)
   // a cushion on the bench, of the kind the box chair's own was
-  cushion(s, P(BENCH.u, BENCH.v - .62, FLOOR_Z + BENCH.size[2]), [V[0], V[1], 0], [U[0], U[1], 0], .21, .15, .06, 99)
+  cushion(s, P(BENCH.u, BENCH.v - .62, FLOOR_Z + BENCH.size[2]), [V[0], V[1], 0], [U[0], U[1], 0], .21, .15, .06, 99, .4)
 }
 /** A CUSHION, as the period sat on them (V&A 740-1895: the box chair "used
  * with a cushion"; others sat on benches, stools or floor cushions): wool
  * over a stuffed case, its top puffed, its seams at the edge, sitting on z.
  * Centre, its two axes, half sizes and height. */
-function cushion(s: Sink, c: V3, X: V3, Y: V3, hx: number, hy: number, h: number, seed: number): void {
-  const n = 8, Z: V3 = [0, 0, 1]
-  const lift = (x: number, y: number): number => { const f = Math.max(0, (1 - x ** 4) * (1 - y ** 4)); return h * (.35 + .65 * Math.sqrt(f)) }
+function cushion(s: Sink, c: V3, X: V3, Y: V3, hx: number, hy: number, h: number, seed: number, sat = 0): void {
+  const n = 10, Z: V3 = [0, 0, 1]
+  // puffed to its seams, and pressed down where it has been sat on
+  const lift = (x: number, y: number): number => { const f = Math.max(0, (1 - x ** 4) * (1 - y ** 4)); return h * (.35 + .65 * Math.sqrt(f) - sat * .5 * Math.exp(-((x / .62) ** 2 + ((y + .1) / .7) ** 2))) }
   const at = (x: number, y: number, z: number): V3 => add(add(add(c, scale(X, x * hx)), scale(Y, y * hy)), scale(Z, z))
   const top = (x: number, y: number): V3 => at(x, y, lift(x, y))
   const nrm = (x: number, y: number): V3 => { const e = .02, dx = sub(top(Math.min(1, x + e), y), top(Math.max(-1, x - e), y)), dy = sub(top(x, Math.min(1, y + e)), top(x, Math.max(-1, y - e))); const g = cross(dx, dy); return unit(g[2] < 0 ? scale(g, -1) : g) }
   const g = (i: number): number => -1 + 2 * i / n
   for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
     const x0 = g(i), x1 = g(i + 1), y0 = g(j), y1 = g(j + 1)
-    s.quadN(top(x0, y0), top(x1, y0), top(x1, y1), top(x0, y1), nrm(x0, y0), nrm(x1, y0), nrm(x1, y1), nrm(x0, y1), [x0 * hx, y0 * hy], [x1 * hx, y0 * hy], [x1 * hx, y1 * hy], [x0 * hx, y1 * hy], K.CLOTH, seed)
+    s.quadN(top(x0, y0), top(x1, y0), top(x1, y1), top(x0, y1), nrm(x0, y0), nrm(x1, y0), nrm(x1, y1), nrm(x0, y1), [x0, y0], [x1, y0], [x1, y1], [x0, y1], K.CLOTH, seed)
   }
   // the welt round the edge, down to what it sits on
   for (const [ax, ay] of [[1, 0], [0, 1], [-1, 0], [0, -1]] as V2[]) for (let i = 0; i < n; i++) {
     const t0 = g(i), t1 = g(i + 1)
     const p0: V2 = ax ? [ax, t0] : [t0, ay], p1: V2 = ax ? [ax, t1] : [t1, ay]
     const out = unit(add(scale(X, ax), scale(Y, ay)))
-    s.quad(at(p0[0], p0[1], .004), at(p1[0], p1[1], .004), top(p1[0], p1[1]), top(p0[0], p0[1]), out, [t0, 0], [t1, 0], [t1, h], [t0, h], K.CLOTH, seed)
+    s.quad(at(p0[0], p0[1], .004), at(p1[0], p1[1], .004), top(p1[0], p1[1]), top(p0[0], p0[1]), out, [t0, .5], [t1, .5], [t1, .97], [t0, .97], K.CLOTH, seed)
   }
 }
 /** A DISH OF THE PERIOD, after V&A 4010-1901 (probably Beauvais, about 1510
@@ -1149,9 +1173,16 @@ function chest(s: Sink, hero: boolean): void {
     if (i > 0) hbox(s, u1 - .03, u1, a - .06, a, .17, H - .15, K.WAX, 124)
     linenfold(s, u1 - .012, a + .012, b - .012, .19, H - .17, hero ? 5 : 3, 125 + i)
   }
-  // the lock plate and its hasp
-  s.box(P(u1 + .004, vc, FLOOR_Z + H - .1), [U[0] * .003, U[1] * .003, 0], [V[0] * .06, V[1] * .06, 0], [0, 0, .07], K.IRON, 129)
-  s.box(P(u1 + .009, vc, FLOOR_Z + H - .06), [U[0] * .005, U[1] * .005, 0], [V[0] * .018, V[1] * .018, 0], [0, 0, .05], K.IRON, 129)
+  // the lock plate after V&A 1319-1901: a wrought plate nailed at its
+  // corners, the keyhole, and the hasp hanging from the lid over its staple
+  const plate = (du: number, dv: number, dz: number, hu: number, hv: number, hz: number, kind: number): void =>
+    s.box(P(u1 + du, vc + dv, FLOOR_Z + H - .1 + dz), [U[0] * hu, U[1] * hu, 0], [V[0] * hv, V[1] * hv, 0], [0, 0, hz], kind, 129)
+  plate(.004, 0, 0, .003, .06, .07, K.IRON)
+  for (const [dv, dz] of [[-.047, -.057], [.047, -.057], [-.047, .057], [.047, .057]] as V2[]) plate(.0085, dv, dz, .0015, .007, .007, K.IRON)
+  plate(.0075, 0, -.028, .0006, .0045, .016, K.CHAR)
+  plate(.0075, 0, -.012, .0006, .008, .008, K.CHAR)
+  plate(.0095, 0, .045, .0025, .017, .05, K.IRON)
+  plate(.013, 0, .012, .004, .006, .01, K.IRON)
 }
 function chestV(): number {
   // the pier between the two west windows
@@ -1198,7 +1229,7 @@ function boxChair(s: Sink): void {
   // its cushion, as the museum's text says the form was used
   {
     const [uc, vc] = at(0, -.03), X: V3 = [U[0] * ca + V[0] * sa, U[1] * ca + V[1] * sa, 0], Y: V3 = [-U[0] * sa + V[0] * ca, -U[1] * sa + V[1] * ca, 0]
-    cushion(s, P(uc, vc, FLOOR_Z + seat), X, Y, W / 2 - st - .005, D / 2 - st - .01, .075, 139)
+    cushion(s, P(uc, vc, FLOOR_Z + seat), X, Y, W / 2 - st - .005, D / 2 - st - .01, .075, 139, 1)
   }
   // arms, and the tall back with its panels and cresting
   for (const x of [-W / 2, W / 2 - st]) cbox(x - .01, x + st + .01, -D / 2 - .02, D / 2, .66, .7, K.WAX, 133)
@@ -1368,7 +1399,7 @@ function hearth(s: Sink, hero: boolean): void {
   // the banked fire: an ash bed, two charred ends on the andirons
   const ash: V2[] = []
   for (let i = 0; i < 12; i++) { const t = i / 12 * Math.PI * 2; ash.push([Math.cos(t) * (open - .12), .30 + Math.sin(t) * .21]) }
-  const ashTop = (x: number, y: number): number => .028 + .035 * Math.max(0, 1 - Math.hypot(x / (open - .1), (y - .3) / .22))
+  const ashTop = (x: number, y: number): number => .03 + .075 * Math.max(0, 1 - Math.hypot(x / (open - .1), (y - .3) / .22)) ** .7
   const centre = L(0, .3, ashTop(0, .3))
   for (let i = 0; i < ash.length; i++) {
     const a = ash[i]!, b = ash[(i + 1) % ash.length]!
@@ -2068,7 +2099,7 @@ function hallMaterial(perPixel: boolean, library?: MaterialLibrary, sunShadow?: 
   const age = smoothstep(FLOOR_Z + 2.1, FLOOR_Z + 3.3, Wp.y).mul(float(.11).add(overHearth.mul(.16)))
   // each of the hall's four linings carries its own seed, so no two walls
   // fail alike; the doorways' cheeks keep their own field
-  const plaster = limewashOverBrick(vec2(T.x.add(seed.lessThan(10).select(seed.mul(5.3), float(0))), T.y), FLOOR_Z, vec3(.60, .55, .46), 1.7, doorWear(Wp), { contrast: 1.35, layered: true }).albedo.mul(float(1).sub(age))
+  const plaster = limewashOverBrick(vec2(T.x.add(seed.lessThan(10).select(seed.mul(6.1), float(0))), T.y), FLOOR_Z, vec3(.60, .55, .46), 1.7, doorWear(Wp), { contrast: 1.35, layered: true }).albedo.mul(float(1).sub(age))
   // oak: grain along the member
   const grain = mx_noise_float(vec3(T.x.mul(2.2), T.y.mul(38), seed.mul(13))).mul(.14).add(mx_noise_float(vec3(T.x.mul(9), T.y.mul(120), seed)).mul(.05))
   // the timbers' history along their length: the adze's long waves, grime
@@ -2125,11 +2156,14 @@ function hallMaterial(perPixel: boolean, library?: MaterialLibrary, sunShadow?: 
   const calcined = mix(vec3(.16, .135, .12), vec3(.24, .21, .19), mx_noise_float(Wp.mul(14)).mul(.5).add(.5))
   const brickHot = mix(brick, calcined.mul(float(1).sub(bJoint.mul(.55))), heat.mul(.85))
   // iron, forged and dark; ash; char
-  const iron = vec3(.040, .038, .035).mul(mx_noise_float(Wp.mul(40)).mul(.25).add(1))
-  const ashC = vec3(.30, .29, .27).mul(mx_noise_float(Wp.mul(25)).mul(.25).add(1))
+  // wrought iron, blackened and rusting at its edges and nail heads
+  // (a neutral dark takes the colour of whatever lights it; the room's day
+  // arrives warm off the terrace, and oiled iron is a brown-black)
+  const iron = mix(vec3(.082, .056, .04), vec3(.13, .066, .034), smoothstep(.1, .6, mx_noise_float(Wp.mul(55)))).mul(mx_noise_float(Wp.mul(140)).mul(.2).add(1))
+  const ashC = vec3(.34, .33, .31).mul(mx_noise_float(Wp.mul(25)).mul(.25).add(1)).mul(float(1).sub(smoothstep(.62, .7, mx_noise_float(Wp.mul(48))).mul(.8)))
   const charC = mix(vec3(.018, .016, .015), vec3(.20, .19, .18), smoothstep(.2, .7, mx_noise_float(Wp.mul(30))).mul(.5))
   // the furniture's oak: darker, waxed, handled
-  const wax = vec3(.096, .056, .031).mul(grain.mul(.7).add(1)).mul(fract(seed.mul(3.17)).mul(.16).add(.92))
+  const wax = vec3(.11, .065, .036).mul(grain.mul(1.1).add(1)).mul(fract(seed.mul(3.17)).mul(.16).add(.92))
   const brass = vec3(.50, .36, .16).mul(mx_noise_float(Wp.mul(60)).mul(.08).add(.95))
   const glaze = mix(vec3(.030, .075, .024), vec3(.045, .10, .035), mx_noise_float(Wp.mul(35)).mul(.5).add(.5))
   // lead glaze over a pale slip, honey where it pooled thin, green where the
@@ -2137,8 +2171,12 @@ function hallMaterial(perPixel: boolean, library?: MaterialLibrary, sunShadow?: 
   const earth = mix(vec3(.40, .29, .09), vec3(.10, .20, .055), smoothstep(-.2, .5, mx_noise_float(Wp.mul(22)))).mul(mx_noise_float(Wp.mul(90)).mul(.06).add(1))
   // wool dyed with madder, faded where the sun and hands have been, its
   // weave a fine rib
-  const rib = mx_noise_float(vec3(T.x.mul(420), T.y.mul(40), seed)).mul(.06)
-  const cloth = mix(vec3(.26, .055, .04), vec3(.20, .07, .055), smoothstep(-.3, .6, mx_noise_float(vec3(T.x.mul(7), T.y.mul(7), seed)))).mul(rib.add(1))
+  // its uv runs -1 to 1 across the top, so the piped seam lies at the edge;
+  // the weave's rib is held only while a pixel can carry it
+  const ribX = T.x.mul(95), ribW = ribX.dFdx().abs().add(ribX.dFdy().abs())
+  const rib = ribX.sin().mul(.07).mul(float(1).sub(smoothstep(.6, 2.5, ribW)))
+  const piping = smoothstep(.9, .95, max(T.x.abs(), T.y.abs())).mul(float(1).sub(smoothstep(.985, 1, max(T.x.abs(), T.y.abs())).mul(.5)))
+  const cloth = mix(vec3(.26, .055, .04), vec3(.20, .07, .055), smoothstep(-.3, .6, mx_noise_float(vec3(T.x.mul(1.6), T.y.mul(1.6), seed)))).mul(rib.add(1)).mul(float(1).sub(piping.mul(.35)))
   // oak the weather has silvered, its grain opened
   const silvered = vec3(.20, .175, .145).mul(grain.mul(2.2).add(1)).mul(mx_noise_float(vec3(Wp.y.mul(.8), seed.mul(5.1), 1.7)).mul(.16).add(1)).mul(fract(seed.mul(9.13)).mul(.22).add(.86))
   // ash raked and trodden out of the opening, over the hearthstone's front
@@ -2156,8 +2194,11 @@ function hallMaterial(perPixel: boolean, library?: MaterialLibrary, sunShadow?: 
   // darkest at the lintel's arris over the fire, spreading and thinning up
   // the lintel, the shelf and the hood's foot, streaked where it climbed
   const above = hz.sub(1.66).max(0)
-  const sheet = float(1).sub(smoothstep(.7, 1.3, hx.abs())).mul(exp(above.div(-.32))).mul(.85)
-  const tongue = exp(hx.div(above.mul(.35).add(.45)).pow(2).negate()).mul(exp(above.div(-.85))).mul(.7)
+  const sheet = float(1).sub(smoothstep(.7, 1.3, hx.abs())).mul(exp(above.div(-.28))).mul(.62)
+  // up the lintel, the shelf and the hood the stain climbs in streaks,
+  // widening and thinning until the hood's courses show through it
+  const streaks = mx_noise_float(vec3(hx.mul(11), hz.mul(.9), 6.3)).mul(.45).add(mx_noise_float(vec3(hx.mul(3.2), hz.mul(.5), 2.9)).mul(.3)).add(.75)
+  const tongue = exp(hx.div(above.mul(.55).add(.5)).pow(2).negate()).mul(exp(above.div(-1.3))).mul(.5).mul(streaks)
   const plume = sheet.add(tongue).mul(smoothstep(1.5, 1.66, hz)).mul(smoothstep(HEARTH.depth - .5, HEARTH.depth - .25, hy))
     .mul(mx_noise_float(vec3(hx.mul(4.5), hz.mul(.8), 5.1)).mul(.35).add(.85)).mul(is(K.STONE))
   const sootField = mix(soot.mul(mx_noise_float(vec3(Wp.x.mul(3), Wp.y.mul(1.2), Wp.z.mul(3))).mul(.35).add(.8)), brickSoot, is(K.BRICK).mul(soot.greaterThan(.8).select(float(0), float(1)))).add(plume).clamp(0, 1)
@@ -2188,9 +2229,9 @@ function hallMaterial(perPixel: boolean, library?: MaterialLibrary, sunShadow?: 
   const tileHearth = is(K.TILE).mul(smoothstep(HEARTH.depth + .3, HEARTH.depth + .5, hy)).mul(float(1).sub(smoothstep(1.3, 1.5, hx.abs()))).mul(float(1).sub(smoothstep(.04, .06, hz)))
   const colour = mix(mix(mix(clean, hearthStone, onSlab), vec3(.07, .045, .03), scorch.mul(tileHearth).mul(.55)).mul(float(1).sub(crumbs.mul(tileHearth).mul(.7))), vec3(.012, .011, .010), sootField)
   m.colorNode = colour
-  m.roughnessNode = float(.9).sub(is(K.TILE).mul(float(.22).add(wear.mul(.28))).mul(float(1).sub(jointCover))).sub(is(K.OAK).mul(.12)).add(is(K.JOINT).mul(.05)).sub(is(K.IRON).mul(.3))
-    .sub(is(K.WAX).mul(.38)).sub(is(K.BRASS).mul(.55)).sub(is(K.GLAZE).add(is(K.EARTH)).mul(.72)).add(is(K.CLOTH).mul(.08)).add(is(K.WEATHERED).mul(.05)).sub(is(K.BRICK).mul(brickSoot).mul(.3))
-  m.metalnessNode = is(K.IRON).mul(.15).add(is(K.BRASS))
+  m.roughnessNode = float(.9).sub(is(K.TILE).mul(float(.22).add(wear.mul(.28))).mul(float(1).sub(jointCover))).sub(is(K.OAK).mul(.12)).add(is(K.JOINT).mul(.05)).sub(is(K.IRON).mul(.08))
+    .sub(is(K.WAX).mul(float(.3).sub(grain.mul(1.4)))).sub(is(K.BRASS).mul(.55)).sub(is(K.GLAZE).add(is(K.EARTH)).mul(.72)).add(is(K.CLOTH).mul(.08)).add(is(K.WEATHERED).mul(.05)).sub(is(K.BRICK).mul(brickSoot).mul(.3))
+  m.metalnessNode = is(K.BRASS)
   m.aoNode = clamp(ambient, 0, 1)
   // A surface of the passage takes no direct sun: nothing faces it.
   const shade = windowShade()
