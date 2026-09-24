@@ -180,10 +180,20 @@ export function installExport(parts: ExportParts): void {
   }
   const drawsSomething = (mesh: Mesh): boolean =>
     Array.isArray(mesh.material) ? mesh.material.some((m) => m.visible) : mesh.material?.visible !== false
+  /** A VOLUME (the hall's air) is marched from the eye and is drawn only
+      while the eye stands inside it: a medium the walk enters, never a body a
+      clip holds or counts. Its presence is the eye's, so a pose still has one
+      picture; the frames it is drawn in are reported apart. */
+  const isVolume = (mesh: Mesh): boolean =>
+    (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).some((m) => (m as { isVolumeNodeMaterial?: boolean } | undefined)?.isVolumeNodeMaterial === true)
+  let volumes = 0
   function eachDrawn(visit: (mesh: Mesh) => void): void {
+    volumes = 0
     parts.scene()?.traverseVisible((object) => {
       const mesh = object as Mesh
-      if (mesh.isMesh && drawsSomething(mesh)) visit(mesh)
+      if (!mesh.isMesh || !drawsSomething(mesh)) return
+      if (isVolume(mesh)) volumes++
+      else visit(mesh)
     })
   }
 
@@ -204,7 +214,7 @@ export function installExport(parts: ExportParts): void {
     }
     if (recording) { const into = recording; eachDrawn((mesh) => { into.add(mesh) }) }
   }
-  function mounted(): { meshes: number; signature: number; stood: number; changed?: { added: string[]; removed: string[]; addedCount: number; removedCount: number } } {
+  function mounted(): { meshes: number; signature: number; stood: number; volumes: number; changed?: { added: string[]; removed: string[]; addedCount: number; removedCount: number } } {
     const ids = new Map<number, Mesh>()
     let hash = 2166136261
     eachDrawn((mesh) => {
@@ -220,7 +230,7 @@ export function installExport(parts: ExportParts): void {
     }
     lastMounted = ids
     lastSignature = hash
-    return { meshes: ids.size, signature: hash, stood: forced.size, ...(changed ? { changed } : {}) }
+    return { meshes: ids.size, signature: hash, stood: forced.size, volumes, ...(changed ? { changed } : {}) }
   }
 
   function idPass(): void {

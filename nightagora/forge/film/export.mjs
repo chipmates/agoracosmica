@@ -15,7 +15,8 @@
 // still and its last the arrival's, rendered by the same program, and the
 // report holds the joins by the sha256 of the raw frames. Every body a clip
 // draws in any frame (taken while it is walked once in silence) stands from
-// its first frame to its last, and the world's clock is pinned at both ends
+// its first frame to its last (a volume the eye enters, the hall's air, is the
+// eye's and is not held), and the world's clock is pinned at both ends
 // (`film.ts`, pinnedWind). A clip is refused (and written nowhere) when the
 // textures in flight at rest are not zero, when the drawn set changes inside
 // it anyway, or when the scene casts more shadows than its measured ceiling
@@ -624,7 +625,9 @@ async function keepClip(session, inbox, edge, nodes, track, out, opts, held) {
     mountedChanges: frames.filter((f) => f.mounted.changed).map((f) => ({ i: f.i, meshes: f.mounted.meshes, ...f.mounted.changed })),
     starvedSteps: starved, pageErrors: session.record.errors.length - errorsBefore,
     pendingAtRest, paintedOverCanvas, mountedSetChanges: signatures.size - 1, casters: armed.casters, bodies: armed.bodies,
-    mount: { rule: opts.mount, held, drawn: frames[0].mounted.meshes, stoodAtFirst: frames[0].mounted.stood, stoodAtLast: frames[frames.length - 1].mounted.stood },
+    mount: { rule: opts.mount, held, drawn: frames[0].mounted.meshes, stoodAtFirst: frames[0].mounted.stood, stoodAtLast: frames[frames.length - 1].mounted.stood,
+      // a volume the eye enters (the hall's air) is the eye's, not held: the frames it begins and ends being drawn
+      volumes: frames.filter((f, k) => k === 0 || f.mounted.volumes !== frames[k - 1].mounted.volumes).map((f) => ({ i: f.i, drawn: f.mounted.volumes })) },
     floorCeilingMax: round(floorCeilingMax, 4), refused: refusal,
     draws: frames.reduce((s, f) => s + f.draws, 0), over: frames.filter((f) => f.over).length,
     fastest: frames.reduce((b, f) => ((f.motion ?? 0) > (b.motion ?? 0) ? f : b), frames[0]).i,
