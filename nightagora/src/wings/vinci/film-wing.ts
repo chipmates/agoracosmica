@@ -138,6 +138,7 @@ export function createWing(): WingModule {
   /* ---- the picture's box ---- */
   /** the phone's picture is sized once, to the large viewport */
   let tall: HTMLDivElement | undefined
+  let cycleLayer: HTMLDivElement | undefined
   function box() {
     if (wide) return { left: 0, top: 0, width: innerWidth, height: deskStageHeight() }
     const height = Math.max(innerHeight, tall?.getBoundingClientRect().height ?? 0)
@@ -158,7 +159,10 @@ export function createWing(): WingModule {
       cutCard.textContent = ''
       cutCard.append(make('p', 'vinci-cut-title', title))
       cutCard.hidden = false
-      if (!cutCard.isConnected) wing.append(cutCard)
+      /* ON THE PHONE THE CUT KEEPS THE FOOT: the card stands inside the stage,
+         under the graded box, so back and gold stay over the dark */
+      const parent = wide ? wing : hosts.stage
+      if (cutCard.parentElement !== parent) parent.append(cutCard)
       void cutCard.offsetWidth
       cutCard.dataset['on'] = '1'
       wing.dataset['cut'] = ''
@@ -295,7 +299,10 @@ export function createWing(): WingModule {
         station: () => stationOf(LIFE[card]!.station).id,
         stack: h.world.stack, scene: h.world.scene, camera: h.world.camera,
         standDown, veil: hidden => picture?.veil(hidden), standing, openRecord,
-        onClose: () => { marksAt = '' } })
+        onClose: () => { marksAt = '' },
+        cycle: id => { const cycle = release?.cycles?.[id]; return cycle ? { cycle, base: filmReleaseBase() } : null },
+        cycleLayer: () => cycleLayer!,
+        box, framing: () => (wide ? 'wide' : 'upright') })
       lookCard = m.FILM_LOOK_CARD
       marksAt = ''
       refreshCells()
@@ -428,6 +435,7 @@ export function createWing(): WingModule {
     root: HTMLElement; name: HTMLElement; line: HTMLElement; drawer: HTMLElement; keys: HTMLElement
     more: HTMLButtonElement; from: HTMLButtonElement; count: HTMLElement
     back: HTMLButtonElement; book: HTMLButtonElement; gold: HTMLButtonElement; goldName: HTMLElement; ringLine: SVGCircleElement
+    goldPath: SVGPathElement
   } | undefined
   let drawerOpen = false
   function buildPhone(h: WingHosts): void {
@@ -465,7 +473,8 @@ export function createWing(): WingModule {
     const ringLine = document.createElementNS(SVG, 'circle')
     ringLine.setAttribute('cx', '22'); ringLine.setAttribute('cy', '22'); ringLine.setAttribute('r', '20.5')
     ring.append(ringLine)
-    arrow.append(ring, icon(ARROW_ON))
+    const goldIcon = icon(ARROW_ON)
+    arrow.append(ring, goldIcon)
     gold.append(goldName, arrow)
     foot.append(back, book, gold)
     root.append(name, line, drawer, keys, foot)
@@ -485,7 +494,7 @@ export function createWing(): WingModule {
       if (dy < -24 && !drawerOpen) setDrawer(true)
       else if (dy > 24 && drawerOpen) setDrawer(false)
     }, { signal })
-    phone = { root, name, line, drawer, keys, more, from, count, back, book, gold, goldName, ringLine }
+    phone = { root, name, line, drawer, keys, more, from, count, back, book, gold, goldName, ringLine, goldPath: goldIcon.querySelector('path')! }
   }
   function setDrawer(open: boolean): void {
     if (!phone) return
@@ -543,18 +552,28 @@ export function createWing(): WingModule {
     if (walking) {
       phone.goldName.textContent = text(deskControl('walk', 'walk_faster'))
       phone.gold.setAttribute('aria-label', `${text(deskControl('walk', 'walking'))} · ${text(deskControl('walk', 'walk_faster'))}`)
+    } else if (to !== null) {
+      const title = text(deskStoryStop(LIFE[to]!.id)?.chapter ?? LIFE[to]!.name)
+      phone.goldName.textContent = title
+      phone.gold.setAttribute('aria-label', `${text(CARDS.controls.date.next)} · ${title}`)
     } else {
-      const title = to === null ? null : text(deskStoryStop(LIFE[to]!.id)?.chapter ?? LIFE[to]!.name)
-      phone.goldName.textContent = title ?? text(deskControl('walk', 'the_end'))
-      phone.gold.setAttribute('aria-label', title ? `${text(CARDS.controls.date.next)} · ${title}` : text(deskControl('walk', 'the_end')))
+      /* THE END OF THE WALK IS A WAY ON, as the desktop's is: named, lit and
+         pointing up, and a press looks up to the lobby */
+      const end = text(deskControl('walk', 'the_end')), look = text(deskControl('walk', 'look_up'))
+      phone.goldName.textContent = ''
+      phone.goldName.append(make('span', 'film-gold-kicker', end), make('span', 'film-gold-look', look))
+      phone.gold.setAttribute('aria-label', `${end} · ${look}`)
     }
-    phone.gold.disabled = !walking && to === null
+    phone.gold.dataset['end'] = String(!walking && to === null)
+    phone.goldPath.setAttribute('d', !walking && to === null ? ARROW_UP : ARROW_ON)
+    phone.gold.disabled = false
   }
   function pressOn(): void {
     const s = picture?.state()
     if (s && s.kind !== 'rest') { picture?.hurry(); return }
     const to = nextIndex()
     if (to !== null) hosts?.navigate(to)
+    else hosts?.stage.parentElement?.querySelector<HTMLElement>('.wing-lobby')?.click()
   }
 
   /* ---- the words of the place, painted where the design stands them ---- */
@@ -605,6 +624,9 @@ export function createWing(): WingModule {
       framing: () => (wide ? 'wide' : 'upright'), box, pace: () => gaitPace(), hold: title => readingMs(title) })
     // the seam as the rigs read it, the way the live wing hands them `__forge`
     ;(window as unknown as { __naSeam?: PictureSource }).__naSeam = picture
+    // a machine's filmed cycle stands over the film and under every word
+    cycleLayer = make('div', 'film-cycle-layer')
+    picture.element.after(cycleLayer)
     picture.on('state', state => { paintDip(state); if (state.kind === 'rest') marksAt = '' })
     picture.on('rest', state => {
       if (state.kind !== 'rest') return

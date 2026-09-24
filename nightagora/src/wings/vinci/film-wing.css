@@ -219,3 +219,33 @@
 @media (prefers-reduced-motion: reduce) {
   .film-gold-ring circle { transition: none; }
 }
+
+/* THE END OF THE WALK IS A WAY ON: the pill stays lit, says it is the end,
+   and names what a press does, as the desktop's control at the same stop */
+.film-gold[data-end='true'] .film-gold-name { display: flex; flex-direction: column; gap: 1px; }
+.film-gold-kicker { font: 400 .875rem/16px var(--sans); letter-spacing: .06em; text-transform: uppercase; color: color-mix(in srgb, var(--gold-ink) 72%, transparent); }
+.film-gold-look { font: 400 .9375rem/18px var(--serif); }
+
+/* THE SHEET'S TALL HEIGHTS on the phone: the record and the panel rise from
+   the foot of the glass to 44 px under its top, the full width, one scroll
+   each, and the way out of them stands in the thumb's reach at the foot */
+#wing[data-film='upright'] .vinci-dock {
+  left: 0; right: 0; top: 44px; bottom: 0; width: auto; height: auto; transform: none; margin: 0;
+  max-width: none; max-height: none;
+  padding: 0 16px calc(80px + env(safe-area-inset-bottom));
+  border: 0; border-top: 1px solid #a9977355; border-radius: 14px 14px 0 0;
+  background: #0d171f;
+}
+#wing[data-film='upright'] .vinci-dock::backdrop { background: #081016a6; }
+#wing[data-film='upright'] .vinci-sources-toolbar .vinci-sources-close {
+  position: fixed; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 2;
+  width: 48px; height: 48px; max-width: 48px; min-width: 48px; padding: 0; border-radius: 50%;
+  background: #07101ad9; box-shadow: inset 0 0 0 1px #ffffff40;
+}
+html:has(#wing[data-film='upright']) #instruments {
+  left: 0; right: 0; top: 44px; bottom: 0; width: auto; max-width: none; max-height: none;
+  padding: 22px 24px calc(16px + env(safe-area-inset-bottom));
+  border-radius: 14px 14px 0 0;
+}
+html:has(#wing[data-film='upright']) #instruments:not([hidden]) { display: flex; flex-direction: column; }
+html:has(#wing[data-film='upright']) #instruments .inst-close { margin: auto auto 0 0; min-height: 48px; padding: 0 4px; }
