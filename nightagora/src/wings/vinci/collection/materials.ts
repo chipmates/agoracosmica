@@ -440,8 +440,10 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
   // THE COURT'S FLAGS ARE STONES OF THEIR OWN: a tone, a grain and wear per
   // slab on the paving's top face, outdoors only
   const courtTop = isOutdoor.select(smoothstep(.9, .97, n.y).mul(float(1).sub(smoothstep(.006, .016, P.y.sub(COURT.level).abs()))), float(0))
+  // the sunken court stays damp along its walls, drier toward its middle
+  const courtEdge = P.x.sub(COURT.west).min(float(COURT.east).sub(P.x)).min(P.z.negate().sub(COURT.south)).min(float(COURT.north).add(P.z))
   const flags = flagFace({ east: COLLECTION_PAVING_ORIGIN.east, north: COLLECTION_PAVING_ORIGIN.north, pitchEast: LINE_SLAB.pitchEast, pitchNorth: LINE_SLAB.pitchNorth, bond: 0 },
-    walked, float(.3))
+    walked, float(.22).add(float(1).sub(smoothstep(.3, 3, courtEdge)).mul(.62)))
   m.colorNode = mix(albedo, albedo.mul(flags.tone), courtTop)
   // A RELIEF FILTERED AWAY LEAVES A SMOOTHER PLANE THAN WAS AUTHORED, and a
   // smoother plane is a shinier one: the slope the gates took goes into the
@@ -464,7 +466,7 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
     isPlaster.select(relief.add(stroke.mul(.0006)).add(lap.mul(.0011)).add(formLift.mul(-.0007)).add(boardJoint.mul(-.0012)),
       isCeiling.select(relief.add(stroke.mul(.0005)).add(lap.mul(.0009)).add(bayNorth.max(bayEast).mul(-.004)),
         isDark.select(relief.add(stroke.mul(.0022)).add(stoneJoint.mul(-.0018)),
-          isOutdoor.select(relief.mul(worn).add(slabJoint.mul(-.0024)), relief))))).toVar()
+          isOutdoor.select(relief.mul(worn).add(slabJoint.mul(-.0024)).add(flags.height.mul(courtTop)), relief))))).toVar()
   m.normalNode = reliefNormal(n.transformDirection(cameraViewMatrix), height, .2)
   const daylight = interiorDaylight(P, n)
   m.aoNode = isOutdoor.select(float(1), daylight.mul(1.55).add(.10).clamp(.10, 1))

@@ -24,7 +24,7 @@ export const mossProvenance = {
   manifestId: 'vinci/moss',
   assetClass: 'GENERATED',
   certainty: 'conjectural',
-  recipe: 'Low moss cushions 30 to 120 mm across, in patches along the foot of every wall and retaining face a stop sees, most on the north feet and inside the grave court, sparse in the back corners of stair treads; thin strips of moss in the court paving joints within five metres of its walls. Colour and relief from a recipe in code. Positions and amounts are an exhibition reading of the damp, not a record.',
+  recipe: 'Moss cushions 30 to 120 mm across, domed up to a third of their width with smaller cushions crowding their flanks, in patches along the foot of every wall and retaining face a stop sees, most on the north feet and inside the grave court, sparse in the back corners of stair treads; thin strips of moss in the court paving joints within five metres of its walls. Colour and relief from a recipe in code. Positions and amounts are an exhibition reading of the damp, not a record.',
 } as const
 
 /** moss greens, damp to dry, in linear reflectance 0.04 to 0.2 */
@@ -82,8 +82,16 @@ export function createMoss(tier: TierName): Group {
       const u = Math.cos(a) * r * 1.6, v = Math.abs(Math.sin(a)) * r * .6
       const pe = e + alongE * u + low[0] * v, pn = n + alongN * u + low[1] * v
       const size = .03 + random() * random() * .09
-      if (pebble(emit, groundAt, pe, pn, size, .16 + random() * .14, random() * Math.PI, calm ? 4 : 5, size * .02,
+      // A CUSHION, NOT A SPLODGE: domed as high as a third of its width,
+      // with smaller cushions crowding its flanks, each its own green
+      if (pebble(emit, groundAt, pe, pn, size, .34 + random() * .22, random() * Math.PI, calm ? 4 : 7, size * .04,
         colourAt(1 - damp), random)) laid++
+      if (calm) continue
+      for (let j = 0, m = 1 + Math.floor(random() * 3); j < m; j++) {
+        const b = random() * Math.PI * 2, d = size * (.35 + random() * .3), small = size * (.35 + random() * .35)
+        if (pebble(emit, groundAt, pe + Math.cos(b) * d, pn + Math.sin(b) * d, small, .38 + random() * .3, random() * Math.PI, 6, small * .05,
+          colourAt(1 - damp + (random() - .5) * .4), random)) laid++
+      }
     }
   }
 
@@ -227,7 +235,7 @@ function mossMaterial(): MeshStandardNodeMaterial {
   const tufts = mx_noise_float(P.mul(48).add(vec3(3.1, 7.7, 1.9))).mul(shows(.02))
   m.colorNode = vec3(1, 1, 1).mul(shoots.mul(.22).add(1)).mul(mix(float(.86), float(1.1), tufts.mul(.5).add(.5)))
   // the felt's relief from its own height: the cushions carry no map coordinates
-  m.normalNode = reliefNormal(normalWorldGeometry.transformDirection(cameraViewMatrix), shoots.mul(.0008).add(tufts.mul(.002)), .35)
+  m.normalNode = reliefNormal(normalWorldGeometry.transformDirection(cameraViewMatrix), shoots.mul(.0012).add(tufts.mul(.0035)), .45)
   m.name = 'vinci generated moss'
   m.userData = { ...mossProvenance }
   return m
