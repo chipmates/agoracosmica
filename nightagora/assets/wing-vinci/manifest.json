@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed to a pale grey at 30 per cent. Assumed weather, no observation claimed.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "d54790df4f6089ebe0d88c65108db4a78f3e124e8ea8d16a4893e13cf14ba46b",
+      "sha256": "72cdf713b4760ab9d250c6944224ed3b037c826f5c434bf257b47368cf8d1c54",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=80c458f2cb5ccddb7fcedccda5df70e5cdccda7d9ca97d65ebfa6462920f61ef;"
     },
     {
@@ -231,7 +231,7 @@
       "prompt": "Original procedural modern museum insertion at the fixed maquette envelope. Low post-grid pavilions, shallow slate roofs, full-height glazed enclosure, concrete apron and garden stair. Exact modern approach grade cuts, supported landings and continuous concrete cheek ownership. Museum design, not a claim about1517. Share the existing pale cast-concrete finish across all four roof soffits; keep their downward normals and the sole measured sun. Derive both entrance post heads from the retained inclined canopy underside; keep their centres and buried feet. Provide continuous derived structural support beneath the existing stair cheeks and both landing heads. Keep the maquette walking widths and every finish level.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "6e43b8b989ad25fce3162fbdeda8a043863a189a7234649b669c33f252f8a1b4",
+      "sha256": "ecb8b8d1e9220d7ec0a2f1272e2f6af6dd0038abc52bb76726369776ff9f3a7b",
       "note": "recipe_file=src/wings/vinci/collection.ts"
     },
     {
@@ -3282,7 +3282,7 @@
       "prompt": "Place the picture module sources on every field of the room's holder-sized wall, including the paired panel reverse, and hang the body wall's admitted Windsor sheets each at the size its holder records, the three without a recorded size at a constant area. No field is withheld: the store's register is the only admission decision, and a work it does not admit leaves the wall. The current holder measurement for the Lansdowne Yarnwinder is 37.1 by 49.5 cm while its earlier layout slot preserves neighbouring placements. Place the admitted Last Supper source within the existing 8.8 by 4.6 metre mural field. Source admission, windows, arch shoulders, decoding and transitions are imported unchanged from the picture module. The room openings and fittings supply the light. All previews remain present: 512 pixel uploads at calm and standard, 1024 at hero, one distance-earned full source outside calm across both walls. Source pixels are never copied into this repository.",
       "model": "Deterministic TypeScript and TSL exhibition placement",
       "date": "2026-09-14",
-      "sha256": "7a8e55d0110179038ee5484fc92b24816eefdbf3a12ae9d1372a8718f44a8ce5",
+      "sha256": "7242442ce1ffe375b5850c98ec38e943837afa73740d2837eef1273d1f086ec6",
       "note": "Modern exhibition supports, no historical room claim. recipe_file=src/wings/vinci/collection/plates.ts wall_register=src/wings/vinci/collection/body-wall.ts; streaming bytes and displayed licences resolve through the store manifest.",
       "recipe_files": [
         {
