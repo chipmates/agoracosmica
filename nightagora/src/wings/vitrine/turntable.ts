@@ -26,6 +26,7 @@ import { deskStageHeight } from '../desk-stage'
 import type { VitrinePayload, VitrinePayloadHost } from './types'
 import { islandFit } from './fit'
 import { paintSlider } from './slider'
+import { folioDoor } from './folio'
 
 export interface TurntableBody {
   object: Object3D
@@ -708,24 +709,9 @@ export function createTurntablePayload(options: TurntableOptions): TurntablePayl
     }
     // THE SHEET BESIDE THE MODEL: the folio the machine was read from.
     if (options.sheet) {
-      const sheet = make('button', 'vitrine-folio')
-      sheet.type = 'button'
-      sheet.setAttribute('aria-label', options.sheet.label)
-      const label = options.sheet.label
-      if (options.sheet.src) {
-        void options.sheet.src.then(src => {
-          if (!mounted) return
-          if (!src) { sheet.textContent = label; return }
-          const image = make('img', 'vitrine-folio-thumb')
-          image.alt = ''
-          image.decoding = 'async'
-          image.src = src
-          sheet.append(image)
-        })
-      } else sheet.textContent = label
-      sheet.addEventListener('click', () => options.sheet?.open(), { signal: listening.signal })
+      const sheet = folioDoor(next.element.ownerDocument, options.sheet, next.narrow, listening.signal, () => mounted)
       // ON THE PHONE THE FOLIO IS A GLASS in the views' row, never a chip on the model
-      if (next.narrow) { sheet.classList.add('vitrine-folio-glass'); views.append(sheet) }
+      if (next.narrow) views.append(sheet)
       else next.element.append(sheet)
     }
     const svg = next.element.ownerDocument.createElementNS('http://www.w3.org/2000/svg', 'svg')

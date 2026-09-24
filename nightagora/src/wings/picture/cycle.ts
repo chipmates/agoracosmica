@@ -10,6 +10,7 @@ import type { PictureBox, PictureFraming } from './seam'
 import type { VitrinePayload, VitrinePayloadHost } from '../vitrine/types'
 import { islandFit } from '../vitrine/fit'
 import { paintSlider } from '../vitrine/slider'
+import { folioDoor, type FolioSheet } from '../vitrine/folio'
 
 export interface CycleFile { file: string; bytes: number }
 
@@ -62,7 +63,7 @@ export function createCyclePayload(options: {
   steps: readonly CycleStep[]
   words: { play: string; pause: string; again: string; clock: string }
   /** the folio beside the model, as the island shows it */
-  sheet?: { src: Promise<string | null> | null; label: string; open(): void }
+  sheet?: FolioSheet
   /** the step it opens landed on, or null to open playing */
   land: number | null
 }): VitrinePayload & { landed(): number | null; standing(): boolean } {
@@ -269,22 +270,8 @@ export function createCyclePayload(options: {
       next.aside.append(list)
     }
     if (options.sheet) {
-      const sheet = make('button', 'vitrine-folio')
-      sheet.type = 'button'
-      sheet.setAttribute('aria-label', options.sheet.label)
-      if (options.sheet.src) {
-        void options.sheet.src.then(src => {
-          if (!root) return
-          if (!src) { sheet.textContent = options.sheet!.label; return }
-          const image = make('img', 'vitrine-folio-thumb')
-          image.alt = ''
-          image.decoding = 'async'
-          image.src = src
-          sheet.append(image)
-        })
-      } else sheet.textContent = options.sheet.label
-      sheet.addEventListener('click', () => options.sheet?.open(), { signal })
-      if (next.narrow) { sheet.classList.add('vitrine-folio-glass'); views.append(sheet) }
+      const sheet = folioDoor(next.element.ownerDocument, options.sheet, next.narrow, signal, () => root !== undefined)
+      if (next.narrow) views.append(sheet)
       else next.element.append(sheet)
     }
   }

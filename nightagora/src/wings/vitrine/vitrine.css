@@ -199,6 +199,7 @@
   .vitrine-views .vitrine-folio-glass {position:static;flex:0 0 44px;width:44px;height:44px;min-width:44px;max-width:44px;
     padding:0;overflow:hidden;border-radius:50%;}
   .vitrine-folio-glass .vitrine-folio-thumb {width:100%;height:100%;object-fit:cover;object-position:50% 30%;}
+  .vitrine-folio-leaf {width:20px;height:24px;fill:none;stroke:#edcc8c;stroke-width:1.3;stroke-linejoin:round;stroke-linecap:round;}
   /* ONE TEXT AT A TIME: the run's caption is the step's one sentence, and the
      steps as rows stand in the drawer "More" opens, never under it as well */
   .vitrine[data-payload='machine'] .vitrine-card:has(.vitrine-more[aria-expanded='false']) .vitrine-steps {display:none;}
