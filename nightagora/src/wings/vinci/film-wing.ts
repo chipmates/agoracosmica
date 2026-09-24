@@ -177,8 +177,10 @@ export function createWing(): WingModule {
     dots = answering ? [answering.dot] : []
     if (chip) chip.hidden = true
   }
+  /** a mark is gold where a press moves the body: a walk, or the dip the film makes where it has no walk */
   function routable(exhibit: string): boolean {
-    return Boolean(release?.edges.some(e => e.to === viewNode(exhibit)))
+    const how = picture?.reach(viewNode(exhibit))
+    return how === 'walk' || how === 'dip'
   }
   function chrome(): { left: number; top: number; right: number; bottom: number } | null {
     const node = hosts?.stage.querySelector<HTMLElement>(wide ? '.desk-low' : '.film-box')

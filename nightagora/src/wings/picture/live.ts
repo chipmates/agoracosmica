@@ -60,6 +60,7 @@ export function createLivePicture(hook: FilmHook, walk: VinciWalk): PictureSourc
     hurry() {},
     ahead() {},
     lean() {},
+    reach: node => (resolveNode(walk, node) ? 'walk' : 'none'),
     state,
     /** the marks the live wing draws now, in picture-box pixels */
     marks(_node, _lang) {

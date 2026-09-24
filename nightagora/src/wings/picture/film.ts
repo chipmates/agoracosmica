@@ -629,6 +629,14 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
         if (edge) void trackOf(edge, f)
       }
     },
+    reach(node) {
+      const f = framingOf()
+      let plan: RouterPlan
+      try { plan = route(graphOf(f), here, node, { framing: f, pace: 'walk' }) } catch { return 'none' }
+      if (plan.type === 'walk') return 'walk'
+      if (plan.type === 'open' || plan.type === 'here') return 'open'
+      return release.nodes[node]?.stills[f] ? 'dip' : 'none'
+    },
     lean(node) {
       if (lean() || busy) return
       const f = framingOf()

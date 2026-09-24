@@ -62,6 +62,9 @@ export interface PictureSource {
   ahead(nodes: readonly PictureNode[]): void
   /** a hand resting on a way: a source may fetch the start of it */
   lean(node: PictureNode): void
+  /** how a press would be answered from here: walked, opened where he stands,
+      reached by a dip, or not at all; a mark promises only what this says */
+  reach(node: PictureNode): 'walk' | 'open' | 'dip' | 'none'
   state(): PictureState
   /** the marks of a node, in picture-box pixels, in one language */
   marks(node: PictureNode, lang: 'en' | 'de'): readonly PictureMark[]
