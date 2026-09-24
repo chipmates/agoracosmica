@@ -48,14 +48,14 @@
   },
   {
    "file": "src/wings/vinci/collection.ts",
-   "sha256": "741bf57b9eb787765ec9156d99518db9cbd02fdd0d4058be086ecac1a3fa7036",
-   "bytes": 47394,
+   "sha256": "ecb8b8d1e9220d7ec0a2f1272e2f6af6dd0038abc52bb76726369776ff9f3a7b",
+   "bytes": 48395,
    "unchangedDuringAudit": true
   },
   {
    "file": "src/wings/vinci/collection/approaches.ts",
-   "sha256": "4c61ef8e25557d5101f848bca86b7f36a97c72c02583004759a7e6cfe994bba5",
-   "bytes": 27748,
+   "sha256": "237f21399cdfb4c8f8009328e82ed3ac54faabf50dc902cbc676490f5c53ef6b",
+   "bytes": 27473,
    "unchangedDuringAudit": true
   },
   {
@@ -90,8 +90,8 @@
   },
   {
    "file": "src/wings/vinci/collection/layout.ts",
-   "sha256": "01b1c3363d39cace4c6a3ee62486f5c8a6f462f7ac7b48b2c1d9e4b7f5f7bdc9",
-   "bytes": 6763,
+   "sha256": "1fe21befa45e8a8a30702b59043ecb0e659f02aee14e90a710ec2ebe1a87e5e2",
+   "bytes": 7235,
    "unchangedDuringAudit": true
   },
   {
@@ -102,14 +102,26 @@
   },
   {
    "file": "src/wings/vinci/collection/materials.ts",
-   "sha256": "89f33b0cd539c66268caa251ca6715ecb5cea5aae62084392a0b14dca91e0b78",
-   "bytes": 42994,
+   "sha256": "8dea2cb204acc18fe72902887ceea25a3471118a0a7f1918fc82e433cd90a18e",
+   "bytes": 43469,
+   "unchangedDuringAudit": true
+  },
+  {
+   "file": "src/wings/vinci/collection/picture-light.ts",
+   "sha256": "4841cfb67376a40a8a824a838af04c70cabf8d2bf0cdc228360b039a4b14abab",
+   "bytes": 16303,
+   "unchangedDuringAudit": true
+  },
+  {
+   "file": "src/wings/vinci/collection/picture-room-plan.ts",
+   "sha256": "569a196101f53ccae848b436ef6f03f2f41e755152ccdd8782d6594b17208391",
+   "bytes": 40124,
    "unchangedDuringAudit": true
   },
   {
    "file": "src/wings/vinci/collection/reading-room-plan.ts",
-   "sha256": "63f60c21bced008f962329bc1020cc917fe059969cdf594c0c79e9efcc74b5fa",
-   "bytes": 73084,
+   "sha256": "1683a7d9650a6feede11b557de1b2bf2557438df18b99efd730a3d80f772b39b",
+   "bytes": 73054,
    "unchangedDuringAudit": true
   },
   {
@@ -126,8 +138,8 @@
   },
   {
    "file": "src/wings/vinci/collection/views.ts",
-   "sha256": "8262f7fd65afc5237eeeabcb9662732f0e89d14bedd87815f48b85aa2942159c",
-   "bytes": 12273,
+   "sha256": "079d3b4f3f21b67b32a390371867d4536da6e5ac143fb614fc7b2f82787948ba",
+   "bytes": 12922,
    "unchangedDuringAudit": true
   },
   {
@@ -245,9 +257,27 @@
    "unchangedDuringAudit": true
   },
   {
+   "file": "src/wings/vinci/grave/court-light.ts",
+   "sha256": "3e36903f60bbf340aab89717b7b732c93bfdd0deba11c074b953b5dc37640326",
+   "bytes": 9556,
+   "unchangedDuringAudit": true
+  },
+  {
+   "file": "src/wings/vinci/grave/court-plan.ts",
+   "sha256": "a84391351c6537c3ff388a6a41d18ca7d8bc0880ac8ec2ccf6e389fd3496bb7b",
+   "bytes": 7192,
+   "unchangedDuringAudit": true
+  },
+  {
    "file": "src/wings/vinci/grave/placement.ts",
    "sha256": "bbbca27b3348cfb65427d7e87b90a9425ee37f184ae9fdf2e180e02d85d48916",
    "bytes": 815,
+   "unchangedDuringAudit": true
+  },
+  {
+   "file": "src/wings/vinci/gravel-maps.ts",
+   "sha256": "219fc8e1f0d63559ddd10a8993e1715d451934a1932d297ade87188ba2a9b56d",
+   "bytes": 11122,
    "unchangedDuringAudit": true
   },
   {
@@ -258,14 +288,14 @@
   },
   {
    "file": "src/wings/vinci/ground-finish.ts",
-   "sha256": "83230d697ca45db3b69219f96642663ce0c7be8b56712cd5c8a1f2c7cdd7dd3e",
-   "bytes": 16611,
+   "sha256": "a336b3d298d58d3a2485b125efce95d8468825c86df1dc3dd580ee05d3c10e80",
+   "bytes": 21878,
    "unchangedDuringAudit": true
   },
   {
    "file": "src/wings/vinci/ground-walls.ts",
-   "sha256": "1dd2a4bc1ed1c0b8de7a8cff9024603610f3e4128db8f2f1ef5904fcf753ec4c",
-   "bytes": 9329,
+   "sha256": "9c0ded5bd35ba939495742c20d463494a94094bcbb082f3c292eb2575d50d571",
+   "bytes": 11775,
    "unchangedDuringAudit": true
   },
   {
@@ -318,14 +348,14 @@
   },
   {
    "file": "src/wings/vinci/leaf-litter.ts",
-   "sha256": "d37b06ff6b46773ff80da23d5796d5b95f866783384cdac91b7f8d8533b52be6",
-   "bytes": 33154,
+   "sha256": "5bcad31081fe77d6220d4060908466b1bf1cc91584a8b3d70a9a08e3e3697efd",
+   "bytes": 34667,
    "unchangedDuringAudit": true
   },
   {
    "file": "src/wings/vinci/leaf-maps.ts",
-   "sha256": "84eba58541f265a3f0cacf622fe2e64e23a498dff12c4ccbd45e9c91b636d806",
-   "bytes": 24108,
+   "sha256": "ec2bc4978bd17ea17afd31529cde1dc6f96cf5ae2dea97beb98fe85d8f4ff996",
+   "bytes": 24112,
    "unchangedDuringAudit": true
   },
   {
@@ -587,6 +617,12 @@
    "unchangedDuringAudit": true
   },
   {
+   "file": "src/wings/vinci/stair-wear.ts",
+   "sha256": "dbd4db39a9c81b5ecdafaf750d62a4f865bb1b6747bf46abb409af735b19f6a4",
+   "bytes": 3481,
+   "unchangedDuringAudit": true
+  },
+  {
    "file": "src/wings/vinci/surface.ts",
    "sha256": "916766c851d42e5f7dce4a85cdd06899a0f4bf93ff841911980527cdc28ca169",
    "bytes": 47907,
@@ -612,8 +648,8 @@
   },
   {
    "file": "src/wings/vinci/vegetation.ts",
-   "sha256": "525b2dff31851eb7d6813452ba1050f8cbb46af8b59cc952fa2e0d0628b0f8d1",
-   "bytes": 36826,
+   "sha256": "c4be75b5be0621977e2b30cd4ee2356251534d0b69c56bc43830b7d590248507",
+   "bytes": 37042,
    "unchangedDuringAudit": true
   },
   {
@@ -630,26 +666,26 @@
   }
  ],
  "geometrySha256": [
-  "8d48a9e1c2c8bc4145db263daad24a70cb83ea0f7c5f3decec7f228db8c4c89a",
-  "823aef6c58c2c1507b88e581cb0353afa0bf65b8a13cc5c9c75a1ef2cdf56501",
-  "565e46c1c7b4cf4cf2ff0f0ffa9c1165a7409c3afc4a4292f8f9449c40383def"
+  "9a5a0363f8d886c06990dd9f28bdd5d7db90ebff4c93916a293bf947031e458d",
+  "65df612aa9202cb08eabaa9bbcb2e151b37767cd8870f73e0fcd25331664fc8b",
+  "1e61c6bdd74edda459241128b7273611f61634122495e0adaa37e424e18fc7d4"
  ],
  "geometry": [
   {
    "tier": "hero",
-   "sha256": "8d48a9e1c2c8bc4145db263daad24a70cb83ea0f7c5f3decec7f228db8c4c89a",
+   "sha256": "9a5a0363f8d886c06990dd9f28bdd5d7db90ebff4c93916a293bf947031e458d",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   },
   {
    "tier": "standard",
-   "sha256": "823aef6c58c2c1507b88e581cb0353afa0bf65b8a13cc5c9c75a1ef2cdf56501",
+   "sha256": "65df612aa9202cb08eabaa9bbcb2e151b37767cd8870f73e0fcd25331664fc8b",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   },
   {
    "tier": "calm",
-   "sha256": "565e46c1c7b4cf4cf2ff0f0ffa9c1165a7409c3afc4a4292f8f9449c40383def",
+   "sha256": "1e61c6bdd74edda459241128b7273611f61634122495e0adaa37e424e18fc7d4",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   }
@@ -2824,7 +2860,7 @@
     {
      "name": "vinci/collection/architecture",
      "manifestId": "vinci/collection",
-     "vertices": 3204,
+     "vertices": 3252,
      "bbox": [
       -65,
       -6.5,
@@ -2834,20 +2870,20 @@
       67
      ],
      "centroid": [
-      -31.812650037615487,
-      -3.776810920082228,
-      34.932340871975214
+      -31.97316443172328,
+      -3.7436645394981567,
+      34.91535059728306
      ],
      "rms": [
-      35.14982786256774,
-      4.430037138032489,
-      37.014138413992384
+      35.30688530380456,
+      4.401170263304528,
+      36.96849723971111
      ]
     },
     {
      "name": "vinci/collection/cast-concrete",
      "manifestId": "vinci/collection",
-     "vertices": 1908,
+     "vertices": 1920,
      "bbox": [
       -62.70000076293945,
       -7.079999923706055,
@@ -2857,14 +2893,14 @@
       64.69999694824219
      ],
      "centroid": [
-      -23.03445003317587,
-      -4.148679239476252,
-      25.34311319747061
+      -23.156422221660613,
+      -4.133104382362217,
+      25.396124988794327
      ],
      "rms": [
-      24.8340765203971,
-      4.437604698510986,
-      27.634984879939296
+      25.01086710524844,
+      4.425653917081271,
+      27.677982267984504
      ]
     },
     {
@@ -4509,7 +4545,7 @@
     {
      "name": "vinci/collection/architecture",
      "manifestId": "vinci/collection",
-     "vertices": 3204,
+     "vertices": 3252,
      "bbox": [
       -65,
       -6.5,
@@ -4519,20 +4555,20 @@
       67
      ],
      "centroid": [
-      -31.812650037615487,
-      -3.776810920082228,
-      34.932340871975214
+      -31.97316443172328,
+      -3.7436645394981567,
+      34.91535059728306
      ],
      "rms": [
-      35.14982786256774,
-      4.430037138032489,
-      37.014138413992384
+      35.30688530380456,
+      4.401170263304528,
+      36.96849723971111
      ]
     },
     {
      "name": "vinci/collection/cast-concrete",
      "manifestId": "vinci/collection",
-     "vertices": 1908,
+     "vertices": 1920,
      "bbox": [
       -62.70000076293945,
       -7.079999923706055,
@@ -4542,14 +4578,14 @@
       64.69999694824219
      ],
      "centroid": [
-      -23.03445003317587,
-      -4.148679239476252,
-      25.34311319747061
+      -23.156422221660613,
+      -4.133104382362217,
+      25.396124988794327
      ],
      "rms": [
-      24.8340765203971,
-      4.437604698510986,
-      27.634984879939296
+      25.01086710524844,
+      4.425653917081271,
+      27.677982267984504
      ]
     },
     {
@@ -5918,7 +5954,7 @@
     {
      "name": "vinci/collection/architecture",
      "manifestId": "vinci/collection",
-     "vertices": 3204,
+     "vertices": 3252,
      "bbox": [
       -65,
       -6.5,
@@ -5928,20 +5964,20 @@
       67
      ],
      "centroid": [
-      -31.812650037615487,
-      -3.776810920082228,
-      34.932340871975214
+      -31.97316443172328,
+      -3.7436645394981567,
+      34.91535059728306
      ],
      "rms": [
-      35.14982786256774,
-      4.430037138032489,
-      37.014138413992384
+      35.30688530380456,
+      4.401170263304528,
+      36.96849723971111
      ]
     },
     {
      "name": "vinci/collection/cast-concrete",
      "manifestId": "vinci/collection",
-     "vertices": 1908,
+     "vertices": 1920,
      "bbox": [
       -62.70000076293945,
       -7.079999923706055,
@@ -5951,14 +5987,14 @@
       64.69999694824219
      ],
      "centroid": [
-      -23.03445003317587,
-      -4.148679239476252,
-      25.34311319747061
+      -23.156422221660613,
+      -4.133104382362217,
+      25.396124988794327
      ],
      "rms": [
-      24.8340765203971,
-      4.437604698510986,
-      27.634984879939296
+      25.01086710524844,
+      4.425653917081271,
+      27.677982267984504
      ]
     },
     {
@@ -7086,7 +7122,7 @@
    "fullBall": {
     "distance": 0.5810004272460958,
     "mesh": "vinci/collection-rooms/construction",
-    "triangle": 274500
+    "triangle": 274520
    },
    "clearAtEveryOrientation": true
   },
