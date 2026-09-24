@@ -635,8 +635,10 @@ export function createWing():VinciWingModule {
     yield
     const entry=createEntryPassage(stack.tierName())
     shell=createShell(stack.tierName(),stack.materials)
-    // The great hall and its passage stand behind the shell's opened windows.
-    const greatHall=stack.tierName()==='calm'?null:createHouseHall(stack.tierName(),stack.materials)
+    // The great hall and its passage stand behind the shell's opened windows,
+    // at every tier: the hall's stop stands in its door, and the walk to it
+    // crosses the service passage's floor.
+    const greatHall=createHouseHall(stack.tierName(),stack.materials)
     yield
     const ground=createGround(stack.tierName(),stack.materials)
     yield

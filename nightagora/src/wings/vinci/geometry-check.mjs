@@ -341,8 +341,8 @@ await section('actual geometry buffers at all tiers', () => {
     const collection = collectionModule.createCollection();
     const collectionAccess = collectionAccessModule.createCollectionAccess();
     const entryPassage = entryPassageModule.createEntryPassage(tier);
-    // The great hall and the service passage to it, at the tiers the wing mounts them (not calm).
-    const houseHall = tier === 'calm' ? null : houseHallModule.createHouseHall(tier).group;
+    // The great hall and the service passage to it, mounted at every tier as the wing mounts them.
+    const houseHall = houseHallModule.createHouseHall(tier).group;
     const vegetation = vegetationModule.createVegetation(gradeModule.gradeAt, tier);
     const roadDressing = roadDressingModule.createRoadDressing(gradeModule.gradeAt, tier);
     const groundDressing = groundDressingModule.createGroundDressing(gradeModule.gradeAt, tier);
