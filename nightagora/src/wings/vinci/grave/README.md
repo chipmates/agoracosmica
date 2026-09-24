@@ -34,12 +34,13 @@ the published local-space anchors through the group's world transform.
 
 The name-only slab's anchor is `(-0.95, 0.24, 0.65)`. Its stone layer is
 2.04 m wide × 3.61 m long × 0.13 m thick, on a 2.16 × 3.74 m base. Its
-top facing is nominally 1.98 × 3.55 × 0.06 m before its 4 mm bevel, extending
-from y=0.17 to y=0.23 before beveling. The slab's only writing is
-**LEONARDO DA VINCI**, requested at 0.153 m cap height on desktop and
-0.20 m on phone, with 3 mm extrusion and its text plane at y=0.2348.
-Phone sets the same name on two lines, **LEONARDO / DA VINCI**. Its text
-origin moves from z=1.71 on desktop to z=1.41 on phone; the slab stays put.
+top facing is a pale honed limestone 1.98 × 3.55 × 0.064 m, its face at
+y=0.234 (`ledger.ts`). The slab's only writing is **LEONARDO / DA VINCI**
+on two centred lines at 0.27 m cap height, cut into the face by the
+museum's cut-letter method (a stone web round the letters, a mouth splayed
+3.5 mm) and filled nearly flush with the grave's ink; the block's middle
+stands 0.35 m from the slab's middle toward its foot. The ledger casts no
+shadow. The slab stays put at every viewport.
 This is an openly generated exhibition study: its dimensions are not an
 attested survey of the actual tomb. A neutral empty bronze inset marks the
 place of a medallion without fabricating a human portrait. The admitted
@@ -88,14 +89,19 @@ intentionally opened `record` root. The bench uses `GRAVE_SOURCE` and
 `GRAVE_DIAGRAM` in `../line/bench/visitor-sources.ts` for these plain readings.
 
 The deep frame centred at `(1.2, 2.46, -1.34)` holds a small three-dimensional
-gable study and a physically inscribed caption. Its backing is
-3.13 m wide × 2.55 m high; the gable outline is 1.90 m wide × 1.75 m high
-with a 0.20 m extrusion. These are authored exhibition dimensions. The
-window, ashlar, roof, frame and slab do not constitute a surveyed replica
-of either historic building or tomb. The gable's orientation carries the
-calculation; its decorative geometry does not testify to a 1519 elevation. Its
-coursing is built from dark joints just proud of the bevelled face, so the
-diagram reads as coursed ashlar rather than as marks on a plane.
+gable study and a physically inscribed caption (`diagram.ts`). Its linen
+ground is 3.13 m wide × 2.55 m high; the relief is a coursed chapel gable
+1.48 m wide and about 1.9 m high on an oak shelf, its blocks each their own
+length, tone and depth, with quoins, a lancet in a chamfered surround, dark
+glass set back in the reveal, stone copings and slate verges. These are
+authored exhibition dimensions. The window, ashlar, roof, frame and slab do
+not constitute a surveyed replica of either historic building or tomb. The
+gable's orientation carries the calculation: only the box takes a light of
+its own (`lightsNode`, hidden from the scene's list of lights), a
+directional light along `graveSunDirection()`, 3000 K, with a shadow map
+drawn from depth-only doubles on layer 12, so the relief shows the chosen
+minute's low light; its decorative geometry does not testify to a 1519
+elevation.
 Desktop uses a projecting ledge whose text plane lies beyond the frame
 posts. It says **CHOSEN LIGHT · A DIAGRAM** and **2 MAY 1519 · JULIAN
 CALENDAR**, or **GEWÄHLTES LICHT · EINE STUDIE** and **2. MAI 1519 ·
