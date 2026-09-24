@@ -7,7 +7,7 @@
  * entry shows the class there only, so the card under it drops its heading.
  */
 import cardsRaw from '../data/cards.json?raw'
-import { JOINT_WORK, policyCertainty } from '../pictures/policy-label'
+import { holderLine, JOINT_WORK, policyCertainty } from '../pictures/policy-label'
 import type { PictureWork, ResolvedPicturePlate } from '../pictures/register'
 import { frameKey, hangNumber } from './picture-room-plan'
 
@@ -44,7 +44,7 @@ export function hangCatalogue(work: PictureWork, face: 'front' | 'reverse' | nul
   const said = PICTURE.reproduction?.[language]
   const kind = QUALIFIED.has(work.attribution_certainty) ? policyCertainty(work, entries.length > 0, entries).word[language]
     : work.attribution_certainty === 'documented' && namedHands(work) > 1 ? JOINT_WORK[language] : null
-  // the holder stays in the language it publishes its name in
-  const where = [work.holder, said, kind].filter((part): part is string => Boolean(part)).join(' · ')
+  // the holder's own name stays as published; the place and the words round it follow the reader
+  const where = [holderLine(work, language), said, kind].filter((part): part is string => Boolean(part)).join(' · ')
   return { number: String(number), date, where, kind }
 }

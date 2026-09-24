@@ -31,7 +31,7 @@ import { COURT, GRAVE_ORIGIN, LINE_FIELD, ROOMS, SUPPER_WALL } from './collectio
 import { collectionView } from './collection/views'
 import { mountCollectionExhibits, type CollectionExhibits } from './collection/exhibits'
 import { isMachineSlug, type MachineSlug } from './machines'
-import { createPictureRecord, createPolicyWorkLabel, createWindowWorkLabel, policyLabelText, PICTURE_CERTAINTY_KEY } from './pictures/policy-label'
+import { createPictureRecord, createPolicyWorkLabel, createWindowWorkLabel, holderLine, policyLabelText, PICTURE_CERTAINTY_KEY } from './pictures/policy-label'
 import { hangCatalogue } from './collection/catalogue'
 import { frameKey, hangNumber } from './collection/picture-room-plan'
 import { MAIN_HANG, REGISTER, type PictureRights } from './pictures/register'
@@ -2380,7 +2380,7 @@ export function createWing():VinciWingModule {
     if(!works.length&&!machines.length&&!sheets.length)return
     host.append(make('h3','',text(vinciSourcesHeadings.inThisRoom)))
     const list=make('ul','vinci-room-list')
-    for(const work of works)list.append(make('li','',`${lang()==='de'?work.title_de:work.title_en} · ${work.holder} · ${text(ROOM_CLASS_WORD[work.rights_class])}`))
+    for(const work of works)list.append(make('li','',`${lang()==='de'?work.title_de:work.title_en} · ${holderLine(work,lang())} · ${text(ROOM_CLASS_WORD[work.rights_class])}`))
     for(const slug of machines){const machine=machineCatalog[slug];list.append(make('li','',`${text(machine.title)} · ${text(machine.label)}`))}
     const centimetres=(value:number)=>lang()==='de'?String(value).replace('.',','):String(value)
     for(const {sheet,page} of sheets){

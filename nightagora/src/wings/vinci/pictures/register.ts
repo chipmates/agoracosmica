@@ -55,6 +55,10 @@ export interface PictureWork {
   readonly title_en: string;
   readonly title_de: string;
   readonly holder: string;
+  /** the holder line in each language: the name as the holder publishes it,
+   * the place after it and the words round it in the reader's language */
+  readonly holder_en?: string;
+  readonly holder_de?: string;
   readonly inventory: string | null;
   readonly height_cm: number | null;
   readonly width_cm: number | null;

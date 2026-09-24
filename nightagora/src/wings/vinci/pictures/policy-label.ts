@@ -33,6 +33,12 @@ export const PICTURE_CERTAINTY_KEY = Object.freeze([
   { colour: '#b56152', en: 'Disputed or conjectural', de: 'Umstritten oder vermutet' },
 ])
 
+/** The holder line a reader of this language reads: the name as the holder
+ * publishes it, the place and the words round it in the reader's language. */
+export function holderLine(work: Pick<PictureWork, 'holder' | 'holder_en' | 'holder_de'>, language: 'en' | 'de'): string {
+  return (language === 'de' ? work.holder_de : work.holder_en) ?? work.holder
+}
+
 /** The label's word for a documented work of more than one named hand. */
 export const JOINT_WORK: PictureBilingual = Object.freeze({ en: 'Collaborative work', de: 'Gemeinschaftswerk' })
 
@@ -259,7 +265,7 @@ export function createPolicyWorkLabel(work: PictureWork, entries: readonly Resol
     first.prepend(dot)
     column.append(first, node('p', 'picture-attribution-state', text.certainty[language]),
       node('p', 'picture-record', text.record[language]),
-      node('p', 'picture-holder', `${work.holder}${work.inventory ? ` · ${work.inventory}` : ''}`),
+      node('p', 'picture-holder', `${holderLine(work, language)}${work.inventory ? ` · ${work.inventory}` : ''}`),
       node('p', language === 'en' ? 'picture-reason' : 'picture-reason-de', text.note[language]))
     for (const source of [...text.sources, ...kept]) {
       if (source.honesty) {
