@@ -24,8 +24,10 @@ export const COLLECTIONS = [
   },
   {
     name: 'inscriptions', file: 'src/wings/vinci/words/data/inscriptions.json',
+    // The public copy carries the first line's corrected folio (Richter 1150 at S. K. M. III. 80b,
+    // Codex Forster III f. 80v) and its two gap sentences; the sealed original does not.
     originalSHA256: '95633ee2b45498b6b4be3b9bc388e66b17e8bc5b45c919a5a9848c01d1f64723',
-    normalizedSHA256: '3fecfcd32557b8eaf2cc0e0a766b1384d568afcd120b008bce12365107f7b960',
+    normalizedSHA256: 'be83cbda69d68f0cda99ff418b599b501c93e54918969d40f8d02fd8643dbc94',
     expected: { passages: 52, apocrypha: 6, verified_popular_quotes: 4, german_catalogue_corrections: 1 },
   },
   {
@@ -38,9 +40,11 @@ export const COLLECTIONS = [
   },
   {
     name: 'paintings', file: 'src/wings/vinci/pictures/data/paintings.json',
-    // The public copy carries the Adoration's corrected height and width; the sealed original does not.
+    // The public copy carries the Adoration's corrected height and width, three facts rows taken
+    // over from the mining catalogue, one fact reworded plainly, short titles, the Ginevra reverse's
+    // own name and a German form of every holder line; the sealed original does not.
     originalSHA256: '7e78e1a73fa55cdd58c75c495332ebe0617387e6b72babbea2695bbb8a3a5d02',
-    normalizedSHA256: '2566437bcfd1155db74606779ff20d40c664c11ff68c6e7b45b5c8178855d33f',
+    normalizedSHA256: '84888324fbe37f565c8209ad4be0529d21794fcabc671387cdd2d7e47cc080fc',
     expected: { works: 30, held_assets: 32, catalogue_mentions: 9 },
   },
 ]
