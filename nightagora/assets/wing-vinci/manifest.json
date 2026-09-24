@@ -3487,11 +3487,11 @@
       "class": "GENERATED",
       "licence": "Original procedural museum exhibition. Source code under the museum repository licence.",
       "display": true,
-      "prompt": "A standing museum plaque on the court's paving beside the parachute, 1.92 m wide over a footed base course with a cap and a bronze bead: the most quoted line he never wrote, cut into its face in English the way it circulates, with the museum's reading of where it comes from, the film it was written for and its year, in the page's own language.",
+      "prompt": "The place on the court's paving beside the parachute where the most quoted line he never wrote is read: a stone bench in the grave's grammar, 1.72 m long and 0.46 m high over a dark base course set back beneath it, a bronze bead along its front arris, turned to the display wall's eye. It carries no words: the quotation, its reading, the film it was written for and its year are read in the place's own card.",
       "model": "Deterministic TypeScript geometry and TSL materials",
-      "date": "2026-09-15",
-      "sha256": "342620090d06974025df4a5856cb2904ec1e6377e5da41c42522f86f87a9bf6f",
-      "note": "recipe_file=src/wings/vinci/collection/court-plaque.ts; words from src/wings/vinci/line/data/never-said.json court_plaque"
+      "date": "2026-09-24",
+      "sha256": "2c675dc220341b8e83f832cae04c719ad486ea41aef2951cdca9dbb68f1a5c30",
+      "note": "recipe_file=src/wings/vinci/collection/court-plaque.ts; words from src/wings/vinci/line/data/never-said.json court_plaque, read in the place's card only"
     },
     {
       "id": "vinci/table-codex-shelf",
@@ -3817,6 +3817,19 @@
       "date": "2026-09-24",
       "sha256": "d7bf1be2c9b99f17cad3579fc771b42bf24ad0253d72f63cf170afee385d19c6",
       "note": "FLORA.md species as a type; the museum's own planting. recipe_file=src/wings/vinci/grave/court.ts"
+    },
+    {
+      "id": "vinci/collection-supper-room",
+      "path": "procedural/collection-supper-room/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural construction; source code under the museum repository licence.",
+      "display": true,
+      "prompt": "The room the Last Supper's measured field stands at the end of, built round the court's display wall and over it, sized to the field and to the court: two volumes. The bay before the field, as wide as the display wall is long and 7.4 m high, is the field's own room: its end wall plastered white round the field so the field sits in a reveal 12.6 cm deep, a white coarse plaster side wall down to the floor at the field's left, a wall over the display wall's coping to the roof, and a top light over its south half set a metre off the end wall, glazed over and closed under by an etched diffuser that the way in never shows. The nave, lower (5.3 m) and narrower, is the way in: fins of plaster before the collection's glazing on its south side, a wall down to a long low opening on the court to the north, and the east end closed but for the opening the walk turns through. Board-formed concrete soffits and beams, poured pale; a floor of two-centimetre white marble tesserae with a border laid long, raised a step over the court's paving; the field's stone sill dressed in pale limestone. Its light, as data and handed only to the surfaces each light can see: the top light as a 6200 K area source over the bay, the bay as the nave sees it through the step, the court's afternoon through each north opening at 4300 K, and a probe in each volume for its bounce. The field's reproduction is drawn unlit and multiplied by the same light: each of the bay's openings as an exact polygon from every point of the field, clipped where the reveal stands between them, the plaster's relief turning each, and the bay's bounce; the image itself is never changed. A modern room; neither the refectory in Milan, whose dimensions this museum does not have, nor any building of 1517 is claimed.",
+      "model": "Deterministic TypeScript geometry and TSL materials",
+      "date": "2026-09-24",
+      "sha256": "813ca1b46303a5c831a027027d041f295b5c593b3b43a80c99dd3af1205ce343",
+      "note": "Modern museum insertion round the court's display wall; no 1517 claim and no claim on the refectory's own dimensions. recipe_file=src/wings/vinci/collection/supper-room.ts; companion_file=src/wings/vinci/collection/supper-room-plan.ts; library_sets=library/plaster-lime-aged,library/concrete-wall-formed,library/marble-white,library/limestone-pale"
     }
   ]
 }

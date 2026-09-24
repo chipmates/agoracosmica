@@ -33,6 +33,7 @@ import { mountPictureRoom } from './picture-room'
 import { VINCI_READING_TABLE } from './approaches'
 import type { BodySheetSource } from './body-wall'
 import { mountReadingRoom, type ReadingRoom } from './reading-room'
+import { mountSupperRoom } from './supper-room'
 
 /** How thick the hall's air is: a haze a spot's shaft is seen in, no more. */
 const HALL_AIR_DENSITY = .085
@@ -79,6 +80,9 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   // THE PICTURE ROOM is finished, furnished and lit by its own module, and
   // its hang's arch mats take its frames' oak
   const pictureRoom = mountPictureRoom(stack)
+  // THE SUPPER ROOM stands before the plates do: the field's reproduction is
+  // lit by that room's own light.
+  const supper = mountSupperRoom(stack)
   const pictures = mountCollectionPlates(host, stack, { hangMask: pictureRoom.maskMaterial })
   let live = true
   let demonstrating: MachineSlug | null = null
@@ -208,6 +212,9 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   ;(host.getObjectByName('vinci/collection-rooms') ?? host).add(bodyWall.group)
   stack.hold(bodyWall.ready)
   teardown.push(() => { bodyWall.dispose() })
+  ;(host.getObjectByName('vinci/collection-rooms') ?? host).add(supper.group)
+  stack.hold(supper.ready)
+  teardown.push(() => { supper.dispose() })
   const line = createCollectionLineFloor(gallery.stones, lang())
   gallery.adoptLine(line)
   line.position.set(LINE_ORIGIN.east, FLOOR + .01, -LINE_ORIGIN.north)
@@ -218,6 +225,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   const TABLE_AT = new Vector3(VINCI_READING_TABLE.east, VINCI_READING_TABLE.top, -VINCI_READING_TABLE.north)
   const tableReach = stack.tierName() === 'hero' ? 18.5 : 16
   const rooms = host.getObjectByName('vinci/collection-rooms')
+  const pictureGroup = host.getObjectByName('vinci/collection-plates')
   // The bench's phone restaging moves the diagram frame in front of the
   // deathbed painting hung on this backdrop, so the wing keeps the one
   // composition both viewports hold whole and takes only the language.
@@ -455,6 +463,8 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       bodyWall.tick(rooms ? [rooms, line] : [line])
       const plates = host.getObjectByName('vinci/collection-plates')
       pictureRoom.tick([rooms, plates].filter((body): body is Object3D => body !== undefined))
+      // the supper room's bounce is read with the court and the field standing
+      supper.tick([rooms ?? host, plaque.group, ...(pictureGroup ? [pictureGroup] : [])])
       // A ROOM THE CAMERA IS NOT IN IS NOT DRAWN.
       // The envelope itself, not the ground around it: the garden station
       // stands on the apron three metres north of the north elevation, and a

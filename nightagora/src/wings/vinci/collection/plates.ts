@@ -21,6 +21,8 @@ import { hangPlacements } from './hang'
 import { COURT, SUPPER_WALL } from './layout'
 import { collectionInteriorMaterial, collectionPlateTone } from './materials'
 import { CANVAS_FORWARD, frameKey, stampHangLight } from './picture-room-plan'
+import { supperMuralLight } from './supper-room'
+import { supperRoomHolds } from './supper-room-plan'
 
 export interface CollectionPictureSource {
   readonly work: PictureWork
@@ -93,6 +95,9 @@ function placements(manifest: ManifestIndex): readonly Placement[] {
   }
   return placed
 }
+
+/** How far off the mural's full plate is raised, from anywhere in its room. */
+const SUPPER_REACH_M = 15
 
 /** The source is uniformly contained inside the carrier: one axis fills it,
  * the other stays shorter. Nothing is stretched to make both axes fit. */
@@ -321,10 +326,11 @@ export function mountCollectionPlates(host: Group, stack: Stack, options: Collec
       }
       // The mural stands alone on its own wall and draws itself.
       const wall: Wall | null = work.id === 'last-supper' ? null : 'paintings'
-      // a work of the hang carries its heads on its own vertices
+      // a work of the hang carries its heads on its own vertices; the mural
+      // takes the light of the room it stands at the end of
       const hung = wall !== null && stampHangLight(geometry, frameKey(work.id, entry.face))
       const stream = createPlateStream(entry.preview, entry.plate,
-        { previewMaxEdge: tier === 'hero' ? 1024 : 512, tone: hung ? hangTone : tone, layered: wall !== null })
+        { previewMaxEdge: tier === 'hero' ? 1024 : 512, tone: wall === null ? supperMuralLight() ?? tone : hung ? hangTone : tone, layered: wall !== null })
       const mesh = new Mesh(geometry, stream.material)
       mesh.name = `vinci/collection-plates/${entry.id}`
       mesh.position.set(...field.position)
@@ -408,7 +414,9 @@ export function mountCollectionPlates(host: Group, stack: Stack, options: Collec
         card.mesh.getWorldPosition(position)
         toEye.copy(eye).sub(position)
         const distance = toEye.length()
-        if (distance < nearest && toEye.dot(card.normal) > 0) { selected = card; nearest = distance }
+        // the mural is read from across its own room, not from a picture's step
+        const limit = card.wall === null && supperRoomHolds(eye) ? Math.max(nearest, SUPPER_REACH_M) : nearest
+        if (distance < limit && toEye.dot(card.normal) > 0) { selected = card; nearest = distance }
       }
     }
     const nextId = selected?.id ?? ''
