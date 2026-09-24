@@ -10,10 +10,11 @@
  * (window form factors and the floor's sun patches) and marked `engineBounce`
  * so the film's true bounce replaces it.
  */
-import { AddEquation, AdditiveBlending, BufferGeometry, CustomBlending, DoubleSide, Float32BufferAttribute, Group, Mesh, MeshBasicNodeMaterial, MeshStandardNodeMaterial, OneFactor, SrcAlphaFactor, ZeroFactor } from 'three/webgpu'
+import { AddEquation, AdditiveBlending, BufferGeometry, CustomBlending, DirectionalLight, DoubleSide, Float32BufferAttribute, Group, Mesh, MeshBasicNodeMaterial, MeshStandardNodeMaterial, OneFactor, ShadowNode, SrcAlphaFactor, Vector3, ZeroFactor } from 'three/webgpu'
 import * as TSL from 'three/tsl'
 import raw from './data/closluce.json?raw'
 import { hourKey } from './site'
+import { SHADOW_ONLY_LAYER } from '../../stack/light'
 import type { TierName } from '../../stack/tier'
 import type { MaterialLibrary } from '../../stack/materials'
 
@@ -111,6 +112,10 @@ const frame = (f: Facade): { dir: V2; out: V2 } => {
 const WEST = facade('F17'), BACK = facade('F16')
 /** Linings stand this far in front of the shell's inner wall face. */
 const LINING_GAP = .012
+/** Linings and door cheeks run this far down past the tiles into the floor's
+ * bed, and the bed this far under them: nothing is built beneath the floor, so
+ * a slit at a wall's foot would show the day outside the foundations. */
+const FOOT = .03, BED_UNDER = .04
 function innerLine(f: Facade): { p: V2; dir: V2 } {
   const fr = frame(f), t = thicknessOf(f) + LINING_GAP
   return { p: [f.from[0] - fr.out[0] * t, f.from[1] - fr.out[1] * t], dir: fr.dir }
@@ -270,6 +275,12 @@ function lightsOf(o: Opening): [number, number, number, number][] {
 /** Diamond quarries of 155 mm sides on a 45 degree lattice centred on each
  * light, as the house's glazing lays them; 7 mm cames, 14 mm at the border. */
 const QUARRY_M = .155, QUARRY_STEP = QUARRY_M * Math.SQRT2, CAME_HALF = .0035, BORDER_HALF = .007
+/** THE DAY THROUGH THE GLASS, AS THE PRINT HOLDS IT. The hall is printed more
+ * than a stop over the court, so the day behind the glass would print past
+ * white: the room's own view of it is taken down to about the court's print,
+ * as a photographer holds a window, and only in the glass the room looks
+ * through. No light in the room changes: the sun's patches come by the key. */
+const WINDOW_PULL = .5, MILK = .35
 
 /** Where the hour's sun lands on the floor through one window, after the
  * wall's own depth has trimmed the beam. */
@@ -587,7 +598,10 @@ export const houseHallProvenance = {
   },
 } as const
 
-export interface HouseHall { group: Group; triangles: number; patches: number }
+export interface HouseHall { group: Group; triangles: number; patches: number
+  /** called every frame: `changed` when what casts may have changed; the
+   * hall's own sun shadow is redrawn once the eye (east, north, up) is near */
+  refreshSun?: (eye: V3, changed: boolean) => void }
 
 /** Build the hall. `cell` is the lining grid the light is baked on. */
 /** The vertex bake is what the lighter tier reads; the hero tier lights every
@@ -603,7 +617,9 @@ export function createHouseHall(tier: TierName, library?: MaterialLibrary): Hous
   entranceLeaf(s)
   entranceReveals(s)
   s.lit = 1
-  const material = hallMaterial(hero, library)
+  const sun = hero ? hallSun() : null
+  const material = hallMaterial(hero, library, sun?.node)
+  if (sun) material.addEventListener('dispose', () => sun.dispose())
   const fabric = new Mesh(bake(s, false), material)
   fabric.name = 'vinci/house-hall/fabric'
   fabric.castShadow = false; fabric.receiveShadow = true
@@ -619,7 +635,70 @@ export function createHouseHall(tier: TierName, library?: MaterialLibrary): Hous
   group.userData['manifestId'] = houseHallProvenance.manifestId
   const triangles = s.v.length / 3
   group.userData['triangles'] = triangles
-  return { group, triangles, patches: PATCHES.length }
+  return { group, triangles, patches: PATCHES.length, ...(sun ? { refreshSun: sun.refresh } : {}) }
+}
+
+/* ---- the sun's shadow inside the hall ---- */
+
+/** THE HALL'S OWN SUN SHADOW. The key's near cascade spans forty metres on a
+ * 1024 map: a 39 mm texel, whose filter spreads every edge over some 12 cm,
+ * so a table leg's shadow at the eye's feet blurs as though the leg stood
+ * metres off the floor. The hall's sunlit faces read a second map of the same
+ * sun fitted to the room alone (about 5 mm a texel). It is drawn once, and
+ * again only when what casts has changed while the eye is near the hall.
+ * The light is never added to the scene: no other material samples it. */
+interface HallSun { node: N; refresh: (eye: V3, changed: boolean) => void; dispose: () => void }
+/** The fine map's own node: the hall reads it inside its received-shadow
+ * hook, so it must not pass through that hook a second time. */
+class HallSunShadowNode extends ShadowNode {
+  override setup(builder: N): N {
+    if (builder.renderer.shadowMap.enabled === false) return undefined
+    const self = this as unknown as { _currentShadowType: unknown; _node: N; _reset: () => void; setupShadowPosition: (b: N) => void; setupShadow: (b: N) => N }
+    return Fn(() => {
+      const type = builder.renderer.shadowMap.type
+      if (self._currentShadowType !== type) { self._reset(); self._node = null }
+      self.setupShadowPosition(builder)
+      if (self._node === null) { self._node = self.setupShadow(builder); self._currentShadowType = type }
+      return self._node
+    })()
+  }
+}
+/** The hall's sunlit faces lie within this box, in the hall's frame. */
+const SUN_BOX = { u0: -.6, u1: HALL_W + .6, v0: -.8, v1: HALL_D + .6 }
+function hallSun(): HallSun {
+  const light = new DirectionalLight(0xffffff, 0)
+  const three = (p: V3): Vector3 => new Vector3(p[0], p[2], -p[1])
+  const centre = P(HALL_W / 2, HALL_D / 2, FLOOR_Z + 1.6)
+  light.position.copy(three(add(centre, scale(TO_SUN, 60))))
+  light.target.position.copy(three(centre))
+  light.updateMatrixWorld(); light.target.updateMatrixWorld()
+  const sh = light.shadow, cam = sh.camera
+  cam.layers.enable(SHADOW_ONLY_LAYER)
+  sh.mapSize.setScalar(2048)
+  sh.bias = -.0001; sh.normalBias = .004
+  cam.near = .5; cam.far = 120
+  sh.updateMatrices(light)
+  // the box the light looks down: every corner of the hall's box, floor to boards
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity
+  for (const u of [SUN_BOX.u0, SUN_BOX.u1]) for (const v of [SUN_BOX.v0, SUN_BOX.v1]) for (const z of [FLOOR_Z - .05, BOARD_Z + .05]) {
+    const q = three(P(u, v, z)).applyMatrix4(cam.matrixWorldInverse)
+    x0 = Math.min(x0, q.x); x1 = Math.max(x1, q.x); y0 = Math.min(y0, q.y); y1 = Math.max(y1, q.y)
+  }
+  cam.left = x0; cam.right = x1; cam.bottom = y0; cam.top = y1
+  cam.updateProjectionMatrix()
+  sh.updateMatrices(light)
+  sh.autoUpdate = false; sh.needsUpdate = true
+  const node = new HallSunShadowNode(light, sh)
+  const reach = Math.hypot(HALL_W, HALL_D) / 2 + 4
+  let stale = false
+  return {
+    node,
+    refresh: (eye, changed) => {
+      stale ||= changed
+      if (stale && Math.hypot(eye[0] - centre[0], eye[1] - centre[1]) < reach) { sh.needsUpdate = true; stale = false }
+    },
+    dispose: () => { node.dispose(); light.dispose() },
+  }
 }
 
 /* ---- the hall's fabric ---- */
@@ -641,12 +720,12 @@ function buildHallShell(s: Sink, hero: boolean): void {
     const s0 = alongWall(a, b, p0), s1 = alongWall(a, b, p1)
     return [Math.min(s0, s1), Math.max(s0, s1), o.base_m, o.base_m + o.height_m]
   }
-  const south = { a: SW, b: SE, holes: [[kitchenDoorU[0], kitchenDoorU[1], FLOOR_Z, FLOOR_Z + DOOR_H]] as [number, number, number, number][] }
-  const east = { a: SE, b: NE, holes: [[linkDoorV[0], linkDoorV[1], FLOOR_Z, FLOOR_Z + DOOR_H]] as [number, number, number, number][] }
+  const south = { a: SW, b: SE, holes: [[kitchenDoorU[0], kitchenDoorU[1], FLOOR_Z - FOOT, FLOOR_Z + DOOR_H]] as [number, number, number, number][] }
+  const east = { a: SE, b: NE, holes: [[linkDoorV[0], linkDoorV[1], FLOOR_Z - FOOT, FLOOR_Z + DOOR_H]] as [number, number, number, number][] }
   const north = { a: NE, b: NW, holes: WINDOWS.filter(w => !w.west).map(w => hole(NE, NW, BACK, w.o)) }
   const west = { a: NW, b: SW, holes: WINDOWS.filter(w => w.west).map(w => hole(NW, SW, WEST, w.o)) }
   walls.push(south, east, north, west)
-  for (const w of walls) lining(s, w.a, w.b, FLOOR_Z, BOARD_Z, w.holes, cell, K.PLASTER, seed)
+  for (const w of walls) lining(s, w.a, w.b, FLOOR_Z - FOOT, BOARD_Z, w.holes, cell, K.PLASTER, seed)
   // THE CEILING: boards between oak joists that run across the shorter span,
   // carried at mid-span by a main beam on two tuffeau corbels. It casts: the
   // rooms above take the sun through their own windows, and their floors
@@ -708,7 +787,7 @@ function flatFloor(s: Sink, outline: V2[], z: number, cell: number): void {
 function squareFloor(s: Sink, outline: V2[], z: number): void {
   // the edge tiles run a hand under the linings, so no joint opens at a wall
   const room = inset(outline.map(toUV), -.01)
-  s.poly(room.map(q => P(q[0], q[1], z - .006)), [0, 0, 1], p => toUV([p[0], p[1]]), K.JOINT, .6)
+  s.poly(inset(outline.map(toUV), -BED_UNDER).map(q => P(q[0], q[1], z - .006)), [0, 0, 1], p => toUV([p[0], p[1]]), K.JOINT, .6)
   const pitch = TILE_M + JOINT_M, us = room.map(q => q[0]), vs = room.map(q => q[1])
   const u0 = Math.min(...us), u1 = Math.max(...us), v0 = Math.min(...vs), v1 = Math.max(...vs)
   for (let i = 0; u0 + i * pitch < u1; i++) for (let j = 0; v0 + j * pitch < v1; j++) {
@@ -722,8 +801,8 @@ function squareFloor(s: Sink, outline: V2[], z: number): void {
  * low prism with a worn arris, standing on its lime bed. */
 function tiledFloor(s: Sink, outline: V2[], z: number): void {
   const room = outline.map(toUV)
-  // the lime bed under everything, a few millimetres down
-  s.poly(room.map(q => P(q[0], q[1], z - .006)), [0, 0, 1], p => toUV([p[0], p[1]]), K.JOINT, .5)
+  // the lime bed under everything, a few millimetres down and on under the linings
+  s.poly(inset(room, -BED_UNDER).map(q => P(q[0], q[1], z - .006)), [0, 0, 1], p => toUV([p[0], p[1]]), K.JOINT, .5)
   const pitch = TILE_M + JOINT_M
   const field = inset(room, pitch)
   // border row: along each wall between the field's corners, square tiles;
@@ -891,7 +970,7 @@ function post(s: Sink, a: V3, b: V3, w: number, kind: number, seed: number): voi
  * two trestles, the common form of the period (MADE-THINGS A1). */
 function trestleTable(s: Sink): void {
   const { u, v, size } = TABLE, w = size[0], l = size[1], h = size[2]
-  const boards = 3, gap = .004
+  const boards = 3, gap = .0025
   for (let i = 0; i < boards; i++) {
     const u0 = u - w / 2 + i * w / boards + gap / 2, u1 = u - w / 2 + (i + 1) * w / boards - gap / 2
     const e0 = (rand(i, 1.1) - .5) * .01, e1 = (rand(i, 2.2) - .5) * .01
@@ -1241,9 +1320,11 @@ function doorReveal(s: Sink, to: 'kitchen' | 'service-link'): void {
   // strongest at the hall's face and falling off into the passage
   const lit = s.lit, cheek = to === 'service-link' ? K.REVEAL : K.PLASTER
   if (to === 'service-link') s.lit = 0
-  // cheeks face each other across the opening, limewashed like the walls
-  s.quad(P3(a, z0), P3(far(a), z0), P3(far(a), z1), P3(a, z1), n(dir), [0, z0], [depth, z0], [depth, z1], [0, z1], cheek, seed)
-  s.quad(P3(far(b), z0), P3(b, z0), P3(b, z1), P3(far(b), z1), n([-dir[0], -dir[1]]), [0, z0], [depth, z0], [depth, z1], [0, z1], cheek, seed)
+  // cheeks face each other across the opening, limewashed like the walls,
+  // their feet in the floor's bed
+  const zf = z0 - FOOT
+  s.quad(P3(a, zf), P3(far(a), zf), P3(far(a), z1), P3(a, z1), n(dir), [0, zf], [depth, zf], [depth, z1], [0, z1], cheek, seed)
+  s.quad(P3(far(b), zf), P3(b, zf), P3(b, z1), P3(far(b), z1), n([-dir[0], -dir[1]]), [0, zf], [depth, zf], [depth, z1], [0, z1], cheek, seed)
   s.lit = lit
   // soffit, under an oak lintel's face, its grain across the opening
   s.quad(P3(a, z1), P3(far(a), z1), P3(far(b), z1), P3(b, z1), [0, 0, -1], [0, 0], [0, depth], [hall.width_m, depth], [hall.width_m, 0], K.OAK, seed)
@@ -1252,11 +1333,14 @@ function doorReveal(s: Sink, to: 'kitchen' | 'service-link'): void {
   // leaf stands shut at the kitchen's face, and the hall's tiles run on
   // through the doorway to it, square-laid, the most trodden of the floor
   if (to === 'kitchen') {
-    const leaf = depth - .045 - .035, [k0, k1] = kitchenDoorU
-    s.poly([P(k0, 0, z0 - .006), P(k1, 0, z0 - .006), P(k1, -leaf, z0 - .006), P(k0, -leaf, z0 - .006)], [0, 0, 1], q => toUV([q[0], q[1]]), K.JOINT, .7)
+    // the tiles run on under the shut leaf to the kitchen's face, and their bed
+    // on under the cheeks and a stride into the kitchen, so the gap under the
+    // leaf shows floor
+    const [k0, k1] = kitchenDoorU
+    s.poly([P(k0 - BED_UNDER, -BED_UNDER, z0 - .006), P(k1 + BED_UNDER, -BED_UNDER, z0 - .006), P(k1 + BED_UNDER, -depth - .3, z0 - .006), P(k0 - BED_UNDER, -depth - .3, z0 - .006)], [0, 0, 1], q => toUV([q[0], q[1]]), K.JOINT, .7)
     const pitch = TILE_M + JOINT_M, across = Math.round((k1 - k0) / pitch), step = (k1 - k0) / across
-    for (let i = 0; i < across; i++) for (let j = 0; j * pitch < leaf - .02; j++) {
-      const u0 = k0 + i * step + JOINT_M / 2, u1 = k0 + (i + 1) * step - JOINT_M / 2, v1 = -j * pitch - JOINT_M / 2, v0 = Math.max(-leaf, v1 - TILE_M)
+    for (let i = 0; i < across; i++) for (let j = 0; j * pitch < depth - .02; j++) {
+      const u0 = k0 + i * step + JOINT_M / 2, u1 = k0 + (i + 1) * step - JOINT_M / 2, v1 = -j * pitch - JOINT_M / 2, v0 = Math.max(-depth, v1 - TILE_M)
       tile(s, [[u0, v0], [u1, v0], [u1, v1], [u0, v1]], z0, rand(i, j, 6.7), [(u0 + u1) / 2, v1 - TILE_M / 2], [1, 0])
     }
     doorLeaf(s, a, b, dir, [-outward[0], -outward[1]], depth - .045, z0, z1)
@@ -1276,7 +1360,7 @@ function doorLeaf(s: Sink, a: V2, b: V2, dir: V2, into: V2, back: number, z0: nu
   const at = (x: number, y: number, z: number): V3 => [a[0] + dir[0] * x + into[0] * (y - back), a[1] + dir[1] * x + into[1] * (y - back), z]
   const lbox = (x0: number, x1: number, y0: number, y1: number, zb: number, zt: number, kind: number, seed: number, skip = ''): void =>
     s.box(at((x0 + x1) / 2, (y0 + y1) / 2, (zb + zt) / 2), scale(A, (x1 - x0) / 2), scale(B, (y1 - y0) / 2), scale(Z, (zt - zb) / 2), kind, seed, skip)
-  const zb = z0 + .012, zt = z1 - .006, bw = (w - .006) / boards
+  const zb = z0 + .005, zt = z1 - .006, bw = (w - .006) / boards
   // y runs from the leaf's back (0) to its face toward the hall (th)
   for (let i = 0; i < boards; i++) {
     const x0 = .003 + i * bw + gap / 2, x1 = .003 + (i + 1) * bw - gap / 2
@@ -1333,13 +1417,21 @@ function innerGlass(): Mesh {
   // distance to the nearest came, in metres, and the border lead's
   const da = abs(fract(a.add(.5)).sub(.5)).mul(QUARRY_M), db = abs(fract(b.add(.5)).sub(.5)).mul(QUARRY_M)
   const border = min(min(E.x, E.y), min(E.z, E.w))
-  const line = (d: N, half: number): N => { const px = vec2(d.dFdx(), d.dFdy()).length().max(1e-6); return float(1).sub(smoothstep(float(half).sub(px), float(half).add(px), d)) }
-  const lead = max(max(line(da, CAME_HALF), line(db, CAME_HALF)), line(border, BORDER_HALF))
+  // a pixel's width is read off the smooth coordinate the distance is folded
+  // from: across the fold itself a difference reads zero, and the came breaks
+  // into dots
+  const width = (x: N, k: number): N => vec2(x.dFdx(), x.dFdy()).length().mul(k).max(1e-6)
+  const line = (d: N, px: N, half: number): N => float(1).sub(smoothstep(float(half).sub(px), float(half).add(px), d))
+  const lead = max(max(line(da, width(a, QUARRY_M), CAME_HALF), line(db, width(b, QUARRY_M), CAME_HALF)), line(border, width(E.x, 1), BORDER_HALF))
+  // each quarry is its own piece of blown glass: its own clarity and its own
+  // share of the milk, so the lattice reads as panes against the bright day
+  const qa = floor(a), qb = floor(b)
+  const piece = fract(qa.mul(12.9898).add(qb.mul(78.233)).add(L.z.mul(4.1)).sin().mul(43758.5453))
   // old glass holds a little of the day it lets through: a warm milk where
   // the sun stands on it, a cool one on the north lights
-  const milk = mix(vec3(.030, .034, .036), vec3(.16, .135, .095), L.z)
+  const milk = mix(vec3(.030, .034, .036), vec3(.16, .135, .095), L.z).mul(MILK).mul(piece.mul(.6).add(.7))
   m.colorNode = mix(milk, vec3(.010, .0095, .009), lead)
-  m.opacityNode = float(1).sub(lead).mul(mix(float(.86), float(.80), L.z))
+  m.opacityNode = float(1).sub(lead).mul(mix(float(.86), float(.80), L.z)).mul(WINDOW_PULL).mul(piece.mul(.24).add(.88))
   m.blending = CustomBlending; m.blendEquation = AddEquation
   m.blendSrc = OneFactor; m.blendDst = SrcAlphaFactor; m.blendSrcAlpha = ZeroFactor; m.blendDstAlpha = OneFactor
   m.name = 'vinci/house-hall/glass'
@@ -1461,9 +1553,9 @@ function buildLink(s: Sink, hero: boolean): void {
       const letter = o.wall?.split(':w')[1]
       const edgeLetter = 'ABCD'[LINK.polygon.findIndex(p => Math.abs(p[0] - a[0]) < 1e-6 && Math.abs(p[1] - a[1]) < 1e-6)]
       if (letter !== edgeLetter) continue
-      holes.push([o.from_m, o.from_m + o.width_m, FLOOR_Z, FLOOR_Z + o.height_m])
+      holes.push([o.from_m, o.from_m + o.width_m, FLOOR_Z - FOOT, FLOOR_Z + o.height_m])
     }
-    lining(s, a, b, FLOOR_Z, BOARD_Z, holes, cell, K.PLASTER, .71)
+    lining(s, a, b, FLOOR_Z - FOOT, BOARD_Z, holes, cell, K.PLASTER, .71)
   }
   // THE SIDE DOOR FROM THE ENTRANCE: its opening runs on through the space
   // between the entrance's partition and this passage's own face, so it takes
@@ -1604,8 +1696,8 @@ function roomReturnAt(n: V3): number {
   const u = n[0] * U[0] + n[1] * U[1], v = n[0] * V[0] + n[1] * V[1], [pu, mu, pv, mv, pz, mz] = ROOM_RETURN as [number, number, number, number, number, number]
   return u * u * (u > 0 ? pu : mu) + v * v * (v > 0 ? pv : mv) + n[2] * n[2] * (n[2] > 0 ? pz : mz)
 }
-function roomReturnNode(): N {
-  const Nw = normalWorld, u = Nw.x.mul(U[0]).sub(Nw.z.mul(U[1])), v = Nw.x.mul(V[0]).sub(Nw.z.mul(V[1])), z = Nw.y
+function roomReturnNode(Nw: N = normalWorld): N {
+  const u = Nw.x.mul(U[0]).sub(Nw.z.mul(U[1])), v = Nw.x.mul(V[0]).sub(Nw.z.mul(V[1])), z = Nw.y
   const [pu, mu, pv, mv, pz, mz] = ROOM_RETURN as [number, number, number, number, number, number]
   const way = (x: N, plus: number, minus: number): N => x.mul(x).mul(x.greaterThan(0).select(float(plus), float(minus)))
   return way(u, pu, mu).add(way(v, pv, mv)).add(way(z, pz, mz))
@@ -1683,6 +1775,39 @@ function windowShade(): N {
 
 /* ---- the material ---- */
 
+/** THE WINDOWS SEEN IN A POLISHED FACE. The eye's ray, mirrored about the
+ * face, is followed to each window's opening in the lining; where it lands in
+ * one, the face returns the day by Fresnel's law, its edges spread by the
+ * wax's roughness over the distance travelled. The day's level is what the
+ * room's own print shows through the glass. In the renderer's frame. */
+const GLOSS_DAY = .3, GLOSS_SPREAD = .09
+function windowGloss(): N {
+  const Wp = positionWorld, Nw = normalWorld
+  const toEye = cameraPosition.sub(Wp).normalize()
+  const R = toEye.negate().reflect(Nw)
+  const cosV = Nw.dot(toEye).max(0)
+  const fresnel = float(1).sub(cosV).pow(5).mul(.96).add(.04)
+  let day: N = float(0), cover: N = float(0)
+  for (const w of WINDOWS) {
+    const [c0, c1, , c3] = w.ap.corners as [V3, V3, V3, V3]
+    const o = vec3(c0[0], c0[2], -c0[1]), a = vec3(c1[0] - c0[0], c1[2] - c0[2], -(c1[1] - c0[1])), b = vec3(c3[0] - c0[0], c3[2] - c0[2], -(c3[1] - c0[1]))
+    const inward = vec3(w.ap.inward[0], w.ap.inward[2], -w.ap.inward[1])
+    const facing = R.dot(inward)
+    const t = o.sub(Wp).dot(inward).div(facing.min(-1e-4))
+    const hit = Wp.add(R.mul(t)).sub(o)
+    const la = len(sub(c1, c0)), lb = len(sub(c3, c0))
+    const sa = hit.dot(a).div(la * la), sb = hit.dot(b).div(lb * lb)
+    const ea = t.mul(GLOSS_SPREAD / la).add(.02), eb = t.mul(GLOSS_SPREAD / lb).add(.02)
+    const inside = smoothstep(ea.negate(), ea, sa).mul(smoothstep(ea.negate(), ea, float(1).sub(sa))).mul(smoothstep(eb.negate(), eb, sb)).mul(smoothstep(eb.negate(), eb, float(1).sub(sb)))
+    const seen = inside.mul(facing.lessThan(-1e-3).select(float(1), float(0)))
+    day = day.add(seen.mul(w.ap.radiance / 1.35)); cover = cover.add(seen)
+  }
+  // elsewhere the face mirrors the lit room: the limewash the ray lands on,
+  // as the room's return in that direction lights it
+  const room = vec3(1, .73, .545).mul(roomReturnNode(R).add(ROOM_FILL).mul(BOUNCE_K * .55))
+  return room.mul(float(1).sub(cover.min(1))).add(vec3(1, .93, .82).mul(day.mul(GLOSS_DAY))).mul(fresnel)
+}
+
 /** A world point in the hall's own frame (u, v), in the shader. */
 function hallUVNode(Wp: N): [N, N] {
   const e = Wp.x.sub(SW[0]), nn = Wp.z.negate().sub(SW[1])
@@ -1704,7 +1829,7 @@ export function doorWear(Wp: N): N {
   return w.mul(smoothstep(.4, .9, h)).mul(float(1).sub(smoothstep(1.7, 2.2, h)))
 }
 
-function hallMaterial(perPixel: boolean, library?: MaterialLibrary): MeshStandardNodeMaterial {
+function hallMaterial(perPixel: boolean, library?: MaterialLibrary, sunShadow?: N): MeshStandardNodeMaterial {
   const m = new MeshStandardNodeMaterial({ metalness: 0, roughness: .85 })
   const A = attribute('hallA', 'vec4'), B = attribute('hallB', 'vec4')
   const kind = A.x, seed = A.w, wear = B.x, soot = B.y, lit = B.z, inHallShade = B.w
@@ -1850,7 +1975,10 @@ function hallMaterial(perPixel: boolean, library?: MaterialLibrary): MeshStandar
   m.aoNode = clamp(ambient, 0, 1)
   // A surface of the passage takes no direct sun: nothing faces it.
   const shade = windowShade()
-  m.receivedShadowNode = Fn(([shadow]: N[]) => shadow.mul(lit).mul(mix(float(1), shade, inHallShade)))
+  // inside the hall's box the room's own fine map stands for the key's
+  const [su, sv] = hallUVNode(Wp)
+  const inSunBox = su.greaterThan(SUN_BOX.u0).and(su.lessThan(SUN_BOX.u1)).and(sv.greaterThan(SUN_BOX.v0)).and(sv.lessThan(SUN_BOX.v1)).and(Wp.y.lessThan(BOARD_Z + .05)).select(float(1), float(0))
+  m.receivedShadowNode = Fn(([shadow]: N[]) => (sunShadow ? mix(shadow, sunShadow, inSunBox) : shadow).mul(lit).mul(mix(float(1), shade, inHallShade)))
   m.userData['engineWindowShade'] = true
   // THE FLOOR'S SUN, SENT BACK: baked form factors from the hour's patches,
   // times the key's colour and strength. The film's true bounce replaces it;
@@ -1858,7 +1986,12 @@ function hallMaterial(perPixel: boolean, library?: MaterialLibrary): MeshStandar
   // the west lights look onto a sunlit terrace and garden, the back ones onto
   // the north sky: their day reaches the walls warm and cool
   const northSky = ambient.sub(westSky).max(0)
-  m.emissiveNode = colour.mul(vec3(1, .73, .545).mul(bounce.mul(BOUNCE_K)).add(vec3(.19, .155, .115).mul(westSky)).add(vec3(.12, .13, .14).mul(northSky)))
+  const diffuseReturn = colour.mul(vec3(1, .73, .545).mul(bounce.mul(BOUNCE_K)).add(vec3(.19, .155, .115).mul(westSky)).add(vec3(.12, .13, .14).mul(northSky)))
+  // waxed oak and glaze mirror the windows at a graze: the sheen a shaded
+  // table top holds where the eye catches the day in it
+  // the wax lies unevenly: the grain opens it, and hands have rubbed it up
+  const waxed = grain.mul(3).add(1).max(.3).mul(mx_noise_float(Wp.mul(2.3)).mul(.3).add(.8))
+  m.emissiveNode = perPixel ? diffuseReturn.add(windowGloss().mul(is(K.WAX).mul(waxed).add(is(K.GLAZE).mul(1.4))).mul(inSunBox)) : diffuseReturn
   m.userData['engineBounce'] = true
   m.name = 'vinci/house-hall/fabric'
   return m
