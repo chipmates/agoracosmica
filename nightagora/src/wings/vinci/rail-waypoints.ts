@@ -176,11 +176,11 @@ const LINKS: readonly { from: RailSide; to: RailSide; via: readonly RailWaypoint
   { from: 'picture-room', to: 'mechanism-hall',
     via: [[PICTURE_TO_HALL, FACE.pictureWallNorth + 1.4, INSIDE], [PICTURE_TO_HALL, FACE.pictureWallSouth - 1, INSIDE],
       HALL_NORTH_AISLE, BETWEEN_THE_SCREWS] },
-  // The gallery's side of the hall door stands clear of the alcove the
-  // reading table brings its own back wall for: at a metre and a half off the
-  // partition the walk went by that wall at arm's length.
+  // The gallery's side of the hall door stands on the line the reading
+  // table's eye stands on, two thirds of a metre off the reading room's front,
+  // so the walk from that eye to the door runs straight past the room.
   { from: 'long-gallery', to: 'mechanism-hall',
-    via: [[FACE.hallPartitionEast + 3.1, HALL_TO_GALLERY, INSIDE], [FACE.hallPartitionEast + 1.1, HALL_TO_GALLERY, INSIDE],
+    via: [[FACE.hallPartitionEast + 3.42, HALL_TO_GALLERY, INSIDE], [FACE.hallPartitionEast + 1.1, HALL_TO_GALLERY, INSIDE],
       [FACE.hallPartitionWest - 1.3, HALL_TO_GALLERY, INSIDE]] },
 ]
 

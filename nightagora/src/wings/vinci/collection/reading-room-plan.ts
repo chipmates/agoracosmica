@@ -14,7 +14,7 @@ import {
   Quaternion, Shape, ShapeUtils, Vector2, Vector3,
 } from 'three/webgpu'
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js'
-import { FACE, FLOOR, OPENING } from './layout'
+import { FACE, FLOOR, LINE_FIELD, OPENING } from './layout'
 import { VINCI_READING_TABLE } from './approaches'
 
 export const READING_ROOM_PROVENANCE = {
@@ -28,22 +28,25 @@ export const T = VINCI_READING_TABLE
  * faces share a plane and no depth can fight. */
 export const BED = .004
 
-/** THE ROOM IN THE WING'S METRES (east, north, height). Its footprint is the
- * niche's: from the gallery lining to the front, which the walk to the hall
- * door passes with a quarter of a metre to spare beyond its certified
- * envelope, and from clear of the body wall's standing sheet to the hall
- * door's jamb. The plinth and the lid run to that footprint; the walls stand
- * back from it. */
+/** THE ROOM IN THE WING'S METRES (east, north, height). It fills the
+ * gallery's aisle bay: from the gallery lining to the line's own field edge
+ * (under the soffit's rib line at east -36), and from the hall door's jamb
+ * south to the rib at north -48, mirrored about the table's axis, which is a
+ * joint of the line's field. The plinth and the lid run to that footprint;
+ * the walls stand back from it. */
+const ROOM_NORTH = OPENING.hallToGallery.north[0] - .02
+/** the field's bronze edge is 28 mm wide on its line: the room stands at its west face */
+const ROOM_FRONT = LINE_FIELD.west - .014
 export const READING_ROOM = {
   /** the gallery lining's face */
   wall: FACE.hallPartitionEast + .033,
   /** the gallery's concrete finish over the lining: the room stands before it */
   finish: FACE.hallPartitionEast + .045,
-  south: -48.30,
-  north: OPENING.hallToGallery.north[0] - .02,
-  front: -36.35,
-  /** the plinth: its top is the room's floor, its foot a dark recessed toe */
-  plinth: .09, toe: .03, toeBack: .02,
+  south: 2 * VINCI_READING_TABLE.north - ROOM_NORTH,
+  north: ROOM_NORTH,
+  front: ROOM_FRONT,
+  /** the plinth: its top is the room's floor, its foot on the gallery's */
+  plinth: .09,
   floor: FLOOR + .09,
   /** how far the walls stand back from the plinth's and the lid's edge */
   setBack: .05,
@@ -53,12 +56,10 @@ export const READING_ROOM = {
   sideWall: .05, frontWall: .1,
   /** the doorway on the table's own axis: clear width and height */
   door: { width: 1.3, height: 2.1, casing: .11 },
-  /** THE SOUTH WINDOW: the south wall's east bay left open over the dado. The
-   * body wall's standing sheet is read from an eye 0.30 m off this wall at
-   * standing height, and that eye's certified envelope passes through here,
-   * so the wall is open where the envelope is (west edge east, over the
-   * room's floor from sill to head, in metres). */
-  window: { west: -37.49, sill: 1.19, head: 1.85 },
+  /** THE SOUTH WINDOW: the south wall's east bay open over the dado, 0.93 m
+   * wide, so the gallery's south end sees the lamp (west edge east, and over
+   * the room's floor from sill to head, in metres). */
+  window: { west: ROOM_FRONT - .05 - .1 - .06 - .93, sill: 1.19, head: 1.85 },
   /** inside: the coffered ceiling's beams and the coffers' panels over them */
   ceiling: FLOOR + 2.86, coffer: FLOOR + 2.96,
   /** outside: the entablature, and the lid's top */
@@ -418,6 +419,9 @@ const quarter = (cx: number, cu: number, r: number, from: number, to: number, n 
   Array.from({ length: n + 1 }, (_, i) => { const t = from + (to - from) * i / n; return [cx + r * Math.cos(t), cu + r * Math.sin(t)] })
 /** the panel mould: an ovolo from the frame's face down into the panel */
 const PANEL_MOULD: Section = [...quarter(0, 0, .012, Math.PI / 2, 0, 5), [.016, 0]]
+/** the main register's frame: a bolection bead standing proud of the frame
+ * inside the opening and falling to the panel, so each panel reads framed */
+const BOLECTION: Section = [[.002, 0], [.002, .006], [.005, .0105], [.009, .0125], [.013, .0115], [.017, .007], [.02, 0], [.022, -.009]]
 /** the dado's cap: a fillet, an ovolo nose and a cove under it */
 const DADO_CAP: Section = [[0, 0], [0, .012], ...quarter(.012, .024, .012, -Math.PI / 2, 0, 3), [.03, .03], ...quarter(.06, .03, .03, Math.PI, Math.PI / 2, 4), [.062, .045], [.062, 0]]
 /** the cornice inside: a cove sprung from the frieze up to a flat top */
@@ -426,6 +430,8 @@ const CORNICE_IN: Section = [[0, 0], [.02, .012], ...quarter(.2, 0, .18, Math.PI
 const SKIRTING: Section = [[0, 0], [0, .008], [.07, .008], ...quarter(.07, .004, .004, -Math.PI / 2, Math.PI / 2, 4), [.078, 0]]
 /** the architrave round the doorway: a fascia, a step, and a back band with a bead */
 const CASING: Section = [[0, 0], [0, .016], [.055, .016], [.058, .02], ...quarter(.095, .02, .01, Math.PI, Math.PI / 2, 3), [.11, .03], [.11, 0]]
+/** the base course outside: a board on the plinth with a round on its top edge */
+const BASE_COURSE: Section = [[0, 0], [0, .018], [.08, .018], ...quarter(.08, .006, .012, Math.PI / 2, -Math.PI / 2, 4).map(([x, u]) => [Math.min(x, .092), u] as [number, number]), [.11, .004], [.11, 0]]
 /** the door's hood: a bed mould, a corona and a cavetto top */
 const HOOD: Section = [[0, 0], [0, .045], [.012, .045], [.012, .04], [.06, .04], [.06, .028], ...quarter(.1, .028, .04, Math.PI, Math.PI * 1.5, 4).map(([a, u]) => [a, Math.max(.004, u)] as [number, number]), [.1, 0]]
 
@@ -442,16 +448,15 @@ export function studioloParts(): { inside: Batch; outside: Batch; ceiling: Batch
   const Y = R.floor
   const high = R.ceiling - Y
 
-  // THE PLINTH. A dark toe set back under an oak band, its top the room's
-  // floor: the room stands on it, lifted off the building's concrete.
+  // THE PLINTH. An oak band standing on the gallery's floor, its top the
+  // room's floor: the room stands on it, lifted off the building's concrete.
+  // The band runs a bed into the floor, so the floor meets it with no gap.
   const W0 = R.finish - BED
-  dark.piece({ box: [W0, R.south + R.toeBack, FLOOR - BED, R.front - R.toeBack, R.north - R.toeBack, FLOOR + R.toe], grain: 'east', offset: [0, 0], tone: [1, 1, 1] })
   const band = (box: Piece['box'], grain: Grain): void => { outside.piece({ box, grain, offset: off(k, 11), tone: tone(OAK.outside, k++, .04) }); solids.push(box) }
-  band([W0, R.south, FLOOR + R.toe, R.front, R.south + R.setBack, Y], 'east')
-  band([W0, R.north - R.setBack, FLOOR + R.toe, R.front, R.north, Y], 'east')
-  band([R.front - R.setBack, R.south + R.setBack, FLOOR + R.toe, R.front, Pl.doorSouth, Y], 'north')
-  band([R.front - R.setBack, Pl.doorNorth, FLOOR + R.toe, R.front, R.north - R.setBack, Y], 'north')
-  solids.push([W0, R.south + R.toeBack, FLOOR - BED, R.front - R.toeBack, R.north - R.toeBack, FLOOR + R.toe])
+  band([W0, R.south, FLOOR - BED, R.front, R.south + R.setBack, Y], 'east')
+  band([W0, R.north - R.setBack, FLOOR - BED, R.front, R.north, Y], 'east')
+  band([R.front - R.setBack, R.south + R.setBack, FLOOR - BED, R.front, Pl.doorSouth, Y], 'north')
+  band([R.front - R.setBack, Pl.doorNorth, FLOOR - BED, R.front, R.north - R.setBack, Y], 'north')
 
   // THE FLOOR: oak boards laid from the doorway to the back wall, each its
   // own length and tone, their ends staggered.
@@ -469,14 +474,17 @@ export function studioloParts(): { inside: Batch; outside: Batch; ceiling: Batch
     dark.piece({ box: [Pl.back - BED, from - BED, Y - .03, Pl.frontInner + BED, to + BED, Y - .021], grain: 'east', offset: [0, 0], tone: [1, 1, 1] })
     solids.push([Pl.back - BED, from - BED, Y - .03, Pl.frontInner + BED, to + BED, Y])
   }
-  // THE THRESHOLD: an oak sill through the doorway, a hair over the floor,
-  // and a bronze nosing at the plinth's edge.
+  // THE THRESHOLD: a step as a joiner makes one. An oak riser set back under
+  // an oak sill through the doorway, a hair over the floor, and a slim bronze
+  // nosing on the sill's edge.
   {
-    const sill: Piece['box'] = [Pl.frontInner - BED, Pl.doorSouth, Y - .02, R.front - .006, Pl.doorNorth, Y + .012]
+    const riser: Piece['box'] = [R.front - R.setBack, Pl.doorSouth, FLOOR - BED, R.front - .015, Pl.doorNorth, Y - .025]
+    outside.piece({ box: riser, grain: 'north', offset: off(2, 91), tone: tone(OAK.outside, 92, 0) })
+    const sill: Piece['box'] = [Pl.frontInner - BED, Pl.doorSouth, Y - .025, R.front - .01, Pl.doorNorth, Y + .012]
     inside.piece({ box: sill, grain: 'north', offset: off(1, 91), tone: tone(OAK.floor, 91, 0) })
-    const nosing: Piece['box'] = [R.front - .006, Pl.doorSouth, FLOOR + R.toe, R.front, Pl.doorNorth, Y + .012]
+    const nosing: Piece['box'] = [R.front - .01, Pl.doorSouth, Y - .006, R.front, Pl.doorNorth, Y + .014]
     bronze.piece({ box: nosing, grain: 'north', offset: [0, 0], tone: [1, 1, 1] })
-    solids.push(sill, nosing)
+    solids.push(riser, sill, nosing)
   }
 
   // ---------------------------------------------------------------- inside
@@ -489,7 +497,7 @@ export function studioloParts(): { inside: Batch; outside: Batch; ceiling: Batch
   const lengthNS = Pl.northInner - Pl.southInner, lengthEW = Pl.frontInner - Pl.back
   const doorX0 = Pl.doorSouth - Pl.southInner, doorX1 = Pl.doorNorth - Pl.southInner
   /** the registers, bottom to top, in metres over the room's floor */
-  const REG = { skirt: .08, dadoLow: .16, dadoHigh: .73, cap: .81, mainLow: .87, mainPanel: .95, mainTop: 2.13, friezeLow: 2.21, friezeHigh: 2.43, cornice: high - .06 }
+  const REG = { skirt: .08, dadoLow: .16, dadoHigh: .73, cap: .81, mainLow: .87, mainPanel: .95, split: 1.6, mainTop: 2.13, friezeLow: 2.21, friezeHigh: 2.43, cornice: high - .06 }
   const frameZ = R.skin, panelZ = R.skin - .009
   /** one wall's panelling: stiles and rails, panels, mouldings, the dado's
    * cap, the skirting, the frieze and the cornice */
@@ -560,19 +568,22 @@ export function studioloParts(): { inside: Batch; outside: Batch; ceiling: Batch
         const y0 = R.window.sill, y1 = R.window.head
         for (const [r0, r1] of [[y0 - .06, y0], [y1, y1 + .06]] as [number, number][]) I.box(f, a, b, r0, r1, panelZ - .004, frameZ, 'x', tone(OAK.wall, k++), off(k, s + 20))
         for (const [p0, p1] of [[REG.mainPanel, y0 - .06], [y1 + .06, REG.mainTop]] as [number, number][]) {
-          I.field(f, a, b, p0, p1, panelZ, .005, .035, tone(OAK.wall, k++, .06), off(k, s + 21))
-          I.frame(f, a, b, p0, p1, frameZ, PANEL_MOULD.map(([x, u]) => [x, u - .0115] as [number, number]), tone(OAK.wall, k++, .03), s * 31 + k)
+          I.field(f, a, b, p0, p1, panelZ, .01, .05, tone(OAK.wall, k++, .06), off(k, s + 21))
+          I.frame(f, a, b, p0, p1, frameZ, BOLECTION, tone(OAK.wall, k++, .03), s * 31 + k)
         }
         continue
       }
       const mainCols = central ? [[a, b] as [number, number]] : cols
-      for (const [c0, c1] of mainCols) {
+      // a rail splits the main register into two tiers, a panel and a
+      // shorter one over it, so each reads as a framed panel from the table
+      I.box(f, a, b, REG.split, REG.split + .07, panelZ - .004, frameZ, 'x', tone(OAK.wall, k++), off(k, s + 22))
+      for (const [c0, c1] of mainCols) for (const [p0, p1] of [[REG.mainPanel, REG.split], [REG.split + .07, REG.mainTop]] as [number, number][]) {
         if (central) {
-          const c = [at(f, c0, REG.mainPanel, panelZ), at(f, c1, REG.mainPanel, panelZ), at(f, c1, REG.mainTop, panelZ), at(f, c0, REG.mainTop, panelZ)]
+          const c = [at(f, c0, p0, panelZ), at(f, c1, p0, panelZ), at(f, c1, p1, panelZ), at(f, c0, p1, panelZ)]
           const o = off(k, s + 8)
-          inside.quad(c, dir(f, 0, 0, 1), [[c0 + o[0], REG.mainPanel + o[1]], [c1 + o[0], REG.mainPanel + o[1]], [c1 + o[0], REG.mainTop + o[1]], [c0 + o[0], REG.mainTop + o[1]]], tone(OAK.wall, k++, .02))
-        } else I.field(f, c0, c1, REG.mainPanel, REG.mainTop, panelZ, .006, .045, tone(OAK.wall, k++, .06), off(k, s + 9))
-        I.frame(f, c0, c1, REG.mainPanel, REG.mainTop, frameZ, PANEL_MOULD.map(([x, u]) => [x, u - .0115] as [number, number]), tone(OAK.wall, k++, .03), s * 17 + k)
+          inside.quad(c, dir(f, 0, 0, 1), [[c0 + o[0], p0 + o[1]], [c1 + o[0], p0 + o[1]], [c1 + o[0], p1 + o[1]], [c0 + o[0], p1 + o[1]]], tone(OAK.wall, k++, .02))
+        } else I.field(f, c0, c1, p0, p1, panelZ, .01, .06, tone(OAK.wall, k++, .06), off(k, s + 9))
+        I.frame(f, c0, c1, p0, p1, frameZ, BOLECTION, tone(OAK.wall, k++, .03), s * 17 + k)
       }
     }
     // THE FRIEZE: a band of small square panels between short muntins, run
@@ -667,11 +678,15 @@ export function studioloParts(): { inside: Batch; outside: Batch; ceiling: Batch
   const northO: Face = { o: v3(R.finish, Pl.northOuter - R.skin, OY), r: EAST, u: UP, n: NORTH }
   const frontLen = Pl.northOuter - Pl.southOuter, sideLen = Pl.frontOuter - R.finish
   const arch = R.architrave - OY
-  const OREG = { course: .11, rail: .17, lowTop: .66, mid: .74, top: arch - .08, arch }
+  /** the registers outside, over the room's floor: a low panel, a main panel
+   * up to the window's head, and a frieze of short panels under the order */
+  const OREG = { course: .11, rail: .17, lowTop: .66, mid: .74, split: R.window.head, top: arch - .08, arch }
   const PIL = { width: .16, proud: .03, base: .16, capital: .12 }
   const ot = (swing = .07): [number, number, number] => tone(OAK.outside, k++, swing)
-  const frameTone = (): [number, number, number] => tone(OAK.outside, k++, .05).map(c => c * .82) as [number, number, number]
-  const mould = PANEL_MOULD.map(([x, u]) => [x, u - .0115] as [number, number])
+  // the frames a shade darker than the fields, and each panel in a proud
+  // bead, so the grid of the joinery reads from across the gallery
+  const frameTone = (): [number, number, number] => tone(OAK.outside, k++, .05).map(c => c * .74) as [number, number, number]
+  const mould = BOLECTION
   /** one bay between two pilasters: base course, rails, panels, and where a
    * window stands its sill rail, opening and head rail */
   const bay = (f: Face, a: number, b: number, salt: number, win?: { y0: number; y1: number }): void => {
@@ -684,10 +699,11 @@ export function studioloParts(): { inside: Batch; outside: Batch; ceiling: Batch
     for (let i = 1; i < count; i++) O.box(f, cols[i - 1]![1], cols[i]![0], OREG.rail, win ? OREG.mid : OREG.top, panelZ - .004, frameZ, 'y', frameTone(), off(k, salt))
     const rails: [number, number][] = [[OREG.course, OREG.rail], [OREG.lowTop, OREG.mid], [OREG.top, OREG.arch]]
     if (win) rails.push([win.y0 - .06, win.y0], [win.y1, win.y1 + .06])
+    else rails.push([OREG.split, OREG.split + .06])
     for (const [y0, y1] of rails) O.box(f, a, b, y0, y1, panelZ - .004, frameZ, 'x', frameTone(), off(k, salt + 1))
     const panel = (c0: number, c1: number, y0: number, y1: number, raised: boolean): void => {
       if (y1 - y0 < .05) return
-      if (raised) O.field(f, c0, c1, y0, y1, panelZ - .004, .008, .05, ot(), off(k, salt + 2))
+      if (raised) O.field(f, c0, c1, y0, y1, panelZ - .004, .012, .07, ot(), off(k, salt + 2))
       else {
         const o = off(k, salt + 3)
         outside.quad([at(f, c0, y0, panelZ), at(f, c1, y0, panelZ), at(f, c1, y1, panelZ), at(f, c0, y1, panelZ)], dir(f, 0, 0, 1),
@@ -699,9 +715,19 @@ export function studioloParts(): { inside: Batch; outside: Batch; ceiling: Batch
     if (win) {
       panel(a, b, OREG.mid, win.y0 - .06, true)
       panel(a, b, win.y1 + .06, OREG.top, true)
-    } else for (const [c0, c1] of cols) panel(c0, c1, OREG.mid, OREG.top, true)
+    } else for (const [c0, c1] of cols) {
+      panel(c0, c1, OREG.mid, OREG.split, true)
+      panel(c0, c1, OREG.split + .06, OREG.top, true)
+    }
     // the base course: a board on the plinth with a round on its top edge
-    O.run(f, 'x', 0, 1, frameZ, [[0, 0], [0, .018], [.08, .018], ...quarter(.08, .006, .012, Math.PI / 2, -Math.PI / 2, 4).map(([x, u]) => [Math.min(x, .092), u] as [number, number]), [.11, .004], [.11, 0]], a, b, SQUARE, SQUARE, ot(.03), off(k, salt + 4), [true, true])
+    O.run(f, 'x', 0, 1, frameZ, BASE_COURSE, a, b, SQUARE, SQUARE, ot(.03), off(k, salt + 4), [true, true])
+  }
+  /** a stile standing between two bays, its ground, its base course and its
+   * own board from the course to the architrave, so no joint opens behind it */
+  const stile = (f: Face, a: number, b: number, salt: number): void => {
+    dark.quad([at(f, a, 0, frameZ - .012), at(f, b, 0, frameZ - .012), at(f, b, arch, frameZ - .012), at(f, a, arch, frameZ - .012)], dir(f, 0, 0, 1), [[a, 0], [b, 0], [b, arch], [a, arch]], [1, 1, 1])
+    O.box(f, a, b, OREG.course, arch, panelZ - .004, frameZ, 'y', frameTone(), off(k, salt))
+    O.run(f, 'x', 0, 1, frameZ, BASE_COURSE, a, b, SQUARE, SQUARE, ot(.03), off(k, salt + 1))
   }
   /** a pilaster standing on a face at [a, b]: a base, a shaft with a sunk
    * panel, a capital; `wrap` turns it round the face's end into a corner */
@@ -746,7 +772,7 @@ export function studioloParts(): { inside: Batch; outside: Batch; ceiling: Batch
   const winO0 = R.window.west - R.finish, winO1 = Pl.windowEast - R.finish
   pilaster(southO, 0, pw, 145)
   bay(southO, pw, winO0 - .06, 147)
-  O.box(southO, winO0 - .06, winO0, OREG.rail, OREG.top, panelZ - .004, frameZ, 'y', ot(), off(k, 149))
+  stile(southO, winO0 - .06, winO0, 149)
   bay(southO, winO0, winO1, 151, { y0: R.window.sill, y1: R.window.head })
   pilaster(southO, sideLen - pw + PIL.proud, sideLen + PIL.proud, 153)
   pilaster(northO, 0, pw, 155)
@@ -907,9 +933,10 @@ const RAIL_ENDS = ((): number => {
  * its two shelves holding the reference volumes a reading room keeps beside
  * a facsimile. Modern bindings, no titles and no period claim. */
 export const BOOKCASE = {
-  west: -38.05, east: -36.85,
-  /** its back a bed into the north wall's panelling */
-  north: Pl.northInner + BED, depth: .3,
+  west: T.east - .33, east: T.east + .87,
+  /** its back a bed into the north wall's panelling; shallow enough to stand
+   * clear of the table's end */
+  north: Pl.northInner + BED, depth: .26,
   height: .8, board: .025, plinth: .06, shelves: [.08, .43],
 } as const
 const BOOKCASE_SPAN = [BOOKCASE.west, BOOKCASE.east] as const
@@ -957,6 +984,21 @@ export const READING_CHAIR = {
   back: TABLE_TOP[3] + .012 + RAIL_ENDS,
   ...CHAIR,
 } as const
+
+/** WHERE THE CHAIR MEETS THE FLOOR: its four feet (east, north), their
+ * radius, and the seat frame's plan rectangle [west, south, east, north] with
+ * the height of its underside over the room's floor, for the floor's own
+ * occlusion under it. */
+export function chairFloor(): { feet: [number, number][]; foot: number; seat: [number, number, number, number]; under: number } {
+  const C = READING_CHAIR, n0 = C.north, half = C.width / 2 - C.leg.inset
+  const rearE = C.back - .05, frontE = rearE - (C.depth - .06)
+  return {
+    feet: [[rearE, n0 - half], [rearE, n0 + half], [frontE, n0 - half], [frontE, n0 + half]],
+    foot: C.leg.foot,
+    seat: [frontE - .012, n0 - half - .012, rearE + .012, n0 + half + .012],
+    under: C.seat - .045,
+  }
+}
 
 /** The chair's parts, each a geometry already in the wing's place, with the
  * box it stands in. */

@@ -16,7 +16,7 @@ import type { VinciStationId } from '../content'
 import { GRAVE_DEATHBED, GRAVE_FRAME, GRAVE_SLAB } from '../grave/placement'
 import { LINE_STUDS } from '../line/studs'
 import { hangPlacements } from './hang'
-import { COURT, FLOOR, GRAVE_ORIGIN, OPENING, SUPPER_WALL } from './layout'
+import { COURT, FLOOR, GRAVE_ORIGIN, SUPPER_WALL } from './layout'
 import { STANDS, standOf, standLevel } from './stands'
 import { dossiers, MACHINE_SLUGS, type MachineSlug } from '../machines/catalog'
 import { bodyWallOrder } from './wall'
@@ -282,17 +282,14 @@ const BODY_STATION: VinciStationId = 'body'
 const SHEET_NEAREST_M = 1.1, SHEET_STEP_BACK = .8
 /** The book lies open on the table under its lamp, read from the chair side.
  *
- * THE TABLE STANDS CENTRED ON ITS OWN PANEL, and the panel is what fixes the
- * place. The panel cannot grow and cannot walk north: the hall door beside it
- * is how a visitor reaches the gallery, so it keeps its length and its
- * clearance from that door's reveal, and the table's own north follows from
- * them. The table's top is 2.8 m along the wall against the panel's 3.25, so
- * nothing of it overhangs the brown at either end.
+ * THE TABLE STANDS ON THE READING ROOM'S AXIS: the joint between two courses
+ * of the line's field, which runs from the dates into the room's doorway. Its
+ * east edge stands a fifth of a metre inside the room's front, which is the
+ * line field's edge; its own panel stays 0.3 m clear of the hall door.
  */
 export const VINCI_READING_TABLE = (() => {
-  const panelWidthM = 3.25, doorClearM = .95
-  return { east: -37.72, north: OPENING.hallToGallery.north[0] - doorClearM - panelWidthM / 2,
-    top: FLOOR + .755, panelWidthM }
+  const panelWidthM = 3.25
+  return { east: -37.38, north: -46.125, top: FLOOR + .755, panelWidthM }
 })()
 const READING_TABLE = VINCI_READING_TABLE
 /** The supplied entry floor of the house, which the hall's ledge stands on. */

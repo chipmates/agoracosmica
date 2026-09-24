@@ -28,7 +28,7 @@ import { kelvinToColour } from '../../../stack/light'
 import { FLOOR } from './layout'
 import { GALLERY_LIGHTS } from './line-gallery-plan'
 import {
-  Batch, bookcasePieces, chairParts, linear, OAK_READ, PLANES, READING_COVE, READING_LAMP, READING_ROOM, READING_ROOM_PROVENANCE, READING_THRESHOLD, READING_WASH,
+  Batch, bookcasePieces, chairFloor, chairParts, linear, OAK_READ, PLANES, READING_COVE, READING_LAMP, READING_ROOM, READING_ROOM_PROVENANCE, READING_THRESHOLD, READING_WASH,
   READING_SHADOW_LAYER, SHADE, studioloParts, T, v3, type Piece,
 } from './reading-room-plan'
 
@@ -172,7 +172,7 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
   // doorway for the floor and what stands on it, and one out in the gallery
   // before the doorway for the room's outside.
   const PROBES = [
-    v3(-37.45, T.north + .65, FLOOR + 1.75),
+    v3(T.east + .27, T.north + .65, FLOOR + 1.75),
     v3(Pl.frontInner - .12, T.north + .72, R.floor + .45),
     v3(R.front + 1.1, T.north, FLOOR + 1.5),
   ]
@@ -236,6 +236,27 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
     const under = P.y.lessThan(tableUnder).select(float(1), float(0))
     return float(1).sub(covered.mul(facingUp).mul(under).mul(engineTerms)).clamp(.3, 1)
   })()
+  // THE CHAIR STANDS ON THE FLOOR: its seat frame shades the boards under it
+  // by the same form factor, and each foot darkens the floor close round it.
+  // The threshold's downlight reaches under the chair unshadowed and the
+  // pendant's map is too soft for a leg, so this is laid on the boards' colour.
+  const underChair = ((): N => {
+    const P = positionWorld, F = chairFloor()
+    const c = float(R.floor + F.under).sub(P.y).max(.02)
+    const corner = (a: N, b: N): N => {
+      const X = a.div(c), Y = b.div(c)
+      const sx = sqrt(X.mul(X).add(1)), sy = sqrt(Y.mul(Y).add(1))
+      return X.div(sx).mul(atan(Y.div(sx))).add(Y.div(sy).mul(atan(X.div(sy)))).mul(1 / (2 * Math.PI))
+    }
+    const [w, s, e, n] = F.seat
+    const x0 = float(w).sub(P.x), x1 = float(e).sub(P.x), z0 = float(-n).sub(P.z), z1 = float(-s).sub(P.z)
+    const seat = corner(x1, z1).sub(corner(x0, z1)).sub(corner(x1, z0)).add(corner(x0, z0)).abs()
+    let feet: N = float(0)
+    for (const [fe, fn] of F.feet) feet = feet.add(smoothstep(F.foot * 5, F.foot, P.xz.sub(vec2(fe, -fn)).length()).mul(.55))
+    const facingUp = smoothstep(.5, .9, normalWorldGeometry.y)
+    const low = P.y.lessThan(R.floor + .03).select(float(1), float(0))
+    return float(1).sub(seat.mul(1.6).add(feet).mul(facingUp).mul(low).mul(engineTerms)).clamp(.4, 1)
+  })()
 
   /** OILED OAK: the photograph read along each piece's grain in metres, each
    * piece's own tone, the figure held a little under the photograph's own */
@@ -245,7 +266,8 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
     const tone = attribute('pieceTone', 'vec3')
     // the photograph's own red held back a little: oiled oak reads golden
     const figured = read.albedo.sub(1).mul(figure).add(1)
-    m.colorNode = tone.mul(mix(vec3(figured.dot(vec3(.3, .5, .2))), figured, colour))
+    const albedo = tone.mul(mix(vec3(figured.dot(vec3(.3, .5, .2))), figured, colour))
+    m.colorNode = occluded ? albedo.mul(underChair) : albedo
     // oiled, so smoother along the grain than the photograph's raw board
     m.roughnessNode = read.roughness.mul(.8).add(.12).clamp(.3, .85)
     m.normalNode = normalMap(read.normal.mul(.5).add(.5), vec2(.65, .65))
@@ -253,7 +275,7 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
     m.name = `vinci/collection-reading-room/${name}`
     return m
   }
-  const oakIn = oak('oak', .72, true), oakCeiling = oak('ceiling', .6, false), oakOut = oak('oak-outside', .8, false, .9)
+  const oakIn = oak('oak', .72, true), oakCeiling = oak('ceiling', .6, false), oakOut = oak('oak-outside', .6, false, .9)
   const darkIn = new MeshStandardNodeMaterial({ color: '#171412', roughness: .8, metalness: 0 })
   darkIn.name = 'vinci/collection-reading-room/ground'
 

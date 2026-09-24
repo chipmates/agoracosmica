@@ -140,7 +140,7 @@ const solids = plan.readingRoomSolids()
 const room = audit(solids)
 // THE CONTROL: a post stood on the walk from the reading table to the hall
 // door, where a refusal is certain, proves the audit can see.
-const control = audit([{ name: 'control-post', box: [-35.75, -45.0, -6.3, -35.6, -44.85, -3.8] }])
+const control = audit([{ name: 'control-post', box: [-35.435, -45.0, -6.3, -35.285, -44.85, -3.8] }])
 // THE CHAIR STANDS AS A CHAIR PUSHED IN: no part of it inside the table's
 // top and every part that rises past the top a finger clear of its edge, the
 // seat run on under the top, four legs on the room's floor.
