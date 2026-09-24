@@ -258,8 +258,14 @@ async function run(engine, width, lang) {
     await press(page, gold)
     record.handover = WALK === 'full' ? await burst(page, dir, '03-handover', 10, box) : null
     await waitState(page, 'walk', 20000)
-    await page.waitForTimeout(2500)
-    shots.push(await shot(page, dir, '04-walking'))
+    // the walking frame is taken inside the leg, never after it: the clip shown and between a third and two thirds through
+    const mid = await page.waitForFunction(() => {
+      const v = document.querySelector('.na-film-clip.shown')
+      return Boolean(v && v.duration > 0 && v.currentTime >= v.duration / 3)
+    }, null, { timeout: 30000, polling: 30 }).then(() => true).catch(() => false)
+    const walking = await shot(page, dir, '04-walking')
+    walking.midLeg = mid && await page.evaluate(() => { const v = document.querySelector('.na-film-clip.shown'); return v ? Math.round((v.currentTime / v.duration) * 100) : null })
+    shots.push(walking)
     if (WALK === 'full') {
       // the arrival: frames from the clip's last half second through the dissolve onto the still
       const near = await page.waitForFunction(() => { const v = document.querySelector('.na-film-clip.shown'); return v && v.duration > 0 && v.currentTime >= v.duration - 0.5 }, null, { timeout: 60000, polling: 30 }).then(() => true).catch(() => false)
@@ -303,6 +309,14 @@ async function run(engine, width, lang) {
       await waitState(page, 'rest', 60000)
       await page.waitForTimeout(6000)
       shots.push(await shot(page, dir, '09-island'))
+      // the record, at the sheet's height, from the close look's own control
+      const opened = await page.evaluate(() => { const b = document.querySelector('.vitrine-controls button'); if (!b) return false; b.click(); return true })
+      if (opened) {
+        await page.waitForTimeout(1200)
+        shots.push(await shot(page, dir, '09b-record'))
+        await page.keyboard.press('Escape')
+        await page.waitForTimeout(600)
+      }
       const folio = await page.$('.vitrine-folio')
       if (folio) {
         await folio.click().catch(() => null)
@@ -320,6 +334,14 @@ async function run(engine, width, lang) {
     await page.waitForFunction(() => document.querySelector('.na-film')?.dataset.state === 'rest' && !document.querySelector('#wing[data-walking]'), null, { timeout: 90000 }).catch(() => null)
     await page.waitForTimeout(1500)
     shots.push(await shot(page, dir, '11-rest-works'))
+    record.end = await page.evaluate(() => { const g = document.querySelector('.film-gold, .desk-on'); return g ? { end: g.getAttribute('data-end'), disabled: g.hasAttribute('disabled') || g.getAttribute('aria-disabled') === 'true', words: g.textContent?.trim() ?? '' } : null })
+    // the panel, at the sheet's height, from the book on the phone and the rail on the desktop
+    if (await press(page, phone ? '.film-book' : '#rail-instruments')) {
+      await page.waitForTimeout(900)
+      shots.push(await shot(page, dir, '11b-panel'))
+      await page.keyboard.press('Escape')
+      await page.waitForTimeout(600)
+    }
     // a jump the film cannot walk: back to the portrait's room at once
     await page.evaluate(() => window.__forge?.station('picture-room-lisa'))
     await waitState(page, 'dip', 10000)
