@@ -9,6 +9,7 @@ import { BoxGeometry, BufferGeometry, CylinderGeometry, Float32BufferAttribute, 
 import { FACE, FLOOR, LINE_FIELD, LINE_ORIGIN, OPENING, ROOMS } from './layout'
 import { lineCutStuds } from '../line/studs'
 import { READING_ROOM_DOOR, READING_ROOM_FOOTPRINT, READING_THRESHOLD } from './reading-room-plan'
+import { bodyMounts } from './body-wall'
 
 export const LINE_GALLERY_PROVENANCE = {
   manifestId: 'vinci/collection-line-gallery',
@@ -139,6 +140,15 @@ const skyFrom = (): P3 => {
   return [east + Math.cos(e) * Math.cos(a) * SKY.distance, north - Math.cos(e) * Math.sin(a) * SKY.distance, FLOOR + Math.sin(e) * SKY.distance]
 }
 
+/** THE HANG OF DRAWINGS AS A LIT PLANE: the sheets' own places along the
+ * west wall (`body-wall.ts`), a hand round them, standing over the chest. */
+const HANG_GLOW = (() => {
+  const grid = bodyMounts().filter(m => m.row !== 'vortex')
+  const south = Math.min(...grid.map(m => m.north - m.width / 2)) - .1, north = Math.max(...grid.map(m => m.north + m.width / 2)) + .1
+  const bottom = Math.min(...grid.map(m => m.datum - m.height / 2)) - .1, top = Math.max(...grid.map(m => m.datum + m.height / 2)) + .1
+  return { east: GALLERY.west + GALLERY.proud + .05, north: (south + north) / 2, middle: (bottom + top) / 2, width: north - south, height: top - bottom }
+})()
+
 /** THE GALLERY'S LIGHT, AS DATA: one table builds both the fittings and the
  * lights. North daylight through the east glass is the key; each date stands
  * in its own warm pool from a head on the track over the line; a linear slot
@@ -184,6 +194,14 @@ export const GALLERY_LIGHTS: readonly GalleryLight[] = [
     at: READING_THRESHOLD.at, aim: READING_THRESHOLD.aim,
     kelvin: READING_THRESHOLD.kelvin, intensity: READING_THRESHOLD.candela,
     angle: READING_THRESHOLD.angle, penumbra: READING_THRESHOLD.penumbra, reach: READING_THRESHOLD.reach,
+  },
+  {
+    // THE LIT HANG sends a little of the cabinet's warm wash back onto the
+    // floor before it, falling away into the gallery
+    name: 'body-hang', kind: 'area', head: false, receivers: 'floor',
+    at: [HANG_GLOW.east, HANG_GLOW.north, HANG_GLOW.middle], aim: [HANG_GLOW.east + 10, HANG_GLOW.north, HANG_GLOW.middle],
+    width: HANG_GLOW.width, height: HANG_GLOW.height,
+    kelvin: 3100, intensity: .5,
   },
   {
     name: 'wash', kind: 'area', head: false, receivers: 'room',
@@ -296,7 +314,10 @@ export function wallSkins(): { walls: Skin; backing: Skin } {
   // the west wall, the hall's partition, between its two doors
   const west = X.west + X.proud
   const hallDoor = OPENING.hallToGallery.north, southDoor = OPENING.hallToSouth.north
-  walls.northSouth(west, 1, southDoor[1], hallDoor[0], low, X.head)
+  // behind the body wall's lining the finish runs on up to the soffit, so
+  // the lining's straight head stands under the ribs against the concrete
+  walls.northSouth(west, 1, southDoor[1], READING_ROOM_FOOTPRINT.south, low, X.soffit)
+  walls.northSouth(west, 1, READING_ROOM_FOOTPRINT.south, hallDoor[0], low, X.head)
   backing.northSouth(west - recess, 1, southDoor[1], hallDoor[0], FLOOR, gapTop)
   walls.northSouth(west, 1, hallDoor[0], hallDoor[1], X.lintel, X.soffit)
   // the far wall, the picture room's partition, open at its door

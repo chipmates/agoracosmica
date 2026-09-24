@@ -25,7 +25,7 @@ import type { MaterialSet } from '../../../stack/materials'
 import { kelvinToColour } from '../../../stack/light'
 import { Solid } from './line-gallery-plan'
 import {
-  BODY_LIGHTS, BODY_SHADOW_LAYER, BODY_WALL_PROVENANCE, chestBoards, Faces, fittings, frameRing, liningBoards, linenBoards,
+  BODY_LIGHTS, BODY_SHADOW_LAYER, BODY_WALL_PROVENANCE, chestBoards, Faces, FIELD_BOUNCE, fittings, frameRing, liningBoards, linenBoards,
   matFaces, mountedSheets, NICHE, PROBE_AT, RECESS, shadowCasters, splayFaces, v3, type BodyLight, type Board,
 } from './body-wall-plan'
 import { BODY_PLATE, washToward } from './body-wall-light'
@@ -263,10 +263,13 @@ export function mountBodyWall(stack: Stack): BodyWallCabinet {
     const up = vec3(...CALM_FILL.up), down = vec3(...CALM_FILL.down), room = vec3(...CALM_FILL.room)
     env = mix(down, up, n.y.mul(.5).add(.5)).add(room.mul(n.x.max(0))).mul(L.envGain).mul(L.envLift)
   }
-  const adopt = (material: Material, inside = false): void => {
+  // THE BOUNCE FALLS AWAY DOWN THE GALLERY: past the chest the long run of
+  // lining takes less of it toward the far end, where the room sends back less
+  const farEnd = mix(float(FIELD_BOUNCE.far), float(1), smoothstep(FIELD_BOUNCE.from, FIELD_BOUNCE.to, positionWorld.z.negate()))
+  const adopt = (material: Material, inside = false, falls = false): void => {
     const lit = material as Material & { lightsNode?: unknown; envNode?: unknown }
     lit.lightsNode = lightsOf([...rig])
-    lit.envNode = env.mul(inside ? L.hangEnv : L.caseEnv)
+    lit.envNode = env.mul(inside ? L.hangEnv : L.caseEnv).mul(falls ? farEnd : float(1))
     material.needsUpdate = true
   }
 
@@ -278,7 +281,8 @@ export function mountBodyWall(stack: Stack): BodyWallCabinet {
   const mat = matMaterial(linenSet!, L)
   const bronze = bronzeMaterial(L)
   const dark = darkMaterial()
-  for (const m of [oak, bronze, dark]) adopt(m)
+  adopt(oak, false, true)
+  for (const m of [bronze, dark]) adopt(m)
   for (const m of [frameOak, linen, mat]) adopt(m, true)
   materials.push(oak, frameOak, linen, mat, bronze, dark)
 

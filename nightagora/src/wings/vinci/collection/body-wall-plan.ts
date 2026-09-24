@@ -145,9 +145,11 @@ export const LINING = {
    * rib at north -48, short of the reading room's plinth */
   north: APART.mount.north + NICHE_WIDTH / 2 + REVEAL_LIP + PIER,
   face: PLANE.finish + .18,
-  /** run into the slab, so the gallery's head band closes over it and every
-   * rib lands on its face */
-  top: GALLERY.soffit + .01,
+  /** ONE HEAD LINE under the ribs: the lining stops a hand short of their
+   * feet and the gallery's concrete runs on behind it up to the soffit
+   * (`line-gallery-plan.ts`), so the ribs land on the wall over a straight
+   * head and no rib foot steps the lining's top */
+  top: GALLERY.ribFoot - .08,
   /** the recessed toe, the panels' shadow joints and their depth */
   toe: H(.08), toeBack: .03, joint: .016, jointDepth: .014,
 } as const
@@ -181,11 +183,20 @@ export const NICHE: Opening & { centre: number } = {
   centre: APART.mount.north,
 }
 
-/** THE TRACK THE HEADS HANG FROM, over the hang's whole width and on over
- * the niche. */
+/** THE PLAIN LINING'S HEADS: a stride apart over the long run south of the
+ * chest, each a little dimmer than the one before it, so the wash on the
+ * panels falls away toward the gallery's far end. */
+export const FIELD_NORTHS = [-56.3, -58.3, -60.3] as const
+export const FIELD_LEVELS = [1.1, .75, .45] as const
+/** the share of the room's bounce the plain lining keeps at the far end, and
+ * the run (north) over which it falls from the chest's end to there */
+export const FIELD_BOUNCE = { far: .55, from: -61.5, to: -55.6 } as const
+
+/** THE TRACK THE HEADS HANG FROM, over the plain lining, the hang's whole
+ * width and on over the niche. */
 export const TRACK = {
   east: TRACK_EAST,
-  south: RECESS.south - .2, north: NICHE.centre + .2,
+  south: Math.min(RECESS.south - .2, ...FIELD_NORTHS.map(n => n - .35)), north: NICHE.centre + .2,
   width: .03, depth: TRACK_DEPTH,
 } as const
 
@@ -288,7 +299,21 @@ export const FRAMER: WashOptic = {
   spread: NICHE_WIDTH / 2, edge: NICHE_WIDTH / 2 - .01, edgeSoft: .05, floor: NICHE.sill + .03, floorSoft: .05,
 }
 
+/** THEIR OPTIC: a broad graze over the panels from the toe to under the
+ * head, soft along the wall so the three washes run into one fall. */
+export const FIELD_WASH: WashOptic = {
+  plane: LINING.face,
+  foot: H(.45), footSoft: .35, tail: .3, tailFall: .25,
+  crown: LINING.top - .15, crownSoft: .35, arc: .08,
+  spread: .75,
+}
+
 export const BODY_LIGHTS: readonly BodyLight[] = [
+  ...FIELD_NORTHS.map((north, i): BodyLight => ({
+    name: `field-${i + 1}`, kind: 'spot', head: true, receivers: 'cabinet',
+    at: [TRACK.east, north, LAMP], aim: [LINING.face, north, H(1.9)], kelvin: 3100, colour: '#ffe0b8',
+    intensity: FIELD_LEVELS[i]!, angle: 1.05, penumbra: .35, wash: FIELD_WASH,
+  })),
   ...HEAD_NORTHS.map((north, i): BodyLight => ({
     name: `head-${i + 1}`, kind: 'spot', head: true, receivers: 'cabinet',
     at: [TRACK.east, north, LAMP], aim: [PLANE.linen, north, H(1.95)], kelvin: 3100, colour: '#ffe0b8',
