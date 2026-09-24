@@ -67,6 +67,12 @@ export function installFilm(parts: FilmParts): void {
     return pose
   }
 
+  /* THE ARRIVAL STANDS ON THE NODE'S OWN POSE. A walked leg lands on it
+     through other arithmetic than a placement (the path's end, the gaze's
+     angles, the eased lens), a last bit apart, and the clip's last frame must
+     be its still's bytes: at rest after the leg the eye is placed on it. */
+  let arriving: FilmNode | null = null
+  let left = false
   const hook = {
     /** the eye stood at a node at once, as a cut stands it */
     place(node: FilmNode): boolean {
@@ -86,6 +92,8 @@ export function installFilm(parts: FilmParts): void {
     /** the leg from one node to the next, asked for as the press asks for it */
     walk(from: FilmNode, to: FilmNode, motion: FilmMotion): boolean {
       const rail = parts.rail()
+      arriving = to
+      left = false
       if (motion.rail === 'route') { rail.set(to.station, poseOf(to), false, phone()); return true }
       if (motion.rail === 'wall') {
         if (to.kind === 'stop') { rail.set(to.station, poseOf(to), false, phone(), Number(motion.to)); return true }
@@ -112,6 +120,11 @@ export function installFilm(parts: FilmParts): void {
     },
     /** at the top of every draw, after the wing's own update wrote the clock */
     beforeDraw(): void {
+      const nav = parts.rail().navigation
+      if (arriving) {
+        if (nav.active !== undefined) left = true
+        else if (left) { const to = arriving; arriving = null; hook.place(to) }
+      }
       windClock.value = pinnedWind(parts.rail().navigation)
     },
   }
