@@ -11,6 +11,7 @@ import type { TierName } from '../../stack/tier'
 import { dossier, edgeDistance, feature, inside, polygon, type Feature, type Quantity } from './site'
 import { anisotropicFootprint } from './masonry-courses'
 import { fadeUnderPixel, pebble, stoneColour } from './pebbles'
+import { stoneFlightMaterial, type StoneFlight } from './stair-wear'
 
 export type CourtPoint = [east:number,north:number]
 export interface InnerCourtRegion {
@@ -223,14 +224,20 @@ function material():MeshStandardNodeMaterial {
   // no normal map: these faces carry no uv, and a tangent-space map takes its frame from one
   return result
 }
-function meshOf(source:Batch,name:string):Mesh {
+/** the threshold flight in the plan terms its stone is dressed in: the
+ * walking line where the entry's middle meets the stair line */
+const entryMiddle:CourtPoint=[entryA[0]+entryAxis[0]*entryLength/2,entryA[1]+entryAxis[1]*entryLength/2]
+const stairAxis:CourtPoint=[(stairB[0]-stairA[0])/stairWidth,(stairB[1]-stairA[1])/stairWidth]
+export const thresholdFlight:StoneFlight={a:stairA,axis:stairAxis,outward,width:stairWidth,tread,count:stairCount,
+  walk:Math.max(.4,Math.min(stairWidth-.4,(entryMiddle[0]-stairA[0])*stairAxis[0]+(entryMiddle[1]-stairA[1])*stairAxis[1]))}
+function meshOf(source:Batch,name:string,material_=material()):Mesh {
   const geometry=new BufferGeometry()
   geometry.setAttribute('position',new Float32BufferAttribute(source.positions,3))
   geometry.setAttribute('color',new Float32BufferAttribute(source.colours,3))
   if(source.normals)geometry.setAttribute('normal',new Float32BufferAttribute(source.normals,3))
   else geometry.computeVertexNormals()
   geometry.computeBoundingSphere()
-  const mesh=new Mesh(geometry,material());mesh.name=name;mesh.receiveShadow=true;mesh.castShadow=false
+  const mesh=new Mesh(geometry,material_);mesh.name=name;mesh.receiveShadow=true;mesh.castShadow=false
   mesh.userData['manifestId']='vinci/inner-court';mesh.userData['labelOccluder']=false
   return mesh
 }
@@ -420,7 +427,7 @@ export function createInnerCourtDressing(heightAt:HeightAt,tier:TierName):Group 
   group.userData={...courtDressingProvenance,triangles:(stone.positions.length+chips.positions.length+wear.positions.length)/9,placedChips:placed}
   for(const [source,name]of[[stone,'tread stone'],[chips,'court gravel'],[wear,'court wear and drainage']] as const){
     if(!source.positions.length)continue
-    const mesh=meshOf(source,`vinci/inner-court/${name}`)
+    const mesh=meshOf(source,`vinci/inner-court/${name}`,source===stone?stoneFlightMaterial(thresholdFlight):material())
     // the court's loose gravel keeps still where it is smaller than the pixel
     if(source===chips)fadeUnderPixel(mesh.material as MeshStandardNodeMaterial,.03)
     group.add(mesh)

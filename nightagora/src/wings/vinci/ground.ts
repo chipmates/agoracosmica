@@ -12,6 +12,7 @@ import { anisotropicFootprint, coursedFace, dressedTuffeau } from './masonry-cou
 import { fractalField, resolved, specularAA } from '../../stack/detail'
 import { applyYardFinish, roadChip } from './ground-finish'
 import { copingUndersides, RETAINING_COURSES, sunEdge, wallInTheSun } from './terrace-wall'
+import { thresholdFlight } from './inner-court'
 
 // TSL graphs retain three independent scales, even on calm's complete ground.
 const { attribute, positionWorld, positionView, normalWorldGeometry, cameraViewMatrix, mx_noise_float, mix, vec3, float, smoothstep, length, cameraPosition, normalMap, vec2, vec4, uv, fract, floor, dot, sin, cos } = TSL
@@ -184,11 +185,19 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     // A STEP IS WORN where feet cross it: the nosing of a low riser paler and
     // smoother down the middle of its flight, a toe-scuff at its foot.
     const riser=float(1).sub(smoothstep(.26,.36,aboveFoot.add(belowHead))).mul(vertical)
-    const middle=smoothstep(-.2,.6,mx_noise_float(vec3(U.x.mul(1.7),0,6.3)))
-    const nosing=float(1).sub(smoothstep(.012,.045,belowHead)).mul(riser).mul(middle)
+    // on the court's threshold flight the feet cross on one line (the entry's
+    // middle); elsewhere a slow field stands for where they go
+    const F=thresholdFlight,rel=vec2(P.x.sub(F.a[0]),P.z.negate().sub(F.a[1]))
+    const across=rel.dot(vec2(F.axis[0],F.axis[1])),down=rel.dot(vec2(F.outward[0],F.outward[1]))
+    const inFlight=smoothstep(-.06,0,across).mul(float(1).sub(smoothstep(F.width,F.width+.06,across)))
+      .mul(smoothstep(-.06,0,down)).mul(float(1).sub(smoothstep(F.count*F.tread,F.count*F.tread+.08,down)))
+    const middle=mix(smoothstep(-.2,.6,mx_noise_float(vec3(U.x.mul(1.7),0,6.3))),across.sub(F.walk).div(.5).pow(2).negate().exp(),inFlight)
+    const nosing=float(1).sub(smoothstep(.012,middle.mul(.03).add(.035),belowHead)).mul(riser).mul(middle.mul(.8).add(.2))
     const toe=float(1).sub(smoothstep(.02,.07,aboveFoot)).mul(riser).mul(middle)
-    stone=mix(stone,stone.mul(vec3(1.12,1.11,1.07)),nosing.mul(.75))
-    stone=stone.mul(float(1).sub(toe.mul(.25)))
+    // the dirt the treads' sweepings leave in the corner at each riser's foot
+    const seat=float(1).sub(smoothstep(.006,.035,aboveFoot)).mul(riser).mul(smoothstep(-.3,.5,mx_noise_float(vec3(U.x.mul(11),0,2.7))).mul(.5).add(.5))
+    stone=mix(stone,stone.mul(vec3(1.14,1.13,1.09)),nosing.mul(.8))
+    stone=stone.mul(float(1).sub(toe.mul(.25))).mul(float(1).sub(seat.mul(.42)))
     // THE DAMP LINE WHERE A WALL MEETS THE GRASS: the sward holds the wet
     // against the foot, a dark band a hand over the blades, its top wandering.
     const tall=smoothstep(.34,.5,aboveFoot.add(belowHead))
@@ -225,7 +234,9 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     m.userData['engineArrisShadow']=true
     m.roughnessNode=specularAA(float(.89).add(cleft.mul(.035)).sub(damp.mul(.06)).clamp(.78,1),
       lost(.0007,.0045).add(lost(.00085,.0115)).add(lost(.0009,.024)).add(lost(.0009,.0625)))
-    const height=cleft.mul(.0009).sub(pores.mul(.0007)).add(grooves.mul(.00085)).add(chatter.mul(.0009)).add(laid.depthM).toVar()
+    // a riser's arris worn round under the soles, most on the walking line
+    const worn=float(1).sub(smoothstep(0,middle.mul(.02).add(.012),belowHead)).pow(2).mul(riser).mul(middle.mul(.8).add(.2))
+    const height=cleft.mul(.0009).sub(pores.mul(.0007)).add(grooves.mul(.00085)).add(chatter.mul(.0009)).add(laid.depthM).sub(worn.mul(.009)).toVar()
     const viewNormal=n.transformDirection(cameraViewMatrix),sx=positionView.dFdx(),sy=positionView.dFdy()
     const rx=sy.cross(viewNormal),ry=viewNormal.cross(sx),det=sx.dot(rx)
     const gradient=rx.mul(height.dFdx()).add(ry.mul(height.dFdy())).mul(det.sign()).div(det.abs().max(1e-10)).toVar()
