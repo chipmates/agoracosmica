@@ -236,10 +236,10 @@ export const vinciStory: readonly VinciStoryStop[] = [
     quiet: true,
     chapter: { en: "The great hall", de: "Der große Saal" },
     age: null,
-    line: { en: "Guests were received in the hall behind this door. It is said the king gave him this house.", de: "Hinter dieser Tür empfing man Gäste. Der König soll ihm dieses Haus gegeben haben." },
-    drawer: { en: "The room is not open, so the house is shown from outside. The panelling and the chimneypiece in it today are eighteenth century. They came two hundred years after him. What the room looked like in his time, no source describes. The house itself has stood since the fifteenth century.", de: "Der Raum ist nicht geöffnet, deshalb zeigen wir das Haus von außen. Vertäfelung und Kamin darin stammen aus dem achtzehnten Jahrhundert. Sie kamen zweihundert Jahre nach ihm ins Haus. Wie der Saal zu seiner Zeit aussah, beschreibt keine Quelle. Das Haus selbst steht seit dem fünfzehnten Jahrhundert." },
+    line: { en: "We rebuilt this great hall. It is said the king gave him this house.", de: "Diesen großen Saal haben wir nachgebaut. Der König soll ihm dieses Haus gegeben haben." },
+    drawer: { en: "No source describes this room in his time, so we rebuilt it. The tiles lie on the diagonal, as a photograph of the room shows. The fireplace there today was changed in the eighteenth century. So ours takes a form of about 1500. The table, chest and stools copy furniture of his time. None of them was his.", de: "Keine Quelle beschreibt diesen Raum zu seiner Zeit, also haben wir ihn nachgebaut. Die Fliesen liegen diagonal, wie eine Fotografie des Raums zeigt. Der Kamin dort wurde im achtzehnten Jahrhundert verändert. Unserer hat deshalb eine Form um 1500. Tisch, Truhe und Hocker folgen Möbeln seiner Zeit. Keines davon gehörte ihm." },
     certainty: "reconstructed",
-    sees: "The open house door at the hall's threshold",
+    sees: "The great hall from inside its door",
     pointers: ["C10"],
   },
   {

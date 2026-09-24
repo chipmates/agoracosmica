@@ -165,8 +165,8 @@ const visitorWords: Record<string, VisitorWords> = {
     sourceDe: 'Fotografien des reliefgeschmückten Hofportals.',
   },
   'hall-arrangement': {
-    en: 'The hall is reconstructed with panelling and a fireplace altered in the eighteenth century.',
-    de: 'Der Saal ist mit einer Vertäfelung und einem Kamin rekonstruiert, die im achtzehnten Jahrhundert verändert wurden.',
+    en: 'The hall is rebuilt with a chimneypiece of about 1500, because the one there today was altered in the eighteenth century.',
+    de: 'Der Saal ist mit einem Kamin um 1500 nachgebaut, denn der heutige wurde im achtzehnten Jahrhundert verändert.',
     sourceEn: 'Photographs of the great hall and the history of its alterations.',
     sourceDe: 'Fotografien des großen Saals und die Geschichte seiner Umbauten.',
   },
@@ -384,10 +384,13 @@ const courtyard = statement('carved-inscription-record',
   'Over the courtyard door, a bird with spread wings and the words DIEV AVANT TOVT.',
   'Über der Hoftür ein Vogel mit ausgebreiteten Flügeln und die Worte DIEV AVANT TOVT.',
   'documented', 'document', 'brief/CONCEPT-OPUS.md §3 S2; Q015');
-const hall = statement('hall-arrangement',
-  'The hall a guest was received in. Its panelling and its chimneypiece were altered in the eighteenth century.',
-  'Der Saal, in dem ein Gast empfangen wurde. Seine Vertäfelung und seine Kamineinfassung wurden im achtzehnten Jahrhundert verändert.',
-  'reconstructed', 'carrier', 'brief/CONCEPT-OPUS.md §3 S3');
+const hall: VinciStatement = {
+  ...statement('hall-arrangement',
+  'The great hall is rebuilt to the proposed plan. Today\u2019s panelling and chimneypiece were altered in the eighteenth century, so the rebuilt chimneypiece takes the Loire form of the years around 1500.',
+  'Der große Saal ist nach dem vorgeschlagenen Grundriss nachgebaut. Vertäfelung und Kamin von heute wurden im achtzehnten Jahrhundert verändert, deshalb hat der nachgebaute Kamin die Form der Loire um 1500.',
+  'reconstructed', 'carrier', 'brief/CONCEPT-OPUS.md §3 S3; house-hall.ts, the great hall as built'),
+  carrier: 'vinci/house-hall',
+};
 const oratory = statement('oratory-date',
   'Built in 1492 for Anne of Brittany.',
   '1492 für Anne de Bretagne erbaut.',
@@ -485,8 +488,8 @@ const stationCards: Record<VinciStationId, VinciText> = {
     de: 'Der Hof zwischen dem Haus und seinem Tor. Über der Tür trägt ein Vogel mit ausgebreiteten Flügeln die Worte DIEV AVANT TOVT, Gott vor allem, und Fotografien dieses Reliefs sind unsere Vorlage. Die Nachmittagssonne steht im Westen und streicht über diesen Hof.',
   },
   hall: {
-    en: 'The hall a guest was received in. Its panelling and its chimneypiece were changed in the eighteenth century, so what survives here is younger than Leonardo. The room is not open, so the house is shown from outside.',
-    de: 'Der Saal, in dem ein Gast empfangen wurde. Vertäfelung und Kamin wurden im achtzehnten Jahrhundert verändert, das Erhaltene ist hier also jünger als Leonardo. Der Raum ist nicht geöffnet, deshalb wird das Haus von außen gezeigt.',
+    en: 'The great hall, rebuilt for this museum from the house\u2019s plan and photographs. The chimneypiece in the room today was changed in the eighteenth century, so ours takes a Loire form of about 1500. The table, the chest and the stools are types of the period. None of them was his.',
+    de: 'Der große Saal, für dieses Museum nach dem Grundriss des Hauses und nach Fotografien nachgebaut. Der Kamin im heutigen Raum wurde im achtzehnten Jahrhundert verändert, deshalb hat unserer eine Form der Loire um 1500. Tisch, Truhe und Hocker sind Typen der Zeit. Keines der Stücke gehörte ihm.',
   },
   oratory: {
     en: 'A small stone chapel set into the south end of the house. Tradition gives it to Anne of Brittany and the year 1492, and no building survey has confirmed that date. Its wall paintings are attributed to Leonardo’s pupils, and that attribution is not settled. The room is not open, so the house is shown from outside.',
