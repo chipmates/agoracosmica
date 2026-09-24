@@ -107,9 +107,9 @@ export const READING_LAMP = {
    * page's pool is this lamp's, several times the ceiling's bounce, so the
    * table falls off from the book into the room */
   lux: 660,
-  /** an opal disc set up inside the dome, whose rim cuts its light to a pool
-   * on the table: full inside a third of a metre, gone a metre out */
-  angle: 1.1, penumbra: .6, reach: 4.5,
+  /** the dome's rim cuts its light to a pool the size of the reader's
+   * place: full inside a fifth of a metre, gone three quarters of a metre out */
+  angle: .9, penumbra: .65, reach: 4.5,
   /** how far over the rim the disc sits */
   disc: .05,
   mapPx: 2048, soft: 2.5,
@@ -147,11 +147,25 @@ export const READING_THRESHOLD = {
   slot: { width: .05, length: R.door.width - .2 },
 } as const
 
+/** THE READING STAND the book lies on, as a reading room lends one: an oak
+ * wedge that lifts the far edge of the book's own linen board by `tilt`, with
+ * a ledge at its foot. In the book's own frame (x across the spread, z toward
+ * the reader, y up from the linen board's underside): the wedge's half width
+ * and half depth, its height at the front edge, and the ledge's rise and depth. */
+export const READING_STAND = { tilt: 20 * Math.PI / 180, half: .205, reach: .15, front: .018, under: .0025, ledge: .016, lip: .014,
+  /** how far round its foot the top darkens, and how deep at the foot */
+  contact: .07, contactDepth: .5,
+  /** the share of the room's bounce the table's top takes: the oiled top
+   * past the pool falls into the room's dark, so the pool is the book's place */
+  tableBounce: .5 } as const
+
 /** The layer only this room's lamp casts from: no eye and no sun sees it. */
 export const READING_SHADOW_LAYER = 4
 
-/** The shade, in its own metres: radius and height over the rim. */
-export const SHADE = { radius: .15, height: .155, fitter: .024 }
+/** The shade, in its own metres: radius and height over the rim; the opal
+ * bowl's swell under the rim and its glow in the stack's units; how far up
+ * the skin the bowl's light reaches, and how strongly. */
+export const SHADE = { radius: .15, height: .155, fitter: .024, bowl: .03, bowlLevel: 3.2, lipGlow: .03, lipLevel: .35 }
 
 export const v3 = (e: number, n: number, h: number): Vector3 => new Vector3(e, h, -n)
 
@@ -1281,5 +1295,10 @@ export function readingRoomSolids(): { name: string; box: [number, number, numbe
   out.push({ name: 'pendant-cord', box: [READING_LAMP.east - .01, READING_LAMP.north - .01, READING_LAMP.rim + SHADE.height, READING_LAMP.east + .01, READING_LAMP.north + .01, R.ceiling] })
   out.push({ name: 'pendant-cup', box: [READING_LAMP.east - .06, READING_LAMP.north - .06, R.ceiling - .1 - .038, READING_LAMP.east + .06, READING_LAMP.north + .06, R.ceiling] })
   chairParts().boxes.forEach((box, i) => out.push({ name: `chair-${i}`, box }))
+  // the stand under the book, the table's depth running east
+  const S = READING_STAND, c = Math.cos(S.tilt), sn = Math.sin(S.tilt)
+  const lift = S.front + S.under * c + S.reach * sn
+  out.push({ name: 'reading-stand', box: [T.east - S.under * sn - S.reach * c, T.north - S.half, T.top,
+    T.east - S.under * sn + S.reach * c, T.north + S.half, T.top + lift - S.under * c + S.reach * sn] })
   return out
 }

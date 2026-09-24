@@ -18,7 +18,7 @@
  */
 import {
   BackSide, BufferGeometry, Color, CubeCamera, CubeRenderTarget, CylinderGeometry, DoubleSide,
-  Group, HalfFloatType, LatheGeometry, Mesh, MeshBasicNodeMaterial, MeshStandardNodeMaterial, Object3D,
+  Group, HalfFloatType, LatheGeometry, Matrix4, Mesh, MeshBasicNodeMaterial, MeshStandardNodeMaterial, Object3D,
   PMREMGenerator, Quaternion, RectAreaLight, SpotLight, Vector2, Vector3, type Light, type Material, type RenderTarget, type Scene,
 } from 'three/webgpu'
 import * as TSL from 'three/tsl'
@@ -29,8 +29,8 @@ import { axisFootprint, lineCoverage } from '../../../stack/detail'
 import { FLOOR } from './layout'
 import { GALLERY_LIGHTS } from './line-gallery-plan'
 import {
-  Batch, bookcasePieces, chairFloor, chairParts, linear, OAK_READ, PLANES, READING_COVE, READING_LAMP, READING_ROOM, READING_ROOM_PROVENANCE, READING_THRESHOLD, READING_WASH,
-  READING_SHADOW_LAYER, SHADE, studioloParts, T, TABLE_BOARDS, TABLE_TOP, v3, volumeGeometry,
+  Batch, bookcasePieces, chairFloor, chairParts, linear, OAK, OAK_READ, PLANES, READING_COVE, READING_LAMP, READING_ROOM, READING_ROOM_PROVENANCE, READING_STAND, READING_THRESHOLD, READING_WASH,
+  READING_SHADOW_LAYER, SHADE, studioloParts, T, TABLE_BOARDS, TABLE_TOP, toned, v3, volumeGeometry,
 } from './reading-room-plan'
 
 export { READING_CHAIR, READING_LAMP, READING_ROOM, READING_ROOM_PROVENANCE, READING_SHADOW_LAYER, readingRoomSolids } from './reading-room-plan'
@@ -211,6 +211,9 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
   const engineTerms = uniform(1)
   /** the table top's footprint in three's x and z, and its underside */
   const tableRect = uniform(vec4(0, 0, 0, 0)), tableUnder = uniform(0)
+  /** the reading stand's footprint in three's x and z: the top darkens round
+   * its foot, the soft contact a lamp this wide leaves */
+  const standRect = uniform(vec4(0, 0, 0, 0))
 
   function adopt(material: Material, rig: readonly Light[], env: N): void {
     const lit = material as Material & { lightsNode?: unknown; envNode?: unknown; lights?: boolean; isNodeMaterial?: boolean }
@@ -325,7 +328,10 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
       .max(smoothstep(.2, .03, fromEdge).mul(smoothstep(.9, .4, north.sub(T.north).abs())).mul(patch).mul(.55))
       .add(smoothstep(.012, .002, fromEdge).mul(.9)).clamp(0, 1)
     const albedo = tone.mul(mix(vec3(figured.dot(vec3(.3, .5, .2))), figured, .85))
+    const outX = standRect.x.sub(P.x).max(P.x.sub(standRect.z)).max(0), outZ = standRect.y.sub(P.z).max(P.z.sub(standRect.w)).max(0)
+    const contact = smoothstep(READING_STAND.contact, 0, vec2(outX, outZ).length()).mul(READING_STAND.contactDepth)
     m.colorNode = mix(albedo, albedo.dot(vec3(.3, .5, .2)).mul(vec3(1.5, 1.3, 1.05)), worn.mul(.55)).mul(float(1).sub(seam.mul(.72))).mul(arris.add(1)).mul(worn.mul(.28).add(1))
+      .mul(float(1).sub(contact))
     m.roughnessNode = read.roughness.mul(.45).add(.2).add(seam.mul(.4)).sub(worn.mul(.08)).clamp(.22, .9)
     m.normalNode = normalMap(read.normal.mul(.5).add(.5), vec2(.5, .5))
     m.name = 'vinci/collection-reading-room/table-top'
@@ -348,14 +354,20 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
     const rings = sin(radius.mul(2400)).mul(.5).add(sin(radius.mul(830)).mul(.5))
     brass.roughnessNode = float(.38).add(rings.mul(.03)).add(mx_noise_float(positionLocal.mul(60)).mul(.05))
     brass.colorNode = vec3(...linear('#6e5638')).mul(rings.mul(.02).add(mx_noise_float(positionLocal.mul(9)).mul(.06)).add(1))
+    // the opal bowl under the rim lights the rolled lip and a hand's breadth
+    // of the skin over it; the fitter and the cup stay dark
+    const overRim = positionLocal.y.sub(L.rim)
+    brass.emissiveNode = vec3(...linear(L.colour)).mul(smoothstep(SHADE.lipGlow, 0, overRim).mul(smoothstep(-.004, .002, overRim)).mul(SHADE.lipLevel))
   }
   brass.name = 'vinci/collection-reading-room/brass'
   const enamel = new MeshStandardNodeMaterial({ color: '#e9e3d6', roughness: .45, metalness: 0, side: BackSide })
   enamel.name = 'vinci/collection-reading-room/enamel'
   const cordMaterial = new MeshStandardNodeMaterial({ color: '#1b1a19', roughness: .92, metalness: 0 })
   cordMaterial.name = 'vinci/collection-reading-room/cord'
-  // the opal disc glows at the lamp's own colour: it is seen, it lights nothing
-  const glow = new MeshBasicNodeMaterial({ color: new Color(L.colour).multiplyScalar(2.2) })
+  // THE OPAL BOWL glows at the lamp's own colour, brightest where the bulb
+  // sits over it: it is seen from every stop that sees the shade, it lights nothing
+  const glow = new MeshBasicNodeMaterial({ side: DoubleSide })
+  glow.colorNode = vec3(...linear(L.colour)).mul(smoothstep(-SHADE.bowl, 0, positionLocal.y.sub(L.rim)).mul(.45).add(.55).mul(SHADE.bowlLevel))
   glow.name = 'vinci/collection-reading-room/diffuser'
   // THE SEAT'S LEATHER: vegetable tanned, darker where it is sat on, satin
   // where hands and cloth have polished it
@@ -408,7 +420,7 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
   adopt(oakCeiling, [lamp, cove], envIn)
   adopt(oakOut, outsideRig, envOut)
   adopt(bronzeMaterial, [...outsideRig, threshold], envOut)
-  adopt(tableTop, [lamp, threshold], envIn)
+  adopt(tableTop, [lamp, threshold], envIn.mul(READING_STAND.tableBounce))
   materials.push(tableTop, oakIn, oakCeiling, oakOut, darkIn, bronzeMaterial, brass, enamel, cordMaterial, leatherMaterial, bindings, glow)
 
   const stampMesh = (mesh: Mesh, name: string): Mesh => {
@@ -462,16 +474,26 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
     cup.translate(L.east, R.ceiling - .002, -L.north)
     stampMesh(new Mesh(mergeGeometries([shell, fitter, cup], false)!, brass), 'shade')
     for (const g of [shell, fitter, cup]) g.dispose()
-    // Inside the shade: its white lining and the opal disc, seen only from
-    // under it, which no stop is; the calm tier leaves them out.
+    // Inside the shade its white lining, seen only from under it, which no
+    // stop is; the calm tier leaves it out.
     if (tier !== 'calm') {
       const inner = outer.slice(1, -1).map(p => new Vector2(p.x - .0025, p.y + .001))
       const lining = new LatheGeometry(inner, 96)
       lining.translate(L.east, rim, -L.north)
       stampMesh(new Mesh(lining, enamel), 'shade-lining')
-      const disc = new CylinderGeometry(r - .012, r - .012, .004, 64)
-      disc.translate(L.east, rim + L.disc, -L.north)
-      const diffuser = stampMesh(new Mesh(disc, glow), 'diffuser')
+    }
+    // THE OPAL BOWL set in the rim and swelling under it: the eye stands just
+    // over the rim's plane, so the lit glass under the dark dome is what says
+    // the pool is this lamp's
+    {
+      const b = r - .006, steps = 12
+      const bowlProfile = Array.from({ length: steps + 1 }, (_, i) => {
+        const x = b * i / steps
+        return new Vector2(x, -SHADE.bowl * (1 - (x / b) ** 2))
+      })
+      const bowl = new LatheGeometry(bowlProfile, 96)
+      bowl.translate(L.east, rim + .003, -L.north)
+      const diffuser = stampMesh(new Mesh(bowl, glow), 'diffuser')
       diffuser.receiveShadow = false
       diffuser.userData['labelOccluder'] = false
     }
@@ -490,6 +512,8 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
   const doubles: Mesh[] = [], ownDoubles: Mesh[] = []
   /** the chair stands and is drawn with the table it is drawn up to */
   const chairBodies: Mesh[] = []
+  /** the room's own bodies drawn only with the table: its reading stand */
+  const withTable: Mesh[] = []
   /** A shadow-only copy of a body on the room's own layer, in the body's place. */
   const double = (caster: Mesh): Mesh => {
     const copy = new Mesh(caster.geometry, doubleMaterial)
@@ -518,6 +542,44 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
     const seat = stampMesh(new Mesh(flat(parts.leather), leatherMaterial), 'chair-seat')
     ownDoubles.push(double(wood), double(seat))
     chairBodies.push(wood, seat, ...ownDoubles)
+  }
+
+  /** THE WEDGE under the tilted book, in the table's own frame (x across the
+   * spread, z toward the reader, y up from the top) and then the world's: a
+   * sloped top under the linen board, square faces down to the table, and a
+   * ledge at the foot that the book's lower edge stands clear of. */
+  const standMesh = (table: Object3D, pivot: Group): Mesh => {
+    const S = READING_STAND, W = S.half, Z = S.reach, y0 = -S.under
+    const tilt = new Matrix4().compose(pivot.position, pivot.quaternion, pivot.scale)
+    const at = (x: number, y: number, z: number): Vector3 => new Vector3(x, y, z).applyMatrix4(tilt)
+    const down = (p: Vector3): Vector3 => new Vector3(p.x, 0, p.z)
+    const b = new Batch(), tone = toned(OAK.chair, 3, 91, 0)
+    const uvOf = (ps: Vector3[], u: (p: Vector3) => number, v: (p: Vector3) => number): [number, number][] => ps.map(p => [u(p) + .4, v(p) + .7])
+    const face = (ps: Vector3[], normal: Vector3, v: (p: Vector3) => number): void => b.quad(ps, normal, uvOf(ps, p => p.x, v), tone)
+    const up = new Vector3(0, Math.cos(S.tilt), Math.sin(S.tilt))
+    const fl = at(-W, y0, Z), fr = at(W, y0, Z), bl = at(-W, y0, -Z), br = at(W, y0, -Z)
+    face([bl, br, fr, fl], up, p => p.z)
+    face([down(fl), down(fr), fr, fl], new Vector3(0, 0, 1), p => p.y)
+    face([down(bl), down(br), br, bl], new Vector3(0, 0, -1), p => p.y)
+    b.quad([down(bl), down(fl), fl, bl], new Vector3(-1, 0, 0), uvOf([down(bl), down(fl), fl, bl], p => p.z, p => p.y), tone)
+    b.quad([down(br), down(fr), fr, br], new Vector3(1, 0, 0), uvOf([down(br), down(fr), fr, br], p => p.z, p => p.y), tone)
+    // the ledge: a strip on the slope's foot, its own box in the book's frame
+    const lw = W - .004, z0 = Z - S.lip, lt = S.ledge
+    const c = (x: number, y: number, z: number): Vector3 => at(x, y, z)
+    face([c(-lw, lt, z0), c(lw, lt, z0), c(lw, lt, Z), c(-lw, lt, Z)], up, p => p.z)
+    face([c(-lw, y0, Z), c(lw, y0, Z), c(lw, lt, Z), c(-lw, lt, Z)], new Vector3(0, -Math.sin(S.tilt), Math.cos(S.tilt)), p => p.y)
+    face([c(-lw, y0, z0), c(lw, y0, z0), c(lw, lt, z0), c(-lw, lt, z0)], new Vector3(0, Math.sin(S.tilt), -Math.cos(S.tilt)), p => p.y)
+    for (const x of [-lw, lw]) {
+      const ps = [c(x, y0, z0), c(x, y0, Z), c(x, lt, Z), c(x, lt, z0)]
+      b.quad(ps, new Vector3(Math.sign(x), 0, 0), uvOf(ps, p => p.z, p => p.y), tone)
+    }
+    const g = b.geometry()
+    g.applyMatrix4(table.matrixWorld)
+    g.computeBoundingBox(); g.computeBoundingSphere()
+    standRect.value.set(g.boundingBox!.min.x, g.boundingBox!.min.z, g.boundingBox!.max.x, g.boundingBox!.max.z)
+    // it casts no map: the pendant's opal is a hand wide, so its shadow round
+    // the foot is the soft contact the top draws, never a hard edge
+    return stampMesh(new Mesh(g, oakIn), 'reading-stand')
   }
 
   // `?roomrig` hands an instrument the room's lights, to lean on a standing
@@ -562,6 +624,18 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
       // THE DESK LAMP GOES: the pendant is the reading light here, and a
       // second lamp lit on the table turns its glow to the visitor
       if (lampHead?.parent) lampHead.parent.visible = false
+      // THE BOOK ON ITS STAND: what the table carries for the open book rides
+      // a pivot the room tilts onto its wedge; the top, the lamp and the rack stay
+      const S = READING_STAND
+      const pivot = new Group()
+      pivot.name = 'reading-stand'
+      pivot.position.set(0, S.front + S.under * Math.cos(S.tilt) + S.reach * Math.sin(S.tilt), 0)
+      pivot.rotation.x = S.tilt
+      const keepFlat = new Set([top?.parent, lampHead?.parent, table.getObjectByName('named-folio-reading-rack')])
+      for (const child of [...table.children]) if (!keepFlat.has(child)) pivot.add(child)
+      table.add(pivot)
+      table.updateMatrixWorld(true)
+      withTable.push(standMesh(table, pivot))
       if (top) doubles.push(double(top))
       // the top wears the room's own oak, board by board
       if (top) top.material = tableTop
@@ -580,7 +654,7 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
       const shade = ['shade', 'shade-lining', 'diffuser']
         .map(name => group.getObjectByName(`vinci/collection-reading-room/${name}`))
         .filter((o): o is Object3D => Boolean(o))
-      const shownBodies = [...doubles, ...chairBodies], doublesShown = shownBodies.map(d => d.visible)
+      const shownBodies = [...doubles, ...chairBodies, ...withTable], doublesShown = shownBodies.map(d => d.visible)
       for (const o of shade) o.visible = false
       for (const d of shownBodies) d.visible = true
       for (const probe of probes) probe.camera.update(stack.renderer, scene)
@@ -589,7 +663,7 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
       for (const probe of probes) generator.fromCubemap(probe.target.texture, probe.pmrem)
     },
     update(tableShown) {
-      for (const d of [...doubles, ...chairBodies]) if (d.visible !== tableShown) d.visible = tableShown
+      for (const d of [...doubles, ...chairBodies, ...withTable]) if (d.visible !== tableShown) d.visible = tableShown
       if (rebake > 0) { rebake--; this.bake() }
     },
     dispose() {
