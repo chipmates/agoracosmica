@@ -19,6 +19,7 @@ import { COLLECTION_PAVING_ORIGIN, COURT, FACE, FLOOR, GRAVE_ORIGIN, LINE_SLAB }
 import { distanceToBoxes, flagFace } from '../court-flags'
 import { bodyWallPlateLight, onBodyWall } from './body-wall-light'
 import { hangTone, PICTURE_LOOKS } from './picture-light'
+import { applyCourtLight } from '../grave/court-light'
 
 /** floor stone, wall plaster, dark stone, steel, ceiling, outdoor paving */
 export type CollectionRole = 0 | 1 | 2 | 3 | 4 | 5
@@ -563,6 +564,8 @@ export function collectionExhibitMaterials(): {
     const face = flagFace({ east: GRAVE_ORIGIN.east - 4, north: GRAVE_ORIGIN.north, pitchEast: 1.4, pitchNorth: 1.8, bond: .9 }, walked, damp)
     stone.colorNode = (stone.colorNode as TSLNode).mul(blend(float(1), face.tone, top))
     stone.roughnessNode = (stone.roughnessNode as TSLNode).add(face.rough.mul(top))
+    // the grave court's sky and the warm light off its sunlit wall head
+    applyCourtLight(stone, stone.colorNode as TSLNode, { floorOnly: true })
   }
   const plaster = make(PALETTE.plaster, .9, .01, {
     scales: [.3, .05, .0025], extent: .6, lapM: .15, driftM: 2.4,

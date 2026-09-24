@@ -179,6 +179,15 @@ export function collectionView(id: string, narrow: boolean): RoomPose | undefine
       return pose(stand.east, -32.6, COURT.level + 1.62,
         stand.east, stand.north, COURT.level + 4.6, narrow ? 86 : 68, 2.1)
     }
+    // TWO INSPECTION EYES IN THE GRAVE COURT, neither a station nor a walk:
+    // the slab's cut name read from the foot of the slab, and the north wall's
+    // lit head with the filter band's light under it.
+    case 'grave-court-slab':
+      return pose(GRAVE_ORIGIN.east + 4.2, GRAVE_ORIGIN.north - 1.75, COURT.level + 1.62,
+        GRAVE_ORIGIN.east + 1.25, GRAVE_ORIGIN.north - .95, COURT.level + .27, narrow ? 64 : 48, .2)
+    case 'grave-court-band':
+      return pose(GRAVE_ORIGIN.east + 5.4, GRAVE_ORIGIN.north + 1.2, COURT.level + 1.62,
+        GRAVE_ORIGIN.east + .2, GRAVE_ORIGIN.north + 8.6, COURT.level + 4.9, narrow ? 72 : 54, .4)
     case 'collection-room-supper':
       // The field is 8.8 by 4.6 m and the card sits in the middle of the
       // frame: the eye stands where the whole measurement clears it.

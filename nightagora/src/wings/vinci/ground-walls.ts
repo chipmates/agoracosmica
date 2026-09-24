@@ -8,6 +8,7 @@ import { dossier, inside, polygon, type Quantity } from './site'
 import { COURT, GRAVE_ORIGIN, SUPPER_WALL } from './collection/layout'
 import { GALLERY } from './collection/rooms'
 import { GRAVE_SLAB } from './grave/placement'
+import { BED, COURT_TREES, courtFurnitureBlocks, WALKWAY, walkwayOutline } from './grave/court-plan'
 
 type V2 = [number, number]
 /** A face the ground meets: its ends, the unit normal (east, north) into
@@ -88,7 +89,26 @@ export function courtBlocks(): FloorBlock[] {
     { ...graveBox(GRAVE_SLAB.x, GRAVE_SLAB.z, GRAVE_SLAB.width, GRAVE_SLAB.length), top: mount + .234 },
     { ...graveBox(GRAVE_SLAB.x, GRAVE_SLAB.z, 2.16, 3.74), top: null },
     { ...graveBox(1.44, 1.37, 1.88, .48), top: null },
+    // the court's beds and bench, and the walkway as squares inside its boards
+    ...courtFurnitureBlocks(),
+    ...walkwaySquares(),
   ]
+}
+
+/** The walkway in plan as squares that lie wholly inside its boards, so a
+    leaf that lands on one lies on the boards and none hangs off their edge. */
+function walkwaySquares(): FloorBlock[] {
+  const [a, b, , d] = walkwayOutline()
+  const along = [b![0] - a![0], b![1] - a![1]], across = [d![0] - a![0], d![1] - a![1]]
+  const length = Math.hypot(along[0]!, along[1]!), width = Math.hypot(across[0]!, across[1]!)
+  const side = width / Math.SQRT2 * .98, top = COURT.level + GRAVE_FLOOR_RISE + WALKWAY.height
+  const out: FloorBlock[] = []
+  for (let t = side / 2 + .02; t < length - side / 2; t += side * .8) {
+    const c = [a![0] + along[0]! * t / length + across[0]! / 2, a![1] + along[1]! * t / length + across[1]! / 2]
+    const h = side / 2 * Math.SQRT1_2
+    out.push({ west: c[0]! - h, east: c[0]! + h, south: c[1]! - h, north: c[1]! + h, top })
+  }
+  return out
 }
 
 /** The faces a blown leaf meets in the insertion's court, each at the front
@@ -121,6 +141,15 @@ export function courtFaces(): Catcher[] {
   face([S.east + base, S.north + half], [S.east - base, S.north + half], [0, 1], .22)
   box(graveBox(GRAVE_SLAB.x, GRAVE_SLAB.z, 2.16, 3.74), .15)
   box(graveBox(1.44, 1.37, 1.88, .48), .17)
+  // the court's beds at their steel edges, and the walkway's two long sides
+  for (const t of COURT_TREES) box({ west: t.east - BED.half, east: t.east + BED.half, south: t.north - BED.half, north: t.north + BED.half }, BED.rise)
+  {
+    const [a, b, c, d] = walkwayOutline()
+    const along = [b![0] - a![0], b![1] - a![1]], l = Math.hypot(along[0]!, along[1]!)
+    const n: [number, number] = [along[1]! / l, -along[0]! / l]
+    face([a![0], a![1]], [b![0], b![1]], n, WALKWAY.height)
+    face([c![0], c![1]], [d![0], d![1]], [-n[0], -n[1]], WALKWAY.height)
+  }
   // the pavilion's north wall at its foot course, across the apron
   face([-62, -34 + FOOT], [-22, -34 + FOOT], [0, 1], 3)
   return out

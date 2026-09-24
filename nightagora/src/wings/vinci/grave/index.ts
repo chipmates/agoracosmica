@@ -3,6 +3,8 @@ import { Construction, exhibitionFloor, galleryBackdrop, type ExhibitMaterials, 
 import { lineAdvance } from '../words'
 import words from '../line/data/never-said.json'
 import { GRAVE_DEATHBED, GRAVE_FRAME, GRAVE_SLAB } from './placement'
+import { cutLedgerFace, ledgerFilling, ledgerStone } from './ledger'
+import { createDiagram } from './diagram'
 
 /** Kept from the local computation, not from the later sunset row. */
 export const GRAVE_HOUR = {
@@ -88,7 +90,7 @@ export function graveSunDirection(): [number, number, number] {
 }
 
 /** A name-only stone study and separate evidential furniture; no invented epitaph. */
-export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, language: 'en' | 'de' = 'en', options:{mobile?:boolean}={}): ExhibitionObject {
+export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, language: 'en' | 'de' = 'en', options:{mobile?:boolean,tier?:'hero'|'standard'|'calm'}={}): ExhibitionObject {
   const pale=materials.tuffeau??materials.stone
   const text=(en:string,de:string)=>language==='en'?en:de
   const build = new Construction(materials, 'vinci-grave', 'vinci/grave-geometry')
@@ -101,16 +103,14 @@ export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, l
   build.box(centreX, 0.075, centreZ, 2.16, 0.15, 3.74, materials.dark)
   // The bedding stone runs the whole length of the slab.
   build.box(centreX, 0.148, centreZ, 2.04, 0.13, 3.61, materials.stone)
-  const slabFace=new Shape();slabFace.moveTo(-.99,-1.775);slabFace.lineTo(.99,-1.775);slabFace.lineTo(.99,1.775);slabFace.lineTo(-.99,1.775);slabFace.closePath()
-  const top=new ExtrudeGeometry(slabFace,{depth:.06,bevelEnabled:true,bevelSize:.004,bevelThickness:.004,bevelSegments:2,curveSegments:36})
-  top.rotateX(-Math.PI/2);top.translate(centreX,.17,centreZ);build.geometry(top,pale)
-
-  // The documented name is the ONLY writing on the slab. The portrait
-  // medallion is not reproduced, and what the real slab carries instead is a
-  // sentence of the record, which is where an absence belongs.
-  const slabName = placed(build, { rotationX: -Math.PI / 2, position: [centreX, 0.2348, centreZ + (options.mobile?.76:1.06)] })
-  const labelWidth = 1.92
-  slabName.text(options.mobile?'LEONARDO\nDA VINCI':GRAVE_EVIDENCE.slab, -labelWidth / 2, 0, 0, options.mobile?.20:.153, labelWidth, materials.ink, 0.003)
+  // The documented name is the ONLY writing on the slab, cut into a pale
+  // honed limestone and filled. The portrait medallion is not reproduced, and
+  // what the real slab carries instead is a sentence of the record, which is
+  // where an absence belongs.
+  const ledgerFace = cutLedgerFace({ centre: [centreX, centreZ], top: .234, width: 1.98, length: 3.55, depth: .064 })
+  const ledger = ledgerStone(), filling = ledgerFilling()
+  for (const geometry of ledgerFace.stone) build.geometry(geometry, ledger)
+  for (const geometry of ledgerFace.filling) build.geometry(geometry, filling)
 
   // A separate low lectern makes "presumed" physically separate as well.
   const plaqueX = options.mobile ? 1.50 : 1.44
@@ -129,101 +129,15 @@ export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, l
 
   const gableScale=options.mobile?.84:1, gableShift:[number,number,number]=options.mobile?[-1.26,0,-1.55]:[0,0,0]
   const gableBuild=placed(build,{scale:gableScale,position:gableShift})
-  // An architectural study in a deep frame, distinct from the burial object.
-  // Its three-dimensional stones and roof catch the computed low sun.
+  // An architectural study in a deep frame, distinct from the burial object:
+  // a coursed relief in a bronze box, lit by the chosen minute's own light.
   const frameX = GRAVE_FRAME.x
   const frameY = GRAVE_FRAME.y
   const frameZ = GRAVE_FRAME.z
-  const fw = GRAVE_FRAME.width
-  const fh = GRAVE_FRAME.height
-  gableBuild.box(frameX, frameY, frameZ - 0.22, fw, fh, 0.13, materials.dark)
-  // Mitred solid strips retain the frame footprint; a small bevel catches
-  // the grazing sun and exposes the corner joint as actual construction.
-  const ow=fw/2+.045,oh=fh/2+.045,iw=fw/2-.045,ih=fh/2-.045,gap=.002
-  const strips=[
-    [[-ow+gap,oh],[ow-gap,oh],[iw-gap,ih],[-iw+gap,ih]],
-    [[ow,oh-gap],[ow,-oh+gap],[iw,-ih+gap],[iw,ih-gap]],
-    [[ow-gap,-oh],[-ow+gap,-oh],[-iw+gap,-ih],[iw-gap,-ih]],
-    [[-ow,-oh+gap],[-ow,oh-gap],[-iw,ih-gap],[-iw,-ih+gap]],
-  ]
-  for(const corners of strips){
-    const shape=new Shape();shape.moveTo(corners[0]![0]!,corners[0]![1]!)
-    for(const [x,y] of corners.slice(1))shape.lineTo(x!,y!)
-    shape.closePath()
-    const strip=new ExtrudeGeometry(shape,{depth:.40,bevelEnabled:true,bevelSize:.006,bevelThickness:.006,bevelSegments:1,steps:1})
-    strip.translate(frameX,frameY,frameZ-.22);gableBuild.geometry(strip,materials.bronze)
-  }
-  const gable = new Shape()
-  gable.moveTo(-0.95, -0.68)
-  gable.lineTo(0.95, -0.68)
-  gable.lineTo(0.95, 0.28)
-  gable.lineTo(0, 1.07)
-  gable.lineTo(-0.95, 0.28)
-  gable.closePath()
-  const gableGeometry = new ExtrudeGeometry(gable, { depth: 0.20, bevelEnabled: true, bevelSize: 0.01, bevelThickness: 0.012, bevelSegments: 1, steps: 1 })
-  gableGeometry.translate(frameX, frameY - 0.12, frameZ - 0.14)
-  gableBuild.geometry(gableGeometry, materials.stone)
-  // Ashlar courses, a heavy sill, and finer recessed mortar preserve scale.
-  for (let i = 0; i < 8; i++) {
-    const y = frameY - 0.77 + i * 0.185
-    const available = Math.min(1.87, Math.max(0.32, (frameY + 0.94 - y) * 2.40))
-    // Joints read as joints when they are darker than the block, and lie in
-    // the face rather than standing 8 mm off it.
-    gableBuild.box(frameX, y, frameZ + 0.0745, available, 0.013, 0.007, materials.dark)
-    const offset = i % 2 === 0 ? -0.5 : -0.21
-    for (let j = 0; j < 3; j++) {
-      const x = offset + j * 0.52
-      if (Math.abs(x) < available / 2 - 0.1) gableBuild.box(frameX + x, y + 0.093, frameZ + 0.0745, 0.008, 0.17, 0.007, materials.dark)
-    }
-  }
-  gableBuild.beam([frameX - 1.03, frameY + 0.17, frameZ + 0.09], [frameX, frameY + 1.03, frameZ + 0.09], 0.075, 0.16, materials.dark)
-  gableBuild.beam([frameX, frameY + 1.03, frameZ + 0.09], [frameX + 1.03, frameY + 0.17, frameZ + 0.09], 0.075, 0.16, materials.dark)
-  // Slate leaves sit over the existing roof supports. The nine courses,
-  // 9 mm thickness and alternating joints are authored exhibition geometry,
-  // not a measured claim about the chapel. Every leaf uses the same dark
-  // material, so welding adds neither a draw nor a texture allocation.
-  const pitchLength = Math.hypot(1.03, 0.86)
-  const courseGauge = pitchLength / 9
-  const roofDepth = 0.312
-  for (const side of [-1, 1]) {
-    const uphillX = -side * 1.03 / pitchLength
-    const uphillY = 0.86 / pitchLength
-    const outwardX = side * uphillY
-    const outwardY = Math.abs(uphillX)
-    // A thin fascia closes the observed gap to the masonry without moving
-    // the gable or its roof. Its front is 22 mm behind the slate overhang.
-    gableBuild.beam(
-      [frameX + side * 1.03 - outwardX * 0.0225, frameY + 0.17 - outwardY * 0.0225, frameZ + 0.065],
-      [frameX - outwardX * 0.0225, frameY + 1.03 - outwardY * 0.0225, frameZ + 0.065],
-      0.085, 0.290, materials.dark,
-    )
-    for (let course = 0; course < 9; course++) {
-      const lower = course * courseGauge
-      const upper = Math.min(pitchLength, lower + courseGauge + 0.026)
-      // Half-leaves at alternate course ends break the continuous joints.
-      const joints = course % 2 === 0 ? [0, 0.104, 0.208, roofDepth] : [0, 0.052, 0.156, 0.260, roofDepth]
-      for (let tile = 0; tile < joints.length - 1; tile++) {
-        const a = joints[tile]!
-        const b = joints[tile + 1]!
-        const z = frameZ - 0.08 + (a + b) / 2
-        // Each butt stands just above the preceding head. This small slope
-        // makes the overlap a lit edge instead of two coplanar dark strips.
-        gableBuild.beam(
-          [frameX + side * 1.03 + uphillX * lower + outwardX * 0.050, frameY + 0.17 + uphillY * lower + outwardY * 0.050, z],
-          [frameX + side * 1.03 + uphillX * upper + outwardX * 0.039, frameY + 0.17 + uphillY * upper + outwardY * 0.039, z],
-          0.009, b - a - 0.003, materials.dark,
-        )
-      }
-    }
-  }
-  // Three shallow cap pieces close the junction of the two slate pitches.
-  for (let cap = 0; cap < 3; cap++) {
-    gableBuild.box(frameX, frameY + 1.067, frameZ - 0.08 + (cap + 0.5) * 0.104, 0.090, 0.012, 0.101, materials.dark)
-  }
-  gableBuild.box(frameX, frameY - 0.41, frameZ + 0.081, 0.34, 0.52, 0.04, materials.dark)
-  gableBuild.box(frameX, frameY - 0.67, frameZ + 0.13, 0.44, 0.06, 0.16, materials.stone)
-  gableBuild.box(frameX, frameY - 0.41, frameZ + 0.13, 0.025, 0.47, 0.035, materials.bronze)
-  gableBuild.box(frameX, frameY - 0.40, frameZ + 0.13, 0.30, 0.025, 0.035, materials.bronze)
+  const diagram = createDiagram({ x: frameX, y: frameY, z: frameZ, width: GRAVE_FRAME.width, height: GRAVE_FRAME.height,
+    toSun: graveSunDirection(), tier: options.tier })
+  diagram.group.scale.setScalar(gableScale)
+  diagram.group.position.set(...gableShift)
   // The visitor caption belongs to the object; calculation stays in the record.
   // This ledge projects beyond the frame posts: neither first glyph enters
   // their silhouette from the fixed oblique museum view.
@@ -253,6 +167,7 @@ export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, l
   ledge.text(first, -inner/2, ledgeHeight/2-.085, .042, fit(first,options.mobile?.155:.118), inner)
   ledge.text(second, -inner/2, -.075, .042, fit(second,options.mobile?.115:.082), inner)
   build.finish()
+  build.group.add(diagram.group)
   // The points a frame has to hold: nothing of the burial or its diagram may
   // fall under a card, so the host composes from these and not from a guess.
   const gablePoint=(x:number,y:number,z:number):[number,number,number]=>[x*gableScale+gableShift[0],y*gableScale+gableShift[1],z*gableScale+gableShift[2]]
@@ -275,7 +190,7 @@ export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, l
     anchors: { slab: [centreX, 0.24, centreZ], plaque: [plaqueX, 0.9, plaqueZ + 0.05], computedFrame: options.mobile?[frameX*.84-1.26,frameY*.84,(frameZ+.1)*.84-1.55]:[frameX, frameY, frameZ + 0.1] },
   }
   build.group.userData.exhibit = metadata
-  return { group: build.group, metadata, dispose: () => build.dispose() }
+  return { group: build.group, metadata, dispose: () => { build.dispose(); diagram.dispose(); ledger.dispose(); filling.dispose() } }
 }
 
 /* THE PAINTING OF A DEATH NOBODY WITNESSED, at the grave it belongs to.

@@ -556,3 +556,6 @@ function* grow(group: Group, heightAt: (east: number, north: number) => number, 
 }
 
 export type { TreeDetail }
+/** The same bark, leaf and fall surfaces and the same mesh assembly, for a
+ * planting that is not the site's own (the grave court's maples). */
+export { materials as vegetationMaterials, meshOf as vegetationMesh }

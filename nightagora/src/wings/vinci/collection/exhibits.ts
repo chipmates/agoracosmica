@@ -13,6 +13,7 @@ import type { ReadyMachineBuild } from '../machines/runtime'
 import { createCollectionLineFloor, fitCollectionExhibitFloor } from './line-floor'
 import { createCourtPlaque, COURT_PLAQUE_STAND } from './court-plaque'
 import { createGrave, createGraveDeathbed } from '../grave'
+import { createGraveCourt } from '../grave/court'
 import { loadPlate, PLATES } from '../line/bench/assets'
 import { buildTable, type PageRecord } from '../table'
 import { loadManifest } from '../../../manifest'
@@ -220,12 +221,19 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   // The bench's phone restaging moves the diagram frame in front of the
   // deathbed painting hung on this backdrop, so the wing keeps the one
   // composition both viewports hold whole and takes only the language.
-  const grave = createGrave(exhibitStones, lang())
+  const grave = createGrave(exhibitStones, lang(), { tier: stack.tierName() })
   fitCollectionExhibitFloor(grave.group, exhibitStones, 'grave')
   grave.group.rotation.y = Math.PI / 2
   grave.group.position.set(GRAVE_ORIGIN.east, COURT.level + .035, -GRAVE_ORIGIN.north)
   stamp(grave.group, 'vinci/grave-geometry')
   host.add(grave.group)
+  // THE COURT THE GRAVE STANDS IN: its brick and filter band laid over the
+  // gallery's core, the walk to the slab, a bench, three maples in their beds
+  const graveCourt = createGraveCourt(stack.tierName())
+  grave.group.add(graveCourt.local)
+  host.add(graveCourt.world)
+  stamp(graveCourt.local, 'vinci/grave-court'); stamp(graveCourt.world, 'vinci/grave-court')
+  teardown.push(() => { graveCourt.dispose() })
   // THE PAINTING OF THE KING AT THE BEDSIDE HANGS HERE, and the frame is built
   // inside the plate's own promise: a reproduction that never arrives leaves
   // the wall bare instead of standing an empty frame in front of a visitor.

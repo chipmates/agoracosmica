@@ -36,7 +36,7 @@
       "prompt": "Trees and hedge shrubs of 10 October 1517 (our 20 October) grown per species habit, every species and its state that week taken from the flora card (refs FLORA.md section 6) as a TYPE of the period, none documented at Cloux: walnut, field elm, oak, field maple, wild cherry, hornbeam, alder, pollard white willow, black poplar, pear, and the hedge shrubs hawthorn and blackthorn. A trunk that runs or forks into leaders, scaffold limbs that fork toward the crown the species makes, second-order branches and twigs, each grown segment by segment and stopped at the crown skin or at a refused place; a refused fork is tried once bent upward, a limb carrying no leaf below it is taken off, a limb left without a fork tapers to a tip. Near crowns carry every leaf as its own card; further crowns carry spray cards; a mid tree a stop sees within 32 m draws every twig at hero. Each species turns at one stage for the week (a third to two thirds; oak and alder greener), each leaf by its exposure, with a small turn by limb and by tree. The grave's tree over its west wall stands 15 m, drawn leaf by leaf. The week's fall lies as a carpet under each crown dropping it, as drifts against every riser, wall foot and retaining face across the south-west wind (clumped, piled in corners, stacked, leaning on the face), as a clumped scatter, in the lane's ruts and gutters and over the walled court's floor, densest where the stops see it; leaves off their floor cast through one opaque triangle within 12 m of a stop. Leaf and bark maps drawn from recipes in code, no photograph sampled. No leaf or limb inside a building, within 3.2 m above a certified walk, or inside the grave court below its walls' top. Wind only on an address that asks for it.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "525b2dff31851eb7d6813452ba1050f8cbb46af8b59cc952fa2e0d0628b0f8d1",
+      "sha256": "c4be75b5be0621977e2b30cd4ee2356251534d0b69c56bc43830b7d590248507",
       "note": "FLORA.md section 6 species and autumn states as types; Q119 Q128 Q178 modern planting as branching character only; recipe_file=src/wings/vinci/vegetation.ts; companion_file=src/wings/vinci/tree-growth.ts; companion_sha256=a173009b55fe61d9cb8964b5caf4433101aa10caa102e23534469832c3ce8cc2; companion_file=src/wings/vinci/leaf-maps.ts; companion_sha256=30ff0932adcfd8b1a5ac030349f43c93896b3fa43b21d3cd03e56b055a4174ae; companion_file=src/wings/vinci/wind.ts; companion_sha256=e1d0da0b23efb5c92171462c8c127ea0f2cb6975a2e97cfcc7dfa4dc2f7ccb98; clusters_near_far_hero=6,3; clusters_near_far_standard_calm=3,1; far_clusters_cast_no_shadow=true; walk_clearance_m=3.2; walk_margin_m=1.0; building_margin_m=0.45; wind=address_only"
     },
     {
@@ -215,10 +215,10 @@
       "class": "GENERATED",
       "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
-      "prompt": "Silent shadow body welded from the wing's fixed casters at mount and re-welded when one of them appears, hides or moves: the shell's existing calm double, the terrain, the planting, the gate and entry passages, the court and road dressing and the modern insertion with its rooms and access. Every source triangle is copied once at its own world transform and the source stops casting, so the two cascades draw one body instead of one per group. No silhouette, material, light, tier or geometry changes; instanced, skinned, morphing and non-opaque casters are left to cast for themselves.",
+      "prompt": "Silent shadow body welded from the wing's fixed casters at mount and re-welded when one of them appears, hides or moves: the shell's existing calm double, the terrain, the planting, the gate and entry passages, the court and road dressing the modern insertion with its rooms and access, and the grave court's walls and furniture. Every source triangle is copied once at its own world transform and the source stops casting, so the two cascades draw one body instead of one per group. No silhouette, material, light, tier or geometry changes; instanced, skinned, morphing and non-opaque casters are left to cast for themselves.",
       "model": "Deterministic TypeScript geometry weld",
       "date": "2026-09-12",
-      "sha256": "849256b82f5ba53e660138d55d7405519989516c9c92d924dcc983edc4cf1483",
+      "sha256": "f9791733d260f1d86ae258be23cec5343f71080741778b3d750698b63230fc38",
       "note": "recipe_file=src/wings/vinci/shadow-body.ts; geometry_dependency=vinci/shell-shadow; shadow_only=true; colorWrite=false"
     },
     {
@@ -2744,10 +2744,10 @@
       "class": "GENERATED",
       "licence": "Original procedural museum exhibition. Source code under the museum repository licence.",
       "display": true,
-      "prompt": "Interpretive museum slab with name only, an empty bronze bezel with its own note, a separate presumed plaque on a footed base and based on a sourced account, and a constructed framed gable relief for the computed sun under a raked reading ledge. No bones or invented historical plaque facsimile.",
+      "prompt": "Interpretive museum ledger slab of pale honed limestone with the documented name cut and filled, and no epitaph; a separate presumed plaque on a footed base, based on a sourced account; a coursed chapel-gable relief on an oak shelf in a deep bronze box, lit by one light of its own from the computed direction of the chosen minute, under a raked reading ledge. No remains, no portrait, no invented historical plaque facsimile.",
       "model": "Deterministic TypeScript geometry and TSL materials",
       "date": "2026-09-10",
-      "sha256": "2f19e846f64d5fa4c568241ddf01c1e57e6446e3d9420b4ba33571e7ebfa6b52",
+      "sha256": "bf238029b291f0c84d14fb82275bc3dcf3d5d60ecc139ff971b06cd1ba61ffa8",
       "note": "recipe_file=src/wings/vinci/grave/index.ts"
     },
     {
@@ -3633,7 +3633,7 @@
       "prompt": "Under each fallen leaf lying on stone, gravel or earth within 14 m of a stop that sees it, the blade's own outline softened on the stone: a tight dark rim at its edge and a faint skirt beyond, hollow under the blade's middle, standing for the sky the leaf takes from the stone under and around it. Drawn at hero, the film's export included, since its occlusion cannot find a leaf two millimetres thick. Outside the walk's solids and the shadow body.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "525b2dff31851eb7d6813452ba1050f8cbb46af8b59cc952fa2e0d0628b0f8d1",
+      "sha256": "c4be75b5be0621977e2b30cd4ee2356251534d0b69c56bc43830b7d590248507",
       "note": "A-SITE; deterministic museum dressing; recipe_file=src/wings/vinci/vegetation.ts"
     },
     {
@@ -3750,7 +3750,7 @@
       "prompt": "The week's fall of the planted trees as dry leaf cards of each species' outline, cupped and folded as drying leaves curl, coloured from each tree's own fall: a carpet under every crown dropping it, carried north-east by the south-west wind; drifts against every riser, wall foot, kerb, retaining face, the chapel's bay, the grave's tomb and lectern and the supper wall's sill, each run heaped in its own places and some treads swept nearly bare; a clumped scatter, the lane's ruts and gutters, and the walled court's floor in small rafts, most of it in the lee of the walls. Densest where the stops see it. A type of one October week, not a record. Dressing a few centimetres deep on the floors, outside the walk's solids like the moss; the fall the rail certificate was written with is still built, leaf for leaf, on a layer no camera draws, until the next certificate.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "525b2dff31851eb7d6813452ba1050f8cbb46af8b59cc952fa2e0d0628b0f8d1",
+      "sha256": "c4be75b5be0621977e2b30cd4ee2356251534d0b69c56bc43830b7d590248507",
       "note": "A-SITE; FLORA.md; deterministic museum dressing; recipe_file=src/wings/vinci/vegetation.ts"
     },
     {
@@ -3791,6 +3791,19 @@
       "date": "2026-09-24",
       "sha256": "ae1064676e80a32fc05eacd16d97477f472f542b5579a72f9a176194fce30012",
       "note": "Modern museum insertion, the picture room only; no 1517 claim. recipe_file=src/wings/vinci/collection/picture-room.ts; companion_file=src/wings/vinci/collection/picture-room-plan.ts; companion_file=src/wings/vinci/collection/picture-light.ts; library_sets=library/concrete-wall-formed,library/oak-veneer-light,library/concrete-floor-polished"
+    },
+    {
+      "id": "vinci/grave-court",
+      "path": "procedural/grave-court/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural construction; source code under the museum repository licence.",
+      "display": true,
+      "prompt": "The grave court as the museum's own modern architecture: a leaf of long flat light-grey brick laid in front of the gallery's cast core, the back wall raised over it as a filter band of brick laid with open head joints so the western light passes in small slots, a plinth course and a string course of pale limestone, stone copings; an oiled oak walkway on two steel bearers from the court's open side to the foot of the slab, an oak bench on bronze feet, and three field maples of the region in steel-edged beds of earth with their week's fall. The court's sky share and the warm light off its sunlit wall faces are baked once from the walls' boxes and the hour's sun as live-engine terms the film's export turns off. No figure: no record names one. A modern design, no claim about 1519, Saint-Florentin or Saint-Hubert.",
+      "model": "Deterministic TypeScript and TSL procedural geometry",
+      "date": "2026-09-24",
+      "sha256": "c47acd80bdae29348c578e79959de4090ba33e8c1a44d752b7c415fd7e359c94",
+      "note": "Modern museum court; no 1519 claim. recipe_file=src/wings/vinci/grave/court.ts"
     }
   ]
 }
