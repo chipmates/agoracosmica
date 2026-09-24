@@ -5846,31 +5846,6 @@
       "notes": "[geometry] Octagonal oak treenail through the plank into the joist, left a little proud."
     },
     {
-      "id": "deck-peg-5-1",
-      "parent": "platform",
-      "shape": "profile of revolution",
-      "dimensions_m": {
-        "closed_axial_radial_profile": [
-          [-0.004, 0.0],
-          [-0.004, 0.0105],
-          [0.0012, 0.0105],
-          [0.0022, 0.008],
-          [0.0026, 0.0]
-        ],
-        "segments": 8
-      },
-      "position_m": [0.0, 0.0175, 0.0],
-      "orientation_rad": [0.0, 0.0, 0.0],
-      "material": {
-        "class": "wood, oak peg",
-        "basis": "assumed",
-        "source": "a-geometry"
-      },
-      "certainty": "C",
-      "source": "a-geometry",
-      "notes": "[geometry] Octagonal oak treenail through the plank into the joist, left a little proud."
-    },
-    {
       "id": "deck-peg-5-2",
       "parent": "platform",
       "shape": "profile of revolution",
