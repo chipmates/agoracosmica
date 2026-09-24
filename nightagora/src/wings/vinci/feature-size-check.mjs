@@ -205,6 +205,10 @@ const ALLOWED = [
   { mesh: 'vinci-grave-made-surface', why: 'known, 2026-09-21: the grave made ground and its furniture, 5360 faces' },
   { mesh: 'vinci/collection-rooms/construction', why: 'known, 2026-09-21: the room linings, reveals and joint bands, 2668 faces' },
   { mesh: 'vinci/collection/architecture', why: 'known, 2026-09-21: the envelope bands at the far court eyes, 232 faces' },
+  // the collection's roof edges at their real size: the zinc trim's folds and
+  // drip, and the paver margin's last cut against a step, from the far eyes
+  { mesh: 'vinci/collection-roofs/trim', why: 'known, 2026-09-24: the trim\'s folds and drip, 425 faces, thinnest 0.12 px at 83 m' },
+  { mesh: 'vinci/collection-roofs/ballast', why: 'known, 2026-09-24: two margin slivers at a slab step, thinnest 0.377 px at 41 m' },
   // THE TWO PASSAGES.
   { mesh: 'wing-vinci/gate-passage/gate ironwork', why: 'known, 2026-09-21: the gate straps and studs, 16 faces' },
   { mesh: 'wing-vinci/entry-passage/plaster', why: 'known, 2026-09-21: four faces of the passage plaster at one far eye' },

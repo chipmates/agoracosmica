@@ -23,7 +23,7 @@
       "prompt": "Bilinear IGN ground from 165 retained samples; explicit A-SITE court, terrace and assumed street cut; three scales of earth and grass; mapped stream. Conjectural exposed-soil clods, erosion variation and shallow normal relief dress declared vertical cut faces without changing their outlines or heights. The library earth-packed map in the exact street corridors with grey-beige mineral drift, filtered aggregate and fine grit; the wheel ruts darker and deeper in relief with pressed lips at their sides. The terrace walk as fine river gravel over packed earth, baked into one filtered tile read wider than its pixel (colour, slope and the slope's second moment with their mips), crowned to shed water, two hand-cart tracks swept to damp fines, their walls shading from the low sun and their lips of coarser stone thrown up beside them, coarser stones rolled to the kerbs, worn back where walked; the house court paved with Loire river cobbles set in sand in wandering courses, one colour per stone, a few sunk or lost, falling to a gutter of stones set lengthwise down its middle, mossy toward the wall feet and smooth and paler along the way from the gate to the door; its flags dished where walked, chipped at their arrises, grit and moss in their joints and darker in the damp under the walls; the carted road with stones bedded in its packed fines (the terrace's tile read larger and sparser), none where wheels and feet swept them or in the wall foot's gutter; the sward's photograph read at two sizes and turns handed over by a slow field, with clover cushions and bare scuffs, trodden paler toward the garden flight. Each retaining face weathers from its own foot and its own coping: rising damp to a wandering tide line, a speckle of splash, runs of rain off the coping and a metre-scale patina; step nosings worn paler where feet cross. Surface recipes only; every sampled height and outline kept. The retaining ashlar takes a tone and a lean to yellow or grey stone by stone, and a damp line where it meets the grass; the modern cut lining weathers as the court stair does.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "ec8872f2510f7127adf5c6c619c2c47e2dc7c77d6e26860ad70a3124201318f1",
+      "sha256": "a5753244a12bcc8ff768c6c0d11b2ed97a5afb0c0c6547e56c0a642a5d2692ff",
       "note": "IGN Licence Ouverte 2.0; OSM contributors ODbL 1.0; src/wings/vinci/data/terrain.json; recipe_file=src/wings/vinci/ground.ts"
     },
     {
@@ -231,7 +231,7 @@
       "prompt": "Original procedural modern museum insertion at the fixed maquette envelope. Low post-grid pavilions, shallow slate roofs, full-height glazed enclosure, concrete apron and garden stair. Exact modern approach grade cuts, supported landings and continuous concrete cheek ownership. Museum design, not a claim about1517. Share the existing pale cast-concrete finish across all four roof soffits; keep their downward normals and the sole measured sun. Derive both entrance post heads from the retained inclined canopy underside; keep their centres and buried feet. Provide continuous derived structural support beneath the existing stair cheeks and both landing heads. Keep the maquette walking widths and every finish level. The garden flight's treads worn where feet land: nosings rounded and paler along a wandering walking line, a shallow hollow behind each nosing, each tread laid in two or three stones with its mortar bed under the nosing. Each stone of a tread takes its own tone, the crease where a tread meets the riser above sees less sky, grit gathers along the cheek, and the west cheek throws its shadow across each tread where the sun draws it.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "3ef90ba783c2284a432f89a59fca865f3f03a0f8bc0c7e07efd099dc80c12394",
+      "sha256": "ce1237211d2f684d3b3a8860d5368c9fb0639f7cbb109d1dc68b3660b3604689",
       "note": "recipe_file=src/wings/vinci/collection.ts; tread_recipe=src/wings/vinci/stair-wear.ts; tread_sha256=fd1524e27dc3e5593ac9aeb8e8d9f92f115f14625544b506c21dfda688043b5b"
     },
     {
@@ -3881,10 +3881,10 @@
       "class": "GENERATED",
       "licence": "Original procedural construction; source code under the museum repository licence.",
       "display": true,
-      "prompt": "The room the Last Supper's measured field stands at the end of, built round the court's display wall and over it, sized to the field and to the court: two volumes. The bay before the field, as wide as the display wall is long and 7.4 m high, is the field's own room: its end wall plastered white round the field so the field sits in a reveal 12.6 cm deep, a white coarse plaster side wall down to the floor at the field's left, a wall over the display wall's coping to the roof, and a top light over its south half set a metre off the end wall, glazed over and closed under by an etched diffuser that the way in never shows. The nave, lower (5.3 m) and narrower, is the way in: fins of plaster before the collection's glazing on its south side, a wall down to a long low opening on the court to the north, and the east end closed but for the opening the walk turns through. Board-formed concrete soffits and beams, poured pale; a floor of two-centimetre white marble tesserae with a border laid long, raised a step over the court's paving; the field's stone sill dressed in pale limestone. Its light, as data and handed only to the surfaces each light can see: the top light as a 6200 K area source over the bay, the bay as the nave sees it through the step, the court's afternoon through each north opening at 4300 K, and a probe in each volume for its bounce. The field's reproduction is drawn unlit and multiplied by the same light: each of the bay's openings as an exact polygon from every point of the field, clipped where the reveal stands between them, the plaster's relief turning each, and the bay's bounce; the image itself is never changed. Outside, as built: the walls a pour of panels 2.4 by 1.2 m in a warm pale concrete, each panel its own tone, its joints and a tie hole on a 0.6 m grid, weathered in streaks under the copings and a greener run under each spout; a parapet round each roof capped in patinated bronze that stands proud of the wall, the decks laid in 0.6 m pavers, the top light on its own curb under a bronze-framed lid, the roofs drained east through three bronze spouts, the east door lined in bronze, and a grey stone base course, threshold and floor edge at the room's foot. A modern room; neither the refectory in Milan, whose dimensions this museum does not have, nor any building of 1517 is claimed.",
+      "prompt": "The room the Last Supper's measured field stands at the end of, built round the court's display wall and over it, sized to the field and to the court: two volumes. The bay before the field, as wide as the display wall is long and 7.4 m high, is the field's own room: its end wall plastered white round the field so the field sits in a reveal 12.6 cm deep, a white coarse plaster side wall down to the floor at the field's left, a wall over the display wall's coping to the roof, and a top light over its south half set a metre off the end wall, glazed over and closed under by an etched diffuser that the way in never shows. The nave, lower (5.3 m) and narrower, is the way in: fins of plaster before the collection's glazing on its south side, a wall down to a long low opening on the court to the north, and the east end closed but for the opening the walk turns through. Board-formed concrete soffits and beams, poured pale, the collection's steel roof edge where it runs through the nave cased in the same concrete with a chamfered arris; a floor of two-centimetre white marble tesserae with a border laid long, raised a step over the court's paving; the field's stone sill dressed in pale limestone. Its light, as data and handed only to the surfaces each light can see: the top light as a 6200 K area source over the bay, the bay as the nave sees it through the step, the court's afternoon through each north opening at 4300 K, and a probe in each volume for its bounce. The field's reproduction is drawn unlit and multiplied by the same light: each of the bay's openings as an exact polygon from every point of the field, clipped where the reveal stands between them, the plaster's relief turning each, and the bay's bounce; the image itself is never changed. Outside, as built: the walls a pour of panels 2.4 by 1.2 m in a warm pale concrete, each panel its own tone, its joints and a tie hole on a 0.6 m grid, weathered in streaks under the copings and a greener run under each spout; a parapet round each roof capped in patinated bronze that stands proud of the wall, the decks laid in 0.6 m pavers, the top light on its own curb under a bronze-framed lid, the roofs drained east through three bronze spouts, the east door lined in bronze, and a grey stone base course, threshold and floor edge at the room's foot. A modern room; neither the refectory in Milan, whose dimensions this museum does not have, nor any building of 1517 is claimed.",
       "model": "Deterministic TypeScript geometry and TSL materials",
       "date": "2026-09-24",
-      "sha256": "c27c1c683ceed37e5eace586e9db1f3d44043b1a449d935f4f560a4531ffc242",
+      "sha256": "9912a72c9691daf163eafc169e3b304d803b7d05d8e666e6edba93d304fd18a1",
       "note": "Modern museum insertion round the court's display wall; no 1517 claim and no claim on the refectory's own dimensions. recipe_file=src/wings/vinci/collection/supper-room.ts; companion_file=src/wings/vinci/collection/supper-room-plan.ts; library_sets=library/plaster-lime-aged,library/concrete-wall-formed,library/marble-white,library/limestone-pale"
     },
     {
@@ -3899,6 +3899,32 @@
       "date": "2026-09-24",
       "sha256": "f1a94730bf611dd8b3d0ebca95f8569f14411158857b198ca7e59da45289ec29",
       "note": "Modern museum insertion, the mechanism hall only; no 1517 claim. recipe_file=src/wings/vinci/collection/hall-floor.ts"
+    },
+    {
+      "id": "vinci/collection-roofs",
+      "path": "procedural/collection-roofs/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural construction; source code under the museum repository licence.",
+      "display": true,
+      "prompt": "The collection's flat roofs dressed as built, over the slabs the collection draws and never changing them: each deck under a layer of washed river gravel held back from every free edge by a 0.6 m margin of concrete pavers laid to the fall, a riser where one slab steps onto another; every free edge faced in board-formed concrete 12 mm proud of the slab, its boards, its pour joints every 7.5 m and dirt at its lip, streaked where rain runs off under the joints of the trim; the edge capped in a folded zinc trim with a drip, in 3 m lengths with 5 mm gaps and closed ends. A modern roof; no 1517 claim.",
+      "model": "Deterministic TypeScript geometry and TSL materials",
+      "date": "2026-09-24",
+      "sha256": "d5d84e8fe8735716cafd551ff2af072e70d96f016cf0d211fdea4f8e6f92d0ca",
+      "note": "Modern museum insertion; surface layers only, not a rail solid. recipe_file=src/wings/vinci/collection/roofs.ts"
+    },
+    {
+      "id": "vinci/coping-joints",
+      "path": "procedural/coping-joints/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural construction; source code under the museum repository licence.",
+      "display": true,
+      "prompt": "The 8 mm joints between the stones of every coping and kerb pointed in a pale lime mortar, set 4 mm back from each face so the joint still reads as a line; the stones alone stay the solid of the walk.",
+      "model": "Deterministic TypeScript geometry",
+      "date": "2026-09-24",
+      "sha256": "6d43a04c4e3c167d2187fffb1b76ffef51934d18b242b61deee44ffcf0c2709d",
+      "note": "A-SITE; the stones themselves are vinci/ground-dressing. recipe_file=src/wings/vinci/copings.ts"
     }
   ]
 }

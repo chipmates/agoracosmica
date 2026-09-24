@@ -23,6 +23,11 @@ export const copingsProvenance = {
   recipe: 'Coping stones 0.55 to 0.95 m long and 0.34 m wide on the heads of the retaining walls of the court, the terrace and the garden square that a stop sees, 14 mm proud of the floor, overhanging the face by 40 mm, their outer arris chamfered 30 mm and worn; a kerb of stones 0.5 to 0.9 m long and 0.24 m wide set 10 mm proud along the court\'s edge before the house, both arrises chamfered. Pale limestone of the Loire, each stone its own tone, lichen on the heads. Types of the period; no surviving coping or kerb is claimed.',
 } as const
 
+export const copingJointsProvenance = {
+  manifestId: 'vinci/coping-joints',
+  recipe: 'The 8 mm joints between the coping and kerb stones pointed in lime mortar, 4 mm back from every face of the stones either side, a shade paler and greyer than the stones. Inside the stones\' envelope; the stones alone are the rail\'s solid.',
+} as const
+
 type P2 = [number, number]
 type V3 = [number, number, number]
 interface Batch { position: number[]; normal: number[]; colour: number[] }
@@ -35,6 +40,8 @@ const SUN_TOWARD = ((azimuth: number, elevation: number) => {
   return [Math.sin(az) * Math.cos(el), Math.sin(el), -Math.cos(az) * Math.cos(el)] as const
 })(hourKey.sun_azimuth_deg.value, hourKey.sun_elevation_deg.value)
 const MEAN = STONE.reduce((sum, c) => sum.add(c), new Color(0, 0, 0)).multiplyScalar(1 / STONE.length)
+/** lime mortar, a shade paler and greyer than the stones it beds */
+const MORTAR = new Color('#b9b3a2')
 
 /** A run of one wall's head: its ends, the side the drop is on, its level. */
 export interface Run { from: P2; to: P2; out: P2; level: number }
@@ -103,20 +110,25 @@ function stone(batch: Batch, a: P2, b: P2, out: P2, level: number, inner: number
 }
 
 /** Lay stones along an edge from `from` to `to`, lengths drawn between
-    `short` and `long`, open joints of 8 mm. */
-function lay(batch: Batch, from: P2, to: P2, out: P2, level: number, inner: number, outer: number, proud: number, depth: number,
+    `short` and `long`, on 8 mm joints pointed in lime mortar. */
+function lay(batch: Batch, joints: Batch, from: P2, to: P2, out: P2, level: number, inner: number, outer: number, proud: number, depth: number,
   chamfer: number, both: boolean, short: number, long: number, random: () => number): number {
   const dx = to[0] - from[0], dn = to[1] - from[1], span = Math.hypot(dx, dn)
-  let s = 0, laid = 0
+  const at = (d: number): P2 => [from[0] + dx * d / span, from[1] + dn * d / span]
+  let s = 0, laid = 0, last = -1
   while (s < span - .05) {
     const length = Math.min(span - s, short + random() * (long - short))
     const e0 = s + .004, e1 = s + length - .004
     if (e1 - e0 > .05) {
-      const a: P2 = [from[0] + dx * e0 / span, from[1] + dn * e0 / span], b: P2 = [from[0] + dx * e1 / span, from[1] + dn * e1 / span]
       // stones of one quarry: their tones close, never a checker
       const c = STONE[Math.floor(random() * STONE.length)]!.clone().lerp(MEAN, .55).multiplyScalar(.95 + random() * .07)
       // each stone set a hair off its neighbours
-      stone(batch, a, b, out, level + (random() - .5) * .006, inner, outer, proud, depth, chamfer, both, c)
+      stone(batch, at(e0), at(e1), out, level + (random() - .5) * .006, inner, outer, proud, depth, chamfer, both, c)
+      // THE JOINT IS POINTED, not open: the mortar stands 4 mm back from
+      // every face of the stones either side, its ends inside them
+      if (last >= 0 && e0 - last < .01)
+        stone(joints, at(last - .0005), at(e0 + .0005), out, level - .003, inner - .004, outer - .004, proud - .004, depth - .01, chamfer, both, MORTAR)
+      last = e1
       laid++
     }
     s += length
@@ -128,9 +140,12 @@ export function createCopings(tier: TierName): Group {
   const group = new Group()
   group.name = 'vinci generated copings and kerbs'
   const batch: Batch = { position: [], normal: [], colour: [] }
+  // the pointing is a body of its own: it lies inside the stones' envelope,
+  // so the stones alone stay the rail's solid
+  const joints: Batch = { position: [], normal: [], colour: [] }
   const random = mulberry(15171071)
   let stones = 0
-  for (const r of copingRuns()) stones += lay(batch, r.from, r.to, r.out, r.level, COPING.inner, COPING.outer, COPING.proud, COPING.depth, .03, false, .55, .95, random)
+  for (const r of copingRuns()) stones += lay(batch, joints, r.from, r.to, r.out, r.level, COPING.inner, COPING.outer, COPING.proud, COPING.depth, .03, false, .55, .95, random)
   // the kerb between the court's cobbles and the flagged walk before the
   // house, along the court's own north-west edge
   const court = polygon('courtyard')
@@ -148,22 +163,33 @@ export function createCopings(tier: TierName): Group {
     if (ok && open === null) open = t
     if (!ok && open !== null) {
       const from: P2 = [a[0] + dx * open, a[1] + dn * open], to: P2 = [a[0] + dx * t, a[1] + dn * t]
-      if ((t - open) * span > .6) stones += lay(batch, shift(from), shift(to), toApron, 0, 0, .24, .01, .14, .025, true, .5, .9, random)
+      if ((t - open) * span > .6) stones += lay(batch, joints, shift(from), shift(to), toApron, 0, 0, .24, .01, .14, .025, true, .5, .9, random)
       open = null
     }
   }
   if (!batch.position.length) return group
-  const geometry = new BufferGeometry()
-  geometry.setAttribute('position', new Float32BufferAttribute(batch.position, 3))
-  geometry.setAttribute('normal', new Float32BufferAttribute(batch.normal, 3))
-  geometry.setAttribute('color', new Float32BufferAttribute(batch.colour, 3))
-  geometry.computeBoundingSphere()
-  const mesh = new Mesh(geometry, stoneMaterial())
+  const made = (b: Batch): BufferGeometry => {
+    const geometry = new BufferGeometry()
+    geometry.setAttribute('position', new Float32BufferAttribute(b.position, 3))
+    geometry.setAttribute('normal', new Float32BufferAttribute(b.normal, 3))
+    geometry.setAttribute('color', new Float32BufferAttribute(b.colour, 3))
+    geometry.computeBoundingSphere()
+    return geometry
+  }
+  const material = stoneMaterial()
+  const mesh = new Mesh(made(batch), material)
   mesh.name = 'vinci generated copings and kerbs'
   mesh.castShadow = tier !== 'calm'
   mesh.receiveShadow = true
   mesh.userData = { manifestId: copingsProvenance.manifestId, recipe: copingsProvenance.recipe }
   group.add(mesh)
+  if (joints.position.length) {
+    const pointing = new Mesh(made(joints), material)
+    pointing.name = 'vinci generated coping joints'
+    pointing.receiveShadow = true
+    pointing.userData = { manifestId: copingJointsProvenance.manifestId, recipe: copingJointsProvenance.recipe }
+    group.add(pointing)
+  }
   group.userData['stones'] = stones
   return group
 }

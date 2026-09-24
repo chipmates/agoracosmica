@@ -374,6 +374,26 @@ export function fins(): Body {
   return b
 }
 
+/** THE OVERHANG, CASED: inside the nave the collection's roof edge runs over
+ * the fins as a slab edge the room's light never reached. It is cased in the
+ * nave's concrete as the beam over the fin wall, from a hand under the
+ * overhang's soffit up into the nave's own, its face 25 mm before the edge. */
+export const CASING = {
+  west: GRAVE_BACKDROP_END + .05, east: ROOM.east,
+  face: ENVELOPE_NORTH.overhang + .025, bottom: ENVELOPE_NORTH.soffit - .02, chamfer: .02,
+} as const
+export function casing(): Body {
+  const b = new Body(), C = CASING
+  // its ends die into the pilaster and the east wall, its back into the south
+  // wall and its top into the nave's slab; the arris the light finds is
+  // taken off, as a formed edge is
+  const top = ROOM.naveSoffit + .002, k = C.chamfer
+  b.eastWest(C.face, 1, C.west, C.east, C.bottom + k, top)
+  b.level({ west: C.west, south: ROOM.south, east: C.east, north: C.face - k }, C.bottom, -1)
+  b.quad([C.west, C.face - k, C.bottom], [C.east, C.face - k, C.bottom], [C.east, C.face, C.bottom + k], [C.west, C.face, C.bottom + k], [0, 1, -1])
+  return b
+}
+
 /** THE FLOOR: the room's own finish over the court's paving, raised a step
  * over the leaves the court holds, round the sill and the display wall's base
  * course. */
@@ -484,7 +504,7 @@ export function supperRoomBodies(): Record<string, Body> {
   const out = outside()
   return {
     'end-wall': plaster, reveal, 'upper-end-wall': upperEndWall(), 'south-wall': southWall(),
-    roof: slab, well, diffuser, glass, frame: frame(), fins: fins(), floor: floor(), sill: sillDress(),
+    roof: slab, well, diffuser, glass, frame: frame(), fins: fins(), casing: casing(), floor: floor(), sill: sillDress(),
     parapet: out.parapet, bronze: out.bronze, deck: out.deck, 'outside-stone': out.stone,
   }
 }

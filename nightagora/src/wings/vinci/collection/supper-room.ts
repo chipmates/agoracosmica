@@ -26,7 +26,7 @@ import { kelvinToColour } from '../../../stack/light'
 import { axisFootprint, lineCoverage } from '../../../stack/detail'
 import { setSupperMuralLight } from './supper-light'
 import {
-  DOOR, END_FACE, FIELD, FINS, FLOOR_RISE, NAVE_PROBE_AT, OUTLINE, PARAPET, PROBE_AT, ROOM, SILL, SPOUT, SPOUTS, SUPPER_LIGHTS,
+  DOOR, END_FACE, FIELD, FINS, FLOOR_RISE, casing, NAVE_PROBE_AT, OUTLINE, PARAPET, PROBE_AT, ROOM, SILL, SPOUT, SPOUTS, SUPPER_LIGHTS,
   SUPPER_ROOM_PROVENANCE, TOP_LIGHT, v3, endWall, fins, floor as floorBody, frame, outside, roof, sillDress, southWall,
   upperEndWall, type Body, type SupperLight,
 } from './supper-room-plan'
@@ -661,10 +661,10 @@ export function mountSupperRoom(stack: Stack): SupperRoom {
   const { plaster: wall, reveal } = endWall()
   const { slab, well, diffuser: panel, glass: pane } = roof()
   const parts = { wall: sort(wall), reveal: sort(reveal), south: sort(southWall()), upper: sort(upperEndWall()),
-    slab: sort(slab), frame: sort(frame()), fins: sort(fins()), floor: sort(floorBody()) }
+    slab: sort(slab), frame: sort(frame()), fins: sort(fins()), casing: sort(casing()), floor: sort(floorBody()) }
   for (const zone of ['bay', 'nave'] as const) {
     make(merged([parts.wall[zone], parts.reveal[zone], parts.south[zone], parts.frame[zone], parts.fins[zone]]), lit.plaster[zone], `plaster-${zone}`, false)
-    make(merged([parts.slab[zone], parts.upper[zone]]), lit.concrete[zone], `concrete-${zone}`, false)
+    make(merged([parts.slab[zone], parts.upper[zone], parts.casing[zone]]), lit.concrete[zone], `concrete-${zone}`, false)
     make(parts.floor[zone], lit.marble[zone], `floor-${zone}`, false)
   }
   // THE ROOM'S OUTSIDE stands in the day and throws the day's shadow: its
@@ -672,7 +672,7 @@ export function mountSupperRoom(stack: Stack): SupperRoom {
   // bronze, the decks in pavers, the floor's open edges and the base in stone
   const shell = outside()
   const [lining, walls] = parts.frame.out ? split(parts.frame.out, inDoorReveal) : [null, null]
-  make(merged([parts.wall.out, parts.reveal.out, parts.south.out, parts.upper.out, parts.slab.out, walls, parts.fins.out, shell.parapet.geometry()]),
+  make(merged([parts.wall.out, parts.reveal.out, parts.south.out, parts.upper.out, parts.slab.out, walls, parts.fins.out, parts.casing.out, shell.parapet.geometry()]),
     concreteOut, 'concrete-out', true)
   make(merged([lining, shell.bronze.geometry()]), bronze, 'bronze', true)
   make(shell.deck.geometry(), deck, 'deck', false)

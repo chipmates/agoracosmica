@@ -12,6 +12,7 @@ import { wearTreads } from './stair-wear'
 import { world } from './site'
 import { anisotropicFootprint } from './masonry-courses'
 import { createCollectionRooms } from './collection/rooms'
+import { createCollectionRoofs, type RoofSlab } from './collection/roofs'
 import { OPENING } from './collection/layout'
 import { surfaceTerms } from './collection/materials'
 
@@ -500,7 +501,9 @@ export function createCollection(): Group {
   // Two low solid slabs and a higher, shallow south-falling hall roof.
   // A slab's edge can be left off where another slab of the same plane
   // carries on from it, so no two edges ever stand in one plane.
+  const slabs: RoofSlab[] = []
   const roof = (west: number, south: number, east: number, north: number, low: number, high: number, open: readonly ('s' | 'n')[] = []) => {
+    slabs.push({ west, south, east, north, low, high, open })
     const thickness = .20
     opaque.quad([west, south, low], [east, south, low], [east, north, high], [west, north, high], slate, 2)
     // The underside is the same pale, weathered cast concrete as the base.
@@ -610,5 +613,8 @@ export function createCollection(): Group {
   // offline checkers run this factory directly and cannot load a bench
   // module's own data import.
   group.add(createCollectionRooms())
+  // Each roof's finish is a body of its own over the slabs, outside the rail's
+  // scope: it lies where the walk never goes.
+  group.add(createCollectionRoofs(slabs))
   return group
 }

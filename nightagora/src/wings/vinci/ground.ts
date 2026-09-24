@@ -118,8 +118,13 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     const recipe={...dressedTuffeau,...RETAINING_COURSES}
     const laid=coursedFace(U,recipe)
     const seam=laid.joint,block=laid.tone.sub(1).mul(shows(.30))
-    const drift=mx_noise_float(P.mul(.24)).mul(shows(1/.24)),cleft=mx_noise_float(P.mul(16)).mul(shows(.0625))
-    const pores=smoothstep(.38,.68,mx_noise_float(P.mul(220))).mul(shows(.0045))
+    // A FINE TERM IS HELD ON THE AXIS IT VARIES ALONG. Gated on the pixel's
+    // short side, a face seen along its length kept grain whose period the
+    // long side spans several times over, and it crawled as a vertical hatch.
+    const wide=pixel.x.max(pixel.y)
+    const heldOn=(metres:number,f:typeof wide)=>smoothstep(2,4,float(metres).div(f))
+    const drift=mx_noise_float(P.mul(.24)).mul(shows(1/.24)),cleft=mx_noise_float(P.mul(16)).mul(heldOn(.0625,wide))
+    const pores=smoothstep(.38,.68,mx_noise_float(P.mul(220))).mul(heldOn(.0045,wide))
     // At arm's length a visitor sees ONE stone, so the stone itself has to
     // carry the frame: a claw chisel leaves parallel grooves about 11 mm
     // apart, each block set at its own angle, and a shelly limestone shows
@@ -128,27 +133,36 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     const wanderTool=mx_noise_float(vec3(U.x.mul(3.4),U.y.mul(2.6),laid.cell.mul(13.3))).mul(2.4)
     const worked=smoothstep(-.42,.38,mx_noise_float(vec3(U.x.mul(6.1),U.y.mul(4.7),laid.cell.mul(7.9))))
     const grooves=sin(U.x.mul(cos(swing)).add(U.y.mul(sin(swing))).mul(556.1).add(wanderTool))
-      .mul(worked.mul(.72).add(.28)).mul(shows(.0115))
-    const chatter=mx_noise_float(vec3(U.x.mul(41),U.y.mul(7.7),laid.cell.mul(19))).mul(shows(.024))
-    const shells=smoothstep(.80,.93,mx_noise_float(P.mul(52).add(vec3(7.3,1.9,4.4)))).mul(shows(.021))
+      .mul(worked.mul(.72).add(.28)).mul(heldOn(.0115,pixel.x.mul(cos(swing).abs()).add(pixel.y.mul(sin(swing).abs()))))
+    // the chisel's chatter belongs to arm's length: from a few metres its
+    // tall narrow marks read as the grain of boards, not of stone
+    const chatter=mx_noise_float(vec3(U.x.mul(41),U.y.mul(7.7),laid.cell.mul(19))).mul(heldOn(.024/3,pixel.x)).mul(heldOn(.13,pixel.y))
+    const shells=smoothstep(.80,.93,mx_noise_float(P.mul(52).add(vec3(7.3,1.9,4.4)))).mul(heldOn(.021,wide))
     // Each face is weathered from its own foot and its own coping: the terrace
     // stands two metres below the court, and a height taken from the court's
     // level made every term on it one flat value.
     const span=attribute('faceSpan','vec2') as unknown as ReturnType<typeof vec2>,aboveFoot=span.x,belowHead=span.y
-    const damp=float(1).sub(smoothstep(1.02,1.85,aboveFoot)).mul(mx_noise_float(P.mul(vec3(1.2,.7,1.2))).mul(shows(1/1.2)).mul(.3).add(.7))
+    // A LOW FACE WEATHERS TO ITS OWN HEIGHT: the damp, the salt line and the
+    // coping's runs are a tall wall's, and on a terrace edge under a metre
+    // they covered the whole face. Under 1.8 m their reach scales with the
+    // face and their weight eases toward a third, the coping's runs further.
+    const faceH=aboveFoot.add(belowHead),tallness=smoothstep(1.2,1.8,faceH)
+    const reach=mix(faceH.div(2.2).clamp(.3,1),float(1),tallness),weight=mix(float(.3),float(1),tallness)
+    const up=aboveFoot.div(reach),below=belowHead.div(reach)
+    const damp=float(1).sub(smoothstep(1.02,1.85,up)).mul(weight).mul(mx_noise_float(P.mul(vec3(1.2,.7,1.2))).mul(shows(1/1.2)).mul(.3).add(.7))
     // A capped tuffeau wall weathers in metre-scale bands: rain washes it in
     // vertical streaks and the foot greens. These survive a grazing angle,
     // where the courses themselves compress below one pixel.
     const streak=mx_noise_float(vec3(U.x.mul(3.1),U.y.mul(.22),0)).mul(smoothstep(.7,2.4,float(.42).div(footprint)))
     // rising damp to a wandering tide line a hand under a metre up
     const tide=mx_noise_float(vec3(U.x.mul(.7),0,2.9)).mul(.32).add(.95).add(mx_noise_float(P.mul(7)).mul(.05).mul(shows(1/7)))
-    const foot=float(1).sub(smoothstep(tide.sub(.10),tide.add(.06),aboveFoot)).mul(mx_noise_float(P.mul(vec3(.9,2.2,.9))).mul(shows(1/2.2)).mul(.3).add(.7))
+    const foot=float(1).sub(smoothstep(tide.sub(.10),tide.add(.06),up)).mul(mx_noise_float(P.mul(vec3(.9,2.2,.9))).mul(shows(1/2.2)).mul(.3).add(.7))
     // rain off the coping runs down the face in separate runs, each its own
     // length, over a general darkening just under the coping's drip
     const runCol=smoothstep(.40,.60,mx_noise_float(vec3(U.x.mul(3.3),0,1.7)).add(mx_noise_float(vec3(U.x.mul(9.1),0,4.4)).mul(.5)).mul(.5).add(.5))
     const runLength=mx_noise_float(vec3(U.x.mul(.9),0,5.2)).mul(.5).add(.5).mul(1.6).add(.5)
-    const fibre=mx_noise_float(vec3(U.x.mul(23),U.y.mul(.8),3.3)).mul(shows(1/23)).mul(.35).add(.65)
-    const coping=belowHead.div(runLength).negate().exp().mul(runCol).mul(fibre).add(belowHead.div(.25).negate().exp().mul(.45)).min(1).mul(vertical)
+    const fibre=mx_noise_float(vec3(U.x.mul(23),U.y.mul(.8),3.3)).mul(heldOn(1/23,pixel.x)).mul(.35).add(.65)
+    const coping=below.div(runLength).negate().exp().mul(runCol).mul(fibre).add(below.div(.25).negate().exp().mul(.45)).min(1).mul(vertical)
     // a wall of this length has patches of its own: a metre-scale patina
     const patina=mx_noise_float(P.mul(vec3(.42,.8,.42)).add(vec3(3.7,1.3,8.1))).mul(shows(1/.42))
     // and the court's splash is a speckle of grit in the lowest hand of it
@@ -177,10 +191,10 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     // face; it is colour, and it never becomes a pattern.
     const lichen=smoothstep(.30,.74,mx_noise_float(P.mul(vec3(2.6,1.4,2.6)).add(vec3(2.1,6.7,3.3))).mul(shows(1/2.6)))
       .mul(smoothstep(.45,.78,mx_noise_float(P.mul(9.4)).mul(shows(1/9.4)).mul(.5).add(.5)))
-      .mul(float(1).sub(smoothstep(.55,1.9,aboveFoot)).mul(.55).add(.45))
+      .mul(float(1).sub(smoothstep(.55,1.9,up)).mul(.55).add(.45))
     stone=mix(stone,rgb('#8d8f72'),lichen.mul(.34).mul(vertical))
-    stone=mix(stone,rgb('#6d7458'),foot.mul(.60).mul(vertical))
-    stone=mix(stone,stone.mul(vec3(.55,.55,.54)),coping.mul(.72)).mul(patina.mul(.16).mul(vertical).add(1))
+    stone=mix(stone,rgb('#6d7458'),foot.mul(.60).mul(weight).mul(vertical))
+    stone=mix(stone,stone.mul(vec3(.55,.55,.54)),coping.mul(.72).mul(weight).mul(weight)).mul(patina.mul(.16).mul(vertical).add(1))
     stone=mix(stone,stone.mul(vec3(.66,.62,.56)),splashed.mul(.5))
     // A STEP IS WORN where feet cross it: the nosing of a low riser paler and
     // smoother down the middle of its flight, a toe-scuff at its foot.
@@ -202,26 +216,26 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     // against the foot, a dark band a hand over the blades, its top wandering.
     const tall=smoothstep(.34,.5,aboveFoot.add(belowHead))
     const sward=mx_noise_float(vec3(U.x.mul(1.3),0,8.3)).mul(.13).add(.44).add(mx_noise_float(vec3(U.x.mul(5.9),0,2.2)).mul(.045).mul(shows(1/5.9)))
-    const wetFoot=float(1).sub(smoothstep(sward.sub(.14),sward.add(.03),aboveFoot)).mul(vertical).mul(tall)
-    stone=mix(stone,stone.mul(vec3(.60,.62,.54)),wetFoot.mul(.72))
+    const wetFoot=float(1).sub(smoothstep(sward.sub(.14),sward.add(.03),up)).mul(vertical).mul(tall)
+    stone=mix(stone,stone.mul(vec3(.60,.62,.54)),wetFoot.mul(.72).mul(weight))
     // A WALL THAT HAS STOOD IN A MEADOW FOR DECADES. Read from the garden at
     // twenty metres the terms above were a few per cent, so the terrace
     // stayed new beside a weathered house: the damp climbs above the blades
     // to a salt line, algae greens the lowest stones, the terrace's own dirt
     // washes over the head, and each run from the coping is its own stain.
     const climb=mx_noise_float(vec3(U.x.mul(.9),0,3.7)).mul(.16).add(.66).add(mx_noise_float(vec3(U.x.mul(4.3),0,6.1)).mul(.06).mul(shows(1/4.3)))
-    const risen=float(1).sub(smoothstep(climb.sub(.20),climb.add(.02),aboveFoot)).mul(vertical).mul(tall)
-    const salt=float(1).sub(smoothstep(.0,.05,aboveFoot.sub(climb).abs())).mul(vertical).mul(tall).mul(shows(.05))
+    const risen=float(1).sub(smoothstep(climb.sub(.20),climb.add(.02),up)).mul(vertical).mul(tall)
+    const salt=float(1).sub(smoothstep(.0,.05,up.sub(climb).abs())).mul(vertical).mul(tall).mul(shows(.05))
     const algae=float(1).sub(smoothstep(.06,.34,aboveFoot)).mul(smoothstep(.35,.7,mx_noise_float(P.mul(vec3(3.3,1.4,3.3)).add(vec3(8.1,2.2,5.5))).mul(.5).add(.5))).mul(vertical).mul(tall)
-    const washed=belowHead.div(.95).negate().exp().mul(vertical).mul(float(1).sub(riser))
+    const washed=below.div(.95).negate().exp().mul(vertical).mul(float(1).sub(riser))
     const stain=smoothstep(.50,.58,mx_noise_float(vec3(U.x.mul(2.3),0,9.3)).add(mx_noise_float(vec3(U.x.mul(9.7),0,2.8)).mul(.4)).mul(.5).add(.5))
     const stainLength=mx_noise_float(vec3(U.x.mul(1.3),0,7.9)).mul(.5).add(.5).mul(1.6).add(.6)
-    const runs=belowHead.div(stainLength).negate().exp().mul(stain).mul(fibre).mul(vertical).mul(float(1).sub(riser))
-    stone=mix(stone,stone.mul(vec3(.66,.67,.60)),risen.mul(.62))
+    const runs=below.div(stainLength).negate().exp().mul(stain).mul(fibre).mul(vertical).mul(float(1).sub(riser))
+    stone=mix(stone,stone.mul(vec3(.66,.67,.60)),risen.mul(.62).mul(weight))
     stone=mix(stone,rgb('#5f6a47').mul(patina.mul(.1).add(.95)),algae.mul(.42))
     stone=mix(stone,stone.mul(vec3(1.08,1.08,1.06)).add(vec3(.02,.02,.02)),salt.mul(.45))
-    stone=stone.mul(float(1).sub(washed.mul(.20)))
-    stone=mix(stone,stone.mul(vec3(.44,.44,.42)),runs.mul(.78))
+    stone=stone.mul(float(1).sub(washed.mul(.20).mul(weight)))
+    stone=mix(stone,stone.mul(vec3(.44,.44,.42)),runs.mul(.78).mul(weight).mul(weight))
     if(library){const maps=library.sync('stone-tuffeau').sample({uv:U,metres:.19,turn:.37});stone=stone.mul(mix(float(1),maps.albedo.clamp(.78,1.22),shows(.03).mul(.40)))}
     m.colorNode=mix(stone,rgb('#8c826d').mul(laid.cell.mul(.26).add(.87)),seam.mul(.58)).mul(float(1).sub(damp.mul(.15)))
     // Recessed joints and the damp foot see less sky than the block faces.
