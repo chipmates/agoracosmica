@@ -37,7 +37,15 @@ const SUN_TOWARD = ((azimuth: number, elevation: number) => {
 const MEAN = STONE.reduce((sum, c) => sum.add(c), new Color(0, 0, 0)).multiplyScalar(1 / STONE.length)
 
 /** A run of one wall's head: its ends, the side the drop is on, its level. */
-interface Run { from: P2; to: P2; out: P2; level: number }
+export interface Run { from: P2; to: P2; out: P2; level: number }
+
+/** the coping stone's section: back into the platform, out over the face,
+    proud of the floor, and its depth */
+export const COPING = { inner: .3, outer: .04, proud: .014, depth: .16 } as const
+
+let cachedRuns: Run[] | undefined
+/** The wall heads a stop sees, which carry a coping. */
+export function copingRuns(): readonly Run[] { return cachedRuns ??= runs() }
 
 function runs(): Run[] {
   const found: Run[] = []
@@ -122,7 +130,7 @@ export function createCopings(tier: TierName): Group {
   const batch: Batch = { position: [], normal: [], colour: [] }
   const random = mulberry(15171071)
   let stones = 0
-  for (const r of runs()) stones += lay(batch, r.from, r.to, r.out, r.level, .3, .04, .014, .16, .03, false, .55, .95, random)
+  for (const r of copingRuns()) stones += lay(batch, r.from, r.to, r.out, r.level, COPING.inner, COPING.outer, COPING.proud, COPING.depth, .03, false, .55, .95, random)
   // the kerb between the court's cobbles and the flagged walk before the
   // house, along the court's own north-west edge
   const court = polygon('courtyard')

@@ -274,11 +274,11 @@ function architectureMaterial(): MeshStandardNodeMaterial {
   const rx = sy.cross(viewNormal), ry = viewNormal.cross(sx), det = sx.dot(rx)
   const gradient = rx.mul(height.dFdx()).add(ry.mul(height.dFdy())).mul(det.sign()).div(det.abs().max(1e-10)).toVar()
   m.normalNode = viewNormal.sub(gradient.div(length(gradient).div(.12).max(1))).normalize()
-  wearTreads(m, { ...S, foot: C.floor }, isPaving.select(float(1), float(0)))
   // A saw cut is a groove and a roof seam is a lap: both see less sky than
   // the face beside them, which is the only way either reads where the apron
   // lies in the building's own shade.
   m.aoNode = float(1).sub(joints.mul(1.6).clamp(0, .55))
+  wearTreads(m, { ...S, foot: C.floor }, isPaving.select(float(1), float(0)))
   m.name = 'vinci/collection/three-scale-architecture'; m.userData['provenance'] = collectionProvenance.recipe
   m.userData['normalGradientLimit'] = .12
   m.userData['filtering'] = 'Original 2.78 m drift, 0.16 m structure and 5.5 mm grain, with a 0.29 m shutter lift laid across the axis each pixel is thin in, a 3.1 m pour along the face and a 2.4 by 1.22 m board panel on the cast surfaces; exact nine-cell pixel coverage of 0.34 × 0.20 m staggered slate and 6/8 mm joints, blending to their area mean. Paving saw cuts integrate a 12 mm band on a 1.5 m world grid. Relief uses bounded world/view derivatives, no tangent-space normal map.'

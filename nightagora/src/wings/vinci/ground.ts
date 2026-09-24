@@ -11,6 +11,7 @@ import { collectionAccessProvenance, weatherCourtConcrete } from './collection-a
 import { anisotropicFootprint, coursedFace, dressedTuffeau } from './masonry-courses'
 import { fractalField, resolved, specularAA } from '../../stack/detail'
 import { applyYardFinish, roadChip } from './ground-finish'
+import { copingUndersides, RETAINING_COURSES, sunEdge, wallInTheSun } from './terrace-wall'
 
 // TSL graphs retain three independent scales, even on calm's complete ground.
 const { attribute, positionWorld, positionView, normalWorldGeometry, cameraViewMatrix, mx_noise_float, mix, vec3, float, smoothstep, length, cameraPosition, normalMap, vec2, vec4, uv, fract, floor, dot, sin, cos } = TSL
@@ -113,7 +114,8 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     const axis=vec2(n.z,n.x.negate()).div(length(n.xz).max(.00001))
     const U=vec2(mix(P.x,P.x.mul(axis.x).add(P.z.mul(axis.y)),vertical),mix(P.z,P.y,vertical))
     const pixel=U.dFdx().abs().add(U.dFdy().abs()).max(vec2(.00001,.00001))
-    const laid=coursedFace(U,{...dressedTuffeau,courseM:.30,blockM:.62,jointM:.015,seed:7.31})
+    const recipe={...dressedTuffeau,...RETAINING_COURSES}
+    const laid=coursedFace(U,recipe)
     const seam=laid.joint,block=laid.tone.sub(1).mul(shows(.30))
     const drift=mx_noise_float(P.mul(.24)).mul(shows(1/.24)),cleft=mx_noise_float(P.mul(16)).mul(shows(.0625))
     const pores=smoothstep(.38,.68,mx_noise_float(P.mul(220))).mul(shows(.0045))
@@ -161,6 +163,12 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
       .mul(streak.mul(.13).add(1)).mul(cleft.mul(.09).add(1)).mul(float(1).sub(pores.mul(.22)))
       .mul(grooves.mul(.032).add(1)).mul(chatter.mul(.085).add(1)).mul(shells.mul(.19).add(1))
     stone=mix(stone,rgb('#9d9784'),bed.add(.5).mul(.34).mul(laid.held))
+    // and among them a few odd stones: one gone grey with weather, one set
+    // new in a repair, each a stone and never a pattern
+    const odd=fract(laid.cell.mul(37.1)) as ReturnType<typeof float>
+    const weathered=smoothstep(.90,.92,odd).mul(laid.held) as unknown as ReturnType<typeof float>,repaired=float(1).sub(smoothstep(.04,.06,odd)).mul(laid.held) as unknown as ReturnType<typeof float>
+    stone=mix(stone,stone.mul(vec3(.80,.80,.78)),weathered)
+    stone=mix(stone,stone.mul(vec3(1.10,1.08,1.03)),repaired)
     // beds of one quarry lean yellow or grey, stone by stone
     const hue=fract(laid.cell.mul(91.7)).sub(.5).mul(laid.held)
     stone=stone.mul(vec3(.05,0,-.1).mul(hue.max(0).mul(2)).add(1)).mul(vec3(-.06,-.025,.02).mul(hue.negate().max(0).mul(2)).add(1))
@@ -210,6 +218,11 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     // Recessed joints and the damp foot see less sky than the block faces.
     m.aoNode=foundationVisibility().mul(float(1).sub(seam.mul(.45)).sub(foot.mul(.12).mul(vertical)))
       .mul(float(1).sub(belowHead.div(.07).negate().exp().mul(.35).mul(vertical)))
+    // the worn arrises and the coping's drip in the low sun (`terrace-wall.ts`)
+    const sun=wallInTheSun(U,recipe,vertical)
+    m.aoNode=(m.aoNode as ReturnType<typeof float>).mul(sun.sky)
+    m.receivedShadowNode=TSL.Fn(([shadow]:ReturnType<typeof float>[])=>sunEdge(shadow!).mul(sun.direct))
+    m.userData['engineArrisShadow']=true
     m.roughnessNode=specularAA(float(.89).add(cleft.mul(.035)).sub(damp.mul(.06)).clamp(.78,1),
       lost(.0007,.0045).add(lost(.00085,.0115)).add(lost(.0009,.024)).add(lost(.0009,.0625)))
     const height=cleft.mul(.0009).sub(pores.mul(.0007)).add(grooves.mul(.00085)).add(chatter.mul(.0009)).add(laid.depthM).toVar()
@@ -390,7 +403,10 @@ export function createGround(tier:TierName,library?:MaterialLibrary):Group {
     const kind=name==='retaining'?'stone':name==='grass'?'grass':'earth'
     const modern=name==='collectionRetaining'
     if(kind==='stone'||modern)faceSpans(geometry)
+    if(kind==='stone')copingUndersides(geometry)
     const mesh=new Mesh(geometry,modern?weatherCourtConcrete(collectionConcreteMaterial()):groundMaterial(kind,library));mesh.receiveShadow=true;mesh.castShadow=name==='retaining'||modern;mesh.name=`wing-vinci/${name}`
+    // the flight's cast lining takes the sun's edge as the stone beside it does
+    if(modern)(mesh.material as MeshStandardNodeMaterial).receivedShadowNode=TSL.Fn(([shadow]:ReturnType<typeof float>[])=>sunEdge(shadow!))
     if(modern){mesh.userData={manifestId:collectionProvenance.manifestId,assetClass:'GENERATED',certainty:'reconstructed',component:'collection-cut-and-fill-lining',label:collectionProvenance.approachLabel,accessLabel:collectionAccessProvenance.label};geometry.userData.basis=collectionProvenance.recipe+' '+collectionAccessProvenance.recipe}
     // The sward is one body two hundred metres across, so every frame drew
     // all of it, court or valley. Partitioned it is the same triangles in

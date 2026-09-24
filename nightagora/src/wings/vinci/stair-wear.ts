@@ -8,11 +8,19 @@
    used stair, a type and not a survey. */
 import * as TSL from 'three/tsl'
 import type { MeshStandardNodeMaterial } from 'three/webgpu'
+import { hourKey } from './site'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type N = any
-const { cameraViewMatrix, float, fract, mix, mx_noise_float, normalWorldGeometry, positionWorld, smoothstep, vec3 } =
+const { cameraViewMatrix, float, Fn, fract, mix, mx_noise_float, normalWorldGeometry, positionWorld, smoothstep, vec3 } =
   TSL as unknown as Record<string, N>
+/** how far the flight's concrete cheeks stand above each tread */
+const CHEEK_RISE = .09
+/** toward the sun of the hour, world frame (x east, y up, z south) */
+const SUN_TOWARD = ((azimuth: number, elevation: number) => {
+  const az = azimuth * Math.PI / 180, el = elevation * Math.PI / 180
+  return [Math.sin(az) * Math.cos(el), Math.sin(el), -Math.cos(az) * Math.cos(el)] as const
+})(hourKey.sun_azimuth_deg.value, hourKey.sun_elevation_deg.value)
 
 /** the flight's footprint, its tread count and the heights of its head and foot */
 export interface Flight { east: number; width: number; north: number; south: number; count: number; top: number; foot: number }
@@ -80,4 +88,36 @@ export function wearTreads(m: MeshStandardNodeMaterial, flight: Flight, gate: N)
   const faceWear = front.mul(float(1).sub(smoothstep(0, .012, below)))
   m.colorNode = (m.colorNode as N).mul(float(1).sub(stoneJoint.mul(.5)).sub(bed.mul(.62))).mul(float(1).add(faceWear.mul(.08)))
   m.roughnessNode = (m.roughnessNode as N).add(bed.mul(.06))
+  // THE CREASE WHERE A TREAD MEETS THE RISER ABOVE sees half the sky the
+  // open tread sees, which is what draws a flight standing in shade
+  const crease = TSL.exp(q.mul(depth).div(.045).negate()).mul(inFlight)
+  m.aoNode = ((m.aoNode as N) ?? float(1)).mul(float(1).sub(crease.mul(.38)))
+  // EACH STONE ITS OWN: one quarry's beds, a little paler or greyer or
+  // warmer from one stone to the next, the tread and its front one stone
+  const which = P.x.greaterThan(j1).select(three.and(P.x.greaterThan(j2)).select(float(2), float(1)), float(0))
+  const id = tread.mul(3).add(which)
+  const value = fract(id.mul(.7548777).add(.31).sin().mul(4371.13)).sub(.5).mul(1.35)
+  const warm = fract(id.mul(.5698403).add(.77).sin().mul(2718.3)).sub(.5)
+  const ownStone = inFlight.max(front).mul(held(.05))
+  const tint = vec3(float(1).add(value.mul(.15)).add(warm.mul(.05)), float(1).add(value.mul(.15)), float(1).add(value.mul(.15)).sub(warm.mul(.07)))
+  m.colorNode = mix(m.colorNode as N, (m.colorNode as N).mul(tint), ownStone)
+  // THE WEST CHEEK'S SHADOW ACROSS EACH TREAD, drawn where it falls: a strip
+  // as wide as the sun climbs over the cheek's height above the tread, cut
+  // where the ray leaves over the nosing. Engine-only, as the house's joints
+  // are; the shadow map's texels are too coarse to hold it.
+  const [sx, sy, sz] = SUN_TOWARD
+  if (sx < -.05 && sy > .02) {
+    const fromCheek = P.x.sub(flight.east - half)
+    const toNosing = float(1).sub(q).mul(depth)
+    const reach = sz > .01 ? float(CHEEK_RISE * -sx / sy).min(toNosing.mul(-sx / sz)) : float(CHEEK_RISE * -sx / sy)
+    const px = pixel.mul(.5)
+    const cheek = float(1).sub(smoothstep(reach.sub(px), reach.add(px), fromCheek)).mul(inFlight).toVar()
+    // and grit gathers along the cheek's foot
+    m.colorNode = (m.colorNode as N).mul(float(1).sub(cheek.mul(float(1).sub(smoothstep(0, .06, fromCheek))).mul(.06)))
+    // and the filtered edge of a farther shadow drawn in on the flight, as on
+    // the wall beside it (`terrace-wall.ts`, sunEdge)
+    const onFlight = inFlight.max(front)
+    m.receivedShadowNode = Fn(([shadow]: N[]) => mix(shadow, smoothstep(.22, .78, shadow), onFlight).mul(float(1).sub(cheek)))
+    m.userData['engineCheekShadow'] = true
+  }
 }
