@@ -60,8 +60,16 @@ const CAMERA_OBSCURA: WearRule[] = [
   },
 ]
 
+/** The anemometer's stand: every timber cut from its own length. */
+const ANEMOMETER: WearRule[] = [
+  'base', 'foot-back', 'sole-right', 'sole-left', 'post', 'post-left', 'arm-right', 'arm-left',
+  'brace-right', 'brace-left', 'quadrant-bracket', 'quadrant', 'rail', 'vane', 'vane-roll',
+].map(id => boardTone(id, .2))
+// the plate stands in the weather it measures, and has gone grey in it
+ANEMOMETER.push({ parts: id => id === 'vane' || id === 'vane-roll', cuts: [], tint: () => [.74, .72, .69] })
+
 export function instrumentWear(slug: string): readonly WearRule[] {
-  return slug === 'camera-obscura' ? CAMERA_OBSCURA : []
+  return slug === 'camera-obscura' ? CAMERA_OBSCURA : slug === 'anemometer' ? ANEMOMETER : []
 }
 
 /** The compass's fittings, burnished by turning against each other: the

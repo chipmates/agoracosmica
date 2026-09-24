@@ -839,17 +839,45 @@
         "en": "Base",
         "de": "Sockel"
       },
+      "foot-back": {
+        "en": "Foot",
+        "de": "Fuß"
+      },
+      "sole-right": {
+        "en": "Sole",
+        "de": "Schwelle"
+      },
       "post": {
         "en": "Post",
         "de": "Pfosten"
       },
-      "rail": {
-        "en": "Overhead rail",
-        "de": "Oberer Balken"
+      "arm-right": {
+        "en": "Arm",
+        "de": "Arm"
       },
-      "vane": {
-        "en": "Hinged plate",
-        "de": "Klappplatte"
+      "brace-right": {
+        "en": "Knee brace",
+        "de": "Kopfband"
+      },
+      "sole-left": {
+        "en": "Sole",
+        "de": "Schwelle"
+      },
+      "post-left": {
+        "en": "Post",
+        "de": "Pfosten"
+      },
+      "arm-left": {
+        "en": "Arm",
+        "de": "Arm"
+      },
+      "brace-left": {
+        "en": "Knee brace",
+        "de": "Kopfband"
+      },
+      "quadrant-bracket": {
+        "en": "Scale bracket",
+        "de": "Skalenhalter"
       },
       "quadrant": {
         "en": "Curved scale",
@@ -859,7 +887,23 @@
         "en": "Scale mark",
         "de": "Teilstrich"
       },
+      "tick-minor-1": {
+        "en": "Scale mark",
+        "de": "Teilstrich"
+      },
+      "tick-minor-2": {
+        "en": "Scale mark",
+        "de": "Teilstrich"
+      },
       "tick-1": {
+        "en": "Scale mark",
+        "de": "Teilstrich"
+      },
+      "tick-minor-4": {
+        "en": "Scale mark",
+        "de": "Teilstrich"
+      },
+      "tick-minor-5": {
         "en": "Scale mark",
         "de": "Teilstrich"
       },
@@ -867,7 +911,23 @@
         "en": "Scale mark",
         "de": "Teilstrich"
       },
+      "tick-minor-7": {
+        "en": "Scale mark",
+        "de": "Teilstrich"
+      },
+      "tick-minor-8": {
+        "en": "Scale mark",
+        "de": "Teilstrich"
+      },
       "tick-3": {
+        "en": "Scale mark",
+        "de": "Teilstrich"
+      },
+      "tick-minor-10": {
+        "en": "Scale mark",
+        "de": "Teilstrich"
+      },
+      "tick-minor-11": {
         "en": "Scale mark",
         "de": "Teilstrich"
       },
@@ -875,7 +935,23 @@
         "en": "Scale mark",
         "de": "Teilstrich"
       },
+      "tick-minor-13": {
+        "en": "Scale mark",
+        "de": "Teilstrich"
+      },
+      "tick-minor-14": {
+        "en": "Scale mark",
+        "de": "Teilstrich"
+      },
       "tick-5": {
+        "en": "Scale mark",
+        "de": "Teilstrich"
+      },
+      "tick-minor-16": {
+        "en": "Scale mark",
+        "de": "Teilstrich"
+      },
+      "tick-minor-17": {
         "en": "Scale mark",
         "de": "Teilstrich"
       },
@@ -883,9 +959,21 @@
         "en": "Scale mark",
         "de": "Teilstrich"
       },
+      "scale-line": {
+        "en": "Ruled line",
+        "de": "Leitlinie"
+      },
+      "rail": {
+        "en": "Overhead rail",
+        "de": "Oberer Balken"
+      },
       "hinge-pin": {
         "en": "Hinge pin",
         "de": "Scharnierstift"
+      },
+      "hinge-pin-head--1": {
+        "en": "Head of the pin",
+        "de": "Kopf des Stifts"
       },
       "fixed-hinge-eye--1": {
         "en": "Fixed hinge eye",
@@ -895,9 +983,13 @@
         "en": "Hinge hanger",
         "de": "Scharnierhalter"
       },
-      "moving-hinge-eye--1": {
-        "en": "Moving hinge eye",
-        "de": "Bewegliche Scharnieröse"
+      "hinge-hanger--1-plate": {
+        "en": "Rivet plate",
+        "de": "Nietplatte"
+      },
+      "hinge-pin-head-1": {
+        "en": "Head of the pin",
+        "de": "Kopf des Stifts"
       },
       "fixed-hinge-eye-1": {
         "en": "Fixed hinge eye",
@@ -907,13 +999,117 @@
         "en": "Hinge hanger",
         "de": "Scharnierhalter"
       },
+      "hinge-hanger-1-plate": {
+        "en": "Rivet plate",
+        "de": "Nietplatte"
+      },
+      "vane": {
+        "en": "Hinged plate",
+        "de": "Klappplatte"
+      },
+      "vane-roll": {
+        "en": "Roll of the plate",
+        "de": "Rolle der Platte"
+      },
+      "moving-hinge-eye--1": {
+        "en": "Moving hinge eye",
+        "de": "Bewegliche Scharnieröse"
+      },
+      "vane-strap--1--1": {
+        "en": "Iron strap",
+        "de": "Eisenband"
+      },
+      "vane-strap--1-1": {
+        "en": "Iron strap",
+        "de": "Eisenband"
+      },
       "moving-hinge-eye-1": {
         "en": "Moving hinge eye",
         "de": "Bewegliche Scharnieröse"
       },
-      "quadrant-bracket": {
-        "en": "Scale bracket",
-        "de": "Skalenhalter"
+      "vane-strap-1--1": {
+        "en": "Iron strap",
+        "de": "Eisenband"
+      },
+      "vane-strap-1-1": {
+        "en": "Iron strap",
+        "de": "Eisenband"
+      },
+      "peg-right-arm": {
+        "en": "Oak peg",
+        "de": "Holznagel"
+      },
+      "peg-right-sole": {
+        "en": "Oak peg",
+        "de": "Holznagel"
+      },
+      "peg-right-brace-top": {
+        "en": "Oak peg",
+        "de": "Holznagel"
+      },
+      "peg-right-brace-foot": {
+        "en": "Oak peg",
+        "de": "Holznagel"
+      },
+      "peg-right-rail": {
+        "en": "Oak peg",
+        "de": "Holznagel"
+      },
+      "peg-left-arm": {
+        "en": "Oak peg",
+        "de": "Holznagel"
+      },
+      "peg-left-sole": {
+        "en": "Oak peg",
+        "de": "Holznagel"
+      },
+      "peg-left-brace-top": {
+        "en": "Oak peg",
+        "de": "Holznagel"
+      },
+      "peg-left-brace-foot": {
+        "en": "Oak peg",
+        "de": "Holznagel"
+      },
+      "peg-left-rail": {
+        "en": "Oak peg",
+        "de": "Holznagel"
+      },
+      "peg-stile-sole": {
+        "en": "Oak peg",
+        "de": "Holznagel"
+      },
+      "quadrant-nail-post-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "quadrant-nail-post-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "quadrant-nail-stile-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "quadrant-nail-stile-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "vane-nail--1-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "vane-nail--1-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "vane-nail-1-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "vane-nail-1-1": {
+        "en": "Nail",
+        "de": "Nagel"
       }
     },
     "inclinometer": {
