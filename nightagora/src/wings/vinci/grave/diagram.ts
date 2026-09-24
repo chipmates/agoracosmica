@@ -150,7 +150,8 @@ export function createDiagram(o: DiagramOptions): Diagram {
   const gableBed = new ExtrudeGeometry(gableShape, { depth: bedFront - bedBack, bevelEnabled: false })
   gableBed.translate(X, eaves, bedBack)
   put(mortar, gableBed)
-  put(stone, toned(2 * half + .03, .1, blockDepth + .03, X, base + .05, face - blockDepth / 2 + .015, .9))
+  // the base course stands a bed into the shelf
+  put(stone, toned(2 * half + .03, .104, blockDepth + .03, X, base + .048, face - blockDepth / 2 + .015, .9))
   const halfAt = (y: number): number => y <= eaves ? half : half * (1 - (y - eaves) / (apex - eaves))
   const openAt = (y0: number, y1: number): number => {
     // the half-width the window and its surround take out of a course

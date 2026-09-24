@@ -212,6 +212,15 @@ const ALLOWED = [
   // things at their real size, read from the walk only through the west
   // windows' glass and the open entrance door
   { mesh: 'house-hall', why: 'known, 2026-09-24: the furniture with the stools\' joinery and the leaf ironwork, 1097 faces, thinnest 0.019 px at 20 m' },
+  // THE GRAVE COURT: its copings and its made things at their real size (the
+  // beds' steel edges, the bench's feet, the walk's nosing), and the diagram's
+  // relief, a model whose joints, slates and glass are millimetres, read from
+  // the far route eyes across the court's walls
+  { mesh: 'vinci-grave-court-walls-made-surface', why: 'known, 2026-09-24: the copings\' drips and the band\'s bricks, 30 faces, thinnest 0.22 px at 61 m' },
+  { mesh: 'vinci-grave-court-floor-made-surface', why: 'known, 2026-09-24: the beds\' steel edges, the bench\'s feet and the walk\'s nosing, 360 faces, thinnest 0.045 px at 52 m' },
+  { mesh: 'vinci/grave/diagram/stone', why: 'known, 2026-09-24: the relief\'s blocks, surround and copings, 364 faces, thinnest 0.003 px at 78 m' },
+  { mesh: 'vinci/grave/diagram/ground', why: 'known, 2026-09-24: the relief\'s slates, glass and shelf, 562 faces, thinnest 0.003 px at 78 m' },
+  { mesh: 'vinci/grave/diagram/bronze', why: 'known, 2026-09-24: the box\'s bevelled strips (were in the grave\'s own body), 80 faces, thinnest 0.023 px at 32 m' },
 ]
 const allowed = row => ALLOWED.find(rule => rule.mesh === row.mesh || rule.mesh === row.body)
 

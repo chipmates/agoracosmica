@@ -87,6 +87,10 @@ export function buildBodies() {
     fitCollectionExhibitFloor(grave.group, exhibitMaterials, 'grave')
     grave.group.rotation.y = Math.PI / 2
     grave.group.position.set(GRAVE_ORIGIN.east, COURT.level + .035, -GRAVE_ORIGIN.north)
+    // and the court's own walls and furniture, which the host lays in the
+    // grave's frame (the planting is sown, not built, and stays out)
+    const { createGraveCourt } = load('src/wings/vinci/grave/court.ts')
+    grave.group.add(createGraveCourt('hero', undefined, { trees: false }).local)
     add('grave', grave.group)
   }
   return bodies

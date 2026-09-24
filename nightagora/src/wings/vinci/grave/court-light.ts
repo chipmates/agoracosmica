@@ -80,10 +80,10 @@ function sunOn(e: number, n: number, h: number): number {
   const lift = 1e-3
   if (!blocked(e + SUN.e * lift, n + SUN.n * lift, h + SUN.u * lift, SUN.e, SUN.n, SUN.u)) return crowns(e, n, h, SUN.e, SUN.n, SUN.u)
   // a ray that meets the back wall between the band's foot and its top
-  // passes a slot about one time in six
+  // passes a slot about one time in four
   const d = (-60.88 - e) / SUN.e
   const at = h + SUN.u * d, across = n + SUN.n * d
-  return d > 0 && at > 6.0 && at < 7.08 && across > -34 && across < -16 ? .16 : 0
+  return d > 0 && at > 6.0 && at < 7.08 && across > -34 && across < -16 ? .25 : 0
 }
 
 interface Patch { e: number; n: number; h: number; ne: number; nn: number; area: number; lit: number }

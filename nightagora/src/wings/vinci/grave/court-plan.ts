@@ -58,10 +58,11 @@ export const FILTER = {
   bottom: 6.0, top: 7.08,
   /** grave |x| of the band's two ends, each a solid pier */
   halfWidth: 9.16, pier: .44,
-  /** the open slot left between two bricks of a perforated course */
-  slot: .19,
+  /** the open slot left between two bricks of a perforated course: wide
+   * enough that the light it passes is a patch the sun's own map can hold */
+  slot: .3,
   /** how many courses make one solid run, and one perforated run */
-  solidCourses: 2, openCourses: 2,
+  solidCourses: 2, openCourses: 3,
   coping: { height: .12, over: .04 },
 } as const
 

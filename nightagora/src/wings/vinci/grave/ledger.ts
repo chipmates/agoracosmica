@@ -40,12 +40,17 @@ const linear = (hex: string): [number, number, number] => { const c = new Color(
 export function ledgerStone(): MeshStandardNodeMaterial {
   const m = new MeshStandardNodeMaterial({ roughness: .5, metalness: 0 })
   const P = positionWorld, n = normalWorldGeometry
-  const d = surfaceDetail({ scales: [.5, .06, .003], figure: [.05, .035, .03], relief: .0006 })
-  // a few shell fragments and a faint bedding in the honed face
-  const shell = smoothstep(.72, .86, mx_noise_float(P.mul(38)).mul(.5).add(.5)).mul(resolved(.03, d.pixel))
-  const bedding = mx_noise_float(P.mul(vec3(.6, 9, .6))).mul(resolved(.12, d.pixel))
+  const d = surfaceDetail({ scales: [.5, .06, .003], figure: [.08, .05, .035], relief: .0006 })
+  // shell fragments and a bedding in the honed face, and the grime a stone
+  // set out in a court keeps along its edges, where the leaves lie
+  const shell = smoothstep(.7, .84, mx_noise_float(P.mul(38)).mul(.5).add(.5)).mul(resolved(.03, d.pixel))
+  const bedding = mx_noise_float(P.mul(vec3(.9, 7, .45))).mul(resolved(.1, d.pixel))
   const top = smoothstep(.6, .9, n.y)
-  const c = vec3(...linear('#cfc8b6')).mul(d.tone).mul(float(1).add(bedding.mul(.035)).sub(shell.mul(.07)))
+  const toEdge = float(.99).sub(P.z.negate().add(25.95).abs()).min(float(1.775).sub(P.x.add(54.85).abs()))
+  // (the slab's place in the wing; a stage that sets it elsewhere keeps none)
+  const grime = float(1).sub(smoothstep(.0, .09, toEdge)).mul(smoothstep(-.002, 0, toEdge)).mul(top)
+  const c = vec3(...linear('#c9c1ad')).mul(d.tone).mul(float(1).add(bedding.mul(.06)).sub(shell.mul(.1)))
+    .mul(float(1).sub(grime.mul(.14)))
   m.colorNode = c
   applyCourtLight(m, c)
   // honed on its face, sawn on its sides
@@ -145,7 +150,7 @@ export function cutLedgerFace(o: {
     ]))
     // the filling is brought up to just under the face, as a ledger's letters
     // are filled, so the name reads from a standing eye and not only from above
-    const floor = new BoxGeometry(field.x1 - field.x0, field.y1 - field.y0, .003)
+    const floor = new BoxGeometry(field.x1 - field.x0 - .008, field.y1 - field.y0 - .008, .003)
     floor.translate((field.x0 + field.x1) / 2, (field.y0 + field.y1) / 2, -.0038)
     filling.push(floor)
   })

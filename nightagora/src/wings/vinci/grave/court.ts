@@ -54,6 +54,9 @@ const FLOOR_Y = -.015
 const COURSE_DATUM = GRAVE_COURT_LEVEL + GRAVE_MOUNT_RISE + PLINTH_COURSE.top
 /** a body laid against another runs this far into it, so no plane is shared */
 const BED_M = .004
+/** how far a thing standing on the flags is set into them: past their top
+ * and short of the mortar bed 4.5 mm under it */
+const SET_IN = .007
 
 /* ─── the surfaces ─────────────────────────────────────────────────────── */
 
@@ -128,7 +131,8 @@ function oakSurface(name: string): MeshStandardNodeMaterial {
   const tone = d.tone.mul(float(1).add(streak.mul(.14)).add(wave.mul(.1)))
   const c = mix(vec3(...base), vec3(...silver), top.mul(.5)).mul(tone)
   m.colorNode = c
-  applyCourtLight(m, c)
+  // a board's edge in its gap sees the gap, not the sunlit wall
+  applyCourtLight(m, c, { floorOnly: true })
   m.roughnessNode = specularAA(float(.6).add(top.mul(.16)).add(d.rough).add(streak.abs().mul(.05)), d.lost)
   m.normalNode = reliefNormal(n.transformDirection(cameraViewMatrix), d.heightM.add(streak.mul(.0004)), .2)
   m.name = `vinci/grave-court/${name}`
@@ -191,20 +195,26 @@ function buildWalls(build: Construction, s: GraveCourtSurfaces): void {
   const face = LEAF.returnFace, rear = LEAF.returnFace + LEAF.depth
   // THE BACK WALL between the returns, its leaf run a bed into both of them
   const reach = face + BED_M
-  span(build, -reach, LEAF.foot, backRear, reach, PLINTH_COURSE.top, PLINTH_COURSE.backFace, s.stone)
+  // the leaf stands a bed into the core's kerb, never on its top face
+  const foot = LEAF.foot - BED_M
+  // the stone courses stop a little short of the leaf's rear, inside the core
+  const courseRear = backRear + .01
+  span(build, -reach, foot, courseRear, reach, PLINTH_COURSE.top, PLINTH_COURSE.backFace, s.stone)
   span(build, -reach, PLINTH_COURSE.top - BED_M, backRear, reach, STRING_COURSE.bottom + BED_M, back, s.brick)
-  span(build, -reach, STRING_COURSE.bottom, backRear, reach, STRING_COURSE.top, STRING_COURSE.backFace, s.stone)
+  span(build, -reach, STRING_COURSE.bottom, courseRear, reach, STRING_COURSE.top, STRING_COURSE.backFace, s.stone)
   span(build, -reach, STRING_COURSE.top - BED_M, backRear, reach, FILTER.bottom + BED_M, back, s.brick)
-  // THE RETURNS, each laid from the back wall's face to its own end, with an
-  // end cap over the core's end and a coping over both
+  // THE RETURNS, each laid from inside the back wall's leaf to its own end,
+  // with an end cap over the core's end and a coping over both; the leaf's
+  // head and its end stop inside the coping and the cap, and the coping and
+  // the cap lie a bed past the core's own top and end
+  const start = backRear + .012, capFrom = LEAF.returnEnd - .03, head = LEAF.returnTop - 2 * BED_M
   for (const side of [-1, 1]) {
     const x = (v: number): number => side * v
-    span(build, x(PLINTH_COURSE.returnFace), LEAF.foot, backRear, x(rear), PLINTH_COURSE.top, LEAF.returnEnd, s.stone)
-    span(build, x(face), PLINTH_COURSE.top - BED_M, backRear, x(rear), LEAF.returnTop, LEAF.returnEnd, s.brick)
-    // the core's end face, closed in brick; it runs a bed into the core
-    span(build, x(face), LEAF.foot, LEAF.returnEnd - BED_M, x(9.17), LEAF.returnTop, LEAF.returnEnd + .04, s.brick)
+    span(build, x(PLINTH_COURSE.returnFace), foot, start, x(rear - .01), PLINTH_COURSE.top, capFrom + BED_M, s.stone)
+    span(build, x(face), PLINTH_COURSE.top - BED_M, start, x(rear), head, capFrom + BED_M, s.brick)
+    span(build, x(face), foot, capFrom, x(9.17), head, LEAF.returnEnd + .04, s.brick)
     const over = LEAF.coping.over
-    span(build, x(face - over), LEAF.returnTop - BED_M, back - BED_M, x(9.15 + over), LEAF.returnTop + LEAF.coping.height,
+    span(build, x(face - over), LEAF.returnTop - 3 * BED_M, back - BED_M, x(9.15 + over), LEAF.returnTop + LEAF.coping.height,
       LEAF.returnEnd + .04 + over, s.stone)
   }
   buildFilterBand(build, s)
@@ -277,8 +287,10 @@ function buildWalkway(build: Construction, s: GraveCourtSurfaces): void {
   const bearerTop = top - board.thickness
   // two bearers under the boards, set in from each edge
   for (const offset of [-WALKWAY.width / 2 + .16, WALKWAY.width / 2 - .16]) {
-    turnedBox(build, (ax + bx) / 2 + across[0] * offset, (FLOOR_Y + bearerTop) / 2 - BED_M / 2, (az + bz) / 2 + across[1] * offset,
-      length - .06, bearerTop - FLOOR_Y + BED_M, .075, [ux, uz], s.steel)
+    // from a little into the flags to a bed into the boards
+    const low = FLOOR_Y - SET_IN, high = bearerTop + BED_M
+    turnedBox(build, (ax + bx) / 2 + across[0] * offset, (low + high) / 2, (az + bz) / 2 + across[1] * offset,
+      length - .06, high - low, .075, [ux, uz], s.steel)
   }
   // the boards across them, each its own length off true by a few mm
   const random = mulberry(90513)
@@ -292,7 +304,7 @@ function buildWalkway(build: Construction, s: GraveCourtSurfaces): void {
       WALKWAY.width - .004 * random(), board.thickness, board.width, across, s.walkway, [across[1], across[0]])
   }
   // a bronze nosing at the end the visitor steps on from
-  turnedBox(build, ax + ux * (start - .012), top - .012, az + uz * (start - .012), WALKWAY.width + .02, .024, .024, across, s.bronze)
+  turnedBox(build, ax + ux * (start - .012 + BED_M), top - .012, az + uz * (start - .012 + BED_M), WALKWAY.width + .02, .024, .024, across, s.bronze)
 }
 
 function buildBench(build: Construction, s: GraveCourtSurfaces): void {
@@ -311,7 +323,7 @@ function buildBench(build: Construction, s: GraveCourtSurfaces): void {
     const z = cz + at
     span(build, cx - BENCH.depth / 2 + .02, seatTop - .085, z - .022, cx + BENCH.depth / 2 - .02, seatTop - .045 + BED_M, z + .022, s.bronze)
     for (const x of [cx - BENCH.depth / 2 + .045, cx + BENCH.depth / 2 - .045])
-      span(build, x - .02, FLOOR_Y - BED_M, z - .02, x + .02, seatTop - .085 + BED_M, z + .02, s.bronze)
+      span(build, x - .02, FLOOR_Y - SET_IN, z - .02, x + .02, seatTop - .085 + BED_M, z + .02, s.bronze)
   }
 }
 
@@ -325,7 +337,7 @@ function buildBeds(build: Construction, s: GraveCourtSurfaces): void {
     span(build, cx + h - t, FLOOR_Y - .01, cz - h, cx + h, top + .006, cz + h, s.steel)
     span(build, cx - h + t - BED_M, FLOOR_Y - .01, cz - h, cx + h - t + BED_M, top + .006, cz - h + t, s.steel)
     span(build, cx - h + t - BED_M, FLOOR_Y - .01, cz + h - t, cx + h - t + BED_M, top + .006, cz + h, s.steel)
-    span(build, cx - h + t, FLOOR_Y - BED_M, cz - h + t, cx + h - t, top, cz + h - t, s.earth)
+    span(build, cx - h + t - BED_M, FLOOR_Y - SET_IN, cz - h + t - BED_M, cx + h - t + BED_M, top, cz + h - t + BED_M, s.earth)
   }
 }
 
@@ -452,7 +464,7 @@ export interface GraveCourt {
   dispose(): void
 }
 
-export function createGraveCourt(tier: TreeTier, surfaces = graveCourtSurfaces()): GraveCourt {
+export function createGraveCourt(tier: TreeTier, surfaces = graveCourtSurfaces(), options: { trees?: boolean } = {}): GraveCourt {
   const placeholder = surfaces.stone
   const materials: ExhibitMaterials = { stone: placeholder, plaster: placeholder, bronze: surfaces.bronze, ink: surfaces.steel, dark: surfaces.steel }
   const walls = new Construction(materials, 'vinci-grave-court-walls', graveCourtProvenance.manifestId)
@@ -468,8 +480,8 @@ export function createGraveCourt(tier: TreeTier, surfaces = graveCourtSurfaces()
   // the furniture is low and never hides a label; the walls may
   floorGroup.traverse(o => { if ((o as Mesh).isMesh) { o.userData['labelOccluder'] = false; (o as Mesh).raycast = () => {} } })
   local.add(wallGroup, floorGroup)
-  const trees = growGraveCourtTrees(tier)
-  const world = trees.group
+  // an offline checker of the architecture alone may leave the planting out
+  const world = options.trees === false ? new Group() : growGraveCourtTrees(tier).group
   return {
     local, world,
     dispose() {
