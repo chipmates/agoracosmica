@@ -361,8 +361,8 @@ export function courtTreeRefusal(): Refuse {
     const e = x, n = -z
     if (e < backE + WALL_KEEP || n > northN - WALL_KEEP || n < southN + WALL_KEEP) return true
     if (y < floor + 2.1) return true
-    // a leaf's card reaches a hand past the point it grows from
-    for (const [a, b] of CERTIFIED_LINES) if (segmentDistance(e, n, a!, b!) < WALK_KEEP.metres + .12) return true
+    // a spray's card reaches a hand or two past the point it grows from
+    for (const [a, b] of CERTIFIED_LINES) if (segmentDistance(e, n, a!, b!) < WALK_KEEP.metres + .3) return true
     // the diagram's frame and its ledge, and the lectern
     if (e > -57.5 && e < -55.9 && n > -26.0 && n < -21.6 && y < floor + 4.6) return true
     if (e > -54.6 && e < -53.5 && n > -24.8 && n < -22.3 && y < floor + 2.4) return true
@@ -379,7 +379,7 @@ export function growGraveCourtTrees(tier: TreeTier): GraveCourtTrees {
   group.name = 'vinci/grave-court/trees'
   group.userData = { ...graveCourtProvenance, certainty: 'conjectural', labelOccluder: false }
   const mats = vegetationMaterials(windWanted())
-  const bark = new Body(), leaves = new Body()
+  const bark = new Body(), fine = new Body(), leaves = new Body()
   const casts = tier !== 'calm'
   const shadows = casts ? new Body() : null
   const bedTop = GRAVE_COURT_LEVEL + .02 + BED.rise
@@ -389,11 +389,14 @@ export function growGraveCourtTrees(tier: TreeTier): GraveCourtTrees {
   for (const tree of COURT_TREES) {
     const result = growTree({
       id: tree.id, species: 'maple', east: tree.east, north: tree.north, height: tree.height, seed: tree.seed,
-      detail: 'near', lean: tree.lean, spread: COURT_TREE_FORM.spread, crownBase: COURT_TREE_FORM.crownBase,
+      // a mid tree seen close: every twig drawn, the crown in sprays, which is
+      // how the site's own trees near a stop are drawn and what the wing's
+      // triangle budget holds at the stops that see the court from afar
+      detail: 'mid', close: true, lean: tree.lean, spread: COURT_TREE_FORM.spread, crownBase: COURT_TREE_FORM.crownBase,
       bole: COURT_TREE_FORM.bole, leafCap: COURT_TREE_FORM.leafCap,
     // the twigs weld into the limbs: the shadow body folds their casting, and
     // a body less is a draw less in every pass that sees the court
-    }, tier, () => bedTop, refuse, bark, bark, leaves, shadows)
+    }, tier, () => bedTop, refuse, bark, casts ? fine : bark, leaves, shadows)
     count += result.leaves
     results.push(result)
   }
@@ -436,11 +439,16 @@ export function growGraveCourtTrees(tier: TreeTier): GraveCourtTrees {
   const meshes: Mesh[] = []
   const add = (mesh: Mesh | null): void => {
     if (!mesh) return
-    mesh.userData = { ...graveCourtProvenance, certainty: 'conjectural', labelOccluder: false }
+    // the planting is its own record, outside the one shadow body: it casts
+    // for itself and only where it can be seen (`update`)
+    mesh.userData = { ...graveCourtProvenance, manifestId: GRAVE_COURT_PLANTING, certainty: 'conjectural', labelOccluder: false }
     mesh.raycast = () => {}
     meshes.push(mesh)
   }
   add(vegetationMesh(bark, mats.bark, 'vinci/grave-court/maple trunks and limbs', casts))
+  // the twigs cast nothing: under a texel of the sun's map, and every stop's
+  // two cascades would draw them in the one shadow body
+  if (casts) add(vegetationMesh(fine, mats.bark, 'vinci/grave-court/maple branches and twigs', false))
   add(vegetationMesh(leaves, mats.leaves, 'vinci/grave-court/maple leaves', false))
   if (shadows) {
     const s = vegetationMesh(shadows, mats.shade, 'vinci/grave-court/maple leaf shadows', true)
@@ -461,8 +469,20 @@ export interface GraveCourt {
   local: Group
   /** the trees and their fall, in the wing's frame */
   world: Group
+  /** where the eye stands: the planting is drawn and casts only near enough
+   * to be seen (see PLANTING_REACH) */
+  update(eye: { x: number; z: number }): void
   dispose(): void
 }
+
+export const GRAVE_COURT_PLANTING = 'vinci/grave-court-planting'
+/** HOW FAR THE PLANTING IS DRAWN, from the court's middle, in metres. The
+ * house stands between the court and every stop beyond the first reach, so
+ * the trees come and go where no eye can see them; their shadows and their
+ * twigs, which no eye resolves past the second, go first. The wing's far
+ * stops keep their triangle budget. */
+export const PLANTING_REACH = { trees: 58, detail: 32, hold: 2 } as const
+const COURT_MIDDLE = { east: -54.5, north: -25 } as const
 
 export function createGraveCourt(tier: TreeTier, surfaces = graveCourtSurfaces(), options: { trees?: boolean } = {}): GraveCourt {
   const placeholder = surfaces.stone
@@ -482,8 +502,20 @@ export function createGraveCourt(tier: TreeTier, surfaces = graveCourtSurfaces()
   local.add(wallGroup, floorGroup)
   // an offline checker of the architecture alone may leave the planting out
   const world = options.trees === false ? new Group() : growGraveCourtTrees(tier).group
+  const twigs = world.getObjectByName('vinci/grave-court/maple branches and twigs')
+  const casters: Mesh[] = []
+  world.traverse(o => { if ((o as Mesh).isMesh && (o as Mesh).castShadow) casters.push(o as Mesh) })
+  let shown = true, detailed = true
   return {
     local, world,
+    update(eye) {
+      const d = Math.hypot(eye.x - COURT_MIDDLE.east, -eye.z - COURT_MIDDLE.north), hold = PLANTING_REACH.hold
+      if (shown ? d > PLANTING_REACH.trees + hold : d < PLANTING_REACH.trees - hold) shown = !shown
+      if (detailed ? d > PLANTING_REACH.detail + hold : d < PLANTING_REACH.detail - hold) detailed = !detailed
+      world.visible = shown
+      if (twigs) twigs.visible = detailed
+      for (const mesh of casters) mesh.castShadow = detailed
+    },
     dispose() {
       for (const group of [local, world]) group.traverse(o => { if ((o as Mesh).isMesh) (o as Mesh).geometry.dispose() })
       local.removeFromParent(); world.removeFromParent()

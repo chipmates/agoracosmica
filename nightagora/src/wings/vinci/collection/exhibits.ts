@@ -448,6 +448,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
     update(now, step, eye) {
       if (!live) return
       pictures.update(step, eye)
+      graveCourt.update(eye)
       // the gallery's bounce is taken with its rooms and its line standing
       gallery.update()
       gallery.tick(rooms ? [rooms, line] : [line])

@@ -2747,7 +2747,7 @@
       "prompt": "Interpretive museum ledger slab of pale honed limestone with the documented name cut and filled, and no epitaph; a separate presumed plaque on a footed base, based on a sourced account; a coursed chapel-gable relief on an oak shelf in a deep bronze box, lit by one light of its own from the computed direction of the chosen minute, under a raked reading ledge. No remains, no portrait, no invented historical plaque facsimile.",
       "model": "Deterministic TypeScript geometry and TSL materials",
       "date": "2026-09-10",
-      "sha256": "6871574a634bf71c421a375aa9eb2a1c5cd4229e86c6b8597df3cc3822b19578",
+      "sha256": "6a356cdd78168ae27ee88d514402c0ccaa37d6c39ab10b15acb5b5fa5dbd1ac4",
       "note": "recipe_file=src/wings/vinci/grave/index.ts"
     },
     {
@@ -3802,8 +3802,21 @@
       "prompt": "The grave court as the museum's own modern architecture: a leaf of long flat light-grey brick laid in front of the gallery's cast core, the back wall raised over it as a filter band of brick laid with open head joints so the western light passes in small slots, a plinth course and a string course of pale limestone, stone copings; an oiled oak walkway on two steel bearers from the court's open side to the foot of the slab, an oak bench on bronze feet, and three field maples of the region in steel-edged beds of earth with their week's fall. The court's sky share and the warm light off its sunlit wall faces are baked once from the walls' boxes and the hour's sun as live-engine terms the film's export turns off. No figure: no record names one. A modern design, no claim about 1519, Saint-Florentin or Saint-Hubert.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-24",
-      "sha256": "7835c9b715aea7e48c691a348693e1e3619d86f252cab847c5503a3a5691d4c2",
+      "sha256": "d7bf1be2c9b99f17cad3579fc771b42bf24ad0253d72f63cf170afee385d19c6",
       "note": "Modern museum court; no 1519 claim. recipe_file=src/wings/vinci/grave/court.ts"
+    },
+    {
+      "id": "vinci/grave-court-planting",
+      "path": "procedural/grave-court-planting/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural reconstruction; source code under the museum repository licence.",
+      "display": true,
+      "prompt": "Three field maples, a tree of the region's hedges and a type of the season, planted by the museum in the grave court's steel-edged beds: 7 to 8.1 m, a stem clear to about a third of their height, their crowns grown by the site's own tree growth in sprays with every twig drawn near a stop, turned to their week's stage, and kept a hand past 1.2 m from every certified line through the court and out of its walls, its diagram and its lectern; their week's fall mostly in the beds and the rest carried north-east over the flags. Drawn within 58 m of the court's middle, the twigs and the shadows within 32 m, where the house stands between the court and every stop further off. Conjectural; the museum's modern planting, not a record of 1519.",
+      "model": "Deterministic TypeScript and TSL procedural geometry",
+      "date": "2026-09-24",
+      "sha256": "d7bf1be2c9b99f17cad3579fc771b42bf24ad0253d72f63cf170afee385d19c6",
+      "note": "FLORA.md species as a type; the museum's own planting. recipe_file=src/wings/vinci/grave/court.ts"
     }
   ]
 }

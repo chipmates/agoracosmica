@@ -168,6 +168,9 @@ export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, l
   ledge.text(first, -inner/2, ledgeHeight/2-.085, .042, fit(first,options.mobile?.155:.118), inner)
   ledge.text(second, -inner/2, -.075, .042, fit(second,options.mobile?.115:.082), inner)
   build.finish()
+  // the ledger's cut face lies flat in the court's shade and casts nothing
+  // the sun's cascades could hold; its letters are thousands of faces
+  build.group.traverse(o => { if (o instanceof Mesh && o.material === ledger) o.castShadow = false })
   build.group.add(diagram.group)
   // The points a frame has to hold: nothing of the burial or its diagram may
   // fall under a card, so the host composes from these and not from a guess.

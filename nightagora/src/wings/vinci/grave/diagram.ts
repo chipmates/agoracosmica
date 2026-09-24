@@ -31,7 +31,7 @@ export const DIAGRAM_SHADOW_LAYER = 12
 
 /** THE LIGHT AS DATA: its colour temperature, its level against the wing's
  * key (320 lux), and the map it draws. */
-export const DIAGRAM_LIGHT = { kelvin: 3000, intensity: 2.6, mapPx: { hero: 1024, standard: 512 } } as const
+export const DIAGRAM_LIGHT = { kelvin: 3000, intensity: 2.1, mapPx: { hero: 1024, standard: 512 } } as const
 
 const linear = (hex: string): [number, number, number] => { const c = new Color(hex); return [c.r, c.g, c.b] }
 

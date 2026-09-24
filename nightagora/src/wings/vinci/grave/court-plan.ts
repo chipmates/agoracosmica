@@ -97,7 +97,7 @@ export const COURT_TREES: readonly CourtTree[] = [
 ]
 /** a court tree's clear stem, and the share of the species' own spread it
  * takes: a tree raised over a walked floor, as a court keeps one */
-export const COURT_TREE_FORM = { crownBase: .33, bole: .33, spread: .9, leafCap: 26000 } as const
+export const COURT_TREE_FORM = { crownBase: .33, bole: .33, spread: .9, leafCap: 7000 } as const
 /** Each bed: a square of earth in a blackened steel edge round its tree. */
 export const BED = { half: .82, edge: .012, rise: .055 } as const
 

@@ -143,7 +143,9 @@ export function cutLedgerFace(o: {
     }))
     // the splayed mouth, 3.5 mm wider than the walls under it: the ledge that
     // takes the court's sky while the wall below stays in shadow
-    const band = Math.max(.0022, cap * .012)
+    // rows of 5 mm: a letter 0.27 m high keeps its outline and the face
+    // keeps its triangles
+    const band = Math.max(.0022, cap * .019)
     stone.push(webSurface([
       { rects: stoneWeb(field, placed, band, .0035), front: 0, depth: .005 },
       { rects: stoneWeb(field, placed, band), front: -.0048, depth: .009 },
