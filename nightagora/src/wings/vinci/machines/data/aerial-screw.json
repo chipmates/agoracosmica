@@ -36,7 +36,7 @@
     "z": 9.5,
     "certainty": "C",
     "source": "a-geometry",
-    "note": "Swept radial extent at most 4.6868 m, the rim wire's outer edge at the first rib. Conservative bounds X and Z [-4.75, 4.75], Y [0, 6.1]. The deck and the bearing block stay on the floor; the mast turns from world y=0.19 (its iron pivot) to 6.0, its iron cap reaching 6.018. Starting sail radius 4.6688 m equals 8*0.5836 under the commissioned conversion."
+    "note": "Swept radial extent at most 4.6783 m, the rim wire's outer edge at the first rib (every part measured at rest; the turn keeps the radius). Conservative bounds X and Z [-4.75, 4.75], Y [0, 6.1]. The deck and the bearing block stay on the floor; the mast turns from world y=0.19 (its iron pivot) to 6.0, its iron cap reaching 6.018. Starting sail radius 4.6688 m equals 8*0.5836 under the commissioned conversion."
   },
   "frame": {
     "handedness": "right",

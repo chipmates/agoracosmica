@@ -29,7 +29,7 @@ export function translucentCloth(from: MeshStandardNodeMaterial, layered = false
   // starch; it spreads, so the glow is broad and never a hot spot, and a
   // share of it leaves the far face whichever way the eye looks: a lamp above
   // the sail lights its underside from within
-  const warm = layered ? vec3(1.0, .96, .88) : vec3(1.0, .93, .8)
+  const warm = layered ? vec3(1.0, .97, .91) : vec3(1.0, .93, .8)
   const base = from.colorNode ? (from.colorNode as unknown as { mul: (v: unknown) => unknown }).mul(warm) : vec3(...new Color(from.color).toArray())
   const colour = layered ? (base as unknown as { mul: (v: unknown) => unknown }).mul(attribute('layers', 'float')) : base
   Object.assign(m, {
@@ -38,7 +38,7 @@ export function translucentCloth(from: MeshStandardNodeMaterial, layered = false
     thicknessPowerNode: float(1.2),
     thicknessScaleNode: float(7),
     thicknessAttenuationNode: float(.7),
-    thicknessAmbientNode: float(layered ? .24 : 0),
+    thicknessAmbientNode: float(layered ? .15 : 0),
   })
   return m
 }
