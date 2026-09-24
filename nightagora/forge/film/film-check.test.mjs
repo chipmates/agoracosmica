@@ -116,7 +116,9 @@ test('a machine part turns red exactly the clips that see its machine', async ()
 })
 
 test('a station\'s exposure turns red exactly the clips that stand at it', async () => {
-  const tree = await treeKeys({ overlay: plant(`${WING_DIR}/index.ts`, 'works:1.24,body:1.4}', 'works:1.24,body:1.45}'), log: (s) => console.log(`# exposure: ${s}`) })
+  // the body's own entry of the exposure table (`print.ts`), moved by a twentieth of a stop
+  const held = read(`${WING_DIR}/print.ts`).match(/\bbody:([0-9.]+)/)
+  const tree = await treeKeys({ overlay: plant(`${WING_DIR}/print.ts`, held[0], `body:${(Number(held[1]) + 0.05).toFixed(2)}`), log: (s) => console.log(`# exposure: ${s}`) })
   assert.equal(changedCells(clean, tree).size, 0, 'no cell moved')
   assert.equal(tree.global.key, clean.global.key, 'the print is not the exposure table')
   const result = plantedReds(tree)
