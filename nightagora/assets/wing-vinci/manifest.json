@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed to a pale grey at 30 per cent. Assumed weather, no observation claimed.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "8af144d099fefcb9867ed4ef0c98f7391c77aef44225b13dcf2017a6f88e86dc",
+      "sha256": "5afd8854d9b8680e604ba2a342da6bb6eab687b3f50db076b41b5fe44c8d7f68",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=80c458f2cb5ccddb7fcedccda5df70e5cdccda7d9ca97d65ebfa6462920f61ef;"
     },
     {
@@ -3331,7 +3331,7 @@
         },
         {
           "path": "src/wings/vinci/index.ts",
-          "sha256": "dbec84ef1391b43251fe4a8c193485e5513529779784ca1d1131c683b2deb6c8"
+          "sha256": "5afd8854d9b8680e604ba2a342da6bb6eab687b3f50db076b41b5fe44c8d7f68"
         },
         {
           "path": "src/wings/vinci/content.ts",
@@ -3339,7 +3339,7 @@
         },
         {
           "path": "src/wings/vinci/wing.css",
-          "sha256": "b554b1166b20e21f8bd6bb5b3248acbf9ce964e78ffd7561417323985d80b0bc"
+          "sha256": "c02bb0b5afb807af31957b7679351a01937924ee7bf8df9e2527d8a3ec625428"
         }
       ]
     },
@@ -3789,8 +3789,8 @@
       "prompt": "The picture room as the wing's great room, finished over its certified construction: the hang's wall in a deep lapis-slate plaster trowelled to a burnish (the sealed floor photograph's cloud and fine relief kept at a wall's scale, its colour taken to the one lapis-slate) over a shadow gap with a dark back, the picture rail read as the foot of a frieze that steps forward, the door surrounds wrapped in the same plaster; a bulkhead closing the cove and the coffered soffit in the building's board-formed concrete; smoked oak boards laid along the room, each board its own piece of the oak photograph at its own length, worn paler along the walk and at the doors, with the room's own probe read in them where the reflected ray meets the room's walls; a dark honed stone band along the glazing and at the thresholds. Every work in a frame of dark oiled oak on a swept section with real mitres and a bronze slip at the sight edge, enclosing the construction's moulding, its reproduction brought forward into the frame's rebate; the arch mats in the same oak; the construction's benches and the east ledge wrapped as built oak benches on bronze shoes. Its light, as data: a black track 1.8 m off the wall with one warm head over every work (two over a work wider than 1.3 m), each lens shaping a soft rounded pool round its frame and levelled so every work stands at one irradiance at its aim; the portrait he kept under a framing projector cut to her frame; every frame's shadow and the frieze's line computed exactly for each head from the frame's box, an engine term behind one switch; the reproductions lit by the same heads through their tone, and a varnish drawn over them as a gentle lobe of each head and the room's bounce by Fresnel; the north glazing as one 6500 K class area source held low, its daylight over the floor as one parallel source with the benches' shadows, the two doorways lit by the next rooms' daylight, the room's bounce from a probe taken inside it, and the room's air over its length. Colours of light as the art direction displays them. Photographs: library/concrete-wall-formed, library/concrete-floor-polished (ambientCG) and library/oak-veneer-light (Poly Haven), all CC0; boards, sections, tints, pools and every light are procedural. A modern room; no 1517 claim.",
       "model": "Deterministic TypeScript geometry and TSL materials",
       "date": "2026-09-24",
-      "sha256": "ae1064676e80a32fc05eacd16d97477f472f542b5579a72f9a176194fce30012",
-      "note": "Modern museum insertion, the picture room only; no 1517 claim. recipe_file=src/wings/vinci/collection/picture-room.ts; companion_file=src/wings/vinci/collection/picture-room-plan.ts; companion_file=src/wings/vinci/collection/picture-light.ts; library_sets=library/concrete-wall-formed,library/oak-veneer-light,library/concrete-floor-polished"
+      "sha256": "e861c937b8792b8ec3b7e2b2f5c9d4a7b1ee5c0675daf53491f3e596d1256129",
+      "note": "Modern museum insertion, the picture room only; no 1517 claim. recipe_file=src/wings/vinci/collection/picture-room.ts; companion_file=src/wings/vinci/collection/picture-room-plan.ts; companion_file=src/wings/vinci/collection/picture-light.ts; companion_file=src/wings/vinci/collection/picture-numerals.ts; library_sets=library/concrete-wall-formed,library/oak-veneer-light,library/concrete-floor-polished"
     },
     {
       "id": "vinci/grave-court",
