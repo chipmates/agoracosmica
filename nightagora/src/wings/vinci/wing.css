@@ -383,6 +383,7 @@
 .vinci-quiet-dot {grid-row:1 / span 2;width:7px;height:7px;border-radius:50%;
   background:var(--certainty,#d2a557);box-shadow:0 0 0 2px #0d172099;}
 .vinci-quiet-name {color:#f0e7d6;font:13px/1.25 var(--serif,var(--sans));letter-spacing:.01em;}
+.vinci-quiet-number {margin-right:.4em;color:#d2a557;font-family:var(--press-display,var(--serif));font-variant-numeric:oldstyle-nums proportional-nums;}
 .vinci-quiet-year {color:#c3b596;font:9px var(--sans);letter-spacing:.14em;text-indent:.14em;text-transform:uppercase;}
 @media(max-aspect-ratio:9/10) {
   .vinci-quiet {max-width:200px;padding:4px 8px 5px;}

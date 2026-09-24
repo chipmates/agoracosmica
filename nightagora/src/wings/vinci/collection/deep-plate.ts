@@ -212,6 +212,8 @@ export function createVinciWholePlate(options: {
   tier(): DeepPlateTier
   /** The phone folds the card so the viewport takes the sheet. */
   narrow: boolean
+  /** the number on the work's frame and its catalogue words, where it hangs under one */
+  catalogue?: VitrineExhibit['catalogue']
 }): VitrineExhibit {
   const language = lang()
   const registration = pictureDisplayWindow(options.plate.plate)
@@ -259,6 +261,7 @@ export function createVinciWholePlate(options: {
     controls: [back, ...options.controls],
     payload,
     work: () => payload.origin(),
+    catalogue: options.catalogue ?? null,
     limit: options.limit,
     visualNote: options.visualNote,
   }

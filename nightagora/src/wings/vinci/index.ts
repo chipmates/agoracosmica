@@ -32,6 +32,8 @@ import { collectionView } from './collection/views'
 import { mountCollectionExhibits, type CollectionExhibits } from './collection/exhibits'
 import { isMachineSlug, type MachineSlug } from './machines'
 import { createPictureRecord, createPolicyWorkLabel, createWindowWorkLabel, policyLabelText, PICTURE_CERTAINTY_KEY } from './pictures/policy-label'
+import { hangCatalogue } from './collection/catalogue'
+import { frameKey, hangNumber } from './collection/picture-room-plan'
 import { MAIN_HANG, REGISTER, type PictureRights } from './pictures/register'
 import { MACHINE_SLUGS, machineCatalog } from './machines/catalog'
 import { validatePaintingRecord } from './pictures/policy'
@@ -1497,7 +1499,9 @@ export function createWing():VinciWingModule {
     }else{
     if(!found)return
     const entries=sources.filter(source=>source.work.id===found.work.id).map(source=>source.entry)
-    quietName.textContent=text(workTitle(found.work,found.entry.face))
+    // the number cast on the frame stands before the name it answers to
+    const numbered=hangNumber(frameKey(found.work.id,found.entry.face))
+    quietName.replaceChildren(...(numbered===null?[]:[make('span','vinci-quiet-number',String(numbered))]),text(workTitle(found.work,found.entry.face)))
     quietYear.textContent=lang()==='de'?found.work.date_label_de:found.work.date_label_en
     quietDot.style.setProperty('--certainty',policyLabelText(found.work,entries).colour)
     }
@@ -2165,6 +2169,8 @@ export function createWing():VinciWingModule {
     // THE PAGE'S LANGUAGE ONLY. The module writes both columns for the wall's
     // own record; the vitrine keeps the one the visitor reads.
     const label=createWindowWorkLabel(work,entries,lang(),narrow())
+    // THE NUMBER ON ITS FRAME: a work of the hang is read as its catalogue entry
+    const catalogue=hangCatalogue(work,entry.face,entries,lang())
     const controls:HTMLElement[]=[]
     const workRectNow=():VitrineRect|null=>{const nav=rail.navigation;return nav.exhibit===id&&!nav.active?workRect(entry.object):null}
     if(plate){
@@ -2178,7 +2184,7 @@ export function createWing():VinciWingModule {
         closeLook.open(createVinciWholePlate({id,title,line:vinciLine(id),work,entries,plate,...vinciLimits(id),
           controls:[control(VINCI_VITRINE_WORDS.provenance,()=>showExhibitRecord(id,work,entries,evidence)),
             control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())],
-          back:()=>openExhibit(id,null),from:()=>seat,narrow:narrow(),
+          back:()=>openExhibit(id,null),from:()=>seat,narrow:narrow(),catalogue,
           tier:()=>hosts?.world.stack.tierName()??'standard'}),whole,'advance')
       })
       controls.push(whole)
@@ -2194,7 +2200,7 @@ export function createWing():VinciWingModule {
       standing:()=>{const nav=rail.navigation;return !nav.active&&!nav.approaching}}):null
     openMode=how
     closeLook.open({id,title,line:vinciLine(id),card:[label],payload,controls,walk,...vinciLimits(id),...own(pictureCertainty(policyLabelText(work,entries).colour)),
-      work:workRectNow},from,how_)
+      catalogue,work:workRectNow},from,how_)
     openMode='auto'
   }
   /** The door asks about the place the visitor is standing in, so the

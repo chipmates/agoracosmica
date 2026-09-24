@@ -39,6 +39,12 @@
 .vitrine-name-text {min-width:0;}
 .vitrine-name-dot {flex:0 0 8px;width:8px;height:8px;border-radius:50%;background:var(--certainty,#d2a557);transform:translateY(-1px);}
 .vitrine-name-dot[hidden] {display:none;}
+/* the number cast on the work's frame, in the museum's own figures */
+.vitrine-name-number {flex:0 0 auto;font:400 1em/1 var(--press-display,var(--serif));font-variant-numeric:oldstyle-nums proportional-nums;color:#d2a557;}
+.vitrine-name-number[hidden] {display:none;}
+/* the catalogue under the name: the date and where the original is */
+.vitrine-catalogue {margin:-6px 0 10px;font:400 14px/1.4 var(--sans);letter-spacing:.01em;color:#c8bda6;text-wrap:pretty;}
+.vitrine-catalogue[hidden] {display:none;}
 .vitrine-line {margin:0 0 14px;font:400 21px/1.3 var(--serif);color:#fff5e3;text-wrap:pretty;}
 .vitrine-line[hidden] {display:none;}
 .vitrine-words p {margin:8px 0;font:14px/1.5 var(--serif);color:#e6e0d2;text-wrap:pretty;}
@@ -77,6 +83,7 @@
   .vitrine-view {border:1px solid #a9977344;border-bottom:0;box-sizing:border-box;}
   .vitrine-name {margin-bottom:6px;font-size:16px;}
   .vitrine-line {margin-bottom:6px;font-size:15px;line-height:1.32;}
+  .vitrine-catalogue {margin:-3px 0 6px;font-size:13px;}
   .vitrine-words p {font-size:13px;line-height:1.42;margin:5px 0;}
   .vitrine-controls {gap:6px;margin-top:8px;padding-top:8px;flex-wrap:nowrap;}
   .vitrine-control {flex:1 1 0;min-width:0;padding:10px 8px;font-size:11px;}
@@ -120,6 +127,7 @@
 /* AT THE PEEK THE CARD IS THE WORK'S OWN NAME AND NOTHING ELSE: the volume's
    line, the row and the walk come up with the card. */
 .vitrine[data-peek='true'] .vitrine-line,
+.vitrine[data-peek='true'] .vitrine-catalogue,
 .vitrine[data-peek='true'] .vitrine-controls,
 .vitrine[data-peek='true'] .vitrine-foot {display:none;}
 .vitrine[data-narrow='true'][data-fill='true'] .vitrine-card {background:#0d171ff5;}

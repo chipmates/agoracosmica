@@ -93,6 +93,9 @@ export interface VitrineExhibit {
   walk?: readonly HTMLElement[]
   /** Where the work stands in the set it belongs to, counted from one. */
   set?: { at: number; of: number } | null
+  /** The number on the work's frame, its date, and where the original is,
+   * for a work the room hangs under a number. */
+  catalogue?: { number: string; date: string; where: string } | null
   /** The museum's own four marks, for the label that carries one. */
   certainty?: 'documented' | 'reconstructed' | 'conjectural' | 'unknown' | null
   payload: VitrinePayload | null

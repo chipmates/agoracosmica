@@ -31,6 +31,11 @@ export interface CloseLookView {
   certainty: VinciCertainty | null
   /** where the work stands in the set it belongs to, counted from one */
   set: { at: number; of: number } | null
+  /** A WORK WITH A NUMBER ON ITS FRAME is read as a catalogue entry: the
+      number before its name, its date in the clock's place, and where the
+      original is in the count's place, since the number already says which
+      one of the set it is */
+  catalogue?: { number: string; date: string; where: string } | null
   /** the room the one step back leads to, in the page's language */
   room: string
   /** the module's own sentences, which the drawer holds */
@@ -126,6 +131,7 @@ export function createCloseLookBand(options: {
   const cap = make('div', 'desk-clb-cap')
   const nameRow = make('div', 'desk-name')
   const title = make('span', 'desk-chapter')
+  const numeral = make('span', 'desk-number')
   const clock = make('span', 'desk-clock')
   const count = make('span', 'desk-count')
   const line = make('p', 'desk-line desk-clb-line')
@@ -287,17 +293,20 @@ export function createCloseLookBand(options: {
       stepBack.textContent = ''
       stepBack.append(icon(STEP_BACK), document.createTextNode(next.room))
       nameRow.textContent = ''
-      nameRow.append(deskMark(next.certainty ?? 'reconstructed'), title, clock, count)
+      const entry = next.catalogue ?? null
+      nameRow.append(deskMark(next.certainty ?? 'reconstructed'), ...(entry ? [numeral] : []), title, clock, count)
+      nameRow.dataset['catalogue'] = String(Boolean(entry))
+      numeral.textContent = entry?.number ?? ''
       title.textContent = next.title
       title.lang = language
-      clock.textContent = ''
-      clock.hidden = true
+      clock.textContent = entry?.date ?? ''
+      clock.hidden = !entry?.date
       // A COUNT OF ONE IS NOISE: a work alone in its set carries no count
       const place = next.set && next.set.of > 1
         ? say(WORD.place()).replace('{n}', String(next.set.at)).replace('{total}', String(next.set.of))
         : ''
-      count.textContent = place
-      count.hidden = !place
+      count.textContent = entry ? entry.where : place
+      count.hidden = !count.textContent
       line.textContent = next.line ?? ''
       line.hidden = !next.line
       line.lang = language

@@ -128,14 +128,20 @@ export function createVitrine(options: {
   const namingDot = make('span', 'vitrine-name-dot')
   namingDot.setAttribute('aria-hidden', 'true')
   const namingText = make('span', 'vitrine-name-text')
-  naming.append(namingDot, namingText)
+  // the number cast on the work's frame, before its name
+  const namingNumber = make('span', 'vitrine-name-number')
+  namingNumber.hidden = true
+  naming.append(namingDot, namingNumber, namingText)
+  // the catalogue's own row under the name: the date and where the original is
+  const entryRow = make('p', 'vitrine-catalogue')
+  entryRow.hidden = true
   const line = make('p', 'vitrine-line')
   setRegister(line, 'label')
   const body = make('div', 'vitrine-body')
   const words = make('div', 'vitrine-words')
   const aside = make('div', 'vitrine-aside')
   const after = make('div', 'vitrine-words vitrine-after')
-  body.append(naming, line, words, aside, after)
+  body.append(naming, entryRow, line, words, aside, after)
   const controls = make('div', 'vitrine-controls')
   const foot = make('div', 'vitrine-foot')
   /** THE CARD IS A SHEET ON THE PHONE. The grabber raises it over the work
@@ -330,7 +336,7 @@ export function createVitrine(options: {
   /* the words change after the layout that placed them: a payload lays in its
      steps, a label opens, a face arrives */
   const wordsResized = new ResizeObserver(() => { if (open) trimWords() })
-  for (const part of [naming, line, words, aside, after]) wordsResized.observe(part)
+  for (const part of [naming, entryRow, line, words, aside, after]) wordsResized.observe(part)
 
   /** The name at the head of the card, and the card's accessible name with
    * it: a window that named itself twice would be read twice. The mark
@@ -432,6 +438,7 @@ export function createVitrine(options: {
       kind: next.payload?.kind ?? '',
       certainty: next.certainty ?? null,
       set: next.set ?? null,
+      catalogue: next.catalogue ?? null,
       room: options.room?.() ?? '',
       words: [...next.card, ...(paged ? [aside] : []), ...(next.after ?? [])],
       record: roles.get('record') ?? null,
@@ -555,6 +562,12 @@ export function createVitrine(options: {
       root.dataset['exhibit'] = next.id
       card.dataset['exhibit'] = next.id
       nameIt(next.title)
+      const entry = next.catalogue ?? null
+      namingNumber.textContent = entry?.number ?? ''
+      namingNumber.hidden = !entry
+      entryRow.textContent = entry ? [entry.date, entry.where].filter(Boolean).join(' · ') : ''
+      entryRow.hidden = !entry
+      entryRow.lang = options.lang()
       line.textContent = next.line ?? ''
       line.hidden = !next.line
       line.lang = options.lang()

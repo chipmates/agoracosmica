@@ -93,6 +93,28 @@
   background: color-mix(in srgb, var(--na-starlight) 30%, transparent);
 }
 #wing[data-desk~='closelook'] .desk-clb .desk-count[hidden] { display: none; }
+/* A WORK OF THE HANG IS ITS CATALOGUE ENTRY: the number cast on its frame
+   before its name, in the museum's own figures and the frame's bronze, its
+   date where a clock stands, and where the original is in the count's place,
+   set as the entry's second row under the name, so every entry of the wall
+   reads the same way and a long holder wraps inside its own row. */
+#wing[data-desk~='closelook'] .desk-clb .desk-name[data-catalogue='true'] { flex-wrap: wrap; row-gap: 0; }
+#wing[data-desk~='closelook'] .desk-clb .desk-number {
+  font: 400 1.25rem/1.625rem var(--press-display);
+  font-variant-numeric: oldstyle-nums proportional-nums;
+  color: var(--desk-clock);
+  margin-right: -3px;
+}
+#wing[data-desk~='closelook'] .desk-clb .desk-name[data-catalogue='true'] .desk-count {
+  flex: 1 0 100%;
+  margin: -2px 0 0;
+  padding-left: 29px;
+  white-space: normal;
+  line-height: 1.375rem;
+  color: var(--desk-quiet);
+  font-variant-numeric: normal;
+}
+#wing[data-desk~='closelook'] .desk-clb .desk-name[data-catalogue='true'] .desk-count::before { content: none; }
 /* THE LINE HOLDS TWO ROWS FREE in every language and takes a third where a
    language needs one: the band grows by that one row and the stage gives it
    back, which is the only case in which a close look moves the picture. */
