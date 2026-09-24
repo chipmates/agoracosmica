@@ -132,8 +132,31 @@ const WATER_SCREW: WearRule[] = [
   },
 ]
 
+/** THE AERIAL SCREW: the ring of the deck four people walk as they push the
+ * bars round, scuffed darker, and the head of the bearing block where the
+ * grease the mast turns in runs down. */
+const AERIAL_SCREW: WearRule[] = [
+  {
+    parts: id => id === 'platform' || id.startsWith('deck-plank-'),
+    cuts: [
+      { normal: [1, 0, 0], at: range(-1.5, 1.5, .1), facing: [0, 1, 0] },
+      { normal: [0, 0, 1], at: range(-1.5, 1.5, .1), facing: [0, 1, 0] },
+    ],
+    tint: (p, n) => {
+      if (n.y < .5) return ONE
+      const d = Math.hypot(p.x, p.z)
+      return mix(ONE, [.84, .82, .78], smooth(.72, .95, d) * (1 - smooth(1.3, 1.52, d)))
+    },
+  },
+  {
+    parts: id => id === 'bearing',
+    cuts: [{ normal: [0, 1, 0], at: [.68, .73, .765] }],
+    tint: (p, n) => mix(ONE, n.y > .5 ? [.7, .66, .6] : [.8, .76, .7], smooth(.66, .78, p.y)),
+  },
+]
+
 export function wearFor(slug: string): readonly WearRule[] {
-  return slug === 'water-lifting-screw' ? WATER_SCREW : []
+  return slug === 'water-lifting-screw' ? WATER_SCREW : slug === 'aerial-screw' ? AERIAL_SCREW : []
 }
 
 /** Cut a flat-listed surface by parallel planes n.p = offset, every

@@ -5,6 +5,7 @@ import {
 import type { TierName } from '../../../stack'
 import type { Coordinates, PartSpec } from './types'
 import { createGlassCoverShell } from './glass-cover'
+import { sailGeometry } from './sail'
 
 const TAU = Math.PI * 2
 const at = (p: readonly number[], n: number): number => p[n] ?? 0
@@ -27,7 +28,7 @@ export interface MutableSweep {
 }
 
 export function createMutableSweep(
-  initial: Coordinates, radius: number, rope = false, tier: TierName = 'standard', innerRadius = 0,
+  initial: Coordinates, radius: number, rope = false, tier: TierName = 'standard', innerRadius = 0, sidesOverride = 0,
 ): MutableSweep {
   if (initial.length < 2) throw new Error('A swept part needs two centreline nodes')
   const sourceCount = initial.length
@@ -39,7 +40,8 @@ export function createMutableSweep(
   const rings = 1 + subdivisions.reduce((sum, n) => sum + n, 0)
   // Millimetre threads retain all 3,201 dossier nodes. Their circular section
   // is smaller than a pixel at the bench and needs fewer radial samples.
-  const sides = rope ? count(tier, 18, 12, 9) : radius <= 0.002 ? count(tier, 12, 8, 6) : count(tier, 24, 16, 12)
+  const sides = sidesOverride > 0 ? sidesOverride
+    : rope ? count(tier, 18, 12, 9) : radius <= 0.002 ? count(tier, 12, 8, 6) : count(tier, 24, 16, 12)
   const stride = sides + 1, wallVertices = rings * stride
   const hollow = innerRadius > 0
   const vertices = wallVertices * (hollow ? 2 : 1) + (hollow ? 0 : 2)
@@ -148,9 +150,19 @@ export function createMutableSweep(
 
 /** A static sweep uses the same exact surface construction as a moving one. */
 export function sweptProfile(
-  points: Coordinates, radius: number, rope = false, tier: TierName = 'standard', innerRadius = 0,
+  points: Coordinates, radius: number, rope = false, tier: TierName = 'standard', innerRadius = 0, sides = 0,
 ): BufferGeometry {
-  return createMutableSweep(points, radius, rope, tier, innerRadius).geometry
+  return createMutableSweep(points, radius, rope, tier, innerRadius, sides).geometry
+}
+
+/** The aerial screw's cane, rim wire and cords are a few centimetres across
+ * and seen from metres away: fewer sides carry their round. */
+function thinSides(slug: string, material: string, tier: TierName): number {
+  if (slug !== 'aerial-screw') return 0
+  if (/cane/.test(material)) return count(tier, 8, 7, 6)
+  if (/wire/.test(material)) return count(tier, 10, 8, 6)
+  if (/rope|hemp/.test(material)) return count(tier, 12, 9, 6)
+  return 0
 }
 
 function polygon(values: Coordinates): Vector2[] {
@@ -457,7 +469,10 @@ export function geometryForPart(part: PartSpec, tier: TierName = 'standard', slu
     }
     case 'profile': geometry = extrudeProfile(part, tier); break
     case 'mesh': {
-      geometry = exactMesh(part, slug === 'aerial-screw' && part.id === 'sail', tier)
+      // a sewn sail is built from its own definition; its listed vertices are
+      // the same surface sampled coarsely, for the checks that read them
+      geometry = s?.helicoid ? sailGeometry(s.helicoid, tier)
+        : exactMesh(part, slug === 'aerial-screw' && part.id === 'sail', tier)
       if (part.id === 'wind-shield' && /glass/.test(part.material.class)) {
         const outer = geometry
         geometry = createGlassCoverShell(outer, required(d.nominal_thickness, 'nominal_thickness'))
@@ -469,7 +484,16 @@ export function geometryForPart(part: PartSpec, tier: TierName = 'standard', slu
       const points = s?.centreline_m ?? d.centreline
       if (!points) throw new Error(`Missing centreline ${part.id}`)
       const radius = s?.outer_radius_m ?? s?.radius_m ?? d.outer_radius ?? required(d.radius, 'radius')
-      geometry = sweptProfile(points, radius, /rope|hemp|thread/.test(part.material.class), tier, s?.inner_radius_m ?? d.inner_radius ?? 0)
+      const rope = /rope|hemp|thread/.test(part.material.class)
+      geometry = sweptProfile(points, radius, rope, tier, s?.inner_radius_m ?? d.inner_radius ?? 0, thinSides(slug, part.material.class, tier))
+      // a cane's nodes ride in the vertex colour, one tone per listed point
+      if (s?.tones && !rope && s.tones.length === points.length) {
+        const wall = geometry.getAttribute('position').count - 2, stride = wall / points.length
+        const tones: number[] = []
+        for (let v = 0; v < wall; v++) tones.push(s.tones[Math.floor(v / stride)]!)
+        tones.push(s.tones[0]!, s.tones[points.length - 1]!)
+        geometry.setAttribute('color', toneAttribute(tones))
+      }
       break
     }
     default: throw new Error(`Unsupported numerical dossier shape: ${String(kind)} (${part.id})`)

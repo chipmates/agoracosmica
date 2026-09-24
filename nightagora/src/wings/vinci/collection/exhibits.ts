@@ -175,7 +175,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
         if (!(child instanceof Mesh) || Array.isArray(child.material)) return
         if (/linen/.test(child.material.name) && !/thread/.test(child.material.name) && child.material instanceof MeshStandardNodeMaterial) {
           const thick = child.material
-          child.material = translucentCloth(thick)
+          child.material = translucentCloth(thick, child.geometry.hasAttribute('layers'))
           teardown.push(() => { child.material.dispose(); thick.dispose() })
           if (new URLSearchParams(location.search).has('hallrig')) console.warn(`hall cloth: ${thick.name} made thin`)
         }

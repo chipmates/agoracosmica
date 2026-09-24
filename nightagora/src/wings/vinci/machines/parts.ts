@@ -178,6 +178,8 @@ export function loadMachineMaterial(stack: Stack, name: string): Promise<Materia
 const libraryName = (material: string): string => {
   // new work in planed and hewn oak, not weathered timber
   if (/planed oak|hewn oak|oak peg|oak grip/.test(material)) return 'oak-veneer-light'
+  // a cane's skin runs in fine straight fibres, as the veneer's grain does
+  if (/cane/.test(material)) return 'oak-veneer-light'
   // a hide sealed with pitch, and the pitch the tube is bedded in
   if (/pitched/.test(material)) return 'leather-worn'
   if (/thread/.test(material)) return 'rope'
@@ -313,6 +315,10 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
       // the set's cast pits, which read as concrete on a crank's face.
       ...set, normalStrength: .3, scale: [.3, .3], scales: [.25, .045, .0012],
       detail: {...set.detail, macro: .25, macroContrast: .2, mid: .45, micro: .2},
+    } : /cane/.test(name) ? {
+      // a cane's skin: long fine fibres, almost no relief
+      ...set, normalStrength: .12, scales: [.3, .03, .0008],
+      grain: set.grain ? {...set.grain, relief: .06, shade: .1, sheen: .3} : null,
     } : /pitched/.test(name) ? {
       // A hide sewn into a hose and sealed with pitch: a close crinkle over a
       // smooth skin, not an upholstery's creases, which read as links.
@@ -356,6 +362,19 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
       const flax = new Color('#c4b89c')
       const weave = detail.albedo.dot(vec3(0.2126, 0.7152, 0.0722))
       material.colorNode = vec3(flax.r, flax.g, flax.b).mul(weave).mul(detail.occlusion)
+      // a sewn cloth carries its rows of stitches in the vertex colour
+      if (/starched/.test(name)) material.colorNode = material.colorNode.mul(attribute('color', 'vec3'))
+    }
+    if (/cane/.test(name)) {
+      // GENERATED straw tint over the CC0 veneer's fibres at a third of their
+      // contrast: a cane's skin is hard and glassy, its nodes ride in the
+      // vertex colour, and a rod this thin needs the key's edge to read.
+      const straw = new Color('#b59c68')
+      const fibres = detail.albedo.dot(vec3(.2126, .7152, .0722))
+      const edge = keyRim(.7)
+      material.colorNode = vec3(straw.r, straw.g, straw.b).mul(fibres.mul(.35).add(.72)).mul(detail.occlusion)
+        .mul(attribute('color', 'vec3')).mul(edge.add(1))
+      material.roughnessNode = detail.roughness.mul(.45).clamp(.26, .42)
     }
     if (glass || water) {
       material.side = glass ? FrontSide : DoubleSide
@@ -517,7 +536,7 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
     if (/ink/.test(name)) material.colorNode = vec3(0.009, 0.007, 0.005).mul(detail.albedo)
     if (/paper/.test(name)) material.colorNode = vec3(0.69, 0.65, 0.55).mul(detail.albedo)
     if (/lead/.test(name)) material.colorNode = vec3(0.16, 0.17, 0.18).mul(detail.albedo)
-    if (['revolving-crane', 'lathe', 'parachute'].includes(dossier.slug) && /rope|hemp/.test(name)) {
+    if (['revolving-crane', 'lathe', 'parachute', 'aerial-screw'].includes(dossier.slug) && /rope|hemp/.test(name)) {
       // The exact 10 mm swept cord keeps its silhouette. Its three-lobed
       // geometry carries the twist; a coarse cloth-like normal buries it.
       const hemp = new Color(dossier.slug === 'revolving-crane' ? '#ad9367' : '#c5ae80')
@@ -529,7 +548,7 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
     return material
   }
   await Promise.all(names.map(async name => {
-    const key = /ink|glass|water|lead|paper|oak peg|hewn oak|oak grip|bedding|lining|scoured/.test(name) ? name : libraryName(name)
+    const key = /ink|glass|water|lead|paper|oak peg|hewn oak|oak grip|bedding|lining|scoured|cane/.test(name) ? name : libraryName(name)
     let surface = surfaceCache.get(key)
     if (!surface) { surface = makeSurface(name); surfaceCache.set(key, surface) }
     materials.set(name, await surface)

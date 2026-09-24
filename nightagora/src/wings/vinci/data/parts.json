@@ -7,109 +7,793 @@
   },
   "parts": {
     "aerial-screw": {
+      "deck-plank-0": {
+        "en": "Deck plank",
+        "de": "Bodenbrett"
+      },
+      "deck-plank-1": {
+        "en": "Deck plank",
+        "de": "Bodenbrett"
+      },
+      "deck-plank-2": {
+        "en": "Deck plank",
+        "de": "Bodenbrett"
+      },
+      "deck-plank-3": {
+        "en": "Deck plank",
+        "de": "Bodenbrett"
+      },
+      "deck-plank-4": {
+        "en": "Deck plank",
+        "de": "Bodenbrett"
+      },
       "platform": {
         "en": "Platform",
         "de": "Plattform"
+      },
+      "deck-plank-6": {
+        "en": "Deck plank",
+        "de": "Bodenbrett"
+      },
+      "deck-plank-7": {
+        "en": "Deck plank",
+        "de": "Bodenbrett"
+      },
+      "deck-plank-8": {
+        "en": "Deck plank",
+        "de": "Bodenbrett"
+      },
+      "deck-plank-9": {
+        "en": "Deck plank",
+        "de": "Bodenbrett"
+      },
+      "deck-plank-10": {
+        "en": "Deck plank",
+        "de": "Bodenbrett"
+      },
+      "deck-joist-0": {
+        "en": "Joist under the deck",
+        "de": "Balken unter dem Boden"
+      },
+      "deck-joist-1": {
+        "en": "Joist under the deck",
+        "de": "Balken unter dem Boden"
+      },
+      "deck-joist-2": {
+        "en": "Joist under the deck",
+        "de": "Balken unter dem Boden"
+      },
+      "deck-peg-0-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-1-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-2-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-2-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-2-2": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-3-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-3-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-3-2": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-4-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-4-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-4-2": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-5-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-5-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-5-2": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-6-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-6-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-6-2": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-7-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-7-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-7-2": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-8-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-8-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-8-2": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-9-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-peg-10-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-rim-0": {
+        "en": "Rim of the platform",
+        "de": "Rand der Plattform"
+      },
+      "deck-dog-0": {
+        "en": "Iron dog across the joint",
+        "de": "Eisenklammer über der Fuge"
+      },
+      "deck-rim-1": {
+        "en": "Rim of the platform",
+        "de": "Rand der Plattform"
+      },
+      "deck-dog-1": {
+        "en": "Iron dog across the joint",
+        "de": "Eisenklammer über der Fuge"
+      },
+      "deck-rim-2": {
+        "en": "Rim of the platform",
+        "de": "Rand der Plattform"
+      },
+      "deck-dog-2": {
+        "en": "Iron dog across the joint",
+        "de": "Eisenklammer über der Fuge"
+      },
+      "deck-rim-3": {
+        "en": "Rim of the platform",
+        "de": "Rand der Plattform"
+      },
+      "deck-dog-3": {
+        "en": "Iron dog across the joint",
+        "de": "Eisenklammer über der Fuge"
+      },
+      "deck-rim-4": {
+        "en": "Rim of the platform",
+        "de": "Rand der Plattform"
+      },
+      "deck-dog-4": {
+        "en": "Iron dog across the joint",
+        "de": "Eisenklammer über der Fuge"
+      },
+      "deck-rim-5": {
+        "en": "Rim of the platform",
+        "de": "Rand der Plattform"
+      },
+      "deck-dog-5": {
+        "en": "Iron dog across the joint",
+        "de": "Eisenklammer über der Fuge"
+      },
+      "deck-rim-6": {
+        "en": "Rim of the platform",
+        "de": "Rand der Plattform"
+      },
+      "deck-dog-6": {
+        "en": "Iron dog across the joint",
+        "de": "Eisenklammer über der Fuge"
+      },
+      "deck-rim-7": {
+        "en": "Rim of the platform",
+        "de": "Rand der Plattform"
+      },
+      "deck-dog-7": {
+        "en": "Iron dog across the joint",
+        "de": "Eisenklammer über der Fuge"
+      },
+      "deck-rim-peg-0-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-rim-peg-0-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-rim-peg-1-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-rim-peg-1-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-rim-peg-2-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-rim-peg-2-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-rim-peg-3-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-rim-peg-3-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-rim-peg-4-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-rim-peg-4-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-rim-peg-5-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-rim-peg-5-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-rim-peg-6-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-rim-peg-6-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-rim-peg-7-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-rim-peg-7-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-rim-peg-8-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-rim-peg-8-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-rim-peg-9-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-rim-peg-9-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-rim-peg-10-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "deck-rim-peg-10-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
       },
       "bearing": {
         "en": "Plain bearing",
         "de": "Gleitlager"
       },
+      "bearing-plate": {
+        "en": "Iron plate round the mast",
+        "de": "Eisenplatte um den Mast"
+      },
+      "bearing-plate-nail-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bearing-plate-nail-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bearing-plate-nail-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bearing-plate-nail-3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bearing-band-0": {
+        "en": "Iron band of the bearing",
+        "de": "Eisenband des Lagers"
+      },
+      "bearing-band-nail-0-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bearing-band-nail-0-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bearing-band-nail-0-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bearing-band-nail-0-3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bearing-band-1": {
+        "en": "Iron band of the bearing",
+        "de": "Eisenband des Lagers"
+      },
+      "bearing-band-nail-1-0": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bearing-band-nail-1-1": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bearing-band-nail-1-2": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "bearing-band-nail-1-3": {
+        "en": "Nail",
+        "de": "Nagel"
+      },
+      "mast-step": {
+        "en": "Iron step under the mast",
+        "de": "Eiserne Pfanne unter dem Mast"
+      },
+      "bearing-knee-0": {
+        "en": "Knee of the bearing",
+        "de": "Knie des Lagers"
+      },
+      "bearing-knee-peg-0-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "bearing-knee-peg-0-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "bearing-knee-1": {
+        "en": "Knee of the bearing",
+        "de": "Knie des Lagers"
+      },
+      "bearing-knee-peg-1-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "bearing-knee-peg-1-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "bearing-knee-2": {
+        "en": "Knee of the bearing",
+        "de": "Knie des Lagers"
+      },
+      "bearing-knee-peg-2-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "bearing-knee-peg-2-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "bearing-knee-3": {
+        "en": "Knee of the bearing",
+        "de": "Knie des Lagers"
+      },
+      "bearing-knee-peg-3-0": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
+      "bearing-knee-peg-3-1": {
+        "en": "Oak peg",
+        "de": "Eichennagel"
+      },
       "mast": {
         "en": "Mast",
         "de": "Mast"
       },
-      "sail": {
-        "en": "Starched linen spiral",
-        "de": "Spirale aus gestärktem Leinen"
+      "mast-journal": {
+        "en": "Turned foot of the mast",
+        "de": "Gedrechselter Mastfuß"
       },
-      "outer-wire": {
-        "en": "Iron rim",
-        "de": "Rand aus Eisendraht"
+      "mast-pivot": {
+        "en": "Iron pivot of the mast",
+        "de": "Eiserner Zapfen des Masts"
       },
-      "rib-0": {
-        "en": "Cane rib",
-        "de": "Rohrstab"
+      "mast-hoop-0": {
+        "en": "Iron hoop",
+        "de": "Eisenreif"
       },
-      "rib-1": {
-        "en": "Cane rib",
-        "de": "Rohrstab"
+      "mast-hoop-1": {
+        "en": "Iron hoop",
+        "de": "Eisenreif"
       },
-      "rib-2": {
-        "en": "Cane rib",
-        "de": "Rohrstab"
+      "mast-cap": {
+        "en": "Iron cap of the mast",
+        "de": "Eisenkappe des Masts"
       },
-      "rib-3": {
-        "en": "Cane rib",
-        "de": "Rohrstab"
+      "capstan-head": {
+        "en": "Head of the push bars",
+        "de": "Kopf der Schubstangen"
       },
-      "rib-4": {
-        "en": "Cane rib",
-        "de": "Rohrstab"
+      "capstan-hoop-0": {
+        "en": "Iron hoop",
+        "de": "Eisenreif"
       },
-      "rib-5": {
-        "en": "Cane rib",
-        "de": "Rohrstab"
+      "capstan-hoop-1": {
+        "en": "Iron hoop",
+        "de": "Eisenreif"
       },
-      "rib-6": {
-        "en": "Cane rib",
-        "de": "Rohrstab"
+      "capstan-pin-0": {
+        "en": "Iron pin of a push bar",
+        "de": "Eisenstift einer Schubstange"
       },
-      "rib-7": {
-        "en": "Cane rib",
-        "de": "Rohrstab"
+      "capstan-wedge-0": {
+        "en": "Wedge",
+        "de": "Keil"
       },
-      "rib-8": {
-        "en": "Cane rib",
-        "de": "Rohrstab"
+      "capstan-pin-1": {
+        "en": "Iron pin of a push bar",
+        "de": "Eisenstift einer Schubstange"
       },
-      "rib-9": {
-        "en": "Cane rib",
-        "de": "Rohrstab"
+      "capstan-wedge-1": {
+        "en": "Wedge",
+        "de": "Keil"
       },
-      "rib-10": {
-        "en": "Cane rib",
-        "de": "Rohrstab"
+      "capstan-pin-2": {
+        "en": "Iron pin of a push bar",
+        "de": "Eisenstift einer Schubstange"
       },
-      "rib-11": {
-        "en": "Cane rib",
-        "de": "Rohrstab"
+      "capstan-wedge-2": {
+        "en": "Wedge",
+        "de": "Keil"
       },
-      "rib-12": {
-        "en": "Cane rib",
-        "de": "Rohrstab"
+      "capstan-pin-3": {
+        "en": "Iron pin of a push bar",
+        "de": "Eisenstift einer Schubstange"
+      },
+      "capstan-wedge-3": {
+        "en": "Wedge",
+        "de": "Keil"
       },
       "push-bar-0": {
         "en": "Push bar",
         "de": "Schubstange"
       },
-      "stay-0": {
-        "en": "Rope brace",
-        "de": "Seilstrebe"
+      "grip-0": {
+        "en": "Grip of the push bar",
+        "de": "Griff der Schubstange"
+      },
+      "stay-hitch-0": {
+        "en": "Hitch of the rope brace",
+        "de": "Knoten der Seilstrebe"
       },
       "push-bar-1": {
         "en": "Push bar",
         "de": "Schubstange"
       },
-      "stay-1": {
-        "en": "Rope brace",
-        "de": "Seilstrebe"
+      "grip-1": {
+        "en": "Grip of the push bar",
+        "de": "Griff der Schubstange"
+      },
+      "stay-hitch-1": {
+        "en": "Hitch of the rope brace",
+        "de": "Knoten der Seilstrebe"
       },
       "push-bar-2": {
         "en": "Push bar",
         "de": "Schubstange"
       },
-      "stay-2": {
-        "en": "Rope brace",
-        "de": "Seilstrebe"
+      "grip-2": {
+        "en": "Grip of the push bar",
+        "de": "Griff der Schubstange"
+      },
+      "stay-hitch-2": {
+        "en": "Hitch of the rope brace",
+        "de": "Knoten der Seilstrebe"
       },
       "push-bar-3": {
         "en": "Push bar",
         "de": "Schubstange"
       },
+      "grip-3": {
+        "en": "Grip of the push bar",
+        "de": "Griff der Schubstange"
+      },
+      "stay-hitch-3": {
+        "en": "Hitch of the rope brace",
+        "de": "Knoten der Seilstrebe"
+      },
+      "brace-collar": {
+        "en": "Iron band for the rope braces",
+        "de": "Eisenband für die Seilstreben"
+      },
+      "brace-eye-0": {
+        "en": "Eye for a rope brace",
+        "de": "Öse für eine Seilstrebe"
+      },
+      "stay-0": {
+        "en": "Rope brace",
+        "de": "Seilstrebe"
+      },
+      "brace-eye-1": {
+        "en": "Eye for a rope brace",
+        "de": "Öse für eine Seilstrebe"
+      },
+      "stay-1": {
+        "en": "Rope brace",
+        "de": "Seilstrebe"
+      },
+      "brace-eye-2": {
+        "en": "Eye for a rope brace",
+        "de": "Öse für eine Seilstrebe"
+      },
+      "stay-2": {
+        "en": "Rope brace",
+        "de": "Seilstrebe"
+      },
+      "brace-eye-3": {
+        "en": "Eye for a rope brace",
+        "de": "Öse für eine Seilstrebe"
+      },
       "stay-3": {
         "en": "Rope brace",
         "de": "Seilstrebe"
+      },
+      "rib-0": {
+        "en": "Cane rib",
+        "de": "Rohrstab"
+      },
+      "rib-0-outer": {
+        "en": "Cane rib",
+        "de": "Rohrstab"
+      },
+      "rib-0-splice-0": {
+        "en": "Binding of the splice",
+        "de": "Bund der Verlängerung"
+      },
+      "rib-0-splice-1": {
+        "en": "Binding of the splice",
+        "de": "Bund der Verlängerung"
+      },
+      "rib-root-0": {
+        "en": "Whipping at the cane's root",
+        "de": "Bund am Fuß des Rohrstabs"
+      },
+      "rib-tip-0": {
+        "en": "Lashing to the iron rim",
+        "de": "Bund am Eisenrand"
+      },
+      "rib-1": {
+        "en": "Cane rib",
+        "de": "Rohrstab"
+      },
+      "rib-1-outer": {
+        "en": "Cane rib",
+        "de": "Rohrstab"
+      },
+      "rib-1-splice-0": {
+        "en": "Binding of the splice",
+        "de": "Bund der Verlängerung"
+      },
+      "rib-1-splice-1": {
+        "en": "Binding of the splice",
+        "de": "Bund der Verlängerung"
+      },
+      "rib-root-1": {
+        "en": "Whipping at the cane's root",
+        "de": "Bund am Fuß des Rohrstabs"
+      },
+      "rib-tip-1": {
+        "en": "Lashing to the iron rim",
+        "de": "Bund am Eisenrand"
+      },
+      "rib-2": {
+        "en": "Cane rib",
+        "de": "Rohrstab"
+      },
+      "rib-2-outer": {
+        "en": "Cane rib",
+        "de": "Rohrstab"
+      },
+      "rib-2-splice-0": {
+        "en": "Binding of the splice",
+        "de": "Bund der Verlängerung"
+      },
+      "rib-2-splice-1": {
+        "en": "Binding of the splice",
+        "de": "Bund der Verlängerung"
+      },
+      "rib-root-2": {
+        "en": "Whipping at the cane's root",
+        "de": "Bund am Fuß des Rohrstabs"
+      },
+      "rib-tip-2": {
+        "en": "Lashing to the iron rim",
+        "de": "Bund am Eisenrand"
+      },
+      "rib-3": {
+        "en": "Cane rib",
+        "de": "Rohrstab"
+      },
+      "rib-3-outer": {
+        "en": "Cane rib",
+        "de": "Rohrstab"
+      },
+      "rib-3-splice-0": {
+        "en": "Binding of the splice",
+        "de": "Bund der Verlängerung"
+      },
+      "rib-3-splice-1": {
+        "en": "Binding of the splice",
+        "de": "Bund der Verlängerung"
+      },
+      "rib-root-3": {
+        "en": "Whipping at the cane's root",
+        "de": "Bund am Fuß des Rohrstabs"
+      },
+      "rib-tip-3": {
+        "en": "Lashing to the iron rim",
+        "de": "Bund am Eisenrand"
+      },
+      "rib-4": {
+        "en": "Cane rib",
+        "de": "Rohrstab"
+      },
+      "rib-root-4": {
+        "en": "Whipping at the cane's root",
+        "de": "Bund am Fuß des Rohrstabs"
+      },
+      "rib-tip-4": {
+        "en": "Lashing to the iron rim",
+        "de": "Bund am Eisenrand"
+      },
+      "rib-5": {
+        "en": "Cane rib",
+        "de": "Rohrstab"
+      },
+      "rib-root-5": {
+        "en": "Whipping at the cane's root",
+        "de": "Bund am Fuß des Rohrstabs"
+      },
+      "rib-tip-5": {
+        "en": "Lashing to the iron rim",
+        "de": "Bund am Eisenrand"
+      },
+      "rib-6": {
+        "en": "Cane rib",
+        "de": "Rohrstab"
+      },
+      "rib-root-6": {
+        "en": "Whipping at the cane's root",
+        "de": "Bund am Fuß des Rohrstabs"
+      },
+      "rib-tip-6": {
+        "en": "Lashing to the iron rim",
+        "de": "Bund am Eisenrand"
+      },
+      "rib-7": {
+        "en": "Cane rib",
+        "de": "Rohrstab"
+      },
+      "rib-root-7": {
+        "en": "Whipping at the cane's root",
+        "de": "Bund am Fuß des Rohrstabs"
+      },
+      "rib-tip-7": {
+        "en": "Lashing to the iron rim",
+        "de": "Bund am Eisenrand"
+      },
+      "rib-8": {
+        "en": "Cane rib",
+        "de": "Rohrstab"
+      },
+      "rib-root-8": {
+        "en": "Whipping at the cane's root",
+        "de": "Bund am Fuß des Rohrstabs"
+      },
+      "rib-tip-8": {
+        "en": "Lashing to the iron rim",
+        "de": "Bund am Eisenrand"
+      },
+      "rib-9": {
+        "en": "Cane rib",
+        "de": "Rohrstab"
+      },
+      "rib-root-9": {
+        "en": "Whipping at the cane's root",
+        "de": "Bund am Fuß des Rohrstabs"
+      },
+      "rib-tip-9": {
+        "en": "Lashing to the iron rim",
+        "de": "Bund am Eisenrand"
+      },
+      "rib-10": {
+        "en": "Cane rib",
+        "de": "Rohrstab"
+      },
+      "rib-root-10": {
+        "en": "Whipping at the cane's root",
+        "de": "Bund am Fuß des Rohrstabs"
+      },
+      "rib-tip-10": {
+        "en": "Lashing to the iron rim",
+        "de": "Bund am Eisenrand"
+      },
+      "rib-11": {
+        "en": "Cane rib",
+        "de": "Rohrstab"
+      },
+      "rib-root-11": {
+        "en": "Whipping at the cane's root",
+        "de": "Bund am Fuß des Rohrstabs"
+      },
+      "rib-tip-11": {
+        "en": "Lashing to the iron rim",
+        "de": "Bund am Eisenrand"
+      },
+      "rib-12": {
+        "en": "Cane rib",
+        "de": "Rohrstab"
+      },
+      "rib-root-12": {
+        "en": "Whipping at the cane's root",
+        "de": "Bund am Fuß des Rohrstabs"
+      },
+      "rib-tip-12": {
+        "en": "Lashing to the iron rim",
+        "de": "Bund am Eisenrand"
+      },
+      "outer-wire": {
+        "en": "Iron rim",
+        "de": "Rand aus Eisendraht"
+      },
+      "sail": {
+        "en": "Starched linen spiral",
+        "de": "Spirale aus gestärktem Leinen"
       }
     },
     "parachute": {

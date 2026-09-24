@@ -1,4 +1,5 @@
 import type { Box3, Group, Mesh } from 'three/webgpu'
+import type { HelicoidSpec } from './sail'
 
 /** The dossier's SI values are kept verbatim. C means a modern assumption. */
 export type Certainty = 'A' | 'B' | 'C' | 'U'
@@ -19,6 +20,10 @@ export interface ShapeSpec {
   plane?: string
   extrude_axis?: string
   extrude_depth_m?: number
+  /** a sewn helical sail's own definition */
+  helicoid?: HelicoidSpec
+  /** a vertex tone per centreline point */
+  tones?: readonly number[]
 }
 export interface Dimensions {
   x?: number; y?: number; z?: number
