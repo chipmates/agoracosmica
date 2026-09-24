@@ -166,6 +166,10 @@ const VIEWPOINT_PARTS: Record<MachineSlug, { drive: string | null; working: stri
   'camera-obscura': { drive: 'aperture-plate', working: 'screen' },
 }
 
+/** The mill's crank and small gear stand on the far side of the whole view's
+ * bearing, so its stage turns it round to face the steps that name them. */
+const STAGE_TURN: Partial<Record<MachineSlug, number>> = { 'rolling-mill': Math.PI }
+
 /** A body built outside its record names some parts its own way: these are
  * the dossier's parts under the names that body gives them. */
 const STORE_NODE_NAMES: Partial<Record<MachineSlug, Record<string, string>>> = {
@@ -310,6 +314,7 @@ export function createVinciMachinePayload(options: {
       clock: CONTROLS.machine.clock[language],
     },
     nodeNames: STORE_NODE_NAMES[slug],
+    turn: STAGE_TURN[slug],
     partNames: new Map(Object.entries(PARTS[slug] ?? {}).map(([id, words]) => [id, words[language]])),
     screens: new Set(Object.entries(PARTS[slug] ?? {}).filter(([, words]) => words.screen === true).map(([id]) => id)),
     light: options.light,

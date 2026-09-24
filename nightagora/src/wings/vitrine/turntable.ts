@@ -73,6 +73,9 @@ export interface TurntableOptions {
   /** True once the eye stands where it walked for this machine: the room
    * draws the walk until then, and the body is lent only after it. */
   standing?(): boolean
+  /** The body's turn about the vertical on the stage alone, radians, so the
+   * side its steps speak of faces the whole view. The room is not turned. */
+  turn?: number
 }
 
 const DEG = Math.PI / 180
@@ -674,7 +677,7 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
     body.animate(0, 0)
     table.add(object)
     object.position.set(0, 0, 0)
-    object.quaternion.identity()
+    object.quaternion.setFromAxisAngle(new Vector3(0, 1, 0), options.turn ?? 0)
     object.visible = true
     object.updateMatrixWorld(true)
     const box = new Box3().setFromObject(object, true)
