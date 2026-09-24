@@ -280,8 +280,12 @@ function outsideMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial {
   const east = P.x, north = P.z.negate()
   const copingFoot = select(east.lessThan(OUTLINE.nave.west + .01), float(OUTLINE.bay.top + PARAPET.rise - PARAPET.drip), float(OUTLINE.nave.top + PARAPET.rise - PARAPET.drip))
   const below = copingFoot.sub(P.y)
-  const streak = smoothstep(.2, .75, mx_noise_float(vec3(u.mul(4.7), P.y.mul(.3), 3.1)).mul(.5).add(.5))
-    .mul(smoothstep(-.01, .05, below)).mul(smoothstep(2.8, .1, below))
+  // the coping sheds unevenly: runs gather along some stretches and not
+  // others, and each falls its own length
+  const gather = smoothstep(.35, .75, mx_noise_float(vec3(u.mul(.7), 11.3, 2.9)).mul(.5).add(.5))
+  const reach = mx_noise_float(vec3(u.mul(2.3), 4.2, 7.7)).mul(.5).add(.5).mul(2.4).add(.6)
+  const streak = smoothstep(.3, .8, mx_noise_float(vec3(u.mul(4.7), P.y.mul(.3), 3.1)).mul(.5).add(.5)).mul(gather.mul(.8).add(.2))
+    .mul(smoothstep(-.01, .05, below)).mul(smoothstep(reach, .1, below))
   let run: N = float(0)
   for (const s of SPOUTS) {
     const fall = float(s.top + SPOUT.lift).sub(P.y)
