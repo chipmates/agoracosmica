@@ -24,6 +24,11 @@
 .vitrine-caption {position:absolute;left:0;right:0;bottom:4px;margin:0 auto;max-width:640px;padding:8px 14px;
   font:15px/1.45 var(--serif);color:#f2eadb;text-align:center;text-wrap:balance;text-shadow:0 1px 14px #0a0f13;pointer-events:none;}
 .vitrine-caption:empty {display:none;}
+/* A MACHINE'S STEP IS READ OVER WHATEVER THE STEP LIGHTS: its line keeps a
+   ground of its own in its place, as the page's line does, so lit linen
+   never takes its contrast */
+.vitrine[data-payload='machine'] .vitrine-caption {width:fit-content;max-width:min(640px,calc(100% - 28px));box-sizing:border-box;
+  padding:6px 12px;background:#101d27e0;border:1px solid #a9977344;text-shadow:none;}
 
 /* THE CARD. The name first, then the line in its own type, then the module's
    own label sentences, the payload's text, and the controls where a hand
