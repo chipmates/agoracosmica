@@ -274,7 +274,7 @@ function architectureMaterial(): MeshStandardNodeMaterial {
   const rx = sy.cross(viewNormal), ry = viewNormal.cross(sx), det = sx.dot(rx)
   const gradient = rx.mul(height.dFdx()).add(ry.mul(height.dFdy())).mul(det.sign()).div(det.abs().max(1e-10)).toVar()
   m.normalNode = viewNormal.sub(gradient.div(length(gradient).div(.12).max(1))).normalize()
-  wearTreads(m, S, isPaving.select(float(1), float(0)))
+  wearTreads(m, { ...S, foot: C.floor }, isPaving.select(float(1), float(0)))
   // A saw cut is a groove and a roof seam is a lap: both see less sky than
   // the face beside them, which is the only way either reads where the apron
   // lies in the building's own shade.

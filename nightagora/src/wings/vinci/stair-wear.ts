@@ -14,7 +14,8 @@ type N = any
 const { cameraViewMatrix, float, fract, mix, mx_noise_float, normalWorldGeometry, positionWorld, smoothstep, vec3 } =
   TSL as unknown as Record<string, N>
 
-export interface Flight { east: number; width: number; north: number; south: number; count: number }
+/** the flight's footprint, its tread count and the heights of its head and foot */
+export interface Flight { east: number; width: number; north: number; south: number; count: number; top: number; foot: number }
 
 /** Lay the flight's wear over a material's own colour, roughness and normal,
     on the treads' top faces inside the flight's footprint only. */
@@ -49,4 +50,34 @@ export function wearTreads(m: MeshStandardNodeMaterial, flight: Flight, gate: N)
   const round = smoothstep(1 - .025 / depth, 1, q).mul(inFlight).mul(held(.025)).mul(worn.mul(.6).add(.4))
   const bent = vec3(0, float(1).sub(round.mul(.45)), round.mul(.62)).normalize().transformDirection(cameraViewMatrix)
   m.normalNode = mix(m.normalNode as N, bent, round.mul(.9)).normalize()
+  // A HOLLOW WORN INTO EACH TREAD where feet land: a few millimetres at the
+  // walking line, a little behind the nosing, as a slope on the normal
+  const hollowD = .0035, hollowX = .42 * half, hollowQ = .3
+  const hx = P.x.sub(flight.east).sub(drift.mul(half)).div(hollowX), hq = q.sub(.58).div(hollowQ)
+  const bowl = TSL.exp(hx.mul(hx).add(hq.mul(hq)).negate()).mul(inFlight).mul(held(.2))
+  // dh/dx and dh/dnorth of -D·bowl; q runs south, so d(q)/d(north) is -1/depth
+  const dhx = bowl.mul(hx).mul(2 * hollowD / hollowX), dhn = bowl.mul(hq).mul(-2 * hollowD / hollowQ / depth)
+  const dished = vec3(dhx.negate(), 1, dhn).normalize().transformDirection(cameraViewMatrix)
+  m.normalNode = mix(m.normalNode as N, dished, bowl.mul(.85)).normalize()
+  m.colorNode = (m.colorNode as N).mul(float(1).add(bowl.mul(.08)))
+  m.roughnessNode = (m.roughnessNode as N).sub(bowl.mul(.08))
+  // EACH TREAD LAID IN TWO OR THREE STONES, their joints across the tread at
+  // their own places, and under each nosing its mortar bed: a dark line at
+  // the foot of the tread's front face where it sits on the riser below
+  const tread = float(flight.north).sub(north).div(depth).floor()
+  const h1 = fract(tread.mul(.6180339).add(.13)), h2 = fract(tread.mul(.4142136).add(.71))
+  const three = fract(tread.mul(.754877)).greaterThan(.45)
+  const j1 = three.select(h1.mul(.12).add(.28), h1.mul(.2).add(.4)).mul(flight.width).add(flight.east - half)
+  const j2 = h2.mul(.12).add(.6).mul(flight.width).add(flight.east - half)
+  const toCut = P.x.sub(j1).abs().min(three.select(P.x.sub(j2).abs(), float(9)))
+  const front = smoothstep(.85, .95, normalWorldGeometry.z)
+    .mul(smoothstep(flight.east - half - .01, flight.east - half + .01, P.x)).mul(float(1).sub(smoothstep(flight.east + half - .01, flight.east + half + .01, P.x)))
+    .mul(smoothstep(flight.south - .05, flight.south + .01, north)).mul(float(1).sub(smoothstep(flight.north - .01, flight.north + .05, north))).mul(gate)
+  const stoneJoint = float(1).sub(smoothstep(.003, .007, toCut)).mul(inFlight.max(front)).mul(held(.012))
+  const rise = (flight.top - flight.foot) / flight.count
+  const below = fract(float(flight.top).sub(P.y).div(rise)).mul(rise)
+  const bed = smoothstep(.044, .049, below).mul(float(1).sub(smoothstep(.059, .061, below))).mul(front).mul(held(.008))
+  const faceWear = front.mul(float(1).sub(smoothstep(0, .012, below)))
+  m.colorNode = (m.colorNode as N).mul(float(1).sub(stoneJoint.mul(.5)).sub(bed.mul(.62))).mul(float(1).add(faceWear.mul(.08)))
+  m.roughnessNode = (m.roughnessNode as N).add(bed.mul(.06))
 }

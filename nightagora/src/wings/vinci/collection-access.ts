@@ -86,8 +86,11 @@ export function weatherCourtConcrete(m: MeshStandardNodeMaterial): MeshStandardN
   const { attribute, exp, float, floor, fract, mix, mx_noise_float, normalWorldGeometry, positionWorld, smoothstep, vec3 } = TSL as unknown as Record<string, N>
   const P = positionWorld, n = normalWorldGeometry, span = attribute('faceSpan', 'vec2')
   const vertical = float(1).sub(smoothstep(.4, .8, n.y.abs())), up = smoothstep(.8, .95, n.y)
-  const col = smoothstep(.3, .7, mx_noise_float(vec3(P.x.mul(8.5), P.y.mul(.6), P.z.mul(8.5))).mul(.5).add(.5))
-  const runs = exp(span.y.div(col.mul(.45).add(.12)).negate()).mul(col.mul(.7).add(.3)).mul(vertical)
+  // A RUN STARTS WHERE WATER LEAVES THE HEAD: a drip point every so often,
+  // a narrow stain under it fading down the face, never a smear the length
+  // of a tall face
+  const col = smoothstep(.5, .78, mx_noise_float(vec3(P.x.mul(6.5), P.y.mul(1.8), P.z.mul(6.5))).mul(.5).add(.5))
+  const runs = exp(span.y.div(col.mul(.28).add(.08)).negate()).mul(col).mul(vertical)
   const patchy = mx_noise_float(P.mul(2.1).add(vec3(4.2, 1.7, 3.9))).mul(.5).add(.5)
   // a hand's height of it, so a low kerb keeps its boards above the green
   const foot = float(1).sub(smoothstep(.01, .12, span.x)).mul(vertical).mul(patchy.mul(.6).add(.4))
@@ -99,7 +102,7 @@ export function weatherCourtConcrete(m: MeshStandardNodeMaterial): MeshStandardN
   const pores = smoothstep(.55, .85, mx_noise_float(P.mul(38)).mul(.5).add(.5)).mul(up)
   let c: N = m.colorNode
   c = c.mul(board.mul(.13).add(1))
-  c = mix(c, c.mul(vec3(.58, .57, .54)), runs.mul(.8))
+  c = mix(c, c.mul(vec3(.62, .61, .58)), runs.mul(.6))
   c = mix(c, c.mul(vec3(.50, .56, .45)), foot.mul(.8))
   // a kerb's top keeps the court's dirt and a skin of lichen in its pores
   const kerb = up.mul(float(1).sub(worn)).mul(float(1).sub(grit))
@@ -110,7 +113,11 @@ export function weatherCourtConcrete(m: MeshStandardNodeMaterial): MeshStandardN
   // THE FORM READS AT THE DISTANCE THE STAIR IS SEEN FROM. Each board left
   // its own grain and a shallow step at its edge, a pour's lime blooms pale
   // low on the faces, and the arrises a hand runs along are a little worn.
-  const along = P.x.mul(tangent[1]).sub(P.z.negate().mul(tangent[0])).add(P.x.mul(tangent[0]).add(P.z.negate().mul(tangent[1])))
+  // the face's own horizontal run, whichever way the face turns: a cheek of
+  // the garden flight runs another way than this stair's, and read along a
+  // fixed bearing its grain, bloom and ties were stretched across the face
+  const facing = n.xz.div(n.xz.length().max(.00001))
+  const along = P.x.mul(facing.y).sub(P.z.mul(facing.x))
   const boardIndex = floor(P.y.div(.15)), inBoard = fract(P.y.div(.15))
   const grain = mx_noise_float(vec3(along.mul(1.6), boardIndex.mul(7.3), P.y.mul(38))).mul(vertical)
   const seam = float(1).sub(smoothstep(.0, .06, inBoard.min(float(1).sub(inBoard)))).mul(vertical)
