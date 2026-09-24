@@ -28,7 +28,7 @@ import { SHADOW_ONLY_LAYER } from '../../../stack/light'
 import { Construction, type ExhibitMaterials } from '../myths/construction'
 import { Body, fallenLeaf, fallenPalette, growTree, mulberry, type Refuse, type TreeResult, type TreeTier } from '../tree-growth'
 import { vegetationMaterials, vegetationMesh } from '../vegetation'
-import { applyCourtLight } from './court-light'
+import { applyCourtLight, COURT_ENGINE_TERMS, SUN } from './court-light'
 import { windWanted } from '../wind'
 import {
   BED, BENCH, BRICK, CERTIFIED_LINES, COURT_TREE_FORM, COURT_TREES, FILTER, GRAVE_COURT_LEVEL, GRAVE_COURT_ORIGIN,
@@ -39,8 +39,20 @@ import {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type N = any
 const {
-  abs, cameraViewMatrix, float, mix, mx_noise_float, normalWorldGeometry, positionWorld, smoothstep, uv: uvNode, vec2, vec3,
+  Fn, abs, cameraViewMatrix, float, floor, fract, min, mix, mx_noise_float, normalWorldGeometry, positionWorld, smoothstep, uv: uvNode, vec2, vec3,
 } = TSL as unknown as Record<string, N>
+
+/** The walk's boards in plan, as the oak's shader reads them: where the walk
+ * starts, its unit direction, its half width and length, and the boards'
+ * pitch and the first board's offset, as `buildWalkway` lays them. */
+function walkFrame(): { from: [number, number]; u: [number, number]; half: number; length: number; start: number; pitch: number; board: number } {
+  const [ax, an] = WALKWAY.from, [bx, bn] = WALKWAY.to
+  const length = Math.hypot(bx - ax, bn - an)
+  const pitch = WALKWAY.board.width + WALKWAY.board.gap
+  const count = Math.floor(length / pitch)
+  return { from: [ax, an], u: [(bx - ax) / length, (bn - an) / length], half: WALKWAY.width / 2, length,
+    start: (length - count * pitch + WALKWAY.board.gap) / 2, pitch, board: WALKWAY.board.width }
+}
 
 export const graveCourtProvenance = {
   manifestId: 'vinci/grave-court',
@@ -88,9 +100,58 @@ function brickSurface(open: boolean): MeshStandardNodeMaterial {
   applyCourtLight(m, c)
   m.roughnessNode = specularAA(float(.87).add(d.rough).add(d.joint.mul(.05)), d.lost)
   m.normalNode = reliefNormal(n.transformDirection(cameraViewMatrix), d.heightM, .25)
+  if (COURT_ENGINE_TERMS) m.receivedShadowNode = Fn(([shadow]: N[]) => mix(shadow, ...filterBandLight(P)))
   m.name = `vinci/grave-court/${open ? 'brick-open' : 'brick'}`
   m.userData = { ...graveCourtProvenance }
   return m
+}
+
+/** THE FILTER BAND'S LIGHT ON THE NORTH WALL, as the sun of the hour gives
+ * it: each slot is a tunnel the depth of the brick, so only the part of it
+ * the sun sees straight through passes light, and the sun is a disc half a
+ * degree across, so a patch ten metres from its slot is a soft image of the
+ * sun, not a lit brick. The live engine's sun is a point and its map holds a
+ * slot to a texel or two; this hands the wall the patch the film's sun draws,
+ * dimmed where a maple's crown stands in the way. Returns the soft light and
+ * where it replaces the map. */
+function filterBandLight(P: N): [N, N] {
+  const S = SUN, sx = S.e, sy = S.u, sz = -S.n
+  const face = GRAVE_COURT_ORIGIN.east + LEAF.backFace, depth = LEAF.depth
+  const base = GRAVE_COURT_LEVEL + GRAVE_MOUNT_RISE + FILTER.bottom
+  const course = (FILTER.top - FILTER.bottom) / Math.round((FILTER.top - FILTER.bottom) / BRICK.course)
+  const period = FILTER.solidCourses + FILTER.openCourses, runH = FILTER.openCourses * course
+  const pitch = BRICK.length + FILTER.slot, pierIn = FILTER.halfWidth - FILTER.pier
+  // the ray to the sun, at the middle of the band's depth
+  const t = float(face - depth / 2).sub(P.x).div(sx)
+  const qy = P.y.add(t.mul(sy)), qn = P.z.add(t.mul(sz)).negate().sub(GRAVE_COURT_ORIGIN.north)
+  // the open run nearest the ray, and its slot nearest the ray
+  const run = floor(qy.sub(base + FILTER.solidCourses * course + runH / 2).div(period * course).add(.5)).clamp(0, 3)
+  const dh = qy.sub(run.mul(period * course).add(base + FILTER.solidCourses * course + runH / 2))
+  const shift = fract(run.mul(.5)).mul(pitch)
+  const first = -pierIn - pitch + BRICK.length + FILTER.slot / 2
+  const slot = floor(qn.sub(shift).sub(first).div(pitch).add(.5))
+  const centre = slot.mul(pitch).add(shift).add(first)
+  const dn = qn.sub(centre)
+  // what the tunnel lets through, and the sun's disc at this distance
+  const drift = (a: number): number => depth * Math.abs(a) / Math.abs(sx)
+  const an = (FILTER.slot - drift(sz)) / 2, ah = (runH - drift(sy)) / 2
+  const w = t.mul(.00465).max(.004)
+  const pass = (d: N, a: number): N => float(a).add(w).sub(abs(d)).div(w.mul(2)).clamp(0, 1).min(float(a).div(w).min(1))
+  const inPier = smoothstep(pierIn - .02, pierIn - .06, abs(centre))
+  let light: N = pass(dn, an).mul(pass(dh, ah)).mul(inPier)
+  // a crown in the way thins the patch to the light its leaves let pass
+  for (const tree of COURT_TREES) {
+    const c = [tree.east, GRAVE_COURT_LEVEL + tree.height * .62, -tree.north] as const, r = tree.height * .4
+    const k = vec3(c[0], c[1], c[2]).sub(P)
+    const along = k.x.mul(sx).add(k.y.mul(sy)).add(k.z.mul(sz)).max(0)
+    const miss = vec3(P.x.add(along.mul(sx)), P.y.add(along.mul(sy)), P.z.add(along.mul(sz))).sub(vec3(c[0], c[1], c[2]))
+    const inside = smoothstep(r, r * .7, miss.length())
+    const leaves = smoothstep(.35, .65, mx_noise_float(miss.mul(3.1).add(tree.seed % 97)).mul(.5).add(.5))
+    light = light.mul(float(1).sub(inside.mul(float(.9).sub(leaves.mul(.7)))))
+  }
+  const onNorth = smoothstep(.8, .95, TSL.normalWorldGeometry.z).mul(smoothstep(.08, .03, abs(P.z.add(GRAVE_COURT_ORIGIN.north + LEAF.returnFace))))
+  const band = smoothstep(base - .02, base + .01, qy).mul(smoothstep(base + FILTER.top - FILTER.bottom + .01, base + FILTER.top - FILTER.bottom - .02, qy))
+  return [light, onNorth.mul(band)]
 }
 
 /** Pale limestone for the courses and copings, dressed fine. */
@@ -128,12 +189,38 @@ function oakSurface(name: string): MeshStandardNodeMaterial {
   const streak = mx_noise_float(vec3(along.mul(.9), across.mul(34), P.y.mul(34))).mul(resolved(.03, d.pixel))
   const wave = mx_noise_float(vec3(along.mul(.25), across.mul(6), P.y.mul(6))).mul(resolved(.15, d.pixel))
   const top = smoothstep(.55, .9, n.y)
-  const tone = d.tone.mul(float(1).add(streak.mul(.14)).add(wave.mul(.1)))
-  const c = mix(vec3(...base), vec3(...silver), top.mul(.5)).mul(tone)
+  // THE WALK'S OWN BOARDS: each its own piece of oak, weathered its own way,
+  // screwed down to the two bearers, and walked pale down the middle
+  const w = walkFrame()
+  const te = P.x.sub(w.from[0]), tn = P.z.negate().sub(w.from[1])
+  const t = te.mul(w.u[0]).add(tn.mul(w.u[1])), side = tn.mul(w.u[0]).sub(te.mul(w.u[1]))
+  const onWalk = smoothstep(w.half + .02, w.half, abs(side)).mul(smoothstep(-.03, 0, t)).mul(smoothstep(w.length + .03, w.length, t))
+    .mul(smoothstep(GRAVE_COURT_LEVEL + .2, GRAVE_COURT_LEVEL + .15, P.y))
+  const slot = t.sub(w.start).div(w.pitch), k = floor(slot), inBoard = fract(slot).mul(w.pitch)
+  const hk = (salt: number): N => fract(k.mul(12.9898).add(salt).sin().mul(43758.5453))
+  const boardTone = float(1).add(hk(1.3).sub(.5).mul(.2).mul(onWalk))
+  const walked = smoothstep(.42, .12, abs(side)).mul(onWalk).mul(mx_noise_float(vec3(t.mul(1.7), side.mul(4), 3.1)).mul(.35).add(.65))
+  const silvered = top.mul(float(.5).add(hk(7.7).sub(.5).mul(.36).mul(onWalk)).add(walked.mul(.28))).clamp(0, 1)
+  // a knot in one board of three, drawn out along its grain
+  const knotAt = hk(4.1).sub(.5).mul(w.half * 1.6)
+  const knotShape = vec2(side.sub(knotAt).mul(.45), inBoard.sub(w.board * (.3 + .4 * .5))).length()
+  const knot = smoothstep(.016, .004, knotShape).mul(hk(9.2).lessThan(.34).select(float(1), float(0))).mul(onWalk).mul(resolved(.02, d.pixel))
+  // the screw heads, two to a board over each bearer, and the dark stain the
+  // iron leaves in the oak round each
+  const bearer = abs(abs(side).sub(w.half - .16))
+  const screw = min(vec2(bearer, inBoard.sub(w.board * .26)).length(), vec2(bearer, inBoard.sub(w.board * .74)).length())
+  const head = smoothstep(.0048, .0036, screw).mul(onWalk).mul(resolved(.008, d.pixel))
+  const stain = smoothstep(.02, .004, screw).mul(onWalk).mul(resolved(.03, d.pixel))
+  const worn = streak.mul(float(.14).sub(walked.mul(.07)))
+  const tone = d.tone.mul(float(1).add(worn).add(wave.mul(.1))).mul(boardTone).mul(float(1).add(walked.mul(.06)))
+  const oak = mix(vec3(...base), vec3(...silver), silvered).mul(tone)
+    .mul(float(1).sub(stain.mul(.22))).mul(float(1).sub(knot.mul(.45)))
+  const c = mix(oak, vec3(.05, .045, .04), head.mul(.85))
   m.colorNode = c
   // a board's edge in its gap sees the gap, not the sunlit wall
   applyCourtLight(m, c, { floorOnly: true })
-  m.roughnessNode = specularAA(float(.6).add(top.mul(.16)).add(d.rough).add(streak.abs().mul(.05)), d.lost)
+  m.roughnessNode = specularAA(float(.6).add(top.mul(.16)).add(d.rough).add(streak.abs().mul(.05))
+    .sub(walked.mul(.08)).sub(head.mul(.25)), d.lost)
   m.normalNode = reliefNormal(n.transformDirection(cameraViewMatrix), d.heightM.add(streak.mul(.0004)), .2)
   m.name = `vinci/grave-court/${name}`
   m.userData = { ...graveCourtProvenance }

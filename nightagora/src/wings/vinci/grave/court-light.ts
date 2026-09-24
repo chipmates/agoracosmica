@@ -28,7 +28,7 @@ const BOUNCE_SCALE = 3
 export const COURT_LIGHT_GRID = { west: -61.4, east: -40.4, south: -34.2, north: -15.6, cell: .35 } as const
 
 /** the hour's sun, from the wing's hour record: 231.9 degrees, 17.39 up */
-const SUN = (() => {
+export const SUN = (() => {
   const az = 231.9 * Math.PI / 180, el = 17.39 * Math.PI / 180
   return { e: Math.sin(az) * Math.cos(el), n: Math.cos(az) * Math.cos(el), u: Math.sin(el) }
 })()
