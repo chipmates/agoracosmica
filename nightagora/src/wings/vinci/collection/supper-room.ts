@@ -26,7 +26,7 @@ import { kelvinToColour } from '../../../stack/light'
 import { axisFootprint, lineCoverage } from '../../../stack/detail'
 import { setSupperMuralLight } from './supper-light'
 import {
-  END_FACE, FIELD, FINS, NAVE_PROBE_AT, PROBE_AT, ROOM, SILL, SUPPER_LIGHTS, SUPPER_ROOM_PROVENANCE, TOP_LIGHT, v3,
+  END_FACE, FIELD, FINS, FLOOR_RISE, NAVE_PROBE_AT, PROBE_AT, ROOM, SILL, SUPPER_LIGHTS, SUPPER_ROOM_PROVENANCE, TOP_LIGHT, v3,
   endWall, fins, floor as floorBody, frame, roof, sillDress, southWall, upperEndWall, type Body, type SupperLight,
 } from './supper-room-plan'
 
@@ -82,6 +82,12 @@ function looks() {
     muralDirect: uniform(1),
     muralBounce: uniform(1),
     muralRelief: uniform(.45),
+    /** the white the field is lit in, and how far its light is held to it */
+    muralWhite: uniform(new Color(.99, 1, 1.03)),
+    muralNeutral: uniform(1),
+    /** the sill's and the bay floor's own brightness, lit by the top light */
+    sillGlow: uniform(new Color(.56, .55, .53)),
+    floorGlow: uniform(new Color(.3, .29, .28)),
     /** Engine-only terms: a renderer that shadows the reveal itself sets 0 */
     engineTerms: uniform(1),
   }
@@ -254,11 +260,29 @@ function buildMuralLight(L: Looks, plasterSet: MaterialSet, bounce: N): MuralLig
     const dir = vec3(xw.add(opening.east).mul(.5), (opening.low + opening.high) / 2, -opening.north).sub(P).normalize()
     direct = direct.add(radiance.get(spec.name)!.mul(f).mul(turn(dir)))
   }
+  // THE SILL AND THE FLOOR BEFORE IT, lit from above, throw their light back
+  // up into the field's lowest band: the sill from just under the reveal's
+  // bottom, which hides the part nearest the wall from a point low on the
+  // field, and the floor past the sill's front edge, which hides the rest.
+  const sillTop = float(SILL.top), floorTop = float(ROOM.floor + FLOOR_RISE)
+  const underReveal = yP.sub(sillTop).mul(d).div(yP.sub(FIELD.bottom).max(.0015))
+  const xs = x0.add(max(float(d), underReveal).min(SILL.east - FIELD.face))
+  const sill = formFactor(P, n, [vec3(xs, sillTop, -FIELD.south), vec3(xs, sillTop, -FIELD.north),
+    vec3(SILL.east, sillTop, -FIELD.north), vec3(SILL.east, sillTop, -FIELD.south)])
+  const overSill = yP.sub(floorTop).mul(SILL.east - FIELD.face).div(yP.sub(sillTop).max(.0015))
+  const xf = x0.add(max(float(SILL.east - FIELD.face), overSill).min(ROOM.step - FIELD.face))
+  const floorLight = formFactor(P, n, [vec3(xf, floorTop, -ROOM.baySouth), vec3(xf, floorTop, -ROOM.north),
+    vec3(ROOM.step, floorTop, -ROOM.north), vec3(ROOM.step, floorTop, -ROOM.baySouth)])
+  direct = direct.add(L.sillGlow.mul(sill)).add(L.floorGlow.mul(floorLight))
   // THE BOUNCE: the reveal's rim sees less of the room than the field's middle
   const edgeIn = min(min(nP.sub(FIELD.south), float(FIELD.north).sub(nP)), min(yP.sub(FIELD.bottom), float(FIELD.top).sub(yP)))
-  const rim = smoothstep(0, d * 2.4, edgeIn).mul(.28).add(.72)
+  const rim = smoothstep(0, d * 2.4, edgeIn).mul(.2).add(.8)
   const ambient = bounce.mul(L.envLift).mul(L.muralBounce).mul(mix(float(1), rim, L.engineTerms))
-  return { node: direct.mul(L.muralDirect).add(ambient), radiance }
+  // A PAINTING IS LIT WHITE: the room's warm bounce stays on its plaster, and
+  // the light on the field keeps its strength and its fall but not its tint
+  const lit = direct.mul(L.muralDirect).add(ambient)
+  const strength = dot(lit, vec3(.2126, .7152, .0722))
+  return { node: mix(lit, L.muralWhite.mul(strength), L.muralNeutral), radiance }
 }
 
 /** An opening of the north side as an upright rectangle facing south. */
