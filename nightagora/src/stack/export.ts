@@ -169,7 +169,8 @@ export function installExport(parts: ExportParts): void {
   }
 
   /** what is mounted and drawn now, as one number: a body built, dropped or
-      hidden inside a clip turns it, and the bodies that did are named */
+      hidden inside a clip turns it, and the bodies that did are named. A body
+      whose every material is hidden draws nothing and is not counted. */
   let lastMounted: Map<number, Mesh> | null = null
   let lastSignature = 0
   const pathOf = (mesh: Mesh): string => {
@@ -177,13 +178,36 @@ export function installExport(parts: ExportParts): void {
     for (let o: Mesh['parent'] | Mesh = mesh; o; o = o.parent) if (o.name) names.push(o.name)
     return names.reverse().join('/') || `mesh ${mesh.id}`
   }
-  function mounted(): { meshes: number; signature: number; changed?: { added: string[]; removed: string[]; addedCount: number; removedCount: number } } {
-    const scene = parts.scene()
+  const drawsSomething = (mesh: Mesh): boolean =>
+    Array.isArray(mesh.material) ? mesh.material.some((m) => m.visible) : mesh.material?.visible !== false
+  function eachDrawn(visit: (mesh: Mesh) => void): void {
+    parts.scene()?.traverseVisible((object) => {
+      const mesh = object as Mesh
+      if (mesh.isMesh && drawsSomething(mesh)) visit(mesh)
+    })
+  }
+
+  /* THE MOUNT RULE, under the export only. A clip is walked once in silence
+     and every body any of its frames draws is taken; from its first frame to
+     its last those bodies stand, whatever distance or stream would have shown
+     them later or hidden them sooner. The wing's own rules still run in its
+     update; the hold is put on at the top of every draw, after them. */
+  const unions = new Map<string, Set<Mesh>>()
+  let recording: Set<Mesh> | null = null
+  let holding: Mesh[] = []
+  /** what the last draw stood up that the wing had hidden: put back on release */
+  let forced = new Set<Mesh['parent'] | Mesh>()
+  function holdAndRecord(): void {
+    forced = new Set()
+    for (const mesh of holding) {
+      for (let o: Mesh['parent'] | Mesh = mesh; o; o = o.parent) if (!o.visible) { o.visible = true; forced.add(o) }
+    }
+    if (recording) { const into = recording; eachDrawn((mesh) => { into.add(mesh) }) }
+  }
+  function mounted(): { meshes: number; signature: number; stood: number; changed?: { added: string[]; removed: string[]; addedCount: number; removedCount: number } } {
     const ids = new Map<number, Mesh>()
     let hash = 2166136261
-    scene?.traverseVisible((object) => {
-      const mesh = object as Mesh
-      if (!mesh.isMesh) return
+    eachDrawn((mesh) => {
       ids.set(mesh.id, mesh)
       hash = Math.imul(hash ^ mesh.id, 16777619) >>> 0
     })
@@ -196,7 +220,7 @@ export function installExport(parts: ExportParts): void {
     }
     lastMounted = ids
     lastSignature = hash
-    return { meshes: ids.size, signature: hash, ...(changed ? { changed } : {}) }
+    return { meshes: ids.size, signature: hash, stood: forced.size, ...(changed ? { changed } : {}) }
   }
 
   function idPass(): void {
@@ -243,7 +267,12 @@ export function installExport(parts: ExportParts): void {
   }
 
   parts.aroundDraw(
-    () => put(true),
+    () => {
+      holdAndRecord()
+      // the wing's own hook pins what the film's clock owns (the world's motion)
+      ;(window as Window & { __naFilm?: { beforeDraw?: () => void } }).__naFilm?.beforeDraw?.()
+      put(true)
+    },
     () => {
       put(false)
       if (idDue) {
@@ -331,6 +360,28 @@ export function installExport(parts: ExportParts): void {
     },
     arm: armIds,
     mounted,
+    /** take every body the coming frames draw as this clip's set; null stops */
+    record(tag: string | null): number {
+      if (tag === null) { const n = recording?.size ?? 0; recording = null; return n }
+      recording = new Set()
+      unions.set(tag, recording)
+      return 0
+    },
+    /** stand a clip's set from the next draw on; null lets go and puts back
+        what the wing had hidden */
+    hold(tag: string | null): number {
+      if (tag === null) {
+        holding = []
+        for (const o of forced) if (o) o.visible = false
+        forced = new Set()
+        return 0
+      }
+      const set = unions.get(tag)
+      if (!set) throw new Error(`no bodies were taken for ${tag}`)
+      // a body disposed since it was taken is no longer the scene's
+      holding = [...set].filter((mesh) => mesh.parent !== null)
+      return holding.length
+    },
     bodies: () => bodies,
     /** one delivered frame: every draw of its shutter, the resolve, the send */
     async frame(plan: FramePlan) {

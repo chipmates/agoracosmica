@@ -13,14 +13,20 @@
 //
 // Every clip starts and ends at rest. Its first frame is the departure node's
 // still and its last the arrival's, rendered by the same program, and the
-// report holds the joins by the sha256 of the raw frames. A clip is refused
-// (and written nowhere) when the textures in flight at rest are not zero, when
-// the mounted set changes inside it, or when the scene casts more shadows than
-// its measured ceiling (MUST-FIX M49, M50).
+// report holds the joins by the sha256 of the raw frames. Every body a clip
+// draws in any frame (taken while it is walked once in silence) stands from
+// its first frame to its last, and the world's clock is pinned at both ends
+// (`film.ts`, pinnedWind). A clip is refused (and written nowhere) when the
+// textures in flight at rest are not zero, when the drawn set changes inside
+// it anyway, or when the scene casts more shadows than its measured ceiling
+// (MUST-FIX M49, M50).
+//
+//   node forge/film/export.mjs --clips=<id> --mount=live       the wing's streaming
+//                                                              left alone: the rule's refusal
 import { chromium } from 'playwright'
 import { spawn } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, statSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { gunzipSync, gzipSync } from 'node:zlib'
@@ -277,6 +283,12 @@ function openEncoder(framing, frames, dir, stem, stage = STAGES[framing]) {
     rungs: rungs.map(([rw, rh], k) => ({ rung: `${rw}x${rh}`, file: outs[k] })),
     write: (buf) => new Promise((ok) => (child.stdin.write(buf) ? ok() : child.stdin.once('drain', ok))),
     close: async () => { child.stdin.end(); await done },
+    /** a refused clip is written nowhere */
+    abort: async () => {
+      child.kill('SIGKILL')
+      await done.catch(() => {})
+      for (const f of outs) rmSync(f, { force: true })
+    },
   }
 }
 
@@ -461,12 +473,14 @@ const printOf = (cam) => [...cam.p.map((v) => round(v)), ...cam.r.map((v) => rou
 /** A CLIP WALKED ONCE UNDER THE CLOCK, KEEPING NOTHING: a room is dressed in
     slices and a machine is built as the eye walks up, so every body a clip can
     show is built before the first still is kept (the capture's round trip). */
-async function silentWalk(page, from, to, motion) {
+async function silentWalk(page, from, to, motion, take = null) {
+  // THE MOUNT RULE's set: every body a frame of the walk draws, the departure's and the arrival's included
+  if (take) await page.evaluate((tag) => window.__naExport.record(tag), take)
   await page.evaluate((n) => window.__naFilm.place(n), from)
   await page.evaluate(() => { for (let k = 0; k < 3; k++) window.__pre.step() })
   const asked = await page.evaluate(([a, b, m]) => window.__naFilm.walk(a, b, m), [from, to, motion])
   if (!asked) throw new Error(`${from.id} to ${to.id}: the rail refused the silent walk`)
-  return page.evaluate(async () => {
+  const steps = await page.evaluate(async () => {
     let n = 0, began = false
     for (; n < 4000; n++) {
       window.__pre.step()
@@ -478,10 +492,22 @@ async function silentWalk(page, from, to, motion) {
     for (let k = 0; k < 10; k++) window.__pre.step()
     return n
   })
+  const bodies = take ? await page.evaluate(() => window.__naExport.record(null)) : null
+  return { steps, bodies }
 }
 
 /** THE CLIP: rest at the departure, the leg on its own clock, rest at the arrival. */
 async function exportClip(session, inbox, edge, nodes, track, out, opts) {
+  // the clip's bodies stand from before its first frame (the rule off: the wing's own streaming)
+  const held = opts.mount === 'held' ? await session.page.evaluate((tag) => window.__naExport.hold(tag), edge.id) : null
+  try {
+    return await keepClip(session, inbox, edge, nodes, track, out, opts, held)
+  } finally {
+    if (held !== null) await session.page.evaluate(() => window.__naExport.hold(null))
+  }
+}
+
+async function keepClip(session, inbox, edge, nodes, track, out, opts, held) {
   const { page, framing, stage } = session
   const from = nodes.get(edge.from), to = nodes.get(edge.to)
   const tag = `${edge.id} ${framing}`
@@ -495,7 +521,7 @@ async function exportClip(session, inbox, edge, nodes, track, out, opts) {
   const refusal = []
   if (pendingAtRest !== 0) refusal.push(`${pendingAtRest} textures in flight at rest (M49)`)
   if (armed.casters > CASTER_CEILING) refusal.push(`${armed.casters} shadow-casting lights over the ceiling of ${CASTER_CEILING} (M50)`)
-  if (refusal.length && !opts.force) return { clip: edge.id, framing, refused: refusal }
+  if (refusal.length && !opts.force) return { clip: edge.id, framing, refused: refusal, mount: { rule: opts.mount, held } }
   const predicted = track.arrivedAt + 2
   const stem = edge.stem
   const dir = join(out, framing)
@@ -515,6 +541,19 @@ async function exportClip(session, inbox, edge, nodes, track, out, opts) {
     frames.push({ i, sha256: sha256(res.frame.rgb), print, cam, draws: res.report.drawn, walking: res.report.walking, mounted: res.report.mounted, ms: res.report.ms, nearM, floorCeiling: round(fc.floorCeiling, 4), ...meta })
     if (opts.keep.has(i) || i === 0) await savePng(res.frame.rgb, stage.width, stage.height, join(opts.frameDir, `${stem}-${framing}-f${String(i).padStart(4, '0')}.png`))
     return nearM
+  }
+  /* ONE DRAWN SET INSIDE A CLIP: the first frame that draws another set than
+     the clip's first refuses it, unless --force renders it on and keeps the
+     refusal in the sidecar */
+  let changedAt = null
+  const drawnSetHolds = async (i, res) => {
+    if (changedAt !== null || res.report.mounted.signature === frames[0].mounted.signature) return true
+    const c = res.report.mounted.changed ?? {}
+    changedAt = { i, meshes: res.report.mounted.meshes, added: c.added ?? [], removed: c.removed ?? [], addedCount: c.addedCount ?? 0, removedCount: c.removedCount ?? 0 }
+    refusal.push(`the drawn set changed inside the clip at frame ${i}: ${changedAt.addedCount} added (${changedAt.added.slice(0, 3).join(', ')}), ${changedAt.removedCount} removed (${changedAt.removed.slice(0, 3).join(', ')})`)
+    if (opts.force) return true
+    await encoder.abort()
+    return false
   }
   // frame 0: the departure at rest
   const f0 = await restFrame(session, inbox, tag, 0, t0, opts)
@@ -544,7 +583,14 @@ async function exportClip(session, inbox, edge, nodes, track, out, opts) {
     }
     j++
     nearM = await put(j, res, { motion: round(m.px, 2), turnPx: round(m.turn, 2), walkPx: round(m.walk, 2), over, wall: Date.now() - t, legFrame: i })
-    if (res.report.walking.every((w) => !w)) { last = j; break }
+    if (!(await drawnSetHolds(j, res))) {
+      return { clip: edge.id, framing, refused: refusal, mount: { rule: opts.mount, held }, mountedChanges: [changedAt], framesRendered: frames.length }
+    }
+    if (res.report.walking.every((w) => !w)) {
+      last = j
+      await savePng(res.frame.rgb, stage.width, stage.height, join(opts.frameDir, `${stem}-${framing}-last.png`))
+      break
+    }
   }
   if (last < 0) throw new Error(`${tag}: the leg never came to rest`)
   await encoder.close()
@@ -578,6 +624,7 @@ async function exportClip(session, inbox, edge, nodes, track, out, opts) {
     mountedChanges: frames.filter((f) => f.mounted.changed).map((f) => ({ i: f.i, meshes: f.mounted.meshes, ...f.mounted.changed })),
     starvedSteps: starved, pageErrors: session.record.errors.length - errorsBefore,
     pendingAtRest, paintedOverCanvas, mountedSetChanges: signatures.size - 1, casters: armed.casters, bodies: armed.bodies,
+    mount: { rule: opts.mount, held, drawn: frames[0].mounted.meshes, stoodAtFirst: frames[0].mounted.stood, stoodAtLast: frames[frames.length - 1].mounted.stood },
     floorCeilingMax: round(floorCeilingMax, 4), refused: refusal,
     draws: frames.reduce((s, f) => s + f.draws, 0), over: frames.filter((f) => f.over).length,
     fastest: frames.reduce((b, f) => ((f.motion ?? 0) > (b.motion ?? 0) ? f : b), frames[0]).i,
@@ -645,6 +692,8 @@ async function main() {
   /* stills only: the named nodes stood at once and shot, no clip walked */
   const stillsOnly = flags.has('stills') ? String(flags.get('stills')).split(',').map((s) => s.trim()).filter(Boolean) : null
   const keep = new Set(String(flags.get('keep') ?? '').split(',').filter(Boolean).map(Number))
+  const mount = String(flags.get('mount') ?? 'held')
+  if (!['held', 'live'].includes(mount)) throw new Error(`--mount is held (the rule) or live (the wing's streaming), not ${mount}`)
   const log = (s) => console.error(s)
   assertBuildFresh()
 
@@ -685,12 +734,12 @@ async function main() {
       try {
         for (const framing of framings) {
           const session = await openSession(browser, framing, { base: BASE, scale, sink, warmNodes, log, view })
-          const opts = { grain, keep, frameDir, force: flags.has('force') }
+          const opts = { grain, keep, frameDir, force: flags.has('force'), mount }
           const before = await session.page.evaluate(() => window.__naExport.mounted().meshes)
           const walked = []
-          for (const edge of edges) walked.push(await silentWalk(session.page, nodes.get(edge.from), nodes.get(edge.to), edge.motion))
+          for (const edge of edges) walked.push(await silentWalk(session.page, nodes.get(edge.from), nodes.get(edge.to), edge.motion, mount === 'held' ? edge.id : null))
           const after = await session.page.evaluate(() => window.__naExport.mounted().meshes)
-          log(`  ${framing}: every clip walked once under the clock (${walked.join(', ')} steps); meshes mounted ${before} before, ${after} after`)
+          log(`  ${framing}: every clip walked once under the clock (${walked.map((w) => w.steps).join(', ')} steps); meshes mounted ${before} before, ${after} after; ${mount === 'held' ? `bodies each clip draws ${walked.map((w) => w.bodies).join(', ')}` : 'the mount rule off'}`)
           for (const node of warmNodes) {
             const s = await exportStill(session, inbox, node, runDir, opts)
             stills.push(s)
@@ -708,7 +757,7 @@ async function main() {
             if (r.refused?.length && !r.files) { log(`  REFUSED ${edge.id} ${framing}: ${r.refused.join('; ')}`); continue }
             const sf = (id) => stills.find((s) => s.node === id && s.framing === framing)?.raw
             r.joinsAgree = { first: r.joins.first === sf(edge.from), last: r.joins.last === sf(edge.to) }
-            log(`  ${edge.id} ${framing}: ${r.frames} frames, ${r.draws} draws, ${r.secondsPerFrame} s a frame; joins ${r.joinsAgree.first}/${r.joinsAgree.last}; track ${r.track.maxDeviation}; late ${r.requestsAfterClock}; mounted changes ${r.mountedSetChanges}`)
+            log(`  ${edge.id} ${framing}: ${r.frames} frames (the graph ${edge.framings[framing].frames + 1}), ${r.draws} draws, ${r.secondsPerFrame} s a frame; joins ${r.joinsAgree.first}/${r.joinsAgree.last}; track ${r.track.maxDeviation}; late ${r.requestsAfterClock}; mounted changes ${r.mountedSetChanges}; held ${r.mount.held}, stood ${r.mount.stoodAtFirst} at the first frame and ${r.mount.stoodAtLast} at the last`)
           }
           await session.ctx.close()
         }
@@ -725,7 +774,7 @@ async function main() {
   // ---- the record ----
   const first = all[0]
   const gate = stillsOnly ? { note: 'stills only: no clip, no keys' } : await gateKeys(first.results, log).catch((err) => ({ note: `the gate's keys failed: ${String(err.message).slice(0, 200)}` }))
-  const recipe = { tier: 'max', geometry: 'hero', scale, stage: view ? `stills: ${Object.entries(view).map(([k, v]) => `${k} ${v.css.width}x${v.css.height} CSS at ${v.dsf}`).join(', ')}` : 'film', minDraws: MIN_DRAWS, maxDraws: MAX_DRAWS, shutter: SHUTTER, jitter: 'halton-2-3', average: 'linear light of the display print, one quantisation', grain: grain ? `baked ${grain}, seeded by the frame, the rest frames seed 0` : 'held (laid by the player)', fps: FPS }
+  const recipe = { mount: mount === 'held' ? 'every body a clip draws stands from its first frame (taken on a silent walk)' : 'the wing\'s own streaming', worldClock: 'pinned: the wind on its loop\'s first frame at rest, whole loops across a leg with the walk', tier: 'max', geometry: 'hero', scale, stage: view ? `stills: ${Object.entries(view).map(([k, v]) => `${k} ${v.css.width}x${v.css.height} CSS at ${v.dsf}`).join(', ')}` : 'film', minDraws: MIN_DRAWS, maxDraws: MAX_DRAWS, shutter: SHUTTER, jitter: 'halton-2-3', average: 'linear light of the display print, one quantisation', grain: grain ? `baked ${grain}, seeded by the frame, the rest frames seed 0` : 'held (laid by the player)', fps: FPS }
   for (const r of first.results) {
     if (!r.files) continue
     const keys = gate.keys?.get(`${r.clip} ${r.framing}`) ?? { motion: r.replay.key, picture: null, global: null, delivery: null }
@@ -734,7 +783,7 @@ async function main() {
       renderer: `chromium ${first.version} webgpu, tier max, ${headHere()}`, recipe, keys, keysNote: gate.note ?? null,
       frames: r.frames, joins: r.joins, track: r.track, projectionThrows: r.projectionThrows,
       requestsAfterClock: r.requestsAfterClock, starvedSteps: r.starvedSteps, pageErrors: r.pageErrors, pendingAtRest: r.pendingAtRest,
-      paintedOverCanvas: r.paintedOverCanvas, mountedSetChanges: r.mountedSetChanges, casters: r.casters,
+      paintedOverCanvas: r.paintedOverCanvas, mountedSetChanges: r.mountedSetChanges, casters: r.casters, mount: r.mount,
       chromeImagesAfterClock: r.chromeImagesAfterClock, lateRequests: r.lateRequests, mountedChanges: r.mountedChanges,
       ...(r.framing === 'upright' ? { floorCeilingMax: r.floorCeilingMax } : {}),
       plateTexelNote: 'not measured by the export: the texel line waits for a plate hook',

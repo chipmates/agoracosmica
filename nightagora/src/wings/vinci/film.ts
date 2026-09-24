@@ -9,6 +9,7 @@
 import type { VinciStationId } from './content'
 import type { createRail, Pose } from './rail'
 import type { VinciWalk, VinciWalkStop } from './walk'
+import { LOOP_S, windClock } from './wind'
 
 type Rail = ReturnType<typeof createRail>
 
@@ -35,6 +36,16 @@ export interface FilmParts {
   narrow: () => boolean
   walkPose: (stop: VinciWalkStop, narrow: boolean) => Pose
   approachPose: (exhibit: string, narrow: boolean) => Pose | undefined
+}
+
+/** THE WORLD'S CLOCK AT THE JOINS. At rest the wind stands on its loop's
+    first frame, so every still of a stop is one picture; a leg carries it
+    through whole loops as the body walks, easing in and out with the walk,
+    and lands on the first frame again. A leg shorter than a loop holds it. */
+export function pinnedWind(nav: { active?: string | null; legSeconds: number; legWalked: number }): number {
+  if (!nav.active) return 0
+  const loops = Math.floor(nav.legSeconds / LOOP_S)
+  return (LOOP_S * loops * nav.legWalked) % LOOP_S
 }
 
 export function installFilm(parts: FilmParts): void {
@@ -98,6 +109,10 @@ export function installFilm(parts: FilmParts): void {
         approaching: nav.approaching ?? null,
         wall: nav.wall ?? null,
       }
+    },
+    /** at the top of every draw, after the wing's own update wrote the clock */
+    beforeDraw(): void {
+      windClock.value = pinnedWind(parts.rail().navigation)
     },
   }
   ;(window as Window & { __naFilm?: unknown }).__naFilm = hook
