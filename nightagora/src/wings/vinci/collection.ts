@@ -498,18 +498,28 @@ export function createCollection(): Group {
   }
   for (const height of [floor + .08, top - .10]) opaque.box(C.east, -49, height, .18, 30, .16, steel, 1)
   // Two low solid slabs and a higher, shallow south-falling hall roof.
-  const roof = (west: number, south: number, east: number, north: number, low: number, high: number) => {
+  // A slab's edge can be left off where another slab of the same plane
+  // carries on from it, so no two edges ever stand in one plane.
+  const roof = (west: number, south: number, east: number, north: number, low: number, high: number, open: readonly ('s' | 'n')[] = []) => {
     const thickness = .20
     opaque.quad([west, south, low], [east, south, low], [east, north, high], [west, north, high], slate, 2)
     // The underside is the same pale, weathered cast concrete as the base.
     // Its real downward normal receives the shared sky/ground environment.
     castConcrete.quad([west, north, high - thickness], [east, north, high - thickness], [east, south, low - thickness], [west, south, low - thickness], concrete)
-    opaque.quad([west, south, low - thickness], [east, south, low - thickness], [east, south, low], [west, south, low], steel, 1)
-    opaque.quad([east, north, high - thickness], [west, north, high - thickness], [west, north, high], [east, north, high], steel, 1)
+    if (!open.includes('s')) opaque.quad([west, south, low - thickness], [east, south, low - thickness], [east, south, low], [west, south, low], steel, 1)
+    if (!open.includes('n')) opaque.quad([east, north, high - thickness], [west, north, high - thickness], [west, north, high], [east, north, high], steel, 1)
     opaque.quad([west, north, high - thickness], [west, south, low - thickness], [west, south, low], [west, north, high], steel, 1)
     opaque.quad([east, south, low - thickness], [east, north, high - thickness], [east, north, high], [east, south, low], steel, 1)
   }
-  roof(-62.7, -42.7, -21.3, -33.3, top + .13, top + .25)
+  // THE PICTURE ROOM'S ROOF, its overhang cut back to the glazing where the
+  // supper room's bay stands: the bay's own roof covers it there, and the
+  // overhang ran through the display wall in front of the field's corner.
+  const glassLine = -34, overhang = -33.3, bay = [-44.9, -41.3] as const
+  const atGlass = top + .13 + .12 * (glassLine + 42.7) / (overhang + 42.7)
+  roof(-62.7, -42.7, -21.3, glassLine, top + .13, atGlass, ['n'])
+  opaque.quad([bay[1], glassLine, atGlass - .20], [bay[0], glassLine, atGlass - .20], [bay[0], glassLine, atGlass], [bay[1], glassLine, atGlass], steel, 1)
+  roof(-62.7, glassLine, bay[0], overhang, atGlass, top + .25, ['s'])
+  roof(bay[1], glassLine, -21.3, overhang, atGlass, top + .25, ['s'])
   roof(-39.7, -64.6, -21.3, -42.7, top + .13, top + .25)
   const hallNorth = floor + 7.65, hallSouth = floor + 6.9
   roof(-62.7, -64.7, -38.9, -42.5, hallSouth, hallNorth)

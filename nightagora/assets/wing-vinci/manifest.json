@@ -228,10 +228,10 @@
       "class": "GENERATED",
       "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
-      "prompt": "Original procedural modern museum insertion at the fixed maquette envelope. Low post-grid pavilions, shallow slate roofs, full-height glazed enclosure, concrete apron and garden stair. Exact modern approach grade cuts, supported landings and continuous concrete cheek ownership. Museum design, not a claim about1517. Share the existing pale cast-concrete finish across all four roof soffits; keep their downward normals and the sole measured sun. Derive both entrance post heads from the retained inclined canopy underside; keep their centres and buried feet. Provide continuous derived structural support beneath the existing stair cheeks and both landing heads. Keep the maquette walking widths and every finish level. Wear the garden treads as a used stair wears: each nosing rounded, paler and smoother along a walking line that wanders from tread to tread, its aggregate showing and a few chips, grit held at the back of each tread against the riser above (surface only, no tread moves).",
+      "prompt": "Original procedural modern museum insertion at the fixed maquette envelope. Low post-grid pavilions, shallow slate roofs, full-height glazed enclosure, concrete apron and garden stair. Exact modern approach grade cuts, supported landings and continuous concrete cheek ownership. Museum design, not a claim about1517. Share the existing pale cast-concrete finish across all four roof soffits; keep their downward normals and the sole measured sun. Derive both entrance post heads from the retained inclined canopy underside; keep their centres and buried feet. Provide continuous derived structural support beneath the existing stair cheeks and both landing heads. Keep the maquette walking widths and every finish level.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "30e9a4cf3b46453f8669be3151a7dfdd1e46d5ad697d71a37d72a312dc894ed9",
+      "sha256": "6e43b8b989ad25fce3162fbdeda8a043863a189a7234649b669c33f252f8a1b4",
       "note": "recipe_file=src/wings/vinci/collection.ts"
     },
     {
