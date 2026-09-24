@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed to a pale grey at 30 per cent. Assumed weather, no observation claimed.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "7daf50624ab93afb18a86f70c44bb0c15bd3b99c4035eab458fb9213427ef26a",
+      "sha256": "0b4c69d82c54a804ae1359b54716648b9f6932306a6727ae7327c96461cdb979",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=80c458f2cb5ccddb7fcedccda5df70e5cdccda7d9ca97d65ebfa6462920f61ef;"
     },
     {
@@ -75,7 +75,7 @@
       "prompt": "Spoken bilingual museum labels with unchanged station names and canonical door questions. Plain source explanations and a separately opened complete record retain the original source chain, dimensional ranges, uncertainty and identical computed-hour arithmetic.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "40e6f4204a6f01afa809acbef67cc3c93c7977d585091205b1c4e0541d6ef53d",
+      "sha256": "2a8617a51d5cfeb710bb4f1a9d094a0ac31d4eb1b4af415d84a9a4b10ed3b0fc",
       "note": "brief/CONCEPT-OPUS.md; brief/CONCEPT-GPT6.md; src/wings/vinci/data/doors.json; recipe_file=src/wings/vinci/content.ts; visitor_evidence_recipe=src/wings/vinci/evidence-copy.ts; visitor_evidence_sha256=1154b783a9a2b7bddd75d4d1294475ae82dbe74006e4b6ff5c0eb2df9247ed00"
     },
     {
@@ -2679,10 +2679,10 @@
       "class": "GENERATED",
       "licence": "Original procedural museum exhibition. Source code under the museum repository licence.",
       "display": true,
-      "prompt": "Museum floor exhibition. Fifty-six data-led dates, equal spacing, carved sockets, bronze inlay, certainty colours, the year in bronze set across the paving face with the certainty word painted beside it, or for a date read from far down the floor one row of year, word and event cut long along the walk, a bronze rail, a coped parapet and a threshold that opens on a continuing walk. Fictional museum carrier, never historical reconstruction testimony.",
+      "prompt": "Museum floor exhibition. Fifty-six data-led dates, equal spacing, carved sockets, bronze inlay, certainty colours, the year in bronze set across the paving face with the certainty word painted beside it, a bronze rail, a coped parapet and a threshold that opens on a continuing walk. Fictional museum carrier, never historical reconstruction testimony.",
       "model": "Deterministic TypeScript geometry and TSL materials",
       "date": "2026-09-10",
-      "sha256": "fcf2d920022f2b4ffbbbe8f74fd3c0b3205e0c6673914b6f758d85fcbe99f1f9",
+      "sha256": "6e2c6c7ebf5588c1a71ce89640e629439e0aa68cae328e6a5368fb676053933f",
       "note": "recipe_file=src/wings/vinci/line/index.ts"
     },
     {
@@ -2744,10 +2744,10 @@
       "class": "GENERATED",
       "licence": "Original procedural museum exhibition. Source code under the museum repository licence.",
       "display": true,
-      "prompt": "Interpretive museum ledger slab of pale honed limestone with the documented name cut and filled, and no epitaph; a separate presumed plaque of the same limestone on a footed base, based on a sourced account; a coursed chapel-gable relief on an oak shelf in a deep bronze box, lit by one light of its own from the computed direction of the chosen minute, under a raked reading ledge. No remains, no portrait, no invented historical plaque facsimile.",
+      "prompt": "Interpretive museum ledger slab of pale honed limestone with the documented name cut and filled, and no epitaph; a separate presumed plaque on a footed base, based on a sourced account; a coursed chapel-gable relief on an oak shelf in a deep bronze box, lit by one light of its own from the computed direction of the chosen minute, under a raked reading ledge. No remains, no portrait, no invented historical plaque facsimile.",
       "model": "Deterministic TypeScript geometry and TSL materials",
       "date": "2026-09-10",
-      "sha256": "8bb96665b1a47e286a8ed3713499dbfe453fa5680e2efd78cd61a6029f70397e",
+      "sha256": "075f58ccb094889bcdb57ea3b679110d434bf5a76640211fb3fe575bcc2c1919",
       "note": "recipe_file=src/wings/vinci/grave/index.ts"
     },
     {
@@ -3379,7 +3379,7 @@
       "prompt": "Authored bilingual visitor source explanations for all fifty-six locked timeline records. Original evidence and uncertainty preserved separately in the record.",
       "model": "Deterministic TypeScript geometry and TSL materials",
       "date": "2026-09-10",
-      "sha256": "d832fc97094312feaaaac38a9ac2ecd8f13279fbaa7ed00f58fdfb43d6abd6d6",
+      "sha256": "836f20185a50bb1cf86e8125335ffdb1fae6a2bb17f9937c793dcb16bfa635fa",
       "note": "recipe_file=src/wings/vinci/line/bench/visitor-sources.ts"
     },
     {
