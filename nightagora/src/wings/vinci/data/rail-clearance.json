@@ -42,8 +42,8 @@
   },
   {
    "file": "src/wings/vinci/collection-access.ts",
-   "sha256": "3295b875f339a8965b08ca9ef48d93d5917c23af90e117395ce7d0661c31698f",
-   "bytes": 13863,
+   "sha256": "40bf6bead01daad7c04c478468a509029b573552d393c84b9828d364c31b7d10",
+   "bytes": 15715,
    "unchangedDuringAudit": true
   },
   {
@@ -56,6 +56,18 @@
    "file": "src/wings/vinci/collection/approaches.ts",
    "sha256": "4c61ef8e25557d5101f848bca86b7f36a97c72c02583004759a7e6cfe994bba5",
    "bytes": 27748,
+   "unchangedDuringAudit": true
+  },
+  {
+   "file": "src/wings/vinci/collection/body-wall-light.ts",
+   "sha256": "380cd072c92ac8431cd6644e4554bd0c47448396d55e2318c413f8915e9f2861",
+   "bytes": 3011,
+   "unchangedDuringAudit": true
+  },
+  {
+   "file": "src/wings/vinci/collection/body-wall-plan.ts",
+   "sha256": "a893477daaee7ec4835d1042ee90830f9fabc745fb8137ad47d68fd7808e15ce",
+   "bytes": 32303,
    "unchangedDuringAudit": true
   },
   {
@@ -83,9 +95,21 @@
    "unchangedDuringAudit": true
   },
   {
+   "file": "src/wings/vinci/collection/line-gallery-plan.ts",
+   "sha256": "fdae52f985d49038c462ba6bfbf6d51a3338e2af24b1591f5d08959c0991505b",
+   "bytes": 25311,
+   "unchangedDuringAudit": true
+  },
+  {
    "file": "src/wings/vinci/collection/materials.ts",
-   "sha256": "81690d05d081a9e3139b00e999189c7a1b9453c2a3bdcf8b2222571b4462ebe6",
-   "bytes": 42757,
+   "sha256": "89f33b0cd539c66268caa251ca6715ecb5cea5aae62084392a0b14dca91e0b78",
+   "bytes": 42994,
+   "unchangedDuringAudit": true
+  },
+  {
+   "file": "src/wings/vinci/collection/reading-room-plan.ts",
+   "sha256": "63f60c21bced008f962329bc1020cc917fe059969cdf594c0c79e9efcc74b5fa",
+   "bytes": 73084,
    "unchangedDuringAudit": true
   },
   {
@@ -186,8 +210,8 @@
   },
   {
    "file": "src/wings/vinci/entry-passage.ts",
-   "sha256": "9248a3072faa9c2553ad64d91507c040b1dfe485948edd6daf1eacebc63e9ed4",
-   "bytes": 20977,
+   "sha256": "2155d30563d3207d80bc511f93a0323520bc5c87b1e0618ce771f0ec6becf0f6",
+   "bytes": 23775,
    "unchangedDuringAudit": true
   },
   {
@@ -246,8 +270,8 @@
   },
   {
    "file": "src/wings/vinci/ground.ts",
-   "sha256": "f94c40d5ddb7262077aa073b1bb1cf47c05ed1f04238635ad7f300154e810b6b",
-   "bytes": 28376,
+   "sha256": "0b6e2be1821dcfec2e341586e828d9f128d4ad69b7172fa5c706dfe3c8c085e8",
+   "bytes": 30115,
    "unchangedDuringAudit": true
   },
   {
@@ -264,8 +288,8 @@
   },
   {
    "file": "src/wings/vinci/house-rooms.ts",
-   "sha256": "ec429b92970124e397319dbb596adeffb9e7386fc7e10a98501fecd6ef20f097",
-   "bytes": 31833,
+   "sha256": "39f46724ae3ce2c2364e93bccac5c558fa4df622a6db8ef3ae4aa3a202770703",
+   "bytes": 35889,
    "unchangedDuringAudit": true
   },
   {
@@ -282,8 +306,8 @@
   },
   {
    "file": "src/wings/vinci/inner-court.ts",
-   "sha256": "78f01ef14573db1e60ee6053b136ad28665b509779740bcded5fdd471d195c46",
-   "bytes": 25148,
+   "sha256": "70498e5daac24841ca459416cae665f87582c1bee36214f233e03599ccb33f81",
+   "bytes": 30559,
    "unchangedDuringAudit": true
   },
   {
@@ -420,14 +444,14 @@
   },
   {
    "file": "src/wings/vinci/machines/data/water-lifting-screw.json",
-   "sha256": "8312e9a5d1ac5f6fc1427959efb9087636caed2115361533a40014b7a6496d3e",
-   "bytes": 372925,
+   "sha256": "b4a7ea08aadf60e9d4f6731ca0de943f40f247e575d536a154e34667fce33354",
+   "bytes": 387009,
    "unchangedDuringAudit": true
   },
   {
    "file": "src/wings/vinci/machines/geometry.ts",
-   "sha256": "8a856578f1f16c6c28a0ad1afc7fcda56f11f09969182c8927e49f3f022e9ac3",
-   "bytes": 24538,
+   "sha256": "79471916384bc35497c26e1e347a2584a331ecf15f8e5b788e70bf217eb80bc1",
+   "bytes": 24536,
    "unchangedDuringAudit": true
   },
   {
@@ -546,8 +570,8 @@
   },
   {
    "file": "src/wings/vinci/shell.ts",
-   "sha256": "bff27695dc137884f46d5bf739b4675e5c107f932d5eb4af774b50175e734c19",
-   "bytes": 48523,
+   "sha256": "cb9365b25b505943051512000d328df398ada625b4344ccb9ec8d020c5c8585a",
+   "bytes": 49513,
    "unchangedDuringAudit": true
   },
   {
@@ -564,8 +588,8 @@
   },
   {
    "file": "src/wings/vinci/surface.ts",
-   "sha256": "afe55ed337630aa1407d6413e1f03916d88cb6fcc89f69e1b74552a30cf6d1fe",
-   "bytes": 45918,
+   "sha256": "916766c851d42e5f7dce4a85cdd06899a0f4bf93ff841911980527cdc28ca169",
+   "bytes": 47907,
    "unchangedDuringAudit": true
   },
   {
