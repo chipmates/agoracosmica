@@ -7,7 +7,7 @@ export type RopeShadowExperiment = 'baseline' | 'no-shadow' | 'flat-normal' | 'o
 
 const targetIds: Record<RopeShadowSlug, readonly string[]> = {
   lathe: ['drive-rope'],
-  'revolving-crane': ['hoist-rope', 'drum-wrap'],
+  'revolving-crane': ['hoist-rope', 'drum-wrap', 'drum-coils'],
   parachute: ['suspension-0', 'suspension-1', 'suspension-2', 'suspension-3'],
 }
 

@@ -3395,6 +3395,10 @@
         "en": "Rope on the drum",
         "de": "Seil auf der Trommel"
       },
+      "drum-coils": {
+        "en": "Rope wound on the drum",
+        "de": "Aufgewickeltes Seil"
+      },
       "rope-anchor": {
         "en": "Rope anchor",
         "de": "Seilanker"
