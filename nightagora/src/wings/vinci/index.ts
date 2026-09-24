@@ -43,7 +43,9 @@ import { createCollectionAccess, collectionAccessPoint, collectionAccessProvenan
 import { createRoadDressing, roadDressingProvenance } from './road-dressing'
 import { createCourtObjects, createInnerCourtDressing, courtObjectsProvenance, innerCourtProvenance, courtDressingProvenance } from './inner-court'
 import { createGatePassage, gatePassageProvenance } from './gate-passage'
-import { createEntryPassage, entryPassageProvenance, hallLedge, hallLedgeProvenance } from './entry-passage'
+import { createStudySheet, type StudySheet } from './study-sheet'
+import { createEntryPassage, createLedgeMount, entryPassageProvenance, hallLedge, hallLedgeProvenance, LEDGE_FINISH_PROUD_M } from './entry-passage'
+import { mountBoxes } from './machines/bench/mounts'
 import { createGround } from './ground'
 import { planVegetation, VEGETATION_STEPS } from './vegetation'
 import { windClock } from './wind'
@@ -395,6 +397,7 @@ export function createWing():VinciWingModule {
   /** THE STORE'S OWN INDEX, held: a row is painted synchronously and every
    * exhibit without a plate of its own takes its preview by address. */
   let assets:ManifestIndex|undefined
+  let studySheet:StudySheet|undefined, releaseSheetMemory:(()=>void)|undefined
   let quiet:HTMLElement|undefined, quietDot:HTMLElement|undefined, quietName:HTMLElement|undefined, quietYear:HTMLElement|undefined
   /** The vertex the eye last stood at, so the marks and the row are taken
    * again the moment it arrives at another stop. */
@@ -653,6 +656,10 @@ export function createWing():VinciWingModule {
     const dressing=planGroundDressing(groundHeight,stack.tierName())
     const courtDressing=createInnerCourtDressing(groundHeight,stack.tierName())
     courtRoot=courtDressing
+    studySheet?.dispose();releaseSheetMemory?.()
+    studySheet=createStudySheet(courtDressing)
+    { const sheet=studySheet;releaseSheetMemory=stack.registerTextureMemory(()=>sheet.textureMB(),'study sheet') }
+    if(assets)supplyStudySheet()
     if(greatHall)scene.add(greatHall.group)
     scene.add(ground,shell,entry,createGatePassage(stack.tierName()),courtDressing,createCourtObjects(groundHeight,stack.models),createRoadDressing(groundHeight,stack.tierName()),collection,createCollectionAccess(),wood.group,dressing.group)
     yield
@@ -742,11 +749,23 @@ export function createWing():VinciWingModule {
     // beside the collection's, because a press has to reach it from the hall.
     {
       const compass=buildMachine('proportional-compass',stack)
-      compass.object.position.set(hallLedge.stand.east,hallLedge.top-compass.bounds.min.y,-hallLedge.stand.north)
+      // Its tips stand clear of the shelf, so it is held as the exhibition
+      // holds it everywhere: a plate on the ledge's finished top, a stem, a
+      // collar at the pivot.
+      // The bench's mount lets the lowest moving tip clear its plate by 48 mm;
+      // on a shelf that reads as floating, so here the instrument sits 40 mm
+      // lower on a shorter stem and its tips still clear the plate by 8 mm.
+      const lift=hallLedge.top+LEDGE_FINISH_PROUD_M-compass.bounds.min.y,drop=.04
+      compass.object.position.set(hallLedge.stand.east,lift-drop,-hallLedge.stand.north)
       compass.object.rotation.y=hallLedge.facing*Math.PI/180
       compass.object.updateMatrixWorld(true)
       houseRoot=new Group();houseRoot.name='vinci/house-exhibits'
       houseRoot.add(compass.object)
+      const held=mountBoxes('proportional-compass').map(box=>box.centre[1]>.3
+        ?{...box,centre:[box.centre[0],box.centre[1]-drop,box.centre[2]] as [number,number,number]}
+        :box.size[1]>.1?{size:[box.size[0],box.size[1]-drop,box.size[2]] as [number,number,number],centre:[box.centre[0],box.centre[1]-drop/2,box.centre[2]] as [number,number,number]}:box)
+      houseRoot.add(createLedgeMount(held,
+        {east:hallLedge.stand.east,north:hallLedge.stand.north,height:lift,bearingRad:compass.object.rotation.y},stack.tierName()!=='calm'))
       scene.add(houseRoot)
     }
     dots=createVinciExhibitDots({host:h.labels,camera,occluders,limit:DOTS_PER_TIER[stack.tierName()]??6,controls:VINCI_EXHIBIT_CARD,
@@ -798,7 +817,7 @@ export function createWing():VinciWingModule {
         dots?.setOpen(null);dots?.invalidate();paintExhibitTitle();paintHeaderVisibility();paintStrip();refreshRecap()
       }})
     strip=createVinciHangStrip({host:h.labels,onOpen:(id,button)=>openExhibit(id,button)})
-    void loadManifest().then(index=>{assets=index;if(hosts&&standing)refreshExhibits()})
+    void loadManifest().then(index=>{assets=index;supplyStudySheet();if(hosts&&standing)refreshExhibits()})
     void exhibits?.picturesReady.then(()=>{if(hosts&&standing)refreshExhibits()})
     // THE REGISTRY IS A READ, and the court's own exhibits land after the
     // plates do: the row of a station that stands over them is empty until
@@ -1868,6 +1887,15 @@ export function createWing():VinciWingModule {
     studyLeaf=pages.find(page=>page.page_kind==='facsimile'&&page.codex==='B'&&page.folio===83&&page.side==='verso')
     return studyLeaf
   }
+  /** THE LEAF ON THE SUPPORT, from the same record the reader opens: the
+   * display scan on the live tiers, its thumb where the budget is calm. */
+  function supplyStudySheet():void {
+    const leaf=studyLeafPage()
+    if(!studySheet||!assets)return
+    const stem=leaf?leafStem(leaf):''
+    const calm=hosts?.world.stack.tierName()==='calm'
+    studySheet.supply(leaf?assets.byId.get(`vinci/${calm?'ms-thumb':'ms-page'}/${stem}`):undefined)
+  }
   /** The stem the store keys this leaf's records by. */
   const leafStem=(page:PageRecord):string=>page.file.replace(/^.*\//,'').replace(/\.[a-z]+$/,'')
   /** ONE ADMITTED LEAF, OPENED WHERE THE VISITOR STANDS. The reading is the
@@ -2577,8 +2605,8 @@ export function createWing():VinciWingModule {
       return {completed:nav?.completed??hereContent().id,target:nav?.queued[0]??nav?.active,question:text(hereContent().door)}
     },
     // A MACHINE NOT YET WHOLE IS STILL IN FLIGHT, and one that cannot be is an error.
-    pending:()=>(exhibits?.pending()??0)+machinesStanding().outstanding,
-    errors:()=>[...(exhibits?.pictureErrors()??[]),...machinesStanding().errors],
+    pending:()=>(exhibits?.pending()??0)+machinesStanding().outstanding+(studySheet?.pending()??0),
+    errors:()=>[...(exhibits?.pictureErrors()??[]),...machinesStanding().errors,...(studySheet?.errors()??[])],
     manifest:()=>[...new Map((exhibits?.pictureSources()??[]).flatMap(({entry})=>[entry.preview,entry.plate]).map(entry=>[entry.id,entry])).values()],
     /* EVERY WORD OF THIS WING, READ AGAIN. The frame hands the language over
        before it repaints its own chrome, so the rail's names are the wing's
@@ -2722,7 +2750,7 @@ export function createWing():VinciWingModule {
       dots?.setFoot(Math.max(0,deskStageHeight()-markFloor()+12,markSafeFoot()))
       dots?.setLimit(closeLook?.id?0:onWallStop()?3:DOTS_PER_TIER[hosts.world.stack.tierName()]??6)
       dots?.update(panels)},
-    stop(){desk?.dispose();desk=undefined;visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;life?.dispose();life=undefined;lifeControl?.remove();lifeControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;house=undefined;houseUp=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
+    stop(){studySheet?.dispose();studySheet=undefined;releaseSheetMemory?.();releaseSheetMemory=undefined;desk?.dispose();desk=undefined;visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;life?.dispose();life=undefined;lifeControl?.remove();lifeControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;house=undefined;houseUp=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
   }
   return wingModule
 }

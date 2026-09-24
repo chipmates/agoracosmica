@@ -13,7 +13,7 @@ import { timberFaceCoordinates, timberPanelFrame } from './timber'
 import { gatePassageProvenance } from './gate-passage'
 import { foundationPlinthFaces, foundationPlinthProvenance } from './foundation-plinth'
 import { createHouseGlazing, houseGlazingProvenance, type GlazedLight } from './house-glazing'
-import { createHouseRooms, houseRoomsProvenance } from './house-rooms'
+import { createDormerRooms, createHouseRooms, houseRoomsProvenance, type DormerRoom } from './house-rooms'
 import { HALL_WINDOWS } from './house-hall'
 import { createHouseTracery, houseTraceryProvenance, type SillSpec, type TraceryWindow } from './house-tracery'
 import dossierText from './data/closluce.json?raw'
@@ -213,7 +213,7 @@ function clipGableBacking(poly:V3[],faces:RoofFace[]):V3[][] {
 
 /** What one createShell call hands the house's own modules: the lights to
  * glaze, the traceried windows to carve, the window backs a room opens. */
-interface HouseBuild { glaze:boolean; carve:boolean; openBacks:ReadonlySet<string>; lights:GlazedLight[]; tracery:TraceryWindow[]; sills:SillSpec[] }
+interface HouseBuild { glaze:boolean; carve:boolean; openBacks:ReadonlySet<string>; lights:GlazedLight[]; tracery:TraceryWindow[]; sills:SillSpec[]; dormers:DormerRoom[] }
 let house:HouseBuild|null=null
 /** The new glass stands in front of every retired pane and saddle bar (the
  * bars' faces reach -40 mm), so no retired piece can win a pixel over it
@@ -522,7 +522,17 @@ function drawDormer(d:Detail,b:Batches):void {
   const at=(x:number,z:number,inside=0):V3=>[p[0]+t[0]*x-n[0]*inside,p[1]+t[1]*x-n[1]*inside,z]
   const f=facadeFrom(d.id,[p[0]-t[0]*w/2,p[1]-t[1]*w/2],[p[0]+t[0]*w/2,p[1]+t[1]*w/2],'oak')
   const a=at(-w/2,base),c=at(w/2,base),upper=base+h*.72,peak=base+h
-  b.dark.quad(a,c,at(w/2,upper),at(-w/2,upper));b.oak.tri(at(-w/2,upper),at(w/2,upper),at(0,peak))
+  // Where the house is glazed, the dark back leaves the camera for leaded
+  // lights and the roof space behind them; it stays a certified solid.
+  const glaze=Boolean(house?.glaze)
+  b.dark.retire=glaze;b.dark.quad(a,c,at(w/2,upper),at(-w/2,upper));b.dark.retire=false
+  b.oak.tri(at(-w/2,upper),at(w/2,upper),at(0,peak))
+  if(glaze&&house){
+    const x0=.075,x1=w-.075,z0=base+h*.035,z1=base+h*.685,mx=w/2,mz=base+h*.37,bar=.0325
+    const panes:[number,number,number,number][]=[[x0,mx-bar,z0,mz-bar],[mx+bar,x1,z0,mz-bar],[x0,mx-bar,mz+bar,z1],[mx+bar,x1,mz+bar,z1]]
+    for(const [i,[u0,u1,v0,v1]] of panes.entries())house.lights.push(lightOf(f,`${d.id}-${i}`,[[u0,v0],[u1,v0],[u1,v1],[u0,v1]],GLASS_OUT,'dormer',[]))
+    house.dormers.push({id:d.id,centre:[p[0],p[1]],along:t,out:n,base,top:upper,width:w,depth})
+  }
   for(const side of [-1,1]) {
     const edge=side*w/2;const cheek=[at(edge,base),at(edge,base,depth),at(edge,upper,depth),at(edge,upper)]
     const cap=[at(edge,upper,-.12),at(edge,upper,depth),at(0,peak,depth),at(0,peak,-.12)]
@@ -563,7 +573,7 @@ export function createShell(tier:Tier,library?:MaterialLibrary):Group {
   const rooms=full?createHouseRooms(tier==='hero'?.45:.9):null
   // The carving is one more draw; standard stands at its draw ceiling.
   // The great hall is its own module's room; its four windows open too.
-  house={glaze:full,carve:tier==='hero',openBacks:new Set([...(rooms?.openedBacks??[]),...(full?HALL_WINDOWS:[])]),lights:[],tracery:[],sills:[]}
+  house={glaze:full,carve:tier==='hero',openBacks:new Set([...(rooms?.openedBacks??[]),...(full?HALL_WINDOWS:[])]),lights:[],tracery:[],sills:[],dormers:[]}
   const faces=roofFaces(),valleys=roofValleys(faces)
   const facades=spec.facades.filter(f=>f.render).map(f=>({...f,openings:f.openings.map(o=>({...o}))}))
   // One through-gateway is cut in both exterior faces of the covered way.
@@ -621,6 +631,7 @@ export function createShell(tier:Tier,library?:MaterialLibrary):Group {
   const adopt=(g:Group):void=>{for(const child of [...g.children])group.add(child)}
   if(built?.glaze){const glazing=createHouseGlazing(built.lights,tier==='hero'?2:1);adopt(glazing.group);group.userData['glazing']={lights:built.lights.length,quarries:glazing.quarries,cames:glazing.cames,triangles:glazing.triangles,provenance:houseGlazingProvenance}}
   if(rooms){adopt(rooms.group);group.userData['rooms']={rooms:rooms.rooms,openedBacks:[...rooms.openedBacks],triangles:rooms.triangles,provenance:houseRoomsProvenance}}
+  if(built?.dormers.length){const attic=createDormerRooms(built.dormers);if(attic.mesh)group.add(attic.mesh);group.userData['dormerRooms']={dormers:built.dormers.length,triangles:attic.triangles}}
   if(built?.carve&&(built.tracery.length||built.sills.length)){const tracery=createHouseTracery(built.tracery,tier,library,built.sills);adopt(tracery.group);group.userData['tracery']={windows:built.tracery.length,sills:built.sills.length,triangles:tracery.triangles,provenance:houseTraceryProvenance}}
   group.userData['foundationPlinth']=foundationPlinthProvenance
   group.userData['northValleys']=valleys

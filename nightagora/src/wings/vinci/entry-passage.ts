@@ -181,10 +181,12 @@ function ledgeBody(batch:Batch):void {
 /** THE LEDGE AS THE MUSEUM MADE IT: an oiled oak board on blackened steel,
  * a hair proud of the certified shelf, which stays the solid it always was
  * inside it. Its own mesh under the ledge's own record. */
+/** How far the finished board stands proud of the certified shelf. */
+export const LEDGE_FINISH_PROUD_M=.003
 function ledgeFinish(perPixel:boolean):Mesh {
   const {point,along,inward}=ledgeAxis
   // three millimetres proud on every face the room sees; none against the wall
-  const half=LEDGE.length/2+.003,top=floorZ+LEDGE.top+.003,e=.003
+  const half=LEDGE.length/2+.003,top=floorZ+LEDGE.top+LEDGE_FINISH_PROUD_M,e=.003
   const positions:number[]=[],finish:number[]=[],light:number[]=[]
   const box=(u0:number,u1:number,v0:number,v1:number,z0:number,z1:number,kind:number):void=>{
     const c=(u:number,v:number,z:number):Point3=>[point[0]+along[0]*u+inward[0]*v,point[1]+along[1]*u+inward[1]*v,z]
@@ -222,6 +224,47 @@ function ledgeFinish(perPixel:boolean):Mesh {
   const mesh=new Mesh(geometry,m);mesh.name='wing-vinci/entry-passage/ledge-finish'
   mesh.castShadow=false;mesh.receiveShadow=true
   mesh.userData={manifestId:hallLedgeProvenance.manifestId,labelOccluder:true}
+  return mesh
+}
+
+/** THE COMPASS'S OWN MOUNT on the ledge: the plate, the stem and the collar
+ * the exhibition holds this instrument by at its pivot, in the machine's
+ * frame (up +Y, forward +Z, metres), placed where the machine stands. */
+export function createLedgeMount(boxes:readonly {size:[number,number,number];centre:[number,number,number]}[],
+  stand:{east:number;north:number;height:number;bearingRad:number},perPixel:boolean):Mesh {
+  const cos=Math.cos(stand.bearingRad),sin=Math.sin(stand.bearingRad)
+  // the machine's +X and +Z in east/north, as its object's yaw turns them
+  const toWorld=(x:number,y:number,z:number):Point3=>[stand.east+x*cos+z*sin,stand.north+x*sin-z*cos,stand.height+y]
+  const turn=(x:number,y:number,z:number):Point3=>[x*cos+z*sin,x*sin-z*cos,y]
+  const positions:number[]=[],light:number[]=[]
+  for(const {size,centre} of boxes){
+    const [w,h,d]=size.map(v=>v/2) as [number,number,number]
+    const faces:[[number,number,number][],[number,number,number]][]=[
+      [[[-w,h,-d],[w,h,-d],[w,h,d],[-w,h,d]],[0,1,0]],[[[-w,-h,-d],[-w,-h,d],[w,-h,d],[w,-h,-d]],[0,-1,0]],
+      [[[-w,-h,d],[-w,h,d],[w,h,d],[w,-h,d]],[0,0,1]],[[[-w,-h,-d],[w,-h,-d],[w,h,-d],[-w,h,-d]],[0,0,-1]],
+      [[[w,-h,-d],[w,-h,d],[w,h,d],[w,h,-d]],[1,0,0]],[[[-w,-h,-d],[-w,h,-d],[-w,h,d],[-w,-h,d]],[-1,0,0]],
+    ]
+    for(const [q,n] of faces){
+      const world=q.map(([x,y,z])=>toWorld(centre[0]+x,centre[1]+y,centre[2]+z)),normal=turn(...n)
+      const a=world[0]!,b=world[1]!,c=world[2]!
+      const g=[(b[1]-a[1])*(c[2]-a[2])-(b[2]-a[2])*(c[1]-a[1]),(b[2]-a[2])*(c[0]-a[0])-(b[0]-a[0])*(c[2]-a[2]),(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0])]
+      const pts=g[0]!*normal[0]+g[1]!*normal[1]+g[2]!*normal[2]<0?[...world].reverse():world
+      for(const i of[0,1,2,0,2,3]){const p=pts[i]!;positions.push(p[0],p[2],-p[1]);light.push(...passageLight(p,normal))}
+    }
+  }
+  const geometry=new BufferGeometry()
+  geometry.setAttribute('position',new Float32BufferAttribute(positions,3))
+  geometry.setAttribute('passage',new Float32BufferAttribute(light,2))
+  geometry.computeVertexNormals();geometry.computeBoundingSphere()
+  // bronze, the museum's metal for what a hand or an eye finds, so the
+  // stem reads between the compass's legs against the shaded wall
+  const m=new MeshStandardNodeMaterial({metalness:.6,roughness:.38})
+  m.colorNode=vec3(.30,.20,.095)
+  applyPassageLight(m,perPixel)
+  m.name='vinci/entry-passage/ledge-mount'
+  const mesh=new Mesh(geometry,m);mesh.name='wing-vinci/entry-passage/ledge-mount'
+  mesh.castShadow=true;mesh.receiveShadow=true
+  mesh.userData={manifestId:hallLedgeProvenance.manifestId,labelOccluder:false}
   return mesh
 }
 

@@ -106,6 +106,27 @@ export function weatherCourtConcrete(m: MeshStandardNodeMaterial): MeshStandardN
   c = c.mul(float(1).sub(pores.mul(.14))).mul(float(1).sub(grit.mul(.32)))
   c = mix(c, c.mul(vec3(1.07, 1.065, 1.05)), worn.mul(.6))
   c = c.mul(patchy.sub(.5).mul(.12).add(1))
+  // THE FORM READS AT THE DISTANCE THE STAIR IS SEEN FROM. Each board left
+  // its own grain and a shallow step at its edge, a pour's lime blooms pale
+  // low on the faces, and the arrises a hand runs along are a little worn.
+  const along = P.x.mul(tangent[1]).sub(P.z.negate().mul(tangent[0])).add(P.x.mul(tangent[0]).add(P.z.negate().mul(tangent[1])))
+  const boardIndex = floor(P.y.div(.15)), inBoard = fract(P.y.div(.15))
+  const grain = mx_noise_float(vec3(along.mul(1.6), boardIndex.mul(7.3), P.y.mul(38))).mul(vertical)
+  const seam = float(1).sub(smoothstep(.0, .06, inBoard.min(float(1).sub(inBoard)))).mul(vertical)
+  const bloom = smoothstep(.55, .85, mx_noise_float(vec3(along.mul(2.3), P.y.mul(3.1), 7.7)).mul(.5).add(.5))
+    .mul(float(1).sub(smoothstep(.05, .45, span.x))).mul(vertical)
+  const arris = float(1).sub(smoothstep(.004, .02, span.y)).mul(vertical).mul(patchy.mul(.6).add(.4))
+  const spots = smoothstep(.78, .92, mx_noise_float(P.mul(24).add(vec3(1.3, 7.1, 4.4))).mul(.5).add(.5)).mul(up.max(foot))
+  // the form's ties, drawn and filled: a darker cone on a 0.6 m grid, one
+  // row at the middle of each face's own height
+  const tieAt = vec3(fract(along.div(.6)).sub(.5).mul(.6), span.x.sub(span.y).mul(.5), 0)
+  const tie = float(1).sub(smoothstep(.012, .022, tieAt.length())).mul(vertical).mul(smoothstep(.2, .3, span.x.add(span.y)))
+  c = c.mul(grain.mul(.16).add(1)).mul(board.mul(.24).add(1)).mul(float(1).sub(seam.mul(.30))).mul(float(1).sub(tie.mul(.5)))
+  c = mix(c, c.mul(vec3(1.16, 1.15, 1.12)), bloom.mul(.55))
+  c = mix(c, c.mul(vec3(1.12, 1.11, 1.08)), arris.mul(.7))
+  c = mix(c, c.mul(vec3(.78, .82, .70)), spots.mul(.6))
+  // a warm limestone aggregate, never the blue-grey of a new pour
+  c = c.mul(vec3(1.035, 1.0, .945))
   m.colorNode = c
   m.roughnessNode = (m.roughnessNode as N).sub(worn.mul(.08)).add(runs.mul(.03)).clamp(.72, .98)
   return m

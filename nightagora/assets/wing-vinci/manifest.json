@@ -7,10 +7,10 @@
       "class": "GENERATED",
       "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
-      "prompt": "Thin brick relief, tuffeau quoins and registered cut apertures, intersecting roofs, dormers, chimneys, turret and separate gallery/watchtower. Dossier nominal dimensions with original certainty ranges. No photograph sampled. Shallow 55 mm rebate within declared 35–90 mm assumption; split upper sky reflection and lower dark-room glazing. Existing roughness .18–.23 remains inside dossier interval; no screen-space transmission. Duplicated upper tower shell now shares registered aperture cuts. Connected F16/F17 masonry below the unchanged −2.20 m base: 0.60 m inward thickness [0.45–0.80], actual standard/calm ground boundary lower envelope embedded 50 mm [25–100], full joined miter volume and inherited stone coursing. No surveyed height or opening changes. The plinth course on the coursed ashlar faces, laid half a course off their beds, stays certified and leaves the colour pass.",
+      "prompt": "Thin brick relief, tuffeau quoins and registered cut apertures, intersecting roofs, dormers, chimneys, turret and separate gallery/watchtower. Dossier nominal dimensions with original certainty ranges. No photograph sampled. Shallow 55 mm rebate within declared 35–90 mm assumption; split upper sky reflection and lower dark-room glazing. Existing roughness .18–.23 remains inside dossier interval; no screen-space transmission. Duplicated upper tower shell now shares registered aperture cuts. Connected F16/F17 masonry below the unchanged −2.20 m base: 0.60 m inward thickness [0.45–0.80], actual standard/calm ground boundary lower envelope embedded 50 mm [25–100], full joined miter volume and inherited stone coursing. No surveyed height or opening changes. The plinth course on the coursed ashlar faces, laid half a course off their beds, stays certified and leaves the colour pass. Where the house is glazed, a dormer's dark back stays certified and leaves the camera for leaded lights.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "bff27695dc137884f46d5bf739b4675e5c107f932d5eb4af774b50175e734c19",
+      "sha256": "cb9365b25b505943051512000d328df398ada625b4344ccb9ec8d020c5c8585a",
       "note": "Q001 Q015 Q019 Q124 Q127 Q131 Q134 Q175; src/wings/vinci/data/closluce.json; recipe_file=src/wings/vinci/shell.ts; geometry_dependency=vinci/foundation-plinth"
     },
     {
@@ -20,10 +20,10 @@
       "class": "GENERATED",
       "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
-      "prompt": "Bilinear IGN ground from 165 retained samples; explicit A-SITE court, terrace and assumed street cut; three scales of earth and grass; mapped stream. Conjectural exposed-soil clods, erosion variation and shallow normal relief dress declared vertical cut faces without changing their outlines or heights. The library earth-packed map in the exact street corridors with grey-beige mineral drift, filtered aggregate and fine grit; the wheel ruts darker and deeper in relief with pressed lips at their sides. The terrace walk as fine river gravel over packed earth, worn back where walked; the house court paved with Loire river cobbles set in sand, one colour per stone, mossy toward the wall feet and smooth along the way from the gate to the door. Each retaining face weathers from its own foot and its own coping: rising damp to a wandering tide line, a speckle of splash, runs of rain off the coping and a metre-scale patina; step nosings worn paler where feet cross. Surface recipes only; every sampled height and outline kept. The retaining ashlar takes a tone and a lean to yellow or grey stone by stone, and a damp line where it meets the grass; the modern cut lining weathers as the court stair does.",
+      "prompt": "Bilinear IGN ground from 165 retained samples; explicit A-SITE court, terrace and assumed street cut; three scales of earth and grass; mapped stream. Conjectural exposed-soil clods, erosion variation and shallow normal relief dress declared vertical cut faces without changing their outlines or heights. The library earth-packed map in the exact street corridors with grey-beige mineral drift, filtered aggregate and fine grit; the wheel ruts darker and deeper in relief with pressed lips at their sides. The terrace walk as fine river gravel over packed earth, worn back where walked; the house court paved with Loire river cobbles set in sand, one colour per stone, mossy toward the wall feet and smooth along the way from the gate to the door. Each retaining face weathers from its own foot and its own coping: rising damp to a wandering tide line, a speckle of splash, runs of rain off the coping and a metre-scale patina; step nosings worn paler where feet cross. Surface recipes only; every sampled height and outline kept. The retaining ashlar takes a tone and a lean to yellow or grey stone by stone, and a damp line where it meets the grass; the modern cut lining weathers as the court stair does. The retaining ashlar's damp climbs above the grass to a salt line, algae greens its lowest stones, the terrace's dirt washes over its head and each run from the coping stains its own column.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "f94c40d5ddb7262077aa073b1bb1cf47c05ed1f04238635ad7f300154e810b6b",
+      "sha256": "0b6e2be1821dcfec2e341586e828d9f128d4ad69b7172fa5c706dfe3c8c085e8",
       "note": "IGN Licence Ouverte 2.0; OSM contributors ODbL 1.0; src/wings/vinci/data/terrain.json; recipe_file=src/wings/vinci/ground.ts"
     },
     {
@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed to a pale grey at 30 per cent. Assumed weather, no observation claimed.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "3cac96689a1d3989cddce59857d01c07acbcea90d2760fcfc5539c8d27ce9370",
+      "sha256": "17d2fb862f96c9fdc6ec41ee918613069886cd366fa676a4c27dd1d7e8e3d75f",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=80c458f2cb5ccddb7fcedccda5df70e5cdccda7d9ca97d65ebfa6462920f61ef;"
     },
     {
@@ -124,10 +124,10 @@
       "class": "GENERATED",
       "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
-      "prompt": "Derivative-filtered original brick, tuffeau, slate and member-local oak finishes on the retained nominal courses, apertures and measured geometry. Brick and pale limestone retain finite pores and restrained broad variation, with continuous overlapping quadratic-spline grain at explicit nominal physical intervals and assumed ranges. Pore colour contrast is reduced; pore depths remain. Slate keeps staggered tile IDs, overlap geometry, palette and fine grain; two broad finite layers and four small finite flakes replace infinite periodic cleft bands. Exact counts, scales, relief ranges, filtering approximations and uncalibrated appearance basis are disclosed EN/DE. The accepted R27b continuous oak body, finite fibres and shallow elongated pores retain their actual member UVs/seeds, worn colour, knots, checks and end grain. All roughness and normal-slope bounds remain. No reference image is sampled, no bitmap is added and no material relief displaces geometry. Brick joints hold the wet toward a face's ends, at its foot and under its sills, most on faces turned to the west-south-west; the brick carries broad soiling drifts between the rain's washes.",
+      "prompt": "Derivative-filtered original brick, tuffeau, slate and member-local oak finishes on the retained nominal courses, apertures and measured geometry. Brick and pale limestone retain finite pores and restrained broad variation, with continuous overlapping quadratic-spline grain at explicit nominal physical intervals and assumed ranges. Pore colour contrast is reduced; pore depths remain. Slate keeps staggered tile IDs, overlap geometry, palette and fine grain; two broad finite layers and four small finite flakes replace infinite periodic cleft bands. Exact counts, scales, relief ranges, filtering approximations and uncalibrated appearance basis are disclosed EN/DE. The accepted R27b continuous oak body, finite fibres and shallow elongated pores retain their actual member UVs/seeds, worn colour, knots, checks and end grain. All roughness and normal-slope bounds remain. No reference image is sampled, no bitmap is added and no material relief displaces geometry. Brick joints hold the wet toward a face's ends, at its foot and under its sills, most on faces turned to the west-south-west; the brick carries broad soiling drifts between the rain's washes. On the roofs every slate is its own stone: its own grey, some leaning purple or green, one in eight darker, the odd one paler and lifted, each set a degree off its neighbours; moss holds in the valleys and lichen dots the pitches. The lowest course of a wall is darker and wetter where it stands in the ground. On the roofs every slate is its own stone: its own grey, some leaning purple or green, one in eight darker, the odd one paler and lifted, each set a degree off its neighbours; moss holds in the valleys and lichen dots the pitches. The lowest course of a wall is darker and wetter where it stands in the ground. On the roofs every slate is its own stone: its own grey, some leaning purple or green, one in eight darker, the odd one paler and lifted, each set a degree off its neighbours; moss holds in the valleys and lichen dots the pitches. The lowest course of a wall is darker and wetter where it stands in the ground.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "afe55ed337630aa1407d6413e1f03916d88cb6fcc89f69e1b74552a30cf6d1fe",
+      "sha256": "916766c851d42e5f7dce4a85cdd06899a0f4bf93ff841911980527cdc28ca169",
       "note": "Text-declared procedural recipe; recipe_file=src/wings/vinci/surface.ts; A-MATERIAL A-MASONRY materials.csv Q124 Q130; mineralSurfaceProvenance contains EN/DE physical scale and amplitude intervals; closeSurfaceProvenance contains EN/DE slate and oak intervals; microstructure_recipe=src/wings/vinci/mineral-microstructure.ts; microstructure_sha256=92c93ba37e7dd89f36690a45e6d785e4548cae5b4c4c27b669ba6a144a136cf2; oak_finish_recipe=src/wings/vinci/oak-microstructure.ts; oak_finish_sha256=2d3a05ee3a15da07c6170e5ba05d8c1100d36e26d560af6a1c7e67c4a9847dc3; dense_mineral_body_recipe=src/wings/vinci/dense-mineral-body.ts; dense_mineral_body_sha256=69c67887495d8d36846c296b7c6e5c52234bf02445895d38f6268f4331b881ea; slate_microstructure_recipe=src/wings/vinci/slate-microstructure.ts; slate_microstructure_sha256=dc1f439cd1964a8705e735e9e8e223d05a0f8e3a16739312101e4f0a888c3af1; weather_recipe=src/wings/vinci/house-weather.ts; weather_sha256=05e3c6db055aedc777f6adae7870d60925be9f320a097e77abbd6b9d4dbc4376"
     },
     {
@@ -254,10 +254,10 @@
       "class": "GENERATED",
       "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
-      "prompt": "Derived 33.8721 square metre inner court apron closes the literal court to registered facade chain at A-SITE zero nominal. Five clipped threshold steps, procedural wear, bedded river pebbles and drain; reconstruction with conjectural dressing. Mounted during court refinement with explicit source-card assumptions.",
+      "prompt": "Derived 33.8721 square metre inner court apron closes the literal court to registered facade chain at A-SITE zero nominal. Five clipped threshold steps, procedural wear, bedded river pebbles and drain; reconstruction with conjectural dressing. Mounted during court refinement with explicit source-card assumptions. The study's reading support is finished as the museum's furniture, an oiled oak board on a bronze post raked low edge to its reader inside the certified solid, and the admitted leaf of Manuscript B folio 83v lies on it at a leaf's size.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "78f01ef14573db1e60ee6053b136ad28665b509779740bcded5fdd471d195c46",
+      "sha256": "16132e0ff4ab63b5aef06ab8476e8ae7ebab5e7ce3a350d6dca0bc6d4214615a",
       "note": "Q124; A-SITE; recipe_file=src/wings/vinci/inner-court.ts"
     },
     {
@@ -293,10 +293,10 @@
       "class": "GENERATED",
       "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
-      "prompt": "Original modern museum access from court H0 to terrace H-1.9 along the retained terrace edge. Twelve risers, 0.30m treads, 2m clear width and two0.75m landings with exact grade cuts and continuous concrete cheek ownership. Explicit design ranges and no historic stair claim. Weathered a few years out of doors: runs off the kerb tops, the shaded feet greening, grit and lichen on the kerbs, treads worn paler down their middle.",
+      "prompt": "Original modern museum access from court H0 to terrace H-1.9 along the retained terrace edge. Twelve risers, 0.30m treads, 2m clear width and two0.75m landings with exact grade cuts and continuous concrete cheek ownership. Explicit design ranges and no historic stair claim. Weathered a few years out of doors: runs off the kerb tops, the shaded feet greening, grit and lichen on the kerbs, treads worn paler down their middle. Each form board keeps its grain and a shallow edge, lime blooms pale low on the faces, the arrises are worn, lichen spots the kerbs, and the aggregate reads warm.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-10",
-      "sha256": "3295b875f339a8965b08ca9ef48d93d5917c23af90e117395ce7d0661c31698f",
+      "sha256": "dcf90de57bee1534fe22048c45258e113cd8634a9a1f17eb3bad1a1ed491c2da",
       "note": "recipe_file=src/wings/vinci/collection-access.ts"
     },
     {
@@ -309,7 +309,7 @@
       "prompt": "Unfurnished entrance structure from existing A-LAYOUT entry polygon: outward0.25m partitions retaining side portals, floor+0.8, ceiling underside+4.0 and next floor+4.3m, terracotta, limewash and flush oak ceiling members. Explicit reconstruction/finish assumptions; no furnishings or occupied room claim. Calm retains all three visible materials and copies the complete enclosure into the existing shell shadow draw.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "9248a3072faa9c2553ad64d91507c040b1dfe485948edd6daf1eacebc63e9ed4",
+      "sha256": "2155d30563d3207d80bc511f93a0323520bc5c87b1e0618ce771f0ec6becf0f6",
       "note": "recipe_file=src/wings/vinci/entry-passage.ts"
     },
     {
@@ -3526,10 +3526,10 @@
       "class": "GENERATED",
       "licence": "Original procedural reconstruction; source code under the museum repository licence.",
       "display": true,
-      "prompt": "A plain modern shelf in the entry passage: 1.20 by 0.30 m, 55 mm thick, on two brackets, fixed to the west partition at 0.90 m over the supplied +0.80 m floor. Square, unmoulded and unpainted: an oiled oak board on two blackened steel brackets, drawn a hair proud of the certified shelf, which stays the solid inside it. A fitting of this museum, not a reconstruction of a 1517 furnishing, and it carries no period claim. Its geometry belongs to the passage, so the rail clearance certificate is written against it and one machine of the collection stands on it.",
+      "prompt": "A plain modern shelf in the entry passage: 1.20 by 0.30 m, 55 mm thick, on two brackets, fixed to the west partition at 0.90 m over the supplied +0.80 m floor. Square, unmoulded and unpainted: an oiled oak board on two blackened steel brackets, drawn a hair proud of the certified shelf, which stays the solid inside it. A fitting of this museum, not a reconstruction of a 1517 furnishing, and it carries no period claim. Its geometry belongs to the passage, so the rail clearance certificate is written against it and one machine of the collection stands on it. The compass on it is held as the exhibition holds it: a blackened steel plate, stem and collar at its pivot.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-20",
-      "sha256": "9248a3072faa9c2553ad64d91507c040b1dfe485948edd6daf1eacebc63e9ed4",
+      "sha256": "2155d30563d3207d80bc511f93a0323520bc5c87b1e0618ce771f0ec6becf0f6",
       "note": "A modern museum fitting inside the entrance structure; the machine it carries has its own record. recipe_file=src/wings/vinci/entry-passage.ts"
     },
     {
@@ -3656,10 +3656,10 @@
       "class": "GENERATED",
       "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
-      "prompt": "The dossier's proposed rooms (A-LAYOUT, A-HEIGHT, A-MASONRY) behind every glazed window except the great hall and the entrance passage, fabric only: floor levels and clear heights as registered, 220 mm terracotta tiles with 8 mm joints, limewashed walls, oak joists 0.18 by 0.23 m at 0.60 m with a main beam past a 5.5 m span, the oratory's quadripartite vault springing at 2.65 m with 120 mm ribs. Exterior edges stand on the shell's inner wall faces with the registered apertures cut. No furnishing. Indirect light baked per vertex once at the fixed hour from window form factors and the sun patches on each floor, on a 0.45 m grid at hero and a 0.9 m grid at standard; the warm bounce is an engine-only term flagged engineBounce.",
+      "prompt": "The dossier's proposed rooms (A-LAYOUT, A-HEIGHT, A-MASONRY) behind every glazed window except the great hall and the entrance passage, fabric only: floor levels and clear heights as registered, 220 mm terracotta tiles with 8 mm joints, limewashed walls, oak joists 0.18 by 0.23 m at 0.60 m with a main beam past a 5.5 m span, the oratory's quadripartite vault springing at 2.65 m with 120 mm ribs. Exterior edges stand on the shell's inner wall faces with the registered apertures cut. No furnishing. Indirect light baked per vertex once at the fixed hour from window form factors and the sun patches on each floor, on a 0.45 m grid at hero and a 0.9 m grid at standard; the warm bounce is an engine-only term flagged engineBounce. The roof space behind each dormer's glass is a plain limewashed box with a tiled floor and one tie beam, lit only through that glass, unfurnished and with no use claimed.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "ec429b92970124e397319dbb596adeffb9e7386fc7e10a98501fecd6ef20f097",
+      "sha256": "39f46724ae3ce2c2364e93bccac5c558fa4df622a6db8ef3ae4aa3a202770703",
       "note": "recipe_file=src/wings/vinci/house-rooms.ts; source=A-LAYOUT A-HEIGHT A-MASONRY; rail_collision=false; engine_terms=engineBounce"
     },
     {
@@ -3765,6 +3765,19 @@
       "date": "2026-09-24",
       "sha256": "f68d00b0c01a383b74e9703b85bb866efa5bd7083e92d47a9073d46b12bae863",
       "note": "Modern museum insertion, the body wall's cabinet only; no 1517 claim. recipe_file=src/wings/vinci/collection/body-wall-cabinet.ts; companion_file=src/wings/vinci/collection/body-wall-plan.ts; library_sets=library/oak-veneer-light,library/linen"
+    },
+    {
+      "id": "vinci/inner-court/study-support",
+      "path": "procedural/inner-court/study-support/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
+      "display": true,
+      "prompt": "The finish of the study's reading support: an oiled oak board 0.46 by 0.34 m and 28 mm thick, raked 28 degrees low edge to its reader, on a 0.09 m bronze post, standing inside the certified support, which stays the rail's solid and the pick's body. A fitting of this museum, not of 1517.",
+      "model": "Deterministic TypeScript and TSL procedural geometry",
+      "date": "2026-09-24",
+      "sha256": "16132e0ff4ab63b5aef06ab8476e8ae7ebab5e7ce3a350d6dca0bc6d4214615a",
+      "note": "recipe_file=src/wings/vinci/inner-court.ts; geometry_dependency=vinci/inner-court; rail_collision=false"
     }
   ]
 }

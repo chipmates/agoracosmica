@@ -314,10 +314,14 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
   }else if(kind==='slate'){
     const row=floor(U.y.div(.14)),yy=U.y.div(.14),xx=U.x.div(.24)
     const fy=pixel.div(.14).max(.004),fx=acrossPixel.div(.24).max(.004)
-    let total:N=float(0),weight:N=float(0)
+    let total:N=float(0),weight:N=float(0),tint:N=vec3(0),tilt:N=vec2(0)
     // Exact box coverage of the surrounding nine slate cells, including
     // their staggered bond. Colour survives down to its physical resolution
     // without hard, one-pixel changes when a cell crosses the footprint.
+    // EVERY SLATE IS ITS OWN STONE: its own grey, a few leaning to the purple
+    // or the green of their bed, one in eight darker where it was replaced
+    // or holds the wet, the odd one paler and lifted at its foot, and each
+    // set a degree or two off its neighbours, so each takes the sky apart.
     for(let j=-1;j<=1;j++){
       const r=row.add(j),offset=fract(r.mul(.5)),column=floor(xx.add(offset))
       const wy=yy.add(fy.mul(.5)).min(r.add(1)).sub(yy.sub(fy.mul(.5)).max(r)).max(0).div(fy)
@@ -325,10 +329,18 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
         const c=column.add(i),u=xx.add(offset)
         const wx=u.add(fx.mul(.5)).min(c.add(1)).sub(u.sub(fx.mul(.5)).max(c)).max(0).div(fx),area=wx.mul(wy)
         const value=fract(c.mul(31.17).add(r.mul(13.713)).sin().mul(4317.1))
+        const second=fract(c.mul(12.9898).add(r.mul(78.233)).sin().mul(43758.5453))
+        const third=fract(c.mul(39.3468).add(r.mul(11.1351)).sin().mul(24634.6345))
+        const dark=smoothstep(.86,.90,second),lifted=smoothstep(.93,.96,third)
+        const bed=mix(mix(vec3(1,1,1),vec3(1.05,.96,1.04),smoothstep(.55,.85,third)),vec3(.97,1.02,.98),smoothstep(.15,.0,third))
+        const own=mix(rgb('#3d4650'),rgb('#5c656e'),value).mul(bed).mul(float(1).sub(dark.mul(.30))).mul(lifted.mul(.20).add(1))
         total=total.add(value.mul(area));weight=weight.add(area)
+        tint=tint.add(own.mul(area))
+        tilt=tilt.add(vec2(third.sub(.5).mul(.07),second.sub(.5).mul(.05).add(lifted.mul(.06))).mul(area))
       }
     }
     const cell=total.div(weight.max(.0001)).toVar()
+    const ownTone=tint.div(weight.max(.0001)).toVar(),ownTilt=tilt.div(weight.max(.0001)).toVar()
     // Integrate a 6% overlap band over the pixel footprint. Its mean stays
     // 0.06 at every scale; the near/far blend applies detail exactly once.
     const width=pixel.div(.14).max(.0001),phase=fract(U.y.div(.14)).add(.03)
@@ -340,13 +352,18 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
     // is why the roof used to read as one colour from the street.
     const patch=mx_noise_float(P.mul(vec3(.62,.9,.62)).add(vec3(5.1,2.3,8.7))).mul(resolvedAt(1.6))
     const wash=mx_noise_float(P.mul(vec3(2.4,.35,2.4))).mul(resolvedAt(.42))
-    const weathered=mix(rgb('#414a53'),rgb('#58616a'),cell)
+    // moss holds where a valley stays wet, and lichen dots the whole pitch
+    const moss=valleyDamp.mul(smoothstep(.40,.72,mx_noise_float(P.mul(3.1).add(vec3(2.7,8.3,1.9))).mul(.5).add(.5)).mul(.8).add(.2))
+    const lichenDots=smoothstep(.80,.93,mx_noise_float(P.mul(17).add(vec3(5.5,1.3,9.1))).mul(.5).add(.5)).mul(resolvedAt(.06))
+    const weathered=ownTone
       .mul(patch.mul(.115).add(1)).mul(wash.mul(.055).add(1))
-    near=weathered.mul(grain.mul(.08).mul(density).add(1)).mul(float(1).sub(seam.mul(.20)))
+    const mossed=mix(mix(weathered,rgb('#8e8f78'),lichenDots.mul(.28)),rgb('#4a5431'),moss.mul(.55))
+    near=mossed.mul(grain.mul(.08).mul(density).add(1)).mul(float(1).sub(seam.mul(.30)))
     far=mix(rgb('#414a53'),rgb('#58616a'),.5).mul(1-.20*.06).mul(patch.mul(.115).add(1))
     relief=seam.sub(.06).mul(-.055).add(grain.mul(.035))
     // Finite irregular cleavage in the same physical staggered tile UV.
     slateBands.push(...slateFiniteFinish(U))
+    slateBands.push({dx:ownTilt.dot(U.dFdx()),dy:ownTilt.dot(U.dFdy()),signal:float(0),colour:0,roughness:0})
     const slateGrain=aggregateField(U,U.dFdx().abs().add(U.dFdy().abs()),{cell:.004,radius:[.12,.22],probability:1,seed:31.719,signed:true})
     slateBands.push({dx:slateGrain.gradient.dot(U.dFdx()).mul(.000035),dy:slateGrain.gradient.dot(U.dFdy()).mul(.000035),signal:slateGrain.value,colour:.085,roughness:.025})
 
@@ -538,6 +555,10 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
     c=mix(c,c.mul(vec3(.62,.58,.52)),splashed.mul(speck.mul(.42).add(.4)))
     // the last hand's breadth, where the paving's dirt lies against it
     c=c.mul(float(1).sub(smoothstep(.95,.995,footMap).mul(.3)))
+    // THE WALL STANDS IN ITS GROUND, NOT ON IT: the lowest course is darker
+    // and wetter than the one above, and splash greys it a little higher.
+    const contact=smoothstep(.84,.99,footMap).mul(at.z)
+    c=mix(c,c.mul(vec3(.70,.70,.66)),contact.mul(.55))
     const lichenMask=smoothstep(.38,.72,mx_noise_float(P.mul(22).add(vec3(1.7,4.1,2.3))).mul(.5).add(.5).mul(resolvedAt(.05)).add(float(1).sub(resolvedAt(.05)).mul(.5)))
     c=mix(c,rgb('#9ba07c').mul(mottled.mul(.2).add(.9)),weather.z.mul(lichenMask).mul(.62))
     // a broad grime, heavier low on the wall where hands and splash reach
@@ -577,7 +598,8 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
     const headJoint=kind==='brick'?float(1).sub(brickCoverage).mul(detail):float(0)
     const shaded=isBacking.mul(bedShade).add(headJoint.mul(headShade)).clamp(0,1)
     m.receivedShadowNode=Fn(([shadow]:N[])=>shadow.mul(float(1).sub(shaded)))
-    m.aoNode=float(1).sub(isBacking.mul(.32)).sub(headJoint.mul(.22))
+    // the ground beside the foot takes most of its sky away
+    m.aoNode=float(1).sub(isBacking.mul(.32)).sub(headJoint.mul(.22)).mul(float(1).sub(smoothstep(.80,.99,weather.y).mul(at.z).mul(.45)))
     m.userData['engineJointShadow']=true
   }else if(kind==='slate'){
     const n=normalWorldGeometry.transformDirection(cameraViewMatrix),sx=positionView.dFdx(),sy=positionView.dFdy()

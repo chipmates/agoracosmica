@@ -6,7 +6,7 @@ import {
   BufferGeometry, Color, DoubleSide, Float32BufferAttribute, Group, Mesh,
   MeshStandardNodeMaterial, type Object3D, ShapeUtils, Vector2, Vector3,
 } from 'three/webgpu'
-import { cameraPosition, float, length, mx_noise_float, positionWorld, smoothstep, vec3 } from 'three/tsl'
+import { attribute, cameraPosition, float, length, mix, mx_noise_float, positionWorld, smoothstep, vec2, vec3 } from 'three/tsl'
 import type { TierName } from '../../stack/tier'
 import { dossier, edgeDistance, feature, inside, polygon, type Feature, type Quantity } from './site'
 import { anisotropicFootprint } from './masonry-courses'
@@ -260,6 +260,89 @@ export const studySupportFace={
   widthM:studySupport.widthM-.07,depthM:studySupport.depthM-.06,
 } as const
 
+/** THE BOARD AS IT IS READ. The certified board rises toward its reader, so
+ * from the station its underside faced the court; the finish board turns the
+ * same rake the other way, low edge to the reader, inside the same box. */
+function supportFrame(){
+  const S=studySupport,rake=S.rakeDeg*Math.PI/180
+  const along:CourtPoint=[Math.cos(supportBearing),-Math.sin(supportBearing)]
+  const out:CourtPoint=[Math.sin(supportBearing),Math.cos(supportBearing)]
+  /** u along the board, s up its face away from the reader, w off its face */
+  const at=(u:number,s:number,w:number):Vector3=>{
+    const h=-s*Math.cos(rake)+w*Math.sin(rake)
+    return world([S.east+along[0]*u+out[0]*h,S.north+along[1]*u+out[1]*h],S.top+s*Math.sin(rake)+w*Math.cos(rake))
+  }
+  return {S,rake,along,out,at}
+}
+/** THE FOUR CORNERS A LEAF LIES ON, at the leaf's own proportions and at the
+ * size of a leaf of Manuscript B: the reader's near left, near right, far
+ * right, far left, which is the order a page's corners are read in and winds
+ * the sheet to face up, its head at the high edge. Two millimetres over the
+ * board's face. */
+export function studySheetCorners(aspect:number):[number,number,number][] {
+  const {at}=supportFrame(),length=.25,halfS=length/2,halfW=aspect*length/2
+  // the reader faces against \`out\`, so the page's left edge lies at +u
+  return [at(halfW,-halfS,.002),at(-halfW,-halfS,.002),at(-halfW,halfS,.002),at(halfW,halfS,.002)].map(p=>[p.x,p.y,p.z] as [number,number,number])
+}
+/** The finish board and its post, as flat-shaded triangles. */
+function supportFinishGeometry(heightAt:HeightAt):BufferGeometry {
+  const {S,rake,out,along,at}=supportFrame(),thickness=.028,halfW=S.widthM/2,halfS=S.depthM/2
+  const positions:number[]=[],parts:number[]=[]
+  let part=0
+  const quad=(a:Vector3,b:Vector3,c:Vector3,d:Vector3,facing:Vector3):void=>{
+    const n=b.clone().sub(a).cross(c.clone().sub(a))
+    const order=n.dot(facing)<0?[a,c,b,a,d,c]:[a,b,c,a,c,d]
+    for(const p of order){positions.push(p.x,p.y,p.z);parts.push(part)}
+  }
+  const box:Vector3[][]=[[-1,-1],[1,-1],[1,1],[-1,1]].map(([i,j])=>[at(i!*halfW,j!*halfS,0),at(i!*halfW,j!*halfS,-thickness)])
+  const centre=at(0,0,-thickness/2)
+  const up=at(0,0,1).sub(at(0,0,0))
+  quad(box[0]![0]!,box[1]![0]!,box[2]![0]!,box[3]![0]!,up)
+  quad(box[0]![1]!,box[1]![1]!,box[2]![1]!,box[3]![1]!,up.clone().negate())
+  for(let i=0;i<4;i++){
+    const a=box[i]!,b=box[(i+1)%4]!,mid=a[0]!.clone().add(b[0]!).multiplyScalar(.5).sub(centre)
+    quad(a[0]!,b[0]!,b[1]!,a[1]!,mid)
+  }
+  // The post rises square to the board's underside and is cut to its rake.
+  const half=.045,under=(e:number,n:number):Vector3=>{
+    const x=S.east+along[0]*e+out[0]*n,z=S.north+along[1]*e+out[1]*n
+    const y=S.top-thickness*Math.cos(rake)-Math.tan(rake)*(n+thickness*Math.sin(rake))-.001
+    return world([x,z],y)
+  }
+  part=1
+  const ring=[[-half,-half],[half,-half],[half,half],[-half,half]].map(([e,n])=>under(e!,n!))
+  const foot=(p:Vector3):Vector3=>new Vector3(p.x,heightAt(p.x,-p.z)-.02,p.z)
+  const axis=world([S.east,S.north],0)
+  for(let i=0;i<4;i++){const a=ring[i]!,b=ring[(i+1)%4]!;quad(a,b,foot(b),foot(a),a.clone().add(b).multiplyScalar(.5).sub(axis).setY(0))}
+  const geometry=new BufferGeometry()
+  geometry.setAttribute('position',new Float32BufferAttribute(positions,3))
+  geometry.setAttribute('part',new Float32BufferAttribute(parts,1))
+  geometry.computeVertexNormals();geometry.computeBoundingSphere()
+  return geometry
+}
+/** The shell's own retired layer: no camera renders it, no shadow camera either. */
+const RETIRED_LAYER=30
+
+/** THE SUPPORT AS THE MUSEUM MAKES ITS FURNITURE: an oiled oak board on a
+ * bronze post. The geometry is the certified one; only its finish is here. */
+function supportMaterial():MeshStandardNodeMaterial {
+  const m=new MeshStandardNodeMaterial({roughness:.55,metalness:0})
+  const p=positionWorld,post=attribute('part','float') as unknown as ReturnType<typeof float>
+  const along=vec2(Math.cos(supportBearing),Math.sin(supportBearing))
+  const u=p.x.mul(along.x).add(p.z.mul(along.y)),v=p.x.mul(along.y).sub(p.z.mul(along.x)).add(p.y.mul(.6))
+  // oak's figure runs with the board: long streaks across, a slow swell along
+  const figure=mx_noise_float(vec3(u.mul(3.2),v.mul(95),0)).mul(.5).add(.5)
+  const swell=mx_noise_float(vec3(u.mul(.9),v.mul(14),4.1)).mul(.5).add(.5)
+  const oak=vec3(.305,.180,.082).mul(figure.mul(.22).add(.89)).mul(swell.mul(.12).add(.94))
+  // bronze, oiled and hand-dark, a little brighter where it is held
+  const bronze=vec3(.160,.100,.045).mul(mx_noise_float(p.mul(vec3(40,3,40))).mul(.08).add(1))
+  m.colorNode=mix(oak,bronze,post)
+  m.metalnessNode=mix(float(0),float(.9),post)
+  m.roughnessNode=mix(figure.mul(.10).add(.50),float(.36),post)
+  m.name='vinci/study-support/finish'
+  return m
+}
+
 export const studySupportProvenance={
   manifestId:'vinci/inner-court',assetClass:'GENERATED',certainty:'assumed',
   source:['modern museum fitting'],
@@ -365,9 +448,16 @@ export function createInnerCourtDressing(heightAt:HeightAt,tier:TierName):Group 
       corner(.045,.045,-rise-thickness),corner(-.045,.045,-rise-thickness)] as const
     for(let i=0;i<4;i++){const a=post[i]!,b=post[(i+1)%4]!;quad(a,b,foot(b),foot(a))}
     if(board.positions.length){
+      // The certified solid stays the pick's body and the certificate's, and
+      // leaves the camera's layer for the finish board beside it.
       const mesh=meshOf(board,studySupport.meshName)
-      mesh.castShadow=tier!=='calm'
+      mesh.layers.set(RETIRED_LAYER);mesh.castShadow=false
       group.add(mesh)
+      const finish=new Mesh(supportFinishGeometry(heightAt),supportMaterial())
+      finish.name='vinci/study-support/finish';finish.castShadow=tier!=='calm';finish.receiveShadow=true
+      // its own record: a finish is no rail solid, the certified board is
+      finish.userData['manifestId']='vinci/inner-court/study-support';finish.userData['labelOccluder']=false
+      group.add(finish)
     }
   }
   return group

@@ -187,6 +187,24 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     const sward=mx_noise_float(vec3(U.x.mul(1.3),0,8.3)).mul(.13).add(.44).add(mx_noise_float(vec3(U.x.mul(5.9),0,2.2)).mul(.045).mul(shows(1/5.9)))
     const wetFoot=float(1).sub(smoothstep(sward.sub(.14),sward.add(.03),aboveFoot)).mul(vertical).mul(tall)
     stone=mix(stone,stone.mul(vec3(.60,.62,.54)),wetFoot.mul(.72))
+    // A WALL THAT HAS STOOD IN A MEADOW FOR DECADES. Read from the garden at
+    // twenty metres the terms above were a few per cent, so the terrace
+    // stayed new beside a weathered house: the damp climbs above the blades
+    // to a salt line, algae greens the lowest stones, the terrace's own dirt
+    // washes over the head, and each run from the coping is its own stain.
+    const climb=mx_noise_float(vec3(U.x.mul(.9),0,3.7)).mul(.16).add(.66).add(mx_noise_float(vec3(U.x.mul(4.3),0,6.1)).mul(.06).mul(shows(1/4.3)))
+    const risen=float(1).sub(smoothstep(climb.sub(.20),climb.add(.02),aboveFoot)).mul(vertical).mul(tall)
+    const salt=float(1).sub(smoothstep(.0,.05,aboveFoot.sub(climb).abs())).mul(vertical).mul(tall).mul(shows(.05))
+    const algae=float(1).sub(smoothstep(.06,.34,aboveFoot)).mul(smoothstep(.35,.7,mx_noise_float(P.mul(vec3(3.3,1.4,3.3)).add(vec3(8.1,2.2,5.5))).mul(.5).add(.5))).mul(vertical).mul(tall)
+    const washed=belowHead.div(.95).negate().exp().mul(vertical).mul(float(1).sub(riser))
+    const stain=smoothstep(.50,.58,mx_noise_float(vec3(U.x.mul(2.3),0,9.3)).add(mx_noise_float(vec3(U.x.mul(9.7),0,2.8)).mul(.4)).mul(.5).add(.5))
+    const stainLength=mx_noise_float(vec3(U.x.mul(1.3),0,7.9)).mul(.5).add(.5).mul(1.6).add(.6)
+    const runs=belowHead.div(stainLength).negate().exp().mul(stain).mul(fibre).mul(vertical).mul(float(1).sub(riser))
+    stone=mix(stone,stone.mul(vec3(.66,.67,.60)),risen.mul(.62))
+    stone=mix(stone,rgb('#5f6a47').mul(patina.mul(.1).add(.95)),algae.mul(.42))
+    stone=mix(stone,stone.mul(vec3(1.08,1.08,1.06)).add(vec3(.02,.02,.02)),salt.mul(.45))
+    stone=stone.mul(float(1).sub(washed.mul(.20)))
+    stone=mix(stone,stone.mul(vec3(.44,.44,.42)),runs.mul(.78))
     if(library){const maps=library.sync('stone-tuffeau').sample({uv:U,metres:.19,turn:.37});stone=stone.mul(mix(float(1),maps.albedo.clamp(.78,1.22),shows(.03).mul(.40)))}
     m.colorNode=mix(stone,rgb('#8c826d').mul(laid.cell.mul(.26).add(.87)),seam.mul(.58)).mul(float(1).sub(damp.mul(.15)))
     // Recessed joints and the damp foot see less sky than the block faces.

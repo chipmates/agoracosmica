@@ -446,6 +446,67 @@ function buildVault(sink: Sink, edges: WallEdge[], level: number, seed: number):
   }
 }
 
+/** One dormer's front, in east/north/up: its centre at the foot of the front,
+ * the front's own direction, its outward normal, and the body behind it. */
+export interface DormerRoom { id: string; centre: V2; along: V2; out: V2; base: number; top: number; width: number; depth: number }
+
+/** THE ROOM BEHIND A DORMER'S GLASS. The roof space the dormer lights, as a
+ * plain limewashed box with a tiled floor and one tie beam, dim and lit only
+ * through its own glass: nothing in it, and nothing claimed of its use. It
+ * stands inside the dormer's own body, so no face of it reaches the roof. */
+export function createDormerRooms(dormers: readonly DormerRoom[]): { mesh: Mesh | null; triangles: number } {
+  const sink = new Sink()
+  for (const [k, d] of dormers.entries()) {
+    const at = (x: number, z: number, inside: number): V3 =>
+      [d.centre[0] + d.along[0] * x - d.out[0] * inside, d.centre[1] + d.along[1] * x - d.out[1] * inside, z]
+    const half = d.width / 2 - .03, near = .05, back = d.depth - .05, floor = d.base + .02, ceiling = d.top - .03
+    const inward: V3 = [-d.out[0], -d.out[1], 0], outward: V3 = [d.out[0], d.out[1], 0]
+    const side = (sign: number): V3 => [-d.along[0] * sign, -d.along[1] * sign, 0]
+    const seed = k * 1.37 + .21
+    sink.quad(at(-half, floor, near), at(half, floor, near), at(half, floor, back), at(-half, floor, back), [0, 0, 1],
+      [0, 0], [half * 2, 0], [half * 2, back], [0, back], FLOOR, seed)
+    sink.quad(at(-half, ceiling, near), at(half, ceiling, near), at(half, ceiling, back), at(-half, ceiling, back), [0, 0, -1],
+      [0, 0], [half * 2, 0], [half * 2, back], [0, back], WALL, seed)
+    sink.quad(at(-half, floor, back), at(half, floor, back), at(half, ceiling, back), at(-half, ceiling, back), outward,
+      [0, 0], [half * 2, 0], [half * 2, ceiling - floor], [0, ceiling - floor], WALL, seed)
+    for (const sign of [-1, 1]) {
+      const x = sign * half
+      sink.quad(at(x, floor, near), at(x, floor, back), at(x, ceiling, back), at(x, ceiling, near), side(sign),
+        [0, 0], [back, 0], [back, ceiling - floor], [0, ceiling - floor], WALL, seed)
+    }
+    // one tie beam across the roof space, a stride in from the glass
+    const beam = (inside: number): void => {
+      const lo = ceiling - .15, w = .07
+      sink.quad(at(-half, lo, inside - w), at(half, lo, inside - w), at(half, lo, inside + w), at(-half, lo, inside + w), [0, 0, -1],
+        [0, 0], [1, 0], [1, .14], [0, .14], OAK, seed)
+      for (const [face, n] of [[inside - w, outward], [inside + w, inward]] as [number, V3][])
+        sink.quad(at(-half, lo, face), at(half, lo, face), at(half, ceiling, face), at(-half, ceiling, face), n,
+          [0, 0], [1, 0], [1, .15], [0, .15], OAK, seed)
+    }
+    beam(Math.min(.75, back * .55))
+  }
+  if (!sink.pending.length) return { mesh: null, triangles: 0 }
+  for (const v of sink.pending) {
+    // lit only by what comes through its glass: the view of that glass falls
+    // off with depth, and the ceiling over the window sees the most of it
+    sink.info.push(v.kind, v.n[2] < -.5 ? .34 : v.n[2] > .5 ? .22 : .26, 0, v.seed)
+    sink.sun.push(0)
+    sink.positions.push(v.p[0], v.p[2], -v.p[1]); sink.normals.push(v.n[0], v.n[2], -v.n[1]); sink.uvs.push(v.t[0], v.t[1])
+  }
+  const geometry = new BufferGeometry()
+  geometry.setAttribute('position', new Float32BufferAttribute(sink.positions, 3))
+  geometry.setAttribute('normal', new Float32BufferAttribute(sink.normals, 3))
+  geometry.setAttribute('uv', new Float32BufferAttribute(sink.uvs, 2))
+  geometry.setAttribute('room', new Float32BufferAttribute(sink.info, 4))
+  geometry.setAttribute('roomSun', new Float32BufferAttribute(sink.sun, 1))
+  geometry.computeBoundingSphere()
+  const mesh = new Mesh(geometry, roomMaterial())
+  mesh.name = 'vinci/house-rooms/dormers'
+  mesh.castShadow = false; mesh.receiveShadow = true
+  mesh.userData['manifestId'] = houseRoomsProvenance.manifestId; mesh.userData['asset'] = houseRoomsProvenance.manifestId
+  return { mesh, triangles: sink.positions.length / 9 }
+}
+
 /** Terracotta laid square, limewash, oak: colours inside AD-2's albedo range. */
 function roomMaterial(): MeshStandardNodeMaterial {
   const m = new MeshStandardNodeMaterial({ metalness: 0, roughness: .85 })
