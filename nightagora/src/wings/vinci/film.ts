@@ -101,4 +101,6 @@ export function installFilm(parts: FilmParts): void {
     },
   }
   ;(window as Window & { __naFilm?: unknown }).__naFilm = hook
+  // the seam's live side: the forge reads the live picture through the calls the chrome makes of the film
+  void import('../picture/live').then(m => { (window as Window & { __naPicture?: unknown }).__naPicture = m.createLivePicture(hook, parts.walk) })
 }
