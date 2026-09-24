@@ -197,11 +197,15 @@ export function installExport(parts: ExportParts): void {
     })
   }
 
-  /* THE MOUNT RULE, under the export only. A clip is walked once in silence
-     and every body any of its frames draws is taken; from its first frame to
-     its last those bodies stand, whatever distance or stream would have shown
-     them later or hidden them sooner. The wing's own rules still run in its
-     update; the hold is put on at the top of every draw, after them. */
+  /* THE MOUNT RULE, under the export only. Each clip is walked once in
+     silence and every body any of its frames draws is taken; the held set
+     then stands in every frame of every clip and still, whatever distance or
+     stream would have shown a body later or hidden it sooner. One set for all
+     of them, because a stop's still is the first frame of every clip leaving
+     it and the last of every clip arriving: a body one clip stands up in view
+     of the stop would otherwise part that clip from the still. The wing's own
+     rules still run in its update; the hold is put on at the top of every
+     draw, after them. */
   const unions = new Map<string, Set<Mesh>>()
   let recording: Set<Mesh> | null = null
   let holding: Mesh[] = []
@@ -377,8 +381,8 @@ export function installExport(parts: ExportParts): void {
       unions.set(tag, recording)
       return 0
     },
-    /** stand a clip's set from the next draw on; null lets go and puts back
-        what the wing had hidden */
+    /** stand a walk's set ('*' every walk's) from the next draw on; null
+        lets go and puts back what the wing had hidden */
     hold(tag: string | null): number {
       if (tag === null) {
         holding = []
@@ -386,7 +390,8 @@ export function installExport(parts: ExportParts): void {
         forced = new Set()
         return 0
       }
-      const set = unions.get(tag)
+      // '*': every body any walk took
+      const set = tag === '*' ? new Set([...unions.values()].flatMap((u) => [...u])) : unions.get(tag)
       if (!set) throw new Error(`no bodies were taken for ${tag}`)
       // a body disposed since it was taken is no longer the scene's
       holding = [...set].filter((mesh) => mesh.parent !== null)

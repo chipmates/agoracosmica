@@ -13,10 +13,11 @@
 //
 // Every clip starts and ends at rest. Its first frame is the departure node's
 // still and its last the arrival's, rendered by the same program, and the
-// report holds the joins by the sha256 of the raw frames. Every body a clip
-// draws in any frame (taken while it is walked once in silence) stands from
-// its first frame to its last (a volume the eye enters, the hall's air, is the
-// eye's and is not held), and the world's clock is pinned at both ends
+// report holds the joins by the sha256 of the raw frames. Every body any clip
+// of a framing draws in any frame (taken while each is walked once in silence)
+// stands for all of that framing's stills and clips, since a stop's still is
+// the first frame of every clip leaving it (a volume the eye enters, the
+// hall's air, is the eye's and is not held); the world's clock is pinned at both ends
 // (`film.ts`, pinnedWind). A clip is refused (and written nowhere) when the
 // textures in flight at rest are not zero, when the drawn set changes inside
 // it anyway, or when the scene casts more shadows than its measured ceiling
@@ -440,7 +441,10 @@ async function exportStill(session, inbox, node, out, opts) {
   const a = await restFrame(session, inbox, tag, 0, t, opts)
   // what the frame drew: a still shot while the machine is loaded can come
   // out with fewer bodies built, which these counts give away
-  const drew = await session.page.evaluate(() => ({ ...(({ draws, tris }) => ({ draws, tris }))(window.__forge.state()), meshes: window.__naExport.mounted().meshes }))
+  const drew = await session.page.evaluate(() => {
+    const m = window.__naExport.mounted()
+    return { ...(({ draws, tris }) => ({ draws, tris }))(window.__forge.state()), meshes: m.meshes, signature: m.signature, stood: m.stood, volumes: m.volumes }
+  })
   const t2 = await session.page.evaluate(() => { for (let k = 0; k < 30; k++) window.__pre.step(); return window.__pre.virtualTime() })
   const b = await restFrame(session, inbox, `${tag} later`, 0, t2, opts)
   let moved = 0, sum = 0, max = 0
@@ -499,16 +503,8 @@ async function silentWalk(page, from, to, motion, take = null) {
 
 /** THE CLIP: rest at the departure, the leg on its own clock, rest at the arrival. */
 async function exportClip(session, inbox, edge, nodes, track, out, opts) {
-  // the clip's bodies stand from before its first frame (the rule off: the wing's own streaming)
-  const held = opts.mount === 'held' ? await session.page.evaluate((tag) => window.__naExport.hold(tag), edge.id) : null
-  try {
-    return await keepClip(session, inbox, edge, nodes, track, out, opts, held)
-  } finally {
-    if (held !== null) await session.page.evaluate(() => window.__naExport.hold(null))
-  }
-}
-
-async function keepClip(session, inbox, edge, nodes, track, out, opts, held) {
+  // the release's held set stands already (the rule off: the wing's own streaming)
+  const held = opts.mount === 'held' ? opts.held : null
   const { page, framing, stage } = session
   const from = nodes.get(edge.from), to = nodes.get(edge.to)
   const tag = `${edge.id} ${framing}`
@@ -625,7 +621,7 @@ async function keepClip(session, inbox, edge, nodes, track, out, opts, held) {
     mountedChanges: frames.filter((f) => f.mounted.changed).map((f) => ({ i: f.i, meshes: f.mounted.meshes, ...f.mounted.changed })),
     starvedSteps: starved, pageErrors: session.record.errors.length - errorsBefore,
     pendingAtRest, paintedOverCanvas, mountedSetChanges: signatures.size - 1, casters: armed.casters, bodies: armed.bodies,
-    mount: { rule: opts.mount, held, drawn: frames[0].mounted.meshes, stoodAtFirst: frames[0].mounted.stood, stoodAtLast: frames[frames.length - 1].mounted.stood,
+    mount: { rule: opts.mount, held, drawn: frames[0].mounted.meshes, signature: frames[0].mounted.signature, stoodAtFirst: frames[0].mounted.stood, stoodAtLast: frames[frames.length - 1].mounted.stood,
       // a volume the eye enters (the hall's air) is the eye's, not held: the frames it begins and ends being drawn
       volumes: frames.filter((f, k) => k === 0 || f.mounted.volumes !== frames[k - 1].mounted.volumes).map((f) => ({ i: f.i, drawn: f.mounted.volumes })) },
     floorCeilingMax: round(floorCeilingMax, 4), refused: refusal,
@@ -737,12 +733,14 @@ async function main() {
       try {
         for (const framing of framings) {
           const session = await openSession(browser, framing, { base: BASE, scale, sink, warmNodes, log, view })
-          const opts = { grain, keep, frameDir, force: flags.has('force'), mount }
+          const opts = { grain, keep, frameDir, force: flags.has('force'), mount, held: null }
           const before = await session.page.evaluate(() => window.__naExport.mounted().meshes)
           const walked = []
           for (const edge of edges) walked.push(await silentWalk(session.page, nodes.get(edge.from), nodes.get(edge.to), edge.motion, mount === 'held' ? edge.id : null))
           const after = await session.page.evaluate(() => window.__naExport.mounted().meshes)
-          log(`  ${framing}: every clip walked once under the clock (${walked.map((w) => w.steps).join(', ')} steps); meshes mounted ${before} before, ${after} after; ${mount === 'held' ? `bodies each clip draws ${walked.map((w) => w.bodies).join(', ')}` : 'the mount rule off'}`)
+          // THE HELD SET: every body any of these walks drew, standing for every still and clip that follows
+          if (mount === 'held') opts.held = await session.page.evaluate(() => window.__naExport.hold('*'))
+          log(`  ${framing}: every clip walked once under the clock (${walked.map((w) => w.steps).join(', ')} steps); meshes mounted ${before} before, ${after} after; ${mount === 'held' ? `bodies each clip draws ${walked.map((w) => w.bodies).join(', ')}, held for every still and clip ${opts.held}` : 'the mount rule off'}`)
           for (const node of warmNodes) {
             const s = await exportStill(session, inbox, node, runDir, opts)
             stills.push(s)
@@ -762,6 +760,9 @@ async function main() {
             r.joinsAgree = { first: r.joins.first === sf(edge.from), last: r.joins.last === sf(edge.to) }
             log(`  ${edge.id} ${framing}: ${r.frames} frames (the graph ${edge.framings[framing].frames + 1}), ${r.draws} draws, ${r.secondsPerFrame} s a frame; joins ${r.joinsAgree.first}/${r.joinsAgree.last}; track ${r.track.maxDeviation}; late ${r.requestsAfterClock}; mounted changes ${r.mountedSetChanges}; held ${r.mount.held}, stood ${r.mount.stoodAtFirst} at the first frame and ${r.mount.stoodAtLast} at the last`)
           }
+          if (mount === 'held') await session.page.evaluate(() => window.__naExport.hold(null))
+          const sets = new Set([...stills.filter((x) => x.framing === framing).map((x) => x.drew.signature), ...results.filter((r) => r.framing === framing && r.mount?.signature !== undefined).map((r) => r.mount.signature)])
+          log(`  ${framing}: drawn sets across its stills and clips ${sets.size}`)
           await session.ctx.close()
         }
       } finally {
@@ -777,7 +778,7 @@ async function main() {
   // ---- the record ----
   const first = all[0]
   const gate = stillsOnly ? { note: 'stills only: no clip, no keys' } : await gateKeys(first.results, log).catch((err) => ({ note: `the gate's keys failed: ${String(err.message).slice(0, 200)}` }))
-  const recipe = { mount: mount === 'held' ? 'every body a clip draws stands from its first frame (taken on a silent walk)' : 'the wing\'s own streaming', worldClock: 'pinned: the wind on its loop\'s first frame at rest, whole loops across a leg with the walk', tier: 'max', geometry: 'hero', scale, stage: view ? `stills: ${Object.entries(view).map(([k, v]) => `${k} ${v.css.width}x${v.css.height} CSS at ${v.dsf}`).join(', ')}` : 'film', minDraws: MIN_DRAWS, maxDraws: MAX_DRAWS, shutter: SHUTTER, jitter: 'halton-2-3', average: 'linear light of the display print, one quantisation', grain: grain ? `baked ${grain}, seeded by the frame, the rest frames seed 0` : 'held (laid by the player)', fps: FPS }
+  const recipe = { mount: mount === 'held' ? 'every body the framing\'s clips draw (taken on silent walks) stands for all its stills and clips' : 'the wing\'s own streaming', worldClock: 'pinned: the wind on its loop\'s first frame at rest, whole loops across a leg with the walk', tier: 'max', geometry: 'hero', scale, stage: view ? `stills: ${Object.entries(view).map(([k, v]) => `${k} ${v.css.width}x${v.css.height} CSS at ${v.dsf}`).join(', ')}` : 'film', minDraws: MIN_DRAWS, maxDraws: MAX_DRAWS, shutter: SHUTTER, jitter: 'halton-2-3', average: 'linear light of the display print, one quantisation', grain: grain ? `baked ${grain}, seeded by the frame, the rest frames seed 0` : 'held (laid by the player)', fps: FPS }
   for (const r of first.results) {
     if (!r.files) continue
     const keys = gate.keys?.get(`${r.clip} ${r.framing}`) ?? { motion: r.replay.key, picture: null, global: null, delivery: null }
