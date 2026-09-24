@@ -549,7 +549,7 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "67067e0fa2791b5183d5e4e3fa81cb93d75daef19d814953feea030586417088"
+          "sha256": "cebfca93b3cfa804cff081f1b735285b46dcde3285857c789c00ef2a712a96b8"
         },
         {
           "path": "src/wings/vinci/machines/runtime.ts",
@@ -565,7 +565,7 @@
         },
         {
           "path": "src/wings/vinci/machines/wear.ts",
-          "sha256": "89e491868b887fec184c5928d38de6127a85ff31a699a9d423780dde4e716b6f"
+          "sha256": "b2b3826456d08f06647c6572139a6ba663a3af390db9cf5656d31c4edc52db06"
         }
       ],
       "dossier": {
@@ -677,9 +677,9 @@
       "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "anemometer, Codex Atlanticus f. 675r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled. Forged-iron detail retains its library maps and three bands across a 12–100m density fade. The gun solid end faces receive only a restrained normal-direction finish difference; no bore or functional firing geometry is invented. Rounded oak parts and inclinometer journal posts use a local quiet library variant: all three bands, 85percent map contribution, normal strength .12, restrained grain relief/shade/sheen and #847967 luminance tint (80percent density contrast retained). The exact 22mm journal post remains wood, not frayed cord. All oak detail now uses the same 12–100m density fade as cloth and iron, preserving physical UV scale, all three bands and library maps at distant phone camera positions. No extra map, geometry or material variant is added by this range correction. Window 6: every sphere reads the library through three local projections blended by the surface normal, so a turned ball has no pole where the grain converges; a cylinder shorter than its own radius runs the long grain around its rim instead of up its wall. Stone parts take a generated #7c7669 luminance tint (95percent density plus .12) with roughness .62-.95, and the flywheel weights use 85mm mottle, 16mm relief and normal strength .26. Leather parts take a generated #5c4331 tint with a .085m crease band, relief .5, shade .3 and normal strength .55. Forged iron now carries metalness .45 with a generated #787e80 luminance response and roughness .38-.70; the gun's barrels use metalness .42 with #5d6265, the camera obscura's aperture plate metalness .5 with #43474a, and the compass legs metalness .38 with #3e434a, roughness .36-.66, over a dressing set that declares a scattering surface so hammer pitting reaches the normal. Linen keeps its fold band in the albedo as well as the normal (shade .36, fold .9).",
-      "model": "GPT-6 Codex",
-      "date": "2026-09-10",
+      "prompt": "anemometer, Codex Atlanticus f. 675r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Build every part as a maker of about 1500 would build it from the sheet: joints, pegs, nails, iron where it is period-apt; each new part is a reconstruction (certainty C). The hinge (axis along X at y 0.76 m), the plate (0.2 x 0.3 m), the scale's radius about the hinge and its divisions every 15 degrees are kept. Two side frames stand on two cross feet: a sole halved over both feet, a post tenoned into it and through an arm, a knee brace, oak pegs at every joint; a crosshead laps over the arms. The plate hangs on an iron pin through two eye bolts riveted over plates on the crosshead, the pin's ends upset into heads; its head is a bored roll bound by two iron straps nailed down the board. The scale is a planed oak band about the hinge, nailed to the post and a front stile, with a filed notch and an ink division every 15 degrees, a short division every 5 and a ruled line. Each timber has its own tone and the plate is greyed by the weather. Oak: the library's CC0 oak veneer under the generated planed oak tint, each timber its own phase and tone in the vertex colour, its end grain darker. Iron: the forged dressing. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "model": "Claude Opus 5.5",
+      "date": "2026-09-24",
       "sha256": "d81e383511d22ddc2483ca14766c766ebc9e7b4767c0515190058f7c3ed06862",
       "recipe_files": [
         {
@@ -692,15 +692,19 @@
         },
         {
           "path": "src/wings/vinci/machines/data/anemometer.json",
-          "sha256": "221d7baf0b679ea48726e784ab4aa5322055de6494992bee33d016c8e5a9df5c"
+          "sha256": "dc3e76dc4d49e8acff7a3217c02615cadb46652d0478ef9b8d4b77da1fa22692"
         },
         {
           "path": "src/wings/vinci/machines/data/records.json",
-          "sha256": "6ff6aa842a31fd17e68e62363fd85456a01c0fe66aa637c636a12034b839778f"
+          "sha256": "a59fe96b8b581db0b4bc563447a5fc28f19cb8ab48ad3ccf08b188266ef149ff"
         },
         {
           "path": "src/wings/vinci/machines/geometry.ts",
-          "sha256": "09f722d7bc6cfb25a3945aa1c22552cbf427cdf4b5e32a4e2dde43290cec2b7b"
+          "sha256": "b4dd83c038c8733f5c6efd01447f91f0ab37ed9ff2544a0eec193533de30e6e1"
+        },
+        {
+          "path": "src/wings/vinci/machines/instruments.ts",
+          "sha256": "725014c2e51120842dd8161fa4836c3c79746e942c8954c45aa2e4d0f605e5b6"
         },
         {
           "path": "src/wings/vinci/machines/motion.ts",
@@ -708,15 +712,19 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "22101cc596e78ee072adc1f24ddbef954c1f5c602a41fd2182694c8613ba3f41"
+          "sha256": "cebfca93b3cfa804cff081f1b735285b46dcde3285857c789c00ef2a712a96b8"
         },
         {
           "path": "src/wings/vinci/machines/runtime.ts",
-          "sha256": "32eac04aa934d02334a668b0eed15811d8e063a2c35e5e44c3147a7d363abd45"
+          "sha256": "ac92bb06b605944ebefb7c7dc96f8eee83a1ac498786723d746fd6bb36d48d6b"
         },
         {
           "path": "src/wings/vinci/machines/types.ts",
-          "sha256": "f447264c124d573303c5bb5b20b9fc7a206d28620c531534b78fb14a37bff5c4"
+          "sha256": "b676dbd2b4703b0fbf0687f0ff7e2eeda8ad12e5665f468340162e4e6435a646"
+        },
+        {
+          "path": "src/wings/vinci/machines/wear.ts",
+          "sha256": "b2b3826456d08f06647c6572139a6ba663a3af390db9cf5656d31c4edc52db06"
         }
       ],
       "dossier": {
@@ -826,7 +834,7 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "22101cc596e78ee072adc1f24ddbef954c1f5c602a41fd2182694c8613ba3f41"
+          "sha256": "cebfca93b3cfa804cff081f1b735285b46dcde3285857c789c00ef2a712a96b8"
         },
         {
           "path": "src/wings/vinci/machines/runtime.ts",
@@ -924,9 +932,9 @@
       "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "camera-obscura, Paris Manuscript D f. 8r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled. Forged-iron detail retains its library maps and three bands across a 12–100m density fade. The gun solid end faces receive only a restrained normal-direction finish difference; no bore or functional firing geometry is invented. Rounded oak parts and inclinometer journal posts use a local quiet library variant: all three bands, 85percent map contribution, normal strength .12, restrained grain relief/shade/sheen and #847967 luminance tint (80percent density contrast retained). The exact 22mm journal post remains wood, not frayed cord. All oak detail now uses the same 12–100m density fade as cloth and iron, preserving physical UV scale, all three bands and library maps at distant phone camera positions. No extra map, geometry or material variant is added by this range correction. Window 6: every sphere reads the library through three local projections blended by the surface normal, so a turned ball has no pole where the grain converges; a cylinder shorter than its own radius runs the long grain around its rim instead of up its wall. Stone parts take a generated #7c7669 luminance tint (95percent density plus .12) with roughness .62-.95, and the flywheel weights use 85mm mottle, 16mm relief and normal strength .26. Leather parts take a generated #5c4331 tint with a .085m crease band, relief .5, shade .3 and normal strength .55. Forged iron now carries metalness .45 with a generated #787e80 luminance response and roughness .38-.70; the gun's barrels use metalness .42 with #5d6265, the camera obscura's aperture plate metalness .5 with #43474a, and the compass legs metalness .38 with #3e434a, roughness .36-.66, over a dressing set that declares a scattering surface so hammer pitting reaches the normal. Linen keeps its fold band in the albedo as well as the normal (shade .36, fold .9).",
-      "model": "GPT-6 Codex",
-      "date": "2026-09-10",
+      "prompt": "camera-obscura, Paris Manuscript D f. 8r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Build every part as a maker of about 1500 would build it from the sheet: joints, pegs, nails, iron where it is period-apt; each new part is a reconstruction (certainty C). The chamber keeps its bounds (1.24 x 1.24 x 0.64 m), its opening, the thin iron plate with the small hole and the white paper 0.5 m behind it. It is boarded: vertical 20 mm oak boards with their outer arrises chamfered, nailed with rose-headed nails to four corner posts and to battens inside; a boarded floor and roof; the front set back between the sides so the plate stands 3.5 mm proud of it; the plate nailed over a square opening; the paper pasted on a light frame on two blocks, sliding in guides on the side walls. Every wall the section lifts carries its boards, battens and nails with it. Each board has its own tone, and the front is darkened where hands reach for the hole. The frame of the paper is dark old stock. Oak: the library's CC0 oak veneer under the generated planed oak tint, each timber its own phase and tone in the vertex colour, its end grain darker. Iron: the forged dressing. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "model": "Claude Opus 5.5",
+      "date": "2026-09-24",
       "sha256": "8805329ef08eb180fb576cee4823f540085abda3a20d69368954f68041f39488",
       "recipe_files": [
         {
@@ -939,15 +947,19 @@
         },
         {
           "path": "src/wings/vinci/machines/data/camera-obscura.json",
-          "sha256": "9234afcd418f470d785b9950f2ca774354bd186222f75e6b990df6e02f0f40fe"
+          "sha256": "0129b0a263cd36ac68e092e7948cd6e302f3af07da8ad6b20b660229d331381d"
         },
         {
           "path": "src/wings/vinci/machines/data/records.json",
-          "sha256": "6ff6aa842a31fd17e68e62363fd85456a01c0fe66aa637c636a12034b839778f"
+          "sha256": "a59fe96b8b581db0b4bc563447a5fc28f19cb8ab48ad3ccf08b188266ef149ff"
         },
         {
           "path": "src/wings/vinci/machines/geometry.ts",
-          "sha256": "09f722d7bc6cfb25a3945aa1c22552cbf427cdf4b5e32a4e2dde43290cec2b7b"
+          "sha256": "b4dd83c038c8733f5c6efd01447f91f0ab37ed9ff2544a0eec193533de30e6e1"
+        },
+        {
+          "path": "src/wings/vinci/machines/instruments.ts",
+          "sha256": "725014c2e51120842dd8161fa4836c3c79746e942c8954c45aa2e4d0f605e5b6"
         },
         {
           "path": "src/wings/vinci/machines/motion.ts",
@@ -955,7 +967,7 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "92b8be9995f065aac841deb070ae041d92dece36ee9af3b133d198143aaa9604"
+          "sha256": "cebfca93b3cfa804cff081f1b735285b46dcde3285857c789c00ef2a712a96b8"
         },
         {
           "path": "src/wings/vinci/machines/runtime.ts",
@@ -963,7 +975,11 @@
         },
         {
           "path": "src/wings/vinci/machines/types.ts",
-          "sha256": "f447264c124d573303c5bb5b20b9fc7a206d28620c531534b78fb14a37bff5c4"
+          "sha256": "b676dbd2b4703b0fbf0687f0ff7e2eeda8ad12e5665f468340162e4e6435a646"
+        },
+        {
+          "path": "src/wings/vinci/machines/wear.ts",
+          "sha256": "b2b3826456d08f06647c6572139a6ba663a3af390db9cf5656d31c4edc52db06"
         }
       ],
       "dossier": {
@@ -1051,7 +1067,7 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "22101cc596e78ee072adc1f24ddbef954c1f5c602a41fd2182694c8613ba3f41"
+          "sha256": "cebfca93b3cfa804cff081f1b735285b46dcde3285857c789c00ef2a712a96b8"
         },
         {
           "path": "src/wings/vinci/machines/runtime.ts",
@@ -1153,9 +1169,9 @@
       "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "inclinometer, Codex Atlanticus f. 1058r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled. Window 3: retain exact glass outer vertices; add dossier nominal2mm inward wall and bottom annulus, weld degenerate crown indices and use continuous smooth normals/metricUV. Physical glass1.48IOR with clearcoat. The bell is still an assumed reconstruction. GENERATED optical dressing: a restrained warm foot-light annulus on the existing deck, peaking3mm outside the2mm glass wall. This deck-local approximation is not a ray-traced caustic or a historical mark; no added geometry. Forged-iron detail retains its library maps and three bands across a 12–100m density fade. The gun solid end faces receive only a restrained normal-direction finish difference; no bore or functional firing geometry is invented. Rounded oak parts and inclinometer journal posts use a local quiet library variant: all three bands, 85percent map contribution, normal strength .12, restrained grain relief/shade/sheen and #847967 luminance tint (80percent density contrast retained). The exact 22mm journal post remains wood, not frayed cord. All oak detail now uses the same 12–100m density fade as cloth and iron, preserving physical UV scale, all three bands and library maps at distant phone camera positions. No extra map, geometry or material variant is added by this range correction. Window 6: every sphere reads the library through three local projections blended by the surface normal, so a turned ball has no pole where the grain converges; a cylinder shorter than its own radius runs the long grain around its rim instead of up its wall. Stone parts take a generated #7c7669 luminance tint (95percent density plus .12) with roughness .62-.95, and the flywheel weights use 85mm mottle, 16mm relief and normal strength .26. Leather parts take a generated #5c4331 tint with a .085m crease band, relief .5, shade .3 and normal strength .55. Forged iron now carries metalness .45 with a generated #787e80 luminance response and roughness .38-.70; the gun's barrels use metalness .42 with #5d6265, the camera obscura's aperture plate metalness .5 with #43474a, and the compass legs metalness .38 with #3e434a, roughness .36-.66, over a dressing set that declares a scattering surface so hammer pitting reaches the normal. Linen keeps its fold band in the albedo as well as the normal (shade .36, fold .9).",
-      "model": "GPT-6 Codex",
-      "date": "2026-09-10",
+      "prompt": "inclinometer, Codex Atlanticus f. 1058r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Build every part as a maker of about 1500 would build it from the sheet: joints, pegs, nails, iron where it is period-apt; each new part is a reconstruction (certainty C). The roll axis (y 0.22 m along Z), the deck and its seat for the glass, the glass bell, the thread and its hook and the ruled circles are kept. The support is an oak base board with its arrises taken off on two cleats; two shaped cheeks stand in it, bored for the shaft, each with an iron bearing plate nailed on and the eye forged on the plate. The shaft is ferruled where it leaves the deck and pinned in a collar outside each cheek. A moulded ring is turned under the deck's edge, the circles are ruled across in ink, and the bob is a pear-shaped lead plumb bob. The stand's timbers are toned darker to sit with the deck. Oak: the library's CC0 oak veneer under the generated planed oak tint, each timber its own phase and tone in the vertex colour, its end grain darker. Iron: the forged dressing. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "model": "Claude Opus 5.5",
+      "date": "2026-09-24",
       "sha256": "02853b377518418b8eb6ff99cdaaae847136441efcd67ad5ea3d13b6504f324f",
       "recipe_files": [
         {
@@ -1164,35 +1180,15 @@
         },
         {
           "path": "src/wings/vinci/machines/data/inclinometer.json",
-          "sha256": "97bf01fcf26ce6ab291a7d17b1e77ab9ab31581476d28935a2936c36a901db6e"
+          "sha256": "61f917cc49ff5e51282ded7ff5eac26c65cb9b6b2bae28c66a9526d7f3cf58f4"
         },
         {
           "path": "src/wings/vinci/machines/data/records.json",
-          "sha256": "6ff6aa842a31fd17e68e62363fd85456a01c0fe66aa637c636a12034b839778f"
+          "sha256": "a59fe96b8b581db0b4bc563447a5fc28f19cb8ab48ad3ccf08b188266ef149ff"
         },
         {
           "path": "src/wings/vinci/machines/geometry.ts",
-          "sha256": "09f722d7bc6cfb25a3945aa1c22552cbf427cdf4b5e32a4e2dde43290cec2b7b"
-        },
-        {
-          "path": "src/wings/vinci/machines/inclinometer.ts",
-          "sha256": "02853b377518418b8eb6ff99cdaaae847136441efcd67ad5ea3d13b6504f324f"
-        },
-        {
-          "path": "src/wings/vinci/machines/motion.ts",
-          "sha256": "b19d6ed2065cfeb26ed5cbb53ad1c2891af27c38c99498aa2ad3e1f13b690aca"
-        },
-        {
-          "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "22101cc596e78ee072adc1f24ddbef954c1f5c602a41fd2182694c8613ba3f41"
-        },
-        {
-          "path": "src/wings/vinci/machines/runtime.ts",
-          "sha256": "32eac04aa934d02334a668b0eed15811d8e063a2c35e5e44c3147a7d363abd45"
-        },
-        {
-          "path": "src/wings/vinci/machines/types.ts",
-          "sha256": "f447264c124d573303c5bb5b20b9fc7a206d28620c531534b78fb14a37bff5c4"
+          "sha256": "b4dd83c038c8733f5c6efd01447f91f0ab37ed9ff2544a0eec193533de30e6e1"
         },
         {
           "path": "src/wings/vinci/machines/glass-cover.ts",
@@ -1201,6 +1197,34 @@
         {
           "path": "src/wings/vinci/machines/glass-seat.ts",
           "sha256": "5e01084b2238df9f6de6edd52af9659ee2391d9c54e39c29c4fa54ce6d791595"
+        },
+        {
+          "path": "src/wings/vinci/machines/inclinometer.ts",
+          "sha256": "02853b377518418b8eb6ff99cdaaae847136441efcd67ad5ea3d13b6504f324f"
+        },
+        {
+          "path": "src/wings/vinci/machines/instruments.ts",
+          "sha256": "725014c2e51120842dd8161fa4836c3c79746e942c8954c45aa2e4d0f605e5b6"
+        },
+        {
+          "path": "src/wings/vinci/machines/motion.ts",
+          "sha256": "b19d6ed2065cfeb26ed5cbb53ad1c2891af27c38c99498aa2ad3e1f13b690aca"
+        },
+        {
+          "path": "src/wings/vinci/machines/parts.ts",
+          "sha256": "cebfca93b3cfa804cff081f1b735285b46dcde3285857c789c00ef2a712a96b8"
+        },
+        {
+          "path": "src/wings/vinci/machines/runtime.ts",
+          "sha256": "ac92bb06b605944ebefb7c7dc96f8eee83a1ac498786723d746fd6bb36d48d6b"
+        },
+        {
+          "path": "src/wings/vinci/machines/types.ts",
+          "sha256": "b676dbd2b4703b0fbf0687f0ff7e2eeda8ad12e5665f468340162e4e6435a646"
+        },
+        {
+          "path": "src/wings/vinci/machines/wear.ts",
+          "sha256": "b2b3826456d08f06647c6572139a6ba663a3af390db9cf5656d31c4edc52db06"
         }
       ],
       "dossier": {
@@ -1288,7 +1312,7 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "22101cc596e78ee072adc1f24ddbef954c1f5c602a41fd2182694c8613ba3f41"
+          "sha256": "cebfca93b3cfa804cff081f1b735285b46dcde3285857c789c00ef2a712a96b8"
         },
         {
           "path": "src/wings/vinci/machines/runtime.ts",
@@ -1353,9 +1377,9 @@
       "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "miter-lock-gates, Codex Atlanticus f. 656r, detail a. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. The sheet's two leaves meeting at an angle, each a frame of heel post, mitre post, four rails and one long brace from the heel's foot to the mitre's head, planked on one face, the heel held at its head by an iron collar and strap, a small door in the lower bay hung on strap hinges and shut by a drop latch worked by a rod from the leaf's head, and the rings on the mitre posts' heads are kept; everything else is a reconstruction of how a lock carpenter and a smith of about 1500 would build them. Each round heel post turns on an iron pintle in an iron socket set in a pivot stone, and in its hollow quoin 10 mm clear; the mitre posts are bevelled so the shut leaves stand 6 mm apart and bear on a hewn mitre sill; eight upright boards are nailed to the rails on the upstream face, the door's two cut for its opening; the rails are strapped with iron at both ends, nailed and pegged; the floor is paved in slabs. Oak: the library's CC0 oak veneer under the generated planed oak tint for rails, boards and door, each timber its own phase and tone in the vertex colour; the posts and the sill under the generated hewn oak tint; treenails under the peg tint. Stone: the library's CC0 limestone. Iron: the forged dressing. Wear, a look and not a claim: below the assumed low water the oak is dark and green with silt on the faces that point up, a line of scum at the low water, a grey band up to the high water, dry above. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
-      "model": "Claude Opus 5.5",
-      "date": "2026-09-24",
+      "prompt": "miter-lock-gates, Codex Atlanticus f. 656r, detail a. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled. Forged-iron detail retains its library maps and three bands across a 12–100m density fade. The gun solid end faces receive only a restrained normal-direction finish difference; no bore or functional firing geometry is invented. Rounded oak parts and inclinometer journal posts use a local quiet library variant: all three bands, 85percent map contribution, normal strength .12, restrained grain relief/shade/sheen and #847967 luminance tint (80percent density contrast retained). The exact 22mm journal post remains wood, not frayed cord. All oak detail now uses the same 12–100m density fade as cloth and iron, preserving physical UV scale, all three bands and library maps at distant phone camera positions. No extra map, geometry or material variant is added by this range correction. Window 6: every sphere reads the library through three local projections blended by the surface normal, so a turned ball has no pole where the grain converges; a cylinder shorter than its own radius runs the long grain around its rim instead of up its wall. Stone parts take a generated #7c7669 luminance tint (95percent density plus .12) with roughness .62-.95, and the flywheel weights use 85mm mottle, 16mm relief and normal strength .26. Leather parts take a generated #5c4331 tint with a .085m crease band, relief .5, shade .3 and normal strength .55. Forged iron now carries metalness .45 with a generated #787e80 luminance response and roughness .38-.70; the gun's barrels use metalness .42 with #5d6265, the camera obscura's aperture plate metalness .5 with #43474a, and the compass legs metalness .38 with #3e434a, roughness .36-.66, over a dressing set that declares a scattering surface so hammer pitting reaches the normal. Linen keeps its fold band in the albedo as well as the normal (shade .36, fold .9).",
+      "model": "GPT-6 Codex",
+      "date": "2026-09-10",
       "sha256": "18f7815f4a3e4342e4f5dba16ee13e890e983b12290b10cb38848e47e8c7c29b",
       "recipe_files": [
         {
@@ -1364,15 +1388,15 @@
         },
         {
           "path": "src/wings/vinci/machines/data/miter-lock-gates.json",
-          "sha256": "a0dc30d4b1f7b6cd6f35cc166188ca0a4c244df9e1fd44afc56108a2c09a87aa"
+          "sha256": "bc32865809556886ed882197f7befd719e84372cd487e9ccfe002b2f571fe570"
         },
         {
           "path": "src/wings/vinci/machines/data/records.json",
-          "sha256": "a59fe96b8b581db0b4bc563447a5fc28f19cb8ab48ad3ccf08b188266ef149ff"
+          "sha256": "6ff6aa842a31fd17e68e62363fd85456a01c0fe66aa637c636a12034b839778f"
         },
         {
           "path": "src/wings/vinci/machines/geometry.ts",
-          "sha256": "b4dd83c038c8733f5c6efd01447f91f0ab37ed9ff2544a0eec193533de30e6e1"
+          "sha256": "09f722d7bc6cfb25a3945aa1c22552cbf427cdf4b5e32a4e2dde43290cec2b7b"
         },
         {
           "path": "src/wings/vinci/machines/miter-lock-gates.ts",
@@ -1384,23 +1408,15 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "67067e0fa2791b5183d5e4e3fa81cb93d75daef19d814953feea030586417088"
+          "sha256": "cebfca93b3cfa804cff081f1b735285b46dcde3285857c789c00ef2a712a96b8"
         },
         {
           "path": "src/wings/vinci/machines/runtime.ts",
-          "sha256": "ac92bb06b605944ebefb7c7dc96f8eee83a1ac498786723d746fd6bb36d48d6b"
+          "sha256": "32eac04aa934d02334a668b0eed15811d8e063a2c35e5e44c3147a7d363abd45"
         },
         {
           "path": "src/wings/vinci/machines/types.ts",
-          "sha256": "b676dbd2b4703b0fbf0687f0ff7e2eeda8ad12e5665f468340162e4e6435a646"
-        },
-        {
-          "path": "src/wings/vinci/machines/wear-water-war.ts",
-          "sha256": "6f47a6c4503d2d91e0bd494fee87f2eca0eb1272e8cdf5884a55e9d1c0376230"
-        },
-        {
-          "path": "src/wings/vinci/machines/wear.ts",
-          "sha256": "075180611d9101002f979972040ecf73b9c66242625e09723f2288a77538bbe9"
+          "sha256": "f447264c124d573303c5bb5b20b9fc7a206d28620c531534b78fb14a37bff5c4"
         }
       ],
       "dossier": {
@@ -1468,9 +1484,9 @@
       "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "multi-barrel-gun, Codex Atlanticus f. 157r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. The sheet's thirty-three barrels, eleven to a bank, three banks turning as one frame on a shaft between two uprights, on a two-wheeled carriage with trails, are kept; everything else is a reconstruction of how a carpenter, a wheelwright and a smith of about 1500 would build them. The barrels are solid forged bodies 0.9 m long with a reinforce at the breech and a swell at the muzzle, no bore, held to their bank by two forged straps nailed down between them and bearing on a breech batten; the banks are nailed to two end frames, a triangle with its corners cut and boarded, fixed to an iron shaft by iron bosses. The shaft turns in half-round seats in the uprights under pinned iron cap squares, kept from sliding by collars, and is turned directly by an eight-faced hand bar with grips through its squared end. The uprights stand on soles with raking struts, pegged through a bed of five planks on the axletree and two curved trails with a transom and iron shoes. Each wheel is a turned nave with two iron hoops, twelve spokes, six felloes and six iron strakes across their joints, on an iron arm held by a washer and a linchpin. Oak: the library's CC0 oak veneer under the generated planed oak tint for the bed, banks, end frames and battens, the banks quiet; the hewn oak tint for the carriage and the wheels; the grip tint for the hand bar's grips; the peg tint for the treenails. Iron: the dark barrel iron over the forged dressing. Wear, a look and not a claim: road dirt on the wheels' rims and the trails' feet. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
-      "model": "Claude Opus 5.5",
-      "date": "2026-09-24",
+      "prompt": "multi-barrel-gun, Codex Atlanticus f. 157r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled. Bank-only generated oak finish retains the library photograph and all three scales, with reduced relief (.08), grain shade (.12), sheen (.04) and normal strength (.18), over a restrained oak luminance tint. All three opaque bank boxes, barrel solids and shadows remain exact. Forged-iron detail retains its library maps and three bands across a 12–100m density fade. The gun solid end faces receive only a restrained normal-direction finish difference; no bore or functional firing geometry is invented. Rounded oak parts and inclinometer journal posts use a local quiet library variant: all three bands, 85percent map contribution, normal strength .12, restrained grain relief/shade/sheen and #847967 luminance tint (80percent density contrast retained). The exact 22mm journal post remains wood, not frayed cord. All oak detail now uses the same 12–100m density fade as cloth and iron, preserving physical UV scale, all three bands and library maps at distant phone camera positions. No extra map, geometry or material variant is added by this range correction. Window 6: every sphere reads the library through three local projections blended by the surface normal, so a turned ball has no pole where the grain converges; a cylinder shorter than its own radius runs the long grain around its rim instead of up its wall. Stone parts take a generated #7c7669 luminance tint (95percent density plus .12) with roughness .62-.95, and the flywheel weights use 85mm mottle, 16mm relief and normal strength .26. Leather parts take a generated #5c4331 tint with a .085m crease band, relief .5, shade .3 and normal strength .55. Forged iron now carries metalness .45 with a generated #787e80 luminance response and roughness .38-.70; the gun's barrels use metalness .42 with #5d6265, the camera obscura's aperture plate metalness .5 with #43474a, and the compass legs metalness .38 with #3e434a, roughness .36-.66, over a dressing set that declares a scattering surface so hammer pitting reaches the normal. Linen keeps its fold band in the albedo as well as the normal (shade .36, fold .9).",
+      "model": "GPT-6 Codex",
+      "date": "2026-09-10",
       "sha256": "a884c7a6b13299982a7b0c217846ba04e0a8045afa30d8d80178b114946cd038",
       "recipe_files": [
         {
@@ -1479,15 +1495,15 @@
         },
         {
           "path": "src/wings/vinci/machines/data/multi-barrel-gun.json",
-          "sha256": "d2d6e027ee2138a0201b15580cbfed962e176014232a2bc670477c91707c7a9b"
+          "sha256": "a8880985c707d7ded9ae1c26e5ba298d93d84eedf07bd35ca24b1c9c71aab6eb"
         },
         {
           "path": "src/wings/vinci/machines/data/records.json",
-          "sha256": "a59fe96b8b581db0b4bc563447a5fc28f19cb8ab48ad3ccf08b188266ef149ff"
+          "sha256": "6ff6aa842a31fd17e68e62363fd85456a01c0fe66aa637c636a12034b839778f"
         },
         {
           "path": "src/wings/vinci/machines/geometry.ts",
-          "sha256": "b4dd83c038c8733f5c6efd01447f91f0ab37ed9ff2544a0eec193533de30e6e1"
+          "sha256": "09f722d7bc6cfb25a3945aa1c22552cbf427cdf4b5e32a4e2dde43290cec2b7b"
         },
         {
           "path": "src/wings/vinci/machines/motion.ts",
@@ -1499,23 +1515,15 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "67067e0fa2791b5183d5e4e3fa81cb93d75daef19d814953feea030586417088"
+          "sha256": "cebfca93b3cfa804cff081f1b735285b46dcde3285857c789c00ef2a712a96b8"
         },
         {
           "path": "src/wings/vinci/machines/runtime.ts",
-          "sha256": "ac92bb06b605944ebefb7c7dc96f8eee83a1ac498786723d746fd6bb36d48d6b"
+          "sha256": "32eac04aa934d02334a668b0eed15811d8e063a2c35e5e44c3147a7d363abd45"
         },
         {
           "path": "src/wings/vinci/machines/types.ts",
-          "sha256": "b676dbd2b4703b0fbf0687f0ff7e2eeda8ad12e5665f468340162e4e6435a646"
-        },
-        {
-          "path": "src/wings/vinci/machines/wear-water-war.ts",
-          "sha256": "6f47a6c4503d2d91e0bd494fee87f2eca0eb1272e8cdf5884a55e9d1c0376230"
-        },
-        {
-          "path": "src/wings/vinci/machines/wear.ts",
-          "sha256": "075180611d9101002f979972040ecf73b9c66242625e09723f2288a77538bbe9"
+          "sha256": "f447264c124d573303c5bb5b20b9fc7a206d28620c531534b78fb14a37bff5c4"
         }
       ],
       "dossier": {
@@ -1583,22 +1591,18 @@
       "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "parachute, Codex Atlanticus f. 1058v. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled. Generated hemp luminance finish #c5ae80 retains exact three-lobed swept geometry, albedo density and occlusion at all three scales. The geometric twist supplies the surface normal instead of coarse cloth-like normal perturbation. A 2mm shadow receiver lookup offset retains both cast and received shadows. Lathe staging faces the tangent spool wrap: rope radius2mm, wrap centreline40mm, spool radius38mm; geometry and scheduled endpoints remain exact. Forged-iron detail retains its library maps and three bands across a 12–100m density fade. The gun solid end faces receive only a restrained normal-direction finish difference; no bore or functional firing geometry is invented. Rounded oak parts and inclinometer journal posts use a local quiet library variant: all three bands, 85percent map contribution, normal strength .12, restrained grain relief/shade/sheen and #847967 luminance tint (80percent density contrast retained). The exact 22mm journal post remains wood, not frayed cord. All oak detail now uses the same 12–100m density fade as cloth and iron, preserving physical UV scale, all three bands and library maps at distant phone camera positions. No extra map, geometry or material variant is added by this range correction. Linen retains full CC0 maps, the original geometry/ribs and three bands, with a generated finer 160mm slub pitch, 8mm tooth, gentle .8m drape, relief .28, shade .24, sheen .025 and normal strength .3. These surface-only choices reduce rigid corrugation without inventing seams or altering the admitted cloth shape. Window 6: every sphere reads the library through three local projections blended by the surface normal, so a turned ball has no pole where the grain converges; a cylinder shorter than its own radius runs the long grain around its rim instead of up its wall. Stone parts take a generated #7c7669 luminance tint (95percent density plus .12) with roughness .62-.95, and the flywheel weights use 85mm mottle, 16mm relief and normal strength .26. Leather parts take a generated #5c4331 tint with a .085m crease band, relief .5, shade .3 and normal strength .55. Forged iron now carries metalness .45 with a generated #787e80 luminance response and roughness .38-.70; the gun's barrels use metalness .42 with #5d6265, the camera obscura's aperture plate metalness .5 with #43474a, and the compass legs metalness .38 with #3e434a, roughness .36-.66, over a dressing set that declares a scattering surface so hammer pitting reaches the normal. Linen keeps its fold band in the albedo as well as the normal (shade .36, fold .9). In the court the canopy is dressed as sealed linen drawn on its four flat faces, every vertex kept: cloths of a hand loom's width joined by felled seams at 0.70 m centres, a 0.045 m ridge tape, a 0.07 m hem laced through eyelets at 0.20 m, corner and apex patches, a brushed size of unnamed substance, a give of up to 0.24 m in the shading only, and a lighting term that passes about 0.24 of the light through each layer, less through doubled layers, with the key's shadow read where its light enters the tent; the stands' shadow double inside the cloth still casts and is not drawn. These are the dossier's assumptions a-cloth-make-up, a-cloth-sealing and a-cloth-light.",
+      "prompt": "parachute, Codex Atlanticus f. 1058v. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled. Generated hemp luminance finish #c5ae80 retains exact three-lobed swept geometry, albedo density and occlusion at all three scales. The geometric twist supplies the surface normal instead of coarse cloth-like normal perturbation. A 2mm shadow receiver lookup offset retains both cast and received shadows. Lathe staging faces the tangent spool wrap: rope radius2mm, wrap centreline40mm, spool radius38mm; geometry and scheduled endpoints remain exact. Forged-iron detail retains its library maps and three bands across a 12–100m density fade. The gun solid end faces receive only a restrained normal-direction finish difference; no bore or functional firing geometry is invented. Rounded oak parts and inclinometer journal posts use a local quiet library variant: all three bands, 85percent map contribution, normal strength .12, restrained grain relief/shade/sheen and #847967 luminance tint (80percent density contrast retained). The exact 22mm journal post remains wood, not frayed cord. All oak detail now uses the same 12–100m density fade as cloth and iron, preserving physical UV scale, all three bands and library maps at distant phone camera positions. No extra map, geometry or material variant is added by this range correction. Linen retains full CC0 maps, the original geometry/ribs and three bands, with a generated finer 160mm slub pitch, 8mm tooth, gentle .8m drape, relief .28, shade .24, sheen .025 and normal strength .3. These surface-only choices reduce rigid corrugation without inventing seams or altering the admitted cloth shape. Window 6: every sphere reads the library through three local projections blended by the surface normal, so a turned ball has no pole where the grain converges; a cylinder shorter than its own radius runs the long grain around its rim instead of up its wall. Stone parts take a generated #7c7669 luminance tint (95percent density plus .12) with roughness .62-.95, and the flywheel weights use 85mm mottle, 16mm relief and normal strength .26. Leather parts take a generated #5c4331 tint with a .085m crease band, relief .5, shade .3 and normal strength .55. Forged iron now carries metalness .45 with a generated #787e80 luminance response and roughness .38-.70; the gun's barrels use metalness .42 with #5d6265, the camera obscura's aperture plate metalness .5 with #43474a, and the compass legs metalness .38 with #3e434a, roughness .36-.66, over a dressing set that declares a scattering surface so hammer pitting reaches the normal. Linen keeps its fold band in the albedo as well as the normal (shade .36, fold .9).",
       "model": "GPT-6 Codex",
       "date": "2026-09-10",
       "sha256": "f2c1987f8ac6f1cbb88559dd8c5263dc0e8cf723e8b341627eabe92c0787cd80",
       "recipe_files": [
-        {
-          "path": "src/wings/vinci/collection/court-linen.ts",
-          "sha256": "4849baf1438cf2be1113fe97c6c3ae15d54db4d5f3e628939a29a458f057c532"
-        },
         {
           "path": "src/wings/vinci/machines/catalog.ts",
           "sha256": "3d858f4a271f025ab4a63d6590576aee89119ea1c53ac09df146ebaa585212f5"
         },
         {
           "path": "src/wings/vinci/machines/data/parachute.json",
-          "sha256": "90cf1c65b985d3a65918a4c40992c5b1eb7cc4c30bdf4a217d02361d1d708706"
+          "sha256": "77621c789da9ef5547fec65be3767d0de9705c84cd10ed53ca282a5ba9828656"
         },
         {
           "path": "src/wings/vinci/machines/data/records.json",
@@ -1618,7 +1622,7 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "22101cc596e78ee072adc1f24ddbef954c1f5c602a41fd2182694c8613ba3f41"
+          "sha256": "cebfca93b3cfa804cff081f1b735285b46dcde3285857c789c00ef2a712a96b8"
         },
         {
           "path": "src/wings/vinci/machines/runtime.ts",
@@ -1760,9 +1764,9 @@
       "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "proportional-compass, Codex Forster I f. 4r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled. Forged-iron detail retains its library maps and three bands across a 12–100m density fade. The gun solid end faces receive only a restrained normal-direction finish difference; no bore or functional firing geometry is invented. Rounded oak parts and inclinometer journal posts use a local quiet library variant: all three bands, 85percent map contribution, normal strength .12, restrained grain relief/shade/sheen and #847967 luminance tint (80percent density contrast retained). The exact 22mm journal post remains wood, not frayed cord. All oak detail now uses the same 12–100m density fade as cloth and iron, preserving physical UV scale, all three bands and library maps at distant phone camera positions. No extra map, geometry or material variant is added by this range correction. Window 6: every sphere reads the library through three local projections blended by the surface normal, so a turned ball has no pole where the grain converges; a cylinder shorter than its own radius runs the long grain around its rim instead of up its wall. Stone parts take a generated #7c7669 luminance tint (95percent density plus .12) with roughness .62-.95, and the flywheel weights use 85mm mottle, 16mm relief and normal strength .26. Leather parts take a generated #5c4331 tint with a .085m crease band, relief .5, shade .3 and normal strength .55. Forged iron now carries metalness .45 with a generated #787e80 luminance response and roughness .38-.70; the gun's barrels use metalness .42 with #5d6265, the camera obscura's aperture plate metalness .5 with #43474a, and the compass legs metalness .38 with #3e434a, roughness .36-.66, over a dressing set that declares a scattering surface so hammer pitting reaches the normal. Linen keeps its fold band in the albedo as well as the normal (shade .36, fold .9).",
-      "model": "GPT-6 Codex",
-      "date": "2026-09-10",
+      "prompt": "proportional-compass, Codex Forster I f. 4r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Build every part as a maker of about 1500 would build it from the sheet: joints, pegs, nails, iron where it is period-apt; each new part is a reconstruction (certainty C). The legs keep their frames, layers and points (0.4 m and 0.2 m from the pivot). Each leg is a flat forged iron bar, filed: it swells toward a slot the pivot stands in and tapers to each end, with a bead where each point is set and at each end of the slot, every arris taken off (a bevelled mesh). Each end carries a steeled four-sided point. One bolt passes through both slots, its round head behind the mount's collar; a thin washer lies between the legs and a washer and a wing nut with its boss in front, the bolt's end peened over. The legs keep the compass's forged iron (metalness .38, #3e434a); the bolt, washers, nut and points take its burnished finish (metalness .55, #4d545c). These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "model": "Claude Opus 5.5",
+      "date": "2026-09-24",
       "sha256": "b853369da5995540ebffb27558c4ed34d661bf76f79c41250b26800f4f878732",
       "recipe_files": [
         {
@@ -1771,15 +1775,19 @@
         },
         {
           "path": "src/wings/vinci/machines/data/proportional-compass.json",
-          "sha256": "99a9253f5ec4635dd6d9a72dd6cfc3f49e16f005c5adaadbcaaf9d3a4b39fac1"
+          "sha256": "fa5197bd1056c79018a330ca82e4dd07e37366a8ca48be617e8b8ee0f7a5b3cc"
         },
         {
           "path": "src/wings/vinci/machines/data/records.json",
-          "sha256": "6ff6aa842a31fd17e68e62363fd85456a01c0fe66aa637c636a12034b839778f"
+          "sha256": "a59fe96b8b581db0b4bc563447a5fc28f19cb8ab48ad3ccf08b188266ef149ff"
         },
         {
           "path": "src/wings/vinci/machines/geometry.ts",
-          "sha256": "09f722d7bc6cfb25a3945aa1c22552cbf427cdf4b5e32a4e2dde43290cec2b7b"
+          "sha256": "b4dd83c038c8733f5c6efd01447f91f0ab37ed9ff2544a0eec193533de30e6e1"
+        },
+        {
+          "path": "src/wings/vinci/machines/instruments.ts",
+          "sha256": "725014c2e51120842dd8161fa4836c3c79746e942c8954c45aa2e4d0f605e5b6"
         },
         {
           "path": "src/wings/vinci/machines/motion.ts",
@@ -1787,7 +1795,7 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "22101cc596e78ee072adc1f24ddbef954c1f5c602a41fd2182694c8613ba3f41"
+          "sha256": "cebfca93b3cfa804cff081f1b735285b46dcde3285857c789c00ef2a712a96b8"
         },
         {
           "path": "src/wings/vinci/machines/proportional-compass.ts",
@@ -1795,11 +1803,15 @@
         },
         {
           "path": "src/wings/vinci/machines/runtime.ts",
-          "sha256": "32eac04aa934d02334a668b0eed15811d8e063a2c35e5e44c3147a7d363abd45"
+          "sha256": "ac92bb06b605944ebefb7c7dc96f8eee83a1ac498786723d746fd6bb36d48d6b"
         },
         {
           "path": "src/wings/vinci/machines/types.ts",
-          "sha256": "f447264c124d573303c5bb5b20b9fc7a206d28620c531534b78fb14a37bff5c4"
+          "sha256": "b676dbd2b4703b0fbf0687f0ff7e2eeda8ad12e5665f468340162e4e6435a646"
+        },
+        {
+          "path": "src/wings/vinci/machines/wear.ts",
+          "sha256": "b2b3826456d08f06647c6572139a6ba663a3af390db9cf5656d31c4edc52db06"
         }
       ],
       "dossier": {
@@ -1898,7 +1910,7 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "22101cc596e78ee072adc1f24ddbef954c1f5c602a41fd2182694c8613ba3f41"
+          "sha256": "cebfca93b3cfa804cff081f1b735285b46dcde3285857c789c00ef2a712a96b8"
         },
         {
           "path": "src/wings/vinci/machines/revolving-crane.ts",
@@ -1994,7 +2006,7 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "22101cc596e78ee072adc1f24ddbef954c1f5c602a41fd2182694c8613ba3f41"
+          "sha256": "cebfca93b3cfa804cff081f1b735285b46dcde3285857c789c00ef2a712a96b8"
         },
         {
           "path": "src/wings/vinci/machines/rolling-mill.ts",
@@ -2090,7 +2102,7 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "9226ce7798c131711019e32d2a2c6934cac77fc438045b7afd05dc05cb4d0940"
+          "sha256": "cebfca93b3cfa804cff081f1b735285b46dcde3285857c789c00ef2a712a96b8"
         },
         {
           "path": "src/wings/vinci/machines/runtime.ts",
@@ -2106,7 +2118,7 @@
         },
         {
           "path": "src/wings/vinci/machines/wear.ts",
-          "sha256": "ad30f07fc564189f3cd1a5ea003cecb3e9ef5c66af031829859e1903b86e4afc"
+          "sha256": "b2b3826456d08f06647c6572139a6ba663a3af390db9cf5656d31c4edc52db06"
         }
       ],
       "dossier": {
