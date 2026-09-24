@@ -317,7 +317,9 @@ test('Containment preserves raster proportions but cannot masquerade as the orig
       registration: w.measurement.registration })
   }
   assert.equal(extentRows.length, 28)
-  assert.equal(extentRows.filter(row => row.rasterMatchesWorkExtentWithinOnePercent).length, 5)
+  // The Adoration joined once its register pair was untransposed to 244 wide by 240 high.
+  assert.deepEqual(extentRows.filter(row => row.rasterMatchesWorkExtentWithinOnePercent).map(row => row.id),
+    ['ginevra-de-benci', 'adoration-of-the-magi', 'lady-with-an-ermine', 'la-scapigliata', 'madonna-litta', 'isabella-deste-cartoon'])
   assert(extentRows.find(row => row.id === 'mona-lisa').heightErrorPercent > 13)
   assert(extentRows.find(row => row.id === 'virgin-of-the-rocks-london').heightErrorPercent > 20)
 })
