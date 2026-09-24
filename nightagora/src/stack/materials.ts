@@ -443,6 +443,14 @@ export interface MaterialLibrary {
       constructor. Its textures exist from that moment and its pixels arrive
       later, so the shader is compiled once and never rebuilt. */
   sync: (name: string) => MaterialSet
+  /** the set as `sync` hands it, its budget taken now, and its bytes held
+      back until `wake(name)` or until any other caller asks for it by name:
+      a scene that stands on one address asks this way, so the others do not
+      pay for it. Optional: a private library sends at once. */
+  defer?: (name: string) => MaterialSet
+  /** send for a set `defer` held back, at the budget it was asked with; a
+      set already on its way is left as it is */
+  wake?: (name: string) => void
   /** every entry the app has resolved, which is what the drawer prints */
   manifest: () => ManifestEntry[]
   /** what the loaded sets hold on the GPU, in megabytes */
@@ -451,9 +459,10 @@ export interface MaterialLibrary {
   inventory?: () => Array<{ name: string; size: number; maps: number; MB: number }>
   /** every set that asked for its bytes and did not get them */
   missing: () => Array<{ name: string; reason: string }>
-  /** how many sets have asked for their bytes and are still waiting. A
-      frame drawn while a set is in flight is a DIFFERENT frame, so the rig
-      waits on this rather than on a guessed delay */
+  /** how many sets have asked for their bytes and are still waiting; a set
+      `defer` holds back has not asked. A frame drawn while a set is in
+      flight is a DIFFERENT frame, so the rig waits on this rather than on a
+      guessed delay */
   pending: () => number
   /** how much of those pending sets is already over the wire, in sets: the
       entry's own line counts whole sets, and one set is tens of megabytes on
@@ -572,6 +581,8 @@ export function createMaterialLibrary(tier: Tier, options: MaterialLibraryOption
   /** one resolution per set: the first request's budget decides its maps, and
       a second request while the first is in flight waits for it */
   const resolving = new Map<string, Promise<void>>()
+  /** the sets asked for and not yet sent for, with the budget of the ask */
+  const deferred = new Map<string, TextureBudget>()
 
   async function manifestOnce(): Promise<Map<string, ManifestEntry>> {
     if (remote) return remote
@@ -846,7 +857,11 @@ export function createMaterialLibrary(tier: Tier, options: MaterialLibraryOption
   function resolve(name: string): Promise<void> {
     const already = resolving.get(name)
     if (already) return already
-    const want = budget
+    const want = deferred.get(name) ?? budget
+    if (deferred.delete(name)) {
+      const set = sets.get(name)
+      if (set) seen.set(set.entry.id, set.entry)
+    }
     const work = manifestOnce().then((index) => resolvers.get(name)?.(index.get(`library/${name}`), want))
     resolving.set(name, work)
     return work
@@ -865,31 +880,54 @@ export function createMaterialLibrary(tier: Tier, options: MaterialLibraryOption
     return set
   }
 
-  function sync(name: string): MaterialSet {
-    const cached = sets.get(name)
-    if (cached) return cached
-    const set = build(name)
-    /* a set whose bytes never arrive leaves `ready` at zero, and every term
-       the library adds is gated on it: the scene draws exactly as it was
-       authored. It says so once and does not throw, because a missing CDN is
-       not a reason for a museum to go dark. */
+  /* a set whose bytes never arrive leaves `ready` at zero, and every term
+     the library adds is gated on it: the scene draws exactly as it was
+     authored. It says so once and does not throw, because a missing CDN is
+     not a reason for a museum to go dark. */
+  function send(name: string): void {
     void resolve(name)
       .catch((err: Error) => {
         missing.set(name, err.message)
         console.warn(`library/${name} was not loaded: ${err.message}`)
       })
+  }
+
+  function sync(name: string): MaterialSet {
+    const cached = sets.get(name)
+    if (cached) {
+      if (deferred.has(name)) send(name)
+      return cached
+    }
+    const set = build(name)
+    send(name)
+    return set
+  }
+
+  function defer(name: string): MaterialSet {
+    const cached = sets.get(name)
+    if (cached) return cached
+    const set = build(name)
+    // a set held back is not part of the page until it is sent, so a scan
+    // of what the page holds never reads it and never sends for it
+    seen.delete(set.entry.id)
+    deferred.set(name, budget)
     return set
   }
 
   return {
     load,
     sync,
+    defer,
+    wake(name) {
+      if (deferred.has(name)) send(name)
+    },
     manifest: () => [...seen.values()],
     textureMB: () => bytes / (1024 * 1024),
     inventory: () =>
       [...uploaded].map(([name, u]) => ({ name: u.encoded ? `${name} ktx2 ${u.encoded}` : name, size: u.size, maps: u.maps, MB: u.MB })),
     missing: () => [...missing].map(([name, reason]) => ({ name, reason })),
-    pending: () => [...sets.values()].filter((set) => !set.ready.value && !missing.has(set.entry.id.replace(/^library\//, ''))).length,
+    pending: () =>
+      [...sets.values()].filter((set) => !set.ready.value && !deferred.has(set.name) && !missing.has(set.entry.id.replace(/^library\//, ''))).length,
     paid: () =>
       [...flight.values()].reduce((sum, w) => sum + (w.total > 0 ? Math.min(1, w.loaded / w.total) : 0), 0),
     setTier(next) {

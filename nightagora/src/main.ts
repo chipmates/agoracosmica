@@ -64,6 +64,9 @@ function isPhase(v: string | null | undefined): v is Phase {
   return v !== null && v !== undefined && v in LOOK
 }
 
+/** the phases the lobby's own room is shown in */
+const LOBBY_PHASES: ReadonlySet<Phase> = new Set<Phase>(['transit', 'held', 'descent', 'agora', 'wheel'])
+
 /** the states the rig may ask for: every phase, plus the pane */
 function isForgeState(v: string | null | undefined): v is ForgeState {
   return v === 'pane' || isPhase(v)
@@ -151,7 +154,11 @@ const KEY_OPTIONS = {
 const key = stack.light(KEY_OPTIONS)
 
 const eclipse = createEclipse(scene)
-const agora = createAgora(scene, { key, stack })
+/* a page that opens on a wing or a bench asks for the lobby's sets with the
+   room and sends for them on the way home, never beside a wing's first
+   picture; an address for a wing that does not exist opens on the lobby */
+const opensOnLobby = !benchPath() && !wingBySlug(wingPath()?.slug ?? '')
+const agora = createAgora(scene, { key, stack, eager: opensOnLobby })
 const breath = createBreath()
 const atlas = createAtlas(scene)
 const mandala = createMandala(scene)
@@ -1702,6 +1709,25 @@ const TRANSIT_SECONDS = 2.0
 /** how long the opening may hold its first frame waiting for the room */
 const OPENING_HOLD = 2.5
 
+/* THE WAY HOME IN FRONT OF THE VISITOR. At a wing's last stop the next step
+   is the lobby, so its sets may go out ahead of it, but only on a line that
+   says it can spare them: never under Save-Data, never on 2G or 3G, and not
+   where the browser does not say what the line is. */
+let lobbyAhead = false
+function sendLobbyAhead(): void {
+  if (lobbyAhead) return
+  const count = wingFrame.stations()
+  if (!count || wingFrame.station() !== count - 1) return
+  lobbyAhead = true
+  const line = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection
+  const spare =
+    line !== undefined &&
+    line.saveData !== true &&
+    typeof line.effectiveType === 'string' &&
+    !['slow-2g', '2g', '3g'].includes(line.effectiveType)
+  if (spare) agora.fetchSets()
+}
+
 function setPhase(next: Phase): void {
   // the phase arrives from the rig as well as from the night's own verbs, so
   // a name nobody wrote is reachable: refuse it and keep the stage standing
@@ -1713,6 +1739,7 @@ function setPhase(next: Phase): void {
   setInstruments(false, false)
   phase = next
   document.body.dataset['phase'] = next
+  if (LOBBY_PHASES.has(next)) agora.fetchSets()
   stack.setScene(scene, camera, LOOK[next])
   /* the door's own layer answers to the door, not to one of its two states:
      the way on, its measure and its word stand while the moon travels and
@@ -2152,7 +2179,10 @@ function frame(now: number): void {
   const pitch = forgeLook ? forgeLook.pitch : dragPitch + idlePitch - freeLookY * 0.018
   camera.rotation.y += yaw
   camera.rotation.x += pitch
-  if (phase === 'wing') wingFrame.update(dt)
+  if (phase === 'wing') {
+    wingFrame.update(dt)
+    sendLobbyAhead()
+  }
   if (!(phase === 'wing' && wingFrame.held())) stack.render(dt)
   if (warmNow) {
     agora.warm(false)

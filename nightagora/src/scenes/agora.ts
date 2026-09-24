@@ -54,7 +54,7 @@ import {
 import * as TSL from 'three/tsl'
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js'
 import { mulberry32, FOUNDING_SEED } from '../core/seed'
-import type { KeyLight, Stack } from '../stack'
+import type { KeyLight, MaterialSet, Stack } from '../stack'
 
 /* TSL, uncast. A hand-composed node graph cannot be followed by TSL's own
    overload types once it is built out of helpers, so the cast happens once,
@@ -260,7 +260,13 @@ const BASIN = { x: 2.06, z: -4.86 }
 export interface AgoraRig {
   key: KeyLight
   stack: Stack
+  /** false when the page opens on another address: the library's sets are
+      asked for with the room and their bytes wait for `fetchSets` */
+  eager?: boolean
 }
+
+/** the library's sets the court, the bowl and the colonnade are dressed in */
+const LIBRARY = ['marble-lapis', 'bronze-dark', 'limestone-pale'] as const
 
 export interface AgoraState {
   /** 0..1 fade-in of the ground world after the dark door */
@@ -289,6 +295,13 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
   const root = new Group()
   root.visible = false
   scene.add(root)
+
+  /* THE LOBBY'S SETS ARE PAID FOR WHERE THE LOBBY IS SHOWN. Asked by name
+     they go out with the page; held back they are the same objects with their
+     pixels still to come, so the shaders below compile once either way. A
+     wing that asks for one of them by name sends for it at this budget. */
+  const library = (name: (typeof LIBRARY)[number]): MaterialSet | string =>
+    rig.eager === false && rig.stack.materials.defer ? rig.stack.materials.defer(name) : name
 
   const narrow = window.innerWidth < 760
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -480,7 +493,7 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
 
   /* the empty-plane law: no plane in this museum is one colour. The court
      takes its three scales from the library's lapis set. */
-  const courtDetail = rig.stack.detail(stoneMat, 'marble-lapis', {
+  const courtDetail = rig.stack.detail(stoneMat, library('marble-lapis'), {
     macro: 0.7,
     fade: [16, 64],
     /* the set's vein network at full strength owns the near court, and this
@@ -945,7 +958,7 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
        place of them: the patina at 9 cm, the hammer at 1.6 cm and the chased
        strokes below the lip are the art's, and the set multiplies a ratio
        around one into them. */
-    const bronzeDetail = rig.stack.detail(bowlMat, 'bronze-dark', {
+    const bronzeDetail = rig.stack.detail(bowlMat, library('bronze-dark'), {
       at: world,
       uv: vec2(uv().x.mul(BOWL_ROUND), hLocal),
       macro: 1.0,
@@ -1188,7 +1201,7 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
        set's albedo only: the flutes are cut by the normal above and a
        photograph's relief has no business bending them. */
     colr = colr.mul(
-      rig.stack.detail(shaftMat, 'limestone-pale', {
+      rig.stack.detail(shaftMat, library('limestone-pale'), {
         at: world,
         uv: vec2(uv().x.mul(SHAFT_ROUND), hLocal),
         macro: 0.8,
@@ -1971,5 +1984,10 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
     }
   }
 
-  return { update, reservePage, warm }
+  /** send for the sets a page opened elsewhere held back; idempotent */
+  function fetchSets(): void {
+    for (const name of LIBRARY) rig.stack.materials.wake?.(name)
+  }
+
+  return { update, reservePage, warm, fetchSets }
 }
