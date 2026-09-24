@@ -167,7 +167,7 @@ const PRINT={...GRADES['first-station'],name:'clos-luce-1517',exposure:.94,lift:
  * under a clerestory and two fittings, and the outdoor exposure left them a
  * stop and a half under. The eye opens at the door, as a camera does. */
 const STATION_EXPOSURE:Partial<Record<VinciStationId,number>>={courtyard:1.0,oratory:1.5,hall:2.2,
-  'picture-room':1.34,'picture-room-west':1.34,'reading-table':0.9,'line-early':1.3,flight:1.55,works:1.55,body:1.4,'supper-wall':1.7,
+  'picture-room':1.34,'picture-room-west':1.34,'reading-table':0.9,'line-early':1.3,flight:1.55,works:1.55,body:1.4,'supper-wall':1.85,
   // the grave court stands in its walls' shade: the eye opens on the shade
   grave:1.36}
 /** THE HALL IS PRINTED ON A SHOULDER: its spots are the hottest light in the

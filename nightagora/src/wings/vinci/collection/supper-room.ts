@@ -68,8 +68,9 @@ function looks() {
     concreteNormal: uniform(.85),
     marbleTint: uniform(new Color(.47, .46, .45)),
     borderTone: uniform(.8),
+    naveFloor: uniform(.55),
     marbleTone: uniform(.1),
-    marbleRough: uniform(.12),
+    marbleRough: uniform(.35),
     groutColour: uniform(new Color(.52, .5, .47)),
     stoneTint: uniform(new Color(.9, .9, .9)),
     /** the diffuser as the eye sees it, over the light it gives the room */
@@ -131,7 +132,7 @@ function concreteMaterial(set: MaterialSet, L: Looks, name: string): MeshStandar
 const TESSERA = .02, JOINT = .0011
 /** the border's width, and the lines it is laid to */
 const BORDER = .32, FINS_FRONT = FINS.front, SILL_EAST = SILL.east
-function marbleMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial {
+function marbleMaterial(set: MaterialSet, L: Looks, shade: N = float(1)): MeshStandardNodeMaterial {
   const m = new MeshStandardNodeMaterial({ roughness: .34, metalness: 0, side: FrontSide })
   const P = positionWorld
   const east = P.x, north = P.z.negate()
@@ -149,7 +150,7 @@ function marbleMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial {
   const half = corner.add(JOINT)
   const joint = lineCoverage(de, half, TESSERA, pixel).max(lineCoverage(dn, half, TESSERA, pixel))
   const tone = float(1).add(h1.sub(.5).mul(L.marbleTone)).add(h2.sub(.5).mul(L.marbleTone.mul(.4)))
-  const stone = sample.colour.mul(.55).add(coarse.colour.mul(.45)).mul(L.marbleTint).mul(tone)
+  const stone = sample.colour.mul(.55).add(coarse.colour.mul(.45)).mul(L.marbleTint).mul(tone).mul(shade)
   // A BORDER OF THE SAME MARBLE LAID LONG, a shade darker, round every edge
   // the floor meets, and across the step where the nave gives onto the bay
   const inBay = east.lessThan(ROOM.step)
@@ -339,7 +340,9 @@ export function mountSupperRoom(stack: Stack): SupperRoom {
   const lit: Record<'plaster' | 'concrete' | 'marble', Record<'bay' | 'nave', MeshStandardNodeMaterial>> = {
     plaster: { bay: plasterMaterial(plasterSet!, L), nave: plasterMaterial(plasterSet!, L) },
     concrete: { bay: concreteMaterial(concreteSet!, L, 'concrete-bay'), nave: concreteMaterial(concreteSet!, L, 'concrete-nave') },
-    marble: { bay: marbleMaterial(marbleSet!, L), nave: marbleMaterial(marbleSet!, L) },
+    // the way in is laid in the same marble a shade deeper, so the bay's floor
+    // and the field, not the foreground, take the eye
+    marble: { bay: marbleMaterial(marbleSet!, L), nave: marbleMaterial(marbleSet!, L, L.naveFloor) },
   }
   for (const family of Object.values(lit)) for (const zone of ['bay', 'nave'] as const) {
     adopt(family[zone], zone)

@@ -144,14 +144,14 @@ export const SUPPER_LIGHTS: readonly SupperLight[] = [
     name: 'bay-portal', kind: 'area', receivers: 'nave',
     at: [ROOM.step + .01, (ROOM.south + ROOM.naveNorth) / 2, (L + ROOM.naveSoffit) / 2],
     aim: [ROOM.east, (ROOM.south + ROOM.naveNorth) / 2, (L + ROOM.naveSoffit) / 2],
-    kelvin: 5600, intensity: .6,
+    kelvin: 5600, intensity: .35,
     width: ROOM.naveNorth - ROOM.south, height: ROOM.naveSoffit - L,
   },
   {
     name: 'north-opening', kind: 'area', receivers: 'nave',
     at: [(ROOM.step + ROOM.stepWall + ROOM.east) / 2, ROOM.naveNorth, (L + BEAMS.naveFoot) / 2],
     aim: [(ROOM.step + ROOM.stepWall + ROOM.east) / 2, ROOM.south, (L + BEAMS.naveFoot) / 2 - .5],
-    kelvin: 4300, intensity: .5,
+    kelvin: 4300, intensity: .3,
     width: ROOM.east - ROOM.step - ROOM.stepWall, height: BEAMS.naveFoot - L,
   },
   {
