@@ -13,6 +13,8 @@ interface Cut {
   normal: readonly [number, number, number]
   /** Where the planes stand along that normal, in metres. */
   at: readonly number[]
+  /** Only faces turned this way are cut, where no other face is seen. */
+  facing?: readonly [number, number, number]
 }
 export interface WearRule {
   parts(id: string): boolean
@@ -75,8 +77,8 @@ const wallCuts = (t: Trough): Cut[] => [
   { normal: [0, 1, 0], at: [t.floor + .012, t.floor + .03, t.floor + .05, t.tide - .006, t.tide, t.tide + .004, t.tide + .018, t.tide + .045] },
 ]
 const floorCuts = (t: Trough): Cut[] => [
-  { normal: [1, 0, 0], at: [-t.x + .03, -t.x + .075, t.x - .075, t.x - .03] },
-  { normal: [0, 0, 1], at: [t.z0 + .03, t.z0 + .075, t.z1 - .075, t.z1 - .03] },
+  { normal: [1, 0, 0], at: [-t.x + .03, -t.x + .075, t.x - .075, t.x - .03], facing: [0, 1, 0] },
+  { normal: [0, 0, 1], at: [t.z0 + .03, t.z0 + .075, t.z1 - .075, t.z1 - .03], facing: [0, 1, 0] },
 ]
 /** The sump's footprint on the base, where the planks stay wet. */
 const FOOT = { x: .57, z0: -1.52, z1: -.58 }
@@ -105,7 +107,7 @@ const WATER_SCREW: WearRule[] = [
   {
     // the base round the sump, darkened by what it spills
     parts: id => id === 'base' || id.startsWith('base-plank-'),
-    cuts: [{ normal: [0, 0, 1], at: range(-1.84, -.22, .09) }],
+    cuts: [{ normal: [0, 0, 1], at: range(-1.84, -.22, .09), facing: [0, 1, 0] }],
     tint: (p, n) => {
       if (n.y < .5) return ONE
       const dx = Math.max(Math.abs(p.x) - FOOT.x, 0), dz = Math.max(FOOT.z0 - p.z, p.z - FOOT.z1, 0)
@@ -136,12 +138,19 @@ export function wearFor(slug: string): readonly WearRule[] {
 
 /** Cut a flat-listed surface by parallel planes n.p = offset, every
  * attribute carried to the new vertices along the edge they split. */
-function slice(geometry: BufferGeometry, normal: Vector3, offsets: readonly number[]): BufferGeometry {
+function slice(geometry: BufferGeometry, normal: Vector3, offsets: readonly number[], facing: Vector3 | null): BufferGeometry {
   const names = Object.keys(geometry.attributes)
   const sizes = names.map(name => geometry.getAttribute(name).itemSize)
   const stride = sizes.reduce((a, b) => a + b, 0)
   const at = names.indexOf('position')
   const lead = sizes.slice(0, at).reduce((a, b) => a + b, 0)
+  const u = new Vector3(), v = new Vector3()
+  const turned = (tri: number[][]): boolean => {
+    if (!facing) return true
+    u.set(tri[1]![lead]! - tri[0]![lead]!, tri[1]![lead + 1]! - tri[0]![lead + 1]!, tri[1]![lead + 2]! - tri[0]![lead + 2]!)
+    v.set(tri[2]![lead]! - tri[0]![lead]!, tri[2]![lead + 1]! - tri[0]![lead + 1]!, tri[2]![lead + 2]! - tri[0]![lead + 2]!)
+    return u.cross(v).normalize().dot(facing) > .5
+  }
   // one record per vertex: every attribute's values side by side
   let records: number[] = []
   const count = geometry.getAttribute('position').count
@@ -159,7 +168,7 @@ function slice(geometry: BufferGeometry, normal: Vector3, offsets: readonly numb
     for (let t = 0; t < records.length / stride; t += 3) {
       const tri = [vertex(t), vertex(t + 1), vertex(t + 2)]
       const d = tri.map(side)
-      if (d.every(v => v >= -EPS) || d.every(v => v <= EPS)) { for (const v of tri) next.push(...v); continue }
+      if (d.every(v => v >= -EPS) || d.every(v => v <= EPS) || !turned(tri)) { for (const v of tri) next.push(...v); continue }
       for (const sign of [1, -1]) {
         const poly: number[][] = []
         for (let i = 0; i < 3; i++) {
@@ -201,7 +210,8 @@ export function wornSurface(geometry: BufferGeometry, toMachine: Matrix4, rules:
     for (const cut of rule.cuts) {
       const n = new Vector3(...cut.normal).normalize()
       const local = n.clone().applyMatrix3(back)
-      const cutSurface = slice(surface, local, cut.at.map(offset => offset - n.dot(shift)))
+      const facing = cut.facing ? new Vector3(...cut.facing).normalize().applyMatrix3(back) : null
+      const cutSurface = slice(surface, local, cut.at.map(offset => offset - n.dot(shift)), facing)
       surface.dispose()
       surface = cutSurface
     }

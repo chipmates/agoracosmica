@@ -499,11 +499,13 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
       // warm scale, over the CC0 set's own mottle.
       // where the water runs over it every turn the scale is scoured off
       const scoured = /scoured/.test(name)
-      material.metalness = scoured ? .62 : .5
-      const scale = new Color(scoured ? '#6b655d' : '#3f3a35')
+      // bright metal under a dark sky mirrors the dark: the scoured lip keeps a
+      // diffuse share so it still reads pale at a phone's size
+      material.metalness = scoured ? .35 : .5
+      const scale = new Color(scoured ? '#857e74' : '#3f3a35')
       const mottle = detail.albedo.dot(vec3(.2126, .7152, .0722))
       material.colorNode = vec3(scale.r, scale.g, scale.b).mul(mottle.mul(.25).add(.8)).mul(detail.occlusion).mul(scoured ? keyRim(1.2).add(1) : float(1))
-      material.roughnessNode = scoured ? detail.roughness.mul(.5).clamp(.26, .42) : detail.roughness.mul(.9).clamp(.5, .82)
+      material.roughnessNode = scoured ? detail.roughness.mul(.5).clamp(.3, .45) : detail.roughness.mul(.9).clamp(.5, .82)
     }
     if (dossier.slug === 'camera-obscura' && set.name === 'oak-beams') {
       // The one flat lid on the bench that the key strikes near square. A

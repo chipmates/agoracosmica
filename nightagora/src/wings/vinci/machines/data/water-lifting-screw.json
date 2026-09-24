@@ -9263,13 +9263,13 @@
         -0.093318882
       ],
       "material": {
-        "class": "iron, forged",
+        "class": "iron, forged, scoured",
         "basis": "assumed",
         "source": "geometry"
       },
       "certainty": "C",
       "source": "geometry",
-      "notes": "[geometry] Iron ring round the open mouth of the tube, keeping the hide round."
+      "notes": "[geometry] Iron ring round the open mouth of the tube, keeping the hide round; it dips into the sump every turn and is scoured bright."
     },
     {
       "id": "tube-mouth-upper",
