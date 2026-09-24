@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed to a pale grey at 30 per cent. Assumed weather, no observation claimed.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "09ec8ac7d3567127b7a3e6cb27fed70f03b6f14f1652d58fee9575aa68327f9c",
+      "sha256": "dbc51da48365c1f48c370245ed3363c5f58b29ef08e9e4861a7de9889149b806",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=80c458f2cb5ccddb7fcedccda5df70e5cdccda7d9ca97d65ebfa6462920f61ef;"
     },
     {
@@ -3182,7 +3182,7 @@
       "prompt": "Compose bilingual museum labels and the four-colour certainty key. Keep labels to a certainty word and title, and reading paragraphs to ordinary bilingual museum language. A close look carries the same label with the certainty word alone on its first line, because the window names the work above it. Preserve each selected source honesty line and licence verbatim in the deliberately opened record, together with immutable collection data and superseded wording. Generated typesetting carries no documentary artwork claim.",
       "model": "Deterministic TypeScript DOM composition",
       "note": "Museum typesetting, not documentary imagery. recipe_file=src/wings/vinci/pictures/policy-label.ts production_files=src/wings/vinci/pictures/policy.ts",
-      "sha256": "34ae5b43f060c044dfdf7c7a5393ee03f193a2c7643d97005e6d801f0b9eef6a"
+      "sha256": "d45a4d81d771db03cd655bef49487818a892b5448081555c73f6d73ed67b826b"
     },
     {
       "wing": "vinci",
@@ -3343,7 +3343,7 @@
         },
         {
           "path": "src/wings/vinci/pictures/policy-label.ts",
-          "sha256": "34ae5b43f060c044dfdf7c7a5393ee03f193a2c7643d97005e6d801f0b9eef6a"
+          "sha256": "d45a4d81d771db03cd655bef49487818a892b5448081555c73f6d73ed67b826b"
         },
         {
           "path": "src/wings/vinci/index.ts",
