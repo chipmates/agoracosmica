@@ -1,19 +1,19 @@
 /** THE BODY WALL'S DECLARED LIGHT ON ITS SHEETS. A sheet is a self-lit plate
  * in this engine, so the light the cabinet's own table puts on the wall is
- * declared on it here, from the same numbers that build the lamps: the wash
- * and the head over the sheet apart, and the cabinet's bounce. No daylight
- * reaches them. A renderer that lights the plates as surfaces reads the
- * table and drops this term.
+ * declared on it here, from the same numbers that build the lamps: the six
+ * wallwashers through their optic, the head over the sheet apart, and the
+ * cabinet's bounce. No daylight reaches them. A renderer that lights the
+ * plates as surfaces reads the table and drops this term.
  */
 import { Color, Vector3 } from 'three/webgpu'
 import * as TSL from 'three/tsl'
-import { BODY_LIGHTS, CHEST, LINING, v3, type BodyLight } from './body-wall-plan'
+import { BODY_LIGHTS, CHEST, LINING, v3, type BodyLight, type WashOptic } from './body-wall-plan'
 
 // The node overload boundary stays local to this file.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type N = any
 
-const { cos, dot, float, max, smoothstep, sqrt, uniform, vec3 } = TSL as unknown as Record<string, N>
+const { cos, dot, exp, float, max, min, select, smoothstep, sqrt, uniform, vec3 } = TSL as unknown as Record<string, N>
 
 /** The live levels, shared by the lamps and the sheets so a change to one
  * is a change to both. */
@@ -26,9 +26,37 @@ export const BODY_PLATE = {
   ambient: uniform(new Color(.05, .047, .043)),
 }
 
+/** The band's share at `height` on the optic's plane, `off` along the wall
+ * from the lamp's line: `washBand` of the plan, as nodes. */
+function band(o: WashOptic, height: N, off: N): N {
+  const lateral = exp(off.mul(off).mul(-1 / (2 * o.spread * o.spread)))
+  const crown = float(o.crown).sub(off.mul(off).mul(o.arc))
+  const lit = smoothstep(o.foot - o.footSoft, o.foot, height)
+  const foot = exp(min(height.sub(o.foot), 0).div(o.tailFall)).mul(o.tail).mul(float(1).sub(lit)).add(lit)
+  return lateral.mul(float(1).sub(smoothstep(crown.sub(o.crownSoft), crown, height))).mul(foot)
+}
+
+/** WHAT A WALLWASHER SENDS TOWARD P, as a multiple of its level: the wash
+ * at the ray's hit on the optic's plane times the cube of that distance over
+ * the lamp's reach to the plane. A surface then takes the level times this,
+ * over its own square distance and on its own cosine, which is the level
+ * times the wash wherever it is the plane. Nothing east of the lamp. */
+export function washToward(P: N, light: BodyLight): N {
+  const o = light.wash!, [east, north, height] = light.at
+  const reach = east - o.plane
+  const d = P.sub(vec3(east, height, -north))
+  const west = float(east).sub(P.x)
+  const t = float(reach).div(max(west, .02))
+  const off = d.z.negate().mul(t)
+  const hit = float(height).add(d.y.mul(t))
+  const far = sqrt(dot(d, d)).mul(t)
+  return select(west.greaterThan(.02), band(o, hit, off).mul(far.mul(far).mul(far)).div(reach), float(0))
+}
+
 /** What a spot of the table lays on a surface at P with normal n: its
- * candela through its cone's soft edge, over the square of the distance, on
- * the cosine of the surface. The same falloff the lamps are drawn with. */
+ * candela through its cone's soft edge (and its optic, where it has one),
+ * over the square of the distance, on the cosine of the surface. The same
+ * falloff the lamps are drawn with. */
 function irradiance(P: N, n: N, light: BodyLight, level: N): N {
   const at = v3(...light.at), aim = v3(...light.aim)
   const axis = new Vector3().subVectors(aim, at).normalize()
@@ -36,7 +64,8 @@ function irradiance(P: N, n: N, light: BodyLight, level: N): N {
   const d2 = dot(toP, toP).max(1e-4)
   const dir = toP.div(sqrt(d2))
   const cone = smoothstep(cos(float(light.angle)), cos(float(light.angle * (1 - light.penumbra))), dot(dir, vec3(axis.x, axis.y, axis.z)))
-  return level.mul(cone).mul(max(dot(n, dir.negate()), 0)).div(d2)
+  const optic = light.wash ? washToward(P, light) : float(1)
+  return level.mul(cone).mul(optic).mul(max(dot(n, dir.negate()), 0)).div(d2)
 }
 
 /** True on the body wall's own sheets: the plates on the partition's

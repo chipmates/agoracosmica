@@ -8,7 +8,9 @@
  * and approach span, every leg and wall run at its saved near and gait
  * envelope, every recorded corner ball, and every station and viewing eye's
  * own near envelope. A control post stood on the walk along the drawings
- * must fail.
+ * must fail. And it reads the six heads' wash from the table: even over the
+ * pages, the bottom course as the top, no pool on the lining round the
+ * opening, the splayed soffit lit.
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -136,16 +138,67 @@ function audit(solids) {
   return { solids: boxes.length, spans, balls, eyes, worst, failures }
 }
 
+/* THE WASH, READ FROM THE TABLE. What the six heads lay through their optic
+ * (the same cone, band and falloff the lamps and the sheets' declared light
+ * are drawn with), at the points the hang is judged by: every sheet's window
+ * centre, top and foot, the splayed soffit, and the lining's face over and
+ * beside the opening. */
+const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t) }
+const heads = plan.BODY_LIGHTS.filter(light => light.wash)
+function washAt(point, normal) {
+  let sum = 0
+  for (const light of heads) {
+    const d = point.map((v, i) => v - light.at[i]), length = Math.hypot(...d)
+    const axis = light.aim.map((v, i) => v - light.at[i]), axisLength = Math.hypot(...axis)
+    const cone = smooth(Math.cos(light.angle), Math.cos(light.angle * (1 - light.penumbra)), d.reduce((s, v, i) => s + v * axis[i], 0) / length / axisLength)
+    const west = light.at[0] - point[0]
+    if (west <= .02) continue
+    const reach = light.at[0] - light.wash.plane, t = reach / west
+    const optic = plan.washBand(light.wash, light.at[2] + d[2] * t, d[1] * t) * (length * t) ** 3 / reach
+    sum += light.intensity * cone * optic * Math.max(0, -d.reduce((s, v, i) => s + v * normal[i], 0) / length) / (length * length)
+  }
+  return sum
+}
+const face = plan.sheetFace(plan.mountedSheets()[0].mount), R = plan.RECESS, east = [1, 0, 0]
+const grid = plan.mountedSheets().filter(s => s.mount.row !== 'vortex')
+const pages = grid.flatMap(s => [s.mount.datum, s.window.top, s.window.bottom].map(h => ({ row: s.mount.row, e: washAt([face, s.mount.north, h], east) })))
+const rowMean = row => { const own = pages.filter(p => p.row === row); return own.reduce((s, p) => s + p.e, 0) / own.length }
+const courses = [...new Set(grid.map(s => s.mount.row))].sort()
+const pageMin = Math.min(...pages.map(p => p.e)), pageMax = Math.max(...pages.map(p => p.e)), pageMean = pages.reduce((s, p) => s + p.e, 0) / pages.length
+const splayNormal = [Math.sin(R.splay), 0, -Math.cos(R.splay)]
+const splay = plan.HEAD_NORTHS.map(n => washAt([plan.PLANE.linen + .09, n, R.back + .09 * Math.tan(R.splay)], splayNormal))
+const over = [], beside = []
+for (let n = R.south; n <= R.north; n += .1) for (const h of [R.head + plan.REVEAL_LIP + .01, R.head + .2, R.head + .5]) over.push(washAt([plan.LINING.face, n, h], east))
+for (const n of [R.south - .5, R.north + .5]) for (let h = R.sill + .1; h < R.head; h += .2) beside.push(washAt([plan.LINING.face, n, h], east))
+// the steepest a head's ray climbs to the splay's front edge, against the splay
+const climb = Math.max(...heads.map(light => (light.at[2] - R.head) / (light.at[0] - plan.LINING.face)))
+const wash = {
+  pages: { min: +pageMin.toFixed(3), max: +pageMax.toFixed(3), mean: +pageMean.toFixed(3) },
+  courses: Object.fromEntries(courses.map(row => [row, +rowMean(row).toFixed(3)])),
+  splay: +Math.min(...splay).toFixed(3),
+  overOpening: +Math.max(...over).toFixed(3),
+  halfMetreBeside: +Math.max(...beside).toFixed(3),
+  climb: +climb.toFixed(3), splayRise: +Math.tan(R.splay).toFixed(3),
+}
+const lightFailures = []
+if (pageMin < .85 * pageMax) lightFailures.push(`The wash swings ${pageMin.toFixed(3)} to ${pageMax.toFixed(3)} over the pages, more than 15 per cent`)
+const lowest = rowMean(courses.at(-1)), highest = rowMean(courses[0])
+if (Math.abs(lowest - highest) > .08 * highest) lightFailures.push(`The bottom course takes ${lowest.toFixed(3)} against the top course's ${highest.toFixed(3)}`)
+if (wash.overOpening > .05 * pageMean) lightFailures.push(`The wash lays ${wash.overOpening} on the lining over the opening, a pool on empty wall`)
+if (wash.halfMetreBeside > .15 * pageMean) lightFailures.push(`The wash lays ${wash.halfMetreBeside} half a metre past the opening's jambs`)
+if (climb >= Math.tan(R.splay)) lightFailures.push('A head\'s ray climbs to the splay\'s edge as steep as the splay: its soffit takes no light')
+if (wash.splay <= 0) lightFailures.push('The splayed soffit takes no light under a head')
+
 const solids = plan.bodyWallSolids()
 const cabinet = audit(solids)
 // THE CONTROL: a post on the wall's own walk between two viewing eyes of the
 // third course, where a refusal is certain, proves the audit can see.
 const control = audit([{ name: 'control-post', box: [-37.62, -52.9, -6.3, -37.48, -52.75, -4.3] }])
-const failures = [...cabinet.failures]
+const failures = [...cabinet.failures, ...lightFailures]
 if (control.failures.length === 0) failures.push('The control post on the walk along the drawings was not refused')
 const bounds = solids.reduce((b, { box }) => [Math.min(b[0], box[0]), Math.min(b[1], box[1]), Math.min(b[2], box[2]), Math.max(b[3], box[3]), Math.max(b[4], box[4]), Math.max(b[5], box[5])], [Infinity, Infinity, Infinity, -Infinity, -Infinity, -Infinity])
 console.log(JSON.stringify({ checker: 'vinci-collection-body-wall', ok: failures.length === 0,
   scope: 'The cabinet of drawings as the runtime builds it: the fumed oak lining whole, every board of the plan chest, its bronze rail and saddles and pulls, every frame at its outer box, the wash track, its rods and seven heads and their lamp faces. Every certificate route, approach, leg and wall span at its saved near and gait envelope plus a margin, every recorded corner ball, every station eye and viewing eye at its own near radius. The mats, the linen and the lining lie inside those boxes; the cabinet stands outside the rail construction fingerprint.',
-  marginM: MARGIN_M, bounds, cabinet: { ...cabinet, failures: cabinet.failures.slice(0, 12) },
+  marginM: MARGIN_M, bounds, cabinet: { ...cabinet, failures: cabinet.failures.slice(0, 12) }, wash,
   control: { failures: control.failures.length, worst: control.worst }, failures: failures.slice(0, 20) }, null, 2))
 process.exitCode = failures.length ? 1 : 0

@@ -113,44 +113,52 @@ export const CHEST = {
   back: PLANE.finish, front: PLANE.finish + .66,
   /** the recessed toe and its set-back */
   toe: .08, toeBack: .06,
-  /** the top board and its overhang, and the round bronze rail laid along
-   * its front edge on small saddles: the rail a visitor leans on */
-  top: H(.9635), board: .02, overhang: .025, rail: { radius: .016, over: .011, saddle: .7 },
+  /** the top: a thin board laid on the construction's ledge (its face at
+   * FLOOR + .945), so the reading surface stands as low as the ledge allows,
+   * and a deep oak band at its front edge that the drawers stop under; the
+   * round bronze rail rides the band on small saddles */
+  top: H(.952), board: .007, edge: .034, overhang: .025, rail: { radius: .016, over: .011, saddle: .7 },
+  /** the shadow gap between the top and the linen inside the opening */
+  gap: .03,
   /** four stacks of six drawers between oak stiles */
   stacks: 4, drawers: 6, stile: .035, joint: .006, proud: .004,
 } as const
 export const LINING = {
   south: OPENING.hallToSouth.north[1] + .08, north: CHEST.north,
   face: PLANE.finish + .18,
-  top: GALLERY.head,
+  /** run into the slab, so the gallery's head band closes over it and every
+   * rib lands on its face */
+  top: GALLERY.soffit + .01,
   /** the recessed toe, the panels' shadow joints and their depth */
   toe: H(.08), toeBack: .03, joint: .016, jointDepth: .014,
 } as const
 
-/** THE WASH, as the heads' optics lay it: low and even over the whole hang,
- * falling off softly past its sides, from the heads' own mean direction. A
- * parallel-looking source far along that direction stands in for them. */
-const WASH = { elevation: 44, distance: 14 } as const
+/** THE HEADS' LINE: a black track under the soffit's ribs a long stride off
+ * the wall, each lamp face a hand under it. */
+const TRACK_EAST = PLANE.finish + 1.75, TRACK_DEPTH = .034
+const TRACK_FOOT = GALLERY.ribFoot - TRACK_DEPTH
+const LAMP = TRACK_FOOT - .21
 
-/** THE HANG'S OPENING in the lining: sized to the frames it holds, a
- * sixth of a metre clear at either side, its sill the chest's top and its
- * head high enough that the head's own shadow ends over the top course. */
+/** THE HANG'S OPENING in the lining: sized to the frames it holds, a sixth
+ * of a metre clear at either side, its sill the chest's top. Its head is
+ * splayed: the soffit meets the linen a hand over the top course (`back`)
+ * and rises to the face (`head`) steeper than the heads' rays climb to it,
+ * so they pass under its edge to the linen and land on the soffit itself. */
 export const RECESS = (() => {
   const sheets = mountedSheets().filter(s => s.mount.row !== 'vortex')
   const reach = Math.max(...sheets.map(s => Math.abs(s.frame.north + 52.6)), ...sheets.map(s => Math.abs(s.frame.south + 52.6)))
   const top = Math.max(...sheets.map(s => s.frame.top))
-  const shade = (LINING.face - PLANE.linen) * Math.tan(WASH.elevation * Math.PI / 180)
-  return { south: -52.6 - reach - .16, north: -52.6 + reach + .16, sill: CHEST.top, head: top + .045 + shade }
+  const splay = 50 * Math.PI / 180, back = top + .09
+  return { south: -52.6 - reach - .16, north: -52.6 + reach + .16, sill: CHEST.top,
+    back, head: back + (LINING.face - PLANE.linen) * Math.tan(splay), splay }
 })()
 
-/** THE TRACK THE WASH HANGS FROM: a black channel under the soffit's ribs,
- * a long stride off the wall, over the hang's whole width. */
+/** THE TRACK THE HEADS HANG FROM, over the hang's whole width. */
 export const TRACK = {
-  east: PLANE.finish + 1.38,
+  east: TRACK_EAST,
   south: RECESS.south - .2, north: RECESS.north + .2,
-  width: .03, depth: .034,
+  width: .03, depth: TRACK_DEPTH,
 } as const
-const TRACK_FOOT = GALLERY.ribFoot - TRACK.depth
 
 // ------------------------------------------------------------ the light
 
@@ -184,37 +192,66 @@ export interface BodyLight {
   standIn?: true
   /** a fitting the export lights and the live engine draws only as a body */
   engine?: false
+  /** a wallwasher's optic: `intensity` is then the illuminance its wash
+   * lays on the wall plane at the band's middle on the lamp's own line */
+  wash?: WashOptic
 }
 
-/** Where the wash is aimed: the middle of the hang. */
-const WASH_AIM: P3 = [PLANE.linen, -52.6, H(1.93)]
-const washFrom = (): P3 => {
-  const e = WASH.elevation * Math.PI / 180
-  return [WASH_AIM[0] + Math.cos(e) * WASH.distance, WASH_AIM[1], WASH_AIM[2] + Math.sin(e) * WASH.distance]
+/** A WALLWASHER'S OPTIC, laid out as the wash it throws on the wall plane:
+ * a band from its foot to its crown, soft at both, the crown dropping to
+ * either side of the lamp's own line (the scallop), a spread along the wall,
+ * and a weak tail under the foot. Its candela toward a ray is the wash at the
+ * ray's hit on the plane times the cube of that distance over the lamp's
+ * reach to the plane, so the plane takes the same light low and high. */
+export interface WashOptic {
+  /** the wall plane (east) the band is laid out on */
+  plane: number
+  foot: number; footSoft: number
+  tail: number; tailFall: number
+  crown: number; crownSoft: number
+  /** how far the crown drops per square metre off the lamp's line */
+  arc: number
+  /** the spread along the wall, one standard deviation */
+  spread: number
 }
+const smooth = (a: number, b: number, x: number): number => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t) }
+/** The band's share at a height on the plane, `off` metres along the wall
+ * from the lamp's own line. `body-wall-light.ts` draws the same formula. */
+export function washBand(o: WashOptic, height: number, off: number): number {
+  const lateral = Math.exp(-off * off / (2 * o.spread * o.spread))
+  const crown = o.crown - o.arc * off * off
+  const lit = smooth(o.foot - o.footSoft, o.foot, height)
+  const foot = o.tail * Math.exp(Math.min(height - o.foot, 0) / o.tailFall) * (1 - lit) + lit
+  return lateral * (1 - smooth(crown - o.crownSoft, crown, height)) * foot
+}
+
 /** the small dark-steel heads on the track, a stride apart over the hang */
 export const HEAD_NORTHS = [-54.1, -53.5, -52.9, -52.3, -51.7, -51.1] as const
-const headAt = (north: number): P3 => [TRACK.east, north, TRACK_FOOT - .21]
+/** THEIR OPTIC: a band from the bottom course's foot to the splayed
+ * soffit, its scallops breaking on the soffit, its foot fading over the
+ * linen under the bottom course so the counter stays out of the beam. */
+export const WASH: WashOptic = {
+  plane: PLANE.linen,
+  foot: H(1.02), footSoft: .12, tail: .08, tailFall: .3,
+  crown: RECESS.back + .12, crownSoft: .1, arc: .55,
+  spread: .28,
+}
 
 /** THE SHEET THAT STANDS APART is read by one head of its own, hung from the
  * soffit over it. */
 const VORTEX_NORTH = -48.55
-export const VORTEX_HEAD: P3 = [TRACK.east, VORTEX_NORTH, TRACK_FOOT - .21]
+export const VORTEX_HEAD: P3 = [TRACK.east, VORTEX_NORTH, LAMP]
 
 export const BODY_LIGHTS: readonly BodyLight[] = [
-  {
-    name: 'wash', kind: 'spot', head: false, receivers: 'cabinet', standIn: true,
-    at: washFrom(), aim: WASH_AIM, kelvin: 3100, colour: '#ffe0b8', intensity: 450, angle: .23, penumbra: .45,
-    shadow: { mapPx: 2048, soft: 5 },
-  },
   ...HEAD_NORTHS.map((north, i): BodyLight => ({
-    name: `head-${i + 1}`, kind: 'spot', head: true, receivers: 'cabinet', engine: false,
-    at: headAt(north), aim: [PLANE.linen, north, H(1.6)], kelvin: 3100, colour: '#ffe0b8', intensity: 27, angle: .78, penumbra: .8,
+    name: `head-${i + 1}`, kind: 'spot', head: true, receivers: 'cabinet',
+    at: [TRACK.east, north, LAMP], aim: [PLANE.linen, north, H(1.95)], kelvin: 3100, colour: '#ffe0b8',
+    intensity: 1.5, angle: .63, penumbra: .1, wash: WASH, shadow: { mapPx: 1024, soft: 3 },
   })),
   {
-    // THE CHEST'S BOUNCE: its lit top throws the wash back up into the
-    // hang's head and the shade over the top course; a renderer with true
-    // bounce finds it by itself
+    // THE HANG'S BOUNCE: the lit pages and mats throw the wash back up into
+    // the splayed head and the jambs; a renderer with true bounce finds it
+    // by itself
     name: 'bounce', kind: 'area', head: false, receivers: 'cabinet', standIn: true,
     at: [CHEST.back + .33, -52.6, CHEST.top + .004], aim: [CHEST.back + .33, -52.6, CHEST.top + 1],
     width: RECESS.north - RECESS.south, height: .6,
@@ -314,6 +351,9 @@ export const WOOD = {
   oak: [.2, .135, .082] as [number, number, number],
   frame: [.17, .108, .062] as [number, number, number],
   top: [.23, .16, .1] as [number, number, number],
+  /** the reading surface, fumed darker than its edge and waxed dull, so the
+   * hang keeps the light and the top gives the room no sheen */
+  reading: [.1, .07, .048] as [number, number, number],
 }
 
 /** Equal panels over a run, with joints between them. */
@@ -357,26 +397,42 @@ export function liningBoards(): { panels: Board[]; core: Board[]; reveals: Board
   // the two ends, lipped in the same fumed oak
   out.push({ box: [back, L.south - .012, L.toe, face, L.south, L.top], grain: 'up', offset: [.6, .4], tone: toned(WOOD.fumed, 40, 13, 0) })
   out.push({ box: [back, L.north, CHEST.top, face, L.north + .012, L.top], grain: 'up', offset: [.8, .3], tone: toned(WOOD.fumed, 41, 13, 0) })
-  // THE OPENING'S REVEALS: oiled oak lining the lining's own thickness, a
-  // lipping that reads on the face as the opening's frame
+  // THE OPENING'S JAMBS: oiled oak lining the lining's own thickness, a
+  // lipping that reads on the face as the opening's frame; the splayed head
+  // is `splayFaces`
   reveals.push({ box: [PLANE.linen - .002, R.south - lip, R.sill, face + .002, R.south, R.head + lip], grain: 'up', offset: [.2, .3], tone: toned(WOOD.oak, 1, 17, .04) })
   reveals.push({ box: [PLANE.linen - .002, R.north, R.sill, face + .002, R.north + lip, R.head + lip], grain: 'up', offset: [.9, .1], tone: toned(WOOD.oak, 2, 17, .04) })
-  reveals.push({ box: [PLANE.linen - .002, R.south, R.head, face + .002, R.north, R.head + lip], grain: 'north', offset: [.4, .8], tone: toned(WOOD.oak, 3, 17, .04) })
   return { panels: out, core, reveals }
 }
 /** the opening's oak lipping */
 export const REVEAL_LIP = .016
 
+/** THE SPLAYED HEAD: one oiled oak board from the linen's head up to the
+ * face, and its lipping on the face over the opening. */
+export function splayFaces(f: Faces): void {
+  const R = RECESS, lip = REVEAL_LIP, rise = Math.tan(R.splay)
+  const back = PLANE.linen - .004, front = LINING.face + .002
+  const at = (e: number): number => R.back + (e - PLANE.linen) * rise
+  const tone = toned(WOOD.oak, 3, 17, .04), run = Math.hypot(front - back, at(front) - at(back))
+  const under = [v3(back, R.south, at(back)), v3(front, R.south, at(front)), v3(front, R.north, at(front)), v3(back, R.north, at(back))]
+  // across the grain runs up the slope, along it runs north
+  f.quad(under, v3(Math.sin(R.splay), 0, -Math.cos(R.splay)).normalize(),
+    [[.4, R.south + .8], [.4 + run, R.south + .8], [.4 + run, R.north + .8], [.4, R.north + .8]], tone, 'north')
+  const face = [v3(front, R.south, at(front)), v3(front, R.north, at(front)), v3(front, R.north, R.head + lip), v3(front, R.south, R.head + lip)]
+  f.quad(face, v3(1, 0, 0), [[.4 + run, R.south + .8], [.4 + run, R.north + .8], [.4 + run + lip, R.north + .8], [.4 + run + lip, R.south + .8]], tone, 'north')
+}
+
 /** THE PLAN CHEST: four stacks of six drawers between oak stiles, on a
  * recessed dark toe, under a top whose front edge is the bronze rail. */
 export function chestBoards(): { oak: Board[]; toe: Board[]; bronze: Box[]; rail: Rod[] } {
   const C = CHEST, oak: Board[] = [], toe: Board[] = [], bronze: Box[] = [], rail: Rod[] = []
-  const bottom = FLOOR + C.toe, underTop = C.top - C.board, end = .018
-  // the carcass behind the fronts, dark where a joint opens onto it
-  oak.push({ box: [C.back - .004, C.south + end, bottom, C.front - C.proud, C.north - end, underTop], grain: 'up', offset: [.5, .5], tone: toned(WOOD.fumed, 50, 21, 0).map(c => c * .35) as [number, number, number] })
+  const bottom = FLOOR + C.toe, underTop = C.top - C.edge, board = C.top - C.board, end = .018
+  // the carcass behind the fronts, dark where a joint opens onto it, closed
+  // up to the top over the ledge it holds
+  oak.push({ box: [C.back - .004, C.south + end, bottom, C.front - C.proud, C.north - end, board], grain: 'up', offset: [.5, .5], tone: toned(WOOD.fumed, 50, 21, 0).map(c => c * .35) as [number, number, number] })
   // its two ends, full boards of the lining's fumed oak from the wall to the front
-  oak.push({ box: [C.back - .004, C.south, bottom, C.front - C.proud - .004, C.south + end, underTop], grain: 'up', offset: [.7, .2], tone: toned(WOOD.fumed, 51, 21, .03) })
-  oak.push({ box: [C.back - .004, C.north - end, bottom, C.front - C.proud - .004, C.north, underTop], grain: 'up', offset: [.1, .6], tone: toned(WOOD.fumed, 52, 21, .03) })
+  oak.push({ box: [C.back - .004, C.south, bottom, C.front - C.proud - .004, C.south + end, board], grain: 'up', offset: [.7, .2], tone: toned(WOOD.fumed, 51, 21, .03) })
+  oak.push({ box: [C.back - .004, C.north - end, bottom, C.front - C.proud - .004, C.north, board], grain: 'up', offset: [.1, .6], tone: toned(WOOD.fumed, 52, 21, .03) })
   const run = C.north - C.south, stack = (run - (C.stacks + 1) * C.stile) / C.stacks
   for (let k = 0; k <= C.stacks; k++) {
     const s = C.south + k * (stack + C.stile)
@@ -391,15 +447,22 @@ export function chestBoards(): { oak: Board[]; toe: Board[]; bronze: Box[]; rail
       const b = bottom + C.joint + j * (height + C.joint)
       oak.push({ box: [C.front - C.proud - .002, s + C.joint, b, C.front, s + stack - C.joint, b + height], grain: 'north',
         offset: [hash(d, 25) * 1.83, hash(d, 26) * 2.9], tone: toned(WOOD.fumed, d, 27, .08), rough: (hash(d, 28) - .5) * .12 })
-      // a small bronze pull at the drawer's head, in the middle of its run
-      const mid = s + stack / 2
-      bronze.push([C.front, mid - .045, b + height - .034, C.front + .011, mid + .045, b + height - .022])
+      // a pair of small bronze pulls at the drawer's head, a hand's span in
+      // from either end of its run
+      for (const at of [s + stack * .23, s + stack * .77])
+        bronze.push([C.front, at - .045, b + height - .034, C.front + .011, at + .045, b + height - .022])
       d++
     }
   }
-  // the top, and its bronze nosing: the rail a hand rests on
-  oak.push({ box: [C.back - .004, C.south - .015, underTop, C.front + C.overhang, C.north + .015, C.top], grain: 'north',
-    offset: [.35, .9], tone: WOOD.top })
+  // the top over the ledge, stopped short of the linen inside the opening
+  // by a shadow gap, so the hang stands clear of the counter; and the deep
+  // oak band at its front edge
+  const O = RECESS, gap = C.back + C.gap
+  for (const [back, south, north] of [[C.back - .004, C.south - .015, O.south], [gap, O.south, O.north], [C.back - .004, O.north, C.north + .015]] as const)
+    oak.push({ box: [back, south, board, C.front + C.overhang, north, C.top], grain: 'north', offset: [.35, .9], tone: WOOD.reading, rough: .32 })
+  toe.push({ box: [C.back - .004, O.south, board, gap, O.north, board + .002], grain: 'north', offset: [0, 0], tone: [.02, .018, .016] })
+  oak.push({ box: [C.front - .03, C.south - .015, underTop, C.front + C.overhang, C.north + .015, board], grain: 'north',
+    offset: [.8, .3], tone: toned(WOOD.top, 61, 21, .02) })
   // THE RAIL: a round bronze bar over the top's front edge, its ends a
   // hand short of the chest's, on a saddle every stride
   const R = C.rail, railEast = C.front + C.overhang - R.radius * .4, railHeight = C.top + R.over
@@ -414,10 +477,24 @@ export function chestBoards(): { oak: Board[]; toe: Board[]; bronze: Box[]; rail
   return { oak, toe, bronze, rail }
 }
 
-/** THE LINEN the hang stands on: the opening's back. */
-export function linenBoard(): Board {
-  const R = RECESS
-  return { box: [PLANE.finish - .004, R.south - .02, R.sill - .01, PLANE.linen, R.north + .02, R.head + .02], grain: 'up', offset: [0, 0], tone: [1, 1, 1] }
+/** THE LINEN the hang stands on: three linen-wrapped boards over the
+ * opening's back, of two, three and two columns, their joints in the gaps
+ * between the frames, on a dark backer that shows in the joints. Each board
+ * is its own dye lot. */
+export const LINEN_JOINT = .004
+export function linenBoards(): { panels: Board[]; backer: Board } {
+  const R = RECESS, sheets = mountedSheets().filter(s => s.mount.row !== 'vortex')
+  const edge = (column: number, side: 'north' | 'south'): number => {
+    const own = sheets.filter(s => s.mount.column === column).map(s => s.frame[side])
+    return side === 'north' ? Math.max(...own) : Math.min(...own)
+  }
+  const joints = [1, 4].map(c => (edge(c, 'north') + edge(c + 1, 'south')) / 2)
+  const bounds = [R.south - .02, ...joints.flatMap(j => [j - LINEN_JOINT / 2, j + LINEN_JOINT / 2]), R.north + .02]
+  const bottom = R.sill - .01, top = R.back + .02, back = PLANE.finish + .0008
+  const panels: Board[] = []
+  for (let i = 0; i < bounds.length; i += 2)
+    panels.push({ box: [back, bounds[i]!, bottom, PLANE.linen, bounds[i + 1]!, top], grain: 'up', offset: [hash(i, 41) * 3, hash(i, 42) * 3], tone: toned([1, 1, 1], i, 43, .035) })
+  return { panels, backer: { box: [PLANE.finish - .004, R.south - .02, bottom, PLANE.finish + .0004, R.north + .02, top], grain: 'up', offset: [0, 0], tone: [.012, .011, .01] } }
 }
 
 /** A FRAME, swept round its rectangle from a profile of (inset from the

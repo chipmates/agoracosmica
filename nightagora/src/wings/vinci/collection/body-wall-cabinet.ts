@@ -13,7 +13,7 @@
  */
 import {
   Color, CubeCamera, CubeRenderTarget, DoubleSide, FrontSide, Group, HalfFloatType, Mesh, MeshBasicNodeMaterial,
-  MeshStandardNodeMaterial, Object3D, PMREMGenerator, RectAreaLight, RectAreaLightNode, SpotLight, type BufferGeometry,
+  MeshStandardNodeMaterial, Object3D, PMREMGenerator, RectAreaLight, RectAreaLightNode, SpotLight, SpotLightNode, type BufferGeometry,
   type Material, type RenderTarget, type Scene,
 } from 'three/webgpu'
 import { RectAreaLightTexturesLib } from 'three/addons/lights/RectAreaLightTexturesLib.js'
@@ -25,10 +25,11 @@ import type { MaterialSet } from '../../../stack/materials'
 import { kelvinToColour } from '../../../stack/light'
 import { Solid } from './line-gallery-plan'
 import {
-  BODY_LIGHTS, BODY_SHADOW_LAYER, BODY_WALL_PROVENANCE, chestBoards, Faces, fittings, frameRing, liningBoards, linenBoard,
-  matFaces, mountedSheets, PROBE_AT, shadowCasters, v3, type BodyLight, type Board,
+  BODY_LIGHTS, BODY_SHADOW_LAYER, BODY_WALL_PROVENANCE, chestBoards, Faces, fittings, frameRing, liningBoards, linenBoards,
+  matFaces, mountedSheets, PROBE_AT, shadowCasters, splayFaces, v3, type BodyLight, type Board,
 } from './body-wall-plan'
-import { BODY_PLATE } from './body-wall-light'
+import { BODY_PLATE, washToward } from './body-wall-light'
+import { anisotropicFootprint, reliefNormal, resolved } from '../../../stack/detail'
 
 // The node overload boundary stays local to this file.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -56,7 +57,10 @@ function looks() {
     frameGain: uniform(1),
     woodRough: uniform(.44),
     /** the ground the hang stands on: a deep linen, and the mats' pale one */
-    linenTone: uniform(new Color(.034, .036, .037)),
+    linenTone: uniform(new Color(.039, .04, .041)),
+    /** how far the weave's own contrast is lifted, and a slub's swing */
+    weaveLift: uniform(2.6),
+    slubShade: uniform(.24),
     matTone: uniform(new Color(.6, .585, .54)),
     coreTone: uniform(new Color(.78, .77, .74)),
     matWeave: uniform(.35),
@@ -64,8 +68,10 @@ function looks() {
     bronzeRough: uniform(.32),
     envGain: uniform(1),
     envLift: uniform(1.2),
-    /** the hang's own share of the room's bounce, inside the opening */
+    /** the hang's own share of the room's bounce, inside the opening, and
+     * the casework's, which faces the gallery's glazing across the room */
     hangEnv: uniform(.45),
+    caseEnv: uniform(1.6),
   }
 }
 type Looks = ReturnType<typeof looks>
@@ -87,15 +93,25 @@ function woodMaterial(set: MaterialSet, L: Looks, gain: N, name: string): MeshSt
   return m
 }
 
-/** THE DEEP LINEN the hang stands on, read square on the wall. */
+/** THE DEEP LINEN the hang stands on, read square on the wall, at three
+ * scales: each board its own dye lot and a slow drift over it; slub runs, the
+ * thicker weft threads a hand long, where the pixel holds a thread; and the
+ * photograph's own weave, its contrast lifted so a deep dye still shows it. */
 function linenMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial {
   const m = new MeshStandardNodeMaterial({ roughness: .9, metalness: 0, side: FrontSide })
   const P = positionWorld, n = normalWorldGeometry
   const sample = set.sample({ uv: vec2(P.z.negate(), P.y), metres: .271 })
-  const drift = mx_noise_float(P.mul(.9)).mul(.05).add(1)
-  m.colorNode = sample.albedo.mul(L.linenTone).mul(drift)
-  m.roughnessNode = float(.84).add(sample.roughness.mul(.1))
-  m.normalNode = bend(vec3(0, 0, -1), vec3(0, 1, 0), n, sample.normal, .8)
+  const pixel = anisotropicFootprint(P)
+  const drift = mx_noise_float(P.mul(1.6)).mul(.07).add(mx_noise_float(P.mul(.45)).mul(.05)).add(1)
+  // the dye's own streak down the warp, a finger wide and a forearm long
+  const abrash = mx_noise_float(vec3(P.z.mul(1 / .022), P.y.mul(1 / .35), 0)).mul(resolved(.022, pixel)).mul(.06).add(1)
+  const runAt = vec3(P.z.mul(1 / .12), P.y.mul(1 / .005), 0)
+  const slub = smoothstep(.38, .7, mx_noise_float(runAt)).sub(smoothstep(.42, .72, mx_noise_float(runAt.add(vec3(7.3, 3.1, 0))).mul(.7)))
+    .mul(smoothstep(1.2, 3, float(.005).div(pixel))).toVar()
+  const weave = sample.albedo.pow(L.weaveLift)
+  m.colorNode = weave.mul(L.linenTone).mul(attribute('pieceTone', 'vec3')).mul(drift).mul(abrash).mul(slub.mul(L.slubShade).add(1))
+  m.roughnessNode = float(.8).add(sample.roughness.mul(.12)).sub(slub.abs().mul(.06))
+  m.normalNode = reliefNormal(bend(vec3(0, 0, -1), vec3(0, 1, 0), n, sample.normal, 1.1), slub.mul(.00025), .18)
   m.name = 'vinci/collection-body-wall/linen'
   m.userData = { ...BODY_WALL_PROVENANCE, set: set.name }
   return m
@@ -140,6 +156,22 @@ function darkMaterial(): MeshStandardNodeMaterial {
   return m
 }
 
+/** A WALLWASHER: a spot whose optic shapes its cone into the band the table
+ * gives it, the same band the sheets' declared light reads. */
+class WasherLight extends SpotLight {
+  constructor(readonly optic: BodyLight, intensity: number) {
+    super(new Color(optic.colour), intensity, 0, optic.angle, optic.penumbra, 2)
+  }
+}
+// the spot node's cone hook, which the published types leave out
+const SpotNode = SpotLightNode as unknown as new (light?: SpotLight) => { light: SpotLight; getSpotAttenuation(builder: N, angleCosine: N): N }
+class WasherLightNode extends SpotNode {
+  static get type(): string { return 'WasherLightNode' }
+  override getSpotAttenuation(builder: N, angleCosine: N): N {
+    return super.getSpotAttenuation(builder, angleCosine).mul(washToward(positionWorld, (this.light as unknown as WasherLight).optic))
+  }
+}
+
 export interface BodyWallCabinet {
   group: Group
   ready: Promise<void>
@@ -165,6 +197,8 @@ export function mountBodyWall(stack: Stack): BodyWallCabinet {
   // live engine only draws is left out of the rig
   const built: { light: SpotLight | RectAreaLight; spec: BodyLight }[] = []
   RectAreaLightNode.setLTC(RectAreaLightTexturesLib.init())
+  const library = (stack.renderer as unknown as { library: { getLightNodeClass(c: unknown): unknown; addLight(n: unknown, c: unknown): void } }).library
+  if (!library.getLightNodeClass(WasherLight)) library.addLight(WasherLightNode, WasherLight)
   for (const spec of BODY_LIGHTS) {
     if (spec.engine === false) continue
     if (spec.kind === 'area') {
@@ -180,8 +214,9 @@ export function mountBodyWall(stack: Stack): BodyWallCabinet {
       built.push({ light: area, spec })
       continue
     }
-    const light = new SpotLight(new Color(spec.colour), spec.intensity, 0, spec.angle, spec.penumbra, 2)
+    const light = spec.wash ? new WasherLight(spec, spec.intensity) : new SpotLight(new Color(spec.colour), spec.intensity, 0, spec.angle, spec.penumbra, 2)
     light.position.copy(v3(...spec.at))
+    // a wallwasher's optic: the band it throws, as a multiplier on its cone
     const target = new Object3D()
     target.position.copy(v3(...spec.aim))
     light.target = target
@@ -231,7 +266,7 @@ export function mountBodyWall(stack: Stack): BodyWallCabinet {
   const adopt = (material: Material, inside = false): void => {
     const lit = material as Material & { lightsNode?: unknown; envNode?: unknown }
     lit.lightsNode = lightsOf([...rig])
-    lit.envNode = inside ? env.mul(L.hangEnv) : env
+    lit.envNode = env.mul(inside ? L.hangEnv : L.caseEnv)
     material.needsUpdate = true
   }
 
@@ -269,17 +304,20 @@ export function mountBodyWall(stack: Stack): BodyWallCabinet {
   // the casework: the lining's panels and reveals, the chest, in one oak
   const lining = liningBoards(), chest = chestBoards()
   const casework = faces([...lining.panels, ...lining.reveals, ...chest.oak])
+  splayFaces(casework)
   make(casework.geometry(), oak, 'casework', true)
   // every frame, swept on its mitres, and every mat with its bevels
   const frames = new Faces(), mats = new Faces()
   mountedSheets().forEach((sheet, i) => { frameRing(frames, sheet.frame, i); matFaces(mats, sheet) })
   make(frames.geometry(), frameOak, 'frames', false)
   make(mats.geometry(), mat, 'mats', false)
-  // the linen: only its face shows
-  const ground = new Faces()
-  ground.board(linenBoard(), ['west', 'south', 'north', 'bottom', 'top'])
+  // the linen boards: their faces and the edges their joints open onto
+  const ground = new Faces(), boards = linenBoards()
+  for (const panel of boards.panels) ground.board(panel, ['west', 'bottom', 'top'])
   make(ground.geometry(), linen, 'linen', false)
-  make(faces([...lining.core, ...chest.toe]).geometry(), dark, 'dark', true)
+  const darks = faces([...lining.core, ...chest.toe])
+  darks.board(boards.backer, ['west', 'south', 'north', 'bottom', 'top'])
+  make(darks.geometry(), dark, 'dark', true)
   const rail = new Solid()
   for (const box of chest.bronze) rail.box(box)
   for (const rod of chest.rail) rail.rod(rod.a, rod.b, rod.radius, rod.sides ?? 16)
