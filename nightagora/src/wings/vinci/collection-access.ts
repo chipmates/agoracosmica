@@ -89,7 +89,8 @@ export function weatherCourtConcrete(m: MeshStandardNodeMaterial): MeshStandardN
   const col = smoothstep(.3, .7, mx_noise_float(vec3(P.x.mul(8.5), P.y.mul(.6), P.z.mul(8.5))).mul(.5).add(.5))
   const runs = exp(span.y.div(col.mul(.45).add(.12)).negate()).mul(col.mul(.7).add(.3)).mul(vertical)
   const patchy = mx_noise_float(P.mul(2.1).add(vec3(4.2, 1.7, 3.9))).mul(.5).add(.5)
-  const foot = float(1).sub(smoothstep(.02, .3, span.x)).mul(vertical).mul(patchy.mul(.6).add(.4))
+  // a hand's height of it, so a low kerb keeps its boards above the green
+  const foot = float(1).sub(smoothstep(.01, .12, span.x)).mul(vertical).mul(patchy.mul(.6).add(.4))
   // each 150 mm board of the formwork took the pour a little differently
   const board = fract(floor(P.y.div(.15)).mul(12.9898).sin().mul(43758.5453)).sub(.5).mul(vertical)
   const across = P.x.sub(crossing[0]).mul(tangent[0]).add(P.z.negate().sub(crossing[1]).mul(tangent[1])).abs()
@@ -121,7 +122,7 @@ export function weatherCourtConcrete(m: MeshStandardNodeMaterial): MeshStandardN
   // row at the middle of each face's own height
   const tieAt = vec3(fract(along.div(.6)).sub(.5).mul(.6), span.x.sub(span.y).mul(.5), 0)
   const tie = float(1).sub(smoothstep(.012, .022, tieAt.length())).mul(vertical).mul(smoothstep(.2, .3, span.x.add(span.y)))
-  c = c.mul(grain.mul(.16).add(1)).mul(board.mul(.24).add(1)).mul(float(1).sub(seam.mul(.30))).mul(float(1).sub(tie.mul(.5)))
+  c = c.mul(grain.mul(.16).add(1)).mul(board.mul(.30).add(1)).mul(float(1).sub(seam.mul(.40))).mul(float(1).sub(tie.mul(.55)))
   c = mix(c, c.mul(vec3(1.16, 1.15, 1.12)), bloom.mul(.55))
   c = mix(c, c.mul(vec3(1.12, 1.11, 1.08)), arris.mul(.7))
   c = mix(c, c.mul(vec3(.78, .82, .70)), spots.mul(.6))
