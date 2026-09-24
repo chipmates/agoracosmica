@@ -24,22 +24,15 @@ const layout = {}, solids = {}
 execute(source('layout.ts').text, { exports: layout })
 execute(source('../rail-solids.ts').text, { exports: solids, require: () => THREE })
 const furniture = source('../table/geometry.ts'), exhibits = source('exhibits.ts')
-const approaches = source('approaches.ts')
-let builder, warmer, table
+let builder, warmer
 function walk(node, visit) { visit(node); ts.forEachChild(node, child => walk(child, visit)) }
 walk(furniture, node => { if (ts.isFunctionDeclaration(node) && node.name?.text === 'buildFurniture') builder = node })
 walk(exhibits, node => { if (ts.isFunctionDeclaration(node) && node.name?.text === 'warmTable') warmer = node })
-// THE TABLE'S PLACE IS ONE CONSTANT, and the module that stands it imports
-// that constant from the module that composes its eye. So this audit reads
-// the declaration itself rather than keeping a second copy of the digits: a
+// THE TABLE'S PLACE IS ONE CONSTANT, declared with the room programme and
+// passed on by the module that composes its eye. So this audit reads the
+// declaration itself rather than keeping a second copy of the digits: a
 // checker that re-encoded them would pass a table that had moved.
-walk(approaches, node => {
-  if (!ts.isVariableStatement(node)) return
-  if (!node.declarationList.declarations.some(declaration => declaration.name.getText(approaches) === 'VINCI_READING_TABLE')) return
-  const held = {}
-  execute(node.getText(approaches), { exports: held, FLOOR: layout.FLOOR, OPENING: layout.OPENING })
-  table = held.VINCI_READING_TABLE
-})
+const table = layout.VINCI_READING_TABLE
 if (!builder || !warmer) throw new Error('The actual table factory or host mount is absent')
 if (!table) throw new Error('The reading table has no declared place')
 const constructor = builder.body.statements.filter(statement => {

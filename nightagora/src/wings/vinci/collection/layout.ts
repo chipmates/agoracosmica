@@ -96,6 +96,16 @@ export const LINE_FIELD = {
   south: LINE_ORIGIN.north - 6 * LINE_SLAB.pitchNorth - LINE_SLAB.depth / 2,
   north: LINE_ORIGIN.north + 9 * LINE_SLAB.pitchNorth + LINE_SLAB.depth / 2,
 }
+/** THE READING TABLE STANDS ON THE READING ROOM'S AXIS: the joint between two
+ * courses of the line's field, which runs from the dates into the room's
+ * doorway. Its east edge stands a fifth of a metre inside the room's front,
+ * which is the line field's edge; its own panel stays 0.3 m clear of the hall
+ * door.
+ */
+export const VINCI_READING_TABLE = (() => {
+  const panelWidthM = 3.25
+  return { east: -37.38, north: -46.125, top: FLOOR + .755, panelWidthM }
+})()
 
 /** The court: the museum's own terrace, north-west of the pavilion, carrying
  * the three exhibits that need the sky or the height the rooms do not have.

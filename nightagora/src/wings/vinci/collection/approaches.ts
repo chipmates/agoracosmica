@@ -16,7 +16,7 @@ import type { VinciStationId } from '../content'
 import { GRAVE_DEATHBED, GRAVE_FRAME, GRAVE_SLAB } from '../grave/placement'
 import { LINE_STUDS } from '../line/studs'
 import { hangPlacements } from './hang'
-import { COURT, FLOOR, GRAVE_ORIGIN, SUPPER_WALL } from './layout'
+import { COURT, FLOOR, GRAVE_ORIGIN, SUPPER_WALL, VINCI_READING_TABLE } from './layout'
 import { STANDS, standOf, standLevel } from './stands'
 import { dossiers, MACHINE_SLUGS, type MachineSlug } from '../machines/catalog'
 import { bodyWallOrder } from './wall'
@@ -281,16 +281,9 @@ const BODY_STATION: VinciStationId = 'body'
  * rise between the standing eye and the sheet's own centre. */
 const SHEET_NEAREST_M = 1.1, SHEET_STEP_BACK = .8
 /** The book lies open on the table under its lamp, read from the chair side.
- *
- * THE TABLE STANDS ON THE READING ROOM'S AXIS: the joint between two courses
- * of the line's field, which runs from the dates into the room's doorway. Its
- * east edge stands a fifth of a metre inside the room's front, which is the
- * line field's edge; its own panel stays 0.3 m clear of the hall door.
- */
-export const VINCI_READING_TABLE = (() => {
-  const panelWidthM = 3.25
-  return { east: -37.38, north: -46.125, top: FLOOR + .755, panelWidthM }
-})()
+ * The table's place is declared with the room programme, so the reading
+ * room's plan reads it without importing this module back. */
+export { VINCI_READING_TABLE }
 const READING_TABLE = VINCI_READING_TABLE
 /** The supplied entry floor of the house, which the hall's ledge stands on. */
 const FLOOR_HOUSE=.8

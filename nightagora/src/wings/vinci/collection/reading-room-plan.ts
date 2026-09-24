@@ -14,8 +14,7 @@ import {
   Quaternion, Shape, ShapeUtils, Vector2, Vector3,
 } from 'three/webgpu'
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js'
-import { FACE, FLOOR, LINE_FIELD, OPENING } from './layout'
-import { VINCI_READING_TABLE } from './approaches'
+import { FACE, FLOOR, LINE_FIELD, OPENING, VINCI_READING_TABLE } from './layout'
 
 export const READING_ROOM_PROVENANCE = {
   manifestId: 'vinci/collection-reading-room',
