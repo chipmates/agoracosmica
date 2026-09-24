@@ -411,6 +411,13 @@ export function createReaderPayload(options: {
     steps.previous?.parentElement?.setAttribute('data-ways', String(shown.length))
     if (steps.previous) steps.previous.disabled = at <= 0
     if (steps.next) steps.next.disabled = !book || at >= book.sides.length - 1
+    /* A BOOK OF ONE SIDE HAS NOTHING TO STEP: its two steps stand down, and a
+       row left with nothing in it stands down with them */
+    const single = !book || book.sides.length < 2
+    if (steps.previous) steps.previous.hidden = single
+    if (steps.next) steps.next.hidden = single
+    const row = steps.previous?.parentElement
+    if (row) row.hidden = single && shown.length === 0
     // A STEP THAT CROSSES INTO ANOTHER VOLUME OR PART NAMES WHERE IT LANDS, so
     // the way on says the book changes before the next side stands.
     for (const [step, to] of [[steps.previous, at - 1], [steps.next, at + 1]] as const) {

@@ -31,6 +31,8 @@ export function createPlatePayload(options: {
   window: PlateWindow | null
   /** True once the eye stands where it will stand for this exhibit. */
   standing(): boolean
+  /** The work takes the narrow stage's whole glass, its card folded under it. */
+  fill?: boolean
 }): VitrinePayload {
   let host: VitrinePayloadHost | undefined
   let frame: HTMLDivElement | undefined, image: HTMLImageElement | HTMLCanvasElement | undefined
@@ -45,9 +47,17 @@ export function createPlatePayload(options: {
     return { left: rect.left + (rect.width - width) / 2, top: rect.top + (rect.height - height) / 2, width, height }
   }
 
+  /** Where the plate may stand: the viewport, or, where the work fills the
+   * glass, the part of it the folded card leaves free. */
+  function room(): VitrineRect {
+    if (!host || !options.fill || !host.narrow) return host!.viewport()
+    const box = host.element.getBoundingClientRect()
+    return box.width > 0 && box.height > 0 ? { left: box.left, top: box.top, width: box.width, height: box.height } : host.viewport()
+  }
+
   function hold(): void {
     if (!host || !frame || !image) return
-    const rect = host.work() ?? contain(host.viewport())
+    const rect = host.work() ?? contain(room())
     frame.style.left = `${rect.left}px`
     frame.style.top = `${rect.top}px`
     frame.style.width = `${rect.width}px`
@@ -72,6 +82,7 @@ export function createPlatePayload(options: {
 
   return {
     kind: 'picture',
+    fill: options.fill,
     mount(next) {
       host = next
       const document = next.element.ownerDocument

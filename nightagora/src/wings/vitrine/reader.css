@@ -58,6 +58,7 @@
    and the viewer's own steps beside them where there is a wheel. One line:
    a second line would stand on the strip. */
 .reader-row {display:flex;flex-wrap:nowrap;align-items:stretch;gap:6px;}
+.reader-row[hidden],.reader-row .vitrine-step[hidden] {display:none;}
 .reader-row .vitrine-step {flex:0 0 44px;}
 .reader-way {flex:1 1 0;min-width:0;}
 .reader-way[hidden] {display:none;}
@@ -87,5 +88,9 @@
   .reader-part {width:104px;height:72px;padding:2px 6px;}
   .reader-row {gap:4px;width:100%;}
   .reader-row[data-ways='0'] .vitrine-step {flex:1 1 0;}
+  /* WHERE THE TWO STEPS TAKE THE ROW each carries its own word beside its
+     chevron, the name it already has for a reader of the screen */
+  .reader-row[data-ways='0'] .vitrine-step:first-child::after {content:' ' attr(aria-label);font:14px/1 var(--sans);}
+  .reader-row[data-ways='0'] .vitrine-step:last-child::before {content:attr(aria-label) ' ';font:14px/1 var(--sans);}
   .reader-zoom {display:none;}
 }
