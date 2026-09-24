@@ -18,6 +18,7 @@
    work may be read through the card. One rule for all of them: each payload
    then carries only the offset of its own furniture. */
 .vitrine[data-narrow='true'][data-fill='true'] .vitrine-payload {bottom:var(--vitrine-peek,0px);}
+.vitrine[data-narrow='true'][data-fill='true'] .vitrine-caption {bottom:calc(var(--vitrine-peek,0px) + 4px);}
 .vitrine-payload:empty {pointer-events:none;}
 .vitrine-payload:focus-visible {outline:1px solid #edcc8c;outline-offset:-3px;}
 .vitrine-caption {position:absolute;left:0;right:0;bottom:4px;margin:0 auto;max-width:640px;padding:8px 14px;
@@ -130,6 +131,7 @@
 .vitrine[data-peek='true'] .vitrine-catalogue,
 .vitrine[data-peek='true'] .vitrine-controls,
 .vitrine[data-peek='true'] .vitrine-foot {display:none;}
+.vitrine[data-peek='true'][data-payload='machine'] .vitrine-after {display:none;}
 .vitrine[data-narrow='true'][data-fill='true'] .vitrine-card {background:#0d171ff5;}
 
 /* THE ONE LINE UNDER A PAGE is read over paper as often as over dark: the
@@ -179,6 +181,13 @@
   /* beside the close mark, which stands 44 px square 6 px inside the corner */
   .vitrine-folio {top:6px;right:56px;bottom:auto;max-width:84px;}
   .vitrine-folio-thumb {width:64px;}
+  /* THE MACHINE'S FOLIO IS A GLASS in the views' row: the model keeps its box whole */
+  .vitrine-views .vitrine-folio-glass {position:static;flex:0 0 44px;width:44px;height:44px;min-width:44px;max-width:44px;
+    padding:0;overflow:hidden;border-radius:50%;}
+  .vitrine-folio-glass .vitrine-folio-thumb {width:100%;height:100%;object-fit:cover;object-position:50% 30%;}
+  /* ONE TEXT AT A TIME: the run's caption is the step's one sentence, and the
+     steps as rows stand in the drawer "More" opens, never under it as well */
+  .vitrine[data-payload='machine'] .vitrine-card:has(.vitrine-more[aria-expanded='false']) .vitrine-steps {display:none;}
   .vitrine-part-name {max-width:200px;font-size:13px;}
 }
 

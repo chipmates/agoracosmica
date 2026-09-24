@@ -7,7 +7,7 @@
  * wing out of its registers: the line, the steps, the card's words.
  */
 import { createVitrine, type Vitrine, type VitrineExhibit, type VitrinePayload } from '../../vitrine'
-import { createTurntablePayload, type TurntableOptions, type TurntableViewpoint } from '../../vitrine/turntable'
+import { createTurntablePayload, type TurntableOptions, type TurntablePayload, type TurntableViewpoint } from '../../vitrine/turntable'
 import type { ReaderWords } from '../../vitrine/reader'
 import { lang } from '../../content'
 import { FURTHER, NEARER } from './deep-plate'
@@ -274,6 +274,27 @@ export function renderVinciMachineRecord(slug: MachineSlug, host: HTMLElement): 
   host.append(full)
 }
 
+/** THE FOLIO BESIDE A MACHINE, as the island shows it: the store's own
+ * thumbnail of the sheet it was read from, and the sheet's name. */
+export function vinciMachineSheet(slug: MachineSlug, open: () => void): { src: Promise<string | null> | null; label: string; open(): void } {
+  const thumb = FOLIO_THUMB[slug]
+  return {
+    src: thumb ? loadManifest().then(index => { const entry = index.byId.get(thumb); return entry?.display ? assetAddress(entry) : null }) : null,
+    label: folioName(slug),
+    open,
+  }
+}
+
+/** The machine's steps and the words of its clock, in the page's language. */
+export function vinciMachineSteps(slug: MachineSlug): { text: string; certainty: string }[] {
+  return (STEPS[slug] ?? []).map(step => ({ text: step[lang()], certainty: step.certainty }))
+}
+export function vinciMachineClockWords(): { play: string; pause: string; again: string; clock: string } {
+  const language = lang()
+  return { play: VINCI_VITRINE_WORDS.play[language], pause: VINCI_VITRINE_WORDS.pause[language],
+    again: VINCI_VITRINE_WORDS.again[language], clock: CONTROLS.machine.clock[language] }
+}
+
 export function createVinciMachinePayload(options: {
   stack: Stack
   slug: MachineSlug
@@ -287,7 +308,7 @@ export function createVinciMachinePayload(options: {
   openFolio?(): void
   /** True once the eye stands where it walked for this machine. */
   standing(): boolean
-}): VitrinePayload {
+}): TurntablePayload {
   const { slug } = options
   const dossier = dossiers[slug], language = lang(), record = machineCatalog[slug]
   const parts = VIEWPOINT_PARTS[slug]

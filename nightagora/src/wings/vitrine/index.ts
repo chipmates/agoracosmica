@@ -503,6 +503,10 @@ export function createVitrine(options: {
   const leaving = new AbortController()
   shutMark.addEventListener('click', () => shut())
   grab.addEventListener('click', () => setRaised(!raised))
+  // what a card opens at its peek opens on the raised card, never in a peek's few lines
+  body.addEventListener('click', event => {
+    if (root.dataset['peek'] === 'true' && (event.target as Element | null)?.closest('.vitrine-more')) setRaised(true)
+  })
   // A DRAG ON THE GRABBER IS THE SAME GESTURE THE STATION'S SHEET TAKES: up
   // raises, down lowers, and a short one is a press.
   let grabFrom = 0, grabHeld = false

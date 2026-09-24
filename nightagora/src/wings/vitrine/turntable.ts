@@ -10,9 +10,12 @@
 import {
   AdditiveBlending, Box3, BoxGeometry, CircleGeometry, Color, CustomBlending, DstColorFactor, Group, Mesh,
   MeshBasicNodeMaterial, MeshStandardNodeMaterial, OneFactor, PerspectiveCamera, PointLight, Raycaster, Scene,
-  Sphere, Vector2, Vector3, ZeroFactor, type BufferGeometry, type Object3D,
+  InstancedMesh, Sphere, Vector2, Vector3, ZeroFactor, type BufferGeometry, type Object3D,
 } from 'three/webgpu'
-import { float, fog, normalView, positionViewDirection, rangeFogFactor, vec3 } from 'three/tsl'
+import {
+  float, fog, fract, fwidth, max, min, mix, mx_noise_float, normalView, positionViewDirection, positionWorld, rangeFogFactor,
+  smoothstep, uniform, vec3,
+} from 'three/tsl'
 import type { Grade, KeyLight, Stack, StackLightOptions } from '../../stack'
 import { createBenchBackdrop } from '../vinci/machines/bench/backdrop'
 import {
@@ -21,6 +24,7 @@ import {
 import { LOOK_RULE } from '../vinci/input'
 import { deskStageHeight } from '../desk-stage'
 import type { VitrinePayload, VitrinePayloadHost } from './types'
+import { islandFit } from './fit'
 
 export interface TurntableBody {
   object: Object3D
@@ -93,7 +97,7 @@ const OVERLAY = { color: '#f2c77a', opacity: .3 }
  * shadow stay where they were; an added flat colour paints the part over.
  * A dark part has little to raise, so a thin warm edge is added where its
  * surface turns from the eye, with a trace of warmth on its face. */
-const LIFT = { face: .45, rim: .75, edge: .7, trace: .03 }
+const LIFT = { face: .45, rim: .75, edge: 1.1, trace: .08 }
 /** The border that marks a screen: a share of its shorter side, never thinner
  * than this, and standing a little proud of the sheet so it reads from both
  * faces of something as thin as paper. */
@@ -103,10 +107,38 @@ const EDGE = { share: .04, least: .006 }
 const WHOLE_FIT = .86
 /** Air around the box the whole view fits. */
 const WHOLE_MARGIN = 1.04
+/** THE ISLAND'S KEY STANDS ON THE VIEWER'S SIDE. The hour's sun comes from
+ * behind the whole view's bearing and left every machine a silhouette in its
+ * own shadow; the key keeps the hour's colour and strength and is turned to
+ * the whole view, this far round from the eye and this high. */
+const KEY_TURN = -48 * DEG, KEY_HEIGHT = 38 * DEG
+/** THE FLOOR IS THE HALL'S: sealed concrete poured in bays, the saw cuts the
+ * hall's own spacing, its tone clouded; it stands under the machine to the
+ * fog, so a step and a view read a floor and a horizon, never a void. */
+const FLOOR = { colour: '#77726a', bay: 4.8, cut: .004, cloud: .09, shade: .72 }
+/** The air follows the eye: the fog begins this many spans past the machine's
+ * centre and closes this many spans further, measured from the eye it has now. */
+const AIR = { near: .7, far: 4.2 }
 
 interface View { yaw: number; pitch: number; distance: number; target: Vector3 }
 
-export function createTurntablePayload(options: TurntableOptions): VitrinePayload {
+/** THE RECORDING'S HAND. The filmed cycle is the island drawn on the export's
+ * own clock: the machine's clock set outright, running on from there or held,
+ * and the named step's light on or off, so every frame of the recording is a
+ * function of its clock alone. */
+export interface TurntableFilm {
+  /** the machine's period in seconds, 0 for a machine that does not move */
+  readonly period: number
+  /** where each step lands on the dial when it is pressed, 0 to 1 */
+  readonly lands: readonly number[]
+  pose(clock: number, how: { playing: boolean; lit: boolean }): void
+  /** the box the machine is fitted in while recording, centred on the stage; null gives the window's own back */
+  frame(box: { width: number; height: number } | null): void
+}
+
+export type TurntablePayload = VitrinePayload & { readonly film: TurntableFilm }
+
+export function createTurntablePayload(options: TurntableOptions): TurntablePayload {
   const { stack, body, schedule, steps } = options
   const period = schedule.kind === 'static' ? 0 : schedule.period
   let host: VitrinePayloadHost | undefined
@@ -121,6 +153,10 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
   let goal: View | null = null, from: View | null = null, eased = 0
   let chosen: TurntableViewpoint = 'whole'
   let active = -1
+  /** true while the recording draws the machine with no part lit */
+  let dark = false
+  let framed: { width: number; height: number } | null = null
+  const airNear = uniform(1), airFar = uniform(2)
   const overlays = new Map<string, Mesh[]>()
   /** Geometry the overlay built itself, which it owns and gives back. */
   const owned = new Set<BufferGeometry>()
@@ -237,9 +273,17 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
     }
     return bars
   }
+  /** THE LIGHT MARKS WHAT THE EYE WAS SENT TO: the part a chosen view names,
+   * or, from the whole view, the part the step under way names. */
+  function litPart(): string | null {
+    if (dark) return null
+    const view = chosen === 'whole' ? null : options.viewpoints.find(v => v.id === chosen)?.part ?? null
+    return view ?? steps[active]?.part ?? null
+  }
   function light(id: string | null): void {
     for (const [part, meshes] of overlays) for (const mesh of meshes) mesh.visible = part === id
-    if (!id || overlays.has(id)) return
+    // a body not yet standing names no parts: its light is built once it stands, never kept empty
+    if (!id || overlays.has(id) || !standing) return
     /* A mark built for the hand is not what the light lands on: it is the
        reach of a tap, and its own mark stands beside it. */
     const found = family(id).flatMap(part => (nodeFor(part)?.geometries ?? []).map(hit => ({ ...hit, part })))
@@ -247,6 +291,10 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
     const meshes: Mesh[] = []
     for (const { node, geometry, part } of found) {
       const screen = options.screens?.has((node.userData['partId'] as string | undefined) ?? part) === true
+      // the light rides the mesh that draws the geometry: a part's node can
+      // hold its mesh at an offset, and a light on the node lands beside it
+      let holder: Object3D = node
+      node.traverse(child => { if (holder === node && child instanceof Mesh && child.geometry === geometry) holder = child })
       for (const shape of screen ? border(geometry) : [geometry]) {
         if (screen) owned.add(shape)
         for (const [material, order] of screen ? [[overlayMaterial, 10] as const] : [[liftMaterial, 10] as const, [edgeMaterial, 11] as const]) {
@@ -254,7 +302,7 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
           mesh.userData['vitrineOverlay'] = true
           mesh.renderOrder = order
           mesh.frustumCulled = false
-          node.add(mesh)
+          holder.add(mesh)
           meshes.push(mesh)
         }
       }
@@ -262,13 +310,27 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
     overlays.set(id, meshes)
   }
 
+  /** the floor's surface: the hall's slab in its bays, clouded, cut, in the table's own metres */
+  function floorMaterial(): MeshStandardNodeMaterial {
+    const material = new MeshStandardNodeMaterial({ roughness: .82, metalness: 0 })
+    const base = new Color(FLOOR.colour)
+    const at = positionWorld.xz
+    const cloud = mx_noise_float(at.mul(.21)).mul(.6).add(mx_noise_float(at.mul(.9)).mul(.4))
+    // a saw cut every bay, never thinner than a pixel, so the far floor does not shimmer
+    const cell = fract(at.div(FLOOR.bay).add(.5)).sub(.5).abs().mul(FLOOR.bay)
+    const edge = min(cell.x, cell.y)
+    const width = max(fwidth(edge), float(FLOOR.cut))
+    const cut = float(1).sub(smoothstep(width, width.mul(2), edge))
+    const tone = float(1).add(cloud.mul(FLOOR.cloud))
+    material.colorNode = vec3(base.r, base.g, base.b).mul(tone).mul(mix(float(1), float(FLOOR.shade), cut))
+    return material
+  }
+
   // ---- the eye on its bounded orbit
   function viewportFit(): { left: number; top: number; width: number; height: number } {
-    const rect = host!.viewport()
-    // The caption and the row under the work take the viewport's foot. Where
-    // the label carries the row, the caption alone is what has to stay clear.
-    const foot = host!.narrow ? 34 : host!.banded ? 52 : 118
-    return { left: rect.left, top: rect.top, width: rect.width, height: Math.max(80, rect.height - foot) }
+    // a recording names its own box, centred on the stage, so no lens shift is needed to draw it
+    if (framed) return { left: (innerWidth - framed.width) / 2, top: (deskStageHeight() - framed.height) / 2, ...framed }
+    return islandFit(host!)
   }
   function fitDistance(r: number): number {
     const fit = viewportFit(), w = innerWidth, h = deskStageHeight()
@@ -282,6 +344,34 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
   let rest = new Box3()
   /** How many moments of the run the fitted box is measured over. */
   const RUN_SAMPLES = 8
+  /** THE MACHINE'S OWN OUTLINE, not its box: a round sail's box has corners
+   * a third wider than the sail, and a fit to them leaves the machine small
+   * in its own window. Points of its surfaces over the run, a few hundred a
+   * part, in the table's metres. */
+  let outline: Vector3[] = []
+  const OUTLINE_PER_PART = 360
+  function outlineOver(moments: number): Vector3[] {
+    const points: Vector3[] = [], box = new Box3(), at = new Vector3()
+    for (let i = 0; i < moments; i++) {
+      body.animate(period * i / moments, 0)
+      body.object.updateMatrixWorld(true)
+      body.object.traverseVisible(child => {
+        if (!(child instanceof Mesh) || child.userData['vitrineOverlay'] || child.userData['vitrineTarget']) return
+        if (child instanceof InstancedMesh) {
+          box.setFromObject(child, true)
+          for (const x of [box.min.x, box.max.x]) for (const y of [box.min.y, box.max.y]) for (const z of [box.min.z, box.max.z]) points.push(new Vector3(x, y, z))
+          return
+        }
+        const position = (child.geometry as BufferGeometry).getAttribute('position')
+        if (!position) return
+        const stride = Math.max(1, Math.ceil(position.count / OUTLINE_PER_PART))
+        for (let k = 0; k < position.count; k += stride) points.push(at.fromBufferAttribute(position, k).applyMatrix4(child.matrixWorld).clone())
+      })
+    }
+    body.animate(0, 0)
+    body.object.updateMatrixWorld(true)
+    return points
+  }
   /** THE BOX THE RUN NEEDS. A machine's rest pose is not its widest moment:
    * the legs open, the arm swings. Where the work owns the stage it is fitted
    * to the box the whole run stands in, so no step of it is ever cut. */
@@ -308,11 +398,13 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
     const up = new Vector3().crossVectors(toward, right).normalize()
     const corner = new Vector3()
     let distance = radius * .5
-    for (const x of [rest.min.x, rest.max.x]) for (const y of [rest.min.y, rest.max.y]) for (const z of [rest.min.z, rest.max.z]) {
-      corner.set(x, y, z).sub(centre)
+    const measure = (point: Vector3): void => {
+      corner.copy(point).sub(centre)
       const depth = corner.dot(toward)
       distance = Math.max(distance, depth + Math.abs(corner.dot(right)) / tanX, depth + Math.abs(corner.dot(up)) / tanY)
     }
+    if (outline.length) for (const point of outline) measure(point)
+    else for (const x of [rest.min.x, rest.max.x]) for (const y of [rest.min.y, rest.max.y]) for (const z of [rest.min.z, rest.max.z]) measure(new Vector3(x, y, z))
     return Math.min(distance * WHOLE_MARGIN, fitDistance(radius) * WHOLE_FIT)
   }
   function goalFor(id: TurntableViewpoint): View {
@@ -340,6 +432,8 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
   function choose(id: TurntableViewpoint): void {
     chosen = id
     for (const [name, button] of viewButtons) button.setAttribute('aria-pressed', String(name === id))
+    tapped = null
+    light(litPart())
     const next = goalFor(id)
     if (host?.reducedMotion) { Object.assign(view, next); goal = null; return }
     from = { ...view, target: view.target.clone() }
@@ -350,7 +444,7 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
     goal = null
     view.yaw -= dx
     view.pitch = Math.min(PITCH.most, Math.max(PITCH.least, view.pitch + dy))
-    chosen = 'whole'
+    if (chosen !== 'whole') { chosen = 'whole'; light(litPart()) }
     for (const [, button] of viewButtons) button.setAttribute('aria-pressed', 'false')
   }
   function placeCamera(dt: number): void {
@@ -370,6 +464,10 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
     camera.position.set(Math.sin(view.yaw) * cos, Math.sin(view.pitch), Math.cos(view.yaw) * cos)
       .multiplyScalar(view.distance).add(view.target)
     camera.lookAt(view.target)
+    // the air is measured from the eye it has now, so a view that steps in keeps the machine clear
+    const span = radius * 2, reach = camera.position.distanceTo(centre)
+    airNear.value = reach + span * AIR.near
+    airFar.value = reach + span * AIR.far
     const w = innerWidth, h = deskStageHeight(), fit = viewportFit()
     // The work stands in the middle of its own viewport, not of the stage.
     camera.aspect = w / h
@@ -399,7 +497,7 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
       // the label reads which step is under way, never a second hand.
       host.step?.(at, steps.length)
       stepButtons.forEach((button, i) => { if (i === at) button.setAttribute('aria-current', 'step'); else button.removeAttribute('aria-current') })
-      light(step?.part ?? null)
+      light(litPart())
       host.describe(step ? `${options.title}. ${step.text}` : options.title)
     }
     paintLeader()
@@ -624,7 +722,9 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
         })
       } else sheet.textContent = label
       sheet.addEventListener('click', () => options.sheet?.open(), { signal: listening.signal })
-      next.element.append(sheet)
+      // ON THE PHONE THE FOLIO IS A GLASS in the views' row, never a chip on the model
+      if (next.narrow) { sheet.classList.add('vitrine-folio-glass'); views.append(sheet) }
+      else next.element.append(sheet)
     }
     const svg = next.element.ownerDocument.createElementNS('http://www.w3.org/2000/svg', 'svg')
     svg.setAttribute('class', 'vitrine-leader')
@@ -637,11 +737,14 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
     next.element.append(svg, leaderText)
   }
 
+  /** where a pressed step lands on the dial: its start, or a turn's own end */
+  const landOf = (index: number): number =>
+    steps[index]!.at >= 1 ? (schedule.kind === 'finite' ? 1 : starts[index]! + .02) : starts[index]!
   function jump(index: number): void {
     const step = steps[index]
     if (!step || !period) return
     tapped = null
-    const at = step.at >= 1 ? (schedule.kind === 'finite' ? 1 : starts[index]! + .02) : starts[index]!
+    const at = landOf(index)
     const cycle = schedule.kind === 'loop' ? Math.floor(state.clock / period) : 0
     setClock((cycle + at) * period)
     active = -2
@@ -687,18 +790,19 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
     rest = new Box3().setFromObject(object, true)
     radius = Math.max(.05, box.getBoundingSphere(new Sphere()).radius)
     centre = new Vector3(0, size.y / 2, 0)
-    if (host.banded) {
+    if (host.banded || host.narrow) {
       rest = runBox(rest)
       centre.setY((rest.min.y + rest.max.y) / 2)
       radius = Math.max(radius, rest.getBoundingSphere(new Sphere()).radius)
     }
+    outline = outlineOver(host.banded || host.narrow ? (period ? RUN_SAMPLES : 1) : 1)
     const span = Math.max(size.x, size.y, size.z)
     object.traverse(child => {
       if (!(child instanceof Mesh) || child.userData['vitrineOverlay']) return
       shadows.set(child, child.castShadow)
       child.castShadow = true
     })
-    ground = new Mesh(new CircleGeometry(span * 14, 72), new MeshStandardNodeMaterial({ color: new Color('#2b2e2c'), roughness: .94, metalness: 0 }))
+    ground = new Mesh(new CircleGeometry(span * 30, 96), floorMaterial())
     ground.rotation.x = -Math.PI / 2
     ground.receiveShadow = true
     ground.name = 'vitrine/ground'
@@ -707,7 +811,10 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
     camera.far = span * 80
     stack.setScene(scene, camera, options.grade)
     const reach = span * 3.4
-    key = stack.light({ ...options.light.key, reach: Math.max(24, span * 6), cascades: [span * 1.25, reach] })
+    // the hour's key, turned to the whole view's bearing: azimuth runs clockwise from -Z
+    const bearing = WHOLE.yaw + KEY_TURN
+    key = stack.light({ ...options.light.key, azimuth: 180 - bearing / DEG, elevation: KEY_HEIGHT / DEG,
+      reach: Math.max(24, span * 6), cascades: [span * 1.25, reach] })
     key.light.shadow.normalBias = span * .0002
     key.light.shadow.bias = -span * .00001
     key.fill.color.set(options.light.fill.color)
@@ -723,16 +830,35 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
     view.distance = wholeDistance()
     view.yaw = WHOLE.yaw; view.pitch = WHOLE.pitch
     placeCamera(0)
-    const near = view.distance + span * .5, far = view.distance + span * 2.4
-    scene.fogNode = fog(backdrop, rangeFogFactor(float(near), float(far)))
+    scene.fogNode = fog(backdrop, rangeFogFactor(airNear, airFar))
     standing = true
     host.surface('own')
     active = -2
     paint()
   }
 
+  const film: TurntableFilm = {
+    period,
+    lands: steps.map((_, i) => landOf(i)),
+    pose(clock, how) {
+      tapped = null
+      dark = !how.lit
+      state = { clock: schedule.kind === 'finite' ? Math.min(period, Math.max(0, clock)) : Math.max(0, clock), playing: how.playing, fixed: !how.playing }
+      active = -2
+      if (standing) { body.animate(state.clock, 0); paint() }
+    },
+    frame(box) {
+      framed = box
+      if (standing && !goal && chosen === 'whole') view.distance = wholeDistance()
+      placeCamera(0)
+    },
+  }
+
   return {
     kind: 'machine',
+    // the machine takes the glass on the phone, its card folded to a peek under it
+    fill: true,
+    film,
     mount(next) {
       host = next
       mounted = true
@@ -806,6 +932,7 @@ export function createTurntablePayload(options: TurntableOptions): VitrinePayloa
       }
       standing = false
       key = undefined; scene = undefined; camera = undefined; ground = undefined; fitting = undefined
+      outline = []
       host = undefined
     },
   }
