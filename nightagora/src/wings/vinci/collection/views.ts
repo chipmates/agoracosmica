@@ -181,13 +181,26 @@ export function collectionView(id: string, narrow: boolean): RoomPose | undefine
     }
     // TWO INSPECTION EYES IN THE GRAVE COURT, neither a station nor a walk:
     // the slab's cut name read from the foot of the slab, and the north wall's
-    // lit head with the filter band's light under it.
+    // lit head with the filter band's light under it. The wide frame stands
+    // south of the slab's axis, so the separate marker beside the name and the
+    // painting's label beyond it both stand whole and clear of the diagram's
+    // box; the narrow one looks down onto the name, under every other word.
     case 'grave-court-slab':
-      return pose(GRAVE_ORIGIN.east + 4.2, GRAVE_ORIGIN.north - 1.75, COURT.level + 1.62,
-        GRAVE_ORIGIN.east + 1.25, GRAVE_ORIGIN.north - .95, COURT.level + .27, narrow ? 64 : 48, .2)
+      return narrow
+        ? { eye: world(GRAVE_ORIGIN.east + 4.3, GRAVE_ORIGIN.north - .4, COURT.level + 1.62),
+          at: world(GRAVE_ORIGIN.east + 1, GRAVE_ORIGIN.north - 1, COURT.level - 1.1), fov: 66 }
+        : pose(GRAVE_ORIGIN.east + 4.5, GRAVE_ORIGIN.north - 1.7, COURT.level + 1.62,
+          GRAVE_ORIGIN.east + 1.3, GRAVE_ORIGIN.north - .2, COURT.level + .4, 50)
     case 'grave-court-band':
       return pose(GRAVE_ORIGIN.east + 5.4, GRAVE_ORIGIN.north + 1.2, COURT.level + 1.62,
         GRAVE_ORIGIN.east + .2, GRAVE_ORIGIN.north + 8.6, COURT.level + 4.9, narrow ? 72 : 54, .4)
+    // TWO INSPECTION EYES ON THE LAST SUPPER'S FIELD, neither a station nor a
+    // walk: the field whole, square on at its middle height, and its lower
+    // left corner at reading distance, with the reveal, the sill and the floor.
+    case 'supper-mural-whole':
+      return { eye: world(-35, -29.5, COURT.level + 2.92), at: world(-44.77, -29.5, COURT.level + 2.92), fov: 31 }
+    case 'supper-mural-lower-left':
+      return { eye: world(-42.9, -32.4, COURT.level + 1.62), at: world(-44.77, -32.9, COURT.level + .99), fov: 50 }
     case 'collection-room-supper':
       // The field is 8.8 by 4.6 m and the card sits in the middle of the
       // frame: the eye stands where the whole measurement clears it.
