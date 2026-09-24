@@ -136,7 +136,7 @@ function pickRung(rungs: readonly [number, number][], aspect: number, box: Pictu
 
 interface Held { url: string; bytes: number; got: number; blob: Blob | null; head: ArrayBuffer | null; fetching: Promise<Blob | null> | null; abort: AbortController | null; used: number }
 
-export function createFilmSource(options: FilmOptions): PictureSource {
+export function createFilmSource(options: FilmOptions): PictureSource & { readout(): Record<string, unknown>[] } {
   const { release, host, base } = options
   const graphs: Partial<Record<PictureFraming, RouterGraph>> = {}
   const graphOf = (f: PictureFraming): RouterGraph => (graphs[f] ??= routerGraph(release, f))
@@ -180,6 +180,9 @@ export function createFilmSource(options: FilmOptions): PictureSource {
   let disposed = false
   let playing: { video: HTMLVideoElement; edge: FilmEdgeRecord; track: CameraPrint[] | null; frame: number } | null = null
   let dipSkip: (() => void) | null = null
+  /** every hand-over as it happened, for the rigs: how long a press waited for its first
+      frame, which frame was on screen when the clip was shown, how the end was handed back */
+  const readouts: Record<string, unknown>[] = []
   const listeners = new Map<PictureEvent, Set<(s: PictureState) => void>>()
   const held = new Map<string, Held>()
   const tracks = new Map<string, Promise<CameraPrint[] | null>>()
@@ -423,6 +426,7 @@ export function createFilmSource(options: FilmOptions): PictureSource {
   /** ONE CLIP FROM PRESS TO REST. False when it could not play: the caller
       then reaches its stop by a dissolve. */
   async function playClip(edge: FilmEdgeRecord, target: PictureNode): Promise<boolean> {
+    const pressed = performance.now()
     const f = framingOf()
     if (f !== shownFraming) await showStill(edge.from, f)
     const arrival = stillFile(edge.to, f)
@@ -449,6 +453,10 @@ export function createFilmSource(options: FilmOptions): PictureSource {
     watchFrames(video)
     await firstFrame(video)
     video.classList.add('shown')
+    const record: Record<string, unknown> = { clip: edge.id, framing: f, rung: rungNow(f), src: src.startsWith('blob:') ? 'bytes' : 'network',
+      pressToShownMs: Math.round(performance.now() - pressed), shownAtMediaTime: Math.round(video.currentTime * 1000) / 1000,
+      stillUnder: still.currentSrc.replace(/^.*\//, '') }
+    readouts.push(record)
     set({ kind: 'walk', from: edge.from, to: edge.to, target, clip: edge.id, share: 0 }, 'depart')
     await new Promise<void>(resolve => {
       // a clip that never says it ended is ended by its own length, and a little air
@@ -459,12 +467,18 @@ export function createFilmSource(options: FilmOptions): PictureSource {
     /* THE CUT AT THE STOP IS INVISIBLE: the arrival's still is decoded and
        swapped in under the clip's last frame, and the clip only leaves on the
        frame after, dissolving over what the codec left */
+    const ended = performance.now()
+    record['endedAtMediaTime'] = Math.round(video.currentTime * 1000) / 1000
+    record['duration'] = Math.round(video.duration * 1000) / 1000
     await arrived
     if (arrival && still.src !== arrival) {
       still.src = arrival
       await still.decode().catch(() => undefined)
     }
     await frame()
+    record['endToDissolveMs'] = Math.round(performance.now() - ended)
+    const quality = (video as HTMLVideoElement & { getVideoPlaybackQuality?: () => { droppedVideoFrames: number; totalVideoFrames: number } }).getVideoPlaybackQuality?.()
+    if (quality) record['dropped'] = `${quality.droppedVideoFrames} of ${quality.totalVideoFrames}`
     video.classList.add('leaving')
     await sleep(END_DISSOLVE_MS + 20)
     tearDown(video)
@@ -593,6 +607,7 @@ export function createFilmSource(options: FilmOptions): PictureSource {
   return {
     kind: 'film',
     element: root,
+    readout: () => readouts.slice(),
     go,
     hurry() {
       if (dipSkip) { dipSkip(); return }

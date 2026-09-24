@@ -303,8 +303,13 @@ async function run(engine, width, lang) {
       await waitState(page, 'rest', 60000)
       await page.waitForTimeout(6000)
       shots.push(await shot(page, dir, '09-island'))
-      const folio = await page.$('.vitrine-sheet, [data-role="folio"], .turntable-sheet, .vitrine-folio')
-      if (folio) { await folio.click().catch(() => null); await page.waitForTimeout(3500); shots.push(await shot(page, dir, '10-leaf')) }
+      const folio = await page.$('.vitrine-folio')
+      if (folio) {
+        await folio.click().catch(() => null)
+        await page.waitForFunction(() => document.querySelector('.vitrine-card')?.getAttribute('data-exhibit')?.endsWith('/leaf') ?? false, null, { timeout: 20000 }).catch(() => null)
+        await page.waitForTimeout(2500)
+        shots.push(await shot(page, dir, '10-leaf'))
+      }
       await page.keyboard.press('Escape')
       await page.waitForTimeout(600)
       await page.keyboard.press('Escape')
@@ -326,6 +331,7 @@ async function run(engine, width, lang) {
   } catch (err) {
     record.failed = String(err.message ?? err).slice(0, 300)
   } finally {
+    record.handovers = await page.evaluate(() => window.__naSeam?.readout?.() ?? []).catch(() => [])
     if (JOINS && !record.failed) await readJoins(page, dir, phone, record).catch((err) => { record.joinsFailed = String(err).slice(0, 200) })
     record.seconds = (Date.now() - t0) / 1000
     await ctx.close()

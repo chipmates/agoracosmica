@@ -15,22 +15,10 @@ import { applyDeskSteps, deskOn } from '../desk-switches'
 import { deskStageHeight } from '../desk-stage'
 import { createDeskChrome, deskMark, type DeskChrome, type DeskStation } from '../desk-chrome'
 import { gaitPace } from './gait'
-import { getWork, findPlateEntries, MAIN_HANG } from './pictures/register'
-import { createWindowWorkLabel, policyLabelText, PICTURE_CERTAINTY_KEY } from './pictures/policy-label'
-import { validatePaintingRecord } from './pictures/policy'
-import { pictureDisplayUV, pictureDisplayWindow } from './pictures/registration'
-import { machineCatalog, type MachineSlug } from './machines/catalog'
-import { createVinciCloseLook, createVinciMachinePayload, vinciLine, vinciLimits, vinciMachineCard, vinciManuscriptWords, VINCI_EXHIBIT_CARD, VINCI_PAGE_HONESTY, VINCI_VITRINE_WORDS, type VinciCloseLook } from './collection/close-look'
-import { vinciLeafSource, vinciPlateDescription } from './collection/deep-plate'
-import { createPlatePayload } from '../vitrine/picture'
-import { createReaderPayload as createLeafReader } from '../vitrine/reader'
 import { createVinciSourcesWindow } from './sources'
-import { FAMOUS_FOLIOS, type PageRecord } from './table/content'
-import studyPageMap from './table/data/msb-pages.json?raw'
 import cardsSource from './data/cards.json?raw'
-import { assetAddress } from '../../stack/materials'
-import { loadManifest, type ManifestIndex } from '../../manifest'
 import { createFilmSource, loadFilmRelease, LEAN_MS, type FilmRelease } from '../picture/film'
+import type { FilmLook } from './film-look'
 import type { PictureMark, PictureNode, PictureSource, PictureState } from '../picture/seam'
 import wingCss from './wing.css?inline'
 import deskCss from '../desk-chrome.css?inline'
@@ -82,11 +70,11 @@ const readingMs = (title: VinciText | null): number => title ? Math.round((2 + t
 interface LifeStop { id: string; station: string; name: VinciText }
 function lifeStops(): LifeStop[] {
   const built = new Set(vinciContent.map(s => s.id as string))
-  const lisa = getWork('mona-lisa')
   const out: LifeStop[] = []
   for (const stop of [...vinciStory].sort((a, b) => a.order - b.order)) {
     if (stop.kind === 'cut') continue
-    if (stop.id === 'picture-room-lisa') out.push({ id: stop.id, station: 'picture-room', name: { en: lisa.title_en, de: lisa.title_de } })
+    // the wall stop is named by its own chapter: the rail that carries these names stands down in the film
+    if (stop.id === 'picture-room-lisa') out.push({ id: stop.id, station: 'picture-room', name: stop.chapter })
     else if (built.has(stop.id)) out.push({ id: stop.id, station: stop.id, name: vinciContent.find(s => s.id === stop.id)!.name })
   }
   return out
@@ -114,13 +102,6 @@ function sentences(said: string): string[] {
 const stopNode = (id: string): PictureNode => `stop:${id}`
 const viewNode = (exhibit: string): PictureNode => `view:${exhibit}`
 
-/** THE ONE LEAF A MACHINE'S FOLIO OPENS here: manuscript B, folio 83 verso,
-    the sheet the aerial screw was read from. */
-function screwLeaf(): PageRecord | undefined {
-  const pages = (JSON.parse(studyPageMap) as { pages: PageRecord[] }).pages
-  return pages.find(page => page.page_kind === 'facsimile' && page.codex === 'B' && page.folio === 83 && page.side === 'verso')
-}
-
 export function createWing(): WingModule {
   const LIFE = lifeStops()
   const stationOf = (id: string) => vinciContent.find(s => s.id === id) ?? vinciContent[0]!
@@ -128,10 +109,8 @@ export function createWing(): WingModule {
   let release: FilmRelease | undefined
   let picture: PictureSource | undefined
   let desk: DeskChrome | undefined
-  let closeLook: VinciCloseLook | undefined
   let sources: ReturnType<typeof createVinciSourcesWindow> | undefined
   let sourceButton: HTMLButtonElement | undefined
-  let assets: ManifestIndex | undefined
   let card = 0
   let wide = true
   let loading: Promise<void> | undefined
@@ -221,11 +200,11 @@ export function createWing(): WingModule {
     if (!hosts || !picture) return
     const node = here()
     const b = picture.box()
-    const key = `${node}|${lang()}|${b.width}x${b.height}|${closeLook?.id ?? ''}|${drawerOpen}`
+    const key = `${node}|${lang()}|${b.width}x${b.height}|${look?.id ?? ''}|${drawerOpen}|${lookCard}`
     if (key === marksAt) return
     marksAt = key
     clearMarks()
-    if (closeLook?.id || picture.state().kind !== 'rest') return
+    if (look?.id || picture.state().kind !== 'rest') return
     const avoid = chrome()
     chip ??= Object.assign(make('span', 'vinci-mark-chip'), { hidden: true })
     chip.setAttribute('aria-hidden', 'true')
@@ -248,7 +227,7 @@ export function createWing(): WingModule {
       const word = walks ? text(deskControl('walk', 'walk_there')) : ''
       dot.dataset['word'] = word
       dot.setAttribute('aria-label', word ? `${word} · ${mark.label}` : mark.label)
-      dot.setAttribute('aria-controls', VINCI_EXHIBIT_CARD)
+      if (lookCard) dot.setAttribute('aria-controls', lookCard)
       dot.setAttribute('aria-expanded', 'false')
       const ring = document.createElementNS(SVG, 'svg')
       ring.setAttribute('class', 'vinci-mark-ring')
@@ -276,7 +255,7 @@ export function createWing(): WingModule {
     }
   }
   function pressMark(dot: HTMLButtonElement, id: string, walks: boolean): void {
-    if (!picture || closeLook?.id) return
+    if (!picture || look?.id) return
     if (!walks) { openExhibit(id, dot); return }
     // THE MARK ANSWERS BEFORE THE PICTURE MOVES: its word and its ring are the walk
     answering = { dot, id }
@@ -290,27 +269,8 @@ export function createWing(): WingModule {
     })
   }
 
-  /* ---- the close look, over the film ---- */
+  /* ---- the close look, loaded after the first picture ---- */
   const standing = (): boolean => picture?.state().kind === 'rest'
-  const control = (words: VinciText, run: () => void, role = ''): HTMLButtonElement => {
-    const button = make('button', 'vitrine-control', text(words))
-    button.type = 'button'
-    button.addEventListener('click', run)
-    if (role) button.dataset['role'] = role
-    return button
-  }
-  const shut = (): HTMLButtonElement => control(VINCI_VITRINE_WORDS.close, () => closeLook?.close(), 'close')
-  function certaintyColour(key: VinciCertainty): string {
-    const order: VinciCertainty[] = ['documented', 'unknown', 'reconstructed', 'conjectural']
-    return PICTURE_CERTAINTY_KEY[order.indexOf(key)]!.colour
-  }
-  function openRecord(id: string, title: VinciText, certainty: VinciCertainty, render: (host: HTMLElement) => void): void {
-    if (!sources) return
-    paintSources({ id, title, certainty, render })
-    sources.resetScroll()
-    sources.select('station')
-    sources.setOpen(true)
-  }
   /* ONE TEXT AT A TIME: on the phone the box stands down before a close look
      opens, so the work takes the whole glass and the vitrine's card is the text */
   function standDown(down: boolean): void {
@@ -318,86 +278,36 @@ export function createWing(): WingModule {
     phone.root.hidden = down
     if (down && drawerOpen) setDrawer(false)
   }
-  async function openExhibit(id: string, from: HTMLElement | null): Promise<void> {
-    if (!closeLook || !hosts) return
-    assets ??= await loadManifest()
-    if (id.startsWith('picture/')) {
-      const [, workId, face] = id.split('/') as [string, string, 'front' | 'reverse']
-      const work = getWork(workId)
-      const entries = findPlateEntries(work, assets)
-      const plate = entries.find(entry => entry.face === face) ?? entries[0]
-      if (!plate) return
-      const names = work as typeof work & { reverse_title_en?: string; reverse_title_de?: string }
-      const title = text(face === 'reverse' ? { en: names.reverse_title_en ?? work.title_en, de: names.reverse_title_de ?? work.title_de } : { en: work.title_en, de: work.title_de })
-      const registration = pictureDisplayWindow(plate.plate)
-      const cut = registration ? pictureDisplayUV(registration) : null
-      const payload = createPlatePayload({
-        src: assetAddress(validatePaintingRecord(plate.preview, 'painting-preview').entry), title,
-        description: vinciPlateDescription(id), aspect: plate.pixels.width / plate.pixels.height, window: cut, standing,
-      })
-      const colour = policyLabelText(work, entries).colour
-      const order: VinciCertainty[] = ['documented', 'unknown', 'reconstructed', 'conjectural']
-      const certainty = order[Math.max(0, PICTURE_CERTAINTY_KEY.findIndex(entry => entry.colour === colour))] ?? 'reconstructed'
-      standDown(true)
-      closeLook.open({ id, title, line: vinciLine(id), card: [createWindowWorkLabel(work, entries, lang(), narrow())], payload,
-        controls: [control(VINCI_VITRINE_WORDS.provenance, () => openRecord(id, { en: work.title_en, de: work.title_de }, certainty,
-          host => host.append(make('p', 'vinci-statement', `${work.holder} · ${text({ en: work.date_label_en, de: work.date_label_de })}`))), 'record'), shut()],
-        ...vinciLimits(id), set: hangPlace(id), certainty }, from, 'enter')
-      return
-    }
-    if (id.startsWith('machine/')) {
-      const slug = id.slice('machine/'.length) as MachineSlug
-      // the island's builders and the wing's own print arrive only when it opens
-      const [{ buildMachine }, { PRINT, STATION_EXPOSURE, KEY_RIG }] = await Promise.all([import('./machines'), import('./print')])
-      const stack = hosts.world.stack
-      const body = buildMachine(slug, stack)
-      const title = machineCatalog[slug].title[lang()]
-      const words = vinciMachineCard(slug, narrow(), { word: text(vinciCertaintyWords.reconstructed), colour: PICTURE_CERTAINTY_KEY[2]!.colour })
-      const record = (): void => openRecord(id, machineCatalog[slug].title, 'reconstructed', host => host.append(make('p', 'vinci-statement', text(machineCatalog[slug].label))))
-      const payload = createVinciMachinePayload({ stack, slug, body,
-        grade: { ...PRINT, exposure: STATION_EXPOSURE[stationOf(LIFE[card]!.station).id] ?? PRINT.exposure }, light: KEY_RIG,
-        openRecord: record,
-        openFolio: slug === 'aerial-screw' ? () => openLeaf(id) : undefined,
-        // the island is the one live picture: the film stands aside while it draws
-        restore: () => { picture?.veil(false); stack.setScene(hosts!.world.scene, hosts!.world.camera, PRINT) },
-        standing })
-      picture?.veil(true)
-      standDown(true)
-      closeLook.open({ id, title, line: vinciLine(id), card: words.card, after: words.after, payload,
-        controls: [control(VINCI_VITRINE_WORDS.provenance, record, 'record'), shut()], ...vinciLimits(id), set: null, certainty: 'reconstructed' }, from, 'enter')
-      return
-    }
+  let look: FilmLook | undefined
+  let lookLoading: Promise<FilmLook> | undefined
+  function lookNow(): Promise<FilmLook> {
+    lookLoading ??= import('./film-look').then(m => {
+      const h = hosts!
+      look = m.createFilmLook({ host: h.labels, narrow,
+        room: () => text(stationOf(LIFE[card]!.station).name),
+        returnFocus: () => h.stage.parentElement!.querySelector<HTMLElement>('.desk-on, .film-gold'),
+        floor: () => desk?.floor() ?? (phone && !phone.root.hidden ? phone.root.getBoundingClientRect().top : innerHeight),
+        station: () => stationOf(LIFE[card]!.station).id,
+        stack: h.world.stack, scene: h.world.scene, camera: h.world.camera,
+        standDown, veil: hidden => picture?.veil(hidden), standing, openRecord,
+        onClose: () => { marksAt = '' } })
+      lookCard = m.FILM_LOOK_CARD
+      marksAt = ''
+      return look
+    })
+    return lookLoading
   }
-  /** THE SHEET: the leaf the screw was read from, opened in the reader where
-      the visitor stands, as the live wing opens the study's own leaf */
-  function openLeaf(machine: string): void {
-    const leaf = screwLeaf()
-    if (!leaf || !assets || !closeLook) return
-    const stem = leaf.file.replace(/^.*\//, '').replace(/\.[a-z]+$/, '')
-    const near = assets.byId.get(`vinci/ms-page-near/${stem}`) ?? assets.byId.get(`vinci/ms-page/${stem}`)
-    const thumb = assets.byId.get(`vinci/ms-thumb/${stem}`)
-    if (!near) return
-    const scan = near as typeof near & { width?: number; height?: number; licence?: string }
-    const named = FAMOUS_FOLIOS.find(folio => folio.folio === '83v')
-    const title = lang() === 'de' ? named?.de ?? '' : named?.en ?? ''
-    const shows = lang() === 'de' ? leaf.what_it_shows_de : leaf.what_it_shows_en
-    const source = vinciLeafSource(assets, leaf.file, { file: assetAddress(near), width: scan.width ?? 0, height: scan.height ?? 0 })
-    const door = `${machine}/leaf`
-    const reader = createLeafReader({
-      book: Promise.resolve({ sides: [{ id: 'screw-leaf', label: title, shows, source, thumb: thumb ? assetAddress(thumb) : null, ways: [],
-        colour: certaintyColour('documented'), head: null, holder: '' }],
-      stripLabel: () => text(stationOf(LIFE[card]!.station).name), holder: '', honesty: text(VINCI_PAGE_HONESTY) }),
-      start: 'screw-leaf', words: vinciManuscriptWords(), tier: () => 'standard' })
-    closeLook.open({ id: door, title, line: null, card: [], payload: reader,
-      controls: [control(VINCI_VITRINE_WORDS.provenance, () => openRecord(door, { en: named?.en ?? '', de: named?.de ?? '' }, 'documented',
-        host => { for (const line of [shows, scan.licence ?? '']) if (line) host.append(make('p', 'vinci-statement', line)) }), 'record'),
-      control(VINCI_VITRINE_WORDS.back, () => void openExhibit(machine, null), 'back'), shut()], set: null, certainty: 'documented' }, null, 'advance')
+  let lookCard = ''
+  function openExhibit(id: string, from: HTMLElement | null): void {
+    if (!hosts) return
+    void lookNow().then(l => l.open(id, from))
   }
-  /** where a work stands in the hang, the row's own count */
-  function hangPlace(id: string): { at: number; of: number } | null {
-    const workId = id.split('/')[1]
-    const at = MAIN_HANG.findIndex(work => work.id === workId)
-    return at < 0 ? null : { at: at + 1, of: MAIN_HANG.length }
+  function openRecord(id: string, title: VinciText, certainty: VinciCertainty, render: (host: HTMLElement) => void): void {
+    if (!sources) return
+    paintSources({ id, title, certainty, render })
+    sources.resetScroll()
+    sources.select('station')
+    sources.setOpen(true)
   }
 
   /* ---- the record: the station's own statements, one window ---- */
@@ -599,6 +509,8 @@ export function createWing(): WingModule {
     if (!carried(card)) card = Math.max(0, LIFE.findIndex((_, i) => carried(i)))
     picture = createFilmSource({ host: h.stage, base: filmReleaseBase(), release, at: stopNode(LIFE[card]!.id),
       framing: () => (wide ? 'wide' : 'upright'), box, pace: () => gaitPace(), hold: title => readingMs(title) })
+    // the seam as the rigs read it, the way the live wing hands them `__forge`
+    ;(window as unknown as { __naSeam?: PictureSource }).__naSeam = picture
     picture.on('state', state => { paintDip(state); if (state.kind === 'rest') marksAt = '' })
     picture.on('rest', state => {
       if (state.kind !== 'rest') return
@@ -640,21 +552,14 @@ export function createWing(): WingModule {
     sourceButton.addEventListener('click', () => { paintSources(null); sources?.select('station'); sources?.setOpen(true) })
     wing.querySelector('.wing-rail-group')?.append(sourceButton)
     sources = createVinciSourcesWindow(h.labels, sourceButton, () => { sources?.setOpen(false); recordOf = null })
-    closeLook = createVinciCloseLook({ host: h.labels, narrow,
-      room: () => text(stationOf(LIFE[card]!.station).name),
-      returnFocus: () => wing.querySelector<HTMLElement>('.desk-on, .film-gold'),
-      floor: () => desk?.floor() ?? (phone && !phone.root.hidden ? phone.root.getBoundingClientRect().top : innerHeight),
-      // the film has already walked there: the window opens where the eye stands
-      onOpen: () => false,
-      onClose: () => { marksAt = ''; picture?.veil(false); standDown(false) } })
     window.addEventListener('keydown', e => {
       if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return
       if (document.querySelector('dialog[open]')) return
       const target = e.target instanceof Element ? e.target : document.body
       if (target.closest('input,textarea,select')) return
-      if (closeLook?.id && closeLook.key(e)) { e.preventDefault(); return }
-      if (closeLook?.id && e.key === 'Escape') { e.preventDefault(); closeLook.close(); return }
-      if (closeLook?.id) return
+      if (look?.id && look.key(e)) { e.preventDefault(); return }
+      if (look?.id && e.key === 'Escape') { e.preventDefault(); look.close(); return }
+      if (look?.id) return
       if (e.key === 'Escape' && desk?.key(e)) { e.preventDefault(); return }
       if (e.key === 'Escape' && drawerOpen) { e.preventDefault(); setDrawer(false); return }
       if (desk?.key(e)) { e.preventDefault(); return }
@@ -664,11 +569,13 @@ export function createWing(): WingModule {
     }, { signal })
     // a press on the picture folds the phone's words back to the one line
     h.stage.addEventListener('click', e => { if (drawerOpen && !(e.target as Element).closest('.film-box')) setDrawer(false) }, { signal })
-    addEventListener('resize', () => { marksAt = ''; closeLook?.layout() }, { signal })
+    addEventListener('resize', () => { marksAt = ''; look?.layout() }, { signal })
     stood.add(LIFE[card]!.id)
     paint()
     await picture.ready()
     ahead()
+    // the close looks are fetched while the visitor reads the first picture
+    void lookNow()
   }
 
   const module: WingModule = {
@@ -687,7 +594,7 @@ export function createWing(): WingModule {
         return
       }
       if (!picture || !carried(index)) return
-      closeLook?.close()
+      look?.close()
       if (drawerOpen) setDrawer(false)
       void picture.go(stopNode(LIFE[index]!.id))
     },
@@ -702,11 +609,11 @@ export function createWing(): WingModule {
       paint()
     },
     // nothing draws but the machine's live island: the film is DOM over a held canvas
-    held: () => closeLook?.surface !== 'own',
+    held: () => look?.surface !== 'own',
     update(dt = 0) {
       if (!hosts || !picture) return
       picture.update()
-      closeLook?.update(dt)
+      look?.update(dt)
       const s = picture.state()
       // THE WORDS NAME THE STOP AHEAD FROM THE HALF OF THE LEG, as the live card does
       if (s.kind === 'walk' && s.share >= CARD_HANDOVER) {
@@ -738,7 +645,7 @@ export function createWing(): WingModule {
     stop() {
       controller.abort()
       desk?.dispose(); desk = undefined
-      closeLook?.dispose(); closeLook = undefined
+      look?.dispose(); look = undefined; lookLoading = undefined
       sources?.dispose(); sources = undefined
       sourceButton?.remove(); sourceButton = undefined
       picture?.dispose(); picture = undefined
