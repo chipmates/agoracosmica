@@ -1,0 +1,31 @@
+/* THE FILMED CYCLE stands where the island's canvas stands, covered the same
+   way, over the bench's own air, so a device that cannot draw the island sees
+   the same frame the island draws. */
+.na-cycle {
+  position: fixed;
+  left: 0;
+  top: 0;
+  overflow: hidden;
+  background: #1a2026;
+  pointer-events: none;
+}
+.na-cycle > img,
+.na-cycle > video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+  display: block;
+}
+.na-cycle > img:not([src]) { display: none; }
+.na-cycle > video { opacity: 0; }
+.na-cycle > video.shown { opacity: 1; }
+.na-cycle > .na-cycle-outline { opacity: 0; transition: opacity 160ms ease; }
+.na-cycle > .na-cycle-outline.shown { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .na-cycle > .na-cycle-outline { transition: none; }
+}
+/* the room's dimming stands down under the cycle: the cycle is the picture */
+.vitrine[data-payload='machine'][data-surface='hold'] .vitrine-scrim { display: none; }

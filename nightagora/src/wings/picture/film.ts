@@ -7,6 +7,7 @@
 
 import { route } from '../../../forge/film/router.mjs'
 import filmCss from './film.css?inline'
+import type { FilmCycle } from './cycle'
 import {
   PICTURE_ASPECT, lineIsLean, onBox, parsePrint, projectPrint,
   type CameraPrint, type PictureBox, type PictureEvent, type PictureFraming, type PictureMark,
@@ -68,6 +69,8 @@ export interface FilmRelease {
   opens: [PictureNode, PictureNode][]
   /** each station's set of exhibits, in the order its room holds them */
   sets?: Record<string, string[]>
+  /** a machine's filmed cycle by its exhibit, where the release carries one */
+  cycles?: Record<string, FilmCycle>
   nodes: Record<PictureNode, FilmNodeRecord>
   edges: FilmEdgeRecord[]
 }

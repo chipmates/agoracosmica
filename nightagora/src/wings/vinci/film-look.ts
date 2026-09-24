@@ -12,7 +12,12 @@ import { createWindowWorkLabel, policyLabelText, PICTURE_CERTAINTY_KEY } from '.
 import { validatePaintingRecord } from './pictures/policy'
 import { pictureDisplayUV, pictureDisplayWindow } from './pictures/registration'
 import { machineCatalog, type MachineSlug } from './machines/catalog'
-import { createVinciCloseLook, createVinciMachinePayload, vinciLine, vinciLimits, vinciMachineCard, vinciManuscriptWords, VINCI_EXHIBIT_CARD, VINCI_PAGE_HONESTY, VINCI_VITRINE_WORDS } from './collection/close-look'
+import { createVinciCloseLook, createVinciMachinePayload, vinciLine, vinciLimits, vinciMachineCard, vinciMachineClockWords, vinciMachineSheet,
+  vinciMachineSteps, vinciManuscriptWords, VINCI_EXHIBIT_CARD, VINCI_PAGE_HONESTY, VINCI_VITRINE_WORDS } from './collection/close-look'
+import { createCyclePayload, type FilmCycle } from '../picture/cycle'
+import { createIslandPayload, islandChoice, type IslandPayload } from '../picture/island'
+import type { PictureBox, PictureFraming } from '../picture/seam'
+import type { TurntablePayload } from '../vitrine/turntable'
 import { vinciLeafSource, vinciPlateDescription } from './collection/deep-plate'
 import { createPlatePayload } from '../vitrine/picture'
 import { createReaderPayload as createLeafReader } from '../vitrine/reader'
@@ -46,6 +51,13 @@ export interface FilmLookHost {
   standing(): boolean
   openRecord(id: string, title: VinciText, certainty: VinciCertainty, render: (host: HTMLElement) => void): void
   onClose(): void
+  /** the release's filmed cycle of a machine, where it carries one, and its folder */
+  cycle(id: string): { cycle: FilmCycle; base: string } | null
+  /** where a filmed cycle stands: over the held canvas, under every word */
+  cycleLayer(): HTMLElement
+  /** the picture's box and its framing, which a filmed cycle covers as the island's canvas does */
+  box(): PictureBox
+  framing(): PictureFraming
 }
 
 const text = (value: VinciText): string => value[lang()]
@@ -87,6 +99,7 @@ export function createFilmLook(h: FilmLookHost) {
   }
 
   async function open(id: string, from: HTMLElement | null): Promise<void> {
+    const asked = performance.now()
     assets ??= await loadManifest()
     if (id.startsWith('picture/')) {
       const [, workId, face] = id.split('/') as [string, string, 'front' | 'reverse']
@@ -101,6 +114,8 @@ export function createFilmLook(h: FilmLookHost) {
       const payload = createPlatePayload({
         src: assetAddress(validatePaintingRecord(plate.preview, 'painting-preview').entry), title,
         description: vinciPlateDescription(id), aspect: plate.pixels.width / plate.pixels.height, window: cut, standing: h.standing,
+        // the phone's close look is the work on the whole glass, the words folded under it
+        fill: h.narrow(),
       })
       const colour = policyLabelText(work, entries).colour
       const certainty = ORDER[Math.max(0, PICTURE_CERTAINTY_KEY.findIndex(entry => entry.colour === colour))] ?? 'reconstructed'
@@ -113,24 +128,64 @@ export function createFilmLook(h: FilmLookHost) {
     }
     if (id.startsWith('machine/')) {
       const slug = id.slice('machine/'.length) as MachineSlug
-      // the island's builders and the wing's own print arrive only when it opens
-      const [{ buildMachine }, { PRINT, STATION_EXPOSURE, KEY_RIG }] = await Promise.all([import('./machines'), import('./print')])
-      const body = buildMachine(slug, h.stack)
       const title = machineCatalog[slug].title[lang()]
       const words = vinciMachineCard(slug, h.narrow(), { word: text(vinciCertaintyWords.reconstructed), colour: PICTURE_CERTAINTY_KEY[2]!.colour })
       const record = (): void => h.openRecord(id, machineCatalog[slug].title, 'reconstructed', host => host.append(make('p', 'vinci-statement', text(machineCatalog[slug].label))))
-      const payload = createVinciMachinePayload({ stack: h.stack, slug, body,
-        grade: { ...PRINT, exposure: STATION_EXPOSURE[h.station() as keyof typeof STATION_EXPOSURE] ?? PRINT.exposure }, light: KEY_RIG,
-        openRecord: record,
-        openFolio: slug === 'aerial-screw' ? () => openLeaf(id) : undefined,
-        // the island is the one live picture: the film stands aside while it draws
-        restore: () => { h.veil(false); h.stack.setScene(h.scene, h.camera, PRINT) },
-        standing: h.standing })
+      const openFolio = slug === 'aerial-screw' ? () => openLeaf(id) : undefined
+      const choice = islandChoice(h.stack)
+      const filmed = h.cycle(id)
+      /* THE ISLAND'S BUILDERS AND THE WING'S PRINT arrive only where the island
+         is drawn: a device shown the film never fetches a byte of them */
+      const live = choice.mode === 'live' || !filmed
+        ? await Promise.all([import('./machines'), import('./print')]) : null
+      let island: TurntablePayload | null = null
+      const makeLive = () => {
+        const [{ buildMachine }, { PRINT, STATION_EXPOSURE, KEY_RIG }] = live!
+        island = createVinciMachinePayload({ stack: h.stack, slug, body: buildMachine(slug, h.stack),
+          grade: { ...PRINT, exposure: STATION_EXPOSURE[h.station() as keyof typeof STATION_EXPOSURE] ?? PRINT.exposure }, light: KEY_RIG,
+          openRecord: record, openFolio,
+          // the island is the one live picture: the film stands aside while it draws
+          restore: () => { h.veil(false); h.stack.setScene(h.scene, h.camera, PRINT) },
+          standing: h.standing })
+        return island
+      }
+      let cycle: ReturnType<typeof createCyclePayload> | null = null
+      const makeFilmed = filmed ? (step: number) => {
+        cycle = createCyclePayload({ cycle: filmed.cycle, base: filmed.base, framing: h.framing, host: h.cycleLayer(), box: h.box,
+          title, steps: vinciMachineSteps(slug), words: vinciMachineClockWords(),
+          sheet: vinciMachineSheet(slug, openFolio ?? record), land: step > 0 ? step : null })
+        return cycle
+      } : null
+      const payload = createIslandPayload({ choice: live ? choice : { mode: 'filmed', why: choice.why }, live: makeLive, filmed: makeFilmed,
+        stepOf: () => Math.max(0, [...h.host.querySelectorAll('.vitrine-step-item')].findIndex(b => b.getAttribute('aria-current') === 'step')), asked })
+      machine = { payload, island: () => island, cycle: () => cycle }
       h.veil(true)
       h.standDown(true)
       closeLook.open({ id, title, line: vinciLine(id), card: words.card, after: words.after, payload,
         controls: [control(VINCI_VITRINE_WORDS.provenance, record, 'record'), shut()], ...vinciLimits(id), set: null, certainty: 'reconstructed' }, from, 'enter')
     }
+  }
+  /** the machine standing open, for the rigs' readout and the recording's hand */
+  let machine: { payload: IslandPayload; island(): TurntablePayload | null; cycle(): ReturnType<typeof createCyclePayload> | null } | null = null
+  function readout() {
+    const open = closeLook.id
+    if (!open?.startsWith('machine/') || !machine) return { id: open, mode: null }
+    const reading = machine.payload.reading()
+    const current = [...h.host.querySelectorAll('.vitrine-step-item')].findIndex(b => b.getAttribute('aria-current') === 'step')
+    const cycle = machine.cycle()
+    return { id: open, surface: closeLook.surface, ...reading,
+      standing: reading.mode === 'live' ? closeLook.surface === 'own' : cycle?.standing() ?? false,
+      landed: reading.mode === 'live' ? current : cycle?.landed() ?? null }
+  }
+  ;(window as Window & { __naLook?: unknown }).__naLook = { readout }
+  /* THE RECORDING'S HAND, under the export's address only: the island opened
+     where the eye stands and its clock set outright, frame by frame */
+  if (new URLSearchParams(location.search).has('export')) (window as Window & { __naIsland?: unknown }).__naIsland = {
+    open: (slug: string) => open(`machine/${slug}`, null),
+    film: () => machine?.island()?.film ?? null,
+    pose: (clock: number, how: { playing: boolean; lit: boolean }) => machine?.island()?.film.pose(clock, how),
+    frame: (box: { width: number; height: number } | null) => machine?.island()?.film.frame(box),
+    readout,
   }
 
   /** THE SHEET: the leaf the screw was read from, opened in the reader where
