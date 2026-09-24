@@ -444,14 +444,14 @@
       "notes": "An iron step set in the bottom of the pillar's bore, its top hollowed to a cone in which the shaft's pivot turns and on which the whole wheel stands. [geometry]"
     },
     {
-      "id": "rotor",
+      "id": "shaft-foot",
       "parent": "base",
       "shape": "cylinder",
       "dimensions_m": {
         "radius": 0.04,
-        "height": 0.83
+        "height": 0.515
       },
-      "position_m": [0.0, 0.51, 0.0],
+      "position_m": [0.0, 0.3525, 0.0],
       "orientation_rad": [0.0, 0.0, 0.0],
       "material": {
         "class": "wood, planed oak",
@@ -460,11 +460,30 @@
       },
       "certainty": "C",
       "source": "A-GEOM",
-      "notes": "A shaft of oak turned round, radius 0.04 m, running in the pillar's bore with 5 mm to spare; the hub, the arms and the crank are fixed on it. [geometry]"
+      "notes": "The shaft's length inside the pillar, turned round, radius 0.04 m, running in the bore with 5 mm to spare; its iron pivot stands in the step. [geometry]"
+    },
+    {
+      "id": "rotor",
+      "parent": "shaft-foot",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.04,
+        "height": 0.315
+      },
+      "position_m": [0.0, 0.415, 0.0],
+      "orientation_rad": [0.0, 0.0, 0.0],
+      "material": {
+        "class": "wood, planed oak",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "The shaft of oak above the pillar's mouth, turned round, radius 0.04 m; the hub, the arms and the crank are fixed on it. [geometry]"
     },
     {
       "id": "gudgeon",
-      "parent": "rotor",
+      "parent": "shaft-foot",
       "shape": "profile of revolution",
       "dimensions_m": {
         "closed_axial_radial_profile": [
@@ -481,7 +500,7 @@
         "axis": "+Y",
         "segments": 24
       },
-      "position_m": [0.0, -0.442718, 0.0],
+      "position_m": [0.0, -0.285218, 0.0],
       "orientation_rad": [0.0, 0.0, 0.0],
       "material": {
         "class": "iron, forged",
@@ -508,7 +527,7 @@
         "axis": "+Y",
         "segments": 48
       },
-      "position_m": [0.0, 0.19, 0.0],
+      "position_m": [0.0, -0.0675, 0.0],
       "orientation_rad": [0.0, 0.0, 0.0],
       "material": {
         "class": "wood, planed oak",
@@ -594,7 +613,7 @@
         "axis": "+Y",
         "segments": 16
       },
-      "position_m": [0.06, 0.19, 0.0],
+      "position_m": [0.06, -0.0675, 0.0],
       "orientation_rad": [0.0, -0.0, -1.570796],
       "material": {
         "class": "wood, planed oak",
@@ -639,7 +658,7 @@
       "dimensions_m": {
         "radius": 0.07
       },
-      "position_m": [0.6, 0.19, 0.0],
+      "position_m": [0.6, -0.0675, 0.0],
       "orientation_rad": [0, 0, 0],
       "material": {
         "basis": "assumed",
@@ -671,7 +690,7 @@
         "axis": "+Y",
         "segments": 16
       },
-      "position_m": [0.0, 0.19, 0.06],
+      "position_m": [0.0, -0.0675, 0.06],
       "orientation_rad": [0.0, -1.570796, -1.570796],
       "material": {
         "class": "wood, planed oak",
@@ -716,7 +735,7 @@
       "dimensions_m": {
         "radius": 0.07
       },
-      "position_m": [0.0, 0.19, 0.6],
+      "position_m": [0.0, -0.0675, 0.6],
       "orientation_rad": [0, 0, 0],
       "material": {
         "basis": "assumed",
@@ -748,7 +767,7 @@
         "axis": "+Y",
         "segments": 16
       },
-      "position_m": [-0.06, 0.19, 0.0],
+      "position_m": [-0.06, -0.0675, 0.0],
       "orientation_rad": [0.0, -3.141593, -1.570796],
       "material": {
         "class": "wood, planed oak",
@@ -793,7 +812,7 @@
       "dimensions_m": {
         "radius": 0.07
       },
-      "position_m": [-0.6, 0.19, 0.0],
+      "position_m": [-0.6, -0.0675, 0.0],
       "orientation_rad": [0, 0, 0],
       "material": {
         "basis": "assumed",
@@ -825,7 +844,7 @@
         "axis": "+Y",
         "segments": 16
       },
-      "position_m": [-0.0, 0.19, -0.06],
+      "position_m": [-0.0, -0.0675, -0.06],
       "orientation_rad": [0.0, -4.712389, -1.570796],
       "material": {
         "class": "wood, planed oak",
@@ -870,7 +889,7 @@
       "dimensions_m": {
         "radius": 0.07
       },
-      "position_m": [-0.0, 0.19, -0.6],
+      "position_m": [-0.0, -0.0675, -0.6],
       "orientation_rad": [0, 0, 0],
       "material": {
         "basis": "assumed",
@@ -896,7 +915,7 @@
         "axis": "+Y",
         "segments": 32
       },
-      "position_m": [0.0, 0.377, 0.0],
+      "position_m": [0.0, 0.1195, 0.0],
       "orientation_rad": [0.0, 0.0, 0.0],
       "material": {
         "class": "iron, forged",
@@ -916,7 +935,7 @@
         "y": 0.018,
         "z": 0.03
       },
-      "position_m": [0.060104, 0.431, 0.060104],
+      "position_m": [0.060104, 0.1735, 0.060104],
       "orientation_rad": [0.0, -0.785398, 0.0],
       "material": {
         "class": "iron, forged",
@@ -1027,7 +1046,7 @@
       "id": "q",
       "type": "revolute",
       "parent": "base",
-      "child": "rotor",
+      "child": "shaft-foot",
       "axis": [0, 1, 0],
       "pivot_m": [0, 0.8, 0],
       "limits": null,

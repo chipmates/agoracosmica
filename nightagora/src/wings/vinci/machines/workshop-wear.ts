@@ -1,7 +1,8 @@
 /** WEAR ON THE WORKSHOP'S MECHANISMS, a look and not a claim (see wear.ts):
  * the ball bearing's two tracks where the balls roll, the lathe's foot bar
- * where the foot presses and its bearings where the grease runs out, and the
- * flywheel's shaft where it turns in the top of its pillar. */
+ * where the foot presses, and the flywheel's shaft where it turns in the top of
+ * its pillar. The lathe's poppets carry none: a stain read at the vertices of a
+ * face triangulated round its bore smears into bands. */
 import type { Vector3 } from 'three/webgpu'
 import type { WearRule } from './wear'
 
@@ -35,8 +36,6 @@ const BALL_BEARING: WearRule[] = [
   },
 ]
 
-/** The spindle's axis, where the grease in each poppet's bearing runs out onto its faces. */
-const AXIS_Y = .85
 const LATHE: WearRule[] = [
   {
     // the middle of the foot bar's top, pressed by a shoe every stroke
@@ -47,28 +46,13 @@ const LATHE: WearRule[] = [
     ],
     tint: (p, n) => n.y > .5 ? mix([.74, .7, .64], ONE, smooth(.02, .12, Math.hypot(p.x / 1.1, (p.z - .02) * 1.6))) : ONE,
   },
-  {
-    parts: id => id === 'headstock' || id === 'tailstock',
-    cuts: [
-      { normal: [0, 1, 0], at: [AXIS_Y - .07, AXIS_Y - .045, AXIS_Y - .025, AXIS_Y + .025, AXIS_Y + .045], facing: [1, 0, 0] },
-      { normal: [0, 1, 0], at: [AXIS_Y - .07, AXIS_Y - .045, AXIS_Y - .025, AXIS_Y + .025, AXIS_Y + .045], facing: [-1, 0, 0] },
-      { normal: [0, 0, 1], at: [-.045, -.025, .025, .045], facing: [1, 0, 0] },
-      { normal: [0, 0, 1], at: [-.045, -.025, .025, .045], facing: [-1, 0, 0] },
-    ],
-    // the grease creeps out round the bush and runs down the face below it
-    tint: (p, n) => {
-      if (Math.abs(n.x) < .5) return ONE
-      const d = Math.hypot(p.y - AXIS_Y, p.z) - Math.max(0, AXIS_Y - p.y) * .35
-      return mix([.6, .56, .5], ONE, smooth(.026, .066, d))
-    },
-  },
 ]
 
 const FLYWHEEL: WearRule[] = [
   {
     // the shaft darkened by grease where it turns in the pillar's mouth
     parts: id => id === 'rotor',
-    cuts: [{ normal: [0, 1, 0], at: [.59, .605, .62, .64, .66] }],
+    cuts: [{ normal: [0, 1, 0], at: [.62, .64, .66] }],
     tint: p => mix([.62, .58, .52], ONE, smooth(.605, .665, p.y)),
   },
   {

@@ -2741,6 +2741,10 @@
         "en": "Thrust pad",
         "de": "Spurlager"
       },
+      "shaft-foot": {
+        "en": "Shaft",
+        "de": "Welle"
+      },
       "rotor": {
         "en": "Shaft",
         "de": "Welle"

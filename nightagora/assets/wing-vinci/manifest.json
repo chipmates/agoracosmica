@@ -413,7 +413,7 @@
       "prompt": "Regenerable actual geometry certificate for40 directed routes across five pose families and two viewport families. Includes foundation, entry, vegetation and all dressing; no sky, DOM or shadow-only duplicate.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-10",
-      "sha256": "c2873001ed351e05b7df493e00de02e39bffb2cdf37ffe827afe6899fb4c9955",
+      "sha256": "4f075c31ea6f26d8a7a00153add7ed156196b74f7d9322e16dcedfcf4c77642e",
       "note": "recipe_file=src/wings/vinci/data/rail-clearance.json; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail; companion_file=src/wings/vinci/collection/approaches.ts"
     },
     {
@@ -803,7 +803,7 @@
       "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "ball-bearing, Codex Madrid I f. 20v. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. The sheet's eight wooden balls between two plates, the small pivoted wheels between them and the octagonal ring round them are kept. Everything else is a reconstruction of how a workshop of about 1500 would build it: two sills and two battens, plates of three oak boards each cut to a round, an iron post with a washer and a forelock, an iron bush in the upper plate, a turned hub from which eight iron pins run out through the wheels to an outer ring and are riveted there, turned oak sleeves between the wheels and the outer ring, an inner ring between the hub and the balls, two turned handles on the upper plate. Oak: the library's CC0 oak veneer under the generated planed, hewn, peg and grip tints, each rectangular timber its own phase and tone; turned parts read the veneer through three local projections. Iron: the forged dressing. Wear, a look and not a claim: the rolled track on each plate's working face, each board its own tone. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "prompt": "ball-bearing, Codex Madrid I f. 20v. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. The sheet's eight wooden balls between two plates, the small pivoted wheels between them and the octagonal ring round them are kept. Everything else is a reconstruction of how a workshop of about 1500 would build it: two sills and two battens, plates of three oak boards each cut to a round (a line of vertices 3 mm inside each seam and round the bore keeps each arris's shading to one even strip), an iron post with a washer and a forelock, an iron bush in the upper plate, a turned hub from which eight iron pins run out through the wheels to an outer ring and are riveted there, turned oak sleeves between the wheels and the outer ring, an inner ring between the hub and the balls, two turned handles on the upper plate. Oak: the library's CC0 oak veneer under the generated planed, hewn, peg and grip tints, each rectangular timber its own phase and tone; turned parts read the veneer through three local projections. Iron: the forged dressing. Wear, a look and not a claim: the rolled track on each plate's working face, each board its own tone. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
       "model": "Claude Opus 5.5",
       "date": "2026-09-24",
       "sha256": "49ccc0e12d7312d0629d676452e89fba9e48396da6ce64990b6200f0417b2b6e",
@@ -818,7 +818,7 @@
         },
         {
           "path": "src/wings/vinci/machines/data/ball-bearing.json",
-          "sha256": "b9cb7f91d558774cfe113d2d72a5e08730a71c68324ec6bff4feab57366ae41c"
+          "sha256": "f556c36f9775d5c0b52fbfde78937f3b2f8d4fdbd8f22b8b72bdadb92604d577"
         },
         {
           "path": "src/wings/vinci/machines/data/records.json",
@@ -850,7 +850,7 @@
         },
         {
           "path": "src/wings/vinci/machines/workshop-wear.ts",
-          "sha256": "8a9c98ceb31bf9927bffcc872d0f0bb619d5fdcc989a34701edd0dc2856a1cc9"
+          "sha256": "9d5dd44467e9f0cd2e51f2d2667665155cafda8ed9029ef2dd9b480fd9e8bf4f"
         }
       ],
       "dossier": {
@@ -1044,7 +1044,7 @@
       "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "flywheel, Codex Madrid I f. 114r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. The sheet's study of weights carried round a shaft, with the crank it draws on the shaft's head, is kept, with four equal stone weights on rigid spokes as the museum's pick. Everything else is a reconstruction of how a workshop of about 1500 would build it: hewn sills laid as a cross, a turned oak pillar bound with two iron hoops and held by four pegged braces, an iron step with a conical hollow in which the shaft's iron pivot turns, the shaft turning in the pillar's mouth, a turned hub with iron hoops, four turned tapered spokes with iron ferrules, the crank's iron arm and its turned grip. Oak: the library's CC0 oak veneer under the generated planed, hewn, peg and grip tints, each rectangular timber its own phase and tone; turned parts read the veneer through three local projections. Iron: the forged dressing. Stone: the library's pale limestone at a macro of 7 cm and a fine chisel peck, the relief held low. Wear, a look and not a claim: grease on the shaft where it turns in the pillar's mouth. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "prompt": "flywheel, Codex Madrid I f. 114r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. The sheet's study of weights carried round a shaft, with the crank it draws on the shaft's head, is kept, with four equal stone weights on rigid spokes as the museum's pick. Everything else is a reconstruction of how a workshop of about 1500 would build it: hewn sills laid as a cross, a turned oak pillar bound with two iron hoops and held by four pegged braces, an iron step with a conical hollow in which the shaft's iron pivot turns, the shaft turning in the pillar's mouth (the length inside the bore a part of its own, so a step lights only the shaft that shows), a turned hub with iron hoops, four turned tapered spokes with iron ferrules, the crank's iron arm and its turned grip. Oak: the library's CC0 oak veneer under the generated planed, hewn, peg and grip tints, each rectangular timber its own phase and tone; turned parts read the veneer through three local projections. Iron: the forged dressing. Stone: the library's pale limestone at a macro of 7 cm and a fine chisel peck, the relief held low. Wear, a look and not a claim: grease on the shaft where it turns in the pillar's mouth. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
       "model": "Claude Opus 5.5",
       "date": "2026-09-24",
       "sha256": "ce5c1ade83fd1aaf42b76da9113ae14a26642909c9ce6aed2ddc6f371044b7a7",
@@ -1055,7 +1055,7 @@
         },
         {
           "path": "src/wings/vinci/machines/data/flywheel.json",
-          "sha256": "e2fc5cb6f48977ec080d2b959b293d0b716d10aae7a1e4c6d3fb182a30c0d957"
+          "sha256": "9b65f8ebf9a44e886aa6cacd03cc3fddc04da17b6280cdba44c183f1cedde936"
         },
         {
           "path": "src/wings/vinci/machines/data/records.json",
@@ -1095,7 +1095,7 @@
         },
         {
           "path": "src/wings/vinci/machines/workshop-wear.ts",
-          "sha256": "8a9c98ceb31bf9927bffcc872d0f0bb619d5fdcc989a34701edd0dc2856a1cc9"
+          "sha256": "9d5dd44467e9f0cd2e51f2d2667665155cafda8ed9029ef2dd9b480fd9e8bf4f"
         }
       ],
       "dossier": {
@@ -1297,7 +1297,7 @@
       "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "lathe, Codex Atlanticus f. 108r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. The sheet's reciprocating drive is kept: a rope wound round the spindle, a foot bar that pulls it down and a bow that pulls it back, the spindle turning one way and back each stroke. Everything else is a reconstruction of how a workshop of about 1500 would build a pole lathe: a floor sill, two trestles of sole, cap and legs pegged together, a bow post wedged into the left trestle with a stretcher wedged through both back posts, two chamfered bed rails with the slot between them, stepped poppets and a nut post each held down by a tenon through the slot and a wedge beneath, iron bushes flanged on both faces of each poppet, a turned whorl for the rope, an iron socket and a spade drill, a tommy bar on the feed screw, slotted guide posts in which the foot bar's tenons ride, the rope knotted under the bar. The bow bends as a pole clamped at its butt. Oak: the library's CC0 oak veneer under the generated planed, hewn, peg and grip tints, each rectangular timber its own phase and tone; turned parts read the veneer through three local projections. Iron: the forged dressing. Hemp: the generated hemp tint on the three-lobed cord. Bronze: the nut. Wear, a look and not a claim: the foot bar's middle polished by the shoe, grease run out round each bearing. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "prompt": "lathe, Codex Atlanticus f. 108r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. The sheet's reciprocating drive is kept: a rope wound round the spindle, a foot bar that pulls it down and a bow that pulls it back, the spindle turning one way and back each stroke. Everything else is a reconstruction of how a workshop of about 1500 would build a pole lathe: a floor sill, two trestles of sole, cap and legs pegged together, a bow post wedged into the left trestle with a stretcher wedged through both back posts, two chamfered bed rails with the slot between them, stepped poppets (taller than deep, the grain running up them) and a nut post each held down by a tenon through the slot and a wedge beneath, iron bushes flanged on both faces of each poppet, a turned whorl for the rope, an iron socket and a spade drill, a tommy bar on the feed screw, slotted guide posts in which the foot bar's tenons ride, the rope knotted under the bar. The bow bends as a pole clamped at its butt. Oak: the library's CC0 oak veneer under the generated planed, hewn, peg and grip tints, each rectangular timber its own phase and tone; turned parts read the veneer through three local projections. Iron: the forged dressing. Hemp: the generated hemp tint on the three-lobed cord. Bronze: the nut. Wear, a look and not a claim: the foot bar's middle polished by the shoe. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
       "model": "Claude Opus 5.5",
       "date": "2026-09-24",
       "sha256": "d34606f49cb2ae4d9a2a9649a237abc1d63c5855d43e62c109ca5f5075587c7a",
@@ -1308,7 +1308,7 @@
         },
         {
           "path": "src/wings/vinci/machines/data/lathe.json",
-          "sha256": "f33a7e07099c5d0d38a8d4b75c58a0ea533801088806a2b90d57eaf548aeb9fa"
+          "sha256": "a923ed8533857c164bb981e6e2694cbfb0d2c7f0af122ca05a52a0f4078abe82"
         },
         {
           "path": "src/wings/vinci/machines/data/records.json",
@@ -1344,7 +1344,7 @@
         },
         {
           "path": "src/wings/vinci/machines/workshop-wear.ts",
-          "sha256": "8a9c98ceb31bf9927bffcc872d0f0bb619d5fdcc989a34701edd0dc2856a1cc9"
+          "sha256": "9d5dd44467e9f0cd2e51f2d2667665155cafda8ed9029ef2dd9b480fd9e8bf4f"
         }
       ],
       "dossier": {
