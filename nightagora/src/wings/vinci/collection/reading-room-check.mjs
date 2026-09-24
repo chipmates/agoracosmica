@@ -38,6 +38,11 @@ async function load(file) {
   return exports
 }
 
+// The plan's imports close a cycle (approaches, stands, the collection's
+// materials, the body wall's light and plan, the gallery plan, the plan): entered
+// at the plan, the gallery plan reads an empty module, so it is entered at the
+// materials, where the gallery plan finds the plan whole.
+await load(path.join(HERE, 'materials.ts'))
 const plan = await load(path.join(HERE, 'reading-room-plan.ts'))
 const { FACE } = await load(path.join(HERE, 'layout.ts'))
 const FACE_WEST = FACE.hallPartitionEast
