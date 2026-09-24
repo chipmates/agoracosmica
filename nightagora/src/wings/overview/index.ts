@@ -43,6 +43,9 @@ export interface DeskOverviewHost {
   measure?: () => VinciText | null
   /** the set's own name where the room gives it one */
   name?: () => VinciText | null
+  /** the columns a set stands in where the room balances its rows; the
+      grid's own seven where it gives none */
+  columns?: () => number | null
   /** what the set names and cannot show: each by name with its reason,
       after the cells, never a cell and never counted */
   absent?: () => { heading: string; items: readonly { title: string; reason: string }[] } | null
@@ -188,6 +191,7 @@ export function createDeskOverview(host: DeskOverviewHost): DeskOverview {
   /** THE CELLS ARE THE ONES WITH A PICTURE. No picture, no cell: a date or an
       absence never gets a tile here, and the count says the same. */
   const pictured = (): DeskOverviewCell[] => host.cells().filter(cell => cell.preview !== null)
+  const columns = (): number => host.columns?.() ?? COLUMNS
 
   function paint(): void {
     const set = pictured()
@@ -211,6 +215,7 @@ export function createDeskOverview(host: DeskOverviewHost): DeskOverview {
     stepBack.append(icon(STEP_BACK), document.createTextNode(host.room()))
     shut.setAttribute('aria-label', say(WORD.close()))
     grid.textContent = ''
+    grid.style.setProperty('--desk-ov-columns', String(columns()))
     buttons = []
     shown.forEach((cell, index) => {
       const item = document.createElement('li')
@@ -275,7 +280,7 @@ export function createDeskOverview(host: DeskOverviewHost): DeskOverview {
     if (framed) window_.cancelAnimationFrame(framed)
     framed = window_.requestAnimationFrame(() => {
       framed = 0
-      const rows = Math.max(1, Math.ceil(buttons.length / COLUMNS))
+      const rows = Math.max(1, Math.ceil(buttons.length / columns()))
       const box = grid.getBoundingClientRect()
       if (box.height < 1) return
       const free = (box.height - (rows - 1) * GAP_ROW) / rows - NAME_BLOCK
@@ -358,7 +363,7 @@ export function createDeskOverview(host: DeskOverviewHost): DeskOverview {
     if (!(event.target instanceof HTMLButtonElement)) return
     const key = event.key
     const by = key === 'ArrowRight' ? 1 : key === 'ArrowLeft' ? -1
-      : key === 'ArrowDown' ? COLUMNS : key === 'ArrowUp' ? -COLUMNS : 0
+      : key === 'ArrowDown' ? columns() : key === 'ArrowUp' ? -columns() : 0
     if (by) { event.preventDefault(); step(by); return }
     if (key === 'Home') { event.preventDefault(); select(0, true) }
     if (key === 'End') { event.preventDefault(); select(buttons.length - 1, true) }

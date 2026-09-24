@@ -103,10 +103,15 @@ export const READING_LAMP = {
   rim: T.top + .52,
   /** a 2700 K lamp as the print shows it, balanced like the sun outdoors */
   colour: '#ffd3a0',
-  /** at the page, in lux; the stack reads one hundred lux as one */
-  lux: 72,
-  /** an opal disc under a dome: a cosine lobe, cut at the rim */
-  angle: 1.45, penumbra: 1, reach: 4.5,
+  /** at the page, in lux; the stack reads one hundred lux as one. The
+   * page's pool is this lamp's, several times the ceiling's bounce, so the
+   * table falls off from the book into the room */
+  lux: 660,
+  /** an opal disc set up inside the dome, whose rim cuts its light to a pool
+   * on the table: full inside a third of a metre, gone a metre out */
+  angle: 1.1, penumbra: .6, reach: 4.5,
+  /** how far over the rim the disc sits */
+  disc: .05,
   mapPx: 2048, soft: 2.5,
 } as const
 
@@ -116,8 +121,9 @@ export const READING_LAMP = {
 export const READING_COVE = {
   height: R.ceiling - .07,
   kelvin: 3500,
-  /** its luminance, in the stack's units */
-  intensity: 5,
+  /** its luminance, in the stack's units: a glow over the room, well under
+   * the pendant's pool on the table */
+  intensity: 3.2,
 } as const
 
 /** THE BACK WALL'S LIGHT: a small warm head over the doorway, inside,
@@ -915,6 +921,19 @@ export function studioloParts(): { inside: Batch; outside: Batch; ceiling: Batch
  * depth runs east: [west, south, bottom, east, north, top]. */
 export const TABLE_TOP = [T.east - .975, T.north - 1.4, T.top - .0495, T.east + 1.025, T.north + 1.4, T.top - .0045] as const
 
+/** THE TOP AS A JOINER LAYS IT: boards running from the reader to the back
+ * wall, each its own width out of the one log, between two breadboard ends
+ * that hold them flat. The joints' north lines, south to north, and the
+ * breadboards' width. Numbers for the room's dress of the top; the table's
+ * body is untouched. */
+export const TABLE_BOARDS = ((): { joints: number[]; bread: number } => {
+  const widths = Array.from({ length: 11 }, (_, i) => .19 + hash(i, 81) * .12)
+  const sum = widths.reduce((a, b) => a + b, 0), span = TABLE_TOP[4] - TABLE_TOP[1]
+  const joints = [TABLE_TOP[1]]
+  for (const w of widths) joints.push(joints[joints.length - 1]! + w * span / sum)
+  return { joints, bread: .09 }
+})()
+
 const CHAIR = {
   width: .46, depth: .42, seat: .44, cushion: .05, rail: { bottom: .69, height: .075, radius: .55, thickness: .022 },
   leg: { foot: .013, top: .018, inset: .025 },
@@ -940,11 +959,35 @@ export const BOOKCASE = {
 } as const
 const BOOKCASE_SPAN = [BOOKCASE.west, BOOKCASE.east] as const
 
-/** Cloth and leather bindings, linear, muted under one warm lamp. */
-const BINDINGS = ['#5a2a22', '#33402f', '#4b3625', '#7a5c32', '#2a3038', '#6b4a36', '#8f7d5c', '#40302a']
+/** Cloth and leather bindings, linear, muted under one warm lamp. The
+ * browns and the red are leather, the green, the navy and the buff are cloth. */
+const BINDINGS = ['#5a2a22', '#33402f', '#4b3625', '#7a5c32', '#2e3a4a', '#6b4a36', '#8f7d5c', '#40302a']
+const LEATHER = new Set([0, 2, 3, 5, 7])
+/** the spine's lettering pieces: a morocco label, a black one, a dark calf */
+const LABELS = ['#6a2419', '#1f1b18', '#35261a']
+const PAPER = ['#d8ccb0', '#cdbf9e', '#e0d5bd']
+/** the marbled papers a half-leather binding carries on its sides */
+const MARBLES = ['#5d6356', '#6e4c3c', '#4e566a', '#7a6a4c']
 
-export function bookcasePieces(): { oak: Piece[]; books: Piece[] } {
-  const B = BOOKCASE, oak: Piece[] = [], books: Piece[] = []
+/** A VOLUME as a binder makes it: two boards, a rounded spine, the text
+ * block standing a board's square inside them. `lying` lays it on its side
+ * with its spine to the room (`spineSouth`) or its fore-edge. */
+export interface Volume {
+  box: Piece['box']
+  lying: boolean
+  spineSouth: boolean
+  leather: boolean
+  tone: [number, number, number]
+  label: [number, number, number]
+  paper: [number, number, number]
+  /** the boards' sides: the marbled paper of a half-leather binding, or the
+   * cloth itself */
+  sides: [number, number, number]
+  seed: number
+}
+
+export function bookcasePieces(): { oak: Piece[]; books: Piece[]; volumes: Volume[] } {
+  const B = BOOKCASE, oak: Piece[] = [], books: Piece[] = [], volumes: Volume[] = []
   const s = B.north - B.depth, floor = R.floor, top = floor + B.height
   const board = (box: Piece['box'], grain: Grain, i: number): void => {
     oak.push({ box, grain, offset: [hash(i, 51) * 1.83, hash(i, 52) * 1.83], tone: toned(OAK.wall, 20 + i, 3, .04) })
@@ -955,22 +998,165 @@ export function bookcasePieces(): { oak: Piece[]; books: Piece[] } {
   board([B.west, s, top - B.board, B.east, B.north, top], 'east', 2)
   B.shelves.forEach((level, i) => board([B.west + B.board, s, floor + level, B.east - B.board, B.north, floor + level + B.board], 'east', 3 + i))
   board([B.west + .03, s + .04, floor, B.east - .03, B.north, floor + B.plinth], 'east', 5)
-  // THE VOLUMES, set a finger back from the shelf's edge, a gap here and there
+  const volume = (box: Piece['box'], k: number, lying = false, spineSouth = true): void => {
+    const which = Math.floor(hash(k, 68) * BINDINGS.length)
+    const tone = toned(BINDINGS[which]!, k, 69, .08)
+    books.push({ box, grain: 'up', offset: [hash(k, 67), -box[2]], tone })
+    volumes.push({
+      box, lying, spineSouth, leather: LEATHER.has(which), tone,
+      // a dark cloth takes a paper label, a pale one a printed panel
+      label: toned(LEATHER.has(which) ? LABELS[Math.floor(hash(k, 71) * LABELS.length)]! : which === 6 ? LABELS[1]! : '#b9a67e', k, 72, .06),
+      paper: toned(PAPER[Math.floor(hash(k, 73) * PAPER.length)]!, k, 74, .04), seed: k,
+      sides: LEATHER.has(which) ? toned(MARBLES[Math.floor(hash(k, 75) * MARBLES.length)]!, k, 76, .08) : tone,
+    })
+  }
+  // THE VOLUMES, set a finger back from the shelf's edge, a gap here and
+  // there; the upper shelf ends in three laid flat, as a reader leaves them
+  const STACK = .25
   B.shelves.forEach((level, shelf) => {
     const base = floor + level + B.board, room = (shelf === 0 ? B.shelves[1]! : B.height - B.board) - level - B.board
+    const end = B.east - B.board - .01 - (shelf === 1 ? STACK : 0)
     let e = B.west + B.board + .01, i = 0
     while (true) {
       const k = shelf * 97 + i++
       const thick = .018 + hash(k, 61) * .034, tall = Math.min(room - .012, .2 + hash(k, 62) * .12)
-      if (e + thick > B.east - B.board - .01) break
+      if (e + thick > end) break
       if (hash(k, 63) < .07) { e += .04 + hash(k, 64) * .08; continue }
       const deep = .15 + hash(k, 65) * .07, front = s + .015 + hash(k, 66) * .01
-      books.push({ box: [e, front, base, e + thick, front + deep, base + tall], grain: 'up', offset: [hash(k, 67), -base],
-        tone: toned(BINDINGS[Math.floor(hash(k, 68) * BINDINGS.length)]!, k, 69, .08) })
+      volume([e, front, base, e + thick, front + deep, base + tall], k)
       e += thick + .0015
     }
+    if (shelf !== 1) return
+    let h = base
+    for (let j = 0; j < 3; j++) {
+      const k = 300 + j, long = .24 - j * .025 + hash(k, 75) * .02, deep = .17 - j * .015 + hash(k, 76) * .015
+      const thick = .026 + hash(k, 77) * .018, west = end + .03 + j * .006 + hash(k, 78) * .01, front = s + .02 + hash(k, 79) * .012
+      volume([west, front, h, Math.min(west + long, B.east - B.board - .008), front + deep, h + thick], k, true, j !== 1)
+      h += thick
+    }
   })
-  return { oak, books }
+  return { oak, books, volumes }
+}
+
+/** THE VOLUMES' GEOMETRY, each in its own box: two boards, a spine rounded
+ * across the back with raised bands on the leather ones, a lettering piece
+ * and gilt rules, a head and a tail cap, and the text block a square inside
+ * the boards. `bookPart` is 0 for a board, 1 for the paper, 2 for gilt and 3
+ * for the spine; `uv` is the fraction across and up a board or the spine, and
+ * metres across the leaves and along them on the paper; `sideTone` is what a
+ * board's side is covered in. */
+export function volumeGeometry(volumes: readonly Volume[]): BufferGeometry {
+  const p: number[] = [], nm: number[] = [], uvs: number[] = [], tones: number[] = [], parts: number[] = [], sideTones: number[] = []
+  let sides: readonly number[] = [1, 1, 1]
+  const push = (c: Vector3[], ns: Vector3[], us: [number, number][], tone: readonly number[], part: number): void => {
+    const cross = c[1]!.clone().sub(c[0]!).cross(c[2]!.clone().sub(c[0]!))
+    const mean = ns[0]!.clone().add(ns[1]!).add(ns[2]!).add(ns[3] ?? ns[2]!)
+    const tri = c.length === 3 ? [0, 1, 2] : [0, 1, 2, 0, 2, 3]
+    const order = cross.dot(mean) >= 0 ? tri : tri.map((_, i, a) => a[i % 3 === 1 ? i + 1 : i % 3 === 2 ? i - 1 : i]!)
+    for (const i of order) {
+      p.push(c[i]!.x, c[i]!.y, c[i]!.z); nm.push(ns[i]!.x, ns[i]!.y, ns[i]!.z)
+      uvs.push(us[i]![0], us[i]![1]); tones.push(tone[0]!, tone[1]!, tone[2]!); parts.push(part)
+      sideTones.push(sides[0]!, sides[1]!, sides[2]!)
+    }
+  }
+  const GILT = linear('#b8904a')
+  for (const V of volumes) {
+    const [w, s, b, e, n, t] = V.box
+    sides = V.sides
+    // the volume's own axes: across its leaves (T), from spine to fore-edge
+    // (D), from tail to head (H), and the corner they start from
+    let o: Vector3, dT: Vector3, dD: Vector3, dH: Vector3, thick: number, deep: number, tall: number
+    if (!V.lying) {
+      o = v3(w, s, b); dT = EAST.clone(); dD = NORTH.clone(); dH = UP.clone()
+      thick = e - w; deep = n - s; tall = t - b
+    } else {
+      thick = t - b; deep = n - s; tall = e - w
+      o = V.spineSouth ? v3(w, s, b) : v3(w, n, b)
+      dT = UP.clone(); dD = V.spineSouth ? NORTH.clone() : SOUTH.clone(); dH = EAST.clone()
+    }
+    const P = (x: number, y: number, z: number): Vector3 => o.clone().addScaledVector(dT, x).addScaledVector(dD, y).addScaledVector(dH, z)
+    const D = (x: number, y: number, z: number): Vector3 => new Vector3().addScaledVector(dT, x).addScaledVector(dD, y).addScaledVector(dH, z).normalize()
+    const box = (x0: number, x1: number, y0: number, y1: number, z0: number, z1: number, tone: readonly number[], part: number, uvOf: (x: number, y: number, z: number) => [number, number]): void => {
+      const faces: [Vector3, [number, number, number][]][] = [
+        [D(-1, 0, 0), [[x0, y0, z0], [x0, y1, z0], [x0, y1, z1], [x0, y0, z1]]],
+        [D(1, 0, 0), [[x1, y0, z0], [x1, y1, z0], [x1, y1, z1], [x1, y0, z1]]],
+        [D(0, -1, 0), [[x0, y0, z0], [x1, y0, z0], [x1, y0, z1], [x0, y0, z1]]],
+        [D(0, 1, 0), [[x0, y1, z0], [x1, y1, z0], [x1, y1, z1], [x0, y1, z1]]],
+        [D(0, 0, -1), [[x0, y0, z0], [x1, y0, z0], [x1, y1, z0], [x0, y1, z0]]],
+        [D(0, 0, 1), [[x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1]]],
+      ]
+      for (const [normal, corners] of faces) push(corners.map(([x, y, z]) => P(x, y, z)), [normal, normal, normal, normal], corners.map(([x, y, z]) => uvOf(x, y, z)), tone, part)
+    }
+    const board = Math.min(.0042, Math.max(.0026, thick * .09)), square = .0032
+    // a leather back is rounded and stands proud; a cloth one nearly flat
+    const bulge = thick * (V.leather ? .2 : .1)
+    const joint = bulge * .85
+    // THE BOARDS, and the paper between them
+    const boardUV = (_x: number, y: number, z: number): [number, number] => [(y - joint) / (deep - joint), z / tall]
+    box(0, board, joint, deep, 0, tall, V.tone, 0, boardUV)
+    box(thick - board, thick, joint, deep, 0, tall, V.tone, 0, boardUV)
+    box(board, thick - board, bulge, deep - square, square, tall - square, V.paper, 1,
+      (x, y, z) => [x, Math.abs(y - (deep - square)) < 1e-6 ? z : y])
+    // THE SPINE: an arc from joint to joint, cut into bands up its height
+    const N = 10
+    const arc = (a: number, out = 0): { x: number; y: number; nx: number; ny: number } => {
+      const nx = -bulge * Math.PI * Math.cos(Math.PI * a), ny = -thick, l = Math.hypot(nx, ny)
+      return { x: a * thick + nx / l * out, y: bulge * (1 - Math.sin(Math.PI * a)) + ny / l * out, nx: nx / l, ny: ny / l }
+    }
+    const bands: number[] = []
+    const rows: [number, number, readonly number[], number][] = []
+    const f = (x: number): number => x * tall
+    if (V.leather) {
+      // five raised bands, a label in the second panel, gilt either side
+      const count = 5, lo = .09, hi = .91
+      for (let i = 0; i < count; i++) bands.push(lo + (hi - lo) * (i + .5) / count)
+      const p0 = bands[3]!, p1 = bands[4]!
+      rows.push([0, p0 + .012, V.tone, 3], [p0 + .012, p0 + .018, GILT, 2], [p0 + .018, p1 - .018, V.label, 3],
+        [p1 - .018, p1 - .012, GILT, 2], [p1 - .012, 1, V.tone, 3])
+    } else {
+      // cloth: a rule at head and tail and a printed panel under the head
+      const r0 = .045, r1 = .955, l0 = .68, l1 = .82
+      rows.push([0, r0, V.tone, 3], [r0, r0 + .01, GILT, 2], [r0 + .01, l0, V.tone, 3], [l0, l1, V.label, 3],
+        [l1, r1 - .01, V.tone, 3], [r1 - .01, r1, GILT, 2], [r1, 1, V.tone, 3])
+    }
+    for (const [z0, z1, tone, part] of rows) for (let k = 0; k < N; k++) {
+      const a0 = arc(k / N), a1 = arc((k + 1) / N)
+      push([P(a0.x, a0.y, f(z0)), P(a1.x, a1.y, f(z0)), P(a1.x, a1.y, f(z1)), P(a0.x, a0.y, f(z1))],
+        [D(a0.nx, a0.ny, 0), D(a1.nx, a1.ny, 0), D(a1.nx, a1.ny, 0), D(a0.nx, a0.ny, 0)],
+        [[k / N, z0], [(k + 1) / N, z0], [(k + 1) / N, z1], [k / N, z1]], tone, part)
+    }
+    // the raised bands: a cord under the leather, 1.4 mm proud, 5 mm high
+    for (const c of bands) {
+      const z0 = f(c) - .0025, z1 = f(c) + .0025, out = .0014
+      for (let k = 0; k < N; k++) {
+        const a0 = arc(k / N), a1 = arc((k + 1) / N), b0 = arc(k / N, out), b1 = arc((k + 1) / N, out)
+        const uv = (a: number, z: number): [number, number] => [a, z / tall]
+        push([P(b0.x, b0.y, z0), P(b1.x, b1.y, z0), P(b1.x, b1.y, z1), P(b0.x, b0.y, z1)],
+          [D(b0.nx, b0.ny, 0), D(b1.nx, b1.ny, 0), D(b1.nx, b1.ny, 0), D(b0.nx, b0.ny, 0)], [uv(k / N, z0), uv((k + 1) / N, z0), uv((k + 1) / N, z1), uv(k / N, z1)], V.tone, 3)
+        for (const [z, sign] of [[z1, 1], [z0, -1]] as const) {
+          const up = D(0, 0, sign)
+          push([P(a0.x, a0.y, z), P(a1.x, a1.y, z), P(b1.x, b1.y, z), P(b0.x, b0.y, z)], [up, up, up, up], [uv(k / N, z), uv((k + 1) / N, z), uv((k + 1) / N, z), uv(k / N, z)], GILT, 2)
+        }
+      }
+    }
+    // the head and tail caps close the back over the paper
+    for (const [z, sign] of [[tall, 1], [0, -1]] as const) {
+      const up = D(0, 0, sign), mid = P(thick / 2, joint, z)
+      for (let k = 0; k < N; k++) {
+        const a0 = arc(k / N), a1 = arc((k + 1) / N)
+        push([mid, P(a0.x, a0.y, z), P(a1.x, a1.y, z)], [up, up, up], [[.5, sign > 0 ? 1 : 0], [k / N, sign > 0 ? 1 : 0], [(k + 1) / N, sign > 0 ? 1 : 0]], V.tone, 3)
+      }
+    }
+  }
+  const g = new BufferGeometry()
+  g.setAttribute('position', new Float32BufferAttribute(p, 3))
+  g.setAttribute('normal', new Float32BufferAttribute(nm, 3))
+  g.setAttribute('uv', new Float32BufferAttribute(uvs, 2))
+  g.setAttribute('pieceTone', new Float32BufferAttribute(tones, 3))
+  g.setAttribute('bookPart', new Float32BufferAttribute(parts, 1))
+  g.setAttribute('sideTone', new Float32BufferAttribute(sideTones, 3))
+  g.computeBoundingBox(); g.computeBoundingSphere()
+  return g
 }
 
 /** THE READER'S CHAIR, drawn up to the book: oak, a leather seat, a bent

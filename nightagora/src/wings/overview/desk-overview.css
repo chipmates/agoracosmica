@@ -75,13 +75,13 @@
   color: var(--desk-quiet);
 }
 
-/* ---- the grid: seven columns at every count ---- */
+/* ---- the grid: seven columns at every count, unless the room balances its rows ---- */
 .desk-ov-grid {
   margin: 18px 0 0;
   padding: 0 0 2px;
   list-style: none;
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 172px));
+  grid-template-columns: repeat(var(--desk-ov-columns, 7), minmax(0, 172px));
   justify-content: center;
   align-content: center;
   gap: 16px 18px;

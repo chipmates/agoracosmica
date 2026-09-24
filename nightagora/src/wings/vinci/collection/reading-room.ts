@@ -25,11 +25,12 @@ import * as TSL from 'three/tsl'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
 import type { Stack } from '../../../stack'
 import { kelvinToColour } from '../../../stack/light'
+import { axisFootprint, lineCoverage } from '../../../stack/detail'
 import { FLOOR } from './layout'
 import { GALLERY_LIGHTS } from './line-gallery-plan'
 import {
   Batch, bookcasePieces, chairFloor, chairParts, linear, OAK_READ, PLANES, READING_COVE, READING_LAMP, READING_ROOM, READING_ROOM_PROVENANCE, READING_THRESHOLD, READING_WASH,
-  READING_SHADOW_LAYER, SHADE, studioloParts, T, v3, type Piece,
+  READING_SHADOW_LAYER, SHADE, studioloParts, T, TABLE_BOARDS, TABLE_TOP, v3, volumeGeometry,
 } from './reading-room-plan'
 
 export { READING_CHAIR, READING_LAMP, READING_ROOM, READING_ROOM_PROVENANCE, READING_SHADOW_LAYER, readingRoomSolids } from './reading-room-plan'
@@ -44,8 +45,8 @@ const CALM_FILL = { inside: [.2, .15, .1], low: [.13, .1, .07], up: [.36, .34, .
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type N = any
 const {
-  atan, attribute, float, lights: lightsOf, mix, mx_noise_float, normalMap, normalWorldGeometry,
-  pmremTexture, positionLocal, positionWorld, sin, smoothstep, sqrt, uniform, uv, vec2, vec3, vec4,
+  atan, attribute, float, fract, lights: lightsOf, mix, mx_noise_float, normalMap, normalWorldGeometry,
+  pmremTexture, positionLocal, positionWorld, sin, smoothstep, sqrt, step, uniform, uv, vec2, vec3, vec4,
 } = TSL as unknown as Record<string, N>
 
 export interface ReadingRoom {
@@ -98,7 +99,7 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
 
   // THE LAMP
   const L = READING_LAMP
-  const lampAt = v3(L.east, L.north, L.rim + .014), aim = v3(L.east, L.north, T.top)
+  const lampAt = v3(L.east, L.north, L.rim + L.disc + .002), aim = v3(L.east, L.north, T.top)
   const throwM = lampAt.distanceTo(aim)
   const lamp = new SpotLight(new Color(L.colour), L.lux / 100 * throwM * throwM, L.reach, L.angle, L.penumbra, 2)
   lamp.position.copy(lampAt)
@@ -276,6 +277,60 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
     return m
   }
   const oakIn = oak('oak', .72, true), oakCeiling = oak('ceiling', .6, false), oakOut = oak('oak-outside', .6, false, .9)
+
+  /** THE TABLE'S TOP, dressed by the room in the room's own oak: every board
+   * its own piece of the photograph (its own width, tone, figure, direction
+   * and run of grain), the breadboards' grain across the board ends, the
+   * joints dark, and the finish worn pale where forearms rest at the near
+   * edge. Read in the wing's metres off the top's own declared place. */
+  const tableTop = ((): MeshStandardNodeMaterial => {
+    const m = new MeshStandardNodeMaterial({ roughness: .45, metalness: 0 })
+    const P = positionWorld, north = P.z.negate(), east = P.x
+    const J = TABLE_BOARDS.joints, west = TABLE_TOP[0], edge = TABLE_TOP[3], bread = TABLE_BOARDS.bread
+    let index: N = float(0), lo: N = float(J[0]!), width: N = float(J[1]! - J[0]!)
+    for (let k = 1; k < J.length - 1; k++) {
+      const past = step(J[k]!, north)
+      index = index.add(past)
+      lo = lo.add(past.mul(J[k]! - J[k - 1]!))
+      width = width.add(past.mul((J[k + 1]! - J[k]!) - (J[k]! - J[k - 1]!)))
+    }
+    const near = step(edge - bread, east), far = float(1).sub(step(west + bread, east)), ends = near.max(far)
+    // a board's own numbers, from its place in the top
+    const piece = mix(index, near.mul(20).add(far.mul(30)), ends)
+    const rnd = (salt: number): N => fract(sin(piece.mul(12.9898).add(salt * 78.233)).mul(43758.5453))
+    const across = north.sub(lo), along = east.sub(west)
+    const flip = rnd(2).lessThan(.5).select(float(1), float(-1))
+    const board = vec2(across.mul(rnd(1).mul(.45).add(.8)).add(along.mul(rnd(3).sub(.5).mul(.05))).add(rnd(4).mul(1.83)),
+      along.mul(flip).add(rnd(5).mul(1.83)))
+    const cleat = vec2(east.sub(near.greaterThan(.5).select(float(edge - bread), float(west))).add(rnd(4).mul(1.83)), north.add(rnd(5).mul(1.83)))
+    const read = oakSet.sample({ uv: mix(board, cleat, ends), metres: [1.83, 1.83] })
+    const value = rnd(6).sub(.5).mul(.2).add(1), warm = rnd(7).sub(.5).mul(.07)
+    const tone = vec3(...linear('#705a3e')).mul(vec3(value.mul(warm.add(1)), value, value.mul(float(1).sub(warm))))
+    const figured = read.albedo.sub(1).mul(rnd(8).mul(.4).add(.75)).add(1)
+    // the joints, each filtered by the pixel along its own axis
+    const pixel = axisFootprint(P)
+    const toJoint = across.min(width.sub(across))
+    const toCleat = east.sub(west + bread).abs().min(east.sub(edge - bread).abs())
+    const seam = lineCoverage(toJoint, .0012, .25, pixel.north).mul(float(1).sub(ends))
+      .max(lineCoverage(toCleat, .0012, 1.8, pixel.east))
+    const arris = smoothstep(.008, .002, toJoint.min(toCleat)).mul(float(1).sub(seam)).mul(.08)
+    // WHERE HANDS REST: the near edge before the chair, worn through the wax
+    // to the paler wood, patchy, and the arris itself polished pale
+    const fromEdge = float(edge).sub(east)
+    const patch = smoothstep(.3, .75, mx_noise_float(P.mul(vec3(9, 0, 5))).mul(.5).add(.5))
+    // two patches where the forearms lie either side of the reader's place,
+    // a paler band the length of the edge, and the arris polished pale
+    const forearm = (side: number): N => smoothstep(1, .35, vec2(north.sub(T.north + side * .33).div(.17), fromEdge.sub(.13).div(.1)).length())
+    const worn = forearm(1).max(forearm(-1)).mul(patch.mul(.5).add(.5))
+      .max(smoothstep(.2, .03, fromEdge).mul(smoothstep(.9, .4, north.sub(T.north).abs())).mul(patch).mul(.55))
+      .add(smoothstep(.012, .002, fromEdge).mul(.9)).clamp(0, 1)
+    const albedo = tone.mul(mix(vec3(figured.dot(vec3(.3, .5, .2))), figured, .85))
+    m.colorNode = mix(albedo, albedo.dot(vec3(.3, .5, .2)).mul(vec3(1.5, 1.3, 1.05)), worn.mul(.55)).mul(float(1).sub(seam.mul(.72))).mul(arris.add(1)).mul(worn.mul(.28).add(1))
+    m.roughnessNode = read.roughness.mul(.45).add(.2).add(seam.mul(.4)).sub(worn.mul(.08)).clamp(.22, .9)
+    m.normalNode = normalMap(read.normal.mul(.5).add(.5), vec2(.5, .5))
+    m.name = 'vinci/collection-reading-room/table-top'
+    return m
+  })()
   const darkIn = new MeshStandardNodeMaterial({ color: '#171412', roughness: .8, metalness: 0 })
   darkIn.name = 'vinci/collection-reading-room/ground'
 
@@ -283,8 +338,8 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
   bronzeMaterial.roughnessNode = float(.34).add(mx_noise_float(positionWorld.mul(vec3(90, 900, 90))).mul(.05))
   bronzeMaterial.name = 'vinci/collection-reading-room/bronze'
 
-  // THE PENDANT: a spun brass dome, white inside, an opal disc across its
-  // mouth, hung on a black cord from a brass cup in the ceiling.
+  // THE PENDANT: a spun brass dome, white inside, an opal disc set up inside
+  // it, hung on a black cord from a brass cup in the ceiling.
   // Darkened brass: polished, it mirrored the lit table and outshone the page.
   const brass = new MeshStandardNodeMaterial({ color: '#6e5638', roughness: .4, metalness: 1 })
   {
@@ -312,13 +367,39 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
     leatherMaterial.roughnessNode = float(.5).add(mx_noise_float(P.mul(vec3(90, 90, 90))).mul(.08))
   }
   leatherMaterial.name = 'vinci/collection-reading-room/leather'
-  // THE BINDINGS: each volume its own cloth or leather, darker at its foot
+  // THE VOLUMES: each its own cloth or leather. The leather is rubbed paler
+  // at the joints, the caps and the boards' corners, where hands take a book
+  // down; the paper shows its leaves as fine lines across the block; the
+  // gilt rules are metal.
   const bindings = new MeshStandardNodeMaterial({ roughness: .72, metalness: 0 })
   {
-    const tone = attribute('pieceTone', 'vec3'), along = uv().y
-    const wear = mx_noise_float(positionWorld.mul(vec3(60, 140, 60))).mul(.07).add(mx_noise_float(positionWorld.mul(900)).mul(.03))
-    bindings.colorNode = tone.mul(wear.add(1)).mul(smoothstep(.0, .012, along).mul(.25).add(.75))
-    bindings.roughnessNode = float(.66).add(wear.mul(.8))
+    const P = positionWorld, tone = attribute('pieceTone', 'vec3'), part = attribute('bookPart', 'float'), at = uv()
+    const is = (k: number): N => smoothstep(.45, .05, part.sub(k).abs())
+    const paper = is(1), gilt = is(2), spine = is(3)
+    const wear = mx_noise_float(P.mul(vec3(60, 140, 60))).mul(.07).add(mx_noise_float(P.mul(900)).mul(.04))
+    // the rub: across the back at its two joints and its caps, on a board at
+    // its fore-edge and its corners
+    const edgeU = smoothstep(.16, 0, at.x).max(smoothstep(.84, 1, at.x))
+    const edgeV = smoothstep(.05, 0, at.y).max(smoothstep(.95, 1, at.y))
+    const rubbed = mix(edgeV.max(smoothstep(.97, 1, at.x).mul(edgeV.add(.35).min(1))), edgeU.mul(.8).max(edgeV), spine)
+      .mul(mx_noise_float(P.mul(420)).mul(.35).add(.75)).clamp(0, 1)
+    // A HALF-LEATHER BOARD: the leather runs a hand's breadth onto the board
+    // from the spine and wraps its two outer corners, the marbled paper covers
+    // the rest; a cloth board is its cloth throughout
+    const onBoard = is(0), corner = float(1).sub(at.x).add(at.y.min(float(1).sub(at.y))).lessThan(.16)
+    const leatherArea = at.x.lessThan(.19).or(corner).select(float(1), float(0))
+    const marble = mx_noise_float(P.mul(vec3(40, 90, 40)).add(mx_noise_float(P.mul(25)).mul(1.6))).mul(.16)
+      .add(mx_noise_float(P.mul(vec3(160, 60, 160))).mul(.07)).add(1)
+    const face = mix(tone, attribute('sideTone', 'vec3').mul(marble), onBoard.mul(float(1).sub(leatherArea)))
+    const cover = face.mul(wear.add(1)).mul(mix(vec3(1), vec3(1.7, 1.6, 1.5), rubbed.mul(.7)))
+    // the leaves: a line every few tenths of a millimetre across the block,
+    // and the edge browned where air and hands reach it
+    const leaves = mx_noise_float(vec3(at.x.mul(2600), at.y.mul(6), 0)).mul(.09).add(mx_noise_float(vec3(at.x.mul(700), at.y.mul(3), 3)).mul(.06))
+    const leafEdge = tone.mul(leaves.add(.97)).mul(mx_noise_float(P.mul(35)).mul(.05).add(.97))
+    const goldLeaf = tone.mul(mx_noise_float(P.mul(1800)).mul(.18).add(.95))
+    bindings.colorNode = mix(mix(cover, leafEdge, paper), goldLeaf, gilt)
+    bindings.roughnessNode = mix(mix(float(.62).add(wear.mul(.8)).add(rubbed.mul(.18)), float(.86), paper), float(.36), gilt)
+    bindings.metalnessNode = gilt.mul(.85)
   }
   bindings.name = 'vinci/collection-reading-room/bindings'
   const outsideRig = daylight ? [daylight] : []
@@ -327,7 +408,8 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
   adopt(oakCeiling, [lamp, cove], envIn)
   adopt(oakOut, outsideRig, envOut)
   adopt(bronzeMaterial, [...outsideRig, threshold], envOut)
-  materials.push(oakIn, oakCeiling, oakOut, darkIn, bronzeMaterial, brass, enamel, cordMaterial, leatherMaterial, bindings, glow)
+  adopt(tableTop, [lamp, threshold], envIn)
+  materials.push(tableTop, oakIn, oakCeiling, oakOut, darkIn, bronzeMaterial, brass, enamel, cordMaterial, leatherMaterial, bindings, glow)
 
   const stampMesh = (mesh: Mesh, name: string): Mesh => {
     mesh.name = `vinci/collection-reading-room/${name}`
@@ -337,7 +419,6 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
     group.add(mesh)
     return mesh
   }
-  const batch = (pieces: Piece[]): BufferGeometry => { const b = new Batch(); for (const q of pieces) b.piece(q); return b.geometry() }
   // THE BODY: the oak inside with the bookcase, the ceiling, the oak outside,
   // the ground and the threshold's bronze
   const body = studioloParts(), shelf = bookcasePieces()
@@ -347,7 +428,7 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
   stampMesh(new Mesh(body.outside.geometry(), oakOut), 'oak-outside')
   stampMesh(new Mesh(body.dark.geometry(), darkIn), 'ground')
   stampMesh(new Mesh(body.bronze.geometry(), bronzeMaterial), 'bronze')
-  stampMesh(new Mesh(batch(shelf.books), bindings), 'books')
+  stampMesh(new Mesh(volumeGeometry(shelf.volumes), bindings), 'books')
   {
     const can = new CylinderGeometry(.034, .03, .09, 20, 1)
     const from = v3(...WA.at), dirTo = v3(...WA.aim).sub(from).normalize()
@@ -389,7 +470,7 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
       lining.translate(L.east, rim, -L.north)
       stampMesh(new Mesh(lining, enamel), 'shade-lining')
       const disc = new CylinderGeometry(r - .012, r - .012, .004, 64)
-      disc.translate(L.east, rim + .012, -L.north)
+      disc.translate(L.east, rim + L.disc, -L.north)
       const diffuser = stampMesh(new Mesh(disc, glow), 'diffuser')
       diffuser.receiveShadow = false
       diffuser.userData['labelOccluder'] = false
@@ -482,6 +563,8 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
       // second lamp lit on the table turns its glow to the visitor
       if (lampHead?.parent) lampHead.parent.visible = false
       if (top) doubles.push(double(top))
+      // the top wears the room's own oak, board by board
+      if (top) top.material = tableTop
       // THE FLOOR UNDER THE TABLE: the top's own footprint and underside, read
       // off the body that stands there
       if (top) {

@@ -258,8 +258,10 @@ export function buildFurniture(stack: Stack) {
   const broadPaper = mx_noise_float(positionWorld.mul(vec3(8,50,10))).mul(0.035)
   const finePaper = mx_noise_float(positionWorld.mul(vec3(4800,12000,2600))).mul(0.015)
   paper.colorNode = color('#baa780').mul(grain.mul(0.022).add(broadPaper).add(finePaper).add(0.94))
-  const linen = new MeshStandardNodeMaterial({ color: '#6c6450', roughness: 0.96 })
-  linen.colorNode = color('#6c6450')
+  /* UNBLEACHED LINEN, the flax's own oatmeal: a grey cloth under a warm lamp
+     read as a plastic slab beside the page. */
+  const linen = new MeshStandardNodeMaterial({ color: '#8f7c5c', roughness: 0.96 })
+  linen.colorNode = color('#8f7c5c')
   const linenSet = carrierSet('linen')
   // Pin the admitted tile extent before the synchronous node graph is built:
   // library/linen records 0.271 m, while the loader initially holds 1 m.
@@ -283,11 +285,24 @@ export function buildFurniture(stack: Stack) {
   // Quiet the square contrast while keeping the admitted physical weave;
   // uneven short fibres keep the padded fitting from reading as a grid.
   linen.colorNode = linen.colorNode!.mul(mx_noise_float(positionWorld.mul(vec3(110,800,2800))).mul(0.04).add(0.98))
-  /* A FITTED SUPPORT IS SEWN AND IT IS USED. A hem four millimetres in, and
-     the soiling a hundred readings leave where the boards rest. */
-  const hemDistance = positionWorld.x.abs().sub(0.1735).max(positionWorld.z.abs().sub(0.1265)).abs()
-  const hem = float(1).sub(smoothstep(0.0006, 0.0022, hemDistance.sub(0.004).abs()))
-  const soil = smoothstep(0.055, 0.005, positionWorld.z.abs().sub(0.03).abs()).mul(smoothstep(0.16, 0.06, positionWorld.x.abs()))
+  /* A FITTED SUPPORT IS SEWN AND IT IS USED. A hem six millimetres in, the
+     soiling a hundred readings leave where hands lift the boards at the near
+     margin, the margin the book never covers faded paler than its footprint,
+     and the rounded edge rubbed through to the lighter fibre. Read in the
+     table's own frame, so the marks stay on the support wherever a room sets
+     the table down. */
+  const at = positionLocal
+  const hemDistance = at.x.abs().sub(0.1785).max(at.z.abs().sub(0.1315)).abs()
+  const hem = float(1).sub(smoothstep(0.0006, 0.0022, hemDistance.sub(0.006).abs()))
+  const soil = smoothstep(0.055, 0.005, at.z.abs().sub(0.03).abs()).mul(smoothstep(0.16, 0.06, at.x.abs()))
+    .max(smoothstep(0.112, 0.128, at.z).mul(smoothstep(0.13, 0.02, at.x.abs())).mul(mx_noise_float(at.mul(vec3(90, 0, 60))).mul(0.4).add(0.7)))
+  const margin = smoothstep(0.1685, 0.1705, at.x.abs()).max(smoothstep(0.1185, 0.1205, at.z.abs()))
+  // the corners take the most: a hand squares the support there
+  const corner = smoothstep(0.03, 0.004, at.x.abs().sub(0.1785).abs().add(at.z.abs().sub(0.1315).abs()))
+  const rubbed = hemDistance.lessThan(0.0035).select(float(1), float(0)).mul(smoothstep(0.0015, 0.0035, at.y)).max(corner.mul(0.8))
+    .mul(mx_noise_float(at.mul(600)).mul(0.5).add(0.6)).clamp(0, 1)
+  // and the cloth darkens where it has stood on the boards of the table
+  const clothFoot = smoothstep(0.0022, -0.0022, at.y).mul(0.3)
   /* THREE SCALES ON THE SUPPORT, AUTHORED, NOT BORROWED. The carrier's weave
      averages away at the distance this slab is seen from, and a pale plane
      with one faint seam reads as flat colour. Large: the bleach and wear of
@@ -295,23 +310,29 @@ export function buildFurniture(stack: Stack) {
      its rails, and the wrinkle a hand leaves. Fine: the tooth of the cloth,
      faded out before it can alias. */
   const linenNear = float(1).sub(smoothstep(0.5, 1.6, positionWorld.sub(cameraPosition).length()))
-  const linenWear = mx_noise_float(positionWorld.mul(vec3(7.5, 3, 8.5))).mul(0.075)
-  const linenSag = mx_noise_float(positionWorld.mul(vec3(26, 8, 31))).mul(0.05)
-    .add(mx_noise_float(positionWorld.mul(vec3(58, 14, 66))).mul(0.028))
-  const linenTooth = mx_noise_float(positionWorld.mul(vec3(330, 90, 330))).mul(0.055)
-    .add(mx_noise_float(positionWorld.mul(vec3(960, 200, 960))).mul(0.03))
+  const linenWear = mx_noise_float(at.mul(vec3(7.5, 3, 8.5))).mul(0.11)
+  const linenSag = mx_noise_float(at.mul(vec3(26, 8, 31))).mul(0.07)
+    .add(mx_noise_float(at.mul(vec3(58, 14, 66))).mul(0.04))
+  const linenTooth = mx_noise_float(at.mul(vec3(330, 90, 330))).mul(0.055)
+    .add(mx_noise_float(at.mul(vec3(960, 200, 960))).mul(0.03))
+  // slubs: the thick threads of an unbleached weave, running along warp and weft
+  const slubs = mx_noise_float(at.mul(vec3(900, 40, 18))).max(mx_noise_float(at.mul(vec3(18, 40, 900)).add(5))).sub(0.35).max(0).mul(0.22)
   // the two rails press a line into the cover on either side of the boards
-  const rails = smoothstep(0.010, 0.002, positionWorld.x.abs().sub(0.151).abs()).mul(0.10)
+  const rails = smoothstep(0.010, 0.002, at.x.abs().sub(0.151).abs()).mul(0.10)
   linen.colorNode = linen.colorNode!
-    .mul(linenWear.add(linenSag).add(linenTooth.mul(linenNear)).add(1))
-    .mul(hem.mul(-0.14).add(1))
-    .mul(soil.mul(-0.17).add(1))
+    .mul(linenWear.add(linenSag).add(linenTooth.mul(linenNear)).add(slubs.mul(linenNear.mul(0.6).add(0.4))).add(1))
+    .mul(hem.mul(-0.16).add(1))
+    .mul(soil.mul(-0.32).add(1))
+    .mul(margin.mul(0.1).add(1))
+    .mul(mix(vec3(1), vec3(1.22, 1.2, 1.16), rubbed))
+    .mul(float(1).sub(clothFoot))
     .mul(float(1).sub(rails))
     .mul(lit)
   linen.roughnessNode = linenDetail.roughness.mul(0.04).add(0.90)
     .add(linenTooth.mul(1.4).mul(linenNear))
     .add(linenSag.mul(0.5))
     .sub(soil.mul(0.06))
+    .add(rubbed.mul(0.04))
   /* A LACQUERED LAMP, NOT A MIRROR. At metalness 0.48 the stem and the arm
      reflected the baked night sky and read as flat black bars beside a lit
      shade; a painted fitting keeps a diffuse term the key can model. */
