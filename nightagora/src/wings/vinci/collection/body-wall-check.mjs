@@ -10,7 +10,7 @@
  * own near envelope. A control post stood on the walk along the drawings
  * must fail. And it reads the six heads' wash from the table: even over the
  * pages, the bottom course as the top, no pool on the lining round the
- * opening, the splayed soffit lit.
+ * opening, the splayed soffit lit; and the niche's own head the same way.
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -144,10 +144,10 @@ function audit(solids) {
  * centre, top and foot, the splayed soffit, and the lining's face over and
  * beside the opening. */
 const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t) }
-const heads = plan.BODY_LIGHTS.filter(light => light.wash)
-function washAt(point, normal) {
+const heads = plan.BODY_LIGHTS.filter(light => light.wash && light.receivers === 'cabinet')
+function washAt(point, normal, lights = heads) {
   let sum = 0
-  for (const light of heads) {
+  for (const light of lights) {
     const d = point.map((v, i) => v - light.at[i]), length = Math.hypot(...d)
     const axis = light.aim.map((v, i) => v - light.at[i]), axisLength = Math.hypot(...axis)
     const cone = smooth(Math.cos(light.angle), Math.cos(light.angle * (1 - light.penumbra)), d.reduce((s, v, i) => s + v * axis[i], 0) / length / axisLength)
@@ -189,6 +189,30 @@ if (wash.halfMetreBeside > .15 * pageMean) lightFailures.push(`The wash lays ${w
 if (climb >= Math.tan(R.splay)) lightFailures.push('A head\'s ray climbs to the splay\'s edge as steep as the splay: its soffit takes no light')
 if (wash.splay <= 0) lightFailures.push('The splayed soffit takes no light under a head')
 
+/* THE NICHE OF THE SHEET APART, read the same way from its own head: the
+ * sheet as bright as the pages of the hang and even over its window, nothing
+ * on the lining round the niche, its splayed head lit; its south jamb on the
+ * chest's north end, and the lining's end short of the reading room. */
+const N = plan.NICHE, apart = plan.mountedSheets().find(s => s.mount.row === 'vortex'), framer = plan.BODY_LIGHTS.filter(light => light.name === 'vortex')
+const sheetPoints = [apart.mount.datum, apart.window.top, apart.window.bottom].flatMap(h => [apart.window.south, apart.mount.north, apart.window.north].map(n => washAt([face, n, h], east, framer)))
+const round = []
+for (let h = N.sill - .3; h <= N.head + .3; h += .1) for (const n of [N.south - plan.REVEAL_LIP - .1, N.north + plan.REVEAL_LIP + .1]) round.push(washAt([plan.LINING.face, n, h], east, framer))
+for (let n = N.south; n <= N.north; n += .05) for (const h of [N.head + plan.REVEAL_LIP + .1, N.sill - plan.REVEAL_LIP - .1]) round.push(washAt([plan.LINING.face, n, h], east, framer))
+const room = await load(path.join(HERE, 'reading-room-plan.ts'))
+const niche = {
+  sheet: { min: +Math.min(...sheetPoints).toFixed(3), max: +Math.max(...sheetPoints).toFixed(3) },
+  roundTheNiche: +Math.max(...round).toFixed(3),
+  splay: +washAt([plan.PLANE.linen + .09, N.centre, N.back + .09 * Math.tan(N.splay)], splayNormal, framer).toFixed(3),
+  southJambOnChest: +(N.south - plan.REVEAL_LIP - plan.CHEST.north).toFixed(6),
+  clearOfReadingRoom: +(room.READING_ROOM_FOOTPRINT.south - (plan.LINING.north + .012)).toFixed(3),
+}
+if (Math.min(...sheetPoints) < .85 * Math.max(...sheetPoints)) lightFailures.push(`The niche's head swings ${niche.sheet.min} to ${niche.sheet.max} over the sheet`)
+if (Math.abs(niche.sheet.max - pageMean) > .15 * pageMean) lightFailures.push(`The sheet apart takes ${niche.sheet.max} against the hang's ${pageMean.toFixed(3)}`)
+if (niche.roundTheNiche > .05 * pageMean) lightFailures.push(`The niche's head lays ${niche.roundTheNiche} on the lining round the niche`)
+if (niche.splay <= 0) lightFailures.push('The niche\'s splayed head takes no light')
+if (Math.abs(niche.southJambOnChest) > 1e-6) lightFailures.push('The niche\'s south jamb does not stand on the chest\'s north end')
+if (niche.clearOfReadingRoom < .05) lightFailures.push(`The lining ends ${niche.clearOfReadingRoom} m short of the reading room's plinth`)
+
 const solids = plan.bodyWallSolids()
 const cabinet = audit(solids)
 // THE CONTROL: a post on the wall's own walk between two viewing eyes of the
@@ -198,7 +222,7 @@ const failures = [...cabinet.failures, ...lightFailures]
 if (control.failures.length === 0) failures.push('The control post on the walk along the drawings was not refused')
 const bounds = solids.reduce((b, { box }) => [Math.min(b[0], box[0]), Math.min(b[1], box[1]), Math.min(b[2], box[2]), Math.max(b[3], box[3]), Math.max(b[4], box[4]), Math.max(b[5], box[5])], [Infinity, Infinity, Infinity, -Infinity, -Infinity, -Infinity])
 console.log(JSON.stringify({ checker: 'vinci-collection-body-wall', ok: failures.length === 0,
-  scope: 'The cabinet of drawings as the runtime builds it: the fumed oak lining whole, every board of the plan chest, its bronze rail and saddles and pulls, every frame at its outer box, the wash track, its rods and seven heads and their lamp faces. Every certificate route, approach, leg and wall span at its saved near and gait envelope plus a margin, every recorded corner ball, every station eye and viewing eye at its own near radius. The mats, the linen and the lining lie inside those boxes; the cabinet stands outside the rail construction fingerprint.',
-  marginM: MARGIN_M, bounds, cabinet: { ...cabinet, failures: cabinet.failures.slice(0, 12) }, wash,
+  scope: 'The cabinet of drawings as the runtime builds it: the fumed oak lining whole with the niche of the sheet apart, every board of the plan chest, its bronze rail and saddles and pulls, every frame at its outer box, the wash track, its rods and seven heads and their lamp faces. Every certificate route, approach, leg and wall span at its saved near and gait envelope plus a margin, every recorded corner ball, every station eye and viewing eye at its own near radius. The mats, the linen and the lining lie inside those boxes; the cabinet stands outside the rail construction fingerprint.',
+  marginM: MARGIN_M, bounds, cabinet: { ...cabinet, failures: cabinet.failures.slice(0, 12) }, wash, niche,
   control: { failures: control.failures.length, worst: control.worst }, failures: failures.slice(0, 20) }, null, 2))
 process.exitCode = failures.length ? 1 : 0

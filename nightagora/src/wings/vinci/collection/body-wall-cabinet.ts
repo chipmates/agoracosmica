@@ -26,7 +26,7 @@ import { kelvinToColour } from '../../../stack/light'
 import { Solid } from './line-gallery-plan'
 import {
   BODY_LIGHTS, BODY_SHADOW_LAYER, BODY_WALL_PROVENANCE, chestBoards, Faces, fittings, frameRing, liningBoards, linenBoards,
-  matFaces, mountedSheets, PROBE_AT, shadowCasters, splayFaces, v3, type BodyLight, type Board,
+  matFaces, mountedSheets, NICHE, PROBE_AT, RECESS, shadowCasters, splayFaces, v3, type BodyLight, type Board,
 } from './body-wall-plan'
 import { BODY_PLATE, washToward } from './body-wall-light'
 import { anisotropicFootprint, reliefNormal, resolved } from '../../../stack/detail'
@@ -301,10 +301,12 @@ export function mountBodyWall(stack: Stack): BodyWallCabinet {
     return g
   }
 
-  // the casework: the lining's panels and reveals, the chest, in one oak
+  // the casework: the lining's panels and reveals, the openings' heads, the
+  // chest, in one oak
   const lining = liningBoards(), chest = chestBoards()
   const casework = faces([...lining.panels, ...lining.reveals, ...chest.oak])
-  splayFaces(casework)
+  splayFaces(casework, RECESS)
+  splayFaces(casework, NICHE)
   make(casework.geometry(), oak, 'casework', true)
   // every frame, swept on its mitres, and every mat with its bevels
   const frames = new Faces(), mats = new Faces()

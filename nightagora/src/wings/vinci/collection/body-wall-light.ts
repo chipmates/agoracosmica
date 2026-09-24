@@ -1,8 +1,8 @@
 /** THE BODY WALL'S DECLARED LIGHT ON ITS SHEETS. A sheet is a self-lit plate
  * in this engine, so the light the cabinet's own table puts on the wall is
  * declared on it here, from the same numbers that build the lamps: the six
- * wallwashers through their optic, the head over the sheet apart, and the
- * cabinet's bounce. No daylight reaches them. A renderer that lights the
+ * wallwashers through their optic, the framing head over the sheet apart, and
+ * the cabinet's bounce. No daylight reaches them. A renderer that lights the
  * plates as surfaces reads the table and drops this term.
  */
 import { Color, Vector3 } from 'three/webgpu'
@@ -29,7 +29,8 @@ export const BODY_PLATE = {
 /** The band's share at `height` on the optic's plane, `off` along the wall
  * from the lamp's line: `washBand` of the plan, as nodes. */
 function band(o: WashOptic, height: N, off: N): N {
-  const lateral = exp(off.mul(off).mul(-1 / (2 * o.spread * o.spread)))
+  const lateral = o.edge === undefined ? exp(off.mul(off).mul(-1 / (2 * o.spread * o.spread)))
+    : float(1).sub(smoothstep(o.edge, o.edge + (o.edgeSoft ?? 0), off.abs()))
   const crown = float(o.crown).sub(off.mul(off).mul(o.arc))
   const lit = smoothstep(o.foot - o.footSoft, o.foot, height)
   const foot = exp(min(height.sub(o.foot), 0).div(o.tailFall)).mul(o.tail).mul(float(1).sub(lit)).add(lit)

@@ -87,6 +87,10 @@ const MOULDING = .028
 /** The clear interval the tightest pair of neighbours keeps, across a course
  * and down a column. Both pitches are uniform and set by that pair. */
 const INTERVAL = .08
+/** THE SHEET APART stands in a niche of its own at the cabinet's north end,
+ * past the plan chest: the niche's south jamb stands on the chest's north end
+ * (`body-wall-plan.ts`, `NICHE`), which puts the sheet here. */
+const APART_NORTH = CENTRE + 3.146
 
 export interface BodyMount extends BodySheet {
   /** Metres of wall the carrier's opening holds. */
@@ -122,7 +126,7 @@ export function bodyMounts(): readonly BodyMount[] {
   const line = (row: number): number => lowestLine + (courses - 1 - row) * coursePitch
   return sized.map(({ sheet, width, height }) => {
     // The sheet apart stands on the second course's centre line, off the grid.
-    const north = sheet.row === 'vortex' ? CENTRE + 4.05 : CENTRE + (sheet.column - (columns - 1) / 2) * columnPitch
+    const north = sheet.row === 'vortex' ? APART_NORTH : CENTRE + (sheet.column - (columns - 1) / 2) * columnPitch
     const datum = sheet.row === 'vortex' ? line(1) : line(sheet.row)
     return { ...sheet, width, height, east: WALL + .026, north, datum }
   })

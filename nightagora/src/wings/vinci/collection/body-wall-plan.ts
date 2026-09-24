@@ -106,8 +106,8 @@ export function mountedSheets(): MountedSheet[] {
 
 /** THE CASEWORK. The plan chest stands before the hang and holds the ledge
  * the construction welds in; its top is the leaning rail. The lining runs
- * from the south door to the chest's north end, and the hang is set into its
- * thickness. */
+ * from the south door past the chest's north end, and the hang and the sheet
+ * apart are set into its thickness. */
 export const CHEST = {
   south: -55.38, north: -49.82,
   back: PLANE.finish, front: PLANE.finish + .66,
@@ -123,8 +123,27 @@ export const CHEST = {
   /** four stacks of six drawers between oak stiles */
   stacks: 4, drawers: 6, stile: .035, joint: .006, proud: .004,
 } as const
+/** the openings' oak lipping */
+export const REVEAL_LIP = .016
+/** THE HANG'S OPENING ALONG THE WALL: sized to the frames it holds, a sixth
+ * of a metre clear at either side. */
+const HANG = (() => {
+  const sheets = mountedSheets().filter(s => s.mount.row !== 'vortex')
+  const reach = Math.max(...sheets.map(s => Math.abs(s.frame.north + 52.6)), ...sheets.map(s => Math.abs(s.frame.south + 52.6)))
+  return { south: -52.6 - reach - .16, north: -52.6 + reach + .16, top: Math.max(...sheets.map(s => s.frame.top)) }
+})()
+/** THE SHEET THAT STANDS APART, and its niche's clear width: its folio board
+ * with 0.18 m of dark linen at either side. */
+const APART = mountedSheets().find(s => s.mount.row === 'vortex')!
+const NICHE_WIDTH = .7
+/** A PIER of the lining: the width it keeps between the hang's opening and
+ * the chest's end, kept again between the niche and the lining's own end. */
+const PIER = CHEST.north - (HANG.north + REVEAL_LIP)
 export const LINING = {
-  south: OPENING.hallToSouth.north[1] + .08, north: CHEST.north,
+  south: OPENING.hallToSouth.north[1] + .08,
+  /** past the chest: the niche and a pier, which ends it under the soffit's
+   * rib at north -48, short of the reading room's plinth */
+  north: APART.mount.north + NICHE_WIDTH / 2 + REVEAL_LIP + PIER,
   face: PLANE.finish + .18,
   /** run into the slab, so the gallery's head band closes over it and every
    * rib lands on its face */
@@ -144,19 +163,29 @@ const LAMP = TRACK_FOOT - .21
  * splayed: the soffit meets the linen a hand over the top course (`back`)
  * and rises to the face (`head`) steeper than the heads' rays climb to it,
  * so they pass under its edge to the linen and land on the soffit itself. */
-export const RECESS = (() => {
-  const sheets = mountedSheets().filter(s => s.mount.row !== 'vortex')
-  const reach = Math.max(...sheets.map(s => Math.abs(s.frame.north + 52.6)), ...sheets.map(s => Math.abs(s.frame.south + 52.6)))
-  const top = Math.max(...sheets.map(s => s.frame.top))
-  const splay = 50 * Math.PI / 180, back = top + .09
-  return { south: -52.6 - reach - .16, north: -52.6 + reach + .16, sill: CHEST.top,
+export interface Opening { south: number; north: number; sill: number; back: number; head: number; splay: number }
+export const RECESS: Opening = (() => {
+  const splay = 50 * Math.PI / 180, back = HANG.top + .09
+  return { south: HANG.south, north: HANG.north, sill: CHEST.top,
     back, head: back + (LINING.face - PLANE.linen) * Math.tan(splay), splay }
 })()
 
-/** THE TRACK THE HEADS HANG FROM, over the hang's whole width. */
+/** THE NICHE OF THE SHEET APART, cut through the lining past the chest: its
+ * south jamb stands on the chest's north end, its head is the hang's own head
+ * line and splay, and its sill lies as far under the sheet's centre as the
+ * head's back lies over it, so the sheet stands in its middle. An oiled oak
+ * sill closes it; one head of its own reads it. */
+export const NICHE: Opening & { centre: number } = {
+  south: APART.mount.north - NICHE_WIDTH / 2, north: APART.mount.north + NICHE_WIDTH / 2,
+  sill: 2 * APART.mount.datum - RECESS.back, back: RECESS.back, head: RECESS.head, splay: RECESS.splay,
+  centre: APART.mount.north,
+}
+
+/** THE TRACK THE HEADS HANG FROM, over the hang's whole width and on over
+ * the niche. */
 export const TRACK = {
   east: TRACK_EAST,
-  south: RECESS.south - .2, north: RECESS.north + .2,
+  south: RECESS.south - .2, north: NICHE.centre + .2,
   width: .03, depth: TRACK_DEPTH,
 } as const
 
@@ -213,12 +242,17 @@ export interface WashOptic {
   arc: number
   /** the spread along the wall, one standard deviation */
   spread: number
+  /** a framing optic's shutters instead of the spread: the band is even to
+   * this far either side of the lamp's line and gone `edgeSoft` further */
+  edge?: number
+  edgeSoft?: number
 }
 const smooth = (a: number, b: number, x: number): number => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t) }
 /** The band's share at a height on the plane, `off` metres along the wall
  * from the lamp's own line. `body-wall-light.ts` draws the same formula. */
 export function washBand(o: WashOptic, height: number, off: number): number {
-  const lateral = Math.exp(-off * off / (2 * o.spread * o.spread))
+  const lateral = o.edge === undefined ? Math.exp(-off * off / (2 * o.spread * o.spread))
+    : 1 - smooth(o.edge, o.edge + (o.edgeSoft ?? 0), Math.abs(off))
   const crown = o.crown - o.arc * off * off
   const lit = smooth(o.foot - o.footSoft, o.foot, height)
   const foot = o.tail * Math.exp(Math.min(height - o.foot, 0) / o.tailFall) * (1 - lit) + lit
@@ -237,10 +271,17 @@ export const WASH: WashOptic = {
   spread: .28,
 }
 
-/** THE SHEET THAT STANDS APART is read by one head of its own, hung from the
- * soffit over it. */
-const VORTEX_NORTH = -48.55
-export const VORTEX_HEAD: P3 = [TRACK.east, VORTEX_NORTH, LAMP]
+/** THE SHEET THAT STANDS APART is read by one head of its own at the track's
+ * north end, a framing optic whose band fills the niche from its sill to its
+ * splayed head and stops at its jambs, so no light lies on the oak round it.
+ * The level is the wash's own on the pages. */
+export const VORTEX_HEAD: P3 = [TRACK.east, NICHE.centre, LAMP]
+export const FRAMER: WashOptic = {
+  plane: PLANE.linen,
+  foot: NICHE.sill + .06, footSoft: .08, tail: 0, tailFall: .3,
+  crown: NICHE.back + .12, crownSoft: .1, arc: 0,
+  spread: NICHE_WIDTH / 2, edge: NICHE_WIDTH / 2 - .01, edgeSoft: .05,
+}
 
 export const BODY_LIGHTS: readonly BodyLight[] = [
   ...HEAD_NORTHS.map((north, i): BodyLight => ({
@@ -259,7 +300,8 @@ export const BODY_LIGHTS: readonly BodyLight[] = [
   },
   {
     name: 'vortex', kind: 'spot', head: true, receivers: 'vortex',
-    at: VORTEX_HEAD, aim: [PLANE.linen, VORTEX_NORTH, H(2.1845)], kelvin: 3100, colour: '#ffe0b8', intensity: 11, angle: .3, penumbra: .8, shadow: { mapPx: 512, soft: 2 },
+    at: VORTEX_HEAD, aim: [PLANE.linen, NICHE.centre, APART.mount.datum], kelvin: 3100, colour: '#ffe0b8',
+    intensity: 1.8, angle: .5, penumbra: .2, wash: FRAMER, shadow: { mapPx: 512, soft: 2 },
   },
 ]
 
@@ -363,10 +405,11 @@ function panels(from: number, to: number, count: number, joint: number): [number
 }
 
 /** THE LINING: fumed oak panels on a dark core, shadow joints between them,
- * a recessed toe, the hang's opening cut through it with oiled oak reveals.
- * Returns the panels, the core that shows in the joints, and the reveals. */
+ * a recessed toe, the hang's opening and the niche cut through it with oiled
+ * oak reveals. Returns the panels, the core that shows in the joints, and the
+ * reveals. */
 export function liningBoards(): { panels: Board[]; core: Board[]; reveals: Board[] } {
-  const L = LINING, R = RECESS, out: Board[] = [], core: Board[] = [], reveals: Board[] = []
+  const L = LINING, R = RECESS, N = NICHE, out: Board[] = [], core: Board[] = [], reveals: Board[] = []
   const back = PLANE.finish - .004, face = L.face, deep = face - L.jointDepth
   const lowTop = CHEST.top - L.joint / 2, highBottom = CHEST.top + L.joint / 2
   /** the opening's oak lipping, a board's thickness round its three sides */
@@ -384,33 +427,45 @@ export function liningBoards(): { panels: Board[]; core: Board[]; reveals: Board
   }
   // either side of the opening, over the chest, a joint clear of its lipping
   panel(CHEST.south + L.joint, R.south - lip - L.joint, highBottom, L.top)
-  panel(R.north + lip + L.joint, L.north, highBottom, L.top)
+  panel(R.north + lip + L.joint, N.south - lip - L.joint, highBottom, L.top)
   // the head over the opening, a joint clear of the head's lipping
   panel(R.south - lip, R.north + lip, R.head + lip + L.joint, L.top)
+  // PAST THE CHEST: the niche's bay, low and high, its panels on the
+  // niche's lipping, then the end pier; the rail line's joint runs on
+  panel(CHEST.north, N.north + lip, L.toe, lowTop)
+  panel(N.north + lip + L.joint, L.north, L.toe, lowTop)
+  panel(N.south - lip, N.north + lip, highBottom, N.sill - lip - L.joint)
+  panel(N.south - lip, N.north + lip, N.head + lip + L.joint, L.top)
+  panel(N.north + lip + L.joint, L.north, highBottom, L.top)
   // THE CORE the joints open onto, run a bed into the finish and cut round
-  // the opening; the toe's own recess stands in front of it
+  // the openings; the toe's own recess stands in front of it
   const dark: [number, number, number] = [.028, .024, .02]
   core.push({ box: [back, L.south, L.toe - .002, deep, R.south - lip, L.top], grain: 'up', offset: [.3, .2], tone: dark })
-  core.push({ box: [back, R.north + lip, L.toe - .002, deep, L.north, L.top], grain: 'up', offset: [.5, .1], tone: dark })
+  core.push({ box: [back, R.north + lip, L.toe - .002, deep, N.south - lip, L.top], grain: 'up', offset: [.5, .1], tone: dark })
   core.push({ box: [back, R.south - lip, R.head + lip, deep, R.north + lip, L.top], grain: 'north', offset: [.2, .6], tone: dark })
   core.push({ box: [back, L.south, FLOOR - .004, face - L.toeBack, CHEST.south, L.toe], grain: 'north', offset: [.1, .7], tone: [.02, .018, .016] })
+  core.push({ box: [back, N.south - lip, L.toe - .002, deep, N.north + lip, N.sill - lip], grain: 'up', offset: [.4, .5], tone: dark })
+  core.push({ box: [back, N.south - lip, N.head + lip, deep, N.north + lip, L.top], grain: 'north', offset: [.6, .2], tone: dark })
+  core.push({ box: [back, N.north + lip, L.toe - .002, deep, L.north, L.top], grain: 'up', offset: [.7, .3], tone: dark })
+  core.push({ box: [back, CHEST.north, FLOOR - .004, face - L.toeBack, L.north, L.toe], grain: 'north', offset: [.3, .8], tone: [.02, .018, .016] })
   // the two ends, lipped in the same fumed oak
   out.push({ box: [back, L.south - .012, L.toe, face, L.south, L.top], grain: 'up', offset: [.6, .4], tone: toned(WOOD.fumed, 40, 13, 0) })
-  out.push({ box: [back, L.north, CHEST.top, face, L.north + .012, L.top], grain: 'up', offset: [.8, .3], tone: toned(WOOD.fumed, 41, 13, 0) })
-  // THE OPENING'S JAMBS: oiled oak lining the lining's own thickness, a
-  // lipping that reads on the face as the opening's frame; the splayed head
-  // is `splayFaces`
+  out.push({ box: [back, L.north, L.toe, face, L.north + .012, L.top], grain: 'up', offset: [.8, .3], tone: toned(WOOD.fumed, 41, 13, 0) })
+  // THE OPENINGS' JAMBS: oiled oak lining the lining's own thickness, a
+  // lipping that reads on the face as the opening's frame; the splayed heads
+  // are `splayFaces`, and the niche's sill is one board lipped the same way
   reveals.push({ box: [PLANE.linen - .002, R.south - lip, R.sill, face + .002, R.south, R.head + lip], grain: 'up', offset: [.2, .3], tone: toned(WOOD.oak, 1, 17, .04) })
   reveals.push({ box: [PLANE.linen - .002, R.north, R.sill, face + .002, R.north + lip, R.head + lip], grain: 'up', offset: [.9, .1], tone: toned(WOOD.oak, 2, 17, .04) })
+  reveals.push({ box: [PLANE.linen - .002, N.south - lip, N.sill - lip, face + .002, N.south, N.head + lip], grain: 'up', offset: [.4, .6], tone: toned(WOOD.oak, 4, 17, .04) })
+  reveals.push({ box: [PLANE.linen - .002, N.north, N.sill - lip, face + .002, N.north + lip, N.head + lip], grain: 'up', offset: [.7, .2], tone: toned(WOOD.oak, 5, 17, .04) })
+  reveals.push({ box: [PLANE.linen - .002, N.south, N.sill - lip, face + .002, N.north, N.sill], grain: 'north', offset: [.3, .5], tone: toned(WOOD.oak, 6, 17, .04) })
   return { panels: out, core, reveals }
 }
-/** the opening's oak lipping */
-export const REVEAL_LIP = .016
 
-/** THE SPLAYED HEAD: one oiled oak board from the linen's head up to the
+/** A SPLAYED HEAD: one oiled oak board from the linen's head up to the
  * face, and its lipping on the face over the opening. */
-export function splayFaces(f: Faces): void {
-  const R = RECESS, lip = REVEAL_LIP, rise = Math.tan(R.splay)
+export function splayFaces(f: Faces, R: Opening): void {
+  const lip = REVEAL_LIP, rise = Math.tan(R.splay)
   const back = PLANE.linen - .004, front = LINING.face + .002
   const at = (e: number): number => R.back + (e - PLANE.linen) * rise
   const tone = toned(WOOD.oak, 3, 17, .04), run = Math.hypot(front - back, at(front) - at(back))
@@ -479,8 +534,8 @@ export function chestBoards(): { oak: Board[]; toe: Board[]; bronze: Box[]; rail
 
 /** THE LINEN the hang stands on: three linen-wrapped boards over the
  * opening's back, of two, three and two columns, their joints in the gaps
- * between the frames, on a dark backer that shows in the joints. Each board
- * is its own dye lot. */
+ * between the frames, on a dark backer that shows in the joints, and a
+ * fourth board at the niche's back. Each board is its own dye lot. */
 export const LINEN_JOINT = .004
 export function linenBoards(): { panels: Board[]; backer: Board } {
   const R = RECESS, sheets = mountedSheets().filter(s => s.mount.row !== 'vortex')
@@ -494,6 +549,9 @@ export function linenBoards(): { panels: Board[]; backer: Board } {
   const panels: Board[] = []
   for (let i = 0; i < bounds.length; i += 2)
     panels.push({ box: [back, bounds[i]!, bottom, PLANE.linen, bounds[i + 1]!, top], grain: 'up', offset: [hash(i, 41) * 3, hash(i, 42) * 3], tone: toned([1, 1, 1], i, 43, .035) })
+  // the niche's back: one board, run under its jambs, sill and head
+  const N = NICHE
+  panels.push({ box: [back, N.south - .02, N.sill - .01, PLANE.linen, N.north + .02, N.back + .02], grain: 'up', offset: [hash(9, 41) * 3, hash(9, 42) * 3], tone: toned([1, 1, 1], 9, 43, .035) })
   return { panels, backer: { box: [PLANE.finish - .004, R.south - .02, bottom, PLANE.finish + .0004, R.north + .02, top], grain: 'up', offset: [0, 0], tone: [.012, .011, .01] } }
 }
 
@@ -577,22 +635,22 @@ export function fittings(): { boxes: Box[]; rods: Rod[]; lenses: Rod[] } {
   const boxes: Box[] = [], rods: Rod[] = [], lenses: Rod[] = []
   const T = TRACK
   boxes.push([T.east - T.width / 2, T.south, TRACK_FOOT, T.east + T.width / 2, T.north, GALLERY.ribFoot])
+  let last = T.south
   for (let n = T.south + .35; n < T.north; n += 1.3) {
     if (GALLERY.ribsNorth.some(r => Math.abs(r - n) < .3)) continue
     rods.push({ a: [T.east, n, GALLERY.soffit], b: [T.east, n, GALLERY.ribFoot], radius: .004, sides: 8 })
+    last = n
   }
-  // the head over the sheet apart hangs from its own rod
-  rods.push({ a: [VORTEX_HEAD[0], VORTEX_HEAD[1], GALLERY.soffit], b: [VORTEX_HEAD[0], VORTEX_HEAD[1], TRACK_FOOT], radius: .005, sides: 8 })
-  boxes.push([VORTEX_HEAD[0] - .03, VORTEX_HEAD[1] - .022, TRACK_FOOT - .012, VORTEX_HEAD[0] + .03, VORTEX_HEAD[1] + .022, TRACK_FOOT])
+  // the track's north end, over the niche, is held like its south end
+  if (T.north - .35 - last > .5) rods.push({ a: [T.east, T.north - .35, GALLERY.soffit], b: [T.east, T.north - .35, GALLERY.ribFoot], radius: .004, sides: 8 })
   for (const light of BODY_LIGHTS) {
     if (!light.head) continue
     const at = v3(...light.at), aim = v3(...light.aim)
     const axis = aim.clone().sub(at).normalize()
     const wing = (p: Vector3): P3 => [p.x, -p.z, p.y]
-    const onRod = light.name !== 'vortex'
-    if (onRod) boxes.push([light.at[0] - .025, light.at[1] - .02, TRACK_FOOT - .045, light.at[0] + .025, light.at[1] + .02, TRACK_FOOT])
+    boxes.push([light.at[0] - .025, light.at[1] - .02, TRACK_FOOT - .045, light.at[0] + .025, light.at[1] + .02, TRACK_FOOT])
     const pivot = at.clone().addScaledVector(axis, -.07)
-    rods.push({ a: [light.at[0], light.at[1], TRACK_FOOT - (onRod ? .045 : .012)], b: wing(pivot.clone().add(new Vector3(0, .05, 0))), radius: .006, sides: 8 })
+    rods.push({ a: [light.at[0], light.at[1], TRACK_FOOT - .045], b: wing(pivot.clone().add(new Vector3(0, .05, 0))), radius: .006, sides: 8 })
     const along = (t: number): P3 => wing(at.clone().addScaledVector(axis, t))
     rods.push({ a: along(-.13), b: along(-.005), radius: .034, sides: 20 })
     rods.push({ a: along(-.005), b: along(.035), radius: .035, radiusB: .038, sides: 20 })
@@ -604,7 +662,7 @@ export function fittings(): { boxes: Box[]; rods: Rod[]; lenses: Rod[] } {
 // ------------------------------------------------------------ checks
 
 /** WHAT THE CABINET'S SHADOWED LIGHT SEES: every frame's four members, the
- * opening's head and sides, and the chest, on the cabinet's own layer. */
+ * opening's and the niche's head and sides, on the cabinet's own layer. */
 export function shadowCasters(): Box[] {
   // every box stands a hair inside the faces it doubles, so no lit face is
   // ever inside its own caster
@@ -620,6 +678,12 @@ export function shadowCasters(): Box[] {
   out.push([PLANE.finish, R.south - lip - .3, R.head + .002, face, R.north + lip + .3, L.top])
   out.push([PLANE.finish, R.south - lip - .6, R.sill + .01, face, R.south - .002, L.top])
   out.push([PLANE.finish, R.north + .002, R.sill + .01, face, R.north + lip + .6, L.top])
+  // the niche's head, jambs and sill
+  const N = NICHE
+  out.push([PLANE.finish, N.south - lip - .3, N.head + .002, face, N.north + lip + .3, L.top])
+  out.push([PLANE.finish, N.south - lip - .3, N.sill + .01, face, N.south - .002, L.top])
+  out.push([PLANE.finish, N.north + .002, N.sill + .01, face, N.north + lip + .3, L.top])
+  out.push([PLANE.finish, N.south - lip - .3, L.toe, face, N.north + lip + .3, N.sill - .002])
   return out
 }
 
@@ -628,7 +692,7 @@ export function shadowCasters(): Box[] {
 export function bodyWallSolids(): { name: string; box: Box }[] {
   const out: { name: string; box: Box }[] = []
   const L = LINING
-  out.push({ name: 'lining', box: [PLANE.finish, L.south - .012, FLOOR, L.face, L.north, L.top] })
+  out.push({ name: 'lining', box: [PLANE.finish, L.south - .012, FLOOR, L.face, L.north + .012, L.top] })
   const chest = chestBoards()
   chest.oak.forEach((q, i) => out.push({ name: `chest-${i}`, box: q.box }))
   chest.bronze.forEach((box, i) => out.push({ name: `bronze-${i}`, box }))
