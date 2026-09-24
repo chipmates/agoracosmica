@@ -8,15 +8,19 @@
  * drift over them are the museum's own. No 1517 claim: a modern room.
  */
 import {
-  BufferGeometry, Float32BufferAttribute, FrontSide, Group, Mesh, MeshStandardNodeMaterial,
-  PlaneGeometry, Vector2, Vector3, type Material,
+  BufferGeometry, ClampToEdgeWrapping, DataTexture, Float32BufferAttribute, FrontSide, Group, LinearFilter,
+  LinearMipmapLinearFilter, Mesh, MeshStandardNodeMaterial, NoColorSpace, PhysicalLightingModel, PlaneGeometry,
+  RepeatWrapping, RGBAFormat, UnsignedByteType, Vector2, Vector3, type Material,
 } from 'three/webgpu'
 import * as TSL from 'three/tsl'
 import type { Stack } from '../../../stack'
 import type { MaterialSet } from '../../../stack/materials'
 import { axisFootprint, lineCoverage } from '../../../stack/detail'
-import { COLLECTION_PAVING_ORIGIN, DARK_BAY, FACE, FLOOR, HALL_CEILING_SOUTH, OPENING, ROOMS } from './layout'
+import { DARK_BAY, FACE, FLOOR, HALL_CEILING_SOUTH, OPENING, ROOMS } from './layout'
 import { standBoxes } from './stands'
+import {
+  bakeFloorTile, bakeHallFloor, hallFloorPlan, HALL_FLOOR_BAY, HALL_FLOOR_MAP, HALL_FLOOR_PROVENANCE, HALL_FLOOR_SHELF, HALL_FLOOR_TILE,
+} from './hall-floor'
 
 // The node overload boundary stays local to this file.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -34,7 +38,7 @@ const PROUD = .045
 /** The wall finish stops this far over the floor: a shadow gap, not a skirting. */
 const GAP = .055
 /** The floor is cut into bays of two museum stones each way. */
-const BAY = { east: 3.2, north: 3.3 } as const
+const BAY = HALL_FLOOR_BAY
 /** The ceiling's slats: wide enough apart that twenty metres off they are
  * still lines and not a moire. */
 const SLAT = { width: .09, depth: .055, pitch: .15 } as const
@@ -177,7 +181,7 @@ function skins(): { walls: Skin; overhead: Skin; floor: Skin; plinths: Skin; sla
 }
 
 const { abs, cameraPosition, cameraViewMatrix, cross, dot, float, floor: floorOf, fract, log2, mix,
-  mx_noise_float, normalWorldGeometry, positionWorld, pow, screenUV, select, smoothstep, uniform, vec2, vec3 } = TSL as unknown as Record<string, N>
+  mx_noise_float, normalWorldGeometry, positionWorld, pow, screenUV, select, smoothstep, texture, uniform, uniformArray, vec2, vec3 } = TSL as unknown as Record<string, N>
 
 /** the tangent frame a world-aligned face is photographed in: u runs along
     the face, v up it (a floor's v runs north) */
@@ -199,8 +203,6 @@ interface Look {
   /** the photograph's roughness is remapped to this range */
   rough: [number, number]
   normal: number
-  /** how much a bay or a face may differ in tone */
-  cell: number
   /** the metre-scale drift over the whole room */
   drift: number
   /** what the light shelf throws up at a face that looks down, at the shelf */
@@ -209,31 +211,16 @@ interface Look {
   turn?: boolean
 }
 
-function fabricMaterial(set: MaterialSet, look: Look, name: string, bays: boolean): MeshStandardNodeMaterial {
+function fabricMaterial(set: MaterialSet, look: Look, name: string): MeshStandardNodeMaterial {
   const m = new MeshStandardNodeMaterial({ roughness: .7, metalness: 0, side: FrontSide })
   const P = positionWorld, n = normalWorldGeometry
   const frame = faceFrame(n)
   const t = look.turn ? frame.b : frame.t, b = look.turn ? frame.t : frame.b
-  const u = dot(P, t), v = dot(P, b)
-  // THE FLOOR IS CUT INTO BAYS, and each bay is read from its own part of the
-  // photograph, so no two bays repeat each other. A wall is read whole.
-  const east = P.x.sub(COLLECTION_PAVING_ORIGIN.east), north = P.z.negate().sub(COLLECTION_PAVING_ORIGIN.north)
-  const cellE = floorOf(east.div(BAY.east)), cellN = floorOf(north.div(BAY.north))
-  const h1 = hash(cellE, cellN, 3.7), h2 = hash(cellE, cellN, 11.3)
-  const face = bays ? vec2(h1, h2).mul(23.7) : vec2(0, 0)
-  const sample = set.sample({ uv: vec2(u, v).add(face), metres: look.metres })
+  const sample = set.sample({ uv: vec2(dot(P, t), dot(P, b)), metres: look.metres })
   const drift = mx_noise_float(P.mul(.11)).mul(look.drift).add(mx_noise_float(P.mul(.37)).mul(look.drift * .5))
-  const tone = float(1).add(bays ? h1.sub(.5).mul(look.cell) : float(0)).add(drift)
-  // the saw cuts between bays, filtered to the pixel they land in
-  const { east: pe, north: pn } = axisFootprint(P)
-  const cut = (c: N, period: number, pixel: N): N => {
-    const f = fract(c.div(period)), edge = f.min(float(1).sub(f)).mul(period)
-    return lineCoverage(edge, .003, period, pixel)
-  }
-  const joint = bays ? cut(east, BAY.east, pe).max(cut(north, BAY.north, pn)) : float(0)
-  const colour = sample.colour.mul(vec3(...look.tint)).mul(tone).mul(float(1).sub(joint.mul(.55)))
+  const colour = sample.colour.mul(vec3(...look.tint)).mul(float(1).add(drift))
   m.colorNode = colour
-  m.roughnessNode = mix(float(look.rough[0]), float(look.rough[1]), sample.roughness).add(joint.mul(.3)).clamp(.05, 1)
+  m.roughnessNode = mix(float(look.rough[0]), float(look.rough[1]), sample.roughness).clamp(.05, 1)
   const tangent = sample.normal
   const bent = t.mul(tangent.x.mul(look.normal)).add(b.mul(tangent.y.mul(look.normal))).add(n.mul(tangent.z)).normalize()
   m.normalNode = bent.transformDirection(cameraViewMatrix)
@@ -248,6 +235,131 @@ function fabricMaterial(set: MaterialSet, look: Look, name: string, bays: boolea
   m.name = `vinci/collection-hall-fabric/${name}`
   m.userData = { ...HALL_FABRIC_PROVENANCE, set: set.name }
   return m
+}
+
+/** A map baked in code, read as data: no colour space, filtered, mipmapped. */
+function dataMap(bytes: Uint8Array, side: number, repeat: boolean, name: string): DataTexture {
+  const t = new DataTexture(bytes, side, side, RGBAFormat, UnsignedByteType)
+  t.colorSpace = NoColorSpace
+  t.wrapS = t.wrapT = repeat ? RepeatWrapping : ClampToEdgeWrapping
+  t.magFilter = LinearFilter; t.minFilter = LinearMipmapLinearFilter; t.generateMipmaps = true
+  t.anisotropy = 8
+  t.name = name
+  t.needsUpdate = true
+  return t
+}
+
+/** THE CLERESTORY ON THE FLOOR, held back where the light shelf and what
+ * stands on the floor hide the window from it. The spots keep their own
+ * shadow maps; the room's bounce takes the occlusion map. */
+class FloorLighting extends PhysicalLightingModel {
+  constructor(private readonly window: N) { super() }
+  override directRectArea(input: Parameters<PhysicalLightingModel['directRectArea']>[0], builder: Parameters<PhysicalLightingModel['directRectArea']>[1]): void {
+    super.directRectArea({ ...input, lightColor: (input as unknown as { lightColor: N }).lightColor.mul(this.window) } as typeof input, builder)
+  }
+}
+class FloorMaterial extends MeshStandardNodeMaterial {
+  windowNode: N = float(1)
+  override setupLightingModel(): PhysicalLightingModel { return new FloorLighting(this.windowNode) }
+}
+
+/** What the floor's finish is made of, as the fabric reads it. */
+export const FLOOR_FINISH = {
+  /** the photograph's own tile, and the tint its linear colour is taken by */
+  metres: 3, tint: [1.2, 1.18, 1.15] as [number, number, number], normal: .3,
+  /** how much of the photograph's own variation (its scratches and stains)
+      the floor keeps: the aggregate and the map carry the rest */
+  photo: .6,
+  /** how far the cut aggregate departs from its paste */
+  aggregate: 1,
+  /** where the sealer is walked through, by its roughness */
+  worn: [.3, .44] as [number, number],
+  /** a dust film: a shade paler than the sealed floor, warm, matte */
+  dust: [.165, .155, .14] as [number, number, number], dustRough: .84, dustCover: .65,
+  /** an open saw cut, and the chips along its arris; how much of the silt
+      the cut shows over its dark */
+  cutDark: .16, chip: .16, silt: .5,
+  /** the reflection the sealer gives back, before dust and the cuts take it */
+  reflection: .7,
+}
+
+export interface FloorMaps { finish: DataTexture; tile: DataTexture; bakeMs: number }
+
+/** The floor's map and tile, baked once for the hall. */
+function floorMaps(side: number): FloorMaps {
+  const baked = bakeHallFloor(hallFloorPlan(), side)
+  return {
+    finish: dataMap(baked.finish, baked.size, false, 'vinci/collection-hall-floor/finish'),
+    tile: dataMap(bakeFloorTile(side), side, true, 'vinci/collection-hall-floor/tile'),
+    bakeMs: baked.bakeMs,
+  }
+}
+
+/** The clerestory past its shelf, by metres south of the glazing. */
+const SHELF_CURVE = uniformArray([...HALL_FLOOR_SHELF.values], 'float')
+
+/** THE SEALED FLOOR: the photograph for its fine grain, read per bay; the
+ * baked map for the pour, the trowel, the wear, the dust and the contact; the
+ * tile's aggregate, scuffs and scratches over it; the saw cuts drawn at the
+ * pixel they land in. Four maps in all: the hall's lights already hold most
+ * of the sixteen a fragment may sample. */
+function floorMaterial(set: MaterialSet, maps: FloorMaps): { material: FloorMaterial; held: N } {
+  const F = FLOOR_FINISH, M = HALL_FLOOR_MAP
+  const m = new FloorMaterial({ roughness: .3, metalness: 0, side: FrontSide })
+  const P = positionWorld
+  const east = P.x, north = P.z.negate()
+  const finish = texture(maps.finish, vec2(east.sub(M.west).div(M.east - M.west), north.sub(M.south).div(M.north - M.south)))
+  // each bay its own read of the photograph and of the tile, turned a
+  // quarter or more, so neither ever lines up with the next bay's
+  const e0 = east.sub(BAY.originEast), n0 = north.sub(BAY.originNorth)
+  const cellE = floorOf(e0.div(BAY.east)), cellN = floorOf(n0.div(BAY.north))
+  const h1 = hash(cellE, cellN, 3.7), h2 = hash(cellE, cellN, 11.3), h3 = hash(cellE, cellN, 17.9)
+  const sample = set.sample({ uv: vec2(east, north).add(vec2(h1, h2).mul(23.7)), metres: F.metres })
+  const quarter = floorOf(h3.mul(4))
+  const turn = (q: N, v: N): N => select(q.lessThan(1), v, select(q.lessThan(2), vec2(v.y.negate(), v.x), select(q.lessThan(3), v.negate(), vec2(v.y, v.x.negate()))))
+  const tile = texture(maps.tile, turn(quarter, vec2(east, north)).add(vec2(h2, h1).mul(7.1)).div(HALL_FLOOR_TILE))
+  const grain = tile.r.mul(2)
+  // the photograph's own mean, whatever its manifest measured it at
+  const mean = sample.colour.div(sample.albedo.max(.05))
+  let colour: N = mean.mul(mix(vec3(1), sample.albedo, F.photo))
+    .mul(vec3(...F.tint)).mul(finish.r.add(.5)).mul(mix(float(1), grain, F.aggregate))
+  // heel scuffs and the haze of fine scratches where the sealer is walked through
+  const worn = smoothstep(float(F.worn[0]), float(F.worn[1]), finish.g)
+  colour = colour.mul(float(1).sub(tile.b.mul(worn).mul(.5))).mul(tile.a.mul(worn).mul(.12).add(1))
+  let rough: N = finish.g.add(tile.g.sub(.5).mul(.6)).add(tile.a.mul(worn).mul(.28))
+  // THE SAW CUTS, each on its own axis and filtered to the pixel it lands in
+  const { east: pe, north: pn } = axisFootprint(P)
+  const along = (c: N, period: number): N => { const f = fract(c.div(period)); return f.min(float(1).sub(f)).mul(period) }
+  const dE = along(e0, BAY.east), dN = along(n0, BAY.north)
+  const joint = lineCoverage(dE, BAY.cutHalf, BAY.east, pe).max(lineCoverage(dN, BAY.cutHalf, BAY.north, pn))
+  // an arris chips where a stone of the aggregate sits in it
+  const stone = smoothstep(float(.1), float(.3), grain.sub(1).abs())
+  const chip = lineCoverage(dE, BAY.chipHalf, BAY.east, pe).max(lineCoverage(dN, BAY.chipHalf, BAY.north, pn)).mul(stone)
+  // the dust film, grained; the cuts' own silt rides on their line in the map
+  const dust = finish.b.mul(smoothstep(float(.018), float(.034), dE.min(dN))).mul(grain.sub(1).mul(.8).add(1)).clamp(0, 1).mul(F.dustCover)
+  colour = mix(colour, vec3(...F.dust), dust)
+  rough = mix(rough, float(F.dustRough), dust)
+  colour = colour.mul(float(1).add(chip.mul(F.chip)))
+  rough = rough.max(chip.mul(.5))
+  colour = mix(colour, mix(colour.mul(F.cutDark), vec3(...F.dust), finish.b.mul(F.silt)), joint)
+  rough = mix(rough, float(.86), joint)
+  m.colorNode = colour
+  m.roughnessNode = rough.clamp(.05, 1)
+  const t = vec3(1, 0, 0), b = vec3(0, 0, -1), n = vec3(0, 1, 0)
+  const bent = t.mul(sample.normal.x.mul(F.normal)).add(b.mul(sample.normal.y.mul(F.normal))).add(n.mul(sample.normal.z)).normalize()
+  m.normalNode = bent.transformDirection(cameraViewMatrix)
+  // THE ENGINE'S STAND-INS for the contact a path tracer finds by itself: the
+  // room's light held back round what stands on the floor, the window's past
+  // its shelf and, near a plinth, much as the room's
+  m.aoNode = finish.a
+  const south = float(HALL_FLOOR_SHELF.glazing).sub(north).max(0).div(HALL_FLOOR_SHELF.step).min(HALL_FLOOR_SHELF.values.length - 1.001)
+  const at = floorOf(south)
+  const shelf = mix(SHELF_CURVE.element(at.toInt()), SHELF_CURVE.element(at.add(1).toInt()), south.sub(at))
+  m.windowNode = shelf.mul(mix(float(1), finish.a, .75))
+  m.name = 'vinci/collection-hall-fabric/floor'
+  // a function, so a copy of the material's record never copies the bytes
+  m.userData = { ...HALL_FLOOR_PROVENANCE, set: set.name, bakeMs: maps.bakeMs, floorMaps: (): FloorMaps => maps }
+  return { material: m, held: dust.max(joint) }
 }
 
 /** The planar pass is drawn at this share of the frame. */
@@ -347,22 +459,24 @@ export function mountHallFabric(stack: Stack, adopt: (material: Material) => voi
   const oak = stack.materials.sync('oak-veneer-light')
   // The ceiling between the beams: oiled oak slats, the clerestory's sky
   // thrown along them, over a backing dark enough that the gaps read as gaps.
-  const slatLook: Look = { metres: 1.83, tint: [.5, .45, .4], rough: [.45, .75], normal: .7, cell: 0, drift: .08, shelf: .34, turn: true }
-  const backingLook: Look = { metres: 2.71, tint: [.1, .095, .09], rough: [.85, 1], normal: .3, cell: 0, drift: .02 }
-  const slatMaterial = fabricMaterial(oak, slatLook, 'slats', false)
-  const backingMaterial = fabricMaterial(concrete, backingLook, 'backing', false)
+  const slatLook: Look = { metres: 1.83, tint: [.5, .45, .4], rough: [.45, .75], normal: .7, drift: .08, shelf: .34, turn: true }
+  const backingLook: Look = { metres: 2.71, tint: [.1, .095, .09], rough: [.85, 1], normal: .3, drift: .02 }
+  const slatMaterial = fabricMaterial(oak, slatLook, 'slats')
+  const backingMaterial = fabricMaterial(concrete, backingLook, 'backing')
   // The formwork photograph is a khaki concrete; the hall's is a warm grey,
   // so its blue is lifted back to the photograph's red.
-  const wallLook: Look = { metres: 2.71, tint: [.92, .97, 1.25], rough: [.62, .95], normal: 1, cell: 0, drift: .06 }
-  const overheadLook: Look = { metres: 2.71, tint: [.84, .88, 1.1], rough: [.7, .98], normal: .8, cell: 0, drift: .05, shelf: .36 }
-  const floorLook: Look = { metres: 3, tint: [.82, .8, .77], rough: [.4, .72], normal: .6, cell: .18, drift: .09 }
-  const wallMaterial = fabricMaterial(concrete, wallLook, 'walls', false)
-  const overheadMaterial = fabricMaterial(concrete, overheadLook, 'overhead', false)
-  const floorMaterial = fabricMaterial(ground, floorLook, 'floor', true)
+  const wallLook: Look = { metres: 2.71, tint: [.92, .97, 1.25], rough: [.62, .95], normal: 1, drift: .06 }
+  const overheadLook: Look = { metres: 2.71, tint: [.84, .88, 1.1], rough: [.7, .98], normal: .8, drift: .05, shelf: .36 }
+  const wallMaterial = fabricMaterial(concrete, wallLook, 'walls')
+  const overheadMaterial = fabricMaterial(concrete, overheadLook, 'overhead')
+  const maps = floorMaps(stack.tierName() === 'calm' ? 1024 : 2048)
+  const mapBytes = [maps.finish, maps.tile].reduce((sum, t) => sum + t.image.width * t.image.height * 4 * 4 / 3, 0)
+  const releaseMaps = stack.registerTextureMemory(() => mapBytes / 1048576, 'hall floor')
+  const { material: floorSurface, held } = floorMaterial(ground, maps)
   // A plinth is a dark honed stone, so the machine on it is the lighter thing.
-  const plinthLook: Look = { metres: 1.5, tint: [.36, .35, .34], rough: [.32, .62], normal: .5, cell: 0, drift: .04 }
-  const plinthMaterial = fabricMaterial(ground, plinthLook, 'plinths', false)
-  const materials = [wallMaterial, overheadMaterial, floorMaterial, plinthMaterial, slatMaterial, backingMaterial]
+  const plinthLook: Look = { metres: 1.5, tint: [.36, .35, .34], rough: [.32, .62], normal: .5, drift: .04 }
+  const plinthMaterial = fabricMaterial(ground, plinthLook, 'plinths')
+  const materials = [wallMaterial, overheadMaterial, floorSurface, plinthMaterial, slatMaterial, backingMaterial]
   for (const material of materials) adopt(material)
   // THE FLOOR IS SEALED, and a sealed floor carries what stands on it: the
   // room drawn once more from under the plane, blurred by the floor's own
@@ -379,8 +493,9 @@ export function mountHallFabric(stack: Stack, adopt: (material: Material) => voi
     const fresnel = float(.04).add(float(.96).mul(pow(float(1).sub(facing), 5)))
     // held under the sky's own level, so the clerestory's glass reflects as
     // a soft brightening and not as a white smear across the bays
-    const seen = glossyReflection(reflection.node, floorMaterial.roughnessNode)
-    floorMaterial.emissiveNode = seen.min(vec3(1.2, 1.2, 1.2)).mul(fresnel).mul(.7)
+    const seen = glossyReflection(reflection.node, floorSurface.roughnessNode)
+    // dust and an open cut are no mirror
+    floorSurface.emissiveNode = seen.min(vec3(1.2, 1.2, 1.2)).mul(fresnel).mul(float(FLOOR_FINISH.reflection).mul(float(1).sub(held)))
   }
   const make = (skin: Skin, material: MeshStandardNodeMaterial, name: string): Mesh => {
     const mesh = new Mesh(skin.geometry(), material)
@@ -392,7 +507,7 @@ export function mountHallFabric(stack: Stack, adopt: (material: Material) => voi
   const group = new Group()
   group.name = 'vinci/collection-hall-fabric'
   group.userData = { ...HALL_FABRIC_PROVENANCE }
-  group.add(make(walls, wallMaterial, 'walls'), make(overhead, overheadMaterial, 'overhead'), make(floor, floorMaterial, 'floor'),
+  group.add(make(walls, wallMaterial, 'walls'), make(overhead, overheadMaterial, 'overhead'), make(floor, floorSurface, 'floor'),
     make(plinths, plinthMaterial, 'plinths'), make(slats, slatMaterial, 'slats'), make(backing, backingMaterial, 'backing'))
   const ready = Promise.all([concrete, ground, oak].map(set => stack.materials.load(set.name))).then(() => undefined)
   return {
@@ -400,6 +515,8 @@ export function mountHallFabric(stack: Stack, adopt: (material: Material) => voi
     ready,
     dispose() {
       reflection.dispose()
+      releaseMaps()
+      for (const t of [maps.finish, maps.tile]) t.dispose()
       plane.geometry.dispose()
       group.traverse(o => { if (o instanceof Mesh) o.geometry.dispose() })
       for (const m of materials) m.dispose()

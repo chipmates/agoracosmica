@@ -3578,10 +3578,10 @@
       "class": "GENERATED",
       "licence": "Original procedural construction; source code under the museum repository licence.",
       "display": true,
-      "prompt": "The mechanism hall's finish over its certified construction: a sealed concrete floor cut into 3.2 by 3.3 m bays, each read from its own part of a CC0 photograph, with saw cuts between them and a reflection of the room blurred by the floor's own roughness; cast concrete walls with their formwork joints and tie holes, stopped over the floor by a shadow gap; the same concrete on the beams and the light shelf; between the beams 90 mm oak slats on a 150 mm pitch over a dark backing; the plinths in a dark honed stone. Photographs: library/concrete-floor-polished, library/concrete-wall-formed and library/oak-veneer-light, all CC0 from Poly Haven; the bays, joints, slats, tint and drift are procedural. A modern room; no 1517 claim.",
+      "prompt": "The mechanism hall's finish over its certified construction: the sealed concrete floor laid by vinci/collection-hall-floor with a reflection of the room blurred by the floor's own roughness; cast concrete walls with their formwork joints and tie holes, stopped over the floor by a shadow gap; the same concrete on the beams and the light shelf; between the beams 90 mm oak slats on a 150 mm pitch over a dark backing; the plinths in a dark honed stone. Photographs: library/concrete-floor-polished, library/concrete-wall-formed and library/oak-veneer-light, all CC0 from Poly Haven; the joints, slats, tint and drift are procedural. A modern room; no 1517 claim.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
-      "date": "2026-09-22",
-      "sha256": "0c97e2ff81ce1a95f98fc9a5ae9eecb17c173d8a21d2183a352da6c3ee6229e1",
+      "date": "2026-09-24",
+      "sha256": "f3a6759e933c364daa78c55b9c147ab5f1baa152a1561733e59ba57ea1930f90",
       "note": "Modern museum insertion, the mechanism hall only; no 1517 claim. recipe_file=src/wings/vinci/collection/hall-fabric.ts"
     },
     {
@@ -3830,6 +3830,19 @@
       "date": "2026-09-24",
       "sha256": "3dad1e1c421f1fbe20ab64a87526a1b9b84d6b3eff56f0b7a2f1a9a1ca54a223",
       "note": "Modern museum insertion round the court's display wall; no 1517 claim and no claim on the refectory's own dimensions. recipe_file=src/wings/vinci/collection/supper-room.ts; companion_file=src/wings/vinci/collection/supper-room-plan.ts; library_sets=library/plaster-lime-aged,library/concrete-wall-formed,library/marble-white,library/limestone-pale"
+    },
+    {
+      "id": "vinci/collection-hall-floor",
+      "path": "procedural/collection-hall-floor/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural construction; source code under the museum repository licence.",
+      "display": true,
+      "prompt": "The mechanism hall's sealed concrete floor, baked in code into one map over the hall and one 1.2 m tile: each 3.2 by 3.3 m bay its own pour a shade apart with a drift across it; clouding one to two metres across; darker, glossier trowel burn; power-trowel arcs burnished into the sealer; wear along the lanes between the three doors, round every plinth and at each door's mouth, rougher and a little lighter, with heel scuffs and hairline scratches; dust under each plinth's overhang, in a line at its foot, at the walls' feet and silted into the 5 mm saw cuts, whose arrises chip where a stone sits; the cut aggregate of sand, fine and coarse stone and pores. The fine grain is the CC0 photograph library/concrete-floor-polished (Poly Haven), pulled toward its own mean. For the engine alone, the contact of the room's light (the form factor of every plinth, the dark bay's walls and the screw's platform) and the clerestory's light past its shelf. A finish specification of a modern room, not a survey; no 1517 claim. No reference image sampled.",
+      "model": "Deterministic TypeScript and TSL procedural textures",
+      "date": "2026-09-24",
+      "sha256": "b49e1dc105731a1f38d8525629451de47ae07eb547be8d0d41e601ade99c7663",
+      "note": "Modern museum insertion, the mechanism hall only; no 1517 claim. recipe_file=src/wings/vinci/collection/hall-floor.ts"
     }
   ]
 }
