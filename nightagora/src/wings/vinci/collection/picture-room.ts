@@ -34,7 +34,7 @@ import {
   PICTURE_ROOM_PROVENANCE, PICTURE_SHADOW_LAYER, PROBE_AT, REVEAL, ROOM, ROOM_LIGHTS, shadowCasters, stampHangLight, v3,
   wallSkins, WINDOW, type HangLamp, type RoomLight, type Skin, type Solid,
 } from './picture-room-plan'
-import { hangSurfaceLight, PICTURE_LOOKS, varnishFilm, withRoomAir } from './picture-light'
+import { hangSurfaceLight, hangWallPool, PICTURE_LOOKS, varnishFilm, withRoomAir } from './picture-light'
 
 // The node overload boundary stays local to this file.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -109,6 +109,9 @@ function looks() {
     /** metres the oak is laid at on the frames, and how far its figure bends the light */
     frameGrain: .95,
     frameRelief: uniform(.42),
+    /** a frame's outer side, in the pool beside it: the wall's bounce and the
+     * neighbouring heads' graze together, a stand-in and not a solve */
+    frameSide: uniform(.3),
     benchTint: uniform(new Color(.74, .66, .58)),
     /** a dark honed stone: the glazing's band, the thresholds, the gaps' backs */
     darkTint: uniform(new Color(.4, .39, .38)),
@@ -284,7 +287,14 @@ function frameOakMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial 
   m.colorNode = albedo
   m.roughnessNode = rough
   m.metalnessNode = metalness
-  m.emissiveNode = hangSurfaceLight(albedo, rough, metalness, PICTURE_LOOKS, true, world)
+  // THE OUTER SIDE faces along the wall and takes no head: what it reads by
+  // is the pool its frame stands in, off the lining beside it and off its
+  // own oiled sheen, so its grain holds instead of going to a slab
+  const P = positionWorld
+  const side = float(1).sub(smoothstep(.3, .75, abs(n.z))).mul(select(metal, float(0), float(1)))
+  const beside = vec3(P.x.add(n.x.mul(.06)), P.y.add(n.y.mul(.06)), float(-ROOM.finish - .002))
+  const sideLight = albedo.mul(hangWallPool(beside)).mul(L.frameSide).mul(side)
+  m.emissiveNode = hangSurfaceLight(albedo, rough, metalness, PICTURE_LOOKS, true, world).add(sideLight)
   m.normalNode = world.transformDirection(cameraViewMatrix)
   // an oiled frame takes the room's light as a sheen, not as a grey film
   m.envMapIntensity = .45

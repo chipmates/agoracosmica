@@ -294,6 +294,21 @@ export function hangSurfaceLight(albedo: N, roughness: N, metalness: N, looks: P
   return sum.mul(looks.lampColour).mul(looks.lampGain)
 }
 
+/** THE POOL BESIDE A FRAME: the heads' irradiance on the lining at a point of
+ * its plane, the frame's own shadow included. A frame's outer side faces
+ * along the wall and takes no head directly; this is what it sees instead. */
+export function hangWallPool(P: N, looks: PictureLooks = PICTURE_LOOKS): N {
+  const n = vec3(0, 0, -1)
+  const { own, other, apart } = slotsAt(P.x)
+  let sum: N = float(0)
+  for (const [slot, weight] of [[own, float(1)], [other, apart]] as const) {
+    const row = hangRow(slot)
+    for (const [lamp, aim, inner, level] of [[row.lampA, row.aimA, row.cone.x, row.cone.z], [row.lampB, row.aimB, row.cone.y, row.cone.w]] as const)
+      sum = sum.add(headOnSurface(P, n, lamp, aim, inner, level, row, looks, true).irradiance.mul(weight))
+  }
+  return looks.lampColour.mul(sum.mul(looks.lampGain))
+}
+
 /** ONE HEAD ON A POINT OF THE CANVAS: its irradiance there (candela, cone,
  * distance, incidence, its lens), cut by the sight edge of the frame the
  * canvas stands in, and the unit vector toward it. */
