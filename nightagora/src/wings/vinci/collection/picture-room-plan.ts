@@ -723,12 +723,20 @@ export function benches(): { oak: Solid; bronze: Solid } {
       bronze.box([at - .082, BENCH_NORTH - .262, ROOM.floor - .001, at + .082, BENCH_NORTH + .262, FLOOR + .026])
     }
   }
-  // the ledge: its bar lies in the top, its sloped board and its legs in
-  // the body under it, which stands a reveal back from the top's edges
-  const L = LEDGE
+  // THE LEDGE, built as a bench: its bar lies in the top; the low edge of
+  // its sloped board in an apron framed round under the top; its two legs
+  // in slab ends on bronze shoes, tied by a stretcher. Air under the apron,
+  // so it reads as joinery and not as a crate.
+  const L = LEDGE, apron = FLOOR + .378, shoe = FLOOR + .045
   oak.box([L.east - .975, L.north - .07, FLOOR + .486, L.east + .975, L.north + .43, FLOOR + .56], true)
-  oak.box([L.east - .96, L.north - .055, FLOOR + .045, L.east + .96, L.north + .418, FLOOR + .486], true)
-  bronze.box([L.east - .9, L.north - .02, ROOM.floor - .001, L.east + .9, L.north + .38, FLOOR + .045])
+  oak.box([L.east - .96, L.north - .045, apron, L.east + .96, L.north - .02, FLOOR + .486], true)
+  oak.box([L.east - .96, L.north + .38, apron, L.east + .96, L.north + .405, FLOOR + .486], true)
+  for (const side of [-1, 1]) {
+    oak.box([L.east + side * .96 - (side > 0 ? .025 : 0), L.north - .02, apron, L.east + side * .96 + (side < 0 ? .025 : 0), L.north + .38, FLOOR + .486], false)
+    oak.box([L.east + side * .8 - .05, L.north - .02, shoe, L.east + side * .8 + .05, L.north + .38, FLOOR + .486], false)
+    bronze.box([L.east + side * .8 - .044, L.north - .024, ROOM.floor - .001, L.east + side * .8 + .044, L.north + .384, shoe])
+  }
+  oak.box([L.east - .75, L.north + .15, FLOOR + .13, L.east + .75, L.north + .21, FLOOR + .19], true)
   return { oak, bronze }
 }
 
