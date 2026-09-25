@@ -249,8 +249,16 @@ async function run(engine, width, lang) {
         const from = await page.evaluate(() => window.__naSeam?.state?.().node ?? null)
         const t = Date.now()
         if (!(await press(page, on))) { record.life.push({ k, from, pressed: false }); break }
-        const how = await page.waitForFunction(() => { const s = window.__naSeam?.state?.(); return s && s.kind !== 'rest' ? s.kind : false }, null, { timeout: 4000, polling: 20 })
+        let how = await page.waitForFunction(() => { const s = window.__naSeam?.state?.(); return s && s.kind !== 'rest' ? s.kind : false }, null, { timeout: 4000, polling: 20 })
           .then((h) => h.jsonValue()).catch(() => 'dissolve')
+        // a clip not yet in hand shows the byte hairline first, then walks (or dissolves when its bytes come too late)
+        let waited = null
+        if (how === 'wait') {
+          const w0 = Date.now()
+          how = await page.waitForFunction(() => { const s = window.__naSeam?.state?.(); return s && s.kind !== 'wait' ? s.kind : false }, null, { timeout: 30000, polling: 20 })
+            .then((h) => h.jsonValue()).then((k) => (k === 'rest' ? 'dissolve' : k)).catch(() => 'wait')
+          waited = Date.now() - w0
+        }
         let mid = null
         if (how === 'walk') {
           const inLeg = await page.waitForFunction(() => { const v = document.querySelector('.na-film-clip.shown'); return Boolean(v && v.duration > 0 && v.currentTime >= v.duration / 2) }, null, { timeout: 60000, polling: 30 }).then(() => true).catch(() => false)
@@ -265,7 +273,7 @@ async function run(engine, width, lang) {
         await page.waitForTimeout(1500)
         const at = await shot(page, dir, `life-${String(k).padStart(2, '0')}-rest`)
         shots.push(at)
-        record.life.push({ k, from, to: landed, how, ms, midLeg: mid?.name ?? null, pictureShare: at.pictureShare, words: at.words?.[0]?.slice(0, 60) ?? null })
+        record.life.push({ k, from, to: landed, how, ...(waited != null ? { waited } : {}), ms, midLeg: mid?.name ?? null, pictureShare: at.pictureShare, words: at.words?.[0]?.slice(0, 60) ?? null })
         if (!landed) break
       }
       return record

@@ -179,6 +179,9 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
   let state: PictureState = { kind: 'rest', node: here }
   let shownFraming: PictureFraming = options.framing()
   let busy = false
+  /* the rest a leg ends on is told while the leg still counts as busy, so the
+     gold way's next clip asked for then is fetched once the leg is done */
+  let aheadLater: readonly PictureNode[] | null = null
   let queued: { node: PictureNode; resolve: ((n: PictureNode) => void)[] } | null = null
   let carried = 0
   let hurried = false
@@ -630,8 +633,25 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
     if (next && !disposed) {
       const landed = await go(next.node)
       for (const r of next.resolve) r(landed)
+    } else if (aheadLater && !disposed) {
+      const nodes = aheadLater
+      aheadLater = null
+      fetchAhead(nodes)
     }
     return at
+  }
+
+  function fetchAhead(nodes: readonly PictureNode[]): void {
+    if (lean()) return
+    const f = framingOf()
+    for (const node of nodes.slice(0, 2)) {
+      const edge = firstClip(node, f)
+      const file = edge ? clipFile(edge, f) : null
+      if (file) void fetchWhole(file.url, file.bytes).then(blob => { if (blob && node === nodes[0]) arm(file.url, blob) })
+      const arrival = edge ? stillFile(edge.to, f) : null
+      if (arrival) void decode(arrival)
+      if (edge) void trackOf(edge, f)
+    }
   }
 
   firstPicture = showStill(here).then(() => { fit(); set({ kind: 'rest', node: here }, 'rest') })
@@ -648,16 +668,8 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
       playing.video.playbackRate = rate()
     },
     ahead(nodes) {
-      if (lean() || busy) return
-      const f = framingOf()
-      for (const node of nodes.slice(0, 2)) {
-        const edge = firstClip(node, f)
-        const file = edge ? clipFile(edge, f) : null
-        if (file) void fetchWhole(file.url, file.bytes).then(blob => { if (blob && node === nodes[0]) arm(file.url, blob) })
-        const arrival = edge ? stillFile(edge.to, f) : null
-        if (arrival) void decode(arrival)
-        if (edge) void trackOf(edge, f)
-      }
+      if (busy) { aheadLater = nodes; return }
+      fetchAhead(nodes)
     },
     reach(node) {
       const f = framingOf()
