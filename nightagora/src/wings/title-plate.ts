@@ -187,11 +187,12 @@ export function createTitlePlate(host: HTMLElement, parts: PlateParts): TitlePla
 
   function wallOf(words: PlateWords): HTMLElement {
     const wall = make('div', 'na-plate-wall')
-    wall.append(
-      make('p', 'na-plate-kicker', words.kicker),
-      make('h1', 'na-plate-title', words.title),
-      make('p', 'na-plate-line', words.line)
-    )
+    const kicker = make('p', 'na-plate-kicker', words.kicker)
+    const title = make('h1', 'na-plate-title', words.title)
+    // the door's wall names him first, the place and the hour under the name
+    if (door) wall.append(title, kicker)
+    else wall.append(kicker, title)
+    wall.append(make('p', 'na-plate-line', words.line))
     return wall
   }
 
