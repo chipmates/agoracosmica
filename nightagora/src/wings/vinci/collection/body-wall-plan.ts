@@ -14,6 +14,7 @@ import { BufferGeometry, Float32BufferAttribute, Vector3 } from 'three/webgpu'
 import { FACE, FLOOR, OPENING } from './layout'
 import { bodyMounts, type BodyMount } from './body-wall'
 import { GALLERY } from './line-gallery-plan'
+import { READING_ROOM_FOOTPRINT } from './reading-room-plan'
 
 export const BODY_WALL_PROVENANCE = {
   manifestId: 'vinci/collection-body-wall',
@@ -152,6 +153,21 @@ export const LINING = {
   top: GALLERY.ribFoot - .08,
   /** the recessed toe, the panels' shadow joints and their depth */
   toe: H(.08), toeBack: .03, joint: .016, jointDepth: .014,
+} as const
+/** THE SCRIBE between the lining's end and the reading room: a fumed oak
+ * fillet a step behind the face, a joint short of the room's plinth, so no
+ * concrete shows between the two casework faces. */
+export const SCRIBE = {
+  south: LINING.north + .012, north: READING_ROOM_FOOTPRINT.south - .006, face: LINING.face - .025,
+} as const
+/** THE SOUTH DOOR TO THE HALL, which no walk takes, stands shut: a pair of
+ * fumed oak leaves in the partition's thickness, clear of the hall's stone
+ * reveals (their east face at hallPartitionWest - .1 + .23) and under their
+ * head, which `rooms.ts` lays at -2.5. */
+export const SOUTH_DOOR = {
+  west: FACE.hallPartitionWest + .135, east: FACE.hallPartitionWest + .18,
+  south: OPENING.hallToSouth.north[0], north: OPENING.hallToSouth.north[1],
+  bottom: FLOOR + .008, top: -2.502, joint: .006,
 } as const
 
 /** THE HEADS' LINE: a black track under the soffit's ribs a long stride off
@@ -481,6 +497,12 @@ export function liningBoards(): { panels: Board[]; core: Board[]; reveals: Board
   // the two ends, lipped in the same fumed oak
   out.push({ box: [back, L.south - .012, L.toe, face, L.south, L.top], grain: 'up', offset: [.6, .4], tone: toned(WOOD.fumed, 40, 13, 0) })
   out.push({ box: [back, L.north, L.toe, face, L.north + .012, L.top], grain: 'up', offset: [.8, .3], tone: toned(WOOD.fumed, 41, 13, 0) })
+  out.push({ box: [back, SCRIBE.south, L.toe, SCRIBE.face, SCRIBE.north, L.top], grain: 'up', offset: [.1, .9], tone: toned(WOOD.fumed, 42, 13, 0) })
+  const D = SOUTH_DOOR, meet = (D.south + D.north) / 2
+  out.push({ box: [D.west, D.south, D.bottom, D.east, meet - D.joint / 2, D.top], grain: 'up', offset: [.35, .15], tone: toned(WOOD.fumed, 43, 13, .05) })
+  out.push({ box: [D.west, meet + D.joint / 2, D.bottom, D.east, D.north, D.top], grain: 'up', offset: [.65, .55], tone: toned(WOOD.fumed, 44, 13, .05) })
+  core.push({ box: [D.west + .01, meet - .02, D.bottom, D.east - .01, meet + .02, D.top], grain: 'up', offset: [.2, .2], tone: dark })
+  core.push({ box: [back, SCRIBE.south, FLOOR - .004, SCRIBE.face - L.toeBack, SCRIBE.north, L.toe], grain: 'north', offset: [.5, .4], tone: [.02, .018, .016] })
   // THE OPENINGS' JAMBS: oiled oak lining the lining's own thickness, a
   // lipping that reads on the face as the opening's frame; the splayed heads
   // are `splayFaces`, and the niche's sill is one board lipped the same way
@@ -723,6 +745,8 @@ export function bodyWallSolids(): { name: string; box: Box }[] {
   const out: { name: string; box: Box }[] = []
   const L = LINING
   out.push({ name: 'lining', box: [PLANE.finish, L.south - .012, FLOOR, L.face, L.north + .012, L.top] })
+  out.push({ name: 'scribe', box: [PLANE.finish, SCRIBE.south, FLOOR, SCRIBE.face, SCRIBE.north, L.top] })
+  out.push({ name: 'south-door', box: [SOUTH_DOOR.west, SOUTH_DOOR.south, SOUTH_DOOR.bottom, SOUTH_DOOR.east, SOUTH_DOOR.north, SOUTH_DOOR.top] })
   const chest = chestBoards()
   chest.oak.forEach((q, i) => out.push({ name: `chest-${i}`, box: q.box }))
   chest.bronze.forEach((box, i) => out.push({ name: `bronze-${i}`, box }))

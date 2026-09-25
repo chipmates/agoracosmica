@@ -205,6 +205,7 @@ const niche = {
   splay: +washAt([plan.PLANE.linen + .09, N.centre, N.back + .09 * Math.tan(N.splay)], splayNormal, framer).toFixed(3),
   southJambOnChest: +(N.south - plan.REVEAL_LIP - plan.CHEST.north).toFixed(6),
   clearOfReadingRoom: +(room.READING_ROOM_FOOTPRINT.south - (plan.LINING.north + .012)).toFixed(3),
+  scribeClearOfPlinth: +(room.READING_ROOM_FOOTPRINT.south - plan.SCRIBE.north).toFixed(4),
 }
 if (Math.min(...sheetPoints) < .85 * Math.max(...sheetPoints)) lightFailures.push(`The niche's head swings ${niche.sheet.min} to ${niche.sheet.max} over the sheet`)
 if (Math.abs(niche.sheet.max - pageMean) > .15 * pageMean) lightFailures.push(`The sheet apart takes ${niche.sheet.max} against the hang's ${pageMean.toFixed(3)}`)
@@ -212,6 +213,7 @@ if (niche.roundTheNiche > .05 * pageMean) lightFailures.push(`The niche's head l
 if (niche.splay <= 0) lightFailures.push('The niche\'s splayed head takes no light')
 if (Math.abs(niche.southJambOnChest) > 1e-6) lightFailures.push('The niche\'s south jamb does not stand on the chest\'s north end')
 if (niche.clearOfReadingRoom < .05) lightFailures.push(`The lining ends ${niche.clearOfReadingRoom} m short of the reading room's plinth`)
+if (niche.scribeClearOfPlinth < .004) lightFailures.push(`The scribe runs to ${niche.scribeClearOfPlinth} m of the reading room's plinth`)
 
 const solids = plan.bodyWallSolids()
 const cabinet = audit(solids)
