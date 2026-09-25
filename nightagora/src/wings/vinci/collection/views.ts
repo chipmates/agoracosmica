@@ -43,26 +43,33 @@ function lineFloorView(north: number, narrow: boolean): RoomPose {
  * is turned to stand its own work clear of it.
  */
 const HANG_EYE_NORTH = FACE.pictureWallNorth + 3.79
-/** How far past its own end of the hang each eye stands, and how far along the
- * wall its aim runs past the work. The west end is the tighter of the two: the
- * room's west wall and the door to the machines stand right behind it, so it
- * takes a shorter stand off and a longer turn, which is also why its work
- * reads squarer than the east one's. */
-const HANG_END = [{ stand: 2.335, turn: .72 }, { stand: 1.255, turn: 1.445 }] as const
-/** The phone is the same stand with a narrower frame. Its card peeks at the
- * foot instead of docking at the side, so the aim barely turns and the work
- * takes the middle; the lens comes in rather than out, because holding the
- * whole wall on a 390 px stage is what made the far end a smudge. */
-const HANG_END_NARROW = { turn: .3, drop: .35, fov: 68 }
+/** How far past its own end of the hang each eye stands, how far along the
+ * wall its aim runs past the work, and its lens. The west end is the tighter
+ * of the two: the room's west wall and the door to the machines stand right
+ * behind it, so it takes a shorter stand off. */
+const HANG_END = [{ stand: 2.335, turn: 2.695, fov: 54 }, { stand: 1.255, turn: 1.445, fov: 60 }] as const
+/** The phone is the same stand with a narrower frame. Its sheet rises from
+ * the foot instead of docking at the side, so the aim barely turns and the
+ * work takes the middle; the lens comes in rather than out, because holding
+ * the whole wall on a 390 px stage is what made the far end a smudge. The
+ * east end turns past its first work so the second, wide one leaves the
+ * frame instead of standing cut at its edge, and closes two degrees so no
+ * sliver of that one's frame stays at the edge; the west end looks down
+ * far enough that the wall over its work is no longer the top fifth. */
+const HANG_END_NARROW = [{ turn: -.32, drop: .316, fov: 62 }, { turn: .3, drop: .648, fov: 64 }] as const
+/** THE EAST END'S WIDE FRAME TURNS WEST OFF THE DOOR. Turned onto the first
+ * work alone, its left edge looked through the door into the next room;
+ * turned on down the wall, the door leaves the frame and the first work
+ * stands in the left third with the whole run behind it. */
 function hangEndPose(end: 0 | 1, narrow: boolean): RoomPose {
   const works = hangPlacements()
   const first = end === 0 ? works[0]! : works[works.length - 1]!
-  const side = end === 0 ? 1 : -1, { stand, turn } = HANG_END[end]
+  const side = end === 0 ? 1 : -1, { stand, turn, fov } = HANG_END[end], phone = HANG_END_NARROW[end]
   return {
     eye: world(first.east + side * stand, HANG_EYE_NORTH, EYE),
-    at: world(first.east - side * (narrow ? HANG_END_NARROW.turn : turn), first.north,
-      HANG_DATUM - (narrow ? HANG_END_NARROW.drop : .1)),
-    fov: narrow ? HANG_END_NARROW.fov : 60,
+    at: world(first.east - side * (narrow ? phone.turn : turn), first.north,
+      HANG_DATUM - (narrow ? phone.drop : .1)),
+    fov: narrow ? phone.fov : fov,
   }
 }
 
@@ -79,28 +86,23 @@ export function collectionView(id: string, narrow: boolean): RoomPose | undefine
     // north end the whole line stands mirrored. So the one station is at the
     // south end, where the reading begins, and the earliest date is the
     // farthest away. The eye stands 0.4 m south of the last socket, which is
-    // all the room the cross wall leaves, and the aim comes down two and a
-    // half metres ahead: that is the pitch that holds the near socket inside
-    // the frame's foot and still lifts 1452 to the middle of it. The phone
-    // looks straight down the line, 38 degrees under the level: the birth's own
-    // numeral lies under the visitor's feet, so the frame's foot has to stand
-    // between it and its socket, or the year is cut at the edge.
+    // all the room the cross wall leaves. The birth's own numeral lies under
+    // the visitor's feet, so the frame's foot has to stand between it and its
+    // socket, or the year is cut at the edge.
     // THE PHONE LOOKS STRAIGHT DOWN THE LINE from the desktop's own eye. The
     // dates' words run east of their sockets, so the line converges on the
     // frame's middle with two degrees to the east kept for the far words;
     // turned west to take in the reading room's door, the far end slid off
     // centre and its last word left the frame.
+    // THE DESKTOP LOOKS DOWN TWENTY-EIGHT DEGREES, NOT THIRTY-FOUR, and turns
+    // fourteen west: the birth's socket leaves the frame's foot while 1452
+    // stays whole above it, and the drawings wall comes in from the edge.
     case 'collection-room-line': {
       const north = LINE_ORIGIN.north - 2.24 * LINE_SLAB.pitchNorth
-      if (!narrow) return {
-        eye: world(LINE_ORIGIN.east + .3, north, FLOOR + 1.66),
-        at: world(LINE_ORIGIN.east, -59.8, FLOOR + .01),
-        fov: 88,
-      }
       const eye = world(LINE_ORIGIN.east + .3, north, FLOOR + 1.66)
-      const heading = 2 * Math.PI / 180, descent = 34 * Math.PI / 180
+      const heading = (narrow ? 2 : -14) * Math.PI / 180, descent = (narrow ? 34 : 28) * Math.PI / 180
       const direction = new Vector3(Math.sin(heading) * Math.cos(descent), -Math.sin(descent), -Math.cos(heading) * Math.cos(descent))
-      return { eye, at: eye.clone().add(direction), fov: 98 }
+      return { eye, at: eye.clone().add(direction), fov: narrow ? 98 : 80 }
     }
     // Three fixed excerpts of the bench's date course, kept as the named
     // inspections the excerpt stations were composed from. The life runs away
@@ -176,8 +178,13 @@ export function collectionView(id: string, narrow: boolean): RoomPose | undefine
     // axis asks, because from the nearer place the hall's south-east door
     // opens at the frame's left edge and a slice of the corrections wall's
     // inscription stands inside it, cut to three letters by the jamb.
+    // The wide frame turns onto the middle of the whole hang, the recess and
+    // its niche, and closes to it: at sixty degrees the empty panelling south
+    // of the recess was the largest thing in the frame and the sheets were
+    // too small to read.
     case 'collection-room-body':
-      return pose(-32.8, -50.6, EYE, -38.7, -52.6, FLOOR + 1.75, narrow ? 78 : 60, .75)
+      return narrow ? pose(-32.8, -50.6, EYE, -38.7, -52.6, FLOOR + 1.75, 78, .75)
+        : pose(-32.8, -50.6, EYE, -38.7, -51.64, EYE + .314, 38)
     // The court, and what stands in it under the sky.
     case 'collection-room-court':
       return pose(-30.8, -28.6, COURT.level + 1.68, -47.5, -26.5, COURT.level + 5.2, narrow ? 88 : 70, 1.4)

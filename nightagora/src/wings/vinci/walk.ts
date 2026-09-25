@@ -107,15 +107,19 @@ export function vinciWalk(life: boolean): VinciWalk {
  * box at the lower left of the frame, so the portrait is carried into the
  * clear half and the wall it hangs on is read with it.
  */
-/** Measured against the frozen desktop design's words: at 1440 by 900 the box
- * runs to x 824, and the portrait's own left edge lands at 834. On the phone
- * the card takes the middle band, so the portrait stands above it.
+/** The desktop keeps the portrait in the right half of the frame, with its
+ * three neighbours whole at the left: turned a little further east, the large
+ * cartoon beyond them stood cut at the left edge.
  * THE DESKTOP LOOKS LEVEL. From an eye 1.1 m off the wall any tilt keystones
  * the frame, so the aim stands at the eye's own height and the lens opens
  * until the frame's foot clears the picture's edge. Its near rectangle stays
- * inside the radius the hang's wall is proved with (78 degrees and under). */
-const LISA_SWING_M = { desktop: .5, phone: 0 }, LISA_RISE_M = { desktop: null, phone: .3 }
-const LISA_FOV = { desktop: 74, phone: 82 }
+ * inside the radius the hang's wall is proved with (78 degrees and under).
+ * THE PHONE LOOKS DOWN TWELVE DEGREES, NOT NINETEEN. The sheet takes the
+ * stage's lower third, so the frame's foot stands just above it; the lens
+ * opens until the whole frame stands inside both edges, and the top of the
+ * frame is a sixth wider than its foot instead of a quarter. */
+const LISA_SWING_M = { desktop: .469, phone: 0 }, LISA_RISE_M = { desktop: null, phone: .163 }
+const LISA_FOV = { desktop: 71, phone: 94 }
 export function vinciLisaPose(narrow: boolean): Pose {
   const viewport = narrow ? 'phone' : 'desktop'
   const eye = vinciApproachPose(LISA_EXHIBIT, narrow)?.eye

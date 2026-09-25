@@ -42,18 +42,30 @@ const p=(e:number,n:number,h:number,te:number,tn:number,th:number,fov=49):Pose=>
 const NARROW_LENS=1.26, NARROW_AIM_SHARE=.21
 /** THE HALL IS STAGED FOR THE PHONE, NOT CROPPED FROM ITS WIDE VIEW. A 390 px
  * stage has under half the wide frame's width, so the aerial screw's sail is
- * centred by yaw before anything else: the flight station turns four and a
- * half degrees south of its room's aim and holds the screw level, which
- * stands the whole sail inside the frame with a tenth of it spare either
- * side. The works station holds the aerial screw's whole sail behind the water
- * screw: the sail is 9.4 m across and stands seven metres beyond the screw, so
- * any narrower lens slices it at the left edge or the rolling mill at the
- * right. Both keep the room's own eye. Heading from north and pitch, in
- * degrees. */
+ * centred by yaw before anything else: the flight station turns seven degrees
+ * south of its room's aim, which stands the whole sail inside the frame and
+ * the water screw's platform under the sheet, and lifts four so the deck
+ * stands just above the sheet rather than over a band of bare floor. The
+ * works station holds the aerial screw's whole sail behind the water screw:
+ * the sail is 9.4 m across and stands seven metres beyond the screw, so any
+ * narrower lens slices it at the left edge or the rolling mill at the right;
+ * it looks down only as far as puts the plinths' feet on the sheet's edge.
+ * Both keep the room's own eye. Heading from north and pitch, in degrees. */
 const HALL_PHONE:Partial<Record<VinciStationId,{heading:number;pitch:number;fov:number}>>={
-  flight:{heading:-77.7994,pitch:.5488,fov:78.12},
-  works:{heading:-67,pitch:-14,fov:104},
+  flight:{heading:-80.5,pitch:4.5,fov:78.12},
+  works:{heading:-67,pitch:-10,fov:100},
 }
+/** THE HALL'S WIDE FRAMES, from the same eyes. The flight station turns west
+ * until the water screw's crank frame stands cut at the right edge instead of
+ * a sixth of the frame beside the sail; turned further, the sail itself
+ * reached that edge. The works station closes on the two water machines, the
+ * screw near the middle and the lock gates whole at the left, with the sail
+ * behind them. */
+const HALL_DESK:Partial<Record<VinciStationId,{heading:number;pitch:number;fov:number}>>={
+  flight:{heading:-84,pitch:11,fov:58},
+  works:{heading:-71,pitch:-5,fov:50},
+}
+const headingOf=(pose:Pose):number=>{const v=pose.at.clone().sub(pose.eye);return Math.atan2(v.x,-v.z)*180/Math.PI}
 function aimedFrom(pose:Pose,heading:number,pitch:number,fov:number):Pose {
   const h=heading*Math.PI/180,t=pitch*Math.PI/180
   const along=new Vector3(Math.sin(h)*Math.cos(t),Math.sin(t),-Math.cos(h)*Math.cos(t))
@@ -63,9 +75,10 @@ function aimedFrom(pose:Pose,heading:number,pitch:number,fov:number):Pose {
 const standing=(e:number,n:number):Pose=>{const h=groundHeight(e,n)+1.65;return p(e,n,h,e,n,h)}
 /** The eye in the great hall's door, on the axis of the three doors. */
 const HALL_DOOR=p(-4.2388,-11.0992,2.45,-4.2388,-11.0992,2.45)
-/** The body wall's phone eye, square on its hang's axis 4.7 m off the linen:
- * the nearest place a 390 px stage holds the whole recess between its jambs. */
-const BODY_PHONE=p(-34,-52.6,FLOOR+1.62,-34,-52.6,FLOOR+1.62)
+/** The body wall's phone eye, 5.5 m off the linen and eighty centimetres
+ * north of the hang's axis: the nearest place a 390 px stage holds the whole
+ * recess and the niche beside it, whose sheet opens the glass heart's film. */
+const BODY_PHONE=p(-33.2,-51.8,FLOOR+1.62,-33.2,-51.8,FLOOR+1.62)
 /** THE DISPLAY WALL'S DESKTOP EYE STANDS UNDER THE NAVE'S WEST END. From
  * eleven metres the nave's north beam, its foot 3.2 m over the floor, stood
  * across the field's upper north corner. From 6.4 m, forty centimetres south
@@ -95,14 +108,15 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // 0.86 m off it, out toward the middle of the road. The phone's lens came
   // down from 116 degrees: at that width the top of its frame looked 68
   // degrees above the gaze and nothing but sky can stand there.
-  // The phone turns eight degrees up the street and lifts thirteen: level at
-  // a hundred degrees, the lower half of its frame was the road. The walnut
-  // over the street now takes the sky's corner.
+  // The phone turns fifteen degrees up the street and lifts eleven: level at
+  // a hundred degrees, the lower half of its frame was the road, and turned
+  // less far the gate's jamb stood cut at the left edge. The walnut over the
+  // street takes the sky's corner.
   // The desktop holds the house front as its one hero: at 70 degrees the road
   // took the lower two fifths, so it closes to 54 on the dormer gable and
   // lifts ten degrees, the gate whole at the left and the road a strip under
   // the house. Turned further up the street the gate's jamb left the frame.
-  if(id==='arrival') return narrow?p(24.98,-16.13,groundHeight(24.98,-16.13)+1.65,6.5664,-9.7504,7.2049,88):aimedFrom(standing(24.98,-16.13),-80,10,54)
+  if(id==='arrival') return narrow?aimedFrom(standing(24.98,-16.13),-63.5,11,88):aimedFrom(standing(24.98,-16.13),-80,10,54)
   // The phone keeps its gaze on the door and opens the lens instead: at 70
   // degrees the cone's right half fell between the court corner and the east
   // range's windows and held neither.
@@ -181,14 +195,18 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // the portrait stage took the recess at its top and bare floor for its
   // lower half; here the recess spans the stage and the drawers under it end
   // where the card begins.
-  if(id==='body'&&narrow) return aimedFrom(BODY_PHONE,-90,-8,90)
+  if(id==='body'&&narrow) return aimedFrom(BODY_PHONE,-90,-6,100)
   const room=COLLECTION_STATION_ROOMS[id]
   // Floor subjects and the wall read end-on have a measured phone composition
   // of their own; the generic room adjustment below is for upright exhibits
   // and architecture, and a subject that runs away from the eye is neither.
   if(room?.startsWith('collection-room-line')||room?.startsWith('collection-room-picture')){const pose=collectionView(room,narrow);if(pose)return pose}
-  if(room){const pose=collectionView(room,false),hall=HALL_PHONE[id]
-    if(pose)return narrow?hall?aimedFrom(pose,hall.heading,hall.pitch,hall.fov):narrowRoomPose(pose):pose}
+  // THE GRAVE'S PHONE LOOKS LESS FAR DOWN than the generic lift asks: the
+  // sheet takes the lower third, so the slab and the board stand just above
+  // it and the boardwalk runs on under it.
+  if(id==='grave'&&narrow){const pose=collectionView(room!,false);if(pose)return aimedFrom(pose,headingOf(pose),-6,72)}
+  if(room){const pose=collectionView(room,false),hall=HALL_PHONE[id],desk=HALL_DESK[id]
+    if(pose)return narrow?hall?aimedFrom(pose,hall.heading,hall.pitch,hall.fov):narrowRoomPose(pose):desk?aimedFrom(pose,desk.heading,desk.pitch,desk.fov):pose}
   // A future station without a room keeps the held terrace composition.
   return p(-12.4,-21.6,groundHeight(-12.4,-21.6)+1.65,-38,-44,-4.2,narrow?74:58)
 }
