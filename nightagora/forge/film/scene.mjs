@@ -32,8 +32,9 @@ export function cellCoords(n) {
 const sha256 = (text) => createHash('sha256').update(text).digest('hex')
 
 /* ---- a stable digest of any value the scene holds (materials, node graphs) ---- */
+// `_cache`: a node's swizzles, kept on the node itself; a shared node (`normalWorld`) holds whatever an earlier build asked of it
 const VOLATILE = new Set(['uuid', 'id', 'version', 'parent', 'children', '_listeners', 'onBeforeCompile',
-  'needsUpdate', '_needsUpdate', 'updateRanges', 'usage', 'dispatchEvent', 'nodeObjects', '_cacheKey', '_cacheKeyVersion'])
+  'needsUpdate', '_needsUpdate', 'updateRanges', 'usage', 'dispatchEvent', 'nodeObjects', '_cacheKey', '_cacheKeyVersion', '_cache'])
 const MAX_WALK = 40000
 
 /** Deterministic across two loads: sorted keys, the three.js counters left
