@@ -10,17 +10,17 @@
   },
   "lines": {
     "picture/baptism-of-christ/front": {
-      "en": "The story goes that the angel at the left upset his master. The panel is by them both.",
-      "de": "Der Engel links soll den Meister verstimmt haben. Die Tafel stammt von beiden.",
-      "source": "MINING-CATALOG-PAINTINGS, the Baptism of Christ, label fact from the holder's own entry",
-      "certainty": "tradition",
+      "en": "New studies give him more of it, the Uffizi says. Christ, and the landscape behind him.",
+      "de": "Neue Studien geben ihm mehr davon, so die Uffizien. Christus und die Landschaft dahinter.",
+      "source": "MINING-CATALOG-PAINTINGS §1, the Baptism of Christ, the holder's entry on the attribution",
+      "certainty": "documented",
       "detail": {
-        "x": 0.09,
-        "y": 0.47,
-        "w": 0.17,
-        "h": 0.26,
-        "name_en": "The angel at the left",
-        "name_de": "Der Engel links"
+        "x": 0.08,
+        "y": 0.36,
+        "w": 0.56,
+        "h": 0.13,
+        "name_en": "The landscape behind him",
+        "name_de": "Die Landschaft dahinter"
       }
     },
     "picture/annunciation/front": {
@@ -142,8 +142,8 @@
       "certainty": "documented"
     },
     "picture/burlington-house-cartoon/front": {
-      "en": "In 1987 someone fired a shotgun at it. The glass took the blast, and it was restored.",
-      "de": "1987 schoss jemand mit einer Flinte darauf. Das Glas hielt es ab, es ist restauriert.",
+      "en": "A shotgun blast hit it in 1987. The glass took most of it, and the sheet was restored.",
+      "de": "1987 fing das Glas das meiste eines Flintenschusses ab. Das Blatt wurde restauriert.",
       "source": "MINING-CATALOG-PAINTINGS, the Burlington House Cartoon, second label fact",
       "certainty": "documented"
     },
@@ -208,28 +208,20 @@
       "certainty": "documented"
     },
     "picture/last-supper/front": {
-      "en": "A doorway was cut through the bottom of this wall. It took the feet of Christ.",
-      "de": "Unten brach man eine Tür durch diese Wand. Sie nahm die Füße von Christus mit.",
+      "en": "In 1943 bombs brought the hall's ceiling down. This wall stood, behind sandbags.",
+      "de": "1943 stürzte das Gewölbe unter Bomben ein. Diese Wand blieb stehen, hinter Sandsäcken.",
       "source": "MINING-CATALOG-PAINTINGS, the Last Supper's wall, room history",
-      "certainty": "documented",
-      "detail": {
-        "x": 0.36,
-        "y": 0.76,
-        "w": 0.3,
-        "h": 0.24,
-        "name_en": "The cut doorway",
-        "name_de": "Die eingebrochene Tür"
-      }
+      "certainty": "documented"
     },
     "sheet/rcin-919000": {
-      "en": "The foot at the bottom of the sheet is drawn upside down, its leg bones with it.",
-      "de": "Der Fuß unten auf dem Blatt steht auf dem Kopf, die Beinknochen mit ihm.",
+      "en": "The foot at the bottom of the sheet is drawn upside down. So are its leg bones.",
+      "de": "Der Fuß unten auf dem Blatt steht auf dem Kopf, samt den Beinknochen.",
       "source": "Royal Collection catalogue entry, RCIN 919000; program sheet facts 2026-09-15",
       "certainty": "documented"
     },
     "sheet/rcin-919001": {
-      "en": "In the note down the right margin: the more you keep away from doctors, the better.",
-      "de": "In der Notiz am rechten Rand: Je mehr du dich vor Ärzten hütest, desto gesünder.",
+      "en": "Down the right margin he gives advice. The more you keep away from doctors, the better.",
+      "de": "Am rechten Rand gibt er einen Rat. Je mehr du dich vor Ärzten hütest, desto gesünder.",
       "source": "Windsor anatomy facsimile of 1898, fogli A, folio 2 recto, matched to this sheet by its notes; program sheet facts 2026-09-15",
       "certainty": "documented"
     },
@@ -240,8 +232,8 @@
       "certainty": "documented"
     },
     "sheet/rcin-919003": {
-      "en": "Most of these drawings are of a living man, with what dissection had shown him.",
-      "de": "Die meisten Zeichnungen hier sind nach einem Lebenden, mit dem Wissen der Sektion.",
+      "en": "Most of these drawings are of a living person. What he saw inside the dead is in them too.",
+      "de": "Meist zeichnete er hier einen Lebenden. Was er in Toten sah, steckt mit darin.",
       "source": "Royal Collection catalogue entry, RCIN 919003; program sheet facts 2026-09-15",
       "certainty": "documented"
     },
@@ -270,7 +262,7 @@
       "certainty": "documented"
     },
     "sheet/rcin-919008": {
-      "en": "He called the long muscle down the front of the thigh the fish of the thigh.",
+      "en": "He called one thigh muscle the fish of the thigh. It is the long one down the front.",
       "de": "Den langen Muskel vorn am Oberschenkel nannte er den Fisch des Oberschenkels.",
       "source": "Royal Collection catalogue entry, RCIN 919014, on 919008 recto; Windsor anatomy facsimile of 1898, fogli A, folio 9 recto; program sheet facts 2026-09-15",
       "certainty": "documented"
@@ -282,8 +274,8 @@
       "certainty": "documented"
     },
     "sheet/rcin-919010": {
-      "en": "His note here draws the comparison: the hand is to the arm as the foot is to the leg.",
-      "de": "Seine Notiz hier zieht den Vergleich: Die Hand verhält sich zum Arm wie der Fuß zum Bein.",
+      "en": "His note here makes a comparison. The hand is to the arm as the foot is to the leg.",
+      "de": "Ein Vergleich in seiner Notiz. Die Hand verhält sich zum Arm wie der Fuß zum Bein.",
       "source": "Royal Collection catalogue entry, RCIN 919010; program sheet facts 2026-09-15",
       "certainty": "documented"
     },
@@ -318,8 +310,8 @@
       "certainty": "documented"
     },
     "sheet/rcin-919016": {
-      "en": "His note here says he believes he will finish all of this anatomy in the winter of 1510.",
-      "de": "Seine Notiz hier sagt, er glaube, diese ganze Anatomie im Winter 1510 abzuschließen.",
+      "en": "On this sheet he names a year. In 1510, he believes, all this anatomy will be finished.",
+      "de": "Auf diesem Blatt nennt er ein Jahr. 1510, glaubt er, ist diese ganze Anatomie fertig.",
       "source": "Royal Collection catalogue entry, RCIN 919016; program sheet facts 2026-09-15",
       "certainty": "documented"
     },
@@ -330,8 +322,8 @@
       "certainty": "documented"
     },
     "sheet/rcin-919018": {
-      "en": "His note here says he finds the veins have no other task than to give warmth.",
-      "de": "Seine Notiz hier sagt, er finde, dass die Venen keine andere Aufgabe haben, als zu wärmen.",
+      "en": "Here he writes what he finds. The veins, he says, have no other task than to give warmth.",
+      "de": "Hier schreibt er, was er findet. Die Venen hätten keine andere Aufgabe, als zu wärmen.",
       "source": "Windsor anatomy facsimile of 1901, fogli B, folio 1 recto, matched to this sheet by its notes; program sheet facts 2026-09-15",
       "certainty": "documented"
     },
@@ -360,8 +352,8 @@
       "certainty": "documented"
     },
     "sheet/rcin-919058": {
-      "en": "His note here: the vessels press half their thickness into the bone of the skull.",
-      "de": "Seine Notiz hier: Die Gefäße drücken sich zur Hälfte in den Schädelknochen.",
+      "en": "The blood vessels, he writes here, press half their thickness into the skull.",
+      "de": "Seine Notiz hier: Die Blutgefäße drücken sich zur Hälfte in den Schädelknochen.",
       "source": "Royal Collection catalogue entry, RCIN 919058; program sheet facts 2026-09-15",
       "certainty": "documented"
     },
@@ -390,15 +382,15 @@
       "certainty": "documented"
     },
     "sheet/rcin-919082": {
-      "en": "He planned a glass copy of this valve, with water and grass seeds pumped through.",
-      "de": "Er plante einen Nachbau dieser Klappe aus Glas, durchströmt von Wasser mit Grassamen.",
+      "en": "He planned a glass copy of this valve. Water with grass seeds would be pumped through it.",
+      "de": "Er plante einen gläsernen Nachbau dieser Klappe, durchströmt von Wasser mit Grassamen.",
       "source": "Royal Collection catalogue entry, RCIN 919082; program sheet facts 2026-09-15",
       "certainty": "documented"
     },
     "codex/paris-B": {
-      "en": "The book on the table is the one you may leaf. A printed copy of 1883, not his own.",
-      "de": "Das Buch auf dem Tisch darfst du blättern. Ein Druck von 1883, nicht die Handschrift.",
-      "source": "table/data/codices.json, the entry for Paris manuscript B",
+      "en": "You may turn the pages of this book. Some leaves of his notebook are missing from it.",
+      "de": "Hier darfst du blättern. Einige Blätter seines Notizbuchs fehlen darin.",
+      "source": "table/data/codices.json, the entry for Paris manuscript B; table/data/msb-pages.json, edition.missing_B_leaves",
       "certainty": "documented"
     },
     "codex/paris-D": {
@@ -408,7 +400,7 @@
       "certainty": "documented"
     },
     "codex/madrid-I": {
-      "en": "The ball bearing and the flywheel in the machine hall come from two of its pages.",
+      "en": "Two machines in the machine hall come from its pages. The ball bearing and the flywheel.",
       "de": "Das Kugellager und das Schwungrad in der Maschinenhalle stammen von zwei seiner Seiten.",
       "source": "table/data/codices.json, the entry for Codex Madrid I; machines/data/ball-bearing.json and flywheel.json, folios Madrid I 20v and 114r",
       "certainty": "documented"
@@ -450,14 +442,14 @@
       "certainty": "documented"
     },
     "machine/aerial-screw": {
-      "en": "It was meant to screw itself up into the air. No flight of it was ever written down.",
-      "de": "Sie sollte sich in die Luft hinaufschrauben. Von einem Flug ist nichts aufgeschrieben.",
+      "en": "He wrote that air holds a screw as wood does. This linen screw was meant to climb the air.",
+      "de": "Er schrieb, Luft halte eine Schraube wie Holz. Diese Leinenschraube sollte hochsteigen.",
       "source": "machines/data/aerial-screw.json, folio Manuscript B 83v; machines/data/records.json, the purpose and build sections",
       "certainty": "reconstructed"
     },
     "machine/parachute": {
-      "en": "He claimed a person could fall from any height under it. Nobody wrote down a jump.",
-      "de": "Ein Mensch könne damit aus jeder Höhe fallen, schrieb er. Ein Sprung ist nicht belegt.",
+      "en": "A long fall kills. Under this linen tent, he claimed, a man falls from any height unhurt.",
+      "de": "Ein tiefer Sturz tötet. Darunter, schrieb er, falle ein Mensch aus jeder Höhe unversehrt.",
       "source": "machines/data/parachute.json, folio Codex Atlanticus 1058v; machines/data/records.json, the purpose and build sections",
       "certainty": "reconstructed"
     },
@@ -468,20 +460,20 @@
       "certainty": "reconstructed"
     },
     "machine/inclinometer": {
-      "en": "It was meant to tell a pilot whether he was flying level. A weight hangs over a circle.",
-      "de": "Es sollte Piloten zeigen, ob sie waagerecht fliegen. Ein Gewicht hängt über einem Kreis.",
+      "en": "A pilot must know whether he flies level. A weight over a circle was meant to show him.",
+      "de": "Ein Pilot muss wissen, ob er waagerecht fliegt. Ein Gewicht über dem Kreis soll es zeigen.",
       "source": "machines/data/inclinometer.json, folio Codex Atlanticus 1058r; machines/data/records.json, the purpose and mechanism sections",
       "certainty": "reconstructed"
     },
     "machine/multi-barrel-gun": {
-      "en": "Eleven shots at once was the idea. Then a hand turns the next bank of barrels up.",
-      "de": "Elf Schüsse auf einmal, das war die Idee. Dann dreht eine Hand die nächste Reihe hoch.",
+      "en": "One shot, and a barrel is empty. Eleven fire at once, and a hand turns the next row up.",
+      "de": "Ein Schuss leert das Rohr. Elf feuern zugleich, eine Hand dreht die nächste Reihe hoch.",
       "source": "machines/data/multi-barrel-gun.json, folio Codex Atlanticus 157r; machines/data/records.json, the folio, purpose and mechanism sections",
       "certainty": "reconstructed"
     },
     "machine/rolling-mill": {
-      "en": "The rollers were meant to press tin thinner and more even. A crank turns the top one.",
-      "de": "Die Walzen sollten Zinn dünner und gleichmäßiger machen. Eine Kurbel dreht die obere.",
+      "en": "Tin should come out even all along. Rollers press it thin, and a crank turns the top one.",
+      "de": "Zinn soll überall gleich dick sein. Walzen pressen es dünner, eine Kurbel dreht die obere.",
       "source": "machines/data/rolling-mill.json, folio Manuscript I 48v; machines/data/records.json, the purpose and mechanism sections",
       "certainty": "reconstructed"
     },
@@ -492,8 +484,8 @@
       "certainty": "reconstructed"
     },
     "machine/flywheel": {
-      "en": "A heavy wheel keeps an uneven machine steady. His sheet asks which weights run best.",
-      "de": "Ein schweres Rad hält eine Maschine ruhig. Das Blatt fragt nach der besten Anordnung.",
+      "en": "The drive jerks. A heavy wheel keeps it steady, and his sheet asks which weights run best.",
+      "de": "Der Antrieb stockt. Ein schweres Rad hält ihn ruhig, das Blatt sucht die beste Anordnung.",
       "source": "machines/data/flywheel.json, folio Codex Madrid I 114r; machines/data/records.json, the folio and purpose sections",
       "certainty": "reconstructed"
     },
@@ -504,14 +496,14 @@
       "certainty": "reconstructed"
     },
     "machine/lathe": {
-      "en": "The tool was meant to drill a hole. A foot pulls the rope, a bent bow pulls it back.",
-      "de": "Das Werkzeug sollte ein Loch bohren. Ein Fuß zieht das Seil, ein Bogen zieht es zurück.",
+      "en": "To drill a hole took muscle power. A foot pulls the rope, a bent bow pulls it back.",
+      "de": "Ein Loch bohren brauchte Muskelkraft. Ein Fuß zieht das Seil, ein Bogen zieht es zurück.",
       "source": "machines/data/lathe.json, folio Codex Atlanticus 108r; machines/data/records.json, the purpose and mechanism sections",
       "certainty": "reconstructed"
     },
     "machine/miter-lock-gates": {
-      "en": "They let a boat climb from low water to high. The water presses the leaves shut.",
-      "de": "Ein Boot kam damit von niedrigem zu hohem Wasser. Das Wasser drückt die Flügel zu.",
+      "en": "A boat had to go uphill. Between two gates the water lifts it and presses them shut.",
+      "de": "Ein Boot musste bergauf. Das Wasser zwischen zwei Toren hebt es und drückt die Flügel zu.",
       "source": "machines/data/miter-lock-gates.json, folio Codex Atlanticus 656r; machines/data/records.json, the purpose and mechanism sections",
       "certainty": "reconstructed"
     },
