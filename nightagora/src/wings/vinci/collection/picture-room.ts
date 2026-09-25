@@ -128,8 +128,11 @@ function looks() {
     glow: uniform(.045),
     /** the next rooms through the doors as an eye settled to the hang reads
      * them: what of their light is kept, and how near the eye comes before
-     * it has left this room's level, in metres */
-    doorKeep: uniform(new Color(.23, .255, .32)),
+     * it has left this room's level, in metres. The hall's door is the walk's
+     * way on and keeps most of its warm light (at a quarter it read as a
+     * murky slot); the gallery's, a side view, stays low and a little cool */
+    doorKeep: uniform(new Color(.72, .66, .56)),
+    doorKeepGallery: uniform(new Color(.3, .31, .34)),
     doorNear: uniform(1.3),
     doorFar: uniform(4.5),
   }
@@ -633,14 +636,15 @@ export function mountPictureRoom(stack: Stack): PictureRoom {
       const at = v3((door.west + door.east) / 2, REVEAL.back, (ROOM.floor + ROOM.friezeFoot) / 2)
       g.translate(at.x, at.y, at.z)
       const count = g.getAttribute('position').count
-      g.setAttribute('door', new Float32BufferAttribute(Array.from({ length: count }, () => [at.x, at.z]).flat(), 2))
+      g.setAttribute('door', new Float32BufferAttribute(Array.from({ length: count }, () => [at.x, at.z, door.name === 'door-gallery' ? 1 : 0]).flat(), 3))
       quads.push(g.toNonIndexed())
       g.dispose()
     }
     const grade = new MeshBasicNodeMaterial({ transparent: true, depthWrite: false, side: FrontSide, fog: false })
-    const near = length(cameraPosition.xz.sub(attribute('door', 'vec2')))
+    const doorAt = attribute('door', 'vec3')
+    const near = length(cameraPosition.xz.sub(doorAt.xy))
     const keep = smoothstep(L.doorNear, L.doorFar, near).mul(H.engineTerms)
-    grade.colorNode = mix(vec3(1, 1, 1), L.doorKeep, keep)
+    grade.colorNode = mix(vec3(1, 1, 1), mix(L.doorKeep, L.doorKeepGallery, doorAt.z), keep)
     grade.blending = CustomBlending
     grade.blendSrc = DstColorFactor
     grade.blendDst = ZeroFactor
