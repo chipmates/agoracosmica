@@ -132,7 +132,7 @@ export const READING_COVE = {
 export const READING_WASH = {
   at: [R.front - R.setBack - R.frontWall - .07, T.north, R.floor + 2.36] as [number, number, number],
   aim: [FACE.hallPartitionEast + .07, T.north, R.floor + 1.86] as [number, number, number],
-  kelvin: 3000, candela: 9, angle: .42, penumbra: .9, reach: 5,
+  kelvin: 3000, candela: 18, angle: .42, penumbra: .9, reach: 5,
 } as const
 
 /** THE THRESHOLD'S DOWNLIGHT: a warm slot let into the doorway's head, so
