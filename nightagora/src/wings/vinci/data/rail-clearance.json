@@ -42,8 +42,8 @@
   },
   {
    "file": "src/wings/vinci/collection-access.ts",
-   "sha256": "a21748f89bb2d20f7fba53f818a060c6d5ed72c4c528061852ad8cd6b327373f",
-   "bytes": 16083,
+   "sha256": "c70781cd90ba9135a7677e6bc40f3e997714d0ade63b628a8f3f29cc5298e827",
+   "bytes": 17065,
    "unchangedDuringAudit": true
   },
   {
@@ -276,8 +276,8 @@
   },
   {
    "file": "src/wings/vinci/grave/court-light.ts",
-   "sha256": "c48b9b8a8587a7eb92c9e70c63ac4d1d8903a75e4ff7e47ae9b93f44f87c9493",
-   "bytes": 9563,
+   "sha256": "ec45545892c304f1d8ceecd3ee43d914e5e118d9c12c99bf20c9ffd6b71b1f22",
+   "bytes": 9562,
    "unchangedDuringAudit": true
   },
   {
@@ -318,14 +318,14 @@
   },
   {
    "file": "src/wings/vinci/ground.ts",
-   "sha256": "a5753244a12bcc8ff768c6c0d11b2ed97a5afb0c0c6547e56c0a642a5d2692ff",
-   "bytes": 35821,
+   "sha256": "e64aeafc108e4932314a65d8108da36fe5d131e48a67d0c44d554de58bd660ed",
+   "bytes": 36949,
    "unchangedDuringAudit": true
   },
   {
    "file": "src/wings/vinci/house-glazing.ts",
-   "sha256": "072e9e6f9c55831971522527121639191abb7d7834ca17b86faa401d66a6e1d2",
-   "bytes": 23501,
+   "sha256": "ddcf1b7ffaf514548060d90f5ad9af72ebce7f51128659ac62ab83585c6d0406",
+   "bytes": 25266,
    "unchangedDuringAudit": true
   },
   {
@@ -354,8 +354,8 @@
   },
   {
    "file": "src/wings/vinci/house-weather.ts",
-   "sha256": "52f728ab4a35c3fbd4934a36bc7ae63910df5eff4e1fde1eb071db5e715985da",
-   "bytes": 17395,
+   "sha256": "1030b4938e086d6ea1db2eaf0f981e0fcb647e454dfc207624842911c499b4c9",
+   "bytes": 24191,
    "unchangedDuringAudit": true
   },
   {
@@ -660,8 +660,8 @@
   },
   {
    "file": "src/wings/vinci/surface.ts",
-   "sha256": "069c1edb8d96b766e586c6cc26bdb9c7098b3744b0296e37dacc1a9282ec1224",
-   "bytes": 53634,
+   "sha256": "dc74e9dfb9e15f159bafaa3b7d70e1a2b3269bf9c76a5be590a07a58be4af216",
+   "bytes": 54451,
    "unchangedDuringAudit": true
   },
   {
@@ -672,8 +672,8 @@
   },
   {
    "file": "src/wings/vinci/terrain-mesh.ts",
-   "sha256": "ff2de1f66592d568ebe9a2b52a812dbecb05d8532e5de7f89a5c70922f879d81",
-   "bytes": 30251,
+   "sha256": "da2751a83a527d487276008294dc44d8ca6960c12263eb9a360ace5740c033f5",
+   "bytes": 30284,
    "unchangedDuringAudit": true
   },
   {
@@ -708,26 +708,26 @@
   }
  ],
  "geometrySha256": [
-  "cdb2de2b204c066f53f487e655fbcf9c0195e61848b188481572dc8282a0abd3",
-  "bad488b27ebcc2a3ec6d9807b58f4067f66f733bc33667c20b8e1456151ca4a4",
-  "b56d9cda971ac6cee25469bd73bdf40dc879a78d97785a974817a3878811e965"
+  "0c9bb26627b8628cac86e992c18f5120411f5f48466bffe4ae104e5c0db623ef",
+  "990e61e7a6d32b4888f31d3ece6189a37dd612188273c49a547d99ff9f29926e",
+  "57319a80fcf3b1d7b07533e3b6a367eb8188285130587fb65939b274025a80ac"
  ],
  "geometry": [
   {
    "tier": "hero",
-   "sha256": "cdb2de2b204c066f53f487e655fbcf9c0195e61848b188481572dc8282a0abd3",
+   "sha256": "0c9bb26627b8628cac86e992c18f5120411f5f48466bffe4ae104e5c0db623ef",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   },
   {
    "tier": "standard",
-   "sha256": "bad488b27ebcc2a3ec6d9807b58f4067f66f733bc33667c20b8e1456151ca4a4",
+   "sha256": "990e61e7a6d32b4888f31d3ece6189a37dd612188273c49a547d99ff9f29926e",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   },
   {
    "tier": "calm",
-   "sha256": "b56d9cda971ac6cee25469bd73bdf40dc879a78d97785a974817a3878811e965",
+   "sha256": "57319a80fcf3b1d7b07533e3b6a367eb8188285130587fb65939b274025a80ac",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   }
@@ -2833,7 +2833,7 @@
     {
      "name": "vinci/collection-access/concrete",
      "manifestId": "vinci/collection-access",
-     "vertices": 1656,
+     "vertices": 1512,
      "bbox": [
       -8.395071983337402,
       -2.119999885559082,
@@ -2843,14 +2843,14 @@
       29.837671279907227
      ],
      "centroid": [
-      -5.61369359795598,
-      -0.9994202848199917,
-      27.478555288867675
+      -5.6261868670819295,
+      -1.0132010530227076,
+      27.48666845049177
      ],
      "rms": [
-      5.741896730534649,
-      1.1906915122137425,
-      27.501176432624916
+      5.75700412924918,
+      1.2072259756144221,
+      27.509477287816846
      ]
     },
     {
@@ -3431,7 +3431,7 @@
     {
      "name": "wing-vinci/collectionRetaining",
      "manifestId": "vinci/collection",
-     "vertices": 3510,
+     "vertices": 3501,
      "bbox": [
       -65,
       -10.875,
@@ -3441,14 +3441,14 @@
       67
      ],
      "centroid": [
-      -27.919535751831837,
-      -5.367476982610603,
-      34.828196472863524
+      -27.98045655285689,
+      -5.380122125799981,
+      34.84839283197616
      ],
      "rms": [
-      33.324288197165274,
-      6.084894426830502,
-      38.555205524994925
+      33.3663990707768,
+      6.092646281797242,
+      38.580478813314095
      ]
     },
     {
@@ -4518,7 +4518,7 @@
     {
      "name": "vinci/collection-access/concrete",
      "manifestId": "vinci/collection-access",
-     "vertices": 1656,
+     "vertices": 1512,
      "bbox": [
       -8.395071983337402,
       -2.119999885559082,
@@ -4528,14 +4528,14 @@
       29.837671279907227
      ],
      "centroid": [
-      -5.61369359795598,
-      -0.9994202848199917,
-      27.478555288867675
+      -5.6261868670819295,
+      -1.0132010530227076,
+      27.48666845049177
      ],
      "rms": [
-      5.741896730534649,
-      1.1906915122137425,
-      27.501176432624916
+      5.75700412924918,
+      1.2072259756144221,
+      27.509477287816846
      ]
     },
     {
@@ -5116,7 +5116,7 @@
     {
      "name": "wing-vinci/collectionRetaining",
      "manifestId": "vinci/collection",
-     "vertices": 3510,
+     "vertices": 3501,
      "bbox": [
       -65,
       -10.875,
@@ -5126,14 +5126,14 @@
       67
      ],
      "centroid": [
-      -27.919535751831837,
-      -5.367476982610603,
-      34.828196472863524
+      -27.98045655285689,
+      -5.380122125799981,
+      34.84839283197616
      ],
      "rms": [
-      33.324288197165274,
-      6.084894426830502,
-      38.555205524994925
+      33.3663990707768,
+      6.092646281797242,
+      38.580478813314095
      ]
     },
     {
@@ -5927,7 +5927,7 @@
     {
      "name": "vinci/collection-access/concrete",
      "manifestId": "vinci/collection-access",
-     "vertices": 1656,
+     "vertices": 1512,
      "bbox": [
       -8.395071983337402,
       -2.119999885559082,
@@ -5937,14 +5937,14 @@
       29.837671279907227
      ],
      "centroid": [
-      -5.61369359795598,
-      -0.9994202848199917,
-      27.478555288867675
+      -5.6261868670819295,
+      -1.0132010530227076,
+      27.48666845049177
      ],
      "rms": [
-      5.741896730534649,
-      1.1906915122137425,
-      27.501176432624916
+      5.75700412924918,
+      1.2072259756144221,
+      27.509477287816846
      ]
     },
     {
@@ -6525,7 +6525,7 @@
     {
      "name": "wing-vinci/collectionRetaining",
      "manifestId": "vinci/collection",
-     "vertices": 3510,
+     "vertices": 3501,
      "bbox": [
       -65,
       -10.875,
@@ -6535,14 +6535,14 @@
       67
      ],
      "centroid": [
-      -27.919535751831837,
-      -5.367476982610603,
-      34.828196472863524
+      -27.98045655285689,
+      -5.380122125799981,
+      34.84839283197616
      ],
      "rms": [
-      33.324288197165274,
-      6.084894426830502,
-      38.555205524994925
+      33.3663990707768,
+      6.092646281797242,
+      38.580478813314095
      ]
     },
     {
@@ -7164,7 +7164,7 @@
    "fullBall": {
     "distance": 0.5810004272460958,
     "mesh": "vinci/collection-rooms/construction",
-    "triangle": 274520
+    "triangle": 274517
    },
    "clearAtEveryOrientation": true
   },

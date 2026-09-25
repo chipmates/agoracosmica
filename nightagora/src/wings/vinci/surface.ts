@@ -12,7 +12,7 @@ import {denseMineralBody,denseMineralProvenance} from './dense-mineral-body'
 import {slateFiniteFinish,slateFiniteProvenance} from './slate-microstructure'
 import {oakFiniteFinish,oakFiniteProvenance} from './oak-microstructure'
 import { anisotropicFootprint, coursedFace, dressedTuffeau } from './masonry-courses'
-import { weatherAtlas, weatherUV } from './house-weather'
+import { WALL_BOUNCE_SCALE, weatherAtlas, weatherUV } from './house-weather'
 import { DRESSING_H_MIN, DRESSING_H_SPAN, dressingAtlas, dressingSky, dressingUV } from './house-sun'
 import { hourKey } from './site'
 
@@ -628,6 +628,10 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
     // sunlit ground it faces, baked per place from that ground's own sun.
     // Engine-only (`engineBounce`); the film's path tracer bounces for real.
     m.emissiveNode=c.mul(vec3(1,.73,.545)).mul(weather.w.mul(.5*.073*2.3))
+    // THE WALLS' SUN, SENT BACK: what the heads of the sunlit walls across a
+    // court return into its shade, at the key's own irradiance (320 lux) and
+    // the sources' reflectance (in the map), in the sun's colour off brick.
+    m.emissiveNode=(m.emissiveNode as N).add(c.mul(vec3(1.33,.93,.69)).mul(joints.w.mul(3.2/Math.PI/WALL_BOUNCE_SCALE)))
     m.userData['engineBounce']=true
     m.roughnessNode=clamp((m.roughnessNode as N).add(streak.mul(.05)).add(weather.z.mul(lichenMask).mul(.08)).add(splashed.mul(.04)).sub(tide.mul(.05)).sub(worn.mul(.16)),roughRange[0]!-.12,roughRange[1])
     m.normalNode=mix(m.normalNode as N,filteredView,worn.mul(.65)).normalize()
@@ -676,7 +680,13 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
     // (the map is the wall's; a dressing's own face stands clear of it)
     const skyHidden=float(1).sub(texture(dressingSky(),at.xy).r).mul(at.z).mul(float(1).sub(smoothstep(.02,.05,da.z)))
     // the sky the court leaves: a wall's foot in a corner sees a slot of it
-    const courtSky=mix(float(1),joints.z.mul(.4).add(.6),at.z)
+    // (a top looks up the court's slot, not across it: it sees more of the
+    // sky than the wall it stands on, near the square root of the wall's share)
+    const courtUp=smoothstep(.3,.9,normalWorldGeometry.y)
+    // The share is geometric; the sky a deep court leaves is its dim upper
+    // part, so the fill falls faster than the share (a Cycles still of the court)
+    const courtShare=mix(joints.z,joints.z.sqrt(),courtUp)
+    const courtSky=mix(float(1),courtShare.pow(1.5).mul(.8).add(.2),at.z)
     m.aoNode=float(1).sub(joint.mul(.30)).sub(headJoint.mul(.22)).add(arrisBand.mul(.25)).mul(float(1).sub(smoothstep(.80,.99,weather.y).mul(at.z).mul(.28))).mul(float(1).sub(skyHidden)).mul(courtSky)
     m.userData['engineJointShadow']=true;m.userData['engineDressingShadow']=true
   }else if(kind==='slate'){

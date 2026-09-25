@@ -2,7 +2,7 @@
 // samples at. A mesh whose material reads a UV attribute stays in its own
 // space under its node's matrix; a surface the engine projects from world
 // position is baked to world metres so its UVs can be the engine's own.
-import { bake, decomposable } from './gltf.mjs'
+import { bake, decomposable, vertexNormals } from './gltf.mjs'
 import { FLOOR_BAYS, lin, ROOM_ROLES } from './materials.mjs'
 
 const fract = (v) => v - Math.floor(v)
@@ -152,6 +152,7 @@ export function assemble(gltf, scan, geoms, recipes, materialDef) {
   const placed = []
   for (const m of scan.meshes) {
     const g = geoms[m.geometry]
+    if (!g.normal) g.normal = vertexNormals(g.position, g.index)
     const meta = scan.geometries[m.geometry]
     const groups = meta.groups.length ? meta.groups : [[0, g.index ? g.index.length : g.position.length / 3, 0]]
     for (const [start, count, mi] of groups) {

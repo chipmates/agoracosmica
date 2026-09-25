@@ -14,15 +14,20 @@ import {
 import * as TSL from 'three/tsl'
 import { maxFromQuery } from '../../stack/tier'
 import { hourKey } from './site'
+import { wallRise } from './house-weather'
 
 // TSL's composable overloads are typed once at this boundary.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type N = any
-const { attribute, clamp, dFdx, dFdy, float, floor, fract, max, mix, mx_fractal_noise_float, mx_noise_float, normalMap, normalView, output, positionViewDirection,
+const { attribute, clamp, dFdx, dFdy, float, floor, fract, max, mix, mx_fractal_noise_float, mx_noise_float, normalMap, normalView, normalWorldGeometry, output, positionViewDirection,
   reflectVector, smoothstep, uv, vec2, vec3, vec4 } = TSL as unknown as Record<string, N>
 /** The hour's sun, for the side of the sky it warms. */
 const SUN_AZ = hourKey.sun_azimuth_deg.value * Math.PI / 180
 const SUN_EAST = Math.sin(SUN_AZ), SUN_NORTH = Math.cos(SUN_AZ)
+/** the half-angle the light's wall rise is baked across, and what a shaded
+ * court wall returns in a pane (the court's brick and tuffeau in its shade) */
+const WALL_RISE_SPREAD = 50 * Math.PI / 180
+const COURT_WALL_SEEN = vec3(.062, .05, .042)
 
 type V2 = [number, number]
 type V3 = [number, number, number]
@@ -151,10 +156,12 @@ function lattice(light: GlazedLight): { pieces: V2[][]; lines: [V2, V2][] } {
  * full metre everywhere, so no lead is drawn along it. */
 const NO_RIM: V3 = [1, 1, 1]
 class Sink {
-  positions: number[] = []; normals: number[] = []; uvs: number[] = []; extra: number[] = []; rims: number[] = []
+  positions: number[] = []; normals: number[] = []; uvs: number[] = []; extra: number[] = []; rims: number[] = []; walls: number[] = []
+  /** the light's wall rise to its left, straight out and to its right */
+  wallRise: V3 = [0, 0, 0]
   vertex(p: V3, n: V3, t: V2, e: [number, number], rims: V3 = NO_RIM, borders = 0): void {
     this.positions.push(p[0], p[2], -p[1]); this.normals.push(n[0], n[2], -n[1]); this.uvs.push(t[0], t[1]); this.extra.push(e[0], e[1], borders, 0)
-    this.rims.push(rims[0], rims[1], rims[2])
+    this.rims.push(rims[0], rims[1], rims[2]); this.walls.push(...this.wallRise)
   }
   /** A flat triangle wound to face along `n`, whatever order it came in. */
   tri(a: V3, b: V3, c: V3, n: V3, e: [number, number]): void {
@@ -170,6 +177,7 @@ class Sink {
     g.setAttribute('uv', new Float32BufferAttribute(this.uvs, 2))
     g.setAttribute('glazing', new Float32BufferAttribute(this.extra, 4))
     g.setAttribute('rims', new Float32BufferAttribute(this.rims, 3))
+    g.setAttribute('walls', new Float32BufferAttribute(this.walls, 3))
     g.computeBoundingSphere()
     return g
   }
@@ -223,7 +231,17 @@ function glassMaterial(cames: boolean): MeshPhysicalNodeMaterial {
   const cirrus = smoothstep(.10, .55, veil).mul(smoothstep(.03, .2, up)).mul(float(1).sub(smoothstep(.6, .95, up)))
   const sky = mix(skyUp, vec3(.52, .52, .50), cirrus.mul(.5))
   const ground = mix(vec3(.11, .10, .085), horizon.mul(.55), smoothstep(-.12, 0, up))
-  const seen = mix(ground, sky, smoothstep(-.006, .006, up))
+  const open = mix(ground, sky, smoothstep(-.006, .006, up))
+  // A pane in a court mirrors the walls across it, in their shade, wherever
+  // its reflection runs under their heads (`wallRise`, baked per light at
+  // 50 degrees either side of straight out).
+  const nw = vec2(normalWorldGeometry.x, normalWorldGeometry.z).normalize()
+  const flat = vec2(R.x, R.z), run = flat.length().max(1e-4)
+  const side = clamp(TSL.atan(flat.dot(vec2(nw.y, nw.x.negate())), flat.dot(nw)).div(WALL_RISE_SPREAD), -1, 1)
+  const walls = attribute('walls', 'vec3')
+  const rise = mix(mix(walls.y, walls.x, side.negate()), mix(walls.y, walls.z, side), side.greaterThan(0).select(float(1), float(0)))
+  const mirrored = float(1).sub(smoothstep(rise.sub(.04), rise.add(.04), R.y.div(run))).mul(smoothstep(.01, .05, rise))
+  const seen = mix(open, COURT_WALL_SEEN, mirrored)
   // each melt its own faint cast: greenish, straw or grey
   const melt = fract(seed.mul(7.31))
   const tint = mix(mix(vec3(.90, 1, .90), vec3(1, .97, .84), smoothstep(.3, .7, melt)), vec3(.95, .97, 1), smoothstep(.75, .95, melt))
@@ -276,6 +294,12 @@ export function createHouseGlazing(lights: readonly GlazedLight[], detail: 1 | 2
     const { pieces, lines } = lattice(light)
     const outline = ccw(light.outline)
     const v0 = Math.min(...light.outline.map(p => p[1]))
+    const us = light.outline.map(p => p[0]), vs = light.outline.map(p => p[1])
+    const centre = at((Math.min(...us) + Math.max(...us)) / 2, (v0 + Math.max(...vs)) / 2, light.out)
+    glass.wallRise = [-1, 0, 1].map(k => {
+      const a = k * WALL_RISE_SPREAD
+      return wallRise(centre[0], centre[1], centre[2], outward[0] * Math.cos(a) + along[0] * Math.sin(a), outward[1] * Math.cos(a) + along[1] * Math.sin(a))
+    }) as V3
     for (const piece of pieces) {
       quarries++
       const c: V2 = [piece.reduce((s, p) => s + p[0], 0) / piece.length, piece.reduce((s, p) => s + p[1], 0) / piece.length]

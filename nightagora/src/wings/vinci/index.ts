@@ -1,6 +1,6 @@
 import { createStaticShadowCache } from './static-shadow-cache'
 import { warmWalk, WARM_EXTRA_FRAMES, type WarmWalk } from '../../stack/warm-up'
-import { applyDisplayedHorizonHaze, displayedHorizonHazeProvenance } from './display-sky-haze'
+import { applyDisplayedSkyAir, createAerialFog, applyDisplayedHorizonHaze, displayedHorizonHazeProvenance } from './display-sky-haze'
 import { mineralSurfaceProvenance, closeSurfaceProvenance } from './surface'
 import { entryMineralSurfaceProvenance } from './entry-mineral-surface'
 import { foundationPlinthProvenance } from './foundation-plinth'
@@ -57,6 +57,7 @@ import { collectRailSolids, createRailGeometryAuthority } from './rail-proof'
 import { bindRailPointer, createWheelStepper } from './input'
 import { dossier, world, type Quantity } from './site'
 import { gradeAt as groundHeight, galleryBankCapProvenance } from './terrain-mesh'
+import { bakeClearSkyProbe } from './sky-probe'
 import { GROUND_DRESSING_STEPS, planGroundDressing } from './ground-dressing'
 import { createWater, type WaterGroup } from './water'
 import { createMeasurement, type VinciMeasurement } from './measurement'
@@ -317,6 +318,7 @@ export function createWing():VinciWingModule {
     }
     if(dip)cutTimers.push(setTimeout(land,dip)); else land()
   }
+  let clearSky:import('three/webgpu').DataTexture|undefined
   let header:HTMLElement,dock:HTMLDialogElement,drawer:HTMLElement,record:HTMLElement,source:HTMLButtonElement,sky:SkyMesh
   let sources:ReturnType<typeof createVinciSourcesWindow>
   let welcome:ReturnType<typeof createVinciWelcome>|undefined
@@ -581,9 +583,10 @@ export function createWing():VinciWingModule {
     const h=hosts!
     const {scene,camera,stack,clock}=h.world
     camera.near=.25;camera.updateProjectionMatrix()
-    scene.clear();scene.background=new Color('#b3b7ac');scene.fog=new FogExp2('#c0bba9',.0075)
+    scene.clear();scene.background=new Color('#b3b7ac');scene.fog=new FogExp2('#c0bba9',.0075);scene.fogNode=null
     stack.setScene(scene,camera,{...PRINT})
-    key=stack.light({...KEY_RIG.key,reach:100,cascades:[SHADOW.nearHalfM,90]})
+    clearSky?.dispose();clearSky=bakeClearSkyProbe({zenith:KEY_RIG.key.sky.zenith,horizon:KEY_RIG.key.sky.horizon,ground:KEY_RIG.key.sky.ground,sun:{azimuth:KEY_RIG.key.azimuth,elevation:KEY_RIG.key.elevation,colour:'#ffe2c4'}}).texture
+    key=stack.light({...KEY_RIG.key,reach:100,cascades:[SHADOW.nearHalfM,90],probe:clearSky})
     key.fill.color.set(KEY_RIG.fill.color);key.fill.groundColor.set(KEY_RIG.fill.groundColor);key.fill.intensity=KEY_RIG.fill.intensity;scene.environmentIntensity=KEY_RIG.environmentIntensity
     // The procedural probe paints azimuth from north; r185 samples longitude
     // from +X. Its inverse environment matrix needs this quarter-turn so the
@@ -618,7 +621,9 @@ export function createWing():VinciWingModule {
     const litCloud=mix(vec3(.40,.44,.51),vec3(.71,.68,.62),smoothstep(-.25,.85,toSun))
     const veiled=mix(mix(vec3(skyLuma),skyRGB,.48),litCloud,cirrus.mul(.58))
     sky.material.colorNode=vec4(veiled.div(float(1).add(skyLuma.div(.58))),1)
-    applyDisplayedHorizonHaze(sky.material,scene.fog as FogExp2)
+    applyDisplayedSkyAir(sky.material,scene.fog as FogExp2,key.direction)
+    applyDisplayedHorizonHaze(sky.material,scene.fog as FogExp2,key.direction)
+    scene.fogNode=createAerialFog(scene.fog as FogExp2,key.direction)
     sky.scale.setScalar(1800);sky.sunPosition.value.copy(key.direction).multiplyScalar(450000);sky.turbidity.value=4;sky.rayleigh.value=1.4;sky.cloudScale.value=.0006;sky.cloudCoverage.value=.28;sky.cloudDensity.value=.42;sky.cloudElevation.value=.35;sky.cloudSpeed.value=0;scene.add(sky)
     yield
     const entry=createEntryPassage(stack.tierName())
@@ -2753,7 +2758,7 @@ export function createWing():VinciWingModule {
       dots?.setFoot(Math.max(0,deskStageHeight()-markFloor()+12,markSafeFoot()))
       dots?.setLimit(closeLook?.id?0:onWallStop()?3:DOTS_PER_TIER[hosts.world.stack.tierName()]??6)
       dots?.update(panels)},
-    stop(){studySheet?.dispose();studySheet=undefined;releaseSheetMemory?.();releaseSheetMemory=undefined;desk?.dispose();desk=undefined;visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;life?.dispose();life=undefined;lifeControl?.remove();lifeControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;house=undefined;houseUp=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;hallSun=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
+    stop(){studySheet?.dispose();studySheet=undefined;releaseSheetMemory?.();releaseSheetMemory=undefined;desk?.dispose();desk=undefined;visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;life?.dispose();life=undefined;lifeControl?.remove();lifeControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;house=undefined;houseUp=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;hallSun=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;clearSky?.dispose();clearSky=undefined;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
   }
   return wingModule
 }

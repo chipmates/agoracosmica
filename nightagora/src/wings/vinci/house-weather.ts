@@ -75,6 +75,20 @@ function open(e: number, n: number, z: number, de: number, dn: number, rise: num
   }
   return true
 }
+/** THE WALLS A WINDOW MIRRORS: the steepest rise, per metre run, of the
+ * house's walls and roofs along a compass direction from a point; a pane in
+ * a court sees them where its reflection runs under that rise, not the sky. */
+export function wallRise(e: number, n: number, z: number, de: number, dn: number): number {
+  let rise = 0
+  for (const w of blockers) {
+    const ex = w.b[0] - w.a[0], ey = w.b[1] - w.a[1]
+    const det = de * ey - dn * ex
+    if (Math.abs(det) < 1e-9) continue
+    const t = ((w.a[0] - e) * ey - (w.a[1] - n) * ex) / det, s = ((w.a[0] - e) * dn - (w.a[1] - n) * de) / det
+    if (t > .3 && s >= 0 && s <= 1) rise = Math.max(rise, (w.head - z) / t)
+  }
+  return rise
+}
 /** THE SKY A COURT LEAVES A WALL: the share of the upper sky a point sees
  * past the house's other walls, cosine-weighted over its outward half. The
  * foot of a wall in a corner sees a slot of it; the head of a street front
@@ -104,6 +118,110 @@ function groundSeen(e: number, n: number, z: number, out: V2, along: V2): number
     if (sunlit(ge, gn, gz + .05)) f += cosWall * cosGround * area / (Math.PI * r2)
   }
   return Math.min(1, f)
+}
+
+/** THE SUNLIT WALLS A PLACE SEES. In a court the ground lies in shade and
+ * the warm light a shaded wall takes comes off the heads of the walls the
+ * sun still reaches. A fan of rays over the place's outward half meets the
+ * nearest wall of the house; where that wall faces the sun and the sun
+ * reaches the point met, the ray carries the wall's irradiance (the cosine
+ * of the sun on it) times its reflectance, cosine-weighted like a view
+ * factor. Engine-only, as the ground's bounce. */
+const SUN_H = Math.cos(SUN_EL)
+const WALL_DIRS = [-40, -20, 0, 20, 40, 60].flatMap(el => [-75, -50, -25, 0, 25, 50, 75].map(az => {
+  const e = el * Math.PI / 180, a = az * Math.PI / 180
+  return { az: a, rise: Math.tan(e), w: Math.cos(e) ** 2 * Math.cos(a) }
+}))
+const WALL_WEIGHT = WALL_DIRS.reduce((s, d) => s + d.w, 0)
+/** a brick front with its stone dressings, and a dressed tuffeau front */
+const REFLECTANCE = { brick: .24, tuffeau: .5 }
+const faces = spec.facades.filter(f => f.render).map(f => {
+  const wall = spec.walls.find(w => w.facade_id === f.id && w.render)
+  const base = wall?.base_m ?? 0, top = wall ? wall.base_m + wall.height_m : 7.7
+  const gable = Boolean((f as Facade & { gable_segment?: string }).gable_segment)
+  const dx = (f.to[0] - f.from[0]) / f.length_m, dy = (f.to[1] - f.from[1]) / f.length_m
+  const out: V2 = [dy, -dx]
+  return { a: f.from, b: f.to, base: base - .3, top: gable ? 13.5 : top, head: gable ? 13.5 : top + (top > 6 ? 2.9 : 1.1),
+    sun: Math.max(0, (SUN_E * out[0] + SUN_N * out[1]) * SUN_H), out, rho: f.pattern.field === 'tuffeau' ? REFLECTANCE.tuffeau : REFLECTANCE.brick }
+})
+function wallsSeen(e: number, n: number, z: number, out: V2, along: V2): number {
+  let lit = 0
+  for (const d of WALL_DIRS) {
+    const de = out[0] * Math.cos(d.az) + along[0] * Math.sin(d.az), dn = out[1] * Math.cos(d.az) + along[1] * Math.sin(d.az)
+    let best = Infinity, hit: (typeof faces)[number] | null = null
+    for (const w of faces) {
+      const ex = w.b[0] - w.a[0], ey = w.b[1] - w.a[1]
+      const det = de * ey - dn * ex
+      if (Math.abs(det) < 1e-9) continue
+      const t = ((w.a[0] - e) * ey - (w.a[1] - n) * ex) / det, s = ((w.a[0] - e) * dn - (w.a[1] - n) * de) / det
+      if (t > .05 && t < best && s >= 0 && s <= 1 && z + t * d.rise < w.head) { best = t; hit = w }
+    }
+    if (!hit || hit.sun <= 0) continue
+    const zh = z + best * d.rise, eh = e + de * best, nh = n + dn * best
+    // a roof, the ground in front, or the wall's back
+    if (zh > hit.top || zh < hit.base || zh < groundHeight(eh, nh) || de * hit.out[0] + dn * hit.out[1] >= 0) continue
+    if (!sunlit(eh + hit.out[0] * .05, nh + hit.out[1] * .05, zh)) continue
+    lit += d.w * hit.sun * hit.rho
+  }
+  return lit / WALL_WEIGHT
+}
+/** the wall bounce is stored at this multiple of its value */
+export const WALL_BOUNCE_SCALE = 4
+
+/** THE COURT'S FLOOR, LIT FROM ABOVE. The ground of the inner court sees
+ * the sky only through the gap its walls leave, and takes the warm light the
+ * heads of the sunlit walls send down into it; an open field's fill on every
+ * flag was what made the court read flat. A grid over the court: R the
+ * share of the upper sky a place sees (cosine-weighted, past the house's
+ * walls), G the sunlit walls it sees (as `wallsSeen`, stored at
+ * WALL_BOUNCE_SCALE). Engine-only, as the walls' bounce. */
+export const COURT_FLOOR_GRID = { west: -9.5, east: 17.5, south: -35, north: -13, cell: .5 } as const
+const FLOOR_SKY = Array.from({ length: 48 }, (_, i) => {
+  const u = (i + .5) / 48, phi = i * 2.399963, r = Math.sqrt(u)
+  return { de: r * Math.cos(phi), dn: r * Math.sin(phi), rise: Math.sqrt(1 - u) / Math.max(1e-3, r) }
+})
+const FLOOR_WALL = [10, 25, 42].flatMap(el => Array.from({ length: 16 }, (_, k) => {
+  const e = el * Math.PI / 180, a = k * Math.PI / 8
+  return { de: Math.cos(a), dn: Math.sin(a), rise: Math.tan(e), w: Math.cos(e) * Math.sin(e) }
+}))
+// the bands reach 52 degrees, which carry 0.62 of a floor's projected hemisphere
+const FLOOR_WALL_WEIGHT = FLOOR_WALL.reduce((s, d) => s + d.w, 0) * Math.PI / 1.95
+let courtFloor: DataTexture | null = null
+export function courtFloorLight(): DataTexture {
+  if (courtFloor) return courtFloor
+  const G = COURT_FLOOR_GRID
+  const W = Math.round((G.east - G.west) / G.cell), H = Math.round((G.north - G.south) / G.cell)
+  const data = new Uint8Array(W * H * 4)
+  for (let j = 0; j < H; j++) for (let i = 0; i < W; i++) {
+    const e = G.west + (i + .5) * G.cell, n = G.south + (j + .5) * G.cell, z = groundHeight(e, n) + .05
+    let sky = 0
+    for (const d of FLOOR_SKY) if (open(e, n, z, d.de, d.dn, d.rise)) sky++
+    let lit = 0
+    for (const d of FLOOR_WALL) {
+      let best = Infinity, hit: (typeof faces)[number] | null = null
+      for (const w of faces) {
+        const ex = w.b[0] - w.a[0], ey = w.b[1] - w.a[1]
+        const det = d.de * ey - d.dn * ex
+        if (Math.abs(det) < 1e-9) continue
+        const t = ((w.a[0] - e) * ey - (w.a[1] - n) * ex) / det, s = ((w.a[0] - e) * d.dn - (w.a[1] - n) * d.de) / det
+        if (t > .05 && t < best && s >= 0 && s <= 1 && z + t * d.rise < w.head) { best = t; hit = w }
+      }
+      if (!hit || hit.sun <= 0) continue
+      const zh = z + best * d.rise, eh = e + d.de * best, nh = n + d.dn * best
+      if (zh > hit.top || d.de * hit.out[0] + d.dn * hit.out[1] >= 0) continue
+      if (!sunlit(eh + hit.out[0] * .05, nh + hit.out[1] * .05, zh)) continue
+      lit += d.w * hit.sun * hit.rho
+    }
+    const k = (j * W + i) * 4
+    data[k] = Math.round(sky / FLOOR_SKY.length * 255)
+    data[k + 1] = Math.round(Math.min(1, lit / FLOOR_WALL_WEIGHT * WALL_BOUNCE_SCALE) * 255)
+    data[k + 3] = 255
+  }
+  const t = new DataTexture(data, W, H, RGBAFormat, UnsignedByteType)
+  t.magFilter = LinearFilter; t.minFilter = LinearFilter
+  t.needsUpdate = true
+  t.name = 'vinci/court-floor-light'
+  return (courtFloor = t)
 }
 
 /** One rect per rendered facade, shelf-packed, and each texel baked. */
@@ -146,12 +264,13 @@ export function weatherAtlas(): Atlas {
     // warm light a wall in shade takes from the court in front of it.
     const out: V2 = [dy, -dx], alongDir: V2 = [dx, dy], GRID = .5
     const gu = Math.ceil(f.length_m / GRID) + 1, gz = Math.ceil(r.height / WEATHER_TEXELS_PER_M / GRID) + 1
-    const bounceGrid = new Float32Array(gu * gz), skyGrid = new Float32Array(gu * gz)
+    const bounceGrid = new Float32Array(gu * gz), skyGrid = new Float32Array(gu * gz), wallGrid = new Float32Array(gu * gz)
     for (let a = 0; a < gu; a++) for (let b = 0; b < gz; b++) {
       const u = Math.min(f.length_m, a * GRID), z = r.bottom + b * GRID
       const pe = f.from[0] + dx * u + out[0] * .03, pn = f.from[1] + dy * u + out[1] * .03
       bounceGrid[b * gu + a] = groundSeen(pe, pn, z, out, alongDir)
       skyGrid[b * gu + a] = skySeen(pe, pn, z, out, alongDir)
+      wallGrid[b * gu + a] = wallsSeen(pe, pn, z, out, alongDir)
     }
     const gridAt = (grid: Float32Array, u: number, z: number): number => {
       const x = Math.min(gu - 1.001, Math.max(0, u / GRID)), y = Math.min(gz - 1.001, Math.max(0, (z - r.bottom) / GRID))
@@ -232,6 +351,7 @@ export function weatherAtlas(): Atlas {
       data2[k] = Math.round(Math.min(1, wet) * 255)
       data2[k + 1] = Math.round(Math.min(1, soiling) * 255)
       data2[k + 2] = Math.round(Math.min(1, gridAt(skyGrid, u, z)) * 255)
+      data2[k + 3] = Math.round(Math.min(1, gridAt(wallGrid, u, z) * WALL_BOUNCE_SCALE) * 255)
       texels++
     }
   }

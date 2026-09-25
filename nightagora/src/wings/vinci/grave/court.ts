@@ -12,7 +12,7 @@
  *
  * On the floor: an oak walkway on two bearers from the court's open side to
  * the foot of the slab, an oak bench on bronze feet facing the slab, and three
- * field maples in steel-edged beds of earth. The ground's flags, drifts and
+ * field maples, each over a cast-iron grate in a steel-edged bed. The ground's flags, drifts and
  * moss are the ground's own and stay under and around all of it.
  *
  * Nothing here enters the certified walk: the walkway and the bench stand
@@ -237,18 +237,50 @@ function metalSurface(hex: string, roughness: number, metalness: number, name: s
   return m
 }
 
-/** The beds' earth: dark and crumbed, finer where it was raked. */
-function earthSurface(): MeshStandardNodeMaterial {
-  const m = new MeshStandardNodeMaterial({ roughness: .96, metalness: 0 })
+/** THE TREES' OWN GROUND: over each bed a cast-iron grate, as a court lays
+ * one round a tree in a walked floor. Three rings of radial slots round an
+ * open ring of earth at the trunk, a border worn a little bright to the steel edge; through
+ * the slots the pit's dark earth, the slots' edges a little worn bright, rust
+ * blooming where water stands. Drawn on the bed's top: the bars and slots are
+ * the material's, the pit under them its darkness. */
+function grateSurface(): MeshStandardNodeMaterial {
+  const m = new MeshStandardNodeMaterial({ roughness: .8, metalness: .35 })
   const P = positionWorld, n = normalWorldGeometry
-  const d = surfaceDetail({ scales: [.3, .04, .006], figure: [.12, .1, .09], relief: .004 })
+  const d = surfaceDetail({ scales: [.3, .04, .006], figure: [.10, .08, .07], relief: .0015 })
+  // the nearest tree's centre, in the wing's plan
+  let de: N = float(1e3), dn: N = float(0), best: N = float(1e6)
+  for (const t of COURT_TREES) {
+    const oe = P.x.sub(t.east), on = P.z.negate().sub(t.north), r2 = oe.mul(oe).add(on.mul(on))
+    const closer = r2.lessThan(best)
+    de = closer.select(oe, de); dn = closer.select(on, dn); best = closer.select(r2, best)
+  }
+  const r = best.sqrt(), a = TSL.atan(dn, de), square = abs(de).max(abs(dn))
+  const pixel = r.dFdx().abs().add(r.dFdy().abs()).max(.0005)
+  const band = (x: N, lo: number, hi: number): N => smoothstep(lo - pixel, lo + pixel, x).mul(smoothstep(hi + pixel, hi - pixel, x))
+  // rings of slots: 0.36 to 0.72 m out, each ring its own slot count
+  const ring = r.sub(.36).div(.12), k = floor(ring), inRing = fract(ring)
+  const count = k.mul(8).add(28)
+  const across = fract(a.div(Math.PI * 2).mul(count)).sub(.5).abs().mul(r.mul(Math.PI * 2).div(count))
+  const slot = band(ring, 0, 3).mul(band(inRing, .16, .84)).mul(smoothstep(.013 + .002, .013 - .002, across.sub(pixel.mul(.5))))
+  const earth = smoothstep(.34 + .01, .34 - .01, r)
+  const rim = smoothstep(BED.half - .075, BED.half - .06, square)
+  // the pit under the grate, and the earth ring at the trunk
   const crumbs = mx_noise_float(P.mul(55)).mul(.5).add(.5).mul(resolved(.018, d.pixel))
-  const c = vec3(...linear('#5c4c3c')).mul(d.tone).mul(float(.88).add(crumbs.mul(.24)))
+  const soil = vec3(...linear('#4a3d31')).mul(float(.85).add(crumbs.mul(.3)))
+  const rust = smoothstep(.45, .8, mx_noise_float(P.mul(4.3).add(vec3(2.1, 0, 7.7))).mul(.5).add(.5))
+  const iron = mix(vec3(...linear('#57514a')), vec3(...linear('#6f4d34')), rust.mul(.5)).mul(d.tone)
+  const worn = smoothstep(.02, .012, across).mul(band(ring, 0, 3)).mul(float(1).sub(slot)).mul(.25)
+  const top = smoothstep(.6, .9, n.y)
+  const open = slot.max(earth).mul(top)
+  const c = mix(iron.mul(float(1).add(worn)).mul(float(1).add(rim.mul(.14))), mix(soil.mul(.2), soil, earth), open)
   m.colorNode = c
   applyCourtLight(m, c)
-  m.roughnessNode = float(.96)
-  m.normalNode = reliefNormal(n.transformDirection(cameraViewMatrix), d.heightM.add(crumbs.mul(.002)), .3)
-  m.name = 'vinci/grave-court/earth'
+  // the pit sees a slot of sky
+  m.aoNode = (m.aoNode as N).mul(float(1).sub(slot.mul(top).mul(.7)))
+  m.roughnessNode = specularAA(mix(float(.72).add(rust.mul(.18)).sub(worn.mul(.3)), float(.97), open).add(d.rough), d.lost)
+  m.metalnessNode = mix(float(.35), float(0), open.max(rust.mul(.6)))
+  m.normalNode = reliefNormal(n.transformDirection(cameraViewMatrix), d.heightM.sub(slot.mul(.004)), .3)
+  m.name = 'vinci/grave-court/grate'
   m.userData = { ...graveCourtProvenance }
   return m
 }
@@ -266,7 +298,7 @@ export function graveCourtSurfaces(): GraveCourtSurfaces {
     walkway: oak, bench: oak,
     bronze: metalSurface('#6b5537', .42, .8, 'bronze'),
     steel: metalSurface('#2d2c2a', .5, .65, 'steel'),
-    earth: earthSurface(),
+    earth: grateSurface(),
   }
 }
 

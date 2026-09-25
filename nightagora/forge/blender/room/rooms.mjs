@@ -50,4 +50,27 @@ export const ROOMS = {
     // canvas each is drawn at and the rail viewport it takes its pose from
     framings: { wide: { viewport: 'desktop', stage: [2400, 1350] }, upright: { viewport: 'phone', stage: [1170, 2532] } },
   },
+  // AN EXTERIOR: the inner court under the hour's sun and sky, for a light
+  // reference; it has no air and no probe of its own.
+  courtyard: {
+    wing: 'vinci',
+    title: 'the inner court',
+    marker: 'vinci/registered-shell',
+    stops: ['courtyard'],
+    // wide enough to hold the trees south-west of the court, which dapple its east range
+    box: { min: [-22, -1.5, 2], max: [26, 16, 50] },
+    machines: [],
+    exclude: {
+      'vinci/sky': 'the sky dome: photographed into the world instead (see sky.hdr)',
+      'vinci/shell-shadow': 'the shell\'s shadow double: Cycles casts from the shell itself',
+      'vinci/shadow-body': 'the wing\'s sun-only caster: Cycles casts from the real surfaces',
+    },
+    skyEye: [10, 1.7, 21],
+    air: null,
+    probe: null,
+    print: { exposure: { courtyard: 1.0 }, shoulder: { courtyard: 1 },
+      lift: [0.012, 0.014, 0.018], gamma: [1, 1, 1], gain: [1, 1, 1], warm: [1, 1, 1], cool: [1, 1, 1],
+      split: 0.055, saturation: 0.9, vignette: 0.15, grain: 'held (0), as the stills are shot' },
+    framings: { wide: { viewport: 'desktop', stage: [2400, 1350] }, upright: { viewport: 'phone', stage: [1170, 2532] } },
+  },
 }

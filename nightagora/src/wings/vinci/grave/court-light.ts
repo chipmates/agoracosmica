@@ -68,7 +68,7 @@ function crowns(e: number, n: number, h: number, de: number, dn: number, dh: num
     const b = oe * de + on * dn + oh * dh * 1.4, c = oe * oe + on * on + oh * oh - r * r
     const k = de * de + dn * dn + dh * dh * 1.96
     const disc = b * b - k * c
-    if (disc > 0 && (-b + Math.sqrt(disc)) > 0) through *= .45
+    if (disc > 0 && (-b + Math.sqrt(disc)) > 0) through *= .3
   }
   return through
 }
@@ -179,7 +179,7 @@ export function applyCourtLight(m: MeshStandardNodeMaterial, albedo: N, opts: { 
   const { sky, bounce, inside } = courtTerms(positionWorld)
   const up = opts.floorOnly ? smoothstep(.6, .9, TSL.normalWorldGeometry.y) : float(1)
   const weight = inside.mul(up)
-  const occlusion = mix(float(1), clamp(sky.div(OPEN_SKY), .5, 1.12), weight)
+  const occlusion = mix(float(1), clamp(sky.div(OPEN_SKY), .3, 1.15), weight)
   m.aoNode = m.aoNode ? (m.aoNode as N).mul(occlusion) : occlusion
   const warm = albedo.mul(vec3(...BOUNCE.colour)).mul(bounce.mul(BOUNCE.gain)).mul(weight)
   m.emissiveNode = m.emissiveNode ? (m.emissiveNode as N).add(warm) : warm

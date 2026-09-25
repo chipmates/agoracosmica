@@ -66,7 +66,10 @@ export class Gltf {
   /** primitives: [{ position, normal, uv?, colour?, index?, material }] as typed arrays */
   mesh(name, primitives) {
     const prims = primitives.map((p) => {
-      const attributes = { POSITION: this.accessor(p.position, 'VEC3', true), NORMAL: this.accessor(p.normal, 'VEC3') }
+      // a body that shades from its own derivatives carries no normals: take
+      // them from its triangles, area-weighted at shared vertices
+      const normal = p.normal ?? vertexNormals(p.position, p.index)
+      const attributes = { POSITION: this.accessor(p.position, 'VEC3', true), NORMAL: this.accessor(normal, 'VEC3') }
       if (p.uv) attributes.TEXCOORD_0 = this.accessor(p.uv, 'VEC2')
       if (p.colour) attributes.COLOR_0 = this.accessor(p.colour, 'VEC3')
       const out = { attributes, material: p.material, mode: 4 }
@@ -133,4 +136,21 @@ export function bake(position, normal, m) {
     }
   }
   return { position: P, normal: N }
+}
+
+export function vertexNormals(position, index) {
+  const n = new Float32Array(position.length)
+  const count = index ? index.length : position.length / 3
+  for (let t = 0; t + 2 < count; t += 3) {
+    const [a, b, c] = index ? [index[t], index[t + 1], index[t + 2]] : [t, t + 1, t + 2]
+    const ux = position[b * 3] - position[a * 3], uy = position[b * 3 + 1] - position[a * 3 + 1], uz = position[b * 3 + 2] - position[a * 3 + 2]
+    const vx = position[c * 3] - position[a * 3], vy = position[c * 3 + 1] - position[a * 3 + 1], vz = position[c * 3 + 2] - position[a * 3 + 2]
+    const nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx
+    for (const v of [a, b, c]) { n[v * 3] += nx; n[v * 3 + 1] += ny; n[v * 3 + 2] += nz }
+  }
+  for (let v = 0; v < n.length; v += 3) {
+    const l = Math.hypot(n[v], n[v + 1], n[v + 2]) || 1
+    n[v] /= l; n[v + 1] /= l; n[v + 2] /= l
+  }
+  return n
 }

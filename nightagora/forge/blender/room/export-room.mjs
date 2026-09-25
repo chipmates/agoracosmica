@@ -302,8 +302,8 @@ async function main() {
   const poses = certifiedPoses(liveCams)
   writeFileSync(join(OUT, 'poses.json'), JSON.stringify(poses.doc, null, 1))
   const skyInfo = writeSky(sky, join(OUT, 'sky.hdr'))
-  const air = { ...room.air, density: sourceConstant(room.air.density) }
-  writeFileSync(join(OUT, 'air.json'), JSON.stringify({
+  const air = room.air ? { ...room.air, density: sourceConstant(room.air.density) } : null
+  if (air) writeFileSync(join(OUT, 'air.json'), JSON.stringify({
     ...air, densitySource: room.air.density, box: { min: [air.west + air.inset, air.floor + air.inset, -air.north + air.inset], max: [air.east - air.inset, air.top - air.inset, -air.south - air.inset] },
     scattering_per_m: 4 * Math.PI * 0.01 * air.density,
     law: 'engine: in-scatter per metre = 0.01 x density x profile x (the sum of the spots\' lit, shadowed irradiance), added over the room (additive: nothing behind it is dimmed). Cycles: an isotropic scattering medium of coefficient 4 pi x 0.01 x density x profile per metre, the same single-scattered light, extinguished as a real medium extinguishes it.',
@@ -329,7 +329,7 @@ async function main() {
     cameras: poses.checks, sky: skyInfo,
     engineOnly: {
       selectiveLights: 'material.lightsNode gives the hall\'s rig to the hall\'s surfaces only (a sampler ceiling, M50): translated to real lights that light everything; the clerestory is kept off the air by light linking, as the engine keeps it off',
-      probe: { ...room.probe, translation: 'dropped: Cycles path-traces the bounce (the engine reads its probe at 1.35 of what it holds; Cycles at what the room holds)' },
+      probe: room.probe && { ...room.probe, translation: 'dropped: Cycles path-traces the bounce (the engine reads its probe at 1.35 of what it holds; Cycles at what the room holds)' },
       air: 'a ray-marched additive volume: translated to a Cycles scattering volume in the same box (air.json)',
       print: 'the post chain\'s print: the Khronos PBR Neutral view transform at the same exposure, with lift, saturation and vignette applied to the linear render exactly as stack/post.ts orders them (print.json)',
       shadowShell: 'the spots\' maps are drawn from a double of the hall\'s shell on layer 3: not exported, Cycles casts from the real surfaces',

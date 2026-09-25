@@ -13,6 +13,7 @@ import { fractalField, resolved, specularAA } from '../../stack/detail'
 import { applyYardFinish, roadChip } from './ground-finish'
 import { copingUndersides, RETAINING_COURSES, sunEdge, wallInTheSun } from './terrace-wall'
 import { thresholdFlight } from './inner-court'
+import { COURT_FLOOR_GRID, courtFloorLight, WALL_BOUNCE_SCALE } from './house-weather'
 
 // TSL graphs retain three independent scales, even on calm's complete ground.
 const { attribute, positionWorld, positionView, normalWorldGeometry, cameraViewMatrix, mx_noise_float, mix, vec3, float, smoothstep, length, cameraPosition, normalMap, vec2, vec4, uv, fract, floor, dot, sin, cos } = TSL
@@ -38,6 +39,21 @@ function footVisibility() {
   const feet=SLENDER_FEET.map(([east,north])=>
     smoothstep(.035,.62,length(vec2(positionWorld.x.sub(east),positionWorld.z.add(north)))).mul(.62).add(.38))
   return feet.reduce((a,b)=>a.mul(b))
+}
+/** THE COURT'S FLOOR IN ITS WALLS: the house's foot takes the sky from the
+ * ground beside it, the court's walls take most of the sky from its floor
+ * (the share against an open field's), and the heads of the sunlit walls send
+ * their warm light down into it. Engine terms (`courtFloorLight`). */
+function courtFloor(m:MeshStandardNodeMaterial):void {
+  const G=COURT_FLOOR_GRID,P=positionWorld
+  const at=vec2(P.x.sub(G.west).div(G.east-G.west),P.z.negate().sub(G.south).div(G.north-G.south))
+  const inside=smoothstep(0,.03,at.x).mul(smoothstep(0,.03,at.y)).mul(smoothstep(1,.97,at.x)).mul(smoothstep(1,.97,at.y))
+  const light=TSL.texture(courtFloorLight(),at)
+  const sky=mix(float(1),light.x.pow(1.5).mul(.85).add(.15),inside)
+  m.aoNode=(m.aoNode as ReturnType<typeof float>).mul(foundationVisibility()).mul(sky)
+  const bounce=light.y.mul(inside).mul(3.2/Math.PI/WALL_BOUNCE_SCALE)
+  m.emissiveNode=(m.colorNode as ReturnType<typeof vec3>).mul(vec3(1.33,.93,.69)).mul(bounce)
+  m.userData['engineBounce']=true
 }
 export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLibrary):MeshStandardNodeMaterial {
   const m=new MeshStandardNodeMaterial({roughness:0.96,side:DoubleSide})
@@ -416,6 +432,7 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     m.userData['roadAppearance']='GENERATED conjectural grey-beige compacted earth and mineral finish; existing library/earth-packed albedo and normals, retained 1.4 m map projection, 2.8 m compaction variation, 7 cm aggregate and 6 mm grit. Existing mapped corridor mask, wheel-track spacing and depth retained. Surface normals only, gradient bounded .25; no displaced terrain or new paving.'
     // the terrace's gravel walk and the court's cobbles
     applyYardFinish(m,shows)
+    courtFloor(m)
   }
   m.name=`wing-vinci/${kind}`
   return m

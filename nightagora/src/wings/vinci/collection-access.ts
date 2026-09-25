@@ -18,7 +18,7 @@ const crossing: Point = [a[0]! + (b[0]! - a[0]!) * .046, a[1]! + (b[1]! - a[1]!)
 export const collectionAccessLayout = {
   crossing, outward, tangent, width: 2, run: 3.6, count: 12, tread: .3,
   upper: 0, lower: -1.9, riser: 1.9 / 12, landingDepth: .75,
-  cheekWidth: .14, cheekRise: .28, cheekDepth: .22, pavingDepth: .06,
+  cheekWidth: .14, cheekRise: .28, cheekDepth: .22, pavingDepth: .06, nosing: .02,
 } as const
 const L = collectionAccessLayout
 export const collectionAccessPoint = (along: number, across = 0): Point =>
@@ -36,6 +36,15 @@ const pieces = [
   { id: 'bottom-landing', low: -L.run / 2 - L.landingDepth, high: -L.run / 2, height: L.lower },
 ]
 
+/** THE CHEEKS RAKE WITH THE FLIGHT: their tops run parallel to the line
+ * through the nosings, `cheekRise` above it, and level over the landings, as
+ * a cast string wall is poured; a top stepped with every tread read as a
+ * heap of blocks. */
+export function collectionAccessCheekTop(along: number): number {
+  const pitch = L.upper + (Math.min(L.run / 2, Math.max(-L.run / 2, along)) - L.run / 2) * L.riser / L.tread
+  return pitch + L.cheekRise
+}
+
 export function getCollectionAccessRegions(): CollectionGradeRegion[] {
   return pieces.map(piece => {
     const points = outline(piece.low, piece.high), height = piece.height - L.pavingDepth
@@ -49,7 +58,7 @@ export const collectionAccessExclusions = [{ id: 'collection-court-terrace-acces
 /** Exact interior cheek planes, in the same local coordinates as the mesh.
  * Terrain clips only this occupied band, preserving uncovered wall faces.
  */
-export function collectionAccessCheekBand(a: Point, b: Point): { bottom: number; top: number } | undefined {
+export function collectionAccessCheekBand(a: Point, b: Point): { bottom: number; top: number; topEnd?: number } | undefined {
   const local = (p: Point): Point => [(p[0] - crossing[0]) * outward[0] + (p[1] - crossing[1]) * outward[1],
     (p[0] - crossing[0]) * tangent[0] + (p[1] - crossing[1]) * tangent[1]]
   const p = local(a), q = local(b), epsilon = 1e-6
@@ -57,7 +66,7 @@ export function collectionAccessCheekBand(a: Point, b: Point): { bottom: number;
   const mid = (p[0] + q[0]) / 2
   const piece = pieces.find(piece => mid > piece.low - epsilon && mid < piece.high + epsilon)
   if (!piece || Math.min(p[0], q[0]) < piece.low - epsilon || Math.max(p[0], q[0]) > piece.high + epsilon) return
-  return { bottom: piece.height - L.cheekDepth, top: piece.height + L.cheekRise }
+  return { bottom: piece.height - L.cheekDepth, top: collectionAccessCheekTop(p[0]), topEnd: collectionAccessCheekTop(q[0]) }
 }
 
 export const collectionAccessProvenance = {
@@ -71,7 +80,7 @@ export const collectionAccessProvenance = {
     en: 'Authored design ranges: width 1.8–2.2 m, tread 0.28–0.32 m, riser 0.14–0.18 m, landing length 0.6–0.9 m; the fixed total rise follows the existing 0.00/−1.90 m platform levels. Placement crosses the terrace east edge 4.6% from its southern endpoint; proposed placement range 4.0–5.0%. Concrete cheeks are 0.14 m wide [0.12–0.18], stand 0.28 m above each tread as a continuous kerb [0.24–0.34] and extend 0.22 m beneath the paving [0.18–0.26]. These are design choices, not survey uncertainties.',
     de: 'Gestaltete Entwurfsbereiche: Breite 1,8–2,2 m, Auftritt 0,28–0,32 m, Steigung 0,14–0,18 m, Podestlänge 0,6–0,9 m; der feste Gesamthöhenunterschied folgt den vorhandenen Plattformhöhen 0,00/−1,90 m. Die Lage kreuzt die östliche Terrassenkante bei 4,6% ab ihrem südlichen Endpunkt; vorgeschlagener Lagebereich 4,0–5,0%. Betonwangen sind 0,14 m breit [0,12–0,18], stehen als durchgehende Bordwange 0,28 m über jeder Stufe [0,24–0,34] und reichen 0,22 m unter den Belag [0,18–0,26]. Dies sind Entwurfsentscheidungen, keine Vermessungsunsicherheiten.',
   },
-  recipe: 'One original welded contemporary concrete mesh, fourteen 60 mm finish caps and continuous 140 mm side cheeks. Structural risers are the actual shared modern terrain batch. Exact inner cheek bands are subtracted from terrain wall triangles; no coplanar offsets or hidden uncovered cut. Shared filtered cast-concrete material, no texture assets. Centreline and footprint use the retained terrace edge, a 4.6% crossing fraction and orthonormal outward/transverse axes.',
+  recipe: 'One original welded contemporary concrete mesh, fourteen 60 mm finish caps, each tread\'s standing a 20 mm nosing proud of its riser, and continuous 140 mm side cheeks whose tops rake 0.28 m above the line of the nosings and run level over the landings. Structural risers are the actual shared modern terrain batch. Exact inner cheek bands are subtracted from terrain wall triangles; no coplanar offsets or hidden uncovered cut. Shared filtered cast-concrete material, no texture assets. Centreline and footprint use the retained terrace edge, a 4.6% crossing fraction and orthonormal outward/transverse axes.',
   date: '2026-09-10',
 } as const
 
@@ -161,23 +170,26 @@ export function createCollectionAccess(): Group {
     for (const across of [west, east]) quad(p(low, across, bottom), p(high, across, bottom), p(high, across, top), p(low, across, top), faceAcross(across < 0 ? -1 : 1))
     for (const along of [...(openLow ? [] : [low]), ...(openHigh ? [] : [high])]) quad(p(along, west, bottom), p(along, east, bottom), p(along, east, top), p(along, west, top), faceAlong(along === low ? -1 : 1))
   }
-  pieces.forEach((piece, i) => cap(piece.low, piece.high, piece.height, pieces[i + 1]?.height === piece.height, pieces[i - 1]?.height === piece.height))
+  // each tread's cap stands a nosing proud of the riser under its front, so
+  // every step draws its own shadow line
+  pieces.forEach((piece, i) => cap(piece.low - (pieces[i + 1] ? L.nosing : 0), piece.high, piece.height, pieces[i + 1]?.height === piece.height, pieces[i - 1]?.height === piece.height))
   for (const side of [-1, 1]) {
     const inside = side * L.width / 2, outside = inside + side * L.cheekWidth
     const across = (along: number, low: number, high: number, facingAlong: number) => {
       if (Math.abs(high - low) > 1e-8) quad(p(along, inside, low), p(along, outside, low), p(along, outside, high), p(along, inside, high), faceAlong(facingAlong))
     }
     for (let i = 0; i < pieces.length; i++) {
-      const piece = pieces[i]!, bottom = piece.height - L.cheekDepth, top = piece.height + L.cheekRise
-      quad(p(piece.low, outside, bottom), p(piece.high, outside, bottom), p(piece.high, outside, top), p(piece.low, outside, top), faceAcross(side))
-      for (const [low, high] of [[bottom, piece.height - L.pavingDepth], [piece.height, top]])
-        quad(p(piece.low, inside, low!), p(piece.high, inside, low!), p(piece.high, inside, high!), p(piece.low, inside, high!), faceAcross(-side))
-      quad(p(piece.low, inside, top), p(piece.low, outside, top), p(piece.high, outside, top), p(piece.high, inside, top), [0, 0, 1])
+      const piece = pieces[i]!, bottom = piece.height - L.cheekDepth
+      const topLow = collectionAccessCheekTop(piece.low), topHigh = collectionAccessCheekTop(piece.high)
+      quad(p(piece.low, outside, bottom), p(piece.high, outside, bottom), p(piece.high, outside, topHigh), p(piece.low, outside, topLow), faceAcross(side))
+      quad(p(piece.low, inside, bottom), p(piece.high, inside, bottom), p(piece.high, inside, piece.height - L.pavingDepth), p(piece.low, inside, piece.height - L.pavingDepth), faceAcross(-side))
+      quad(p(piece.low, inside, piece.height), p(piece.high, inside, piece.height), p(piece.high, inside, topHigh), p(piece.low, inside, topLow), faceAcross(-side))
+      quad(p(piece.low, inside, topLow), p(piece.low, outside, topLow), p(piece.high, outside, topHigh), p(piece.high, inside, topHigh), [0, 0, 1])
       quad(p(piece.high, inside, bottom), p(piece.high, outside, bottom), p(piece.low, outside, bottom), p(piece.low, inside, bottom), [0, 0, -1])
-      if (!i) across(piece.high, bottom, top, 1)
+      if (!i) across(piece.high, bottom, topHigh, 1)
       const next = pieces[i + 1]
-      if (!next) across(piece.low, bottom, top, -1)
-      else { across(piece.low, next.height + L.cheekRise, top, -1); across(piece.low, next.height - L.cheekDepth, bottom, 1) }
+      if (!next) across(piece.low, bottom, topLow, -1)
+      else across(piece.low, next.height - L.cheekDepth, bottom, 1)
     }
   }
   const geometry = new BufferGeometry()

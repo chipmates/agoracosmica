@@ -265,7 +265,7 @@ function top(target: Batch, points: Point[], region?: Region): void {
   }
 }
 
-function wall(target: Batch, a: Point, b: Point, a0: number, b0: number, a1: number, b1: number, positive: boolean, covered?: { bottom: number; top: number }): void {
+function wall(target: Batch, a: Point, b: Point, a0: number, b0: number, a1: number, b1: number, positive: boolean, covered?: { bottom: number; top: number; topEnd?: number }): void {
   const dx = b[0] - a[0], dn = b[1] - a[1], length = Math.hypot(dx, dn)
   if(length<EPS)return
   const normal: Point3 = positive ? [dn / length, 0, dx / length] : [-dn / length, 0, -dx / length]
@@ -282,7 +282,7 @@ function wall(target: Batch, a: Point, b: Point, a0: number, b0: number, a1: num
     // clamping just the endpoints would leave triangular overlaps or gaps.
     const section:Point[]=triangle.map(([,h,u])=>[u,h])
     const pieces=[clip(section,[0,covered.bottom],[length,covered.bottom],false),
-      clip(section,[0,covered.top],[length,covered.top],true)]
+      clip(section,[0,covered.top],[length,covered.topEnd??covered.top],true)]
     for(const piece of pieces)for(let j=1;j<piece.length-1;j++)
       for(const [u,h]of[piece[0]!,piece[j]!,piece[j+1]!])push(target,lerp(a,b,u/length),h,normal,true,u)
   }
