@@ -328,8 +328,27 @@ export function countsOf(entries) {
   return out
 }
 
+/** THE MARKS OF A STILL, as the gate's release holds them: one file a language
+ * at its content address beside the still's rungs, from the marks read on the
+ * job's own build (`<job>/marks.json`, written by the pack's marks reading) */
+export function stillMarkFiles(dir, marks, e, stillFile, langs = ['en', 'de']) {
+  const out = {}
+  const stem = stillFile.split('/').pop().replace(/\.[0-9a-f]{16}\.png$/, '')
+  for (const lang of langs) {
+    const list = marks?.nodes?.[e.node]?.[e.framing]?.[lang]
+    if (!list) continue
+    const body = JSON.stringify({ format: 'vinci-film-still-marks-v1', node: e.node, framing: e.framing, lang, print: marks.prints?.[e.node]?.[e.framing] ?? null, marks: list }, null, 1)
+    const hash = sha256(body)
+    const file = `stills/${e.framing}/marks-${lang}/${stem}.${hash.slice(0, 16)}.json`
+    if (!existsSync(join(dir, file))) { mkdirSync(dirname(join(dir, file)), { recursive: true }); writeAtomic(join(dir, file), body) }
+    out[`marks-${lang}`] = { file, bytes: Buffer.byteLength(body), sha256: hash }
+  }
+  return out
+}
+
 /* ---- the record the gate and the pack read, rewritten from the ledger ---- */
 function writeRecord(dir, job, records) {
+  const marks = existsSync(join(dir, 'marks.json')) ? JSON.parse(readFileSync(join(dir, 'marks.json'), 'utf8')) : null
   const done = [...records.values()].filter((r) => r.status === 'done')
   const byId = new Map(job.entries.map((e) => [e.id, e]))
   const release = { format: 'vinci-film-release-v1', keysFormat: job.keys.format, wing: 'vinci', revision: job.head, renderer: done.find((r) => r.renderer)?.renderer ?? null, fps: FPS, pace: 'walk', global: job.keys.global, delivery: job.keys.delivery, clips: [], stills: [], sampledJoins: [] }
@@ -340,7 +359,7 @@ function writeRecord(dir, job, records) {
     if (!e) continue
     const keys = e.keys ? { motion: e.keys.motion, picture: e.keys.picture, global: job.keys.global, delivery: job.keys.delivery } : null
     if (e.kind === 'still') {
-      release.stills.push({ node: e.node, framing: e.framing, keys, files: { [STILL_RUNG[e.framing].join('x')]: r.rung }, sidecar: r.sidecar })
+      release.stills.push({ node: e.node, framing: e.framing, keys, files: { [STILL_RUNG[e.framing].join('x')]: r.rung, ...stillMarkFiles(dir, marks, e, r.rung.file) }, sidecar: r.sidecar })
       summary.stills.push({ node: e.node, framing: e.framing, raw: r.raw, master: r.master, rung: r.rung, settledIn: r.settledIn, aSecondLater: r.aSecondLater, pendingAtRest: r.pendingAtRest })
     } else if (e.kind === 'clip') {
       release.clips.push({ clip: e.edge, framing: e.framing, keys, frames: r.frames, seconds: r.frames / FPS, files: r.files, sidecar: r.sidecar })

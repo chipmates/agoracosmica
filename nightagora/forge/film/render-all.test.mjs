@@ -11,7 +11,7 @@ import { buildGraph, openWing } from './graph.mjs'
 import { route } from './router.mjs'
 import {
   PILOT, appendLedger, areaEntries, clipId, countsOf, gateLock, keysOf, machinesOf, onlyEntries, orderEntries, readLedger,
-  joinGap, recordWhole, resumeWalks, stillCurrent, stillId, writeAtomic,
+  joinGap, recordWhole, resumeWalks, stillCurrent, stillId, stillMarkFiles, writeAtomic,
 } from './render-all.mjs'
 import sharp from 'sharp'
 
@@ -199,5 +199,24 @@ test('a parted join is measured: the pixels that differ and the largest step', a
     assert.deepEqual(await joinGap(join(dir, 'a.png'), join(dir, 'b.png')), { pixels: 2, share: 0.0625, max: 12 })
     assert.deepEqual(await joinGap(join(dir, 'a.png'), join(dir, 'c.png')), { pixels: 0, share: 0, max: 0 })
     assert.ok((await joinGap(join(dir, 'a.png'), join(dir, 'missing.png'))).error, 'a missing file is named, never thrown')
+  } finally { rmSync(dir, { recursive: true, force: true }) }
+})
+
+test("a still's marks stand in the release at their content address, one file a language", () => {
+  const dir = mkdtempSync(join(tmpdir(), 'w7-marks-'))
+  try {
+    const marks = { nodes: { 'stop:flight': { wide: { en: [{ id: 'machine/aerial-screw', u: 0.5, v: 0.6 }], de: [] } } }, prints: { 'stop:flight': { wide: '1,2,3,0,0,0,62' } } }
+    const e = { node: 'stop:flight', framing: 'wide' }
+    const files = stillMarkFiles(dir, marks, e, 'stills/wide/1920x1080/stop-flight.0123456789abcdef.png')
+    assert.deepEqual(Object.keys(files), ['marks-en', 'marks-de'])
+    for (const f of Object.values(files)) {
+      assert.match(f.file, /^stills\/wide\/marks-(en|de)\/stop-flight\.[0-9a-f]{16}\.json$/)
+      const body = readFileSync(join(dir, f.file))
+      assert.equal(body.length, f.bytes)
+      assert.ok(f.file.includes(f.sha256.slice(0, 16)))
+    }
+    assert.deepEqual(stillMarkFiles(dir, marks, e, 'stills/wide/1920x1080/stop-flight.0123456789abcdef.png'), files, 'the same marks, the same address')
+    assert.deepEqual(stillMarkFiles(dir, marks, { node: 'stop:works', framing: 'wide' }, 'stills/wide/1920x1080/stop-works.0123456789abcdef.png'), {}, 'a node never read carries none')
+    assert.deepEqual(stillMarkFiles(dir, null, e, 'x.png'), {})
   } finally { rmSync(dir, { recursive: true, force: true }) }
 })
