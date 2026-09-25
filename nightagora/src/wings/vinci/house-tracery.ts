@@ -81,10 +81,13 @@ const disc = (c: V2, r: number, steps = 36): V2[] => Array.from({ length: steps 
 
 class Sink {
   positions: number[] = []; normals: number[] = []; uvs: number[] = []; tones: number[] = []; cavity: number[] = []
-  vertex(p: V3, n: V3, t: V2, cavity = 1): void { this.positions.push(p[0], p[2], -p[1]); this.normals.push(n[0], n[2], -n[1]); this.uvs.push(t[0], t[1]); this.tones.push(1); this.cavity.push(cavity) }
+  vertex(p: V3, n: V3, t: V2, cavity = 1, tone = 1): void { this.positions.push(p[0], p[2], -p[1]); this.normals.push(n[0], n[2], -n[1]); this.uvs.push(t[0], t[1]); this.tones.push(tone); this.cavity.push(cavity) }
 }
 
 export interface HouseTracery { group: Group; triangles: number }
+/** A dressing stone in its facade frame (along, height, out from the wall),
+ * cut back from an opening's surround or run on to fill a pier. */
+export interface DressingStone { from: V2; to: V2; length: number; u0: number; u1: number; z0: number; z1: number; back: number; front: number; tone: number }
 /** A window's sill in its facade frame: the opening's start, width and base. */
 export interface SillSpec { from: V2; to: V2; length: number; x: number; w: number; z: number }
 
@@ -132,6 +135,27 @@ function sills(sink: Sink, list: readonly SillSpec[]): void {
         put(at(u, a), at(u, b), at(u, c), n, [a[0], a[1]], [b[0], b[1]], [c[0], c[1]])
       }
     }
+  }
+}
+
+/** The redrawn dressing stones: five faces each, the back lies in the wall.
+ * Their map coordinates are the shell's own (east, up), so the laid courses
+ * and the stains run on across them as across the stones they replace. */
+function dressingStones(sink: Sink, list: readonly DressingStone[]): void {
+  for (const s of list) {
+    const dx = (s.to[0] - s.from[0]) / s.length, dy = (s.to[1] - s.from[1]) / s.length
+    const at = (u: number, z: number, o: number): V3 => [s.from[0] + dx * u + dy * o, s.from[1] + dy * u - dx * o, z]
+    const quad = (a: V3, b: V3, c: V3, d: V3, n: V3): void => {
+      const e1: V3 = [b[0] - a[0], b[1] - a[1], b[2] - a[2]], e2: V3 = [c[0] - a[0], c[1] - a[1], c[2] - a[2]]
+      const flip = (e1[1] * e2[2] - e1[2] * e2[1]) * n[0] + (e1[2] * e2[0] - e1[0] * e2[2]) * n[1] + (e1[0] * e2[1] - e1[1] * e2[0]) * n[2] < 0
+      for (const [p, q, r] of flip ? [[a, c, b], [a, d, c]] : [[a, b, c], [a, c, d]]) for (const v of [p!, q!, r!]) sink.vertex(v, n, [v[0], v[2]], 1, s.tone)
+    }
+    const { u0, u1, z0, z1, back, front } = s
+    quad(at(u0, z0, front), at(u1, z0, front), at(u1, z1, front), at(u0, z1, front), [dy, -dx, 0])
+    quad(at(u0, z1, back), at(u1, z1, back), at(u1, z1, front), at(u0, z1, front), [0, 0, 1])
+    quad(at(u0, z0, front), at(u1, z0, front), at(u1, z0, back), at(u0, z0, back), [0, 0, -1])
+    quad(at(u0, z0, back), at(u0, z0, front), at(u0, z1, front), at(u0, z1, back), [-dx, -dy, 0])
+    quad(at(u1, z0, front), at(u1, z0, back), at(u1, z1, back), at(u1, z1, front), [dx, dy, 0])
   }
 }
 
@@ -184,7 +208,7 @@ function clipPoly(poly: FV[], keep: (p: FV) => number): FV[] {
   return out
 }
 
-export function createHouseTracery(windows: readonly TraceryWindow[], tier: 'hero' | 'standard' | 'calm', library?: MaterialLibrary, sillList: readonly SillSpec[] = []): HouseTracery {
+export function createHouseTracery(windows: readonly TraceryWindow[], tier: 'hero' | 'standard' | 'calm', library?: MaterialLibrary, sillList: readonly SillSpec[] = [], stones: readonly DressingStone[] = []): HouseTracery {
   const sink = new Sink()
   sills(sink, sillList)
   for (const win of windows) {
@@ -410,7 +434,25 @@ export function createHouseTracery(windows: readonly TraceryWindow[], tier: 'her
   mesh.userData['manifestId'] = houseTraceryProvenance.manifestId; mesh.userData['asset'] = houseTraceryProvenance.manifestId
   const group = new Group(); group.name = 'vinci/house-tracery'; group.add(mesh)
   group.userData['manifestId'] = houseTraceryProvenance.manifestId
-  const triangles = sink.positions.length / 9
+  let triangles = sink.positions.length / 9
+  if (stones.length) {
+    // the plain dressings keep the shell's own stone, laid courses and all
+    const laid = new Sink()
+    dressingStones(laid, stones)
+    const g = new BufferGeometry()
+    g.setAttribute('position', new Float32BufferAttribute(laid.positions, 3))
+    g.setAttribute('normal', new Float32BufferAttribute(laid.normals, 3))
+    g.setAttribute('uv', new Float32BufferAttribute(laid.uvs, 2))
+    g.setAttribute('tone', new Float32BufferAttribute(laid.tones, 1))
+    g.computeBoundingSphere()
+    prepareSurfaceGeometry(g, 'stone')
+    const dressed = new Mesh(g, createShellSurface('stone', library, []))
+    dressed.name = 'vinci/house-tracery/dressing-stones'
+    dressed.castShadow = true; dressed.receiveShadow = true
+    dressed.userData['manifestId'] = houseTraceryProvenance.manifestId; dressed.userData['asset'] = houseTraceryProvenance.manifestId
+    group.add(dressed)
+    triangles += laid.positions.length / 9
+  }
   group.userData['triangles'] = triangles
   return { group, triangles }
 }
@@ -419,5 +461,5 @@ export const houseTraceryProvenance = {
   manifestId: 'vinci/house-tracery',
   assetClass: 'GENERATED',
   certainty: 'conjectural',
-  recipe: 'The traceried windows cut as one tuffeau panel on the wall plane inside their registered opening. Round every lancet the orders are swept from the arch ring in: a 140 mm arch ring with a V joint at its extrados, a hollow, a 40 mm roll half proud of the wall, a chamfer to the shell\'s glass line, the reveal running on 140 mm behind; the jamb stones are jointed on the wall\'s 0.28 m courses, the heads cut into voussoirs of about 160 mm, and the mullion\'s two rolls meet on its centre line. The quadrilobe\'s lobes keep the shell\'s glass line, chamfered 35 mm at 45 degrees, and carry four moulded rings 30 mm thick on a 103 mm radius, interlaced over and under. Each carved face carries the share of sky it sees as an occlusion term. Outlines, lancet height and lobe radius stay the shell\'s (Q175, ARVIVA-0); the orders, rings, joints and panel depth are proposals. Every window sill is recut as a weathered stone: a top falling about 12 degrees, a 100 mm projection and front, a 12 mm drip channel under the front edge, 120 mm past each jamb, 50 mm into the wall.',
+  recipe: 'The traceried windows cut as one tuffeau panel on the wall plane inside their registered opening. Round every lancet the orders are swept from the arch ring in: a 140 mm arch ring with a V joint at its extrados, a hollow, a 40 mm roll half proud of the wall, a chamfer to the shell\'s glass line, the reveal running on 140 mm behind; the jamb stones are jointed on the wall\'s 0.28 m courses, the heads cut into voussoirs of about 160 mm, and the mullion\'s two rolls meet on its centre line. The quadrilobe\'s lobes keep the shell\'s glass line, chamfered 35 mm at 45 degrees, and carry four moulded rings 30 mm thick on a 103 mm radius, interlaced over and under. Each carved face carries the share of sky it sees as an occlusion term. Outlines, lancet height and lobe radius stay the shell\'s (Q175, ARVIVA-0); the orders, rings, joints and panel depth are proposals. Every window sill is recut as a weathered stone: a top falling about 12 degrees, a 100 mm projection and front, a 12 mm drip channel under the front edge, 120 mm past each jamb, 50 mm into the wall. A corner quoin that would run into an opening\'s surround is cut back to it, and where two surrounds stand closer than a long jamb stone and a hand, the jamb stones fill the pier between them in every course.',
 } as const

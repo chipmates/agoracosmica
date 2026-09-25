@@ -10,7 +10,7 @@
       "prompt": "Thin brick relief, tuffeau quoins and registered cut apertures, intersecting roofs, dormers, chimneys, turret and separate gallery/watchtower. Dossier nominal dimensions with original certainty ranges. No photograph sampled. Shallow 55 mm rebate within declared 35–90 mm assumption; split upper sky reflection and lower dark-room glazing. Existing roughness .18–.23 remains inside dossier interval; no screen-space transmission. Duplicated upper tower shell now shares registered aperture cuts. Connected F16/F17 masonry below the unchanged −2.20 m base: 0.60 m inward thickness [0.45–0.80], actual standard/calm ground boundary lower envelope embedded 50 mm [25–100], full joined miter volume and inherited stone coursing. No surveyed height or opening changes. The plinth course on the coursed ashlar faces, laid half a course off their beds, stays certified and leaves the colour pass. Where the house is glazed, a dormer's dark back stays certified and leaves the camera for leaded lights. Every dressing it lays proud of a facade is recorded as it is laid, for the shadow it throws and the sky it takes from that face; no triangle moves for it.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "553530f8c5db4dd17bd2582475a4c2a6aa32f430714a422fdc06d8afe513742a",
+      "sha256": "83d05d46e659866b833128002b8e1b698b1b80b8da719e5862d8a9e650a535bd",
       "note": "Q001 Q015 Q019 Q124 Q127 Q131 Q134 Q175; src/wings/vinci/data/closluce.json; recipe_file=src/wings/vinci/shell.ts; geometry_dependency=vinci/foundation-plinth"
     },
     {
@@ -3752,7 +3752,7 @@
       "prompt": "The traceried windows (Q175: two pointed lancets, central mullion, quadrilobe tympan) cut as one tuffeau panel on the wall plane inside the registered opening. Round every lancet the orders are swept from the arch ring in: a 140 mm arch ring with a V joint at its extrados, a hollow, a 40 mm roll half proud of the wall, a chamfer to the shell's own glass line, the reveal behind; the jamb stones are jointed on the wall's 0.28 m courses and the heads cut into voussoirs of about 160 mm, the mullion's two rolls meeting on its centre line. The quadrilobe's lobes are chamfered 35 mm to their glass and carry four moulded rings, 30 mm thick on a 103 mm radius, interlaced so each passes alternately over and under its neighbours. Each carved face carries the share of sky it sees. Every window sill recut as a weathered stone with a 12 degree top, a 100 mm projection and a 12 mm drip channel; door thresholds unchanged. Outlines, lancet height and lobe radius are the shell's; the orders, rings, joints and sill section are proposals. The shell's flat tracery pieces and slab sills stay certified and leave the colour pass. Hero tier. The hollows of the orders and the lobes keep a dark crust in patches where rain never washes them.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "273c06cf76da9a0e5cb6a45d020891edff4592632107fa2d0ee681fa31a08327",
+      "sha256": "112643d0c10b2f1de50539d4c8a3753cbb4d0d6b14cccf5c791f420856aa31dd",
       "note": "recipe_file=src/wings/vinci/house-tracery.ts; source=Q175 ARVIVA-0 A-OPENING; geometry_dependency=vinci/shell; rail_collision=false"
     },
     {

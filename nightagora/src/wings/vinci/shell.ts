@@ -15,7 +15,7 @@ import { foundationPlinthFaces, foundationPlinthProvenance } from './foundation-
 import { createHouseGlazing, houseGlazingProvenance, type GlazedLight } from './house-glazing'
 import { createDormerRooms, createHouseRooms, houseRoomsProvenance, type DormerRoom } from './house-rooms'
 import { HALL_WINDOWS } from './house-hall'
-import { createHouseTracery, houseTraceryProvenance, type SillSpec, type TraceryWindow } from './house-tracery'
+import { createHouseTracery, houseTraceryProvenance, type DressingStone, type SillSpec, type TraceryWindow } from './house-tracery'
 import { bakeDressingShadows, bakeDressingSky, type DressingBox } from './house-sun'
 import dossierText from './data/closluce.json?raw'
 
@@ -215,6 +215,8 @@ function clipGableBacking(poly:V3[],faces:RoofFace[]):V3[][] {
 /** What one createShell call hands the house's own modules: the lights to
  * glaze, the traceried windows to carve, the window backs a room opens. */
 interface HouseBuild { glaze:boolean; carve:boolean; openBacks:ReadonlySet<string>; lights:GlazedLight[]; tracery:TraceryWindow[]; sills:SillSpec[]; dormers:DormerRoom[]
+  /** dressing stones cut back from an opening, redrawn by the carving */
+  stones:DressingStone[]
   /** every dressing laid proud of a facade, for the shadows it throws on it */
   dressings:DressingBox[]; casting:ReadonlySet<Batch> }
 let house:HouseBuild|null=null
@@ -236,6 +238,24 @@ function faceBox(b:Batch,f:Facade,x:number,z:number,w:number,h:number,depth:numb
   if(house?.casting.has(b)&&!b.retire&&out>.004)house.dressings.push({facade:f.id,u0:x-w/2,u1:x+w/2,z0:z-h/2,z1:z+h/2,front:out})
   const p=facadePoint(f,x,z,out-depth/2)
   solid(b,p,[w,depth,h],Math.atan2(f.to[1]-f.from[1],f.to[0]-f.from[0]),tone)
+}
+/** What each rendered opening's surround and sill take of its facade, in
+ * the facade frame: no other dressing stone may run into it. */
+interface Zone { o:Opening; u0:number; u1:number; z0:number; z1:number }
+function surroundZones(f:Facade):Zone[] {
+  if(f.id.startsWith('tower-crown-'))return[]
+  return f.openings.filter(o=>o.render&&o.type!=='blind-recess').map(o=>{
+    const open=o.type==='gate'||o.type==='open-arcade',jamb=o.type==='open-arcade'?.14:o.type==='gate'?.27:.16
+    return{o,u0:o.from_m-jamb,u1:o.from_m+o.width_m+jamb,z0:o.base_m-(open?0:.16),z1:o.base_m+o.height_m+jamb}
+  })
+}
+/** A certified dressing stone cut back or stretched: on the carving tier the
+ * certified one leaves the colour pass and the carving draws this one, so
+ * the rail's solids stay exactly what they were. */
+function redress(f:Facade,u0:number,u1:number,z0:number,z1:number,depth:number,out:number,tone:number):void {
+  if(!house||u1-u0<.04)return
+  house.stones.push({from:f.from,to:f.to,length:f.length_m,u0,u1,z0,z1,back:out-depth,front:out,tone})
+  if(out>.004)house.dressings.push({facade:f.id,u0,u1,z0,z1,front:out})
 }
 function rectPlanes(x0:number,x1:number,z0:number,z1:number):Plane[] {return [
   {fn:p=>p[0]-x0},{fn:p=>x1-p[0]},{fn:p=>p[2]-z0},{fn:p=>z1-p[2]},
@@ -288,7 +308,17 @@ function drawFacade(f:Facade,wall:Wall,b:Batches,tier:Tier,faces:RoofFace[]):voi
   // A dressing below a wall's own foot stands on a wall that is not there,
   // and on coursed ashlar a quoin laid half a course off the beds breaks
   // every joint it meets: both stay certified and leave the colour pass.
-  const corner=(x:number):void=>{for(let z=.7,n=0;z<heightAt(x)-.2;z+=.28,n++){const w=n%2?.38:.58;b.stone.retire=stoneField||z<base;faceBox(b.stone,f,x===0?w/2:f.length_m-w/2,z+.133,w,.262,.10,.055,.91+hash(n,f.length_m)*.10)}b.stone.retire=false}
+  // A quoin stops at an opening's surround: a door 0.35 m from the corner
+  // took every long quoin 0.23 m into the doorway.
+  const zones=surroundZones(f)
+  const corner=(x:number):void=>{for(let z=.7,n=0;z<heightAt(x)-.2;z+=.28,n++){
+    const w=n%2?.38:.58,tone=.91+hash(n,f.length_m)*.10,z0=z+.002,z1=z+.264,kept=stoneField||z<base
+    const hits=zones.filter(q=>q.z0<z1&&q.z1>z0&&(x===0?q.u0<w&&q.u1>0:q.u1>f.length_m-w&&q.u0<f.length_m))
+    const inner=x===0?Math.min(w,...hits.map(q=>q.u0)):Math.max(f.length_m-w,...hits.map(q=>q.u1))
+    const cut=Boolean(house?.carve)&&!kept&&Math.abs(inner-(x===0?w:f.length_m-w))>1e-6
+    b.stone.retire=kept||cut;faceBox(b.stone,f,x===0?w/2:f.length_m-w/2,z+.133,w,.262,.10,.055,tone)
+    if(cut)redress(f,x===0?0:inner,x===0?inner:f.length_m,z0,z1,.10,.055,tone)
+  }b.stone.retire=false}
   if(f.length_m>2.5){corner(0);corner(f.length_m)}
   // The plinth course marks a brick wall's stone foot; on coursed ashlar it
   // lies half a course off the beds and its sky-lit top reads as a ribbon.
@@ -452,7 +482,22 @@ function drawOpening(f:Facade,o:Opening,thickness:number,b:Batches):void {
       faceBox(b.stone,f,x+w/2,z+h+offset,w+offset*2,.025,.065,.095+offset/2)
     }
     b.stone.retire=false
-    for(let j=0;j<h/.28;j++){const len=j%2?.10:.23;for(const side of [-1,1])faceBox(b.stone,f,side<0?x-.16-len/2:x+w+.16+len/2,z+.14+j*.28,len,.255,.065,.035,.91+hash(j,x)*.09)}
+    // Between two openings closer than a long stone and a hand, the jamb
+    // stones fill the pier: a short stone left a sliver of brick between
+    // the two surrounds. A window's right-hand pier is its neighbour's to
+    // fill when that neighbour is a window too.
+    const zones=house?.carve?surroundZones(f).filter(q=>q.o.id!==o.id):[]
+    const plain=(q:Zone):boolean=>q.o.type!=='door'&&q.o.type!=='gate'&&q.o.type!=='open-arcade'&&q.o.type!=='traceried-window'
+    for(let j=0;j<h/.28;j++){const len=j%2?.10:.23,zc=z+.14+j*.28,tone=.91+hash(j,x)*.09;for(const side of [-1,1]){
+      const near=side<0?x-.16:x+w+.16,beside=zones.filter(q=>q.z0<zc+.1275&&q.z1>zc-.1275&&(side<0?q.u1<=near+1e-6:q.u0>=near-1e-6))
+      const edge=beside.length?(side<0?Math.max(...beside.map(q=>q.u1)):Math.min(...beside.map(q=>q.u0))):NaN
+      const neighbour=beside.find(q=>(side<0?q.u1:q.u0)===edge)
+      const pier=neighbour!==undefined&&Math.abs(near-edge)<.33
+      b.stone.retire=pier
+      faceBox(b.stone,f,side<0?x-.16-len/2:x+w+.16+len/2,zc,len,.255,.065,.035,tone)
+      if(pier&&!(side>0&&plain(neighbour)))redress(f,Math.min(near,edge),Math.max(near,edge),zc-.1275,zc+.1275,.065,.035,tone)
+    }}
+    b.stone.retire=false
   }
 }
 function drawPortal(f:Facade,x:number,z:number,w:number,h:number,b:Batches):void {
@@ -580,7 +625,7 @@ export function createShell(tier:Tier,library?:MaterialLibrary):Group {
   const rooms=full?createHouseRooms(tier==='hero'?.45:.9):null
   // The carving is one more draw; standard stands at its draw ceiling.
   // The great hall is its own module's room; its four windows open too.
-  house={glaze:full,carve:tier==='hero',openBacks:new Set([...(rooms?.openedBacks??[]),...(full?HALL_WINDOWS:[])]),lights:[],tracery:[],sills:[],dormers:[],dressings:[],casting:new Set([b.stone,b.oak])}
+  house={glaze:full,carve:tier==='hero',openBacks:new Set([...(rooms?.openedBacks??[]),...(full?HALL_WINDOWS:[])]),lights:[],tracery:[],sills:[],dormers:[],stones:[],dressings:[],casting:new Set([b.stone,b.oak])}
   const faces=roofFaces(),valleys=roofValleys(faces)
   const facades=spec.facades.filter(f=>f.render).map(f=>({...f,openings:f.openings.map(o=>({...o}))}))
   // One through-gateway is cut in both exterior faces of the covered way.
@@ -641,7 +686,7 @@ export function createShell(tier:Tier,library?:MaterialLibrary):Group {
   if(built?.glaze){const glazing=createHouseGlazing(built.lights,tier==='hero'?2:1);adopt(glazing.group);group.userData['glazing']={lights:built.lights.length,quarries:glazing.quarries,cames:glazing.cames,triangles:glazing.triangles,provenance:houseGlazingProvenance}}
   if(rooms){adopt(rooms.group);group.userData['rooms']={rooms:rooms.rooms,openedBacks:[...rooms.openedBacks],triangles:rooms.triangles,provenance:houseRoomsProvenance}}
   if(built?.dormers.length){const attic=createDormerRooms(built.dormers);if(attic.mesh)group.add(attic.mesh);group.userData['dormerRooms']={dormers:built.dormers.length,triangles:attic.triangles}}
-  if(built?.carve&&(built.tracery.length||built.sills.length)){const tracery=createHouseTracery(built.tracery,tier,library,built.sills);adopt(tracery.group);group.userData['tracery']={windows:built.tracery.length,sills:built.sills.length,triangles:tracery.triangles,provenance:houseTraceryProvenance}}
+  if(built?.carve&&(built.tracery.length||built.sills.length||built.stones.length)){const tracery=createHouseTracery(built.tracery,tier,library,built.sills,built.stones);adopt(tracery.group);group.userData['tracery']={windows:built.tracery.length,sills:built.sills.length,stones:built.stones.length,triangles:tracery.triangles,provenance:houseTraceryProvenance}}
   group.userData['foundationPlinth']=foundationPlinthProvenance
   group.userData['northValleys']=valleys
   group.userData['triangles']=Object.values(b).reduce((n,batch)=>n+batch.positions.length/9,0)
