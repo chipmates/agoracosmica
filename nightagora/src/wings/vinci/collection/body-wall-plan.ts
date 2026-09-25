@@ -203,7 +203,7 @@ export const NICHE: Opening & { centre: number } = {
  * chest, each a little dimmer than the one before it, so the wash on the
  * panels falls away toward the gallery's far end. */
 export const FIELD_NORTHS = [-56.3, -58.3, -60.3] as const
-export const FIELD_LEVELS = [1.1, .75, .45] as const
+export const FIELD_LEVELS = [2.2, 1.5, .9] as const
 /** the share of the room's bounce the plain lining keeps at the far end, and
  * the run (north) over which it falls from the chest's end to there */
 export const FIELD_BOUNCE = { far: .55, from: -61.5, to: -55.6 } as const
@@ -315,13 +315,14 @@ export const FRAMER: WashOptic = {
   spread: NICHE_WIDTH / 2, edge: NICHE_WIDTH / 2 - .01, edgeSoft: .05, floor: NICHE.sill + .03, floorSoft: .05,
 }
 
-/** THEIR OPTIC: a broad graze over the panels from the toe to under the
- * head, soft along the wall so the three washes run into one fall. */
+/** THEIR OPTIC: a graze over the panels from the toe to under the head,
+ * narrow along the wall and arched at the crown, so each head throws its own
+ * pool and the three read as track spots, falling away down the run. */
 export const FIELD_WASH: WashOptic = {
   plane: LINING.face,
   foot: H(.45), footSoft: .35, tail: .3, tailFall: .25,
-  crown: LINING.top - .15, crownSoft: .35, arc: .08,
-  spread: .75,
+  crown: LINING.top - .15, crownSoft: .35, arc: .45,
+  spread: .35,
 }
 
 export const BODY_LIGHTS: readonly BodyLight[] = [

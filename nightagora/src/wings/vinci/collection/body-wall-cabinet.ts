@@ -69,9 +69,10 @@ function looks() {
     envGain: uniform(1),
     envLift: uniform(1.2),
     /** the hang's own share of the room's bounce, inside the opening, and
-     * the casework's, which faces the gallery's glazing across the room */
+     * the casework's, which faces the gallery's glazing across the room and
+     * stays under the lining's pools */
     hangEnv: uniform(.45),
-    caseEnv: uniform(1.6),
+    caseEnv: uniform(1),
   }
 }
 type Looks = ReturnType<typeof looks>
