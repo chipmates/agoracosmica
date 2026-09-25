@@ -234,6 +234,8 @@ export function warmWalk(
     abort() {
       if (at >= total) return
       at = total
+      // an eye placed since the last warm frame is the one to give back
+      adopt()
       restore()
       finish()
     },

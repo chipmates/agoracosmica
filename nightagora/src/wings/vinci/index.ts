@@ -341,6 +341,8 @@ export function createWing():VinciWingModule {
    * a frame draws it. The caller holds its loading field until both are done,
    * so no compile lands inside a stride. */
   let warm:WarmWalk|undefined, warmed:Promise<void>|undefined
+  /** whether the warm up began under the entry's gold field */
+  let warmUnderField=false
   /* THE ENTRY REPORTS TWO COUNTS AND NOTHING ELSE: the bodies this entry
    * builds, and the poses its warm up draws. Both totals are known before the
    * first one is paid, every unit weighs the same, and each half is held at
@@ -767,6 +769,7 @@ export function createWing():VinciWingModule {
         // ONE EXHIBIT AT A TIME: the room's marks stand down before the
         // stage may be held, so none is left standing on a still frame.
         dots?.setOpen(id);dots?.setLimit(0);paintExhibitTitle();paintHeaderVisibility();paintStrip()
+        yieldEye()
         // ON THE WALL A PRESS IS A RUN. A stop is a vertex of the room's own
         // certified line, so the eye slides along the hang to the work asked
         // for instead of returning to a station between two neighbours. It
@@ -787,9 +790,9 @@ export function createWing():VinciWingModule {
         if(!pose){if(from!==null&&rail.navigation.exhibit)rail.returnToStation();return false}
         // WALKING ON IS ONE MOTION: the certified return and the certified
         // approach out, with nothing standing still at the station.
-        if(from!==null)return exhibitWalks(true)?rail.chain(id,pose,narrow()):rail.returnToStation()
+        if(from!==null)return proved(()=>exhibitWalks(true)?rail.chain(id,pose,narrow()):rail.returnToStation())
         if(!exhibitWalks())return false
-        return rail.approach(id,pose,narrow(),openMode==='walk'?false:openMode==='cut'||cutToStation())
+        return proved(()=>rail.approach(id,pose,narrow(),openMode==='walk'?false:openMode==='cut'||cutToStation()))
       },
       onClose:()=>{
         if(exhibitSources){exhibitSources=null;if(mode===2)mode=1;paintDock()}
@@ -947,6 +950,7 @@ export function createWing():VinciWingModule {
     // a warm frame draws the shadow map too, which is where the depth
     // pipelines are built; the cache takes over once they exist
     key.light.shadow.autoUpdate=true
+    warmUnderField=document.body.classList.contains('entering')
     warm=warmWalk(stack,scene,camera,WALK.stops.map(stop=>vinciWalkPose(stop,wide)),done=>{posesUp=Math.max(posesUp,done)},()=>focusNearCascade(true))
     await warm.done
     warm=undefined
@@ -959,6 +963,14 @@ export function createWing():VinciWingModule {
     // frame they shoot.
     if(!document.body.classList.contains('forge')&&!vinciWelcomeSeen()&&card===0)welcome?.open()
   }
+  /** THE EYE IS THE VISITOR'S ONCE THEY CAN USE IT. The warm up parks the
+   * camera on the walk's poses, and on a slow device the entry's field lifts
+   * on its own cap while it still runs. A leg leaves only from the eye the
+   * rail placed, so a press, or the field lifting, ends the warm up first. */
+  function yieldEye():void{if(warm){warm.abort();warm=undefined}}
+  /** A LEG THE RAIL CANNOT PROVE IS NOT WALKED: the look still opens where
+   * the visitor stands, and the refusal is said on the console. */
+  const proved=(leg:()=>boolean):boolean=>{try{return leg()}catch(error){console.error(error);return false}}
   /** AN EXHIBIT'S NAME IN BOTH LANGUAGES, from the module that owns its kind.
    * Two kinds publish one language only, and there their own record is the
    * title in both columns rather than a second one being invented. */
@@ -1657,7 +1669,9 @@ export function createWing():VinciWingModule {
     const vertex=vinciWallVertex(wall,exhibit)
     if(vertex===undefined||wallAt()===undefined||!railReady()||activeView)return false
     const pose=vinciApproachPose(exhibit,narrow())
-    return pose?rail.along(vertex,hereContent().id,pose,exhibit):false
+    if(!pose)return false
+    yieldEye()
+    return proved(()=>rail.along(vertex,hereContent().id,pose,exhibit))
   }
   /** One stop along the wall, with or without a card. Right runs on to the
    * later work and left back to the earlier, which is the way each end's own
@@ -2661,6 +2675,7 @@ export function createWing():VinciWingModule {
       // THE WARM UP OWNS THE EYE. While it steps through the walk's poses
       // the rail may not put the camera back, or half the walk is compiled
       // from the seat of one station, and nothing is being looked at yet.
+      if(warm&&warmUnderField&&!document.body.classList.contains('entering'))yieldEye()
       if(warm){if(!warm.frame())warm=undefined;return}
       // THE ROOM HOLDS STILL WHILE A PAYLOAD HOLDS THE STAGE: nothing of it
       // walks, streams or is drawn until the vitrine hands it back.
