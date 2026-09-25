@@ -3648,7 +3648,7 @@
       "prompt": "Modern exhibition lighting of the mechanism hall: one broad daylight source standing in the north clerestory's glazing and warm spots hung from black track heads on the beams, every one casting a shadow drawn from a double of the hall's own walls, roof, beams, light shelf, dark bay and plinths; the rig stands only while the eye is in the hall. A lighting design choice; no light of 1517 is claimed. No texture asset, no reference image sampled.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-24",
-      "sha256": "7eb74b66536b3151d20358e72e2a2105bb9bb67f7a15588cc2b1e4568b3a734f",
+      "sha256": "e63f1327e07e732bf539d1044a396d7a52d7d9da71739c24740af9628c25a9f4",
       "note": "Modern museum insertion, the mechanism hall only; no 1517 claim. recipe_file=src/wings/vinci/collection/hall-light.ts"
     },
     {

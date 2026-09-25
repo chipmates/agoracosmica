@@ -83,10 +83,12 @@ const CLERESTORY = {
 
 export const HALL_SPOTS: readonly HallSpot[] = [
   // THE SPOTS. The screw from the aisle side, far enough off that its spiral
-  // is thrown onto the north and west walls; the water screw, the gates, the
-  // mill and lathe, and the three machines south of the aisle.
+  // is thrown onto the north and west walls, soft and thin: the sail is
+  // starched linen and passes much of the spot, and a hard dark round-headed
+  // shadow there read as a doorway; the water screw,
+  // the gates, the mill and lathe, and the three machines south of the aisle.
   { name: 'key-screw', at: hung(-50, -52.2), aim: [-57.2, -45.4, FLOOR + 2.7], kelvin: 3300,
-    intensity: 420, angle: .6, penumbra: .55, decay: 2, reach: 22, mapPx: 2048, soft: 2.5, shade: .78, head: true },
+    intensity: 420, angle: .6, penumbra: .55, decay: 2, reach: 22, mapPx: 2048, soft: 8, shade: .35, head: true },
   { name: 'key-water', at: hung(-46, -46.4), aim: [-49.3, -44.9, FLOOR + 1.05], kelvin: 3400,
     intensity: 190, angle: .42, penumbra: .7, decay: 2, reach: 16, mapPx: 2048, soft: 1.5, head: true },
   { name: 'key-gates', at: hung(-54, -51.4), aim: [-55.5, -51.3, FLOOR + 1.2], kelvin: 3300,
