@@ -376,6 +376,22 @@ const PASSAGE_DOOR: { corners: V3[]; inward: V3 } = (() => {
   const z0 = FLOOR_Z, z1 = FLOOR_Z + o.height_m
   return { corners: [at(o.from_m, z0), at(o.from_m + o.width_m, z0), at(o.from_m + o.width_m, z1), at(o.from_m, z1)], inward: [-d[1], d[0], 0] }
 })()
+/** the same door on the partition's far face: its cheeks and head stand behind
+ * the near face, and the service passage's light reaches them through this one,
+ * at a graze and from its dim near part (the hall's own `REVEAL_GAIN`). Only
+ * there: a face in the passage would see it through the partition. */
+const PASSAGE_FAR: V3[] = (() => {
+  const o = ENTRY_ROOM.openings.find(x => x.connects_to === 'service-link')!, t = spec.walls.find(w => w.id === o.wall)?.thickness_m ?? .25
+  return PASSAGE_DOOR.corners.map(c => [c[0] - PASSAGE_DOOR.inward[0] * t, c[1] - PASSAGE_DOOR.inward[1] * t, c[2]] as V3)
+})()
+/** a point of the door's cheeks or head: behind its near face and inside its frame */
+const PASSAGE_ALONG: V2 = (() => { const [a, b] = PASSAGE_DOOR.corners as [V3, V3]; const l = Math.hypot(b[0] - a[0], b[1] - a[1]); return [(b[0] - a[0]) / l, (b[1] - a[1]) / l] })()
+const PASSAGE_WIDTH = Math.hypot(PASSAGE_DOOR.corners[1]![0] - PASSAGE_DOOR.corners[0]![0], PASSAGE_DOOR.corners[1]![1] - PASSAGE_DOOR.corners[0]![1])
+function inPassageDoor(at: V3): boolean {
+  const c = PASSAGE_DOOR.corners[0]!, e = at[0] - c[0], nn = at[1] - c[1]
+  const before = e * PASSAGE_DOOR.inward[0] + nn * PASSAGE_DOOR.inward[1], along = e * PASSAGE_ALONG[0] + nn * PASSAGE_ALONG[1]
+  return before < .01 && along > -.01 && along < PASSAGE_WIDTH + .01 && at[2] < PASSAGE_DOOR.corners[2]![2] + .01
+}
 /** the jambs of the passage's other side door, to the workshop */
 const WORKSHOP_JAMBS: V2[] = (() => {
   const o = ENTRY_ROOM.openings.find(x => x.connects_to === 'workshop-reference')
@@ -392,7 +408,7 @@ const outPast = (at: V3): number => { const fr = frame(ENTRY_F); return (at[0] -
 export function passageLight(at: V3, n: V3): [number, number] {
   const lip = Math.min(1, Math.max(0, (outPast(at) + .12) / .17))
   const court = Math.max(lip * .32, formFactor(at, n, COURT_DOOR.corners, COURT_DOOR.inward, 3) + formFactor(at, n, COURT_WINDOW.corners, COURT_WINDOW.inward, 2) * TRANSMIT)
-  const hall = formFactor(at, n, PASSAGE_DOOR.corners, PASSAGE_DOOR.inward, 2)
+  const hall = inPassageDoor(at) ? formFactor(at, n, PASSAGE_FAR, PASSAGE_DOOR.inward, 2) * REVEAL_GAIN : formFactor(at, n, PASSAGE_DOOR.corners, PASSAGE_DOOR.inward, 2)
   return [Math.min(1, .03 + court * 2.2), hall * .9 + court * .12]
 }
 
@@ -433,7 +449,10 @@ function passageLightNode(): N {
   const outside = P.x.sub(ENTRY_F.from[0]).mul(fr.out[0]).sub(P.z.add(ENTRY_F.from[1]).mul(fr.out[1]))
   const lip = smoothstep(-.12, .05, outside)
   const court = max(lip.mul(.32), formFactorNode(COURT_DOOR.corners, inside).add(formFactorNode(COURT_WINDOW.corners, inside).mul(TRANSMIT)))
-  const hall = formFactorNode(PASSAGE_DOOR.corners, inside)
+  const c0 = PASSAGE_DOOR.corners[0]!, e = P.x.sub(c0[0]), nn = P.z.add(c0[1]).negate()
+  const before = e.mul(PASSAGE_DOOR.inward[0]).add(nn.mul(PASSAGE_DOOR.inward[1])), along = e.mul(PASSAGE_ALONG[0]).add(nn.mul(PASSAGE_ALONG[1]))
+  const door = float(1).sub(step(.01, before)).mul(step(-.01, along)).mul(step(along, PASSAGE_WIDTH + .01)).mul(step(P.y, PASSAGE_DOOR.corners[2]![2] + .01))
+  const hall = mix(formFactorNode(PASSAGE_DOOR.corners, inside), formFactorNode(PASSAGE_FAR, inside).mul(REVEAL_GAIN), door)
   return vec2(min(float(1), court.mul(2.2).add(.03)), hall.mul(.9).add(court.mul(.12)))
 }
 
