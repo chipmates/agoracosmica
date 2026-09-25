@@ -168,8 +168,9 @@ function courtTerms(P: N): { sky: N; bounce: N; inside: N } {
 /** The sky share at the court's open middle, which reads as the unchanged
  * ambient; a place that sees less is darker in the same proportion. */
 const OPEN_SKY = .6
-/** the sunlit brick's colour times the hour's key, for the bounce */
-const BOUNCE = { colour: [1, .78, .6] as const, gain: 3.2 * .34 * 1.15 }
+/** the sunlit brick's colour times the hour's key, for the bounce, and half
+ * again for the later bounces a closed court of pale stone keeps */
+const BOUNCE = { colour: [1, .78, .6] as const, gain: 3.2 * .34 * 1.15 * 1.5 }
 
 /** Hand a court surface its two terms: the ambient occlusion (multiplied into
  * any it already has) and the warm bounce, the surface's own albedo times the
