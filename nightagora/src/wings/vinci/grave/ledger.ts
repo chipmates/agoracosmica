@@ -83,6 +83,35 @@ export function ledgerStone(): MeshStandardNodeMaterial {
   return m
 }
 
+/** THE BED THE SLAB IS SET IN, and the marker's foot: a grey limestone
+ * darker than the slab, laid as a course of stones about 0.6 m long with
+ * lime joints, their top arrises worn pale, the foot darkened where the
+ * paving's wet reaches it. A flat black band read as a painted plinth. */
+export function ledgerBed(): MeshStandardNodeMaterial {
+  const m = new MeshStandardNodeMaterial({ roughness: .8, metalness: 0 })
+  const P = positionWorld, n = normalWorldGeometry
+  const d = surfaceDetail({ scales: [.4, .05, .003], figure: [.09, .06, .04], relief: .0008 })
+  // a face along the slab counts its stones along x, an end along z
+  const endFace = smoothstep(.6, .8, n.x.abs())
+  const along = mix(P.x.add(54.85 + 1.87).div(3.74 / 6), P.z.sub(25.95 - 1.08).div(2.16 / 3), endFace)
+  const cell = TSL.floor(along), inCell = TSL.fract(along)
+  const pitch = mix(float(3.74 / 6), float(2.16 / 3), endFace)
+  const jointAt = inCell.min(float(1).sub(inCell)).mul(pitch)
+  const joint = float(1).sub(smoothstep(.003, .006, jointAt)).mul(resolved(.012, d.pixel)).mul(float(1).sub(smoothstep(.6, .9, n.y.abs())))
+  const tone = TSL.fract(cell.mul(12.9898).add(endFace.mul(78.2)).sin().mul(43758.5453)).sub(.5).mul(.16).add(1)
+  // the top arris: the last centimetre under the bedding course, worn pale
+  const top = smoothstep(-6.285, -6.262, P.y).mul(float(1).sub(smoothstep(.6, .9, n.y)))
+  const foot = float(1).sub(smoothstep(-6.405, -6.36, P.y))
+  const c = vec3(...linear('#6a6a63')).mul(d.tone).mul(tone)
+    .mul(float(1).sub(joint.mul(.35))).mul(float(1).add(top.mul(.28))).mul(float(1).sub(foot.mul(.22)))
+  m.colorNode = c
+  applyCourtLight(m, c)
+  m.roughnessNode = specularAA(float(.8).add(d.rough).add(joint.mul(.1)).sub(top.mul(.12)), d.lost)
+  m.normalNode = reliefNormal(n.transformDirection(cameraViewMatrix), d.heightM.sub(joint.mul(.002)), .15)
+  m.name = 'vinci/grave/ledger-bed'
+  return m
+}
+
 /** The filling in the cut: a dull warm black. */
 export function ledgerFilling(): MeshStandardNodeMaterial {
   const m = new MeshStandardNodeMaterial({ roughness: .9, metalness: 0 })

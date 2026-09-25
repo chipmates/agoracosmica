@@ -42,7 +42,7 @@ const linear = (hex: string): [number, number, number] => { const c = new Color(
  * one body and still read one by one. */
 function modelStone(): MeshStandardNodeMaterial {
   const m = new MeshStandardNodeMaterial({ roughness: .86, metalness: 0 })
-  const d = surfaceDetail({ scales: [.2, .03, .0015], figure: [.05, .04, .03], relief: .0004 })
+  const d = surfaceDetail({ scales: [.2, .03, .0015], figure: [.08, .06, .04], relief: .0006 })
   const block = attribute('blockTone', 'float')
   const c = vec3(...linear('#d6cdb8')).mul(d.tone).mul(block)
   m.colorNode = c
@@ -57,7 +57,10 @@ type Role = { tint: string; rough: number }
 function groundSurface(): MeshStandardNodeMaterial {
   const m = new MeshStandardNodeMaterial({ roughness: .9, metalness: 0 })
   const fine = mx_noise_float(positionWorld.mul(90)).mul(.05)
-  m.colorNode = attribute('tint', 'vec3').mul(float(1).add(fine))
+  // the linen's own unevenness, a hand across, and the shade of the box's
+  // deep sides on it (`occl`, 1 on every part but the ground)
+  const cloth = mx_noise_float(positionWorld.mul(9)).mul(.07)
+  m.colorNode = attribute('tint', 'vec3').mul(float(1).add(fine).add(cloth)).mul(attribute('occl', 'float'))
   m.roughnessNode = attribute('rough', 'float')
   m.name = 'vinci/grave/diagram-ground'
   return m
@@ -114,8 +117,21 @@ export function createDiagram(o: DiagramOptions): Diagram {
   const parts = new Map<Material | Role, BufferGeometry[]>()
   const put = (m: Material | Role, g: BufferGeometry): void => { const list = parts.get(m) ?? []; list.push(g); parts.set(m, list) }
 
-  // THE BOX: a linen ground, and mitred bronze strips 0.40 m deep round it
-  put(linen, box(W, H, .13, X, Y, Z - .22))
+  // THE BOX: a linen ground, and mitred bronze strips 0.40 m deep round it.
+  // The ground is subdivided so the shade of the box's sides can lie on it:
+  // the strips stand 0.40 m proud and hide most of the sky near them.
+  const linenGround = new BoxGeometry(W, H, .13, 32, 24, 1)
+  linenGround.translate(X, Y, Z - .22)
+  {
+    const pos = linenGround.getAttribute('position'), occl = new Float32Array(pos.count)
+    for (let i = 0; i < pos.count; i++) {
+      const edge = Math.min(W / 2 - Math.abs(pos.getX(i) - X), H / 2 - Math.abs(pos.getY(i) - Y))
+      const corner = Math.hypot(Math.max(0, .5 - (W / 2 - Math.abs(pos.getX(i) - X))), Math.max(0, .5 - (H / 2 - Math.abs(pos.getY(i) - Y))))
+      occl[i] = Math.max(.42, 1 - .5 * Math.exp(-Math.max(0, edge) / .16) - .12 * Math.min(1, corner / .5))
+    }
+    linenGround.setAttribute('occl', new Float32BufferAttribute(occl, 1))
+  }
+  put(linen, linenGround)
   const ow = W / 2 + .045, oh = H / 2 + .045, iw = W / 2 - .045, ih = H / 2 - .045, gap = .002
   for (const corners of [
     [[-ow + gap, oh], [ow - gap, oh], [iw - gap, ih], [-iw + gap, ih]],
@@ -173,7 +189,8 @@ export function createDiagram(o: DiagramOptions): Diagram {
     let x = -reach
     while (x < reach - .02) {
       const l = Math.min(reach - x, x === -reach && quoin ? quoin : .22 + random() * .22)
-      const a = x + .002, b = x + l - .002
+      // joints a hand's breadth wide at the model's scale, so they read
+      const a = x + .004, b = x + l - .004
       x += l
       const corner = quoin > 0 && (a < -reach + .01 || b > reach - .01)
       const pieces: [number, number][] = opening && a < opening && b > -opening
@@ -182,7 +199,7 @@ export function createDiagram(o: DiagramOptions): Diagram {
         if (q - p < .03) continue
         const proud = corner ? .006 : (random() - .5) * .006
         put(stone, toned(q - p, y1 - y0 - .004, blockDepth, X + (p + q) / 2, (y0 + y1) / 2, face - blockDepth / 2 + proud,
-          corner ? 1.02 : .9 + random() * .16))
+          corner ? 1.02 : .82 + random() * .26))
       }
     }
   }
@@ -264,6 +281,7 @@ export function createDiagram(o: DiagramOptions): Diagram {
       for (let i = 0; i < n; i++) tint.set([c.r, c.g, c.b], i * 3)
       g.setAttribute('tint', new Float32BufferAttribute(tint, 3))
       g.setAttribute('rough', new Float32BufferAttribute(new Float32Array(n).fill(role.rough), 1))
+      if (!g.getAttribute('occl')) g.setAttribute('occl', new Float32BufferAttribute(new Float32Array(n).fill(1), 1))
       bodies.get(ground)!.push(g)
     }
   }
@@ -271,7 +289,7 @@ export function createDiagram(o: DiagramOptions): Diagram {
   // wing's key never draws the box into its cascades
   const double = new MeshBasicNodeMaterial({ colorWrite: false, depthWrite: false })
   materials.push(double)
-  const keep: Record<string, string[]> = { stone: ['blockTone'], bronze: [], ground: ['tint', 'rough'] }
+  const keep: Record<string, string[]> = { stone: ['blockTone'], bronze: [], ground: ['tint', 'rough', 'occl'] }
   for (const [material, list] of bodies) {
     const role = (material as { name: string }).name.split('-').pop()!
     const merged = mergeGeometries(list.map(g => g.index ? g.toNonIndexed() : g).map(g => {

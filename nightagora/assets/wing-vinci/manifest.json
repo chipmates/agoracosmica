@@ -2827,7 +2827,7 @@
       "prompt": "Interpretive museum ledger slab of pale honed limestone with the documented name cut and filled, and no epitaph; a separate presumed plaque on a footed base, based on a sourced account, cutting the dig's year while the page draws its words and the ledge's and label's words over the picture in the visitor's language; a coursed chapel-gable relief on an oak shelf in a deep bronze box, lit by one light of its own from the computed direction of the chosen minute, under a raked reading ledge. No remains, no portrait, no invented historical plaque facsimile.",
       "model": "Deterministic TypeScript geometry and TSL materials",
       "date": "2026-09-10",
-      "sha256": "1abc90e0538cebf5a2d1b9b1b2ea6ba5dc20edd4e28fb71bc1d7ef7f6c361c8e",
+      "sha256": "f0c8defaa18d62b611767ccd76634b90eacd032508815c55078d79733ceef3d6",
       "note": "recipe_file=src/wings/vinci/grave/index.ts"
     },
     {

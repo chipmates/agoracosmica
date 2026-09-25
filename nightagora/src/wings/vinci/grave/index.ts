@@ -2,7 +2,7 @@ import { CylinderGeometry, ExtrudeGeometry, Matrix4, Mesh, MeshStandardNodeMater
 import { Construction, exhibitionFloor, galleryBackdrop, type ExhibitMaterials, type ExhibitionObject } from '../myths/construction'
 import words from '../line/data/never-said.json'
 import { GRAVE_DEATHBED, GRAVE_FRAME, GRAVE_SLAB } from './placement'
-import { cutLedgerFace, ledgerStone } from './ledger'
+import { cutLedgerFace, ledgerBed, ledgerStone } from './ledger'
 import { createDiagram } from './diagram'
 import { DEATHBED_LABEL, GRAVE_EVIDENCE, GRAVE_WORDS, graveGable, graveLedge, graveMarker } from './lettering'
 export { GRAVE_EVIDENCE, GRAVE_WORDS, graveDeathbedLettering, graveLettering, type GraveLetters } from './lettering'
@@ -59,12 +59,12 @@ export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, l
   const build = new Construction(materials, 'vinci-grave', 'vinci/grave-geometry')
   exhibitionFloor(build, 12, 13)
   galleryBackdrop(build)
-  const ledger = ledgerStone()
+  const ledger = ledgerStone(), bed = ledgerBed()
   // Low masonry holds the slab in the floor. The narrow stepped reveal makes
   // its weight readable even under the grazing light of the closing room.
   const centreX = GRAVE_SLAB.x
   const centreZ = GRAVE_SLAB.z
-  build.box(centreX, 0.075, centreZ, 2.16, 0.15, 3.74, materials.dark)
+  build.box(centreX, 0.075, centreZ, 2.16, 0.15, 3.74, bed)
   // The bedding stone runs the whole length of the slab.
   build.box(centreX, 0.148, centreZ, 2.04, 0.13, 3.61, materials.stone)
   // The documented name is the ONLY writing on the slab, cut into a pale
@@ -83,7 +83,7 @@ export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, l
   // The marker is cut from the slab's own honed limestone, one stone from its
   // cap to its face: the floor's flag stone carries the flags' own cells, and
   // a cell's edge across a face reads as a patch laid on it.
-  build.box(plaqueX, 0.085, plaqueZ - 0.08, 1.88, 0.17, 0.48, materials.dark)
+  build.box(plaqueX, 0.085, plaqueZ - 0.08, 1.88, 0.17, 0.48, bed)
   build.box(plaqueX, 0.188, plaqueZ - 0.06, 1.72, 0.05, 0.42, ledger)
   build.box(plaqueX, 0.225, plaqueZ + 0.06, 1.64, 0.028, 0.14, materials.bronze)
   build.box(plaqueX, 0.62, plaqueZ - 0.08175, 1.60, 0.88, 0.2565, ledger)
