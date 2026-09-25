@@ -494,14 +494,18 @@ async function run(flags) {
     const t0 = Date.now()
     await lock.take()
     const browser = await chromium.launch({ args: [...browserArgs(), ...FRAME_TIME_FLAGS] })
-    const s = await openSession(browser, framing, { base: BASE, scale: 1, sink, warmNodes: graph.nodes, log, view: null })
+    // a smoke run stands only at the nodes its own entries touch
+    const warm = flags.get('walk') === 'run'
+      ? [...new Set(todo.filter((x) => x.framing === framing).flatMap((x) => (x.kind === 'clip' ? [x.from, x.to] : x.kind === 'still' ? [x.node] : [])))].map((id) => nodes.get(id))
+      : graph.nodes
+    const s = await openSession(browser, framing, { base: BASE, scale: 1, sink, warmNodes: warm, log, view: null })
     lock.release()
     const warmed = Date.now()
     /* THE HELD SET IS THE JOB'S: every clip of the framing walked (`--walk=run`
        walks only this run's clips, for a smoke run in a job of its own) */
     const walkRun = flags.get('walk') === 'run'
     const walks = walkRun ? [...new Set(todo.filter((x) => x.kind === 'clip' && x.framing === framing).map((x) => x.edge))].map((id) => edges.get(id)) : graph.edges
-    log(`  ${framing}: the session stood at all ${graph.nodes.length} nodes in ${Math.round((warmed - t0) / 1000)} s; the silent walks of ${walks.length} clips begin`)
+    log(`  ${framing}: the session stood at ${warm.length} nodes in ${Math.round((warmed - t0) / 1000)} s; the silent walks of ${walks.length} clips begin`)
     const steps = []
     let walked = 0
     for (const e of walks) {
