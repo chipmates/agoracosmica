@@ -18,9 +18,9 @@
  * light or building of 1517 is claimed.
  */
 import {
-  AdditiveBlending, Color, CubeCamera, CubeRenderTarget, CylinderGeometry, DirectionalLight, DoubleSide, Float32BufferAttribute, FrontSide,
+  AdditiveBlending, Color, CubeCamera, CubeRenderTarget, CustomBlending, CylinderGeometry, DirectionalLight, DoubleSide, DstColorFactor, Float32BufferAttribute, FrontSide,
   Group, HalfFloatType, Matrix4, Mesh, MeshBasicNodeMaterial, MeshStandardNodeMaterial, Object3D, PMREMGenerator, PlaneGeometry,
-  Quaternion, RectAreaLight, RectAreaLightNode, SpotLight, Vector3, type BufferGeometry, type Light, type Material, type RenderTarget, type Scene,
+  OneFactor, Quaternion, RectAreaLight, RectAreaLightNode, SpotLight, Vector3, ZeroFactor, type BufferGeometry, type Light, type Material, type RenderTarget, type Scene,
 } from 'three/webgpu'
 import * as TSL from 'three/tsl'
 import { lights as lightsOf, output, pmremTexture } from 'three/tsl'
@@ -30,8 +30,8 @@ import type { Stack } from '../../../stack'
 import type { MaterialSet } from '../../../stack/materials'
 import { axisFootprint, lineCoverage } from '../../../stack/detail'
 import {
-  benches, ceilingSkin, fittings, floorSkins, frameGeometry, hangFrames, hangLamps, LAMP_COLOUR, lensOf,
-  PICTURE_ROOM_PROVENANCE, PICTURE_SHADOW_LAYER, PROBE_AT, ROOM, ROOM_LIGHTS, shadowCasters, stampHangLight, v3,
+  benches, ceilingSkin, DOORWAYS, fittings, floorSkins, frameGeometry, hangFrames, hangLamps, LAMP_COLOUR, lensOf,
+  PICTURE_ROOM_PROVENANCE, PICTURE_SHADOW_LAYER, PROBE_AT, REVEAL, ROOM, ROOM_LIGHTS, shadowCasters, stampHangLight, v3,
   wallSkins, WINDOW, type HangLamp, type RoomLight, type Skin, type Solid,
 } from './picture-room-plan'
 import { hangSurfaceLight, PICTURE_LOOKS, varnishFilm, withRoomAir } from './picture-light'
@@ -88,6 +88,14 @@ function looks() {
     plasterToothTone: uniform(.1),
     plasterSand: uniform(.17),
     plasterSandTone: uniform(.035),
+    /** THE TROWEL'S CLOUD at the stops' distance: the lime's slow drift over
+     * a metre, the laps a trowel leaves over a hand, and the fleck of the
+     * aggregate a pixel still holds, as shares of the tone */
+    plasterDrift: uniform(.16),
+    plasterLap: uniform(.11),
+    plasterFleck: uniform(.075),
+    /** the fleck's own relief, which the heads rake across */
+    plasterFleckRelief: uniform(.17),
     /** the building's concrete, poured a shade cooler than the gallery's */
     concreteTint: uniform(new Color(.9, .95, 1.12)),
     soffitTint: uniform(new Color(.84, .9, 1.1)),
@@ -115,6 +123,12 @@ function looks() {
     /** the lit lens of every head, and the air it lights in front of it */
     lens: uniform(18),
     glow: uniform(.045),
+    /** the next rooms through the doors as an eye settled to the hang reads
+     * them: what of their light is kept, and how near the eye comes before
+     * it has left this room's level, in metres */
+    doorKeep: uniform(new Color(.23, .255, .32)),
+    doorNear: uniform(1.3),
+    doorFar: uniform(4.5),
   }
 }
 type Looks = ReturnType<typeof looks>
@@ -142,12 +156,22 @@ function plasterMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial {
   const cloud = luminance(sample.albedo).mul(.6).add(luminance(wide.albedo).mul(.4))
   const drift = mx_noise_float(P.mul(.21)).mul(.05).add(mx_noise_float(P.mul(.73)).mul(.025))
   const grain = luminance(tooth.albedo).sub(1).mul(L.plasterToothTone).add(mx_noise_float(vec3(sand, 4.4)).mul(sandFade).mul(L.plasterSandTone))
-  const tone = mix(float(1), cloud, L.plasterCloud).add(drift).add(grain)
+  // the laps run in arcs a forearm long, so they are drawn out along two
+  // swept directions; the fleck is a centimetre and fades as the grain does
+  const slow = mx_noise_float(vec3(at.mul(1.15), 2.9)).mul(.65).add(mx_noise_float(vec3(at.mul(2.6), 5.3)).mul(.35))
+  const lapA = mx_noise_float(vec3(at.x.mul(3.1).add(at.y.mul(1.9)), at.y.mul(7.4).sub(at.x.mul(4.2)), 1.7))
+  const lapB = mx_noise_float(vec3(at.x.mul(6.3).sub(at.y.mul(2.2)), at.y.mul(3.3).add(at.x.mul(5.1)), 8.3))
+  const fleckAt = at.mul(105)
+  const fleckFade = float(1).sub(smoothstep(.3, .8, TSL.fwidth(fleckAt.x)))
+  const fleck = mx_noise_float(vec3(fleckAt, 6.6)).add(mx_noise_float(vec3(fleckAt.mul(2.3), 3.1)).mul(.5)).mul(fleckFade)
+  const trowel = slow.mul(L.plasterDrift).add(lapA.max(lapB).mul(L.plasterLap)).add(fleck.mul(L.plasterFleck))
+  const tone = mix(float(1), cloud, L.plasterCloud).add(drift).add(grain).add(trowel)
   const albedo = L.plaster.mul(tone).toVar()
   const rough = mix(L.plasterRough.sub(.1), L.plasterRough.add(.14), sample.roughness.mul(.6).add(tooth.roughness.mul(.4))).clamp(.3, .95).toVar()
   // the broad trowel and the fine tooth, one relief: the heads read it too
-  const relief = vec3(sample.normal.x.mul(L.plasterNormal).add(tooth.normal.x.mul(L.plasterTooth)).add(grit.x.mul(L.plasterSand)),
-    sample.normal.y.mul(L.plasterNormal).add(tooth.normal.y.mul(L.plasterTooth)).add(grit.y.mul(L.plasterSand)), 1)
+  const bump = vec2(mx_noise_float(vec3(fleckAt, 11.2)), mx_noise_float(vec3(fleckAt, 13.9))).mul(fleckFade.mul(L.plasterFleckRelief))
+  const relief = vec3(sample.normal.x.mul(L.plasterNormal).add(tooth.normal.x.mul(L.plasterTooth)).add(grit.x.mul(L.plasterSand)).add(bump.x),
+    sample.normal.y.mul(L.plasterNormal).add(tooth.normal.y.mul(L.plasterTooth)).add(grit.y.mul(L.plasterSand)).add(bump.y), 1)
   const world = bendWorld(t, b, n, relief, 1).toVar()
   m.colorNode = albedo
   m.roughnessNode = rough
@@ -270,7 +294,11 @@ function frameOakMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial 
   return m
 }
 
-/** OILED OAK for the benches, its grain along each bench and up its legs. */
+/** OILED OAK for the benches, its grain along each bench and up its legs: the
+ * top glued up from boards across its width, each board its own piece of the
+ * photograph drawn out along the grain as a sawn board's figure runs, its
+ * rings fine and sharp at a sitter's distance. */
+const BENCH_BOARD = .118
 function benchOakMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial {
   const m = new MeshStandardNodeMaterial({ roughness: .55, metalness: 0, side: FrontSide })
   const P = positionWorld, n = normalWorldGeometry
@@ -279,7 +307,18 @@ function benchOakMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial 
   const end = abs(dot(n, along)).greaterThan(.5)
   const grain = select(end, vec3(0, 0, -1), along)
   const t = cross(grain, n).normalize()
-  const sample = set.sample({ uv: vec2(dot(P, t), dot(P, grain)), metres: 1.83 })
+  const board = floorOf(P.z.div(BENCH_BOARD))
+  const b1 = hash(board, float(0), 2.3), b2 = hash(board, float(0), 6.1), b3 = hash(board, float(0), 8.7)
+  const u = dot(P, t), v = dot(P, grain)
+  const sample = set.sample({ uv: vec2(u.add(b1.mul(7.3)), v.add(b2.mul(11.9))), metres: [.6, 2.3] })
+  // THE RINGS a pixel can hold: late wood lines along the board, their run
+  // bent a little, read as their mean where a pixel holds several
+  const ringAt = u.add(mx_noise_float(vec3(v.mul(.9), u.mul(7), b3.mul(9))).mul(.006))
+    .add(mx_noise_float(vec3(v.mul(6), u.mul(40), 2.1)).mul(.0009)).div(.0023)
+  const ringF = fract(ringAt)
+  const sharp = float(1).sub(smoothstep(.3, .75, TSL.fwidth(ringAt)))
+  const lateRing = smoothstep(.58, .8, ringF).mul(float(1).sub(smoothstep(.84, 1, ringF))).sub(.22).mul(sharp).add(.22)
+  const faceGrain = sample.colour.mul(L.benchTint).mul(float(1).add(b3.sub(.5).mul(.12))).mul(float(1.03).sub(lateRing.mul(.14)))
   // THE END OF A BOARD SHOWS ITS RINGS: arcs round a heart that lies under
   // and beside the board, the late wood dark, the rays across them, the cut
   // end drinking the oil darker than the face
@@ -296,7 +335,7 @@ function benchOakMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial 
   const endGrain = sample.colour.mul(L.benchTint).mul(float(.6).sub(late.mul(.2)).add(ray.mul(.12)))
   // the shoes under the legs are dark bronze, carried on the same mesh
   const metal = attribute('metal', 'float').greaterThan(.5)
-  m.colorNode = select(metal, L.bronze.mul(.55), select(end, endGrain, sample.colour.mul(L.benchTint)))
+  m.colorNode = select(metal, L.bronze.mul(.55), select(end, endGrain, faceGrain))
   m.roughnessNode = select(metal, float(.42), select(end, float(.72), mix(float(.4), float(.66), sample.roughness)))
   m.metalnessNode = select(metal, float(1), float(0))
   m.normalNode = select(metal, n.transformDirection(cameraViewMatrix), bend(t, grain, n, sample.normal, .7))
@@ -568,6 +607,39 @@ export function mountPictureRoom(stack: Stack): PictureRoom {
     materials.push(air)
     const mesh = make(merged(cones), air, 'beam-air', false)
     mesh.renderOrder = 3
+  }
+
+  // THE NEXT ROOMS THROUGH THE DOORS: a daylit room seen from the dim hang
+  // reads lower and cooler to an eye settled to the hang. A grade across the
+  // back of each opening, faced into this room alone, gone as the eye nears
+  // the door; an engine term, as the air is
+  {
+    const quads: BufferGeometry[] = []
+    for (const door of DOORWAYS) {
+      const width = door.east - door.west + .02, height = ROOM.friezeFoot - ROOM.floor + .02
+      const g = new PlaneGeometry(width, height)
+      g.rotateY(Math.PI)
+      const at = v3((door.west + door.east) / 2, REVEAL.back, (ROOM.floor + ROOM.friezeFoot) / 2)
+      g.translate(at.x, at.y, at.z)
+      const count = g.getAttribute('position').count
+      g.setAttribute('door', new Float32BufferAttribute(Array.from({ length: count }, () => [at.x, at.z]).flat(), 2))
+      quads.push(g.toNonIndexed())
+      g.dispose()
+    }
+    const grade = new MeshBasicNodeMaterial({ transparent: true, depthWrite: false, side: FrontSide, fog: false })
+    const near = length(cameraPosition.xz.sub(attribute('door', 'vec2')))
+    const keep = smoothstep(L.doorNear, L.doorFar, near).mul(H.engineTerms)
+    grade.colorNode = mix(vec3(1, 1, 1), L.doorKeep, keep)
+    grade.blending = CustomBlending
+    grade.blendSrc = DstColorFactor
+    grade.blendDst = ZeroFactor
+    grade.blendSrcAlpha = ZeroFactor
+    grade.blendDstAlpha = OneFactor
+    grade.toneMapped = false
+    grade.name = 'vinci/collection-picture-room/door-grade'
+    materials.push(grade)
+    const mesh = make(merged(quads), grade, 'door-grade', false)
+    mesh.renderOrder = 4
   }
 
   // THE VARNISH: one film over every reproduction, a hair in front of it,

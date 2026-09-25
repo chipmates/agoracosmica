@@ -52,13 +52,19 @@ export function pictureLooks() {
      * the sides a little outside it and opening as the beam falls, no floor
      * to it (it falls down the wall onto the boards); in metres */
     beamTop: uniform(.16),
-    beamTopSoft: uniform(.085),
+    beamTopSoft: uniform(.12),
     beamSide: uniform(.12),
-    beamSideSoft: uniform(.14),
+    beamSideSoft: uniform(.17),
     beamOpen: uniform(.12),
     /** how far the foot runs past the frame, and how soft it grows as it falls */
     beamTail: uniform(1.2),
     beamTailSoft: uniform(.55),
+    /** THE HALO: the lens's own scatter past its cut, as a share of the pool,
+     * dying over `haloReach` metres from the frame into the wall above and
+     * between the works; a framing projector scatters `haloCut` of it */
+    halo: uniform(.2),
+    haloReach: uniform(.34),
+    haloCut: uniform(.35),
     /** how much of the physical falloff down the wall the beam keeps: at one
      * the pool is brightest where the head is nearest, high on the wall */
     beamKeep: uniform(.78),
@@ -155,6 +161,14 @@ function slotsAt(x: N): { own: N; other: N; apart: N } {
   return { own, other, apart: other.notEqual(own).select(float(1), float(0)) }
 }
 
+/** one past either end of the hang, where only the end work is read and its
+    halo may run on over the wall to the door */
+function hangEnd(x: N): N {
+  const frames = hangFrames()
+  const west = Math.min(...frames.map(f => f.outer.west)), east = Math.max(...frames.map(f => f.outer.east))
+  return x.lessThan(west).or(x.greaterThan(east)).select(float(1), float(0))
+}
+
 /** HOW MUCH OF A HEAD A POINT SEES PAST A BOX standing off the wall: the box
  * [x0, x1] by [y0, y1], from depth `back` to depth `front` off the lining,
  * projected from the head onto the plane parallel to the wall that the point
@@ -222,7 +236,17 @@ function headOnSurface(P: N, n: N, lamp: N, aim: N, inner: N, level: N, row: Rec
   const lateral = float(1).sub(smoothstep(half, half.add(.5), aside))
   // it falls: over the work's middle it gives way to the beam's own top
   const falling = float(1).sub(smoothstep(o.z.add(o.w).mul(.5), o.w.add(.2), P.y))
-  const shape = spot.mul(cut).add(pow(field, 1.25).mul(looks.spill).mul(lateral).mul(falling))
+  let shape = spot.mul(cut).add(pow(field, 1.25).mul(looks.spill).mul(lateral).mul(falling))
+  if (shadows) {
+    // the halo round the frame in the wall's plane, gone before the next
+    // work's middle, where a point stops reading this head
+    const qx = wx.sub(o.x.add(o.y).mul(.5)).abs().sub(half), qy = wy.sub(o.z.add(o.w).mul(.5)).abs().sub(o.w.sub(o.z).mul(.5))
+    const out = length(vec2(max(qx, 0), max(qy, 0)))
+    const guard = float(1).sub(smoothstep(half.add(.1), half.add(.42), aside)).max(hangEnd(P.x))
+    const share = u.y.sub(u.x).greaterThan(.001).select(looks.halo.mul(looks.haloCut), looks.halo)
+    const halo = exp(out.div(looks.haloReach).negate()).mul(share).mul(guard).mul(smoothstep(-.2, .15, dL.sub(p)))
+    shape = shape.add(halo.mul(float(1).sub(shape.min(1))))
+  }
   let shadow: N = float(1)
   if (shadows) {
     const frame = boxVisibilityOf(P, L, o.x, o.y, o.z, o.w, FRAME_BACK_Z, FRAME_SHADOW_Z, looks.lampRadius)
