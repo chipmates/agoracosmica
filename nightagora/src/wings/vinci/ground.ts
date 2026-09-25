@@ -311,6 +311,20 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     m.colorNode=mix(m.colorNode!,rgb('#3d6230'),clover.mul(.45).mul(float(1).sub(trodden.mul(.5))))
     m.colorNode=mix(m.colorNode!,rgb('#806c4f'),scuff.mul(.6))
     m.colorNode=mix(m.colorNode!,rgb('#8e8a60'),trodden.mul(.3))
+    // AT ARM'S LENGTH A SWARD IS BLADES, not the photograph's mottle: strokes
+    // about 8 mm across and 7 cm long, each clump leaning its own way, the
+    // sward's own floor dark between them and some blades gone to straw.
+    // Held on the blade's own width, so it is gone before it can crawl. Three
+    // fixed turns handed over by a slow field: a turn that varied with place
+    // would multiply the world coordinate and shred the strokes to grain.
+    const way=(turn:number)=>{const c=Math.cos(turn),s=Math.sin(turn)
+      return smoothstep(.28,.72,mx_noise_float(vec3(P.x.mul(c).add(P.z.mul(s)).mul(120),P.z.mul(c).sub(P.x.mul(s)).mul(14),P.y.mul(2).add(turn))).mul(.5).add(.5))}
+    const lean=mx_noise_float(P.mul(vec3(4.1,1,4.1)).add(vec3(2.3,8.1,5.9)))
+    const blade=mix(mix(way(.35),way(1.4),smoothstep(-.45,-.05,lean)),way(2.45),smoothstep(.05,.45,lean))
+    const bladeHeld=shows(1/120)
+    const straw=smoothstep(.6,.84,mx_noise_float(P.mul(vec3(38,1,38)).add(vec3(4.4,2.2,7.1))).mul(.5).add(.5)).mul(blade)
+    m.colorNode=m.colorNode!.mul(mix(float(1),blade.mul(.62).add(.69),bladeHeld))
+    m.colorNode=mix(m.colorNode!,m.colorNode!.mul(vec3(1.32,1.2,.78)),straw.mul(.4).mul(bladeHeld))
     // THE FAR GROUND IS WORKED LAND. A slope above a manor in October is a
     // mosaic of plots at the scale a person walks, divided by banks: without
     // that, distance is one green and the haze does all the work. Conjectural
@@ -334,12 +348,12 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     m.colorNode=mix(m.colorNode!,plots,worked.mul(.40).mul(throughAir).mul(shows(9)).clamp(0,.86))
     m.colorNode=mix(m.colorNode!,rgb('#414a30'),bank.mul(worked).mul(.62).mul(throughAir).mul(shows(1.4)).clamp(0,.92))
     const relief=tussock.mul(.115).add(patch.mul(.05)).add(clump.mul(.028)).mul(swardFade)
-      .add(bank.mul(worked).mul(.07)).toVar()
+      .add(bank.mul(worked).mul(.07)).add(blade.sub(.5).mul(.0009).mul(bladeHeld)).toVar()
     const gn=normalWorldGeometry.transformDirection(cameraViewMatrix)
     const gsx=positionView.dFdx(),gsy=positionView.dFdy(),grx=gsy.cross(gn),gry=gn.cross(gsx),gdet=gsx.dot(grx)
     const ggrad=grx.mul(relief.dFdx()).add(gry.mul(relief.dFdy())).mul(gdet.sign()).div(gdet.abs().max(1e-10)).toVar()
     m.normalNode=gn.sub(ggrad.div(length(ggrad).div(.22).max(1))).normalize()
-    m.userData['swardAppearance']='GENERATED October sward: tussock relief near 1.2 m within 0.03-0.19 m, a 0.35 m clump scale, bleached dry fraction and sparse thin scrapes. Surface finish only; no surveyed height, mowing regime or species is claimed.'
+    m.userData['swardAppearance']='GENERATED October sward: tussock relief near 1.2 m within 0.03-0.19 m, a 0.35 m clump scale, bleached dry fraction and sparse thin scrapes; at arm\'s length blade strokes near 8 mm × 7 cm leaning by the clump, some gone to straw. Surface finish only; no surveyed height, mowing regime or species is claimed.'
   }
   if(kind==='earth'){
     // Conjectural exposed-soil appearance on the already declared cuts.
