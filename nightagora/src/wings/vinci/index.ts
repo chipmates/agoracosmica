@@ -65,7 +65,7 @@ import { createPictureWords, type PictureWordsLayer } from './picture-words'
 import { collectVinciLabelOccluders, createVinciExhibitDots, createVinciLabelAnchor, vinciSightBlocked, type VinciExhibitDots, type VinciExhibitMark, type VinciLabelAnchor, type VinciLabelMode, type VinciLabelRect } from './labels'
 import { pickVinciExhibit, readVinciExhibits, vinciMachineRoom, type VinciPickEntry } from './collection/pick'
 import { LINE_FLOOR_PICK, VINCI_STUDY_LEAF, vinciApproachPose, vinciApproachStation, vinciStudIndex } from './collection/approaches'
-import { createVinciCloseLook, createVinciMachinePayload, fillVinciLimitSlots, renderVinciMachineRecord, vinciDeathbedCard, vinciLimits, vinciLine, vinciMachineCard, vinciPlaceCard, vinciPlaceTitle, vinciManuscriptWords, VINCI_EXHIBIT_CARD, VINCI_PAGE_HONESTY, VINCI_VITRINE_WORDS, type VinciPlaceCard, type VinciPlaceCertainty, type VinciPlaceId } from './collection/close-look'
+import { createVinciCloseLook, createVinciMachinePayload, createVinciShowpiecePayload, fillVinciLimitSlots, renderVinciMachineRecord, renderVinciShowpieceRecord, vinciShowpiece, vinciDeathbedCard, vinciLimits, vinciLine, vinciMachineCard, vinciPlaceCard, vinciPlaceTitle, vinciManuscriptWords, VINCI_EXHIBIT_CARD, VINCI_PAGE_HONESTY, VINCI_VITRINE_WORDS, type VinciPlaceCard, type VinciPlaceCertainty, type VinciPlaceId } from './collection/close-look'
 import { createPlacePayload } from '../vitrine/place'
 import { readingTableOf } from './table'
 import { CODEX_ABSENCES, CODEX_ENTRIES, EDITION_EXHIBIT, SHELF_BOOKS, isCollectionBook, shelfBook, shelfPlate } from './table/codex-shelf'
@@ -2014,7 +2014,7 @@ export function createWing():VinciWingModule {
    * the keys and the swipe walk the wall itself, and the card, the strip and
    * the record follow the sheet standing. One way, because a drawn sheet has
    * no second face and no printed page beside it. */
-  function openSheetDoor(id:string,from:HTMLElement|null,how:'enter'|'advance'):void {
+  function openSheetDoor(id:string,from:HTMLElement|null,how:'enter'|'advance',back?:()=>void):void {
     // THE BOOK'S ORDER IS THE WALL'S. The sheets are read in the order the
     // wall is walked, so the arrows in the reader and the arrows in the room
     // step the same way.
@@ -2039,7 +2039,8 @@ export function createWing():VinciWingModule {
       }}
     }
     const openRecord=()=>{record();sources.resetScroll();sources.select('station');mode=2;paintDock()}
-    const sides=wall.map(source=>{
+    // FROM A FILM the sheet stands alone, and the way back is the film's
+    const sides=(back?[opened]:wall).map(source=>{
       const page=validateSheetRecord(source.page,'sheet-page')
       const thumb=validateSheetRecord(source.preview,'sheet-thumb')
       const record=source.page as typeof source.page&{holder?:string}
@@ -2056,9 +2057,39 @@ export function createWing():VinciWingModule {
       start:opened.sheet.id,words:vinciManuscriptWords(),
       tier:()=>hosts?.world.stack.tierName()??'standard',
       changed:()=>{if(exhibitSources?.id===door&&mode===2){record();paintDock()}}})
+    let toFilm:HTMLButtonElement|null=null
+    if(back){
+      toFilm=make('button','vitrine-control vitrine-step','\u2039')
+      toFilm.type='button'
+      toFilm.dataset['role']='back'
+      toFilm.setAttribute('aria-label',text(VINCI_VITRINE_WORDS.back))
+      toFilm.addEventListener('click',back)
+    }
     closeLook.open({id:door,title:named(opened),line:vinciLine(id),card:[],payload:reader,
       controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())],
-      ...vinciLimits(id),...exhibitStand(id)},from,how)
+      ...(toFilm?{walk:[toFilm]}:{}),...vinciLimits(id),...exhibitStand(id)},from,how)
+  }
+  /** A SHEET WHOSE FILM THE STORE CARRIES OPENS AS THAT FILM: the model the
+   * sheet describes, its lines under it, and the sheet itself behind its own
+   * door. False where it has none. */
+  function openShowpieceLook(id:string,from:HTMLElement|null,how:'enter'|'advance'):boolean {
+    const show=assets?vinciShowpiece(id,assets):null
+    const source=exhibits?.sheetSources().find(each=>`sheet/${each.sheet.id}`===id)
+    if(!show||!source||!closeLook)return false
+    const title=vinciSheetTitle(lang()==='de'?source.page.honesty_de:source.page.honesty_en)
+    const payload=createVinciShowpiecePayload(show,{framing:()=>narrow()?'upright':'wide',title,
+      sheet:{src:Promise.resolve(assetAddress(source.preview)),label:title,
+        open:()=>openSheetDoor(id,null,'advance',()=>{openShowpieceLook(id,null,'advance')})}})
+    const openRecord=()=>{
+      exhibitSources={id,title:{en:title,de:title},certainty:show.certainty,renderStation(host){renderVinciShowpieceRecord(show,source.page,host)}}
+      sources.resetScroll();sources.select('station');mode=2;paintDock()
+    }
+    // the station's own row walks on from the film as from any work in it
+    const walk=[stepControl('\u2039',exhibitStep(id,-1)),stepControl('\u203a',exhibitStep(id,1))]
+    closeLook.open({id,title,line:vinciLine(id),card:[],payload,
+      controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())],
+      walk,...exhibitStand(id),certainty:show.certainty},from,how)
+    return true
   }
   /** THE VITRINE, for every kind this wing can open: the line at its head,
    * the module's own card in the page's language only, the payload, the
@@ -2078,7 +2109,7 @@ export function createWing():VinciWingModule {
     const walk=[stepControl('\u2039',exhibitStep(id,-1)),stepControl('\u203a',exhibitStep(id,1))]
     const how_=closeLook.id&&closeLook.id!==id?'advance':'enter'
     const shut=control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())
-    if(entry.kind==='sheet'){openMode=how;openSheetDoor(id,from,how_);openMode='auto';return}
+    if(entry.kind==='sheet'){openMode=how;if(!openShowpieceLook(id,from,how_))openSheetDoor(id,from,how_);openMode='auto';return}
     // THE PAGE ON THE COURT'S SUPPORT. The eye has already walked to the
     // board; the reading opens over the frame it stands in.
     if(id===VINCI_STUDY_LEAF){openMode=how;openStudyLeaf(from,how_);openMode='auto';return}

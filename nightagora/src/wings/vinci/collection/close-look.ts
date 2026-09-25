@@ -30,6 +30,12 @@ import cardsRaw from '../data/cards.json?raw'
 import limitsRaw from '../data/limits.json?raw'
 import partsRaw from '../data/parts.json?raw'
 import sizesRaw from '../data/sizes.json?raw'
+import filmsRaw from '../data/films.json?raw'
+import { createShowpiecePayload, type ShowpieceCut, type ShowpieceFile, type ShowpieceFraming, type ShowpiecePayload } from '../../vitrine/showpiece'
+import type { FolioSheet } from '../../vitrine/folio'
+import type { ManifestEntry, ManifestIndex } from '../../../manifest'
+import { validateSheetRecord, type SheetManifestEntry } from '../pictures/sheet-record'
+import { vinciSheetTitle } from './strip'
 
 export type VinciCloseLook = Vitrine
 export type VinciCloseLookExhibit = VitrineExhibit
@@ -351,6 +357,89 @@ export function createVinciMachinePayload(options: {
     standing: options.standing,
   })
   return payload
+}
+
+/* ---- a film of what a work describes ---------------------------------- */
+
+type FilmLine = Words & { from: number; source: string; certainty: string }
+const FILMS = (JSON.parse(filmsRaw) as { films: Record<string, { name: string; certainty: VinciShowpiece['certainty']; lines: FilmLine[] }> }).films
+type FilmRecord = ManifestEntry & { source?: string; framing?: string; width?: number; height?: number; seconds?: number }
+
+/** THE FILM A WORK'S CLOSE LOOK SHOWS: its cuts by framing from the store,
+ * its lines in the page's language and the sources they rest on. */
+export interface VinciShowpiece {
+  id: string
+  cuts: Partial<Record<ShowpieceFraming, ShowpieceCut>>
+  seconds: number
+  lines: { from: number; text: string }[]
+  sources: string[]
+  certainty: 'documented' | 'reconstructed' | 'conjectural'
+  licence: string
+}
+
+/** A work whose film the store does not carry, in a framing with its first
+ * frame and one size at least, has none: its close look opens as before. */
+export function vinciShowpiece(id: string, index: ManifestIndex): VinciShowpiece | null {
+  const film = FILMS[id]
+  if (!film) return null
+  const records = (index.all as FilmRecord[]).filter(entry => entry.source === id && entry.display === true && entry.class === 'GENERATED'
+    && (entry.role === 'showpiece-film' || entry.role === 'showpiece-poster') && Number(entry.width) > 0 && Number(entry.height) > 0)
+  const file = (entry: FilmRecord): ShowpieceFile => ({ src: assetAddress(entry), width: entry.width!, height: entry.height! })
+  const cuts: VinciShowpiece['cuts'] = {}
+  let seconds = 0
+  for (const framing of ['wide', 'upright'] as const) {
+    const mine = records.filter(entry => entry.framing === framing)
+    const poster = mine.find(entry => entry.role === 'showpiece-poster')
+    const rungs = mine.filter(entry => entry.role === 'showpiece-film')
+    if (!poster || !rungs.length) continue
+    cuts[framing] = { poster: file(poster), rungs: rungs.map(file) }
+    seconds = Math.max(seconds, ...rungs.map(entry => Number(entry.seconds) || 0))
+  }
+  if (!cuts.wide && !cuts.upright) return null
+  const language = lang()
+  return { id, cuts, seconds: seconds || Math.max(...film.lines.map(line => line.from)) + 1,
+    lines: film.lines.map(line => ({ from: line.from, text: line[language] })), sources: film.lines.map(line => line.source),
+    certainty: film.certainty, licence: records[0]!.licence }
+}
+
+/** The sheet a film shows the model of, as the store records it: its page
+ * and its thumbnail, or null where either is not admitted. */
+export function vinciSheetRecords(id: string, index: ManifestIndex): { page: SheetManifestEntry; thumb: SheetManifestEntry; title: string } | null {
+  const sheet = id.replace(/^sheet\//, '')
+  const pick = (role: 'sheet-page' | 'sheet-thumb'): SheetManifestEntry | null => {
+    const found = index.all.filter(entry => (entry as Partial<SheetManifestEntry>).role === role && entry.path?.includes(`/${sheet}__`))
+    if (found.length !== 1) return null
+    try { return validateSheetRecord(found[0]!, role).entry } catch { return null }
+  }
+  const page = pick('sheet-page'), thumb = pick('sheet-thumb')
+  if (!page || !thumb) return null
+  return { page, thumb, title: vinciSheetTitle(lang() === 'de' ? page.honesty_de : page.honesty_en) }
+}
+
+/** THE FILM IN THE VITRINE, its words in the page's language: play and pause
+ * are the clock's own, and the slider is named by the work it plays. */
+export function createVinciShowpiecePayload(show: VinciShowpiece, options: {
+  framing(): ShowpieceFraming
+  title: string
+  sheet?: FolioSheet
+}): ShowpiecePayload {
+  const language = lang()
+  return createShowpiecePayload({ cuts: show.cuts, framing: options.framing, seconds: show.seconds, title: options.title, lines: show.lines,
+    words: { play: CONTROLS.machine.play[language], pause: CONTROLS.machine.pause[language], clock: options.title }, sheet: options.sheet })
+}
+
+/** THE FILM'S RECORD: what the sheet's reproduction is, the film's own line
+ * from the store, and the sources its lines rest on. */
+export function renderVinciShowpieceRecord(show: VinciShowpiece, sheet: SheetManifestEntry | null, host: HTMLElement): void {
+  const full = make('div', 'vinci-record')
+  setRegister(full, 'record')
+  if (sheet) {
+    full.append(make('p', 'vinci-statement', lang() === 'de' ? sheet.honesty_de : sheet.honesty_en))
+    full.append(make('p', 'vinci-statement', sheet.licence))
+  }
+  full.append(make('p', 'vinci-statement', show.licence))
+  for (const source of show.sources) full.append(make('p', 'vinci-statement', source))
+  host.append(full)
 }
 
 /* ---- the places and the painting at the grave ------------------------- */

@@ -157,6 +157,7 @@ const MIME = {
   '.gltf': 'model/gltf+json',
   '.json': 'application/json',
   '.webm': 'video/webm',
+  '.mp4': 'video/mp4',
   '.mp3': 'audio/mpeg',
   '.wav': 'audio/wav',
   '.ogg': 'audio/ogg',
@@ -185,6 +186,27 @@ export function naAssets() {
       } else {
         res.setHeader('cache-control', 'no-store')
       }
+      // A VIDEO IS READ IN RANGES: WebKit plays no mp4 from a server that
+      // refuses them, and every engine seeks by them
+      const size = statSync(file).size
+      res.setHeader('accept-ranges', 'bytes')
+      const range = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range ?? '')
+      if (range && (range[1] || range[2])) {
+        const start = range[1] ? Number(range[1]) : Math.max(0, size - Number(range[2]))
+        const end = range[1] && range[2] ? Math.min(size - 1, Number(range[2])) : size - 1
+        if (start >= size || start > end) {
+          res.statusCode = 416
+          res.setHeader('content-range', `bytes */${size}`)
+          return res.end()
+        }
+        res.statusCode = 206
+        res.setHeader('content-range', `bytes ${start}-${end}/${size}`)
+        res.setHeader('content-length', String(end - start + 1))
+        if (req.method === 'HEAD') return res.end()
+        return createReadStream(file, { start, end }).pipe(res)
+      }
+      res.setHeader('content-length', String(size))
+      if (req.method === 'HEAD') return res.end()
       createReadStream(file).pipe(res)
     })
   }

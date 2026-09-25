@@ -1,0 +1,26 @@
+/* THE SHOWPIECE FILM: the picture whole in the viewport, its first frame
+   under it as a still until the film presents a frame of its own. */
+.showpiece {position:absolute;overflow:hidden;pointer-events:none;background:#0a0f13;box-shadow:0 2px 24px #0a0f13cc;}
+.showpiece > img,
+.showpiece > video {position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:contain;}
+.showpiece > img:not([src]) {display:none;}
+.showpiece > video {opacity:0;}
+.showpiece > video.shown {opacity:1;}
+
+/* ITS LINES stand under the picture, never on it: the payload places the
+   caption's top under the film and holds the longest line's height. The type
+   is the line's (the text law, section 9): 22 px on a phone, the close look's
+   line on a wide stage. */
+.vitrine[data-payload='showpiece'] .vitrine-caption {width:fit-content;max-width:min(860px,calc(100% - 28px));box-sizing:border-box;
+  margin:0 auto;padding:0 12px;font:400 1.375rem/1.32 var(--serif);color:#fff5e3;text-align:center;text-wrap:balance;
+  text-shadow:0 1px 12px #0a0f13;}
+#wing[data-desk~='closelook'] .vitrine[data-narrow='false'][data-payload='showpiece'] .vitrine-caption {
+  max-width:min(860px,calc(100% - 28px));font:400 1.625rem/2.25rem var(--serif);color:var(--desk-title,#fff5e3);}
+.vitrine[data-narrow='true'][data-payload='showpiece'] .vitrine-caption {max-width:calc(100% - 8px);padding:0 6px;}
+
+/* THE WORK'S OWN DOOR in the lane beside the picture's foot on a wide stage;
+   on the phone it is the glass at the clock row's right end, as a machine's folio is. */
+.vitrine[data-narrow='false'] .showpiece-door {position:absolute;right:auto;bottom:auto;}
+.vitrine[data-narrow='true'] .vitrine-clock .showpiece-door {position:static;flex:0 0 44px;width:44px;height:44px;min-width:44px;max-width:44px;
+  padding:0;overflow:hidden;border-radius:50%;}
+.vitrine[data-narrow='true'] .vitrine-clock .showpiece-door .vitrine-folio-thumb {width:100%;height:100%;object-fit:cover;object-position:50% 30%;}

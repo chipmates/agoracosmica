@@ -165,6 +165,29 @@ for (const [id, line] of Object.entries(lines.lines)) {
   speak(id, 'detail.name_de', d.name_de, 'de')
 }
 
+/* --------------------------------------------------------------- the films */
+
+/* A film the museum made of what a work describes runs its lines under the
+   picture in that work's close look: keyed by the registry, sourced, in the
+   wing's certainty set, spoken under the same registers, and each on the
+   film's own measure (story-check holds the characters and the order). */
+const films = readJson('src/wings/vinci/data/films.json').films ?? {}
+let filmLines = 0
+for (const [id, film] of Object.entries(films)) {
+  if (!registry.has(id)) refuse('unknown-key', `films ${id}`, 'no exhibit of the registry carries this id')
+  if (!CERTAINTY.has(film.certainty)) refuse('certainty', `films ${id}`, `certainty must be one of ${[...CERTAINTY].join(', ')}`, film.certainty)
+  for (const [index, line] of (film.lines ?? []).entries()) {
+    const at = `films ${id}[${index}]`
+    filmLines++
+    if (!CERTAINTY.has(line.certainty)) refuse('certainty', at, `certainty must be one of ${[...CERTAINTY].join(', ')}`, line.certainty)
+    if (typeof line.source !== 'string' || line.source.trim().length < 8) refuse('source', at, 'a line without a named source does not exist', line.source)
+    speak(at, 'en', line.en, 'en')
+    speak(at, 'de', line.de, 'de')
+    const en = words(line.en ?? ''), de = words(line.de ?? '')
+    if (en > 20 || de > 20) refuse('too-long', at, `a film's line runs to at most twenty words, this one ${Math.max(en, de)}`, line.en)
+  }
+}
+
 /* --------------------------------------------------------------- the steps */
 
 const steps = readJson('src/wings/vinci/data/steps.json')
@@ -349,6 +372,7 @@ const report = {
   steps: `${Object.keys(steps.steps).length} machines, ${Object.values(steps.steps).reduce((n, l) => n + l.length, 0)} steps`,
   details: Object.values(lines.lines).filter((l) => l.detail).length,
   cards: `${cardStrings} pairs of card words`,
+  films: `${Object.keys(films).length} films, ${filmLines} lines`,
   slots: `${Object.keys(limits.slots).length} exhibits, ${slotStrings} slot strings`,
   sizes: `${Object.keys(sizes).length} machines, ${sizeStrings} size sentences`,
   descriptions: `${Object.keys(plates).length} faces, ${plateStrings} descriptions`,

@@ -12,8 +12,10 @@ import { createWindowWorkLabel, policyLabelText, PICTURE_CERTAINTY_KEY } from '.
 import { validatePaintingRecord } from './pictures/policy'
 import { pictureDisplayUV, pictureDisplayWindow } from './pictures/registration'
 import { machineCatalog, type MachineSlug } from './machines/catalog'
-import { createVinciCloseLook, createVinciMachinePayload, vinciLine, vinciLimits, vinciMachineCard, vinciMachineClockWords, vinciMachineSheet,
-  vinciMachineSteps, vinciManuscriptWords, VINCI_EXHIBIT_CARD, VINCI_PAGE_HONESTY, VINCI_VITRINE_WORDS } from './collection/close-look'
+import { createVinciCloseLook, createVinciMachinePayload, createVinciShowpiecePayload, renderVinciShowpieceRecord, vinciLine, vinciLimits,
+  vinciMachineCard, vinciMachineClockWords, vinciMachineSheet, vinciMachineSteps, vinciManuscriptWords, vinciSheetRecords, vinciShowpiece,
+  VINCI_EXHIBIT_CARD, VINCI_PAGE_HONESTY, VINCI_VITRINE_WORDS, type VinciShowpiece } from './collection/close-look'
+import type { ShowpiecePayload } from '../vitrine/showpiece'
 import { createCyclePayload, type FilmCycle } from '../picture/cycle'
 import { createIslandPayload, islandChoice, type IslandPayload } from '../picture/island'
 import type { PictureBox, PictureFraming } from '../picture/seam'
@@ -101,6 +103,12 @@ export function createFilmLook(h: FilmLookHost) {
   async function open(id: string, from: HTMLElement | null): Promise<void> {
     const asked = performance.now()
     assets ??= await loadManifest()
+    if (id.startsWith('sheet/')) {
+      // a sheet whose film the store carries opens as that film
+      const show = vinciShowpiece(id, assets)
+      if (show) openShowpiece(show, from, 'enter')
+      return
+    }
     if (id.startsWith('picture/')) {
       const [, workId, face] = id.split('/') as [string, string, 'front' | 'reverse']
       const work = getWork(workId)
@@ -170,6 +178,7 @@ export function createFilmLook(h: FilmLookHost) {
   let machine: { payload: IslandPayload; island(): TurntablePayload | null; cycle(): ReturnType<typeof createCyclePayload> | null } | null = null
   function readout() {
     const open = closeLook.id
+    if (film && open === film.id) return { id: open, surface: closeLook.surface, mode: 'showpiece', standing: film.payload.standing(), ...film.payload.readout() }
     if (!open?.startsWith('machine/') || !machine) return { id: open, mode: null }
     const reading = machine.payload.reading()
     const current = [...h.host.querySelectorAll('.vitrine-step-item')].findIndex(b => b.getAttribute('aria-current') === 'step')
@@ -215,6 +224,63 @@ export function createFilmLook(h: FilmLookHost) {
       control(VINCI_VITRINE_WORDS.back, () => void open(machine, null), 'back'), shut()], set: null, certainty: 'documented' }, null, 'advance')
   }
 
+  /** THE FILM OF WHAT A SHEET DESCRIBES, as the sheet's close look: the film
+      whole with its lines under it, and the sheet itself one press away */
+  let film: { id: string; payload: ShowpiecePayload } | null = null
+  function openShowpiece(show: VinciShowpiece, from: HTMLElement | null, how: 'enter' | 'advance'): void {
+    if (!assets) return
+    const sheet = vinciSheetRecords(show.id, assets)
+    const title = sheet?.title ?? ''
+    const payload = createVinciShowpiecePayload(show, { framing: h.framing, title,
+      sheet: sheet ? { src: Promise.resolve(assetAddress(sheet.thumb)), label: title, open: () => openSheet(show) } : undefined })
+    film = { id: show.id, payload }
+    const record = (): void => h.openRecord(show.id, { en: title, de: title }, show.certainty, host => renderVinciShowpieceRecord(show, sheet?.page ?? null, host))
+    h.standDown(true)
+    closeLook.open({ id: show.id, title, line: vinciLine(show.id), card: [], payload,
+      controls: [control(VINCI_VITRINE_WORDS.provenance, record, 'record'), shut()], set: null, certainty: show.certainty }, from, how)
+  }
+  /** THE SHEET ITSELF, in the reader where the visitor stands; Back stands the film up again */
+  function openSheet(show: VinciShowpiece): void {
+    const sheet = assets ? vinciSheetRecords(show.id, assets) : null
+    if (!sheet) return
+    const door = `${show.id}/leaf`
+    const id = show.id.replace(/^sheet\//, '')
+    const reader = createLeafReader({
+      book: Promise.resolve({ sides: [{ id, label: sheet.title, shows: '', ways: [], head: vinciLine(show.id),
+        source: { pyramid: null, file: assetAddress(sheet.page), width: sheet.page.width, height: sheet.page.height },
+        thumb: assetAddress(sheet.thumb), colour: certaintyColour('documented'), holder: sheet.page.holder ?? '' }],
+      stripLabel: h.room, holder: '', honesty: text(VINCI_PAGE_HONESTY) }),
+      start: id, words: vinciManuscriptWords(), tier: () => 'standard' })
+    const record = (): void => h.openRecord(door, { en: sheet.title, de: sheet.title }, 'documented', host => {
+      for (const line of [lang() === 'de' ? sheet.page.honesty_de : sheet.page.honesty_en, sheet.page.licence]) host.append(make('p', 'vinci-statement', line))
+    })
+    // THE WAY BACK TO THE FILM is the look's own way back: the band's arrow on
+    // the desktop, the card row's first seat on the phone
+    const back = make('button', 'vitrine-control vitrine-step', '‹')
+    back.type = 'button'
+    back.dataset['role'] = 'back'
+    back.setAttribute('aria-label', text(VINCI_VITRINE_WORDS.back))
+    back.addEventListener('click', () => openShowpiece(show, null, 'advance'))
+    closeLook.open({ id: door, title: sheet.title, line: vinciLine(show.id), card: [], payload: reader,
+      controls: [control(VINCI_VITRINE_WORDS.provenance, record, 'record'), shut()], walk: [back],
+      set: null, certainty: 'documented' }, null, 'advance')
+  }
+  /** A PRESSED MARK FETCHES ITS FILM'S FIRST FRAME while the walk runs, so the
+      still stands the moment the look opens */
+  function warm(id: string): void {
+    if (!id.startsWith('sheet/')) return
+    void (async () => {
+      assets ??= await loadManifest()
+      const show = vinciShowpiece(id, assets)
+      const cut = show?.cuts[h.framing()] ?? show?.cuts.wide ?? show?.cuts.upright
+      if (!cut) return
+      const still = new Image()
+      still.decoding = 'async'
+      still.src = cut.poster.src
+      void still.decode().catch(() => undefined)
+    })()
+  }
+
   /** THE OVERVIEW'S CELLS for a set: each work's name, mark and plate at rest,
       from the registers the live row reads; a cell exists only where a plate resolves */
   async function cells(exhibits: readonly string[]): Promise<DeskOverviewCell[]> {
@@ -250,6 +316,7 @@ export function createFilmLook(h: FilmLookHost) {
     get id(): string | null { return closeLook.id },
     get surface() { return closeLook.surface },
     open,
+    warm,
     close: () => closeLook.close(),
     key: (event: KeyboardEvent): boolean => closeLook.key(event),
     layout: () => closeLook.layout(),

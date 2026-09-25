@@ -22,6 +22,7 @@ import ts from 'typescript'
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const STORY = 'src/wings/vinci/story.ts'
 const EXHIBITS = 'src/wings/vinci/data/lines.json'
+const FILMS = 'src/wings/vinci/data/films.json'
 
 /* THE TWO BANDS, named here once and nowhere else. A station's line stands in
    the label band under the picture, two rows of the serif at 30 on 40 over an
@@ -31,6 +32,9 @@ const EXHIBITS = 'src/wings/vinci/data/lines.json'
    language, because German runs longer in characters than English here. */
 const STATION_LINE_CHARS = 120
 const EXHIBIT_LINE_CHARS = 90
+/* A FILM'S LINES stand under its picture on the station line's measure, two
+   rows of the line's type, so they hold the station line's characters. */
+const FILM_LINE_CHARS = 120
 
 /** the rule, the section it stands on, and what it says in the report */
 const RULES = {
@@ -40,6 +44,8 @@ const RULES = {
   'line-chars-de': ['§6', `a station line holds ${STATION_LINE_CHARS} characters, the German included`],
   'exhibit-chars': ['§5', `an exhibit line holds ${EXHIBIT_LINE_CHARS} characters at the close look`],
   'exhibit-debt': ['§5', 'a line inside the band has no place on the re-authoring list'],
+  'film-chars': ['§5', `a film's line holds ${FILM_LINE_CHARS} characters under its picture`],
+  'film-order': ['§5', 'a film\'s lines stand from 0 s in the order of the film'],
   'drawer-words': ['§5', 'a drawer runs 40 to 60 words'],
   'drawer-sentence': ['§5', 'no sentence of a drawer runs over fourteen words'],
   'dash': ['§13', 'the path carries no em dash and no en dash'],
@@ -154,6 +160,35 @@ export function judgeExhibit(id, line, debt) {
     if (!debt.has(id)) out.push(['exhibit-chars', `${id}.${language}`, `${characters(said)} characters`])
   }
   if (debt.has(id) && !over) out.push(['exhibit-debt', id, 'inside the band and still on the list'])
+  return out
+}
+
+/** A FILM'S LINES, each under the line's own budget on the film's measure:
+ *  the first from the film's start, the rest in the film's order. */
+export function judgeFilm(id, film) {
+  const out = []
+  const lines = Array.isArray(film?.lines) ? film.lines : []
+  if (!lines.length) out.push(['language', `${id}.lines`, 'none'])
+  lines.forEach((line, index) => {
+    const at = `${id}.lines[${index}]`
+    const previous = index ? lines[index - 1].from : -1
+    if (typeof line.from !== 'number' || (index === 0 ? line.from !== 0 : !(line.from > previous)))
+      out.push(['film-order', `${at}.from`, String(line.from)])
+    for (const language of ['en', 'de']) {
+      const said = line?.[language]
+      if (typeof said !== 'string' || !said.trim()) { out.push(['language', `${at}.${language}`, 'empty']); continue }
+      if (/[\u2014\u2013]/.test(said)) out.push(['dash', `${at}.${language}`, said])
+      if (said.includes(';')) out.push(['semicolon', `${at}.${language}`, said])
+      if (said.includes('?')) out.push(['question', `${at}.${language}`, said])
+      if (words(said) > LINE_WORDS) out.push(['line-words', `${at}.${language}`, `${words(said)} words`])
+      if (longestSentence(said, language) > SENTENCE_WORDS)
+        out.push(['line-sentence', `${at}.${language}`, `${longestSentence(said, language)} words in one sentence`])
+      if (characters(said) > FILM_LINE_CHARS) out.push(['film-chars', `${at}.${language}`, `${characters(said)} characters`])
+    }
+    if (typeof line.en === 'string' && typeof line.de === 'string' && digits(line.en).length !== digits(line.de).length)
+      out.push(['digits', at, `${digits(line.en).length} in the English, ${digits(line.de).length} in the German`])
+    if (!CLASSES.has(line.certainty)) out.push(['certainty', `${at}.certainty`, String(line.certainty)])
+  })
   return out
 }
 
@@ -293,6 +328,15 @@ function run() {
     if (Math.max(characters(line.en ?? ''), characters(line.de ?? '')) > EXHIBIT_LINE_CHARS) overBand++
   }
 
+  /* the films' lines, read from their own file: they run under a film the
+     museum made, in the close look of the work the film shows */
+  const films = JSON.parse(fs.readFileSync(path.join(ROOT, FILMS), 'utf8')).films ?? {}
+  let filmLines = 0
+  for (const [id, film] of Object.entries(films)) {
+    for (const [rule, at, measured] of judgeFilm(id, film)) refuse(rule, at, measured, id)
+    filmLines += film.lines?.length ?? 0
+  }
+
   const from = process.argv[process.argv.indexOf('--from') + 1]
   let cardCanon = null
   if (process.argv.includes('--from') && from) {
@@ -313,6 +357,7 @@ function run() {
       stationLineCharacters: STATION_LINE_CHARS, exhibitLineCharacters: EXHIBIT_LINE_CHARS,
     },
     exhibits: { read: Object.keys(exhibits).length, overBand, waiting: BAND_DEBT.size },
+    films: { read: Object.keys(films).length, lines: filmLines, lineCharacters: FILM_LINE_CHARS },
     titleWall: story.vinciStoryTitleWall ? { buttons: story.vinciStoryTitleWall.buttons.length } : null,
     openings: Object.keys(openings).length,
     exit: story.vinciStoryExit ? { things: story.vinciStoryExit.things.length, doors: story.vinciStoryExit.doors.length } : null,
@@ -409,6 +454,15 @@ const SENTENCE_CASES = [
   ['a year ends a German sentence', 'de', 'Er starb 1519. Die Kirche stand noch.', 2],
 ]
 
+/* A FILM'S LINE ON ITS EDGE: 120 characters holds, 121 is refused, and a
+   first line that does not stand from the start is refused. */
+const FILM_AT = 'Leonardo\'s anatomical drawing records the circulating water behind every cusp. Watch those darkened seeds rotate slowly.'
+const FILM_CASES = [
+  ['a film line at its band', { lines: [{ from: 0, en: FILM_AT, de: FILM_AT, certainty: 'documented' }] }, 120, []],
+  ['a film line one character over', { lines: [{ from: 0, en: `${FILM_AT}s`, de: FILM_AT, certainty: 'documented' }] }, 121, ['film-chars']],
+  ['a film whose first line is late', { lines: [{ from: 2, en: FILM_AT, de: FILM_AT, certainty: 'documented' }] }, 120, ['film-order']],
+]
+
 function selftest() {
   const canonKeys = new Set(['C00', 'C01'])
   const bad = []
@@ -426,10 +480,15 @@ function selftest() {
     const got = judgeExhibit(id, line, waiting ? new Set([id]) : new Set()).map(([rule]) => rule)
     if (got.join(',') !== want.join(',')) bad.push(`${said}: expected ${want.join(', ') || 'nothing'}, got ${got.join(', ') || 'nothing'}`)
   }
+  for (const [said, film, length, want] of FILM_CASES) {
+    if (characters(film.lines[0].en) !== length) bad.push(`${said}: the case reads ${characters(film.lines[0].en)} characters, not ${length}`)
+    const got = judgeFilm('sheet/case', film).map(([rule]) => rule)
+    if (got.join(',') !== want.join(',')) bad.push(`${said}: expected ${want.join(', ') || 'nothing'}, got ${got.join(', ') || 'nothing'}`)
+  }
   const wing = run()
   for (const line of bad) console.log(` · ${line}`)
   if (!wing.ok) for (const error of wing.errors) console.log(` · the wing: ${error.stop} ${error.at} ${error.rule} (${error.measured})`)
-  const cases = CASES.length + EXHIBIT_CASES.length + SENTENCE_CASES.length
+  const cases = CASES.length + EXHIBIT_CASES.length + SENTENCE_CASES.length + FILM_CASES.length
   console.log(bad.length || !wing.ok
     ? `SELFTEST FAILED: ${bad.length} of ${cases} cases, the wing ${wing.ok ? 'passes' : 'is refused'}`
     : `selftest: ${cases} cases as written, and the wing's own ${wing.stops} stops and ${wing.exhibits.read} exhibit lines pass`)

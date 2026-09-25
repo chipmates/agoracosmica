@@ -106,6 +106,10 @@ const WORD = {
   close: () => LOBBY_TEXT.close,
 }
 
+/** A KIND THAT RUNS asks for its run before it offers the way on: a machine
+    and a film the museum made are started by the gold control first */
+const runs = (kind: string | undefined): boolean => kind === 'machine' || kind === 'showpiece'
+
 /** the word the gold control carries at a kind */
 function wayOn(kind: string): VinciText {
   if (kind === 'machine') return WORD.machine()
@@ -192,9 +196,19 @@ export function createCloseLookBand(options: {
   }
 
   backWay.addEventListener('click', () => press(view?.back ?? null))
+  /** the run the gold control still asks for: a machine's first run, and a
+      film's every run while it stands still, so a paused or ended film is
+      started again from the same corner */
+  function asks(): boolean {
+    const run = view?.run ?? null
+    if (!run || !runs(view?.kind)) return false
+    return view?.kind === 'showpiece' ? run.getAttribute('aria-pressed') !== 'true' : !ran
+  }
+  const pressed = new MutationObserver(() => paintWays())
+
   on.addEventListener('click', () => {
     const run = view?.run ?? null
-    if (view?.kind === 'machine' && !ran && run) {
+    if (run && asks()) {
       // a run already under way is not started twice: the word goes on, the
       // machine keeps running
       ran = true
@@ -243,7 +257,7 @@ export function createCloseLookBand(options: {
   function paintWays(): void {
     if (!view) return
     const on_ = view.on as HTMLButtonElement | null
-    const running = view.kind === 'machine' && !ran && Boolean(view.run)
+    const running = asks()
     // the set names where the way on leads; a book's own step names it only
     // where it crosses into another volume
     const target = view.onTitle ?? on_?.dataset['title'] ?? ''
@@ -289,6 +303,8 @@ export function createCloseLookBand(options: {
       const keep = next.id === view?.id && !drawer.hidden
       if (next.id !== view?.id) ran = false
       view = next
+      pressed.disconnect()
+      if (next.kind === 'showpiece' && next.run) pressed.observe(next.run, { attributes: true, attributeFilter: ['aria-pressed'] })
       root.lang = language
       stepBack.textContent = ''
       stepBack.append(icon(STEP_BACK), document.createTextNode(next.room))
@@ -344,6 +360,7 @@ export function createCloseLookBand(options: {
     clear() {
       view = null
       ran = false
+      pressed.disconnect()
       measured = 0
       drawer.hidden = true
       delete root.dataset['drawer']

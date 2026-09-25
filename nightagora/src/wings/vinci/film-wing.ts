@@ -309,6 +309,7 @@ export function createWing(): WingModule {
   }
   function pressMark(dot: HTMLButtonElement, id: string, walks: boolean): void {
     if (!picture || look?.id) return
+    void lookNow().then(l => l.warm(id))
     if (!walks) { openExhibit(id, dot); return }
     // THE MARK ANSWERS BEFORE THE PICTURE MOVES: its word and its ring are the walk
     answering = { dot, id }

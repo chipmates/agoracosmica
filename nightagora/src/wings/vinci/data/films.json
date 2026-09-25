@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "provenance": {
+    "scope": "A film the museum made of what a work describes, shown as that work's close look. Its lines run under the film, outside the picture: each from its own second of the film until the next line's. The work's own line in lines.json stays the work's.",
+    "rule": "A line holds at most 120 characters and 20 words in either language, and no sentence over 14 words. Every line names its source, and the record prints it.",
+    "files": "The film's bytes live in the asset store. A record there names this file's key as its `source`, its role (`showpiece-film` or `showpiece-poster`) and its framing; a work whose records the store does not carry opens as it did before.",
+    "prepared": "2026-09-25"
+  },
+  "films": {
+    "sheet/rcin-919082": {
+      "name": "glass-heart",
+      "certainty": "reconstructed",
+      "lines": [
+        {
+          "from": 0,
+          "en": "Built on a computer from his notes. Around 1512 he drew the water curling behind the flaps.",
+          "de": "Nach seinen Notizen am Computer gebaut. Um 1512 zeichnete er, wie das Wasser hinter der Klappe wirbelt.",
+          "source": "Royal Collection, RCIN 919082, about 1512 to 1513.",
+          "certainty": "documented"
+        },
+        {
+          "from": 17.94,
+          "en": "Those curls help shut the valve, as he wrote. Seen in a model in 1968, in living people in 2014.",
+          "de": "Diese Wirbel helfen der Klappe beim Schließen, wie er schrieb. 1968 sah man sie im Modell, 2014 bei lebenden Menschen.",
+          "source": "Bellhouse and Bellhouse, Nature 217 (1968). Bissell, Dall'Armellina and Choudhury, European Heart Journal 35 (2014).",
+          "certainty": "documented"
+        }
+      ]
+    }
+  }
+}
