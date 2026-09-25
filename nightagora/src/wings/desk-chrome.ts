@@ -416,17 +416,18 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
     else if (held) back.focus({ preventScroll: true })
   }
 
-  /* ONE SENTENCE A ROW. A day of a month ends in a short number whose stop is
-     not the sentence's, so a period after one or two digits never cuts. */
-  function sentences(said: string): string[] {
+  /* ONE SENTENCE A ROW. German writes a day and a century with a period
+     ("2. Mai", "19. Jahrhundert"), so that stop never cuts; an age or a year
+     before a stop ends the sentence in either language. */
+  function sentences(said: string, language: string): string[] {
     const out: string[] = []
     let start = 0
     for (let i = 0; i < said.length; i++) {
       const mark = said[i]
       if (mark !== '.' && mark !== '!' && mark !== '?') continue
       if (said[i + 1] !== ' ') continue
-      const digits = /(\d+)$/.exec(said.slice(start, i))
-      if (mark === '.' && digits && digits[1]!.length <= 2) continue
+      if (mark === '.' && language === 'de' && /(?:^|\D)\d{1,2}$/.test(said.slice(start, i))
+        && /^ (?:Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember|Jahrhunderts?)(?!\p{L})/u.test(said.slice(i + 1))) continue
       out.push(said.slice(start, i + 1).trim())
       start = i + 1
     }
@@ -449,7 +450,7 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
     plateClock.hidden = !stop?.age
     plateCount.textContent = `${at.index + 1} / ${at.count}`
     plateWords.textContent = ''
-    for (const line of sentences(said)) plateWords.append(make('p', '', line))
+    for (const line of sentences(said, host.lang())) plateWords.append(make('p', '', line))
     plateFoot.textContent = ''
     if (sourcesNode) plateFoot.append(sourcesNode)
     plateQuestion.textContent = host.question()

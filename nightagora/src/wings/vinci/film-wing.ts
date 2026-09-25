@@ -84,17 +84,18 @@ function lifeStops(): LifeStop[] {
   return out
 }
 
-/** ONE SENTENCE A ROW, cut as the desktop's drawer cuts them: a day of a
-    month ends in a short number whose stop is not the sentence's. */
-function sentences(said: string): string[] {
+/** ONE SENTENCE A ROW, cut as the desktop's drawer cuts them: a German day
+    or century keeps its period ("2. Mai", "19. Jahrhundert"), an age or a
+    year before a stop ends the sentence in either language. */
+function sentences(said: string, language: string): string[] {
   const out: string[] = []
   let start = 0
   for (let i = 0; i < said.length; i++) {
     const mark = said[i]
     if (mark !== '.' && mark !== '!' && mark !== '?') continue
     if (said[i + 1] !== ' ') continue
-    const digits = /(\d+)$/.exec(said.slice(start, i))
-    if (mark === '.' && digits && digits[1]!.length <= 2) continue
+    if (mark === '.' && language === 'de' && /(?:^|\D)\d{1,2}$/.test(said.slice(start, i))
+      && /^ (?:Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember|Jahrhunderts?)(?!\p{L})/u.test(said.slice(i + 1))) continue
     out.push(said.slice(start, i + 1).trim())
     start = i + 1
   }
@@ -541,7 +542,7 @@ export function createWing(): WingModule {
     phone.line.textContent = stop ? text(stop.line) : ''
     phone.drawer.textContent = ''
     if (drawerOpen && stop?.drawer) {
-      for (const sentence of sentences(text(stop.drawer))) phone.drawer.append(make('p', '', sentence))
+      for (const sentence of sentences(text(stop.drawer), lang())) phone.drawer.append(make('p', '', sentence))
       const door = hosts.stage.parentElement!.querySelector<HTMLElement>('.wing-door')
       if (door) {
         const ask = make('button', 'film-ask', door.textContent ?? '')

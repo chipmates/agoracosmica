@@ -70,13 +70,19 @@ export const words = (text) => text.trim().split(/\s+/).filter(Boolean).length
 export const characters = (text) => [...text].length
 
 /** A sentence ends on a stop, a bang or a question followed by a capital.
- *  German writes ordinals with a period, so "2. Mai" and "19. Jahrhundert"
- *  are not two sentences, while a year ending a sentence still is. */
+ *  German writes a day and a century with a period, so "2. Mai" and "19.
+ *  Jahrhundert" are not two sentences; any other number before a stop, an
+ *  age or a year, ends one ("Er war 65. Das Bild"). English writes no
+ *  ordinal with a period. The display's two splitters keep the same rule. */
+const GERMAN_ORDINAL_NEXT = /^(?:Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember|Jahrhunderts?)(?![\p{L}])/u
 export function sentences(text, language) {
-  const split = language === 'de'
-    ? /(?<!(?<!\d)\d{1,2})[.!?]+\s+(?=[A-ZÄÖÜ0-9])/
-    : /[.!?]+\s+(?=[A-ZÄÖÜ0-9])/
-  return text.split(new RegExp(split, 'g')).map((s) => s.trim()).filter(Boolean)
+  const out = []
+  for (const piece of text.split(/(?<=[.!?])\s+(?=[A-ZÄÖÜ0-9])/)) {
+    const last = out.length ? out[out.length - 1] : null
+    if (language === 'de' && last !== null && /(?:^|\D)\d{1,2}\.$/.test(last) && GERMAN_ORDINAL_NEXT.test(piece)) out[out.length - 1] = `${last} ${piece}`
+    else out.push(piece)
+  }
+  return out.map((s) => s.trim()).filter(Boolean)
 }
 const longestSentence = (text, language) => Math.max(0, ...sentences(text, language).map(words))
 const digits = (text) => (text.match(/\d+/g) ?? []).map(Number)
@@ -345,9 +351,31 @@ const EXHIBIT_CASES = [
   ['a waiting line that is now inside the band', 'sheet/rcin-919006', AT_BAND, true, [90, 90], ['exhibit-debt']],
 ]
 
+/* THE ORDINAL, both ways: an age or a year before a stop ends the sentence in
+   either language, a German day or century does not. The four joins are the
+   wing's own drawers. */
+const SENTENCE_CASES = [
+  ['an age ends a sentence at the arrival', 'en', 'The king was Francis the First, then about 22. His accounts record a pension of two thousand écus for two years.', 2],
+  ['an age ends a sentence at the arrival, in German', 'de', 'Der König war Franz der Erste, damals etwa 22. Seine Rechnungsbücher verzeichnen eine Pension von zweitausend Écus für zwei Jahre.', 2],
+  ['an age ends a sentence at the study', 'en', "He was 65. The woman's picture, he wrote, was made for Giuliano de' Medici.", 2],
+  ['an age ends a sentence at the study, in German', 'de', "Er war 65. Das Bild der Frau, schrieb er, sei für Giuliano de' Medici gemalt worden.", 2],
+  ['an age ends a sentence at the supper wall', 'en', 'The duke pressed him to finish it, and he did at 45. He painted it dry on the plaster, not into it.', 2],
+  ['an age ends a sentence at the supper wall, in German', 'de', 'Der Herzog drängte ihn, es zu vollenden, und mit 45 war es fertig. Er malte trocken auf den Putz, nicht in ihn hinein.', 2],
+  ['an age ends a sentence at the chamber', 'en', 'Vasari wrote later that the king held his head, giving his age as 75. He was 67.', 2],
+  ['an age ends a sentence at the chamber, in German', 'de', 'Vasari schrieb später, der König habe seinen Kopf gehalten, als er mit 75 starb. Er war 67.', 2],
+  ['a German day stays in its sentence', 'de', 'Er starb am 2. Mai 1519 in diesem Haus.', 1],
+  ['a German century stays in its sentence', 'de', 'Die Kapelle wurde im 16. Jahrhundert verändert.', 1],
+  ['a German century in the genitive stays in its sentence', 'de', 'Die Kirche stand bis Anfang des 19. Jahrhunderts. Eine Grabung fand 1863 Knochen.', 2],
+  ['a year ends a German sentence', 'de', 'Er starb 1519. Die Kirche stand noch.', 2],
+]
+
 function selftest() {
   const canonKeys = new Set(['C00', 'C01'])
   const bad = []
+  for (const [said, language, text, want] of SENTENCE_CASES) {
+    const got = sentences(text, language).length
+    if (got !== want) bad.push(`${said}: expected ${want} sentence(s), got ${got}`)
+  }
   for (const [said, stop, want] of CASES) {
     const got = judgeStop(stop, canonKeys).map(([rule]) => rule)
     if (got.join(',') !== want.join(',')) bad.push(`${said}: expected ${want.join(', ') || 'nothing'}, got ${got.join(', ') || 'nothing'}`)
@@ -361,7 +389,7 @@ function selftest() {
   const wing = run()
   for (const line of bad) console.log(` · ${line}`)
   if (!wing.ok) for (const error of wing.errors) console.log(` · the wing: ${error.stop} ${error.at} ${error.rule} (${error.measured})`)
-  const cases = CASES.length + EXHIBIT_CASES.length
+  const cases = CASES.length + EXHIBIT_CASES.length + SENTENCE_CASES.length
   console.log(bad.length || !wing.ok
     ? `SELFTEST FAILED: ${bad.length} of ${cases} cases, the wing ${wing.ok ? 'passes' : 'is refused'}`
     : `selftest: ${cases} cases as written, and the wing's own ${wing.stops} stops and ${wing.exhibits.read} exhibit lines pass`)
