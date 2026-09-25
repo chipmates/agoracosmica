@@ -42,8 +42,17 @@ import {
 
 export const JOB_FORMAT = 'vinci-film-job-v1'
 export const LEDGER = 'ledger.jsonl'
-/** the program's gate lock: slot A, or slot B at this battery share or more (`scratch/locked.sh`'s own rule) */
-export const LOCK_DIR = resolve(APP_ROOT, '..', '..', 'internal', 'night-agora', 'program', 'forge')
+/** THE PROGRAM'S GATE LOCK, found upward from the checkout (a worktree of a
+    round, the museum inside the public repository, or its own): slot A, or
+    slot B at this battery share or more (`scratch/locked.sh`'s own rule) */
+export function findLockDir(from = APP_ROOT) {
+  if (process.env['NA_LOCK_DIR']) return resolve(process.env['NA_LOCK_DIR'])
+  for (let at = from; ; at = dirname(at)) {
+    const here = join(at, 'internal', 'night-agora', 'program', 'forge')
+    if (existsSync(here)) return here
+    if (dirname(at) === at) throw new Error(`no program forge above ${from}: name it with NA_LOCK_DIR`)
+  }
+}
 const LOCK_SLOTS = ['.gate-lock', '.gate-lock-b']
 const SLOT_B_BATTERY = 90
 const LOCK_POLL_MS = 20000
@@ -198,7 +207,7 @@ function battery() {
  * by mkdir; slot B only at 90 percent battery or more; the owner and the time
  * written inside. Only a slot this process made is ever removed.
  */
-export function gateLock({ dir = LOCK_DIR, owner = 'w7', mode = 'gate', log = () => {}, batteryOf = battery, pollMs = LOCK_POLL_MS } = {}) {
+export function gateLock({ mode = 'gate', dir = mode === 'none' ? '' : findLockDir(), owner = 'w7', log = () => {}, batteryOf = battery, pollMs = LOCK_POLL_MS } = {}) {
   let held = null, lastGap = Date.now()
   const release = () => {
     if (!held) return
