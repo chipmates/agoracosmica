@@ -27,6 +27,10 @@ export const STATION_EXPOSURE:Partial<Record<VinciStationId,number>>={courtyard:
   'picture-room':1.34,'picture-room-west':1.34,'reading-table':0.4,'line-early':1.3,flight:1.55,works:1.55,body:1.4,'supper-wall':1.85,
   // the grave court stands in its walls' shade: the eye opens on the shade
   grave:1.36}
+/** THE TOE WHERE A ROOM IS ALL SHADE. The reading booth has one lamp and one
+ * pool; under the wing's toe everything off the pool fell to black. The toe
+ * eases over the last third of a leg, as the exposure does. */
+export const STATION_TOE:Partial<Record<VinciStationId,number>>={'reading-table':.02}
 /** THE WING'S ONE LIGHT RIG, which the vitrine's turntable stands under too:
  * the key and fill of the hour, and the hall's own fittings. */
 export const KEY_RIG={

@@ -67,9 +67,11 @@ export function declarations(text, names) {
   return found
 }
 
-/** THE EXPOSURE A STATION OPENS AT: the index's own table and its default. */
+/** THE EXPOSURE A STATION OPENS AT: the index's own table and its default.
+    A station with its own toe carries it in the same value, so a toe moved
+    turns red the clips that stand there; a station without one keeps its key. */
 export function exposures(text) {
-  const held = declarations(text, ['STATION_EXPOSURE', 'PRINT'])
+  const held = declarations(text, ['STATION_EXPOSURE', 'STATION_TOE', 'PRINT'])
   const literal = (node) => {
     if (ts.isNumericLiteral(node)) return Number(node.text)
     if (ts.isPrefixUnaryExpression(node) && node.operator === ts.SyntaxKind.MinusToken) return -literal(node.operand)
@@ -89,7 +91,15 @@ export function exposures(text) {
   }
   const print = objectOf(held.get('PRINT')).properties.find((p) => ts.isPropertyAssignment(p) && p.name.getText() === 'exposure')
   if (!print) throw new Error('the print names no exposure')
-  return { table, fallback: literal(print.initializer), of: (station) => table[station] ?? literal(print.initializer) }
+  const toes = {}
+  if (held.has('STATION_TOE')) for (const p of objectOf(held.get('STATION_TOE')).properties) {
+    if (ts.isPropertyAssignment(p)) toes[p.name.getText().replace(/^['"]|['"]$/g, '')] = literal(p.initializer)
+  }
+  const of = (station) => {
+    const ex = table[station] ?? literal(print.initializer)
+    return toes[station] === undefined ? ex : `${ex} toe ${toes[station]}`
+  }
+  return { table, toes, fallback: literal(print.initializer), of }
 }
 
 /** A module's value imports, followed within the app (types are erased). */

@@ -148,9 +148,10 @@ export function createFilmLook(h: FilmLookHost) {
         ? await Promise.all([import('./machines'), import('./print')]) : null
       let island: TurntablePayload | null = null
       const makeLive = () => {
-        const [{ buildMachine }, { PRINT, STATION_EXPOSURE, KEY_RIG }] = live!
+        const [{ buildMachine }, { PRINT, STATION_EXPOSURE, STATION_TOE, KEY_RIG }] = live!
+        const at = h.station() as keyof typeof STATION_EXPOSURE
         island = createVinciMachinePayload({ stack: h.stack, slug, body: buildMachine(slug, h.stack),
-          grade: { ...PRINT, exposure: STATION_EXPOSURE[h.station() as keyof typeof STATION_EXPOSURE] ?? PRINT.exposure }, light: KEY_RIG,
+          grade: { ...PRINT, exposure: STATION_EXPOSURE[at] ?? PRINT.exposure, toe: STATION_TOE[at] ?? PRINT.toe }, light: KEY_RIG,
           openRecord: record, openFolio,
           // the island is the one live picture: the film stands aside while it draws
           restore: () => { h.veil(false); h.stack.setScene(h.scene, h.camera, PRINT) },
