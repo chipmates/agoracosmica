@@ -20,7 +20,7 @@ import type { MaterialLibrary } from '../../stack/materials'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type N = any
-const { Fn, abs, acos, attribute, cameraPosition, clamp, exp, float, floor, fract, max, min, mix, mx_noise_float, normalWorld, normalWorldGeometry, positionWorld, smoothstep, uv, vec2, vec3 } = TSL as unknown as Record<string, N>
+const { Fn, abs, acos, attribute, cameraPosition, clamp, exp, float, floor, fract, max, min, mix, mx_noise_float, normalWorld, normalWorldGeometry, positionWorld, smoothstep, step, uv, vec2, vec3 } = TSL as unknown as Record<string, N>
 
 type V2 = [number, number]
 type V3 = [number, number, number]
@@ -1788,6 +1788,7 @@ function bakePoint(at: V3, n: V3, hall: boolean): [number, number] {
   let sky = 0, bounce = 0
   if (hall) {
     for (const w of WINDOWS) sky += formFactor(at, n, w.ap.corners, w.ap.inward, 2) * TRANSMIT * w.ap.radiance
+    for (const e of EMBRASURES) if (e.holds(at)) for (const [poly, normal] of e.cheeks) sky += formFactor(at, n, poly, normal, 4) * TRANSMIT * e.radiance * CHEEK_RETURN
     for (const patch of PATCHES) bounce += formFactor(at, n, patch, [0, 0, 1], 3)
     bounce += ROOM_FILL + roomReturnAt(n)
   } else {
@@ -1798,6 +1799,34 @@ function bakePoint(at: V3, n: V3, hall: boolean): [number, number] {
   }
   return [Math.min(1, .02 + sky * 2.4), bounce]
 }
+/** INSIDE AN EMBRASURE the bake's window, which stands at the mouth, lies
+ * behind a face: the cross's inner faces see the daylit cheeks, soffit and
+ * sill instead, which send back about this share of the mouth's radiance. */
+const CHEEK_RETURN = .8
+const EMBRASURES = WINDOWS.map(w => {
+  const f = w.facade, fr = frame(f), o = w.o, mouth = thicknessOf(f) + LINING_GAP
+  const at = (a: number, inward: number, z: number): V3 => [f.from[0] + fr.dir[0] * a - fr.out[0] * inward, f.from[1] + fr.dir[1] * a - fr.out[1] * inward, z]
+  const a0 = o.from_m, a1 = o.from_m + o.width_m, z0 = o.base_m, z1 = o.base_m + o.height_m
+  const side = (a: number): V3[] => [at(a, GLASS_IN, z0), at(a, mouth, z0), at(a, mouth, z1), at(a, GLASS_IN, z1)]
+  const flat = (z: number): V3[] => [at(a0, GLASS_IN, z), at(a1, GLASS_IN, z), at(a1, mouth, z), at(a0, mouth, z)]
+  const cheeks: [V3[], V3][] = [
+    [side(a0), [fr.dir[0], fr.dir[1], 0]], [side(a1), [-fr.dir[0], -fr.dir[1], 0]],
+    [flat(z0), [0, 0, 1]], [flat(z1), [0, 0, -1]],
+  ]
+  const holds = (p: V3): boolean => {
+    const d: V2 = [p[0] - f.from[0], p[1] - f.from[1]]
+    const along = d[0] * fr.dir[0] + d[1] * fr.dir[1], inward = -(d[0] * fr.out[0] + d[1] * fr.out[1])
+    return inward > GLASS_IN && inward < mouth - .005 && along > a0 - .01 && along < a1 + .01 && p[2] > z0 - .01 && p[2] < z1 + .01
+  }
+  // the same test per pixel, for the tier that lights every point in the shader
+  const holdsNode = (): N => {
+    const dx = positionWorld.x.sub(f.from[0]), dy = positionWorld.z.negate().sub(f.from[1]), z = positionWorld.y
+    const along = dx.mul(fr.dir[0]).add(dy.mul(fr.dir[1])), inward = dx.mul(fr.out[0]).add(dy.mul(fr.out[1])).negate()
+    return step(GLASS_IN, inward).mul(step(inward, mouth - .005)).mul(step(a0 - .01, along)).mul(step(along, a1 + .01)).mul(step(z0 - .01, z)).mul(step(z, z1 + .01))
+  }
+  const centreOf = (poly: V3[]): V3 => [0, 1, 2].map(k => poly.reduce((sum, q) => sum + q[k]! / poly.length, 0)) as V3
+  return { cheeks, holds, holdsNode, centreOf, radiance: w.ap.radiance }
+})
 /** The room's second bounce, in the patches' own units: what a surface
  * receives from the lit walls and ceiling rather than from the floor. */
 const ROOM_FILL = .05
@@ -2014,6 +2043,11 @@ function hallMaterial(perPixel: boolean, library?: MaterialLibrary, sunShadow?: 
       const f = formFactorNode(w.ap.corners, centre).mul(TRANSMIT * w.ap.radiance)
       sky = sky.add(f)
       if (w.west) westSky = westSky.add(f)
+    }
+    for (const e of EMBRASURES) {
+      let back: N = float(0)
+      for (const [poly, normal] of e.cheeks) back = back.add(formFactorNode(poly, add(e.centreOf(poly), normal)))
+      sky = sky.add(back.mul(e.holdsNode()).mul(TRANSMIT * e.radiance * CHEEK_RETURN))
     }
     for (const patch of PATCHES) sun = sun.add(formFactorNode(patch, add(patch[0]!, [0, 0, 1.5])))
     const linkCentre: V3 = [LINK_OUTLINE.reduce((a, q) => a + q[0], 0) / 4, LINK_OUTLINE.reduce((a, q) => a + q[1], 0) / 4, FLOOR_Z + 1.5]
