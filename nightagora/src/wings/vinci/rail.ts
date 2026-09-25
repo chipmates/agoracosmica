@@ -68,10 +68,8 @@ const HALL_DOOR=p(-4.2388,-11.0992,2.45,-4.2388,-11.0992,2.45)
 /** The body wall's phone eye, square on its hang's axis 4.7 m off the linen:
  * the nearest place a 390 px stage holds the whole recess between its jambs. */
 const BODY_PHONE=p(-34,-52.6,FLOOR+1.62,-34,-52.6,FLOOR+1.62)
-/** The chamber's two eyes at the court's west end, above the terrace's edge.
- * The desktop's stands 1.6 m further east, short of the terrace's step, where
- * the lens that holds the house and the pavilion both is narrowest. */
-const CHAMBER_EYE=p(-4.2,-32.4,1.65,-4.2,-32.4,1.65), CHAMBER_DESK=p(-2.6,-32.6,1.65,-2.6,-32.6,1.65)
+/** The chamber's eye, on the lawn under the court's south-west corner. */
+const CHAMBER_LAWN=standing(-4,-38)
 function narrowRoomPose(pose:Pose,share=NARROW_AIM_SHARE):Pose {
   const fov=Math.min(104,pose.fov*NARROW_LENS)
   const reach=pose.eye.distanceTo(pose.at)
@@ -103,7 +101,9 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // The phone keeps its gaze on the door and opens the lens instead: at 70
   // degrees the cone's right half fell between the court corner and the east
   // range's windows and held neither.
-  if(id==='courtyard') return narrow?p(10,-21,1.7,2.6,-12.5,4.8,80):p(10,-21,1.7,2.6,-12.5,4.3,60)
+  // The desktop stands 1.5 m further back on the same gaze and lifts a degree
+  // and a half: from the old eye the chimney stack stood cut by the top edge.
+  if(id==='courtyard') return narrow?p(10,-21,1.7,2.6,-12.5,4.8,80):aimedFrom(p(10.98,-22.13,1.7,10.98,-22.13,1.7),-41.04,14.5,60)
   // THE FOUR HOUSE ROOMS ARE NOT OPEN, so three of the stations stand on built
   // ground at the one thing of their room a visitor can see from outside: the
   // chapel's window, the court under the study's window, and the court's west
@@ -113,39 +113,39 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // down it at the west windows the hour's sun comes through; the wide frame
   // turns four degrees onto the table and holds the whole west wall.
   if(id==='hall') return narrow?aimedFrom(HALL_DOOR,-123,-11,74):aimedFrom(HALL_DOOR,-119,-4,52)
-  // THE CHAPEL IS SEEN WITH THE HOUSE IT STANDS AGAINST. Square on from the
-  // court it was a wall of ashlar in the house's shadow with nothing behind
-  // it. The desktop stands at the foot of the raised lawn south-east of it
-  // and looks west-north-west: the gable at the left with the hazed valley
-  // past its corner, the chapel's lancets under the stair turret's cone, the
-  // entry steps at the right. Further up the lawn the walk in from the gate
-  // crossed the bank at knee height. The phone keeps the chapel in the middle
-  // of its stage, the turret over it, from the court's own paving.
-  if(id==='oratory') return narrow?aimedFrom(standing(5.5,-25),-18,10,72):aimedFrom(standing(9,-26),-54,10,56)
+  // THE CHAPEL IS THE ONE HERO. Square on from the court it was a wall of
+  // ashlar in the house's shadow with nothing behind it; from the foot of the
+  // raised lawn the gable took the left half of the frame, the gable the study
+  // and the chamber show too. The desktop stands on the court's paving south
+  // of the chapel and looks north-north-west: its lancet in the middle, the
+  // stair turret whole to its cone over it, the house door's steps at the
+  // right.
+  // The phone keeps the chapel in the middle of its stage from a stride west.
+  if(id==='oratory') return narrow?aimedFrom(standing(5.5,-25),-18,10,72):aimedFrom(standing(7.5,-25),-32,13,56)
   // The study holds two things at once now: the window of the room the visit
   // was written in, and the support under it the page is read at. The phone
   // stands 2.8 m east of the desktop's eye, where its frame holds the whole
   // gable and the trees past the house's west corner instead of brick alone,
-  // turned onto the gable and lifted so the house stands in the middle of the
-  // frame rather than high at its right over a third of cobble. The desktop
-  // steps down off the terrace's edge, twelve metres from the gable, which is
-  // as far back as a straight walk in from the gate stays clear of the raised
-  // lawn east of it. It lifts thirteen degrees, not twenty-one, and opens the
-  // lens instead: the quoins lean half as far, the finial stays whole and
-  // the court runs clear to the plinth. At 80 degrees the walk in from the
-  // gate carried a lens too wide for the meadow beside the bank.
-  if(id==='study') return narrow?p(5.2,-29.8,1.65,-2.3955,-24.0764,4.7402,86):aimedFrom(standing(.5,-34),-14,13,76)
-  // The royal château stands 590 m away on a bearing of 308.84 degrees, which
-  // from this end of the court runs over the house's west corner and down the
-  // valley; nothing of the castle is built, and its line stays in the desktop's frame.
-  // The pavilion of the Last Supper stands 27 to 41 m off, ninety degrees west
-  // of the house's end: the desktop holds the two whole, the pavilion at the
-  // left and this end of the house to its finial at the right, at the lens
-  // that takes both from this terrace, and the route to the line keeps that
-  // lens clear of the collection's doors. The phone cannot hold both on its
-  // stage, and the house's end is the stop's subject: it turns from the
-  // castle's line onto the gable, whole to its finial above the card.
-  if(id==='chamber') return narrow?aimedFrom(CHAMBER_EYE,2,10,100):aimedFrom(CHAMBER_DESK,-37,17,94.5)
+  // turned onto the gable until both its slopes stand inside the frame, and
+  // lifted so the house stands in the middle of it rather than high at its
+  // right over a third of cobble. The desktop steps down off the terrace's
+  // edge, twelve metres from the gable, which is as far back as a straight
+  // walk in from the gate stays clear of the raised lawn east of it. It lifts
+  // sixteen degrees at seventy: the finial stays whole, the quoins lean less
+  // than at the old twenty-one, and the gravel in front of the plinth is a
+  // fifth of the frame, not a third. At 80 degrees the walk in from the gate
+  // carried a lens too wide for the meadow beside the bank.
+  if(id==='study') return narrow?aimedFrom(p(5.2,-29.8,1.65,5.2,-29.8,1.65),-49,18,86):aimedFrom(standing(.5,-34),-14,16,70)
+  // THE HOUSE HE DIED IN, SEEN WHOLE. From the court's west end the chamber
+  // showed the gable the study stands square to, with the same windows and
+  // plaque. It steps down onto the lawn under the court's south-west corner
+  // and looks up the length of the house: the sunlit long front running to
+  // the north end at the left, the gable's corner at the right, the chapel's
+  // roofs beyond. The north gable itself stands behind a tree on ground the
+  // walk does not reach. The desktop lifts fourteen degrees at seventy, which
+  // keeps the finial whole; the phone turns five degrees further onto the
+  // long front.
+  if(id==='chamber') return narrow?aimedFrom(CHAMBER_LAWN,0,14,96):aimedFrom(CHAMBER_LAWN,5,14,70)
   // R19 accepted: actual apron paving +1.65 m; all eight principal windows clear vegetation.
   // The phone looks up eleven degrees, not twenty-three: a third of its frame
   // was sky and the house stood low, where the card is. The lens is opened

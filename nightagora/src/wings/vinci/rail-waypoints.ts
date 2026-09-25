@@ -105,7 +105,7 @@ const COURT_LANE_WEST: RailWaypoint = [-49.5, -20.6, COURT.level + railEyeHeight
 
 /** Where a station stands. The house keeps its three sides; the collection
  * ground is its rooms, because a room is entered through its door. */
-export type RailSide = 'street' | 'court' | 'great-hall' | 'terrace' | 'apron'
+export type RailSide = 'street' | 'court' | 'south-lawn' | 'great-hall' | 'terrace' | 'apron'
   | 'picture-room' | 'long-gallery' | 'mechanism-hall' | 'exhibit-court' | 'grave-court'
 
 export function railSide(stationId: string): RailSide {
@@ -113,7 +113,8 @@ export function railSide(stationId: string): RailSide {
   // The hall's eye stands in the great hall's own door, one storey above the
   // court: it is reached over the threshold steps and through the passage.
   if (stationId === 'hall') return 'great-hall'
-  if (['courtyard', 'oratory', 'study', 'chamber'].includes(stationId)) return 'court'
+  if (['courtyard', 'oratory', 'study'].includes(stationId)) return 'court'
+  if (stationId === 'chamber') return 'south-lawn'
   // The garden eye stands on the apron itself (apron.height + the eye), so it
   // is routed from there: routed as a terrace station it climbed to the stair
   // head and came back down the same stair to reach its own ground.
@@ -152,6 +153,11 @@ const THRESHOLD_FOOT: RailWaypoint = [4.834, -14.329, railEyeHeightM]
  * off both jambs, so the walk crosses the landing onto it and goes straight in;
  * it turns where that line meets the axis of the passage's side door, the
  * service passage and the hall's door, and walks down the axis to the hall. */
+/** THE LAWN UNDER THE COURT'S SOUTH-WEST CORNER, where the chamber is seen
+ * from. The court's south edge is a retaining wall a metre and a half high
+ * west of the study's eye, so the walk leaves the court where the edge is a
+ * step, beside that eye, and turns west along the lawn. */
+const LAWN_FOOT: RailWaypoint = [-.3, -34.4, -.6 + railEyeHeightM]
 const HOUSE_FLOOR_EYE = .8 + railEyeHeightM
 const HOUSE_LANDING: RailWaypoint = [3.0682, -13.0604, HOUSE_FLOOR_EYE]
 const ENFILADE_TURN: RailWaypoint = [.0049, -8.3434, HOUSE_FLOOR_EYE]
@@ -160,6 +166,7 @@ const LINKS: readonly { from: RailSide; to: RailSide; via: readonly RailWaypoint
   { from: 'street', to: 'court', via: railGateWaypoints },
   { from: 'court', to: 'great-hall', via: [COURT_OPEN, THRESHOLD_FOOT, HOUSE_LANDING, ENFILADE_TURN] },
   { from: 'court', to: 'terrace', via: railAccessWaypoints },
+  { from: 'court', to: 'south-lawn', via: [LAWN_FOOT] },
   { from: 'terrace', to: 'apron', via: railCollectionStairWaypoints },
   { from: 'apron', to: 'picture-room', via: [APRON_CORNER, ENTRANCE_OUT, ENTRANCE_IN] },
   { from: 'apron', to: 'exhibit-court', via: [APRON_CORNER, APRON_NORTH, COURT_EAST] },
