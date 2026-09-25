@@ -4,6 +4,11 @@
 // is all the player reads. Nothing here renders; a missing file is a refusal.
 //
 //   node forge/film/pack.mjs --export=<run dir> --marks=<marks.json> --out=<release dir>
+//   node forge/film/pack.mjs --export=<job dir> ... --whole    every edge of the graph, a clip not yet
+//                                                             rendered answered by its two stills
+//
+// A job folder (`render-all.mjs`) is an export run: its `export.json` is
+// rewritten from the ledger, and its `cycles.json` carries the machines' cycles.
 //
 // The still at a rung is the master scaled by the same kernel the encoder's
 // rungs are scaled by, so the picture under a clip is the clip's own first
@@ -27,6 +32,10 @@ const EXPORTS = String(flags.get('export') ?? '').split(',').filter(Boolean).map
 const MARKS = flags.has('marks') ? String(flags.get('marks')).split(',').filter(Boolean).map((f) => resolve(f)) : []
 const OUT = resolve(String(flags.get('out') ?? ''))
 const QUALITY = Number(flags.get('quality') ?? 90)
+/** THE WHOLE GRAPH: an edge with no clip yet stands in the release with its
+    seconds and no file, so the router walks the life as the full film will,
+    and the player answers the missing clip by the dissolve between its stills */
+const WHOLE = flags.has('whole')
 for (const dir of EXPORTS) if (!existsSync(join(dir, 'export.json'))) throw new Error(`no export at ${dir}`)
 
 export const FILM_FORMAT = 'vinci-film-player-v1'
@@ -111,6 +120,43 @@ for (const clip of summary.clips) {
   edges.set(clip.clip, e)
 }
 
+/* ---- the clips not yet rendered, answered by their stills ---- */
+const answered = []
+if (WHOLE) {
+  for (const meta of graph.edges) for (const [framing, x] of Object.entries(meta.framings)) {
+    const e = edges.get(meta.id) ?? { id: meta.id, from: meta.from, to: meta.to, kinds: meta.kinds, passes: meta.passes ?? [], framings: {} }
+    if (e.framings[framing]) continue
+    const frames = x.frames + (x.restLag ?? 0) + 1
+    e.framings[framing] = { seconds: Object.fromEntries(Object.entries(PACE_RATE).map(([pace, rate]) => [pace, frames / FPS / rate])), frames, files: {}, track: '' }
+    edges.set(meta.id, e)
+    answered.push(`${meta.id} ${framing}`)
+  }
+}
+
+/* ---- the machines' filmed cycles, where a job recorded them ---- */
+const cycles = {}
+for (const { dir } of runs) {
+  const file = join(dir, 'cycles.json')
+  if (!existsSync(file)) continue
+  for (const [id, cycle] of Object.entries(JSON.parse(readFileSync(file, 'utf8')))) {
+    const held = (cycles[id] ??= { period: cycle.period, fps: cycle.fps, frames: cycle.frames, framings: {} })
+    for (const [framing, f] of Object.entries(cycle.framings)) {
+      // the files keep their paths under the release: the recorder wrote them relative to its own folder
+      const place = (entry) => {
+        if (!entry) return entry
+        const to = join(OUT, entry.file)
+        mkdirSync(dirname(to), { recursive: true })
+        try { linkSync(join(dir, entry.file), to) } catch { copyFileSync(join(dir, entry.file), to) }
+        return entry
+      }
+      for (const entry of Object.values(f.files)) place(entry)
+      place(f.poster)
+      for (const step of f.steps) place(step.outline)
+      held.framings[framing] = f
+    }
+  }
+}
+
 /* ---- the stills, at every rung of their framing ---- */
 const nodes = {}
 const stillRecords = []
@@ -168,15 +214,16 @@ const release = {
   sets,
   nodes,
   edges: [...edges.values()].map((e) => ({ ...e, framings: Object.fromEntries(Object.entries(e.framings).map(([f, x]) => [f, { seconds: x.seconds, frames: x.frames, files: x.files, track: x.track }])) })),
+  ...(Object.keys(cycles).length ? { cycles } : {}),
 }
 writeFileSync(join(OUT, 'film.json'), JSON.stringify(release))
 writeFileSync(join(OUT, 'pack.json'), JSON.stringify({
-  format: 'vinci-film-pack-v1', exports: EXPORTS, exportHeads: summary.heads, marks: MARKS, quality: QUALITY,
+  format: 'vinci-film-pack-v1', exports: EXPORTS, exportHeads: summary.heads, marks: MARKS, quality: QUALITY, whole: WHOLE, answeredByStills: answered.length,
   sharp: sharp.versions, refusals, projection, retagged, duplicates, emptyReadings,
   clips: [...edges.values()].map((e) => ({ id: e.id, framings: Object.fromEntries(Object.entries(e.framings).map(([f, x]) => [f, { frames: x.frames, joins: x.joins, mountedSetChanges: x.mountedSetChanges, pendingAtRest: x.pendingAtRest, bytes: Object.fromEntries(Object.entries(x.files).map(([r, v]) => [r, v.bytes])) }])) })),
   stills: stillRecords,
 }, null, 1))
 const kB = (n) => Math.round(n / 1024)
-console.log(`the release: ${Object.keys(nodes).length} nodes, ${edges.size} clips (${refusals.length} refused, ${retagged.length} rung files tagged sRGB here), ${stillRecords.length} stills (${kB(stillRecords.reduce((s, r) => s + r.bytes, 0))} kB)`)
+console.log(`the release: ${Object.keys(nodes).length} nodes, ${edges.size} clips (${refusals.length} refused, ${retagged.length} rung files tagged sRGB here${WHOLE ? `, ${answered.length} edge framings answered by their stills` : ''}), ${stillRecords.length} stills (${kB(stillRecords.reduce((s, r) => s + r.bytes, 0))} kB)${Object.keys(cycles).length ? `, cycles ${Object.keys(cycles).join(', ')}` : ''}`)
 for (const p of projection) if (!p.same) console.log(`  PROJECTION ${p.node} ${p.framing}: still ${p.still} · marks ${p.marks}`)
 console.log(`  ${join(OUT, 'film.json')}`)

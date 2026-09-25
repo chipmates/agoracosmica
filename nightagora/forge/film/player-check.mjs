@@ -6,7 +6,11 @@
 //
 //   node forge/film/player-check.mjs --base=https://127.0.0.1:5515 --release=w5 --out=<dir>
 //     [--engines=chromium,webkit,firefox] [--widths=360,390,430,1440,1512] [--langs=en,de]
-//     [--walk=full|short|none] [--joins] [--record]
+//     [--walk=full|short|none|life] [--joins] [--record] [--at=<stop>] [--stops=<n>]
+//
+// `--walk=life` walks the whole life from `--at` (the entrance, `garden`, for
+// a whole wing's release): the way on pressed at every stop, a frame kept at
+// each arrival and one inside every leg a clip plays, the cuts' dips shot.
 //
 // It shoots a running server and starts none. A state that never takes is
 // written down as such and the walk goes on.
@@ -32,6 +36,8 @@ const RECORD = flags.has('record')
 const HEIGHT = { 360: 800, 390: 844, 430: 932, 1440: 900, 1512: 950, 1280: 800, 1920: 1080 }
 const TYPES = { chromium, webkit, firefox }
 const FIRST = String(flags.get('at') ?? 'picture-room-lisa')
+/** how many ways on the life walk presses (the life's sixteen by default) */
+const STOPS = Number(flags.get('stops') ?? 16)
 
 const report = { base: BASE, release: RELEASE, runs: [] }
 mkdirSync(OUT, { recursive: true })
@@ -168,7 +174,8 @@ async function readJoins(page, dir, phone, record) {
       const framing = phone ? 'upright' : 'wide'
       for (const e of joins.edges) {
         const f = e.framings[framing]
-        if (!f) continue
+        // a clip the release does not carry yet is answered by its stills: no join to read
+        if (!f || !Object.keys(f.files).length) continue
         const rung = Object.keys(f.files)[0]
         const [w, h] = rung.split('x').map(Number)
         const base = `${BASE}/film/${RELEASE}/`
@@ -232,6 +239,37 @@ async function run(engine, width, lang) {
     await page.waitForTimeout(1200)
     shots.push(await shot(page, dir, '01-rest-lisa'))
     if (WALK === 'none') return record
+    if (WALK === 'life') {
+      /* THE WHOLE LIFE FROM THE ENTRANCE: every way on pressed as a visitor presses
+         it; a leg the release carries plays, one it does not dissolves, a cut dips */
+      const on = phone ? '.film-gold' : '.desk-on'
+      record.life = []
+      for (let k = 1; k <= STOPS; k++) {
+        await page.waitForTimeout(1200)
+        const from = await page.evaluate(() => window.__naSeam?.state?.().node ?? null)
+        const t = Date.now()
+        if (!(await press(page, on))) { record.life.push({ k, from, pressed: false }); break }
+        const how = await page.waitForFunction(() => { const s = window.__naSeam?.state?.(); return s && s.kind !== 'rest' ? s.kind : false }, null, { timeout: 4000, polling: 20 })
+          .then((h) => h.jsonValue()).catch(() => 'dissolve')
+        let mid = null
+        if (how === 'walk') {
+          const inLeg = await page.waitForFunction(() => { const v = document.querySelector('.na-film-clip.shown'); return Boolean(v && v.duration > 0 && v.currentTime >= v.duration / 2) }, null, { timeout: 60000, polling: 30 }).then(() => true).catch(() => false)
+          if (inLeg) { mid = await shot(page, dir, `life-${String(k).padStart(2, '0')}-walking`); shots.push(mid) }
+        } else if (how === 'dip') {
+          await page.waitForTimeout(700)
+          shots.push(await shot(page, dir, `life-${String(k).padStart(2, '0')}-dip`))
+        }
+        const landed = await page.waitForFunction((f) => { const s = window.__naSeam?.state?.(); return s && s.kind === 'rest' && s.node !== f ? s.node : false }, from, { timeout: 120000, polling: 50 })
+          .then((h) => h.jsonValue()).catch(() => null)
+        const ms = Date.now() - t
+        await page.waitForTimeout(1500)
+        const at = await shot(page, dir, `life-${String(k).padStart(2, '0')}-rest`)
+        shots.push(at)
+        record.life.push({ k, from, to: landed, how, ms, midLeg: mid?.name ?? null, pictureShare: at.pictureShare, words: at.words?.[0]?.slice(0, 60) ?? null })
+        if (!landed) break
+      }
+      return record
+    }
     if (WALK === 'legs') {
       // THE CHAPTERS PLAYED THROUGH: the way on pressed at each stop, as a visitor presses it
       const on = phone ? '.film-gold' : '.desk-on'

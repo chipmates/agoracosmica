@@ -503,6 +503,10 @@ async function run(flags) {
     const t0 = Date.now()
     await lock.take()
     const browser = await chromium.launch({ args: [...browserArgs(), ...FRAME_TIME_FLAGS] })
+    // a session that cannot stand leaves no browser behind
+    try { return await standFraming(framing, browser, t0) } catch (err) { await browser.close().catch(() => {}); throw err }
+  }
+  const standFraming = async (framing, browser, t0) => {
     // a smoke run stands only at the nodes its own entries touch
     const warm = flags.get('walk') === 'run'
       ? [...new Set(todo.filter((x) => x.framing === framing).flatMap((x) => (x.kind === 'clip' ? [x.from, x.to] : x.kind === 'still' ? [x.node] : [])))].map((id) => nodes.get(id))
