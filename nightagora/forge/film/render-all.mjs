@@ -367,7 +367,7 @@ export function statusOf(job, records, { now = Date.now() } = {}) {
     row.entries++
     row.frames += units
     const r = records.get(e.id)
-    if (r?.status === 'done' && stillCurrent(r, e, job)) { row.done++; row.framesDone += e.kind === 'still' ? 1 : r.frames ?? units; row.seconds += r.seconds ?? 0 }
+    if (r?.status === 'done' && stillCurrent(r, e, job)) { row.done++; row.framesDone += e.kind === 'still' ? 1 : r.frames ?? units; row.seconds += r.renderSeconds ?? r.seconds ?? 0 }
     else if (r?.status === 'refused') row.refused++
     else if (r?.status === 'failed') row.failed++
   }
@@ -588,19 +588,24 @@ async function run(flags) {
     n++
     const t0 = Date.now()
     const before = load()
-    let record
+    // the render's own seconds, from the lock taken to the entry written: a wait on the lock or a session opening apart
+    let record, r0 = 0, r1 = 0
     try {
       if (e.kind === 'cycle') {
         await startOrigin()
         await lock.take()
+        r0 = Date.now()
         record = await renderCycle(e, { dir, originPort: ORIGIN_PORT, log })
+        r1 = Date.now()
         lock.release()
       } else {
         const fs = await openFraming(e.framing)
         await lock.take()
+        r0 = Date.now()
         record = e.kind === 'still'
           ? await renderStill(e, fs, { dir, nodes, inbox, job, opts: opts(fs.opened.held) })
           : await renderClip(e, fs, { dir, nodes, edges, inbox, job, replay, graph, records, opts: opts(fs.opened.held) })
+        r1 = Date.now()
         lock.release()
       }
       fails = 0
@@ -610,8 +615,9 @@ async function run(flags) {
       fails++
     }
     const seconds = (Date.now() - t0) / 1000
-    const full = { id: e.id, kind: e.kind, framing: e.framing, session, at: stamp(), head: headHere(), source: job.source, keys: keysOf(e, job), load: before, loadAfter: load(), seconds: round(seconds, 1), ...record }
-    if (full.frames) full.secondsPerFrame = round(seconds / full.frames, 3)
+    const renderSeconds = r1 > r0 ? (r1 - r0) / 1000 : seconds
+    const full = { id: e.id, kind: e.kind, framing: e.framing, session, at: stamp(), head: headHere(), source: job.source, keys: keysOf(e, job), load: before, loadAfter: load(), seconds: round(seconds, 1), renderSeconds: round(renderSeconds, 1), ...record }
+    if (full.frames) full.secondsPerFrame = round(renderSeconds / full.frames, 3)
     appendLedger(dir, full)
     records.set(e.id, full)
     log(`${n}/${todo.length} ${e.id}: ${full.status}${full.frames ? `, ${full.frames} frames, ${full.secondsPerFrame} s a frame` : ''}${full.joinsAgree ? `, joins ${full.joinsAgree.first}/${full.joinsAgree.last}` : ''}${full.error ? `: ${full.error}` : ''} (load ${before.join(' ')})`)
