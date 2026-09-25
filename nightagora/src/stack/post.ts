@@ -167,6 +167,7 @@ interface Dials {
   dofFocal: number
   dofBokeh: number
   shoulder: number
+  toe: number
 }
 
 /* A grade may arrive from outside this module (a route, a rig state, a phase
@@ -197,6 +198,7 @@ function dialsOf(asked: Grade | null | undefined): Dials {
     dofFocal: g.dof?.focal ?? 1000,
     dofBokeh: g.dof?.bokeh ?? 0,
     shoulder: g.shoulder ?? 0,
+    toe: g.toe ?? 0,
   }
 }
 
@@ -268,6 +270,7 @@ export function createPost(
     dofFocal: uniform(d.dofFocal),
     dofBokeh: uniform(d.dofBokeh),
     shoulder: uniform(d.shoulder),
+    toe: uniform(d.toe),
     /* the grain is reseeded every frame, so a still is one draw from the
        hash and a walk is never the same field twice */
     grainSeed: uniform(0),
@@ -333,9 +336,16 @@ export function createPost(
      a threshold, so the print has nothing to tell it. */
   if (tier.aa === 'taa') frame = traa(frame, depth, scenePass.getTextureNode('velocity'), camera)
 
-  // 5 · the print: exposure, lift/gamma/gain, the warm-cool split, saturation
+  // 5 · the print: exposure, lift, the toe, gamma/gain, the warm-cool split, saturation
   let c: N = frame.rgb.mul(u.exposure)
   c = c.add(u.lift.mul(clamp(float(1).sub(luminance(c)), 0, 1)))
+  // the toe bends luminance only, so a dark keeps its hue, and it bends the
+  // lift with it, so the lift still sets the black. The Neutral shoulder
+  // carries a toe of its own, so this one gives way as the shoulder comes in.
+  // Selected: a grade without one prints exactly the pixels it always printed.
+  const toeD = u.toe.mul(float(1).sub(clamp(u.shoulder, 0, 1)))
+  const toeL = luminance(c).max(1e-6)
+  c = toeD.greaterThan(0).select(c.mul(toeL.div(toeL.mul(toeL).add(toeD.mul(toeD)).sqrt())), c)
   c = pow(clamp(c, 0, 8), vec3(1, 1, 1).div(u.gamma)).mul(u.gain)
   const lum = luminance(c)
   const splitTint = mix(u.cool, u.warm, clamp(lum.mul(1.6), 0, 1))
@@ -409,6 +419,7 @@ export function createPost(
     d.dofFocal = ease(d.dofFocal, target.dofFocal, k)
     d.dofBokeh = ease(d.dofBokeh, target.dofBokeh, k)
     d.shoulder = ease(d.shoulder, target.shoulder, k)
+    d.toe = ease(d.toe, target.toe, k)
 
     u.exposure.value = d.exposure
     u.lift.value.set(...d.lift)
@@ -428,6 +439,7 @@ export function createPost(
     u.dofBokeh.value = d.dofBokeh
     // an ease never lands on zero by itself, and zero is the identity print
     u.shoulder.value = d.shoulder < 1e-4 && target.shoulder === 0 ? 0 : d.shoulder
+    u.toe.value = d.toe < 1e-6 && target.toe === 0 ? 0 : d.toe
     u.bloomStrength.value = d.bloomStrength
     u.bloomThreshold.value = d.bloomThreshold
     if (bloomPass) {

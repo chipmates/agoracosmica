@@ -11,6 +11,10 @@ def engine_print(rgb, dials, stop, frame=None):
     c = rgb * dials["exposure"][stop]
     lum = lambda x: x[..., 0] * 0.2126 + x[..., 1] * 0.7152 + x[..., 2] * 0.0722
     c = c + np.asarray(dials["lift"]) * np.clip(1 - lum(c), 0, 1)[..., None]
+    toe = dials.get("toe", 0) * (1 - min(max(dials["shoulder"][stop], 0), 1))
+    if toe > 0:
+        l0 = np.maximum(lum(c), 1e-6)[..., None]
+        c = c * (l0 / np.sqrt(l0 * l0 + toe * toe))
     c = np.power(np.clip(c, 0, 8), 1 / np.asarray(dials["gamma"])) * np.asarray(dials["gain"])
     l = lum(c)[..., None]
     tint = np.asarray(dials["cool"]) + (np.asarray(dials["warm"]) - np.asarray(dials["cool"])) * np.clip(l * 1.6, 0, 1)

@@ -12,9 +12,11 @@ import type { VinciStationId } from './content'
  * moves; this is the print, not the sun. */
 // A COURT UNDER ITS OWN WALLS. Most of this wing stands in the building's own
 // shade at this hour, and an eye standing there opens on the shade, not on the
-// sky. The toe is lifted a little, cool, the way shade is: it is the print, and
-// no light in the scene moves.
-export const PRINT={...GRADES['first-station'],name:'clos-luce-1517',exposure:.94,lift:[.012,.014,.018] as [number,number,number],split:.055,saturation:.9,vignette:.15,grain:.007,bloom:{strength:0,radius:.1,threshold:10,warmth:1}}
+// sky. The black is lifted a little, cool, the way shade is; the toe then bends
+// everything under a mid-grey down, so a shade deepens as its light falls away
+// while a sunlit face or a lit work keeps its value. It is the print, and no
+// light in the scene moves.
+export const PRINT={...GRADES['first-station'],name:'clos-luce-1517',exposure:.94,lift:[.012,.014,.018] as [number,number,number],toe:.06,split:.055,saturation:.9,vignette:.15,grain:.007,bloom:{strength:0,radius:.1,threshold:10,warmth:1}}
 // The court used to open two thirds of a stop, which warmed the tuffeau toward
 // grey-gold and lifted the plaster's mottling into view. One print holds the
 // whole wing now, and the court is lit rather than exposed.

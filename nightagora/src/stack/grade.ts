@@ -42,6 +42,12 @@ export interface Grade {
   /** 0 prints the frame as it is; 1 rolls the highlights off the Khronos
       neutral shoulder, for a room lit hot enough that its sources clip */
   shoulder?: number
+  /** the linear luminance the toe bends at: `L^2 / sqrt(L^2 + toe^2)` leaves
+      everything a few toes over it where it was and falls to `L^2 / toe`
+      under it, with the channels' ratio kept. It gives way as the shoulder
+      comes in, whose Neutral curve has a toe of its own. 0 or absent prints
+      no toe. */
+  toe?: number
 }
 
 /* IDENTITY — the print that changes nothing.

@@ -309,7 +309,7 @@ async function main() {
     law: 'engine: in-scatter per metre = 0.01 x density x profile x (the sum of the spots\' lit, shadowed irradiance), added over the room (additive: nothing behind it is dimmed). Cycles: an isotropic scattering medium of coefficient 4 pi x 0.01 x density x profile per metre, the same single-scattered light, extinguished as a real medium extinguishes it.',
     profile: 'density x ((1 - smoothstep(floor, top, y)) x 0.8 + 0.2) x (noise(p x 0.23) x 0.35 + 1)',
   }, null, 1))
-  writeFileSync(join(OUT, 'print.json'), JSON.stringify({ ...room.print, law: 'stack/post.ts step 5-7: c = linear x exposure; c += lift x clamp(1 - lum c); c = pow(clamp(c, 0, 8), 1/gamma) x gain; c = mix(c, c x mix(cool, warm, clamp(lum x 1.6)), split); c = mix(lum, c, saturation); c = shoulder ? Khronos PBR Neutral(c) : c; c x= 1 - smoothstep(.34, .86, |uv - .5|) x vignette; sRGB' }, null, 1))
+  writeFileSync(join(OUT, 'print.json'), JSON.stringify({ ...room.print, law: 'stack/post.ts step 5-7: c = linear x exposure; c += lift x clamp(1 - lum c); c x= L / sqrt(L^2 + (toe x (1 - shoulder))^2), L = lum c; c = pow(clamp(c, 0, 8), 1/gamma) x gain; c = mix(c, c x mix(cool, warm, clamp(lum x 1.6)), split); c = mix(lum, c, saturation); c = shoulder ? Khronos PBR Neutral(c) : c; c x= 1 - smoothstep(.34, .86, |uv - .5|) x vignette; sRGB' }, null, 1))
   writeFileSync(join(OUT, 'materials.json'), JSON.stringify(sidecar, null, 1))
 
   // THE REPORT

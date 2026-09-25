@@ -49,7 +49,7 @@ function courtFloor(m:MeshStandardNodeMaterial):void {
   const at=vec2(P.x.sub(G.west).div(G.east-G.west),P.z.negate().sub(G.south).div(G.north-G.south))
   const inside=smoothstep(0,.03,at.x).mul(smoothstep(0,.03,at.y)).mul(smoothstep(1,.97,at.x)).mul(smoothstep(1,.97,at.y))
   const light=TSL.texture(courtFloorLight(),at)
-  const sky=mix(float(1),light.x.pow(1.5).mul(.85).add(.15),inside)
+  const sky=mix(float(1),light.x.pow(2).mul(.85).add(.15),inside)
   m.aoNode=(m.aoNode as ReturnType<typeof float>).mul(foundationVisibility()).mul(sky)
   const bounce=light.y.mul(inside).mul(3.2/Math.PI/WALL_BOUNCE_SCALE)
   m.emissiveNode=(m.colorNode as ReturnType<typeof vec3>).mul(vec3(1.33,.93,.69)).mul(bounce)

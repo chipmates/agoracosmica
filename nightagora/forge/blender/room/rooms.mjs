@@ -44,7 +44,7 @@ export const ROOMS = {
     probe: { at: [-50.3, -4.2, 52.85], gain: 1.35, size: 256 },
     // THE PRINT at each stop (index.ts PRINT, STATION_EXPOSURE, STATION_SHOULDER)
     print: { exposure: { flight: 1.55, works: 1.55 }, shoulder: { flight: 1, works: 1 },
-      lift: [0.012, 0.014, 0.018], gamma: [1, 1, 1], gain: [1, 1, 1], warm: [1, 1, 1], cool: [1, 1, 1],
+      lift: [0.012, 0.014, 0.018], toe: 0.06, gamma: [1, 1, 1], gain: [1, 1, 1], warm: [1, 1, 1], cool: [1, 1, 1],
       split: 0.055, saturation: 0.9, vignette: 0.15, grain: 'held (0), as the stills are shot' },
     // the stills' two framings (forge/prerender/stills.mjs FRAMINGS): the
     // canvas each is drawn at and the rail viewport it takes its pose from
@@ -68,8 +68,9 @@ export const ROOMS = {
     skyEye: [10, 1.7, 21],
     air: null,
     probe: null,
-    print: { exposure: { courtyard: 1.0 }, shoulder: { courtyard: 1 },
-      lift: [0.012, 0.014, 0.018], gamma: [1, 1, 1], gain: [1, 1, 1], warm: [1, 1, 1], cool: [1, 1, 1],
+    // the court prints with no shoulder (STATION_SHOULDER), so its darks sit on the toe
+    print: { exposure: { courtyard: 1.0 }, shoulder: { courtyard: 0 },
+      lift: [0.012, 0.014, 0.018], toe: 0.06, gamma: [1, 1, 1], gain: [1, 1, 1], warm: [1, 1, 1], cool: [1, 1, 1],
       split: 0.055, saturation: 0.9, vignette: 0.15, grain: 'held (0), as the stills are shot' },
     framings: { wide: { viewport: 'desktop', stage: [2400, 1350] }, upright: { viewport: 'phone', stage: [1170, 2532] } },
   },

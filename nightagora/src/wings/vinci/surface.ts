@@ -684,9 +684,9 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
     // sky than the wall it stands on, near the square root of the wall's share)
     const courtUp=smoothstep(.3,.9,normalWorldGeometry.y)
     // The share is geometric; the sky a deep court leaves is its dim upper
-    // part, so the fill falls faster than the share (a Cycles still of the court)
+    // part, so the fill falls as the share squared (a Cycles still of the court)
     const courtShare=mix(joints.z,joints.z.sqrt(),courtUp)
-    const courtSky=mix(float(1),courtShare.pow(1.5).mul(.8).add(.2),at.z)
+    const courtSky=mix(float(1),courtShare.pow(2).mul(.8).add(.2),at.z)
     m.aoNode=float(1).sub(joint.mul(.30)).sub(headJoint.mul(.22)).add(arrisBand.mul(.25)).mul(float(1).sub(smoothstep(.80,.99,weather.y).mul(at.z).mul(.28))).mul(float(1).sub(skyHidden)).mul(courtSky)
     m.userData['engineJointShadow']=true;m.userData['engineDressingShadow']=true
   }else if(kind==='slate'){
