@@ -3567,10 +3567,10 @@
       "class": "GENERATED",
       "licence": "Original procedural museum exhibition. Source code under the museum repository licence.",
       "display": true,
-      "prompt": "The place on the court's paving beside the parachute where the most quoted line he never wrote is read: a stone bench in the grave's grammar, 1.72 m long and 0.46 m high over a dark base course set back beneath it, a bronze bead along its front arris, turned to the display wall's eye. It carries no words: the quotation, its reading, the film it was written for and its year are read in the place's own card.",
+      "prompt": "The place on the court's paving beside the parachute where the most quoted line he never wrote is read: a stone bench in the grave's grammar, 1.72 m long and 0.46 m high over a base course of the same stone set back beneath it, a bronze bead along its front arris, turned to the display wall's eye. It carries no words: the quotation, its reading, the film it was written for and its year are read in the place's own card.",
       "model": "Deterministic TypeScript geometry and TSL materials",
       "date": "2026-09-24",
-      "sha256": "2c675dc220341b8e83f832cae04c719ad486ea41aef2951cdca9dbb68f1a5c30",
+      "sha256": "fba7f94385c4add71f8e9d3189989f34888eefde66abcfe2f2c96f744d88460a",
       "note": "recipe_file=src/wings/vinci/collection/court-plaque.ts; words from src/wings/vinci/line/data/never-said.json court_plaque, read in the place's card only"
     },
     {

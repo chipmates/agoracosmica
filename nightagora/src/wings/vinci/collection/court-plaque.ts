@@ -43,9 +43,10 @@ export function createCourtPlaque(materials: ExhibitMaterials, language: 'en' | 
   const build = new Construction(materials, 'vinci-court-plaque', COURT_PLAQUE_MANIFEST_ID)
   const de = language === 'de'
   const width = 1.72, seat = .46, depth = .44
-  // A footed stone seat: a dark base course set back under a stone slab, and
-  // the bronze bead the plaque carried, now along the seat's front arris.
-  build.box(0, .06, -.02, width - .1, .12, depth - .1, materials.dark)
+  // A footed stone seat: a base course of the same stone set back under the
+  // slab, so its shadow and not a second colour parts them, and the bronze
+  // bead the plaque carried, now along the seat's front arris.
+  build.box(0, .06, -.02, width - .1, .12, depth - .1, materials.stone)
   build.box(0, (seat - .09 + .12) / 2, -.02, width - .16, seat - .09 - .12, depth - .16, materials.stone)
   build.box(0, seat - .045, -.02, width, .09, depth, materials.stone)
   build.box(0, seat - .092, depth / 2 - .02 + .006, width - .04, .014, .012, materials.bronze)
