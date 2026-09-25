@@ -217,6 +217,8 @@ function clipGableBacking(poly:V3[],faces:RoofFace[]):V3[][] {
 interface HouseBuild { glaze:boolean; carve:boolean; openBacks:ReadonlySet<string>; lights:GlazedLight[]; tracery:TraceryWindow[]; sills:SillSpec[]; dormers:DormerRoom[]
   /** dressing stones cut back from an opening, redrawn by the carving */
   stones:DressingStone[]
+  /** facade ends (`id:start`, `id:end`) where the same wall runs on in line */
+  runsOn:ReadonlySet<string>
   /** every dressing laid proud of a facade, for the shadows it throws on it */
   dressings:DressingBox[]; casting:ReadonlySet<Batch> }
 let house:HouseBuild|null=null
@@ -256,6 +258,21 @@ function redress(f:Facade,u0:number,u1:number,z0:number,z1:number,depth:number,o
   if(!house||u1-u0<.04)return
   house.stones.push({from:f.from,to:f.to,length:f.length_m,u0,u1,z0,z1,back:out-depth,front:out,tone})
   if(out>.004)house.dressings.push({facade:f.id,u0,u1,z0,z1,front:out})
+}
+/** Facade ends where the next registered facade carries the same wall on in
+ * the same line (within a degree, same base and height): a cadastral join,
+ * not a corner, so no dressed quoin belongs there. */
+function runsOn(facades:readonly Facade[]):Set<string> {
+  const ends=new Set<string>(),wallOf=(f:Facade)=>spec.walls.find(w=>w.facade_id===f.id&&w.render)
+  const unit=(f:Facade):V2=>[(f.to[0]-f.from[0])/f.length_m,(f.to[1]-f.from[1])/f.length_m]
+  for(const f of facades)for(const g of facades){
+    const wf=wallOf(f),wg=wallOf(g),df=unit(f),dg=unit(g)
+    if(f===g||!wf||!wg||Math.abs(wf.base_m-wg.base_m)>.01||Math.abs(wf.base_m+wf.height_m-wg.base_m-wg.height_m)>.01)continue
+    if(df[0]*dg[0]+df[1]*dg[1]<Math.cos(Math.PI/180))continue
+    if(Math.hypot(f.to[0]-g.from[0],f.to[1]-g.from[1])<.05)ends.add(`${f.id}:end`)
+    if(Math.hypot(f.from[0]-g.to[0],f.from[1]-g.to[1])<.05)ends.add(`${f.id}:start`)
+  }
+  return ends
 }
 function rectPlanes(x0:number,x1:number,z0:number,z1:number):Plane[] {return [
   {fn:p=>p[0]-x0},{fn:p=>x1-p[0]},{fn:p=>p[2]-z0},{fn:p=>z1-p[2]},
@@ -312,7 +329,8 @@ function drawFacade(f:Facade,wall:Wall,b:Batches,tier:Tier,faces:RoofFace[]):voi
   // took every long quoin 0.23 m into the doorway.
   const zones=surroundZones(f)
   const corner=(x:number):void=>{for(let z=.7,n=0;z<heightAt(x)-.2;z+=.28,n++){
-    const w=n%2?.38:.58,tone=.91+hash(n,f.length_m)*.10,z0=z+.002,z1=z+.264,kept=stoneField||z<base
+    const w=n%2?.38:.58,tone=.91+hash(n,f.length_m)*.10,z0=z+.002,z1=z+.264
+    const kept=stoneField||z<base||Boolean(house?.runsOn.has(`${f.id}:${x===0?'start':'end'}`))
     const hits=zones.filter(q=>q.z0<z1&&q.z1>z0&&(x===0?q.u0<w&&q.u1>0:q.u1>f.length_m-w&&q.u0<f.length_m))
     const inner=x===0?Math.min(w,...hits.map(q=>q.u0)):Math.max(f.length_m-w,...hits.map(q=>q.u1))
     const cut=Boolean(house?.carve)&&!kept&&Math.abs(inner-(x===0?w:f.length_m-w))>1e-6
@@ -625,9 +643,10 @@ export function createShell(tier:Tier,library?:MaterialLibrary):Group {
   const rooms=full?createHouseRooms(tier==='hero'?.45:.9):null
   // The carving is one more draw; standard stands at its draw ceiling.
   // The great hall is its own module's room; its four windows open too.
-  house={glaze:full,carve:tier==='hero',openBacks:new Set([...(rooms?.openedBacks??[]),...(full?HALL_WINDOWS:[])]),lights:[],tracery:[],sills:[],dormers:[],stones:[],dressings:[],casting:new Set([b.stone,b.oak])}
+  house={glaze:full,carve:tier==='hero',openBacks:new Set([...(rooms?.openedBacks??[]),...(full?HALL_WINDOWS:[])]),lights:[],tracery:[],sills:[],dormers:[],stones:[],runsOn:new Set(),dressings:[],casting:new Set([b.stone,b.oak])}
   const faces=roofFaces(),valleys=roofValleys(faces)
   const facades=spec.facades.filter(f=>f.render).map(f=>({...f,openings:f.openings.map(o=>({...o}))}))
+  house.runsOn=runsOn(facades)
   // One through-gateway is cut in both exterior faces of the covered way.
   const court=facades.find(f=>f.id==='G5')!,street=facades.find(f=>f.id==='G1')!;const gate=court.openings.find(o=>o.type==='gate')!
   gate.height_m=gatePassageProvenance.dimensions.head_m-gate.base_m

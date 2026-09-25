@@ -10,7 +10,7 @@
       "prompt": "Thin brick relief, tuffeau quoins and registered cut apertures, intersecting roofs, dormers, chimneys, turret and separate gallery/watchtower. Dossier nominal dimensions with original certainty ranges. No photograph sampled. Shallow 55 mm rebate within declared 35–90 mm assumption; split upper sky reflection and lower dark-room glazing. Existing roughness .18–.23 remains inside dossier interval; no screen-space transmission. Duplicated upper tower shell now shares registered aperture cuts. Connected F16/F17 masonry below the unchanged −2.20 m base: 0.60 m inward thickness [0.45–0.80], actual standard/calm ground boundary lower envelope embedded 50 mm [25–100], full joined miter volume and inherited stone coursing. No surveyed height or opening changes. The plinth course on the coursed ashlar faces, laid half a course off their beds, stays certified and leaves the colour pass. Where the house is glazed, a dormer's dark back stays certified and leaves the camera for leaded lights. Every dressing it lays proud of a facade is recorded as it is laid, for the shadow it throws and the sky it takes from that face; no triangle moves for it.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "83d05d46e659866b833128002b8e1b698b1b80b8da719e5862d8a9e650a535bd",
+      "sha256": "55489a2a066aa5186d90f7925a1ae9afb8596a9f6f097d06a6db4f302b882cb8",
       "note": "Q001 Q015 Q019 Q124 Q127 Q131 Q134 Q175; src/wings/vinci/data/closluce.json; recipe_file=src/wings/vinci/shell.ts; geometry_dependency=vinci/foundation-plinth"
     },
     {
