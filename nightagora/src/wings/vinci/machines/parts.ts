@@ -2,7 +2,7 @@ import {
   Color, DoubleSide, FrontSide, Group, InstancedMesh, Matrix4, Mesh, MeshPhysicalNodeMaterial, MeshStandardNodeMaterial,
   type BufferGeometry,
 } from 'three/webgpu'
-import { attribute, cameraPosition, float, mix, normalGeometry, normalMap, normalWorld, positionGeometry, positionWorld, uv, vec2, vec3 } from 'three/tsl'
+import { attribute, cameraPosition, float, fwidth, mix, mx_worley_noise_vec2, normalGeometry, normalMap, normalWorld, positionGeometry, positionWorld, smoothstep, uv, vec2, vec3 } from 'three/tsl'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
 import type { MaterialSet, Stack } from '../../../stack'
 import type { DetailNodes } from '../../../stack/detail'
@@ -506,6 +506,27 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Dresse
       material.colorNode = vec3(pitch.r, pitch.g, pitch.b).mul(fibres.mul(spread).add(1 - spread).clamp(.5, 1.4)).mul(detail.occlusion).mul(edge.add(1))
       material.roughnessNode = /bedding|lining/.test(name) ? detail.roughness.mul(.3).add(.5).clamp(.52, .72) : detail.roughness.mul(.75).clamp(.46, .66)
       if (/bedding|lining/.test(name)) material.normalNode = null
+      const sewn = dossier.parts.find(p => p.material.class === name)?.shape as { outer_radius_m?: number } | undefined
+      if (!/bedding|lining/.test(name) && sewn?.outer_radius_m) {
+        // THE HIDE WAS SEWN INTO A TUBE: its seam runs the length of the coil,
+        // a welt with its stitches, and the pitch lies in it thick and dull.
+        // Away from it the pitch was brushed on unevenly, so the skin goes
+        // matt in patches and a hose's even gloss never forms.
+        const round = Math.PI * 2 * sewn.outer_radius_m, at = uv()
+        const fromSeam = at.x.sub(round / 2).abs()
+        const welt = float(1).sub(fromSeam.div(.0035).clamp(0, 1))
+        const stitch = at.y.div(.009).fract().sub(.5).abs().lessThan(.18).select(float(1), float(0)).mul(float(1).sub(fromSeam.sub(.0045).abs().div(.0012).clamp(0, 1)))
+        const brushed = at.y.mul(3.7).sin().mul(at.y.mul(1.1).add(at.x.mul(Math.PI * 2 / round)).sin()).mul(.5).add(.5)
+        // old pitch crazes: fine cracks, the cells drawn long along the coil,
+        // held back where a pixel is larger than a crack
+        const cells = mx_worley_noise_vec2(vec2(at.x.mul(46), at.y.mul(28)))
+        const craze = float(1).sub(smoothstep(0, .08, cells.y.sub(cells.x))).mul(float(1).sub(smoothstep(.004, .012, fwidth(at.y).add(fwidth(at.x)))))
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const tone = material.colorNode as any, sheen = material.roughnessNode as any
+        // the pitch darkens the hide toward black and takes its red
+        material.colorNode = tone.mul(vec3(.46, .41, .37)).mul(float(1).sub(welt.mul(.38)).sub(stitch.mul(.3)).sub(craze.mul(.3))).mul(brushed.mul(.22).add(.89))
+        material.roughnessNode = sheen.add(.2).add(brushed.mul(.12)).add(welt.mul(.08)).add(craze.mul(.1)).clamp(.62, .92)
+      }
     }
     if (/planed oak|hewn oak|oak peg|oak grip/.test(name)) {
       // GENERATED tint: new planed oak, paler and greyer than the museum's
