@@ -113,12 +113,15 @@ for (const [kind, want] of Object.entries(EXPECTED)) {
 
 const CERTAINTY = new Set(['documented', 'tradition', 'reconstructed', 'conjectural'])
 const FILLER = /\b(?:delve|delves|tapestry|landscape|leverage|multifaceted|it's worth noting|masterpiece|iconic|genius)\b/i
+/** On a painting's own label and detail "landscape" is the painted thing, the
+ * painter's word; everywhere else it stays refused as filler. */
+const filler = (text, id) => FILLER.test(String(id).startsWith('picture/') ? text.replace(/\blandscape\b/gi, '') : text)
 /** What the wing's own registers refuse in a spoken line, and what the museum's
  * voice refuses on top of them. */
 const VOICE = [
   ['em-dash', 'the museum writes with commas and periods', (t) => /[\u2014\u2013]/.test(t)],
   ['semicolon', 'a semicolon is not how a label speaks', (t) => /;/.test(t)],
-  ['filler', 'the museum does not write like a brochure', (t) => FILLER.test(t)],
+  ['filler', 'the museum does not write like a brochure', (t, id) => filler(t, id)],
 ]
 const words = (text) => text.trim().split(/\s+/).filter(Boolean).length
 /** German writes ordinals with a period, so 25. April is not two sentences.
@@ -130,7 +133,7 @@ function speak(id, field, text, lang) {
   if (typeof text !== 'string' || !text.trim()) return refuse('empty', id, `${field} is empty`)
   for (const rule of registers.SPOKEN_REFUSALS) if (rule.test(text)) refuse(`register-${rule.code}`, `${id} ${field}`, rule.says, text)
   for (const hit of forge.judge(text, lang)) refuse(`b14-${hit.rule.replace(/ /g, '-')}`, `${id} ${field}`, `${hit.why}: ${hit.on.join(' | ')}`, text)
-  for (const [code, says, test] of VOICE) if (test(text)) refuse(code, `${id} ${field}`, says, text)
+  for (const [code, says, test] of VOICE) if (test(text, id)) refuse(code, `${id} ${field}`, says, text)
 }
 
 /* --------------------------------------------------------------- the lines */
@@ -387,14 +390,29 @@ const CASES = [
     ['part-key']],
 ]
 
+/* The painter's word: "landscape" passes on a painting's label and detail and
+   nowhere else, and it lends no other filler word a pass. */
+const FILLER_CASES = [
+  ['landscape on a painting\'s label', 'picture/case/front', 'Christ, and the landscape behind him.', false],
+  ['landscape on a painting\'s detail name', 'picture/case/front', 'The landscape behind him', false],
+  ['landscape on a sheet', 'sheet/rcin-919000', 'The landscape of the body.', true],
+  ['landscape on a machine', 'machine/aerial-screw', 'It changed the landscape of flight.', true],
+  ['landscape in a record slot', 'limits picture/case/front', 'A landscape of loss.', true],
+  ['another filler word on a painting', 'picture/case/front', 'A masterpiece of light.', true],
+]
+
 function selftest() {
   const bad = []
   for (const [said, at, want] of CASES) {
     const got = judgeDemonstration({ id: at.id, entry: at.entry, dossierIds: new Set(at.dossier), visualNote: at.note }).map(([code]) => code)
     if (got.join(',') !== want.join(',')) bad.push(`${said}: expected ${want.join(', ') || 'nothing'}, got ${got.join(', ') || 'nothing'}`)
   }
+  for (const [said, id, text, refused] of FILLER_CASES) {
+    if (filler(text, id) !== refused) bad.push(`${said}: expected ${refused ? 'a refusal' : 'a pass'}`)
+  }
+  const cases = CASES.length + FILLER_CASES.length
   for (const line of bad) console.log(` · ${line}`)
-  console.log(bad.length ? `SELFTEST FAILED: ${bad.length} of ${CASES.length}` : `selftest: ${CASES.length} cases, all as written`)
+  console.log(bad.length ? `SELFTEST FAILED: ${bad.length} of ${cases}` : `selftest: ${cases} cases, all as written`)
   process.exitCode = bad.length ? 1 : 0
 }
 
