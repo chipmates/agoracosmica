@@ -174,6 +174,25 @@ function loadStory() {
   return module.exports
 }
 
+/** THE DOOR'S OPENINGS, from the wing's content with its two raw imports
+ *  handed in: they are displayed words and stand under a station line's rules */
+function loadOpenings() {
+  const source = fs.readFileSync(path.join(ROOT, 'src/wings/vinci/content.ts'), 'utf8')
+  const output = ts.transpileModule(source, {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+  }).outputText
+  const raw = {
+    './data/doors.json?raw': fs.readFileSync(path.join(ROOT, 'src/wings/vinci/data/doors.json'), 'utf8'),
+    './line/data/never-said.json?raw': fs.readFileSync(path.join(ROOT, 'src/wings/vinci/line/data/never-said.json'), 'utf8'),
+  }
+  const module = { exports: {} }
+  vm.runInNewContext(output, {
+    module, exports: module.exports,
+    require: (id) => { if (id in raw) return { default: raw[id] }; throw new Error(`the content imports ${id}, which this check does not hand in`) },
+  })
+  return module.exports.vinciOpenings ?? {}
+}
+
 /** the canon keys as the card itself prints them, for the run that has the
  *  card at hand. The parse is one heading pattern deep and breaks if part 7
  *  ever renumbers its rows or changes its heading level. */
@@ -244,6 +263,26 @@ function run() {
     }
   }
 
+  /* the door's openings: the kicker and the button under the wall's rules,
+     the line under a station line's own limits */
+  const openings = loadOpenings()
+  for (const [id, opening] of Object.entries(openings)) {
+    for (const [name, value] of [['kicker', opening.kicker], ['line', opening.line], ['enter', opening.enter]]) {
+      for (const language of ['en', 'de']) {
+        const said = value?.[language]
+        const at = `opening ${id} ${name}`
+        if (typeof said !== 'string' || !said.trim()) { refuse('language', language, 'empty', at); continue }
+        if (/[\u2014\u2013]/.test(said)) refuse('dash', language, said, at)
+        if (said.includes(';')) refuse('semicolon', language, said, at)
+        if (said.includes('?')) refuse('question', language, said, at)
+        if (name !== 'line') continue
+        if (words(said) > LINE_WORDS) refuse('line-words', language, `${words(said)} words`, at)
+        if (longestSentence(said, language) > SENTENCE_WORDS) refuse('line-sentence', language, `${longestSentence(said, language)} words in one sentence`, at)
+        if (characters(said) > LINE_CHARS[language]) refuse(`line-chars-${language}`, language, `${characters(said)} characters`, at)
+      }
+    }
+  }
+
   /* the exhibit lines, read from the wing's own data file: no surface of the
      story layer carries them, and they stand in the narrower band */
   const exhibits = JSON.parse(fs.readFileSync(path.join(ROOT, EXHIBITS), 'utf8')).lines ?? {}
@@ -275,6 +314,7 @@ function run() {
     },
     exhibits: { read: Object.keys(exhibits).length, overBand, waiting: BAND_DEBT.size },
     titleWall: story.vinciStoryTitleWall ? { buttons: story.vinciStoryTitleWall.buttons.length } : null,
+    openings: Object.keys(openings).length,
     exit: story.vinciStoryExit ? { things: story.vinciStoryExit.things.length, doors: story.vinciStoryExit.doors.length } : null,
     table,
     warnings,

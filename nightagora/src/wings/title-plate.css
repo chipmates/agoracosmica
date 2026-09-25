@@ -35,10 +35,12 @@
    every one of them keeps its place and comes back without a jump. The rule
    lives here and not in the shared window stylesheet, which is mounted only
    while a sheet stands on a narrow stage. */
-:root[data-na-plate='open'] .wing-stage > *:not(style),
-:root[data-na-plate='open'] .wing-labels > *:not(dialog),
-:root[data-na-plate='open'] .wing-rail-group,
-:root[data-na-plate='open'] .wing-doorblock { visibility: hidden; pointer-events: none; }
+:root[data-na-plate] .wing-stage > *:not(style, .na-film, .film-tall, .film-cycle-layer, .vinci-picture-words),
+:root[data-na-plate] .wing-labels > *:not(dialog),
+:root[data-na-plate] .wing-rail-group,
+:root[data-na-plate] .wing-doorblock { visibility: hidden; pointer-events: none; }
+/* the door is the one text on the screen: the masthead waits behind it too */
+:root[data-na-plate='door'] :is(.brand, #rail) { visibility: hidden; }
 
 .na-plate-grab { display: none; }
 
@@ -275,4 +277,185 @@
     order: 2;
     font-size: .875rem;
   }
+}
+
+/* THE DOOR, picture first. It stands where the wing's own words will stand,
+   the band's place on a desktop and the box's on a phone, on the same solid
+   ground, and the picture above it is neither dimmed nor covered. The words
+   start from the band's one x; the one gold way in keeps the band's corner. */
+.na-plate[data-form='door'] {
+  --door-g: max(64px, (100vw - 1680px) / 2);
+  --door-read: clamp(560px, calc(100vw - var(--door-g) * 2 - 452px), 860px);
+  position: fixed;
+  inset: auto 0 0 0;
+  width: 100%;
+  max-width: none;
+  max-height: 100dvh;
+  margin: 0;
+  padding: 20px var(--door-g) 18px;
+  border: 0;
+  background: var(--na-abyss);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--na-gold) 34%, transparent);
+  backdrop-filter: none;
+  overflow: visible;
+}
+.na-plate[data-form='door'][open] {
+  display: grid;
+  grid-template-columns: minmax(0, var(--door-read)) minmax(0, 1fr) auto;
+  grid-template-areas:
+    'rack rack rack'
+    'wall . book'
+    'wall links go';
+  column-gap: 24px;
+  align-items: end;
+}
+.na-plate[data-form='door']::backdrop { background: none; }
+.na-plate[data-form='door'] .na-plate-wall { grid-area: wall; padding: 0; }
+.na-plate[data-form='door'] .na-plate-title { margin-top: 8px; }
+.na-plate[data-form='door'] .na-plate-line {
+  margin-top: 8px;
+  max-width: 62ch;
+  color: color-mix(in srgb, var(--na-starlight) 90%, var(--na-mist));
+}
+
+/* the one way in: the band's gold corner, grown to the door's size */
+.na-door-go { grid-area: go; }
+.na-plate[data-form='door'] .na-plate-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  min-width: 248px;
+  min-height: 64px;
+  padding: 0 11px 0 26px;
+  border: 1px solid var(--na-gold);
+  background: color-mix(in srgb, var(--na-gold) 12%, transparent);
+  color: var(--na-starlight);
+  font: 400 1.375rem/1.2 var(--serif);
+  letter-spacing: .01em;
+  text-transform: none;
+}
+.na-plate[data-form='door'] .na-plate-primary:hover { background: color-mix(in srgb, var(--na-gold) 22%, transparent); }
+.na-plate[data-form='door'] .na-plate-primary:focus-visible { outline: 1px solid var(--na-gold); outline-offset: 4px; }
+.na-door-arrow {
+  display: grid;
+  place-items: center;
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--na-gold);
+  border-radius: 50%;
+  color: var(--na-gold);
+}
+.na-door-ic { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+/* the small ways: words with a hairline under them, never boxes */
+.na-door-links { grid-area: links; justify-self: end; display: flex; flex-wrap: wrap; justify-content: flex-end; column-gap: 24px; }
+.na-plate[data-form='door'] :is(.na-plate-second, .na-plate-third) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  min-width: 44px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: color-mix(in srgb, var(--na-starlight) 86%, var(--na-mist));
+  font: 400 .9375rem/1.2 var(--sans);
+  letter-spacing: .01em;
+  text-transform: none;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--na-gold) 45%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 6px;
+}
+.na-plate[data-form='door'] :is(.na-plate-second, .na-plate-third):hover { color: var(--na-starlight); text-decoration-color: var(--na-gold); }
+.na-plate[data-form='door'] :is(.na-plate-second, .na-plate-third):focus-visible { outline: 1px solid var(--na-gold); outline-offset: 4px; }
+
+/* the book: the leaflet and its sources, out of the first view */
+.na-door-book {
+  grid-area: book;
+  justify-self: end;
+  align-self: start;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: -10px -8px 0 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: color-mix(in srgb, var(--na-starlight) 78%, var(--na-mist));
+  cursor: pointer;
+}
+.na-door-book .na-door-ic { width: 26px; height: 26px; stroke-width: 1.1; }
+.na-door-book:hover, .na-door-book[aria-expanded='true'] { color: var(--na-gold); }
+.na-door-book:focus-visible { outline: 1px solid var(--na-gold); outline-offset: 0; }
+
+/* the leaflet rises above the wall, the door grows upward and nothing moves */
+.na-plate[data-form='door'] .na-plate-leaflet { grid-area: rack; max-height: 52vh; }
+.na-plate[data-form='door'] .na-plate-row { gap: 0 20px; margin: 0 0 14px; padding: 0; border-top: 0; border-bottom: 1px solid var(--rule-faint); }
+.na-plate[data-form='door'] .na-plate-tab::after { right: -12px; }
+
+/* MOBILE FIRST ON A PHONE: the door is the phone's own box. The words on the
+   solid part, the small ways on the key row, and the foot's seats: the book
+   where the book stands, the gold way in beside it under the thumb. */
+@media (max-aspect-ratio: 9/10) {
+  .na-plate[data-form='door'] {
+    --door-foot: calc(80px + env(safe-area-inset-bottom));
+    max-height: 84dvh;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: linear-gradient(to top,
+      color-mix(in srgb, var(--na-abyss) 45%, transparent) var(--door-foot),
+      color-mix(in srgb, var(--na-abyss) 94%, transparent) var(--door-foot));
+  }
+  .na-plate[data-form='door'][open] {
+    grid-template-columns: 72px minmax(0, 1fr);
+    grid-template-areas:
+      'rack rack'
+      'wall wall'
+      'links links'
+      'book go';
+    column-gap: 0;
+  }
+  .na-plate[data-form='door'] .na-plate-wall { padding: 8px 16px 0; }
+  .na-plate[data-form='door'] .na-plate-kicker { line-height: 1.25; }
+  .na-plate[data-form='door'] .na-plate-title { margin-top: 4px; }
+  .na-plate[data-form='door'] .na-plate-line { margin-top: 4px; max-width: none; font-size: 1.0625rem; line-height: 1.45; }
+  .na-door-links { justify-self: stretch; justify-content: flex-start; column-gap: 22px; padding: 0 16px; }
+  .na-plate[data-form='door'] :is(.na-plate-second, .na-plate-third) { flex: 0 0 auto; padding: 0; }
+  /* the book's seat: a 40 px glass ring inside a 44 px target */
+  .na-door-book {
+    align-self: start;
+    justify-self: start;
+    width: 44px;
+    height: 44px;
+    margin: 14px 0 0 14px;
+    background: radial-gradient(circle closest-side,
+      color-mix(in srgb, var(--na-abyss) 85%, transparent) 19.5px,
+      color-mix(in srgb, var(--na-starlight) 25%, transparent) 19.5px 20.5px, transparent 20.5px);
+    color: color-mix(in srgb, var(--na-starlight) 88%, var(--na-gold));
+  }
+  .na-door-book .na-door-ic { width: 18px; height: 18px; stroke-width: 1.6; }
+  .na-door-go { align-self: start; padding: 12px 12px calc(16px + env(safe-area-inset-bottom)) 0; }
+  .na-plate[data-form='door'] .na-plate-primary {
+    width: 100%;
+    min-width: 0;
+    min-height: 52px;
+    padding: 0 8px 0 20px;
+    border: 0;
+    border-radius: 26px;
+    background: var(--na-gold);
+    color: var(--na-abyss);
+    font-size: 1.125rem;
+    box-shadow: 0 2px 14px color-mix(in srgb, var(--na-gold) 22%, transparent);
+  }
+  .na-plate[data-form='door'] .na-plate-primary:hover { background: var(--na-gold); }
+  .na-plate[data-form='door'] .na-door-arrow { width: 36px; height: 36px; flex-basis: 36px; border: 0; background: color-mix(in srgb, var(--na-abyss) 12%, transparent); color: var(--na-abyss); }
+  .na-plate[data-form='door'] .na-plate-leaflet { max-height: 46dvh; background: color-mix(in srgb, var(--na-abyss) 94%, transparent); }
+  .na-plate[data-form='door'] .na-plate-row { margin: 0; padding: 4px 16px 0; border-bottom: 0; }
 }

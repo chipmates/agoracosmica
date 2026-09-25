@@ -2290,8 +2290,11 @@ function bootRoute(): boolean {
   flashAt = -1
   wakeInstruments()
   /* A DEEP LINK WAITS AT THE SAME FIELD. Typed straight in, the address used
-     to stand the visitor on the raw stage until the wing was built. */
-  breath.hold(openWing(here.slug, here.station))
+     to stand the visitor on the raw stage until the wing was built. A door's
+     address is the one exception: the page already paints the film's first
+     still, and the door stands over it, so no field is lit over the picture. */
+  if (document.documentElement.dataset['naDoor'] === 'early') void openWing(here.slug, here.station)
+  else breath.hold(openWing(here.slug, here.station))
   return true
 }
 

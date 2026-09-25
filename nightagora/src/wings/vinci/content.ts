@@ -732,6 +732,46 @@ export const vinciWelcomeText = {
   sources: { en: 'Sources', de: 'Quellen' },
 } satisfies Record<string, VinciText>
 
+/* THE DOOR'S OPENINGS, picture first: the kicker, the one line that opens a
+   question the walk answers, and the word on the one big control. Three are
+   shot side by side and one is chosen; the address picks by `opening=`. */
+export interface VinciOpening {
+  kicker: VinciText
+  line: VinciText
+  enter: VinciText
+}
+export type VinciOpeningId = 'a' | 'b' | 'c'
+
+export const vinciOpenings: Readonly<Record<VinciOpeningId, VinciOpening>> = {
+  // the woman without a name: kept at station 3 and paid at station 12
+  a: {
+    kicker: { en: 'CLOS LUCÉ, AMBOISE · 10 OCTOBER 1517, 15:19 BY THE SUN', de: 'CLOS LUCÉ, AMBOISE · 10. OKTOBER 1517, 15:19 NACH DER SONNE' },
+    line: {
+      en: 'On this day a visitor saw three of his paintings. For the woman from Florence, he wrote down no name.',
+      de: 'An diesem Tag sah ein Besucher drei seiner Bilder. Bei der Frau aus Florenz notierte er keinen Namen.',
+    },
+    enter: { en: 'Begin', de: 'Beginnen' },
+  },
+  // a grave nobody is sure of: kept at station 14
+  b: {
+    kicker: { en: 'CLOS LUCÉ, AMBOISE · 10 OCTOBER 1517, 15:19 BY THE SUN', de: 'CLOS LUCÉ, AMBOISE · 10. OKTOBER 1517, 15:19 NACH DER SONNE' },
+    line: {
+      en: 'He died in the house above you, and his grave is up the road. Nobody is sure it is him.',
+      de: 'Er starb im Haus über dir, und sein Grab ist oben beim Schloss. Ob er darin liegt, weiß niemand sicher.',
+    },
+    enter: { en: 'Begin', de: 'Beginnen' },
+  },
+  // over thirty dead bodies, as he told it: kept at station 0 and station 8
+  c: {
+    kicker: { en: 'CLOS LUCÉ, AMBOISE · 10 OCTOBER 1517, 15:19 BY THE SUN', de: 'CLOS LUCÉ, AMBOISE · 10. OKTOBER 1517, 15:19 NACH DER SONNE' },
+    line: {
+      en: 'His last house is above you. On this day he told a visitor he had opened over thirty dead bodies.',
+      de: 'Sein letztes Haus steht über dir. An diesem Tag erzählte er einem Besucher, er habe mehr als dreißig Tote geöffnet.',
+    },
+    enter: { en: 'Begin', de: 'Beginnen' },
+  },
+}
+
 /* THE WING'S SOURCES, GROUPED. The records are the asset store's own: every
    picture, leaf, model and material the museum shows carries its holder and
    its licence line there, so this file groups them and never restates them.

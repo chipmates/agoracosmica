@@ -20,11 +20,19 @@ import { LIFE_WORDS } from '../life/words'
 import { createTitlePlate, plateGroups, type PlateGroup, type PlateLeaf } from '../title-plate'
 import { loadManifest, type ManifestEntry } from '../../manifest'
 import {
-  vinciCertaintyWords, vinciSourceGroups, vinciSourceScopes, vinciThroughLine,
-  vinciWelcomeBlocks, vinciWelcomeText, type VinciText,
+  vinciCertaintyWords, vinciOpenings, vinciSourceGroups, vinciSourceScopes, vinciThroughLine,
+  vinciWelcomeBlocks, vinciWelcomeText, type VinciOpeningId, type VinciText,
 } from './content'
 
 const FLAG = 'vinci-welcome'
+
+/** The door the address asks for: one of the openings, or today's sheet
+ *  (`now`) so its frames can still be shot. */
+export type VinciDoorForm = VinciOpeningId | 'now'
+export function vinciOpening(): VinciDoorForm {
+  const asked = new URLSearchParams(location.search).get('opening')
+  return asked === 'now' || asked === 'b' || asked === 'c' ? asked : 'a'
+}
 
 /** Read as seen when the store refuses, so the door never sticks. */
 export function vinciWelcomeSeen(): boolean {
@@ -45,14 +53,20 @@ function markSeen(): void {
 
 export interface VinciWelcome {
   element: HTMLDialogElement
+  /** `door` leaves the picture whole; `sheet` is today's plate */
+  form: 'door' | 'sheet'
   open(): void
   dispose(): void
 }
 
 export function createVinciWelcome(
   host: HTMLElement,
-  onEnter: (route: 'house' | 'collection' | 'life') => void
+  onEnter: (route: 'house' | 'collection' | 'life') => void,
+  /** a wing that has no years to open leaves the third way out */
+  options: { life?: boolean } = {}
 ): VinciWelcome {
+  const form = vinciOpening()
+  const opening = form === 'now' ? null : vinciOpenings[form]
   const text = (value: VinciText): string => value[lang()]
   const document_ = host.ownerDocument
   const phone = (): boolean => innerWidth / innerHeight <= 0.9
@@ -151,26 +165,28 @@ export function createVinciWelcome(
   const plate = createTitlePlate(host, {
     id: 'vinci-welcome',
     className: 'vinci-welcome',
+    form: opening ? 'door' : 'sheet',
     words: () => ({
       label: text(vinciWelcomeText.label),
-      kicker: text(vinciWelcomeText.kicker),
+      kicker: text(opening?.kicker ?? vinciWelcomeText.kicker),
       title: text(vinciWelcomeText.title),
-      // The wing's one sentence, the same one the recap carries at the exit.
-      line: text(vinciThroughLine),
+      // Today's sheet carries the wing's one sentence, the one the recap
+      // carries at the exit; a door carries its opening's own line.
+      line: text(opening?.line ?? vinciThroughLine),
       leaflet: text(vinciWelcomeText.leaflet),
       handle: text(vinciWelcomeText.handle),
     }),
     leaves,
     controls: () => [
-      { word: text(vinciWelcomeText.enter), rank: 'primary', press: () => { route = 'house' } },
+      { word: text(opening?.enter ?? vinciWelcomeText.enter), rank: 'primary', press: () => { route = 'house' } },
       { word: text(vinciWelcomeText.collection), rank: 'second', press: () => { route = 'collection' } },
       /* THE THIRD DOOR IS NOT A THIRD WAY IN. The two controls above choose
          where the visitor arrives; this one opens the years over the house
          they arrive in, so it stands under them and carries less weight. */
-      {
-        word: text(LIFE_WORDS.life), rank: 'third', className: 'wing-life-door',
+      ...(options.life === false ? [] : [{
+        word: text(LIFE_WORDS.life), rank: 'third' as const, className: 'wing-life-door',
         attributes: { 'aria-controls': 'wing-life' }, press: () => { route = 'life' },
-      },
+      }]),
     ],
     onClose() {
       markSeen()
@@ -180,6 +196,7 @@ export function createVinciWelcome(
 
   return {
     element: plate.element,
+    form: opening ? 'door' : 'sheet',
     open() {
       route = 'house'
       painting++

@@ -10,6 +10,60 @@
   <meta property="og:title" data-lobby="pageTitle" content="Night Agora · The digital museum of thirty lives" />
   <meta property="og:description" data-lobby="tagline" content="The digital museum of thirty lives. Walk where they lived, see what they made." />
   <meta property="og:type" content="website" />
+  <script>
+    /* THE DOOR'S FIRST PICTURE. A film address that opens at a wing's door
+       fetches the release and paints its first still before the museum's own
+       code has arrived; the wing adopts the same release and takes the
+       picture over. Any other address, a visitor who has passed the door this
+       visit, and a driven browser that does not ask for a door get the page
+       as it was. */
+    (function () {
+      try {
+        var q = new URLSearchParams(location.search), film = q.get('film')
+        var at = /^\/w\/([a-z0-9-]{1,64})\/?$/.exec(location.pathname)
+        if (!film || !at || !/^(#s=0?)?$/.test(location.hash)) return
+        if (sessionStorage.getItem(at[1] + '-welcome') === '1') return
+        if (navigator.webdriver && !q.has('opening')) return
+        var root = document.documentElement
+        var base = new URL('/film/' + encodeURIComponent(film) + '/', location.origin).href
+        var release = fetch(base + 'film.json', { cache: 'no-cache' }).then(function (r) {
+          if (!r.ok) throw new Error('release ' + r.status)
+          return r.json()
+        })
+        window.__naFilmEarly = { base: base, release: release }
+        root.dataset.naDoor = 'early'
+        release.then(function (rel) {
+          // the still the player itself picks: the framing by the glass, the
+          // smallest rung that carries the box, the smallest on a lean line
+          var upright = innerWidth / innerHeight <= 0.9, f = upright ? 'upright' : 'wide'
+          // the door belongs to the story's first stop: a release without it has no door
+          var node = (rel.story || [])[0]
+          var stills = node && rel.nodes[node] && rel.nodes[node].stills[f]
+          if (!stills) throw new Error('no still')
+          var c = navigator.connection, lean = !!c && (c.saveData || /^(slow-2g|2g|3g)$/.test(c.effectiveType || ''))
+          var rungs = rel.framings[f].rungs.slice().sort(function (a, b) { return a[0] - b[0] })
+          var aspect = upright ? 390 / 844 : 1280 / 720, dpr = devicePixelRatio || 1
+          var across = Math.max(innerWidth, innerHeight * aspect) * dpr
+          var rung = lean ? rungs[0] : rungs.filter(function (r) { return r[0] >= across * 0.9 })[0] || rungs[rungs.length - 1]
+          var file = stills[rung.join('x')] || stills[Object.keys(stills)[0]]
+          var img = new Image()
+          img.id = 'na-first'
+          img.alt = ''
+          img.setAttribute('aria-hidden', 'true')
+          img.setAttribute('elementtiming', 'na-first')
+          img.fetchPriority = 'high'
+          img.src = new URL(file.file, base).href
+          var place = function () { if (root.dataset.naDoor) document.body.prepend(img) }
+          if (document.body) place()
+          else addEventListener('DOMContentLoaded', place)
+        }).catch(function () {
+          if (root.dataset.naDoor === 'early') delete root.dataset.naDoor
+        })
+      } catch (e) {
+        delete document.documentElement.dataset.naDoor
+      }
+    })()
+  </script>
   <style>
     :root {
       --na-abyss: #060b1c;
@@ -298,6 +352,15 @@
     #goldbreath.cutting { transition: none; }
 
     body.forge #voice, body.forge #goldbreath { transition: none !important; }
+
+    /* THE DOOR'S FIRST PICTURE stands in the film's own box, under the wing,
+       and nothing of the lobby's first light or the gold field stands over it */
+    #na-first {
+      position: fixed; left: 0; top: 0; width: 100%; height: 100%; z-index: 2;
+      object-fit: cover; object-position: 50% 50%; pointer-events: none;
+    }
+    @media (max-aspect-ratio: 9/10) { #na-first { height: max(100vh, 100lvh); } }
+    :root[data-na-door] :is(#veil, #goldbreath, #vignette, #descent, #verse) { visibility: hidden; }
 
     /* ---- the descent: the travel down to the agora, question by
        question. Every scroll gives a line and the world coming closer ---- */

@@ -19,7 +19,8 @@ import { createDeskChrome, deskMark, type DeskChrome, type DeskStation } from '.
 import { gaitPace } from './gait'
 import { createVinciSourcesWindow } from './sources'
 import cardsSource from './data/cards.json?raw'
-import { createFilmSource, loadFilmRelease, LEAN_MS, type FilmRelease } from '../picture/film'
+import { createFilmSource, FILM_FORMAT, loadFilmRelease, LEAN_MS, type FilmRelease } from '../picture/film'
+import { createVinciWelcome, vinciWelcomeSeen, type VinciWelcome } from './welcome'
 import type { FilmLook } from './film-look'
 import { createPictureWords, type PictureWordsLayer } from './picture-words'
 import type { DeskOverviewCell } from '../overview'
@@ -104,6 +105,20 @@ function sentences(said: string, language: string): string[] {
   return out
 }
 
+/* THE RELEASE THE PAGE ALREADY ASKED FOR. A door's address has the page
+   fetch the release and paint its first still before this module arrives;
+   the wing adopts that answer instead of asking twice. */
+interface EarlyFilm { base: string; release: Promise<FilmRelease> }
+function adoptRelease(base: string): Promise<FilmRelease> {
+  const early = (window as unknown as { __naFilmEarly?: EarlyFilm }).__naFilmEarly
+  if (!early || early.base !== base) return loadFilmRelease(base)
+  return early.release.then(r => (r.format === FILM_FORMAT ? r : loadFilmRelease(base)), () => loadFilmRelease(base))
+}
+/** the page's own first still, once the film's own picture stands over it */
+function releaseFirstStill(): void {
+  document.getElementById('na-first')?.remove()
+}
+
 const stopNode = (id: string): PictureNode => `stop:${id}`
 const viewNode = (exhibit: string): PictureNode => `view:${exhibit}`
 
@@ -128,6 +143,10 @@ export function createWing(): WingModule {
   let legUnderWay = false
   let answering: { dot: HTMLButtonElement; id: string } | null = null
   const stood = new Set<string>()
+  /** the door at the first stop: while it stands the picture keeps the whole glass */
+  let welcome: VinciWelcome | undefined
+  let doorStanding = false
+  let doorLeaving = 0
   const controller = new AbortController()
   const signal = controller.signal
   const narrow = (): boolean => innerWidth / innerHeight <= 0.9
@@ -147,7 +166,7 @@ export function createWing(): WingModule {
   let tall: HTMLDivElement | undefined
   let cycleLayer: HTMLDivElement | undefined
   function box() {
-    if (wide) return { left: 0, top: 0, width: innerWidth, height: deskStageHeight() }
+    if (wide) return { left: 0, top: 0, width: innerWidth, height: doorStanding ? innerHeight : deskStageHeight() }
     const height = Math.max(innerHeight, tall?.getBoundingClientRect().height ?? 0)
     return { left: 0, top: 0, width: innerWidth, height }
   }
@@ -627,6 +646,40 @@ export function createWing(): WingModule {
     if (next !== null) picture?.ahead([stopNode(LIFE[next]!.id)])
   }
 
+  /* ---- the door ---- */
+  /** THE DOOR STANDS AT THE FIRST STOP, once a visit, and a driven browser
+      meets it only when its address asks for one */
+  function doorWanted(): boolean {
+    if (card !== 0 || vinciWelcomeSeen()) return false
+    return !navigator.webdriver || new URLSearchParams(location.search).has('opening')
+  }
+  function openDoor(): void {
+    if (!welcome || doorStanding) return
+    doorStanding = true
+    document.documentElement.dataset['naDoor'] = 'open'
+    welcome.open()
+  }
+  function leaveDoor(route: 'house' | 'collection' | 'life'): void {
+    doorStanding = false
+    delete document.documentElement.dataset['naDoor']
+    releaseFirstStill()
+    const wing = hosts?.stage.parentElement
+    /* THE PICTURE GIVES THE BAND ITS ROW as the door leaves, in one soft move
+       rather than a cut; the marks wait for the picture to settle */
+    if (wing && wide) {
+      wing.dataset['doorLeaving'] = ''
+      doorLeaving = performance.now() + 460
+      setTimeout(() => { delete wing.dataset['doorLeaving']; marksAt = ''; wordsAt = '' }, 470)
+    }
+    marksAt = ''
+    paint()
+    if (route === 'collection') {
+      const at = LIFE.findIndex((s, i) => carried(i) && stationOf(s.station).group === 'collection')
+      if (at >= 0 && hosts) { hosts.navigate(at); return }
+    }
+    requestAnimationFrame(() => wing?.querySelector<HTMLElement>(wide ? '.desk-on' : '.film-gold')?.focus({ preventScroll: true }))
+  }
+
   async function mount(h: WingHosts): Promise<void> {
     hosts = h
     wide = !narrow()
@@ -641,10 +694,26 @@ export function createWing(): WingModule {
     h.stage.append(style)
     tall = make('div', 'film-tall')
     h.stage.append(tall)
-    release = await loadFilmRelease(filmReleaseBase())
+    /* THE DOOR FIRST: where the page already painted the first still the door
+       stands over it now; otherwise it waits for the film's own picture. */
+    const early = document.documentElement.dataset['naDoor'] === 'early'
+    if (doorWanted()) {
+      welcome = createVinciWelcome(h.labels, route => leaveDoor(route), { life: false })
+      if (early) openDoor()
+    } else if (early) {
+      delete document.documentElement.dataset['naDoor']
+    }
+    release = await adoptRelease(filmReleaseBase())
     if (!hosts) return
     // the visit enters at the stop asked for, or at the first this release carries
     if (!carried(card)) card = Math.max(0, LIFE.findIndex((_, i) => carried(i)))
+    // a release that does not carry the first stop has no door to stand at
+    if (welcome && card !== 0) {
+      welcome.dispose(); welcome = undefined
+      doorStanding = false
+      delete document.documentElement.dataset['naDoor']
+      releaseFirstStill()
+    }
     picture = createFilmSource({ host: h.stage, base: filmReleaseBase(), release, at: stopNode(LIFE[card]!.id),
       framing: () => (wide ? 'wide' : 'upright'), box, pace: () => gaitPace(), hold: title => readingMs(title) })
     // the seam as the rigs read it, the way the live wing hands them `__forge`
@@ -727,6 +796,8 @@ export function createWing(): WingModule {
     stood.add(LIFE[card]!.id)
     paint()
     await picture.ready()
+    releaseFirstStill()
+    if (welcome && !doorStanding && !vinciWelcomeSeen()) openDoor()
     ahead()
     // the close looks are fetched while the visitor reads the first picture
     void lookNow()
@@ -793,7 +864,7 @@ export function createWing(): WingModule {
         leg?.setAttribute('stroke-dasharray', `${(2 * Math.PI * 20.5 * share).toFixed(1)} ${(2 * Math.PI * 20.5).toFixed(1)}`)
       }
       desk?.update()
-      if (s.kind === 'rest') { paintMarks(); paintWords() }
+      if (s.kind === 'rest' && performance.now() > doorLeaving) { paintMarks(); paintWords() }
       else if (s.kind === 'wait' && dots.length) clearMarks()
       if (s.kind !== 'rest' && wordsAt) { words?.hide(); wordsAt = '' }
     },
@@ -807,6 +878,10 @@ export function createWing(): WingModule {
       clearMarks(); chip?.remove(); answering?.dot.remove(); answering = null
       words?.dispose(); words = undefined; wordsAt = ''
       cutCard?.remove()
+      welcome?.dispose(); welcome = undefined
+      if (doorStanding) delete document.documentElement.dataset['naDoor']
+      doorStanding = false
+      releaseFirstStill()
       if (hosts) {
         const wing = hosts.stage.parentElement!
         delete wing.dataset['wing']; delete wing.dataset['film']; delete wing.dataset['cut']

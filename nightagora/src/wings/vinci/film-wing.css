@@ -262,3 +262,9 @@ html:has(#wing[data-film='upright']) #instruments .inst-close {
   font-size: 15px; color: var(--press-white);
   background: linear-gradient(to bottom, color-mix(in srgb, var(--na-abyss) 0%, transparent), var(--na-abyss) 18px);
 }
+
+/* THE DOOR LEAVES: the picture gives the band its row in one soft move */
+#wing[data-door-leaving] .na-film { transition: height 420ms cubic-bezier(.22,.61,.36,1); }
+@media (prefers-reduced-motion: reduce) {
+  #wing[data-door-leaving] .na-film { transition: none; }
+}
