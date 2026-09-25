@@ -320,7 +320,7 @@ function chromeProof() {
 /** THE BUILD MUST BE THE TREE. The preview serves `dist/`, and its whoami
     names the checkout's head, not the build's: a source newer than the build
     is refused here instead of rendered from yesterday's bundle. */
-function assertBuildFresh() {
+export function assertBuildFresh() {
   const built = join(APP_ROOT, 'dist', 'index.html')
   if (!existsSync(built)) throw new Error('no build: run pnpm build first')
   const at = statSync(built).mtimeMs
@@ -451,7 +451,7 @@ async function savePng(rgb, width, height, file) {
 
 /** THE STILL OF A NODE: stood at once, one rest frame; and a second one a second
     of the world later, which is what the joins may have to carry */
-async function exportStill(session, inbox, node, out, opts) {
+export async function exportStill(session, inbox, node, out, opts) {
   await standAt(session.page, node)
   const pending = await session.page.evaluate(() => window.__forge.state().texturesPending)
   const tag = `still ${node.id} ${session.framing}`
@@ -520,7 +520,7 @@ export async function silentWalk(page, from, to, motion, take = null) {
 }
 
 /** THE CLIP: rest at the departure, the leg on its own clock, rest at the arrival. */
-async function exportClip(session, inbox, edge, nodes, track, out, opts) {
+export async function exportClip(session, inbox, edge, nodes, track, out, opts) {
   // the release's held set stands already (the rule off: the wing's own streaming)
   const held = opts.mount === 'held' ? opts.held : null
   const { page, framing, stage } = session
@@ -659,7 +659,9 @@ function saveSeen(cells, dir, stem) {
   const { bits, count } = cells.dilated()
   mkdirSync(dir, { recursive: true })
   const file = join(dir, `${stem}.cells.gz`)
-  writeFileSync(file, gzipSync(bits))
+  // whole or not at all: a job that stops mid-write finds no half set under the name
+  writeFileSync(`${file}.part`, gzipSync(bits))
+  renameSync(`${file}.part`, file)
   return { cells: count, file, box: CELL_BOX, method: 'each id pixel ray to its hit, sky rays on every second pixel to the box, one cell dilated' }
 }
 
@@ -670,6 +672,34 @@ function nearDepth(frame) {
   if (!d.length) return 0
   d.sort((a, b) => a - b)
   return d[Math.floor(d.length * 0.1)]
+}
+
+/* ---- the record of a clip and a still, as the gate reads them ---- */
+/** how the frames were made, as every sidecar names it */
+export function recipeOf({ mount = 'held', scale = 1, view = null, grain = 0 } = {}) {
+  return { mount: mount === 'held' ? 'every body the framing\'s clips draw (taken on silent walks) stands for all its stills and clips' : 'the wing\'s own streaming', worldClock: 'pinned: the wind on its loop\'s first frame at rest, whole loops across a leg with the walk', tier: 'max', geometry: 'hero', scale, stage: view ? `stills: ${Object.entries(view).map(([k, v]) => `${k} ${v.css.width}x${v.css.height} CSS at ${v.dsf}`).join(', ')}` : 'film', minDraws: MIN_DRAWS, maxDraws: MAX_DRAWS, shutter: SHUTTER, jitter: 'halton-2-3', average: 'linear light of the display print, one quantisation', grain: grain ? `baked ${grain}, seeded by the frame, the rest frames seed 0` : 'held (laid by the player)', fps: FPS }
+}
+
+/** a clip's sidecar: what its export measured, frame by frame */
+export function clipSidecar(r, { version, recipe, keys, keysNote = null, head = headHere() }) {
+  return {
+    format: 'vinci-film-sidecar-v1', exportFormat: EXPORT_FORMAT, clip: r.clip, framing: r.framing,
+    renderer: `chromium ${version} webgpu, tier max, ${head}`, recipe, keys, keysNote,
+    frames: r.frames, joins: r.joins, track: r.track, projectionThrows: r.projectionThrows,
+    requestsAfterClock: r.requestsAfterClock, starvedSteps: r.starvedSteps, pageErrors: r.pageErrors, pendingAtRest: r.pendingAtRest,
+    paintedOverCanvas: r.paintedOverCanvas, mountedSetChanges: r.mountedSetChanges, casters: r.casters, mount: r.mount,
+    chromeImagesAfterClock: r.chromeImagesAfterClock, lateRequests: r.lateRequests, mountedChanges: r.mountedChanges,
+    ...(r.framing === 'upright' ? { floorCeilingMax: r.floorCeilingMax } : {}),
+    plateTexelNote: 'not measured by the export: the texel line waits for a plate hook',
+    seen: r.seen,
+    refused: r.refused,
+    files: r.files, perFrame: r.frameRecords.map((f) => ({ i: f.i, sha256: f.sha256, draws: f.draws, motion: f.motion ?? 0, turnPx: f.turnPx ?? 0, walkPx: f.walkPx ?? 0, nearM: round(f.nearM ?? 0, 3), floorCeiling: f.floorCeiling, meshes: f.mounted?.meshes, wallMs: f.wall, ms: f.ms, print: f.print, cam: f.cam })),
+  }
+}
+
+/** a still's sidecar */
+export function stillSidecar(s, { renderer, keys }) {
+  return { format: 'vinci-film-sidecar-v1', node: s.node, framing: s.framing, renderer, keys, raw: s.raw, pendingAtRest: s.pendingAtRest, pageErrors: 0, paintedOverCanvas: s.paintedOverCanvas }
 }
 
 /* ---- the keys, where the gate's own module stands in the tree ---- */
@@ -799,23 +829,11 @@ async function main() {
   // ---- the record ----
   const first = all[0]
   const gate = stillsOnly ? { note: 'stills only: no clip, no keys' } : await gateKeys(first.results, log).catch((err) => ({ note: `the gate's keys failed: ${String(err.message).slice(0, 200)}` }))
-  const recipe = { mount: mount === 'held' ? 'every body the framing\'s clips draw (taken on silent walks) stands for all its stills and clips' : 'the wing\'s own streaming', worldClock: 'pinned: the wind on its loop\'s first frame at rest, whole loops across a leg with the walk', tier: 'max', geometry: 'hero', scale, stage: view ? `stills: ${Object.entries(view).map(([k, v]) => `${k} ${v.css.width}x${v.css.height} CSS at ${v.dsf}`).join(', ')}` : 'film', minDraws: MIN_DRAWS, maxDraws: MAX_DRAWS, shutter: SHUTTER, jitter: 'halton-2-3', average: 'linear light of the display print, one quantisation', grain: grain ? `baked ${grain}, seeded by the frame, the rest frames seed 0` : 'held (laid by the player)', fps: FPS }
+  const recipe = recipeOf({ mount, scale, view, grain })
   for (const r of first.results) {
     if (!r.files) continue
     const keys = gate.keys?.get(`${r.clip} ${r.framing}`) ?? { motion: r.replay.key, picture: null, global: null, delivery: null }
-    const sidecar = {
-      format: 'vinci-film-sidecar-v1', exportFormat: EXPORT_FORMAT, clip: r.clip, framing: r.framing,
-      renderer: `chromium ${first.version} webgpu, tier max, ${headHere()}`, recipe, keys, keysNote: gate.note ?? null,
-      frames: r.frames, joins: r.joins, track: r.track, projectionThrows: r.projectionThrows,
-      requestsAfterClock: r.requestsAfterClock, starvedSteps: r.starvedSteps, pageErrors: r.pageErrors, pendingAtRest: r.pendingAtRest,
-      paintedOverCanvas: r.paintedOverCanvas, mountedSetChanges: r.mountedSetChanges, casters: r.casters, mount: r.mount,
-      chromeImagesAfterClock: r.chromeImagesAfterClock, lateRequests: r.lateRequests, mountedChanges: r.mountedChanges,
-      ...(r.framing === 'upright' ? { floorCeilingMax: r.floorCeilingMax } : {}),
-      plateTexelNote: 'not measured by the export: the texel line waits for a plate hook',
-      seen: r.seen,
-      refused: r.refused,
-      files: r.files, perFrame: r.frameRecords.map((f) => ({ i: f.i, sha256: f.sha256, draws: f.draws, motion: f.motion ?? 0, turnPx: f.turnPx ?? 0, walkPx: f.walkPx ?? 0, nearM: round(f.nearM ?? 0, 3), floorCeiling: f.floorCeiling, meshes: f.mounted?.meshes, wallMs: f.wall, ms: f.ms, print: f.print, cam: f.cam })),
-    }
+    const sidecar = clipSidecar(r, { version: first.version, recipe, keys, keysNote: gate.note ?? null })
     mkdirSync(join(first.dir, 'sidecars', r.framing), { recursive: true })
     writeFileSync(join(first.dir, 'sidecars', r.framing, `${r.stem}.json`), JSON.stringify(sidecar, null, 1))
   }
@@ -831,7 +849,7 @@ async function main() {
       const keys = keysOf(`${s.node} ${s.framing}`, stillKeys)
       const rel = (f) => ({ file: f.file.slice(first.dir.length + 1), bytes: f.bytes, sha256: f.sha256 })
       mkdirSync(join(first.dir, 'sidecars', s.framing, 'stills'), { recursive: true })
-      writeFileSync(join(first.dir, sidecar), JSON.stringify({ format: 'vinci-film-sidecar-v1', node: s.node, framing: s.framing, renderer: release.renderer, keys, raw: s.raw, pendingAtRest: s.pendingAtRest, pageErrors: 0, paintedOverCanvas: s.paintedOverCanvas }, null, 1))
+      writeFileSync(join(first.dir, sidecar), JSON.stringify(stillSidecar(s, { renderer: release.renderer, keys }), null, 1))
       release.stills.push({ node: s.node, framing: s.framing, keys, files: { [STILL_RUNG[s.framing].join('x')]: rel(s.rung) }, sidecar })
     }
     for (const r of first.results) {

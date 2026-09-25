@@ -397,6 +397,8 @@ export function installExport(parts: ExportParts): void {
       holding = [...set].filter((mesh) => mesh.parent !== null)
       return holding.length
     },
+    /** the held bodies by their names, sorted: two sessions hold one set when these agree */
+    held: (): string[] => holding.map(pathOf).sort(),
     bodies: () => bodies,
     /** one delivered frame: every draw of its shutter, the resolve, the send */
     async frame(plan: FramePlan) {

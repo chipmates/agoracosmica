@@ -285,7 +285,8 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
   }
   function trackOf(edge: FilmEdgeRecord, f: PictureFraming): Promise<CameraPrint[] | null> {
     const at = edge.framings[f]
-    if (!at) return Promise.resolve(null)
+    // a clip not yet rendered is answered by its stills and has no track to fetch
+    if (!at?.track) return Promise.resolve(null)
     const url = address(at.track)
     let held = tracks.get(url)
     if (!held) {

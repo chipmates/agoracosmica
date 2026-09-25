@@ -103,7 +103,7 @@ export function exposures(text) {
 }
 
 /** A module's value imports, followed within the app (types are erased). */
-function closure(loader, entry, within) {
+export function closure(loader, entry, within) {
   const out = new Set()
   const exists = (file) => { try { loader.text(file); return true } catch { return false } }
   const walk = (file) => {

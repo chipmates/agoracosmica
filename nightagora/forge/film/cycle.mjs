@@ -6,7 +6,7 @@
 // pixels the light changed are drawn round.
 //
 //   node forge/film/cycle.mjs --base=https://127.0.0.1:5551 --release=w6 --out=<release dir>
-//     [--slug=aerial-screw] [--framings=wide,upright] [--draws=8]
+//     [--slug=aerial-screw] [--station=flight] [--framings=wide,upright] [--draws=8]
 //
 // The page is the film wing under the export's address; the island is opened
 // and posed by `window.__naIsland`, a frame is drawn by `window.__naExport`
@@ -32,6 +32,8 @@ const BASE = String(flags.get('base') ?? 'https://127.0.0.1:5551')
 const RELEASE = String(flags.get('release') ?? 'w6')
 const OUT = resolve(String(flags.get('out') ?? '.'))
 const SLUG = String(flags.get('slug') ?? 'aerial-screw')
+/** the station the machine stands in: the island is printed at its exposure */
+const STATION = String(flags.get('station') ?? 'flight')
 const FRAMINGS = String(flags.get('framings') ?? 'wide,upright').split(',')
 const DRAWS = Number(flags.get('draws') ?? MIN_DRAWS)
 /** a smoke run: this many frames, no release written */
@@ -177,7 +179,7 @@ async function renderFraming(browser, framing, sink, inbox) {
   const errors = []
   page.on('pageerror', (e) => errors.push(e.message.slice(0, 200)))
   try {
-    await page.goto(`${BASE}/w/vinci?film=${RELEASE}&order=life&probe=1&tier=max&export=1&pr=${stage.dsf}&lang=en#s=flight`, { waitUntil: 'load', timeout: 120000 })
+    await page.goto(`${BASE}/w/vinci?film=${RELEASE}&order=life&probe=1&tier=max&export=1&pr=${stage.dsf}&lang=en#s=${STATION}`, { waitUntil: 'load', timeout: 120000 })
     await page.waitForFunction(() => document.querySelector('.na-film')?.dataset.state === 'rest' && Boolean(window.__naIsland && window.__naExport), null, { timeout: 120000, polling: 200 })
     const said = await page.evaluate(() => ({ backend: document.body.dataset.backend, tier: document.body.dataset.tier }))
     log(`${framing}: backend ${said.backend}, tier ${said.tier}`)
@@ -270,7 +272,7 @@ const sink = await openSink((buf) => inbox.take(buf))
 const browser = await chromium.launch({ args: [...browserArgs(), ...FRAME_TIME_FLAGS] })
 const framings = {}
 let period = 0, frames = 0
-const report = { base: BASE, release: RELEASE, slug: SLUG, draws: DRAWS, shutter: SHUTTER, x264: { ...X264, stepCrf: STEP_CRF }, runs: {} }
+const report = { base: BASE, release: RELEASE, slug: SLUG, station: STATION, draws: DRAWS, shutter: SHUTTER, x264: { ...X264, stepCrf: STEP_CRF }, runs: {} }
 try {
   for (const framing of FRAMINGS) {
     const t0 = Date.now()
