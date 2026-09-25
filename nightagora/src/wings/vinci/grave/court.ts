@@ -136,9 +136,18 @@ function filterBandLight(P: N): [N, N] {
   const drift = (a: number): number => depth * Math.abs(a) / Math.abs(sx)
   const an = (FILTER.slot - drift(sz)) / 2, ah = (runH - drift(sy)) / 2
   const w = t.mul(.00465).max(.004)
-  const pass = (d: N, a: number): N => float(a).add(w).sub(abs(d)).div(w.mul(2)).clamp(0, 1).min(float(a).div(w).min(1))
+  const pass = (d: N, a: N): N => float(a).add(w).sub(abs(d)).div(w.mul(2)).clamp(0, 1).min(float(a).div(w).min(1))
   const inPier = smoothstep(pierIn - .02, pierIn - .06, abs(centre))
-  let light: N = pass(dn, an).mul(pass(dh, ah)).mul(inPier)
+  // A HAND-LAID SCREEN: no two slots are the same tunnel. Mortar narrows or
+  // skews each one and chokes a few, so every patch differs in size, place
+  // and strength (a hash per slot and run); a perfect lattice read as rows.
+  const hs = (a: number, b: number): N => TSL.fract(TSL.sin(slot.mul(a).add(run.mul(b))).mul(43758.5453))
+  const anJ = float(an).mul(float(1).sub(hs(12.9898, 78.233).mul(.4)))
+  const ahJ = float(ah).mul(float(1).sub(hs(39.3468, 11.135).mul(.5)))
+  const dnJ = dn.sub(hs(7.231, 51.77).sub(.5).mul(.25))
+  const dhJ = dh.sub(hs(2.113, 63.41).sub(.5).mul(.06))
+  const choke = smoothstep(.45, .9, hs(3.17, 91.3)).mul(.9)
+  let light: N = pass(dnJ, anJ).mul(pass(dhJ, ahJ)).mul(inPier).mul(float(1).sub(choke)).mul(float(1).sub(hs(5.3, 17.9).mul(.35)))
   // a crown in the way thins the patch to the light its leaves let pass
   for (const tree of COURT_TREES) {
     const c = [tree.east, GRAVE_COURT_LEVEL + tree.height * .62, -tree.north] as const, r = tree.height * .4
