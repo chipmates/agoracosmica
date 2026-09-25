@@ -61,6 +61,8 @@ function aimedFrom(pose:Pose,heading:number,pitch:number,fov:number):Pose {
   const along=new Vector3(Math.sin(h)*Math.cos(t),Math.sin(t),-Math.cos(h)*Math.cos(t))
   return {eye:pose.eye.clone(),at:pose.eye.clone().addScaledVector(along,10),fov}
 }
+/** An eye standing on the ground at east, north; aimedFrom gives its gaze. */
+const standing=(e:number,n:number):Pose=>{const h=groundHeight(e,n)+1.65;return p(e,n,h,e,n,h)}
 /** The eye in the great hall's door, on the axis of the three doors. */
 const HALL_DOOR=p(-4.2388,-11.0992,2.45,-4.2388,-11.0992,2.45)
 /** The body wall's phone eye, square on its hang's axis 4.7 m off the linen:
@@ -93,7 +95,11 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // The phone turns eight degrees up the street and lifts thirteen: level at
   // a hundred degrees, the lower half of its frame was the road. The walnut
   // over the street now takes the sky's corner.
-  if(id==='arrival') return narrow?p(24.98,-16.13,groundHeight(24.98,-16.13)+1.65,6.5664,-9.7504,7.2049,88):p(24.98,-16.13,groundHeight(24.98,-16.13)+1.65,8,-13.5,5,70)
+  // The desktop holds the house front as its one hero: at 70 degrees the road
+  // took the lower two fifths, so it closes to 54 on the dormer gable and
+  // lifts ten degrees, the gate whole at the left and the road a strip under
+  // the house. Turned further up the street the gate's jamb left the frame.
+  if(id==='arrival') return narrow?p(24.98,-16.13,groundHeight(24.98,-16.13)+1.65,6.5664,-9.7504,7.2049,88):aimedFrom(standing(24.98,-16.13),-80,10,54)
   // The phone keeps its gaze on the door and opens the lens instead: at 70
   // degrees the cone's right half fell between the court corner and the east
   // range's windows and held neither.
@@ -107,10 +113,15 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // down it at the west windows the hour's sun comes through; the wide frame
   // turns four degrees onto the table and holds the whole west wall.
   if(id==='hall') return narrow?aimedFrom(HALL_DOOR,-123,-11,74):aimedFrom(HALL_DOOR,-119,-4,52)
-  // The phone stands 1.5 m further back on the window's own axis: from the
-  // desktop's eye its lower half was bare ashlar, and from here the paving and
-  // the leaves banked at the wall's foot come into the frame under the window.
-  if(id==='oratory') return narrow?p(6.57,-22.45,1.65,3.053,-18.288,1.555,64):p(5.6,-21.3,1.65,3.053,-18.288,2.9,46)
+  // THE CHAPEL IS SEEN WITH THE HOUSE IT STANDS AGAINST. Square on from the
+  // court it was a wall of ashlar in the house's shadow with nothing behind
+  // it. The desktop stands at the foot of the raised lawn south-east of it
+  // and looks west-north-west: the gable at the left with the hazed valley
+  // past its corner, the chapel's lancets under the stair turret's cone, the
+  // entry steps at the right. Further up the lawn the walk in from the gate
+  // crossed the bank at knee height. The phone keeps the chapel in the middle
+  // of its stage, the turret over it, from the court's own paving.
+  if(id==='oratory') return narrow?aimedFrom(standing(5.5,-25),-18,10,72):aimedFrom(standing(9,-26),-54,10,56)
   // The study holds two things at once now: the window of the room the visit
   // was written in, and the support under it the page is read at. The phone
   // stands 2.8 m east of the desktop's eye, where its frame holds the whole
@@ -119,19 +130,22 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // frame rather than high at its right over a third of cobble. The desktop
   // steps down off the terrace's edge, twelve metres from the gable, which is
   // as far back as a straight walk in from the gate stays clear of the raised
-  // lawn east of it: the whole gable to its finial, the support under it.
-  if(id==='study') return narrow?p(5.2,-29.8,1.65,-2.3955,-24.0764,4.7402,86):p(.5,-34,groundHeight(.5,-34)+1.65,-1.4344,-24.8991,4.84,62)
+  // lawn east of it. It lifts thirteen degrees, not twenty-one, and opens the
+  // lens instead: the quoins lean half as far, the finial stays whole and
+  // the court runs clear to the plinth. At 80 degrees the walk in from the
+  // gate carried a lens too wide for the meadow beside the bank.
+  if(id==='study') return narrow?p(5.2,-29.8,1.65,-2.3955,-24.0764,4.7402,86):aimedFrom(standing(.5,-34),-14,13,76)
   // The royal château stands 590 m away on a bearing of 308.84 degrees, which
   // from this end of the court runs over the house's west corner and down the
-  // valley; nothing of the castle is built, and its line stays in both frames.
+  // valley; nothing of the castle is built, and its line stays in the desktop's frame.
   // The pavilion of the Last Supper stands 27 to 41 m off, ninety degrees west
   // of the house's end: the desktop holds the two whole, the pavilion at the
   // left and this end of the house to its finial at the right, at the lens
   // that takes both from this terrace, and the route to the line keeps that
   // lens clear of the collection's doors. The phone cannot hold both on its
-  // stage and looks down the castle's line with the pavilion whole in the
-  // court below, its left edge short of the collection's glazed corner.
-  if(id==='chamber') return narrow?aimedFrom(CHAMBER_EYE,-66.5,-4,96):aimedFrom(CHAMBER_DESK,-37,17,94.5)
+  // stage, and the house's end is the stop's subject: it turns from the
+  // castle's line onto the gable, whole to its finial above the card.
+  if(id==='chamber') return narrow?aimedFrom(CHAMBER_EYE,2,10,100):aimedFrom(CHAMBER_DESK,-37,17,94.5)
   // R19 accepted: actual apron paving +1.65 m; all eight principal windows clear vegetation.
   // The phone looks up eleven degrees, not twenty-three: a third of its frame
   // was sky and the house stood low, where the card is. The lens is opened

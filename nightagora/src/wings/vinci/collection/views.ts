@@ -85,11 +85,11 @@ export function collectionView(id: string, narrow: boolean): RoomPose | undefine
     // looks straight down the line, 38 degrees under the level: the birth's own
     // numeral lies under the visitor's feet, so the frame's foot has to stand
     // between it and its socket, or the year is cut at the edge.
-    // THE PHONE ALSO HOLDS THE READING ROOM'S LIT DOOR at the head of the
-    // line. It stands 0.3 m further east and turns twelve degrees west: the
-    // room stands whole at the top left, clear of the body wall's frames
-    // beside it, and every date from the birth's socket to the far end stays
-    // whole inside the right edge.
+    // THE PHONE LOOKS STRAIGHT DOWN THE LINE from the desktop's own eye. The
+    // dates' words run east of their sockets, so the line converges on the
+    // frame's middle with two degrees to the east kept for the far words;
+    // turned west to take in the reading room's door, the far end slid off
+    // centre and its last word left the frame.
     case 'collection-room-line': {
       const north = LINE_ORIGIN.north - 2.24 * LINE_SLAB.pitchNorth
       if (!narrow) return {
@@ -97,8 +97,8 @@ export function collectionView(id: string, narrow: boolean): RoomPose | undefine
         at: world(LINE_ORIGIN.east, -59.8, FLOOR + .01),
         fov: 88,
       }
-      const eye = world(LINE_ORIGIN.east + .6, north, FLOOR + 1.66)
-      const heading = -12 * Math.PI / 180, descent = 34 * Math.PI / 180
+      const eye = world(LINE_ORIGIN.east + .3, north, FLOOR + 1.66)
+      const heading = 2 * Math.PI / 180, descent = 34 * Math.PI / 180
       const direction = new Vector3(Math.sin(heading) * Math.cos(descent), -Math.sin(descent), -Math.cos(heading) * Math.cos(descent))
       return { eye, at: eye.clone().add(direction), fov: 98 }
     }

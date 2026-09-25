@@ -108,10 +108,14 @@ export function vinciWalk(life: boolean): VinciWalk {
  * clear half and the wall it hangs on is read with it.
  */
 /** Measured against the frozen desktop design's words: at 1440 by 900 the box
- * runs to x 824, and the portrait's own left edge lands at 847. On the phone
- * the card takes the middle band, so the portrait stands above it. */
-const LISA_SWING_M = { desktop: .5, phone: 0 }, LISA_RISE_M = { desktop: .06, phone: .3 }
-const LISA_FOV = { desktop: 66, phone: 82 }
+ * runs to x 824, and the portrait's own left edge lands at 834. On the phone
+ * the card takes the middle band, so the portrait stands above it.
+ * THE DESKTOP LOOKS LEVEL. From an eye 1.1 m off the wall any tilt keystones
+ * the frame, so the aim stands at the eye's own height and the lens opens
+ * until the frame's foot clears the picture's edge. Its near rectangle stays
+ * inside the radius the hang's wall is proved with (78 degrees and under). */
+const LISA_SWING_M = { desktop: .5, phone: 0 }, LISA_RISE_M = { desktop: null, phone: .3 }
+const LISA_FOV = { desktop: 74, phone: 82 }
 export function vinciLisaPose(narrow: boolean): Pose {
   const viewport = narrow ? 'phone' : 'desktop'
   const eye = vinciApproachPose(LISA_EXHIBIT, narrow)?.eye
@@ -120,7 +124,8 @@ export function vinciLisaPose(narrow: boolean): Pose {
   // The wall runs east to west and the eye faces it, so the earlier works
   // stand to the left of the frame: looking east of the portrait carries the
   // portrait to the right, clear of the words, with its neighbour beside it.
-  const at = world(field.east + LISA_SWING_M[viewport], field.north, field.datum - LISA_RISE_M[viewport])
+  const rise = LISA_RISE_M[viewport]
+  const at = world(field.east + LISA_SWING_M[viewport], field.north, rise === null ? eye.y : field.datum - rise)
   return { eye: eye.clone(), at, fov: LISA_FOV[viewport] }
 }
 
