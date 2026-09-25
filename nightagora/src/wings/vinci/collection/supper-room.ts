@@ -162,13 +162,13 @@ function concreteMaterial(set: MaterialSet, L: Looks, name: string): MeshStandar
   return m
 }
 
-/** THE FLOOR: two-centimetre tesserae of white marble, each cut from its own
- * piece of the stone, their corners eased, set in a pale grout; the joint is
- * drawn only where a pixel can hold it, and fades to the floor's own tone. */
-const TESSERA = .02, JOINT = .0011
+/** THE FLOOR: white marble in slabs a metre and a bit square, each cut from
+ * its own piece of the stone and parted by a dark bronze strip, inside a
+ * border of the same marble laid long; at the walk's distances a slab reads
+ * as stone, where a mosaic's joints read as a printed grid. */
 /** the border's width, and the lines it is laid to */
 const BORDER = .32, FINS_FRONT = FINS.front, SILL_EAST = SILL.east
-/** the panels inside the border, measured from the border's inner corner at
+/** the slabs inside the border, measured from the border's inner corner at
  * the step, and the brass strip between them */
 const PANEL = { size: 1.2, strip: .008, east: ROOM.step + BORDER, north: FINS.front + BORDER } as const
 /** the line the way in is walked along: the middle of the nave's floor */
@@ -177,19 +177,14 @@ function marbleMaterial(set: MaterialSet, L: Looks, shade: N = float(1)): MeshSt
   const m = new MeshStandardNodeMaterial({ roughness: .34, metalness: 0, side: FrontSide })
   const P = positionWorld
   const east = P.x, north = P.z.negate()
-  const i = floorOf(east.div(TESSERA)), j = floorOf(north.div(TESSERA))
+  const ue = east.sub(PANEL.east).div(PANEL.size), un = north.sub(PANEL.north).div(PANEL.size)
+  const i = floorOf(ue), j = floorOf(un)
   const h1 = hash(i, j, 5.3), h2 = hash(i, j, 9.1)
-  // each tessera shows its own patch of the stone
-  const sample = set.sample({ uv: vec2(east, north).add(vec2(h1, h2).mul(3.7)), metres: .6 })
+  // each slab shows its own piece of the stone, its veins run on across it
+  const sample = set.sample({ uv: vec2(east, north).add(vec2(h1, h2).mul(3.7)), metres: 1.2 })
   const coarse = set.sample({ uv: vec2(east, north).mul(.37).add(vec2(11.2, 4.4)), metres: 2.4 })
   const { east: pe, north: pn } = axisFootprint(P)
-  const fe = fract(east.div(TESSERA)), fn = fract(north.div(TESSERA))
-  const de = min(fe, float(1).sub(fe)).mul(TESSERA), dn = min(fn, float(1).sub(fn)).mul(TESSERA)
   const pixel = max(pe, pn)
-  // eased corners: the joint widens a little where two joints meet
-  const corner = smoothstep(.0032, 0, vec2(de, dn).length()).mul(.0009)
-  const half = corner.add(JOINT)
-  const joint = lineCoverage(de, half, TESSERA, pixel).max(lineCoverage(dn, half, TESSERA, pixel))
   const tone = float(1).add(h1.sub(.5).mul(L.marbleTone)).add(h2.sub(.5).mul(L.marbleTone.mul(.4)))
   const stone = sample.colour.mul(.55).add(coarse.colour.mul(.45)).mul(L.marbleTint).mul(tone).mul(shade)
   // A BORDER OF THE SAME MARBLE LAID LONG, a shade darker, round every edge
@@ -202,10 +197,8 @@ function marbleMaterial(set: MaterialSet, L: Looks, shade: N = float(1)): MeshSt
   const edge = min(toWall, toEnd)
   const band = smoothstep(BORDER + .004, BORDER - .004, edge)
   const seam = lineCoverage(edge.sub(BORDER), .0016, 1, pixel)
-  // THE PANELS: the field inside the border is laid in panels a metre and a
-  // bit square, each from its own batch of the stone, parted by a dark bronze strip
-  const ue = east.sub(PANEL.east).div(PANEL.size), un = north.sub(PANEL.north).div(PANEL.size)
-  const panelTone = float(1).add(hash(floorOf(ue), floorOf(un), 3.7).sub(.5).mul(L.panelTone))
+  // THE SLABS: each from its own batch of the stone, parted by a dark bronze strip
+  const panelTone = float(1).add(hash(i, j, 3.7).sub(.5).mul(L.panelTone))
   // each strip is held by the pixel's own reach across it, not the floor's
   // longest: a strip running away from the eye stays drawn where the ones
   // across the view have become a tone
@@ -221,9 +214,9 @@ function marbleMaterial(set: MaterialSet, L: Looks, shade: N = float(1)): MeshSt
   const dust = smoothstep(BORDER * 1.4, 0, edge).mul(mx_noise_float(vec3(east.mul(3.1), north.mul(3.1), 5.9)).mul(.3).add(.7))
   const laid = mix(stone.mul(panelTone), stone.mul(L.borderTone), band)
     .mul(float(1).add(wear.mul(L.wearClean))).mul(float(1).sub(dust.mul(L.wallDust)))
-  const grouted = mix(mix(laid, L.groutColour, joint.mul(.85).mul(float(1).sub(band))), L.groutColour, seam.mul(.9))
+  const grouted = mix(laid, L.groutColour, seam.mul(.9))
   m.colorNode = mix(grouted, L.stripColour, strip.mul(.9))
-  m.roughnessNode = L.marbleRough.add(h2.sub(.5).mul(.08)).add(joint.mul(.4).mul(float(1).sub(band))).add(band.mul(.08))
+  m.roughnessNode = L.marbleRough.add(h2.sub(.5).mul(.08)).add(band.mul(.08))
     .sub(wear.mul(L.wearPolish)).add(dust.mul(.1)).mul(float(1).sub(strip.mul(.3))).clamp(.08, 1)
   m.name = 'vinci/collection-supper-room/marble'
   m.userData = { ...SUPPER_ROOM_PROVENANCE, set: set.name }
