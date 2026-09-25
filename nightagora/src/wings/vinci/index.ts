@@ -629,8 +629,10 @@ export function createWing():VinciWingModule {
     // the veil takes the sun's own direction rather than one flat tone.
     const toSun=ray.dot(vec3(key.direction.x,key.direction.y,key.direction.z))
     const litCloud=mix(vec3(.40,.44,.51),vec3(.71,.68,.62),smoothstep(-.25,.85,toSun))
-    const veiled=mix(mix(vec3(skyLuma),skyRGB,.48),litCloud,cirrus.mul(.58))
-    sky.material.colorNode=vec4(veiled.div(float(1).add(skyLuma.div(.58))),1)
+    // A clear October afternoon: the dome keeps four fifths of its blue and
+    // the veil stays thin; at half the blue it read as a slate overcast.
+    const veiled=mix(mix(vec3(skyLuma),skyRGB,.82),litCloud,cirrus.mul(.4))
+    sky.material.colorNode=vec4(veiled.div(float(1).add(skyLuma.div(.85))),1)
     applyDisplayedSkyAir(sky.material,scene.fog as FogExp2,key.direction)
     applyDisplayedHorizonHaze(sky.material,scene.fog as FogExp2,key.direction)
     scene.fogNode=createAerialFog(scene.fog as FogExp2,key.direction)

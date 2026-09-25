@@ -39,9 +39,9 @@ export function applyDisplayedHorizonHaze(material: NodeMaterial, fog: FogExp2, 
  * lifts and cools what stands far off before it hides it. */
 export const aerialPerspectiveProvenance = {
   class: 'GENERATED',
-  recipe: 'The rig\'s fog colour turned by the view\'s angle to the sun (cool #a8b2b6 away from it, warm #d2c7ae toward it); geometry takes it by an optical depth of beta times the path past the clear distance (in addition to the squared-exponential exhibition fog, never less); the displayed sky pales toward the horizon as a clear sky does: from nothing at the zenith to two thirds at fifteen degrees (one minus the sine of the elevation, to the power 1.4), half its saturation and up to a quarter brighter, and toward the same haze colour. Exhibition atmosphere, not measured weather.',
-  clearM: 18, betaPerM: .007, cool: '#a8b2b6', warm: '#d2c7ae',
-  skyBand: { power: 1.4, desaturate: .5, lift: .4, brighten: .25 },
+  recipe: 'The rig\'s fog colour turned by the view\'s angle to the sun (cool #a8b2b6 away from it, warm #d2c7ae toward it); geometry takes it by an optical depth of beta times the path past the clear distance (in addition to the squared-exponential exhibition fog, never less); the displayed sky pales toward the horizon as a clear sky does: from nothing at the zenith to two thirds at fifteen degrees (one minus the sine of the elevation, to the power 1.4), up to 28 per cent of its saturation and up to a quarter brighter, and a quarter of the way toward the same haze colour. Exhibition atmosphere, not measured weather.',
+  clearM: 18, betaPerM: .004, cool: '#a8b2b6', warm: '#d2c7ae',
+  skyBand: { power: 1.4, desaturate: .28, lift: .25, brighten: .25 },
 } as const
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
