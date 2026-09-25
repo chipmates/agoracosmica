@@ -457,3 +457,10 @@
 @media (prefers-reduced-motion:reduce) {
   #wing[data-wing='vinci'] .vinci-cut {transition:none;}
 }
+/* THE WORDS THE OBJECTS CARRY. The scene cuts numbers and names only; the
+   page lays each word on its stone in the wing's own letters, under every
+   mark. The cut ink measured a near constant dark grey on lit and shaded
+   stone alike, so the fill is that grey with a little of the stone through. */
+.vinci-picture-words {position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible;pointer-events:none;transition:opacity .24s ease-out;}
+.vinci-picture-words path[data-finish='ink'] {fill:#2e2e2feb;}
+.vinci-picture-words path[data-finish='bronze'] {fill:#3a2a16b3;}

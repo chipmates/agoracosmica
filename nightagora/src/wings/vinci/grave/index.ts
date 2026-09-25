@@ -1,10 +1,11 @@
 import { CylinderGeometry, ExtrudeGeometry, Matrix4, Mesh, MeshStandardNodeMaterial, PlaneGeometry, Quaternion, Vector3, Shape, type BufferGeometry, type Material, type Texture } from 'three/webgpu'
 import { Construction, exhibitionFloor, galleryBackdrop, type ExhibitMaterials, type ExhibitionObject } from '../myths/construction'
-import { lineAdvance } from '../words'
 import words from '../line/data/never-said.json'
 import { GRAVE_DEATHBED, GRAVE_FRAME, GRAVE_SLAB } from './placement'
 import { cutLedgerFace, ledgerStone } from './ledger'
 import { createDiagram } from './diagram'
+import { DEATHBED_LABEL, GRAVE_EVIDENCE, GRAVE_WORDS, graveGable, graveLedge, graveMarker } from './lettering'
+export { GRAVE_EVIDENCE, GRAVE_WORDS, graveDeathbedLettering, graveLettering, type GraveLetters } from './lettering'
 
 /** Kept from the local computation, not from the later sunset row. */
 export const GRAVE_HOUR = {
@@ -20,43 +21,6 @@ export const GRAVE_HOUR = {
   gableBearing: 321.47,
   source: 'refs/place/notes/hour.py; refs/place/notes/hour-2may1519.txt',
   chosen: true,
-} as const
-
-export const GRAVE_EVIDENCE = {
-  slab: 'LEONARDO DA VINCI',
-  presumption: 'presumed remains',
-  plaque: 'The chapel’s own plaque says presumed remains. Its wording belongs to a separate plaque, not to the slab.',
-  dig: 'Arsène Houssaye excavated the former Saint-Florentin church in 1863 and reported a nearly complete skeleton. The identification remains presumed.',
-  transfer: 'The château describes a nineteenth-century transfer to Saint-Hubert. The precise 1874 date and the letter-fragment account need the historical excavation and transfer record.',
-  frame: 'Computed light · 2 May 1519 · 18:50 UT. A chosen minute, not a witnessed moment.',
-} as const
-
-/** EVERY WORD CUT INTO THE GRAVE'S STONES, in both languages. The stones are
- * the atmosphere and the card is the reading, so the close look repeats these
- * in its record rather than asking a visitor to read them off the floor. */
-export const GRAVE_WORDS = {
-  slab: GRAVE_EVIDENCE.slab,
-  presumption: { en: 'presumed remains', de: 'mutmaßliche Überreste' },
-  dig: '1863',
-  identification: { en: 'The identification remains presumed.', de: 'Die Identifizierung bleibt unbewiesen.' },
-  /** What the setting on the real slab holds. An absence is a sentence in
-   * the record and never a piece of furniture, so nothing of it is built.
-   * The bronze is a 2004 sculpture
-   * whose copyright runs, so no photograph of it is admissible and the record
-   * carries the fact in words. */
-  medallionRecord: {
-    en: 'A bronze medallion with his profile was set into the slab in 2004. It is modern work, so the museum shows the words and not the picture.',
-    de: 'Ein Bronzemedaillon mit seinem Profil kam 2004 in die Grabplatte. Es ist ein modernes Werk, darum zeigt das Museum die Worte und nicht das Bild.',
-  },
-  diagram: { en: 'CHOSEN LIGHT · A MODEL', de: 'GEWÄHLTES LICHT · EIN MODELL' },
-  diagramDate: { en: '2 MAY 1519 · JULIAN CALENDAR', de: '2. MAI 1519 · JULIANISCH' },
-  disclosure: {
-    en: 'The slab and the gable model are made for this exhibition. The slab is pale limestone with the name cut on two lines. Their sizes and lettering are interpretive, not a measured copy of the tomb or the chapel. The portrait medallion is not reproduced.',
-    de: 'Grabplatte und Giebelmodell sind für diese Ausstellung gemacht. Die Platte ist heller Kalkstein, der Name ist auf zwei Zeilen eingeschnitten. Maße und Schrift beruhen auf einer Interpretation und sind keine vermessene Nachbildung von Grab oder Kapelle. Das Porträtmedaillon wird nicht wiedergegeben.',
-  },
-  painter: 'INGRES · 1818',
-  holder: 'Paris Musées',
-  enlarged: { en: 'A small painting enlarged for this room', de: 'Ein kleines Gemälde für diesen Raum vergrößert' },
 } as const
 
 /** A PART SHAPED IN ITS OWN FRAME, welded into the object's own batches.
@@ -113,8 +77,7 @@ export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, l
   for (const geometry of ledgerFace.filling) build.geometry(geometry, materials.ink)
 
   // A separate low lectern makes "presumed" physically separate as well.
-  const plaqueX = options.mobile ? 1.50 : 1.44
-  const plaqueZ = options.mobile ? 1.62 : 1.45
+  const { x: plaqueX, z: plaqueZ } = graveMarker(options.mobile)
   // The standing label has a foot: a base course, a cap and a bronze bead, so
   // it stands on the paving instead of meeting it on an edge.
   // The marker is cut from the slab's own honed limestone, one stone from its
@@ -124,12 +87,12 @@ export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, l
   build.box(plaqueX, 0.188, plaqueZ - 0.06, 1.72, 0.05, 0.42, ledger)
   build.box(plaqueX, 0.225, plaqueZ + 0.06, 1.64, 0.028, 0.14, materials.bronze)
   build.box(plaqueX, 0.62, plaqueZ - 0.08175, 1.60, 0.88, 0.2565, ledger)
-  build.text(text(GRAVE_WORDS.presumption.en,GRAVE_WORDS.presumption.de), plaqueX - 0.70, 0.98, plaqueZ + 0.05, options.mobile?(language==='de'?.135:.16):(language === 'de' ? 0.102 : 0.13), 1.40, materials.ink)
+  // The stone cuts the year of the dig; "presumed" and the sentence under it
+  // are words in a language, drawn by the page from `graveLettering`.
   build.text(GRAVE_WORDS.dig, plaqueX - 0.70, options.mobile?0.46:0.68, plaqueZ + 0.05, 0.095, 1.4, materials.bronze)
-  if(!options.mobile)build.text(text(GRAVE_WORDS.identification.en,GRAVE_WORDS.identification.de), plaqueX - 0.70, 0.51, plaqueZ + 0.05, 0.070, 1.4)
 
 
-  const gableScale=options.mobile?.84:1, gableShift:[number,number,number]=options.mobile?[-1.26,0,-1.55]:[0,0,0]
+  const { scale: gableScale, shift: gableShift } = graveGable(options.mobile)
   const gableBuild=placed(build,{scale:gableScale,position:gableShift})
   // An architectural study in a deep frame, distinct from the burial object:
   // a coursed relief in a bronze box, lit by the chosen minute's own light.
@@ -154,20 +117,14 @@ export function createGrave(materials: ExhibitMaterials & {tuffeau?:Material}, l
   // A reading ledge raked back towards the eye. A vertical caption under a
   // camera that looks down foreshortens two lines into one; at 25 degrees the
   // face meets the visitor and the lines keep their air.
-  const ledge=placed(gableBuild,{rotationX:-.44,position:[frameX,options.mobile?1.00:.95,frameZ+(options.mobile?.34:.32)]})
-  const ledgeWidth=options.mobile?2.62:2.36, ledgeHeight=options.mobile?.58:.50
-  const inner=ledgeWidth-.26
+  const L=graveLedge(options.mobile)
+  const ledge=placed(gableBuild,{rotationX:L.rotationX,position:L.position})
+  const ledgeWidth=L.width, ledgeHeight=L.height
   ledge.box(0,0,0,ledgeWidth,ledgeHeight,.075,materials.plaster)
   ledge.box(0,-ledgeHeight/2+.02,.035,ledgeWidth,.045,.075,materials.bronze)
   ledge.box(0,ledgeHeight/2-.012,.02,ledgeWidth,.028,.065,materials.stone)
-  // Each line takes the largest cap height that keeps it ON one line. Caps run
-  // wider than a lowercase sentence and German runs wider again; a size typed
-  // once for English wraps the caption and the two lines then collide.
-  const fit=(value:string,cap:number)=>Math.min(cap,inner/Math.max(1e-6,lineAdvance(value,1))*.985)
-  const first=text(GRAVE_WORDS.diagram.en,GRAVE_WORDS.diagram.de)
-  const second=text(GRAVE_WORDS.diagramDate.en,GRAVE_WORDS.diagramDate.de)
-  ledge.text(first, -inner/2, ledgeHeight/2-.085, .042, fit(first,options.mobile?.155:.118), inner)
-  ledge.text(second, -inner/2, -.075, .042, fit(second,options.mobile?.115:.082), inner)
+  // The caption is words in a language: the ledge stands bare in the picture
+  // and the page lays the two lines on it from `graveLettering`.
   build.finish()
   // the ledger's cut face lies flat in the court's shade and casts nothing
   // the sun's cascades could hold; its letters are thousands of faces
@@ -235,15 +192,14 @@ export function createGraveDeathbed(
   }
   // The label on the wall under it. The card is the reading; this says whose
   // hand, which year, and that the painting on the wall is an enlargement.
-  const labelWidth = 1.55, labelLeft = x - labelWidth / 2
-  const labelTop = 1.22
+  // The stone cuts the painter, the year and the holder under a slot the
+  // title fills; the title and the enlargement are words in a language,
+  // drawn by the page from `graveDeathbedLettering`.
+  const { width: labelWidth, left: labelLeft, top: labelTop, slot } = DEATHBED_LABEL
   build.box(x, labelTop - .34, z + .045, labelWidth + .22, .90, .07, materials.stone)
   build.box(x, labelTop - .80, z + .075, labelWidth + .16, .035, .06, materials.bronze)
-  const title = build.text(text(DEATHBED.title_en, DEATHBED.title_de), labelLeft, labelTop, z + .085, .115, labelWidth)
-  build.text(GRAVE_WORDS.painter, labelLeft, labelTop - title.height - .10, z + .085, .082, labelWidth, materials.bronze)
-  build.text(GRAVE_WORDS.holder, labelLeft, labelTop - title.height - .26, z + .085, .058, labelWidth)
-  build.text(text(GRAVE_WORDS.enlarged.en, GRAVE_WORDS.enlarged.de),
-    labelLeft, labelTop - title.height - .40, z + .085, .058, labelWidth)
+  build.text(GRAVE_WORDS.painter, labelLeft, labelTop - slot - .10, z + .085, .082, labelWidth, materials.bronze)
+  build.text(GRAVE_WORDS.holder, labelLeft, labelTop - slot - .26, z + .085, .058, labelWidth)
   build.finish()
   // Varnished oil under a gallery key, not a file on a screen.
   const plate = new MeshStandardNodeMaterial({ roughness: .58, metalness: 0, map: plateTexture })

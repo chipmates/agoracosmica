@@ -61,6 +61,7 @@ import { bakeClearSkyProbe } from './sky-probe'
 import { GROUND_DRESSING_STEPS, planGroundDressing } from './ground-dressing'
 import { createWater, type WaterGroup } from './water'
 import { createMeasurement, type VinciMeasurement } from './measurement'
+import { createPictureWords, type PictureWordsLayer } from './picture-words'
 import { collectVinciLabelOccluders, createVinciExhibitDots, createVinciLabelAnchor, vinciSightBlocked, type VinciExhibitDots, type VinciExhibitMark, type VinciLabelAnchor, type VinciLabelMode, type VinciLabelRect } from './labels'
 import { pickVinciExhibit, readVinciExhibits, vinciMachineRoom, type VinciPickEntry } from './collection/pick'
 import { LINE_FLOOR_PICK, VINCI_STUDY_LEAF, vinciApproachPose, vinciApproachStation, vinciStudIndex } from './collection/approaches'
@@ -377,6 +378,7 @@ export function createWing():VinciWingModule {
   /** THE CLOSE LOOK. The registry is a read over the collection's own group,
    * the dots live in the label layer, and one owner holds the open exhibit. */
   let collectionRoot:Group|undefined, houseRoot:Group|undefined, courtRoot:Group|undefined, occluders:readonly Mesh[]=[]
+  let pictureWordsLayer:PictureWordsLayer|undefined, wordsPrint='', wordsSince=0, wordsDrawn=''
   let dots:VinciExhibitDots|undefined, closeLook:ReturnType<typeof createVinciCloseLook>|undefined
   let strip:ReturnType<typeof createVinciHangStrip>|undefined
   /** THE STORE'S OWN INDEX, held: a row is painted synchronously and every
@@ -763,6 +765,7 @@ export function createWing():VinciWingModule {
       // the word a pressed walking mark takes, and the leg its ring counts
       pressedWord:()=>text(deskControl('walk','walking')),
       leg:()=>{const nav=standing?rail.navigation:undefined;return nav?.active?nav.legWalked:null}})
+    pictureWordsLayer?.dispose();pictureWordsLayer=createPictureWords(layer=>h.labels.prepend(layer))
     closeLook=createVinciCloseLook({host:h.labels,narrow,
       // the one step back of a close look names the room it goes back to
       room:roomName,
@@ -1467,6 +1470,26 @@ export function createWing():VinciWingModule {
       return
     }
     dots?.setExhibits(marks)
+  }
+  /** THE WORDS THE OBJECTS CARRY, laid on their stones by the page at rest:
+   * taken down for a leg, and drawn again once the eye has stood still for a
+   * moment, through the camera the frame was drawn with. */
+  function paintPictureWords():void {
+    if(!pictureWordsLayer||!hosts)return
+    const nav=rail.navigation
+    if(!standing||nav.active||nav.approaching){if(wordsPrint){pictureWordsLayer.hide();wordsPrint='';wordsDrawn=''}return}
+    const cam=hosts.world.camera,now=performance.now(),station=hereContent().id
+    const print=`${cam.position.toArray().map(v=>v.toFixed(4))}|${cam.quaternion.toArray().map(v=>v.toFixed(5))}|${cam.fov}|${innerWidth}x${deskStageHeight()}|${lang()}|${station}`
+    if(print!==wordsPrint){wordsPrint=print;wordsSince=now;wordsDrawn='';pictureWordsLayer.hide();return}
+    if(wordsDrawn===print||now-wordsSince<80)return
+    cam.updateMatrixWorld()
+    const width=innerWidth,height=deskStageHeight(),v=new Vector3()
+    // the live camera is always known: what it cannot project is behind it
+    wordsDrawn=print
+    pictureWordsLayer.paint(station,lang(),point=>{
+      v.set(point[0],point[1],point[2]).project(cam)
+      return v.z>-1&&v.z<1?{x:(v.x*.5+.5)*width,y:(-v.y*.5+.5)*height}:null
+    })
   }
   /** THE NAME UNDER THE PAINTING, at a stop with no card over it. Both words
    * are the register's own, sealed: the title and the year. It leaves with the
@@ -2757,8 +2780,9 @@ export function createWing():VinciWingModule {
       // so the reserve is the row's own top edge and not a fixed band.
       dots?.setFoot(Math.max(0,deskStageHeight()-markFloor()+12,markSafeFoot()))
       dots?.setLimit(closeLook?.id?0:onWallStop()?3:DOTS_PER_TIER[hosts.world.stack.tierName()]??6)
-      dots?.update(panels)},
-    stop(){studySheet?.dispose();studySheet=undefined;releaseSheetMemory?.();releaseSheetMemory=undefined;desk?.dispose();desk=undefined;visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;life?.dispose();life=undefined;lifeControl?.remove();lifeControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;house=undefined;houseUp=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;hallSun=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;clearSky?.dispose();clearSky=undefined;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
+      dots?.update(panels)
+      paintPictureWords()},
+    stop(){pictureWordsLayer?.dispose();pictureWordsLayer=undefined;wordsPrint=wordsDrawn="";studySheet?.dispose();studySheet=undefined;releaseSheetMemory?.();releaseSheetMemory=undefined;desk?.dispose();desk=undefined;visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;life?.dispose();life=undefined;lifeControl?.remove();lifeControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;house=undefined;houseUp=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;hallSun=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;clearSky?.dispose();clearSky=undefined;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
   }
   return wingModule
 }

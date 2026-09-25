@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed to a pale grey at 30 per cent. Assumed weather, no observation claimed. The irradiance probe is the CIE clear sky (ISO 15469 type 12, circumsolar term held to a third) from the same sun, coloured from the rig zenith to its horizon and warmed toward the sun, levelled to the former two-colour band on an open horizontal face (src/wings/vinci/sky-probe.ts). Aerial perspective past 18 m at an assumed 0.007/m, cooler away from the sun and warmer toward it; the displayed sky pales and loses up to half its saturation toward the horizon.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "36e00133b12fa77dd082a68c750473eec6715b8c71d273594d26d0502b3e15b9",
+      "sha256": "fafdbc1f4d7360def2f62a6cf02c40e6a67e6cf65aa26b1cab4d038aaaed9c2c",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=eefa60a7708f712ca54b5ae62700b82f4777570bee3bbfd408c6403465fb66c3;"
     },
     {
@@ -2759,10 +2759,10 @@
       "class": "GENERATED",
       "licence": "Original procedural museum exhibition. Source code under the museum repository licence.",
       "display": true,
-      "prompt": "Museum floor exhibition. Fifty-six data-led dates, equal spacing, carved sockets, bronze inlay, certainty colours, the year in bronze set across the paving face with the certainty word painted beside it, a bronze rail, a coped parapet and a threshold that opens on a continuing walk. Fictional museum carrier, never historical reconstruction testimony.",
+      "prompt": "Museum floor exhibition. Fifty-six data-led dates, equal spacing, carved sockets, bronze inlay, certainty colours, the year in bronze set across the paving face, the certainty word beside it drawn by the page over the picture in the visitor's language, a bronze rail, a coped parapet and a threshold that opens on a continuing walk. Fictional museum carrier, never historical reconstruction testimony.",
       "model": "Deterministic TypeScript geometry and TSL materials",
       "date": "2026-09-10",
-      "sha256": "b6dd44f7fa2fd3d3ad0e1e411efb6194aa27ee94063b7ef7b5c86ecc7a21f720",
+      "sha256": "34eb76eceadc3e42c76af218cec43d8fee67badd041adc7137f6c02d47ca932e",
       "note": "recipe_file=src/wings/vinci/line/index.ts"
     },
     {
@@ -2788,7 +2788,7 @@
       "prompt": "Literal Richter and Herzfeld text CUT into a constructed carrier: the dressed face opens over the text field, the stone left standing between the letters is rebuilt at the face level with a splayed mouth, and pigment lies at the bottom of the cut. The folio siglum is optional and is left to the record by the museum host. Display readiness and absent German preserved.",
       "model": "Deterministic TypeScript geometry and TSL materials",
       "date": "2026-09-10",
-      "sha256": "357f4aa063a5912dc0df1120676eaccf8e0694d7b1e96c6f81f866315c68a773",
+      "sha256": "afa86f27e7c292f2520cd85ed25ddef490dc6364bbe3e16326ee0eca279bd6d8",
       "note": "recipe_file=src/wings/vinci/words/index.ts"
     },
     {
@@ -2824,10 +2824,10 @@
       "class": "GENERATED",
       "licence": "Original procedural museum exhibition. Source code under the museum repository licence.",
       "display": true,
-      "prompt": "Interpretive museum ledger slab of pale honed limestone with the documented name cut and filled, and no epitaph; a separate presumed plaque on a footed base, based on a sourced account; a coursed chapel-gable relief on an oak shelf in a deep bronze box, lit by one light of its own from the computed direction of the chosen minute, under a raked reading ledge. No remains, no portrait, no invented historical plaque facsimile.",
+      "prompt": "Interpretive museum ledger slab of pale honed limestone with the documented name cut and filled, and no epitaph; a separate presumed plaque on a footed base, based on a sourced account, cutting the dig's year while the page draws its words and the ledge's and label's words over the picture in the visitor's language; a coursed chapel-gable relief on an oak shelf in a deep bronze box, lit by one light of its own from the computed direction of the chosen minute, under a raked reading ledge. No remains, no portrait, no invented historical plaque facsimile.",
       "model": "Deterministic TypeScript geometry and TSL materials",
       "date": "2026-09-10",
-      "sha256": "ea2d798a5209a0b0366bdd7dd0733a22d629a70d4aa8a0b45bd7761a1a12cdc2",
+      "sha256": "1abc90e0538cebf5a2d1b9b1b2ea6ba5dc20edd4e28fb71bc1d7ef7f6c361c8e",
       "note": "recipe_file=src/wings/vinci/grave/index.ts"
     },
     {
@@ -3469,10 +3469,10 @@
       "class": "GENERATED",
       "licence": "Original procedural museum exhibition. Source code under the museum repository licence.",
       "display": true,
-      "prompt": "Twelve complete date sockets from the unchanged line bench, mounted in three fixed excerpts of four at true scale on the long gallery floor. The sections begin with the recorded birth in1452, the Vespucci note in1503 and the Amboise visit in1517, and end with the1519 will and death. Original bronze numerals, certainty words and colours, two named1504 events, the day on each date that shares its year and its certainty word with its neighbour, and1.65m nonchronological spacing are retained; the first excerpt keeps the bench's stacked lettering, the two read from the far end set each date's word and event beside its year on one row. The collection host clips the original paving to its room and excludes the standalone bench walls, rail and threshold continuation, keeping the gallery doors and crossing clear. Modern exhibition composition, no historical building claim.",
+      "prompt": "Twelve complete date sockets from the unchanged line bench, mounted in three fixed excerpts of four at true scale on the long gallery floor. The sections begin with the recorded birth in1452, the Vespucci note in1503 and the Amboise visit in1517, and end with the1519 will and death. Original bronze numerals, certainty colours and1.65m nonchronological spacing are retained; the first excerpt keeps the bench's stacked lettering, the two read from the far end set each date's year on one row. The certainty words, the two named1504 events and the day on each date that shares its year and its certainty with its neighbour are not cut: the page draws them over the picture in the visitor's language, as flat outlines of the same letters at the places the lettering sets, so one film serves every language. The collection host clips the original paving to its room and excludes the standalone bench walls, rail and threshold continuation, keeping the gallery doors and crossing clear. Modern exhibition composition, no historical building claim.",
       "model": "Deterministic TypeScript geometry derived from the line module",
       "date": "2026-09-14",
-      "sha256": "9dbcc66e49b5b36d585078bc3f9ffd89f071ebc97d0d230286d8abb528aabb4f",
+      "sha256": "d05e8ed55326e2c0ce4e382a018be20aaa45e11d6087f7d21ffdc50b0796c855",
       "note": "recipe_file=src/wings/vinci/collection/line-floor.ts; source_module=src/wings/vinci/line/index.ts; source_indices=0..3,28..31,38..41; all56 records remain at the bench address",
       "recipe_files": [
         {
@@ -3527,7 +3527,7 @@
       "prompt": "The collection host fits the unchanged grave and corrections modules to their existing museum floor reservations. Only the original native stage paving triangles are clipped: grave 12 by 13 m, deathbed and quote corrections 13 by 12 m, each around local depth centre 2.5 m. The larger independent bench stages remain unchanged at their bench addresses. All upright exhibit geometry and its attributes pass through intact. This prevents the corrections paving from covering the date course or adjoining picture room and keeps one instance of each built exhibit. The shared collection paving coordinates retain their original datum. Authored museum installation, no historical architectural claim.",
       "model": "Deterministic TypeScript clipping of the original native floor triangles",
       "date": "2026-09-14",
-      "sha256": "9dbcc66e49b5b36d585078bc3f9ffd89f071ebc97d0d230286d8abb528aabb4f",
+      "sha256": "d05e8ed55326e2c0ce4e382a018be20aaa45e11d6087f7d21ffdc50b0796c855",
       "note": "recipe_file=src/wings/vinci/collection/line-floor.ts; recipe_function=fitCollectionExhibitFloor; source_modules=grave,myths; floor_only=true",
       "recipe_files": [
         {

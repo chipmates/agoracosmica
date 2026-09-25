@@ -186,6 +186,15 @@ binary assets nor runtime dependencies. `metadata` contains `kind`,
 `geometryDisclosure` and `anchors`. The solar vector and `hour` in this
 static metadata describe the start; use `computedHour` for a live sample.
 
+**The stones cut what reads the same in every language**: the name, the
+dig's year 1863, the painter's line and the holder. The plaque's two lines,
+the ledge's caption and the deathbed label's title and enlargement note are
+set in `lettering.ts` (`graveLettering`, `graveDeathbedLettering`) and drawn
+by the page over the picture in the visitor's language (`../picture-words.ts`),
+so one film serves every language. The label's lower lines stand under a
+title slot of the English title's height; a longer title takes a smaller cap
+on one line. The sizes above are that setting's.
+
 Museum-authored plaque and diagram lettering follow `language`, as do
 `metadata.plaqueText` and `metadata.geometryDisclosure`. The name-only slab
 retains the same name in both languages. `GRAVE_EVIDENCE` remains the source

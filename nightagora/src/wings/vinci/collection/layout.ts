@@ -118,6 +118,12 @@ export const COURT = {
 /** The grave's own floor is the west half of the court's paving, which is
  * why the court is exactly as deep as that floor. */
 export const GRAVE_ORIGIN = { east: -55.5, north: -25 }
+/** Where the line's floor and the grave stand in the world, as the collection
+ * places them (`exhibits.ts`, whose literals the approach and ground checks
+ * read): the page lays their words from these, and `picture-words-check`
+ * holds the two equal. */
+export const LINE_FLOOR_AT: readonly [number, number, number] = [LINE_ORIGIN.east, FLOOR + .01, -LINE_ORIGIN.north]
+export const GRAVE_AT = { position: [GRAVE_ORIGIN.east, COURT.level + .035, -GRAVE_ORIGIN.north] as readonly [number, number, number], rotationY: Math.PI / 2 } as const
 /** The camera obscura's own bay in the hall: three walls and an open north
  * side, which is what makes the dark its image needs. */
 export const DARK_BAY = { west: -47.3, east: -43.9, south: -54.2, north: -51.6, wall: .22, height: 2.7 }

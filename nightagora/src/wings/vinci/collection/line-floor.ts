@@ -4,6 +4,7 @@
  */
 import { BufferGeometry, Float32BufferAttribute, Group, Mesh, type Material } from 'three/webgpu'
 import { createLine, STUDS, STUD_SPACING, type LineMaterials } from '../line'
+import { LINE_FLOOR_SECTIONS, lineSectionShift } from '../line/lettering'
 import { LINE_FIELD, LINE_ORIGIN, LINE_SLAB, ROOMS } from './layout'
 
 /** The exact horizontal planes of each sheet of the shared exhibition floor.
@@ -15,15 +16,8 @@ export const EXHIBITION_STAGE_LEVELS = {
   bed: [-.2195, -.0195],
 } as const
 
-/** HOW EACH EXCERPT IS LETTERED: the first is read standing over it, each
- * word beside its socket and each year at the visitor's feet; the two down
- * the room are read from its south end, where a stacked date runs into the
- * next, so each of their dates is laid as one row. */
-export const COLLECTION_LINE_SECTIONS = [
-  { station: 'line-early', selected: 0, row: 0, lettering: 'stacked' },
-  { station: 'line-late', selected: 28, row: 4, lettering: 'row' },
-  { station: 'line-amboise', selected: 38, row: 8, lettering: 'row' },
-] as const
+/** How each excerpt is lettered, shared with the page that draws its words. */
+export const COLLECTION_LINE_SECTIONS = LINE_FLOOR_SECTIONS
 /** THE LIFE RUNS AWAY FROM THE VISITOR. The one station stands at the south
  * end, where every numeral reads upright, so the birth is the date at the
  * standing eye's own feet and the last year is at the far wall. The twelve
@@ -226,7 +220,7 @@ export function createCollectionLineFloor(materials: LineMaterials, language: 'e
         // keeps every numeral's bearing as the bench cut it.
         const translated = vertices.map(vertex => {
           const copy = [...vertex]
-          copy[2] = vertex[2]! + (2 - section.row) * STUD_SPACING
+          copy[2] = vertex[2]! + lineSectionShift(section.row)
           return copy
         })
         append(material, translated)

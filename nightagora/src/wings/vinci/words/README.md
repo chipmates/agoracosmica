@@ -57,6 +57,11 @@ they could not otherwise fit. Wrapping changes whitespace alone; the exact
 original string is held in `mesh.userData.text`. Unsupported characters fail
 explicitly rather than being silently rendered as question marks.
 
+`textOutline(text, {size, maxWidth?, lineHeight?})` in `outline.ts` returns the
+same setting as flat closed contours (outer counter-clockwise, counters
+clockwise) with the same `width`, `height`, `lines` and `size`. It carries the
+font and no scene, so a page can draw the letters a stone would have cut.
+
 `embedded` defaults to false. Set it only when lettering is bonded to a
 carrier: it omits triangles whose three vertex normals point backward along
 local -Z, retaining the front caps, side walls and any bevels. This saves

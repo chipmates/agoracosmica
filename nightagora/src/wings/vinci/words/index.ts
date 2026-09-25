@@ -18,6 +18,8 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
 import catalogue from './data/inscriptions.json'
 import { assertGlyphs, font, textAdvance } from './font'
+import { setting, wrap } from './outline'
+export { textOutline, type TextOutline } from './outline'
 
 /** The advance of one unwrapped line at a given cap height, in metres. */
 export const lineAdvance = (text: string, size: number): number => textAdvance(text, size)
@@ -54,23 +56,6 @@ export interface PhysicalText {
   dispose(): void
 }
 
-function wrap(text: string, size: number, maxWidth: number): string[] {
-  const lines: string[] = []
-  for (const paragraph of text.replace(/\r/g, '').split('\n')) {
-    if (!paragraph.trim()) { lines.push(''); continue }
-    const words = paragraph.split(/\s+/).filter(Boolean)
-    let line = ''
-    for (const word of words) {
-      const candidate = line ? `${line} ${word}` : word
-      if (line && textAdvance(candidate, size) > maxWidth) {
-        lines.push(line)
-        line = word
-      } else line = candidate
-    }
-    lines.push(line)
-  }
-  return lines
-}
 
 function withoutBackCaps(geometry: BufferGeometry): BufferGeometry {
   const source = geometry.index ? geometry.toNonIndexed() : geometry
@@ -99,18 +84,9 @@ function withoutBackCaps(geometry: BufferGeometry): BufferGeometry {
 /** Geometry-only text. Reflow changes whitespace; spelling, case and
  * punctuation stay untouched. The unmodified source stays in userData.text. */
 export function createText(text: string, opts: TextOptions): PhysicalText {
-  assertGlyphs(text)
-  if (!Number.isFinite(opts.size) || opts.size <= 0) throw new Error('Text size must be positive')
-  if (opts.maxWidth !== undefined && (!Number.isFinite(opts.maxWidth) || opts.maxWidth <= 0)) {
-    throw new Error('Text maxWidth must be positive')
-  }
-  const maxWidth = opts.maxWidth ?? Infinity
-  const longest = Math.max(1e-9, ...text.split(/\s+/).map(word => textAdvance(word, opts.size)))
-  const size = opts.size * Math.min(1, maxWidth / longest)
-  const lines = wrap(text, size, maxWidth)
+  const { size, lines, lineHeight } = setting(text, opts)
   const parts: BufferGeometry[] = []
   const lineWidths: number[] = []
-  const lineHeight = size * (opts.lineHeight ?? 1.40)
   for (const [i, line] of lines.entries()) {
     if (!line.trim()) { lineWidths.push(0); continue }
     const extruded = new TextGeometry(line, {

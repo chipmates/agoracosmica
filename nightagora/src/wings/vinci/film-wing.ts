@@ -21,6 +21,7 @@ import { createVinciSourcesWindow } from './sources'
 import cardsSource from './data/cards.json?raw'
 import { createFilmSource, loadFilmRelease, LEAN_MS, type FilmRelease } from '../picture/film'
 import type { FilmLook } from './film-look'
+import { createPictureWords, type PictureWordsLayer } from './picture-words'
 import type { DeskOverviewCell } from '../overview'
 import type { PictureMark, PictureNode, PictureSource, PictureState } from '../picture/seam'
 import wingCss from './wing.css?inline'
@@ -118,6 +119,11 @@ export function createWing(): WingModule {
   let wide = true
   let loading: Promise<void> | undefined
   let marksAt = ''
+  /** the words the objects carry, laid on the picture at rest */
+  let words: PictureWordsLayer | undefined
+  let wordsAt = ''
+  let wordsTries = 0
+  let veiled = false
   let legUnderWay = false
   let answering: { dot: HTMLButtonElement; id: string } | null = null
   const stood = new Set<string>()
@@ -263,6 +269,24 @@ export function createWing(): WingModule {
       dots.push(dot)
     }
   }
+  /** THE WORDS THE OBJECTS CARRY, projected through the node's printed
+   * camera: drawn once the picture rests, gone for the walk, as the marks are. */
+  function paintWords(): void {
+    if (!words || !picture) return
+    const node = here()
+    const b = picture.box()
+    // the station is read into the key: a release that lands after the first rest paints then
+    const station = veiled ? null : release?.nodes[node]?.station ?? null
+    const key = `${node}|${station}|${lang()}|${b.left},${b.top},${b.width}x${b.height}`
+    if (key === wordsAt) return
+    const seam = picture
+    const drawn = words.paint(station, lang(), point => {
+      const at = seam.project(point)
+      return at ? { x: b.left + at.x, y: b.top + at.y } : null
+    })
+    // a rest whose print is not read yet is asked again, for a second at most
+    if (drawn || ++wordsTries > 60) { wordsAt = key; wordsTries = 0 }
+  }
   function pressMark(dot: HTMLButtonElement, id: string, walks: boolean): void {
     if (!picture || look?.id) return
     if (!walks) { openExhibit(id, dot); return }
@@ -298,7 +322,7 @@ export function createWing(): WingModule {
         floor: () => desk?.floor() ?? (phone && !phone.root.hidden ? phone.root.getBoundingClientRect().top : innerHeight),
         station: () => stationOf(LIFE[card]!.station).id,
         stack: h.world.stack, scene: h.world.scene, camera: h.world.camera,
-        standDown, veil: hidden => picture?.veil(hidden), standing, openRecord,
+        standDown, veil: hidden => { picture?.veil(hidden); veiled = hidden; wordsAt = '' }, standing, openRecord,
         onClose: () => { marksAt = '' },
         cycle: id => { const cycle = release?.cycles?.[id]; return cycle ? { cycle, base: filmReleaseBase() } : null },
         cycleLayer: () => cycleLayer!,
@@ -627,6 +651,8 @@ export function createWing(): WingModule {
     // a machine's filmed cycle stands over the film and under every word
     cycleLayer = make('div', 'film-cycle-layer')
     picture.element.after(cycleLayer)
+    words?.dispose()
+    words = createPictureWords(layer => cycleLayer!.after(layer))
     picture.on('state', state => { paintDip(state); if (state.kind === 'rest') marksAt = '' })
     picture.on('rest', state => {
       if (state.kind !== 'rest') return
@@ -766,8 +792,9 @@ export function createWing(): WingModule {
         leg?.setAttribute('stroke-dasharray', `${(2 * Math.PI * 20.5 * share).toFixed(1)} ${(2 * Math.PI * 20.5).toFixed(1)}`)
       }
       desk?.update()
-      if (s.kind === 'rest') paintMarks()
+      if (s.kind === 'rest') { paintMarks(); paintWords() }
       else if (s.kind === 'wait' && dots.length) clearMarks()
+      if (s.kind !== 'rest' && wordsAt) { words?.hide(); wordsAt = '' }
     },
     stop() {
       controller.abort()
@@ -777,6 +804,7 @@ export function createWing(): WingModule {
       sourceButton?.remove(); sourceButton = undefined
       picture?.dispose(); picture = undefined
       clearMarks(); chip?.remove(); answering?.dot.remove(); answering = null
+      words?.dispose(); words = undefined; wordsAt = ''
       cutCard?.remove()
       if (hosts) {
         const wing = hosts.stage.parentElement!
