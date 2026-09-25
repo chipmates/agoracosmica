@@ -599,7 +599,9 @@ export function limewashOverBrick(T: N, floorZ: number, base: N, seed: number, w
     // every edge is held to a pixel: the field's own change per pixel, not
     // the wall's metres, sets how soft an edge is, so a loss never feathers
     const fw = v.dFdx().abs().add(v.dFdy().abs()).max(1e-5), e = fw.mul(.7)
-    const t1 = float(.5), t2 = float(.56).add(n(.19, .15, 97).mul(.025))
+    // the render's band round a loss is as uneven as the render was laid:
+    // wide in places, gone in others where the wash lay on the brick
+    const t1 = float(.5), t2 = float(.565).add(n(.19, .15, 97).mul(.045)).add(n(.07, .06, 131).mul(.02).mul(fade(.07))).max(.505)
     const finish = smoothstep(t1.sub(e), t1.add(e), v), render = smoothstep(t2.sub(e), t2.add(e), v)
     // the render: lime and coarse sand, darker and greyer than the wash
     const sand = mx_noise_float(vec3(T.x.div(.004), T.y.div(.004), seed + 101)).mul(fade(.004))
@@ -625,7 +627,12 @@ export function limewashOverBrick(T: N, floorZ: number, base: N, seed: number, w
     }
     const cracks = max(max(stair(4.4, 1.25, 1.9, 1.7, .0016), stair(4.4 + .55 / 1.9 + .3, 1.8, -2.4, .6, .001)), max(max(stair(10.9, .9, -2.1, 2.0, .0017), stair(15.3, 1.5, 1.7, 1.4, .0014)), stair(21.2, 1.1, -1.8, 1.8, .0016)))
       .mul(fade(.01)).mul(float(1).sub(render))
-    const layered = mix(mix(through.mul(lip.mul(.08).add(1)), rendered, finish), under, render)
+    // a wash that is failing greys and thins round its losses before it lets
+    // go, and dirt settles on the rough edge: a halo, so a loss lies in the
+    // wall and not on it
+    const halo = smoothstep(t1.sub(.1), t1, v).mul(float(1).sub(finish)).mul(fade(.08))
+    const failing = through.mul(mix(vec3(1, 1, 1), vec3(.84, .81, .77), halo.mul(halo).mul(.55)))
+    const layered = mix(mix(failing.mul(lip.mul(.08).add(1)), rendered, finish), under, render)
       .mul(float(1).sub(shadeUnder(finish, vUp, t1).mul(.22)).sub(shadeUnder(render, vUp, t2).mul(.4)).sub(cracks.mul(.55)))
     washed = mix(layered, under, band.mul(fade(.06)).mul(.85))
     bare = max(band.mul(fade(.06)), render)
