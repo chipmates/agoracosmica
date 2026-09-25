@@ -257,7 +257,7 @@
       "prompt": "Derived 33.8721 square metre inner court apron closes the literal court to registered facade chain at A-SITE zero nominal. Five clipped threshold steps, procedural wear, bedded river pebbles and drain; reconstruction with conjectural dressing. Mounted during court refinement with explicit source-card assumptions. The study's reading support is finished as the museum's furniture, an oiled oak board on a bronze post raked low edge to its reader inside the certified solid, and the admitted leaf of Manuscript B folio 83v lies on it at a leaf's size.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "c7b34c2e53185c05ebfe0bd2b5520351d99845e1e9ae4db8320aeb173bed0dc4",
+      "sha256": "940d74e510221069e562dbab5574e8d0142a7f8d358507341f688b362b0c04e1",
       "note": "Q124; A-SITE; recipe_file=src/wings/vinci/inner-court.ts"
     },
     {
@@ -3856,7 +3856,7 @@
       "prompt": "The finish of the study's reading support: an oiled oak board 0.46 by 0.34 m and 28 mm thick, raked 28 degrees low edge to its reader, on a 0.09 m bronze post, standing inside the certified support, which stays the rail's solid and the pick's body. A fitting of this museum, not of 1517.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-24",
-      "sha256": "c7b34c2e53185c05ebfe0bd2b5520351d99845e1e9ae4db8320aeb173bed0dc4",
+      "sha256": "940d74e510221069e562dbab5574e8d0142a7f8d358507341f688b362b0c04e1",
       "note": "recipe_file=src/wings/vinci/inner-court.ts; geometry_dependency=vinci/inner-court; rail_collision=false"
     },
     {

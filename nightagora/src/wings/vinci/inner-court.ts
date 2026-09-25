@@ -94,6 +94,22 @@ for(let step=0;step<stairCount;step++){
 }
 addClipped('inner-court-landing',[stairA,stairB,projectToEntry(stairB),projectToEntry(stairA)],level.value+rise,'landing')
 
+/** THE COURT'S WEAR, as lines in (east, north): two cart traces 1.40 m apart
+ * along the court and the drainage seam from the foot of the steps to the
+ * court's centre. The cobbles' own shader (`ground-finish.ts`) wears them into
+ * the stones; the certified ribbons on the same lines leave the camera. */
+export const courtWear=(()=>{
+  const axisLength=Math.hypot(court[1]![0]-court[0]![0],court[1]![1]-court[0]![1])
+  const along:CourtPoint=[(court[1]![0]-court[0]![0])/axisLength,(court[1]![1]-court[0]![1])/axisLength],inward:CourtPoint=[-along[1],along[0]]
+  const trace=(offset:number):[CourtPoint,CourtPoint]=>{
+    const at=(t:number):CourtPoint=>[court[0]![0]+along[0]*axisLength*t+inward[0]*(3.1+offset),court[0]![1]+along[1]*axisLength*t+inward[1]*(3.1+offset)]
+    return[at(.12),at(.89)]
+  }
+  const centre:CourtPoint=[court.reduce((s,p)=>s+p[0],0)/court.length,court.reduce((s,p)=>s+p[1],0)/court.length]
+  const foot=shifted([(stairA[0]+stairB[0])/2,(stairA[1]+stairB[1])/2],stairCount*tread+.08)
+  return{traces:[trace(-.7),trace(.7)],traceWidth:.11,drain:[foot,centre] as [CourtPoint,CourtPoint],drainWidth:.08}
+})()
+
 /** Ordered low to high priority. Insert before existing literal platforms and
  * gate connections. Every returned outline is convex, as terrain requires.
  */
@@ -428,6 +444,9 @@ export function createInnerCourtDressing(heightAt:HeightAt,tier:TierName):Group 
   for(const [source,name]of[[stone,'tread stone'],[chips,'court gravel'],[wear,'court wear and drainage']] as const){
     if(!source.positions.length)continue
     const mesh=meshOf(source,`vinci/inner-court/${name}`,source===stone?stoneFlightMaterial(thresholdFlight):material())
+    // flat ribbons over the cobbles read as strips pasted on the paving; the
+    // cobbles wear the same lines into their stones (`courtWear`)
+    if(source===wear){mesh.layers.set(RETIRED_LAYER);mesh.castShadow=false}
     // the court's loose gravel keeps still where it is smaller than the pixel
     if(source===chips)fadeUnderPixel(mesh.material as MeshStandardNodeMaterial,.03)
     group.add(mesh)
