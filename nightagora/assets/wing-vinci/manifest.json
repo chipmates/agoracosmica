@@ -3472,7 +3472,7 @@
       "prompt": "Twelve complete date sockets from the unchanged line bench, mounted in three fixed excerpts of four at true scale on the long gallery floor. The sections begin with the recorded birth in1452, the Vespucci note in1503 and the Amboise visit in1517, and end with the1519 will and death. Original bronze numerals, certainty colours and1.65m nonchronological spacing are retained; the first excerpt keeps the bench's stacked lettering, the two read from the far end set each date's year on one row. The certainty words, the two named1504 events and the day on each date that shares its year and its certainty with its neighbour are not cut: the page draws them over the picture in the visitor's language, as flat outlines of the same letters at the places the lettering sets, so one film serves every language. The collection host clips the original paving to its room and excludes the standalone bench walls, rail and threshold continuation, keeping the gallery doors and crossing clear. Modern exhibition composition, no historical building claim.",
       "model": "Deterministic TypeScript geometry derived from the line module",
       "date": "2026-09-14",
-      "sha256": "d05e8ed55326e2c0ce4e382a018be20aaa45e11d6087f7d21ffdc50b0796c855",
+      "sha256": "d53a911ee675300b57c3b4fad2bca8568a602ddfc0fde65b9ab78e084765645a",
       "note": "recipe_file=src/wings/vinci/collection/line-floor.ts; source_module=src/wings/vinci/line/index.ts; source_indices=0..3,28..31,38..41; all56 records remain at the bench address",
       "recipe_files": [
         {
@@ -3527,7 +3527,7 @@
       "prompt": "The collection host fits the unchanged grave and corrections modules to their existing museum floor reservations. Only the original native stage paving triangles are clipped: grave 12 by 13 m, deathbed and quote corrections 13 by 12 m, each around local depth centre 2.5 m. The larger independent bench stages remain unchanged at their bench addresses. All upright exhibit geometry and its attributes pass through intact. This prevents the corrections paving from covering the date course or adjoining picture room and keeps one instance of each built exhibit. The shared collection paving coordinates retain their original datum. Authored museum installation, no historical architectural claim.",
       "model": "Deterministic TypeScript clipping of the original native floor triangles",
       "date": "2026-09-14",
-      "sha256": "d05e8ed55326e2c0ce4e382a018be20aaa45e11d6087f7d21ffdc50b0796c855",
+      "sha256": "d53a911ee675300b57c3b4fad2bca8568a602ddfc0fde65b9ab78e084765645a",
       "note": "recipe_file=src/wings/vinci/collection/line-floor.ts; recipe_function=fitCollectionExhibitFloor; source_modules=grave,myths; floor_only=true",
       "recipe_files": [
         {

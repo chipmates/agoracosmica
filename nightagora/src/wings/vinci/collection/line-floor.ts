@@ -40,6 +40,14 @@ export const collectionLineStuds = COLLECTION_LINE_SECTIONS.flatMap(section =>
 type Vertex = number[]
 type Buffers = { position: number[]; normal: number[]; uv: number[] }
 const EPS = .00002
+/** The bench's bracket round its selected date, in the bench's own frame
+ * (x, then z; the selected date at z 0): the long bar west of the line and
+ * the two short bars across it. */
+const SELECTION_BRACKET: readonly (readonly [number, number, number, number])[] = [
+  [-.632, -.608, -.751, .751],
+  [-.636, .316, .631, .649],
+  [-.636, .316, -.649, -.631],
+]
 const near = (value: number, expected: number): boolean => Math.abs(value - expected) < EPS
 function clip(vertices: Vertex[], axis: number, edge: number, keepAbove: boolean): Vertex[] {
   if (!vertices.length) return []
@@ -214,6 +222,11 @@ export function createCollectionLineFloor(materials: LineMaterials, language: 'e
         const right = socketStone ? .801 : 3.6
         if (!vertices.every(vertex => vertex[0]! >= -.801 && vertex[0]! <= right
           && vertex[2]! >= -3 * STUD_SPACING - .82 && vertex[2]! <= .82)) continue
+        // The bench frames the date it stands at in a bronze bracket. This
+        // floor shows every date at once, so the bracket stays out and the
+        // one bronze line runs through the sockets alone.
+        if (material === materials.bronze && SELECTION_BRACKET.some(([west, east, south, north]) =>
+          vertices.every(vertex => vertex[0]! >= west && vertex[0]! <= east && vertex[2]! >= south && vertex[2]! <= north))) continue
         // The visitor reads from the south end, and the excerpt already runs
         // the way the life does: the earliest of its four at the south. So
         // the whole excerpt is carried onto its own course as one piece, which
