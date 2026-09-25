@@ -286,7 +286,9 @@ function grateSurface(): MeshStandardNodeMaterial {
   m.colorNode = c
   applyCourtLight(m, c)
   // the pit sees a slot of sky
-  m.aoNode = (m.aoNode as N).mul(float(1).sub(slot.mul(top).mul(.7)))
+  // the export address turns the court's own terms off, and leaves no occlusion to multiply
+  const pit = float(1).sub(slot.mul(top).mul(.7))
+  m.aoNode = m.aoNode ? (m.aoNode as N).mul(pit) : pit
   m.roughnessNode = specularAA(mix(float(.72).add(rust.mul(.18)).sub(worn.mul(.3)), float(.97), open).add(d.rough), d.lost)
   m.metalnessNode = mix(float(.35), float(0), open.max(rust.mul(.6)))
   m.normalNode = reliefNormal(n.transformDirection(cameraViewMatrix), d.heightM.sub(slot.mul(.004)), .3)
