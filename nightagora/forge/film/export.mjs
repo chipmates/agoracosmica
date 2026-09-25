@@ -428,12 +428,12 @@ export async function restFrame(session, inbox, tag, i, from, { grain }) {
   return renderFrame(session, inbox, { tag, i, times, jitter: jitterOf(MIN_DRAWS), anchor: MIN_DRAWS / 2, ids: true, send: true, grain, seed: 0 })
 }
 
-/** THE SETTLED REST FRAME: a pose cut to from far off can draw its first
-    rest frame a level off in a few pixels, and the same pose drawn once more
-    is the one every later visit draws. Rest frames are drawn until two in a
-    row are the same bytes; the second is kept, and the draws it took are
-    reported. */
-export const SETTLE_TRIES = 4
+/** THE SETTLED REST FRAME: a pose reached by a cut or by a walk can draw
+    its first rest frames a level off in scattered pixels while the scene
+    settles, and the settled picture is the one every visit draws. A still,
+    a clip's first frame and its arrival are drawn until two rest frames in a
+    row are the same bytes; the second is kept and the count reported. */
+export const SETTLE_TRIES = 6
 async function settledRest(session, inbox, tag, opts) {
   const now = () => session.page.evaluate(() => window.__pre.virtualTime())
   let prev = await restFrame(session, inbox, `${tag} settle`, 0, await now(), opts)
@@ -586,22 +586,25 @@ async function exportClip(session, inbox, edge, nodes, track, out, opts) {
      easing in moves less than the print's last digit), so both runners
      number the same instant of the leg alike */
   const stillPrint = frames[0].print
-  let last = -1, j = 0, idle = 0
+  let last = -1, j = 0, idle = 0, settledLastIn = 0
   for (let i = 1; i < predicted + 60; i++) {
     const m = motionOf(track.prints, Math.min(j + 1, track.arrivedAt), stage.height, nearM)
     const { n, over } = drawsFor(m.px)
     const t = Date.now()
-    const res = await renderFrame(session, inbox, { tag, i, times: shutterTimes(origin.t, i, n), jitter: jitterOf(n), anchor: n / 2, ids: true, send: true, grain: opts.grain, seed: j + 1 })
+    let res = await renderFrame(session, inbox, { tag, i, times: shutterTimes(origin.t, i, n), jitter: jitterOf(n), anchor: n / 2, ids: true, send: true, grain: opts.grain, seed: j + 1 })
     if (j === 0 && printOf(res.report.cam) === stillPrint) {
       if (++idle > 40) throw new Error(`${tag}: the leg never got under way`)
       continue
     }
+    // the arrival at rest is kept as a still is: once two rest frames in a row are the same bytes
+    const resting = res.report.walking.every((w) => !w)
+    if (resting) ({ res, frames: settledLastIn } = await settledRest(session, inbox, `${tag} arrival`, opts))
     j++
     nearM = await put(j, res, { motion: round(m.px, 2), turnPx: round(m.turn, 2), walkPx: round(m.walk, 2), over, wall: Date.now() - t, legFrame: i })
     if (!(await drawnSetHolds(j, res))) {
       return { clip: edge.id, framing, refused: refusal, mount: { rule: opts.mount, held }, mountedChanges: [changedAt], framesRendered: frames.length }
     }
-    if (res.report.walking.every((w) => !w)) {
+    if (resting) {
       last = j
       await savePng(res.frame.rgb, stage.width, stage.height, join(opts.frameDir, `${stem}-${framing}-last.png`))
       break
@@ -638,7 +641,7 @@ async function exportClip(session, inbox, edge, nodes, track, out, opts) {
     chromeImagesAfterClock: session.record.chrome.length - chromeBefore,
     mountedChanges: frames.filter((f) => f.mounted.changed).map((f) => ({ i: f.i, meshes: f.mounted.meshes, ...f.mounted.changed })),
     starvedSteps: starved, pageErrors: session.record.errors.length - errorsBefore,
-    pendingAtRest, settledIn, paintedOverCanvas, mountedSetChanges: signatures.size - 1, casters: armed.casters, bodies: armed.bodies,
+    pendingAtRest, settledIn, settledLastIn, paintedOverCanvas, mountedSetChanges: signatures.size - 1, casters: armed.casters, bodies: armed.bodies,
     mount: { rule: opts.mount, held, drawn: frames[0].mounted.meshes, signature: frames[0].mounted.signature, stoodAtFirst: frames[0].mounted.stood, stoodAtLast: frames[frames.length - 1].mounted.stood,
       // a volume the eye enters (the hall's air) is the eye's, not held: the frames it begins and ends being drawn
       volumes: frames.filter((f, k) => k === 0 || f.mounted.volumes !== frames[k - 1].mounted.volumes).map((f) => ({ i: f.i, drawn: f.mounted.volumes })) },
@@ -776,7 +779,7 @@ async function main() {
             if (r.refused?.length && !r.files) { log(`  REFUSED ${edge.id} ${framing}: ${r.refused.join('; ')}`); continue }
             const sf = (id) => stills.find((s) => s.node === id && s.framing === framing)?.raw
             r.joinsAgree = { first: r.joins.first === sf(edge.from), last: r.joins.last === sf(edge.to) }
-            log(`  ${edge.id} ${framing}: ${r.frames} frames (the graph ${edge.framings[framing].frames + edge.framings[framing].restLag + 1}), ${r.draws} draws, ${r.secondsPerFrame} s a frame; settled in ${r.settledIn}; joins ${r.joinsAgree.first}/${r.joinsAgree.last}; track ${r.track.maxDeviation}; late ${r.requestsAfterClock}; mounted changes ${r.mountedSetChanges}; held ${r.mount.held}, stood ${r.mount.stoodAtFirst} at the first frame and ${r.mount.stoodAtLast} at the last`)
+            log(`  ${edge.id} ${framing}: ${r.frames} frames (the graph ${edge.framings[framing].frames + edge.framings[framing].restLag + 1}), ${r.draws} draws, ${r.secondsPerFrame} s a frame; settled in ${r.settledIn} and ${r.settledLastIn}; joins ${r.joinsAgree.first}/${r.joinsAgree.last}; track ${r.track.maxDeviation}; late ${r.requestsAfterClock}; mounted changes ${r.mountedSetChanges}; held ${r.mount.held}, stood ${r.mount.stoodAtFirst} at the first frame and ${r.mount.stoodAtLast} at the last`)
           }
           if (mount === 'held') await session.page.evaluate(() => window.__naExport.hold(null))
           const sets = new Set([...stills.filter((x) => x.framing === framing).map((x) => x.drew.signature), ...results.filter((r) => r.framing === framing && r.mount?.signature !== undefined).map((r) => r.mount.signature)])
