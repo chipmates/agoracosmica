@@ -330,10 +330,24 @@ export function mountReadingRoom(stack: Stack, host: Object3D): ReadingRoom {
     const albedo = tone.mul(mix(vec3(figured.dot(vec3(.3, .5, .2))), figured, .85))
     const outX = standRect.x.sub(P.x).max(P.x.sub(standRect.z)).max(0), outZ = standRect.y.sub(P.z).max(P.z.sub(standRect.w)).max(0)
     const contact = smoothstep(READING_STAND.contact, 0, vec2(outX, outZ).length()).mul(READING_STAND.contactDepth)
-    m.colorNode = mix(albedo, albedo.dot(vec3(.3, .5, .2)).mul(vec3(1.5, 1.3, 1.05)), worn.mul(.55)).mul(float(1).sub(seam.mul(.72))).mul(arris.add(1)).mul(worn.mul(.28).add(1))
-      .mul(float(1).sub(contact))
-    m.roughnessNode = read.roughness.mul(.45).add(.2).add(seam.mul(.4)).sub(worn.mul(.08)).clamp(.22, .9)
-    m.normalNode = normalMap(read.normal.mul(.5).add(.5), vec2(.5, .5))
+    // THE READER'S PAD: a green tanned leather laid under the stand, a gilt
+    // fillet tooled round it, its edge drawn a few millimetres proud of the
+    // oak by the shade it lays on the grain beside it. A second material, and the
+    // place the top is used, so the top reads as a desk and not a floor.
+    const into = east.sub(T.east - .2).min(float(T.east + .45).sub(east)).min(north.sub(T.north - .42).min(float(T.north + .42).sub(north)))
+    const padPixel = pixel.east.max(pixel.north)
+    const pad = into.div(padPixel).add(.5).clamp(0, 1)
+    const hide = mx_noise_float(P.mul(vec3(140, 0, 140))).mul(.07).add(mx_noise_float(P.mul(vec3(9, 0, 9))).mul(.1))
+    const leather = vec3(...linear('#4a6650')).mul(hide.add(1))
+    const fillet = lineCoverage(into.sub(.024), .0011, 1, padPixel).add(lineCoverage(into.sub(.031), .0005, 1, padPixel).mul(.7)).clamp(0, 1)
+    const padColour = mix(leather, vec3(...linear('#8c6d38')), fillet.mul(.85)).mul(smoothstep(0, .006, into).mul(.25).add(.75))
+    const rim = float(1).sub(smoothstep(.007, 0, into.negate()).mul(float(1).sub(pad)).mul(.4))
+    const wood = mix(albedo, albedo.dot(vec3(.3, .5, .2)).mul(vec3(1.5, 1.3, 1.05)), worn.mul(.55)).mul(float(1).sub(seam.mul(.72))).mul(arris.add(1)).mul(worn.mul(.28).add(1))
+    m.colorNode = mix(wood.mul(rim), padColour, pad).mul(float(1).sub(contact))
+    m.roughnessNode = mix(read.roughness.mul(.45).add(.2).add(seam.mul(.4)).sub(worn.mul(.08)).clamp(.22, .9),
+      float(.5).add(hide.mul(.3)).sub(fillet.mul(.2)), pad)
+    m.metalnessNode = fillet.mul(pad).mul(.6)
+    m.normalNode = normalMap(mix(read.normal.mul(.5).add(.5), vec3(.5, .5, 1), pad), vec2(.5, .5))
     m.name = 'vinci/collection-reading-room/table-top'
     return m
   })()
