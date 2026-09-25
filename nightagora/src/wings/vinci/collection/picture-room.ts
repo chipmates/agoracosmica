@@ -606,7 +606,8 @@ export function mountPictureRoom(stack: Stack): PictureRoom {
       cones.push(g.toNonIndexed())
       g.dispose()
     }
-    const air = new MeshBasicNodeMaterial({ transparent: true, depthWrite: false, side: DoubleSide })
+    // no fog: an added layer that takes the fog adds the haze colour once per face it draws
+    const air = new MeshBasicNodeMaterial({ transparent: true, depthWrite: false, side: DoubleSide, fog: false })
     // the air lit along the beam: thicker where the eye looks through it,
     // fading from the lens over the first metre
     const along = uv().y, facing = abs(dot(normalWorldGeometry, cameraPosition.sub(positionWorld).normalize()))
@@ -664,7 +665,7 @@ export function mountPictureRoom(stack: Stack): PictureRoom {
       quads.push(g.toNonIndexed())
       g.dispose()
     }
-    const film = new MeshBasicNodeMaterial({ transparent: true, depthWrite: false, side: FrontSide })
+    const film = new MeshBasicNodeMaterial({ transparent: true, depthWrite: false, side: FrontSide, fog: false })
     film.colorNode = varnishFilm(reflection, H)
     film.blending = AdditiveBlending
     film.toneMapped = false

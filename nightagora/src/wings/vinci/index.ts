@@ -1,6 +1,6 @@
 import { createStaticShadowCache } from './static-shadow-cache'
 import { warmWalk, WARM_EXTRA_FRAMES, type WarmWalk } from '../../stack/warm-up'
-import { applyDisplayedSkyAir, createAerialFog, applyDisplayedHorizonHaze, displayedHorizonHazeProvenance } from './display-sky-haze'
+import { applyDisplayedSkyAir, createAerialFog, applyDisplayedHorizonHaze, displayedHorizonHazeProvenance, type IndoorBox } from './display-sky-haze'
 import { mineralSurfaceProvenance, closeSurfaceProvenance } from './surface'
 import { entryMineralSurfaceProvenance } from './entry-mineral-surface'
 import { foundationPlinthProvenance } from './foundation-plinth'
@@ -27,7 +27,7 @@ import { createHouseHall, houseHallProvenance, type HouseHall } from './house-ha
 import { createShellShadowDouble } from './shadow-shell'
 import { createWingShadowBody, type WingShadowBody } from './shadow-body'
 import { createCollection, collectionProvenance } from './collection'
-import { COURT, GRAVE_ORIGIN, LINE_FIELD, ROOMS, SUPPER_WALL } from './collection/layout'
+import { COURT, FLOOR, GRAVE_ORIGIN, HALL_CEILING_NORTH, LINE_FIELD, ROOMS, SUPPER_WALL } from './collection/layout'
 import { collectionView } from './collection/views'
 import { mountCollectionExhibits, type CollectionExhibits } from './collection/exhibits'
 import { isMachineSlug, type MachineSlug } from './machines'
@@ -195,6 +195,11 @@ function legToe(nav:{completed?:string,active?:string,legWalked:number}):number 
   const t=Math.max(0,Math.min(1,(nav.legWalked-EXPOSURE_OPENS)/(1-EXPOSURE_OPENS)))
   return from+(toeOf(nav.active)-from)*t*t*(3-2*t)
 }
+/** The collection's rooms as one box (x east, y up, z south), which the air by distance stays out of. */
+const COLLECTION_INDOORS:IndoorBox=(()=>{
+  const r=Object.values(ROOMS)
+  return {min:[Math.min(...r.map(o=>o.west)),FLOOR,-Math.max(...r.map(o=>o.north))],max:[Math.max(...r.map(o=>o.east)),HALL_CEILING_NORTH,-Math.min(...r.map(o=>o.south))]}
+})()
 const SHADOW={nearHalfM:20,nearMapPx:1024,aheadM:10,refocusM:3,lightDistanceM:80} as const
 /** THE SUN'S THREE SWITCHES, off unless an address asks for them. A flicker
  * is separated by taking one thing away at a time, and a seat that has to
@@ -635,7 +640,7 @@ export function createWing():VinciWingModule {
     sky.material.colorNode=vec4(veiled.div(float(1).add(skyLuma.div(.85))),1)
     applyDisplayedSkyAir(sky.material,scene.fog as FogExp2,key.direction)
     applyDisplayedHorizonHaze(sky.material,scene.fog as FogExp2,key.direction)
-    scene.fogNode=createAerialFog(scene.fog as FogExp2,key.direction)
+    scene.fogNode=createAerialFog(scene.fog as FogExp2,key.direction,COLLECTION_INDOORS)
     sky.scale.setScalar(1800);sky.sunPosition.value.copy(key.direction).multiplyScalar(450000);sky.turbidity.value=4;sky.rayleigh.value=1.4;sky.cloudScale.value=.0006;sky.cloudCoverage.value=.28;sky.cloudDensity.value=.42;sky.cloudElevation.value=.35;sky.cloudSpeed.value=0;scene.add(sky)
     yield
     const entry=createEntryPassage(stack.tierName())

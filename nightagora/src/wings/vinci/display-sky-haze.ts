@@ -39,7 +39,7 @@ export function applyDisplayedHorizonHaze(material: NodeMaterial, fog: FogExp2, 
  * lifts and cools what stands far off before it hides it. */
 export const aerialPerspectiveProvenance = {
   class: 'GENERATED',
-  recipe: 'The rig\'s fog colour turned by the view\'s angle to the sun (cool #a8b2b6 away from it, warm #d2c7ae toward it); geometry takes it by an optical depth of beta times the path past the clear distance (in addition to the squared-exponential exhibition fog, never less); the displayed sky pales toward the horizon as a clear sky does: from nothing at the zenith to two thirds at fifteen degrees (one minus the sine of the elevation, to the power 1.4), up to 28 per cent of its saturation and up to a quarter brighter, and a quarter of the way toward the same haze colour. Exhibition atmosphere, not measured weather.',
+  recipe: 'The rig\'s fog colour turned by the view\'s angle to the sun (cool #a8b2b6 away from it, warm #d2c7ae toward it); geometry takes it by an optical depth of beta times the path past the clear distance (in addition to the squared-exponential exhibition fog, never less); the displayed sky pales toward the horizon as a clear sky does: from nothing at the zenith to two thirds at fifteen degrees (one minus the sine of the elevation, to the power 1.4), up to 28 per cent of its saturation and up to a quarter brighter, and a quarter of the way toward the same haze colour. The air by distance is outdoor air: a surface inside the collection, seen from inside it, takes none. Exhibition atmosphere, not measured weather.',
   clearM: 18, betaPerM: .004, cool: '#a8b2b6', warm: '#d2c7ae',
   skyBand: { power: 1.4, desaturate: .28, lift: .25, brighten: .25 },
 } as const
@@ -55,14 +55,27 @@ export function hazeColour(direction: TslNode, sun: { x: number; y: number; z: n
   return mix(away, c(P.warm), smoothstep(.15, .95, toSun))
 }
 
+/** A world box, min and max corners: the rooms the aerial term stays out of. */
+export interface IndoorBox { min: readonly [number, number, number]; max: readonly [number, number, number] }
+
 /** The fog node for geometry: the exhibition fog as it was, and the aerial
- * term past the clear distance, both in the directional haze colour. */
-export function createAerialFog(fog: FogExp2, sun: { x: number; y: number; z: number }): TslNode {
+ * term past the clear distance, both in the directional haze colour. The
+ * aerial term is dropped where both the eye and the surface stand indoors. */
+export function createAerialFog(fog: FogExp2, sun: { x: number; y: number; z: number }, indoors?: IndoorBox): TslNode {
   const P = aerialPerspectiveProvenance
   const view = positionWorld.sub(cameraPosition), distance = view.length()
   const direction = view.div(distance.max(.0001))
   const exhibition = float(1).sub(distance.mul(fog.density).pow(2).negate().exp())
-  const aerial = float(1).sub(distance.sub(P.clearM).max(0).mul(P.betaPerM).negate().exp())
+  let aerial: TslNode = float(1).sub(distance.sub(P.clearM).max(0).mul(P.betaPerM).negate().exp())
+  if (indoors) {
+    const lo = vec3(...indoors.min), hi = vec3(...indoors.max)
+    // full inside the box and a fifth of a metre past its faces, which are the rooms' inner faces
+    const within = (p: TslNode): TslNode => {
+      const out = lo.sub(p).max(p.sub(hi))
+      return smoothstep(.6, .2, out.x.max(out.y).max(out.z))
+    }
+    aerial = aerial.mul(float(1).sub(within(positionWorld).mul(within(cameraPosition))))
+  }
   return fogNode(hazeColour(direction, sun, fog), exhibition.max(aerial)) as unknown as TslNode
 }
 

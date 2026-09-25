@@ -1685,7 +1685,8 @@ function dustBeams(): Mesh | null {
   g.computeBoundingSphere()
   // Both sides are drawn: a face the eye's ray enters by carries the length
   // to where the ray leaves; a face it leaves by carries none.
-  const m = new MeshBasicNodeMaterial({ transparent: true, depthWrite: false, side: DoubleSide, blending: AdditiveBlending })
+  // no fog: an added layer that takes the fog adds the haze colour once per face
+  const m = new MeshBasicNodeMaterial({ transparent: true, depthWrite: false, side: DoubleSide, blending: AdditiveBlending, fog: false })
   const IA = attribute('beamA', 'vec3'), IB = attribute('beamB', 'vec3'), IS = attribute('beamS', 'vec3'), O = attribute('beamO', 'vec3'), Lh = attribute('beamL', 'vec2')
   const eye = cameraPosition, ray = positionWorld.sub(eye), here = ray.length(), dir = ray.div(here.max(1e-6))
   const e0 = vec3(IA.dot(eye.sub(O)), IB.dot(eye.sub(O)), IS.dot(eye.sub(O)))
