@@ -314,6 +314,7 @@
 .na-plate[data-form='door'] .na-plate-title { margin: 0; font-size: clamp(1.75rem, 2.4vw, 2.25rem); }
 /* every word of the door starts from the band's one x: no indent on the caps */
 .na-plate[data-form='door'] .na-plate-kicker { margin-top: 6px; text-indent: 0; }
+.na-door-run { white-space: nowrap; }
 /* the line is the band's own line: its serif, its two rows, its measure */
 .na-plate[data-form='door'] .na-plate-line {
   margin-top: 10px;
@@ -324,8 +325,9 @@
   text-wrap: balance;
 }
 
-/* the one way in: the band's gold corner, grown to the door's size */
-.na-door-go { grid-area: go; }
+/* the one way in: the band's gold corner, grown to the door's size, its
+   focus ring as far from the foot as the name stands from the top */
+.na-door-go { grid-area: go; margin-bottom: 11px; }
 .na-plate[data-form='door'] .na-plate-primary {
   display: inline-flex;
   align-items: center;
@@ -356,6 +358,7 @@
 .na-door-ic { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 
 /* the small ways: words with a hairline under them, never boxes */
+.na-door-ways { display: contents; }
 .na-door-links { grid-area: links; justify-self: end; display: flex; flex-wrap: wrap; justify-content: flex-end; column-gap: 24px; }
 .na-plate[data-form='door'] :is(.na-plate-second, .na-plate-third) {
   display: inline-flex;
@@ -378,76 +381,66 @@
 .na-plate[data-form='door'] :is(.na-plate-second, .na-plate-third):hover { color: var(--na-starlight); text-decoration-color: var(--na-gold); }
 .na-plate[data-form='door'] :is(.na-plate-second, .na-plate-third):focus-visible { outline: 1px solid var(--na-gold); outline-offset: 4px; }
 
-/* the book: the leaflet and its sources, out of the first view */
+/* the book: the leaflet and its sources, out of the first view, named, its
+   right edge on the way in's right edge */
 .na-door-book {
   grid-area: book;
   justify-self: end;
   align-self: start;
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  margin: -10px -8px 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 44px;
+  min-height: 44px;
+  margin: -8px 0 0;
   padding: 0;
   border: 0;
-  border-radius: 50%;
   background: none;
-  color: color-mix(in srgb, var(--na-starlight) 78%, var(--na-mist));
+  color: color-mix(in srgb, var(--na-starlight) 86%, var(--na-mist));
+  font: 400 .9375rem/1.2 var(--sans);
+  letter-spacing: .01em;
   cursor: pointer;
 }
-.na-door-book .na-door-ic { width: 26px; height: 26px; stroke-width: 1.1; }
+.na-door-book .na-door-ic { flex: 0 0 auto; width: 22px; height: 22px; stroke-width: 1.2; }
 .na-door-book:hover, .na-door-book[aria-expanded='true'] { color: var(--na-gold); }
-.na-door-book:focus-visible { outline: 1px solid var(--na-gold); outline-offset: 0; }
+.na-door-book:focus-visible { outline: 1px solid var(--na-gold); outline-offset: 4px; }
+.na-door-quiet { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 /* the leaflet rises above the wall, the door grows upward and nothing moves */
 .na-plate[data-form='door'] .na-plate-leaflet { grid-area: rack; max-height: 52vh; }
 .na-plate[data-form='door'] .na-plate-row { gap: 0 20px; margin: 0 0 14px; padding: 0; border-top: 0; border-bottom: 1px solid var(--rule-faint); }
 .na-plate[data-form='door'] .na-plate-tab::after { right: -12px; }
 
-/* MOBILE FIRST ON A PHONE: the door is the phone's own box. The words on the
-   solid part, the small ways on the key row, and the foot's seats: the book
-   where the book stands, the gold way in beside it under the thumb. */
+/* MOBILE FIRST ON A PHONE: the door is the phone's own box, one ground from
+   the name to the glass's edge. The words, the two small ways on one row,
+   and the gold way in across the foot under the thumb, every edge 16 px in
+   and the foot clear of the home bar. */
 @media (max-aspect-ratio: 9/10) {
   .na-plate[data-form='door'] {
-    --door-foot: calc(80px + env(safe-area-inset-bottom));
     max-height: 84dvh;
     padding: 0;
     border: 0;
     border-radius: 0;
     box-shadow: none;
-    background: linear-gradient(to top,
-      color-mix(in srgb, var(--na-abyss) 45%, transparent) var(--door-foot),
-      color-mix(in srgb, var(--na-abyss) 94%, transparent) var(--door-foot));
+    background: color-mix(in srgb, var(--na-abyss) 94%, transparent);
   }
   .na-plate[data-form='door'][open] {
-    grid-template-columns: 72px minmax(0, 1fr);
-    grid-template-areas:
-      'rack rack'
-      'wall wall'
-      'links links'
-      'book go';
-    column-gap: 0;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'rack' 'wall' 'ways' 'go';
   }
-  .na-plate[data-form='door'] .na-plate-wall { padding: 8px 16px 0; }
+  .na-plate[data-form='door'] .na-plate-wall { padding: 13px 16px 0; }
   .na-plate[data-form='door'] .na-plate-title { font-size: 1.625rem; }
-  .na-plate[data-form='door'] .na-plate-kicker { margin-top: 2px; line-height: 1.25; text-indent: 0; }
-  .na-plate[data-form='door'] .na-plate-line { margin-top: 5px; font-size: 1.0625rem; line-height: 1.45; text-wrap: pretty; }
-  .na-door-links { justify-self: stretch; justify-content: flex-start; column-gap: 22px; padding: 0 16px; }
+  .na-plate[data-form='door'] .na-plate-kicker { margin-top: 2px; line-height: 1.2; text-indent: 0; }
+  .na-plate[data-form='door'] .na-plate-line { margin-top: 5px; font-size: 1.0625rem; line-height: 1.4; text-wrap: pretty; }
+  /* one row, the book at its right end on the words' edge; a row too narrow
+     for all of them lets the book down under them, never between them */
+  .na-door-ways { grid-area: ways; display: flex; flex-wrap: wrap; align-items: center; column-gap: 16px; padding: 0 16px; }
+  .na-door-links { display: contents; }
   .na-plate[data-form='door'] :is(.na-plate-second, .na-plate-third) { flex: 0 0 auto; padding: 0; }
-  /* the book's seat: a 40 px glass ring inside a 44 px target */
-  .na-door-book {
-    align-self: start;
-    justify-self: start;
-    width: 44px;
-    height: 44px;
-    margin: 14px 0 0 14px;
-    background: radial-gradient(circle closest-side,
-      color-mix(in srgb, var(--na-abyss) 85%, transparent) 19.5px,
-      color-mix(in srgb, var(--na-starlight) 25%, transparent) 19.5px 20.5px, transparent 20.5px);
-    color: color-mix(in srgb, var(--na-starlight) 88%, var(--na-gold));
-  }
-  .na-door-book .na-door-ic { width: 18px; height: 18px; stroke-width: 1.6; }
-  .na-door-go { align-self: start; padding: 12px 12px calc(16px + env(safe-area-inset-bottom)) 0; }
+  .na-door-book { align-self: center; margin: 0 0 0 auto; gap: 7px; }
+  .na-door-book .na-door-ic { width: 20px; height: 20px; stroke-width: 1.4; }
+  /* the ring stays inside the words' column and above the home bar */
+  .na-door-go { align-self: start; margin: 0; padding: 2px 21px max(21px, calc(env(safe-area-inset-bottom) + 8px)); }
   .na-plate[data-form='door'] .na-plate-primary {
     width: 100%;
     min-width: 0;
@@ -462,6 +455,6 @@
   }
   .na-plate[data-form='door'] .na-plate-primary:hover { background: var(--na-gold); }
   .na-plate[data-form='door'] .na-door-arrow { width: 36px; height: 36px; flex-basis: 36px; border: 0; background: color-mix(in srgb, var(--na-abyss) 12%, transparent); color: var(--na-abyss); }
-  .na-plate[data-form='door'] .na-plate-leaflet { max-height: 46dvh; background: color-mix(in srgb, var(--na-abyss) 94%, transparent); }
+  .na-plate[data-form='door'] .na-plate-leaflet { max-height: 46dvh; }
   .na-plate[data-form='door'] .na-plate-row { margin: 0; padding: 4px 16px 0; border-bottom: 0; }
 }

@@ -772,6 +772,9 @@ export const vinciOpenings: Readonly<Record<VinciOpeningId, VinciOpening>> = {
   },
 }
 
+/** the door's book, named where it stands; the handle stays its spoken name */
+export const vinciDoorAbout: VinciText = { en: 'About the wing', de: 'Über den Flügel' }
+
 /* THE WING'S SOURCES, GROUPED. The records are the asset store's own: every
    picture, leaf, model and material the museum shows carries its holder and
    its licence line there, so this file groups them and never restates them.

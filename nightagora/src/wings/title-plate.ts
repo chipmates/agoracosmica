@@ -27,6 +27,8 @@ export interface PlateWords {
   leaflet: string
   /** what the handle that pulls the sheet up is called; never displayed */
   handle: string
+  /** the door's book, as its seat displays it */
+  about?: string
 }
 
 export interface PlateLeaf {
@@ -154,6 +156,54 @@ export function plateGroups(host: HTMLElement, groups: readonly PlateGroup[]): v
   }
 }
 
+/* A LINE BREAKS WHERE A READER PAUSES. The door sets its one line by hand at
+   the width it has: the fewest rows first, then a break at a sentence's end
+   or a comma, never after a word that leans on the next one or before a
+   pronoun that leans on its verb, and never a last row of one or two words. */
+const LEANS: Readonly<Record<string, ReadonlySet<string>>> = {
+  en: new Set(('a an the of to in on at for from by with into his her its their my your our no not and or but '
+    + 'he she it we they is was had has have been three thirty over more than').split(' ')),
+  de: new Set(('der die das dem den des ein eine einer einem einen eines im am zum zur beim vom ins ans in an auf '
+    + 'aus bei mit nach von zu über unter vor für um sein seine seiner seinem seinen seines ihr ihre ihrer ihren '
+    + 'kein keine keinen und oder aber er sie es wir man ist war hat hatte habe drei dreißig mehr als').split(' ')),
+}
+const LEANS_BACK: Readonly<Record<string, ReadonlySet<string>>> = {
+  de: new Set('er sie es ich wir man du'.split(' ')),
+}
+
+function breakAfter(word: string, next: string, language: string): number {
+  if (/[.!?][»«"”’)]*$/.test(word)) return 0
+  if (/[,:]$/.test(word)) return 3
+  if (LEANS[language]?.has(word.toLowerCase())) return 60
+  return LEANS_BACK[language]?.has(next.toLowerCase()) ? 40 : 12
+}
+
+/** the rows the line is set in, or null when a word alone overruns the width */
+export function phraseRows(words: readonly string[], widths: readonly number[], space: number, width: number, language: string): string[][] | null {
+  const n = words.length
+  // best[j]: the fewest rows, then the least cost, that set words 0..j-1
+  const best: { rows: number; cost: number; from: number }[] = [{ rows: 0, cost: 0, from: -1 }]
+  for (let j = 1; j <= n; j++) {
+    let pick = { rows: Infinity, cost: Infinity, from: -1 }
+    let run = -space
+    for (let i = j - 1; i >= 0; i--) {
+      run += widths[i]! + space
+      if (run > width && i < j - 1) break
+      if (run > width) return null
+      const before = best[i]!
+      let cost = before.cost
+      if (j < n) cost += breakAfter(words[j - 1]!, words[j]!, language) + 12 * ((width - run) / width) ** 2
+      else if (j - i <= 2 && n > 2) cost += 40
+      const rows = before.rows + 1
+      if (rows < pick.rows || (rows === pick.rows && cost < pick.cost)) pick = { rows, cost, from: i }
+    }
+    best.push(pick)
+  }
+  const rows: string[][] = []
+  for (let j = n; j > 0; j = best[j]!.from) rows.unshift(words.slice(best[j]!.from, j))
+  return rows
+}
+
 export function createTitlePlate(host: HTMLElement, parts: PlateParts): TitlePlate {
   const document_ = host.ownerDocument
   mountStyle(document_)
@@ -187,11 +237,18 @@ export function createTitlePlate(host: HTMLElement, parts: PlateParts): TitlePla
 
   function wallOf(words: PlateWords): HTMLElement {
     const wall = make('div', 'na-plate-wall')
-    const kicker = make('p', 'na-plate-kicker', words.kicker)
+    const kicker = make('p', 'na-plate-kicker', door ? '' : words.kicker)
     const title = make('h1', 'na-plate-title', words.title)
     // the door's wall names him first, the place and the hour under the name
     if (door) wall.append(title, kicker)
     else wall.append(kicker, title)
+    // the door's caps break only after a comma or a dot, never inside a date
+    if (door) {
+      words.kicker.split(/(?<=[,·])\s+/).forEach((run, index) => {
+        if (index) kicker.append(' ')
+        kicker.append(make('span', 'na-door-run', run))
+      })
+    }
     wall.append(make('p', 'na-plate-line', words.line))
     return wall
   }
@@ -296,17 +353,47 @@ export function createTitlePlate(host: HTMLElement, parts: PlateParts): TitlePla
     }
     const book = make('button', 'na-door-book')
     book.type = 'button'
-    book.title = words.handle
-    book.setAttribute('aria-label', words.handle)
     book.setAttribute('aria-controls', `${parts.id}-leaflet`)
     book.append(icon(document_, BOOK, 'na-door-ic'))
+    if (words.about) {
+      // the spoken name starts with the displayed one and keeps the handle's words
+      book.append(make('span', 'na-door-about', words.about), ' ', make('span', 'na-door-quiet', words.handle))
+    } else {
+      book.title = words.handle
+      book.setAttribute('aria-label', words.handle)
+    }
     book.addEventListener('click', () => {
       pulledUp = !pulledUp
       if (!pulledUp) shutLeaf()
       height()
       if (pulledUp) requestAnimationFrame(() => tabs[0]?.focus({ preventScroll: true }))
     })
-    dialog.append(wallOf(words), go, links, book, leafletOf(words))
+    // the small ways and the book share one row on a phone; a desk places each
+    const ways = make('div', 'na-door-ways')
+    ways.append(links, book)
+    dialog.append(wallOf(words), go, ways, leafletOf(words))
+  }
+
+  function setLine(): void {
+    const line = door && dialog.open ? dialog.querySelector<HTMLElement>('.na-plate-line') : null
+    if (!line) return
+    const said = parts.words().line
+    const style = getComputedStyle(line)
+    const width = line.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight)
+    const pen = document_.createElement('canvas').getContext('2d')
+    if (!pen || width <= 0) return
+    pen.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`
+    const spacing = parseFloat(style.letterSpacing) || 0
+    const measure = (text: string): number => pen.measureText(text).width + spacing * text.length
+    const words_ = said.split(/\s+/).filter(Boolean)
+    // a pixel under the width: the canvas and the page may round a glyph apart
+    const rows = phraseRows(words_, words_.map(measure), measure(' '), width - 1, document_.documentElement.lang.slice(0, 2))
+    line.textContent = ''
+    if (!rows) { line.textContent = said; return }
+    rows.forEach((row, index) => {
+      if (index) line.append(make('br', ''))
+      line.append(row.join(' '))
+    })
   }
 
   function shutLeaf(): void {
@@ -388,9 +475,9 @@ export function createTitlePlate(host: HTMLElement, parts: PlateParts): TitlePla
     if (!dialog.open || narrow.matches) { setCloseLookBand(null); return }
     setCloseLookBand(dialog.getBoundingClientRect().height)
   }
-  const answerStage = (): void => { standDown(); if (dialog.open) height(); holdBand() }
+  const answerStage = (): void => { standDown(); if (dialog.open) height(); setLine(); holdBand() }
   narrow.addEventListener('change', answerStage)
-  const resized = (): void => { if (door && dialog.open) holdBand() }
+  const resized = (): void => { if (door && dialog.open) { setLine(); holdBand() } }
   addEventListener('resize', resized)
   host.append(dialog)
 
@@ -405,6 +492,9 @@ export function createTitlePlate(host: HTMLElement, parts: PlateParts): TitlePla
       paint()
       if (!dialog.open) dialog.showModal()
       standDown()
+      setLine()
+      // the serif may still be on its way: the rows are set again once it is here
+      if (door) void document_.fonts?.ready.then(() => { if (live && dialog.open) { setLine(); holdBand() } })
       holdBand()
       dialog.querySelector<HTMLButtonElement>('.na-plate-primary')?.focus({ preventScroll: true })
       dialog.scrollTop = 0

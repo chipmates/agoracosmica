@@ -20,7 +20,7 @@ import { LIFE_WORDS } from '../life/words'
 import { createTitlePlate, plateGroups, type PlateGroup, type PlateLeaf } from '../title-plate'
 import { loadManifest, type ManifestEntry } from '../../manifest'
 import {
-  vinciCertaintyWords, vinciOpenings, vinciSourceGroups, vinciSourceScopes, vinciThroughLine,
+  vinciCertaintyWords, vinciDoorAbout, vinciOpenings, vinciSourceGroups, vinciSourceScopes, vinciThroughLine,
   vinciWelcomeBlocks, vinciWelcomeText, type VinciOpeningId, type VinciText,
 } from './content'
 
@@ -175,6 +175,7 @@ export function createVinciWelcome(
       line: text(opening?.line ?? vinciThroughLine),
       leaflet: text(vinciWelcomeText.leaflet),
       handle: text(vinciWelcomeText.handle),
+      about: text(vinciDoorAbout),
     }),
     leaves,
     controls: () => [

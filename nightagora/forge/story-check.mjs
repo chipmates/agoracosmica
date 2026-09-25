@@ -190,7 +190,7 @@ function loadOpenings() {
     module, exports: module.exports,
     require: (id) => { if (id in raw) return { default: raw[id] }; throw new Error(`the content imports ${id}, which this check does not hand in`) },
   })
-  return module.exports.vinciOpenings ?? {}
+  return { openings: module.exports.vinciOpenings ?? {}, about: module.exports.vinciDoorAbout }
 }
 
 /** the canon keys as the card itself prints them, for the run that has the
@@ -265,21 +265,21 @@ function run() {
 
   /* the door's openings: the kicker and the button under the wall's rules,
      the line under a station line's own limits */
-  const openings = loadOpenings()
-  for (const [id, opening] of Object.entries(openings)) {
-    for (const [name, value] of [['kicker', opening.kicker], ['line', opening.line], ['enter', opening.enter]]) {
-      for (const language of ['en', 'de']) {
-        const said = value?.[language]
-        const at = `opening ${id} ${name}`
-        if (typeof said !== 'string' || !said.trim()) { refuse('language', language, 'empty', at); continue }
-        if (/[\u2014\u2013]/.test(said)) refuse('dash', language, said, at)
-        if (said.includes(';')) refuse('semicolon', language, said, at)
-        if (said.includes('?')) refuse('question', language, said, at)
-        if (name !== 'line') continue
-        if (words(said) > LINE_WORDS) refuse('line-words', language, `${words(said)} words`, at)
-        if (longestSentence(said, language) > SENTENCE_WORDS) refuse('line-sentence', language, `${longestSentence(said, language)} words in one sentence`, at)
-        if (characters(said) > LINE_CHARS[language]) refuse(`line-chars-${language}`, language, `${characters(said)} characters`, at)
-      }
+  const { openings, about } = loadOpenings()
+  const doorWords = Object.entries(openings).flatMap(([id, opening]) =>
+    [['kicker', opening.kicker], ['line', opening.line], ['enter', opening.enter]].map(([name, value]) => [`opening ${id} ${name}`, name, value]))
+  doorWords.push(['door about', 'about', about])
+  for (const [at, name, value] of doorWords) {
+    for (const language of ['en', 'de']) {
+      const said = value?.[language]
+      if (typeof said !== 'string' || !said.trim()) { refuse('language', language, 'empty', at); continue }
+      if (/[\u2014\u2013]/.test(said)) refuse('dash', language, said, at)
+      if (said.includes(';')) refuse('semicolon', language, said, at)
+      if (said.includes('?')) refuse('question', language, said, at)
+      if (name !== 'line') continue
+      if (words(said) > LINE_WORDS) refuse('line-words', language, `${words(said)} words`, at)
+      if (longestSentence(said, language) > SENTENCE_WORDS) refuse('line-sentence', language, `${longestSentence(said, language)} words in one sentence`, at)
+      if (characters(said) > LINE_CHARS[language]) refuse(`line-chars-${language}`, language, `${characters(said)} characters`, at)
     }
   }
 
