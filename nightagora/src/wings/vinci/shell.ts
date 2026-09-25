@@ -220,7 +220,9 @@ interface HouseBuild { glaze:boolean; carve:boolean; openBacks:ReadonlySet<strin
   /** facade ends (`id:start`, `id:end`) where the same wall runs on in line */
   runsOn:ReadonlySet<string>
   /** every dressing laid proud of a facade, for the shadows it throws on it */
-  dressings:DressingBox[]; casting:ReadonlySet<Batch> }
+  dressings:DressingBox[]; casting:ReadonlySet<Batch>
+  /** timber members redrawn outside the certified set */
+  posts:Batch }
 let house:HouseBuild|null=null
 /** The new glass stands in front of every retired pane and saddle bar (the
  * bars' faces reach -40 mm), so no retired piece can win a pixel over it
@@ -377,8 +379,17 @@ function drawOpening(f:Facade,o:Opening,thickness:number,b:Batches):void {
   const x=o.from_m,w=o.width_m,z=o.base_m,h=o.height_m;const open=o.type==='gate'||o.type==='open-arcade';const wooden=o.type==='open-arcade'
   if(o.type==='blind-recess'){faceBox(b.stone,f,x+w/2,z+h/2,w,h,.05,-.015,.72);return}
   const surround=wooden?b.oak:b.stone;const jamb=wooden?.14:o.type==='gate'?.27:.16
-  faceBox(surround,f,x-jamb/2,z+h/2,jamb,h+jamb,thickness+.11,.09)
-  faceBox(surround,f,x+w+jamb/2,z+h/2,jamb,h+jamb,thickness+.11,.09)
+  // An arcade post over the gateway stands on its lintel; the certified one
+  // runs down through the passage's ceiling.
+  const gates=wooden&&house?.carve?surroundZones(f).filter(q=>q.o.type==='gate'):[]
+  for(const u of [x-jamb/2,x+w+jamb/2]){
+    const foot=z-jamb/2,top=z+h+jamb/2,prior=surround.retire
+    const head=Math.max(foot,...gates.filter(q=>q.u0<u+jamb/2&&q.u1>u-jamb/2&&q.z0<top&&q.z1>foot).map(q=>q.z1))
+    surround.retire=prior||head>foot
+    faceBox(surround,f,u,z+h/2,jamb,h+jamb,thickness+.11,.09)
+    surround.retire=prior
+    if(head>foot&&head<top){faceBox(house!.posts,f,u,(head+top)/2,jamb,top-head,thickness+.11,.09);house!.dressings.push({facade:f.id,u0:u-jamb/2,u1:u+jamb/2,z0:head,z1:top,front:.09})}
+  }
   faceBox(surround,f,x+w/2,z+h+jamb/2,w+jamb*2,jamb,thickness+.11,.09)
   if(!open) {
     // A window's slab sill gives way to a weathered one cut with a drip;
@@ -643,7 +654,7 @@ export function createShell(tier:Tier,library?:MaterialLibrary):Group {
   const rooms=full?createHouseRooms(tier==='hero'?.45:.9):null
   // The carving is one more draw; standard stands at its draw ceiling.
   // The great hall is its own module's room; its four windows open too.
-  house={glaze:full,carve:tier==='hero',openBacks:new Set([...(rooms?.openedBacks??[]),...(full?HALL_WINDOWS:[])]),lights:[],tracery:[],sills:[],dormers:[],stones:[],runsOn:new Set(),dressings:[],casting:new Set([b.stone,b.oak])}
+  house={glaze:full,carve:tier==='hero',openBacks:new Set([...(rooms?.openedBacks??[]),...(full?HALL_WINDOWS:[])]),lights:[],tracery:[],sills:[],dormers:[],stones:[],runsOn:new Set(),dressings:[],casting:new Set([b.stone,b.oak]),posts:new Batch(true)}
   const faces=roofFaces(),valleys=roofValleys(faces)
   const facades=spec.facades.filter(f=>f.render).map(f=>({...f,openings:f.openings.map(o=>({...o}))}))
   house.runsOn=runsOn(facades)
@@ -705,6 +716,7 @@ export function createShell(tier:Tier,library?:MaterialLibrary):Group {
   if(built?.glaze){const glazing=createHouseGlazing(built.lights,tier==='hero'?2:1);adopt(glazing.group);group.userData['glazing']={lights:built.lights.length,quarries:glazing.quarries,cames:glazing.cames,triangles:glazing.triangles,provenance:houseGlazingProvenance}}
   if(rooms){adopt(rooms.group);group.userData['rooms']={rooms:rooms.rooms,openedBacks:[...rooms.openedBacks],triangles:rooms.triangles,provenance:houseRoomsProvenance}}
   if(built?.dormers.length){const attic=createDormerRooms(built.dormers);if(attic.mesh)group.add(attic.mesh);group.userData['dormerRooms']={dormers:built.dormers.length,triangles:attic.triangles}}
+  if(built?.carve&&built.posts.positions.length){const posts=built.posts.mesh(surface('oak',library));posts.name='vinci/house-tracery/arcade-posts';posts.userData['manifestId']=houseTraceryProvenance.manifestId;posts.userData['asset']=houseTraceryProvenance.manifestId;group.add(posts)}
   if(built?.carve&&(built.tracery.length||built.sills.length||built.stones.length)){const tracery=createHouseTracery(built.tracery,tier,library,built.sills,built.stones);adopt(tracery.group);group.userData['tracery']={windows:built.tracery.length,sills:built.sills.length,stones:built.stones.length,triangles:tracery.triangles,provenance:houseTraceryProvenance}}
   group.userData['foundationPlinth']=foundationPlinthProvenance
   group.userData['northValleys']=valleys
