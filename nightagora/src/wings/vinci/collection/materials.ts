@@ -260,10 +260,10 @@ function trafficLine(P: TSLNode): { feet: TSLNode; doors: TSLNode } {
 
 /** One material for every welded room surface. The role attribute decides
  * which stone it is; the three scales and the daylight are shared. */
-export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
+export function collectionInteriorMaterial(opts: { plinths?: boolean } = {}): MeshStandardNodeMaterial {
   const {
     attribute, cameraViewMatrix, float, floor, fract, mix, mx_noise_float,
-    normalWorldGeometry, positionWorld, smoothstep, vec3,
+    normalWorldGeometry, positionWorld, smoothstep, uv, vec3,
   } = TSL as unknown as Record<string, TSLNode>
   const m = new MeshStandardNodeMaterial({ roughness: .84, side: DoubleSide, shadowSide: BackSide })
   const P = positionWorld, n = normalWorldGeometry
@@ -436,8 +436,35 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
   // reaches, a share of the pixel carried no material at all and the figure
   // read at a fraction of the contrast it was authored at. The wash itself is
   // untouched: what a lamp puts on a stone is still the stone.
-  const albedo = tone.mul(figure.add(1)).mul(float(1).sub(cut))
+  let albedo = tone.mul(figure.add(1)).mul(float(1).sub(cut))
     .mul(float(1).add(walked.mul(.08)).sub(grime.mul(.13)).sub(handled.mul(.035))).toVar()
+  // THE EXHIBITION'S PLINTHS, on the one instance their mesh carries: a
+  // honed bluestone top whose arrises are worn pale, over a steel shaft in a
+  // dark matt coat (paint takes the sky as a sheen, bare steel as a mirror),
+  // both scuffed where feet and trolleys meet them. Each face knows its own
+  // span, so every edge can be found.
+  const plinth = opts.plinths ? smoothstep(1.5, 1.6, role).mul(smoothstep(3.6, 3.5, role)).toVar() : float(0)
+  let plinthRough: TSLNode = float(0), plinthSteel: TSLNode = float(0)
+  if (opts.plinths) {
+    const span = attribute('faceSpan', 'vec2'), f = uv()
+    const edgeM = f.x.min(span.x.sub(f.x)).min(f.y.min(span.y.sub(f.y))).max(0)
+    const arris = lineCoverage(edgeM, .0035, 1, pixel).mul(float(1).sub(isSteel.select(float(.6), float(0))))
+    const speck = mx_noise_float(P.mul(210)).mul(held(.012)).add(mx_noise_float(P.mul(47)).mul(.6).mul(held(.05)))
+    const cloud = mx_noise_float(P.mul(vec3(2.3, 5.1, 2.3))).mul(held(.5))
+    // pale crinoid flecks in the honed stone; a band of dust at the steel's foot
+    const fleck = smoothstep(.5, .72, mx_noise_float(P.mul(95))).mul(held(.02))
+    const stoneTone = vec3(.07, .072, .072).mul(float(1).add(speck.mul(.3)).add(cloud.mul(.24)).add(stoneCell.mul(.3))).mul(fleck.mul(.9).add(1))
+    const scale = mx_noise_float(P.mul(vec3(7, 13, 7))).add(mx_noise_float(P.mul(31)).mul(.4))
+    const standsOn = P.y.sub(FLOOR).min(P.y.sub(COURT.level).abs())
+    const dust = smoothstep(.16, .02, standsOn).mul(n.y.abs().oneMinus()).mul(mx_noise_float(P.mul(vec3(9, 3, 9))).mul(.3).add(.7))
+    const steelTone = mix(mix(vec3(.04, .039, .038), vec3(.068, .064, .058), smoothstep(-.35, .45, scale.mul(held(.12)))), vec3(.1, .095, .085), dust.mul(.45))
+    const scuff = smoothstep(.09, .01, standsOn).mul(n.y.abs().oneMinus()).mul(smoothstep(.1, .5, mx_noise_float(P.mul(vec3(18, 40, 18)))))
+    const face = isSteel.select(steelTone, stoneTone)
+    const worn = mix(face, face.mul(2.4).add(vec3(.02, .019, .017)), arris.mul(.8))
+    albedo = mix(albedo, mix(worn, worn.mul(.62), scuff.mul(.7)), plinth).toVar()
+    plinthRough = isSteel.select(float(.62).add(scale.mul(.08)), float(.62).add(speck.mul(.06)).sub(arris.mul(.18))).add(scuff.mul(.12))
+    plinthSteel = isSteel.select(float(.12), float(0))
+  }
   // THE COURT'S FLAGS ARE STONES OF THEIR OWN: a tone, a grain and wear per
   // slab on the paving's top face, outdoors only
   const courtTop = isOutdoor.select(smoothstep(.9, .97, n.y).mul(float(1).sub(smoothstep(.006, .016, P.y.sub(COURT.level).abs()))), float(0))
@@ -458,7 +485,8 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
       .add(slabJoint.mul(.15)).sub(walked.mul(.22)).add(grime.mul(.07)),
       isOutdoor.select(float(.88).add(detail.rough).add(cell.mul(.14)).add(lap.mul(.05)).sub(walked.mul(.18)).add(flags.rough.mul(courtTop)),
         float(.88).add(detail.rough).add(cell.mul(.1)).add(lap.mul(.07)).add(formBoard.mul(.05)).sub(handled.mul(.09))))).clamp(.30, .97), detail.lost)
-  m.metalnessNode = isSteel.select(float(.72), float(.02))
+  if (opts.plinths) m.roughnessNode = mix(m.roughnessNode as TSLNode, plinthRough, plinth)
+  m.metalnessNode = opts.plinths ? mix(isSteel.select(float(.72), float(.02)), plinthSteel, plinth) : isSteel.select(float(.72), float(.02))
   // A sawn slab keeps a shallow relief of its own; at the room's drift it had
   // none, so nothing on it ever caught a raking light.
   const relief = detail.heightM.mul(byRole([.45, .4, 2.1, .25, .38, .7])).toVar()

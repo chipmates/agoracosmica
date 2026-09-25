@@ -8,7 +8,7 @@
  * Every number here is a modern exhibition-design choice. The machines'
  * own sizes come from their dossiers and are not restated.
  */
-import type { Material, Mesh } from 'three/webgpu'
+import { Float32BufferAttribute, type Material, type Mesh } from 'three/webgpu'
 import { dossiers, type MachineSlug } from '../machines/catalog'
 import { mountBoxes } from '../machines/bench/mounts'
 import { RoomBatch } from './build'
@@ -204,5 +204,16 @@ export function createCollectionStandSolids(material: Material): Mesh {
   const { corners, top } = parachuteCloth()
   for (let i = 0; i < 4; i++) batch.quad(corners[i]!, corners[(i + 1) % 4]!, top, top, 4)
   batch.quad(corners[0]!, corners[1]!, corners[2]!, corners[3]!, 4)
-  return batch.mesh(STAND_SOLIDS_NAME, material)
+  const mesh = batch.mesh(STAND_SOLIDS_NAME, material)
+  // Every face is emitted as six vertices with its uv in metres from one
+  // corner, so its own span is the largest uv it carries: the surface finds
+  // its arrises from it. Positions are untouched.
+  const uv = mesh.geometry.getAttribute('uv'), span = new Float32Array(uv.count * 2)
+  for (let face = 0; face + 5 < uv.count; face += 6) {
+    let u = 0, v = 0
+    for (let k = face; k < face + 6; k++) { u = Math.max(u, uv.getX(k)); v = Math.max(v, uv.getY(k)) }
+    for (let k = face; k < face + 6; k++) { span[k * 2] = u; span[k * 2 + 1] = v }
+  }
+  mesh.geometry.setAttribute('faceSpan', new Float32BufferAttribute(span, 2))
+  return mesh
 }

@@ -77,7 +77,7 @@ export interface CollectionExhibits {
 
 export function mountCollectionExhibits(host: Group, stack: Stack): CollectionExhibits {
   const machines: { build: ReadyMachineBuild; slug: MachineSlug; ground: StandGround; at: Vector3; reach: number }[] = []
-  const material = collectionInteriorMaterial()
+  const material = collectionInteriorMaterial({ plinths: true })
   // THE PICTURE ROOM is finished, furnished and lit by its own module, and
   // its hang's arch mats take its frames' oak
   const pictureRoom = mountPictureRoom(stack)
