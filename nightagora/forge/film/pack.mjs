@@ -197,6 +197,20 @@ for (const [id, n] of Object.entries(nodes)) for (const f of Object.keys(n.print
   if (read) projection.push({ node: id, framing: f, same: read === n.print[f], still: n.print[f], marks: read })
 }
 
+/* THE WORKS THE FILM WING OPENS ONLY FROM A MARK: a showpiece (a work whose
+   close look is a film, `data/films.json`) needs a mark on it at some node in
+   each framing, or no press reaches it */
+const showpieceMarks = []
+const filmsFile = new URL('../../src/wings/vinci/data/films.json', import.meta.url)
+if (existsSync(filmsFile)) {
+  for (const id of Object.keys(JSON.parse(readFileSync(filmsFile, 'utf8')).films ?? {})) {
+    for (const f of Object.keys(MASTER)) {
+      const at = Object.entries(nodes).filter(([, n]) => Object.values(n.marks[f] ?? {}).some((list) => list.some((m) => m.id === id))).map(([node]) => node)
+      showpieceMarks.push({ id, framing: f, nodes: at })
+    }
+  }
+}
+
 /* EACH STATION'S SET, in the order its room holds it, from the graph's own
    views: what the overview offers where the visitor stands */
 const sets = {}
@@ -219,11 +233,12 @@ const release = {
 writeFileSync(join(OUT, 'film.json'), JSON.stringify(release))
 writeFileSync(join(OUT, 'pack.json'), JSON.stringify({
   format: 'vinci-film-pack-v1', exports: EXPORTS, exportHeads: summary.heads, marks: MARKS, quality: QUALITY, whole: WHOLE, answeredByStills: answered.length,
-  sharp: sharp.versions, refusals, projection, retagged, duplicates, emptyReadings,
+  sharp: sharp.versions, refusals, projection, retagged, duplicates, emptyReadings, showpieceMarks,
   clips: [...edges.values()].map((e) => ({ id: e.id, framings: Object.fromEntries(Object.entries(e.framings).map(([f, x]) => [f, { frames: x.frames, joins: x.joins, mountedSetChanges: x.mountedSetChanges, pendingAtRest: x.pendingAtRest, bytes: Object.fromEntries(Object.entries(x.files).map(([r, v]) => [r, v.bytes])) }])) })),
   stills: stillRecords,
 }, null, 1))
 const kB = (n) => Math.round(n / 1024)
 console.log(`the release: ${Object.keys(nodes).length} nodes, ${edges.size} clips (${refusals.length} refused, ${retagged.length} rung files tagged sRGB here${WHOLE ? `, ${answered.length} edge framings answered by their stills` : ''}), ${stillRecords.length} stills (${kB(stillRecords.reduce((s, r) => s + r.bytes, 0))} kB)${Object.keys(cycles).length ? `, cycles ${Object.keys(cycles).join(', ')}` : ''}`)
 for (const p of projection) if (!p.same) console.log(`  PROJECTION ${p.node} ${p.framing}: still ${p.still} · marks ${p.marks}`)
+for (const s of showpieceMarks) console.log(`  ${s.nodes.length ? 'showpiece' : 'SHOWPIECE WITHOUT A MARK'} ${s.id} ${s.framing}${s.nodes.length ? `: marked at ${s.nodes.join(', ')}` : ': no node carries its mark, so the film wing cannot open it'}`)
 console.log(`  ${join(OUT, 'film.json')}`)
