@@ -1,15 +1,15 @@
 /** THE DIAGRAM OF THE CHOSEN LIGHT, as the museum object its record says it
  * is: a study for the light, not a likeness of Saint-Hubert. A small relief of
- * a coursed gable stands in a deep bronze box on a dark linen ground, and one
- * light of its own reaches it: the direction the computed sun of the chosen
- * minute (2 May 1519, 18:50 UT) takes against the gable's measured bearing,
- * 3.7 degrees over the horizon, the warm colour of so low a sun. So the stones
- * catch it on their left arrises, the window's reveal throws its shadow across
- * the glass and the roof's edge lays a long line over the wall, which is what
- * the diagram is there to show. The court's own sun and sky light everything
- * else; only the box takes this light (`lightsNode`), and its map is drawn
- * from the box's own casters alone. Its dimensions are authored exhibition
- * geometry; no elevation of 1519 is claimed.
+ * a coursed gable stands in a deep bronze box on an unbleached linen ground,
+ * and one light of its own reaches it: the direction the computed sun of the
+ * chosen minute (2 May 1519, 18:50 UT) takes against the gable's measured
+ * bearing, 3.7 degrees over the horizon, the warm colour of so low a sun. So
+ * the stones catch it on their left arrises, the window's reveal throws its
+ * shadow across the glass and the roof's edge lays a long line over the wall,
+ * which is what the diagram is there to show. The court's own sun and sky
+ * light everything else; only the box takes this light (`lightsNode`), and
+ * its map is drawn from the box's own casters alone. Its dimensions are
+ * authored exhibition geometry; no elevation of 1519 is claimed.
  */
 import {
   BoxGeometry, BufferGeometry, Color, DirectionalLight, ExtrudeGeometry, Float32BufferAttribute, Group, Mesh,
@@ -42,7 +42,7 @@ const linear = (hex: string): [number, number, number] => { const c = new Color(
  * one body and still read one by one. */
 function modelStone(): MeshStandardNodeMaterial {
   const m = new MeshStandardNodeMaterial({ roughness: .86, metalness: 0 })
-  const d = surfaceDetail({ scales: [.2, .03, .0015], figure: [.08, .06, .04], relief: .0006 })
+  const d = surfaceDetail({ scales: [.2, .03, .0015], figure: [.10, .13, .07], relief: .0009 })
   const block = attribute('blockTone', 'float')
   const c = vec3(...linear('#d6cdb8')).mul(d.tone).mul(block)
   m.colorNode = c
@@ -112,7 +112,7 @@ export function createDiagram(o: DiagramOptions): Diagram {
   // everything in the box but its stones and its bronze is one body: each
   // part carries its own colour and roughness on its vertices
   const mortar: Role = { tint: '#8d8472', rough: .92 }, slate: Role = { tint: '#4a5058', rough: .62 }
-  const glass: Role = { tint: '#1b2024', rough: .14 }, linen: Role = { tint: '#34302b', rough: .95 }
+  const glass: Role = { tint: '#1b2024', rough: .14 }, linen: Role = { tint: '#5d564b', rough: .95 }
   const oak: Role = { tint: '#7a5c3e', rough: .6 }
   const parts = new Map<Material | Role, BufferGeometry[]>()
   const put = (m: Material | Role, g: BufferGeometry): void => { const list = parts.get(m) ?? []; list.push(g); parts.set(m, list) }
