@@ -404,8 +404,8 @@ const oratoryAttribution = statement('oratory-attribution',
   'Die Wandmalereien werden Schülern Leonardo da Vincis zugeschrieben, doch die Zuschreibung ist nicht geklärt.',
   'conjectural', 'document', 'brief/CONCEPT-OPUS.md §3 S4');
 const study = statement('visit-record',
-  "On 10 October 1517 Cardinal Luigi d'Aragona visited this house. His secretary wrote down three paintings, a right hand that no longer worked, and an infinite number of volumes in the vulgar tongue.",
-  "Am 10. Oktober 1517 besuchte Kardinal Luigi d'Aragona dieses Haus. Sein Sekretär verzeichnete drei Gemälde, eine rechte Hand, die nicht mehr funktionierte, und eine unendliche Zahl von Bänden in der Volkssprache.",
+  "On 10 October 1517 Cardinal Luigi d'Aragona visited this house. His secretary wrote down three paintings, a paralysis in the right hand, and that Leonardo still drew and taught. He also wrote of books without number, all in Italian.",
+  "Am 10. Oktober 1517 besuchte Kardinal Luigi d'Aragona dieses Haus. Sein Sekretär verzeichnete drei Gemälde, eine Lähmung der rechten Hand und dass Leonardo noch zeichnete und lehrte. Er schrieb auch von Büchern ohne Zahl, alle auf Italienisch.",
   'documented', 'document', 'brief/CONCEPT-OPUS.md §3 S5');
 const chamber = statement('death-record',
   'Leonardo da Vinci died in this house on 2 May 1519.',
@@ -496,8 +496,8 @@ const stationCards: Record<VinciStationId, VinciText> = {
     de: 'Eine kleine steinerne Kapelle am Südende des Hauses. Die Überlieferung schreibt sie Anne de Bretagne und dem Jahr 1492 zu, eine Bauuntersuchung hat dieses Datum nie bestätigt. Die Wandmalereien werden Schülern Leonardos zugeschrieben, und diese Zuschreibung ist ungeklärt. Der Raum ist nicht geöffnet, deshalb wird das Haus von außen gezeigt.',
   },
   study: {
-    en: 'On 10 October 1517 a cardinal from Aragon visited this house, and his secretary wrote down what he saw. Three paintings, a right hand that no longer worked, and an endless number of books in the vulgar tongue. The hour you are standing in is that afternoon. The room is not open, so the house is shown from outside.',
-    de: 'Am 10. Oktober 1517 besuchte ein Kardinal aus Aragón dieses Haus, und sein Sekretär hielt fest, was er sah. Drei Gemälde, eine rechte Hand, die nicht mehr funktionierte, und unendlich viele Bücher in der Volkssprache. Die Stunde, in der du stehst, ist dieser Nachmittag. Der Raum ist nicht geöffnet, deshalb wird das Haus von außen gezeigt.',
+    en: 'On 10 October 1517 a cardinal visited this house. His secretary wrote down three paintings, a paralysis in the right hand, and that Leonardo still drew and taught. He also wrote of books without number, all in Italian. The hour you are standing in is that afternoon. The room is not open, so the house is shown from outside.',
+    de: 'Am 10. Oktober 1517 besuchte ein Kardinal dieses Haus. Sein Sekretär hielt drei Gemälde fest, eine Lähmung der rechten Hand und dass Leonardo noch zeichnete und lehrte. Er schrieb auch von Büchern ohne Zahl, alle auf Italienisch. Die Stunde, in der du stehst, ist dieser Nachmittag. Der Raum ist nicht geöffnet, deshalb wird das Haus von außen gezeigt.',
   },
   chamber: {
     en: 'Leonardo da Vinci died in this house on 2 May 1519. The house museum places his room at this end, with the window facing the king’s castle, and that placement is a proposal rather than a record. The room is not open, so the house is shown from outside.',
@@ -508,8 +508,8 @@ const stationCards: Record<VinciStationId, VinciText> = {
     de: 'Die Gartenfront nimmt die tiefe Westsonne, dahinter fällt das Tal ab. Der Hang folgt der Vermessung des Geländes, die Bepflanzung stammt von uns, denn keine Quelle hält fest, was hier zu seiner Zeit wuchs. Du verlässt das Jahr 1517. Es folgt ein Museum dessen, was erhalten ist, erbaut in unserem Jahrhundert.',
   },
   'picture-room': {
-    en: 'Twenty-five paintings hang here at the size their holders record, in the order he made them, so this wall gives you the real scale. Every position carries a picture, and each names the reproduction it comes from. The sources name every work, where it is today and what its licence says. The wall is thirty-four metres long from here, and the last painting hangs at the far end.',
-    de: 'Fünfundzwanzig Gemälde hängen hier in den Maßen, die ihre Sammlungen verzeichnen, in der Reihenfolge ihrer Entstehung, diese Wand gibt dir also den wirklichen Maßstab. Jeder Platz trägt ein Bild, und jedes nennt die Reproduktion, aus der es stammt. Die Quellen nennen jedes Werk, seinen heutigen Ort und seine Lizenz. Die Wand ist von hier aus vierunddreißig Meter lang, und das letzte Gemälde hängt am anderen Ende.',
+    en: 'Twenty-five paintings hang here close to the sizes recorded for them, roughly in the order he made them, so this wall gives you the real scale. Every position carries a picture, and each names the reproduction it comes from. The sources name every work, where it is today and what its licence says. The wall is thirty-four metres long from here, and the last painting hangs at the far end.',
+    de: 'Fünfundzwanzig Gemälde hängen hier annähernd in den Maßen, die für sie verzeichnet sind, ungefähr in der Reihenfolge ihrer Entstehung, diese Wand gibt dir also den wirklichen Maßstab. Jeder Platz trägt ein Bild, und jedes nennt die Reproduktion, aus der es stammt. Die Quellen nennen jedes Werk, seinen heutigen Ort und seine Lizenz. Die Wand ist von hier aus vierunddreißig Meter lang, und das letzte Gemälde hängt am anderen Ende.',
   },
   'picture-room-west': {
     en: 'This end is the latest. From here the wall runs back to the first of them, and the door beside you opens on the machines.',
@@ -649,8 +649,8 @@ export const vinciWelcomeBlocks: readonly VinciWelcomeBlock[] = [
       {
         certainty: 'documented',
         text: {
-          en: 'The first firm record that places him at this house is dated 22 May 1517. He died here on 2 May 1519 and was buried in Amboise on 12 August of that year.',
-          de: 'Der erste sichere Beleg, der ihn in diesem Haus verortet, ist vom 22. Mai 1517. Er starb hier am 2. Mai 1519 und wurde am 12. August desselben Jahres in Amboise bestattet.',
+          en: 'The earliest known record that places him at this house is dated 22 May 1517. He died here on 2 May 1519. His will asked for a grave in the church at the castle.',
+          de: 'Der früheste bekannte Beleg, der ihn in diesem Haus verortet, ist vom 22. Mai 1517. Er starb hier am 2. Mai 1519. Sein Testament bat um ein Grab in der Kirche beim Schloss.',
         },
       },
       {
@@ -670,8 +670,8 @@ export const vinciWelcomeBlocks: readonly VinciWelcomeBlock[] = [
       {
         certainty: 'documented',
         text: {
-          en: 'On 10 October 1517 a cardinal came to this house, and his secretary wrote down what he saw: three paintings, a right hand that no longer worked, and an endless number of books.',
-          de: 'Am 10. Oktober 1517 kam ein Kardinal in dieses Haus, und sein Sekretär hielt fest, was er sah: drei Gemälde, eine rechte Hand, die nicht mehr funktionierte, und unendlich viele Bücher.',
+          en: 'On 10 October 1517 a cardinal came to this house, and his secretary wrote it down: three paintings, a paralysis in the right hand, and that Leonardo still drew and taught. He also wrote of books without number.',
+          de: 'Am 10. Oktober 1517 kam ein Kardinal in dieses Haus, und sein Sekretär schrieb es auf: drei Gemälde, eine Lähmung der rechten Hand und dass Leonardo noch zeichnete und lehrte. Er schrieb auch von Büchern ohne Zahl.',
         },
       },
       {
@@ -904,8 +904,8 @@ export const vinciRightsPolicy: VinciText = {
 
 /** What this wing holds, counted. The sentences above carry what it does not. */
 export const vinciWingCounts: VinciText = {
-  en: 'This wing stands on two grounds. The picture room holds 25 positions at the size their holders record and every one of them carries a picture, the wall of the body 29 sheets from Windsor, the mechanism hall 14 machines rebuilt from the sheets, and the reading table one open page. The rights review of this museum read 538 catalogued Windsor sheet groups and admitted 389 of them, and of 25 named codex units it admitted 11. What it could not admit is named in the room it belongs to, with its holder and its reason.',
-  de: 'Dieser Flügel steht auf zwei Gründen. Der Bildersaal trägt 25 Plätze in den Maßen, die die Sammlungen verzeichnen, und jeder davon trägt ein Bild, die Wand des Körpers 29 Blätter aus Windsor, die Maschinenhalle 14 nach den Blättern gebaute Maschinen und der Lesetisch eine offene Seite. Die Rechteprüfung dieses Museums las 538 verzeichnete Windsor-Blattgruppen und ließ 389 von ihnen zu, und von 25 benannten Codex-Einheiten ließ sie 11 zu. Was sie nicht zulassen konnte, steht in dem Raum, zu dem es gehört, mit Sammlung und Grund.',
+  en: 'This wing stands on two grounds. The picture room holds 25 positions close to the sizes recorded for the works, and every one of them carries a picture, the wall of the body 29 sheets from Windsor, the mechanism hall 14 machines rebuilt from the sheets, and the reading table one open page. The rights review of this museum read 538 catalogued Windsor sheet groups and admitted 389 of them, and of 25 named codex units it admitted 11. What it could not admit is named in the room it belongs to, with its holder and its reason.',
+  de: 'Dieser Flügel steht auf zwei Gründen. Der Bildersaal trägt 25 Plätze, annähernd in den Maßen, die für die Werke verzeichnet sind, und jeder davon trägt ein Bild, die Wand des Körpers 29 Blätter aus Windsor, die Maschinenhalle 14 nach den Blättern gebaute Maschinen und der Lesetisch eine offene Seite. Die Rechteprüfung dieses Museums las 538 verzeichnete Windsor-Blattgruppen und ließ 389 von ihnen zu, und von 25 benannten Codex-Einheiten ließ sie 11 zu. Was sie nicht zulassen konnte, steht in dem Raum, zu dem es gehört, mit Sammlung und Grund.',
 }
 
 /** THE WING'S ONE SENTENCE, the same in the welcome, the recap at the exit

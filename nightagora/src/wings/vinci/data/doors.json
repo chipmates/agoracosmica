@@ -67,8 +67,8 @@
     },
     {
       "station": "study",
-      "question_en": "A visitor wrote that your right hand no longer worked. What could you still do?",
-      "question_de": "Ein Besucher schrieb, deine rechte Hand funktioniere nicht mehr. Was konntest du noch tun?",
+      "question_en": "A visitor wrote of a paralysis in your right hand, and that you still drew and taught. Which mattered more to you, the drawing or the teaching?",
+      "question_de": "Ein Besucher schrieb von einer Lähmung deiner rechten Hand und dass du noch zeichnest und andere lehrst. Was war dir wichtiger, das Zeichnen oder das Lehren?",
       "source": {
         "converged_station": "CONCEPT.md section 3",
         "seat_questions": [
