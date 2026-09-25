@@ -75,10 +75,10 @@ function looks() {
     stoneRough: uniform(.46),
     /** how far the walk along the dates has polished its band */
     stoneWalk: uniform(.08),
-    stoneTone: uniform(.16),
+    stoneTone: uniform(.28),
     stoneNormal: uniform(.22),
     /** the limestone's own body: its clouds, its grain and its shell */
-    stoneCloud: uniform(.13),
+    stoneCloud: uniform(.22),
     stoneGrain: uniform(.2),
     stoneFleck: uniform(.28),
     fleckTint: uniform(new Color(.93, .95, 1.02)),
