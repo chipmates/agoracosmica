@@ -256,7 +256,8 @@ function grateSurface(): MeshStandardNodeMaterial {
   }
   const r = best.sqrt(), a = TSL.atan(dn, de), square = abs(de).max(abs(dn))
   const pixel = r.dFdx().abs().add(r.dFdy().abs()).max(.0005)
-  const band = (x: N, lo: number, hi: number): N => smoothstep(lo - pixel, lo + pixel, x).mul(smoothstep(hi + pixel, hi - pixel, x))
+  // `pixel` is a node: the edges are built as nodes, never with JS arithmetic
+  const band = (x: N, lo: number, hi: number): N => smoothstep(float(lo).sub(pixel), float(lo).add(pixel), x).mul(smoothstep(float(hi).add(pixel), float(hi).sub(pixel), x))
   // rings of slots: 0.36 to 0.72 m out, each ring its own slot count
   const ring = r.sub(.36).div(.12), k = floor(ring), inRing = fract(ring)
   const count = k.mul(8).add(28)

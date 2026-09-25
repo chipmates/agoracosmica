@@ -3882,7 +3882,7 @@
       "prompt": "The grave court as the museum's own modern architecture: a leaf of long flat light-grey brick laid in front of the gallery's cast core, the back wall raised over it as a filter band of brick laid with open head joints so the western light passes in small slots, a plinth course and a string course of pale limestone, stone copings; an oiled oak walkway on two steel bearers from the court's open side to the foot of the slab, an oak bench on bronze feet, and three field maples of the region in steel-edged beds under cast-iron grates with their week's fall. The court's sky share and the warm light off its sunlit wall faces are baked once from the walls' boxes and the hour's sun as live-engine terms the film's export turns off. No figure: no record names one. A modern design, no claim about 1519, Saint-Florentin or Saint-Hubert. Each bed is covered by a cast-iron grate: three rings of radial slots round an open ring of earth at the trunk, a worn border to the steel edge.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-24",
-      "sha256": "c87edcdfadc9232c9864c1a46cefc5edbb8506a51fc502a2ae4dd18ab95bae94",
+      "sha256": "67d0ab651e1914afda3e5c0c11199dcae9bba8e153abdbb982c4ced1738ffbf2",
       "note": "Modern museum court; no 1519 claim. recipe_file=src/wings/vinci/grave/court.ts"
     },
     {
@@ -3895,7 +3895,7 @@
       "prompt": "Three field maples, a tree of the region's hedges and a type of the season, planted by the museum in the grave court's steel-edged beds: 7 to 8.1 m, a stem clear to about a third of their height, their crowns grown by the site's own tree growth in sprays with every twig drawn near a stop, turned to their week's stage, and kept a hand past 1.2 m from every certified line through the court and out of its walls, its diagram and its lectern; their week's fall mostly in the beds and the rest carried north-east over the flags. Drawn within 58 m of the court's middle, the twigs and the shadows within 32 m, where the house stands between the court and every stop further off. Conjectural; the museum's modern planting, not a record of 1519.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-24",
-      "sha256": "c87edcdfadc9232c9864c1a46cefc5edbb8506a51fc502a2ae4dd18ab95bae94",
+      "sha256": "67d0ab651e1914afda3e5c0c11199dcae9bba8e153abdbb982c4ced1738ffbf2",
       "note": "FLORA.md species as a type; the museum's own planting. recipe_file=src/wings/vinci/grave/court.ts"
     },
     {
