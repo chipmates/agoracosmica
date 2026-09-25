@@ -252,7 +252,11 @@ const MACHINE_EYES: Record<Exclude<MachineSlug, 'proportional-compass'>, { stati
   // The hall's west half, from the screw's own station.
   'aerial-screw': { station: 'flight', east: -50.8, north: -48.4 },
   'miter-lock-gates': { station: 'flight', east: -51.2, north: -52.0 },
-  'camera-obscura': { station: 'flight', east: -46.4, north: -50.2 },
+  // The chamber is read from its bay's north-east corner, looking south-west
+  // into the open side: from the screw's west view that is a turn of about
+  // seventy degrees, where the bay's own axis asked for a hundred and
+  // twenty-five and filmed a wall for most of the walk.
+  'camera-obscura': { station: 'flight', east: -44.4, north: -50.9 },
   'flywheel': { station: 'flight', east: -45.9, north: -49.4 },
   // The aisle's east half, from the workshop's station.
   'multi-barrel-gun': { station: 'works', east: -42.2, north: -47.9 },
