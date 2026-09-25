@@ -91,6 +91,56 @@ class Skin {
   }
 }
 
+/** A plinth's box in the world's own axes, and whether it is the top slab. */
+interface PlinthBox { centre: Vector3; half: Vector3; top: boolean }
+/** Each vertex of the plinths' skin learns its box, so the surface can find
+ * the box's arrises and tell the slab from the shaft under it. */
+function plinthGeometry(skin: Skin, boxes: readonly PlinthBox[]): BufferGeometry {
+  const g = skin.geometry(), pos = g.getAttribute('position'), count = pos.count
+  const centre = new Float32Array(count * 3), half = new Float32Array(count * 3), top = new Float32Array(count)
+  const p = new Vector3()
+  for (let i = 0; i < count; i++) {
+    p.set(pos.getX(i), pos.getY(i), pos.getZ(i))
+    const box = boxes.find(b => Math.abs(p.x - b.centre.x) <= b.half.x + 1e-4 && Math.abs(p.y - b.centre.y) <= b.half.y + 1e-4 && Math.abs(p.z - b.centre.z) <= b.half.z + 1e-4)
+    if (!box) continue
+    centre.set([box.centre.x, box.centre.y, box.centre.z], i * 3); half.set([box.half.x, box.half.y, box.half.z], i * 3); top[i] = box.top ? 1 : 0
+  }
+  g.setAttribute('plinthCentre', new Float32BufferAttribute(centre, 3))
+  g.setAttribute('plinthHalf', new Float32BufferAttribute(half, 3))
+  g.setAttribute('plinthTop', new Float32BufferAttribute(top, 1))
+  return g
+}
+
+/** THE PLINTHS' OWN FINISH over the photograph: a honed bluestone slab with
+ * its specks and clouds over a blackened steel shaft with its mill scale,
+ * every arris worn pale, both scuffed low where feet and trolleys meet them. */
+function dressPlinths(m: MeshStandardNodeMaterial): void {
+  const { attribute, float, fwidth, mix, mx_noise_float, normalWorldGeometry, positionWorld, smoothstep, vec3 } = TSL as unknown as Record<string, N>
+  const P = positionWorld, n = normalWorldGeometry
+  const c = attribute('plinthCentre', 'vec3'), h = attribute('plinthHalf', 'vec3'), top = attribute('plinthTop', 'float')
+  // on a face one axis stands at its half: the arris is the next nearest
+  const d = h.sub(P.sub(c).abs()).max(0)
+  const edgeM = d.x.add(d.y).add(d.z).sub(d.x.max(d.y).max(d.z)).sub(d.x.min(d.y).min(d.z))
+  const fw = fwidth(edgeM).max(1e-5)
+  const arris = float(1).sub(smoothstep(float(.004).sub(fw), float(.004).add(fw), edgeM))
+  const speck = mx_noise_float(P.mul(190)).mul(.5).add(mx_noise_float(P.mul(41)).mul(.5))
+  const cloud = mx_noise_float(P.mul(vec3(2.1, 4.7, 2.1)))
+  const scale = mx_noise_float(P.mul(vec3(7, 13, 7))).add(mx_noise_float(P.mul(31)).mul(.4))
+  const scuff = smoothstep(.09, .01, P.y.sub(FLOOR)).mul(n.y.abs().oneMinus()).mul(smoothstep(.1, .5, mx_noise_float(P.mul(vec3(18, 40, 18)))))
+  const base = m.colorNode as N, rough = m.roughnessNode as N
+  // honed bluestone shows pale crinoid flecks, drawn only where a pixel can
+  // hold one; the steel collects a band of dust at its foot
+  const rho = fwidth(P.x).add(fwidth(P.y)).add(fwidth(P.z))
+  const fleck = smoothstep(.5, .72, mx_noise_float(P.mul(95))).mul(float(1).sub(smoothstep(.004, .01, rho)))
+  const stone = base.mul(1.3).mul(float(1).add(speck.mul(.26)).add(cloud.mul(.24))).mul(fleck.mul(.9).add(1))
+  const dust = smoothstep(.16, .02, P.y.sub(FLOOR)).mul(n.y.abs().oneMinus()).mul(mx_noise_float(P.mul(vec3(9, 3, 9))).mul(.3).add(.7))
+  const steel = mix(base.mul(.72).mul(float(1).add(smoothstep(-.35, .45, scale).mul(.5))), base.mul(1.4).add(vec3(.01, .0095, .008)), dust.mul(.45))
+  const face = mix(steel, stone, top)
+  m.colorNode = mix(face, face.mul(2.3).add(vec3(.012, .011, .01)), arris.mul(.8)).mul(float(1).sub(scuff.mul(.3)))
+  m.roughnessNode = mix(float(.5).add(scale.mul(.06)), rough, top).sub(arris.mul(top).mul(.12)).add(scuff.mul(.12)).clamp(.05, 1)
+  m.metalnessNode = float(1).sub(top).mul(.3)
+}
+
 /** Runs of a span with gaps cut out of it. */
 function runs(from: number, to: number, gaps: [number, number][]): [number, number][] {
   const out: [number, number][] = []
@@ -107,13 +157,16 @@ function runs(from: number, to: number, gaps: [number, number][]): [number, numb
  * the plinths under the hall's machines, and between the beams a ceiling of
  * oak slats over a dark backing. Doors are left open to their reveals and
  * lintels. */
-function skins(): { walls: Skin; overhead: Skin; floor: Skin; plinths: Skin; slats: Skin; backing: Skin } {
+function skins(): { walls: Skin; overhead: Skin; floor: Skin; plinths: Skin; plinthBoxes: PlinthBox[]; slats: Skin; backing: Skin } {
   const H = ROOMS.hall, walls = new Skin(), overhead = new Skin(), floor = new Skin(), plinths = new Skin()
-  const slats = new Skin(), backing = new Skin()
+  const slats = new Skin(), backing = new Skin(), plinthBoxes: PlinthBox[] = []
   for (const b of standBoxes()) {
     if (b.east < H.west || b.east > H.east || b.north < H.south || b.north > H.north) continue
     // the top slab stands over a shadow gap, so its underside is seen
     plinths.box(b.east, b.north, b.height, b.width, b.depth, b.tall, .005, b.role === 2)
+    const under = b.role === 2 ? .005 : 0
+    plinthBoxes.push({ centre: new Vector3(b.east, b.height + (.005 - under) / 2, -b.north),
+      half: new Vector3(b.width / 2 + .005, b.tall / 2 + (.005 + under) / 2, b.depth / 2 + .005), top: b.role === 2 })
   }
   const low = FLOOR + GAP
   const lintel = -2.5 + .26
@@ -177,7 +230,7 @@ function skins(): { walls: Skin; overhead: Skin; floor: Skin; plinths: Skin; sla
   // the floor, a few millimetres over the construction's own
   floor.quad([H.west, H.south, FLOOR + .003], [H.east, H.south, FLOOR + .003],
     [H.east, H.north, FLOOR + .003], [H.west, H.north, FLOOR + .003], [0, 0, 1])
-  return { walls, overhead, floor, plinths, slats, backing }
+  return { walls, overhead, floor, plinths, plinthBoxes, slats, backing }
 }
 
 const { abs, cameraPosition, cameraViewMatrix, cross, dot, float, floor: floorOf, fract, log2, mix,
@@ -456,7 +509,7 @@ export interface HallFabric {
 /** The hall's finish, its materials and the floor's reflection, each surface
  * lit by the hall's own rig through `adopt`. */
 export function mountHallFabric(stack: Stack, adopt: (material: Material) => void): HallFabric {
-  const { walls, overhead, floor, plinths, slats, backing } = skins()
+  const { walls, overhead, floor, plinths, plinthBoxes, slats, backing } = skins()
   const concrete = stack.materials.sync('concrete-wall-formed')
   const ground = stack.materials.sync('concrete-floor-polished')
   const oak = stack.materials.sync('oak-veneer-light')
@@ -479,6 +532,7 @@ export function mountHallFabric(stack: Stack, adopt: (material: Material) => voi
   // A plinth is a dark honed stone, so the machine on it is the lighter thing.
   const plinthLook: Look = { metres: 1.5, tint: [.36, .35, .34], rough: [.32, .62], normal: .5, drift: .04 }
   const plinthMaterial = fabricMaterial(ground, plinthLook, 'plinths')
+  dressPlinths(plinthMaterial)
   const materials = [wallMaterial, overheadMaterial, floorSurface, plinthMaterial, slatMaterial, backingMaterial]
   for (const material of materials) adopt(material)
   // THE FLOOR IS SEALED, and a sealed floor carries what stands on it: the
@@ -500,8 +554,8 @@ export function mountHallFabric(stack: Stack, adopt: (material: Material) => voi
     // dust and an open cut are no mirror
     floorSurface.emissiveNode = seen.min(vec3(1.2, 1.2, 1.2)).mul(fresnel).mul(float(FLOOR_FINISH.reflection).mul(float(1).sub(held)))
   }
-  const make = (skin: Skin, material: MeshStandardNodeMaterial, name: string): Mesh => {
-    const mesh = new Mesh(skin.geometry(), material)
+  const make = (skin: Skin | BufferGeometry, material: MeshStandardNodeMaterial, name: string): Mesh => {
+    const mesh = new Mesh(skin instanceof Skin ? skin.geometry() : skin, material)
     mesh.name = `vinci/collection-hall-fabric/${name}`
     mesh.castShadow = false; mesh.receiveShadow = true
     mesh.userData = { ...HALL_FABRIC_PROVENANCE }
@@ -511,7 +565,7 @@ export function mountHallFabric(stack: Stack, adopt: (material: Material) => voi
   group.name = 'vinci/collection-hall-fabric'
   group.userData = { ...HALL_FABRIC_PROVENANCE }
   group.add(make(walls, wallMaterial, 'walls'), make(overhead, overheadMaterial, 'overhead'), make(floor, floorSurface, 'floor'),
-    make(plinths, plinthMaterial, 'plinths'), make(slats, slatMaterial, 'slats'), make(backing, backingMaterial, 'backing'))
+    make(plinthGeometry(plinths, plinthBoxes), plinthMaterial, 'plinths'), make(slats, slatMaterial, 'slats'), make(backing, backingMaterial, 'backing'))
   const ready = Promise.all([concrete, ground, oak].map(set => stack.materials.load(set.name))).then(() => undefined)
   return {
     group,
