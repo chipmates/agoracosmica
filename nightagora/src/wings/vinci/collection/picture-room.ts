@@ -580,7 +580,7 @@ export function mountPictureRoom(stack: Stack): PictureRoom {
     g.setAttribute('heart', new Float32BufferAttribute(new Float32Array(g.getAttribute('position').count * 3), 3))
     return g
   }
-  make(merged([...bench.oak.parts.map(g => flag(g, 'metal', 0)), ...bench.bronze.parts.map(g => hearted(flag(flag(g, 'grain', 0), 'metal', 1)))]), benchOak, 'benches')
+  make(merged([...bench.oak.parts, ...walls.lining.parts].map(g => flag(g, 'metal', 0)).concat(bench.bronze.parts.map(g => hearted(flag(flag(g, 'grain', 0), 'metal', 1))))), benchOak, 'benches')
   {
     const { metal, lenses } = fittings()
     const anodised = new MeshStandardNodeMaterial({ roughness: .38, metalness: .8 })

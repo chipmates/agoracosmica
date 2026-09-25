@@ -624,10 +624,12 @@ function inFrame(frames: readonly HangFrame[], east: number, low: number, high: 
 
 /** THE WALLS: the hang's deep plaster over the lining, stopped over the floor
  * by a shadow gap with a dark back; the frieze stepping forward at the rail
- * and its soffit; the door surrounds wrapped in the same plaster; the west
- * wall the same. The plaster runs behind every frame: a frame stands on it. */
-export function wallSkins(): { plaster: Skin; frieze: Skin; backing: Skin } {
-  const plaster = new Skin(), frieze = new Skin(), backing = new Skin(), X = ROOM
+ * and its soffit; the door surrounds' faces in the same plaster, and their
+ * passages through the wall lined in the benches' oiled oak, so a door reads
+ * the same from the room on either side; the west wall the same plaster.
+ * The plaster runs behind every frame: a frame stands on it. */
+export function wallSkins(): { plaster: Skin; frieze: Skin; backing: Skin; lining: Solid } {
+  const plaster = new Skin(), frieze = new Skin(), backing = new Skin(), lining = new Solid(true), X = ROOM
   const low = FLOOR + X.gap, gapTop = low + .004
   const doorHall = DOORS.hall.reveals, doorGallery = DOORS.gallery.reveals
   // the hanging wall runs between the two door surrounds
@@ -659,13 +661,15 @@ export function wallSkins(): { plaster: Skin; frieze: Skin; backing: Skin } {
     // the returns where the wall meets each surround
     if (west - REVEAL.half - skin > X.westFinish + .01) plaster.northSouth(west - REVEAL.half - skin, -1, X.finish, front, low, X.friezeFoot + .004)
     plaster.northSouth(outerEast, 1, X.finish, front, low, X.friezeFoot + .004)
-    // the jambs, the wall's whole thickness, and the head's soffit
-    const back = REVEAL.back - skin
-    if (jambWest) plaster.northSouth(innerWest, 1, back, front, FLOOR + .004, X.friezeFoot)
-    if (jambEast) plaster.northSouth(innerEast, -1, back, front, FLOOR + .004, X.friezeFoot)
-    plaster.level({ west: innerWest, south: back, east: innerEast, north: front }, X.friezeFoot, -1)
+    // the lining: the jambs through the wall's whole thickness and the head's
+    // soffit, each a board inside the surround's own certified box, a hair
+    // behind the front so no two faces share its plane
+    const back = REVEAL.back - skin, face = front - .001
+    if (jambWest) lining.box([innerWest - skin + .0005, back, FLOOR + .004, innerWest, face, X.friezeFoot])
+    if (jambEast) lining.box([innerEast, back, FLOOR + .004, innerEast + skin - .0005, face, X.friezeFoot])
+    lining.box([innerWest, back, X.friezeFoot, innerEast, face, X.friezeFoot + skin], true)
   }
-  return { plaster, frieze, backing }
+  return { plaster, frieze, backing, lining }
 }
 
 /** THE BULKHEAD over the hanging wall, closing the cove the construction left
