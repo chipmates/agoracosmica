@@ -2077,6 +2077,14 @@ function hallMaterial(perPixel: boolean, library?: MaterialLibrary, sunShadow?: 
     westSky = westSky.mul(2.4).mul(inHallShade).mul(bay)
     bounce = sun.mul(inHallShade).mul(bay).add(door.mul(LINK_DOOR_GAIN).add(side.mul(LINK_SIDE_GAIN)).add(LINK_FILL).mul(isLink)).add(entrance.y.mul(3.2).mul(isEntrance))
   }
+  // THE BOARDS OVERHEAD. One bounce leaves the ceiling's oak between the
+  // joists near black; the room's later bounces off the limewash and the
+  // joists' sides reach it too. An exhibition lift, not a measured transport.
+  {
+    const overhead = is(K.OAK).mul(smoothstep(-.02, .01, positionWorld.y.sub(CEIL_Z)))
+    bounce = bounce.mul(mix(float(1), float(4), overhead))
+    ambient = ambient.mul(mix(float(1), float(3), overhead))
+  }
   const Wp = positionWorld, T = uv()
   // along the passage wall, in metres: what the hearth's courses run along
   const alongWall = Wp.x.mul(V[0]).sub(Wp.z.mul(V[1]))
