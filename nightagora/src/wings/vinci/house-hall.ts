@@ -1051,7 +1051,7 @@ function furnish(s: Sink, hero: boolean): void {
   chest(s, hero)
   boxChair(s)
   stool(s, TABLE.u + .78, TABLE.v - .75, .12, 91)
-  stool(s, TABLE.u + .8, TABLE.v + .9, -.2, 92)
+  stool(s, TABLE.u + .8, TABLE.v + .6, -.2, 92)
   // on the table: two brass candlesticks, their candles never lit, a jug,
   // and a glazed dish set down in the sun at the table's south end
   const top = FLOOR_Z + TABLE.size[2]
@@ -1139,13 +1139,16 @@ function trestleTable(s: Sink): void {
   }
   for (const dv of [-l / 2 + .55, l / 2 - .55]) {
     hbox(s, u - w / 2 + .06, u + w / 2 - .06, v + dv - .05, v + dv + .05, h - .14, h - .05, K.WAX, 104)
-    for (const su of [-1, 1]) for (const sv of [-1, 1]) {
-      const top: V3 = [u + su * (w / 2 - .16), v + dv + sv * .03, h - .1]
-      const foot: V3 = [u + su * (w / 2 - .03), v + dv + sv * .17, 0]
-      post(s, foot, top, .06, K.WAX, 105)
+    const top = (su: number, sv: number): V3 => [u + su * (w / 2 - .16), v + dv + sv * .03, h - .1]
+    const foot = (su: number, sv: number): V3 => [u + su * (w / 2 - .03), v + dv + sv * .17, 0]
+    for (const su of [-1, 1]) for (const sv of [-1, 1]) post(s, foot(su, sv), top(su, sv), .06, K.WAX, 105)
+    // a low stretcher ties each pair of legs across, its ends in the legs:
+    // the legs splay, so each runs where its own pair stands at that height
+    const zs = .225, t = zs / (h - .1)
+    for (const sv of [-1, 1]) {
+      const reach = foot(1, sv)[0] - u + (top(1, sv)[0] - foot(1, sv)[0]) * t, at = foot(1, sv)[1] + (top(1, sv)[1] - foot(1, sv)[1]) * t
+      hbox(s, u - reach, u + reach, at - .02, at + .02, zs - .025, zs + .025, K.WAX, 106)
     }
-    // a low stretcher ties each trestle's legs across
-    hbox(s, u - w / 2 + .06, u + w / 2 - .06, v + dv - .02, v + dv + .02, .2, .25, K.WAX, 106)
   }
 }
 /** THE BENCH: A-FURNITURE's plain oak bench, 2.8 m by 0.40 at 0.48: a plank
