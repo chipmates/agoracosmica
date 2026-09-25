@@ -11,7 +11,7 @@ import { buildGraph, openWing } from './graph.mjs'
 import { route } from './router.mjs'
 import {
   PILOT, appendLedger, areaEntries, clipId, countsOf, gateLock, keysOf, machinesOf, onlyEntries, orderEntries, readLedger,
-  recordWhole, stillCurrent, stillId, writeAtomic,
+  recordWhole, resumeWalks, stillCurrent, stillId, writeAtomic,
 } from './render-all.mjs'
 
 const wing = await openWing()
@@ -175,4 +175,15 @@ test('the router over a release that carries every edge walks the whole life', (
   const plans = graph.story.slice(1).map((to, i) => route(graph, graph.story[i], to, { framing: 'upright' }))
   assert.equal(plans.filter((p) => p.type === 'dip').length, graph.cuts.length)
   assert.ok(plans.filter((p) => p.type === 'walk').every((p) => p.clips.length === 1))
+})
+
+test('a resumed session walks its own clips and one clip leaving each of its stills', () => {
+  const todo = onlyEntries(entries, 'pilot').filter((e) => e.framing === 'wide')
+  const walks = resumeWalks(todo, graph, 'wide')
+  const ids = new Set(walks.map((e) => e.id))
+  for (const e of todo.filter((x) => x.kind === 'clip')) assert.ok(ids.has(e.edge), e.edge)
+  for (const e of todo.filter((x) => x.kind === 'still')) assert.ok(walks.some((w) => w.from === e.node) || !graph.edges.some((g) => g.from === e.node), e.node)
+  assert.ok(walks.length < graph.edges.length / 2, 'far fewer walks than the job has clips')
+  assert.deepEqual(resumeWalks([], graph, 'wide'), [])
+  assert.deepEqual(resumeWalks(todo, graph, 'upright'), [], 'another framing walks none of these')
 })

@@ -9,7 +9,7 @@
 //                                                             machine (`machine/aerial-screw`, its view, clips and cycle)
 //   node forge/film/render-all.mjs --job=<dir> --status       the ledger against the job, the hours left, the joins
 //     [--only=pilot|<entry id,...>] [--framings=wide,upright] [--limit=N] [--port=5573] [--origin-port=5572]
-//     [--lock=gate|none] [--accept-held] [--walk=job|run]
+//     [--lock=gate|none] [--accept-held] [--walk=job|all|run]
 //
 // The job folder is a release the gate reads (`film-check.mjs --release=<dir>`)
 // and the pack packs (`pack.mjs --export=<dir>`). Each output is written under
@@ -20,9 +20,10 @@
 // entries, so a landing sweep can slip in.
 //
 // One set of bodies is held per framing for every still and clip (the mount
-// rule): each session walks every clip of its framing once in silence before it
-// renders, and the names of the set it holds are kept in the job, so a later
-// session that would hold another set says so and stops.
+// rule): the job's first session walks every clip of its framing once in
+// silence before it renders and keeps the names of the set it holds; a later
+// session walks its own clips first, every clip when those hold another set,
+// and stops when even that holds another set than the job's.
 import { chromium } from 'playwright'
 import { execFileSync, spawn } from 'node:child_process'
 import { createHash } from 'node:crypto'
@@ -145,6 +146,20 @@ export function areaEntries(entries, names) {
   // a machine is its view, the clips that reach it, and its cycle
   const want = new Set(names.flatMap((n) => (n.startsWith('machine/') ? [n, `view:${n}`] : [n])))
   return entries.filter((e) => e.areas.some((a) => want.has(a)))
+}
+
+/** THE WALKS A RESUMED SESSION TAKES FIRST, once a session of the job has walked
+    every clip and kept the union: this run's own clips of the framing and one
+    clip leaving each still it renders. They hold the job's set when the union
+    is the same from any walk; the rest is walked only when they do not. */
+export function resumeWalks(todo, graph, framing) {
+  const ids = new Set(todo.filter((x) => x.kind === 'clip' && x.framing === framing).map((x) => x.edge))
+  for (const x of todo) {
+    if (x.kind !== 'still' || x.framing !== framing) continue
+    const leaving = graph.edges.find((e) => e.from === x.node)
+    if (leaving) ids.add(leaving.id)
+  }
+  return graph.edges.filter((e) => ids.has(e.id))
 }
 
 /** the pilot's entries, or named ones */
@@ -508,35 +523,49 @@ async function run(flags) {
   }
   const standFraming = async (framing, browser, t0) => {
     // a smoke run stands only at the nodes its own entries touch
-    const warm = flags.get('walk') === 'run'
+    const mode = String(flags.get('walk') ?? 'job')
+    const warm = mode === 'run'
       ? [...new Set(todo.filter((x) => x.framing === framing).flatMap((x) => (x.kind === 'clip' ? [x.from, x.to] : x.kind === 'still' ? [x.node] : [])))].map((id) => nodes.get(id))
       : graph.nodes
     const s = await openSession(browser, framing, { base: BASE, scale: 1, sink, warmNodes: warm, log, view: null })
     lock.release()
     const warmed = Date.now()
-    /* THE HELD SET IS THE JOB'S: every clip of the framing walked (`--walk=run`
-       walks only this run's clips, for a smoke run in a job of its own) */
-    const walkRun = flags.get('walk') === 'run'
-    const walks = walkRun ? [...new Set(todo.filter((x) => x.kind === 'clip' && x.framing === framing).map((x) => x.edge))].map((id) => edges.get(id)) : graph.edges
-    log(`  ${framing}: the session stood at ${warm.length} nodes in ${Math.round((warmed - t0) / 1000)} s; the silent walks of ${walks.length} clips begin`)
+    /* THE HELD SET IS THE JOB'S: the first session walks every clip of the
+       framing and keeps the union; a resumed one walks its own first and the
+       rest only when those hold another set (`--walk=all` walks every clip
+       again; `--walk=run` walks only this run's clips, for a smoke run in a
+       job of its own) */
+    const heldFile = join(dir, `held-${framing}${mode === 'run' ? '-run' : ''}.json`)
+    const union = existsSync(heldFile) ? JSON.parse(readFileSync(heldFile, 'utf8')) : null
+    const resumed = mode === 'job' && union?.walked === 'all'
+    const walks = mode === 'run' ? [...new Set(todo.filter((x) => x.kind === 'clip' && x.framing === framing).map((x) => x.edge))].map((id) => edges.get(id))
+      : resumed ? resumeWalks(todo, graph, framing) : graph.edges
+    log(`  ${framing}: the session stood at ${warm.length} nodes in ${Math.round((warmed - t0) / 1000)} s; the silent walks of ${walks.length} clips begin${resumed ? ' (a resumed session: its own walks first)' : ''}`)
     const steps = []
-    let walked = 0
-    for (const e of walks) {
+    const done = new Set()
+    const walkAll = async (list) => {
+      for (const e of list) {
+        if (done.has(e.id)) continue
+        await lock.take()
+        const w = await silentWalk(s.page, nodes.get(e.from), nodes.get(e.to), e.motion, e.id)
+        steps.push(w.steps)
+        done.add(e.id)
+        if (done.size % 40 === 0) log(`  ${framing}: ${done.size} walked, ${steps.reduce((a, b) => a + b, 0)} steps, ${Math.round((Date.now() - warmed) / 1000)} s`)
+        lock.release()
+      }
       await lock.take()
-      const w = await silentWalk(s.page, nodes.get(e.from), nodes.get(e.to), e.motion, e.id)
-      steps.push(w.steps)
-      walked++
-      if (walked % 40 === 0) log(`  ${framing}: ${walked} walked, ${steps.reduce((a, b) => a + b, 0)} steps, ${Math.round((Date.now() - warmed) / 1000)} s`)
+      const n = await s.page.evaluate(() => window.__naExport.hold('*'))
+      const names = await s.page.evaluate(() => window.__naExport.held())
       lock.release()
+      return { count: n, held: names, heldSha: sha256(names.join('\n')) }
     }
-    await lock.take()
-    const count = await s.page.evaluate(() => window.__naExport.hold('*'))
-    const held = await s.page.evaluate(() => window.__naExport.held())
-    lock.release()
+    let { count, held, heldSha } = await walkAll(walks)
+    if (resumed && heldSha !== union.sha256) {
+      log(`  ${framing}: its own walks held ${count} bodies (${heldSha.slice(0, 12)}), not the job's ${union.count}: every clip is walked`)
+      ;({ count, held, heldSha } = await walkAll(graph.edges))
+    }
     const walkSeconds = (Date.now() - warmed) / 1000
-    const heldFile = join(dir, `held-${framing}${walkRun ? '-run' : ''}.json`)
-    const heldSha = sha256(held.join('\n'))
-    if (!existsSync(heldFile)) writeAtomic(heldFile, JSON.stringify({ framing, count, sha256: heldSha, session, names: held }, null, 1))
+    if (!existsSync(heldFile)) writeAtomic(heldFile, JSON.stringify({ framing, count, sha256: heldSha, session, walked: mode === 'run' ? 'run' : 'all', names: held }, null, 1))
     const kept = JSON.parse(readFileSync(heldFile, 'utf8'))
     const same = kept.sha256 === heldSha
     log(`  ${framing}: ${steps.reduce((a, b) => a + b, 0)} silent steps in ${Math.round(walkSeconds)} s; ${count} bodies held; the job's set ${same ? 'the same' : 'DIFFERS'} (${heldSha.slice(0, 12)} against ${kept.sha256.slice(0, 12)})`)
