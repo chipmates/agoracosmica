@@ -40,8 +40,6 @@ const p=(e:number,n:number,h:number,te:number,tn:number,th:number,fov=49):Pose=>
  * out from behind the card. The eye does not move: the visitor stands where
  * the room's own view stands them. */
 const NARROW_LENS=1.26, NARROW_AIM_SHARE=.21
-/** The phone stage the narrow poses are composed against, 390 by 844 px. */
-const PHONE_STAGE=390/844
 /** THE HALL IS STAGED FOR THE PHONE, NOT CROPPED FROM ITS WIDE VIEW. A 390 px
  * stage has under half the wide frame's width, so the aerial screw's sail is
  * centred by yaw before anything else: the flight station turns four and a
@@ -68,6 +66,13 @@ const HALL_DOOR=p(-4.2388,-11.0992,2.45,-4.2388,-11.0992,2.45)
 /** The body wall's phone eye, square on its hang's axis 4.7 m off the linen:
  * the nearest place a 390 px stage holds the whole recess between its jambs. */
 const BODY_PHONE=p(-34,-52.6,FLOOR+1.62,-34,-52.6,FLOOR+1.62)
+/** THE DISPLAY WALL'S DESKTOP EYE STANDS UNDER THE NAVE'S WEST END. From
+ * eleven metres the nave's north beam, its foot 3.2 m over the floor, stood
+ * across the field's upper north corner. From 6.4 m, forty centimetres south
+ * of the axis, the line to that corner passes beyond the beam's west end and
+ * under the bay's step, and the eye still faces the wall square. The phone's
+ * eye stands further back, where its lens can hold the field's width. */
+const SUPPER_DESK_EYE={east:-38.4,north:SUPPER_WALL.north-.4}
 /** The chamber's eye, on the lawn under the court's south-west corner. */
 const CHAMBER_LAWN=standing(-4,-38)
 function narrowRoomPose(pose:Pose,share=NARROW_AIM_SHARE):Pose {
@@ -157,20 +162,20 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // own room views were composed from. A room is entered through its door and
   // seen from where a visitor would stand to read it.
   // The wall that is not here is a measurement, and a measurement is read
-  // square: the eye stands eleven metres off its field, which is what holds
-  // all 8.8 by 4.6 m of the absence in one frame.
+  // square, or as near square as a stage can hold it: the desktop's eye stands
+  // at the bay's mouth (SUPPER_DESK_EYE), the phone's 9.3 m off the field.
   if(id==='supper-wall'){
     const face=SUPPER_WALL.east+SUPPER_WALL.thickness/2
-    const square=p(-33.9,SUPPER_WALL.north,COURT.level+1.66,face,SUPPER_WALL.north,COURT.level+2.95,62)
-    if(!narrow) return square
-    // THE MEASUREMENT IS WHAT THE PHONE HOLDS. A 390 px stage at the room's
-    // own lens keeps 8.15 m of the field's 8.8 and loses both ends of it, so
-    // the lens comes off the field's width at this reach with a sixth of it
-    // as margin, and the aim drops to the wall's foot, which stands the whole
-    // outline above the card.
-    const reach=Math.abs(square.eye.x-face)
-    const fov=Math.atan(SUPPER_WALL.field.width/2*1.16/reach/PHONE_STAGE)*360/Math.PI
-    return p(-33.9,SUPPER_WALL.north,COURT.level+1.66,face,SUPPER_WALL.north,COURT.level+.15,fov)
+    if(!narrow){const {east,north}=SUPPER_DESK_EYE;return p(east,north,COURT.level+1.66,face,north,COURT.level+1.66+Math.tan(8*Math.PI/180)*(east-face),62)}
+    // THE MEASUREMENT IS WHAT THE PHONE HOLDS. A 390 px stage takes the whole
+    // 8.8 m field with a margin at a lens under a hundred degrees only from
+    // nine metres or more, and on the axis at that reach the nave's north beam
+    // crossed the field's upper north corner. The phone's eye stands 1.5 m
+    // south of the axis, where the line to that corner passes the beam's west
+    // end, and turns seven and a half degrees off square onto the field: its
+    // far end stands about a tenth shorter than its near end, and the whole
+    // outline stands above the sheet.
+    return aimedFrom(p(-35.5,-31,COURT.level+1.66,-35.5,-31,COURT.level+1.66),-82.5,-2,100)
   }
   // THE BODY WALL'S PHONE STANDS SQUARE ON THE HANG. From the room's own eye
   // the portrait stage took the recess at its top and bare floor for its

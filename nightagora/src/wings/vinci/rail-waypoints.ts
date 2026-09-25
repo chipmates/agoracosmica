@@ -100,6 +100,11 @@ const COURT_EAST: RailWaypoint = [COURT.east - 1.4, SUPPER_WALL.north, COURT.lev
  * the lane would otherwise run, so the walk leaves the station east of it
  * and comes back onto the lane north of the cloth. */
 const COURT_LANE_SOUTH: RailWaypoint = [-32.4, -26, COURT.level + railEyeHeightM]
+/** THE DISPLAY WALL'S EYES LEAVE FOR THE LANE BY ONE TURN. Both stand south
+ * and west of where the one eye stood, and a straight walk from either to the
+ * lane's south end passed the parachute's south-east upright; this turn
+ * stands 1.6 m south of that upright, and from it the lane runs clear. */
+const COURT_LANE_START: RailWaypoint = [-33.375, -28.275, COURT.level + railEyeHeightM]
 const COURT_LANE_EAST: RailWaypoint = [COURT.east - 3, -20.6, COURT.level + railEyeHeightM]
 const COURT_LANE_WEST: RailWaypoint = [-49.5, -20.6, COURT.level + railEyeHeightM]
 
@@ -172,7 +177,7 @@ const LINKS: readonly { from: RailSide; to: RailSide; via: readonly RailWaypoint
   { from: 'apron', to: 'exhibit-court', via: [APRON_CORNER, APRON_NORTH, COURT_EAST] },
   // The lane leaves the display wall's eye due north, so a walk to the grave
   // begins by turning up it and never by stepping back east first.
-  { from: 'exhibit-court', to: 'grave-court', via: [COURT_LANE_SOUTH, COURT_LANE_EAST, COURT_LANE_WEST] },
+  { from: 'exhibit-court', to: 'grave-court', via: [COURT_LANE_START, COURT_LANE_SOUTH, COURT_LANE_EAST, COURT_LANE_WEST] },
   { from: 'picture-room', to: 'long-gallery',
     via: [[PICTURE_TO_GALLERY, FACE.pictureWallNorth + 1.4, INSIDE], [PICTURE_TO_GALLERY, FACE.pictureWallSouth - 1.4, INSIDE]] },
   // The picture room's west door. The hall's side of it stands north of the
