@@ -11,8 +11,9 @@ import { buildGraph, openWing } from './graph.mjs'
 import { route } from './router.mjs'
 import {
   PILOT, appendLedger, areaEntries, clipId, countsOf, gateLock, keysOf, machinesOf, onlyEntries, orderEntries, readLedger,
-  recordWhole, resumeWalks, stillCurrent, stillId, writeAtomic,
+  joinGap, recordWhole, resumeWalks, stillCurrent, stillId, writeAtomic,
 } from './render-all.mjs'
+import sharp from 'sharp'
 
 const wing = await openWing()
 const graph = buildGraph(wing)
@@ -186,4 +187,17 @@ test('a resumed session walks its own clips and one clip leaving each of its sti
   assert.ok(walks.length < graph.edges.length / 2, 'far fewer walks than the job has clips')
   assert.deepEqual(resumeWalks([], graph, 'wide'), [])
   assert.deepEqual(resumeWalks(todo, graph, 'upright'), [], 'another framing walks none of these')
+})
+
+test('a parted join is measured: the pixels that differ and the largest step', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'w7-gap-'))
+  try {
+    const px = Buffer.alloc(8 * 4 * 3, 100)
+    const png = (buf, name) => sharp(buf, { raw: { width: 8, height: 4, channels: 3 } }).png().toFile(join(dir, name))
+    const other = Buffer.from(px); other[0] = 101; other[3 * 9 + 2] = 112
+    await png(px, 'a.png'); await png(other, 'b.png'); await png(px, 'c.png')
+    assert.deepEqual(await joinGap(join(dir, 'a.png'), join(dir, 'b.png')), { pixels: 2, share: 0.0625, max: 12 })
+    assert.deepEqual(await joinGap(join(dir, 'a.png'), join(dir, 'c.png')), { pixels: 0, share: 0, max: 0 })
+    assert.ok((await joinGap(join(dir, 'a.png'), join(dir, 'missing.png'))).error, 'a missing file is named, never thrown')
+  } finally { rmSync(dir, { recursive: true, force: true }) }
 })

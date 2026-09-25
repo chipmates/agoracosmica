@@ -32,6 +32,7 @@ import { loadavg } from 'node:os'
 import { dirname, join, relative, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { gunzipSync } from 'node:zlib'
+import sharp from 'sharp'
 import { APP_ROOT, assertServer, browserArgs, FRAME_TIME_FLAGS, headHere, waitForServer } from '../rig.mjs'
 import { FPS, FRAMINGS, buildGraph } from './graph.mjs'
 import { openReplay, replayEdge } from './replay.mjs'
@@ -390,13 +391,31 @@ export function statusOf(job, records, { now = Date.now() } = {}) {
     const r = done.get(e.id)
     if (e.kind !== 'clip' || !r) continue
     const a = stillRaw.get(`${e.from} ${e.framing}`), b = stillRaw.get(`${e.to} ${e.framing}`)
-    joins.push({ id: e.id, first: a ? r.joins.first === a : null, last: b ? r.joins.last === b : null, frames: r.frames, graph: e.frames, session: r.session, stillSessions: [done.get(stillId(e.from, e.framing))?.session, done.get(stillId(e.to, e.framing))?.session] })
+    joins.push({ id: e.id, first: a ? r.joins.first === a : null, last: b ? r.joins.last === b : null, gaps: r.joinGaps ?? null, frames: r.frames, graph: e.frames, session: r.session, stillSessions: [done.get(stillId(e.from, e.framing))?.session, done.get(stillId(e.to, e.framing))?.session] })
   }
   if (joins.length) {
     lines.push(`  joins by sha256: ${joins.filter((j) => j.first && j.last).length} of ${joins.length} clips identical at both ends`)
-    for (const j of joins) lines.push(`    ${j.id}: first ${j.first}, last ${j.last}; ${j.frames} frames (the graph ${j.graph})${j.stillSessions.some((s) => s && s !== j.session) ? '; a still from another session' : ''}`)
+    const gap = (g) => (g ? (g.max != null ? ` (${g.pixels} px, up to ${g.max})` : ` (${g.size ?? g.error})`) : '')
+    for (const j of joins) lines.push(`    ${j.id}: first ${j.first}${gap(j.gaps?.first)}, last ${j.last}${gap(j.gaps?.last)}; ${j.frames} frames (the graph ${j.graph})${j.stillSessions.some((s) => s && s !== j.session) ? '; a still from another session' : ''}`)
   }
   return { text: lines.join('\n'), kinds, joins, hoursLeft: left / 3600 }
+}
+
+/** HOW FAR A PARTED JOIN PARTS: the pixels that differ and the largest step
+ * of a channel, a clip's kept end frame against its still's master. Two
+ * sessions of one build part by a level in under one percent of the pixels;
+ * a join that parts further is not a session's drift. */
+export async function joinGap(frameFile, stillFile) {
+  try {
+    const [a, b] = await Promise.all([frameFile, stillFile].map((f) => sharp(f).removeAlpha().raw().toBuffer({ resolveWithObject: true })))
+    if (a.info.width !== b.info.width || a.info.height !== b.info.height) return { size: `${a.info.width}x${a.info.height} against ${b.info.width}x${b.info.height}` }
+    let pixels = 0, max = 0
+    for (let i = 0; i < a.data.length; i += 3) {
+      const d = Math.max(Math.abs(a.data[i] - b.data[i]), Math.abs(a.data[i + 1] - b.data[i + 1]), Math.abs(a.data[i + 2] - b.data[i + 2]))
+      if (d) { pixels++; if (d > max) max = d }
+    }
+    return { pixels, share: round(pixels / (a.info.width * a.info.height), 5), max }
+  } catch (err) { return { error: String(err.message ?? err).slice(0, 120) } }
 }
 
 /* ---- the run ---- */
@@ -665,11 +684,13 @@ async function renderClip(e, fs, { dir, nodes, edges, inbox, job, replay, graph,
   const joinsAgree = { first: a?.status === 'done' ? r.joins.first === a.raw : null, last: b?.status === 'done' ? r.joins.last === b.raw : null }
   // the ends' frames are kept only where a join parts, for the table to read
   const ends = [join(opts.frameDir, `${r.stem}-${e.framing}-f0000.png`), join(opts.frameDir, `${r.stem}-${e.framing}-last.png`)]
+  const joinGaps = {}
+  for (const [k, still, end] of [['first', a, ends[0]], ['last', b, ends[1]]]) if (joinsAgree[k] === false && still?.master?.file) joinGaps[k] = await joinGap(end, join(dir, still.master.file))
   if (joinsAgree.first !== false && joinsAgree.last !== false) for (const f of ends) rmSync(f, { force: true })
   const seen = written(dir, r.seen.file)
   return {
     status: r.refused?.length ? 'refused' : 'done', ...(r.refused?.length ? { refused: r.refused } : {}),
-    stem: r.stem, frames: r.frames, graphFrames: e.frames, files, joins: r.joins, joinsAgree, track: r.track,
+    stem: r.stem, frames: r.frames, graphFrames: e.frames, files, joins: r.joins, joinsAgree, ...(Object.keys(joinGaps).length ? { joinGaps } : {}), track: r.track,
     settledIn: r.settledIn, settledLastIn: r.settledLastIn, draws: r.draws, over: r.over, exportSeconds: round(r.seconds, 1),
     requestsAfterClock: r.requestsAfterClock, starvedSteps: r.starvedSteps, pageErrors: r.pageErrors, pendingAtRest: r.pendingAtRest,
     mountedSetChanges: r.mountedSetChanges, floorCeilingMax: r.floorCeilingMax, seenCells, sidecar: sidecarRel,
