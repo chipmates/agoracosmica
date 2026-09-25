@@ -163,7 +163,7 @@ const DOOR_H = Math.max(KITCHEN_DOOR.height_m, LINK_DOOR.height_m)
 /* ---- the sink: one mesh, every surface a kind the material reads ---- */
 
 /** Surface kinds, read by the material. */
-export const K = { TILE: 0, JOINT: 1, PLASTER: 2, OAK: 3, STONE: 4, BRICK: 5, IRON: 6, BRASS: 7, GLAZE: 8, ASH: 9, CHAR: 10, WAX: 11, WEATHERED: 12, REVEAL: 13, CLOTH: 14, EARTH: 15 } as const
+export const K = { TILE: 0, JOINT: 1, PLASTER: 2, OAK: 3, STONE: 4, BRICK: 5, IRON: 6, BRASS: 7, GLAZE: 8, ASH: 9, CHAR: 10, WAX: 11, WEATHERED: 12, REVEAL: 13, CLOTH: 14, EARTH: 15, CANDLE: 16 } as const
 interface Vertex { p: V3; n: V3; t: V2; kind: number; seed: number; wear: number; soot: number; lit: number; cast: boolean; fixed?: [number, number] }
 class Sink {
   v: Vertex[] = []
@@ -1298,7 +1298,7 @@ function candlestick(s: Sink, base: V3, seed: number): void {
     [.024, .058], [.014, .068], [.022, .083], [.013, .094], [.021, .108], [.013, .119], [.022, .133], [.013, .144], [.02, .156],
     [.014, .166], [.032, .176], [.030, .215], [.022, .217], [0, .217]]
   s.lathe(base, prof, 14, K.BRASS, seed)
-  s.lathe([base[0], base[1], base[2] + .205], [[0, 0], [.012, 0], [.012, .11], [.009, .118], [0, .12]], 10, K.WAX, 150)
+  s.lathe([base[0], base[1], base[2] + .205], [[0, 0], [.012, 0], [.012, .11], [.009, .118], [0, .12]], 10, K.CANDLE, 150)
 }
 /** A JUG OF THE PERIOD, after the Beauvais jug V&A C.185-1909: a round belly
  * under a narrow neck, a dark green glaze over the clay, a strap handle. */
@@ -2165,6 +2165,8 @@ function hallMaterial(perPixel: boolean, library?: MaterialLibrary, sunShadow?: 
   // the furniture's oak: darker, waxed, handled
   const wax = vec3(.11, .065, .036).mul(grain.mul(1.1).add(1)).mul(fract(seed.mul(3.17)).mul(.16).add(.92))
   const brass = vec3(.50, .36, .16).mul(mx_noise_float(Wp.mul(60)).mul(.08).add(.95))
+  // beeswax, bleached, never lit: an ivory that yellows toward the socket
+  const candle = mix(vec3(.62, .56, .43), vec3(.54, .46, .32), mx_noise_float(Wp.mul(24)).mul(.5).add(.5)).mul(mx_noise_float(Wp.mul(90)).mul(.04).add(1))
   const glaze = mix(vec3(.030, .075, .024), vec3(.045, .10, .035), mx_noise_float(Wp.mul(35)).mul(.5).add(.5))
   // lead glaze over a pale slip, honey where it pooled thin, green where the
   // copper ran in it
@@ -2186,7 +2188,7 @@ function hallMaterial(perPixel: boolean, library?: MaterialLibrary, sunShadow?: 
     .mul(is(K.STONE).add(is(K.TILE).mul(.45)))
   tuffJ = mix(tuffJ, ashC, spill.mul(.55))
   tileColour = mix(tileColour, ashC.mul(.8), spill.mul(.4))
-  const clean = silvered.mul(is(K.WEATHERED)).add(wax.mul(is(K.WAX))).add(brass.mul(is(K.BRASS))).add(glaze.mul(is(K.GLAZE))).add(earth.mul(is(K.EARTH))).add(cloth.mul(is(K.CLOTH))).add(tileColour.mul(is(K.TILE))).add(joint.mul(is(K.JOINT))).add(plaster.mul(is(K.PLASTER).add(is(K.REVEAL)))).add(oak.mul(is(K.OAK)))
+  const clean = silvered.mul(is(K.WEATHERED)).add(wax.mul(is(K.WAX))).add(candle.mul(is(K.CANDLE))).add(brass.mul(is(K.BRASS))).add(glaze.mul(is(K.GLAZE))).add(earth.mul(is(K.EARTH))).add(cloth.mul(is(K.CLOTH))).add(tileColour.mul(is(K.TILE))).add(joint.mul(is(K.JOINT))).add(plaster.mul(is(K.PLASTER).add(is(K.REVEAL)))).add(oak.mul(is(K.OAK)))
     .add(tuffJ.mul(is(K.STONE))).add(brickHot.mul(is(K.BRICK))).add(iron.mul(is(K.IRON))).add(ashC.mul(is(K.ASH))).add(charC.mul(is(K.CHAR)))
   // soot: carried by the surface, gathered in blotches and rising streaks
   // THE BREAST OVER THE OPENING. A fire that draws badly rolls its smoke out
@@ -2230,7 +2232,7 @@ function hallMaterial(perPixel: boolean, library?: MaterialLibrary, sunShadow?: 
   const colour = mix(mix(mix(clean, hearthStone, onSlab), vec3(.07, .045, .03), scorch.mul(tileHearth).mul(.55)).mul(float(1).sub(crumbs.mul(tileHearth).mul(.7))), vec3(.012, .011, .010), sootField)
   m.colorNode = colour
   m.roughnessNode = float(.9).sub(is(K.TILE).mul(float(.22).add(wear.mul(.28))).mul(float(1).sub(jointCover))).sub(is(K.OAK).mul(.12)).add(is(K.JOINT).mul(.05)).sub(is(K.IRON).mul(.08))
-    .sub(is(K.WAX).mul(float(.3).sub(grain.mul(1.4)))).sub(is(K.BRASS).mul(.55)).sub(is(K.GLAZE).add(is(K.EARTH)).mul(.72)).add(is(K.CLOTH).mul(.08)).add(is(K.WEATHERED).mul(.05)).sub(is(K.BRICK).mul(brickSoot).mul(.3))
+    .sub(is(K.WAX).mul(float(.3).sub(grain.mul(1.4)))).sub(is(K.CANDLE).mul(.38)).sub(is(K.BRASS).mul(.55)).sub(is(K.GLAZE).add(is(K.EARTH)).mul(.72)).add(is(K.CLOTH).mul(.08)).add(is(K.WEATHERED).mul(.05)).sub(is(K.BRICK).mul(brickSoot).mul(.3))
   m.metalnessNode = is(K.BRASS)
   m.aoNode = clamp(ambient, 0, 1)
   // A surface of the passage takes no direct sun: nothing faces it.
