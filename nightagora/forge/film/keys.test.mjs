@@ -5,7 +5,8 @@
 //   node --test forge/film/keys.test.mjs
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { drawable, globalKey } from './keys.mjs'
+import { BYTE_EXEMPT } from './film-check.mjs'
+import { DELIVERY, clipDeliveryKey, deliveryKey, drawable, globalKey } from './keys.mjs'
 import { createLoader } from './load.mjs'
 import { libraryOf } from './scene.mjs'
 import { mergeManifests } from '../vite-na-assets.mjs'
@@ -46,4 +47,17 @@ test('a texture the world binds moves the global key', () => {
   assert.deepEqual(Object.keys(after.parts).filter((k) => after.parts[k] !== before.parts[k]), ['library sets no plate claims'])
   const added = [...store, { id: 'library/new-stone/albedo', wing: 'library', path: 'library/new-stone/albedo.ktx2', sha256: '1'.repeat(64) }]
   assert.notEqual(keyOf(added), keyOf(store), 'a texture added moves the key')
+})
+
+test("the delivery key moves for the grass's legs alone", () => {
+  const plain = deliveryKey(DELIVERY)
+  for (const clip of BYTE_EXEMPT.clips) {
+    assert.notEqual(clipDeliveryKey(clip), plain, `${clip} names the exemption`)
+    assert.equal(clipDeliveryKey(clip), clipDeliveryKey(clip, DELIVERY))
+  }
+  assert.equal(clipDeliveryKey(BYTE_EXEMPT.clips[0]), clipDeliveryKey(BYTE_EXEMPT.clips[1]), 'one exemption, one key')
+  for (const clip of ['stop:study>stop:chamber', 'stop:garden>stop:garden-gate', 'view:machine/aerial-screw>view:machine/miter-lock-gates', ''])
+    assert.equal(clipDeliveryKey(clip), plain, `${clip || 'no clip'} keeps the delivery's own key`)
+  // the exemption is in the key: the delivery with no cap, said so
+  assert.equal(clipDeliveryKey(BYTE_EXEMPT.clips[0]), deliveryKey({ ...DELIVERY, vbv: 'none: exempt from the byte line, encoded uncapped', byteCap: false }))
 })

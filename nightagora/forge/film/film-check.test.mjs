@@ -13,8 +13,8 @@ import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
-import { JOIN_TOLERANCE, calmCaps, calmReadings, checkRelease, joinVerdict, memoryStore, writeStandIn } from './film-check.mjs'
-import { treeKeys } from './keys.mjs'
+import { BYTE_EXEMPT, BYTE_LINES, JOIN_TOLERANCE, byteExempt, calmCaps, calmReadings, checkRelease, joinVerdict, lineOf, memoryStore, writeStandIn } from './film-check.mjs'
+import { DELIVERY, deliveryKey, treeKeys } from './keys.mjs'
 import { APP_ROOT, CERTIFICATE_FILE, WING_DIR, createLoader } from './load.mjs'
 import { CELL_M, cellCoords } from './scene.mjs'
 
@@ -182,7 +182,8 @@ test('the post chain turns every clip and still red, by the global key alone', a
 
 test('every line of §5.2 fires on its own entry and on nothing else', () => {
   const clip = 'stop:line-early>stop:picture-room upright'
-  const other = [...clean.clips.keys()].find((k) => k.endsWith(' wide') && k !== clip)
+  // an exempt clip is never red on bytes: the lines fire on a clip that has one
+  const other = [...clean.clips.keys()].find((k) => k.endsWith(' wide') && k !== clip && !byteExempt(clean.clips.get(k).clip))
   const fire = (mutate, options) => {
     const store = release.fork()
     mutate(store)
@@ -276,4 +277,74 @@ test('the joins line reads the sessions and the gaps the release carries', () =>
   const same = run((e, s, raw) => { e.session = 'run 1'; s.session = 'run 1'; e.joinGaps = { last: { pixels: 900, share: 0.0007, max: 1, still: raw } } })
   assert.deepEqual(same.red.map((r) => r.at), [clip])
   assert.match(same.red[0].why, /one session/)
+})
+
+/** A rung of a clip in a forked release replaced by bytes at a rate (kbit/s over the graph seconds). */
+function plantRate(store, at, rung, kbits) {
+  const rel = JSON.parse(store.read('release.json'))
+  const e = rel.clips.find((c) => `${c.clip} ${c.framing}` === at)
+  const bytes = Buffer.alloc(Math.floor(kbits * clean.clips.get(at).seconds * 1000 / 8), 1)
+  const digest = createHash('sha256').update(bytes).digest('hex')
+  const file = e.files[rung].file.replace(/\.[0-9a-f]{16}\.mp4$/, `.${digest.slice(0, 16)}.mp4`)
+  store.write(file, bytes)
+  e.files[rung] = { file, bytes: bytes.length, sha256: digest }
+  store.write('release.json', JSON.stringify(rel))
+}
+
+test("the grass's legs are exempt from the byte line: their rate is noted, never red", () => {
+  const garden = [...new Set([...clean.clips.values()].filter((c) => c.from === 'stop:garden' || c.to === 'stop:garden').map((c) => c.clip))].sort()
+  assert.deepEqual(garden, [...BYTE_EXEMPT.clips].sort(), 'the exemption names exactly the clips with the garden at either end')
+  const plain = 'stop:line-early>stop:picture-room'
+  for (const r of Object.keys(BYTE_LINES)) {
+    for (const clip of garden) assert.equal(lineOf(r, clip), undefined, `${clip} ${r}: no line`)
+    assert.equal(lineOf(r, plain), BYTE_LINES[r])
+  }
+  const bytesLine = (plants) => {
+    const store = release.fork()
+    for (const [at, rung, kbits] of plants) plantRate(store, at, rung, kbits)
+    const result = gate(clean, store)
+    for (const l of result.lines) if (l.name !== 'bytes') assert.deepEqual(l.red, [], `${l.name} stays green`)
+    const l = result.lines.find((x) => x.name === 'bytes')
+    return { red: l.red.map((r) => `${r.at} ${r.why.split(':')[0]}`).sort(), notes: l.notes }
+  }
+  // the exempt clips at three times every rung's line, both framings: green, each rate named
+  const exempt = [...clean.clips.values()].filter((c) => byteExempt(c.clip))
+  assert.equal(exempt.length, 4, 'two legs, two framings')
+  const heavy = exempt.flatMap((c) => clean.delivery.settings.rungs[c.framing].map((r) => [`${c.clip} ${c.framing}`, r, BYTE_LINES[r] * 3]))
+  const seen = bytesLine(heavy)
+  assert.deepEqual(seen.red, [], 'an exempt clip is never red on bytes')
+  for (const c of exempt) {
+    const note = seen.notes.find((n) => n.startsWith(`${c.clip} ${c.framing}: exempt`))
+    assert.ok(note, `${c.clip} ${c.framing}: its rate is noted`)
+    for (const r of clean.delivery.settings.rungs[c.framing]) assert.match(note, new RegExp(`${r} ${BYTE_LINES[r] * 3 - 1}|${r} ${BYTE_LINES[r] * 3}`))
+  }
+  // the clean release notes the exempt clips too, and nothing else
+  assert.equal(bytesLine([]).notes.filter((n) => n.includes(': exempt, uncapped')).length, 4)
+  // the same rates on a clip with a line are red on every rung
+  const moved = clean.delivery.settings.rungs.wide.map((r) => [`${plain} wide`, r, BYTE_LINES[r] * 3])
+  assert.deepEqual(bytesLine(moved).red, moved.map(([at, r]) => `${at} ${r}`).sort())
+})
+
+test("the delivery key moves for the grass's legs alone, and a capped encode of them turns them red", () => {
+  const plain = deliveryKey(DELIVERY)
+  assert.equal(clean.delivery.key, plain, "the tree's delivery key is the delivery's own")
+  const gardenClips = [...clean.clips.values()].filter((c) => byteExempt(c.clip)).map((c) => `${c.clip} ${c.framing}`).sort()
+  assert.equal(gardenClips.length, 4, 'two legs, two framings')
+  for (const [at, c] of clean.clips) {
+    if (gardenClips.includes(at)) assert.notEqual(c.delivery, plain, `${at} names the exemption`)
+    else assert.equal(c.delivery, plain, `${at} keeps the delivery's own key`)
+  }
+  // the pilot's garden legs, keyed with the delivery's own key: exactly those four go red, by the delivery key
+  const store = release.fork()
+  const rel = JSON.parse(store.read('release.json'))
+  for (const e of rel.clips.filter((c) => gardenClips.includes(`${c.clip} ${c.framing}`))) {
+    e.keys = { ...e.keys, delivery: plain }
+    const side = JSON.parse(store.read(e.sidecar))
+    side.keys = { ...side.keys, delivery: plain }
+    store.write(e.sidecar, JSON.stringify(side))
+  }
+  store.write('release.json', JSON.stringify(rel))
+  const result = gate(clean, store)
+  for (const l of result.lines) assert.deepEqual(sorted(new Set(l.red.map((r) => r.at))), l.name === 'keys' ? gardenClips : [], `${l.name}`)
+  for (const at of gardenClips) assert.deepEqual(result.keyRed.get(at), ['delivery'])
 })

@@ -300,7 +300,8 @@ async function planJob(dir, log) {
   const island = ['src/wings/vinci/film-look.ts', 'src/wings/vinci/print.ts'].flatMap((f) => closure(loader, f, 'src/'))
   for (const e of entries) {
     const k = e.kind === 'clip' ? tree.clips.get(`${e.edge} ${e.framing}`) : e.kind === 'still' ? tree.stills.get(`${e.node} ${e.framing}`) : null
-    if (k) e.keys = { motion: k.motion, picture: k.picture }
+    // a clip exempt from its byte line carries its own delivery key
+    if (k) e.keys = { motion: k.motion, picture: k.picture, ...(k.delivery ? { delivery: k.delivery } : {}) }
     if (e.kind === 'cycle') {
       const files = [...new Set([...closure(loader, `src/wings/vinci/machines/${e.slug}.ts`, 'src/'), `src/wings/vinci/machines/data/${e.slug}.json`, ...island])].sort()
       e.keys = { motion: null, picture: sha256(files.map((f) => `${f} ${sha256(loader.text(f))}`).join('\n')).slice(0, 32) }
@@ -357,7 +358,7 @@ function writeRecord(dir, job, records) {
   for (const r of done) {
     const e = byId.get(r.id)
     if (!e) continue
-    const keys = e.keys ? { motion: e.keys.motion, picture: e.keys.picture, global: job.keys.global, delivery: job.keys.delivery } : null
+    const keys = e.keys ? { motion: e.keys.motion, picture: e.keys.picture, global: job.keys.global, delivery: e.keys.delivery ?? job.keys.delivery } : null
     if (e.kind === 'still') {
       release.stills.push({ node: e.node, framing: e.framing, keys, files: { [STILL_RUNG[e.framing].join('x')]: r.rung, ...stillMarkFiles(dir, marks, e, r.rung.file) }, sidecar: r.sidecar, session: r.session })
       summary.stills.push({ node: e.node, framing: e.framing, raw: r.raw, master: r.master, rung: r.rung, settledIn: r.settledIn, aSecondLater: r.aSecondLater, pendingAtRest: r.pendingAtRest })
@@ -454,7 +455,7 @@ function flagsOf(argv) {
 }
 const load = () => loadavg().map((v) => round(v, 2))
 /** an entry's four keys under the job */
-export const keysOf = (e, job) => (e.keys ? { motion: e.keys.motion, picture: e.keys.picture, global: job.keys.global, delivery: job.keys.delivery } : null)
+export const keysOf = (e, job) => (e.keys ? { motion: e.keys.motion, picture: e.keys.picture, global: job.keys.global, delivery: e.keys.delivery ?? job.keys.delivery } : null)
 /** A DONE ENTRY STAYS DONE under a later job while its keys have not moved */
 export function stillCurrent(record, e, job) {
   if (record.source && record.source === job.source) return true
@@ -679,7 +680,7 @@ async function renderStill(e, fs, { dir, nodes, inbox, job, opts }) {
   const node = nodes.get(e.node)
   const s = await exportStill(fs.s, inbox, node, dir, opts)
   const sidecar = `sidecars/${e.framing}/stills/${stemOf(e.node)}.json`
-  const keys = e.keys ? { motion: e.keys.motion, picture: e.keys.picture, global: job.keys.global, delivery: job.keys.delivery } : null
+  const keys = e.keys ? { motion: e.keys.motion, picture: e.keys.picture, global: job.keys.global, delivery: e.keys.delivery ?? job.keys.delivery } : null
   writeAtomic(join(dir, sidecar), JSON.stringify(stillSidecar(s, { renderer: `chromium ${fs.version} webgpu, tier max`, keys }), null, 1))
   const master = written(dir, s.master.file), rung = written(dir, s.rung.file)
   return {
@@ -696,7 +697,7 @@ async function renderClip(e, fs, { dir, nodes, edges, inbox, job, replay, graph,
   const track = replayEdge(replay, graph, edge, e.framing, { tail: 2 })
   const r = await exportClip(fs.s, inbox, edge, nodes, track, dir, opts)
   if (!r.files) return { status: 'refused', refused: r.refused }
-  const keys = e.keys ? { motion: e.keys.motion, picture: e.keys.picture, global: job.keys.global, delivery: job.keys.delivery } : { motion: r.replay.key, picture: null, global: null, delivery: null }
+  const keys = e.keys ? { motion: e.keys.motion, picture: e.keys.picture, global: job.keys.global, delivery: e.keys.delivery ?? job.keys.delivery } : { motion: r.replay.key, picture: null, global: null, delivery: null }
   // the ID pass's own cells ride beside the gate's frustum key, as the export's release carries them
   let seenCells = null
   try { seenCells = cellNumbers(gunzipSync(readFileSync(r.seen.file))).length } catch { /* kept without */ }

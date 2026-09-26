@@ -56,13 +56,13 @@ export function pickSampled(clips, n = SAMPLED_JOINS) {
   return Array.from({ length: n }, (_, k) => ({ ...sorted[Math.floor((k * sorted.length) / n)], end: k % 2 ? 'last' : 'first' }))
 }
 
-/** the still's master as a one-frame clip, the top rung of its framing */
-async function stillAsClip(master, framing, dir) {
+/** the still's master as a one-frame clip, the top rung of its framing, under the clip's own byte line */
+async function stillAsClip(master, framing, dir, clip) {
   const stage = STAGES[framing]
   const { data, info } = await sharp(master).removeAlpha().raw().toBuffer({ resolveWithObject: true })
   if (info.width !== stage.width || info.height !== stage.height) throw new Error(`${master}: ${info.width}x${info.height}, the stage is ${stage.width}x${stage.height}`)
   const stem = master.split('/').pop().replace(/\.png$/, '')
-  const enc = openEncoder(framing, 1, dir, stem, stage)
+  const enc = openEncoder(framing, 1, dir, stem, stage, 0, clip)
   await enc.write(data)
   await enc.close()
   const [w, h] = RUNGS[framing][0]
@@ -122,7 +122,7 @@ export async function sampledJoins(dir, { engines = ENGINES, log = () => {} } = 
       const still = summary.stills.find((s) => s.node === node && s.framing === p.framing)
       const sample = { clip: p.clip, framing: p.framing, end: p.end, statistic: SAMPLED_STATISTIC, file: rung.sha256, still: still?.raw ?? null, engines: {} }
       if (!still?.master?.file) { for (const e of engines) sample.engines[e] = { decoded: false, why: `no master still of ${node}` }; out.push(sample); continue }
-      const stillClip = await stillAsClip(resolve(dir, still.master.file), p.framing, work)
+      const stillClip = await stillAsClip(resolve(dir, still.master.file), p.framing, work, p.clip)
       for (const engine of engines) {
         const b = browsers[engine]
         if (b.missing) { sample.engines[engine] = { decoded: false, why: `the engine is not installed: ${b.missing}` }; continue }

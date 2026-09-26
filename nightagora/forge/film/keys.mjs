@@ -7,11 +7,14 @@
 //             (`scene.mjs`, `seen.mjs`), and the exposure at its two ends
 //   GLOBAL    the stack, the print, the light, the sky, the recipe, and the
 //             library sets no plate claims that a frame can draw
-//   DELIVERY  the job image, the encoder and the rungs
+//   DELIVERY  the job image, the encoder and the rungs; a clip exempt from
+//             its byte line says so
 //
 // A text change moves none of them: no interface word is in a frame.
 import { createHash } from 'node:crypto'
 import ts from 'typescript'
+// film-check imports this module back: read its exports inside functions only
+import { BYTE_EXEMPT, byteExempt } from './film-check.mjs'
 import { FILM_PACE, FPS, FRAMINGS, buildGraph } from './graph.mjs'
 import { WING_DIR, createLoader } from './load.mjs'
 import { canonicalPrint, openReplay, replayEdge, trackKey } from './replay.mjs'
@@ -148,6 +151,10 @@ export function globalKey(loader, { library = [], claimed = new Set() } = {}) {
 }
 
 export const deliveryKey = (delivery = DELIVERY) => short(JSON.stringify(delivery))
+/** A CLIP'S DELIVERY KEY: a clip exempt from its byte line names the
+    exemption, every other clip carries the delivery's own key, unchanged. */
+export const clipDeliveryKey = (clip, delivery = DELIVERY) =>
+  (byteExempt(clip) ? short(JSON.stringify({ ...delivery, vbv: 'none: exempt from the byte line, encoded uncapped', byteCap: BYTE_EXEMPT.cap })) : deliveryKey(delivery))
 const SEEN_MEMO = new Map()
 
 /** THE PICTURE KEY: the exposure at both ends and every cell the clip can
@@ -200,7 +207,7 @@ export async function treeKeys({ rev = '', overlay = {}, library, delivery = DEL
     const cells = seen(edge.id, framing, r.samples, world)
     clips.set(`${edge.id} ${framing}`, {
       clip: edge.id, stem: edge.stem, framing, frames: r.arrivedAt, from: edge.from, to: edge.to, kinds: edge.kinds,
-      seconds: edge.framings[framing].seconds[FILM_PACE],
+      seconds: edge.framings[framing].seconds[FILM_PACE], delivery: clipDeliveryKey(edge.id, delivery),
       motion: r.key, picture: pictureKey(cells, world.cells.hashes, pair), exposure: pair, stations: [r.departed, r.completed], seen: cells.length,
       first: canonicalPrint(r.prints[0]), last: canonicalPrint(r.prints[r.arrivedAt]), samples: r.samples,
       cells,

@@ -36,7 +36,7 @@ import sharp from 'sharp'
 import { APP_ROOT, assertServer, browserArgs, FRAME_TIME_FLAGS, headHere, waitForServer, wingStanding } from '../rig.mjs'
 import { BARE, CHROME_OFF, STILL_DESK, installVirtualClock } from '../prerender/clock.mjs'
 import { restingPending } from '../prerender/pending.mjs'
-import { BYTE_LINES } from './film-check.mjs'
+import { lineOf } from './film-check.mjs'
 import { FILM_PACE, FPS, FRAMINGS, SHUTTER, buildGraph } from './graph.mjs'
 import { camPrint as nodePrint, openReplay, replayEdge } from './replay.mjs'
 import { openSink, unpack } from './sink.mjs'
@@ -69,10 +69,11 @@ export const X264 = { preset: 'medium', crf: 23, endsCrf: 12, endsFrames: 3, key
  * bytes over the clip's graph seconds; x264's buffer lets a clip spend at most
  * its initial fill plus the rate over its length, so the rate is set for
  * init x buffer + rate x clip seconds <= share x line x graph seconds. A
- * buffer of one second at the line holds the near-lossless first frame.
+ * buffer of one second at the line holds the near-lossless first frame. The
+ * line is the clip's own (`lineOf`): a clip exempt from it is not capped.
  */
-export function vbvOf(rung, frames, graphSeconds, v = X264.vbv) {
-  const line = BYTE_LINES[rung]
+export function vbvOf(rung, frames, graphSeconds, clip = '', v = X264.vbv) {
+  const line = lineOf(rung, clip)
   if (!line || !(graphSeconds > 0)) return null
   const bufsize = Math.round(line * v.bufferSeconds)
   const clipSeconds = (frames + v.spareFrames) / FPS
@@ -275,8 +276,9 @@ function walkRay(cells, from, to) {
 /* ---- the encoder ---- */
 /** one ffmpeg for a clip, every rung in one pass, the ends near lossless; without
     the graph seconds no rung is capped. A still passed as a one-frame clip
-    (`frames` 1) is encoded as a clip's end is: the ends' crf and the buffer. */
-export function openEncoder(framing, frames, dir, stem, stage = STAGES[framing], graphSeconds = 0) {
+    (`frames` 1) is encoded as a clip's end is: the ends' crf and the buffer.
+    `clip` names the edge, whose byte line sets the caps. */
+export function openEncoder(framing, frames, dir, stem, stage = STAGES[framing], graphSeconds = 0, clip = '') {
   const [w, h] = [stage.width, stage.height]
   const rungs = RUNGS[framing]
   const last = frames - 1
@@ -292,7 +294,7 @@ export function openEncoder(framing, frames, dir, stem, stage = STAGES[framing],
     '-filter_complex', `[0:v]split=${rungs.length}${split};${scales}`]
   // a one-frame clip is drawn from the same buffer a clip's first frame is
   const firstOf = (line) => (line ? { maxrate: line, bufsize: Math.round(line * X264.vbv.bufferSeconds), init: X264.vbv.init } : null)
-  const caps = rungs.map(([rw, rh]) => (one ? firstOf(BYTE_LINES[`${rw}x${rh}`]) : vbvOf(`${rw}x${rh}`, frames, graphSeconds)))
+  const caps = rungs.map(([rw, rh]) => (one ? firstOf(lineOf(`${rw}x${rh}`, clip)) : vbvOf(`${rw}x${rh}`, frames, graphSeconds, clip)))
   rungs.forEach((_, k) => {
     const vbv = caps[k] ? `:vbv-maxrate=${caps[k].maxrate}:vbv-bufsize=${caps[k].bufsize}:vbv-init=${caps[k].init}` : ''
     args.push('-map', `[o${k}]`, '-c:v', 'libx264', '-preset', X264.preset, '-crf', String(one ? X264.endsCrf : X264.crf), '-profile:v', 'high',
@@ -565,7 +567,7 @@ export async function exportClip(session, inbox, edge, nodes, track, out, opts) 
   const predicted = track.arrivedAt + 2
   const stem = edge.stem
   const dir = join(out, framing)
-  const encoder = openEncoder(framing, predicted, dir, stem, stage, edge.framings[framing]?.seconds?.[FILM_PACE] ?? 0)
+  const encoder = openEncoder(framing, predicted, dir, stem, stage, edge.framings[framing]?.seconds?.[FILM_PACE] ?? 0, edge.id)
   const frames = []
   const cells = cellSet()
   let floorCeilingMax = 0
@@ -742,7 +744,7 @@ async function gateKeys(results, log) {
   const out = new Map()
   for (const [at, c] of tree.clips) {
     const cells = mine.get(at)
-    out.set(at, { motion: c.motion, picture: c.picture, global: tree.global.key, delivery: tree.delivery.key, ...(cells ? { pictureSeen: pictureKey(cells, tree.world.cells.hashes, c.exposure), seenCells: cells.length, frustumCells: c.seen } : {}) })
+    out.set(at, { motion: c.motion, picture: c.picture, global: tree.global.key, delivery: c.delivery ?? tree.delivery.key, ...(cells ? { pictureSeen: pictureKey(cells, tree.world.cells.hashes, c.exposure), seenCells: cells.length, frustumCells: c.seen } : {}) })
   }
   return { tree, keys: out }
 }
@@ -865,7 +867,7 @@ async function main() {
   /* THE RELEASE THE GATE READS (`film-check.mjs --release=<dir>`), where the
      gate stands in the tree: every clip and still with its four keys */
   if (gate.tree) {
-    const keysOf = (at, table) => { const k = table.get(at); return k ? { motion: k.motion, picture: k.picture, global: gate.tree.global.key, delivery: gate.tree.delivery.key } : null }
+    const keysOf = (at, table) => { const k = table.get(at); return k ? { motion: k.motion, picture: k.picture, global: gate.tree.global.key, delivery: k.delivery ?? gate.tree.delivery.key } : null }
     const stillKeys = new Map([...gate.tree.stills].map(([at, s]) => [at, s]))
     const release = { format: 'vinci-film-release-v1', keysFormat: gate.tree.format, wing: 'vinci', revision: headHere(), renderer: `chromium ${first.version} webgpu, tier max`, fps: FPS, pace: 'walk', global: gate.tree.global.key, delivery: gate.tree.delivery.key, clips: [], stills: [], sampledJoins: [] }
     for (const s of first.stills) {

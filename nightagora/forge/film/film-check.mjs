@@ -52,6 +52,15 @@ export const TEXEL_CAP = 1
 /** Each rung's byte line in kbit/s: twice the hero rates the one measured hang
     leg gave (§3.3), until T0's bytes set them. */
 export const BYTE_LINES = { '1920x1080': 6606, '1280x720': 3236, '854x480': 1722, '720x1558': 2852, '480x1038': 1482 }
+/** THE GRASS'S EXEMPTION: the garden's two legs, both framings, every rung,
+    are encoded uncapped. Any cap on them starves their near-lossless ends and
+    softens the thin blades in shade, even at twice the line. The gate notes
+    their rate and never reds it. The encoder, this gate and the clip's
+    delivery key all read this one table. */
+export const BYTE_EXEMPT = { cap: false, clips: ['stop:garden>stop:line-early', 'stop:line-early>stop:garden'] }
+export const byteExempt = (clip) => BYTE_EXEMPT.clips.includes(clip)
+/** A clip's byte line on a rung in kbit/s; none for an exempt clip or off the rungs. */
+export const lineOf = (rung, clip) => (byteExempt(clip) ? undefined : BYTE_LINES[rung])
 /** The calm caps of M46, read from the calm checker when it is in the tree. */
 const CALM_FILE = `${WING_DIR}/calm-check.mjs`
 
@@ -140,7 +149,7 @@ export function memoryStore(files = new Map()) {
 const stillStem = (node) => node.replace(/[:/]/g, (c) => (c === ':' ? '-' : '.'))
 /** A node's files: its still at each rung and its marks file in each language. */
 const stillRungs = (tree, framing) => [...tree.delivery.settings.still.rungs[framing], ...tree.delivery.settings.still.marks.map((l) => `marks-${l}`)]
-const keysOf = (entry, tree) => ({ motion: entry.motion, picture: entry.picture, global: tree.global.key, delivery: tree.delivery.key })
+const keysOf = (entry, tree) => ({ motion: entry.motion, picture: entry.picture, global: tree.global.key, delivery: entry.delivery ?? tree.delivery.key })
 
 /**
  * A STAND-IN RELEASE of a tree: what an export that rendered nothing would
@@ -213,7 +222,7 @@ export function checkRelease(store, tree, { calm = null } = {}) {
     hygiene: line('hygiene', 'zero requests after the clock, starved steps, page errors, pending at rest, painted elements over the canvas, and one mounted set inside a clip'),
     upright: line('upright', 'upright: no frame mostly floor and ceiling'),
     texels: line('texels', 'a plate never shows more texels than its source holds'),
-    bytes: line('bytes', 'each rung under its byte line'),
+    bytes: line('bytes', "each rung under its byte line (the grass's legs exempt: their rate is noted)"),
     sampled: line('sampled joins', `ten joins decoded in Chromium, WebKit and Firefox against their stills as one-frame clips, colour included, within ${JOIN_TOLERANCE} of 255 by 16x16 block means`),
   }
   if (!text) {
@@ -236,13 +245,14 @@ export function checkRelease(store, tree, { calm = null } = {}) {
     const sidecar = read(entry.sidecar)
     sidecars.set(at, sidecar)
     // KEYS: the release's record, and the sidecar agreeing with it
-    const current = { motion: now.motion, picture: now.picture, global: tree.global.key, delivery: tree.delivery.key }
+    const current = { motion: now.motion, picture: now.picture, global: tree.global.key, delivery: now.delivery ?? tree.delivery.key }
     const moved = Object.keys(current).filter((k) => entry.keys?.[k] !== current[k])
     if (!sidecar) moved.push('sidecar missing')
     else if (Object.keys(current).some((k) => sidecar.keys?.[k] !== entry.keys?.[k])) moved.push('sidecar disagrees with the release')
     if (moved.length) L.keys.red.push({ at, why: moved.join(', '), moved })
     // FILES
     const rungs = now.kind === 'clip' ? tree.delivery.settings.rungs[now.framing] : stillRungs(tree, now.framing)
+    const exemptRates = []
     for (const rung of rungs) {
       const f = entry.files?.[rung]
       const bytes = f && store.read(f.file)
@@ -253,10 +263,13 @@ export function checkRelease(store, tree, { calm = null } = {}) {
         if (digest !== f.sha256 || !f.file.includes(`.${digest.slice(0, 16)}.`) || bytes.length !== f.bytes) red(L.files, at, `${rung}: bytes are not the ones addressed`)
         else if (now.kind === 'clip' && BYTE_LINES[rung]) {
           const kbits = bytes.length * 8 / 1000 / Math.max(now.seconds, 1 / FPS)
-          if (kbits > BYTE_LINES[rung]) red(L.bytes, at, `${rung}: ${kbits.toFixed(0)} kbit/s over ${BYTE_LINES[rung]}`)
+          const cap = lineOf(rung, now.clip)
+          if (!cap) exemptRates.push(`${rung} ${kbits.toFixed(0)}`)
+          else if (kbits > cap) red(L.bytes, at, `${rung}: ${kbits.toFixed(0)} kbit/s over ${cap}`)
         }
       }
     }
+    if (exemptRates.length) L.bytes.notes.push(`${at}: exempt, uncapped: ${exemptRates.join(', ')} kbit/s`)
     if (!sidecar) continue
     if (now.kind === 'still') {
       if (now.histories.prints > 1 || now.histories.exposures > 1) red(L.law3, at, `${now.histories.prints} prints, ${now.histories.exposures} exposures`)
