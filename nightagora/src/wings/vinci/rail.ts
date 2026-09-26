@@ -50,20 +50,23 @@ const NARROW_LENS=1.26, NARROW_AIM_SHARE=.21
  * the sail is 9.4 m across and stands seven metres beyond the screw, so any
  * narrower lens slices it at the left edge or the rolling mill at the right;
  * it looks down only as far as puts the plinths' feet on the sheet's edge.
- * Both keep the room's own eye. Heading from north and pitch, in degrees. */
+ * Both lenses open until the sail's lower blade stands whole inside the
+ * edge it reached. Both keep the room's own eye. Heading from north and
+ * pitch, in degrees. */
 const HALL_PHONE:Partial<Record<VinciStationId,{heading:number;pitch:number;fov:number}>>={
-  flight:{heading:-80.5,pitch:4.5,fov:78.12},
-  works:{heading:-67,pitch:-10,fov:100},
+  flight:{heading:-77.5,pitch:5,fov:88},
+  works:{heading:-70,pitch:-10,fov:104},
 }
-/** THE HALL'S WIDE FRAMES, from the same eyes. The flight station turns west
- * until the water screw's crank frame stands cut at the right edge instead of
- * a sixth of the frame beside the sail; turned further, the sail itself
- * reached that edge. The works station closes on the two water machines, the
- * screw near the middle and the lock gates whole at the left, with the sail
- * behind them. */
-const HALL_DESK:Partial<Record<VinciStationId,{heading:number;pitch:number;fov:number}>>={
-  flight:{heading:-84,pitch:11,fov:58},
-  works:{heading:-71,pitch:-5,fov:50},
+/** THE HALL'S WIDE FRAMES. From the room's eye the water screw's crank
+ * frame stood cut at the flight frame's right edge, and no turn cleared it
+ * that did not bring the sail to that edge: the flight eye stands a metre
+ * further in and half a metre south, where the near screw parts from the far
+ * sail, and the screw leaves the frame. The works station keeps its eye and
+ * opens until the lock gates' platform and the rolling mill's plinth both
+ * stand inside its edges, the sail still at its middle. */
+const HALL_DESK:Partial<Record<VinciStationId,{heading:number;pitch:number;fov:number;eye?:readonly [east:number,north:number]}>>={
+  flight:{heading:-87,pitch:11,fov:60,eye:[-47.5,-49.3]},
+  works:{heading:-76.5,pitch:-3,fov:59},
 }
 const headingOf=(pose:Pose):number=>{const v=pose.at.clone().sub(pose.eye);return Math.atan2(v.x,-v.z)*180/Math.PI}
 function aimedFrom(pose:Pose,heading:number,pitch:number,fov:number):Pose {
@@ -206,7 +209,8 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // it and the boardwalk runs on under it.
   if(id==='grave'&&narrow){const pose=collectionView(room!,false);if(pose)return aimedFrom(pose,headingOf(pose),-6,72)}
   if(room){const pose=collectionView(room,false),hall=HALL_PHONE[id],desk=HALL_DESK[id]
-    if(pose)return narrow?hall?aimedFrom(pose,hall.heading,hall.pitch,hall.fov):narrowRoomPose(pose):desk?aimedFrom(pose,desk.heading,desk.pitch,desk.fov):pose}
+    if(pose)return narrow?hall?aimedFrom(pose,hall.heading,hall.pitch,hall.fov):narrowRoomPose(pose)
+      :desk?aimedFrom(desk.eye?{...pose,eye:world(desk.eye[0],desk.eye[1],pose.eye.y)}:pose,desk.heading,desk.pitch,desk.fov):pose}
   // A future station without a room keeps the held terrace composition.
   return p(-12.4,-21.6,groundHeight(-12.4,-21.6)+1.65,-38,-44,-4.2,narrow?74:58)
 }
