@@ -39,10 +39,6 @@ function fakeStream(preview, full, options) {
     filmHeld: false, filmShown: false,
     filmHold() { if (!api.disposed) api.filmHeld = true; return Promise.resolve() },
     filmShow(full) { if (!api.disposed && api.filmHeld) api.filmShown = full },
-    filmPrimed: null, emptied: false,
-    filmPrime(blank) { if (!api.disposed) { api.filmPrimed = blank; api.emptied = false } },
-    // a batch takes the preview and leaves the stream's nodes on its nearest empty
-    takePreview() { api.emptied = true; return null },
     textureMB: () => api.disposed ? 0 : 1 + (api.full ? 32 : 0),
     error: () => api.failure ?? null,
     pending: () => 0,
@@ -312,14 +308,6 @@ const reelStreams = streams.slice(filmFrom)
 for (let turn = 0; turn < 400 && !reelStreams.every(stream => stream.filmHeld); turn++) await Promise.resolve()
 assert.equal(reelStreams.length, CARDS)
 assert.ok(reelStreams.every(stream => stream.filmHeld), 'the film holds every full raster before its first frame')
-// every card is primed with the one filterable blank before the first draw compiles it
-const blanks = new Set(reelStreams.map(stream => stream.filmPrimed))
-assert.equal(blanks.size, 1, 'every card shares one blank')
-const primedBlank = [...blanks][0]
-assert.ok(primedBlank && primedBlank.minFilter === THREE.LinearFilter && primedBlank.magFilter === THREE.LinearFilter,
-  'the blank is linear-filtered: a nearest one compiles every card to a point fetch')
-assert.ok(reelStreams.every(stream => !stream.emptied),
-  'no card is left on the nearest empty once the batches have taken the previews')
 const reelCards = []
 host.traverse(object => { if (object.isMesh && typeof object.userData.previewId === 'string') reelCards.push(object) })
 const streamOf = card => reelStreams.find(stream => stream.plate.id === card.userData.manifestId)

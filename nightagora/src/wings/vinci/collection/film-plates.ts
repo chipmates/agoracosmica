@@ -5,7 +5,6 @@
  * reaches it; the plate's decoded raster is held for the whole run and put on
  * the GPU in the very frame that needs it, and taken off where none does.
  * The picture key reads this module (`forge/film/scene.mjs`). */
-import { DataTexture, LinearFilter, RGBAFormat, SRGBColorSpace, UnsignedByteType, type Texture } from 'three/webgpu'
 
 /** The most of a delivered pixel one texel of a preview may take before the
  * full raster is shown: half, for the frame's corners and a slanted wall. */
@@ -24,27 +23,6 @@ export function previewPitch(widthM: number, heightM: number, texelsWide: number
 export function filmReachMetres(pitchM: number, stageHeightPx: number): number {
   const pixelPerMetre = (2 * Math.tan((FILM_NARROWEST_LENS_DEG * Math.PI) / 360)) / stageHeightPx
   return pitchM / (pixelPerMetre * FILM_PREVIEW_CAP)
-}
-
-/** THE FILM'S BLANK PLATE. A card's material is compiled against what its
- * texture nodes hold when it is first drawn, and the film draws every card
- * from its first frame. A nearest-filtered blank compiles to a point fetch at
- * a raster's top level, which sparkles wherever a full raster is drawn smaller
- * than it is; a linear-filtered one compiles to a filtered, mipmapped sample. */
-export function filmBlank(): DataTexture {
-  const blank = new DataTexture(new Uint8Array([0, 0, 0, 255]), 1, 1, RGBAFormat, UnsignedByteType)
-  blank.colorSpace = SRGBColorSpace
-  blank.minFilter = LinearFilter
-  blank.magFilter = LinearFilter
-  blank.needsUpdate = true
-  return blank
-}
-
-/** Puts the blank into every node of these cards that holds the stream's
- * nearest empty: at the mount, and again once the batches have taken the
- * previews, since a card compiles against what it holds when first drawn. */
-export function filmPrimeCards(cards: Iterable<{ stream: { filmPrime(blank: Texture): void } }>, blank: Texture): void {
-  for (const card of cards) card.stream.filmPrime(blank)
 }
 
 type V3 = readonly [number, number, number]
