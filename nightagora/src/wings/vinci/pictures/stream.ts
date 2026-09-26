@@ -83,6 +83,9 @@ export interface PlateStream {
    * asks: no fade, no request. A texture shown is uploaded by that frame's
    * draw; one taken down leaves the GPU. */
   filmShow(full: boolean): void
+  /** Stands a filterable blank in both texture nodes before the first draw
+   * compiles the material (offline only). */
+  filmPrime(blank: Texture): void
   dispose(): void
 }
 
@@ -242,6 +245,7 @@ export function createPlateStream(preview: ManifestEntry, full: ManifestEntry, o
   let fade: { from: number; to: number; started: number } | null = null
   let filmHeld: LoadedPlate | null = null
   let filmShown = false
+  let filmBlank: Texture | null = null
   let timer: ReturnType<typeof setTimeout> | null = null
   let arrivalStarted: number | null = null
   let arrivalTimer: ReturnType<typeof setTimeout> | null = null
@@ -432,11 +436,20 @@ export function createPlateStream(preview: ManifestEntry, full: ManifestEntry, o
         fullNode.value = filmHeld.texture
         blend.value = 1
       } else {
-        fullNode.value = previewImage?.texture ?? empty
+        fullNode.value = previewImage?.texture ?? filmBlank ?? empty
         blend.value = 0
         // the decoded raster stays held; only its upload is let go
         filmHeld.texture.dispose()
       }
+    },
+    filmPrime(blank) {
+      if (!live) return
+      filmBlank = blank
+      // A node compiles against the texture it holds when first drawn, and a
+      // nearest-filtered one compiles to a point fetch at the top level.
+      if (fullNode.value === empty) fullNode.value = blank
+      if (previewNode.value === empty) previewNode.value = blank
+      material.needsUpdate = true
     },
     dispose() {
       if (!live) return
