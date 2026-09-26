@@ -448,7 +448,7 @@ export function mountCollectionPlates(host: Group, stack: Stack, options: Collec
     let selected: Card | undefined, nearest = Math.max(2.2, vinciApproachReachMetres() + .02)
     if (tier !== 'calm') {
       const cost = stack.cost()
-      const previews = cards.reduce((sum, card) => sum + card.stream.allocation().previewMB + 4 / 1048576, 0)
+      const previews = cards.reduce((sum, card) => sum + card.stream.allocation().previewMB + 8 / 1048576, 0)
       const other = cost.textureMB - textureMB()
       for (const card of cards) {
         if (!card.mesh.visible || other + previews + card.stream.allocation().fullMB > cost.budget.textureMB) continue
