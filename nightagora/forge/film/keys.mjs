@@ -6,7 +6,7 @@
 //   PICTURE   the cells the clip can show, each by what is drawn in it
 //             (`scene.mjs`, `seen.mjs`), and the exposure at its two ends
 //   GLOBAL    the stack, the print, the light, the sky, the recipe, and the
-//             library sets no plate claims
+//             library sets no plate claims that a frame can draw
 //   DELIVERY  the job image, the encoder and the rungs
 //
 // A text change moves none of them: no interface word is in a frame.
@@ -124,6 +124,12 @@ export function closure(loader, entry, within) {
   return [...out].sort()
 }
 
+/** WHAT NO FRAME CAN DRAW: time-based media (the world binds no video and no
+    sound) and a showpiece's own files, which only its close look plays. A
+    write of these to the store leaves every key where it was. */
+const NOT_DRAWN = /\.(mp4|m4v|mov|webm|mp3|m4a|aac|wav|ogg|opus)$/i
+export const drawable = (entry) => !NOT_DRAWN.test(String(entry.path ?? '')) && !String(entry.role ?? '').startsWith('showpiece-')
+
 /** THE GLOBAL KEY and each of its inputs, so a red can say which one moved. */
 export function globalKey(loader, { library = [], claimed = new Set() } = {}) {
   const parts = {}
@@ -135,7 +141,7 @@ export function globalKey(loader, { library = [], claimed = new Set() } = {}) {
     parts[`${INDEX_FILE}#${name}`] = short(held.get(name).getText())
   }
   parts.recipe = short(JSON.stringify(RECIPE))
-  parts['library sets no plate claims'] = short(library.filter((e) => !claimed.has(`${e.id}|${e.path}|${e.sha256 ?? ''}`))
+  parts['library sets no plate claims'] = short(library.filter((e) => drawable(e) && !claimed.has(`${e.id}|${e.path}|${e.sha256 ?? ''}`))
     .map((e) => `${e.id}|${e.path}|${e.sha256 ?? ''}`).sort().join('\n'))
   return { key: short(JSON.stringify(Object.entries(parts).sort())), parts }
 }
