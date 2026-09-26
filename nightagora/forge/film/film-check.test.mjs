@@ -131,8 +131,8 @@ test('a station\'s exposure turns red exactly the clips that stand at it', async
 
 test('a rail pose turns red exactly the clips that begin or end at it', async () => {
   const railFile = `${WING_DIR}/rail.ts`
-  const overlay = plant(railFile, "if(id==='courtyard') return narrow?p(10,-21,1.7,2.6,-12.5,4.8,80):p(10,-21,1.7,2.6,-12.5,4.3,60)",
-    "if(id==='courtyard') return narrow?p(10,-21,1.7,2.6,-12.5,4.9,80):p(10,-21,1.7,2.6,-12.5,4.4,60)")
+  const overlay = plant(railFile, "if(id==='courtyard') return narrow?p(10,-21,1.7,2.6,-12.5,4.8,80):aimedFrom(p(10.98,-22.13,1.7,10.98,-22.13,1.7),-41.04,14.5,60)",
+    "if(id==='courtyard') return narrow?p(10,-21,1.7,2.6,-12.5,4.9,80):aimedFrom(p(10.98,-22.13,1.7,10.98,-22.13,1.7),-40.94,14.5,60)")
   // what the certificate writer records for a pose whose aim moved and whose eye did not
   const before = await createLoader(), after = await createLoader({ overlay })
   const poses = [false, true].map((phone) => [before, after].map((l) => {
