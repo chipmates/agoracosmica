@@ -168,3 +168,22 @@ test('a wall of previews in one body, and a raised plate over one of them', () =
   // a batch's texture counts whatever its name; the same body under another name does not
   assert.equal(plateModels([{ ...batch, id: null }], sizes).models.length, 0)
 })
+
+test('a raised plate hides its batch card to the edge pixel, where their edge tolerances disagree', () => {
+  const d = 3, cam = camera(50)
+  // an id pixel's ray meets the wall at X: the batch card's right edge stands 1.2 mm short of it (inside its
+  // 2.4 mm edge tolerance), the raised card's 2.7 mm short (outside its own): one quad, read 1.5 mm apart
+  const x = 150, X = ((((x + 0.5) / iw) * 2 - 1 + cam.proj[8]) * d) / cam.proj[0]
+  const edge = X - 0.0012, centre = [edge - 0.6, 1.6, -d]
+  const LAYER = { id: 'vinci/collection-plates/paintings/0', width: 200, height: 150, share: 1 }
+  const under = card(centre, 1.2, 0.9)
+  const batch = { name: 'batch', id: 'vinci/collection-plates', order: -1, vertices: 4, drawn: true, shown: [LAYER], ...under }
+  const raised = body('raised', 'plate/a', card([centre[0] - 0.0015, 1.6, -d], 1.2, 0.9))
+  const { models } = plateModels([batch, raised], sizes)
+  const got = plateTexels(frame(cam), models, [drawn(LAYER), drawn(FULL)], sizes)
+  // the full raster's texel is what shows; the preview's, four times coarser, never
+  assert.ok(Math.abs(got.ratio - closed(d)) < 1e-6 * closed(d) && got.plate === 'raised', `${got.ratio} on ${got.plate}`)
+  // with the raised plate down, the batch card reads again, its edge pixel included
+  const down = plateTexels(frame(cam), models, [drawn(LAYER), { drawn: false, shown: [FULL] }], sizes)
+  assert.ok(Math.abs(down.ratio - 4 * closed(d)) < 1e-6 * closed(d), `${down.ratio}`)
+})

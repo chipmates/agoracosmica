@@ -241,7 +241,7 @@ export function frameCells(cells, frame) {
 }
 
 /* ---- a plate's texels on the screen (§5.2: a plate never shows more texels than its source holds) ---- */
-export const PLATE_TEXEL_METHOD = 'delivered pixels per texel, the most of any frame: every id pixel where a plate shows (its ray meets a flat card of a body showing a raster record or a plates batch inside the card\'s uv rectangle, no further than the id pass\'s depth; the nearest, of one plane the one drawn later), that ray and its neighbours\' meeting the card\'s plane, their steps in texels of the smallest raster the body shows at that frame (its uploaded size; the record\'s size when it shows none), the inverse of that map\'s least stretch'
+export const PLATE_TEXEL_METHOD = 'delivered pixels per texel, the most of any frame: every id pixel where a plate shows (its ray meets a flat card of a body showing a raster record or a plates batch inside the card\'s uv rectangle, no further than the id pass\'s depth; the nearest, of one plane the one drawn later, a raised plate hiding its batch card whole), that ray and its neighbours\' meeting the card\'s plane, their steps in texels of the smallest raster the body shows at that frame (its uploaded size; the record\'s size when it shows none), the inverse of that map\'s least stretch'
 /** a card's vertices must sit on one affine uv map to this, in metres */
 const PLATE_FLAT_M = 0.002
 let rasters = null
@@ -343,6 +343,13 @@ export function plateSize(model, share, sizes = rasterSizes()) {
 export const PLATE_HIDDEN_M = 0.0005
 /** how far outside its uv rectangle a ray may meet a card and still be on it (a share of the rectangle) */
 const CARD_EDGE = 0.002
+/** a card's four corners in world metres */
+const cornersOf = (c) => {
+  const [ua, ub, va, vb] = c.rect
+  return [[ua, va], [ub, va], [ub, vb], [ua, vb]].map(([u, v]) => [0, 1, 2].map((k) => c.origin[k] + (u - c.u0) * c.A[k] + (v - c.v0) * c.B[k]))
+}
+/** two cards whose corners agree to within the flatness a card is read at are one quad */
+const sameQuad = (a, b) => { const qb = cornersOf(b); return cornersOf(a).every((p) => qb.some((q) => Math.hypot(...sub(p, q)) <= PLATE_FLAT_M)) }
 /**
  * THE MOST DELIVERED PIXELS ONE TEXEL TAKES in a frame. The id pass's depth
  * holds the nearest surface that writes depth; a plate's card writes none, so
@@ -365,6 +372,11 @@ export function plateTexels(frame, models, shares, sizes = rasterSizes()) {
     const cards = m.cards.map((c, k) => ({ ...c, k, texelBasis: planeBasis(scale3(c.A, 1 / size.width), scale3(c.B, 1 / size.height)) }))
     live.push({ m, size, cards })
   }
+  // A raised plate is its batch card's own quad drawn over it, so it hides that
+  // card to the edge pixel; the edge tolerance of two coincident cards can
+  // disagree by a rounding, which let a preview's texel through at one pixel.
+  const raised = live.filter((l) => !l.m.batch).flatMap((l) => l.cards)
+  for (const l of live) if (l.m.batch) l.cards = l.cards.filter((c) => !raised.some((r) => sameQuad(c, r)))
   if (!live.length) return out
   const { depth, idSize: [w, h], cam } = frame
   const kx = frame.head?.w ? frame.head.w / w : ID_DIV, ky = frame.head?.h ? frame.head.h / h : ID_DIV
