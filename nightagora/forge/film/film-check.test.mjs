@@ -13,7 +13,7 @@ import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
-import { calmCaps, calmReadings, checkRelease, memoryStore, writeStandIn } from './film-check.mjs'
+import { JOIN_TOLERANCE, calmCaps, calmReadings, checkRelease, joinVerdict, memoryStore, writeStandIn } from './film-check.mjs'
 import { treeKeys } from './keys.mjs'
 import { APP_ROOT, CERTIFICATE_FILE, WING_DIR, createLoader } from './load.mjs'
 import { CELL_M, cellCoords } from './scene.mjs'
@@ -234,4 +234,46 @@ test('every line of §5.2 fires on its own entry and on nothing else', () => {
   const over = [...clean.clips].filter(([, c]) => { const r = calmReadings(c.samples); return r.turnDegPerSecond > 12 + 1e-9 || r.turnDegPerSecond2 > 12 + 1e-9 }).map(([at]) => at)
   only(checkRelease(release, clean, { calm: caps }), 'calm', over)
   console.log(`# calm at 12 deg/s and 12 deg/s2 on today's walk: ${over.length} of ${clean.clips.size} clips over`)
+})
+
+test('a join between two sessions holds within the tolerance, and inside one session only by sha256', () => {
+  const still = 'a'.repeat(64), other = 'b'.repeat(64)
+  const gap = (max, against = still) => ({ pixels: 15123, share: 0.0073, max, still: against })
+  assert.equal(joinVerdict({ end: still, still }).holds, true, 'the same picture holds')
+  assert.equal(joinVerdict({ end: other, still, clipSession: 's1', stillSession: 's1', gap: gap(1) }).holds, false, 'inside one session a gap is a mismatch')
+  assert.equal(joinVerdict({ end: other, still, gap: gap(1) }).holds, false, 'no session recorded: judged as one session')
+  const drift = joinVerdict({ end: other, still, clipSession: 's1', stillSession: 's2', gap: gap(JOIN_TOLERANCE) })
+  assert.equal(drift.holds, true, 'two sessions within the tolerance hold')
+  assert.deepEqual(drift.between, { pixels: 15123, max: JOIN_TOLERANCE })
+  assert.equal(joinVerdict({ end: other, still, clipSession: 's1', stillSession: 's2', gap: gap(JOIN_TOLERANCE + 1) }).holds, false, 'a real mismatch stays red')
+  assert.equal(joinVerdict({ end: other, still, clipSession: 's1', stillSession: 's2', gap: gap(1, other) }).holds, false, 'a gap measured against another still is not this join')
+  assert.equal(joinVerdict({ end: other, still, clipSession: 's1', stillSession: 's2' }).holds, false, 'no gap measured')
+})
+
+test('the joins line reads the sessions and the gaps the release carries', () => {
+  const clip = 'stop:line-early>stop:picture-room upright'
+  const run = (change) => {
+    const store = release.fork()
+    const rel = JSON.parse(store.read('release.json'))
+    const e = rel.clips.find((c) => `${c.clip} ${c.framing}` === clip)
+    const side = JSON.parse(store.read(e.sidecar))
+    const arrival = rel.stills.find((s) => s.node === 'stop:picture-room' && s.framing === 'upright')
+    const raw = JSON.parse(store.read(arrival.sidecar)).raw
+    side.joins.last = 'c'.repeat(64)
+    change(e, arrival, raw)
+    store.write(e.sidecar, JSON.stringify(side))
+    store.write('release.json', JSON.stringify(rel))
+    const result = gate(clean, store)
+    for (const l of result.lines) if (l.name !== 'joins') assert.deepEqual(l.red, [], `${l.name} stays green`)
+    return result.lines.find((l) => l.name === 'joins')
+  }
+  const within = run((e, s, raw) => { e.session = 'run 2'; s.session = 'run 1'; e.joinGaps = { last: { pixels: 900, share: 0.0007, max: 1, still: raw } } })
+  assert.deepEqual(within.red, [])
+  assert.ok(within.notes.some((n) => n.includes('between two sessions')), 'the drift is named')
+  const over = run((e, s, raw) => { e.session = 'run 2'; s.session = 'run 1'; e.joinGaps = { last: { pixels: 139, share: 0.0001, max: 12, still: raw } } })
+  assert.deepEqual(over.red.map((r) => r.at), [clip])
+  assert.match(over.red[0].why, /up to 12 of 255/)
+  const same = run((e, s, raw) => { e.session = 'run 1'; s.session = 'run 1'; e.joinGaps = { last: { pixels: 900, share: 0.0007, max: 1, still: raw } } })
+  assert.deepEqual(same.red.map((r) => r.at), [clip])
+  assert.match(same.red[0].why, /one session/)
 })

@@ -32,7 +32,8 @@ export const STAND_IN = 'stand-in: no frame rendered (the export is W2)'
 /* ---- the lines' own numbers ---- */
 /** Browser prints against the replay: the print's own last digit. */
 export const TRACK_TOLERANCE = 1e-4
-/** Three engines against their stills, per channel, of 255: the grain's tooth. */
+/** Three engines against their stills, per channel, of 255: the grain's tooth.
+    Also how far a join between two sessions of one build may part. */
 export const JOIN_TOLERANCE = 2
 export const SAMPLED_JOINS = 10
 export const ENGINES = ['chromium', 'webkit', 'firefox']
@@ -94,6 +95,23 @@ export function calmReadings(samples, fps = FPS) {
     prev = w
   }
   return { turnDegPerSecond: turn, turnDegPerSecond2: accel, turnDegPerSecond3: jerk, zoomPerSecond: zoom, bodyMetresPerSecond2: body }
+}
+
+/**
+ * ONE END OF A CLIP AGAINST ITS STILL. Inside one session of the renderer the
+ * end is the still, sha256-equal. Two sessions of one build draw a still a
+ * level apart in under one percent of its pixels, so a clip and a still from
+ * two sessions may part by at most JOIN_TOLERANCE at the largest step, as the
+ * job measured it against this very still (`joinGaps`). A session unknown to
+ * the release, or a gap measured against another still, is judged as one session.
+ */
+export function joinVerdict({ end, still, clipSession = null, stillSession = null, gap = null }) {
+  if (end && still && end === still) return { holds: true }
+  if (!end || !still) return { holds: false, why: 'no raw digest to compare' }
+  if (!clipSession || !stillSession || clipSession === stillSession) return { holds: false, why: clipSession && stillSession ? 'one session, not the same picture' : 'no session recorded' }
+  if (!gap || gap.still !== still || typeof gap.max !== 'number') return { holds: false, why: 'another session, no gap measured against this still' }
+  if (gap.max > JOIN_TOLERANCE) return { holds: false, why: `another session, parts by up to ${gap.max} of 255 (the tolerance ${JOIN_TOLERANCE})` }
+  return { holds: true, between: { pixels: gap.pixels, max: gap.max } }
 }
 
 /* ---- a release, on disk or in memory ---- */
@@ -182,7 +200,7 @@ export function checkRelease(store, tree, { calm = null } = {}) {
     graph: line('graph', 'every edge and node of the graph has its clip or still in the release, both framings'),
     keys: line('keys', 'all four keys match: motion, picture, global, delivery'),
     files: line('files', 'every rung of every clip and still is on disk at its content address'),
-    joins: line('joins', "frame 0 and the last frame equal the two stills' raw masters"),
+    joins: line('joins', `frame 0 and the last frame equal the two stills' raw masters; between two sessions within ${JOIN_TOLERANCE} of 255`),
     law3: line('law 3', 'a rest pose has one picture, whichever way it was reached'),
     calm: line('calm', "the calm caps of M46 hold on the camera track"),
     track: line('track', 'the browser track agrees with the replay; assertRailProjection never threw'),
@@ -205,6 +223,7 @@ export function checkRelease(store, tree, { calm = null } = {}) {
   const orphans = [...held.keys()].filter((at) => !want.has(at))
   if (orphans.length) L.graph.notes.push(`${orphans.length} orphaned (dropped from the graph; kept until the owner deletes them): ${orphans.slice(0, 4).join(', ')}`)
   const sidecars = new Map()
+  const drift = []
   for (const [at, entry] of held) {
     const now = want.get(at)
     if (!now) continue
@@ -241,8 +260,11 @@ export function checkRelease(store, tree, { calm = null } = {}) {
     // JOINS
     const from = sidecars.get(`${now.from} ${now.framing}`) ?? read(held.get(`${now.from} ${now.framing}`)?.sidecar ?? '')
     const to = sidecars.get(`${now.to} ${now.framing}`) ?? read(held.get(`${now.to} ${now.framing}`)?.sidecar ?? '')
-    if (!from?.raw || sidecar.joins?.first !== from.raw) red(L.joins, at, `frame 0 is not the still of ${now.from}`)
-    if (!to?.raw || sidecar.joins?.last !== to.raw) red(L.joins, at, `the last frame is not the still of ${now.to}`)
+    for (const [end, node, still, word] of [['first', now.from, from, 'frame 0'], ['last', now.to, to, 'the last frame']]) {
+      const verdict = joinVerdict({ end: sidecar.joins?.[end], still: still?.raw, clipSession: entry.session, stillSession: held.get(`${node} ${now.framing}`)?.session, gap: entry.joinGaps?.[end] })
+      if (!verdict.holds) red(L.joins, at, `${word} is not the still of ${node}: ${verdict.why}`)
+      else if (verdict.between) drift.push(verdict.between)
+    }
     // CALM, on the replayed track (the one the key names)
     if (calm) {
       const r = calmReadings(now.samples)
@@ -261,6 +283,7 @@ export function checkRelease(store, tree, { calm = null } = {}) {
     // TEXELS
     if (!(sidecar.plateTexelRatioMax <= TEXEL_CAP)) red(L.texels, at, `a plate at ${sidecar.plateTexelRatioMax} screen pixels a source texel`)
   }
+  if (drift.length) L.joins.notes.push(`${drift.length} joins between two sessions part by at most ${Math.max(...drift.map((d) => d.max))} of 255 in at most ${Math.max(...drift.map((d) => d.pixels))} pixels, within the tolerance`)
   if (!calm) L.calm.notes.push(`waiting: no calm caps in the tree (${CALM_FILE} arrives with M46); the line reads them the day it lands`)
   // THE SAMPLED LINE
   const sampled = release.sampledJoins ?? []

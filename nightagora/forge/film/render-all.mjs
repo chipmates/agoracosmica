@@ -359,10 +359,11 @@ function writeRecord(dir, job, records) {
     if (!e) continue
     const keys = e.keys ? { motion: e.keys.motion, picture: e.keys.picture, global: job.keys.global, delivery: job.keys.delivery } : null
     if (e.kind === 'still') {
-      release.stills.push({ node: e.node, framing: e.framing, keys, files: { [STILL_RUNG[e.framing].join('x')]: r.rung, ...stillMarkFiles(dir, marks, e, r.rung.file) }, sidecar: r.sidecar })
+      release.stills.push({ node: e.node, framing: e.framing, keys, files: { [STILL_RUNG[e.framing].join('x')]: r.rung, ...stillMarkFiles(dir, marks, e, r.rung.file) }, sidecar: r.sidecar, session: r.session })
       summary.stills.push({ node: e.node, framing: e.framing, raw: r.raw, master: r.master, rung: r.rung, settledIn: r.settledIn, aSecondLater: r.aSecondLater, pendingAtRest: r.pendingAtRest })
     } else if (e.kind === 'clip') {
-      release.clips.push({ clip: e.edge, framing: e.framing, keys, frames: r.frames, seconds: r.frames / FPS, files: r.files, sidecar: r.sidecar })
+      // the sessions and the measured gaps are the gate's: a join between sessions may part by its tolerance
+      release.clips.push({ clip: e.edge, framing: e.framing, keys, frames: r.frames, seconds: r.frames / FPS, files: r.files, sidecar: r.sidecar, session: r.session, ...(r.joinGaps ? { joinGaps: r.joinGaps } : {}) })
       summary.clips.push({ clip: e.edge, framing: e.framing, kinds: e.kinds, stem: r.stem, frames: r.frames, files: r.files, joins: r.joins, joinsAgree: r.joinsAgree, mountedSetChanges: r.mountedSetChanges, pendingAtRest: r.pendingAtRest, refused: [] })
     } else if (e.kind === 'cycle') {
       const c = (cycles[`machine/${e.slug}`] ??= { period: r.period, fps: FPS, frames: r.cycleFrames, framings: {} })
@@ -704,7 +705,8 @@ async function renderClip(e, fs, { dir, nodes, edges, inbox, job, replay, graph,
   // the ends' frames are kept only where a join parts, for the table to read
   const ends = [join(opts.frameDir, `${r.stem}-${e.framing}-f0000.png`), join(opts.frameDir, `${r.stem}-${e.framing}-last.png`)]
   const joinGaps = {}
-  for (const [k, still, end] of [['first', a, ends[0]], ['last', b, ends[1]]]) if (joinsAgree[k] === false && still?.master?.file) joinGaps[k] = await joinGap(end, join(dir, still.master.file))
+  // the gap names the still it was measured against, so a still drawn again later is not judged by it
+  for (const [k, still, end] of [['first', a, ends[0]], ['last', b, ends[1]]]) if (joinsAgree[k] === false && still?.master?.file) joinGaps[k] = { ...await joinGap(end, join(dir, still.master.file)), still: still.raw }
   if (joinsAgree.first !== false && joinsAgree.last !== false) for (const f of ends) rmSync(f, { force: true })
   const seen = written(dir, r.seen.file)
   return {
