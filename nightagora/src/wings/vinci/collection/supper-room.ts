@@ -656,8 +656,13 @@ export function mountSupperRoom(stack: Stack): SupperRoom {
   const parts = { wall: sort(wall), reveal: sort(reveal), south: sort(southWall()), upper: sort(upperEndWall()),
     slab: sort(slab), frame: sort(frame()), fins: sort(fins()), casing: sort(casing()), floor: sort(floorBody()) }
   for (const zone of ['bay', 'nave'] as const) {
-    make(merged([parts.wall[zone], parts.reveal[zone], parts.south[zone], parts.frame[zone], parts.fins[zone]]), lit.plaster[zone], `plaster-${zone}`, false)
-    make(merged([parts.slab[zone], parts.upper[zone], parts.casing[zone]]), lit.concrete[zone], `concrete-${zone}`, false)
+    // the beams and the pier are poured with the roof; the east wall is a wall
+    const [poured, walls] = parts.frame[zone] ? split(parts.frame[zone], c => c.e < ROOM.east - .001) : [null, null]
+    // the bay's side wall stands right under the top light: in white plaster
+    // its wash burns out, in the roof's concrete the light shows its fall
+    const side = zone === 'bay' ? parts.south[zone] : null
+    make(merged([parts.wall[zone], parts.reveal[zone], side ? null : parts.south[zone], walls, parts.fins[zone]]), lit.plaster[zone], `plaster-${zone}`, false)
+    make(merged([parts.slab[zone], parts.upper[zone], parts.casing[zone], side, poured]), lit.concrete[zone], `concrete-${zone}`, false)
     make(parts.floor[zone], lit.marble[zone], `floor-${zone}`, false)
   }
   // THE ROOM'S OUTSIDE stands in the day and throws the day's shadow: its
