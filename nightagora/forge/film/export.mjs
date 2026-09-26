@@ -36,7 +36,8 @@ import sharp from 'sharp'
 import { APP_ROOT, assertServer, browserArgs, FRAME_TIME_FLAGS, headHere, waitForServer, wingStanding } from '../rig.mjs'
 import { BARE, CHROME_OFF, STILL_DESK, installVirtualClock } from '../prerender/clock.mjs'
 import { restingPending } from '../prerender/pending.mjs'
-import { FPS, FRAMINGS, SHUTTER, buildGraph } from './graph.mjs'
+import { BYTE_LINES } from './film-check.mjs'
+import { FILM_PACE, FPS, FRAMINGS, SHUTTER, buildGraph } from './graph.mjs'
 import { camPrint as nodePrint, openReplay, replayEdge } from './replay.mjs'
 import { openSink, unpack } from './sink.mjs'
 
@@ -61,7 +62,24 @@ export const STILL_RUNG = { wide: [1920, 1080], upright: [720, 1558] }
     CSS stage at 1.5 device pixels, drawn and delivered one to one, so the
     film's recipe can be set beside a still of the same pixels */
 export const STILL_STAGES = { wide: { css: { width: 1600, height: 900 }, dsf: 1.5 }, upright: { css: { width: 780, height: 1688 }, dsf: 1.5 } }
-export const X264 = { preset: 'medium', crf: 23, endsCrf: 12, endsFrames: 3, keyint: FPS, aq: 3, threads: 8 }
+export const X264 = { preset: 'medium', crf: 23, endsCrf: 12, endsFrames: 3, keyint: FPS, aq: 3, threads: 8,
+  vbv: { bufferSeconds: 1, init: 0.9, share: 0.98, spareFrames: 3 } }
+/**
+ * THE BYTE LINE HELD BY THE ENCODER'S OWN BUFFER. The gate reads a rung's
+ * bytes over the clip's graph seconds; x264's buffer lets a clip spend at most
+ * its initial fill plus the rate over its length, so the rate is set for
+ * init x buffer + rate x clip seconds <= share x line x graph seconds. A
+ * buffer of one second at the line holds the near-lossless first frame.
+ */
+export function vbvOf(rung, frames, graphSeconds, v = X264.vbv) {
+  const line = BYTE_LINES[rung]
+  if (!line || !(graphSeconds > 0)) return null
+  const bufsize = Math.round(line * v.bufferSeconds)
+  const clipSeconds = (frames + v.spareFrames) / FPS
+  const maxrate = Math.floor((v.share * line * graphSeconds - v.init * bufsize) / clipSeconds)
+  // a clip too short to carry its buffer keeps a quarter of the line, and the gate judges it
+  return { maxrate: Math.max(Math.round(line / 4), maxrate), bufsize, init: v.init }
+}
 /** the ceiling of the world's own motion the joins may carry, of 255 */
 const SKY_REACH_M = 800
 const CELL_M = 2
@@ -255,12 +273,13 @@ function walkRay(cells, from, to) {
 }
 
 /* ---- the encoder ---- */
-/** one ffmpeg for a clip, every rung in one pass, the ends near lossless */
-function openEncoder(framing, frames, dir, stem, stage = STAGES[framing]) {
+/** one ffmpeg for a clip, every rung in one pass, the ends near lossless; without
+    the graph seconds no rung is capped */
+function openEncoder(framing, frames, dir, stem, stage = STAGES[framing], graphSeconds = 0) {
   const [w, h] = [stage.width, stage.height]
   const rungs = RUNGS[framing]
   const last = frames - 1
-  const zones = `zones=0,${X264.endsFrames - 1},crf=${X264.endsCrf}/${Math.max(X264.endsFrames, last - X264.endsFrames + 1)},${last},crf=${X264.endsCrf}`
+  const zones = `:zones=0,${X264.endsFrames - 1},crf=${X264.endsCrf}/${Math.max(X264.endsFrames, last - X264.endsFrames + 1)},${last},crf=${X264.endsCrf}`
   const split = rungs.map((_, k) => `[s${k}]`).join('')
   const scales = rungs.map(([rw, rh], k) => `[s${k}]scale=${rw}:${rh}:flags=lanczos+accurate_rnd+full_chroma_int:out_color_matrix=bt709:out_range=tv,format=yuv420p[o${k}]`).join(';')
   const outs = rungs.map(([rw, rh], k) => {
@@ -269,11 +288,13 @@ function openEncoder(framing, frames, dir, stem, stage = STAGES[framing]) {
   })
   const args = ['-hide_banner', '-loglevel', 'error', '-y', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', `${w}x${h}`, '-r', String(FPS), '-i', '-',
     '-filter_complex', `[0:v]split=${rungs.length}${split};${scales}`]
+  const caps = rungs.map(([rw, rh]) => vbvOf(`${rw}x${rh}`, frames, graphSeconds))
   rungs.forEach((_, k) => {
+    const vbv = caps[k] ? `:vbv-maxrate=${caps[k].maxrate}:vbv-bufsize=${caps[k].bufsize}:vbv-init=${caps[k].init}` : ''
     args.push('-map', `[o${k}]`, '-c:v', 'libx264', '-preset', X264.preset, '-crf', String(X264.crf), '-profile:v', 'high',
       // the colour goes into the stream's own header: the output options alone leave the transfer
       // untagged, and WebKit then paints the clip brighter than the still it hands over to
-      '-x264-params', `keyint=${X264.keyint}:min-keyint=${X264.keyint}:scenecut=0:aq-mode=${X264.aq}:threads=${X264.threads}:colorprim=bt709:transfer=iec61966-2-1:colormatrix=bt709:${zones}`,
+      '-x264-params', `keyint=${X264.keyint}:min-keyint=${X264.keyint}:scenecut=0:aq-mode=${X264.aq}:threads=${X264.threads}:colorprim=bt709:transfer=iec61966-2-1:colormatrix=bt709${zones}${vbv}`,
       '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'iec61966-2-1', '-color_range', 'tv',
       '-an', '-movflags', '+faststart', outs[k])
   })
@@ -282,7 +303,7 @@ function openEncoder(framing, frames, dir, stem, stage = STAGES[framing]) {
   child.stderr.on('data', (d) => { err += d })
   const done = new Promise((ok, fail) => child.on('close', (code) => (code === 0 ? ok() : fail(new Error(`ffmpeg ${code}: ${err.slice(0, 400)}`)))))
   return {
-    rungs: rungs.map(([rw, rh], k) => ({ rung: `${rw}x${rh}`, file: outs[k] })),
+    rungs: rungs.map(([rw, rh], k) => ({ rung: `${rw}x${rh}`, file: outs[k], vbv: caps[k] })),
     write: (buf) => new Promise((ok) => (child.stdin.write(buf) ? ok() : child.stdin.once('drain', ok))),
     close: async () => { child.stdin.end(); await done },
     /** a refused clip is written nowhere */
@@ -540,7 +561,7 @@ export async function exportClip(session, inbox, edge, nodes, track, out, opts) 
   const predicted = track.arrivedAt + 2
   const stem = edge.stem
   const dir = join(out, framing)
-  const encoder = openEncoder(framing, predicted, dir, stem, stage)
+  const encoder = openEncoder(framing, predicted, dir, stem, stage, edge.framings[framing]?.seconds?.[FILM_PACE] ?? 0)
   const frames = []
   const cells = cellSet()
   let floorCeilingMax = 0

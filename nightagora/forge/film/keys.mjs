@@ -32,6 +32,7 @@ export const RECIPE = {
 export const DELIVERY = {
   image: 'unset: the job image digest arrives with the box (W4)',
   codec: 'h264 high 8-bit 4:2:0 +faststart', crf: 23, ends: { frames: 3, crf: 12 }, keyint: 30, aq: 3,
+  vbv: 'each rung capped under its byte line: a buffer of one second, 0.9 full at the start, the rate over the clip',
   colour: 'bt709 matrix, transfer tagged', x264Threads: 'fixed',
   rungs: { wide: ['1920x1080', '1280x720', '854x480'], upright: ['720x1558', '480x1038'] },
   still: { format: 'png', rungs: { wide: ['1920x1080'], upright: ['720x1558'] }, marks: ['en', 'de'] },
