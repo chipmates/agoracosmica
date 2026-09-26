@@ -6,7 +6,7 @@
  * are raised after the rail reads the scene, so they stand outside the
  * construction fingerprint. This supplement builds the room's own plan,
  * every solid of it, and proves each clear of every certified route and
- * approach span, every leg and wall run at its saved near and gait envelope,
+ * approach span, every leg, wall run and gallery aisle and spur at its saved near and gait envelope,
  * every recorded corner ball, and every station and viewing eye's own near
  * envelope. A control post stood on the walk down the room must fail. It
  * then proves the frames: each section clears the construction's moulding on
@@ -101,6 +101,15 @@ function audit(solids) {
     ...(certificate.approaches ?? []).map(r => ({ kind: 'approach', label: `${r.viewport} ${r.station} to ${r.exhibit}`, entry: r })),
     ...(certificate.links ?? []).map(r => ({ kind: 'leg', label: `${r.viewport} ${r.from} to ${r.to}`, entry: r })),
     ...(certificate.walls ?? []).map(r => ({ kind: 'wall', label: `${r.viewport} ${r.id}`, entry: r })),
+    // the gallery's aisle line, and each spur from a wall vertex to its gate with the gate's balls
+    ...(certificate.galleries ?? []).flatMap(g => [
+      { kind: 'gallery', label: `${g.viewport} ${g.id} line`, entry: { points: g.line, maxNearRadius: g.maxNearRadius } },
+      ...g.spurs.map(spur => {
+        const wall = certificate.walls.find(w => w.viewport === g.viewport && w.id === g.id)
+        return { kind: 'gallery', label: `${g.viewport} ${g.id} spur ${spur.vertex} ${spur.side > 0 ? 'east' : 'west'}`,
+          entry: { points: [wall.points[spur.vertex], spur.gate], maxNearRadius: g.maxNearRadius, certifiedBalls: spur.certifiedBalls } }
+      }),
+    ]),
   ]
   for (const { kind, label, entry } of runs) {
     const points = entry.points.map(([east, north, height]) => new THREE.Vector3(east, height, -north))

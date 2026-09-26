@@ -1,6 +1,7 @@
 // THE FILM GATE'S TWO MOTION LINES, tested: the readings on made walks and a
-// made room, then the lines on today's tracks (the two legs first seen as
-// wrong come out red, a calm leg green), then the film check's wiring.
+// made room, then the lines on real tracks (the two legs first seen as wrong,
+// as they were walked, come out red; the same legs walked today and a calm leg
+// green), then the film check's wiring.
 //
 //   node --test forge/film/motion.test.mjs
 //
@@ -8,6 +9,7 @@
 // a minute); nothing is rendered.
 import { before, test } from 'node:test'
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import { MOTION_CAPS, headingReadings, middleOf, motionVerdict, swings, viewReadings } from './motion.mjs'
 import { measureClip, motionOfTree } from './motion-gate.mjs'
 import { reverseOf, openAudit } from './motion-audit.mjs'
@@ -134,37 +136,50 @@ test('what the frame holds near the lens: a wall filling it, then open space', (
   assert.ok(Math.abs(away.min - 1.5) < 1e-9, 'nothing within the depth read')
 })
 
-/* ---- today's tracks (main as measured) ---- */
+/* ---- real tracks: the two legs as first seen, and today's ---- */
 const GALLERY = 'stop:picture-room>stop:picture-room-lisa'
 const PAVILION = 'stop:line-early>stop:garden'
 const CALM = 'stop:chamber>stop:study'
-let audit, measured
+/** the two legs as the tree before the picture wall's aisle walked them, kept
+    so the lines are still proved on the walks the owner saw */
+const OWNER = JSON.parse(readFileSync(new URL('./motion-owner-legs.json', import.meta.url), 'utf8')).clips
+let audit, measured, owner
 
+const reading = (grid, samples, framing) => {
+  const r = measureClip(grid, samples, framing)
+  return { ...r, verdict: motionVerdict({ heading: r.heading, view: r.view }) }
+}
 before(async () => {
   audit = await openAudit({ only: [GALLERY, PAVILION, CALM], log: (s) => console.log(`# ${s}`) })
-  measured = new Map(audit.tracks.map((t) => {
-    const r = measureClip(audit.grid, t.samples, t.framing)
-    return [`${t.edge.id} ${t.framing}`, { ...r, verdict: motionVerdict({ heading: r.heading, view: r.view }) }]
-  }))
+  measured = new Map(audit.tracks.map((t) => [`${t.edge.id} ${t.framing}`, reading(audit.grid, t.samples, t.framing)]))
+  // the old walks pass within a metre and a half of today's: the world mounted near today's holds them
+  owner = new Map(Object.entries(OWNER).map(([at, samples]) => [at, reading(audit.grid, samples, at.split(' ')[1])]))
 })
 
-test("the gallery leg seen as wrong is red on the heading line, both framings", () => {
+test('the gallery leg as first seen is red on the heading line, both framings', () => {
   for (const framing of ['wide', 'upright']) {
-    const r = measured.get(`${GALLERY} ${framing}`)
+    const r = owner.get(`${GALLERY} ${framing}`)
     assert.ok(r.verdict.heading, `${framing} is red`)
     assert.match(r.verdict.heading, /the way the eye walks swings/)
-    console.log(`# ${GALLERY} ${framing}: ${r.verdict.heading}`)
+    console.log(`# ${GALLERY} ${framing} as first seen: ${r.verdict.heading}`)
   }
 })
 
-test('the pavilion leg seen as wrong is red on the near line (wide)', () => {
-  const r = measured.get(`${PAVILION} wide`)
+test('the pavilion leg as first seen is red on the near line (wide)', () => {
+  const r = owner.get(`${PAVILION} wide`)
   assert.ok(r.verdict.near, 'wide is red')
   assert.ok(r.view.minM < 0.6, `the jamb at ${r.view.minM} m`)
-  console.log(`# ${PAVILION} wide: ${r.verdict.near}`)
+  console.log(`# ${PAVILION} wide as first seen: ${r.verdict.near}`)
   // the phone's frame is narrow: the entrance beam stands at the cap's edge there (flagged.md)
-  const up = measured.get(`${PAVILION} upright`)
-  console.log(`# ${PAVILION} upright: nearest in view ${up.view.minM.toFixed(3)} m, near ${up.verdict.near ?? 'green'}`)
+  const up = owner.get(`${PAVILION} upright`)
+  console.log(`# ${PAVILION} upright as first seen: nearest in view ${up.view.minM.toFixed(3)} m, near ${up.verdict.near ?? 'green'}`)
+})
+
+test('the same two legs walked today are green on both lines, both framings', () => {
+  for (const id of [GALLERY, PAVILION]) for (const framing of ['wide', 'upright']) {
+    const at = `${id} ${framing}`
+    assert.deepEqual(measured.get(at).verdict, { near: null, heading: null }, at)
+  }
 })
 
 test('a calm leg is green on both lines, both framings', () => {

@@ -6,7 +6,7 @@ import { createCertifiedRailPath } from './rail-smoothing'
 import { assertRailProjection } from './rail-projection'
 export { assertRailProjection, fittedRailFov } from './rail-projection'
 import { vinciApproachPose, vinciApproachRunPairs, vinciExhibitRecords } from './collection/approaches'
-import { VINCI_WALLS } from './collection/wall'
+import { GALLERY_WALK_M, VINCI_WALLS, vinciGalleryGate, vinciGalleryRun, type VinciGallery } from './collection/wall'
 import type { VinciStationId } from './content'
 import certificateText from './data/rail-clearance.json?raw'
 
@@ -36,6 +36,17 @@ interface SavedWall {
       accepted corner takes out of it: a sub-path's own certified length */
   chordM: number[]; shortenM: number[]
 }
+/** A WALL'S GALLERY: its aisle's line between the two end stations' gates,
+ * and each vertex's spur to the gate forward of it on either side, with the
+ * corner there: the parts every long run along the wall is built from. */
+interface SavedGallerySpur {
+  vertex: number; side: 1 | -1; gate: number[]; spurM: number; trimM: number; shortenM: number
+  certifiedBalls: { centre: number[]; radiusM: number }[]
+}
+interface SavedGallery {
+  viewport: 'desktop' | 'phone'; id: string; north: number; gateM: number; line: number[][]
+  maxNearRadius: number; spurs: SavedGallerySpur[]
+}
 /** A LEG FROM ONE VIEWING EYE TO THE ONE BESIDE IT, so a visitor walking a
  * row of objects never goes back to the station between two of them. */
 interface SavedLink {
@@ -47,6 +58,7 @@ interface SavedLink {
 interface ClearanceData {
   format: 'vinci-rail-clearance-v2'; completeNearClearance: boolean
   geometrySha256: string[]; routes: SavedRoute[]; approaches: SavedApproach[]; walls: SavedWall[]; links: SavedLink[]
+  galleries?: SavedGallery[]
   /** the same solids by count and moments, matched within a tolerance: the
       exact hash holds only in the engine that wrote it (see rail-fingerprint) */
   geometrySignatures?: { tier: string; toleranceM: number; meshes: RailMeshSignature[] }[]
@@ -142,6 +154,35 @@ for (const viewport of VIEWPORTS) {
         throw new Error('Missing complete Vinci wall certificate')
       }
     }
+  }
+}
+// EVERY DECLARED GALLERY, ONCE PER VIEWPORT, on its wall's own certified
+// vertices: its line between the end stations' gates, and a spur for every
+// gate that stands on that line. A gate off the table is a run the rail
+// cannot build, so a moved stop or aisle is refused here.
+const galleryOf = (viewport: 'desktop' | 'phone', id: string): SavedGallery | undefined =>
+  (data.galleries ?? []).find(entry => entry.viewport === viewport && entry.id === id)
+if ((data.galleries ?? []).length !== VINCI_WALLS.filter(wall => wall.gallery).length * VIEWPORTS.length) throw new Error('Missing complete Vinci gallery certificate')
+for (const viewport of VIEWPORTS) {
+  for (const declared of VINCI_WALLS) {
+    const gallery = declared.gallery
+    if (!gallery) continue
+    const saved = galleryOf(viewport, declared.id), wall = data.walls.find(entry => entry.viewport === viewport && entry.id === declared.id)
+    if (!saved || !wall || saved.north !== gallery.north || saved.gateM !== gallery.gateM || saved.line.length !== 2) throw new Error('Missing complete Vinci gallery certificate')
+    const last = wall.points.length - 1
+    const ends = [vinciGalleryGate(gallery, wall.points[0]!, wall.points[last]![0]! > wall.points[0]![0]! ? 1 : -1),
+      vinciGalleryGate(gallery, wall.points[last]!, wall.points[0]![0]! > wall.points[last]![0]! ? 1 : -1)]
+    if (!ends.every((end, i) => near(saved.line[i]!, end, POSE_TOLERANCE_M))) throw new Error('Missing complete Vinci gallery certificate')
+    const low = Math.min(ends[0]![0], ends[1]![0]), high = Math.max(ends[0]![0], ends[1]![0])
+    let expected = 0
+    for (const [vertex, eye] of wall.points.entries()) for (const side of [1, -1] as const) {
+      const gate = vinciGalleryGate(gallery, eye, side)
+      if (gate[0] < low - 1e-9 || gate[0] > high + 1e-9) continue
+      expected++
+      const spur = saved.spurs.filter(entry => entry.vertex === vertex && entry.side === side)
+      if (spur.length !== 1 || !near(spur[0]!.gate, gate, POSE_TOLERANCE_M)) throw new Error('Missing complete Vinci gallery certificate')
+    }
+    if (saved.spurs.length !== expected) throw new Error('Missing complete Vinci gallery certificate')
   }
 }
 // EVERY DECLARED NEIGHBOUR PAIR IS CERTIFIED, at both viewports, on the two
@@ -247,7 +288,7 @@ export function createRailGeometryAuthority(roots: readonly Object3D[]) {
    * another order, so a wall run allows a nanometre where a whole route,
    * whose length is stored as one number, allows nothing. */
   const SUBPATH_TOLERANCE_M = 1e-9
-  function rebuild(saved: SavedRoute | SavedApproach | SavedWall | SavedLink, points: Vector3[],
+  function rebuild(saved: Pick<SavedRoute, 'certifiedBalls' | 'maxNearRadius' | 'roundedLength'>, points: Vector3[],
     certifiedLength = saved.roundedLength, tolerance = 0): Certified {
     const balls = saved.certifiedBalls.map(ball => ({ centre: new Vector3().fromArray(ball.centre), radius: ball.radiusM - geometryToleranceM }))
     const path = createCertifiedRailPath(points, {
@@ -264,6 +305,31 @@ export function createRailGeometryAuthority(roots: readonly Object3D[]) {
     // No unproved curve, altered waypoint or unverified geometry fallback.
     return path
   }
+  /** THE GALLERY RUN between two vertices of a wall, where the wall declares
+   * an aisle and the run is long enough to walk it: its polyline, the two
+   * spurs it leaves and arrives by, and its certified length. */
+  function galleryRun(id: string, from: number, to: number, phone: boolean) {
+    const viewport = phone ? 'phone' : 'desktop'
+    const declared = VINCI_WALLS.find(wall => wall.id === id), gallery = galleryOf(viewport, id)
+    const wall = data.walls.find(entry => entry.viewport === viewport && entry.id === id)
+    if (!declared?.gallery || !gallery || !wall) return null
+    const low = Math.min(from, to), high = Math.max(from, to)
+    if (wallRunLength(wall, low, high) < GALLERY_WALK_M) return null
+    const points = vinciGalleryRun(declared.gallery as VinciGallery, wall.points, from, to)
+    if (!points) return null
+    const side = points[3]![0]! > points[0]![0]! ? 1 : -1
+    const leave = gallery.spurs.find(spur => spur.vertex === from && spur.side === side)
+    const arrive = gallery.spurs.find(spur => spur.vertex === to && spur.side === -side)
+    if (!leave || !arrive) return null
+    const middle = Math.hypot(arrive.gate[0]! - leave.gate[0]!, arrive.gate[1]! - leave.gate[1]!, arrive.gate[2]! - leave.gate[2]!)
+    const certifiedLength = leave.spurM + middle + arrive.spurM - leave.shortenM - arrive.shortenM
+    return { points, leave, arrive, gallery, certifiedLength }
+  }
+  /** A run's certified length on the wall's own line: the chord between its
+   * two vertices, less what each corner INSIDE it takes out of that chord. */
+  const wallRunLength = (saved: SavedWall, low: number, high: number): number =>
+    (saved.chordM[high]! - saved.chordM[low]!) - (saved.shortenM[high - 1]! - saved.shortenM[low]!)
+  const galleryPaths = new Map<string, Certified>()
   return {
     ready,
     get status() { return status },
@@ -349,13 +415,42 @@ export function createRailGeometryAuthority(roots: readonly Object3D[]) {
         // The certified length of exactly this run: the chord between its two
         // vertices, less what each corner INSIDE it takes out of that chord.
         // Its own two ends take no corner, which is why they are excluded.
-        const certifiedLength = (saved.chordM[high]! - saved.chordM[low]!) - (saved.shortenM[high - 1]! - saved.shortenM[low]!)
+        const certifiedLength = wallRunLength(saved, low, high)
         const slice = saved.points.slice(low, high + 1).map(([east, north, height]) => new Vector3(east!, height!, -north!))
         path = rebuild(saved, from < to ? slice : slice.reverse(), certifiedLength, SUBPATH_TOLERANCE_M)
         held.set(key, path)
         wallPaths.set(saved, held)
       }
       return path
+    },
+    /** A LONG RUN ALONG A WALL, down its gallery: the gate spurs and the
+     * aisle's line are the offline proof's own, so nothing new is proved
+     * here either. Null where the wall declares no aisle or the run is too
+     * short to walk it; the run is then the wall's own sub-path. */
+    gallery(id: string, from: number, to: number, phone: boolean, camera: PerspectiveCamera): Certified | null {
+      if (status !== 'verified') throw new Error(failure || 'Rail clearance identity is still being checked')
+      const run = galleryRun(id, from, to, phone)
+      if (!run) return null
+      assertRailProjection(camera)
+      const start = run.points[0]!
+      if (camera.position.distanceToSquared(new Vector3(start[0]!, start[2]!, -start[1]!)) > 1e-18) throw new Error('This camera start/target has no certified Vinci gallery run')
+      const key = `${phone ? 'phone' : 'desktop'}:${id}:${from}:${to}`
+      let path = galleryPaths.get(key)
+      if (!path) {
+        const saved = { certifiedBalls: [...run.leave.certifiedBalls, ...run.arrive.certifiedBalls], maxNearRadius: run.gallery.maxNearRadius, roundedLength: run.certifiedLength }
+        path = rebuild(saved, run.points.map(([east, north, height]) => new Vector3(east!, height!, -north!)), run.certifiedLength, SUBPATH_TOLERANCE_M)
+        galleryPaths.set(key, path)
+      }
+      return path
+    },
+    /** The certified metres of a run along a wall as the rail walks it: down
+     * the gallery where it takes one, otherwise the wall's own sub-path. */
+    wallRunMetres(id: string, from: number, to: number, phone: boolean): number {
+      const run = galleryRun(id, from, to, phone)
+      if (run) return run.certifiedLength
+      const saved = data.walls.find(entry => entry.viewport === (phone ? 'phone' : 'desktop') && entry.id === id)
+      if (!saved) throw new Error('This wall has no certificate')
+      return wallRunLength(saved, Math.min(from, to), Math.max(from, to))
     },
   }
 }

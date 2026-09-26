@@ -7,14 +7,16 @@ import { createRailLookSmoother, createCertifiedRailPath } from './rail-smoothin
 import { projectRailDrag } from './projection-drag'
 import { carriedPace, gaitAt, gaitHeadLift, gaitLeg, gaitRhythm, gaitSecondsAt, strollMetresPerSecond, type GaitThreshold } from './gait'
 import { filmLensPixels, planCalmGaze, type CalmGazePlan, type GazeCourse } from './rail-gaze'
+import { GALLERY_LIFT_RAD, planGalleryGaze } from './rail-gallery-gaze'
 import { collectionLayout } from './collection'
 import { collectionView } from './collection/views'
-import { vinciWallEndVertex, vinciWallIsEnd, vinciWallNearerEnd, vinciWallOfStation, type VinciWall } from './collection/wall'
+import { GALLERY_WALK_M, vinciWallEndVertex, vinciWallIsEnd, vinciWallNearerEnd, vinciWallOfStation, type VinciWall } from './collection/wall'
 import { vinciApproachesAreNeighbours } from './collection/approaches'
 import { COURT, FLOOR, SUPPER_WALL } from './collection/layout'
 import { fittedRailFov, assertRailProjection } from './rail-projection'
 import type { RailGeometryAuthority } from './rail-proof'
 import { hallView } from './house-hall'
+import { railSide, type RailSide } from './rail-waypoints'
 
 export interface Pose { eye: Vector3; at: Vector3; fov: number }
 /** Which room view each collection station stands in. The rooms are built by
@@ -361,8 +363,6 @@ const GAZE_AHEAD_M = 6, WALKED_LEG_M = 3
 /** Over the last metres the way ahead runs out and the arriving composition
  * takes the gaze. */
 const GAZE_ARRIVAL_M = 4
-/** A run along a wall this long leads its gaze down the gallery. */
-const GALLERY_WALK_M = 8
 /** How far the line of sight may stand off the way it leads down, how short
  * the lead may be pulled, and in what steps. Half a metre is inside the
  * envelope the certificate proves around the path, so a chord that holds it
@@ -380,6 +380,8 @@ const ramp=(edge0:number,edge1:number,x:number):number=>{const t=Math.max(0,Math
  * two ends, the last are station eyes; the stops stand between them in that
  * wall's own order. */
 const wallOfStation=(id:VinciStationId):VinciWall|undefined=>vinciWallOfStation(id)
+/** The rooms under the pavilion's roof, left and entered by its one door. */
+const INSIDE:readonly RailSide[]=['picture-room','long-gallery','mechanism-hall']
 export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:RailGeometryAuthority) {
   /** A request that carries a wall vertex is walked on the wall's own line,
    * whether it ends at a stop of the hang or at one of its two end stations. */
@@ -484,14 +486,23 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
    * the certificate holds. */
   /** The certified path, and whether it is a route between two stations: the
    * one kind of leg whose gaze follows its way. */
-  function certifiedPath(request:Request):{path:ReturnType<typeof createCertifiedRailPath>;route:boolean} {
+  function certifiedPath(request:Request):{path:ReturnType<typeof createCertifiedRailPath>;route:boolean;held?:{turnFirst:boolean;liftFirst?:boolean;lensFirst?:boolean;long?:boolean}} {
     // A run along the wall is the sub-path of the wall's own certified line
     // between the vertex the eye stands on and the one it is asked for.
     // A run the length of a hang is a walk down the gallery, not a step to
     // the next frame: seen side on at a metre, the wall would stream past.
     if(request.wall!==undefined&&wallAt!==undefined&&request.wallOn){
+      // A wall with an aisle is walked down it: the eyes' own line weaves
+      // in and out along the frames, a metre off them.
+      const aisle=authority.gallery(request.wallOn.id,wallAt,request.wall,request.phone,camera)
+      if(aisle)return {path:aisle,route:true,held:{turnFirst:false,long:true}}
       const run=authority.wall(request.wallOn.id,wallAt,request.wall,request.phone,camera)
-      return {path:run,route:run.length>=GALLERY_WALK_M}
+      // Between a room's station and a work the view is not panned across the
+      // hang at arm's length: the room's view is held out to the work and
+      // turned to it at the end, and on the way back turned to first.
+      const leaves=vinciWallIsEnd(request.wallOn,wallAt),arrives=vinciWallIsEnd(request.wallOn,request.wall)
+      const held=request.wallOn.gallery!==undefined&&leaves!==arrives?{turnFirst:arrives}:undefined
+      return {path:run,route:run.length>=GALLERY_WALK_M,held}
     }
     // TWO NEIGHBOURS ARE JOINED BY THEIR OWN LEG. Standing at one object and
     // asking for the one beside it walks the line between the two eyes, not
@@ -501,7 +512,16 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     if(request.exhibit)return {path:authority.approach(completed!.pose,request.pose,request.phone,camera),route:false}
     if(viewing&&standing&&request.id===standing.id&&samePose(request.pose,standing.pose))
       return {path:authority.approach(standing.pose,viewing.pose,request.phone,camera,true),route:false}
-    return {path:authority.route(completed!.pose,request.pose,request.phone,camera),route:true}
+    const route=authority.route(completed!.pose,request.pose,request.phone,camera)
+    // OUT THROUGH THE PAVILION'S DOOR TO THE GARDEN the view is held until the
+    // walk is outside and lifted to the house there: lifted on the way, it
+    // swept the door's head and posts through the frame. Coming in, it turns
+    // to the room first and walks in under a level view. Either way the doors
+    // are passed on the garden's narrower lens, which keeps their reveals out
+    // of the frame's edges.
+    if(request.id==='garden'&&INSIDE.includes(railSide(completed!.id)))return {path:route,route:true,held:{turnFirst:false,liftFirst:false,lensFirst:true}}
+    if(completed!.id==='garden'&&INSIDE.includes(railSide(request.id)))return {path:route,route:true,held:{turnFirst:true,lensFirst:false}}
+    return {path:route,route:true}
   }
   /** Where the way leads from a body position on the leg under way. */
   function course(metres:number):GazeCourse {
@@ -526,10 +546,16 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     fromHeading=from.heading;fromElevation=from.elevation
     fromFov=completed.pose.fov;targetFov=request.pose.fov
     const length=path.length
-    gaze=planCalmGaze({from,to,lengthM:length,lensPixels:filmLensPixels(Math.min(fromFov,targetFov),request.phone),
-      zoom:scaleOf(fittedRailFov(targetFov,camera.aspect,request.phone))-scaleOf(fittedRailFov(fromFov,camera.aspect,request.phone)),
-      timed:seconds=>gaitLeg(length,seconds),
-      course:certified.route&&length>=WALKED_LEG_M?course:null})
+    const lensPixels=filmLensPixels(Math.min(fromFov,targetFov),request.phone)
+    const zoom=scaleOf(fittedRailFov(targetFov,camera.aspect,request.phone))-scaleOf(fittedRailFov(fromFov,camera.aspect,request.phone))
+    // down the aisle the view holds its line and turns once, at the end
+    // a view bent further down than the one it goes to is lifted before the
+    // walk, with its lens
+    const held=certified.held,lift=held?held.liftFirst??(held.turnFirst||from.elevation<to.elevation-GALLERY_LIFT_RAD):false
+    gaze=held?planGalleryGaze({from,to,zoom,lensPixels,timed:seconds=>gaitLeg(length,seconds),
+      first:{heading:held.turnFirst,elevation:lift,lens:held.lensFirst??lift},long:held.long===true})
+      :planCalmGaze({from,to,lengthM:length,lensPixels,zoom,timed:seconds=>gaitLeg(length,seconds),
+        course:certified.route&&length>=WALKED_LEG_M?course:null})
     leg=gaze.leg;duration=leg.seconds;legClock=0;legClockAt=now;pace=1;waiting=0;strideM=strideTarget=0;strideAt=now
     active=request
   }

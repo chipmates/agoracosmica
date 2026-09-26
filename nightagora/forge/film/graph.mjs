@@ -320,6 +320,8 @@ export function buildGraph(wing, { wall: wallRuns = 'both' } = {}) {
     if (m.rail === 'wall') {
       const w = wallRecord(framing, m.wall)
       if (!w) throw new Error(`${e.id}: no certified wall ${m.wall}`)
+      // the rail's own reading: down the gallery where the run takes one
+      if (wing.authority.wallRunMetres) return wing.authority.wallRunMetres(m.wall, m.from, m.to, framing.phone)
       // rail-proof's own sub-path length: the chord less what each inside corner takes out
       const low = Math.min(m.from, m.to), high = Math.max(m.from, m.to)
       return (w.chordM[high] - w.chordM[low]) - (w.shortenM[high - 1] - w.shortenM[low])

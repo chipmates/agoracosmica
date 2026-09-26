@@ -97,7 +97,7 @@ const { geometryForPart } = await load(path.join(WING, 'machines/geometry.ts'))
 const { jointValuesAt } = await load(path.join(WING, 'machines/motion.ts'))
 const { gradeAt } = await load(path.join(WING, 'terrain-mesh.ts'))
 const { vinciExhibitRecords, vinciApproachPose, vinciApproachFit, vinciApproachPlateMetres, vinciApproachRunPairs } = await load(path.join(WING, 'collection/approaches.ts'))
-const { VINCI_WALLS } = await load(path.join(WING, 'collection/wall.ts'))
+const { VINCI_WALLS, vinciGalleryGate, GALLERY_MIDDLE_LEAST_M } = await load(path.join(WING, 'collection/wall.ts'))
 
 /* ---- the mounted geometry, at every tier ---- */
 
@@ -736,6 +736,85 @@ for (const { viewport, seen } of families) for (const declared of VINCI_WALLS) {
   })
 }
 
+/* ---- the gallery: one straight aisle down a hang, a spur to each eye ----
+ *
+ * A long run walks the wall's declared aisle: from its first vertex by a
+ * spur to a gate on the line, straight down the line, and by a spur from a
+ * gate to its last vertex (`vinciGalleryRun`). The line between the two end
+ * stations' gates is proved whole, every spur whole, and the corner at every
+ * gate by the same closed balls a wall uses. A gate's corner is the same
+ * curve for every run through it, leaving or arriving: its trim is set by its
+ * spur alone, because the straight between two gates is never shorter than
+ * GALLERY_MIDDLE_LEAST_M, and that is the straight it is proved with here.
+ */
+const galleries = [], galleryReadings = []
+for (const wall of walls) {
+  const declared = VINCI_WALLS.find(entry => entry.id === wall.id)
+  if (!declared?.gallery) continue
+  if (declared.ends.length !== 2) throw new Error(`${wall.id}: a gallery runs between two end stations`)
+  const gallery = declared.gallery, clearance = wall.maxNearRadius
+  const toVector = ([east, north, height]) => new THREE.Vector3(east, height, -north)
+  const last = wall.points.length - 1
+  const lineEnds = [
+    vinciGalleryGate(gallery, wall.points[0], wall.points[last][0] > wall.points[0][0] ? 1 : -1),
+    vinciGalleryGate(gallery, wall.points[last], wall.points[0][0] > wall.points[last][0] ? 1 : -1),
+  ]
+  const lineLow = Math.min(lineEnds[0][0], lineEnds[1][0]), lineHigh = Math.max(lineEnds[0][0], lineEnds[1][0])
+  const line = segmentClearance(toVector(lineEnds[0]), toVector(lineEnds[1]), clearance)
+  let worst = line.distance, worstMesh = line.mesh, worstAt = 'line', corners = 0, uncertified = 0
+  const spurs = []
+  for (const [vertex, eye] of wall.points.entries()) for (const side of [1, -1]) {
+    // the line is proved at one height: a vertex off it would bend a run's straight
+    if (Math.abs(eye[2] - lineEnds[0][2]) > 1e-9 || Math.abs(lineEnds[1][2] - lineEnds[0][2]) > 1e-9) throw new Error(`${wall.id}: vertex ${vertex} stands off the gallery's height`)
+    const gate = vinciGalleryGate(gallery, eye, side)
+    // a gate off the line's own extent serves no run: no run leaves an end
+    // station away from the room, and none walks past an end to turn back
+    if (gate[0] < lineLow - 1e-9 || gate[0] > lineHigh + 1e-9) continue
+    const from = toVector(eye), at = toVector(gate)
+    const on = toVector([gate[0] + side * GALLERY_MIDDLE_LEAST_M, gate[1], gate[2]])
+    const span = segmentClearance(from, at, clearance)
+    if (span.distance < worst) { worst = span.distance; worstMesh = span.mesh; worstAt = `vertex ${vertex} side ${side}` }
+    const balls = []
+    const path = createCertifiedRailPath([from, at, on], {
+      clearanceRadiusM: clearance, maxTrimM: .5, certificateDepth: 6, numericalMarginM: NUMERICAL_MARGIN_M,
+      certifyBall(centre, radius) {
+        if (!ballIsClear(centre, radius)) return false
+        balls.push({ centre: [centre.x, centre.y, centre.z], radiusM: radius + BALL_RESERVE_M })
+        return true
+      },
+    })
+    const corner = path.corners[0]
+    const spurM = from.distanceTo(at)
+    let trimM = 0, shortenM = 0
+    const kept = []
+    if (corner.result === 'certified') {
+      corners++
+      trimM = corner.acceptedTrimM
+      const incoming = at.clone().sub(from).normalize(), outgoing = on.clone().sub(at).normalize()
+      const a = at.clone().addScaledVector(incoming, -trimM), b = at.clone().addScaledVector(outgoing, trimM)
+      shortenM = 2 * trimM - quadraticLength(a, at, b)
+      const accepted = new Map(balls.map(ball => [ball.centre.join(','), ball]))
+      const collect = (x, control, z, remaining) => {
+        const centre = x.clone().add(control).add(z).multiplyScalar(1 / 3)
+        const ball = accepted.get([centre.x, centre.y, centre.z].join(','))
+        if (ball) { kept.push(ball); return }
+        if (remaining === 0) throw new Error('A certified gallery corner has no recorded ball')
+        const left = x.clone().lerp(control, .5), right = control.clone().lerp(z, .5), middle = left.clone().lerp(right, .5)
+        collect(x, left, middle, remaining - 1); collect(middle, right, z, remaining - 1)
+      }
+      collect(a, at.clone(), b, 6)
+    } else if (corner.result === 'uncertified') uncertified++
+    spurs.push({ vertex, side, gate, spurM, trimM, shortenM, certifiedBalls: kept })
+  }
+  galleryReadings.push({
+    viewport: wall.viewport, id: wall.id, north: gallery.north, gateM: gallery.gateM,
+    lineM: +Math.abs(lineHigh - lineLow).toFixed(4), spurs: spurs.length, corners, uncertifiedCorners: uncertified,
+    requiredM: +clearance.toFixed(4), spanClearanceM: +worst.toFixed(4), spanMesh: worstMesh, worstAt,
+    clear: worst > clearance - 1e-9,
+  })
+  galleries.push({ viewport: wall.viewport, id: wall.id, north: gallery.north, gateM: gallery.gateM, line: lineEnds, maxNearRadius: clearance, spurs })
+}
+
 /* ---- the station envelopes ---- */
 
 const stationCones = []
@@ -782,6 +861,7 @@ const certificate = {
     `The walk carries a step rhythm of at most ${(gaitEnvelopeM * 1000).toFixed(2)} mm off the certified line, and that envelope is added to the clearance radius every span and every corner above is proved against.`,
     'An approach is one straight leg from a station eye to one exhibit\'s viewing eye and back, proved by the same exact segment/triangle distance and the same near rectangle plus gait envelope as a route. It is reachable from that station only, it is not addressable by the station rail, and the table is linear: two entries per exhibit, never the product of poses. The exhibits are the hang\'s plates, the mural, the machines, the grave\'s three, the plaque, the book and the twelve cut dates.',
     'A wall is one polyline through every stop of it, with its declared station eyes as its ends. Every span is proved WHOLE, end to end and untrimmed, and every interior corner by the same closed balls a route uses, so a run from any stop to any other is the sub-path between those two vertices and needs no proof of its own: the trim at an interior vertex depends only on its two adjoining spans and is identical in every sub-path holding it, and the ends of a sub-path take no corner. The table is linear in the stops, never their product, and no viewing eye moves to be on it.',
+    'A gallery is the straight aisle a long run along a wall walks instead of the eyes\' own line. Its line between the two end stations\' gates is proved whole, every spur from a vertex to its gate whole, and every gate\'s corner by closed balls, with the straight beside it at the least a run allows, so its trim is set by the spur alone and one proof serves every run through that gate, leaving or arriving. The table is linear in the stops.',
     `A station whose full near ball is not clear carries an oriented certificate instead: its near pyramid is proved over the whole ±${LOOK_YAW} rad yaw and ±${LOOK_PITCH} rad pitch look envelope, sampled every ${LOOK_STEP} rad, with the distance a corner can travel between two samples subtracted from the measured margin.`,
   ],
   arrivalEN,
@@ -795,6 +875,7 @@ const certificate = {
   routes,
   approaches,
   walls,
+  galleries,
   links,
 }
 
@@ -818,6 +899,12 @@ for (const reading of wallReadings) {
   if (reading.uncertifiedCorners) failures.push(`${reading.viewport} ${reading.id}: ${reading.uncertifiedCorners} corner(s) of the wall carry no certified fillet`)
   if (reading.worstNearBallMarginM <= 0) failures.push(`${reading.viewport} ${reading.id}: vertex ${reading.worstNearBallVertex} stands inside its own near envelope, ${reading.worstNearBallMarginM} m from ${reading.worstNearBallMesh}`)
 }
+for (const reading of galleryReadings) {
+  if (!reading.clear) failures.push(`${reading.viewport} ${reading.id} gallery: ${reading.worstAt} passes within ${reading.spanClearanceM} m of ${reading.spanMesh}, under the ${reading.requiredM} m envelope`)
+  if (reading.uncertifiedCorners) failures.push(`${reading.viewport} ${reading.id} gallery: ${reading.uncertifiedCorners} gate corner(s) carry no certified fillet`)
+}
+const expectedGalleries = families.length * VINCI_WALLS.filter(wall => wall.gallery).length
+if (galleries.length !== expectedGalleries) failures.push(`Expected ${expectedGalleries} galleries, certified ${galleries.length}`)
 // Every declared wall once per viewport, with every stop on it and its own
 // station eyes as its ends: a run is a sub-path of that line, never a new
 // proof.
@@ -847,6 +934,9 @@ const sameApproaches = previousCertificate ? previousCertificate.format === cert
   && approachIdentity(previousCertificate.approaches) === approachIdentity(approaches) : false
 const wallIdentity = table => JSON.stringify((table ?? []).map(entry => [entry.viewport, entry.id, entry.stops, entry.points, entry.roundedLength, entry.maxNearRadius, entry.chordM, entry.shortenM]))
 const sameWalls = previousCertificate ? wallIdentity(previousCertificate.walls) === wallIdentity(walls) : false
+const galleryIdentity = table => JSON.stringify((table ?? []).map(entry => [entry.viewport, entry.id, entry.north, entry.gateM, entry.line, entry.maxNearRadius,
+  entry.spurs.map(spur => [spur.vertex, spur.side, spur.gate, spur.spurM, spur.trimM, spur.shortenM, spur.certifiedBalls.length])]))
+const sameGalleries = previousCertificate ? galleryIdentity(previousCertificate.galleries) === galleryIdentity(galleries) : false
 const linkIdentity = table => JSON.stringify((table ?? []).map(entry => [entry.viewport, entry.from, entry.to, entry.points, entry.roundedLength, entry.maxNearRadius]))
 const sameLinks = previousCertificate ? linkIdentity(previousCertificate.links) === linkIdentity(links) : false
 
@@ -856,6 +946,7 @@ if (VERIFY) {
   if (!samePoints) failures.push('The certificate on disk does not carry the routes the current poses produce')
   if (!sameApproaches) failures.push('The certificate on disk does not carry the approaches the current viewing poses produce')
   if (!sameWalls) failures.push('The certificate on disk does not carry the wall the current stops and end stations produce')
+  if (!sameGalleries) failures.push('The certificate on disk does not carry the gallery the current stops and aisle produce')
   if (!sameLinks) failures.push('The certificate on disk does not carry the legs the current neighbouring viewing eyes produce')
 } else if (!failures.length) {
   fs.writeFileSync(CERTIFICATE, text)
@@ -878,9 +969,10 @@ const report = {
   routes: routes.length,
   approaches: approaches.length,
   walls: wallReadings,
+  galleries: galleryReadings,
   links: linkReadings.length,
   triangles: index.data.count,
-  sameGeometryAsDisk: sameGeometry, sameRoutesAsDisk: samePoints, sameApproachesAsDisk: sameApproaches, sameWallsAsDisk: sameWalls, sameLinksAsDisk: sameLinks,
+  sameGeometryAsDisk: sameGeometry, sameRoutesAsDisk: samePoints, sameApproachesAsDisk: sameApproaches, sameWallsAsDisk: sameWalls, sameGalleriesAsDisk: sameGalleries, sameLinksAsDisk: sameLinks,
   worstSpanClearance: readings.reduce((worst, reading) => reading.spanClearanceM < worst.spanClearanceM ? reading : worst, readings[0]),
   worstApproachSpan: approachReadings.reduce((worst, reading) => reading.spanClearanceM - reading.requiredM < worst.spanClearanceM - worst.requiredM ? reading : worst, approachReadings[0]),
   worstApproachNearBall: approachCones.reduce((worst, cone) => cone.fullBallM - cone.radius < worst.fullBallM - worst.radius ? cone : worst, approachCones[0]),

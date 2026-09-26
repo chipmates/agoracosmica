@@ -97,7 +97,7 @@ const { stationPose } = load('src/wings/vinci/rail.ts')
 const { mountCollectionPlates } = load('src/wings/vinci/collection/plates.ts')
 const { readVinciExhibits } = load('src/wings/vinci/collection/pick.ts')
 const { createCertifiedRailPath } = load('src/wings/vinci/rail-smoothing.ts')
-const { VINCI_WALLS, vinciWallStops } = load('src/wings/vinci/collection/wall.ts')
+const { VINCI_WALLS, vinciWallStops, vinciGalleryRun, GALLERY_WALK_M } = load('src/wings/vinci/collection/wall.ts')
 const certificate = JSON.parse(source('src/wings/vinci/data/rail-clearance.json'))
 
 /* ---- 1. every declared viewing eye is certified, at both viewports ---- */
@@ -284,6 +284,58 @@ for (const viewport of ['desktop', 'phone']) for (const declared of VINCI_WALLS)
   }
 }
 report.wall = wallReport
+
+/* ---- 4b. the gallery: every long run down a wall's aisle ----
+ *
+ * A run long enough to walk a wall's aisle is its first vertex, one gate, the
+ * gate forward of its last vertex, and that vertex. What is proved here is
+ * what the certificate's linear table rests on: each gate's corner, rebuilt
+ * against the SAVED balls of its two spurs, takes the trim the table records
+ * in every run through it, both ends are exact, and the run's length is the
+ * table's own sum. A corner refused in some run, or a gate the table lacks,
+ * would show here.
+ */
+const galleryReport = {}
+for (const viewport of ['desktop', 'phone']) for (const declared of VINCI_WALLS) {
+  if (!declared.gallery) continue
+  const gallery = (certificate.galleries ?? []).find(entry => entry.viewport === viewport && entry.id === declared.id)
+  assert.ok(gallery, `no gallery certificate: ${viewport} ${declared.id}`)
+  const wall = walls.find(entry => entry.viewport === viewport && entry.id === declared.id)
+  const toVector = ([east, north, height]) => new THREE.Vector3(east, height, -north)
+  let runs = 0, drift = 0, lengthError = 0, trimError = 0, shortest = Infinity
+  for (let from = 0; from < wall.points.length; from++) for (let to = 0; to < wall.points.length; to++) {
+    if (from === to) continue
+    const low = Math.min(from, to), high = Math.max(from, to)
+    if ((wall.chordM[high] - wall.chordM[low]) - (wall.shortenM[high - 1] - wall.shortenM[low]) < GALLERY_WALK_M) continue
+    const points = vinciGalleryRun(declared.gallery, wall.points, from, to)
+    if (!points) continue
+    const side = points[3][0] > points[0][0] ? 1 : -1
+    const leave = gallery.spurs.find(spur => spur.vertex === from && spur.side === side)
+    const arrive = gallery.spurs.find(spur => spur.vertex === to && spur.side === -side)
+    assert.ok(leave && arrive, `a long run has no gate on the table: ${viewport} ${from} to ${to}`)
+    const balls = [...leave.certifiedBalls, ...arrive.certifiedBalls].map(ball =>
+      ({ centre: new THREE.Vector3().fromArray(ball.centre), radius: ball.radiusM - .000002 }))
+    const path = createCertifiedRailPath(points.map(toVector), {
+      clearanceRadiusM: gallery.maxNearRadius, maxTrimM: .5, certificateDepth: 6,
+      certifyBall: (centre, radius) => balls.some(ball => ball.centre.distanceTo(centre) + radius <= ball.radius),
+    })
+    const [first, second] = path.corners
+    trimError = Math.max(trimError, Math.abs(first.acceptedTrimM - leave.trimM), Math.abs(second.acceptedTrimM - arrive.trimM))
+    const start = new THREE.Vector3(), end = new THREE.Vector3()
+    path.pointAtDistance(0, start); path.pointAtDistance(path.length, end)
+    drift = Math.max(drift, start.distanceTo(toVector(points[0])), end.distanceTo(toVector(points[3])))
+    const certified = leave.spurM + Math.abs(arrive.gate[0] - leave.gate[0]) + arrive.spurM - leave.shortenM - arrive.shortenM
+    lengthError = Math.max(lengthError, Math.abs(path.length - certified))
+    shortest = Math.min(shortest, path.length)
+    runs++
+  }
+  assert.ok(runs > 0, `no run walks the gallery: ${viewport} ${declared.id}`)
+  assert.equal(drift, 0, `a gallery run drifts ${drift} m off its own vertex: ${viewport} ${declared.id}`)
+  assert.equal(trimError, 0, `a gate rounds differently in some run: ${viewport} ${declared.id}`)
+  assert.ok(lengthError < 1e-9, `a gallery run is ${lengthError} m off its certified length: ${viewport} ${declared.id}`)
+  galleryReport[`${viewport}/${declared.id}`] = { runs, spurs: gallery.spurs.length, drift, trimError, lengthError, shortestRunM: +shortest.toFixed(4) }
+}
+report.gallery = galleryReport
 
 /* ---- 5. the poses stand where the room builds what they look at ---- */
 

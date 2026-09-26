@@ -20,6 +20,7 @@
 import type { VinciStationId } from '../content'
 import { bodyMounts, type BodyMount } from './body-wall'
 import { hangPlacements } from './hang'
+import { FACE } from './layout'
 
 export interface VinciWallStop {
   /** Its place along the wall, counted from the end a visitor comes in by. */
@@ -36,6 +37,42 @@ export interface VinciWall {
    * vertex 0 is the first, and where a second is declared it is the last. */
   ends: readonly VinciStationId[]
   stops(): readonly VinciWallStop[]
+  /** The aisle a long run walks down instead of the eyes' own line. */
+  gallery?: VinciGallery
+}
+
+/** THE GALLERY WALK. The eyes of a hang stand where each work is read, a
+ * metre or two off it and in and out with the size of the work, so a run past
+ * twenty of them along their own line weaves along the frames. A run this
+ * long walks one straight line down the room instead, and meets the eyes it
+ * leaves and arrives at by one spur each, `gateM` along the room from the
+ * eye, forward in the walk. The certificate proves the line whole and every
+ * spur with its corner, so the table stays linear in the stops. */
+export interface VinciGallery { north: number; gateM: number }
+/** A run along a wall this long walks the gallery where one is declared, and
+ * leads its gaze down the room. */
+export const GALLERY_WALK_M = 8
+/** The least straight between the two gates of a gallery run: from it on, a
+ * gate's rounding is set by its own spur alone (a quarter of the span, at
+ * most half a metre), so one proof per spur serves every run through it. */
+export const GALLERY_MIDDLE_LEAST_M = 2.1
+type ENH = readonly number[]
+/** Where a vertex meets the gallery's line walking toward `side` (+1 east,
+ * -1 west): the line's own north, `gateM` along from the vertex, at its eye
+ * height. */
+export function vinciGalleryGate(gallery: VinciGallery, vertex: ENH, side: 1 | -1): [number, number, number] {
+  return [vertex[0]! + side * gallery.gateM, gallery.north, vertex[2]!]
+}
+/** The polyline of a gallery run between two vertices of a wall's own line
+ * (points east, north, height), or null where the two gates stand too close
+ * for the straight between them. */
+export function vinciGalleryRun(gallery: VinciGallery, points: readonly ENH[], from: number, to: number): ENH[] | null {
+  const a = points[from], b = points[to]
+  if (!a || !b || from === to) return null
+  const side: 1 | -1 = b[0]! > a[0]! ? 1 : -1
+  const leave = vinciGalleryGate(gallery, a, side), arrive = vinciGalleryGate(gallery, b, side === 1 ? -1 : 1)
+  if (side * (arrive[0] - leave[0]) < GALLERY_MIDDLE_LEAST_M) return null
+  return [a, leave, arrive, b]
 }
 
 const exhibitId = (workId: string, face: string): string => `picture/${workId}/${face}`
@@ -81,8 +118,14 @@ export const VINCI_BODY_WALL = 'body-wall-main'
 /** The two stations the hang runs between, in the certificate's own order. */
 export const VINCI_WALL_ENDS = ['picture-room', 'picture-room-west'] as const
 
+/** THE PICTURE ROOM'S AISLE. The room's middle holds the bench row, so the
+ * walk down it runs between the benches and the hang: 2.45 m off the hang's
+ * face, half a metre clear of the benches' edge, where the frames pass as a
+ * row and not one by one at arm's length. */
+const PICTURE_GALLERY: VinciGallery = { north: FACE.pictureWallNorth + 2.45, gateM: 2 }
+
 export const VINCI_WALLS: readonly VinciWall[] = [
-  { id: VINCI_PICTURE_WALL, ends: [...VINCI_WALL_ENDS], stops: pictureStops },
+  { id: VINCI_PICTURE_WALL, ends: [...VINCI_WALL_ENDS], stops: pictureStops, gallery: PICTURE_GALLERY },
   { id: VINCI_BODY_WALL, ends: ['body'], stops: bodyStops },
 ]
 
