@@ -88,7 +88,7 @@
       "prompt": "Exact registered pad clipping, surveyed slope, derived narrow A-SITE gate connection and six treads. No DEM apron interpolation. Support the exact exterior 140 mm collection cheek strips to their retained underside. Classify the derived court-to-G4/G5 exposed bank as mineral ground, retaining its actual height field and every prior platform. The cheek clip follows the raking cheek top.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "da2751a83a527d487276008294dc44d8ca6960c12263eb9a360ace5740c033f5",
+      "sha256": "dea4042091c566719e52c326137b5a0bc0a28022cf5e4cb817a2b404171ff7cc",
       "note": "A-SITE; deterministic museum dressing; recipe_file=src/wings/vinci/terrain-mesh.ts"
     },
     {

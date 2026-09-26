@@ -166,6 +166,19 @@ if (landing > EPS) regions.push(makeRegion('gate-lower-landing', rectangle(stair
 regions.push(...collectionRegions.filter(region=>isCollectionApproachRegion(region.id))
   .map(region=>makeRegion(region.id,region.points,region.levelAt,'earth',region.gradient)))
 
+/** THE COURT IS CUT INTO THE SLOPE ALONG ITS SOUTH-EAST SIDE, up to two
+    metres at the gate. Proposed: where the cut is deeper than a step it is
+    revetted in ashlar and carries a parapet proud of the lawn, so the lawn
+    ends in a built edge and the drop into the court has its guard. Where it
+    is a step the walk from the court climbs it onto the lawn; the parapet
+    is held low enough for the certified walks that pass over it. */
+const COURT_PARAPET = { proud: .25, thick: .42, deeper: .3 } as const
+const courtCorners = polygon('courtyard').map(asPoint)
+const onCourtSouthEast = (p: Point): boolean => {
+  const a = courtCorners[0]!, b = courtCorners[1]!, length = Math.hypot(b[0] - a[0], b[1] - a[1])
+  return Math.abs(halfPlane(a, b, p)) / length < 1e-4
+}
+
 function regionAt(e: number, n: number): Region | undefined {
   for (let i = regions.length - 1; i >= 0; i--) if (contains(regions[i]!, e, n)) return regions[i]
   return undefined
@@ -295,7 +308,7 @@ function finish(source: Batch, name: string): BufferGeometry {
   geometry.setAttribute('normal', new Float32BufferAttribute(source.normal, 3))
   geometry.setAttribute('uv', new Float32BufferAttribute(source.uv, 2))
   geometry.computeBoundingSphere()
-  geometry.userData = { galleryBankCap: galleryBankCapProvenance, basis: 'IGN bilinear grid and A-SITE platform levels; exact platform, proposed road-cut and clipped-stream boundaries. A separate flat 1 m house-side apron fills only the derived gap from F01/F02/G2/G1 to the retained road-cut west edge, with explicit terminal retaining edges and no smoothing into walls. The separate 5 m road approach continues the nominal 1 m grade through the mapped gallery crossing and interpolates to the next mapped point at IGN height; literal platforms and gate connections retain priority. Other mapped path corridors and the derived court-to-G4/G5 mineral bank cap classify the existing slope as earth without changing its elevation. Exact exterior collection-cheek strips now support their existing finish and close both landing heads. Stream beds and banks are supplied by water.ts; modern ponds omitted.', triangles: source.position.length / 9 }
+  geometry.userData = { galleryBankCap: galleryBankCapProvenance, basis: 'IGN bilinear grid and A-SITE platform levels; exact platform, proposed road-cut and clipped-stream boundaries. A separate flat 1 m house-side apron fills only the derived gap from F01/F02/G2/G1 to the retained road-cut west edge, with explicit terminal retaining edges and no smoothing into walls. The separate 5 m road approach continues the nominal 1 m grade through the mapped gallery crossing and interpolates to the next mapped point at IGN height; literal platforms and gate connections retain priority. Other mapped path corridors and the derived court-to-G4/G5 mineral bank cap classify the existing slope as earth without changing its elevation. Exact exterior collection-cheek strips now support their existing finish and close both landing heads. Where the court is cut more than 0.3 m into the slope along its south-east side, the cut is a proposed ashlar revetment carrying a 0.42 m parapet 0.25 m proud of the lawn; no revetment of 1517 is claimed. Stream beds and banks are supplied by water.ts; modern ponds omitted.', triangles: source.position.length / 9 }
   return geometry
 }
 
@@ -442,6 +455,7 @@ export function buildTerrainMeshes(tier: TierName): { earth: BufferGeometry; gra
     }
   }
 
+  const parapet: { from: Point; to: Point; out: Point; fromTop: number; toTop: number }[] = []
   for (let i = 0; i < regions.length; i++) {
     const region = regions[i]!
     const later: Cutter[] = [...regions.slice(i + 1), ...footprintTriangles, ...waterCutters]
@@ -478,6 +492,20 @@ export function buildTerrainMeshes(tier: TierName): { earth: BufferGeometry; gra
           const covered=modern?(collectionCheekBand(from,to)??collectionAccessCheekBand(from,to)):undefined
           if(difference>0)wall(modern?collectionRetaining:retaining,from,to,Math.min(aOther,aOwn),Math.min(bOther,bOwn),aOwn,bOwn,true,covered)
           else if(!isLinedGateEdge(from,to)){
+            if(region.id==='courtyard'&&difference<-COURT_PARAPET.deeper&&onCourtSouthEast(from)&&onCourtSouthEast(to)){
+              const out:Point=[outward[0]/.002,outward[1]/.002],fromTop=aOther+COURT_PARAPET.proud,toTop=bOther+COURT_PARAPET.proud
+              const far=(p:Point):Point=>[p[0]+out[0]*COURT_PARAPET.thick,p[1]+out[1]*COURT_PARAPET.thick]
+              wall(retaining,from,to,aOwn,bOwn,fromTop,toTop,false)
+              // its back is bedded below the lawn, whose mesh runs straight between samples
+              wall(retaining,far(from),far(to),surveyedHeight(...far(from))-.2,surveyedHeight(...far(to))-.2,fromTop,toTop,true)
+              const cap=ccw([from,to,far(to),far(from)]),run=Math.hypot(to[0]-from[0],to[1]-from[1])
+              top(retaining,cap,makeRegion('court-parapet-cap',cap,(e,n)=>{
+                const t=((e-from[0])*(to[0]-from[0])+(n-from[1])*(to[1]-from[1]))/(run*run)
+                return fromTop+(toTop-fromTop)*Math.max(0,Math.min(1,t))
+              }))
+              parapet.push({from,to,out,fromTop,toTop})
+              continue
+            }
             const roadLining=!modern&&(region.id==='street-grade'||region.id.startsWith('road-cut-'))
             wall(modern?collectionRetaining:roadLining?retaining:earth,from,to,aOwn,bOwn,Math.max(aOther,aOwn)+(roadLining?.035:0),Math.max(bOther,bOwn)+(roadLining?.035:0),false,covered)
             if(roadLining){
@@ -490,6 +518,17 @@ export function buildTerrainMeshes(tier: TierName): { earth: BufferGeometry; gra
           }
         }
       }
+    }
+  }
+  // the parapet's two ends, where no length of it runs on
+  const meets = (p: Point, q: Point): boolean => Math.hypot(p[0] - q[0], p[1] - q[1]) < 1e-6
+  for (const piece of parapet) {
+    for (const [end, height, other] of [[piece.from, piece.fromTop, 'to'], [piece.to, piece.toTop, 'from']] as const) {
+      if (parapet.some(next => next !== piece && meets(next[other], end))) continue
+      const back: Point = [end[0] + piece.out[0] * COURT_PARAPET.thick, end[1] + piece.out[1] * COURT_PARAPET.thick]
+      const ground = Math.min(0, surveyedHeight(...end))
+      const faces = other === 'to' ? [back, end] as const : [end, back] as const
+      wall(retaining, faces[0], faces[1], ground, ground, height, height, true)
     }
   }
   return {
