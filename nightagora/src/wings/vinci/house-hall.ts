@@ -142,6 +142,8 @@ const toUV = (p: V2): V2 => [(p[0] - SW[0]) * U[0] + (p[1] - SW[1]) * U[1], (p[0
 const fromUV = (u: number, v: number): V2 => [SW[0] + U[0] * u + V[0] * v, SW[1] + U[1] * u + V[1] * v]
 const P = (u: number, v: number, z: number): V3 => { const q = fromUV(u, v); return [q[0], q[1], z] }
 const HALL_W = toUV(SE)[0], HALL_D = toUV(NW)[1]
+/** the joists' count past the first and the first's centre along u */
+const JOIST_N = Math.floor((HALL_W - JOIST_W) / JOIST_STEP), JOIST_FIRST = (HALL_W - JOIST_N * JOIST_STEP) / 2
 /** The diagonal field's outline, a border row in from the walls: the joint the
  * border and the field share runs along it. Each edge as a point and its
  * inward normal in the hall's frame. */
@@ -284,6 +286,11 @@ const WINDOWS = HALL_WINDOWS.map(id => {
  * 0.105 m transom at 0.63 of the height with its inner face at 0.205 m, and
  * the leaded glass 38 mm behind the face. */
 const MULLION_M = .12, MULLION_IN = .21, TRANSOM_M = .105, TRANSOM_IN = .205, TRANSOM_AT = .63, GLASS_IN = .038
+/** THE LEADED CASEMENTS AS THE ROOM SEES THEM, hung inside the stone cross:
+ * glazed at the shell's glass line, the cross's inner depth ran on past the
+ * glass across each jamb wherever a window is seen at an angle. The sun's
+ * leads are still read at the shell's line. */
+const CASEMENT_IN = MULLION_IN + .008
 /** the four lights of a cross window, in facade metres: along and height */
 function lightsOf(o: Opening): [number, number, number, number][] {
   const x = o.from_m, w = o.width_m, z = o.base_m, h = o.height_m, transom = z + h * TRANSOM_AT
@@ -977,8 +984,7 @@ function ceiling(s: Sink): void {
     s.poly(strip.map(q => P(q[0], q[1], BOARD_Z)), [0, 0, -1], p => { const q = toUV([p[0], p[1]]); return [q[0], q[1]] }, K.OAK, 2 + board)
   }
   // joists: along v, stepped along u, from the kitchen wall to the back wall
-  const jn = Math.floor((HALL_W - JOIST_W) / JOIST_STEP)
-  const first = (HALL_W - jn * JOIST_STEP) / 2
+  const jn = JOIST_N, first = JOIST_FIRST
   // each member's two lower arrises taken off and worn round, as the
   // carpenter finished a timber left in view and the years eased it; the
   // rounds face down to the floor's light
@@ -1588,7 +1594,7 @@ function innerGlass(): Mesh {
   const positions: number[] = [], edge: number[] = [], lat: number[] = []
   for (const w of WINDOWS) {
     const f = w.facade, fr = frame(f)
-    const at = (along: number, z: number): V3 => [f.from[0] + fr.dir[0] * along - fr.out[0] * (GLASS_IN + .003), f.from[1] + fr.dir[1] * along - fr.out[1] * (GLASS_IN + .003), z]
+    const at = (along: number, z: number): V3 => [f.from[0] + fr.dir[0] * along - fr.out[0] * CASEMENT_IN, f.from[1] + fr.dir[1] * along - fr.out[1] * CASEMENT_IN, z]
     for (const [u0, u1, z0, z1] of lightsOf(w.o)) {
       const cu = (u0 + u1) / 2
       const corners: [number, number][] = [[u0, z0], [u1, z0], [u1, z1], [u0, z1]]
@@ -2067,6 +2073,8 @@ function hallMaterial(perPixel: boolean, library?: MaterialLibrary, sunShadow?: 
   const kind = A.x, seed = A.w, wear = B.x, soot = B.y, lit = B.z, inHallShade = B.w
   const is = (k: number): N => float(1).sub(smoothstep(.2, .45, kind.sub(k).abs()))
   let ambient: N = A.y, bounce: N = A.z, westSky: N = A.y.mul(.6)
+  // the sky a point sees before the ceiling's bays close it, and that share
+  let skyOpen: N = A.y, occluded: N = float(1)
   if (perPixel) {
     // the same light as the vertex bake, per point: the hall's windows and
     // sun patches, the passage's hall door, the entrance's court
@@ -2094,18 +2102,27 @@ function hallMaterial(perPixel: boolean, library?: MaterialLibrary, sunShadow?: 
     // the boards, and the boards see the room through a slot. The analytic
     // terms know no such occluder
     const hb = positionWorld.y.sub(CEIL_Z), sideways = float(1).sub(normalWorld.y.abs())
-    const bay = mix(float(1), mix(mix(float(1), float(.82), smoothstep(.02, .2, hb)), exp(hb.max(0).div(-.06)).mul(.6).add(.4), sideways), is(K.OAK).mul(smoothstep(-.004, .004, hb)))
-    ambient = min(float(1), sky.mul(2.4).add(.02)).mul(inHallShade).mul(bay).add(door.mul(.3 * 2.4).add(side.mul(.2 * 2.4)).add(.07).mul(isLink)).add(entrance.x.mul(isEntrance))
+    // A board sees the room only through the gap between its two joists: the
+    // view factor of that slot, about two thirds in the middle of a bay and
+    // under half beside a joist
+    const gap = (JOIST_STEP - JOIST_W) / 2
+    const off = fract(hallUVNode(positionWorld)[0].sub(JOIST_FIRST).div(JOIST_STEP)).sub(.5).abs().mul(JOIST_STEP).min(gap)
+    const near = float(gap).sub(off), far = float(gap).add(off)
+    const slot = near.div(near.mul(near).add(JOIST_D * JOIST_D).sqrt()).add(far.div(far.mul(far).add(JOIST_D * JOIST_D).sqrt())).mul(.5)
+    const bay = mix(float(1), mix(mix(float(1), slot, smoothstep(.02, .2, hb)), exp(hb.max(0).div(-.045)).mul(.8).add(.2), sideways), is(K.OAK).mul(smoothstep(-.004, .004, hb)))
+    skyOpen = min(float(1), sky.mul(2.4).add(.02)).mul(inHallShade); occluded = bay
+    ambient = skyOpen.mul(bay).add(door.mul(.3 * 2.4).add(side.mul(.2 * 2.4)).add(.07).mul(isLink)).add(entrance.x.mul(isEntrance))
     westSky = westSky.mul(2.4).mul(inHallShade).mul(bay)
     bounce = sun.mul(inHallShade).mul(bay).add(door.mul(LINK_DOOR_GAIN).add(side.mul(LINK_SIDE_GAIN)).add(LINK_FILL).mul(isLink)).add(entrance.y.mul(3.2).mul(isEntrance))
   }
-  // THE BOARDS OVERHEAD. One bounce leaves the ceiling's oak between the
-  // joists near black; the room's later bounces off the limewash and the
-  // joists' sides reach it too. An exhibition lift, not a measured transport.
+  // THE CEILING OVERHEAD. One bounce leaves its oak near black; the room's
+  // later bounces off the limewash reach it too. An exhibition lift, not a
+  // measured transport. The sky's share is lifted before the bays close it,
+  // or its clamp at one would light the boards as fully as the joists.
   {
-    const overhead = is(K.OAK).mul(smoothstep(-.02, .01, positionWorld.y.sub(CEIL_Z)))
-    bounce = bounce.mul(mix(float(1), float(4), overhead))
-    ambient = ambient.mul(mix(float(1), float(3), overhead))
+    const overhead = is(K.OAK).mul(smoothstep(-.03, -.005, positionWorld.y.sub(CEIL_Z)))
+    bounce = bounce.mul(mix(float(1), float(3.2), overhead))
+    ambient = mix(ambient, skyOpen.mul(2.5).min(1).mul(occluded), overhead)
   }
   const Wp = positionWorld, T = uv()
   // along the passage wall, in metres: what the hearth's courses run along
