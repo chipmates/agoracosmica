@@ -1779,13 +1779,16 @@ function sideDoorReveal(s: Sink): void {
   const [c0, c1] = [PASSAGE_DOOR.corners[0]!, PASSAGE_DOOR.corners[1]!]
   const out: V2 = [-PASSAGE_DOOR.inward[0], -PASSAGE_DOOR.inward[1]]
   // from the entrance partition's far face to the passage's own lining, the
-  // edge of its outline that runs along the door, nearest it
-  const wallT = .25
+  // edge of its outline that runs along the door, nearest it. The reveal
+  // starts on that face, where the entrance's own cheeks end: any gap there
+  // is a slit onto what stands behind the wall
+  const o = ENTRY_ROOM.openings.find(x => x.connects_to === 'service-link')!
+  const wallT = spec.walls.find(w => w.id === o.wall)?.thickness_m ?? .25
   const faces = LINK_OUTLINE.map((q, i) => [q, LINK_OUTLINE[(i + 1) % LINK_OUTLINE.length]!] as [V2, V2])
     .filter(([q, b]) => Math.abs((b[0] - q[0]) * out[0] + (b[1] - q[1]) * out[1]) < .05 * Math.hypot(b[0] - q[0], b[1] - q[1]))
     .map(([q]) => (q[0] - c0[0]) * out[0] + (q[1] - c0[1]) * out[1]).filter(d => d > 0)
   if (!faces.length) return
-  const d0 = wallT + .002, d1 = Math.min(...faces)
+  const d0 = wallT, d1 = Math.min(...faces)
   if (d1 - d0 < .02) return
   const at = (c: V3, d: number, z: number): V3 => [c[0] + out[0] * d, c[1] + out[1] * d, z]
   const along: V2 = (() => { const l = Math.hypot(c1[0] - c0[0], c1[1] - c0[1]); return [(c1[0] - c0[0]) / l, (c1[1] - c0[1]) / l] })()
