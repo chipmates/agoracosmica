@@ -175,7 +175,8 @@ export function installExport(parts: ExportParts): void {
       const light = object as DirectionalLight
       if (light.isLight && light.castShadow && light.visible) casters++
       const mesh = object as Mesh
-      if (!mesh.isMesh || !mesh.visible || !mesh.material) return
+      // a body hidden now may be stood up inside the clip; a volume is no body
+      if (!mesh.isMesh || !mesh.material || isVolume(mesh)) return
       const names: string[] = []
       for (let o: typeof object | null = object; o; o = o.parent) if (o.name) names.push(o.name)
       index++
@@ -284,11 +285,23 @@ export function installExport(parts: ExportParts): void {
     scene.background = null
     scene.fog = null
     renderer.setClearColor(0x000000, 0)
-    for (const s of swaps) s.mesh.material = s.now
+    /* THE AIR IS NOT A SURFACE. A volume draws without a depth test after
+       everything else: as an id body its box hid the whole room, in its own
+       material it added its light into the ids and the depths. */
+    const air: Mesh[] = []
+    scene.traverseVisible((object) => { const mesh = object as Mesh; if (mesh.isMesh && isVolume(mesh)) air.push(mesh) })
+    for (const mesh of air) mesh.visible = false
+    for (const s of swaps) {
+      // a material the wing hides draws nothing in the frame, so none in the ids
+      if (Array.isArray(s.now)) s.now.forEach((m, k) => { m.visible = (s.was as Material[])[k]?.visible !== false })
+      else s.now.visible = (s.was as Material).visible !== false
+      s.mesh.material = s.now
+    }
     renderer.setRenderTarget(idTarget)
     renderer.render(scene, camera)
     renderer.setRenderTarget(wasTarget)
     for (const s of swaps) s.mesh.material = s.was
+    for (const mesh of air) mesh.visible = true
     for (const [light, auto, needs] of held) {
       light.shadow.autoUpdate = auto
       light.shadow.needsUpdate = needs
