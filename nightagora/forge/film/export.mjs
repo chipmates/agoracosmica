@@ -240,6 +240,194 @@ export function frameCells(cells, frame) {
   return { floorCeiling: seen ? flat / seen : 0 }
 }
 
+/* ---- a plate's texels on the screen (§5.2: a plate never shows more texels than its source holds) ---- */
+export const PLATE_TEXEL_METHOD = 'delivered pixels per texel, the most of any frame: every id pixel where a plate shows (its ray meets a flat card of a body showing a raster record or a plates batch inside the card\'s uv rectangle, no further than the id pass\'s depth; the nearest, of one plane the one drawn later), that ray and its neighbours\' meeting the card\'s plane, their steps in texels of the smallest raster the body shows at that frame (its uploaded size; the record\'s size when it shows none), the inverse of that map\'s least stretch'
+/** a card's vertices must sit on one affine uv map to this, in metres */
+const PLATE_FLAT_M = 0.002
+let rasters = null
+/** Every raster record the build serves, by id, at the pixel size its file
+    carries (`name__WxH.jpg`, checked against the record's pixel count). */
+export function rasterSizes(file = join(APP_ROOT, 'dist', 'na-manifest.json')) {
+  if (rasters) return rasters
+  rasters = new Map()
+  for (const e of JSON.parse(readFileSync(file, 'utf8')).assets ?? []) {
+    const m = /__(\d+)x(\d+)\.[a-z0-9]+$/.exec(e.path ?? '')
+    if (!m) continue
+    const width = Number(m[1]), height = Number(m[2])
+    if (e.pixels !== undefined && e.pixels !== width * height) continue
+    rasters.set(e.id, { width, height })
+  }
+  return rasters
+}
+const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]]
+const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
+const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]]
+const scale3 = (a, k) => [a[0] * k, a[1] * k, a[2] * k]
+/** a world vector on a plane, in the coordinates of two vectors spanning it */
+function planeBasis(a, b) {
+  const aa = dot(a, a), ab = dot(a, b), bb = dot(b, b), det = aa * bb - ab * ab
+  return { a, b, g: [bb / det, -ab / det, -ab / det, aa / det] }
+}
+const coords = (basis, v) => {
+  const x = dot(basis.a, v), y = dot(basis.b, v), g = basis.g
+  return [g[0] * x + g[1] * y, g[2] * x + g[3] * y]
+}
+
+/** a texture shown by less than this share of a mix is not on the screen */
+const SHOWN_SHARE = 0.01
+/** bodies that draw many plates' previews from one array texture: every
+    texture they show is a plate's, whatever its name */
+export const PLATE_BATCHES = new Set(['vinci/collection-plates'])
+/** the records the page is asked about */
+export const plateIds = (sizes = rasterSizes()) => [...sizes.keys(), ...PLATE_BATCHES]
+
+/** one flat card of a body: vertices `from` to `to`, on one affine uv map, or null */
+function cardOf(P, T, from, to) {
+  const at = (i) => [P[i * 3], P[i * 3 + 1], P[i * 3 + 2]], uv = (i) => [T[i * 2], T[i * 2 + 1]]
+  // the uv map from the first triangle that spans its uvs: [e1 e2] = [A B] [[du1 du2] [dv1 dv2]]
+  let map = null
+  for (let i = from + 1; i < to && !map; i++) for (let j = i + 1; j < to && !map; j++) {
+    const du1 = uv(i)[0] - uv(from)[0], dv1 = uv(i)[1] - uv(from)[1], du2 = uv(j)[0] - uv(from)[0], dv2 = uv(j)[1] - uv(from)[1]
+    const det = du1 * dv2 - du2 * dv1
+    if (Math.abs(det) < 1e-9) continue
+    const e1 = sub(at(i), at(from)), e2 = sub(at(j), at(from))
+    map = { A: [0, 1, 2].map((k) => (e1[k] * dv2 - e2[k] * dv1) / det), B: [0, 1, 2].map((k) => (e2[k] * du1 - e1[k] * du2) / det) }
+  }
+  if (!map) return null
+  const origin = at(from), [u0, v0] = uv(from)
+  let ua = Infinity, ub = -Infinity, va = Infinity, vb = -Infinity
+  for (let i = from; i < to; i++) {
+    const [u, v] = uv(i)
+    if (Math.hypot(...sub(at(i), [0, 1, 2].map((k) => origin[k] + (u - u0) * map.A[k] + (v - v0) * map.B[k]))) > PLATE_FLAT_M) return null
+    ua = Math.min(ua, u); ub = Math.max(ub, u); va = Math.min(va, v); vb = Math.max(vb, v)
+  }
+  const normal = cross(map.A, map.B)
+  return { origin, u0, v0, A: map.A, B: map.B, normal: scale3(normal, 1 / Math.hypot(...normal)), uvBasis: planeBasis(map.A, map.B), rect: [ua, ub, va, vb] }
+}
+
+/**
+ * THE PLATES OF A CLIP, from the page's list (`__naExport.plates(ids)`): each
+ * body that can show a raster record, as its cards (one flat card, or a wall
+ * of four-vertex cards), each with its plane and uv map. A body that cannot
+ * be measured so is kept by name.
+ */
+export function plateModels(listed, sizes = rasterSizes()) {
+  const models = [], unmeasured = []
+  listed.forEach((body, key) => {
+    const batch = PLATE_BATCHES.has(body.id)
+    if (!batch && !(body.id && sizes.has(body.id)) && !(body.shown ?? []).some((t) => sizes.has(t.id))) return
+    const P = body.positions, T = body.uvs
+    if (!P || !T) { unmeasured.push(`${body.name} (${body.vertices} vertices)`); return }
+    const n = P.length / 3
+    let cards = [cardOf(P, T, 0, n)]
+    if (!cards[0] && n > 4 && n % 4 === 0) cards = Array.from({ length: n / 4 }, (_, k) => cardOf(P, T, k * 4, k * 4 + 4))
+    if (!cards.every(Boolean)) { unmeasured.push(`${body.name} (not flat cards)`); return }
+    models.push({ name: body.name, key, id: body.id, batch, order: body.order ?? 0, cards })
+  })
+  return { models, unmeasured }
+}
+
+/** THE RASTER A BODY SHOWS NOW: the smallest one its drawn materials show by
+    more than a sliver (a preview while it stands in for the full plate), at
+    its uploaded size; its record's, when it names one and shows none; none
+    while it is not drawn. */
+export function plateSize(model, share, sizes = rasterSizes()) {
+  if (!share?.drawn) return null
+  const shown = share.shown.filter((t) => t.share > SHOWN_SHARE && (model.batch || sizes.has(t.id)))
+  if (shown.length) return shown.reduce((a, b) => (b.width * b.height < a.width * a.height ? b : a))
+  return model.id && sizes.has(model.id) ? { id: model.id, ...sizes.get(model.id), record: true } : null
+}
+
+/** a surface of the id pass nearer than a plate by more than this hides it:
+    a plate's card writes no depth, the wall it hangs on lies centimetres behind */
+export const PLATE_HIDDEN_M = 0.0005
+/** how far outside its uv rectangle a ray may meet a card and still be on it (a share of the rectangle) */
+const CARD_EDGE = 0.002
+/**
+ * THE MOST DELIVERED PIXELS ONE TEXEL TAKES in a frame. The id pass's depth
+ * holds the nearest surface that writes depth; a plate's card writes none, so
+ * a plate shows at an id pixel when its ray meets one of the plate's cards
+ * inside its uv rectangle no further than that depth. Where two plates meet
+ * one ray, the nearer shows, and of two in one plane the one drawn later (a
+ * raised plate over its batch's preview). The pixel's ray and its
+ * neighbours' across and down meet that card's plane exactly; their steps,
+ * in texels of the raster it shows now, are a 2 by 2 map, and one texel's
+ * longest reach on the screen is the inverse of the map's least stretch. The
+ * id pass runs near a quarter of the stage: one id pixel is the delivered
+ * width (height) over the id width (height) in delivered pixels.
+ */
+export function plateTexels(frame, models, shares, sizes = rasterSizes()) {
+  const out = { ratio: 0, plate: null, raster: null, pixels: 0 }
+  const live = []
+  for (const m of models) {
+    const size = plateSize(m, shares?.[m.key], sizes)
+    if (!size) continue
+    const cards = m.cards.map((c) => ({ ...c, texelBasis: planeBasis(scale3(c.A, 1 / size.width), scale3(c.B, 1 / size.height)) }))
+    live.push({ m, size, cards })
+  }
+  if (!live.length) return out
+  const { depth, idSize: [w, h], cam } = frame
+  const kx = frame.head?.w ? frame.head.w / w : ID_DIV, ky = frame.head?.h ? frame.head.h / h : ID_DIV
+  const P = cam.proj, M = cam.world
+  const ix = 1 / P[0], iy = 1 / P[5], ox = P[8], oy = P[9]
+  const eye = [M[12], M[13], M[14]]
+  const ray = (x, y) => {
+    const vx = (((x + 0.5) / w) * 2 - 1 + ox) * ix, vy = (1 - ((y + 0.5) / h) * 2 + oy) * iy
+    return [M[0] * vx + M[4] * vy - M[8], M[1] * vx + M[5] * vy - M[9], M[2] * vx + M[6] * vy - M[10]]
+  }
+  // with the view axis at -1 in the ray, a ray's parameter is the id pass's depth
+  const onPlane = (c, r) => {
+    const den = dot(r, c.normal)
+    if (Math.abs(den) < 1e-12) return null
+    const t = dot(sub(c.origin, eye), c.normal) / den
+    return t > 0 ? { t, q: [eye[0] + r[0] * t, eye[1] + r[1] * t, eye[2] + r[2] * t] } : null
+  }
+  const inside = (c, q) => {
+    const [du, dv] = coords(c.uvBasis, sub(q, c.origin)), u = c.u0 + du, v = c.v0 + dv
+    const [ua, ub, va, vb] = c.rect, eu = (ub - ua) * CARD_EDGE, ev = (vb - va) * CARD_EDGE
+    return u >= ua - eu && u <= ub + eu && v >= va - ev && v <= vb + ev
+  }
+  // where a world point falls in id pixels, or null behind the eye
+  const toPixel = (p) => {
+    const d = sub(p, eye)
+    const cx = d[0] * M[0] + d[1] * M[1] + d[2] * M[2], cy = d[0] * M[4] + d[1] * M[5] + d[2] * M[6], cz = d[0] * M[8] + d[1] * M[9] + d[2] * M[10]
+    if (cz >= -1e-6) return null
+    return [((cx / -cz / ix - ox + 1) / 2) * w - 0.5, ((1 - (cy / -cz / iy - oy)) / 2) * h - 0.5]
+  }
+  const best = new Map()
+  for (const { m, size, cards } of live) for (const c of cards) {
+    const [ua, ub, va, vb] = c.rect
+    const corners = [[ua, va], [ub, va], [ub, vb], [ua, vb]].map(([u, v]) => toPixel([0, 1, 2].map((k) => c.origin[k] + (u - c.u0) * c.A[k] + (v - c.v0) * c.B[k])))
+    let x0 = 0, x1 = w - 1, y0 = 0, y1 = h - 1
+    if (corners.every(Boolean)) {
+      x0 = Math.max(0, Math.floor(Math.min(...corners.map((p) => p[0])))); x1 = Math.min(w - 1, Math.ceil(Math.max(...corners.map((p) => p[0]))))
+      y0 = Math.max(0, Math.floor(Math.min(...corners.map((p) => p[1])))); y1 = Math.min(h - 1, Math.ceil(Math.max(...corners.map((p) => p[1]))))
+    }
+    for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
+      const i = y * w + x
+      const hit = onPlane(c, ray(x, y))
+      if (!hit || !inside(c, hit.q)) continue
+      if (depth[i] > 0 && hit.t > depth[i] + PLATE_HIDDEN_M) continue
+      const was = best.get(i)
+      if (was && (was.t < hit.t - PLATE_HIDDEN_M || (Math.abs(was.t - hit.t) <= PLATE_HIDDEN_M && was.m.order > m.order))) continue
+      best.set(i, { t: hit.t, m, size, c, x, y, q: hit.q })
+    }
+  }
+  for (const { m, size, c, x, y, q } of best.values()) {
+    const hx = onPlane(c, ray(x + 1, y)), hy = onPlane(c, ray(x, y + 1))
+    if (!hx || !hy) continue
+    // texels per delivered pixel, along the screen's x and y
+    const [sx, tx] = coords(c.texelBasis, scale3(sub(hx.q, q), 1 / kx)), [sy, ty] = coords(c.texelBasis, scale3(sub(hy.q, q), 1 / ky))
+    const a = sx * sx + tx * tx, b = sx * sy + tx * ty, d = sy * sy + ty * ty
+    const least = (a + d) / 2 - Math.sqrt(((a - d) / 2) ** 2 + b * b)
+    if (!(least > 0)) continue
+    out.pixels++
+    const ratio = 1 / Math.sqrt(least)
+    if (ratio > out.ratio) Object.assign(out, { ratio, plate: m.name, raster: `${size.id} ${size.width}x${size.height}${size.record ? ' (its record)' : ''}` })
+  }
+  return out
+}
+
 /** the cells a segment crosses inside the site's box, Amanatides and Woo */
 function walkRay(cells, from, to) {
   // the segment clipped to the box, by its slabs
@@ -571,16 +759,23 @@ export async function exportClip(session, inbox, edge, nodes, track, out, opts) 
   const frames = []
   const cells = cellSet()
   let floorCeilingMax = 0
+  // the plates are listed once the departure has settled: the held set stands for the whole clip
+  let plates = { models: [], unmeasured: [] }
+  const texel = { max: 0, at: null, plate: null, raster: null, pixels: 0 }
   const began = Date.now()
   const put = async (i, res, meta) => {
     await encoder.write(Buffer.from(res.frame.rgb.buffer, res.frame.rgb.byteOffset, res.frame.rgb.byteLength))
     const fc = frameCells(cells, res.frame)
     floorCeilingMax = Math.max(floorCeilingMax, fc.floorCeiling)
+    // what each plate shows can change inside a clip: read as this frame left it
+    const pt = plates.models.length ? plateTexels(res.frame, plates.models, await page.evaluate(() => window.__naExport.plateShares())) : { ratio: 0, pixels: 0 }
+    texel.pixels += pt.pixels
+    if (pt.ratio > texel.max) Object.assign(texel, { max: pt.ratio, at: i, plate: pt.plate, raster: pt.raster })
     const print = printOf(res.report.cam)
     const nearM = nearDepth(res.frame)
     // the camera at full precision beside its print: another renderer can take the same eye
     const cam = { p: res.report.cam.p, q: res.report.cam.q, fov: res.report.cam.fov }
-    frames.push({ i, sha256: sha256(res.frame.rgb), print, cam, draws: res.report.drawn, walking: res.report.walking, mounted: res.report.mounted, ms: res.report.ms, nearM, floorCeiling: round(fc.floorCeiling, 4), ...meta })
+    frames.push({ i, sha256: sha256(res.frame.rgb), print, cam, draws: res.report.drawn, walking: res.report.walking, mounted: res.report.mounted, ms: res.report.ms, nearM, floorCeiling: round(fc.floorCeiling, 4), plateTexel: round(pt.ratio, 3), ...meta })
     if (opts.keep.has(i) || i === 0) await savePng(res.frame.rgb, stage.width, stage.height, join(opts.frameDir, `${stem}-${framing}-f${String(i).padStart(4, '0')}.png`))
     return nearM
   }
@@ -599,6 +794,7 @@ export async function exportClip(session, inbox, edge, nodes, track, out, opts) 
   }
   // frame 0: the departure at rest
   const { res: f0, frames: settledIn } = await settledRest(session, inbox, tag, opts)
+  plates = plateModels(await page.evaluate((ids) => window.__naExport.plates(ids), plateIds()))
   let nearM = await put(0, f0, { motion: 0, over: false, wall: Date.now() - began })
   // the press, and the leg taken at the instant it was asked for
   const asked = await page.evaluate(([a, b, m]) => window.__naFilm.walk(a, b, m), [from, to, edge.motion])
@@ -673,6 +869,8 @@ export async function exportClip(session, inbox, edge, nodes, track, out, opts) 
       // a volume the eye enters (the hall's air) is the eye's, not held: the frames it begins and ends being drawn
       volumes: frames.filter((f, k) => k === 0 || f.mounted.volumes !== frames[k - 1].mounted.volumes).map((f) => ({ i: f.i, drawn: f.mounted.volumes })) },
     floorCeilingMax: round(floorCeilingMax, 4), refused: refusal,
+    plateTexelRatioMax: round(texel.max, 3),
+    plateTexel: { at: texel.at, plate: texel.plate, raster: texel.raster, pixels: texel.pixels, plates: plates.models.map((m) => `${m.name} (${m.cards.length} card${m.cards.length > 1 ? 's' : ''})`), unmeasured: plates.unmeasured },
     draws: frames.reduce((s, f) => s + f.draws, 0), over: frames.filter((f) => f.over).length,
     fastest: frames.reduce((b, f) => ((f.motion ?? 0) > (b.motion ?? 0) ? f : b), frames[0]).i,
     seconds, secondsPerFrame: round(seconds / frames.length, 3),
@@ -717,10 +915,10 @@ export function clipSidecar(r, { version, recipe, keys, keysNote = null, head = 
     paintedOverCanvas: r.paintedOverCanvas, mountedSetChanges: r.mountedSetChanges, casters: r.casters, mount: r.mount,
     chromeImagesAfterClock: r.chromeImagesAfterClock, lateRequests: r.lateRequests, mountedChanges: r.mountedChanges,
     ...(r.framing === 'upright' ? { floorCeilingMax: r.floorCeilingMax } : {}),
-    plateTexelNote: 'not measured by the export: the texel line waits for a plate hook',
+    plateTexelRatioMax: r.plateTexelRatioMax, plateTexel: { ...r.plateTexel, method: PLATE_TEXEL_METHOD },
     seen: r.seen,
     refused: r.refused,
-    files: r.files, perFrame: r.frameRecords.map((f) => ({ i: f.i, sha256: f.sha256, draws: f.draws, motion: f.motion ?? 0, turnPx: f.turnPx ?? 0, walkPx: f.walkPx ?? 0, nearM: round(f.nearM ?? 0, 3), floorCeiling: f.floorCeiling, meshes: f.mounted?.meshes, wallMs: f.wall, ms: f.ms, print: f.print, cam: f.cam })),
+    files: r.files, perFrame: r.frameRecords.map((f) => ({ i: f.i, sha256: f.sha256, draws: f.draws, motion: f.motion ?? 0, turnPx: f.turnPx ?? 0, walkPx: f.walkPx ?? 0, nearM: round(f.nearM ?? 0, 3), floorCeiling: f.floorCeiling, meshes: f.mounted?.meshes, wallMs: f.wall, ms: f.ms, print: f.print, plateTexel: f.plateTexel, cam: f.cam })),
   }
 }
 
@@ -836,7 +1034,7 @@ async function main() {
             if (r.refused?.length && !r.files) { log(`  REFUSED ${edge.id} ${framing}: ${r.refused.join('; ')}`); continue }
             const sf = (id) => stills.find((s) => s.node === id && s.framing === framing)?.raw
             r.joinsAgree = { first: r.joins.first === sf(edge.from), last: r.joins.last === sf(edge.to) }
-            log(`  ${edge.id} ${framing}: ${r.frames} frames (the graph ${edge.framings[framing].frames + edge.framings[framing].restLag + 1}), ${r.draws} draws, ${r.secondsPerFrame} s a frame; settled in ${r.settledIn} and ${r.settledLastIn}; joins ${r.joinsAgree.first}/${r.joinsAgree.last}; track ${r.track.maxDeviation}; late ${r.requestsAfterClock}; mounted changes ${r.mountedSetChanges}; held ${r.mount.held}, stood ${r.mount.stoodAtFirst} at the first frame and ${r.mount.stoodAtLast} at the last`)
+            log(`  ${edge.id} ${framing}: ${r.frames} frames (the graph ${edge.framings[framing].frames + edge.framings[framing].restLag + 1}), ${r.draws} draws, ${r.secondsPerFrame} s a frame; settled in ${r.settledIn} and ${r.settledLastIn}; joins ${r.joinsAgree.first}/${r.joinsAgree.last}; track ${r.track.maxDeviation}; late ${r.requestsAfterClock}; mounted changes ${r.mountedSetChanges}; held ${r.mount.held}, stood ${r.mount.stoodAtFirst} at the first frame and ${r.mount.stoodAtLast} at the last; plate texels ${r.plateTexelRatioMax} (${r.plateTexel.plate ?? 'no plate'}, ${r.plateTexel.plates.length} plates, ${r.plateTexel.unmeasured.length} not measured)`)
           }
           if (mount === 'held') await session.page.evaluate(() => window.__naExport.hold(null))
           const sets = new Set([...stills.filter((x) => x.framing === framing).map((x) => x.drew.signature), ...results.filter((r) => r.framing === framing && r.mount?.signature !== undefined).map((r) => r.mount.signature)])

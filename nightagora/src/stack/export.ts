@@ -20,11 +20,14 @@ import {
   NearestFilter,
   RGBAFormat,
   RenderTarget,
+  Vector3,
   type Camera,
   type DirectionalLight,
+  type Material,
   type Mesh,
   type PerspectiveCamera,
   type Scene,
+  type Texture,
   type WebGPURenderer,
 } from 'three/webgpu'
 import { drawIdBodies, idPlanes, idSwap, isVolume, type IdSwap } from './audit'
@@ -100,6 +103,57 @@ function tooth(x: number, y: number, seed: number): number {
 
 export { idPlanes }
 
+/** A plate's body is a card or a wall of cards; a larger one is named, not measured. */
+const PLATE_VERTICES = 4096
+interface Shown { id: string; width: number; height: number; share: number }
+interface PlateBody { name: string; id: string | null; order: number; vertices: number; drawn: boolean; shown: Shown[]; positions?: number[]; uvs?: number[] }
+interface NodeLike {
+  isTextureNode?: boolean; isMathNode?: boolean; isUniformNode?: boolean; isConstNode?: boolean
+  value?: unknown; method?: string; aNode?: NodeLike; bNode?: NodeLike; cNode?: NodeLike
+  getChildren?: () => Iterable<NodeLike>
+}
+/** THE TEXTURES A MATERIAL SHOWS NOW, by their share: a mix by a uniform
+    (a plate's preview fading to its full raster) shows each side by the
+    uniform's value, every other node passes its share on whole. */
+export function shownTextures(material: Material, out: Map<Texture, number>): void {
+  const seen = new Set<NodeLike>()
+  const walk = (node: NodeLike | null | undefined, share: number): void => {
+    if (!node || share <= 0 || seen.has(node)) return
+    seen.add(node)
+    const texture = node.value as Texture | undefined
+    if (node.isTextureNode && texture?.isTexture) out.set(texture, Math.max(out.get(texture) ?? 0, share))
+    const by = node.cNode
+    if (node.isMathNode && node.method === 'mix' && (by?.isUniformNode || by?.isConstNode) && typeof by.value === 'number') {
+      const t = Math.min(1, Math.max(0, by.value))
+      walk(node.aNode, share * (1 - t))
+      walk(node.bNode, share * t)
+      return
+    }
+    for (const child of node.getChildren?.() ?? []) walk(child, share)
+  }
+  const m = material as Material & { colorNode?: NodeLike | null; map?: Texture | null }
+  walk(m.colorNode, 1)
+  if (!m.colorNode && m.map) out.set(m.map, 1)
+}
+/** whether a body draws now, and every sized texture its drawn materials show
+    (all its materials' with `all`), each with its name and uploaded size */
+function showing(mesh: Mesh, all = false): { drawn: boolean; shown: Shown[] } {
+  const textures = new Map<Texture, number>()
+  let drawn = false
+  for (const material of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
+    if (!material) continue
+    drawn ||= material.visible
+    if (all || material.visible) shownTextures(material, textures)
+  }
+  const shown: Shown[] = []
+  for (const [texture, share] of textures) {
+    const tid = texture.userData?.['manifestId'] ?? texture.name
+    const image = texture.image as { width?: number; height?: number } | null
+    if (image?.width && image.height) shown.push({ id: typeof tid === 'string' ? tid : '', width: image.width, height: image.height, share })
+  }
+  return { drawn, shown }
+}
+
 export function installExport(parts: ExportParts): void {
   const { renderer } = parts
   let socket: WebSocket | null = null
@@ -113,6 +167,8 @@ export function installExport(parts: ExportParts): void {
   let idTarget: RenderTarget | null = null
   let swaps: IdSwap[] = []
   let bodies: string[] = []
+  /** the bodies the last plates() listed, for plateShares() */
+  let plateBodies: Mesh[] = []
   let readMs = 0
 
   const stage = (): { w: number; h: number } => ({ w: renderer.domElement.width, h: renderer.domElement.height })
@@ -394,6 +450,43 @@ export function installExport(parts: ExportParts): void {
     /** the held bodies by their names, sorted: two sessions hold one set when these agree */
     held: (): string[] => holding.map(pathOf).sort(),
     bodies: () => bodies,
+    /** THE BODIES THAT CAN SHOW A PLATE in the clip about to be made: every
+        visible one that names one of the given records, itself or by a
+        texture any of its materials holds, with what it shows now, its
+        draw order, and its vertices in world metres and its uvs when it is
+        small enough to be cards. The list is kept for plateShares(). */
+    plates(rasters: readonly string[]): PlateBody[] {
+      const out: PlateBody[] = []
+      const wanted = new Set(rasters)
+      const at = new Vector3()
+      plateBodies = []
+      parts.scene()?.traverseVisible((object) => {
+        const mesh = object as Mesh
+        if (!mesh.isMesh || !mesh.material) return
+        const named = mesh.userData?.['manifestId']
+        const id = typeof named === 'string' && wanted.has(named) ? named : null
+        if (!id && !showing(mesh, true).shown.some((t) => wanted.has(t.id))) return
+        const position = mesh.geometry?.getAttribute('position')
+        const uv = mesh.geometry?.getAttribute('uv')
+        if (!position) return
+        plateBodies.push(mesh)
+        const body: PlateBody = { name: pathOf(mesh), id, order: mesh.renderOrder, vertices: position.count, ...showing(mesh) }
+        const many = (mesh as { isInstancedMesh?: boolean }).isInstancedMesh || (mesh as { isBatchedMesh?: boolean }).isBatchedMesh
+        if (!uv || many || position.count > PLATE_VERTICES) { out.push(body); return }
+        mesh.updateWorldMatrix(true, false)
+        const positions: number[] = [], uvs: number[] = []
+        for (let i = 0; i < position.count; i++) {
+          at.fromBufferAttribute(position, i).applyMatrix4(mesh.matrixWorld)
+          positions.push(at.x, at.y, at.z)
+          uvs.push(uv.getX(i), uv.getY(i))
+        }
+        out.push({ ...body, positions, uvs })
+      })
+      return out
+    },
+    /** what each body plates() listed shows now, in its order: a plate's
+        preview gives way to its full raster inside a clip */
+    plateShares: (): Array<{ drawn: boolean; shown: Shown[] }> => plateBodies.map((mesh) => showing(mesh)),
     /** one delivered frame: every draw of its shutter, the resolve, the send */
     async frame(plan: FramePlan) {
       if (!acc || !spec) throw new Error('open the export first')
