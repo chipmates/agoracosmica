@@ -76,6 +76,13 @@ export interface PlateStream {
   allocation(): { previewMB: number; fullMB: number; previewWidth: number; previewHeight: number; fullWidth: number; fullHeight: number }
   residency(): { preview: boolean; full: boolean; blending: boolean; previewUpload: PlateUpload | null; fullUpload: PlateUpload | null }
   error(): string | null
+  /** THE FILM'S PLATE (offline only): the full raster is fetched and decoded
+   * once and held, counted as pending until it is. */
+  filmHold(): Promise<void>
+  /** Shows the held full raster at once, or the preview, in the frame that
+   * asks: no fade, no request. A texture shown is uploaded by that frame's
+   * draw; one taken down leaves the GPU. */
+  filmShow(full: boolean): void
   dispose(): void
 }
 
@@ -233,6 +240,8 @@ export function createPlateStream(preview: ManifestEntry, full: ManifestEntry, o
   let highController: AbortController | null = null
   let highRequest: Promise<void> | null = null
   let fade: { from: number; to: number; started: number } | null = null
+  let filmHeld: LoadedPlate | null = null
+  let filmShown = false
   let timer: ReturnType<typeof setTimeout> | null = null
   let arrivalStarted: number | null = null
   let arrivalTimer: ReturnType<typeof setTimeout> | null = null
@@ -391,7 +400,7 @@ export function createPlateStream(preview: ManifestEntry, full: ManifestEntry, o
     update(_dt) { if (live) advance() },
     high,
     pending: () => live ? requests + (fade ? 1 : 0) + (arrivalStarted !== null ? 1 : 0) : 0,
-    textureMB: () => live ? ((previewImage?.bytes ?? 0) + (fullImage?.bytes ?? 0) + 4) / (1024 * 1024) : 0,
+    textureMB: () => live ? ((previewImage?.bytes ?? 0) + (fullImage?.bytes ?? 0) + (filmShown && filmHeld ? filmHeld.bytes : 0) + 4) / (1024 * 1024) : 0,
     allocation: () => ({ previewMB: mipBytes(previewUpload.width, previewUpload.height) / 1048576,
       fullMB: mipBytes(fullUpload.width, fullUpload.height) / 1048576,
       previewWidth: previewUpload.width, previewHeight: previewUpload.height,
@@ -400,6 +409,35 @@ export function createPlateStream(preview: ManifestEntry, full: ManifestEntry, o
       previewUpload: previewImage ? { ...previewImage.upload } : previewArrived ? { ...previewUpload } : null,
       fullUpload: fullImage ? { ...fullImage.upload } : null }),
     error: () => previewError ?? fullError,
+    async filmHold() {
+      await ready
+      if (!live || filmHeld || !previewArrived) return
+      requests++
+      try {
+        const loaded = await load(fullRecord, previewController.signal, fullUpload)
+        if (!live) { release(loaded); return }
+        filmHeld = loaded
+      } catch (error) {
+        if (live && !previewController.signal.aborted) fullError = String(error)
+      } finally {
+        requests--
+      }
+    },
+    filmShow(full) {
+      if (!live || !filmHeld || full === filmShown) return
+      filmShown = full
+      fade = null
+      if (full) {
+        filmHeld.texture.needsUpdate = true
+        fullNode.value = filmHeld.texture
+        blend.value = 1
+      } else {
+        fullNode.value = previewImage?.texture ?? empty
+        blend.value = 0
+        // the decoded raster stays held; only its upload is let go
+        filmHeld.texture.dispose()
+      }
+    },
     dispose() {
       if (!live) return
       live = false
@@ -416,6 +454,8 @@ export function createPlateStream(preview: ManifestEntry, full: ManifestEntry, o
       material.dispose()
       release(previewImage)
       release(fullImage)
+      release(filmHeld)
+      filmHeld = null
       previewImage = null
       // a handed-over preview is the caller's now; a disposed stream reports no residency
       previewArrived = false

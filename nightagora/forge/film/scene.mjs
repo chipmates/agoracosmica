@@ -169,13 +169,16 @@ export function librarySetOf(library, id) {
 }
 
 /** Every plate as the quad it is streamed onto: the hang, the body wall and
-    the mural, each bound to the store's files for its work. */
+    the mural, each bound to the store's files for its work and to the film's
+    rule for which of them it shows (`collection/film-plates.ts`). */
 function plateQuads(loader, library) {
   const load = at(loader)
   const group = new THREE.Group()
+  const filmRule = stableDigest(load('collection/film-plates'))
   const quad = (name, width, height, position, bearing, identity) => {
     const material = new THREE.MeshBasicMaterial({ name })
     material.userData.library = identity
+    material.userData.film = filmRule
     const mesh = new THREE.Mesh(new THREE.PlaneGeometry(width, height), material)
     mesh.name = name
     mesh.position.set(...position)

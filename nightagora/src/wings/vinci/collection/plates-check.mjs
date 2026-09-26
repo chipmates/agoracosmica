@@ -35,7 +35,10 @@ function fakeStream(preview, full, options) {
     ...state,
     material: new THREE.MeshBasicNodeMaterial(), ready: Promise.resolve(),
     available() { return !api.disposed }, update() {},
-    allocation: () => ({ previewMB: 1, fullMB: 32 }),
+    allocation: () => ({ previewMB: 1, fullMB: 32, previewWidth: 1024, previewHeight: 1024 }),
+    filmHeld: false, filmShown: false,
+    filmHold() { if (!api.disposed) api.filmHeld = true; return Promise.resolve() },
+    filmShow(full) { if (!api.disposed && api.filmHeld) api.filmShown = full },
     textureMB: () => api.disposed ? 0 : 1 + (api.full ? 32 : 0),
     error: () => api.failure ?? null,
     pending: () => 0,
@@ -293,7 +296,47 @@ departing.dispose()
 await departing.ready
 assert.equal(host.children.length, 0)
 assert.equal(memory.size, 0)
+
+// THE FILM (offline): no budget and no one slot. Every full raster is held
+// from the mount, and each card shows it by where the eye stands, the same
+// whatever came before; a batched card is drawn throughout.
+const filmStack = { ...stack, film: true, renderer: { domElement: { height: 1080 } } }
+const filmFrom = streams.length
+const reel = mountCollectionPlates(host, filmStack)
+await reel.ready
+const reelStreams = streams.slice(filmFrom)
+for (let turn = 0; turn < 400 && !reelStreams.every(stream => stream.filmHeld); turn++) await Promise.resolve()
+assert.equal(reelStreams.length, CARDS)
+assert.ok(reelStreams.every(stream => stream.filmHeld), 'the film holds every full raster before its first frame')
+const reelCards = []
+host.traverse(object => { if (object.isMesh && typeof object.userData.previewId === 'string') reelCards.push(object) })
+const streamOf = card => reelStreams.find(stream => stream.plate.id === card.userData.manifestId)
+const shownAt = async eye => {
+  reel.update(1 / 60, eye)
+  for (let turn = 0; turn < 8; turn++) await Promise.resolve()
+  return reelStreams.filter(stream => stream.filmShown).map(stream => stream.plate.id).sort()
+}
+const reelFirst = reelCards.find(card => card.userData.workId === 'madonna-of-the-carnation')
+const reelMural = reelCards.find(card => card.userData.workId === 'last-supper')
+const atFirst = await shownAt(near(reelFirst))
+assert.ok(atFirst.includes(reelFirst.userData.manifestId), 'a card a metre off shows its full raster')
+assert.ok(atFirst.length < CARDS / 2, `the rule is local: ${atFirst.length} of ${CARDS} cards shown at one field`)
+otherMiB = 10000
+assert.deepEqual(await shownAt(near(reelFirst)), atFirst, 'no live budget holds a film plate down')
+otherMiB = 0
+assert.deepEqual(await shownAt(new THREE.Vector3(1000, 1.6, 1000)), [], 'far from every wall, every card shows its preview')
+const atMural = await shownAt(near(reelMural))
+assert.ok(atMural.includes(reelMural.userData.manifestId))
+const behind = reelFirst.position.clone().add(new THREE.Vector3(0, 0, -1).applyEuler(reelFirst.rotation))
+assert.ok(!(await shownAt(behind)).includes(reelFirst.userData.manifestId), 'an eye behind a card does not raise it')
+// one eye, one set, whichever way it was reached
+assert.deepEqual(await shownAt(near(reelFirst)), atFirst)
+assert.ok(reelStreams.filter(stream => stream.options.layered).every(stream => stream.material.visible), 'the film draws every batched card')
+reel.dispose()
+assert.ok(reelStreams.every(stream => stream.disposed))
+assert.equal(memory.size, 0)
 console.log(JSON.stringify({ checker: 'collection-picture-integration', ok: true,
   plates: 25, murals: 1, sheets: 29, withheldFields: 0, retainedFrameCentres: 25,
   tierRemounts: 3, maximumFullSources: 1, memoryRegistration: 'once and disposed',
+  film: { heldAtMount: CARDS, shownAtFirstField: atFirst.length, shownAtMural: atMural.length },
   limitations: ['Simulated stream lifecycle; no browser, illumination, decoding or rendered cost measurement.'] }, null, 2))

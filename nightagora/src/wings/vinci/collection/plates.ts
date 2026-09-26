@@ -23,6 +23,7 @@ import { collectionInteriorMaterial, collectionPlateTone } from './materials'
 import { CANVAS_FORWARD, frameKey, stampHangLight } from './picture-room-plan'
 import { supperMuralLight } from './supper-light'
 import { supperRoomHolds } from './supper-room-plan'
+import { cardDistance, filmReachMetres, previewPitch } from './film-plates'
 
 export interface CollectionPictureSource {
   readonly work: PictureWork
@@ -44,6 +45,8 @@ interface Card {
   normal: Vector3
   /** The wall whose one draw carries this card's preview; null draws itself. */
   wall: Wall | null
+  /** Its face in world metres and its preview's texel pitch, for the film's rule. */
+  face: { widthM: number; heightM: number; pitchM: number }
 }
 type Wall = 'paintings' | 'sheets'
 /** One wall's previews in one draw: every preview a layer of one array
@@ -136,6 +139,9 @@ export function mountCollectionPlates(host: Group, stack: Stack, options: Collec
    * run past twenty-five works carries one request, for the stop it ends at,
    * and has the whole leg to arrive. */
   let aimed: Vector3 | undefined
+  /** THE FILM (offline): every full plate is held decoded, and shown by the
+   * film's own rule (`film-plates.ts`) instead of the one live slot. */
+  const film = stack.film === true
   let failure: string | null = null
   const changes = new Set<Promise<void>>()
   const reported = new Set<string>()
@@ -181,7 +187,36 @@ export function mountCollectionPlates(host: Group, stack: Stack, options: Collec
       .then(() => {
         if (!live || current !== epoch) return
         for (const wall of ['paintings', 'sheets'] as const) batch(wall)
+        if (film) void holdForFilm(current)
       })
+  }
+
+  /** Four decodes at a time, so the count the export waits on falls steadily. */
+  async function holdForFilm(current: number): Promise<void> {
+    const queue = [...cards]
+    const worker = async (): Promise<void> => {
+      for (let card = queue.shift(); card && live && current === epoch; card = queue.shift()) await card.stream.filmHold()
+    }
+    await Promise.all([worker(), worker(), worker(), worker()])
+  }
+
+  const eyeAt: [number, number, number] = [0, 0, 0]
+  const faceAt = new Vector3(), rightAt = new Vector3(), upAt = new Vector3()
+  /** THE FILM'S RULE, from where the eye stands now: a card in reach shows its
+   * full raster in this frame, every other its preview. */
+  function filmNear(eye: Vector3): void {
+    const stageHeight = stack.renderer.domElement.height
+    eyeAt[0] = eye.x; eyeAt[1] = eye.y; eyeAt[2] = eye.z
+    for (const card of cards) {
+      card.mesh.updateWorldMatrix(true, false)
+      const m = card.mesh.matrixWorld
+      faceAt.setFromMatrixPosition(m)
+      rightAt.setFromMatrixColumn(m, 0).normalize()
+      upAt.setFromMatrixColumn(m, 1).normalize()
+      const d = cardDistance(eyeAt, [faceAt.x, faceAt.y, faceAt.z], [rightAt.x, rightAt.y, rightAt.z], [upAt.x, upAt.y, upAt.z],
+        card.face.widthM / 2, card.face.heightM / 2)
+      card.stream.filmShow(d !== null && d < filmReachMetres(card.face.pitchM, stageHeight))
+    }
   }
 
   /** A WALL OF PREVIEWS IS A FEW DRAWS. Each preview is copied once, at its
@@ -346,7 +381,10 @@ export function mountCollectionPlates(host: Group, stack: Stack, options: Collec
         sourceWindow: window, physicalRegistration: false, light: 'collection openings and fittings',
       }
       group.add(mesh)
-      cards.push({ id: entry.id, mesh, stream, normal: new Vector3(Math.sin(field.bearing), 0, Math.cos(field.bearing)), wall })
+      const texels = stream.allocation()
+      cards.push({ id: entry.id, mesh, stream, normal: new Vector3(Math.sin(field.bearing), 0, Math.cos(field.bearing)), wall,
+        face: { widthM: size.widthM, heightM: size.heightM, pitchM: previewPitch(size.widthM, size.heightM,
+          texels.previewWidth * (window?.scaleU ?? 1), texels.previewHeight * (window?.scaleV ?? 1)) } })
       const current = epoch
       void stream.ready.then(() => { if (live && current === epoch) mesh.visible = stream.available() })
       const arch = pictureArchMask(entry.plate)
@@ -392,7 +430,9 @@ export function mountCollectionPlates(host: Group, stack: Stack, options: Collec
         physicalRegistration: false, light: 'collection openings and fittings',
       }
       group.add(mesh)
-      cards.push({ id: page.id, mesh, stream, normal: new Vector3(1, 0, 0), wall: 'sheets' })
+      const texels = stream.allocation()
+      cards.push({ id: page.id, mesh, stream, normal: new Vector3(1, 0, 0), wall: 'sheets',
+        face: { widthM: size.widthM, heightM: size.heightM, pitchM: previewPitch(size.widthM, size.heightM, texels.previewWidth, texels.previewHeight) } })
       const current = epoch
       void stream.ready.then(() => { if (live && current === epoch) mesh.visible = stream.available() })
     }
@@ -482,15 +522,17 @@ export function mountCollectionPlates(host: Group, stack: Stack, options: Collec
       for (const card of cards) {
         card.stream.update(delta)
         card.mesh.visible = card.stream.available()
-        // a batched card costs a draw only while its earned plate is up
-        if (card.wall !== null && card.stream.raised) card.stream.material.visible = card.stream.raised()
+        // a batched card costs a draw only while its earned plate is up; the
+        // film draws every card, so its drawn set holds as a plate comes up
+        if (card.wall !== null && card.stream.raised) card.stream.material.visible = film || card.stream.raised()
       }
       for (const made of batches) {
         const t = Math.min(1, (performance.now() - made.arrived) / 240)
         made.arrival.value = t * t * (3 - 2 * t)
       }
       reportErrors()
-      streamNear(aimed ?? eye)
+      if (film) filmNear(eye)
+      else streamNear(aimed ?? eye)
     },
     dispose(): void {
       if (!live) return
