@@ -99,6 +99,24 @@ function tooth(x: number, y: number, seed: number): number {
   return h / 4294967296 - 0.5
 }
 
+/** The id pass's two planes out of an RGBA float readback. WebGPU copies a
+    texture out in rows padded to 256 bytes and three hands the padded buffer
+    back, so each row is read at its own stride: the upright id target is 195
+    texels wide, which a dense read shears by 13 texels a row. */
+export function idPlanes(raw: Float32Array, w: number, h: number): { ids: Uint32Array<ArrayBuffer>; depth: Float32Array<ArrayBuffer> } {
+  const stride = h > 1 ? (raw.length / 4 - w) / (h - 1) : w
+  if (!Number.isInteger(stride) || stride < w) throw new Error(`the id readback holds ${raw.length} floats for ${w}x${h}`)
+  const ids = new Uint32Array(w * h)
+  const depth = new Float32Array(w * h)
+  for (let y = 0, i = 0; y < h; y++) {
+    for (let x = 0, p = y * stride * 4; x < w; x++, i++, p += 4) {
+      ids[i] = raw[p]! | 0
+      depth[i] = raw[p + 1]!
+    }
+  }
+  return { ids, depth }
+}
+
 export function installExport(parts: ExportParts): void {
   const { renderer } = parts
   let socket: WebSocket | null = null
@@ -446,12 +464,7 @@ export function installExport(parts: ExportParts): void {
       if (plan.ids && idTarget) {
         const raw = (await renderer.readRenderTargetPixelsAsync(idTarget, 0, 0, idTarget.width, idTarget.height)) as Float32Array
         idSize = [idTarget.width, idTarget.height]
-        depth = new Float32Array(idSize[0] * idSize[1])
-        ids = new Uint32Array(idSize[0] * idSize[1])
-        for (let i = 0, p = 0; i < depth.length; i++, p += 4) {
-          ids[i] = raw[p]! | 0
-          depth[i] = raw[p + 1]!
-        }
+        ;({ ids, depth } = idPlanes(raw, idSize[0], idSize[1]))
       }
       const t3 = performance.now()
       if (plan.send && socket) {
