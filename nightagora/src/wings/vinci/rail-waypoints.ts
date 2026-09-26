@@ -96,9 +96,9 @@ const COURT_EAST: RailWaypoint = [COURT.east - 1.4, SUPPER_WALL.north, COURT.lev
  * quarter off the parapet, because the parachute's suspension cords reach
  * walking height two and a half metres from its axis. */
 /** The lane's own south end, out from under the parachute: its south-east
- * upright stands a metre north-east of the display wall's eye on the line
- * the lane would otherwise run, so the walk leaves the station east of it
- * and comes back onto the lane north of the cloth. */
+ * upright stands near (-33.4, -26.7), a metre west and 0.7 m south of this
+ * turn, so the walk passes east of it and comes back onto the lane north of
+ * the cloth. */
 const COURT_LANE_SOUTH: RailWaypoint = [-32.4, -26, COURT.level + railEyeHeightM]
 /** THE DISPLAY WALL'S EYES LEAVE FOR THE LANE BY ONE TURN. Both stand south
  * and west of where the one eye stood, and a straight walk from either to the

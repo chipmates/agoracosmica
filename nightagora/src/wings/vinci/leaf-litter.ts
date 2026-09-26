@@ -46,9 +46,9 @@ function nearCourt(p: V2): boolean {
 export const STOP_EYES: readonly { at: V2; look: V2 }[] = [
   { at: [25.0, -16.1], look: [-.99, .15] }, // arrival
   { at: [10.0, -21.0], look: [-.66, .75] }, // courtyard
-  { at: [5.6, -21.3], look: [-.65, .76] },  // oratory
-  { at: [2.4, -29.3], look: [-.56, .83] },  // study
-  { at: [-4.2, -32.4], look: [-.78, .63] }, // chamber
+  { at: [7.5, -25.0], look: [-.53, .85] },  // oratory
+  { at: [.5, -34.0], look: [-.24, .97] },   // study
+  { at: [-4.0, -38.0], look: [.09, 1.0] },  // chamber
   { at: [-24.5, -31.2], look: [.73, .68] }, // garden
   { at: [-33.9, -29.5], look: [-1, 0] },    // supper wall
   { at: [-46.9, -29.2], look: [-.88, .47] }, // grave

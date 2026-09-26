@@ -439,7 +439,7 @@
       "prompt": "The turns a route takes between two stations, written against the registered gate crossing, the access stair layout and the collection stair.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-11",
-      "sha256": "935842d87e93d5633f0b1e6a8ab6b74933d60c3d3728c59757e7a439e3806f46",
+      "sha256": "566c3ba53e3819660a71cf45868d4e3587fa37c708f0609e2d5c33d4960717f6",
       "note": "recipe_file=src/wings/vinci/rail-waypoints.ts; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail"
     },
     {
