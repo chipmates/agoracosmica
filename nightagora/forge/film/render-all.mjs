@@ -370,6 +370,10 @@ function writeRecord(dir, job, records) {
       c.framings[e.framing] = r.framing
     }
   }
+  // the pack's sampled joins (`sampled-joins.mjs`), kept while the files they decoded are the release's
+  const sampled = existsSync(join(dir, 'sampled-joins.json')) ? JSON.parse(readFileSync(join(dir, 'sampled-joins.json'), 'utf8')).samples ?? [] : []
+  const held = new Set(release.clips.flatMap((c) => Object.values(c.files ?? {}).map((f) => f.sha256)))
+  release.sampledJoins = sampled.filter((s) => held.has(s.file))
   writeAtomic(join(dir, 'release.json'), JSON.stringify(release, null, 1))
   writeAtomic(join(dir, 'export.json'), JSON.stringify(summary, null, 1))
   writeAtomic(join(dir, 'cycles.json'), JSON.stringify(cycles, null, 1))

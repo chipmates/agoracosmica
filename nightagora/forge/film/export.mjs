@@ -274,12 +274,14 @@ function walkRay(cells, from, to) {
 
 /* ---- the encoder ---- */
 /** one ffmpeg for a clip, every rung in one pass, the ends near lossless; without
-    the graph seconds no rung is capped */
-function openEncoder(framing, frames, dir, stem, stage = STAGES[framing], graphSeconds = 0) {
+    the graph seconds no rung is capped. A still passed as a one-frame clip
+    (`frames` 1) is encoded as a clip's end is: the ends' crf and the buffer. */
+export function openEncoder(framing, frames, dir, stem, stage = STAGES[framing], graphSeconds = 0) {
   const [w, h] = [stage.width, stage.height]
   const rungs = RUNGS[framing]
   const last = frames - 1
-  const zones = `:zones=0,${X264.endsFrames - 1},crf=${X264.endsCrf}/${Math.max(X264.endsFrames, last - X264.endsFrames + 1)},${last},crf=${X264.endsCrf}`
+  const one = frames === 1
+  const zones = one ? '' : `:zones=0,${X264.endsFrames - 1},crf=${X264.endsCrf}/${Math.max(X264.endsFrames, last - X264.endsFrames + 1)},${last},crf=${X264.endsCrf}`
   const split = rungs.map((_, k) => `[s${k}]`).join('')
   const scales = rungs.map(([rw, rh], k) => `[s${k}]scale=${rw}:${rh}:flags=lanczos+accurate_rnd+full_chroma_int:out_color_matrix=bt709:out_range=tv,format=yuv420p[o${k}]`).join(';')
   const outs = rungs.map(([rw, rh], k) => {
@@ -288,10 +290,12 @@ function openEncoder(framing, frames, dir, stem, stage = STAGES[framing], graphS
   })
   const args = ['-hide_banner', '-loglevel', 'error', '-y', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', `${w}x${h}`, '-r', String(FPS), '-i', '-',
     '-filter_complex', `[0:v]split=${rungs.length}${split};${scales}`]
-  const caps = rungs.map(([rw, rh]) => vbvOf(`${rw}x${rh}`, frames, graphSeconds))
+  // a one-frame clip is drawn from the same buffer a clip's first frame is
+  const firstOf = (line) => (line ? { maxrate: line, bufsize: Math.round(line * X264.vbv.bufferSeconds), init: X264.vbv.init } : null)
+  const caps = rungs.map(([rw, rh]) => (one ? firstOf(BYTE_LINES[`${rw}x${rh}`]) : vbvOf(`${rw}x${rh}`, frames, graphSeconds)))
   rungs.forEach((_, k) => {
     const vbv = caps[k] ? `:vbv-maxrate=${caps[k].maxrate}:vbv-bufsize=${caps[k].bufsize}:vbv-init=${caps[k].init}` : ''
-    args.push('-map', `[o${k}]`, '-c:v', 'libx264', '-preset', X264.preset, '-crf', String(X264.crf), '-profile:v', 'high',
+    args.push('-map', `[o${k}]`, '-c:v', 'libx264', '-preset', X264.preset, '-crf', String(one ? X264.endsCrf : X264.crf), '-profile:v', 'high',
       // the colour goes into the stream's own header: the output options alone leave the transfer
       // untagged, and WebKit then paints the clip brighter than the still it hands over to
       '-x264-params', `keyint=${X264.keyint}:min-keyint=${X264.keyint}:scenecut=0:aq-mode=${X264.aq}:threads=${X264.threads}:colorprim=bt709:transfer=iec61966-2-1:colormatrix=bt709${zones}${vbv}`,

@@ -36,6 +36,12 @@ export const TRACK_TOLERANCE = 1e-4
     Also how far a join between two sessions of one build may part. */
 export const JOIN_TOLERANCE = 2
 export const SAMPLED_JOINS = 10
+/** A SAMPLED JOIN, as `sampled-joins.mjs` reads it: the clip's end against its
+    still passed through the ends' encoder as a one-frame clip, both decoded by
+    one engine, the largest difference of 16 by 16 block means in Y', Cb and Cr.
+    Two encodes of one picture part pixel by pixel inside the macroblock; a
+    wrong picture or a shift of colour does not. */
+export const SAMPLED_STATISTIC = 'one-frame clip, 16x16 block means in BT.709 YCbCr'
 export const ENGINES = ['chromium', 'webkit', 'firefox']
 /** THE UPRIGHT MID-LEG RULE: the share of a frame's pixels on surfaces facing
     straight up or down. The owner's eye on the first clips sets it; this
@@ -178,7 +184,7 @@ export function writeStandIn(store, tree) {
   }
   // one sampled line per release: ten joins, three engines, colour included
   const sample = [...tree.clips.values()].filter((c, i) => i % Math.max(1, Math.floor(tree.clips.size / SAMPLED_JOINS)) === 0).slice(0, SAMPLED_JOINS)
-  release.sampledJoins = sample.map((c) => ({ clip: c.clip, framing: c.framing, end: 'last', engines: Object.fromEntries(ENGINES.map((e) => [e, { maxDelta: 0, colour: true }])) }))
+  release.sampledJoins = sample.map((c) => ({ clip: c.clip, framing: c.framing, end: 'last', statistic: SAMPLED_STATISTIC, engines: Object.fromEntries(ENGINES.map((e) => [e, { maxDelta: 0, colour: true }])) }))
   store.write('release.json', JSON.stringify(release, null, 1))
   return release
 }
@@ -208,7 +214,7 @@ export function checkRelease(store, tree, { calm = null } = {}) {
     upright: line('upright', 'upright: no frame mostly floor and ceiling'),
     texels: line('texels', 'a plate never shows more texels than its source holds'),
     bytes: line('bytes', 'each rung under its byte line'),
-    sampled: line('sampled joins', 'ten joins decoded in Chromium, WebKit and Firefox against their stills, colour included'),
+    sampled: line('sampled joins', `ten joins decoded in Chromium, WebKit and Firefox against their stills as one-frame clips, colour included, within ${JOIN_TOLERANCE} of 255 by 16x16 block means`),
   }
   if (!text) {
     red(L.graph, 'release', 'release.json is missing')
@@ -288,9 +294,15 @@ export function checkRelease(store, tree, { calm = null } = {}) {
   // THE SAMPLED LINE
   const sampled = release.sampledJoins ?? []
   if (sampled.length < SAMPLED_JOINS) red(L.sampled, 'release', `${sampled.length} sampled joins, the line wants ${SAMPLED_JOINS}`)
-  for (const s of sampled) for (const engine of ENGINES) {
-    const e = s.engines?.[engine]
-    if (!e || !(e.maxDelta <= JOIN_TOLERANCE) || e.colour !== true) red(L.sampled, `${s.clip} ${s.framing}`, `${s.end} in ${engine}: ${e ? `${e.maxDelta} of 255${e.colour ? '' : ', colour not compared'}` : 'not decoded'}`)
+  const clipFiles = new Map(release.clips.map((c) => [`${c.clip} ${c.framing}`, new Set(Object.values(c.files ?? {}).map((f) => f.sha256))]))
+  for (const s of sampled) {
+    if (s.statistic !== SAMPLED_STATISTIC) { red(L.sampled, `${s.clip} ${s.framing}`, `${s.end}: read by another statistic (${s.statistic ?? 'none named'})`); continue }
+    // a sample names the file it decoded: a clip rendered again since is not what it measured
+    if (s.file && !clipFiles.get(`${s.clip} ${s.framing}`)?.has(s.file)) { red(L.sampled, `${s.clip} ${s.framing}`, `${s.end}: measured on a file the release no longer holds`); continue }
+    for (const engine of ENGINES) {
+      const e = s.engines?.[engine]
+      if (!e || !(e.maxDelta <= JOIN_TOLERANCE) || e.colour !== true) red(L.sampled, `${s.clip} ${s.framing}`, `${s.end} in ${engine}: ${e?.maxDelta !== undefined ? `${e.maxDelta} of 255${e.colour ? '' : ', colour not compared'}` : `not decoded${e?.why ? ` (${e.why})` : ''}`}`)
+    }
   }
   if (release.renderer === STAND_IN) L.graph.notes.push(STAND_IN)
   return summarise(lines)

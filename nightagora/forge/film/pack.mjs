@@ -9,6 +9,8 @@
 //
 // A job folder (`render-all.mjs`) is an export run: its `export.json` is
 // rewritten from the ledger, and its `cycles.json` carries the machines' cycles.
+// The gate's sampled joins are measured on it (`sampled-joins.mjs`) and kept
+// in the job's own record.
 //
 // The still at a rung is the master scaled by the same kernel the encoder's
 // rungs are scaled by, so the picture under a clip is the clip's own first
@@ -21,6 +23,7 @@ import sharp from 'sharp'
 import { FPS, buildGraph } from './graph.mjs'
 import { openReplay } from './replay.mjs'
 import { RUNGS } from './export.mjs'
+import { sampledJoins, writeSampled } from './sampled-joins.mjs'
 
 const flags = new Map(process.argv.slice(2).filter((a) => a.startsWith('--')).map((a) => {
   const at = a.indexOf('=')
@@ -242,3 +245,15 @@ console.log(`the release: ${Object.keys(nodes).length} nodes, ${edges.size} clip
 for (const p of projection) if (!p.same) console.log(`  PROJECTION ${p.node} ${p.framing}: still ${p.still} · marks ${p.marks}`)
 for (const s of showpieceMarks) console.log(`  ${s.nodes.length ? 'showpiece' : 'SHOWPIECE WITHOUT A MARK'} ${s.id} ${s.framing}${s.nodes.length ? `: marked at ${s.nodes.join(', ')}` : ': no node carries its mark, so the film wing cannot open it'}`)
 console.log(`  ${join(OUT, 'film.json')}`)
+
+/* THE GATE'S SAMPLED JOINS, measured on the job the pack reads (a job keeps a
+   ledger): ten ends in each engine, into the job's own record. `--sampled=none` skips them. */
+if (flags.get('sampled') !== 'none') {
+  for (const dir of EXPORTS.filter((d) => existsSync(join(d, 'ledger.jsonl')))) {
+    const samples = await sampledJoins(dir, { log: (s) => console.log(s) })
+    writeSampled(dir, samples)
+    const worst = Math.max(0, ...samples.flatMap((s) => Object.values(s.engines).map((e) => e.maxDelta ?? 0)))
+    const missing = [...new Set(samples.flatMap((s) => Object.entries(s.engines).filter(([, e]) => e.maxDelta === undefined).map(([k]) => k)))]
+    console.log(`  sampled joins: ${samples.length} in ${dir}, the largest block difference ${worst} of 255${missing.length ? `; not decoded in ${missing.join(', ')}` : ''}`)
+  }
+}
