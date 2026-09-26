@@ -1,6 +1,7 @@
 /** The picture module's sources on the room's existing measured fields.
  * The room owns the placements and its light. The picture module owns source
- * admission, source windows, image decoding, upload sizes and transitions. */
+ * admission, source windows, image decoding, upload sizes and transitions.
+ * The film's picture key reads this file's text (`forge/film/scene.mjs`). */
 import {
   BufferGeometry, ClampToEdgeWrapping, DataArrayTexture, Float32BufferAttribute, Group, LinearFilter,
   LinearMipmapLinearFilter, Matrix3, Mesh, MeshBasicNodeMaterial, PlaneGeometry, RGBAFormat, SRGBColorSpace,

@@ -1,6 +1,7 @@
 /** One admitted reproduction, unchanged, with a preview and one earned plate.
  * The hang owns the room-wide residency budget. This object owns its requests,
  * decoded bitmaps, texture mip chains, and a continuous 700 ms resolution fade.
+ * The film's picture key reads this file's text (`forge/film/scene.mjs`).
  */
 import {
   ClampToEdgeWrapping,
@@ -212,8 +213,16 @@ export function createPlateStream(preview: ManifestEntry, full: ManifestEntry, o
   const empty = new DataTexture(new Uint8Array([0, 0, 0, 255]), 1, 1, RGBAFormat, UnsignedByteType)
   empty.colorSpace = SRGBColorSpace
   empty.needsUpdate = true
+  // Two texture nodes holding one texture when the material compiles share one
+  // binding, and the full raster would never be drawn: the full node keeps its
+  // own blank, filtered as the raster it stands for, and never the preview.
+  const fullBlank = new DataTexture(new Uint8Array([0, 0, 0, 255]), 1, 1, RGBAFormat, UnsignedByteType)
+  fullBlank.colorSpace = SRGBColorSpace
+  fullBlank.magFilter = LinearFilter
+  fullBlank.minFilter = LinearFilter
+  fullBlank.needsUpdate = true
   const previewNode = texture(empty)
-  const fullNode = texture(empty)
+  const fullNode = texture(fullBlank)
   const blend = uniform(0)
   const arrival = uniform(0)
   const layered = options.layered === true
@@ -252,7 +261,7 @@ export function createPlateStream(preview: ManifestEntry, full: ManifestEntry, o
     waiters.clear()
   }
   function releaseFull(): void {
-    fullNode.value = previewImage?.texture ?? empty
+    fullNode.value = fullBlank
     release(fullImage)
     fullImage = null
   }
@@ -308,7 +317,6 @@ export function createPlateStream(preview: ManifestEntry, full: ManifestEntry, o
       previewImage = loaded
       previewArrived = true
       previewNode.value = loaded.texture
-      fullNode.value = loaded.texture
       // The first decoded preview appears continuously. Its source colours
       // are unchanged and remain fully opaque throughout later resolution
       // switches. A separate timer also settles a frozen/reduced-motion view.
@@ -391,7 +399,6 @@ export function createPlateStream(preview: ManifestEntry, full: ManifestEntry, o
       if (!layered || !previewImage) return null
       const { bitmap, texture: uploaded } = previewImage
       // the texture never drew: a layered material samples no preview
-      if (fullNode.value === uploaded) fullNode.value = empty
       previewNode.value = empty
       uploaded.dispose()
       previewImage = null
@@ -400,7 +407,7 @@ export function createPlateStream(preview: ManifestEntry, full: ManifestEntry, o
     update(_dt) { if (live) advance() },
     high,
     pending: () => live ? requests + (fade ? 1 : 0) + (arrivalStarted !== null ? 1 : 0) : 0,
-    textureMB: () => live ? ((previewImage?.bytes ?? 0) + (fullImage?.bytes ?? 0) + (filmShown && filmHeld ? filmHeld.bytes : 0) + 4) / (1024 * 1024) : 0,
+    textureMB: () => live ? ((previewImage?.bytes ?? 0) + (fullImage?.bytes ?? 0) + (filmShown && filmHeld ? filmHeld.bytes : 0) + 8) / (1024 * 1024) : 0,
     allocation: () => ({ previewMB: mipBytes(previewUpload.width, previewUpload.height) / 1048576,
       fullMB: mipBytes(fullUpload.width, fullUpload.height) / 1048576,
       previewWidth: previewUpload.width, previewHeight: previewUpload.height,
@@ -432,7 +439,7 @@ export function createPlateStream(preview: ManifestEntry, full: ManifestEntry, o
         fullNode.value = filmHeld.texture
         blend.value = 1
       } else {
-        fullNode.value = previewImage?.texture ?? empty
+        fullNode.value = fullBlank
         blend.value = 0
         // the decoded raster stays held; only its upload is let go
         filmHeld.texture.dispose()
@@ -461,6 +468,7 @@ export function createPlateStream(preview: ManifestEntry, full: ManifestEntry, o
       previewArrived = false
       fullImage = null
       empty.dispose()
+      fullBlank.dispose()
     },
   }
 }

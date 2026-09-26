@@ -169,18 +169,21 @@ export function librarySetOf(library, id) {
 }
 
 /** Every plate as the quad it is streamed onto: the hang, the body wall and
-    the mural, each bound to the store's files for its work and to the film's
-    rule for which of them it shows (`collection/film-plates.ts`). */
+    the mural, each bound to the store's files for its work, to the film's
+    rule for which of them it shows (`collection/film-plates.ts`) and to the
+    code that draws it. */
 function plateQuads(loader, library) {
   const load = at(loader)
   const group = new THREE.Group()
   // a tree from before the film's own rule has none, and keys as it did
   const ruled = (() => { try { loader.text(`${WING_DIR}/collection/film-plates.ts`); return true } catch { return false } })()
   const filmRule = ruled ? stableDigest(load('collection/film-plates')) : null
+  // the code that puts a plate on the screen, the stream's shader and the hang's hold of it, by its text
+  const drawnBy = ruled ? sha256(['pictures/stream.ts', 'collection/plates.ts'].map((f) => loader.text(`${WING_DIR}/${f}`)).join('\0')) : null
   const quad = (name, width, height, position, bearing, identity) => {
     const material = new THREE.MeshBasicMaterial({ name })
     material.userData.library = identity
-    if (filmRule) material.userData.film = filmRule
+    if (filmRule) { material.userData.film = filmRule; material.userData.drawnBy = drawnBy }
     const mesh = new THREE.Mesh(new THREE.PlaneGeometry(width, height), material)
     mesh.name = name
     mesh.position.set(...position)

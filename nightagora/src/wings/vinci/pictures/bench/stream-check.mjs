@@ -281,7 +281,7 @@ test('The 512 preview validates the original first, rounds its aspect and publis
     assert.deepEqual({ ...uploaded.userData.upload }, { ...s.residency().previewUpload })
     s.residency().previewUpload.width = 1
     assert.equal(s.residency().previewUpload.width, 336, 'Residency metadata exposed mutable internal upload dimensions')
-    assert.equal(s.textureMB(), s.allocation().previewMB + 4 / 1024 ** 2)
+    assert.equal(s.textureMB(), s.allocation().previewMB + 8 / 1024 ** 2)
     assert.equal(s.pending(), 0); assert.equal(s.error(), null)
     const high = s.high(true); await flush(); await h.advance(); await high
     assert.deepEqual(h.bitmapCalls.map(call => call.kind), ['decode', 'resize', 'decode'], 'A full plate was resized')
@@ -292,7 +292,7 @@ test('The 512 preview validates the original first, rounds its aspect and publis
     assert.equal(fullTexture.userData.manifestId, w.entries[0].plate.id)
     assert.equal(fullTexture.userData.sourceSha256, w.entries[0].plate.sha256)
     assert.equal(h.bitmaps[2].closes, 0)
-    assert.equal(s.textureMB(), s.allocation().previewMB + s.allocation().fullMB + 4 / 1024 ** 2)
+    assert.equal(s.textureMB(), s.allocation().previewMB + s.allocation().fullMB + 8 / 1024 ** 2)
   } finally { s.dispose(); h.released() }
   assert.equal(s.residency().previewUpload, null); assert.equal(s.residency().fullUpload, null)
 })
@@ -333,7 +333,7 @@ test('Wrong resized output dimensions close both bitmaps and never publish a tex
     await s.ready
     assert.deepEqual(h.bitmapCalls.map(call => call.kind), ['decode', 'resize'])
     assert.equal(h.bitmaps.length, 2); assert.ok(h.bitmaps.every(bitmap => bitmap.closes === 1))
-    assert.equal(h.textures.length, 1, 'A wrong-size preview received a GPU texture')
+    assert.equal(h.textures.length, 2, 'A wrong-size preview received a GPU texture')
     assert.equal(s.available(), false); assert.equal(s.pending(), 0)
     assert.match(s.error(), /dimensions disagree/i)
     assert.equal(s.residency().previewUpload, null)
@@ -350,7 +350,7 @@ test('Disposal during a non-cancellable preview resize closes the original and l
   assert.equal(h.requests[0].signal.aborted, true)
   gate.resolve(); await s.ready
   assert.equal(h.bitmaps.length, 2); assert.ok(h.bitmaps.every(bitmap => bitmap.closes === 1))
-  assert.equal(h.textures.length, 1, 'The late resize resurrected a GPU resource')
+  assert.equal(h.textures.length, 2, 'The late resize resurrected a GPU resource')
   assert.equal(s.pending(), 0); assert.equal(s.textureMB(), 0); assert.equal(s.available(), false)
   assert.equal(s.residency().previewUpload, null)
   h.released()
@@ -441,8 +441,8 @@ test('preview readiness, exact non-square mip accounting and continuous upgrade'
   assert.equal(s.pending(), 1, 'First arrival remains pending after decode')
   await h.advance(300)
   assert.equal(s.pending(), 0); assert.equal(s.error(), null)
-  // 1024×512 down to 2×1 and 1×1: 699051 RGBA texels + one placeholder.
-  assert.equal(s.textureMB(), (699051 * 4 + 4) / 1024 ** 2)
+  // 1024×512 down to 2×1 and 1×1: 699051 RGBA texels + two placeholders.
+  assert.equal(s.textureMB(), (699051 * 4 + 8) / 1024 ** 2)
   const high = s.high(true); await flush()
   assert.equal(h.highCount(), 1); assert.equal(s.pending(), 1)
   await h.advance(350); s.update(.35)
