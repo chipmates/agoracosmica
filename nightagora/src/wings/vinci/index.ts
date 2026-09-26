@@ -1466,6 +1466,17 @@ export function createWing():VinciWingModule {
         if(isMachineSlug(slug))marks.push({id:entry.id,anchor:entry.anchor,object:entry.object,label:machineCatalog[slug].title[lang()],colour:PICTURE_CERTAINTY_KEY[2]!.colour,...sign(entry)})
         continue
       }
+      /* A SHEET TAKES A MARK ONLY WHERE THE STORE CARRIES ITS FILM: the press
+         opens that film, whose certainty the mark wears. A sheet without one
+         is read on the wall and the row, and stays unmarked. */
+      if(entry.kind==='sheet'){
+        const show=assets?vinciShowpiece(entry.id,assets):null
+        const sheet=show?exhibits?.sheetSources().find(source=>`sheet/${source.sheet.id}`===entry.id):undefined
+        if(show&&sheet)marks.push({id:entry.id,anchor:entry.anchor,object:entry.object,
+          label:vinciSheetTitle(lang()==='de'?sheet.page.honesty_de:sheet.page.honesty_en),
+          colour:certaintyColour(show.certainty),...sign(entry)})
+        continue
+      }
       const named=namedExhibit(entry)
       if(named){marks.push({id:entry.id,anchor:entry.anchor,object:entry.object,label:named.title,colour:named.colour,...sign(entry)});continue}
       const found=sources.find(source=>source.work.id===entry.workId)
