@@ -94,8 +94,12 @@ const BODY_PHONE=p(-33.2,-51.8,FLOOR+1.62,-33.2,-51.8,FLOOR+1.62)
  * across the field's upper north corner. From 6.4 m, forty centimetres south
  * of the axis, the line to that corner passes beyond the beam's west end and
  * under the bay's step, and the eye still faces the wall square. The phone's
- * eye stands further back, where its lens can hold the field's width. */
-const SUPPER_DESK_EYE={east:-38.4,north:SUPPER_WALL.north-.4}
+ * eye stands further back, where its lens can hold the field's width.
+ * At 62 degrees the beam's own west end hung in the frame's top right
+ * corner with nothing under it, and no pier can stand there: the walk
+ * passes that corner at head height. At 56 its end stands outside the
+ * frame with a margin and the field takes four fifths of its width. */
+const SUPPER_DESK_EYE={east:-38.4,north:SUPPER_WALL.north-.4,fov:56}
 /** The chamber's eye, on the lawn under the court's south-west corner. */
 const CHAMBER_LAWN=standing(-4,-38)
 function narrowRoomPose(pose:Pose,share=NARROW_AIM_SHARE):Pose {
@@ -190,7 +194,7 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // at the bay's mouth (SUPPER_DESK_EYE), the phone's 9.3 m off the field.
   if(id==='supper-wall'){
     const face=SUPPER_WALL.east+SUPPER_WALL.thickness/2
-    if(!narrow){const {east,north}=SUPPER_DESK_EYE;return p(east,north,COURT.level+1.66,face,north,COURT.level+1.66+Math.tan(8*Math.PI/180)*(east-face),62)}
+    if(!narrow){const {east,north,fov}=SUPPER_DESK_EYE;return p(east,north,COURT.level+1.66,face,north,COURT.level+1.66+Math.tan(8*Math.PI/180)*(east-face),fov)}
     // THE MEASUREMENT IS WHAT THE PHONE HOLDS. A 390 px stage takes the whole
     // 8.8 m field with a margin at a lens under a hundred degrees only from
     // nine metres or more, and on the axis at that reach the nave's north beam
