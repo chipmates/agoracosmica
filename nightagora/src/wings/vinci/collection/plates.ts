@@ -23,7 +23,7 @@ import { collectionInteriorMaterial, collectionPlateTone } from './materials'
 import { CANVAS_FORWARD, frameKey, stampHangLight } from './picture-room-plan'
 import { supperMuralLight } from './supper-light'
 import { supperRoomHolds } from './supper-room-plan'
-import { cardDistance, filmBlank, filmReachMetres, previewPitch } from './film-plates'
+import { cardDistance, filmBlank, filmPrimeCards, filmReachMetres, previewPitch } from './film-plates'
 
 export interface CollectionPictureSource {
   readonly work: PictureWork
@@ -177,7 +177,7 @@ export function mountCollectionPlates(host: Group, stack: Stack, options: Collec
     strike()
     mountPictures()
     mountSheets()
-    if (blank) for (const card of cards) card.stream.filmPrime(blank)
+    if (blank) filmPrimeCards(cards, blank)
     group.updateMatrixWorld(true)
     const current = epoch
     return Promise.all(cards.map(card => card.stream.ready))
@@ -189,6 +189,7 @@ export function mountCollectionPlates(host: Group, stack: Stack, options: Collec
       .then(() => {
         if (!live || current !== epoch) return
         for (const wall of ['paintings', 'sheets'] as const) batch(wall)
+        if (blank) filmPrimeCards(cards, blank)
         if (film) void holdForFilm(current)
       })
   }
