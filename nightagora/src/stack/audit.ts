@@ -106,11 +106,63 @@ export function idMaterial(source: Material, index: number): MeshBasicNodeMateri
   return mat
 }
 
+/** The id pass's two planes out of an RGBA float readback. WebGPU copies a
+    texture out in rows padded to 256 bytes and three hands the padded buffer
+    back, so each row is read at its own stride: a target whose width is not a
+    multiple of 16 texels comes out sheared by a dense read. */
+export function idPlanes(raw: Float32Array, w: number, h: number): { ids: Uint32Array<ArrayBuffer>; depth: Float32Array<ArrayBuffer> } {
+  const stride = h > 1 ? (raw.length / 4 - w) / (h - 1) : w
+  if (!Number.isInteger(stride) || stride < w) throw new Error(`the id readback holds ${raw.length} floats for ${w}x${h}`)
+  const ids = new Uint32Array(w * h)
+  const depth = new Float32Array(w * h)
+  for (let y = 0, i = 0; y < h; y++) {
+    for (let x = 0, p = y * stride * 4; x < w; x++, i++, p += 4) {
+      ids[i] = raw[p]! | 0
+      depth[i] = raw[p + 1]!
+    }
+  }
+  return { ids, depth }
+}
+
+/** A volume (the hall's air) is marched from the eye: a medium, never a body. */
+export const isVolume = (mesh: Mesh): boolean =>
+  (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).some((m) => (m as { isVolumeNodeMaterial?: boolean } | undefined)?.isVolumeNodeMaterial === true)
+
+export interface IdSwap { mesh: Mesh; was: Material | Material[]; now: Material | Material[] }
+
+/** A body's id materials, one per material it draws with. */
+export function idSwap(mesh: Mesh, index: number): IdSwap {
+  const now = Array.isArray(mesh.material) ? mesh.material.map((m) => idMaterial(m, index)) : idMaterial(mesh.material, index)
+  return { mesh, was: mesh.material, now }
+}
+
+/** THE ID BODIES, DRAWN INTO A TARGET. The air is not a surface: a volume
+    draws without a depth test after everything else, so as an id body its
+    box hides the room and in its own material it adds light into the ids
+    and depths. A material the wing hides draws nothing in the frame, so
+    none in the ids. Everything is put back before this returns. */
+export function drawIdBodies(renderer: WebGPURenderer, scene: Scene, camera: Camera, target: RenderTarget, swaps: readonly IdSwap[]): void {
+  const air: Mesh[] = []
+  scene.traverseVisible((object) => { const mesh = object as Mesh; if (mesh.isMesh && isVolume(mesh)) air.push(mesh) })
+  for (const mesh of air) mesh.visible = false
+  for (const s of swaps) {
+    if (Array.isArray(s.now)) s.now.forEach((m, k) => { m.visible = (s.was as Material[])[k]?.visible !== false })
+    else s.now.visible = (s.was as Material).visible !== false
+    s.mesh.material = s.now
+  }
+  const was = renderer.getRenderTarget()
+  renderer.setRenderTarget(target)
+  renderer.render(scene, camera)
+  renderer.setRenderTarget(was)
+  for (const s of swaps) s.mesh.material = s.was
+  for (const mesh of air) mesh.visible = true
+}
+
 export function installAudit(parts: AuditParts): void {
   const { renderer } = parts
   let target: RenderTarget | null = null
   let paper: HTMLCanvasElement | null = null
-  let swaps: Array<{ mesh: Mesh; was: Material | Material[]; now: Material | Material[] }> = []
+  let swaps: IdSwap[] = []
   let bodies: Body[] = []
   const frames: Frame[] = []
   let shift = { dx: 0, dy: 0 }
@@ -131,7 +183,8 @@ export function installAudit(parts: AuditParts): void {
     let index = 0
     scene.traverse((object) => {
       const mesh = object as Mesh
-      if (!mesh.isMesh || !mesh.visible || !mesh.material) return
+      // a body hidden now may be shown before a capture; a volume is no body
+      if (!mesh.isMesh || !mesh.material || isVolume(mesh)) return
       // the whole chain of names, so a body in the table can be found again
       const names: string[] = []
       for (let p: typeof object | null = object; p; p = p.parent) if (p.name) names.push(p.name)
@@ -144,10 +197,7 @@ export function installAudit(parts: AuditParts): void {
         material: source.name || source.type,
         path: names.reverse().join('/'),
       })
-      const now = Array.isArray(mesh.material)
-        ? mesh.material.map((m) => idMaterial(m, index))
-        : idMaterial(mesh.material, index)
-      swaps.push({ mesh, was: mesh.material, now })
+      swaps.push(idSwap(mesh, index))
     })
     return bodies.length
   }
@@ -173,16 +223,11 @@ export function installAudit(parts: AuditParts): void {
     const fog = scene.fog
     const clear = renderer.getClearColor(new Color())
     const clearAlpha = renderer.getClearAlpha()
-    const wasTarget = renderer.getRenderTarget()
     // id 0 is "nothing stood here": the sky is a colour, not a body
     scene.background = null
     scene.fog = null
     renderer.setClearColor(0x000000, 0)
-    for (const s of swaps) s.mesh.material = s.now
-    renderer.setRenderTarget(target)
-    renderer.render(scene, camera)
-    renderer.setRenderTarget(wasTarget)
-    for (const s of swaps) s.mesh.material = s.was
+    drawIdBodies(renderer, scene, camera, target, swaps)
     scene.background = background
     scene.fog = fog
     renderer.setClearColor(clear, clearAlpha)
@@ -246,12 +291,7 @@ export function installAudit(parts: AuditParts): void {
     const raw = target
       ? ((await renderer.readRenderTargetPixelsAsync(target, 0, 0, w, h)) as Float32Array)
       : new Float32Array(w * h * 4)
-    const id = new Uint32Array(w * h)
-    const depth = new Float32Array(w * h)
-    for (let i = 0, p = 0; i < id.length; i++, p += 4) {
-      id[i] = raw[p]! | 0
-      depth[i] = raw[p + 1]!
-    }
+    const { ids: id, depth } = idPlanes(raw, w, h)
     frames.push({ tag, dx: shift.dx, dy: shift.dy, id, depth, light })
     return { tag, bodies: bodies.length, w, h }
   }

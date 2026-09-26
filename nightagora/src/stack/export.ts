@@ -22,13 +22,12 @@ import {
   RenderTarget,
   type Camera,
   type DirectionalLight,
-  type Material,
   type Mesh,
   type PerspectiveCamera,
   type Scene,
   type WebGPURenderer,
 } from 'three/webgpu'
-import { idMaterial } from './audit'
+import { drawIdBodies, idPlanes, idSwap, isVolume, type IdSwap } from './audit'
 
 export interface ExportParts {
   renderer: WebGPURenderer
@@ -99,23 +98,7 @@ function tooth(x: number, y: number, seed: number): number {
   return h / 4294967296 - 0.5
 }
 
-/** The id pass's two planes out of an RGBA float readback. WebGPU copies a
-    texture out in rows padded to 256 bytes and three hands the padded buffer
-    back, so each row is read at its own stride: the upright id target is 195
-    texels wide, which a dense read shears by 13 texels a row. */
-export function idPlanes(raw: Float32Array, w: number, h: number): { ids: Uint32Array<ArrayBuffer>; depth: Float32Array<ArrayBuffer> } {
-  const stride = h > 1 ? (raw.length / 4 - w) / (h - 1) : w
-  if (!Number.isInteger(stride) || stride < w) throw new Error(`the id readback holds ${raw.length} floats for ${w}x${h}`)
-  const ids = new Uint32Array(w * h)
-  const depth = new Float32Array(w * h)
-  for (let y = 0, i = 0; y < h; y++) {
-    for (let x = 0, p = y * stride * 4; x < w; x++, i++, p += 4) {
-      ids[i] = raw[p]! | 0
-      depth[i] = raw[p + 1]!
-    }
-  }
-  return { ids, depth }
-}
+export { idPlanes }
 
 export function installExport(parts: ExportParts): void {
   const { renderer } = parts
@@ -128,7 +111,7 @@ export function installExport(parts: ExportParts): void {
   let jitter: [number, number] = [0, 0]
   let idDue = false
   let idTarget: RenderTarget | null = null
-  let swaps: Array<{ mesh: Mesh; was: Material | Material[]; now: Material | Material[] }> = []
+  let swaps: IdSwap[] = []
   let bodies: string[] = []
   let readMs = 0
 
@@ -181,8 +164,7 @@ export function installExport(parts: ExportParts): void {
       for (let o: typeof object | null = object; o; o = o.parent) if (o.name) names.push(o.name)
       index++
       bodies.push(names.reverse().join('/') || `mesh ${index}`)
-      const now = Array.isArray(mesh.material) ? mesh.material.map((m) => idMaterial(m, index)) : idMaterial(mesh.material, index)
-      swaps.push({ mesh, was: mesh.material, now })
+      swaps.push(idSwap(mesh, index))
     })
     return { bodies: bodies.length, casters }
   }
@@ -203,8 +185,6 @@ export function installExport(parts: ExportParts): void {
       while the eye stands inside it: a medium the walk enters, never a body a
       clip holds or counts. Its presence is the eye's, so a pose still has one
       picture; the frames it is drawn in are reported apart. */
-  const isVolume = (mesh: Mesh): boolean =>
-    (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).some((m) => (m as { isVolumeNodeMaterial?: boolean } | undefined)?.isVolumeNodeMaterial === true)
   let volumes = 0
   function eachDrawn(visit: (mesh: Mesh) => void): void {
     volumes = 0
@@ -271,7 +251,6 @@ export function installExport(parts: ExportParts): void {
     const fog = scene.fog
     const clear = renderer.getClearColor(new Color())
     const clearAlpha = renderer.getClearAlpha()
-    const wasTarget = renderer.getRenderTarget()
     /* no shadow map may be drawn from the id bodies: the shaded draw of the
        next frame would read a map made of the wrong materials */
     const held: Array<[DirectionalLight, boolean, boolean]> = []
@@ -285,23 +264,7 @@ export function installExport(parts: ExportParts): void {
     scene.background = null
     scene.fog = null
     renderer.setClearColor(0x000000, 0)
-    /* THE AIR IS NOT A SURFACE. A volume draws without a depth test after
-       everything else: as an id body its box hid the whole room, in its own
-       material it added its light into the ids and the depths. */
-    const air: Mesh[] = []
-    scene.traverseVisible((object) => { const mesh = object as Mesh; if (mesh.isMesh && isVolume(mesh)) air.push(mesh) })
-    for (const mesh of air) mesh.visible = false
-    for (const s of swaps) {
-      // a material the wing hides draws nothing in the frame, so none in the ids
-      if (Array.isArray(s.now)) s.now.forEach((m, k) => { m.visible = (s.was as Material[])[k]?.visible !== false })
-      else s.now.visible = (s.was as Material).visible !== false
-      s.mesh.material = s.now
-    }
-    renderer.setRenderTarget(idTarget)
-    renderer.render(scene, camera)
-    renderer.setRenderTarget(wasTarget)
-    for (const s of swaps) s.mesh.material = s.was
-    for (const mesh of air) mesh.visible = true
+    drawIdBodies(renderer, scene, camera, idTarget, swaps)
     for (const [light, auto, needs] of held) {
       light.shadow.autoUpdate = auto
       light.shadow.needsUpdate = needs
