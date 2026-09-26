@@ -174,11 +174,13 @@ export function librarySetOf(library, id) {
 function plateQuads(loader, library) {
   const load = at(loader)
   const group = new THREE.Group()
-  const filmRule = stableDigest(load('collection/film-plates'))
+  // a tree from before the film's own rule has none, and keys as it did
+  const ruled = (() => { try { loader.text(`${WING_DIR}/collection/film-plates.ts`); return true } catch { return false } })()
+  const filmRule = ruled ? stableDigest(load('collection/film-plates')) : null
   const quad = (name, width, height, position, bearing, identity) => {
     const material = new THREE.MeshBasicMaterial({ name })
     material.userData.library = identity
-    material.userData.film = filmRule
+    if (filmRule) material.userData.film = filmRule
     const mesh = new THREE.Mesh(new THREE.PlaneGeometry(width, height), material)
     mesh.name = name
     mesh.position.set(...position)

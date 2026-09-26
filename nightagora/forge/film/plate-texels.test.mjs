@@ -128,6 +128,22 @@ test('the page reads a plate stream\'s mix: each side by the uniform\'s share', 
   assert.deepEqual([...out.values()], [1])
 })
 
+test('the page reads a layered plate faded out as drawing nothing', async () => {
+  const { createLoader } = await import('./load.mjs')
+  const { drawsNow } = (await createLoader()).load('src/stack/export.ts')
+  const { uniform } = await import('three/tsl')
+  const arrival = uniform(1), blend = uniform(0)
+  const card = new THREE.MeshBasicNodeMaterial({ transparent: true })
+  card.opacityNode = arrival.mul(blend)
+  assert.equal(drawsNow(card), false, 'its plate faded out over the batch')
+  blend.value = 1
+  assert.equal(drawsNow(card), true)
+  card.visible = false
+  assert.equal(drawsNow(card), false)
+  assert.equal(drawsNow(new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 })), false)
+  assert.equal(drawsNow(new THREE.MeshBasicMaterial()), true)
+})
+
 test('a wall of previews in one body, and a raised plate over one of them', () => {
   const d = 3, cam = camera(50)
   // two cards in one array layer of 800 by 600: the right one half as wide, showing half the layer
@@ -148,7 +164,7 @@ test('a wall of previews in one body, and a raised plate over one of them', () =
   assert.ok(Math.abs(over.ratio - 4 * closed(d)) < 1e-6 * closed(d) && over.plate === 'raised', `${over.ratio} on ${over.plate}`)
   // not raised, the batch's preview is what shows
   const lowered = plateTexels(frame(cam), models, [drawn(LAYER), { drawn: false, shown: [PREVIEW] }], sizes)
-  assert.ok(Math.abs(lowered.ratio - closed(d)) < 1e-6 * closed(d) && lowered.plate === 'batch')
+  assert.ok(Math.abs(lowered.ratio - closed(d)) < 1e-6 * closed(d) && lowered.plate.startsWith('batch card 0 at '), lowered.plate)
   // a batch's texture counts whatever its name; the same body under another name does not
   assert.equal(plateModels([{ ...batch, id: null }], sizes).models.length, 0)
 })

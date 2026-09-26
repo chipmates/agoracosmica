@@ -108,9 +108,26 @@ const PLATE_VERTICES = 4096
 interface Shown { id: string; width: number; height: number; share: number }
 interface PlateBody { name: string; id: string | null; order: number; vertices: number; drawn: boolean; shown: Shown[]; positions?: number[]; uvs?: number[] }
 interface NodeLike {
-  isTextureNode?: boolean; isMathNode?: boolean; isUniformNode?: boolean; isConstNode?: boolean
-  value?: unknown; method?: string; aNode?: NodeLike; bNode?: NodeLike; cNode?: NodeLike
+  isTextureNode?: boolean; isMathNode?: boolean; isUniformNode?: boolean; isConstNode?: boolean; isOperatorNode?: boolean
+  value?: unknown; method?: string; op?: string; aNode?: NodeLike; bNode?: NodeLike; cNode?: NodeLike; node?: NodeLike
   getChildren?: () => Iterable<NodeLike>
+}
+/** a node made of numbers alone (uniforms and constants under + - * /), or null */
+function numberOf(node: NodeLike | null | undefined): number | null {
+  if (!node) return null
+  if ((node.isUniformNode || node.isConstNode) && typeof node.value === 'number') return node.value
+  // a product in TSL comes wrapped in a variable of its own
+  if (!node.isOperatorNode) return node.node ? numberOf(node.node) : null
+  const a = numberOf(node.aNode), b = numberOf(node.bNode)
+  if (a === null || b === null) return null
+  return node.op === '*' ? a * b : node.op === '+' ? a + b : node.op === '-' ? a - b : node.op === '/' ? a / b : null
+}
+/** A MATERIAL DRAWS NOTHING when it is hidden or its opacity is a number at
+    zero (a plate faded out over its batch's preview). */
+export function drawsNow(material: Material): boolean {
+  if (!material.visible) return false
+  const opacity = numberOf((material as Material & { opacityNode?: NodeLike | null }).opacityNode)
+  return (opacity ?? (material.transparent ? material.opacity : 1)) > 0
 }
 /** THE TEXTURES A MATERIAL SHOWS NOW, by their share: a mix by a uniform
     (a plate's preview fading to its full raster) shows each side by the
@@ -142,8 +159,9 @@ function showing(mesh: Mesh, all = false): { drawn: boolean; shown: Shown[] } {
   let drawn = false
   for (const material of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
     if (!material) continue
-    drawn ||= material.visible
-    if (all || material.visible) shownTextures(material, textures)
+    const draws = drawsNow(material)
+    drawn ||= draws
+    if (all || draws) shownTextures(material, textures)
   }
   const shown: Shown[] = []
   for (const [texture, share] of textures) {
@@ -500,6 +518,7 @@ export function installExport(parts: ExportParts): void {
       const walking: boolean[] = []
       let cam: { p: number[]; q: number[]; r: number[]; fov: number; proj: number[]; world: number[] } | null = null
       let set: ReturnType<typeof mounted> | null = null
+      let plates: Array<{ drawn: boolean; shown: Shown[] }> | null = null
       for (let k = 0; k < plan.times.length; k++) {
         jitter = plan.jitter[k] ?? [0, 0]
         idDue = plan.ids && k === plan.anchor
@@ -519,6 +538,8 @@ export function installExport(parts: ExportParts): void {
             world: c.matrixWorld.toArray(),
           }
           set = mounted()
+          // what each plate shows at the instant the id pass is drawn
+          plates = plateBodies.length ? plateBodies.map((mesh) => showing(mesh)) : null
         }
         await yieldTask()
       }
@@ -548,6 +569,7 @@ export function installExport(parts: ExportParts): void {
         walking,
         cam,
         mounted: set,
+        plates,
         ms: { draws: Math.round(t1 - t0 - readMs), read: Math.round(readMs), resolve: Math.round(t2 - t1), ids: Math.round(t3 - t2), send: Math.round(t4 - t3) },
       }
     },

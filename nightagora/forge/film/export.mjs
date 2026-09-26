@@ -362,7 +362,7 @@ export function plateTexels(frame, models, shares, sizes = rasterSizes()) {
   for (const m of models) {
     const size = plateSize(m, shares?.[m.key], sizes)
     if (!size) continue
-    const cards = m.cards.map((c) => ({ ...c, texelBasis: planeBasis(scale3(c.A, 1 / size.width), scale3(c.B, 1 / size.height)) }))
+    const cards = m.cards.map((c, k) => ({ ...c, k, texelBasis: planeBasis(scale3(c.A, 1 / size.width), scale3(c.B, 1 / size.height)) }))
     live.push({ m, size, cards })
   }
   if (!live.length) return out
@@ -423,7 +423,7 @@ export function plateTexels(frame, models, shares, sizes = rasterSizes()) {
     if (!(least > 0)) continue
     out.pixels++
     const ratio = 1 / Math.sqrt(least)
-    if (ratio > out.ratio) Object.assign(out, { ratio, plate: m.name, raster: `${size.id} ${size.width}x${size.height}${size.record ? ' (its record)' : ''}` })
+    if (ratio > out.ratio) Object.assign(out, { ratio, plate: m.cards.length > 1 ? `${m.name} card ${c.k} at ${c.origin.map((v) => v.toFixed(2)).join(',')}` : m.name, raster: `${size.id} ${size.width}x${size.height}${size.record ? ' (its record)' : ''}` })
   }
   return out
 }
@@ -767,8 +767,8 @@ export async function exportClip(session, inbox, edge, nodes, track, out, opts) 
     await encoder.write(Buffer.from(res.frame.rgb.buffer, res.frame.rgb.byteOffset, res.frame.rgb.byteLength))
     const fc = frameCells(cells, res.frame)
     floorCeilingMax = Math.max(floorCeilingMax, fc.floorCeiling)
-    // what each plate shows can change inside a clip: read as this frame left it
-    const pt = plates.models.length ? plateTexels(res.frame, plates.models, await page.evaluate(() => window.__naExport.plateShares())) : { ratio: 0, pixels: 0 }
+    // what each plate showed at the frame's id pass
+    const pt = plates.models.length ? plateTexels(res.frame, plates.models, res.report.plates ?? []) : { ratio: 0, pixels: 0 }
     texel.pixels += pt.pixels
     if (pt.ratio > texel.max) Object.assign(texel, { max: pt.ratio, at: i, plate: pt.plate, raster: pt.raster })
     const print = printOf(res.report.cam)
