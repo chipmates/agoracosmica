@@ -24,7 +24,7 @@ import { collectionInteriorMaterial, collectionPlateTone } from './materials'
 import { CANVAS_FORWARD, frameKey, stampHangLight } from './picture-room-plan'
 import { supperMuralLight } from './supper-light'
 import { supperRoomHolds } from './supper-room-plan'
-import { cardDistance, filmReachMetres, previewPitch } from './film-plates'
+import { cardDistance, FILM_PREVIEW_HELD, filmReachMetres, previewPitch } from './film-plates'
 
 export interface CollectionPictureSource {
   readonly work: PictureWork
@@ -194,13 +194,14 @@ export function mountCollectionPlates(host: Group, stack: Stack, options: Collec
 
   /** Four decodes at a time, so the count the export waits on falls steadily. */
   async function holdForFilm(current: number): Promise<void> {
-    const queue = [...cards]
+    const queue = cards.filter(card => !filmHeldBack(card))
     const worker = async (): Promise<void> => {
       for (let card = queue.shift(); card && live && current === epoch; card = queue.shift()) await card.stream.filmHold()
     }
     await Promise.all([worker(), worker(), worker(), worker()])
   }
 
+  const filmHeldBack = (card: Card): boolean => FILM_PREVIEW_HELD.has(String(card.mesh.userData['workId']))
   const eyeAt: [number, number, number] = [0, 0, 0]
   const faceAt = new Vector3(), rightAt = new Vector3(), upAt = new Vector3()
   /** THE FILM'S RULE, from where the eye stands now: a card in reach shows its
@@ -216,7 +217,7 @@ export function mountCollectionPlates(host: Group, stack: Stack, options: Collec
       upAt.setFromMatrixColumn(m, 1).normalize()
       const d = cardDistance(eyeAt, [faceAt.x, faceAt.y, faceAt.z], [rightAt.x, rightAt.y, rightAt.z], [upAt.x, upAt.y, upAt.z],
         card.face.widthM / 2, card.face.heightM / 2)
-      card.stream.filmShow(d !== null && d < filmReachMetres(card.face.pitchM, stageHeight))
+      card.stream.filmShow(!filmHeldBack(card) && d !== null && d < filmReachMetres(card.face.pitchM, stageHeight))
     }
   }
 

@@ -305,9 +305,10 @@ const filmFrom = streams.length
 const reel = mountCollectionPlates(host, filmStack)
 await reel.ready
 const reelStreams = streams.slice(filmFrom)
-for (let turn = 0; turn < 400 && !reelStreams.every(stream => stream.filmHeld); turn++) await Promise.resolve()
+const heldBack = stream => stream.plate.id.includes('last-supper')
+for (let turn = 0; turn < 400 && !reelStreams.every(stream => stream.filmHeld || heldBack(stream)); turn++) await Promise.resolve()
 assert.equal(reelStreams.length, CARDS)
-assert.ok(reelStreams.every(stream => stream.filmHeld), 'the film holds every full raster before its first frame')
+assert.ok(reelStreams.every(stream => stream.filmHeld === !heldBack(stream)), 'the film holds every full raster it may show before its first frame, and none it keeps at its preview')
 const reelCards = []
 host.traverse(object => { if (object.isMesh && typeof object.userData.previewId === 'string') reelCards.push(object) })
 const streamOf = card => reelStreams.find(stream => stream.plate.id === card.userData.manifestId)
@@ -326,7 +327,7 @@ assert.deepEqual(await shownAt(near(reelFirst)), atFirst, 'no live budget holds 
 otherMiB = 0
 assert.deepEqual(await shownAt(new THREE.Vector3(1000, 1.6, 1000)), [], 'far from every wall, every card shows its preview')
 const atMural = await shownAt(near(reelMural))
-assert.ok(atMural.includes(reelMural.userData.manifestId))
+assert.ok(!atMural.includes(reelMural.userData.manifestId), 'the mural keeps its preview in the film')
 const behind = reelFirst.position.clone().add(new THREE.Vector3(0, 0, -1).applyEuler(reelFirst.rotation))
 assert.ok(!(await shownAt(behind)).includes(reelFirst.userData.manifestId), 'an eye behind a card does not raise it')
 // one eye, one set, whichever way it was reached
@@ -338,5 +339,5 @@ assert.equal(memory.size, 0)
 console.log(JSON.stringify({ checker: 'collection-picture-integration', ok: true,
   plates: 25, murals: 1, sheets: 29, withheldFields: 0, retainedFrameCentres: 25,
   tierRemounts: 3, maximumFullSources: 1, memoryRegistration: 'once and disposed',
-  film: { heldAtMount: CARDS, shownAtFirstField: atFirst.length, shownAtMural: atMural.length },
+  film: { heldAtMount: CARDS - 1, shownAtFirstField: atFirst.length, shownAtMural: atMural.length },
   limitations: ['Simulated stream lifecycle; no browser, illumination, decoding or rendered cost measurement.'] }, null, 2))

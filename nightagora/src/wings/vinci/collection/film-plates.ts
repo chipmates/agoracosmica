@@ -11,6 +11,10 @@
 export const FILM_PREVIEW_CAP = 0.5
 /** The film's narrowest lens, vertical, over every clip of both framings. */
 export const FILM_NARROWEST_LENS_DEG = 34
+/** Works the film shows at their preview wherever the eye stands. The mural's
+ * scan is covered in flaking: its full raster, filtered down to the sizes the
+ * film draws it at, reads paler and grainy where the preview reads clean. */
+export const FILM_PREVIEW_HELD: ReadonlySet<string> = new Set(['last-supper'])
 
 /** Metres of wall one preview texel spans on a card: the coarser axis. */
 export function previewPitch(widthM: number, heightM: number, texelsWide: number, texelsHigh: number): number {
