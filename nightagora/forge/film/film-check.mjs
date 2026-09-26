@@ -23,6 +23,8 @@ import { pathToFileURL } from 'node:url'
 import { FILM_PACE, FPS } from './graph.mjs'
 import { KEYS_FORMAT, treeKeys } from './keys.mjs'
 import { APP_ROOT, WING_DIR } from './load.mjs'
+import { MOTION_CAPS, motionVerdict } from './motion.mjs'
+import { motionOfTree } from './motion-gate.mjs'
 
 export const RELEASE_FORMAT = 'vinci-film-release-v1'
 export const SIDECAR_FORMAT = 'vinci-film-sidecar-v1'
@@ -204,9 +206,11 @@ export function writeStandIn(store, tree) {
  *   store   diskStore(dir) or memoryStore()
  *   tree    treeKeys() of the tree the gate stands on
  *   calm    the calm caps, or null while M46's checker is not in the tree
+ *   motion  motionOfTree(tree): each clip's near and heading readings, or
+ *           null when not measured (both motion lines then carry a note)
  * Returns the lines, each with its red entries, and whether all are green.
  */
-export function checkRelease(store, tree, { calm = null } = {}) {
+export function checkRelease(store, tree, { calm = null, motion = null } = {}) {
   const lines = []
   const line = (name, what) => { const l = { name, what, red: [], notes: [] }; lines.push(l); return l }
   const red = (l, at, why) => l.red.push({ at, why })
@@ -218,6 +222,8 @@ export function checkRelease(store, tree, { calm = null } = {}) {
     joins: line('joins', `frame 0 and the last frame equal the two stills' raw masters; between two sessions within ${JOIN_TOLERANCE} of 255`),
     law3: line('law 3', 'a rest pose has one picture, whichever way it was reached'),
     calm: line('calm', "the calm caps of M46 hold on the camera track"),
+    near: line('near', `in view, no drawn surface nearer than ${MOTION_CAPS.nearM} m over ${MOTION_CAPS.nearShare * 100}% of the frame for more than ${MOTION_CAPS.nearSeconds} s of a walk's middle`),
+    heading: line('heading', `the view's heading swings at most ${MOTION_CAPS.yawReversals} times and travels at most ${MOTION_CAPS.yawExcessDeg} degrees beyond its net turn; the way the eye walks swings at most ${MOTION_CAPS.walkReversals} times under the view`),
     track: line('track', 'the browser track agrees with the replay; assertRailProjection never threw'),
     hygiene: line('hygiene', 'zero requests after the clock, starved steps, page errors, pending at rest, painted elements over the canvas, and one mounted set inside a clip'),
     upright: line('upright', 'upright: no frame mostly floor and ceiling'),
@@ -290,6 +296,15 @@ export function checkRelease(store, tree, { calm = null } = {}) {
       const over = Object.entries(calm).filter(([k, cap]) => r[k] !== undefined && r[k] > cap + 1e-9)
       if (over.length) red(L.calm, at, over.map(([k, cap]) => `${k} ${r[k].toFixed(1)} over ${cap}`).join(', '))
     }
+    // NEAR AND HEADING, on the replayed track against the drawn world
+    if (motion) {
+      const m = motion.readings.get(at)
+      if (!m) { red(L.near, at, 'not measured'); red(L.heading, at, 'not measured') } else {
+        const verdict = motionVerdict(m, motion.caps ?? MOTION_CAPS)
+        if (verdict.near) red(L.near, at, verdict.near)
+        if (verdict.heading) red(L.heading, at, verdict.heading)
+      }
+    }
     // TRACK AND PROJECTION
     if (!(sidecar.track && sidecar.track.maxDeviation <= TRACK_TOLERANCE)) red(L.track, at, `the browser track is ${sidecar.track?.maxDeviation} off the replay`)
     if (sidecar.projectionThrows !== 0) red(L.track, at, `assertRailProjection threw ${sidecar.projectionThrows} times`)
@@ -303,6 +318,7 @@ export function checkRelease(store, tree, { calm = null } = {}) {
     if (!(sidecar.plateTexelRatioMax <= TEXEL_CAP)) red(L.texels, at, `a plate at ${sidecar.plateTexelRatioMax} screen pixels a source texel`)
   }
   if (drift.length) L.joins.notes.push(`${drift.length} joins between two sessions part by at most ${Math.max(...drift.map((d) => d.max))} of 255 in at most ${Math.max(...drift.map((d) => d.pixels))} pixels, within the tolerance`)
+  if (!motion) for (const l of [L.near, L.heading]) l.notes.push('not measured: the film check runs them unless --no-motion')
   if (!calm) L.calm.notes.push(`waiting: no calm caps in the tree (${CALM_FILE} arrives with M46); the line reads them the day it lands`)
   // THE SAMPLED LINE
   const sampled = release.sampledJoins ?? []
@@ -362,7 +378,8 @@ async function main() {
   }
   if (!flags.has('release')) { console.log('nothing asked: --release=<dir> or --stand-in=<dir>'); return }
   const calmText = existsSync(path.join(APP_ROOT, CALM_FILE)) ? readFileSync(path.join(APP_ROOT, CALM_FILE), 'utf8') : ''
-  const result = checkRelease(diskStore(path.resolve(String(flags.get('release')))), tree, { calm: calmCaps(calmText) })
+  const motion = flags.has('no-motion') ? null : await motionOfTree(tree, { rev: String(flags.get('rev') ?? ''), log: (s) => console.log(`  ${s}`) })
+  const result = checkRelease(diskStore(path.resolve(String(flags.get('release')))), tree, { calm: calmCaps(calmText), motion })
   console.log(formatReport(result, { list: Number(flags.get('list') ?? 6) }))
   console.log(`the gate in ${((Date.now() - t0) / 1000).toFixed(1)} s`)
   if (!result.green) process.exitCode = 1

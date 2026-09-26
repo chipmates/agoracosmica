@@ -15,6 +15,7 @@ import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { BYTE_EXEMPT, BYTE_LINES, JOIN_TOLERANCE, byteExempt, calmCaps, calmReadings, checkRelease, joinVerdict, lineOf, memoryStore, writeStandIn } from './film-check.mjs'
 import { DELIVERY, deliveryKey, treeKeys } from './keys.mjs'
+import { MOTION_CAPS } from './motion.mjs'
 import { APP_ROOT, CERTIFICATE_FILE, WING_DIR, createLoader } from './load.mjs'
 import { CELL_M, cellCoords } from './scene.mjs'
 
@@ -235,6 +236,26 @@ test('every line of §5.2 fires on its own entry and on nothing else', () => {
   const over = [...clean.clips].filter(([, c]) => { const r = calmReadings(c.samples); return r.turnDegPerSecond > 12 + 1e-9 || r.turnDegPerSecond2 > 12 + 1e-9 }).map(([at]) => at)
   only(checkRelease(release, clean, { calm: caps }), 'calm', over)
   console.log(`# calm at 12 deg/s and 12 deg/s2 on today's walk: ${over.length} of ${clean.clips.size} clips over`)
+})
+
+test('the near and heading lines fire on their own clip alone, and wait with a note when not measured', () => {
+  const calm = { heading: { yaw: { reversals: 0, totalDeg: 0, netDeg: 0, excessDeg: 0 }, way: { inView: { reversals: 0, totalDeg: 0, netDeg: 0 } } }, view: { minM: 1.5, minWhat: null, near: { longestSeconds: 0, longestAt: 0 } } }
+  const readings = new Map([...clean.clips.keys()].map((at) => [at, calm]))
+  const weave = 'stop:picture-room>stop:picture-room-lisa wide', brush = 'stop:line-early>stop:garden wide'
+  readings.set(weave, { ...calm, heading: { ...calm.heading, way: { inView: { reversals: 8, totalDeg: 557, netDeg: 108 } } } })
+  readings.set(brush, { ...calm, view: { minM: 0.51, minWhat: 'jamb', near: { longestSeconds: 0.33, longestAt: 9.67 } } })
+  const result = checkRelease(release, clean, { motion: { caps: MOTION_CAPS, readings } })
+  for (const l of result.lines) assert.deepEqual(sorted(new Set(l.red.map((r) => r.at))), l.name === 'near' ? [brush] : l.name === 'heading' ? [weave] : [], l.name)
+  // a clip the readings miss is red on both lines, never passed
+  readings.delete(weave)
+  const missing = checkRelease(release, clean, { motion: { caps: MOTION_CAPS, readings } })
+  for (const name of ['near', 'heading']) assert.ok(missing.lines.find((l) => l.name === name).red.some((r) => r.at === weave && r.why === 'not measured'), name)
+  const none = checkRelease(release, clean)
+  for (const name of ['near', 'heading']) {
+    const l = none.lines.find((x) => x.name === name)
+    assert.deepEqual(l.red, [])
+    assert.ok(l.notes.some((n) => n.startsWith('not measured')), `${name} carries its note`)
+  }
 })
 
 test('a join between two sessions holds within the tolerance, and inside one session only by sha256', () => {
