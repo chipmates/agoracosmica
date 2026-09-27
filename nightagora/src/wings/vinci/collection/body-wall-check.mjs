@@ -9,8 +9,10 @@
  * envelope, every recorded corner ball, and every station and viewing eye's
  * own near envelope. A control post stood on the walk along the drawings
  * must fail. And it reads the six heads' wash from the table: even over the
- * pages, the bottom course as the top, no pool on the lining round the
- * opening, the splayed soffit lit; and the niche's own head the same way.
+ * pages, the bottom course as the top, no pool on the lining over the
+ * opening, a spill on the oak beside its jambs that is there and has fallen
+ * away a metre out, the splayed soffit lit; and the niche's own head the same
+ * way, its sheet leading the pages by a third to three fifths.
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -154,7 +156,7 @@ function washAt(point, normal, lights = heads) {
     const west = light.at[0] - point[0]
     if (west <= .02) continue
     const reach = light.at[0] - light.wash.plane, t = reach / west
-    const optic = plan.washBand(light.wash, light.at[2] + d[2] * t, d[1] * t) * (length * t) ** 3 / reach
+    const optic = plan.washBand(light.wash, light.at[2] + d[2] * t, d[1] * t, light.at[1]) * (length * t) ** 3 / reach
     sum += light.intensity * cone * optic * Math.max(0, -d.reduce((s, v, i) => s + v * normal[i], 0) / length) / (length * length)
   }
   return sum
@@ -167,9 +169,17 @@ const courses = [...new Set(grid.map(s => s.mount.row))].sort()
 const pageMin = Math.min(...pages.map(p => p.e)), pageMax = Math.max(...pages.map(p => p.e)), pageMean = pages.reduce((s, p) => s + p.e, 0) / pages.length
 const splayNormal = [Math.sin(R.splay), 0, -Math.cos(R.splay)]
 const splay = plan.HEAD_NORTHS.map(n => washAt([plan.PLANE.linen + .09, n, R.back + .09 * Math.tan(R.splay)], splayNormal))
-const over = [], beside = []
+const over = []
 for (let n = R.south; n <= R.north; n += .1) for (const h of [R.head + plan.REVEAL_LIP + .01, R.head + .2, R.head + .5]) over.push(washAt([plan.LINING.face, n, h], east))
-for (const n of [R.south - .5, R.north + .5]) for (let h = R.sill + .1; h < R.head; h += .2) beside.push(washAt([plan.LINING.face, n, h], east))
+/* THE SPILL BESIDE THE JAMBS, the hang's own heads alone (the plain lining's
+   pools further south are their own lamps): its mean over the oak within
+   0.3 m of either jamb, its peak there, and its most a metre out. */
+const hangHeads = heads.filter(light => light.wash === plan.WASH)
+const within = [], metreOut = []
+for (let h = R.sill + .1; h < R.head - .05; h += .1) {
+  for (let off = .02; off <= .3; off += .04) for (const n of [R.south - plan.REVEAL_LIP - off, R.north + plan.REVEAL_LIP + off]) within.push(washAt([plan.LINING.face, n, h], east, hangHeads))
+  for (const n of [R.south - plan.REVEAL_LIP - 1, R.north + plan.REVEAL_LIP + 1]) metreOut.push(washAt([plan.LINING.face, n, h], east, hangHeads))
+}
 // the steepest a head's ray climbs to the splay's front edge, against the splay
 const climb = Math.max(...heads.map(light => (light.at[2] - R.head) / (light.at[0] - plan.LINING.face)))
 const wash = {
@@ -177,7 +187,8 @@ const wash = {
   courses: Object.fromEntries(courses.map(row => [row, +rowMean(row).toFixed(3)])),
   splay: +Math.min(...splay).toFixed(3),
   overOpening: +Math.max(...over).toFixed(3),
-  halfMetreBeside: +Math.max(...beside).toFixed(3),
+  spill: { within: +(within.reduce((a, b) => a + b, 0) / within.length / pageMean).toFixed(3),
+    peak: +(Math.max(...within) / pageMean).toFixed(3), metreOut: +(Math.max(...metreOut) / pageMean).toFixed(3) },
   climb: +climb.toFixed(3), splayRise: +Math.tan(R.splay).toFixed(3),
 }
 const lightFailures = []
@@ -185,12 +196,15 @@ if (pageMin < .85 * pageMax) lightFailures.push(`The wash swings ${pageMin.toFix
 const lowest = rowMean(courses.at(-1)), highest = rowMean(courses[0])
 if (Math.abs(lowest - highest) > .08 * highest) lightFailures.push(`The bottom course takes ${lowest.toFixed(3)} against the top course's ${highest.toFixed(3)}`)
 if (wash.overOpening > .05 * pageMean) lightFailures.push(`The wash lays ${wash.overOpening} on the lining over the opening, a pool on empty wall`)
-if (wash.halfMetreBeside > .15 * pageMean) lightFailures.push(`The wash lays ${wash.halfMetreBeside} half a metre past the opening's jambs`)
+// a mean of a third to four fifths of the pages: enough that the oak reads
+// round a lit opening, never a second hang beside it
+if (wash.spill.within < .35 || wash.spill.within > .8) lightFailures.push(`The oak within 0.3 m of the jambs takes ${wash.spill.within} of the pages' wash, outside a third to four fifths`)
+if (wash.spill.metreOut > .05) lightFailures.push(`The spill still lays ${wash.spill.metreOut} of the pages' wash a metre past the jambs`)
 if (climb >= Math.tan(R.splay)) lightFailures.push('A head\'s ray climbs to the splay\'s edge as steep as the splay: its soffit takes no light')
 if (wash.splay <= 0) lightFailures.push('The splayed soffit takes no light under a head')
 
 /* THE NICHE OF THE SHEET APART, read the same way from its own head: the
- * sheet as bright as the pages of the hang and even over its window, nothing
+ * sheet leading the pages of the hang and even over its window, nothing
  * on the lining round the niche, its splayed head lit; its south jamb on the
  * chest's north end, and the lining's end short of the reading room. */
 const N = plan.NICHE, apart = plan.mountedSheets().find(s => s.mount.row === 'vortex'), framer = plan.BODY_LIGHTS.filter(light => light.name === 'vortex')
@@ -208,7 +222,10 @@ const niche = {
   scribeClearOfPlinth: +(room.READING_ROOM_FOOTPRINT.south - plan.SCRIBE.north).toFixed(4),
 }
 if (Math.min(...sheetPoints) < .85 * Math.max(...sheetPoints)) lightFailures.push(`The niche's head swings ${niche.sheet.min} to ${niche.sheet.max} over the sheet`)
-if (Math.abs(niche.sheet.max - pageMean) > .15 * pageMean) lightFailures.push(`The sheet apart takes ${niche.sheet.max} against the hang's ${pageMean.toFixed(3)}`)
+// THE VALVE LEADS: its paper is a darker, cooler sheet than the grid's and
+// stands alone in a dark niche, so it takes 1.3 to 1.6 times the pages' wash
+niche.lead = +(niche.sheet.max / pageMean).toFixed(3)
+if (niche.lead < 1.3 || niche.lead > 1.6) lightFailures.push(`The sheet apart takes ${niche.lead} of the hang's wash, outside 1.3 to 1.6`)
 if (niche.roundTheNiche > .05 * pageMean) lightFailures.push(`The niche's head lays ${niche.roundTheNiche} on the lining round the niche`)
 if (niche.splay <= 0) lightFailures.push('The niche\'s splayed head takes no light')
 if (Math.abs(niche.southJambOnChest) > 1e-6) lightFailures.push('The niche\'s south jamb does not stand on the chest\'s north end')

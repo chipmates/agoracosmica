@@ -162,7 +162,10 @@ const entryInspectionAnchors:Record<string,Vector3>={
 /** THE HALL IS PRINTED ON A SHOULDER: its spots are the hottest light in the
  * wing, and a linear print clips a lit sail to one flat white. */
 const STATION_SHOULDER:Partial<Record<VinciStationId,number>>={flight:1,works:1,hall:1,'supper-wall':1}
-const exposureOf=(id?:string):number=>STATION_EXPOSURE[id as VinciStationId]??PRINT.exposure
+/** A place of the walk prints as the station whose room it stands in: the
+ * valve's niche is the body wall's, so the eye does not close on arrival. */
+const printStation=(id?:string):string|undefined=>id===VINCI_VALVE.place?VINCI_VALVE.station:id
+const exposureOf=(id?:string):number=>STATION_EXPOSURE[printStation(id) as VinciStationId]??PRINT.exposure
 /** THE EYE THAT STEPS INTO A ROOM OF THE HOUSE opens as it does at a door:
  * the house's close looks stand indoors, a stop over the landing's print. */
 const VIEW_EXPOSURE:Readonly<Record<string,number>>={'great-hall':2.2,'great-hall-door':2.2}
@@ -171,8 +174,8 @@ const VIEW_EXPOSURE:Readonly<Record<string,number>>={'great-hall':2.2,'great-hal
  * shoulder's toe takes a little from the mid-tones, which the exposure gives
  * back */
 const VIEW_SHOULDER:Readonly<Record<string,number>>={'great-hall':1,'great-hall-door':1}
-const shoulderOf=(id?:string):number=>STATION_SHOULDER[id as VinciStationId]??0
-const toeOf=(id?:string):number=>STATION_TOE[id as VinciStationId]??PRINT.toe
+const shoulderOf=(id?:string):number=>STATION_SHOULDER[printStation(id) as VinciStationId]??0
+const toeOf=(id?:string):number=>STATION_TOE[printStation(id) as VinciStationId]??PRINT.toe
 /** THE EYE OPENS OVER THE LAST THIRD OF A LEG, so the leg lands on the
  * station's own print: a stop has one picture whichever way it was reached,
  * live and filmed, and no ease is left to run after the arrival. */
@@ -227,7 +230,7 @@ function roomsForPrint():{room:string,box:PrintBox,station:VinciStationId}[] {
 const HALL_STATIONS:ReadonlySet<string>=new Set(['flight','works'])
 const PRINT_INDOORS:PrintBox={west:ROOMS.picture.west,east:ROOMS.picture.east,south:ROOMS.hall.south,north:ROOMS.picture.north}
 function roomPrint(nav:{completed?:string,active?:string,legWalked:number},eye:Vector3):{exposure:number,shoulder:number,toe:number}|null {
-  const from=nav.completed as VinciStationId|undefined, to=nav.active as VinciStationId|undefined
+  const from=printStation(nav.completed) as VinciStationId|undefined, to=printStation(nav.active) as VinciStationId|undefined
   if(!from||!to)return null
   const a=exposureOf(from), b=exposureOf(to)
   if(Math.max(a,b)<=Math.min(a,b)*ROOM_PRINT_RATIO)return null
@@ -1075,8 +1078,10 @@ export function createWing():VinciWingModule {
       // the hang's own order, which is the way each end's frame reads it: at
       // the east end the wall runs away to the right and at the west end back
       // to the left, so one rule agrees with both. Up and down stay the
-      // station rail, except at a stop, where they are the wall too.
-      if(wallAt()!==undefined&&!target.closest('.vinci-strip')){
+      // station rail, except at a stop, where they are the wall too. The body
+      // wall is read in the reader, never run along, so its arrows stay the
+      // gold control and the way back.
+      if(wallAt()!==undefined&&!target.closest('.vinci-strip')&&wallOn()?.id!==VINCI_BODY_WALL){
         const step=e.key==='ArrowRight'||(onWallStop()&&e.key==='ArrowDown')?1
           :e.key==='ArrowLeft'||(onWallStop()&&e.key==='ArrowUp')?-1:0
         if(step){e.preventDefault();stepWall(step);return}
@@ -1685,19 +1690,19 @@ export function createWing():VinciWingModule {
     }
     dots?.setExhibits(marks)
   }
-  /** ONE MARK FOR THE WHOLE GRID ON THE PHONE, the line's rule: the sheets
-   * without a film are pressable but unmarked, and a narrow frame has no
-   * pointer to find them by. The mark stands at the grid's middle, says the
-   * wall's own short name and walks to its first sheet in wall order. */
+  /** ONE MARK FOR THE WHOLE GRID, the line's rule: the sheets without a film
+   * are pressable but unmarked, so the grid carries one mark in the wall's
+   * own short name. It stands on the sheet nearest the grid's middle, where
+   * its plaque would be, and opens the reader on that sheet. */
   function bodyGridMark():Omit<VinciExhibitMark,'walks'|'word'>|null {
-    if(!narrow())return null
     const grid=picks.filter(entry=>entry.kind==='sheet'&&entry.openable&&!(assets&&vinciShowpiece(entry.id,assets)))
-    const first=grid.reduce<VinciPickEntry|undefined>((best,entry)=>!best||entry.order<best.order?entry:best,undefined)
     const name=ROOM_SHORT['body']
-    if(!first||!name)return null
-    const anchor=new Vector3()
-    for(const entry of grid)anchor.add(entry.anchor)
-    return {id:first.id,anchor:anchor.divideScalar(grid.length),object:first.object,label:text(name),colour:certaintyColour('documented')}
+    if(!grid.length||!name)return null
+    const middle=new Vector3()
+    for(const entry of grid)middle.add(entry.anchor)
+    middle.divideScalar(grid.length)
+    const target=grid.reduce((best,entry)=>entry.anchor.distanceToSquared(middle)<best.anchor.distanceToSquared(middle)?entry:best)
+    return {id:target.id,anchor:target.anchor,object:target.object,label:text(name),colour:certaintyColour('documented')}
   }
   /** WHAT THE HOVER NAMES: the name a mark over this exhibit would carry, and
    * for a sheet without a film its own title, since a press opens it all the
@@ -1727,9 +1732,7 @@ export function createWing():VinciWingModule {
       queued=0
       const nav=rail.navigation
       if(!hosts||!standing||nav.active||nav.approaching||!picks.length||closeLook?.id){clear();return}
-      const rect=stage.getBoundingClientRect()
-      if(rect.width<=0||rect.height<=0){clear();return}
-      pickRay.setFromCamera(new Vector2((x-rect.left)/rect.width*2-1,-((y-rect.top)/rect.height)*2+1),hosts.world.camera)
+      if(!aimPickRay(x,y)){clear();return}
       const hit=pickVinciExhibit({ray:pickRay,entries:picks,occluded:(from,to)=>vinciSightBlocked(from,to,occluders,sightRay,sightHits)})
       const name=hit?exhibitHoverName(hit):null
       if(!hit||!name){clear();return}
@@ -1910,12 +1913,20 @@ export function createWing():VinciWingModule {
     }
     return panels
   }
+  /** A SCREEN POINT ON THE PICTURE. While the desktop's band stands under the
+   * picture the canvas is the stage's height, not the window's, so the ray is
+   * built over that box (`desk-stage.ts`); a point on the band is no press. */
+  function aimPickRay(x:number,y:number):boolean {
+    if(!hosts)return false
+    const height=deskStageHeight()
+    if(innerWidth<=0||y<0||y>height)return false
+    pickRay.setFromCamera(new Vector2(x/innerWidth*2-1,-(y/height)*2+1),hosts.world.camera)
+    return true
+  }
   /** ONE RAY ON A PRESS, never on a hover. */
   function pressExhibit(x:number,y:number):void {
     if(!hosts||!picks.length||closeLook?.id)return
-    const rect=hosts.stage.getBoundingClientRect()
-    if(rect.width<=0||rect.height<=0)return
-    pickRay.setFromCamera(new Vector2((x-rect.left)/rect.width*2-1,-((y-rect.top)/rect.height)*2+1),hosts.world.camera)
+    if(!aimPickRay(x,y))return
     const hit=pickVinciExhibit({ray:pickRay,entries:picks,
       occluded:(from,to)=>vinciSightBlocked(from,to,occluders,sightRay,sightHits)})
     if(hit)openExhibit(hit.id,null)

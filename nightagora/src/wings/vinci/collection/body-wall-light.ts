@@ -28,14 +28,20 @@ export const BODY_PLATE = {
 
 /** The band's share at `height` on the optic's plane, `off` along the wall
  * from the lamp's line: `washBand` of the plan, as nodes. */
-function band(o: WashOptic, height: N, off: N): N {
+function band(o: WashOptic, height: N, off: N, lampNorth: number): N {
   const lateral = o.edge === undefined ? exp(off.mul(off).mul(-1 / (2 * o.spread * o.spread)))
     : float(1).sub(smoothstep(o.edge, o.edge + (o.edgeSoft ?? 0), off.abs()))
   const crown = float(o.crown).sub(off.mul(off).mul(o.arc))
   const lit = smoothstep(o.foot - o.footSoft, o.foot, height)
   const foot = exp(min(height.sub(o.foot), 0).div(o.tailFall)).mul(o.tail).mul(float(1).sub(lit)).add(lit)
   const shutter = o.floor === undefined ? float(1) : smoothstep(o.floor - (o.floorSoft ?? 0), o.floor, height)
-  return lateral.mul(float(1).sub(smoothstep(crown.sub(o.crownSoft), crown, height))).mul(foot).mul(shutter)
+  let band = lateral.mul(float(1).sub(smoothstep(crown.sub(o.crownSoft), crown, height))).mul(foot)
+  if (o.spill) {
+    const s = o.spill, at = off.add(lampNorth), outside = max(max(float(s.south).sub(at), at.sub(s.north)), 0)
+    band = band.add(smoothstep(0, .02, outside).mul(exp(outside.mul(-1 / s.reach))).mul(s.share)
+      .mul(smoothstep(o.foot - s.soft, o.foot, height)).mul(float(1).sub(smoothstep(crown.sub(s.soft), crown, height))))
+  }
+  return band.mul(shutter)
 }
 
 /** WHAT A WALLWASHER SENDS TOWARD P, as a multiple of its level: the wash
@@ -52,7 +58,7 @@ export function washToward(P: N, light: BodyLight): N {
   const off = d.z.negate().mul(t)
   const hit = float(height).add(d.y.mul(t))
   const far = sqrt(dot(d, d)).mul(t)
-  return select(west.greaterThan(.02), band(o, hit, off).mul(far.mul(far).mul(far)).div(reach), float(0))
+  return select(west.greaterThan(.02), band(o, hit, off, north).mul(far.mul(far).mul(far)).div(reach), float(0))
 }
 
 /** What a spot of the table lays on a surface at P with normal n: its

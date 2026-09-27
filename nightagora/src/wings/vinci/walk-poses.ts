@@ -15,10 +15,11 @@
  * proves every walk between it and every other pose (`rail-certify.mjs` and
  * `rail-proof.ts` read this list), and none of them moves a station.
  */
-import type { Vector3 } from 'three/webgpu'
+import { Vector3 } from 'three/webgpu'
 import type { VinciStationId } from './content'
 import { world } from './site'
 import { vinciApproachPose } from './collection/approaches'
+import { FRAME_FRONT, mountedSheets } from './collection/body-wall-plan'
 import { VINCI_VALVE, type VinciWalkPoseId } from './walk-places'
 
 export { VINCI_HOUSE_DOOR, VINCI_VALVE, VINCI_WALK_POSE_IDS, isVinciWalkPose, type VinciWalkPoseId } from './walk-places'
@@ -58,12 +59,44 @@ function doorPose(id: 'hall-door-in' | 'hall-door-out', narrow: boolean): WalkPo
   return { eye: world(...onTheSteps(DOOR_OUT_SHARE)), at: world(...DOOR_OUT_AIM), fov }
 }
 
+/** THE VALVE'S SHEET IS READ LARGE AND CENTRED ON THE DESKTOP. The eye is the
+ * sheet's certified viewing eye, unmoved; the aim rises to the sheet and the
+ * lens closes until its frame takes more than half the picture, its middle a
+ * little above the picture's. The words stand in the band under the picture,
+ * so nothing is carried aside. The shares hold at the desktop picture under
+ * the English band (1440 by 708), which is also the film's wide frame cropped
+ * to that box; the lens is authored for the rail's 16:9 frame, which keeps
+ * its horizontal field on wider pictures (`rail-projection.ts`). The phone
+ * keeps its approach: the sheet already takes three fifths of its picture. */
+const VALVE_FILL = .57, VALVE_MIDDLE = .47, DESK_PICTURE_ASPECT = 1440 / 708, RAIL_ASPECT = 1280 / 720
+function valveDesktopPose(pose: WalkPose): WalkPose {
+  const sheet = mountedSheets().find(entry => `sheet/${entry.mount.id}` === VINCI_VALVE.exhibit)
+  if (!sheet) return pose
+  const eye = pose.eye, middle = world(FRAME_FRONT, sheet.mount.north, sheet.mount.datum)
+  const reach = Math.hypot(middle.x - eye.x, middle.z - eye.z)
+  const rise = (height: number): number => Math.atan2(height - eye.y, reach)
+  const top = rise(sheet.frame.top), foot = rise(sheet.frame.bottom)
+  // the frame's edges on the picture, in half heights of the lens from its middle
+  const topAt = 1 - 2 * (VALVE_MIDDLE - VALVE_FILL / 2), footAt = 2 * (VALVE_MIDDLE + VALVE_FILL / 2) - 1
+  // the pitch at which both edges ask for the same lens
+  let low = foot, high = top
+  for (let i = 0; i < 60; i++) {
+    const pitch = (low + high) / 2
+    if (Math.tan(top - pitch) / topAt > Math.tan(pitch - foot) / footAt) low = pitch
+    else high = pitch
+  }
+  const pitch = (low + high) / 2, half = Math.tan(top - pitch) / topAt
+  const toward = new Vector3(middle.x - eye.x, 0, middle.z - eye.z).normalize()
+  const at = eye.clone().add(new Vector3(toward.x * Math.cos(pitch), Math.sin(pitch), toward.z * Math.cos(pitch)).multiplyScalar(reach))
+  return { eye: eye.clone(), at, fov: 360 / Math.PI * Math.atan(half * DESK_PICTURE_ASPECT / RAIL_ASPECT) }
+}
+
 /** The pose one of the walk's own places stands at. */
 export function vinciWalkPoseOf(id: VinciWalkPoseId, narrow: boolean): WalkPose {
   if (id === 'body-valve') {
     const pose = vinciApproachPose(VINCI_VALVE.exhibit, narrow)
     if (!pose) throw new Error(`${VINCI_VALVE.exhibit}: no viewing eye for the valve's stop`)
-    return pose
+    return narrow ? pose : valveDesktopPose(pose)
   }
   return doorPose(id, narrow)
 }
