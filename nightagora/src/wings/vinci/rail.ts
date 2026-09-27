@@ -87,10 +87,12 @@ function aimedFrom(pose:Pose,heading:number,pitch:number,fov:number):Pose {
 const standing=(e:number,n:number):Pose=>{const h=groundHeight(e,n)+1.65;return p(e,n,h,e,n,h)}
 /** The eye in the great hall's door, on the axis of the three doors. */
 const HALL_DOOR=p(-4.2388,-11.0992,2.45,-4.2388,-11.0992,2.45)
-/** The body wall's phone eye, 5.5 m off the linen and eighty centimetres
- * north of the hang's axis: the nearest place a 390 px stage holds the whole
- * recess and the niche beside it, whose sheet opens the glass heart's film. */
-const BODY_PHONE=p(-33.2,-51.8,FLOOR+1.62,-33.2,-51.8,FLOOR+1.62)
+/** The body wall's phone eye, on the grid's axis 6.7 m off the frames: at a
+ * 64 degree lens the grid takes four fifths of a 390 px stage and the sheet
+ * apart is the next stop, not a speck at the frame's edge. The lens is the
+ * walk's clock too: the valve's stop reads at about 33 degrees and a lens
+ * change takes its own time, so a wider lens here was a longer walk there. */
+const BODY_PHONE=p(-32,-52.55,FLOOR+1.62,-32,-52.55,FLOOR+1.62)
 /** THE DISPLAY WALL'S DESKTOP EYE STANDS UNDER THE NAVE'S WEST END. From
  * eleven metres the nave's north beam, its foot 3.2 m over the floor, stood
  * across the field's upper north corner. From 6.4 m, forty centimetres south
@@ -212,11 +214,10 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
     // outline stands above the sheet.
     return aimedFrom(p(-35.5,-31,COURT.level+1.66,-35.5,-31,COURT.level+1.66),-82.5,-2,100)
   }
-  // THE BODY WALL'S PHONE STANDS SQUARE ON THE HANG. From the room's own eye
-  // the portrait stage took the recess at its top and bare floor for its
-  // lower half; here the recess spans the stage and the drawers under it end
-  // where the card begins.
-  if(id==='body'&&narrow) return aimedFrom(BODY_PHONE,-90,-6,100)
+  // THE BODY WALL'S PHONE STANDS SQUARE ON THE HANG. Looking eight degrees
+  // down, the soffit takes a tenth of the picture over the lining's head and
+  // the drawers under the grid end a little above the card.
+  if(id==='body'&&narrow) return aimedFrom(BODY_PHONE,-90,-8,64)
   const room=COLLECTION_STATION_ROOMS[id]
   // THE TIMELINE'S FIRST EYE stands north of its room's view: 0.6 m off the
   // gallery's end wall, every walk in turned round with that wall filling the frame.
