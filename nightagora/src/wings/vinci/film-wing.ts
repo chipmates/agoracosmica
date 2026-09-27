@@ -12,6 +12,7 @@ import { vinciAbsences, vinciCertaintyWords, vinciCollectionThreshold, vinciCont
   vinciReconstruction, vinciRightsPolicy, vinciRoomStationIds, vinciSourcesHeadings, vinciWingCounts,
   type VinciCertainty, type VinciStatement, type VinciStationId, type VinciText } from './content'
 import { vinciStory } from './story'
+import { VINCI_VALVE } from './walk-places'
 import { deskControl, deskStoryStop } from '../desk-story'
 import { applyDeskSteps, deskOn } from '../desk-switches'
 import { deskStageHeight } from '../desk-stage'
@@ -81,6 +82,8 @@ function lifeStops(): LifeStop[] {
     // the wall stop is named by its own chapter: the rail that carries these names stands down in the film
     if (stop.id === 'picture-room-lisa') out.push({ id: stop.id, station: 'picture-room', name: stop.chapter })
     else if (built.has(stop.id)) out.push({ id: stop.id, station: stop.id, name: vinciContent.find(s => s.id === stop.id)!.name })
+    // the heart valve's stop follows the body wall, as in the walk (walk.ts)
+    if (stop.id === VINCI_VALVE.station) out.push({ id: VINCI_VALVE.place, station: VINCI_VALVE.station, name: VINCI_VALVE.name })
   }
   return out
 }
@@ -153,9 +156,14 @@ export function createWing(): WingModule {
 
   const carried = (index: number): boolean => Boolean(release?.nodes[stopNode(LIFE[index]?.id ?? '')])
   const deskStation = (index: number): DeskStation => ({ id: LIFE[index]!.id, index, count: LIFE.length })
-  /** the way on: the next stop of the life this release carries */
-  const nextIndex = (): number | null => (card + 1 < LIFE.length && carried(card + 1) ? card + 1 : null)
-  const backIndex = (): number | null => (card > 0 && carried(card - 1) ? card - 1 : null)
+  /** the way on: the next stop of the life this release carries, past one it
+      does not carry yet (a stop added after the release was rendered) */
+  const carriedFrom = (from: number, step: 1 | -1): number | null => {
+    for (let i = from + step; i >= 0 && i < LIFE.length; i += step) if (carried(i)) return i
+    return null
+  }
+  const nextIndex = (): number | null => carriedFrom(card, 1)
+  const backIndex = (): number | null => carriedFrom(card, -1)
   const here = (): PictureNode => {
     const s = picture?.state()
     return !s ? stopNode(LIFE[card]!.id) : s.kind === 'rest' ? s.node : s.kind === 'dip' ? s.to : s.from
@@ -181,9 +189,10 @@ export function createWing(): WingModule {
     if (state.kind === 'dip') {
       const node = release?.nodes[state.to]
       const to = LIFE.find(s => stopNode(s.id) === state.to)
-      const title = state.title ? text(state.title) : to ? text(deskStoryStop(to.id)?.chapter ?? to.name) : node?.station ?? ''
+      // a door's dip is dark and says nothing
+      const title = state.quiet ? '' : state.title ? text(state.title) : to ? text(deskStoryStop(to.id)?.chapter ?? to.name) : node?.station ?? ''
       cutCard.textContent = ''
-      cutCard.append(make('p', 'vinci-cut-title', title))
+      if (title) cutCard.append(make('p', 'vinci-cut-title', title))
       cutCard.hidden = false
       /* ON THE PHONE THE CUT KEEPS THE FOOT: the card stands inside the stage,
          under the graded box, so back and gold stay over the dark */

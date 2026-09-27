@@ -42,8 +42,9 @@ export type PictureState =
   | { kind: 'walk'; from: PictureNode; to: PictureNode; target: PictureNode; clip: string; share: number }
   /** a clip is asked for and its bytes are not here yet */
   | { kind: 'wait'; from: PictureNode; to: PictureNode; target: PictureNode; clip: string; share: number }
-  /** the picture goes down to the museum's dark and comes up somewhere else */
-  | { kind: 'dip'; from: PictureNode; to: PictureNode; title: PictureWords | null }
+  /** the picture goes down to the museum's dark and comes up somewhere else;
+      a quiet dip (a door) carries no words and stands the shortest moment */
+  | { kind: 'dip'; from: PictureNode; to: PictureNode; title: PictureWords | null; quiet?: true }
 
 export type PictureEvent = 'state' | 'rest' | 'depart' | 'wait' | 'dip'
 

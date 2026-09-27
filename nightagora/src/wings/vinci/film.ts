@@ -9,14 +9,17 @@
 import type { VinciStationId } from './content'
 import type { createRail, Pose } from './rail'
 import type { VinciWalk, VinciWalkStop } from './walk'
+import type { VinciWalkPoseId } from './walk-places'
 import { LOOP_S, windClock } from './wind'
 
 type Rail = ReturnType<typeof createRail>
 
 export interface FilmNode {
   id: string
-  kind: 'stop' | 'view'
+  kind: 'stop' | 'view' | 'door'
   station: VinciStationId
+  /** the place a door or a stop of its own stands at on the rail */
+  railId?: VinciWalkPoseId
   walkId?: string
   exhibit?: string
   wall?: string
@@ -36,6 +39,7 @@ export interface FilmParts {
   narrow: () => boolean
   walkPose: (stop: VinciWalkStop, narrow: boolean) => Pose
   approachPose: (exhibit: string, narrow: boolean) => Pose | undefined
+  placePose: (place: VinciWalkPoseId, narrow: boolean) => Pose
 }
 
 /** THE WORLD'S CLOCK AT THE JOINS. At rest the wind stands on its loop's
@@ -56,11 +60,13 @@ export function installFilm(parts: FilmParts): void {
     return stop
   }
   const stationStop = (station: string): VinciWalkStop => {
-    const stop = parts.walk.stops.find((s) => s.station === station && !s.exhibit)
+    const stop = parts.walk.stops.find((s) => s.station === station && !s.exhibit && !s.place)
     if (!stop) throw new Error(`no stop of the walk stands at ${station}`)
     return stop
   }
+  const railOf = (node: FilmNode): VinciStationId => (node.railId ?? node.station) as VinciStationId
   const poseOf = (node: FilmNode): Pose => {
+    if (node.kind === 'door' && node.railId) return parts.placePose(node.railId, phone())
     if (node.kind === 'stop') return parts.walkPose(stopOf(node.walkId ?? node.station), phone())
     const pose = parts.approachPose(node.exhibit ?? '', phone())
     if (!pose) throw new Error(`${node.id}: no viewing pose`)
@@ -77,8 +83,8 @@ export function installFilm(parts: FilmParts): void {
     /** the eye stood at a node at once, as a cut stands it */
     place(node: FilmNode): boolean {
       const rail = parts.rail()
-      if (node.kind === 'stop') {
-        rail.set(node.station, poseOf(node), true, phone(), node.exhibit ? node.vertex : undefined)
+      if (node.kind === 'stop' || node.kind === 'door') {
+        rail.set(railOf(node), poseOf(node), true, phone(), node.exhibit ? node.vertex : undefined)
         return true
       }
       if (node.wall) {
@@ -94,7 +100,7 @@ export function installFilm(parts: FilmParts): void {
       const rail = parts.rail()
       arriving = to
       left = false
-      if (motion.rail === 'route') { rail.set(to.station, poseOf(to), false, phone()); return true }
+      if (motion.rail === 'route') { rail.set(railOf(to), poseOf(to), false, phone()); return true }
       if (motion.rail === 'wall') {
         if (to.kind === 'stop') { rail.set(to.station, poseOf(to), false, phone(), Number(motion.to)); return true }
         return rail.along(Number(motion.to), from.station, poseOf(to), to.exhibit, phone())

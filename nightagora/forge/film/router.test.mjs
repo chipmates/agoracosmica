@@ -12,6 +12,8 @@ import { buildGraph, openWing } from './graph.mjs'
  *   stop:D ── LEG ── stop:A ═ 1 ═ 2 ═ 3 ═ 4 ═ [stop:B | view:5] ═ 6 ═ stop:C  ╳ cut ╳  stop:E ─ X ─ Y
  *                                                                                       (approach, link)
  *   stop:F ═ f1 ═ f2 ═ f3 ═ f4 ═ f5            a wall with one end
+ *   stop:E ── LEG ── door:in ░ quiet ░ stop:H ─ Z      the house's door: in by one pose,
+ *   stop:E ── LEG ── door:out ░ quiet ░ stop:H         out by the other, never walked
  */
 function fixture() {
   const nodes = [], edges = new Map()
@@ -22,7 +24,7 @@ function fixture() {
     if (held) { held.kinds.push(kind); return }
     edges.set(id, { id, from, to, kinds: [kind], passes, framings: { wide: { seconds: { walk: seconds, brisk: seconds / 1.5 } }, upright: { seconds: { walk: seconds + 0.1, brisk: (seconds + 0.1) / 1.5 } } } })
   }
-  const story = ['stop:D', 'stop:A', 'stop:B', 'stop:C', 'stop:E']
+  const story = ['stop:D', 'stop:A', 'stop:B', 'stop:C', 'stop:E', 'stop:H']
   story.forEach((id, order) => node(id, { kind: 'stop', order }))
   const wall = { 'stop:A': 0, 'view:1': 1, 'view:2': 2, 'view:3': 3, 'view:4': 4, 'stop:B': 5, 'view:5': 5, 'view:6': 6, 'stop:C': 7 }
   for (const [id, vertex] of Object.entries(wall)) {
@@ -33,7 +35,8 @@ function fixture() {
   const fwall = ['stop:F', 'f1', 'f2', 'f3', 'f4', 'f5']
   node('stop:F', { kind: 'stop', order: 5, wall: 'F', vertex: 0 })
   fwall.slice(1).forEach((id, i) => node(id, { kind: 'view', wall: 'F', vertex: i + 1 }))
-  node('view:X', { kind: 'view' }); node('view:Y', { kind: 'view' })
+  node('view:X', { kind: 'view' }); node('view:Y', { kind: 'view' }); node('view:Z', { kind: 'view' })
+  node('door:in', { kind: 'door' }); node('door:out', { kind: 'door' })
   const between = (w, a, b) => nodes.filter((n) => n.wall === w && n.vertex > Math.min(a, b) && n.vertex < Math.max(a, b)).map((n) => n.id)
   const run = (w, a, b, kind) => edge(kind, a, b, 1 + 1.2 * Math.abs(nodes.find((n) => n.id === a).vertex - nodes.find((n) => n.id === b).vertex),
     between(w, nodes.find((n) => n.id === a).vertex, nodes.find((n) => n.id === b).vertex))
@@ -50,10 +53,13 @@ function fixture() {
   edge('APPROACH', 'stop:E', 'view:X', 2); edge('RETURN', 'view:X', 'stop:E', 2)
   edge('APPROACH', 'stop:E', 'view:Y', 2.5); edge('RETURN', 'view:Y', 'stop:E', 2.5)
   edge('LINK', 'view:X', 'view:Y', 1.5); edge('LINK', 'view:Y', 'view:X', 1.5)
+  edge('LEG', 'stop:E', 'door:in', 3); edge('LEG', 'door:out', 'stop:E', 3.2)
+  edge('APPROACH', 'stop:H', 'view:Z', 2); edge('RETURN', 'view:Z', 'stop:H', 2)
   return {
     filmPace: 'walk', story, nodes, edges: [...edges.values()],
     opens: [['stop:B', 'view:5']],
-    cuts: [{ from: 'stop:C', to: 'stop:E', title: { en: 'Amboise', de: 'Amboise' } }],
+    cuts: [{ from: 'stop:C', to: 'stop:E', title: { en: 'Amboise', de: 'Amboise' } },
+      { from: 'door:in', to: 'stop:H', quiet: true }, { from: 'stop:H', to: 'door:out', quiet: true }],
   }
 }
 
@@ -140,6 +146,25 @@ test('a chapter boundary is a dip with its title, never a walk', () => {
   assert.equal(far.type, 'dip'); assert.equal(far.cut, undefined)
 })
 
+test('rule 4: through a door, a walk up to it, its quiet dip and a walk on', () => {
+  const g = fixture()
+  const inward = route(g, 'stop:E', 'view:Z')
+  assert.deepEqual([inward.type, inward.rule], ['walk', 4])
+  assert.deepEqual(inward.steps.map((s) => Object.keys(s)[0]), ['clip', 'dip', 'clip'])
+  assert.deepEqual(inward.steps[1], { dip: 'stop:H', quiet: true })
+  assert.deepEqual(inward.clips, ['stop:E>door:in', 'stop:H>view:Z'])
+  assert.equal(inward.seconds, 3 + 2)
+  const outward = route(g, 'stop:H', 'stop:E')
+  assert.deepEqual(outward.steps, [{ dip: 'door:out', quiet: true }, { clip: 'door:out>stop:E', seconds: 3.2 }])
+  // two clips up to the door, as rule 2 walks them, then in
+  const far = route(g, 'view:X', 'stop:H')
+  assert.deepEqual(far.clips, ['view:X>stop:E', 'stop:E>door:in'])
+  assert.deepEqual(far.steps.map((s) => Object.keys(s)[0]), ['clip', 'wait', 'clip', 'dip'])
+  // the door is one way: nothing walks out through the way in
+  assert.equal(route(g, 'door:in', 'stop:E').type, 'dip')
+  assert.equal(route(g, 'door:in', 'stop:E').rule, undefined)
+})
+
 test('the seconds are the framing and the pace asked for', () => {
   const g = fixture()
   assert.equal(route(g, 'stop:D', 'stop:A', { framing: 'upright' }).seconds, 8.1)
@@ -158,8 +183,9 @@ test('the router writes nothing and answers the same twice', () => {
 test('the guided visit walks the LEGs, reads at every stop and dips at a cut', () => {
   const g = fixture()
   const visit = guidedVisit(g, { readingSeconds: () => 4, titleSeconds: (t) => 2 + t.en.length / 10 })
-  assert.deepEqual(visit.steps.map((s) => Object.keys(s)[0]), ['read', 'clip', 'read', 'clip', 'read', 'clip', 'read', 'dip', 'read'])
-  assert.ok(Math.abs(visit.seconds - (5 * 4 + 8 + (1 + 6) + (1 + 2.4) + 2.7)) < 1e-9)
+  assert.deepEqual(visit.steps.map((s) => Object.keys(s)[0]), ['read', 'clip', 'read', 'clip', 'read', 'clip', 'read', 'dip', 'read', 'clip', 'dip', 'read'])
+  assert.deepEqual(visit.steps.at(-2), { dip: 'stop:H', quiet: true, seconds: 0 })
+  assert.ok(Math.abs(visit.seconds - (6 * 4 + 8 + (1 + 6) + (1 + 2.4) + 2.7 + 3)) < 1e-9)
 })
 
 /* ---- the wing's own graph ---- */
@@ -168,12 +194,16 @@ const wing = await openWing()
 const graph = buildGraph(wing)
 
 test('the wing: every walked leg of the life is one clip, both ways, and the cuts dip', () => {
+  const doors = graph.cuts.filter((c) => c.quiet)
   for (let i = 1; i < graph.story.length; i++) {
     const a = graph.story[i - 1], b = graph.story[i]
-    const cut = graph.cuts.some((c) => c.from === a && c.to === b)
+    const cut = graph.cuts.some((c) => !c.quiet && c.from === a && c.to === b)
     for (const [x, y] of [[a, b], [b, a]]) {
       const plan = route(graph, x, y)
+      const door = doors.some((d) => d.to === y || d.from === x)
       if (cut) assert.equal(plan.type, 'dip', `${x} to ${y}`)
+      // into the house and out of it: one clip and the door's quiet dip
+      else if (door) assert.deepEqual([plan.rule, plan.clips.length, plan.steps.filter((s) => s.quiet).length], [4, 1, 1], `${x} to ${y}`)
       else assert.deepEqual([plan.rule, plan.clips.length], [1, 1], `${x} to ${y}`)
     }
   }
@@ -205,24 +235,35 @@ test('the wing: every plan over every pair of nodes is a walk the graph holds', 
     walks++
     const clips = plan.clips.map((id) => edges.get(id))
     assert.ok(clips.every(Boolean))
-    assert.equal(clips[0].from, a.id)
-    for (let i = 1; i < clips.length; i++) assert.equal(clips[i].from, clips[i - 1].to)
-    const landed = clips.at(-1).to
+    // the body stands where each clip begins: at the start, or where the one before it or the door's dip left it
+    let at = a.id, k = 0
+    for (const step of plan.steps) {
+      if (step.dip) { assert.ok(step.quiet && graph.cuts.some((c) => c.quiet && c.from === at && c.to === step.dip), `${a.id} to ${b.id}: a dip from ${at}`); at = step.dip }
+      if (step.clip) { assert.equal(clips[k].from, at); at = clips[k++].to }
+    }
+    const landed = at
     assert.ok(landed === b.id || graph.opens.some(([x, y]) => (x === landed && y === b.id) || (y === landed && x === b.id)))
     assert.ok(clips.every((c) => !c.passes.includes(b.id)), `${a.id} to ${b.id} walks through its target`)
     assert.ok(clips.slice(1).every((c) => !c.passes.includes(a.id)), `${a.id} to ${b.id} walks back over its start`)
-    if (clips.length > 2) assert.ok(clips.length <= MAX_WALL_STEPS && clips.every((c) => c.kinds.includes('STEP')))
+    if (clips.length > 2 && plan.rule !== 4) assert.ok(clips.length <= MAX_WALL_STEPS && clips.every((c) => c.kinds.includes('STEP')))
   }
   assert.ok(walks > 0 && dips > 0)
 })
 
-test('the wing: the guided visit is the fourteen LEGs forward and the two cuts', () => {
+test('the wing: the guided visit is the fifteen LEGs forward, the two cuts and the house door both ways', () => {
   const visit = guidedVisit(graph)
-  assert.equal(visit.steps.filter((s) => s.clip).length, 14)
-  assert.equal(visit.steps.filter((s) => s.dip).length, 2)
-  assert.equal(visit.steps.filter((s) => s.read !== undefined).length, 17)
-  // the life walked forward at the film's pace, whatever the certificate holds tonight
-  const forward = graph.story.slice(1).map((to, i) => graph.edges.find((e) => e.from === graph.story[i] && e.to === to))
+  assert.equal(visit.steps.filter((s) => s.clip).length, 15)
+  assert.equal(visit.steps.filter((s) => s.dip && s.title).length, 2)
+  assert.equal(visit.steps.filter((s) => s.dip && s.quiet).length, 2)
+  assert.equal(visit.steps.filter((s) => s.read !== undefined).length, 18)
+  // the life walked forward at the film's pace, whatever the certificate holds tonight: into the house
+  // the leg ends at the door's way in, out of it the leg begins at its way out
+  const doors = graph.cuts.filter((c) => c.quiet)
+  const forward = graph.story.slice(1).map((to, i) => {
+    const from = graph.story[i]
+    const inward = doors.find((d) => d.to === to), outward = doors.find((d) => d.from === from)
+    return graph.edges.find((e) => e.from === (outward ? outward.to : from) && e.to === (inward ? inward.from : to))
+  })
   const legs = forward.filter(Boolean).reduce((sum, e) => sum + e.framings.wide.seconds.walk, 0)
   assert.ok(Math.abs(visit.seconds - legs) < 1e-9, `${visit.seconds} against ${legs}`)
 })

@@ -39,18 +39,22 @@ test('every clip, still and cycle of the graph stands in the job once, in both f
 
 test('the spine comes first: a film rendered in part is walkable from the entrance', () => {
   const spine = entries.filter((e) => e.phase === 'spine')
-  // every stop of the life and every leg of the life, before anything else
-  assert.equal(spine.length, 2 * (graph.story.length + graph.edges.filter((e) => e.kinds.includes('LEG')).length))
+  // every stop of the life, the house door's two poses and every leg of the life, before anything else
+  const doorPoses = graph.nodes.filter((n) => n.kind === 'door').length
+  assert.equal(spine.length, 2 * (graph.story.length + doorPoses + graph.edges.filter((e) => e.kinds.includes('LEG')).length))
   assert.ok(entries.slice(0, spine.length).every((e) => e.phase === 'spine'))
   /* at every cut through the spine the stops rendered so far are joined by their legs: a
      visitor walking from the entrance never meets a leg whose far still is missing */
   const at = new Map(entries.map((e) => [e.id, e.order]))
   for (let i = 1; i < graph.story.length; i++) {
     const a = graph.story[i - 1], b = graph.story[i]
-    const leg = graph.edges.find((e) => e.from === a && e.to === b)
+    // into the house the leg ends at the door's way in
+    const door = graph.cuts.find((c) => c.quiet && c.to === b), out = graph.cuts.find((c) => c.quiet && c.from === a)
+    const arrives = door ? door.from : b
+    const leg = graph.edges.find((e) => e.from === (out ? out.to : a) && e.to === arrives)
     if (!leg) { assert.ok(graph.cuts.some((c) => c.from === a && c.to === b), `${a} to ${b} is a cut`); continue }
     for (const f of ['wide', 'upright']) {
-      assert.ok(at.get(clipId(leg.id, f)) > at.get(stillId(b, f)), 'the leg after the still it arrives at')
+      assert.ok(at.get(clipId(leg.id, f)) > at.get(stillId(arrives, f)), 'the leg after the still it arrives at')
       assert.ok(at.get(clipId(leg.id, f)) < at.get(stillId(graph.story[Math.min(i + 1, graph.story.length - 1)], f)) || i === graph.story.length - 1, 'and before the next stop')
     }
   }
@@ -173,8 +177,9 @@ test('the lock: slot A by mkdir, slot B only on a full battery, and only its own
 
 test('the router over a release that carries every edge walks the whole life', () => {
   // a missing clip stays an edge of the release, answered by its stills: the life never dips but at its two cuts
+  // and the house door's quiet dips between two walked legs
   const plans = graph.story.slice(1).map((to, i) => route(graph, graph.story[i], to, { framing: 'upright' }))
-  assert.equal(plans.filter((p) => p.type === 'dip').length, graph.cuts.length)
+  assert.equal(plans.filter((p) => p.type === 'dip').length, graph.cuts.filter((c) => !c.quiet).length)
   assert.ok(plans.filter((p) => p.type === 'walk').every((p) => p.clips.length === 1))
 })
 

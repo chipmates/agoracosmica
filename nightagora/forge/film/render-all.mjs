@@ -104,7 +104,8 @@ export function machinesOf(graph, readDossier) {
 export function orderEntries(graph, machines, { framings = Object.keys(FRAMINGS) } = {}) {
   const nodes = new Map(graph.nodes.map((n) => [n.id, n]))
   const byPair = new Map(graph.edges.map((e) => [`${e.from}>${e.to}`, e]))
-  const cut = (a, b) => graph.cuts.some((c) => (c.from === a && c.to === b) || (c.from === b && c.to === a))
+  const cut = (a, b) => graph.cuts.some((c) => !c.quiet && ((c.from === a && c.to === b) || (c.from === b && c.to === a)))
+  const doors = graph.cuts.filter((c) => c.quiet)
   const entries = []
   const placed = new Set()
   const push = (entry) => { if (placed.has(entry.id)) return; placed.add(entry.id); entries.push(entry) }
@@ -123,7 +124,16 @@ export function orderEntries(graph, machines, { framings = Object.keys(FRAMINGS)
     still(stop, 'spine')
     const prev = graph.story[i - 1]
     if (!prev || cut(prev, stop)) return
-    for (const [a, b] of [[prev, stop], [stop, prev]]) { const e = byPair.get(`${a}>${b}`); if (e) clip(e, 'spine') }
+    // into the house the leg ends at the door's way in, out of it it begins at
+    // the way out: the door's still stands before the leg that touches it
+    for (const [a, b] of [[prev, stop], [stop, prev]]) {
+      const inward = doors.find((d) => d.to === b), outward = doors.find((d) => d.from === a)
+      const from = outward ? outward.to : a, to = inward ? inward.from : b
+      if (from !== a) still(from, 'spine')
+      if (to !== b) still(to, 'spine')
+      const e = byPair.get(`${from}>${to}`)
+      if (e) clip(e, 'spine')
+    }
   })
   // 2 EVERY VIEW'S STILL, room by room in the life's order
   const stations = [...new Set(graph.story.map((s) => nodes.get(s).station))]

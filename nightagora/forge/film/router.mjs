@@ -8,8 +8,12 @@
 //   2. two clips through one rest node, neither walking through the target
 //      nor back over the node it began at;
 //   3. on a wall, a chain of at most three STEPs;
-//   4. a dip, the wing's own chapter cut, the only cut in the museum.
+//   4. through a door: a walk by 1 to 3 up to it, its quiet dip, and a walk
+//      by 1 to 3 on from the room it opens on;
+//   5. a dip, the wing's own chapter cut.
 // Between two clips the visitor stands a moment at the middle node, as a walker stops.
+// A DOOR is a cut marked quiet, one way: the picture goes down and comes up
+// on the far side with no title (the house's door, which is not walked).
 
 /** How long the visitor stands at a middle node between two clips, in seconds. */
 export const WAIT_AT_MIDDLE_S = 0.3
@@ -36,8 +40,10 @@ function indexOf(graph) {
     partners.set(a, [...(partners.get(a) ?? []), b])
     partners.set(b, [...(partners.get(b) ?? []), a])
   }
-  const cuts = new Map((graph.cuts ?? []).flatMap((c) => [[`${c.from}|${c.to}`, c], [`${c.to}|${c.from}`, c]]))
-  held = { nodes, byPair, out, opens, partners, cuts }
+  const titled = (graph.cuts ?? []).filter((c) => !c.quiet)
+  const cuts = new Map(titled.flatMap((c) => [[`${c.from}|${c.to}`, c], [`${c.to}|${c.from}`, c]]))
+  const doors = (graph.cuts ?? []).filter((c) => c.quiet)
+  held = { nodes, byPair, out, opens, partners, cuts, doors }
   indexes.set(graph, held)
   return held
 }
@@ -69,10 +75,21 @@ const better = (a, b) => !b || a.seconds < b.seconds - 1e-9 || (Math.abs(a.secon
  *   pace      the pace the seconds are read at (the film renders 'walk')
  *   noDoubleBack   a two-clip route may not walk back over its own start
  */
-export function route(graph, from, to, { framing = 'wide', pace = graph.filmPace ?? 'walk', noDoubleBack = true } = {}) {
-  const { nodes, byPair, out, opens, partners, cuts } = indexOf(graph)
+export function route(graph, from, to, options = {}) {
+  const { nodes, cuts } = indexOf(graph)
   if (!nodes.has(from)) throw new Error(`no node ${from}`)
   if (!nodes.has(to)) throw new Error(`no node ${to}`)
+  const walked = walkRoute(graph, from, to, options)
+  if (walked) return walked
+  const door = doorRoute(graph, from, to, options)
+  if (door) return door
+  const cut = cuts.get(`${from}|${to}`)
+  return { type: 'dip', from, to, steps: [{ dip: to, ...(cut ? { title: cut.title } : {}) }], seconds: 0, ...(cut ? { cut: true } : {}) }
+}
+
+/** Rules 1 to 3, or nothing where none of them walks it. */
+function walkRoute(graph, from, to, { framing = 'wide', pace = graph.filmPace ?? 'walk', noDoubleBack = true } = {}) {
+  const { byPair, out, opens, partners } = indexOf(graph)
   if (from === to) return { type: 'here', from, to, steps: [], seconds: 0 }
   // one eye, two compositions: the work opens where the visitor stands
   if (opens.has(`${from}|${to}`)) return { type: 'open', from, to, steps: [{ open: to, at: from }], seconds: 0 }
@@ -109,8 +126,26 @@ export function route(graph, from, to, { framing = 'wide', pace = graph.filmPace
     return chain && { seconds: chain.reduce((sum, e) => sum + secondsOf(e, framing, pace), 0), clips: chain }
   })
   if (three) return walkPlan(from, to, three.clips, framing, pace, 3)
-  const cut = cuts.get(`${from}|${to}`)
-  return { type: 'dip', from, to, steps: [{ dip: to, ...(cut ? { title: cut.title } : {}) }], seconds: 0, ...(cut ? { cut: true } : {}) }
+  return undefined
+}
+
+/** Rule 4: the quickest way through one door, each side walked by rules 1 to 3. */
+function doorRoute(graph, from, to, options) {
+  const { doors } = indexOf(graph)
+  let best
+  for (const door of doors) {
+    const up = walkRoute(graph, from, door.from, options)
+    const on = up && walkRoute(graph, door.to, to, options)
+    if (!up || !on || up.type === 'open') continue
+    const seconds = up.seconds + on.seconds
+    if (best && seconds >= best.seconds - 1e-9) continue
+    const clips = [...(up.clips ?? []), ...(on.clips ?? [])]
+    best = {
+      type: clips.length ? 'walk' : 'dip', rule: 4, from, to, clips,
+      steps: [...up.steps, { dip: door.to, quiet: true }, ...on.steps], seconds,
+    }
+  }
+  return best
 }
 
 /** The shortest chain of at most three STEPs from one node to another on one wall. */
@@ -139,7 +174,7 @@ function wallSteps(graph, from, to, framing, pace) {
  *   titleSeconds     (title) => seconds a chapter's title stands
  */
 export function guidedVisit(graph, { from = graph.story[0], framing = 'wide', pace = graph.filmPace ?? 'walk', readingSeconds = () => 0, titleSeconds = () => 0 } = {}) {
-  const { byPair, cuts } = indexOf(graph)
+  const { byPair, cuts, doors } = indexOf(graph)
   const start = graph.story.indexOf(from)
   if (start < 0) throw new Error(`${from} is not a stop of the life`)
   const steps = []
@@ -158,11 +193,16 @@ export function guidedVisit(graph, { from = graph.story[0], framing = 'wide', pa
       seconds += stand
       continue
     }
-    const leg = byPair.get(`${here}>${next}`)
-    if (!leg || !leg.kinds.includes('LEG')) throw new Error(`${here} to ${next}: the life has no LEG here`)
-    const s = secondsOf(leg, framing, pace)
-    steps.push({ clip: leg.id, seconds: s })
-    seconds += s
+    const leg = (a, b) => { const e = byPair.get(`${a}>${b}`); return e && e.kinds.includes('LEG') ? e : undefined }
+    const walk = (e) => { const s = secondsOf(e, framing, pace); steps.push({ clip: e.id, seconds: s }); seconds += s }
+    const direct = leg(here, next)
+    if (direct) { walk(direct); continue }
+    // through the house's door: up to it and in, or out and on from it
+    const inward = doors.find((d) => d.to === next && leg(here, d.from))
+    const outward = doors.find((d) => d.from === here && leg(d.to, next))
+    if (inward) { walk(leg(here, inward.from)); steps.push({ dip: next, quiet: true, seconds: 0 }); continue }
+    if (outward) { steps.push({ dip: outward.to, quiet: true, seconds: 0 }); walk(leg(outward.to, next)); continue }
+    throw new Error(`${here} to ${next}: the life has no LEG here`)
   }
   return { from, steps, seconds }
 }

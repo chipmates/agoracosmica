@@ -12,7 +12,7 @@ export interface RouterGraph {
     framings: Record<string, { seconds: Record<string, number> }>
   }[]
   opens?: readonly (readonly [string, string])[]
-  cuts?: readonly { from: string; to: string; title: { en: string; de: string } }[]
+  cuts?: readonly { from: string; to: string; title?: { en: string; de: string }; quiet?: boolean }[]
   story?: readonly string[]
   filmPace?: string
 }
@@ -21,13 +21,13 @@ export type RouterStep =
   | { clip: string; seconds: number }
   | { wait: number; at: string }
   | { open: string; at: string }
-  | { dip: string; title?: { en: string; de: string } }
+  | { dip: string; title?: { en: string; de: string }; quiet?: true }
 
 export type RouterPlan =
   | { type: 'here'; from: string; to: string; steps: RouterStep[]; seconds: number }
   | { type: 'open'; from: string; to: string; steps: RouterStep[]; seconds: number }
-  | { type: 'walk'; rule: 1 | 2 | 3; from: string; to: string; clips: string[]; steps: RouterStep[]; seconds: number }
-  | { type: 'dip'; from: string; to: string; steps: RouterStep[]; seconds: number; cut?: boolean }
+  | { type: 'walk'; rule: 1 | 2 | 3 | 4; from: string; to: string; clips: string[]; steps: RouterStep[]; seconds: number }
+  | { type: 'dip'; rule?: 4; from: string; to: string; steps: RouterStep[]; seconds: number; cut?: boolean; clips?: string[] }
 
 export const WAIT_AT_MIDDLE_S: number
 export const MAX_WALL_STEPS: number
@@ -40,4 +40,4 @@ export function guidedVisit(graph: RouterGraph, options?: {
   pace?: string
   readingSeconds?: (node: string) => number
   titleSeconds?: (title: { en: string; de: string }) => number
-}): { from: string; steps: ({ read: number; at: string } | { dip: string; title: { en: string; de: string }; seconds: number } | { clip: string; seconds: number })[]; seconds: number }
+}): { from: string; steps: ({ read: number; at: string } | { dip: string; title?: { en: string; de: string }; quiet?: true; seconds: number } | { clip: string; seconds: number })[]; seconds: number }

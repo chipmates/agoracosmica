@@ -65,7 +65,8 @@ export interface FilmRelease {
   revision: string
   framings: Record<PictureFraming, { master: [number, number]; rungs: [number, number][] }>
   story: PictureNode[]
-  cuts: { from: PictureNode; to: PictureNode; title: PictureWords }[]
+  /** the chapter cuts, and the doors: a quiet cut, one way and untitled */
+  cuts: { from: PictureNode; to: PictureNode; title?: PictureWords; quiet?: true }[]
   opens: [PictureNode, PictureNode][]
   /** each station's set of exhibits, in the order its room holds them */
   sets?: Record<string, string[]>
@@ -99,6 +100,8 @@ const STILL_DISSOLVE_MS = 200
 const WAIT_MOST_MS = 3000
 /** the dark of a dip, down and up, as the wing's own chapter cut */
 const DIP_MS = 450
+/** a door's dip stands in the dark this long, as the live door's does */
+const QUIET_HOLD_MS = 150
 /** a mark held this long under a desktop pointer fetches the start of its clip */
 export const LEAN_MS = 150
 const LEAN_BYTES = 512 * 1024
@@ -542,15 +545,15 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
 
   /** THE JUMP: down to the museum's dark, the place it goes to named where a
       chapter's title stands, and that place's still up again */
-  async function dip(node: PictureNode, title: PictureWords | null): Promise<void> {
-    set({ kind: 'dip', from: here, to: node, title }, 'dip')
+  async function dip(node: PictureNode, title: PictureWords | null, quiet = false): Promise<void> {
+    set({ kind: 'dip', from: here, to: node, title, ...(quiet ? { quiet: true as const } : {}) }, 'dip')
     dark.classList.add('shown')
     const url = stillFile(node, framingOf())
     await Promise.all([sleep(reduced() ? 0 : DIP_MS), url ? decode(url) : Promise.resolve()])
     if (url) { still.src = url; await still.decode().catch(() => undefined) }
     shownFraming = framingOf()
     here = node
-    await Promise.race([sleep(options.hold(title)), new Promise<void>(resolve => { dipSkip = resolve })])
+    await Promise.race([sleep(quiet ? QUIET_HOLD_MS : options.hold(title)), new Promise<void>(resolve => { dipSkip = resolve })])
     dipSkip = null
     dark.classList.remove('shown')
     await sleep(reduced() ? 0 : DIP_MS)
@@ -558,12 +561,19 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
 
   async function walkPlan(plan: Extract<RouterPlan, { type: 'walk' }>, target: PictureNode): Promise<void> {
     if (reduced()) {
-      const landed = plan.steps.filter((s): s is { clip: string; seconds: number } => 'clip' in s).map(s => edgeById.get(s.clip)?.to).filter(Boolean).at(-1)
+      // where the plan leaves the body: the last clip's end, or the room a door's dip after it opens on
+      let landed: PictureNode | undefined
+      for (const s of plan.steps) {
+        if ('clip' in s) landed = edgeById.get(s.clip)?.to ?? landed
+        else if ('dip' in s) landed = s.dip
+      }
       await dissolveTo(landed ?? target)
       return
     }
     for (const step of plan.steps) {
       if (disposed) return
+      // THROUGH A DOOR: the dark between the walk up to it and the walk on
+      if ('dip' in step) { await dip(step.dip, step.title ?? null, step.quiet === true); continue }
       if ('wait' in step) {
         // A MOMENT AT THE MIDDLE NODE, as a walker stops: still a walk, so no mark comes and goes
         await sleep((step.wait * 1000) / rate())
@@ -590,8 +600,8 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
     if (plan.type === 'here' || plan.type === 'open') return here
     if (plan.type === 'dip') {
       if (!release.nodes[node]?.stills[f]) return here
-      const step = plan.steps[0] as { title?: PictureWords } | undefined
-      await dip(node, step?.title ?? null)
+      const step = plan.steps[0] as { title?: PictureWords; quiet?: true } | undefined
+      await dip(node, step?.title ?? null, step?.quiet === true)
     } else {
       // the chain's second clip, fetched while the first plays
       const clips = plan.steps.filter((s): s is { clip: string; seconds: number } => 'clip' in s)

@@ -48,6 +48,7 @@ const saved = (pose) => ({ eye: pose.eye.toArray(), at: pose.at.toArray(), fov: 
 const sha256 = (text) => createHash('sha256').update(text).digest('hex')
 export const stopId = (walkId) => `stop:${walkId}`
 export const viewId = (exhibit) => `view:${exhibit}`
+export const doorId = (place) => `door:${place}`
 /** A clip's name on disk: the node ids with their separators made safe. */
 export const clipStem = (edgeId) => edgeId.replace(/[:/]/g, (c) => (c === ':' ? '-' : '.')).replace('>', '--')
 
@@ -80,6 +81,8 @@ export async function openWing({ rev = '', stand = {}, overlay = {} } = {}) {
     /* the life's order is read only by the graph: an older revision a route is
        replayed at may predate it */
     get walk() { return loader.load(`${WING_DIR}/walk.ts`) },
+    /* the walk's own places: a revision before them has none */
+    get places() { try { return loader.load(`${WING_DIR}/walk-poses.ts`) } catch { return null } },
   }
 }
 
@@ -96,7 +99,8 @@ function legMoves(wing, byId, stationStop, framingName) {
   const phone = FRAMINGS[framingName].phone
   const pose = (node) => livePose(node.pose[framingName])
   const place = (node) => (rail) => {
-    if (node.kind === 'stop') { rail.set(node.station, pose(node), true, phone, node.exhibit ? node.vertex : undefined); return }
+    // a door and a stop at a place of its own stand on the rail under that place's id
+    if (node.kind === 'stop' || node.kind === 'door') { rail.set(node.railId ?? node.station, pose(node), true, phone, node.exhibit ? node.vertex : undefined); return }
     if (node.wall) { rail.set(node.station, pose(node), true, phone, node.vertex); return }
     rail.set(node.station, pose(stationStop(node.station)), true, phone)
     rail.update()
@@ -104,7 +108,7 @@ function legMoves(wing, byId, stationStop, framingName) {
   }
   const request = (edge) => (rail) => {
     const m = edge.motion, from = byId.get(edge.from), to = byId.get(edge.to)
-    if (m.rail === 'route') return rail.set(to.station, pose(to), false, phone)
+    if (m.rail === 'route') return rail.set(to.railId ?? to.station, pose(to), false, phone)
     if (m.rail === 'wall') {
       if (to.kind === 'stop') return rail.set(to.station, pose(to), false, phone, m.to)
       return rail.along(m.to, from.station, pose(to), to.exhibit, phone)
@@ -189,8 +193,9 @@ function railLeg(wing, moves, edge, framingName) {
  */
 export function buildGraph(wing, { wall: wallRuns = 'both' } = {}) {
   if (!WALL_RUNS.includes(wallRuns)) throw new Error(`D1 is 'both' or 'behind', not ${wallRuns}`)
-  const { walk, gait, walls: wallModule, approaches, certificate } = wing
+  const { walk, gait, walls: wallModule, approaches, certificate, places } = wing
   const life = walk.vinciWalk(true)
+  const poses = (at) => Object.fromEntries(Object.entries(FRAMINGS).map(([name, f]) => [name, saved(at(f.phone))]))
 
   /* ---- the nodes ---- */
   const nodes = []
@@ -201,15 +206,24 @@ export function buildGraph(wing, { wall: wallRuns = 'both' } = {}) {
     byId.set(node.id, node)
   }
   for (const [order, stop] of life.stops.entries()) {
-    const onWall = stop.wall ? wallModule.vinciWallById(stop.wall) : wallModule.vinciWallOfStation(stop.station)
+    // a stop at a place of its own stands on no wall, even in a station that ends one
+    const onWall = stop.place ? undefined : stop.wall ? wallModule.vinciWallById(stop.wall) : wallModule.vinciWallOfStation(stop.station)
     const vertex = !onWall ? undefined
       : stop.exhibit ? wallModule.vinciWallVertex(onWall, stop.exhibit) : wallModule.vinciWallEndVertex(onWall, stop.station)
     add({
       id: stopId(stop.id), kind: 'stop', order, walkId: stop.id, station: stop.station,
+      ...(stop.place ? { railId: stop.place } : {}),
+      ...(stop.opens ? { opens: stop.opens } : {}),
       ...(stop.exhibit ? { exhibit: stop.exhibit } : {}),
       ...(onWall && vertex !== undefined ? { wall: onWall.id, vertex } : {}),
-      pose: Object.fromEntries(Object.entries(FRAMINGS).map(([name, f]) => [name, saved(walk.vinciWalkPose(stop, f.phone))])),
+      pose: poses((phone) => walk.vinciWalkPose(stop, phone)),
     })
+  }
+  // THE HOUSE'S DOOR, its two poses: the walk in ends at the one, the walk out
+  // begins at the other, and the room between is reached by a quiet dip
+  const door = places?.VINCI_HOUSE_DOOR
+  if (door) for (const [place, way] of [[door.inward, 'in'], [door.outward, 'out']]) {
+    add({ id: doorId(place), kind: 'door', railId: place, way, station: door.station, pose: poses((phone) => places.vinciWalkPoseOf(place, phone)) })
   }
   const records = approaches.vinciExhibitRecords()
   for (const record of records) {
@@ -229,7 +243,7 @@ export function buildGraph(wing, { wall: wallRuns = 'both' } = {}) {
   const views = nodes.filter((n) => n.kind === 'view')
   /** the station stop a leg off the walls leaves from */
   const stationStop = (station) => {
-    const found = stops.find((n) => n.station === station && !n.exhibit)
+    const found = stops.find((n) => n.station === station && !n.exhibit && !n.railId)
     if (!found) throw new Error(`no story stop stands at the station ${station}`)
     return found
   }
@@ -237,6 +251,12 @@ export function buildGraph(wing, { wall: wallRuns = 'both' } = {}) {
   const opens = []
   for (const stop of stops) for (const view of views) {
     if (stop.wall && stop.wall === view.wall && stop.vertex === view.vertex) opens.push([stop.id, view.id])
+  }
+  // a stop that stands at a work's own viewing eye opens it there
+  for (const stop of stops) {
+    if (!stop.opens) continue
+    if (!byId.has(viewId(stop.opens))) throw new Error(`${stop.id}: no view of ${stop.opens} to open`)
+    opens.push([stop.id, viewId(stop.opens)])
   }
 
   /* ---- the edges ---- */
@@ -255,16 +275,24 @@ export function buildGraph(wing, { wall: wallRuns = 'both' } = {}) {
   const motionBetween = (a, b) => {
     if (a.wall && a.wall === b.wall) return wallMotion(a, b)
     if (a.exhibit || b.exhibit) throw new Error(`${a.id} to ${b.id}: a wall stop is walked from its own wall only`)
-    return { rail: 'route', from: a.station, to: b.station }
+    return { rail: 'route', from: a.railId ?? a.station, to: b.railId ?? b.station }
   }
-  // LEG: the life's own walk, both ways, never across a chapter cut
+  // LEG: the life's own walk, both ways, never across a chapter cut; into the
+  // house it ends at the door's way in, out of it it begins at the way out
   const cut = (a, b) => life.cuts.some((c) => (c.from === a.walkId && c.to === b.walkId) || (c.from === b.walkId && c.to === a.walkId))
+  const doorIn = door && byId.get(doorId(door.inward)), doorOut = door && byId.get(doorId(door.outward))
   for (let i = 1; i < stops.length; i++) {
     const a = stops[i - 1], b = stops[i]
     if (cut(a, b)) continue
-    edge('LEG', a, b, motionBetween(a, b))
-    edge('LEG', b, a, motionBetween(b, a))
+    for (const [x, y] of [[a, b], [b, a]]) {
+      const through = door ? walk.vinciDoorBetween(x.station, y.station) : undefined
+      if (!through) edge('LEG', x, y, motionBetween(x, y))
+      else if (through.way === 'in') edge('LEG', x, doorIn, motionBetween(x, doorIn))
+      else edge('LEG', doorOut, y, motionBetween(doorOut, y))
+    }
   }
+  const room = door && stationStop(door.station)
+  const quiet = door ? [{ from: doorIn.id, to: room.id, quiet: true }, { from: room.id, to: doorOut.id, quiet: true }] : []
   // STEP: every span of every wall, both ways; the stop that holds a vertex is
   // its view, and the ends are the wall's own station stops
   for (const declared of wallModule.VINCI_WALLS) {
@@ -371,7 +399,7 @@ export function buildGraph(wing, { wall: wallRuns = 'both' } = {}) {
     framings: FRAMINGS,
     certificate: { file: CERTIFICATE_FILE, sha256: wing.certificateSha256, routes: certificate.routes.length, approaches: certificate.approaches.length, walls: certificate.walls.length, links: certificate.links.length },
     story: stops.map((s) => s.id),
-    cuts: life.cuts.map((c) => ({ from: stopId(c.from), to: stopId(c.to), title: c.title })),
+    cuts: [...life.cuts.map((c) => ({ from: stopId(c.from), to: stopId(c.to), title: c.title })), ...quiet],
     opens,
     nodes,
     edges: list,
@@ -416,7 +444,8 @@ const ROW_TOLERANCE_S = 0.1
 export function formatTable(graph, table) {
   const f1 = (n) => n.toFixed(1)
   const lines = []
-  lines.push(`the film's graph: ${graph.nodes.length} nodes (${graph.story.length} story stops, ${graph.nodes.length - graph.story.length} views), D1 = ${graph.wallRuns}, certificate ${graph.certificate.sha256.slice(0, 12)}`)
+  const doors = graph.nodes.filter((n) => n.kind === 'door').length
+  lines.push(`the film's graph: ${graph.nodes.length} nodes (${graph.story.length} story stops, ${doors} door poses, ${graph.nodes.length - graph.story.length - doors} views), D1 = ${graph.wallRuns}, certificate ${graph.certificate.sha256.slice(0, 12)}`)
   lines.push('')
   lines.push('| kind | clips W | s W | clips U | s U |')
   lines.push('|---|---:|---:|---:|---:|')

@@ -114,9 +114,9 @@ export function walkClip(replay, { aspect, phone, place, request, fps = FPS, tai
 function nodeMoves(replay, framingName, phone) {
   const pose = (node) => livePose(node.pose[framingName])
   const place = (node) => (rail) => {
-    if (node.kind === 'stop') {
-      // a stop stands at its station, or at its own vertex of the wall (index.ts, crossChapter)
-      rail.set(node.station, pose(node), true, phone, node.exhibit ? node.vertex : undefined)
+    if (node.kind === 'stop' || node.kind === 'door') {
+      // a stop stands at its station, at its own vertex of the wall (index.ts, crossChapter), or at a place of its own
+      rail.set(node.railId ?? node.station, pose(node), true, phone, node.exhibit ? node.vertex : undefined)
       return
     }
     if (node.wall) {
@@ -131,7 +131,7 @@ function nodeMoves(replay, framingName, phone) {
   }
   const request = (edge, from, to) => (rail) => {
     const m = edge.motion
-    if (m.rail === 'route') return rail.set(to.station, pose(to), false, phone)
+    if (m.rail === 'route') return rail.set(to.railId ?? to.station, pose(to), false, phone)
     if (m.rail === 'wall') {
       if (to.kind === 'stop') return rail.set(to.station, pose(to), false, phone, m.to)
       return rail.along(m.to, from.station, pose(to), to.exhibit, phone)
@@ -148,7 +148,7 @@ function nodeMoves(replay, framingName, phone) {
 export function replayEdge(replay, graph, edge, framingName, { tail = 0 } = {}) {
   const framing = FRAMINGS[framingName]
   const byId = replay.byId ??= new Map(graph.nodes.map((n) => [n.id, n]))
-  replay.stationNode ??= (station) => graph.nodes.find((n) => n.kind === 'stop' && n.station === station && !n.exhibit)
+  replay.stationNode ??= (station) => graph.nodes.find((n) => n.kind === 'stop' && n.station === station && !n.exhibit && !n.railId)
   const from = byId.get(edge.from), to = byId.get(edge.to)
   const moves = nodeMoves(replay, framingName, framing.phone)
   return walkClip(replay, { aspect: framing.width / framing.height, phone: framing.phone, place: moves.place(from), request: moves.request(edge, from, to), tail })
