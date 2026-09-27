@@ -276,37 +276,56 @@ export interface WashOptic {
   /** and its bottom shutter: nothing under this height, less `floorSoft` */
   floor?: number
   floorSoft?: number
+  /** THE SPILL PAST THE OPENING the band is shaped to: the share of the
+   * band's middle a real wallwasher's lens lets by beyond the jambs, falling
+   * away along the wall over `reach` metres, so the oak beside the opening
+   * catches the light escaping it while the pages inside take none of it;
+   * its edges up and down fade over `soft` metres, so it is a glow and not a
+   * second scallop */
+  spill?: { share: number; reach: number; soft: number; south: number; north: number }
 }
 const smooth = (a: number, b: number, x: number): number => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t) }
 /** The band's share at a height on the plane, `off` metres along the wall
- * from the lamp's own line. `body-wall-light.ts` draws the same formula. */
-export function washBand(o: WashOptic, height: number, off: number): number {
+ * from the lamp's own line, which stands at `lampNorth`. `body-wall-light.ts`
+ * draws the same formula. */
+export function washBand(o: WashOptic, height: number, off: number, lampNorth = 0): number {
   const lateral = o.edge === undefined ? Math.exp(-off * off / (2 * o.spread * o.spread))
     : 1 - smooth(o.edge, o.edge + (o.edgeSoft ?? 0), Math.abs(off))
   const crown = o.crown - o.arc * off * off
   const lit = smooth(o.foot - o.footSoft, o.foot, height)
   const foot = o.tail * Math.exp(Math.min(height - o.foot, 0) / o.tailFall) * (1 - lit) + lit
   const shutter = o.floor === undefined ? 1 : smooth(o.floor - (o.floorSoft ?? 0), o.floor, height)
-  return lateral * (1 - smooth(crown - o.crownSoft, crown, height)) * foot * shutter
+  let band = lateral * (1 - smooth(crown - o.crownSoft, crown, height)) * foot
+  if (o.spill) {
+    const s = o.spill, at = lampNorth + off, outside = Math.max(0, s.south - at, at - s.north)
+    band += smooth(0, .02, outside) * s.share * Math.exp(-outside / s.reach)
+      * smooth(o.foot - s.soft, o.foot, height) * (1 - smooth(crown - s.soft, crown, height))
+  }
+  return band * shutter
 }
 
 /** the small dark-steel heads on the track, a stride apart over the hang */
 export const HEAD_NORTHS = [-54.1, -53.5, -52.9, -52.3, -51.7, -51.1] as const
 /** THEIR OPTIC: a band from the bottom course's foot to the splayed
  * soffit, its scallops breaking on the soffit, its foot fading over the
- * linen under the bottom course so the counter stays out of the beam. */
+ * linen under the bottom course so the counter stays out of the beam; past
+ * the jambs a spill lights the oak round the opening and is gone a metre out,
+ * so the cabinet reads as timber round a lit hang, never as a void. */
 export const WASH: WashOptic = {
   plane: PLANE.linen,
   foot: H(1.02), footSoft: .12, tail: .08, tailFall: .3,
   crown: RECESS.back + .12, crownSoft: .1, arc: .55,
   spread: .28,
+  spill: { share: .55, reach: .4, soft: .5, south: RECESS.south, north: RECESS.north },
 }
 
 /** THE SHEET THAT STANDS APART is read by one head of its own at the track's
  * north end, a framing optic whose band is full from the sheet's frame up to
  * the splayed head, falls to about two fifths at the sill, and is shuttered at
  * the jambs and the sill, so the sheet stands in the light and no light lies
- * on the oak round the niche. The level is the wash's own on the pages. */
+ * on the oak round the niche. THE VALVE LEADS: its level is about half as
+ * much again as the wash on the pages, since its paper is a darker, cooler
+ * sheet than the grid's and it closes the wall's walk. */
 export const VORTEX_HEAD: P3 = [TRACK.east, NICHE.centre, LAMP]
 export const FRAMER: WashOptic = {
   plane: PLANE.linen,
@@ -348,7 +367,7 @@ export const BODY_LIGHTS: readonly BodyLight[] = [
   {
     name: 'vortex', kind: 'spot', head: true, receivers: 'vortex',
     at: VORTEX_HEAD, aim: [PLANE.linen, NICHE.centre, APART.mount.datum], kelvin: 3100, colour: '#ffe0b8',
-    intensity: 1.8, angle: .5, penumbra: .2, wash: FRAMER, shadow: { mapPx: 512, soft: 2 },
+    intensity: 2.6, angle: .5, penumbra: .2, wash: FRAMER, shadow: { mapPx: 512, soft: 2 },
   },
 ]
 

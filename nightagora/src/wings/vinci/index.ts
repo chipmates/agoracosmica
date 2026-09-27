@@ -162,7 +162,10 @@ const entryInspectionAnchors:Record<string,Vector3>={
 /** THE HALL IS PRINTED ON A SHOULDER: its spots are the hottest light in the
  * wing, and a linear print clips a lit sail to one flat white. */
 const STATION_SHOULDER:Partial<Record<VinciStationId,number>>={flight:1,works:1,hall:1,'supper-wall':1}
-const exposureOf=(id?:string):number=>STATION_EXPOSURE[id as VinciStationId]??PRINT.exposure
+/** A place of the walk prints as the station whose room it stands in: the
+ * valve's niche is the body wall's, so the eye does not close on arrival. */
+const printStation=(id?:string):string|undefined=>id===VINCI_VALVE.place?VINCI_VALVE.station:id
+const exposureOf=(id?:string):number=>STATION_EXPOSURE[printStation(id) as VinciStationId]??PRINT.exposure
 /** THE EYE THAT STEPS INTO A ROOM OF THE HOUSE opens as it does at a door:
  * the house's close looks stand indoors, a stop over the landing's print. */
 const VIEW_EXPOSURE:Readonly<Record<string,number>>={'great-hall':2.2,'great-hall-door':2.2}
@@ -171,8 +174,8 @@ const VIEW_EXPOSURE:Readonly<Record<string,number>>={'great-hall':2.2,'great-hal
  * shoulder's toe takes a little from the mid-tones, which the exposure gives
  * back */
 const VIEW_SHOULDER:Readonly<Record<string,number>>={'great-hall':1,'great-hall-door':1}
-const shoulderOf=(id?:string):number=>STATION_SHOULDER[id as VinciStationId]??0
-const toeOf=(id?:string):number=>STATION_TOE[id as VinciStationId]??PRINT.toe
+const shoulderOf=(id?:string):number=>STATION_SHOULDER[printStation(id) as VinciStationId]??0
+const toeOf=(id?:string):number=>STATION_TOE[printStation(id) as VinciStationId]??PRINT.toe
 /** THE EYE OPENS OVER THE LAST THIRD OF A LEG, so the leg lands on the
  * station's own print: a stop has one picture whichever way it was reached,
  * live and filmed, and no ease is left to run after the arrival. */
@@ -227,7 +230,7 @@ function roomsForPrint():{room:string,box:PrintBox,station:VinciStationId}[] {
 const HALL_STATIONS:ReadonlySet<string>=new Set(['flight','works'])
 const PRINT_INDOORS:PrintBox={west:ROOMS.picture.west,east:ROOMS.picture.east,south:ROOMS.hall.south,north:ROOMS.picture.north}
 function roomPrint(nav:{completed?:string,active?:string,legWalked:number},eye:Vector3):{exposure:number,shoulder:number,toe:number}|null {
-  const from=nav.completed as VinciStationId|undefined, to=nav.active as VinciStationId|undefined
+  const from=printStation(nav.completed) as VinciStationId|undefined, to=printStation(nav.active) as VinciStationId|undefined
   if(!from||!to)return null
   const a=exposureOf(from), b=exposureOf(to)
   if(Math.max(a,b)<=Math.min(a,b)*ROOM_PRINT_RATIO)return null
