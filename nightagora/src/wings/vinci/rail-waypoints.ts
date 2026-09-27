@@ -171,19 +171,18 @@ const ENFILADE_TURN: RailWaypoint = [.0049, -8.3434, HOUSE_FLOOR_EYE]
 /** THE STUDIOLO'S DOORSTEP. The reading table is seen through the studiolo's
  * door from two thirds of a metre off its front; every walk to that eye comes
  * in on the door's axis from here, facing through the door, and every walk
- * from it draws back to here before it turns away. It stands north of the
- * body wall's eye, so the walk between the two glides past the wall. */
-const READING_PORCH: RailWaypoint = [-32.8, -46.125, INSIDE]
+ * from it draws back to here before it turns away. It stands a metre off the
+ * eye: a longer pull-back out of the booth read as walking out backward. */
+const READING_PORCH: RailWaypoint = [-34.36, -46.125, INSIDE]
 /** THE DOORSTEPS OF EYES THAT STAND AGAINST A WALL, on the way in a little
  * back from the eye. A view turned round on the eye itself sweeps that wall
  * from a hand away, so a walk that leaves such an eye facing away draws back
  * to its doorstep and turns there, and one that would arrive facing away
  * turns there and backs in. The hall's eye stands in the hall's own door,
  * half a metre from either reveal (its doorstep is in the room behind,
- * nearly four metres across); the timeline's first eye stands 0.6 m from the
- * gallery's end wall, the street's eye 0.87 m from the street's wall. */
+ * nearly four metres across); the street's eye 0.87 m from the street's
+ * wall; the reading table's eye two thirds of a metre off the studiolo. */
 const HALL_PORCH: RailWaypoint = [-2.7714, -10.1461, HOUSE_FLOOR_EYE]
-const TIMELINE_PORCH: RailWaypoint = [-29.224, -59.855, INSIDE]
 const STREET_PORCH: RailWaypoint = [22.799, -15.121, 2.661]
 /** THE STEP INTO THE GREAT HALL. A walk away from the hall's eye goes on a
  * metre and a half into the hall along the door's axis, turns there with the
@@ -196,7 +195,9 @@ const HALL_INSIDE: RailWaypoint = [-5.5037, -11.9181, HOUSE_FLOOR_EYE]
  * the view goes through the door straight and is never swung across its
  * reveals at a walking pace. */
 export const railDoorTurns: readonly RailWaypoint[] = [ENFILADE_TURN, READING_PORCH, HALL_WEST_BAY, HALL_INSIDE]
-export const railPorchStands: readonly RailWaypoint[] = [HALL_PORCH, TIMELINE_PORCH, STREET_PORCH]
+/** The studiolo's doorstep, where the booth is left and entered. */
+export const railReadingPorch: RailWaypoint = READING_PORCH
+export const railPorchStands: readonly RailWaypoint[] = [HALL_PORCH, STREET_PORCH, READING_PORCH]
 /** THE NARROW DOORS A WALK PASSES STRAIGHT THROUGH, at their centres: a door
  * a metre wide holds its reveals in the frame's edges, and a view askew in
  * it holds one of them in the frame. */
@@ -224,8 +225,15 @@ const SKIPPED: Readonly<Record<string, readonly RailWaypoint[]>> = {
  * wall's walk to the display wall comes out of the picture room facing its
  * entrance and turns to the display wall on the apron's corner: turning
  * there on the move swung the way under the view four times. */
+/** THE GARDEN'S PORCH, at the foot of the collection stair. The garden's eye
+ * looks back up at the house and the pavilion's door lies behind it, so a walk
+ * in turns round here, standing, and quick: on the move the view was led
+ * round each corner of the way in and the walk slowed to let it. */
+export const railGardenPorch: RailWaypoint = APRON_CORNER
+const PAVILION_STATIONS = ['picture-room', 'picture-room-west', 'line-early', 'reading-table', 'body', 'flight', 'works']
 export const railPairTurns: Readonly<Record<string, readonly RailWaypoint[]>> = {
   'body>supper-wall': [APRON_CORNER],
+  ...Object.fromEntries(PAVILION_STATIONS.map(id => [`garden>${id}`, [APRON_CORNER]])),
 }
 /** A LINK BETWEEN TWO NEIGHBOURING VIEWS THAT BENDS, by its pair either way, in east
  * and north (the height runs even between the two eyes): the crane's plinth

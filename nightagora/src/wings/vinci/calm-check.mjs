@@ -62,6 +62,14 @@ export const CALM_STANDING = {
   desktop: { turnDegPerSecond: 21, turnDegPerSecond2: 16, turnDegPerSecond3: 60, filmPixelsPerFrame: 14 },
   phone: { turnDegPerSecond: 15, turnDegPerSecond2: 16, turnDegPerSecond3: 60, filmPixelsPerFrame: 14 },
 }
+/** THE NAMED STANDS (the garden porch, the line-early arrival, the works
+ * departure, the reading booth's mouth) turn at 28 degrees a second on the
+ * desktop and 20 on the phone, eased at 22: a leg whose plan names them is
+ * read against these, under the same pixel cap. */
+export const CALM_NAMED = {
+  desktop: { turnDegPerSecond: 29, turnDegPerSecond2: 23, turnDegPerSecond3: 60, filmPixelsPerFrame: 14 },
+  phone: { turnDegPerSecond: 21, turnDegPerSecond2: 23, turnDegPerSecond3: 60, filmPixelsPerFrame: 14 },
+}
 /** The film keeps the authored width: landscape 1920 px from the desktop's
  * lens, portrait 1080 px from the phone's. */
 const filmFocalPixels = (fov, phone) => (phone ? 540 : 960) / (Math.tan(fov * Math.PI / 360) * (phone ? 390 / 844 : 1280 / 720))
@@ -315,7 +323,7 @@ for (const phone of VIEWPORTS) {
   }
 }
 
-const overStanding = leg => { const cap = CALM_STANDING[leg.viewport], st = leg.standing
+const overStanding = leg => { const cap = (/ named\b/.test(leg.gaze ?? '') ? CALM_NAMED : CALM_STANDING)[leg.viewport], st = leg.standing
   return st.peakDegPerSecond > cap.turnDegPerSecond || st.peakDegPerSecond2 > cap.turnDegPerSecond2 || st.peakDegPerSecond3 > cap.turnDegPerSecond3 || st.filmPixelsPerFrame > cap.filmPixelsPerFrame }
 const over = leg => leg.peakDegPerSecond > CALM.turnDegPerSecond || leg.peakDegPerSecond2 > CALM.turnDegPerSecond2
   || leg.peakDegPerSecond3 > CALM.turnDegPerSecond3 || leg.zoomPerSecond > CALM.zoomPerSecond || leg.bodyMetresPerSecond2 > CALM.bodyMetresPerSecond2
