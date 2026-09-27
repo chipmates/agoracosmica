@@ -38,6 +38,9 @@ import { mountSupperRoom } from './supper-room'
 
 /** How thick the hall's air is: a haze a spot's shaft is seen in, no more. */
 const HALL_AIR_DENSITY = .085
+/** Where the air starts to come up, metres inside the hall's walls (the
+ * threshold the hall is entered by), and over how many metres it is full. */
+const HALL_AIR_FROM_M = -.25, HALL_AIR_RAMP_M = 1.2
 /** How far clear of the hall's walls a walk out keeps its machines, in metres. */
 const HALL_KEEP_M = 10
 
@@ -518,7 +521,13 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       const inside = Math.min(eye.x + 61.66, -39.02 - eye.x, eye.z - 42.04, 63.66 - eye.z)
       const t = Math.min(1, Math.max(0, inside / 2.5)), dim = t * t * (3 - 2 * t)
       for (const fitting of hallFittings) fitting.intensity = 9.5 + (HALL_FILL - 9.5) * dim
-      if (hallAir.mesh.visible !== inHall) hallAir.mesh.visible = inHall
+      // THE AIR COMES UP OVER THE FIRST METRE PAST THE THRESHOLD: switched on
+      // at the line it lifted the whole frame in two frames, and its additive
+      // blend scales with the material's opacity.
+      const a = inHall ? Math.min(1, Math.max(0, (inside - HALL_AIR_FROM_M) / HALL_AIR_RAMP_M)) : 0, airShare = a * a * (3 - 2 * a)
+      if (hallAir.mesh.visible !== airShare > 0) hallAir.mesh.visible = airShare > 0
+      const airMaterial = hallAir.mesh.material as Material
+      if (airMaterial.opacity !== airShare) airMaterial.opacity = airShare
       // A HALL SEEN THROUGH ITS DOOR IS NEVER EMPTY. A leg that ends in the
       // hall stands its machines from the leg's first step, and a walk out
       // keeps them until the eye is ten metres clear of the hall's walls.
