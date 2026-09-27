@@ -217,9 +217,11 @@ const STEPS_OUT: Readonly<Record<string, readonly RailWaypoint[]>> = { hall: [HA
 /** Turns a walk between two stations leaves out, by its pair either way. The
  * body wall's walk to the display wall comes round the picture room's corner
  * and crosses the apron to the display wall's eye straight: the step onto
- * the wall's line swung its way twice more under a view already turning. */
+ * the wall's line swung its way twice more under a view already turning.
+ * The studiolo's walk to the display wall takes the same corner. */
 const SKIPPED: Readonly<Record<string, readonly RailWaypoint[]>> = {
   'body>supper-wall': [APRON_NORTH, COURT_EAST],
+  'reading-table>supper-wall': [APRON_NORTH, COURT_EAST],
 }
 /** Turns one walk makes standing, by its pair in walking order. The body
  * wall's walk to the display wall comes out of the picture room facing its
@@ -232,7 +234,7 @@ const SKIPPED: Readonly<Record<string, readonly RailWaypoint[]>> = {
 export const railGardenPorch: RailWaypoint = APRON_CORNER
 const PAVILION_STATIONS = ['picture-room', 'picture-room-west', 'line-early', 'reading-table', 'body', 'flight', 'works']
 export const railPairTurns: Readonly<Record<string, readonly RailWaypoint[]>> = {
-  'body>supper-wall': [APRON_CORNER],
+  'body>supper-wall': [APRON_CORNER], 'supper-wall>body': [APRON_CORNER],
   ...Object.fromEntries(PAVILION_STATIONS.map(id => [`garden>${id}`, [APRON_CORNER]])),
 }
 /** A LINK BETWEEN TWO NEIGHBOURING VIEWS THAT BENDS, by its pair either way, in east

@@ -389,6 +389,12 @@ const RAIL_TURN_ON_ARRIVAL:ReadonlySet<string>=new Set(['arrival','courtyard','o
 const RAIL_NAMED_LEAVE:ReadonlySet<string>=new Set(['works'])
 const RAIL_NAMED_ARRIVE:ReadonlySet<string>=new Set(['line-early'])
 const RAIL_QUICK_NAMED=28,RAIL_QUICK_NAMED_PHONE=20
+/** THE ARRIVALS WALKED INTO TURNED. The timeline's eye stands a metre or two
+ * before the gallery's end wall and looks back up the line: a walk down the
+ * gallery held on the wall until it stood there, the wall filling the frame
+ * while the stand began to turn. These walks look toward the view already
+ * as they come. */
+const RAIL_TURNED_ARRIVALS=new Set(['garden>line-early','body>line-early'])
 /** Station walks kept as they were walked and passed, off the floor. */
 const RAIL_FLOOR_KEPT=new Set(['study>chamber','chamber>study'])
 /** THE COLLECTION STAIR IS WALKED DOWN LOOKING OUT, not back: at the
@@ -403,7 +409,7 @@ const STAIR_VIEW_HEADING=150*Math.PI/180,STAIR_TURN_M=.5,STAIR_RELEASE_M=2
 const RAIL_STAIRS:readonly (readonly [RailWaypoint,RailWaypoint,RailWaypoint])[]=[
   [railCollectionStairWaypoints[0]!,railCollectionStairWaypoints[1]!,railCollectionStairWaypoints[2]!],
 ]
-/** Stretches walked down without a stand, never backward. */
+/** Stretches walked without a stand, never backward. */
 const RAIL_FLIGHTS:readonly (readonly [RailWaypoint,RailWaypoint])[]=[[railAccessWaypoints[1]!,railAccessWaypoints[2]!]]
 /** An exhibit whose viewing eye stands outside its station's room is walked
  * to and from as a route: out of the room's door facing it. */
@@ -434,7 +440,7 @@ const wallOfStation=(id:VinciStationId):VinciWall|undefined=>vinciWallOfStation(
 /** The rooms under the pavilion's roof, left and entered by its one door. */
 const INSIDE:readonly RailSide[]=['picture-room','long-gallery','mechanism-hall']
 /** How a route may stand and turn: the gaze plan's own table (`rail-gaze.ts`). */
-interface RouteTurns {start:boolean;end:boolean;stands?:readonly RailWaypoint[];named?:{start?:boolean;end?:boolean;at?:readonly RailWaypoint[]};floor?:boolean;lens?:'place'|'last'|'first';forward?:boolean}
+interface RouteTurns {start:boolean;end:boolean;stands?:readonly RailWaypoint[];named?:{start?:boolean;end?:boolean;at?:readonly RailWaypoint[]};floor?:boolean;lens?:'place'|'last'|'first';forward?:boolean;turned?:boolean}
 export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:RailGeometryAuthority) {
   /** A request that carries a wall vertex is walked on the wall's own line,
    * whether it ends at a stop of the hang or at one of its two end stations. */
@@ -521,6 +527,14 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     if(flat<1e-9)return {heading:fromHeading,elevation:fromElevation}
     return {heading:Math.atan2(-ahead.x,-ahead.z),elevation:Math.max(-.20,Math.min(.13,Math.atan2(ahead.y,flat)))}
   }
+  /** The way's own direction between two distances along it, however short
+   * the chord: as the film's gate reads a walk from its frames. */
+  function chordHeading(from:number,to:number):number {
+    const total=path!.length
+    path!.pointAtDistance(Math.max(0,Math.min(total,from)),behind);path!.pointAtDistance(Math.max(0,Math.min(total,to)),ahead)
+    ahead.sub(behind)
+    return Math.hypot(ahead.x,ahead.z)>1e-6?Math.atan2(-ahead.x,-ahead.z):pathAngles(from,to-from).heading
+  }
   function samePose(a:Pose,b:Pose) { return a.eye.distanceToSquared(b.eye)<1e-18&&a.at.distanceToSquared(b.at)<1e-18&&Math.abs(a.fov-b.fov)<1e-9 }
   function sameRequest(a:Request,b:Request) { return a.id===b.id&&a.phone===b.phone&&samePose(a.pose,b.pose) }
   function matrices() { camera.updateProjectionMatrix();camera.updateMatrixWorld() }
@@ -568,13 +582,14 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     if(viewing&&standing&&request.id===standing.id&&samePose(request.pose,standing.pose)){const walked=RAIL_WALKED_APPROACHES.has(viewing.exhibit!)
       return {path:authority.approach(standing.pose,viewing.pose,request.phone,camera,true),route:walked,...(walked?{turns:{start:true,end:true}}:{})}}
     const route=authority.route(completed!.pose,request.pose,request.phone,camera)
-    // A STATION WALK is held to the floor and turns standing where its view
-    // faces away from its way. Between the pavilion and the garden it turns
-    // at the garden's porch, and the doors are passed on the garden's
-    // narrower lens, which keeps their reveals out of the frame's edges.
+    // A STATION WALK is held to the floor, walked forward both ways past a
+    // pull-back, and turns standing where its view faces away from its way.
+    // Between the pavilion and the garden it turns at the garden's porch, and
+    // the doors are passed on the garden's narrower lens, which keeps their
+    // reveals out of the frame's edges.
     const pair=`${completed!.id}>${request.id}`,from=completed!.id,to=request.id
     const named={start:RAIL_NAMED_LEAVE.has(from),end:RAIL_NAMED_ARRIVE.has(to),at:from==='reading-table'||to==='reading-table'?[railReadingPorch]:[]}
-    const turns={start:RAIL_TURN_TO_LEAVE.has(from),end:RAIL_TURN_ON_ARRIVAL.has(to),stands:railPairTurns[pair],named,floor:!RAIL_FLOOR_KEPT.has(pair),forward:named.start||named.end||named.at.length>0}
+    const turns={start:RAIL_TURN_TO_LEAVE.has(from),end:RAIL_TURN_ON_ARRIVAL.has(to),stands:railPairTurns[pair],named,floor:!RAIL_FLOOR_KEPT.has(pair),forward:true,turned:RAIL_TURNED_ARRIVALS.has(pair)}
     if(to==='garden'&&INSIDE.includes(railSide(from)))return {path:route,route:true,turns:{...turns,end:true,named:{...named,at:[...named.at,railGardenPorch]},lens:'first',forward:true}}
     if(from==='garden'&&INSIDE.includes(railSide(to)))return {path:route,route:true,turns:{...turns,start:false,named:{...named,at:[...named.at,railGardenPorch]},lens:'last',forward:true}}
     return {path:route,route:true,turns}
@@ -616,16 +631,18 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     // the offline proof. An inspection eye cannot borrow a station proof.
     const certified=certifiedPath(request)
     path=certified.path
-    // THE STAIRS WALKED DOWN, never backward: the collection stair turned to
-    // at its landing, the court's short run under the walk's own view
+    // THE STAIRS, never walked backward: the collection stair turned at its
+    // landing both ways, the court's short run under the walk's own view
     const stairs:[number,number][]=[],stairStands:RailWaypoint[]=[]
     if(certified.route)for(const [landing,top,foot] of RAIL_STAIRS){
       const a=doorTurns([top]),b=doorTurns([foot])
       if(a.length===1&&b.length===1&&a[0]!<b[0]!){stairs.push([a[0]!,b[0]!]);stairStands.push(landing)}
+      // walked up, it turns to the terrace at its landing
+      if(a.length===1&&b.length===1&&b[0]!<a[0]!){stairs.push([b[0]!,a[0]!]);stairStands.push(landing)}
     }
     if(certified.route)for(const [top,foot] of RAIL_FLIGHTS){
       const a=doorTurns([top]),b=doorTurns([foot])
-      if(a.length===1&&b.length===1&&a[0]!<b[0]!)stairs.push([a[0]!,b[0]!])
+      if(a.length===1&&b.length===1)stairs.push([Math.min(a[0]!,b[0]!),Math.max(a[0]!,b[0]!)])
     }
     const head=doorTurns([railCollectionStairWaypoints[1]!]),foot=doorTurns([railCollectionStairWaypoints[2]!])
     stairDown=certified.route&&head.length===1&&foot.length===1&&head[0]!<foot[0]!?[head[0]!,foot[0]!]:undefined
@@ -648,14 +665,14 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
       first:{heading:held.turnFirst,elevation:lift,lens:held.lensFirst??lift},long:held.long===true})
       :planCalmGaze({from,to,lengthM:length,lensPixels,zoom,timed:seconds=>gaitLeg(length,seconds),
         fovs:[fittedRailFov(fromFov,camera.aspect,request.phone),fittedRailFov(targetFov,camera.aspect,request.phone)],
-        tangent:(from:number,to:number)=>pathAngles(from,to-from).heading,
+        tangent:chordHeading,
         course:certified.route&&length>=WALKED_LEG_M?course:null,
         ...(certified.turns&&length>=WALKED_LEG_M?{turns:{start:certified.turns.start,end:certified.turns.end,
           at:doorTurns([...railDoorTurns,...(certified.turns.stands??[]),...stairStands]),doors:doorTurns(railDoorways),porches:doorTurns(railPorchStands),stairs,
           quickDegPerSecond:request.phone?RAIL_QUICK_TURN_PHONE:RAIL_QUICK_TURN,
           ...(certified.turns.named?{named:{start:certified.turns.named.start,end:certified.turns.named.end,at:doorTurns(certified.turns.named.at??[])},
             namedDegPerSecond:request.phone?RAIL_QUICK_NAMED_PHONE:RAIL_QUICK_NAMED}:{}),
-          floor:certified.turns.floor===true,lens:certified.turns.lens??'place',forward:certified.turns.forward===true||stairs.length>0}}:{})})
+          floor:certified.turns.floor===true,lens:certified.turns.lens??'place',forward:certified.turns.forward===true||stairs.length>0,turned:certified.turns.turned===true}}:{})})
     leg=gaze.leg;duration=leg.seconds;legClock=0;legClockAt=now;pace=1;waiting=0;strideM=strideTarget=0;strideAt=now
     active=request
   }

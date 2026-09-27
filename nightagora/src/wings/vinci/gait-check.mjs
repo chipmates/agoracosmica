@@ -139,7 +139,10 @@ const THREE = await import('three/webgpu')
 const { createRail, stationPose } = await load(path.join(wing, 'rail.ts'))
 const { createCertifiedRailPath } = await load(path.join(wing, 'rail-smoothing.ts'))
 function walkTrace(metres, reduced) {
-  const from = stationPose('arrival', false)
+  // both eyes look along the leg: a station walk is never walked backward, and
+  // a leg that faced away would stand to turn and bury the rhythm in stands
+  const station = stationPose('arrival', false)
+  const from = { eye: station.eye.clone(), at: station.eye.clone().add(new THREE.Vector3(10, 0, 0)), fov: station.fov }
   const to = { eye: from.eye.clone().add(new THREE.Vector3(metres, 0, 0)), at: from.at.clone().add(new THREE.Vector3(metres, 0, 0)), fov: from.fov }
   const straight = createCertifiedRailPath([from.eye.clone(), to.eye.clone()], { clearanceRadiusM: 1, certifyBall: () => true })
   let now = 0
