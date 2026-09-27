@@ -74,7 +74,6 @@ const EXHIBITS = [
   { id: 'machine/parachute', kind: 'machine', station: 'supper-wall' },
   { id: 'machine/revolving-crane', kind: 'machine', station: 'supper-wall' },
   { id: 'machine/anemometer', kind: 'machine', station: 'supper-wall' },
-  { id: 'machine/inclinometer', kind: 'machine', station: 'supper-wall' },
   { id: 'plaque/flight-quote', kind: 'place', station: 'supper-wall' },
   { id: 'machine/aerial-screw', kind: 'machine', station: 'flight' },
   { id: 'machine/miter-lock-gates', kind: 'machine', station: 'flight' },
@@ -85,7 +84,8 @@ const EXHIBITS = [
   { id: 'machine/rolling-mill', kind: 'machine', station: 'works' },
   { id: 'machine/lathe', kind: 'machine', station: 'works' },
   { id: 'machine/water-lifting-screw', kind: 'machine', station: 'works' },
-  // The house's one piece of the collection, on the hall's own ledge.
+  // The house's two pieces of the collection, on the great hall's table.
+  { id: 'machine/inclinometer', kind: 'machine', station: 'hall' },
   { id: 'machine/proportional-compass', kind: 'machine', station: 'hall' },
   { id: 'grave', kind: 'place', station: 'grave' },
   { id: 'grave-diagram', kind: 'place', station: 'grave' },

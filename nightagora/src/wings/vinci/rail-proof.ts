@@ -6,6 +6,7 @@ import { createCertifiedRailPath } from './rail-smoothing'
 import { assertRailProjection } from './rail-projection'
 export { assertRailProjection, fittedRailFov } from './rail-projection'
 import { vinciApproachPose, vinciApproachRunPairs, vinciExhibitRecords } from './collection/approaches'
+import { VINCI_WALK_POSE_IDS, vinciWalkPoseOf } from './walk-poses'
 import { GALLERY_WALK_M, VINCI_WALLS, vinciGalleryGate, vinciGalleryRun, type VinciGallery } from './collection/wall'
 import type { VinciStationId } from './content'
 import certificateText from './data/rail-clearance.json?raw'
@@ -81,6 +82,12 @@ function physicalPoses(viewport: 'desktop' | 'phone'): SavedPose[] {
   const poses: SavedPose[] = []
   for (const station of vinciContent) {
     const pose = toSaved(stationPose(station.id, viewport === 'phone'))
+    if (!poses.some(held => samePose(held, pose))) poses.push(pose)
+  }
+  // the walk's own poses, the house door's and the heart valve's, are rail
+  // poses like a station's
+  for (const id of VINCI_WALK_POSE_IDS) {
+    const pose = toSaved(vinciWalkPoseOf(id, viewport === 'phone'))
     if (!poses.some(held => samePose(held, pose))) poses.push(pose)
   }
   return poses

@@ -83,6 +83,7 @@ async function load(file) {
 }
 
 const { stationPose } = await load(path.join(WING, 'rail.ts'))
+const { VINCI_WALK_POSE_IDS, vinciWalkPoseOf } = await load(path.join(WING, 'walk-poses.ts'))
 const { vinciContent } = await load(path.join(WING, 'content.ts'))
 const { railGeometryFingerprint, railGeometrySignature } = await load(path.join(WING, 'rail-fingerprint.ts'))
 const { collectRailSolids } = await load(path.join(WING, 'rail-solids.ts'))
@@ -384,12 +385,13 @@ function walkedNearRadius(fromFov, toFov, shareFrom, shareTo, viewport) {
 
 /* ---- the stations ---- */
 
-const ids = vinciContent.map(station => station.id)
+// The walk's own poses (walk-poses.ts) stand on the rail like stations.
+const ids = [...vinciContent.map(station => station.id), ...VINCI_WALK_POSE_IDS]
 const families = []
 for (const viewport of VIEWPORTS) {
   const seen = []
   for (const id of ids) {
-    const pose = stationPose(id, viewport.phone)
+    const pose = VINCI_WALK_POSE_IDS.includes(id) ? vinciWalkPoseOf(id, viewport.phone) : stationPose(id, viewport.phone)
     const known = seen.find(entry => entry.pose.eye.distanceToSquared(pose.eye) < 1e-18
       && entry.pose.at.distanceToSquared(pose.at) < 1e-18 && Math.abs(entry.pose.fov - pose.fov) < 1e-9)
     if (known) { known.stations.push(id); continue }

@@ -111,10 +111,14 @@ const COURT_LANE_WEST: RailWaypoint = [-49.5, -20.6, COURT.level + railEyeHeight
 /** Where a station stands. The house keeps its three sides; the collection
  * ground is its rooms, because a room is entered through its door. */
 export type RailSide = 'street' | 'court' | 'south-lawn' | 'great-hall' | 'terrace' | 'apron'
-  | 'picture-room' | 'long-gallery' | 'mechanism-hall' | 'exhibit-court' | 'grave-court'
+  | 'picture-room' | 'long-gallery' | 'mechanism-hall' | 'exhibit-court' | 'grave-court' | 'house-door' | 'valve-niche'
 
 export function railSide(stationId: string): RailSide {
   if (stationId === 'arrival') return 'street'
+  // The walk's own poses (walk-poses.ts): the house door's two stand on the
+  // threshold steps, the heart valve's before its niche by the body wall.
+  if (stationId === 'hall-door-in' || stationId === 'hall-door-out') return 'house-door'
+  if (stationId === 'body-valve') return 'valve-niche'
   // The hall's eye stands in the great hall's own door, one storey above the
   // court: it is reached over the threshold steps and through the passage.
   if (stationId === 'hall') return 'great-hall'
@@ -244,9 +248,20 @@ export const railLinkVia: Readonly<Record<string, readonly (readonly [east: numb
   'machine/revolving-crane>machine/parachute': [[-40.4, -27.72]],
 }
 
+/** THE HEART VALVE'S EYE STANDS SOUTH OF THE STUDIOLO, inside the line of
+ * its front, so a straight walk to the reading table crossed the booth's
+ * south-east corner. It leaves by one step back into the gallery, near the
+ * straight line to the body wall's eye, and goes on from there. */
+const VALVE_STEP: RailWaypoint = [-34, -49.9, INSIDE]
+
 const LINKS: readonly { from: RailSide; to: RailSide; via: readonly RailWaypoint[] }[] = [
   { from: 'street', to: 'court', via: railGateWaypoints },
-  { from: 'court', to: 'great-hall', via: [COURT_OPEN, THRESHOLD_FOOT, HOUSE_LANDING, ENFILADE_TURN] },
+  // The threshold steps are a side of their own, where the house door's two
+  // poses stand: every walk from the court to the hall still takes the same
+  // four turns.
+  { from: 'court', to: 'house-door', via: [COURT_OPEN, THRESHOLD_FOOT] },
+  { from: 'house-door', to: 'great-hall', via: [HOUSE_LANDING, ENFILADE_TURN] },
+  { from: 'valve-niche', to: 'long-gallery', via: [VALVE_STEP] },
   { from: 'court', to: 'terrace', via: railAccessWaypoints },
   { from: 'court', to: 'south-lawn', via: [LAWN_FOOT] },
   { from: 'terrace', to: 'apron', via: railCollectionStairWaypoints },

@@ -1078,11 +1078,12 @@ function furnish(s: Sink, hero: boolean): void {
   stool(s, TABLE.u + .78, TABLE.v - .75, .12, 91)
   stool(s, TABLE.u + .8, TABLE.v + .6, -.2, 92)
   // on the table: two brass candlesticks, their candles never lit, a jug,
-  // and a glazed dish set down in the sun at the table's south end
+  // and a glazed dish at the table's north end; its sunlit south end carries
+  // the two instruments the house builds (hall-table-pieces.ts)
   const top = FLOOR_Z + TABLE.size[2]
   for (const [k, dv] of [[0, -.35], [1, .35]] as [number, number][]) candlestick(s, P(TABLE.u - .08, TABLE.v + dv, top), 93 + k)
   jug(s, P(TABLE.u + .18, TABLE.v - .02, top), 95)
-  dish(s, P(TABLE.u + .06, TABLE.v - 1.05, top), 96)
+  dish(s, P(TABLE.u + .06, TABLE.v + 1.05, top), 96)
   // on the chest between the windows: a brass basin and its ewer, for the
   // washing of hands at table
   const chestTop = FLOOR_Z + .776, vc = chestV()
