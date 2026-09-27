@@ -36,10 +36,14 @@ const WALL_WORDS = CONTROLS.picture
 const STEP_WORDS = CONTROLS.date
 /** THE STRIP NAMES A WORK WITH THE RECORD'S OWN WORDS. A Windsor sheet
  * carries no title of its own: its record opens with the author and then the
- * name the holder's catalogue gives the sheet, in both languages. */
+ * name the holder's catalogue gives the sheet, in both languages. The name
+ * ends before the catalogue's date ("c. 1512-13", "c.1510-11", ", um
+ * 1512-13"), whose abbreviated "c." would otherwise end it mid-word. */
 export function vinciSheetTitle(honesty: string): string {
   const said = honesty.replace(/^Leonardo da Vinci,\s*/, '')
   const stop = said.indexOf('. ')
+  const dated = said.search(/,?\s+(?:c\.\s?|um\s)\d{3,4}/)
+  if (dated >= 0 && (stop < 0 || dated < stop)) return said.slice(0, dated)
   return stop < 0 ? said : said.slice(0, stop)
 }
 

@@ -11,7 +11,7 @@
  * An exhibit opens where it carries a certified viewing pose at both
  * viewports; a sheet is read and inert until the window that wires it.
  */
-import { Box3, Mesh, Raycaster, Sphere, Vector3, type Object3D } from 'three/webgpu'
+import { Box3, Matrix4, Mesh, Ray, Raycaster, Sphere, Vector3, type Object3D } from 'three/webgpu'
 import type { VinciStationId } from '../content'
 import { HOUSE_CLOSE_LOOKS } from '../rail'
 import { studySupport } from '../inner-court'
@@ -19,6 +19,7 @@ import { LINE_FLOOR_PICK, VINCI_LINE_STATION, VINCI_STUDY_LEAF, vinciApproachPos
 import { vinciWallOrderOf } from './wall'
 import { hangPlacements } from './hang'
 import { HALL_TABLE_PIECE_SLUGS, STANDS, isHallTablePiece } from './stands'
+import { FRAME_FRONT, mountedSheets, sheetFace } from './body-wall-plan'
 
 export interface VinciPickEntry {
   id: string
@@ -40,6 +41,21 @@ export interface VinciPickEntry {
   /** Where this exhibit stands in its own station's hang: the wall's own
    * order, so a row of them reads as the wall reads. */
   order: number
+  /** A framed sheet's press target: the frame's outer rectangle in the
+   * sheet's own mesh frame (x along the wall, y up, z off the face). */
+  frame?: VinciPickFrame
+}
+export interface VinciPickFrame { minX: number; maxX: number; minY: number; maxY: number; z: number }
+
+/** A SHEET IS PRESSED OVER ITS WHOLE FRAME, mat and moulding: the drawing
+ * alone is a third of the box a hand points at, and the gap between two
+ * frames names neither. The plate stands a quarter turn about up, centred on
+ * its mount, so its x runs north and its z east. */
+function sheetFrames(): Map<string, VinciPickFrame> {
+  return new Map(mountedSheets().map(({ mount, frame }) => [mount.id, {
+    minX: frame.south - mount.north, maxX: frame.north - mount.north,
+    minY: frame.bottom - mount.datum, maxY: frame.top - mount.datum, z: FRAME_FRONT - sheetFace(mount),
+  }]))
 }
 
 /** The smallest proxy an exhibit gets, so a small object keeps its own size
@@ -132,6 +148,7 @@ function place(id: string, kind: VinciExhibitKind, object: Object3D, centre: Vec
 
 export function readVinciExhibits(root: Object3D): VinciPickEntry[] {
   const entries: VinciPickEntry[] = []
+  const frames = sheetFrames()
   const machines = new Map<string, Object3D[]>()
   root.traverse(object => {
     const data = object.userData
@@ -161,7 +178,8 @@ export function readVinciExhibits(root: Object3D): VinciPickEntry[] {
       const { centre, radiusM, corner } = proxy(object)
       const placed = placedAt(kind, id, workId, sheet)
       entries.push({ id, kind, station: placed.station, order: placed.order, object, centre, radiusM,
-        anchor: corner.addScaledVector(faceNormal(object), ANCHOR_OFF_M), openable, workId, face })
+        anchor: corner.addScaledVector(faceNormal(object), ANCHOR_OFF_M), openable, workId, face,
+        ...(sheet && frames.has(sheet) ? { frame: frames.get(sheet)! } : {}) })
     }
   })
   // THE KINDS THAT ARE NOT A PLATE OR A MACHINE are read by what their own
@@ -275,6 +293,21 @@ export function readVinciAuthoredViews(): VinciAuthoredView[] {
   return views
 }
 
+const localRay = new Ray(), toLocal = new Matrix4(), onFrame = new Vector3()
+/** Where the ray meets a framed sheet's frame from in front, in metres from
+ * its origin; undefined where it passes beside the frame or behind the wall. */
+function frameHit(ray: Raycaster, object: Object3D, frame: VinciPickFrame): number | undefined {
+  object.updateWorldMatrix(true, false)
+  localRay.copy(ray.ray).applyMatrix4(toLocal.copy(object.matrixWorld).invert())
+  const toward = localRay.direction.z
+  if (toward >= -1e-9) return undefined
+  const t = (frame.z - localRay.origin.z) / toward
+  if (t <= 0) return undefined
+  localRay.at(t, onFrame)
+  if (onFrame.x < frame.minX || onFrame.x > frame.maxX || onFrame.y < frame.minY || onFrame.y > frame.maxY) return undefined
+  return onFrame.applyMatrix4(object.matrixWorld).distanceTo(ray.ray.origin)
+}
+
 /** ONE RAY ON A PRESS, never on a hover, and never through a wall: the hit is
  * depth tested against the same opaque occluders the dots are, so a plate in
  * the next room cannot win from behind its own wall.
@@ -292,6 +325,13 @@ export function pickVinciExhibit(options: {
     // A date, a place and the book are a region of a larger body: only their
     // proxy takes the press.
     if (entry.kind === 'stud' || entry.kind === 'place' || entry.kind === 'manuscript') continue
+    if (entry.frame) {
+      const reach = frameHit(ray, entry.object, entry.frame)
+      if (reach === undefined || reach >= at) continue
+      best = entry
+      at = reach
+      continue
+    }
     const hits = ray.intersectObject(entry.object, entry.kind === 'machine')
     const hit = hits[0]
     if (!hit || hit.distance >= at) continue
@@ -302,6 +342,7 @@ export function pickVinciExhibit(options: {
     // The proxy is what a thumb lands on: a small exhibit is still its own
     // size in the room, and the press has the slack a hand needs.
     for (const entry of live) {
+      if (entry.frame) continue
       const along = ray.ray.closestPointToPoint(entry.centre, new Vector3())
       const reach = along.distanceTo(ray.ray.origin)
       if (along.distanceTo(entry.centre) > entry.radiusM || reach >= at) continue
