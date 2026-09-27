@@ -156,7 +156,8 @@ function slotsAt(x: N): { own: N; other: N; apart: N } {
   const own = slot.toVar()
   const sight = hangRow(own).sight
   const centre = sight.x.add(sight.y).mul(.5)
-  const other = max(min(own.add(x.lessThan(centre).select(int(1), int(-1))), int(frames.length - 1)), int(0))
+  // clamp, not min and max: three's GLSL writer turns a scalar int bound of min/max into a float, which WebGL2 refuses
+  const other = own.add(x.lessThan(centre).select(int(1), int(-1))).clamp(int(0), int(frames.length - 1))
   // at either end of the wall the neighbour is the work itself: it counts once
   return { own, other, apart: other.notEqual(own).select(float(1), float(0)) }
 }
