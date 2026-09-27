@@ -38,6 +38,8 @@ import { mountSupperRoom } from './supper-room'
 
 /** How thick the hall's air is: a haze a spot's shaft is seen in, no more. */
 const HALL_AIR_DENSITY = .085
+/** How far clear of the hall's walls a walk out keeps its machines, in metres. */
+const HALL_KEEP_M = 10
 
 /** Which ground each machine is built with. Every ground is built at entry,
  * the court's first because it is seen from every station on this ground. */
@@ -51,6 +53,9 @@ export interface CollectionExhibits {
    * own schedule has at t=0. The close-look host names the one machine whose
    * clock may run, and `null` puts every machine back at rest. */
   demonstrate(slug: MachineSlug | null): void
+  /** A LEG THAT ENDS IN THE HALL, from its first step (true): the hall's
+   * machines stand from then on and stay until the eye is well clear. */
+  holdHall(held: boolean): void
   /** Release the room's one full plate while a payload holds the stage
    * (true), and let the room choose again once it lets go (false). */
   holdPlates(release: boolean): void
@@ -87,6 +92,8 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   const pictures = mountCollectionPlates(host, stack, { hangMask: pictureRoom.maskMaterial })
   let live = true
   let demonstrating: MachineSlug | null = null
+  /** a leg that ends in the hall is under way, and the hall's machines stand */
+  let hallHeld = false, hallKept = false
   /** the hall's rig, once it stands; a machine is only ever ready after it */
   let hallRig: { adopt(surface: Material): void; release(surface: Material): void } | undefined
   /** which hall machines are lit by the hall's rig right now */
@@ -455,6 +462,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
     picturesReady: pictures.ready,
     warm: warmHall,
     demonstrate(slug) { demonstrating = slug },
+    holdHall(held) { hallHeld = held },
     holdPlates(release) { pictures.hold(release) },
     aimPlates(eye) { pictures.aim(eye) },
     update(now, step, eye) {
@@ -511,6 +519,12 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       const t = Math.min(1, Math.max(0, inside / 2.5)), dim = t * t * (3 - 2 * t)
       for (const fitting of hallFittings) fitting.intensity = 9.5 + (HALL_FILL - 9.5) * dim
       if (hallAir.mesh.visible !== inHall) hallAir.mesh.visible = inHall
+      // A HALL SEEN THROUGH ITS DOOR IS NEVER EMPTY. A leg that ends in the
+      // hall stands its machines from the leg's first step, and a walk out
+      // keeps them until the eye is ten metres clear of the hall's walls.
+      const clear = Math.hypot(Math.max(-61.66 - eye.x, 0, eye.x + 39.02), Math.max(42.04 - eye.z, 0, eye.z - 63.66))
+      if (inHall || hallHeld) hallKept = true
+      else if (hallKept && clear > HALL_KEEP_M) hallKept = false
       for (const machine of machines) {
         // lent to the close look's table, a machine takes that table's light
         const lit = hallLit.get(machine.build)
@@ -519,7 +533,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
           lightHallMachine(machine.build, !lit)
         }
         const reach = eye.distanceToSquared(machine.at) < machine.reach * machine.reach
-        const visible = machine.ground === 'hall' ? inHall && reach
+        const visible = machine.ground === 'hall' ? (inHall || hallKept) && reach
           : machine.ground === 'house' ? reach
           : near && reach
         if (machine.build.object.visible !== visible) machine.build.object.visible = visible

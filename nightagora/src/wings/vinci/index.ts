@@ -29,6 +29,7 @@ import { createWingShadowBody, type WingShadowBody } from './shadow-body'
 import { createCollection, collectionProvenance } from './collection'
 import { COURT, FLOOR, GRAVE_ORIGIN, HALL_CEILING_NORTH, LINE_FIELD, ROOMS, SUPPER_WALL } from './collection/layout'
 import { collectionView } from './collection/views'
+import { READING_ROOM_FOOTPRINT } from './collection/reading-room-plan'
 import { mountCollectionExhibits, type CollectionExhibits } from './collection/exhibits'
 import { isMachineSlug, type MachineSlug } from './machines'
 import { createPictureRecord, createPolicyWorkLabel, createWindowWorkLabel, holderLine, policyLabelText, PICTURE_CERTAINTY_KEY } from './pictures/policy-label'
@@ -195,6 +196,65 @@ function legToe(nav:{completed?:string,active?:string,legWalked:number}):number 
   if(!nav.active)return from
   const t=Math.max(0,Math.min(1,(nav.legWalked-EXPOSURE_OPENS)/(1-EXPOSURE_OPENS)))
   return from+(toeOf(nav.active)-from)*t*t*(3-2*t)
+}
+/** THE PRINT BY ROOM. On a leg between two prints more than twice apart (the
+ * reading booth's one lamp against the bright rooms) the eye opens at each
+ * doorway it passes, over a metre either side of it, and never over a share
+ * of the leg: a wall seen on the way keeps its own room's print. */
+const ROOM_PRINT_RATIO=2, DOOR_EASE_M=1.1, PIN_SHARE=.06
+type PrintBox={west:number,east:number,south:number,north:number}
+const smooth01=(x:number):number=>{const t=Math.max(0,Math.min(1,x));return t*t*(3-2*t)}
+const insideBy=(east:number,north:number,b:PrintBox):number=>Math.min(east-b.west,b.east-east,north-b.south,b.north-north)
+const doorEase=(d:number):number=>smooth01((d+DOOR_EASE_M)/(2*DOOR_EASE_M))
+/** Which room each collection station's print belongs to. */
+const STATION_ROOM:Partial<Record<VinciStationId,string>>={'reading-table':'reading','picture-room':'picture','picture-room-west':'picture',flight:'hall',works:'hall','line-early':'gallery',body:'gallery'}
+let printRooms:{room:string,box:PrintBox,station:VinciStationId}[]|undefined
+function roomsForPrint():{room:string,box:PrintBox,station:VinciStationId}[] {
+  if(printRooms)return printRooms
+  // the reading table's eye stands in the booth's mouth, looking in: its print
+  // is the booth's, so the booth's reach runs a doorway's ease past that eye
+  const eye=collectionView('collection-room-reading',false)?.eye.x??READING_ROOM_FOOTPRINT.east
+  const reading={...READING_ROOM_FOOTPRINT,east:Math.max(READING_ROOM_FOOTPRINT.east,eye+DOOR_EASE_M)}
+  return printRooms=[
+    {room:'reading',box:reading,station:'reading-table'},
+    {room:'gallery',box:ROOMS.gallery,station:'body'},
+    {room:'picture',box:ROOMS.picture,station:'picture-room'},
+    {room:'hall',box:ROOMS.hall,station:'works'},
+  ]
+}
+/** The stations that stand in the mechanism hall: a leg that ends at one
+ * mounts the hall's machines from its first step. */
+const HALL_STATIONS:ReadonlySet<string>=new Set(['flight','works'])
+const PRINT_INDOORS:PrintBox={west:ROOMS.picture.west,east:ROOMS.picture.east,south:ROOMS.hall.south,north:ROOMS.picture.north}
+function roomPrint(nav:{completed?:string,active?:string,legWalked:number},eye:Vector3):{exposure:number,shoulder:number,toe:number}|null {
+  const from=nav.completed as VinciStationId|undefined, to=nav.active as VinciStationId|undefined
+  if(!from||!to)return null
+  const a=exposureOf(from), b=exposureOf(to)
+  if(Math.max(a,b)<=Math.min(a,b)*ROOM_PRINT_RATIO)return null
+  const east=eye.x, north=-eye.z
+  // an end of the leg that stands in a room is that room's print on this leg
+  const standsFor=(room:string,fallback:VinciStationId):VinciStationId=>STATION_ROOM[from]===room?from:STATION_ROOM[to]===room?to:fallback
+  const outdoor=STATION_ROOM[from]===undefined?from:STATION_ROOM[to]===undefined?to:undefined
+  let total=0, logE=0, shoulder=0, toe=0, reading=0
+  for(const r of roomsForPrint()){
+    let w=doorEase(insideBy(east,north,r.box))
+    if(r.room==='reading')reading=w
+    else if(r.room==='gallery')w*=1-reading
+    if(w<=0)continue
+    const s=standsFor(r.room,r.station)
+    total+=w;logE+=w*Math.log2(exposureOf(s));shoulder+=w*shoulderOf(s);toe+=w*toeOf(s)
+  }
+  const outE=Math.log2(outdoor?exposureOf(outdoor):PRINT.exposure), outS=outdoor?shoulderOf(outdoor):0, outT=outdoor?toeOf(outdoor):PRINT.toe
+  const within=total>0?doorEase(insideBy(east,north,PRINT_INDOORS)):0
+  let e=outE+((total>0?logE/total:outE)-outE)*within
+  let sh=outS+((total>0?shoulder/total:outS)-outS)*within
+  let tt=outT+((total>0?toe/total:outT)-outT)*within
+  // the leg still leaves on its own print and lands on the other one
+  const t=nav.legWalked, end=t<.5?from:to, pin=smooth01((t<.5?t:1-t)/PIN_SHARE)
+  e=Math.log2(exposureOf(end))+(e-Math.log2(exposureOf(end)))*pin
+  sh=shoulderOf(end)+(sh-shoulderOf(end))*pin
+  tt=toeOf(end)+(tt-toeOf(end))*pin
+  return {exposure:2**e,shoulder:sh,toe:tt}
 }
 /** The collection's rooms as one box (x east, y up, z south), which the air by distance stays out of. */
 const COLLECTION_INDOORS:IndoorBox=(()=>{
@@ -974,6 +1034,7 @@ export function createWing():VinciWingModule {
       look:(dx,dy,height)=>rail.drag(dx,dy,height),
       step:direction=>h.navigate(station+direction),
       press:(x,y)=>pressExhibit(x,y)})
+    bindExhibitHover(h.stage,h.labels,controller.signal)
     window.addEventListener('keydown',(e)=>{
       if(e.defaultPrevented||e.ctrlKey||e.metaKey||e.altKey)return
       const target=e.target instanceof Element?e.target:document.body
@@ -1611,6 +1672,8 @@ export function createWing():VinciWingModule {
         label:text(workTitle(found.work,entry.face)),
         colour:policyLabelText(found.work,entries).colour,...sign(entry)})
     }
+    const grid=bodyGridMark()
+    if(grid)marks.push({...grid,...sign(picks.find(entry=>entry.id===grid.id)!)})
     // THREE MARKS AT A STOP, AND WHICH THREE: this work and its two
     // neighbours. Standing in front of one painting, what a hand wants is the
     // one it is looking at and the two it can step to.
@@ -1621,6 +1684,78 @@ export function createWing():VinciWingModule {
       return
     }
     dots?.setExhibits(marks)
+  }
+  /** ONE MARK FOR THE WHOLE GRID ON THE PHONE, the line's rule: the sheets
+   * without a film are pressable but unmarked, and a narrow frame has no
+   * pointer to find them by. The mark stands at the grid's middle, says the
+   * wall's own short name and walks to its first sheet in wall order. */
+  function bodyGridMark():Omit<VinciExhibitMark,'walks'|'word'>|null {
+    if(!narrow())return null
+    const grid=picks.filter(entry=>entry.kind==='sheet'&&entry.openable&&!(assets&&vinciShowpiece(entry.id,assets)))
+    const first=grid.reduce<VinciPickEntry|undefined>((best,entry)=>!best||entry.order<best.order?entry:best,undefined)
+    const name=ROOM_SHORT['body']
+    if(!first||!name)return null
+    const anchor=new Vector3()
+    for(const entry of grid)anchor.add(entry.anchor)
+    return {id:first.id,anchor:anchor.divideScalar(grid.length),object:first.object,label:text(name),colour:certaintyColour('documented')}
+  }
+  /** WHAT THE HOVER NAMES: the name a mark over this exhibit would carry, and
+   * for a sheet without a film its own title, since a press opens it all the
+   * same. */
+  function exhibitHoverName(entry:VinciPickEntry):string|null {
+    if(entry.kind==='machine'){const slug=entry.id.slice('machine/'.length);return isMachineSlug(slug)?machineCatalog[slug].title[lang()]:null}
+    if(entry.kind==='sheet'){
+      const sheet=exhibits?.sheetSources().find(source=>`sheet/${source.sheet.id}`===entry.id)
+      return sheet?vinciSheetTitle(lang()==='de'?sheet.page.honesty_de:sheet.page.honesty_en):null
+    }
+    const named=namedExhibit(entry)
+    if(named)return named.title
+    const found=(exhibits?.pictureSources()??[]).find(source=>source.work.id===entry.workId)
+    return found?text(workTitle(found.work,entry.face)):null
+  }
+  /** THE PICTURE ANSWERS THE POINTER WHERE A PRESS WOULD. Over any exhibit a
+   * press opens, the hand becomes a pointer and the mark's own chip names it;
+   * the same ray as the press, once a frame at most, never while a leg runs
+   * or a drag looks, and only for a fine pointer that can hover. */
+  function bindExhibitHover(stage:HTMLElement,host:HTMLElement,signal:AbortSignal):void {
+    const fine=matchMedia('(hover: hover) and (pointer: fine)')
+    const chip=make('span','vinci-mark-chip vinci-hover-chip'),chipWord=make('span','vinci-mark-chip-word'),chipName=make('span','vinci-mark-chip-name')
+    chip.hidden=true;chip.setAttribute('aria-hidden','true');chip.append(chipWord,chipName);host.append(chip)
+    let x=0,y=0,queued=0,shown=''
+    const clear=()=>{if(!shown&&chip.hidden)return;shown='';chip.hidden=true;stage.style.cursor=''}
+    const look=()=>{
+      queued=0
+      const nav=rail.navigation
+      if(!hosts||!standing||nav.active||nav.approaching||!picks.length||closeLook?.id){clear();return}
+      const rect=stage.getBoundingClientRect()
+      if(rect.width<=0||rect.height<=0){clear();return}
+      pickRay.setFromCamera(new Vector2((x-rect.left)/rect.width*2-1,-((y-rect.top)/rect.height)*2+1),hosts.world.camera)
+      const hit=pickVinciExhibit({ray:pickRay,entries:picks,occluded:(from,to)=>vinciSightBlocked(from,to,occluders,sightRay,sightHits)})
+      const name=hit?exhibitHoverName(hit):null
+      if(!hit||!name){clear();return}
+      stage.style.cursor='pointer'
+      const walks=markWalks(hit.id),word=walks?markWord(hit.station):''
+      if(shown!==`${hit.id}|${word}|${name}`){
+        shown=`${hit.id}|${word}|${name}`
+        chipWord.textContent=word;chipWord.hidden=!word;chipName.textContent=name
+        chip.dataset['mark']=walks?'walk':'detail'
+      }
+      chip.hidden=false
+      const right=x+22+chip.offsetWidth<=innerWidth-22
+      chip.dataset['side']=right?'right':'left'
+      chip.style.left=`${right?x+22:x-22-chip.offsetWidth}px`
+      chip.style.top=`${y-46}px`
+    }
+    stage.addEventListener('pointermove',(e)=>{
+      if(!fine.matches||e.pointerType!=='mouse'||e.buttons||(e.target as Element|null)?.closest?.('button,a,input,textarea,select,.vinci-dock,.wing-rail-group,.vinci-exhibit-card,.vinci-heading,.vinci-strip,.desk-low')){
+        cancelAnimationFrame(queued);queued=0;clear();return}
+      x=e.clientX;y=e.clientY
+      if(!queued)queued=requestAnimationFrame(look)
+    },{signal})
+    const drop=()=>{cancelAnimationFrame(queued);queued=0;clear()}
+    for(const type of ['pointerleave','pointerdown','wheel'] as const)stage.addEventListener(type,drop,{signal,passive:true})
+    addEventListener('keydown',drop,{signal})
+    signal.addEventListener('abort',()=>{cancelAnimationFrame(queued);chip.remove();stage.style.cursor=''})
   }
   /** THE WORDS THE OBJECTS CARRY, laid on their stones by the page at rest:
    * taken down for a leg, and drawn again once the eye has stood still for a
@@ -2907,7 +3042,7 @@ export function createWing():VinciWingModule {
       // along the wall the near rule measures from the stop it will land on,
       // so a run past twenty-five works costs one request and not twenty-five.
       exhibits?.aimPlates(rail.navigation.aimEye??null)
-      if(exhibits){const now=hosts.world.clock();exhibits.update(now,Math.max(0,Math.min(.25,now-exhibitClock)),hosts.world.camera.position);exhibitClock=now}
+      if(exhibits){const now=hosts.world.clock();exhibits.holdHall(HALL_STATIONS.has(rail.navigation.active??''));exhibits.update(now,Math.max(0,Math.min(.25,now-exhibitClock)),hosts.world.camera.position);exhibitClock=now}
       // THE CARD NAMES THE STATION THE WALKER IS IN. It hands over at the
       // half of the leg, by walked distance: before that the walker is still
       // in the room they left, after it they are in the one they are entering,
@@ -2922,8 +3057,9 @@ export function createWing():VinciWingModule {
       const arrived=here?walkIndexAt(here,arriving?nav.wallTo:nav.wall):-1
       if(arrived>=0&&arrived!==card&&!activeView){card=arrived;dock.scrollTop=0;paintHeader();paintDock();paintQuestion();standHere()}
       if(nav.completed&&nav.completed!==exposureAt)exposureAt=nav.completed
-      const opening=activeView&&VIEW_EXPOSURE[activeView]!==undefined?VIEW_EXPOSURE[activeView]!:legExposure(nav), rolling=activeView&&VIEW_SHOULDER[activeView]!==undefined?VIEW_SHOULDER[activeView]!:legShoulder(nav)
-      const bending=legToe(nav)
+      const byRoom=activeView?null:roomPrint(nav,hosts.world.camera.position)
+      const opening=activeView&&VIEW_EXPOSURE[activeView]!==undefined?VIEW_EXPOSURE[activeView]!:byRoom?.exposure??legExposure(nav), rolling=activeView&&VIEW_SHOULDER[activeView]!==undefined?VIEW_SHOULDER[activeView]!:byRoom?.shoulder??legShoulder(nav)
+      const bending=byRoom?.toe??legToe(nav)
       if(nav.completed&&(opening!==exposureShown||rolling!==shoulderShown||bending!==toeShown))aimPrint(nav.completed,opening,rolling,bending)
       // THE DOOR IS REACHED: the picture dips into the room behind it.
       if(doorAhead>=0&&!nav.active&&!nav.exhibit&&isVinciWalkPose(nav.completed)){const to=doorAhead;doorAhead=-1;throughDoor(to)}

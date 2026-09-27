@@ -552,6 +552,61 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
     hideChip()
   }
 
+  /* ONE HEIGHT FOR THE WHOLE VISIT. A stop whose line took a third row grew
+     the band at the card's handover, mid leg, and the picture gave that row
+     back in one frame, which read as a cut in the walk. The band now stands at
+     the tallest stop of the walk for this window and this language, measured
+     on a hidden copy of itself; only the drawer, opened by a hand, grows it. */
+  let steady = 0
+  let steadyFor = ''
+  function steadyHeight(): number {
+    if (!stage) return 0
+    const ids = host.order()
+    const key = `${innerWidth}x${innerHeight}|${host.lang()}|${ids.join(',')}`
+    if (key === steadyFor) return steady
+    const probe = band.cloneNode(true) as HTMLElement
+    for (const node of probe.querySelectorAll('[id]')) node.removeAttribute('id')
+    probe.setAttribute('aria-hidden', 'true')
+    probe.style.visibility = 'hidden'
+    probe.style.minHeight = ''
+    const copyOf = <T extends Element>(selector: string): T | null => probe.querySelector<T>(selector)
+    const drawerCopy = copyOf<HTMLElement>('.desk-drawer')
+    if (drawerCopy) drawerCopy.hidden = true
+    const pChapter = copyOf<HTMLElement>('.desk-cap .desk-chapter')
+    const pClock = copyOf<HTMLElement>('.desk-cap .desk-clock')
+    const pCount = copyOf<HTMLElement>('.desk-cap .desk-count')
+    const pLine = copyOf<HTMLElement>('.desk-cap .desk-line')
+    const pKicker = copyOf<HTMLElement>('.desk-on-kicker')
+    const pTitle = copyOf<HTMLElement>('.desk-on-title')
+    host.stage.append(probe)
+    let tallest = 0
+    ids.forEach((id, index) => {
+      const stop = deskStoryStop(id)
+      if (pChapter) pChapter.textContent = say(titleOf(id))
+      if (pClock) { pClock.textContent = stop?.age ? say(stop.age) : ''; pClock.hidden = !stop?.age }
+      if (pCount) pCount.textContent = `${index + 1} / ${ids.length}`
+      if (pLine) { pLine.textContent = stop ? say(stop.line) : ''; pLine.hidden = !stop }
+      const next = ids[index + 1]
+      // the way on names the next stop at rest and the walk while a leg runs
+      for (const [kicker, title] of [
+        [say(next ? host.words.next : WORD.end()), next ? say(titleOf(next)) : ''],
+        [say(WORD.walking()), say(WORD.faster())],
+      ] as const) {
+        if (pKicker) pKicker.textContent = kicker
+        if (pTitle) { pTitle.textContent = title; pTitle.hidden = !title }
+        tallest = Math.max(tallest, probe.getBoundingClientRect().height)
+      }
+    })
+    probe.remove()
+    steadyFor = key
+    steady = Math.ceil(tallest)
+    return steady
+  }
+  const steadyWatch = new AbortController()
+  addEventListener('resize', () => measure(), { signal: steadyWatch.signal })
+  // a face that lands after the first measure changes every row's width
+  void document.fonts?.ready.then(() => { if (steadyWatch.signal.aborted) return; steadyFor = ''; measure() })
+
   /* WHAT THE BAND TAKES AT THE FOOT, published for the parts that stood
      above the bar: the row and the sources window clear the words instead of
      standing under them. */
@@ -559,9 +614,10 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
     if (!words) return
     requestAnimationFrame(() => {
       /* THE BAND'S OWN HEIGHT IS THE STAGE'S PRICE, so it is measured and
-         never assumed: a third row of a long language grows the band by one
-         row here and the picture gives that row back in the same frame. */
+         never assumed. */
       if (stage) {
+        const hold = steadyHeight()
+        band.style.minHeight = hold > 0 ? `${hold}px` : ''
         const low = band.getBoundingClientRect()
         if (low.height < 1) return
         setDeskBand(low.height)
@@ -715,6 +771,7 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
     update,
     key,
     dispose() {
+      steadyWatch.abort()
       // the picture takes the whole window back with the band
       setDeskBand(0)
       // the frame's door and the wing's own sources go home before the band
