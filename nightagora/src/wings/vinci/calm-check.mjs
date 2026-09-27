@@ -51,6 +51,17 @@ export const CALM = {
    * film's half-open shutter a hung work smears by half of it and still reads. */
   filmPixelsPerFrame: 9,
 }
+/** A TURN MADE STANDING STILL may run faster than one made walking: up to
+ * 20 degrees a second on the desktop and 14 on the phone, eased onto that
+ * rate and off it over a second, so a half turn takes seconds. Its picture
+ * crosses a frame width in about five seconds on the desktop's widest lens,
+ * faster than the walking pan's seven, and a narrower lens turns slower so
+ * the picture moves no more than 14 px a frame. Frames read against it are
+ * those whose body has not moved over the whole reading. */
+export const CALM_STANDING = {
+  desktop: { turnDegPerSecond: 21, turnDegPerSecond2: 16, turnDegPerSecond3: 60, filmPixelsPerFrame: 14 },
+  phone: { turnDegPerSecond: 15, turnDegPerSecond2: 16, turnDegPerSecond3: 60, filmPixelsPerFrame: 14 },
+}
 /** The film keeps the authored width: landscape 1920 px from the desktop's
  * lens, portrait 1080 px from the phone's. */
 const filmFocalPixels = (fov, phone) => (phone ? 540 : 960) / (Math.tan(fov * Math.PI / 360) * (phone ? 390 / 844 : 1280 / 720))
@@ -152,14 +163,30 @@ const widthOf = (fov, aspect) => 2 * Math.atan(Math.tan(fov * Math.PI / 360) * a
 function read(frames) {
   let film = 0, peak = 0, peakAt = 0, accel = 0, accelAt = 0, jerk = 0, jerkAt = 0, zoom = 0, turned = 0, widths = 0, body = 0, bodySpeed = null
   let over = 0, previous = null, previousAccel = null
+  const still = { peakDegPerSecond: 0, peakDegPerSecond2: 0, peakDegPerSecond3: 0, filmPixelsPerFrame: 0, seconds: 0 }
+  // the body has not moved between frame n - 1 and frame n
+  const stood = n => n >= 1 && frames[n].metres !== undefined && frames[n - 1].metres !== undefined && Math.abs(frames[n].metres - frames[n - 1].metres) < 1e-9
   for (let n = 1; n < frames.length; n++) {
     const dt = frames[n].t - frames[n - 1].t
     if (!(dt > 0)) continue
     const w = spin(frames[n - 1].q, frames[n].q, dt)
     const rate = w.length()
     turned += rate * dt
+    const pixels = filmFocalPixels(Math.min(frames[n].fov, frames[n - 1].fov), frames[n].aspect <= .9) * rate / DEG / FILM_FPS
+    if (stood(n)) {
+      still.seconds += dt
+      still.peakDegPerSecond = Math.max(still.peakDegPerSecond, rate); still.filmPixelsPerFrame = Math.max(still.filmPixelsPerFrame, pixels)
+      if (previous) {
+        const a = w.clone().sub(previous).divideScalar(dt)
+        if (stood(n - 1)) still.peakDegPerSecond2 = Math.max(still.peakDegPerSecond2, a.length())
+        if (previousAccel && stood(n - 1) && stood(n - 2)) still.peakDegPerSecond3 = Math.max(still.peakDegPerSecond3, a.clone().sub(previousAccel).divideScalar(dt).length())
+        previousAccel = a
+      }
+      previous = w
+      continue
+    }
     if (rate > peak) { peak = rate; peakAt = frames[n].share }
-    film = Math.max(film, filmFocalPixels(Math.min(frames[n].fov, frames[n - 1].fov), frames[n].aspect <= .9) * rate / DEG / FILM_FPS)
+    film = Math.max(film, pixels)
     widths = Math.max(widths, rate / widthOf(frames[n].fov, frames[n].aspect))
     zoom = Math.max(zoom, Math.abs(scaleOf(frames[n].fov) - scaleOf(frames[n - 1].fov)) / dt)
     if (frames[n].metres !== undefined && frames[n - 1].metres !== undefined) {
@@ -185,10 +212,12 @@ function read(frames) {
     peakDegPerSecond2: +accel.toFixed(1), accelAt: +accelAt.toFixed(3),
     peakDegPerSecond3: +jerk.toFixed(0), jerkAt: +jerkAt.toFixed(3),
     zoomPerSecond: +zoom.toFixed(3), bodyMetresPerSecond2: +body.toFixed(2), filmPixelsPerFrame: +film.toFixed(2), framesOverTurnCap: over,
+    standing: { seconds: +still.seconds.toFixed(2), peakDegPerSecond: +still.peakDegPerSecond.toFixed(2), peakDegPerSecond2: +still.peakDegPerSecond2.toFixed(1),
+      peakDegPerSecond3: +still.peakDegPerSecond3.toFixed(0), filmPixelsPerFrame: +still.filmPixelsPerFrame.toFixed(2) },
   }
 }
 
-const report = { checker: 'vinci-calm', hz: HZ, pace: PACE ?? 'the default', calm: CALM, legs: [], refused: [] }
+const report = { checker: 'vinci-calm', hz: HZ, pace: PACE ?? 'the default', calm: CALM, calmStanding: CALM_STANDING, legs: [], refused: [] }
 for (const phone of VIEWPORTS) {
   const viewport = phone ? 'phone' : 'desktop'
   const camera = new THREE.PerspectiveCamera(49, phone ? 390 / 844 : 1440 / 900, .25, 1100)
@@ -286,9 +315,11 @@ for (const phone of VIEWPORTS) {
   }
 }
 
+const overStanding = leg => { const cap = CALM_STANDING[leg.viewport], st = leg.standing
+  return st.peakDegPerSecond > cap.turnDegPerSecond || st.peakDegPerSecond2 > cap.turnDegPerSecond2 || st.peakDegPerSecond3 > cap.turnDegPerSecond3 || st.filmPixelsPerFrame > cap.filmPixelsPerFrame }
 const over = leg => leg.peakDegPerSecond > CALM.turnDegPerSecond || leg.peakDegPerSecond2 > CALM.turnDegPerSecond2
   || leg.peakDegPerSecond3 > CALM.turnDegPerSecond3 || leg.zoomPerSecond > CALM.zoomPerSecond || leg.bodyMetresPerSecond2 > CALM.bodyMetresPerSecond2
-  || leg.filmPixelsPerFrame > CALM.filmPixelsPerFrame
+  || leg.filmPixelsPerFrame > CALM.filmPixelsPerFrame || overStanding(leg)
 const failing = report.legs.filter(over)
 const byKind = {}
 for (const leg of report.legs) {
@@ -302,6 +333,9 @@ for (const leg of report.legs) {
 }
 report.summary = { legs: report.legs.length, over: failing.length, refused: report.refused.length, byKind }
 report.fastest = [...report.legs].sort((a, b) => b.peakDegPerSecond - a.peakDegPerSecond).slice(0, TOP)
+report.standing = { calm: CALM_STANDING, worst: Object.fromEntries(['desktop', 'phone'].map(v => [v, ['peakDegPerSecond', 'peakDegPerSecond2', 'peakDegPerSecond3', 'filmPixelsPerFrame']
+  .map(k => [k, Math.max(0, ...report.legs.filter(l => l.viewport === v).map(l => l.standing[k]))])]).map(([v, e]) => [v, Object.fromEntries(e)])),
+  seconds: +report.legs.reduce((n, l) => n + l.standing.seconds, 0).toFixed(1) }
 if (!args.includes('--legs')) delete report.legs
 report.ok = failing.length === 0 && report.refused.length === 0
 console.log(JSON.stringify(report, null, 1))

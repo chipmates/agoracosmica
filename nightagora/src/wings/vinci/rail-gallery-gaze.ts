@@ -11,7 +11,7 @@
  * slowed only when they do not fit it. The lens changes at one end, with that
  * end's turn and for as long as it needs.
  */
-import type { GaitLeg } from './gait'
+import { gaitAt, gaitSecondsAt, type GaitLeg } from './gait'
 import { CALM_FILM, CALM_GAZE, type CalmGazePlan, type GazeAngles } from './rail-gaze'
 
 const RAD = Math.PI / 180
@@ -92,5 +92,7 @@ export function planGalleryGaze(input: {
       return target
     },
     lens: seconds => lens[1] > lens[0] ? smooth((seconds - lens[0]) / (lens[1] - lens[0])) : seconds >= lens[1] ? 1 : 0,
+    walk: seconds => gaitAt(leg, seconds),
+    secondsAt: metres => gaitSecondsAt(leg, metres),
   }
 }

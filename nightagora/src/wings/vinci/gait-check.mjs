@@ -148,7 +148,9 @@ function walkTrace(metres, reduced) {
   reducedMotionNow.value = reduced
   rail.set('arrival', from, true, false)
   rail.update()
-  rail.set('courtyard', to, false, false)
+  // a station the arrival's walks neither leave nor arrive at turning, so the
+  // rail makes no stand on this leg and the trace is the walk alone
+  rail.set('hall', to, false, false)
   const leg = gaitLeg(metres), samples = []
   rail.update()
   const seconds = rail.navigation.legSeconds

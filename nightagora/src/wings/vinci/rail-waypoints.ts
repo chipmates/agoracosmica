@@ -148,10 +148,11 @@ const NOT_A_CORRIDOR: readonly RailSide[] = ['mechanism-hall']
  * to the house door leaves from; the second is the foot of the five treads,
  * on the door's own axis, so the eye goes up them and not across their cheek.
  */
-/** Two authored turns on the machine hall's open floor: the north aisle east
- * of the sail's lowest reach, and the gap between the two screws. */
-const HALL_NORTH_AISLE: RailWaypoint = [-52.6, -43.4, INSIDE]
-const BETWEEN_THE_SCREWS: RailWaypoint = [-51.2, -47.3, INSIDE]
+/** An authored turn on the machine hall's open floor: its south-west bay,
+ * two metres off the aerial screw's deck and 1.76 m off the west wall, where
+ * the walk turns standing between the hall and the way up to the picture
+ * room's door. */
+const HALL_WEST_BAY: RailWaypoint = [-59.9, -49.5, INSIDE]
 const COURT_OPEN: RailWaypoint = [8, -21, railEyeHeightM]
 const THRESHOLD_FOOT: RailWaypoint = [4.834, -14.329, railEyeHeightM]
 /** THE HOUSE DOOR AND THE ENFILADE. The entrance's best clear line runs 0.47 m
@@ -167,6 +168,72 @@ const HOUSE_FLOOR_EYE = .8 + railEyeHeightM
 const HOUSE_LANDING: RailWaypoint = [3.0682, -13.0604, HOUSE_FLOOR_EYE]
 const ENFILADE_TURN: RailWaypoint = [.0049, -8.3434, HOUSE_FLOOR_EYE]
 
+/** THE STUDIOLO'S DOORSTEP. The reading table is seen through the studiolo's
+ * door from two thirds of a metre off its front; every walk to that eye comes
+ * in on the door's axis from here, facing through the door, and every walk
+ * from it draws back to here before it turns away. It stands north of the
+ * body wall's eye, so the walk between the two glides past the wall. */
+const READING_PORCH: RailWaypoint = [-32.8, -46.125, INSIDE]
+/** THE DOORSTEPS OF EYES THAT STAND AGAINST A WALL, on the way in a little
+ * back from the eye. A view turned round on the eye itself sweeps that wall
+ * from a hand away, so a walk that leaves such an eye facing away draws back
+ * to its doorstep and turns there, and one that would arrive facing away
+ * turns there and backs in. The hall's eye stands in the hall's own door,
+ * half a metre from either reveal (its doorstep is in the room behind,
+ * nearly four metres across); the timeline's first eye stands 0.6 m from the
+ * gallery's end wall, the street's eye 0.87 m from the street's wall. */
+const HALL_PORCH: RailWaypoint = [-2.7714, -10.1461, HOUSE_FLOOR_EYE]
+const TIMELINE_PORCH: RailWaypoint = [-29.224, -59.855, INSIDE]
+const STREET_PORCH: RailWaypoint = [22.799, -15.121, 2.661]
+/** THE STEP INTO THE GREAT HALL. A walk away from the hall's eye goes on a
+ * metre and a half into the hall along the door's axis, turns there with the
+ * room in front of it, and walks back out through the door on that axis: the
+ * turn sweeps the hall, never the doorstep's walls a metre off, and nothing
+ * is walked backward. The hall's tables stand clear of it by 0.7 m. */
+const HALL_INSIDE: RailWaypoint = [-5.5037, -11.9181, HOUSE_FLOOR_EYE]
+/** THE TURNS MADE STANDING, in a doorway or where the way to a door turns. A
+ * walk stands still where its way turns at one of these and turns there, so
+ * the view goes through the door straight and is never swung across its
+ * reveals at a walking pace. */
+export const railDoorTurns: readonly RailWaypoint[] = [ENFILADE_TURN, READING_PORCH, HALL_WEST_BAY, HALL_INSIDE]
+export const railPorchStands: readonly RailWaypoint[] = [HALL_PORCH, TIMELINE_PORCH, STREET_PORCH]
+/** THE NARROW DOORS A WALK PASSES STRAIGHT THROUGH, at their centres: a door
+ * a metre wide holds its reveals in the frame's edges, and a view askew in
+ * it holds one of them in the frame. */
+export const railDoorways: readonly RailWaypoint[] = [
+  // the house door and the passage's side door to the service passage
+  [2.298, -12.07, HOUSE_FLOOR_EYE], [-1.04, -9.02, HOUSE_FLOOR_EYE],
+  // the great hall's own door, where the hall's eye stands
+  [-4.2388, -11.0992, HOUSE_FLOOR_EYE],
+  // the picture room's west door and its door to the gallery
+  [PICTURE_TO_HALL, (FACE.pictureWallNorth + FACE.pictureWallSouth) / 2, INSIDE],
+  [PICTURE_TO_GALLERY, (FACE.pictureWallNorth + FACE.pictureWallSouth) / 2, INSIDE],
+]
+/** Where a station's walks leave from and arrive on, next to its eye. */
+const PORCHES: Readonly<Record<string, RailWaypoint>> = { 'reading-table': READING_PORCH }
+/** Where a station's walks go first when they leave, and never come back by. */
+const STEPS_OUT: Readonly<Record<string, readonly RailWaypoint[]>> = { hall: [HALL_INSIDE] }
+/** Turns a walk between two stations leaves out, by its pair either way. The
+ * body wall's walk to the display wall comes round the picture room's corner
+ * and crosses the apron to the display wall's eye straight: the step onto
+ * the wall's line swung its way twice more under a view already turning. */
+const SKIPPED: Readonly<Record<string, readonly RailWaypoint[]>> = {
+  'body>supper-wall': [APRON_NORTH, COURT_EAST],
+}
+/** Turns one walk makes standing, by its pair in walking order. The body
+ * wall's walk to the display wall comes out of the picture room facing its
+ * entrance and turns to the display wall on the apron's corner: turning
+ * there on the move swung the way under the view four times. */
+export const railPairTurns: Readonly<Record<string, readonly RailWaypoint[]>> = {
+  'body>supper-wall': [APRON_CORNER],
+}
+/** A LINK BETWEEN TWO NEIGHBOURING VIEWS THAT BENDS, by its pair either way, in east
+ * and north (the height runs even between the two eyes): the crane's plinth
+ * stands a hand off the straight line to the parachute. */
+export const railLinkVia: Readonly<Record<string, readonly (readonly [east: number, north: number])[]>> = {
+  'machine/revolving-crane>machine/parachute': [[-40.4, -27.72]],
+}
+
 const LINKS: readonly { from: RailSide; to: RailSide; via: readonly RailWaypoint[] }[] = [
   { from: 'street', to: 'court', via: railGateWaypoints },
   { from: 'court', to: 'great-hall', via: [COURT_OPEN, THRESHOLD_FOOT, HOUSE_LANDING, ENFILADE_TURN] },
@@ -180,14 +247,14 @@ const LINKS: readonly { from: RailSide; to: RailSide; via: readonly RailWaypoint
   { from: 'exhibit-court', to: 'grave-court', via: [COURT_LANE_START, COURT_LANE_SOUTH, COURT_LANE_EAST, COURT_LANE_WEST] },
   { from: 'picture-room', to: 'long-gallery',
     via: [[PICTURE_TO_GALLERY, FACE.pictureWallNorth + 1.4, INSIDE], [PICTURE_TO_GALLERY, FACE.pictureWallSouth - 1.4, INSIDE]] },
-  // The picture room's west door. The hall's side of it stands north of the
-  // machine bay, so the walk leaves the door before it meets a plinth, keeps
-  // to the north wall past the aerial screw's sail, and turns south between
-  // the two screws: the works' eye stands south of the water screw's raised
-  // end, and a straight line to it ran through that end's support.
+  // The picture room's west door stands in the machine hall's north-west
+  // corner, its west reveal the hall's west wall. The walk comes to it up the
+  // hall's west side from the south-west bay, so it faces the door for the
+  // last six metres and turns in it by a few degrees: along the north wall it
+  // met the door at a right angle, facing the west wall from 0.8 m.
   { from: 'picture-room', to: 'mechanism-hall',
     via: [[PICTURE_TO_HALL, FACE.pictureWallNorth + 1.4, INSIDE], [PICTURE_TO_HALL, FACE.pictureWallSouth - 1, INSIDE],
-      HALL_NORTH_AISLE, BETWEEN_THE_SCREWS] },
+      HALL_WEST_BAY] },
   // The gallery's side of the hall door stands on the line the reading
   // table's eye stands on, two thirds of a metre off the reading room's front,
   // so the walk from that eye to the door runs straight past the room.
@@ -249,4 +316,16 @@ export function railWaypointsBetween(from: RailSide, to: RailSide,
     if (cost < shortest) { shortest = cost; best = chain }
   }
   return best!
+}
+
+/** THE WAY BETWEEN TWO STATION EYES: the shortest chain between their sides,
+ * through the doorstep either station keeps. */
+export function railStationWaypoints(from: string, to: string,
+  ends?: { from: readonly [number, number]; to: readonly [number, number] }): RailWaypoint[] {
+  const first = PORCHES[from], last = PORCHES[to]
+  const inner = railWaypointsBetween(railSide(from), railSide(to), ends && {
+    from: first ? [first[0], first[1]] : ends.from, to: last ? [last[0], last[1]] : ends.to,
+  })
+  const skipped = SKIPPED[`${from}>${to}`] ?? SKIPPED[`${to}>${from}`] ?? []
+  return [...(STEPS_OUT[from] ?? []), ...(first ? [first] : []), ...inner.filter(point => !skipped.includes(point)), ...(last ? [last] : [])]
 }

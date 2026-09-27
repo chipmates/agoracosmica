@@ -5,7 +5,7 @@ import { roadGradeProvenance } from './road-grade'
 import { vinciStationIds, type VinciStationId } from './content'
 import { createRailLookSmoother, createCertifiedRailPath } from './rail-smoothing'
 import { projectRailDrag } from './projection-drag'
-import { carriedPace, gaitAt, gaitHeadLift, gaitLeg, gaitRhythm, gaitSecondsAt, strollMetresPerSecond, type GaitThreshold } from './gait'
+import { carriedPace, gaitHeadLift, gaitLeg, gaitRhythm, strollMetresPerSecond, type GaitThreshold } from './gait'
 import { filmLensPixels, planCalmGaze, type CalmGazePlan, type GazeCourse } from './rail-gaze'
 import { GALLERY_LIFT_RAD, planGalleryGaze } from './rail-gallery-gaze'
 import { collectionLayout } from './collection'
@@ -13,10 +13,10 @@ import { collectionView } from './collection/views'
 import { GALLERY_WALK_M, vinciWallEndVertex, vinciWallIsEnd, vinciWallNearerEnd, vinciWallOfStation, type VinciWall } from './collection/wall'
 import { vinciApproachesAreNeighbours } from './collection/approaches'
 import { COURT, FLOOR, SUPPER_WALL } from './collection/layout'
+import { railDoorTurns, railDoorways, railPairTurns, railPorchStands, railSide, type RailSide, type RailWaypoint } from './rail-waypoints'
 import { fittedRailFov, assertRailProjection } from './rail-projection'
 import type { RailGeometryAuthority } from './rail-proof'
 import { hallView } from './house-hall'
-import { railSide, type RailSide } from './rail-waypoints'
 
 export interface Pose { eye: Vector3; at: Vector3; fov: number }
 /** Which room view each collection station stands in. The rooms are built by
@@ -360,6 +360,25 @@ export const railMoveDurationSeconds = 20
  * on the room: it crabs and pulls back as a camera does, never turning round
  * to face its own few metres of floor. */
 const GAZE_AHEAD_M = 6, WALKED_LEG_M = 3
+/** THE ROOMS LEFT BY TURNING ROUND. Each of these stations looks into its room
+ * with its way out behind it, through a door or a passage a hand wider than
+ * a person: the walk turns to its way before it leaves rather than backing
+ * through the door. Elsewhere a walk may still leave by pulling back, which
+ * in the open reads as the reveal it is. */
+const RAIL_TURN_TO_LEAVE:ReadonlySet<string>=new Set(['hall','courtyard','works','body'])
+/** THE PLACES ARRIVED AT FACING THE WAY IN. Their view looks back the way a
+ * walk comes, through a door or down the line: the walk arrives forward and
+ * turns to the view where it stands. */
+const RAIL_TURN_ON_ARRIVAL:ReadonlySet<string>=new Set(['arrival','courtyard','oratory','body','flight','line-early','picture-room'])
+/** Walks that keep the gaze they were planned with: the pavilion's walk to
+ * the timeline is planned with its own door. */
+const RAIL_TURNS_LEFT_OUT:ReadonlySet<string>=new Set(['garden>line-early'])
+/** An exhibit whose viewing eye stands outside its station's room is walked
+ * to and from as a route: out of the room's door facing it. */
+const RAIL_WALKED_APPROACHES:ReadonlySet<string>=new Set(['machine/proportional-compass'])
+/** A turn made standing still may run this fast, in degrees a second: a half
+ * turn in about eleven seconds on the desktop and fifteen on the phone. */
+const RAIL_QUICK_TURN=20,RAIL_QUICK_TURN_PHONE=14
 /** Over the last metres the way ahead runs out and the arriving composition
  * takes the gaze. */
 const GAZE_ARRIVAL_M = 4
@@ -432,8 +451,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
   /** HOW FAR OFF THE WAY A CHORD RUNS. The certificate proves the path, not
    * the line of sight over it, so a chord that leaves the way the body walks
    * is a chord through whatever the way turns around. */
-  function chordLeavesTheWay(at:number,aheadMetres:number):boolean {
-    const total=path!.length
+  function chordLeavesTheWay(at:number,aheadMetres:number,total=path!.length):boolean {
     path!.pointAtDistance(at,behind);path!.pointAtDistance(Math.min(total,at+aheadMetres),lead)
     span.subVectors(lead,behind)
     const length=span.lengthSq()
@@ -450,15 +468,15 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
    * walk is going only while the way runs straight at it; through a bend that
    * chord cuts the corner, and the corner is a wall. The lead is pulled back
    * to the last chord the way itself still lies under. */
-  function leadMetres(bodyMetres:number):number {
-    const room=Math.max(0,path!.length-bodyMetres)
+  function leadMetres(bodyMetres:number,until=path!.length):number {
+    const room=Math.max(0,until-bodyMetres)
     for(let metres=Math.min(GAZE_AHEAD_M,room);metres>GAZE_AHEAD_LEAST_M;metres-=GAZE_AHEAD_STEP_M){
-      if(!chordLeavesTheWay(bodyMetres,metres))return metres
+      if(!chordLeavesTheWay(bodyMetres,metres,until))return metres
     }
     return Math.min(GAZE_AHEAD_LEAST_M,room)
   }
-  function pathAngles(bodyMetres:number,aheadMetres:number):{heading:number;elevation:number} {
-    const total=path!.length,at=Math.max(0,Math.min(total,bodyMetres))
+  function pathAngles(bodyMetres:number,aheadMetres:number,total=path!.length):{heading:number;elevation:number} {
+    const at=Math.max(0,Math.min(total,bodyMetres))
     path!.pointAtDistance(at,behind);path!.pointAtDistance(Math.min(total,at+aheadMetres),ahead)
     ahead.sub(behind)
     if(ahead.lengthSq()<.25){
@@ -486,7 +504,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
    * the certificate holds. */
   /** The certified path, and whether it is a route between two stations: the
    * one kind of leg whose gaze follows its way. */
-  function certifiedPath(request:Request):{path:ReturnType<typeof createCertifiedRailPath>;route:boolean;held?:{turnFirst:boolean;liftFirst?:boolean;lensFirst?:boolean;long?:boolean}} {
+  function certifiedPath(request:Request):{path:ReturnType<typeof createCertifiedRailPath>;route:boolean;held?:{turnFirst:boolean;liftFirst?:boolean;lensFirst?:boolean;long?:boolean};turns?:{start:boolean;end:boolean;stands?:readonly RailWaypoint[]}} {
     // A run along the wall is the sub-path of the wall's own certified line
     // between the vertex the eye stands on and the one it is asked for.
     // A run the length of a hang is a walk down the gallery, not a step to
@@ -509,9 +527,12 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     // the way out to the station and in again.
     if(request.exhibit&&request.link&&viewing?.exhibit)
       return {path:authority.link(viewing.exhibit,request.exhibit,completed!.pose,request.pose,request.phone,camera),route:false}
-    if(request.exhibit)return {path:authority.approach(completed!.pose,request.pose,request.phone,camera),route:false}
-    if(viewing&&standing&&request.id===standing.id&&samePose(request.pose,standing.pose))
-      return {path:authority.approach(standing.pose,viewing.pose,request.phone,camera,true),route:false}
+    // An exhibit that stands out of its station's room is walked to as a
+    // route is, and back.
+    if(request.exhibit){const walked=RAIL_WALKED_APPROACHES.has(request.exhibit)
+      return {path:authority.approach(completed!.pose,request.pose,request.phone,camera),route:walked,...(walked?{turns:{start:true,end:true}}:{})}}
+    if(viewing&&standing&&request.id===standing.id&&samePose(request.pose,standing.pose)){const walked=RAIL_WALKED_APPROACHES.has(viewing.exhibit!)
+      return {path:authority.approach(standing.pose,viewing.pose,request.phone,camera,true),route:walked,...(walked?{turns:{start:true,end:true}}:{})}}
     const route=authority.route(completed!.pose,request.pose,request.phone,camera)
     // OUT THROUGH THE PAVILION'S DOOR TO THE GARDEN the view is held until the
     // walk is outside and lifted to the house there: lifted on the way, it
@@ -521,14 +542,35 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     // of the frame's edges.
     if(request.id==='garden'&&INSIDE.includes(railSide(completed!.id)))return {path:route,route:true,held:{turnFirst:false,liftFirst:false,lensFirst:true}}
     if(completed!.id==='garden'&&INSIDE.includes(railSide(request.id)))return {path:route,route:true,held:{turnFirst:true,lensFirst:false}}
-    return {path:route,route:true}
+    const pair=`${completed!.id}>${request.id}`
+    return {path:route,route:true,
+      ...(RAIL_TURNS_LEFT_OUT.has(pair)?{}:{turns:{start:RAIL_TURN_TO_LEAVE.has(completed!.id),end:RAIL_TURN_ON_ARRIVAL.has(request.id),stands:railPairTurns[pair]}})}
+  }
+  /** WHERE THE WAY TURNS IN A DOORWAY: the distance along the path nearest
+   * each declared door turn, at every pass through it (a way that steps out
+   * through a door and comes back passes it twice). */
+  function doorTurns(points:readonly (readonly [number,number,number])[]=railDoorTurns):number[] {
+    const out:number[]=[],step=.05,total=path!.length,near=.6*.6
+    for(const [east,north,height] of points){
+      probe.set(east,height,-north)
+      let best=Infinity,at=-1
+      const settle=()=>{
+        if(at<0)return
+        for(let m=Math.max(0,at-step),end=Math.min(total,at+step);m<=end;m+=step/50){path!.pointAtDistance(m,span);const d=span.distanceToSquared(probe);if(d<best){best=d;at=m}}
+        out.push(at);best=Infinity;at=-1
+      }
+      for(let m=0;m<=total;m+=step){path!.pointAtDistance(m,span);const d=span.distanceToSquared(probe);if(d<near){if(d<best){best=d;at=m}}else settle()}
+      settle()
+    }
+    return out.sort((a,b)=>a-b)
   }
   /** Where the way leads from a body position on the leg under way. */
-  function course(metres:number):GazeCourse {
-    const along=pathAngles(metres,leadMetres(metres))
+  /** A stretch of the way that ends at a stand is read no further than it. */
+  function course(metres:number,until=path!.length):GazeCourse {
+    const along=pathAngles(metres,leadMetres(metres,until),until)
     path!.pointAtDistance(metres,probe)
     const lift=gaitHeadLift(headLifts,probe.x,-probe.z)
-    return {heading:along.heading,elevation:along.elevation+lift,weight:ramp(0,GAZE_ARRIVAL_M,path!.length-metres)}
+    return {heading:along.heading,elevation:along.elevation+lift,weight:ramp(0,GAZE_ARRIVAL_M,until-metres)}
   }
   const scaleOf=(fov:number):number=>Math.log(Math.tan(fov*Math.PI/360))
   function begin(request:Request,now:number) {
@@ -555,7 +597,10 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     gaze=held?planGalleryGaze({from,to,zoom,lensPixels,timed:seconds=>gaitLeg(length,seconds),
       first:{heading:held.turnFirst,elevation:lift,lens:held.lensFirst??lift},long:held.long===true})
       :planCalmGaze({from,to,lengthM:length,lensPixels,zoom,timed:seconds=>gaitLeg(length,seconds),
-        course:certified.route&&length>=WALKED_LEG_M?course:null})
+        course:certified.route&&length>=WALKED_LEG_M?course:null,
+        ...(certified.turns&&length>=WALKED_LEG_M?{turns:{start:certified.turns.start,end:certified.turns.end,
+          at:doorTurns([...railDoorTurns,...(certified.turns.stands??[])]),doors:doorTurns(railDoorways),porches:doorTurns(railPorchStands),
+          quickDegPerSecond:request.phone?RAIL_QUICK_TURN_PHONE:RAIL_QUICK_TURN}}:{})})
     leg=gaze.leg;duration=leg.seconds;legClock=0;legClockAt=now;pace=1;waiting=0;strideM=strideTarget=0;strideAt=now
     active=request
   }
@@ -741,24 +786,25 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
       // target changes neither this leg's certified route nor its pace.
       if(active)legClock+=Math.max(0,now-legClockAt)*pace
       legClockAt=now
-      const walk=active&&path?gaitAt(leg,legClock):undefined
+      const walk=active&&path&&gaze?gaze.walk(legClock):undefined
       const metres=walk?Math.min(path!.length,walk.metres+strideM):path?path.length:0
       const s=active&&path&&path.length>0?Math.max(0,Math.min(1,metres/path.length)):1
       walkedShare=s
+      // A leg that stands to turn at its end has walked its way before it lands.
+      const tau=!active||!gaze?duration:s>=1&&strideM>0?duration:strideM>0?Math.max(legClock,gaze.secondsAt(metres)):Math.min(legClock,duration)
       if(active&&path&&gaze) {
         assertRailProjection(camera)
         path.pointAtDistance(metres,camera.position)
         // THE GAZE LEADS THE WALK, on the curve planned when the leg began.
         // It is read where the body is: a stride taken by hand carries the
         // view on with it, and the arrival is the arriving view exactly.
-        const tau=s>=1?leg.seconds:strideM>0?Math.max(legClock,gaitSecondsAt(leg,metres)):Math.min(legClock,leg.seconds)
         gaze.at(tau,view)
         euler.set(view.elevation,view.heading,0,'YXZ');base.setFromEuler(euler)
         camera.fov=fittedRailFov(fromFov+(targetFov-fromFov)*gaze.lens(tau),camera.aspect,active.phone)
         carry(metres,view.heading)
       }
       render(now)
-      if(active&&s===1) {
+      if(active&&tau>=duration) {
         const arrived=active
         wallOn=arrived.wallOn??wallOfStation(arrived.id)
         wallAt=arrived.wall??(wallOn?vinciWallEndVertex(wallOn,arrived.id):undefined)

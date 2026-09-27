@@ -90,7 +90,9 @@ const { createCertifiedRailPath, railNearRectangleRadius } = await load(path.joi
 const { fittedRailFov } = await load(path.join(WING, 'rail-projection.ts'))
 const { gaitEnvelopeM, gaitLeg, gaitSecondsAt, setGaitPace, GAIT_PACES } = await load(path.join(WING, 'gait.ts'))
 const { planCalmGaze } = await load(path.join(WING, 'rail-gaze.ts'))
-const { railSide, railWaypointsBetween, railGateWaypoints, railTerraceWaypoints } = await load(path.join(WING, 'rail-waypoints.ts'))
+const { railStationWaypoints, railGateWaypoints, railTerraceWaypoints, railDoorTurns, railPairTurns, railLinkVia } = await load(path.join(WING, 'rail-waypoints.ts'))
+/** A turn in a doorway, or one a walk makes standing, is made on the corner itself, so it is left unrounded. */
+const atStandingTurn = (turns, centre) => turns.some(([east, north, height]) => Math.hypot(centre.x - east, centre.y - height, centre.z + north) < .55)
 const { railExhibitStands, railExhibitLevel } = await load(path.join(WING, 'rail-solids.ts'))
 const { createCollectionStandSolids } = await load(path.join(WING, 'collection/stands.ts'))
 const { geometryForPart } = await load(path.join(WING, 'machines/geometry.ts'))
@@ -435,7 +437,8 @@ const routes = [], readings = []
 for (const { viewport, seen } of families) {
   for (const from of seen) for (const to of seen) {
     if (from === to) continue
-    const chain = railWaypointsBetween(railSide(from.id), railSide(to.id),
+    const standing = [...railDoorTurns, ...(railPairTurns[`${from.id}>${to.id}`] ?? [])]
+    const chain = railStationWaypoints(from.id, to.id,
       { from: [from.pose.eye.x, -from.pose.eye.z], to: [to.pose.eye.x, -to.pose.eye.z] })
     const enh = [[from.pose.eye.x, -from.pose.eye.z, from.pose.eye.y], ...chain.map(point => [...point]), [to.pose.eye.x, -to.pose.eye.z, to.pose.eye.y]]
     const points = enh.map(([east, north, height]) => new THREE.Vector3(east, height, -north))
@@ -446,7 +449,7 @@ for (const { viewport, seen } of families) {
     const path = createCertifiedRailPath(points, {
       clearanceRadiusM: clearance, maxTrimM: .5, certificateDepth: 6, numericalMarginM: NUMERICAL_MARGIN_M,
       certifyBall(centre, radius) {
-        if (!ballIsClear(centre, radius)) return false
+        if (atStandingTurn(standing, centre) || !ballIsClear(centre, radius)) return false
         balls.push({ centre: [centre.x, centre.y, centre.z], radiusM: radius + BALL_RESERVE_M })
         return true
       },
@@ -582,13 +585,20 @@ for (const { viewport, seen } of families) {
  * objects, never their product, and the same proof a straight approach takes.
  */
 const links = [], linkReadings = []
+/** A bent link walked back sums the same curve in the other order, a few
+ * units in the last place shorter: its certified length allows a nanometre. */
+const LINK_REVERSED_M = 1e-9
 for (const { viewport } of families) {
   for (const pair of vinciApproachRunPairs()) {
     const from = vinciApproachPose(pair.from, viewport.phone), to = vinciApproachPose(pair.to, viewport.phone)
     if (!from || !to) throw new Error(`${pair.from} to ${pair.to}: no viewing pose at ${viewport.name}`)
     const radius = pose => railNearRectangleRadius(NEAR_M, fittedRailFov(pose.fov, viewport.aspect, viewport.phone), viewport.aspect)
     const clearance = Math.max(radius(from), radius(to)) + (NO_GAIT ? 0 : gaitEnvelopeM)
-    const enh = [[from.eye.x, -from.eye.z, from.eye.y], [to.eye.x, -to.eye.z, to.eye.y]]
+    const via = railLinkVia[`${pair.from}>${pair.to}`] ?? [...(railLinkVia[`${pair.to}>${pair.from}`] ?? [])].reverse()
+    const run = Math.hypot(to.eye.x - from.eye.x, to.eye.z - from.eye.z)
+    const enh = [[from.eye.x, -from.eye.z, from.eye.y],
+      ...via.map(([east, north]) => [east, north, from.eye.y + (to.eye.y - from.eye.y) * Math.min(1, Math.hypot(east - from.eye.x, north + from.eye.z) / run)]),
+      [to.eye.x, -to.eye.z, to.eye.y]]
     const points = enh.map(([east, north, height]) => new THREE.Vector3(east, height, -north))
     const balls = []
     const path = createCertifiedRailPath(points, {
@@ -599,8 +609,30 @@ for (const { viewport } of families) {
         return true
       },
     })
-    if (path.corners.length || balls.length) throw new Error(`${pair.from} to ${pair.to}: a link is not a straight leg`)
-    const span = segmentClearance(points[0], points[1], clearance)
+    if (!via.length && (path.corners.length || balls.length)) throw new Error(`${pair.from} to ${pair.to}: a link is not a straight leg`)
+    if (path.corners.some(corner => corner.result !== 'certified')) throw new Error(`${pair.from} to ${pair.to}: a bent link's corner is not certified`)
+    // only the balls that carried each accepted trim, as a route keeps them
+    const accepted = new Map(balls.map(ball => [ball.centre.join(','), ball]))
+    const kept = []
+    for (const corner of path.corners) {
+      const vertex = points[corner.index], trim = corner.acceptedTrimM
+      const a = vertex.clone().addScaledVector(vertex.clone().sub(points[corner.index - 1]).normalize(), -trim)
+      const b = vertex.clone().addScaledVector(points[corner.index + 1].clone().sub(vertex).normalize(), trim)
+      const collect = (x, control, z, remaining) => {
+        const ball = accepted.get(x.clone().add(control).add(z).multiplyScalar(1 / 3).toArray().join(','))
+        if (ball) { kept.push(ball); return }
+        if (remaining === 0) throw new Error('A certified corner of a link has no recorded ball')
+        const left = x.clone().lerp(control, .5), right = control.clone().lerp(z, .5), middle = left.clone().lerp(right, .5)
+        collect(x, left, middle, remaining - 1); collect(middle, right, z, remaining - 1)
+      }
+      collect(a, vertex.clone(), b, 6)
+    }
+    // a bent link's straight parts, each proved end to end
+    let span = { distance: Infinity, mesh: null }
+    for (let i = 1; i < points.length; i++) {
+      const part = segmentClearance(points[i - 1], points[i], clearance)
+      if (part.distance < span.distance) span = part
+    }
     linkReadings.push({
       viewport: viewport.name, station: pair.station, from: pair.from, to: pair.to,
       lengthM: +path.length.toFixed(4), requiredM: +clearance.toFixed(4),
@@ -611,7 +643,7 @@ for (const { viewport } of families) {
       viewport: viewport.name, station: pair.station, from: pair.from, to: pair.to,
       fromPose: { eye: from.eye.toArray(), at: from.at.toArray(), fov: from.fov },
       toPose: { eye: to.eye.toArray(), at: to.at.toArray(), fov: to.fov },
-      points: enh, roundedLength: path.length, maxNearRadius: clearance, certifiedBalls: balls,
+      points: enh, roundedLength: path.length - (via.length ? LINK_REVERSED_M : 0), maxNearRadius: clearance, certifiedBalls: kept,
     })
   }
 }
