@@ -11,12 +11,29 @@
    resolution on a polished stone floor is indistinguishable from one at full
    resolution, because stone is not a mirror. */
 
-import { Object3D, type Mesh, type Scene } from 'three/webgpu'
+import { Object3D, Source, ViewportTextureNode, type Mesh, type Scene, type Texture } from 'three/webgpu'
 import * as TSL from 'three/tsl'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type N = any
 const { reflector } = TSL as unknown as Record<string, N>
+
+/* A MIRROR IS ONE MORE TARGET THE GLASS IS COPIED FROM. three keeps a
+   transmission copy per render target, each a clone of one texture, and a
+   clone shares its image: a mirror whose target grew to a size another
+   target had already written never reallocated, and the copy overran its
+   warm-up-sized texture, dropping the mirror's pass. Each copy gets its own
+   image, empty, so its first use sizes it. */
+const ownCopies = new WeakSet<Texture>()
+const perTarget = ViewportTextureNode.prototype.getTextureForReference
+ViewportTextureNode.prototype.getTextureForReference = function (reference = null) {
+  const texture = perTarget.call(this, reference)
+  if (reference !== null && !ownCopies.has(texture)) {
+    ownCopies.add(texture)
+    texture.source = new Source({ width: 0, height: 0 })
+  }
+  return texture
+}
 
 export interface ReflectorOptions {
   /** 1 is the full frame; a stone floor is convincing at 0.5 */
