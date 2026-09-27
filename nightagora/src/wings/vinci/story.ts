@@ -173,8 +173,22 @@ export const vinciStory: readonly VinciStoryStop[] = [
     pointers: ["C08"],
   },
   {
-    id: "supper-wall",
+    id: "body-valve",
     order: 9,
+    kind: "station",
+    built: false,
+    quiet: false,
+    chapter: { en: "The heart valve", de: "Die Herzklappe" },
+    age: { en: "about 60", de: "mit etwa 60 Jahren" },
+    line: { en: "He drew this heart valve on paper. Ours moves in a film. Open the sheet.", de: "Er zeichnete diese Herzklappe auf Papier. Unsere bewegt sich im Film. Öffne das Blatt." },
+    drawer: null,
+    certainty: "documented",
+    sees: "The sheet apart",
+    pointers: ["C08"],
+  },
+  {
+    id: "supper-wall",
+    order: 10,
     kind: "station",
     built: true,
     quiet: false,
@@ -188,7 +202,7 @@ export const vinciStory: readonly VinciStoryStop[] = [
   },
   {
     id: "cut-now-to-france-and-his-last-house",
-    order: 10,
+    order: 11,
     kind: "cut",
     built: false,
     quiet: false,
@@ -202,7 +216,7 @@ export const vinciStory: readonly VinciStoryStop[] = [
   },
   {
     id: "arrival",
-    order: 11,
+    order: 12,
     kind: "station",
     built: true,
     quiet: false,
@@ -216,7 +230,7 @@ export const vinciStory: readonly VinciStoryStop[] = [
   },
   {
     id: "courtyard",
-    order: 12,
+    order: 13,
     kind: "station",
     built: true,
     quiet: false,
@@ -230,7 +244,7 @@ export const vinciStory: readonly VinciStoryStop[] = [
   },
   {
     id: "hall",
-    order: 13,
+    order: 14,
     kind: "station",
     built: true,
     quiet: true,
@@ -244,7 +258,7 @@ export const vinciStory: readonly VinciStoryStop[] = [
   },
   {
     id: "oratory",
-    order: 14,
+    order: 15,
     kind: "station",
     built: true,
     quiet: true,
@@ -258,7 +272,7 @@ export const vinciStory: readonly VinciStoryStop[] = [
   },
   {
     id: "study",
-    order: 15,
+    order: 16,
     kind: "station",
     built: true,
     quiet: false,
@@ -272,7 +286,7 @@ export const vinciStory: readonly VinciStoryStop[] = [
   },
   {
     id: "chamber",
-    order: 16,
+    order: 17,
     kind: "station",
     built: true,
     quiet: false,
@@ -286,7 +300,7 @@ export const vinciStory: readonly VinciStoryStop[] = [
   },
   {
     id: "cut-kings-castle-up-the-road",
-    order: 17,
+    order: 18,
     kind: "cut",
     built: false,
     quiet: false,
@@ -300,7 +314,7 @@ export const vinciStory: readonly VinciStoryStop[] = [
   },
   {
     id: "grave",
-    order: 18,
+    order: 19,
     kind: "station",
     built: true,
     quiet: false,
