@@ -6,6 +6,7 @@
 import { Group } from 'three/webgpu'
 import { RoomBatch } from './build'
 import { buildBodyWall, buildHang, buildPictureRoomFurniture } from './hang'
+import { CLOSED_BAYS } from './picture-room-plan'
 import { collectionBorrowedLightMaterial, collectionInteriorMaterial, collectionRoomsProvenance } from './materials'
 import {
   COURT, DARK_BAY, FACE, FLOOR, GRAVE_ORIGIN, HANG_DATUM, LINE_FIELD, OPENING, ROOMS, SUPPER_WALL,
@@ -75,10 +76,10 @@ function wallNorthSouth(b: RoomBatch, east: number, inward: 1 | -1, south: numbe
 
 /** A door is a dressed hole: two stone reveals, a head, and a floor band
  * that says the threshold is a threshold. */
-function doorEastWest(b: RoomBatch, north: number, west: number, east: number, head: number): void {
-  for (const at of [west, east]) b.box(at, north, (FLOOR + head) / 2, .26, .46, head - FLOOR, 2)
-  b.box((west + east) / 2, north, head + .13, east - west + .52, .46, .26, 2)
-  b.box((west + east) / 2, north, FLOOR - .006, east - west, .5, .024, 2)
+function doorEastWest(b: RoomBatch, north: number, west: number, east: number, head: number, depth = .46): void {
+  for (const at of [west, east]) b.box(at, north, (FLOOR + head) / 2, .26, depth, head - FLOOR, 2)
+  b.box((west + east) / 2, north, head + .13, east - west + .52, depth, .26, 2)
+  b.box((west + east) / 2, north, FLOOR - .006, east - west, depth + .04, .024, 2)
 }
 
 function doorNorthSouth(b: RoomBatch, east: number, south: number, north: number, head: number): void {
@@ -101,7 +102,8 @@ function lightCove(b: RoomBatch, north: number, west: number, east: number, inwa
   const depth = .62
   b.box((west + east) / 2, north + inward * depth / 2, CEILING - .10, east - west, depth, .06, 4)
   b.box((west + east) / 2, north + inward * depth, CEILING - .28, east - west, .07, .30, 4)
-  b.box((west + east) / 2, north + inward * (depth - .03), CEILING - .40, east - west, .05, .07, 3)
+  // the lip stops a bed short of the cove's ends, so the two end faces never share a plane
+  b.box((west + east) / 2, north + inward * (depth - .03), CEILING - .40, east - west - 2 * BED, .05, .07, 3)
 }
 
 /** The pavilion's outer faces and the level its apron is paved at. They are
@@ -210,7 +212,7 @@ function courtCarriedToTheWalls(b: RoomBatch): void {
     b.box((west + east) / 2, (south + north) / 2, COURT.level - .06 + (PROUD + .06) / 2,
       east - west, north - south, PROUD + .06, 2)
   foot(GALLERY.backKerb - BED, COURT.south, GALLERY.backKerb + DEPTH, GALLERY.north - BED)
-  foot(GALLERY.backKerb + DEPTH, GALLERY.northKerb - DEPTH, GALLERY.returnEast - BED, GALLERY.northKerb + BED)
+  foot(GALLERY.backKerb + DEPTH, GALLERY.northKerb - DEPTH, GALLERY.returnEast - 2 * BED, GALLERY.northKerb + BED)
 }
 
 export function createCollectionRooms(): Group {
@@ -230,8 +232,14 @@ export function createCollectionRooms(): Group {
   b.box((P.west + P.east) / 2, FACE.pictureWallNorth + .09, HANG_DATUM + 1.42, P.east - P.west - .6, .16, .07, 3)
   buildHang(b)
   buildPictureRoomFurniture(b)
-  doorEastWest(b, FACE.pictureWallNorth - .1, OPENING.pictureToHall.east[0] + .1, OPENING.pictureToHall.east[1], -2.5)
-  doorEastWest(b, FACE.pictureWallNorth - .1, OPENING.pictureToGallery.east[0], OPENING.pictureToGallery.east[1] - .1, -2.5)
+  // Each door of the hanging wall is dressed once, through the wall's whole
+  // thickness: a dressing from each room laid one body in the other's planes.
+  const hangingWall = (FACE.pictureWallNorth + FACE.pictureWallSouth) / 2
+  doorEastWest(b, hangingWall, OPENING.pictureToHall.east[0] + .1, OPENING.pictureToHall.east[1], -2.5, .5)
+  doorEastWest(b, hangingWall, OPENING.pictureToGallery.east[0], OPENING.pictureToGallery.east[1] - .1, -2.5, .5)
+  // THE BAYS BEHIND THE GRAVE'S COURT, closed by a wall of the room's own in
+  // front of the court's return. The window's light stays.
+  wallEastWest(b, CLOSED_BAYS.face, -1, P.west + .03, CLOSED_BAYS.east, -1.94, [], SOFFIT)
 
   // THE MECHANISM HALL. Six metres of clear height and a north clerestory,
   // which is the only room in the insertion tall enough for the screw.
@@ -248,7 +256,6 @@ export function createCollectionRooms(): Group {
     b.box((H.west + H.east) / 2, north, hallSoffit(north) - .34, H.east - H.west, .34, .58, 4)
     for (const east of [H.west + 3.4, H.east - 3.4]) b.box(east, north, hallSoffit(north) - .74, .5, .42, .26, 3)
   }
-  doorEastWest(b, FACE.pictureWallSouth + .1, OPENING.pictureToHall.east[0] + .1, OPENING.pictureToHall.east[1], -2.5)
   doorNorthSouth(b, FACE.hallPartitionWest - .1, OPENING.hallToGallery.north[0], OPENING.hallToGallery.north[1] - .1, -2.5)
   doorNorthSouth(b, FACE.hallPartitionWest - .1, OPENING.hallToSouth.north[0] + .1, OPENING.hallToSouth.north[1], -2.5)
   // THE DARK BAY. A camera obscura has nothing to show in a lit room, so the
@@ -261,7 +268,8 @@ export function createCollectionRooms(): Group {
   ]) {
     b.box((west! + east!) / 2, (south! + north!) / 2, FLOOR + DARK_BAY.height / 2,
       east! - west!, north! - south!, DARK_BAY.height, 1)
-    b.box((west! + east!) / 2, (south! + north!) / 2, FLOOR + BASE / 2, east! - west!, north! - south!, BASE, 2)
+    // the base stands a bed proud of its wall, never in the wall's own planes
+    b.box((west! + east!) / 2, (south! + north!) / 2, FLOOR + BASE / 2, east! - west! + 2 * BED, north! - south! + 2 * BED, BASE, 2)
     b.box((west! + east!) / 2, (south! + north!) / 2, FLOOR + DARK_BAY.height + .07,
       east! - west! + .06, north! - south! + .06, .14, 2)
   }
@@ -274,7 +282,6 @@ export function createCollectionRooms(): Group {
   wallEastWest(b, FACE.pictureWallSouth, -1, G.west, G.east, -2.06, [[OPENING.pictureToGallery.east[0], OPENING.pictureToGallery.east[1]]], SOFFIT)
   wallEastWest(b, FACE.southStripNorth, 1, G.west + .1, -22.8, -2.1, [], SOFFIT)
   ceiling(b, G.west, G.south, G.east, G.north)
-  doorEastWest(b, FACE.pictureWallSouth + .1, OPENING.pictureToGallery.east[0], OPENING.pictureToGallery.east[1] - .1, -2.5)
   // The gallery's east end is the glazed elevation: its sill and reveal are
   // dressed so the room ends in a window and not in an edge.
   b.box(FACE.glazingEast + .13, (G.south + G.north) / 2, FLOOR + .21, .26, G.north - G.south, .42, 2)
@@ -325,11 +332,22 @@ export function createCollectionRooms(): Group {
   // the way a visitor arrives, carrying a measured absence of 880 by 460 cm
   // and nothing else. Its field is recessed, so its edge is a shadow.
   const S = SUPPER_WALL, base = COURT.level
-  b.box(S.east, S.north, base + S.height / 2, S.thickness, S.length, S.height, 1)
+  const fieldBase = base + S.field.sill, fieldFace = S.east + S.thickness / 2, fieldTop = fieldBase + S.field.height
+  const wallSouth = S.north - S.length / 2, wallNorth = S.north + S.length / 2
+  const fieldSouth = S.north - S.field.width / 2, fieldNorth = S.north + S.field.width / 2, back = S.east - S.thickness / 2
+  // The wall stands round its field, and behind the field it stops at the
+  // plaster's back: one wall face and one field face in one plane read as a
+  // shimmer across the whole painting's measure.
+  const wallPiece = (south: number, north: number, low: number, high: number): void =>
+    b.box(S.east, (south + north) / 2, (low + high) / 2, S.thickness, north - south, high - low, 1)
+  wallPiece(wallSouth, wallNorth, base, fieldBase)
+  wallPiece(wallSouth, wallNorth, fieldTop, base + S.height)
+  wallPiece(wallSouth, fieldSouth, fieldBase, fieldTop)
+  wallPiece(fieldNorth, wallNorth, fieldBase, fieldTop)
+  b.box((back + fieldFace - .06) / 2, S.north, (fieldBase + fieldTop) / 2, fieldFace - .06 - back, S.field.width, S.field.height, 1)
   b.box(S.east, S.north, base + S.height + .08, S.thickness + .18, S.length + .18, .16, 2)
   b.box(S.east, S.north, base + .11, S.thickness + .14, S.length + .14, .22, 2)
   for (const side of [-1, 1]) b.box(S.east - S.thickness / 2 - .45, S.north + side * (S.length / 2 - .42), base + S.height / 2 - .25, .9, .84, S.height - .5, 1)
-  const fieldBase = base + S.field.sill, fieldFace = S.east + S.thickness / 2
   // The field is the painting's own measurement. A stone band stands proud
   // around it and the plaster inside steps back, so at any distance the
   // rectangle is an edge with a shadow in it and not a change of tone.
@@ -337,10 +355,6 @@ export function createCollectionRooms(): Group {
   for (const side of [-1, 1]) {
     b.box(fieldFace + .06, S.north + side * (S.field.width / 2 + .11), fieldBase + S.field.height / 2, .12, .22, S.field.height + .44, 2)
     b.box(fieldFace + .06, S.north, fieldBase + (side > 0 ? S.field.height + .11 : -.11), .12, S.field.width + .44, .22, 2)
-    b.quad([fieldFace, S.north + side * S.field.width / 2, fieldBase], [fieldFace - .06, S.north + side * S.field.width / 2, fieldBase],
-      [fieldFace - .06, S.north + side * S.field.width / 2, fieldBase + S.field.height], [fieldFace, S.north + side * S.field.width / 2, fieldBase + S.field.height], 2, [side, 0, 0])
-    b.quad([fieldFace, S.north - S.field.width / 2, fieldBase + (side > 0 ? S.field.height : 0)], [fieldFace, S.north + S.field.width / 2, fieldBase + (side > 0 ? S.field.height : 0)],
-      [fieldFace - .06, S.north + S.field.width / 2, fieldBase + (side > 0 ? S.field.height : 0)], [fieldFace - .06, S.north - S.field.width / 2, fieldBase + (side > 0 ? S.field.height : 0)], 2, [0, 0, side])
   }
   // A stone sill at the foot of the field, at the distance a visitor stops.
   b.box(fieldFace + .42, S.north, base + .22, .84, S.field.width, .44, 2)

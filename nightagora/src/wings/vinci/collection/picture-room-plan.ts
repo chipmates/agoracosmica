@@ -348,6 +348,27 @@ export const WINDOW = {
   north: FACE.glazingNorth - .02, west: R.west, east: FACE.glazingEast,
   bottom: FLOOR + .1, top: ROOM.soffit,
 } as const
+/** THE GLAZING'S CLOSED BAYS. The grave court's south return stands inside
+ * the glazing's line: its outer face, the mirror of the gallery's north face
+ * (-15.85) about the grave's axis (-25), is at -34.15, and from the west wall
+ * to this mullion it was all the glass showed, a dark wall in a daylit room.
+ * The construction closes these bays with a wall of its own, laid clear of
+ * every face of that return, and this finish stands over it. */
+export const CLOSED_BAYS = (() => {
+  const face = -34.15 - .045
+  return {
+    /** the construction's own wall line, as `wallEastWest` takes it */
+    face,
+    east: -40,
+    finish: face - .033 - .013,
+    backing: face - .033 - .006,
+    /** the bounce that lights them: its distance off their face, the part of
+     * the wall it stands over (clear of the floor, the soffit and both end
+     * walls, so none takes an edge where its plane meets them) and its level */
+    bounceFrom: 3.2, bounceLow: FLOOR + .6, bounceHigh: FLOOR + 3, bounceWest: ROOM.westFinish + 1.2, bounceEast: -41, bounce: 1.3,
+  } as const
+})()
+
 /** THE NORTH SKY over the floor: the glazing's daylight as one parallel
  * source a little over the horizon, so the benches stand on their shadows. */
 const SKY = { elevation: 38, fromEast: 8, on: [-42, -38.6] as [number, number], distance: 40 } as const
@@ -382,6 +403,14 @@ export const ROOM_LIGHTS: readonly RoomLight[] = [
     aim: [(door.west + door.east) / 2, FACE.pictureWallNorth + 2.6, FLOOR],
     intensity: 5.5, angle: 1.2, penumbra: .95,
   })),
+  // the closed bays no longer face the window, so their plaster takes the
+  // room's bounce: one soft source over the aisle, turned onto them
+  {
+    name: 'closed-bays', kind: 'area', receivers: 'room', colour: DAYLIGHT_COLOUR,
+    at: [(CLOSED_BAYS.bounceWest + CLOSED_BAYS.bounceEast) / 2, CLOSED_BAYS.finish - CLOSED_BAYS.bounceFrom, (CLOSED_BAYS.bounceLow + CLOSED_BAYS.bounceHigh) / 2],
+    aim: [(CLOSED_BAYS.bounceWest + CLOSED_BAYS.bounceEast) / 2, CLOSED_BAYS.finish + 10, (CLOSED_BAYS.bounceLow + CLOSED_BAYS.bounceHigh) / 2],
+    width: CLOSED_BAYS.bounceEast - CLOSED_BAYS.bounceWest, height: CLOSED_BAYS.bounceHigh - CLOSED_BAYS.bounceLow, intensity: CLOSED_BAYS.bounce,
+  },
 ]
 
 /** Where the room's bounce is taken: the room's middle at eye height. */
@@ -637,7 +666,15 @@ export function wallSkins(): { plaster: Skin; frieze: Skin; backing: Skin; linin
   plaster.eastWest(X.finish, 1, wallWest, wallEast, low, X.friezeFoot + .004)
   backing.eastWest(X.backing, 1, wallWest, wallEast, FLOOR, gapTop)
   // the frieze: its soffit over the rail and its face up into the bulkhead
-  frieze.level({ west: X.west, south: X.finish - .004, east: X.east, north: X.frieze }, X.friezeFoot, -1)
+  // over each door the head's oak board is the soffit, in the frieze's own
+  // plane: the plaster stops there, or oak and plaster fight in one plane
+  const headSkin = .005, headFace = REVEAL.front + headSkin - .001
+  const heads = [DOORS.hall, DOORS.gallery].map(door => [
+    door.reveals[0] + REVEAL.half + (door.dressedJambs[0] ? headSkin : 0),
+    door.reveals[1] - REVEAL.half - (door.dressedJambs[1] ? headSkin : 0)] as const)
+  for (const [west, east] of runs(X.west, X.east, heads))
+    frieze.level({ west, south: X.finish - .004, east, north: headFace }, X.friezeFoot, -1)
+  frieze.level({ west: X.west, south: headFace, east: X.east, north: X.frieze }, X.friezeFoot, -1)
   frieze.eastWest(X.frieze, 1, X.west, X.east, X.friezeFoot, X.bulkheadFoot + .004)
   // the west wall, from the hanging wall's door to the glazing
   const westReveal = doorHall[0] - REVEAL.half
@@ -669,6 +706,12 @@ export function wallSkins(): { plaster: Skin; frieze: Skin; backing: Skin; linin
     if (jambEast) lining.box([innerEast, back, FLOOR + .004, innerEast + skin - .0005, face, X.friezeFoot])
     lining.box([innerWest, back, X.friezeFoot, innerEast, face, X.friezeFoot + skin], true)
   }
+  // the glazing's closed bays, the same distance over their own lining, and
+  // the lining's end at the mullion it stops on
+  const closed = CLOSED_BAYS
+  plaster.eastWest(closed.finish, -1, X.westFinish, closed.east, low, X.soffit - .001)
+  backing.eastWest(closed.backing, -1, X.westFinish, closed.east, FLOOR, gapTop)
+  plaster.northSouth(closed.east + .013, 1, closed.finish, FACE.glazingNorth + .02, low, X.soffit - .001)
   return { plaster, frieze, backing, lining }
 }
 
