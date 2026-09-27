@@ -1,10 +1,10 @@
 /** THE ORDER THE WING IS WALKED IN.
  *
- * Two orders stand here. The one the rooms were built in, which is the order
- * `content.ts` declares its stations in, and the LIFE, from the birth to the
- * grave, which is the order `story.ts` carries in its `order` field. The life
- * is asked for by the address (`?order=life`) and is off everywhere else, so
- * the wing walks, numbers and opens exactly as before until it is asked for.
+ * Two orders stand here. The LIFE, from the birth to the grave, which is the
+ * order `story.ts` carries in its `order` field and the order the film is
+ * rendered in, is the walk; the one the rooms were built in, the order
+ * `content.ts` declares its stations in, is asked for by the address
+ * (`?order=room`). A visitor walks what the film shows.
  *
  * A STOP OF THE WALK IS NOT ALWAYS A STATION. The life stands once at a place
  * that is a stop of a certified wall and not a station of its own: the eye is
@@ -25,12 +25,14 @@ import { hangPlacements } from './collection/hang'
 import { VINCI_PICTURE_WALL } from './collection/wall'
 import { world } from './site'
 import { gaitPace } from './gait'
+import { VINCI_HOUSE_DOOR, VINCI_VALVE, vinciWalkPoseOf, type VinciWalkPoseId } from './walk-poses'
 
-/** The address that asks for the life's order, and the value it takes. */
-export const VINCI_ORDER_PARAM = 'order', VINCI_LIFE_ORDER = 'life'
+/** The address that names an order, and the values it takes. */
+export const VINCI_ORDER_PARAM = 'order', VINCI_LIFE_ORDER = 'life', VINCI_ROOM_ORDER = 'room'
 
+/** The life's order unless the address asks for the rooms'. */
 export function vinciLifeOrderAsked(): boolean {
-  try { return new URLSearchParams(location.search).get(VINCI_ORDER_PARAM) === VINCI_LIFE_ORDER } catch { return false }
+  try { return new URLSearchParams(location.search).get(VINCI_ORDER_PARAM) !== VINCI_ROOM_ORDER } catch { return true }
 }
 
 export interface VinciWalkStop {
@@ -44,6 +46,10 @@ export interface VinciWalkStop {
   /** The certified wall a stop stands on, and which of its stops it is. */
   wall?: string
   exhibit?: string
+  /** A stop that stands at a pose of its own (`walk-poses.ts`), walked to and
+   * from as a station is, and the exhibit that opens where it stands. */
+  place?: VinciWalkPoseId
+  opens?: string
 }
 
 export interface VinciWalkCut {
@@ -71,9 +77,18 @@ const lisaName = (): VinciText => {
 
 const built = new Set(vinciContent.map(station => station.id as string))
 
+/** THE HEART VALVE, a stop of its own after the body wall's grid, in both
+ * orders: the one button that goes on reads the sheets first and then the
+ * valve. The sheet it stands at keeps its own title in the row. */
+const VALVE_STOP: VinciWalkStop = { id: VINCI_VALVE.place, station: VINCI_VALVE.station, name: VINCI_VALVE.name, place: VINCI_VALVE.place, opens: VINCI_VALVE.exhibit }
+const withValve = (stops: VinciWalkStop[]): VinciWalkStop[] => {
+  const at = stops.findIndex(stop => stop.id === VINCI_VALVE.station)
+  return at < 0 ? stops : [...stops.slice(0, at + 1), VALVE_STOP, ...stops.slice(at + 1)]
+}
+
 /** The order the rooms were built in, one stop per station. */
 const roomOrder = (): VinciWalkStop[] =>
-  vinciContent.map(station => ({ id: station.id, station: station.id }))
+  withValve(vinciContent.map(station => ({ id: station.id, station: station.id })))
 
 /** The life's own order, from the story layer. A story stop the wing does not
  * build is left out rather than breaking the walk: the story is re-imported
@@ -93,7 +108,7 @@ function lifeOrder(): VinciWalk {
     waiting = null
     stops.push(here)
   }
-  return { stops, cuts }
+  return { stops: withValve(stops), cuts }
 }
 
 export function vinciWalk(life: boolean): VinciWalk {
@@ -135,7 +150,20 @@ export function vinciLisaPose(narrow: boolean): Pose {
 
 /** The pose a stop of the walk stands at. */
 export function vinciWalkPose(stop: VinciWalkStop, narrow: boolean): Pose {
+  if (stop.place) return vinciWalkPoseOf(stop.place, narrow)
   return stop.id === LISA_STOP ? vinciLisaPose(narrow) : stationPose(stop.station, narrow)
+}
+
+/** THE DOOR A WALK BETWEEN TWO STATIONS CROSSES, if it crosses one: into the
+ * hall from anywhere else, or out of it to anywhere else. A walk in goes to
+ * the door's inward pose and dips into the room; a walk out dips to the
+ * outward pose and walks on from there. */
+export function vinciDoorBetween(from: VinciStationId | string | undefined, to: VinciStationId | string):
+  { door: typeof VINCI_HOUSE_DOOR; way: 'in' | 'out' } | undefined {
+  const room = VINCI_HOUSE_DOOR.station
+  if (to === room && from !== room) return { door: VINCI_HOUSE_DOOR, way: 'in' }
+  if (from === room && to !== room) return { door: VINCI_HOUSE_DOOR, way: 'out' }
+  return undefined
 }
 
 /** HOW LONG A CHAPTER'S TITLE STANDS, when it is not waiting for a press.

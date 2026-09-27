@@ -34,14 +34,42 @@ export interface Stand {
 /** THE MACHINES ACROSS THE MUSEUM.
  *
  * The court takes what wants the sky: the parachute behind the display wall,
- * the crane that was built outdoors, and the two weather instruments on one
- * plinth. The hall keeps the workshop, one aisle wide, with the camera
- * obscura in the dark bay its image needs and the gun apart at the far end.
+ * the crane that was built outdoors, and the anemometer, which reads the
+ * wind. The hall keeps the workshop, one aisle wide, with the camera obscura
+ * in the dark bay its image needs and the gun apart at the far end.
  *
- * ONE MACHINE OF THE CATALOGUE HAS NO STAND: the proportional compass stands
- * on the hall's own ledge, which the house builds, so it is not stood on a
- * plinth of the exhibition's furniture as well.
+ * TWO MACHINES OF THE CATALOGUE HAVE NO STAND: the inclinometer and the
+ * proportional compass stand on the house's great hall table
+ * (`HALL_TABLE_PIECES`), which the house builds (`hall-table-pieces.ts`),
+ * not on a plinth of the exhibition's.
  */
+/** THE GREAT HALL'S TABLE, where the house's furniture dossier places it:
+ * its middle, the hall's raised floor and the table's top over it, the unit
+ * along its length (negative toward the sunlit south end) and across it
+ * toward the door, and the bearing that turns a machine's front to the door. */
+export const HALL_TABLE = {
+  east: -9.0563, north: -12.6777, floor: .8, top: .78,
+  along: [-.54464, .83866] as const, across: [.83866, .54464] as const, facing: 123,
+}
+/** A place on the table, metres along its length from its middle and across
+ * it toward the door. */
+export function onHallTable(along: number, across = 0): { east: number; north: number } {
+  return { east: HALL_TABLE.east + HALL_TABLE.along[0] * along + HALL_TABLE.across[0] * across,
+    north: HALL_TABLE.north + HALL_TABLE.along[1] * along + HALL_TABLE.across[1] * across }
+}
+
+/** THE TABLE'S TWO PIECES, in the order a visitor steps along them from the
+ * door: the inclinometer on the table's sunlit end, 5 cm in from its edge,
+ * the compass beside it, short of the candlesticks. Both turn their fronts to
+ * the door. */
+export const HALL_TABLE_PIECES = {
+  'inclinometer': { ...onHallTable(-1.3), bearing: HALL_TABLE.facing },
+  'proportional-compass': { ...onHallTable(-.7), bearing: HALL_TABLE.facing },
+} as const satisfies Partial<Record<MachineSlug, { east: number; north: number; bearing: number }>>
+export type HallTablePiece = keyof typeof HALL_TABLE_PIECES
+export const HALL_TABLE_PIECE_SLUGS = Object.keys(HALL_TABLE_PIECES) as HallTablePiece[]
+export const isHallTablePiece = (slug: string): slug is HallTablePiece => slug in HALL_TABLE_PIECES
+
 export const STANDS: Partial<Record<MachineSlug, Stand>> = {
   // THE COURT. The parachute is 10.34 m tall and the tallest room in the
   // insertion is 6.61 m, so it stands outside on its own four uprights. It
@@ -50,10 +78,9 @@ export const STANDS: Partial<Record<MachineSlug, Stand>> = {
   'parachute': { east: -37, north: -23.1, bearing: 0, plinth: 0, ground: 'court' },
   // A revolving crane was built outdoors and stands on its own base frame.
   'revolving-crane': { east: -44.9, north: -22.5, bearing: 0, plinth: 0, ground: 'court' },
-  // The two weather instruments read the weather, so they read it outdoors,
-  // side by side on one plinth under the open sky.
-  'anemometer': { east: -42.65, north: -22.4, bearing: 8, plinth: .72, ground: 'court', plinthGroup: 'weather' },
-  'inclinometer': { east: -41.9, north: -22.4, bearing: -6, plinth: .72, ground: 'court', plinthGroup: 'weather' },
+  // The anemometer reads the wind, so it reads it outdoors, alone on its
+  // plinth under the open sky, where the two weather instruments stood.
+  'anemometer': { east: -42.28, north: -22.4, bearing: 8, plinth: .72, ground: 'court' },
   // THE WORKSHOP HALL, north-west of its one aisle. The screw needs six
   // metres of clear height and eight of floor, and this is the only room in
   // the museum with both, which is what the hall's section was cut for.

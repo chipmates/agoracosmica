@@ -17,10 +17,9 @@ import { GRAVE_DEATHBED, GRAVE_FRAME, GRAVE_SLAB } from '../grave/placement'
 import { LINE_STUDS } from '../line/studs'
 import { hangPlacements } from './hang'
 import { COURT, FLOOR, GRAVE_ORIGIN, SUPPER_WALL, VINCI_READING_TABLE } from './layout'
-import { STANDS, standOf, standLevel } from './stands'
+import { HALL_TABLE, HALL_TABLE_PIECES, HALL_TABLE_PIECE_SLUGS, STANDS, isHallTablePiece, standOf, standLevel, type HallTablePiece } from './stands'
 import { dossiers, MACHINE_SLUGS, type MachineSlug } from '../machines/catalog'
 import { bodyWallOrder } from './wall'
-import { hallLedge } from '../entry-passage'
 import { studySupport } from '../inner-court'
 
 export interface ApproachPose { eye: Vector3; at: Vector3; fov: number }
@@ -242,13 +241,12 @@ const DIAGRAM: Field = (() => {
 /** Where each object's eye stands, in east, north: every one is a short
  * straight leg from its own station eye that passes no plinth, no upright and
  * no furniture, and every eye stands clear of its object's swept envelope. */
-const MACHINE_EYES: Record<Exclude<MachineSlug, 'proportional-compass'>, { station: VinciStationId; east: number; north: number }> = {
+const MACHINE_EYES: Record<Exclude<MachineSlug, HallTablePiece>, { station: VinciStationId; east: number; north: number }> = {
   // The court, from the display wall's eye: every leg passes south of the
   // plaque and of the parachute's south-west upright.
   'parachute': { station: 'supper-wall', east: -36.2, north: -28.3 },
   'revolving-crane': { station: 'supper-wall', east: -44.0, north: -26.3 },
   'anemometer': { station: 'supper-wall', east: -42.4, north: -26.9 },
-  'inclinometer': { station: 'supper-wall', east: -42.4, north: -26.9 },
   // The hall's west half, from the screw's own station.
   'aerial-screw': { station: 'flight', east: -50.8, north: -48.4 },
   'miter-lock-gates': { station: 'flight', east: -51.2, north: -52.0 },
@@ -273,8 +271,23 @@ function machinePose(slug: keyof typeof MACHINE_EYES, narrow: boolean): Approach
   // up at a nine metre screw from the aisle.
   const aim = level + stand.plinth + Math.min(y / 2, 2.2)
   const reach = Math.hypot(eye.east - stand.east, eye.north - stand.north)
-  const fov = Math.max(35, Math.min(75, 2 * Math.atan(1.2 * Math.max(y, x, z) / 2 / reach) * 180 / Math.PI))
-  return pose([eye.east, eye.north, level + 1.62], [stand.east, stand.north, aim], fov, narrow)
+  return pose([eye.east, eye.north, level + 1.62], [stand.east, stand.north, aim], readingLens(Math.max(y, x, z), reach), narrow)
+}
+/** The lens a body of this size fills at this reach, a fifth to spare. */
+const readingLens = (size: number, reach: number): number =>
+  Math.max(35, Math.min(75, 2 * Math.atan(1.2 * size / 2 / reach) * 180 / Math.PI))
+
+/** THE HALL TABLE'S PIECES ARE READ SQUARE ON, each from the same distance
+ * in front of its own face: the walk in from the door's eye runs down the
+ * inclinometer's own axis, and the step from one piece to the other is a
+ * step sideways along the table. */
+const TABLE_READING_M = 1.85
+function tablePiecePose(slug: HallTablePiece, narrow: boolean): ApproachPose {
+  const place = HALL_TABLE_PIECES[slug], { x, y, z } = dossiers[slug].scale_m
+  const eye = [place.east + HALL_TABLE.across[0] * TABLE_READING_M, place.north + HALL_TABLE.across[1] * TABLE_READING_M] as const
+  const top = HALL_TABLE.floor + HALL_TABLE.top
+  return pose([eye[0], eye[1], HALL_TABLE.floor + 1.62], [place.east, place.north, top + y / 2],
+    readingLens(Math.max(y, x, z), TABLE_READING_M), narrow)
 }
 
 /** The one station the gallery's cut line is read from. */
@@ -289,15 +302,6 @@ const SHEET_NEAREST_M = 1.1, SHEET_STEP_BACK = .8
  * room's plan reads it without importing this module back. */
 export { VINCI_READING_TABLE }
 const READING_TABLE = VINCI_READING_TABLE
-/** The supplied entry floor of the house, which the hall's ledge stands on. */
-const FLOOR_HOUSE=.8
-/** WHERE THE LEDGE IS READ FROM: on the axis of the passage's side door and
- * the hall's own door, a metre and a quarter in from the partition the shelf
- * is fixed to, so the leg out from the hall's eye runs straight down that axis
- * through both doors. The shelf stands a stride and two thirds off it. */
-export const HALL_LEDGE_EYE={east:.2062,north:-8.2126,height:FLOOR_HOUSE+1.65} as const
-/** Half the compass's own height, where the eye is aimed. */
-const COMPASS_MIDDLE_M=.335
 
 /** The flight plaque's stone, and the standing distance its lines read at. */
 export const VINCI_PLAQUE_AT = { east: -40.2, north: -25.5 }
@@ -332,15 +336,9 @@ function otherKinds(): Placed[] {
     add(`sheet/${mount.id}`, 'sheet', BODY_STATION, narrow => eastFacingApproach(field, narrow))
   }
   for (const slug of MACHINE_SLUGS) {
-    if (slug === 'proportional-compass') continue
-    add(`machine/${slug}`, 'machine', MACHINE_EYES[slug].station, narrow => machinePose(slug, narrow))
+    if (isHallTablePiece(slug)) add(`machine/${slug}`, 'machine', 'hall', narrow => tablePiecePose(slug, narrow))
+    else add(`machine/${slug}`, 'machine', MACHINE_EYES[slug].station, narrow => machinePose(slug, narrow))
   }
-  // THE HOUSE'S ONE PIECE OF THE COLLECTION, on the hall's own ledge. The leg
-  // to it runs back from the hall's door along the axis of the three doors,
-  // whose 0.50 m of clear line carries its 0.36 m of envelope.
-  add('machine/proportional-compass', 'machine', 'hall', narrow =>
-    pose([HALL_LEDGE_EYE.east, HALL_LEDGE_EYE.north, HALL_LEDGE_EYE.height],
-      [hallLedge.stand.east, hallLedge.stand.north, hallLedge.top + COMPASS_MIDDLE_M], 44, narrow))
   // THE STUDY'S PAGE, on its support below the window the visit was written
   // under. The eye stands a stride off the board, on the line in from the
   // station's own eye, and the reading itself opens in the reader.
@@ -429,16 +427,17 @@ export function vinciApproachReachMetres(): number {
  * the objects and never their product. The hang and the body wall have their
  * own polylines and are not here.
  */
-const RUN_STATIONS: readonly VinciStationId[] = ['flight', 'works', 'supper-wall']
+const RUN_STATIONS: readonly VinciStationId[] = ['flight', 'works', 'supper-wall', 'hall']
 /** A station's own objects in the order its row stands them, which is the
  * order a hand and a keyboard step through: the measurement first where the
  * room carries one, then the machines in the order the rooms stand them, then
  * the plaque. */
 function runOf(station: VinciStationId): string[] {
+  if (station === 'hall') return HALL_TABLE_PIECE_SLUGS.map(slug => `machine/${slug}`)
   return [
     ...(station === 'supper-wall' ? [MURAL_ID] : []),
     ...(Object.keys(STANDS) as MachineSlug[])
-      .filter(slug => slug !== 'proportional-compass' && MACHINE_EYES[slug as keyof typeof MACHINE_EYES].station === station)
+      .filter(slug => !isHallTablePiece(slug) && MACHINE_EYES[slug as keyof typeof MACHINE_EYES].station === station)
       .map(slug => `machine/${slug}`),
     ...(station === 'supper-wall' ? ['plaque/flight-quote'] : []),
   ]
@@ -447,15 +446,14 @@ export const VINCI_APPROACH_RUNS: readonly { station: VinciStationId; exhibits: 
   RUN_STATIONS.map(station => ({ station, exhibits: runOf(station) }))
 
 /** A PAIR THE GROUND REFUSES. The parachute's south-west upright stands on
- * the line between the two weather instruments' eye and the plaque's, and no
- * walking envelope clears it: those two keep the room's own chain through the
+ * the line between the anemometer's eye and the plaque's, and no walking
+ * envelope clears it: those two keep the room's own chain through the
  * station. */
-const THE_GROUND_REFUSES = new Set(['machine/inclinometer|plaque/flight-quote'])
+const THE_GROUND_REFUSES = new Set(['machine/anemometer|plaque/flight-quote'])
 
 /** The neighbouring pairs of one run, in walking order. TWO OBJECTS READ FROM
- * ONE PLACE ARE NOT A LEG: the two weather instruments stand side by side on
- * one plinth and share a viewing eye, so a walk between them has no length to
- * certify and that pair keeps the room's own chain. */
+ * ONE PLACE ARE NOT A LEG: a walk between two that share a viewing eye has no
+ * length to certify, and that pair keeps the room's own chain. */
 export function vinciApproachRunPairs(): readonly { station: VinciStationId; from: string; to: string }[] {
   const pairs: { station: VinciStationId; from: string; to: string }[] = []
   for (const run of VINCI_APPROACH_RUNS) {

@@ -46,13 +46,14 @@ import { createRoadDressing, roadDressingProvenance } from './road-dressing'
 import { createCourtObjects, createInnerCourtDressing, courtObjectsProvenance, innerCourtProvenance, courtDressingProvenance } from './inner-court'
 import { createGatePassage, gatePassageProvenance } from './gate-passage'
 import { createStudySheet, type StudySheet } from './study-sheet'
-import { createEntryPassage, createLedgeMount, entryPassageProvenance, hallLedge, hallLedgeProvenance, LEDGE_FINISH_PROUD_M } from './entry-passage'
-import { mountBoxes } from './machines/bench/mounts'
+import { createEntryPassage, entryPassageProvenance, hallLedgeProvenance } from './entry-passage'
+import { createHallTablePieces } from './hall-table-pieces'
 import { createGround } from './ground'
 import { planVegetation, VEGETATION_STEPS } from './vegetation'
 import { windClock } from './wind'
 import { createRail, stationPose, namedPose, vinciStandsInRoom } from './rail'
-import { vinciWalk, vinciLifeOrderAsked, vinciWalkPose, vinciReadingSeconds, type VinciWalkCut, type VinciWalkStop } from './walk'
+import { vinciWalk, vinciLifeOrderAsked, vinciWalkPose, vinciReadingSeconds, vinciDoorBetween, type VinciWalkCut, type VinciWalkStop } from './walk'
+import { isVinciWalkPose, VINCI_HOUSE_DOOR, VINCI_VALVE, vinciRailPlace, vinciWalkPoseOf, type VinciWalkPoseId } from './walk-poses'
 import { collectRailSolids, createRailGeometryAuthority } from './rail-proof'
 import { bindRailPointer, createWheelStepper } from './input'
 import { dossier, world, type Quantity } from './site'
@@ -86,9 +87,9 @@ import { loadManifest, type ManifestIndex } from '../../manifest'
 import { createPlatePayload } from '../vitrine/picture'
 import { createVinciWholePlate, isWholePlate, vinciPlateDescription } from './collection/deep-plate'
 import type { VitrineRect } from '../vitrine'
-import { buildMachine, machineBuildOf, machinesStanding, onMachineStanding } from './machines'
+import { machineBuildOf, machinesStanding, onMachineStanding } from './machines'
 import { createVinciHangStrip, vinciSheetTitle, type VinciStripEntry } from './collection/strip'
-import { vinciWallById, vinciWallEndVertex, vinciWallIsEnd, vinciWallOrderOf, VINCI_PICTURE_WALL, vinciWallNearerEnd, vinciWallOfExhibit, vinciWallOfStation, vinciWallStops, vinciWallVertex, VINCI_WALL_ENDS, type VinciWall } from './collection/wall'
+import { vinciWallById, vinciWallEndVertex, vinciWallIsEnd, vinciWallOrderOf, VINCI_PICTURE_WALL, VINCI_BODY_WALL, vinciWallNearerEnd, vinciWallOfExhibit, vinciWallOfStation, vinciWallStops, vinciWallVertex, VINCI_WALL_ENDS, type VinciWall } from './collection/wall'
 import { pathSpecifications } from './paths'
 import { roadGradeProvenance } from './road-grade'
 import { apronProvenance } from './apron'
@@ -231,15 +232,48 @@ export function createWing():VinciWingModule {
   const hereContent=():VinciStationContent=>contentAt(card)
   /** Where a stop of the walk stands on its wall, for the run that reaches it. */
   const walkVertex=(stop:VinciWalkStop):number|undefined=>{
+    // an uncertified place stands at the vertex of the work it opens
+    if(stop.place&&stop.opens&&!placeProved(stop)){const wall=vinciWallOfExhibit(stop.opens);return wall?vinciWallVertex(wall,stop.opens):undefined}
     const wall=stop.wall?vinciWallById(stop.wall):undefined
     return wall&&stop.exhibit?vinciWallVertex(wall,stop.exhibit):undefined
   }
   /** THE STOP OF THE WALK THE EYE IS AT. Two stops may stand in one station's
    * room, so the vertex of the wall decides between them where there is one. */
   function walkIndexAt(id:string,vertex?:number):number {
-    const here=WALK.stops.findIndex(stop=>stop.station===id&&walkVertex(stop)===vertex)
-    return here>=0?here:WALK.stops.findIndex(stop=>stop.station===id&&stop.exhibit===undefined)
+    const placed=WALK.stops.findIndex(stop=>stop.place===id||(stop.place&&!placeProved(stop)&&stop.station===id&&vertex!==undefined&&walkVertex(stop)===vertex))
+    if(placed>=0)return placed
+    const here=WALK.stops.findIndex(stop=>!stop.place&&stop.station===id&&walkVertex(stop)===vertex)
+    return here>=0?here:WALK.stops.findIndex(stop=>!stop.place&&stop.station===id&&stop.exhibit===undefined)
   }
+  /** THE EXHIBIT THE EYE STANDS AT: a stop at a place of its own stands at
+   * one sheet's viewing eye, so that sheet opens where the visitor stands. */
+  function opensHere(id:string):boolean {
+    const stop=WALK.stops[card], nav=standing?rail.navigation:undefined
+    return Boolean(stop?.opens===id&&stop.place&&nav&&!nav.active&&nav.completed===railPlaceOf(stop)&&(placeProved(stop)||nav.wall===walkVertex(stop)))
+  }
+  /** A sheet of the body wall with no stop of its own: read in the reader
+   * where the visitor stands, never run to along the grid. */
+  const readWhole=(id:string):boolean=>vinciWallOfExhibit(id)?.id===VINCI_BODY_WALL&&!WALK.stops.some(stop=>Boolean(stop.place)&&stop.opens===id)
+  /** WHETHER THE CERTIFICATE CARRIES A PLACE OF THE WALK, probed once as a
+   * walk from a station beside it. A certificate written before the place
+   * stood holds no walk to it: a stop there is then stood at its station's
+   * own vertex of the wall, by a cut. */
+  const placesProved=new Map<VinciWalkPoseId,boolean>()
+  function placeCertified(place:VinciWalkPoseId,from:VinciStationId=VINCI_VALVE.station):boolean {
+    const held=placesProved.get(place)
+    if(held!==undefined)return held
+    if(!authority||authority.status!=='verified'||!hosts)return false
+    const probe=hosts.world.camera.clone(), a=stationPose(from,narrow()), b=vinciWalkPoseOf(place,narrow())
+    probe.position.copy(a.eye);probe.updateMatrixWorld()
+    let proved=true
+    try{authority.route(a,b,narrow(),probe)}catch{proved=false}
+    placesProved.set(place,proved)
+    return proved
+  }
+  /** A stop at a place of its own that the certificate carries. */
+  const placeProved=(stop:VinciWalkStop):boolean=>Boolean(stop.place&&placeCertified(stop.place))
+  /** The id the rail stands a stop at: its station's, or its own place's. */
+  const railPlaceOf=(stop:VinciWalkStop):VinciStationId=>placeProved(stop)?vinciRailPlace(stop.place!):stationOf(stop.station).id
   /** The chapter boundary between two stops, which is crossed and never walked. */
   const walkCut=(from:number,to:number):VinciWalkCut|undefined=>
     WALK.cuts.find(cut=>cut.from===stopAt(from).id&&cut.to===stopAt(to).id)
@@ -255,7 +289,7 @@ export function createWing():VinciWingModule {
    * stands. Only the life's order walks a wall between its stations: in the
    * order the rooms were built the two ends are joined by their own route. */
   function walkRunVertex(stop:VinciWalkStop):number|undefined {
-    if(!LIFE||!standing)return undefined
+    if(!LIFE||!standing||stop.place)return undefined
     const nav=rail.navigation, wall=nav.wallId?vinciWallById(nav.wallId):undefined
     if(!wall||nav.wall===undefined)return undefined
     const target=stop.wall===wall.id?walkVertex(stop)
@@ -314,7 +348,7 @@ export function createWing():VinciWingModule {
     void cutCard.offsetWidth
     cutCard.dataset['on']='1'
     const land=():void=>{
-      rail.set(s.id,vinciWalkPose(stop,narrow()),true,narrow(),walkVertex(stop))
+      rail.set(railPlaceOf(stop),vinciWalkPose(stop,narrow()),true,narrow(),walkVertex(stop))
       card=station=to;dock.scrollTop=0;aimPrint(s.id);exposureAt=s.id
       paintHeader();paintHeaderVisibility();paintDock();paintQuestion();standHere()
       cutPress=()=>moveOn()
@@ -331,6 +365,105 @@ export function createWing():VinciWingModule {
       cutTimers.push(setTimeout(()=>{if(cutCard){cutCard.hidden=true;cutCard.textContent=''}},dip))
     }
     if(dip)cutTimers.push(setTimeout(land,dip)); else land()
+  }
+  /** THE QUIET DIP: the chapter card's dark with no words on it and the
+   * shortest stand, for the house's door. `land` stands the next place while
+   * the picture is dark; `rise` runs as it comes up again. */
+  const QUIET_HOLD_MS=150
+  function quietDip(land:()=>void,rise?:()=>void):void {
+    if(!hosts)return
+    endChapterCard()
+    const still=matchMedia('(prefers-reduced-motion: reduce)').matches
+    const dip=still?0:CUT_DIP_SECONDS*1000
+    cutCard??=make('div','vinci-cut')
+    cutCard.setAttribute('role','status')
+    cutCard.textContent=''
+    cutCard.hidden=false
+    const wingEl=hosts.stage.parentElement
+    if(wingEl&&barEl&&barEl.parentElement===wingEl)wingEl.insertBefore(cutCard,barEl)
+    else wingEl?.append(cutCard)
+    const wing=wingElement()
+    if(wing)wing.dataset['cut']=''
+    void cutCard.offsetWidth
+    cutCard.dataset['on']='1'
+    const up=():void=>{
+      if(cutCard)delete cutCard.dataset['on']
+      const wing=wingElement()
+      if(wing)delete wing.dataset['cut']
+      cutTimers.push(setTimeout(()=>{if(cutCard){cutCard.hidden=true;cutCard.textContent=''}},dip))
+      rise?.()
+    }
+    const down=():void=>{land();cutTimers.push(setTimeout(up,still?0:QUIET_HOLD_MS))}
+    if(dip)cutTimers.push(setTimeout(down,dip)); else down()
+  }
+  /** THE DOOR A WALK IS ON ITS WAY TO, and the stop the dip behind it lands
+   * on; -1 when no walk is going to the door. */
+  let doorAhead=-1
+  /** WHETHER THE CERTIFICATE CARRIES THE DOOR'S WALKS. A certificate written
+   * before the door's poses stood holds none of them, and the house is then
+   * walked through its passages as it was. */
+  const doorsCertified=():boolean=>placeCertified('hall-door-in','courtyard')
+  /** The place the eye stands at, or is walking to. */
+  const railHere=():string|undefined=>{const nav=rail.navigation;return nav.active??nav.completed}
+  /** Whether a station stands next to the door's room in the walk: only
+   * those walk to the door or on from it. */
+  function besideTheDoor(station:string|undefined):boolean {
+    const at=WALK.stops.findIndex(s=>s.station===VINCI_HOUSE_DOOR.station&&!s.place)
+    return at>=0&&[WALK.stops[at-1],WALK.stops[at+1]].some(s=>s!==undefined&&!s.place&&s.station===station)
+  }
+  /** THROUGH THE HOUSE'S DOOR, both ways. In: the walk goes up the steps to
+   * the door and dips into the room once it stands there. Out: the picture
+   * dips, the eye stands on the steps facing the court, and the walk goes on
+   * from there. A jump from or to a station that is not the room's neighbour
+   * is one quiet dip, no walk. False where no door lies between. */
+  function crossDoor(index:number):boolean {
+    doorAhead=-1
+    const stop=stopAt(index), from=railHere(), crossing=vinciDoorBetween(from,stop.place??stop.station)
+    if(!crossing||!doorsCertified())return false
+    const inward=crossing.door.inward
+    const onFoot=crossing.way==='in'?besideTheDoor(from):!stop.place&&besideTheDoor(stop.station)
+    if(!onFoot){throughDoor(index);return true}
+    if(crossing.way==='in'){
+      const nav=rail.navigation
+      if(!nav.active&&nav.completed===vinciRailPlace(inward)){throughDoor(index);return true}
+      doorAhead=index
+      rail.set(vinciRailPlace(inward),vinciWalkPoseOf(inward,narrow()),false,narrow())
+      return true
+    }
+    throughDoor(index,crossing.door.outward)
+    return true
+  }
+  /** The dip at the door: into the stop asked for, or out onto the steps
+   * and on to it. */
+  function throughDoor(to:number,outward?:VinciWalkPoseId):void {
+    quietDip(()=>{
+      if(outward){
+        rail.set(vinciRailPlace(outward),vinciWalkPoseOf(outward,narrow()),true,narrow())
+        exposureAt=undefined
+        return
+      }
+      const stop=stopAt(to), s=stationOf(stop.station)
+      rail.set(railPlaceOf(stop),vinciWalkPose(stop,narrow()),true,narrow(),walkVertex(stop))
+      card=station=to;dock.scrollTop=0;aimPrint(s.id);exposureAt=s.id
+      paintHeader();paintHeaderVisibility();paintDock();paintQuestion();standHere()
+    },outward?()=>walkOn(to,false):undefined)
+  }
+  /** THE WALK TO A STOP, as a press asks for it: along its wall where it
+   * stands on one, otherwise the certified route to its pose. */
+  function walkOn(index:number,cut:boolean,closeSources=false):void {
+    const stop=stopAt(index),s=stationOf(stop.station)
+    // A STOP THAT IS NOT REACHABLE FROM HERE ON ITS OWN WALL is walked to in
+    // two legs: the wall's nearer end, and the wall's own run from there.
+    const vertex=walkRunVertex(stop)
+    if(!cut&&vertex===undefined&&stop.exhibit){walkOnToWall(index);return}
+    // an uncertified place is stood at by a cut, never walked along the grid
+    const cutHere=cut||Boolean(stop.place&&!placeProved(stop))
+    rail.set(railPlaceOf(stop),vinciWalkPose(stop,narrow()),cutHere,narrow(),cutHere&&stop.place?walkVertex(stop):vertex)
+    // On a walk the card changes when the visitor arrives, not when the
+    // rail mark is pressed: a title that names the next room over the room
+    // you are still standing in is a lie the frame tells.
+    if(cutHere||walkIndexAt(rail.navigation.completed??'',rail.navigation.wall)===index){card=index;dock.scrollTop=0;aimPrint(s.id);exposureAt=s.id;paintHeader();paintDock();standHere()}
+    else if(closeSources)paintDock()
   }
   let clearSky:import('three/webgpu').DataTexture|undefined
   let header:HTMLElement,dock:HTMLDialogElement,drawer:HTMLElement,record:HTMLElement,source:HTMLButtonElement,sky:SkyMesh
@@ -710,7 +843,7 @@ export function createWing():VinciWingModule {
     authority=createRailGeometryAuthority(collectRailSolids(scene))
     rail=createRail(camera,clock,authority);measurement=createMeasurement(h.labels,stack)
     // the film's hand on the rail, fetched only by the export's own address
-    if(FILM_EXPORT)void import('./film').then(m=>m.installFilm({rail:()=>rail,walk:WALK,narrow,walkPose:vinciWalkPose,approachPose:vinciApproachPose}))
+    if(FILM_EXPORT)void import('./film').then(m=>m.installFilm({rail:()=>rail,walk:WALK,narrow,walkPose:vinciWalkPose,approachPose:vinciApproachPose,placePose:vinciWalkPoseOf}))
     yield
     source=make('button','vinci-source',sourcesWord());source.type='button';source.setAttribute('aria-keyshortcuts','l');source.setAttribute('aria-controls','vinci-source-card');source.addEventListener('click',()=>{mode=mode===2?1:2;paintDock()});barEl=h.stage.parentElement!.querySelector('.wing-rail-group');barEl!.append(source)
     // THE PLAN STANDS IN THE BAR'S OWN GROUP, beside the sources of the
@@ -750,31 +883,11 @@ export function createWing():VinciWingModule {
     occluders=collectVinciLabelOccluders(scene)
     labels=createVinciLabelAnchor({host:h.labels,camera,occluders,onOpen:()=>{mode=2;paintDock()}})
     collectionRoot=collection
-    // THE HOUSE'S ONE EXHIBIT, on the hall's ledge: the compass the machine
-    // catalogue held back for it. It stands where the ledge's own record puts
-    // it, is stamped like every other machine, and is read by the registry
-    // beside the collection's, because a press has to reach it from the hall.
-    {
-      const compass=buildMachine('proportional-compass',stack)
-      // Its tips stand clear of the shelf, so it is held as the exhibition
-      // holds it everywhere: a plate on the ledge's finished top, a stem, a
-      // collar at the pivot.
-      // The bench's mount lets the lowest moving tip clear its plate by 48 mm;
-      // on a shelf that reads as floating, so here the instrument sits 40 mm
-      // lower on a shorter stem and its tips still clear the plate by 8 mm.
-      const lift=hallLedge.top+LEDGE_FINISH_PROUD_M-compass.bounds.min.y,drop=.04
-      compass.object.position.set(hallLedge.stand.east,lift-drop,-hallLedge.stand.north)
-      compass.object.rotation.y=hallLedge.facing*Math.PI/180
-      compass.object.updateMatrixWorld(true)
-      houseRoot=new Group();houseRoot.name='vinci/house-exhibits'
-      houseRoot.add(compass.object)
-      const held=mountBoxes('proportional-compass').map(box=>box.centre[1]>.3
-        ?{...box,centre:[box.centre[0],box.centre[1]-drop,box.centre[2]] as [number,number,number]}
-        :box.size[1]>.1?{size:[box.size[0],box.size[1]-drop,box.size[2]] as [number,number,number],centre:[box.centre[0],box.centre[1]-drop/2,box.centre[2]] as [number,number,number]}:box)
-      houseRoot.add(createLedgeMount(held,
-        {east:hallLedge.stand.east,north:hallLedge.stand.north,height:lift,bearingRad:compass.object.rotation.y},stack.tierName()!=='calm'))
-      scene.add(houseRoot)
-    }
+    // THE HOUSE'S TWO EXHIBITS, on the great hall's table: stamped like every
+    // other machine and read by the registry beside the collection's, because
+    // a press has to reach them from the hall.
+    houseRoot=createHallTablePieces(stack).group
+    scene.add(houseRoot)
     dots=createVinciExhibitDots({host:h.labels,camera,occluders,limit:DOTS_PER_TIER[stack.tierName()]??6,controls:VINCI_EXHIBIT_CARD,
       onOpen:(id,dot)=>openExhibit(id,dot),
       // the word a pressed walking mark takes, and the leg its ring counts
@@ -800,6 +913,12 @@ export function createWing():VinciWingModule {
         // and the run carries one plate request, for the stop it lands on.
         // A sheet opens in the reader, and the reader's id carries the leaf
         // door: the run is asked for with the stop's own id under it.
+        // AT THE STOP THAT STANDS AT IT, the sheet opens where the visitor is.
+        if(opensHere(isLeafDoor(id)?id.slice(0,-LEAF_DOOR.length):id))return false
+        // THE BODY WALL IS READ WHOLE: a sheet opens in the reader where the
+        // visitor stands, so shutting it leaves the grid and the valve's niche
+        // in one frame (a run behind the held reader walked the grid unseen).
+        if(readWhole(isLeafDoor(id)?id.slice(0,-LEAF_DOOR.length):id))return false
         if(!isWholePlate(id)&&wallRun(isLeafDoor(id)?id.slice(0,-LEAF_DOOR.length):id))return true
         // THE WHOLE PLATE IS THE SAME PLACE: the visitor already stands where
         // the work hangs, so the eye neither walks out to it nor back from it.
@@ -823,6 +942,9 @@ export function createWing():VinciWingModule {
         // shut the card is still standing in front of that painting, with its
         // name under it and the arrows stepping on from there.
         if(!onWallStop())rail.returnToStation()
+        // THE BODY WALL IS READ WHOLE: a sheet shut goes back to the wall's
+        // own eye, where the grid and the valve's niche stand in one frame.
+        else if(wallOn()?.id===VINCI_BODY_WALL&&!showing&&!rail.navigation.active)wholeWall()
         dots?.setOpen(null);dots?.invalidate();paintExhibitTitle();paintHeaderVisibility();paintStrip();refreshRecap()
       }})
     strip=createVinciHangStrip({host:h.labels,onOpen:(id,button)=>openExhibit(id,button)})
@@ -926,7 +1048,7 @@ export function createWing():VinciWingModule {
     standing=true
     card=station
     const stop=stopAt(card),s=stationOf(stop.station)
-    aimPrint(s.id);exposureAt=s.id;rail.set(s.id,vinciWalkPose(stop,narrow()),true,narrow(),walkVertex(stop));paintHeader();paintDock();standHere()
+    aimPrint(s.id);exposureAt=s.id;rail.set(railPlaceOf(stop),vinciWalkPose(stop,narrow()),true,narrow(),walkVertex(stop));paintHeader();paintDock();standHere()
     if(pendingView){const id=pendingView;pendingView='';showView(id)}
     announceBuilt()
   }
@@ -1434,7 +1556,7 @@ export function createWing():VinciWingModule {
    * eye does not stand at, or a certified approach from the standing station.
    * Where neither holds, the press opens a label where the visitor stands. */
   function markWalks(id:string):boolean {
-    if(isWholePlate(id)||isLeafDoor(id)||activeView||!railReady())return false
+    if(isWholePlate(id)||isLeafDoor(id)||activeView||!railReady()||opensHere(id)||readWhole(id))return false
     const wall=vinciWallOfExhibit(id), at=wallAt()
     if(wall&&wall===wallOn()&&at!==undefined&&vinciWallVertex(wall,id)!==undefined){
       const stops=wallRow()
@@ -2125,6 +2247,10 @@ export function createWing():VinciWingModule {
     const entry=picks.find(pick=>pick.id===id)
     if(!entry||!hosts||!closeLook)return
     if(!entry.openable)return
+    // A WORK THAT HAS A STOP OF ITS OWN is walked to at that stop, straight,
+    // never along the wall it hangs on, and opens there.
+    const ownStop=WALK.stops.findIndex(stop=>Boolean(stop.place)&&stop.opens===id)
+    if(ownStop>=0&&ownStop!==card&&railReady()&&!activeView){pendingExhibit=`open:${id}`;hosts.navigate(ownStop);return}
     const here=hereContent().id
     /* A WORK OF ANOTHER STATION, SEEN FROM HERE, OPENS HERE. Its mark stands
        in this room's picture, and no leg leaves from here to it, so its label
@@ -2289,7 +2415,9 @@ export function createWing():VinciWingModule {
     const title=make('h1','vinci-title')
     const dot=make('span','vinci-title-dot');dot.dataset['certainty']=s.built?s.carrierCertainty:'unknown'
     dot.setAttribute('role','img');dot.setAttribute('aria-label',text(vinciCertaintyWords[s.built?s.carrierCertainty:'unknown']))
-    title.append(dot,make('span','vinci-title-name',text(s.name)))
+    // a stop at a place of its own (the valve) carries its own name
+    const own=stopAt(index)
+    title.append(dot,make('span','vinci-title-name',text(own.place&&own.name?own.name:s.name)))
     header.append(make('p','vinci-kicker',stationKicker()),title)
     if(s.outdoor)header.append(make('p','vinci-hour',text(vinciHourSpoken)))
     // A STATION THAT STANDS IN A ROOM DOES NOT COVER IT. The centred panel
@@ -2333,8 +2461,8 @@ export function createWing():VinciWingModule {
   function titleForView(viewId:string) {
     const s=hereContent()
     const name=vinciViewNames[viewId]??(viewId.startsWith('collection')?vinciViewNames['collection']:undefined)
-    const h1=header.querySelector('.vinci-title-name')
-    if(h1)h1.textContent=text(name??s.name)
+    const h1=header.querySelector('.vinci-title-name'), own=stopAt(card)
+    if(h1)h1.textContent=text(name??(own.place&&own.name?own.name:s.name))
     const kicker=header.querySelector('.vinci-kicker')
     if(kicker)kicker.textContent=name?viewKicker():stationKicker()
   }
@@ -2398,9 +2526,9 @@ export function createWing():VinciWingModule {
     stack.setScene(scene,camera,{...PRINT,exposure,shoulder,toe},true)
   }
   function placeCanonicalStation() {
-    const stop=stopAt(card),id=stationOf(stop.station).id
+    const stop=stopAt(card)
     activeView='';measurement.hide();header.querySelector('.vinci-insertion')?.remove();titleForView('')
-    rail.set(id,vinciWalkPose(stop,narrow()),true,narrow(),walkVertex(stop))
+    rail.set(railPlaceOf(stop),vinciWalkPose(stop,narrow()),true,narrow(),walkVertex(stop))
   }
   function endInspection() { if(activeView)placeCanonicalStation() }
   function appendRecord(value:VinciText,citation:string,certainty?:VinciCertainty,anchorId?:string,anchorClass?:'GENERATED'|'procedural'):[HTMLElement,HTMLElement] {
@@ -2674,6 +2802,31 @@ export function createWing():VinciWingModule {
       else sources.select(sources.tab,true)
     }
   }
+  /** A STOP OF THE WALK ASKED FOR: by the rail, the band, the plan or a key. */
+  let showing=false
+  function showStop(index:number,h:WingHosts):void {
+    if(!hosts){mount(h);station=card=index;paintHeader();schedule();return}
+    // A station asked for before the place is built is remembered, not lost.
+    if(!standing){station=card=index;paintHeader();return}
+    const closeSources=mode===2
+    if(closeSources)mode=1
+    // A WORK QUEUED FROM THE PLAN BELONGS TO THE WALK THE PLAN BEGAN. A
+    // station the visitor asks for instead cancels it.
+    if(pendingExhibit&&vinciApproachStation(pendingExhibit.replace(/^(?:open|walk):/,''))!==contentAt(index).id)pendingExhibit=''
+    // THE STATION RAIL STAYS LIVE. Pressing a station closes the exhibit and
+    // the rail walks from the station eye, which is the certified pair.
+    closeLook?.close()
+    exhibitSources=null;endInspection();if(station!==index)sources.resetScroll();station=index;activeView='';measurement.hide()
+    endChapterCard()
+    const cut=cutToStation()
+    // A CHAPTER BOUNDARY IS CROSSED, NEVER WALKED. The leg under it exists
+    // and is certified; what the story says is that the visitor is somewhere
+    // else now, which is a title and a new place and no walk between them.
+    if(!cut&&walkCutBoundary(card,index)){crossChapter(index);return}
+    // THE HOUSE'S DOOR IS CROSSED BY A CUT, never walked through.
+    if(!cut&&crossDoor(index))return
+    walkOn(index,cut,closeSources)
+  }
   const wingModule:VinciWingModule={
     stations:WALK.stops.map(walkStation),
     legacyStationIds:vinciLegacyStationIds,
@@ -2688,7 +2841,11 @@ export function createWing():VinciWingModule {
     demonstrateMachine(slug:string|null){exhibits?.demonstrate(isMachineSlug(slug??'')?slug as MachineSlug:null)},
     navigation:()=>{
       const nav=standing?rail.navigation:undefined
-      return {completed:nav?.completed??hereContent().id,target:nav?.queued[0]??nav?.active,question:text(hereContent().door)}
+      // a stop of the walk's own place is named by its id; the door's two
+      // poses are passed through and name the stop the card stands at
+      const named=(id?:string):string|undefined=>id===undefined?undefined:isVinciWalkPose(id)?(walkIndexAt(id)>=0?id:undefined):id
+      const target=doorAhead>=0?stopAt(doorAhead).id:named(nav?.queued[0]??nav?.active)
+      return {completed:named(nav?.completed)??WALK.stops[card]?.id??hereContent().id,target,question:text(hereContent().door)}
     },
     // A MACHINE NOT YET WHOLE IS STILL IN FLIGHT, and one that cannot be is an error.
     pending:()=>(exhibits?.pending()??0)+machinesStanding().outstanding+(studySheet?.pending()??0),
@@ -2703,34 +2860,8 @@ export function createWing():VinciWingModule {
       paintBarWords();paintHeader();paintDock();paintQuestion();paintExhibitTitle();paintExhibitMarks();paintStrip()
     },
     show(index,h){
-      if(!hosts){mount(h);station=card=index;paintHeader();schedule();return}
-      // A station asked for before the place is built is remembered, not lost.
-      if(!standing){station=card=index;paintHeader();return}
-      const closeSources=mode===2
-      if(closeSources)mode=1
-      // A WORK QUEUED FROM THE PLAN BELONGS TO THE WALK THE PLAN BEGAN. A
-      // station the visitor asks for instead cancels it.
-      if(pendingExhibit&&vinciApproachStation(pendingExhibit.replace(/^(?:open|walk):/,''))!==contentAt(index).id)pendingExhibit=''
-      // THE STATION RAIL STAYS LIVE. Pressing a station closes the exhibit and
-      // the rail walks from the station eye, which is the certified pair.
-      closeLook?.close()
-      exhibitSources=null;endInspection();if(station!==index)sources.resetScroll();station=index;activeView='';measurement.hide()
-      endChapterCard()
-      const stop=stopAt(index),s=stationOf(stop.station),cut=cutToStation()
-      // A CHAPTER BOUNDARY IS CROSSED, NEVER WALKED. The leg under it exists
-      // and is certified; what the story says is that the visitor is somewhere
-      // else now, which is a title and a new place and no walk between them.
-      if(!cut&&walkCutBoundary(card,index)){crossChapter(index);return}
-      // A STOP THAT IS NOT REACHABLE FROM HERE ON ITS OWN WALL is walked to in
-      // two legs: the wall's nearer end, and the wall's own run from there.
-      const vertex=walkRunVertex(stop)
-      if(!cut&&vertex===undefined&&stop.exhibit){walkOnToWall(index);return}
-      rail.set(s.id,vinciWalkPose(stop,narrow()),cut,narrow(),vertex)
-      // On a walk the card changes when the visitor arrives, not when the
-      // rail mark is pressed: a title that names the next room over the room
-      // you are still standing in is a lie the frame tells.
-      if(cut||walkIndexAt(rail.navigation.completed??'',rail.navigation.wall)===index){card=index;dock.scrollTop=0;aimPrint(s.id);exposureAt=s.id;paintHeader();paintDock();standHere()}
-      else if(closeSources)paintDock()
+      showing=true
+      try{showStop(index,h)}finally{showing=false}
     },
     async ready(report){
       tell=report
@@ -2791,6 +2922,8 @@ export function createWing():VinciWingModule {
       const opening=activeView&&VIEW_EXPOSURE[activeView]!==undefined?VIEW_EXPOSURE[activeView]!:legExposure(nav), rolling=activeView&&VIEW_SHOULDER[activeView]!==undefined?VIEW_SHOULDER[activeView]!:legShoulder(nav)
       const bending=legToe(nav)
       if(nav.completed&&(opening!==exposureShown||rolling!==shoulderShown||bending!==toeShown))aimPrint(nav.completed,opening,rolling,bending)
+      // THE DOOR IS REACHED: the picture dips into the room behind it.
+      if(doorAhead>=0&&!nav.active&&!nav.exhibit&&isVinciWalkPose(nav.completed)){const to=doorAhead;doorAhead=-1;throughDoor(to)}
       // A JOURNEY ONTO A WALL IS TWO LEGS AND ONE ASKING: the run along the
       // wall leaves as soon as the leg to its end has landed.
       if(walkOnwards>=0&&!nav.active&&!nav.exhibit&&!nav.approaching){

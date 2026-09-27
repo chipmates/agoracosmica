@@ -18,7 +18,7 @@ import { studySupport } from '../inner-court'
 import { LINE_FLOOR_PICK, VINCI_LINE_STATION, VINCI_STUDY_LEAF, vinciApproachPose, vinciApproachStation, vinciPlateExhibitId, type VinciExhibitKind } from './approaches'
 import { vinciWallOrderOf } from './wall'
 import { hangPlacements } from './hang'
-import { STANDS } from './stands'
+import { HALL_TABLE_PIECE_SLUGS, STANDS, isHallTablePiece } from './stands'
 
 export interface VinciPickEntry {
   id: string
@@ -75,10 +75,10 @@ function placedAt(kind: VinciExhibitKind, id: string, workId: string | null, she
     return { station: at === undefined ? null : 'body', order: at ?? 0 }
   }
   if (kind === 'machine' && slug !== undefined) {
-    const table = Object.keys(STANDS), at = table.indexOf(slug)
     // THE HALL IS ONE ROOM UNDER TWO STATIONS, and both walk one row of its
     // machines; the station a machine's certified leg leaves from is its own.
-    // The house's compass waits for its ledge.
+    // The house's table stands its two pieces in the order they are stepped.
+    const at = isHallTablePiece(slug) ? HALL_TABLE_PIECE_SLUGS.indexOf(slug) : Object.keys(STANDS).indexOf(slug)
     return { station: vinciApproachStation(id) ?? null, order: MACHINE_OFFSET + Math.max(0, at) }
   }
   return { station: vinciApproachStation(id) ?? null, order: 0 }
