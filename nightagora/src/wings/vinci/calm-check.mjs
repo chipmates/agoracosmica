@@ -52,24 +52,20 @@ export const CALM = {
   filmPixelsPerFrame: 9,
 }
 /** A TURN MADE STANDING STILL may run faster than one made walking: up to
- * 20 degrees a second on the desktop and 14 on the phone, eased onto that
- * rate and off it over a second, so a half turn takes seconds. Its picture
- * crosses a frame width in about five seconds on the desktop's widest lens,
- * faster than the walking pan's seven, and a narrower lens turns slower so
- * the picture moves no more than 14 px a frame. Frames read against it are
- * those whose body has not moved over the whole reading. */
+ * 20 degrees a second on the desktop and 14 on the phone, and on a lens of
+ * 60 degrees or wider up to 35 and 25 eased at 22, so a half turn takes
+ * seconds. Whatever the rate, the picture moves no more than 14 px a frame
+ * at the lens it turns on, a narrower lens turning slower. Frames read
+ * against it are those whose body has not moved over the whole reading. */
 export const CALM_STANDING = {
-  desktop: { turnDegPerSecond: 21, turnDegPerSecond2: 16, turnDegPerSecond3: 60, filmPixelsPerFrame: 14 },
-  phone: { turnDegPerSecond: 15, turnDegPerSecond2: 16, turnDegPerSecond3: 60, filmPixelsPerFrame: 14 },
+  desktop: { turnDegPerSecond: 36, turnDegPerSecond2: 23, turnDegPerSecond3: 60, filmPixelsPerFrame: 14 },
+  phone: { turnDegPerSecond: 26, turnDegPerSecond2: 23, turnDegPerSecond3: 60, filmPixelsPerFrame: 14 },
 }
 /** THE NAMED STANDS (the garden porch, the line-early arrival, the works
  * departure, the reading booth's mouth) turn at 28 degrees a second on the
- * desktop and 20 on the phone, eased at 22: a leg whose plan names them is
- * read against these, under the same pixel cap. */
-export const CALM_NAMED = {
-  desktop: { turnDegPerSecond: 29, turnDegPerSecond2: 23, turnDegPerSecond3: 60, filmPixelsPerFrame: 14 },
-  phone: { turnDegPerSecond: 21, turnDegPerSecond2: 23, turnDegPerSecond3: 60, filmPixelsPerFrame: 14 },
-}
+ * desktop and 20 on the phone on a narrower lens, eased at 22: read against
+ * the same caps. */
+export const CALM_NAMED = CALM_STANDING
 /** The film keeps the authored width: landscape 1920 px from the desktop's
  * lens, portrait 1080 px from the phone's. */
 const filmFocalPixels = (fov, phone) => (phone ? 540 : 960) / (Math.tan(fov * Math.PI / 360) * (phone ? 390 / 844 : 1280 / 720))

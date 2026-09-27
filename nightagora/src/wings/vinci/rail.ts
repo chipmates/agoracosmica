@@ -395,8 +395,10 @@ const RAIL_QUICK_NAMED=28,RAIL_QUICK_NAMED_PHONE=20
  * while the stand began to turn. These walks look toward the view already
  * as they come. */
 const RAIL_TURNED_ARRIVALS=new Set(['garden>line-early','body>line-early'])
-/** Station walks kept as they were walked and passed, off the floor. */
-const RAIL_FLOOR_KEPT=new Set(['study>chamber','chamber>study'])
+/** Station walks kept as they were walked and passed, off the floor: two
+ * short ones that look the same way at both ends step back rather than turn
+ * round twice. */
+const RAIL_FLOOR_KEPT=new Set(['study>chamber','chamber>study','flight>works','oratory>study'])
 /** THE COLLECTION STAIR IS WALKED DOWN LOOKING OUT, not back: at the
  * landing, the terrace's end, the view turns south-west to the court and the
  * pavilion below, standing, holds there down the treads, and gives way to the
@@ -409,6 +411,18 @@ const STAIR_VIEW_HEADING=150*Math.PI/180,STAIR_TURN_M=.5,STAIR_RELEASE_M=2
 const RAIL_STAIRS:readonly (readonly [RailWaypoint,RailWaypoint,RailWaypoint])[]=[
   [railCollectionStairWaypoints[0]!,railCollectionStairWaypoints[1]!,railCollectionStairWaypoints[2]!],
 ]
+/** THE TERRACE WALK LOOKS OUT OVER THE COURT. From the chamber to the garden
+ * the view turns one way the whole walk and turns only where the film's gate
+ * lets it: held up the lawn and through the court's short flight, turned out
+ * toward the court along the terrace, turned to the court at the stair's
+ * landing (the turn seen from above), and on down the stair toward the
+ * garden. Headings, west of north, at waypoints along the way and metres
+ * past them; the walk leaves on its own view and turns standing from the
+ * last heading to the one it arrives in. */
+const RAIL_TERRACE_LOOK:Readonly<Record<string,{keys:readonly (readonly [RailWaypoint,number,number])[];end:number;sign:1|-1}>>={
+  'chamber>garden':{sign:1,end:176,keys:[[railAccessWaypoints[0]!,0,2],[railAccessWaypoints[3]!,0,4],[railAccessWaypoints[4]!,0,80],
+    [railCollectionStairWaypoints[0]!,-.1,85],[railCollectionStairWaypoints[0]!,0,133],[railCollectionStairWaypoints[1]!,0,135],[railCollectionStairWaypoints[2]!,0,174]]},
+}
 /** Stretches walked without a stand, never backward. */
 const RAIL_FLIGHTS:readonly (readonly [RailWaypoint,RailWaypoint])[]=[[railAccessWaypoints[1]!,railAccessWaypoints[2]!]]
 /** An exhibit whose viewing eye stands outside its station's room is walked
@@ -417,6 +431,9 @@ const RAIL_WALKED_APPROACHES:ReadonlySet<string>=new Set(['machine/proportional-
 /** A turn made standing still may run this fast, in degrees a second: a half
  * turn in about eleven seconds on the desktop and fifteen on the phone. */
 const RAIL_QUICK_TURN=20,RAIL_QUICK_TURN_PHONE=14
+/** On a lens of 60 degrees or wider a standing turn may run up to this fast,
+ * still under the film's pixel cap at that lens. */
+const RAIL_QUICK_WIDE=35,RAIL_QUICK_WIDE_PHONE=25
 /** Over the last metres the way ahead runs out and the arriving composition
  * takes the gaze. */
 const GAZE_ARRIVAL_M = 4
@@ -618,12 +635,20 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     const along=pathAngles(metres,leadMetres(metres,until),until)
     path!.pointAtDistance(metres,probe)
     const lift=gaitHeadLift(headLifts,probe.x,-probe.z)
-    const out=stairDown?ramp(stairDown[0]-STAIR_TURN_M,stairDown[0],metres)*(1-ramp(stairDown[1],stairDown[1]+STAIR_RELEASE_M,metres)):0
-    const heading=out>0?along.heading+out*Math.atan2(Math.sin(STAIR_VIEW_HEADING-along.heading),Math.cos(STAIR_VIEW_HEADING-along.heading)):along.heading
+    const out=stairDown&&!lookKeys?ramp(stairDown[0]-STAIR_TURN_M,stairDown[0],metres)*(1-ramp(stairDown[1],stairDown[1]+STAIR_RELEASE_M,metres)):0
+    const heading=lookKeys?lookAt(metres):out>0?along.heading+out*Math.atan2(Math.sin(STAIR_VIEW_HEADING-along.heading),Math.cos(STAIR_VIEW_HEADING-along.heading)):along.heading
     return {heading,elevation:along.elevation+lift,weight:ramp(0,GAZE_ARRIVAL_M,until-metres)}
   }
   /** Where the leg under way goes down the collection stair, head to foot. */
   let stairDown:[number,number]|undefined
+  /** The terrace walk's headings by distance, turning one way, or none. */
+  let lookKeys:{m:number;h:number}[]|undefined
+  function lookAt(metres:number):number {
+    const k=lookKeys!
+    if(metres<=k[0]!.m)return k[0]!.h
+    for(let i=1;i<k.length;i++)if(metres<=k[i]!.m){const a=k[i-1]!,b=k[i]!;return a.h+(b.h-a.h)*(metres-a.m)/Math.max(1e-6,b.m-a.m)}
+    return k[k.length-1]!.h
+  }
   const scaleOf=(fov:number):number=>Math.log(Math.tan(fov*Math.PI/360))
   function begin(request:Request,now:number) {
     if(!completed)throw new Error('Rail needs an explicit initial placement')
@@ -634,6 +659,17 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     // THE STAIRS, never walked backward: the collection stair turned at its
     // landing both ways, the court's short run under the walk's own view
     const stairs:[number,number][]=[],stairStands:RailWaypoint[]=[]
+    const terrace=certified.route?RAIL_TERRACE_LOOK[`${completed.id}>${request.id}`]:undefined
+    lookKeys=undefined
+    if(terrace){
+      const keys=[{m:0,h:angles(camera.quaternion).heading}]
+      for(const [point,past,deg] of terrace.keys){const at=doorTurns([point]);if(at.length!==1){keys.length=0;break};keys.push({m:at[0]!+past,h:deg*Math.PI/180})}
+      if(keys.length){
+        keys.push({m:path.length,h:terrace.end*Math.PI/180})
+        for(let i=1;i<keys.length;i++){let d=Math.atan2(Math.sin(keys[i]!.h-keys[i-1]!.h),Math.cos(keys[i]!.h-keys[i-1]!.h));if(d*terrace.sign<0)d+=terrace.sign*2*Math.PI;keys[i]!.h=keys[i-1]!.h+d}
+        lookKeys=keys
+      }
+    }
     if(certified.route)for(const [landing,top,foot] of RAIL_STAIRS){
       const a=doorTurns([top]),b=doorTurns([foot])
       if(a.length===1&&b.length===1&&a[0]!<b[0]!){stairs.push([a[0]!,b[0]!]);stairStands.push(landing)}
@@ -669,10 +705,10 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
         course:certified.route&&length>=WALKED_LEG_M?course:null,
         ...(certified.turns&&length>=WALKED_LEG_M?{turns:{start:certified.turns.start,end:certified.turns.end,
           at:doorTurns([...railDoorTurns,...(certified.turns.stands??[]),...stairStands]),doors:doorTurns(railDoorways),porches:doorTurns(railPorchStands),stairs,
-          quickDegPerSecond:request.phone?RAIL_QUICK_TURN_PHONE:RAIL_QUICK_TURN,
+          quickDegPerSecond:request.phone?RAIL_QUICK_TURN_PHONE:RAIL_QUICK_TURN,wideDegPerSecond:request.phone?RAIL_QUICK_WIDE_PHONE:RAIL_QUICK_WIDE,
           ...(certified.turns.named?{named:{start:certified.turns.named.start,end:certified.turns.named.end,at:doorTurns(certified.turns.named.at??[])},
             namedDegPerSecond:request.phone?RAIL_QUICK_NAMED_PHONE:RAIL_QUICK_NAMED}:{}),
-          floor:certified.turns.floor===true,lens:certified.turns.lens??'place',forward:certified.turns.forward===true||stairs.length>0,turned:certified.turns.turned===true}}:{})})
+          floor:certified.turns.floor===true,lens:certified.turns.lens??'place',forward:certified.turns.forward===true||stairs.length>0,turned:certified.turns.turned===true,scripted:lookKeys!==undefined}}:{})})
     leg=gaze.leg;duration=leg.seconds;legClock=0;legClockAt=now;pace=1;waiting=0;strideM=strideTarget=0;strideAt=now
     active=request
   }
