@@ -531,6 +531,9 @@ export interface GazeTurns {
   stairs?: readonly (readonly [number, number])[]
   /** a walk whose way carries the view it is walked under, stretch by stretch */
   scripted?: boolean
+  /** a walk whose way winds round may turn round with it one way, its stands
+   * the long way, where that reads green */
+  windingRound?: boolean
 }
 /** A held view this far off its way is turned from standing; a doorway whose
  * way turns this much is turned in from standing. */
@@ -544,6 +547,9 @@ const PULL_BACK_M = 3
 /** A stand turned more than this may go the long way round, when that keeps
  * the whole walk turning one way: the gate reads every turn given back. */
 const EITHER_WAY_DEG = 120
+/** A way that winds round turns more than the first figure one way between
+ * its two eyes; on it a stand may turn the long way from the second. */
+const WINDING_DEG = 150, WINDING_EITHER_DEG = 45
 /** A stretch between stands walks under one steady view while its way stays
  * this near it (a crab at most, never backward): its bends are the path's,
  * and a view led round each of them swings. Beyond the second figure a view
@@ -942,6 +948,15 @@ function planTurns(input: TurnInput): CalmGazePlan | null {
   type Choice = { cost: number; stretches: Stretch[]; startTurn: boolean; endTurn: boolean; picks: Option[]; longs: Set<number> }
   let best: Choice | null = null
   const ranked: Choice[] = []
+  // A WAY THAT WINDS ROUND between two eyes that face the same way is walked
+  // forward only by turning round with it: its stands may turn the long way,
+  // so the whole walk turns one way instead of round and back
+  let winding = 0
+  if (strict && input.tangent && input.turns.windingRound === true) {
+    let previous = input.tangent(0, Math.min(L, 1))
+    for (let m = 1; m + .5 <= L; m += .5) { const h = input.tangent(m - .5, Math.min(L, m + .5)); winding += wrap(h - previous); previous = h }
+  }
+  const eitherDeg = Math.abs(winding) > WINDING_DEG * RAD ? WINDING_EITHER_DEG : EITHER_WAY_DEG
   for (const startTurn of mustStart ? [true] : mayStart ? [true, false] : [false]) for (const endTurn of mustEnd ? [true] : mayEnd ? [true, false] : [false]) {
     if (!startTurn && !endTurn && !stops.length) continue
     const stretches = stretchesFor(startTurn, endTurn)
@@ -958,7 +973,7 @@ function planTurns(input: TurnInput): CalmGazePlan | null {
         facing = picks[k]!.start + picks[k]!.turn
       })
       if (endTurn) standTo(input.to.heading)
-      const either = steps.map((x, k) => (x.stand && Math.abs(x.turn) / RAD > EITHER_WAY_DEG ? k : -1)).filter(k => k >= 0)
+      const either = steps.map((x, k) => (x.stand && Math.abs(x.turn) / RAD > eitherDeg ? k : -1)).filter(k => k >= 0)
       // under the floor the way's swings are read over the whole leg, across its stands, as the gate reads them
       let weave = picks.reduce((n, o) => n + o.weave, 0)
       if (strict) {
@@ -1009,6 +1024,8 @@ function planTurns(input: TurnInput): CalmGazePlan | null {
       if (!gateRed(plan, input.tangent)) return { ...plan, red: false }
     }
   }
+  // the long way round only where it reads green
+  if (eitherDeg !== EITHER_WAY_DEG) return planTurns({ ...input, turns: { ...input.turns, windingRound: false } })
   return { ...first, red: true }
 
   function build(chosen: Choice, carry: boolean): CalmGazePlan {
