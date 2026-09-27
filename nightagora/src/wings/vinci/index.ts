@@ -1049,6 +1049,9 @@ export function createWing():VinciWingModule {
     card=station
     const stop=stopAt(card),s=stationOf(stop.station)
     aimPrint(s.id);exposureAt=s.id;rail.set(railPlaceOf(stop),vinciWalkPose(stop,narrow()),true,narrow(),walkVertex(stop));paintHeader();paintDock();standHere()
+    // An address that opens on a stop of its own place stands before the proof
+    // resolves at the wall's vertex: once it resolves the eye stands on the place.
+    if(stop.place&&!railReady())void authority?.ready.then(()=>{if(railReady()&&standing&&stopAt(card)===stop&&!rail.navigation.active&&!activeView){placeCanonicalStation();paintHeader();paintDock()}})
     if(pendingView){const id=pendingView;pendingView='';showView(id)}
     announceBuilt()
   }
