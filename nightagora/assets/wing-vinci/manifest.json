@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed toward a grey lit from the sun at up to 40 per cent. The dome keeps 82 per cent of its own saturation. Assumed weather, no observation claimed. The irradiance probe is the CIE clear sky (ISO 15469 type 12, circumsolar term held to a third) from the same sun, coloured from the rig zenith to its horizon and warmed toward the sun, levelled to the former two-colour band on an open horizontal face (src/wings/vinci/sky-probe.ts). Aerial perspective past 18 m at an assumed 0.004/m, cooler away from the sun and warmer toward it; none on a surface inside the collection seen from inside it; the displayed sky pales and loses up to 28 per cent of its saturation toward the horizon.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "5592243258baf56730403359680218d76c710bc40051e5fbeb44b73d67be0671",
+      "sha256": "1cf2bc7fda34589b2e413dcafd89725570179a42b81378aec64e399e4a052a4c",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=8c9b9be738df3285931a694255770c477d0cf7a23804a954af3cf89c2460f684;"
     },
     {
@@ -244,7 +244,7 @@
       "prompt": "Rooms of the modern collection ground inside the existing pavilion envelope: a stone floor finish on the 1.60 by 1.65 m grid the timeline is laid on, lined walls with a dark stone base and bay ribs, a flat plaster soffit coffered on the structure's four-metre bay with a light cove at the hanging wall, dressed reveals at the four doors the rail walks through, a clerestory light shelf in the hall, and outside a terrace with its parapet and retaining faces carrying the grave, the parachute and the freestanding display wall whose field is 880 by 460 cm. Interior daylight is a per-opening sky-visibility term on the ambient channel only. No texture asset, no reference image sampled, no period claim.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-11",
-      "sha256": "cfbd4b6fb5f692b558b6803ee27c0542461c9ce1591dd3b264815a683872019a",
+      "sha256": "4ee09395f184b20bbb38b44a9fe8b12a515a331086a42eb0fa583e692915ca44",
       "note": "Modern museum insertion, rooms only; no 1517 claim. recipe_file=src/wings/vinci/collection/rooms.ts; companion_file=src/wings/vinci/collection/stands.ts"
     },
     {
@@ -361,7 +361,7 @@
       "prompt": "Runtime exact canonical pose and actual mounted geometry identity guard for all40 directed physical routes. Applies conservative complete near-camera certificates; fails if stale.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-24",
-      "sha256": "c8a970fe4d341464fd2dd7267e99f81078c17f006f5b28056d061ef9b286a6c1",
+      "sha256": "e90b58205d398f958192937435013c8740b83595c04f0e361f401d655fcdcded",
       "note": "recipe_file=src/wings/vinci/rail-proof.ts; source_generator=forge/results/final-rail-route-proof.mjs; runtime dependency of vinci/rail; companion_file=src/wings/vinci/collection/pick.ts; companion_file=src/wings/vinci/collection/wall.ts"
     },
     {
@@ -439,7 +439,7 @@
       "prompt": "The turns a route takes between two stations, written against the registered gate crossing, the access stair layout and the collection stair.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-11",
-      "sha256": "8052182f0262ff0f1695e28f12db54f5eee24a42f87b3f5fdad3cdd9aa372c37",
+      "sha256": "b7cb09cec0f96d4acf15c1ad6c003e98412ffbfb819e1555d551311ef364d867",
       "note": "recipe_file=src/wings/vinci/rail-waypoints.ts; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail"
     },
     {
@@ -3626,7 +3626,7 @@
       "prompt": "The wing's story layer as data: one stop per station of the wing's story card, in the card's order, each with its chapter title in both languages, its age clock, the object its frame must show, its line, its drawer, its certainty class and the canon sheet keys its claims resolve to, plus the two chapter cuts, the title wall and the exit's three things. Every displayed string is copied from the card and none is written here. The file is generated by forge/story-import.mjs and measured by forge/story-check.mjs against the line and drawer budgets of the house's story law.",
       "model": "Deterministic import from the wing's story card",
       "date": "2026-09-21",
-      "sha256": "532fb14f2ca50a75d699569a0c9a3e5e2a4a635eb25b48dcc411e49064fa87ae",
+      "sha256": "936093ee2d23a9e4472c851dbed4525b425395222a7ce3e5b35e2859a32e7fdd",
       "note": "The words are the story card's, the structure is this file's. No surface reads this layer yet. recipe_file=src/wings/vinci/story.ts"
     },
     {
@@ -3821,7 +3821,7 @@
       "prompt": "The dossier's great hall (A-LAYOUT room hall, 8.65 by 8.05 m, floor +0.80 m, clear height 3.20 m) and the inner service passage beside it. Terracotta tiles of 0.22 m with 8 mm joints laid at 45 degrees (read from Q144) inside a square border row, each tile its own firing, bed and fraction of tilt; limewash with its age; oak joists 0.18 by 0.23 m at 0.60 m on a 0.34 by 0.38 m main beam carried by two tuffeau corbels; window seats; the room's face of each stone cross; the chimneypiece in A-FURNITURE's envelope at its place as the Loire type of about 1500, with a brick fireback, a banked fire's ash, charred ends and andirons of a generic type. Types of the period after museum objects, none documented at Cloux: A-FURNITURE's trestle table and bench, a chest after V&A W.38-1938 with linenfold and a lock plate after V&A 1319-1901, a box chair after V&A 740-1895, two stools after V&A 968-1897, two brass candlesticks after V&A M.435-1926 (unlit), a jug after V&A C.185-1909. The leaded lights as the room sees them. The entrance's leaf drawn again in the certified leaf's volume (planked, strap hinges, clout nails, ring, lock plate) and its two reveals faced in coursed tuffeau. Light at the fixed hour: the sun through the two west windows by the key light; the windows' cross, bars and leads read analytically in the sun patches; the room's return and the shafts of lit dust computed per point; the ceiling's oak between the joists lifted for the room's later bounces, an exhibition choice; the cheeks and head of the entrance passage's door to the service passage take that passage's light through the door's far face, at a graze.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "a2349dffbff6998883af2337278bba28d4b5826a771de8d2e60da9718d8fb313",
+      "sha256": "14c607dbab43cfec556b5545ca245283b3cfb0608c7032c4068a48093741d0a6",
       "note": "recipe_file=src/wings/vinci/house-hall.ts; source=A-LAYOUT A-HEIGHT A-MASONRY A-FURNITURE Q144 MADE-THINGS; rail_collision=false; library_sets=stone-tuffeau (already loaded by the shell); engine_terms=engineBounce engineWindowShade engineVolume; hero_sun_shadow=a second 2048 map of the key fitted to the hall; print_terms=glass_view_pull 0.5"
     },
     {
