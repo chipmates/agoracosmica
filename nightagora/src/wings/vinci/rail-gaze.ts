@@ -214,6 +214,92 @@ function limit(target: Float64Array, from: number, to: number, perStep: number, 
   return out
 }
 
+/** THE PAN UNDER THE LENS OF THE MOMENT: as the pan, its rate held under the
+ * caps of the lens at each time, eased on and off a little longer than their
+ * own acceleration asks (the caps themselves grow as the lens widens), spread
+ * over the leg; the leg is slowed only where even the capped rate does not fit. */
+function varyingPan(from: GazeAngles, to: GazeAngles, atLeast: number, timed: (seconds: number) => GaitLeg,
+  capsAt: (seconds: number, total: number) => { rate: number; accel: number; jerk: number }): CalmGazePlan {
+  const turnHeading = wrap(to.heading - from.heading), turnElevation = to.elevation - from.elevation
+  const angle = Math.hypot(turnHeading, turnElevation) / RAD
+  const form = (total: number) => {
+    const n = Math.max(2, Math.ceil(total * CHECK_HZ)), dt = total / n, ceiling = new Float64Array(n + 1)
+    let ease = 0
+    for (let i = 0; i <= n; i++) {
+      const c = capsAt(i * dt, total)
+      ceiling[i] = c.rate * PAN_SHARE
+      ease = Math.max(ease, 1.15 * Math.PI * c.rate / (2 * c.accel), Math.PI * Math.sqrt(c.rate / (2 * c.jerk)))
+    }
+    ease = Math.min(total / 2, ease)
+    const shape = (t: number) => t < ease ? (1 - Math.cos(Math.PI * t / ease)) / 2 : t > total - ease ? (1 - Math.cos(Math.PI * (total - t) / ease)) / 2 : 1
+    const area = new Float64Array(n + 1)
+    for (let i = 1; i <= n; i++) area[i] = area[i - 1]! + dt * (ceiling[i - 1]! * shape((i - 1) * dt) + ceiling[i]! * shape(i * dt)) / 2
+    return { n, dt, area }
+  }
+  let total = Math.max(atLeast, 1e-3), f = form(total)
+  for (let k = 0; k < 40 && f.area[f.n]! < angle; k++) { total *= Math.max(1.02, Math.min(2, angle / Math.max(1e-6, f.area[f.n]!))); f = form(total) }
+  const leg = timed(total)
+  total = leg.seconds
+  f = form(total)
+  const reach = f.area[f.n]!
+  const progress = (t: number) => {
+    if (angle <= 1e-6 || t >= total || !(reach > 0)) return 1
+    if (t <= 0) return 0
+    const x = t / f.dt, i = Math.min(f.n - 1, Math.floor(x))
+    return (f.area[i]! + (f.area[i + 1]! - f.area[i]!) * (x - i)) / reach
+  }
+  return {
+    leg, stretch: leg.seconds / timed(0).seconds, kind: 'pan',
+    at(seconds, target) {
+      const p = progress(seconds)
+      target.heading = from.heading + turnHeading * p; target.elevation = from.elevation + turnElevation * p
+      return target
+    },
+    lens: seconds => smooth(seconds / total),
+    walk: seconds => gaitAt(leg, seconds),
+    secondsAt: metres => gaitSecondsAt(leg, metres),
+  }
+}
+
+/** The limiter under a rate that changes along the leg, a step's own at each
+ * sample (scaled by `share`): followed forward, then back from the arriving
+ * view, and kept inside the cones either end can still be reached from. */
+function limitBy(target: Float64Array, from: number, to: number, steps: Float64Array, share: number): Float64Array {
+  const n = target.length, out = new Float64Array(n), early = new Float64Array(n), late = new Float64Array(n)
+  for (let k = 1; k < n; k++) early[k] = early[k - 1]! + steps[k]! * share
+  for (let k = n - 2; k >= 0; k--) late[k] = late[k + 1]! + steps[k + 1]! * share
+  let x = from
+  for (let k = 0; k < n; k++) { if (k > 0) x += Math.max(-steps[k]! * share, Math.min(steps[k]! * share, target[k]! - x)); out[k] = x }
+  let y = to
+  for (let k = n - 1; k >= 0; k--) { if (k < n - 1) y += Math.max(-steps[k + 1]! * share, Math.min(steps[k + 1]! * share, target[k]! - y)); out[k] = (out[k]! + y) / 2 }
+  for (let k = 0; k < n; k++) out[k] = Math.max(to - late[k]!, Math.min(to + late[k]!, Math.max(from - early[k]!, Math.min(from + early[k]!, out[k]!))))
+  return out
+}
+
+/** How far the spline goes past the caps of the lens at each moment: its
+ * rate, acceleration and jerk against the caps there, as one ratio. */
+function peakRatio(spline: Spline, capsAt: (seconds: number) => { rate: number; accel: number; jerk: number }): number {
+  const step = 1 / CHECK_HZ, count = Math.max(4, Math.ceil(spline.total / step))
+  const at = { heading: 0, elevation: 0 }
+  let ratio = 0, previous = evaluate(spline, 0, { heading: 0, elevation: 0 })
+  let r1x = 0, r1y = 0, a1x = 0, a1y = 0, have = 0
+  for (let i = 1; i <= count + 2; i++) {
+    const t = Math.min(spline.total, i * step), c = capsAt(t)
+    evaluate(spline, t, at)
+    const rx = (at.heading - previous.heading) / step, ry = (at.elevation - previous.elevation) / step
+    ratio = Math.max(ratio, Math.hypot(rx, ry) / RAD / c.rate)
+    if (have >= 1) {
+      const ax = (rx - r1x) / step, ay = (ry - r1y) / step
+      ratio = Math.max(ratio, Math.sqrt(Math.hypot(ax, ay) / RAD / c.accel))
+      if (have >= 2) ratio = Math.max(ratio, Math.cbrt(Math.hypot(ax - a1x, ay - a1y) / step / RAD / c.jerk))
+      a1x = ax; a1y = ay
+    }
+    r1x = rx; r1y = ry; have++
+    previous = { heading: at.heading, elevation: at.elevation }
+  }
+  return ratio
+}
+
 export interface CalmGazePlan {
   /** the leg's timing, slowed where the turning asked for it */
   leg: GaitLeg
@@ -281,14 +367,19 @@ export function planCalmGaze(input: {
     if (!input.course || !input.tangent) return free
     const turned = planTurns({ ...input, turns: { ...input.turns, mayEnds: true } } as TurnInput)
     const floored = turned && !spins(turned, input.lengthM) ? turned : null
+    // a walk whose lens may wait is planned with it waiting too, standing and walking
+    const waited = input.turns.lensWait === true ? [planTurns({ ...input, turns: { ...input.turns, mayEnds: true } } as TurnInput, true), planWay(input, true)]
+      .filter((plan): plan is CalmGazePlan => plan !== null && !spins(plan, input.lengthM)) : []
     const tangent = input.tangent
-    const read = [free, ...(floored ? [floored] : [])].map(plan => {
+    const read = [free, ...(floored ? [floored] : []), ...waited].map(plan => {
       const back = backwardOf(plan, tangent)
       return { plan, back, red: gateRed(plan, tangent), floor: input.lengthM < FLOOR_LEAST_M || holdsFloor(plan), cost: plan.leg.seconds + BACKWARD_WEIGHT * back.seconds }
     })
     // the walk that follows its way reads red only where the walk it keeps reads red
     const anyGreen = read.some(r => !r.red)
-    const fits = read.filter(r => r.back.run <= BACKWARD_RUN_S && r.floor && (!r.red || r.plan === free || !anyGreen))
+    // and a walk that fits and reads green is taken before one that reads red
+    const fitting = read.filter(r => r.back.run <= BACKWARD_RUN_S && r.floor), greenFits = fitting.some(r => !r.red)
+    const fits = fitting.filter(r => !r.red || (!greenFits && (r.plan === free || !anyGreen)))
     // where none fits, a red the other does not read weighs more than a longer walk backward
     const calm = read.filter(r => r.floor && (!r.red || r.plan === free || !anyGreen))
     const pool = fits.length ? fits : calm.length ? calm : read
@@ -340,7 +431,7 @@ function holdsFloor(plan: CalmGazePlan): boolean {
   return true
 }
 
-function planWay(input: Parameters<typeof planCalmGaze>[0]): CalmGazePlan {
+function planWay(input: Parameters<typeof planCalmGaze>[0], waitLens = false): CalmGazePlan {
   const base = input.timed(0)
   // THE WAY IS READ ONCE, by the metre, so slowing the walk costs no second
   // reading of the path; the heading is unwrapped along it as it is read.
@@ -379,21 +470,38 @@ function planWay(input: Parameters<typeof planCalmGaze>[0]): CalmGazePlan {
     return target
   }
   const read: GazeCourse = { heading: 0, elevation: 0, weight: 0 }
-  const lensSeconds = 1.875 * Math.abs(input.zoom) / CALM_GAZE.zoomPerSecond
+  // a lens that waits changes evenly at the walk's narrow end, first where it
+  // widens and last where it narrows, and the caps follow the lens of the moment
+  const change = waitLens && input.fovs && Math.abs(input.zoom) > 1e-9 ? lensChange(input.zoom, input.fovs) : null
+  const lensSeconds = change ? change.seconds : 1.875 * Math.abs(input.zoom) / CALM_GAZE.zoomPerSecond
   caps = capsFor(input.lensPixels)
-  const rate = caps.lead * RAD
+  const rate = caps.lead * RAD, narrowCaps = caps
+  const shareAt = (t: number, total: number) => !change ? 0 : input.zoom > 0 ? change.share(t) : change.share(t - (total - change.seconds))
+  const lensPixelsAt = (t: number, total: number) => change && input.fovs
+    ? input.lensPixels * Math.tan(Math.min(...input.fovs) * RAD / 2) / Math.tan(change.fovAt(shareAt(t, total)) * RAD / 2) : input.lensPixels
+  const capsAt = (t: number, total: number) => change ? capsFor(lensPixelsAt(t, total)) : narrowCaps
+  const wideRate = change ? Math.max(capsAt(0, lensSeconds).lead, capsAt(lensSeconds * 4, lensSeconds * 4).lead) * RAD : rate
+  // a pan's caps meet the rate's own cap smoothly, so its acceleration never steps
+  const smoothCapsAt = (t: number, total: number) => {
+    const byLens = CALM_FILM.pixelsPerFrame * CALM_FILM.framesPerSecond / lensPixelsAt(t, total) / RAD
+    const share = Math.pow(Math.pow(CALM_GAZE.turnDegPerSecond, -8) + Math.pow(byLens, -8), -1 / 8) / CALM_GAZE.turnDegPerSecond
+    return { rate: CALM_GAZE.turnDegPerSecond * share, accel: CALM_GAZE.turnDegPerSecond2 * share, jerk: CALM_GAZE.turnDegPerSecond3 * share }
+  }
+  const waitPan = (pan: CalmGazePlan): CalmGazePlan => change ? { ...pan, lens: seconds => change.blend(shareAt(seconds, pan.leg.seconds)) } : pan
+  const pan = () => change ? waitPan(varyingPan(input.from, input.to, Math.max(base.seconds, lensSeconds), input.timed, smoothCapsAt))
+    : panPlan(input.from, input.to, Math.max(base.seconds, lensSeconds), input.timed, base)
   // The way's own last heading, which decides which way round the arriving
   // view is turned to while the way is followed.
   let endHeld = input.from.heading
   if (way) for (let i = wayCount; i >= 0; i--) if (way.weight[i]! > 0) { endHeld = way.heading[i]!; break }
-  if (!way) return panPlan(input.from, input.to, Math.max(base.seconds, lensSeconds), input.timed, base)
+  if (!way) return pan()
   let leg = base, spline: Spline | null = null, total = base.seconds, followed = 0
   for (const share of COURSE_SHARES) {
     const toHeading = share > 0 ? endHeld + wrap(input.to.heading - endHeld) : input.from.heading + wrap(input.to.heading - input.from.heading)
     // A leg too short to turn from one held view to the other at the lead's
     // rate is slowed until it is not, with time left over to ease both ends.
-    const owed = Math.max(Math.abs(toHeading - input.from.heading) / rate,
-      Math.abs(input.to.elevation - input.from.elevation) / (rate * PITCH_SHARE)) + EASE_SECONDS
+    const owed = Math.max(Math.abs(toHeading - input.from.heading) / wideRate,
+      Math.abs(input.to.elevation - input.from.elevation) / (wideRate * PITCH_SHARE)) + EASE_SECONDS
     total = Math.max(base.seconds, lensSeconds, owed)
     // The budget is set by the pan the leg would be without its way, so a way
     // that winds a whole turn round is not followed round it.
@@ -416,8 +524,9 @@ function planWay(input: Parameters<typeof planCalmGaze>[0]): CalmGazePlan {
         heading[k] = (input.from.heading + (toHeading - input.from.heading) * u) * (1 - w) + held * w
         elevation[k] = (input.from.elevation + (input.to.elevation - input.from.elevation) * u) * (1 - w) + (here ? here.elevation : 0) * w
       }
-      const headingLed = limit(heading, input.from.heading, toHeading, rate * step, times, total)
-      const elevationLed = limit(elevation, input.from.elevation, input.to.elevation, rate * PITCH_SHARE * step, times, total)
+      const steps = change ? Float64Array.from(times, t => capsAt(t, total).lead * RAD * step) : null
+      const headingLed = steps ? limitBy(heading, input.from.heading, toHeading, steps, 1) : limit(heading, input.from.heading, toHeading, rate * step, times, total)
+      const elevationLed = steps ? limitBy(elevation, input.from.elevation, input.to.elevation, steps, PITCH_SHARE) : limit(elevation, input.from.elevation, input.to.elevation, rate * PITCH_SHARE * step, times, total)
       let best = Infinity
       for (const spacing of SPACINGS) {
         const spans = Math.max(3, Math.round(total / spacing))
@@ -425,7 +534,7 @@ function planWay(input: Parameters<typeof planCalmGaze>[0]): CalmGazePlan {
         const e = fit(elevationLed, times, input.from.elevation, input.to.elevation, spans, total)
         const candidate: Spline = { knots: h.knots, heading: h.points, elevation: e.points, total }
         const read = peaks(candidate)
-        const ratio = Math.max(read.rate / caps.rate, Math.sqrt(read.accel / caps.accel), Math.cbrt(read.jerk / caps.jerk))
+        const ratio = change ? peakRatio(candidate, t => capsAt(t, total)) : Math.max(read.rate / caps.rate, Math.sqrt(read.accel / caps.accel), Math.cbrt(read.jerk / caps.jerk))
         if (ratio <= 1) { spline = candidate; break }
         best = Math.min(best, ratio)
       }
@@ -433,12 +542,12 @@ function planWay(input: Parameters<typeof planCalmGaze>[0]): CalmGazePlan {
     }
     if (spline) { followed = share; break }
   }
-  if (!spline) return panPlan(input.from, input.to, Math.max(base.seconds, lensSeconds), input.timed, base)
+  if (!spline) return pan()
   const planned = spline
   return {
     leg, stretch: leg.seconds / base.seconds, kind: `way ${followed}`,
     at: (seconds, target) => evaluate(planned, seconds, target),
-    lens: seconds => smooth(seconds / planned.total),
+    lens: seconds => change ? change.blend(shareAt(seconds, planned.total)) : smooth(seconds / planned.total),
     walk: seconds => gaitAt(leg, seconds),
     secondsAt: metres => gaitSecondsAt(leg, metres),
   }
@@ -534,6 +643,13 @@ export interface GazeTurns {
   /** a walk whose way winds round may turn round with it one way, its stands
    * the long way, where that reads green */
   windingRound?: boolean
+  /** a walk whose lens may wait: it changes evenly in the picture's scale,
+   * and may change where the walk stands or starts at its narrow end while
+   * the walk turns on the wider lens */
+  lensWait?: boolean
+  /** a walk that reads red every other way may hold a view at the edge of a
+   * sideways walk, a right angle off its way */
+  sideways?: boolean
 }
 /** A held view this far off its way is turned from standing; a doorway whose
  * way turns this much is turned in from standing. */
@@ -635,6 +751,24 @@ const QUICK_ACCEL = 15, QUICK_JERK = 55, QUICK_FILM_PIXELS = 13.5
 const QUICK_NAMED_ACCEL = 22, WIDE_LENS_DEG = 60
 /** A lens changed by time eases in and out over this long. */
 const LENS_EASE_S = 1.5
+/** A STAND ON A LENS THIS SLOW WAITS FOR THE WIDER ONE: on a walk whose lens
+ * may wait, where the pixel cap holds a standing turn at the walk's narrow end
+ * under this many degrees a second, the lens changes while the body stands
+ * there, the turn quickening as it widens, and the walk goes on the wider lens. */
+const LENS_WAIT_DEG_PER_S = 15
+/** THE LENS CHANGED EVENLY IN THE PICTURE'S SCALE, at the calm zoom rate and
+ * eased at both ends: its seconds, its share at a time from its start, the
+ * lens at a share, and the stage's blend (in authored degrees) there. */
+function lensChange(zoom: number, fovs: readonly [number, number]) {
+  const seconds = Math.abs(zoom) / (CALM_GAZE.zoomPerSecond * PAN_SHARE) + LENS_EASE_S
+  const ease = Math.min(LENS_EASE_S, seconds / 2), rate = 1 / (seconds - ease)
+  const ramp = (x: number) => rate * (x / 2 - ease / (2 * Math.PI) * Math.sin(Math.PI * x / ease))
+  const share = (t: number): number => t <= 0 ? 0 : t >= seconds ? 1 : t <= ease ? ramp(t) : t >= seconds - ease ? 1 - ramp(seconds - t) : rate * (ease / 2 + (t - ease))
+  const [f0, f1] = fovs
+  const fovAt = (u: number) => 2 * Math.atan(Math.tan(f0 * RAD / 2) * Math.exp(zoom * u)) / RAD
+  const blend = (u: number) => Math.abs(f1 - f0) < 1e-9 ? u : Math.max(0, Math.min(1, (fovAt(u) - f0) / (f1 - f0)))
+  return { seconds, share, fovAt, blend }
+}
 /** A distance within this of another is the same place on the way. */
 const SAME_M = .05, EDGE_M = .01
 /** A view within this of the one it ends or starts on counts as held there,
@@ -717,7 +851,7 @@ function leadPlan(from: GazeAngles, to: GazeAngles, timed: (seconds: number) => 
  * either side as far as the walk allows. The lens follows the body's place, as
  * the unhurried leg over the whole way would hold it there, so a stand holds
  * the lens where it stands and the walked-lens proof is the plain leg's. */
-function planTurns(input: TurnInput): CalmGazePlan | null {
+function planTurns(input: TurnInput, waitLens = false): CalmGazePlan | null {
   const L = input.lengthM, course = input.course
   if (!(L > 0)) return null
   const leaving = course(0, Math.min(L, input.turns.at.find(m => m > ARRIVING_M) ?? L))
@@ -786,20 +920,49 @@ function planTurns(input: TurnInput): CalmGazePlan | null {
   let lensMode = input.turns.lens ?? 'place'
   if (floorOn && lensMode === 'place' && Math.abs(input.zoom) > 0
     && cuts.slice(0, -1).some((a, i) => lensFloor(a, cuts[i + 1]!) > floorSeconds(cuts[i + 1]! - a) + 1e-6)) lensMode = input.zoom < 0 ? 'last' : 'first'
+  // THE LENS THAT WAITS, at the walk's narrow end where it stands there: the
+  // lens changes evenly while that stand turns under the pixel cap at the lens
+  // of each moment; every other stand and every stretch turns on the wider lens
+  const [fLeave, fArrive] = input.fovs ?? [0, 0], fNarrow = Math.min(fLeave, fArrive), fWide = Math.max(fLeave, fArrive)
+  const lensPixelsOf = (fov: number) => input.fovs ? input.lensPixels * Math.tan(fNarrow * RAD / 2) / Math.tan(fov * RAD / 2) : input.lensPixels
+  const pixelRate = (fov: number) => QUICK_FILM_PIXELS * CALM_FILM.framesPerSecond / Math.max(1, lensPixelsOf(fov)) / RAD
+  const askedAt = (fov: number) => input.turns.wideDegPerSecond !== undefined && fov >= WIDE_LENS_DEG ? input.turns.wideDegPerSecond : input.turns.quickDegPerSecond ?? CALM_GAZE.turnDegPerSecond
+  const even = input.turns.lensWait === true && input.fovs && Math.abs(input.zoom) > 1e-9 && fWide > fNarrow ? lensChange(input.zoom, input.fovs) : null
+  const waitAt: 'start' | 'end' | null = waitLens && strict && even && (input.turns.lens ?? 'place') === 'place'
+    && pixelRate(fNarrow) < LENS_WAIT_DEG_PER_S ? (fArrive > fLeave ? 'start' : 'end') : null
+  if (waitLens && !waitAt) return null
+  const waiting = (startTurn: boolean, endTurn: boolean) => (waitAt === 'start' && startTurn) || (waitAt === 'end' && endTurn)
+  const waitSeconds = even ? even.seconds : 0
+  // the share of the lens's change from the narrow end, by the time from there
+  const waitShare = (s: number) => even ? (input.zoom > 0 ? even.share(s) : 1 - even.share(waitSeconds - s)) : 0
+  // the stand's ceiling from the narrow end: the pixel cap's own growth as the
+  // lens widens, from the narrow lens's rate to the wide lens's
+  const waitLow = Math.min(askedAt(fNarrow), pixelRate(fNarrow)), waitHigh = Math.max(waitLow, Math.min(askedAt(fWide), pixelRate(fWide)))
+  const waitGrowth = Math.exp(Math.abs(input.zoom)) - 1
+  const waitCeiling = (s: number) => waitLow + (waitHigh - waitLow) * (Math.exp(Math.abs(input.zoom) * waitShare(s)) - 1) / waitGrowth
+  // the degrees the ceiling turns over the lens's change, for the choice, and
+  // its own steepest growth, which the stand's eases leave room for
+  let waitCovered = 0, waitSlope = 0
+  if (waitAt) for (let s = 0; s < waitSeconds; s += 1 / 30) { waitCovered += waitCeiling(s + 1 / 60) / 30; waitSlope = Math.max(waitSlope, (waitCeiling(s + 1 / 30) - waitCeiling(s)) * 30) }
+  const waitStandSeconds = (deg: number) => deg < .5 ? waitSeconds
+    : deg <= waitCovered ? Math.max(waitSeconds, 1 + deg / Math.max(1e-6, waitCovered) * waitSeconds) : waitSeconds + (deg - waitCovered) / waitHigh + 1
+  const wideStandRate = Math.min(askedAt(fWide), pixelRate(fWide))
+  const wideStandSeconds = (deg: number) => (deg < .5 ? 0 : deg / wideStandRate + Math.min(Math.max(QUICK_EASE_S, 1.875 * wideStandRate / QUICK_NAMED_ACCEL), deg / wideStandRate))
   // each way of looking at each stretch, walked as the film will read it: the
   // body's own direction over a stride against the view, wherever it
   // walks at a walker's pace, and how far off its way the view passes each
   // doorway
   // a stretch under the floor turns under the caps of the narrowest lens it
   // walks on, the lens changed with the body's place
-  const stretchLens = (a: number, b: number): number => {
+  const stretchLens = (a: number, b: number, waits = false): number => {
+    if (waits) return lensPixelsOf(fWide)
     if (!strict || lensMode !== 'place' || !input.fovs || !(Math.abs(input.zoom) > 1e-9)) return input.lensPixels
     const [f0, f1] = input.fovs, at = (m: number) => f0 + (f1 - f0) * lensAt(m)
     return input.lensPixels * Math.tan(Math.min(f0, f1) * RAD / 2) / Math.tan(Math.min(at(a), at(b)) * RAD / 2)
   }
   const stretchesFor = (startTurn: boolean, endTurn: boolean): Stretch[] => cuts.slice(0, -1).map((a, i) => {
-    const b = cuts[i + 1]!, first = i === 0, last = i + 2 === cuts.length
-    const ownLens = stretchLens(a, b), ownCaps = capsFor(ownLens)
+    const b = cuts[i + 1]!, first = i === 0, last = i + 2 === cuts.length, waits = waiting(startTurn, endTurn)
+    const ownLens = stretchLens(a, b, waits), ownCaps = capsFor(ownLens)
     caps = ownCaps
     const pick = (g: GazeAngles): GazeAngles => ({ heading: g.heading, elevation: g.elevation })
     const out = pick(first && !startTurn ? input.from : course(a, b))
@@ -812,7 +975,7 @@ function planTurns(input: TurnInput): CalmGazePlan | null {
       for (let m = a + .5; m < b; m += .5) { const h = course(m, Math.min(b, m + .6)).heading; net += wrap(h - prev); prev = h }
       if (Math.abs(net) > Math.PI / 2 && Math.sign(net) !== Math.sign(turn)) turn -= Math.sign(turn) * 2 * Math.PI
     }
-    const floor = lensMode === 'place' ? lensFloor(a, b) : 0
+    const floor = lensMode === 'place' && !waits ? lensFloor(a, b) : 0
     const timed = (seconds: number) => gaitLeg(length, Math.max(seconds, floor))
     const cap = floorOn ? Math.max(floorSeconds(length), floor) : Infinity
     const next = last ? input.to.heading : course(b, cuts[i + 2]!).heading
@@ -852,6 +1015,9 @@ function planTurns(input: TurnInput): CalmGazePlan | null {
         const want = out.heading + wrap(next - out.heading)
         const heading = Math.max(high - glance, Math.min(low + glance, want))
         candidates.push({ mode: 'toward', start: heading, plan: held(heading) })
+        // or, where every other way reads red, at the edge of a sideways walk
+        const side = CRAB_DEG * RAD, edge = Math.max(high - side, Math.min(low + side, want))
+        if (input.turns.sideways === true && Math.abs(edge - heading) > RAD) candidates.push({ mode: 'toward', start: edge, plan: held(edge) })
       }
     }
     // a stretch through a doorway may hold the view straight through it
@@ -940,6 +1106,53 @@ function planTurns(input: TurnInput): CalmGazePlan | null {
     }
     return { a, b, out, in: inn, options: kept }
   })
+  // THE STAND THAT WAITS, in time from the walk's narrow end: eased on from
+  // rest under the ceiling, held to it, and eased onto the rate and its change
+  // the walk takes at the wide end; slowed as a whole where it would end before
+  // the lens has come. Its seconds, and the degrees turned by a time.
+  const waitGrid = 1 / 240, waitCount = Math.ceil(waitSeconds / waitGrid) + 1
+  const waitArea = new Float64Array(waitCount + 1)
+  if (waitAt) for (let i = 1; i <= waitCount; i++) waitArea[i] = waitArea[i - 1]! + waitGrid * waitCeiling((i - .5) * waitGrid)
+  const waitAreaAt = (s: number): number => {
+    if (s <= 0) return 0
+    const x = s / waitGrid
+    if (x >= waitCount) return waitArea[waitCount]! + (s - waitCount * waitGrid) * waitHigh
+    const i = Math.floor(x)
+    return waitArea[i]! + (waitArea[i + 1]! - waitArea[i]!) * (x - i)
+  }
+  const waitTurn = (A: number, rFar: number, aFar: number, easeFor: (delta: number) => number): { seconds: number; turned: (s: number) => number } => {
+    const N = 64
+    // the degrees of the ease from rest, and of the ease onto the far rate from b
+    const easeIn = (k: number, e1: number) => { let n = 0; for (let i = 0; i < N; i++) { const s = (i + .5) / N * e1; n += k * waitCeiling(s) * smooth(s / e1) } return n * e1 / N }
+    const rateOut = (s: number, k: number, b: number, e3: number) => { const u = Math.min(1, Math.max(0, (s - b) / e3)), r = k * waitCeiling(s); return r + (rFar - r) * smooth(u) + aFar * e3 * u * u * u * (u - 1) }
+    const easeOut = (k: number, b: number, e3: number) => { let n = 0; for (let i = 0; i < N; i++) n += rateOut(b + (i + .5) / N * e3, k, b, e3); return n * e3 / N }
+    const shape = (k: number) => {
+      const e1 = easeFor(k * waitLow), head = easeIn(k, e1)
+      const through = (b: number) => { const e3 = easeFor(Math.abs(k * waitCeiling(b) - rFar)); return { e3, deg: head + k * (waitAreaAt(b) - waitAreaAt(e1)) + easeOut(k, b, e3) } }
+      if (through(e1).deg > A) return null
+      let low = e1, high = e1 + 1
+      while (through(high).deg < A && high < 3600) high *= 2
+      for (let i = 0; i < 40; i++) { const mid = (low + high) / 2; if (through(mid).deg < A) low = mid; else high = mid }
+      return { k, e1, b: high, e3: through(high).e3 }
+    }
+    let form = A < .5 ? null : shape(1)
+    if (A >= .5 && (!form || form.b + form.e3 < waitSeconds)) {
+      let low = 0, high = 1, found: typeof form = null
+      for (let i = 0; i < 30; i++) {
+        const mid = (low + high) / 2, f = shape(mid)
+        if (f && f.b + f.e3 >= waitSeconds) { low = mid; found = f } else high = mid
+      }
+      form = found ?? form
+    }
+    if (!form) return { seconds: waitSeconds, turned: s => A * smooth(s / waitSeconds) }
+    const { k, e1, b, e3 } = form, T = b + e3, count = Math.ceil(T / waitGrid)
+    const table = new Float64Array(count + 1)
+    const rate = (s: number) => s < e1 ? k * waitCeiling(s) * smooth(s / e1) : s <= b ? k * waitCeiling(s) : rateOut(s, k, b, e3)
+    for (let i = 1; i <= count; i++) table[i] = table[i - 1]! + Math.min(waitGrid, T - (i - 1) * waitGrid) * rate(Math.min(T, (i - .5) * waitGrid))
+    // closes on the angle asked, whatever the grid left over
+    const scale = table[count]! > 0 ? A / table[count]! : 1
+    return { seconds: Math.max(T, waitSeconds), turned: s => { const x = Math.max(0, Math.min(count, s / waitGrid)), i = Math.min(count - 1, Math.floor(x)); return scale * (table[i]! + (table[i + 1]! - table[i]!) * (x - i)) } }
+  }
   // THE WAY ROUND. Every stand may turn the short way or, near a half turn,
   // the long; every stretch picks how it looks; a doorway near an end may be
   // faced from standing or not. What the film's gate would read red costs
@@ -959,6 +1172,8 @@ function planTurns(input: TurnInput): CalmGazePlan | null {
   const eitherDeg = Math.abs(winding) > WINDING_DEG * RAD ? WINDING_EITHER_DEG : EITHER_WAY_DEG
   for (const startTurn of mustStart ? [true] : mayStart ? [true, false] : [false]) for (const endTurn of mustEnd ? [true] : mayEnd ? [true, false] : [false]) {
     if (!startTurn && !endTurn && !stops.length) continue
+    // a walk planned for its lens to wait stands at its narrow end
+    if (waitLens && !waiting(startTurn, endTurn)) continue
     const stretches = stretchesFor(startTurn, endTurn)
     const count = stretches.reduce((n, x) => n * x.options.length, 1)
     for (let pickIndex = 0; pickIndex < count; pickIndex++) {
@@ -988,13 +1203,14 @@ function planTurns(input: TurnInput): CalmGazePlan | null {
       const aslant = strict ? picks.reduce((n, o) => n + o.crab, 0) : 0
       const walked = picks.reduce((n, o) => n + o.plan.leg.seconds, 0), backward = picks.reduce((n, o) => n + o.back, 0)
       const spare = strict ? (startTurn && !mustStart ? 1 : 0) + (endTurn && !mustEnd ? 1 : 0) : 0
+      const waits = waiting(startTurn, endTurn), waitStep = waits ? (waitAt === 'start' ? 0 : steps.length - 1) : -1
       for (let lm = 0; lm < 1 << either.length; lm++) {
         const longs = new Set(either.filter((_, j) => lm & (1 << j)))
         let total = 0, net = 0, reversals = 0, sign = 0, standTime = 0
         steps.forEach((x, k) => {
           const t = longs.has(k) ? x.turn - Math.sign(x.turn) * 2 * Math.PI : x.turn
           total += Math.abs(t); net += t
-          if (x.stand) standTime += standSeconds(Math.abs(t) / RAD)
+          if (x.stand) standTime += k === waitStep ? waitStandSeconds(Math.abs(t) / RAD) : waits ? wideStandSeconds(Math.abs(t) / RAD) : standSeconds(Math.abs(t) / RAD)
           if (Math.abs(t) > YAW_SWING_DEG * RAD) { if (sign && Math.sign(t) !== sign) reversals++; sign = Math.sign(t) }
         })
         const given = (total - Math.abs(net)) / RAD
@@ -1011,7 +1227,8 @@ function planTurns(input: TurnInput): CalmGazePlan | null {
   // unless the film's gate would read its heading red; then the next that
   // costs least and reads green, if one does. Each is tried with its stands'
   // turns carried into the walk either side, then with the stands at rest.
-  const first = build(best!, true)
+  if (!best) return null
+  const first = build(best, true)
   if (!strict || !input.tangent) return first
   if (!gateRed(first, input.tangent)) return { ...first, red: false }
   const plain = build(best!, false)
@@ -1025,11 +1242,17 @@ function planTurns(input: TurnInput): CalmGazePlan | null {
     }
   }
   // the long way round only where it reads green
-  if (eitherDeg !== EITHER_WAY_DEG) return planTurns({ ...input, turns: { ...input.turns, windingRound: false } })
+  if (eitherDeg !== EITHER_WAY_DEG) return planTurns({ ...input, turns: { ...input.turns, windingRound: false } }, waitLens)
+  // and a view held at the edge of a sideways walk only where nothing else is green
+  if (input.turns.sideways !== true) {
+    const sideways = planTurns({ ...input, turns: { ...input.turns, sideways: true } }, waitLens)
+    if (sideways && !sideways.red) return sideways
+  }
   return { ...first, red: true }
 
   function build(chosen: Choice, carry: boolean): CalmGazePlan {
     const { stretches, startTurn, endTurn } = chosen
+    const waits = waiting(startTurn, endTurn)
     const pieces: Piece[] = []
     let clock = 0, step = 0
     let facing: GazeAngles = { heading: input.from.heading, elevation: input.from.elevation }
@@ -1144,10 +1367,12 @@ function planTurns(input: TurnInput): CalmGazePlan | null {
     const standFov = (p: Piece): number => {
       const [f0, f1] = input.fovs!, narrow = Math.min(f0, f1)
       if (!(Math.abs(input.zoom) > 1e-9)) return narrow
+      if (waits) return fWide
       if (lensMode === 'place') return f0 + (f1 - f0) * lensAt(p.from)
       return lensMode === 'last' && isNamed(p) ? f0 : narrow
     }
     const standLensPixels = (fov: number) => input.lensPixels * Math.tan(Math.min(...input.fovs!) * RAD / 2) / Math.tan(fov * RAD / 2)
+    const waitPiece = waits ? (waitAt === 'start' ? pieces[0] : pieces[pieces.length - 1]) : undefined
     pieces.forEach((turn, j) => {
       if (turn.kind !== 'turn') return
       const before = pieces[j - 1], after = pieces[j + 1], F = turn.plan.leg.seconds
@@ -1212,6 +1437,22 @@ function planTurns(input: TurnInput): CalmGazePlan | null {
       const aIn = x > 0 ? (rateAt(x + .02) - rateAt(Math.max(1e-3, x - .02))) / (x + .02 - Math.max(1e-3, x - .02)) : 0
       const aOut = y > 0 ? (rateAt(Math.min(F - 1e-3, F - y + .02)) - rateAt(F - y - .02)) / (Math.min(F - 1e-3, F - y + .02) - (F - y - .02)) : 0
       const easeFor = (delta: number) => Math.max(QUICK_EASE_S, 1.875 * delta / accelCap, Math.sqrt(5.7735 * delta / QUICK_JERK))
+      // the stand at the narrow end turns as the lens widens, in time from that end
+      if (waits && turn === waitPiece) {
+        const fromStart = waitAt === 'start'
+        const waitAccel = Math.max(1, (named || fWide >= WIDE_LENS_DEG ? QUICK_NAMED_ACCEL : QUICK_ACCEL) - 1.25 * waitSlope)
+        const waitEaseFor = (delta: number) => Math.max(QUICK_EASE_S, 1.875 * delta / waitAccel, Math.sqrt(5.7735 * delta / QUICK_JERK))
+        const planned = waitTurn(A, fromStart ? rOut : rIn, fromStart ? aOut : -aIn, waitEaseFor), T = planned.seconds
+        turn.plan = { ...pan, at: (seconds, target) => {
+          const t = Math.max(0, Math.min(T, seconds)), done = fromStart ? planned.turned(t) : A - planned.turned(T - t)
+          const share = A > 0 ? done / A : 1
+          target.heading = h0.heading + (h1.heading - h0.heading) * share
+          target.elevation = h0.elevation + (h1.elevation - h0.elevation) * share
+          return target
+        } }
+        turn.seconds = T
+        return
+      }
       const ramps = (R: number) => {
         const e1 = easeFor(Math.abs(R - rIn)), e3 = easeFor(Math.abs(R - rOut))
         return { e1, e3, covered: e1 * (rIn + R) / 2 + .05 * aIn * e1 * e1 + e3 * (R + rOut) / 2 - .05 * aOut * e3 * e3 }
@@ -1289,9 +1530,10 @@ function planTurns(input: TurnInput): CalmGazePlan | null {
     // narrows and first where it widens; a leg shorter than that stands on at
     // its end until the lens has come
     let lensTime: { start: number; seconds: number; ease: number; rate: number } | null = null
-    if (lensMode !== 'place' && Math.abs(input.zoom) > 1e-9) {
+    if (!waits && lensMode !== 'place' && Math.abs(input.zoom) > 1e-9) {
       const [f0, f1] = input.fovs ?? [0, 0]
-      const perShare = input.fovs && Math.abs(f1 - f0) > 1e-9 ? Math.abs(f1 - f0) * RAD / Math.sin(Math.min(f0, f1) * RAD) : Math.abs(input.zoom)
+      // a lens that may wait changes evenly in the picture's scale
+      const perShare = even ? Math.abs(input.zoom) : input.fovs && Math.abs(f1 - f0) > 1e-9 ? Math.abs(f1 - f0) * RAD / Math.sin(Math.min(f0, f1) * RAD) : Math.abs(input.zoom)
       const seconds = Math.max(perShare, Math.abs(input.zoom)) / (CALM_GAZE.zoomPerSecond * PAN_SHARE) + LENS_EASE_S
       // a lens changed last waits for the named stands, which turned on the leaving lens
       const narrowing = input.fovs ? input.fovs[0] > input.fovs[1] : false
@@ -1322,18 +1564,21 @@ function planTurns(input: TurnInput): CalmGazePlan | null {
     const leg: GaitLeg = { ...natural, lengthM: L, seconds: total }
     return {
       leg, stretch: total / input.timed(0).seconds, red: chosen.cost >= 1000,
-      kind: `turns ${[startTurn ? 'start' : '', ...stops.map(m => m.toFixed(1)), endTurn ? 'end' : ''].filter(Boolean).join(' ')} (${modes.join(' ')})${namedUsed ? ' named' : ''}${lensTime ? ` lens ${lensMode}` : ''}`,
+      kind: `turns ${[startTurn ? 'start' : '', ...stops.map(m => m.toFixed(1)), endTurn ? 'end' : ''].filter(Boolean).join(' ')} (${modes.join(' ')})${namedUsed ? ' named' : ''}${lensTime ? ` lens ${lensMode}` : ''}${waits ? ' lens waits' : ''}`,
       at(seconds, target) {
         const t = Math.max(0, Math.min(total, seconds)), p = pieceAt(t)
         return p.plan.at(t - p.start, target)
       },
       lens: seconds => {
+        // the lens that waits changes where the body stands at the narrow end
+        if (waits && even) return even.blend(waitAt === 'start' ? even.share(seconds) : even.share(seconds - (total - waitSeconds)))
         if (!lensTime) return smooth(gaitSecondsAt(natural, walk(seconds).metres) / natural.seconds)
         const { start, seconds: T, ease, rate } = lensTime, t = seconds - start
         if (t <= 0) return 0
         if (t >= T) return 1
         const ramp = (x: number) => rate * (x / 2 - ease / (2 * Math.PI) * Math.sin(Math.PI * x / ease))
-        return t <= ease ? ramp(t) : t >= T - ease ? 1 - ramp(T - t) : rate * (ease / 2 + (t - ease))
+        const u = t <= ease ? ramp(t) : t >= T - ease ? 1 - ramp(T - t) : rate * (ease / 2 + (t - ease))
+        return even ? even.blend(u) : u
       },
       walk,
       secondsAt(metres) {

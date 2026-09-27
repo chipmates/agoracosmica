@@ -404,6 +404,13 @@ const RAIL_FLOOR_KEPT=new Set(['study>chamber','chamber>study','flight>works','o
  * heart valve's walk out to the display wall leaves its niche eastward and
  * comes round to face west again, so it turns round one way with its way. */
 const RAIL_WINDING_ROUND=new Set(['body-valve>supper-wall'])
+/** Walks whose lens waits at their narrow end: between the heart valve's and
+ * the body wall's narrow lenses and the wider rooms round them the lens
+ * changes where the walk stands or starts there, and the turns are made on
+ * the wider lens. Elsewhere a wider lens walked past a machine brings it to
+ * the frame's edge, so the rule is kept to the walks it was measured on. */
+const RAIL_LENS_WAITS=new Set(['body-valve>supper-wall','supper-wall>body-valve','body>supper-wall','supper-wall>body','body>line-early','line-early>body',
+  'body>body-valve','body-valve>body','body-valve>reading-table','reading-table>body-valve','body>reading-table','reading-table>body'])
 /** THE COLLECTION STAIR IS WALKED DOWN LOOKING OUT, not back: at the
  * landing, the terrace's end, the view turns south-west to the court and the
  * pavilion below, standing, holds there down the treads, and gives way to the
@@ -462,7 +469,7 @@ const wallOfStation=(id:VinciStationId):VinciWall|undefined=>vinciWallOfStation(
 /** The rooms under the pavilion's roof, left and entered by its one door. */
 const INSIDE:readonly RailSide[]=['picture-room','long-gallery','mechanism-hall']
 /** How a route may stand and turn: the gaze plan's own table (`rail-gaze.ts`). */
-interface RouteTurns {start:boolean;end:boolean;stands?:readonly RailWaypoint[];named?:{start?:boolean;end?:boolean;at?:readonly RailWaypoint[]};floor?:boolean;lens?:'place'|'last'|'first';forward?:boolean;turned?:boolean;windingRound?:boolean}
+interface RouteTurns {start:boolean;end:boolean;stands?:readonly RailWaypoint[];named?:{start?:boolean;end?:boolean;at?:readonly RailWaypoint[]};floor?:boolean;lens?:'place'|'last'|'first';forward?:boolean;turned?:boolean;windingRound?:boolean;lensWait?:boolean}
 export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:RailGeometryAuthority) {
   /** A request that carries a wall vertex is walked on the wall's own line,
    * whether it ends at a stop of the hang or at one of its two end stations. */
@@ -611,7 +618,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     // reveals out of the frame's edges.
     const pair=`${completed!.id}>${request.id}`,from=completed!.id,to=request.id
     const named={start:RAIL_NAMED_LEAVE.has(from),end:RAIL_NAMED_ARRIVE.has(to),at:from==='reading-table'||to==='reading-table'?[railReadingPorch]:[]}
-    const turns={start:RAIL_TURN_TO_LEAVE.has(from),end:RAIL_TURN_ON_ARRIVAL.has(to),stands:railPairTurns[pair],named,floor:!RAIL_FLOOR_KEPT.has(pair),forward:true,turned:RAIL_TURNED_ARRIVALS.has(pair),windingRound:RAIL_WINDING_ROUND.has(pair)}
+    const turns={start:RAIL_TURN_TO_LEAVE.has(from),end:RAIL_TURN_ON_ARRIVAL.has(to),stands:railPairTurns[pair],named,floor:!RAIL_FLOOR_KEPT.has(pair),forward:true,turned:RAIL_TURNED_ARRIVALS.has(pair),windingRound:RAIL_WINDING_ROUND.has(pair),lensWait:RAIL_LENS_WAITS.has(pair)}
     if(to==='garden'&&INSIDE.includes(railSide(from)))return {path:route,route:true,turns:{...turns,end:true,named:{...named,at:[...named.at,railGardenPorch]},lens:'first',forward:true}}
     if(from==='garden'&&INSIDE.includes(railSide(to)))return {path:route,route:true,turns:{...turns,start:false,named:{...named,at:[...named.at,railGardenPorch]},lens:'last',forward:true}}
     return {path:route,route:true,turns}
@@ -713,7 +720,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
           quickDegPerSecond:request.phone?RAIL_QUICK_TURN_PHONE:RAIL_QUICK_TURN,wideDegPerSecond:request.phone?RAIL_QUICK_WIDE_PHONE:RAIL_QUICK_WIDE,
           ...(certified.turns.named?{named:{start:certified.turns.named.start,end:certified.turns.named.end,at:doorTurns(certified.turns.named.at??[])},
             namedDegPerSecond:request.phone?RAIL_QUICK_NAMED_PHONE:RAIL_QUICK_NAMED}:{}),
-          floor:certified.turns.floor===true,lens:certified.turns.lens??'place',forward:certified.turns.forward===true||stairs.length>0,turned:certified.turns.turned===true,windingRound:certified.turns.windingRound===true,scripted:lookKeys!==undefined}}:{})})
+          floor:certified.turns.floor===true,lens:certified.turns.lens??'place',forward:certified.turns.forward===true||stairs.length>0,turned:certified.turns.turned===true,windingRound:certified.turns.windingRound===true,lensWait:certified.turns.lensWait===true,scripted:lookKeys!==undefined}}:{})})
     leg=gaze.leg;duration=leg.seconds;legClock=0;legClockAt=now;pace=1;waiting=0;strideM=strideTarget=0;strideAt=now
     active=request
   }
