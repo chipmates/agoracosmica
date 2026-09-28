@@ -222,8 +222,8 @@
   },
   {
    "file": "src/wings/vinci/dense-mineral-body.ts",
-   "sha256": "69c67887495d8d36846c296b7c6e5c52234bf02445895d38f6268f4331b881ea",
-   "bytes": 6996,
+   "sha256": "99f36b412c620d691d6489e5019760f3f25e5e932e9f6e4d268fba8fc8a94b6b",
+   "bytes": 7319,
    "unchangedDuringAudit": true
   },
   {
@@ -684,8 +684,8 @@
   },
   {
    "file": "src/wings/vinci/surface.ts",
-   "sha256": "a1ffe793f89d759717adab8db429f81d830b17db610acedf48ba02881805cb4b",
-   "bytes": 54448,
+   "sha256": "f38f5ba4e4d35c30b813c5a84951491a87879297dd8a08cb98526e974ef96321",
+   "bytes": 54804,
    "unchangedDuringAudit": true
   },
   {
