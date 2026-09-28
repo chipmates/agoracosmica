@@ -1,7 +1,7 @@
 import { createStaticShadowCache } from './static-shadow-cache'
 import { warmWalk, WARM_EXTRA_FRAMES, type WarmWalk } from '../../stack/warm-up'
 import { applyDisplayedSkyAir, createAerialFog, applyDisplayedHorizonHaze, displayedHorizonHazeProvenance, createHazeLive, resetHazeLive, type HazeLive, type IndoorBox } from './display-sky-haze'
-import { farewellAir, farewellAt, farewellPose, farewellSunDirection } from './farewell'
+import { FAREWELL_SECONDS, farewellAir, farewellAt, farewellPose, farewellSunDirection } from './farewell'
 import { createEveningSky, createEveningStars, sunDiscRadiance, twilightRadiance, type EveningSky, type EveningStars } from './farewell-sky'
 import { kelvinToColour } from '../../stack/light'
 import { mineralSurfaceProvenance, closeSurfaceProvenance } from './surface'
@@ -104,7 +104,7 @@ import { apronProvenance } from './apron'
 import { vinciContent, vinciPlanRooms, vinciThroughLine, vinciLifeBands, vinciLifePeople, vinciLifeSecondLine, vinciLifeCut, vinciLifeWorksRow, vinciLifeWorksCount, vinciLifeWorksEmpty, vinciLifeCertaintyCounted, vinciLifeHourMark, vinciLifeFloorCount, vinciHourValues, vinciWelcomeText, vinciLegacyStationIds, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, vinciAbsences, vinciGrounds, vinciRightsPolicy, vinciWingCounts, vinciSourcesHeadings, type VinciCertainty, type VinciStatement, type VinciStationContent, type VinciStationId, type VinciText } from './content'
 import wingCss from './wing.css?inline'
 import { applyDeskSteps, deskOn } from '../desk-switches'
-import { deskStageHeight } from '../desk-stage'
+import { deskBand, deskStageHeight, setDeskBand } from '../desk-stage'
 import { createDeskChrome, type DeskChrome, type DeskStation } from '../desk-chrome'
 import deskCss from '../desk-chrome.css?inline'
 import deskTypeCss from '../desk-type.css?inline'
@@ -655,6 +655,9 @@ export function createWing():VinciWingModule {
   /** the share of the farewell the wing stands at, or null outside it */
   let farewellShare:number|null=null
   let farewellHeld:{eye:Vector3,at:Vector3,fov:number}|null=null
+  /** THE LOOK UP WHILE IT RUNS: when it began on the wing's clock and the
+   * eye it rose from */
+  let farewellRun:{pressed:number,from:number,band:number,start:{eye:Vector3,at:Vector3,fov:number}}|null=null
   const hourSun=new Vector3(), eveningSun=new Vector3()
   /** the dome's own haze share at the hour, read once it is built */
   let mieAtRest=.005
@@ -764,6 +767,61 @@ export function createWing():VinciWingModule {
     const c=hosts.world.camera
     c.position.copy(farewellHeld.eye);c.lookAt(farewellHeld.at);c.fov=fittedRailFov(farewellHeld.fov,c.aspect,narrow())
     c.updateProjectionMatrix();c.updateMatrixWorld()
+  }
+  /** the stars held a breath before the lobby takes the visitor home, the
+   * last of it a dip of the print so the lobby's own night comes in on a cut */
+  const FAREWELL_REST=2, FAREWELL_DIP=.8
+  /** THE DESK'S BAND GOES UNDER A DIP: the evening was framed for the whole
+   * window, so the band's strip is given back to the picture at the bottom
+   * of a short dip of the print, where the new frame cannot be seen to jump. */
+  const BAND_DOWN=.3, BAND_UP=.6
+  /** THE GRAVE'S LOOK UP: the eye rises over the house, the sun goes down
+   * behind it, the stars come out, then the lobby. False where it cannot run
+   * (away from the grave, mid-walk, reduced motion): the caller goes home. */
+  function lookUp():boolean {
+    if(farewellRun)return true
+    if(!hosts||!standing||matchMedia('(prefers-reduced-motion: reduce)').matches)return false
+    const nav=rail.navigation
+    if(hereContent().id!=='grave'||nav.active||nav.exhibit||nav.approaching||closeLook?.id)return false
+    const c=hosts.world.camera, ahead=c.getWorldDirection(new Vector3()), now=hosts.world.clock(), band=deskBand()
+    // the rise starts from the eye as it stands, the stop's own lens unfitted
+    farewellRun={pressed:now,from:now+(band>0?BAND_DOWN:0),band,start:{eye:c.position.clone(),at:c.position.clone().addScaledVector(ahead,10),fov:stationPose('grave',narrow()).fov}}
+    hosts.stage.parentElement!.dataset['farewell']=''
+    return true
+  }
+  /** The look up at the wing's clock; a walk begun under it ends it where it
+   * stands, and its end is the lobby. True once the wing is gone. */
+  function runFarewell():boolean {
+    if(!farewellRun||!hosts)return false
+    if(rail.navigation.active){endFarewell(false);return false}
+    const now=hosts.world.clock()
+    // the band stays given back: a repaint of the desk that measures it again is undone
+    if(farewellRun.band>0&&now-farewellRun.pressed>=BAND_DOWN&&deskBand()>0){farewellRun.band=deskBand();setDeskBand(0)}
+    const share=(now-farewellRun.from)/FAREWELL_SECONDS
+    if(share>=1+FAREWELL_REST/FAREWELL_SECONDS){endFarewell(true);return !hosts}
+    const s=Math.max(0,Math.min(1,share))
+    farewellHeld=farewellPose(s,farewellRun.start,narrow())
+    const e=farewellHeld.eye
+    if(s!==farewellShare)applyEvening(s,e.y-groundHeight(e.x,-e.z))
+    return false
+  }
+  /** The print's share left by the dips: the band's, down and up again at
+   * the start, and the closing one in the rest's last beat. */
+  function farewellDip():number {
+    if(!farewellRun||!hosts)return 1
+    const now=hosts.world.clock(), eased=(u:number)=>{const v=Math.max(0,Math.min(1,u));return v*v*(3-2*v)}
+    const since=now-farewellRun.pressed
+    const band=farewellRun.band>0?(since<BAND_DOWN?1-eased(since/BAND_DOWN):eased((since-BAND_DOWN)/BAND_UP)):1
+    return band*eased((FAREWELL_SECONDS+FAREWELL_REST-(now-farewellRun.from))/FAREWELL_DIP)
+  }
+  /** Home to the lobby under the stars, or back to the hour where it stands. */
+  function endFarewell(home:boolean):void {
+    const frame=hosts?.stage.parentElement, band=farewellRun?.band??0
+    farewellRun=null;farewellHeld=null
+    if(frame)delete frame.dataset['farewell']
+    if(home){frame?.querySelector<HTMLElement>('.wing-lobby')?.click();return}
+    if(band>0)setDeskBand(band)
+    applyEvening(null)
   }
   /** A LOOK TEST OF THE FAREWELL, under the export only: the evening at a
    * share, from the farewell's own path or from a pose that scouts one. */
@@ -1217,7 +1275,11 @@ export function createWing():VinciWingModule {
     window.addEventListener('na-wing-plan',()=>openPlan(),options)
     // THE WALK'S SECOND ENDING, at the grave: the talk opens the library's
     // door where its adapter is wired, and says it did.
-    window.addEventListener('na-wing-ending',e=>{const asked=e as CustomEvent<{ending?:string}>;if(asked.detail?.ending==='talk'&&talkAtTheGrave())asked.preventDefault()},options)
+    window.addEventListener('na-wing-ending',e=>{const asked=e as CustomEvent<{ending?:string}>,ending=asked.detail?.ending;if(ending==='talk'?talkAtTheGrave():ending==='lookup'&&lookUp())asked.preventDefault()},options)
+    // UNDER THE LOOK UP the chrome is gone: a press or Escape goes on to the
+    // lobby at once, and no other key walks the rail behind the evening.
+    window.addEventListener('pointerdown',e=>{if(!farewellRun)return;e.preventDefault();e.stopPropagation();endFarewell(true)},{...options,capture:true})
+    window.addEventListener('keydown',e=>{if(!farewellRun)return;e.preventDefault();e.stopPropagation();if(!e.repeat&&(e.key==='Escape'||e.key==='Enter'||e.key===' '))endFarewell(true)},{...options,capture:true})
     // THE SHEET TAKES ITS OWN GESTURE: a drag up opens it, a drag down or a
     // tap on the peek closes or opens it, and the card itself outlives every
     // repaint, so this is bound once.
@@ -3273,7 +3335,10 @@ export function createWing():VinciWingModule {
       const payload=Boolean(closeLook?.id&&closeLook.surface!=='room')||Boolean(plan?.held())||Boolean(life?.held())
       exhibits?.holdPlates(payload)
       if(payload)return
-      measurement.update();rail.update();holdFarewell()
+      measurement.update();rail.update()
+      // the lobby taken at the look up's end stops the wing inside this frame
+      if(runFarewell())return
+      holdFarewell()
       // THE ROOM'S ONE FULL PLATE DOES NOT CHASE A RUN. While the eye slides
       // along the wall the near rule measures from the stop it will land on,
       // so a run past twenty-five works costs one request and not twenty-five.
@@ -3294,7 +3359,7 @@ export function createWing():VinciWingModule {
       if(arrived>=0&&arrived!==card&&!activeView){card=arrived;dock.scrollTop=0;paintHeader();paintDock();paintQuestion();standHere()}
       if(nav.completed&&nav.completed!==exposureAt)exposureAt=nav.completed
       const byRoom=activeView?null:roomPrint(nav,hosts.world.camera.position)
-      const dusk=farewellShare===null?1:farewellExposure(farewellShare,hosts.world.camera)
+      const dusk=farewellShare===null?1:farewellExposure(farewellShare,hosts.world.camera)*farewellDip()
       const opening=(activeView&&VIEW_EXPOSURE[activeView]!==undefined?VIEW_EXPOSURE[activeView]!:byRoom?.exposure??legExposure(nav))*dusk, rolling=activeView&&VIEW_SHOULDER[activeView]!==undefined?VIEW_SHOULDER[activeView]!:byRoom?.shoulder??legShoulder(nav)
       const bending=byRoom?.toe??legToe(nav)
       if(nav.completed&&(opening!==exposureShown||rolling!==shoulderShown||bending!==toeShown))aimPrint(nav.completed,opening,rolling,bending)
@@ -3352,7 +3417,8 @@ export function createWing():VinciWingModule {
       const name=quiet&&!quiet.hidden?quiet.getBoundingClientRect():null
       dots?.update(panels,undefined,name&&name.width>0?[{left:name.left,top:name.top,right:name.right,bottom:name.bottom}]:null)
       paintPictureWords()},
-    stop(){pictureWordsLayer?.dispose();pictureWordsLayer=undefined;wordsPrint=wordsDrawn="";studySheet?.dispose();studySheet=undefined;releaseSheetMemory?.();releaseSheetMemory=undefined;desk?.dispose();desk=undefined;visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;life?.dispose();life=undefined;lifeControl?.remove();lifeControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;house=undefined;houseUp=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;hallSun=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;clearSky?.dispose();clearSky=undefined;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
+    // the evening's uniforms and the scene's light outlive a visit: the hour goes back before they are let go
+    stop(){if(hosts)delete hosts.stage.parentElement!.dataset['farewell'];farewellRun=null;farewellHeld=null;if(farewellShare!==null)applyEvening(null);pictureWordsLayer?.dispose();pictureWordsLayer=undefined;wordsPrint=wordsDrawn="";studySheet?.dispose();studySheet=undefined;releaseSheetMemory?.();releaseSheetMemory=undefined;desk?.dispose();desk=undefined;visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;life?.dispose();life=undefined;lifeControl?.remove();lifeControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;house=undefined;houseUp=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;hallSun=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;clearSky?.dispose();clearSky=undefined;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
   }
   return wingModule
 }

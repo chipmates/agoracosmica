@@ -474,3 +474,7 @@
 .vinci-picture-words {position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible;pointer-events:none;transition:opacity .24s ease-out;}
 .vinci-picture-words path[data-finish='ink'] {fill:#2e2e2feb;}
 .vinci-picture-words path[data-finish='bronze'] {fill:#3a2a16b3;}
+/* THE LOOK UP OWNS THE SCREEN: every piece of chrome steps back while the
+   evening falls, and nothing of it takes a press. */
+#wing[data-wing='vinci'][data-farewell] > * {opacity:0;pointer-events:none;transition:opacity .9s ease;}
+body:has(#wing[data-wing='vinci'][data-farewell]) :is(#rail-instruments,#rail-sound) {opacity:0;visibility:hidden;}
