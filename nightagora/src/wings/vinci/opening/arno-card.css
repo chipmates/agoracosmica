@@ -1,0 +1,241 @@
+/* THE ARNO CARD. The drawing on the night above, the words on the band under
+   it, the one gold control in the band's corner: the desktop's stage and
+   label band, and on the upright glass the phone's graded foot. Every colour
+   is a museum token. */
+
+.arno-card {
+  /* the desktop band's own margin, measure and row */
+  --arno-g: max(64px, (100vw - 1680px) / 2);
+  --arno-read: clamp(560px, calc(100vw - var(--arno-g) * 2 - 452px), 860px);
+  --arno-line-row: 2.5rem;
+  /* the wing's name row and its gap stand above its line: the card keeps
+     their height as air, so the band does not move when the wing takes over */
+  --arno-name-row: 38px;
+  --arno-ease: cubic-bezier(.22, .61, .36, 1);
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 85% at 50% 38%, var(--na-lapis) 0%, color-mix(in srgb, var(--na-lapis) 40%, var(--na-abyss)) 55%, var(--na-abyss) 100%);
+  color: var(--na-starlight);
+  font-family: var(--serif);
+  /* the host may be a layer the hand passes through, and its type is not the card's */
+  pointer-events: auto;
+  touch-action: manipulation;
+  text-shadow: none;
+  letter-spacing: normal;
+  text-transform: none;
+  opacity: 0;
+  transition: opacity 360ms var(--arno-ease);
+}
+.arno-card[open] { display: grid; grid-template-rows: minmax(0, 1fr) auto; }
+.arno-card[data-shown] { opacity: 1; }
+.arno-card[data-leaving] { opacity: 0; transition-duration: 420ms; }
+.arno-card::backdrop { background: var(--na-abyss); }
+
+/* ---- the drawing, as large as the stage allows, never cropped ---- */
+.arno-stage {
+  container-type: size;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  padding: clamp(32px, 7vh, 72px) var(--arno-g) clamp(24px, 4.5vh, 44px);
+}
+.arno-sheet {
+  margin: 0;
+  width: min(100cqw, 100cqh * var(--arno-ratio));
+  aspect-ratio: var(--arno-ratio);
+  /* the paper's place is held while the file arrives */
+  background: color-mix(in srgb, var(--na-starlight) 10%, var(--na-lapis));
+  box-shadow:
+    0 2px 6px color-mix(in srgb, var(--na-abyss) 55%, transparent),
+    0 26px 70px color-mix(in srgb, var(--na-abyss) 75%, transparent);
+}
+.arno-drawing {
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 480ms var(--arno-ease);
+}
+.arno-sheet[data-loaded] .arno-drawing { opacity: 1; }
+
+/* ---- the band: solid night with one gold hairline at its top edge ---- */
+.arno-band {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding: calc(16px + var(--arno-name-row)) var(--arno-g) 9px;
+  background: var(--na-abyss);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--na-gold) 34%, transparent);
+}
+.arno-words { flex: 0 1 var(--arno-read); max-width: var(--arno-read); min-width: 0; }
+.arno-line {
+  margin: 0;
+  /* two rows held free in every language, so the German never moves the stage */
+  min-height: calc(var(--arno-line-row) * 2);
+  font: 400 clamp(1.375rem, 0.95rem + 1vw, 1.875rem) / 1.334 var(--serif);
+  color: var(--na-starlight);
+  text-wrap: pretty;
+}
+.arno-line[hidden] { display: none; }
+
+/* THE CREDIT IS A WORD, with a hairline under it; it opens the label. Its
+   words flow inline, so a credit that wraps keeps its mark beside the last
+   word, and the padding makes a 44 px target of a 20 px row. */
+.arno-credit {
+  position: relative;
+  display: inline-block;
+  min-height: 44px;
+  margin-top: 5px;
+  padding: 12px 0;
+  border: 0;
+  background: none;
+  font: 500 0.9375rem/20px var(--sans);
+  color: color-mix(in srgb, var(--na-starlight) 78%, var(--na-mist));
+  text-align: left;
+  cursor: pointer;
+}
+.arno-credit-words {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in srgb, var(--na-starlight) 36%, transparent);
+  text-underline-offset: 5px;
+}
+.arno-credit:hover { color: var(--na-starlight); }
+.arno-credit:hover .arno-credit-words { text-decoration-color: var(--na-starlight); }
+.arno-credit-mark {
+  display: inline-block;
+  vertical-align: -2px;
+  margin-left: 6px;
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: var(--na-gold);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 180ms var(--arno-ease);
+}
+.arno-credit[aria-expanded='true'] .arno-credit-mark { transform: rotate(180deg); }
+.arno-credit:focus-visible { outline: 1px solid var(--na-gold); outline-offset: 2px; }
+
+/* THE LABEL IS THE BAND GROWN: the record in the line's place and measure */
+.arno-label {
+  max-height: min(360px, 42vh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* a label that runs on fades at its foot; one that fits ends above the fade */
+  padding: 2px 8px 18px 0;
+  mask-image: linear-gradient(to bottom, black calc(100% - 18px), transparent);
+}
+.arno-label[hidden] { display: none; }
+.arno-label-part {
+  margin: 0 0 10px;
+  max-width: 72ch;
+  font: 400 0.9375rem/1.55 var(--sans);
+  color: color-mix(in srgb, var(--na-starlight) 86%, var(--na-mist));
+}
+.arno-label-part:first-child { color: var(--na-starlight); }
+
+/* ---- the one gold control, the box and corner of the wing's own ---- */
+.arno-start {
+  flex: none;
+  margin-bottom: 9px;
+  min-height: 64px;
+  min-width: 360px;
+  padding: 9px 10px 9px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border: 0;
+  border-radius: 3px;
+  background:
+    linear-gradient(color-mix(in srgb, var(--na-gold) 17%, transparent), color-mix(in srgb, var(--na-gold) 17%, transparent)),
+    color-mix(in srgb, var(--na-abyss) 80%, transparent);
+  box-shadow: inset 0 0 0 1px var(--na-gold);
+  color: var(--na-starlight);
+  text-align: left;
+  cursor: pointer;
+  transition: background 160ms ease, transform 160ms ease;
+}
+.arno-start-word { font: 400 1.1875rem/1.5rem var(--serif); }
+.arno-start-arrow {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--na-gold);
+  display: grid;
+  place-items: center;
+  color: var(--na-gold);
+}
+.arno-start-icon { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.arno-start:hover {
+  background:
+    linear-gradient(color-mix(in srgb, var(--na-gold) 27%, transparent), color-mix(in srgb, var(--na-gold) 27%, transparent)),
+    color-mix(in srgb, var(--na-abyss) 80%, transparent);
+}
+.arno-start:active {
+  transform: scale(0.98);
+  transition-duration: 90ms;
+}
+.arno-start:focus-visible { outline: 1px solid var(--na-gold); outline-offset: 3px; }
+
+/* ---- THE UPRIGHT GLASS: the phone's form. The words at the foot of the
+   glass, the gold pill in the thumb's corner of its floor. ---- */
+@media (max-aspect-ratio: 9/10) {
+  .arno-stage { padding: calc(env(safe-area-inset-top) + 28px) 12px 20px; }
+  .arno-band {
+    position: relative;
+    display: block;
+    padding: 10px 16px calc(80px + env(safe-area-inset-bottom));
+    /* the phone's plate exists to hold words over a picture; on the card the
+       ground under the words is already the night, so it stays that night */
+    background: none;
+    box-shadow: none;
+  }
+  .arno-words { max-width: none; }
+  .arno-line { min-height: 0; font: 400 1.375rem/29px var(--serif); }
+  .arno-credit { margin-top: 4px; }
+  .arno-label { max-height: 46vh; }
+  .arno-start {
+    position: absolute;
+    right: 12px;
+    bottom: calc(20px + env(safe-area-inset-bottom));
+    min-width: 48px;
+    min-height: 48px;
+    height: 48px;
+    max-width: calc(100% - 24px);
+    margin: 0;
+    padding: 0 6px 0 18px;
+    gap: 10px;
+    border-radius: 24px;
+    background: var(--na-gold);
+    box-shadow: 0 2px 14px color-mix(in srgb, var(--na-gold) 22%, transparent);
+    color: var(--na-abyss);
+  }
+  .arno-start:hover { background: color-mix(in srgb, var(--na-gold) 88%, var(--na-starlight)); }
+  .arno-start-word { font: 400 0.9375rem/18px var(--serif); white-space: nowrap; }
+  .arno-start-arrow {
+    width: 36px;
+    height: 36px;
+    box-shadow: none;
+    background: color-mix(in srgb, var(--na-abyss) 12%, transparent);
+    color: var(--na-abyss);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arno-card, .arno-drawing, .arno-start, .arno-credit-mark { transition: none; }
+}
+body.forge .arno-card, body.forge .arno-drawing { transition: none !important; }
