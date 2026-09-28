@@ -526,7 +526,7 @@
         },
         "nebius": {
           "name": "Nebius",
-          "region": "United Kingdom and Finland (EU)",
+          "region": "United Kingdom and Finland",
           "purpose": "Free-tier LLM",
           "status": "DPA + ZDR enabled"
         },
@@ -1440,7 +1440,7 @@
   "legal": {
     "privacy": {
       "title": "Privacy Policy",
-      "lastUpdated": "Last updated: September 3, 2026"
+      "lastUpdated": "Last updated: September 29, 2026"
     },
     "imprint": {
       "title": "Impressum",
@@ -1470,7 +1470,7 @@
     },
     "cookiePolicy": {
       "title": "Cookie Policy",
-      "lastUpdated": "Last updated: June 2026",
+      "lastUpdated": "Last updated: September 29, 2026",
       "intro": "At Agora Cosmica, we respect your privacy and are committed to being transparent about our use of cookies and similar technologies.",
       "whatAreCookies": {
         "title": "What Are Cookies?",
@@ -1481,23 +1481,59 @@
         "description": "We have designed Agora Cosmica to operate without the use of tracking cookies, analytics cookies, or marketing cookies. This means you can use our application without being tracked or profiled."
       },
       "essentialStorage": {
-        "title": "Essential Technical Storage",
-        "description": "We only use essential technical storage that is strictly necessary for the application to function:",
+        "title": "Storage on Your Device",
+        "description": "We store only what a function you use needs. For ad measurement, nothing is stored until you say yes.",
         "table": {
           "type": "Type",
           "purpose": "Purpose",
           "duration": "Duration"
         },
-        "sessionStorage": "Session Storage",
-        "sessionPurpose": "Maintains your session state while using the application. If you arrive from a Google ad, the click identifier (gclid) is held here until you consent to ad measurement or the tab closes.",
-        "sessionDuration": "Until you close your browser",
-        "localStorage": "Local Storage",
-        "localPurpose": "Saves your language preference and your consent decisions (for example agb_consent, and agc_ad_consent for ad measurement)",
-        "localDuration": "Until manually cleared"
+        "rows": {
+          "indexedDb": {
+            "type": "IndexedDB",
+            "purpose": "Your conversations and progress, encrypted, only on your device. With BYOK also your own API key, encrypted",
+            "duration": "Until you delete them"
+          },
+          "local": {
+            "type": "Local Storage",
+            "purpose": "Language setting, consent to the terms of use, age confirmation, app state (progress, hints already seen)",
+            "duration": "Until you delete them"
+          },
+          "clientId": {
+            "type": "Local Storage (agora_client_id)",
+            "purpose": "Random browser ID for the daily free quota, used only for that",
+            "duration": "One day"
+          },
+          "community": {
+            "type": "Local Storage (community_device_uuid)",
+            "purpose": "Random ID so that your browser counts only once in the community tally. Created when you open the Community page",
+            "duration": "Until you delete it"
+          },
+          "adConsent": {
+            "type": "Local Storage (agc_ad_consent)",
+            "purpose": "Your answer to the ad-measurement question, yes or no, with version and date, so that we can respect it",
+            "duration": "12 months"
+          },
+          "session": {
+            "type": "Session Storage",
+            "purpose": "What you picked on our pages before entering the app, whether the home page has already taken you on, summaries already made",
+            "duration": "Until you close the tab"
+          },
+          "clickId": {
+            "type": "Session Storage (agc_gclid), only after your yes",
+            "purpose": "The ad's click ID",
+            "duration": "Until you close the tab or withdraw"
+          },
+          "markers": {
+            "type": "Session Storage (agc_conv_fired_*, agc_listened_seconds), only after your yes",
+            "purpose": "Stops a step from being sent to Google twice, and counts the seconds toward the 30-second step",
+            "duration": "Until you close the tab or withdraw"
+          }
+        }
       },
       "securityCookie": {
         "title": "Security Cookie (__cf_bm)",
-        "description": "We use one technically necessary cookie set by Cloudflare for bot protection and firewall (WAF). It does not track you across sites, contains no personal information, and is required for the application to defend against automated abuse.",
+        "description": "We use one technically necessary cookie set by Cloudflare for bot protection and firewall (WAF). It does not track you across sites, contains no personal information, and is required for the application to defend against automated abuse. After a security check, Cloudflare also sets cf_clearance, likewise technically necessary.",
         "table": {
           "name": "Name",
           "purpose": "Purpose",
@@ -1511,7 +1547,7 @@
       },
       "whatWeDontUse": {
         "title": "What We Don't Use",
-        "description": "Apart from the security cookie above, we do NOT use:",
+        "description": "Apart from the security cookies above, we do NOT use:",
         "analytics": "Analytics cookies or tracking (e.g., Google Analytics, Facebook Pixel)",
         "marketing": "Marketing or advertising cookies",
         "social": "Social media tracking cookies",
@@ -1520,11 +1556,11 @@
       },
       "privacyRights": {
         "title": "Your Privacy Rights",
-        "description": "Since we don't use tracking cookies, there are no cookie preferences to manage. Your privacy is protected by default. The minimal technical storage we use is essential for the application to remember your basic preferences like language selection."
+        "description": "We use no tracking cookies, and your privacy is protected by default. The only setting you can manage is the optional ad measurement for visits through one of our free Google ads. You can withdraw this consent at any time with the \"Ad measurement\" link at the foot of every page, or in the app under Settings › Legal. Withdrawing deletes the stored click ID and records your no. The rest of the storage is needed for functions you use, such as your language choice."
       },
       "privacyAnalytics": {
         "title": "Privacy-Preserving Analytics",
-        "description": "We count anonymous, aggregate events with our own server-side counter (no third-party service, no cookie, no pixel). It records only structural labels such as the endpoint used, the language, and a 2-letter country code from the Cloudflare edge. No IP addresses are stored in analytics, no individuals are tracked, and no profiles are built."
+        "description": "We count anonymous events with our own counter on our server (no third-party service, no cookie, no pixel). Each count carries only coarse labels, such as what happened, the language, a country code and the type of device, and at the start of a visit one coarse word for where it came from, for example \"search\" or \"direct\". For the counting, nothing is stored on or read from your device. We store no IP addresses in the analytics, track no individuals and build no profiles. The details are in our privacy policy, in the section \"Reach measurement\"."
       },
       "changes": {
         "title": "Changes to This Policy",
@@ -1788,10 +1824,10 @@
       },
       "tracking": {
         "title": "No tracking cookies, no profiling",
-        "description": "No analytics scripts, no user profiles, no third-party trackers.",
+        "description": "No third-party analytics or trackers, no user profiles.",
         "points": [
           "No trackers from Google, Meta, or anyone else",
-          "One technical cookie that helps block bots",
+          "Technical cookies from Cloudflare that help block bots",
           "Anonymous aggregate counters, like which features get used, so we can keep the service running and fix bugs"
         ]
       },
@@ -1800,7 +1836,7 @@
         "description": "You pick the provider. We pick the free tier model.",
         "points": [
           "Free tier: we choose the model and swap it when a better one arrives",
-          "Free: via Nebius (United Kingdom and Finland, EU). DPA signed, ZDR enabled.",
+          "Free: via Nebius (United Kingdom and Finland). DPA signed, ZDR enabled.",
           "Your key: Qwen3 235B via OpenRouter. ZDR routing on by default."
         ]
       }
@@ -2160,7 +2196,7 @@
     },
     "dataCard": {
       "title": "Save & restore your progress",
-      "hint": "Your voting power and conversations live on this device. Save them to a file you keep, or restore from one.",
+      "hint": "Your voting power and conversations live on this device. When you open this page, your voting power is also counted on our server. Save them to a file you keep, or restore from one.",
       "backup": "Back up",
       "backupAria": "Back up your progress to a file",
       "restore": "Restore",

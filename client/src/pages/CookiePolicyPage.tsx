@@ -4,6 +4,11 @@ import CloseButton from '../components/Button/CloseButton';
 import './LegalPages.css';
 import { useTranslation } from '../hooks/useTranslation';
 
+// Same rows, same order as the public cookie policy's table.
+const STORAGE_ROWS = [
+  'indexedDb', 'local', 'clientId', 'community', 'adConsent', 'session', 'clickId', 'markers',
+] as const;
+
 const CookiePolicyPage: FC = () => {
   const navigate = useNavigate();
   const { tNode, language } = useTranslation();
@@ -83,16 +88,13 @@ const CookiePolicyPage: FC = () => {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>{tNode('legal.cookiePolicy.essentialStorage.sessionStorage')}</td>
-                <td>{tNode('legal.cookiePolicy.essentialStorage.sessionPurpose')}</td>
-                <td>{tNode('legal.cookiePolicy.essentialStorage.sessionDuration')}</td>
-              </tr>
-              <tr>
-                <td>{tNode('legal.cookiePolicy.essentialStorage.localStorage')}</td>
-                <td>{tNode('legal.cookiePolicy.essentialStorage.localPurpose')}</td>
-                <td>{tNode('legal.cookiePolicy.essentialStorage.localDuration')}</td>
-              </tr>
+              {STORAGE_ROWS.map((row) => (
+                <tr key={row}>
+                  <td>{tNode(`legal.cookiePolicy.essentialStorage.rows.${row}.type`)}</td>
+                  <td>{tNode(`legal.cookiePolicy.essentialStorage.rows.${row}.purpose`)}</td>
+                  <td>{tNode(`legal.cookiePolicy.essentialStorage.rows.${row}.duration`)}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </section>

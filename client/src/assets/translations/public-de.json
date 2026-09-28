@@ -383,7 +383,7 @@
     "builtDifferent": {
       "nonprofit": "Wir sind gemeinnützig. Die ChipMates gemeinnützige GmbH ist in Freiburg eingetragen, und der Registereintrag ist öffentlich.",
       "factChecked": "Jede Lebensgeschichte wird an Primärquellen geprüft, und der Faktencheck steht auf der Seite dieses Menschen.",
-      "noTracking": "Keine Werbung, keine Drittanbieter-Tracker, keine Profile. Deine Gespräche bleiben auf deinem Gerät, und wir speichern sie nie auf unseren Servern.",
+      "noTracking": "Keine Werbung, keine Drittanbieter-Tracker, keine Profile. Wir speichern deine Gespräche nur in deinem Browser, nie auf unseren Servern.",
       "openSource": "Die ganze App ist Open Source unter der AGPL-3.0. Lies den Code, oder betreibe das Ganze auf deinem eigenen Rechner.",
       "freeTurns": "30 kostenlose Nachrichten pro Tag, ohne Anmeldung. Bring deinen eigenen API-Schlüssel mit, wenn du mehr willst.",
       "github": "Der Code ist Open Source auf GitHub."

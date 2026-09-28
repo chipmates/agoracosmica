@@ -61,7 +61,6 @@ const DatenschutzPage: FC = () => {
           <p>
             Die verwendeten Begriffe sind nicht geschlechtsspezifisch.
           </p>
-          <p>Stand: 10. Juni 2026</p>
           <p>
             <strong>Inhaltsübersicht</strong><br/>
             * Präambel<br/>
@@ -75,6 +74,7 @@ const DatenschutzPage: FC = () => {
             * Bereitstellung des Onlineangebotes und Webhosting<br/>
             * KI-gestützter Chat-Dienst<br/>
             * Audio-Dienst<br/>
+            * Community-Zählung<br/>
             * Bot-Schutz (Cloudflare Turnstile)<br/>
             * Conversion-Messung (Google Ads)<br/>
             * Reichweitenmessung<br/>
@@ -196,7 +196,7 @@ const DatenschutzPage: FC = () => {
         <section className="legal-section">
           <h2>Einsatz von Cookies und lokale Speicherung</h2>
           <p>
-            Wir verwenden KEINE Tracking-, Analyse- oder Marketing-Cookies. Die einzige Cookie-Nutzung erfolgt durch Cloudflare (__cf_bm), einen technisch notwendigen Sicherheitscookie für Bot-Schutz und Firewall (§ 25 Abs. 2 Nr. 2 TDDDG). Dieser Cookie wird automatisch von Cloudflare gesetzt und erfordert keine Einwilligung.
+            Wir verwenden KEINE Tracking-, Analyse- oder Marketing-Cookies. Die einzige Cookie-Nutzung erfolgt durch Cloudflare (__cf_bm, nach einer Sicherheitsprüfung auch cf_clearance), technisch notwendige Sicherheitscookies für Bot-Schutz und Firewall (§ 25 Abs. 2 Nr. 2 TDDDG). Diese Cookies werden automatisch von Cloudflare gesetzt und erfordern keine Einwilligung.
           </p>
         </section>
 
@@ -235,8 +235,8 @@ const DatenschutzPage: FC = () => {
           </p>
           <p><strong>Verarbeitete Daten:</strong></p>
           <ul>
-            <li>Ihre Chat-Eingaben (Textnachrichten an den KI-Assistenten)</li>
-            <li>Technische Daten (IP-Adresse gehasht, Zeitstempel, Browser-Kennung)</li>
+            <li>Ihre Chat-Eingaben zusammen mit dem bisherigen Gesprächsverlauf, den die App mit jeder Nachricht mitschickt, damit die Persönlichkeit im Zusammenhang antworten kann</li>
+            <li>Technische Daten: IP-Adresse, Zeitpunkt und eine zufällige Browser-Kennung, die die App für das tägliche kostenlose Kontingent in Ihrem Browser speichert</li>
             <li>Spracheinstellung</li>
           </ul>
           <p><strong>Verarbeitungszweck:</strong> Bereitstellung des KI-gestützten Bildungsdienstes (Art. 6 Abs. 1 lit. b DSGVO, Vertragserfüllung).</p>
@@ -246,7 +246,7 @@ const DatenschutzPage: FC = () => {
             <li>OpenRouter, Inc. (USA). Zweck: API-Routing für KI-Inferenz im BYOK-Modus (Bring Your Own Key). Nutzer stellen ihren eigenen API-Schlüssel bereit, der ausschließlich lokal im Browser gespeichert wird. OpenRouter leitet Anfragen an den gewählten KI-Anbieter weiter. Datenschutzrichtlinie: <a href="https://openrouter.ai/privacy">https://openrouter.ai/privacy</a>.</li>
             <li>Cloudflare, Inc. (USA), Verarbeitung überwiegend in Europa. Zweck: API-Proxy, Sicherheit (WAF, Bot-Schutz), Rate Limiting. Auftragsverarbeitungsvertrag im Cloudflare Dashboard abrufbar. EU Cloud Code of Conduct Compliance Mark.</li>
           </ul>
-          <p><strong>Speicherdauer:</strong> Chat-Inhalte werden serverseitig NICHT gespeichert. KI-Antworten werden per Streaming direkt an Ihren Browser übertragen. Sicherheitslogs (nur bei Blockierung durch Inhaltsfilter) werden bis zu 90 Tage anonymisiert aufbewahrt (IP gehasht). Rate-Limit-Zähler halten die IP-Adresse für höchstens eine Stunde in einem kurzlebigen Schlüssel und werden danach automatisch gelöscht. IP-Adressen gelangen nie in unsere Analytik.</p>
+          <p><strong>Speicherdauer:</strong> Chat-Inhalte speichern wir nicht auf unseren Servern. Jede Nachricht läuft über unseren Server zum KI-Modell, die Antwort wird per Streaming an Ihren Browser übertragen. Unsere Server-Logs erfassen Fehler ohne Nachrichteninhalte. Um das tägliche kostenlose Kontingent durchzusetzen und den Dienst zu schützen, halten unsere Server die zufällige Browser-Kennung und die IP-Adresse oder einen mit geheimem Schlüssel gebildeten Hashwert davon höchstens 24 Stunden vor. Blockiert der Inhaltsfilter eine Nachricht, bewahren wir bis zu 90 Tage einen Sicherheitsvermerk ohne den Nachrichtentext auf: Zeitpunkt, Art der Blockierung, Persönlichkeit, Modus, Sprache und einen mit geheimem Schlüssel gebildeten Hashwert der IP-Adresse (pseudonymisiert). IP-Adressen gelangen nie in unsere Analytik.</p>
           <p><strong>Hinweis:</strong> Bitte geben Sie keine personenbezogenen Daten (Name, Adresse, Telefonnummer, E-Mail, Bankdaten) in den Chat ein.</p>
         </section>
 
@@ -257,11 +257,22 @@ const DatenschutzPage: FC = () => {
           </p>
           <ul>
             <li>Standort: Hetzner GEX130, Falkenstein und Nürnberg, Deutschland</li>
-            <li>Datenverarbeitung ausschließlich in Deutschland</li>
-            <li>Sprachdaten werden zur Verarbeitung übertragen und unmittelbar nach der Konvertierung gelöscht</li>
-            <li>Keine Aufzeichnung von Sprachaufnahmen</li>
-            <li>Audio-Daten werden direkt vom Browser an die Hetzner-Server übertragen (kein Drittanbieter beteiligt)</li>
+            <li>Sprache wird ausschließlich auf diesen Servern erzeugt und erkannt</li>
+            <li>Für die Sprachausgabe wird der zu sprechende Text dorthin übertragen, zum Beispiel die Antwort einer Persönlichkeit oder eine Geschichte. Für die Spracheingabe wird Ihre Aufnahme dorthin übertragen und in Text umgewandelt.</li>
+            <li>Beides läuft über unseren Audio-Proxy bei Cloudflare, der die Daten weiterleitet und nichts speichert</li>
+            <li>Texte und Aufnahmen werden unmittelbar nach der Verarbeitung gelöscht. Ihre Stimme wird nicht aufgezeichnet oder gespeichert.</li>
+            <li>Zum Schutz vor Missbrauch hält der Proxy einen mit geheimem Schlüssel gebildeten Hashwert Ihrer IP-Adresse bis zu 24 Stunden vor</li>
           </ul>
+        </section>
+
+        <section className="legal-section">
+          <h2>Community-Zählung</h2>
+          <p>
+            Die Community-Seite in der App zeigt, wie viele Menschen mitmachen und wie groß ihre gemeinsame Stimmkraft ist. Wenn Sie die Community-Seite öffnen, erzeugt die App eine zufällige Kennung für diesen Browser, speichert sie in Ihrem Browser (localStorage) und sendet sie mit Ihrer Stimmkraft und der Zahl Ihrer abgeschlossenen Persönlichkeiten an unseren Server, damit jeder Browser nur einmal zählt. Unser Server bewahrt diese Werte unter einem mit geheimem Schlüssel gebildeten Hashwert der Kennung auf und löscht sie 12 Monate nach Ihrem letzten Besuch der Community-Seite.
+          </p>
+          <p>
+            <strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. f DSGVO, unser Interesse an einer fairen Zählung. Die Kennung auf Ihrem Endgerät ist für diese von Ihnen genutzte Funktion erforderlich (§ 25 Abs. 2 Nr. 2 TDDDG).
+          </p>
         </section>
 
         <section className="legal-section">
@@ -279,17 +290,30 @@ const DatenschutzPage: FC = () => {
         </section>
 
         <section className="legal-section">
-          <h2>Technisch notwendige Speicherung</h2>
+          <h2>Speicherung auf Ihrem Endgerät</h2>
           <p>
-            Wir verwenden KEINE Tracking-, Analyse- oder Marketing-Cookies. Folgende technisch notwendige Speicherungen erfolgen auf Ihrem Gerät (§ 25 Abs. 2 Nr. 2 TDDDG):
+            Wir verwenden keine Tracking-, Analyse- oder Marketing-Cookies. Unsere Seiten und die App speichern Folgendes in Ihrem Browser.
+          </p>
+          <p>
+            <strong>Technisch notwendig für eine Funktion, die Sie nutzen</strong> (§ 25 Abs. 2 Nr. 2 TDDDG, keine Einwilligung nötig):
           </p>
           <ul>
-            <li>Chat-Verlauf und Konversationen (IndexedDB, verschlüsselt mit AES-256-GCM, ausschließlich lokal auf Ihrem Gerät)</li>
+            <li>Ihre Gespräche und Ihr Fortschritt (IndexedDB, verschlüsselt mit AES-256-GCM, ausschließlich auf Ihrem Gerät) sowie der Zustand der App, etwa Lesefortschritt, gehörte Geschichten und bereits gesehene Hinweise (localStorage)</li>
+            <li>Ihr eigener API-Schlüssel, wenn Sie BYOK nutzen (IndexedDB, verschlüsselt, ausschließlich auf Ihrem Gerät)</li>
             <li>Spracheinstellung (localStorage)</li>
-            <li>Zustimmung zu den Nutzungsbedingungen (localStorage)</li>
-            <li>Altersbestätigung (localStorage)</li>
-            <li>Sitzungsdaten (sessionStorage, bei Schließen des Tabs gelöscht)</li>
-            <li>Cloudflare-Sicherheitscookies (__cf_bm): Technisch notwendig für Bot-Schutz und WAF</li>
+            <li>Zustimmung zu den Nutzungsbedingungen und Altersbestätigung (localStorage)</li>
+            <li>Eine zufällige Browser-Kennung für das tägliche kostenlose Kontingent, erzeugt beim ersten Gespräch im kostenlosen Modus (localStorage) und täglich erneuert</li>
+            <li>Eine zufällige Kennung für die Community-Zählung, erzeugt, wenn Sie die Community-Seite öffnen (localStorage)</li>
+            <li>Ihre Antwort auf die Frage zur Werbe-Messung, Ja oder Nein, mit Version und Datum, damit wir sie respektieren (localStorage) für 12 Monate</li>
+            <li>Kurzlebige Daten für den aktuellen Tab (sessionStorage, beim Schließen des Tabs gelöscht): was Sie auf unseren Seiten vor dem Einstieg in die App gewählt haben (Persönlichkeit, Konzil, Kapitel, Frage), ob die Startseite Sie bereits in die App weitergeleitet hat, und bereits erstellte Zusammenfassungen</li>
+            <li>Cloudflare-Sicherheitscookies: __cf_bm (Bot-Schutz, 30 Minuten) und nach einer Sicherheitsprüfung cf_clearance</li>
+          </ul>
+          <p>
+            <strong>Nur mit Ihrer Einwilligung zur Werbe-Messung</strong> (§ 25 Abs. 1 TDDDG, siehe „Conversion-Messung“), im sessionStorage, gelöscht beim Schließen des Tabs oder mit dem Widerruf:
+          </p>
+          <ul>
+            <li>Die Klick-Kennung der Anzeige</li>
+            <li>Markierungen, die verhindern, dass ein Schritt doppelt an Google geht, sowie die gehörten Sekunden bis zum 30-Sekunden-Schritt</li>
           </ul>
           <p>
             Alle lokal gespeicherten Daten können Sie jederzeit durch Löschen Ihrer Browserdaten vollständig entfernen.
@@ -344,32 +368,38 @@ const DatenschutzPage: FC = () => {
         <section className="legal-section">
           <h2>Conversion-Messung (Google Ads, nur mit Einwilligung)</h2>
           <p>
-            Wenn Sie über eine Google-Werbeanzeige auf unsere Website gelangen, enthält die URL einen Klick-Identifikator (gclid). Der gclid ist eine von Google vergebene Kennung pro Klick. Da Google ihn Ihrem Klick und gegebenenfalls Ihrem Google-Konto zuordnen kann, behandeln wir ihn als personenbezogenes Datum, nicht als anonyme Kennung.
+            Wir schalten kostenlose Anzeigen über Googles Programm für gemeinnützige Organisationen (Google Ad Grants). Wenn Sie über eine dieser Anzeigen zu uns kommen, enthält die Webadresse eine von Google vergebene Klick-Kennung (gclid). Google kann sie Ihrem Klick und gegebenenfalls Ihrem Google-Konto zuordnen, daher behandeln wir sie als personenbezogenes Datum.
           </p>
           <p>
-            Der gclid wird im sessionStorage Ihres Browsers gespeichert (kein Cookie). Er ist an den Browser-Tab gebunden. Eine Übermittlung an Google findet ausschließlich dann statt, wenn Sie hierzu Ihre ausdrückliche Einwilligung erteilen. Diese Einwilligung wird nur Besuchern angeboten, die über eine Google-Anzeige kommen, und ist optional. Ohne Einwilligung wird nichts an Google übermittelt.
+            Kommen Sie über eine solche Anzeige, fragen wir, ob wir Ihren Besuch für Google zählen dürfen. Die Frage ist freiwillig, und die ganze Bibliothek bleibt so oder so offen. Bis zu Ihrer Antwort bleibt die Klick-Kennung nur im Arbeitsspeicher der Seite und wird nicht gespeichert. Sagen Sie Nein, wird sie verworfen, und Ihr Browser merkt sich das Nein. Sagen Sie Ja, halten wir die Klick-Kennung in diesem Browser-Tab (sessionStorage), bis der Tab geschlossen wird, und Ihr Browser merkt sich das Ja (localStorage) für 12 Monate, damit auch spätere Besuche über unsere Anzeigen gezählt werden. Besucher unserer bezahlten Anzeigen (ihre Webadresse enthält p=1) werden nie gefragt, ihre Klick-Kennung wird sofort verworfen.
           </p>
           <p>
-            Mit Ihrer Einwilligung übermitteln wir den gclid bei bestimmten Ereignissen (Beginn der Erkundung der Bibliothek, Profilerstellung, Auswahl eines Lernmodus, Nutzung eines Konzils) serverseitig über die Google Ads Conversion API, damit die Anzeige einer Conversion zugeordnet werden kann (kein JavaScript-Tracker, kein Pixel auf der Website). Übermittelt werden: der gclid, das ausgelöste Ereignis (als Conversion-Aktion), ein Wert, eine Währung, ein Zeitstempel und eine Order-ID (gclid plus Ereignis, zur Deduplizierung). Weder die gewählte Persönlichkeit noch Ihr Länder-Kürzel, keine Gesprächsinhalte und keine sonstigen personenbezogenen Daten werden übermittelt. Auf unseren Systemen speichern wir den gclid nicht dauerhaft.
+            Mit Ihrer Einwilligung sendet unser Server Google die Klick-Kennung bei jedem dieser Schritte: Ihr Ja auf die Frage, das Öffnen der App von einer unserer Seiten, die Zustimmung zu den Nutzungsbedingungen beim ersten Einstieg in die App, 30 Sekunden gehörtes Audio, die erste Nachricht an eine Persönlichkeit, die dritte Nachricht im selben Gespräch und die Nutzung eines Konzils. Mit jedem Schritt erhält Google die Klick-Kennung, den Schritt (als Conversion-Aktion), einen Wert und eine Währung, den Zeitpunkt, eine Auftragsnummer (Klick-Kennung plus Schritt, damit nichts doppelt zählt) und ein Einwilligungssignal (Nutzung zur Messung erlaubt, Nutzung für personalisierte Werbung nicht erlaubt). Google erhält weder die gewählte Persönlichkeit noch Ihr Land, keine Gesprächsinhalte und keine sonstigen Daten über Sie. Auf unseren Seiten läuft kein Skript und kein Pixel von Google. Die Übermittlung erfolgt von unserem Server an Google (Google Ads API).
           </p>
           <p>
-            Empfänger ist Google (Google Ireland Limited sowie Google LLC, USA). Eine Übermittlung in die USA kann erfolgen. Google ist unter dem EU-US Data Privacy Framework zertifiziert.
+            Empfänger ist Google (Google Ireland Limited sowie Google LLC, USA). Eine Übermittlung in die USA kann erfolgen. Google ist unter dem EU-US Data Privacy Framework zertifiziert. Wie Google Daten von Partnerseiten nutzt: <a href="https://business.safety.google/privacy">https://business.safety.google/privacy</a>.
           </p>
           <p>
-            <strong>Speicherdauer:</strong> Auf unserer Seite verbleibt nur ein Ereignis-Zähler ohne gclid für 90 Tage. Die Speicherdauer bei Google richtet sich nach Googles Aufbewahrungsrichtlinien für Werbedaten.
+            <strong>Speicherdauer:</strong> Die Klick-Kennung bewahren wir auf unseren Servern nicht auf. Für jeden gesendeten Schritt halten wir 90 Tage lang einen Vermerk ohne Klick-Kennung vor (den Schritt, gegebenenfalls die Persönlichkeit und den Zeitpunkt), um zu prüfen, ob die Zählung funktioniert. Die Speicherdauer bei Google richtet sich nach Googles Aufbewahrungsregeln für Werbedaten.
           </p>
           <p>
-            <strong>Rechtsgrundlage:</strong> Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO und § 25 Abs. 1 TDDDG). Sie können Ihre Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen, in den Einstellungen unter „Rechtliches" über „Einwilligung zur Werbe-Messung widerrufen". Der Widerruf löscht den gespeicherten gclid.
+            <strong>Rechtsgrundlage und Widerruf:</strong> Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO und § 25 Abs. 1 TDDDG). Sie können sie jederzeit mit Wirkung für die Zukunft widerrufen: über den Link „Werbe-Messung“ unten auf jeder Seite oder in der App unter Einstellungen › Rechtliches. Der Widerruf löscht die gespeicherte Klick-Kennung und vermerkt Ihr Nein. Danach wird nichts mehr gesendet.
           </p>
         </section>
 
         <section className="legal-section">
           <h2>Reichweitenmessung</h2>
           <p>
-            Wir messen pro serverseitig gezählter Aktivität (zum Beispiel ein gestarteter Chat, eine begonnene oder abgeschlossene Inhalts-Wiedergabe einer Geschichte, Lehre, eines Prismas oder Konzils, ein Seitenaufruf) einen anonymen Zähler. Erfasst werden ausschließlich strukturelle Etiketten: der genutzte Endpunkt, die ausgewählte Persönlichkeit, der gewählte Modus, die Sprache (en oder de), das vom Cloudflare-Edge ermittelte Länder-Kürzel (zweistelliger ISO-Code, zum Beispiel DE oder XX bei Unbekannt) und die grobe Geräteklasse (mobil, Desktop oder Tablet), die serverseitig aus der Browser-Kennung abgeleitet wird. Gespeichert wird ausschließlich diese Klasse, niemals die vollständige Browser-Kennung. Es werden keine IP-Adressen in Analyse-Datensätzen gespeichert, keine Nutzer-Profile gebildet, keine Cookies gesetzt, kein Quell- oder Kanal-Etikett hinterlegt. Es findet keine Wiedererkennung über Sitzungen hinweg statt.
+            Wir zählen, wie unsere Seiten und die App genutzt werden, ohne Cookies und ohne jemanden zu identifizieren. Wenn etwas geschieht, zum Beispiel eine Seite geöffnet, ein Chat begonnen oder eine Geschichte abgespielt wird, sendet die Seite eine kurze Zählmeldung an unseren Server. Jede Zählung ist eine Zeile mit wenigen groben Angaben, je nach Ereignis: was geschah (zum Beispiel „Chat begonnen“ oder „Geschichte beendet“), der Seitenpfad, die Persönlichkeit, der Modus oder das Kapitel, die Sprache (en oder de), das Land als zweistelliges Kürzel, das Cloudflare aus der Verbindung ableitet (zum Beispiel DE, oder XX, wenn unbekannt), die Geräteart (Smartphone, Tablet oder Desktop), wie lange unser Server für die Antwort brauchte, und bei einigen Schritten eine grobe Spanne statt einer genauen Zahl (zum Beispiel „1 bis 3 Minuten gehört“). Unsere Mess-Dokumentation listet jede Angabe auf.
           </p>
           <p>
-            <strong>Rechtsgrundlage:</strong> Berechtigtes Interesse (Art. 6 Abs. 1 lit. f DSGVO) an der Messung der Wirksamkeit unserer gemeinnützigen Öffentlichkeitsarbeit. Die rein aggregierte, anonyme Messung liegt unterhalb der Schwelle personenbezogener Daten gemäß Erwägungsgrund 26 DSGVO. § 25 TDDDG ist auf diese Messung nicht einschlägig, da im Rahmen der Zählung keine Speicherung oder Auslesung von Informationen auf Ihrem Endgerät stattfindet. Die für den Betrieb der App technisch notwendige lokale Speicherung (zum Beispiel Spracheinstellung, Sitzungs-UUID für Ratelimiting) ist gemäß § 25 Abs. 2 TDDDG ausgenommen.
+            Beginnt ein Besuch, vermerkt die Zählung zusätzlich mit einem groben Stichwort, von welcher Art Ort der Besuch kam, zum Beispiel „Suche“, „Google-Anzeige“, „KI-Assistent“ oder „direkt“. Die Seite leitet das aus der Adresse der verlinkenden Seite ab, die Browser normalerweise mitsenden, und behält nur dieses Stichwort. Dasselbe Stichwort kann auch die Zählung des App-Einstiegs und des ersten Chats begleiten, wenn Sie über einen Link auf unseren Seiten in die App kommen.
+          </p>
+          <p>
+            Keine Zählung enthält eine IP-Adresse, eine Nutzerkennung oder etwas, das Sie geschrieben haben. Wir bilden keine Profile und erkennen für die Zählung keinen Browser von einem Besuch zum nächsten wieder. Die Zählungen werden 90 Tage aufbewahrt.
+          </p>
+          <p>
+            <strong>Rechtsgrundlage:</strong> Unser berechtigtes Interesse daran, zu wissen, ob unser gemeinnütziger Dienst funktioniert und wen er erreicht (Art. 6 Abs. 1 lit. f DSGVO). Die Zählungen tragen keine Kennung und lassen sich von uns keiner Person zuordnen, sie sind daher keine personenbezogenen Daten (Erwägungsgrund 26 DSGVO). Für die Zählung wird nichts auf Ihrem Endgerät gespeichert und nichts dort bereits Gespeichertes ausgelesen, deshalb holen wir dafür keine Einwilligung nach § 25 TDDDG ein. Was die App für ihre eigenen Funktionen auf Ihrem Endgerät speichert, steht im Abschnitt „Speicherung auf Ihrem Endgerät“.
           </p>
         </section>
 

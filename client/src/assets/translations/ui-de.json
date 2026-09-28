@@ -524,7 +524,7 @@
         },
         "nebius": {
           "name": "Nebius",
-          "region": "Vereinigtes Königreich und Finnland (EU)",
+          "region": "Vereinigtes Königreich und Finnland",
           "purpose": "LLM für kostenlosen Tarif",
           "status": "AVV + ZDR aktiviert"
         },
@@ -1442,7 +1442,7 @@
   "legal": {
     "privacy": {
       "title": "Datenschutzerklärung",
-      "lastUpdated": "Stand: 3. September 2026"
+      "lastUpdated": "Stand: 29. September 2026"
     },
     "imprint": {
       "title": "Impressum",
@@ -1472,7 +1472,7 @@
     },
     "cookiePolicy": {
       "title": "Cookie-Richtlinie",
-      "lastUpdated": "Zuletzt aktualisiert: Juni 2026",
+      "lastUpdated": "Zuletzt aktualisiert: 29. September 2026",
       "intro": "Bei Agora Cosmica respektieren wir deine Privatsphäre und legen Wert auf Transparenz bei der Verwendung von Cookies und ähnlichen Technologien.",
       "whatAreCookies": {
         "title": "Was sind Cookies?",
@@ -1483,23 +1483,59 @@
         "description": "Wir haben Agora Cosmica so entwickelt, dass es ohne Tracking-Cookies, Analyse-Cookies oder Marketing-Cookies funktioniert. Das bedeutet, dass du unsere Anwendung nutzen kannst, ohne verfolgt oder profiliert zu werden."
       },
       "essentialStorage": {
-        "title": "Essenzielle technische Speicherung",
-        "description": "Wir verwenden nur essenzielle technische Speicherung, die für das Funktionieren der Anwendung unbedingt erforderlich ist:",
+        "title": "Speicherung auf deinem Gerät",
+        "description": "Wir speichern nur, was für eine Funktion nötig ist, die du nutzt. Für die Werbe-Messung wird erst nach deinem Ja etwas gespeichert.",
         "table": {
           "type": "Typ",
           "purpose": "Zweck",
           "duration": "Dauer"
         },
-        "sessionStorage": "Session Storage",
-        "sessionPurpose": "Erhält deinen Sitzungszustand während der Nutzung der Anwendung. Bei Ankunft über eine Google-Anzeige wird hier der Klick-Identifikator (gclid) gehalten, bis du der Werbe-Messung zustimmst oder der Tab schließt.",
-        "sessionDuration": "Bis du deinen Browser schließt",
-        "localStorage": "Local Storage",
-        "localPurpose": "Speichert deine Spracheinstellung sowie deine Einwilligungs-Entscheidungen (zum Beispiel agb_consent, und bei Werbe-Messung agc_ad_consent)",
-        "localDuration": "Bis zur manuellen Löschung"
+        "rows": {
+          "indexedDb": {
+            "type": "IndexedDB",
+            "purpose": "Deine Gespräche und dein Fortschritt, verschlüsselt, nur auf deinem Gerät. Bei BYOK auch dein eigener API-Schlüssel, verschlüsselt",
+            "duration": "Bis du sie löschst"
+          },
+          "local": {
+            "type": "Local Storage",
+            "purpose": "Spracheinstellung, Zustimmung zu den Nutzungsbedingungen, Altersbestätigung, Zustand der App (Fortschritt, gesehene Hinweise)",
+            "duration": "Bis du sie löschst"
+          },
+          "clientId": {
+            "type": "Local Storage (agora_client_id)",
+            "purpose": "Zufällige Browser-Kennung für das tägliche kostenlose Kontingent, nur dafür genutzt",
+            "duration": "Ein Tag"
+          },
+          "community": {
+            "type": "Local Storage (community_device_uuid)",
+            "purpose": "Zufällige Kennung, damit dein Browser in der Community-Zählung nur einmal zählt. Entsteht, wenn du die Community-Seite öffnest",
+            "duration": "Bis du sie löschst"
+          },
+          "adConsent": {
+            "type": "Local Storage (agc_ad_consent)",
+            "purpose": "Deine Antwort auf die Frage zur Werbe-Messung, Ja oder Nein, mit Version und Datum, damit wir sie respektieren",
+            "duration": "12 Monate"
+          },
+          "session": {
+            "type": "Session Storage",
+            "purpose": "Was du auf unseren Seiten gewählt hast, bevor du in die App gehst, ob die Startseite dich schon weitergeleitet hat, bereits erstellte Zusammenfassungen",
+            "duration": "Bis du den Tab schließt"
+          },
+          "clickId": {
+            "type": "Session Storage (agc_gclid), nur nach deinem Ja",
+            "purpose": "Die Klick-ID der Anzeige",
+            "duration": "Bis du den Tab schließt oder widerrufst"
+          },
+          "markers": {
+            "type": "Session Storage (agc_conv_fired_*, agc_listened_seconds), nur nach deinem Ja",
+            "purpose": "Verhindert, dass ein Schritt doppelt an Google geht, und zählt die Sekunden bis zum 30-Sekunden-Schritt",
+            "duration": "Bis du den Tab schließt oder widerrufst"
+          }
+        }
       },
       "securityCookie": {
         "title": "Sicherheits-Cookie (__cf_bm)",
-        "description": "Wir verwenden ein technisch notwendiges Cookie, das Cloudflare für Bot-Schutz und Firewall (WAF) setzt. Es trackt dich nicht über Websites hinweg, enthält keine personenbezogenen Daten und ist nötig, damit die Anwendung sich vor automatisiertem Missbrauch schützen kann.",
+        "description": "Wir verwenden ein technisch notwendiges Cookie, das Cloudflare für Bot-Schutz und Firewall (WAF) setzt. Es trackt dich nicht über Websites hinweg, enthält keine personenbezogenen Daten und ist nötig, damit die Anwendung sich vor automatisiertem Missbrauch schützen kann. Nach einer Sicherheitsprüfung setzt Cloudflare außerdem cf_clearance, ebenfalls technisch notwendig.",
         "table": {
           "name": "Name",
           "purpose": "Zweck",
@@ -1513,7 +1549,7 @@
       },
       "whatWeDontUse": {
         "title": "Was wir NICHT verwenden",
-        "description": "Abgesehen vom oben genannten Sicherheits-Cookie verwenden wir KEINE:",
+        "description": "Abgesehen von den oben genannten Sicherheits-Cookies verwenden wir KEINE:",
         "analytics": "Analyse-Cookies oder Tracking (z.B. Google Analytics, Facebook Pixel)",
         "marketing": "Marketing- oder Werbe-Cookies",
         "social": "Social Media Tracking-Cookies",
@@ -1522,11 +1558,11 @@
       },
       "privacyRights": {
         "title": "Deine Datenschutzrechte",
-        "description": "Da wir keine Tracking-Cookies verwenden, gibt es keine Cookie-Einstellungen zu verwalten. Deine Privatsphäre ist standardmäßig geschützt. Die minimale technische Speicherung, die wir verwenden, ist für die Anwendung unerlässlich, um deine grundlegenden Einstellungen wie die Sprachauswahl zu speichern."
+        "description": "Wir verwenden keine Tracking-Cookies, deine Privatsphäre ist standardmäßig geschützt. Die einzige Einstellung, die du verwalten kannst, ist die freiwillige Werbe-Messung für Besuche über eine unserer kostenlosen Google-Anzeigen. Du kannst diese Einwilligung jederzeit über den Link „Werbe-Messung“ unten auf jeder Seite widerrufen, oder in der App unter Einstellungen › Rechtliches. Der Widerruf löscht die gespeicherte Klick-ID und vermerkt dein Nein. Die übrige Speicherung ist für Funktionen nötig, die du nutzt, etwa deine Sprachauswahl."
       },
       "privacyAnalytics": {
         "title": "Datenschutzfreundliche Analyse",
-        "description": "Wir zählen anonyme, aggregierte Ereignisse über einen eigenen serverseitigen Zähler (kein Drittanbieter-Dienst, kein Cookie, kein Pixel). Erfasst werden nur strukturelle Angaben wie der genutzte Endpunkt, die Sprache und ein vom Cloudflare-Edge ermitteltes Länder-Kürzel. Es werden keine IP-Adressen in der Analyse gespeichert, keine Einzelpersonen verfolgt und keine Profile gebildet."
+        "description": "Wir zählen anonyme Ereignisse über einen eigenen Zähler auf unserem Server (kein Drittanbieter-Dienst, kein Cookie, kein Pixel). Jede Zählung trägt nur grobe Angaben, etwa was geschah, die Sprache, ein Länder-Kürzel und die Geräteart, und beim Start eines Besuchs ein grobes Stichwort zur Herkunft, zum Beispiel „Suche“ oder „direkt“. Für die Zählung wird nichts auf deinem Gerät gespeichert oder ausgelesen. Wir speichern keine IP-Adressen in der Analyse, verfolgen keine Einzelpersonen und bilden keine Profile. Einzelheiten stehen in unserer Datenschutzerklärung im Abschnitt „Reichweitenmessung“."
       },
       "changes": {
         "title": "Änderungen dieser Richtlinie",
@@ -1790,10 +1826,10 @@
       },
       "tracking": {
         "title": "Keine Tracking-Cookies, kein Profiling",
-        "description": "Keine Analyse-Skripte, keine Nutzerprofile, keine Dritt-Tracker.",
+        "description": "Keine Analyse oder Tracker von Dritten, keine Nutzerprofile.",
         "points": [
           "Keine Tracker von Google, Meta oder anderen",
-          "Ein technisches Cookie, das vor Bots schützt",
+          "Technische Cookies von Cloudflare, die vor Bots schützen",
           "Anonyme aggregierte Zähler, etwa welche Funktionen genutzt werden, damit der Dienst läuft und wir Bugs beheben können"
         ]
       },
@@ -1802,7 +1838,7 @@
         "description": "Du wählst den Anbieter. Das Modell im kostenlosen Tarif wählen wir.",
         "points": [
           "Kostenloser Tarif: wir wählen das Modell und tauschen es, wenn ein besseres kommt",
-          "Kostenlos: über Nebius (Vereinigtes Königreich und Finnland, EU). AVV unterschrieben, ZDR aktiviert.",
+          "Kostenlos: über Nebius (Vereinigtes Königreich und Finnland). AVV unterschrieben, ZDR aktiviert.",
           "Eigener Key: Qwen3 235B über OpenRouter. ZDR-Routing standardmäßig an."
         ]
       }
@@ -2162,7 +2198,7 @@
     },
     "dataCard": {
       "title": "Sichern & wiederherstellen",
-      "hint": "Deine Stimmkraft und alle Gespräche liegen auf diesem Gerät. Sichere sie in einer Datei oder stelle sie aus einer Datei wieder her.",
+      "hint": "Deine Stimmkraft und alle Gespräche liegen auf diesem Gerät. Wenn du diese Seite öffnest, wird deine Stimmkraft auch auf unserem Server gezählt. Sichere sie in einer Datei oder stelle sie aus einer Datei wieder her.",
       "backup": "Sichern",
       "backupAria": "Fortschritt als Datei sichern",
       "restore": "Wiederherstellen",
