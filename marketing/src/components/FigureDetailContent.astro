@@ -353,9 +353,12 @@ if (figure.essence) {
     <p class="fig-close__trust">{t('cta.trust')}</p>
   </section>
 
+  <!-- The rail only shows on phones and small tablets. Its trust line wrapped
+       to two lines in German and the bar took a third of the first screen, so
+       it keeps the free note and the door; the footer carries the trust line. -->
   <div class="pub-cta pub-cta--sticky fig-rail">
     <div class="pub-cta__inner">
-      <p class="pub-cta__trust">{t('cta.trust')}</p>
+      {frozen && <p class="pub-cta__trust">{t('cta.trust')}</p>}
       <p class="pub-cta__trust">{t('cta.freeNote')}</p>
       <a
         href={beginHref}
