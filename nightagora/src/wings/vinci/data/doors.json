@@ -290,13 +290,21 @@
       "german_provenance": "Newly authored for this commission."
     }
   ],
+  "farewell": {
+    "station": "farewell",
+    "question_en": "Looking back over your whole life, what mattered most to you?",
+    "question_de": "Wenn du auf dein ganzes Leben zurückblickst, was war dir am wichtigsten?",
+    "status": "placeholder",
+    "editorial_note": "Placeholder for the words round. The closing question the talk choice at the grave asks, after the last station. Not a station of the walk.",
+    "german_provenance": "Newly authored as a placeholder."
+  },
   "door_contract": {
     "figure_id": "leonardo-da-vinci",
     "figure_name": "Leonardo da Vinci",
-    "fallback_tag": "askf:vinci:1",
-    "fallback_behavior": "Existing hero tag opens the figure. It does not promise a station-specific seeded question. Keep the visible EN/DE question copyable.",
+    "fallback_tag": "f:vinci:1",
+    "fallback_behavior": "The hero tag opens the figure with its own question. The app falls back to it for a station it does not know.",
     "proposed_tag_pattern": "w:vinci:<station>",
-    "proposed_tag_status": "Contract proposal for the builder, not an implemented route.",
+    "proposed_tag_status": "Implemented: the app resolves w:vinci:<station> and w:vinci:farewell to these questions in EN and DE.",
     "question_source": "Use this station record in the selected language.",
     "return_behavior": "Return the visitor to the same wing station and reading position."
   }

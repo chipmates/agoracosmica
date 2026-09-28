@@ -49,6 +49,7 @@ export interface VinciStationContent {
 
 interface DoorSource {
   doors: Array<{ station: string; question_en: string; question_de: string }>;
+  farewell: { station: string; question_en: string; question_de: string };
   door_contract: {
     figure_id: string;
     figure_name: string;
@@ -62,6 +63,13 @@ interface DoorSource {
 
 const doorData = JSON.parse(doorsSource) as DoorSource;
 export const vinciDoorContract = Object.freeze(doorData.door_contract);
+/** The question the talk choice at the end of the walk asks. It is a door and
+ * not a station: the rail never stands at it. */
+export const vinciFarewellDoor: Readonly<VinciText & { station: string }> = Object.freeze({
+  station: doorData.farewell.station,
+  en: doorData.farewell.question_en,
+  de: doorData.farewell.question_de,
+});
 export const vinciConstructionStatus: VinciText = { en: 'in construction', de: 'im Bau' };
 export const vinciHourSpoken: VinciText = {
   en: '15:19 by the sun, 10 October 1517',

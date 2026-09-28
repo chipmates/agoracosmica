@@ -34,10 +34,11 @@ export const COLLECTIONS = [
     name: 'doors', file: 'src/wings/vinci/data/doors.json',
     // The public copy carries the revision's station set, a twentieth question for the west end
     // and its own wording for it, and the study door's question in the secretary's own terms (a
-    // paralysis of the right hand, while he still drew and taught); the sealed original does not.
-    // Sixteen of the twenty stations stand.
+    // paralysis of the right hand, while he still drew and taught), the closing question the walk's
+    // talk choice asks (a placeholder for the words round) and the implemented tag contract; the
+    // sealed original does not. Sixteen of the twenty stations stand.
     originalSHA256: 'c6bcb90a55fa4d3ce3ec00928ab276613233432468f05a1566ca306d81c47647',
-    normalizedSHA256: 'b909e418852aac567e32c127298a4aab4a9b77dffe013bfc55c7f0780f65e8fb',
+    normalizedSHA256: '2babba0fe0f9450c3859ed18018d5e5c224c5e34fcb1cb33bb82c129179b24ba',
     expected: { doors: 20 },
   },
   {

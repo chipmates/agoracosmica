@@ -20,6 +20,9 @@ export interface WingEntry {
   /** the app's ask tag for this figure: it NAMES a question, never carries
       one, so nothing a stranger writes into a link reaches the composer */
   askTag?: string
+  /** the figure's id in the app, which names a station's own question as
+      `w:<appFigure>:<door>`; the figure's tag above is the fallback */
+  appFigure?: string
   load: () => Promise<{ createWing: () => WingModule }>
 }
 
@@ -35,6 +38,7 @@ export const WINGS: WingEntry[] = [
     status: 'preparing',
     publicSlug: 'leonardo-da-vinci',
     askTag: 'f:vinci:1',
+    appFigure: 'vinci',
     /* THE FILM STANDS BEHIND THE SAME CHROME. An address that names a film
        release loads the wing that plays it; every other address, the rigs'
        and the owner's walks among them, loads the live engine. */

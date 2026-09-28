@@ -113,12 +113,15 @@ export interface WingStation {
   name: string
   /** the question its door carries, shown beside the door as text */
   question: string
+  /** the id the library knows that question by: the door asks
+      `w:<figure>:<door>`, and a station without one asks the figure's own */
+  door?: string
 }
 
 export interface WingModule {
   stations: WingStation[]
   /** A walking wing distinguishes its standing station from its destination. */
-  navigation?(): { completed?: string; target?: string; question?: string }
+  navigation?(): { completed?: string; target?: string; question?: string; door?: string }
   /** Keep the library disclosure behind a door press: it stands on the first
       one and on every later one until the visitor has gone through. */
   doorDisclosure?: 'first-press'
@@ -216,24 +219,38 @@ export function resolveWingStationIndex(at: number | string, stations: readonly 
   return Math.max(0, stations.findIndex(station => station.id === at))
 }
 
+/** a door id as the app's tag accepts it: lowercase, digits and hyphens */
+const DOOR_ID = /^[a-z0-9-]{1,40}$/
+
 /** The library's own door, at the app itself: the site's root is a static
     page that keeps no question. The app's entry parser resolves NAMED ask
     tags only, so a question travels as an identifier and free text never
-    rides the URL into the composer. */
-function doorUrl(entry: WingEntry): string {
+    rides the URL into the composer. A door that names its own question asks
+    `w:<figure>:<door>`; the app falls back to the figure's own question for
+    one it does not know. */
+function doorUrl(entry: WingEntry, doorId?: string): string {
   const p = new URLSearchParams()
-  // TODO-WING-ASK-TAG: the app resolves f:<figure>:1 (the figure's hero
-  // question) and nothing per station. A w:<figure>:<station> tag class in
-  // the app would let each station name its own question; until it exists
-  // every door of a wing carries the same named question.
   if (!entry.publicSlug || !entry.askTag) {
     p.set('figure', entry.slug)
     return `${APP_ORIGIN}/app?${p.toString()}`
   }
   p.set('figure', entry.publicSlug)
-  p.set('ask', entry.askTag)
+  const own = entry.appFigure && doorId && DOOR_ID.test(doorId)
+  p.set('ask', own ? `w:${entry.appFigure}:${doorId}` : entry.askTag)
   p.set('lang', lang())
   return `${APP_ORIGIN}/app?${p.toString()}`
+}
+
+/** the door of the frame standing on this page, for a choice a wing builds */
+let throughTheDoor: ((doorId: string, asked: string) => string) | null = null
+
+/** THE SAME DOOR, ASKED FROM INSIDE A WING. A choice the wing builds itself
+    (the walk's farewell) goes through the frame's own door: the plate on a
+    first press, then the library in a new tab asking `w:<figure>:<door>`.
+    Call it from the control's click, so the new tab is the visitor's own.
+    Returns the address it opens, empty while no wing stands. */
+export function openWingDoor(doorId: string, question: string): string {
+  return throughTheDoor?.(doorId, question) ?? ''
 }
 
 function el<K extends keyof HTMLElementTagNameMap>(
@@ -489,7 +506,7 @@ export function createWingFrame(
   function paintDoorPlate(): void {
     const band = disclosure.dataset['form'] === 'band'
     doorAsked.hidden = !band
-    doorAsked.textContent = band ? question.textContent ?? '' : ''
+    doorAsked.textContent = band ? plateAsked ?? question.textContent ?? '' : ''
     // the plate is named by what it carries: the question on a band, the
     // heading in the centred plate
     disclosure.setAttribute('aria-labelledby', band ? doorAsked.id : doorTitle.id)
@@ -510,14 +527,16 @@ export function createWingFrame(
   /** True once the visitor has gone through the door: the plate says what is
       behind it, so it stands on every press until it has been passed. */
   let doorPassed = false
+  /** the question a wing's own choice carried onto the plate, while it stands */
+  let plateAsked: string | null = null
+  /** where the hand goes back to when the plate closes */
+  let plateOpener: HTMLElement = door
   door.setAttribute('aria-controls', doorWords.id)
   door.setAttribute('aria-expanded', 'false')
-  door.addEventListener('click', event => {
-    // the control that opens the plate also takes it away again
-    if (disclosure.open) { event.preventDefault(); disclosure.close(); return }
-    if (wing?.doorDisclosure !== 'first-press' || doorPassed) return
-    event.preventDefault()
-    continueDoor.href = door.href
+  function showPlate(href: string, asked: string | null, opener: HTMLElement): void {
+    continueDoor.href = href
+    plateAsked = asked
+    plateOpener = opener
     /* THE PLATE GROWS FROM THE BAND where the band stands: no centred plate
        over a dimmed room, and the room above it stays the room. */
     if (deskOn('panel') && !narrowStage()) disclosure.dataset['form'] = 'band'
@@ -530,14 +549,36 @@ export function createWingFrame(
     continueDoor.focus({ preventScroll: true })
     // the ways belong to the surface that owns the foot of the screen
     dispatchEvent(new CustomEvent('na-wing-plate', { detail: { open: true } }))
+  }
+  door.addEventListener('click', event => {
+    // the control that opens the plate also takes it away again
+    if (disclosure.open) { event.preventDefault(); disclosure.close(); return }
+    if (wing?.doorDisclosure !== 'first-press' || doorPassed) return
+    event.preventDefault()
+    showPlate(door.href, null, door)
   })
+  throughTheDoor = (doorId, asked) => {
+    if (!entry) return ''
+    const href = doorUrl(entry, doorId)
+    if (disclosure.open) disclosure.close()
+    if (wing?.doorDisclosure === 'first-press' && !doorPassed) {
+      const active = document.activeElement
+      showPlate(href, asked || null, active instanceof HTMLElement && active !== document.body ? active : door)
+    } else {
+      window.open(href, '_blank', 'noopener')
+    }
+    return href
+  }
   continueDoor.addEventListener('click', () => { doorPassed = true; disclosure.close() })
   closeDisclosure.addEventListener('click', () => disclosure.close())
   disclosure.addEventListener('close', () => {
     door.setAttribute('aria-expanded', 'false')
     doorStandsAlone()
     dispatchEvent(new CustomEvent('na-wing-plate', { detail: { open: false } }))
-    if (!host.hidden) door.focus({ preventScroll: true })
+    const back = plateOpener.isConnected ? plateOpener : door
+    plateAsked = null
+    plateOpener = door
+    if (!host.hidden) back.focus({ preventScroll: true })
   })
 
   /* THE LOST CONTEXT. A phone under memory pressure takes the GPU back from
@@ -646,7 +687,7 @@ export function createWingFrame(
       )
     }
     question.textContent = stations[index]?.question ?? ''
-    if (entry) door.href = doorUrl(entry)
+    paintDoor(stations[index]?.door)
   }
 
   /* ONE MECHANISM FOR THE WHOLE FRAME. The language is announced once, by
@@ -686,9 +727,23 @@ export function createWingFrame(
     }
   }
 
+  /** The door's address, made again only when its question or the language
+      moves: the walk asks for it on every frame. */
+  let doorKey = ''
+  function paintDoor(doorId: string | undefined): void {
+    if (!entry) return
+    const key = `${entry.slug}|${doorId ?? ''}|${spoken}`
+    if (key === doorKey) return
+    doorKey = key
+    door.href = doorUrl(entry, doorId)
+  }
+
   function paintNavigation(): void {
     const navigation = wing?.navigation?.()
     if (navigation?.question !== undefined && question.textContent !== navigation.question) question.textContent = navigation.question
+    // the door asks what the visitor reads beside it: a walk that names the
+    // question names its door too
+    if (navigation?.question !== undefined) paintDoor(navigation.door)
     for (let i = 0; i < rail.children.length; i++) {
       const button = rail.children[i] as HTMLElement
       const current = navigation ? button.dataset['station'] === navigation.completed : i === index
@@ -718,7 +773,9 @@ export function createWingFrame(
     const station = wing.stations[index]
     wing.show(index, { labels, stage, world, navigate: goto, barFoot, walking })
     question.textContent = station?.question ?? ''
-    door.href = doorUrl(entry)
+    // a station change reads the language afresh
+    doorKey = ''
+    paintDoor(station?.door)
     paintNavigation()
     const selected = rail.children[index] as HTMLElement | undefined
     if (selected && !wing.navigation) rail.scrollLeft = selected.offsetLeft - rail.clientWidth / 2 + 22

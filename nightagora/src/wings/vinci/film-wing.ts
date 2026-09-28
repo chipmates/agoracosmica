@@ -814,12 +814,13 @@ export function createWing(): WingModule {
   }
 
   const module: WingModule = {
-    stations: LIFE.map((s): WingStation => ({ id: s.id, name: text(s.name), question: text(stationOf(s.station).door) })),
+    stations: LIFE.map((s): WingStation => ({ id: s.id, name: text(s.name), question: text(stationOf(s.station).door), door: stationOf(s.station).door.station })),
     doorDisclosure: 'first-press',
     navigation: () => {
       const s = picture?.state()
       const target = s && s.kind !== 'rest' ? LIFE.find(l => stopNode(l.id) === (s.kind === 'dip' ? s.to : s.target))?.id : undefined
-      return { completed: LIFE[card]!.id, ...(target ? { target } : {}), question: text(stationOf(LIFE[card]!.station).door) }
+      const here = stationOf(LIFE[card]!.station).door
+      return { completed: LIFE[card]!.id, ...(target ? { target } : {}), question: text(here), door: here.station }
     },
     show(index, h) {
       if (!hosts) {
@@ -839,7 +840,7 @@ export function createWing(): WingModule {
       report?.({ stage: 'walk', share: 1 })
     },
     language() {
-      module.stations = LIFE.map(s => ({ id: s.id, name: text(s.name), question: text(stationOf(s.station).door) }))
+      module.stations = LIFE.map(s => ({ id: s.id, name: text(s.name), question: text(stationOf(s.station).door), door: stationOf(s.station).door.station }))
       if (sourceButton) sourceButton.textContent = lang() === 'de' ? 'Quellen' : 'Sources'
       paint()
     },

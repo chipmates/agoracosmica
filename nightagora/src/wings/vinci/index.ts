@@ -346,7 +346,7 @@ export function createWing():VinciWingModule {
    * question of the room it stands in, which is what the door asks. */
   const walkStation=(stop:VinciWalkStop):WingStation=>{
     const s=stationOf(stop.station)
-    return {id:stop.id,name:text(stop.name??s.name),question:text(s.door)}
+    return {id:stop.id,name:text(stop.name??s.name),question:text(s.door),door:s.door.station}
   }
   /** THE VERTEX A RUN ALONG THE WALL WOULD LAND ON, from where the eye
    * stands. Only the life's order walks a wall between its stations: in the
@@ -3026,7 +3026,7 @@ export function createWing():VinciWingModule {
       // poses are passed through and name the stop the card stands at
       const named=(id?:string):string|undefined=>id===undefined?undefined:isVinciWalkPose(id)?(walkIndexAt(id)>=0?id:undefined):id
       const target=doorAhead>=0?stopAt(doorAhead).id:named(nav?.queued[0]??nav?.active)
-      return {completed:named(nav?.completed)??WALK.stops[card]?.id??hereContent().id,target,question:text(hereContent().door)}
+      return {completed:named(nav?.completed)??WALK.stops[card]?.id??hereContent().id,target,question:text(hereContent().door),door:hereContent().door.station}
     },
     // A MACHINE NOT YET WHOLE IS STILL IN FLIGHT, and one that cannot be is an error.
     pending:()=>(exhibits?.pending()??0)+machinesStanding().outstanding+(studySheet?.pending()??0),
