@@ -1120,7 +1120,7 @@ export function createWing():VinciWingModule {
       if(want!==sheetOpen){sheetOpen=want;paintSheet()}
     },options)
     header.addEventListener('pointercancel',()=>{sheetHeld=false},options)
-    window.addEventListener('resize',()=>{placeCanonicalStation();paintDock()},options)
+    window.addEventListener('resize',()=>{placeAfterResize();paintDock()},options)
     standing=true
     card=station
     const stop=stopAt(card),s=stationOf(stop.station)
@@ -2688,6 +2688,21 @@ export function createWing():VinciWingModule {
     rail.set(railPlaceOf(stop),vinciWalkPose(stop,narrow()),true,narrow(),walkVertex(stop))
   }
   function endInspection() { if(activeView)placeCanonicalStation() }
+  /** A RESIZE OR A TURNED PHONE KEEPS THE VISITOR WHERE HE STANDS, framed
+   * again for the window it now has: at a work of a wall, or the work a run
+   * is walking to; at the work an approach stands at; else the stop's view. */
+  function placeAfterResize():void {
+    const nav=rail.navigation, wall=wallOn(), stop=stopAt(card)
+    const vertex=nav.active?nav.wallTo:nav.wall
+    const work=!activeView&&wall&&vertex!==undefined&&!vinciWallIsEnd(wall,vertex)&&vertex!==walkVertex(stop)
+      ?vinciWallStops(wall)[vertex-1]?.exhibit:undefined
+    const onWork=work?vinciApproachPose(work,narrow()):undefined
+    if(onWork){rail.set(hereContent().id,onWork,true,narrow(),vertex);return}
+    const viewed=activeView?undefined:nav.exhibit??nav.approaching
+    placeCanonicalStation()
+    const pose=viewed&&vinciApproachStation(viewed)===hereContent().id?vinciApproachPose(viewed,narrow()):undefined
+    if(viewed&&pose)proved(()=>rail.approach(viewed,pose,narrow(),true))
+  }
   function appendRecord(value:VinciText,citation:string,certainty?:VinciCertainty,anchorId?:string,anchorClass?:'GENERATED'|'procedural'):[HTMLElement,HTMLElement] {
     const p=make('p','vinci-statement')
     if(certainty){
