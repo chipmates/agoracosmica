@@ -446,6 +446,11 @@ const RAIL_QUICK_TURN=20,RAIL_QUICK_TURN_PHONE=14
 /** On a lens of 60 degrees or wider a standing turn may run up to this fast,
  * still under the film's pixel cap at that lens. */
 const RAIL_QUICK_WIDE=35,RAIL_QUICK_WIDE_PHONE=25
+/** FROM ONE WORK OF A WALL TO THE NEXT, where the caller asks for it, the
+ * leg's clock runs this much faster than the walk's; a leg to or from the
+ * wall's end stations keeps the walk's, and a caller that does not ask (the
+ * film's own graph) keeps every leg at the walk's. */
+const STOP_TO_STOP_PACE=1.4
 /** Over the last metres the way ahead runs out and the arriving composition
  * takes the gaze. */
 const GAZE_ARRIVAL_M = 4
@@ -473,7 +478,7 @@ interface RouteTurns {start:boolean;end:boolean;stands?:readonly RailWaypoint[];
 export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:RailGeometryAuthority) {
   /** A request that carries a wall vertex is walked on the wall's own line,
    * whether it ends at a stop of the hang or at one of its two end stations. */
-  interface Request { id:VinciStationId; pose:Pose; phone:boolean; exhibit?:string; wall?:number; wallOn?:VinciWall; link?:boolean }
+  interface Request { id:VinciStationId; pose:Pose; phone:boolean; exhibit?:string; wall?:number; wallOn?:VinciWall; link?:boolean; quick?:boolean }
   let completed:Request|undefined, active:Request|undefined, pending:Request|undefined
   /** THE STATION AN APPROACH LEFT FROM, and the exhibit eye standing in front
    * of one object. A viewing eye is never a station: it carries its station's
@@ -722,6 +727,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
             namedDegPerSecond:request.phone?RAIL_QUICK_NAMED_PHONE:RAIL_QUICK_NAMED}:{}),
           floor:certified.turns.floor===true,lens:certified.turns.lens??'place',forward:certified.turns.forward===true||stairs.length>0,turned:certified.turns.turned===true,windingRound:certified.turns.windingRound===true,lensWait:certified.turns.lensWait===true,scripted:lookKeys!==undefined}}:{})})
     leg=gaze.leg;duration=leg.seconds;legClock=0;legClockAt=now;pace=1;waiting=0;strideM=strideTarget=0;strideAt=now
+    if(request.quick&&request.wall!==undefined&&request.wallOn&&wallAt!==undefined&&!vinciWallIsEnd(request.wallOn,wallAt)&&!vinciWallIsEnd(request.wallOn,request.wall))pace=STOP_TO_STOP_PACE
     active=request
   }
   function render(now:number) {
@@ -785,10 +791,10 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     /** A RUN ALONG THE WALL, from the vertex the eye stands on to another. A
      * second press while one runs is queued, not cut: it leaves in the update
      * the current run lands in, so the eye never stands still between them. */
-    along(vertex:number,id:VinciStationId,pose:Pose,exhibit?:string,phone=camera.aspect<=.9):boolean {
+    along(vertex:number,id:VinciStationId,pose:Pose,exhibit?:string,phone=camera.aspect<=.9,quick=false):boolean {
       if(!completed||wallOn===undefined||wallAt===undefined||vertex===wallAt||wallReturn!==undefined)return false
-      const request:Request={id,pose:{eye:pose.eye.clone(),at:pose.at.clone(),fov:pose.fov},phone,exhibit,wall:vertex,wallOn}
-      if(active){pending=request;pace=carriedPace(++waiting);return true}
+      const request:Request={id,pose:{eye:pose.eye.clone(),at:pose.at.clone(),fov:pose.fov},phone,exhibit,wall:vertex,wallOn,quick}
+      if(active){pending=request;pace=Math.max(pace,carriedPace(++waiting));return true}
       begin(request,clock())
       return true
     },

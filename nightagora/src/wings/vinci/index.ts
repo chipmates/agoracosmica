@@ -2010,7 +2010,7 @@ export function createWing():VinciWingModule {
     const pose=vinciApproachPose(exhibit,narrow())
     if(!pose)return false
     yieldEye()
-    return proved(()=>rail.along(vertex,hereContent().id,pose,exhibit))
+    return proved(()=>rail.along(vertex,hereContent().id,pose,exhibit,undefined,true))
   }
   /** One stop along the wall, with or without a card. Right runs on to the
    * later work and left back to the earlier, which is the way each end's own
