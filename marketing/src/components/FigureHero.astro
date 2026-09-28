@@ -18,6 +18,8 @@ import type { Lang } from '../i18n';
 import { getPublicTrailerUrl } from '@client/utils/public/publicMediaUrl';
 import { getSeedsFor } from '../lib/seeds';
 import { getStoryChapter } from '../lib/stories';
+import { chapterDisplayMinutes } from '../lib/storyRuntime';
+import { isFrozenFigurePage } from '../lib/frozenPages';
 import { getFigureWorld, numberWord, capitalize, cleanDisplayText } from '../lib/figureWorld';
 
 interface Figure {
@@ -73,7 +75,10 @@ const beginHref = `/app?figure=${slug}&lang=${lang}`;
 // below uses for chapter 1 and the runtime the story file reports. Nothing is
 // written by hand, and a figure missing either half drops that half.
 const chapterTitle = cleanDisplayText(getSeedsFor(figure.id, lang)[0]?.title);
-const chapterMinutes = getStoryChapter(figure.id, lang, 1)?.minutes;
+// Pages in the running search test keep the text estimate they launched with.
+const chapterMinutes = isFrozenFigurePage(lang, slug)
+  ? getStoryChapter(figure.id, lang, 1)?.minutes
+  : chapterDisplayMinutes(figure.id, lang, 1);
 let chapterBeat = `${S.chapterWord} 1`;
 if (chapterTitle) chapterBeat += `: ${chapterTitle}`;
 if (chapterMinutes) chapterBeat += ` · ${chapterMinutes} ${S.min}`;

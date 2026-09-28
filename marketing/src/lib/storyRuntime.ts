@@ -5,6 +5,7 @@
 // none. Same posture as councilRuntime.
 
 import type { Lang } from '../i18n';
+import { getStoryChapter } from './stories';
 
 type Durations = Record<string, number>;
 
@@ -35,6 +36,12 @@ function seconds(figureId: string, lang: Lang, chapter: number): number | null {
 export function chapterMinutes(figureId: string, lang: Lang, chapter: number): number | null {
   const total = seconds(figureId, lang, chapter);
   return total === null ? null : Math.max(1, Math.round(total / 60));
+}
+
+/** The one length every chapter door prints. */
+export function chapterDisplayMinutes(figureId: string, lang: Lang, chapter: number): number | null {
+  const estimate = getStoryChapter(figureId, lang, chapter)?.minutes;
+  return estimate ? estimate : null;
 }
 
 /** All twelve chapters of one life, in minutes. */

@@ -15,6 +15,7 @@ import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
 import { figureIdToSlug } from '@client/data/public/slugMap';
 import { getSeedsFor } from '../lib/seeds';
 import { getStoryChapter } from '../lib/stories';
+import { chapterDisplayMinutes, shortRuntimeLabel } from '../lib/storyRuntime';
 import { MEDIA_URL, publicUrl } from '../lib/urls';
 import './landing-lab/lab-samples.css';
 import './landing-lab/lab-library.css';
@@ -49,19 +50,18 @@ const clean = (s: string | undefined): string =>
     .replace(/\s+/g, ' ')
     .trim();
 
-// The Story panel quotes the chapter's own hook and states its real runtime,
-// both straight out of the story catalog.
+// The Story panel quotes the chapter's own hook from the story catalog and
+// states its runtime from the produced audio, as every chapter door does.
 const chapter = getStoryChapter(FEATURED_ID, lang, CHAPTER_INDEX + 1);
 const chapterHook = clean(chapter?.hook);
-const chapterRuntime = chapter
-  ? (lang === 'de' ? `${chapter.minutes} Min.` : `${chapter.minutes} min`)
-  : undefined;
+const chapterRuntime =
+  shortRuntimeLabel(chapterDisplayMinutes(FEATURED_ID, lang, CHAPTER_INDEX + 1), lang) ?? undefined;
 
 // Per-mode overrides. Everything else resolves from the figure's real data.
 const OVERRIDES = {
   en: {
     // The Story link points at his full page (the four app doors below are
-    // enough), and the chapter runtime comes from the story catalog.
+    // enough), and the chapter runtime is the one every chapter door prints.
     story: {
       ...(chapterHook ? { body: chapterHook } : {}),
       ...(chapterRuntime ? { duration: chapterRuntime } : {}),
