@@ -9,6 +9,8 @@
 // Trade-offs:
 //   - User clears localStorage → fresh clientId → fresh quota.
 //     Mitigated by Turnstile fingerprinting on each fresh session.
+//   - The client drops its UUID when the UTC day changes (the quota keys are
+//     per UTC day), so an ID is never sent on a later day than it counts for.
 //   - JWT no longer IP-bound → token theft window is the same as before
 //     (10 min TTL, in-memory only on client).
 

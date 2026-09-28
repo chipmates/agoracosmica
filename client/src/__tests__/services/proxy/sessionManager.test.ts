@@ -2,7 +2,7 @@
 // page load says first, every later one (refresh, retry) says not first, and
 // nothing about the count is written to storage.
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 const fetchMock = vi.fn();
 
@@ -64,5 +64,76 @@ describe('session count flag', () => {
     const keys = Array.from({ length: localStorage.length }, (_, i) => localStorage.key(i));
     expect(keys).toEqual(['agora_client_id']);
     expect(sessionStorage.length).toBe(0);
+  });
+});
+
+describe('quota ID renewed every UTC day', () => {
+  const OTHER_ID = '9a8b7c6d-5e4f-4a3b-9c2d-1e0f9a8b7c6d';
+  const stored = () => localStorage.getItem('agora_client_id');
+
+  beforeEach(() => {
+    vi.resetModules();
+    fetchMock.mockReset();
+    localStorage.clear();
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-09-28T12:00:00Z'));
+  });
+  afterEach(() => vi.useRealTimers());
+
+  it('stores the ID with the UTC day and sends it again the same day', async () => {
+    fetchMock.mockImplementation(async () => okResponse(60_000));
+    const { getSessionToken } = await import('../../../services/proxy/sessionManager');
+    await getSessionToken();
+    expect(JSON.parse(stored()!)).toEqual({ id: CLIENT_ID, day: '2026-09-28' });
+    vi.setSystemTime(new Date('2026-09-28T23:59:00Z'));
+    await getSessionToken();
+    expect(sentBodies()[0].clientId).toBeUndefined();
+    expect(sentBodies()[1].clientId).toBe(CLIENT_ID);
+  });
+
+  it('drops the ID on a new UTC day and keeps the one the server issues', async () => {
+    localStorage.setItem('agora_client_id', JSON.stringify({ id: OTHER_ID, day: '2026-09-27' }));
+    fetchMock.mockImplementation(async () => okResponse(60_000));
+    const { getSessionToken } = await import('../../../services/proxy/sessionManager');
+    await getSessionToken();
+    expect(sentBodies()[0].clientId).toBeUndefined();
+    expect(JSON.parse(stored()!)).toEqual({ id: CLIENT_ID, day: '2026-09-28' });
+  });
+
+  it('removes a stale ID even when the request fails', async () => {
+    localStorage.setItem('agora_client_id', JSON.stringify({ id: OTHER_ID, day: '2026-09-20' }));
+    fetchMock.mockImplementation(async () => new Response('{"error":"x"}', { status: 403 }));
+    const { getSessionToken } = await import('../../../services/proxy/sessionManager');
+    await expect(getSessionToken()).rejects.toThrow();
+    expect(stored()).toBeNull();
+  });
+
+  it('keeps a bare ID from an older build for today, then renews it', async () => {
+    localStorage.setItem('agora_client_id', OTHER_ID);
+    fetchMock.mockImplementation(async () => new Response(JSON.stringify({
+      token: 'jwt', expiresAt: new Date(Date.now() + 60_000).toISOString(), clientId: OTHER_ID,
+    }), { status: 200 }));
+    const { getSessionToken } = await import('../../../services/proxy/sessionManager');
+    await getSessionToken();
+    expect(sentBodies()[0].clientId).toBe(OTHER_ID);
+    expect(JSON.parse(stored()!)).toEqual({ id: OTHER_ID, day: '2026-09-28' });
+    vi.setSystemTime(new Date('2026-09-29T00:01:00Z'));
+    fetchMock.mockImplementation(async () => okResponse(60_000));
+    await getSessionToken();
+    expect(sentBodies()[1].clientId).toBeUndefined();
+    expect(JSON.parse(stored()!)).toEqual({ id: CLIENT_ID, day: '2026-09-29' });
+  });
+
+  it('ignores an unreadable value and a malformed ID', async () => {
+    for (const value of ['not json', JSON.stringify({ id: 'x', day: '2026-09-28' })]) {
+      vi.resetModules();
+      fetchMock.mockReset();
+      localStorage.setItem('agora_client_id', value);
+      fetchMock.mockImplementation(async () => okResponse(60_000));
+      const { getSessionToken } = await import('../../../services/proxy/sessionManager');
+      await getSessionToken();
+      expect(sentBodies()[0].clientId).toBeUndefined();
+      expect(JSON.parse(stored()!)).toEqual({ id: CLIENT_ID, day: '2026-09-28' });
+    }
   });
 });

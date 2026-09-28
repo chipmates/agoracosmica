@@ -2,10 +2,13 @@
 // Creates session via Turnstile → Worker, stores JWT in memory, lazily refreshes
 // on the next getSessionToken() call when the cached token is within 5min of expiry.
 //
-// Identity: a UUID v4 ("clientId") is persisted in localStorage and sent with
-// every /v1/session call so the server's daily quota stays bound to this device
-// across tabs, page reloads, and JWT refreshes — independent of the public IP.
-// Cleared localStorage → fresh quota; that's a known and accepted trade-off.
+// Identity: a UUID v4 ("clientId") is persisted in localStorage with the UTC
+// day it was issued and sent with every /v1/session call, so the server's daily
+// quota stays bound to this device across tabs, page reloads and JWT refreshes,
+// independent of the public IP. The quota keys are per UTC day, so the ID is
+// dropped when the day changes and the server issues a new one: no ID outlives
+// the one day it counts. Cleared localStorage gives a fresh quota, a known and
+// accepted trade-off (the per-address ceiling still holds).
 //
 // Refresh policy is LAZY (no setTimeout). An open-but-idle tab does not burn
 // Turnstile + JWT issuance every 5min. Sessions analytics only fire on real
@@ -27,24 +30,48 @@ let pendingSession: Promise<string> | null = null; // Deduplication mutex
 // a page load, so nothing is stored or looked up for the count.
 let sessionCounted = false;
 
-/** Read the persisted clientId. Returns null if missing, malformed, or storage is unavailable. */
+/** The current UTC day, the same day key the worker's quota uses. */
+function utcDay(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+/**
+ * Read today's clientId. Returns null if missing, malformed, from an earlier
+ * UTC day (then it is removed), or storage is unavailable. A bare UUID from an
+ * older build counts as today's, so an update does not reset today's quota.
+ */
 function readStoredClientId(): string | null {
   try {
     const stored = localStorage.getItem(CLIENT_ID_STORAGE_KEY);
-    return stored && UUID_V4_RE.test(stored) ? stored : null;
+    if (!stored) return null;
+    if (UUID_V4_RE.test(stored)) {
+      writeStoredClientId(stored);
+      return stored;
+    }
+    const parsed: unknown = JSON.parse(stored);
+    const record = parsed as { id?: unknown; day?: unknown } | null;
+    if (
+      record && typeof record.id === 'string' && UUID_V4_RE.test(record.id) &&
+      record.day === utcDay()
+    ) {
+      return record.id;
+    }
+    localStorage.removeItem(CLIENT_ID_STORAGE_KEY);
+    return null;
   } catch {
-    // localStorage may be unavailable (Safari private mode in some configs).
-    // Falling back to per-session UUIDs is acceptable — server still rate-limits.
+    // localStorage may be unavailable (Safari private mode in some configs), or
+    // the value unreadable. Per-session UUIDs are acceptable, the server still
+    // rate-limits.
     return null;
   }
 }
 
-/** Persist the clientId returned by the server so subsequent sessions reuse it. */
+/** Persist the clientId returned by the server, stamped with today's UTC day. */
 function writeStoredClientId(clientId: string): void {
   try {
-    localStorage.setItem(CLIENT_ID_STORAGE_KEY, clientId);
+    localStorage.setItem(CLIENT_ID_STORAGE_KEY, JSON.stringify({ id: clientId, day: utcDay() }));
   } catch {
-    // Storage write failed — silent. Server will mint a fresh UUID next session.
+    // Storage write failed, silent. The server mints a fresh UUID next session.
   }
 }
 
