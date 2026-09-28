@@ -128,6 +128,15 @@ describe('agc-public.js: the ad click ID', () => {
     expect(storageKeys(sessionStorage)).toEqual([]);
   });
 
+  it('looks up no click ID on a CTA click without a yes', () => {
+    const getItem = vi.spyOn(Storage.prototype, 'getItem');
+    loadPage(`/marcus-aurelius/?gclid=${CLICK}`);
+    click(door({ 'data-agc-cta': 'start-exploring' }));
+    expect(getItem.mock.calls.map((c) => c[0])).not.toContain('agc_gclid');
+    expect(conversions()).toHaveLength(0);
+    getItem.mockRestore();
+  });
+
   it('stores the click ID when a yes is on record, and the CTA reports it', () => {
     localStorage.setItem('agc_ad_consent', YES);
     loadPage(`/marcus-aurelius/?gclid=${CLICK}`);

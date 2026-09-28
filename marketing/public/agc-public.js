@@ -99,10 +99,10 @@
   // opt-in, so the bare gclid alone never sends anything.
   function fireConversion(event, metadata) {
     if (hasPaidParam()) return; // paid: never forward
+    if (!adConsentGranted()) return; // no opt-in: nothing sent, nothing looked up
     var gclid;
     try { gclid = sessionStorage.getItem(SS_GCLID); } catch (e) { return; }
     if (!gclid) return;
-    if (!adConsentGranted()) return; // no opt-in, no send
     try {
       var firedKey = 'agc_conv_fired_' + event;
       if (sessionStorage.getItem(firedKey)) return;
