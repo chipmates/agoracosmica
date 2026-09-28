@@ -168,8 +168,8 @@
           "a": "Not by thinking harder in a quiet room. Every answer here involves doing something. De Beauvoir points at choices, especially the uncomfortable ones, because that is where a self shows up. Jung points at dreams, and at the traits that irritate you in other people. Kahlo points at the work, fifty-five self-portraits worth of it. Woolf points at attention, the plain practice of noticing what your mind actually does. The short version: you find out by watching what you do, not by deciding in advance what you are."
         }
       ],
-      "metaTitle": "Who Am I, Really? Four Philosophers Answer",
-      "metaDescription": "Four ways into the oldest question: becoming, integrating, painting, observing. Read the answers side by side, then ask one of them yourself."
+      "metaTitle": "Who Am I, Really? 4 Answers, 12 Questions to Ask Yourself",
+      "metaDescription": "Who am I, really? Beauvoir, Jung, Frida Kahlo and Virginia Woolf answer side by side, plus 12 questions to ask yourself."
     },
     "mind-creativity": {
       "name": "Mind and Creativity",
@@ -298,7 +298,8 @@
     "indexOpenLine": "Every question below opens a page with the answers, a debate you can hear, and a way to ask it yourself.",
     "answersLabel": "The answers, side by side",
     "askLabel": "Ask it yourself",
-    "askLabelSelf": "12 questions to ask yourself",
+    "askLabelSelf": "{count} questions to ask yourself",
+    "askJumpSelf": "Or start with {count} questions to ask yourself.",
     "askCaption": "Each question below opens a conversation with the person who leads that debate. One tap, no typing.",
     "askDoor": "Ask {name}",
     "hearLabel": "Hear it argued",

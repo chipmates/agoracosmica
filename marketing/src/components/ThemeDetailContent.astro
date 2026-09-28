@@ -184,6 +184,14 @@ const askItems: DoorItem[] = askCouncils.map(c => ({
   question: getLocalizedQuestion(c, lang),
   figureId: c.moderator.id,
 }));
+// Who-am-i's list of questions is the page's hook, six phone screens down, so
+// the first screen points at it. Both lines count the doors they promise.
+const askHeading = isSelfTheme
+  ? t('themes.askLabelSelf').replace('{count}', String(askItems.length))
+  : t('themes.askLabel');
+const askJump = isSelfTheme && askItems.length > 0
+  ? t('themes.askJumpSelf').replace('{count}', String(askItems.length))
+  : '';
 
 // Dickinson and Woolf punctuate with dashes, and those are theirs, not ours.
 // The house rule still keeps dashes off displayed pages, so a dashed quote is
@@ -235,6 +243,7 @@ const heroFacts = [
         data-agc-door="theme_top"
       >{t('nav.startExploring')}</a>
       <span class="tq-enter__note">{t('cta.freeNote')}</span>
+      {askJump && <a class="tq-enter__jump" href="#questions">{askJump}</a>}
     </p>
 
     <!-- Block 3: the answer, in crawlable HTML. -->
@@ -368,7 +377,7 @@ const heroFacts = [
          nowhere else, so the same question is never offered four ways. -->
     {askItems.length > 0 && (
       <section class="tq-section tq-ask" id="questions">
-        <h2 class="tq-h2">{isSelfTheme ? t('themes.askLabelSelf') : t('themes.askLabel')}</h2>
+        <h2 class="tq-h2">{askHeading}</h2>
         <p class="tq-note">{askCaption}</p>
         <QuestionDoors items={askItems} lang={lang} door="theme_ask" />
       </section>
@@ -558,6 +567,22 @@ const heroFacts = [
     line-height: var(--leading-relaxed);
     color: var(--text-tertiary);
   }
+  /* An in-page link, so it reads as text, in the site's text-link look. */
+  .tq-enter__jump {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: var(--text-md);
+    line-height: 1.4;
+    color: var(--gold-primary);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.22em;
+    text-decoration-color: color-mix(in srgb, var(--gold-primary) var(--a-40), transparent);
+  }
+  .tq-enter__jump:hover,
+  .tq-enter__jump:focus-visible { color: var(--gold-hover); text-decoration-color: currentColor; }
   @media (max-width: 640px) {
     .tq-enter { margin-bottom: 1.5rem; }
   }
