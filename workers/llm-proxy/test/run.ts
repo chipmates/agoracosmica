@@ -32,6 +32,7 @@ import {
 } from '../src/middleware/rateLimit';
 import { createAwardGuardedStream } from '../src/services/awardGuard';
 import { dispatchToNebius } from '../src/services/nebius';
+import { forwardConversionToGoogleAds } from '../src/services/googleAdsCapi';
 import { checkServingRegions, regionVerified, runRegionProbe } from '../src/services/regionProbe';
 import { handleChat } from '../src/routes/chat';
 import { handleFunnel } from '../src/routes/funnel';
@@ -1277,6 +1278,35 @@ async function main(): Promise<number> {
       const row = await funnelBeacon({ step, figureId: 'aurelius', mode: 'story', language: 'en' });
       assertEqual(row, undefined, `unlisted step recorded: ${JSON.stringify(step)}`);
     }
+  });
+
+  // -------------------------------------------------------------------------
+  // Conversion upload: one account only
+  // -------------------------------------------------------------------------
+
+  await test('a consented conversion is uploaded once, to the grant account only', async () => {
+    const urls: string[] = [];
+    const bodies: string[] = [];
+    const kv = fakeKv();
+    await kv.put('google_ads_access_token', 'cached-token');
+    globalThis.fetch = (async (url: string, init: RequestInit) => {
+      urls.push(String(url));
+      bodies.push(String(init.body));
+      return new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } });
+    }) as unknown as typeof fetch;
+    try {
+      for (const event of ['start_exploring', 'profile_created', 'council_engaged'] as const) {
+        await forwardConversionToGoogleAds(
+          fakeEnv({ RATE_LIMITS: kv, GOOGLE_ADS_DEVELOPER_TOKEN: 'dev', GOOGLE_ADS_LOGIN_CUSTOMER_ID: '1' }),
+          { gclid: 'TESTCLICKID0001', event, timestamp: Date.UTC(2026, 8, 28) },
+        );
+      }
+    } finally {
+      globalThis.fetch = realFetch;
+    }
+    assertEqual(urls.length, 3, 'one upload per event');
+    assert(urls.every(u => u.includes('/customers/7266866262:uploadClickConversions')), 'the grant account only');
+    assert(bodies.every(b => b.includes('"currency_code":"USD"')), 'the grant account currency');
   });
 
   // -------------------------------------------------------------------------

@@ -1,9 +1,8 @@
 // Google Ads Conversion API forwarding
 // Receives a gclid-keyed conversion event from /api/conversions and uploads
-// it to the Google Ads customer accounts that subscribe to that event. Most
-// events go to both accounts in parallel; the unmatched account fails the row
-// silently via partial_failure — the account that actually issued the gclid
-// records the conversion. Per-event scope overrides live in SCOPED_EVENTS.
+// it to the Ad Grants account, the only account whose click IDs the client
+// keeps. A click ID that account did not issue fails the row silently via
+// partial_failure.
 //
 // All CAPI calls are fire-and-forget from the route handler's perspective:
 // errors are logged here but never propagated. If GOOGLE_ADS_DEVELOPER_TOKEN
@@ -27,11 +26,11 @@ type ConversionEvent =
   | 'listened'
   | 'dialogue_started'
   | 'conversation_deepened';
-type AccountKey = 'grants' | 'paid';
+type AccountKey = 'grants';
 
 interface AccountConfig {
   customerId: string;
-  currency: 'USD' | 'EUR';
+  currency: 'USD';
   actions: Record<ConversionEvent, string>; // numeric conversion action IDs
 }
 
@@ -49,23 +48,17 @@ interface UploadResult {
   status:
     | 'ok_200'
     | 'partial_failure'
-    | 'skipped:scoped'
-    | 'skipped:todo_pending'
-    | 'skipped:not_applicable'
     | 'error:exception'
     | `http_${number}`;
   pfMessage: string | null;
   actionId: string;
 }
 
-// Two-account architecture: each Google Ads account has its own conversion
-// actions. customerId is the 10-digit account ID, digits only, no dashes.
-// The actions map holds the numeric conversionAction IDs. Neither value is a
-// secret. They identify accounts, not credentials. The developer token and
-// OAuth credentials are the secrets and come from env.
-//
-// Currencies are per-account: the Ad Grants account is USD-denominated, the
-// paid account is billed in EUR.
+// customerId is the 10-digit account ID, digits only, no dashes. The actions
+// map holds the numeric conversionAction IDs. Neither value is a secret. They
+// identify the account, not credentials. The developer token and OAuth
+// credentials are the secrets and come from env. The Ad Grants account is
+// USD-denominated.
 //
 // Conversion actions must be created with the "Import from clicks" source.
 // Google Ads silently drops offline uploads to Website-source actions (those
@@ -85,36 +78,6 @@ const ACCOUNTS: Record<AccountKey, AccountConfig> = {
       conversation_deepened: '7699419345',
     },
   },
-  paid: {
-    customerId: '3791478447',
-    currency: 'EUR',
-    actions: {
-      // Paid actions still on the old Website-source IDs. Replace with the
-      // offline-import equivalents once they are configured on the paid
-      // account; uploads to the current IDs are silently dropped by Google.
-      profile_created: 'TODO_PENDING',
-      start_exploring: 'TODO_PENDING',
-      mode_selected: 'TODO_PENDING',
-      listened: 'TODO_PENDING',
-      dialogue_started: 'TODO_PENDING',
-      conversation_deepened: 'TODO_PENDING',
-      // council_engaged is Grants-only — see SCOPED_EVENTS below.
-      council_engaged: 'NOT_APPLICABLE',
-    },
-  },
-};
-
-// Account scope per event. Default (event absent from this map) = both
-// accounts. Listed here = exactly the accounts that receive forwarding for
-// that event.
-//
-// council_engaged: Grants only. The theme→council funnel that triggers this
-// event lives on theme pages, which are the long-tail Grants surface. Paid
-// campaigns are figure-focused (figure pages don't route to councils) and
-// keep Profile Creation as their sole Primary action by deliberate design —
-// shallow engagement events stay off the Paid bidding signal.
-const SCOPED_EVENTS: Partial<Record<ConversionEvent, AccountKey[]>> = {
-  council_engaged: ['grants'],
 };
 
 // Conversion values are read at runtime from wrangler secrets (env.VALUE_*),
@@ -165,17 +128,10 @@ export async function forwardConversionToGoogleAds(
     return;
   }
 
-  // Dual upload: send to both customer accounts in parallel. The account that
-  // didn't issue this gclid will reject the row inside partial_failure — that
-  // is the expected, silent failure path. Errors are logged, never thrown.
-  await Promise.all([
-    uploadToAccount(env, accessToken, 'grants', input).catch((err) => {
-      console.error('[capi] grants upload threw', err);
-    }),
-    uploadToAccount(env, accessToken, 'paid', input).catch((err) => {
-      console.error('[capi] paid upload threw', err);
-    }),
-  ]);
+  // Errors are logged, never thrown.
+  await uploadToAccount(env, accessToken, 'grants', input).catch((err) => {
+    console.error('[capi] grants upload threw', err);
+  });
 }
 
 /**
@@ -234,8 +190,7 @@ async function getAccessToken(env: Env): Promise<string> {
 
 /**
  * Upload a single conversion to one Google Ads account. partial_failure is
- * always true so an unmatched-gclid row doesn't fail the whole request — the
- * unmatched-account is the expected outcome for one of the two dual-uploads.
+ * always true so an unmatched-gclid row doesn't fail the whole request.
  */
 async function uploadToAccount(
   env: Env,
@@ -245,26 +200,6 @@ async function uploadToAccount(
 ): Promise<UploadResult> {
   const account = ACCOUNTS[accountKey];
   const actionId = account.actions[input.event];
-
-  // Event-level account scoping. Events listed in SCOPED_EVENTS only forward
-  // to the accounts in the list — silent skip for the others, no log noise.
-  const scopedAccounts = SCOPED_EVENTS[input.event];
-  if (scopedAccounts && !scopedAccounts.includes(accountKey)) {
-    return { status: 'skipped:scoped', pfMessage: null, actionId };
-  }
-
-  // A conversion action still on a placeholder ID (not yet set up in Google
-  // Ads) is skipped, rather than sent with an invalid resource name.
-  if (actionId === 'TODO_PENDING') {
-    console.log(`[capi] ${accountKey} ${input.event} skipped: action id pending`);
-    return { status: 'skipped:todo_pending', pfMessage: null, actionId };
-  }
-
-  // Defensive: if SCOPED_EVENTS is ever broken and a NOT_APPLICABLE id slips
-  // through, surface it as a distinct skip rather than firing at Google.
-  if (actionId === 'NOT_APPLICABLE') {
-    return { status: 'skipped:not_applicable', pfMessage: null, actionId };
-  }
 
   const customerId = account.customerId;
   const conversion = {
@@ -306,8 +241,7 @@ async function uploadToAccount(
 
   // Top-level errors (auth, malformed request) come back as non-200.
   // Per-row errors (gclid not in this account) come back as 200 with
-  // partial_failure_error populated — those are the EXPECTED silent
-  // failures for the dual-upload approach.
+  // partial_failure_error populated.
   if (!res.ok) {
     const text = redactGclid(await res.text().catch(() => ''), input.gclid);
     console.error(
@@ -329,8 +263,7 @@ async function uploadToAccount(
     | { partial_failure_error?: { code?: number; message?: string } }
     | null;
   if (json?.partial_failure_error?.message) {
-    // Don't elevate to error — the gclid-not-in-account row is the normal
-    // case for one of the two dual-uploads on every conversion.
+    // Not an error: a click ID the account did not issue lands here.
     const pfMessage = redactGclid(json.partial_failure_error.message, input.gclid);
     console.log(
       `[capi] ${accountKey} partial-failure (expected for non-matching account):`,
