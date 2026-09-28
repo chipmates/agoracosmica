@@ -427,6 +427,8 @@
 @media (max-width: 860px) {
   .fx-block { padding: 2.25rem 1.1rem 0; }
 }
+/* Right under the hero, whose own floor already gives the air above. */
+.fx-block.fx-deeper { padding-top: 0.5rem; padding-bottom: 1.5rem; }
 
 /* ── tradition cross cut ──────────────────────────────────────────────── */
 

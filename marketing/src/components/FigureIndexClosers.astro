@@ -1,8 +1,9 @@
 ---
 // Closing blocks of the /figures index: the theme question rail and the FAQ,
 // both absorbed from the broad LEARN hub this page replaces, plus the lattice
-// links out. The FAQ array is the same one the route feeds to faqSchema(), so
-// the visible answers and the JSON-LD cannot drift.
+// links out. The deep pages sit under the hero instead (FigureIndexDeeper).
+// The FAQ array is the same one the route feeds to faqSchema(), so the
+// visible answers and the JSON-LD cannot drift.
 
 import { publicUrl } from '../lib/urls';
 import { HUB_THEME_IDS } from '../lib/wisdomHubData';
@@ -23,27 +24,6 @@ const themes = HUB_THEME_IDS.map(id => ({
   question: t(`themes.${id}.tagline`),
   href: publicUrl(lang, `/themes/${id}`),
 }));
-
-// The pages that go one level below a figure: a poet's own texts, or the topic
-// a figure is the doorway to. Language-specific, because these deep pages exist
-// per language rather than as translated twins.
-const deeperHeading = lang === 'de' ? 'Tiefer in ein Thema' : 'Go deeper on one thing';
-const deeper = lang === 'de'
-  ? [
-      { label: 'Die Heldenreise', href: '/de/heldenreise/' },
-      { label: 'Stoizismus', href: '/de/stoizismus/' },
-      { label: 'Platons Höhlengleichnis', href: '/de/figures/plato/hoehlengleichnis/' },
-      { label: 'Platons Ideenlehre', href: '/de/figures/plato/ideenlehre/' },
-    ]
-  : [
-      { label: "The hero's journey", href: '/the-heros-journey/' },
-      { label: 'Stoicism', href: '/stoicism/' },
-      { label: 'Talk to historical figures', href: '/talk-to-historical-figures/' },
-      { label: "Emily Dickinson's poems", href: '/figures/emily-dickinson/poems/' },
-      { label: "William Blake's poems", href: '/figures/william-blake/poems/' },
-      { label: "Shakespeare's sonnets", href: '/figures/william-shakespeare/sonnets/' },
-      { label: "Rumi's poems", href: '/figures/rumi/poems/' },
-    ];
 
 const readOn = [
   { label: ui.moreThemes, href: publicUrl(lang, '/themes') },
@@ -81,13 +61,6 @@ const readOn = [
         </div>
       ))}
     </div>
-  </section>
-
-  <section class="fx-block" aria-labelledby="fx-deeper-title">
-    <h2 class="pub-section__title" id="fx-deeper-title">{deeperHeading}</h2>
-    <ul class="fx-readon">
-      {deeper.map(link => <li><a href={link.href}>{link.label}</a></li>)}
-    </ul>
   </section>
 
   <section class="fx-block" aria-labelledby="fx-readon-title">

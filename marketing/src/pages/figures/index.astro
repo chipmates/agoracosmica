@@ -6,6 +6,7 @@ import V2ObservatoryMotion from '../../islands/V2ObservatoryMotion';
 import FigureDescent from '../../components/FigureDescent.astro';
 import FigureTraditions from '../../components/FigureTraditions.astro';
 import FigureIndexClosers from '../../components/FigureIndexClosers.astro';
+import FigureIndexDeeper from '../../components/FigureIndexDeeper.astro';
 import FiguresCatalogContent from '../../components/FiguresCatalogContent.astro';
 import PublicCTA from '../../components/PublicCTA.astro';
 import { getFiguresFaq, strataSchemas } from '../../components/figureStrata';
@@ -67,6 +68,7 @@ const lcpPortraitSizes = '(max-width: 900px) 56px, 88px';
 >
   <FigureOrbit lang={lang} />
   <V2ObservatoryMotion client:idle targetId="figures-orbit" />
+  <FigureIndexDeeper lang={lang} />
   <FigureDescent lang={lang} />
   <FigureTraditions lang={lang} />
   <FiguresCatalogContent lang={lang} gridOnly={true} />
