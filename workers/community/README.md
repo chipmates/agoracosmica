@@ -81,7 +81,7 @@ A ladder beats a formula here because a predictable step is easier to talk about
 
 Two more limits are worth knowing before quoting the numbers:
 
-- Device records never expire, so `joinedCount` is a running total of every device that has ever written. The currently active count is smaller. Rotating `IP_SALT` makes returning devices look new, which pushes the total up again.
+- Device records expire 12 months after their last write, but `joinedCount` is never decremented, so it stays a running total of every device that has ever written. The currently active count is smaller. Rotating `IP_SALT` makes returning devices look new, which pushes the total up again.
 - The six-hour gate is keyed to the hashed address, so several people behind one address share it. The later ones get the snapshot back without a write of their own.
 
 The stakes are set low on purpose. This is a non-binding signal with a human review step behind it, and the cost of a false claim is that ChipMates does not act on it.
