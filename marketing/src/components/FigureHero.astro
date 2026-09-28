@@ -2,10 +2,10 @@
 // The figure page hero: the per-figure spine.
 //
 // Portrait (the LCP image) with the Echo disclosure as its caption, who this
-// is, the trailer that ends by handing you the story, the promise line, the
-// first chapter as a quiet door, one gold Begin, and one line naming how big
-// this figure's world is. The about paragraphs that used to sit here moved
-// down the page: they pushed the trailer below the fold on a phone.
+// is, the answer a searcher came for, one gold Begin, then the trailer that
+// ends by handing you the story, the promise line, the first chapter as a
+// quiet door, and one line naming how big this figure's world is. The answer
+// sits under the name so a phone shows it on the first screen.
 //
 // The disclosure sits under the portrait because that is what it describes:
 // the image and the voice. Its wording is fixed by the transparency program,
@@ -35,11 +35,20 @@ interface Props {
   figure: Figure;
   slug: string;
   lang: Lang;
+  /** The lead answer. Pages in the running search test render it below the hero instead. */
+  answer?: string;
 }
 
-const { figure, slug, lang } = Astro.props;
+const { figure, slug, lang, answer } = Astro.props;
 const t = getT(lang);
 const de = lang === 'de';
+// Pages in the running search test keep the hero they launched with.
+const frozen = isFrozenFigurePage(lang, slug);
+const heroAnswer = frozen ? '' : (answer ?? '');
+// The promise is our line about the figure, never a quotation of them.
+const learnLine = figure.learn
+  ? (frozen ? (de ? `„${figure.learn}“` : `“${figure.learn}”`) : figure.learn)
+  : '';
 
 const S = de
   ? {
@@ -76,7 +85,7 @@ const beginHref = `/app?figure=${slug}&lang=${lang}`;
 // written by hand, and a figure missing either half drops that half.
 const chapterTitle = cleanDisplayText(getSeedsFor(figure.id, lang)[0]?.title);
 // Pages in the running search test keep the text estimate they launched with.
-const chapterMinutes = isFrozenFigurePage(lang, slug)
+const chapterMinutes = frozen
   ? getStoryChapter(figure.id, lang, 1)?.minutes
   : chapterDisplayMinutes(figure.id, lang, 1);
 let chapterBeat = `${S.chapterWord} 1`;
@@ -91,7 +100,7 @@ const worldLine = [
   world.connections > 0 ? `${capitalize(numberWord(world.connections, lang))} ${S.worldEdges}.` : '',
 ].filter(Boolean).join(' ');
 ---
-<section class="pub-fig-hero">
+<section class={frozen ? 'pub-fig-hero' : 'pub-fig-hero pub-fig-hero--answer'}>
   <figure class="pub-fig-hero__figure">
     <div class="pub-fig-hero__portrait">
       <FigurePortrait figureId={figure.id} name={figure.name} lang={lang} />
@@ -103,14 +112,26 @@ const worldLine = [
     <h1 class="pub-fig-hero__name">{figure.name}</h1>
     {metaLine && <p class="pub-fig-hero__meta">{metaLine}</p>}
 
+    {heroAnswer && <p class="pub-fig-answer pub-fig-hero__answer">{heroAnswer}</p>}
+
+    {!frozen && (
+      <p class="fig-begin">
+        <a
+          class="fig-begin__button pub-cta__button"
+          href={beginHref}
+          data-agc-cta="start-exploring"
+          data-agc-figure={figure.id}
+          data-agc-door="fig_begin"
+        >{S.begin}</a>
+      </p>
+    )}
+
     <FigureTrailer client:visible figureId={figure.id} lang={lang} chapterHref={chapterHref} />
     <noscript>
       <a class="pub-textlink" href={trailerMp3}>{S.noscript}</a>
     </noscript>
 
-    {figure.learn && (
-      <p class="pub-fig-hero__learn">{de ? `„${figure.learn}“` : `“${figure.learn}”`}</p>
-    )}
+    {learnLine && <p class="pub-fig-hero__learn">{learnLine}</p>}
 
     <p class="fig-hero-chapter">
       <a
@@ -122,15 +143,17 @@ const worldLine = [
       >{chapterBeat}<span class="fig-hero-chapter__go" aria-hidden="true"> →</span></a>
     </p>
 
-    <p class="fig-begin">
-      <a
-        class="fig-begin__button pub-cta__button"
-        href={beginHref}
-        data-agc-cta="start-exploring"
-        data-agc-figure={figure.id}
-        data-agc-door="fig_begin"
-      >{S.begin}</a>
-    </p>
+    {frozen && (
+      <p class="fig-begin">
+        <a
+          class="fig-begin__button pub-cta__button"
+          href={beginHref}
+          data-agc-cta="start-exploring"
+          data-agc-figure={figure.id}
+          data-agc-door="fig_begin"
+        >{S.begin}</a>
+      </p>
+    )}
 
     <p class="pub-fig-hero__world">{worldLine}</p>
     <p class="pub-fig-hero__caption pub-fig-hero__caption--end">{t('figures.echoGloss')}</p>
@@ -187,6 +210,19 @@ const worldLine = [
     line-height: 1.3;
     text-wrap: balance;
   }
+  /* The answer under the name: body text, so it reads left-aligned even where
+     the phone hero centres everything else. */
+  .pub-figure .pub-fig-hero .pub-fig-hero__answer {
+    margin: 0.35rem 0 0;
+    max-width: 62ch;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: 1.06rem;
+    line-height: 1.72;
+    color: var(--text-primary);
+    text-align: left;
+  }
+  .pub-fig-hero--answer .fig-begin { margin-top: 1.3rem; }
+  .pub-fig-hero--answer .pub-trailer { margin-top: 1.1rem; }
   .pub-fig-hero__world {
     margin: 1.1rem 0 0;
     font-family: var(--font-ui, 'Space Grotesk', sans-serif);
@@ -218,5 +254,7 @@ const worldLine = [
     /* the caption belongs to the portrait column, so it keeps its width */
     .pub-fig-hero__figure { align-items: flex-start; }
     .pub-fig-hero__caption { max-width: 340px; }
+    /* with the answer the text column outgrows the portrait: both start at the top */
+    .pub-fig-hero--answer { align-items: flex-start; }
   }
 </style>

@@ -7,11 +7,10 @@
 // substance is open, headed with the questions people actually type.
 //
 //   WHO
-//   hero            portrait and its disclosure caption, the promise, one
-//                   gold Begin
-//   answer          40 to 80 words, the first paragraph after the H1
+//   hero            portrait and its disclosure caption, the answer (40 to 80
+//                   words, the first paragraph after the H1), one gold Begin,
+//                   the trailer and the promise
 //   deep pages      the figure's own deeper pages, one tap from the answer
-//   life            the short life summary the twelve scenes expand
 //   PROOF
 //   is this real    the honesty capsule, answered plainly, with the link to
 //                   how these Echoes get built and checked
@@ -84,7 +83,11 @@ if (!figure) {
 const seeds = getSeedsFor(figureId, lang);
 const qa = getFigureQA(figureId, lang);
 const leadAnswer = qa?.pairs[0]?.a ?? '';
-const aboutParas = figure.about.split('\n').map(p => p.trim()).filter(Boolean);
+// The life summary restates the answer, so it only stays where the answer is
+// missing, or on pages in the running search test.
+const aboutParas = frozen || !leadAnswer
+  ? figure.about.split('\n').map(p => p.trim()).filter(Boolean)
+  : [];
 
 // The closing door: the same promise and the same destination as the hero's,
 // so the long reader ends on the offer they started with. Wide screens get the
@@ -221,9 +224,9 @@ if (figure.essence) {
     ]}
   />
 
-  <FigureHero figure={figure} slug={slug} lang={lang} />
+  <FigureHero figure={figure} slug={slug} lang={lang} answer={leadAnswer} />
 
-  {leadAnswer && (
+  {frozen && leadAnswer && (
     <p class="pub-section__text pub-fig-answer">{leadAnswer}</p>
   )}
 

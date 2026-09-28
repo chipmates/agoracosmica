@@ -65,10 +65,15 @@ const schemaWorks = pageContent?.works?.length
   ? pageContent.works.map(w => w.title)
   : figure.primaryWorks;
 
+// The Person description is the answer the hero shows; pages in the running
+// search test keep the life paragraph they still show.
+const frozenPage = FROZEN_PAGES.has(`/de/figures/${slug}/`);
+const personDescription = (!frozenPage && figQA?.pairs[0]?.a) || aboutParas[0] || figure.about;
+
 const schemas = [
   personSchema({
     name: figure.name,
-    about: aboutParas[0] || figure.about,
+    about: personDescription,
     period: figure.period,
     tradition: figure.tradition,
     slug: slug!,
