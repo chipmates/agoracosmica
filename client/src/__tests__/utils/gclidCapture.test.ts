@@ -170,3 +170,23 @@ describe('a paid arrival (?p=1)', () => {
     expect(storageKeys(localStorage)).not.toContain('agc_paid');
   });
 });
+
+describe('withdrawal', () => {
+  it('clears the click ID, the step markers and the listening seconds, and records the no', async () => {
+    localStorage.setItem('agc_ad_consent', JSON.stringify(YES));
+    sessionStorage.setItem('agc_gclid', CLICK);
+    sessionStorage.setItem('agc_conv_fired_start_exploring', '1');
+    sessionStorage.setItem('agc_conv_fired_listened', '1');
+    sessionStorage.setItem('agc_listened_seconds', '12.00');
+    sessionStorage.setItem('agc_listened_pending', JSON.stringify({ event: 'listened', timestamp: 1 }));
+    sessionStorage.setItem('agc_intended_figure', 'aurelius');
+    const m = await loadAt('/seneca/');
+    expect(m.getGclid()).toBe(CLICK);
+    m.revokeAdConsent();
+    expect(m.getGclid()).toBeNull();
+    expect(storageKeys(sessionStorage)).toEqual(['agc_intended_figure']);
+    expect(JSON.parse(localStorage.getItem('agc_ad_consent')!).granted).toBe(false);
+    await m.sendConversion('dialogue_started');
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+});

@@ -194,7 +194,8 @@ export function grantAdConsent(): void {
 
 /**
  * Withdraw ad-measurement consent. Records the decline and drops the captured
- * gclid plus any per-event dedup flags so nothing further is sent to Google.
+ * gclid, the per-event dedup flags and the listening seconds counted toward
+ * the 30-second step, so nothing further is sent to Google.
  */
 export function revokeAdConsent(): void {
   try {
@@ -224,6 +225,9 @@ export function revokeAdConsent(): void {
       ]) {
         sessionStorage.removeItem(`agc_conv_fired_${event}`);
       }
+      // The public pages' listening total and its held crossing (heardSeconds.ts).
+      sessionStorage.removeItem('agc_listened_seconds');
+      sessionStorage.removeItem('agc_listened_pending');
     }
   } catch {
     // no-op
