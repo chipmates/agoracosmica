@@ -50,18 +50,16 @@ function dropStoredGclid(): void {
 
 // Module load, before any importer can ask: a paid landing drops every click ID,
 // even one stored after an earlier yes. Otherwise a click ID stored after a yes
-// earlier in this tab is picked up, and one whose yes is gone is dropped.
+// earlier in this tab is picked up; without a yes on record it is removed
+// unread.
 try {
   if (typeof window !== 'undefined') {
     isPaid = urlHasPaidParam();
-    if (isPaid) {
+    if (isPaid || !adConsentGranted()) {
       dropStoredGclid();
     } else if (typeof sessionStorage !== 'undefined') {
       const stored = sessionStorage.getItem(SS_GCLID_KEY);
-      if (isValidGclid(stored)) {
-        if (adConsentGranted()) capturedGclid = stored;
-        else dropStoredGclid();
-      }
+      if (isValidGclid(stored)) capturedGclid = stored;
     }
   }
 } catch {

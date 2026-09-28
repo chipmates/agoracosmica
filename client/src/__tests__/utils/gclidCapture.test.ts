@@ -241,3 +241,12 @@ describe('the 12-month memory of an answer', () => {
     }
   });
 });
+
+describe('module load without a yes', () => {
+  it('looks nothing up in sessionStorage', async () => {
+    const getItem = vi.spyOn(Storage.prototype, 'getItem');
+    await loadAt(`/marcus-aurelius/?gclid=${CLICK}`);
+    expect(getItem.mock.calls.map((c) => c[0])).not.toContain('agc_gclid');
+    getItem.mockRestore();
+  });
+});
