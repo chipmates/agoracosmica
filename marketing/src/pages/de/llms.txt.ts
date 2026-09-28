@@ -44,7 +44,7 @@ export const GET: APIRoute = () => {
   lines.push('# Agora Cosmica');
   lines.push('');
   lines.push(
-    '> Agora Cosmica ist eine quelloffene, gemeinnützige Lern-App, in der du mit KI-"Echos" von 30 Menschen aus der Geschichte sprichst, quer durch Philosophie, Wissenschaft, Kunst und Aktivismus. Jedes Echo ist im eigenen Werk verankert, mit faktengeprüften Biografien und vertonten Texten. AGPL-3.0, entwickelt von der ChipMates gGmbH. Keine Tracking-Cookies, kein Profiling. Englisch und Deutsch.',
+    '> Agora Cosmica ist eine gemeinnützige Open-Source-Lern-App, in der du mit KI-"Echos" von 30 Menschen aus der Geschichte sprichst, quer durch Philosophie, Wissenschaft, Kunst und Aktivismus. Jedes Echo ist im eigenen Werk verankert, mit faktengeprüften Biografien und vertonten Texten. AGPL-3.0, entwickelt von der ChipMates gGmbH. Keine Tracking-Cookies, kein Profiling. Englisch und Deutsch.',
   );
   lines.push('');
   lines.push(
@@ -62,7 +62,7 @@ export const GET: APIRoute = () => {
   lines.push(
     'Die Anweisungsprofile, die jedes Echo verankern, kommen von einem öffentlichen CDN, nicht versteckt in der App.',
   );
-  lines.push('Die gesamte App ist quelloffen unter AGPL-3.0, die Methode ist also nachprüfbar.');
+  lines.push('Die gesamte App ist Open Source unter AGPL-3.0, die Methode ist also nachprüfbar.');
   lines.push(
     'Betrieben wird sie von der ChipMates gGmbH, einer deutschen gemeinnützigen Organisation, ohne Tracking-Cookies und ohne Profiling.',
   );
@@ -100,9 +100,9 @@ export const GET: APIRoute = () => {
   lines.push(`- [Alle Themen](${SITE_URL}/de/themes/)`);
   lines.push(`- [Über uns](${SITE_URL}/de/about/)`);
   lines.push(`- [Warum wir sie Echos nennen](${SITE_URL}/de/echoes/)`);
-  lines.push(`- [Methodik: wie wir die Echos bauen](${SITE_URL}/de/methodik/): wie jedes KI-Echo aus Primärwerken gebaut, belegt und faktengeprüft wird, mit einem öffentlichen Faktencheck pro Mensch und quelloffenem Code.`);
-  lines.push(`- [Open-Source-Philosophie-App](${SITE_URL}/de/open-source-philosophy-app/): eine quelloffene, gemeinnützige Alternative zu KI-Charakter-Apps, für Philosophie und Geschichte.`);
-  lines.push(`- [Philosophie lernen mit einem KI-Tutor](${SITE_URL}/de/philosophie-lernen/): Philosophie im Gespräch mit den KI-Echos der Philosophen der Geschichte lernen, gemeinnützig und quelloffen, 30 kostenlose Nachrichten pro Tag.`);
+  lines.push(`- [Methodik: wie wir die Echos bauen](${SITE_URL}/de/methodik/): wie jedes KI-Echo aus Primärwerken gebaut, belegt und faktengeprüft wird, mit einem öffentlichen Faktencheck pro Mensch und Open-Source-Code.`);
+  lines.push(`- [Open-Source-Philosophie-App](${SITE_URL}/de/open-source-philosophy-app/): eine gemeinnützige Open-Source-Alternative zu KI-Charakter-Apps, für Philosophie und Geschichte.`);
+  lines.push(`- [Philosophie lernen mit einem KI-Tutor](${SITE_URL}/de/philosophie-lernen/): Philosophie im Gespräch mit den KI-Echos der Philosophen der Geschichte lernen, gemeinnützig und Open Source, 30 kostenlose Nachrichten pro Tag.`);
   lines.push(`- [Volltext-Verzeichnis (llms-full.txt)](${SITE_URL}/de/llms-full.txt): die vollständigen Beschreibungen aller Menschen und alle Frage-Antwort-Paare, dazu die acht Themen.`);
   lines.push('- [Quellcode (GitHub)](https://github.com/chipmates/agoracosmica)');
   lines.push('');
