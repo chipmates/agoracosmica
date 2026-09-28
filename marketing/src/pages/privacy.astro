@@ -228,7 +228,7 @@ const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Ago
     <section>
       <h2>Community tally</h2>
       <p>
-        The Community page in the app shows how many people take part and their combined voting power. When you open the Community page, the app creates a random ID for this browser, stores it in your browser (localStorage) and sends it to our server with your voting power and the number of figures you have completed, so that each browser counts once. Our server keeps these values under a hash of the ID made with a secret key and deletes them 12 months after your last visit to the Community page.
+        The Community page in the app shows how many people take part and their combined voting power. When you open the Community page, the app creates a random ID for this browser, stores it in your browser (localStorage) and sends it to our server with your voting power and the number of figures you have completed, so that each browser counts once. Our server keeps these values under a hash of the ID made with a secret key and deletes them 12 months after your last visit to the Community page. To prevent abuse, it also keeps a hash of your IP address, made with a secret key, for 6 hours.
       </p>
       <p>
         <strong>Legal basis:</strong> Art. 6(1)(f) GDPR, our interest in a fair count. The ID on your device is needed for this feature you use (Sect. 25(2) No. 2 TDDDG).
