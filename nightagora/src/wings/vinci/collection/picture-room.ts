@@ -372,6 +372,11 @@ function maskMaterial(set: MaterialSet, L: Looks): MeshStandardNodeMaterial {
   m.emissiveNode = hangSurfaceLight(albedo, rough, float(0))
   m.normalNode = n.transformDirection(cameraViewMatrix)
   m.outputNode = withRoomAir(output)
+  // The mat lies in the varnish film's own plane, 0.4 mm over the plate: a
+  // depth bias decides that tie for the mat at every distance, not the last bit.
+  m.polygonOffset = true
+  m.polygonOffsetFactor = -1
+  m.polygonOffsetUnits = -4
   m.name = 'vinci/collection-picture-room/arch-mat'
   m.userData = { ...PICTURE_ROOM_PROVENANCE, set: set.name }
   return m
