@@ -62,7 +62,7 @@ var RAW = [
  'You will learn to read your own turning points.','Du lernst, deine eigenen Wendepunkte zu lesen.'],
 ['zenji','dogen-zenji','Dōgen Zenji','Dōgen Zenji','Zen Buddhism','Zen-Buddhismus',
  'You will learn to stop chasing the next moment.','Du lernst, dem nächsten Augenblick nicht mehr nachzujagen.'],
-['dickinson','emily-dickinson','Emily Dickinson','Emily Dickinson','American Poetry','Amerikanische Poesie',
+['dickinson','emily-dickinson','Emily Dickinson','Emily Dickinson','American Poetry','Amerikanische Lyrik',
  'You will learn to tell the truth slant.','Du lernst, die Wahrheit schräg zu sagen.'],
 ['einstein','albert-einstein','Albert Einstein','Albert Einstein','Theoretical Physics','Theoretische Physik',
  'You will learn to stay amazed.','Du lernst, das Staunen zu behalten.'],

@@ -42,7 +42,7 @@ const SHORT_TRADITIONS = {
   blake: { en: 'Visionary Poetry', de: 'Vision\u00e4re Poesie' },
   campbell: { en: 'Comparative Mythology', de: 'Vergleichende Mythologie' },
   zenji: { en: 'Zen Buddhism', de: 'Zen-Buddhismus' },
-  dickinson: { en: 'American Poetry', de: 'Amerikanische Poesie' },
+  dickinson: { en: 'American Poetry', de: 'Amerikanische Lyrik' },
   einstein: { en: 'Theoretical Physics', de: 'Theoretische Physik' },
   eckhart: { en: 'Christian Mysticism', de: 'Christliche Mystik' },
   galilei: { en: 'Natural Philosophy', de: 'Naturphilosophie' },
