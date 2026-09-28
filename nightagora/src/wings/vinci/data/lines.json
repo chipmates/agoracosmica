@@ -136,20 +136,20 @@
       "certainty": "documented"
     },
     "picture/madonna-litta/front": {
-      "en": "The count who sold it in 1865 gave it its name. Whether Leonardo painted it is argued.",
+      "en": "The count who sold it in 1865 gave it its name. Whether Leonardo painted it is disputed.",
       "de": "Den Namen gab ihr der Graf, der sie 1865 verkaufte. Ob Leonardo sie malte, ist strittig.",
       "source": "MINING-CATALOG-PAINTINGS, Madonna Litta, label fact and attribution",
       "certainty": "documented"
     },
     "picture/burlington-house-cartoon/front": {
       "en": "A shotgun blast hit it in 1987. The glass took most of it, and the sheet was restored.",
-      "de": "1987 traf ein Schrotschuss das Blatt. Das Glas fing das meiste ab, dann wurde es restauriert.",
+      "de": "1987 traf ein Schrotschuss das Blatt. Das Glas fing das meiste ab, und die Zeichnung wurde restauriert.",
       "source": "MINING-CATALOG-PAINTINGS, the Burlington House Cartoon, second label fact",
       "certainty": "documented"
     },
     "picture/yarnwinder-buccleuch/front": {
-      "en": "Two men stole it from a Scottish castle in 2003. It came back in 2007, but they were never identified.",
-      "de": "Zwei Männer stahlen sie 2003 aus einem schottischen Schloss. 2007 kam sie zurück, die Diebe wurden nie ermittelt.",
+      "en": "Two men stole it from a Scottish castle in 2003. It came back in 2007, but who they were is still unknown.",
+      "de": "Zwei Männer stahlen sie 2003 aus einem schottischen Schloss. 2007 kam sie zurück, aber die Diebe sind bis heute unbekannt.",
       "source": "the 2015 Court of Session judgment as reported by Scottish Legal News (the theft at Drumlanrig on 27 August 2003, the recovery at a Glasgow solicitors' office on 4 October 2007, the arrests, the 2010 trial with every man cleared) and Central Bylines, 30 September 2025 (the two thieves never caught or identified); FACTS-PICTURE-ROOM 2026-09-28 §3",
       "certainty": "documented"
     },
@@ -209,7 +209,7 @@
     },
     "picture/last-supper/front": {
       "en": "In 1943 bombs brought the hall's ceiling down. This wall stood, behind sandbags.",
-      "de": "1943 stürzte das Gewölbe des Saals unter Bomben ein. Diese Wand blieb stehen, hinter Sandsäcken.",
+      "de": "1943 stürzte das Gewölbe des Saals nach Bombentreffern ein. Hinter Sandsäcken blieb diese Wand stehen.",
       "source": "MINING-CATALOG-PAINTINGS, the Last Supper's wall, room history",
       "certainty": "documented"
     },
