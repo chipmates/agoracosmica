@@ -1,5 +1,5 @@
 /** Public bench playback policy. This module has no renderer or DOM dependency.
- * Continuous schedules keep absolute, unwrapped time. Only the two admitted
+ * Continuous schedules keep absolute, unwrapped time. Only the three admitted
  * finite demonstrations stop at their dossier endpoint; their final mechanical
  * states are still calculated by the unchanged machine motion module.
  */
@@ -12,6 +12,7 @@ export type PlaybackSchedule =
   | { readonly kind: 'static'; readonly period: null }
   | { readonly kind: 'loop'; readonly period: number }
   | { readonly kind: 'finite'; readonly period: 12; readonly slug: 'rolling-mill' | 'revolving-crane' }
+  | { readonly kind: 'finite'; readonly period: 20; readonly slug: 'mechanical-lion' }
 
 export interface PlaybackState {
   readonly clock: number
@@ -30,6 +31,7 @@ export function playbackSchedule(dossier: PlaybackDossier): PlaybackSchedule {
   if (period === 12 && (dossier.slug === 'rolling-mill' || dossier.slug === 'revolving-crane')) {
     return { kind: 'finite', period: 12, slug: dossier.slug }
   }
+  if (period === 20 && dossier.slug === 'mechanical-lion') return { kind: 'finite', period: 20, slug: 'mechanical-lion' }
   throw new Error(`No admitted finite playback policy: ${dossier.slug}`)
 }
 
@@ -92,6 +94,10 @@ const holdCopy = {
   'revolving-crane': {
     en: { short: 'Operator holding', detail: 'At 12 s the operator continues to hold the handle with an ideal tangential force of 39.2 N. The pawl remains disengaged.' },
     de: { short: 'Von Hand gehalten', detail: 'Nach 12 s hält die Bedienperson den Griff weiterhin mit einer idealen Tangentialkraft von 39,2 N. Die Sperrklinke bleibt ausgerückt.' },
+  },
+  'mechanical-lion': {
+    en: { short: 'Chest open', detail: 'At 20 s the lion stands with its chest open and the lilies forward. Nothing winds it back.' },
+    de: { short: 'Brust offen', detail: 'Nach 20 s steht der Löwe mit offener Brust, die Lilien vorn. Nichts zieht ihn zurück.' },
   },
 } as const
 

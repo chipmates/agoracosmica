@@ -155,7 +155,8 @@ const FOLIO_THUMB: Partial<Record<MachineSlug, string>> = {
 /** THE THREE VIEWPOINTS of the four-station grammar: the whole, the part a
  * hand or a force drives, and the part that does the work. A machine with
  * no drive of its own has no drive to look at. */
-const VIEWPOINT_PARTS: Record<MachineSlug, { drive: string | null; working: string | null }> = {
+type OwnView = { yaw: number; pitch: number }
+const VIEWPOINT_PARTS: Record<MachineSlug, { drive: string | null; working: string | null; views?: { drive?: OwnView; working?: OwnView } }> = {
   'aerial-screw': { drive: 'push-bar-0', working: 'sail' },
   'parachute': { drive: null, working: 'harness' },
   'anemometer': { drive: 'vane', working: 'quadrant' },
@@ -170,11 +171,26 @@ const VIEWPOINT_PARTS: Record<MachineSlug, { drive: string | null; working: stri
   'water-lifting-screw': { drive: 'handle', working: 'helical-tube' },
   'proportional-compass': { drive: 'screw-head', working: 'leg-left' },
   'camera-obscura': { drive: 'aperture-plate', working: 'screen' },
+  // The lion walks, so neither view may turn on where its centre falls. The
+  // key is read from the open flank's side, with the works behind it; the
+  // chest opens a walk ahead of where it stood, between its shoulders and
+  // under its chin, so it is read at its place after the walk, from almost in
+  // front and low, and the walk comes into that view.
+  'mechanical-lion': { drive: 'key', working: 'chest-stage', views: {
+    drive: { yaw: 60 * Math.PI / 180, pitch: 22 * Math.PI / 180 },
+    working: { yaw: 2 * Math.PI / 180, pitch: 9 * Math.PI / 180 } } },
 }
 
 /** The mill's crank and small gear stand on the far side of the whole view's
- * bearing, so its stage turns it round to face the steps that name them. */
-const STAGE_TURN: Partial<Record<MachineSlug, number>> = { 'rolling-mill': Math.PI }
+ * bearing, so its stage turns it round to face the steps that name them. The
+ * lion turns a little away, so one bearing reads both its open flank and its
+ * chest. */
+const STAGE_TURN: Partial<Record<MachineSlug, number>> = { 'rolling-mill': Math.PI, 'mechanical-lion': -10 * Math.PI / 180 }
+/** A machine whose works show only with a panel off stands so in its island,
+ * as it stands in its room. */
+const OPEN_SECTION: ReadonlySet<MachineSlug> = new Set(['mechanical-lion'])
+/** A machine that walks away from where it stood. */
+const TRAVELS: ReadonlySet<MachineSlug> = new Set(['mechanical-lion'])
 
 /** A body built outside its record names some parts its own way: these are
  * the dossier's parts under the names that body gives them. */
@@ -317,12 +333,14 @@ export function createVinciMachinePayload(options: {
 }): TurntablePayload {
   const { slug } = options
   const dossier = dossiers[slug], language = lang(), record = machineCatalog[slug]
+  if (OPEN_SECTION.has(slug)) options.body.section(true)
   const parts = VIEWPOINT_PARTS[slug]
   const named = CONTROLS.machine.viewpoint_labels?.[slug]
   const viewpoints = CONTROLS.machine.viewpoints.map(entry => ({
     id: entry.id as TurntableViewpoint,
     label: (named?.[entry.id] ?? entry)[language],
     part: entry.id === 'drive' ? parts.drive : entry.id === 'working-part' ? parts.working : null,
+    ...(entry.id === 'drive' ? parts.views?.drive : entry.id === 'working-part' ? parts.views?.working : undefined),
   }))
   const sheetLabel = folioName(slug)
   const thumb = FOLIO_THUMB[slug]
@@ -346,7 +364,8 @@ export function createVinciMachinePayload(options: {
     screens: new Set(Object.entries(PARTS[slug] ?? {}).filter(([, words]) => words.screen === true).map(([id]) => id)),
     light: options.light,
     grade: options.grade,
-    sheet: {
+    // a machine no surviving sheet shows gets no folio door at all
+    sheet: record.folio.length === 0 ? undefined : {
       // the store's own file, never the record's source_url: that address is
       // the holder's page for the sheet and not the picture of it
       src: thumb ? loadManifest().then(index => { const entry = index.byId.get(thumb); return entry?.display ? assetAddress(entry) : null }) : null,
@@ -355,6 +374,7 @@ export function createVinciMachinePayload(options: {
     },
     restore: options.restore,
     standing: options.standing,
+    travels: TRAVELS.has(slug),
   })
   return payload
 }

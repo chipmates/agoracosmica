@@ -185,6 +185,10 @@
       "viewpoint_labels": {
         "camera-obscura": {
           "drive": { "en": "The plate", "de": "Die Platte" }
+        },
+        "mechanical-lion": {
+          "drive": { "en": "The key", "de": "Der Schlüssel" },
+          "working-part": { "en": "The chest", "de": "Die Brust" }
         }
       }
     },

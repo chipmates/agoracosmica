@@ -101,7 +101,7 @@ for (const slug of machines.MACHINE_SLUGS) registry.set(`machine/${slug}`, 'mach
 registry.set('grave', 'grave')
 registry.set('grave-diagram', 'grave')
 
-const EXPECTED = { picture: 25, mural: 1, sheet: 29, codex: 9, machine: 14, grave: 2 }
+const EXPECTED = { picture: 25, mural: 1, sheet: 29, codex: 9, machine: 15, grave: 2 }
 const counted = {}
 for (const kind of registry.values()) counted[kind] = (counted[kind] ?? 0) + 1
 for (const [kind, want] of Object.entries(EXPECTED)) {

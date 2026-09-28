@@ -1395,6 +1395,143 @@
       "recipe_file": "src/wings/vinci/machines/lathe.ts"
     },
     {
+      "id": "vinci/machine/mechanical-lion",
+      "path": "procedural/machines/mechanical-lion/*",
+      "class": "GENERATED",
+      "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
+      "wing": "vinci",
+      "display": true,
+      "prompt": "mechanical-lion, no surviving sheet. The museum's reconstruction from the old accounts (Vasari 1568, Lomazzo 1584 and 1590): a lion that walks a few steps, stops and opens its chest on gold lilies on blue. Build it as a maker of about 1515 would: a carved wooden shell in panels on an oak frame, the near flank panel taken off so the works show; the face carved with the gravity of the Florentine carved lions of the time (Donatello's Marzocco as the style anchor: a heavy brow, deep-set eyes, a long broad bridge, a closed mouth, the muzzle two rounded pads split by a short cleft), the mane a hood of large undercut flame locks in four tiers grown from the face, over the neck and the shoulders' tops to a hard end on the shoulder line and over the upper chest, above the chest's doors; the legs carved limbs cut at lap joints round forged pins at shoulder, elbow, wrist, hip, stifle and hock, with iron hinge straps across the lower joints, each forged to its own end; broad paws with short blunt claws; tempera over gesso, a matte tawny hide with a soft mottle, an umber band along the back and down the backs of the legs, paler under the belly, darker in the hollows, the muzzle's pads in the hide's tan with whisker spots, cream on the chin and the lower lip; the mane dark umber, near black in its hollows; gilding on about a third of the mane's crests, the claws' tips and a rim inside each door's edge, worn to the bole in places, the paint rubbed to the gesso at the brow, the knuckles, round the key and beside the window's rim; iron and brass works: a spring barrel wound by a key, a great wheel driving two crank shafts through lantern pinions, cranks and rods swinging the four legs, a count wheel whose deep notch stops the train after six steps, a bell crank lifting the chest latch; two chest doors hung on forged strap hinges on their outer faces, their backs plain limewood; a rack and pinion bringing forward a blue board with three gold lilies in front and four small ones behind. Head and tail do not move and the run holds at its end, with no hidden reset. Every part is a reconstruction (certainty C). No modern replica's choice is copied: no moving head, jaw or tail, no mane trigger, no flank trapdoor, no hidden wheels, no sitting, no purple lilies, no three-metre body. The carving is distance functions sampled on a private canvas at load; tempera, gesso wear, gilding, oak, forged iron and brass are procedural surfaces. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled, and no photograph of a period lion is shown or sampled: the Marzocco and the period carved lions are a style reference for forms only.",
+      "model": "Claude Opus 5.5",
+      "date": "2026-09-28",
+      "sha256": "61a4f29475aa12fe23ad3d08b35fdced2b4e15f4888eb632de54f95870a4cfc2",
+      "recipe_files": [
+        {
+          "path": "src/wings/vinci/machines/catalog.ts",
+          "sha256": "f72ca9ccb5778e51fa19659af29632b1e9ec186beb53f1109cf6f376d1fdde6a"
+        },
+        {
+          "path": "src/wings/vinci/machines/data/mechanical-lion.json",
+          "sha256": "1228dbf5ae2ab4f6849fe5deb3b943cc79d5818832e8767c47e296d4cff4f3fb"
+        },
+        {
+          "path": "src/wings/vinci/machines/data/records.json",
+          "sha256": "827f0603a4a7b7c3c5e6b594caf7fe6c8d76cc67a06849193a9a026c77ef31a2"
+        },
+        {
+          "path": "src/wings/vinci/machines/lion/bake.ts",
+          "sha256": "b1d7907f5ddfc24e908e91b5c4367d6cb958d75008a88a962e39603f74866122"
+        },
+        {
+          "path": "src/wings/vinci/machines/lion/gait.ts",
+          "sha256": "ef1835f8801c454a59b0c3574b2a8ddc6c2f91de0ca00b8d0248c010b0563b62"
+        },
+        {
+          "path": "src/wings/vinci/machines/lion/head.ts",
+          "sha256": "8b90d0e9c9c3f71fc010ad8e0fa5694ff9e1bab0d1651907604be3198e7675b2"
+        },
+        {
+          "path": "src/wings/vinci/machines/lion/sdf.ts",
+          "sha256": "a12590cddc2f032d9a81683854dc5da8ee371cdb8ba9212339306918e7c3bf24"
+        },
+        {
+          "path": "src/wings/vinci/machines/lion/surface.ts",
+          "sha256": "5182070b9ef01bd872d1e1746d056ad1cdae733dba3e5008fb51047628a43ed8"
+        },
+        {
+          "path": "src/wings/vinci/machines/lion/works.ts",
+          "sha256": "3538c31c8a6983a8a18fda9cc0fed63d15ad09f252aa127c2d70b3b089fbefad"
+        },
+        {
+          "path": "src/wings/vinci/machines/mechanical-lion.ts",
+          "sha256": "61a4f29475aa12fe23ad3d08b35fdced2b4e15f4888eb632de54f95870a4cfc2"
+        },
+        {
+          "path": "src/wings/vinci/machines/parts.ts",
+          "sha256": "83664fb84cc163e0c15c01c3253af6b96aaaa5a07270ff549363a1d9357287f1"
+        },
+        {
+          "path": "src/wings/vinci/machines/runtime.ts",
+          "sha256": "ac92bb06b605944ebefb7c7dc96f8eee83a1ac498786723d746fd6bb36d48d6b"
+        },
+        {
+          "path": "src/wings/vinci/machines/types.ts",
+          "sha256": "b676dbd2b4703b0fbf0687f0ff7e2eeda8ad12e5665f468340162e4e6435a646"
+        }
+      ],
+      "sources": [
+        {
+          "id": "s-vasari",
+          "title": "Vasari, Le vite, 1568, Lionardo da Vinci",
+          "author_or_institution": "Wikisource",
+          "year": 1568,
+          "url": "https://it.wikisource.org/wiki/Le_vite_de%27_pi%C3%B9_eccellenti_pittori,_scultori_e_architettori_(1568)/Lionardo_da_Vinci",
+          "accessed": "2026-09-27",
+          "supports": "A lion that walked a few steps before a King of France and opened its chest full of lilies.",
+          "source_type": "primary",
+          "limitations": "Written about fifty years after the event; no mechanism, size or material."
+        },
+        {
+          "id": "s-lomazzo-1584",
+          "title": "Lomazzo, Trattato dell'arte della pittura, 1584, reprint of 1844",
+          "author_or_institution": "Internet Archive",
+          "year": 1584,
+          "url": "https://archive.org/details/bub_gb_t68PqJUMmaYC",
+          "accessed": "2026-09-27",
+          "supports": "The lion walked in a hall before Francis I and opened its chest full of lilies.",
+          "source_type": "primary",
+          "limitations": "Written about seventy years after the event."
+        },
+        {
+          "id": "s-lomazzo-1590",
+          "title": "Lomazzo, Idea del tempio della pittura, 1590",
+          "author_or_institution": "Internet Archive",
+          "year": 1590,
+          "url": "https://archive.org/details/gri_ideadeltempi00loma",
+          "accessed": "2026-09-27",
+          "supports": "Lions that went by force of wheels.",
+          "source_type": "primary",
+          "limitations": "Says only that wheels moved them; every part inside this lion is the museum's reading."
+        },
+        {
+          "id": "s-burke",
+          "title": "Burke, Meaning and crisis in the early sixteenth century: interpreting Leonardo's lion, 2006",
+          "author_or_institution": "Oxford Art Journal",
+          "year": 2006,
+          "url": "https://doi.org/10.1093/oxartj/kci048",
+          "accessed": "2026-09-27",
+          "supports": "The two contemporary notes (about 1509 and 1517) and the lion's meaning for the French king.",
+          "source_type": "scholarship",
+          "limitations": "Paywalled: read through its abstract and its first page."
+        },
+        {
+          "id": "s-tours",
+          "title": "Les machines de Leonard, the lion",
+          "author_or_institution": "Universite de Tours, Marignan 2015",
+          "year": 2015,
+          "url": "https://marignan2015.univ-tours.fr/les-machines-de-leonard/",
+          "accessed": "2026-09-27",
+          "supports": "The accounts, the modern attributions of two sheets, both weak.",
+          "source_type": "scholarship",
+          "limitations": "No reconstruction geometry copied."
+        },
+        {
+          "id": "s-marzocco",
+          "title": "Donatello, Marzocco, 1418 to 1420, Museo Nazionale del Bargello, Florence",
+          "author_or_institution": "Wikimedia Commons, photographs of a public-domain sculpture",
+          "year": 1420,
+          "url": "https://commons.wikimedia.org/wiki/File:Florenz_-_Bargello_2014-08-09t.jpg",
+          "accessed": "2026-09-27",
+          "supports": "The style of the carving: the heavy brow, the deep-set eyes, the broad bridge, the closed mouth and the mane in large undercut locks.",
+          "source_type": "museum",
+          "limitations": "A style reference for forms only: no geometry is copied and no photograph is shown or sampled. It is a seated stone lion made a century before this one, not the lion of the accounts."
+        }
+      ],
+      "certainty": "C",
+      "note": "A GENERATED reconstruction carrier. No drawing, part or measurement of the lion survives; the old accounts are separate facts. Geometry bounds retain the dossier conservative swept envelope. This record admits no folio image and samples no modern replica.",
+      "recipe_file": "src/wings/vinci/machines/mechanical-lion.ts"
+    },
+    {
       "id": "vinci/machine/miter-lock-gates",
       "path": "procedural/machines/miter-lock-gates/*",
       "class": "GENERATED",
@@ -2338,7 +2475,7 @@
       "prompt": "The da Vinci machine bench. Restrained museum typography, folio mounts, named absence panels, certainty marks, navigation, finite-demonstration status and evidence reading furniture, plus an optional diagnostic card displaying observed runtime measurements. Reuse the locked bilingual pages verbatim. No unapproved folio or reconstruction photograph is displayed. Window 5: three registers of text. The label speaks the hour (15:19 by the sun, 10 October 1517) and says the day is documented and the hour chosen, and it names what the bench does not show; the drawer explains without bracket citations; the record behind Read the evidence carries the arithmetic, the place, the method and the sources. The same computed 10 October 1517 Julian 15:19:00 LAT hour and geographic sun A=231.9005 degrees h=17.3882 degrees drive the bench key. The hour is chosen, not historical observation. Window 6: the phone drops the footer's top rule so one line closes the reading column; the compass is staged as an object (three-quarter view, full frame height on the wide frame, .35 on the phone) and every machine is fitted at .80 of the half height and .70 of the half width, .31 on the phone; a close state frames the working end of a machine alone. No locked copy changed.",
       "model": "GPT-6 Codex, with a Claude Opus 5 harvest seat",
       "date": "2026-09-11",
-      "sha256": "bf8b12d5f8755fa4b7b014438db20f90a3e3459304cbbf7b52db644fb389e75f",
+      "sha256": "60b557c9103fc3420f3e3d0381648074f557fc6166f6b727f08f5688855a8f62",
       "recipe_files": [
         {
           "path": "src/wings/vinci/machines/bench/bench.css",

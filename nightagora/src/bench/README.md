@@ -25,7 +25,7 @@ window.__forge.state()          // stationId / stationIds / texturesPending
 
 | kind | names its state by | ids |
 |---|---|---|
-| `machines` | `slug` | the fourteen machine slugs |
+| `machines` | `slug` | the fifteen machine slugs |
 | `table` | `state` | `closed` `open-83v` `turning` `mirror` `shelf` `open-33r` `phone-open` |
 | `line` | `state` | `line-early` `line-late` `stud-1503` `inscription` `myth-deathbed` `myth-quotes` `grave` `phone-line` |
 | `object` | `slug` | one built body out of the store (`dovecote`), with `state` naming its station |

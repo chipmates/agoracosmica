@@ -1,0 +1,2224 @@
+{
+  "slug": "mechanical-lion",
+  "name_en": "Mechanical lion",
+  "name_de": "Mechanischer Löwe",
+  "status": "reconstruction",
+  "scope": "The museum's reconstruction from the old accounts. No drawing, part or measurement of the lion survives. The walk, the stop and the chest full of lilies are in the texts. The size, the wood and paint, the spring, the wheels, the cranks, the gait and the latch are modern choices.",
+  "gaps": [
+    "No drawing of the lion survives. Two sheets are linked to it by modern writers, both weakly.",
+    "Size, material, outer finish and weight are not documented.",
+    "The drive, the power store, the gait, the leg joints and the opening trigger are not documented. Lomazzo 1590 says only that lions went by force of wheels.",
+    "Whether a person worked it, from inside or outside, is not known.",
+    "The accounts disagree on place, date and king. They name Milan, Lyon and a hall before Francis I. A letter of 1517 from Argentan tells of a lion in its street but does not name Leonardo.",
+    "Whether this was one lion or several, and what became of any, is not known.",
+    "Whether the lilies were carved, gilt, cloth, paper or real flowers is not known."
+  ],
+  "scale_m": {
+    "x": 0.8,
+    "y": 1.55,
+    "z": 3.46,
+    "certainty": "C",
+    "source": "museum choice",
+    "note": "Life size by choice; no source gives a size. At rest it is 2.1 m from nose to tail and 1.34 m to the top of the mane; the envelope also holds the 1.2 m walk and the key."
+  },
+  "frame": {
+    "handedness": "right",
+    "units": "m",
+    "up": "+Y",
+    "forward": "+Z",
+    "ground_y_m": 0.0,
+    "origin": "On the floor between the paws, where the lion stands before it walks; +X is the lion's left.",
+    "transforms": "Every part's position_m is the centre of its envelope box in the lion's rest frame, not relative to its parent; parents name the moving hierarchy. The carved parts are distance functions baked at load; the works are built from their own numbers."
+  },
+  "parts": [
+    {
+      "id": "shell",
+      "parent": "root",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.52,
+        "y": 0.85,
+        "z": 1.56
+      },
+      "position_m": [
+        0.0,
+        0.825,
+        -0.06
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "carved limewood shell, tempera and gilding over gesso",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "The torso: a carved shell two fingers thick in panels, the seams cut and pegged, hung over the oak frame. Tempera over gesso, darker in the hollows, gilded on the mane's crests and round the chest's doors; the colours are the museum's."
+    },
+    {
+      "id": "flank-panel",
+      "parent": "shell",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.1,
+        "y": 0.43,
+        "z": 0.47
+      },
+      "position_m": [
+        0.2,
+        0.755,
+        -0.055
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "carved limewood panel, tempera over gesso",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "The near flank panel, lifted off in the inspection view so the works show. Its hole passes the winding arbor."
+    },
+    {
+      "id": "head",
+      "parent": "shell",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.84,
+        "y": 0.8,
+        "z": 1.16
+      },
+      "position_m": [
+        0.0,
+        1.12,
+        0.56
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "carved limewood, tempera over gesso, gilded crests",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "Carved from one block with its mane; it does not move. No old text says the head moved. The face follows the carved lions of Florence of the time: a heavy brow, deep-set eyes, a long bridge and a closed mouth."
+    },
+    {
+      "id": "tail",
+      "parent": "shell",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.24,
+        "y": 0.58,
+        "z": 0.48
+      },
+      "position_m": [
+        0.0,
+        1.07,
+        -0.84
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "carved limewood, tempera over gesso",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "Carved and still."
+    },
+    {
+      "id": "frame",
+      "parent": "shell",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.37,
+        "y": 0.42,
+        "z": 0.72
+      },
+      "position_m": [
+        0.0,
+        0.8,
+        -0.03
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "planed oak",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "Two side frames of rails, posts and braces, joined by stretchers and hung from the shell on cleats; the arbors run in its posts."
+    },
+    {
+      "id": "bearings",
+      "parent": "frame",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.24,
+        "y": 0.3,
+        "z": 0.4
+      },
+      "position_m": [
+        0.0,
+        0.8,
+        -0.03
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "forged iron",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "Iron bearing plates at every arbor, the detent's stud and the ratchet's click."
+    },
+    {
+      "id": "barrel",
+      "parent": "frame",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.09,
+        "y": 0.15,
+        "z": 0.15
+      },
+      "position_m": [
+        -0.011,
+        0.74,
+        -0.03
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "forged iron",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "Lomazzo, Idea del tempio 1590: lions went by force of wheels; the train itself is the museum's",
+      "notes": "The spring barrel. The key winds the spring on the arbor; the barrel turns the great wheel."
+    },
+    {
+      "id": "great-wheel",
+      "parent": "barrel",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.015,
+        "y": 0.26,
+        "z": 0.26
+      },
+      "position_m": [
+        0.036,
+        0.74,
+        -0.03
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "cast brass",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "Lomazzo, Idea del tempio 1590: lions went by force of wheels; the train itself is the museum's",
+      "notes": "Forty-eight teeth, fixed to the barrel; it drives both crank shafts."
+    },
+    {
+      "id": "count-wheel",
+      "parent": "barrel",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.006,
+        "y": 0.136,
+        "z": 0.136
+      },
+      "position_m": [
+        0.054,
+        0.74,
+        -0.03
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "forged iron",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "Turns half a turn over the walk: a shallow notch for each of the six steps and a deep one where the walk ends."
+    },
+    {
+      "id": "key",
+      "parent": "frame",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.44,
+        "y": 0.07,
+        "z": 0.09
+      },
+      "position_m": [
+        0.16,
+        0.74,
+        -0.03
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "forged iron",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "The winding key on its square, with the arbor and its ratchet. No old text says how it was set going."
+    },
+    {
+      "id": "lily-barrel",
+      "parent": "frame",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.06,
+        "y": 0.07,
+        "z": 0.1
+      },
+      "position_m": [
+        0.095,
+        0.6,
+        0.25
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "forged iron",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "A second small spring behind the chest's back wall; it drives the lily carriage once the latch is lifted."
+    },
+    {
+      "id": "fore-shaft",
+      "parent": "frame",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.24,
+        "y": 0.05,
+        "z": 0.05
+      },
+      "position_m": [
+        0.0,
+        0.74,
+        0.14
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "forged iron",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "Lomazzo, Idea del tempio 1590: lions went by force of wheels; the train itself is the museum's",
+      "notes": "The fore crank shaft with its two cranks set half a turn apart; it turns once for every two steps."
+    },
+    {
+      "id": "fore-pinion",
+      "parent": "fore-shaft",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.02,
+        "y": 0.09,
+        "z": 0.09
+      },
+      "position_m": [
+        0.036,
+        0.74,
+        0.14
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "brass and iron",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "Lomazzo, Idea del tempio 1590: lions went by force of wheels; the train itself is the museum's",
+      "notes": "A lantern pinion of eight staves, driven by the great wheel."
+    },
+    {
+      "id": "hind-shaft",
+      "parent": "frame",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.24,
+        "y": 0.05,
+        "z": 0.05
+      },
+      "position_m": [
+        0.0,
+        0.74,
+        -0.2
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "forged iron",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "Lomazzo, Idea del tempio 1590: lions went by force of wheels; the train itself is the museum's",
+      "notes": "The hind crank shaft with its two cranks set half a turn apart; it turns once for every two steps."
+    },
+    {
+      "id": "hind-pinion",
+      "parent": "hind-shaft",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.02,
+        "y": 0.09,
+        "z": 0.09
+      },
+      "position_m": [
+        0.036,
+        0.74,
+        -0.2
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "brass and iron",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "Lomazzo, Idea del tempio 1590: lions went by force of wheels; the train itself is the museum's",
+      "notes": "A lantern pinion of eight staves, driven by the great wheel."
+    },
+    {
+      "id": "detent",
+      "parent": "frame",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.012,
+        "y": 0.1,
+        "z": 0.12
+      },
+      "position_m": [
+        0.054,
+        0.84,
+        -0.07
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "forged iron",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "Rides the count wheel's rim, ticks into each step's notch and falls into the deep one at the end: the train is caught."
+    },
+    {
+      "id": "latch-rod",
+      "parent": "detent",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.005,
+        "y": 0.08,
+        "z": 0.64
+      },
+      "position_m": [
+        0.054,
+        0.9,
+        0.19
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "forged iron",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "Pulled back by the detent as it falls; through a bell crank it lifts the chest latch."
+    },
+    {
+      "id": "latch",
+      "parent": "shell",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.07,
+        "y": 0.056,
+        "z": 0.012
+      },
+      "position_m": [
+        0.0,
+        0.822,
+        0.5
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "forged iron",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "The bolt behind the doors. It lifts clear into the shell, and the doors swing."
+    },
+    {
+      "id": "door-left",
+      "parent": "shell",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.18,
+        "y": 0.33,
+        "z": 0.17
+      },
+      "position_m": [
+        0.087,
+        0.698,
+        0.562
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "carved limewood, blue inside, iron straps and hinges",
+        "basis": "reported",
+        "source": "Vasari, Lives 1550 and 1568; Lomazzo, Trattato 1584: it walked, stopped and its chest opened full of lilies"
+      },
+      "certainty": "B",
+      "source": "Vasari, Lives 1550 and 1568; Lomazzo, Trattato 1584: it walked, stopped and its chest opened full of lilies",
+      "notes": "One of the two chest doors on iron hinges; outside, the mane runs on down the breast. The chest opening is in the accounts; two doors, their hinges and straps are the museum's."
+    },
+    {
+      "id": "door-right",
+      "parent": "shell",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.18,
+        "y": 0.33,
+        "z": 0.17
+      },
+      "position_m": [
+        -0.087,
+        0.698,
+        0.562
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "carved limewood, blue inside, iron straps and hinges",
+        "basis": "reported",
+        "source": "Vasari, Lives 1550 and 1568; Lomazzo, Trattato 1584: it walked, stopped and its chest opened full of lilies"
+      },
+      "certainty": "B",
+      "source": "Vasari, Lives 1550 and 1568; Lomazzo, Trattato 1584: it walked, stopped and its chest opened full of lilies",
+      "notes": "One of the two chest doors on iron hinges; outside, the mane runs on down the breast. The chest opening is in the accounts; two doors, their hinges and straps are the museum's."
+    },
+    {
+      "id": "lily-rack",
+      "parent": "shell",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.14,
+        "y": 0.015,
+        "z": 0.2
+      },
+      "position_m": [
+        0.03,
+        0.557,
+        0.28
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "forged iron",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "The toothed bar the lily carriage runs forward on."
+    },
+    {
+      "id": "lily-board",
+      "parent": "lily-rack",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.24,
+        "y": 0.25,
+        "z": 0.014
+      },
+      "position_m": [
+        0.0,
+        0.695,
+        0.305
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "limewood painted blue",
+        "basis": "reported",
+        "source": "Turrioni letter, Argentan 1517 (blue inside, a lily in the middle); Parenti note, about 1509 (blue balls full of gold lilies)"
+      },
+      "certainty": "B",
+      "source": "Turrioni letter, Argentan 1517 (blue inside, a lily in the middle); Parenti note, about 1509 (blue balls full of gold lilies)",
+      "notes": "A blue board carrying the three large lilies, two over one as in the French arms of 1515."
+    },
+    {
+      "id": "lily-front-0",
+      "parent": "lily-board",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.1024,
+        "y": 0.108,
+        "z": 0.056
+      },
+      "position_m": [
+        -0.056,
+        0.752,
+        0.324
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "water gilding on limewood",
+        "basis": "reported",
+        "source": "Turrioni letter, Argentan 1517 (blue inside, a lily in the middle); Parenti note, about 1509 (blue balls full of gold lilies)"
+      },
+      "certainty": "B",
+      "source": "Turrioni letter, Argentan 1517 (blue inside, a lily in the middle); Parenti note, about 1509 (blue balls full of gold lilies)",
+      "notes": "One of the three large gold lilies in front. That they were carved and gilt is the museum's choice."
+    },
+    {
+      "id": "lily-front-1",
+      "parent": "lily-board",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.1024,
+        "y": 0.108,
+        "z": 0.056
+      },
+      "position_m": [
+        0.056,
+        0.752,
+        0.324
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "water gilding on limewood",
+        "basis": "reported",
+        "source": "Turrioni letter, Argentan 1517 (blue inside, a lily in the middle); Parenti note, about 1509 (blue balls full of gold lilies)"
+      },
+      "certainty": "B",
+      "source": "Turrioni letter, Argentan 1517 (blue inside, a lily in the middle); Parenti note, about 1509 (blue balls full of gold lilies)",
+      "notes": "One of the three large gold lilies in front. That they were carved and gilt is the museum's choice."
+    },
+    {
+      "id": "lily-front-2",
+      "parent": "lily-board",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.1024,
+        "y": 0.108,
+        "z": 0.056
+      },
+      "position_m": [
+        0.0,
+        0.634,
+        0.324
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "water gilding on limewood",
+        "basis": "reported",
+        "source": "Turrioni letter, Argentan 1517 (blue inside, a lily in the middle); Parenti note, about 1509 (blue balls full of gold lilies)"
+      },
+      "certainty": "B",
+      "source": "Turrioni letter, Argentan 1517 (blue inside, a lily in the middle); Parenti note, about 1509 (blue balls full of gold lilies)",
+      "notes": "One of the three large gold lilies in front. That they were carved and gilt is the museum's choice."
+    },
+    {
+      "id": "lily-back-0",
+      "parent": "lily-board",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.0538,
+        "y": 0.0567,
+        "z": 0.0294
+      },
+      "position_m": [
+        -0.097,
+        0.795,
+        0.313
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "water gilding on limewood",
+        "basis": "reported",
+        "source": "Turrioni letter, Argentan 1517 (blue inside, a lily in the middle); Parenti note, about 1509 (blue balls full of gold lilies)"
+      },
+      "certainty": "B",
+      "source": "Turrioni letter, Argentan 1517 (blue inside, a lily in the middle); Parenti note, about 1509 (blue balls full of gold lilies)",
+      "notes": "One of four smaller lilies behind the three. That they were carved and gilt is the museum's choice."
+    },
+    {
+      "id": "lily-back-1",
+      "parent": "lily-board",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.0538,
+        "y": 0.0567,
+        "z": 0.0294
+      },
+      "position_m": [
+        0.097,
+        0.795,
+        0.313
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "water gilding on limewood",
+        "basis": "reported",
+        "source": "Turrioni letter, Argentan 1517 (blue inside, a lily in the middle); Parenti note, about 1509 (blue balls full of gold lilies)"
+      },
+      "certainty": "B",
+      "source": "Turrioni letter, Argentan 1517 (blue inside, a lily in the middle); Parenti note, about 1509 (blue balls full of gold lilies)",
+      "notes": "One of four smaller lilies behind the three. That they were carved and gilt is the museum's choice."
+    },
+    {
+      "id": "lily-back-2",
+      "parent": "lily-board",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.0538,
+        "y": 0.0567,
+        "z": 0.0294
+      },
+      "position_m": [
+        -0.097,
+        0.604,
+        0.313
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "water gilding on limewood",
+        "basis": "reported",
+        "source": "Turrioni letter, Argentan 1517 (blue inside, a lily in the middle); Parenti note, about 1509 (blue balls full of gold lilies)"
+      },
+      "certainty": "B",
+      "source": "Turrioni letter, Argentan 1517 (blue inside, a lily in the middle); Parenti note, about 1509 (blue balls full of gold lilies)",
+      "notes": "One of four smaller lilies behind the three. That they were carved and gilt is the museum's choice."
+    },
+    {
+      "id": "lily-back-3",
+      "parent": "lily-board",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.0538,
+        "y": 0.0567,
+        "z": 0.0294
+      },
+      "position_m": [
+        0.097,
+        0.604,
+        0.313
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "water gilding on limewood",
+        "basis": "reported",
+        "source": "Turrioni letter, Argentan 1517 (blue inside, a lily in the middle); Parenti note, about 1509 (blue balls full of gold lilies)"
+      },
+      "certainty": "B",
+      "source": "Turrioni letter, Argentan 1517 (blue inside, a lily in the middle); Parenti note, about 1509 (blue balls full of gold lilies)",
+      "notes": "One of four smaller lilies behind the three. That they were carved and gilt is the museum's choice."
+    },
+    {
+      "id": "lily-pinion",
+      "parent": "shell",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.045,
+        "y": 0.06,
+        "z": 0.045
+      },
+      "position_m": [
+        0.095,
+        0.557,
+        0.3
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "forged iron",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "Turned by the lily spring, it drives the rack forward."
+    },
+    {
+      "id": "fore-left-upper",
+      "parent": "shell",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.23,
+        "y": 0.62,
+        "z": 0.3
+      },
+      "position_m": [
+        0.195,
+        0.64,
+        0.33
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "carved limewood, tempera over gesso, iron pins and straps",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "The upper leg, turning on an iron axle in its socket; an iron strap runs down it to the next pin. Legs that carry the body are the museum's reading; the accounts only say it walked."
+    },
+    {
+      "id": "fore-left-lower",
+      "parent": "fore-left-upper",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.18,
+        "y": 0.47,
+        "z": 0.19
+      },
+      "position_m": [
+        0.19,
+        0.265,
+        0.365
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "carved limewood, tempera over gesso, iron pins and straps",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "The lower leg, turning on an iron pin at the elbow. Legs that carry the body are the museum's reading; the accounts only say it walked."
+    },
+    {
+      "id": "fore-left-paw",
+      "parent": "fore-left-lower",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.22,
+        "y": 0.19,
+        "z": 0.3
+      },
+      "position_m": [
+        0.19,
+        0.09,
+        0.455
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "carved limewood, tempera over gesso",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "The paw, held level through each step."
+    },
+    {
+      "id": "fore-left-lever",
+      "parent": "fore-left-upper",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.07,
+        "y": 0.13,
+        "z": 0.03
+      },
+      "position_m": [
+        0.13,
+        0.85,
+        0.33
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "forged iron",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "Lomazzo, Idea del tempio 1590: lions went by force of wheels; the train itself is the museum's",
+      "notes": "An iron lever on the leg's axle; the rod from the crank rocks it and the leg swings."
+    },
+    {
+      "id": "fore-left-rod",
+      "parent": "frame",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.02,
+        "y": 0.184,
+        "z": 0.25
+      },
+      "position_m": [
+        0.121,
+        0.828,
+        0.235
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "planed oak, iron slot",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "Lomazzo, Idea del tempio 1590: lions went by force of wheels; the train itself is the museum's",
+      "notes": "The rod from a crank pin to the leg's lever; the crank pin rides in the slot at its end."
+    },
+    {
+      "id": "fore-right-upper",
+      "parent": "shell",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.23,
+        "y": 0.62,
+        "z": 0.3
+      },
+      "position_m": [
+        -0.195,
+        0.64,
+        0.33
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "carved limewood, tempera over gesso, iron pins and straps",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "The upper leg, turning on an iron axle in its socket; an iron strap runs down it to the next pin. Legs that carry the body are the museum's reading; the accounts only say it walked."
+    },
+    {
+      "id": "fore-right-lower",
+      "parent": "fore-right-upper",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.18,
+        "y": 0.47,
+        "z": 0.19
+      },
+      "position_m": [
+        -0.19,
+        0.265,
+        0.365
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "carved limewood, tempera over gesso, iron pins and straps",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "The lower leg, turning on an iron pin at the elbow. Legs that carry the body are the museum's reading; the accounts only say it walked."
+    },
+    {
+      "id": "fore-right-paw",
+      "parent": "fore-right-lower",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.22,
+        "y": 0.19,
+        "z": 0.3
+      },
+      "position_m": [
+        -0.19,
+        0.09,
+        0.455
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "carved limewood, tempera over gesso",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "The paw, held level through each step."
+    },
+    {
+      "id": "fore-right-lever",
+      "parent": "fore-right-upper",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.07,
+        "y": 0.13,
+        "z": 0.03
+      },
+      "position_m": [
+        -0.13,
+        0.85,
+        0.33
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "forged iron",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "Lomazzo, Idea del tempio 1590: lions went by force of wheels; the train itself is the museum's",
+      "notes": "An iron lever on the leg's axle; the rod from the crank rocks it and the leg swings."
+    },
+    {
+      "id": "fore-right-rod",
+      "parent": "frame",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.02,
+        "y": 0.184,
+        "z": 0.25
+      },
+      "position_m": [
+        -0.121,
+        0.828,
+        0.235
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "planed oak, iron slot",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "Lomazzo, Idea del tempio 1590: lions went by force of wheels; the train itself is the museum's",
+      "notes": "The rod from a crank pin to the leg's lever; the crank pin rides in the slot at its end."
+    },
+    {
+      "id": "hind-left-upper",
+      "parent": "shell",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.24,
+        "y": 0.76,
+        "z": 0.51
+      },
+      "position_m": [
+        0.19,
+        0.58,
+        -0.455
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "carved limewood, tempera over gesso, iron pins and straps",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "The upper leg, turning on an iron axle in its socket; an iron strap runs down it to the next pin. Legs that carry the body are the museum's reading; the accounts only say it walked."
+    },
+    {
+      "id": "hind-left-lower",
+      "parent": "hind-left-upper",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.18,
+        "y": 0.35,
+        "z": 0.4
+      },
+      "position_m": [
+        0.19,
+        0.355,
+        -0.47
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "carved limewood, tempera over gesso, iron pins and straps",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "The lower leg, turning on an iron pin at the stifle. Legs that carry the body are the museum's reading; the accounts only say it walked."
+    },
+    {
+      "id": "hind-left-paw",
+      "parent": "hind-left-lower",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.22,
+        "y": 0.31,
+        "z": 0.28
+      },
+      "position_m": [
+        0.19,
+        0.145,
+        -0.535
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "carved limewood, tempera over gesso",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "The long hind foot from the hock and its paw, held level through each step."
+    },
+    {
+      "id": "hind-left-lever",
+      "parent": "hind-left-upper",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.07,
+        "y": 0.13,
+        "z": 0.03
+      },
+      "position_m": [
+        0.13,
+        0.85,
+        -0.45
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "forged iron",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "Lomazzo, Idea del tempio 1590: lions went by force of wheels; the train itself is the museum's",
+      "notes": "An iron lever on the leg's axle; the rod from the crank rocks it and the leg swings."
+    },
+    {
+      "id": "hind-left-rod",
+      "parent": "frame",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.02,
+        "y": 0.184,
+        "z": 0.31
+      },
+      "position_m": [
+        0.121,
+        0.828,
+        -0.325
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "planed oak, iron slot",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "Lomazzo, Idea del tempio 1590: lions went by force of wheels; the train itself is the museum's",
+      "notes": "The rod from a crank pin to the leg's lever; the crank pin rides in the slot at its end."
+    },
+    {
+      "id": "hind-right-upper",
+      "parent": "shell",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.24,
+        "y": 0.76,
+        "z": 0.51
+      },
+      "position_m": [
+        -0.19,
+        0.58,
+        -0.455
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "carved limewood, tempera over gesso, iron pins and straps",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "The upper leg, turning on an iron axle in its socket; an iron strap runs down it to the next pin. Legs that carry the body are the museum's reading; the accounts only say it walked."
+    },
+    {
+      "id": "hind-right-lower",
+      "parent": "hind-right-upper",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.18,
+        "y": 0.35,
+        "z": 0.4
+      },
+      "position_m": [
+        -0.19,
+        0.355,
+        -0.47
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "carved limewood, tempera over gesso, iron pins and straps",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "The lower leg, turning on an iron pin at the stifle. Legs that carry the body are the museum's reading; the accounts only say it walked."
+    },
+    {
+      "id": "hind-right-paw",
+      "parent": "hind-right-lower",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.22,
+        "y": 0.31,
+        "z": 0.28
+      },
+      "position_m": [
+        -0.19,
+        0.145,
+        -0.535
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "carved limewood, tempera over gesso",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "The long hind foot from the hock and its paw, held level through each step."
+    },
+    {
+      "id": "hind-right-lever",
+      "parent": "hind-right-upper",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.07,
+        "y": 0.13,
+        "z": 0.03
+      },
+      "position_m": [
+        -0.13,
+        0.85,
+        -0.45
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "forged iron",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "Lomazzo, Idea del tempio 1590: lions went by force of wheels; the train itself is the museum's",
+      "notes": "An iron lever on the leg's axle; the rod from the crank rocks it and the leg swings."
+    },
+    {
+      "id": "hind-right-rod",
+      "parent": "frame",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.02,
+        "y": 0.184,
+        "z": 0.31
+      },
+      "position_m": [
+        -0.121,
+        0.828,
+        -0.325
+      ],
+      "orientation_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material": {
+        "class": "planed oak, iron slot",
+        "basis": "assumed",
+        "source": "museum choice"
+      },
+      "certainty": "C",
+      "source": "Lomazzo, Idea del tempio 1590: lions went by force of wheels; the train itself is the museum's",
+      "notes": "The rod from a crank pin to the leg's lever; the crank pin rides in the slot at its end."
+    }
+  ],
+  "joints": [
+    {
+      "id": "travel",
+      "type": "prismatic",
+      "parent": "root",
+      "child": "shell",
+      "axis": [
+        0,
+        0,
+        1
+      ],
+      "pivot_m": [
+        0,
+        0,
+        0
+      ],
+      "limits": [
+        0,
+        1.2
+      ],
+      "ratio": null,
+      "certainty": "C",
+      "source": "Vasari 1550 and 1568 (a few steps); the distance is the museum's",
+      "notes": "The body walks 1.2 m in six steps. No old text gives the distance; \"a few steps\" is in Vasari."
+    },
+    {
+      "id": "key",
+      "type": "revolute",
+      "parent": "frame",
+      "child": "key",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "pivot_m": [
+        0.0,
+        0.74,
+        -0.03
+      ],
+      "limits": [
+        0,
+        12.566370614359172
+      ],
+      "ratio": null,
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "Two turns in quarter steps, the click taking each."
+    },
+    {
+      "id": "barrel",
+      "type": "revolute",
+      "parent": "frame",
+      "child": "barrel",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "pivot_m": [
+        0.0,
+        0.74,
+        -0.03
+      ],
+      "limits": [
+        -3.141592653589793,
+        0
+      ],
+      "ratio": null,
+      "certainty": "C",
+      "source": "Lomazzo, Idea del tempio 1590: lions went by force of wheels; the train itself is the museum's",
+      "notes": "The barrel and the great wheel turn half a turn over the walk."
+    },
+    {
+      "id": "fore-crank",
+      "type": "revolute",
+      "parent": "frame",
+      "child": "fore-shaft",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "pivot_m": [
+        0.0,
+        0.74,
+        0.14
+      ],
+      "limits": null,
+      "ratio": null,
+      "certainty": "C",
+      "source": "Lomazzo, Idea del tempio 1590: lions went by force of wheels; the train itself is the museum's",
+      "notes": "Once per two steps."
+    },
+    {
+      "id": "hind-crank",
+      "type": "revolute",
+      "parent": "frame",
+      "child": "hind-shaft",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "pivot_m": [
+        0.0,
+        0.74,
+        -0.2
+      ],
+      "limits": null,
+      "ratio": null,
+      "certainty": "C",
+      "source": "Lomazzo, Idea del tempio 1590: lions went by force of wheels; the train itself is the museum's",
+      "notes": "Half a turn behind the fore shaft, so diagonal legs step together."
+    },
+    {
+      "id": "fore-gear",
+      "type": "gear",
+      "parent": "barrel",
+      "child": "fore-shaft",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "pivot_m": [
+        0.0,
+        0.74,
+        0.14
+      ],
+      "limits": null,
+      "ratio": -6,
+      "certainty": "C",
+      "source": "Lomazzo, Idea del tempio 1590: lions went by force of wheels; the train itself is the museum's",
+      "notes": "Great wheel of 48 teeth on a lantern pinion of 8.",
+      "driver_joint": "barrel",
+      "driven_joint": "fore-crank"
+    },
+    {
+      "id": "hind-gear",
+      "type": "gear",
+      "parent": "barrel",
+      "child": "hind-shaft",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "pivot_m": [
+        0.0,
+        0.74,
+        -0.2
+      ],
+      "limits": null,
+      "ratio": -6,
+      "certainty": "C",
+      "source": "Lomazzo, Idea del tempio 1590: lions went by force of wheels; the train itself is the museum's",
+      "notes": "Great wheel of 48 teeth on a lantern pinion of 8.",
+      "driver_joint": "barrel",
+      "driven_joint": "hind-crank"
+    },
+    {
+      "id": "detent",
+      "type": "revolute",
+      "parent": "frame",
+      "child": "detent",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "pivot_m": [
+        0.054,
+        0.868,
+        -0.118
+      ],
+      "limits": [
+        0,
+        0.32
+      ],
+      "ratio": null,
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "A tick into each step's notch, and the fall at the end."
+    },
+    {
+      "id": "latch-rod",
+      "type": "prismatic",
+      "parent": "detent",
+      "child": "latch-rod",
+      "axis": [
+        0,
+        0,
+        -1
+      ],
+      "pivot_m": [
+        0.054,
+        0.868,
+        -0.118
+      ],
+      "limits": [
+        0,
+        0.03
+      ],
+      "ratio": null,
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "Pulled 30 mm back as the detent falls."
+    },
+    {
+      "id": "latch",
+      "type": "prismatic",
+      "parent": "shell",
+      "child": "latch",
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "pivot_m": [
+        0,
+        0.85,
+        0.5
+      ],
+      "limits": [
+        0,
+        0.06
+      ],
+      "ratio": null,
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "The bolt lifts 60 mm, clear of the opening."
+    },
+    {
+      "id": "door-left",
+      "type": "revolute",
+      "parent": "shell",
+      "child": "door-left",
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "pivot_m": [
+        0.158,
+        0.66,
+        0.538
+      ],
+      "limits": [
+        0,
+        2.4435
+      ],
+      "ratio": null,
+      "certainty": "B",
+      "source": "Vasari, Lives 1550 and 1568; Lomazzo, Trattato 1584: it walked, stopped and its chest opened full of lilies",
+      "notes": "Swings 140 degrees outward on its hinges, short of the forelegs."
+    },
+    {
+      "id": "door-right",
+      "type": "revolute",
+      "parent": "shell",
+      "child": "door-right",
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "pivot_m": [
+        -0.158,
+        0.66,
+        0.538
+      ],
+      "limits": [
+        -2.4435,
+        0
+      ],
+      "ratio": null,
+      "certainty": "B",
+      "source": "Vasari, Lives 1550 and 1568; Lomazzo, Trattato 1584: it walked, stopped and its chest opened full of lilies",
+      "notes": "Swings 140 degrees outward on its hinges, short of the forelegs."
+    },
+    {
+      "id": "lily-rack",
+      "type": "prismatic",
+      "parent": "shell",
+      "child": "lily-rack",
+      "axis": [
+        0,
+        0,
+        1
+      ],
+      "pivot_m": [
+        0.03,
+        0.557,
+        0.28
+      ],
+      "limits": [
+        0,
+        0.13
+      ],
+      "ratio": null,
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "The carriage runs 130 mm forward."
+    },
+    {
+      "id": "lily-pinion",
+      "type": "revolute",
+      "parent": "shell",
+      "child": "lily-pinion",
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "pivot_m": [
+        0.095,
+        0.557,
+        0.3
+      ],
+      "limits": null,
+      "ratio": null,
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "Rack and pinion, pitch radius 22 mm."
+    },
+    {
+      "id": "fore-left-upper",
+      "type": "revolute",
+      "parent": "shell",
+      "child": "fore-left-upper",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "pivot_m": [
+        0.215,
+        0.8,
+        0.33
+      ],
+      "limits": null,
+      "ratio": null,
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "Solved each moment so the planted paw never slides and the lifted one clears the floor by 70 mm."
+    },
+    {
+      "id": "fore-left-lower",
+      "type": "revolute",
+      "parent": "fore-left-upper",
+      "child": "fore-left-lower",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "pivot_m": [
+        0.19,
+        0.42,
+        0.36
+      ],
+      "limits": null,
+      "ratio": null,
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "Solved each moment so the planted paw never slides and the lifted one clears the floor by 70 mm."
+    },
+    {
+      "id": "fore-left-paw",
+      "type": "revolute",
+      "parent": "fore-left-lower",
+      "child": "fore-left-paw",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "pivot_m": [
+        0.19,
+        0.115,
+        0.38
+      ],
+      "limits": null,
+      "ratio": null,
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "Solved each moment so the planted paw never slides and the lifted one clears the floor by 70 mm."
+    },
+    {
+      "id": "fore-left-rod",
+      "type": "link",
+      "parent": "frame",
+      "child": "fore-left-rod",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "pivot_m": [
+        0.121,
+        0.9,
+        0.33
+      ],
+      "limits": null,
+      "ratio": null,
+      "certainty": "C",
+      "source": "Lomazzo, Idea del tempio 1590: lions went by force of wheels; the train itself is the museum's",
+      "notes": "The rod hangs from the lever pin and points at the crank pin; the slot takes up the change in length."
+    },
+    {
+      "id": "fore-right-upper",
+      "type": "revolute",
+      "parent": "shell",
+      "child": "fore-right-upper",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "pivot_m": [
+        -0.215,
+        0.8,
+        0.33
+      ],
+      "limits": null,
+      "ratio": null,
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "Solved each moment so the planted paw never slides and the lifted one clears the floor by 70 mm."
+    },
+    {
+      "id": "fore-right-lower",
+      "type": "revolute",
+      "parent": "fore-right-upper",
+      "child": "fore-right-lower",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "pivot_m": [
+        -0.19,
+        0.42,
+        0.36
+      ],
+      "limits": null,
+      "ratio": null,
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "Solved each moment so the planted paw never slides and the lifted one clears the floor by 70 mm."
+    },
+    {
+      "id": "fore-right-paw",
+      "type": "revolute",
+      "parent": "fore-right-lower",
+      "child": "fore-right-paw",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "pivot_m": [
+        -0.19,
+        0.115,
+        0.38
+      ],
+      "limits": null,
+      "ratio": null,
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "Solved each moment so the planted paw never slides and the lifted one clears the floor by 70 mm."
+    },
+    {
+      "id": "fore-right-rod",
+      "type": "link",
+      "parent": "frame",
+      "child": "fore-right-rod",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "pivot_m": [
+        -0.121,
+        0.9,
+        0.33
+      ],
+      "limits": null,
+      "ratio": null,
+      "certainty": "C",
+      "source": "Lomazzo, Idea del tempio 1590: lions went by force of wheels; the train itself is the museum's",
+      "notes": "The rod hangs from the lever pin and points at the crank pin; the slot takes up the change in length."
+    },
+    {
+      "id": "hind-left-upper",
+      "type": "revolute",
+      "parent": "shell",
+      "child": "hind-left-upper",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "pivot_m": [
+        0.2,
+        0.8,
+        -0.45
+      ],
+      "limits": null,
+      "ratio": null,
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "Solved each moment so the planted paw never slides and the lifted one clears the floor by 70 mm."
+    },
+    {
+      "id": "hind-left-lower",
+      "type": "revolute",
+      "parent": "hind-left-upper",
+      "child": "hind-left-lower",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "pivot_m": [
+        0.19,
+        0.47,
+        -0.33
+      ],
+      "limits": null,
+      "ratio": null,
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "Solved each moment so the planted paw never slides and the lifted one clears the floor by 70 mm."
+    },
+    {
+      "id": "hind-left-paw",
+      "type": "revolute",
+      "parent": "hind-left-lower",
+      "child": "hind-left-paw",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "pivot_m": [
+        0.19,
+        0.245,
+        -0.6
+      ],
+      "limits": null,
+      "ratio": null,
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "Solved each moment so the planted paw never slides and the lifted one clears the floor by 70 mm."
+    },
+    {
+      "id": "hind-left-rod",
+      "type": "link",
+      "parent": "frame",
+      "child": "hind-left-rod",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "pivot_m": [
+        0.121,
+        0.9,
+        -0.45
+      ],
+      "limits": null,
+      "ratio": null,
+      "certainty": "C",
+      "source": "Lomazzo, Idea del tempio 1590: lions went by force of wheels; the train itself is the museum's",
+      "notes": "The rod hangs from the lever pin and points at the crank pin; the slot takes up the change in length."
+    },
+    {
+      "id": "hind-right-upper",
+      "type": "revolute",
+      "parent": "shell",
+      "child": "hind-right-upper",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "pivot_m": [
+        -0.2,
+        0.8,
+        -0.45
+      ],
+      "limits": null,
+      "ratio": null,
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "Solved each moment so the planted paw never slides and the lifted one clears the floor by 70 mm."
+    },
+    {
+      "id": "hind-right-lower",
+      "type": "revolute",
+      "parent": "hind-right-upper",
+      "child": "hind-right-lower",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "pivot_m": [
+        -0.19,
+        0.47,
+        -0.33
+      ],
+      "limits": null,
+      "ratio": null,
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "Solved each moment so the planted paw never slides and the lifted one clears the floor by 70 mm."
+    },
+    {
+      "id": "hind-right-paw",
+      "type": "revolute",
+      "parent": "hind-right-lower",
+      "child": "hind-right-paw",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "pivot_m": [
+        -0.19,
+        0.245,
+        -0.6
+      ],
+      "limits": null,
+      "ratio": null,
+      "certainty": "C",
+      "source": "museum choice; no source gives it",
+      "notes": "Solved each moment so the planted paw never slides and the lifted one clears the floor by 70 mm."
+    },
+    {
+      "id": "hind-right-rod",
+      "type": "link",
+      "parent": "frame",
+      "child": "hind-right-rod",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "pivot_m": [
+        -0.121,
+        0.9,
+        -0.45
+      ],
+      "limits": null,
+      "ratio": null,
+      "certainty": "C",
+      "source": "Lomazzo, Idea del tempio 1590: lions went by force of wheels; the train itself is the museum's",
+      "notes": "The rod hangs from the lever pin and points at the crank pin; the slot takes up the change in length."
+    }
+  ],
+  "motion": {
+    "period_s": 20,
+    "loop": false,
+    "initial_states": {
+      "travel": 0,
+      "key": 0,
+      "barrel": 0,
+      "door-left": 0,
+      "door-right": 0,
+      "lily-rack": 0
+    },
+    "phases": [
+      {
+        "name": "At rest",
+        "start_s": 0,
+        "duration_s": 1.2,
+        "joint_values": {},
+        "interpolation": "hold"
+      },
+      {
+        "name": "The key winds the spring",
+        "start_s": 1.2,
+        "duration_s": 2.2,
+        "joint_values": {
+          "key": "two turns in quarter steps"
+        },
+        "interpolation": "stepped"
+      },
+      {
+        "name": "The train takes up",
+        "start_s": 3.6,
+        "duration_s": 0.3,
+        "joint_values": {
+          "travel": 0
+        },
+        "interpolation": "jolt"
+      },
+      {
+        "name": "Six steps",
+        "start_s": 3.9,
+        "duration_s": 6.875,
+        "joint_values": {
+          "fore-crank": "three turns",
+          "barrel": "half a turn back",
+          "travel": 1.2
+        },
+        "interpolation": "ratchet, slowest as the pairs change over"
+      },
+      {
+        "name": "The count wheel trips, the train is caught",
+        "start_s": 10.775,
+        "duration_s": 0.2,
+        "joint_values": {
+          "detent": 0.32,
+          "latch-rod": 0.03
+        },
+        "interpolation": "fall"
+      },
+      {
+        "name": "The latch lifts",
+        "start_s": 11.5,
+        "duration_s": 0.3,
+        "joint_values": {
+          "latch": 0.06
+        },
+        "interpolation": "smooth"
+      },
+      {
+        "name": "The doors swing open",
+        "start_s": 12.0,
+        "duration_s": 2.3,
+        "joint_values": {
+          "door-left": 2.4435,
+          "door-right": -2.4435
+        },
+        "interpolation": "smoother"
+      },
+      {
+        "name": "The lilies come forward",
+        "start_s": 14.8,
+        "duration_s": 2.8,
+        "joint_values": {
+          "lily-rack": 0.13
+        },
+        "interpolation": "smoother"
+      },
+      {
+        "name": "It holds",
+        "start_s": 17.6,
+        "duration_s": 2.4,
+        "joint_values": {},
+        "interpolation": "hold"
+      }
+    ],
+    "final_hold": "It holds with the chest open and the lilies forward. Nothing rewinds or resets; only the visitor starts it again.",
+    "visitor_12s": "The key winds, the wheels take up, six stiff steps over 1.2 m, the count wheel trips and it stops mid-stride; the chest opens after."
+  },
+  "drive": {
+    "type": "spring barrel, wound by a key",
+    "input_joint": "barrel",
+    "input_rate": {
+      "value": 0.4545,
+      "unit": "turns per second at the crank shafts",
+      "certainty": "C",
+      "source": "museum choice",
+      "note": "Two steps every 2.2 s; the spring, its store and the rate are modern choices."
+    },
+    "justification": "Lomazzo 1590 writes that lions went by force of wheels. The spring barrel, the train, the cranks and the rate are the museum's reading, chosen so that wheels visibly drive stepping legs.",
+    "source": "Lomazzo, Idea del tempio 1590: lions went by force of wheels; the train itself is the museum's"
+  },
+  "label_en": "The museum's reconstruction of the lion the old accounts describe: it walks a few steps, stops, and opens its chest full of lilies.",
+  "label_de": "Die Rekonstruktion des Museums nach den alten Berichten: Der Löwe geht einige Schritte, bleibt stehen und öffnet die Brust voller Lilien.",
+  "animation_notes": [
+    "One finite run of 20 s that holds at its end. No hidden reset; only the visitor starts it again.",
+    "Head, jaw and tail never move.",
+    "Legs carry the body; nothing rolls. A planted paw never slides.",
+    "The count wheel turns half a turn over the walk; the detent drops into its deep notch at the end and the train stops.",
+    "The section view takes the near flank panel off; the geometry is unchanged."
+  ],
+  "folio": [],
+  "research": {
+    "physics": {
+      "verdict_en": "Nothing about its mass, spring or speed is documented. The museum's numbers only make the walk readable.",
+      "verdict_de": "Masse, Feder und Tempo sind nicht überliefert. Die Zahlen des Museums machen den Gang nur lesbar."
+    }
+  }
+}

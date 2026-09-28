@@ -1666,6 +1666,111 @@
       "sourceSha256": "ce9009e8ad154a6247c62ef8004bfce50ebdf2688a0a5f1abe3d55777448f64c",
       "pageSourcePath": "brief/pages/water-lifting-screw.md",
       "pageSourceSha256": "b5301ae47dffc8f9d4523809833bf49a07a452827d145ebca9a439e82d77494f"
+    },
+    "mechanical-lion": {
+      "slug": "mechanical-lion",
+      "status": "reconstruction",
+      "title": {
+        "en": "Mechanical lion",
+        "de": "Mechanischer Löwe"
+      },
+      "label": {
+        "en": "Old accounts tell of a lion Leonardo made for a King of France. It walked a few steps, stopped and opened its chest full of lilies.",
+        "de": "Alte Berichte erzählen von einem Löwen, den Leonardo für einen König von Frankreich machte. Er ging einige Schritte, blieb stehen und öffnete die Brust voller Lilien."
+      },
+      "arithmetic": {
+        "en": "No mass, spring or speed of the original is known. This lion walks 1.2 m in six steps in about 7 seconds and opens its chest a second after it stops. These are the museum’s values.",
+        "de": "Masse, Feder und Tempo des Originals sind unbekannt. Dieser Löwe geht in sechs Schritten 1,2 m in etwa 7 Sekunden und öffnet die Brust eine Sekunde nach dem Halt. Das sind Werte des Museums."
+      },
+      "page": {
+        "en": "# Mechanical lion\n\nOld accounts tell of a lion Leonardo made for a King of France. It walked a few steps, stopped and opened its chest full of lilies.\n\n## The folio\n\nNo drawing of the lion survives. Modern writers link two sheets to it, a spring cart in the Codex Atlanticus and a leg lifted by a cord in the first Madrid codex, both weakly. [1]\n\n## The mechanism\n\nThe accounts say it moved by itself, and a book of 1590 says his lions went by force of wheels. Everything inside this one is the museum’s reading: a spring, a train of wheels, cranks that swing the legs, a count wheel that ends the walk and a latch that opens the chest. [3]\n\n## What it was for\n\nA greeting for a King of France. The lilies in the opened chest were the lilies of his arms. Vasari sets it in Milan, Lomazzo in a hall before Francis I, Buonarroti the Younger in Lyon for the Florentine community. [2,4,5]\n\n## Was it built\n\nEvery account says it walked. A note from about 1509 tells of a lion over a gate in Milan that rose and opened its chest, and gold lilies came out of blue. A letter from Argentan in 1517 tells of a lion opened before Francis I, blue inside with a lily in the middle, but it does not name Leonardo. Nothing of any of them survives. [6,7]\n\n## What tests found\n\nModern makers have built walking lions of their own design. This reconstruction follows none of them.\n\n## The arithmetic\n\nNo mass, spring or speed of the original is known. This lion walks 1.2 m in six steps in about 7 seconds and opens its chest a second after it stops. These are the museum’s values.\n\n## The myth\n\nNo old source says that the Pope ordered it, that it wore a real lion’s skin, or that Leonardo brought it to this house.\n\n## Sources\n\n1. [Leonardo’s machines, the lion](https://marignan2015.univ-tours.fr/les-machines-de-leonard/). Université de Tours, Marignan 2015.\n2. [Vasari, Lives, 1568, Lionardo da Vinci](https://it.wikisource.org/wiki/Le_vite_de%27_pi%C3%B9_eccellenti_pittori,_scultori_e_architettori_(1568)/Lionardo_da_Vinci). Wikisource.\n3. [Lomazzo, Idea del tempio della pittura, 1590](https://archive.org/details/gri_ideadeltempi00loma). Internet Archive.\n4. [Lomazzo, Trattato dell’arte della pittura, 1584, reprint of 1844](https://archive.org/details/bub_gb_t68PqJUMmaYC). Internet Archive.\n5. [Buonarroti the Younger, 1600, a transcription](https://lucacaricato.it/index.php?Itemid=111&catid=13&id=26%3Ail-leone-di-maria-de-medici-ricostruzione-storica-luca-garai-compositing-luca-caricato&option=com_content&view=article). Luca Caricato.\n6. [Jill Burke, Interpreting Leonardo’s Lion, 2006](https://doi.org/10.1093/oxartj/kci048). Oxford Art Journal.\n7. [The mechanical lion](https://artsandculture.google.com/asset/the-mechanical-lion/dgFdl098UaILWg). Château du Clos Lucé on Google Arts and Culture.",
+        "de": "# Mechanischer Löwe\n\nAlte Berichte erzählen von einem Löwen, den Leonardo für einen König von Frankreich machte. Er ging einige Schritte, blieb stehen und öffnete die Brust voller Lilien.\n\n## Das Blatt\n\nKeine Zeichnung des Löwen ist erhalten. Heutige Autoren verbinden zwei Blätter mit ihm, einen Federwagen im Codex Atlanticus und ein Bein, das eine Schnur hebt, im ersten Madrider Codex, beide nur schwach. [1]\n\n## Der Mechanismus\n\nDie Berichte sagen, er bewegte sich von selbst, und ein Buch von 1590 sagt, seine Löwen gingen durch die Kraft von Rädern. Alles in diesem hier ist die Lesart des Museums: eine Feder, ein Räderwerk, Kurbeln, die die Beine schwingen, ein Zählrad, das den Gang beendet, und ein Riegel, der die Brust öffnet. [3]\n\n## Wofür es gedacht war\n\nEin Gruß an einen König von Frankreich. Die Lilien in der offenen Brust waren die Lilien seines Wappens. Vasari verlegt es nach Mailand, Lomazzo in einen Saal vor Franz I., Buonarroti der Jüngere nach Lyon für die Florentiner Gemeinde. [2,4,5]\n\n## Wurde es gebaut\n\nJeder Bericht sagt, er ging. Eine Notiz von etwa 1509 erzählt von einem Löwen über einem Tor in Mailand, der sich erhob und die Brust öffnete, und goldene Lilien kamen aus Blau. Ein Brief aus Argentan von 1517 erzählt von einem Löwen, der vor Franz I. aufging, innen blau mit einer Lilie in der Mitte, nennt aber Leonardo nicht. Von keinem ist etwas erhalten. [6,7]\n\n## Was Versuche zeigen\n\nHeutige Bauer haben gehende Löwen nach eigenem Entwurf gebaut. Diese Rekonstruktion folgt keinem davon.\n\n## Die Rechnung\n\nMasse, Feder und Tempo des Originals sind unbekannt. Dieser Löwe geht in sechs Schritten 1,2 m in etwa 7 Sekunden und öffnet die Brust eine Sekunde nach dem Halt. Das sind Werte des Museums.\n\n## Der Mythos\n\nKeine alte Quelle sagt, dass der Papst ihn bestellte, dass er echtes Löwenfell trug oder dass Leonardo ihn in dieses Haus brachte.\n\n## Quellen\n\n1. [Leonardo’s machines, the lion](https://marignan2015.univ-tours.fr/les-machines-de-leonard/). Université de Tours, Marignan 2015.\n2. [Vasari, Lives, 1568, Lionardo da Vinci](https://it.wikisource.org/wiki/Le_vite_de%27_pi%C3%B9_eccellenti_pittori,_scultori_e_architettori_(1568)/Lionardo_da_Vinci). Wikisource.\n3. [Lomazzo, Idea del tempio della pittura, 1590](https://archive.org/details/gri_ideadeltempi00loma). Internet Archive.\n4. [Lomazzo, Trattato dell’arte della pittura, 1584, reprint of 1844](https://archive.org/details/bub_gb_t68PqJUMmaYC). Internet Archive.\n5. [Buonarroti the Younger, 1600, a transcription](https://lucacaricato.it/index.php?Itemid=111&catid=13&id=26%3Ail-leone-di-maria-de-medici-ricostruzione-storica-luca-garai-compositing-luca-caricato&option=com_content&view=article). Luca Caricato.\n6. [Jill Burke, Interpreting Leonardo’s Lion, 2006](https://doi.org/10.1093/oxartj/kci048). Oxford Art Journal.\n7. [The mechanical lion](https://artsandculture.google.com/asset/the-mechanical-lion/dgFdl098UaILWg). Château du Clos Lucé on Google Arts and Culture."
+      },
+      "sections": {
+        "en": [
+          {
+            "title": "The folio",
+            "body": "No drawing of the lion survives. Modern writers link two sheets to it, a spring cart in the Codex Atlanticus and a leg lifted by a cord in the first Madrid codex, both weakly. [1]"
+          },
+          {
+            "title": "The mechanism",
+            "body": "The accounts say it moved by itself, and a book of 1590 says his lions went by force of wheels. Everything inside this one is the museum’s reading: a spring, a train of wheels, cranks that swing the legs, a count wheel that ends the walk and a latch that opens the chest. [3]"
+          },
+          {
+            "title": "What it was for",
+            "body": "A greeting for a King of France. The lilies in the opened chest were the lilies of his arms. Vasari sets it in Milan, Lomazzo in a hall before Francis I, Buonarroti the Younger in Lyon for the Florentine community. [2,4,5]"
+          },
+          {
+            "title": "Was it built",
+            "body": "Every account says it walked. A note from about 1509 tells of a lion over a gate in Milan that rose and opened its chest, and gold lilies came out of blue. A letter from Argentan in 1517 tells of a lion opened before Francis I, blue inside with a lily in the middle, but it does not name Leonardo. Nothing of any of them survives. [6,7]"
+          },
+          {
+            "title": "What tests found",
+            "body": "Modern makers have built walking lions of their own design. This reconstruction follows none of them."
+          },
+          {
+            "title": "The arithmetic",
+            "body": "No mass, spring or speed of the original is known. This lion walks 1.2 m in six steps in about 7 seconds and opens its chest a second after it stops. These are the museum’s values."
+          },
+          {
+            "title": "The myth",
+            "body": "No old source says that the Pope ordered it, that it wore a real lion’s skin, or that Leonardo brought it to this house."
+          },
+          {
+            "title": "Sources",
+            "body": "1. [Leonardo’s machines, the lion](https://marignan2015.univ-tours.fr/les-machines-de-leonard/). Université de Tours, Marignan 2015.\n2. [Vasari, Lives, 1568, Lionardo da Vinci](https://it.wikisource.org/wiki/Le_vite_de%27_pi%C3%B9_eccellenti_pittori,_scultori_e_architettori_(1568)/Lionardo_da_Vinci). Wikisource.\n3. [Lomazzo, Idea del tempio della pittura, 1590](https://archive.org/details/gri_ideadeltempi00loma). Internet Archive.\n4. [Lomazzo, Trattato dell’arte della pittura, 1584, reprint of 1844](https://archive.org/details/bub_gb_t68PqJUMmaYC). Internet Archive.\n5. [Buonarroti the Younger, 1600, a transcription](https://lucacaricato.it/index.php?Itemid=111&catid=13&id=26%3Ail-leone-di-maria-de-medici-ricostruzione-storica-luca-garai-compositing-luca-caricato&option=com_content&view=article). Luca Caricato.\n6. [Jill Burke, Interpreting Leonardo’s Lion, 2006](https://doi.org/10.1093/oxartj/kci048). Oxford Art Journal.\n7. [The mechanical lion](https://artsandculture.google.com/asset/the-mechanical-lion/dgFdl098UaILWg). Château du Clos Lucé on Google Arts and Culture."
+          }
+        ],
+        "de": [
+          {
+            "title": "Das Blatt",
+            "body": "Keine Zeichnung des Löwen ist erhalten. Heutige Autoren verbinden zwei Blätter mit ihm, einen Federwagen im Codex Atlanticus und ein Bein, das eine Schnur hebt, im ersten Madrider Codex, beide nur schwach. [1]"
+          },
+          {
+            "title": "Der Mechanismus",
+            "body": "Die Berichte sagen, er bewegte sich von selbst, und ein Buch von 1590 sagt, seine Löwen gingen durch die Kraft von Rädern. Alles in diesem hier ist die Lesart des Museums: eine Feder, ein Räderwerk, Kurbeln, die die Beine schwingen, ein Zählrad, das den Gang beendet, und ein Riegel, der die Brust öffnet. [3]"
+          },
+          {
+            "title": "Wofür es gedacht war",
+            "body": "Ein Gruß an einen König von Frankreich. Die Lilien in der offenen Brust waren die Lilien seines Wappens. Vasari verlegt es nach Mailand, Lomazzo in einen Saal vor Franz I., Buonarroti der Jüngere nach Lyon für die Florentiner Gemeinde. [2,4,5]"
+          },
+          {
+            "title": "Wurde es gebaut",
+            "body": "Jeder Bericht sagt, er ging. Eine Notiz von etwa 1509 erzählt von einem Löwen über einem Tor in Mailand, der sich erhob und die Brust öffnete, und goldene Lilien kamen aus Blau. Ein Brief aus Argentan von 1517 erzählt von einem Löwen, der vor Franz I. aufging, innen blau mit einer Lilie in der Mitte, nennt aber Leonardo nicht. Von keinem ist etwas erhalten. [6,7]"
+          },
+          {
+            "title": "Was Versuche zeigen",
+            "body": "Heutige Bauer haben gehende Löwen nach eigenem Entwurf gebaut. Diese Rekonstruktion folgt keinem davon."
+          },
+          {
+            "title": "Die Rechnung",
+            "body": "Masse, Feder und Tempo des Originals sind unbekannt. Dieser Löwe geht in sechs Schritten 1,2 m in etwa 7 Sekunden und öffnet die Brust eine Sekunde nach dem Halt. Das sind Werte des Museums."
+          },
+          {
+            "title": "Der Mythos",
+            "body": "Keine alte Quelle sagt, dass der Papst ihn bestellte, dass er echtes Löwenfell trug oder dass Leonardo ihn in dieses Haus brachte."
+          },
+          {
+            "title": "Quellen",
+            "body": "1. [Leonardo’s machines, the lion](https://marignan2015.univ-tours.fr/les-machines-de-leonard/). Université de Tours, Marignan 2015.\n2. [Vasari, Lives, 1568, Lionardo da Vinci](https://it.wikisource.org/wiki/Le_vite_de%27_pi%C3%B9_eccellenti_pittori,_scultori_e_architettori_(1568)/Lionardo_da_Vinci). Wikisource.\n3. [Lomazzo, Idea del tempio della pittura, 1590](https://archive.org/details/gri_ideadeltempi00loma). Internet Archive.\n4. [Lomazzo, Trattato dell’arte della pittura, 1584, reprint of 1844](https://archive.org/details/bub_gb_t68PqJUMmaYC). Internet Archive.\n5. [Buonarroti the Younger, 1600, a transcription](https://lucacaricato.it/index.php?Itemid=111&catid=13&id=26%3Ail-leone-di-maria-de-medici-ricostruzione-storica-luca-garai-compositing-luca-caricato&option=com_content&view=article). Luca Caricato.\n6. [Jill Burke, Interpreting Leonardo’s Lion, 2006](https://doi.org/10.1093/oxartj/kci048). Oxford Art Journal.\n7. [The mechanical lion](https://artsandculture.google.com/asset/the-mechanical-lion/dgFdl098UaILWg). Château du Clos Lucé on Google Arts and Culture."
+          }
+        ]
+      },
+      "folio": [],
+      "scope": "The museum's reconstruction from the old accounts. No drawing, part or measurement of the lion survives. The walk, the stop and the chest full of lilies are in the texts. The size, the wood and paint, the spring, the wheels, the cranks, the gait and the latch are modern choices.",
+      "gaps": [
+        "No drawing of the lion survives. Two sheets are linked to it by modern writers, both weakly.",
+        "Size, material, outer finish and weight are not documented.",
+        "The drive, the power store, the gait, the leg joints and the opening trigger are not documented. Lomazzo 1590 says only that lions went by force of wheels.",
+        "Whether a person worked it, from inside or outside, is not known.",
+        "The accounts disagree on place, date and king. They name Milan, Lyon and a hall before Francis I. A letter of 1517 from Argentan tells of a lion in its street but does not name Leonardo.",
+        "Whether this was one lion or several, and what became of any, is not known.",
+        "Whether the lilies were carved, gilt, cloth, paper or real flowers is not known."
+      ],
+      "sourcePath": "machines/data/mechanical-lion.json",
+      "sourceSha256": "1228dbf5ae2ab4f6849fe5deb3b943cc79d5818832e8767c47e296d4cff4f3fb",
+      "pageSourcePath": "machines/data/records.json, mechanical-lion page",
+      "pageSourceSha256": "4fc493c13f3c0e29f2922d7e807f5d87265255ab0fb4b774bc63b01b23e50875"
     }
   },
   "partial": [
@@ -3419,128 +3524,6 @@
       "sourceSha256": "194fad797b7135a8135937d8b13d3b592e96640e7af09283eb8b0827d114e711",
       "pageSourcePath": "brief/pages/mechanical-knight.md",
       "pageSourceSha256": "289b9fe4ba990af9eded154b36f286ffd78e829f10867f37134afc9091d67dec"
-    },
-    {
-      "slug": "mechanical-lion",
-      "status": "documentary_only",
-      "title": {
-        "en": "Mechanical lion attributed to 1515",
-        "de": "Mechanischer Löwe, traditionell 1515 zugeordnet"
-      },
-      "label": {
-        "en": "The mechanical lion survives in accounts. Its original mechanism is unknown.",
-        "de": "Berichte überliefern den mechanischen Löwen. Sein ursprünglicher Mechanismus ist unbekannt."
-      },
-      "arithmetic": {
-        "en": "There is no justified original mass, spring energy or walking speed to calculate. The modern model’s dimensions cannot fill that gap.",
-        "de": "Für Masse, Federenergie und Gehgeschwindigkeit des Originals fehlen belastbare Werte. Maße des heutigen Modells schließen diese Lücke nicht."
-      },
-      "page": {
-        "en": "# Mechanical lion attributed to 1515\n\nThe mechanical lion survives in accounts. Its original mechanism is unknown.\n\n## The folio\n\nNo verified construction drawing for the lion was found. The 1515 attribution and a report of festivities in 1517 must be kept separate. [1,3]\n\n## The mechanism\n\nThe original drive, joints and gait are unknown. A description of movement cannot uniquely reveal the mechanism.\n\n## What it was for\n\nThe lion served a courtly spectacle and presented royal emblems. [1]\n\n## Was it built\n\nClos Lucé cites a letter by Anastasio Turrioni describing a lion at Argentan in 1517. This dossier has not verified the autograph or a contemporary 1515 letter. [1]\n\n## What tests found\n\nRenato Boaretto made a working interpretation in 2009. Other studies by Leonardo helped him fill the missing engineering. [1,2]\n\n## The arithmetic\n\nThere is no justified original mass, spring energy or walking speed to calculate. The modern model’s dimensions cannot fill that gap.\n\n## The myth\n\nThe 2009 automaton is not a recovered 1515 machine.\n\n## Sources\n\n1. [The mechanical lion](https://artsandculture.google.com/asset/the-mechanical-lion/dgFdl098UaILWg). Château du Clos Lucé on Google Arts and Culture.\n2. [Les années françaises de Léonard de Vinci](https://culture.uliege.be/jcms/prod_93955/fr/les-annees-francaises-de-leonard-de-vinci-exposition?part=2). Université de Liège.\n3. [Codex Atlanticus812r critical entry](https://teche.museogalileo.it/leonardo/foglio/index.html?lang=it&num=ATL.1623.1). Museo Galileo, Paola Cordera.",
-        "de": "# Mechanischer Löwe, traditionell 1515 zugeordnet\n\nBerichte überliefern den mechanischen Löwen. Sein ursprünglicher Mechanismus ist unbekannt.\n\n## Das Blatt\n\nEine überprüfte Konstruktionszeichnung des Löwen wurde nicht gefunden. Die Zuordnung zu 1515 und der Bericht über ein Fest 1517 müssen getrennt bleiben. [1,3]\n\n## Der Mechanismus\n\nAntrieb, Gelenke und Gang des Originals sind unbekannt. Ein Bewegungsbericht legt den Mechanismus nicht eindeutig fest.\n\n## Wofür es gedacht war\n\nDer Löwe gehörte zu einem höfischen Schauspiel und zeigte königliche Zeichen. [1]\n\n## Wurde es gebaut\n\nClos Lucé beruft sich auf einen Brief von Anastasio Turrioni über einen Löwen in Argentan 1517. Das Original dieses Briefs und ein zeitgenössischer Brief von 1515 wurden hier nicht geprüft. [1]\n\n## Was Versuche zeigen\n\nRenato Boaretto baute 2009 eine funktionsfähige Deutung. Andere Studien Leonardos halfen ihm, die fehlende Technik zu ergänzen. [1,2]\n\n## Die Rechnung\n\nFür Masse, Federenergie und Gehgeschwindigkeit des Originals fehlen belastbare Werte. Maße des heutigen Modells schließen diese Lücke nicht.\n\n## Der Mythos\n\nDer Automat von 2009 ist keine wiedergefundene Maschine von 1515.\n\n## Quellen\n\n1. [The mechanical lion](https://artsandculture.google.com/asset/the-mechanical-lion/dgFdl098UaILWg). Château du Clos Lucé on Google Arts and Culture.\n2. [Les années françaises de Léonard de Vinci](https://culture.uliege.be/jcms/prod_93955/fr/les-annees-francaises-de-leonard-de-vinci-exposition?part=2). Université de Liège.\n3. [Codex Atlanticus812r critical entry](https://teche.museogalileo.it/leonardo/foglio/index.html?lang=it&num=ATL.1623.1). Museo Galileo, Paola Cordera."
-      },
-      "sections": {
-        "en": [
-          {
-            "title": "The folio",
-            "body": "No verified construction drawing for the lion was found. The 1515 attribution and a report of festivities in 1517 must be kept separate. [1,3]"
-          },
-          {
-            "title": "The mechanism",
-            "body": "The original drive, joints and gait are unknown. A description of movement cannot uniquely reveal the mechanism."
-          },
-          {
-            "title": "What it was for",
-            "body": "The lion served a courtly spectacle and presented royal emblems. [1]"
-          },
-          {
-            "title": "Was it built",
-            "body": "Clos Lucé cites a letter by Anastasio Turrioni describing a lion at Argentan in 1517. This dossier has not verified the autograph or a contemporary 1515 letter. [1]"
-          },
-          {
-            "title": "What tests found",
-            "body": "Renato Boaretto made a working interpretation in 2009. Other studies by Leonardo helped him fill the missing engineering. [1,2]"
-          },
-          {
-            "title": "The arithmetic",
-            "body": "There is no justified original mass, spring energy or walking speed to calculate. The modern model’s dimensions cannot fill that gap."
-          },
-          {
-            "title": "The myth",
-            "body": "The 2009 automaton is not a recovered 1515 machine."
-          },
-          {
-            "title": "Sources",
-            "body": "1. [The mechanical lion](https://artsandculture.google.com/asset/the-mechanical-lion/dgFdl098UaILWg). Château du Clos Lucé on Google Arts and Culture.\n2. [Les années françaises de Léonard de Vinci](https://culture.uliege.be/jcms/prod_93955/fr/les-annees-francaises-de-leonard-de-vinci-exposition?part=2). Université de Liège.\n3. [Codex Atlanticus812r critical entry](https://teche.museogalileo.it/leonardo/foglio/index.html?lang=it&num=ATL.1623.1). Museo Galileo, Paola Cordera."
-          }
-        ],
-        "de": [
-          {
-            "title": "Das Blatt",
-            "body": "Eine überprüfte Konstruktionszeichnung des Löwen wurde nicht gefunden. Die Zuordnung zu 1515 und der Bericht über ein Fest 1517 müssen getrennt bleiben. [1,3]"
-          },
-          {
-            "title": "Der Mechanismus",
-            "body": "Antrieb, Gelenke und Gang des Originals sind unbekannt. Ein Bewegungsbericht legt den Mechanismus nicht eindeutig fest."
-          },
-          {
-            "title": "Wofür es gedacht war",
-            "body": "Der Löwe gehörte zu einem höfischen Schauspiel und zeigte königliche Zeichen. [1]"
-          },
-          {
-            "title": "Wurde es gebaut",
-            "body": "Clos Lucé beruft sich auf einen Brief von Anastasio Turrioni über einen Löwen in Argentan 1517. Das Original dieses Briefs und ein zeitgenössischer Brief von 1515 wurden hier nicht geprüft. [1]"
-          },
-          {
-            "title": "Was Versuche zeigen",
-            "body": "Renato Boaretto baute 2009 eine funktionsfähige Deutung. Andere Studien Leonardos halfen ihm, die fehlende Technik zu ergänzen. [1,2]"
-          },
-          {
-            "title": "Die Rechnung",
-            "body": "Für Masse, Federenergie und Gehgeschwindigkeit des Originals fehlen belastbare Werte. Maße des heutigen Modells schließen diese Lücke nicht."
-          },
-          {
-            "title": "Der Mythos",
-            "body": "Der Automat von 2009 ist keine wiedergefundene Maschine von 1515."
-          },
-          {
-            "title": "Quellen",
-            "body": "1. [The mechanical lion](https://artsandculture.google.com/asset/the-mechanical-lion/dgFdl098UaILWg). Château du Clos Lucé on Google Arts and Culture.\n2. [Les années françaises de Léonard de Vinci](https://culture.uliege.be/jcms/prod_93955/fr/les-annees-francaises-de-leonard-de-vinci-exposition?part=2). Université de Liège.\n3. [Codex Atlanticus812r critical entry](https://teche.museogalileo.it/leonardo/foglio/index.html?lang=it&num=ATL.1623.1). Museo Galileo, Paola Cordera."
-          }
-        ]
-      },
-      "folio": [
-        {
-          "codex": null,
-          "folio": null,
-          "holder": null,
-          "catalogue_reference": null,
-          "catalogue_url": null,
-          "verification": "not_applicable",
-          "commission_reference": "Mechanical lion of1515, letters and2009 reconstruction",
-          "correction": "A1517 Argentan report is not automatically a contemporary1515 construction record.",
-          "date": {
-            "range": "1515 traditional attribution,1517 reported event",
-            "certainty": "B",
-            "source": "LION-H",
-            "note": "Dating and identity of successive lions must remain separate."
-          },
-          "image_url": null,
-          "image_licence_quote": null,
-          "licence_source": null
-        }
-      ],
-      "scope": "Documentary exception. No verified construction sheet survives in the evidence located. No lion mechanism or replacement anatomy is modelled.",
-      "gaps": [
-        "No surviving dimensioned lion sheet verified.",
-        "Original1515 letter, archive shelfmark, mechanical internals and dimensions not established.",
-        "1517 letter quotation reached through the modern holder account, not the autograph.",
-        "Do not trace or reproduce Renato Boaretto s2009 mechanism or outer form."
-      ],
-      "sourcePath": "brief/dossiers/mechanical-lion.json",
-      "sourceSha256": "4770bb505e63aeefe124784b29e6e2087bb59f1e2f5d0813bffd652e481ce1fe",
-      "pageSourcePath": "brief/pages/mechanical-lion.md",
-      "pageSourceSha256": "e9de222e9c0076fb5801b7b28beeac803c187188b7a8849a2b87ff7795abe4aa"
     },
     {
       "slug": "mechanical-wing-test-rig",

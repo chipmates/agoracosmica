@@ -9,7 +9,7 @@
  * Address:  /bench/vinci/<kind>/<id>
  * Rig:      window.__forge.jump('bench', { kind, ... })
  *
- *   machines  { kind: 'machines', slug }    one of the fourteen machines
+ *   machines  { kind: 'machines', slug }    one of the fifteen machines
  *   table     { kind: 'table', state }      the reading table's seven states
  *   line      { kind: 'line', state }       the timeline's eight states
  *   object    { kind: 'object', slug }      one built body out of the store,

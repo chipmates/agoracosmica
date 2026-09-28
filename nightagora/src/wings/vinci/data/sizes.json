@@ -76,6 +76,11 @@
       "en": "The chamber is 1.24 m wide, 1.24 m high and 0.64 m deep, and the window opens its near corner so the inside can be seen.",
       "de": "Die Kammer ist 1,24 m breit, 1,24 m hoch und 0,64 m tief, und das Fenster öffnet ihre vordere Ecke, damit man hineinsieht.",
       "source": "machines/data/camera-obscura.json, scale_m 1.24 by 1.24 by 0.64 m, chamber bounds"
+    },
+    "mechanical-lion": {
+      "en": "The lion walks inside a space 3.46 m long, 1.55 m high and 0.8 m wide, and the window holds all of it.",
+      "de": "Der Löwe geht in einem Raum von 3,46 m Länge, 1,55 m Höhe und 0,8 m Breite, und das Fenster fasst ihn ganz.",
+      "source": "machines/data/mechanical-lion.json, scale_m 0.8 by 1.55 by 3.46 m, the walk’s full swept bound"
     }
   }
 }

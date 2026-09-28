@@ -15,6 +15,7 @@ import miter_lock_gatesJson from './data/miter-lock-gates.json?raw'
 import water_lifting_screwJson from './data/water-lifting-screw.json?raw'
 import proportional_compassJson from './data/proportional-compass.json?raw'
 import camera_obscuraJson from './data/camera-obscura.json?raw'
+import mechanical_lionJson from './data/mechanical-lion.json?raw'
 
 export const MACHINE_SLUGS = [
   "aerial-screw",
@@ -30,7 +31,8 @@ export const MACHINE_SLUGS = [
   "miter-lock-gates",
   "water-lifting-screw",
   "proportional-compass",
-  "camera-obscura"
+  "camera-obscura",
+  "mechanical-lion"
 ] as const
 export type MachineSlug = (typeof MACHINE_SLUGS)[number]
 export type Language = 'en' | 'de'
@@ -70,6 +72,7 @@ export const dossiers: Record<MachineSlug, Dossier> = {
   'water-lifting-screw': JSON.parse(water_lifting_screwJson) as Dossier,
   'proportional-compass': JSON.parse(proportional_compassJson) as Dossier,
   'camera-obscura': JSON.parse(camera_obscuraJson) as Dossier,
+  'mechanical-lion': JSON.parse(mechanical_lionJson) as Dossier,
 }
 export const machineCatalog = Object.fromEntries(
   MACHINE_SLUGS.map((slug) => [slug, { ...records.complete[slug], slug, dossier: dossiers[slug] }])

@@ -55,8 +55,9 @@ export interface TurntableOptions {
   /** The dossier's own tree, child to parent, so a tap on a fitting finds
    * the step that speaks of the part it belongs to. */
   parents: ReadonlyMap<string, string>
-  /** The part each viewpoint looks at; `whole` looks at the machine. */
-  viewpoints: readonly { id: TurntableViewpoint; label: string; part: string | null }[]
+  /** The part each viewpoint looks at; `whole` looks at the machine. A view
+   * may name its own bearing and height where the whole view's do not serve. */
+  viewpoints: readonly { id: TurntableViewpoint; label: string; part: string | null; yaw?: number; pitch?: number }[]
   words: { play: string; pause: string; again: string; clock: string }
   /** Where a part lives in a body that was not built from its dossier. */
   nodeNames?: Readonly<Record<string, string>>
@@ -74,6 +75,9 @@ export interface TurntableOptions {
   grade: Grade
   /** The folio beside the model: its thumbnail where the store holds one. */
   sheet?: { src: Promise<string | null> | null; label: string; open(): void }
+  /** A machine that walks is fitted and centred on the ground its whole run
+   * covers, not on the pose it starts from, so its last step is never cut. */
+  travels?: boolean
   /** Hand the stage back to the room. */
   restore(): void
   /** True once the eye stands where it walked for this machine: the room
@@ -424,12 +428,12 @@ export function createTurntablePayload(options: TurntableOptions): TurntablePayl
     const across = new Vector3(sphere.center.x - centre.x, 0, sphere.center.z - centre.z)
     // A part on the far side of the machine is looked at from its own side,
     // so the body does not stand between the eye and it.
-    const yaw = across.dot(toward) < -radius * .1 ? WHOLE.yaw + Math.PI : WHOLE.yaw
+    const yaw = entry?.yaw ?? (across.dot(toward) < -radius * .1 ? WHOLE.yaw + Math.PI : WHOLE.yaw)
     // A STEP IN, NEVER A NEW PLACE: the eye comes a third to two thirds of
     // the way toward the part, which keeps the machine it belongs to in the
     // frame and the eye inside the air the whole view stands in.
     const distance = Math.min(whole * .7, Math.max(whole * .35, fitDistance(sphere.radius * 2.6)))
-    return { yaw, pitch: WHOLE.pitch + 4 * DEG, distance, target: centre.clone().lerp(sphere.center, .75) }
+    return { yaw, pitch: entry?.pitch ?? WHOLE.pitch + 4 * DEG, distance, target: centre.clone().lerp(sphere.center, .75) }
   }
   function choose(id: TurntableViewpoint): void {
     chosen = id
@@ -778,12 +782,14 @@ export function createTurntablePayload(options: TurntableOptions): TurntablePayl
     rest = new Box3().setFromObject(object, true)
     radius = Math.max(.05, box.getBoundingSphere(new Sphere()).radius)
     centre = new Vector3(0, size.y / 2, 0)
-    if (host.banded || host.narrow) {
+    const whole = host.banded || host.narrow || options.travels === true
+    if (whole) {
       rest = runBox(rest)
       centre.setY((rest.min.y + rest.max.y) / 2)
       radius = Math.max(radius, rest.getBoundingSphere(new Sphere()).radius)
     }
-    outline = outlineOver(host.banded || host.narrow ? (period ? RUN_SAMPLES : 1) : 1)
+    if (options.travels) centre.set((rest.min.x + rest.max.x) / 2, centre.y, (rest.min.z + rest.max.z) / 2)
+    outline = outlineOver(whole ? (period ? RUN_SAMPLES : 1) : 1)
     const span = Math.max(size.x, size.y, size.z)
     object.traverse(child => {
       if (!(child instanceof Mesh) || child.userData['vitrineOverlay']) return

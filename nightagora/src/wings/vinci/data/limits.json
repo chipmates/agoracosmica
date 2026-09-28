@@ -466,6 +466,18 @@
         "de": "Er beschreibt einen verdunkelten Raum, nicht diesen kleinen Kasten, und die Kerze davor und ihr Bild auf dem Papier sind die Vorführung des Museums.",
         "source": "machines/data/camera-obscura.json, scope and research sheet_vs_reconstruction"
       }
+    },
+    "machine/mechanical-lion": {
+      "limit": {
+        "en": "No drawing, part or measurement of the lion survives, and the accounts disagree on where and when it walked.",
+        "de": "Keine Zeichnung, kein Teil und kein Maß des Löwen ist erhalten, und die Berichte widersprechen sich, wo und wann er ging.",
+        "source": "machines/data/mechanical-lion.json, gaps; machines/data/records.json, mechanical-lion, the folio and Was it built sections"
+      },
+      "visual_note": {
+        "en": "The size, the painted wood, every wheel inside and the open flank that shows them are the museum’s choices.",
+        "de": "Größe, bemaltes Holz, jedes Rad darin und die offene Flanke, die sie zeigt, sind Entscheidungen des Museums.",
+        "source": "machines/data/mechanical-lion.json, scale_m, parts and animation_notes"
+      }
     }
   }
 }

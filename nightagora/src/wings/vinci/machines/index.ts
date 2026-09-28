@@ -15,6 +15,7 @@ import { build as miter_lock_gates } from './miter-lock-gates'
 import { build as water_lifting_screw } from './water-lifting-screw'
 import { build as proportional_compass } from './proportional-compass'
 import { build as camera_obscura } from './camera-obscura'
+import { build as mechanical_lion } from './mechanical-lion'
 
 export * from './catalog'
 export type { ReadyMachineBuild, MachinesStanding, MachineStanding } from './runtime'
@@ -36,6 +37,7 @@ export const builders: Record<MachineSlug, (stack: Stack) => ReadyMachineBuild> 
   'water-lifting-screw': water_lifting_screw,
   'proportional-compass': proportional_compass,
   'camera-obscura': camera_obscura,
+  'mechanical-lion': mechanical_lion,
 }
 
 export function buildMachine(slug: MachineSlug, stack: Stack): ReadyMachineBuild {

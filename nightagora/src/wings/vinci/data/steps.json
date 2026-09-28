@@ -340,6 +340,36 @@
         "de": "Bewegt sich die Flamme zur einen Seite, wandert ihr Bild zur anderen.",
         "certainty": "reconstructed"
       }
+    ],
+    "mechanical-lion": [
+      {
+        "at": 0.06,
+        "part": "key",
+        "en": "In our reconstruction a key winds a spring.",
+        "de": "In unserer Rekonstruktion zieht ein Schlüssel eine Feder auf.",
+        "certainty": "conjectural"
+      },
+      {
+        "at": 0.2,
+        "part": "great-wheel",
+        "en": "Wheels drive it, as a book of 1590 says. The cranks that swing the legs are our guess.",
+        "de": "Räder treiben ihn an, so ein Buch von 1590. Die Kurbeln an den Beinen sind unsere Annahme.",
+        "certainty": "conjectural"
+      },
+      {
+        "at": 0.47,
+        "part": "count-wheel",
+        "en": "After six steps a notched wheel stops it. That wheel is our guess too.",
+        "de": "Nach sechs Schritten hält ihn ein gekerbtes Rad an. Auch dieses Rad ist unsere Annahme.",
+        "certainty": "conjectural"
+      },
+      {
+        "at": 0.6,
+        "part": "lily-board",
+        "en": "Then the chest opens, as the old accounts tell, blue inside with gold lilies.",
+        "de": "Dann öffnet sich die Brust, wie die alten Berichte erzählen, innen blau mit goldenen Lilien.",
+        "certainty": "tradition"
+      }
     ]
   }
 }

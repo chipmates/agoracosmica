@@ -536,6 +536,12 @@
       "de": "Eine Studie zum Licht, kein Bild der Kapelle. Der Tag ist belegt, die Stunde wählten wir.",
       "source": "line/bench/visitor-sources.ts GRAVE_DIAGRAM; grave/README.md, the chosen minute",
       "certainty": "reconstructed"
+    },
+    "machine/mechanical-lion": {
+      "en": "A lion for a King of France walked a few steps and opened its chest full of lilies. This one is our reconstruction.",
+      "de": "Ein Löwe für einen König von Frankreich ging einige Schritte und öffnete die Brust voller Lilien. Dieser ist unsere Rekonstruktion.",
+      "source": "machines/data/records.json, mechanical-lion, the label and the Was it built section, after Vasari 1568 and Lomazzo 1584",
+      "certainty": "tradition"
     }
   }
 }

@@ -6346,6 +6346,209 @@
         "demonstration": true,
         "certainty": "reconstructed"
       }
+    },
+    "mechanical-lion": {
+      "shell": {
+        "en": "Carved shell",
+        "de": "Geschnitzte Hülle"
+      },
+      "flank-panel": {
+        "en": "Flank panel",
+        "de": "Flankenplatte"
+      },
+      "head": {
+        "en": "Head and mane",
+        "de": "Kopf und Mähne"
+      },
+      "tail": {
+        "en": "Tail",
+        "de": "Schwanz"
+      },
+      "frame": {
+        "en": "Oak frame",
+        "de": "Eichenrahmen"
+      },
+      "bearings": {
+        "en": "Iron bearing",
+        "de": "Eisenlager"
+      },
+      "barrel": {
+        "en": "Spring barrel",
+        "de": "Federhaus"
+      },
+      "great-wheel": {
+        "en": "Great wheel",
+        "de": "Großes Rad"
+      },
+      "count-wheel": {
+        "en": "Count wheel",
+        "de": "Zählrad"
+      },
+      "key": {
+        "en": "Winding key",
+        "de": "Aufzugsschlüssel"
+      },
+      "lily-barrel": {
+        "en": "Spring for the lilies",
+        "de": "Feder für die Lilien"
+      },
+      "fore-shaft": {
+        "en": "Crank shaft",
+        "de": "Kurbelwelle"
+      },
+      "fore-pinion": {
+        "en": "Lantern pinion",
+        "de": "Laternentrieb"
+      },
+      "hind-shaft": {
+        "en": "Crank shaft",
+        "de": "Kurbelwelle"
+      },
+      "hind-pinion": {
+        "en": "Lantern pinion",
+        "de": "Laternentrieb"
+      },
+      "detent": {
+        "en": "Detent",
+        "de": "Sperrhebel"
+      },
+      "latch-rod": {
+        "en": "Latch rod",
+        "de": "Riegelstange"
+      },
+      "latch": {
+        "en": "Latch",
+        "de": "Riegel"
+      },
+      "door-left": {
+        "en": "Chest door",
+        "de": "Brusttür"
+      },
+      "door-right": {
+        "en": "Chest door",
+        "de": "Brusttür"
+      },
+      "lily-rack": {
+        "en": "Rack",
+        "de": "Zahnstange"
+      },
+      "lily-board": {
+        "en": "Blue board",
+        "de": "Blaues Brett",
+        "screen": true
+      },
+      "lily-front-0": {
+        "en": "Gold lily",
+        "de": "Goldene Lilie"
+      },
+      "lily-front-1": {
+        "en": "Gold lily",
+        "de": "Goldene Lilie"
+      },
+      "lily-front-2": {
+        "en": "Gold lily",
+        "de": "Goldene Lilie"
+      },
+      "lily-back-0": {
+        "en": "Gold lily",
+        "de": "Goldene Lilie"
+      },
+      "lily-back-1": {
+        "en": "Gold lily",
+        "de": "Goldene Lilie"
+      },
+      "lily-back-2": {
+        "en": "Gold lily",
+        "de": "Goldene Lilie"
+      },
+      "lily-back-3": {
+        "en": "Gold lily",
+        "de": "Goldene Lilie"
+      },
+      "lily-pinion": {
+        "en": "Pinion",
+        "de": "Ritzel"
+      },
+      "fore-left-upper": {
+        "en": "Upper leg",
+        "de": "Oberes Bein"
+      },
+      "fore-left-lower": {
+        "en": "Lower leg",
+        "de": "Unteres Bein"
+      },
+      "fore-left-paw": {
+        "en": "Paw",
+        "de": "Pranke"
+      },
+      "fore-left-lever": {
+        "en": "Leg lever",
+        "de": "Beinhebel"
+      },
+      "fore-left-rod": {
+        "en": "Crank rod",
+        "de": "Schubstange"
+      },
+      "fore-right-upper": {
+        "en": "Upper leg",
+        "de": "Oberes Bein"
+      },
+      "fore-right-lower": {
+        "en": "Lower leg",
+        "de": "Unteres Bein"
+      },
+      "fore-right-paw": {
+        "en": "Paw",
+        "de": "Pranke"
+      },
+      "fore-right-lever": {
+        "en": "Leg lever",
+        "de": "Beinhebel"
+      },
+      "fore-right-rod": {
+        "en": "Crank rod",
+        "de": "Schubstange"
+      },
+      "hind-left-upper": {
+        "en": "Upper leg",
+        "de": "Oberes Bein"
+      },
+      "hind-left-lower": {
+        "en": "Lower leg",
+        "de": "Unteres Bein"
+      },
+      "hind-left-paw": {
+        "en": "Paw",
+        "de": "Pranke"
+      },
+      "hind-left-lever": {
+        "en": "Leg lever",
+        "de": "Beinhebel"
+      },
+      "hind-left-rod": {
+        "en": "Crank rod",
+        "de": "Schubstange"
+      },
+      "hind-right-upper": {
+        "en": "Upper leg",
+        "de": "Oberes Bein"
+      },
+      "hind-right-lower": {
+        "en": "Lower leg",
+        "de": "Unteres Bein"
+      },
+      "hind-right-paw": {
+        "en": "Paw",
+        "de": "Pranke"
+      },
+      "hind-right-lever": {
+        "en": "Leg lever",
+        "de": "Beinhebel"
+      },
+      "hind-right-rod": {
+        "en": "Crank rod",
+        "de": "Schubstange"
+      }
     }
   }
 }

@@ -453,8 +453,9 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       const plates = pictureBodies()
       return {
         done: machinesUp + tableUp + deathbedUp + plates.done,
-        // the reading table and the grave's reproduction are one body each
-        total: MACHINE_SLUGS.length + 1 + 1 + plates.total,
+        // the reading table and the grave's reproduction are one body each;
+        // a machine the house stands, not the collection, is not counted here
+        total: Object.keys(STANDS).length + 1 + 1 + plates.total,
       }
     },
     ready: Promise.all([court.then(() => courtGround).then(() => hall ?? Promise.resolve()).then(() => table ?? Promise.resolve()), pictures.ready]).then(() => undefined),
