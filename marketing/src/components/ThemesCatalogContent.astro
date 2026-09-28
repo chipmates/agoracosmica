@@ -39,13 +39,12 @@ const { lang } = Astro.props;
 const t = getT(lang);
 
 // The answer-first paragraph names all eight questions by reading them
-// straight out of the theme strings, so both languages stay in step.
-const eightQuestions = THEMES.map(theme => t(`themes.${theme.id}.question`));
-const indexAnswer = [
-  t('themes.indexAnswerLead'),
-  ...eightQuestions,
-  t('themes.indexAnswerClose'),
-].join(' ');
+// straight out of the theme strings, so both languages stay in step. Each
+// question is also the link to its page.
+const eightQuestions = THEMES.map(theme => ({
+  question: t(`themes.${theme.id}.question`),
+  href: publicUrl(lang, `/themes/${theme.id}`),
+}));
 
 // Three per group stay open. The rest sit one tap behind a panel, in the
 // markup the whole time, and the group's own theme page carries them all as
@@ -119,7 +118,13 @@ const deeper = lang === 'de'
 
   <header class="tq-index__head">
     <h1 class="tq-index__title">{t('themes.indexTitle')}</h1>
-    <p class="tq-answer">{indexAnswer}</p>
+    <p class="tq-answer">
+      {t('themes.indexAnswerLead')}
+      {eightQuestions.map(q => (
+        <>{' '}<a class="tq-answer__q" href={q.href}>{q.question}</a></>
+      ))}
+      {' '}{t('themes.indexAnswerClose')}
+    </p>
     <p class="tq-index__ai">
       {lang === 'de'
         ? 'Jede Stimme in diesen Debatten ist ein KI-Echo. Deutungen, keine Aufnahmen.'
@@ -211,7 +216,15 @@ const deeper = lang === 'de'
 
 <style is:global>
   .tq-index { padding-bottom: 2.5rem; }
+  /* The breadcrumb sits on the reading column, not on the wider page box. */
+  .tq-index .pub-breadcrumbs { max-width: 42rem; margin-left: auto; margin-right: auto; }
   .tq-index__head { max-width: 42rem; margin: 0 auto 2.5rem; }
+  .tq-answer__q {
+    color: var(--gold-primary);
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-primary) var(--a-40), transparent);
+  }
+  .tq-answer__q:hover { color: var(--gold-hover); border-bottom-color: var(--gold-hover); }
   .tq-index__title {
     margin: 0 0 1.25rem;
     font-family: var(--font-content, 'Libre Caslon Text', serif);
