@@ -234,7 +234,8 @@ const SKIPPED: Readonly<Record<string, readonly RailWaypoint[]>> = {
 /** Turns one walk makes standing, by its pair in walking order. The body
  * wall's walk to the display wall comes out of the picture room facing its
  * entrance and turns to the display wall on the apron's corner: turning
- * there on the move swung the way under the view four times. */
+ * there on the move swung the way under the view four times. The timeline's
+ * walk to the display wall takes the same corner the same way. */
 /** THE GARDEN'S PORCH, at the foot of the collection stair. The garden's eye
  * looks back up at the house and the pavilion's door lies behind it, so a walk
  * in turns round here, standing, and quick: on the move the view was led
@@ -244,6 +245,7 @@ const PAVILION_STATIONS = ['picture-room', 'picture-room-west', 'line-early', 'r
 export const railPairTurns: Readonly<Record<string, readonly RailWaypoint[]>> = {
   'body>supper-wall': [APRON_CORNER], 'supper-wall>body': [APRON_CORNER],
   'body-valve>supper-wall': [APRON_CORNER], 'supper-wall>body-valve': [APRON_CORNER],
+  'line-early>supper-wall': [APRON_CORNER],
   ...Object.fromEntries(PAVILION_STATIONS.map(id => [`garden>${id}`, [APRON_CORNER]])),
 }
 /** A LINK BETWEEN TWO NEIGHBOURING VIEWS THAT BENDS, by its pair either way, in east
