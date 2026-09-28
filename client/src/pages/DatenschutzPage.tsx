@@ -302,7 +302,7 @@ const DatenschutzPage: FC = () => {
             <li>Ihr eigener API-Schlüssel, wenn Sie BYOK nutzen (IndexedDB, verschlüsselt, ausschließlich auf Ihrem Gerät)</li>
             <li>Spracheinstellung (localStorage)</li>
             <li>Zustimmung zu den Nutzungsbedingungen und Altersbestätigung (localStorage)</li>
-            <li>Eine zufällige Browser-Kennung für das tägliche kostenlose Kontingent, erzeugt beim ersten Gespräch im kostenlosen Modus (localStorage) und täglich erneuert</li>
+            <li>Eine zufällige Browser-Kennung für das tägliche kostenlose Kontingent, erzeugt, wenn Sie die App ohne eigenen Schlüssel öffnen (localStorage), und täglich erneuert</li>
             <li>Eine zufällige Kennung für die Community-Zählung, erzeugt, wenn Sie die Community-Seite öffnen (localStorage)</li>
             <li>Ihre Antwort auf die Frage zur Werbe-Messung, Ja oder Nein, mit Version und Datum, damit wir sie respektieren (localStorage) für 12 Monate</li>
             <li>Kurzlebige Daten für den aktuellen Tab (sessionStorage, beim Schließen des Tabs gelöscht): was Sie auf unseren Seiten vor dem Einstieg in die App gewählt haben (Persönlichkeit, Konzil, Kapitel, Frage), ob die Startseite Sie bereits in die App weitergeleitet hat, und bereits erstellte Zusammenfassungen</li>
