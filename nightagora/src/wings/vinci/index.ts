@@ -722,6 +722,9 @@ export function createWing():VinciWingModule {
       question:()=>vinciContent[card]?.door[lang()]??'',
       words:{next:LIFE_CARDS.controls.date.next,back:LIFE_CARDS.controls.date.previous,rail:WING_TEXT.rail},
       go:index=>h.navigate(index),
+      // THE WAY BACK GOES UP ONE LEVEL: standing at a work of a wall, back is
+      // the view the visitor arrived in, before it is the stop before this one
+      up:()=>{if(closeLook?.id){closeLook.back();return true}return standing&&toStationView()},
       leg:()=>{const nav=standing?rail.navigation:undefined;return nav?.active?nav.legWalked:null},
 
       // desk.panel: its host fields
@@ -1012,6 +1015,9 @@ export function createWing():VinciWingModule {
         // THE BODY WALL IS READ WHOLE: a sheet shut goes back to the wall's
         // own eye, where the grid and the valve's niche stand in one frame.
         else if(wallOn()?.id===VINCI_BODY_WALL&&!showing&&!rail.navigation.active)wholeWall()
+        // A WORK SHUT BY THE VISITOR is one level up: back to the stop's own
+        // view. A close that walks on to another stop leaves from the work.
+        else if(!quietClose)toStationView()
         dots?.setOpen(null);dots?.invalidate();paintExhibitTitle();paintHeaderVisibility();paintStrip();refreshRecap()
       }})
     strip=createVinciHangStrip({host:h.labels,onOpen:(id,button)=>openExhibit(id,button)})
@@ -1057,7 +1063,7 @@ export function createWing():VinciWingModule {
         // ONE SURFACE BACK, EXACTLY ONE. The record a close look opened stands
         // over its label, so Escape puts the record away before the window.
         if(e.key==='Escape'&&deskOn('closelook')&&!narrow()&&mode===2&&exhibitSources){e.preventDefault();mode=1;paintDock();return}
-        if(e.key==='Escape'){e.preventDefault();closeLook.close();return}
+        if(e.key==='Escape'){e.preventDefault();closeLook.back();return}
         // THE ARROWS WALK THE WALL while an exhibit stands: the station rail
         // is what the visitor left to come here.
         if(e.key==='ArrowRight'||e.key==='ArrowDown'){e.preventDefault();stepExhibit(1)}
@@ -1070,9 +1076,9 @@ export function createWing():VinciWingModule {
       // room's own three answers.
       if(e.key==='Escape'&&desk?.key(e)){e.preventDefault();return}
       if(e.key==='Escape'&&sheetOpen&&narrow()){e.preventDefault();sheetOpen=false;paintSheet();return}
-      // ESCAPE CLOSES THE CARD FIRST (above), then stands the visitor off the
-      // wall at the nearer of the room's two ends.
-      if(e.key==='Escape'&&onWallStop()){e.preventDefault();mode=1;rail.look(0,0);paintDock();leaveWall();return}
+      // ESCAPE CLOSES THE CARD FIRST (above), then goes one level up: from a
+      // work back to the view the visitor arrived in at this stop.
+      if(e.key==='Escape'&&onWallStop()){e.preventDefault();mode=1;rail.look(0,0);paintDock();if(!toStationView())leaveWall();return}
       if(e.key==='Escape'){e.preventDefault();mode=1;rail.look(0,0);paintDock();sourceControl().focus({preventScroll:true});return}
       if(e.key.toLowerCase()==='l'&&!e.repeat){e.preventDefault();mode=((mode+1)%3) as VinciLabelMode;paintDock();if(mode!==2&&target.closest('.vinci-dock'))sourceControl().focus({preventScroll:true});return}
       if(e.key.toLowerCase()==='p'&&!e.repeat){e.preventDefault();openPlan();return}
@@ -1186,6 +1192,9 @@ export function createWing():VinciWingModule {
    * on its own cap while it still runs. A leg leaves only from the eye the
    * rail placed, so a press, or the field lifting, ends the warm up first. */
   function yieldEye():void{if(warm){warm.abort();warm=undefined}}
+  /** A window shut on the way to something else: no step back is walked. */
+  let quietClose=false
+  function quietly(close:()=>void):void{quietClose=true;try{close()}finally{quietClose=false}}
   /** A LEG THE RAIL CANNOT PROVE IS NOT WALKED: the look still opens where
    * the visitor stands, and the refusal is said on the console. */
   const proved=(leg:()=>boolean):boolean=>{try{return leg()}catch(error){console.error(error);return false}}
@@ -1324,7 +1333,7 @@ export function createWing():VinciWingModule {
     if(!plan||!standing)return
     if(plan.standing){plan.close();return}
     planAdopt=Boolean(closeLook?.id)
-    if(planAdopt)closeLook?.close(false)
+    if(planAdopt)quietly(()=>closeLook?.close(false))
     plan.show()
     planAdopt=false
   }
@@ -1335,7 +1344,7 @@ export function createWing():VinciWingModule {
     if(!life||!standing)return
     if(life.standing){life.close();return}
     lifeAdopt=Boolean(closeLook?.id)
-    if(lifeAdopt)closeLook?.close(false)
+    if(lifeAdopt)quietly(()=>closeLook?.close(false))
     life.show(at)
     lifeAdopt=false
   }
@@ -1580,7 +1589,7 @@ export function createWing():VinciWingModule {
       // the browser's own history back while a new exhibit is opening.
       placeCanonicalStation()
       openExhibit(target.id,null,how)
-      if(back)closeLook?.close(false)
+      if(back)quietly(()=>closeLook?.close(false))
       if(inspectCost)measurement.show(`${s.id} / ${id}`)
       return
     }if(id==='scene')endInspection();if(id==='scene'||id.startsWith('audit-'))rail.look(0,0);if(id==='scene'||id==='audit-cost'){mode=1;paintDock()}if(id==='audit-cost')measurement.show(s.id);if(id==='audit-ui'){mode=1;paintDock();measurement.show(s.id,'ui')}if(id==='audit-ui-labels'){mode=2;paintDock();measurement.show(s.id,'ui')}if(id.startsWith('collection-room')||id.startsWith('collection-hang'))exhibits?.warm()
@@ -2016,6 +2025,16 @@ export function createWing():VinciWingModule {
     if(closeLook?.id){openExhibit(stop.exhibit,null);return}
     wallRun(stop.exhibit)
   }
+  /** BACK AT A WORK IS ONE LEVEL UP: out of the work to the view the visitor
+   * arrived in at this stop, walked back along the wall's own line. */
+  function toStationView():boolean {
+    const wall=wallOn(), stop=stopAt(card)
+    if(!wall||!onWallStop()||!railReady()||activeView)return false
+    const place=railPlaceOf(stop), vertex=walkVertex(stop)??vinciWallEndVertex(wall,place)
+    if(vertex===undefined||vertex===wallAt())return false
+    yieldEye()
+    return proved(()=>rail.along(vertex,place,vinciWalkPose(stop,narrow())))
+  }
   /** Off the wall at the nearer of the room's two ends, which is where a walk
    * that leaves the wall begins. */
   function leaveWall():void {
@@ -2198,11 +2217,12 @@ export function createWing():VinciWingModule {
     }
     return undefined
   }
-  /** THE FOLIO BESIDE A MACHINE opens that leaf, with its three ways and the
-   * strip of the manuscript it stands in. Back returns to the machine. */
+  /** THE FOLIO BESIDE A MACHINE opens that leaf, with its three ways, and
+   * pages through that machine's own leaves only. Back returns to the machine. */
   function openFolioDoor(slug:MachineSlug,base:string,back:()=>void):void {
     const table=theBook()
-    openLeafReading(table?.pages.find(page=>page.page_kind==='facsimile'&&page.machine_slugs.includes(slug)),base,back)
+    const own=(page:PageRecord)=>page.page_kind==='facsimile'&&page.machine_slugs.includes(slug)
+    openLeafReading(table?.pages.find(own),base,back,{only:own,upLabel:machineCatalog[slug].title[lang()]})
   }
   /** THE PAGE THE STUDY'S SUPPORT IS READ AT. Read from the edition's own
    * record and not from the reading table, because the table is built when a
@@ -2227,7 +2247,8 @@ export function createWing():VinciWingModule {
   const leafStem=(page:PageRecord):string=>page.file.replace(/^.*\//,'').replace(/\.[a-z]+$/,'')
   /** ONE ADMITTED LEAF, OPENED WHERE THE VISITOR STANDS. The reading is the
    * table module's own: its pages, its pyramids, its three ways. */
-  function openLeafReading(leaf:PageRecord|undefined,base:string,back:()=>void):void {
+  function openLeafReading(leaf:PageRecord|undefined,base:string,back:()=>void,
+    part?:{only(page:PageRecord):boolean;upLabel:string}):void {
     const table=theBook()
     if(!table||!leaf||!closeLook)return
     const codex=CODEX_ENTRIES.find(record=>record.id===`paris-${leaf.codex}`)
@@ -2242,10 +2263,11 @@ export function createWing():VinciWingModule {
       more:text(VINCI_VITRINE_WORDS.more),honesty:text(VINCI_PAGE_HONESTY),
       words:vinciManuscriptWords(),colour:certaintyColour('documented'),
       tier:()=>hosts?.world.stack.tierName()??'standard',start:`edition:${leaf.edition_index}`,
-      changed:()=>{if(exhibitSources?.id===id&&mode===2)paintDock()}})
+      changed:()=>{if(exhibitSources?.id===id&&mode===2)paintDock()},only:part?.only})
     closeLook.open({id,title:lang()==='de'?codex?.de??'':codex?.en??'',line:null,card:[],payload:reader,
       controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),control(VINCI_VITRINE_WORDS.back,back),
-        control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())],...exhibitStand(base)},null,'advance')
+        control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())],...exhibitStand(base),
+      up:back,...(part?{upLabel:part.upLabel}:{})},null,'advance')
   }
   /** A BOOK OF THE SHELF, OPENED ON THE TABLE in the reader where the visitor
    * stands: no walk, the reader takes the window at once, and the record
@@ -2367,7 +2389,9 @@ export function createWing():VinciWingModule {
     }
     closeLook.open({id:door,title:named(opened),line:vinciLine(id),card:[],payload:reader,
       controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())],
-      ...(toFilm?{walk:[toFilm]}:{}),...vinciLimits(id),...exhibitStand(id)},from,how)
+      ...(toFilm?{walk:[toFilm]}:{}),...vinciLimits(id),...exhibitStand(id),
+      // from a film's sheet one level up is the film, named as it is
+      ...(back?{up:back,upLabel:named(opened)}:{})},from,how)
   }
   /** A SHEET WHOSE FILM THE STORE CARRIES OPENS AS THAT FILM: the model the
    * sheet describes, its lines under it, and the sheet itself behind its own
@@ -2948,7 +2972,7 @@ export function createWing():VinciWingModule {
     if(pendingExhibit&&vinciApproachStation(pendingExhibit.replace(/^(?:open|walk):/,''))!==contentAt(index).id)pendingExhibit=''
     // THE STATION RAIL STAYS LIVE. Pressing a station closes the exhibit and
     // the rail walks from the station eye, which is the certified pair.
-    closeLook?.close()
+    quietly(()=>closeLook?.close())
     exhibitSources=null;endInspection();if(station!==index)sources.resetScroll();station=index;activeView='';measurement.hide()
     endChapterCard()
     const cut=cutToStation()

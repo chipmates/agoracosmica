@@ -67,6 +67,9 @@ export function createReaderPayload(options: {
   changed(): void
   /** Open another book of the shelf, from the record's list of codices. */
   openBook?(id: string): void
+  /** The leaves this reading holds, where a door opens a part of the book:
+   * a machine's folio pages through that machine's own leaves only. */
+  only?(page: PageRecord): boolean
 }): ReaderPayload {
   const { table } = options
   const pages = table.pages
@@ -145,6 +148,7 @@ export function createReaderPayload(options: {
     const sides: ReaderSide[] = []
     for (const page of pages) {
       if (page.page_kind !== 'facsimile') continue
+      if (options.only && !options.only(page)) continue
       const read = scan(page)
       if (!read) continue
       const named = FAMOUS_FOLIOS.find(entry => folioKey(page) === `B:${entry.folio}`)
@@ -166,7 +170,8 @@ export function createReaderPayload(options: {
     }
     return {
       sides,
-      gaps: gapAfter(sides),
+      // a part of the book says nothing of the leaves missing from the whole
+      gaps: options.only ? [] : gapAfter(sides),
       stripLabel: () => SHELF_UI[language].edition,
       partLabel: part => [codexName(part), CODEX_TITLES[`paris-${part}`]?.[language] ?? ''],
       holder,
@@ -305,6 +310,9 @@ export function createReaderPayload(options: {
       const folioUrl = page.machine_sources.find(source => source.folio_source_url)?.folio_source_url
       if (folioUrl) link(copy.folioSource, folioUrl)
       add(page.licence_line)
+      // A reading of a part of the book holds no other leaf to open, so the
+      // registers that walk the whole edition stay with the table's reading.
+      if (options.only) { record.append(full); return }
       // THE THIRD REGISTER. The register of every codex the museum holds,
       // the ones it cannot show, and the eight studies this wing is built
       // from: the full chain, opened on purpose.

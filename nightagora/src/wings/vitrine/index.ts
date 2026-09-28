@@ -34,6 +34,9 @@ export interface Vitrine {
   /** `pop` false leaves the browser's own entry where it is, for a caller
    * composing a still rather than dismissing on a visitor's behalf. */
   close(pop?: boolean): void
+  /** ONE LEVEL UP: a detail goes back to the close look it was opened from,
+   * a close look leaves the window. Every kind takes the same step. */
+  back(): void
   escape(): boolean
   /** True while the window owns the keys and the wheel over its own surface. */
   owns(target: Element | null): boolean
@@ -166,7 +169,7 @@ export function createVitrine(options: {
   let band: CloseLookBand | null = null
   function theBand(): CloseLookBand {
     if (band) return band
-    band = createCloseLookBand({ lang: options.lang, back: () => shut(), resized: () => layout() })
+    band = createCloseLookBand({ lang: options.lang, back: () => up(), resized: () => layout() })
     root.append(band.element)
     return band
   }
@@ -449,7 +452,7 @@ export function createVitrine(options: {
       certainty: next.certainty ?? null,
       set: next.set ?? null,
       catalogue: next.catalogue ?? null,
-      room: options.room?.() ?? '',
+      room: next.upLabel ?? options.room?.() ?? '',
       words: [...next.card, ...(paged ? [aside] : []), ...(next.after ?? [])],
       record: roles.get('record') ?? null,
       back,
@@ -533,6 +536,9 @@ export function createVitrine(options: {
     if (popping) { popping = false; return }
     if (!open) return
     marked = false
+    // the browser's Back is one level up as well; the level it lands on
+    // keeps one entry of its own for the next Back
+    if (exhibit?.up) { mark(); exhibit.up(); return }
     dismiss()
   }, { signal: leaving.signal })
   view.addEventListener('resize', () => {
@@ -545,6 +551,11 @@ export function createVitrine(options: {
     if (!open) return
     if (pop) unmark(); else marked = false
     dismiss()
+  }
+  function up(): void {
+    if (!open) return
+    if (exhibit?.up) { exhibit.up(); return }
+    shut()
   }
 
   return {
@@ -614,9 +625,10 @@ export function createVitrine(options: {
       else if (!advancing || inside) card.focus({ preventScroll: true })
     },
     close: shut,
+    back: up,
     escape() {
       if (!open) return false
-      shut()
+      up()
       return true
     },
     owns(target) {

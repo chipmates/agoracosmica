@@ -101,6 +101,11 @@ export interface VitrineExhibit {
   payload: VitrinePayload | null
   /** The work's rectangle at the frame the room stands at. */
   work?: () => VitrineRect | null
+  /** ONE LEVEL UP, where this exhibit is a detail opened from another's close
+   * look: that close look again. Absent, one level up leaves the window. */
+  up?: () => void
+  /** The name of the close look `up` returns to, in the page's language. */
+  upLabel?: string
   /** What the evidence does not say, and what the view invents or refuses
    * to show. Read behind the record's control; empty until a text seat
    * writes them. */

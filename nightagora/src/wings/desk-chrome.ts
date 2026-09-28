@@ -68,6 +68,8 @@ export interface DeskChromeHost {
     rail: VinciText
   }
   go: (index: number) => void
+  /** one level up before the stop before: true when the wing took the step */
+  up?: () => boolean
   /** how much of the leg under way is walked, 0 to 1, or null at rest */
   leg: () => number | null
   /** a second press on the gold control while a leg runs */
@@ -467,6 +469,7 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
   }
 
   back.addEventListener('click', () => {
+    if (host.up?.()) return
     const at = host.standing()
     if (at.index > 0) host.go(at.index - 1)
   })
