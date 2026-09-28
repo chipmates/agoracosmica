@@ -174,15 +174,19 @@ function mineralFinish(kind:ShellSurfaceKind,clayWeight:N,baseNormal:N,regional:
   const signedSafe=det.greaterThanEqual(0).select(float(1),float(-1)).mul(det.abs().max(1e-12))
   const fromUV=(g:N):N=>rx.mul(g.dot(U.dFdx())).add(ry.mul(g.dot(U.dFdy()))).div(signedSafe)
   const recipe=(clay:boolean):{gradient:N;colour:N;roughness:N}=>{
-    const pores=aggregateField(U,footprint,{cell:clay?.012:.016,radius:clay?[.10,.22]:[.08,.19],probability:clay?.80:.45,seed:clay?1.173:5.719})
+    const cell=clay?.012:.016,radius:[number,number]=clay?[.10,.22]:[.08,.19]
+    const pores=aggregateField(U,footprint,{cell,radius,probability:clay?.80:.45,seed:clay?1.173:5.719})
+    // a pore's tone needs two pixels across it and its pit four, or the walk re-samples it every frame
+    const across=float((radius[0]+radius[1])*cell).div(footprint.x.max(footprint.y).max(1e-7))
+    const poreShade=smoothstep(2,4,across),poreTilt=smoothstep(4,8,across)
     const body=denseMineralBody(U,footprint,clay)
     const scale=clay?.12:.18,fade=float(1).sub(smoothstep(scale/8,scale/2,worldPixel))
     const broad=mx_noise_float(P.div(scale).add(vec3(1.73,5.19,11.71))).mul(2.4).clamp(-1,1)
     const broadHeight=broad.mul(.00018)
     const broadGradient=rx.mul(broadHeight.dFdx()).add(ry.mul(broadHeight.dFdy())).div(signedSafe).mul(fade)
-    const gradient=fromUV(pores.gradient.mul(clay?-.00055:-.00038).add(body.gradient)).add(broadGradient)
-    return{gradient,colour:pores.value.mul(clay?-.12:-.10).add(body.colour).add(broad.mul(.020).mul(fade)),
-      roughness:pores.value.mul(.045).add(body.roughness)}
+    const gradient=fromUV(pores.gradient.mul(clay?-.00055:-.00038).mul(poreTilt).add(body.gradient)).add(broadGradient)
+    return{gradient,colour:pores.value.mul(clay?-.12:-.10).mul(poreShade).add(body.colour).add(broad.mul(.020).mul(fade)),
+      roughness:pores.value.mul(.045).mul(poreShade).add(body.roughness)}
   }
   const brick=recipe(true),stone=kind==='brick'?brick:recipe(false)
   let gradient=mix(stone.gradient,brick.gradient,clayWeight)

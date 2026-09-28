@@ -41,7 +41,11 @@ export function denseMineralBody(U:N,footprint:N,clay:boolean):{gradient:N;colou
     const c=Math.cos(r.angle),s=Math.sin(r.angle),Q=vec2(U.x.mul(c).add(U.y.mul(s)),U.y.mul(c).sub(U.x.mul(s))).div(r.cell).toVar()
     const W=vec2(footprint.x.mul(Math.abs(c)).add(footprint.y.mul(Math.abs(s))),footprint.x.mul(Math.abs(s)).add(footprint.y.mul(Math.abs(c)))).div(r.cell).toVar()
     const f=denseQuadraticField(Q,W,float(r.seed*73.17)),g=vec2(f.y.mul(c).sub(f.z.mul(s)),f.y.mul(s).add(f.z.mul(c))).div(r.cell)
-    gradient=gradient.add(g.mul(r.height));colour=colour.add(f.x.mul(r.colour));roughness=roughness.add(f.x.mul(r.roughness))
+    // A GRAIN FINER THAN A FEW PIXELS IS NOISE THE PIXEL GRID SAMPLES ANEW
+    // AT EVERY STEP OF A WALK: its tone needs two pixels a cell, its slope four.
+    const extent=W.x.max(W.y)
+    const shade=float(1).sub(smoothstep(.25,.5,extent)),tilt=float(1).sub(smoothstep(.125,.25,extent))
+    gradient=gradient.add(g.mul(r.height).mul(tilt));colour=colour.add(f.x.mul(r.colour).mul(shade));roughness=roughness.add(f.x.mul(r.roughness).mul(shade))
   }
   return{gradient,colour,roughness}
 }

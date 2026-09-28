@@ -190,6 +190,8 @@ const DRAG_WAIT_MS = Number(value('drag-wait', '25')) || 25
 const PACE = value('pace', '')
 /** the pose has stood when it has not moved for this many frames */
 const STAND_FRAMES = 10
+/** how long a leg may hold its first pose before it is read as a cut */
+const START_GRACE_FRAMES = 240
 const STAND_CEILING_MS = 30_000
 const STAND_EPSILON = 1e-5
 const ARRIVED_SETTLE_MS = 2200
@@ -1271,7 +1273,7 @@ async function walkLeg(page, client, from, to, name, keepPairs) {
   /* THE CAST RUNS UNTIL THE WALK IS OVER, and the walk is over when the app's
      own pose has stopped moving, not when a guessed delay has run out. */
   await page.evaluate(
-    ([ceiling, want, eps]) =>
+    ([ceiling, want, eps, START_GRACE_FRAMES]) =>
       new Promise((done) => {
         const clock = window.__even ? window.__even.realNow : performance.now.bind(performance)
         const pose = () => {
@@ -1281,16 +1283,22 @@ async function walkLeg(page, client, from, to, name, keepPairs) {
         const began = clock()
         let last = pose()
         let held = 0
+        /* a leg may hold its first pose for a moment before the eye sets
+           off, so the stand is only counted once the pose has moved, or
+           once a leg that never moves (a cut) has had its grace */
+        let moved = false, frames = 0
         const tick = () => {
           const now = pose()
-          held = now && last && now.every((v, i) => Math.abs(v - last[i]) <= eps) ? held + 1 : 0
+          const same = now && last && now.every((v, i) => Math.abs(v - last[i]) <= eps)
+          if (!same || ++frames > START_GRACE_FRAMES) moved = true
+          held = moved && same ? held + 1 : 0
           last = now ?? last
           if (held >= want || clock() - began >= ceiling) return done(null)
           requestAnimationFrame(tick)
         }
         requestAnimationFrame(tick)
       }),
-    [LEG_CEILING_MS, STAND_FRAMES, STAND_EPSILON]
+    [LEG_CEILING_MS, STAND_FRAMES, STAND_EPSILON, START_GRACE_FRAMES]
   )
   const { times, even, heldFrom, stale } = await cast.stop()
   const rec = await stopRecorder(page)
