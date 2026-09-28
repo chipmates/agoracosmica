@@ -481,3 +481,5 @@
    evening falls, and nothing of it takes a press. */
 #wing[data-wing='vinci'][data-farewell] > * {opacity:0;pointer-events:none;transition:opacity .9s ease;}
 body:has(#wing[data-wing='vinci'][data-farewell]) :is(#rail-instruments,#rail-sound) {opacity:0;visibility:hidden;}
+/* the museum's wordmark goes with it; it is back the moment the lobby stands */
+body:has(#wing[data-wing='vinci'][data-farewell]) .brand {opacity:0;transition:opacity .9s ease;}
