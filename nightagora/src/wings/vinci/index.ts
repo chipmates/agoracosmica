@@ -299,6 +299,8 @@ export function createWing():VinciWingModule {
    * museum, at the head of the collection stair (`descend`). */
   const NAMED_ENTRY=typeof location!=='undefined'&&/(?:^|[#&])s=/.test(location.hash)
   let descending=false
+  /** how long the eye stands at the stair head before the walk goes down */
+  const STAIR_HEAD_HOLD_MS=1400
   const stopAt=(index:number):VinciWalkStop=>WALK.stops[Math.max(0,Math.min(WALK.stops.length-1,index))]!
   const stationOf=(id:string):VinciStationContent=>vinciContent.find(station=>station.id===id)??vinciContent[0]!
   const contentAt=(index:number):VinciStationContent=>stationOf(stopAt(index).station)
@@ -1301,7 +1303,8 @@ export function createWing():VinciWingModule {
     // the field and its backdrop over the gold. The eyes arrive through the
     // forge marker, and a sheet over the arrival frame would stand in every
     // frame they shoot.
-    if(!document.body.classList.contains('forge')&&!vinciWelcomeSeen()&&card===0)welcome?.open()
+    // the walk that begins above the museum opens on the Arno card instead
+    if(!descending&&!document.body.classList.contains('forge')&&!vinciWelcomeSeen()&&card===0)welcome?.open()
     void descend()
   }
   const atStairHead=():boolean=>standing&&rail.navigation.completed===vinciRailPlace(VINCI_STAIR_HEAD)&&!rail.navigation.active
@@ -1311,9 +1314,14 @@ export function createWing():VinciWingModule {
    * sheet. A visitor who asks for a stop first is taken there instead. */
   async function descend():Promise<void>{
     if(!descending||!hosts)return
+    // the view from the stair head is seen before anything moves: the entry's
+    // field lifts, the opening card has its say, and the eye stands a beat
+    await new Promise<void>(resolve=>{const look=()=>document.body.classList.contains('entering')?requestAnimationFrame(look):resolve();look()})
+    if(!hosts)return
     await awaitOpening(hosts.labels)
     const panel=welcome?.element
     if(panel?.open)await new Promise<void>(resolve=>panel.addEventListener('close',()=>resolve(),{once:true}))
+    await new Promise<void>(resolve=>setTimeout(resolve,STAIR_HEAD_HOLD_MS))
     if(!descending||!atStairHead())return
     walkDown()
   }
@@ -1794,6 +1802,8 @@ export function createWing():VinciWingModule {
   /** What each exhibit's mark says and what colour it carries: its own name
    * and its own certainty, both off the picture module's register. */
   function paintExhibitMarks():void {
+    // above the museum nothing is pressable yet: the walk goes down first
+    if(atStairHead()){dots?.setExhibits([]);return}
     const sources=exhibits?.pictureSources()??[]
     const marks:VinciExhibitMark[]=[]
     // the two kinds of mark, decided per exhibit and never by colour alone
@@ -3130,11 +3140,11 @@ export function createWing():VinciWingModule {
     if(!hosts){mount(h);station=card=index;paintHeader();schedule();return}
     // A station asked for before the place is built is remembered, not lost.
     if(!standing){station=card=index;paintHeader();return}
-    // AT THE HEAD OF THE STAIR the one walk is the descent to the first stop;
-    // any other stop asked for fades there.
+    // AT THE HEAD OF THE STAIR the one walk is the descent to the first stop:
+    // the way on takes it, and any stop further on fades there.
     if(atStairHead()){
       quietly(()=>closeLook?.close())
-      if(index===0){walkDown();return}
+      if(index<=1){walkDown();return}
       descending=false;station=index;fadeTo(index);return
     }
     const asked=station
