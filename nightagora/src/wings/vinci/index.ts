@@ -73,7 +73,7 @@ import { readingTableOf } from './table'
 import { CODEX_ABSENCES, CODEX_ENTRIES, EDITION_EXHIBIT, SHELF_BOOKS, isCollectionBook, shelfBook, shelfPlate } from './table/codex-shelf'
 import { createCodexReaderPayload, type CodexReaderPayload } from './table/codex-reader'
 import type { ReadingTable } from './table'
-import { FAMOUS_FOLIOS, SHELF_UI, TABLE_UI, type PageRecord } from './table/content'
+import { FAMOUS_FOLIOS, MIRROR_EXPLANATION, SHELF_UI, TABLE_UI, type PageRecord } from './table/content'
 import { vinciLeafSource } from './collection/deep-plate'
 import studyPageMap from './table/data/msb-pages.json?raw'
 import { createReaderPayload, type ReaderPayload } from './table/reader'
@@ -2340,8 +2340,8 @@ export function createWing():VinciWingModule {
   /** THE BODY WALL IS ONE BOOK. A press on any sheet opens the whole wall in
    * the reader at that sheet, in the order the wall hangs them: the arrows,
    * the keys and the swipe walk the wall itself, and the card, the strip and
-   * the record follow the sheet standing. One way, because a drawn sheet has
-   * no second face and no printed page beside it. */
+   * the record follow the sheet standing. Two ways, his hand and its mirror,
+   * as a manuscript page has; a drawn sheet has no printed page beside it. */
   function openSheetDoor(id:string,from:HTMLElement|null,how:'enter'|'advance',back?:()=>void):void {
     // THE BOOK'S ORDER IS THE WALL'S. The sheets are read in the order the
     // wall is walked, so the arrows in the reader and the arrows in the room
@@ -2367,6 +2367,11 @@ export function createWing():VinciWingModule {
       }}
     }
     const openRecord=()=>{record();sources.resetScroll();sources.select('station');mode=2;paintDock()}
+    // HIS HAND AND ITS MIRROR, as every manuscript page is read: the sheets
+    // carry his reversed writing beside the drawing
+    const words=vinciManuscriptWords()
+    const ways=[{id:'hand',label:words.hand},
+      {id:'mirror',label:words.mirror,mirrored:true,line:MIRROR_EXPLANATION[lang()].documented}]
     // FROM A FILM the sheet stands alone, and the way back is the film's
     const sides=(back?[opened]:wall).map(source=>{
       const page=validateSheetRecord(source.page,'sheet-page')
@@ -2374,7 +2379,7 @@ export function createWing():VinciWingModule {
       const record=source.page as typeof source.page&{holder?:string}
       return {id:source.sheet.id,label:named(source),shows:'',head:vinciLine(`sheet/${source.sheet.id}`),
         source:{pyramid:null,file:assetAddress(page.entry),width:page.pixels.width,height:page.pixels.height},
-        thumb:assetAddress(thumb.entry),ways:[],colour:certaintyColour('documented'),holder:record.holder??''}
+        thumb:assetAddress(thumb.entry),ways,colour:certaintyColour('documented'),holder:record.holder??''}
     })
     reader=createVitrineReaderPayload({
       book:Promise.resolve({sides,
@@ -2382,7 +2387,7 @@ export function createWing():VinciWingModule {
         // strip beside it is.
         stripLabel:()=>text(hereContent().name),
         holder:'',honesty:text(VINCI_PAGE_HONESTY)}),
-      start:opened.sheet.id,words:vinciManuscriptWords(),
+      start:opened.sheet.id,words,
       tier:()=>hosts?.world.stack.tierName()??'standard',
       changed:()=>{if(exhibitSources?.id===door&&mode===2){record();paintDock()}}})
     let toFilm:HTMLButtonElement|null=null
