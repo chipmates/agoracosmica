@@ -36,6 +36,7 @@ import { forwardConversionToGoogleAds } from '../src/services/googleAdsCapi';
 import { checkServingRegions, regionVerified, runRegionProbe } from '../src/services/regionProbe';
 import { handleChat } from '../src/routes/chat';
 import { handleFunnel } from '../src/routes/funnel';
+import { handleEntry } from '../src/routes/entry';
 import { handlePage } from '../src/routes/page';
 import { handleQuota } from '../src/routes/quota';
 import { handleSession } from '../src/routes/session';
@@ -1294,6 +1295,50 @@ async function main(): Promise<number> {
     for (const step of ['ask_listen', 'ask_listen_failed', 'ask_listen_resume', '', 'made_up_step']) {
       const row = await funnelBeacon({ step, figureId: 'aurelius', mode: 'story', language: 'en' });
       assertEqual(row, undefined, `unlisted step recorded: ${JSON.stringify(step)}`);
+    }
+  });
+
+  // -------------------------------------------------------------------------
+  // The landing's source class on the entry and first-chat rows
+  // -------------------------------------------------------------------------
+
+  const entryBeaconRow = async (payload: Record<string, unknown>) => {
+    analyticsRows.length = 0;
+    await handleEntry(
+      new Request('https://example.invalid/v1/entry', {
+        method: 'POST',
+        headers: { 'CF-Connecting-IP': '10.0.0.21' },
+        body: JSON.stringify(payload),
+      }),
+      fakeEnv(),
+    );
+    return analyticsRows[0];
+  };
+
+  await test('an entry carries a listed source class in blob3, anything else as empty', async () => {
+    const row = await entryBeaconRow({ path: '/app', language: 'de', source: 'search' });
+    assertEqual(row.blobs[0], 'entry', 'event type');
+    assertEqual(row.blobs[2], 'search', 'the class in blob3');
+    assertEqual(row.blobs[3], 'de', 'language unchanged at blob4');
+    for (const value of [undefined, 'google.com', 'SEARCH', 1, { src: 'search' }]) {
+      const other = await entryBeaconRow({ path: '/app', language: 'en', source: value });
+      assertEqual(other.blobs[2], '', `rejected: ${JSON.stringify(value)}`);
+    }
+  });
+
+  await test('first-chat steps carry the source class in blob8, other steps never', async () => {
+    for (const step of ['first_turn', 'first_turn_prefilled']) {
+      const row = await funnelBeacon({ step, figureId: 'aurelius', mode: 'free_conversation', language: 'en', source: 'assistant' });
+      assertEqual(row.blobs[7], 'assistant', `${step} keeps the class`);
+      assertEqual(row.blobs[2], 'free_conversation', `${step} keeps its mode`);
+      const bare = await funnelBeacon({ step, figureId: 'aurelius', language: 'en' });
+      assertEqual(bare.blobs[7], '', `${step} without a class`);
+      const odd = await funnelBeacon({ step, figureId: 'aurelius', language: 'en', source: 'https://chatgpt.com' });
+      assertEqual(odd.blobs[7], '', `${step} with an unlisted value`);
+    }
+    for (const step of ['figure_selected', 'welcome_shown', 'cta_click']) {
+      const row = await funnelBeacon({ step, figureId: 'aurelius', mode: 'figure', language: 'en', source: 'search' });
+      assertEqual(row.blobs[7], '', `${step} drops the class`);
     }
   });
 

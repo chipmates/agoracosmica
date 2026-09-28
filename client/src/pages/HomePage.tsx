@@ -934,7 +934,7 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
         // Funnel: first chat turn this tab (the North Star activation event).
         // Fires for BYOK users too — their chat bypasses the proxy entirely,
         // so this beacon is the only server-visible signal a conversation
-        // started. One-shot via tab-scoped sessionStorage, gated on the submit
+        // started. One-shot per page load (page memory), gated on the submit
         // (the assistant has not replied yet), never on assistant count.
         //
         // A send whose text came from a staged question is never a typed first

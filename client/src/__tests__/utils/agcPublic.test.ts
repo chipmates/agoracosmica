@@ -177,3 +177,47 @@ describe('agc-public.js: the 12-month memory', () => {
     expect(sessionStorage.getItem('agc_gclid')).toBe(CLICK);
   });
 });
+
+describe('agc-public.js: the source class on the app doors', () => {
+  function setReferrer(value: string) {
+    Object.defineProperty(document, 'referrer', { value, configurable: true });
+  }
+  afterEach(() => setReferrer(''));
+
+  it('marks the app doors of a landing page with the class, and nothing else', () => {
+    setReferrer('https://www.google.de/');
+    const a = door({}, '/app?figure=marcus-aurelius&lang=en');
+    const b = door({}, '/app/');
+    const own = door({}, '/app?lang=en#already');
+    const other = door({}, '/figures/seneca/');
+    const outside = door({}, 'https://github.com/chipmates/agoracosmica');
+    loadPage('/marcus-aurelius/');
+    expect(a.getAttribute('href')).toBe('/app?figure=marcus-aurelius&lang=en#src=search');
+    expect(b.getAttribute('href')).toBe('/app/#src=search');
+    expect(own.getAttribute('href')).toBe('/app?lang=en#already');
+    expect(other.getAttribute('href')).toBe('/figures/seneca/');
+    expect(outside.getAttribute('href')).toBe('https://github.com/chipmates/agoracosmica');
+    expect(storageKeys(sessionStorage)).toEqual([]);
+  });
+
+  it('marks direct arrivals as direct', () => {
+    const a = door({}, '/app?lang=de');
+    loadPage('/de/');
+    expect(a.getAttribute('href')).toBe('/app?lang=de#src=direct');
+  });
+
+  it('leaves the doors alone on a page reached from our own site', () => {
+    setReferrer(`${window.location.origin}/figures/`);
+    const a = door({}, '/app?lang=en');
+    loadPage('/marcus-aurelius/');
+    expect(a.getAttribute('href')).toBe('/app?lang=en');
+  });
+
+  it('marks a door an island renders later, when it is used', () => {
+    setReferrer('https://chatgpt.com/');
+    loadPage('/marcus-aurelius/');
+    const late = door({}, '/app?figure=seneca&lang=en');
+    click(late);
+    expect(late.getAttribute('href')).toBe('/app?figure=seneca&lang=en#src=assistant');
+  });
+});

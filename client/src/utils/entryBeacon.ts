@@ -11,6 +11,7 @@
 import { isSelfHost } from '../config/deployment';
 import { probeField } from './probeSession';
 import { shownLanguage } from './shownLanguage';
+import { arrivalSource } from './arrivalSource';
 
 const API_BASE = import.meta.env.VITE_FREE_TIER_API_URL || '';
 
@@ -20,6 +21,8 @@ const API_BASE = import.meta.env.VITE_FREE_TIER_API_URL || '';
  *   - path (no query string, validated server-side against a regex)
  *   - language (en/de)
  *   - country (CF-edge two-letter code, server-side)
+ *   - the landing's source class, when the visit came in through a door on
+ *     the public page it landed on (utils/arrivalSource.ts)
  *   - the in-house probe constant, only from a browser marked as one
  *
  * No user dimension, no message content, no fingerprint. Same posture as
@@ -32,6 +35,7 @@ export function sendEntryBeacon(): void {
     const body = JSON.stringify({
       path,
       language: shownLanguage(),
+      source: arrivalSource(),
       probe: probeField(),
     });
 

@@ -9,12 +9,15 @@
 // Privacy: aggregate counter only. No user dimension. No IP retention.
 // Same legal posture as the rest of analytics — see docs/MEASUREMENT.md.
 
-import { trackEntry, readCountry, readDevice, readProbe } from '../utils/analytics';
+import { trackEntry, readCountry, readDevice, readProbe, readSource } from '../utils/analytics';
 import type { Env } from '../utils/types';
 
 interface EntryPayload {
   path?: string;
   language?: string;
+  // The landing's source class, from the door link's fragment. Optional:
+  // older clients send none and get an empty slot.
+  source?: unknown;
   probe?: unknown;
 }
 
@@ -56,6 +59,7 @@ export async function handleEntry(request: Request, env: Env): Promise<Response>
 
   trackEntry(env, {
     path,
+    source: readSource(payload.source),
     language: lang,
     country: readCountry(request),
     device: readDevice(request),

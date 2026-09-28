@@ -313,13 +313,43 @@
     } catch (e) { return false; }
   }
 
+  // The source class rides on landings only: an internal navigation has no
+  // arrival to describe, and the referrer of one is our own page.
+  var LANDING = isLandingPageview();
+  var ARRIVAL_CLASS = LANDING ? sourceClass(window.location.href, document.referrer) : undefined;
+
+  // On a landing page the app doors carry the class into the app in the
+  // link's fragment (#src=search): a fragment never travels with a request,
+  // and the app reads it once, removes it and stores nothing. A link that has
+  // a fragment of its own keeps it.
+  function isAppDoor(a) {
+    try {
+      var u = new URL(a.href, window.location.href);
+      return u.origin === window.location.origin &&
+        (u.pathname === '/app' || u.pathname.indexOf('/app/') === 0);
+    } catch (e) { return false; }
+  }
+
+  function markDoor(a) {
+    if (!ARRIVAL_CLASS || !isAppDoor(a)) return;
+    try {
+      var u = new URL(a.href, window.location.href);
+      if (u.hash) return;
+      a.setAttribute('href', u.pathname + u.search + '#src=' + ARRIVAL_CLASS);
+    } catch (e) { /* leave the link as it is */ }
+  }
+
+  function markDoors() {
+    if (!ARRIVAL_CLASS) return;
+    var links = document.querySelectorAll('a[href]');
+    for (var i = 0; i < links.length; i++) markDoor(links[i]);
+  }
+
   function sendPageBeacon() {
     try {
       var docLang = (document.documentElement.lang || 'en').toLowerCase();
       var language = docLang.indexOf('de') === 0 ? 'de' : 'en';
-      // The source class rides on landings only: an internal navigation has no
-      // arrival to describe, and the referrer of one is our own page.
-      var landing = isLandingPageview();
+      var landing = LANDING;
       // Absolute worker URL on purpose (agoracosmica.org has no /v1/* route).
       fetch('https://llm.agoracosmica.org/v1/page', {
         method: 'POST',
@@ -328,7 +358,7 @@
           path: window.location.pathname,
           language: language,
           landing: landing ? 1 : undefined,
-          source: landing ? sourceClass(window.location.href, document.referrer) : undefined,
+          source: ARRIVAL_CLASS,
           probe: probeField(),
         }),
         keepalive: true,
@@ -365,6 +395,15 @@
   captureGclidFromUrl();
   sendPageBeacon();
   if (hasPaidParam()) sendPaidArrivalBeacon();
+  markDoors();
+
+  // Doors an island renders after this script ran get the class when used.
+  function markUsedDoor(e) {
+    var link = e.target instanceof Element ? e.target.closest('a[href]') : null;
+    if (link) markDoor(link);
+  }
+  document.addEventListener('click', markUsedDoor, true);
+  document.addEventListener('auxclick', markUsedDoor, true);
 
   document.addEventListener('click', function (e) {
     var target = e.target instanceof Element ? e.target.closest('[data-agc-cta]') : null;

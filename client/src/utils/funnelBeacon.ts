@@ -30,6 +30,7 @@
 import { isSelfHost } from '../config/deployment';
 import { probeField } from './probeSession';
 import { shownLanguage } from './shownLanguage';
+import { arrivalSource } from './arrivalSource';
 
 // A browser marks itself as an in-house probe by landing on any URL with
 // ?probe=1, so a harness or an owner's own browser stays out of the funnel.
@@ -318,11 +319,14 @@ interface FunnelFields {
   bucket?: number;
 }
 
+// The first-chat steps also carry the landing's source class, when there is one.
+const SOURCE_STEPS: ReadonlySet<FunnelStep> = new Set<FunnelStep>(['first_turn', 'first_turn_prefilled']);
+
 // Shared transport for both senders. Payload: step, optional figureId/mode
 // (content labels, validated server-side), optional outcome, optional coarse
-// bucket index, language (en/de), and the in-house probe constant when this
-// browser is marked. Country is derived server-side at the CF edge. No user
-// dimension of any kind.
+// bucket index, language (en/de), the landing's source class on the first-chat
+// steps, and the in-house probe constant when this browser is marked. Country
+// is derived server-side at the CF edge. No user dimension of any kind.
 function postFunnel(step: FunnelStep, fields: FunnelFields): void {
   const body = JSON.stringify({
     step,
@@ -331,6 +335,7 @@ function postFunnel(step: FunnelStep, fields: FunnelFields): void {
     outcome: fields.outcome,
     bucket: fields.bucket,
     language: shownLanguage(),
+    source: SOURCE_STEPS.has(step) ? arrivalSource() : undefined,
     probe: probeField(),
   });
   const url = `${API_BASE}/v1/funnel`;

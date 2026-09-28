@@ -265,13 +265,17 @@ export function trackPageView(
  * step; since the 2026-05-29 refactor). Sits between the page-load beacon
  * (every arrival) and the session row (Turnstile-gated).
  * dataset: agora_llm
- * blobs: ['entry', path, '', language, '200', device, country, '', probe]
+ * blobs: ['entry', path, source, language, '200', device, country, '', probe]
  * indexes: ['entry']
+ *
+ * blob3 is the landing's source class when the visitor came in through a door
+ * on the public page they landed on (same slot and list as page rows), else ''.
  */
 export function trackEntry(
   env: Env,
   data: {
     path: string;
+    source: string;
     language: string;
     country: string;
     device: string;
@@ -280,7 +284,7 @@ export function trackEntry(
 ): void {
   try {
     env.ANALYTICS.writeDataPoint({
-      blobs: ['entry', data.path, '', data.language, '200', data.device, data.country, '', data.probe],
+      blobs: ['entry', data.path, data.source, data.language, '200', data.device, data.country, '', data.probe],
       doubles: [0],
       indexes: ['entry'],
     });
@@ -342,7 +346,9 @@ export function trackSignup(
  * conversation mode: the same slot, a different closed vocabulary.
  *
  * blob6 carries the coarse device class (keeps country at blob7 across all
- * event types); blob8 stays empty (it belongs to playback rows).
+ * event types). blob8 carries the landing's source class on the two first-chat
+ * steps (first_turn, first_turn_prefilled) when the visit came in through a
+ * door on its landing page, and stays empty everywhere else.
  */
 export function trackFunnel(
   env: Env,
@@ -355,6 +361,7 @@ export function trackFunnel(
     bucket: number;
     country: string;
     device: string;
+    source: string;
     probe: string;
   }
 ): void {
@@ -368,7 +375,7 @@ export function trackFunnel(
         data.outcome,
         data.device,
         data.country,
-        '',
+        data.source,
         data.probe,
       ],
       doubles: [data.bucket],

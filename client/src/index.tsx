@@ -13,6 +13,7 @@ import { initializeSeedsCache } from './services/seedCacheInitializer';
 import { LocalStorageAdapter } from './storage/localAdapter';
 import { captureGclid } from './utils/public/gclidCapture';
 import { captureEntryIntentFromUrl } from './utils/public/entryIntent';
+import { captureArrivalSourceFromUrl } from './utils/arrivalSource';
 import { sendPageBeacon } from './utils/pageBeacon';
 import { migrateHistoryToEncrypted } from './services/history/historyEncryptionMigration';
 
@@ -22,6 +23,10 @@ import { migrateHistoryToEncrypted } from './services/history/historyEncryptionM
 // App's effect fires. The app has no consent question, so it keeps a click ID
 // only when a yes is already on record and drops it otherwise.
 captureGclid();
+
+// The landing's source class rides in the door link's fragment (#src=...).
+// Read into memory and removed from the address before anything else runs.
+captureArrivalSourceFromUrl();
 
 // Capture a figure/council deep-link (?figure=/?council=) from the landing URL
 // before the catch-all router redirect can strip it, for the same reason as

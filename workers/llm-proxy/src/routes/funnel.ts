@@ -14,7 +14,7 @@
 // coarse bucket index, never raw milliseconds. Disclosed in
 // docs/MEASUREMENT.md alongside the other event counters.
 
-import { trackFunnel, readCountry, readDevice, readProbe } from '../utils/analytics';
+import { trackFunnel, readCountry, readDevice, readProbe, readSource } from '../utils/analytics';
 import type { Env } from '../utils/types';
 
 interface FunnelPayload {
@@ -25,6 +25,8 @@ interface FunnelPayload {
   language?: string;
   outcome?: string;
   bucket?: number;
+  // The landing's source class, kept on the first-chat steps only.
+  source?: unknown;
   probe?: unknown;
 }
 
@@ -162,6 +164,9 @@ const FIGURE_RE = /^[A-Za-z0-9_-]{1,64}$/;
 const MODE_RE = /^[a-z_]{1,40}$/;
 const VALID_LANGS = new Set(['en', 'de']);
 
+// The steps that may carry the landing's source class (blob8).
+const SOURCE_STEPS = new Set(['first_turn', 'first_turn_prefilled']);
+
 // Coarse bucket index ceiling (cinematic dwell and the consent time-to-answer
 // set use 0-3, the first_reply reply-time set uses 0-4; the ceiling keeps one
 // slot of headroom). Anything else collapses to 0.
@@ -254,6 +259,7 @@ export async function handleFunnel(request: Request, env: Env): Promise<Response
     bucket: outBucket,
     country: readCountry(request),
     device: readDevice(request),
+    source: SOURCE_STEPS.has(step) ? readSource(payload.source) : '',
     probe: readProbe(payload.probe),
   });
 
