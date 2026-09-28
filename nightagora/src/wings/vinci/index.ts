@@ -1,11 +1,14 @@
 import { createStaticShadowCache } from './static-shadow-cache'
 import { warmWalk, WARM_EXTRA_FRAMES, type WarmWalk } from '../../stack/warm-up'
-import { applyDisplayedSkyAir, createAerialFog, applyDisplayedHorizonHaze, displayedHorizonHazeProvenance, type IndoorBox } from './display-sky-haze'
+import { applyDisplayedSkyAir, createAerialFog, applyDisplayedHorizonHaze, displayedHorizonHazeProvenance, createHazeLive, resetHazeLive, type HazeLive, type IndoorBox } from './display-sky-haze'
+import { farewellAir, farewellAt, farewellPose, farewellSunDirection } from './farewell'
+import { createEveningSky, createEveningStars, twilightRadiance, type EveningSky, type EveningStars } from './farewell-sky'
+import { kelvinToColour } from '../../stack/light'
 import { mineralSurfaceProvenance, closeSurfaceProvenance } from './surface'
 import { entryMineralSurfaceProvenance } from './entry-mineral-surface'
 import { foundationPlinthProvenance } from './foundation-plinth'
 import { Box3, Color, FogExp2, DirectionalLight, Group, Mesh, Raycaster, Vector2, Vector3 } from 'three/webgpu'
-import { float, mix, vec3, vec4, dot as nodeDot, positionWorld, cameraPosition, smoothstep, mx_fractal_noise_float } from 'three/tsl'
+import { float, mix, vec3, vec4, dot as nodeDot, positionWorld, cameraPosition, smoothstep, mx_fractal_noise_float, uniform } from 'three/tsl'
 import { SkyMesh } from 'three/addons/objects/SkyMesh.js'
 import { setRegister, type WingHosts, type WingModule, type WingProgress, type WingReport, type WingStage, type WingStation } from '../frame'
 import { beginVisit, type Visit } from '../visit'
@@ -53,6 +56,7 @@ import { createGround } from './ground'
 import { planVegetation, VEGETATION_STEPS } from './vegetation'
 import { windClock } from './wind'
 import { createRail, stationPose, namedPose, vinciStandsInRoom } from './rail'
+import { fittedRailFov } from './rail-projection'
 import { vinciWalk, vinciLifeOrderAsked, vinciWalkPose, vinciReadingSeconds, vinciDoorBetween, type VinciWalkCut, type VinciWalkStop } from './walk'
 import { isVinciWalkPose, VINCI_HOUSE_DOOR, VINCI_VALVE, vinciRailPlace, vinciWalkPoseOf, type VinciWalkPoseId } from './walk-poses'
 import { collectRailSolids, createRailGeometryAuthority } from './rail-proof'
@@ -634,6 +638,17 @@ export function createWing():VinciWingModule {
   /** How far down the screen a panel of this wing may stand. */
   let panelFloor:()=>number=()=>innerHeight
   let restoreEnvironmentRotation:(()=>void)|null=null
+  /** THE EVENING THE FAREWELL RUNS THROUGH: the air's live colours, the
+   * twilight's uniforms, the clouds' two lit colours and the stars. At rest
+   * every one holds the hour's own value. */
+  let hazeLive:HazeLive|undefined, evening:EveningSky|undefined, stars:EveningStars|undefined
+  const cloudLit=uniform(new Color(.71,.68,.62)), cloudShade=uniform(new Color(.40,.44,.51))
+  /** the share of the farewell the wing stands at, or null outside it */
+  let farewellShare:number|null=null
+  let farewellHeld:{eye:Vector3,at:Vector3,fov:number}|null=null
+  const hourSun=new Vector3(), eveningSun=new Vector3()
+  /** the dome's own haze share at the hour, read once it is built */
+  let mieAtRest=.005
   const narrow=()=>innerWidth/innerHeight<=.9
   const shadowFocus=new Vector3(NaN,NaN,NaN), focusAhead=new Vector3()
   /** THE LATTICE MAY NOT MOVE BY A FRACTION OF ITS OWN TEXEL. The near
@@ -672,6 +687,84 @@ export function createWing():VinciWingModule {
     key.light.target.position.copy(shadowFocus)
     key.light.position.copy(key.direction).multiplyScalar(SHADOW.lightDistanceM).add(shadowFocus)
     key.light.target.updateMatrixWorld();key.light.updateMatrixWorld()
+  }
+  /** THE KEY'S SECOND CASCADE looks at the origin from along the sun, as
+   * the rig stood it; an evening moves the sun, so it is stood again. */
+  function aimFarCascade():void {
+    if(!hosts||!key)return
+    hosts.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key.light&&o.castShadow){o.position.copy(key.direction).multiplyScalar(80);o.updateMatrixWorld()}})
+  }
+  /** THE EVENING AT A SHARE OF THE FAREWELL, or the hour again with null:
+   * the sun where it stood that day, its light and the sky's, the air's
+   * colours, the twilight and the stars. */
+  function applyEvening(share:number|null,aboveGround=1.6):void {
+    if(!hosts||!key||!hazeLive||!evening||!stars||!sky)return
+    const scene=hosts.world.scene, fog=scene.fog as FogExp2
+    if(share===null){
+      key.direction.copy(hourSun)
+      key.light.color.copy(kelvinToColour(KEY_RIG.key.kelvin));key.light.intensity=KEY_RIG.key.lux/100
+      key.fill.color.set(KEY_RIG.fill.color);key.fill.groundColor.set(KEY_RIG.fill.groundColor);key.fill.intensity=KEY_RIG.fill.intensity
+      scene.environmentIntensity=KEY_RIG.environmentIntensity
+      resetHazeLive(hazeLive,fog,hourSun)
+      evening.sun.value.copy(hourSun);evening.depression.value=0;evening.share.value=0
+      cloudLit.value.setRGB(.71,.68,.62);cloudShade.value.setRGB(.40,.44,.51)
+      sky.sunPosition.value.copy(hourSun).multiplyScalar(450000);sky.turbidity.value=4;sky.rayleigh.value=1.4;sky.mieDirectionalG.value=.8;sky.mieCoefficient.value=mieAtRest
+      stars.sprite.visible=false;stars.uLevel.value=0
+      farewellShare=null
+      aimFarCascade();focusNearCascade(true)
+      return
+    }
+    farewellShare=share
+    const at=farewellAt(share), light=at.light, el=at.sun.elevation
+    farewellSunDirection(at.sun,eveningSun)
+    // the light keeps a direction a hair over the ground once the disc is gone
+    farewellSunDirection({azimuth:at.sun.azimuth,elevation:Math.max(1,el)},key.direction)
+    key.light.color.copy(kelvinToColour(light.kelvin));key.light.intensity=KEY_RIG.key.lux/100*light.keyShare
+    key.fill.color.setRGB(...light.fillSky);key.fill.groundColor.setRGB(...light.fillGround);key.fill.intensity=KEY_RIG.fill.intensity*light.fillShare
+    scene.environmentIntensity=KEY_RIG.environmentIntensity*light.environmentShare
+    hazeLive.sun.value.copy(eveningSun);hazeLive.warm.value.setRGB(...light.hazeWarm);hazeLive.mid.value.setRGB(...light.hazeMid);hazeLive.cool.value.setRGB(...light.hazeCool)
+    hazeLive.air.value=farewellAir(aboveGround);hazeLive.land.value=light.land;hazeLive.veil.value=light.veil;hazeLive.far.value=1
+    evening.sun.value.copy(eveningSun);evening.depression.value=light.depression;evening.share.value=light.twilight
+    // high cloud takes the low sun from below: orange on the sunward side and
+    // rose away from it while the disc is up, rose and then mauve once it is
+    // gone, darkening into the night
+    const g=light.cloudGlow, rose=Math.max(0,Math.min(1,-el/4)), dark=Math.max(0,Math.min(1,(el+8)/10))
+    const glowR=1-.14*rose, glowG=.58-.16*rose, glowB=.38+.12*rose
+    cloudLit.value.setRGB((.71+(glowR-.71)*g)*dark,(.68+(glowG-.68)*g)*dark,(.62+(glowB-.62)*g)*dark)
+    cloudShade.value.setRGB((.40+(.62-.40-.2*rose)*g)*dark,(.44+(.42-.44-.12*rose)*g)*dark,(.51+(.48-.51)*g)*dark)
+    sky.sunPosition.value.copy(eveningSun).multiplyScalar(450000);sky.turbidity.value=light.turbidity;sky.rayleigh.value=light.rayleigh;sky.mieDirectionalG.value=light.mieFocus;sky.mieCoefficient.value=mieAtRest*light.mieShare
+    stars.sprite.visible=light.depression>1;stars.uDepression.value=light.depression;stars.uLevel.value=1
+    aimFarCascade();focusNearCascade(true)
+  }
+  /** THE PRINT'S OPENING THROUGH THE EVENING: the eye's adaptation to the
+   * falling light, closed again while it faces a low sun, as a camera meters
+   * a sunset so the land goes dark against the sky. */
+  const meterAhead=new Vector3()
+  function farewellExposure(share:number,camera:{getWorldDirection(v:Vector3):Vector3}):number {
+    const at=farewellAt(share)
+    camera.getWorldDirection(meterAhead);meterAhead.y=0;meterAhead.normalize()
+    const facing=meterAhead.x*eveningSun.x+meterAhead.z*eveningSun.z
+    const flat=Math.hypot(eveningSun.x,eveningSun.z)||1
+    const toward=Math.max(0,Math.min(1,(facing/flat-.25)/.65)), low=Math.max(0,Math.min(1,(12-at.sun.elevation)/8))*Math.max(0,Math.min(1,(at.sun.elevation+5)/4))
+    return at.light.exposureGain*(1-.62*toward*toward*(3-2*toward)*low)
+  }
+  /** The farewell's eye over the rail's, while the farewell runs. */
+  function holdFarewell():void {
+    if(!farewellHeld||!hosts)return
+    const c=hosts.world.camera
+    c.position.copy(farewellHeld.eye);c.lookAt(farewellHeld.at);c.fov=fittedRailFov(farewellHeld.fov,c.aspect,narrow())
+    c.updateProjectionMatrix();c.updateMatrixWorld()
+  }
+  /** A LOOK TEST OF THE FAREWELL, under the export only: the evening at a
+   * share, from the farewell's own path or from a pose that scouts one. */
+  if(FILM_EXPORT)(window as Window&{__naFarewell?:unknown}).__naFarewell=(p:{share:number,eye?:number[],at?:number[],fov?:number}|null)=>{
+    if(!p){farewellHeld=null;applyEvening(null);return null}
+    farewellHeld=p.eye&&p.at?{eye:world(p.eye[0]!,p.eye[1]!,p.eye[2]!),at:world(p.at[0]!,p.at[1]!,p.at[2]!),fov:p.fov??60}
+      :farewellPose(p.share,stationPose('grave',narrow()),narrow())
+    const e=farewellHeld.eye, d=farewellHeld.at.clone().sub(e).normalize(), ground=groundHeight(e.x,-e.z)
+    applyEvening(p.share,e.y-ground)
+    // the pose in the wing's own terms, for the scout that asked
+    return {eye:[e.x,-e.z,e.y],ground,heading:Math.atan2(d.x,-d.z)*180/Math.PI,pitch:Math.asin(d.y)*180/Math.PI,fov:farewellHeld.fov}
   }
   /** The heading, the hairline and nothing else: cheap enough to paint in the
    * frame the visitor arrives in. */
@@ -831,15 +924,18 @@ export function createWing():VinciWingModule {
       .mul(smoothstep(.54,.82,cover))
     // High cloud at this hour is lit from the west and grey away from it, so
     // the veil takes the sun's own direction rather than one flat tone.
-    const toSun=ray.dot(vec3(key.direction.x,key.direction.y,key.direction.z))
-    const litCloud=mix(vec3(.40,.44,.51),vec3(.71,.68,.62),smoothstep(-.25,.85,toSun))
+    hazeLive=createHazeLive(scene.fog as FogExp2,key.direction);evening=createEveningSky();evening.sun.value.copy(key.direction);hourSun.copy(key.direction)
+    const toSun=ray.dot(hazeLive.sun)
+    const litCloud=mix(cloudShade,cloudLit,smoothstep(-.25,.85,toSun))
     // A clear October afternoon: the dome keeps four fifths of its blue and
     // the veil stays thin; at half the blue it read as a slate overcast.
     const veiled=mix(mix(vec3(skyLuma),skyRGB,.82),litCloud,cirrus.mul(.4))
-    sky.material.colorNode=vec4(veiled.div(float(1).add(skyLuma.div(.85))),1)
-    applyDisplayedSkyAir(sky.material,scene.fog as FogExp2,key.direction)
-    applyDisplayedHorizonHaze(sky.material,scene.fog as FogExp2,key.direction)
-    scene.fogNode=createAerialFog(scene.fog as FogExp2,key.direction,COLLECTION_INDOORS)
+    // THE TWILIGHT the dome goes dark under, added at nothing while the sun is up
+    sky.material.colorNode=vec4(veiled.div(float(1).add(skyLuma.div(.85))).add(twilightRadiance(ray,evening)),1)
+    applyDisplayedSkyAir(sky.material,scene.fog as FogExp2,key.direction,hazeLive)
+    applyDisplayedHorizonHaze(sky.material,scene.fog as FogExp2,key.direction,hazeLive)
+    scene.fogNode=createAerialFog(scene.fog as FogExp2,key.direction,COLLECTION_INDOORS,hazeLive)
+    stars=createEveningStars();scene.add(stars.sprite);mieAtRest=sky.mieCoefficient.value
     sky.scale.setScalar(1800);sky.sunPosition.value.copy(key.direction).multiplyScalar(450000);sky.turbidity.value=4;sky.rayleigh.value=1.4;sky.cloudScale.value=.0006;sky.cloudCoverage.value=.28;sky.cloudDensity.value=.42;sky.cloudElevation.value=.35;sky.cloudSpeed.value=0;scene.add(sky)
     yield
     const entry=createEntryPassage(stack.tierName())
@@ -3080,7 +3176,7 @@ export function createWing():VinciWingModule {
       const payload=Boolean(closeLook?.id&&closeLook.surface!=='room')||Boolean(plan?.held())||Boolean(life?.held())
       exhibits?.holdPlates(payload)
       if(payload)return
-      measurement.update();rail.update()
+      measurement.update();rail.update();holdFarewell()
       // THE ROOM'S ONE FULL PLATE DOES NOT CHASE A RUN. While the eye slides
       // along the wall the near rule measures from the stop it will land on,
       // so a run past twenty-five works costs one request and not twenty-five.
@@ -3101,7 +3197,8 @@ export function createWing():VinciWingModule {
       if(arrived>=0&&arrived!==card&&!activeView){card=arrived;dock.scrollTop=0;paintHeader();paintDock();paintQuestion();standHere()}
       if(nav.completed&&nav.completed!==exposureAt)exposureAt=nav.completed
       const byRoom=activeView?null:roomPrint(nav,hosts.world.camera.position)
-      const opening=activeView&&VIEW_EXPOSURE[activeView]!==undefined?VIEW_EXPOSURE[activeView]!:byRoom?.exposure??legExposure(nav), rolling=activeView&&VIEW_SHOULDER[activeView]!==undefined?VIEW_SHOULDER[activeView]!:byRoom?.shoulder??legShoulder(nav)
+      const dusk=farewellShare===null?1:farewellExposure(farewellShare,hosts.world.camera)
+      const opening=(activeView&&VIEW_EXPOSURE[activeView]!==undefined?VIEW_EXPOSURE[activeView]!:byRoom?.exposure??legExposure(nav))*dusk, rolling=activeView&&VIEW_SHOULDER[activeView]!==undefined?VIEW_SHOULDER[activeView]!:byRoom?.shoulder??legShoulder(nav)
       const bending=byRoom?.toe??legToe(nav)
       if(nav.completed&&(opening!==exposureShown||rolling!==shoulderShown||bending!==toeShown))aimPrint(nav.completed,opening,rolling,bending)
       // THE DOOR IS REACHED: the picture dips into the room behind it.
@@ -3123,6 +3220,7 @@ export function createWing():VinciWingModule {
       // away from its station.
       if(closeLook?.id||exhibitAway!==Boolean(nav.exhibit??nav.approaching)){exhibitAway=Boolean(nav.exhibit??nav.approaching);paintExhibitTitle();paintHeaderVisibility()}
       focusNearCascade();shadowBody?.update();shadowCache?.update();sky.position.copy(hosts.world.camera.position)
+      if(stars?.sprite.visible){stars.sprite.position.copy(hosts.world.camera.position);stars.uTime.value=hosts.world.clock()}
       if(hallSun){const seen=shadowCache?.state().invalidations??0,eye=hosts.world.camera.position;hallSun([eye.x,-eye.z,eye.y],seen!==hallSunSeen);hallSunSeen=seen}
       // A REMOUNTED PLATE IS A NEW MESH. The registry is a read, so it is
       // taken again when a tier change has replaced what it read.
