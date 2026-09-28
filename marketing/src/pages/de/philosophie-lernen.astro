@@ -1,20 +1,10 @@
 ---
-// Philosophie-Lernen-Hub (DE). Deutsches Pendant zu /ai-philosophy-tutor.
-// Eine antwort-zuerst-Seite für Menschen, die Philosophie im Gespräch lernen
-// wollen: erzählte Leben, Kernlehren und einen Gedanken mit dem KI-Echo eines
-// Denkers durchdenken. Die Kopf-Begriffe bleiben im eigenen Cluster dieser
-// Seite (Philosophie-App / Philosophie lernen / Philosophie online lernen /
-// KI-Philosophie-Tutor / mit Philosophen sprechen), getrennt von der
-// Open-Source-Positionierungsseite. Die FAQ wird hier definiert und sowohl an
-// die sichtbare Ausgabe als auch an faqSchema() übergeben, damit JSON-LD und
-// DOM nicht auseinanderlaufen.
-//
-// EN- und DE-Slug unterscheiden sich (/ai-philosophy-tutor vs
-// /de/philosophie-lernen). Der hreflang-Helfer leitet das DE-Alternate nur
-// durch ein /de-Präfix aus demselben Pfad ab und könnte das hier nicht korrekt
-// ausgeben, darum noHreflang={true}: lieber kein Alternate als ein falsches.
+// The German twin of /ai-philosophy-tutor: the same answer-first page, one
+// recommendation and six doors that stage a question, written in German. The
+// FAQ array is defined here and passed to both the visible render and
+// faqSchema(), so the JSON-LD can never drift from the DOM.
 import Public from '../../layouts/Public.astro';
-import PhilosophyHubContent from '../../components/PhilosophyHubContent.astro';
+import TutorHubContent from '../../components/TutorHubContent.astro';
 import {
   organizationSchema,
   agoraCosmicaSchema,
@@ -75,7 +65,7 @@ const schemas = [
   faqSchema(faq, canonical),
   breadcrumbSchema([
     { name: t('breadcrumbs.home'), url: `${SITE_URL}/de/` },
-    { name: 'Philosophie lernen', url: canonical },
+    { name: 'Philosophie für Anfänger', url: canonical },
   ]),
   itemListSchema(
     figures.map(f => ({
@@ -87,9 +77,9 @@ const schemas = [
 ];
 ---
 <Public
-  title="KI-Philosophie-Tutor"
-  fullTitle="KI-Philosophie-Tutor: Philosophie im Gespräch lernen"
-  description="Eine Lernplattform, um mit Philosophen zu sprechen und Philosophie online zu lernen. Stoizismus, Existenzialismus, Taoismus, Zen und mehr. Gemeinnützig, 30 kostenlose Nachrichten pro Tag."
+  title="Womit fange ich in der Philosophie an?"
+  fullTitle="Philosophie für Anfänger: Womit fange ich an?"
+  description="Eine klare Empfehlung statt einer Leseliste, dazu sechs Einstiege. Denk mit 13 Denkern eine Frage durch. Gemeinnützig, 30 kostenlose Nachrichten am Tag."
   canonicalPath={canonicalPath}
   lang={lang}
   ogType="website"
@@ -97,5 +87,5 @@ const schemas = [
   altDe="/de/philosophie-lernen"
   schemas={schemas}
 >
-  <PhilosophyHubContent lang={lang} faq={faq} figures={figures} />
+  <TutorHubContent lang={lang} faq={faq} figures={figures} />
 </Public>

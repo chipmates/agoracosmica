@@ -1,6 +1,7 @@
 ---
-// Body for /ai-philosophy-tutor, repositioned around the one job no figure page
-// can do: answering "where should I start with philosophy?"
+// Body for /ai-philosophy-tutor and its German twin /de/philosophie-lernen,
+// built around the one job no figure page can do: answering "where should I
+// start with philosophy?"
 //
 // The page used to open with a category claim and a ten-row menu, which is the
 // answer a beginner already has. It now opens with ONE recommendation, then a
@@ -10,8 +11,7 @@
 // The rows are generated from data, never hand-copied: the want line is the
 // catalog's `learn` sentence with its lead-in removed, and the question is the
 // figure's entry question from heroEntry, linked as ?ask=f:{id}:1 so what you
-// click is what the app stages. The DE twin at /de/philosophie-lernen keeps its
-// own component and is untouched.
+// click is what the app stages.
 import StaticImage from './StaticImage.astro';
 import { publicUrl } from '../lib/urls';
 import { figureIdToSlug } from '@client/data/public/slugMap';
@@ -34,10 +34,16 @@ const START_IDS = ['aurelius', 'plato', 'nietzsche', 'laozi', 'gautama', 'jung']
 // on a name the reader has not been offered yet.
 const FIRST_QUESTION_IDS = ['beauvoir', 'rumi', 'bingen'];
 
-// "You will learn to X." -> "to X". The catalog sentence is the source of
-// truth; only its lead-in is dropped, so a catalog edit flows straight through.
+// "You will learn to X." -> "to X"; "Du lernst, X zu V." -> "Wenn du X V
+// willst". The catalog sentence stays the source of truth, so a catalog edit
+// flows straight through; a German line of another shape shows as written.
 function want(learn: string): string {
-  return learn.trim().replace(/^You will learn\s+/i, '').replace(/\.$/, '');
+  const line = learn.trim().replace(/\.$/, '');
+  if (lang === 'de') {
+    const m = line.match(/^Du lernst,\s+(.+)\s+zu\s+(\S+)$/);
+    return m ? `Wenn du ${m[1]} ${m[2]} willst` : `${line}.`;
+  }
+  return line.replace(/^You will learn\s+/i, '');
 }
 
 interface Row {
@@ -71,7 +77,7 @@ function buildRows(ids: string[]): Row[] {
 const startRows = buildRows(START_IDS);
 const firstQuestions = buildRows(FIRST_QUESTION_IDS);
 
-const c = {
+const en = {
   eyebrow: 'A starting point, not a reading list',
   h1: 'Where should I start with philosophy?',
   tagline: 'One thinker, one first question, and a conversation you steer.',
@@ -107,7 +113,51 @@ const c = {
     { href: '/open-source-philosophy-app', label: 'Why it is open source and nonprofit' },
   ],
   methodologyLabel: 'How the Echoes are built',
+  methodologyHref: '/methodology/',
 };
+
+const de: typeof en = {
+  eyebrow: 'Ein Anfang, keine Leseliste',
+  h1: 'Womit fange ich in der Philosophie an?',
+  tagline: 'Ein Denker, eine erste Frage und ein Gespräch, das du lenkst.',
+  lead: 'Fang mit Mark Aurel an. Er führte ein Notizbuch nur für sich, während er ein Weltreich regierte, und rechnete nie damit, dass es jemand liest. Darum sind seine Ratschläge praktisch und ohne Heldenpose. Hör dir zuerst seine Lebensgeschichte an, zwölf kurze Kapitel, und frag ihn dann, was dich gerade wirklich umtreibt. Lässt dich der Stoizismus kalt, findest du unten fünf andere Anfänge.',
+  leadTwo: 'Alle dreizehn sprechen hier als KI-Echo, eine pädagogische Deutung, verankert in ihren echten Schriften. Das ist klar gekennzeichnet, nie eine Aufnahme und nie die echte Person. Es geht darum, die Philosophie zu verstehen, nicht darum, so zu tun, als wäre der Philosoph zurück.',
+  startTitle: 'Wo du anfangen kannst',
+  startIntro: 'Sechs Einstiege, einer pro Tradition. Jede Zeile öffnet die App mit der Frage schon im Eingabefeld, du musst sie nur noch abschicken.',
+  askLabel: 'Diese Frage stellen',
+  thinkersTitle: 'Die dreizehn Denker',
+  thinkersLead: 'Dreizehn der dreißig sind Philosophen oder Lehrer einer Weisheitstradition. Die Mystiker, der Tiefenpsychologe und der Mythenforscher heißen hier, was sie sind. Wir machen keine Fachphilosophen aus ihnen.',
+  thinkersMore: 'Alle 30 Menschen ansehen',
+  howTitle: 'Wie Lernen im Gespräch funktioniert',
+  howIntro: 'Das Gespräch ist einer von sechs Lernwegen hier. Das meiste ist vorher geschrieben und eingesprochen, und im Chat nimmst du einen Gedanken mit deinen eigenen Worten auseinander.',
+  modes: [
+    { label: 'Hören', text: 'Eine erzählte Lebensgeschichte in zwölf Kapiteln, in der Ich-Form, damit eine Idee in einem echten Leben ankommt und nicht als Abstraktion.' },
+    { label: 'Lesen', text: 'Zwölf Kernlehren pro Denker, die tragenden Begriffe seiner Philosophie in klarer Sprache, jede mit einem konkreten Beispiel.' },
+    { label: 'Sprechen', text: 'Stell deine eigene Frage und folge ihr, wohin sie führt. Das ist der Teil mit dem Tutor, und das Tempo bestimmst du.' },
+    { label: 'Vergleichen', text: 'Der Prisma-Modus stellt vier Stimmen vor eine Frage. So beantworten ein Stoiker, ein Mystiker und ein Skeptiker dasselbe nebeneinander.' },
+  ],
+  howClose: 'Dazu kommen 110 fertig produzierte Council-Debatten, in denen mehrere Denker ein Thema ausfechten. Da hörst du, wo Traditionen wirklich uneins sind. Alles funktioniert auf Deutsch und Englisch. Du bekommst 30 kostenlose Nachrichten pro Tag, ohne Anmeldung. Wenn du mehr willst, bring deinen eigenen OpenRouter-Schlüssel mit, er berührt unsere Server nie. Die ganze Plattform ist Open Source unter der AGPL-3.0, ohne Tracking-Cookies und ohne Profiling.',
+  firstTitle: 'Deine erste Frage',
+  firstIntro: 'Noch unentschlossen? Nimm eine davon. Die Frage steht schon da, du schickst sie nur ab.',
+  faqTitle: 'Fragen, die Menschen uns stellen',
+  ctaTitle: 'Fang mit einer Frage an',
+  ctaText: 'Öffne die App und denk einen Gedanken mit einem der dreizehn durch. 30 kostenlose Nachrichten pro Tag, ohne Anmeldung.',
+  ctaButton: 'Loslegen',
+  starText: 'Wenn dir ein offener Philosophie-Tutor etwas wert ist, hilft ein Stern auf GitHub am meisten, damit ihn mehr Menschen finden.',
+  starCta: 'Auf GitHub einen Stern geben →',
+  crossTitle: 'Weiter entdecken',
+  crossLinks: [
+    { href: '/figures/plato/hoehlengleichnis', label: 'Platons Höhlengleichnis einfach erklärt' },
+    { href: '/figures/plato/ideenlehre', label: 'Platons Ideenlehre einfach erklärt' },
+    { href: '/figures', label: 'Alle 30 Menschen' },
+    { href: '/themes', label: 'Die 8 großen Fragen' },
+    { href: '/open-source-philosophy-app', label: 'Warum es Open Source und gemeinnützig ist' },
+  ],
+  methodologyLabel: 'Wie die Echos entstehen',
+  methodologyHref: '/de/methodik/',
+};
+
+const c = lang === 'de' ? de : en;
 ---
 <div class="pub-content tut">
   <header class="pub-theme-hero">
@@ -270,7 +320,7 @@ const c = {
           {' · '}
         </>
       ))}
-      <a class="pub-textlink" href="/methodology/">{c.methodologyLabel}</a>
+      <a class="pub-textlink" href={c.methodologyHref}>{c.methodologyLabel}</a>
     </p>
   </section>
 </div>
