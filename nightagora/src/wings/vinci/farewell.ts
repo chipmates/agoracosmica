@@ -1,14 +1,17 @@
 /** THE FAREWELL AT THE GRAVE: the eye rises over the grave court and looks out
- * over the terrace and the museum while the afternoon runs on to its evening,
- * then turns up into the sky as the first stars come out.
+ * over the house while the afternoon runs on to its evening, the sun goes
+ * down beside the house, and the eye tilts up into the sky as the first
+ * stars come out.
  *
- * The sun keeps the day it keeps everywhere else in the wing: 10 October 1517
- * at Amboise, from the hour the wing stands in to nautical dusk, its place
- * computed from the site's latitude and the day's own noon, which reproduces
- * the ephemeris rows in `data/light-rig.json` to a few hundredths of a degree.
- * The light, the sky's twilight and the stars below the horizon are scenic
- * assumptions, as the rig's night rule says of every twilight: a type of an
- * October evening, not a record of that one.
+ * The sun keeps the day's own hours: 10 October 1517 at Amboise, from the
+ * hour the wing stands in to nautical dusk, its height computed from the
+ * site's latitude and the day's own noon, which reproduces the ephemeris rows
+ * in `data/light-rig.json` to a few hundredths of a degree. ITS AZIMUTH IS
+ * THE MUSEUM'S, NOT THE DAY'S: the day's sunset (255.6 deg) lies behind the
+ * eye over the unbuilt land, so during the rise the sun swings to the house's
+ * side of the sky (`FAREWELL_SUN_AZIMUTH`). The light, the sky's twilight and
+ * the stars are scenic assumptions, as the rig's night rule says of every
+ * twilight: a type of an October evening, not a record of that one.
  */
 import { Vector3 } from 'three/webgpu'
 import { hourKey } from './site'
@@ -51,18 +54,30 @@ function curve(knots: readonly (readonly [number, number])[], x: number): number
 }
 
 /** THE FAREWELL'S CLOCK, in shares of its length: the eye rises and turns
- * to the terrace, the museum and the house while the low sun lights them;
- * it holds there; it turns left, the short way, to the west as the sun
- * reaches the land; it watches the disc go; it tilts up into the sky as the
- * blue hour deepens and the stars come out. */
+ * to the house; it holds there as the sun comes down beside it; it tilts up
+ * as the sun reaches the hill, so the land is a dark band under the sky with
+ * the house and the trees against it; it watches the disc go; it looks up
+ * into the sky as the blue hour deepens and the stars come out. */
 export const FAREWELL_SECONDS = 18
-export const FAREWELL_BEATS = { risen: .25, held: .38, west: .66, set: .76 } as const
+export const FAREWELL_BEATS = { risen: .22, held: .34, glow: .56, set: .7 } as const
 /** The hour at a share of the farewell: the sun at eight degrees when the eye
- * has risen, five when it leaves the house, a degree and a half when it
- * faces the west, gone under the land a breath later, twelve under at the end. */
+ * has risen, five as it starts to look up, three at the golden moment, where
+ * it meets the hill's crest, half a degree when it is gone behind it, twelve
+ * under at the end. */
 export function farewellHour(share: number): number {
   const B = FAREWELL_BEATS
-  return curve([[0, FAREWELL_FROM_HOUR], [B.risen, 16.38], [B.held, 16.72], [B.west, 17.09], [B.set, 17.32], [1, FAREWELL_TO_HOUR]], share)
+  return curve([[0, FAREWELL_FROM_HOUR], [B.risen, 16.38], [B.held, 16.72], [B.glow, 16.95], [B.set, 17.2], [1, FAREWELL_TO_HOUR]], share)
+}
+/** Where the museum's sun goes down, clockwise from north: right of the house
+ * as the risen eye sees it (the house at 58 deg), where the hill's crest and
+ * its trees fall lowest before the open land. */
+export const FAREWELL_SUN_AZIMUTH = 84
+/** The sun at a share: the day's own at the grave, swung the short way to the
+ * museum's azimuth while the eye rises and turns, then held there. */
+export function farewellSunAt(share: number): { azimuth: number; elevation: number } {
+  const day = farewellSun(farewellHour(share))
+  const swing = smooth(share / FAREWELL_BEATS.risen)
+  return { azimuth: (day.azimuth + shortestTurn(day.azimuth, FAREWELL_SUN_AZIMUTH) * swing + 360) % 360, elevation: day.elevation }
 }
 
 /** How the evening lights the wing at one sun elevation. The direct light
@@ -151,8 +166,8 @@ export function farewellLight(elevation: number): FarewellLight {
     veil: curve([[-6, .3], [0, .16], [3, .3], [8, .7], [17.4, 1]], el),
     turbidity: curve([[-2, 7], [2, 6.5], [8, 5], [17.4, 4]], el),
     rayleigh: curve([[-2, 3.2], [2, 3], [8, 2], [17.4, 1.4]], el),
-    mieFocus: curve([[1, .95], [8, .86], [17.4, .8]], el),
-    mieShare: curve([[1, .45], [6, .7], [17.4, 1]], el),
+    mieFocus: curve([[1, .99], [6, .985], [12, .93], [17.4, .8]], el),
+    mieShare: curve([[1, .12], [5, .14], [10, .22], [17.4, 1]], el),
     depression,
   }
 }
@@ -168,22 +183,25 @@ export function farewellAir(heightAboveGroundM: number): number {
  * passes through at the clock's beats, from the one it leaves at the grave.
  * Headings run clockwise from north and every turn takes the short way. */
 export interface FarewellBeat { eye: readonly [east: number, north: number, height: number]; heading: number; pitch: number; fov: number }
-export interface FarewellPath { risen: FarewellBeat; held: FarewellBeat; west: FarewellBeat; set: FarewellBeat; up: FarewellBeat }
+export interface FarewellPath { risen: FarewellBeat; held: FarewellBeat; glow: FarewellBeat; set: FarewellBeat; up: FarewellBeat }
 const RISEN_EYE = [-47.5, -28.5, 15] as const
+/** From the golden moment the frame's lower edge stands near the house's
+ * foot, so the land is a band of about a fifth of the frame with the house
+ * and the crest's trees against the sky over it. */
 export const FAREWELL_PATH: { desktop: FarewellPath; phone: FarewellPath } = {
   desktop: {
-    risen: { eye: RISEN_EYE, heading: 58, pitch: -11, fov: 60 },
-    held: { eye: [-47.1, -28.2, 15.3], heading: 54, pitch: -10, fov: 60 },
-    west: { eye: [-47.4, -28.6, 15.6], heading: 252, pitch: 1.5, fov: 56 },
-    set: { eye: [-47.5, -28.7, 15.7], heading: 253, pitch: 2.5, fov: 56 },
-    up: { eye: [-47.6, -28.8, 16.2], heading: 255, pitch: 36, fov: 72 },
+    risen: { eye: RISEN_EYE, heading: 60, pitch: -10, fov: 60 },
+    held: { eye: [-47.3, -28.3, 15.3], heading: 62, pitch: -6, fov: 60 },
+    glow: { eye: [-47.3, -28.3, 15.5], heading: 64, pitch: 16, fov: 56 },
+    set: { eye: [-47.3, -28.3, 15.6], heading: 64, pitch: 24, fov: 58 },
+    up: { eye: [-47.3, -28.3, 16], heading: 65, pitch: 40, fov: 72 },
   },
   phone: {
-    risen: { eye: RISEN_EYE, heading: 58, pitch: -4, fov: 76 },
-    held: { eye: [-47.1, -28.2, 15.3], heading: 55, pitch: -3.5, fov: 76 },
-    west: { eye: [-47.4, -28.6, 15.6], heading: 252, pitch: 3, fov: 78 },
-    set: { eye: [-47.5, -28.7, 15.7], heading: 253, pitch: 4, fov: 78 },
-    up: { eye: [-47.6, -28.8, 16.2], heading: 255, pitch: 40, fov: 92 },
+    risen: { eye: RISEN_EYE, heading: 60, pitch: -4, fov: 76 },
+    held: { eye: [-47.3, -28.3, 15.3], heading: 63, pitch: -1, fov: 76 },
+    glow: { eye: [-47.3, -28.3, 15.5], heading: 72, pitch: 26, fov: 88 },
+    set: { eye: [-47.3, -28.3, 15.6], heading: 72, pitch: 32, fov: 88 },
+    up: { eye: [-47.3, -28.3, 16], heading: 72, pitch: 48, fov: 94 },
   },
 }
 
@@ -204,7 +222,7 @@ export function farewellPose(share: number, start: { eye: Vector3; at: Vector3; 
   const s = Math.max(0, Math.min(1, share))
   const d0 = start.at.clone().sub(start.eye)
   const first: FarewellBeat = { eye: [start.eye.x, -start.eye.z, start.eye.y], heading: headingOf(d0), pitch: pitchOf(d0), fov: start.fov }
-  const beats: [number, FarewellBeat][] = [[0, first], [B.risen, path.risen], [B.held, path.held], [B.west, path.west], [B.set, path.set], [1, path.up]]
+  const beats: [number, FarewellBeat][] = [[0, first], [B.risen, path.risen], [B.held, path.held], [B.glow, path.glow], [B.set, path.set], [1, path.up]]
   let i = 1
   while (i < beats.length - 1 && s > beats[i]![0]) i++
   const [s0, a] = beats[i - 1]!, [s1, b] = beats[i]!
@@ -220,6 +238,6 @@ export function farewellPose(share: number, start: { eye: Vector3; at: Vector3; 
 /** The whole state at a share: the hour, the sun and its light. */
 export function farewellAt(share: number): { hour: number; sun: { azimuth: number; elevation: number }; light: FarewellLight } {
   const hour = farewellHour(share)
-  const sun = farewellSun(hour)
+  const sun = farewellSunAt(share)
   return { hour, sun, light: farewellLight(sun.elevation) }
 }

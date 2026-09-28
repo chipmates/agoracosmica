@@ -2,7 +2,7 @@ import { createStaticShadowCache } from './static-shadow-cache'
 import { warmWalk, WARM_EXTRA_FRAMES, type WarmWalk } from '../../stack/warm-up'
 import { applyDisplayedSkyAir, createAerialFog, applyDisplayedHorizonHaze, displayedHorizonHazeProvenance, createHazeLive, resetHazeLive, type HazeLive, type IndoorBox } from './display-sky-haze'
 import { farewellAir, farewellAt, farewellPose, farewellSunDirection } from './farewell'
-import { createEveningSky, createEveningStars, twilightRadiance, type EveningSky, type EveningStars } from './farewell-sky'
+import { createEveningSky, createEveningStars, sunDiscRadiance, twilightRadiance, type EveningSky, type EveningStars } from './farewell-sky'
 import { kelvinToColour } from '../../stack/light'
 import { mineralSurfaceProvenance, closeSurfaceProvenance } from './surface'
 import { entryMineralSurfaceProvenance } from './entry-mineral-surface'
@@ -715,7 +715,7 @@ export function createWing():VinciWingModule {
       key.fill.color.set(KEY_RIG.fill.color);key.fill.groundColor.set(KEY_RIG.fill.groundColor);key.fill.intensity=KEY_RIG.fill.intensity
       scene.environmentIntensity=KEY_RIG.environmentIntensity
       resetHazeLive(hazeLive,fog,hourSun)
-      evening.sun.value.copy(hourSun);evening.depression.value=0;evening.share.value=0
+      evening.sun.value.copy(hourSun);evening.depression.value=0;evening.share.value=0;evening.disc.value=0
       cloudLit.value.setRGB(.71,.68,.62);cloudShade.value.setRGB(.40,.44,.51)
       sky.sunPosition.value.copy(hourSun).multiplyScalar(450000);sky.turbidity.value=4;sky.rayleigh.value=1.4;sky.mieDirectionalG.value=.8;sky.mieCoefficient.value=mieAtRest
       stars.sprite.visible=false;stars.uLevel.value=0
@@ -733,12 +733,13 @@ export function createWing():VinciWingModule {
     scene.environmentIntensity=KEY_RIG.environmentIntensity*light.environmentShare
     hazeLive.sun.value.copy(eveningSun);hazeLive.warm.value.setRGB(...light.hazeWarm);hazeLive.mid.value.setRGB(...light.hazeMid);hazeLive.cool.value.setRGB(...light.hazeCool)
     hazeLive.air.value=farewellAir(aboveGround);hazeLive.land.value=light.land;hazeLive.veil.value=light.veil;hazeLive.far.value=1
-    evening.sun.value.copy(eveningSun);evening.depression.value=light.depression;evening.share.value=light.twilight
+    evening.sun.value.copy(eveningSun);evening.depression.value=light.depression;evening.share.value=light.twilight;evening.disc.value=1
     // high cloud takes the low sun from below: orange on the sunward side and
     // rose away from it while the disc is up, rose and then mauve once it is
     // gone, darkening into the night
     const g=light.cloudGlow, rose=Math.max(0,Math.min(1,-el/4)), dark=Math.max(0,Math.min(1,(el+8)/10))
-    const glowR=1-.14*rose, glowG=.58-.16*rose, glowB=.38+.12*rose
+    // lit from below, warmer than the dome round them
+    const glowR=1.18-.2*rose, glowG=.6-.16*rose, glowB=.34+.14*rose
     cloudLit.value.setRGB((.71+(glowR-.71)*g)*dark,(.68+(glowG-.68)*g)*dark,(.62+(glowB-.62)*g)*dark)
     cloudShade.value.setRGB((.40+(.62-.40-.2*rose)*g)*dark,(.44+(.42-.44-.12*rose)*g)*dark,(.51+(.48-.51)*g)*dark)
     sky.sunPosition.value.copy(eveningSun).multiplyScalar(450000);sky.turbidity.value=light.turbidity;sky.rayleigh.value=light.rayleigh;sky.mieDirectionalG.value=light.mieFocus;sky.mieCoefficient.value=mieAtRest*light.mieShare
@@ -940,7 +941,7 @@ export function createWing():VinciWingModule {
     // the veil stays thin; at half the blue it read as a slate overcast.
     const veiled=mix(mix(vec3(skyLuma),skyRGB,.82),litCloud,cirrus.mul(.4))
     // THE TWILIGHT the dome goes dark under, added at nothing while the sun is up
-    sky.material.colorNode=vec4(veiled.div(float(1).add(skyLuma.div(.85))).add(twilightRadiance(ray,evening)),1)
+    sky.material.colorNode=vec4(veiled.div(float(1).add(skyLuma.div(.85))).add(twilightRadiance(ray,evening)).add(sunDiscRadiance(ray,evening)),1)
     applyDisplayedSkyAir(sky.material,scene.fog as FogExp2,key.direction,hazeLive)
     applyDisplayedHorizonHaze(sky.material,scene.fog as FogExp2,key.direction,hazeLive)
     scene.fogNode=createAerialFog(scene.fog as FogExp2,key.direction,COLLECTION_INDOORS,hazeLive)

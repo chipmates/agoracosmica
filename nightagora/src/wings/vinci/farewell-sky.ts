@@ -13,16 +13,34 @@
  * darkens. None is smaller than two pixels, so none shimmers as a grain.
  */
 import { AdditiveBlending, Color, InstancedBufferAttribute, PointsNodeMaterial, Sprite, Vector3 } from 'three/webgpu'
-import { clamp, exp, float, instancedBufferAttribute, length, max, mix, normalize, pow, sin, smoothstep, uniform, uv, vec2, vec3 } from 'three/tsl'
+import { clamp, cross, exp, float, instancedBufferAttribute, length, max, mix, normalize, pow, sin, smoothstep, step, uniform, uv, vec2, vec3 } from 'three/tsl'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type N = any
 
 /** The uniforms the evening moves: the sun's direction (engine frame), how far
- * it stands under the horizon in degrees, and the twilight's share. */
-export interface EveningSky { sun: N; depression: N; share: N }
+ * it stands under the horizon in degrees, the twilight's share, and the
+ * share of the farewell's own sun disc (0 outside the farewell). */
+export interface EveningSky { sun: N; depression: N; share: N; disc: N }
 export function createEveningSky(): EveningSky {
-  return { sun: uniform(new Vector3(0, 1, 0)), depression: uniform(0), share: uniform(0) }
+  return { sun: uniform(new Vector3(0, 1, 0)), depression: uniform(0), share: uniform(0), disc: uniform(0) }
+}
+
+/** THE LOW SUN AS A DISC: half a degree across, warm, redder and dimmer as
+ * the air it crosses thickens toward the horizon, with a small aureole of a
+ * degree or so. The dome's own disc is folded into its compressed glow, so
+ * this one is added after the compression; whatever stands in front of the
+ * sky hides it, and it sinks away as its centre passes under the horizon. */
+const SUN_RADIUS = Math.sin(.26 * Math.PI / 180), SUN_EDGE = SUN_RADIUS * .12
+export function sunDiscRadiance(ray: N, evening: EveningSky): N {
+  const sun = evening.sun
+  const off = length(cross(ray, sun)), facing = step(0, ray.dot(sun))
+  const low = smoothstep(.14, 0, sun.y)
+  const colour = mix(vec3(1, .84, .6), vec3(1, .42, .14), low)
+  const disc = smoothstep(SUN_RADIUS + SUN_EDGE, SUN_RADIUS - SUN_EDGE, off)
+  const aureole = exp(off.negate().div(.012)).mul(.5)
+  const level = mix(float(12), float(3.2), low).mul(smoothstep(-.0045, .0015, sun.y))
+  return colour.mul(disc.mul(level).add(aureole.mul(level.mul(.12)))).mul(facing).mul(evening.disc)
 }
 
 const rgb = (hex: string): N => { const c = new Color(hex); return vec3(c.r, c.g, c.b) }
@@ -36,8 +54,8 @@ export function twilightRadiance(ray: N, evening: EveningSky): N {
   const d = evening.depression
   // the glow over the sunset: bright and warm on the horizon, spreading over
   // a third of the sky round the sun's azimuth, fading as the sun goes down
-  const spread = pow(towardSun.mul(.5).add(.5), 2.6)
-  const glowLevel = exp(d.negate().div(2.4)).mul(.95)
+  const spread = pow(towardSun.mul(.5).add(.5), 5)
+  const glowLevel = exp(d.negate().div(2.4)).mul(.7)
   const low = exp(up.negate().div(.09))
   const mid = exp(up.negate().div(.3))
   const glow = mix(rgb('#ff9a55'), rgb('#ff5a2c'), low).mul(low.mul(.8).add(mid.mul(.45))).mul(spread).mul(glowLevel)
