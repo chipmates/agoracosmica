@@ -6,10 +6,12 @@
 // bundles a component's styles into pages that render it.
 ---
 <style is:global>
+  /* No top padding: .pub-main already clears the navbar, so the breadcrumb
+     sits where it does on every other page type. */
   .esy {
     max-width: 46rem;
     margin: 0 auto;
-    padding: 2.5rem 1.25rem 4rem;
+    padding: 0 1.25rem 4rem;
   }
 
   /* Hero */

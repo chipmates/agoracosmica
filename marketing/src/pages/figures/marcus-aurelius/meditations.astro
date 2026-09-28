@@ -218,10 +218,12 @@ const schemas = [
 <style>
   /* Reading column, hero and section rhythm on the poem pages' values, so the
      two surfaces read as one family without sharing a stylesheet. */
+  /* No top padding: .pub-main already clears the navbar, so the breadcrumb
+     sits where it does on every other page type. */
   .med {
     max-width: 46rem;
     margin: 0 auto;
-    padding: 2.5rem 1.25rem 4rem;
+    padding: 0 1.25rem 4rem;
   }
 
   .med-hero {
@@ -337,9 +339,6 @@ const schemas = [
   @media (max-width: 560px) {
     /* Tighter than the desktop rhythm on purpose: the lead runs long on a
        phone, and the door has to stay on the first screen with it. */
-    .med {
-      padding-top: 1.25rem;
-    }
     .med-hero {
       margin: 0.75rem 0 2rem;
     }

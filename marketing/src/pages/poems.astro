@@ -107,10 +107,12 @@ const schemas = [
 <style>
   /* Self-contained on purpose: sharing the essay stylesheet would redraw the
      CSS chunks of the poem pages this page links to. */
+  /* No top padding: .pub-main already clears the navbar, so the breadcrumb
+     sits where it does on every other page type. */
   .pi {
     max-width: 46rem;
     margin: 0 auto;
-    padding: 2.5rem 1.25rem 4rem;
+    padding: 0 1.25rem 4rem;
   }
 
   .pi-hero {

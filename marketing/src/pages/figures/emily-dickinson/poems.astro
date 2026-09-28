@@ -385,10 +385,12 @@ const schemas = [
 <style>
   /* Scoped reading-room treatment. Uses brand design tokens only; adds no
      global CSS (architecture frozen at 89/100). */
+  /* No top padding: .pub-main already clears the navbar, so the breadcrumb
+     sits where it does on every other page type. */
   .ed {
     max-width: 46rem;
     margin: 0 auto;
-    padding: 2.5rem 1.25rem 4rem;
+    padding: 0 1.25rem 4rem;
   }
 
   /* Hero */
