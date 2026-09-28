@@ -471,7 +471,8 @@ const STOP_TO_STOP_PACE=1.4
  * door and rooms. A leg in the film is planned the same way. */
 export const RAIL_WALK_SPEED=1.4
 const RAIL_PACE_KEPT:ReadonlySet<string>=new Set([
-  'picture-room>picture-room-west','picture-room-west>picture-room','picture-room-west>flight','flight>picture-room-west',
+  'picture-room>picture-room-lisa','picture-room-lisa>picture-room','picture-room-lisa>picture-room-west','picture-room-west>picture-room-lisa',
+  'picture-room-west>flight','flight>picture-room-west',
   'body>body-valve','body-valve>body','courtyard>hall-door-in','hall-door-out>courtyard','hall-door-out>oratory','oratory>hall-door-in',
   'oratory>study','study>oratory','study>chamber','chamber>study'])
 export const railLegSpeed=(from:string,to:string):number=>RAIL_PACE_KEPT.has(`${from}>${to}`)?1:RAIL_WALK_SPEED
