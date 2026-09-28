@@ -6,8 +6,7 @@ import OptimizedImage from './OptimizedImage';
 import CosmicLogo from './CosmicLogo';
 import styles from './WelcomeDisclosureModal.module.css';
 import { preferencesIndexedDbAdapter } from '../storage/preferencesIndexedDbAdapter';
-import { LocalStorageAdapter } from '../storage/localAdapter';
-import { HISTORY_PREFIXES, CURRENT_AGB_VERSION } from '../utils/userState';
+import { CURRENT_AGB_VERSION } from '../utils/userState';
 import { sendEntryBeacon } from '../utils/entryBeacon';
 import { sendSignupBeacon } from '../utils/signupBeacon';
 import { sendFunnelBeaconOnce } from '../utils/funnelBeacon';
@@ -59,19 +58,13 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
       locale: language,
     }).catch((err) => console.error('Failed to save profile:', err));
 
-    // Entry funnel beacons — this is the true "entered the app" moment (profile
-    // created + consent given). isFirstLogin gates the organic-signup beacon;
-    // the profile_created conversion self-gates on a captured gclid (unchanged).
-    // Check the canonical history prefixes, not only the legacy history_ format,
-    // so returning users are not miscounted as first signups.
-    const historyPrefixes = [...HISTORY_PREFIXES, 'history_'];
-    const hasAnyHistory = LocalStorageAdapter.keys().some((k) =>
-      historyPrefixes.some((prefix) => k.startsWith(prefix))
-    );
-    const hasSelectedFigure = LocalStorageAdapter.getString('selectedFigure');
-    const isFirstLogin = !hasAnyHistory && !hasSelectedFigure;
+    // Entry funnel beacons: this is the true "entered the app" moment (profile
+    // created + consent given). The signup count goes with every accepted
+    // welcome: deciding "new or returning" would mean reading the browser's
+    // history for counting, so a browser that accepts a new terms version
+    // counts again.
     sendEntryBeacon();
-    if (isFirstLogin) sendSignupBeacon();
+    sendSignupBeacon();
     // profile_created self-gates on a captured gclid + the consent granted on
     // the landing prompt, so it no-ops for everyone who did not opt in there.
     sendConversion('profile_created');

@@ -1,8 +1,8 @@
 // Anonymous signup beacon
-// Fires from WelcomeDisclosureModal.handleComplete IF the user is new (no
-// prior profile/history/onboarding). Distinct from entry (fires for everyone
-// who completes the welcome step) and from profile_created (gclid-gated,
-// ad-attributed only). Lets the dashboard show total signups including organic.
+// Fires from WelcomeDisclosureModal.handleComplete on every accepted welcome
+// (the welcome shows only where no terms record is stored). Distinct from
+// profile_created (gclid-gated, ad-attributed only). Lets the dashboard show
+// total signups including organic.
 //
 // Privacy: aggregate counter only. No user dimension. No IP retention.
 // Same posture as the entry and page-load beacons.
@@ -23,9 +23,9 @@ const API_BASE = import.meta.env.VITE_FREE_TIER_API_URL || '';
  *
  * No user dimension, no email, no name. Aggregate counter only.
  *
- * Caller is responsible for the "is new user" gate: only fire on first
- * signup, never on returning sign-in. See WelcomeDisclosureModal.handleComplete
- * for the isFirstLogin check.
+ * No "is new user" gate: telling new from returning would take a read of the
+ * browser's history for counting. A new terms version that makes browsers
+ * accept again shows up as extra signups that week.
  */
 export function sendSignupBeacon(): void {
   if (isSelfHost) return; // self-host instances are analytics-silent
