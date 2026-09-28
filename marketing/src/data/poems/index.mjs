@@ -97,6 +97,9 @@ export const poets = {
   },
 };
 
+/** A title in quotation marks, unless it already carries its own ("Hope" is the thing with feathers). */
+export const quoted = (title) => (/["“”]/.test(title) ? title : `"${title}"`);
+
 const verseLines = (text) => text.split('\n').filter((line) => line.trim()).length;
 
 const firstVerseLine = (text) => (text.split('\n').find((line) => line.trim()) || '').trim();
@@ -110,7 +113,7 @@ const dickinsonRecords = dickinsonOrder.map(({ key, slug }) => {
     path: `${poets.dickinson.collectionPath}${slug}/`,
     title: poem.firstLine,
     metaTitle: `${poem.firstLine} by Emily Dickinson`,
-    description: `The full text of "${poem.firstLine}" by Emily Dickinson, as she wrote it, with her dashes kept.`,
+    description: `The full text of ${quoted(poem.firstLine)} by Emily Dickinson, as she wrote it, with her dashes kept.`,
     firstLine: poem.firstLine,
     text: poem.text,
     intro: '',
@@ -142,7 +145,7 @@ const blakeRecords = blakeOrder.map(({ key, slug }) => {
     path: `${poets.blake.collectionPath}${slug}/`,
     title: poem.title,
     metaTitle: `${metaName} by William Blake`,
-    description: `The full text of "${poem.title}" by William Blake, from ${group.title.replace('From ', '')}, free to read.`,
+    description: `The full text of ${quoted(poem.title)} by William Blake, from ${group.title.replace('From ', '')}, free to read.`,
     firstLine: firstVerseLine(text),
     text,
     intro: poem.intro,
@@ -163,7 +166,7 @@ const shakespeareRecords = shakespeareOrder.map(({ key, slug }) => {
     path: `${poets.shakespeare.collectionPath}${slug}/`,
     title: `Sonnet ${sonnet.num}`,
     metaTitle: `Sonnet ${sonnet.num} by William Shakespeare`,
-    description: `The full text of Sonnet ${sonnet.num} by William Shakespeare, "${sonnet.firstLine}", free to read.`,
+    description: `The full text of Sonnet ${sonnet.num} by William Shakespeare, ${quoted(sonnet.firstLine)}, free to read.`,
     firstLine: sonnet.firstLine,
     text,
     intro: sonnet.intro,

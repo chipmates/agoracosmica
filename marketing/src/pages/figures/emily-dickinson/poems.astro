@@ -19,7 +19,9 @@ import {
   dickinsonFacsimileLeaves as FACS_LEAVES,
   dickinsonFacsimileSources as FACS,
 } from '../../../data/poems/dickinson.mjs';
-import { poemsByPoet } from '../../../data/poems/index.mjs';
+import { poemsByPoet, quoted } from '../../../data/poems/index.mjs';
+import { breadcrumbSchema } from '../../../lib/schemas';
+import { SITE_URL } from '../../../lib/urls';
 // Where each poem's own page lives, from the same data the pages render from.
 const OWN_PAGE: Record<string, string> = Object.fromEntries(
   poemsByPoet('dickinson').map((poem) => [poem.key, poem.path]),
@@ -139,6 +141,12 @@ const schemas = [
       })),
     },
   },
+  breadcrumbSchema([
+    { name: 'Home', url: `${SITE_URL}/` },
+    { name: 'Figures', url: `${SITE_URL}/figures/` },
+    { name: 'Emily Dickinson', url: `${SITE_URL}/figures/emily-dickinson/` },
+    { name: 'Poems', url: PAGE_URL },
+  ]),
 ];
 ---
 <Public
@@ -147,6 +155,8 @@ const schemas = [
   canonicalPath="/figures/emily-dickinson/poems"
   lang={lang}
   ogType="article"
+  ogImage={msUrl('portrait-1847')}
+  ogImageAlt="Emily Dickinson, daguerreotype, about 1847"
   noindex={false}
   noHreflang={true}
   stickyCta={false}
@@ -222,7 +232,7 @@ const schemas = [
                           data-ed-carousel
                           role="group"
                           aria-roledescription="carousel"
-                          aria-label={`Manuscript of "${POEMS[key].firstLine}", ${FACS_LEAVES[key].length} pages`}
+                          aria-label={`Manuscript of ${quoted(POEMS[key].firstLine)}, ${FACS_LEAVES[key].length} pages`}
                         >
                           <div class="ed-carousel__track">
                             {FACS_LEAVES[key].map((leaf, n) => (
@@ -231,12 +241,12 @@ const schemas = [
                                 href={msUrl(leaf)}
                                 target="_blank"
                                 rel="noopener"
-                                aria-label={`Page ${n + 1} of ${FACS_LEAVES[key].length}, manuscript of "${POEMS[key].firstLine}", opens full size in a new tab`}
+                                aria-label={`Page ${n + 1} of ${FACS_LEAVES[key].length}, manuscript of ${quoted(POEMS[key].firstLine)}, opens full size in a new tab`}
                               >
                                 <img
                                   class="ed-hand__img"
                                   src={msUrl(leaf)}
-                                  alt={`Emily Dickinson's manuscript of "${POEMS[key].firstLine}", page ${n + 1} of ${FACS_LEAVES[key].length}`}
+                                  alt={`Emily Dickinson's manuscript of ${quoted(POEMS[key].firstLine)}, page ${n + 1} of ${FACS_LEAVES[key].length}`}
                                   loading="lazy"
                                   decoding="async"
                                 />
@@ -262,12 +272,12 @@ const schemas = [
                             href={msUrl(FACS_LEAVES[key][0])}
                             target="_blank"
                             rel="noopener"
-                            aria-label={`Open the manuscript of "${POEMS[key].firstLine}" full size in a new tab`}
+                            aria-label={`Open the manuscript of ${quoted(POEMS[key].firstLine)} full size in a new tab`}
                           >
                             <img
                               class="ed-hand__img"
                               src={msUrl(FACS_LEAVES[key][0])}
-                              alt={`Emily Dickinson's handwritten manuscript of "${POEMS[key].firstLine}"`}
+                              alt={`Emily Dickinson's handwritten manuscript of ${quoted(POEMS[key].firstLine)}`}
                               loading="lazy"
                               decoding="async"
                             />
