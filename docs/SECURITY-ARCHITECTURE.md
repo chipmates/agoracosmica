@@ -146,9 +146,9 @@ The quota is keyed to identity so that everyone behind one carrier address keeps
 
 | Data | TTL | Purpose |
 |---|---|---|
-| Rate-limit counters, per identity and per hashed address | 24h, and 1h for the session-mint counter | Quota enforcement |
+| Rate-limit counters, per identity and per hashed address | 24h, 6h for the community tally, and 1h for the session-mint counter | Quota enforcement |
 | Beacon and conversion flood brakes | 1h | Stops a flood on the anonymous counter routes. The only place a plain address appears, and it never reaches analytics |
-| Safety screening events | 90 days | Anonymized content moderation review |
+| Safety screening events | 90 days | Pseudonymized content moderation review |
 | Ad conversion events (event name, optional figure id, timestamp) | 90 days | The operator readout. The click id is never in this record |
 | Community tally record (keyed hash of the browser's ID, voting power, completed figures, last seen) | 12 months after last seen | Each browser counts once in the community total |
 | Audio server health snapshot | 2 min | Failover routing, refreshed at most every 15 seconds |
