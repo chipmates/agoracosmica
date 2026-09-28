@@ -305,7 +305,7 @@ const DatenschutzPage: FC = () => {
             <li>Eine zufällige Browser-Kennung für das tägliche kostenlose Kontingent, erzeugt, wenn Sie die App ohne eigenen Schlüssel öffnen (localStorage), und täglich erneuert</li>
             <li>Eine zufällige Kennung für die Community-Zählung, erzeugt, wenn Sie die Community-Seite öffnen (localStorage)</li>
             <li>Ihre Antwort auf die Frage zur Werbe-Messung, Ja oder Nein, mit Version und Datum, damit wir sie respektieren (localStorage) für 12 Monate</li>
-            <li>Kurzlebige Daten für den aktuellen Tab (sessionStorage, beim Schließen des Tabs gelöscht): was Sie auf unseren Seiten vor dem Einstieg in die App gewählt haben (Persönlichkeit, Konzil, Kapitel, Frage), ob die Startseite Sie bereits in die App weitergeleitet hat, und bereits erstellte Zusammenfassungen</li>
+            <li>Kurzlebige Daten für den aktuellen Tab (sessionStorage, beim Schließen des Tabs gelöscht): was Sie auf unseren Seiten vor dem Einstieg in die App gewählt haben (Persönlichkeit, Konzil, Kapitel, Frage), ob die Startseite Sie bereits in die App weitergeleitet hat, bereits erstellte Zusammenfassungen und Zustand der Oberfläche, etwa ob eine Animation schon gelaufen ist</li>
             <li>Cloudflare-Sicherheitscookies: __cf_bm (Bot-Schutz, 30 Minuten) und nach einer Sicherheitsprüfung cf_clearance</li>
           </ul>
           <p>

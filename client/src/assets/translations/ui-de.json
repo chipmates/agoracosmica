@@ -1518,7 +1518,7 @@
           },
           "session": {
             "type": "Session Storage",
-            "purpose": "Was du auf unseren Seiten gewählt hast, bevor du in die App gehst, ob die Startseite dich schon weitergeleitet hat, bereits erstellte Zusammenfassungen",
+            "purpose": "Was du auf unseren Seiten gewählt hast, bevor du in die App gehst, ob die Startseite dich schon weitergeleitet hat, bereits erstellte Zusammenfassungen, Zustand der Oberfläche",
             "duration": "Bis du den Tab schließt"
           },
           "clickId": {

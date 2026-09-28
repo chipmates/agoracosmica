@@ -1516,7 +1516,7 @@
           },
           "session": {
             "type": "Session Storage",
-            "purpose": "What you picked on our pages before entering the app, whether the home page has already taken you on, summaries already made",
+            "purpose": "What you picked on our pages before entering the app, whether the home page has already taken you on, summaries already made, interface state",
             "duration": "Until you close the tab"
           },
           "clickId": {
