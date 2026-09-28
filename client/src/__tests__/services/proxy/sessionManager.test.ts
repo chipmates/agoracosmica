@@ -100,6 +100,13 @@ describe('quota ID renewed every UTC day', () => {
     expect(JSON.parse(stored()!)).toEqual({ id: CLIENT_ID, day: '2026-09-28' });
   });
 
+  it('removes an ID from an earlier day when the app loads, with no session asked', async () => {
+    localStorage.setItem('agora_client_id', JSON.stringify({ id: OTHER_ID, day: '2026-09-27' }));
+    await import('../../../services/proxy/sessionManager');
+    expect(stored()).toBeNull();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it('removes a stale ID even when the request fails', async () => {
     localStorage.setItem('agora_client_id', JSON.stringify({ id: OTHER_ID, day: '2026-09-20' }));
     fetchMock.mockImplementation(async () => new Response('{"error":"x"}', { status: 403 }));

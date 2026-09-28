@@ -17,8 +17,8 @@ const SS_GCLID_KEY = 'agc_gclid';
 // version, time), kept so the choice is respected across visits.
 const LS_AD_CONSENT_KEY = 'agc_ad_consent';
 const AD_CONSENT_VERSION = '1.0.0';
-// An answer is remembered for 12 months; an older one counts as no answer, so
-// the question may be asked again.
+// An answer is remembered for 12 months; an older one is removed and counts as
+// no answer, so the question may be asked again.
 const AD_CONSENT_MAX_AGE_MS = 365 * 24 * 60 * 60 * 1000;
 // Clock skew allowance for a record that looks slightly newer than now.
 const AD_CONSENT_SKEW_MS = 24 * 60 * 60 * 1000;
@@ -127,7 +127,8 @@ export function isPaidVisitor(): boolean {
 /**
  * The stored answer, if it still counts: written under the current consent
  * version (an older version no longer covers the current scope) and less than
- * 12 months old. Anything else counts as no answer.
+ * 12 months old. Anything else counts as no answer and is removed, so no
+ * answer is kept longer than the 12 months the policy states.
  */
 function currentAdConsent(): { granted: boolean } | null {
   try {
@@ -135,9 +136,12 @@ function currentAdConsent(): { granted: boolean } | null {
     const raw = localStorage.getItem(LS_AD_CONSENT_KEY);
     if (!raw) return null;
     const record = JSON.parse(raw) as { granted?: unknown; version?: unknown; timestamp?: unknown };
-    if (record.version !== AD_CONSENT_VERSION) return null;
     const age = Date.now() - Number(record.timestamp);
-    if (!Number.isFinite(age) || age >= AD_CONSENT_MAX_AGE_MS || age < -AD_CONSENT_SKEW_MS) return null;
+    if (record.version !== AD_CONSENT_VERSION || !Number.isFinite(age) ||
+        age >= AD_CONSENT_MAX_AGE_MS || age < -AD_CONSENT_SKEW_MS) {
+      localStorage.removeItem(LS_AD_CONSENT_KEY);
+      return null;
+    }
     return { granted: record.granted === true };
   } catch {
     return null;

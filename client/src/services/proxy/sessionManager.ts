@@ -66,6 +66,10 @@ function readStoredClientId(): string | null {
   }
 }
 
+// An ID from an earlier UTC day goes when the app loads, also for a visitor who
+// now uses their own key and never asks for a session.
+if (typeof window !== 'undefined') readStoredClientId();
+
 /** Persist the clientId returned by the server, stamped with today's UTC day. */
 function writeStoredClientId(clientId: string): void {
   try {

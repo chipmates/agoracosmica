@@ -1502,7 +1502,7 @@
           "clientId": {
             "type": "Local Storage (agora_client_id)",
             "purpose": "Random browser ID for the daily free quota, used only for that",
-            "duration": "One day"
+            "duration": "One day, then removed the next time you open the app"
           },
           "community": {
             "type": "Local Storage (community_device_uuid)",

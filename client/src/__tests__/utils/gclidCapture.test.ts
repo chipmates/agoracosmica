@@ -207,6 +207,21 @@ describe('the 12-month memory of an answer', () => {
     expect(m.adConsentGranted()).toBe(false);
   });
 
+  it('removes an answer that no longer counts when the module loads', async () => {
+    for (const record of [
+      aged(true, 366),
+      aged(false, 366),
+      JSON.stringify({ granted: true, version: '0.9.0', timestamp: Date.now() }),
+    ]) {
+      localStorage.setItem('agc_ad_consent', record);
+      await loadAt('/');
+      expect(localStorage.getItem('agc_ad_consent')).toBeNull();
+    }
+    localStorage.setItem('agc_ad_consent', aged(true, 364));
+    await loadAt('/');
+    expect(localStorage.getItem('agc_ad_consent')).not.toBeNull();
+  });
+
   it('treats an answer older than 365 days as no answer', async () => {
     for (const granted of [true, false]) {
       localStorage.setItem('agc_ad_consent', aged(granted, 366));

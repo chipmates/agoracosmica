@@ -1504,7 +1504,7 @@
           "clientId": {
             "type": "Local Storage (agora_client_id)",
             "purpose": "Zufällige Browser-Kennung für das tägliche kostenlose Kontingent, nur dafür genutzt",
-            "duration": "Ein Tag"
+            "duration": "Ein Tag, danach beim nächsten Öffnen der App gelöscht"
           },
           "community": {
             "type": "Local Storage (community_device_uuid)",
