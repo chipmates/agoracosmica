@@ -31,6 +31,7 @@ const NO_HREFLANG_PATTERNS = [
   /^figures\/(emily-dickinson|william-blake)\/poems\/[^/]+$/,
   /^figures\/william-shakespeare\/sonnets\/[^/]+$/,
   /^figures\/marcus-aurelius\/meditations$/,
+  /^figures\/william-shakespeare\/quotes$/,
   /^poems$/,
 ];
 
