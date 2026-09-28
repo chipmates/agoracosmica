@@ -273,7 +273,6 @@ const PHILO_HUB_MOD = gitLastModified(
   'marketing/src/pages/ai-philosophy-tutor.astro',
   'marketing/src/pages/de/philosophie-lernen.astro',
   'marketing/src/components/TutorHubContent.astro',
-  'marketing/src/components/PhilosophyHubContent.astro',
 );
 urls.push(...crossPair('/ai-philosophy-tutor', '/de/philosophie-lernen', '0.8', PHILO_HUB_MOD, 'weekly'));
 
