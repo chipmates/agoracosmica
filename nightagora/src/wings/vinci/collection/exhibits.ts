@@ -5,7 +5,7 @@
  * `grave/` by their own factories. This module owns where they stand, what
  * they stand on and which way they face, and nothing else.
  */
-import { Group, Mesh, MeshStandardNodeMaterial, PointLight, Vector3, type Material, type Object3D, type PlaneGeometry, type Scene } from 'three/webgpu'
+import { Box3, Group, Mesh, MeshStandardNodeMaterial, PointLight, Vector3, type Material, type Object3D, type PlaneGeometry, type Scene } from 'three/webgpu'
 import { translucentCloth } from './hall-cloth'
 import { dressParachuteCloth, hideClothDouble } from './court-linen'
 import type { Stack } from '../../../stack'
@@ -22,7 +22,7 @@ import pageMap from '../table/data/msb-pages.json?raw'
 import { lang } from '../../content'
 import { stamp } from './build'
 import { collectionExhibitMaterials, collectionInteriorMaterial, collectionProceduralStack } from './materials'
-import { COURT, FLOOR, GRAVE_ORIGIN, LINE_ORIGIN } from './layout'
+import { COURT, FACE, FLOOR, GRAVE_ORIGIN, LINE_ORIGIN } from './layout'
 import { createCollectionStandSolids, standLevel, STANDS, standOf, type StandGround } from './stands'
 import { mountCollectionPlates, type CollectionPictureSource } from './plates'
 import { HALL_FILL, mountHallLight } from './hall-light'
@@ -448,6 +448,22 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
     return { done: picturesUp, total: picturesAsked }
   }
 
+  // `?popin` lets an instrument read which machines stand, frame by frame
+  if (typeof location !== 'undefined' && new URLSearchParams(location.search).has('popin')) {
+    const boxes = new Map<MachineSlug, number[]>()
+    ;(window as unknown as Record<string, unknown>)['__naStands'] = () => machines.map(machine => {
+      let box = boxes.get(machine.slug)
+      if (!box && machine.build.object.parent === host) {
+        const shown = machine.build.object.visible
+        machine.build.object.visible = true
+        const measured = new Box3().setFromObject(machine.build.object)
+        machine.build.object.visible = shown
+        if (!measured.isEmpty()) boxes.set(machine.slug, box = [...measured.min.toArray(), ...measured.max.toArray()])
+      }
+      return { slug: machine.slug, ground: machine.ground, visible: machine.build.object.visible, box: box ?? null }
+    })
+  }
+
   return {
     bodies() {
       const plates = pictureBodies()
@@ -535,6 +551,10 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       const clear = Math.hypot(Math.max(-61.66 - eye.x, 0, eye.x + 39.02), Math.max(42.04 - eye.z, 0, eye.z - 63.66))
       if (inHall || hallHeld) hallKept = true
       else if (hallKept && clear > HALL_KEEP_M) hallKept = false
+      // the hall and the long gallery are walled off from the court; the
+      // picture room looks out on it through its north glazing
+      const walledOff = eye.y < -1.5 && eye.x > FACE.wallWest && eye.x < FACE.glazingEast
+        && eye.z > -FACE.pictureWallSouth && eye.z < -FACE.wallSouth
       for (const machine of machines) {
         // lent to the close look's table, a machine takes that table's light
         const lit = hallLit.get(machine.build)
@@ -543,9 +563,14 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
           lightHallMachine(machine.build, !lit)
         }
         const reach = eye.distanceToSquared(machine.at) < machine.reach * machine.reach
-        const visible = machine.ground === 'hall' ? (inHall || hallKept) && reach
+        // A MACHINE STANDS WHEREVER ITS ROOM CAN BE SEEN, never only once
+        // the eye is near it: the whole hall from inside it and from the
+        // first step of a leg into it, the whole court from wherever the
+        // court is seen. A walk out of the hall keeps what is within reach,
+        // and the house keeps its reach.
+        const visible = machine.ground === 'hall' ? inHall || hallHeld || (hallKept && reach)
           : machine.ground === 'house' ? reach
-          : near && reach
+          : near && !walledOff
         if (machine.build.object.visible !== visible) machine.build.object.visible = visible
         // ONE CLOCK RUNS AT A TIME, and only for the machine a close look has
         // been asked for. Everything else stands in its rest pose, which is
