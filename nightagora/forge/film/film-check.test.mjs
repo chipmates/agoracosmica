@@ -60,8 +60,8 @@ test('a clean tree is green on every line', () => {
   const result = gate(clean)
   for (const l of result.lines) assert.deepEqual(l.red, [], `${l.name} is green`)
   assert.equal(result.green, true)
-  assert.equal(clean.clips.size, 712)
-  assert.equal(clean.stills.size, 190)
+  assert.equal(clean.clips.size, 716)
+  assert.equal(clean.stills.size, 192)
   for (const s of clean.stills.values()) assert.deepEqual(s.histories, { prints: 1, exposures: 1 }, `${s.node} ${s.framing} has one picture`)
 })
 

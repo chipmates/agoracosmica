@@ -95,7 +95,7 @@ const { railStationWaypoints, railGateWaypoints, railTerraceWaypoints, railDoorT
 /** A turn in a doorway, or one a walk makes standing, is made on the corner itself, so it is left unrounded. */
 const atStandingTurn = (turns, centre) => turns.some(([east, north, height]) => Math.hypot(centre.x - east, centre.y - height, centre.z + north) < .55)
 const { railExhibitStands, railExhibitLevel } = await load(path.join(WING, 'rail-solids.ts'))
-const { createCollectionStandSolids } = await load(path.join(WING, 'collection/stands.ts'))
+const { createCollectionStandSolids, HALL_LION, HALL_LION_REST } = await load(path.join(WING, 'collection/stands.ts'))
 const { geometryForPart } = await load(path.join(WING, 'machines/geometry.ts'))
 const { jointValuesAt } = await load(path.join(WING, 'machines/motion.ts'))
 const { gradeAt } = await load(path.join(WING, 'terrain-mesh.ts'))
@@ -195,8 +195,24 @@ async function houseRoomSolids(tier) {
   return meshes
 }
 
+/** THE LION ON THE HALL'S FLOOR is the house's, like the rooms: its body at
+ * rest, as one box, stands inside the clearance and outside the fingerprint. */
+function hallLionSolids() {
+  const { min, max } = HALL_LION_REST
+  const box = new THREE.Mesh(new THREE.BoxGeometry(max[0] - min[0], max[1] - min[1], max[2] - min[2]))
+  box.name = 'vinci/mechanical-lion/rest'
+  box.position.set((min[0] + max[0]) / 2, (min[1] + max[1]) / 2, (min[2] + max[2]) / 2)
+  const root = new THREE.Group()
+  root.rotation.y = HALL_LION.bearing * Math.PI / 180
+  root.position.set(HALL_LION.east, HALL_LION.floor, -HALL_LION.north)
+  root.add(box)
+  root.updateMatrixWorld(true)
+  return [box]
+}
+
 const geometry = [], geometrySignatures = [], solidSets = [], restSets = []
 for (const tier of HOUSE_ROOM_TIERS) restSets.push({ tier: `house-${tier}`, solids: await houseRoomSolids(tier) })
+restSets.push({ tier: 'house-lion', solids: hallLionSolids() })
 for (const tier of ['hero', 'standard', 'calm']) {
   const scene = await mount(tier)
   const solids = collectRailSolids(scene)

@@ -24,6 +24,7 @@ import { createVinciWelcome, vinciWelcomeSeen } from './welcome'
 import { KEY_RIG, PRINT, STATION_EXPOSURE, STATION_TOE } from './print'
 import { createShell } from './shell'
 import { createHouseHall, houseHallProvenance, type HouseHall } from './house-hall'
+import { createHallLion } from './hall-lion'
 import { createShellShadowDouble } from './shadow-shell'
 import { createWingShadowBody, type WingShadowBody } from './shadow-body'
 import { createCollection, collectionProvenance } from './collection'
@@ -951,6 +952,10 @@ export function createWing():VinciWingModule {
     // a press has to reach them from the hall.
     houseRoot=createHallTablePieces(stack).group
     scene.add(houseRoot)
+    // THE LION stands on the hall's floor in the house's own group, so the
+    // registry reads it beside the table's pieces. Its carving lands after the
+    // warm up may have taken the shadow snapshot, which is then taken again.
+    { const lion=createHallLion(stack);houseRoot.add(lion.object);void lion.ready.then(()=>{if(hosts&&standing&&!warm)standShadowCache()}) }
     dots=createVinciExhibitDots({host:h.labels,camera,occluders,limit:DOTS_PER_TIER[stack.tierName()]??6,controls:VINCI_EXHIBIT_CARD,
       onOpen:(id,dot)=>openExhibit(id,dot),
       // the word a pressed walking mark takes, and the leg its ring counts

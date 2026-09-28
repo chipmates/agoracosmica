@@ -17,7 +17,7 @@ import { GRAVE_DEATHBED, GRAVE_FRAME, GRAVE_SLAB } from '../grave/placement'
 import { LINE_STUDS } from '../line/studs'
 import { hangPlacements } from './hang'
 import { COURT, FLOOR, GRAVE_ORIGIN, SUPPER_WALL, VINCI_READING_TABLE } from './layout'
-import { HALL_TABLE, HALL_TABLE_PIECES, HALL_TABLE_PIECE_SLUGS, STANDS, isHallTablePiece, standOf, standLevel, type HallTablePiece } from './stands'
+import { HALL_LION, HALL_LION_REST, HALL_TABLE, HALL_TABLE_PIECES, HALL_TABLE_PIECE_SLUGS, STANDS, isHallTablePiece, standOf, standLevel, type HallTablePiece } from './stands'
 import { dossiers, MACHINE_SLUGS, type MachineSlug } from '../machines/catalog'
 import { bodyWallOrder } from './wall'
 import { studySupport } from '../inner-court'
@@ -241,7 +241,7 @@ const DIAGRAM: Field = (() => {
 /** Where each object's eye stands, in east, north: every one is a short
  * straight leg from its own station eye that passes no plinth, no upright and
  * no furniture, and every eye stands clear of its object's swept envelope. */
-const MACHINE_EYES: Record<Exclude<MachineSlug, HallTablePiece>, { station: VinciStationId; east: number; north: number }> = {
+const MACHINE_EYES: Record<Exclude<MachineSlug, HallTablePiece | 'mechanical-lion'>, { station: VinciStationId; east: number; north: number }> = {
   // The court, from the display wall's eye: every leg passes south of the
   // plaque and of the parachute's south-west upright.
   'parachute': { station: 'supper-wall', east: -36.2, north: -28.3 },
@@ -290,6 +290,22 @@ function tablePiecePose(slug: HallTablePiece, narrow: boolean): ApproachPose {
     readingLens(Math.max(y, x, z), TABLE_READING_M), narrow)
 }
 
+/** THE LION IS READ FROM ITS LEFT SHOULDER, where the open flank and the
+ * chest show together: an eye three metres off, a short straight leg in from
+ * the hall's door that passes in front of the table's south end. In the
+ * lion's own frame, +z its nose and +x its left. */
+const LION_EYE = { x: 1.63, z: 2.52 }
+function lionPose(narrow: boolean): ApproachPose {
+  const b = HALL_LION.bearing * Math.PI / 180, cos = Math.cos(b), sin = Math.sin(b)
+  const on = (x: number, z: number): [number, number] => [HALL_LION.east + x * cos + z * sin, HALL_LION.north + x * sin - z * cos]
+  const { min, max } = HALL_LION_REST
+  const [eyeEast, eyeNorth] = on(LION_EYE.x, LION_EYE.z)
+  const [atEast, atNorth] = on((min[0] + max[0]) / 2, (min[2] + max[2]) / 2)
+  const size = Math.max(max[0] - min[0], max[1] - min[1], max[2] - min[2])
+  const lens = 2 * Math.atan(1.2 * size / 2 / Math.hypot(LION_EYE.x, LION_EYE.z)) * 180 / Math.PI
+  return pose([eyeEast, eyeNorth, HALL_LION.floor + 1.65], [atEast, atNorth, HALL_LION.floor + max[1] / 2], lens, narrow)
+}
+
 /** The one station the gallery's cut line is read from. */
 export const VINCI_LINE_STATION: VinciStationId = 'line-early'
 /** The one station the body wall's sheets are walked from. */
@@ -336,7 +352,8 @@ function otherKinds(): Placed[] {
     add(`sheet/${mount.id}`, 'sheet', BODY_STATION, narrow => eastFacingApproach(field, narrow))
   }
   for (const slug of MACHINE_SLUGS) {
-    if (isHallTablePiece(slug)) add(`machine/${slug}`, 'machine', 'hall', narrow => tablePiecePose(slug, narrow))
+    if (slug === 'mechanical-lion') add(`machine/${slug}`, 'machine', 'hall', lionPose)
+    else if (isHallTablePiece(slug)) add(`machine/${slug}`, 'machine', 'hall', narrow => tablePiecePose(slug, narrow))
     else add(`machine/${slug}`, 'machine', MACHINE_EYES[slug].station, narrow => machinePose(slug, narrow))
   }
   // THE STUDY'S PAGE, on its support below the window the visit was written

@@ -87,6 +87,9 @@ const EXHIBITS = [
   // The house's two pieces of the collection, on the great hall's table.
   { id: 'machine/inclinometer', kind: 'machine', station: 'hall' },
   { id: 'machine/proportional-compass', kind: 'machine', station: 'hall' },
+  // The lion on the hall's floor, its third thing to see. It is long in the
+  // whole view, so its upright cell is cut round its head and chest.
+  { id: 'machine/mechanical-lion', kind: 'machine', station: 'hall', focus: .3 },
   { id: 'grave', kind: 'place', station: 'grave' },
   { id: 'grave-diagram', kind: 'place', station: 'grave' },
   { id: 'codex/paris-B', kind: 'manuscript', station: 'reading-table' },
@@ -214,8 +217,9 @@ function atCellProportion(rect, window) {
   return { x: Math.round(x), y: Math.round(y), width: Math.round(width), height: Math.round(height) }
 }
 
-/** The body's box, given air and the cell's proportion, inside its frame. */
-function boxForCell(box, air = .1) {
+/** The body's box, given air and the cell's proportion, inside its frame;
+ *  `focus` is where across the body the cut centres when it cannot hold it all. */
+function boxForCell(box, air = .1, focus = .5) {
   const want = CELL.width / CELL.height
   const frame = box.frame
   let width = box.width * (1 + air), height = box.height * (1 + air)
@@ -223,7 +227,7 @@ function boxForCell(box, air = .1) {
   else width = height * want
   const scale = Math.min(1, frame.width / width, frame.height / height)
   width *= scale; height *= scale
-  const centreX = box.left + box.width / 2, centreY = box.top + box.height / 2
+  const centreX = box.left + box.width * focus, centreY = box.top + box.height / 2
   const left = Math.max(0, Math.min(frame.width - width, centreX - width / 2))
   const top = Math.max(0, Math.min(frame.height - height, centreY - height / 2))
   return { left: Math.round(left), top: Math.round(top), width: Math.round(width), height: Math.round(height) }
@@ -553,7 +557,7 @@ try {
     // A MACHINE IS CUT TO ITS OWN BODY: the turntable fits it into a viewport
     // wider than the cell, and the cell would take the air with it.
     const box = exhibit.kind === 'machine' ? await contentBox(frame) : null
-    const cut = box ? boxForCell(box) : null
+    const cut = box ? boxForCell(box, .1, exhibit.focus ?? .5) : null
     const png = cut ? await sharp(frame).extract({ left: cut.left, top: cut.top, width: cut.width, height: cut.height }).png().toBuffer() : frame
     const name = exhibit.id.replace(/\//g, '-')
     writeFileSync(join(SHOTS, `${name}-frame.png`), frame)

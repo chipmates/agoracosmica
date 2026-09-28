@@ -29,12 +29,12 @@ test('every clip, still and cycle of the graph stands in the job once, in both f
     for (const e of graph.edges) assert.ok(ids.has(clipId(e.id, f)), `${e.id} ${f}`)
     for (const n of graph.nodes) assert.ok(ids.has(stillId(n.id, f)), `${n.id} ${f}`)
   }
-  assert.equal(machines.length, 13, 'thirteen machines move; the parachute stands')
+  assert.equal(machines.length, 14, 'fourteen machines move; the parachute stands')
   assert.ok(!machines.some((m) => m.slug === 'parachute'))
-  assert.equal(entries.filter((e) => e.kind === 'cycle').length, 26)
+  assert.equal(entries.filter((e) => e.kind === 'cycle').length, 28)
   assert.equal(entries.length, 2 * (graph.edges.length + graph.nodes.length + machines.length))
   const c = countsOf(entries)
-  assert.equal(c['cycle wide'].frames, 298 * 30)
+  assert.equal(c['cycle wide'].frames, 318 * 30)
 })
 
 test('the spine comes first: a film rendered in part is walkable from the entrance', () => {
