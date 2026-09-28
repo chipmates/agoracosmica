@@ -99,7 +99,7 @@ function valveDesktopPose(pose: WalkPose): WalkPose {
  * The desktop's bearing is the one the stair is walked down under
  * (`rail.ts`, STAIR_VIEW_HEADING). Bearings are east of north. */
 const STAIR_HEAD_BACK_M = .4, STAIR_HEAD_REACH_M = 20
-const STAIR_HEAD_LOOK = { desktop: { bearing: 210, pitch: -12, fov: 55 }, phone: { bearing: 224, pitch: -13, fov: 80 } }
+const STAIR_HEAD_LOOK = { desktop: { bearing: 210, pitch: -12, fov: 55 }, phone: { bearing: 220, pitch: -16, fov: 80 } }
 function stairHeadPose(narrow: boolean): WalkPose {
   const [east, north, height] = railCollectionStairWaypoints[0]!
   const look = STAIR_HEAD_LOOK[narrow ? 'phone' : 'desktop']
