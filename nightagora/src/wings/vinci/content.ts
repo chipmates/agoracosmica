@@ -730,7 +730,7 @@ export const vinciWelcomeText = {
   label: { en: 'The da Vinci wing, at the door', de: 'Der da-Vinci-Flügel, an der Tür' },
   kicker: { en: 'CLOS LUCE, AMBOISE · 10 OCTOBER 1517', de: 'CLOS LUCE, AMBOISE · 10. OKTOBER 1517' },
   title: { en: 'Leonardo da Vinci', de: 'Leonardo da Vinci' },
-  route: { en: 'Walk the house from the street, or go straight to the collection.', de: 'Geh vom Hoftor durch das Haus, oder geh direkt zur Sammlung.' },
+  route: { en: 'Follow the story, or go straight to the collection.', de: 'Folge der Geschichte, oder geh direkt zur Sammlung.' },
   enter: { en: 'Enter', de: 'Eintreten' },
   collection: { en: 'Go to the collection', de: 'Zur Sammlung' },
   /* THE RACK AND ITS HANDLE, said for a screen reader and never displayed:
@@ -964,8 +964,8 @@ export const vinciWingCounts: VinciText = {
  * later, a place and a documented day, and both are claims this wing already
  * makes at its own stations. */
 export const vinciThroughLine: VinciText = {
-  en: 'You are standing in the last house Leonardo da Vinci lived in, on an afternoon a visitor wrote down.',
-  de: 'Du stehst im letzten Haus, in dem Leonardo da Vinci lebte, an einem Nachmittag, den ein Besucher aufgeschrieben hat.',
+  en: 'The last house Leonardo da Vinci lived in, on an afternoon a visitor wrote down.',
+  de: 'Das letzte Haus, in dem Leonardo da Vinci lebte, an einem Nachmittag, den ein Besucher aufgeschrieben hat.',
 };
 
 /** THE PLAN'S ROOMS. The plan draws the wing from geometry the collection
