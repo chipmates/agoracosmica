@@ -445,13 +445,15 @@ const RAIL_FLIGHTS:readonly (readonly [RailWaypoint,RailWaypoint])[]=[[railAcces
  * to and from as a route: out of the room's door facing it. */
 const RAIL_WALKED_APPROACHES:ReadonlySet<string>=new Set(['machine/proportional-compass'])
 /** THE LINKS WALKED LOOKING AT WHERE THEY GO, by their pair of exhibits: the
- * view turns to the next object as the walk sets off and holds it in the
- * middle of the frame all the way. A pan between the two held views walked
- * sideways past the court's wall to the crane, and in the hall kept the next
- * machine out of the frame for most of the way (`gaze-check.mjs`, lost). */
+ * view turns toward the next object as the walk sets off and holds it in the
+ * frame all the way. A pan between the two held views walked sideways past
+ * the court's wall to the crane, and in the hall kept the next machine out of
+ * the frame for most of the way (`gaze-check.mjs`, lost). The view turns no
+ * further than AIM_BEYOND past the two held views' headings, so what it gives
+ * back on arriving stays under the film's gate (`motion.mjs`, 45 deg). */
 const RAIL_AIMED_LINKS:ReadonlySet<string>=new Set(['machine/parachute>machine/revolving-crane',
   'machine/miter-lock-gates>machine/flywheel','machine/flywheel>machine/miter-lock-gates',
-  'machine/camera-obscura>machine/water-lifting-screw','machine/water-lifting-screw>machine/camera-obscura']),AIM_TAKEN_M=1.5
+  'machine/camera-obscura>machine/water-lifting-screw','machine/water-lifting-screw>machine/camera-obscura']),AIM_TAKEN_M=1.5,AIM_BEYOND=15*Math.PI/180,KEY_NEAR_M=1.5
 /** A turn made standing still may run this fast, in degrees a second: a half
  * turn in about six seconds on the desktop and eight on the phone. */
 const RAIL_QUICK_TURN=20*TURN_TIME_SCALE,RAIL_QUICK_TURN_PHONE=14*TURN_TIME_SCALE
@@ -669,14 +671,27 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     }
     return out.sort((a,b)=>a-b)
   }
+  /** Where a scripted look's waypoint lies along the leg: the path's nearest
+   * pass over the ground, which each framing's own smoothing may carry a
+   * little off the corner (a stand's 0.6 m would miss it); -1 where none. */
+  function keyTurn([east,north]:readonly [number,number,number]):number {
+    let best=KEY_NEAR_M*KEY_NEAR_M,at=-1
+    for(let m=0;m<=path!.length;m+=.05){path!.pointAtDistance(m,span);const d=(span.x-east)**2+(span.z+north)**2;if(d<best){best=d;at=m}}
+    return at
+  }
   /** Where an aimed link looks from a body position: at the object it walks
    * to, taken up over the first steps and handed to the arriving view over
    * the last metre. */
-  function aimedAt(at:Vector3):(metres:number,until?:number)=>GazeCourse {
+  function aimedAt(at:Vector3,leaving:number,arriving:number):(metres:number,until?:number)=>GazeCourse {
+    const turn=(a:number):number=>Math.atan2(Math.sin(a),Math.cos(a)),arrive=turn(arriving-leaving)
+    const low=Math.min(0,arrive)-AIM_BEYOND,high=Math.max(0,arrive)+AIM_BEYOND,middle=(low+high)/2
     return (metres,until=path!.length)=>{
       path!.pointAtDistance(Math.max(0,Math.min(path!.length,metres)),probe)
       const east=at.x-probe.x,up=at.y-probe.y,south=at.z-probe.z
-      return {heading:Math.atan2(-east,-south),elevation:Math.atan2(up,Math.hypot(east,south)),weight:ramp(0,AIM_TAKEN_M,metres)*ramp(0,1,until-metres)}
+      // the object's bearing read on the side of the band it lies nearest
+      const seen=middle+turn(Math.atan2(-east,-south)-leaving-middle)
+      const heading=leaving+Math.max(low,Math.min(high,seen))
+      return {heading,elevation:Math.atan2(up,Math.hypot(east,south)),weight:ramp(0,AIM_TAKEN_M,metres)*ramp(0,1,until-metres)}
     }
   }
   /** Where the way leads from a body position on the leg under way. */
@@ -713,7 +728,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     lookKeys=undefined
     if(terrace){
       const keys=[{m:0,h:angles(camera.quaternion).heading}]
-      for(const [point,past,deg] of terrace.keys){const at=doorTurns([point]);if(at.length!==1){keys.length=0;break};keys.push({m:at[0]!+past,h:deg*Math.PI/180})}
+      for(const [point,past,deg] of terrace.keys){const at=keyTurn(point);if(at<0){keys.length=0;break};keys.push({m:at+past,h:deg*Math.PI/180})}
       if(keys.length){
         keys.push({m:path.length,h:terrace.end*Math.PI/180})
         for(let i=1;i<keys.length;i++){let d=Math.atan2(Math.sin(keys[i]!.h-keys[i-1]!.h),Math.cos(keys[i]!.h-keys[i-1]!.h));if(d*terrace.sign<0)d+=terrace.sign*2*Math.PI;keys[i]!.h=keys[i-1]!.h+d}
@@ -753,7 +768,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
       :planCalmGaze({from,to,lengthM:length,lensPixels,zoom,timed:seconds=>gaitLeg(length,seconds),
         fovs:[fittedRailFov(fromFov,camera.aspect,request.phone),fittedRailFov(targetFov,camera.aspect,request.phone)],
         tangent:chordHeading,
-        course:certified.aim&&length>=WALKED_LEG_M?aimedAt(certified.aim):certified.route&&length>=WALKED_LEG_M?course:null,
+        course:certified.aim&&length>=WALKED_LEG_M?aimedAt(certified.aim,from.heading,to.heading):certified.route&&length>=WALKED_LEG_M?course:null,
         // an aimed link turns to its object standing and walks on holding it
         ...(certified.aim&&length>=WALKED_LEG_M?{turns:{start:true,end:true,at:[],quickDegPerSecond:request.phone?RAIL_QUICK_TURN_PHONE:RAIL_QUICK_TURN,
           wideDegPerSecond:request.phone?RAIL_QUICK_WIDE_PHONE:RAIL_QUICK_WIDE,forward:true,scripted:true}}:{}),

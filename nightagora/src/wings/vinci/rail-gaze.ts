@@ -20,8 +20,16 @@ const T1 = TURN_TIME_SCALE, T2 = T1 * T1, T3 = T2 * T1
  * a margin below them so the frames it samples never read the plan's peak. */
 export const CALM_GAZE = { turnDegPerSecond: 11 * T1, turnDegPerSecond2: 11 * T2, turnDegPerSecond3: 36 * T3, zoomPerSecond: .13 } as const
 /** The limiter's own rate, under the plan's cap: the spline that smooths its
- * corners rounds them a little past it. The pitch turns at a share of it. */
-const LEAD_DEG_PER_SECOND = 9.4 * T1, PITCH_SHARE = .45
+ * corners rounds them a little past it. The pitch turns at a share of it. A
+ * view led along a way keeps its first calm (`WAY_CALM`): the turns quicken,
+ * the way's bends are not followed any tighter. */
+const LEAD_DEG_PER_SECOND = 9.4, PITCH_SHARE = .45
+/** The caps a view led along its way is fitted under: the turns' own, slowed
+ * back by the scale (a scripted look keeps the turns' own). Beyond the turn
+ * itself at the lead's rate, the time its curve takes to get under way and to
+ * settle. */
+const WAY_CALM = (c: { rate: number; accel: number; jerk: number }) => ({ rate: c.rate / T1, accel: c.accel / T2, jerk: c.jerk / T3 })
+const WAY_EASE_SECONDS = 2.5
 /** THE PICTURE MAY NOT MOVE MORE THAN THIS PER FILM FRAME, in the film's own
  * pixels at its centre: a frame width in no less than three and a half
  * seconds at 1920 px and 30 frames, under the checker's 18. A narrow lens
@@ -42,12 +50,11 @@ function capsFor(lensPixels: number) {
   return { rate: CALM_GAZE.turnDegPerSecond * share, accel: CALM_GAZE.turnDegPerSecond2 * share, jerk: CALM_GAZE.turnDegPerSecond3 * share, lead: LEAD_DEG_PER_SECOND * share }
 }
 /** The target is read at this step; the spline's knots are never closer than
- * the first spacing, which is what bounds its acceleration. */
-const GRID_SECONDS = 1 / 30, SPACINGS = [1.4, 2, 2.8, 4, 5.6, 8, Infinity].map(s => s / T1), CHECK_HZ = 60
+ * the first spacing, which is what bounds its acceleration. The spacing keeps
+ * its first figures: a view led along a way follows its bends no tighter for
+ * turning faster. */
+const GRID_SECONDS = 1 / 30, SPACINGS = [1.4, 2, 2.8, 4, 5.6, 8, Infinity], CHECK_HZ = 60
 const STRETCH_TRIES = 14
-/** Beyond the turn itself at the lead's rate, the time the curve takes to
- * get under way and to settle. */
-const EASE_SECONDS = 2.5 / T1
 const RAD = Math.PI / 180
 const FLIP = 100 * RAD
 /** The stretch of way either side of the body its direction is averaged
@@ -362,6 +369,8 @@ export function planCalmGaze(input: {
   /** the way's own direction between two distances along it: over a stride
    * either side of the body, it is what the film's gate reads the walk against */
   tangent?: (from: number, to: number) => number
+  /** a scripted look's stretch: its course is followed at the turns' own caps */
+  quick?: boolean
 }): CalmGazePlan {
   // A STATION WALK takes the plan that costs least of the one that follows
   // its way and the one held to the floor, walked forward: seconds, and twice
@@ -481,12 +490,15 @@ function planWay(input: Parameters<typeof planCalmGaze>[0], waitLens = false): C
   const change = waitLens && input.fovs && Math.abs(input.zoom) > 1e-9 ? lensChange(input.zoom, input.fovs) : null
   const lensSeconds = change ? change.seconds : 1.875 * Math.abs(input.zoom) / CALM_GAZE.zoomPerSecond
   caps = capsFor(input.lensPixels)
-  const rate = caps.lead * RAD, narrowCaps = caps
+  // a scripted look leads at the turns' own quicker rate
+  const quick = input.quick === true || input.turns?.scripted === true
+  const leadScale = quick ? T1 : 1
+  const rate = caps.lead * leadScale * RAD, narrowCaps = caps
   const shareAt = (t: number, total: number) => !change ? 0 : input.zoom > 0 ? change.share(t) : change.share(t - (total - change.seconds))
   const lensPixelsAt = (t: number, total: number) => change && input.fovs
     ? input.lensPixels * Math.tan(Math.min(...input.fovs) * RAD / 2) / Math.tan(change.fovAt(shareAt(t, total)) * RAD / 2) : input.lensPixels
   const capsAt = (t: number, total: number) => change ? capsFor(lensPixelsAt(t, total)) : narrowCaps
-  const wideRate = change ? Math.max(capsAt(0, lensSeconds).lead, capsAt(lensSeconds * 4, lensSeconds * 4).lead) * RAD : rate
+  const wideRate = change ? Math.max(capsAt(0, lensSeconds).lead, capsAt(lensSeconds * 4, lensSeconds * 4).lead) * leadScale * RAD : rate
   // a pan's caps meet the rate's own cap smoothly, so its acceleration never steps
   const smoothCapsAt = (t: number, total: number) => {
     const byLens = CALM_FILM.pixelsPerFrame * CALM_FILM.framesPerSecond / lensPixelsAt(t, total) / RAD
@@ -507,12 +519,12 @@ function planWay(input: Parameters<typeof planCalmGaze>[0], waitLens = false): C
     // A leg too short to turn from one held view to the other at the lead's
     // rate is slowed until it is not, with time left over to ease both ends.
     const owed = Math.max(Math.abs(toHeading - input.from.heading) / wideRate,
-      Math.abs(input.to.elevation - input.from.elevation) / (wideRate * PITCH_SHARE)) + EASE_SECONDS
+      Math.abs(input.to.elevation - input.from.elevation) / (wideRate * PITCH_SHARE)) + WAY_EASE_SECONDS
     total = Math.max(base.seconds, lensSeconds, owed)
     // The budget is set by the pan the leg would be without its way, so a way
     // that winds a whole turn round is not followed round it.
     const shortest = Math.max(Math.abs(wrap(input.to.heading - input.from.heading)) / rate,
-      Math.abs(input.to.elevation - input.from.elevation) / (rate * PITCH_SHARE)) + EASE_SECONDS
+      Math.abs(input.to.elevation - input.from.elevation) / (rate * PITCH_SHARE)) + WAY_EASE_SECONDS
     const budget = Math.max(base.seconds, lensSeconds, shortest) * COURSE_STRETCH
     for (let attempt = 0; attempt < STRETCH_TRIES && !spline && total <= budget; attempt++) {
       leg = input.timed(total)
@@ -530,7 +542,7 @@ function planWay(input: Parameters<typeof planCalmGaze>[0], waitLens = false): C
         heading[k] = (input.from.heading + (toHeading - input.from.heading) * u) * (1 - w) + held * w
         elevation[k] = (input.from.elevation + (input.to.elevation - input.from.elevation) * u) * (1 - w) + (here ? here.elevation : 0) * w
       }
-      const steps = change ? Float64Array.from(times, t => capsAt(t, total).lead * RAD * step) : null
+      const steps = change ? Float64Array.from(times, t => capsAt(t, total).lead * leadScale * RAD * step) : null
       const headingLed = steps ? limitBy(heading, input.from.heading, toHeading, steps, 1) : limit(heading, input.from.heading, toHeading, rate * step, times, total)
       const elevationLed = steps ? limitBy(elevation, input.from.elevation, input.to.elevation, steps, PITCH_SHARE) : limit(elevation, input.from.elevation, input.to.elevation, rate * PITCH_SHARE * step, times, total)
       let best = Infinity
@@ -540,7 +552,10 @@ function planWay(input: Parameters<typeof planCalmGaze>[0], waitLens = false): C
         const e = fit(elevationLed, times, input.from.elevation, input.to.elevation, spans, total)
         const candidate: Spline = { knots: h.knots, heading: h.points, elevation: e.points, total }
         const read = peaks(candidate)
-        const ratio = change ? peakRatio(candidate, t => capsAt(t, total)) : Math.max(read.rate / caps.rate, Math.sqrt(read.accel / caps.accel), Math.cbrt(read.jerk / caps.jerk))
+        // a scripted look (an aimed link, a look through a gate) turns on purpose, at the turns' own caps
+        const slow = quick ? (c: typeof caps) => c : WAY_CALM
+        const calm = slow(caps)
+        const ratio = change ? peakRatio(candidate, t => slow(capsAt(t, total))) : Math.max(read.rate / calm.rate, Math.sqrt(read.accel / calm.accel), Math.cbrt(read.jerk / calm.jerk))
         if (ratio <= 1) { spline = candidate; break }
         best = Math.min(best, ratio)
       }
@@ -656,6 +671,8 @@ export interface GazeTurns {
   /** a walk that reads red every other way may hold a view at the edge of a
    * sideways walk, a right angle off its way */
   sideways?: boolean
+  /** a walk that reads red every other way may pass a doorway askew */
+  askew?: boolean
 }
 /** A held view this far off its way is turned from standing; a doorway whose
  * way turns this much is turned in from standing. */
@@ -1000,7 +1017,7 @@ function planTurns(input: TurnInput, waitLens = false): CalmGazePlan | null {
     candidates.push({ mode: 'pan', start: out.heading, plan: panPlan(out, { heading: out.heading + turn, elevation: inn.elevation }, 0, timed, timed(0), true) })
     caps = ownCaps
     candidates.push({ mode: 'way', start: out.heading, plan: planCalmGaze({ from: out, to: { heading: out.heading + turn, elevation: inn.elevation }, zoom: 0, lengthM: length,
-      lensPixels: ownLens, timed, course: (m: number) => course(a + m, b) }) })
+      lensPixels: ownLens, timed, course: (m: number) => course(a + m, b), quick: input.turns.scripted === true }) })
     caps = ownCaps
     // the way's own run over the stretch, as the gate reads it
     const ways: number[] = []
@@ -1055,6 +1072,8 @@ function planTurns(input: TurnInput, waitLens = false): CalmGazePlan | null {
       const ends = standAfter ? [inWay, inWay + clamp(wrap(next - inWay))] : [inWay]
       for (const s0 of starts) for (const e0 of ends) {
         if (Math.abs(s0 - out.heading) < RAD && Math.abs(e0 - inWay) < RAD) continue
+        // a walked turn, too, takes the short way: never past a half turn
+        if (Math.abs(e0 - s0) > Math.PI) continue
         const from = { heading: s0, elevation: out.elevation }, to = { heading: e0, elevation: inn.elevation }
         candidates.push({ mode: 'pan', start: s0, plan: panPlan(from, to, 0, timed, timed(0), true) })
         // or turned as it sets off and held, or held and turned as it arrives
@@ -1102,7 +1121,7 @@ function planTurns(input: TurnInput, waitLens = false): CalmGazePlan | null {
     const forward = options.filter(o => o.stairBack < BACKWARD_SECONDS)
     const within0 = (forward.length ? forward : options).filter(o => o.pulled || (o.plan.leg.seconds <= cap + 1e-6 && (!strict || o.back < BACKWARD_RUN_S)))
     // under the floor a doorway is passed nearly straight, its jambs out of the frame
-    const square = strict ? within0.filter(o => o.doorOff <= DOOR_ASKEW_DEG) : within0
+    const square = strict && input.turns.askew !== true ? within0.filter(o => o.doorOff <= DOOR_ASKEW_DEG) : within0
     const within = square.length ? square : within0
     const pool = forward.length ? forward : options
     const kept = within.length ? within : [pool.reduce((x, y) => (y.plan.leg.seconds < x.plan.leg.seconds ? y : x))]
@@ -1255,6 +1274,11 @@ function planTurns(input: TurnInput, waitLens = false): CalmGazePlan | null {
   }
   // the long way round only where it reads green
   if (eitherDeg !== EITHER_WAY_DEG) return planTurns({ ...input, turns: { ...input.turns, windingRound: false } }, waitLens)
+  // a doorway passed askew where nothing straight through it reads green
+  if (input.turns.askew !== true) {
+    const askew = planTurns({ ...input, turns: { ...input.turns, askew: true } }, waitLens)
+    if (askew && !askew.red) return askew
+  }
   // and a view held at the edge of a sideways walk only where nothing else is green
   if (input.turns.sideways !== true) {
     const sideways = planTurns({ ...input, turns: { ...input.turns, sideways: true } }, waitLens)
