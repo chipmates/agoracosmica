@@ -15,6 +15,8 @@ import { getFigurePageContent } from '@client/data/public/figurePageContent';
 import { getFigureQA } from '@client/data/public/figureQA';
 import { getSeedsFor } from '../lib/seeds';
 import { cleanDisplayText } from '../lib/figureWorld';
+import { anchorIds } from '../lib/anchors';
+import { isFrozenFigurePage } from '../lib/frozenPages';
 
 interface Props {
   figureId: string;
@@ -55,12 +57,20 @@ for (const c of authored?.concepts ?? []) {
 for (const pair of qa?.pairs.slice(1) ?? []) {
   blocks.push({ h2: pair.q, body: pair.a, bullets: [] });
 }
+
+// Every concept heading gets an id from its own words, so an ad or a link can
+// land on the answer. The ids the rest of the figure page already uses stay
+// out of reach. Pages in the running search test keep their markup.
+const PAGE_IDS = ['main-content', 'pub-nav', 'story', 'wisdom', 'prism', 'quest', 'freetalk', 'council',
+  ...Array.from({ length: 12 }, (_, i) => `idea-${i + 1}`)];
+const nextId = isFrozenFigurePage(lang, slug) ? null : anchorIds(PAGE_IDS);
+const anchored = blocks.map(b => ({ ...b, id: nextId ? nextId(b.h2) : undefined }));
 ---
 {blocks.length > 0 && (
   <div class="fig-concepts">
-    {blocks.map(b => (
+    {anchored.map(b => (
       <section class="pub-section fig-concept">
-        <h2 class="pub-section__title">{b.h2}</h2>
+        <h2 class="pub-section__title" id={b.id}>{b.h2}</h2>
         {b.body.split('\n').map(p => p.trim()).filter(Boolean).map(p => (
           <p class="pub-section__text">{p}</p>
         ))}
@@ -107,4 +117,6 @@ for (const pair of qa?.pairs.slice(1) ?? []) {
   }
   .fig-concept__points li::marker { color: var(--gold-deep); }
   .fig-concept__link { margin: 0.35rem 0 0; font-size: 0.95rem; }
+  /* A landing on the anchor clears the sticky navbar. */
+  .fig-concept h2[id] { scroll-margin-top: 5.5rem; }
 </style>

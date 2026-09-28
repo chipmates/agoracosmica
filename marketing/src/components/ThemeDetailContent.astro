@@ -367,7 +367,7 @@ const heroFacts = [
     <!-- Section 4: make it yours. Every ask door on the page lives here, and
          nowhere else, so the same question is never offered four ways. -->
     {askItems.length > 0 && (
-      <section class="tq-section">
+      <section class="tq-section tq-ask" id="questions">
         <h2 class="tq-h2">{isSelfTheme ? t('themes.askLabelSelf') : t('themes.askLabel')}</h2>
         <p class="tq-note">{askCaption}</p>
         <QuestionDoors items={askItems} lang={lang} door="theme_ask" />
@@ -488,6 +488,8 @@ const heroFacts = [
 <style is:global>
   .pub-theme { padding-bottom: 2.5rem; }
   .tq-body { max-width: 42rem; margin: 0 auto; }
+  /* #questions is a landing target for links and ads: clear the sticky navbar. */
+  .tq-ask { scroll-margin-top: 5.5rem; }
 
 
   /* ── The answers ── */
