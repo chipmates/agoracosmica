@@ -246,6 +246,18 @@ export function vinciMachineCard(slug: MachineSlug, narrow: boolean, certainty: 
   const mechanism = at < 0 ? null : record.sections[language][at]
   const label = make('p', '', record.label[language])
   if (mechanism) description.append(make('p', '', uncited(mechanism.body)))
+  // The flight quotation is read under the parachute since the court's
+  // plaque stop left the walk: its words stay in the never-said record.
+  if (slug === 'parachute') {
+    const plate = NEVER_SAID.court_plaque
+    const quote = make('p', '', plate.quote)
+    quote.lang = 'en'
+    // the source line names the year itself, so it is not said twice here
+    description.append(
+      make('p', '', language === 'de' ? plate.title_de : plate.title_en), quote,
+      make('p', '', language === 'de' ? plate.line_de : plate.line_en),
+      make('p', 'vitrine-meta', language === 'de' ? plate.where_de : plate.where_en))
+  }
   const card: HTMLElement[] = narrow ? [] : [label]
   // TWO TO FOUR SENTENCES ON A CARD. The mechanism is one deliberate control
   // away on the wide stage, and the whole description is on the phone, so the
