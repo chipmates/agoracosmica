@@ -19,7 +19,7 @@
     "z": 3.46,
     "certainty": "C",
     "source": "museum choice",
-    "note": "Life size by choice; no source gives a size. At rest it is 2.1 m from nose to tail and 1.34 m to the top of the mane; the envelope also holds the 1.2 m walk and the key."
+    "note": "Life size by choice: no source gives a size. At rest it is 2.16 m long and 1.26 m high. The envelope also holds the 1.2 m walk and the key."
   },
   "frame": {
     "handedness": "right",
@@ -57,7 +57,7 @@
       },
       "certainty": "C",
       "source": "museum choice; no source gives it",
-      "notes": "The torso: a carved shell two fingers thick in panels, the seams cut and pegged, hung over the oak frame. Tempera over gesso, darker in the hollows, gilded on the mane's crests and round the chest's doors; the colours are the museum's."
+      "notes": "The torso: a carved shell two fingers thick in panels, the seams cut and pegged, hung over the oak frame. Tempera over gesso, darker in the hollows, gold on some of the mane's crests and the doors' rims. The colours are the museum's."
     },
     {
       "id": "flank-panel",
@@ -555,13 +555,13 @@
         0.0
       ],
       "material": {
-        "class": "carved limewood, blue inside, iron straps and hinges",
+        "class": "carved limewood, bare inside, iron straps and hinges",
         "basis": "reported",
         "source": "Vasari, Lives 1550 and 1568; Lomazzo, Trattato 1584: it walked, stopped and its chest opened full of lilies"
       },
       "certainty": "B",
       "source": "Vasari, Lives 1550 and 1568; Lomazzo, Trattato 1584: it walked, stopped and its chest opened full of lilies",
-      "notes": "One of the two chest doors on iron hinges; outside, the mane runs on down the breast. The chest opening is in the accounts; two doors, their hinges and straps are the museum's."
+      "notes": "One of the two chest doors on iron hinges. Outside, the mane ends above it. The chest opening is in the accounts. Two doors, their hinges and straps are the museum's."
     },
     {
       "id": "door-right",
@@ -583,13 +583,13 @@
         0.0
       ],
       "material": {
-        "class": "carved limewood, blue inside, iron straps and hinges",
+        "class": "carved limewood, bare inside, iron straps and hinges",
         "basis": "reported",
         "source": "Vasari, Lives 1550 and 1568; Lomazzo, Trattato 1584: it walked, stopped and its chest opened full of lilies"
       },
       "certainty": "B",
       "source": "Vasari, Lives 1550 and 1568; Lomazzo, Trattato 1584: it walked, stopped and its chest opened full of lilies",
-      "notes": "One of the two chest doors on iron hinges; outside, the mane runs on down the breast. The chest opening is in the accounts; two doors, their hinges and straps are the museum's."
+      "notes": "One of the two chest doors on iron hinges. Outside, the mane ends above it. The chest opening is in the accounts. Two doors, their hinges and straps are the museum's."
     },
     {
       "id": "lily-rack",
@@ -2205,8 +2205,8 @@
     "justification": "Lomazzo 1590 writes that lions went by force of wheels. The spring barrel, the train, the cranks and the rate are the museum's reading, chosen so that wheels visibly drive stepping legs.",
     "source": "Lomazzo, Idea del tempio 1590: lions went by force of wheels; the train itself is the museum's"
   },
-  "label_en": "The museum's reconstruction of the lion the old accounts describe: it walks a few steps, stops, and opens its chest full of lilies.",
-  "label_de": "Die Rekonstruktion des Museums nach den alten Berichten: Der Löwe geht einige Schritte, bleibt stehen und öffnet die Brust voller Lilien.",
+  "label_en": "Reconstructed from old accounts: it walks, stops and opens its chest full of lilies.",
+  "label_de": "Nach alten Berichten rekonstruiert: er geht, hält an und öffnet die Brust voller Lilien.",
   "animation_notes": [
     "One finite run of 20 s that holds at its end. No hidden reset; only the visitor starts it again.",
     "Head, jaw and tail never move.",

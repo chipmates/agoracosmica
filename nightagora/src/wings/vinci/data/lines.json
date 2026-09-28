@@ -31,7 +31,7 @@
     },
     "picture/ginevra-de-benci/front": {
       "en": "Someone cut the bottom off this panel. Her arms and hands probably went with it.",
-      "de": "Jemand hat unten ein Stück dieser Tafel abgeschnitten. Ihre Arme und Hände waren wohl darauf.",
+      "de": "Jemand schnitt unten ein Stück dieser Tafel ab. Darauf waren wohl ihre Arme und Hände.",
       "source": "MINING-CATALOG-PAINTINGS, Ginevra de' Benci, condition",
       "certainty": "documented",
       "detail": {
@@ -70,8 +70,8 @@
       "certainty": "documented"
     },
     "picture/saint-jerome/front": {
-      "en": "Someone sawed this panel into five pieces. A cardinal bought them and had them joined again.",
-      "de": "Jemand zersägte diese Tafel in fünf Teile. Ein Kardinal kaufte sie und ließ sie wieder zusammenfügen.",
+      "en": "Someone sawed this panel into five pieces. A cardinal bought them and had them joined.",
+      "de": "Jemand zersägte diese Tafel in fünf Teile. Ein Kardinal kaufte sie und fügte sie zusammen.",
       "source": "Vatican Museums, catalogue MV.40337.0.0 (sawn into pieces, bought and recomposed) and the Pinacoteca room IX page (five pieces, joined for Cardinal Fesch); FACTS-PICTURE-ROOM 2026-09-28 §1",
       "certainty": "documented",
       "detail": {
@@ -85,7 +85,7 @@
     },
     "picture/adoration-of-the-magi/front": {
       "en": "He left it unfinished in 1482 and went to Milan. The charcoal drawing is still visible.",
-      "de": "1482 ließ er sie unvollendet zurück und ging nach Mailand. Die Kohlezeichnung ist noch heute zu sehen.",
+      "de": "1482 ließ er sie unvollendet und ging nach Mailand. Die Kohlezeichnung ist noch zu sehen.",
       "source": "MINING-CATALOG-PAINTINGS, Adoration of the Magi, commission and the holder's record",
       "certainty": "documented"
     },
@@ -97,7 +97,7 @@
     },
     "picture/virgin-of-the-rocks-louvre/front": {
       "en": "A brotherhood ordered it in April 1483 and wanted it by that December.",
-      "de": "Eine Bruderschaft bestellte es im April 1483 und wollte es bis zum Dezember desselben Jahres haben.",
+      "de": "Eine Bruderschaft bestellte es im April 1483 und wollte es noch im Dezember haben.",
       "source": "MINING-CATALOG-PAINTINGS, Virgin of the Rocks, Louvre version, commission",
       "certainty": "documented"
     },
@@ -116,8 +116,8 @@
       }
     },
     "picture/lady-with-an-ermine/front": {
-      "en": "The black behind her is not his. An unknown hand painted over his background in the 1700s or early 1800s.",
-      "de": "Das Schwarz hinter ihr ist nicht von ihm. Eine unbekannte Hand übermalte den Hintergrund im 18. oder frühen 19. Jahrhundert.",
+      "en": "The black behind her is not his. An unknown hand painted it in the 1700s or 1800s.",
+      "de": "Das Schwarz hinter ihr ist nicht von ihm. Jemand malte es im 18. oder 19. Jahrhundert.",
       "source": "the holder's scientists in Technè 2024 (the background overpainted in black, most likely in the 18th century) and the holder's collection page (repainted in the 19th century); FACTS-PICTURE-ROOM 2026-09-28 §2",
       "certainty": "documented",
       "detail": {
@@ -143,13 +143,13 @@
     },
     "picture/burlington-house-cartoon/front": {
       "en": "A shotgun blast hit it in 1987. The glass took most of it, and the sheet was restored.",
-      "de": "1987 traf ein Schrotschuss das Blatt. Das Glas fing das meiste ab, und die Zeichnung wurde restauriert.",
+      "de": "1987 traf es ein Schrotschuss. Das Glas fing das meiste ab, das Blatt wurde restauriert.",
       "source": "MINING-CATALOG-PAINTINGS, the Burlington House Cartoon, second label fact",
       "certainty": "documented"
     },
     "picture/yarnwinder-buccleuch/front": {
-      "en": "Two men stole it from a Scottish castle in 2003. It came back in 2007, but who they were is still unknown.",
-      "de": "Zwei Männer stahlen sie 2003 aus einem schottischen Schloss. 2007 kam sie zurück, aber die Diebe sind bis heute unbekannt.",
+      "en": "Two men stole it from a Scottish castle in 2003. It came back in 2007, they did not.",
+      "de": "Zwei Männer stahlen sie 2003 in Schottland. 2007 kam sie zurück, die Diebe nicht.",
       "source": "the 2015 Court of Session judgment as reported by Scottish Legal News (the theft at Drumlanrig on 27 August 2003, the recovery at a Glasgow solicitors' office on 4 October 2007, the arrests, the 2010 trial with every man cleared) and Central Bylines, 30 September 2025 (the two thieves never caught or identified); FACTS-PICTURE-ROOM 2026-09-28 §3",
       "certainty": "documented"
     },
@@ -161,7 +161,7 @@
     },
     "picture/anghiari-copy/front": {
       "en": "The wall painting is lost. This sheet is a copy, worked over by several later hands.",
-      "de": "Das Wandbild ist verloren. Dieses Blatt ist eine Kopie, später von mehreren Händen überarbeitet.",
+      "de": "Das Wandbild ist verloren. Dies ist eine Kopie, später von mehreren Händen überarbeitet.",
       "source": "MINING-CATALOG-PAINTINGS, the Battle of Anghiari, the holder's reading of the sheet",
       "certainty": "documented"
     },
@@ -196,8 +196,8 @@
       "certainty": "conjectural"
     },
     "picture/la-scapigliata/front": {
-      "en": "An inventory of 1627 lists a dishevelled woman's head, maybe this one. It is the smallest picture on this wall.",
-      "de": "Ein Inventar von 1627 verzeichnet den Kopf einer zerzausten Frau, vielleicht diesen. Kein Bild an dieser Wand ist kleiner.",
+      "en": "A 1627 inventory has a dishevelled woman's head, maybe this one. Smallest on this wall.",
+      "de": "Ein Inventar von 1627 nennt eine Zerzauste, vielleicht diese. Das kleinste an dieser Wand.",
       "source": "the 1627 inventory of Duke Ferdinando Gonzaga's goods as quoted by Finestre sull'Arte (a sketched head of a dishevelled woman by Leonardo, its identity with this panel not certain); the holder sizes in collection/hang.ts (24.7 by 21 cm, the smallest of the 24 works by area); FACTS-PICTURE-ROOM 2026-09-28 §4",
       "certainty": "documented"
     },
@@ -209,7 +209,7 @@
     },
     "picture/last-supper/front": {
       "en": "In 1943 bombs brought the hall's ceiling down. This wall stood, behind sandbags.",
-      "de": "1943 stürzte das Gewölbe des Saals nach Bombentreffern ein. Hinter Sandsäcken blieb diese Wand stehen.",
+      "de": "1943 trafen Bomben den Saal, das Gewölbe stürzte ein. Diese Wand stand hinter Sandsäcken.",
       "source": "MINING-CATALOG-PAINTINGS, the Last Supper's wall, room history",
       "certainty": "documented"
     },
@@ -538,8 +538,8 @@
       "certainty": "reconstructed"
     },
     "machine/mechanical-lion": {
-      "en": "A lion for a King of France walked a few steps and opened its chest full of lilies. This one is our reconstruction.",
-      "de": "Ein Löwe für einen König von Frankreich ging einige Schritte und öffnete die Brust voller Lilien. Dieser ist unsere Rekonstruktion.",
+      "en": "A reconstruction: a lion for a King of France walked and opened its chest full of lilies.",
+      "de": "Rekonstruiert: Ein Löwe für Frankreichs König ging und öffnete die Brust voller Lilien.",
       "source": "machines/data/records.json, mechanical-lion, the label and the Was it built section, after Vasari 1568 and Lomazzo 1584",
       "certainty": "tradition"
     }
