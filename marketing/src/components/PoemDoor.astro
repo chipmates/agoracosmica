@@ -19,11 +19,13 @@ interface Props {
   line?: string;
   /** The cta slot this door reports. Omit on a page of poems. */
   door?: string;
+  /** A page that has ended the top-door test puts its door here instead. */
+  placement?: PoemDoorSlot;
 }
 
 const PLACEMENT: PoemDoorSlot = 'hero';
 
-const { at, href, buttonLabel, figureId, shapedBy, line, door } = Astro.props;
+const { at, href, buttonLabel, figureId, shapedBy, line, door, placement = PLACEMENT } = Astro.props;
 
 const doorLine = line ?? 'Want to stay with a poem a little longer?';
 
@@ -31,7 +33,7 @@ const note = shapedBy
   ? `An AI voice, shaped by ${shapedBy}. 30 free messages a day, no signup.`
   : 'An AI voice. 30 free messages a day, no signup.';
 ---
-{at === PLACEMENT && (
+{at === placement && (
   <aside class:list={['poem-door', at === 'hero' ? 'poem-door--hero' : 'poem-door--inlist']}>
     <p class="poem-door__line">{doorLine}</p>
     <a

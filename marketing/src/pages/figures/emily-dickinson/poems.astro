@@ -22,6 +22,7 @@ import {
 import { poemsByPoet, quoted } from '../../../data/poems/index.mjs';
 import { breadcrumbSchema } from '../../../lib/schemas';
 import { SITE_URL } from '../../../lib/urls';
+import { numberWord } from '../../../lib/figureWorld';
 // Where each poem's own page lives, from the same data the pages render from.
 const OWN_PAGE: Record<string, string> = Object.fromEntries(
   poemsByPoet('dickinson').map((poem) => [poem.key, poem.path]),
@@ -111,6 +112,9 @@ const THEMES = [
   },
 ];
 
+// The lead counts the poems the page holds, so it stays true when one is added.
+const POEM_COUNT_WORD = numberWord(THEMES.flatMap(t => t.poems).length, 'en');
+
 // --- JSON-LD: the citable interpretive layer (poem text itself is Gutenberg's
 //     turf; our value is the curation + framing). ---
 const PAGE_URL = 'https://agoracosmica.org/figures/emily-dickinson/poems/';
@@ -188,21 +192,22 @@ const schemas = [
       </figure>
       <div class="ed-hero__text">
         <p class="ed-hero__eyebrow">In her own words</p>
-        <h1 class="ed-hero__title">Emily Dickinson</h1>
+        <h1 class="ed-hero__title">Emily Dickinson's poems</h1>
         <p class="ed-hero__dates">1830-1886 · Amherst, Massachusetts</p>
         <p class="ed-hero__lead">
-          She wrote nearly eighteen hundred poems and published almost none of
-          them. She kept them in a drawer, stitched into little hand-sewn
-          booklets, and let almost no one read them. What survives is a mind
-          testing the largest questions in the smallest spaces. Here are a few
-          of her poems, grouped by what they reach for, in the words and dashes
-          she actually used.
+          She wrote nearly eighteen hundred poems and published almost none.
+          Here are {POEM_COUNT_WORD} of the best known, grouped by what they
+          reach for, with her own dashes.
         </p>
       </div>
     </header>
 
+    <!-- The door sits under the first poem: a reader who came for a poem
+         meets one before the offer to talk about it. -->
     <PoemDoor
       at="hero"
+      placement="after-first-poem"
+      door="poem_after_first"
       href={DOOR_HREF}
       buttonLabel="Ask her Echo about it"
       figureId="dickinson"
@@ -299,6 +304,8 @@ const schemas = [
               {ti === 0 && i === 0 && (
                 <PoemDoor
                   at="after-first-poem"
+                  placement="after-first-poem"
+                  door="poem_after_first"
                   href={DOOR_HREF}
                   buttonLabel="Ask her Echo about it"
                   figureId="dickinson"
