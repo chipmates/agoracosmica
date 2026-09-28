@@ -10,14 +10,14 @@ export const fragment: FigureFragment = {
       pairs: [
         {
           q: 'What can I learn from Joseph Campbell?',
-          a: 'Joseph Campbell (1904-1987) read the myths of the whole world and found one shape under all of them. Leave what you know. Get broken open. Come back changed. He did not mean it as old history. He meant it as the map of a life, and that reading has shaped how stories get told ever since.',
+          a: "Joseph Campbell (1904-1987) read the myths of the whole world and found one shape under all of them. He called it the monomyth. Most people know it as the hero's journey: leave what you know, get broken open, come back changed. He laid it out in 17 stages in The Hero with a Thousand Faces (1949) and meant it as the map of a life.",
         },
         {
           q: 'What did Joseph Campbell teach?',
           a: "Joseph Campbell taught the hero's journey: departure, initiation, return. He found that three-part shape repeating in myths from widely separated traditions, and he laid it out in The Hero with a Thousand Faces in 1949. He taught that the figures blocking the door in those stories are not there to stop you. They are there to find out whether you are ready. And he taught that myth does four jobs at once. It wakes you to the mystery and shows you where you stand in the universe. It holds a society together, and it walks a person through the stages of a life. That last job he thought mattered most now.",
         },
         {
-          q: 'What does follow your bliss mean?',
+          q: 'What does “follow your bliss” mean?',
           a: 'It is the line Campbell gets quoted for most, and the one people misread most. He did not mean do whatever feels nice. Bliss, in his sense, is the thing that takes you over completely. You lose track of time inside it, and your body knows before your head does, the way a compass needle finds north without understanding magnetism. Pleasure is shallow and gets satisfied fast. This does not. He meant the second one, and he only began using the phrase late in his life.',
         },
       ],
@@ -30,15 +30,15 @@ export const fragment: FigureFragment = {
       pairs: [
         {
           q: 'Was kann ich von Joseph Campbell lernen?',
-          a: 'Joseph Campbell (1904-1987) hat die Mythen der ganzen Welt gelesen und unter allen dieselbe Form gefunden. Verlass das Vertraute. Lass dich erschüttern. Komm verwandelt zurück. Er meinte das nicht als alte Geschichte. Er meinte es als Landkarte eines Lebens, und diese Lesart hat geprägt, wie seither Geschichten erzählt werden.',
+          a: 'Joseph Campbell (1904-1987) hat die Mythen der ganzen Welt gelesen und unter allen dieselbe Form gefunden. Er nannte sie den Monomythos. Die meisten kennen sie als Heldenreise: Verlass das Vertraute, lass dich erschüttern, komm verwandelt zurück. In seinem Buch Der Heros in tausend Gestalten (1949) beschreibt er sie in 17 Stationen, als Landkarte eines Lebens.',
         },
         {
           q: 'Was hat Joseph Campbell gelehrt?',
           a: 'Joseph Campbell lehrte die Heldenreise: Aufbruch, Initiation, Rückkehr. Dieses Dreierschema fand er in Mythen weit voneinander entfernter Kulturen wieder, und 1949 legte er es in Der Heros in tausend Gestalten dar. Er lehrte, dass die Gestalten, die in solchen Geschichten den Weg versperren, nicht da sind, um dich aufzuhalten. Sie sind da, um zu prüfen, ob du bereit bist. Und er lehrte, dass der Mythos vier Aufgaben zugleich erfüllt. Er weckt das Staunen vor dem Geheimnis und zeigt dir, wo du im Universum stehst. Er hält eine Gesellschaft zusammen, und er führt einen Menschen durch die Stufen eines Lebens. Die letzte Aufgabe hielt er für Menschen von heute für die wichtigste.',
         },
         {
-          q: 'Was bedeutet folge deiner Seligkeit?',
-          a: 'Das ist der Satz, für den Campbell am häufigsten zitiert wird, und der am häufigsten falsch verstanden wird. Er meinte nicht: Tu, was sich gerade angenehm anfühlt. Seligkeit ist bei ihm das, was dich ganz ergreift. Du vergisst darin die Zeit, und dein Körper weiß es früher als dein Kopf, so wie eine Kompassnadel den Norden findet, ohne den Magnetismus zu verstehen. Vergnügen ist flach und schnell befriedigt. Das hier nicht. Er meinte das Zweite, und die Formel selbst benutzte er erst spät in seinem Leben.',
+          q: 'Was meinte Campbell mit „Folge deiner Glückseligkeit“?',
+          a: 'Das ist der Satz, für den Campbell am häufigsten zitiert wird, und der am häufigsten falsch verstanden wird. Er meinte nicht: Tu, was sich gerade angenehm anfühlt. Glückseligkeit ist bei ihm das, was dich ganz ergreift. Du vergisst darin die Zeit, und dein Körper weiß es früher als dein Kopf, so wie eine Kompassnadel den Norden findet, ohne den Magnetismus zu verstehen. Vergnügen ist flach und schnell befriedigt. Das hier nicht. Er meinte das Zweite, und die Formel selbst benutzte er erst spät in seinem Leben.',
         },
       ],
       disclosure: {
