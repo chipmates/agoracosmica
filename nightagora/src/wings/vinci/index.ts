@@ -719,7 +719,7 @@ export function createWing():VinciWingModule {
         ??vinciContent.find(s=>s.id===id)?.name??{en:'',de:''},
       door:()=>wing.querySelector<HTMLElement>('.wing-door'),
       sources:()=>source??null,
-      question:()=>vinciContent[card]?.door[lang()]??'',
+      question:()=>text(hereContent().door),
       words:{next:LIFE_CARDS.controls.date.next,back:LIFE_CARDS.controls.date.previous,rail:WING_TEXT.rail},
       go:index=>h.navigate(index),
       // THE WAY BACK GOES UP ONE LEVEL: standing at a work of a wall, back is
