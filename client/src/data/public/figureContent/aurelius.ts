@@ -29,7 +29,7 @@ export const fragment: FigureFragment = {
       pairs: [
         {
           q: 'Was kann ich von Mark Aurel lernen?',
-          a: "Mark Aurel (Marcus Aurelius, 121-180 n. Chr.) war römischer Kaiser. Er regierte von 161 bis 180, durch Pest und Krieg. In seinen letzten zehn Jahren schrieb er Notizen an sich selbst, zum Teil im Feld an der Donaugrenze. Diese Notizen tun immer wieder dasselbe. Sie trennen das, was geschehen ist, von der Geschichte, die der Kopf dazu erfindet. Für Leser waren sie nie gedacht. Erhalten sind sie als die Selbstbetrachtungen.",
+          a: "Mark Aurel (auch Marc Aurel, lateinisch Marcus Aurelius, 121-180 n. Chr.) war römischer Kaiser. Er regierte von 161 bis 180, durch Pest und Krieg. In seinen letzten zehn Jahren schrieb er Notizen an sich selbst, zum Teil im Feld an der Donaugrenze. Diese Notizen tun immer wieder dasselbe. Sie trennen das, was geschehen ist, von der Geschichte, die der Kopf dazu erfindet. Für Leser waren sie nie gedacht. Erhalten sind sie als die Selbstbetrachtungen.",
         },
         {
           q: 'Was hat Mark Aurel gelehrt?',
@@ -54,6 +54,11 @@ export const fragment: FigureFragment = {
           seedId: 1,
           body:
             "Stoicism is an ancient philosophy that treats thinking as training, not as talk. It covers three areas: how the world works, how to live well, and how to tell true from false. Marcus Aurelius practiced it as three daily disciplines, desire, action and assent. Only your character counts as good. Wisdom, justice, courage and self-control are the whole list. Everything else, health, money, reputation, is worth having and worth working for, but it does not decide whether you act well. That is why a Stoic can lose almost everything and still hold the one thing that mattered.",
+        },
+        {
+          h2: 'What is in the Meditations?',
+          body:
+            "The Meditations were never written for readers. They are private notes in Greek, twelve books of them, set down roughly between 170 and 180 AD, partly on campaign at the Danube frontier. Book 1 is a list of debts: what he learned from his teachers and his family, one person at a time. Nothing like it survives from the ancient world. In Books 2 and 3 the tone gets harder. Death stands close, the pressure of the war shows, and he practices exactly what he teaches: examine an impression before you give it your assent. You can start at any page.",
         },
         {
           h2: 'How do you practice Stoicism every day?',

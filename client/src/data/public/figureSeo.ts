@@ -19,7 +19,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
     de: {
       description: "Entdecke stoische Philosophie mit Mark Aurel (Marcus Aurelius). 12 Kapitel Lebensgeschichte, Lehren zu emotionaler Klarheit, Memento Mori und Tugendethik.",
       teachingsHeading: "Stoische Lehren von Mark Aurel",
-      seoTitle: "Mark Aurel - Stoizismus & Selbstbetrachtungen",
+      seoTitle: "Mark Aurel (Marc Aurel): Stoizismus & Selbstbetrachtungen",
     },
   },
   angelou: {
