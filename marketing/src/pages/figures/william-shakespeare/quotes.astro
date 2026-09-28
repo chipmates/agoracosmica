@@ -91,7 +91,7 @@ const schemas = [
   schemas={schemas}
 >
   <EssayStyles />
-  <div class="pub-content esy">
+  <div class="pub-content esy sq">
     <Breadcrumbs
       lang={lang}
       items={[
@@ -108,11 +108,9 @@ const schemas = [
         The Shakespeare lines people look up most are “To be, or not to be”,
         “Tomorrow, and tomorrow, and tomorrow”, “Et tu, Brute?” and “All the
         world’s a stage”. Here are {countWord} famous lines, each with its play,
-        act, scene and speaker, and a few plain sentences on what it means
-        where it stands. That is often not what it means on a mug. Plenty of
-        the best-loved advice comes from fools and villains. Every line is
-        checked against his complete works, and five he never wrote come at
-        the end.
+        act, scene and speaker and what it means where it stands, which is
+        often not what it means on a mug. Every line is checked against his
+        complete works. Five he never wrote come at the end.
       </p>
     </header>
 
@@ -297,9 +295,14 @@ const schemas = [
     line-height: var(--leading-relaxed);
   }
   .sq-quote__more {
-    margin: 0.6rem 0 0;
+    margin: 0.35rem 0 0;
     font-family: var(--font-ui, 'Space Grotesk', sans-serif);
     font-size: var(--text-sm);
+  }
+  .sq-quote__more a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
   }
 
   /* The lines he never wrote: the same entry, with a quieter rule so they do
@@ -326,6 +329,13 @@ const schemas = [
   }
 
   @media (max-width: 560px) {
+    /* Tighter top on a phone, so the jump list reaches the first screen. */
+    .sq {
+      padding-top: 1.25rem;
+    }
+    .sq-hero {
+      margin-top: 0.75rem;
+    }
     .sq-jump {
       margin-bottom: 2.25rem;
     }
