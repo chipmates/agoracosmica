@@ -16,7 +16,7 @@ import {
   clearComposerStagedOrigin,
   PREFILL_STAGED_EVENT,
 } from '../utils/public/entryIntent';
-import { resolveAnchorSeedId } from '../data/public/heroEntry';
+import { askTagFigure, resolveAnchorSeedId } from '../data/public/heroEntry';
 import { useUIStore } from '../stores/uiStore';
 import { loadServiceConfig } from '../services/audio/config/serviceConfig';
 import { useTranslation } from '../hooks/useTranslation';
@@ -131,7 +131,8 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
       setUseTextInput(true);
       // Same figure guard the anchor selection uses: a tag naming another
       // figure grounds nothing here.
-      const ownTag = !!tag && (!tag.startsWith('f:') || tag.startsWith(`f:${figureId}:`));
+      const named = tag ? askTagFigure(tag) : null;
+      const ownTag = !!tag && (named === null || named === figureId);
       markComposerStagedOrigin(
         ownTag && figureId ? resolveAnchorSeedId(figureId, tag!) : null
       );

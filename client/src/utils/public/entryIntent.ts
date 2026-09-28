@@ -12,6 +12,7 @@ import { sendFunnelBeaconOnce } from '../funnelBeacon';
 import { LocalStorageAdapter } from '../../storage/localAdapter';
 import { figureSlugToId } from '../../data/public/slugMap';
 import { getHeroEntryQuestion, getReadingEntryQuestion, hasHeroEntry } from '../../data/public/heroEntry';
+import { WING_ASK_TAG, getWingDoorQuestion } from '../../data/public/wingDoors';
 import { getFigurePageContent } from '../../data/public/figurePageContent';
 
 const SS_FIGURE_KEY = 'agc_intended_figure';
@@ -36,6 +37,9 @@ const SS_TEXT_FIRST_KEY = 'agc_entry_text_first';
 //                     the reading page's question. Slots 2 and 4 fall back to slot
 //                     1 for a figure that has no such question, and so does
 //                     slot 3 (the council door prefills through its own rail).
+//   w:{figure}:{station}  a museum station's door: the question read beside
+//                     it (wingDoors.ts). An unknown station or language falls
+//                     back to the figure's hero question.
 //   life              the one question that belongs to no figure.
 const LEGACY_ASK_TAG = 'hero';
 const LIFE_ASK_TAG = 'life';
@@ -46,7 +50,7 @@ const FIGURE_ASK_TAG = /^f:([a-z]+):([1-4])$/;
 /** True for any tag the app knows how to resolve into a question. */
 export function isValidAskTag(tag: string): boolean {
   if (tag === LEGACY_ASK_TAG || tag === LIFE_ASK_TAG) return true;
-  const match = FIGURE_ASK_TAG.exec(tag);
+  const match = FIGURE_ASK_TAG.exec(tag) ?? WING_ASK_TAG.exec(tag);
   return !!match && hasHeroEntry(match[1]);
 }
 
@@ -83,6 +87,13 @@ export function resolveAskPrefill(
       if (reading) return { kind: 'text', text: reading };
     }
     const text = getHeroEntryQuestion(match[1], lang);
+    return text ? { kind: 'text', text } : null;
+  }
+
+  const station = WING_ASK_TAG.exec(tag);
+  if (station) {
+    const text = getWingDoorQuestion(station[1], station[2], lang)
+      ?? getHeroEntryQuestion(station[1], lang);
     return text ? { kind: 'text', text } : null;
   }
 

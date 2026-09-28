@@ -57,7 +57,7 @@ import { getPendingQuestVerdict, clearPendingQuestVerdict } from '../utils/quest
 import { restartQuest } from '../utils/questRestart';
 import { LocalStorageAdapter } from '../storage/localAdapter';
 import { readFigureIntent, clearFigureIntent, readCouncilIntent, clearCouncilIntent, readAskIntent, clearAskIntent, stashAskPrefill, stageCouncilHandoff, readStoryIntent, clearStoryIntent, readLibraryIntent, clearLibraryIntent, requestAudioLibrary, peekAskPrefillTag, consumeComposerStagedOrigin, beginCarriedThread, carryStoryExchange, type CarriedExchange } from '../utils/public/entryIntent';
-import { resolveAnchorSeedId } from '../data/public/heroEntry';
+import { askTagFigure, resolveAnchorSeedId } from '../data/public/heroEntry';
 import { ASK_WHILE_LISTENING, CEREMONY_CARRIED_ENTRY, NAV_BATCH } from '../config/features';
 import { preferencesAdapter } from '../storage/preferencesAdapter';
 import { encryptHistory, readHistoryMessages } from '../services/history/historyEncryption';
@@ -710,8 +710,8 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
     if (mode === 'free_conversation') {
       const stagedTag = peekAskPrefillTag();
       const figureId = useDomainStore.getState().figures.selectedId;
-      if (stagedTag && figureId &&
-          (!stagedTag.startsWith('f:') || stagedTag.startsWith(`f:${figureId}:`))) {
+      const namedFigure = stagedTag ? askTagFigure(stagedTag) : null;
+      if (stagedTag && figureId && (namedFigure === null || namedFigure === figureId)) {
         selectAnchorSeedRef.current(figureId, stagedTag);
         // The anchor is part of THIS mode choice, not a fresh figure+seed
         // pick: without the flag, Effect#14 sees the new pair and re-opens

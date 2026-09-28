@@ -8,6 +8,7 @@
 // grounded in the right material.
 
 import { getIdeaSeedId } from './figurePageContent';
+import { WING_ASK_TAG, getWingDoorSeedId, hasWingDoor } from './wingDoors';
 
 export interface HeroEntry {
   figureId: string;
@@ -263,6 +264,13 @@ export const getReadingEntryQuestion = (
 const FIGURE_ASK_TAG = /^f:([a-z]+):([1-4])$/;
 
 /**
+ * The figure an ask tag names (a figure slot or a museum station), or null for
+ * a tag that names none. A staged question grounds only its own figure.
+ */
+export const askTagFigure = (tag: string): string | null =>
+  FIGURE_ASK_TAG.exec(tag)?.[1] ?? WING_ASK_TAG.exec(tag)?.[1] ?? null;
+
+/**
  * The anchor seed behind a staged question, by the ask tag that named it.
  * Follows the same figure the question text follows, so text and grounding
  * never come from different tables. Returns null whenever the tag names no
@@ -279,6 +287,15 @@ export const resolveAnchorSeedId = (figureId: string, tag: string): string | nul
     const seedId = match[2] === '2'
       ? getIdeaSeedId(match[1])
       : getHeroEntrySeedId(match[1]);
+    return seedId === null ? null : String(seedId);
+  }
+  const station = WING_ASK_TAG.exec(tag);
+  if (station) {
+    if (station[1] !== figureId) return null;
+    // An unknown station asks the hero question, so it keeps the hero anchor.
+    const seedId = hasWingDoor(station[1], station[2])
+      ? getWingDoorSeedId(station[1], station[2])
+      : getHeroEntrySeedId(station[1]);
     return seedId === null ? null : String(seedId);
   }
   if (tag === 'hero') {
