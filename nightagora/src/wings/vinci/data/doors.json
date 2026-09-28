@@ -69,8 +69,8 @@
     },
     {
       "station": "study",
-      "question_en": "Your right hand was paralysed, a cardinal's secretary wrote. How did you keep working?",
-      "question_de": "Ein Kardinalssekretär schrieb, deine rechte Hand sei gelähmt. Wie hast du weitergemacht?",
+      "question_en": "A visitor wrote of a paralysis in your right hand. How did you keep working?",
+      "question_de": "Ein Besucher schrieb von einer Lähmung deiner rechten Hand. Wie hast du weitergemacht?",
       "source": {
         "converged_station": "CONCEPT.md section 3",
         "seat_questions": [
@@ -78,7 +78,7 @@
           "CONCEPT-GPT6.md station study and door contract"
         ]
       },
-      "editorial_note": "Both languages ask one question, inside 90 characters. The secretary is the cardinal's, named at the courtyard, so the Echo knows which report is meant.",
+      "editorial_note": "Both languages ask one question inside 90 characters. The paralysis is reported as the secretary reported it, a paralysis in the right hand, not a paralysed hand; the reporter is a visitor, as the stop's own line says.",
       "german_provenance": "Written in German for the words round of 2026-09-28, not translated from the English."
     },
     {

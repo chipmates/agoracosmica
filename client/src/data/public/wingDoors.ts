@@ -31,8 +31,8 @@ const vinciDoors: Record<string, WingDoorQuestion> = {
     de: 'Deine Schüler haben diese Kapelle vielleicht ausgemalt. Was sollten sie von dir lernen?',
   },
   study: {
-    en: "Your right hand was paralysed, a cardinal's secretary wrote. How did you keep working?",
-    de: 'Ein Kardinalssekretär schrieb, deine rechte Hand sei gelähmt. Wie hast du weitergemacht?',
+    en: 'A visitor wrote of a paralysis in your right hand. How did you keep working?',
+    de: 'Ein Besucher schrieb von einer Lähmung deiner rechten Hand. Wie hast du weitergemacht?',
   },
   chamber: {
     en: 'You left your books to Melzi, and he called you the best of fathers. What was he to you?',

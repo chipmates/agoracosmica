@@ -964,8 +964,8 @@ export const vinciWingCounts: VinciText = {
  * later, a place and a documented day, and both are claims this wing already
  * makes at its own stations. */
 export const vinciThroughLine: VinciText = {
-  en: 'The last house Leonardo da Vinci lived in, on an afternoon a visitor wrote down.',
-  de: 'Das letzte Haus, in dem Leonardo da Vinci lebte, an einem Nachmittag, den ein Besucher aufgeschrieben hat.',
+  en: 'The last house Leonardo da Vinci lived in, on a day a visitor wrote down.',
+  de: 'Das letzte Haus, in dem Leonardo da Vinci lebte, an einem Tag, den ein Besucher festgehalten hat.',
 };
 
 /** THE PLAN'S ROOMS. The plan draws the wing from geometry the collection

@@ -38,7 +38,7 @@ export const COLLECTIONS = [
     // (judge/door-words-2026-09-28). The sealed original does not. Sixteen of the twenty stations
     // stand.
     originalSHA256: 'c6bcb90a55fa4d3ce3ec00928ab276613233432468f05a1566ca306d81c47647',
-    normalizedSHA256: 'd3498c80a141cdeb683b0f5791532892db48146813f8b90d3762389032a4b5d5',
+    normalizedSHA256: 'd5588e7abcc4631c10ab30f47c5a11d2cc8d9c951eaed9b61100ff28b3a76dd9',
     expected: { doors: 20 },
   },
   {
