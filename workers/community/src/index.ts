@@ -167,19 +167,22 @@ async function handlePower(
   }
 
   const deviceHash = await sha256(`${env.IP_SALT}:${payload.deviceId}`);
+  const deviceKey = `${DEVICE_PREFIX}${deviceHash}`;
+  const previous = (await env.COMMUNITY_KV.get(deviceKey, 'json')) as DeviceRecord | null;
+
   const ip = request.headers.get('cf-connecting-ip') ?? 'unknown';
   const ipHash = await sha256(`${env.IP_SALT}:${ip}`);
   const rlKey = `${RATE_LIMIT_PREFIX}${ipHash}`;
   const recent = await env.COMMUNITY_KV.get(rlKey);
   if (recent) {
-    // Rate-limited: still return current snapshot so UI can show stats.
+    // A device this worker has not seen is not counted inside the window: it
+    // gets an error, so the client keeps nothing and does not claim a count.
+    // A known device only skips its update and still sees the totals.
+    if (!previous) return jsonResponse({ error: 'rate_limited' }, 429, cors);
     const snap = await readSnapshot(env);
     return jsonResponse(snap, 200, cors);
   }
   await env.COMMUNITY_KV.put(rlKey, '1', { expirationTtl: RATE_LIMIT_WINDOW_S });
-
-  const deviceKey = `${DEVICE_PREFIX}${deviceHash}`;
-  const previous = (await env.COMMUNITY_KV.get(deviceKey, 'json')) as DeviceRecord | null;
 
   const next: DeviceRecord = {
     power: Math.floor(payload.power),

@@ -41,7 +41,7 @@ Response (200):
 
 All three fields are required. `deviceId` is a string of 8 to 128 characters, `power` a finite number from 0 to 31, `completedFigures` a finite number from 0 to 30. Anything outside that gets `400 invalid_payload`, and a body that is not JSON gets `400 invalid_json`.
 
-A device that already wrote within the last six hours is not written again. It still gets a 200 with the current aggregate, so the panel always has numbers to show.
+Writes are limited per address: after one write, the same address is not written again for six hours. Inside that window a device the worker already knows gets a 200 with the current aggregate and no write, so the panel still has numbers to show. A device it has not seen gets `429 rate_limited` and nothing is written, so the app keeps no ID and does not claim a count that never happened.
 
 Cross-origin requests are checked against the `ALLOWED_ORIGINS` allowlist in `wrangler.toml`. An origin outside the list gets the first allowed origin echoed back, and an empty allowlist gets no `Access-Control-Allow-Origin` header at all, which the browser then rejects. The wildcard is never reflected.
 
@@ -51,7 +51,7 @@ One KV namespace, three kinds of key:
 
 | Key | Value | Lifetime |
 |---|---|---|
-| `device:<hash>` | that device's `power`, `completedFigures`, `lastSeen` | no expiry |
+| `device:<hash>` | that device's `power`, `completedFigures`, `lastSeen` | 12 months after the last write |
 | `aggregate:snapshot` | `joinedCount`, `totalPower`, `updatedAt` | no expiry |
 | `rl:<hash>` | write marker for the rate limit | 6 hours |
 
@@ -82,7 +82,7 @@ A ladder beats a formula here because a predictable step is easier to talk about
 Two more limits are worth knowing before quoting the numbers:
 
 - Device records expire 12 months after their last write, but `joinedCount` is never decremented, so it stays a running total of every device that has ever written. The currently active count is smaller. Rotating `IP_SALT` makes returning devices look new, which pushes the total up again.
-- The six-hour gate is keyed to the hashed address, so several people behind one address share it. The later ones get the snapshot back without a write of their own.
+- The six-hour gate is keyed to the hashed address, so several people behind one address share it. Inside the window a known device gets the snapshot back without a write, and a new one gets `429 rate_limited` and can try again later.
 
 The stakes are set low on purpose. This is a non-binding signal with a human review step behind it, and the cost of a false claim is that ChipMates does not act on it.
 
@@ -92,6 +92,8 @@ The stakes are set low on purpose. This is a non-binding signal with a human rev
 pnpm install
 npx wrangler dev
 ```
+
+The tests need no framework and print a tally: `npx tsx test/run.ts`.
 
 `wrangler.toml` pins the dev port to 8789. The client picks the worker up from an env var:
 
