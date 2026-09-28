@@ -34,6 +34,11 @@ import {
   LISTENED_THRESHOLD_S,
 } from '@client/utils/public/gclidCapture';
 
+// For the footer switch. Every island that reaches gclidCapture must also reach
+// this module, so the two share one chunk named after this file: a chunk named
+// after gclidCapture would be blocked (client/scripts/check-asset-names.mjs).
+export { adConsentGranted, revokeAdConsent } from '@client/utils/public/gclidCapture';
+
 const CONVERSIONS_URL = 'https://llm.agoracosmica.org/api/conversions';
 
 // sessionStorage on purpose: the marketing site is a multi-page app, so the

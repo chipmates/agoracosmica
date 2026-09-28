@@ -2,6 +2,7 @@
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
 import { publicUrl } from '../lib/urls';
+import FooterChoice from '../islands/FooterChoice';
 
 interface Props {
   lang: Lang;
@@ -33,6 +34,9 @@ const t = getT(lang);
         <a href={lang === 'en' ? '/privacy/' : '/datenschutz/'}>{t('footer.datenschutz')}</a>
         <a href="/cookie-policy/">{t('footer.cookiePolicy')}</a>
         <a href="/nutzungsbedingungen/">{t('footer.terms')}</a>
+        {/* Withdrawing ad-measurement consent must be as easy as giving it,
+            on every page where the yes can be given. */}
+        <FooterChoice client:visible lang={lang} />
       </div>
       <div class="pub-footer__col">
         <a href="https://github.com/chipmates/agoracosmica" target="_blank" rel="noopener noreferrer">GitHub</a>

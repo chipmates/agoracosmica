@@ -1,0 +1,99 @@
+/* The ad-measurement switch in the public footer (FooterChoice island). It sits
+   in the legal column of both footer skins, so it takes the column's own text
+   size and ink and adds only the panel. Tokens only, from index.css. */
+
+.pub-footer__choice {
+  margin: 0;
+  font-family: var(--font-ui);
+}
+
+.pub-footer__choice-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  min-height: 44px;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  list-style: none;
+  transition: color var(--transition-base);
+}
+.pub-footer__choice-toggle::-webkit-details-marker { display: none; }
+.pub-footer__choice-toggle::marker { content: ''; }
+/* Chevron: points down while closed, up while open. */
+.pub-footer__choice-toggle::after {
+  content: '';
+  width: 0.38em;
+  height: 0.38em;
+  margin-top: -0.18em;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform var(--transition-base);
+}
+.pub-footer__choice[open] > .pub-footer__choice-toggle::after {
+  margin-top: 0.18em;
+  transform: rotate(-135deg);
+}
+.pub-footer__choice-toggle:hover,
+.pub-footer__choice[open] > .pub-footer__choice-toggle {
+  color: var(--gold-primary);
+}
+.pub-footer__choice-toggle:focus-visible,
+.pub-footer__choice-button:focus-visible,
+.pub-footer__choice-link:focus-visible,
+.pub-footer__choice-state:focus-visible {
+  outline: 2px solid var(--gold-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.pub-footer__choice-panel {
+  max-width: 20rem;
+  margin: 0.1rem 0 0.4rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-25), transparent);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--bg-card) var(--a-80), transparent);
+}
+
+.pub-footer__choice-state {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--text-primary);
+}
+
+.pub-footer__choice-button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 0.55rem;
+  padding: 0 1rem;
+  font: inherit;
+  font-size: 0.875rem;
+  color: var(--gold-primary);
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--gold-primary) var(--a-45), transparent);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--transition-base), border-color var(--transition-base);
+}
+.pub-footer__choice-button:hover {
+  background: color-mix(in srgb, var(--gold-primary) var(--a-12), transparent);
+  border-color: var(--gold-primary);
+}
+
+.pub-footer__choice-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pub-footer__choice-toggle,
+  .pub-footer__choice-toggle::after,
+  .pub-footer__choice-button { transition: none; }
+}
