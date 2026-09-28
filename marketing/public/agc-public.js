@@ -33,7 +33,7 @@
   // Keep in sync with AD_CONSENT_VERSION in client/src/utils/public/
   // gclidCapture.ts: a grant recorded under an older consent version no longer
   // covers the current scope, so it must not authorize sends.
-  var AD_CONSENT_VERSION = '1.0.0';
+  var AD_CONSENT_VERSION = '1.1.0';
   // Same 12-month memory as gclidCapture.ts: an older answer counts as none.
   var AD_CONSENT_MAX_AGE_MS = 365 * 24 * 60 * 60 * 1000;
   var AD_CONSENT_SKEW_MS = 24 * 60 * 60 * 1000;

@@ -6,8 +6,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, fireEvent, act } from '@testing-library/react';
 
 const CLICK = 'TESTCLICKID0001';
-const YES = JSON.stringify({ granted: true, version: '1.0.0', timestamp: Date.now() });
-const NO = JSON.stringify({ granted: false, version: '1.0.0', timestamp: Date.now() });
+const YES = JSON.stringify({ granted: true, version: '1.1.0', timestamp: Date.now() });
+const NO = JSON.stringify({ granted: false, version: '1.1.0', timestamp: Date.now() });
 
 function storageKeys(store: Storage): string[] {
   return Array.from({ length: store.length }, (_, i) => store.key(i) as string);
@@ -100,7 +100,16 @@ describe('FooterChoice', () => {
   });
 
   it('shows "off" for a yes older than a year', async () => {
-    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: true, version: '1.0.0', timestamp: Date.now() - 366 * 86_400_000 }));
+    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: true, version: '1.1.0', timestamp: Date.now() - 366 * 86_400_000 }));
+    const { container } = await mount();
+    await open(container);
+    expect(container.querySelector('[role="status"]')!.textContent).toBe('Ad measurement is off.');
+  });
+});
+
+describe('FooterChoice and the earlier card text', () => {
+  it('shows off for a yes given under version 1.0.0', async () => {
+    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: true, version: '1.0.0', timestamp: Date.now() }));
     const { container } = await mount();
     await open(container);
     expect(container.querySelector('[role="status"]')!.textContent).toBe('Ad measurement is off.');

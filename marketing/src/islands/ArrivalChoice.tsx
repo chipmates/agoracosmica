@@ -18,9 +18,11 @@
 // page memory and nothing is stored; only a yes stores it. The next page has
 // no click ID in its address, so the card asks on the landing page only.
 //
-// Copy is legally reviewed: the withdrawal notice, the privacy link and the
-// click-ID scope sentence are all load bearing and none of them may be
-// dropped for space. Lift into publicI18n if it ever needs more languages.
+// Copy is legally reviewed: the withdrawal notice, the privacy and Google
+// links and the click-ID scope sentence are all load bearing and none of
+// them may be dropped for space. A change to what the yes covers bumps
+// AD_CONSENT_VERSION (gclidCapture.ts, agc-public.js), so earlier answers
+// are asked again. Lift into publicI18n if it ever needs more languages.
 
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -56,26 +58,26 @@ const COPY = {
     kicker: 'One question about this ad',
     heading: 'So the next person finds it too.',
     lead: 'Nonprofits get their Google ads for free. Counted clicks help those ads reach more people searching for the same thing.',
-    // Non-breaking spaces around the chevron: the settings path must never
-    // break across lines.
-    fine: 'Nothing about you goes to Google except the ad’s click ID. No name, no browsing history. You can undo it anytime under Settings › Legal. Either way, the whole library stays open. A no is remembered.',
+    fine: 'A yes sends Google the ad’s click ID with each step you take here: this yes, opening the app, listening, starting a conversation, a third message, a council. Nothing else about you, no name. We remember your answer on this device for a year. Turn it off anytime at the foot of every page. Either way, the whole library stays open.',
     accept: 'Yes, count it',
     decline: 'No, don’t count it',
     link: 'See the code',
     privacy: 'Privacy policy',
     privacyHref: '/privacy/',
+    google: 'How Google uses this',
   },
   de: {
     trust: 'Gemeinnützig · Open Source · Keine Tracking-Cookies, kein Profiling',
     kicker: 'Eine Frage zu dieser Anzeige',
     heading: 'Damit der nächste Mensch es auch findet.',
     lead: 'Gemeinnützige bekommen ihre Anzeigen bei Google gratis. Gezählte Klicks helfen, mehr Menschen zu erreichen, die dasselbe suchen.',
-    fine: 'Von dir geht nur die Klick-ID der Anzeige zu Google. Kein Name, keine Browserdaten. Jederzeit widerrufbar unter Einstellungen › Rechtliches. So oder so bleibt die Bibliothek offen. Ein Nein merken wir uns.',
+    fine: 'Ein Ja schickt Google die Klick-ID der Anzeige mit jedem Schritt, den du hier gehst: diesem Ja, dem Öffnen der App, dem Zuhören, dem Beginn eines Gesprächs, der dritten Nachricht, einem Konzil. Sonst nichts über dich, kein Name. Deine Antwort merken wir uns auf diesem Gerät für ein Jahr. Ausschalten kannst du es jederzeit unten auf jeder Seite. So oder so bleibt die Bibliothek offen.',
     accept: 'Ja, zählen',
     decline: 'Nein, nicht zählen',
     link: 'Code ansehen',
     privacy: 'Datenschutzerklärung',
     privacyHref: '/datenschutz/',
+    google: 'Wie Google das nutzt',
   },
 } as const;
 
@@ -89,6 +91,7 @@ const CONVERSIONS_URL = 'https://llm.agoracosmica.org/api/conversions';
 const FUNNEL_URL = 'https://llm.agoracosmica.org/v1/funnel';
 const CODE_URL =
   'https://github.com/chipmates/agoracosmica/blob/main/client/src/utils/public/gclidCapture.ts';
+const GOOGLE_PARTNER_URL = 'https://business.safety.google/privacy';
 const SS_FIRED = 'agc_conv_fired_start_exploring';
 
 // Anonymous consent counters: how many ad arrivals get asked, and what they
@@ -384,6 +387,17 @@ export default function ArrivalChoice({ lang }: Props) {
           </span>
           <a className="agc-consent__link" href={t.privacyHref}>
             {t.privacy}
+          </a>
+          <span className="agc-consent__sep" aria-hidden="true">
+            {' · '}
+          </span>
+          <a
+            className="agc-consent__link"
+            href={GOOGLE_PARTNER_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {t.google}
           </a>
         </span>
       </p>

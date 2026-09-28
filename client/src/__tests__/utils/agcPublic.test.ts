@@ -120,7 +120,7 @@ describe('agc-public.js: counting stores nothing', () => {
 
 describe('agc-public.js: the ad click ID', () => {
   const CLICK = 'TESTCLICKID0001';
-  const YES = JSON.stringify({ granted: true, version: '1.0.0', timestamp: Date.now() });
+  const YES = JSON.stringify({ granted: true, version: '1.1.0', timestamp: Date.now() });
   const conversions = () => fetches.filter((f) => f.url.endsWith('/api/conversions'));
 
   it('stores nothing on a grant landing without an answer', () => {
@@ -176,12 +176,12 @@ describe('agc-public.js: the 12-month memory', () => {
   const CLICK = 'TESTCLICKID0001';
   const DAY = 24 * 60 * 60 * 1000;
   it('stores no click ID under a yes older than a year', () => {
-    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: true, version: '1.0.0', timestamp: Date.now() - 366 * DAY }));
+    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: true, version: '1.1.0', timestamp: Date.now() - 366 * DAY }));
     loadPage(`/marcus-aurelius/?gclid=${CLICK}`);
     expect(storageKeys(sessionStorage)).toEqual([]);
   });
   it('stores it under a yes younger than a year', () => {
-    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: true, version: '1.0.0', timestamp: Date.now() - 300 * DAY }));
+    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: true, version: '1.1.0', timestamp: Date.now() - 300 * DAY }));
     loadPage(`/marcus-aurelius/?gclid=${CLICK}`);
     expect(sessionStorage.getItem('agc_gclid')).toBe(CLICK);
   });
@@ -228,5 +228,13 @@ describe('agc-public.js: the source class on the app doors', () => {
     const late = door({}, '/app?figure=seneca&lang=en');
     click(late);
     expect(late.getAttribute('href')).toBe('/app?figure=seneca&lang=en#src=assistant');
+  });
+});
+
+describe('agc-public.js: an answer under the earlier card text', () => {
+  it('stores no click ID under a 1.0.0 yes', () => {
+    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: true, version: '1.0.0', timestamp: Date.now() }));
+    loadPage('/marcus-aurelius/?gclid=TESTCLICKID0001');
+    expect(storageKeys(sessionStorage)).toEqual([]);
   });
 });

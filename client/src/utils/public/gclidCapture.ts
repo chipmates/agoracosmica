@@ -16,7 +16,7 @@ const SS_GCLID_KEY = 'agc_gclid';
 // localStorage key: the ad-measurement answer. A consent record (yes or no,
 // version, time), kept so the choice is respected across visits.
 const LS_AD_CONSENT_KEY = 'agc_ad_consent';
-const AD_CONSENT_VERSION = '1.0.0';
+const AD_CONSENT_VERSION = '1.1.0';
 // An answer is remembered for 12 months; an older one is removed and counts as
 // no answer, so the question may be asked again.
 const AD_CONSENT_MAX_AGE_MS = 365 * 24 * 60 * 60 * 1000;
