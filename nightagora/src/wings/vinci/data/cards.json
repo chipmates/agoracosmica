@@ -133,6 +133,10 @@
       "the_end": { "en": "The end", "de": "Das Ende" },
       "look_up": { "en": "Look up", "de": "Nach oben schauen" }
     },
+    "ending": {
+      "lookup": { "en": "Look up", "de": "Nach oben schauen" },
+      "talk": { "en": "Talk with Leonardo", "de": "Mit Leonardo sprechen" }
+    },
     "visit": {
       "tell_the_story": { "en": "Tell me the story", "de": "Erzähl mir die Geschichte" },
       "go_on": { "en": "Go on", "de": "Weiter erzählen" },

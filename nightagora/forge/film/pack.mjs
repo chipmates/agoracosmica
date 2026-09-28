@@ -226,6 +226,7 @@ const release = {
   revision: summary.head,
   framings: Object.fromEntries(Object.entries(MASTER).map(([f, master]) => [f, { master, rungs: RUNGS[f] }])),
   story: graph.story,
+  ...(graph.start ? { start: graph.start } : {}),
   cuts: graph.cuts,
   opens: graph.opens,
   sets,

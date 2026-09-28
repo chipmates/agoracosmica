@@ -64,6 +64,18 @@ export function createDeskPanel(host: DeskPanelHost): void {
      has borrowed them, so the row is rebuilt nowhere */
   const waysNext = host.ways.nextElementSibling
 
+  /* THE WALK ENDS IN TWO WAYS, side by side at its last stop: the way on
+     looks up, and beside it the wing's other ending, which a wing answers
+     for itself (`na-wing-ending`). Hidden everywhere else. */
+  const talk = document.createElement('button')
+  talk.type = 'button'
+  talk.className = 'desk-panel-talk'
+  talk.hidden = true
+  const talkWords = document.createElement('span')
+  talkWords.className = 'desk-panel-talk-words'
+  talk.append(talkWords)
+  host.ways.insertBefore(talk, host.on)
+
   const path = host.arrow.querySelector<SVGPathElement>('.desk-ic path')
 
   function set(node: HTMLElement, key: 'textContent' | 'ariaLabel', value: string): void {
@@ -87,11 +99,13 @@ export function createDeskPanel(host: DeskPanelHost): void {
     }
     if (end) {
       if (host.on.disabled) host.on.disabled = false
-      const look = text(deskControl('walk', 'look_up'))
+      const look = text(deskControl('ending', 'lookup'))
       set(host.title, 'textContent', look)
       if (host.title.hidden) host.title.hidden = false
       set(host.on, 'ariaLabel', `${host.kicker.textContent ?? ''} · ${look}`)
+      set(talkWords, 'textContent', text(deskControl('ending', 'talk')))
     }
+    if (talk.hidden === end) talk.hidden = !end
     const d = end ? ARROW_UP : ARROW_ON
     if (path && path.getAttribute('d') !== d) path.setAttribute('d', d)
   }
@@ -103,9 +117,16 @@ export function createDeskPanel(host: DeskPanelHost): void {
   host.back.addEventListener('click', () => {
     if (host.standing().index === 0) leave()
   }, { signal })
+  /** An ending the wing answers for itself; unanswered, the walk goes home. */
+  function endWith(ending: 'lookup' | 'talk'): boolean {
+    const asked = new CustomEvent('na-wing-ending', { detail: { ending }, cancelable: true })
+    dispatchEvent(asked)
+    return asked.defaultPrevented
+  }
   host.on.addEventListener('click', () => {
-    if (host.next() === null) leave()
+    if (host.next() === null && !endWith('lookup')) leave()
   }, { signal })
+  talk.addEventListener('click', () => { endWith('talk') }, { signal })
 
   /* THE FIVE ROWS THE WING ADDS at the panel's head. Every word is the card
      data's or the wing's own control's, so a wing that carries no plan offers

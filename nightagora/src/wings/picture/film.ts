@@ -11,7 +11,7 @@ import type { FilmCycle } from './cycle'
 import {
   PICTURE_ASPECT, lineIsLean, onBox, parsePrint, projectPrint,
   type CameraPrint, type PictureBox, type PictureEvent, type PictureFraming, type PictureMark,
-  type PictureNode, type PictureSource, type PictureState, type PictureWords,
+  type PictureGo, type PictureNode, type PictureSource, type PictureState, type PictureWords,
 } from './seam'
 
 export const FILM_FORMAT = 'vinci-film-player-v1'
@@ -65,6 +65,8 @@ export interface FilmRelease {
   revision: string
   framings: Record<PictureFraming, { master: [number, number]; rungs: [number, number][] }>
   story: PictureNode[]
+  /** where the walk begins before its first stop, where the release carries it */
+  start?: PictureNode
   /** the chapter cuts, and the doors: a quiet cut, one way and untitled */
   cuts: { from: PictureNode; to: PictureNode; title?: PictureWords; quiet?: true }[]
   opens: [PictureNode, PictureNode][]
@@ -185,7 +187,7 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
   /* the rest a leg ends on is told while the leg still counts as busy, so the
      gold way's next clip asked for then is fetched once the leg is done */
   let aheadLater: readonly PictureNode[] | null = null
-  let queued: { node: PictureNode; resolve: ((n: PictureNode) => void)[] } | null = null
+  let queued: { node: PictureNode; fade: boolean; resolve: ((n: PictureNode) => void)[] } | null = null
   let carried = 0
   let hurried = false
   let disposed = false
@@ -588,8 +590,15 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
     }
   }
 
-  async function goNow(node: PictureNode): Promise<PictureNode> {
+  async function goNow(node: PictureNode, fade = false): Promise<PictureNode> {
     const f = framingOf()
+    // A FADE WALKS NOTHING: down to the dark, the place stood, up again
+    if (fade && node !== here) {
+      if (!release.nodes[node]?.stills[f]) return here
+      await dip(node, null, true)
+      set({ kind: 'rest', node: here }, 'rest')
+      return here
+    }
     let plan: RouterPlan
     try {
       plan = route(graphOf(f), here, node, { framing: f, pace: 'walk' })
@@ -615,7 +624,8 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
     return here
   }
 
-  async function go(node: PictureNode): Promise<PictureNode> {
+  async function go(node: PictureNode, how: PictureGo = {}): Promise<PictureNode> {
+    const fade = how.fade === true
     if (busy) {
       /* A PRESS WHILE WALKING queues one target, as the rail's one pending slot
          does, and carries the pace up while it waits */
@@ -623,7 +633,7 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
         if (queued && queued.node === node) queued.resolve.push(resolve)
         else {
           for (const r of queued?.resolve ?? []) r(here)
-          queued = { node, resolve: [resolve] }
+          queued = { node, fade, resolve: [resolve] }
         }
         carried = 1
         if (playing) playing.video.playbackRate = rate()
@@ -632,7 +642,7 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
     busy = true
     let at = here
     try {
-      at = await goNow(node)
+      at = await goNow(node, fade)
     } finally {
       busy = false
       carried = 0
@@ -641,7 +651,7 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
     const next = queued
     queued = null
     if (next && !disposed) {
-      const landed = await go(next.node)
+      const landed = await go(next.node, { fade: next.fade })
       for (const r of next.resolve) r(landed)
     } else if (aheadLater && !disposed) {
       const nodes = aheadLater

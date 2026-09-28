@@ -74,8 +74,9 @@ const PLANTING: readonly TreeSpec[] = [
   // the garden front: a walnut in the meadow under the terrace wall, and a
   // field maple at the court's south corner
   // (its crown stays left of the garden front: the eight principal windows
-  // stand clear of leaves in both framings)
-  { id: 'meadow-walnut', species: 'walnut', east: -28.6, north: -20.2, height: 13.6, seed: 71517, detail: 'near', lean: [-.6, .4] },
+  // stand clear of leaves in both framings; it stands north of the line from
+  // the stair head to the court, so the walk's opening sees the court)
+  { id: 'meadow-walnut', species: 'walnut', east: -28.5, north: -10, height: 13.6, seed: 71517, detail: 'near', lean: [-.6, .4] },
   { id: 'court-maple', species: 'maple', east: -8.2, north: -36.6, height: 9.8, seed: 10151, detail: 'near', lean: [-.5, -.4] },
   // the road: a walnut in the yard across the street from the gate, leaning
   // over the road to the light, and a field elm further up the road

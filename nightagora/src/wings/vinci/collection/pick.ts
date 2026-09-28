@@ -15,10 +15,11 @@ import { Box3, Matrix4, Mesh, Ray, Raycaster, Sphere, Vector3, type Object3D } f
 import type { VinciStationId } from '../content'
 import { HOUSE_CLOSE_LOOKS } from '../rail'
 import { studySupport } from '../inner-court'
-import { LINE_FLOOR_PICK, VINCI_LINE_STATION, VINCI_STUDY_LEAF, vinciApproachPose, vinciApproachStation, vinciPlateExhibitId, type VinciExhibitKind } from './approaches'
+import { LINE_FLOOR_PICK, VINCI_LINE_STATION, VINCI_STUDY_LEAF, vinciApproachPose, vinciApproachStation, vinciMachineRowIndex, vinciPlateExhibitId, type VinciExhibitKind } from './approaches'
 import { vinciWallOrderOf } from './wall'
 import { hangPlacements } from './hang'
-import { HALL_TABLE_PIECE_SLUGS, STANDS, isHallTablePiece } from './stands'
+import { STANDS } from './stands'
+import type { MachineSlug } from '../machines/catalog'
 import { FRAME_FRONT, mountedSheets, sheetFace } from './body-wall-plan'
 
 export interface VinciPickEntry {
@@ -93,8 +94,8 @@ function placedAt(kind: VinciExhibitKind, id: string, workId: string | null, she
   if (kind === 'machine' && slug !== undefined) {
     // THE HALL IS ONE ROOM UNDER TWO STATIONS, and both walk one row of its
     // machines; the station a machine's certified leg leaves from is its own.
-    // The house's table stands its two pieces in the order they are stepped.
-    const at = isHallTablePiece(slug) ? HALL_TABLE_PIECE_SLUGS.indexOf(slug) : Object.keys(STANDS).indexOf(slug)
+    // Every room's row is the order its machines are walked in.
+    const at = vinciMachineRowIndex(slug as MachineSlug)
     return { station: vinciApproachStation(id) ?? null, order: MACHINE_OFFSET + Math.max(0, at) }
   }
   return { station: vinciApproachStation(id) ?? null, order: 0 }
@@ -236,9 +237,6 @@ export function readVinciExhibits(root: Object3D): VinciPickEntry[] {
       const { centre, radiusM } = proxy(object)
       const over = centre.clone().setY(studySupport.top + .1)
       entries.push(place(VINCI_STUDY_LEAF, 'manuscript', object, centre, Math.max(.3, radiusM), over, 0))
-    } else if (exhibit?.kind === 'court-plaque') {
-      const { centre, radiusM } = proxy(object)
-      entries.push(place('plaque/flight-quote', 'place', object, centre, radiusM, centre.clone(), MACHINE_OFFSET + Object.keys(STANDS).length))
     } else if (exhibit?.kind === 'grave' && exhibit.anchors) {
       object.updateWorldMatrix(true, true)
       const slab = new Vector3().fromArray(exhibit.anchors['slab']!)

@@ -36,8 +36,9 @@
           // the still the player itself picks: the framing by the glass, the
           // smallest rung that carries the box, the smallest on a lean line
           var upright = innerWidth / innerHeight <= 0.9, f = upright ? 'upright' : 'wide'
-          // the door belongs to the story's first stop: a release without it has no door
-          var node = (rel.story || [])[0]
+          // the door belongs to the walk's start, above the museum, or where a
+          // release has none to the story's first stop: without it, no door
+          var node = rel.start && rel.nodes[rel.start] ? rel.start : (rel.story || [])[0]
           var stills = node && rel.nodes[node] && rel.nodes[node].stills[f]
           if (!stills) throw new Error('no still')
           var c = navigator.connection, lean = !!c && (c.saveData || /^(slow-2g|2g|3g)$/.test(c.effectiveType || ''))

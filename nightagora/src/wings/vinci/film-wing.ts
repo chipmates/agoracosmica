@@ -12,7 +12,8 @@ import { vinciAbsences, vinciCertaintyWords, vinciCollectionThreshold, vinciCont
   vinciReconstruction, vinciRightsPolicy, vinciRoomStationIds, vinciSourcesHeadings, vinciWingCounts,
   type VinciCertainty, type VinciStatement, type VinciStationId, type VinciText } from './content'
 import { vinciStory } from './story'
-import { VINCI_VALVE } from './walk-places'
+import { VINCI_LISA_STOP, VINCI_OFF_THE_WALK, VINCI_VALVE } from './walk-places'
+import { awaitOpening } from './opening-seam'
 import { deskControl, deskStoryStop } from '../desk-story'
 import { applyDeskSteps, deskOn } from '../desk-switches'
 import { deskStageHeight } from '../desk-stage'
@@ -80,8 +81,8 @@ function lifeStops(): LifeStop[] {
   for (const stop of [...vinciStory].sort((a, b) => a.order - b.order)) {
     if (stop.kind === 'cut') continue
     // the wall stop is named by its own chapter: the rail that carries these names stands down in the film
-    if (stop.id === 'picture-room-lisa') out.push({ id: stop.id, station: 'picture-room', name: stop.chapter })
-    else if (built.has(stop.id)) out.push({ id: stop.id, station: stop.id, name: vinciContent.find(s => s.id === stop.id)!.name })
+    if (stop.id === VINCI_LISA_STOP) out.push({ id: stop.id, station: 'picture-room', name: stop.chapter })
+    else if (built.has(stop.id) && !VINCI_OFF_THE_WALK.has(stop.id)) out.push({ id: stop.id, station: stop.id, name: vinciContent.find(s => s.id === stop.id)!.name })
     // the heart valve's stop follows the body wall, as in the walk (walk.ts)
     if (stop.id === VINCI_VALVE.station) out.push({ id: VINCI_VALVE.place, station: VINCI_VALVE.station, name: VINCI_VALVE.name })
   }
@@ -128,6 +129,13 @@ const viewNode = (exhibit: string): PictureNode => `view:${exhibit}`
 export function createWing(): WingModule {
   const LIFE = lifeStops()
   const stationOf = (id: string) => vinciContent.find(s => s.id === id) ?? vinciContent[0]!
+  /** An entry that names a stop stands there; any other begins at the walk's
+      start where the release carries one, and walks down into the first stop
+      once the opening and the door are done. Read before the frame writes
+      the address. */
+  const namedEntry = /(?:^|[#&])s=/.test(location.hash)
+  let above = false
+  let doorDone: (() => void) | null = null
   let hosts: WingHosts | undefined
   let release: FilmRelease | undefined
   let picture: PictureSource | undefined
@@ -135,6 +143,8 @@ export function createWing(): WingModule {
   let sources: ReturnType<typeof createVinciSourcesWindow> | undefined
   let sourceButton: HTMLButtonElement | undefined
   let card = 0
+  /** the stop last asked for, which a press's neighbours are counted from */
+  let asked = 0
   let wide = true
   let loading: Promise<void> | undefined
   let marksAt = ''
@@ -652,8 +662,19 @@ export function createWing(): WingModule {
     if (q) q.textContent = text(s.door)
   }
   function ahead(): void {
+    if (above) { picture?.ahead([stopNode(LIFE[0]!.id)]); return }
     const next = nextIndex()
     if (next !== null) picture?.ahead([stopNode(LIFE[next]!.id)])
+  }
+  /** THE DESCENT: the walk's start to the first stop, after the opening and the door */
+  async function descend(): Promise<void> {
+    if (!above || !hosts) return
+    await awaitOpening(hosts.labels)
+    if (doorStanding) await new Promise<void>(resolve => { doorDone = resolve })
+    const s = picture?.state()
+    if (!above || !picture || s?.kind !== 'rest' || s.node !== release?.start) return
+    above = false
+    void picture.go(stopNode(LIFE[0]!.id))
   }
 
   /* ---- the door ---- */
@@ -671,6 +692,7 @@ export function createWing(): WingModule {
   }
   function leaveDoor(route: 'house' | 'collection' | 'life'): void {
     doorStanding = false
+    doorDone?.(); doorDone = null
     delete document.documentElement.dataset['naDoor']
     releaseFirstStill()
     const wing = hosts?.stage.parentElement
@@ -716,7 +738,7 @@ export function createWing(): WingModule {
     release = await adoptRelease(filmReleaseBase())
     if (!hosts) return
     // the visit enters at the stop asked for, or at the first this release carries
-    if (!carried(card)) card = Math.max(0, LIFE.findIndex((_, i) => carried(i)))
+    if (!carried(card)) card = asked = Math.max(0, LIFE.findIndex((_, i) => carried(i)))
     // a release that does not carry the first stop has no door to stand at
     if (welcome && card !== 0) {
       welcome.dispose(); welcome = undefined
@@ -724,7 +746,8 @@ export function createWing(): WingModule {
       delete document.documentElement.dataset['naDoor']
       releaseFirstStill()
     }
-    picture = createFilmSource({ host: h.stage, base: filmReleaseBase(), release, at: stopNode(LIFE[card]!.id),
+    above = card === 0 && !namedEntry && Boolean(release.start && release.nodes[release.start]) && !new URLSearchParams(location.search).has('export')
+    picture = createFilmSource({ host: h.stage, base: filmReleaseBase(), release, at: above ? release.start! : stopNode(LIFE[card]!.id),
       framing: () => (wide ? 'wide' : 'upright'), box, pace: () => gaitPace(), hold: title => readingMs(title) })
     // the seam as the rigs read it, the way the live wing hands them `__forge`
     ;(window as unknown as { __naSeam?: PictureSource }).__naSeam = picture
@@ -738,6 +761,7 @@ export function createWing(): WingModule {
       if (state.kind !== 'rest') return
       const at = LIFE.findIndex(s => stopNode(s.id) === state.node)
       if (at >= 0 && at !== card) { card = at; paint() }
+      if (at >= 0) asked = at
       stood.add(LIFE[card]!.id)
       paintGold()
       ahead()
@@ -809,6 +833,7 @@ export function createWing(): WingModule {
     releaseFirstStill()
     if (welcome && !doorStanding && !vinciWelcomeSeen()) openDoor()
     ahead()
+    void descend()
     // the close looks are fetched while the visitor reads the first picture
     void lookNow()
   }
@@ -824,7 +849,7 @@ export function createWing(): WingModule {
     },
     show(index, h) {
       if (!hosts) {
-        card = Math.max(0, Math.min(LIFE.length - 1, index))
+        card = asked = Math.max(0, Math.min(LIFE.length - 1, index))
         // a release that cannot be read leaves the entry, never holds it at the gold field
         loading = mount(h).catch(err => console.error(`the film could not stand: ${String(err)}`))
         return
@@ -832,7 +857,12 @@ export function createWing(): WingModule {
       if (!picture || !carried(index)) return
       look?.close()
       if (drawerOpen) setDrawer(false)
-      void picture.go(stopNode(LIFE[index]!.id))
+      // ONLY THE NEXT AND THE PREVIOUS STOP ARE WALKED: a press on the plan
+      // or on a far stop fades there, as the live wing's does
+      above = false
+      const from = asked
+      asked = index
+      void picture.go(stopNode(LIFE[index]!.id), { fade: Math.abs(index - from) > 1 })
     },
     async ready(report) {
       report?.({ stage: 'house', share: null })

@@ -119,6 +119,8 @@ export function railSide(stationId: string): RailSide {
   // threshold steps, the heart valve's before its niche by the body wall.
   if (stationId === 'hall-door-in' || stationId === 'hall-door-out') return 'house-door'
   if (stationId === 'body-valve') return 'valve-niche'
+  // the walk's start stands on the terrace's top landing, over the stair
+  if (stationId === 'stair-head') return 'terrace'
   // The hall's eye stands in the great hall's own door, one storey above the
   // court: it is reached over the threshold steps and through the passage.
   if (stationId === 'hall') return 'great-hall'

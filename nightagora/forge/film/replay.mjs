@@ -114,7 +114,7 @@ export function walkClip(replay, { aspect, phone, place, request, fps = FPS, tai
 function nodeMoves(replay, framingName, phone) {
   const pose = (node) => livePose(node.pose[framingName])
   const place = (node) => (rail) => {
-    if (node.kind === 'stop' || node.kind === 'door') {
+    if (node.kind === 'stop' || node.kind === 'door' || node.kind === 'start') {
       // a stop stands at its station, at its own vertex of the wall (index.ts, crossChapter), or at a place of its own
       rail.set(node.railId ?? node.station, pose(node), true, phone, node.exhibit ? node.vertex : undefined)
       return

@@ -61,6 +61,18 @@ const RHYTHM_NONE_SHARE = 1.75 / 1.6
  * at a stroll's cadence. */
 const CARRIED_SHARE = .9, CARRIED_MAX = 4
 
+/** THE LEG'S OWN SPEED against the pace the visitor set: a walk between two
+ * stops runs faster than it, except where a leg keeps it (`rail.ts`). It
+ * holds while one leg is planned. Its ramps lengthen with it, so getting
+ * under way and stopping keep the acceleration the walk's pace has. */
+let legSpeed = 1
+export function withGaitLegSpeed<T>(speed: number, plan: () => T): T {
+  const was = legSpeed
+  legSpeed = speed > 0 && Number.isFinite(speed) ? speed : 1
+  try { return plan() } finally { legSpeed = was }
+}
+const RAMP_PER_SPEED = .95
+
 const clamp01 = (x: number) => Math.max(0, Math.min(1, x))
 /** Smoothstep: the velocity shape of getting under way and of stopping. */
 const shape = (u: number) => { const x = clamp01(u); return x * x * (3 - 2 * x) }
@@ -81,9 +93,11 @@ export interface GaitLeg {
  * turning asks for. */
 export function gaitLeg(lengthM: number, atLeastSeconds = 0): GaitLeg {
   const length = Math.max(0, Number.isFinite(lengthM) ? lengthM : 0)
-  const walk = gaitMetresPerSecond()
-  const full = walk, none = walk * RHYTHM_NONE_SHARE
-  const ramps = ACCEL_SECONDS + BRAKE_SECONDS
+  // the step rhythm's band stays the pace's own: a faster leg is a traverse
+  const pace = gaitMetresPerSecond(), walk = pace * legSpeed
+  const full = pace, none = pace * RHYTHM_NONE_SHARE
+  const rampScale = Math.max(1, RAMP_PER_SPEED * legSpeed)
+  const ramps = (ACCEL_SECONDS + BRAKE_SECONDS) * rampScale
   const seconds = Math.max(MIN_SECONDS, Math.min(MAX_SECONDS, ramps / 2 + length / walk),
     Number.isFinite(atLeastSeconds) ? atLeastSeconds : 0)
   // A leg too short for both ramps keeps their proportion and loses its cruise.
@@ -91,7 +105,7 @@ export function gaitLeg(lengthM: number, atLeastSeconds = 0): GaitLeg {
   const shortScale = Math.min(1, seconds / ramps)
   const traverse = Math.max(1, length / (seconds - ramps * shortScale / 2) / walk)
   const scale = Math.min(seconds / ramps, shortScale * traverse)
-  const accelSeconds = ACCEL_SECONDS * scale, brakeSeconds = BRAKE_SECONDS * scale
+  const accelSeconds = ACCEL_SECONDS * rampScale * scale, brakeSeconds = BRAKE_SECONDS * rampScale * scale
   const cruiseMetresPerSecond = length / (seconds - (accelSeconds + brakeSeconds) / 2)
   return {
     lengthM: length, seconds, cruiseMetresPerSecond, accelSeconds, brakeSeconds,

@@ -6,7 +6,8 @@ import { createCertifiedRailPath } from './rail-smoothing'
 import { assertRailProjection } from './rail-projection'
 export { assertRailProjection, fittedRailFov } from './rail-projection'
 import { vinciApproachPose, vinciApproachRunPairs, vinciExhibitRecords } from './collection/approaches'
-import { VINCI_WALK_POSE_IDS, vinciWalkPoseOf } from './walk-poses'
+import { isVinciWalkPose, vinciWalkPoseOf } from './walk-poses'
+import { vinciRailNeighbourLegs } from './rail-neighbours'
 import { GALLERY_WALK_M, VINCI_WALLS, vinciGalleryGate, vinciGalleryRun, type VinciGallery } from './collection/wall'
 import type { VinciStationId } from './content'
 import certificateText from './data/rail-clearance.json?raw'
@@ -77,31 +78,28 @@ const samePose = (a: SavedPose, b: SavedPose) =>
   near(a.eye, b.eye, POSE_TOLERANCE_M) && near(a.at, b.at, POSE_TOLERANCE_M) && Math.abs(a.fov - b.fov) <= POSE_TOLERANCE_DEG
 const toSaved = (pose: Pose): SavedPose => ({ eye: pose.eye.toArray(), at: pose.at.toArray(), fov: pose.fov })
 const VIEWPORTS = ['desktop', 'phone'] as const
-/** The physical poses the stations stand at, one entry per distinct pose. */
-function physicalPoses(viewport: 'desktop' | 'phone'): SavedPose[] {
-  const poses: SavedPose[] = []
-  for (const station of vinciContent) {
-    const pose = toSaved(stationPose(station.id, viewport === 'phone'))
-    if (!poses.some(held => samePose(held, pose))) poses.push(pose)
+/** The pose a rail place stands at: a station's, or one of the walk's own. */
+const placePose = (id: string, viewport: 'desktop' | 'phone'): SavedPose =>
+  toSaved(isVinciWalkPose(id) ? vinciWalkPoseOf(id, viewport === 'phone') : stationPose(id as VinciStationId, viewport === 'phone'))
+/** THE LEGS THE WALK CAN ASK FOR, as distinct pairs of physical poses: a
+ * stop's next and previous in either order (`rail-neighbours.ts`). Two
+ * places that share a pose need no leg between them. */
+function neighbourLegs(viewport: 'desktop' | 'phone'): [SavedPose, SavedPose][] {
+  const legs: [SavedPose, SavedPose][] = []
+  for (const [a, b] of vinciRailNeighbourLegs(vinciContent.map(station => station.id))) {
+    const from = placePose(a, viewport), to = placePose(b, viewport)
+    if (samePose(from, to) || legs.some(([x, y]) => samePose(x, from) && samePose(y, to))) continue
+    legs.push([from, to])
   }
-  // the walk's own poses, the house door's and the heart valve's, are rail
-  // poses like a station's
-  for (const id of VINCI_WALK_POSE_IDS) {
-    const pose = toSaved(vinciWalkPoseOf(id, viewport === 'phone'))
-    if (!poses.some(held => samePose(held, pose))) poses.push(pose)
-  }
-  return poses
+  return legs
 }
-// Semantic stations may share a physical pose. Require every directed pair
-// of the current physical poses, so a newly opened station cannot silently
-// rely on the route count of the previous room arrangement. Every saved route
-// must answer to one required pair and every required pair to one saved route.
+// Every saved route must answer to one required leg and every required leg
+// to one saved route, so a stop that moves in the walk cannot silently rely
+// on a leg of the previous order.
 let requiredRoutes = 0, matchedRoutes = 0
 const unmatchedRoutes = new Set(data.routes)
 for (const viewport of VIEWPORTS) {
-  const poses = physicalPoses(viewport)
-  for (const from of poses) for (const to of poses) {
-    if (from === to) continue
+  for (const [from, to] of neighbourLegs(viewport)) {
     requiredRoutes++
     const saved = data.routes.find(route => unmatchedRoutes.has(route) && route.viewport === viewport
       && samePose(route.fromPose, from) && samePose(route.toPose, to))

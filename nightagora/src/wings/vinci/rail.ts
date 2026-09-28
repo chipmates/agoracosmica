@@ -5,8 +5,8 @@ import { roadGradeProvenance } from './road-grade'
 import { vinciStationIds, type VinciStationId } from './content'
 import { createRailLookSmoother, createCertifiedRailPath } from './rail-smoothing'
 import { projectRailDrag } from './projection-drag'
-import { carriedPace, gaitHeadLift, gaitLeg, gaitRhythm, strollMetresPerSecond, type GaitThreshold } from './gait'
-import { filmLensPixels, planCalmGaze, type CalmGazePlan, type GazeCourse } from './rail-gaze'
+import { carriedPace, gaitHeadLift, gaitLeg, gaitRhythm, strollMetresPerSecond, withGaitLegSpeed, type GaitThreshold } from './gait'
+import { filmLensPixels, planCalmGaze, TURN_TIME_SCALE, type CalmGazePlan, type GazeCourse } from './rail-gaze'
 import { GALLERY_LIFT_RAD, planGalleryGaze } from './rail-gallery-gaze'
 import { collectionLayout } from './collection'
 import { collectionView } from './collection/views'
@@ -389,7 +389,7 @@ const RAIL_TURN_ON_ARRIVAL:ReadonlySet<string>=new Set(['arrival','courtyard','o
  * rate below. */
 const RAIL_NAMED_LEAVE:ReadonlySet<string>=new Set(['works'])
 const RAIL_NAMED_ARRIVE:ReadonlySet<string>=new Set(['line-early'])
-const RAIL_QUICK_NAMED=28,RAIL_QUICK_NAMED_PHONE=20
+const RAIL_QUICK_NAMED=28*TURN_TIME_SCALE,RAIL_QUICK_NAMED_PHONE=20*TURN_TIME_SCALE
 /** THE ARRIVALS WALKED INTO TURNED. The timeline's eye stands a metre or two
  * before the gallery's end wall and looks back up the line: a walk down the
  * gallery held on the wall until it stood there, the wall filling the frame
@@ -400,10 +400,9 @@ const RAIL_TURNED_ARRIVALS=new Set(['garden>line-early','body>line-early'])
  * short ones that look the same way at both ends step back rather than turn
  * round twice. */
 const RAIL_FLOOR_KEPT=new Set(['study>chamber','chamber>study','flight>works','oratory>study'])
-/** Walks whose way winds round between two eyes facing the same way: the
- * heart valve's walk out to the display wall leaves its niche eastward and
- * comes round to face west again, so it turns round one way with its way. */
-const RAIL_WINDING_ROUND=new Set(['body-valve>supper-wall'])
+/** Walks whose way winds round between two eyes facing the same way may turn
+ * round one way with their way. None does: every turn takes the short way. */
+const RAIL_WINDING_ROUND=new Set<string>()
 /** Walks whose lens waits at their narrow end: between the heart valve's and
  * the body wall's narrow lenses and the wider rooms round them the lens
  * changes where the walk stands or starts there, and the turns are made on
@@ -441,16 +440,26 @@ const RAIL_FLIGHTS:readonly (readonly [RailWaypoint,RailWaypoint])[]=[[railAcces
  * to and from as a route: out of the room's door facing it. */
 const RAIL_WALKED_APPROACHES:ReadonlySet<string>=new Set(['machine/proportional-compass'])
 /** A turn made standing still may run this fast, in degrees a second: a half
- * turn in about eleven seconds on the desktop and fifteen on the phone. */
-const RAIL_QUICK_TURN=20,RAIL_QUICK_TURN_PHONE=14
+ * turn in about six seconds on the desktop and eight on the phone. */
+const RAIL_QUICK_TURN=20*TURN_TIME_SCALE,RAIL_QUICK_TURN_PHONE=14*TURN_TIME_SCALE
 /** On a lens of 60 degrees or wider a standing turn may run up to this fast,
  * still under the film's pixel cap at that lens. */
-const RAIL_QUICK_WIDE=35,RAIL_QUICK_WIDE_PHONE=25
+const RAIL_QUICK_WIDE=35*TURN_TIME_SCALE,RAIL_QUICK_WIDE_PHONE=25*TURN_TIME_SCALE
 /** FROM ONE WORK OF A WALL TO THE NEXT, where the caller asks for it, the
  * leg's clock runs this much faster than the walk's; a leg to or from the
  * wall's end stations keeps the walk's, and a caller that does not ask (the
  * film's own graph) keeps every leg at the walk's. */
 const STOP_TO_STOP_PACE=1.4
+/** THE WALK BETWEEN TWO STOPS RUNS 1.4 TIMES FASTER than the pace the visitor
+ * set, except the legs found right at their own pace: the picture room's, the
+ * walk from the pictures into the hall, the heart valve's, and the house's
+ * door and rooms. A leg in the film is planned the same way. */
+export const RAIL_WALK_SPEED=1.4
+const RAIL_PACE_KEPT:ReadonlySet<string>=new Set([
+  'picture-room>picture-room-west','picture-room-west>picture-room','picture-room-west>flight','flight>picture-room-west',
+  'body>body-valve','body-valve>body','courtyard>hall-door-in','hall-door-out>courtyard','hall-door-out>oratory','oratory>hall-door-in',
+  'oratory>study','study>oratory','study>chamber','chamber>study'])
+export const railLegSpeed=(from:string,to:string):number=>RAIL_PACE_KEPT.has(`${from}>${to}`)?1:RAIL_WALK_SPEED
 /** Over the last metres the way ahead runs out and the arriving composition
  * takes the gaze. */
 const GAZE_ARRIVAL_M = 4
@@ -586,7 +595,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
    * the certificate holds. */
   /** The certified path, and whether it is a route between two stations: the
    * one kind of leg whose gaze follows its way. */
-  function certifiedPath(request:Request):{path:ReturnType<typeof createCertifiedRailPath>;route:boolean;held?:{turnFirst:boolean;liftFirst?:boolean;lensFirst?:boolean;long?:boolean};turns?:RouteTurns} {
+  function certifiedPath(request:Request):{path:ReturnType<typeof createCertifiedRailPath>;route:boolean;station?:boolean;held?:{turnFirst:boolean;liftFirst?:boolean;lensFirst?:boolean;long?:boolean};turns?:RouteTurns} {
     // A run along the wall is the sub-path of the wall's own certified line
     // between the vertex the eye stands on and the one it is asked for.
     // A run the length of a hang is a walk down the gallery, not a step to
@@ -624,9 +633,9 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     const pair=`${completed!.id}>${request.id}`,from=completed!.id,to=request.id
     const named={start:RAIL_NAMED_LEAVE.has(from),end:RAIL_NAMED_ARRIVE.has(to),at:from==='reading-table'||to==='reading-table'?[railReadingPorch]:[]}
     const turns={start:RAIL_TURN_TO_LEAVE.has(from),end:RAIL_TURN_ON_ARRIVAL.has(to),stands:railPairTurns[pair],named,floor:!RAIL_FLOOR_KEPT.has(pair),forward:true,turned:RAIL_TURNED_ARRIVALS.has(pair),windingRound:RAIL_WINDING_ROUND.has(pair),lensWait:RAIL_LENS_WAITS.has(pair)}
-    if(to==='garden'&&INSIDE.includes(railSide(from)))return {path:route,route:true,turns:{...turns,end:true,named:{...named,at:[...named.at,railGardenPorch]},lens:'first',forward:true}}
-    if(from==='garden'&&INSIDE.includes(railSide(to)))return {path:route,route:true,turns:{...turns,start:false,named:{...named,at:[...named.at,railGardenPorch]},lens:'last',forward:true}}
-    return {path:route,route:true,turns}
+    if(to==='garden'&&INSIDE.includes(railSide(from)))return {path:route,route:true,station:true,turns:{...turns,end:true,named:{...named,at:[...named.at,railGardenPorch]},lens:'first',forward:true}}
+    if(from==='garden'&&INSIDE.includes(railSide(to)))return {path:route,route:true,station:true,turns:{...turns,start:false,named:{...named,at:[...named.at,railGardenPorch]},lens:'last',forward:true}}
+    return {path:route,route:true,station:true,turns}
   }
   /** WHERE THE WAY TURNS IN A DOORWAY: the distance along the path nearest
    * each declared door turn, at every pass through it (a way that steps out
@@ -714,7 +723,8 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     // a view bent further down than the one it goes to is lifted before the
     // walk, with its lens
     const held=certified.held,lift=held?held.liftFirst??(held.turnFirst||from.elevation<to.elevation-GALLERY_LIFT_RAD):false
-    gaze=held?planGalleryGaze({from,to,zoom,lensPixels,timed:seconds=>gaitLeg(length,seconds),
+    // a walk between two stops runs at its own speed, planned at it
+    gaze=withGaitLegSpeed(certified.station?railLegSpeed(completed!.id,request.id):1,()=>held?planGalleryGaze({from,to,zoom,lensPixels,timed:seconds=>gaitLeg(length,seconds),
       first:{heading:held.turnFirst,elevation:lift,lens:held.lensFirst??lift},long:held.long===true})
       :planCalmGaze({from,to,lengthM:length,lensPixels,zoom,timed:seconds=>gaitLeg(length,seconds),
         fovs:[fittedRailFov(fromFov,camera.aspect,request.phone),fittedRailFov(targetFov,camera.aspect,request.phone)],
@@ -725,7 +735,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
           quickDegPerSecond:request.phone?RAIL_QUICK_TURN_PHONE:RAIL_QUICK_TURN,wideDegPerSecond:request.phone?RAIL_QUICK_WIDE_PHONE:RAIL_QUICK_WIDE,
           ...(certified.turns.named?{named:{start:certified.turns.named.start,end:certified.turns.named.end,at:doorTurns(certified.turns.named.at??[])},
             namedDegPerSecond:request.phone?RAIL_QUICK_NAMED_PHONE:RAIL_QUICK_NAMED}:{}),
-          floor:certified.turns.floor===true,lens:certified.turns.lens??'place',forward:certified.turns.forward===true||stairs.length>0,turned:certified.turns.turned===true,windingRound:certified.turns.windingRound===true,lensWait:certified.turns.lensWait===true,scripted:lookKeys!==undefined}}:{})})
+          floor:certified.turns.floor===true,lens:certified.turns.lens??'place',forward:certified.turns.forward===true||stairs.length>0,turned:certified.turns.turned===true,windingRound:certified.turns.windingRound===true,lensWait:certified.turns.lensWait===true,scripted:lookKeys!==undefined}}:{})}))
     leg=gaze.leg;duration=leg.seconds;legClock=0;legClockAt=now;pace=1;waiting=0;strideM=strideTarget=0;strideAt=now
     if(request.quick&&request.wall!==undefined&&request.wallOn&&wallAt!==undefined&&!vinciWallIsEnd(request.wallOn,wallAt)&&!vinciWallIsEnd(request.wallOn,request.wall))pace=STOP_TO_STOP_PACE
     active=request
@@ -824,17 +834,24 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     /** ONE EXHIBIT TO THE NEXT, as one motion: the return this leaves on and
      * the approach it walks out again, both certified, with nothing standing
      * still at the station between them. */
-    chain(exhibit:string,pose:Pose,phone=camera.aspect<=.9):boolean {
+    chain(exhibit:string,pose:Pose,phone=camera.aspect<=.9,home?:{id:VinciStationId;pose:Pose}):boolean {
       if(!viewing||!standing||active)return false
-      const request:Request={id:standing.id,pose:{eye:pose.eye.clone(),at:pose.at.clone(),fov:pose.fov},phone,exhibit}
+      // `home` is the next exhibit's own station where it is not the one
+      // stood at: the hall's row runs across its two stations.
+      const across=home&&home.id!==standing.id?home:undefined
+      const request:Request={id:(across??standing).id,pose:{eye:pose.eye.clone(),at:pose.at.clone(),fov:pose.fov},phone,exhibit}
       // THE NEIGHBOUR IS ONE LEG AWAY. Where the room certifies the line
       // between these two eyes the walk takes it and the station is never
       // stood at; anywhere else the chain is still the return and the
       // approach out, begun in the same update.
       if(viewing.exhibit&&vinciApproachesAreNeighbours(viewing.exhibit,exhibit)&&authority.status==='verified'){
         begin({...request,link:true},clock())
+        // the way back from a machine of the other station is its own approach
+        if(across)standing={id:across.id,pose:{eye:across.pose.eye.clone(),at:across.pose.at.clone(),fov:across.pose.fov},phone}
         return true
       }
+      // across the two stations only a neighbour is walked
+      if(across)return false
       chained=request
       wantsReturn=true
       return true

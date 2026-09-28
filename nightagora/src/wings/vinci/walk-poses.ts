@@ -21,8 +21,9 @@ import { world } from './site'
 import { vinciApproachPose } from './collection/approaches'
 import { FRAME_FRONT, mountedSheets } from './collection/body-wall-plan'
 import { VINCI_VALVE, type VinciWalkPoseId } from './walk-places'
+import { railCollectionStairWaypoints } from './rail-waypoints'
 
-export { VINCI_HOUSE_DOOR, VINCI_VALVE, VINCI_WALK_POSE_IDS, isVinciWalkPose, type VinciWalkPoseId } from './walk-places'
+export { VINCI_HOUSE_DOOR, VINCI_STAIR_HEAD, VINCI_VALVE, VINCI_WALK_POSE_IDS, isVinciWalkPose, type VinciWalkPoseId } from './walk-places'
 
 interface WalkPose { eye: Vector3; at: Vector3; fov: number }
 
@@ -91,8 +92,26 @@ function valveDesktopPose(pose: WalkPose): WalkPose {
   return { eye: eye.clone(), at, fov: 360 / Math.PI * Math.atan(half * DESK_PICTURE_ASPECT / RAIL_ASPECT) }
 }
 
+/** THE HEAD OF THE COLLECTION STAIR, a stride back from its first tread on
+ * the top landing: the stair goes down in front, the pavilion's glazing below
+ * it, and the court with the display wall and its machines on the right. The
+ * phone looks further round, so the display wall stands in its narrow frame.
+ * The desktop's bearing is the one the stair is walked down under
+ * (`rail.ts`, STAIR_VIEW_HEADING). Bearings are east of north. */
+const STAIR_HEAD_BACK_M = .4, STAIR_HEAD_REACH_M = 20
+const STAIR_HEAD_LOOK = { desktop: { bearing: 210, pitch: -12, fov: 55 }, phone: { bearing: 224, pitch: -13, fov: 80 } }
+function stairHeadPose(narrow: boolean): WalkPose {
+  const [east, north, height] = railCollectionStairWaypoints[0]!
+  const look = STAIR_HEAD_LOOK[narrow ? 'phone' : 'desktop']
+  const bearing = look.bearing * Math.PI / 180, pitch = look.pitch * Math.PI / 180, level = Math.cos(pitch) * STAIR_HEAD_REACH_M
+  const eye = [east, north + STAIR_HEAD_BACK_M, height] as const
+  return { eye: world(...eye), fov: look.fov,
+    at: world(eye[0] + Math.sin(bearing) * level, eye[1] + Math.cos(bearing) * level, eye[2] + Math.sin(pitch) * STAIR_HEAD_REACH_M) }
+}
+
 /** The pose one of the walk's own places stands at. */
 export function vinciWalkPoseOf(id: VinciWalkPoseId, narrow: boolean): WalkPose {
+  if (id === 'stair-head') return stairHeadPose(narrow)
   if (id === 'body-valve') {
     const pose = vinciApproachPose(VINCI_VALVE.exhibit, narrow)
     if (!pose) throw new Error(`${VINCI_VALVE.exhibit}: no viewing eye for the valve's stop`)

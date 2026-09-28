@@ -26,6 +26,7 @@ import { VINCI_PICTURE_WALL } from './collection/wall'
 import { world } from './site'
 import { gaitPace } from './gait'
 import { VINCI_HOUSE_DOOR, VINCI_VALVE, vinciWalkPoseOf, type VinciWalkPoseId } from './walk-poses'
+import { VINCI_LISA_STOP, VINCI_OFF_THE_WALK } from './walk-places'
 
 /** The address that names an order, and the values it takes. */
 export const VINCI_ORDER_PARAM = 'order', VINCI_LIFE_ORDER = 'life', VINCI_ROOM_ORDER = 'room'
@@ -67,7 +68,7 @@ export interface VinciWalk {
 
 /** The one stop of the life that is a wall stop and not a station: the
  * portrait he kept, at its own place in the hang. */
-const LISA_STOP = 'picture-room-lisa', LISA_WORK = 'mona-lisa', LISA_EXHIBIT = `picture/${LISA_WORK}/front`
+const LISA_STOP = VINCI_LISA_STOP, LISA_WORK = 'mona-lisa', LISA_EXHIBIT = `picture/${LISA_WORK}/front`
 
 /** The work's own title, from the register that already displays it. */
 const lisaName = (): VinciText => {
@@ -92,7 +93,8 @@ const roomOrder = (): VinciWalkStop[] =>
 
 /** The life's own order, from the story layer. A story stop the wing does not
  * build is left out rather than breaking the walk: the story is re-imported
- * from its card and may name a place before the wing stands one. */
+ * from its card and may name a place before the wing stands one. A station
+ * the walk no longer stands at keeps its words and leaves the walk. */
 function lifeOrder(): VinciWalk {
   const told = [...vinciStory].sort((a, b) => a.order - b.order)
   const stops: VinciWalkStop[] = []
@@ -102,7 +104,7 @@ function lifeOrder(): VinciWalk {
     if (stop.kind === 'cut') { waiting = stop.chapter; continue }
     const here: VinciWalkStop | null = stop.id === LISA_STOP
       ? { id: LISA_STOP, station: 'picture-room', name: lisaName(), wall: VINCI_PICTURE_WALL, exhibit: LISA_EXHIBIT }
-      : built.has(stop.id) ? { id: stop.id, station: stop.id as VinciStationId } : null
+      : built.has(stop.id) && !VINCI_OFF_THE_WALK.has(stop.id) ? { id: stop.id, station: stop.id as VinciStationId } : null
     if (!here) continue
     if (waiting && stops.length) cuts.push({ from: stops[stops.length - 1]!.id, to: here.id, title: waiting })
     waiting = null

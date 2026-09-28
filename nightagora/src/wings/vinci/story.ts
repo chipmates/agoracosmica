@@ -47,36 +47,8 @@ export interface VinciStoryExit {
 
 export const vinciStory: readonly VinciStoryStop[] = [
   {
-    id: "garden",
-    order: 0,
-    kind: "station",
-    built: true,
-    quiet: false,
-    chapter: { en: "His last house", de: "Sein letztes Haus" },
-    age: { en: "he is 65", de: "mit 65 Jahren" },
-    line: { en: "He wanted to see everything himself: faces, water, birds, the inside of the body.", de: "Er wollte alles mit eigenen Augen sehen: Gesichter, Wasser, Vögel, das Innere des Körpers." },
-    drawer: { en: "That is our reading of one notebook line: wisdom is the daughter of experience. The page is in London, and the note breaks off. All four wait behind you, in a museum of our century. The faces hang in the picture room. Water and birds are in the machine hall. The inside of the body fills a wall of sheets.", de: "So lesen wir eine Zeile in seinen Notizbüchern: Weisheit ist die Tochter der Erfahrung. Die Seite liegt heute in London, und die Notiz bricht mittendrin ab. Alle vier warten hinter dir, in einem Museum, erbaut in unserem Jahrhundert. Die Gesichter hängen im Bildersaal. Wasser und Vögel sind in der Maschinenhalle. Das Innere des Körpers füllt eine Wand voller Blätter." },
-    certainty: "documented",
-    sees: "The garden apron",
-    pointers: ["C00", "C01", "C08", "C10", "C14"],
-  },
-  {
-    id: "line-early",
-    order: 1,
-    kind: "station",
-    built: true,
-    quiet: false,
-    chapter: { en: "The night he was born", de: "Die Nacht seiner Geburt" },
-    age: { en: "age 0", de: "Geburt" },
-    line: { en: "Now the story goes back, to the day he was born. His grandfather wrote it down: a Saturday, at night.", de: "Jetzt geht die Geschichte zurück, zu seiner Geburt. Sein Großvater schrieb sie auf: ein Samstag, nachts." },
-    drawer: { en: "Twelve dates are cut into this floor, and these are the first. The note says 15 April 1452, at the third hour of the night. Those hours ran from nightfall, not midnight. One mark says tradition: Anchiano, said to be his birthplace. The note names no place. A tax return lists him at five as a son born outside marriage.", de: "Zwölf Daten sind in diesen Boden eingelassen, das hier sind die ersten. Die Notiz nennt den 15. April 1452, die dritte Stunde der Nacht. Diese Stunden zählte man ab Einbruch der Nacht, nicht ab Mitternacht. Bei einer Markierung steht Überlieferung: Anchiano, das als sein Geburtsort gilt. Die Notiz nennt keinen Ort. Eine Steuererklärung führt ihn mit fünf als unehelichen Sohn." },
-    certainty: "documented",
-    sees: "The dates cut into the gallery floor",
-    pointers: ["C01", "C02"],
-  },
-  {
     id: "picture-room",
-    order: 2,
+    order: 0,
     kind: "station",
     built: true,
     quiet: false,
@@ -90,7 +62,7 @@ export const vinciStory: readonly VinciStoryStop[] = [
   },
   {
     id: "picture-room-lisa",
-    order: 3,
+    order: 1,
     kind: "station",
     built: false,
     quiet: false,
@@ -104,7 +76,7 @@ export const vinciStory: readonly VinciStoryStop[] = [
   },
   {
     id: "picture-room-west",
-    order: 4,
+    order: 2,
     kind: "station",
     built: true,
     quiet: false,
@@ -118,7 +90,7 @@ export const vinciStory: readonly VinciStoryStop[] = [
   },
   {
     id: "flight",
-    order: 5,
+    order: 3,
     kind: "station",
     built: true,
     quiet: false,
@@ -132,7 +104,7 @@ export const vinciStory: readonly VinciStoryStop[] = [
   },
   {
     id: "works",
-    order: 6,
+    order: 4,
     kind: "station",
     built: true,
     quiet: false,
@@ -146,7 +118,7 @@ export const vinciStory: readonly VinciStoryStop[] = [
   },
   {
     id: "reading-table",
-    order: 7,
+    order: 5,
     kind: "station",
     built: true,
     quiet: false,
@@ -160,7 +132,7 @@ export const vinciStory: readonly VinciStoryStop[] = [
   },
   {
     id: "body",
-    order: 8,
+    order: 6,
     kind: "station",
     built: true,
     quiet: false,
@@ -174,7 +146,7 @@ export const vinciStory: readonly VinciStoryStop[] = [
   },
   {
     id: "body-valve",
-    order: 9,
+    order: 7,
     kind: "station",
     built: false,
     quiet: false,
@@ -187,8 +159,22 @@ export const vinciStory: readonly VinciStoryStop[] = [
     pointers: ["C08"],
   },
   {
+    id: "line-early",
+    order: 8,
+    kind: "station",
+    built: true,
+    quiet: false,
+    chapter: { en: "The night he was born", de: "Die Nacht seiner Geburt" },
+    age: { en: "age 0", de: "Geburt" },
+    line: { en: "Now the story goes back, to the day he was born. His grandfather wrote it down: a Saturday, at night.", de: "Jetzt geht die Geschichte zurück, zu seiner Geburt. Sein Großvater schrieb sie auf: ein Samstag, nachts." },
+    drawer: { en: "Twelve dates are cut into this floor, and these are the first. The note says 15 April 1452, at the third hour of the night. Those hours ran from nightfall, not midnight. One mark says tradition: Anchiano, said to be his birthplace. The note names no place. A tax return lists him at five as a son born outside marriage.", de: "Zwölf Daten sind in diesen Boden eingelassen, das hier sind die ersten. Die Notiz nennt den 15. April 1452, die dritte Stunde der Nacht. Diese Stunden zählte man ab Einbruch der Nacht, nicht ab Mitternacht. Bei einer Markierung steht Überlieferung: Anchiano, das als sein Geburtsort gilt. Die Notiz nennt keinen Ort. Eine Steuererklärung führt ihn mit fünf als unehelichen Sohn." },
+    certainty: "documented",
+    sees: "The dates cut into the gallery floor",
+    pointers: ["C01", "C02"],
+  },
+  {
     id: "supper-wall",
-    order: 10,
+    order: 9,
     kind: "station",
     built: true,
     quiet: false,
@@ -202,7 +188,7 @@ export const vinciStory: readonly VinciStoryStop[] = [
   },
   {
     id: "cut-now-to-france-and-his-last-house",
-    order: 11,
+    order: 10,
     kind: "cut",
     built: false,
     quiet: false,
@@ -216,7 +202,7 @@ export const vinciStory: readonly VinciStoryStop[] = [
   },
   {
     id: "arrival",
-    order: 12,
+    order: 11,
     kind: "station",
     built: true,
     quiet: false,
@@ -230,7 +216,7 @@ export const vinciStory: readonly VinciStoryStop[] = [
   },
   {
     id: "courtyard",
-    order: 13,
+    order: 12,
     kind: "station",
     built: true,
     quiet: false,
@@ -244,7 +230,7 @@ export const vinciStory: readonly VinciStoryStop[] = [
   },
   {
     id: "hall",
-    order: 14,
+    order: 13,
     kind: "station",
     built: true,
     quiet: true,
@@ -258,7 +244,7 @@ export const vinciStory: readonly VinciStoryStop[] = [
   },
   {
     id: "oratory",
-    order: 15,
+    order: 14,
     kind: "station",
     built: true,
     quiet: true,
@@ -272,7 +258,7 @@ export const vinciStory: readonly VinciStoryStop[] = [
   },
   {
     id: "study",
-    order: 16,
+    order: 15,
     kind: "station",
     built: true,
     quiet: false,
@@ -286,7 +272,7 @@ export const vinciStory: readonly VinciStoryStop[] = [
   },
   {
     id: "chamber",
-    order: 17,
+    order: 16,
     kind: "station",
     built: true,
     quiet: false,
@@ -300,7 +286,7 @@ export const vinciStory: readonly VinciStoryStop[] = [
   },
   {
     id: "cut-kings-castle-up-the-road",
-    order: 18,
+    order: 17,
     kind: "cut",
     built: false,
     quiet: false,
@@ -314,7 +300,7 @@ export const vinciStory: readonly VinciStoryStop[] = [
   },
   {
     id: "grave",
-    order: 19,
+    order: 18,
     kind: "station",
     built: true,
     quiet: false,
@@ -325,6 +311,20 @@ export const vinciStory: readonly VinciStoryStop[] = [
     certainty: "documented",
     sees: "The slab in the grave court",
     pointers: ["C15", "C16"],
+  },
+  {
+    id: "garden",
+    order: 19,
+    kind: "station",
+    built: true,
+    quiet: false,
+    chapter: { en: "His last house", de: "Sein letztes Haus" },
+    age: { en: "he is 65", de: "mit 65 Jahren" },
+    line: { en: "He wanted to see everything himself: faces, water, birds, the inside of the body.", de: "Er wollte alles mit eigenen Augen sehen: Gesichter, Wasser, Vögel, das Innere des Körpers." },
+    drawer: { en: "That is our reading of one notebook line: wisdom is the daughter of experience. The page is in London, and the note breaks off. All four wait behind you, in a museum of our century. The faces hang in the picture room. Water and birds are in the machine hall. The inside of the body fills a wall of sheets.", de: "So lesen wir eine Zeile in seinen Notizbüchern: Weisheit ist die Tochter der Erfahrung. Die Seite liegt heute in London, und die Notiz bricht mittendrin ab. Alle vier warten hinter dir, in einem Museum, erbaut in unserem Jahrhundert. Die Gesichter hängen im Bildersaal. Wasser und Vögel sind in der Maschinenhalle. Das Innere des Körpers füllt eine Wand voller Blätter." },
+    certainty: "documented",
+    sees: "The garden apron",
+    pointers: ["C00", "C01", "C08", "C10", "C14"],
   },
 ];
 

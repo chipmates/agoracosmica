@@ -92,7 +92,8 @@ function load(relative) {
 }
 
 const { vinciExhibitRecords, vinciApproachPose, vinciApproachFit, vinciApproachPlateMetres, vinciApproachReachMetres,
-  VINCI_PLAQUE_AT, VINCI_READING_TABLE } = load('src/wings/vinci/collection/approaches.ts')
+  vinciApproachRunPairs, vinciApproachRowNeighbours, VINCI_MACHINE_ROW, VINCI_PLAQUE_AT, VINCI_READING_TABLE } = load('src/wings/vinci/collection/approaches.ts')
+const { MACHINE_SLUGS } = load('src/wings/vinci/machines/catalog.ts')
 const { stationPose } = load('src/wings/vinci/rail.ts')
 const { mountCollectionPlates } = load('src/wings/vinci/collection/plates.ts')
 const { readVinciExhibits } = load('src/wings/vinci/collection/pick.ts')
@@ -113,12 +114,21 @@ for (const record of records) kinds[record.kind] = (kinds[record.kind] ?? 0) + 1
    are declared in is the registry's own business, so this reads them by name:
    the hang and the deathbed painting, the wall in Milan, the body wall's
    sheets, the twelve machines on their stands, the two on the hall's table
-   and the lion on the hall's floor, the plaque and the two of the grave
-   court, the codex and the study's leaf. */
-const CENSUS = { picture: 26, mural: 1, sheet: 29, machine: 15, place: 3, manuscript: 2 }
+   and the lion on the hall's floor, the two of the grave court, the codex
+   and the study's leaf. The court's stone is a bench and no exhibit. */
+const CENSUS = { picture: 26, mural: 1, sheet: 29, machine: 15, place: 2, manuscript: 2 }
 const named = kinds_ => Object.keys(kinds_).sort().map(kind => `${kind} ${kinds_[kind]}`).join(', ')
 assert.equal(named(kinds), named(CENSUS),
-  'the hang and the deathbed painting, the mural, the body wall\'s sheets, twelve machines on stands, the table\'s two and the floor\'s lion, three places, the codex and the study\'s leaf')
+  'the hang and the deathbed painting, the mural, the body wall\'s sheets, twelve machines on stands, the table\'s two and the floor\'s lion, two places, the codex and the study\'s leaf')
+/* EVERY NEIGHBOUR OF A ROW IS WALKED: the machine row holds every machine
+   once, and each step of a room's row is a certified leg, so a step to the
+   next machine is never a jump. */
+assert.deepEqual([...VINCI_MACHINE_ROW].sort(), [...MACHINE_SLUGS].sort(), 'the machine row holds every machine once')
+const walked = new Set(vinciApproachRunPairs().map(pair => `${pair.from}|${pair.to}`))
+for (const [from, to] of vinciApproachRowNeighbours()) assert.ok(walked.has(`${from}|${to}`), `a row step is not walked: ${from} to ${to}`)
+for (const pair of vinciApproachRunPairs()) for (const viewport of ['desktop', 'phone']) {
+  assert.ok(certificate.links.some(link => link.viewport === viewport && link.from === pair.from && link.to === pair.to), `no certified link: ${viewport} ${pair.from} to ${pair.to}`)
+}
 assert.equal(new Set(records.map(record => record.id)).size, records.length, 'an exhibit is declared once')
 assert.equal(certificate.approaches.length, records.length * 2)
 const hang = records.filter(record => record.station === 'picture-room')
@@ -353,9 +363,10 @@ assert.equal(JSON.stringify(floor.collectionLineStuds.map(stud => [stud.id, stud
 // A date is read from the one station that stands at the line's head, so no
 // socket carries a certified leg and none may stand in the approach table.
 for (const stud of floor.collectionLineStuds) assert.ok(!records.some(record => record.id === `stud/${stud.id}`), `a dead leg for ${stud.id}`)
-// The plaque's stone and the reading table, read off the modules that stand them.
+// The court's bench and the reading table, read off the modules that stand them.
 const plaque = /COURT_PLAQUE_STAND = \{ east: (-?[\d.]+), north: (-?[\d.]+)/.exec(source('src/wings/vinci/collection/court-plaque.ts'))
-assert.ok(plaque && +plaque[1] === VINCI_PLAQUE_AT.east && +plaque[2] === VINCI_PLAQUE_AT.north, 'the plaque stands where its pose looks')
+assert.ok(plaque && +plaque[1] === VINCI_PLAQUE_AT.east && +plaque[2] === VINCI_PLAQUE_AT.north, 'the bench stands where the court puts it')
+assert.ok(!records.some(record => record.id === 'plaque/flight-quote'), 'the bench is no exhibit')
 // The table's place is ONE constant now, imported by the module that stands
 // it from the module that composes the eye, so there are no two literals left
 // to disagree. What is checked is that the import is the one that is used.
@@ -368,6 +379,6 @@ const grave = source('src/wings/vinci/collection/exhibits.ts')
 assert.ok(grave.includes('grave.group.rotation.y = Math.PI / 2')
   && grave.includes('grave.group.position.set(GRAVE_ORIGIN.east, COURT.level + .035, -GRAVE_ORIGIN.north)'),
   'the grave stands turned and set where its poses look')
-report.placed = { studs: floor.collectionLineStuds.length, plaque: true, table: true, grave: true }
+report.placed = { studs: floor.collectionLineStuds.length, bench: true, table: true, grave: true }
 report.ok = true
 console.log(JSON.stringify(report, null, 2))

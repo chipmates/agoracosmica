@@ -86,6 +86,7 @@ const { gradeAt } = await load(path.join(wing, 'terrain-mesh.ts'))
 const { createCollectionStandSolids } = await load(path.join(wing, 'collection/stands.ts'))
 const { vinciWalk, vinciWalkPose } = await load(path.join(wing, 'walk.ts'))
 const { vinciWallById, vinciWallVertex } = await load(path.join(wing, 'collection/wall.ts'))
+const { vinciApproachPose, vinciApproachRunPairs, vinciApproachStation } = await load(path.join(wing, 'collection/approaches.ts'))
 
 const factories = [
   ['shell', 'shell', 'createShell', false], ['terrain', 'ground', 'createGround', false],
@@ -194,6 +195,31 @@ function firstHit(origin, direction) {
   return { distance: Infinity, name: null, up: 0, level: null }
 }
 
+/* ---- the goal ---- */
+/** A LEG SHOWS WHERE IT GOES. The goal is the arriving view's own aim; a
+ * frame shows it when that point stands inside the frame with nothing solid
+ * between it and the eye. Judged over the walked stretch only: the leaving
+ * and the arriving compositions are the two ends' own. */
+const GOAL = { from: .15, to: .85, edge: .9, marginM: .6 }
+const goalScreen = new THREE.Vector3(), toGoal = new THREE.Vector3()
+function goalSeen(camera, goal) {
+  camera.updateMatrixWorld(true)
+  goalScreen.copy(goal).project(camera)
+  const inFrame = goalScreen.z < 1 && Math.abs(goalScreen.x) <= GOAL.edge && Math.abs(goalScreen.y) <= GOAL.edge
+  toGoal.subVectors(goal, camera.position)
+  const distance = toGoal.length()
+  const clear = distance < GOAL.marginM || firstHit(camera.position, toGoal.normalize()).distance >= distance - GOAL.marginM
+  return { inFrame, clear }
+}
+/** The shares of a leg's walked stretch whose goal is out of the frame, or
+ * behind a solid, or either. */
+function goalReading(samples) {
+  const judged = samples.filter(sample => sample.share >= GOAL.from && sample.share <= GOAL.to && sample.goal)
+  if (!judged.length) return null
+  const share = test => +(judged.filter(test).length / judged.length).toFixed(3)
+  return { out: share(sample => !sample.goal.inFrame), blocked: share(sample => !sample.goal.clear), hidden: share(sample => !sample.goal.inFrame || !sample.goal.clear) }
+}
+
 /* ---- the walk ---- */
 const inverse = new THREE.Matrix4(), corner = new THREE.Vector3(), forward = new THREE.Vector3()
 const travel = new THREE.Vector3(), look = new THREE.Vector3(), chord = new THREE.Vector3()
@@ -238,8 +264,41 @@ function readBox(camera) {
   }
 }
 
-const report = { checker: 'vinci-gaze', near: NEAR_M, run: RUN, box: BOX, rays: BOX_RAYS * BOX_RAYS, legs: [], flat: [], twice: [], refused: [] }
+const report = { checker: 'vinci-gaze', near: NEAR_M, run: RUN, box: BOX, rays: BOX_RAYS * BOX_RAYS, goalRule: GOAL, legs: [], links: [], flat: [], twice: [], refused: [] }
 for (const phone of VIEWPORTS) {
+  /* THE ROWS: each neighbouring pair of a room's row, both ways, walked as
+     the rail walks it, from one viewing eye to the next. */
+  if (!args.includes('--no-links')) {
+    let now = 0
+    const camera = new THREE.PerspectiveCamera(49, phone ? 390 / 844 : 1440 / 900, .25, 1100)
+    const rail = createRail(camera, () => now, authorities.get(phone ? 'calm' : 'standard'))
+    for (const pair of vinciApproachRunPairs()) for (const [from, to] of [[pair.from, pair.to], [pair.to, pair.from]]) {
+      const fromStation = vinciApproachStation(from), toStation = vinciApproachStation(to)
+      const toPose = vinciApproachPose(to, phone)
+      try {
+        rail.set(fromStation, stationPose(fromStation, phone), true, phone)
+        now += 1e-3; rail.update()
+        if (!rail.approach(from, vinciApproachPose(from, phone), phone, true)) throw new Error('the rail refused the approach')
+        now += 1e-3; rail.update()
+        const home = toStation !== fromStation ? { id: toStation, pose: stationPose(toStation, phone) } : undefined
+        if (!rail.chain(to, toPose, phone, home)) throw new Error('the rail refused the link')
+        const start = now
+        now += 1e-6; rail.update()
+        const seconds = (rail.navigation.legSeconds || DURATION) / (rail.navigation.legPace || 1)
+        const samples = []
+        for (let step = 1; step <= STEPS; step++) {
+          now = start + step * seconds / STEPS
+          rail.update()
+          samples.push({ share: +(step / STEPS).toFixed(3), ...readBox(camera), goal: goalSeen(camera, toPose.at) })
+        }
+        for (let guard = 0; guard < 400 && rail.navigation.active; guard++) { now += .25; rail.update() }
+        report.links.push({ viewport: phone ? 'phone' : 'desktop', from, to, seconds: +seconds.toFixed(2),
+          nearest: Math.min(...samples.map(entry => entry.nearest)), goal: goalReading(samples) })
+      } catch (error) {
+        report.refused.push({ viewport: phone ? 'phone' : 'desktop', order: 'row', from, to, why: String(error.message ?? error) })
+      }
+    }
+  }
   for (const order of ORDERS) {
     const stops = vinciWalk(order === 'life').stops
     let now = 0
@@ -271,7 +330,7 @@ for (const phone of VIEWPORTS) {
           rail.update()
           assertRailProjection(camera)
           const frame = step % 4 === 0 && step / STEPS >= WALKED.from && step / STEPS <= WALKED.to ? readFrame(camera) : {}
-          samples.push({ share: +(step / STEPS).toFixed(3), at: camera.position.clone(), q: camera.quaternion.clone(), ...readBox(camera), ...frame })
+          samples.push({ share: +(step / STEPS).toFixed(3), at: camera.position.clone(), q: camera.quaternion.clone(), ...readBox(camera), ...frame, goal: goalSeen(camera, move.pose.at) })
         }
         // WHERE THE BODY IS GOING, beside where the eye is looking. The step
         // between two samples is the direction of travel, and one ray along
@@ -355,6 +414,7 @@ for (const phone of VIEWPORTS) {
         nearest: Math.min(...samples.map(entry => entry.nearest)),
         oneBodyFrames: samples.filter(entry => entry.bodies === 1).length,
         flat,
+        goal: goalReading(samples),
       }
       const framed = samples.filter(entry => entry.floorShare !== undefined)
       if (framed.length) {

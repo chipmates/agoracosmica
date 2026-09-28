@@ -11,17 +11,23 @@
  */
 import { gaitAt, gaitLeg, gaitMetresPerSecond, gaitSecondsAt, type GaitLeg } from './gait'
 
+/** THE TURNS RUN AT TWICE THEIR FIRST SPEED: every turn is the same curve in
+ * half the time, so its rate doubles, its acceleration goes up four times and
+ * its jerk eight, and the seconds it eases over halve. */
+export const TURN_TIME_SCALE = 2
+const T1 = TURN_TIME_SCALE, T2 = T1 * T1, T3 = T2 * T1
 /** What the plan holds under. `calm-check.mjs` carries the criteria; these sit
  * a margin below them so the frames it samples never read the plan's peak. */
-export const CALM_GAZE = { turnDegPerSecond: 11, turnDegPerSecond2: 11, turnDegPerSecond3: 36, zoomPerSecond: .13 } as const
+export const CALM_GAZE = { turnDegPerSecond: 11 * T1, turnDegPerSecond2: 11 * T2, turnDegPerSecond3: 36 * T3, zoomPerSecond: .13 } as const
 /** The limiter's own rate, under the plan's cap: the spline that smooths its
  * corners rounds them a little past it. The pitch turns at a share of it. */
-const LEAD_DEG_PER_SECOND = 9.4, PITCH_SHARE = .45
+const LEAD_DEG_PER_SECOND = 9.4 * T1, PITCH_SHARE = .45
 /** THE PICTURE MAY NOT MOVE MORE THAN THIS PER FILM FRAME, in the film's own
- * pixels at its centre: a frame width in no less than seven seconds at 1920
- * px and 30 frames, under the checker's 9. A narrow lens magnifies a turn,
- * so the caps above fall with the lens where this binds first. */
-export const CALM_FILM = { pixelsPerFrame: 8.2, framesPerSecond: 30 } as const
+ * pixels at its centre: a frame width in no less than three and a half
+ * seconds at 1920 px and 30 frames, under the checker's 18. A narrow lens
+ * magnifies a turn, so the caps above fall with the lens where this binds
+ * first. */
+export const CALM_FILM = { pixelsPerFrame: 8.2 * T1, framesPerSecond: 30 } as const
 /** The film's focal length in its own pixels for an authored lens: the film
  * keeps the authored width, landscape 1920 px wide and portrait 1080. */
 export function filmLensPixels(authoredFov: number, phone: boolean): number {
@@ -29,7 +35,7 @@ export function filmLensPixels(authoredFov: number, phone: boolean): number {
   return halfWidth / (Math.tan(authoredFov * Math.PI / 360) * aspect)
 }
 /** The caps of the plan under way, the degrees above scaled to its lens. */
-let caps = { rate: 11, accel: 11, jerk: 36, lead: LEAD_DEG_PER_SECOND }
+let caps = { rate: CALM_GAZE.turnDegPerSecond, accel: CALM_GAZE.turnDegPerSecond2, jerk: CALM_GAZE.turnDegPerSecond3, lead: LEAD_DEG_PER_SECOND }
 function capsFor(lensPixels: number) {
   const byLens = lensPixels > 0 ? CALM_FILM.pixelsPerFrame * CALM_FILM.framesPerSecond / lensPixels / RAD : Infinity
   const share = Math.min(1, byLens / CALM_GAZE.turnDegPerSecond)
@@ -37,11 +43,11 @@ function capsFor(lensPixels: number) {
 }
 /** The target is read at this step; the spline's knots are never closer than
  * the first spacing, which is what bounds its acceleration. */
-const GRID_SECONDS = 1 / 30, SPACINGS = [1.4, 2, 2.8, 4, 5.6, 8, Infinity], CHECK_HZ = 60
+const GRID_SECONDS = 1 / 30, SPACINGS = [1.4, 2, 2.8, 4, 5.6, 8, Infinity].map(s => s / T1), CHECK_HZ = 60
 const STRETCH_TRIES = 14
 /** Beyond the turn itself at the lead's rate, the time the curve takes to
  * get under way and to settle. */
-const EASE_SECONDS = 2.5
+const EASE_SECONDS = 2.5 / T1
 const RAD = Math.PI / 180
 const FLIP = 100 * RAD
 /** The stretch of way either side of the body its direction is averaged
@@ -661,11 +667,15 @@ const DOOR_NEAR_M = 5
 /** A first stretch this short may draw back from its view, as a pull-back. */
 const PULL_BACK_M = 3
 /** A stand turned more than this may go the long way round, when that keeps
- * the whole walk turning one way: the gate reads every turn given back. */
-const EITHER_WAY_DEG = 120
+ * the whole walk turning one way: the gate reads every turn given back.
+ * EVERY TURN TAKES THE SHORT WAY: no stand is ever turned the long way, so the
+ * figure stands past any turn a stand can make. */
+const EITHER_WAY_DEG = 360
 /** A way that winds round turns more than the first figure one way between
  * its two eyes; on it a stand may turn the long way from the second. */
 const WINDING_DEG = 150, WINDING_EITHER_DEG = 45
+/** Whether a winding way may still turn its stands the long way: never. */
+const LONG_WAY_ROUND = false
 /** A stretch between stands walks under one steady view while its way stays
  * this near it (a crab at most, never backward): its bends are the path's,
  * and a view led round each of them swings. Beyond the second figure a view
@@ -742,20 +752,20 @@ const CREEP_LEAST = .25, CREEP_EASE_S = 3, CREEP_SHARE = .4
 const STILL_MPS = .02
 /** What the walk cannot take of a turn is made standing and quick, eased onto
  * the quick rate and off it over at least this long. */
-const QUICK_EASE_S = 1
+const QUICK_EASE_S = 1 / T1
 /** The quick turn's own ease: at most this acceleration and jerk, in degrees
  * a second squared and cubed, and at most this many film pixels a frame. */
-const QUICK_ACCEL = 15, QUICK_JERK = 55, QUICK_FILM_PIXELS = 13.5
+const QUICK_ACCEL = 15 * T2, QUICK_JERK = 55 * T3, QUICK_FILM_PIXELS = 13.5 * T1
 /** A named stand's quick turn, and any on a lens this wide or wider, eases
  * onto its rate at this acceleration. */
-const QUICK_NAMED_ACCEL = 22, WIDE_LENS_DEG = 60
+const QUICK_NAMED_ACCEL = 22 * T2, WIDE_LENS_DEG = 60
 /** A lens changed by time eases in and out over this long. */
 const LENS_EASE_S = 1.5
 /** A STAND ON A LENS THIS SLOW WAITS FOR THE WIDER ONE: on a walk whose lens
  * may wait, where the pixel cap holds a standing turn at the walk's narrow end
  * under this many degrees a second, the lens changes while the body stands
  * there, the turn quickening as it widens, and the walk goes on the wider lens. */
-const LENS_WAIT_DEG_PER_S = 15
+const LENS_WAIT_DEG_PER_S = 15 * T1
 /** THE LENS CHANGED EVENLY IN THE PICTURE'S SCALE, at the calm zoom rate and
  * eased at both ends: its seconds, its share at a time from its start, the
  * lens at a share, and the stage's blend (in authored degrees) there. */
@@ -1169,7 +1179,7 @@ function planTurns(input: TurnInput, waitLens = false): CalmGazePlan | null {
     let previous = input.tangent(0, Math.min(L, 1))
     for (let m = 1; m + .5 <= L; m += .5) { const h = input.tangent(m - .5, Math.min(L, m + .5)); winding += wrap(h - previous); previous = h }
   }
-  const eitherDeg = Math.abs(winding) > WINDING_DEG * RAD ? WINDING_EITHER_DEG : EITHER_WAY_DEG
+  const eitherDeg = Math.abs(winding) > WINDING_DEG * RAD && LONG_WAY_ROUND ? WINDING_EITHER_DEG : EITHER_WAY_DEG
   for (const startTurn of mustStart ? [true] : mayStart ? [true, false] : [false]) for (const endTurn of mustEnd ? [true] : mayEnd ? [true, false] : [false]) {
     if (!startTurn && !endTurn && !stops.length) continue
     // a walk planned for its lens to wait stands at its narrow end

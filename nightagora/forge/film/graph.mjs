@@ -49,6 +49,7 @@ const sha256 = (text) => createHash('sha256').update(text).digest('hex')
 export const stopId = (walkId) => `stop:${walkId}`
 export const viewId = (exhibit) => `view:${exhibit}`
 export const doorId = (place) => `door:${place}`
+export const startId = (place) => `start:${place}`
 /** A clip's name on disk: the node ids with their separators made safe. */
 export const clipStem = (edgeId) => edgeId.replace(/[:/]/g, (c) => (c === ':' ? '-' : '.')).replace('>', '--')
 
@@ -100,7 +101,7 @@ function legMoves(wing, byId, stationStop, framingName) {
   const pose = (node) => livePose(node.pose[framingName])
   const place = (node) => (rail) => {
     // a door and a stop at a place of its own stand on the rail under that place's id
-    if (node.kind === 'stop' || node.kind === 'door') { rail.set(node.railId ?? node.station, pose(node), true, phone, node.exhibit ? node.vertex : undefined); return }
+    if (node.kind === 'stop' || node.kind === 'door' || node.kind === 'start') { rail.set(node.railId ?? node.station, pose(node), true, phone, node.exhibit ? node.vertex : undefined); return }
     if (node.wall) { rail.set(node.station, pose(node), true, phone, node.vertex); return }
     rail.set(node.station, pose(stationStop(node.station)), true, phone)
     rail.update()
@@ -225,6 +226,10 @@ export function buildGraph(wing, { wall: wallRuns = 'both' } = {}) {
   if (door) for (const [place, way] of [[door.inward, 'in'], [door.outward, 'out']]) {
     add({ id: doorId(place), kind: 'door', railId: place, way, station: door.station, pose: poses((phone) => places.vinciWalkPoseOf(place, phone)) })
   }
+  // THE WALK'S START, above the museum at the head of the collection stair:
+  // its one leg is the descent into the first stop (a revision before it has none)
+  const startPlace = places?.VINCI_STAIR_HEAD
+  if (startPlace) add({ id: startId(startPlace), kind: 'start', railId: startPlace, station: life.stops[0]?.station, pose: poses((phone) => places.vinciWalkPoseOf(startPlace, phone)) })
   const records = approaches.vinciExhibitRecords()
   for (const record of records) {
     const onWall = wallModule.vinciWallOfExhibit(record.id)
@@ -291,6 +296,8 @@ export function buildGraph(wing, { wall: wallRuns = 'both' } = {}) {
       else edge('LEG', doorOut, y, motionBetween(doorOut, y))
     }
   }
+  const startNode = startPlace && byId.get(startId(startPlace))
+  if (startNode && stops.length) edge('LEG', startNode, stops[0], motionBetween(startNode, stops[0]))
   const room = door && stationStop(door.station)
   const quiet = door ? [{ from: doorIn.id, to: room.id, quiet: true }, { from: room.id, to: doorOut.id, quiet: true }] : []
   // STEP: every span of every wall, both ways; the stop that holds a vertex is
@@ -399,6 +406,7 @@ export function buildGraph(wing, { wall: wallRuns = 'both' } = {}) {
     framings: FRAMINGS,
     certificate: { file: CERTIFICATE_FILE, sha256: wing.certificateSha256, routes: certificate.routes.length, approaches: certificate.approaches.length, walls: certificate.walls.length, links: certificate.links.length },
     story: stops.map((s) => s.id),
+    ...(startNode ? { start: startNode.id } : {}),
     cuts: [...life.cuts.map((c) => ({ from: stopId(c.from), to: stopId(c.to), title: c.title })), ...quiet],
     opens,
     nodes,

@@ -18,7 +18,7 @@ import { LINE_STUDS } from '../line/studs'
 import { hangPlacements } from './hang'
 import { COURT, FLOOR, GRAVE_ORIGIN, SUPPER_WALL, VINCI_READING_TABLE } from './layout'
 import { HALL_LION, HALL_LION_REST, HALL_TABLE, HALL_TABLE_PIECES, HALL_TABLE_PIECE_SLUGS, STANDS, isHallTablePiece, standOf, standLevel, type HallTablePiece } from './stands'
-import { dossiers, MACHINE_SLUGS, type MachineSlug } from '../machines/catalog'
+import { dossiers, type MachineSlug } from '../machines/catalog'
 import { bodyWallOrder } from './wall'
 import { studySupport } from '../inner-court'
 
@@ -319,9 +319,21 @@ const SHEET_NEAREST_M = 1.1, SHEET_STEP_BACK = .8
 export { VINCI_READING_TABLE }
 const READING_TABLE = VINCI_READING_TABLE
 
-/** The flight plaque's stone, and the standing distance its lines read at. */
+/** The court's stone bench, where the flight quote's plaque once stood. It is
+ * a bench now and no exhibit: nothing walks to it and no mark stands on it. */
 export const VINCI_PLAQUE_AT = { east: -40.2, north: -25.5 }
-const PLAQUE = VINCI_PLAQUE_AT
+
+/** THE ORDER THE ROOMS STAND THEIR MACHINES IN, which is the order the row
+ * shows them and a hand steps through them: the court's three past the
+ * display wall; the hall walked round once from its west end, the flight
+ * station's four and then the workshop's five, ending at the gun beside the
+ * workshop's own eye; the house's table and its lion. */
+export const VINCI_MACHINE_ROW: readonly MachineSlug[] = [
+  'parachute', 'revolving-crane', 'anemometer',
+  'aerial-screw', 'miter-lock-gates', 'flywheel', 'camera-obscura',
+  'water-lifting-screw', 'rolling-mill', 'lathe', 'ball-bearing', 'multi-barrel-gun',
+  'inclinometer', 'proportional-compass', 'mechanical-lion',
+]
 
 interface Placed { record: VinciExhibitRecord; pose(narrow: boolean): ApproachPose }
 
@@ -351,7 +363,7 @@ function otherKinds(): Placed[] {
       nearest: distance, furthest: { desktop: distance, phone: distance } }
     add(`sheet/${mount.id}`, 'sheet', BODY_STATION, narrow => eastFacingApproach(field, narrow))
   }
-  for (const slug of MACHINE_SLUGS) {
+  for (const slug of VINCI_MACHINE_ROW) {
     if (slug === 'mechanical-lion') add(`machine/${slug}`, 'machine', 'hall', lionPose)
     else if (isHallTablePiece(slug)) add(`machine/${slug}`, 'machine', 'hall', narrow => tablePiecePose(slug, narrow))
     else add(`machine/${slug}`, 'machine', MACHINE_EYES[slug].station, narrow => machinePose(slug, narrow))
@@ -362,9 +374,6 @@ function otherKinds(): Placed[] {
   add(VINCI_STUDY_LEAF, 'manuscript', 'study', narrow =>
     pose([studySupport.eye.east, studySupport.eye.north, studySupport.eye.height],
       [studySupport.east, studySupport.north, studySupport.top], 46, narrow))
-  // The plaque is read square, from the side it turns to the display wall's eye.
-  add('plaque/flight-quote', 'place', 'supper-wall', narrow =>
-    pose([-38.17, -26.79, COURT.level + 1.62], [PLAQUE.east, PLAQUE.north, COURT.level + .95], 50, narrow))
   // The grave: the slab from three and a half metres, the diagram square to
   // its frame, and the painting on the backdrop past the diagram's south end,
   // where the frame no longer stands between the eye and the painting.
@@ -443,52 +452,65 @@ export function vinciApproachReachMetres(): number {
  * certificate holds one leg per neighbouring pair, so the table is linear in
  * the objects and never their product. The hang and the body wall have their
  * own polylines and are not here.
+ *
+ * THE HALL IS ONE ROW UNDER TWO STATIONS. The step from the flight station's
+ * last machine to the workshop's first is a leg like the others, and the way
+ * back from a machine is always its own approach, to its own station.
  */
-const RUN_STATIONS: readonly VinciStationId[] = ['flight', 'works', 'supper-wall', 'hall']
-/** A station's own objects in the order its row stands them, which is the
- * order a hand and a keyboard step through: the measurement first where the
- * room carries one, then the machines in the order the rooms stand them, then
- * the plaque. */
-function runOf(station: VinciStationId): string[] {
-  if (station === 'hall') return HALL_TABLE_PIECE_SLUGS.map(slug => `machine/${slug}`)
-  return [
-    ...(station === 'supper-wall' ? [MURAL_ID] : []),
-    ...(Object.keys(STANDS) as MachineSlug[])
-      .filter(slug => !isHallTablePiece(slug) && MACHINE_EYES[slug as keyof typeof MACHINE_EYES].station === station)
-      .map(slug => `machine/${slug}`),
-    ...(station === 'supper-wall' ? ['plaque/flight-quote'] : []),
-  ]
+const machinesOf = (stations: readonly VinciStationId[]): string[] => VINCI_MACHINE_ROW
+  .filter(slug => slug !== 'mechanical-lion' && !isHallTablePiece(slug)
+    && stations.includes(MACHINE_EYES[slug as keyof typeof MACHINE_EYES].station))
+  .map(slug => `machine/${slug}`)
+const ROWS: readonly (readonly string[])[] = [
+  [MURAL_ID, ...machinesOf(['supper-wall'])],
+  machinesOf(['flight', 'works']),
+  HALL_TABLE_PIECE_SLUGS.map(slug => `machine/${slug}`),
+]
+
+/** Where a machine stands in its own room's row, from nought; -1 for one
+ * that stands in none (the lion on the hall's floor). */
+export function vinciMachineRowIndex(slug: MachineSlug): number {
+  for (const row of ROWS) {
+    const at = row.indexOf(`machine/${slug}`)
+    if (at >= 0) return row[0] === MURAL_ID ? at - 1 : at
+  }
+  return -1
 }
-export const VINCI_APPROACH_RUNS: readonly { station: VinciStationId; exhibits: readonly string[] }[] =
-  RUN_STATIONS.map(station => ({ station, exhibits: runOf(station) }))
 
-/** A PAIR THE GROUND REFUSES. The parachute's south-west upright stands on
- * the line between the anemometer's eye and the plaque's, and no walking
- * envelope clears it: those two keep the room's own chain through the
- * station. */
-const THE_GROUND_REFUSES = new Set(['machine/anemometer|plaque/flight-quote'])
+/** A PAIR THE GROUND REFUSES: two neighbours no walking envelope clears,
+ * which keep the room's own chain through the station. None is left since
+ * the court's plaque went; `approach-check.mjs` fails a row whose neighbours
+ * are not all walked, so a refusal is never a silent jump. */
+const THE_GROUND_REFUSES = new Set<string>()
 
-/** The neighbouring pairs of one run, in walking order. TWO OBJECTS READ FROM
- * ONE PLACE ARE NOT A LEG: a walk between two that share a viewing eye has no
+/** The neighbouring pairs of every row, in walking order, each labelled with
+ * the station the first of the two is walked from. TWO OBJECTS READ FROM ONE
+ * PLACE ARE NOT A LEG: a walk between two that share a viewing eye has no
  * length to certify, and that pair keeps the room's own chain. */
 export function vinciApproachRunPairs(): readonly { station: VinciStationId; from: string; to: string }[] {
   const pairs: { station: VinciStationId; from: string; to: string }[] = []
-  for (const run of VINCI_APPROACH_RUNS) {
-    for (let at = 1; at < run.exhibits.length; at++) {
-      const from = run.exhibits[at - 1]!, to = run.exhibits[at]!
+  for (const row of ROWS) {
+    for (let at = 1; at < row.length; at++) {
+      const from = row[at - 1]!, to = row[at]!
       const apart = [false, true].every(narrow => {
         const a = vinciApproachPose(from, narrow), b = vinciApproachPose(to, narrow)
         return Boolean(a && b && a.eye.distanceToSquared(b.eye) > 1e-12)
       })
-      if (apart && !THE_GROUND_REFUSES.has(`${from}|${to}`)) pairs.push({ station: run.station, from, to })
+      const station = vinciApproachStation(from)
+      if (station && apart && !THE_GROUND_REFUSES.has(`${from}|${to}`)) pairs.push({ station, from, to })
     }
   }
   return pairs
 }
-/** True where two viewing eyes stand next to each other in one room's run. */
+/** Every row's neighbours, walked or not, for the check that holds them all walked. */
+export function vinciApproachRowNeighbours(): readonly (readonly [string, string])[] {
+  return ROWS.flatMap(row => row.slice(1).map((to, at) => [row[at]!, to] as const))
+}
+/** True where two viewing eyes stand next to each other in one room's row. */
 export function vinciApproachesAreNeighbours(a: string, b: string): boolean {
   return vinciApproachRunPairs().some(pair => (pair.from === a && pair.to === b) || (pair.from === b && pair.to === a))
 }
+
 
 /** THE ONE PAGE THE STUDY OPENS. Manuscript B 83v, of the fifteen leaves this
  * museum has admitted, read on the court's support below the study's window.

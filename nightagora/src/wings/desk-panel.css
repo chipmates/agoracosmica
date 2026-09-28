@@ -224,6 +224,25 @@
 }
 .desk-panel-out[hidden] { display: none; }
 
+/* ---- the second ending, beside the way on at the last stop ---- */
+.desk-panel-talk {
+  min-height: 64px;
+  padding: 9px 22px;
+  display: inline-flex;
+  align-items: center;
+  border: 0;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--na-abyss) 80%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--na-gold) 60%, transparent);
+  color: var(--desk-title, var(--na-starlight));
+  font: 400 1.1875rem/1.5rem var(--serif);
+  text-align: left;
+  cursor: pointer;
+}
+.desk-panel-talk:hover { background: linear-gradient(color-mix(in srgb, var(--na-gold) 12%, transparent), color-mix(in srgb, var(--na-gold) 12%, transparent)), color-mix(in srgb, var(--na-abyss) 80%, transparent); }
+.desk-panel-talk:focus-visible { outline: 2px solid var(--na-gold); outline-offset: 2px; }
+.desk-panel-talk[hidden] { display: none; }
+
 /* ---- the door's plate as the band grown ----
    One ground in the whole museum at four heights: the plate is the same wall
    the line stood on, taller, and the way on keeps its place inside it. */

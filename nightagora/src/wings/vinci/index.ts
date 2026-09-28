@@ -59,6 +59,9 @@ import { createRail, stationPose, namedPose, vinciStandsInRoom } from './rail'
 import { fittedRailFov } from './rail-projection'
 import { vinciWalk, vinciLifeOrderAsked, vinciWalkPose, vinciReadingSeconds, vinciDoorBetween, type VinciWalkCut, type VinciWalkStop } from './walk'
 import { isVinciWalkPose, VINCI_HOUSE_DOOR, VINCI_VALVE, vinciRailPlace, vinciWalkPoseOf, type VinciWalkPoseId } from './walk-poses'
+import { VINCI_STAIR_HEAD } from './walk-places'
+import { awaitOpening } from './opening-seam'
+import { talkAtTheGrave } from './ending-talk'
 import { collectRailSolids, createRailGeometryAuthority } from './rail-proof'
 import { bindRailPointer, createWheelStepper } from './input'
 import { dossier, world, type Quantity } from './site'
@@ -70,7 +73,7 @@ import { createMeasurement, type VinciMeasurement } from './measurement'
 import { createPictureWords, type PictureWordsLayer } from './picture-words'
 import { collectVinciLabelOccluders, createVinciExhibitDots, createVinciLabelAnchor, vinciSightBlocked, type VinciExhibitDots, type VinciExhibitMark, type VinciLabelAnchor, type VinciLabelMode, type VinciLabelRect } from './labels'
 import { pickVinciExhibit, readVinciExhibits, vinciMachineRoom, type VinciPickEntry } from './collection/pick'
-import { LINE_FLOOR_PICK, VINCI_STUDY_LEAF, vinciApproachPose, vinciApproachStation, vinciStudIndex } from './collection/approaches'
+import { LINE_FLOOR_PICK, VINCI_STUDY_LEAF, vinciApproachPose, vinciApproachStation, vinciApproachesAreNeighbours, vinciStudIndex } from './collection/approaches'
 import { createVinciCloseLook, createVinciMachinePayload, createVinciShowpiecePayload, fillVinciLimitSlots, renderVinciMachineRecord, renderVinciShowpieceRecord, vinciShowpiece, vinciDeathbedCard, vinciLimits, vinciLine, vinciMachineCard, vinciPlaceCard, vinciPlaceTitle, vinciManuscriptWords, VINCI_EXHIBIT_CARD, VINCI_PAGE_HONESTY, VINCI_VITRINE_WORDS, type VinciPlaceCard, type VinciPlaceCertainty, type VinciPlaceId } from './collection/close-look'
 import { createPlacePayload } from '../vitrine/place'
 import { readingTableOf } from './table'
@@ -292,6 +295,10 @@ export function createWing():VinciWingModule {
   let station=0, card=0, activeView='', mode:VinciLabelMode=1, controller:AbortController|undefined
   const LIFE=vinciLifeOrderAsked()
   const WALK=vinciWalk(LIFE)
+  /** An entry that names a stop stands there; any other begins above the
+   * museum, at the head of the collection stair (`descend`). */
+  const NAMED_ENTRY=typeof location!=='undefined'&&/(?:^|[#&])s=/.test(location.hash)
+  let descending=false
   const stopAt=(index:number):VinciWalkStop=>WALK.stops[Math.max(0,Math.min(WALK.stops.length-1,index))]!
   const stationOf=(id:string):VinciStationContent=>vinciContent.find(station=>station.id===id)??vinciContent[0]!
   const contentAt=(index:number):VinciStationContent=>stationOf(stopAt(index).station)
@@ -1019,8 +1026,8 @@ export function createWing():VinciWingModule {
       floor:panelFloor,
       title:()=>text(vinciWelcomeText.title),site:planSite,
       standing:()=>hereContent().id,stood:()=>visit?.stood??[],
-      // THE QUICK SELECT IS THE PRESS THE BAR ALREADY MAKES: every pair is
-      // certified, so the museum walks there and nothing is cut.
+      // THE QUICK SELECT IS THE PRESS THE BAR ALREADY MAKES: the next or the
+      // previous stop is walked to, any other fades there.
       station:id=>{const index=walkIndexAt(id);if(index>=0)h.navigate(index)},
       highlight:openFromPlan,
       // THE OTHER WAY THROUGH THIS WING, from the sheet that draws the place:
@@ -1090,15 +1097,18 @@ export function createWing():VinciWingModule {
         // work is, so the eye neither walks out to it nor back from it.
         if(isLeafDoor(id)||isLeafDoor(from))return false
         // A LEG LEAVES FROM ITS OWN STATION ONLY: a hall machine opened from the
-        // hall's other station opens where the visitor stands.
-        const pose=vinciApproachStation(id)===hereContent().id?vinciApproachPose(id,narrow()):undefined
+        // hall's other station opens where the visitor stands, unless it is the
+        // neighbour of the one open, since the hall's row is walked through.
+        const home=vinciApproachStation(id), here=hereContent().id
+        const across=home!==undefined&&home!==here&&from!==null&&rail.navigation.exhibit===from&&vinciApproachesAreNeighbours(from,id)
+        const pose=home===here||across?vinciApproachPose(id,narrow()):undefined
         // ON CALM, ON THE PHONE AND UNDER REDUCED MOTION THE EYE DOES NOT MOVE:
         // the vitrine opens where the visitor stands. Where it may move, the
         // eye walks; a rig composing a still cuts to the same certified eye.
         if(!pose){if(from!==null&&rail.navigation.exhibit)rail.returnToStation();return false}
         // WALKING ON IS ONE MOTION: the certified return and the certified
         // approach out, with nothing standing still at the station.
-        if(from!==null)return proved(()=>exhibitWalks(true)?rail.chain(id,pose,narrow()):rail.returnToStation())
+        if(from!==null)return proved(()=>exhibitWalks(true)?rail.chain(id,pose,narrow(),across?{id:home!,pose:stationPose(home!,narrow())}:undefined):rail.returnToStation())
         if(!exhibitWalks())return false
         return proved(()=>rail.approach(id,pose,narrow(),openMode==='walk'?false:openMode==='cut'||cutToStation()))
       },
@@ -1202,6 +1212,9 @@ export function createWing():VinciWingModule {
     },options)
     // The instruments panel of the museum opens the plan of the wing standing.
     window.addEventListener('na-wing-plan',()=>openPlan(),options)
+    // THE WALK'S SECOND ENDING, at the grave: the talk opens the library's
+    // door where its adapter is wired, and says it did.
+    window.addEventListener('na-wing-ending',e=>{const asked=e as CustomEvent<{ending?:string}>;if(asked.detail?.ending==='talk'&&talkAtTheGrave())asked.preventDefault()},options)
     // THE SHEET TAKES ITS OWN GESTURE: a drag up opens it, a drag down or a
     // tap on the peek closes or opens it, and the card itself outlives every
     // repaint, so this is bound once.
@@ -1220,7 +1233,14 @@ export function createWing():VinciWingModule {
     standing=true
     card=station
     const stop=stopAt(card),s=stationOf(stop.station)
-    aimPrint(s.id);exposureAt=s.id;rail.set(railPlaceOf(stop),vinciWalkPose(stop,narrow()),true,narrow(),walkVertex(stop));paintHeader();paintDock();standHere()
+    // THE WALK BEGINS ABOVE THE MUSEUM: an entry that names no stop stands at
+    // the head of the collection stair and walks down into the first stop
+    // once the opening is done. A rig's frames stand where they are asked.
+    descending=LIFE&&card===0&&!NAMED_ENTRY&&!FILM_EXPORT&&!document.body.classList.contains('forge')
+    aimPrint(s.id);exposureAt=s.id
+    if(descending)standAtStairHead()
+    else rail.set(railPlaceOf(stop),vinciWalkPose(stop,narrow()),true,narrow(),walkVertex(stop))
+    paintHeader();paintDock();standHere()
     // An address that opens on a stop of its own place stands before the proof
     // resolves at the wall's vertex: once it resolves the eye stands on the place.
     if(stop.place&&!railReady())void authority?.ready.then(()=>{if(railReady()&&standing&&stopAt(card)===stop&&!rail.navigation.active&&!activeView){placeCanonicalStation();paintHeader();paintDock()}})
@@ -1282,6 +1302,25 @@ export function createWing():VinciWingModule {
     // forge marker, and a sheet over the arrival frame would stand in every
     // frame they shoot.
     if(!document.body.classList.contains('forge')&&!vinciWelcomeSeen()&&card===0)welcome?.open()
+    void descend()
+  }
+  const atStairHead=():boolean=>standing&&rail.navigation.completed===vinciRailPlace(VINCI_STAIR_HEAD)&&!rail.navigation.active
+  function standAtStairHead():void{rail.set(vinciRailPlace(VINCI_STAIR_HEAD),vinciWalkPoseOf(VINCI_STAIR_HEAD,narrow()),true,narrow())}
+  /** THE DESCENT, down the stair and into the first stop: after the opening,
+   * and after the entrance panel where it stands, so nothing walks behind a
+   * sheet. A visitor who asks for a stop first is taken there instead. */
+  async function descend():Promise<void>{
+    if(!descending||!hosts)return
+    await awaitOpening(hosts.labels)
+    const panel=welcome?.element
+    if(panel?.open)await new Promise<void>(resolve=>panel.addEventListener('close',()=>resolve(),{once:true}))
+    if(!descending||!atStairHead())return
+    walkDown()
+  }
+  function walkDown():void{
+    descending=false
+    const first=stopAt(0)
+    rail.set(railPlaceOf(first),vinciWalkPose(first,narrow()),false,narrow(),walkVertex(first))
   }
   /** THE EYE IS THE VISITOR'S ONCE THEY CAN USE IT. The warm up parks the
    * camera on the walk's poses, and on a slow device the entry's field lifts
@@ -1412,14 +1451,17 @@ export function createWing():VinciWingModule {
       {id:'parapet-west',points:box(COURT.west,COURT.west+COURT.parapetThickness,COURT.south,COURT.north),closed:true,fill:true,built:true},
       {id:'parapet-east',points:box(COURT.east-COURT.parapetThickness,COURT.east,COURT.south,COURT.north),closed:true,fill:true,built:true},
     ]
-    const eyes=vinciContent.map(station=>{const eye=stationPose(station.id,false).eye;return {east:eye.x,north:-eye.z}})
-    const stations:PlanStation[]=vinciContent.map((station,index)=>{
+    // A STATION THE WALK DOES NOT STAND AT IS NOT A MARK: a press on it
+    // would lead nowhere.
+    const walked=vinciContent.filter(station=>walkIndexAt(station.id)>=0)
+    const eyes=walked.map(station=>{const eye=stationPose(station.id,false).eye;return {east:eye.x,north:-eye.z}})
+    const stations:PlanStation[]=walked.map((station,index)=>{
       const here=eyes[index]!
-      return {id:station.id,number:Math.max(0,walkIndexAt(station.id))+1,name:station.name,group:station.group,east:here.east,north:here.north,
+      return {id:station.id,number:walkIndexAt(station.id)+1,name:station.name,group:station.group,east:here.east,north:here.north,
         // FOUR ROOMS ENTERED FROM ONE PLACE ARE ONE MARK. The rail's own
         // poses say which stations share a standing place, so the drawing
         // carries the standstill instead of explaining it.
-        sharesPoseWith:vinciContent.flatMap((other,at)=>at===index||eyes[at]!.east!==here.east||eyes[at]!.north!==here.north?[]:[other.id])}
+        sharesPoseWith:walked.flatMap((other,at)=>at===index||eyes[at]!.east!==here.east||eyes[at]!.north!==here.north?[]:[other.id])}
     })
     return {rooms,shapes,stations,highlights:planHighlights()}
   }
@@ -1635,6 +1677,8 @@ export function createWing():VinciWingModule {
     // first stop where the life is walked.
     const index=WALK.cuts.length?0:vinciContent.findIndex(station=>station.group==='collection')
     if(index<0||!hosts)return
+    // from the head of the stair the way in is the descent itself
+    if(atStairHead()){hosts.navigate(index);return}
     const id=contentAt(index).id
     hosts.navigate(index)
     exhibits?.warm()
@@ -2797,6 +2841,7 @@ export function createWing():VinciWingModule {
    * again for the window it now has: at a work of a wall, or the work a run
    * is walking to; at the work an approach stands at; else the stop's view. */
   function placeAfterResize():void {
+    if(atStairHead()){standAtStairHead();return}
     const nav=rail.navigation, wall=wallOn(), stop=stopAt(card)
     const vertex=nav.active?nav.wallTo:nav.wall
     const work=!activeView&&wall&&vertex!==undefined&&!vinciWallIsEnd(wall,vertex)&&vertex!==walkVertex(stop)
@@ -3085,6 +3130,14 @@ export function createWing():VinciWingModule {
     if(!hosts){mount(h);station=card=index;paintHeader();schedule();return}
     // A station asked for before the place is built is remembered, not lost.
     if(!standing){station=card=index;paintHeader();return}
+    // AT THE HEAD OF THE STAIR the one walk is the descent to the first stop;
+    // any other stop asked for fades there.
+    if(atStairHead()){
+      quietly(()=>closeLook?.close())
+      if(index===0){walkDown();return}
+      descending=false;station=index;fadeTo(index);return
+    }
+    const asked=station
     const closeSources=mode===2
     if(closeSources)mode=1
     // A WORK QUEUED FROM THE PLAN BELONGS TO THE WALK THE PLAN BEGAN. A
@@ -3100,9 +3153,24 @@ export function createWing():VinciWingModule {
     // and is certified; what the story says is that the visitor is somewhere
     // else now, which is a title and a new place and no walk between them.
     if(!cut&&walkCutBoundary(card,index)){crossChapter(index);return}
+    // ONLY THE NEXT AND THE PREVIOUS STOP ARE WALKED. A press on the plan or
+    // on a far mark of the bar fades there, so every walk is a neighbour leg
+    // the certificate carries (`rail-neighbours.ts`).
+    if(!cut&&Math.abs(index-asked)>1){fadeTo(index);return}
     // THE HOUSE'S DOOR IS CROSSED BY A CUT, never walked through.
     if(!cut&&crossDoor(index))return
     walkOn(index,cut,closeSources)
+  }
+  /** THE FADE TO A STOP THAT IS NOT A NEIGHBOUR: the quiet dip, the stop
+   * stood while the picture is dark, and the arrival settling as it comes up. */
+  function fadeTo(index:number):void {
+    doorAhead=-1;walkOnwards=-1
+    quietDip(()=>{
+      const stop=stopAt(index), s=stationOf(stop.station)
+      rail.set(railPlaceOf(stop),vinciWalkPose(stop,narrow()),true,narrow(),walkVertex(stop))
+      card=station=index;dock.scrollTop=0;aimPrint(s.id);exposureAt=s.id
+      paintHeader();paintHeaderVisibility();paintDock();paintQuestion();standHere()
+    })
   }
   const wingModule:VinciWingModule={
     stations:WALK.stops.map(walkStation),

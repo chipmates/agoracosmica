@@ -74,7 +74,6 @@ const EXHIBITS = [
   { id: 'machine/parachute', kind: 'machine', station: 'supper-wall' },
   { id: 'machine/revolving-crane', kind: 'machine', station: 'supper-wall' },
   { id: 'machine/anemometer', kind: 'machine', station: 'supper-wall' },
-  { id: 'plaque/flight-quote', kind: 'place', station: 'supper-wall' },
   { id: 'machine/aerial-screw', kind: 'machine', station: 'flight' },
   { id: 'machine/miter-lock-gates', kind: 'machine', station: 'flight' },
   { id: 'machine/camera-obscura', kind: 'machine', station: 'flight' },

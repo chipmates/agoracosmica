@@ -7,8 +7,8 @@
  * pose can move and no solid can change. This is that program.
  *
  * It runs the real factories at every tier, hashes them with the same
- * `rail-fingerprint.ts` the browser runs, builds every directed route
- * routes from `rail-waypoints.ts`, proves every straight span and every
+ * `rail-fingerprint.ts` the browser runs, builds every neighbour leg of the
+ * walk (`rail-neighbours.ts`) from `rail-waypoints.ts`, proves every straight span and every
  * rounded corner against the real triangles, proves each station's own near
  * envelope, and writes the certificate plus its manifest hash.
  *
@@ -82,14 +82,15 @@ async function load(file) {
   return exports
 }
 
-const { stationPose } = await load(path.join(WING, 'rail.ts'))
+const { stationPose, RAIL_WALK_SPEED } = await load(path.join(WING, 'rail.ts'))
 const { VINCI_WALK_POSE_IDS, vinciWalkPoseOf } = await load(path.join(WING, 'walk-poses.ts'))
+const { vinciRailNeighbourLegs } = await load(path.join(WING, 'rail-neighbours.ts'))
 const { vinciContent } = await load(path.join(WING, 'content.ts'))
 const { railGeometryFingerprint, railGeometrySignature } = await load(path.join(WING, 'rail-fingerprint.ts'))
 const { collectRailSolids } = await load(path.join(WING, 'rail-solids.ts'))
 const { createCertifiedRailPath, railNearRectangleRadius } = await load(path.join(WING, 'rail-smoothing.ts'))
 const { fittedRailFov } = await load(path.join(WING, 'rail-projection.ts'))
-const { gaitEnvelopeM, gaitLeg, gaitSecondsAt, setGaitPace, GAIT_PACES } = await load(path.join(WING, 'gait.ts'))
+const { gaitEnvelopeM, gaitLeg, gaitSecondsAt, setGaitPace, withGaitLegSpeed, GAIT_PACES } = await load(path.join(WING, 'gait.ts'))
 const { planCalmGaze } = await load(path.join(WING, 'rail-gaze.ts'))
 const { railStationWaypoints, railGateWaypoints, railTerraceWaypoints, railDoorTurns, railPairTurns, railLinkVia } = await load(path.join(WING, 'rail-waypoints.ts'))
 /** A turn in a doorway, or one a walk makes standing, is made on the corner itself, so it is left unrounded. */
@@ -370,23 +371,26 @@ if (Math.abs(ALL_RAMP.accelSeconds + ALL_RAMP.brakeSeconds - ALL_RAMP.seconds) >
 const rampClock = share => gaitSecondsAt(ALL_RAMP, share * ALL_RAMP.lengthM) / ALL_RAMP.seconds
 const clockLow = share => Math.max(0, Math.min(share, rampClock(share)) - 1e-6)
 const clockHigh = share => Math.min(1, Math.max(share, rampClock(share)) + 1e-6)
-// every pace, lengths from half a metre to a traverse, stretches to eight
-// times a leg's own seconds: the share of the clock stays inside the two
+// every pace, every leg's own speed, lengths from half a metre to a traverse,
+// stretches to eight times a leg's own seconds: the share of the clock stays
+// inside the two
 {
   const walkPace = Object.keys(GAIT_PACES).find(name => GAIT_PACES[name] === GAIT_PACES.walk)
   let worst = 0
-  for (const pace of Object.keys(GAIT_PACES)) {
+  for (const pace of Object.keys(GAIT_PACES)) for (const speed of [1, RAIL_WALK_SPEED]) {
     setGaitPace(pace)
-    for (const lengthM of [.3, 1, 2.5, 6, 14, 30, 45, 66, 90, 130, 200]) {
-      const natural = gaitLeg(lengthM).seconds
-      for (const stretch of [0, 1.01, 1.2, 1.5, 2, 3, 5, 8]) {
-        const leg = gaitLeg(lengthM, natural * stretch)
-        for (let i = 0; i <= 400; i++) {
-          const share = i / 400, clock = gaitSecondsAt(leg, share * lengthM) / leg.seconds
-          worst = Math.max(worst, clockLow(share) - clock, clock - clockHigh(share))
+    withGaitLegSpeed(speed, () => {
+      for (const lengthM of [.3, 1, 2.5, 6, 14, 30, 45, 66, 90, 130, 200]) {
+        const natural = gaitLeg(lengthM).seconds
+        for (const stretch of [0, 1.01, 1.2, 1.5, 2, 3, 5, 8]) {
+          const leg = gaitLeg(lengthM, natural * stretch)
+          for (let i = 0; i <= 400; i++) {
+            const share = i / 400, clock = gaitSecondsAt(leg, share * lengthM) / leg.seconds
+            worst = Math.max(worst, clockLow(share) - clock, clock - clockHigh(share))
+          }
         }
       }
-    }
+    })
   }
   setGaitPace(walkPace)
   if (worst > 0) throw new Error(`A gait timing leaves the walked-lens envelope by ${worst} of its clock`)
@@ -451,10 +455,22 @@ function orientedStationClearance(pose, fov, aspect, cornerRadius) {
 
 /* ---- the routes ---- */
 
+/** THE LEGS THE WALK CAN ASK FOR, as pairs of physical poses: a stop's next
+ * and previous in either order (`rail-neighbours.ts`). A press anywhere else
+ * is a fade and walks nothing, so no other pair is proved. */
+function neighbourFamilies(seen) {
+  const pairs = []
+  for (const [a, b] of vinciRailNeighbourLegs(vinciContent.map(station => station.id))) {
+    const from = seen.find(entry => entry.stations.includes(a)), to = seen.find(entry => entry.stations.includes(b))
+    if (!from || !to) throw new Error(`No rail pose for the leg ${a} to ${b}`)
+    if (from === to || pairs.some(([x, y]) => x === from && y === to)) continue
+    pairs.push([from, to])
+  }
+  return pairs
+}
 const routes = [], readings = []
 for (const { viewport, seen } of families) {
-  for (const from of seen) for (const to of seen) {
-    if (from === to) continue
+  for (const [from, to] of neighbourFamilies(seen)) {
     const standing = [...railDoorTurns, ...(railPairTurns[`${from.id}>${to.id}`] ?? [])]
     const chain = railStationWaypoints(from.id, to.id,
       { from: [from.pose.eye.x, -from.pose.eye.z], to: [to.pose.eye.x, -to.pose.eye.z] })
@@ -537,7 +553,7 @@ for (const { viewport, seen } of families) {
 /* ---- the approaches: one short certified leg per exhibit, per viewport ----
  *
  * An approach is reachable from exactly one station and returns to it, so it
- * is a LINEAR table and never part of the any-to-any product of station poses.
+ * is a LINEAR table and never part of the station legs.
  * The proof is the routes' own: the same certified path, the same closed
  * balls, the same exact segment/triangle distance, the same near rectangle
  * plus the gait envelope, against the same solids.
@@ -968,9 +984,9 @@ for (const wall of walls) {
 // station, so the table is linear and the rail refuses anything not in it.
 const expectedApproaches = families.length * vinciExhibitRecords().length
 if (approaches.length !== expectedApproaches) failures.push(`Expected ${expectedApproaches} approaches, certified ${approaches.length}`)
-// Every ordered pair of distinct station poses, both viewports: a visitor can
-// press any mark on the rail, so any pair is a route the walk may be asked for.
-const expectedRoutes = families.reduce((sum, family) => sum + family.seen.length * (family.seen.length - 1), 0)
+// Every neighbour leg of the walk once, both viewports: a press anywhere
+// else fades, so no other pair is a route the walk may be asked for.
+const expectedRoutes = families.reduce((sum, family) => sum + neighbourFamilies(family.seen).length, 0)
 if (routes.length !== expectedRoutes) failures.push(`Expected ${expectedRoutes} directed routes, certified ${routes.length}`)
 
 const text = JSON.stringify(certificate, null, 1) + '\n'

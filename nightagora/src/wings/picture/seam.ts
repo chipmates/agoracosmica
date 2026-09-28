@@ -47,6 +47,9 @@ export type PictureState =
   | { kind: 'dip'; from: PictureNode; to: PictureNode; title: PictureWords | null; quiet?: true }
 
 export type PictureEvent = 'state' | 'rest' | 'depart' | 'wait' | 'dip'
+/** How a press goes: `fade` reaches the node by the quiet dip and walks
+    nothing, the way a press on the plan or on a far stop goes. */
+export interface PictureGo { fade?: boolean }
 
 export interface PictureSource {
   readonly kind: 'film' | 'live'
@@ -55,7 +58,7 @@ export interface PictureSource {
   /** Walk, open or dip to a node. Resolves with the node the picture rests at
       when the press is answered: the node asked for, or the node he already
       stands at when the work asked for opens where he stands. */
-  go(node: PictureNode): Promise<PictureNode>
+  go(node: PictureNode, how?: PictureGo): Promise<PictureNode>
   /** a second press of the way on while a clip plays: the walk goes faster */
   hurry(): void
   /** the ways the chrome offers from here, the likeliest first: a source may

@@ -33,38 +33,41 @@ const PACE = value('--pace', null)
 const ONLY = value('--only', null)
 const DT = 1 / HZ
 
-/** THE CRITERIA. A frame width may not be crossed in under seven seconds at
- * the film's own landscape field (the panning rule of cinema practice), and a
- * turn eases in and out over no less than about a second and a half. The
- * phone is held to the same degrees: its screen subtends about as much of the
- * eye per degree of view as the desktop's does. */
+/** THE CRITERIA, AT TWICE THE FIRST TURNING SPEED. They were the panning rule
+ * of cinema practice (a frame width in no less than seven seconds at the
+ * film's landscape field, a turn eased over about a second and a half); every
+ * turn now runs the same curve in half the time, so a rate doubles, its
+ * acceleration goes up four times and its jerk eight. The phone is held to
+ * the same degrees: its screen subtends about as much of the eye per degree
+ * of view as the desktop's does. */
+const T1 = 2, T2 = T1 * T1, T3 = T2 * T1
 export const CALM = {
-  turnDegPerSecond: 12,
-  turnDegPerSecond2: 12,
-  turnDegPerSecond3: 40,
+  turnDegPerSecond: 12 * T1,
+  turnDegPerSecond2: 12 * T2,
+  turnDegPerSecond3: 40 * T3,
   /** the change of the lens, as a share of the picture's scale per second */
   zoomPerSecond: .15,
   /** the body getting under way and stopping, in metres per second squared */
   bodyMetresPerSecond2: 2,
   /** THE PICTURE'S OWN MOTION, in the film's pixels per frame at 30 frames:
-   * a frame width of 1920 px crossed in no less than seven seconds. With the
-   * film's half-open shutter a hung work smears by half of it and still reads. */
-  filmPixelsPerFrame: 9,
+   * a frame width of 1920 px crossed in no less than three and a half
+   * seconds. With the film's half-open shutter a hung work smears by half of
+   * it. */
+  filmPixelsPerFrame: 9 * T1,
 }
 /** A TURN MADE STANDING STILL may run faster than one made walking: up to
- * 20 degrees a second on the desktop and 14 on the phone, and on a lens of
- * 60 degrees or wider up to 35 and 25 eased at 22, so a half turn takes
- * seconds. Whatever the rate, the picture moves no more than 14 px a frame
- * at the lens it turns on, a narrower lens turning slower. Frames read
+ * 40 degrees a second on the desktop and 28 on the phone, and on a lens of
+ * 60 degrees or wider up to 70 and 50 eased at 88, so a half turn takes a
+ * few seconds. Whatever the rate, the picture moves no more than 28 px a
+ * frame at the lens it turns on, a narrower lens turning slower. Frames read
  * against it are those whose body has not moved over the whole reading. */
 export const CALM_STANDING = {
-  desktop: { turnDegPerSecond: 36, turnDegPerSecond2: 23, turnDegPerSecond3: 60, filmPixelsPerFrame: 14 },
-  phone: { turnDegPerSecond: 26, turnDegPerSecond2: 23, turnDegPerSecond3: 60, filmPixelsPerFrame: 14 },
+  desktop: { turnDegPerSecond: 36 * T1, turnDegPerSecond2: 23 * T2, turnDegPerSecond3: 60 * T3, filmPixelsPerFrame: 14 * T1 },
+  phone: { turnDegPerSecond: 26 * T1, turnDegPerSecond2: 23 * T2, turnDegPerSecond3: 60 * T3, filmPixelsPerFrame: 14 * T1 },
 }
-/** THE NAMED STANDS (the garden porch, the line-early arrival, the works
- * departure, the reading booth's mouth) turn at 28 degrees a second on the
- * desktop and 20 on the phone on a narrower lens, eased at 22: read against
- * the same caps. */
+/** THE NAMED STANDS (the line-early arrival, the works departure) turn at 56
+ * degrees a second on the desktop and 40 on the phone on a narrower lens,
+ * eased at 88: read against the same caps. */
 export const CALM_NAMED = CALM_STANDING
 /** The film keeps the authored width: landscape 1920 px from the desktop's
  * lens, portrait 1080 px from the phone's. */
