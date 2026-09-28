@@ -24,9 +24,11 @@ The parts of that the code enforces:
 
 | Surface | What | Why |
 |---|---|---|
-| **Cloudflare strictly-necessary cookies** (`__cf_bm`, `cf_clearance`, `__cflb`) | Bot detection, load balancing | Required for the site to work. Exempt from a cookie banner under ePrivacy Article 5(3). |
-| **Per-identity rate-limit counters** (Cloudflare KV, 24h TTL) | An anonymous UUID your browser generates | Free-tier quota enforcement |
-| **Per-address rate-limit counters** (Cloudflare KV, 24h for the daily chat ceiling, 1h for session mints) | A salted one-way hash of the address, never the address | Bounds what identity rotation from one machine can buy |
+| **Cloudflare strictly-necessary cookies** (`__cf_bm`, `cf_clearance`) | Bot detection | Required for the site to work. Exempt from a cookie banner under ePrivacy Article 5(3). |
+| **Per-identity rate-limit counters** (Cloudflare KV, 24h TTL) | A random ID the server issues for the day | Free-tier quota enforcement |
+| **Per-address rate-limit counters** (Cloudflare KV, 24h for the daily chat ceiling and audio, 6h for the community tally, 1h for session mints) | A salted one-way hash of the address, never the address | Bounds what identity rotation from one machine can buy |
+| **Beacon and conversion rate-limit counters** (Cloudflare KV, up to 1h) | The address itself, as the counter's key | Keeps one machine from flooding the counters or the conversion relay |
+| **Community tally** (Cloudflare KV, 12 months after the browser was last seen) | A keyed hash of a random ID the browser keeps, with its voting power and number of completed figures | Each browser counts once in the community total |
 | **Safety screening events** (Cloudflare KV, 90 days) | Event metadata and a salted address hash | Content safety and abuse review |
 | **Aggregate event counters** (Cloudflare Analytics Engine, 90 days) | Keyless rows: endpoint, figure, language, country, coarse device class, status, timing bucket | Knowing whether the service works and where it breaks. Every counter is listed in [MEASUREMENT.md](MEASUREMENT.md) |
 
