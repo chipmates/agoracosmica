@@ -73,28 +73,6 @@ const schemas = [
     { name: 'William Shakespeare', url: `${SITE_URL}/figures/william-shakespeare/` },
     { name: 'Sonnets', url: PAGE_URL },
   ]),
-  {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: [
-      {
-        '@type': 'Question',
-        name: 'How many sonnets did Shakespeare write?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'The 1609 Quarto prints 154. Most of the first 126 address a young man, most of the rest a dark-haired woman. Who either of them was, nobody knows, and four centuries of guessing have not settled it.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'What form is a Shakespearean sonnet?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Fourteen lines of iambic pentameter: three quatrains rhymed abab cdcd efef, then a closing couplet rhymed gg. The couplet typically turns, answers, or undercuts everything before it.',
-        },
-      },
-    ],
-  },
 ];
 ---
 <Public
