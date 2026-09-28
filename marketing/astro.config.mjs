@@ -85,6 +85,12 @@ export default defineConfig({
   // deploy) because the font files live in client/public/fonts and aren't
   // copied into marketing/. In production both worlds share a build output.
   vite: {
+    // Vite 8 minifies CSS with lightningcss, which folds `backdrop-filter`
+    // followed by `-webkit-backdrop-filter` into the prefixed one alone, so
+    // Chromium drew the blurred bars with no blur. esbuild keeps both.
+    build: {
+      cssMinify: 'esbuild',
+    },
     server: {
       proxy: {
         '/fonts': { target: 'https://agoracosmica.org', changeOrigin: true, secure: true },
