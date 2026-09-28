@@ -85,3 +85,8 @@ dataset = "agora_llm"
 
 [observability]
 enabled = true
+
+# Console logs stay; the per-request invocation log entries are not kept.
+[observability.logs]
+enabled = true
+invocation_logs = false
