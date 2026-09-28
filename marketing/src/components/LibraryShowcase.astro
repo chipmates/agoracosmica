@@ -37,7 +37,7 @@ const figureHref = publicUrl(lang, `/figures/${figureIdToSlug[FEATURED_ID]}`);
 // Wisdom shows a DIFFERENT teaching than the Story and Prism panels, so the
 // six panels demonstrate the twelve chapters instead of circling one. Persona
 // is Jung's own counterpart to the shadow. Both strings come from the seed
-// file, never hand-written here.
+// file; the one exception is the German line below.
 const seeds = getSeedsFor(FEATURED_ID, lang);
 const personaSeed = seeds[1];
 // Same displayed-text scrub the library applies to seed prose: no em/en dash,
@@ -57,6 +57,15 @@ const chapterHook = clean(chapter?.hook);
 const chapterRuntime =
   shortRuntimeLabel(chapterDisplayMinutes(FEATURED_ID, lang, CHAPTER_INDEX + 1), lang) ?? undefined;
 
+// The German seed's persona line reads translated. Until the seed itself is
+// revised, the home says it in plain German; a changed seed line wins.
+const PERSONA_DE_SEED =
+  'Die Persona ist notwendig für soziale Anpassung, wird aber einschränkend, wenn sie mit der Gesamtidentität verwechselt wird.';
+const PERSONA_DE_PLAIN =
+  'Die Persona brauchst du, um unter Menschen zurechtzukommen. Zur Falle wird sie erst, wenn du sie für dein ganzes Ich hältst.';
+const personaLine = clean(personaSeed?.coreInsights?.[0]);
+const personaLineDe = personaLine === PERSONA_DE_SEED ? PERSONA_DE_PLAIN : personaLine;
+
 // Per-mode overrides. Everything else resolves from the figure's real data.
 const OVERRIDES = {
   en: {
@@ -71,7 +80,7 @@ const OVERRIDES = {
     },
     wisdom: {
       title: clean(personaSeed?.title) || 'The Social Mask',
-      body: clean(personaSeed?.coreInsights?.[0]),
+      body: personaLine,
       kicker: 'One of his twelve core teachings',
     },
     freetalk: {
@@ -89,7 +98,7 @@ const OVERRIDES = {
     },
     wisdom: {
       title: clean(personaSeed?.title) || 'Die soziale Maske',
-      body: clean(personaSeed?.coreInsights?.[0]),
+      body: personaLineDe,
       kicker: 'Eine seiner zwölf Kernlehren',
     },
     freetalk: {
@@ -119,10 +128,10 @@ const BAND = {
   de: {
     eyebrow: 'Probier die Bibliothek aus',
     title: 'Sechs Wege, von einem Menschen zu lernen',
-    ledeOpen: 'Oben hast du einen Menschen und eine Tür kennengelernt. Hier siehst du, was ein einziger Mensch wirklich alles mitbringt. Sechs Wege, von Carl Gustav Jung zu lernen, drei davon kannst du direkt hier abspielen.',
+    ledeOpen: 'Oben hast du einen Menschen getroffen. Hier siehst du an Carl Gustav Jung, was jeder Mensch in der Bibliothek mitbringt: sechs Wege, von ihm zu lernen, drei davon kannst du direkt hier abspielen.',
     newHere: 'Neu hier?',
     ledeOnboarding: 'Fang mit einer Geschichte an, einer erzählten Szene aus ihrem Leben. Alles andere baut darauf auf.',
-    ledeCrafted: 'Verschiedene Fragen verlangen nach verschiedenen Wegen. Das meiste davon ist im Voraus gestaltet, gemacht, um dir etwas beizubringen. Zwei davon sind lebendige Gespräche, für die Momente, in denen du tiefer gehen willst.',
+    ledeCrafted: 'Verschiedene Fragen verlangen nach verschiedenen Wegen. Das meiste ist vorbereitet und zum Lernen gemacht. Zwei der sechs sind lebendige Gespräche, für die Momente, in denen du tiefer gehen willst.',
   },
 }[lang];
 
