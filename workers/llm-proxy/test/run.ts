@@ -748,6 +748,53 @@ async function main(): Promise<number> {
     assertEqual(result.upstreamStatus, 500, 'the last upstream status rides out for the outage alert');
   });
 
+  await test('a provider error body never reaches the log, only the status and a fixed reason', async () => {
+    const ECHO = 'field messages[0].content: my secret question';
+    const logged: string[] = [];
+    const realError = console.error;
+    console.error = (...args: unknown[]) => { logged.push(args.map(String).join(' ')); };
+    try {
+      for (const status of [400, 401, 404, 408, 422, 429, 500, 503]) {
+        stubFetch(() => new Response(ECHO, { status }));
+        await dispatchToNebius({
+          systemPrompt: 'p', messages: [{ role: 'user', content: 'q' }], env: UNARMED,
+          model: primaryModel(UNARMED), usePresencePenalty: true,
+        });
+      }
+    } finally {
+      console.error = realError;
+    }
+    assertEqual(logged.length, 8, 'one line per failed call');
+    assert(logged.every(line => !line.includes('secret') && !line.includes('messages[0]')), 'no provider text logged');
+    assert(logged[0].includes('400') && logged[0].includes('bad request'), 'status and reason for 400');
+    assert(logged[7].includes('503') && logged[7].includes('provider error'), 'status and reason for 5xx');
+  });
+
+  await test('an unhandled error logs its name and route, never its message', async () => {
+    const logged: string[] = [];
+    const realError = console.error;
+    console.error = (...args: unknown[]) => { logged.push(args.map(String).join(' ')); };
+    const throwingEnv = fakeEnv({
+      RATE_LIMITS: {
+        get: async () => { throw new TypeError('text the visitor typed'); },
+        put: async () => { throw new TypeError('text the visitor typed'); },
+      } as unknown as KVNamespace,
+    });
+    let status = 0;
+    try {
+      const res = await worker.fetch(
+        new Request('https://llm.test/v1/page', { method: 'POST', body: JSON.stringify({ path: '/' }) }),
+        throwingEnv, fakeCtx().ctx,
+      );
+      status = res.status;
+    } finally {
+      console.error = realError;
+    }
+    assertEqual(status, 500, 'the error reached the boundary');
+    assertEqual(logged.length, 1, 'one line for the unhandled error');
+    assertEqual(logged[0], '[Worker] Unhandled TypeError on POST /v1/page', 'name and route only');
+  });
+
   // -------------------------------------------------------------------------
   // Operator alerts: one line per event, and flood control in front of them
   // -------------------------------------------------------------------------

@@ -123,7 +123,9 @@ export default {
 
       return withCors(response, corsHeaders, env);
     } catch (error) {
-      console.error('[Worker] Unhandled error:', error);
+      // Name and route only: an error message can carry request content.
+      const name = error instanceof Error ? error.name : typeof error;
+      console.error(`[Worker] Unhandled ${name} on ${request.method} ${path}`);
       const errorResponse = new Response(
         JSON.stringify({
           error: 'Internal server error. Please try again.',

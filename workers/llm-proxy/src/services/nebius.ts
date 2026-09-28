@@ -153,9 +153,9 @@ async function callModel(
   }
 
   if (!response.ok) {
-    const errorText = await response.text();
-    // 404 from a regional host means the model is no longer deployed in that region.
-    console.error(`[Nebius] ${model.key} ${response.status} in ${model.region}: ${errorText.slice(0, 500)}`);
+    // A provider error body can quote the request, so it is discarded unread.
+    void response.body?.cancel().catch(() => {});
+    console.error(`[Nebius] ${model.key} ${response.status} in ${model.region}: ${upstreamReason(response.status)}`);
     return { ok: false, status: response.status === 429 ? 429 : 502, reason: 'upstream_error', upstream: response.status };
   }
 
@@ -174,6 +174,18 @@ async function callModel(
   }
 
   return { ok: true, stream: meter ? tapUsage(stream, model, onUsage!) : stream };
+}
+
+/** A fixed log reason per upstream status, so no provider text reaches the log. */
+export function upstreamReason(status: number): string {
+  if (status === 400) return 'bad request';
+  if (status === 401 || status === 403) return 'key rejected';
+  if (status === 404) return 'model not deployed in this region';
+  if (status === 408) return 'upstream timeout';
+  if (status === 413 || status === 422) return 'request not accepted';
+  if (status === 429) return 'rate limited';
+  if (status >= 500) return 'provider error';
+  return 'unexpected status';
 }
 
 /**
