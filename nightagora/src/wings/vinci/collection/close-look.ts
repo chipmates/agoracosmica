@@ -7,7 +7,7 @@
  * wing out of its registers: the line, the steps, the card's words.
  */
 import { createVitrine, type Vitrine, type VitrineExhibit, type VitrinePayload } from '../../vitrine'
-import { createTurntablePayload, type TurntableOptions, type TurntablePayload, type TurntableViewpoint } from '../../vitrine/turntable'
+import { createTurntablePayload, type TurntableEye, type TurntableOptions, type TurntablePayload, type TurntableViewpoint } from '../../vitrine/turntable'
 import type { ReaderWords } from '../../vitrine/reader'
 import { lang } from '../../content'
 import { FURTHER, NEARER } from './deep-plate'
@@ -156,9 +156,16 @@ const FOLIO_THUMB: Partial<Record<MachineSlug, string>> = {
  * hand or a force drives, and the part that does the work. A machine with
  * no drive of its own has no drive to look at. */
 type OwnView = { yaw: number; pitch: number }
-const VIEWPOINT_PARTS: Record<MachineSlug, { drive: string | null; working: string | null; views?: { drive?: OwnView; working?: OwnView } }> = {
+const VIEWPOINT_PARTS: Record<MachineSlug, { drive: string | null; working: string | null; views?: { drive?: OwnView; working?: OwnView }
+  eyes?: { working?: TurntableEye } }> = {
   'aerial-screw': { drive: 'push-bar-0', working: 'sail' },
-  'parachute': { drive: null, working: 'harness' },
+  // THE PARACHUTE IS READ FROM UNDER IT: low under the open hem on the side
+  // away from the key, looking up the ribs to the apex, the linen lit through
+  // from the far side. Its own metres: the hem at 3.3 m, the apex at 10.3 m.
+  'parachute': { drive: null, working: 'harness', eyes: { working: {
+    at: [-0.776, 1.985, -2.898], look: [-0.274, 5.483, -1.025],
+    narrow: { at: [-0.776, 1.985, -2.898], look: [-0.306, 5.549, -1.144] },
+  } } },
   'anemometer': { drive: 'vane', working: 'quadrant' },
   'inclinometer': { drive: 'deck', working: 'pendulum' },
   'multi-barrel-gun': { drive: 'handbar', working: 'bank-0' },
@@ -353,6 +360,7 @@ export function createVinciMachinePayload(options: {
     label: (named?.[entry.id] ?? entry)[language],
     part: entry.id === 'drive' ? parts.drive : entry.id === 'working-part' ? parts.working : null,
     ...(entry.id === 'drive' ? parts.views?.drive : entry.id === 'working-part' ? parts.views?.working : undefined),
+    ...(entry.id === 'working-part' && parts.eyes?.working ? { eye: parts.eyes.working } : {}),
   }))
   const sheetLabel = folioName(slug)
   const thumb = FOLIO_THUMB[slug]

@@ -46,6 +46,12 @@ export interface TurntableStep {
 
 export type TurntableViewpoint = 'whole' | 'drive' | 'working-part'
 
+type Metres3 = readonly [number, number, number]
+/** A VIEW FROM WITHIN THE BODY'S OWN ENVELOPE: where the eye stands and what
+ * it looks at, in the body's own metres, with the phone's own pair where its
+ * frame asks for one. */
+export interface TurntableEye { at: Metres3; look: Metres3; narrow?: { at: Metres3; look: Metres3 } }
+
 export interface TurntableOptions {
   stack: Stack
   body: TurntableBody
@@ -57,7 +63,7 @@ export interface TurntableOptions {
   parents: ReadonlyMap<string, string>
   /** The part each viewpoint looks at; `whole` looks at the machine. A view
    * may name its own bearing and height where the whole view's do not serve. */
-  viewpoints: readonly { id: TurntableViewpoint; label: string; part: string | null; yaw?: number; pitch?: number }[]
+  viewpoints: readonly { id: TurntableViewpoint; label: string; part: string | null; yaw?: number; pitch?: number; eye?: TurntableEye }[]
   words: { play: string; pause: string; again: string; clock: string }
   /** Where a part lives in a body that was not built from its dossier. */
   nodeNames?: Readonly<Record<string, string>>
@@ -133,7 +139,9 @@ const FLOOR = { colour: '#77726a', bay: 4.8, cut: .004, cloud: .09, shade: .72 }
  * centre and closes this many spans further, measured from the eye it has now. */
 const AIR = { near: .7, far: 4.2 }
 
-interface View { yaw: number; pitch: number; distance: number; target: Vector3 }
+/** `via` marks a view whose eye stands inside the body's envelope: the low
+ * point outside the body every way into it and out of it passes. */
+interface View { yaw: number; pitch: number; distance: number; target: Vector3; via?: Vector3 | null }
 
 /** THE RECORDING'S HAND. The filmed cycle is the island drawn on the export's
  * own clock: the machine's clock set outright, running on from there or held,
@@ -424,8 +432,25 @@ export function createTurntablePayload(options: TurntableOptions): TurntablePayl
     else for (const x of [rest.min.x, rest.max.x]) for (const y of [rest.min.y, rest.max.y]) for (const z of [rest.min.z, rest.max.z]) measure(new Vector3(x, y, z))
     return Math.min(distance * WHOLE_MARGIN, fitDistance(radius) * WHOLE_FIT)
   }
+  /** The eye and its aim, from the body's own metres onto the table, and the
+   * point on the eye's own side, past the body and at the eye's height, that
+   * the way in passes: under the body, never through its floor or its skin. */
+  function eyeView(eye: TurntableEye): View {
+    const pick = host?.narrow && eye.narrow ? eye.narrow : eye
+    body.object.updateMatrixWorld(true)
+    const at = body.object.localToWorld(new Vector3(...pick.at)), look = body.object.localToWorld(new Vector3(...pick.look))
+    const offset = at.clone().sub(look), distance = Math.max(1e-3, offset.length())
+    const out = new Vector3(at.x - centre.x, 0, at.z - centre.z)
+    if (out.lengthSq() < 1e-8) out.set(0, 0, 1)
+    out.normalize()
+    const halfX = (rest.max.x - rest.min.x) / 2, halfZ = (rest.max.z - rest.min.z) / 2
+    const leaves = Math.min(halfX / Math.max(1e-6, Math.abs(out.x)), halfZ / Math.max(1e-6, Math.abs(out.z)))
+    const via = new Vector3(centre.x, at.y, centre.z).addScaledVector(out, leaves + radius * .3)
+    return { yaw: Math.atan2(offset.x, offset.z), pitch: Math.asin(offset.y / distance), distance, target: look, via }
+  }
   function goalFor(id: TurntableViewpoint, own?: { yaw: number; pitch: number }): View {
     const entry = options.viewpoints.find(v => v.id === id)
+    if (entry?.eye && id !== 'whole' && !own) return eyeView(entry.eye)
     const part = entry?.part ? family(entry.part).flatMap(name => nodeFor(name)?.geometries ?? []) : []
     if (!part.length || id === 'whole') {
       const at = own ? { yaw: own.yaw, pitch: own.pitch } : WHOLE
@@ -456,12 +481,17 @@ export function createTurntablePayload(options: TurntableOptions): TurntablePayl
     tapped = null
     light(litPart())
     const next = goalFor(id)
-    if (host?.reducedMotion) { Object.assign(view, next); goal = null; return }
+    if (host?.reducedMotion) { Object.assign(view, next); view.via = next.via ?? null; goal = null; return }
     from = { ...view, target: view.target.clone() }
     goal = next
     eased = 0
   }
   function orbit(dx: number, dy: number): void {
+    // an eye inside the body is taken back out along its own way before the hand turns the table
+    if (view.via || goal?.via || (goal && from?.via)) {
+      if (!goal) choose('whole')
+      return
+    }
     goal = null
     carrying = false
     view.yaw -= dx
@@ -469,10 +499,45 @@ export function createTurntablePayload(options: TurntableOptions): TurntablePayl
     if (chosen !== 'whole') { chosen = 'whole'; light(litPart()) }
     for (const [, button] of viewButtons) button.setAttribute('aria-pressed', 'false')
   }
+  const eyeOf = (v: View): Vector3 => {
+    const cos = Math.cos(v.pitch)
+    return new Vector3(Math.sin(v.yaw) * cos, Math.sin(v.pitch), Math.cos(v.yaw) * cos).multiplyScalar(v.distance).add(v.target)
+  }
+  /** The eye standing at a view's low point, aimed where the view aims. */
+  const outside = (v: View): View => {
+    const offset = v.via!.clone().sub(v.target), distance = Math.max(1e-3, offset.length())
+    return { yaw: Math.atan2(offset.x, offset.z), pitch: Math.asin(offset.y / distance), distance, target: v.target.clone() }
+  }
+  /** A straight way between two eyes, the aim carried along it. */
+  function line(a: View, b: View, k: number): void {
+    const eye = eyeOf(a).lerp(eyeOf(b), k)
+    view.target.lerpVectors(a.target, b.target, k)
+    const offset = eye.sub(view.target)
+    view.distance = Math.max(1e-3, offset.length())
+    view.yaw = Math.atan2(offset.x, offset.z)
+    view.pitch = Math.asin(Math.max(-1, Math.min(1, offset.y / view.distance)))
+  }
+  /** Into or out of the body only on the straight line from its low point;
+   * the turn round the body happens out there, in the air. */
+  const INSIDE_LEG = .3
   function blend(a: View, b: View, k: number): void {
-    let turn = b.yaw - a.yaw
-    turn = Math.atan2(Math.sin(turn), Math.cos(turn))
-    view.yaw = a.yaw + turn * k
+    if (a.via || b.via) {
+      const start = a.via ? outside(a) : a, end = b.via ? outside(b) : b
+      const out = a.via ? INSIDE_LEG : 0, back = b.via ? 1 - INSIDE_LEG : 1
+      // the eye counts as inside only on the straight legs, so a way broken
+      // off out in the air turns from where it is
+      if (k < out) { line(a, start, k / out); view.via = a.via! }
+      else if (k > back) { line(end, b, (k - back) / (1 - back)); view.via = b.via! }
+      else { sweep(start, end, (k - out) / Math.max(1e-6, back - out)); view.via = null }
+      return
+    }
+    view.via = null
+    sweep(a, b, k)
+  }
+  function sweep(a: View, b: View, k: number): void {
+    let swing = b.yaw - a.yaw
+    swing = Math.atan2(Math.sin(swing), Math.cos(swing))
+    view.yaw = a.yaw + swing * k
     view.pitch = a.pitch + (b.pitch - a.pitch) * k
     view.distance = a.distance + (b.distance - a.distance) * k
     view.target.lerpVectors(a.target, b.target, k)
@@ -500,7 +565,7 @@ export function createTurntablePayload(options: TurntableOptions): TurntablePayl
   function placeCamera(dt: number): void {
     if (!camera || !host) return
     if (goal && from) {
-      eased = Math.min(1, eased + dt / EASE_S)
+      eased = Math.min(1, eased + dt / (goal.via || from.via ? EASE_S * 2 : EASE_S))
       blend(from, goal, eased * eased * (3 - 2 * eased))
       if (eased >= 1) goal = null
     } else if (carrying && standing) carry(dt)
