@@ -216,9 +216,10 @@ export function resolveWingStationIndex(at: number | string, stations: readonly 
   return Math.max(0, stations.findIndex(station => station.id === at))
 }
 
-/** The library's own door. The app's entry parser resolves NAMED ask tags
-    only, so a question travels as an identifier and free text never rides
-    the URL into the composer. */
+/** The library's own door, at the app itself: the site's root is a static
+    page that keeps no question. The app's entry parser resolves NAMED ask
+    tags only, so a question travels as an identifier and free text never
+    rides the URL into the composer. */
 function doorUrl(entry: WingEntry): string {
   const p = new URLSearchParams()
   // TODO-WING-ASK-TAG: the app resolves f:<figure>:1 (the figure's hero
@@ -227,12 +228,12 @@ function doorUrl(entry: WingEntry): string {
   // every door of a wing carries the same named question.
   if (!entry.publicSlug || !entry.askTag) {
     p.set('figure', entry.slug)
-    return `${APP_ORIGIN}/?${p.toString()}`
+    return `${APP_ORIGIN}/app?${p.toString()}`
   }
   p.set('figure', entry.publicSlug)
   p.set('ask', entry.askTag)
   p.set('lang', lang())
-  return `${APP_ORIGIN}/?${p.toString()}`
+  return `${APP_ORIGIN}/app?${p.toString()}`
 }
 
 function el<K extends keyof HTMLElementTagNameMap>(
