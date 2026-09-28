@@ -3,7 +3,7 @@ import Public from '../layouts/Public.astro';
 import LegalDoc from '../components/legal/LegalDoc.astro';
 
 const title = 'Privacy Policy';
-const lastUpdated = 'Last updated: 3 September 2026';
+const lastUpdated = 'Last updated: 29 September 2026';
 const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Agora Cosmica platform. GDPR-compliant information on data processing, processors, and the rights of data subjects.';
 ---
 <Public
@@ -40,6 +40,7 @@ const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Ago
         * Provision of the online offering and web hosting<br/>
         * AI-powered chat service<br/>
         * Audio service<br/>
+        * Community tally<br/>
         * Bot protection (Cloudflare Turnstile)<br/>
         * Conversion measurement (Google Ads)<br/>
         * Reach measurement<br/>
@@ -159,7 +160,7 @@ const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Ago
     <section>
       <h2>Cookies and local storage</h2>
       <p>
-        We do NOT use tracking, analytics, or marketing cookies. The only cookie use is by Cloudflare (__cf_bm), a technically necessary security cookie for bot protection and firewall (Sect. 25(2) No. 2 TDDDG, the German Telecommunications-Digital-Services Data Protection Act). This cookie is set automatically by Cloudflare and requires no consent.
+        We do NOT use tracking, analytics, or marketing cookies. The only cookie use is by Cloudflare (__cf_bm, and after a security check cf_clearance), technically necessary security cookies for bot protection and firewall (Sect. 25(2) No. 2 TDDDG, the German Telecommunications-Digital-Services Data Protection Act). These cookies are set automatically by Cloudflare and require no consent.
       </p>
     </section>
 
@@ -196,8 +197,8 @@ const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Ago
       <p>Our chat service uses artificial intelligence (AI) to generate educational content. The following data is processed:</p>
       <p><strong>Data processed:</strong></p>
       <ul>
-        <li>Your chat inputs (text messages to the AI assistant)</li>
-        <li>Technical data (hashed IP address, timestamp, browser identifier)</li>
+        <li>Your chat inputs, together with the conversation so far, which the app sends with each message so the figure can answer in context</li>
+        <li>Technical data: IP address, time, and a random browser ID that the app keeps in your browser for the daily free quota</li>
         <li>Language setting</li>
       </ul>
       <p><strong>Purpose of processing:</strong> Provision of the AI-powered educational service (Art. 6(1)(b) GDPR, performance of a contract).</p>
@@ -207,7 +208,7 @@ const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Ago
         <li>OpenRouter, Inc. (USA). Purpose: API routing for AI inference in BYOK mode (bring your own key). Users provide their own API key, which is stored exclusively locally in the browser. OpenRouter forwards requests to the selected AI provider. Privacy policy: <a href="https://openrouter.ai/privacy">https://openrouter.ai/privacy</a>.</li>
         <li>Cloudflare, Inc. (USA), processing predominantly in Europe. Purpose: API proxy, security (WAF, bot protection), rate limiting. The data processing agreement is available in the Cloudflare dashboard. EU Cloud Code of Conduct compliance mark.</li>
       </ul>
-      <p><strong>Storage period:</strong> Chat content is NOT stored on our servers. AI responses are streamed directly to your browser. Security logs (only when blocked by the content filter) are retained for up to 90 days in anonymized form (IP hashed). Rate-limit counters hold the IP address in a short-lived key for up to one hour and are then deleted automatically. IP addresses never enter our analytics records.</p>
+      <p><strong>Storage period:</strong> We do not store chat content on our servers. Each message passes through our server to the AI model, and the answer streams back to your browser. Our server logs record errors without message content. To enforce the daily free quota and protect the service, our servers keep the random browser ID and the IP address, or a hash of it made with a secret key, for at most 24 hours. When the content filter blocks a message, we keep a security record without the message text for up to 90 days: the time, the kind of block, the figure, the mode, the language and a hash of the IP address made with a secret key (pseudonymized). IP addresses never enter our analytics records.</p>
       <p><strong>Note:</strong> Please do not enter personal data (name, address, phone number, email, bank details) into the chat.</p>
     </section>
 
@@ -216,11 +217,22 @@ const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Ago
       <p>For speech output (text-to-speech) and speech input (speech-to-text) we use our own servers in Germany:</p>
       <ul>
         <li>Location: Hetzner GEX130, Falkenstein and Nuremberg, Germany</li>
-        <li>Data processing exclusively in Germany</li>
-        <li>Voice data is transmitted for processing and deleted immediately after conversion</li>
-        <li>Voice input is not recorded or stored</li>
-        <li>Audio data is transmitted directly from the browser to the Hetzner servers (no third party involved)</li>
+        <li>Speech is generated and transcribed only on these servers</li>
+        <li>For speech output, the text to be spoken is sent there, for example a figure's answer or a story. For speech input, your recording is sent there and turned into text.</li>
+        <li>Both pass through our audio proxy at Cloudflare, which forwards them and stores nothing</li>
+        <li>Texts and recordings are deleted right after processing. Your voice is not recorded or stored.</li>
+        <li>To prevent abuse, the proxy keeps a hash of your IP address, made with a secret key, for up to 24 hours</li>
       </ul>
+    </section>
+
+    <section>
+      <h2>Community tally</h2>
+      <p>
+        The Community page in the app shows how many people take part and their combined voting power. When you open the Community page, the app creates a random ID for this browser, stores it in your browser (localStorage) and sends it to our server with your voting power and the number of figures you have completed, so that each browser counts once. Our server keeps these values under a hash of the ID made with a secret key and deletes them 12 months after your last visit to the Community page.
+      </p>
+      <p>
+        <strong>Legal basis:</strong> Art. 6(1)(f) GDPR, our interest in a fair count. The ID on your device is needed for this feature you use (Sect. 25(2) No. 2 TDDDG).
+      </p>
     </section>
 
     <section>
@@ -238,19 +250,32 @@ const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Ago
     </section>
 
     <section>
-      <h2>Technically necessary storage</h2>
+      <h2>Storage on your device</h2>
       <p>
-        We do NOT use tracking, analytics, or marketing cookies. The following technically necessary storage takes place on your device (Sect. 25(2) No. 2 TDDDG):
+        We do not use tracking, analytics or marketing cookies. Our pages and the app store the following in your browser.
+      </p>
+      <p>
+        <strong>Technically necessary for a function you use</strong> (Sect. 25(2) No. 2 TDDDG, no consent needed):
       </p>
       <ul>
-        <li>Chat history and conversations (IndexedDB, encrypted with AES-256-GCM, exclusively local on your device)</li>
+        <li>Your conversations and progress (IndexedDB, encrypted with AES-256-GCM, only on your device), and app state such as reading progress, stories played and hints already seen (localStorage)</li>
+        <li>Your own API key, if you use BYOK (IndexedDB, encrypted, only on your device)</li>
         <li>Language setting (localStorage)</li>
-        <li>Consent to the terms of use (localStorage)</li>
-        <li>Age confirmation (localStorage)</li>
-        <li>Session data (sessionStorage, deleted when the tab is closed)</li>
-        <li>Cloudflare security cookies (__cf_bm): technically necessary for bot protection and WAF</li>
+        <li>Consent to the terms of use, and age confirmation (localStorage)</li>
+        <li>A random browser ID for the daily free quota, created when you first open a conversation in the free mode (localStorage) and renewed every day</li>
+        <li>A random ID for the community tally, created when you open the Community page (localStorage)</li>
+        <li>Your answer to the ad-measurement question, yes or no, with version and date, so that we can respect it (localStorage) for 12 months</li>
+        <li>Short-lived data for the current tab (sessionStorage, deleted when the tab closes): what you picked on our pages before entering the app (figure, council, chapter, question), whether the home page has already taken you on to the app, and summaries already made</li>
+        <li>Cloudflare security cookies: __cf_bm (bot protection, 30 minutes) and, after a security check, cf_clearance</li>
       </ul>
-      <p>You can remove all locally stored data completely at any time by clearing your browser data.</p>
+      <p>
+        <strong>Only with your consent to ad measurement</strong> (Sect. 25(1) TDDDG, see "Conversion measurement"), in sessionStorage, deleted when the tab closes or when you withdraw:
+      </p>
+      <ul>
+        <li>The ad's click ID</li>
+        <li>Markers that stop a step from being sent to Google twice, and the seconds listened toward the 30-second step</li>
+      </ul>
+      <p>You can remove all of it at any time by clearing your browser data.</p>
     </section>
 
     <section>
@@ -301,32 +326,38 @@ const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Ago
     <section>
       <h2>Conversion measurement (Google Ads, only with your consent)</h2>
       <p>
-        If you reach our website via a Google ad, the URL contains a click identifier (gclid). The gclid is an identifier issued by Google per click. Because Google can link it to your click and, where applicable, to your Google account, we treat it as personal data, not as an anonymous identifier.
+        We run free ads through Google's program for nonprofits (Google Ad Grants). If you reach us through one of these ads, the web address contains a click ID issued by Google (gclid). Google can link it to your click and possibly to your Google account, so we treat it as personal data.
       </p>
       <p>
-        The gclid is stored in your browser's sessionStorage (not a cookie). It is bound to the browser tab. A transfer to Google takes place exclusively if you give your explicit consent. This consent is offered only to visitors who arrive via a Google ad, and it is optional. Without consent, nothing is transmitted to Google.
+        When you arrive through such an ad, we ask whether we may count your visit for Google. The question is optional, and the whole library stays open either way. Until you answer, the click ID stays only in the page's memory and is not stored. If you say no, it is discarded, and your browser remembers the no. If you say yes, we keep the click ID in this browser tab (sessionStorage) until the tab closes, and your browser remembers the yes (localStorage) for 12 months, so that later visits through our ads are counted too. Visitors from our paid ads (their web address contains p=1) are never asked, and their click ID is discarded at once.
       </p>
       <p>
-        With your consent, we transmit the gclid on certain events (starting to explore the library, profile creation, selecting a learning mode, using a Council) server-side via the Google Ads Conversion API, so that the ad can be matched to a conversion (no JavaScript tracker, no pixel on the website). What is transmitted: the gclid, the triggered event (as a conversion action), a value, a currency, a timestamp, and an order ID (gclid plus event, for de-duplication). Neither the selected figure nor your country code, no conversation content, and no other personal data is transmitted. We do not store the gclid permanently on our systems.
+        With your consent, our server sends Google the click ID each time you take one of these steps: saying yes to the question, opening the app from one of our pages, accepting the app's terms when you first enter it, listening to 30 seconds of audio, sending a first message to a figure, sending a third message in the same conversation, and using a council. With each step, Google receives the click ID, the step (as a conversion action), a value and a currency, the time, an order number (click ID plus step, so nothing counts twice) and a consent signal (use for measurement allowed, use for personalized advertising not allowed). Google receives neither the figure nor your country, no conversation content and no other data about you. No Google script or pixel runs on our pages. The transfer goes from our server to Google (Google Ads API).
       </p>
       <p>
-        The recipient is Google (Google Ireland Limited and Google LLC, USA). A transfer to the USA may take place. Google is certified under the EU-US Data Privacy Framework.
+        Recipient: Google Ireland Limited and Google LLC (USA). A transfer to the USA can take place. Google is certified under the EU-US Data Privacy Framework. How Google uses data from partner sites: <a href="https://business.safety.google/privacy">https://business.safety.google/privacy</a>.
       </p>
       <p>
-        <strong>Storage period:</strong> On our side, only an event counter without the gclid is kept for 90 days. Storage at Google follows Google's retention policies for advertising data.
+        <strong>Storage period:</strong> We do not keep the click ID on our servers. For each step sent, we keep a record without the click ID (the step, the figure if there was one, and the time) for 90 days, to check that the counting works. Google keeps the data according to its own retention rules for advertising data.
       </p>
       <p>
-        <strong>Legal basis:</strong> Your consent (Art. 6(1)(a) GDPR and Sect. 25(1) TDDDG). You can withdraw your consent at any time with effect for the future, in Settings under "Legal" via "Withdraw ad-measurement consent". Withdrawal deletes the stored gclid.
+        <strong>Legal basis and withdrawal:</strong> Your consent (Art. 6(1)(a) GDPR and Sect. 25(1) TDDDG). You can withdraw it at any time with effect for the future: with the "Ad measurement" link at the foot of every page, or in the app under Settings › Legal. Withdrawing deletes the stored click ID and records your no. After that, nothing more is sent.
       </p>
     </section>
 
     <section>
       <h2>Reach measurement</h2>
       <p>
-        We count an anonymous counter per server-side counted activity (for example a started chat, a started or completed playback of a story, teaching, prism, or council, a page view). Only structural labels are recorded: the endpoint used, the selected figure, the selected mode, the language (en or de), and the 2-letter country code derived at the Cloudflare edge (two-letter ISO code, for example DE or XX for unknown). No IP addresses are stored in analytics records, no user profiles are built, no cookies are set, and no source or channel label is stored. There is no recognition across sessions.
+        We count how our pages and the app are used, without cookies and without identifying anyone. When something happens, for example a page opens, a chat starts or a story plays, the page sends a short count to our server. Each count is one row with a few coarse labels, depending on what happened: what happened (for example "chat started" or "story finished"), the page path, the figure, the mode or chapter, the language (en or de), the country as a two-letter code that Cloudflare derives from the connection (for example DE, or XX when unknown), the type of device (mobile, tablet or desktop), how long our server took to answer, and for some steps a rough range instead of an exact number (for example "1 to 3 minutes listened"). Our measurement documentation lists every label.
       </p>
       <p>
-        <strong>Legal basis:</strong> Legitimate interest (Art. 6(1)(f) GDPR) in measuring the effectiveness of our nonprofit public outreach. The purely aggregate, anonymous measurement falls below the threshold of personal data under Recital 26 GDPR. Sect. 25 TDDDG does not apply to the measurement itself, as no information is stored on or read from your device as part of the counting. Locally stored information that is technically necessary for operating the app (for example the language setting, a session UUID for rate limiting) is exempt under Sect. 25(2) TDDDG.
+        When a visit starts, the count also notes in one coarse word what kind of place the visitor came from, for example "search", "Google ad", "AI assistant" or "direct". The page works this out from the address of the page that linked here, which browsers normally pass along, and keeps only that word. The same word can also go with the counts for entering the app and for the first chat, when you come into the app through a link on our pages.
+      </p>
+      <p>
+        No count contains an IP address, a user ID or anything you typed. We build no profiles, and we do not recognize a browser from one visit to the next for counting. The counts are kept for 90 days.
+      </p>
+      <p>
+        <strong>Legal basis:</strong> Our legitimate interest in knowing whether our nonprofit service works and whom it reaches (Art. 6(1)(f) GDPR). The counts carry no identifier and cannot be traced back to a person by us, so they are not personal data (Recital 26 GDPR). For the counting, nothing is stored on your device and nothing already stored there is read, which is why we do not ask for consent under Sect. 25 TDDDG. What the app stores on your device for its own functions is listed under "Storage on your device".
       </p>
     </section>
 

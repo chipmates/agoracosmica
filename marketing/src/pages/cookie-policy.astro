@@ -3,8 +3,8 @@ import Public from '../layouts/Public.astro';
 import LegalDoc from '../components/legal/LegalDoc.astro';
 
 const title = 'Cookie-Richtlinie';
-const lastUpdated = 'Zuletzt aktualisiert: Juni 2026';
-const description = 'Cookie-Richtlinie von Agora Cosmica. Wir verwenden keine Tracking-, Analyse- oder Marketing-Cookies. Nur technisch notwendige Speicherung gemäß § 25 Abs. 2 Nr. 2 TDDDG.';
+const lastUpdated = 'Zuletzt aktualisiert: 29. September 2026';
+const description = 'Cookie-Richtlinie von Agora Cosmica. Keine Tracking-, Analyse- oder Marketing-Cookies. Für die Werbe-Messung wird erst nach deinem Ja etwas gespeichert.';
 ---
 <Public
   lang="de"
@@ -36,9 +36,9 @@ const description = 'Cookie-Richtlinie von Agora Cosmica. Wir verwenden keine Tr
     </section>
 
     <section>
-      <h2>Essenzielle technische Speicherung</h2>
+      <h2>Speicherung auf deinem Gerät</h2>
       <p>
-        Wir verwenden nur essenzielle technische Speicherung, die für das Funktionieren der Anwendung unbedingt erforderlich ist:
+        Wir speichern nur, was für eine Funktion nötig ist, die du nutzt. Für die Werbe-Messung wird erst nach deinem Ja etwas gespeichert.
       </p>
 
       <table>
@@ -51,24 +51,44 @@ const description = 'Cookie-Richtlinie von Agora Cosmica. Wir verwenden keine Tr
         </thead>
         <tbody>
           <tr>
-            <td>Session Storage</td>
-            <td>Erhält deinen Sitzungszustand während der Nutzung der Anwendung. Bei Ankunft über eine Google-Anzeige wird hier der Klick-Identifikator (gclid) gehalten, bis du der Werbe-Messung zustimmst, sie ablehnst oder der Tab endet.</td>
-            <td>Bis du deinen Browser schließt</td>
-          </tr>
-          <tr>
-            <td>Session Storage (agc_paid)</td>
-            <td>Markiert Besuche über bezahlte Anzeigen (?p=1), damit für sie KEINE Messung stattfindet. Reine Unterdrückungs-Markierung, wird nie übertragen.</td>
-            <td>Bis du deinen Browser schließt</td>
-          </tr>
-          <tr>
-            <td>Session Storage (agc_conv_fired_*)</td>
-            <td>Verhindert nach erteilter Einwilligung, dass dasselbe Mess-Ereignis doppelt gezählt wird. Wird beim Widerruf gelöscht.</td>
-            <td>Bis du deinen Browser schließt</td>
+            <td>IndexedDB</td>
+            <td>Deine Gespräche und dein Fortschritt, verschlüsselt, nur auf deinem Gerät. Bei BYOK auch dein eigener API-Schlüssel, verschlüsselt</td>
+            <td>Bis du sie löschst</td>
           </tr>
           <tr>
             <td>Local Storage</td>
-            <td>Speichert deine Spracheinstellung sowie deine Einwilligungs-Entscheidungen (zum Beispiel agb_consent, und bei Werbe-Messung agc_ad_consent)</td>
-            <td>Bis zur manuellen Löschung</td>
+            <td>Spracheinstellung, Zustimmung zu den Nutzungsbedingungen, Altersbestätigung, Zustand der App (Fortschritt, gesehene Hinweise)</td>
+            <td>Bis du sie löschst</td>
+          </tr>
+          <tr>
+            <td>Local Storage (agora_client_id)</td>
+            <td>Zufällige Browser-Kennung für das tägliche kostenlose Kontingent, nur dafür genutzt</td>
+            <td>Ein Tag</td>
+          </tr>
+          <tr>
+            <td>Local Storage (community_device_uuid)</td>
+            <td>Zufällige Kennung, damit dein Browser in der Community-Zählung nur einmal zählt. Entsteht, wenn du die Community-Seite öffnest</td>
+            <td>Bis du sie löschst</td>
+          </tr>
+          <tr>
+            <td>Local Storage (agc_ad_consent)</td>
+            <td>Deine Antwort auf die Frage zur Werbe-Messung, Ja oder Nein, mit Version und Datum, damit wir sie respektieren</td>
+            <td>12 Monate</td>
+          </tr>
+          <tr>
+            <td>Session Storage</td>
+            <td>Was du auf unseren Seiten gewählt hast, bevor du in die App gehst, ob die Startseite dich schon weitergeleitet hat, bereits erstellte Zusammenfassungen</td>
+            <td>Bis du den Tab schließt</td>
+          </tr>
+          <tr>
+            <td>Session Storage (agc_gclid), nur nach deinem Ja</td>
+            <td>Die Klick-ID der Anzeige</td>
+            <td>Bis du den Tab schließt oder widerrufst</td>
+          </tr>
+          <tr>
+            <td>Session Storage (agc_conv_fired_*, agc_listened_seconds), nur nach deinem Ja</td>
+            <td>Verhindert, dass ein Schritt doppelt an Google geht, und zählt die Sekunden bis zum 30-Sekunden-Schritt</td>
+            <td>Bis du den Tab schließt oder widerrufst</td>
           </tr>
         </tbody>
       </table>
@@ -77,7 +97,7 @@ const description = 'Cookie-Richtlinie von Agora Cosmica. Wir verwenden keine Tr
     <section>
       <h2>Sicherheits-Cookie (__cf_bm)</h2>
       <p>
-        Wir verwenden ein technisch notwendiges Cookie, das Cloudflare für Bot-Schutz und Firewall (WAF) setzt. Es trackt dich nicht über Websites hinweg, enthält keine personenbezogenen Daten und ist nötig, damit die Anwendung sich vor automatisiertem Missbrauch schützen kann.
+        Wir verwenden ein technisch notwendiges Cookie, das Cloudflare für Bot-Schutz und Firewall (WAF) setzt. Es trackt dich nicht über Websites hinweg, enthält keine personenbezogenen Daten und ist nötig, damit die Anwendung sich vor automatisiertem Missbrauch schützen kann. Nach einer Sicherheitsprüfung setzt Cloudflare außerdem cf_clearance, ebenfalls technisch notwendig.
       </p>
 
       <table>
@@ -102,7 +122,7 @@ const description = 'Cookie-Richtlinie von Agora Cosmica. Wir verwenden keine Tr
 
     <section>
       <h2>Was wir NICHT verwenden</h2>
-      <p>Abgesehen vom oben genannten Sicherheits-Cookie verwenden wir KEINE:</p>
+      <p>Abgesehen von den oben genannten Sicherheits-Cookies verwenden wir KEINE:</p>
       <ul>
         <li>Analyse-Cookies oder Tracking (z.B. Google Analytics, Facebook Pixel)</li>
         <li>Marketing- oder Werbe-Cookies</li>
@@ -115,14 +135,14 @@ const description = 'Cookie-Richtlinie von Agora Cosmica. Wir verwenden keine Tr
     <section>
       <h2>Deine Datenschutzrechte</h2>
       <p>
-        Wir verwenden keine Tracking-Cookies, deine Privatsphäre ist standardmäßig geschützt. Die einzige verwaltbare Einstellung ist die freiwillige Werbe-Messung für Besuche über eine Google-Anzeige. Du kannst diese Einwilligung jederzeit in den Einstellungen unter „Rechtliches" widerrufen. Der Widerruf löscht den gespeicherten Klick-Identifikator. Die übrige minimale technische Speicherung ist für die Anwendung unerlässlich, etwa für deine Sprachauswahl.
+        Wir verwenden keine Tracking-Cookies, deine Privatsphäre ist standardmäßig geschützt. Die einzige Einstellung, die du verwalten kannst, ist die freiwillige Werbe-Messung für Besuche über eine unserer kostenlosen Google-Anzeigen. Du kannst diese Einwilligung jederzeit über den Link „Werbe-Messung“ unten auf jeder Seite widerrufen, oder in der App unter Einstellungen › Rechtliches. Der Widerruf löscht die gespeicherte Klick-ID und vermerkt dein Nein. Die übrige Speicherung ist für Funktionen nötig, die du nutzt, etwa deine Sprachauswahl.
       </p>
     </section>
 
     <section>
       <h2>Datenschutzfreundliche Analyse</h2>
       <p>
-        Wir zählen anonyme, aggregierte Ereignisse über einen eigenen serverseitigen Zähler (kein Drittanbieter-Dienst, kein Cookie, kein Pixel). Erfasst werden nur strukturelle Angaben wie der genutzte Endpunkt, die Sprache und ein vom Cloudflare-Edge ermitteltes Länder-Kürzel. Es werden keine IP-Adressen in der Analyse gespeichert, keine Einzelpersonen verfolgt und keine Profile gebildet. Einzelheiten beschreibt unsere Datenschutzerklärung im Abschnitt „Reichweitenmessung".
+        Wir zählen anonyme Ereignisse über einen eigenen Zähler auf unserem Server (kein Drittanbieter-Dienst, kein Cookie, kein Pixel). Jede Zählung trägt nur grobe Angaben, etwa was geschah, die Sprache, ein Länder-Kürzel und die Geräteart, und beim Start eines Besuchs ein grobes Stichwort zur Herkunft, zum Beispiel „Suche“ oder „direkt“. Für die Zählung wird nichts auf deinem Gerät gespeichert oder ausgelesen. Wir speichern keine IP-Adressen in der Analyse, verfolgen keine Einzelpersonen und bilden keine Profile. Einzelheiten stehen in unserer Datenschutzerklärung im Abschnitt „Reichweitenmessung“.
       </p>
     </section>
 
