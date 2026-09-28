@@ -9,7 +9,7 @@
 import { lang } from '../../content'
 import { assetAddress, assetPyramidBase } from '../../../stack/materials'
 import { loadManifest, type ManifestEntry, type ManifestIndex } from '../../../manifest'
-import { createDeepPlatePayload, type DeepPlateDetail, type DeepPlateSource, type DeepPlateTier } from '../../vitrine/deep-plate'
+import { createDeepPlatePayload, type DeepPlateDetail, type DeepPlatePayload, type DeepPlateSource, type DeepPlateTier } from '../../vitrine/deep-plate'
 import type { DeepTilePyramid } from '../../vitrine/deep-viewer'
 import type { VitrineExhibit, VitrineRect } from '../../vitrine'
 import { validatePaintingRecord } from '../pictures/policy'
@@ -34,11 +34,6 @@ const CARDS = JSON.parse(cardsRaw) as {
 const DESCRIPTIONS = (JSON.parse(platesRaw) as { descriptions: Record<string, Words> }).descriptions
 type DetailRect = { x: number; y: number; w: number; h: number; name_en: string; name_de: string }
 const LINES = (JSON.parse(linesRaw) as { lines: Record<string, { detail?: DetailRect }> }).lines
-
-/** The whole plate stands in front of the close look of the same work, so
- * it carries the same id with one word after it. */
-const WHOLE = '/whole'
-export const isWholePlate = (id: string | null): boolean => Boolean(id?.endsWith(WHOLE))
 
 /** THE RULE'S NUMERALS, as the card models write them. A numeral is a
  * measurement and reads the same in both languages, so the centimetres are
@@ -191,12 +186,12 @@ function platePxPerCm(work: PictureWork, plate: ResolvedPicturePlate,
   return Math.max(across / work.width_cm, down / work.height_cm)
 }
 
-/** THE WHOLE PLATE AS AN EXHIBIT of the wing's own window: the same label
- * the room hangs, folded to its first line, the deep viewer as its payload,
- * and three controls. Back returns to the close look the visitor came from,
- * which is the one motion this window adds to the wall. */
-export function createVinciWholePlate(options: {
-  /** The picture exhibit this one stands in front of. */
+/** A PAINTING'S ONE VIEW: the same label the room hangs, the deep viewer as
+ * its payload, the record and Close. The eye walks to the work in the room
+ * and the plate seats itself on the frame the walk lands on, then fits: the
+ * walk is the way in, and there is no second view of the same work. */
+export function createVinciPaintingView(options: {
+  /** The picture exhibit's own id. */
   id: string
   title: string
   line: string | null
@@ -207,20 +202,19 @@ export function createVinciWholePlate(options: {
   visualNote: string | null
   /** The record and Close, composed by the wing as they are everywhere. */
   controls: readonly HTMLElement[]
-  /** Walk back to the close look. */
-  back(): void
+  /** The work's rectangle on the frame the eye stands at, or null. */
   from(): VitrineRect | null
+  /** True once the eye stands at the work. */
+  standing(): boolean
   tier(): DeepPlateTier
   /** The phone folds the card so the viewport takes the sheet. */
   narrow: boolean
   /** the number on the work's frame and its catalogue words, where it hangs under one */
   catalogue?: HangCatalogue | null
-}): VitrineExhibit {
+}): VitrineExhibit & { payload: DeepPlatePayload } {
   const language = lang()
   const registration = pictureDisplayWindow(options.plate.plate)
   const cut = registration ? pictureDisplayUV(registration) : null
-  // The same label the close look carries, folded where it folds there: the
-  // plate is what this window is for, and the words stand beside it.
   const label = createWindowWorkLabel(options.work, options.entries, language, options.narrow, Boolean(options.catalogue?.kind))
   // THE DEEP SOURCE WHERE THE STORE HOLDS ONE. Its pixels are the view's
   // ceiling and the rule's own scale, so the centimetres are measured
@@ -239,27 +233,21 @@ export function createVinciWholePlate(options: {
     words: { whole: CARDS.controls.machine.viewpoints[0]![language], nearer: NEARER[language],
       further: FURTHER[language], ceiling: CARDS.zoom_ceiling[language], rule: RULE },
     from: options.from,
+    standing: options.standing,
     tier: options.tier,
     pxPerCm: platePxPerCm(options.work, options.plate, cut, deep ? deep.width / options.plate.pixels.width : 1),
     details: vinciPlateDetails(options.id),
   })
-  /* AN OPEN WINDOW OWNS THE SCREEN. The reproduction is the whole subject of
-     this view, and on the phone it was read through a third of the height
-     while the sheet under it stood half empty. The viewer takes the window
-     and the card folds to its peek over the foot, which is the rule the
-     other windows of this wing already stand on. */
+  /* AN OPEN WINDOW OWNS THE SCREEN. On the phone the viewer takes the window
+     and the card folds to its peek over the foot, the rule the other windows
+     of this wing already stand on. */
   if (options.narrow) Object.assign(payload, { fill: true })
-  const back = document.createElement('button')
-  back.type = 'button'
-  back.className = 'vitrine-control'
-  back.textContent = CARDS.controls.shared.back[language]
-  back.addEventListener('click', options.back)
   return {
-    id: `${options.id}${WHOLE}`,
+    id: options.id,
     title: options.title,
     line: options.line,
     card: [label],
-    controls: [back, ...options.controls],
+    controls: [...options.controls],
     payload,
     work: () => payload.origin(),
     catalogue: options.catalogue ?? null,

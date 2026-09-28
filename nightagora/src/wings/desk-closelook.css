@@ -323,6 +323,16 @@ body:has(dialog[open]) #wing[data-desk~='closelook'] .desk-clb {
    The viewer's own ground goes with them: on a stage of its own the leaf
    stands on the room, not on a black plate laid over it. */
 #wing[data-desk~='closelook'] .vitrine[data-narrow='false'] .deep-plate[data-seated='true'] { background: transparent; }
+/* A PAINTING'S ONE VIEW STANDS ON THE GROUND, never on the room: once the
+   plate has grown out of the frame the walk landed on, the held frame would
+   show the work's own frame and wall beside a plate that no longer stands
+   there. The held frame stays undimmed until the plate is seated on it, and
+   the ground comes up while the plate grows. */
+#wing[data-desk~='closelook'] .vitrine[data-payload='deep-plate'] .vitrine-scrim { background: transparent; transition: background-color .4s ease-out; }
+#wing[data-desk~='closelook'] .vitrine[data-payload='deep-plate']:has(.deep-plate[data-seated='true']) .vitrine-scrim { background: #0a0f13; }
+@media (prefers-reduced-motion: reduce) {
+  #wing[data-desk~='closelook'] .vitrine[data-payload='deep-plate'] .vitrine-scrim { transition: none; }
+}
 /* the corner that named the side on the glass is the band's name row now */
 #wing[data-desk~='closelook'] .vitrine[data-narrow='false'] .deep-stand { display: none; }
 #wing[data-desk~='closelook'] .vitrine[data-narrow='false'] .reader-shelf { display: none; }

@@ -115,6 +115,9 @@ const STAND_CLEAR = 22
 
 /** One step nearer, which is what a press and a key each take. */
 const ZOOM_STEP = 1.4
+/** Frames the room draws at the standing eye before it is held, so the
+ * frame the viewer seats on is the arrival and not the last stride. */
+const SETTLE_FRAMES = 2
 
 export function createDeepPlatePayload(options: {
   /** The work's own name, and the viewport's accessible name where no
@@ -138,6 +141,10 @@ export function createDeepPlatePayload(options: {
   /** The source standing now has drawn its first tile: the caller may take
    * down whatever ground it laid under the viewer. */
   onDrawn?(): void
+  /** True once the eye stands where it will stand for this work. Given, the
+   * room draws the walk up to the work and the viewer seats itself on the
+   * frame the walk lands on; absent, it seats at once on the frame held now. */
+  standing?(): boolean
 }): DeepPlatePayload {
   let host: VitrinePayloadHost | undefined
   let root: HTMLDivElement | undefined, stage: HTMLDivElement | undefined
@@ -147,7 +154,7 @@ export function createDeepPlatePayload(options: {
   let library: typeof import('openseadragon') | undefined
   let live = false, seated = false, tileSize = 256, tilePixels = 256 * 256, said = ''
   let framed: DeepPlateDetail | null = null
-  let grown = false, drawn = false, waiting = 0, homeZoom = 0
+  let grown = false, drawn = false, waiting = 0, homeZoom = 0, settled = 0, arrived = false
   let seat: VitrineRect | null = null
   /** The source standing in the viewer now. A reading replaces it; a plate
    * never does. */
@@ -418,6 +425,15 @@ export function createDeepPlatePayload(options: {
     readout()
   }
 
+  /** The eye stands: the frame it stands in is held and the viewer is
+   * seated on the work where that frame shows it. */
+  function arrive(): void {
+    if (!host) return
+    seat = options.from()
+    host.surface('hold')
+    void mountViewer()
+  }
+
   /** Nearer or further by one step, bounded by the same constraints the
    * wheel and the keys are bounded by, so no press passes the ceiling. */
   function zoom(factor: number): void {
@@ -472,8 +488,6 @@ export function createDeepPlatePayload(options: {
       next.element.append(root)
       next.element.tabIndex = 0
       next.describe(shown.description ?? shown.title)
-      seat = options.from()
-      next.surface('hold')
       next.controls.append(press(options.words.whole, () => {
         fitHome(host?.reducedMotion ?? false)
       }))
@@ -484,7 +498,16 @@ export function createDeepPlatePayload(options: {
       // ONE CONTROL PER LINE THAT POINTS: the name is the one the wing's own
       // register already carries, in both languages.
       for (const detail of shown.details ?? []) next.controls.append(press(detail.name, () => frame(detail)))
-      void mountViewer()
+      settled = 0
+      arrived = !options.standing
+      if (arrived) arrive()
+      else next.surface('room')
+    },
+    update() {
+      if (!host || arrived || !options.standing) return
+      if (!options.standing()) { settled = 0; return }
+      // the room draws the standing eye twice before its frame is held
+      if (++settled > SETTLE_FRAMES) { arrived = true; arrive() }
     },
     show(next) {
       shown = next
@@ -520,11 +543,12 @@ export function createDeepPlatePayload(options: {
       measure()
     },
     key(event) {
-      // THE KEYS OF AN OPEN PLATE ARE THE PLATE'S, from the moment it is
-      // mounted: arrows that walked the wall would otherwise carry the
-      // visitor off the work while the viewer is still arriving.
+      // THE ARROWS PAN A PLATE THE VISITOR HAS MOVED IN ON. At Home there is
+      // nothing to pan, so left and right are the wall's and step the works.
       const mine = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', '+', '=', '-', '0']
       if (!mine.includes(event.key)) return false
+      const home = !viewer || !homeZoom || viewer.viewport.getZoom(true) <= homeZoom * 1.02
+      if ((event.key === 'ArrowLeft' || event.key === 'ArrowRight') && home) return false
       if (!viewer || !library || !host) return true
       const now = host.reducedMotion, step = event.shiftKey ? .25 : .1
       const pan = (x: number, y: number): void => {
@@ -542,6 +566,7 @@ export function createDeepPlatePayload(options: {
     },
     unmount() {
       live = false
+      arrived = false
       clearTimeout(waiting)
       waiting = 0
       // v6 destroys only what it made, and the stage it stood in goes with

@@ -40,7 +40,6 @@ import { MAIN_HANG, REGISTER, type PictureRights } from './pictures/register'
 import { MACHINE_SLUGS, machineCatalog } from './machines/catalog'
 import { validatePaintingRecord } from './pictures/policy'
 import { validateSheetRecord } from './pictures/sheet-record'
-import { pictureDisplayUV, pictureDisplayWindow } from './pictures/registration'
 import { assetAddress } from '../../stack/materials'
 import { createCollectionReceiverPlaneShadowFilter } from './receiver-plane-shadow'
 import { createCollectionAccess, collectionAccessPoint, collectionAccessProvenance } from './collection-access'
@@ -87,7 +86,7 @@ import { CERTAINTY as LINE_CERTAINTY } from './line'
 import { GRAVE_DEATHBED } from './grave/placement'
 import { loadManifest, type ManifestIndex } from '../../manifest'
 import { createPlatePayload } from '../vitrine/picture'
-import { createVinciWholePlate, isWholePlate, vinciPlateDescription } from './collection/deep-plate'
+import { createVinciPaintingView } from './collection/deep-plate'
 import type { VitrineRect } from '../vitrine'
 import { machineBuildOf, machinesStanding, onMachineStanding } from './machines'
 import { createVinciHangStrip, vinciSheetTitle, type VinciStripEntry } from './collection/strip'
@@ -987,10 +986,10 @@ export function createWing():VinciWingModule {
         // visitor stands, so shutting it leaves the grid and the valve's niche
         // in one frame (a run behind the held reader walked the grid unseen).
         if(readWhole(isLeafDoor(id)?id.slice(0,-LEAF_DOOR.length):id))return false
-        if(!isWholePlate(id)&&wallRun(isLeafDoor(id)?id.slice(0,-LEAF_DOOR.length):id))return true
-        // THE WHOLE PLATE IS THE SAME PLACE: the visitor already stands where
-        // the work hangs, so the eye neither walks out to it nor back from it.
-        if(isWholePlate(id)||isWholePlate(from)||isLeafDoor(id)||isLeafDoor(from))return false
+        if(wallRun(isLeafDoor(id)?id.slice(0,-LEAF_DOOR.length):id))return true
+        // A LEAF DOOR IS THE SAME PLACE: the visitor already stands where the
+        // work is, so the eye neither walks out to it nor back from it.
+        if(isLeafDoor(id)||isLeafDoor(from))return false
         // A LEG LEAVES FROM ITS OWN STATION ONLY: a hall machine opened from the
         // hall's other station opens where the visitor stands.
         const pose=vinciApproachStation(id)===hereContent().id?vinciApproachPose(id,narrow()):undefined
@@ -1630,7 +1629,7 @@ export function createWing():VinciWingModule {
    * eye does not stand at, or a certified approach from the standing station.
    * Where neither holds, the press opens a label where the visitor stands. */
   function markWalks(id:string):boolean {
-    if(isWholePlate(id)||isLeafDoor(id)||activeView||!railReady()||opensHere(id)||readWhole(id))return false
+    if(isLeafDoor(id)||activeView||!railReady()||opensHere(id)||readWhole(id))return false
     const wall=vinciWallOfExhibit(id), at=wallAt()
     if(wall&&wall===wallOn()&&at!==undefined&&vinciWallVertex(wall,id)!==undefined){
       const stops=wallRow()
@@ -2137,7 +2136,6 @@ export function createWing():VinciWingModule {
     // controls in places of its own asks for the role and never for the word.
     const role=words===VINCI_VITRINE_WORDS.provenance?'record'
       :words===VINCI_VITRINE_WORDS.close?'close'
-      :words===VINCI_VITRINE_WORDS.wholePlate?'zoom'
       :words===VINCI_VITRINE_WORDS.back?'back':''
     if(role)button.dataset['role']=role
     return button
@@ -2524,37 +2522,18 @@ export function createWing():VinciWingModule {
     // own record; the vitrine keeps the one the visitor reads.
     // THE NUMBER ON ITS FRAME: a work of the hang is read as its catalogue entry
     const catalogue=hangCatalogue(work,entry.face,entries,lang())
-    const label=createWindowWorkLabel(work,entries,lang(),narrow(),Boolean(catalogue?.kind))
-    const controls:HTMLElement[]=[]
+    const controls:HTMLElement[]=[control(VINCI_VITRINE_WORDS.provenance,()=>showExhibitRecord(id,work,entries,evidence)),shut]
     const workRectNow=():VitrineRect|null=>{const nav=rail.navigation;return nav.exhibit===id&&!nav.active?workRect(entry.object):null}
-    if(plate){
-      // THE WHOLE PLATE stands in the same window, one press on from the
-      // close look: the source itself, as deeply as the store holds it. The
-      // rectangle is taken here, where the room's own frame still shows the
-      // work, so the deep view opens on it without a jump.
-      const whole=control(VINCI_VITRINE_WORDS.wholePlate,()=>{
-        if(!closeLook||!plate)return
-        const seat=workRectNow()
-        closeLook.open(createVinciWholePlate({id,title,line:vinciLine(id),work,entries,plate,...vinciLimits(id),
-          controls:[control(VINCI_VITRINE_WORDS.provenance,()=>showExhibitRecord(id,work,entries,evidence)),
-            control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())],
-          back:()=>openExhibit(id,null),from:()=>seat,narrow:narrow(),catalogue,
-          tier:()=>hosts?.world.stack.tierName()??'standard'}),whole,'advance')
-      })
-      controls.push(whole)
-    }
-    controls.push(control(VINCI_VITRINE_WORDS.provenance,()=>showExhibitRecord(id,work,entries,evidence)),shut)
     const title=text(workTitle(work,entry.face))
-    // The room cuts its plate to the source's approved display window, and
-    // the payload shows the same share of the same file.
-    const registration=plate?pictureDisplayWindow(plate.plate):null
-    const cut=registration?pictureDisplayUV(registration):null
-    const payload=plate?createPlatePayload({src:assetAddress(validatePaintingRecord(plate.preview,'painting-preview').entry),title,
-      description:vinciPlateDescription(id),aspect:plate.pixels.width/plate.pixels.height,window:cut,
-      standing:()=>{const nav=rail.navigation;return !nav.active&&!nav.approaching}}):null
+    const certainty=own(pictureCertainty(policyLabelText(work,entries).colour))
     openMode=how
-    closeLook.open({id,title,line:vinciLine(id),card:[label],payload,controls,walk,...vinciLimits(id),...own(pictureCertainty(policyLabelText(work,entries).colour)),
-      catalogue,work:workRectNow},from,how_)
+    // ONE VIEW OF A PAINTING. The eye walks to it in the room, and the plate
+    // with its rule and its zoom takes the window where the walk lands.
+    if(plate)closeLook.open({...createVinciPaintingView({id,title,line:vinciLine(id),work,entries,plate,...vinciLimits(id),controls,
+      from:workRectNow,standing:()=>{const nav=rail.navigation;return !nav.active&&!nav.approaching},
+      narrow:narrow(),catalogue,tier:()=>hosts?.world.stack.tierName()??'standard'}),walk,...certainty},from,how_)
+    else closeLook.open({id,title,line:vinciLine(id),card:[createWindowWorkLabel(work,entries,lang(),narrow(),Boolean(catalogue?.kind))],
+      payload:null,controls,walk,...vinciLimits(id),...certainty,catalogue},from,how_)
     openMode='auto'
   }
   /** The door asks about the place the visitor is standing in, so the
