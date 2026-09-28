@@ -24,13 +24,12 @@ interface RechtDatenschutzPanelProps {
   onNavigateToAIInfo?: () => void;
 }
 
-type SubProcessorKey = 'hetzner' | 'nebius' | 'cloudflare' | 'openrouter';
+type SubProcessorKey = 'hetzner' | 'nebius' | 'cloudflare';
 
 const SUB_PROCESSORS: { key: SubProcessorKey; avatar: string }[] = [
   { key: 'hetzner', avatar: 'H' },
   { key: 'nebius', avatar: 'N' },
   { key: 'cloudflare', avatar: 'CF' },
-  { key: 'openrouter', avatar: 'OR' },
 ];
 
 const RechtDatenschutzPanel: FC<RechtDatenschutzPanelProps> = ({ onNavigateToAIInfo }) => {

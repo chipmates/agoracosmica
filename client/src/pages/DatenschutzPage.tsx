@@ -243,9 +243,9 @@ const DatenschutzPage: FC = () => {
           <p><strong>Auftragsverarbeiter:</strong></p>
           <ul>
             <li>Nebius B.V. (Niederlande), Verarbeitung in uk-south1 (Vereinigtes Königreich) und eu-north1 (Finnland, EWR). Zweck: KI-Inferenz (Textgenerierung) im kostenlosen Modus. Das primär eingesetzte Modell antwortet aus dem Vereinigten Königreich. Das Ausweichmodell in Finnland antwortet, wenn das Tagesbudget des primären Modells aufgebraucht oder das Modell nicht erreichbar ist. Keine Datenaufbewahrung (Zero Data Retention aktiviert, von Nebius für unser gesamtes Organisationskonto und alle Regionen angewendet). Kein Training mit Nutzerdaten. Auftragsverarbeitungsvertrag in den Nebius-Nutzungsbedingungen integriert.</li>
-            <li>OpenRouter, Inc. (USA). Zweck: API-Routing für KI-Inferenz im BYOK-Modus (Bring Your Own Key). Nutzer stellen ihren eigenen API-Schlüssel bereit, der ausschließlich lokal im Browser gespeichert wird. OpenRouter leitet Anfragen an den gewählten KI-Anbieter weiter. Datenschutzrichtlinie: <a href="https://openrouter.ai/privacy">https://openrouter.ai/privacy</a>.</li>
             <li>Cloudflare, Inc. (USA), Verarbeitung überwiegend in Europa. Zweck: API-Proxy, Sicherheit (WAF, Bot-Schutz), Rate Limiting. Auftragsverarbeitungsvertrag im Cloudflare Dashboard abrufbar. EU Cloud Code of Conduct Compliance Mark.</li>
           </ul>
+          <p><strong>Eigener Schlüssel (BYOK):</strong> Wenn Sie Ihren eigenen OpenRouter-Schlüssel hinterlegen, sendet Ihr Browser Ihre geschriebenen Nachrichten direkt an OpenRouter, Inc. (USA), unter Ihrem eigenen OpenRouter-Konto und dessen Bedingungen. Diese Nachrichten laufen nicht über unsere Server, und wir sind an diesem Austausch nicht beteiligt. Ihr Schlüssel wird nur in Ihrem Browser gespeichert, verschlüsselt. Solange der Schalter „Zero Data Retention“ an ist (Standard), bittet die App OpenRouter, nur an Anbieter weiterzuleiten, die keine Daten aufbewahren. Datenschutzrichtlinie von OpenRouter: <a href="https://openrouter.ai/privacy">https://openrouter.ai/privacy</a>.</p>
           <p><strong>Speicherdauer:</strong> Chat-Inhalte speichern wir nicht auf unseren Servern. Jede Nachricht läuft über unseren Server zum KI-Modell, die Antwort wird per Streaming an Ihren Browser übertragen. Unsere Server-Logs erfassen Fehler ohne Nachrichteninhalte. Um das tägliche kostenlose Kontingent durchzusetzen und den Dienst zu schützen, halten unsere Server die zufällige Browser-Kennung und die IP-Adresse oder einen mit geheimem Schlüssel gebildeten Hashwert davon höchstens 24 Stunden vor. Blockiert der Inhaltsfilter eine Nachricht, bewahren wir bis zu 90 Tage einen Sicherheitsvermerk ohne den Nachrichtentext auf: Zeitpunkt, Art der Blockierung, Persönlichkeit, Modus, Sprache und einen mit geheimem Schlüssel gebildeten Hashwert der IP-Adresse (pseudonymisiert). IP-Adressen gelangen nie in unsere Analytik.</p>
           <p><strong>Hinweis:</strong> Bitte geben Sie keine personenbezogenen Daten (Name, Adresse, Telefonnummer, E-Mail, Bankdaten) in den Chat ein.</p>
         </section>
@@ -340,11 +340,6 @@ const DatenschutzPage: FC = () => {
                 <td style={{ padding: '0.5rem' }}>Nebius B.V.</td>
                 <td style={{ padding: '0.5rem' }}>KI-Inferenz (kostenloser Modus)</td>
                 <td style={{ padding: '0.5rem' }}>uk-south1 (Vereinigtes Königreich, primäres Modell) und eu-north1 (Finnland, EWR, Ausweichmodell)</td>
-              </tr>
-              <tr>
-                <td style={{ padding: '0.5rem' }}>OpenRouter, Inc.</td>
-                <td style={{ padding: '0.5rem' }}>KI-Inferenz (BYOK-Modus)</td>
-                <td style={{ padding: '0.5rem' }}>USA (je nach gewähltem Modell)</td>
               </tr>
               <tr>
                 <td style={{ padding: '0.5rem' }}>Hetzner Online GmbH</td>
