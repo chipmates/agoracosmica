@@ -1246,7 +1246,8 @@ function planTurns(input: TurnInput, waitLens = false): CalmGazePlan | null {
         })
         const given = (total - Math.abs(net)) / RAD
         const red = given > GIVEN_BACK_DEG * 2 || reversals > 2 || weave > SWINGS_ALLOWED + 1
-        const cost = (red ? 1000 : 0) + total / RAD + 2 * Math.max(0, given - GIVEN_BACK_DEG) + 5 * weave + 3 * askew + 2 * aside + 5 * slow + ASLANT_COST * aslant + SPARE_STAND_COST * spare
+        // a doorway passed askew outweighs the seconds a quicker stand saves: its jamb looms
+        const cost = (red ? 1000 : 0) + total / RAD + 2 * Math.max(0, given - GIVEN_BACK_DEG) + 5 * weave + 5 * askew + 2 * aside + 5 * slow + ASLANT_COST * aslant + SPARE_STAND_COST * spare
           + (strict ? TIME_WEIGHT * (walked + standTime + BACKWARD_WEIGHT * backward) : 0)
         const choice = { cost, stretches, startTurn, endTurn, picks, longs }
         if (strict) ranked.push(choice)
