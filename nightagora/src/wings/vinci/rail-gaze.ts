@@ -889,9 +889,11 @@ function planTurns(input: TurnInput, waitLens = false): CalmGazePlan | null {
   const pullBack = cuts[1]! <= PULL_BACK_M && stops.length > (pushIn ? 1 : 0)
   // a view off its way by more than a right angle is turned from standing; a
   // doorway near an end may be faced from standing, if the walk is calmer so
-  const mustStart = !pullBack && (input.turns.start || input.turns.floor === true) && leavingOff > TURN_AWAY_DEG
+  const mustStart = !pullBack && (input.turns.start || input.turns.floor === true) && leavingOff > (input.turns.scripted === true ? DOOR_TURN_DEG : TURN_AWAY_DEG)
   const mayStart = !pullBack && (doorNear(0, Math.min(cuts[1]!, DOOR_NEAR_M)) || input.turns.mayEnds === true) && leavingOff > DOOR_TURN_DEG
-  const mustEnd = !pushIn && (input.turns.end || input.turns.floor === true) && arrivingOff > TURN_AWAY_DEG
+  // a scripted walk leaves and arrives on its own headings, turned to them
+  // standing wherever they and the held views part by more than a door's turn
+  const mustEnd = !pushIn && (input.turns.end || input.turns.floor === true) && arrivingOff > (input.turns.scripted === true ? DOOR_TURN_DEG : TURN_AWAY_DEG)
   const mayEnd = !pushIn && (doorNear(Math.max(cuts[cuts.length - 2]!, L - DOOR_NEAR_M), L) || input.turns.mayEnds === true) && arrivingOff > (input.turns.mayEnds === true ? SWING_DEG : DOOR_TURN_DEG)
   if (!mustStart && !mayStart && !mustEnd && !mayEnd && !stops.length) return null
   const lensCaps = capsFor(input.lensPixels)

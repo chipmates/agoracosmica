@@ -10,6 +10,8 @@
  * named as a body at a distance rather than as a statistic.
  *
  *   node src/wings/vinci/gaze-check.mjs [--phone] [--life] [--steps 60]
+ *   ... --trace <from>'>'<to>   the leg's own samples, to stderr: share, eye,
+ *                               bearing and pitch of the view, the goal read
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -48,6 +50,7 @@ const GAZE_AHEAD_M = 6
  * this much walking between them, are the same stretch seen a second time:
  * the visitor's own reading of it is that the walk repeated itself. */
 const DOUBLED_NEAR_M = 2, DOUBLED_APART_M = 5
+const TRACE = args.includes('--trace') ? args[args.indexOf('--trace') + 1] : null
 
 const modules = new Map()
 const media = { reduced: false }
@@ -196,28 +199,67 @@ function firstHit(origin, direction) {
 }
 
 /* ---- the goal ---- */
-/** A LEG SHOWS WHERE IT GOES. The goal is the arriving view's own aim; a
- * frame shows it when that point stands inside the frame with nothing solid
- * between it and the eye. Judged over the walked stretch only: the leaving
- * and the arriving compositions are the two ends' own. */
-const GOAL = { from: .15, to: .85, edge: .9, marginM: .6 }
+/** A LEG SHOWS WHERE IT GOES. Its goal is the object the arriving view looks
+ * at, or the place the walk arrives at: a frame shows it when either stands
+ * inside the frame with nothing solid between it and the eye, or when the
+ * walk is already there. Judged over the walked stretch only: the leaving and
+ * the arriving compositions are the two ends' own. A walk between two views
+ * of one wall crabs along it by design and is not judged. */
+const GOAL = { from: .15, to: .85, edge: .9, marginM: .6, arrivedM: 1.5, lostMost: .5, walkedM: 3 }
 const goalScreen = new THREE.Vector3(), toGoal = new THREE.Vector3()
-function goalSeen(camera, goal) {
-  camera.updateMatrixWorld(true)
-  goalScreen.copy(goal).project(camera)
+function pointSeen(camera, point) {
+  goalScreen.copy(point).project(camera)
   const inFrame = goalScreen.z < 1 && Math.abs(goalScreen.x) <= GOAL.edge && Math.abs(goalScreen.y) <= GOAL.edge
-  toGoal.subVectors(goal, camera.position)
+  toGoal.subVectors(point, camera.position)
   const distance = toGoal.length()
   const clear = distance < GOAL.marginM || firstHit(camera.position, toGoal.normalize()).distance >= distance - GOAL.marginM
   return { inFrame, clear }
 }
-/** The shares of a leg's walked stretch whose goal is out of the frame, or
- * behind a solid, or either. */
+function goalSeen(camera, pose) {
+  camera.updateMatrixWorld(true)
+  const aim = pointSeen(camera, pose.at), eye = pointSeen(camera, pose.eye)
+  const arrived = camera.position.distanceTo(pose.eye) <= GOAL.arrivedM
+  return { ...aim, shown: arrived || (aim.inFrame && aim.clear) || (eye.inFrame && eye.clear) }
+}
+/** The shares of a leg's walked stretch whose aim is out of the frame, or
+ * behind a solid, or either; and whose goal is not shown at all. */
 function goalReading(samples) {
   const judged = samples.filter(sample => sample.share >= GOAL.from && sample.share <= GOAL.to && sample.goal)
   if (!judged.length) return null
   const share = test => +(judged.filter(test).length / judged.length).toFixed(3)
-  return { out: share(sample => !sample.goal.inFrame), blocked: share(sample => !sample.goal.clear), hidden: share(sample => !sample.goal.inFrame || !sample.goal.clear) }
+  return { out: share(sample => !sample.goal.inFrame), blocked: share(sample => !sample.goal.clear), hidden: share(sample => !sample.goal.inFrame || !sample.goal.clear),
+    unseen: share(sample => !sample.goal.shown) }
+}
+
+/** THE GATE JUDGES THE WALK THE VISITOR IS GIVEN: the life's own order and
+ * the rows of objects, on the desktop's frame. The phone's narrower frame
+ * loses a goal at its side on the legs it crabs by design, and the rooms'
+ * order is walked only where the address asks for it: both are read and
+ * reported, for the seat that judges their frames. */
+const judgedLost = (phone, order) => !phone && (order === 'life' || order === 'row')
+/** LOST: the share of the walked stretch where the goal is not shown and the
+ * view does not look down its own way either. A walk between two rooms
+ * shows its goal late and leads its way until then; a walk that looks at
+ * neither is looking at whatever stands beside it. */
+const LED_DEG = 45
+function lostReading(samples) {
+  const judged = samples.filter(sample => sample.share >= GOAL.from && sample.share <= GOAL.to && sample.goal)
+  if (!judged.length) return null
+  return +(judged.filter(sample => !sample.goal.shown && sample.offDegrees !== undefined && sample.offDegrees !== null && sample.offDegrees > LED_DEG).length / judged.length).toFixed(3)
+}
+/** The direction of travel at each sample and the view's angle off it. */
+function readTravel(samples) {
+  for (let i = 0; i < samples.length; i++) {
+    const previous = samples[Math.max(0, i - 1)].at, next = samples[Math.min(samples.length - 1, i + 1)].at
+    travel.subVectors(next, previous)
+    travel.y = 0
+    if (travel.lengthSq() < 1e-8) continue
+    travel.normalize()
+    look.set(0, 0, -1).applyQuaternion(samples[i].q)
+    look.y = 0
+    samples[i].offDegrees = look.lengthSq() < 1e-12 ? null
+      : +(Math.acos(Math.max(-1, Math.min(1, look.normalize().dot(travel)))) * 180 / Math.PI).toFixed(1)
+  }
 }
 
 /* ---- the walk ---- */
@@ -264,7 +306,7 @@ function readBox(camera) {
   }
 }
 
-const report = { checker: 'vinci-gaze', near: NEAR_M, run: RUN, box: BOX, rays: BOX_RAYS * BOX_RAYS, goalRule: GOAL, legs: [], links: [], flat: [], twice: [], refused: [] }
+const report = { checker: 'vinci-gaze', near: NEAR_M, run: RUN, box: BOX, rays: BOX_RAYS * BOX_RAYS, goalRule: GOAL, legs: [], links: [], flat: [], twice: [], lost: [], lostElsewhere: [], refused: [] }
 for (const phone of VIEWPORTS) {
   /* THE ROWS: each neighbouring pair of a room's row, both ways, walked as
      the rail walks it, from one viewing eye to the next. */
@@ -289,11 +331,24 @@ for (const phone of VIEWPORTS) {
         for (let step = 1; step <= STEPS; step++) {
           now = start + step * seconds / STEPS
           rail.update()
-          samples.push({ share: +(step / STEPS).toFixed(3), ...readBox(camera), goal: goalSeen(camera, toPose.at) })
+          samples.push({ share: +(step / STEPS).toFixed(3), at: camera.position.clone(), q: camera.quaternion.clone(), ...readBox(camera), goal: goalSeen(camera, toPose) })
+          if (TRACE === `${from}>${to}`) {
+            look.set(0, 0, -1).applyQuaternion(camera.quaternion)
+            console.error([phone ? 'phone' : 'desktop', 'link', rail.navigation.legGaze ?? '', (step / STEPS).toFixed(3), camera.position.x.toFixed(2), (-camera.position.z).toFixed(2),
+              'bearing', ((Math.atan2(look.x, -look.z) * 180 / Math.PI + 360) % 360).toFixed(1), 'pitch', (Math.asin(Math.max(-1, Math.min(1, look.y))) * 180 / Math.PI).toFixed(1),
+              'centre', samples.at(-1).body ?? '-', samples.at(-1).nearest, 'goal', samples.at(-1).goal.inFrame ? 'in' : 'out', samples.at(-1).goal.clear ? 'clear' : 'blocked', samples.at(-1).goal.shown ? 'shown' : 'UNSEEN'].join(' '))
+          }
         }
         for (let guard = 0; guard < 400 && rail.navigation.active; guard++) { now += .25; rail.update() }
-        report.links.push({ viewport: phone ? 'phone' : 'desktop', from, to, seconds: +seconds.toFixed(2),
-          nearest: Math.min(...samples.map(entry => entry.nearest)), goal: goalReading(samples) })
+        const goal = goalReading(samples)
+        readTravel(samples)
+        let metres = 0
+        for (let i = 1; i < samples.length; i++) metres += samples[i - 1].at.distanceTo(samples[i].at)
+        report.links.push({ viewport: phone ? 'phone' : 'desktop', from, to, seconds: +seconds.toFixed(2), metres: +metres.toFixed(2),
+          nearest: Math.min(...samples.map(entry => entry.nearest)), goal, lost: lostReading(samples) })
+        const lost = report.links.at(-1).lost
+        if (lost !== null && lost > GOAL.lostMost && metres >= GOAL.walkedM)
+          (judgedLost(phone, 'row') ? report.lost : report.lostElsewhere).push({ viewport: phone ? 'phone' : 'desktop', order: 'row', from, to, lost, goal })
       } catch (error) {
         report.refused.push({ viewport: phone ? 'phone' : 'desktop', order: 'row', from, to, why: String(error.message ?? error) })
       }
@@ -316,7 +371,7 @@ for (const phone of VIEWPORTS) {
     }
     rail.set(stops[0].station, vinciWalkPose(stops[0], phone), true, phone)
     now = 0; rail.update()
-    let standing = stops[0].id
+    let standing = stops[0].id, standingVertex
     for (let n = 1; n < stops.length; n++) for (const move of movesTo(stops[n])) {
       if (move.id === standing) continue
       rail.set(move.station, move.pose, false, phone, move.vertex)
@@ -330,7 +385,9 @@ for (const phone of VIEWPORTS) {
           rail.update()
           assertRailProjection(camera)
           const frame = step % 4 === 0 && step / STEPS >= WALKED.from && step / STEPS <= WALKED.to ? readFrame(camera) : {}
-          samples.push({ share: +(step / STEPS).toFixed(3), at: camera.position.clone(), q: camera.quaternion.clone(), ...readBox(camera), ...frame, goal: goalSeen(camera, move.pose.at) })
+          look.set(0, 0, -1).applyQuaternion(camera.quaternion)
+          const bearing = (Math.atan2(look.x, -look.z) * 180 / Math.PI + 360) % 360, pitch = Math.asin(Math.max(-1, Math.min(1, look.y))) * 180 / Math.PI
+          samples.push({ share: +(step / STEPS).toFixed(3), at: camera.position.clone(), q: camera.quaternion.clone(), bearing, pitch, ...readBox(camera), ...frame, goal: goalSeen(camera, move.pose) })
         }
         // WHERE THE BODY IS GOING, beside where the eye is looking. The step
         // between two samples is the direction of travel, and one ray along
@@ -367,10 +424,17 @@ for (const phone of VIEWPORTS) {
         rail.set(move.station, move.pose, true, phone, move.vertex)
         now += 1e-6; rail.update()
         standing = move.id
+        standingVertex = move.vertex
         continue
       }
-      const from = standing
+      const from = standing, onWall = standingVertex !== undefined || move.vertex !== undefined
       standing = move.id
+      standingVertex = move.vertex
+      if (TRACE === `${from}>${move.id}`) for (const sample of samples) {
+        console.error([phone ? 'phone' : 'desktop', order, sample.share.toFixed(3), sample.at.x.toFixed(2), (-sample.at.z).toFixed(2),
+          'bearing', sample.bearing.toFixed(1), 'pitch', sample.pitch.toFixed(1), 'centre', sample.body ?? '-', sample.nearest,
+          'goal', sample.goal.inFrame ? 'in' : 'out', sample.goal.clear ? 'clear' : 'blocked', sample.goal.shown ? 'shown' : 'UNSEEN'].join(' '))
+      }
       const flat = []
       let run = []
       const close = () => {
@@ -415,6 +479,8 @@ for (const phone of VIEWPORTS) {
         oneBodyFrames: samples.filter(entry => entry.bodies === 1).length,
         flat,
         goal: goalReading(samples),
+        lost: lostReading(samples),
+        ...(onWall ? { onWall } : {}),
       }
       const framed = samples.filter(entry => entry.floorShare !== undefined)
       if (framed.length) {
@@ -422,6 +488,8 @@ for (const phone of VIEWPORTS) {
         leg.openShare = +(framed.reduce((sum, entry) => sum + entry.openShare, 0) / framed.length).toFixed(3)
       }
       report.legs.push(leg)
+      if (!onWall && leg.lost !== null && leg.lost > GOAL.lostMost && leg.metres >= GOAL.walkedM)
+        (judgedLost(phone, order) ? report.lost : report.lostElsewhere).push({ viewport: leg.viewport, order, from, to: move.id, lost: leg.lost, goal: leg.goal })
       if (flat.length) report.flat.push(leg)
       if (doubled.length) report.twice.push(leg)
     }
@@ -432,8 +500,12 @@ for (const phone of VIEWPORTS) {
  * one mesh holds every wall of the insertion, and a long wall at a grazing
  * angle has perspective in pixels and one name here. The count is reported
  * for the seat that judges the frames. */
-report.ok = report.twice.length === 0
+/** A LEG THAT NEITHER SHOWS WHERE IT GOES NOR LOOKS DOWN ITS WAY for most of
+ * its walked stretch FAILS too: the visitor watches a wall slide past and
+ * arrives somewhere never seen coming. */
+report.ok = report.twice.length === 0 && report.lost.length === 0
 report.flatLegs = report.flat.length
 report.twiceLegs = report.twice.length
+report.lostLegs = report.lost.length
 console.log(JSON.stringify(report, null, 1))
 process.exitCode = report.ok ? 0 : 1

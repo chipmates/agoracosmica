@@ -13,7 +13,7 @@ import { collectionView } from './collection/views'
 import { GALLERY_WALK_M, vinciWallEndVertex, vinciWallIsEnd, vinciWallNearerEnd, vinciWallOfStation, type VinciWall } from './collection/wall'
 import { vinciApproachesAreNeighbours } from './collection/approaches'
 import { COURT, FLOOR, SUPPER_WALL } from './collection/layout'
-import { railAccessWaypoints, railCollectionStairWaypoints, railDoorTurns, railDoorways, railGardenPorch, railPairTurns, railPorchStands, railReadingPorch, railSide, type RailSide, type RailWaypoint } from './rail-waypoints'
+import { railAccessWaypoints, railCollectionStairWaypoints, railDoorTurns, railGateWaypoints, railDoorways, railGardenPorch, railPairTurns, railPorchStands, railReadingPorch, railSide, type RailSide, type RailWaypoint } from './rail-waypoints'
 import { fittedRailFov, assertRailProjection } from './rail-projection'
 import type { RailGeometryAuthority } from './rail-proof'
 import { hallView } from './house-hall'
@@ -395,7 +395,7 @@ const RAIL_QUICK_NAMED=28*TURN_TIME_SCALE,RAIL_QUICK_NAMED_PHONE=20*TURN_TIME_SC
  * gallery held on the wall until it stood there, the wall filling the frame
  * while the stand began to turn. These walks look toward the view already
  * as they come. */
-const RAIL_TURNED_ARRIVALS=new Set(['garden>line-early','body>line-early'])
+const RAIL_TURNED_ARRIVALS=new Set(['garden>line-early','body>line-early','body-valve>line-early'])
 /** Station walks kept as they were walked and passed, off the floor: two
  * short ones that look the same way at both ends step back rather than turn
  * round twice. */
@@ -409,7 +409,8 @@ const RAIL_WINDING_ROUND=new Set<string>()
  * the wider lens. Elsewhere a wider lens walked past a machine brings it to
  * the frame's edge, so the rule is kept to the walks it was measured on. */
 const RAIL_LENS_WAITS=new Set(['body-valve>supper-wall','supper-wall>body-valve','body>supper-wall','supper-wall>body','body>line-early','line-early>body',
-  'body>body-valve','body-valve>body','body-valve>reading-table','reading-table>body-valve','body>reading-table','reading-table>body'])
+  'body>body-valve','body-valve>body','body-valve>reading-table','reading-table>body-valve','body>reading-table','reading-table>body',
+  'body-valve>line-early','line-early>body-valve'])
 /** THE COLLECTION STAIR IS WALKED DOWN LOOKING OUT, not back: at the
  * landing, the terrace's end, the view turns south-west to the court and the
  * pavilion below, standing, holds there down the treads, and gives way to the
@@ -433,12 +434,24 @@ const RAIL_STAIRS:readonly (readonly [RailWaypoint,RailWaypoint,RailWaypoint])[]
 const RAIL_TERRACE_LOOK:Readonly<Record<string,{keys:readonly (readonly [RailWaypoint,number,number])[];end:number;sign:1|-1}>>={
   'chamber>garden':{sign:1,end:176,keys:[[railAccessWaypoints[0]!,0,2],[railAccessWaypoints[3]!,0,4],[railAccessWaypoints[4]!,0,80],
     [railCollectionStairWaypoints[0]!,-.1,85],[railCollectionStairWaypoints[0]!,0,133],[railCollectionStairWaypoints[1]!,0,135],[railCollectionStairWaypoints[2]!,0,174]]},
+  // THE WAY IN FROM THE STREET LOOKS THROUGH THE GATE, as the way back out
+  // looks up the gallery: held on the street to the gallery's mouth, turned
+  // into it there, and down it to the court, where the view turns standing
+  'arrival>courtyard':{sign:1,end:123,keys:[[railGateWaypoints[0]!,-1,80],[railGateWaypoints[1]!,0,123],[railGateWaypoints[4]!,0,123]]},
 }
 /** Stretches walked without a stand, never backward. */
 const RAIL_FLIGHTS:readonly (readonly [RailWaypoint,RailWaypoint])[]=[[railAccessWaypoints[1]!,railAccessWaypoints[2]!]]
 /** An exhibit whose viewing eye stands outside its station's room is walked
  * to and from as a route: out of the room's door facing it. */
 const RAIL_WALKED_APPROACHES:ReadonlySet<string>=new Set(['machine/proportional-compass'])
+/** THE LINKS WALKED LOOKING AT WHERE THEY GO, by their pair of exhibits: the
+ * view turns to the next object as the walk sets off and holds it in the
+ * middle of the frame all the way. A pan between the two held views walked
+ * sideways past the court's wall to the crane, and in the hall kept the next
+ * machine out of the frame for most of the way (`gaze-check.mjs`, lost). */
+const RAIL_AIMED_LINKS:ReadonlySet<string>=new Set(['machine/parachute>machine/revolving-crane',
+  'machine/miter-lock-gates>machine/flywheel','machine/flywheel>machine/miter-lock-gates',
+  'machine/camera-obscura>machine/water-lifting-screw','machine/water-lifting-screw>machine/camera-obscura']),AIM_TAKEN_M=1.5
 /** A turn made standing still may run this fast, in degrees a second: a half
  * turn in about six seconds on the desktop and eight on the phone. */
 const RAIL_QUICK_TURN=20*TURN_TIME_SCALE,RAIL_QUICK_TURN_PHONE=14*TURN_TIME_SCALE
@@ -595,7 +608,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
    * the certificate holds. */
   /** The certified path, and whether it is a route between two stations: the
    * one kind of leg whose gaze follows its way. */
-  function certifiedPath(request:Request):{path:ReturnType<typeof createCertifiedRailPath>;route:boolean;station?:boolean;held?:{turnFirst:boolean;liftFirst?:boolean;lensFirst?:boolean;long?:boolean};turns?:RouteTurns} {
+  function certifiedPath(request:Request):{path:ReturnType<typeof createCertifiedRailPath>;route:boolean;station?:boolean;held?:{turnFirst:boolean;liftFirst?:boolean;lensFirst?:boolean;long?:boolean};turns?:RouteTurns;aim?:Vector3} {
     // A run along the wall is the sub-path of the wall's own certified line
     // between the vertex the eye stands on and the one it is asked for.
     // A run the length of a hang is a walk down the gallery, not a step to
@@ -617,7 +630,8 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     // asking for the one beside it walks the line between the two eyes, not
     // the way out to the station and in again.
     if(request.exhibit&&request.link&&viewing?.exhibit)
-      return {path:authority.link(viewing.exhibit,request.exhibit,completed!.pose,request.pose,request.phone,camera),route:false}
+      return {path:authority.link(viewing.exhibit,request.exhibit,completed!.pose,request.pose,request.phone,camera),route:false,
+        ...(RAIL_AIMED_LINKS.has(`${viewing.exhibit}>${request.exhibit}`)?{aim:request.pose.at.clone()}:{})}
     // An exhibit that stands out of its station's room is walked to as a
     // route is, and back.
     if(request.exhibit){const walked=RAIL_WALKED_APPROACHES.has(request.exhibit)
@@ -654,6 +668,16 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
       settle()
     }
     return out.sort((a,b)=>a-b)
+  }
+  /** Where an aimed link looks from a body position: at the object it walks
+   * to, taken up over the first steps and handed to the arriving view over
+   * the last metre. */
+  function aimedAt(at:Vector3):(metres:number,until?:number)=>GazeCourse {
+    return (metres,until=path!.length)=>{
+      path!.pointAtDistance(Math.max(0,Math.min(path!.length,metres)),probe)
+      const east=at.x-probe.x,up=at.y-probe.y,south=at.z-probe.z
+      return {heading:Math.atan2(-east,-south),elevation:Math.atan2(up,Math.hypot(east,south)),weight:ramp(0,AIM_TAKEN_M,metres)*ramp(0,1,until-metres)}
+    }
   }
   /** Where the way leads from a body position on the leg under way. */
   /** A stretch of the way that ends at a stand is read no further than it. */
@@ -729,7 +753,10 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
       :planCalmGaze({from,to,lengthM:length,lensPixels,zoom,timed:seconds=>gaitLeg(length,seconds),
         fovs:[fittedRailFov(fromFov,camera.aspect,request.phone),fittedRailFov(targetFov,camera.aspect,request.phone)],
         tangent:chordHeading,
-        course:certified.route&&length>=WALKED_LEG_M?course:null,
+        course:certified.aim&&length>=WALKED_LEG_M?aimedAt(certified.aim):certified.route&&length>=WALKED_LEG_M?course:null,
+        // an aimed link turns to its object standing and walks on holding it
+        ...(certified.aim&&length>=WALKED_LEG_M?{turns:{start:true,end:true,at:[],quickDegPerSecond:request.phone?RAIL_QUICK_TURN_PHONE:RAIL_QUICK_TURN,
+          wideDegPerSecond:request.phone?RAIL_QUICK_WIDE_PHONE:RAIL_QUICK_WIDE,forward:true,scripted:true}}:{}),
         ...(certified.turns&&length>=WALKED_LEG_M?{turns:{start:certified.turns.start,end:certified.turns.end,
           at:doorTurns([...railDoorTurns,...(certified.turns.stands??[]),...stairStands]),doors:doorTurns(railDoorways),porches:doorTurns(railPorchStands),stairs,
           quickDegPerSecond:request.phone?RAIL_QUICK_TURN_PHONE:RAIL_QUICK_TURN,wideDegPerSecond:request.phone?RAIL_QUICK_WIDE_PHONE:RAIL_QUICK_WIDE,

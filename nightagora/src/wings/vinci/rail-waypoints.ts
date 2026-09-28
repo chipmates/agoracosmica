@@ -229,6 +229,7 @@ const SKIPPED: Readonly<Record<string, readonly RailWaypoint[]>> = {
   'body>supper-wall': [APRON_NORTH, COURT_EAST],
   'reading-table>supper-wall': [APRON_NORTH, COURT_EAST],
   'body-valve>supper-wall': [APRON_NORTH, COURT_EAST],
+  'line-early>supper-wall': [APRON_NORTH, COURT_EAST],
 }
 /** Turns one walk makes standing, by its pair in walking order. The body
  * wall's walk to the display wall comes out of the picture room facing its
