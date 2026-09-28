@@ -1,5 +1,5 @@
 // Anonymous funnel-step beacon (Waves 1-2)
-// One-shot steps fire once per tab: cinematic_start / cinematic_end
+// One-shot steps fire once per page load: cinematic_start / cinematic_end
 // (LoginPage), welcome_shown (WelcomeDisclosureModal), first_turn and
 // first_turn_prefilled (HomePage, one or the other per send),
 // first_reply (useConversationEffects chunk handler, error variant from the
@@ -12,7 +12,7 @@
 // (the ways out of a conversation),
 // chat_depth (flushed here on chat switch
 // and unload) and the turnstile_* family (services/proxy/turnstile.ts).
-// engaged fires at most twice per tab, from the first_turn one-shot and from
+// engaged fires at most twice per page, from the first_turn one-shot and from
 // the listen tracker in utils/playbackBeacon.ts. paid_arrival fires once per
 // pageview from utils/pageBeacon.ts. The ask_listen_* trio fires from the
 // paused-chapter ask (hooks/useAskWhileListening.ts), shown deduped per
@@ -23,10 +23,9 @@
 // Privacy: keyless aggregate counter only. No clientId, no gclid, no IP, no
 // raw milliseconds — timing leaves the browser only as a coarse bucket index.
 // There is no join key between funnel steps; the funnel is read at the
-// population level (compare totals), never per person. The one-shot dedup
-// flag lives in tab-scoped sessionStorage and is never transmitted (mirrors
-// the agc_conv_fired_* pattern in gclidCapture.ts). Never localStorage: that
-// would be cross-session memory of an individual.
+// population level (compare totals), never per person. The one-shot flag lives
+// in page memory: nothing is written to the browser's storage for counting, so
+// a reload can count a step again.
 // Disclosed in docs/MEASUREMENT.md alongside the other event counters.
 
 import { isSelfHost } from '../config/deployment';
@@ -64,7 +63,7 @@ export type FunnelStep =
   | 'figure_selected'
   | 'mode_selected'
   | 'first_reply'
-  // Why a first reply never arrived. One-shot per tab, fired next to (never
+  // Why a first reply never arrived. One-shot per page, fired next to (never
   // instead of) first_reply, so the existing counter keeps its exact shape.
   | 'first_reply_failed'
   // How deep a chat went, emitted once when the chat is left behind. Carries a
@@ -97,7 +96,7 @@ export type FunnelStep =
   // turnstile_failed drowned the real failures at roughly 14 to 1.
   | 'turnstile_token_aged'
   // The visit did something rather than only arriving. The arm rides in the
-  // mode slot and says which half of the product it was. At most two per tab:
+  // mode slot and says which half of the product it was. At most two per page:
   // the arm that qualified first, then 'both' if the other one follows.
   | 'engaged'
   // The landing URL carried the paid-ads parameter. One per pageview,
@@ -299,26 +298,19 @@ function detectLanguage(): 'en' | 'de' {
   return 'en';
 }
 
-// Tab-scoped one-shot. The flag itself never leaves the browser.
+// One-shot per page load, in memory only: counting stores nothing on the device.
+const firedSteps = new Set<FunnelStep>();
+
 function alreadyFired(step: FunnelStep): boolean {
-  try {
-    return sessionStorage.getItem(`agc_funnel_fired_${step}`) === '1';
-  } catch {
-    return false;
-  }
+  return firedSteps.has(step);
 }
 
 function markFired(step: FunnelStep): void {
-  try {
-    sessionStorage.setItem(`agc_funnel_fired_${step}`, '1');
-  } catch {
-    // Storage blocked (private mode, quota) — the beacon still fires once
-    // per page lifetime via the call sites' own guards.
-  }
+  firedSteps.add(step);
 }
 
 /**
- * Has a given funnel step already fired this tab? Lets a later step gate itself
+ * Has a given funnel step already fired on this page? Lets a later step gate itself
  * on an earlier one. first_reply uses this to stay a true reply: the figure's
  * auto-greeting dispatches the same assistant-chunk event before the visitor
  * has typed, so first_reply must wait until first_turn has fired or it would
@@ -329,7 +321,7 @@ export function hasFiredFunnelStep(step: FunnelStep): boolean {
 }
 
 /**
- * Has this tab had its first user turn at all, typed or carried? The reply
+ * Has this page had its first user turn at all, typed or carried? The reply
  * counters gate on this rather than on first_turn alone: a carried question is
  * a real turn that simply was not typed, and gating on first_turn would drop
  * every carried conversation out of first_reply.
@@ -382,7 +374,7 @@ function postFunnel(step: FunnelStep, fields: FunnelFields): void {
 }
 
 /**
- * Send a funnel-step beacon, at most once per tab per step. Fire-and-forget:
+ * Send a funnel-step beacon, at most once per page load per step. Fire-and-forget:
  * never throws, never blocks the caller, never surfaces a network failure.
  */
 export function sendFunnelBeaconOnce(step: FunnelStep, fields: FunnelFields = {}): void {
@@ -404,7 +396,7 @@ export function sendFunnelBeaconOnce(step: FunnelStep, fields: FunnelFields = {}
 /**
  * Send a funnel-step beacon on EVERY occurrence, no one-shot dedup. For the
  * volume counters (figure_selected, mode_selected) that measure how often a
- * step happens, not whether it happened this tab. Same anonymous row shape
+ * step happens, not whether it happened on this page. Same anonymous row shape
  * and fire-and-forget posture as sendFunnelBeaconOnce.
  */
 export function sendFunnelBeacon(step: FunnelStep, fields: FunnelFields = {}): void {

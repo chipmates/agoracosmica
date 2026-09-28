@@ -147,3 +147,44 @@ describe('the ?probe=1 marker', () => {
     expect(body.probe).toBe(1);
   });
 });
+
+// Counting stores nothing on the device: the one-shot flag is page memory, so a
+// fresh module (a reload) counts again and no storage key is ever written.
+describe('one-shot steps', () => {
+  function captureBeacon() {
+    const sendBeacon = vi.fn((_url: string, _body: Blob) => true);
+    Object.defineProperty(navigator, 'sendBeacon', { value: sendBeacon, configurable: true, writable: true });
+    return sendBeacon;
+  }
+
+  afterEach(() => {
+    Reflect.deleteProperty(navigator, 'sendBeacon');
+    vi.resetModules();
+  });
+
+  it('fire once per page load and write nothing to storage', async () => {
+    sessionStorage.clear();
+    const sendBeacon = captureBeacon();
+    vi.resetModules();
+    const m = await import('../../utils/funnelBeacon');
+    m.sendFunnelBeaconOnce('welcome_shown');
+    m.sendFunnelBeaconOnce('welcome_shown');
+    m.sendFunnelBeaconOnce('first_turn');
+    expect(sendBeacon).toHaveBeenCalledTimes(3); // welcome_shown, first_turn, engaged
+    expect(m.hasFiredFunnelStep('welcome_shown')).toBe(true);
+    expect(m.hasFiredFirstTurn()).toBe(true);
+    expect(sessionStorage.length).toBe(0);
+    expect(localStorage.length).toBe(0);
+  });
+
+  it('count again after a reload', async () => {
+    const sendBeacon = captureBeacon();
+    vi.resetModules();
+    (await import('../../utils/funnelBeacon')).sendFunnelBeaconOnce('welcome_shown');
+    vi.resetModules();
+    const reloaded = await import('../../utils/funnelBeacon');
+    expect(reloaded.hasFiredFunnelStep('welcome_shown')).toBe(false);
+    reloaded.sendFunnelBeaconOnce('welcome_shown');
+    expect(sendBeacon).toHaveBeenCalledTimes(2);
+  });
+});

@@ -133,14 +133,12 @@ function nowMs(): number {
   return Date.now();
 }
 
+// Once per page load, in page memory: counting writes nothing to storage.
+const countedSteps = new Set<ConsentCounter>();
+
 function countConsentStep(step: ConsentCounter, lang: Props['lang'], bucket?: number): void {
-  try {
-    const firedKey = `agc_funnel_fired_${step}`;
-    if (sessionStorage.getItem(firedKey)) return;
-    sessionStorage.setItem(firedKey, '1');
-  } catch {
-    // storage blocked: still send once per page, the worker rate-limits
-  }
+  if (countedSteps.has(step)) return;
+  countedSteps.add(step);
   try {
     // Path only, no query and no hash, exactly like the cta_click beacon.
     // The worker holds it to the same closed shape it holds that one to

@@ -144,18 +144,16 @@
   // Anonymous funnel counter: how many visitors click Start Exploring at all
   // (cta_click / homepage page-views = the CTA rate). Unlike the conversion
   // above it is keyless and unconditional: no gclid, no user dimension, same
-  // privacy posture as the /v1/page beacon. One-shot per tab. The dedup flag
-  // stays in tab-scoped sessionStorage and is never transmitted.
+  // privacy posture as the /v1/page beacon. One-shot per page load, held in
+  // page memory: counting writes nothing to the browser's storage.
   // Door names are a fixed vocabulary of page positions, not anything about the
   // visitor. Anything unexpected is dropped rather than forwarded.
   var DOOR_RE = /^[a-z_]{1,40}$/;
+  var ctaCounted = false;
 
   function sendCtaFunnelBeacon(door) {
-    try {
-      var firedKey = 'agc_funnel_fired_cta_click';
-      if (sessionStorage.getItem(firedKey)) return;
-      sessionStorage.setItem(firedKey, '1');
-    } catch (e) { /* storage blocked — still fire once, worker rate-limits */ }
+    if (ctaCounted) return;
+    ctaCounted = true;
     try {
       var docLang = (document.documentElement.lang || 'en').toLowerCase();
       var payload = {
