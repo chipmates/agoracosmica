@@ -60,7 +60,14 @@ const POEMS: Record<string, { text: string }> = {
   }
 };
 
+// The first passage is the one open on arrival, so it is the most quoted.
 const PASSAGES = [
+  {
+    key: 'silence',
+    title: 'The Silence of Love',
+    intro:
+      'The astrolabe line is the most quoted in the book: an instrument for reading heavens you cannot touch. Then the admission every honest writer on love arrives at.',
+  },
   {
     key: 'sorrow',
     title: 'Sorrow Quenched in the Beloved',
@@ -72,12 +79,6 @@ const PASSAGES = [
     title: 'The Music of Love',
     intro:
       'Love greeted as a sweet madness and a physician. Rumi names Plato and Galen, the two great healers of Greek learning, and says love outdoes them both.',
-  },
-  {
-    key: 'silence',
-    title: 'The Silence of Love',
-    intro:
-      'The astrolabe line is the most quoted in the book: an instrument for reading heavens you cannot touch. Then the admission every honest writer on love arrives at.',
   },
   {
     key: 'rose',

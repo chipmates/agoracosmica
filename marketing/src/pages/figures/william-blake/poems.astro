@@ -38,6 +38,9 @@ const metaDescription =
 const OWN_PAGE: Record<string, string> = Object.fromEntries(
   poemsByPoet('blake').map((poem) => [poem.key, poem.path]),
 );
+// Open on arrival: the collection's opening poem, and the famous contrary pair
+// most visitors come for.
+const OPEN = new Set(['introduction', 'lamb', 'tyger']);
 
 const blake = {
   '@type': 'Person',
@@ -101,14 +104,14 @@ const schemas = [
 
     <header class="esy-hero">
       <p class="esy-hero__eyebrow">In his own words</p>
-      <h1 class="esy-hero__title">William Blake</h1>
+      <h1 class="esy-hero__title">William Blake's poems</h1>
       <p class="esy-hero__lead">
         1757-1827 · London. Engraver, painter, and poet, ignored in his own
         lifetime and unlike anyone before or since. He wrote his poems, etched
         them into copper with his own illustrations, printed them, and colored
         them by hand, book by book. Here are twelve from his two contrary
         collections, the trusting songs of 1789 and the open-eyed ones of 1794,
-        each with a line of introduction to hand you the door.
+        each with a short note on what it is doing.
       </p>
     </header>
 
@@ -127,7 +130,7 @@ const schemas = [
         <div class="esy-poemlist">
           {group.poems.map((p, i) => (
             <Fragment>
-              <details class="esy-poem" open={gi === 0 && i === 0}>
+              <details class="esy-poem" open={OPEN.has(p.key)}>
                 <summary class="esy-poem__summary">{p.title}</summary>
                 <p class="esy-poem__intro">{p.intro}</p>
                 <div class="esy-poem__text">{POEMS[p.key].text.split('\n\n').map(stanza => (<div class="esy-poem__stanza">{stanza.split('\n').map(line => (<span class="esy-poem__line">{line}</span>))}</div>))}</div>
