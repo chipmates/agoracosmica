@@ -61,7 +61,7 @@ import { figureThemes } from '@client/data/public/figureSeo';
 import { getFigureQA } from '@client/data/public/figureQA';
 import { getFigurePageContent } from '@client/data/public/figurePageContent';
 import { dickinsonPoemsFaqEn, dickinsonPoemsFaqDe } from '../lib/dickinsonPoemsFaq';
-import { isFrozenFigurePage } from '../lib/frozenPages';
+import { isFrozenFigurePage, frozenWording } from '../lib/frozenPages';
 
 interface Props {
   figureId: string;
@@ -308,7 +308,7 @@ if (figure.essence) {
                 />
                 <div>
                   <div class="pub-figure-card__name">{relFigure.name}</div>
-                  <div class="pub-figure-card__tradition">{relFigure.tradition}</div>
+                  <div class="pub-figure-card__tradition">{frozenWording(frozen, lang, `tradition.${relId}`, relFigure.tradition)}</div>
                 </div>
               </a>
             );
@@ -325,7 +325,7 @@ if (figure.essence) {
         {themesForFigure.map(themeId => (
           <a href={publicUrl(lang, `/themes/${themeId}`)} class="pub-theme-card">
             <h3 class="pub-theme-card__name">{t(`themes.${themeId}.name`)}</h3>
-            <p class="pub-theme-card__tagline">{t(`themes.${themeId}.tagline`)}</p>
+            <p class="pub-theme-card__tagline">{frozenWording(frozen, lang, `themes.${themeId}.tagline`, t(`themes.${themeId}.tagline`))}</p>
           </a>
         ))}
       </div>
@@ -361,9 +361,9 @@ if (figure.essence) {
     <p class="fig-close__trust">{t('cta.trust')}</p>
   </section>
 
-  <!-- The rail only shows on phones and small tablets. Its trust line wrapped
-       to two lines in German and the bar took a third of the first screen, so
-       it keeps the free note and the door; the footer carries the trust line. -->
+  {/* The rail only shows on phones and small tablets. Its trust line wrapped
+      to two lines in German and the bar took a third of the first screen, so
+      it keeps the free note and the door; the footer carries the trust line. */}
   <div class="pub-cta pub-cta--sticky fig-rail">
     <div class="pub-cta__inner">
       {frozen && <p class="pub-cta__trust">{t('cta.trust')}</p>}

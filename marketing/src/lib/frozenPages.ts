@@ -18,3 +18,16 @@ export const FROZEN_PAGES: ReadonlySet<string> = new Set([
 export function isFrozenFigurePage(lang: 'en' | 'de', slug: string): boolean {
   return FROZEN_PAGES.has(`${lang === 'de' ? '/de' : ''}/figures/${slug}/`);
 }
+
+// Shared strings changed after the test began. A frozen page keeps the old
+// wording in its cross-links (theme cards, related figures) until the test ends.
+const FROZEN_STRINGS: Readonly<Record<string, string>> = {
+  'en:themes.meaning-purpose.tagline': 'What makes a life worth living?',
+  'en:themes.freedom-justice.tagline': 'What does it mean to be free?',
+  'de:tradition.dickinson': 'Amerikanische Poesie',
+};
+
+/** On a frozen page, the wording a shared string had when the test began; otherwise `current`. */
+export function frozenWording(frozen: boolean, lang: 'en' | 'de', key: string, current: string): string {
+  return (frozen && FROZEN_STRINGS[`${lang}:${key}`]) || current;
+}
