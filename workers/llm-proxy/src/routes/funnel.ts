@@ -31,7 +31,7 @@ interface FunnelPayload {
 }
 
 // Ad-measurement consent prompt: how many ad arrivals see the question and
-// what they answer. One-shot per tab on the client, counter-only here.
+// what they answer. One-shot per page load on the client, counter-only here.
 // The two answers carry a coarse time-to-answer bucket (0 = under 1s,
 // 1 = 1 to 3s, 2 = 3 to 10s, 3 = over 10s, measured from the moment the card
 // came into view). The shown step has nothing to time and keeps bucket 0.
@@ -44,7 +44,7 @@ const CONSENT_STEPS = ['ad_consent_shown', ...CONSENT_ANSWER_STEPS] as const;
 // Strict server-side step allowlist (Waves 1-2). Anything not on this list is
 // silently dropped — no row is written and the client learns nothing (same
 // fire-and-forget posture as the other beacons).
-// Wave-1 steps are one-shot per tab on the client. The Wave-2 figure_selected
+// Wave-1 steps are one-shot per page load on the client. The Wave-2 figure_selected
 // and mode_selected are per-occurrence volume counters (same anonymous row
 // shape, no dedup); first_reply is one-shot like Wave 1.
 const VALID_STEPS = new Set([
@@ -54,7 +54,7 @@ const VALID_STEPS = new Set([
   'welcome_shown',
   'first_turn',
   // The activation moment for a send the visitor did not type: the question
-  // came from a public page and arrived in the composer. One-shot per tab like
+  // came from a public page and arrived in the composer. One-shot per page load like
   // first_turn, and never instead of it — the two split the same total, so
   // first_turn keeps its typed-only meaning.
   'first_turn_prefilled',
@@ -62,7 +62,7 @@ const VALID_STEPS = new Set([
   'mode_selected',
   'first_reply',
   // Why a first reply never arrived, in the outcome slot: turnstile / quota /
-  // upstream / abort. One-shot per tab like first_reply, and it never replaces
+  // upstream / abort. One-shot per page load like first_reply, and it never replaces
   // first_reply — that counter keeps its exact prior shape.
   'first_reply_failed',
   // Per-chat depth, emitted once when a chat is left behind. The row carries
@@ -94,7 +94,7 @@ const VALID_STEPS = new Set([
   'turnstile_token_aged',
   // The visit did something rather than only arriving: a first typed turn, or
   // enough listening to count as listening. The arm rides in the mode slot.
-  // At most two per tab (the first arm, then 'both' if the other one follows).
+  // At most two per page load (the first arm, then 'both' if the other one follows).
   'engaged',
   // Ask while listening, per-occurrence volume counters. shown = the bar
   // arrived under a paused chapter (once per chapter play, deduped on the

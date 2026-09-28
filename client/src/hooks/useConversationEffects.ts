@@ -149,10 +149,10 @@ export const useConversationEffects = (params: UseConversationEffectsParams) => 
       setLoading(false);
       setTranslationInProgress(false);
 
-      // Funnel: first assistant reply this tab. The earliest chunk is the
+      // Funnel: first assistant reply this page load. The earliest chunk is the
       // most reliable "a reply actually arrived" point (works for BYOK too,
       // which never touches the proxy). One-shot via the shared first_reply
-      // sessionStorage key, so the per-chunk calls after the first are
+      // flag in page memory, so the per-chunk calls after the first are
       // no-ops and the HomePage dispatch-error variant can never double-
       // fire. Bucket = coarse time since dispatch start (indices 0-4),
       // never raw milliseconds.

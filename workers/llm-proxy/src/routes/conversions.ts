@@ -125,7 +125,7 @@ export async function handleConversions(
     });
   }
 
-  // Forward to Google Ads Conversion API (dual-upload to both accounts).
+  // Forward to Google Ads Conversion API (the grant account).
   // A no-op when the developer-token secret is absent. Fire-and-forget,
   // never blocks the response, never surfaces errors to the client.
   ctx.waitUntil(
