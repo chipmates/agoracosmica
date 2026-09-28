@@ -1,5 +1,5 @@
 import {
-  Mesh, Raycaster, Vector3,
+  Box3, Mesh, Raycaster, Vector3,
   type Intersection, type Material, type Object3D, type PerspectiveCamera,
 } from 'three/webgpu'
 import { deskStageHeight } from '../desk-stage'
@@ -239,7 +239,16 @@ export interface VinciExhibitMark {
   walks?: boolean
   /** The walking mark's word at rest, from the card data by key. */
   word?: string
+  /** A FLAT WORK, a painting or a sheet: its mark stands under its face and
+   * beside the name under it, never on either. */
+  face?: boolean
 }
+
+/** How far a mark's drawing reaches from its centre, halo included: the
+ * walking ring and the certainty bead. */
+const MARK_REACH = { walk: 23, detail: 13 }
+/** The air a mark keeps from a work's face and from a name. */
+const MARK_GAP = 4
 
 const MARK_SVG = 'http://www.w3.org/2000/svg'
 /** the whole circumference of the walking mark's counted ring, in user units */
@@ -293,7 +302,9 @@ export interface VinciExhibitDots {
   /** How much of the frame's foot is reserved, in pixels. */
   setFoot(pixels: number): void
   /** `panels` are the boxes of every panel standing on the frame. */
-  update(panels?: readonly VinciLabelRect[] | null, now?: number): void
+  /** `names` are the boxes of the names standing under works: a mark keeps
+   * clear of them as it keeps clear of the works' faces. */
+  update(panels?: readonly VinciLabelRect[] | null, now?: number, names?: readonly VinciLabelRect[] | null): void
   invalidate(): void
   dispose(): void
 }
@@ -354,7 +365,8 @@ export function createVinciExhibitDots(options: {
     chip.hidden = false
     const x = parseFloat(dot.style.left) || 0, y = parseFloat(dot.style.top) || 0
     const width = chip.offsetWidth, stage = view.innerWidth
-    const right = x + 26 + width <= stage - 22
+    // a mark that stands left of a name says its word on the side away from it
+    const right = dot.dataset['beside'] !== 'left' && x + 26 + width <= stage - 22
     chip.dataset['side'] = right ? 'right' : 'left'
     chip.style.left = `${right ? x + 26 : x - 26 - width}px`
     chip.style.top = `${y - 18}px`
@@ -418,6 +430,49 @@ export function createVinciExhibitDots(options: {
     host.append(dot)
   }
   const eye = new Vector3(), observedEye = new Vector3(Infinity, 0, 0), projected = new Vector3()
+  const box = new Box3(), corner = new Vector3()
+
+  /** The work's own face on the frame, or null where a corner is behind the eye. */
+  function faceOf(object: Object3D, width: number, height: number): VinciLabelRect | null {
+    box.setFromObject(object)
+    let left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity
+    for (const x of [box.min.x, box.max.x]) for (const y of [box.min.y, box.max.y]) for (const z of [box.min.z, box.max.z]) {
+      corner.set(x, y, z).project(camera)
+      if (corner.z <= -1 || corner.z >= 1) return null
+      const px = (corner.x * .5 + .5) * width, py = (-corner.y * .5 + .5) * height
+      left = Math.min(left, px); right = Math.max(right, px); top = Math.min(top, py); bottom = Math.max(bottom, py)
+    }
+    return { left, top, right, bottom }
+  }
+  /** WHERE A FLAT WORK'S MARK STANDS: where it was anchored while that
+   * covers neither the work's face nor a name under a work; else under the
+   * face, beside the name at its middle, or beside the face's foot, the first
+   * of these the frame has room for. Null where none has. */
+  function clearOf(mark: VinciExhibitMark, x: number, y: number, width: number, height: number,
+    names: readonly VinciLabelRect[] | null, fits: (x: number, y: number) => boolean)
+    : { x: number; y: number; beside: '' | 'left' | 'right' } | null {
+    const reach = mark.walks ? MARK_REACH.walk : MARK_REACH.detail
+    const face = faceOf(mark.object, width, height)
+    const meets = (px: number, py: number, rect: VinciLabelRect): boolean =>
+      px + reach + MARK_GAP > rect.left && px - reach - MARK_GAP < rect.right
+      && py + reach + MARK_GAP > rect.top && py - reach - MARK_GAP < rect.bottom
+    const nameAt = (px: number, py: number): VinciLabelRect | undefined => names?.find(name => meets(px, py, name))
+    const clear = (px: number, py: number): boolean => !(face && meets(px, py, face)) && !nameAt(px, py)
+    if (clear(x, y) && fits(x, y)) return { x, y, beside: '' }
+    const under = face ? face.bottom + MARK_GAP + reach : y
+    const tries: { x: number; y: number; beside: '' | 'left' | 'right' }[] = [{ x, y: under, beside: '' }]
+    const name = nameAt(x, under)
+    if (name) {
+      const middle = (name.top + name.bottom) / 2
+      tries.push({ x: name.left - MARK_GAP - reach, y: middle, beside: 'left' },
+        { x: name.right + MARK_GAP + reach, y: middle, beside: 'right' })
+    }
+    if (face) {
+      const foot = face.bottom - reach
+      tries.push({ x: face.left - MARK_GAP - reach, y: foot, beside: '' }, { x: face.right + MARK_GAP + reach, y: foot, beside: '' })
+    }
+    return tries.find(at => at.x - reach >= 0 && at.x + reach <= width && clear(at.x, at.y) && fits(at.x, at.y)) ?? null
+  }
   const ray = new Raycaster()
   const hits: Intersection<Mesh>[] = []
   const sight = new Map<string, boolean>()
@@ -470,7 +525,7 @@ export function createVinciExhibitDots(options: {
       foot = value
       invalidate()
     },
-    update(panels = null, now = view.performance.now()) {
+    update(panels = null, now = view.performance.now(), names = null) {
       // THE PRESSED MARK KEEPS ITS PLACE while it answers, and its ring is
       // the leg itself: the walk's own share, never a clock.
       if (answering) {
@@ -502,15 +557,18 @@ export function createVinciExhibitDots(options: {
       // the picture's own box, which is the window where no band stands
       const width = view.innerWidth, height = deskStageHeight()
       const centreX = width / 2, centreY = height / 2
-      const candidates: { mark: VinciExhibitMark; x: number; y: number; from: number }[] = []
+      const candidates: { mark: VinciExhibitMark; x: number; y: number; from: number; beside: string }[] = []
       for (const mark of marks) {
         if (!mark.object.visible) continue
         projected.copy(mark.anchor as Vector3).project(camera)
         if (projected.z <= -1 || projected.z >= 1) continue
-        const x = (projected.x * .5 + .5) * width, y = (-projected.y * .5 + .5) * height
-        if (!vinciMarkInBand(x, y, width, height, foot)) continue
-        if (underPanel(x, y, panels)) continue
-        candidates.push({ mark, x, y, from: Math.hypot(x - centreX, y - centreY) })
+        const at = { x: (projected.x * .5 + .5) * width, y: (-projected.y * .5 + .5) * height, beside: '' }
+        const fits = (px: number, py: number): boolean => vinciMarkInBand(px, py, width, height, foot) && !underPanel(px, py, panels)
+        const placed = mark.face ? clearOf(mark, at.x, at.y, width, height, names, fits) : fits(at.x, at.y) ? at : null
+        if (!placed) continue
+        const { x, y, beside } = placed
+        // which marks stand is chosen by where the works are, not where their marks stepped to
+        candidates.push({ mark, x, y, from: Math.hypot(at.x - centreX, at.y - centreY), beside })
       }
       candidates.sort((a, b) => a.from - b.from)
       const shown: typeof candidates = []
@@ -548,6 +606,8 @@ export function createVinciExhibitDots(options: {
         dot.id = vinciMarkDomId(entry.mark.id)
         dot.style.left = `${entry.x}px`
         dot.style.top = `${entry.y}px`
+        if (entry.beside) dot.dataset['beside'] = entry.beside
+        else delete dot.dataset['beside']
         dot.style.setProperty('--certainty', entry.mark.colour)
         /* THE SHAPE SAYS WHAT THE PRESS DOES, and the word says it in words:
            gold moves you, a certainty colour tells you something. */

@@ -1678,17 +1678,18 @@ export function createWing():VinciWingModule {
         const sheet=show?exhibits?.sheetSources().find(source=>`sheet/${source.sheet.id}`===entry.id):undefined
         if(show&&sheet)marks.push({id:entry.id,anchor:entry.anchor,object:entry.object,
           label:vinciSheetTitle(lang()==='de'?sheet.page.honesty_de:sheet.page.honesty_en),
-          colour:certaintyColour(show.certainty),...sign(entry)})
+          colour:certaintyColour(show.certainty),face:true,...sign(entry)})
         continue
       }
       const named=namedExhibit(entry)
-      if(named){marks.push({id:entry.id,anchor:entry.anchor,object:entry.object,label:named.title,colour:named.colour,...sign(entry)});continue}
+      if(named){marks.push({id:entry.id,anchor:entry.anchor,object:entry.object,label:named.title,colour:named.colour,
+        face:entry.workId===DEATHBED_WORK,...sign(entry)});continue}
       const found=sources.find(source=>source.work.id===entry.workId)
       if(!found)continue
       const entries=sources.filter(source=>source.work.id===entry.workId).map(source=>source.entry)
       marks.push({id:entry.id,anchor:entry.anchor,object:entry.object,
         label:text(workTitle(found.work,entry.face)),
-        colour:policyLabelText(found.work,entries).colour,...sign(entry)})
+        colour:policyLabelText(found.work,entries).colour,face:true,...sign(entry)})
     }
     const grid=bodyGridMark()
     if(grid)marks.push({...grid,...sign(picks.find(entry=>entry.id===grid.id)!)})
@@ -3144,7 +3145,9 @@ export function createWing():VinciWingModule {
       // so the reserve is the row's own top edge and not a fixed band.
       dots?.setFoot(Math.max(0,deskStageHeight()-markFloor()+12,markSafeFoot()))
       dots?.setLimit(closeLook?.id?0:onWallStop()?3:DOTS_PER_TIER[hosts.world.stack.tierName()]??6)
-      dots?.update(panels)
+      // the name under the work stands where its mark would: the mark steps aside
+      const name=quiet&&!quiet.hidden?quiet.getBoundingClientRect():null
+      dots?.update(panels,undefined,name&&name.width>0?[{left:name.left,top:name.top,right:name.right,bottom:name.bottom}]:null)
       paintPictureWords()},
     stop(){pictureWordsLayer?.dispose();pictureWordsLayer=undefined;wordsPrint=wordsDrawn="";studySheet?.dispose();studySheet=undefined;releaseSheetMemory?.();releaseSheetMemory=undefined;desk?.dispose();desk=undefined;visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;life?.dispose();life=undefined;lifeControl?.remove();lifeControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;house=undefined;houseUp=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;hallSun=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;clearSky?.dispose();clearSky=undefined;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
   }
