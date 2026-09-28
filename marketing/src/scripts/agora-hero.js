@@ -260,6 +260,7 @@ var heroEl = document.querySelector('.hero');
 var cv = $('dust'), ctx = cv.getContext('2d');
 var W = 0, H = 0, DPR = 1;
 var face = [], stream = [], raf = 0, t0 = 0, running = false;
+var doorBox = null;               /* the gold door, which the dust never paints over */
 var qWords = [], beginEl = $('begin'), chapEl = $('chapDoor'), beginLi = beginEl.closest('li');
 var seed = 20260728;
 function rnd() { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; }
@@ -314,6 +315,7 @@ function sizeCanvas() {
   DPR = Math.min(window.devicePixelRatio || 1, W < 900 ? 2 : 1.75);
   cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  doorBox = boxOf(beginEl);
 }
 
 /* Sample the painting the way the browser draws it: cover, at whatever
@@ -511,11 +513,19 @@ function reveal(tt) {
 
 function renderAt(tt) {
   ctx.clearRect(0, 0, W, H);
+  ctx.save();
+  /* the stream ends at the door's edge: the label is written, never dusted
+     over, since the canvas lies above the reading column */
+  if (doorBox) {
+    ctx.beginPath();
+    ctx.rect(0, 0, W, H);
+    ctx.rect(doorBox.x - 1, doorBox.y - 1, doorBox.w + 2, doorBox.h + 2);
+    ctx.clip('evenodd');
+  }
   ctx.globalCompositeOperation = 'lighter';
   drawFace(tt);
   drawStream(tt);
-  ctx.globalAlpha = 1;
-  ctx.globalCompositeOperation = 'source-over';
+  ctx.restore();
   reveal(tt);
 }
 
