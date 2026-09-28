@@ -13,6 +13,7 @@ import {
   Info,
   DownloadSimple,
   UploadSimple,
+  UserPlus,
 } from '@phosphor-icons/react';
 import { ModalContainer } from '../Modal';
 import { CloseButton } from '../Button';
@@ -21,7 +22,13 @@ import { computeVotingPower, computeSuggestionSlots } from './computeVotingPower
 import { VotingPowerHero } from './VotingPowerHero';
 import { TopicsList } from './TopicsList';
 import { SuggestSlotPanel } from './SuggestSlotPanel';
-import { registerVotingPower, type CommunitySnapshot } from '../../services/communityVote';
+import {
+  fetchCommunitySnapshot,
+  forgetTallyId,
+  hasJoinedTally,
+  registerVotingPower,
+  type CommunitySnapshot,
+} from '../../services/communityVote';
 import { exportHistory, importHistory } from '../../services/history/historyExportService';
 import styles from './CommunityGovernanceModal.module.css';
 
@@ -147,6 +154,9 @@ const CommunityGovernanceModal: FC<CommunityGovernanceModalProps> = ({
   );
 
   const [snapshot, setSnapshot] = useState<CommunitySnapshot | null>(null);
+  const [joined, setJoined] = useState(false);
+  const [joining, setJoining] = useState(false);
+  const [joinFailed, setJoinFailed] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Use cosmic-reveal on first open per session, faster fade-scale on subsequent.
@@ -161,13 +171,20 @@ const CommunityGovernanceModal: FC<CommunityGovernanceModalProps> = ({
     }
   }, []);
 
+  // Opening only reads the public totals. The browser's ID is created and its
+  // power sent only after "Count me in"; from then on each open updates it.
   useEffect(() => {
     if (!isOpen || !power) return;
     let cancelled = false;
-    registerVotingPower({
-      power: power.total,
-      completedFigures: power.earned,
-    })
+    const alreadyJoined = hasJoinedTally();
+    setJoined(alreadyJoined);
+    const request = alreadyJoined
+      ? registerVotingPower({
+          power: power.total,
+          completedFigures: power.earned,
+        })
+      : fetchCommunitySnapshot();
+    request
       .then((result) => {
         if (!cancelled && result) setSnapshot(result);
       })
@@ -178,6 +195,26 @@ const CommunityGovernanceModal: FC<CommunityGovernanceModalProps> = ({
       cancelled = true;
     };
   }, [isOpen, power]);
+
+  // Counted only once the server answered. A press it never answered leaves
+  // nothing behind: the ID just made is removed again.
+  const handleJoin = useCallback(async () => {
+    if (!power || joining) return;
+    setJoining(true);
+    setJoinFailed(false);
+    const result = await registerVotingPower({
+      power: power.total,
+      completedFigures: power.earned,
+    });
+    if (result) {
+      setSnapshot(result);
+      setJoined(true);
+    } else {
+      forgetTallyId();
+      setJoinFailed(true);
+    }
+    setJoining(false);
+  }, [power, joining]);
 
   const handleBackup = useCallback(async () => {
     try {
@@ -288,6 +325,59 @@ const CommunityGovernanceModal: FC<CommunityGovernanceModalProps> = ({
             }
           />
 
+          {snapshot && (
+            <section
+              className={styles.dataCard}
+              aria-labelledby="community-tally-card-title"
+            >
+              <header
+                className={`${styles.dataCardHeader} ${
+                  joined ? styles.tallyCardHeaderDone : ''
+                }`}
+              >
+                <span
+                  id="community-tally-card-title"
+                  className={styles.dataCardTitle}
+                >
+                  {tString('community.tally.title', 'Community tally')}
+                </span>
+                <span className={styles.dataCardHint} aria-live="polite">
+                  {joined
+                    ? tString(
+                        'community.tally.joinedHint',
+                        "You're counted. Your voting power is updated each time you open this page."
+                      )
+                    : tString(
+                        'community.tally.hint',
+                        'Add your voting power to the community total. A random ID then stays in this browser, so you count only once.'
+                      )}
+                </span>
+              </header>
+              {!joined && (
+                <div className={styles.dataCardActions}>
+                  <button
+                    type="button"
+                    className={styles.dataCardButton}
+                    onClick={handleJoin}
+                    disabled={joining}
+                    aria-busy={joining}
+                  >
+                    <UserPlus size={16} weight="duotone" aria-hidden="true" />
+                    <span>{tString('community.tally.join', 'Count me in')}</span>
+                  </button>
+                </div>
+              )}
+              {!joined && joinFailed && (
+                <p className={styles.tallyNote} role="status">
+                  {tString(
+                    'community.tally.failed',
+                    "Couldn't add you to the tally just now. Nothing was kept in this browser. Try again later."
+                  )}
+                </p>
+              )}
+            </section>
+          )}
+
           <section
             className={styles.dataCard}
             aria-labelledby="community-data-card-title"
@@ -305,7 +395,7 @@ const CommunityGovernanceModal: FC<CommunityGovernanceModalProps> = ({
               <span className={styles.dataCardHint}>
                 {tString(
                   'community.dataCard.hint',
-                  'Your voting power and conversations live on this device. Save them to a file you keep, or restore from one.'
+                  'Your voting power and conversations live on this device. If you add yourself to the tally, your voting power is also counted on our server. Save them to a file you keep, or restore from one.'
                 )}
               </span>
             </header>
@@ -361,10 +451,20 @@ const CommunityGovernanceModal: FC<CommunityGovernanceModalProps> = ({
               )}
             </p>
             <p className={styles.sectionNotice}>
-              {tString(
-                'community.section.notice',
-                'Voting opens in the near future. Your voting power is already counted.'
-              )}
+              {joined
+                ? tString(
+                    'community.section.notice',
+                    'Voting opens in the near future. Your voting power is already counted.'
+                  )
+                : snapshot
+                ? tString(
+                    'community.section.noticeNotJoined',
+                    'Voting opens in the near future. Count yourself in above to add your voting power.'
+                  )
+                : tString(
+                    'community.section.noticeNeutral',
+                    'Voting opens in the near future.'
+                  )}
             </p>
           </section>
 

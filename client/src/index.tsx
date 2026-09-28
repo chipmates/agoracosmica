@@ -12,6 +12,7 @@ import { useDomainStore } from './stores/domainStore';
 import { initializeSeedsCache } from './services/seedCacheInitializer';
 import { LocalStorageAdapter } from './storage/localAdapter';
 import { captureGclid } from './utils/public/gclidCapture';
+import { dropPreActId } from './services/communityVote';
 import { captureEntryIntentFromUrl } from './utils/public/entryIntent';
 import { captureArrivalSourceFromUrl } from './utils/arrivalSource';
 import { sendPageBeacon } from './utils/pageBeacon';
@@ -23,6 +24,9 @@ import { migrateHistoryToEncrypted } from './services/history/historyEncryptionM
 // App's effect fires. The app has no consent question, so it keeps a click ID
 // only when a yes is already on record and drops it otherwise.
 captureGclid();
+
+// A community ID stored before the tally asked for an explicit act goes unread.
+dropPreActId();
 
 // The landing's source class rides in the door link's fragment (#src=...).
 // Read into memory and removed from the address before anything else runs.

@@ -513,6 +513,24 @@
   outline-offset: 4px;
 }
 
+.dataCardButton:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.tallyNote {
+  margin: 10px 0 0;
+  font-family: var(--font-content);
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+/* The tally card after "Count me in" has a hint and no actions below it. */
+.tallyCardHeaderDone {
+  margin-bottom: 0;
+}
+
 .dataCardFileInput {
   position: absolute;
   width: 1px;

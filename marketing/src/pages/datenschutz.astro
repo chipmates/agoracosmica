@@ -222,7 +222,7 @@ const description = 'Datenschutzerklärung der ChipMates gemeinnützige GmbH fü
     <section>
       <h2>Community-Zählung</h2>
       <p>
-        Die Community-Seite in der App zeigt, wie viele Menschen mitmachen und wie groß ihre gemeinsame Stimmkraft ist. Wenn Sie die Community-Seite öffnen, erzeugt die App eine zufällige Kennung für diesen Browser, speichert sie in Ihrem Browser (localStorage) und sendet sie mit Ihrer Stimmkraft und der Zahl Ihrer abgeschlossenen Persönlichkeiten an unseren Server, damit jeder Browser nur einmal zählt. Unser Server bewahrt diese Werte unter einem mit geheimem Schlüssel gebildeten Hashwert der Kennung auf und löscht sie 12 Monate nach Ihrem letzten Besuch der Community-Seite. Zum Schutz vor Missbrauch hält er außerdem einen mit geheimem Schlüssel gebildeten Hashwert Ihrer IP-Adresse 6 Stunden lang vor.
+        Die Community-Seite in der App kann zeigen, wie viele Menschen mitmachen und wie groß ihre gemeinsame Stimmkraft ist. Wenn Sie sich zählen lassen, erzeugt die App eine zufällige Kennung für diesen Browser, speichert sie in Ihrem Browser (localStorage) und sendet sie mit Ihrer Stimmkraft und der Zahl Ihrer abgeschlossenen Persönlichkeiten an unseren Server, und danach bei jedem Öffnen der Community-Seite erneut, damit jeder Browser nur einmal zählt. Unser Server bewahrt diese Werte unter einem mit geheimem Schlüssel gebildeten Hashwert der Kennung auf und löscht sie 12 Monate nach Ihrem letzten Besuch der Community-Seite. Zum Schutz vor Missbrauch hält er außerdem einen mit geheimem Schlüssel gebildeten Hashwert Ihrer IP-Adresse 6 Stunden lang vor.
       </p>
       <p>
         <strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. f DSGVO, unser Interesse an einer fairen Zählung. Die Kennung auf Ihrem Endgerät ist für diese von Ihnen genutzte Funktion erforderlich (§ 25 Abs. 2 Nr. 2 TDDDG).
@@ -257,7 +257,7 @@ const description = 'Datenschutzerklärung der ChipMates gemeinnützige GmbH fü
         <li>Spracheinstellung (localStorage)</li>
         <li>Zustimmung zu den Nutzungsbedingungen und Altersbestätigung (localStorage)</li>
         <li>Eine zufällige Browser-Kennung für das tägliche kostenlose Kontingent, erzeugt, wenn Sie die App ohne eigenen Schlüssel öffnen (localStorage), und täglich erneuert</li>
-        <li>Eine zufällige Kennung für die Community-Zählung, erzeugt, wenn Sie die Community-Seite öffnen (localStorage)</li>
+        <li>Eine zufällige Kennung für die Community-Zählung, erzeugt erst, wenn Sie sich zählen lassen (localStorage)</li>
         <li>Ihre Antwort auf die Frage zur Werbe-Messung, Ja oder Nein, mit Version und Datum, damit wir sie respektieren (localStorage) für 12 Monate</li>
         <li>Kurzlebige Daten für den aktuellen Tab (sessionStorage, beim Schließen des Tabs gelöscht): was Sie auf unseren Seiten vor dem Einstieg in die App gewählt haben (Persönlichkeit, Konzil, Kapitel, Frage), ob die Startseite Sie bereits in die App weitergeleitet hat, bereits erstellte Zusammenfassungen und Zustand der Oberfläche, etwa ob eine Animation schon gelaufen ist</li>
         <li>Cloudflare-Sicherheitscookies: __cf_bm (Bot-Schutz, 30 Minuten) und nach einer Sicherheitsprüfung cf_clearance</li>

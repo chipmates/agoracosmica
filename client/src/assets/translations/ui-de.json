@@ -1508,8 +1508,8 @@
             "duration": "Ein Tag, danach beim nächsten Öffnen der App gelöscht"
           },
           "community": {
-            "type": "Local Storage (community_device_uuid)",
-            "purpose": "Zufällige Kennung, damit dein Browser in der Community-Zählung nur einmal zählt. Entsteht, wenn du die Community-Seite öffnest",
+            "type": "Local Storage (community_tally_id)",
+            "purpose": "Zufällige Kennung, damit dein Browser in der Community-Zählung nur einmal zählt. Entsteht erst, wenn du dich zählen lässt",
             "duration": "Bis du sie löschst"
           },
           "adConsent": {
@@ -2191,15 +2191,24 @@
     "section": {
       "title": "Was sollen wir als Nächstes bauen?",
       "subtitle": "Sieh dir an, was zur Wahl steht.",
-      "notice": "Die Abstimmung öffnet in naher Zukunft. Deine Stimmkraft wird bereits gezählt."
+      "notice": "Die Abstimmung öffnet in naher Zukunft. Deine Stimmkraft wird bereits gezählt.",
+      "noticeNotJoined": "Die Abstimmung öffnet in naher Zukunft. Lass dich oben mitzählen, damit deine Stimmkraft dazukommt.",
+      "noticeNeutral": "Die Abstimmung öffnet in naher Zukunft."
     },
     "howSection": {
       "title": "Wie Mitbestimmung funktioniert",
       "subtitle": "Stufen, Slots und die Mittragen-Schwelle."
     },
+    "tally": {
+      "title": "Community-Zählung",
+      "hint": "Füge deine Stimmkraft der Gesamtzahl hinzu. Dafür bleibt eine zufällige Kennung in diesem Browser, damit du nur einmal zählst.",
+      "joinedHint": "Du wirst mitgezählt. Deine Stimmkraft wird jedes Mal aktualisiert, wenn du diese Seite öffnest.",
+      "join": "Zähl mich mit",
+      "failed": "Das Mitzählen hat gerade nicht geklappt. In diesem Browser bleibt nichts gespeichert. Versuch es später noch einmal."
+    },
     "dataCard": {
       "title": "Sichern & wiederherstellen",
-      "hint": "Deine Stimmkraft und alle Gespräche liegen auf diesem Gerät. Wenn du diese Seite öffnest, wird deine Stimmkraft auch auf unserem Server gezählt. Sichere sie in einer Datei oder stelle sie aus einer Datei wieder her.",
+      "hint": "Deine Stimmkraft und alle Gespräche liegen auf diesem Gerät. Wenn du dich zählen lässt, wird deine Stimmkraft auch auf unserem Server gezählt. Sichere sie in einer Datei oder stelle sie aus einer Datei wieder her.",
       "backup": "Sichern",
       "backupAria": "Fortschritt als Datei sichern",
       "restore": "Wiederherstellen",

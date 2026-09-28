@@ -1,9 +1,13 @@
 // communityVote.ts — Best-effort heartbeat to the community-tally backend.
-// Privacy: a random per-device UUID, sent as is; the server stores only a keyed
-// hash of it. No PII, no analytics.
+// Privacy: a random per-device UUID, created only when the visitor adds
+// themselves to the tally, then sent as is; the server stores only a keyed hash
+// of it. Until then only the public totals are read. No PII, no analytics.
 // Failure mode: silent. The modal must work offline.
 
-const STORAGE_KEY = 'community_device_uuid';
+// Made by "Count me in". The earlier key was created just by opening the
+// page, without that act, so it is removed unread and never sent.
+const STORAGE_KEY = 'community_tally_id';
+const PRE_ACT_KEY = 'community_device_uuid';
 const REQUEST_TIMEOUT_MS = 5000;
 
 const COMMUNITY_API_URL =
@@ -25,6 +29,32 @@ export interface CommunitySnapshot {
 interface RegisterPayload {
   power: number;
   completedFigures: number;
+}
+
+export function dropPreActId(): void {
+  try {
+    localStorage.removeItem(PRE_ACT_KEY);
+  } catch {
+    // storage blocked
+  }
+}
+
+/** Removes this browser's tally ID, after a press the server never answered. */
+export function forgetTallyId(): void {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // storage blocked
+  }
+}
+
+/** True once this browser has added itself to the tally (its ID exists). */
+export function hasJoinedTally(): boolean {
+  try {
+    return !!localStorage.getItem(STORAGE_KEY);
+  } catch {
+    return false;
+  }
 }
 
 function getOrCreateDeviceId(): string {
@@ -58,9 +88,10 @@ async function fetchWithTimeout(
 }
 
 /**
- * Register the user's current voting power with the community tally.
- * Returns the latest community-wide aggregate snapshot, or null on failure.
- * Never throws. Always safe to call.
+ * Register the user's current voting power with the community tally, creating
+ * this browser's ID on the first call. Only after the visitor's own "Count me
+ * in", or once that ID exists. Returns the latest community-wide aggregate
+ * snapshot, or null on failure. Never throws.
  */
 export async function registerVotingPower(
   payload: RegisterPayload
@@ -108,8 +139,8 @@ export async function registerVotingPower(
 }
 
 /**
- * Read-only snapshot fetch (used if voting power was already registered earlier
- * in this session). Best-effort, never throws.
+ * Read-only snapshot fetch: the public totals, for a browser that has not added
+ * itself. Stores and sends nothing about the visitor. Best-effort, never throws.
  */
 export async function fetchCommunitySnapshot(): Promise<CommunitySnapshot | null> {
   try {

@@ -1506,8 +1506,8 @@
             "duration": "One day, then removed the next time you open the app"
           },
           "community": {
-            "type": "Local Storage (community_device_uuid)",
-            "purpose": "Random ID so that your browser counts only once in the community tally. Created when you open the Community page",
+            "type": "Local Storage (community_tally_id)",
+            "purpose": "Random ID so that your browser counts only once in the community tally. Created only when you add yourself to the tally",
             "duration": "Until you delete it"
           },
           "adConsent": {
@@ -2189,15 +2189,24 @@
     "section": {
       "title": "What should we build next?",
       "subtitle": "Browse what's on the table.",
-      "notice": "Voting opens in the near future. Your voting power is already counted."
+      "notice": "Voting opens in the near future. Your voting power is already counted.",
+      "noticeNotJoined": "Voting opens in the near future. Count yourself in above to add your voting power.",
+      "noticeNeutral": "Voting opens in the near future."
     },
     "howSection": {
       "title": "How governance works",
       "subtitle": "Tiers, slots, and the co-sign threshold."
     },
+    "tally": {
+      "title": "Community tally",
+      "hint": "Add your voting power to the community total. A random ID then stays in this browser, so you count only once.",
+      "joinedHint": "You're counted. Your voting power is updated each time you open this page.",
+      "join": "Count me in",
+      "failed": "Couldn't add you to the tally just now. Nothing was kept in this browser. Try again later."
+    },
     "dataCard": {
       "title": "Save & restore your progress",
-      "hint": "Your voting power and conversations live on this device. When you open this page, your voting power is also counted on our server. Save them to a file you keep, or restore from one.",
+      "hint": "Your voting power and conversations live on this device. If you add yourself to the tally, your voting power is also counted on our server. Save them to a file you keep, or restore from one.",
       "backup": "Back up",
       "backupAria": "Back up your progress to a file",
       "restore": "Restore",
