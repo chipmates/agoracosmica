@@ -276,6 +276,19 @@ float lockShapeT(vec3 l, float len, float hw, float th, float curl, float lift, 
   } else if (kind < 1.5) {
     vec3 a1 = lkArc(l.xy, vec2(0.0), vec2(0.4 * len, 0.2 * sw), vec2(0.7 * len, 0.14 * sw));
     vec3 a2 = lkArc(l.xy, vec2(0.7 * len, 0.14 * sw), vec2(0.97 * len, 0.08 * sw), vec2(0.9 * len, -0.16 * sw));
+    // (on the mane the hook is wider than its curl, so inside the curl two points
+    // of the arc lie nearest at once and the nearest's parameter jumps, a step
+    // in the lock's height; there the parameter is a soft nearest over the arc)
+    if (tip > 0.5) {
+      float ws = 0.0, ts = 0.0;
+      for (int i = 0; i <= 16; i++) {
+        float u = float(i) / 16.0;
+        vec2 q = mix(mix(vec2(0.7 * len, 0.14 * sw), vec2(0.97 * len, 0.08 * sw), u), mix(vec2(0.97 * len, 0.08 * sw), vec2(0.9 * len, -0.16 * sw), u), u);
+        float e = exp((a2.x - length(l.xy - q)) / 0.004);
+        ws += e; ts += e * u;
+      }
+      a2.y = ts / ws;
+    }
     // (the two arcs hand over in a narrow band, so the field has no step there)
     float k = smoothstep(-0.004, 0.004, a2.x - a1.x);
     a = vec3(min(a1.x, a2.x), mix(0.7 + 0.3 * a2.y, 0.7 * a1.y, k), k > 0.5 ? a1.z : a2.z);
@@ -301,8 +314,16 @@ float lockShapeT(vec3 l, float len, float hw, float th, float curl, float lift, 
   ridge = max(ridge, max(0.5 * th, min(0.012, 1.2 * th)) * smoothstep(0.3, 0.6, t));
   float top = ridge * (0.55 + 0.45 * (1.0 - ac * ac)) + lf;
   // (a tip either lies on the ground or stands a clear 8 mm off it: no thin
-  // wedge of air under it)
-  float bot = -0.5 * th + (0.4 * th + lf) * smoothstep(0.55, 1.0, t);
+  // wedge of air under it; on the mane a tip whose end would stand under 8 mm
+  // lies down with its underside sunk, so its rounded edge meets the ground
+  // steeply, and one that stands clear opens its gap within a short cove)
+  float bot0 = -0.5 * th + 0.4 * th * smoothstep(0.55, 1.0, t);
+  float bot = bot0 + lf * smoothstep(0.55, 1.0, t);
+  if (tip > 0.5) {
+    const float TIP_CLEAR = 0.008;
+    float lfEnd = lift * (kind > 0.5 && kind < 1.5 ? 1.5 : 1.0);
+    bot = lfEnd - 0.1 * th < TIP_CLEAR ? -0.5 * th : mix(bot0, bot, smoothstep(0.4 * TIP_CLEAR, TIP_CLEAR, bot));
+  }
   const float re = 0.006;
   vec2 e = vec2(a.x - w + re, max(l.z - top, bot - l.z) + re);
   float d = length(max(e, 0.0)) + min(max(e.x, e.y), 0.0) - re;
@@ -684,6 +705,12 @@ function layMane(): ManeLock[] {
       MANE_EMPTY.push({ tier: s.k, side: s.sgn, deg: s.deg, why: `no room: root ${root.map(x => x.toFixed(3))} at ${bad.map(x => x.toFixed(3))} chest ${chestJ(bad).toFixed(3)} flow ${flow.map(x => x.toFixed(2))}` })
       continue
     }
+    // (an S-curl's hook lies down where the hood's ground runs out before the
+    // mane's end, so it never hangs off the neck as a flap)
+    if (kind === 1) {
+      const tp = va(root, vk(flow, len))
+      lift *= smoothJ(0, lerp(EDGE.end, EDGE.endHigh, smoothJ(EDGE.high[0], EDGE.high[1], tp[1])), -(maneEndJ(tp) + EDGE.margin))
+    }
     locks.push({ tier: s.k, side: s.sgn, deg: s.deg, root, flow, across, len, hw, th, lift, kind, curl })
   }
   // no two neighbours alike within a tenth on length, width and curl
@@ -957,11 +984,16 @@ export function faceColour(P: N, col: N, paint: N, n1: N, n2: N): { col: N; eye:
   // width, fading back along the jaw and down into the throat
   const ce: N = qs.x.div(0.046).pow(2).add(qs.y.add(0.182).div(0.05).pow(2))
   const chin: N = smoothstep(-0.006, -0.013, dy).mul(smoothstep(0.16, 0.21, qs.z)).mul(smoothstep(1.2, 0.7, ce))
+  // the lower lip, the band under the line to the jaw's turn, in the lip's
+  // own red-umber, feathered into the chin (cream there reads cold in shade)
+  const lower: N = smoothstep(-0.003, -0.007, dy).mul(smoothstep(-0.05, -0.03, dy)).mul(smoothstep(0.1, 0.086, qs.x))
+    .mul(smoothstep(M.corner.at, M.corner.at + M.corner.fade, qs.z)).mul(smoothstep(-0.03, -0.07, qs.y))
   let c: N = col
   c = mix(c, c.mul(1.06), pad.mul(paint))
   c = mix(c, lin('#cdb48c').mul(mix(0.92, 1.04, n2)), low.mul(paint))
   c = mix(c, lin('#3a2415').mul(mix(0.9, 1.08, n1)), spots.mul(paint).mul(0.6))
   c = mix(c, lin('#e4d0aa').mul(mix(0.94, 1.04, n2)), chin.mul(paint).mul(0.95))
+  c = mix(c, lin('#34160f').mul(mix(1.3, 2.4, smoothstep(-0.01, -0.035, dy))).mul(mix(0.9, 1.1, n1)), lower.mul(paint).mul(0.85))
   c = mix(c, lin('#34160f').mul(mix(0.9, 1.1, n1)), lip.max(stem).mul(paint).mul(0.88))
   c = mix(c, lin('#a5712a').mul(mix(0.9, 1.08, n1)), f.eye.mul(paint))
   c = mix(c, lin('#120b07'), f.pupil.mul(paint))

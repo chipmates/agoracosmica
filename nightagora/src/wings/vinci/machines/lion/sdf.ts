@@ -616,6 +616,19 @@ float lapLower(vec3 p, vec2 c, float R, float xm, vec2 nb) {
 }
 // the cut edges at a lap's seam, rounded under one cell of the film grid so the seam stays a line
 const float LAP_K = 0.0015;
+// the lip that runs round a lap's disc where the face meets the cut (the lower piece's
+// on the outer face, s 1; the upper piece's on the inner face, s -1; f the face's plane,
+// negative inside), rounded over more than a cell of its grid, since a lip under a
+// cell bakes saw-toothed along the circle; what the rounding takes off beyond the plain
+// cut, added to the cut piece's field; it fades out 3 cm before the parting plane, so
+// the cut across the leg keeps its line
+const float LAP_LIP = 0.006;
+float lapLip(float f, vec3 p, vec2 c, float R, vec2 nb, float s) {
+  vec2 q = p.yz - c;
+  float w = R + SEAM_RING - length(q);
+  float rounded = min(max(f, w) + LAP_LIP, 0.0) + length(max(vec2(f, w) + LAP_LIP, 0.0)) - LAP_LIP;
+  return (rounded - max(f, w)) * smoothstep(-0.008, -0.03, s * dot(q, nb));
+}
 // the facets on a leg, in the rest frame, cells longer down the leg; none within
 // 1.5 cm of a seam circle or on the plate, so the seams and the iron lie on the plain carving
 float legFacets(vec3 P, float d) {
@@ -804,7 +817,7 @@ float map(vec3 p) {
   d += legFacets(p, d);
   // the turned boss behind the plate, in the bearing hole
   d = min(d, slab(length(p.yz - SH.yz) - 0.06, p.x, 0.13, FP_INNER + 0.004, 0.004));
-  d = smax(d, lapUpper(p, KF.yz, FE_R, KF.x, NB_FE), LAP_K);
+  d = smax(d, lapUpper(p, KF.yz, FE_R, KF.x, NB_FE), LAP_K) + lapLip(FE_XI - p.x, p, KF.yz, FE_R, NB_FE, -1.0);
   // (the clearance cut rounded away from the plate's ring, as the thigh's)
   float cl = clearFore(p);
   return mix(max(d, cl), smax(d, cl, 0.006), smoothstep(FP_R + 0.01, FP_R + 0.03, length(p.yz - SH.yz)));
@@ -815,8 +828,9 @@ export const FORE_LOWER = LEG_KIT + /* glsl */ `
 float map(vec3 p) {
   float d = foreForearm(p);
   d += legFacets(p, d);
+  float lips = lapLip(p.x - FE_XO + coneFall(length(p.yz - KF.yz), FE_R), p, KF.yz, FE_R, NB_FE, 1.0) + lapLip(FW_XI - p.x, p, WF.yz, FW_R, NB_FW, -1.0);
   d = smax(d, lapLower(p, KF.yz, FE_R, KF.x, NB_FE), LAP_K);
-  return smax(d, lapUpper(p, WF.yz, FW_R, WF.x, NB_FW), LAP_K);
+  return smax(d, lapUpper(p, WF.yz, FW_R, WF.x, NB_FW), LAP_K) + lips;
 }
 float matId(vec3 p) { return 0.0; }
 `
@@ -850,7 +864,7 @@ float map(vec3 p) {
   vec3 P = p + WF;
   float d = forePaw(P);
   d += legFacets(P, d);
-  return smax(d, lapLower(P, WF.yz, FW_R, WF.x, NB_FW), LAP_K);
+  return smax(d, lapLower(P, WF.yz, FW_R, WF.x, NB_FW), LAP_K) + lapLip(P.x - FW_XO + coneFall(length(P.yz - WF.yz), FW_R), P, WF.yz, FW_R, NB_FW, 1.0);
 }
 float matId(vec3 p) { return 0.0; }
 `
