@@ -21,6 +21,7 @@ import ThemeStyles from './ThemeStyles.astro';
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
 import { publicUrl } from '../lib/urls';
+import { characterLine } from '../lib/spokenLines';
 import { runtimeMinutes, hearDebateLabel, shortMinutes } from '../lib/councilRuntime';
 import {
   type ThemeId,
@@ -200,7 +201,9 @@ const quotePool = (themeSeedCrossRef[themeId]?.[lang] ?? []).filter(m =>
   usableQuote(m.quote, m.figureId),
 );
 const dashless = quotePool.filter(m => !/[—–]/.test(m.quote));
-const quotes = (dashless.length >= 2 ? dashless : quotePool).slice(0, 4);
+const quotes = (dashless.length >= 2 ? dashless : quotePool)
+  .slice(0, 4)
+  .map(m => ({ ...m, spoken: characterLine(m.figureId, m.quote, lang) }));
 
 const bundle = (lang === 'de' ? publicDe : publicEn) as Record<string, any>;
 const substance: { q: string; a: string }[] = bundle.themes?.[themeId]?.substance ?? [];
@@ -398,16 +401,38 @@ const heroFacts = [
               {quotes.map(q => (
                 <figure class="tq-quote">
                   <blockquote class="tq-quote__text">{q.quote}</blockquote>
-                  <figcaption class="tq-quote__cite">
-                    <a
-                      class="tq-quote__name"
-                      href={publicUrl(lang, `/figures/${figureIdToSlug[q.figureId] || q.figureId}`)}
-                    >{getFigureById(q.figureId, lang)?.name ?? q.figureName}</a>
-                    <span class="tq-quote__sep" aria-hidden="true">·</span>
-                    <span class="tq-quote__src">
-                      {t('themes.fromTeaching', 'from {title}').replace('{title}', q.seedTitle)}
-                    </span>
-                  </figcaption>
+                  {q.spoken ? (
+                    <figcaption class="tq-quote__cite">
+                      <span class="tq-quote__speaker">{q.spoken.speaker}</span>
+                      <span class="tq-quote__sep" aria-hidden="true">·</span>
+                      {lang === 'de' ? (
+                        <span class="tq-quote__src">
+                          in <cite>{q.spoken.work}</cite> von <a
+                            class="tq-quote__name"
+                            href={publicUrl(lang, `/figures/${figureIdToSlug[q.figureId] || q.figureId}`)}
+                          >{getFigureById(q.figureId, lang)?.name ?? q.figureName}</a>
+                        </span>
+                      ) : (
+                        <span class="tq-quote__src">
+                          in <a
+                            class="tq-quote__name"
+                            href={publicUrl(lang, `/figures/${figureIdToSlug[q.figureId] || q.figureId}`)}
+                          >{getFigureById(q.figureId, lang)?.name ?? q.figureName}</a>’s <cite>{q.spoken.work}</cite>
+                        </span>
+                      )}
+                    </figcaption>
+                  ) : (
+                    <figcaption class="tq-quote__cite">
+                      <a
+                        class="tq-quote__name"
+                        href={publicUrl(lang, `/figures/${figureIdToSlug[q.figureId] || q.figureId}`)}
+                      >{getFigureById(q.figureId, lang)?.name ?? q.figureName}</a>
+                      <span class="tq-quote__sep" aria-hidden="true">·</span>
+                      <span class="tq-quote__src">
+                        {t('themes.fromTeaching', 'from {title}').replace('{title}', q.seedTitle)}
+                      </span>
+                    </figcaption>
+                  )}
                 </figure>
               ))}
             </div>
@@ -714,6 +739,8 @@ const heroFacts = [
     color: var(--text-tertiary);
   }
   .tq-quote__name { color: var(--gold-deep); text-decoration: none; }
+  .tq-quote__speaker { color: var(--text-secondary); }
+  .tq-quote__src cite { font-style: italic; }
   .tq-quote__sep { color: var(--text-dim); }
   .tq-quote__name:hover { color: var(--gold-primary); }
 
