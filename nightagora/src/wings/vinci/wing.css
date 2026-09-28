@@ -441,9 +441,12 @@
 /* THE PACE IN THE SHEET, where the bar's words stand on a narrow stage. */
 #wing[data-wing='vinci'] .wing-sheet-foot .wing-pace {display:flex;flex-wrap:wrap;align-items:center;gap:8px;
   margin-top:10px;padding-top:9px;border-top:1px solid #a9977333;}
-#wing[data-wing='vinci'] .wing-pace-name {color:#c3b596;font:9px var(--sans);letter-spacing:.14em;text-indent:.14em;text-transform:uppercase;}
-#wing[data-wing='vinci'] .wing-pace-step {flex:1;min-width:0;min-height:44px;padding:8px 6px;background:none;
+#wing[data-wing='vinci'] .wing-pace-name {flex:none;color:#c3b596;font:9px var(--sans);letter-spacing:.14em;text-indent:.14em;text-transform:uppercase;}
+/* Each step is at least its own word wide; where the three and the name do
+   not fit one line the name stands above them. */
+#wing[data-wing='vinci'] .wing-pace-step {flex:1 0 auto;min-width:44px;min-height:44px;padding:8px 10px;background:none;white-space:nowrap;
   border:1px solid #a9977344;color:#eae1d1;font:9px var(--sans);letter-spacing:.12em;text-indent:.12em;text-transform:uppercase;cursor:pointer;}
+@media(max-width:340px) {#wing[data-wing='vinci'] .wing-sheet-foot .wing-pace-name {flex-basis:100%;}}
 #wing[data-wing='vinci'] .wing-pace-step[aria-pressed='true'] {border-color:#edcc8c;color:#edcc8c;}
 #wing[data-wing='vinci'] .wing-pace-step:focus-visible {outline:1px solid #edcc8c;outline-offset:-2px;}
 

@@ -379,7 +379,9 @@ export function createWingFrame(
     if (away) {
       if (doorBlock.parentElement !== footHost) footHost!.append(doorBlock)
       if (wordRow.parentElement !== footHost) footHost!.append(wordRow)
-      if (paceRow.parentElement !== wordRow) wordRow.append(paceRow)
+      // its own line under the words: as one of their even cells the three
+      // paces had a quarter of the row and their labels ran over each other
+      if (paceRow.previousElementSibling !== wordRow) wordRow.after(paceRow)
       paintPace()
     } else {
       // back to its own place in the frame, which is under the bar and
