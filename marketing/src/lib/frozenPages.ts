@@ -13,3 +13,8 @@ export const FROZEN_PAGES: ReadonlySet<string> = new Set([
   '/de/figures/hildegard-von-bingen/',
   '/de/figures/jane-austen/',
 ]);
+
+/** Whether a figure page in the running search test is frozen, by language and slug. */
+export function isFrozenFigurePage(lang: 'en' | 'de', slug: string): boolean {
+  return FROZEN_PAGES.has(`${lang === 'de' ? '/de' : ''}/figures/${slug}/`);
+}

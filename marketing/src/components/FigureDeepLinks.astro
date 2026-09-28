@@ -1,0 +1,34 @@
+---
+// The figure's deep pages. Under the lead answer the lead-in is a label, not a
+// heading, so the outline does not jump from the H1 to an H3; frozen pages keep
+// the old heading in the old place.
+
+interface Props {
+  links: { href: string; label: string }[];
+  lead: string;
+  placement: 'answer' | 'late';
+}
+
+const { links, lead, placement } = Astro.props;
+---
+{links.length > 0 && (
+  placement === 'answer' ? (
+    <section class="pub-section pub-fig-deeper">
+      <p class="fig-related__title">{lead}</p>
+      {links.map(link => (
+        <p class="pub-section__text pub-figure__poems-link">
+          <a class="pub-textlink" href={link.href}>{link.label}</a>
+        </p>
+      ))}
+    </section>
+  ) : (
+    <section class="pub-section">
+      <h3 class="fig-related__title">{lead}</h3>
+      {links.map(link => (
+        <p class="pub-section__text pub-figure__poems-link">
+          <a class="pub-textlink" href={link.href}>{link.label}</a>
+        </p>
+      ))}
+    </section>
+  )
+)}

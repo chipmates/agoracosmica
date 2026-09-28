@@ -10,6 +10,7 @@
 //   hero            portrait and its disclosure caption, the promise, one
 //                   gold Begin
 //   answer          40 to 80 words, the first paragraph after the H1
+//   deep pages      the figure's own deeper pages, one tap from the answer
 //   life            the short life summary the twelve scenes expand
 //   PROOF
 //   is this real    the honesty capsule, answered plainly, with the link to
@@ -48,6 +49,7 @@ import FigureQA from './FigureQA.astro';
 import EchoNote from './EchoNote.astro';
 import StaticImage from './StaticImage.astro';
 import SourcesBlock from './SourcesBlock.astro';
+import FigureDeepLinks from './FigureDeepLinks.astro';
 
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
@@ -59,6 +61,7 @@ import { figureIdToSlug } from '@client/data/public/slugMap';
 import { figureThemes } from '@client/data/public/figureSeo';
 import { getFigureQA } from '@client/data/public/figureQA';
 import { dickinsonPoemsFaqEn, dickinsonPoemsFaqDe } from '../lib/dickinsonPoemsFaq';
+import { isFrozenFigurePage } from '../lib/frozenPages';
 
 interface Props {
   figureId: string;
@@ -70,6 +73,8 @@ const { figureId, slug, lang } = Astro.props;
 const t = getT(lang);
 const de = lang === 'de';
 const figure = getFigureById(figureId, lang);
+// Pages in the running search test keep their old order and markup.
+const frozen = isFrozenFigurePage(lang, slug);
 
 if (!figure) {
   throw new Error(`Unknown figure: ${figureId}`);
@@ -150,7 +155,10 @@ const DEEP_LINKS: Record<string, { en?: { href: string; label: string }[]; de?: 
     de: [{ href: '/de/heldenreise/', label: 'Die Heldenreise, vom Ruf bis zur Rückkehr →' }],
   },
   aurelius: {
-    en: [{ href: '/stoicism/', label: 'Stoicism, what it is and how people practice it →' }],
+    en: [
+      { href: '/figures/marcus-aurelius/meditations/', label: "Read the Meditations, in George Long's translation →" },
+      { href: '/stoicism/', label: 'Stoicism, what it is and how people practice it →' },
+    ],
     de: [{ href: '/de/stoizismus/', label: 'Stoizismus, was er ist und wie man ihn übt →' }],
   },
 };
@@ -207,6 +215,8 @@ if (figure.essence) {
     <p class="pub-section__text pub-fig-answer">{leadAnswer}</p>
   )}
 
+  {!frozen && <FigureDeepLinks links={deepLinks} lead={deepLinksLead} placement="answer" />}
+
   {aboutParas.length > 0 && (
     <section class="pub-section pub-fig-life">
       {aboutParas.map(p => <p class="pub-section__text">{p}</p>)}
@@ -239,16 +249,7 @@ if (figure.essence) {
     </section>
   )}
 
-  {deepLinks.length > 0 && (
-    <section class="pub-section">
-      <h3 class="fig-related__title">{deepLinksLead}</h3>
-      {deepLinks.map(link => (
-        <p class="pub-section__text pub-figure__poems-link">
-          <a class="pub-textlink" href={link.href}>{link.label}</a>
-        </p>
-      ))}
-    </section>
-  )}
+  {frozen && <FigureDeepLinks links={deepLinks} lead={deepLinksLead} placement="late" />}
 
   <FigureChapters
     figureId={figureId}
@@ -365,6 +366,9 @@ if (figure.essence) {
   /* The life summary: the short prose the twelve scenes expand, sitting with
      the answer it belongs to instead of on top of the chapter rail. */
   .pub-figure .pub-fig-life { margin: 0; }
+  /* The deep pages, right under the answer they extend. */
+  .pub-figure .pub-fig-deeper { margin: 0.4rem 0 0.6rem; gap: 0.2rem; }
+  .pub-figure .pub-fig-deeper .fig-related__title { margin: 0 0 0.2rem; }
   .pub-figure .pub-fig-life .pub-section__text { max-width: 64ch; }
   /* The closing door. Same label, same destination as the hero plate. */
   .pub-figure .fig-close {
