@@ -733,11 +733,14 @@ export function createWing(): WingModule {
     tall = make('div', 'film-tall')
     h.stage.append(tall)
     /* THE DOOR FIRST: where the page already painted the first still the door
-       stands over it now; otherwise it waits for the film's own picture. */
+       stands over it now; otherwise it waits for the film's own picture. An
+       entry that may walk down from above waits for the release to say so:
+       that walk opens on the Arno card, and the card replaces the door. */
     const early = document.documentElement.dataset['naDoor'] === 'early'
+    const mayDescend = card === 0 && !namedEntry && !new URLSearchParams(location.search).has('export')
     if (doorWanted()) {
       welcome = createVinciWelcome(h.labels, route => leaveDoor(route), { life: false })
-      if (early) openDoor()
+      if (early && !mayDescend) openDoor()
     } else if (early) {
       delete document.documentElement.dataset['naDoor']
     }
@@ -752,7 +755,9 @@ export function createWing(): WingModule {
       delete document.documentElement.dataset['naDoor']
       releaseFirstStill()
     }
-    above = card === 0 && !namedEntry && Boolean(release.start && release.nodes[release.start]) && !new URLSearchParams(location.search).has('export')
+    above = mayDescend && card === 0 && Boolean(release.start && release.nodes[release.start])
+    if (welcome && above) { welcome.dispose(); welcome = undefined }
+    else if (welcome && early && mayDescend) openDoor()
     picture = createFilmSource({ host: h.stage, base: filmReleaseBase(), release, at: above ? release.start! : stopNode(LIFE[card]!.id),
       framing: () => (wide ? 'wide' : 'upright'), box, pace: () => gaitPace(), hold: title => readingMs(title) })
     // the seam as the rigs read it, the way the live wing hands them `__forge`
@@ -842,6 +847,8 @@ export function createWing(): WingModule {
     paint()
     await picture.ready()
     releaseFirstStill()
+    // no door stands over the walk from above: the page's flag goes with its still
+    if (!welcome && document.documentElement.dataset['naDoor'] === 'early') delete document.documentElement.dataset['naDoor']
     if (welcome && !doorStanding && !vinciWelcomeSeen()) openDoor()
     ahead()
     void descend()
