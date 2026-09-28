@@ -1,5 +1,6 @@
 // communityVote.ts — Best-effort heartbeat to the community-tally backend.
-// Privacy: per-device anonymous UUID, hashed before send. No PII, no analytics.
+// Privacy: a random per-device UUID, sent as is; the server stores only a keyed
+// hash of it. No PII, no analytics.
 // Failure mode: silent. The modal must work offline.
 
 const STORAGE_KEY = 'community_device_uuid';

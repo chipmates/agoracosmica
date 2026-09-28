@@ -6,7 +6,8 @@
  *   GET  /v1/community/snapshot — read aggregate counts + current threshold
  *
  * Privacy:
- *   - Per-device anonymous UUID (hashed before persistence).
+ *   - Per-device anonymous UUID (hashed before persistence). A device record
+ *     expires 12 months after it was last written.
  *   - IP is hashed with rotating IP_SALT; only used for write rate-limit.
  *   - No PII, no analytics, no cookies.
  *
@@ -48,6 +49,9 @@ const SNAPSHOT_KEY = 'aggregate:snapshot';
 const DEVICE_PREFIX = 'device:';
 const RATE_LIMIT_PREFIX = 'rl:';
 const RATE_LIMIT_WINDOW_S = 60 * 60 * 6; // 6h per-IP write rate-limit
+// The aggregate is never decremented, so a device that returns after its
+// record expired counts as newly joined.
+const DEVICE_TTL_S = 60 * 60 * 24 * 365;
 
 interface ThresholdTier {
   upTo: number; // active-user ceiling, exclusive
@@ -182,7 +186,7 @@ async function handlePower(
     completedFigures: Math.floor(payload.completedFigures),
     lastSeen: Date.now(),
   };
-  await env.COMMUNITY_KV.put(deviceKey, JSON.stringify(next));
+  await env.COMMUNITY_KV.put(deviceKey, JSON.stringify(next), { expirationTtl: DEVICE_TTL_S });
 
   const snap = await readSnapshot(env);
   if (!previous) {
