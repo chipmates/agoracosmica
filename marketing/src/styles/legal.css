@@ -128,6 +128,12 @@
   border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
 }
 
+/* Storage key names are long unbroken words; letting only them break keeps
+   a table inside a phone's width without splitting ordinary words. */
+.legal-doc td code {
+  overflow-wrap: anywhere;
+}
+
 .legal-doc th {
   background: color-mix(in srgb, var(--gold-subtle) 10%, transparent);
   font-weight: 500;
@@ -194,5 +200,10 @@
 
   .legal-doc table {
     font-size: 0.875rem;
+  }
+
+  .legal-doc th,
+  .legal-doc td {
+    padding: 0.6rem 0.5rem;
   }
 }
