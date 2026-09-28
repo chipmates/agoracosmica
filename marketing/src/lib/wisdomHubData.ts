@@ -48,7 +48,7 @@ export function getWisdomFaq(lang: Lang): WisdomFaqEntry[] {
       },
       {
         q: 'Ist die Nutzung kostenlos?',
-        a: '30 kostenlose Nachrichten pro Tag, ohne Anmeldung. Willst du mehr, bring deinen eigenen OpenRouter-Schlüssel mit. Die ganze Plattform ist quelloffen unter der AGPL-3.0, gemeinnützig, und es gibt keine Tracking-Cookies und keine Profile darüber, wer du bist.',
+        a: '30 kostenlose Nachrichten pro Tag, ohne Anmeldung. Willst du mehr, bring deinen eigenen OpenRouter-Schlüssel mit. Die ganze Plattform ist Open Source unter der AGPL-3.0, gemeinnützig, und es gibt keine Tracking-Cookies und keine Profile darüber, wer du bist.',
       },
     ];
   }
