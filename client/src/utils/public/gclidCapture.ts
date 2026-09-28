@@ -1,46 +1,62 @@
-// Google Ads conversion tracking. Captures the gclid from the landing URL and,
-// ONLY after the visitor gives ad-measurement consent, relays a conversion
-// event to our CF Worker, which forwards it to the Google Ads Conversion API.
-// No tracking cookies, no pixel. The gclid lives in sessionStorage (tab-scoped)
-// so it survives reloads within the same tab; the consent decision lives in
-// localStorage so a returning ad visitor keeps their choice. Nothing reaches
-// Google until consent is granted, and revoking consent clears the gclid.
+// Google Ads conversion measurement, only with the visitor's yes. The click ID
+// (gclid) from the landing URL stays in page memory while the landing page asks
+// its question; only a yes stores it (sessionStorage, this tab), so later pages
+// and the app can report steps. The answer lives in localStorage. A paid
+// arrival (?p=1) never keeps a click ID. No tracking cookies, no pixel, and
+// nothing reaches Google until consent is granted.
 
 import { isSelfHost } from '../../config/deployment';
 
 const API_BASE = import.meta.env.VITE_FREE_TIER_API_URL || '';
 
-// sessionStorage key: persist gclid across reloads of the same tab. Without
-// this, a user who clicks an ad → lands at /?gclid=… → reloads (URL no longer
-// carries the param) → would lose the click ID and miss a later conversion
-// inside that same tab. Tab-scoped on purpose — a new tab without the URL
-// param has no attribution.
+// sessionStorage key, written only after a yes: the click ID for the rest of
+// this tab, so a step on a later page or in the app can still be reported.
 const SS_GCLID_KEY = 'agc_gclid';
 
-// localStorage key: the ad-measurement consent decision. Kept separate from the
-// gclid so a returning ad visitor keeps their choice across tabs and sessions.
-// This is a consent record (technically necessary, § 25 Abs. 2 Nr. 2 TDDDG).
+// localStorage key: the ad-measurement answer. A consent record (yes or no,
+// version, time), kept so the choice is respected across visits.
 const LS_AD_CONSENT_KEY = 'agc_ad_consent';
 const AD_CONSENT_VERSION = '1.0.0';
 
-// sessionStorage key: marks a paid-campaign arrival (the ?p=1 Final-URL-suffix
-// Google appends to paid ads). Paid clicks run on clicks only — we never
-// capture or forward their gclid, so they see no consent step and no conversion
-// is ever sent for them. Forwarding a paid gclid without consent would be
-// unlawful and would contradict the privacy policy.
-const SS_PAID_KEY = 'agc_paid';
-
 let capturedGclid: string | null = null;
+// This page's address carried ?p=1. Page memory only: later pages of a paid
+// visit carry no click ID, since the landing kept none.
 let isPaid = false;
 
-// Hydrate from sessionStorage on module load (cheap, runs once). If the URL
-// later carries a fresh gclid (or the paid suffix), captureGclid() updates this.
+function isValidGclid(value: string | null): value is string {
+  return !!value && value.length > 10 && value.length < 200;
+}
+
+function urlHasPaidParam(): boolean {
+  try {
+    return new URLSearchParams(window.location.search).get('p') === '1';
+  } catch {
+    return false;
+  }
+}
+
+function dropStoredGclid(): void {
+  try {
+    if (typeof sessionStorage !== 'undefined') sessionStorage.removeItem(SS_GCLID_KEY);
+  } catch {
+    // sessionStorage unavailable — nothing stored to drop
+  }
+}
+
+// Module load, before any importer can ask: a paid landing drops every click ID,
+// even one stored after an earlier yes. Otherwise a click ID stored after a yes
+// earlier in this tab is picked up, and one whose yes is gone is dropped.
 try {
-  if (typeof sessionStorage !== 'undefined') {
-    if (sessionStorage.getItem(SS_PAID_KEY) === '1') isPaid = true;
-    const storedGclid = sessionStorage.getItem(SS_GCLID_KEY);
-    if (!isPaid && storedGclid && storedGclid.length > 10 && storedGclid.length < 200) {
-      capturedGclid = storedGclid;
+  if (typeof window !== 'undefined') {
+    isPaid = urlHasPaidParam();
+    if (isPaid) {
+      dropStoredGclid();
+    } else if (typeof sessionStorage !== 'undefined') {
+      const stored = sessionStorage.getItem(SS_GCLID_KEY);
+      if (isValidGclid(stored)) {
+        if (adConsentGranted()) capturedGclid = stored;
+        else dropStoredGclid();
+      }
     }
   }
 } catch {
@@ -50,40 +66,38 @@ try {
 function persistGclid(): void {
   try {
     if (typeof sessionStorage === 'undefined') return;
-    if (capturedGclid) sessionStorage.setItem(SS_GCLID_KEY, capturedGclid);
+    if (capturedGclid && !isPaid) sessionStorage.setItem(SS_GCLID_KEY, capturedGclid);
   } catch {
     // sessionStorage write blocked (quota, private mode) — no-op
   }
 }
 
 /**
- * Capture gclid from the URL on page load. Call once when the app initializes.
+ * Read the click ID from the landing URL. Call once per page, before anything
+ * decides on it. With a yes already on record, the click ID is stored for the
+ * tab. Without one, `holdUntilAnswer` (the landing page's question) keeps it in
+ * page memory until the answer; everywhere else it is dropped.
  */
-export function captureGclid(): void {
+export function captureGclid(options: { holdUntilAnswer?: boolean } = {}): void {
   if (isSelfHost) return; // no ad attribution on a self-host instance
   try {
     const params = new URLSearchParams(window.location.search);
-    // Paid-campaign arrivals carry ?p=1. They run on clicks only: we never
-    // capture or forward their gclid, so there is no consent step and no
-    // conversion for them. This guard is what keeps the paid split lawful.
+    // Paid-campaign arrivals carry ?p=1. They run on clicks only: no click ID
+    // is kept, the question never shows, nothing is ever sent for them.
     if (params.get('p') === '1') {
       isPaid = true;
       capturedGclid = null;
-      try {
-        if (typeof sessionStorage !== 'undefined') {
-          sessionStorage.setItem(SS_PAID_KEY, '1');
-          sessionStorage.removeItem(SS_GCLID_KEY);
-        }
-      } catch {
-        // sessionStorage blocked — no-op
-      }
+      dropStoredGclid();
       return;
     }
-    if (isPaid) return; // persisted paid flag from earlier in this tab
+    if (isPaid) return;
     const gclid = params.get('gclid');
-    if (gclid && gclid.length > 10 && gclid.length < 200) {
+    if (!isValidGclid(gclid)) return;
+    if (adConsentGranted()) {
       capturedGclid = gclid;
       persistGclid();
+    } else if (options.holdUntilAnswer && !adConsentDecided()) {
+      capturedGclid = gclid;
     }
   } catch {
     // Silently fail in SSR or restricted environments
@@ -99,9 +113,9 @@ export function getGclid(): string | null {
 }
 
 /**
- * True if this visitor arrived from a paid campaign (?p=1). Paid arrivals are
- * never shown the consent step and never have a conversion sent (we run paid on
- * clicks only), so the consent UI checks this before rendering.
+ * True if this page's address carries the paid-campaign parameter (?p=1). Paid
+ * arrivals are never shown the consent step and never have a conversion sent
+ * (we run paid on clicks only), so the consent UI checks this before rendering.
  */
 export function isPaidVisitor(): boolean {
   return isPaid;
@@ -109,9 +123,7 @@ export function isPaidVisitor(): boolean {
 
 /**
  * True once the visitor has made an explicit ad-measurement choice (granted or
- * declined), recorded in localStorage. Used to avoid re-asking: a landing-page
- * accept or decline is remembered across the session. A passive dismiss writes
- * nothing and clears the click ID instead (see clearGclid).
+ * declined), recorded in localStorage. Used to avoid re-asking.
  *
  * A record written under an older AD_CONSENT_VERSION no longer covers the
  * current scope, so it counts as undecided and the prompt may ask again.
@@ -129,9 +141,7 @@ export function adConsentDecided(): boolean {
 
 /**
  * Drop the captured gclid from memory and sessionStorage without recording a
- * consent decision. Used when the consent prompt is dismissed: no surface is
- * left to grant consent this session, so a stored click ID has no purpose
- * (§ 25 Abs. 1 TDDDG, storage needs a purpose backed by consent or necessity).
+ * consent decision.
  */
 export function clearGclid(): void {
   capturedGclid = null;
@@ -164,9 +174,9 @@ export function adConsentGranted(): boolean {
 }
 
 /**
- * Record ad-measurement consent and keep the gclid available for the later
- * engagement conversions (listened, dialogue_started, conversation_deepened,
- * council_engaged) that fire outside the modal.
+ * Record ad-measurement consent and store the click ID held in page memory, so
+ * the later steps (listened, profile_created, dialogue_started,
+ * conversation_deepened, council_engaged) can be reported from other pages.
  */
 export function grantAdConsent(): void {
   try {

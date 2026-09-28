@@ -2,8 +2,8 @@
 // NAMING CONSTRAINT: the file name becomes a public chunk URL and must stay
 // free of ad-tech-looking words (ad, consent+ad, conversion, track): content
 // blockers match those in URLs and would keep the card from ever loading.
-// Shown only when a gclid is present, the visitor is NOT on the paid ?p=1 split,
-// and no explicit choice was made yet this session. Non-blocking: the figure or
+// Shown only when this page's address carries a gclid, it is NOT the paid ?p=1
+// split, and no answer is on record. Non-blocking: the figure or
 // theme content stays fully readable behind it (no wall, no scroll lock, no
 // focus trap), which is what keeps the consent lawful (EDPB cookie-wall rule).
 //
@@ -14,9 +14,9 @@
 //              nothing). Remembered, so the visitor is not asked again.
 //
 // There is no dismiss control: the two answers are the only exits, and an
-// unanswered card simply stays for the visit. While the ask is pending the
-// stored click ID keeps its purpose under § 25 TDDDG (an open consent
-// surface is waiting on it); it leaves storage with the answer either way.
+// unanswered card stays on this page. Until the answer the click ID stays in
+// page memory and nothing is stored; only a yes stores it. The next page has
+// no click ID in its address, so the card asks on the landing page only.
 //
 // Copy is legally reviewed: the withdrawal notice, the privacy link and the
 // click-ID scope sentence are all load bearing and none of them may be
@@ -260,7 +260,7 @@ export default function ArrivalChoice({ lang }: Props) {
   const t = COPY[lang] ?? COPY.en;
 
   useEffect(() => {
-    captureGclid(); // reads ?gclid / ?p=1 from the landing URL into storage
+    captureGclid({ holdUntilAnswer: true }); // ?gclid into page memory, ?p=1 drops it
     if (!getGclid() || isPaidVisitor() || adConsentDecided()) return;
     if (!ASK_ON_INTERACTION) {
       setShow(true);

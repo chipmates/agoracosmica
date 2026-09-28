@@ -25,6 +25,10 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      // The public pages' islands import client code this way (marketing/tsconfig).
+      '@client': path.resolve(__dirname, './src'),
     },
+    // One React for the marketing islands under test and the client's renderer.
+    dedupe: ['react', 'react-dom'],
   },
 })

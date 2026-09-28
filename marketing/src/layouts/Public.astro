@@ -98,7 +98,7 @@ const revealSticky = isHome || props.heroReveal === true;
     {/* Ad-measurement consent prompt, shown only to Google ad-grant arrivals
         (a gclid in the URL, not the paid ?p=1 split). Non-blocking, decides
         client-side, renders nothing for everyone else. */}
-    <ArrivalChoice client:idle lang={props.lang} />
+    <ArrivalChoice client:load lang={props.lang} />
   </body>
 </html>
 

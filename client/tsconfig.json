@@ -26,7 +26,8 @@
     "allowSyntheticDefaultImports": true,
     "types": ["vite/client", "node"],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@client/*": ["./src/*"]
     }
   },
   "include": ["src/**/*", "vite.config.mjs"],

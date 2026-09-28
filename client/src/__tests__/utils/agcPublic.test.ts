@@ -117,3 +117,48 @@ describe('agc-public.js: counting stores nothing', () => {
     expect(beacons.filter((b) => b.body.step === 'cta_click')).toHaveLength(2);
   });
 });
+
+describe('agc-public.js: the ad click ID', () => {
+  const CLICK = 'TESTCLICKID0001';
+  const YES = JSON.stringify({ granted: true, version: '1.0.0', timestamp: Date.now() });
+  const conversions = () => fetches.filter((f) => f.url.endsWith('/api/conversions'));
+
+  it('stores nothing on a grant landing without an answer', () => {
+    loadPage(`/marcus-aurelius/?gclid=${CLICK}`);
+    expect(storageKeys(sessionStorage)).toEqual([]);
+  });
+
+  it('stores the click ID when a yes is on record, and the CTA reports it', () => {
+    localStorage.setItem('agc_ad_consent', YES);
+    loadPage(`/marcus-aurelius/?gclid=${CLICK}`);
+    expect(sessionStorage.getItem('agc_gclid')).toBe(CLICK);
+    click(door({ 'data-agc-cta': 'start-exploring', 'data-agc-figure': 'aurelius' }));
+    expect(conversions()).toHaveLength(1);
+    expect(conversions()[0].body.gclid).toBe(CLICK);
+    expect(conversions()[0].body.event).toBe('start_exploring');
+  });
+
+  it('on a paid landing drops an old click ID despite an old yes, and sends nothing', async () => {
+    localStorage.setItem('agc_ad_consent', YES);
+    sessionStorage.setItem('agc_gclid', 'OLDCLICKID00001');
+    loadPage(`/marcus-aurelius/?p=1&gclid=${CLICK}`);
+    expect(storageKeys(sessionStorage)).toEqual([]);
+    click(door({ 'data-agc-cta': 'start-exploring' }));
+    await new Promise((r) => setTimeout(r, 0));
+    expect(conversions()).toHaveLength(0);
+    const paid = beacons.filter((b) => b.body.step === 'paid_arrival');
+    expect(paid).toHaveLength(1);
+    expect(JSON.stringify(paid[0].body)).not.toContain(CLICK);
+    expect(storageKeys(sessionStorage)).not.toContain('agc_paid');
+    expect(storageKeys(localStorage)).not.toContain('agc_paid');
+  });
+
+  it('never puts a click ID in any count', async () => {
+    loadPage(`/marcus-aurelius/?gclid=${CLICK}`);
+    click(door({ 'data-agc-cta': 'start-exploring' }));
+    await new Promise((r) => setTimeout(r, 0));
+    const counts = [...beacons, ...fetches.filter((f) => !f.url.endsWith('/api/conversions'))];
+    expect(counts.length).toBeGreaterThan(0);
+    for (const c of counts) expect(JSON.stringify(c.body)).not.toContain(CLICK);
+  });
+});

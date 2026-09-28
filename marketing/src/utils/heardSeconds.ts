@@ -10,16 +10,16 @@
 // fire.
 //
 // Same consent posture as every other conversion: a gclid must be present,
-// the visitor must not be on the paid ?p=1 split, and ad-measurement consent
+// the page must not be on the paid ?p=1 split, and ad-measurement consent
 // must be granted. Nothing here decides any of that, it only asks. The gate
 // sits on the accumulator, not just on the send, so a visitor this could
-// never be sent for gets no seconds counted and nothing written.
+// never be sent for gets no seconds counted, nothing written and nothing read.
 //
 // The deferred ask (ASK_ON_INTERACTION in ArrivalChoice) adds one state to
 // that: while the prompt is armed and still unanswered, seconds accrue but
 // nothing may be sent, so a crossing is held with the moment it happened. An
-// accept flushes it, a decline or a dismiss drops it. Only the prompt arms
-// this, so with that flag off the gate below is the granted-only one.
+// accept flushes it, a decline drops it. Only the prompt arms this, so with
+// that flag off the gate below is the granted-only one.
 //
 // The worker URL is absolute on purpose: agoracosmica.org has no /api/* route,
 // so a relative path falls through the SPA fallback (/* -> index.html 200),
@@ -95,8 +95,18 @@ function readFiredFlag(): boolean {
 // Seconds heard so far in this tab, seeded from the earlier pages of the
 // visit. Kept in memory as well as in storage so the count still adds up on a
 // browser that blocks sessionStorage (it just stops carrying across pages).
-let heardSeconds = readStoredSeconds();
-let fired = readFiredFlag();
+// Seeded only once counting is allowed: the keys exist only after a yes, so
+// nothing is looked up for anyone else.
+let heardSeconds = 0;
+let fired = false;
+let restored = false;
+
+function restoreOnce(): void {
+  if (restored) return;
+  restored = true;
+  heardSeconds = readStoredSeconds();
+  fired = readFiredFlag();
+}
 
 // Pre-decision state. Both stay at their initial value unless the consent
 // prompt arms them, which only the deferred ask does, so nothing below this
@@ -117,6 +127,7 @@ function canCount(): boolean {
 }
 
 function fireListened(figureId?: string, timestamp: number = Date.now()): void {
+  restoreOnce();
   if (fired) return;
   if (isPaidVisitor()) return; // paid arrivals run on clicks only
   const gclid = getGclid();
@@ -201,9 +212,10 @@ function bufferListened(figureId?: string): void {
  * a seek or a paused tab from buying seconds nobody heard.
  */
 export function addHeardSeconds(seconds: number, figureId?: string): void {
-  if (fired || pending) return;
   if (!(seconds > 0) || seconds > MAX_TICK_S) return;
   if (!canCount()) return;
+  restoreOnce();
+  if (fired || pending) return;
   if (onFirstPlayback) {
     // The marketing players use detached Audio elements, whose play events
     // never reach the document, so this is the only place that sees playback
@@ -253,8 +265,8 @@ export function flushPreDecisionListening(): void {
 }
 
 /**
- * Declined or dismissed: nothing may ever be sent for this visit, so the held
- * crossing and the seconds behind it go the way of the click ID.
+ * Declined: nothing may ever be sent for this visit, so the held crossing and
+ * the seconds behind it go the way of the click ID.
  */
 export function dropPreDecisionListening(): void {
   preDecisionArmed = false;

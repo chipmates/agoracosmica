@@ -3,16 +3,16 @@
 // no hash needed). Cached by CF Pages, one HTTP request per visitor.
 //
 // Responsibilities:
-//   - Capture gclid from URL into sessionStorage so the app can offer ad-
-//     measurement consent and (only if granted) report the conversion
+//   - Keep the gclid for the tab only when a yes to ad measurement is already
+//     on record, and drop any kept click ID on a paid (?p=1) landing
 //   - Fire the anonymous page-load beacon (/v1/page), flagged when the pageview
 //     opened the visit and carrying the source class of that arrival, plus the
 //     paid-arrival counter on a paid landing URL
 //   - Click handlers on [data-agc-cta] elements (entry intent)
 //   - Mobile burger menu toggle in the navbar
 //
-// No conversion is sent from the marketing pages. The gclid is forwarded to
-// Google only from inside the app, after the visitor opts in.
+// A conversion leaves these pages only after the visitor's yes: the Start
+// Exploring click below and the consent card's own report of the yes.
 (function () {
   'use strict';
 
@@ -26,7 +26,6 @@
   }
 
   var SS_GCLID = 'agc_gclid';
-  var SS_PAID = 'agc_paid';
   var SS_FIGURE = 'agc_intended_figure';
   var SS_COUNCIL = 'agc_intended_council';
   var LS_LANG = 'selectedLanguage';
@@ -55,30 +54,25 @@
   var CONV_URL = 'https://llm.agoracosmica.org/api/conversions';
   var FUNNEL_URL = 'https://llm.agoracosmica.org/v1/funnel';
 
-  // The paid-ads parameter on this URL. Deliberately the URL only, never the
-  // persisted paid flag: the arrival counter below counts the click that
-  // carried the parameter, not every later page of the same visit.
+  // The paid-ads parameter on this URL. The URL only: nothing about a paid
+  // visit is stored, and later pages of it carry no click ID to guard.
   function hasPaidParam() {
     try { return new URLSearchParams(window.location.search).get('p') === '1'; }
     catch (e) { return false; }
   }
 
+  // The click ID is stored only after a yes. Without one on record it stays in
+  // the address, where the consent card reads it into page memory. Paid
+  // arrivals (?p=1) run on clicks only: any stored click ID is dropped, even
+  // one kept after an earlier yes, so nothing is ever sent for a paid visit.
   function captureGclidFromUrl() {
     try {
-      var params = new URLSearchParams(window.location.search);
-      // Paid-campaign arrivals carry ?p=1. They run on clicks only: we never
-      // capture or forward their gclid. This is the FIRST, unconditional writer
-      // (it runs at parse, before the app island's guard), so it must own the
-      // paid suppression itself and never leave a paid gclid for the SPA to
-      // adopt. Forwarding a paid gclid without consent would be unlawful.
       if (hasPaidParam()) {
-        sessionStorage.setItem(SS_PAID, '1');
         sessionStorage.removeItem(SS_GCLID);
         return;
       }
-      if (sessionStorage.getItem(SS_PAID) === '1') return; // persisted paid flag
-      var g = params.get('gclid');
-      if (g && g.length > 10 && g.length < 200) {
+      var g = new URLSearchParams(window.location.search).get('gclid');
+      if (g && g.length > 10 && g.length < 200 && adConsentGranted()) {
         sessionStorage.setItem(SS_GCLID, g);
       }
     } catch (e) { /* sessionStorage blocked — ignore */ }
@@ -99,7 +93,7 @@
   // signal: unlike the version removed in 1.1.2, it now requires an explicit
   // opt-in, so the bare gclid alone never sends anything.
   function fireConversion(event, metadata) {
-    if (sessionStorage.getItem(SS_PAID) === '1') return; // paid: never forward
+    if (hasPaidParam()) return; // paid: never forward
     var gclid;
     try { gclid = sessionStorage.getItem(SS_GCLID); } catch (e) { return; }
     if (!gclid) return;

@@ -19,7 +19,8 @@ import { migrateHistoryToEncrypted } from './services/history/historyEncryptionM
 // Capture gclid from the landing URL before any router redirect can strip it.
 // Must run synchronously at module load. Running inside a React effect is too
 // late, because the catch-all Navigate in App.tsx rewrites the URL before
-// App's effect fires.
+// App's effect fires. The app has no consent question, so it keeps a click ID
+// only when a yes is already on record and drops it otherwise.
 captureGclid();
 
 // Capture a figure/council deep-link (?figure=/?council=) from the landing URL
