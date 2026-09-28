@@ -13,11 +13,16 @@ interface Props {
 }
 
 const { themeName, question, tagline, facts } = Astro.props;
+// Where the shelf label or the tagline is the question itself, the first
+// screen would say it twice, so that line stays out (same rule as ThemeCard).
+const same = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase();
+const showEyebrow = !same(themeName, question);
+const showTagline = !same(tagline, question);
 ---
 <header class="tq-hero">
-  <p class="tq-hero__eyebrow">{themeName}</p>
+  {showEyebrow && <p class="tq-hero__eyebrow">{themeName}</p>}
   <h1 class="tq-hero__q">{question}</h1>
-  <p class="tq-hero__tag">{tagline}</p>
+  {showTagline && <p class="tq-hero__tag">{tagline}</p>}
   <p class="tq-hero__facts">{facts}</p>
 </header>
 

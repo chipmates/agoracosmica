@@ -18,16 +18,23 @@ const { themeId, councilCount, voiceCount, lang } = Astro.props;
 const t = getT(lang);
 const question = t(`themes.${themeId}.question`);
 const tagline = t(`themes.${themeId}.tagline`);
-// Three themes use the question as their tagline; printing it twice reads
-// like a rendering bug, so the second line only appears when it differs.
-const showTagline = tagline.trim() !== question.trim();
+const label = t(`themes.${themeId}.name`);
+// Three themes use the question as their tagline, and one German label is the
+// question; printing it twice reads like a rendering bug, so a line only
+// appears when it differs from the question. A dropped label keeps its blank
+// line, so the headings in a row of cards stay level.
+const same = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase();
+const showTagline = !same(tagline, question);
+const showLabel = !same(label, question);
 const meta = [
   t('themes.voicesCount', '{count} voices').replace('{count}', String(voiceCount)),
   `${councilCount} ${t('themes.councils')}`,
 ].join(' \u00b7 ');
 ---
 <a href={publicUrl(lang, `/themes/${themeId}`)} class="tq-card" data-theme={themeId}>
-  <span class="tq-card__label">{t(`themes.${themeId}.name`)}</span>
+  {showLabel
+    ? <span class="tq-card__label">{label}</span>
+    : <span class="tq-card__label" aria-hidden="true">{'\u00a0'}</span>}
   <h2 class="tq-card__q">{question}</h2>
   {showTagline && <p class="tq-card__tag">{tagline}</p>}
   <p class="tq-card__meta">{meta}</p>
