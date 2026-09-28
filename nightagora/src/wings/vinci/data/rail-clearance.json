@@ -168,8 +168,8 @@
   },
   {
    "file": "src/wings/vinci/content.ts",
-   "sha256": "2a8b3a335918bf76b406ffe45224f1cfb61d72a20028ce9fe4a970409f861964",
-   "bytes": 88855,
+   "sha256": "e89cf4db20d335c284abe4e64bbb875e2f6af54ffa47c5f5fda2912431a14d4e",
+   "bytes": 88786,
    "unchangedDuringAudit": true
   },
   {
@@ -198,8 +198,8 @@
   },
   {
    "file": "src/wings/vinci/data/doors.json",
-   "sha256": "2babba0fe0f9450c3859ed18018d5e5c224c5e34fcb1cb33bb82c129179b24ba",
-   "bytes": 13260,
+   "sha256": "d5588e7abcc4631c10ab30f47c5a11d2cc8d9c951eaed9b61100ff28b3a76dd9",
+   "bytes": 15622,
    "unchangedDuringAudit": true
   },
   {
@@ -390,8 +390,8 @@
   },
   {
    "file": "src/wings/vinci/line/data/never-said.json",
-   "sha256": "0bd3dea1c295b3c4c78966ee117ce1312fb9e23773b4a13d54f09a253c971e97",
-   "bytes": 6766,
+   "sha256": "3d3422a11402a002251b2549b3e410d4d9fa4a35d56f94663cbc0ad3ddb014f4",
+   "bytes": 6950,
    "unchangedDuringAudit": true
   },
   {
@@ -678,8 +678,8 @@
   },
   {
    "file": "src/wings/vinci/story.ts",
-   "sha256": "9dc833c4a2b61f77374c9d639b1eef75ee5ce71a2fb79f16cc12d2706b0368ef",
-   "bytes": 26480,
+   "sha256": "b1c1422437b0f8cf06887275ba2f4ca96cf78969975e271c9851ad0deb3ad93c",
+   "bytes": 26585,
    "unchangedDuringAudit": true
   },
   {
