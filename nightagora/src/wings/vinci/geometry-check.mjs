@@ -107,7 +107,7 @@ async function load(filename) {
   return exported;
 }
 
-let site, groundModule, shellModule, gatePassageModule, innerCourtModule, collectionModule, collectionAccessModule, entryPassageModule, houseHallModule, roadDressingModule, groundDressingModule, vegetationModule, waterModule, railModule;
+let site, groundModule, shellModule, gatePassageModule, innerCourtModule, collectionModule, collectionAccessModule, entryPassageModule, houseHallModule, roadDressingModule, groundDressingModule, vegetationModule, waterModule, railModule, neighbourModule, walkPoseModule, walkPlaceModule;
 await section('load actual modules', async () => {
   site = await load(`${WING}/site.ts`);
   groundModule = await load(`${WING}/ground.ts`);
@@ -123,6 +123,9 @@ await section('load actual modules', async () => {
   vegetationModule = await load(`${WING}/vegetation.ts`);
   waterModule = await load(`${WING}/water.ts`);
   railModule = await load(`${WING}/rail.ts`);
+  neighbourModule = await load(`${WING}/rail-neighbours.ts`);
+  walkPoseModule = await load(`${WING}/walk-poses.ts`);
+  walkPlaceModule = await load(`${WING}/walk-places.ts`);
 });
 const gradeModule = await load(`${WING}/terrain-mesh.ts`).catch(error => { fail('grade-load', error.message); return null; });
 
@@ -425,25 +428,24 @@ await section('actual camera rail against actual triangles', async () => {
     if (authority.status !== 'verified') throw new Error(authority.failure);
     let clock = 0;
     const rail = railModule.createRail(camera, () => clock, authority);
-    rail.set(ids[0], railModule.stationPose(ids[0], narrow), true); rail.update();
-    const adjacentItinerary = [...ids, ...ids.slice(0, -1).reverse()];
-    // The scrolling rail permits direct station selection. These five IDs
-    // represent every distinct physical pose used by the house and the street.
-    const physicalIds = ['arrival','courtyard','hall','garden','line-early'];
-    const direct = physicalIds.flatMap(from => physicalIds.filter(to => to !== from).map(to => ({ from, to })));
-    const itinerary = [...adjacentItinerary, ...direct.map(item => item.to)];
-    for (let beat = 0; beat < itinerary.length; beat++) {
-      const jump = direct[beat - adjacentItinerary.length];
-      const id = itinerary[beat], from = jump?.from ?? (beat ? itinerary[beat - 1] : id);
-      if (jump) { rail.set(from, railModule.stationPose(from, narrow), true); rail.update(); }
-      const pose = railModule.stationPose(id, narrow);
-      if (beat) rail.set(id, pose, false);
+    // THE LEGS THE RAIL WALKS: every certified neighbour leg, walked from its
+    // start set in place. A chapter cut and a press on a far stop walk nothing.
+    const legs = neighbourModule.vinciRailNeighbourLegs(ids);
+    const { VINCI_STAIR_HEAD, VINCI_VALVE, VINCI_HOUSE_DOOR } = walkPlaceModule;
+    const walkPlaces = new Set([VINCI_STAIR_HEAD, VINCI_VALVE.place, VINCI_HOUSE_DOOR.inward, VINCI_HOUSE_DOOR.outward]);
+    const poseOf = id => walkPlaces.has(id) ? walkPoseModule.vinciWalkPoseOf(id, narrow) : railModule.stationPose(id, narrow);
+    const posed = new Set();
+    for (let beat = 0; beat < legs.length; beat++) {
+      const [from, id] = legs[beat];
+      rail.set(from, poseOf(from), true); rail.update();
+      const pose = poseOf(id);
+      rail.set(id, pose, false);
       const startTime = clock;
       const previous = camera.position.clone();
       let lastTested = null, pathGrade = Infinity, pathMesh = Infinity, pathShell = SHELL_CLEARANCE, pathStep = 0, pathRoll = 0, tested = 0;
-      const steps = beat ? Math.ceil(TRANSITION_SECONDS / STEP_SECONDS) : 1;
+      const steps = Math.ceil(TRANSITION_SECONDS / STEP_SECONDS);
       let arrived = false;
-      for (let sample = 0; (sample <= steps || (beat && rail.navigation.active && sample * STEP_SECONDS < TRANSITION_CEILING_SECONDS)) && !arrived; sample++) {
+      for (let sample = 0; (sample <= steps || (rail.navigation.active && sample * STEP_SECONDS < TRANSITION_CEILING_SECONDS)) && !arrived; sample++) {
         clock = startTime + sample * STEP_SECONDS;
         rail.update(); totalSamples++;
         // the whole leg is walked, and nothing past its arrival is sampled
@@ -500,14 +502,15 @@ await section('actual camera rail against actual triangles', async () => {
       const expectedForward = pose.at.clone().sub(pose.eye).normalize();
       const actualForward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
       const aimError = expectedForward.angleTo(actualForward); maxAimError = Math.max(maxAimError, aimError);
-      if (beat < ids.length) {
+      if (!posed.has(id)) {
+        posed.add(id);
         poses.push({ viewport, station: id, ...coordinate(camera.position), fov: camera.fov, endpointErrorM: endpointError, aimErrorRadians: aimError });
         for (const yaw of [-.6, .6]) for (const pitch of [-.32, .32]) {
           rail.look(yaw, pitch); rail.update(); euler.setFromQuaternion(camera.quaternion, 'YXZ'); pathRoll = Math.max(pathRoll, Math.abs(euler.z));
         }
         rail.look(0, 0); rail.update();
       }
-      paths.push({ viewport, direction: jump ? 'direct' : beat < ids.length ? 'forward' : 'back', from, to: id, samples: steps + 1, distinctPositionSamples: tested, maxSampleStepM: pathStep, minimumGradeClearanceM: pathGrade, minimumMeshClearanceM: Number.isFinite(pathMesh) ? pathMesh : null, shellClearanceLowerBoundM: pathShell, maximumYXZRollRadians: pathRoll });
+      paths.push({ viewport, direction: 'neighbour', from, to: id, samples: steps + 1, distinctPositionSamples: tested, maxSampleStepM: pathStep, minimumGradeClearanceM: pathGrade, minimumMeshClearanceM: Number.isFinite(pathMesh) ? pathMesh : null, shellClearanceLowerBoundM: pathShell, maximumYXZRollRadians: pathRoll });
       minimumGrade = Math.min(minimumGrade, pathGrade); minimumMesh = Math.min(minimumMesh, pathMesh); minimumShell = Math.min(minimumShell, pathShell);
       maxRoll = Math.max(maxRoll, pathRoll); maxStepM = Math.max(maxStepM, pathStep);
     }
@@ -517,7 +520,7 @@ await section('actual camera rail against actual triangles', async () => {
   report.house = { footprintVertices: houseFootprint.length, floorM: houseFloor, lowestFloorM: houseFloorLowest, nextFloorM: houseCeiling, samples: houseSamples, minimumFloorClearanceM: Number.isFinite(minimumHouseFloor) ? minimumHouseFloor : null, missingFloorSamples: missingHouseFloor, missingByViewport: houseMissesByViewport };
   if (minimumShell < SHELL_CLEARANCE - 1e-6) fail('shell-clearance', 'A sampled path chord passes within 0.25 m of the actual DoubleSide shell, gate passage, inner court, collection or historic/modern retaining/stair geometry.', { minimumM: minimumShell });
   if (maxRoll > 1e-8 || maxQuaternionError > 1e-10 || maxAimError > 1e-6) fail('camera-orientation', 'YXZ roll, quaternion norm or final target direction exceeds tolerance.', { maxRoll, maxQuaternionError, maxAimError });
-  report.rail = { stationIds: ids, viewportCount: 2, adjacentTransitions: 2 * 2 * (ids.length - 1), directPhysicalTransitions: 40, timeStepSeconds: STEP_SECONDS, transitionObservationSeconds: TRANSITION_SECONDS, shellThresholdM: SHELL_CLEARANCE, terrainThresholdM: TERRAIN_CLEARANCE, collisionGeometry, totalCameraSamples: totalSamples, distinctPositionSamples: uniquePositions, maximumSampleStepM: maxStepM, minimumGradeClearanceM: minimumGrade, minimumMeshClearanceM: Number.isFinite(minimumMesh) ? minimumMesh : null, shellClearanceLowerBoundM: minimumShell, intersectingSampleChords: intersectingChords, maximumYXZRollRadians: maxRoll, maximumQuaternionNormError: maxQuaternionError, maximumAimErrorRadians: maxAimError, missingGroundSamples: missingGround, violationCount, violationExamples: violations, violationExamplesCappedAt: MAX_VIOLATIONS, poses, paths };
+  report.rail = { stationIds: ids, viewportCount: 2, neighbourTransitions: paths.length, timeStepSeconds: STEP_SECONDS, transitionObservationSeconds: TRANSITION_SECONDS, shellThresholdM: SHELL_CLEARANCE, terrainThresholdM: TERRAIN_CLEARANCE, collisionGeometry, totalCameraSamples: totalSamples, distinctPositionSamples: uniquePositions, maximumSampleStepM: maxStepM, minimumGradeClearanceM: minimumGrade, minimumMeshClearanceM: Number.isFinite(minimumMesh) ? minimumMesh : null, shellClearanceLowerBoundM: minimumShell, intersectingSampleChords: intersectingChords, maximumYXZRollRadians: maxRoll, maximumQuaternionNormError: maxQuaternionError, maximumAimErrorRadians: maxAimError, missingGroundSamples: missingGround, violationCount, violationExamples: violations, violationExamplesCappedAt: MAX_VIOLATIONS, poses, paths };
 });
 
 for (const { shell, ground, gatePassage, innerCourt, collection, collectionAccess, entryPassage, vegetation, roadDressing, groundDressing, water } of collisionSets.values()) { dispose(shell); dispose(ground); dispose(gatePassage); dispose(innerCourt); dispose(collection); dispose(collectionAccess); dispose(entryPassage); dispose(vegetation); dispose(roadDressing); dispose(groundDressing); water.dispose(); }

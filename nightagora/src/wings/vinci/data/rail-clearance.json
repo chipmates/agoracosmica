@@ -600,8 +600,8 @@
   },
   {
    "file": "src/wings/vinci/rail-gaze.ts",
-   "sha256": "a5e36acab0f6a515e906b91c551c056e2dd6b3cc51398c177a8320fa4f42dfb8",
-   "bytes": 102427,
+   "sha256": "a73c75e39558be025ce05202bbcac0bc5d619bceec1f7333343bfdc881731513",
+   "bytes": 104061,
    "unchangedDuringAudit": true
   },
   {
@@ -630,14 +630,14 @@
   },
   {
    "file": "src/wings/vinci/rail-waypoints.ts",
-   "sha256": "09b335c08949e8d0f8935761302116ecb6ea0c2d6a638ff3873c72c4220a5562",
-   "bytes": 22129,
+   "sha256": "32c368323eccb170aae483d09823a78d121ebec1e4d79682e8cfcdaa27212f29",
+   "bytes": 22043,
    "unchangedDuringAudit": true
   },
   {
    "file": "src/wings/vinci/rail.ts",
-   "sha256": "1ae9729f123e35036b54d7277b1e5f022c03c0753d7ded576a590d7f1a12175f",
-   "bytes": 72481,
+   "sha256": "4834ed53a34e61784d66b731b02e2bc3a4f1895889be0f494c26b0f9b49fef8a",
+   "bytes": 73764,
    "unchangedDuringAudit": true
   },
   {
@@ -8622,7 +8622,7 @@
      -4.78
     ]
    ],
-   "roundedLength": 51.70390334204863,
+   "roundedLength": 51.52358136442943,
    "maxNearRadius": 0.5063816453137727,
    "certifiedBalls": [
     {
@@ -8656,6 +8656,14 @@
       34.83351885131
      ],
      "radiusM": 0.8860315537907244
+    },
+    {
+     "centre": [
+      -20.87393296763332,
+      -4.789906174374106,
+      31.552407304805758
+     ],
+     "radiusM": 0.8846001598528328
     }
    ]
   },
@@ -8726,9 +8734,17 @@
      -4.64
     ]
    ],
-   "roundedLength": 51.70390334204863,
+   "roundedLength": 51.52358136442943,
    "maxNearRadius": 0.5063816453137727,
    "certifiedBalls": [
+    {
+     "centre": [
+      -20.873932967633316,
+      -4.789906174374106,
+      31.552407304805758
+     ],
+     "radiusM": 0.8846001598528357
+    },
     {
      "centre": [
       -21.028597113347054,
@@ -11899,7 +11915,7 @@
      -4.78
     ]
    ],
-   "roundedLength": 48.186715425452135,
+   "roundedLength": 47.99392738179937,
    "maxNearRadius": 0.4233952912279731,
    "certifiedBalls": [
     {
@@ -11933,6 +11949,14 @@
       34.83351885131
      ],
      "radiusM": 0.8030451997049247
+    },
+    {
+     "centre": [
+      -20.87446740010825,
+      -4.789887428520062,
+      31.56197828949246
+     ],
+     "radiusM": 0.7930689924674419
     }
    ]
   },
@@ -12003,9 +12027,17 @@
      -4.64
     ]
    ],
-   "roundedLength": 48.186715425452135,
+   "roundedLength": 47.993927381799374,
    "maxNearRadius": 0.4233952912279731,
    "certifiedBalls": [
+    {
+     "centre": [
+      -20.874467400108248,
+      -4.789887428520062,
+      31.56197828949246
+     ],
+     "radiusM": 0.7930689924674404
+    },
     {
      "centre": [
       -21.028597113347054,
