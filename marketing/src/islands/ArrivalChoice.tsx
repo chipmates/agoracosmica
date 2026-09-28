@@ -21,8 +21,9 @@
 // Copy is legally reviewed: the withdrawal notice, the privacy and Google
 // links and the click-ID scope sentence are all load bearing and none of
 // them may be dropped for space. A change to what the yes covers bumps
-// AD_CONSENT_VERSION (gclidCapture.ts, agc-public.js), so earlier answers
-// are asked again. Lift into publicI18n if it ever needs more languages.
+// AD_CONSENT_VERSION (gclidCapture.ts, agc-public.js), so an earlier yes is
+// asked again (an earlier no stays a no). Lift into publicI18n if it ever
+// needs more languages.
 
 import { useEffect, useRef, useState } from 'react';
 import {

@@ -184,6 +184,13 @@ describe('ArrivalChoice copy and version', () => {
     expect(storageKeys(sessionStorage)).toEqual([]);
   });
 
+  it('does not ask again after a no given under the earlier text', async () => {
+    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: false, version: '1.0.0', timestamp: Date.now() }));
+    const { container } = await mountAt(`/marcus-aurelius/?gclid=${CLICK}`);
+    expect(container.querySelector('.agc-consent')).toBeNull();
+    expect(storageKeys(sessionStorage)).toEqual([]);
+  });
+
   it('still never shows on a paid arrival, whatever version is stored', async () => {
     localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: true, version: '1.0.0', timestamp: Date.now() }));
     const { container } = await mountAt(`/marcus-aurelius/?p=1&gclid=${CLICK}`);

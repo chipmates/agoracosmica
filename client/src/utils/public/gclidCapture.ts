@@ -126,9 +126,10 @@ export function isPaidVisitor(): boolean {
 
 /**
  * The stored answer, if it still counts: written under the current consent
- * version (an older version no longer covers the current scope) and less than
- * 12 months old. Anything else counts as no answer and is removed, so no
- * answer is kept longer than the 12 months the policy states.
+ * version (an older yes no longer covers the current scope; an older no stays a
+ * no, since declining does not widen with the text) and less than 12 months
+ * old. Anything else counts as no answer and is removed, so no answer is kept
+ * longer than the 12 months the policy states.
  */
 function currentAdConsent(): { granted: boolean } | null {
   try {
@@ -137,7 +138,8 @@ function currentAdConsent(): { granted: boolean } | null {
     if (!raw) return null;
     const record = JSON.parse(raw) as { granted?: unknown; version?: unknown; timestamp?: unknown };
     const age = Date.now() - Number(record.timestamp);
-    if (record.version !== AD_CONSENT_VERSION || !Number.isFinite(age) ||
+    const isNo = record.granted === false;
+    if ((record.version !== AD_CONSENT_VERSION && !isNo) || !Number.isFinite(age) ||
         age >= AD_CONSENT_MAX_AGE_MS || age < -AD_CONSENT_SKEW_MS) {
       localStorage.removeItem(LS_AD_CONSENT_KEY);
       return null;

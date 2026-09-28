@@ -278,6 +278,25 @@ describe('an answer given under the earlier card text', () => {
     expect(storageKeys(sessionStorage)).toEqual([]);
     expect(fetchMock).not.toHaveBeenCalled();
   });
+  it('a no given under any earlier text stays a no, and is not asked again', async () => {
+    for (const version of ['1.0.0', '0.9.0']) {
+      localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: false, version, timestamp: Date.now() }));
+      const m = await loadAt(`/marcus-aurelius/?gclid=${CLICK}`);
+      expect(m.adConsentDecided()).toBe(true);
+      expect(m.adConsentGranted()).toBe(false);
+      m.captureGclid({ holdUntilAnswer: true });
+      expect(m.getGclid()).toBeNull();
+      expect(storageKeys(sessionStorage)).toEqual([]);
+      expect(localStorage.getItem('agc_ad_consent')).not.toBeNull();
+    }
+  });
+  it('an earlier no still goes after 12 months', async () => {
+    const old = Date.now() - 366 * 24 * 60 * 60 * 1000;
+    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: false, version: '1.0.0', timestamp: old }));
+    const m = await loadAt('/');
+    expect(m.adConsentDecided()).toBe(false);
+    expect(localStorage.getItem('agc_ad_consent')).toBeNull();
+  });
   it('a new yes is recorded under the current version', async () => {
     const m = await loadAt(`/marcus-aurelius/?gclid=${CLICK}`);
     m.captureGclid({ holdUntilAnswer: true });
