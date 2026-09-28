@@ -38,8 +38,11 @@ export function chapterMinutes(figureId: string, lang: Lang, chapter: number): n
   return total === null ? null : Math.max(1, Math.round(total / 60));
 }
 
-/** The one length every chapter door prints. */
+/** The one length every chapter door prints: the produced audio where it is
+ *  measured, the catalog's words-per-minute estimate otherwise. */
 export function chapterDisplayMinutes(figureId: string, lang: Lang, chapter: number): number | null {
+  const measured = chapterMinutes(figureId, lang, chapter);
+  if (measured) return measured;
   const estimate = getStoryChapter(figureId, lang, chapter)?.minutes;
   return estimate ? estimate : null;
 }
