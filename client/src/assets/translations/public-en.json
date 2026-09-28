@@ -99,10 +99,14 @@
       "name": "Meaning and Purpose",
       "question": "What is the meaning of life?",
       "answer": "There are four answers here: make your own meaning, let go of wanting, live the story you are already inside, or follow the longing home. They come from Marcus Aurelius, the Buddha, Joseph Campbell and Rumi. They do not agree. Each one has held up for centuries. Read them side by side, then ask whichever one sounds closest to you.",
-      "tagline": "What makes a life worth living?",
+      "tagline": "How do you find your own purpose?",
       "description": "What makes a life worth living? How do you find purpose when the world offers none? For thousands of years, thinkers have wrestled with these questions. Some found answers in duty, others in love, still others in the simple act of paying attention. Here, remarkable people across history explore what it means to live with clarity and depth.",
       "intro": "What turns days into a life worth waking up for?\n\nSome thinkers answer this from above. The long view. The indifferent stars. Marcus Aurelius wrote his Meditations late at night, between military campaigns. He reminded himself daily that he and the empire he ruled would both be forgotten. Strangely, that is where he found dignity. Stoicism does not promise meaning. It promises the courage to make some yourself.\n\nOthers find meaning in waking up rather than in achieving. Siddhartha Gautama walked away from a palace because comfort was not the answer. He spent years on the question. What came back was quieter than he expected. Most of our suffering does not come from what happens. It comes from how hard we hold on to wanting it otherwise. The Four Noble Truths are not abstract theology. They are a practice, a way of being.\n\nJoseph Campbell read the myths that cultures all over the world tell themselves, and found one shape repeating. The hero leaves the familiar, faces the dragon within, and brings something useful home. Your life has this shape too, Campbell said, even when it feels formless.\n\nRumi, drunk on what he called the Beloved, wrote that purpose is not something to find. It is something to remember. The reed flute cries because it has been cut from the reed bed. Meaning is the homesickness, and the way home is through love.\n\nFour very different answers. Stoic clarity, Buddhist release, mythic narrative, mystical longing. Start with whichever voice feels closest tonight. The conversation will lead you to the others.",
       "substance": [
+        {
+          "q": "How do you find your purpose in life?",
+          "a": "None of the four says you find it by waiting. Marcus Aurelius starts with today: do the next useful, honest thing, and let purpose grow out of the habit. The Buddha asks first what you are chasing, because a purpose built on wanting keeps moving away. Joseph Campbell says follow the pull you keep feeling, even when nobody else sees why. Rumi says look at what you long for, because the longing already points somewhere. Try one of them for a week and see which one fits."
+        },
         {
           "q": "What is the purpose of life?",
           "a": "Meaning and purpose sit close together, but they are not the same word. Meaning is what a life adds up to. Purpose is what you get up and do about it. Marcus Aurelius answered the purpose question like a job description: be useful, be just, be honest, today. Joseph Campbell answered it as a direction, follow the thing that pulls you, even when nobody else sees why. Siddhartha Gautama answered by shrinking the question. Stop chasing, and look at what is already here. None of them hands you a purpose. All three treat it as something you practice rather than something you are given."
@@ -117,7 +121,7 @@
         }
       ],
       "metaTitle": "What Is the Meaning of Life? Four Answers",
-      "metaDescription": "Stoic clarity, Buddhist release, mythic narrative, mystical longing. Four answers that have lasted, side by side, and a way to ask your own."
+      "metaDescription": "What is the meaning of life, and how do you find your purpose? Marcus Aurelius, the Buddha, Joseph Campbell and Rumi answer side by side."
     },
     "loss-grief": {
       "name": "Loss and Grief",
