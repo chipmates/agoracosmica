@@ -36,7 +36,7 @@
       "prompt": "Trees and hedge shrubs of 10 October 1517 (our 20 October) grown per species habit, every species and its state that week taken from the flora card (refs FLORA.md section 6) as a TYPE of the period, none documented at Cloux: walnut, field elm, oak, field maple, wild cherry, hornbeam, alder, pollard white willow, black poplar, pear, and the hedge shrubs hawthorn and blackthorn. A trunk that runs or forks into leaders, scaffold limbs that fork toward the crown the species makes, second-order branches and twigs, each grown segment by segment and stopped at the crown skin or at a refused place; a refused fork is tried once bent upward, a limb carrying no leaf below it is taken off, a limb left without a fork tapers to a tip. Near crowns carry every leaf as its own card; further crowns carry spray cards; a mid tree a stop sees within 32 m draws every twig at hero. Each species turns at one stage for the week (a third to two thirds; oak and alder greener), each leaf by its exposure, with a small turn by limb and by tree. The grave's tree over its west wall stands 15 m, drawn leaf by leaf. The week's fall lies as a carpet under each crown dropping it, as drifts against every riser, wall foot and retaining face across the south-west wind (clumped, piled in corners, stacked, leaning on the face), as a clumped scatter, in the lane's ruts and gutters and over the walled court's floor, densest where the stops see it; leaves off their floor cast through one opaque triangle within 12 m of a stop. Leaf and bark maps drawn from recipes in code, no photograph sampled. No leaf or limb inside a building, within 3.2 m above a certified walk, or inside the grave court below its walls' top. Wind only on an address that asks for it.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "8e165b8bbc3be5c13d3c54b0af5f3e47e1bc070c6196845efc79c2b935cdb184",
+      "sha256": "3d0fdc96f963c839da5471c79a71ad9eda5ec8c72feb7208f94294985b301a6d",
       "note": "FLORA.md section 6 species and autumn states as types; Q119 Q128 Q178 modern planting as branching character only; recipe_file=src/wings/vinci/vegetation.ts; companion_file=src/wings/vinci/tree-growth.ts; companion_sha256=a173009b55fe61d9cb8964b5caf4433101aa10caa102e23534469832c3ce8cc2; companion_file=src/wings/vinci/leaf-maps.ts; companion_sha256=30ff0932adcfd8b1a5ac030349f43c93896b3fa43b21d3cd03e56b055a4174ae; companion_file=src/wings/vinci/wind.ts; companion_sha256=e1d0da0b23efb5c92171462c8c127ea0f2cb6975a2e97cfcc7dfa4dc2f7ccb98; clusters_near_far_hero=6,3; clusters_near_far_standard_calm=3,1; far_clusters_cast_no_shadow=true; walk_clearance_m=3.2; walk_margin_m=1.0; building_margin_m=0.45; wind=address_only"
     },
     {
@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed toward a grey lit from the sun at up to 40 per cent. The dome keeps 82 per cent of its own saturation. Assumed weather, no observation claimed. The irradiance probe is the CIE clear sky (ISO 15469 type 12, circumsolar term held to a third) from the same sun, coloured from the rig zenith to its horizon and warmed toward the sun, levelled to the former two-colour band on an open horizontal face (src/wings/vinci/sky-probe.ts). Aerial perspective past 18 m at an assumed 0.004/m, cooler away from the sun and warmer toward it; none on a surface inside the collection seen from inside it; the displayed sky pales and loses up to 28 per cent of its saturation toward the horizon.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "db8afe8263e9902e3f147766e47f7d1eb7dc6515b184d45e53f3460f95fdc7b1",
+      "sha256": "429a5afe424c4747dae644179ba9f3a0bcf0300819def3e9cd584de2d10f380b",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=8c9b9be738df3285931a694255770c477d0cf7a23804a954af3cf89c2460f684;"
     },
     {
@@ -62,7 +62,7 @@
       "prompt": "Museum camera poses and piecewise exterior circulation in the fixed dossier frame. All poses are exhibition choices. Latest target semantic navigation on measured gate/terrace/stair/apron routes. Bounded physical near-pyramid clearance; measured geometry identity at mount. CSS projection-derived drag with 0.1 second monotone response; explicit inspection entry and return. The active certified leg finishes before a direct certified route to the newest pending target. Static material inspection aliases have separate actual placement audits.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "be609b89993b4f2d340184199844f35dd78382b0a315236b8cf6642b1e50cb5c",
+      "sha256": "dceb1188c4a222307454d83cbf151424076585a1091d6a1b0452775ead4318f9",
       "note": "brief/CONCEPT.md; src/wings/vinci/data/closluce.json; recipe_file=src/wings/vinci/rail.ts; companion_file=src/wings/vinci/input.ts; companion_file=src/wings/vinci/rail-gallery-gaze.ts; companion_recipe_ids=vinci/rail-smoothing,vinci/rail-proof,vinci/rail-fingerprint,vinci/rail-projection,vinci/projection-drag,vinci/rail-clearance,vinci/rail-waypoints,vinci/rail-solids,vinci/gait"
     },
     {
@@ -361,7 +361,7 @@
       "prompt": "Runtime exact canonical pose and actual mounted geometry identity guard for all40 directed physical routes. Applies conservative complete near-camera certificates; fails if stale.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-24",
-      "sha256": "e90b58205d398f958192937435013c8740b83595c04f0e361f401d655fcdcded",
+      "sha256": "982d64c56d79987b6ecea7cd831d59e02d8b4d8c365e90522dcb373394aa21d2",
       "note": "recipe_file=src/wings/vinci/rail-proof.ts; source_generator=forge/results/final-rail-route-proof.mjs; runtime dependency of vinci/rail; companion_file=src/wings/vinci/collection/pick.ts; companion_file=src/wings/vinci/collection/wall.ts"
     },
     {
@@ -426,7 +426,7 @@
       "prompt": "The walk between two stations as a person walks it: the leg profile, the step rhythm and the head lift, with every number a measured walking quantity.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-11",
-      "sha256": "bef61aa2b76f7f47dce392d4e6ef733e63754350bb379b1d8bd551402cb5d45f",
+      "sha256": "e4661db82aca15ba3b81cb645dcc5d24ad347a3e134903ae6c65b8c9e0dc2cb9",
       "note": "recipe_file=src/wings/vinci/gait.ts; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail"
     },
     {
@@ -439,7 +439,7 @@
       "prompt": "The turns a route takes between two stations, written against the registered gate crossing, the access stair layout and the collection stair.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-11",
-      "sha256": "dc0b2fe30abbfd780d7b4274d0f2bee693fdec538aa1772821a79e97079079ab",
+      "sha256": "32c368323eccb170aae483d09823a78d121ebec1e4d79682e8cfcdaa27212f29",
       "note": "recipe_file=src/wings/vinci/rail-waypoints.ts; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail"
     },
     {
@@ -3763,7 +3763,7 @@
       "prompt": "The wing's story layer as data: one stop per station of the wing's story card, in the card's order, each with its chapter title in both languages, its age clock, the object its frame must show, its line, its drawer, its certainty class and the canon sheet keys its claims resolve to, plus the two chapter cuts, the title wall and the exit's three things. Every displayed string is copied from the card and none is written here. The file is generated by forge/story-import.mjs and measured by forge/story-check.mjs against the line and drawer budgets of the house's story law.",
       "model": "Deterministic import from the wing's story card",
       "date": "2026-09-21",
-      "sha256": "b877f2e062f0ab3083afc49a6d68df1e1f30e6baac48c5a7eb6545840ab244c9",
+      "sha256": "9dc833c4a2b61f77374c9d639b1eef75ee5ce71a2fb79f16cc12d2706b0368ef",
       "note": "The words are the story card's, the structure is this file's. No surface reads this layer yet. recipe_file=src/wings/vinci/story.ts"
     },
     {
@@ -3854,7 +3854,7 @@
       "prompt": "Under each fallen leaf lying on stone, gravel or earth within 14 m of a stop that sees it, the blade's own outline softened on the stone: a tight dark rim at its edge and a faint skirt beyond, full under the blade so a lifted edge shows shade and not lit stone; within 7.5 m of a stop the outline as the rolled blade lies, narrower and off its axis, softer the more it stands off and shifted down-sun by the height its margins stand at, standing for the sky the leaf takes from the stone under and around it. Drawn at hero, the film's export included, since its occlusion cannot find a leaf two millimetres thick. Outside the walk's solids and the shadow body.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "8e165b8bbc3be5c13d3c54b0af5f3e47e1bc070c6196845efc79c2b935cdb184",
+      "sha256": "3d0fdc96f963c839da5471c79a71ad9eda5ec8c72feb7208f94294985b301a6d",
       "note": "A-SITE; deterministic museum dressing; recipe_file=src/wings/vinci/vegetation.ts"
     },
     {
@@ -3971,7 +3971,7 @@
       "prompt": "The week's fall of the planted trees as dry leaf cards of each species' outline, cupped and folded as drying leaves curl, and within 7.5 m of a stop (and in the grave court) as blades held near their species' own size: margins rolled up over an arc, some far enough to turn over and show the paler underside, tips curled, stalk ends lifted, resting on the lowest line of that shape, coloured from each tree's own fall: a carpet under every crown dropping it, carried north-east by the south-west wind; drifts against every riser, wall foot, kerb (the court's kerb before the house among them), retaining face, the chapel's bay, the grave's tomb and lectern and the supper wall's sill, each run heaped in its own places with bare stone between and some treads swept nearly bare, the wall feet and the kerb of a walked court holding what feet move off it; a clumped scatter, the lane's ruts and gutters, and the walled court's floor in small rafts, most of it in the lee of the walls. Densest where the stops see it. A type of one October week, not a record. Dressing a few centimetres deep on the floors, outside the walk's solids like the moss; the fall the rail certificate was written with is still built, leaf for leaf, on a layer no camera draws, until the next certificate.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-23",
-      "sha256": "8e165b8bbc3be5c13d3c54b0af5f3e47e1bc070c6196845efc79c2b935cdb184",
+      "sha256": "3d0fdc96f963c839da5471c79a71ad9eda5ec8c72feb7208f94294985b301a6d",
       "note": "A-SITE; FLORA.md; deterministic museum dressing; recipe_file=src/wings/vinci/vegetation.ts"
     },
     {
