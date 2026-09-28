@@ -22,6 +22,7 @@ const FigureController = lazy(() => import('../components/animations/CosmicLogin
 import { useTranslation } from '../hooks/useTranslation';
 import { mediaBaseUrl as MEDIA_BASE } from '../config/runtime';
 import { sendFunnelBeaconOnce, cinematicDwellBucket, CinematicOutcome } from '../utils/funnelBeacon';
+import { doorArrivalLabel } from '../utils/public/entryIntent';
 
 // Music served from R2 (same track as the podcast + landing clips). The mp3
 // exists because Safari and iOS cannot decode Opus-in-WebM in an audio element.
@@ -94,6 +95,7 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
     sendFunnelBeaconOnce('cinematic_end', {
       outcome,
       bucket: cinematicDwellBucket(performance.now() - cinematicStartRef.current),
+      mode: doorArrivalLabel(),
     });
     // Fade the music out over the handoff so it is silent by the time the
     // welcome disclosure takes over (unmount alone would cut it mid-note).
@@ -150,7 +152,7 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
   // denominator. One-shot per tab; also (re)arms the dwell clock.
   useEffect(() => {
     cinematicStartRef.current = performance.now();
-    sendFunnelBeaconOnce('cinematic_start');
+    sendFunnelBeaconOnce('cinematic_start', { mode: doorArrivalLabel() });
   }, []);
 
   // Mount: play the music, set the reveal timer, watch orientation.

@@ -52,6 +52,30 @@ describe('the welcome_shown class', () => {
   });
 });
 
+describe('the intro film door label', () => {
+  afterEach(() => {
+    window.history.replaceState({}, '', '/');
+  });
+
+  it('is door for a figure, question, council or chapter door, plain otherwise', async () => {
+    expect((await bootAt('/app?figure=marcus-aurelius&lang=de')).doorArrivalLabel()).toBe('door');
+    expect((await bootAt('/app?council=free-will&lang=en')).doorArrivalLabel()).toBe('door');
+    expect((await bootAt('/app?ask=life&lang=en')).doorArrivalLabel()).toBe('door');
+    expect((await bootAt('/app?figure=seneca&mode=story&chapter=3')).doorArrivalLabel()).toBe('door');
+    expect((await bootAt('/app?lang=de')).doorArrivalLabel()).toBe('plain');
+    expect((await bootAt('/app')).doorArrivalLabel()).toBe('plain');
+  });
+
+  it('reads no storage, even with an intent staged there', async () => {
+    const mod = await bootAt('/app?lang=en');
+    sessionStorage.setItem('agc_intended_figure', 'aurelius');
+    const getItem = vi.spyOn(Storage.prototype, 'getItem');
+    expect(mod.doorArrivalLabel()).toBe('plain');
+    expect(getItem).not.toHaveBeenCalled();
+    getItem.mockRestore();
+  });
+});
+
 describe('the homepage forward', () => {
   beforeEach(() => {
     funnel.sendFunnelBeaconOnce.mockClear();

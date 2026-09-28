@@ -118,6 +118,12 @@ const VALID_STEPS = new Set([
 // cannot be read and would inflate the total, so it is dropped instead.
 const ENGAGED_ARMS = new Set(['typed', 'listened', 'both']);
 
+// The intro film's one structural label, in the mode slot: whether the visit
+// came in through a door that named a figure, a question, a council or a
+// chapter. A closed pair; anything else, or nothing, leaves the slot empty.
+const DOOR_LABEL_STEPS = new Set(['cinematic_start', 'cinematic_end']);
+const DOOR_LABELS = new Set(['door', 'plain']);
+
 // Steps whose row is the step name and the standard edge dimensions, nothing
 // else: no path, no figure, no mode. Deliberately not COUNTER_ONLY_STEPS,
 // which keeps the sanitized path.
@@ -216,9 +222,10 @@ export async function handleFunnel(request: Request, env: Env): Promise<Response
     ref = payload.figureId;
   }
 
-  const mode = (typeof payload.mode === 'string' && MODE_RE.test(payload.mode))
+  let mode = (typeof payload.mode === 'string' && MODE_RE.test(payload.mode))
     ? payload.mode
     : '';
+  if (DOOR_LABEL_STEPS.has(step) && !DOOR_LABELS.has(mode)) mode = '';
   // The arm is the whole content of an engaged row, so an unreadable one is
   // dropped rather than stored blank.
   if (step === 'engaged' && !ENGAGED_ARMS.has(mode)) {

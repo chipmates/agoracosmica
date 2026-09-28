@@ -1342,6 +1342,26 @@ async function main(): Promise<number> {
     }
   });
 
+  await test('the intro steps carry the door label in the mode slot, a closed pair', async () => {
+    for (const step of ['cinematic_start', 'cinematic_end']) {
+      for (const label of ['door', 'plain']) {
+        const row = await funnelBeacon({ step, mode: label, language: 'de', outcome: 'watched', bucket: 2 });
+        assertEqual(row.blobs[0], step, 'step');
+        assertEqual(row.blobs[2], label, `${step} keeps ${label}`);
+      }
+      const bare = await funnelBeacon({ step, language: 'de' });
+      assertEqual(bare.blobs[0], step, `${step} still counted without a label`);
+      assertEqual(bare.blobs[2], '', `${step} without a label`);
+      const odd = await funnelBeacon({ step, mode: 'figure', language: 'de' });
+      assertEqual(odd.blobs[2], '', `${step} drops a value outside the pair`);
+    }
+    const end = await funnelBeacon({ step: 'cinematic_end', mode: 'door', outcome: 'skipped', bucket: 1, language: 'en' });
+    assertEqual(end.blobs[4], 'skipped', 'outcome unchanged');
+    assertEqual(end.doubles[0], 1, 'dwell bucket unchanged');
+    const other = await funnelBeacon({ step: 'welcome_shown', mode: 'figure', language: 'en' });
+    assertEqual(other.blobs[2], 'figure', 'other steps keep their own mode vocabulary');
+  });
+
   // -------------------------------------------------------------------------
   // Session count: the page's first token request, no lookup by client ID
   // -------------------------------------------------------------------------

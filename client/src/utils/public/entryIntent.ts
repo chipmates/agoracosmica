@@ -518,6 +518,18 @@ export function classifyEntryForFunnel(): EntryClass {
   return bootEntryClass;
 }
 
+/**
+ * Whether the visit came in through a door that named a figure, a question,
+ * a council or a chapter: the intro film's one structural label. From the
+ * same boot-time reading, so nothing is read from storage for it.
+ */
+export function doorArrivalLabel(): 'door' | 'plain' {
+  return bootEntryClass === 'council' || bootEntryClass === 'ask'
+    || bootEntryClass === 'chapter' || bootEntryClass === 'figure'
+    ? 'door'
+    : 'plain';
+}
+
 // Same precedence the staged intents are routed by: council first, library last.
 function classifyBootParams(params: URLSearchParams): EntryClass {
   const ask = params.get('ask');
