@@ -295,7 +295,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
     de: {
       description: "Platons Philosophie der Ideen, Gerechtigkeit und des geprüften Lebens. Eine erzählte Lebensgeschichte, Lehren zum Höhlengleichnis und zur Sokratik.",
       teachingsHeading: "Platon über Wahrheit, Gerechtigkeit und das geprüfte Leben",
-      seoTitle: "Platon - Höhlengleichnis & Ideenlehre | Agora Cosmica",
+      seoTitle: "Platon: Leben, Dialoge und Lehre | Agora Cosmica",
     },
   },
   rumi: {

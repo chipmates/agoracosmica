@@ -81,7 +81,7 @@ export const fragment: FigureFragment = {
     de: {
       concepts: [
         {
-          h2: 'Platons Ideenlehre einfach erklärt',
+          h2: 'Die Ideenlehre am Beispiel eines Kreises',
           seedId: 6,
           body:
             "Zeichne einen Kreis in den Sand. Deine Hand zittert, die Körner verrutschen, der Kreis wird schief. Achte jetzt darauf, was gerade passiert ist. Du hast gemerkt, dass er schief ist. Also trägst du irgendwo schon einen vollkommenen Kreis in dir, obwohl du nie einen mit den Augen gesehen hast. Das ist Platons Gedanke in einem einzigen Schritt. Hinter jedem unvollkommenen Ding steht seine Idee, die Sache selbst, unveränderlich und ganz. Kreise, ja, aber auch Gerechtigkeit, Schönheit und Gleichheit. Was deine Sinne erreichen, ist die Welt des Werdens, immer in Bewegung und nie fertig. Die Ideen sind die Welt des Seins. Philosophie ist für Platon die langsame Wendung von der einen zur anderen.",
