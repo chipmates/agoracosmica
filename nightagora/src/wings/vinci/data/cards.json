@@ -119,7 +119,7 @@
       "record": { "en": "The full record", "de": "Der ganze Nachweis" },
       "more": { "en": "More", "de": "Mehr" },
       "read_more": { "en": "Read more", "de": "Mehr lesen" },
-      "ask_figure": { "en": "Ask {figure}", "de": "Frag {figure}" }
+      "ask_figure": { "en": "Ask the Echo of {figure}", "de": "Frag das Echo von {figure}" }
     },
     "walk": {
       "walk_in": { "en": "Walk in", "de": "Hineingehen" },
@@ -129,13 +129,14 @@
       "next_work": { "en": "Next work", "de": "Nächstes Werk" },
       "next_page": { "en": "Next page", "de": "Nächste Seite" },
       "next_machine": { "en": "Next machine", "de": "Nächste Maschine" },
+      "next_manuscript": { "en": "Next manuscript", "de": "Nächstes Manuskript" },
       "run_it": { "en": "Run it", "de": "Laufen lassen" },
       "the_end": { "en": "The end", "de": "Das Ende" },
       "look_up": { "en": "Look up", "de": "Nach oben schauen" }
     },
     "ending": {
-      "lookup": { "en": "Look up", "de": "Nach oben schauen" },
-      "talk": { "en": "Talk with Leonardo", "de": "Mit Leonardo sprechen" }
+      "lookup": { "en": "Look up", "de": "Schau nach oben" },
+      "talk": { "en": "Ask Leonardo's Echo", "de": "Frag Leonardos Echo" }
     },
     "visit": {
       "tell_the_story": { "en": "Tell me the story", "de": "Erzähl mir die Geschichte" },
