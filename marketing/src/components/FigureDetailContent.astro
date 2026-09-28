@@ -142,7 +142,14 @@ const poemsFaq = figureId === 'dickinson' ? (de ? dickinsonPoemsFaqDe : dickinso
 type DeepLink = { href: string; label: string; under?: string };
 const DEEP_LINKS: Record<string, { en?: DeepLink[]; de?: DeepLink[] }> = {
   blake: {
-    en: [{ href: '/figures/william-blake/poems/', label: "Read William Blake's poems →" }],
+    en: [
+      { href: '/figures/william-blake/poems/', label: "Read William Blake's poems →" },
+      { href: '/figures/william-blake/poems/the-lamb/', label: 'Read The Lamb →', under: 'Which William Blake poems should I read first?' },
+      { href: '/figures/william-blake/poems/the-tyger/', label: 'Read The Tyger →', under: 'Which William Blake poems should I read first?' },
+      { href: '/figures/william-blake/poems/london/', label: 'Read London →', under: 'Which William Blake poems should I read first?' },
+      { href: '/figures/william-blake/poems/a-poison-tree/', label: 'Read A Poison Tree →', under: 'Which William Blake poems should I read first?' },
+      { href: '/figures/william-blake/poems/london/', label: 'Read London, the whole poem →', under: "What are Blake's mind-forged manacles?" },
+    ],
   },
   shakespeare: {
     en: [{ href: '/figures/william-shakespeare/sonnets/', label: "Read Shakespeare's sonnets →" }],

@@ -81,7 +81,7 @@ export const fragment: FigureFragment = {
     de: {
       concepts: [
         {
-          h2: 'Drama bei Shakespeare: Wie ist es gebaut?',
+          h2: 'Wie sind Shakespeares Dramen gebaut?',
           seedId: 6,
           body:
             'Shakespeares Dramen laufen nach zwei Grundmustern. In der Tragödie kommt die Einsicht zu spät, um das Unglück zu verhindern, aber nicht zu spät für Erkenntnis. Genau dieser Moment trägt die Stücke, nicht das Blutbad am Ende. In der Komödie verlassen die Figuren die geordnete Welt, geraten in einen Wald oder eine fremde Stadt, wo die Regeln nicht gelten, und kehren verwandelt zurück. Dazu kommt seine Bauweise. Er hält sich nicht an die klassischen Einheiten von Ort, Zeit und Handlung. Er führt mehrere Handlungsstränge parallel und lässt sie sich gegenseitig kommentieren. Der Konflikt läuft dabei immer auf drei Ebenen zugleich: in der Figur, zwischen den Figuren und zwischen Figur und Welt.',

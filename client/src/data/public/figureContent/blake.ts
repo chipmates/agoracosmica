@@ -18,7 +18,7 @@ export const fragment: FigureFragment = {
         },
         {
           q: "What are Blake's mind-forged manacles?",
-          a: "A boy sees angels in a tree and is told to stop lying. A student draws what he actually sees and is told he is imagining things. Year after year, correction on correction, the chains weave themselves. That is Blake's point. The manacles are not iron that somebody clamped on you. They are thought pulled tight from the inside, until the prison feels like the natural shape of the world. He heard them everywhere. In every cry of every Man, In every Infants cry of fear, In every voice: in every ban, The mind-forg'd manacles I hear. That is from Songs of Experience, which he printed in 1794.",
+          a: "A boy sees angels in a tree and is told to stop lying. A student draws what he actually sees and is told he is imagining things. Year after year, correction on correction, the chains weave themselves. That is Blake's point. The manacles are not iron that somebody clamped on you. They are thought pulled tight from the inside, until the prison feels like the natural shape of the world. He heard them everywhere. In every cry of every Man, In every Infants cry of fear, In every voice: in every ban, The mind-forg'd manacles I hear. That is from London, a poem in Songs of Experience, which he printed in 1794.",
         },
       ],
       disclosure: {
@@ -38,7 +38,7 @@ export const fragment: FigureFragment = {
         },
         {
           q: 'Was sind William Blakes geistgeschmiedete Fesseln?',
-          a: 'Ein Junge sieht Engel in einem Baum und soll aufhören zu lügen. Ein Schüler zeichnet, was er wirklich sieht, und hört, er bilde sich das ein. Jahr für Jahr, Zurechtweisung um Zurechtweisung, flechten sich die Ketten von selbst. Das ist Blakes Punkt. Die Fesseln sind kein Eisen, das dir jemand angelegt hat. Sie sind Denken, das von innen festgezogen wird, bis das Gefängnis wie die natürliche Form der Welt wirkt. Er hörte sie überall: In jedem Schrei eines jeden Manns, im Schreckensschrei jedes Kinds, in jeder Stimme, in jedem Bann hör ich die geistgeschmiedeten Fesseln. Die Zeilen stehen in Songs of Experience, gedruckt 1794.',
+          a: 'Ein Junge sieht Engel in einem Baum und soll aufhören zu lügen. Ein Schüler zeichnet, was er wirklich sieht, und hört, er bilde sich das ein. Jahr für Jahr, Zurechtweisung um Zurechtweisung, flechten sich die Ketten von selbst. Das ist Blakes Punkt. Die Fesseln sind kein Eisen, das dir jemand angelegt hat. Sie sind Denken, das von innen festgezogen wird, bis das Gefängnis wie die natürliche Form der Welt wirkt. Er hörte sie überall: In jedem Schrei eines jeden Manns, im Schreckensschrei jedes Kinds, in jeder Stimme, in jedem Bann hör ich die geistgeschmiedeten Fesseln. Die Zeilen stammen aus dem Gedicht London in Songs of Experience, gedruckt 1794.',
         },
       ],
       disclosure: {
@@ -50,6 +50,11 @@ export const fragment: FigureFragment = {
   page: {
     en: {
       concepts: [
+        {
+          h2: 'Which William Blake poems should I read first?',
+          body:
+            "Start with the pair. The Lamb, from Songs of Innocence (1789), asks a lamb who made it, and answers. The Tyger, from Songs of Experience (1794), asks a tiger burning bright the same thing and gets no answer: Did he who made the lamb make thee? Then London, a walk through the city where every face shows marks of weakness, marks of woe. Then A Poison Tree, four short stanzas on what anger does when you keep it to yourself. All four are short, and all four are here in full.",
+        },
         {
           h2: 'Who is Orc in William Blake?',
           seedId: 11,
@@ -82,10 +87,10 @@ export const fragment: FigureFragment = {
     de: {
       concepts: [
         {
-          h2: 'William Blake Gedichte: Welche sollte man kennen?',
+          h2: 'Welche Gedichte von William Blake sollte man kennen?',
           seedId: 2,
           body:
-            'Blake hat seine Gedichte selbst gedruckt, Text und Bild auf derselben Platte. Vier Bücher lohnen den Anfang. Songs of Innocence (1789) und Songs of Experience (1794) gehören zusammen und zeigen dieselbe Welt zweimal, einmal unschuldig und einmal wach. Aus Songs of Experience stammt die bekannteste Zeile. In jedem Schrei eines jeden Manns, im Schreckensschrei jedes Kinds, in jeder Stimme, in jedem Bann hör ich die geistgeschmiedeten Fesseln. The Marriage of Heaven and Hell (1790 bis 1793) ist das Buch der Gegensätze, kurze harte Sätze, fast Sprichwörter. America a Prophecy (1793) ist das politische Buch. Und aus Auguries of Innocence kommt die Zeile, die fast jeder kennt: Die Welt zu sehn in einem Sandkorn. Alle Texte sind gemeinfrei.',
+            'Blake hat seine Gedichte selbst gedruckt, Text und Bild auf derselben Platte. Vier Bücher lohnen den Anfang. Songs of Innocence (1789) und Songs of Experience (1794) gehören zusammen und zeigen dieselbe Welt zweimal, einmal unschuldig und einmal wach. Aus dem Gedicht London in Songs of Experience stammt die bekannteste Zeile. In jedem Schrei eines jeden Manns, im Schreckensschrei jedes Kinds, in jeder Stimme, in jedem Bann hör ich die geistgeschmiedeten Fesseln. The Marriage of Heaven and Hell (1790 bis 1793) ist das Buch der Gegensätze, kurze harte Sätze, fast Sprichwörter. America a Prophecy (1793) ist das politische Buch. Und aus Auguries of Innocence kommt die Zeile, die fast jeder kennt: Die Welt zu sehn in einem Sandkorn. Alle Texte sind gemeinfrei.',
         },
         {
           h2: 'William Blake einfach erklärt',
