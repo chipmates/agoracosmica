@@ -156,7 +156,7 @@ const room = audit(tris)
 // THE CONTROL: a post on the walk from the station eye to the court's east
 // edge, where a refusal is certain, proves the audit can see.
 const post = new plan.Body()
-post.box([-33.0, -29.6, -6.44, -32.9, -29.4, -3.5])
+post.box([-33.0, -30.46, -6.44, -32.9, -30.26, -3.5])
 const control = audit(trianglesOf({ 'control-post': post }))
 const failures = [...room.failures]
 if (control.failures.length === 0) failures.push('The control post on the walk out of the station was not refused')
