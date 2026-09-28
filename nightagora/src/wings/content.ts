@@ -52,8 +52,8 @@ export const WING_TEXT = {
   },
   /** the door at every station */
   door: {
-    en: 'Ask them about this',
-    de: 'Danach fragen',
+    en: 'Ask the Echo about this',
+    de: 'Frag das Echo danach',
   },
   /** the no-key case: the app's free tier is a daily quota, not a key */
   doorNote: {
@@ -65,21 +65,21 @@ export const WING_TEXT = {
      the title is the wing's own, which is why it stands here as a mark. What
      an Echo is comes from the disclosure canon and is never written twice. */
   doorTitle: {
-    en: 'Talk with {name}',
-    de: 'Sprich mit {name}',
+    en: 'Talk with the Echo of {name}',
+    de: 'Sprich mit dem Echo von {name}',
   },
   doorLead: {
-    en: 'This door leads to Agora Cosmica, the library this museum belongs to. There you learn from thirty lives by talking with them.',
-    de: 'Diese Tür führt zu Agora Cosmica, der Bibliothek, zu der dieses Museum gehört. Dort lernst du von dreißig Leben, indem du mit ihnen sprichst.',
+    en: 'This door leads to Agora Cosmica, the library this museum belongs to. There you talk with the AI Echoes of thirty lives. You learn how they thought and what they knew about living, and you can put your own questions to them.',
+    de: 'Diese Tür führt zu Agora Cosmica, der Bibliothek, zu der dieses Museum gehört. Dort sprichst du mit den KI-Echos von dreißig Leben. Du lernst, wie sie dachten und was sie über das Leben wussten, und du kannst ihnen deine eigenen Fragen stellen.',
   },
   doorTerms: {
-    en: 'Nonprofit and open source. It opens in a new tab, with free turns every day and no key needed.',
-    de: 'Non-Profit und Open Source. Öffnet in einem neuen Tab, mit freien Gesprächsrunden an jedem Tag und ohne Schlüssel.',
+    en: 'Nonprofit and Open Source. It opens in a new tab, with free turns every day and no key needed.',
+    de: 'Non-Profit und Open Source. Öffnet in einem neuen Tab, mit freien Gesprächsrunden jeden Tag und ohne Schlüssel.',
   },
   /** the plate's way in, which carries the station's own question */
   doorAsk: {
-    en: 'Ask about this',
-    de: 'Danach fragen',
+    en: 'Ask the Echo',
+    de: 'Frag das Echo',
   },
   doorStay: {
     en: 'Stay in the museum',
