@@ -138,7 +138,7 @@ ensure(headLift.every(lift => lift.degreesAtThreshold > 0 && lift.degreesTenMetr
 const THREE = await import('three/webgpu')
 const { createRail, stationPose } = await load(path.join(wing, 'rail.ts'))
 const { createCertifiedRailPath } = await load(path.join(wing, 'rail-smoothing.ts'))
-function walkTrace(metres, reduced) {
+function walkTrace(metres, reduced, pair = ['oratory', 'study']) {
   // both eyes look along the leg: a station walk is never walked backward, and
   // a leg that faced away would stand to turn and bury the rhythm in stands
   const station = stationPose('arrival', false)
@@ -149,11 +149,11 @@ function walkTrace(metres, reduced) {
   const camera = new THREE.PerspectiveCamera(49, 1512 / 950, .25, 1100)
   const rail = createRail(camera, () => now, { status: 'verified', failure: '', route: () => straight })
   reducedMotionNow.value = reduced
-  rail.set('arrival', from, true, false)
+  // a pair that keeps the visitor's pace (`RAIL_PACE_KEPT`), both eyes along
+  // the straight leg, so the rail makes no stand and the trace is the walk alone
+  rail.set(pair[0], from, true, false)
   rail.update()
-  // a station the arrival's walks neither leave nor arrive at turning, so the
-  // rail makes no stand on this leg and the trace is the walk alone
-  rail.set('hall', to, false, false)
+  rail.set(pair[1], to, false, false)
   const leg = gaitLeg(metres), samples = []
   rail.update()
   const seconds = rail.navigation.legSeconds
@@ -176,7 +176,8 @@ function walkTrace(metres, reduced) {
     endEastErrorMM: +(Math.abs(samples.at(-1).east - (base.x + metres)) * 1000).toFixed(6),
   }
 }
-const traces = [walkTrace(17.369497651827334, false), walkTrace(17.369497651827334, true), walkTrace(6.073302231899875, false)]
+const traces = [walkTrace(17.369497651827334, false), walkTrace(17.369497651827334, true), walkTrace(6.073302231899875, false),
+  walkTrace(17.369497651827334, false, ['arrival', 'hall'])]
 ensure(traces[0].heightAmplitudeMM > 6 && traces[0].heightAmplitudeMM < 10, 'The measured rise and fall left its declared band')
 // THE CADENCE FOLLOWS THE PACE, it is not set: the measured rise and fall of
 // the trace is the leg's own cadence, whichever pace the visitor walks at.
@@ -186,6 +187,9 @@ const walkedCadence = gaitLeg(17.369497651827334).cadenceStepsPerSecond
 ensure(traces[0].riseAndFallPerSecond > walkedCadence * .7 && traces[0].riseAndFallPerSecond <= walkedCadence + 1e-9,
   `The measured cadence ${traces[0].riseAndFallPerSecond} is not the leg's own ${walkedCadence.toFixed(2)}`)
 ensure(traces[1].heightAmplitudeMM === 0 && traces[1].swayAmplitudeMM === 0, 'Reduced motion still carries a step rhythm on the camera')
+// A LEG WALKED FASTER THAN THE PACE (`RAIL_WALK_SPEED`) IS A TRAVERSE: at the
+// step's length its rise and fall would run near five a second, a jog.
+ensure(traces[3].heightAmplitudeMM === 0 && traces[3].swayAmplitudeMM === 0, 'A leg walked faster than the pace still carries a step rhythm')
 ensure(traces.every(trace => trace.endHeightErrorMM < 1e-6 && trace.endEastErrorMM < 1e-6), 'A walk does not land on its own certified eye')
 
 /** The retained carried-pace helper and the card's handover, measured on the

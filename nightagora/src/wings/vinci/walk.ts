@@ -13,7 +13,7 @@
  *
  * A CUT IS A CHAPTER BOUNDARY, not a leg. Where the story cuts, the walk does
  * not cross the site: the picture dips to the chapter's title and the visitor
- * arrives at the next stop. The certified leg under each cut still exists.
+ * arrives at the next stop. No leg is certified under a cut.
  */
 import type { Pose } from './rail'
 import { stationPose } from './rail'

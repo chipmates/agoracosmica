@@ -52,6 +52,8 @@ const {gradeAt}=await load(path.join(wing,'terrain-mesh.ts'))
 const {createCollectionStandSolids}=await load(path.join(wing,'collection/stands.ts'))
 const {vinciExhibitRecords,vinciApproachPose:approachPose}=await load(path.join(wing,'collection/approaches.ts'))
 const EXHIBITS=vinciExhibitRecords()
+const {VINCI_HOUSE_DOOR:DOOR}=await load(path.join(wing,'walk-places.ts'))
+const {vinciWalkPoseOf}=await load(path.join(wing,'walk-poses.ts'))
 const authorityFactories=[
   ['shell','shell','createShell',false],['terrain','ground','createGround',false],
   ['gate-passage','gate-passage','createGatePassage',false],
@@ -120,6 +122,8 @@ function harness(phone,initial='arrival',status='verified') {
   const rail=createRail(camera,()=>now,authority)
   const h={camera,rail,authority,calls,phone,pose:id=>stationPose(id,phone),get now(){return now},
     set(id,instant=false){rail.set(id,stationPose(id,phone),instant,phone)},
+    /** a place of the walk's own, the house door's two poses */
+    place(id,instant=false){rail.set(id,vinciWalkPoseOf(id,phone),instant,phone)},
     at(time){now=time;rail.update();validate(camera)},
     drag(dx,dy){rail.drag(dx,dy,phone?844:950)},
   }
@@ -239,85 +243,90 @@ for(const phone of [false,true]) {
       ensure(apart>1,'Two house stations fell back to one plate: '+houses[i]+' and '+houses[j])
       nearest=Math.min(nearest,apart)
     }
-    h.drag(-49,29);h.at(0)
-    h.set('oratory');h.at(.005)
-    const metres=h.rail.navigation.legMetres,seconds=h.rail.navigation.legSeconds
+    // the hall is entered and left through the door's cut, so the walked
+    // pairs are the three rooms beyond it, each only to its neighbour
+    const w=harness(phone,'oratory')
+    w.drag(-49,29);w.at(0)
+    w.set('study');w.at(.005)
+    const metres=w.rail.navigation.legMetres,seconds=w.rail.navigation.legSeconds
     ensure(metres>0&&seconds>0,'A change between two house stations walked no path')
-    h.set('chamber');h.set('study')
-    ensure(h.rail.navigation.queued.join(',')==='study','The newest house target was lost')
-    settle(h,'oratory');settle(h,'study')
-    ensure(h.calls.length===2&&h.calls.every(call=>!call.kind),'The two legs were not certified station routes')
-    ensure(h.calls[1].from.every((v,i)=>Math.abs(v-h.pose('oratory').eye.getComponent(i))<1e-12)
-      &&h.calls[1].to.every((v,i)=>Math.abs(v-h.pose('study').eye.getComponent(i))<1e-12),'The second leg was not the station pair')
-    h.at(h.now+5);compare(h.camera,canonical(phone,'study'),'The arrival holds the station composition')
+    w.set('oratory');w.set('chamber')
+    ensure(w.rail.navigation.queued.join(',')==='chamber','The newest house target was lost')
+    settle(w,'study');settle(w,'chamber')
+    ensure(w.calls.length===2&&w.calls.every(call=>!call.kind),'The two legs were not certified station routes')
+    ensure(w.calls[1].from.every((v,i)=>Math.abs(v-w.pose('study').eye.getComponent(i))<1e-12)
+      &&w.calls[1].to.every((v,i)=>Math.abs(v-w.pose('chamber').eye.getComponent(i))<1e-12),'The second leg was not the station pair')
+    w.at(w.now+5);compare(w.camera,canonical(phone,'chamber'),'The arrival holds the station composition')
     return {nearestHouseEyesM:+nearest.toFixed(2),firstLegMetres:+metres.toFixed(2),firstLegSeconds:+seconds.toFixed(2)}
   })
   check(viewport,'A long held-input burst retains at most one target and walks only the active and latest endpoints',()=>{
     // The burst never ends on the station it starts from: asking for the
     // endpoint you already stand at cancels the queue by design, and a walk
     // whose station count happens to divide the burst would test that instead.
-    const h=harness(phone),others=ids.filter(id=>id!=='courtyard')
+    // Only a neighbour of the leg's end is ever queued (a far stop is a fade
+    // the wing makes, not a walk), so the burst alternates between the two.
+    const h=harness(phone,'picture-room-west'),others=['works','picture-room-west']
     const accepted=Array.from({length:257},(_,i)=>others[i%others.length])
-    h.set('courtyard');h.at(0);h.at(.2)
+    h.set('flight');h.at(0);h.at(.2)
     for(const id of accepted){h.set(id);ensure(h.rail.navigation.queued.length<=1,'A held input built a chain')}
     ensure(h.rail.navigation.queued.join(',')===accepted.at(-1),'Burst did not retain its latest target')
-    const trace=[];let previous='arrival'
+    const trace=[];let previous='picture-room-west'
     for(let tick=0;trace.length<2&&tick<600;tick++) {
       h.at(.2+tick*2)
       const current=h.rail.navigation.completed
       if(current!==previous){trace.push(current);endpoint(h,current);previous=current}
     }
-    ensure(trace.join(',')===['courtyard',accepted.at(-1)].join(','),'Burst walked a superseded endpoint or lost its newest target')
+    ensure(trace.join(',')===['flight',accepted.at(-1)].join(','),'Burst walked a superseded endpoint or lost its newest target')
     ensure(h.calls.length===2&&h.rail.navigation.queued.length===0,'Burst created an extra route')
     return {acceptedRequests:accepted.length,observedEndpoints:trace.length}
   })
   check(viewport,'A delayed frame completes only the active endpoint and gives later legs fresh clocks',()=>{
-    const h=harness(phone);h.set('courtyard');h.at(0);h.at(.2);h.set('garden');h.set('hall')
+    const h=harness(phone,'oratory');h.set('study');h.at(0);h.at(.2);h.set('oratory');h.set('chamber')
     const late=DURATION+10
-    h.at(late);endpoint(h,'courtyard');ensure(h.rail.navigation.active===undefined,'A second leg began during completion')
-    ensure(h.rail.navigation.queued.join(',')==='hall','Delayed frame lost the newest pending request')
-    h.at(late);compare(h.camera,canonical(phone,'courtyard'),'New leg zero elapsed time')
-    const control=harness(phone,'courtyard');control.set('hall');control.at(0)
+    h.at(late);endpoint(h,'study');ensure(h.rail.navigation.active===undefined,'A second leg began during completion')
+    ensure(h.rail.navigation.queued.join(',')==='chamber','Delayed frame lost the newest pending request')
+    h.at(late);compare(h.camera,canonical(phone,'study'),'New leg zero elapsed time')
+    const control=harness(phone,'study');control.set('chamber');control.at(0)
     const seconds=control.rail.navigation.legSeconds/control.rail.navigation.legPace,step=seconds/224
     for(let i=1;i<224;i++){h.at(late+i*step);control.at(i*step);compare(h.camera,control.camera,'Fresh route clock')}
     h.at(late+seconds+1e-6);control.at(seconds+1e-6);compare(h.camera,control.camera,'Fresh route clock at the endpoint')
-    endpoint(h,'hall')
+    endpoint(h,'chamber')
   })
   check(viewport,'Reduced motion finishes the active request then completes only the newest pending target',()=>{
-    const h=harness(phone);h.set('courtyard');h.at(0);h.at(.2);h.set('garden');h.set('hall')
+    const h=harness(phone,'oratory');h.set('study');h.at(0);h.at(.2);h.set('oratory');h.set('chamber')
     media.reduced=true
     const trace=[]
     for(let i=0;i<2;i++){h.at(10);trace.push(h.rail.navigation.completed)}
-    ensure(trace.join(',')==='courtyard,hall','Reduced motion lost the active endpoint or newest target')
+    ensure(trace.join(',')==='study,chamber','Reduced motion lost the active endpoint or newest target')
     ensure(h.calls.length===2&&h.rail.navigation.queued.length===0,'Reduced motion walked a superseded target')
-    h.drag(34,20);h.at(10);const looked=snapshot(h.camera);h.set('hall');h.at(11);compare(h.camera,looked,'Reduced duplicate')
+    h.drag(34,20);h.at(10);const looked=snapshot(h.camera);h.set('chamber');h.at(11);compare(h.camera,looked,'Reduced duplicate')
   })
   check(viewport,'Pending or failed authority holds the origin and retains only the newest target',()=>{
-    const h=harness(phone,'arrival','checking'),origin=snapshot(h.camera)
-    h.set('courtyard');h.set('garden');h.set('arrival');h.at(10)
+    const h=harness(phone,'flight','checking'),origin=snapshot(h.camera)
+    h.set('works');h.set('picture-room-west');h.set('flight');h.at(10)
     compare(h.camera,origin,'Pending proof');ensure(h.calls.length===0,'Pending authority was bypassed')
     ensure(h.rail.navigation.queued.length===0,'Requesting the standing station failed to cancel pending work')
-    h.set('courtyard');h.set('garden')
+    h.set('works');h.set('picture-room-west')
     h.authority.status='failed';h.at(20);compare(h.camera,origin,'Failed proof')
-    ensure(h.rail.navigation.queued.join(',')==='garden','Proof failure lost the latest target or retained superseded work')
-    h.authority.status='verified';h.at(30);compare(h.camera,origin,'Ready proof fresh clock');settle(h,'garden')
+    ensure(h.rail.navigation.queued.join(',')==='picture-room-west','Proof failure lost the latest target or retained superseded work')
+    h.authority.status='verified';h.at(30);compare(h.camera,origin,'Ready proof fresh clock');settle(h,'picture-room-west')
     ensure(h.calls.length===1,'Pending proof later walked a superseded request')
   })
   check(viewport,'A rejected route or lens cannot move, claim arrival, or discard the accepted request',()=>{
-    const h=harness(phone),origin=snapshot(h.camera);h.set('courtyard');h.set('garden');h.authority.rejectRoute=true
+    const h=harness(phone,'flight'),origin=snapshot(h.camera);h.set('works');h.set('picture-room-west');h.authority.rejectRoute=true
     let failed=false;try{h.at(0)}catch{failed=true}ensure(failed,'Route rejection was bypassed')
-    compare(h.camera,origin,'Rejected route');ensure(h.rail.navigation.queued.join(',')==='garden','Rejected target was discarded or a superseded one retained')
+    compare(h.camera,origin,'Rejected route');ensure(h.rail.navigation.queued.join(',')==='picture-room-west','Rejected target was discarded or a superseded one retained')
     h.authority.rejectRoute=false;h.camera.zoom=.8;failed=false;try{h.at(0)}catch{failed=true}ensure(failed,'Invalid lens was bypassed')
-    ensure(h.rail.navigation.completed==='arrival'&&h.rail.navigation.queued.length===1,'Invalid lens reported arrival')
-    h.camera.zoom=1;h.at(0);settle(h,'garden')
+    ensure(h.rail.navigation.completed==='flight'&&h.rail.navigation.queued.length===1,'Invalid lens reported arrival')
+    h.camera.zoom=1;h.at(0);settle(h,'picture-room-west')
   })
   check(viewport,'Explicit inspection and resize cancel only their old sequence and render the cut first',()=>{
-    const h=harness(phone);h.set('courtyard');h.at(0);h.at(.2);h.set('garden')
+    const h=harness(phone);h.set('courtyard');h.at(0);h.at(.2);h.set('arrival')
     const inspection=namedPose('entry-structure',phone);ensure(inspection,'Missing actual named pose')
     h.rail.set('arrival',inspection,true,phone);const named=snapshot(h.camera);h.at(10);compare(h.camera,named,'Named explicit placement')
     ensure(h.rail.navigation.queued.length===0&&!h.rail.navigation.active,'Named reset retained old work')
     // Ordinary inspection return restores the previous canonical eye first.
-    h.set('arrival',true);h.set('courtyard');h.set('garden');const callCount=h.calls.length
+    h.set('arrival',true);h.set('courtyard');const callCount=h.calls.length
     h.at(20);compare(h.camera,canonical(phone,'arrival'),'Return placement frame');ensure(h.calls.length===callCount,'Return cut skipped its rendered update')
     h.at(20);ensure(h.calls.length===callCount+1,'Certified canonical route did not start')
     ensure(h.calls.at(-1).from.every((v,i)=>Math.abs(v-h.pose('arrival').eye.getComponent(i))<1e-12),'Named eye borrowed a canonical proof')
@@ -331,6 +340,19 @@ for(const phone of [false,true]) {
     const walks=[]
     let clock=0
     for(let i=0;i<ids.length;i++) {
+      // THE HOUSE'S DOOR IS CROSSED BY A CUT: the walk ends at the door's
+      // inward pose and the hall is placed; out of it, the door's outward
+      // pose is placed and the walk begins there
+      if(ids[i]===DOOR.station){
+        h.at(clock);h.place(DOOR.inward);h.at(clock+=.005)
+        const seconds=h.rail.navigation.legSeconds
+        for(let sample=1;sample<240;sample++)h.at(clock+sample*seconds/240)
+        h.at(clock+seconds+1e-6);clock+=seconds+.05
+        ensure(h.rail.navigation.completed===DOOR.inward,'The walk to the door did not land at it')
+        h.set(ids[i],true);h.at(clock);endpoint(h,ids[i]);clock+=.05
+        continue
+      }
+      if(ids[i-1]===DOOR.station){h.place(DOOR.outward,true);h.at(clock);clock+=.05}
       h.at(clock);h.set(ids[i]);h.at(clock+=.005)
       const metres=h.rail.navigation.legMetres,seconds=h.rail.navigation.legSeconds
       const samples=Math.max(240,Math.ceil(seconds/.005))

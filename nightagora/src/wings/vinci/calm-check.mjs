@@ -111,8 +111,10 @@ const { createRailGeometryAuthority, collectRailSolids } = await load(path.join(
 const { gradeAt } = await load(path.join(wing, 'terrain-mesh.ts'))
 const { createCollectionStandSolids } = await load(path.join(wing, 'collection/stands.ts'))
 const { vinciWalk, vinciWalkPose } = await load(path.join(wing, 'walk.ts'))
+const { VINCI_HOUSE_DOOR: DOOR, VINCI_STAIR_HEAD } = await load(path.join(wing, 'walk-places.ts'))
+const { vinciWalkPoseOf } = await load(path.join(wing, 'walk-poses.ts'))
 const { VINCI_WALLS, vinciWallById, vinciWallVertex, vinciWallLastVertex } = await load(path.join(wing, 'collection/wall.ts'))
-const { vinciExhibitRecords, vinciApproachPose, vinciApproachRunPairs } = await load(path.join(wing, 'collection/approaches.ts'))
+const { vinciExhibitRecords, vinciApproachPose, vinciApproachRunPairs, vinciApproachStation } = await load(path.join(wing, 'collection/approaches.ts'))
 
 const factories = [
   ['shell', 'shell', 'createShell', false], ['terrain', 'ground', 'createGround', false],
@@ -267,8 +269,12 @@ for (const phone of VIEWPORTS) {
   for (const life of [false, true]) for (const back of [false, true]) {
     const order = (life ? 'life' : 'rooms') + (back ? ' back' : '')
     if (ONLY && !order.startsWith(ONLY)) continue
-    const stops = [...vinciWalk(life).stops]
+    const { stops: walked, cuts } = vinciWalk(life)
+    const stops = [...walked]
     if (back) stops.reverse()
+    // A CHAPTER CUT IS CROSSED BY ITS TITLE and the house's door by a cut:
+    // neither is walked, so neither is a leg the certificate carries
+    const cutPairs = new Set(cuts.flatMap(cut => [`${cut.from}>${cut.to}`, `${cut.to}>${cut.from}`]))
     const movesTo = stop => {
       const wall = stop.wall ? vinciWallById(stop.wall) : undefined
       const vertex = wall && stop.exhibit ? vinciWallVertex(wall, stop.exhibit) : undefined
@@ -276,13 +282,25 @@ for (const phone of VIEWPORTS) {
       if (vertex === undefined) return [onWall]
       return [{ id: stop.station, station: stop.station, pose: stationPose(stop.station, phone) }, onWall]
     }
-    place(stops[0].station, vinciWalkPose(stops[0], phone))
-    let standing = stops[0].id
+    // the life's walk begins above the museum and walks down into its first stop
+    if (life && !back) {
+      place(VINCI_STAIR_HEAD, vinciWalkPoseOf(VINCI_STAIR_HEAD, phone))
+      if (!walk('spine ' + order, VINCI_STAIR_HEAD, stops[0].id, () => rail.set(stops[0].station, vinciWalkPose(stops[0], phone), false, phone), nav => nav.completed === stops[0].station))
+        place(stops[0].station, vinciWalkPose(stops[0], phone))
+    } else place(stops[0].station, vinciWalkPose(stops[0], phone))
+    let standing = stops[0].id, standingStation = stops[0].station
     for (let n = 1; n < stops.length; n++) for (const move of movesTo(stops[n])) {
       if (move.id === standing) continue
-      const ok = walk('spine ' + order, standing, move.id, () => rail.set(move.station, move.pose, false, phone, move.vertex), nav => nav.completed === move.station)
+      if (cutPairs.has(`${standing}>${move.id}`)) { place(move.station, move.pose); standing = move.id; standingStation = move.station; continue }
+      if (move.station === DOOR.station && standingStation !== DOOR.station) {
+        const door = vinciWalkPoseOf(DOOR.inward, phone)
+        walk('spine ' + order, standing, DOOR.inward, () => rail.set(DOOR.inward, door, false, phone), nav => nav.completed === DOOR.inward)
+        place(move.station, move.pose); standing = move.id; standingStation = move.station; continue
+      }
+      if (standingStation === DOOR.station && move.station !== DOOR.station) place(DOOR.outward, vinciWalkPoseOf(DOOR.outward, phone))
+      const ok = walk('spine ' + order, standingStation === DOOR.station ? DOOR.outward : standing, move.id, () => rail.set(move.station, move.pose, false, phone, move.vertex), nav => nav.completed === move.station)
       if (!ok) place(move.station, move.pose)
-      standing = move.id
+      standing = move.id; standingStation = move.station
     }
   }
   if (ONLY && ONLY.startsWith('spine')) continue
@@ -298,9 +316,13 @@ for (const phone of VIEWPORTS) {
 
   /* every neighbour link, both ways */
   for (const pair of vinciApproachRunPairs()) for (const [from, to] of [[pair.from, pair.to], [pair.to, pair.from]]) {
-    place(pair.station, stationPose(pair.station, phone))
+    // each end stands at its own station; a link across two (the hall's one
+    // row) hands the card to the other, as the wing's own walk does
+    const home = vinciApproachStation(from), there = vinciApproachStation(to)
+    place(home, stationPose(home, phone))
     rail.approach(from, vinciApproachPose(from, phone), phone, true); now += DT; rail.update()
-    walk('link', from, to, () => rail.chain(to, vinciApproachPose(to, phone), phone), nav => nav.exhibit === to)
+    const across = there !== home ? { id: there, pose: stationPose(there, phone) } : undefined
+    walk('link', from, to, () => rail.chain(to, vinciApproachPose(to, phone), phone, across), nav => nav.exhibit === to)
   }
 
   /* every run along a wall, stop to stop, out and back */
