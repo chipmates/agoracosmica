@@ -61,7 +61,7 @@ import { vinciWalk, vinciLifeOrderAsked, vinciWalkPose, vinciReadingSeconds, vin
 import { isVinciWalkPose, VINCI_HOUSE_DOOR, VINCI_VALVE, vinciRailPlace, vinciWalkPoseOf, type VinciWalkPoseId } from './walk-poses'
 import { VINCI_STAIR_HEAD } from './walk-places'
 import { awaitOpening } from './opening-seam'
-import { talkAtTheGrave } from './ending-talk'
+import { endWith, talkAtTheGrave } from './ending-talk'
 import { collectRailSolids, createRailGeometryAuthority } from './rail-proof'
 import { bindRailPointer, createWheelStepper } from './input'
 import { dossier, world, type Quantity } from './site'
@@ -1397,6 +1397,21 @@ export function createWing():VinciWingModule {
    * an id be named at all. */
   function refreshRecap():void {
     if(standing&&hosts&&hereContent().id==='grave')paintHeader()
+  }
+  /** the phone's two endings under the last stop's name, side by side as the desk's panel stands them */
+  function endingsAtTheEnd():HTMLElement {
+    const row=make('div','vinci-endings')
+    const talk=make('button','vinci-ending vinci-ending-talk',text(deskControl('ending','talk')))
+    const look=make('button','vinci-ending vinci-ending-look')
+    const arrow=document.createElementNS('http://www.w3.org/2000/svg','svg'),line=document.createElementNS('http://www.w3.org/2000/svg','path')
+    arrow.setAttribute('viewBox','0 0 16 16');arrow.setAttribute('aria-hidden','true');arrow.setAttribute('class','vinci-ending-arrow')
+    line.setAttribute('d','M8 13V3M4 7l4-4 4 4');arrow.append(line)
+    look.append(make('span','vinci-ending-words',text(deskControl('ending','lookup'))),arrow)
+    talk.type='button';look.type='button'
+    talk.addEventListener('click',()=>{endWith('talk')})
+    look.addEventListener('click',()=>{if(!endWith('lookup'))hosts?.stage.parentElement?.querySelector<HTMLElement>('.wing-lobby')?.click()})
+    row.append(talk,look)
+    return row
   }
   /** THE RECAP AT THE EXIT. The night holds ids, so every title and every
    * line is resolved here from the wing's own registers, the way the card
@@ -2735,6 +2750,9 @@ export function createWing():VinciWingModule {
     const own=stopAt(index)
     title.append(dot,make('span','vinci-title-name',text(own.place&&own.name?own.name:s.name)))
     header.append(make('p','vinci-kicker',stationKicker()),title)
+    // THE WALK ENDS IN TWO WAYS on the phone as on the desk, under the name
+    // of its last stop, where the peeked sheet keeps them in reach
+    if(narrow()&&index===WALK.stops.length-1)header.append(endingsAtTheEnd())
     if(s.outdoor)header.append(make('p','vinci-hour',text(vinciHourSpoken)))
     // A STATION THAT STANDS IN A ROOM DOES NOT COVER IT. The centred panel
     // belongs to the stations that are still a plate; where the room is

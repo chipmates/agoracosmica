@@ -14,6 +14,7 @@ import { vinciAbsences, vinciCertaintyWords, vinciCollectionThreshold, vinciCont
 import { vinciStory } from './story'
 import { VINCI_LISA_STOP, VINCI_OFF_THE_WALK, VINCI_VALVE } from './walk-places'
 import { awaitOpening } from './opening-seam'
+import { endWith, talkAtTheGrave } from './ending-talk'
 import { deskControl, deskStoryStop } from '../desk-story'
 import { applyDeskSteps, deskOn } from '../desk-switches'
 import { deskStageHeight } from '../desk-stage'
@@ -498,7 +499,7 @@ export function createWing(): WingModule {
   let phone: {
     root: HTMLElement; name: HTMLElement; line: HTMLElement; drawer: HTMLElement; keys: HTMLElement
     more: HTMLButtonElement; from: HTMLButtonElement; count: HTMLElement
-    back: HTMLButtonElement; book: HTMLButtonElement; gold: HTMLButtonElement; goldName: HTMLElement; ringLine: SVGCircleElement
+    back: HTMLButtonElement; book: HTMLButtonElement; talk: HTMLButtonElement; gold: HTMLButtonElement; goldName: HTMLElement; ringLine: SVGCircleElement
     goldPath: SVGPathElement
   } | undefined
   let drawerOpen = false
@@ -526,6 +527,9 @@ export function createWing(): WingModule {
     const book = make('button', 'film-book')
     book.type = 'button'
     book.append(icon(BOOK))
+    // the walk's other ending, standing in the book's seat at the last stop only
+    const talk = make('button', 'film-talk')
+    talk.type = 'button'
     const gold = make('button', 'film-gold')
     gold.type = 'button'
     const goldName = make('span', 'film-gold-name')
@@ -540,13 +544,14 @@ export function createWing(): WingModule {
     const goldIcon = icon(ARROW_ON)
     arrow.append(ring, goldIcon)
     gold.append(goldName, arrow)
-    foot.append(back, book, gold)
+    foot.append(back, book, talk, gold)
     root.append(name, line, drawer, keys, foot)
     h.stage.append(root)
     more.addEventListener('click', () => setDrawer(!drawerOpen))
     from.addEventListener('click', () => { paintSources(null); sources?.select('station'); sources?.setOpen(true) })
     back.addEventListener('click', () => { const to = backIndex(); if (to !== null) h.navigate(to) })
     book.addEventListener('click', () => document.getElementById('rail-instruments')?.click())
+    talk.addEventListener('click', () => { endWith('talk') })
     gold.addEventListener('click', () => pressOn())
     // a swipe up raises the words, a swipe down or a tap on the picture folds them
     let fromY = 0, held = false
@@ -558,7 +563,7 @@ export function createWing(): WingModule {
       if (dy < -24 && !drawerOpen) setDrawer(true)
       else if (dy > 24 && drawerOpen) setDrawer(false)
     }, { signal })
-    phone = { root, name, line, drawer, keys, more, from, count, back, book, gold, goldName, ringLine, goldPath: goldIcon.querySelector('path')! }
+    phone = { root, name, line, drawer, keys, more, from, count, back, book, talk, gold, goldName, ringLine, goldPath: goldIcon.querySelector('path')! }
   }
   function setDrawer(open: boolean): void {
     if (!phone) return
@@ -621,14 +626,15 @@ export function createWing(): WingModule {
       phone.goldName.textContent = title
       phone.gold.setAttribute('aria-label', `${text(CARDS.controls.date.next)} · ${title}`)
     } else {
-      /* THE END OF THE WALK IS A WAY ON, as the desktop's is: named, lit and
-         pointing up, and a press looks up to the lobby */
-      const end = text(deskControl('walk', 'the_end')), look = text(deskControl('walk', 'look_up'))
-      phone.goldName.textContent = ''
-      phone.goldName.append(make('span', 'film-gold-kicker', end), make('span', 'film-gold-look', look))
+      /* THE WALK ENDS IN TWO WAYS, side by side as the desktop's panel stands
+         them: gold looks up, and the talk choice beside it opens the door */
+      const end = text(deskControl('walk', 'the_end')), look = text(deskControl('ending', 'lookup'))
+      phone.goldName.textContent = look
       phone.gold.setAttribute('aria-label', `${end} · ${look}`)
+      phone.talk.textContent = text(deskControl('ending', 'talk'))
     }
     phone.gold.dataset['end'] = String(!walking && to === null)
+    phone.root.dataset['end'] = String(!walking && to === null)
     phone.goldPath.setAttribute('d', !walking && to === null ? ARROW_UP : ARROW_ON)
     phone.gold.disabled = false
   }
@@ -637,7 +643,7 @@ export function createWing(): WingModule {
     if (s && s.kind !== 'rest') { picture?.hurry(); return }
     const to = nextIndex()
     if (to !== null) hosts?.navigate(to)
-    else hosts?.stage.parentElement?.querySelector<HTMLElement>('.wing-lobby')?.click()
+    else if (!endWith('lookup')) hosts?.stage.parentElement?.querySelector<HTMLElement>('.wing-lobby')?.click()
   }
 
   /* ---- the words of the place, painted where the design stands them ---- */
@@ -823,6 +829,11 @@ export function createWing(): WingModule {
       if (!desk && (e.key === ' ' || e.key === 'Spacebar') && !target.closest('button,a')) { e.preventDefault(); pressOn(); return }
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); pressOn() }
       if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); const to = backIndex(); if (to !== null) h.navigate(to) }
+    }, { signal })
+    // the grave's talk choice opens the library's door, as in the live wing
+    addEventListener('na-wing-ending', e => {
+      const asked = e as CustomEvent<{ ending?: string }>
+      if (asked.detail?.ending === 'talk' && talkAtTheGrave()) asked.preventDefault()
     }, { signal })
     // a press on the picture folds the phone's words back to the one line
     h.stage.addEventListener('click', e => { if (drawerOpen && !(e.target as Element).closest('.film-box')) setDrawer(false) }, { signal })

@@ -224,11 +224,33 @@
   .film-gold-ring circle { transition: none; }
 }
 
-/* THE END OF THE WALK IS A WAY ON: the pill stays lit, says it is the end,
-   and names what a press does, as the desktop's control at the same stop */
-.film-gold[data-end='true'] .film-gold-name { display: flex; flex-direction: column; gap: 1px; }
-.film-gold-kicker { font: 400 .875rem/16px var(--sans); letter-spacing: .06em; text-transform: uppercase; color: color-mix(in srgb, var(--gold-ink) 72%, transparent); }
-.film-gold-look { font: 400 .9375rem/18px var(--serif); white-space: nowrap; }
+/* THE WALK ENDS IN TWO WAYS at its last stop: the talk choice takes the
+   book's seat, and it and gold stand side by side at one width, gold still
+   lit, pointing up; the row's height and the controls' centres stay put */
+.film-talk { display: none; }
+.film-box[data-end='true'] .film-foot { display: flex; align-items: flex-start; gap: 8px; height: 68px; padding: 12px 12px env(safe-area-inset-bottom) 16px; }
+.film-box[data-end='true'] .film-back { position: relative; top: 4px; left: auto; flex: 0 0 40px; }
+.film-box[data-end='true'] .film-book { display: none; }
+/* one width each: the row less the way back (40), the gaps (8, 8) and the book's old margin (12) */
+.film-box[data-end='true'] .film-talk,
+.film-box[data-end='true'] .film-gold { position: relative; top: auto; right: auto; flex: 0 0 calc((100% - 68px) / 2); box-sizing: border-box; min-width: 0; max-width: none; height: 48px; }
+.film-box[data-end='true'] .film-talk {
+  display: flex;
+  align-items: center;
+  margin-left: 12px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 24px;
+  background: var(--glass);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gold) 60%, transparent);
+  color: var(--ink-bright);
+  font: 400 .9375rem/18px var(--serif);
+  text-align: left;
+  text-wrap: balance;
+  cursor: pointer;
+}
+.film-talk::after { content: ''; position: absolute; left: -4px; right: -4px; top: -4px; bottom: -4px; }
+.film-box[data-end='true'] .film-gold { justify-content: space-between; }
 
 /* THE SHEET'S TALL HEIGHTS on the phone: the record and the panel rise from
    the foot of the glass to 44 px under its top, the full width, one scroll

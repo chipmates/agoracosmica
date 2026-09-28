@@ -355,7 +355,17 @@
   /* the card rides the bar's own offset, so the row and the bar keep their
      order under it however the bar is placed */
   .vinci-heading.vinci-standing {bottom:calc(var(--wing-rail-bottom) + 126px);}
-  .vinci-heading.vinci-standing[data-sheet='peek'] > :not(.vinci-sheet-grab):not(.vinci-kicker):not(.vinci-title) {display:none;}
+  .vinci-heading.vinci-standing[data-sheet='peek'] > :not(.vinci-sheet-grab):not(.vinci-kicker):not(.vinci-title):not(.vinci-endings) {display:none;}
+  /* THE TWO ENDINGS at the walk's last stop, side by side under its name:
+     the talk quiet and outlined, the way on gold and pointing up. */
+  .vinci-endings {display:flex;gap:10px;margin:12px 0 2px;pointer-events:auto;}
+  .vinci-ending {flex:1 1 0;min-width:0;min-height:52px;padding:8px 14px;border:0;border-radius:3px;
+    display:flex;align-items:center;justify-content:space-between;gap:8px;font:400 15px/1.3 var(--serif);text-align:left;cursor:pointer;}
+  .vinci-ending-talk {background:color-mix(in srgb, var(--na-abyss) 70%, transparent);
+    box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--na-gold) 60%, transparent);color:var(--na-starlight);}
+  .vinci-ending-look {background:var(--na-gold);color:var(--na-abyss);}
+  .vinci-ending-arrow {flex:none;width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+  .vinci-ending:focus-visible {outline:2px solid var(--na-starlight);outline-offset:2px;}
   /* THE PULLED SHEET IS A READING SURFACE. Its own field is solid: the
      card's gradient lets the room through on the right, which is calm under
      a title and unreadable under a paragraph. */

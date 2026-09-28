@@ -8,3 +8,11 @@ import { vinciFarewellDoor } from './content'
 export function talkAtTheGrave(): boolean {
   return openWingDoor(vinciFarewellDoor.station, vinciFarewellDoor[lang()]) !== ''
 }
+
+/** An ending asked of the wing (`na-wing-ending`), as the desk's panel asks
+ * it; false when nothing answered, and the caller goes home. */
+export function endWith(ending: 'lookup' | 'talk'): boolean {
+  const asked = new CustomEvent('na-wing-ending', { detail: { ending }, cancelable: true })
+  dispatchEvent(asked)
+  return asked.defaultPrevented
+}
