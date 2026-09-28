@@ -57,6 +57,14 @@ const themeOgImageAlt =
   themeOgImage && ogFigure ? `KI-generiertes Porträt: ${ogFigure.name}` : themeName;
 const themeUrl = canonicalUrl(publicUrl(lang, `/themes/${themeId}`));
 
+// The H1 question leads the FAQ; a depth panel that asks the same question
+// again stays on the page but not twice in the markup.
+const faqItems = [
+  { q: themeQuestion, a: themeAnswer },
+  ...substance.map(block => ({ q: block.q, a: block.a })),
+].filter((item, i, all) =>
+  all.findIndex(other => other.q.trim().toLowerCase() === item.q.trim().toLowerCase()) === i);
+
 const schemas = [
   articleSchema({
     title: themeQuestion,
@@ -75,13 +83,7 @@ const schemas = [
     { name: t('breadcrumbs.themes'), url: `${SITE_URL}/de/themes` },
     { name: themeName, url: themeUrl },
   ]),
-  faqSchema(
-    [
-      { q: themeQuestion, a: themeAnswer },
-      ...substance.map(block => ({ q: block.q, a: block.a })),
-    ],
-    themeUrl,
-  ),
+  faqSchema(faqItems, themeUrl),
 ];
 ---
 <Public
