@@ -1,7 +1,7 @@
 ---
 // Sticky top navbar for all marketing pages. Static HTML — no React needed.
-// The "Start Exploring" CTA is a plain <a href="/app"> that does a hard nav
-// into the React SPA. The conversion + entry-intent fire from a tiny global click
+// The "Start Exploring" CTA is a plain <a href="/app?lang=.."> that does a hard
+// nav into the React SPA in the page's language. The conversion + entry-intent fire from a tiny global click
 // handler set up in Public.astro (vanilla JS, no React island for this).
 
 import { getT } from '../i18n';
@@ -80,7 +80,7 @@ const isActive = (path: string) => currentPath === path || currentPath === path.
         {otherLang.toUpperCase()}
       </a>
 
-      <a href="/app" class="pub-navbar__cta" data-agc-cta="start-exploring">
+      <a href={`/app?lang=${lang}`} class="pub-navbar__cta" data-agc-cta="start-exploring">
         {t('nav.startExploring')}
       </a>
     </nav>

@@ -158,7 +158,7 @@ const metaDescription = clampDescription(description);
 <link rel="preload" href="/fonts/libre-caslon-text-v5-latin-regular.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="preload" href="/fonts/SpaceGrotesk[wght].woff2" as="font" type="font/woff2" crossorigin />
 <link rel="stylesheet" href="/fonts/fonts.css" />
-<link rel="prefetch" href="/app" as="document" />
+<link rel="prefetch" href={`/app?lang=${lang}`} as="document" />
 
 {schemas.length > 0 && (
   <script type="application/ld+json" set:html={JSON.stringify({

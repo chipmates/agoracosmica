@@ -77,7 +77,7 @@ const revealSticky = isHome || props.heroReveal === true;
     {props.stickyCta !== false && (
       <div class="pub-cta pub-cta--sticky">
         <div class="pub-cta__inner">
-          <a href="/app" class="pub-cta__button" data-agc-cta="start-exploring">{t('nav.startExploring')}</a>
+          <a href={`/app?lang=${props.lang}`} class="pub-cta__button" data-agc-cta="start-exploring">{t('nav.startExploring')}</a>
         </div>
       </div>
     )}

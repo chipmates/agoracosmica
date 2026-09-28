@@ -192,7 +192,7 @@ const planets: Planet[] = ringPlan.flatMap((ring, ringIndex) => {
         ))}
       </p>
       <div class="v2-actions">
-        <a href="/app" class="pub-cta__button v2-cta" data-agc-cta="start-exploring">
+        <a href={`/app?lang=${lang}`} class="pub-cta__button v2-cta" data-agc-cta="start-exploring">
           {ctaLabel}
         </a>
         <p class="v2-free">{copy.free}</p>

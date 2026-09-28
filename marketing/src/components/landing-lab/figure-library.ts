@@ -107,7 +107,7 @@ export function getFigureLibraryModes(
   const seeds = getSeedsFor(figureId, lang);
   const t = TX[lang];
   const slug = figureIdToSlug[figureId];
-  const appHref = `/app?figure=${slug}`;
+  const appHref = `/app?figure=${slug}&lang=${lang}`;
 
   // The chosen chapter. Seed ids run 1..12 and match both the story segment
   // number and the prism folder, so everything below derives from the seed
