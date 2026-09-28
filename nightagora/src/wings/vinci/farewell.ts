@@ -183,13 +183,30 @@ export function farewellAir(heightAboveGroundM: number): number {
  * passes through at the clock's beats, from the one it leaves at the grave.
  * Headings run clockwise from north and every turn takes the short way. */
 export interface FarewellBeat { eye: readonly [east: number, north: number, height: number]; heading: number; pitch: number; fov: number }
-export interface FarewellPath { risen: FarewellBeat; held: FarewellBeat; glow: FarewellBeat; set: FarewellBeat; up: FarewellBeat }
+/** Keys inside the rise, at shares of the farewell between the grave and
+ * the risen beat: the share of the height climbed, the heading and the
+ * pitch, each passed through without overshoot. */
+export interface FarewellRise { lift: readonly (readonly [number, number])[]; heading: readonly (readonly [number, number])[]; pitch: readonly (readonly [number, number])[] }
+export interface FarewellPath { risen: FarewellBeat; held: FarewellBeat; glow: FarewellBeat; set: FarewellBeat; up: FarewellBeat; rise: FarewellRise }
 const RISEN_EYE = [-47.5, -28.5, 15] as const
+/** THE RISE LOOKS UP OUT OF THE COURT. Every heading from the grave to the
+ * house passes a tree at the court's height (the tall elm west of the back
+ * wall, the court's maple, the cherry and the hornbeam over the north wall),
+ * and a level eye crossing the walls' coping sees the coping edge on with a
+ * crown filling the frame. So the eye turns off the elm while still low,
+ * tilts up to the sky as it climbs past the coping, and comes down onto the
+ * house by the risen beat. Keys in seconds of the farewell's own clock. */
+const sec = (seconds: number): number => seconds / FAREWELL_SECONDS
+const RISE_LIFT = [[sec(.7), .04], [sec(1.45), .24], [sec(2.1), .66], [sec(2.7), .91], [sec(3.3), .99]] as const
 /** From the golden moment the frame's lower edge stands near the house's
  * foot, so the land is a band of about a fifth of the frame with the house
  * and the crest's trees against the sky over it. */
 export const FAREWELL_PATH: { desktop: FarewellPath; phone: FarewellPath } = {
   desktop: {
+    // the wide frame's right edge reaches the gallery's block 2.4 m east of
+    // the grave, so the heading holds west of it until the eye is over its
+    // roof; the elm stands in the sky at the left for that moment
+    rise: { lift: RISE_LIFT, heading: [[sec(1), -46], [sec(1.7), -30], [sec(2.3), 0], [sec(3), 38], [sec(3.5), 53]], pitch: [[sec(.35), -2], [sec(1.35), 40], [sec(2), 44], [sec(3), 6]] },
     risen: { eye: RISEN_EYE, heading: 60, pitch: -10, fov: 60 },
     held: { eye: [-47.3, -28.3, 15.3], heading: 62, pitch: -6, fov: 60 },
     glow: { eye: [-47.3, -28.3, 15.5], heading: 64, pitch: 16, fov: 56 },
@@ -197,6 +214,7 @@ export const FAREWELL_PATH: { desktop: FarewellPath; phone: FarewellPath } = {
     up: { eye: [-47.3, -28.3, 16], heading: 65, pitch: 40, fov: 72 },
   },
   phone: {
+    rise: { lift: RISE_LIFT, heading: [[sec(1), -34], [sec(2), 2], [sec(3), 42]], pitch: [[sec(.2), -4], [sec(1.3), 40], [sec(2), 44], [sec(2.9), 12]] },
     risen: { eye: RISEN_EYE, heading: 60, pitch: -4, fov: 76 },
     held: { eye: [-47.3, -28.3, 15.3], heading: 63, pitch: -1, fov: 76 },
     glow: { eye: [-47.3, -28.3, 15.5], heading: 72, pitch: 26, fov: 88 },
@@ -215,14 +233,35 @@ const pitchOf = (d: Vector3): number => Math.asin(Math.max(-1, Math.min(1, d.y /
 /** The shortest way round from one heading to another, in degrees. */
 export const shortestTurn = (from: number, to: number): number => ((to - from) % 360 + 540) % 360 - 180
 
+/** A monotone cubic through (x, y) knots (Fritsch and Carlson), level at
+ * both ends, so a key is passed through without overshoot or a stop. */
+function monotone(knots: readonly (readonly [number, number])[], x: number): number {
+  const n = knots.length
+  if (x <= knots[0]![0]) return knots[0]![1]
+  if (x >= knots[n - 1]![0]) return knots[n - 1]![1]
+  const h: number[] = [], d: number[] = [], m: number[] = new Array(n).fill(0)
+  for (let i = 0; i < n - 1; i++) { h.push(knots[i + 1]![0] - knots[i]![0]); d.push((knots[i + 1]![1] - knots[i]![1]) / h[i]!) }
+  for (let i = 1; i < n - 1; i++) {
+    if (d[i - 1]! * d[i]! <= 0) continue
+    const w1 = 2 * h[i]! + h[i - 1]!, w2 = h[i]! + 2 * h[i - 1]!
+    m[i] = (w1 + w2) / (w1 / d[i - 1]! + w2 / d[i]!)
+  }
+  let i = 0
+  while (i < n - 2 && x > knots[i + 1]![0]) i++
+  const t = (x - knots[i]![0]) / h[i]!, t2 = t * t, t3 = t2 * t
+  return (2 * t3 - 3 * t2 + 1) * knots[i]![1] + (t3 - 2 * t2 + t) * h[i]! * m[i]! + (-2 * t3 + 3 * t2) * knots[i + 1]![1] + (t3 - t2) * h[i]! * m[i + 1]!
+}
+
 /** The eye at a share of the farewell, from the pose it leaves at the grave:
- * each stretch between two beats eased at both ends. */
+ * each stretch between two beats eased at both ends, the rise through its
+ * own keys. */
 export function farewellPose(share: number, start: { eye: Vector3; at: Vector3; fov: number }, phone: boolean): { eye: Vector3; at: Vector3; fov: number } {
   const path = FAREWELL_PATH[phone ? 'phone' : 'desktop'], B = FAREWELL_BEATS
   const s = Math.max(0, Math.min(1, share))
   const d0 = start.at.clone().sub(start.eye)
   const first: FarewellBeat = { eye: [start.eye.x, -start.eye.z, start.eye.y], heading: headingOf(d0), pitch: pitchOf(d0), fov: start.fov }
   const beats: [number, FarewellBeat][] = [[0, first], [B.risen, path.risen], [B.held, path.held], [B.glow, path.glow], [B.set, path.set], [1, path.up]]
+  if (s < B.risen) return risePose(s, first, path)
   let i = 1
   while (i < beats.length - 1 && s > beats[i]![0]) i++
   const [s0, a] = beats[i - 1]!, [s1, b] = beats[i]!
@@ -233,6 +272,21 @@ export function farewellPose(share: number, start: { eye: Vector3; at: Vector3; 
   const heading = a.heading + shortestTurn(a.heading, b.heading) * u
   const dir = along(heading, lerp(a.pitch, b.pitch, u), new Vector3())
   return { eye, at: eye.clone().addScaledVector(dir, 10), fov: lerp(a.fov, b.fov, u) }
+}
+
+/** The rise from the grave's own pose to the risen beat, through the keys. */
+function risePose(s: number, first: FarewellBeat, path: FarewellPath): { eye: Vector3; at: Vector3; fov: number } {
+  const B = FAREWELL_BEATS, b = path.risen, rise = path.rise
+  const lift = monotone([[0, 0], ...rise.lift, [B.risen, 1]], s)
+  // headings unwrapped key to key, so every step takes the short way round
+  const headings: [number, number][] = [[0, first.heading]]
+  for (const [at, value] of [...rise.heading, [B.risen, b.heading] as const]) {
+    const last = headings[headings.length - 1]![1]
+    headings.push([at, last + shortestTurn(last, value)])
+  }
+  const eye = new Vector3(lerp(first.eye[0], b.eye[0], lift), lerp(first.eye[2], b.eye[2], lift), -lerp(first.eye[1], b.eye[1], lift))
+  const dir = along(monotone(headings, s), monotone([[0, first.pitch], ...rise.pitch, [B.risen, b.pitch]], s), new Vector3())
+  return { eye, at: eye.clone().addScaledVector(dir, 10), fov: lerp(first.fov, b.fov, smooth(s / B.risen)) }
 }
 
 /** The whole state at a share: the hour, the sun and its light. */
