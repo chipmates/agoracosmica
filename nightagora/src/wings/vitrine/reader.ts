@@ -55,6 +55,10 @@ export interface ReaderSide {
   window?: DeepPlateWindow | null
   /** The cell in the strip, where the store holds one. */
   thumb: string | null
+  /** THE LEAF'S OWN MARK, `B 83v`, where a book reads by its leaves: it
+   * stands where the count would, so a volume binding two manuscripts never
+   * shows a position no page of it carries. */
+  leaf?: string
   ways: readonly ReaderWay[]
   /** The colour of the museum's own certainty word for this reproduction. */
   colour?: string
@@ -343,7 +347,7 @@ export function createReaderPayload(options: {
     // need to say, and a label in the band already says in its name row.
     const inside = volume(), place = inside.indexOf(at)
     if (inside.length > 1 && !host.banded) block.append(make('p', 'vitrine-meta reader-place',
-      options.words.place.replace('{n}', String(place + 1)).replace('{total}', String(inside.length))))
+      here.leaf ?? options.words.place.replace('{n}', String(place + 1)).replace('{total}', String(inside.length))))
     if (here.shows) block.append(make('p', '', here.shows))
     if (here.named) block.append(make('p', 'reader-named', here.named))
     const line = chosen()?.line
@@ -360,7 +364,8 @@ export function createReaderPayload(options: {
     // where the side stands in its book goes with the name: a label that
     // counts the volumes of a room would count the wrong thing here
     host.rename?.(here.label, here.head, here.colour ?? null,
-      inside.length > 1 ? { at: place + 1, of: inside.length } : null)
+      here.leaf ? { at: place + 1, of: inside.length, leaf: here.leaf }
+        : inside.length > 1 ? { at: place + 1, of: inside.length } : null)
     const readBeside = banded && here.ways.some(item => item.beside)
     if (witnesses().length && !readBeside) {
       const texts = make('div', 'vitrine-description reader-texts')

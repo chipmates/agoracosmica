@@ -29,8 +29,9 @@ export interface CloseLookView {
   /** the payload's kind, which chooses the gold control's word */
   kind: string
   certainty: VinciCertainty | null
-  /** where the work stands in the set it belongs to, counted from one */
-  set: { at: number; of: number } | null
+  /** where the work stands in the set it belongs to, counted from one; a
+      book that reads by its leaves names the leaf in the count's place */
+  set: { at: number; of: number; leaf?: string } | null
   /** A WORK WITH A NUMBER ON ITS FRAME is read as a catalogue entry: the
       number before its name, its date in the clock's place, and where the
       original is in the count's place, since the number already says which
@@ -296,9 +297,9 @@ export function createCloseLookBand(options: {
       clock.textContent = entry?.date ?? ''
       clock.hidden = !entry?.date
       // A COUNT OF ONE IS NOISE: a work alone in its set carries no count
-      const place = next.set && next.set.of > 1
+      const place = next.set?.leaf ?? (next.set && next.set.of > 1
         ? say(WORD.place()).replace('{n}', String(next.set.at)).replace('{total}', String(next.set.of))
-        : ''
+        : '')
       count.textContent = entry ? entry.where : place
       count.hidden = !count.textContent
       line.textContent = next.line ?? ''

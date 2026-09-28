@@ -162,10 +162,13 @@ export function createReaderPayload(options: {
         ways: ways(page),
         colour: options.colour,
         named: named ? named[language] : null,
-        // ONE VOLUME, ONE COUNT: the book on the table counts its 188 sides
-        // in one run, and the manuscript a side belongs to is its part
+        // ONE VOLUME, ONE STRIP: the book on the table binds two manuscripts,
+        // and the manuscript a side belongs to is its part
         volume: 'edition',
         part: page.codex ?? undefined,
+        // the count names the leaf seen, never a place in the binding
+        ...(page.codex && page.folio !== null && page.side
+          ? { leaf: `${page.codex} ${page.folio}${page.side === 'recto' ? 'r' : 'v'}` } : {}),
       })
     }
     return {

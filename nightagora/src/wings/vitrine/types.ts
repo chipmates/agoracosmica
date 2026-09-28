@@ -52,7 +52,7 @@ export interface VitrinePayloadHost {
    * to has its own certainty. The words are the caller's, as every word
    * here is. */
   rename?(title: string, head?: string | null, certainty?: string | null,
-    place?: { at: number; of: number } | null): void
+    place?: { at: number; of: number; leaf?: string } | null): void
 }
 
 export interface VitrinePayload {
@@ -92,7 +92,7 @@ export interface VitrineExhibit {
   /** The two that walk the station's own row, at the card's two ends. */
   walk?: readonly HTMLElement[]
   /** Where the work stands in the set it belongs to, counted from one. */
-  set?: { at: number; of: number } | null
+  set?: { at: number; of: number; leaf?: string } | null
   /** The number on the work's frame, its date, and where the original is,
    * for a work the room hangs under a number. */
   catalogue?: { number: string; date: string; where: string } | null
