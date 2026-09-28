@@ -1,4 +1,4 @@
-import { FC, useEffect } from 'react';
+import { FC, Fragment, ReactNode, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import CloseButton from '../components/Button/CloseButton';
 import './LegalPages.css';
@@ -9,9 +9,29 @@ const STORAGE_ROWS = [
   'indexedDb', 'local', 'clientId', 'community', 'adConsent', 'session', 'clickId', 'markers',
 ] as const;
 
+// Storage key names in parentheses become code chips that may break, so the
+// table fits a phone without splitting ordinary words.
+function renderStorageType(text: string): ReactNode {
+  const m = /^(.*?)\(([^)]*)\)(.*)$/.exec(text);
+  if (!m) return text;
+  const keys = m[2].split(/,\s*/);
+  return (
+    <>
+      {m[1]}(
+      {keys.map((k, i) => (
+        <Fragment key={k}>
+          {i > 0 && ', '}
+          <code className="legal-key">{k}</code>
+        </Fragment>
+      ))}
+      ){m[3]}
+    </>
+  );
+}
+
 const CookiePolicyPage: FC = () => {
   const navigate = useNavigate();
-  const { tNode, language } = useTranslation();
+  const { tNode, tString, language } = useTranslation();
 
   const handleClose = () => {
     if (window.history.length > 1) {
@@ -90,7 +110,7 @@ const CookiePolicyPage: FC = () => {
             <tbody>
               {STORAGE_ROWS.map((row) => (
                 <tr key={row}>
-                  <td>{tNode(`legal.cookiePolicy.essentialStorage.rows.${row}.type`)}</td>
+                  <td>{renderStorageType(tString(`legal.cookiePolicy.essentialStorage.rows.${row}.type`))}</td>
                   <td>{tNode(`legal.cookiePolicy.essentialStorage.rows.${row}.purpose`)}</td>
                   <td>{tNode(`legal.cookiePolicy.essentialStorage.rows.${row}.duration`)}</td>
                 </tr>

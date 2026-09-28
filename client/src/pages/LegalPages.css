@@ -473,6 +473,17 @@ html:has(.legal-page)::-webkit-scrollbar-thumb:hover {
   border-bottom: none;
 }
 
+.legal-table .legal-key {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 768px) {
+  .legal-table th,
+  .legal-table td {
+    padding: 10px 8px;
+  }
+}
+
 .legal-highlight {
   color: var(--gold-subtle);
   font-weight: 500;
