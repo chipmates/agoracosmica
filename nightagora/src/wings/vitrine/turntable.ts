@@ -78,6 +78,11 @@ export interface TurntableOptions {
   /** A machine that walks is fitted and centred on the ground its whole run
    * covers, not on the pose it starts from, so its last step is never cut. */
   travels?: boolean
+  /** THE RUN CARRIES THE EYE, in seconds of the run: over each stage the eye
+   * eases from where the stage before left it to this bearing, on the run's
+   * centre (`whole`) or on a viewpoint's part, and holds there until the
+   * next. The visitor's own turn or view ends it until the run starts again. */
+  runViews?: readonly { from: number; to: number; view: TurntableViewpoint; yaw: number; pitch: number }[]
   /** Hand the stage back to the room. */
   restore(): void
   /** True once the eye stands where it walked for this machine: the room
@@ -93,6 +98,8 @@ const DEG = Math.PI / 180
 const WHOLE = { yaw: 35 * DEG, pitch: 16 * DEG }
 const PITCH = { least: 3 * DEG, most: 58 * DEG }
 const EASE_S = .7
+/** A jump of the run's clock is followed by the eye, never cut. */
+const CARRY_FOLLOW_S = .45
 /** A full drag across the viewport is one period of the machine's clock. */
 const DRAG_PERIODS = 1
 /** An arrow key turns the crank by this share of the period. */
@@ -158,6 +165,10 @@ export function createTurntablePayload(options: TurntableOptions): TurntablePayl
   const view: View = { ...WHOLE, distance: 1, target: new Vector3() }
   let goal: View | null = null, from: View | null = null, eased = 0
   let chosen: TurntableViewpoint = 'whole'
+  const runViews = options.runViews ?? []
+  /** how far along the run's views the eye stands, 0 the whole view */
+  let carrying = runViews.length > 0, carried = 0
+  let carryViews: View[] | null = null, carryShown: TurntableViewpoint | null = null
   let active = -1
   /** true while the recording draws the machine with no part lit */
   let dark = false
@@ -393,13 +404,13 @@ export function createTurntablePayload(options: TurntableOptions): TurntablePayl
     body.object.updateMatrixWorld(true)
     return union
   }
-  function wholeDistance(): number {
+  function wholeDistance(at: { yaw: number; pitch: number } = WHOLE): number {
     if (rest.isEmpty()) return fitDistance(radius) * WHOLE_FIT
     const fit = viewportFit(), w = innerWidth, h = deskStageHeight()
     const tanY = Math.tan(camera!.fov * DEG / 2) * fit.height / h
     const tanX = Math.tan(camera!.fov * DEG / 2) * (w / h) * fit.width / w
-    const cos = Math.cos(WHOLE.pitch)
-    const toward = new Vector3(Math.sin(WHOLE.yaw) * cos, Math.sin(WHOLE.pitch), Math.cos(WHOLE.yaw) * cos)
+    const cos = Math.cos(at.pitch)
+    const toward = new Vector3(Math.sin(at.yaw) * cos, Math.sin(at.pitch), Math.cos(at.yaw) * cos)
     const right = new Vector3().crossVectors(new Vector3(0, 1, 0), toward).normalize()
     const up = new Vector3().crossVectors(toward, right).normalize()
     const corner = new Vector3()
@@ -413,10 +424,13 @@ export function createTurntablePayload(options: TurntableOptions): TurntablePayl
     else for (const x of [rest.min.x, rest.max.x]) for (const y of [rest.min.y, rest.max.y]) for (const z of [rest.min.z, rest.max.z]) measure(new Vector3(x, y, z))
     return Math.min(distance * WHOLE_MARGIN, fitDistance(radius) * WHOLE_FIT)
   }
-  function goalFor(id: TurntableViewpoint): View {
+  function goalFor(id: TurntableViewpoint, own?: { yaw: number; pitch: number }): View {
     const entry = options.viewpoints.find(v => v.id === id)
     const part = entry?.part ? family(entry.part).flatMap(name => nodeFor(name)?.geometries ?? []) : []
-    if (!part.length || id === 'whole') return { ...WHOLE, distance: wholeDistance(), target: centre.clone() }
+    if (!part.length || id === 'whole') {
+      const at = own ? { yaw: own.yaw, pitch: own.pitch } : WHOLE
+      return { ...at, distance: wholeDistance(at), target: centre.clone() }
+    }
     const box = new Box3()
     for (const { node, geometry } of part) {
       if (!geometry.boundingBox) geometry.computeBoundingBox()
@@ -428,14 +442,15 @@ export function createTurntablePayload(options: TurntableOptions): TurntablePayl
     const across = new Vector3(sphere.center.x - centre.x, 0, sphere.center.z - centre.z)
     // A part on the far side of the machine is looked at from its own side,
     // so the body does not stand between the eye and it.
-    const yaw = entry?.yaw ?? (across.dot(toward) < -radius * .1 ? WHOLE.yaw + Math.PI : WHOLE.yaw)
+    const yaw = own?.yaw ?? entry?.yaw ?? (across.dot(toward) < -radius * .1 ? WHOLE.yaw + Math.PI : WHOLE.yaw)
     // A STEP IN, NEVER A NEW PLACE: the eye comes a third to two thirds of
     // the way toward the part, which keeps the machine it belongs to in the
     // frame and the eye inside the air the whole view stands in.
     const distance = Math.min(whole * .7, Math.max(whole * .35, fitDistance(sphere.radius * 2.6)))
-    return { yaw, pitch: entry?.pitch ?? WHOLE.pitch + 4 * DEG, distance, target: centre.clone().lerp(sphere.center, .75) }
+    return { yaw, pitch: own?.pitch ?? entry?.pitch ?? WHOLE.pitch + 4 * DEG, distance, target: centre.clone().lerp(sphere.center, .75) }
   }
   function choose(id: TurntableViewpoint): void {
+    carrying = false
     chosen = id
     for (const [name, button] of viewButtons) button.setAttribute('aria-pressed', String(name === id))
     tapped = null
@@ -448,24 +463,47 @@ export function createTurntablePayload(options: TurntableOptions): TurntablePayl
   }
   function orbit(dx: number, dy: number): void {
     goal = null
+    carrying = false
     view.yaw -= dx
     view.pitch = Math.min(PITCH.most, Math.max(PITCH.least, view.pitch + dy))
     if (chosen !== 'whole') { chosen = 'whole'; light(litPart()) }
     for (const [, button] of viewButtons) button.setAttribute('aria-pressed', 'false')
   }
+  function blend(a: View, b: View, k: number): void {
+    let turn = b.yaw - a.yaw
+    turn = Math.atan2(Math.sin(turn), Math.cos(turn))
+    view.yaw = a.yaw + turn * k
+    view.pitch = a.pitch + (b.pitch - a.pitch) * k
+    view.distance = a.distance + (b.distance - a.distance) * k
+    view.target.lerpVectors(a.target, b.target, k)
+  }
+  /** The eye along the run's views, by the clock; under reduced motion it
+   * cuts to a stage's view once that stage's move would have ended. */
+  function carry(dt: number): void {
+    const at = schedule.kind === 'loop' && period ? state.clock % period : state.clock
+    let want = 0
+    runViews.forEach((stage, i) => {
+      if (at <= stage.from) return
+      const u = Math.min(1, (at - stage.from) / Math.max(1e-3, stage.to - stage.from))
+      want = i + u * u * (3 - 2 * u)
+    })
+    if (host?.reducedMotion) carried = Math.floor(want + 1e-6)
+    else carried += (want - carried) * (1 - Math.exp(-dt / CARRY_FOLLOW_S))
+    carryViews ??= [goalFor('whole'), ...runViews.map(stage => goalFor(stage.view, stage))]
+    const i = Math.min(runViews.length - 1, Math.floor(carried))
+    blend(carryViews[i]!, carryViews[i + 1]!, carried - i)
+    const shown = carried > runViews.length - .001 ? runViews[runViews.length - 1]!.view : 'whole'
+    if (shown === carryShown) return
+    carryShown = shown
+    for (const [name, button] of viewButtons) button.setAttribute('aria-pressed', String(name === shown))
+  }
   function placeCamera(dt: number): void {
     if (!camera || !host) return
     if (goal && from) {
       eased = Math.min(1, eased + dt / EASE_S)
-      const k = eased * eased * (3 - 2 * eased)
-      let turn = goal.yaw - from.yaw
-      turn = Math.atan2(Math.sin(turn), Math.cos(turn))
-      view.yaw = from.yaw + turn * k
-      view.pitch = from.pitch + (goal.pitch - from.pitch) * k
-      view.distance = from.distance + (goal.distance - from.distance) * k
-      view.target.lerpVectors(from.target, goal.target, k)
+      blend(from, goal, eased * eased * (3 - 2 * eased))
       if (eased >= 1) goal = null
-    }
+    } else if (carrying && standing) carry(dt)
     const cos = Math.cos(view.pitch)
     camera.position.set(Math.sin(view.yaw) * cos, Math.sin(view.pitch), Math.cos(view.yaw) * cos)
       .multiplyScalar(view.distance).add(view.target)
@@ -647,7 +685,11 @@ export function createTurntablePayload(options: TurntableOptions): TurntablePayl
     play.disabled = !period
     play.addEventListener('click', () => {
       if (!period) return
-      if (schedule.kind === 'finite' && state.clock >= period) setClock(0, true)
+      if (schedule.kind === 'finite' && state.clock >= period) {
+        setClock(0, true)
+        // a replay is the run again, and its eye with it
+        if (runViews.length && !carrying) { choose('whole'); carrying = true; carried = 0 }
+      }
       else state = { clock: state.clock, playing: !state.playing, fixed: false }
       paint()
     }, { signal: listening.signal })
@@ -836,6 +878,11 @@ export function createTurntablePayload(options: TurntableOptions): TurntablePayl
     lands: steps.map((_, i) => landOf(i)),
     pose(clock, how) {
       tapped = null
+      // the recorded cycle is the whole view's
+      if (carrying) {
+        carrying = false; carried = 0
+        if (standing && !goal && chosen === 'whole') Object.assign(view, goalFor('whole'))
+      }
       dark = !how.lit
       state = { clock: schedule.kind === 'finite' ? Math.min(period, Math.max(0, clock)) : Math.max(0, clock), playing: how.playing, fixed: !how.playing }
       active = -2
@@ -843,7 +890,8 @@ export function createTurntablePayload(options: TurntableOptions): TurntablePayl
     },
     frame(box) {
       framed = box
-      if (standing && !goal && chosen === 'whole') view.distance = wholeDistance()
+      carryViews = null
+      if (standing && !goal && chosen === 'whole' && !carrying) view.distance = wholeDistance()
       placeCamera(0)
     },
   }
@@ -876,7 +924,8 @@ export function createTurntablePayload(options: TurntableOptions): TurntablePayl
     },
     layout() {
       if (!standing) return
-      if (!goal && chosen === 'whole') view.distance = wholeDistance()
+      carryViews = null
+      if (!goal && chosen === 'whole' && !carrying) view.distance = wholeDistance()
       placeCamera(0)
     },
     key(event) {

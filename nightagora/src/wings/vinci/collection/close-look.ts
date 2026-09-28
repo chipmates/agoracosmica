@@ -191,6 +191,18 @@ const STAGE_TURN: Partial<Record<MachineSlug, number>> = { 'rolling-mill': Math.
 const OPEN_SECTION: ReadonlySet<MachineSlug> = new Set(['mechanical-lion'])
 /** A machine that walks away from where it stood. */
 const TRAVELS: ReadonlySet<MachineSlug> = new Set(['mechanical-lion'])
+/** THE RUN CARRIES THE EYE, in seconds of the run, bearings from the lion's
+ * own axis on the stage: a front three quarter while it walks (3.9 s to
+ * 10.8 s), so the stride and the chest both read, then low and nearly in
+ * front as the doors swing (12 s) and before the lilies come (14.8 s), so
+ * the open doors do not hide them. */
+const LION_AXIS = STAGE_TURN['mechanical-lion'] ?? 0
+const RUN_VIEWS: Partial<Record<MachineSlug, TurntableOptions['runViews']>> = {
+  'mechanical-lion': [
+    { from: 3.9, to: 6.4, view: 'whole', yaw: LION_AXIS + 30 * Math.PI / 180, pitch: 12 * Math.PI / 180 },
+    { from: 10.8, to: 14.4, view: 'working-part', yaw: LION_AXIS + 15 * Math.PI / 180, pitch: 9 * Math.PI / 180 },
+  ],
+}
 
 /** A body built outside its record names some parts its own way: these are
  * the dossier's parts under the names that body gives them. */
@@ -375,6 +387,7 @@ export function createVinciMachinePayload(options: {
     restore: options.restore,
     standing: options.standing,
     travels: TRAVELS.has(slug),
+    runViews: RUN_VIEWS[slug],
   })
   return payload
 }
