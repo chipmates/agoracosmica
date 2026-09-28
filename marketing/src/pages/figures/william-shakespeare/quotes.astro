@@ -1,0 +1,344 @@
+---
+// Shakespeare quotes: forty famous lines, each with where it stands and what it
+// means in its scene, then five lines he never wrote. Lines and explanations
+// live in the data module, where the lines are the edition's own text.
+// English single page without a DE twin, so no hreflang block (the
+// validate-seo allowlist is a shared file this build does not touch).
+
+import Public from '../../../layouts/Public.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import EssayStyles from '../../../components/EssayStyles.astro';
+import EssayInvite from '../../../components/EssayInvite.astro';
+import { figureImage } from '../../../lib/figureImages';
+import { articleSchema, breadcrumbSchema } from '../../../lib/schemas';
+import { canonicalUrl, SITE_URL } from '../../../lib/urls';
+import {
+  SHAKESPEARE_QUOTES_PATH,
+  SHAKESPEARE_QUOTES_INDEXABLE,
+  quoteGroups,
+  neverWrote,
+  allQuotes,
+} from '../../../data/quotes/shakespeare.mjs';
+
+const lang = 'en' as const;
+const PAGE_PATH = SHAKESPEARE_QUOTES_PATH;
+const PAGE_URL = canonicalUrl(PAGE_PATH);
+const NEVER_ID = 'lines-he-never-wrote';
+
+const count = allQuotes.length;
+// The lead spells the count out, as prose should; any other count falls back to digits.
+const countWord = count === 40 ? 'forty' : String(count);
+const heading = 'Famous Shakespeare quotes and what they mean';
+const metaTitle = `Shakespeare Quotes: ${count} Famous Lines and What They Mean`;
+const metaDescription =
+  'The most famous Shakespeare quotes, each with its play, act, scene and speaker, and what it means in its scene. Plus five lines he never wrote.';
+
+type Quote = (typeof allQuotes)[number];
+
+/** Where a line stands, in words: never with a dash between the parts. */
+function where(q: Quote): { work: string; rest: string } {
+  if (q.act === undefined && q.part === undefined) return { work: q.work, rest: '' };
+  const place = q.part ?? `Act ${q.act}, Scene ${q.scene}`;
+  return { work: q.work, rest: `, ${place}. ${q.verb ?? 'Spoken by'} ${q.by}.` };
+}
+
+const shakespeare = {
+  '@type': 'Person',
+  '@id': `${PAGE_URL}#person`,
+  name: 'William Shakespeare',
+  birthDate: '1564-04',
+  deathDate: '1616-04-23',
+  birthPlace: 'Stratford-upon-Avon',
+  sameAs: [
+    'https://en.wikipedia.org/wiki/William_Shakespeare',
+    'https://www.wikidata.org/wiki/Q692',
+  ],
+};
+const schemas = [
+  {
+    ...articleSchema({
+      title: heading,
+      description: metaDescription,
+      url: PAGE_URL,
+      lang,
+      image: figureImage('shakespeare', 'main', 1200),
+    }),
+    about: shakespeare,
+    isAccessibleForFree: true,
+  },
+  breadcrumbSchema([
+    { name: 'Home', url: `${SITE_URL}/` },
+    { name: 'Figures', url: `${SITE_URL}/figures/` },
+    { name: 'William Shakespeare', url: `${SITE_URL}/figures/william-shakespeare/` },
+    { name: 'Quotes', url: PAGE_URL },
+  ]),
+];
+---
+<Public
+  title={metaTitle}
+  fullTitle={metaTitle}
+  ogTitle={`${metaTitle} | Agora Cosmica`}
+  description={metaDescription}
+  canonicalPath={PAGE_PATH}
+  lang={lang}
+  ogType="article"
+  ogImage={figureImage('shakespeare', 'main', 1200)}
+  ogImageAlt="AI-generated portrait: William Shakespeare"
+  noHreflang={true}
+  noindex={!SHAKESPEARE_QUOTES_INDEXABLE}
+  robots="noindex, follow"
+  stickyCta={false}
+  schemas={schemas}
+>
+  <EssayStyles />
+  <div class="pub-content esy">
+    <Breadcrumbs
+      lang={lang}
+      items={[
+        { label: 'Figures', path: '/figures' },
+        { label: 'William Shakespeare', path: '/figures/william-shakespeare' },
+        { label: 'Quotes' },
+      ]}
+    />
+
+    <header class="esy-hero sq-hero">
+      <p class="esy-hero__eyebrow">In his own words</p>
+      <h1 class="esy-hero__title">{heading}</h1>
+      <p class="esy-hero__lead">
+        The Shakespeare lines people look up most are “To be, or not to be”,
+        “Tomorrow, and tomorrow, and tomorrow”, “Et tu, Brute?” and “All the
+        world’s a stage”. Here are {countWord} famous lines, each with its play,
+        act, scene and speaker, and a few plain sentences on what it means
+        where it stands. That is often not what it means on a mug. Plenty of
+        the best-loved advice comes from fools and villains. Every line is
+        checked against his complete works, and five he never wrote come at
+        the end.
+      </p>
+    </header>
+
+    <nav class="sq-jump" aria-label="Groups of quotes on this page">
+      <ul class="sq-jump__list">
+        {quoteGroups.map((group) => (
+          <li><a class="sq-jump__link" href={`#${group.id}`}>{group.navLabel}</a></li>
+        ))}
+        <li><a class="sq-jump__link" href={`#${NEVER_ID}`}>Lines he never wrote</a></li>
+      </ul>
+    </nav>
+
+    {quoteGroups.map((group) => (
+      <section class="esy-section sq-group" id={group.id}>
+        <h2 class="esy-h2">{group.title}</h2>
+        <p class="esy-p sq-group__blurb">{group.blurb}</p>
+        <div class="sq-list">
+          {group.quotes.map((q) => {
+            const w = where(q);
+            return (
+              <article class="sq-quote" id={q.id}>
+                <figure class="sq-quote__figure">
+                  <blockquote class="sq-quote__text">
+                    {q.prose
+                      ? <p class="sq-quote__prose">{q.lines.join(' ')}</p>
+                      : <p class="sq-quote__verse">{q.lines.map((line) => (<span class="sq-quote__line">{line}</span>))}</p>}
+                  </blockquote>
+                  <figcaption class="sq-quote__where"><cite class="sq-quote__work">{w.work}</cite>{w.rest}</figcaption>
+                </figure>
+                <p class="sq-quote__meaning">{q.meaning}</p>
+                {q.more && (
+                  <p class="sq-quote__more"><a class="pub-textlink" href={q.more.href}>{q.more.label}</a></p>
+                )}
+              </article>
+            );
+          })}
+        </div>
+      </section>
+    ))}
+
+    <section class="esy-section sq-group" id={NEVER_ID}>
+      <h2 class="esy-h2">Lines Shakespeare never wrote</h2>
+      <p class="esy-p sq-group__blurb">
+        These travel under his name on posters and quote sites. We searched his
+        complete works for each one, by its key words and not only its exact
+        wording.
+      </p>
+      <div class="sq-list">
+        {neverWrote.map((n) => (
+          <article class="sq-myth" id={n.id}>
+            <h3 class="sq-myth__line">“{n.line}”</h3>
+            <p class="sq-myth__verdict">{n.verdict}</p>
+            <p class="sq-quote__meaning">{n.body}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <EssayInvite
+      lang={lang}
+      line="You have just read Shakespeare in his own words. On Agora Cosmica you can hear his life told in chapters, sit with the ideas under the sonnets, and talk them through with his Echo, an AI voice grounded in his real work. An interpretation, never the man himself."
+      href="/app?figure=william-shakespeare&lang=en"
+      buttonLabel="Learn from his Echo"
+      figureId="shakespeare"
+      portraitAlt="AI-generated portrait of William Shakespeare"
+      moreLinks={[
+        { label: 'William Shakespeare, the figure', href: '/figures/william-shakespeare/' },
+        { label: 'Shakespeare’s sonnets', href: '/figures/william-shakespeare/sonnets/' },
+        { label: 'What is love, really?', href: '/themes/love-connection/' },
+      ]}
+    />
+
+    <footer class="esy-sources">
+      <p>
+        Shakespeare’s plays and poems are in the public domain. Every line here
+        follows The Complete Works of William Shakespeare, Project Gutenberg
+        ebook 100, word for word, with its spelling and punctuation. The only
+        change is that the underscores it uses for italics are left out. The act
+        and scene numbers and the speakers are that edition’s. Other editions
+        differ here and there by a word, and where the familiar wording is
+        different, the note says so. The explanations are ours.
+      </p>
+    </footer>
+  </div>
+</Public>
+
+<style>
+  /* The jump list sits between the lead and the first group. Plain text links
+     on one wrapping line, each tall enough to tap. */
+  .sq-hero {
+    margin-bottom: 1.75rem;
+  }
+  .sq-jump {
+    margin: 0 0 3rem;
+    padding: 0.35rem 0;
+    border-top: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  }
+  .sq-jump__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 1.6rem;
+  }
+  .sq-jump__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-sm);
+    color: var(--gold-primary);
+    text-decoration: none;
+  }
+  .sq-jump__link:hover,
+  .sq-jump__link:focus-visible {
+    color: var(--gold-hover);
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+  }
+
+  .sq-group {
+    scroll-margin-top: 5.5rem;
+  }
+  .sq-group__blurb {
+    margin-bottom: 2rem;
+  }
+  .sq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2.6rem;
+  }
+
+  /* One entry: the line in the poem pages' reading face under their gold rule,
+     where it stands, then what it means. */
+  .sq-quote,
+  .sq-myth {
+    border-left: 2px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+    padding-left: 1.5rem;
+    scroll-margin-top: 5.5rem;
+  }
+  .sq-quote__figure {
+    margin: 0;
+  }
+  .sq-quote__text {
+    margin: 0;
+    font-family: 'Iowan Old Style', Palatino, Georgia, 'Times New Roman', serif;
+    font-size: 1.16rem;
+    line-height: 1.7;
+    color: var(--text-primary);
+  }
+  .sq-quote__verse,
+  .sq-quote__prose {
+    margin: 0;
+    max-width: 37rem;
+  }
+  /* One block per verse line, with a hanging indent so a wrapped line stays
+     distinct from the next verse line on a phone. */
+  .sq-quote__line {
+    display: block;
+    overflow-wrap: break-word;
+    padding-left: 1.1em;
+    text-indent: -1.1em;
+  }
+  .sq-quote__where {
+    margin: 0.75rem 0 0;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    color: var(--text-tertiary);
+  }
+  .sq-quote__work {
+    font-style: italic;
+    color: var(--gold-subtle);
+  }
+  .sq-quote__meaning {
+    margin: 0.9rem 0 0;
+    max-width: 38rem;
+    color: var(--text-secondary);
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+  }
+  .sq-quote__more {
+    margin: 0.6rem 0 0;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-sm);
+  }
+
+  /* The lines he never wrote: the same entry, with a quieter rule so they do
+     not read as his. */
+  .sq-myth {
+    border-left-color: color-mix(in srgb, var(--text-tertiary) 45%, transparent);
+  }
+  .sq-myth__line {
+    margin: 0;
+    font-family: 'Iowan Old Style', Palatino, Georgia, 'Times New Roman', serif;
+    font-size: 1.16rem;
+    font-weight: normal;
+    line-height: 1.6;
+    color: var(--text-primary);
+  }
+  .sq-myth__verdict {
+    margin: 0.55rem 0 0;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold-subtle);
+  }
+
+  @media (max-width: 560px) {
+    .sq-jump {
+      margin-bottom: 2.25rem;
+    }
+    .sq-jump__list {
+      column-gap: 1.25rem;
+    }
+    .sq-quote,
+    .sq-myth {
+      padding-left: 1rem;
+    }
+    .sq-quote__text,
+    .sq-myth__line {
+      font-size: 1.05rem;
+    }
+  }
+</style>
