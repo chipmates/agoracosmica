@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "provenance": {
+    "scope": "the drawings the wing shows off the wall, beside the locked paintings register",
+    "rights_authority": "program/RIGHTS-POLICY.md, decision of 2026-09-28",
+    "facts": "briefs/walk-monday-0928/FACTS-PICTURE-ROOM.md section 5",
+    "prepared_date": "2026-09-28"
+  },
+  "drawings": [
+    {
+      "id": "arno-1473",
+      "manifest_id": "vinci/opening-plate/arno-1473",
+      "role": "opening-plate",
+      "path_stem": "opening/arno-1473",
+      "title": {
+        "en": "Landscape of the Arno valley",
+        "de": "Landschaft des Arnotals"
+      },
+      "maker": "Leonardo da Vinci",
+      "date": "1473-08-05",
+      "date_label": {
+        "en": "5 August 1473",
+        "de": "5. August 1473"
+      },
+      "date_certainty": "documented",
+      "date_source": "https://www.uffizi.it/en/news/diagnostic-campaign-first-landescape-leonardo-drawing-8p-opificio-pietre-dure",
+      "holder": {
+        "en": "Gallerie degli Uffizi, Florence",
+        "de": "Gallerie degli Uffizi, Florenz"
+      },
+      "holder_type": "italian-state",
+      "inventory": {
+        "en": "inv. 8 P",
+        "de": "Inv. 8 P"
+      },
+      "tier": "TIER2",
+      "class": "PD-ART",
+      "photograph": {
+        "by": "Tangopaso",
+        "licence_template": "PD-self",
+        "licence_line": "Public domain. Photograph by Tangopaso, released into the public domain by the photographer (PD-self), via Wikimedia Commons.",
+        "taken": "2019-12-11",
+        "taken_label": {
+          "en": "11 December 2019",
+          "de": "11. Dezember 2019"
+        },
+        "file": "File:Paysage de la vallée de l'Arno, Leonard de Vinci (Uffizi, inv. 8 P).jpg",
+        "commons_pageid": 84868721,
+        "source_url": "https://commons.wikimedia.org/wiki/File:Paysage_de_la_vall%C3%A9e_de_l%27Arno,_Leonard_de_Vinci_(Uffizi,_inv._8_P).jpg",
+        "original_url": "https://upload.wikimedia.org/wikipedia/commons/4/48/Paysage_de_la_vall%C3%A9e_de_l%27Arno%2C_Leonard_de_Vinci_%28Uffizi%2C_inv._8_P%29.jpg",
+        "sha1": "63760afb8aa838871707a187832580233092aa28",
+        "width": 2816,
+        "height": 2112
+      },
+      "correction": {
+        "kind": "non-creative",
+        "steps": [
+          {
+            "en": "The slight keystone of a handheld gallery photograph was taken out by one projective transform from the four corners of the visible sheet.",
+            "de": "Die leichte Verzerrung einer Aufnahme aus freier Hand wurde mit einer einzigen Perspektivkorrektur aus den vier Ecken des sichtbaren Blattes entfernt."
+          },
+          {
+            "en": "The grey window mount was cropped away. The crop follows the inner edge of the mount, where the visible paper begins, and the shadow the mount casts along the top edge stays.",
+            "de": "Das graue Passepartout wurde weggeschnitten. Der Schnitt folgt der Innenkante des Passepartouts, wo das sichtbare Papier beginnt. Der Schatten, den es an der Oberkante wirft, bleibt."
+          },
+          {
+            "en": "No retouching and no change of tone or colour. The mount already reads neutral to within about two percent, so no white point was set.",
+            "de": "Keine Retusche, keine Änderung von Tonwert oder Farbe. Das Passepartout erscheint schon auf etwa zwei Prozent genau neutral, darum wurde kein Weißpunkt gesetzt."
+          }
+        ]
+      },
+      "rights": {
+        "decision": "RIGHTS-POLICY.md, decision of 2026-09-28: Tier 2 under the 2026-09-14 reclass",
+        "basis": [
+          "The drawing of 1473 is in the public domain.",
+          "A flat photograph of it adds no originality: Directive (EU) 2019/790 art. 14, UrhG s. 68, Italian copyright law art. 32-quater.",
+          "The photograph was taken by a visitor and released by the photographer (PD-self).",
+          "Italian Codice dei beni culturali art. 108 paragraph 3-bis exempts non-profit study, research and promotion of the heritage; the museum is non-commercial.",
+          "The Landgericht Stuttgart (17 O 247/22, 14 March 2024, confirmed on appeal) held that the Italian code does not reach outside Italy."
+        ],
+        "residual_risk": "low to medium (Italian image-fee practice; non-commercial use)",
+        "open_points": [
+          "Art. 108 paragraph 3-bis asks that the image was lawfully acquired; the conditions of the capture are not recorded.",
+          "The same paragraph asks that the image cannot be reproduced further for profit; some read this as a resolution limit."
+        ]
+      }
+    }
+  ]
+}
