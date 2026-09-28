@@ -2148,6 +2148,11 @@ export function createWing():VinciWingModule {
     }
     return button
   }
+  /** THE SHELF IS WALKED BOOK TO BOOK, as a wall is walked work to work: the
+   * gold control is the next book, and a book's pages turn with its own arrows. */
+  function shelfWalk(id:string):HTMLElement[] {
+    return [stepControl('\u2039',exhibitStep(id,-1)),stepControl('\u203a',exhibitStep(id,1))]
+  }
   function control(words:VinciText,run:()=>void):HTMLButtonElement {
     const button=make('button','vitrine-control',text(words))
     button.type='button'
@@ -2292,7 +2297,7 @@ export function createWing():VinciWingModule {
     // under it is the shelf's plain title, what the book is about
     closeLook.open({id,title:text(book.title),line:text(book.title),card:[],payload:reader,
       controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())],
-      ...exhibitStand(id)},from,how_)
+      walk:shelfWalk(id),...exhibitStand(id)},from,how_)
     openMode='auto'
     if(recordNext){recordNext=false;openRecord()}
   }
@@ -2502,10 +2507,8 @@ export function createWing():VinciWingModule {
         changed:()=>{if(exhibitSources?.id===id&&mode===2)paintDock()},openBook:openFromRecord})
       leafAt=null
       openMode=how
-      // A BOOK TURNS ITS OWN PAGES: the shelf is chosen at the table, so the
-      // band's two ways stay the book's own steps and never walk the shelf
       closeLook.open({id,title,line:vinciLine(id),card:[],payload:reader,
-        controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),shut],...vinciLimits(id),...own('documented'),
+        controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),shut],walk:shelfWalk(id),...vinciLimits(id),...own('documented'),
         work:()=>{const nav=rail.navigation;return nav.exhibit===id&&!nav.active?sphereRect(entry.centre,entry.radiusM):null}},from,how_)
       openMode='auto'
       if(recordNext){recordNext=false;openRecord()}

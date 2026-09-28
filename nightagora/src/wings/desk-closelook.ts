@@ -47,8 +47,9 @@ export interface CloseLookView {
   on: HTMLElement | null
   /** what the way on leads to, where the set names it */
   onTitle: string | null
-  /** the machine's own play control, where the kind has one */
-  run: HTMLElement | null
+  /** true when the way on turns the payload's own page rather than walking
+      the set: the gold control then names a page */
+  paging: boolean
 }
 
 export interface CloseLookBand {
@@ -94,26 +95,31 @@ function make<K extends keyof HTMLElementTagNameMap>(
 }
 
 /* EVERY DISPLAYED WORD OF THIS BAND IS THE CARD DATA'S, by key: the way on
-   for each kind, the run, the two side paths, and the count's own pattern. */
+   for each kind, the two side paths, and the count's own pattern. */
 const WORD = {
   more: () => deskControl('shared', 'read_more'),
   work: () => deskControl('walk', 'next_work'),
   page: () => deskControl('walk', 'next_page'),
   machine: () => deskControl('walk', 'next_machine'),
-  run: () => deskControl('walk', 'run_it'),
+  // the words round writes next_manuscript; until it stands, the way on to
+  // the next book says what it says at every other work
+  manuscript: (): VinciText => {
+    const own = deskControl('walk', 'next_manuscript')
+    return own.en && own.de ? own : deskControl('walk', 'next_work')
+  },
   place: () => deskControl('picture', 'place'),
   step: () => deskControl('machine', 'step'),
   close: () => LOBBY_TEXT.close,
 }
 
-/** A KIND THAT RUNS asks for its run before it offers the way on: a machine
-    and a film the museum made are started by the gold control first */
-const runs = (kind: string | undefined): boolean => kind === 'machine' || kind === 'showpiece'
-
-/** the word the gold control carries at a kind */
-function wayOn(kind: string): VinciText {
+/** THE GOLD CONTROL IS THE WAY ON TO THE NEXT OBJECT at every kind, and one
+    word for one meaning: a run starts by itself and replays from the kind's
+    own play control, and a page turns with the payload's own arrows. Only a
+    set the wing gives no walk to is paged by the gold. */
+function wayOn(kind: string, paging: boolean): VinciText {
+  if (paging) return WORD.page()
   if (kind === 'machine') return WORD.machine()
-  if (kind === 'manuscript') return WORD.page()
+  if (kind === 'manuscript') return WORD.manuscript()
   return WORD.work()
 }
 
@@ -185,9 +191,6 @@ export function createCloseLookBand(options: {
   root.append(stepBack, left, rightColumn)
 
   let view: CloseLookView | null = null
-  /** the run a machine has not had yet, which is what the gold control asks
-      for before it offers the next machine */
-  let ran = false
   let measured = 0
 
   function press(node: HTMLElement | null): void {
@@ -196,28 +199,7 @@ export function createCloseLookBand(options: {
   }
 
   backWay.addEventListener('click', () => press(view?.back ?? null))
-  /** the run the gold control still asks for: a machine's first run, and a
-      film's every run while it stands still, so a paused or ended film is
-      started again from the same corner */
-  function asks(): boolean {
-    const run = view?.run ?? null
-    if (!run || !runs(view?.kind)) return false
-    return view?.kind === 'showpiece' ? run.getAttribute('aria-pressed') !== 'true' : !ran
-  }
-  const pressed = new MutationObserver(() => paintWays())
-
-  on.addEventListener('click', () => {
-    const run = view?.run ?? null
-    if (run && asks()) {
-      // a run already under way is not started twice: the word goes on, the
-      // machine keeps running
-      ran = true
-      if (run.getAttribute('aria-pressed') !== 'true') press(run)
-      paintWays()
-      return
-    }
-    press(view?.on ?? null)
-  })
+  on.addEventListener('click', () => press(view?.on ?? null))
   more.addEventListener('click', () => openDrawer(drawer.hidden))
 
   function openDrawer(open: boolean): void {
@@ -253,18 +235,17 @@ export function createCloseLookBand(options: {
   const sized = new ResizeObserver(() => { if (!drawer.hidden) measure() })
   sized.observe(drawerWords)
 
-  /** the gold control's two states at a machine, and its one everywhere else */
+  /** the gold control's one state: the way on */
   function paintWays(): void {
     if (!view) return
     const on_ = view.on as HTMLButtonElement | null
-    const running = asks()
     // the set names where the way on leads; a book's own step names it only
     // where it crosses into another volume
     const target = view.onTitle ?? on_?.dataset['title'] ?? ''
-    onKicker.textContent = say(running ? WORD.run() : wayOn(view.kind))
-    onTitle.textContent = running ? '' : target
-    onTitle.hidden = running || !target
-    on.disabled = running ? false : !on_ || on_.disabled
+    onKicker.textContent = say(wayOn(view.kind, view.paging))
+    onTitle.textContent = target
+    onTitle.hidden = !target
+    on.disabled = !on_ || on_.disabled
     on.setAttribute('aria-label', `${onKicker.textContent}${onTitle.hidden ? '' : ` · ${onTitle.textContent}`}`)
     const back = view.back as HTMLButtonElement | null
     backWay.disabled = !back || back.disabled
@@ -301,10 +282,7 @@ export function createCloseLookBand(options: {
       // a page turned inside the same work keeps an open drawer open: the
       // reader asked to read, and the next side's words take the same place
       const keep = next.id === view?.id && !drawer.hidden
-      if (next.id !== view?.id) ran = false
       view = next
-      pressed.disconnect()
-      if (next.kind === 'showpiece' && next.run) pressed.observe(next.run, { attributes: true, attributeFilter: ['aria-pressed'] })
       root.lang = language
       stepBack.textContent = ''
       stepBack.append(icon(STEP_BACK), document.createTextNode(next.room))
@@ -353,14 +331,9 @@ export function createCloseLookBand(options: {
         : ''
       clock.textContent = said
       clock.hidden = !said
-      // the run has begun once the clock has left its first step: before that
-      // the gold control still asks for the run
-      if (at > 0 && view?.kind === 'machine' && !ran) { ran = true; paintWays() }
     },
     clear() {
       view = null
-      ran = false
-      pressed.disconnect()
       measured = 0
       drawer.hidden = true
       delete root.dataset['drawer']

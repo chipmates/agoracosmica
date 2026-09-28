@@ -275,7 +275,9 @@ export function createShowpiecePayload(options: {
       next.surface('hold')
       // fitted first, so the size fetched is the one the picture stands at
       fit()
-      load(framing, 0, false)
+      // THE FILM RUNS BY ITSELF when its look opens, as a machine does; its
+      // own play control replays it, and starts it where motion is reduced
+      load(framing, 0, !next.reducedMotion)
       paint()
     },
     update() {

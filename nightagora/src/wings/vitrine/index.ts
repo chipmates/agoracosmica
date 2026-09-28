@@ -437,8 +437,10 @@ export function createVitrine(options: {
     // A SET THE STATION CANNOT WALK IS WALKED BY THE PAYLOAD: a book steps
     // its own sides where the row holds one volume.
     const steps = payloadControls.querySelectorAll<HTMLElement>('.vitrine-step')
-    const on = live(walk[1]) ?? live(steps[1]) ?? walk[1] ?? null
-    const back = live(walk[0]) ?? live(steps[0]) ?? walk[0] ?? null
+    // A SET THE WING WALKS IS WALKED TO ITS END: past the last book of a
+    // shelf the gold rests, and the book's own arrows keep turning its pages.
+    const on = walk[1] ?? live(steps[1]) ?? null
+    const back = walk[0] ?? live(steps[0]) ?? null
     // A MACHINE'S STEPS ARE THE RUN'S CAPTIONS, one at a time under the work,
     // so the list of them does not stand in the label as well.
     const paged = next.payload?.kind !== 'machine'
@@ -459,7 +461,8 @@ export function createVitrine(options: {
       on,
       // the work the way on leads to, where the set knows its name
       onTitle: on && walk.includes(on) ? on.getAttribute('aria-label') : null,
-      run: payloadControls.querySelector<HTMLElement>('.vitrine-play'),
+      // no walk of the wing's: the way on is the payload's own page, or none
+      paging: !walk[1],
     })
   }
 
