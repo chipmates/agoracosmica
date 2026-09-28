@@ -5,6 +5,7 @@
 
 import { buildKokoroFallbackBody, QWEN_EN_TO_KOKORO } from '../src/ttsEngine';
 import { proxyWithFailoverFromBuffer } from '../src/proxy';
+import { checkAudioRateLimit, hashIP } from '../src/rateLimit';
 import type { Env, ServerInfo } from '../src/types';
 
 // ---------------------------------------------------------------------------
@@ -267,6 +268,64 @@ async function main(): Promise<number> {
     } finally {
       globalThis.fetch = original;
     }
+  });
+
+  // -------------------------------------------------------------------------
+  // The rate limiter's address hash: keyed with the worker secret
+  // -------------------------------------------------------------------------
+
+  const hex16 = (buffer: ArrayBuffer) => Array.from(new Uint8Array(buffer).slice(0, 8))
+    .map(b => b.toString(16).padStart(2, '0')).join('');
+  const unkeyed = async (text: string) =>
+    hex16(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)));
+  const hmac = async (secret: string, text: string) => {
+    const key = await crypto.subtle.importKey(
+      'raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'],
+    );
+    return hex16(await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(text)));
+  };
+
+  await test('with the secret the address hash is an HMAC, per scope', async () => {
+    const got = await hashIP('203.0.113.9', 'test-salt');
+    assertEqual(got, await hmac('test-salt', 'audio-ratelimit:203.0.113.9'), 'HMAC-SHA-256 under the secret');
+    assert(got !== await unkeyed('audio-ratelimit:203.0.113.9'), 'differs from the unkeyed hash');
+    assert(got !== await hashIP('203.0.113.9', 'other-salt'), 'another secret, another hash');
+    assert(got !== await hashIP('203.0.113.9', 'test-salt', 'archive-ratelimit'), 'the scopes stay apart');
+    assertEqual(got.length, 16, 'same key width as before');
+  });
+
+  await test('without the secret the old hash is kept and one warning is logged', async () => {
+    const warnings: string[] = [];
+    const realWarn = console.warn;
+    console.warn = (...args: unknown[]) => { warnings.push(args.map(String).join(' ')); };
+    try {
+      const a = await hashIP('203.0.113.9', undefined);
+      const b = await hashIP('198.51.100.4', undefined, 'archive-ratelimit');
+      assertEqual(a, await unkeyed('audio-ratelimit:203.0.113.9'), 'today\'s audio key');
+      assertEqual(b, await unkeyed('archive-ratelimit:198.51.100.4'), 'today\'s archive key');
+    } finally {
+      console.warn = realWarn;
+    }
+    assertEqual(warnings.length, 1, 'one warning per isolate');
+    assert(!warnings[0].includes('203.0.113.9'), 'the address is not logged');
+  });
+
+  await test('the limiter\'s counter keys carry the keyed hash', async () => {
+    const puts: string[] = [];
+    const kv = {
+      get: async () => null,
+      put: async (key: string) => { puts.push(key); },
+    } as unknown as KVNamespace;
+    const env = { ...fakeEnv(), RATE_LIMITS: kv, IP_HASH_SALT: 'test-salt' } as Env;
+    const req = new Request('https://audio.agoracosmica.org/v1/audio/speech', {
+      method: 'POST', headers: { 'CF-Connecting-IP': '203.0.113.9' },
+    });
+    const result = await checkAudioRateLimit(req, env, 'en', 'tts');
+    assertEqual(result.allowed, true, 'allowed');
+    const keyed = await hmac('test-salt', 'audio-ratelimit:203.0.113.9');
+    assertEqual(puts.length, 2, 'daily and burst counters');
+    assert(puts.every(key => key.includes(keyed)), 'both keys use the keyed hash');
+    assert(puts.every(key => !key.includes('203.0.113.9')), 'no plain address in a key');
   });
 
   // -------------------------------------------------------------------------

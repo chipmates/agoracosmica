@@ -17,6 +17,8 @@ export interface Env {
    * Optional during shadow rollout; once nginx enforces, treat as required.
    */
   ORIGIN_VERIFY_KEY?: string;
+  /** Key for the rate limiter's address hash. Unset falls back to an unkeyed hash. */
+  IP_HASH_SALT?: string;
 }
 
 export interface GpuSlots {

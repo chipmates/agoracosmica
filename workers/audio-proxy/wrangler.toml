@@ -38,6 +38,9 @@ SERVER_NBG1_URL = "https://nbg1.agoracosmica.org"
 #                       Defense against direct-to-origin abuse with leaked AUDIO_API_KEY.
 #                       Generate: openssl rand -hex 32)
 # - LOAD_TEST_BYPASS_KEY  (optional; if set, X-Load-Test-Auth header skips rate limits)
+# - IP_HASH_SALT  (openssl rand -hex 32) — HMAC key for the rate limiter's address
+#                 hash. Set it before deploying; unset, the limiter falls back to
+#                 an unkeyed hash and logs one warning per isolate.
 
 # Routes
 [[routes]]

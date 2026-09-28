@@ -5,6 +5,7 @@
 // show availability and download size before committing to ~400 MB.
 
 import { corsHeaders } from './cors';
+import { hashIP } from './rateLimit';
 import type { Env } from './types';
 import { streamZip, zipByteLength, type ZipEntry } from './zip';
 
@@ -201,7 +202,7 @@ function readmeText(lang: Language, label: string, audioCount: number, transcrip
 
 async function withinQuota(request: Request, env: Env): Promise<boolean> {
   const ip = request.headers.get('CF-Connecting-IP') || '127.0.0.1';
-  const hash = await hashIp(ip);
+  const hash = await hashIP(ip, env.IP_HASH_SALT, 'archive-ratelimit');
   const dayKey = `archive:day:${hash}:${new Date().toISOString().slice(0, 10)}`;
   const minuteKey = `archive:min:${hash}:${Math.floor(Date.now() / 60_000)}`;
 
@@ -221,14 +222,6 @@ async function withinQuota(request: Request, env: Env): Promise<boolean> {
 async function readCounter(kv: KVNamespace, key: string): Promise<number> {
   const value = await kv.get(key);
   return value ? parseInt(value, 10) || 0 : 0;
-}
-
-async function hashIp(ip: string): Promise<string> {
-  const data = new TextEncoder().encode('archive-ratelimit:' + ip);
-  const digest = await crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(digest).slice(0, 8))
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('');
 }
 
 // --- Helpers ---
