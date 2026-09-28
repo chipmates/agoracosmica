@@ -51,3 +51,23 @@ describe('the welcome_shown class', () => {
     expect(window.location.search).toBe('');
   });
 });
+
+describe('the homepage forward', () => {
+  beforeEach(() => {
+    funnel.sendFunnelBeaconOnce.mockClear();
+    localStorage.clear();
+  });
+  afterEach(() => {
+    window.history.replaceState({}, '', '/');
+  });
+
+  it('counts nothing for an old forward URL and strips its marker', async () => {
+    localStorage.setItem('agb_consent', JSON.stringify({ version: '1.0.0', timestamp: 1 }));
+    const getItem = vi.mocked(localStorage.getItem);
+    getItem.mockClear();
+    await bootAt('/app/?entry=return&utm_source=x');
+    expect(funnel.sendFunnelBeaconOnce).not.toHaveBeenCalled();
+    expect(getItem.mock.calls.map((c) => c[0])).not.toContain('agb_consent');
+    expect(window.location.search).toBe('?utm_source=x');
+  });
+});

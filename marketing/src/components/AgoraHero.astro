@@ -122,7 +122,8 @@ const S = de
      only the entry URL differs between a restored and a fresh window). Once
      per tab, so a deliberate revisit stays. ?stay=1 keeps the homepage and
      pins the tab. No script, blocked storage or no record: the page renders
-     as for any first visit. */
+     as for any first visit. It adds nothing to the address and counts
+     nothing. */
   (function () {
     try {
       var q = new URLSearchParams(location.search);
@@ -132,8 +133,8 @@ const S = de
       }
       if (!localStorage.getItem('agb_consent')) return;
       sessionStorage.setItem('agc_home', '1');
-      q.set('entry', 'return');
-      location.replace('/app/?' + q.toString());
+      var qs = q.toString();
+      location.replace('/app/' + (qs ? '?' + qs : ''));
     } catch (e) {
       /* fall through to the homepage */
     }

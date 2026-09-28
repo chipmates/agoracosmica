@@ -1274,6 +1274,22 @@ async function main(): Promise<number> {
     }
   });
 
+  await test('the retired return_visit and ad_consent_dismissed are dropped quietly', async () => {
+    for (const step of ['return_visit', 'ad_consent_dismissed']) {
+      analyticsRows.length = 0;
+      const res = await handleFunnel(
+        new Request('https://example.invalid/v1/funnel', {
+          method: 'POST',
+          headers: { 'CF-Connecting-IP': '10.0.0.11' },
+          body: JSON.stringify({ step, language: 'en', bucket: 1 }),
+        }),
+        fakeEnv(),
+      );
+      assert(res.status < 400, `${step} answered ${res.status}, an old client must see no error`);
+      assertEqual(analyticsRows.length, 0, `${step} wrote a row`);
+    }
+  });
+
   await test('a step outside the allowlist writes nothing at all', async () => {
     for (const step of ['ask_listen', 'ask_listen_failed', 'ask_listen_resume', '', 'made_up_step']) {
       const row = await funnelBeacon({ step, figureId: 'aurelius', mode: 'story', language: 'en' });

@@ -142,7 +142,7 @@ function countConsentStep(step: ConsentCounter, lang: Props['lang'], bucket?: nu
   try {
     // Path only, no query and no hash, exactly like the cta_click beacon.
     // The worker holds it to the same closed shape it holds that one to
-    // (a short slug path or nothing), plus the coarse bucket on the three
+    // (a short slug path or nothing), plus the coarse bucket on the two
     // answer steps.
     const body = JSON.stringify(
       bucket === undefined
@@ -254,7 +254,7 @@ export default function ArrivalChoice({ lang }: Props) {
   const [show, setShow] = useState(false);
   const cardRef = useRef<HTMLElement | null>(null);
   // Start of the time-to-answer window. Never transmitted, never stored: the
-  // three answer beacons carry the coarse bucket derived from it and nothing
+  // two answer beacons carry the coarse bucket derived from it and nothing
   // else.
   const seenAtRef = useRef<number | null>(null);
   const t = COPY[lang] ?? COPY.en;

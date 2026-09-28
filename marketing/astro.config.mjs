@@ -48,7 +48,7 @@ export default defineConfig({
       scriptDirective: {
         hashes: [
           // returning-visitor forward
-          'sha256-A8NUHhsua1tqctjSRQ8Dm0bH3kI2fxxxBOPUfC7yDCM=',
+          'sha256-xVbuB7I21PnKG6CO0O0YP+Yn2QlTQRkHID5CTWBBIts=',
           // pre-paint marker
           'sha256-i/ofomzmMjJLegES6OLDsJfA4wJAI3UQ8UCNyC3zlcY=',
         ],

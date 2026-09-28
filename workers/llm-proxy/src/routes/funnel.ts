@@ -30,13 +30,12 @@ interface FunnelPayload {
 
 // Ad-measurement consent prompt: how many ad arrivals see the question and
 // what they answer. One-shot per tab on the client, counter-only here.
-// The three answers carry a coarse time-to-answer bucket (0 = under 1s,
+// The two answers carry a coarse time-to-answer bucket (0 = under 1s,
 // 1 = 1 to 3s, 2 = 3 to 10s, 3 = over 10s, measured from the moment the card
 // came into view). The shown step has nothing to time and keeps bucket 0.
 const CONSENT_ANSWER_STEPS = [
   'ad_consent_accepted',
   'ad_consent_declined',
-  'ad_consent_dismissed',
 ] as const;
 const CONSENT_STEPS = ['ad_consent_shown', ...CONSENT_ANSWER_STEPS] as const;
 
@@ -91,10 +90,6 @@ const VALID_STEPS = new Set([
   'turnstile_failed',
   'turnstile_abandoned',
   'turnstile_token_aged',
-  // The homepage recognized a returning browser (consent record present) and
-  // forwarded it straight into the app. One-shot per tab on the client; the
-  // row carries language only.
-  'return_visit',
   // The visit did something rather than only arriving: a first typed turn, or
   // enough listening to count as listening. The arm rides in the mode slot.
   // At most two per tab (the first arm, then 'both' if the other one follows).
@@ -128,7 +123,7 @@ const DIMENSIONLESS_STEPS = new Set(['paid_arrival']);
 
 // Counter-only steps: the row is the step name, the sanitized page path the
 // question appeared on, the interface language, the country and device class
-// the edge derives, and on the three answers the coarse time-to-answer
+// the edge derives, and on the two answers the coarse time-to-answer
 // bucket. Nothing else. The mode slot is blanked, the outcome is forced to
 // '200' server-side, and the path slot only ever takes a path — a figure id
 // sent on one of these steps is dropped rather than stored, so no content

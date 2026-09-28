@@ -8,7 +8,6 @@
 // Language is a real preference and is meant to persist.
 
 import { AUDIO_LIBRARY_ENTRY } from '../../config/features';
-import { sendFunnelBeaconOnce } from '../funnelBeacon';
 import { LocalStorageAdapter } from '../../storage/localAdapter';
 import { figureSlugToId } from '../../data/public/slugMap';
 import { getHeroEntryQuestion, getReadingEntryQuestion, hasHeroEntry } from '../../data/public/heroEntry';
@@ -667,10 +666,8 @@ export function hasEntryTextFirst(): boolean {
  * the app resolves at render time, so nothing a stranger writes into a link
  * can reach the composer or the model.
  *
- * ?entry=return is the homepage's returning-visitor forward marker. It stages
- * nothing and only feeds an anonymous one-shot counter, gated on the consent
- * record the forward keys off, so a shared or bookmarked forward URL never
- * inflates it.
+ * ?entry= is only stripped: older homepages added it to their forward, and
+ * nothing reads it.
  */
 export function captureEntryIntentFromUrl(): void {
   try {
@@ -718,17 +715,6 @@ export function captureEntryIntentFromUrl(): void {
     // that also carries a figure or a question loses neither.
     if (modeParam === 'library' && AUDIO_LIBRARY_ENTRY) {
       sessionStorage.setItem(SS_LIBRARY_KEY, '1');
-    }
-    // The homepage's returning-visitor forward. Counted only when the consent
-    // record the redirect keys off is really present in this browser.
-    if (entryParam === 'return') {
-      try {
-        if (localStorage.getItem('agb_consent') !== null) {
-          sendFunnelBeaconOnce('return_visit');
-        }
-      } catch {
-        // storage blocked — no row rather than a guessed one
-      }
     }
     if (figureParam || councilParam || askParam || questionParam || modeParam) {
       markEntryTextFirst();
