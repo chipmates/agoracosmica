@@ -60,6 +60,7 @@ import { getFigureById } from '@client/data/public/figuresCatalog';
 import { figureIdToSlug } from '@client/data/public/slugMap';
 import { figureThemes } from '@client/data/public/figureSeo';
 import { getFigureQA } from '@client/data/public/figureQA';
+import { getFigurePageContent } from '@client/data/public/figurePageContent';
 import { dickinsonPoemsFaqEn, dickinsonPoemsFaqDe } from '../lib/dickinsonPoemsFaq';
 import { isFrozenFigurePage } from '../lib/frozenPages';
 
@@ -133,8 +134,10 @@ const poemsFaq = figureId === 'dickinson' ? (de ? dickinsonPoemsFaqDe : dickinso
 // Deep pages that belong to one figure: the child page under their own slug, or
 // the topic page their work is the entry point for. Same visual pattern as the
 // Dickinson poems link above, so a figure gains a route down without a new
-// component. Keyed per language because not every deep page has both.
-const DEEP_LINKS: Record<string, { en?: { href: string; label: string }[]; de?: { href: string; label: string }[] }> = {
+// component. Keyed per language because not every deep page has both. A link
+// with `under` explains one concept and sits under that concept's heading.
+type DeepLink = { href: string; label: string; under?: string };
+const DEEP_LINKS: Record<string, { en?: DeepLink[]; de?: DeepLink[] }> = {
   blake: {
     en: [{ href: '/figures/william-blake/poems/', label: "Read William Blake's poems →" }],
   },
@@ -146,8 +149,8 @@ const DEEP_LINKS: Record<string, { en?: { href: string; label: string }[]; de?: 
   },
   plato: {
     de: [
-      { href: '/de/figures/plato/hoehlengleichnis/', label: 'Das Höhlengleichnis, einfach erklärt →' },
-      { href: '/de/figures/plato/ideenlehre/', label: 'Die Ideenlehre, und was Platon damit meinte →' },
+      { href: '/de/figures/plato/hoehlengleichnis/', label: 'Das Höhlengleichnis, einfach erklärt →', under: 'Was ist das Höhlengleichnis?' },
+      { href: '/de/figures/plato/ideenlehre/', label: 'Die Ideenlehre, und was Platon damit meinte →', under: 'Platons Ideenlehre einfach erklärt' },
     ],
   },
   campbell: {
@@ -162,7 +165,16 @@ const DEEP_LINKS: Record<string, { en?: { href: string; label: string }[]; de?: 
     de: [{ href: '/de/stoizismus/', label: 'Stoizismus, was er ist und wie man ihn übt →' }],
   },
 };
-const deepLinks = DEEP_LINKS[figureId]?.[lang] ?? [];
+const allDeepLinks = DEEP_LINKS[figureId]?.[lang] ?? [];
+// The concept headings FigureConcepts renders, from the same two sources. A
+// link whose heading is missing falls back to the block under the answer.
+const conceptHeadings = new Set([
+  ...(getFigurePageContent(figureId, lang)?.concepts ?? []).map(c => c.h2),
+  ...(qa?.pairs.slice(1) ?? []).map(pair => pair.q),
+]);
+const inSection = (link: DeepLink) => !frozen && !!link.under && conceptHeadings.has(link.under);
+const sectionLinks = allDeepLinks.filter(inSection);
+const deepLinks = allDeepLinks.filter(link => !inSection(link));
 const deepLinksLead = de ? 'Zu einem Thema tiefer:' : 'Go deeper on one thing:';
 
 const S = de
@@ -231,7 +243,7 @@ if (figure.essence) {
 
   <FigureSixWays figureId={figureId} figureName={figure.name} lang={lang} />
 
-  <FigureConcepts figureId={figureId} slug={slug} lang={lang} />
+  <FigureConcepts figureId={figureId} slug={slug} lang={lang} links={sectionLinks} />
 
   {poemsFaq && (
     <section class="pub-section pub-figure__poems">

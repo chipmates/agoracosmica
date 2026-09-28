@@ -114,6 +114,8 @@ export const GET: APIRoute = () => {
   lines.push(`- [Alle Menschen](${SITE_URL}/de/figures/)`);
   lines.push(`- [Alle Themen](${SITE_URL}/de/themes/)`);
   lines.push(`- [Open-Source-Philosophie-App](${SITE_URL}/de/open-source-philosophy-app/)`);
+  lines.push(`- [Platons Höhlengleichnis einfach erklärt](${SITE_URL}/de/figures/plato/hoehlengleichnis/)`);
+  lines.push(`- [Platons Ideenlehre einfach erklärt](${SITE_URL}/de/figures/plato/ideenlehre/)`);
   lines.push('');
 
   return new Response(lines.join('\n'), {

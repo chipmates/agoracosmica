@@ -22,9 +22,11 @@ interface Props {
   figureId: string;
   slug: string;
   lang: Lang;
+  /** Deep pages that explain one concept, placed under the heading named in `under`. */
+  links?: { href: string; label: string; under?: string }[];
 }
 
-const { figureId, slug, lang } = Astro.props;
+const { figureId, slug, lang, links = [] } = Astro.props;
 const de = lang === 'de';
 const authored = getFigurePageContent(figureId, lang);
 const qa = getFigureQA(figureId, lang);
@@ -64,7 +66,11 @@ for (const pair of qa?.pairs.slice(1) ?? []) {
 const PAGE_IDS = ['main-content', 'pub-nav', 'story', 'wisdom', 'prism', 'quest', 'freetalk', 'council',
   ...Array.from({ length: 12 }, (_, i) => `idea-${i + 1}`)];
 const nextId = isFrozenFigurePage(lang, slug) ? null : anchorIds(PAGE_IDS);
-const anchored = blocks.map(b => ({ ...b, id: nextId ? nextId(b.h2) : undefined }));
+const anchored = blocks.map(b => ({
+  ...b,
+  id: nextId ? nextId(b.h2) : undefined,
+  links: links.filter(link => link.under === b.h2),
+}));
 ---
 {blocks.length > 0 && (
   <div class="fig-concepts">
@@ -79,6 +85,11 @@ const anchored = blocks.map(b => ({ ...b, id: nextId ? nextId(b.h2) : undefined 
             {b.bullets.map(p => <li>{p}</li>)}
           </ul>
         )}
+        {b.links.map(link => (
+          <p class="pub-section__text pub-figure__poems-link">
+            <a class="pub-textlink" href={link.href}>{link.label}</a>
+          </p>
+        ))}
         {b.chapter && (
           <p class="fig-concept__link">
             <a

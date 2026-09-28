@@ -103,6 +103,8 @@ export const GET: APIRoute = () => {
   lines.push(`- [Methodik: wie wir die Echos bauen](${SITE_URL}/de/methodik/): wie jedes KI-Echo aus Primärwerken gebaut, belegt und faktengeprüft wird, mit einem öffentlichen Faktencheck pro Mensch und Open-Source-Code.`);
   lines.push(`- [Open-Source-Philosophie-App](${SITE_URL}/de/open-source-philosophy-app/): eine gemeinnützige Open-Source-Alternative zu KI-Charakter-Apps, für Philosophie und Geschichte.`);
   lines.push(`- [Philosophie lernen mit einem KI-Tutor](${SITE_URL}/de/philosophie-lernen/): Philosophie im Gespräch mit den KI-Echos der Philosophen der Geschichte lernen, gemeinnützig und Open Source, 30 kostenlose Nachrichten pro Tag.`);
+  lines.push(`- [Platons Höhlengleichnis einfach erklärt](${SITE_URL}/de/figures/plato/hoehlengleichnis/): Platons Höhlengleichnis aus der Politeia, Buch 7, Schritt für Schritt erklärt: das Bild, der Aufstieg, die Rückkehr und was Platon damit sagen will.`);
+  lines.push(`- [Platons Ideenlehre einfach erklärt](${SITE_URL}/de/figures/plato/ideenlehre/): Platons Ideenlehre für Schüler erklärt: die zwei Welten, das Beispiel vom Kreis, die Teilhabe, die Idee des Guten und die bekanntesten Einwände.`);
   lines.push(`- [Volltext-Verzeichnis (llms-full.txt)](${SITE_URL}/de/llms-full.txt): die vollständigen Beschreibungen aller Menschen und alle Frage-Antwort-Paare, dazu die acht Themen.`);
   lines.push('- [Quellcode (GitHub)](https://github.com/chipmates/agoracosmica)');
   lines.push('');
