@@ -162,3 +162,18 @@ describe('agc-public.js: the ad click ID', () => {
     for (const c of counts) expect(JSON.stringify(c.body)).not.toContain(CLICK);
   });
 });
+
+describe('agc-public.js: the 12-month memory', () => {
+  const CLICK = 'TESTCLICKID0001';
+  const DAY = 24 * 60 * 60 * 1000;
+  it('stores no click ID under a yes older than a year', () => {
+    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: true, version: '1.0.0', timestamp: Date.now() - 366 * DAY }));
+    loadPage(`/marcus-aurelius/?gclid=${CLICK}`);
+    expect(storageKeys(sessionStorage)).toEqual([]);
+  });
+  it('stores it under a yes younger than a year', () => {
+    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: true, version: '1.0.0', timestamp: Date.now() - 300 * DAY }));
+    loadPage(`/marcus-aurelius/?gclid=${CLICK}`);
+    expect(sessionStorage.getItem('agc_gclid')).toBe(CLICK);
+  });
+});

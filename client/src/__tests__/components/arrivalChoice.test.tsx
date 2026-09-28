@@ -144,3 +144,16 @@ describe('heard seconds', () => {
     expect(conversions()).toHaveLength(0);
   });
 });
+
+describe('ArrivalChoice after a year', () => {
+  it('asks again when the stored answer is older than 365 days', async () => {
+    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: false, version: '1.0.0', timestamp: Date.now() - 366 * 86_400_000 }));
+    const { container } = await mountAt(`/marcus-aurelius/?gclid=${CLICK}`);
+    expect(container.querySelector('.agc-consent')).not.toBeNull();
+  });
+  it('does not ask within the year', async () => {
+    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: false, version: '1.0.0', timestamp: Date.now() - 100 * 86_400_000 }));
+    const { container } = await mountAt(`/marcus-aurelius/?gclid=${CLICK}`);
+    expect(container.querySelector('.agc-consent')).toBeNull();
+  });
+});

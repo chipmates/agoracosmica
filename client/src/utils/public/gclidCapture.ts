@@ -17,6 +17,11 @@ const SS_GCLID_KEY = 'agc_gclid';
 // version, time), kept so the choice is respected across visits.
 const LS_AD_CONSENT_KEY = 'agc_ad_consent';
 const AD_CONSENT_VERSION = '1.0.0';
+// An answer is remembered for 12 months; an older one counts as no answer, so
+// the question may be asked again.
+const AD_CONSENT_MAX_AGE_MS = 365 * 24 * 60 * 60 * 1000;
+// Clock skew allowance for a record that looks slightly newer than now.
+const AD_CONSENT_SKEW_MS = 24 * 60 * 60 * 1000;
 
 let capturedGclid: string | null = null;
 // This page's address carried ?p=1. Page memory only: later pages of a paid
@@ -122,21 +127,31 @@ export function isPaidVisitor(): boolean {
 }
 
 /**
+ * The stored answer, if it still counts: written under the current consent
+ * version (an older version no longer covers the current scope) and less than
+ * 12 months old. Anything else counts as no answer.
+ */
+function currentAdConsent(): { granted: boolean } | null {
+  try {
+    if (typeof localStorage === 'undefined') return null;
+    const raw = localStorage.getItem(LS_AD_CONSENT_KEY);
+    if (!raw) return null;
+    const record = JSON.parse(raw) as { granted?: unknown; version?: unknown; timestamp?: unknown };
+    if (record.version !== AD_CONSENT_VERSION) return null;
+    const age = Date.now() - Number(record.timestamp);
+    if (!Number.isFinite(age) || age >= AD_CONSENT_MAX_AGE_MS || age < -AD_CONSENT_SKEW_MS) return null;
+    return { granted: record.granted === true };
+  } catch {
+    return null;
+  }
+}
+
+/**
  * True once the visitor has made an explicit ad-measurement choice (granted or
- * declined), recorded in localStorage. Used to avoid re-asking.
- *
- * A record written under an older AD_CONSENT_VERSION no longer covers the
- * current scope, so it counts as undecided and the prompt may ask again.
+ * declined) that still counts. Used to avoid re-asking.
  */
 export function adConsentDecided(): boolean {
-  try {
-    if (typeof localStorage === 'undefined') return false;
-    const raw = localStorage.getItem(LS_AD_CONSENT_KEY);
-    if (!raw) return false;
-    return (JSON.parse(raw) as { version?: string }).version === AD_CONSENT_VERSION;
-  } catch {
-    return false;
-  }
+  return currentAdConsent() !== null;
 }
 
 /**
@@ -159,18 +174,7 @@ export function clearGclid(): void {
  * Google when this is true. Default is false (no consent until explicitly given).
  */
 export function adConsentGranted(): boolean {
-  try {
-    if (typeof localStorage === 'undefined') return false;
-    const raw = localStorage.getItem(LS_AD_CONSENT_KEY);
-    if (!raw) return false;
-    // Same version rule as adConsentDecided: a grant recorded under an older
-    // consent version no longer covers the current scope, so it must not
-    // authorize sends. Strictly more conservative than before.
-    const record = JSON.parse(raw) as { granted?: boolean; version?: string };
-    return record.granted === true && record.version === AD_CONSENT_VERSION;
-  } catch {
-    return false;
-  }
+  return currentAdConsent()?.granted === true;
 }
 
 /**

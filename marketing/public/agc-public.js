@@ -34,6 +34,9 @@
   // gclidCapture.ts: a grant recorded under an older consent version no longer
   // covers the current scope, so it must not authorize sends.
   var AD_CONSENT_VERSION = '1.0.0';
+  // Same 12-month memory as gclidCapture.ts: an older answer counts as none.
+  var AD_CONSENT_MAX_AGE_MS = 365 * 24 * 60 * 60 * 1000;
+  var AD_CONSENT_SKEW_MS = 24 * 60 * 60 * 1000;
   // In-house probe marker, shared with the app (utils/probeSession.ts). A
   // constant, never an identifier: a marked browser stamps its own rows so
   // internal testing can be subtracted from small-n weeks at query time.
@@ -83,7 +86,9 @@
       var raw = localStorage.getItem(LS_AD_CONSENT);
       if (!raw) return false;
       var record = JSON.parse(raw);
-      return record.granted === true && record.version === AD_CONSENT_VERSION;
+      if (record.granted !== true || record.version !== AD_CONSENT_VERSION) return false;
+      var age = Date.now() - Number(record.timestamp);
+      return isFinite(age) && age < AD_CONSENT_MAX_AGE_MS && age >= -AD_CONSENT_SKEW_MS;
     } catch (e) { return false; }
   }
 

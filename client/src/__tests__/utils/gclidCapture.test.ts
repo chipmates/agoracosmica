@@ -190,3 +190,54 @@ describe('withdrawal', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });
+
+describe('the 12-month memory of an answer', () => {
+  const DAY = 24 * 60 * 60 * 1000;
+  const aged = (granted: boolean, days: number) =>
+    JSON.stringify({ granted, version: '1.0.0', timestamp: Date.now() - days * DAY });
+
+  it('counts a yes or no up to a year old', async () => {
+    localStorage.setItem('agc_ad_consent', aged(true, 364));
+    let m = await loadAt('/');
+    expect(m.adConsentGranted()).toBe(true);
+    expect(m.adConsentDecided()).toBe(true);
+    localStorage.setItem('agc_ad_consent', aged(false, 364));
+    m = await loadAt('/');
+    expect(m.adConsentDecided()).toBe(true);
+    expect(m.adConsentGranted()).toBe(false);
+  });
+
+  it('treats an answer older than 365 days as no answer', async () => {
+    for (const granted of [true, false]) {
+      localStorage.setItem('agc_ad_consent', aged(granted, 366));
+      const m = await loadAt(`/seneca/?gclid=${CLICK}`);
+      expect(m.adConsentGranted()).toBe(false);
+      expect(m.adConsentDecided()).toBe(false);
+      m.captureGclid({ holdUntilAnswer: true });
+      expect(m.getGclid()).toBe(CLICK); // held for the question, not stored
+      expect(sessionStorage.getItem('agc_gclid')).toBeNull();
+      await m.sendConversion('start_exploring');
+      expect(fetchMock).not.toHaveBeenCalled();
+    }
+  });
+
+  it('drops a stored click ID whose yes has expired', async () => {
+    localStorage.setItem('agc_ad_consent', aged(true, 400));
+    sessionStorage.setItem('agc_gclid', CLICK);
+    const m = await loadAt('/app/');
+    expect(m.getGclid()).toBeNull();
+    expect(sessionStorage.getItem('agc_gclid')).toBeNull();
+  });
+
+  it('treats a record without a readable date, or far in the future, as no answer', async () => {
+    for (const record of [
+      { granted: true, version: '1.0.0' },
+      { granted: true, version: '1.0.0', timestamp: 'soon' },
+      { granted: true, version: '1.0.0', timestamp: Date.now() + 30 * DAY },
+    ]) {
+      localStorage.setItem('agc_ad_consent', JSON.stringify(record));
+      const m = await loadAt('/');
+      expect(m.adConsentDecided()).toBe(false);
+    }
+  });
+});
