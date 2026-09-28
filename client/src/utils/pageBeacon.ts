@@ -10,6 +10,7 @@ import { isSelfHost } from '../config/deployment';
 import { probeField } from './probeSession';
 import { sendFunnelBeacon } from './funnelBeacon';
 import { sourceClass } from './sourceClass';
+import { shownLanguage } from './shownLanguage';
 
 const API_BASE = import.meta.env.VITE_FREE_TIER_API_URL || '';
 
@@ -44,26 +45,6 @@ function hasPaidParam(): boolean {
 }
 
 /**
- * Detect the current UI language from the document or localStorage. Mirrors
- * the playbackBeacon helper so language labels stay consistent across event
- * types. Falls back to 'en' if nothing is set.
- */
-function detectLanguage(): 'en' | 'de' {
-  try {
-    const docLang = typeof document !== 'undefined' ? document.documentElement.lang : '';
-    if (docLang && docLang.toLowerCase().startsWith('de')) return 'de';
-    const stored = typeof localStorage !== 'undefined'
-      ? localStorage.getItem('selectedLanguage') || localStorage.getItem('language')
-      : null;
-    if (stored && stored.toLowerCase().startsWith('de')) return 'de';
-    if (typeof navigator !== 'undefined' && navigator.language && navigator.language.toLowerCase().startsWith('de')) return 'de';
-  } catch {
-    // Ignore — fall through to 'en'
-  }
-  return 'en';
-}
-
-/**
  * Send a page-load beacon. Fire-and-forget — never throws, never blocks the
  * caller, never breaks app boot on network failure. Captures only:
  *   - path (no query string, validated server-side against a regex)
@@ -90,7 +71,7 @@ export function sendPageBeacon(): void {
     const referrer = typeof document !== 'undefined' ? document.referrer : '';
     const body = JSON.stringify({
       path,
-      language: detectLanguage(),
+      language: shownLanguage(),
       landing: landing ? 1 : undefined,
       source: landing ? sourceClass(href, referrer) : undefined,
       probe: probeField(),

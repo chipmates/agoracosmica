@@ -12,6 +12,7 @@
 
 import { isSelfHost } from '../config/deployment';
 import { probeField } from './probeSession';
+import { shownLanguage } from './shownLanguage';
 import { noteEngagedListenMilestone, noteEngagedListenSeconds } from './funnelBeacon';
 
 const API_BASE = import.meta.env.VITE_FREE_TIER_API_URL || '';
@@ -123,22 +124,11 @@ export function sendPlaybackBeacon(
 }
 
 /**
- * Read the current UI language from the document or localStorage. Falls back
- * to 'en'. Used so the beacon can label content engagement by language without
- * each caller needing to plumb it through.
+ * The language the app is showing, from memory. Used so the beacon can label
+ * content engagement by language without each caller needing to plumb it through.
  */
 export function detectCurrentLanguage(): 'en' | 'de' {
-  try {
-    const docLang = typeof document !== 'undefined' ? document.documentElement.lang : '';
-    if (docLang && docLang.toLowerCase().startsWith('de')) return 'de';
-    const stored = typeof localStorage !== 'undefined'
-      ? localStorage.getItem('selectedLanguage') || localStorage.getItem('language')
-      : null;
-    if (stored && stored.toLowerCase().startsWith('de')) return 'de';
-  } catch {
-    // Ignore
-  }
-  return 'en';
+  return shownLanguage();
 }
 
 // ============================================

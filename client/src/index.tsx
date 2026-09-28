@@ -29,10 +29,6 @@ captureGclid();
 // that figure's mode selector.
 captureEntryIntentFromUrl();
 
-// Page-load beacon: count this arrival in analytics. Anonymous, fire-and-forget.
-// Closes the gap between landing-page render and the existing engagement events
-// (chat, playback) so we can measure true bounce rate.
-sendPageBeacon();
 // Service Worker registration (DISABLED until Q1 2026 - Offline Mode implementation)
 // Currently causes 404 errors since service-worker.js doesn't exist yet
 // Roadmap: CLAUDE.md Q1 2026 - Offline Mode with service worker
@@ -92,6 +88,10 @@ const selectedLanguage: string = detectBrowserLanguage();
 
 // Initialize the language store immediately
 useDomainStore.getState().initializeLanguage();
+
+// Page-load beacon: count this arrival in analytics. Anonymous, fire-and-forget.
+// After the language store, whose in-memory language labels the row.
+sendPageBeacon();
 
 // Initialize seeds cache for enhanced seed data processing
 initializeSeedsCache(selectedLanguage).catch((error: Error) => {

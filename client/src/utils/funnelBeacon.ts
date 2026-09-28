@@ -30,6 +30,7 @@
 
 import { isSelfHost } from '../config/deployment';
 import { probeField } from './probeSession';
+import { shownLanguage } from './shownLanguage';
 
 // A browser marks itself as an in-house probe by landing on any URL with
 // ?probe=1, so a harness or an owner's own browser stays out of the funnel.
@@ -283,21 +284,6 @@ if (typeof window !== 'undefined') {
   window.addEventListener('pagehide', () => flushChatDepth());
 }
 
-function detectLanguage(): 'en' | 'de' {
-  try {
-    const docLang = typeof document !== 'undefined' ? document.documentElement.lang : '';
-    if (docLang && docLang.toLowerCase().startsWith('de')) return 'de';
-    const stored = typeof localStorage !== 'undefined'
-      ? localStorage.getItem('selectedLanguage') || localStorage.getItem('language')
-      : null;
-    if (stored && stored.toLowerCase().startsWith('de')) return 'de';
-    if (typeof navigator !== 'undefined' && navigator.language && navigator.language.toLowerCase().startsWith('de')) return 'de';
-  } catch {
-    // Ignore — fall through to 'en'
-  }
-  return 'en';
-}
-
 // One-shot per page load, in memory only: counting stores nothing on the device.
 const firedSteps = new Set<FunnelStep>();
 
@@ -349,7 +335,7 @@ function postFunnel(step: FunnelStep, fields: FunnelFields): void {
     mode: fields.mode || undefined,
     outcome: fields.outcome,
     bucket: fields.bucket,
-    language: detectLanguage(),
+    language: shownLanguage(),
     probe: probeField(),
   });
   const url = `${API_BASE}/v1/funnel`;

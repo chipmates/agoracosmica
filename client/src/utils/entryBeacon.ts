@@ -10,23 +10,9 @@
 
 import { isSelfHost } from '../config/deployment';
 import { probeField } from './probeSession';
+import { shownLanguage } from './shownLanguage';
 
 const API_BASE = import.meta.env.VITE_FREE_TIER_API_URL || '';
-
-function detectLanguage(): 'en' | 'de' {
-  try {
-    const docLang = typeof document !== 'undefined' ? document.documentElement.lang : '';
-    if (docLang && docLang.toLowerCase().startsWith('de')) return 'de';
-    const stored = typeof localStorage !== 'undefined'
-      ? localStorage.getItem('selectedLanguage') || localStorage.getItem('language')
-      : null;
-    if (stored && stored.toLowerCase().startsWith('de')) return 'de';
-    if (typeof navigator !== 'undefined' && navigator.language && navigator.language.toLowerCase().startsWith('de')) return 'de';
-  } catch {
-    // Ignore — fall through to 'en'
-  }
-  return 'en';
-}
 
 /**
  * Send an entry beacon. Fire-and-forget — never throws, never blocks the
@@ -45,7 +31,7 @@ export function sendEntryBeacon(): void {
     const path = typeof window !== 'undefined' ? window.location.pathname : '';
     const body = JSON.stringify({
       path,
-      language: detectLanguage(),
+      language: shownLanguage(),
       probe: probeField(),
     });
 

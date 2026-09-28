@@ -6,6 +6,7 @@
 import { LANGUAGE_CODES, LanguageCode } from '../../constants/languages';
 import type { Language, Translation } from '../../types/global';
 import { LocalStorageAdapter } from '../../storage/localAdapter';
+import { noteShownLanguage } from '../../utils/shownLanguage';
 
 // ============================================================================
 // TYPES
@@ -111,6 +112,7 @@ export const createLanguageSlice = (
 
     // Persist so future hydrations don't override with stale data
     LocalStorageAdapter.setString('selectedLanguage', initialLanguage);
+    noteShownLanguage(initialLanguage);
 
     // Update state with initial language (synchronously)
     set((state: any) => ({
@@ -159,6 +161,7 @@ export const createLanguageSlice = (
     // CRITICAL: Also update legacy localStorage key for backward compatibility
     // detectBrowserLanguage() checks this key first on startup
     LocalStorageAdapter.setString('selectedLanguage', newLanguage);
+    noteShownLanguage(newLanguage);
 
     // Load new translations
     await get().loadTranslations(newLanguage);
