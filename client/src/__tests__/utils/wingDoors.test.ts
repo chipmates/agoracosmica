@@ -162,7 +162,7 @@ describe('w: ask tags', () => {
     stashAskPrefill('w:vinci:flight');
     expect(hasStagedQuestion()).toBe(true);
     expect(peekStagedQuestion('vinci', 'de')).toEqual({
-      text: 'Wie hast du entschieden, ob du am Fliegen weiterarbeiten solltest?',
+      text: 'Hast du wirklich geglaubt, dass Menschen fliegen können?',
       source: 'ask',
     });
     expect(consumeAskPrefill()).toBe('w:vinci:flight');

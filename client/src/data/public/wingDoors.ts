@@ -15,48 +15,48 @@ export const WING_ASK_TAG = /^w:([a-z]+):([a-z0-9-]{1,40})$/;
 
 const vinciDoors: Record<string, WingDoorQuestion> = {
   arrival: {
-    en: 'Why did you leave Italy for a house in France?',
-    de: 'Warum hast du Italien für ein Haus in Frankreich verlassen?',
+    en: 'You came to France past sixty. Why leave Italy so late in life?',
+    de: 'Du kamst mit über sechzig nach Frankreich. Warum hast du Italien so spät noch verlassen?',
   },
   courtyard: {
-    en: 'What did you owe the men who paid you?',
-    de: 'Was warst du den Männern schuldig, die dich bezahlten?',
+    en: 'A visitor called you the best painter of your time. Did such praise still matter to you?',
+    de: 'Ein Gast nannte dich den besten Maler deiner Zeit. Bedeutete dir solches Lob noch etwas?',
   },
   hall: {
-    en: 'How did you speak to people who wanted a spectacle from you?',
-    de: 'Wie hast du mit Menschen gesprochen, die von dir ein Schauspiel erwarteten?',
+    en: 'When a guest came to this house, what did you show them first?',
+    de: 'Wenn ein Gast in dieses Haus kam, was hast du ihm zuerst gezeigt?',
   },
   oratory: {
-    en: 'What lasts longer, a wall painting or a page?',
-    de: 'Was hält länger, ein Wandgemälde oder ein Blatt Papier?',
+    en: 'Your pupils may have painted this chapel. What did you want a pupil to learn from you?',
+    de: 'Deine Schüler haben diese Kapelle vielleicht ausgemalt. Was sollten sie von dir lernen?',
   },
   study: {
-    en: 'A visitor wrote of a paralysis in your right hand, and that you still drew and taught. Which mattered more to you, the drawing or the teaching?',
-    de: 'Ein Besucher schrieb von einer Lähmung deiner rechten Hand und dass du noch zeichnest und andere lehrst. Was war dir wichtiger, das Zeichnen oder das Lehren?',
+    en: "Your right hand was paralysed, a cardinal's secretary wrote. How did you keep working?",
+    de: 'Ein Kardinalssekretär schrieb, deine rechte Hand sei gelähmt. Wie hast du weitergemacht?',
   },
   chamber: {
-    en: 'Why did painters keep returning to the story of your death?',
-    de: 'Warum haben Maler die Geschichte deines Todes immer wieder dargestellt?',
+    en: 'You left your books to Melzi, and he called you the best of fathers. What was he to you?',
+    de: 'Melzi bekam deine Bücher und nannte dich den besten Vater. Was war er für dich?',
   },
   garden: {
-    en: 'How did you decide when to trust what your eyes showed you?',
-    de: 'Wie hast du entschieden, wann du deinen Augen vertrauen konntest?',
+    en: 'You wanted to see everything yourself. Did your eyes ever fool you?',
+    de: 'Du wolltest alles mit eigenen Augen sehen. Haben sie dich je getäuscht?',
   },
   'line-early': {
-    en: 'How much did being listed as illegitimate at seventeen shape your choices?',
-    de: 'Wie sehr hat es deine Entscheidungen geprägt, mit siebzehn als unehelich verzeichnet zu sein?',
+    en: 'At five a tax return lists you as born outside marriage. What did that mean back then?',
+    de: 'Eine Steuererklärung führt dich mit fünf als unehelich. Was hieß das damals für ein Kind?',
   },
   'line-late': {
     en: 'What were you looking for in all those cities?',
     de: 'Was hast du in all diesen Städten gesucht?',
   },
   'line-amboise': {
-    en: "What did a king's support let you do freely?",
-    de: 'Welche Freiheiten gab dir die Unterstützung eines Königs?',
+    en: 'What could you do with a king behind you that you could not do before?',
+    de: 'Was konntest du mit einem König im Rücken tun, was vorher nicht ging?',
   },
   'picture-room': {
-    en: 'Why did you leave so few paintings?',
-    de: 'Warum hast du so wenige Gemälde hinterlassen?',
+    en: "They say your angel here outdid your master's. What did you learn from Verrocchio?",
+    de: 'Dein Engel hier soll den Meister übertroffen haben. Was hast du von Verrocchio gelernt?',
   },
   'supper-wall': {
     en: 'Why did you choose such a fragile way to paint the Last Supper?',
@@ -71,32 +71,32 @@ const vinciDoors: Record<string, WingDoorQuestion> = {
     de: 'Wenn du nur ein Blatt behalten könntest, welches wäre es?',
   },
   flight: {
-    en: 'How did you decide whether to keep working on flight?',
-    de: 'Wie hast du entschieden, ob du am Fliegen weiterarbeiten solltest?',
+    en: 'Did you really believe people could fly?',
+    de: 'Hast du wirklich geglaubt, dass Menschen fliegen können?',
   },
   works: {
-    en: 'When does a drawing become a machine?',
-    de: 'Wann wird aus einer Zeichnung eine Maschine?',
+    en: 'The bronze for your horse went to cannon instead. How did you take that?',
+    de: 'Die Bronze für dein Pferd wurde zu Kanonen. Wie hast du das verkraftet?',
   },
   body: {
-    en: 'What could a drawing show that a dissection could not?',
-    de: 'Was konnte eine Zeichnung zeigen, was eine Sektion nicht zeigen konnte?',
+    en: 'You told a visitor you had opened over thirty bodies. What were you looking for inside?',
+    de: 'Über dreißig Tote hast du geöffnet, sagtest du einem Besucher. Was hast du darin gesucht?',
   },
   myths: {
-    en: 'How would you feel about words being quoted as yours that you never wrote?',
-    de: 'Wie wäre es für dich, wenn man Worte als deine zitiert, die du nie geschrieben hast?',
+    en: 'People quote sentences as yours that you never wrote. Does that bother you?',
+    de: 'Man zitiert Sätze als deine, die du nie geschrieben hast. Stört dich das?',
   },
   grave: {
-    en: 'What should a grave say when the remains are only presumed to be yours?',
-    de: 'Was sollte auf einem Grab stehen, wenn die Überreste nur vermutlich deine sind?',
+    en: 'Nobody is sure these bones are yours. Does it matter to you where you lie?',
+    de: 'Ob diese Knochen deine sind, weiß niemand sicher. Ist es dir wichtig, wo du liegst?',
   },
   'picture-room-west': {
-    en: 'What were you still trying to do in your last paintings?',
-    de: 'Was wolltest du in deinen letzten Gemälden noch erreichen?',
+    en: 'Your paintings fit on one wall, and some are unfinished. Why so few?',
+    de: 'Deine Gemälde passen an eine Wand, manche blieben unvollendet. Warum so wenige?',
   },
   farewell: {
-    en: 'Looking back over your whole life, what mattered most to you?',
-    de: 'Wenn du auf dein ganzes Leben zurückblickst, was war dir am wichtigsten?',
+    en: 'I have just walked through your whole life. What should I take with me?',
+    de: 'Ich bin gerade durch dein ganzes Leben gegangen. Was soll ich mitnehmen?',
   },
 };
 

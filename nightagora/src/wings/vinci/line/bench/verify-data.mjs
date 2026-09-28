@@ -32,13 +32,13 @@ export const COLLECTIONS = [
   },
   {
     name: 'doors', file: 'src/wings/vinci/data/doors.json',
-    // The public copy carries the revision's station set, a twentieth question for the west end
-    // and its own wording for it, and the study door's question in the secretary's own terms (a
-    // paralysis of the right hand, while he still drew and taught), the closing question the walk's
-    // talk choice asks (a placeholder for the words round) and the implemented tag contract; the
-    // sealed original does not. Sixteen of the twenty stations stand.
+    // The public copy carries the revision's station set, a twentieth question for the west end,
+    // the closing question the walk's talk choice asks and the implemented tag contract; since the
+    // words round of 2026-09-28 it carries the questions as the blind read of that day chose them
+    // (judge/door-words-2026-09-28). The sealed original does not. Sixteen of the twenty stations
+    // stand.
     originalSHA256: 'c6bcb90a55fa4d3ce3ec00928ab276613233432468f05a1566ca306d81c47647',
-    normalizedSHA256: '2babba0fe0f9450c3859ed18018d5e5c224c5e34fcb1cb33bb82c129179b24ba',
+    normalizedSHA256: 'd3498c80a141cdeb683b0f5791532892db48146813f8b90d3762389032a4b5d5',
     expected: { doors: 20 },
   },
   {

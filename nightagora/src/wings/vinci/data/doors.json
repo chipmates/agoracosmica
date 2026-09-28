@@ -6,13 +6,15 @@
     "rights_authority": "refs/RIGHTS-CROSSCHECK.md",
     "catalogue_date": "2026-09-08",
     "prepared_date": "2026-09-09",
-    "scope": "Data commission. Source assets remain read-only."
+    "scope": "Data commission. Source assets remain read-only.",
+    "revised_date": "2026-09-28",
+    "revision": "The words round after the owner's walk: every question and the farewell read blind against the old set (judge/door-words-2026-09-28), the winners applied."
   },
   "doors": [
     {
       "station": "arrival",
-      "question_en": "Why did you leave Italy for a house in France?",
-      "question_de": "Warum hast du Italien für ein Haus in Frankreich verlassen?",
+      "question_en": "You came to France past sixty. Why leave Italy so late in life?",
+      "question_de": "Du kamst mit über sechzig nach Frankreich. Warum hast du Italien so spät noch verlassen?",
       "source": {
         "converged_station": "CONCEPT.md section 3",
         "seat_questions": [
@@ -20,13 +22,13 @@
           "CONCEPT-GPT6.md station arrival and door contract"
         ]
       },
-      "editorial_note": "Converged from the seat questions into one visitor prompt.",
-      "german_provenance": "Newly authored for this commission."
+      "editorial_note": "The visitor's hook on this card is his age. Past sixty holds whether he arrived in 1516 or 1517, which the drawer leaves open.",
+      "german_provenance": "Written in German for the words round of 2026-09-28, not translated from the English."
     },
     {
       "station": "courtyard",
-      "question_en": "What did you owe the men who paid you?",
-      "question_de": "Was warst du den Männern schuldig, die dich bezahlten?",
+      "question_en": "A visitor called you the best painter of your time. Did such praise still matter to you?",
+      "question_de": "Ein Gast nannte dich den besten Maler deiner Zeit. Bedeutete dir solches Lob noch etwas?",
       "source": {
         "converged_station": "CONCEPT.md section 3",
         "seat_questions": [
@@ -34,13 +36,13 @@
           "CONCEPT-GPT6.md station courtyard and door contract"
         ]
       },
-      "editorial_note": "Converged from the seat questions into one visitor prompt.",
-      "german_provenance": "Newly authored for this commission."
+      "editorial_note": "Rests on the stop's own line, the secretary's praise. Patrons are not on this card.",
+      "german_provenance": "Written in German for the words round of 2026-09-28, not translated from the English."
     },
     {
       "station": "hall",
-      "question_en": "How did you speak to people who wanted a spectacle from you?",
-      "question_de": "Wie hast du mit Menschen gesprochen, die von dir ein Schauspiel erwarteten?",
+      "question_en": "When a guest came to this house, what did you show them first?",
+      "question_de": "Wenn ein Gast in dieses Haus kam, was hast du ihm zuerst gezeigt?",
       "source": {
         "converged_station": "CONCEPT.md section 3",
         "seat_questions": [
@@ -48,13 +50,13 @@
           "CONCEPT-GPT6.md station hall and door contract"
         ]
       },
-      "editorial_note": "Converged from the seat questions into one visitor prompt.",
-      "german_provenance": "Newly authored for this commission."
+      "editorial_note": "Says this house, which is documented, not this hall, which is ours.",
+      "german_provenance": "Written in German for the words round of 2026-09-28, not translated from the English."
     },
     {
       "station": "oratory",
-      "question_en": "What lasts longer, a wall painting or a page?",
-      "question_de": "Was hält länger, ein Wandgemälde oder ein Blatt Papier?",
+      "question_en": "Your pupils may have painted this chapel. What did you want a pupil to learn from you?",
+      "question_de": "Deine Schüler haben diese Kapelle vielleicht ausgemalt. Was sollten sie von dir lernen?",
       "source": {
         "converged_station": "CONCEPT.md section 3",
         "seat_questions": [
@@ -62,13 +64,13 @@
           "CONCEPT-GPT6.md station oratory and door contract"
         ]
       },
-      "editorial_note": "Removed an unsupported numerical comparison of work on a wall and a manuscript.",
-      "german_provenance": "Newly authored for this commission."
+      "editorial_note": "May have keeps the attribution open as the card does. Teaching is asked here and nowhere else.",
+      "german_provenance": "Written in German for the words round of 2026-09-28, not translated from the English."
     },
     {
       "station": "study",
-      "question_en": "A visitor wrote of a paralysis in your right hand, and that you still drew and taught. Which mattered more to you, the drawing or the teaching?",
-      "question_de": "Ein Besucher schrieb von einer Lähmung deiner rechten Hand und dass du noch zeichnest und andere lehrst. Was war dir wichtiger, das Zeichnen oder das Lehren?",
+      "question_en": "Your right hand was paralysed, a cardinal's secretary wrote. How did you keep working?",
+      "question_de": "Ein Kardinalssekretär schrieb, deine rechte Hand sei gelähmt. Wie hast du weitergemacht?",
       "source": {
         "converged_station": "CONCEPT.md section 3",
         "seat_questions": [
@@ -76,13 +78,13 @@
           "CONCEPT-GPT6.md station study and door contract"
         ]
       },
-      "editorial_note": "Reports the visitor’s claim without turning it into a diagnosis.",
-      "german_provenance": "Newly authored for this commission."
+      "editorial_note": "Both languages ask one question, inside 90 characters. The secretary is the cardinal's, named at the courtyard, so the Echo knows which report is meant.",
+      "german_provenance": "Written in German for the words round of 2026-09-28, not translated from the English."
     },
     {
       "station": "chamber",
-      "question_en": "Why did painters keep returning to the story of your death?",
-      "question_de": "Warum haben Maler die Geschichte deines Todes immer wieder dargestellt?",
+      "question_en": "You left your books to Melzi, and he called you the best of fathers. What was he to you?",
+      "question_de": "Melzi bekam deine Bücher und nannte dich den besten Vater. Was war er für dich?",
       "source": {
         "converged_station": "CONCEPT.md section 3",
         "seat_questions": [
@@ -90,13 +92,13 @@
           "CONCEPT-GPT6.md station chamber and door contract"
         ]
       },
-      "editorial_note": "Removed an unsupported fixed duration from the death-painting question.",
-      "german_provenance": "Newly authored for this commission."
+      "editorial_note": "The deathbed painting hangs at the grave now, so the painters question lost its anchor here. Both facts stand in this stop's drawer.",
+      "german_provenance": "Written in German for the words round of 2026-09-28, not translated from the English."
     },
     {
       "station": "garden",
-      "question_en": "How did you decide when to trust what your eyes showed you?",
-      "question_de": "Wie hast du entschieden, wann du deinen Augen vertrauen konntest?",
+      "question_en": "You wanted to see everything yourself. Did your eyes ever fool you?",
+      "question_de": "Du wolltest alles mit eigenen Augen sehen. Haben sie dich je getäuscht?",
       "source": {
         "converged_station": "CONCEPT.md section 3",
         "seat_questions": [
@@ -104,13 +106,13 @@
           "CONCEPT-GPT6.md station garden and door contract"
         ]
       },
-      "editorial_note": "Converged from the seat questions into one visitor prompt.",
-      "german_provenance": "Newly authored for this commission."
+      "editorial_note": "Repeats the stop's own line word for word and asks the simpler thing.",
+      "german_provenance": "Written in German for the words round of 2026-09-28, not translated from the English."
     },
     {
       "station": "line-early",
-      "question_en": "How much did being listed as illegitimate at seventeen shape your choices?",
-      "question_de": "Wie sehr hat es deine Entscheidungen geprägt, mit siebzehn als unehelich verzeichnet zu sein?",
+      "question_en": "At five a tax return lists you as born outside marriage. What did that mean back then?",
+      "question_de": "Eine Steuererklärung führt dich mit fünf als unehelich. Was hieß das damals für ein Kind?",
       "source": {
         "converged_station": "CONCEPT.md section 3",
         "seat_questions": [
@@ -118,8 +120,8 @@
           "CONCEPT-GPT6.md station line-early and door contract"
         ]
       },
-      "editorial_note": "Uses the documented household wording as social context without inventing its psychological effect.",
-      "german_provenance": "Newly authored for this commission."
+      "editorial_note": "The stop shows the tax return listing him at five. The old question said seventeen, which the stop does not show.",
+      "german_provenance": "Written in German for the words round of 2026-09-28, not translated from the English."
     },
     {
       "station": "line-late",
@@ -132,13 +134,13 @@
           "CONCEPT-GPT6.md station line-late and door contract"
         ]
       },
-      "editorial_note": "Converged from the seat questions into one visitor prompt.",
+      "editorial_note": "Retired station: numeric links land on line-early. Kept as it was.",
       "german_provenance": "Newly authored for this commission."
     },
     {
       "station": "line-amboise",
-      "question_en": "What did a king's support let you do freely?",
-      "question_de": "Welche Freiheiten gab dir die Unterstützung eines Königs?",
+      "question_en": "What could you do with a king behind you that you could not do before?",
+      "question_de": "Was konntest du mit einem König im Rücken tun, was vorher nicht ging?",
       "source": {
         "converged_station": "CONCEPT.md section 3",
         "seat_questions": [
@@ -146,13 +148,13 @@
           "CONCEPT-GPT6.md station line-amboise and door contract"
         ]
       },
-      "editorial_note": "Does not assert that Francis asked almost nothing.",
-      "german_provenance": "Newly authored for this commission."
+      "editorial_note": "Retired station: numeric links land on line-early. A light polish of the old question, which did not claim the king asked nothing of him.",
+      "german_provenance": "Written in German for the words round of 2026-09-28, not translated from the English."
     },
     {
       "station": "picture-room",
-      "question_en": "Why did you leave so few paintings?",
-      "question_de": "Warum hast du so wenige Gemälde hinterlassen?",
+      "question_en": "They say your angel here outdid your master's. What did you learn from Verrocchio?",
+      "question_de": "Dein Engel hier soll den Meister übertroffen haben. Was hast du von Verrocchio gelernt?",
       "source": {
         "converged_station": "CONCEPT.md section 3",
         "seat_questions": [
@@ -160,8 +162,8 @@
           "CONCEPT-GPT6.md station picture-room and door contract"
         ]
       },
-      "editorial_note": "Avoids a fixed authorship count.",
-      "german_provenance": "Newly authored for this commission."
+      "editorial_note": "They say and soll keep Vasari's story a story. The question of the few paintings moved to the west end, where the whole wall is seen.",
+      "german_provenance": "Written in German for the words round of 2026-09-28, not translated from the English."
     },
     {
       "station": "supper-wall",
@@ -174,7 +176,7 @@
           "CONCEPT-GPT6.md station supper-wall and door contract"
         ]
       },
-      "editorial_note": "Names the technique’s fragility without claiming Leonardo predicted the later damage.",
+      "editorial_note": "Kept: the blind read of 2026-09-28 preferred the old English, and the German was identical.",
       "german_provenance": "Newly authored for this commission."
     },
     {
@@ -188,7 +190,7 @@
           "CONCEPT-GPT6.md station reading-table and door contract"
         ]
       },
-      "editorial_note": "Converged from the seat questions into one visitor prompt.",
+      "editorial_note": "Kept: exactly the question every visitor asks at this table. The stop says he never wrote down why.",
       "german_provenance": "Newly authored for this commission."
     },
     {
@@ -202,13 +204,13 @@
           "CONCEPT-GPT6.md station scattered and door contract"
         ]
       },
-      "editorial_note": "Converged from the seat questions into one visitor prompt.",
+      "editorial_note": "Retired station: numeric links land on line-early. Kept as it was.",
       "german_provenance": "Newly authored for this commission."
     },
     {
       "station": "flight",
-      "question_en": "How did you decide whether to keep working on flight?",
-      "question_de": "Wie hast du entschieden, ob du am Fliegen weiterarbeiten solltest?",
+      "question_en": "Did you really believe people could fly?",
+      "question_de": "Hast du wirklich geglaubt, dass Menschen fliegen können?",
       "source": {
         "converged_station": "CONCEPT.md section 3",
         "seat_questions": [
@@ -216,13 +218,13 @@
           "CONCEPT-GPT6.md station flight and door contract"
         ]
       },
-      "editorial_note": "Does not presume that no experiment occurred.",
-      "german_provenance": "Newly authored for this commission."
+      "editorial_note": "The blunt question under the screw. No premise: that the screw fails is only our estimate.",
+      "german_provenance": "Written in German for the words round of 2026-09-28, not translated from the English."
     },
     {
       "station": "works",
-      "question_en": "When does a drawing become a machine?",
-      "question_de": "Wann wird aus einer Zeichnung eine Maschine?",
+      "question_en": "The bronze for your horse went to cannon instead. How did you take that?",
+      "question_de": "Die Bronze für dein Pferd wurde zu Kanonen. Wie hast du das verkraftet?",
       "source": {
         "converged_station": "CONCEPT.md section 3",
         "seat_questions": [
@@ -230,13 +232,13 @@
           "CONCEPT-GPT6.md station works and door contract"
         ]
       },
-      "editorial_note": "Leaves building and operating a machine open as separate questions.",
-      "german_provenance": "Newly authored for this commission."
+      "editorial_note": "The stop's chapter is the fall of Milan and the horse. The German uses the drawer's own wording, zu Kanonen.",
+      "german_provenance": "Written in German for the words round of 2026-09-28, not translated from the English."
     },
     {
       "station": "body",
-      "question_en": "What could a drawing show that a dissection could not?",
-      "question_de": "Was konnte eine Zeichnung zeigen, was eine Sektion nicht zeigen konnte?",
+      "question_en": "You told a visitor you had opened over thirty bodies. What were you looking for inside?",
+      "question_de": "Über dreißig Tote hast du geöffnet, sagtest du einem Besucher. Was hast du darin gesucht?",
       "source": {
         "converged_station": "CONCEPT.md section 3",
         "seat_questions": [
@@ -244,13 +246,13 @@
           "CONCEPT-GPT6.md station body and door contract"
         ]
       },
-      "editorial_note": "Converged from the seat questions into one visitor prompt.",
-      "german_provenance": "Newly authored for this commission."
+      "editorial_note": "The number stays what he told the visitor, as the drawer says; the question does not state it as fact.",
+      "german_provenance": "Written in German for the words round of 2026-09-28, not translated from the English."
     },
     {
       "station": "myths",
-      "question_en": "How would you feel about words being quoted as yours that you never wrote?",
-      "question_de": "Wie wäre es für dich, wenn man Worte als deine zitiert, die du nie geschrieben hast?",
+      "question_en": "People quote sentences as yours that you never wrote. Does that bother you?",
+      "question_de": "Man zitiert Sätze als deine, die du nie geschrieben hast. Stört dich das?",
       "source": {
         "converged_station": "CONCEPT.md section 3",
         "seat_questions": [
@@ -258,13 +260,13 @@
           "CONCEPT-GPT6.md station myths and door contract"
         ]
       },
-      "editorial_note": "Removes the unsupported claim that half of popular quotations are false.",
-      "german_provenance": "Newly authored for this commission."
+      "editorial_note": "Retired station: numeric links land on the grave. The same question, said the way a person says it.",
+      "german_provenance": "Written in German for the words round of 2026-09-28, not translated from the English."
     },
     {
       "station": "grave",
-      "question_en": "What should a grave say when the remains are only presumed to be yours?",
-      "question_de": "Was sollte auf einem Grab stehen, wenn die Überreste nur vermutlich deine sind?",
+      "question_en": "Nobody is sure these bones are yours. Does it matter to you where you lie?",
+      "question_de": "Ob diese Knochen deine sind, weiß niemand sicher. Ist es dir wichtig, wo du liegst?",
       "source": {
         "converged_station": "CONCEPT.md section 3",
         "seat_questions": [
@@ -272,13 +274,13 @@
           "CONCEPT-GPT6.md station grave and door contract"
         ]
       },
-      "editorial_note": "Keeps the remains explicitly presumed.",
-      "german_provenance": "Newly authored for this commission."
+      "editorial_note": "Asks him, not the stone. His will asked for a place, so the Echo has something true to answer with.",
+      "german_provenance": "Written in German for the words round of 2026-09-28, not translated from the English."
     },
     {
       "station": "picture-room-west",
-      "question_en": "What were you still trying to do in your last paintings?",
-      "question_de": "Was wolltest du in deinen letzten Gemälden noch erreichen?",
+      "question_en": "Your paintings fit on one wall, and some are unfinished. Why so few?",
+      "question_de": "Deine Gemälde passen an eine Wand, manche blieben unvollendet. Warum so wenige?",
       "source": {
         "converged_station": "CONCEPT.md section 3",
         "seat_questions": [
@@ -286,17 +288,16 @@
           "CONCEPT-GPT6.md station picture-room and door contract"
         ]
       },
-      "editorial_note": "The west end stands at the latest work of the hang, so its question asks after the late paintings rather than the room's whole wall.",
-      "german_provenance": "Newly authored for this commission."
+      "editorial_note": "Asked where the visitor has seen the whole wall. Fit on one wall is what the room shows, not a count the drawer avoids; unfinished work is on this drawer.",
+      "german_provenance": "Written in German for the words round of 2026-09-28, not translated from the English."
     }
   ],
   "farewell": {
     "station": "farewell",
-    "question_en": "Looking back over your whole life, what mattered most to you?",
-    "question_de": "Wenn du auf dein ganzes Leben zurückblickst, was war dir am wichtigsten?",
-    "status": "placeholder",
-    "editorial_note": "Placeholder for the words round. The closing question the talk choice at the grave asks, after the last station. Not a station of the walk.",
-    "german_provenance": "Newly authored as a placeholder."
+    "question_en": "I have just walked through your whole life. What should I take with me?",
+    "question_de": "Ich bin gerade durch dein ganzes Leben gegangen. Was soll ich mitnehmen?",
+    "editorial_note": "The closing question the talk choice at the grave asks, after the last station. Not a station of the walk. It is the first message the Echo receives, so it carries the walk in it and leaves the answer open; it does not repeat the grave's door.",
+    "german_provenance": "Written in German for the words round of 2026-09-28, not translated from the English."
   },
   "door_contract": {
     "figure_id": "leonardo-da-vinci",
