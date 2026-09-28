@@ -2,7 +2,7 @@
  "format": "vinci-rail-clearance-v2",
  "completeNearClearance": true,
  "recipe": "src/wings/vinci/rail-certify.mjs",
- "recipeSha256": "75ed34c9404e881e41edc3d970262dfce7b11d841d6248acddbb8b9f88c4450a",
+ "recipeSha256": "d55b9ef2c2fb5698eb532879c1c21e2194563074db31b77727100779ee1e8863",
  "sources": [
   {
    "file": "src/stack/detail.ts",
@@ -54,8 +54,8 @@
   },
   {
    "file": "src/wings/vinci/collection/approaches.ts",
-   "sha256": "ffa36c8193abc460329fbb59fbb760f704ef8f07901e3bb04cd59348541bc56c",
-   "bytes": 27678,
+   "sha256": "f288161471d6c66e8b5057f615dae2dc432b91051dc607d5cff00b5648918ec1",
+   "bytes": 28870,
    "unchangedDuringAudit": true
   },
   {
@@ -144,8 +144,8 @@
   },
   {
    "file": "src/wings/vinci/collection/stands.ts",
-   "sha256": "f35d9fb4c57f3127a989b61e8b0460046bcda5268bf2dd0934388f5864927d4c",
-   "bytes": 13219,
+   "sha256": "db72eced0abd666d5378b3a0bb3d1d134545bf745d0a0b7951ec3acd5dea07e4",
+   "bytes": 13876,
    "unchangedDuringAudit": true
   },
   {
@@ -414,8 +414,8 @@
   },
   {
    "file": "src/wings/vinci/machines/catalog.ts",
-   "sha256": "3d858f4a271f025ab4a63d6590576aee89119ea1c53ac09df146ebaa585212f5",
-   "bytes": 3501,
+   "sha256": "f72ca9ccb5778e51fa19659af29632b1e9ec186beb53f1109cf6f376d1fdde6a",
+   "bytes": 3653,
    "unchangedDuringAudit": true
   },
   {
@@ -461,6 +461,12 @@
    "unchangedDuringAudit": true
   },
   {
+   "file": "src/wings/vinci/machines/data/mechanical-lion.json",
+   "sha256": "1228dbf5ae2ab4f6849fe5deb3b943cc79d5818832e8767c47e296d4cff4f3fb",
+   "bytes": 57592,
+   "unchangedDuringAudit": true
+  },
+  {
    "file": "src/wings/vinci/machines/data/miter-lock-gates.json",
    "sha256": "a0dc30d4b1f7b6cd6f35cc166188ca0a4c244df9e1fd44afc56108a2c09a87aa",
    "bytes": 195398,
@@ -486,8 +492,8 @@
   },
   {
    "file": "src/wings/vinci/machines/data/records.json",
-   "sha256": "a59fe96b8b581db0b4bc563447a5fc28f19cb8ab48ad3ccf08b188266ef149ff",
-   "bytes": 507111,
+   "sha256": "827f0603a4a7b7c3c5e6b594caf7fe6c8d76cc67a06849193a9a026c77ef31a2",
+   "bytes": 512234,
    "unchangedDuringAudit": true
   },
   {
@@ -127585,6 +127591,52 @@
   },
   {
    "viewport": "desktop",
+   "station": "hall",
+   "exhibit": "machine/mechanical-lion",
+   "fromPose": {
+    "eye": [
+     -4.2388,
+     2.45,
+     11.0992
+    ],
+    "at": [
+     -12.96369177491037,
+     1.7524352625587472,
+     15.935486483778632
+    ],
+    "fov": 52
+   },
+   "toPose": {
+    "eye": [
+     -7.077330992006331,
+     2.45,
+     13.877169954869437
+    ],
+    "at": [
+     -9.223857461925945,
+     1.51,
+     15.870188799219495
+    ],
+    "fov": 47.481866717345895
+   },
+   "points": [
+    [
+     -4.2388,
+     -11.0992,
+     2.45
+    ],
+    [
+     -7.077330992006331,
+     -13.877169954869437,
+     2.45
+    ]
+   ],
+   "roundedLength": 3.971696773765307,
+   "maxNearRadius": 0.3634594509130298,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "desktop",
    "station": "study",
    "exhibit": "leaf/paris-B-83v",
    "fromPose": {
@@ -131031,6 +131083,52 @@
    ],
    "roundedLength": 3.4885527085024832,
    "maxNearRadius": 0.37582320802241764,
+   "certifiedBalls": []
+  },
+  {
+   "viewport": "phone",
+   "station": "hall",
+   "exhibit": "machine/mechanical-lion",
+   "fromPose": {
+    "eye": [
+     -4.2388,
+     2.45,
+     11.0992
+    ],
+    "at": [
+     -12.471418274527196,
+     0.5419100462345521,
+     16.445524819374548
+    ],
+    "fov": 74
+   },
+   "toPose": {
+    "eye": [
+     -7.077330992006331,
+     2.45,
+     13.877169954869437
+    ],
+    "at": [
+     -9.223857461925945,
+     1.51,
+     15.870188799219495
+    ],
+    "fov": 64.10052006841696
+   },
+   "points": [
+    [
+     -4.2388,
+     -11.0992,
+     2.45
+    ],
+    [
+     -7.077330992006331,
+     -13.877169954869437,
+     2.45
+    ]
+   ],
+   "roundedLength": 3.971696773765307,
+   "maxNearRadius": 0.33572926733881453,
    "certifiedBalls": []
   },
   {
