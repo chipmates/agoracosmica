@@ -506,25 +506,32 @@ export function isCarriedEntryTurn(threadKey: string | null, userTurnCount: numb
 }
 
 /**
- * Which arrival a first-timer's consent screen belongs to. Non-consuming, so
- * the routing that runs later still finds every intent it needs.
+ * Which arrival a first-timer's consent screen belongs to. Taken from the
+ * landing URL when the app boots and held in memory, so the count reads no
+ * storage. An intent staged only by a click, with nothing in the URL, stays
+ * 'generic'.
  */
 export type EntryClass = 'council' | 'ask' | 'chapter' | 'figure' | 'library' | 'generic';
 
+let bootEntryClass: EntryClass = 'generic';
+
 export function classifyEntryForFunnel(): EntryClass {
-  try {
-    if (typeof sessionStorage === 'undefined') return 'generic';
-    const ask = sessionStorage.getItem(SS_ASK_KEY);
-    if (sessionStorage.getItem(SS_COUNCIL_KEY) || ask === 'council') return 'council';
-    if (ask && isValidAskTag(ask)) return 'ask';
-    if (readStoryIntent()) return 'chapter';
-    if (sessionStorage.getItem(SS_FIGURE_KEY)) return 'figure';
-    // Last before generic, so no arrival that already had a class changes one.
-    if (readLibraryIntent()) return 'library';
-    return 'generic';
-  } catch {
-    return 'generic';
+  return bootEntryClass;
+}
+
+// Same precedence the staged intents are routed by: council first, library last.
+function classifyBootParams(params: URLSearchParams): EntryClass {
+  const ask = params.get('ask');
+  const question = params.get('q');
+  const chapter = Number(params.get('chapter'));
+  if (params.get('council') || (question && /^[a-z0-9-]{1,64}$/.test(question))) return 'council';
+  if (ask && isValidAskTag(ask)) return 'ask';
+  if (params.get('mode') === 'story' && Number.isInteger(chapter) && chapter >= 1 && chapter <= 12) {
+    return 'chapter';
   }
+  if (params.get('figure')) return 'figure';
+  if (params.get('mode') === 'library' && AUDIO_LIBRARY_ENTRY) return 'library';
+  return 'generic';
 }
 
 /**
@@ -680,6 +687,7 @@ export function captureEntryIntentFromUrl(): void {
     if (!figureParam && !councilParam && !langParam && !askParam && !questionParam && !modeParam && !entryParam) {
       return;
     }
+    bootEntryClass = classifyBootParams(params);
     if (figureParam) {
       const id = figureSlugToId[figureParam] || figureParam;
       if (id.length < 64) sessionStorage.setItem(SS_FIGURE_KEY, id);
