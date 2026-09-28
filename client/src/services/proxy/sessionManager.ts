@@ -23,6 +23,9 @@ const UUID_V4_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9
 let currentToken: string | null = null;
 let tokenExpiresAt: number = 0; // Unix ms
 let pendingSession: Promise<string> | null = null; // Deduplication mutex
+// Page memory only: the worker counts a session on the first token request of
+// a page load, so nothing is stored or looked up for the count.
+let sessionCounted = false;
 
 /** Read the persisted clientId. Returns null if missing, malformed, or storage is unavailable. */
 function readStoredClientId(): string | null {
@@ -74,11 +77,12 @@ export async function getSessionToken(): Promise<string> {
 async function createSession(): Promise<string> {
   const turnstileToken = await getTurnstileToken();
   const clientId = readStoredClientId();
+  const first = !sessionCounted;
 
   const response = await fetchWithTimeout(`${FREE_TIER_API_URL}/v1/session`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(clientId ? { turnstileToken, clientId } : { turnstileToken }),
+    body: JSON.stringify(clientId ? { turnstileToken, clientId, first } : { turnstileToken, first }),
     timeoutMs: 10_000,
   });
 
@@ -91,6 +95,7 @@ async function createSession(): Promise<string> {
 
   currentToken = data.token;
   tokenExpiresAt = new Date(data.expiresAt).getTime();
+  sessionCounted = true;
 
   // Persist the server-assigned clientId. On a fresh device this is the first
   // time we see it; on subsequent sessions the server echoes back what we sent.

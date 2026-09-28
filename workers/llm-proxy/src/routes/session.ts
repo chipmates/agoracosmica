@@ -35,7 +35,7 @@ export async function handleSession(request: Request, env: Env): Promise<Respons
     );
   }
 
-  const { turnstileToken, clientId } = body;
+  const { turnstileToken, clientId, first } = body;
   if (typeof turnstileToken !== 'string' || !turnstileToken) {
     return new Response(
       JSON.stringify({ error: 'Missing turnstileToken' }),
@@ -97,37 +97,11 @@ export async function handleSession(request: Request, env: Env): Promise<Respons
   const payload = createJWTPayload(finalClientId);
   const token = await signJWT(payload, env.JWT_SIGNING_KEY);
 
-  // Phase 0a — Sessions metric truthing.
-  // Only count this as a session event if the clientId hasn't been seen in
-  // the last 30 minutes. Multiple tabs / lazy-refresh / 401 retry within the
-  // window all share one event. Standard "30-min idle gap" sessionization,
-  // matching how Plausible / Umami / GA define a session.
-  const FRESHNESS_WINDOW_MS = 30 * 60 * 1000;
-  const lastSeenKey = `last_seen:${finalClientId}`;
-  let isFresh = true;
-  try {
-    const lastSeenRaw = await env.SESSION_LAST_SEEN.get(lastSeenKey);
-    if (lastSeenRaw) {
-      const lastSeen = parseInt(lastSeenRaw, 10);
-      if (Number.isFinite(lastSeen) && (Date.now() - lastSeen) < FRESHNESS_WINDOW_MS) {
-        isFresh = false;
-      }
-    }
-  } catch {
-    // KV read failure is non-fatal — default to tracking, never block JWT issuance.
-  }
-
-  if (isFresh) {
+  // One session per page: the client flags its first token request of a page
+  // load. Nothing identifying is looked up for the count, so two tabs are two
+  // sessions, and a request without the flag (an older client) is not counted.
+  if (first === true) {
     trackSession(env, 200, readCountry(request), readDevice(request));
-  }
-
-  // Always extend the freshness window for this clientId. TTL 1h is plenty
-  // wider than the 30-min check window so eventual cleanup is guaranteed
-  // even for one-and-done visitors.
-  try {
-    await env.SESSION_LAST_SEEN.put(lastSeenKey, String(Date.now()), { expirationTtl: 3600 });
-  } catch {
-    // KV write failure is non-fatal.
   }
 
   return new Response(

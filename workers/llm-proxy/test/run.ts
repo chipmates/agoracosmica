@@ -38,6 +38,7 @@ import { handleChat } from '../src/routes/chat';
 import { handleFunnel } from '../src/routes/funnel';
 import { handlePage } from '../src/routes/page';
 import { handleQuota } from '../src/routes/quota';
+import { handleSession } from '../src/routes/session';
 import { signJWT } from '../src/utils/jwt';
 import worker from '../src/index';
 import type { Env, JWTPayload } from '../src/utils/types';
@@ -1278,6 +1279,48 @@ async function main(): Promise<number> {
       const row = await funnelBeacon({ step, figureId: 'aurelius', mode: 'story', language: 'en' });
       assertEqual(row, undefined, `unlisted step recorded: ${JSON.stringify(step)}`);
     }
+  });
+
+  // -------------------------------------------------------------------------
+  // Session count: the page's first token request, no lookup by client ID
+  // -------------------------------------------------------------------------
+
+  const sessionRequest = async (body: Record<string, unknown>) => {
+    analyticsRows.length = 0;
+    const { kv, puts } = auditedKv();
+    const res = await handleSession(
+      new Request('https://example.invalid/v1/session', { method: 'POST', body: JSON.stringify(body) }),
+      fakeEnv({ RATE_LIMITS: kv }),
+    );
+    const sessionRows = analyticsRows.filter(r => r.blobs[0] === 'session');
+    return { res, sessionRows, puts };
+  };
+  const KNOWN_ID = '3f1c2b4a-5d6e-4f70-8a9b-0c1d2e3f4a5b';
+
+  await test('a first token request counts one session, later ones none', async () => {
+    const first = await sessionRequest({ turnstileToken: 'dev-test-token', clientId: KNOWN_ID, first: true });
+    assertEqual(first.res.status, 200, 'token issued');
+    assertEqual(first.sessionRows.length, 1, 'the first request is counted');
+    const again = await sessionRequest({ turnstileToken: 'dev-test-token', clientId: KNOWN_ID, first: true });
+    assertEqual(again.sessionRows.length, 1, 'a second page with the same ID is counted again, nothing is looked up');
+    const refresh = await sessionRequest({ turnstileToken: 'dev-test-token', clientId: KNOWN_ID, first: false });
+    assertEqual(refresh.res.status, 200, 'a refresh still gets its token');
+    assertEqual(refresh.sessionRows.length, 0, 'a refresh is not counted');
+  });
+
+  await test('a request without the flag gets its token and is not counted', async () => {
+    const legacy = await sessionRequest({ turnstileToken: 'dev-test-token', clientId: KNOWN_ID });
+    assertEqual(legacy.res.status, 200, 'token issued');
+    assertEqual(legacy.sessionRows.length, 0, 'no count without the flag');
+    for (const odd of ['true', 1, 'first']) {
+      const r = await sessionRequest({ turnstileToken: 'dev-test-token', first: odd });
+      assertEqual(r.sessionRows.length, 0, `no count for ${JSON.stringify(odd)}`);
+    }
+  });
+
+  await test('the session route writes no key named after the client ID', async () => {
+    const r = await sessionRequest({ turnstileToken: 'dev-test-token', clientId: KNOWN_ID, first: true });
+    assert(r.puts.every(key => !key.includes(KNOWN_ID)), 'no client-ID key written');
   });
 
   // -------------------------------------------------------------------------
