@@ -678,8 +678,8 @@
   },
   {
    "file": "src/wings/vinci/story.ts",
-   "sha256": "b1c1422437b0f8cf06887275ba2f4ca96cf78969975e271c9851ad0deb3ad93c",
-   "bytes": 26585,
+   "sha256": "1d77304eeb8ed10ff90c894aaf29dd61022911e7e639502943304ddb9ad94e70",
+   "bytes": 26591,
    "unchangedDuringAudit": true
   },
   {
