@@ -829,6 +829,8 @@ export function createWing():VinciWingModule {
     // the night's one shooting star keeps the run's clock
     stars?.night.startAt(farewellRun.from)
     hosts.stage.parentElement!.dataset['farewell']=''
+    // the marks stand down under it: the band given back would re-raycast every sightline in one frame
+    labels.setMode(0);dots?.setMode(0)
     return true
   }
   /** The look up at the wing's clock; a walk begun under it ends it where it
@@ -862,6 +864,7 @@ export function createWing():VinciWingModule {
     if(frame)delete frame.dataset['farewell']
     if(home){frame?.querySelector<HTMLElement>('.wing-lobby')?.click();return}
     if(band>0)setDeskBand(band)
+    labels.setMode(mode);dots?.setMode(mode)
     applyEvening(null)
   }
   /** A LOOK TEST OF THE FAREWELL, under the export only: the evening at a
