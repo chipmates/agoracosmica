@@ -2,7 +2,7 @@
  "topic": "machines",
  "pages": {
   "B.105": {
-   "lead": 0,
+   "lead": null,
    "notes": "Heading (the editor's): 'COURTAUDS POUR NAVIRES'. The only text on the page belongs to the lower drawing, the long curved blade, which the curator's reason calls 'a hinged scoop'; text and edition make it a scythe to be fired from ships. The revolving crane, the curator's lead drawing, has no text on this page, so 'lead' is null. Checked on the edition's plate (Polona scan 200).",
    "passages": [
     {
@@ -11,14 +11,14 @@
      "it": {
       "text": "— questi ~~bo~~ chortaldi deono stare sopra forti navili equesti 2 chortaldi arano con forte chatena o corda nova bagniata vna falce lunga braccia 12 larga nel mezo uno pie grssa [grossa] nella costa uno dito e debesidare focho invno tenpo",
       "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "These short cannons must stand on strong ships, and these 2 short cannons shall have, on a strong chain or a new wet rope, a scythe 12 braccia long, one foot wide in the middle, one finger thick at the back; and they must be fired at the same moment.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1883), checked against his French translation (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
       "doubts": [
        "'chortaldi' (cortaldi, French 'courtauds') are short, wide-bored cannons; 'short cannons' is a plain gloss.",
        "'arano con forte chatena ... vna falce' is read as the scythe being fastened to the guns by the chain or rope; the Italian only says the guns 'shall have, with a strong chain or rope, a scythe'.",
@@ -28,11 +28,11 @@
      "de": {
       "text": "Diese kurzen Kanonen müssen auf starken Schiffen stehen, und diese 2 kurzen Kanonen sollen an einer starken Kette oder einem neuen, nassen Seil eine Sense tragen, 12 Braccia lang, in der Mitte einen Fuß breit, am Rücken einen Finger dick; und man muss sie im selben Augenblick abfeuern.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1883) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
       "doubts": [
-       "'chortaldi' (cortaldi, French 'courtauds') are short, wide-bored cannons; 'short cannons' is a plain gloss.",
-       "'arano con forte chatena ... vna falce' is read as the scythe being fastened to the guns by the chain or rope; the Italian only says the guns 'shall have, with a strong chain or rope, a scythe'.",
-       "The struck-out 'bo' (italics in the edition) is left out; 'grssa [grossa]' follows the editor's bracket."
+       "'chortaldi' (cortaldi, französisch 'courtauds') sind kurze Kanonen mit weiter Bohrung; 'kurze Kanonen' ist eine schlichte Umschreibung.",
+       "'arano con forte chatena ... vna falce' wird so gelesen, dass die Sense mit der Kette oder dem Seil an den Kanonen befestigt ist; das Italienische sagt nur, die Kanonen 'sollen mit einer starken Kette oder einem Seil eine Sense haben'.",
+       "Das gestrichene 'bo' (in der Ausgabe kursiv) ist weggelassen; 'grssa [grossa]' folgt der Klammer des Herausgebers."
       ]
      },
      "fr": {
@@ -55,7 +55,7 @@
    ]
   },
   "L.077": {
-   "lead": 0,
+   "lead": null,
    "notes": "Heading (the editor's): '[MOULIN]'. The two lines are the measures written under the windmill drawing. Ravaisson prints the fractions stacked; they are written here as 1/2 and 1/4. The facing page, fol. 36 recto (next leaf, heading [CONSTRUCTION]), carries 'il tetto eposato sulla rota' (Le toit est posé sur la roue: the roof rests on the wheel), which belongs to the same windmill idea but is not on this page. Page match checked: Ravaisson's phototype plate of 35 verso (archive.org viewer n246) shows the same windmill as the SET image.",
    "passages": [
     {
@@ -64,14 +64,14 @@
      "it": {
       "text": "vano braccia 7 1/2   1/4 . . [?]\ngrosseza di muro braccio uno e. . [?]",
       "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "Clear space: 7 1/2 braccia   1/4 . . [?]\nThickness of the wall: one braccio and . . [?]",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1890), checked against his French translation (Ravaisson-Mollien, vol. V, 1890). It may contain errors.",
       "doubts": [
        "'vano' is the empty space inside the walls (Ravaisson: 'Vide'); read here as the inner width of the round tower.",
        "The fraction 1/4 stands apart on the line, and the edition marks what follows it, and the end of the second line, as unread ('. . [?]'). The measures are incomplete and are left so.",
@@ -81,11 +81,11 @@
      "de": {
       "text": "Lichte Weite: 7 1/2 Braccia   1/4 . . [?]\nMauerstärke: ein Braccio und . . [?]",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1890) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. V, 1890). Sie kann Fehler enthalten.",
       "doubts": [
-       "'vano' is the empty space inside the walls (Ravaisson: 'Vide'); read here as the inner width of the round tower.",
-       "The fraction 1/4 stands apart on the line, and the edition marks what follows it, and the end of the second line, as unread ('. . [?]'). The measures are incomplete and are left so.",
-       "braccio (plural braccia): the Italian arm's-length unit, left untranslated."
+       "'vano' ist der leere Raum innerhalb der Mauern (Ravaisson: 'Vide'); hier als lichte Weite des runden Turms gelesen.",
+       "Der Bruch 1/4 steht abgesetzt in der Zeile, und die Ausgabe markiert, was darauf folgt, und das Ende der zweiten Zeile als ungelesen ('. . [?]'). Die Maße sind unvollständig und bleiben so.",
+       "Braccio (Mehrzahl Braccia): das italienische Längenmaß von etwa einer Armlänge, unübersetzt gelassen."
       ]
      },
      "fr": {
@@ -117,14 +117,14 @@
      "it": {
       "text": "— sprone contro allinpito dun fiume",
       "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "A spur against the onrush of a river.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1883), checked against his French translation (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
       "doubts": [
        "A 'sprone' (spur) is a wedge-shaped bank or breakwater that turns the current."
       ]
@@ -132,9 +132,9 @@
      "de": {
       "text": "Ein Sporn gegen den Ansturm eines Flusses.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1883) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
       "doubts": [
-       "A 'sprone' (spur) is a wedge-shaped bank or breakwater that turns the current."
+       "Ein 'sprone' (Sporn) ist ein keilförmiger Damm oder Wellenbrecher, der die Strömung ablenkt."
       ]
      },
      "fr": {
@@ -160,14 +160,14 @@
      "it": {
       "text": "— di questa natura vorebe. essere la shorza [scorza?] delle pescaie",
       "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "The facing [?] of the weirs ought to be of this kind.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1883), checked against his French translation (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
       "doubts": [
        "'shorza [scorza?]': the editor's bracket suggests 'scorza' (bark, rind), which Ravaisson takes as the facing ('le revêtement') and marks doubtful.",
        "'pescaie' are weirs or dams across a river; Ravaisson has 'épis' (groynes)."
@@ -176,10 +176,10 @@
      "de": {
       "text": "Von dieser Art sollte die Verkleidung [?] der Wehre sein.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1883) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
       "doubts": [
-       "'shorza [scorza?]': the editor's bracket suggests 'scorza' (bark, rind), which Ravaisson takes as the facing ('le revêtement') and marks doubtful.",
-       "'pescaie' are weirs or dams across a river; Ravaisson has 'épis' (groynes)."
+       "'shorza [scorza?]': Die Klammer des Herausgebers schlägt 'scorza' (Rinde, Schale) vor; Ravaisson versteht das als Verkleidung ('le revêtement') und markiert es als unsicher.",
+       "'pescaie' sind Wehre oder Dämme quer durch einen Fluss; Ravaisson schreibt 'épis' (Buhnen)."
       ]
      },
      "fr": {
@@ -205,19 +205,19 @@
      "it": {
       "text": "— afforare vna pietra maffa. chessenpre cagia. acqua",
       "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "To bore a stone: but see that water keeps falling.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1883), checked against his French translation (Ravaisson-Mollien, vol. II, 1883). It may contain errors."
      },
      "de": {
       "text": "Um einen Stein zu bohren: Sorge aber dafür, dass immer Wasser fällt.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1883) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten."
      },
      "fr": {
       "text": "— Pour forer [percer] une pierre; mais fais que de l'eau tombe toujours."
@@ -242,19 +242,19 @@
      "it": {
       "text": "— Modo difare una opera chomprestezza",
       "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "A way to get a piece of work done quickly.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1883), checked against his French translation (Ravaisson-Mollien, vol. II, 1883). It may contain errors."
      },
      "de": {
       "text": "Wie man eine Arbeit rasch erledigt.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1883) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten."
      },
      "fr": {
       "text": "— Manière de faire un ouvrage avec promptitude."

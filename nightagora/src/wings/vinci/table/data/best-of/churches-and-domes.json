@@ -1,256 +1,6 @@
 {
  "topic": "churches-and-domes",
  "pages": {
-  "B.042": {
-   "lead": 5,
-   "notes": "Heading (the editor's): 'TAILLE D'ARBRES, ARCHITECTURE'. The page's text is mostly about trees and timber; only the last line concerns the churches the curator chose, so it is the lead. 'anello' is printed with a broken final letter on the Polona copy; the OCR's 'chelia' is 'chefia' on the scan. The French 'vivace..' has two dots as printed.",
-   "passages": [
-    {
-     "index": 0,
-     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 17v, block 1 of 6",
-     "it": {
-      "text": "— sevoichellalbero. a. facci ilsuo ramo n. grosso. quanto. m. tieni. rimondi irami alramo. m. lassciando. isua rami a. n. elcresciera come. m.",
-      "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
-      }
-     },
-     "en": {
-      "text": "If you want the tree a to make its branch n as thick as m, keep the branch m pruned of its twigs, leaving n its twigs, and it will grow like m.",
-      "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
-     },
-     "de": {
-      "text": "Wenn du willst, dass der Baum a seinen Ast n so dick macht wie m, halte den Ast m frei von Zweigen und lass n seine Zweige; dann wird er wachsen wie m.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
-     },
-     "fr": {
-      "text": "— Si tu veux que l'arbre a fasse sa branche n aussi grosse que m, tiens émondés les rameaux de la branche m, en laissant à n ses rameaux, et elle [n] croîtra comme m."
-     },
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
-       "page": "FOLIO 17 (verso), the transcription below the facsimile plate; archive.org leaf n76",
-       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n76/mode/1up"
-      },
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
-       "page": "FOLIO 17 (verso), the facing page of the plate; archive.org leaf n75",
-       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n75/mode/1up"
-      }
-     ]
-    },
-    {
-     "index": 1,
-     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 17v, block 2 of 6",
-     "it": {
-      "text": "— Sevoli. vna lancia chenonsitorcha chavala delalbero. b. ilqale perla sua sottiglieza seruira quasi alla grosseza della. lancia",
-      "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
-      }
-     },
-     "en": {
-      "text": "If you want a lance that does not warp, take it from the tree b, which by its slenderness will almost match the thickness of the lance.",
-      "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
-     },
-     "de": {
-      "text": "Wenn du eine Lanze willst, die sich nicht verzieht, nimm sie aus dem Baum b, der durch seine Schlankheit fast schon die Dicke der Lanze hat.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
-     },
-     "fr": {
-      "text": "— Si tu veux une lance qui ne se torde pas, tire-la de l'arbre b, qui, par sa minceur, sera pour ainsi dire juste ce qu'il faut pour l'épaisseur de la lance."
-     },
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
-       "page": "FOLIO 17 (verso), the transcription below the facsimile plate; archive.org leaf n76",
-       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n76/mode/1up"
-      },
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
-       "page": "FOLIO 17 (verso), the facing page of the plate; archive.org leaf n75",
-       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n75/mode/1up"
-      }
-     ]
-    },
-    {
-     "index": 2,
-     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 17v, block 3 of 6",
-     "it": {
-      "text": "— Inellalbero. c. nonchauerai se ~~nv~~ nonvna. lancia bona che mai sipiegera, ecquella sichavera diquela. parte. chefia volta. attramontana. ettutte laltre sitorcieranno perli omori che senpre simovan colsole",
-      "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
-      }
-     },
-     "en": {
-      "text": "From the tree c you will get only one good lance that will never bend, and it will be taken from the part that faces north; and all the others will warp because of the humours, which always move with the sun.",
-      "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
-      "doubts": [
-       "The struck-out 'nv' (italics in the edition) is left out.",
-       "'omori' are the humours, the saps of the tree; the idea that they follow the sun is Leonardo's."
-      ]
-     },
-     "de": {
-      "text": "Aus dem Baum c gewinnst du nur eine gute Lanze, die sich nie biegen wird, und sie wird aus dem Teil genommen, der nach Norden gewandt ist; alle anderen werden sich verziehen wegen der Säfte, die sich immer mit der Sonne bewegen.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "The struck-out 'nv' (italics in the edition) is left out.",
-       "'omori' are the humours, the saps of the tree; the idea that they follow the sun is Leonardo's."
-      ]
-     },
-     "fr": {
-      "text": "— De l'arbre c, tu ne tireras qu'une bonne lance qui ne se ploiera jamais; elle se tirera de la partie qui est tournée au nord. Toutes les autres se tordront, par les humeurs qui se meuvent toujours avec le soleil."
-     },
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
-       "page": "FOLIO 17 (verso), the transcription below the facsimile plate; archive.org leaf n76",
-       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n76/mode/1up"
-      },
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
-       "page": "FOLIO 17 (verso), the facing page of the plate; archive.org leaf n75",
-       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n75/mode/1up"
-      }
-     ]
-    },
-    {
-     "index": 3,
-     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 17v, block 4 of 6",
-     "it": {
-      "text": "— Selleuerai vnanello di pelle allalbero. d. dallanello insu. sisechera edaindi ingiv restera. vivo esse farai ildetto anello achattiva luna epoitagli lapianta dapie abona. luna quel della bona luna. simantera elresto siguastera.",
-      "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
-      }
-     },
-     "en": {
-      "text": "If you take a ring of bark off the tree d, it will dry out from the ring upward and stay alive from there downward. And if you make the said ring at a bad moon and then cut the plant at the foot at a good moon, what belongs to the good moon will keep and the rest will spoil.",
-      "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
-      "doubts": [
-       "'pelle' (skin) is the bark.",
-       "'quel della bona luna' (what is of the good moon) is kept literal; Leonardo does not say which part that is."
-      ]
-     },
-     "de": {
-      "text": "Wenn du dem Baum d einen Ring Rinde abnimmst, vertrocknet er vom Ring aufwärts und bleibt von dort abwärts lebendig. Und wenn du diesen Ring bei schlechtem Mond machst und dann die Pflanze am Fuß bei gutem Mond fällst, hält sich, was zum guten Mond gehört, und der Rest verdirbt.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "'pelle' (skin) is the bark.",
-       "'quel della bona luna' (what is of the good moon) is kept literal; Leonardo does not say which part that is."
-      ]
-     },
-     "fr": {
-      "text": "— Si tu enlèves un anneau d'écorce à l'arbre d, il se séchera au-dessus de l'anneau et tout au-dessous restera vivace.. Si tu fais ledit anneau à mauvaise lune, et puis que tu tailles la plante au pied à bonne lune, ce qui est de la bonne lune se conservera et le reste se gâtera."
-     },
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
-       "page": "FOLIO 17 (verso), the transcription below the facsimile plate; archive.org leaf n76",
-       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n76/mode/1up"
-      },
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
-       "page": "FOLIO 17 (verso), the facing page of the plate; archive.org leaf n75",
-       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n75/mode/1up"
-      }
-     ]
-    },
-    {
-     "index": 4,
-     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 17v, block 5 of 6",
-     "it": {
-      "text": "— Sevolli. chevna trave oaltradirittura nonsi torcha. sega illegnio perlolungo indue parti evolgi ledette parti chapo. pie affermale bene insieme emai. sitorcieranno",
-      "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
-      }
-     },
-     "en": {
-      "text": "If you want a beam or other straight timber not to warp, saw the wood lengthwise into two parts, turn the said parts head to foot, and fix them well together, and they will never warp.",
-      "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
-     },
-     "de": {
-      "text": "Wenn du willst, dass sich ein Balken oder ein anderes gerades Holz nicht verzieht, säge das Holz der Länge nach in zwei Teile, lege die Teile Kopf an Fuß und befestige sie gut miteinander; dann verziehen sie sich nie.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
-     },
-     "fr": {
-      "text": "— Si tu veux qu'une poutre ou autre pièce droite ne se torde pas, scie le bois en long en deux parties, tourne les deux parties tête aux pieds, fixe les bien ensemble, et jamais elles ne se tordront."
-     },
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
-       "page": "FOLIO 17 (verso), the transcription below the facsimile plate; archive.org leaf n76",
-       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n76/mode/1up"
-      },
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
-       "page": "FOLIO 17 (verso), the facing page of the plate; archive.org leaf n75",
-       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n75/mode/1up"
-      }
-     ]
-    },
-    {
-     "index": 5,
-     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 17v, block 6 of 6",
-     "it": {
-      "text": "— questo. edifitio. anchora. starebbe bene affarlo dalla linia. a. b. c. d. insui",
-      "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
-      }
-     },
-     "en": {
-      "text": "It would also be good to build this edifice from the line a b c d upward.",
-      "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
-      "doubts": [
-       "'insui' is read as 'in su' (upward); Ravaisson has 'selon la ligne a b c d' (along the line)."
-      ]
-     },
-     "de": {
-      "text": "Auch wäre es gut, dieses Gebäude von der Linie a b c d an aufwärts zu bauen.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "'insui' is read as 'in su' (upward); Ravaisson has 'selon la ligne a b c d' (along the line)."
-      ]
-     },
-     "fr": {
-      "text": "— Pour cet édifice, il serait encore bien de l'élever selon la ligne a b c d."
-     },
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
-       "page": "FOLIO 17 (verso), the transcription below the facsimile plate; archive.org leaf n76",
-       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n76/mode/1up"
-      },
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
-       "page": "FOLIO 17 (verso), the facing page of the plate; archive.org leaf n75",
-       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n75/mode/1up"
-      }
-     ]
-    }
-   ]
-  },
   "AshB.035": {
    "lead": 1,
    "notes": "Placement confirmed twice: Richter's Bibliography (vol. II p. 485, Ash. II) lists '8b Pl. XCI, No. 2, 754', and Ravaisson vol. VI prints the passage under Ms 2037 'FOLIO 5 (verso)' with the footnote 'J.-P. Richter, t. II, no 754 (8b), et pl. XCI, no 2'. Richter's 'Ash. II. 8b' is his count; the modern folio is 5 verso. Richter's footnotes: 'This text is written by the side of the plan given on Pl. XCI. No. 2.' and, on Chiaravalle: 'The Abbey of Chiaravalle, a few miles from Milan, has a central tower on the intersection of the cross in the style of that of the Certosa of Pavia, but the style is mediaeval (A. D. 1330). Leonardo seems here to mean, that in a building, in which the circular form is strongly conspicuous, the campanile must either be separated, or rise from the centre of the building and therefore take the form of a lantern.' Passage 2 is Ravaisson's reading of the short line above the passage, which Richter does not print; it names the eight domes of the drawing. Both are given in the manuscript's order (Ravaisson prints the line above the passage). The curator's reason names the drawing, not a passage; lead 1 points to Richter's passage, the page's main text with printed English.",
@@ -261,14 +11,14 @@
      "it": {
       "text": "cosi deono stare li 8\ntiburi deltenpio vissino",
       "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "This is how the 8 domes of the neighbouring temple should stand.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "label": "AI translation, may contain errors",
       "doubts": [
        "'tiburi': a tiburio is the tower or lantern dome over a crossing; Ravaisson renders 'dômes'.",
        "'vissino' read as 'vicino' (near, neighbouring), as Ravaisson reads it ('voisin')."
@@ -277,10 +27,10 @@
      "de": {
       "text": "So sollen die 8 Kuppeln des benachbarten Tempels stehen.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung, kann Fehler enthalten",
       "doubts": [
-       "'tiburi': a tiburio is the tower or lantern dome over a crossing; Ravaisson renders 'dômes'.",
-       "'vissino' read as 'vicino' (near, neighbouring), as Ravaisson reads it ('voisin')."
+       "'tiburi': Ein tiburio ist der Turm oder die Laternenkuppel über einer Vierung; Ravaisson übersetzt 'dômes'.",
+       "'vissino' gelesen als 'vicino' (nahe, benachbart), wie bei Ravaisson ('voisin')."
       ]
      },
      "fr": {
@@ -306,21 +56,21 @@
      "it": {
       "text": "Qui nō si può nè si debe fare cāpanile, anzi debe stare separato come à il domo e Sā Giovanni di Firēze·, e così il domo di Pisa · che mostra il cāpanile per se dispiccato ī circa e così il domo, e ogni vno per se può mostrare la sua perfettione, e chi lo uolesse pure fare colla chiesa, faccia la lāterna scusare cāpanile come è la chiesa di Chiaravalle.",
       "label": {
-       "en": "Transcription: Jean Paul Richter, 1883",
-       "de": "Umschrift: Jean Paul Richter, 1883"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "Here there cannot and ought not to be any campanile; on the contrary it must stand apart like that of the Cathedral and of San Giovanni at Florence, and of the Cathedral at Pisa, where the campanile is quite detached as well as the dome. Thus each can display its own perfection. If however you wish to join it to the church, make the lantern serve for the campanile as in the church at Chiaravalle.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter, 1883"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
      },
      "de": {
       "text": "Hier kann und soll kein Glockenturm gebaut werden. Er muss vielmehr getrennt stehen, wie beim Dom und bei San Giovanni in Florenz, und ebenso beim Dom von Pisa, wo der Glockenturm für sich steht, rundum frei, und ebenso der Dom, und jedes kann für sich seine Vollkommenheit zeigen. Und wer ihn dennoch mit der Kirche verbinden will, der lasse die Laterne als Glockenturm dienen, wie bei der Kirche von Chiaravalle.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Jean Paul Richter, 1883, Englisch vor allem von Mrs R. C. Bell). Sie kann Fehler enthalten.",
       "doubts": [
-       "'faccia la lāterna scusare cāpanile': 'scusare' in the sense of standing in for something; read as 'let the lantern serve as the campanile', as Richter does."
+       "'faccia la lāterna scusare cāpanile': 'scusare' im Sinn von etwas vertreten; gelesen wie bei Richter: Die Laterne soll als Glockenturm dienen."
       ]
      },
      "fr": null,
@@ -340,6 +90,308 @@
     }
    ]
   },
+  "B.042": {
+   "lead": null,
+   "notes": "Heading (the editor's): 'TAILLE D'ARBRES, ARCHITECTURE'. The page's text is mostly about trees and timber; only the last line concerns the churches the curator chose, so it is the lead. 'anello' is printed with a broken final letter on the Polona copy; the OCR's 'chelia' is 'chefia' on the scan. The French 'vivace..' has two dots as printed.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 17v, block 1 of 6",
+     "it": {
+      "text": "— sevoichellalbero. a. facci ilsuo ramo n. grosso. quanto. m. tieni. rimondi irami alramo. m. lassciando. isua rami a. n. elcresciera come. m.",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "If you want the tree a to make its branch n as thick as m, keep the branch m pruned of its twigs, leaving n its twigs, and it will grow like m.",
+      "kind": "ours",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1883), checked against his French translation (Ravaisson-Mollien, vol. II, 1883). It may contain errors."
+     },
+     "de": {
+      "text": "Wenn du willst, dass der Baum a seinen Ast n so dick macht wie m, halte den Ast m frei von Zweigen und lass n seine Zweige; dann wird er wachsen wie m.",
+      "kind": "ours",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1883) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Si tu veux que l'arbre a fasse sa branche n aussi grosse que m, tiens émondés les rameaux de la branche m, en laissant à n ses rameaux, et elle [n] croîtra comme m."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 17 (verso), the transcription below the facsimile plate; archive.org leaf n76",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n76/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 17 (verso), the facing page of the plate; archive.org leaf n75",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n75/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 17v, block 2 of 6",
+     "it": {
+      "text": "— Sevoli. vna lancia chenonsitorcha chavala delalbero. b. ilqale perla sua sottiglieza seruira quasi alla grosseza della. lancia",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "If you want a lance that does not warp, take it from the tree b, which by its slenderness will almost match the thickness of the lance.",
+      "kind": "ours",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1883), checked against his French translation (Ravaisson-Mollien, vol. II, 1883). It may contain errors."
+     },
+     "de": {
+      "text": "Wenn du eine Lanze willst, die sich nicht verzieht, nimm sie aus dem Baum b, der durch seine Schlankheit fast schon die Dicke der Lanze hat.",
+      "kind": "ours",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1883) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Si tu veux une lance qui ne se torde pas, tire-la de l'arbre b, qui, par sa minceur, sera pour ainsi dire juste ce qu'il faut pour l'épaisseur de la lance."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 17 (verso), the transcription below the facsimile plate; archive.org leaf n76",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n76/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 17 (verso), the facing page of the plate; archive.org leaf n75",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n75/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 17v, block 3 of 6",
+     "it": {
+      "text": "— Inellalbero. c. nonchauerai se ~~nv~~ nonvna. lancia bona che mai sipiegera, ecquella sichavera diquela. parte. chefia volta. attramontana. ettutte laltre sitorcieranno perli omori che senpre simovan colsole",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "From the tree c you will get only one good lance that will never bend, and it will be taken from the part that faces north; and all the others will warp because of the humours, which always move with the sun.",
+      "kind": "ours",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1883), checked against his French translation (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+      "doubts": [
+       "The struck-out 'nv' (italics in the edition) is left out.",
+       "'omori' are the humours, the saps of the tree; the idea that they follow the sun is Leonardo's."
+      ]
+     },
+     "de": {
+      "text": "Aus dem Baum c gewinnst du nur eine gute Lanze, die sich nie biegen wird, und sie wird aus dem Teil genommen, der nach Norden gewandt ist; alle anderen werden sich verziehen wegen der Säfte, die sich immer mit der Sonne bewegen.",
+      "kind": "ours",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1883) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "doubts": [
+       "Das gestrichene 'nv' (in der Ausgabe kursiv) ist weggelassen.",
+       "'omori' sind die Säfte des Baumes; die Vorstellung, dass sie der Sonne folgen, ist Leonardos eigene."
+      ]
+     },
+     "fr": {
+      "text": "— De l'arbre c, tu ne tireras qu'une bonne lance qui ne se ploiera jamais; elle se tirera de la partie qui est tournée au nord. Toutes les autres se tordront, par les humeurs qui se meuvent toujours avec le soleil."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 17 (verso), the transcription below the facsimile plate; archive.org leaf n76",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n76/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 17 (verso), the facing page of the plate; archive.org leaf n75",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n75/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 3,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 17v, block 4 of 6",
+     "it": {
+      "text": "— Selleuerai vnanello di pelle allalbero. d. dallanello insu. sisechera edaindi ingiv restera. vivo esse farai ildetto anello achattiva luna epoitagli lapianta dapie abona. luna quel della bona luna. simantera elresto siguastera.",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "If you take a ring of bark off the tree d, it will dry out from the ring upward and stay alive from there downward. And if you make the said ring at a bad moon and then cut the plant at the foot at a good moon, what belongs to the good moon will keep and the rest will spoil.",
+      "kind": "ours",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1883), checked against his French translation (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+      "doubts": [
+       "'pelle' (skin) is the bark.",
+       "'quel della bona luna' (what is of the good moon) is kept literal; Leonardo does not say which part that is."
+      ]
+     },
+     "de": {
+      "text": "Wenn du dem Baum d einen Ring Rinde abnimmst, vertrocknet er vom Ring aufwärts und bleibt von dort abwärts lebendig. Und wenn du diesen Ring bei schlechtem Mond machst und dann die Pflanze am Fuß bei gutem Mond fällst, hält sich, was zum guten Mond gehört, und der Rest verdirbt.",
+      "kind": "ours",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1883) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "doubts": [
+       "'pelle' (Haut) ist die Rinde.",
+       "'quel della bona luna' (was zum guten Mond gehört) bleibt wörtlich; Leonardo sagt nicht, welcher Teil das ist."
+      ]
+     },
+     "fr": {
+      "text": "— Si tu enlèves un anneau d'écorce à l'arbre d, il se séchera au-dessus de l'anneau et tout au-dessous restera vivace.. Si tu fais ledit anneau à mauvaise lune, et puis que tu tailles la plante au pied à bonne lune, ce qui est de la bonne lune se conservera et le reste se gâtera."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 17 (verso), the transcription below the facsimile plate; archive.org leaf n76",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n76/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 17 (verso), the facing page of the plate; archive.org leaf n75",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n75/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 4,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 17v, block 5 of 6",
+     "it": {
+      "text": "— Sevolli. chevna trave oaltradirittura nonsi torcha. sega illegnio perlolungo indue parti evolgi ledette parti chapo. pie affermale bene insieme emai. sitorcieranno",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "If you want a beam or other straight timber not to warp, saw the wood lengthwise into two parts, turn the said parts head to foot, and fix them well together, and they will never warp.",
+      "kind": "ours",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1883), checked against his French translation (Ravaisson-Mollien, vol. II, 1883). It may contain errors."
+     },
+     "de": {
+      "text": "Wenn du willst, dass sich ein Balken oder ein anderes gerades Holz nicht verzieht, säge das Holz der Länge nach in zwei Teile, lege die Teile Kopf an Fuß und befestige sie gut miteinander; dann verziehen sie sich nie.",
+      "kind": "ours",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1883) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Si tu veux qu'une poutre ou autre pièce droite ne se torde pas, scie le bois en long en deux parties, tourne les deux parties tête aux pieds, fixe les bien ensemble, et jamais elles ne se tordront."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 17 (verso), the transcription below the facsimile plate; archive.org leaf n76",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n76/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 17 (verso), the facing page of the plate; archive.org leaf n75",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n75/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 5,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 17v, block 6 of 6",
+     "it": {
+      "text": "— questo. edifitio. anchora. starebbe bene affarlo dalla linia. a. b. c. d. insui",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "It would also be good to build this edifice from the line a b c d upward.",
+      "kind": "ours",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1883), checked against his French translation (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+      "doubts": [
+       "'insui' is read as 'in su' (upward); Ravaisson has 'selon la ligne a b c d' (along the line)."
+      ]
+     },
+     "de": {
+      "text": "Auch wäre es gut, dieses Gebäude von der Linie a b c d an aufwärts zu bauen.",
+      "kind": "ours",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1883) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "doubts": [
+       "'insui' wird als 'in su' (aufwärts) gelesen; Ravaisson schreibt 'selon la ligne a b c d' (entlang der Linie)."
+      ]
+     },
+     "fr": {
+      "text": "— Pour cet édifice, il serait encore bien de l'élever selon la ligne a b c d."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 17 (verso), the transcription below the facsimile plate; archive.org leaf n76",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n76/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 17 (verso), the facing page of the plate; archive.org leaf n75",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n75/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "AshB.031": {
+   "lead": null,
+   "notes": "FOLIO CORRECTION: the SET row gives 3 recto; the page is Ms 2037 (now Institut Ms 2184) fol. 3 verso (see folio_check). Heading (the editor's): '[ARCHITECTURE D'ÉGLISES]'. The only writing is a note on the small capital at the lower left; the church drawings carry no words, so no passage is the lead. Ravaisson's note 1: J.-P. Richter, vol. II, p. 74, lines 1 and 2 ('6b'), pl. LXXXV no. 6, and the third figure on the left, vol. II, p. 45, fig. 3. Richter cites the leaf as 'MS. Ash. II 6b' (his numbering of this manuscript), prints the Italian as 'I chorni del capitelo deono essere la quarta parte d'uno quadro' and glosses it in English; that printed gloss, checked on the 1883 scan, is given as the English. The German is ours.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. VI (1891), Ms 2037 (Ashburnham, B complement) fol. 3v, block 1 of 1",
+     "it": {
+      "text": "ichorni del capite lo. deono essere la quarta parte duno. quadro",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "The horns of a capital must measure the fourth part of a square",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     },
+     "de": {
+      "text": "Die Ecken des Kapitells müssen der vierte Teil eines Quadrats sein.",
+      "kind": "ours",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1891) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. VI, 1891). Sie kann Fehler enthalten.",
+      "doubts": [
+       "'chorni' (corni, Hörner) sind die Ecken des Kapitells, die vorspringenden Spitzen der Deckplatte; Ravaisson: 'coins', Richter: 'horns'. Das Deutsche sagt 'Ecken'.",
+       "Die gedruckte Zeile trennt 'capite / lo' (capitello) wie die Handschrift; in der Übersetzung zusammengefügt."
+      ]
+     },
+     "fr": {
+      "text": "Les coins du chapiteau doivent être la quatrième partie d'un carré."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. VI]: Manuscrits H de la Bibliothèque de l'Institut, Ash. 2038 et 2037 de la Bibliothèque nationale, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, suivis d'un appendice, Paris: Maison Quantin, 1891",
+       "page": "Ms 2037 (Ashburnham, B complement), FOLIO 3 (verso), transcription (under the heading [ARCHITECTURE D'ÉGLISES]); archive.org viewer page n307",
+       "url": "https://archive.org/details/lesmanuscritsdel06lo/page/n307/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 74, the commentary before §769 (on Pl. LXXXV No. 6, MS. Ash. II 6b)",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n175/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. VI]: Manuscrits H de la Bibliothèque de l'Institut, Ash. 2038 et 2037 de la Bibliothèque nationale, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, suivis d'un appendice, Paris: Maison Quantin, 1891",
+       "page": "Ms 2037 (Ashburnham, B complement), FOLIO 3 (verso), French translation (below the Italian); archive.org viewer page n307",
+       "url": "https://archive.org/details/lesmanuscritsdel06lo/page/n307/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
   "AshB.032": {
    "lead": 0,
    "notes": "Placement confirmed twice: Richter's Bibliography (vol. II p. 485, Ash. II) lists '7a 756, Pl. XCI, No. 1', and Ravaisson vol. VI prints the passage under Ms 2037 'FOLIO 4 (recto)' with the footnote 'J.-P. Richter, t. II, no 756 (7a), et pl. XCI, no 1'. Richter's 'Ash. II. 7a' is his count; the modern folio is 4 recto. Richter's footnote: 'The church of San Sepolcro at Milan, founded in 1030 and repeatedly rebuilt after the middle of the XVIth century, still stands over the crypt of the original structure.' His commentary: 'Above the plan on the same sheet is a view of the exterior. By the aid of these two figures and the description, sections of the edifice may easily be reconstructed. But the section drawn on the left side of the building seems not to be in keeping with the same plan, notwithstanding the explanatory note written underneath it', which is passage 2. Ravaisson notes that this leaf was folio 94 recto of Paris B. The curator's reason names the drawing; lead 0 is the main passage.",
@@ -350,23 +402,23 @@
      "it": {
       "text": "Questo edifitio è abitato di sotto · e di sopra come · è san Sepulcro, ed è sopra come sotto, saluo che 'l di sopra · al tiburio · c · d · e'l di sotto al tiburio a · b · e quādo entri nella chiesa di sotto, tu cali 10 scalini, e quādo mōti in quello di sopra tu sali 20 scalini, che a 1/3 l'uno fāno 10 braccia, e questo è lo spatio ch'è in̄fra i piani dell'una e l'altra chiesa.",
       "label": {
-       "en": "Transcription: Jean Paul Richter, 1883",
-       "de": "Umschrift: Jean Paul Richter, 1883"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "This edifice is inhabited [accessible] below and above, like San Sepolcro, and it is the same above as below, except that the upper story has the dome c d; and the lower has the dome a b, and when you enter into the crypt, you descend 10 steps, and when you mount into the upper you ascend 20 steps, which, with 1/3 braccio for each, make 10 braccia, and this is the height between one floor of the church and the other.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter, 1883"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
      },
      "de": {
-      "text": "Dieses Gebäude ist unten und oben bewohnt, wie San Sepolcro, und es ist oben wie unten, nur dass das obere die Kuppel c d hat und das untere die Kuppel a b. Und wenn du in die untere Kirche gehst, steigst du 10 Stufen hinab, und wenn du in die obere hinaufgehst, steigst du 20 Stufen hinauf, die zu je 1/3 Elle 10 Ellen ergeben. Und das ist der Abstand zwischen den Böden der einen und der anderen Kirche.",
+      "text": "Dieses Gebäude ist unten und oben begehbar, wie San Sepolcro, und es ist oben wie unten, nur dass das obere die Kuppel c d hat und das untere die Kuppel a b. Und wenn du in die untere Kirche gehst, steigst du 10 Stufen hinab, und wenn du in die obere hinaufgehst, steigst du 20 Stufen hinauf, die zu je 1/3 Elle 10 Ellen ergeben. Und das ist der Abstand zwischen den Böden der einen und der anderen Kirche.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Jean Paul Richter, 1883, Englisch vor allem von Mrs R. C. Bell). Sie kann Fehler enthalten.",
       "doubts": [
-       "'abitato': literally 'inhabited'; kept as 'bewohnt'. Richter adds the gloss '[accessible]', which is his and not in the Italian.",
-       "'al tiburio': the tiburio is the dome or lantern tower over the centre; rendered 'Kuppel', as Richter renders 'dome'.",
-       "'che a 1/3 l'uno fāno 10 braccia': the 30 steps together, at a third of a braccio each, make 10 braccia; braccio rendered 'Elle', the usual German for the old measure."
+       "'abitato': wörtlich 'bewohnt'; übersetzt mit 'begehbar' (auf beiden Ebenen in Gebrauch und erreichbar), gestützt auf Richters Erklärung '[accessible]' (zugänglich).",
+       "'al tiburio': Der tiburio ist die Kuppel oder der Laternenturm über der Mitte; übersetzt mit 'Kuppel', wie Richter 'dome' schreibt.",
+       "'che a 1/3 l'uno fāno 10 braccia': Die 30 Stufen zusammen, je ein Drittel Braccio hoch, ergeben 10 Braccia; Braccio ist mit 'Elle' übersetzt, dem üblichen deutschen Wort für das alte Maß."
       ]
      },
      "fr": null,
@@ -390,21 +442,21 @@
      "it": {
       "text": "dentro il difitio di sopra",
       "label": {
-       "en": "Transcription: Jean Paul Richter, 1883",
-       "de": "Umschrift: Jean Paul Richter, 1883"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "interior of the edifice above",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter, 1883"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
      },
      "de": {
-      "text": "Innen das obere Gebäude",
+      "text": "Im Inneren des oberen Gebäudes",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Jean Paul Richter, 1883, Englisch vor allem von Mrs R. C. Bell). Sie kann Fehler enthalten.",
       "doubts": [
-       "A label of three words under the section drawing; 'dentro' read as 'inside'."
+       "Eine Beschriftung aus fünf Wörtern unter der Schnittzeichnung; 'dentro' gelesen als 'im Inneren'."
       ]
      },
      "fr": null,
@@ -419,310 +471,13 @@
        "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
        "page": "vol. II p. 51",
        "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n134/mode/1up"
-      }
-     ]
-    }
-   ]
-  },
-  "AshB.031": {
-   "lead": 0,
-   "notes": "FOLIO CORRECTION: the SET row gives 3 recto; the page is Ms 2037 (now Institut Ms 2184) fol. 3 verso (see folio_check). Heading (the editor's): '[ARCHITECTURE D'ÉGLISES]'. The only writing is a note on the small capital at the lower left; the church drawings carry no words, so no passage is the lead. Ravaisson's note 1: J.-P. Richter, vol. II, p. 74, lines 1 and 2 ('6b'), pl. LXXXV no. 6, and the third figure on the left, vol. II, p. 45, fig. 3. Richter cites the leaf as 'MS. Ash. II 6b' (his numbering of this manuscript), prints the Italian as 'I chorni del capitelo deono essere la quarta parte d'uno quadro' and glosses it in English; that gloss is a printed English for this line and may serve instead of ours.",
-   "passages": [
-    {
-     "index": 0,
-     "ref": "Ravaisson-Mollien vol. VI (1891), Ms 2037 (Ashburnham, B complement) fol. 3v, block 1 of 1",
-     "it": {
-      "text": "ichorni del capite lo. deono essere la quarta parte duno. quadro",
-      "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
-      }
-     },
-     "en": {
-      "text": "The horns of the capital must be the fourth part of a square.",
-      "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
-      "doubts": [
-       "'chorni' (corni, horns) are the corners of the capital, the projecting tips of the abacus; Ravaisson: 'coins'. English keeps 'horns', the architects' word; German uses 'Ecken'.",
-       "The printed line breaks 'capite / lo' (capitello) as the manuscript does; joined in the translations."
-      ]
-     },
-     "de": {
-      "text": "Die Ecken des Kapitells müssen der vierte Teil eines Quadrats sein.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "'chorni' (corni, horns) are the corners of the capital, the projecting tips of the abacus; Ravaisson: 'coins'. English keeps 'horns', the architects' word; German uses 'Ecken'.",
-       "The printed line breaks 'capite / lo' (capitello) as the manuscript does; joined in the translations."
-      ]
-     },
-     "fr": {
-      "text": "Les coins du chapiteau doivent être la quatrième partie d'un carré."
-     },
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. VI]: Manuscrits H de la Bibliothèque de l'Institut, Ash. 2038 et 2037 de la Bibliothèque nationale, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, suivis d'un appendice, Paris: Maison Quantin, 1891",
-       "page": "Ms 2037 (Ashburnham, B complement), FOLIO 3 (verso), transcription (under the heading [ARCHITECTURE D'ÉGLISES]); archive.org viewer page n307",
-       "url": "https://archive.org/details/lesmanuscritsdel06lo/page/n307/mode/1up"
-      },
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. VI]: Manuscrits H de la Bibliothèque de l'Institut, Ash. 2038 et 2037 de la Bibliothèque nationale, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, suivis d'un appendice, Paris: Maison Quantin, 1891",
-       "page": "Ms 2037 (Ashburnham, B complement), FOLIO 3 (verso), French translation (below the Italian); archive.org viewer page n307",
-       "url": "https://archive.org/details/lesmanuscritsdel06lo/page/n307/mode/1up"
-      }
-     ]
-    }
-   ]
-  },
-  "B.055": {
-   "lead": 0,
-   "notes": "Placement confirmed: Richter's Bibliography (vol. II p. 485, MS. B) lists '24a Pl. XCVI, No. 2, 757', his only passage from this side. Richter introduces it: 'On the left is a view of the exterior of the preceding plan. It is accompanied by the following note' (Pl. XCVI No. 2). Ravaisson vol. II prints the same passage under 'FOLIO 24 (recto)' and two more notes on the side, on scythes for ships ('la falce sia lunga braccia 8 ... siano tratte da 2 cortaldi', 'questa si debe trare alle chorde delle navi ...'; Polona scan 100, i.e. archive.org lesmanuscritsdel02lo leaf n102 by the facts-0929 rule; OCR not proofread here). Richter prints neither; they are not in this record. Ravaisson's footnote says the top of this page was reproduced in facsimile by Geymüller (Les projets primitifs, pl. 43, fig. 2). The curator's reason names the drawing; lead 0.",
-   "passages": [
-    {
-     "index": 0,
-     "ref": "Richter 1883 §757 (B. 24a), vol. II p. 53",
-     "it": {
-      "text": "Questo · edifitio è abitato di sopra e di sotto; di sopra · si va · per li campanili · e uassi sù per lo piano dove sono fondati · i · 4 · tiburi, e detto piano à uno parapetto dināzi, e di detti tiburi nessuno ne riesce in chiesa, anzi sono separati ī tutto.",
-      "label": {
-       "en": "Transcription: Jean Paul Richter, 1883",
-       "de": "Umschrift: Jean Paul Richter, 1883"
-      }
-     },
-     "en": {
-      "text": "This building is inhabited below and above; the way up is by the campaniles, and in going up one has to use the platform, where the drums of the four domes are, and this platform has a parapet in front, and none of these domes communicate with the church, but they are quite separate.",
-      "kind": "printed",
-      "label": "Translation: Jean Paul Richter, 1883"
-     },
-     "de": {
-      "text": "Dieses Gebäude ist oben und unten bewohnt. Nach oben geht man über die Glockentürme, und man steigt hinauf über die Plattform, auf der die 4 Kuppeln gegründet sind, und diese Plattform hat vorn eine Brüstung. Und keine dieser Kuppeln öffnet sich zur Kirche, vielmehr sind sie ganz getrennt.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "'abitato': literally 'inhabited', kept as 'bewohnt' (in use on both levels).",
-       "'tiburi': the tiburio is the dome or its drum over a centre; rendered 'Kuppeln'. Richter: 'the drums of the four domes'.",
-       "'nessuno ne riesce in chiesa': literally 'none comes out into the church'; read as none opening into the church (Richter: 'none of these domes communicate with the church')."
-      ]
-     },
-     "fr": null,
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
-       "page": "vol. II p. 53",
-       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n138/mode/1up"
-      },
-      {
-       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
-       "page": "vol. II p. 53",
-       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n138/mode/1up"
-      }
-     ]
-    }
-   ]
-  },
-  "AshB.034": {
-   "lead": 0,
-   "notes": "Heading (the editor's): '[POUR PRÊCHER]'. His notes: (1) the leaf was folio 92 [?] recto of Ms B; under the figures, a few lines in stylus; (2) J.-P. Richter, vol. II, pp. 55, 56, fig. 2, 57, figures 3 and 4 ('8a'). FOR THE CURATOR: Leonardo's own label calls the building a 'place where one preaches', not a tomb; Richter describes it as 'a most singular plan for a building', a theatre for preaching with the pulpit on a column at the centre. The curator's reason ('a great tomb in perspective') should be corrected before the words go up. Richter's glosses are a printed English for these two labels and may serve instead of ours. Page match checked: Ravaisson's phototype plate of 5 recto (archive.org viewer n314) shows the same leaf as the SET image (it reads 5 in the corner).",
-   "passages": [
-    {
-     "index": 0,
-     "ref": "Ravaisson-Mollien vol. VI (1891), Ms 2037 (Ashburnham, B complement) fol. 5r, block 1 of 1",
-     "it": {
-      "text": "[1re fig. :] locho. dove sipredicha\n[3e fig. :] fondamento",
-      "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
-      }
-     },
-     "en": {
-      "text": "[First figure:] Place where one preaches.\n[Third figure:] Foundation",
-      "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
-      "doubts": [
-       "'fondamento' (foundation) is the word Leonardo writes in plans for the ground plan; German 'Grundriss' says that, English keeps 'foundation'. J.-P. Richter notes that Leonardo often used the word for plans.",
-       "The bracketed figure numbers are the editor's: the first figure is the view of the exterior, the third the half-circle plan."
-      ]
-     },
-     "de": {
-      "text": "[Erste Figur:] Ort, an dem gepredigt wird.\n[Dritte Figur:] Grundriss",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "'fondamento' (foundation) is the word Leonardo writes in plans for the ground plan; German 'Grundriss' says that, English keeps 'foundation'. J.-P. Richter notes that Leonardo often used the word for plans.",
-       "The bracketed figure numbers are the editor's: the first figure is the view of the exterior, the third the half-circle plan."
-      ]
-     },
-     "fr": {
-      "text": "[1re fig. :] Lieu où on prêche.\n[3e fig. :] Fondement."
-     },
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. VI]: Manuscrits H de la Bibliothèque de l'Institut, Ash. 2038 et 2037 de la Bibliothèque nationale, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, suivis d'un appendice, Paris: Maison Quantin, 1891",
-       "page": "Ms 2037 (Ashburnham, B complement), FOLIO 5 (recto), transcription (under the heading [POUR PRÊCHER]); archive.org viewer page n313",
-       "url": "https://archive.org/details/lesmanuscritsdel06lo/page/n313/mode/1up"
-      },
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. VI]: Manuscrits H de la Bibliothèque de l'Institut, Ash. 2038 et 2037 de la Bibliothèque nationale, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, suivis d'un appendice, Paris: Maison Quantin, 1891",
-       "page": "Ms 2037 (Ashburnham, B complement), FOLIO 5 (recto), French translation (below the Italian); archive.org viewer page n313",
-       "url": "https://archive.org/details/lesmanuscritsdel06lo/page/n313/mode/1up"
-      }
-     ]
-    }
-   ]
-  },
-  "B.044": {
-   "lead": 0,
-   "notes": "Placement confirmed: Richter's Bibliography (vol. II p. 485, MS. B) lists '18b Pl. LXXXVII, No. 2, 755, Fo', his only passage from this side. Richter's footnote: 'This text is to the left of the domed church reproduced on Pl. LXXXVII, No. 2.' Ravaisson vol. II prints this side as 'FOLIO 18 (verso)' with more notes that Richter does not print: the night watch of fortresses ('leguardie delle roche si debon fare notte per notte ...'), the centre of a hanging weight ('il cientro di ciascuno peso sospeso si stabilisce sotto il suo sostentaculo'), a fortress that sweeps the ditches, and a fortress with three gates and a portcullis (Polona scan 78, i.e. archive.org lesmanuscritsdel02lo leaf n80 by the facts-0929 rule; OCR not proofread here). They are not in this record. The curator's reason names the drawing; lead 0.",
-   "passages": [
-    {
-     "index": 0,
-     "ref": "Richter 1883 §755 (B. 18b), vol. II p. 37",
-     "it": {
-      "text": "A nessuna chiesa sta bene vedere tetti, āzi sia rappianato e per canali l'acqua discēda ai condotti fatti nel fregiō.",
-      "label": {
-       "en": "Transcription: Jean Paul Richter, 1883",
-       "de": "Umschrift: Jean Paul Richter, 1883"
-      }
-     },
-     "en": {
-      "text": "It never looks well to see the roofs of a church; they should rather be flat and the water should run off by gutters made in the frieze.",
-      "kind": "printed",
-      "label": "Translation: Jean Paul Richter, 1883"
-     },
-     "de": {
-      "text": "Keiner Kirche steht es gut an, dass man ihre Dächer sieht. Vielmehr soll das Dach eingeebnet sein, und das Wasser soll durch Rinnen zu den Leitungen hinablaufen, die im Fries angelegt sind.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "'sia rappianato': the subject is not stated; read as the roof, as Richter reads it ('they should rather be flat').",
-       "'fregiō': Richter prints a macron over the final o; Ravaisson reads the manuscript as 'fregiona'. Neither changes the sense 'frieze'."
-      ]
-     },
-     "fr": null,
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
-       "page": "vol. II p. 37",
-       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n102/mode/1up"
-      },
-      {
-       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
-       "page": "vol. II p. 37",
-       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n102/mode/1up"
-      }
-     ]
-    }
-   ]
-  },
-  "B.051": {
-   "lead": 0,
-   "notes": "Heading (the editor's): 'ARCHITECTURE — MÉCANIQUE'. The page's text is about a machine with a box, levers and screws that is heated; nothing in it refers to the domed church the curator chose, so 'lead' is null. Italian and French Errata applied. A mark before the second block's dash on the Polona copy is not a letter.",
-   "passages": [
-    {
-     "index": 0,
-     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 22r, block 1 of 2",
-     "it": {
-      "text": "— il tramvtare di m. infra. s. n. sifa perche. quando. g. tochissi. h. la cassa tocherebe il mvro e la lieua. m. non ui. potre stare dentro e conchivgo chelangolo [della cassa] sotto. g. tochi le 2 faccie di. g. chiso. volte. allui e non mouere selacassa non napariscie. li. alquanto infocata",
-      "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
-      }
-     },
-     "en": {
-      "text": "The moving of m between s and n is done because, if g touched h, the box would touch the wall and the lever m could not stay inside; and I conclude that the angle [of the box] under g should touch the 2 faces of g that are turned towards it. And do not move it unless the box looks somewhat red-hot.",
-      "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
-      "doubts": [
-       "'e non mouere' is read as a command (do not move it), the old negative imperative; Ravaisson reads a statement ('il n'y aura pas de déplacement').",
-       "'[della cassa]' is the editor's insertion, kept in brackets.",
-       "What the box and the heat are for is not said on this page."
-      ]
-     },
-     "de": {
-      "text": "Das Versetzen von m zwischen s und n geschieht, weil der Kasten, wenn g an h stieße, an die Mauer stoßen würde und der Hebel m nicht darin bleiben könnte; und ich schließe, dass die Ecke [des Kastens] unter g die 2 Seiten von g berühren soll, die ihr zugewandt sind. Und bewege ihn nicht, solange der Kasten nicht etwas glühend aussieht.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "'e non mouere' is read as a command (do not move it), the old negative imperative; Ravaisson reads a statement ('il n'y aura pas de déplacement').",
-       "'[della cassa]' is the editor's insertion, kept in brackets.",
-       "What the box and the heat are for is not said on this page."
-      ]
-     },
-     "fr": {
-      "text": "— La transmission de m en s n se fait, parce que quand [si] g touchait h, la caisse toucherait le mur et le levier m ne pourrait rester dedans; je conclus que l'angle (de la caisse) sous g touche les 2 faces [côtés] de g qui sont tournées vers lui, et il n'y aura pas de déplacement si la caisse n'en apparaît pas un peu embrasée."
-     },
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
-       "page": "FOLIO 22 (recto), the transcription below the facsimile plate; archive.org leaf n94",
-       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n94/mode/1up"
-      },
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
-       "page": "FOLIO 22 (recto), the facing page of the plate; archive.org leaf n93",
-       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n93/mode/1up"
-      }
-     ]
-    },
-    {
-     "index": 1,
-     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 22r, block 2 of 2",
-     "it": {
-      "text": "— fache. la. lieva. m. m. sia. femina cholfigliolo inchorpo ecquando laltra. femina. n. se tanta allontanata dalla. chonpagnia quanto. e grossa. la femmina. m. ettu. spicha tutto. lo strumento ~~e in e trai~~ e cava. fori. la lieua femina ~~me e~~ m. e poi trai via. la femina. n. e metti m. nello spatio chessara fatto infra. n. s e poi rimetti. n. al suo. locho e adopera la lieua femina attuo. modo — a. sie. vn fero che sta. trala forma el fero aciosi schaldi. meglio. b. ecquando fai questo ofitio dismonta",
-      "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
-      }
-     },
-     "en": {
-      "text": "Make the lever m m a female with its son in its body; and when the other female n has moved as far from its companion as the female m is thick, detach the whole instrument and take out the female lever m, then remove the female n and put m in the space that will have been made between n and s, then put n back in its place, and use the female lever as you please. a is an iron that stands between the mould and the iron, so that b heats better; and when you do this work, take it apart [?].",
-      "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
-      "doubts": [
-       "Errata applied: line 4, 'li. eva. m. n.' is to be read 'lieva. m. m.' (Errata du manuscrit B, p. 6).",
-       "'femina' (female) is Leonardo's word for a nut, the part a screw turns in; 'figliolo' (son) is probably the screw inside it. The German 'Mutter' carries both senses.",
-       "'dismonta' may mean 'take it apart' or 'get down'; Ravaisson marks 'démonte [?]'.",
-       "Struck-out words printed in italics ('e in e trai', 'me e') are left out.",
-       "'forma' (mould or form) is not explained; Ravaisson marks 'la forme [?]'."
-      ]
-     },
-     "de": {
-      "text": "Mache den Hebel m m zu einer Mutter mit ihrem Sohn im Leib; und wenn sich die andere Mutter n so weit von ihrer Gefährtin entfernt hat, wie die Mutter m dick ist, dann löse das ganze Instrument, zieh den Mutterhebel m heraus, nimm dann die Mutter n weg und setze m in den Raum, der zwischen n und s entstanden ist; dann setze n wieder an seinen Platz und gebrauche den Mutterhebel nach deinem Belieben. a ist ein Eisen, das zwischen der Form und dem Eisen steht, damit sich b besser erhitzt; und wenn du diese Arbeit machst, nimm es auseinander [?].",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "Errata applied: line 4, 'li. eva. m. n.' is to be read 'lieva. m. m.' (Errata du manuscrit B, p. 6).",
-       "'femina' (female) is Leonardo's word for a nut, the part a screw turns in; 'figliolo' (son) is probably the screw inside it. The German 'Mutter' carries both senses.",
-       "'dismonta' may mean 'take it apart' or 'get down'; Ravaisson marks 'démonte [?]'.",
-       "Struck-out words printed in italics ('e in e trai', 'me e') are left out.",
-       "'forma' (mould or form) is not explained; Ravaisson marks 'la forme [?]'."
-      ]
-     },
-     "fr": {
-      "text": "— Fais que le levier m m soit femme avec son fils dans le corps; quand l'autre femme n s'est autant éloignée de sa compagne qu'est grosse la femme m, tu détaches tout l'instrument et tires au dehors le levier femme m, puis tu enlèves la femme n et tu mets m dans l'espace qui sera fait entre n et s et puis tu remets n à sa place, et tu emploies le levier femme à ta guise — a est un fer qui se trouve entre la forme [?] et le fer, afin que b s'échauffe mieux, et quand tu fais cet office [cette opération], démonte [?]."
-     },
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
-       "page": "FOLIO 22 (recto), the transcription below the facsimile plate; archive.org leaf n94",
-       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n94/mode/1up"
-      },
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
-       "page": "FOLIO 22 (recto), the facing page of the plate; archive.org leaf n93",
-       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n93/mode/1up"
       }
      ]
     }
    ]
   },
   "B.120": {
-   "lead": 1,
+   "lead": null,
    "notes": "Heading (the editor's): 'ARCHITECTURE D'ÉGLISE'. Italian Errata applied. The note asks for 12 faces and 12 tabernacles, while the curator's reason describes a plan with eight lobed chapels; the note may belong to the small round temple (Ravaisson places a b at the top of the last figure). A broken letter in 'tabernaculi' on the Polona copy is read from the context.",
    "passages": [
     {
@@ -731,14 +486,14 @@
      "it": {
       "text": "— a b —",
       "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "a b",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1883), checked against his French translation (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
       "doubts": [
        "Letters of the drawing; Ravaisson's footnote puts them at the top of the last figure."
       ]
@@ -746,9 +501,9 @@
      "de": {
       "text": "a b",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1883) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
       "doubts": [
-       "Letters of the drawing; Ravaisson's footnote puts them at the top of the last figure."
+       "Buchstaben der Zeichnung; Ravaissons Fußnote setzt sie oben an die letzte Figur."
       ]
      },
      "fr": {
@@ -774,14 +529,14 @@
      "it": {
       "text": "— questo. vole. avere 12. facce. con. 12 tabernaculi come. a. b.",
       "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "This one should have 12 faces, with 12 tabernacles, like a b.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1883), checked against his French translation (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
       "doubts": [
        "Errata applied: line 2, 'come' is to be read 'come. a. b.' (Errata du manuscrit B, p. 7).",
        "'tabernaculi' are small shrines or chapels; Ravaisson glosses '[chapelles à coupoles]' (domed chapels)."
@@ -790,10 +545,10 @@
      "de": {
       "text": "Dieser soll 12 Seiten haben, mit 12 Tabernakeln, wie a b.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1883) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
       "doubts": [
-       "Errata applied: line 2, 'come' is to be read 'come. a. b.' (Errata du manuscrit B, p. 7).",
-       "'tabernaculi' are small shrines or chapels; Ravaisson glosses '[chapelles à coupoles]' (domed chapels)."
+       "Errata angewandt: In Zeile 2 ist 'come' als 'come. a. b.' zu lesen (Errata du manuscrit B, S. 7).",
+       "'tabernaculi' sind kleine Schreine oder Kapellen; Ravaisson erklärt '[chapelles à coupoles]' (Kapellen mit Kuppeln)."
       ]
      },
      "fr": {
@@ -810,6 +565,338 @@
        "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
        "page": "FOLIO 56 (verso), the facing page of the plate; archive.org leaf n231",
        "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n231/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "B.051": {
+   "lead": null,
+   "notes": "Heading (the editor's): 'ARCHITECTURE — MÉCANIQUE'. The page's text is about a machine with a box, levers and screws that is heated; nothing in it refers to the domed church the curator chose, so 'lead' is null. Italian and French Errata applied. A mark before the second block's dash on the Polona copy is not a letter.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 22r, block 1 of 2",
+     "it": {
+      "text": "— il tramvtare di m. infra. s. n. sifa perche. quando. g. tochissi. h. la cassa tocherebe il mvro e la lieua. m. non ui. potre stare dentro e conchivgo chelangolo [della cassa] sotto. g. tochi le 2 faccie di. g. chiso. volte. allui e non mouere selacassa non napariscie. li. alquanto infocata",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "The moving of m between s and n is done because, if g touched h, the box would touch the wall and the lever m could not stay inside; and I conclude that the angle [of the box] under g should touch the 2 faces of g that are turned towards it. And do not move it unless the box looks somewhat red-hot.",
+      "kind": "ours",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1883), checked against his French translation (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+      "doubts": [
+       "'e non mouere' is read as a command (do not move it), the old negative imperative; Ravaisson reads a statement ('il n'y aura pas de déplacement').",
+       "'[della cassa]' is the editor's insertion, kept in brackets.",
+       "What the box and the heat are for is not said on this page."
+      ]
+     },
+     "de": {
+      "text": "Das Versetzen von m zwischen s und n geschieht, weil der Kasten, wenn g an h stieße, an die Mauer stoßen würde und der Hebel m nicht darin bleiben könnte; und ich schließe, dass die Ecke [des Kastens] unter g die 2 Seiten von g berühren soll, die ihr zugewandt sind. Und bewege ihn nicht, solange der Kasten nicht etwas glühend aussieht.",
+      "kind": "ours",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1883) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "doubts": [
+       "'e non mouere' wird als Befehl gelesen (bewege ihn nicht), der alte verneinte Imperativ; Ravaisson liest eine Aussage ('il n'y aura pas de déplacement').",
+       "'[della cassa]' ist eine Ergänzung des Herausgebers und bleibt in Klammern.",
+       "Wozu der Kasten und die Hitze dienen, sagt diese Seite nicht."
+      ]
+     },
+     "fr": {
+      "text": "— La transmission de m en s n se fait, parce que quand [si] g touchait h, la caisse toucherait le mur et le levier m ne pourrait rester dedans; je conclus que l'angle (de la caisse) sous g touche les 2 faces [côtés] de g qui sont tournées vers lui, et il n'y aura pas de déplacement si la caisse n'en apparaît pas un peu embrasée."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 22 (recto), the transcription below the facsimile plate; archive.org leaf n94",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n94/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 22 (recto), the facing page of the plate; archive.org leaf n93",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n93/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 22r, block 2 of 2",
+     "it": {
+      "text": "— fache. la. lieva. m. m. sia. femina cholfigliolo inchorpo ecquando laltra. femina. n. se tanta allontanata dalla. chonpagnia quanto. e grossa. la femmina. m. ettu. spicha tutto. lo strumento ~~e in e trai~~ e cava. fori. la lieua femina ~~me e~~ m. e poi trai via. la femina. n. e metti m. nello spatio chessara fatto infra. n. s e poi rimetti. n. al suo. locho e adopera la lieua femina attuo. modo — a. sie. vn fero che sta. trala forma el fero aciosi schaldi. meglio. b. ecquando fai questo ofitio dismonta",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "Make the lever m m a female with its son in its body; and when the other female n has moved as far from its companion as the female m is thick, detach the whole instrument and take out the female lever m, then remove the female n and put m in the space that will have been made between n and s, then put n back in its place, and use the female lever as you please. a is an iron that stands between the mould and the iron, so that b heats better; and when you do this work, take it apart [?].",
+      "kind": "ours",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1883), checked against his French translation (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+      "doubts": [
+       "Errata applied: line 4, 'li. eva. m. n.' is to be read 'lieva. m. m.' (Errata du manuscrit B, p. 6).",
+       "'femina' (female) is Leonardo's word for a nut, the part a screw turns in; 'figliolo' (son) is probably the screw inside it. The German 'Mutter' carries both senses.",
+       "'dismonta' may mean 'take it apart' or 'get down'; Ravaisson marks 'démonte [?]'.",
+       "Struck-out words printed in italics ('e in e trai', 'me e') are left out.",
+       "'forma' (mould or form) is not explained; Ravaisson marks 'la forme [?]'."
+      ]
+     },
+     "de": {
+      "text": "Mache den Hebel m m zu einer Mutter mit ihrem Sohn im Leib; und wenn sich die andere Mutter n so weit von ihrer Gefährtin entfernt hat, wie die Mutter m dick ist, dann löse das ganze Instrument, zieh den Mutterhebel m heraus, nimm dann die Mutter n weg und setze m in den Raum, der zwischen n und s entstanden ist; dann setze n wieder an seinen Platz und gebrauche den Mutterhebel nach deinem Belieben. a ist ein Eisen, das zwischen der Form und dem Eisen steht, damit sich b besser erhitzt; und wenn du diese Arbeit machst, nimm es auseinander [?].",
+      "kind": "ours",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1883) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "doubts": [
+       "Errata angewandt: In Zeile 4 ist 'li. eva. m. n.' als 'lieva. m. m.' zu lesen (Errata du manuscrit B, S. 6).",
+       "'femina' (wörtlich 'die Weibliche') ist Leonardos Wort für eine Schraubenmutter, das Teil, in dem sich eine Schraube dreht; 'figliolo' (Sohn) ist wohl die Schraube darin. Das deutsche 'Mutter' trägt beide Bedeutungen.",
+       "'dismonta' kann 'nimm es auseinander' oder 'steig ab' heißen; Ravaisson markiert 'démonte [?]'.",
+       "Gestrichene, kursiv gedruckte Wörter ('e in e trai', 'me e') sind weggelassen.",
+       "'forma' (Gussform oder Form) wird nicht erklärt; Ravaisson markiert 'la forme [?]'."
+      ]
+     },
+     "fr": {
+      "text": "— Fais que le levier m m soit femme avec son fils dans le corps; quand l'autre femme n s'est autant éloignée de sa compagne qu'est grosse la femme m, tu détaches tout l'instrument et tires au dehors le levier femme m, puis tu enlèves la femme n et tu mets m dans l'espace qui sera fait entre n et s et puis tu remets n à sa place, et tu emploies le levier femme à ta guise — a est un fer qui se trouve entre la forme [?] et le fer, afin que b s'échauffe mieux, et quand tu fais cet office [cette opération], démonte [?]."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 22 (recto), the transcription below the facsimile plate; archive.org leaf n94",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n94/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 22 (recto), the facing page of the plate; archive.org leaf n93",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n93/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "B.055": {
+   "lead": 0,
+   "notes": "Placement confirmed: Richter's Bibliography (vol. II p. 485, MS. B) lists '24a Pl. XCVI, No. 2, 757', his only passage from this side. Richter introduces it: 'On the left is a view of the exterior of the preceding plan. It is accompanied by the following note' (Pl. XCVI No. 2). Ravaisson vol. II prints the same passage under 'FOLIO 24 (recto)' and two more notes on the side, on scythes for ships ('la falce sia lunga braccia 8 ... siano tratte da 2 cortaldi', 'questa si debe trare alle chorde delle navi ...'; Polona scan 100, i.e. archive.org lesmanuscritsdel02lo leaf n102 by the facts-0929 rule; OCR not proofread here). Richter prints neither; they are not in this record. Ravaisson's footnote says the top of this page was reproduced in facsimile by Geymüller (Les projets primitifs, pl. 43, fig. 2). The curator's reason names the drawing; lead 0.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §757 (B. 24a), vol. II p. 53",
+     "it": {
+      "text": "Questo · edifitio è abitato di sopra e di sotto; di sopra · si va · per li campanili · e uassi sù per lo piano dove sono fondati · i · 4 · tiburi, e detto piano à uno parapetto dināzi, e di detti tiburi nessuno ne riesce in chiesa, anzi sono separati ī tutto.",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "This building is inhabited below and above; the way up is by the campaniles, and in going up one has to use the platform, where the drums of the four domes are, and this platform has a parapet in front, and none of these domes communicate with the church, but they are quite separate.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     },
+     "de": {
+      "text": "Dieses Gebäude ist oben und unten begehbar. Nach oben geht man über die Glockentürme, und man steigt hinauf über die Plattform, auf der die 4 Kuppeln gegründet sind, und diese Plattform hat vorn eine Brüstung. Und keine dieser Kuppeln öffnet sich zur Kirche, vielmehr sind sie ganz getrennt.",
+      "kind": "ours",
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Jean Paul Richter, 1883, Englisch vor allem von Mrs R. C. Bell). Sie kann Fehler enthalten.",
+      "doubts": [
+       "'abitato': wörtlich 'bewohnt', übersetzt mit 'begehbar' (auf beiden Ebenen in Gebrauch).",
+       "'tiburi': Der tiburio ist die Kuppel oder ihr Tambour über einer Mitte; übersetzt mit 'Kuppeln'. Richter: 'the drums of the four domes' (die Tamboure der vier Kuppeln).",
+       "'nessuno ne riesce in chiesa': wörtlich 'keiner kommt in die Kirche heraus'; gelesen als: keine öffnet sich zur Kirche (Richter: 'none of these domes communicate with the church')."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 53",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n138/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 53",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n138/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "AshB.034": {
+   "lead": null,
+   "notes": "Heading (the editor's): '[POUR PRÊCHER]'. His notes: (1) the leaf was folio 92 [?] recto of Ms B; under the figures, a few lines in stylus; (2) J.-P. Richter, vol. II, pp. 55, 56, fig. 2, 57, figures 3 and 4 ('8a'). FOR THE CURATOR: Leonardo's own label calls the building a 'place where one preaches', not a tomb; Richter describes it as 'a most singular plan for a building', a theatre for preaching with the pulpit on a column at the centre. The curator's reason ('a great tomb in perspective') should be corrected before the words go up. Richter's glosses are a printed English for these two labels and may serve instead of ours. Page match checked: Ravaisson's phototype plate of 5 recto (archive.org viewer n314) shows the same leaf as the SET image (it reads 5 in the corner).",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. VI (1891), Ms 2037 (Ashburnham, B complement) fol. 5r, block 1 of 1",
+     "it": {
+      "text": "[1re fig. :] locho. dove sipredicha\n[3e fig. :] fondamento",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "[First figure:] Place where one preaches.\n[Third figure:] Foundation",
+      "kind": "ours",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1891), checked against his French translation (Ravaisson-Mollien, vol. VI, 1891). It may contain errors.",
+      "doubts": [
+       "'fondamento' (foundation) is the word Leonardo writes in plans for the ground plan; German 'Grundriss' says that, English keeps 'foundation'. J.-P. Richter notes that Leonardo often used the word for plans.",
+       "The bracketed figure numbers are the editor's: the first figure is the view of the exterior, the third the half-circle plan."
+      ]
+     },
+     "de": {
+      "text": "[Erste Figur:] Ort, an dem gepredigt wird.\n[Dritte Figur:] Grundriss",
+      "kind": "ours",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1891) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. VI, 1891). Sie kann Fehler enthalten.",
+      "doubts": [
+       "'fondamento' (Fundament) ist das Wort, das Leonardo auf Plänen für den Grundriss schreibt; das deutsche 'Grundriss' sagt das, das Englische behält 'foundation'. J.-P. Richter merkt an, dass Leonardo das Wort oft für Grundrisse gebrauchte.",
+       "Die Figurennummern in Klammern stammen vom Herausgeber: Die erste Figur ist die Außenansicht, die dritte der halbkreisförmige Grundriss."
+      ]
+     },
+     "fr": {
+      "text": "[1re fig. :] Lieu où on prêche.\n[3e fig. :] Fondement."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. VI]: Manuscrits H de la Bibliothèque de l'Institut, Ash. 2038 et 2037 de la Bibliothèque nationale, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, suivis d'un appendice, Paris: Maison Quantin, 1891",
+       "page": "Ms 2037 (Ashburnham, B complement), FOLIO 5 (recto), transcription (under the heading [POUR PRÊCHER]); archive.org viewer page n313",
+       "url": "https://archive.org/details/lesmanuscritsdel06lo/page/n313/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. VI]: Manuscrits H de la Bibliothèque de l'Institut, Ash. 2038 et 2037 de la Bibliothèque nationale, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, suivis d'un appendice, Paris: Maison Quantin, 1891",
+       "page": "Ms 2037 (Ashburnham, B complement), FOLIO 5 (recto), French translation (below the Italian); archive.org viewer page n313",
+       "url": "https://archive.org/details/lesmanuscritsdel06lo/page/n313/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "TR.130": {
+   "lead": null,
+   "notes": "Both lines are also read and translated by Richter (1883, vol. II, p. 61), who describes the large drawing as 'a section of a very elevated dome, with double vaults, connected by ribs and buttresses ingeniously disposed, so as to bring the weight of the lantern to bear on the base of the dome'. The English of both passages is Richter's, printed; the German is ours. Beltrami's own note on this plate (Note, p. 305, Polona scan index 306, https://polona2.pl/archive?uid=146395095&cid=148035766&name=download_fullJPG): 'Il Richter ha riprodotto quasi interamente questo foglio nel vol. II, Tav. C, fig. 4. Lo schizzo di cupola è particolarmente interessante perchè si collega agli studii di Leonardo per il tiburio del Duomo di Milano. Vedi Codice Atlantico, fol. 146 r.' Lead: the curator's reason names the dome with its piers; passage 2 is the note written under the dome section about the pier's load. Page match: the SET image p0130 is Beltrami's Tavola 37 (fol. 22 v.), and the facing transcription page p0131 is headed 'Tavola 37.a, fol. 22 v. (41)'.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Beltrami 1891, Tavola 37, fol. 22 v. (41), passage 1 of 2 (the note beside the small arch)",
+     "placement": "top right of the leaf, beside a small sketch of an arch with a line running down from it; Beltrami's transcription page, which faces the plate, sets it top left",
+     "it": {
+      "text": "larcho regie . tanto . sotto . asse\nchome disopra . se —",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "The arch supports as much below it [i. e. a hanging weight] as above it",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     },
+     "de": {
+      "text": "Der Bogen trägt ebenso viel unter sich wie über sich.",
+      "kind": "ours",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Beltrami (1891) gedruckten Italienisch, geprüft an Richters englischer Übersetzung (1883, Bd. II, S. 61). Sie kann Fehler enthalten.",
+      "doubts": [
+       "Beltrami druckt 'regie' (regge: trägt, stützt); Richter liest 'regierà' (wird tragen). Der Sinn ist derselbe.",
+       "Was unter dem Bogen hängt, steht nicht da. Richter ergänzt '[i. e. a hanging weight]' (also ein hängendes Gewicht); das Deutsche lässt es offen wie das Italienische.",
+       "Der Strich nach 'se' steht so in Beltramis Druck und bleibt im Italienischen."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Il Codice di Leonardo da Vinci nella Biblioteca del Principe Trivulzio in Milano, trascritto ed annotato da Luca Beltrami, riprodotto in 94 tavole eliografiche da Angelo Della Croce, Milano 1891 (MDCCCXCI)",
+       "page": "Tavola 37.a, fol. 22 v. (41): the transcription page facing the plate (unpaginated); Polona scan index 130",
+       "url": "https://polona2.pl/archive?uid=146395095&cid=148035500&name=download_fullJPG"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 61, the commentary after §758 (on Pl. C, No. 4, MS. Tr. 41)",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n156/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Beltrami 1891, Tavola 37, fol. 22 v. (41), passage 2 of 2 (the note under the dome section)",
+     "placement": "left of the leaf, under the large dome section, above the round pillar sketches; Beltrami's transcription page sets it on the right",
+     "it": {
+      "text": "il pilastro sara cha\nricho . in . a . b",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "The column will bear the weight at a b.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     },
+     "de": {
+      "text": "Der Pfeiler wird bei a b belastet sein.",
+      "kind": "ours",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Beltrami (1891) gedruckten Italienisch, geprüft an Richters englischer Übersetzung (1883, Bd. II, S. 61). Sie kann Fehler enthalten.",
+      "doubts": [
+       "'pilastro' ist ein Pfeiler oder eine Stütze; Richter sagt 'column' (Säule) und beschreibt die Skizze als 'a round pillar on which is indicated which part of its summit is to bear the weight' (ein runder Pfeiler, an dem angegeben ist, welcher Teil seines oberen Endes die Last tragen soll)."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Il Codice di Leonardo da Vinci nella Biblioteca del Principe Trivulzio in Milano, trascritto ed annotato da Luca Beltrami, riprodotto in 94 tavole eliografiche da Angelo Della Croce, Milano 1891 (MDCCCXCI)",
+       "page": "Tavola 37.a, fol. 22 v. (41): the transcription page facing the plate (unpaginated); Polona scan index 130",
+       "url": "https://polona2.pl/archive?uid=146395095&cid=148035500&name=download_fullJPG"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 61, the commentary after §758 (on Pl. C, No. 4, MS. Tr. 41)",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n156/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "B.044": {
+   "lead": 0,
+   "notes": "Placement confirmed: Richter's Bibliography (vol. II p. 485, MS. B) lists '18b Pl. LXXXVII, No. 2, 755, Fo', his only passage from this side. Richter's footnote: 'This text is to the left of the domed church reproduced on Pl. LXXXVII, No. 2.' Ravaisson vol. II prints this side as 'FOLIO 18 (verso)' with more notes that Richter does not print: the night watch of fortresses ('leguardie delle roche si debon fare notte per notte ...'), the centre of a hanging weight ('il cientro di ciascuno peso sospeso si stabilisce sotto il suo sostentaculo'), a fortress that sweeps the ditches, and a fortress with three gates and a portcullis (Polona scan 78, i.e. archive.org lesmanuscritsdel02lo leaf n80 by the facts-0929 rule; OCR not proofread here). They are not in this record. The curator's reason names the drawing; lead 0.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §755 (B. 18b), vol. II p. 37",
+     "it": {
+      "text": "A nessuna chiesa sta bene vedere tetti, āzi sia rappianato e per canali l'acqua discēda ai condotti fatti nel fregiō.",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "It never looks well to see the roofs of a church; they should rather be flat and the water should run off by gutters made in the frieze.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     },
+     "de": {
+      "text": "Keiner Kirche steht es gut an, dass man ihre Dächer sieht. Vielmehr soll das Dach eingeebnet sein, und das Wasser soll durch Rinnen zu den Leitungen hinablaufen, die im Fries angelegt sind.",
+      "kind": "ours",
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Jean Paul Richter, 1883, Englisch vor allem von Mrs R. C. Bell). Sie kann Fehler enthalten.",
+      "doubts": [
+       "'sia rappianato': Das Subjekt steht nicht da; gelesen als das Dach, wie bei Richter ('they should rather be flat').",
+       "'fregiō': Richter druckt einen Querstrich über dem letzten o; Ravaisson liest in der Handschrift 'fregiona'. Beides ändert nichts am Sinn 'Fries'."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 37",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n102/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 37",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n102/mode/1up"
       }
      ]
     }

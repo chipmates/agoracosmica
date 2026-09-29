@@ -284,8 +284,10 @@ function passagesOf(record) {
       const kind = t.kind === 'printed' ? 'printed' : 'ours'
       const edition = kind === 'printed' ? editionOf(t.edition) : editionOf(t.basis) ?? itEdition
       out[lang] = { text: struck(t.text), kind, label: translationLabel(kind, edition, lang, t) }
-      // what the translator could not settle goes on the record, in the language it was written for
-      const doubts = (lang === 'de' ? t.de_doubts ?? t.doubts : t.doubts) ?? []
+      // what the translator could not settle goes on the record; `doubts` is
+      // English on every block, so a German page shows only `doubts_de`,
+      // and nothing where that is not written, never the English
+      const doubts = (lang === 'de' ? t.doubts_de : t.doubts) ?? []
       if (doubts.length) out[lang].doubts = doubts
     }
     out.fr = p.fr?.text ? { text: struck(p.fr.text) } : null
@@ -380,7 +382,10 @@ function codexName(codex, lang) {
   return name.split(',')[0].trim()
 }
 const folioOf = row => /^\d+$/.test(row.folio) ? `${row.folio}${row.side === 'recto' ? 'r' : row.side === 'verso' ? 'v' : ''}` : row.folio
-const seatOf = row => Object.fromEntries(['en', 'de'].map(lang => [lang, `${codexName(row.codex, lang)}, ${folioOf(row)}`]))
+// a folio written out in words is English in the set, so the German seat
+// names the book alone until the words pass writes the place
+const seatOf = row => Object.fromEntries(['en', 'de'].map(lang => [lang,
+  lang === 'de' && !/^\d+[a-z]?$/.test(row.folio) ? codexName(row.codex, lang) : `${codexName(row.codex, lang)}, ${folioOf(row)}`]))
 
 /** WHAT THE PICTURE IS: a photograph of the leaf, a printed plate of a
  * facsimile, or a photograph of a printed facsimile, by where it came from. */
@@ -544,7 +549,8 @@ const PLATES_FILE = join(DATA, 'best-of-plates.json')
 const PLATES = existsSync(PLATES_FILE) ? JSON.parse(readFileSync(PLATES_FILE, 'utf8')).plates ?? {} : {}
 for (const page of pages) {
   const plate = PLATES[page.id]
-  page.plate = plate ? { path: plate.path, window: plate.window ?? null } : null
+  // the plate's own pixels travel with it, since the 1883 volume's records name none
+  page.plate = plate?.width && plate.height ? { path: plate.path, window: plate.window ?? null, width: plate.width, height: plate.height } : null
   // THE MIRROR TURNS ONLY WHAT MAY BE TURNED: the Institut's own views are
   // shown as they are, and their mirror is the printed plate or nothing
   page.mirror = !page.writing || page.hand === 'copy' ? 'none'

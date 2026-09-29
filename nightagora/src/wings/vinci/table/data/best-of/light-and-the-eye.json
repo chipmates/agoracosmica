@@ -1,184 +1,35 @@
 {
  "topic": "light-and-the-eye",
  "pages": {
-  "AR1.303": {
+  "AshA.040": {
    "lead": 0,
-   "notes": "The Italian is the edition's critical transcription (see AR1.293 for the two transcriptions). The four passages are the text under the half-circle mirror; the first states what the drawing shows (the curved boundary of the reflected rays, which reaches at most a quarter of the diameter), so it is the lead. Page match: the SET image is this edition's plate of fol. 87 recto (p0303 of the same scan); the diplomatic page facing it is headed 'Fol. 87 recto'.",
+   "notes": "Placement confirmed: Ravaisson vol. VI prints this passage under Ms 2038 'FOLIO 14 (recto)' (https://archive.org/details/lesmanuscritsdel06lo/page/n211/mode/1up) with the footnote 'J.-P. Richter, t. I, no 149 (21b), et pl. III, no 2'. Richter's 'Ash. I. 21b' is his own count; Ravaisson's and the library's folio is 14 recto. Richter's footnote: 'The diagram belonging to this chapter is No. 2 on Plate III. In the original it is placed between lines 3 and 4, and in the reproduction these are shown in part. The semi circle above is marked orizonte (horizon). The number 6 at the left hand side, outside the facsimile, is in the place of a figure which has become indistinct in the original.' The curator's reason names the drawing, which this passage explains; lead 0.",
    "passages": [
     {
      "index": 0,
-     "ref": "Codice Arundel 263 (1923), fol. 87 recto, trascrizione critica, passage 1 of 4",
+     "ref": "Richter 1883 §149 (Ash. I. 21b), vol. I pp. 87-88",
      "it": {
-      "text": "Ecco qui che lo spechio concavo di mezo corpo sperico ha le ipotemisse curve, le quale dentro a di loro includano il concorso de' razi refressi, i quali s'astendano il più insino alla quarta parte del diamitro della predetta spera, e tanto più, quanto è la minor parte che imaginar si possa vicina a esso termine. La qual così si dimostra.",
+      "text": "Ogni · lume · che cade · sopra · ai corpi ōbrosi · īfra equali · āgoli tiene il primo grado · di chiarezza · e quello fia piv scuro che ricieve l'āgoli meno · equali e il lume · o l'onbre faño loro · ofitio per piramide; l'angolo · c · tiene · jl primo · grado · di chiarezza · perchè gli uede · tutta · la finestra · a · b · e tutto l'orizzōte del cielo · m · x ·, l'angolo · d · fa poca · differētia da · c · perchè li āgoli che lo mettono ī mezzo · nō sono tāto difformi di proportione · quāto li altri · di sotto · e mācagli solamēte quella parte dell'orizzōte · ch'è tra · y · x · bench'eli acquisti altrettāto dall'opposito lato · nōdimeno la sua linia è di poca potēza perchè il suo angolo · è minore · che'l suo cōpagno, l'angoli · e · i · fiā di minore lume perchè · egli · non vede manco · il lume · m · s · e 'l lume v · x · e i loro āgoli sono assai disformi: l'angolo · k · e l'angolo · f · sono messi in mezzo ciascū · per se · da āgoli · molto diformi l'uno dal'altro e però fieno di poco lume · perchè in · k · vede solamēte il lume · p · t · e in · f; nō uede se nō t · q · | o · g · fia l'ultimo grado di lume perchè lì nō uede nessuna parte del lume del'orizzōte · e sono quelle le linie che vn altra volta ricōpōgono una · piramide · simile · alla piramide · c · la quale piramide · l si troverà nel primo grado · d'ōbra, perchè ācora lei cade īfra · equali āgoli e essi āgoli · si dirizzano e si sguardano per una · linia retta che passa dal cientro del corpo ōbroso e capita al mezzo del lume; le spetie luminose mvltiplicate · ne' termini della · finestra ne' pūti · a · b · fāno chiarore · che circūda l'ōbra diriuativa creata dal corpo ōbroso ne' lochi 4 · e 6 · le spetie oscure si mvltiplicano · jn · o · g e finiscono · in · 7 · e 8.",
       "label": {
-       "en": "Transcription: the printed Arundel edition, 1923",
-       "de": "Umschrift: die gedruckte Arundel-Ausgabe, 1923"
+       "en": null,
+       "de": null
       }
      },
      "en": {
-      "text": "See here how the concave mirror made of half a spherical body has curved hypotenuses, which enclose within them the meeting of the reflected rays. These rays reach at most as far as the fourth part of the diameter of the said sphere, and beyond it only by the smallest part one can imagine close to that limit [?]. This is shown as follows.",
-      "kind": "ours",
-      "label": "Translated by AI from the printed text of the printed Arundel edition, 1923. It may contain errors.",
-      "doubts": [
-       "'ipotemisse curve' (curved hypotenuses) are the curved outer boundaries of the reflected rays, the curve now called a caustic; Leonardo has no other word for it.",
-       "'e tanto più, quanto è la minor parte che imaginar si possa vicina a esso termine' is compressed; it is read as 'and further only by the smallest imaginable part near that limit', and marked [?]."
-      ]
-     },
-     "de": {
-      "text": "Sieh hier, wie der Hohlspiegel aus einem halben Kugelkörper gekrümmte Hypotenusen hat, die in sich das Zusammentreffen der zurückgeworfenen Strahlen einschließen. Diese Strahlen reichen höchstens bis zum vierten Teil des Durchmessers der genannten Kugel, und darüber hinaus nur um den kleinsten Teil, den man sich nahe dieser Grenze denken kann [?]. Das wird so bewiesen.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von die gedruckte Arundel-Ausgabe, 1923 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "'ipotemisse curve' (curved hypotenuses) are the curved outer boundaries of the reflected rays, the curve now called a caustic; Leonardo has no other word for it.",
-       "'e tanto più, quanto è la minor parte che imaginar si possa vicina a esso termine' is compressed; it is read as 'and further only by the smallest imaginable part near that limit', and marked [?]."
-      ]
-     },
-     "fr": null,
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "I manoscritti e i disegni di Leonardo da Vinci, pubblicati dalla Reale Commissione Vinciana, vol. I: Il Codice Arundel 263 nel Museo Britannico. Riproduzione fototipica con trascrizioni diplomatica e critica. Parte prima (da fol. 1 a fol. 116), Roma: Danesi, 1923",
-       "page": "Parte prima, trascrizione critica, pp. 102*-103* (margin: f. 87 r); archive.org viewer pages n502 and n503",
-       "url": "https://archive.org/details/pbc.gda.pl.503231_01_01_01_1923_11478/page/n502/mode/1up"
-      }
-     ]
-    },
-    {
-     "index": 1,
-     "ref": "Codice Arundel 263 (1923), fol. 87 recto, trascrizione critica, passage 2 of 4",
-     "it": {
-      "text": "Quanto l'angolo che s'include infra 'l razo incidente, e 'l razo refresso sarà magiore, tanto il concorso de' razi refressi saran più brievi. E così de converso sarà esso concorso più lungo, quanto el predetto angolo sarà minore.",
-      "label": {
-       "en": "Transcription: the printed Arundel edition, 1923",
-       "de": "Umschrift: die gedruckte Arundel-Ausgabe, 1923"
-      }
-     },
-     "en": {
-      "text": "The greater the angle enclosed between the incident ray and the reflected ray, the shorter the meeting of the reflected rays. And so conversely, that meeting will be longer the smaller the said angle is.",
-      "kind": "ours",
-      "label": "Translated by AI from the printed text of the printed Arundel edition, 1923. It may contain errors.",
-      "doubts": [
-       "'saran più brievi' is plural after a singular subject in the Italian; the sense is that the meeting point lies closer to the mirror."
-      ]
-     },
-     "de": {
-      "text": "Je größer der Winkel zwischen dem einfallenden und dem zurückgeworfenen Strahl ist, desto kürzer ist das Zusammentreffen der zurückgeworfenen Strahlen. Und umgekehrt wird dieses Zusammentreffen umso länger, je kleiner der genannte Winkel ist.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von die gedruckte Arundel-Ausgabe, 1923 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "'saran più brievi' is plural after a singular subject in the Italian; the sense is that the meeting point lies closer to the mirror."
-      ]
-     },
-     "fr": null,
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "I manoscritti e i disegni di Leonardo da Vinci, pubblicati dalla Reale Commissione Vinciana, vol. I: Il Codice Arundel 263 nel Museo Britannico. Riproduzione fototipica con trascrizioni diplomatica e critica. Parte prima (da fol. 1 a fol. 116), Roma: Danesi, 1923",
-       "page": "Parte prima, trascrizione critica, pp. 102*-103* (margin: f. 87 r); archive.org viewer pages n502 and n503",
-       "url": "https://archive.org/details/pbc.gda.pl.503231_01_01_01_1923_11478/page/n502/mode/1up"
-      }
-     ]
-    },
-    {
-     "index": 2,
-     "ref": "Codice Arundel 263 (1923), fol. 87 recto, trascrizione critica, passage 3 of 4",
-     "it": {
-      "text": "Vedi l'angolo d m h che gitta l'angolo o nato dalla basa m g, e vedi il converso dell'angolo s 3 b che gitta la piramide in b, nata dalla basa f 3.",
-      "label": {
-       "en": "Transcription: the printed Arundel edition, 1923",
-       "de": "Umschrift: die gedruckte Arundel-Ausgabe, 1923"
-      }
-     },
-     "en": {
-      "text": "See the angle d m h, which casts the angle o, born of the base m g; and see the converse in the angle s 3 b, which casts the pyramid at b, born of the base f 3.",
-      "kind": "ours",
-      "label": "Translated by AI from the printed text of the printed Arundel edition, 1923. It may contain errors.",
-      "doubts": [
-       "The letters refer to the drawing of the half-circle mirror; 'gitta' (casts, throws) is Leonardo's verb for a mirror sending its rays to a point."
-      ]
-     },
-     "de": {
-      "text": "Sieh den Winkel d m h, der den Winkel o wirft, der aus der Grundlinie m g entsteht; und sieh das Umgekehrte am Winkel s 3 b, der die Pyramide bei b wirft, die aus der Grundlinie f 3 entsteht.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von die gedruckte Arundel-Ausgabe, 1923 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "The letters refer to the drawing of the half-circle mirror; 'gitta' (casts, throws) is Leonardo's verb for a mirror sending its rays to a point."
-      ]
-     },
-     "fr": null,
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "I manoscritti e i disegni di Leonardo da Vinci, pubblicati dalla Reale Commissione Vinciana, vol. I: Il Codice Arundel 263 nel Museo Britannico. Riproduzione fototipica con trascrizioni diplomatica e critica. Parte prima (da fol. 1 a fol. 116), Roma: Danesi, 1923",
-       "page": "Parte prima, trascrizione critica, pp. 102*-103* (margin: f. 87 r); archive.org viewer pages n502 and n503",
-       "url": "https://archive.org/details/pbc.gda.pl.503231_01_01_01_1923_11478/page/n502/mode/1up"
-      }
-     ]
-    },
-    {
-     "index": 3,
-     "ref": "Codice Arundel 263 (1923), fol. 87 recto, trascrizione critica, passage 4 of 4",
-     "it": {
-      "text": "Tutte le linie che dirivano da K, son quelle che tagliano l'angolo inferiore per mezo, cioè quel'angolo che s'include infra la congiunzione della linia incidente e la linia refressa.",
-      "label": {
-       "en": "Transcription: the printed Arundel edition, 1923",
-       "de": "Umschrift: die gedruckte Arundel-Ausgabe, 1923"
-      }
-     },
-     "en": {
-      "text": "All the lines that come from K are those that cut the lower angle in half, that is, the angle enclosed at the junction of the incident line and the reflected line.",
-      "kind": "ours",
-      "label": "Translated by AI from the printed text of the printed Arundel edition, 1923. It may contain errors.",
-      "doubts": [
-       "K is the centre of the sphere; the lines from it are the radii, which halve the angle between incident and reflected ray (the law of reflection). The edition's critical text reads 'K' where its diplomatic text prints a special letter sign."
-      ]
-     },
-     "de": {
-      "text": "Alle Linien, die von K ausgehen, sind diejenigen, die den unteren Winkel halbieren, nämlich den Winkel, der an der Verbindung von einfallender und zurückgeworfener Linie eingeschlossen ist.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von die gedruckte Arundel-Ausgabe, 1923 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "K is the centre of the sphere; the lines from it are the radii, which halve the angle between incident and reflected ray (the law of reflection). The edition's critical text reads 'K' where its diplomatic text prints a special letter sign."
-      ]
-     },
-     "fr": null,
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "I manoscritti e i disegni di Leonardo da Vinci, pubblicati dalla Reale Commissione Vinciana, vol. I: Il Codice Arundel 263 nel Museo Britannico. Riproduzione fototipica con trascrizioni diplomatica e critica. Parte prima (da fol. 1 a fol. 116), Roma: Danesi, 1923",
-       "page": "Parte prima, trascrizione critica, pp. 102*-103* (margin: f. 87 r); archive.org viewer pages n502 and n503",
-       "url": "https://archive.org/details/pbc.gda.pl.503231_01_01_01_1923_11478/page/n502/mode/1up"
-      }
-     ]
-    }
-   ]
-  },
-  "D.030": {
-   "lead": 0,
-   "notes": "The only passage Richter prints from this side (Reference Table: §71 = D. 8a). The heading in small caps is Leonardo's (Richter's lines 1-2). Richter prints the camera obscura figure (letters a b c d e, m n, o r, s t, k, f) between the columns on p. 45; it is a drawing, not text. Richter's footnote: the chapter was known through Venturi's French translation (Paris, 1797).",
-   "passages": [
-    {
-     "index": 0,
-     "ref": "Richter 1883 §71 (D. 8a), vol. I pp. 44-45",
-     "it": {
-      "text": "COME S'INTERSEGANO LE SPETIE DELLI OBBIETTI RICEVUTI DALL OCHIO DENTRO AL OMORE ALBUGINO.\n\nLa speriētia che mostra come li obbietti mandino le loro spetie over similitudini intersegate dentro all'ochio nello umore albugino si dimostra quando per alcuno piccolo spiraculo rotōdo penetrāno le spetie delli obbietti alluminati in abitatione fortemente oscura; allora tu riceverai tale spetie in vna carta bianca posta dentro a tale abitatione alquāto vicina a esso spiraculo e vedrai tutti li predetti obbietti in essa carta colle lor propie figure e colori, ma sarā minori e fieno sotto sopra per causa della detta intersegatione li quali simulacri se nascierāno di loco alluminato dal sole parā propio dipīti in essa carta, la qual' uole essere sottilissima e veduta da riverscio, e lo spiracolo detto sia fatto in piastra sottilissima di ferro; a b c d e sieno li detti obietti alluminati dal sole, o r sia la faccia della abitatione oscura, nella quale è lo spiracolo detto in n m, s t sia la detta carta dove si tagliano li razzi delle spetie d'essi obietti sotto sopra perchè essēdo li lor razzi diritti, a destro si fa sinistro in k e lo e sinistro si fa destro in · f ·, e cosi fa dentro alla popilla.",
-      "label": {
-       "en": "Transcription: Jean Paul Richter, 1883",
-       "de": "Umschrift: Jean Paul Richter, 1883"
-      }
-     },
-     "en": {
-      "text": "HOW THE IMAGES OF OBJECTS RECEIVED BY THE EYE INTERSECT WITHIN THE CRYSTALLINE HUMOUR OF THE EYE.\n\nAn experiment, showing how objects transmit their images or pictures, intersecting within the eye in the crystalline humour, is seen when by some small round hole penetrate the images of illuminated objects into a very dark chamber. Then, receive these images on a white paper placed within this dark room and rather near to the hole and you will see all the objects on the paper in their proper forms and colours, but much smaller; and they will be upside down by reason of that very intersection. These images being transmitted from a place illuminated by the sun will seem actually painted on this paper which must be extremely thin and looked at from behind. And let the little perforation be made in a very thin plate of iron. Let a b c d e be the object illuminated by the sun and o r the front of the dark chamber in which is the said hole at n m. Let s t be the sheet of paper intercepting the rays of the images of these objects upside down, because the rays being straight, a on the right hand becomes k on the left, and e on the left becomes f on the right; and the same takes place inside the pupil.",
+      "text": "The light which falls on a shaded body at the acutest angle receives the highest light, and the darkest portion is that which receives it at an obtuse angle and both the light and the shadow form pyramids. The angle c receives the highest grade of light because it is directly in front of the window a b and the whole horizon of the sky m x. The angle d differs but little from c because the angles which divide it are not so unequal as those below, and only that portion of the horizon is intercepted which lies between y and x. Although it gains as much on the other side its line is nevertheless not very strong because one angle is smaller than its fellow. The angles e i will have less light because they do not see much of the light m s and the light v x and their angles are very unequal. The angle k and the angle f are each placed between very unequal angles and therefore have but little light, because at k it has only the light p t, and at f only t q; o g is the lowest grade of light because this part has no light at all from the sky; and thence come the lines which will reconstruct a pyramid that is the counterpart of the pyramid c; and this pyramid l is in the first grade of shadow; for this too is placed between equal angles directly opposite to each other on either side of a straight line which passes through the centre of the body and goes to the centre of the light. The several luminous images cast within the frame of the window at the points a and b make a light which surrounds the derived shadow cast by the solid body at the points 4 and 6. The shaded images increase from o g and end at 7 and 8.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter, 1883"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
      },
      "de": {
-      "text": "WIE SICH DIE BILDER DER DINGE, DIE DAS AUGE EMPFÄNGT, IN DER EIWEISSARTIGEN FLÜSSIGKEIT KREUZEN.\n\nDie Erfahrung, die zeigt, wie die Dinge ihre Bilder oder Abbilder aussenden, die sich im Auge in der eiweißartigen Flüssigkeit kreuzen, zeigt sich, wenn durch ein kleines rundes Loch die Bilder beleuchteter Dinge in einen sehr dunklen Raum dringen. Dann fängst du diese Bilder auf einem weißen Blatt auf, das in diesem Raum ziemlich nah an dem Loch steht, und du wirst alle genannten Dinge auf diesem Blatt in ihren eigenen Gestalten und Farben sehen. Aber sie werden kleiner sein und auf dem Kopf stehen, wegen dieser Kreuzung. Kommen diese Abbilder von einem Ort, den die Sonne beleuchtet, so erscheinen sie auf dem Blatt wie gemalt. Das Blatt soll sehr dünn sein und von hinten betrachtet werden, und das Loch soll in eine sehr dünne Eisenplatte gemacht sein. a b c d e seien die genannten Dinge, von der Sonne beleuchtet, o r sei die Vorderwand des dunklen Raumes, in der das Loch bei n m ist, s t sei das genannte Blatt, wo die Strahlen der Bilder dieser Dinge geschnitten werden, auf dem Kopf stehend. Denn da ihre Strahlen gerade sind, wird a rechts zu k links, und e links wird zu f rechts. Und so geschieht es auch im Inneren der Pupille.",
+      "text": "Jedes Licht, das zwischen gleichen Winkeln auf schattige Körper fällt, hat den ersten Grad der Helligkeit, und das wird dunkler sein, was die weniger gleichen Winkel empfängt. Und das Licht oder die Schatten tun ihr Werk durch Pyramiden. Der Winkel c hat den ersten Grad der Helligkeit, weil er das ganze Fenster a b und den ganzen Horizont des Himmels m x sieht. Der Winkel d unterscheidet sich wenig von c, weil die Winkel, die ihn einschließen, in ihrem Verhältnis nicht so ungleich sind wie die anderen darunter, und ihm fehlt nur der Teil des Horizonts, der zwischen y und x liegt. Obwohl er auf der Gegenseite ebenso viel gewinnt, hat seine Linie doch wenig Kraft, weil sein Winkel kleiner ist als sein Gegenstück. Die Winkel e i werden weniger Licht haben, weil sie das Licht m s und das Licht v x nicht sehen [?], und ihre Winkel sind sehr ungleich. Der Winkel k und der Winkel f sind jeder für sich von Winkeln eingeschlossen, die einander sehr ungleich sind, und haben darum wenig Licht, denn in k sieht man nur das Licht p t, und in f nur t q. o g wird der letzte Grad des Lichts sein, weil man dort keinen Teil vom Licht des Horizonts sieht. Und das sind die Linien, die noch einmal eine Pyramide bilden, die der Pyramide c gleicht. Diese Pyramide l wird im ersten Grad des Schattens liegen, weil auch sie zwischen gleiche Winkel fällt, und diese Winkel richten sich aus und schauen einander an entlang einer geraden Linie, die durch die Mitte des schattigen Körpers geht und in der Mitte des Lichts ankommt. Die Lichtbilder, die sich an den Rändern des Fensters in den Punkten a b vervielfältigen, erzeugen eine Helle, die den abgeleiteten Schatten umgibt, den der schattige Körper an den Stellen 4 und 6 wirft. Die dunklen Bilder vervielfältigen sich in o g und enden in 7 und 8.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Jean Paul Richter, 1883, Englisch vor allem von Mrs R. C. Bell). Sie kann Fehler enthalten.",
       "doubts": [
-       "'omore albugino': literally the egg-white-like humour, in older anatomy the name of the aqueous humour; Richter renders 'crystalline humour'. We keep the literal sense.",
-       "'la qual' uole': the printed mark after 'qual' is read as an apostrophe; it may be a raised point. The sense ('which must be') is not affected."
+       "'īfra equali āgoli' und 'meno equali': Das Italienische sagt 'zwischen gleichen Winkeln' und 'weniger gleich'; Richters Englisch liest 'at the acutest angle' (im spitzesten Winkel) und 'at an obtuse angle' (in einem stumpfen Winkel). Das Deutsche folgt dem Italienischen, ebenso Ravaissons Französisch ('entre des angles égaux').",
+       "'perchè egli non vede manco il lume m s e 'l lume v x': 'manco' kann 'weniger' oder 'nicht einmal' heißen; Richter: 'they do not see much of' (sie sehen nicht viel von). Ravaisson liest die Handschrift anders ('perche li non vede, mancha il lume m s e il lume v x': dort sieht er nicht, das Licht m s und v x fehlt). Mit [?] markiert.",
+       "'il suo cōpagno': wörtlich 'sein Gefährte', der Winkel auf der anderen Seite; übersetzt mit 'Gegenstück'.",
+       "'le spetie': die Bilder, die ein Ding aussendet, in der Optik jener Zeit; übersetzt mit 'Bilder', wie Richter 'images' schreibt.",
+       "Leonardos 'egli' steht in der Einzahl, obwohl die Winkel e i Mehrzahl sind; es ist mit 'sie' wiedergegeben. Wo das Italienische kein Subjekt hat ('in k vede', 'lì nō uede'), schreibt das Deutsche 'man'."
       ]
      },
      "fr": null,
@@ -186,13 +37,13 @@
      "sources": [
       {
        "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
-       "page": "vol. I pp. 44-45",
-       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n83/mode/1up"
+       "page": "vol. I pp. 87-88",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n128/mode/1up"
       },
       {
        "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
-       "page": "vol. I pp. 44-45",
-       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n83/mode/1up"
+       "page": "vol. I pp. 87-88",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n128/mode/1up"
       }
      ]
     }
@@ -208,19 +59,19 @@
      "it": {
       "text": "Infra i colori · de' corpi nō fia · differentia · in lunga · distantia · nelle · loro · parti onbrose.",
       "label": {
-       "en": "Transcription: Jean Paul Richter, 1883",
-       "de": "Umschrift: Jean Paul Richter, 1883"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "As to the colours of objects: at long distances no difference is perceptible in the parts in shadow.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter, 1883"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
      },
      "de": {
       "text": "Zwischen den Farben der Körper wird auf große Entfernung in ihren beschatteten Teilen kein Unterschied sein.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Jean Paul Richter, 1883, Englisch vor allem von Mrs R. C. Bell). Sie kann Fehler enthalten."
      },
      "fr": null,
      "label_only": false,
@@ -249,24 +100,24 @@
      "it": {
       "text": "Quelli · corpi sparsi situati in abitatione alluminata da una · sola · finestra faranno · l'ōbra · diriuativa · piv · o meno · brieue secōdo che fia piv o meno a riscōtro · d'essa finestra. ¶ Īfra l'onbre fatte da equali corpi e ī disequali distātie dallo spiraculo loro alluminatore quella fia piv lūga che à il suo corpo meno luminoso: e tāto fia più · luminoso · l'ū che l'altro corpo, quāto l'ombra sua fia piv · corta · che l'altra.¶ Quella · proportione che à in se · n · m · e · v · k cō · r · t · et · v · x, tale avrà onbra x cō 4 · y ·\n\nLa ragione che i corpi ōbrosi, che si trovano situati piv dritti · al mezzo della finestra, fanno l'obre piv brievi che quelli situati ī trauerso · sito si è, che vedono maggiore la finestra ī propia forma, e i corpi traversi la uederanno in iscorto; a quello di mezzo la finestra pare grāde, ai traversi pare piccola, quel di mezzo vede l'emisperio grāde cioè · e · f · e quelli da lato lo uedono piccolo cioè q · r · vede a · b · e cosi m · n · vede c · d: il corpo di mezzo perchè à maggiore quātità di lume che quelli da cāto, è alluminato assai piv basso che'l suo cientro, e però · l'ōbra è piv breve, e tāto quāto a · b · entra in · e · f · tanto la piramide g · 4 · entra in · l · y · appunto. Ogni mezzo . d'ōbra dirivativa passa per 6 1/2 e si dirizza col mezzo dell'ōbra originale e col ciētro del corpo ōbroso e del lume deriuatiuo e col mezzo della finestra · e in vltimo col mezzo di quella parte del lume originale fatto dal' emisperio cieleste; · y · h · è il mezzo dell'ōbra · diriuatiua · l · h · del'ōbra originale · l · sia il mezzo del corpo ōbroso l · k del lume deriuativo · v sia il mezzo della finestra · e · sia l'ultimo mezzo del lume originale fatto da quella parte dell'emisperio del cielo che lumina il corpo ōbroso.",
       "label": {
-       "en": "Transcription: Jean Paul Richter, 1883",
-       "de": "Umschrift: Jean Paul Richter, 1883"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "These bodies standing apart in a room lighted by a single window will have derivative shadows more or less short according as they are more or less opposite to the window. Among the shadows cast by bodies of equal mass but at unequal distances from the opening by which they are illuminated, that shadow will be the longest of the body which is least in the light. And in proportion as one body is better illuminated than another its shadow will be shorter than another. The proportion n m and e v k bear to r t and v x corresponds with that of the shadow x to 4 and y.\n\nThe reason why those bodies which are placed most in front of the middle of the window throw shorter shadows than those obliquely situated is:—That the window appears in its proper form and to the obliquely placed ones it appears foreshortened; to those in the middle, the window shows its full size, to the oblique ones it appears smaller; the one in the middle faces the whole hemisphere that is e f and those on the side have only a strip; that is q r faces a b; and m n faces c d; the body in the middle having a larger quantity of light than those at the sides is lighted from a point much below its centre, and thus the shadow is shorter. And the pyramid g 4 goes into l y exactly as often as a b goes into e f. The axis of every derivative shadow passes through 6 1/2 and is in a straight line with the centre of the primary shadow, with the centre of the body casting it and of the derivative light and with the centre of the window and, finally, with the centre of that portion of the source of light which is the celestial hemisphere. y h is the centre of the derived shade, l h of the primary shadow, l of the body throwing it, l k of the derived light, v is the centre of the window, e is the final centre of the original light afforded by that portion of the hemisphere of the sky which illuminates the solid body.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter, 1883"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
      },
      "de": {
-      "text": "Die verstreuten Körper, die in einem Raum stehen, der von einem einzigen Fenster beleuchtet wird, werfen einen abgeleiteten Schatten, der mehr oder weniger kurz ist, je nachdem sie dem Fenster mehr oder weniger gegenüberstehen. Unter den Schatten, die gleiche Körper in ungleichen Abständen von der Öffnung werfen, die sie beleuchtet, wird der Schatten am längsten sein, dessen Körper weniger beleuchtet ist. Und um so viel heller der eine Körper beleuchtet ist als der andere, um so viel kürzer wird sein Schatten sein als der andere. Welches Verhältnis n m e v k zu r t und v x hat, dasselbe Verhältnis wird der Schatten x zu 4 y haben.\n\nDer Grund, warum die schattigen Körper, die gerader vor der Mitte des Fensters stehen, kürzere Schatten werfen als die schräg stehenden, ist dieser: Sie sehen das Fenster größer, in seiner eigenen Form, und die seitlichen Körper sehen es verkürzt. Dem in der Mitte erscheint das Fenster groß, den seitlichen klein. Der in der Mitte sieht die große Halbkugel, also e f, und die an der Seite sehen sie klein, also: q r sieht a b, und ebenso sieht m n c d. Der Körper in der Mitte wird, weil er mehr Licht hat als die seitlichen, viel tiefer als sein Mittelpunkt beleuchtet [?], und darum ist sein Schatten kürzer. Und so oft a b in e f hineingeht, so oft geht die Pyramide g 4 genau in l y hinein. Die Mittellinie jedes abgeleiteten Schattens geht durch 6 1/2 [?] und liegt in einer geraden Linie mit der Mitte des ursprünglichen Schattens, mit dem Mittelpunkt des schattigen Körpers und des abgeleiteten Lichts, mit der Mitte des Fensters und zuletzt mit der Mitte jenes Teils des ursprünglichen Lichts, den die Himmelshalbkugel bildet. y h ist die Mitte des abgeleiteten Schattens, l h die des ursprünglichen Schattens, l sei die Mitte des schattigen Körpers, l k die des abgeleiteten Lichts, v sei die Mitte des Fensters, e sei die letzte Mitte des ursprünglichen Lichts, das jener Teil der Himmelshalbkugel bildet, der den schattigen Körper beleuchtet.",
+      "text": "Die verstreuten Körper, die in einem Raum stehen, der von einem einzigen Fenster beleuchtet wird, werfen einen abgeleiteten Schatten, der mehr oder weniger kurz ist, je nachdem sie dem Fenster mehr oder weniger gegenüberstehen. Unter den Schatten, die gleiche Körper in ungleichen Abständen von der Öffnung werfen, die sie beleuchtet, wird der Schatten am längsten sein, dessen Körper weniger beleuchtet ist. Und so viel heller der eine Körper beleuchtet ist als der andere, so viel kürzer wird sein Schatten sein als der andere. Welches Verhältnis n m e v k zu r t und v x hat, dasselbe Verhältnis wird der Schatten x zu 4 y haben.\n\nDer Grund, warum die schattigen Körper, die gerader vor der Mitte des Fensters stehen, kürzere Schatten werfen als die schräg stehenden, ist dieser: Sie sehen das Fenster größer, in seiner eigenen Form, und die seitlichen Körper sehen es verkürzt. Dem in der Mitte erscheint das Fenster groß, den seitlichen klein. Der in der Mitte sieht die große Halbkugel, also e f, und die an der Seite sehen sie klein, also: q r sieht a b, und ebenso sieht m n c d. Der Körper in der Mitte wird, weil er mehr Licht hat als die seitlichen, viel tiefer als sein Mittelpunkt beleuchtet [?], und darum ist sein Schatten kürzer. Und so oft a b in e f hineingeht, so oft geht die Pyramide g 4 genau in l y hinein. Die Mittellinie jedes abgeleiteten Schattens geht durch 6 1/2 [?] und liegt in einer geraden Linie mit der Mitte des ursprünglichen Schattens, mit dem Mittelpunkt des schattigen Körpers und des abgeleiteten Lichts, mit der Mitte des Fensters und zuletzt mit der Mitte jenes Teils des ursprünglichen Lichts, den die Himmelshalbkugel bildet. y h ist die Mitte des abgeleiteten Schattens, l h die des ursprünglichen Schattens, l sei die Mitte des schattigen Körpers, l k die des abgeleiteten Lichts, v sei die Mitte des Fensters, e sei die letzte Mitte des ursprünglichen Lichts, das jener Teil der Himmelshalbkugel bildet, der den schattigen Körper beleuchtet.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Jean Paul Richter, 1883, Englisch vor allem von Mrs R. C. Bell). Sie kann Fehler enthalten.",
       "doubts": [
-       "'è alluminato assai piv basso che'l suo cientro': literally 'is lit much lower than its centre'; Richter reads 'is lighted from a point much below its centre'. We keep the literal wording and mark it.",
-       "'passa per 6 1/2': unclear. Richter's footnote suggests that each axis, prolonged upwards, crosses six lines of the figure.",
-       "'Quella proportione che à in se n m e v k cō r t et v x, tale avrà onbra x cō 4 y': the letter groups refer to the figure; we follow the printed letters without regrouping them.",
-       "'Ogni mezzo . d'ōbra': the printed full stop inside the phrase is read as a stray point; Richter's English has 'The axis of every derivative shadow'."
+       "'è alluminato assai piv basso che'l suo cientro': wörtlich 'wird viel tiefer als sein Mittelpunkt beleuchtet'; Richter liest 'is lighted from a point much below its centre' (wird von einem Punkt weit unter seinem Mittelpunkt beleuchtet). Wir behalten den Wortlaut bei und markieren ihn.",
+       "'passa per 6 1/2': unklar. Richters Fußnote vermutet, dass jede Achse, nach oben verlängert, sechs Linien der Figur kreuzt.",
+       "'Quella proportione che à in se n m e v k cō r t et v x, tale avrà onbra x cō 4 y': Die Buchstabengruppen beziehen sich auf die Figur; wir folgen den gedruckten Buchstaben, ohne sie neu zu gruppieren.",
+       "'Ogni mezzo . d'ōbra': Der gedruckte Punkt mitten in der Wendung wird als versprengter Punkt gelesen; Richters Englisch hat 'The axis of every derivative shadow' (die Achse jedes abgeleiteten Schattens)."
       ]
      },
      "fr": null,
@@ -281,411 +132,13 @@
        "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
        "page": "vol. I pp. 97-98",
        "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n140/mode/1up"
-      }
-     ]
-    }
-   ]
-  },
-  "CA.8": {
-   "lead": 0,
-   "notes": "Placement: Richter prints 'C. A. 36a; 115a]' and his Bibliography (vol. II p. 498) lists '36a 115a 178' as his only passage from this side; the Leonardo//thek@ catalogue entry for CA 104r (studies of light and shade) gives Richter 178. Richter's footnote: 'In the original the diagram is placed between lines 27 and 28.' The curator's reason points to this passage: lead 0.",
-   "passages": [
-    {
-     "index": 0,
-     "ref": "Richter 1883 §178 (C. A. 36a; 115a), vol. I pp. 99-100",
-     "it": {
-      "text": "Pruovasi perchè l'onbra o p c h è tanto piv oscura, quanto ella più s'avicina alla linia p · h, ed è tanto più chiara quāto essa più s'avicina alla linia o c, e sia il lume a b finestra, e la pariete oscura, dove tale finestra è collocata, sia b s cioè vn de lati d'essa pariete.\nAddunque diremo la linia p h essere più oscura che altra parte dello spatio · o p c h, perchè essa linia vede ed è veduta da tutto lo spatio ōbroso della pariete b s ·, ma la linia o c è piv chiara che altra parte d'esso spatio o p c h perchè essa linia vede lo spatio luminoso a b.\n¶Doue l'ōbra è maggiore o minore o equale al corpo ōbroso sua origine.¶\n[Di prima della qualità de lumi divisi.\nDELL'ONBRA COMPOSTA F, R, C, H NATA DAL LUME PARTICULARE.\nL'onbra composta f r c h è in tal modo conditionata che quanto ella si fa più remota dal suo lato intrinsico, tanto perde della sua oscurità; pruovasi:\nSia adunque il luminoso d a e l'ōbroso f n, e sia a e vna delle parieti laterali della finestra cioè d a; Dico per la 2ª, la superfitie d'ogni corpo participa del color del suo obbietto, adunque il lato r c, ch'è veduto dalla oscurità a e, participa d'essa oscurità e similmēte il lato estrinsico ch'è veduto dal lume d a participa d'esso lume e cosi abiā definito tale stremo del mezzo cōtenuto dalli stremi]\nQuesta si diuide in 4 parti prima delli stremi cōtenēti l'onbra conposita, seconda, Dell'onbra cōposita dentro alli sua stremi.",
-      "label": {
-       "en": "Transcription: Jean Paul Richter, 1883",
-       "de": "Umschrift: Jean Paul Richter, 1883"
-      }
-     },
-     "en": {
-      "text": "It can be proved why the shadow o p c h is darker in proportion as it is nearer to the line p h and is lighter in proportion as it is nearer to the line o c. Let the light a b, be a window, and let the dark wall in which this window is, be b s, that is, one of the sides of the wall.\nThen we may say that the line p h is darker than any other part of the space o p c h, because this line faces the whole surface in shadow of the wall b s. The line o c is lighter than the other part of this space o p c h, because this line faces the luminous space a b.\nWhere the shadow is larger, or smaller, or equal the body which casts it.\n[First of the character of divided lights.\nOF THE COMPOUND SHADOW F, R, C, H CAUSED BY A SINGLE LIGHT.\nThe shadow f r c h is under such conditions as that where it is farthest from its inner side it loses depth in proportion. To prove this:\nLet d a, be the light and f n the solid body, and let a e be one of the side walls of the window that is d a. Then I say—according to the 2nd [proposition]: that the surface of any body is affected by the tone of the objects surrounding it,—that the side r c, which faces the dark wall a e must participate of its darkness and, in the same way that the outer surface which faces the light d a participates of the light; thus we get the outlines of the extremes on each side of the centre included between them.]\nThis is divided into four parts. The first the extremes, which include the compound shadow, secondly the compound shadow between these extremes.",
-      "kind": "printed",
-      "label": "Translation: Jean Paul Richter, 1883"
-     },
-     "de": {
-      "text": "Man beweist, warum der Schatten o p c h umso dunkler ist, je näher er der Linie p h kommt, und umso heller, je näher er der Linie o c kommt. Das Licht a b sei ein Fenster, und die dunkle Wand, in der dieses Fenster sitzt, sei b s, das heißt eine der Seiten dieser Wand.\nAlso sagen wir, dass die Linie p h dunkler ist als jeder andere Teil des Raumes o p c h, weil diese Linie den ganzen schattigen Raum der Wand b s sieht und von ihm gesehen wird. Die Linie o c aber ist heller als jeder andere Teil dieses Raumes o p c h, weil diese Linie den leuchtenden Raum a b sieht.\nWo der Schatten größer, kleiner oder gleich groß ist wie der schattende Körper, von dem er ausgeht.\n[Zuerst von der Beschaffenheit der geteilten Lichter.\nVOM ZUSAMMENGESETZTEN SCHATTEN F, R, C, H, DER AUS EINEM EINZELNEN LICHT ENTSTEHT.\nDer zusammengesetzte Schatten f r c h ist so beschaffen, dass er umso mehr von seiner Dunkelheit verliert, je weiter er sich von seiner inneren Seite entfernt. Man beweist es so:\nEs sei also d a das Leuchtende und f n das Schattende, und a e sei eine der Seitenwände des Fensters, das heißt von d a. Ich sage nach dem 2. Satz: Die Oberfläche jedes Körpers hat teil an der Farbe dessen, was ihr gegenübersteht. Also hat die Seite r c, die von der Dunkelheit a e gesehen wird, an dieser Dunkelheit teil, und ebenso hat die äußere Seite, die vom Licht d a gesehen wird, an diesem Licht teil. Und so haben wir diese Grenze der Mitte bestimmt, die zwischen den Grenzen liegt.]\nDies teilt sich in 4 Teile. Erstens von den Grenzen, die den zusammengesetzten Schatten einschließen. Zweitens vom zusammengesetzten Schatten innerhalb seiner Grenzen.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "The square brackets are Richter's: by his key they mark words crossed out in the manuscript; they are kept around the same passage in the German.",
-       "Richter's sign ¶ (a sentence Leonardo set apart with a bracket) is left out of the German.",
-       "'vede ed è veduta da': literally 'sees and is seen by'; kept, where Richter writes 'faces'.",
-       "'lume particulare': a single, limited light source; Richter: 'a single light'.",
-       "'per la 2ª': Leonardo cites a second proposition without naming it; 'Satz' is supplied for sense, as Richter supplies '[proposition]'.",
-       "'e cosi abiā definito tale stremo del mezzo cōtenuto dalli stremi': translated literally; the sense is obscure, and Richter paraphrases ('thus we get the outlines of the extremes on each side of the centre included between them').",
-       "Only two of the four parts are named; the text breaks off there. Richter's footnote on 'lumi divisi': 'The text here breaks off abruptly.'"
-      ]
-     },
-     "fr": null,
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
-       "page": "vol. I pp. 99-100",
-       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n142/mode/1up"
-      },
-      {
-       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
-       "page": "vol. I pp. 99-100",
-       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n142/mode/1up"
-      }
-     ]
-    }
-   ]
-  },
-  "A.088": {
-   "lead": 1,
-   "notes": "Placement confirmed: both passages carry 'A. 38b]', and Richter's Bibliography (vol. II p. 486, MS. A) lists '38b 41, Pl. XXXI, No. 3, 526'. Given in the edition's order (§41 in vol. I, §526 later in the same volume). Richter's notes to §526: 'See Pl. XXXI. 3. The second sketch, which in the plate is incomplete, is here reproduced and completed from the original to illustrate the text. In the original the larger diagram is placed between lines 5 and 6.' 'The translation here given renders the meaning of the passage as I think it must be understood. The MS. is perfectly legible and the construction of the sentence is simple and clear; difficulties can only arise from the very fullness of the meaning, particularly towards the end of the passage.' '17. che leverai dalla pariete r n. The letters refer to the larger sketch, No. 3 on Pl. XXXI.' '18. Leonardo here says nothing as to how the image foreshortened by perspective and thus produced on the vertical plane is to be transferred to the wall; but from what is said in Nos. 525 and 523 we may conclude that he was familiar with the process of casting the enlarged shadow of a squaring net on the surface of a wall to guide him in drawing the figure.' The curator's reason names §526 first: lead 1.",
-   "passages": [
-    {
-     "index": 0,
-     "ref": "Richter 1883 §41 (A. 38b), vol. I p. 27",
-     "it": {
-      "text": "¶La prospettiva · è di tale · natura · ch'ella fa · parere · il piano · rilievo e 'l rilievo piano.",
-      "label": {
-       "en": "Transcription: Jean Paul Richter, 1883",
-       "de": "Umschrift: Jean Paul Richter, 1883"
-      }
-     },
-     "en": {
-      "text": "The art of perspective is of such a nature as to make what is flat appear in relief and what is in relief flat.",
-      "kind": "printed",
-      "label": "Translation: Jean Paul Richter, 1883"
-     },
-     "de": {
-      "text": "Die Perspektive ist von solcher Natur, dass sie das Flache erhaben und das Erhabene flach erscheinen lässt.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "'rilievo': relief, what stands out in the round; rendered 'erhaben'."
-      ]
-     },
-     "fr": null,
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
-       "page": "vol. I p. 27",
-       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n64/mode/1up"
-      },
-      {
-       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
-       "page": "vol. I p. 27",
-       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n64/mode/1up"
-      }
-     ]
-    },
-    {
-     "index": 1,
-     "ref": "Richter 1883 §526 (A. 38b), vol. I p. 263",
-     "it": {
-      "text": "A FARE · UNA · FIGURA · IN V̄ MURO · DI 12 BRACCIA CHE APPARISCA D'ALTEZZA DI 24 BRACCIA.\nSe voli fare · una · figura · o altra cosa · che apparisca d'altezza di 24 braccia farai · in questa · forma: figura · prima · la pariete · m · r · colla metà del'omo · che voi · fare: dipoi l'altra metà: farai nella volta · m · n · la figura che voi · fare detta di sopra;—fa prima la pariete in sul piā d'una sala della forma · che à · il mvro · colla · volta dov'ài a fare la tua figura ·, dipoi · farai dirieto a essa · pariete · la figura · disegniata ī proffilo · di che grādezza ti piace, e tira tutte le sue linie al pūto f e nel modo · ch'elle · si tagliano · sulla pariete m · n · così le figura sul mvro che à similitudine colla pariete ·, e avrai tutte l'altezze e sporti della · figura, e le larghezze over grossezze che si trovano nel mvro diritto · m · r ·, faraile in propia · forma, imperochè, nel fugire del mvro, la figura · diminvisce per se medesima; la figura · che va nella volta ti bisognia · diminvirla, come se ella fussi diritta, la quale diminvitione · ti bisognia fare ī sù una sala bē piana · e lì sarà la figura che leverai dalla pariete · r · n con le sue vere grossezze e bisogna ridiminuirla in sù una pariete di rilievo e fia bō modo.",
-      "label": {
-       "en": "Transcription: Jean Paul Richter, 1883",
-       "de": "Umschrift: Jean Paul Richter, 1883"
-      }
-     },
-     "en": {
-      "text": "TO DRAW A FIGURE ON A WALL 12 BRACCIA HIGH WHICH SHALL LOOK 24 BRACCIA HIGH.\nIf you wish to draw a figure or any other object to look 24 braccia high you must do it in this way. First, on the surface m r draw half the man you wish to represent; then the other half; then put on the vault m n [the rest of] the figure spoken of above; first set out the vertical plane on the floor of a room of the same shape as the wall with the coved part on which you are to paint your figure. Then, behind it, draw a figure set out in profile of whatever size you please, and draw lines from it to the point f and, as these lines cut m n on the vertical plane, so will the figure come on the wall, of which the vertical plane gives a likeness, and you will have all the [relative] heights and prominences of the figure. And the breadth or thickness which are on the upright wall m n are to be drawn in their proper form, since, as the wall recedes the figure will be foreshortened by itself; but [that part of] the figure which goes into the cove you must foreshorten, as if it were standing upright; this diminution you must set out on a flat floor and there must stand the figure which is to be transferred from the vertical plane r n in its real size and reduce it once more on a vertical plane; and this will be a good method.",
-      "kind": "printed",
-      "label": "Translation: Jean Paul Richter, 1883"
-     },
-     "de": {
-      "text": "EINE FIGUR AUF EINE MAUER VON 12 ELLEN ZU MALEN, DIE 24 ELLEN HOCH ERSCHEINT.\nWillst du eine Figur oder etwas anderes machen, das 24 Ellen hoch erscheinen soll, so gehst du so vor: Zeichne zuerst auf der Wand m r die Hälfte des Menschen, den du machen willst, dann die andere Hälfte: Im Gewölbe m n machst du die oben genannte Figur, die du machen willst. Zeichne zuerst die Wand auf dem Boden eines Saales auf, in der Form, die die Mauer mit dem Gewölbe hat, auf der du deine Figur machen sollst. Dann zeichne hinter diese Wand die Figur im Profil, so groß du willst, und ziehe alle ihre Linien zum Punkt f. Und so, wie sie die Wand m n schneiden, so zeichne sie auf die Mauer, die der Wand gleicht, und du hast alle Höhen und Vorsprünge der Figur. Die Breiten oder Stärken aber, die auf der geraden Mauer m r liegen, machst du in ihrer eigenen Form, denn wo die Mauer zurückweicht, verkürzt sich die Figur von selbst. Die Figur, die ins Gewölbe kommt, musst du verkürzen, als ob sie aufrecht stünde. Diese Verkürzung musst du auf einem ganz ebenen Saalboden machen, und dort wird die Figur stehen, die du mit ihren wahren Stärken von der Wand r n abnimmst, und du musst sie noch einmal verkürzen, auf einer Wand im Relief [?], und das wird ein gutes Verfahren sein.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "'pariete' (the drawn wall, Richter's 'vertical plane') is rendered 'Wand', and 'mvro' (the real wall to be painted) 'Mauer', to keep Leonardo's two words apart.",
-       "'figura prima la pariete m r colla metà del'omo': 'figura' is a verb here ('draw', 'figure'); read as drawing half the man on m r.",
-       "'dipoi l'altra metà: farai nella volta m n la figura ... detta di sopra': translated in Leonardo's order. Richter reads it as putting '[the rest of] the figure' on the vault; his bracket is his own.",
-       "'nel mvro diritto m r': the Italian has m r; Richter's English has 'm n' at this point. The German follows the Italian.",
-       "'in sù una sala bē piana': literally 'on a quite level hall'; read as the hall's floor, as Richter does ('a flat floor').",
-       "'pariete di rilievo' is unclear, marked [?]. Richter's footnote calls it a puzzling expression (Ravaisson: 'sur une paroi en relief'; Ludwig: 'auf einer Schnittlinie zum Aufrichten') and points to his No. 545, lines 15 to 17.",
-       "braccio rendered 'Elle', the usual German for the old measure; 'diminuire' in its perspective sense rendered 'verkürzen'."
-      ]
-     },
-     "fr": null,
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
-       "page": "vol. I p. 263",
-       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n360/mode/1up"
-      },
-      {
-       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
-       "page": "vol. I p. 263",
-       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n360/mode/1up"
-      }
-     ]
-    }
-   ]
-  },
-  "C.019": {
-   "lead": 0,
-   "notes": "The only passage Richter prints from this side (Reference Table: §216 = C. 4b); his margin reads 'C. 4b (12a)', the bracket giving a second folio number, which we do not interpret. Richter's footnote: the diagram between lines 3 and 4 is on Pl. VI, No. 3; in the diagram printed in the text (above line 14 of the original) the words 'corpo luminoso' are written in circle m, 'luminoso' in circle b and 'ombroso' in circle o. His side heading 'On relative proportion of light and shadows (216-221)' is left out.",
-   "passages": [
-    {
-     "index": 0,
-     "ref": "Richter 1883 §216 (C. 4b (12a)), vol. I pp. 119-120",
-     "it": {
-      "text": "Quella parte della superfitie · de' corpi · che fia · percossa da maggiore · angolo delle spetie de' contra se posti corpi · piv si tignierà in nel color di quelle: 8 di sotto · è maggiore āgolo che · 4, perchè la sua basa · a · n · è maggiore che · e · n basa di 4 Questa figura di sotto vol'essere terminata · da · a · n · e · 4 · e · 8. Quella parte · dell'alluminato · che circunda · la percussione dell'onbra fia · piv · luminosa, la quale · sarà · più a essa percussione uicina. Siccome vna · cosa toccata · da maggior sōma · di razzi luminosi · si fa piv chiara, cosi quella si farà · piv scura che da maggior sōma di razzi ōbrosi sia percossa.\n\n4 Sia la parte dell'alluminato · 4 · 8 · che circūda la percussione dell'onbra · g · e · 4, e fia esso loco · 4 · piv luminoso · perchè lì uede minor sōma d'onbra che nō fa · nel loco · 8 ·, perchè 4 vede solamēte l'ōbra · i · n ·, e · 8 · vede ed è percosso dall'onbra · a · e · e dal'ōbra i · n · ch'è 2 tāti piv scura, e questo medesimo accade quādo l'aria col sole metterai in loco dell'ōbra · e del lume.\n\nIl concorso · dell'onbra, nata · e terminata · infra propinque · et piane · superfitie di pari · qualità · e retta oppositione, avrà più scuro fine che principio · jl quale · terminerà · infra la · percussione de'luminosi razzi.\n\nQuella proportione troverai di oscurità infra l'ōbre diriuatiue · a · n ·, quale fia quella della vicinità de' corpi luminosi m · b, che le cavsano, e se essi corpi luminosi fieno di pari grandezza ancora troverai tal proportione delle percussioni de' cierchi luminosi e l'ōbre qual'è quella della distantia d'essi corpi luminosi.",
-      "label": {
-       "en": "Transcription: Jean Paul Richter, 1883",
-       "de": "Umschrift: Jean Paul Richter, 1883"
-      }
-     },
-     "en": {
-      "text": "That part of the surface of a body on which the images [reflection] from other bodies placed opposite fall at the largest angle will assume their hue most strongly. In the diagram below, 8 is a larger angle than 4, since its base a n is larger than e n the base of 4. This diagram below should end at a n 4 8. That portion of the illuminated surface on which a shadow is cast will be brightest which lies contiguous to the cast shadow. Just as an object which is lighted up by a greater quantity of luminous rays becomes brighter, so one on which a greater quantity of shadow falls, will be darker.\n\nLet 4 be the side of an illuminated surface 4 8, surrounding the cast shadow g e 4. And this spot 4 will be lighter than 8, because less shadow falls on it than on 8. Since 4 faces only the shadow i n; and 8 faces and receives the shadow a e as well as i n which makes it twice as dark. And the same thing happens when you put the atmosphere and the sun in the place of shade and light.\n\nThe distribution of shadow, originating in, and limited by, plane surfaces placed near to each other, equal in tone and directly opposite, will be darker at the ends than at the beginning, which will be determined by the incidence of the luminous rays.\n\nYou will find the same proportion in the depth of the derived shadows a n as in the nearness of the luminous bodies m b, which cause them; and if the luminous bodies were of equal size you would still farther find the same proportion in the light cast by the luminous circles and their shadows as in the distance of the said luminous bodies.",
-      "kind": "printed",
-      "label": "Translation: Jean Paul Richter, 1883"
-     },
-     "de": {
-      "text": "Der Teil der Oberfläche der Körper, der von den Bildern der gegenüberstehenden Körper unter dem größeren Winkel getroffen wird, färbt sich am stärksten in deren Farbe: 8 unten ist ein größerer Winkel als 4, weil seine Grundlinie a n größer ist als e n, die Grundlinie von 4. Diese Figur unten soll von a n und 4 und 8 begrenzt sein. Der Teil des Beleuchteten, der die Stelle umgibt, auf die der Schatten fällt, wird dort am hellsten sein, wo er dieser Stelle am nächsten ist. So wie ein Ding, das von einer größeren Menge Lichtstrahlen berührt wird, heller wird, so wird ein Ding dunkler, das von einer größeren Menge Schattenstrahlen getroffen wird.\n\n4 sei der Teil des Beleuchteten 4 8, der die Stelle g e 4 umgibt, auf die der Schatten fällt. Diese Stelle 4 wird heller sein, weil sie weniger Schatten sieht als die Stelle 8. Denn 4 sieht nur den Schatten i n, 8 aber sieht und empfängt den Schatten a e und den Schatten i n und ist darum doppelt so dunkel. Und dasselbe geschieht, wenn du die Luft und die Sonne an die Stelle des Schattens und des Lichts setzt.\n\nDas Zusammenlaufen [?] des Schattens, der zwischen nahen, ebenen Flächen von gleicher Beschaffenheit und gerade gegenüber entsteht und von ihnen begrenzt wird, ist am Ende dunkler als am Anfang, und dieser endet dort, wo die Lichtstrahlen auftreffen [?].\n\nWelches Verhältnis die Nähe der leuchtenden Körper m b hat, die die abgeleiteten Schatten a n verursachen, dasselbe Verhältnis wirst du in der Dunkelheit dieser Schatten finden. Und wenn diese leuchtenden Körper gleich groß sind, wirst du zwischen den Stellen, auf die die leuchtenden Kreise treffen, und den Schatten wieder dasselbe Verhältnis finden wie zwischen den Abständen dieser leuchtenden Körper.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "'Il concorso · dell'onbra': literally 'the coming together' of the shadow; Richter renders 'the distribution of shadow'. We keep a literal word and mark it.",
-       "'jl quale · terminerà · infra la · percussione de'luminosi razzi': 'il quale' may refer to the beginning or to the shadow; Richter reads 'which will be determined by the incidence of the luminous rays'.",
-       "'4 Sia la parte': the first '4' is a figure label and the subject of the sentence ('let 4 be the part'), as in Richter's English."
-      ]
-     },
-     "fr": null,
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
-       "page": "vol. I pp. 119-120",
-       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n166/mode/1up"
-      },
-      {
-       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
-       "page": "vol. I pp. 119-120",
-       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n166/mode/1up"
-      }
-     ]
-    }
-   ]
-  },
-  "AR1.305": {
-   "lead": 0,
-   "notes": "The Italian is the edition's critical transcription (see AR1.293 for the two transcriptions). The first passage is the caption beside the drawing of the pointed caustic (Leonardo's 'linia a o'), so it is the lead; the second describes how to make the rays visible with the half-ring mirror drawn in section below. Page match: the SET image is this edition's plate of fol. 87 verso (p0305 of the same scan); the diplomatic page facing it is headed 'Fol. 87 verso'.",
-   "passages": [
-    {
-     "index": 0,
-     "ref": "Codice Arundel 263 (1923), fol. 87 verso, trascrizione critica, passage 1 of 2",
-     "it": {
-      "text": "Qui si dimostra come il concorso de' razi refressi non passa il 4° del diamitro delle spere donde li spechi concavi hanno la loro curvità, come si dimostra nella linia a o.",
-      "label": {
-       "en": "Transcription: the printed Arundel edition, 1923",
-       "de": "Umschrift: die gedruckte Arundel-Ausgabe, 1923"
-      }
-     },
-     "en": {
-      "text": "Here it is shown how the meeting of the reflected rays does not pass the 4th of the diameter of the spheres from which concave mirrors take their curvature, as is shown in the line a o.",
-      "kind": "ours",
-      "label": "Translated by AI from the printed text of the printed Arundel edition, 1923. It may contain errors.",
-      "doubts": [
-       "'il 4°' (the 4th) is read as the fourth part, as in the facing page 87 recto."
-      ]
-     },
-     "de": {
-      "text": "Hier wird gezeigt, wie das Zusammentreffen der zurückgeworfenen Strahlen nicht über das Viertel des Durchmessers der Kugeln hinausgeht, von denen die Hohlspiegel ihre Krümmung haben, wie es an der Linie a o gezeigt wird.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von die gedruckte Arundel-Ausgabe, 1923 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "'il 4°' (the 4th) is read as the fourth part, as in the facing page 87 recto."
-      ]
-     },
-     "fr": null,
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "I manoscritti e i disegni di Leonardo da Vinci, pubblicati dalla Reale Commissione Vinciana, vol. I: Il Codice Arundel 263 nel Museo Britannico. Riproduzione fototipica con trascrizioni diplomatica e critica. Parte prima (da fol. 1 a fol. 116), Roma: Danesi, 1923",
-       "page": "Parte prima, trascrizione critica, pp. 103*-104* (margin: f. 87 v); archive.org viewer pages n503 and n504",
-       "url": "https://archive.org/details/pbc.gda.pl.503231_01_01_01_1923_11478/page/n503/mode/1up"
-      }
-     ]
-    },
-    {
-     "index": 1,
-     "ref": "Codice Arundel 263 (1923), fol. 87 verso, trascrizione critica, passage 2 of 2",
-     "it": {
-      "text": "Se si volessi vedere e' razi seperati, sia tolto lo spechio in figura d'un mezo anello il quale sia piano di dentro, di poi s'è fatto una mistura di biacca tenperato con uovo, e con quella coperta col penello due o tre volte, e secca ch'elle sia, sgraffiata e scoperto lo spechio collo stile di legno aciò non graffi lo spechio, e così vedrai li razi seperati sopra il piano a b c, come son seperate le lor cause.",
-      "label": {
-       "en": "Transcription: the printed Arundel edition, 1923",
-       "de": "Umschrift: die gedruckte Arundel-Ausgabe, 1923"
-      }
-     },
-     "en": {
-      "text": "If one wished to see the rays separately, take the mirror in the shape of a half ring which is flat inside [?]. Then a mixture is made of white lead tempered with egg, and with it [the piece] is covered with the brush two or three times. When it is dry, scratch it and uncover the mirror with the wooden stylus, so as not to scratch the mirror. And so you will see the rays separated on the plane a b c, just as their causes are separated.",
-      "kind": "ours",
-      "label": "Translated by AI from the printed text of the printed Arundel edition, 1923. It may contain errors.",
-      "doubts": [
-       "'il quale sia piano di dentro' (which is flat inside) is unclear: most likely the half ring stands on a flat base, and the white coating stays on that base, where the reflected rays then show as separate lines. Marked [?].",
-       "The Italian does not say what is coated ('con quella coperta', covered with it); the translations add '[the piece]'. The tenses shift ('sia tolto', 's'è fatto'); the translations make them one instruction.",
-       "'biacca' is white lead; 'stile di legno' a wooden stylus, used so that the metal of the mirror is not scratched."
-      ]
-     },
-     "de": {
-      "text": "Wollte man die Strahlen getrennt sehen, so nehme man den Spiegel in Form eines halben Rings, der innen eben ist [?]. Dann wird eine Mischung aus Bleiweiß, mit Ei angerührt, gemacht, und damit wird [das Stück] zwei- oder dreimal mit dem Pinsel bestrichen. Ist es trocken, so kratze man es ab und lege den Spiegel mit dem Holzgriffel frei, damit man den Spiegel nicht zerkratzt. Und so wirst du die Strahlen getrennt auf der Ebene a b c sehen, so wie ihre Ursachen getrennt sind.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von die gedruckte Arundel-Ausgabe, 1923 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "'il quale sia piano di dentro' (which is flat inside) is unclear: most likely the half ring stands on a flat base, and the white coating stays on that base, where the reflected rays then show as separate lines. Marked [?].",
-       "The Italian does not say what is coated ('con quella coperta', covered with it); the translations add '[the piece]'. The tenses shift ('sia tolto', 's'è fatto'); the translations make them one instruction.",
-       "'biacca' is white lead; 'stile di legno' a wooden stylus, used so that the metal of the mirror is not scratched."
-      ]
-     },
-     "fr": null,
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "I manoscritti e i disegni di Leonardo da Vinci, pubblicati dalla Reale Commissione Vinciana, vol. I: Il Codice Arundel 263 nel Museo Britannico. Riproduzione fototipica con trascrizioni diplomatica e critica. Parte prima (da fol. 1 a fol. 116), Roma: Danesi, 1923",
-       "page": "Parte prima, trascrizione critica, pp. 103*-104* (margin: f. 87 v); archive.org viewer pages n503 and n504",
-       "url": "https://archive.org/details/pbc.gda.pl.503231_01_01_01_1923_11478/page/n503/mode/1up"
-      }
-     ]
-    }
-   ]
-  },
-  "AshA.040": {
-   "lead": 0,
-   "notes": "Placement confirmed: Ravaisson vol. VI prints this passage under Ms 2038 'FOLIO 14 (recto)' (https://archive.org/details/lesmanuscritsdel06lo/page/n211/mode/1up) with the footnote 'J.-P. Richter, t. I, no 149 (21b), et pl. III, no 2'. Richter's 'Ash. I. 21b' is his own count; Ravaisson's and the library's folio is 14 recto. Richter's footnote: 'The diagram belonging to this chapter is No. 2 on Plate III. In the original it is placed between lines 3 and 4, and in the reproduction these are shown in part. The semi circle above is marked orizonte (horizon). The number 6 at the left hand side, outside the facsimile, is in the place of a figure which has become indistinct in the original.' The curator's reason names the drawing, which this passage explains; lead 0.",
-   "passages": [
-    {
-     "index": 0,
-     "ref": "Richter 1883 §149 (Ash. I. 21b), vol. I pp. 87-88",
-     "it": {
-      "text": "Ogni · lume · che cade · sopra · ai corpi ōbrosi · īfra equali · āgoli tiene il primo grado · di chiarezza · e quello fia piv scuro che ricieve l'āgoli meno · equali e il lume · o l'onbre faño loro · ofitio per piramide; l'angolo · c · tiene · jl primo · grado · di chiarezza · perchè gli uede · tutta · la finestra · a · b · e tutto l'orizzōte del cielo · m · x ·, l'angolo · d · fa poca · differētia da · c · perchè li āgoli che lo mettono ī mezzo · nō sono tāto difformi di proportione · quāto li altri · di sotto · e mācagli solamēte quella parte dell'orizzōte · ch'è tra · y · x · bench'eli acquisti altrettāto dall'opposito lato · nōdimeno la sua linia è di poca potēza perchè il suo angolo · è minore · che'l suo cōpagno, l'angoli · e · i · fiā di minore lume perchè · egli · non vede manco · il lume · m · s · e 'l lume v · x · e i loro āgoli sono assai disformi: l'angolo · k · e l'angolo · f · sono messi in mezzo ciascū · per se · da āgoli · molto diformi l'uno dal'altro e però fieno di poco lume · perchè in · k · vede solamēte il lume · p · t · e in · f; nō uede se nō t · q · | o · g · fia l'ultimo grado di lume perchè lì nō uede nessuna parte del lume del'orizzōte · e sono quelle le linie che vn altra volta ricōpōgono una · piramide · simile · alla piramide · c · la quale piramide · l si troverà nel primo grado · d'ōbra, perchè ācora lei cade īfra · equali āgoli e essi āgoli · si dirizzano e si sguardano per una · linia retta che passa dal cientro del corpo ōbroso e capita al mezzo del lume; le spetie luminose mvltiplicate · ne' termini della · finestra ne' pūti · a · b · fāno chiarore · che circūda l'ōbra diriuativa creata dal corpo ōbroso ne' lochi 4 · e 6 · le spetie oscure si mvltiplicano · jn · o · g e finiscono · in · 7 · e 8.",
-      "label": {
-       "en": "Transcription: Jean Paul Richter, 1883",
-       "de": "Umschrift: Jean Paul Richter, 1883"
-      }
-     },
-     "en": {
-      "text": "The light which falls on a shaded body at the acutest angle receives the highest light, and the darkest portion is that which receives it at an obtuse angle and both the light and the shadow form pyramids. The angle c receives the highest grade of light because it is directly in front of the window a b and the whole horizon of the sky m x. The angle d differs but little from c because the angles which divide it are not so unequal as those below, and only that portion of the horizon is intercepted which lies between y and x. Although it gains as much on the other side its line is nevertheless not very strong because one angle is smaller than its fellow. The angles e i will have less light because they do not see much of the light m s and the light v x and their angles are very unequal. The angle k and the angle f are each placed between very unequal angles and therefore have but little light, because at k it has only the light p t, and at f only t q; o g is the lowest grade of light because this part has no light at all from the sky; and thence come the lines which will reconstruct a pyramid that is the counterpart of the pyramid c; and this pyramid l is in the first grade of shadow; for this too is placed between equal angles directly opposite to each other on either side of a straight line which passes through the centre of the body and goes to the centre of the light. The several luminous images cast within the frame of the window at the points a and b make a light which surrounds the derived shadow cast by the solid body at the points 4 and 6. The shaded images increase from o g and end at 7 and 8.",
-      "kind": "printed",
-      "label": "Translation: Jean Paul Richter, 1883"
-     },
-     "de": {
-      "text": "Jedes Licht, das zwischen gleichen Winkeln auf schattige Körper fällt, hat den ersten Grad der Helligkeit, und das wird dunkler sein, was die weniger gleichen Winkel empfängt. Und das Licht oder die Schatten tun ihr Werk durch Pyramiden. Der Winkel c hat den ersten Grad der Helligkeit, weil er das ganze Fenster a b und den ganzen Horizont des Himmels m x sieht. Der Winkel d unterscheidet sich wenig von c, weil die Winkel, die ihn einschließen, in ihrem Verhältnis nicht so ungleich sind wie die anderen darunter, und ihm fehlt nur der Teil des Horizonts, der zwischen y und x liegt. Obwohl er auf der Gegenseite ebenso viel gewinnt, hat seine Linie doch wenig Kraft, weil sein Winkel kleiner ist als sein Gegenstück. Die Winkel e i werden weniger Licht haben, weil er das Licht m s und das Licht v x nicht sieht [?], und ihre Winkel sind sehr ungleich. Der Winkel k und der Winkel f sind jeder für sich von Winkeln eingeschlossen, die einander sehr ungleich sind, und haben darum wenig Licht, denn in k sieht er nur das Licht p t, und in f sieht er nur t q. o g wird der letzte Grad des Lichts sein, weil er dort keinen Teil vom Licht des Horizonts sieht. Und das sind die Linien, die noch einmal eine Pyramide bilden, die der Pyramide c gleicht. Diese Pyramide l wird im ersten Grad des Schattens liegen, weil auch sie zwischen gleiche Winkel fällt, und diese Winkel richten sich aus und schauen einander an entlang einer geraden Linie, die durch die Mitte des schattigen Körpers geht und in der Mitte des Lichts ankommt. Die Lichtbilder, die sich an den Rändern des Fensters in den Punkten a b vervielfältigen, erzeugen eine Helle, die den abgeleiteten Schatten umgibt, den der schattige Körper an den Stellen 4 und 6 wirft. Die dunklen Bilder vervielfältigen sich in o g und enden in 7 und 8.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "'īfra equali āgoli' and 'meno equali': the Italian says 'between equal angles' and 'less equal'; Richter's English reads 'at the acutest angle' and 'at an obtuse angle'. The German follows the Italian, as does Ravaisson's French ('entre des angles égaux').",
-       "'perchè egli non vede manco il lume m s e 'l lume v x': 'manco' can mean 'less' or 'not even'; Richter: 'they do not see much of'. Ravaisson reads the manuscript differently ('perche li non vede, mancha il lume m s e il lume v x': there it does not see, the light m s and v x is missing). Marked [?].",
-       "'il suo cōpagno': literally 'its companion', the angle on the other side; rendered 'Gegenstück'.",
-       "'le spetie': the images a thing sends out, in the optics of the time; rendered 'Bilder', as Richter renders 'images'.",
-       "The singular 'er' in 'weil er ... nicht sieht' and 'in k sieht er' follows Leonardo's shift from the angles to a single 'egli'."
-      ]
-     },
-     "fr": null,
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
-       "page": "vol. I pp. 87-88",
-       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n128/mode/1up"
-      },
-      {
-       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
-       "page": "vol. I pp. 87-88",
-       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n128/mode/1up"
-      }
-     ]
-    }
-   ]
-  },
-  "I.086": {
-   "lead": 0,
-   "notes": "One sentence on the page, printed twice by Richter: as §188 (Fourth Book on Light and Shade, vol. I p. 107) and as §452 (the cast shadow of trees, vol. I p. 227), with two different English renderings and a small difference in his Italian ('nasce' / 'nascie'). Both are kept, in the edition's order; the German is the same for both. A page shows one of them. Placement confirmed: both carry 'I.1 37b]'; Richter's Bibliography (vol. II p. 489, MS. I) lists '37b Pl. XXVIII, No. 5, 188, 452'; Ravaisson vol. IV prints the sentence under MS I 'FOLIO 37 (verso)' with the footnote 'J.-P. Richter, t. I, 188 et 452, pl. XXVIII, 5' (https://archive.org/details/lesmanuscritsdel04lo/page/n253/mode/1up). Richter's footnotes: 'Comp. the drawing on Pl. XXVIII, No. 5.' and 'See Pl. XXVIII, No. 5.' Ravaisson prints more on this side that Richter does not: a label beside the figure, 'Onbre [varie ?] da piramide equidistante al suo luminoso', and a paragraph beginning 'Ancora che un corpo onbroso sia piramidale ...' (a pyramidal shaded body throws its shadow ...; not proofread here). They are not in this record. The curator's reason names the drawing; lead 0.",
-   "passages": [
-    {
-     "index": 0,
-     "ref": "Richter 1883 §188 (I.1 37b), vol. I p. 107",
-     "it": {
-      "text": "La stanpa dell'onbra di qualūque corpo di uniforme grossezza mai sarà simile al corpo donde ella nasce.",
-      "label": {
-       "en": "Transcription: Jean Paul Richter, 1883",
-       "de": "Umschrift: Jean Paul Richter, 1883"
-      }
-     },
-     "en": {
-      "text": "The form of the shadow cast by any body of uniform density can never be the same as that of the body producing it.",
-      "kind": "printed",
-      "label": "Translation: Jean Paul Richter, 1883"
-     },
-     "de": {
-      "text": "Der Abdruck des Schattens eines Körpers von gleichmäßiger Dicke wird niemals dem Körper gleichen, aus dem er entsteht.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "'La stanpa dell'onbra': literally 'the print (stamp) of the shadow', the shape the shadow leaves on a surface; rendered 'Abdruck'.",
-       "'grossezza': thickness; Richter renders it 'density' in §188 and 'breadth' in §452."
-      ]
-     },
-     "fr": null,
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
-       "page": "vol. I p. 107",
-       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n152/mode/1up"
-      },
-      {
-       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
-       "page": "vol. I p. 107",
-       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n152/mode/1up"
-      }
-     ]
-    },
-    {
-     "index": 1,
-     "ref": "Richter 1883 §452 (I.1 37b), vol. I p. 227",
-     "it": {
-      "text": "La stanpa dell'onbra di qualūque corpo di uniforme grossezza mai sarà simile al corpo, donde ella nascie.",
-      "label": {
-       "en": "Transcription: Jean Paul Richter, 1883",
-       "de": "Umschrift: Jean Paul Richter, 1883"
-      }
-     },
-     "en": {
-      "text": "The image of the shadow of any object of uniform breadth can never be [exactly] the same as that of the body which casts it.",
-      "kind": "printed",
-      "label": "Translation: Jean Paul Richter, 1883"
-     },
-     "de": {
-      "text": "Der Abdruck des Schattens eines Körpers von gleichmäßiger Dicke wird niemals dem Körper gleichen, aus dem er entsteht.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "'La stanpa dell'onbra': literally 'the print (stamp) of the shadow', the shape the shadow leaves on a surface; rendered 'Abdruck'.",
-       "'grossezza': thickness; Richter renders it 'density' in §188 and 'breadth' in §452."
-      ]
-     },
-     "fr": null,
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
-       "page": "vol. I p. 227",
-       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n318/mode/1up"
-      },
-      {
-       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
-       "page": "vol. I p. 227",
-       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n318/mode/1up"
       }
      ]
     }
    ]
   },
   "C.048": {
-   "lead": 0,
+   "lead": null,
    "notes": "Heading (the editor's): '[LUMIÈRE ET OMBRE (OMBRES SUPERPOSÉES)]'. The three statements stand on the leaf beside and below the drawing of rays from two lit spheres past two small ones, where the half-shadows cross; Ravaisson prints them in the order top, middle, bottom. All three concern the drawing; lead 0 is the first. Italics in 'it' and 'fr' mark words Leonardo struck out. Page match checked: Ravaisson's phototype plate of 19 recto (archive.org viewer n88) shows the same leaf as the SET image.",
    "passages": [
     {
@@ -694,26 +147,26 @@
      "it": {
       "text": "Quanto sara di uersa. la osschurita. di due. razzi. dinperfecta onbrosita tanto. sidiuersifichera. lonbra cheresultera dalla loro misstion ~~dessi razi~~ dalsuo. primo essere —",
       "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+       "en": null,
+       "de": null
       }
      },
      "en": {
-      "text": "As much as the darkness of two rays of imperfect shadow differs, so much will the shadow that results from their mixture differ from its first being.",
+      "text": "As much as the darkness of two rays of imperfect shadow differs, so much will the shadow that results from their mixture differ from its first state.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1888), checked against his French translation (Ravaisson-Mollien, vol. III, 1888). It may contain errors.",
       "doubts": [
        "'razzi d'inperfecta onbrosita' (rays of imperfect shadowiness) are rays that are only partly shaded, the half-shadow between full light and full shadow; the text does not define the term.",
        "'dessi razi' is printed in italics, struck out by Leonardo; left out."
       ]
      },
      "de": {
-      "text": "So sehr sich die Dunkelheit zweier Strahlen von unvollkommener Schattigkeit unterscheidet, so sehr wird der Schatten, der aus ihrer Mischung entsteht, von seinem ersten Wesen abweichen.",
+      "text": "So sehr sich die Dunkelheit zweier Strahlen von unvollkommener Schattigkeit unterscheidet, so sehr wird der Schatten, der aus ihrer Mischung entsteht, von seinem ursprünglichen Zustand abweichen.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1888) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. III, 1888). Sie kann Fehler enthalten.",
       "doubts": [
-       "'razzi d'inperfecta onbrosita' (rays of imperfect shadowiness) are rays that are only partly shaded, the half-shadow between full light and full shadow; the text does not define the term.",
-       "'dessi razi' is printed in italics, struck out by Leonardo; left out."
+       "'razzi d'inperfecta onbrosita' (Strahlen von unvollkommener Schattigkeit) sind Strahlen, die nur teilweise beschattet sind, der Halbschatten zwischen vollem Licht und vollem Schatten; der Text bestimmt den Begriff nicht.",
+       "'dessi razi' ist kursiv gedruckt, von Leonardo gestrichen; weggelassen."
       ]
      },
      "fr": {
@@ -739,14 +192,14 @@
      "it": {
       "text": "Jnpossibile he che ~~per~~ de la mistione. di 2. perfette onbre. ne resulti onbra di piv. osschura. qualita. —",
       "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "It is impossible that from the mixture of 2 perfect shadows there should result a shadow of darker quality.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1888), checked against his French translation (Ravaisson-Mollien, vol. III, 1888). It may contain errors.",
       "doubts": [
        "'perfette onbre' (perfect shadows) are read as full shadows, which no light reaches; the text does not define the term.",
        "'per' is printed in italics, struck out; left out."
@@ -755,10 +208,10 @@
      "de": {
       "text": "Es ist unmöglich, dass aus der Mischung von 2 vollkommenen Schatten ein Schatten von dunklerer Beschaffenheit entsteht.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1888) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. III, 1888). Sie kann Fehler enthalten.",
       "doubts": [
-       "'perfette onbre' (perfect shadows) are read as full shadows, which no light reaches; the text does not define the term.",
-       "'per' is printed in italics, struck out; left out."
+       "'perfette onbre' (vollkommene Schatten) werden als volle Schatten gelesen, die kein Licht erreicht; der Text bestimmt den Begriff nicht.",
+       "'per' ist kursiv gedruckt, gestrichen; weggelassen."
       ]
      },
      "fr": {
@@ -784,14 +237,14 @@
      "it": {
       "text": "possibile. he. che ~~per~~ de la. chommistione. di 2 inperfetto onbre. neresulti onbra perfette ~~di pivosschura. qualita. chenessuna delle prime~~ —",
       "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "It is possible that from the mixing of 2 imperfect shadows there should result a perfect shadow.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1888), checked against his French translation (Ravaisson-Mollien, vol. III, 1888). It may contain errors.",
       "doubts": [
        "Leonardo struck out the end of the sentence, 'di piv osschura qualita che nessuna delle prime' (of darker quality than either of the first); the edition prints it in italics in both languages. It is left out of the translations, so the sentence ends at 'a perfect shadow'.",
        "'inperfetto onbre' is printed so (for 'inperfette'); the plural sense is clear.",
@@ -801,11 +254,11 @@
      "de": {
       "text": "Es ist möglich, dass aus der Vermischung von 2 unvollkommenen Schatten ein vollkommener Schatten entsteht.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1888) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. III, 1888). Sie kann Fehler enthalten.",
       "doubts": [
-       "Leonardo struck out the end of the sentence, 'di piv osschura qualita che nessuna delle prime' (of darker quality than either of the first); the edition prints it in italics in both languages. It is left out of the translations, so the sentence ends at 'a perfect shadow'.",
-       "'inperfetto onbre' is printed so (for 'inperfette'); the plural sense is clear.",
-       "'per' is printed in italics, struck out; left out."
+       "Leonardo strich das Satzende, 'di piv osschura qualita che nessuna delle prime' (von dunklerer Beschaffenheit als jeder der ersten); die Ausgabe druckt es in beiden Sprachen kursiv. In den Übersetzungen ist es weggelassen, so endet der Satz bei 'ein vollkommener Schatten'.",
+       "'inperfetto onbre' ist so gedruckt (für 'inperfette'); der Sinn der Mehrzahl ist klar.",
+       "'per' ist kursiv gedruckt, gestrichen; weggelassen."
       ]
      },
      "fr": {
@@ -827,6 +280,420 @@
     }
    ]
   },
+  "C.019": {
+   "lead": 0,
+   "notes": "The only passage Richter prints from this side (Reference Table: §216 = C. 4b); his margin reads 'C. 4b (12a)', the bracket giving a second folio number, which we do not interpret. Richter's footnote: the diagram between lines 3 and 4 is on Pl. VI, No. 3; in the diagram printed in the text (above line 14 of the original) the words 'corpo luminoso' are written in circle m, 'luminoso' in circle b and 'ombroso' in circle o. His side heading 'On relative proportion of light and shadows (216-221)' is left out.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §216 (C. 4b (12a)), vol. I pp. 119-120",
+     "it": {
+      "text": "Quella parte della superfitie · de' corpi · che fia · percossa da maggiore · angolo delle spetie de' contra se posti corpi · piv si tignierà in nel color di quelle: 8 di sotto · è maggiore āgolo che · 4, perchè la sua basa · a · n · è maggiore che · e · n basa di 4 Questa figura di sotto vol'essere terminata · da · a · n · e · 4 · e · 8. Quella parte · dell'alluminato · che circunda · la percussione dell'onbra fia · piv · luminosa, la quale · sarà · più a essa percussione uicina. Siccome vna · cosa toccata · da maggior sōma · di razzi luminosi · si fa piv chiara, cosi quella si farà · piv scura che da maggior sōma di razzi ōbrosi sia percossa.\n\n4 Sia la parte dell'alluminato · 4 · 8 · che circūda la percussione dell'onbra · g · e · 4, e fia esso loco · 4 · piv luminoso · perchè lì uede minor sōma d'onbra che nō fa · nel loco · 8 ·, perchè 4 vede solamēte l'ōbra · i · n ·, e · 8 · vede ed è percosso dall'onbra · a · e · e dal'ōbra i · n · ch'è 2 tāti piv scura, e questo medesimo accade quādo l'aria col sole metterai in loco dell'ōbra · e del lume.\n\nIl concorso · dell'onbra, nata · e terminata · infra propinque · et piane · superfitie di pari · qualità · e retta oppositione, avrà più scuro fine che principio · jl quale · terminerà · infra la · percussione de'luminosi razzi.\n\nQuella proportione troverai di oscurità infra l'ōbre diriuatiue · a · n ·, quale fia quella della vicinità de' corpi luminosi m · b, che le cavsano, e se essi corpi luminosi fieno di pari grandezza ancora troverai tal proportione delle percussioni de' cierchi luminosi e l'ōbre qual'è quella della distantia d'essi corpi luminosi.",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "That part of the surface of a body on which the images [reflection] from other bodies placed opposite fall at the largest angle will assume their hue most strongly. In the diagram below, 8 is a larger angle than 4, since its base a n is larger than e n the base of 4. This diagram below should end at a n 4 8. That portion of the illuminated surface on which a shadow is cast will be brightest which lies contiguous to the cast shadow. Just as an object which is lighted up by a greater quantity of luminous rays becomes brighter, so one on which a greater quantity of shadow falls, will be darker.\n\nLet 4 be the side of an illuminated surface 4 8, surrounding the cast shadow g e 4. And this spot 4 will be lighter than 8, because less shadow falls on it than on 8. Since 4 faces only the shadow i n; and 8 faces and receives the shadow a e as well as i n which makes it twice as dark. And the same thing happens when you put the atmosphere and the sun in the place of shade and light.\n\nThe distribution of shadow, originating in, and limited by, plane surfaces placed near to each other, equal in tone and directly opposite, will be darker at the ends than at the beginning, which will be determined by the incidence of the luminous rays.\n\nYou will find the same proportion in the depth of the derived shadows a n as in the nearness of the luminous bodies m b, which cause them; and if the luminous bodies were of equal size you would still farther find the same proportion in the light cast by the luminous circles and their shadows as in the distance of the said luminous bodies.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     },
+     "de": {
+      "text": "Der Teil der Oberfläche der Körper, der von den Bildern der gegenüberstehenden Körper unter dem größeren Winkel getroffen wird, färbt sich am stärksten in deren Farbe: 8 unten ist ein größerer Winkel als 4, weil seine Grundlinie a n größer ist als e n, die Grundlinie von 4. Diese Figur unten soll von a n und 4 und 8 begrenzt sein. Der Teil des Beleuchteten, der die Stelle umgibt, auf die der Schatten fällt, wird dort am hellsten sein, wo er dieser Stelle am nächsten ist. So wie ein Ding, das von einer größeren Menge Lichtstrahlen berührt wird, heller wird, so wird ein Ding dunkler, das von einer größeren Menge Schattenstrahlen getroffen wird.\n\n4 sei der Teil des Beleuchteten 4 8, der die Stelle g e 4 umgibt, auf die der Schatten fällt. Diese Stelle 4 wird heller sein, weil sie weniger Schatten sieht als die Stelle 8. Denn 4 sieht nur den Schatten i n, 8 aber sieht und empfängt den Schatten a e und den Schatten i n und ist darum doppelt so dunkel. Und dasselbe geschieht, wenn du die Luft und die Sonne an die Stelle des Schattens und des Lichts setzt.\n\nDas Zusammenlaufen [?] des Schattens, der zwischen nahen, ebenen Flächen von gleicher Beschaffenheit, die einander gerade gegenüberstehen, entsteht und von ihnen begrenzt wird, ist am Ende dunkler als am Anfang, und dieser endet dort, wo die Lichtstrahlen auftreffen [?].\n\nDu wirst zwischen den abgeleiteten Schatten a n dasselbe Verhältnis der Dunkelheit finden, das die Nähe der leuchtenden Körper m b hat, die sie verursachen. Und wenn diese leuchtenden Körper gleich groß sind, wirst du bei den Stellen, auf die die leuchtenden Kreise treffen, und bei den Schatten wieder dasselbe Verhältnis finden wie bei den Abständen dieser leuchtenden Körper [?].",
+      "kind": "ours",
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Jean Paul Richter, 1883, Englisch vor allem von Mrs R. C. Bell). Sie kann Fehler enthalten.",
+      "doubts": [
+       "'Il concorso · dell'onbra': wörtlich 'das Zusammenlaufen' des Schattens; Richter übersetzt 'the distribution of shadow' (die Verteilung des Schattens). Wir behalten ein wörtliches Wort und markieren es.",
+       "'jl quale · terminerà · infra la · percussione de'luminosi razzi': 'il quale' kann sich auf den Anfang oder auf den Schatten beziehen; Richter liest 'which will be determined by the incidence of the luminous rays' (der durch das Auftreffen der Lichtstrahlen bestimmt wird).",
+       "'4 Sia la parte': Die erste '4' ist eine Markierung der Figur und das Subjekt des Satzes ('4 sei der Teil'), wie in Richters Englisch."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I pp. 119-120",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n166/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I pp. 119-120",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n166/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "CA.8": {
+   "lead": 0,
+   "notes": "Placement: Richter prints 'C. A. 36a; 115a]' and his Bibliography (vol. II p. 498) lists '36a 115a 178' as his only passage from this side; the Leonardo//thek@ catalogue entry for CA 104r (studies of light and shade) gives Richter 178. Richter's footnote: 'In the original the diagram is placed between lines 27 and 28.' The curator's reason points to this passage: lead 0.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §178 (C. A. 36a; 115a), vol. I pp. 99-100",
+     "it": {
+      "text": "Pruovasi perchè l'onbra o p c h è tanto piv oscura, quanto ella più s'avicina alla linia p · h, ed è tanto più chiara quāto essa più s'avicina alla linia o c, e sia il lume a b finestra, e la pariete oscura, dove tale finestra è collocata, sia b s cioè vn de lati d'essa pariete.\nAddunque diremo la linia p h essere più oscura che altra parte dello spatio · o p c h, perchè essa linia vede ed è veduta da tutto lo spatio ōbroso della pariete b s ·, ma la linia o c è piv chiara che altra parte d'esso spatio o p c h perchè essa linia vede lo spatio luminoso a b.\n¶Doue l'ōbra è maggiore o minore o equale al corpo ōbroso sua origine.¶\n[Di prima della qualità de lumi divisi.\nDELL'ONBRA COMPOSTA F, R, C, H NATA DAL LUME PARTICULARE.\nL'onbra composta f r c h è in tal modo conditionata che quanto ella si fa più remota dal suo lato intrinsico, tanto perde della sua oscurità; pruovasi:\nSia adunque il luminoso d a e l'ōbroso f n, e sia a e vna delle parieti laterali della finestra cioè d a; Dico per la 2ª, la superfitie d'ogni corpo participa del color del suo obbietto, adunque il lato r c, ch'è veduto dalla oscurità a e, participa d'essa oscurità e similmēte il lato estrinsico ch'è veduto dal lume d a participa d'esso lume e cosi abiā definito tale stremo del mezzo cōtenuto dalli stremi]\nQuesta si diuide in 4 parti prima delli stremi cōtenēti l'onbra conposita, seconda, Dell'onbra cōposita dentro alli sua stremi.",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "It can be proved why the shadow o p c h is darker in proportion as it is nearer to the line p h and is lighter in proportion as it is nearer to the line o c. Let the light a b, be a window, and let the dark wall in which this window is, be b s, that is, one of the sides of the wall.\nThen we may say that the line p h is darker than any other part of the space o p c h, because this line faces the whole surface in shadow of the wall b s. The line o c is lighter than the other part of this space o p c h, because this line faces the luminous space a b.\nWhere the shadow is larger, or smaller, or equal the body which casts it.\n[First of the character of divided lights.\nOF THE COMPOUND SHADOW F, R, C, H CAUSED BY A SINGLE LIGHT.\nThe shadow f r c h is under such conditions as that where it is farthest from its inner side it loses depth in proportion. To prove this:\nLet d a, be the light and f n the solid body, and let a e be one of the side walls of the window that is d a. Then I say—according to the 2nd [proposition]: that the surface of any body is affected by the tone of the objects surrounding it,—that the side r c, which faces the dark wall a e must participate of its darkness and, in the same way that the outer surface which faces the light d a participates of the light; thus we get the outlines of the extremes on each side of the centre included between them.]\nThis is divided into four parts. The first the extremes, which include the compound shadow, secondly the compound shadow between these extremes.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     },
+     "de": {
+      "text": "Man beweist, warum der Schatten o p c h umso dunkler ist, je näher er der Linie p h kommt, und umso heller, je näher er der Linie o c kommt. Das Licht a b sei ein Fenster, und die dunkle Wand, in der dieses Fenster sitzt, sei b s, das heißt eine der Seiten dieser Wand.\nAlso sagen wir, dass die Linie p h dunkler ist als jeder andere Teil des Raumes o p c h, weil diese Linie den ganzen schattigen Raum der Wand b s sieht und von ihm gesehen wird. Die Linie o c aber ist heller als jeder andere Teil dieses Raumes o p c h, weil diese Linie den leuchtenden Raum a b sieht.\nWo der Schatten größer oder kleiner ist als der schattende Körper, von dem er ausgeht, oder ebenso groß wie er.\n[Zuerst von der Beschaffenheit der geteilten Lichter.\nVOM ZUSAMMENGESETZTEN SCHATTEN F, R, C, H, DER AUS EINEM EINZELNEN LICHT ENTSTEHT.\nDer zusammengesetzte Schatten f r c h ist so beschaffen, dass er umso mehr von seiner Dunkelheit verliert, je weiter er sich von seiner inneren Seite entfernt. Man beweist es so:\nEs sei also d a das Leuchtende und f n das Schattende, und a e sei eine der Seitenwände des Fensters, das heißt von d a. Ich sage nach dem 2. Satz: Die Oberfläche jedes Körpers hat teil an der Farbe dessen, was ihr gegenübersteht. Also hat die Seite r c, die von der Dunkelheit a e gesehen wird, an dieser Dunkelheit teil, und ebenso hat die äußere Seite, die vom Licht d a gesehen wird, an diesem Licht teil. Und so haben wir diese Grenze der Mitte bestimmt, die zwischen den Grenzen liegt [?].]\nDies teilt sich in 4 Teile. Erstens von den Grenzen, die den zusammengesetzten Schatten einschließen. Zweitens vom zusammengesetzten Schatten innerhalb seiner Grenzen.",
+      "kind": "ours",
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Jean Paul Richter, 1883, Englisch vor allem von Mrs R. C. Bell). Sie kann Fehler enthalten.",
+      "doubts": [
+       "Die eckigen Klammern stammen von Richter: Nach seinem Schlüssel markieren sie Wörter, die in der Handschrift gestrichen sind; im Deutschen stehen sie um dieselbe Stelle.",
+       "Richters Zeichen ¶ (ein Satz, den Leonardo mit einer Klammer abgesetzt hat) ist im Deutschen weggelassen.",
+       "'vede ed è veduta da': wörtlich 'sieht und wird gesehen von'; so beibehalten, wo Richter 'faces' (liegt gegenüber) schreibt.",
+       "'lume particulare': eine einzelne, begrenzte Lichtquelle; Richter: 'a single light'.",
+       "'per la 2ª': Leonardo beruft sich auf einen zweiten Lehrsatz, ohne ihn zu nennen; 'Satz' ist dem Sinn nach ergänzt, wie Richter '[proposition]' ergänzt.",
+       "'e cosi abiā definito tale stremo del mezzo cōtenuto dalli stremi': wörtlich übersetzt; der Sinn ist dunkel, und Richter umschreibt ('thus we get the outlines of the extremes on each side of the centre included between them').",
+       "Nur zwei der vier Teile werden genannt; dort bricht der Text ab. Richters Fußnote zu 'lumi divisi': 'The text here breaks off abruptly.' (Der Text bricht hier unvermittelt ab.)"
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I pp. 99-100",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n142/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I pp. 99-100",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n142/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "I.086": {
+   "lead": 0,
+   "notes": "One sentence on the page, printed twice by Richter: as §188 (Fourth Book on Light and Shade, vol. I p. 107) and as §452 (the cast shadow of trees, vol. I p. 227), with two different English renderings and a small difference in his Italian ('nasce' / 'nascie'). Both are kept, in the edition's order; the German is the same for both. A page shows one of them. Placement confirmed: both carry 'I.1 37b]'; Richter's Bibliography (vol. II p. 489, MS. I) lists '37b Pl. XXVIII, No. 5, 188, 452'; Ravaisson vol. IV prints the sentence under MS I 'FOLIO 37 (verso)' with the footnote 'J.-P. Richter, t. I, 188 et 452, pl. XXVIII, 5' (https://archive.org/details/lesmanuscritsdel04lo/page/n253/mode/1up). Richter's footnotes: 'Comp. the drawing on Pl. XXVIII, No. 5.' and 'See Pl. XXVIII, No. 5.' Ravaisson prints more on this side that Richter does not: a label beside the figure, 'Onbre [varie ?] da piramide equidistante al suo luminoso', and a paragraph beginning 'Ancora che un corpo onbroso sia piramidale ...' (a pyramidal shaded body throws its shadow ...; not proofread here). They are not in this record. The curator's reason names the drawing; lead 0.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §188 (I.1 37b), vol. I p. 107",
+     "it": {
+      "text": "La stanpa dell'onbra di qualūque corpo di uniforme grossezza mai sarà simile al corpo donde ella nasce.",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "The form of the shadow cast by any body of uniform density can never be the same as that of the body producing it.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     },
+     "de": {
+      "text": "Der Abdruck des Schattens jedes beliebigen Körpers von gleichmäßiger Dicke wird niemals dem Körper gleichen, aus dem er entsteht.",
+      "kind": "ours",
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Jean Paul Richter, 1883, Englisch vor allem von Mrs R. C. Bell). Sie kann Fehler enthalten.",
+      "doubts": [
+       "'La stanpa dell'onbra': wörtlich 'der Druck (Stempel) des Schattens', die Form, die der Schatten auf einer Fläche hinterlässt; übersetzt mit 'Abdruck'.",
+       "'grossezza': Dicke; Richter übersetzt es in §188 mit 'density' (Dichte) und in §452 mit 'breadth' (Breite)."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 107",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n152/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 107",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n152/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Richter 1883 §452 (I.1 37b), vol. I p. 227",
+     "it": {
+      "text": "La stanpa dell'onbra di qualūque corpo di uniforme grossezza mai sarà simile al corpo, donde ella nascie.",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "The image of the shadow of any object of uniform breadth can never be [exactly] the same as that of the body which casts it.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     },
+     "de": {
+      "text": "Der Abdruck des Schattens jedes beliebigen Körpers von gleichmäßiger Dicke wird niemals dem Körper gleichen, aus dem er entsteht.",
+      "kind": "ours",
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Jean Paul Richter, 1883, Englisch vor allem von Mrs R. C. Bell). Sie kann Fehler enthalten.",
+      "doubts": [
+       "'La stanpa dell'onbra': wörtlich 'der Druck (Stempel) des Schattens', die Form, die der Schatten auf einer Fläche hinterlässt; übersetzt mit 'Abdruck'.",
+       "'grossezza': Dicke; Richter übersetzt es in §188 mit 'density' (Dichte) und in §452 mit 'breadth' (Breite)."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 227",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n318/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 227",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n318/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "AR1.303": {
+   "lead": 0,
+   "notes": "The Italian is the edition's critical transcription (see AR1.293 for the two transcriptions). The four passages are the text under the half-circle mirror; the first states what the drawing shows (the curved boundary of the reflected rays, which reaches at most a quarter of the diameter), so it is the lead. Page match: the SET image is this edition's plate of fol. 87 recto (p0303 of the same scan); the diplomatic page facing it is headed 'Fol. 87 recto'.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Codice Arundel 263 (1923), fol. 87 recto, trascrizione critica, passage 1 of 4",
+     "it": {
+      "text": "Ecco qui che lo spechio concavo di mezo corpo sperico ha le ipotemisse curve, le quale dentro a di loro includano il concorso de' razi refressi, i quali s'astendano il più insino alla quarta parte del diamitro della predetta spera, e tanto più, quanto è la minor parte che imaginar si possa vicina a esso termine. La qual così si dimostra.",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "See here how the concave mirror made of half a spherical body has curved hypotenuses, which enclose within them the meeting of the reflected rays. These rays reach at most as far as the fourth part of the diameter of the said sphere, and beyond it only by the smallest part one can imagine close to that limit [?]. This is shown as follows.",
+      "kind": "ours",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Reale Commissione Vinciana (1923), checked against the edition's diplomatic transcription of the same folio. It may contain errors.",
+      "doubts": [
+       "'ipotemisse curve' (curved hypotenuses) are the curved outer boundaries of the reflected rays, the curve now called a caustic; Leonardo has no other word for it.",
+       "'e tanto più, quanto è la minor parte che imaginar si possa vicina a esso termine' is compressed; it is read as 'and further only by the smallest imaginable part near that limit', and marked [?]."
+      ]
+     },
+     "de": {
+      "text": "Sieh hier, wie der Hohlspiegel aus einem halben Kugelkörper gekrümmte Hypotenusen hat, die in sich das Zusammentreffen der zurückgeworfenen Strahlen einschließen. Diese Strahlen reichen höchstens bis zum vierten Teil des Durchmessers der genannten Kugel, und darüber hinaus nur um den kleinsten Teil, den man sich nahe dieser Grenze denken kann [?]. Das wird so bewiesen.",
+      "kind": "ours",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von der Reale Commissione Vinciana (1923) gedruckten Italienisch, geprüft an der diplomatischen Transkription derselben Ausgabe. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'ipotemisse curve' (gekrümmte Hypotenusen) sind die gekrümmten äußeren Grenzen der zurückgeworfenen Strahlen, die Kurve, die man heute Kaustik nennt; Leonardo hat kein anderes Wort dafür.",
+       "'e tanto più, quanto è la minor parte che imaginar si possa vicina a esso termine' ist gedrängt; gelesen als 'und darüber hinaus nur um den kleinsten Teil, den man sich nahe dieser Grenze denken kann', und mit [?] markiert."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "I manoscritti e i disegni di Leonardo da Vinci, pubblicati dalla Reale Commissione Vinciana, vol. I: Il Codice Arundel 263 nel Museo Britannico. Riproduzione fototipica con trascrizioni diplomatica e critica. Parte prima (da fol. 1 a fol. 116), Roma: Danesi, 1923",
+       "page": "Parte prima, trascrizione critica, pp. 102*-103* (margin: f. 87 r); archive.org viewer pages n502 and n503",
+       "url": "https://archive.org/details/pbc.gda.pl.503231_01_01_01_1923_11478/page/n502/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Codice Arundel 263 (1923), fol. 87 recto, trascrizione critica, passage 2 of 4",
+     "it": {
+      "text": "Quanto l'angolo che s'include infra 'l razo incidente, e 'l razo refresso sarà magiore, tanto il concorso de' razi refressi saran più brievi. E così de converso sarà esso concorso più lungo, quanto el predetto angolo sarà minore.",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "The greater the angle enclosed between the incident ray and the reflected ray, the shorter the meeting of the reflected rays. And so conversely, that meeting will be longer the smaller the said angle is.",
+      "kind": "ours",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Reale Commissione Vinciana (1923), checked against the edition's diplomatic transcription of the same folio. It may contain errors.",
+      "doubts": [
+       "'saran più brievi' is plural after a singular subject in the Italian; the sense is that the meeting point lies closer to the mirror."
+      ]
+     },
+     "de": {
+      "text": "Je größer der Winkel zwischen dem einfallenden und dem zurückgeworfenen Strahl ist, desto kürzer ist das Zusammentreffen der zurückgeworfenen Strahlen. Und umgekehrt wird dieses Zusammentreffen umso länger, je kleiner der genannte Winkel ist.",
+      "kind": "ours",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von der Reale Commissione Vinciana (1923) gedruckten Italienisch, geprüft an der diplomatischen Transkription derselben Ausgabe. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'saran più brievi' steht im Italienischen in der Mehrzahl nach einem Subjekt in der Einzahl; gemeint ist, dass der Treffpunkt näher am Spiegel liegt."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "I manoscritti e i disegni di Leonardo da Vinci, pubblicati dalla Reale Commissione Vinciana, vol. I: Il Codice Arundel 263 nel Museo Britannico. Riproduzione fototipica con trascrizioni diplomatica e critica. Parte prima (da fol. 1 a fol. 116), Roma: Danesi, 1923",
+       "page": "Parte prima, trascrizione critica, pp. 102*-103* (margin: f. 87 r); archive.org viewer pages n502 and n503",
+       "url": "https://archive.org/details/pbc.gda.pl.503231_01_01_01_1923_11478/page/n502/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Codice Arundel 263 (1923), fol. 87 recto, trascrizione critica, passage 3 of 4",
+     "it": {
+      "text": "Vedi l'angolo d m h che gitta l'angolo o nato dalla basa m g, e vedi il converso dell'angolo s 3 b che gitta la piramide in b, nata dalla basa f 3.",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "See the angle d m h, which casts the angle o, born of the base m g. And see the converse in the angle s 3 b, which casts the pyramid at b, born of the base f 3.",
+      "kind": "ours",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Reale Commissione Vinciana (1923), checked against the edition's diplomatic transcription of the same folio. It may contain errors.",
+      "doubts": [
+       "The letters refer to the drawing of the half-circle mirror; 'gitta' (casts, throws) is Leonardo's verb for a mirror sending its rays to a point."
+      ]
+     },
+     "de": {
+      "text": "Sieh den Winkel d m h, der den Winkel o wirft, der aus der Grundlinie m g entsteht. Und sieh das Umgekehrte am Winkel s 3 b, der die Pyramide bei b wirft, die aus der Grundlinie f 3 entsteht.",
+      "kind": "ours",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von der Reale Commissione Vinciana (1923) gedruckten Italienisch, geprüft an der diplomatischen Transkription derselben Ausgabe. Sie kann Fehler enthalten.",
+      "doubts": [
+       "Die Buchstaben beziehen sich auf die Zeichnung des halbkreisförmigen Spiegels; 'gitta' (wirft) ist Leonardos Verb dafür, dass ein Spiegel seine Strahlen auf einen Punkt sendet."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "I manoscritti e i disegni di Leonardo da Vinci, pubblicati dalla Reale Commissione Vinciana, vol. I: Il Codice Arundel 263 nel Museo Britannico. Riproduzione fototipica con trascrizioni diplomatica e critica. Parte prima (da fol. 1 a fol. 116), Roma: Danesi, 1923",
+       "page": "Parte prima, trascrizione critica, pp. 102*-103* (margin: f. 87 r); archive.org viewer pages n502 and n503",
+       "url": "https://archive.org/details/pbc.gda.pl.503231_01_01_01_1923_11478/page/n502/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 3,
+     "ref": "Codice Arundel 263 (1923), fol. 87 recto, trascrizione critica, passage 4 of 4",
+     "it": {
+      "text": "Tutte le linie che dirivano da K, son quelle che tagliano l'angolo inferiore per mezo, cioè quel'angolo che s'include infra la congiunzione della linia incidente e la linia refressa.",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "All the lines that come from K are those that cut the lower angle in half, that is, the angle enclosed at the junction of the incident line and the reflected line.",
+      "kind": "ours",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Reale Commissione Vinciana (1923), checked against the edition's diplomatic transcription of the same folio. It may contain errors.",
+      "doubts": [
+       "K is the centre of the sphere; the lines from it are the radii, which halve the angle between incident and reflected ray (the law of reflection). The edition's critical text reads 'K' where its diplomatic text prints a special letter sign."
+      ]
+     },
+     "de": {
+      "text": "Alle Linien, die von K ausgehen, sind diejenigen, die den unteren Winkel halbieren, nämlich den Winkel, der an der Verbindung von einfallender und zurückgeworfener Linie eingeschlossen ist.",
+      "kind": "ours",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von der Reale Commissione Vinciana (1923) gedruckten Italienisch, geprüft an der diplomatischen Transkription derselben Ausgabe. Sie kann Fehler enthalten.",
+      "doubts": [
+       "K ist der Mittelpunkt der Kugel; die Linien von ihm aus sind die Radien, die den Winkel zwischen einfallendem und zurückgeworfenem Strahl halbieren (das Reflexionsgesetz). Der kritische Text der Ausgabe liest 'K', wo ihr diplomatischer Text ein besonderes Buchstabenzeichen druckt."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "I manoscritti e i disegni di Leonardo da Vinci, pubblicati dalla Reale Commissione Vinciana, vol. I: Il Codice Arundel 263 nel Museo Britannico. Riproduzione fototipica con trascrizioni diplomatica e critica. Parte prima (da fol. 1 a fol. 116), Roma: Danesi, 1923",
+       "page": "Parte prima, trascrizione critica, pp. 102*-103* (margin: f. 87 r); archive.org viewer pages n502 and n503",
+       "url": "https://archive.org/details/pbc.gda.pl.503231_01_01_01_1923_11478/page/n502/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "AR1.305": {
+   "lead": null,
+   "notes": "The Italian is the edition's critical transcription (see AR1.293 for the two transcriptions). The first passage is the caption beside the drawing of the pointed caustic (Leonardo's 'linia a o'), so it is the lead; the second describes how to make the rays visible with the half-ring mirror drawn in section below. Page match: the SET image is this edition's plate of fol. 87 verso (p0305 of the same scan); the diplomatic page facing it is headed 'Fol. 87 verso'.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Codice Arundel 263 (1923), fol. 87 verso, trascrizione critica, passage 1 of 2",
+     "it": {
+      "text": "Qui si dimostra come il concorso de' razi refressi non passa il 4° del diamitro delle spere donde li spechi concavi hanno la loro curvità, come si dimostra nella linia a o.",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "Here it is shown how the meeting of the reflected rays does not go beyond the 4th part of the diameter of the spheres from which concave mirrors take their curvature, as is shown in the line a o.",
+      "kind": "ours",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Reale Commissione Vinciana (1923), checked against the edition's diplomatic transcription of the same folio. It may contain errors.",
+      "doubts": [
+       "'il 4°' (the 4th) is read as the fourth part, as in the facing page 87 recto."
+      ]
+     },
+     "de": {
+      "text": "Hier wird gezeigt, wie das Zusammentreffen der zurückgeworfenen Strahlen nicht über den 4. Teil des Durchmessers der Kugeln hinausgeht, von denen die Hohlspiegel ihre Krümmung haben, wie es an der Linie a o gezeigt wird.",
+      "kind": "ours",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von der Reale Commissione Vinciana (1923) gedruckten Italienisch, geprüft an der diplomatischen Transkription derselben Ausgabe. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'il 4°' (das 4.) wird als der vierte Teil gelesen, wie auf der gegenüberliegenden Seite 87 recto."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "I manoscritti e i disegni di Leonardo da Vinci, pubblicati dalla Reale Commissione Vinciana, vol. I: Il Codice Arundel 263 nel Museo Britannico. Riproduzione fototipica con trascrizioni diplomatica e critica. Parte prima (da fol. 1 a fol. 116), Roma: Danesi, 1923",
+       "page": "Parte prima, trascrizione critica, pp. 103*-104* (margin: f. 87 v); archive.org viewer pages n503 and n504",
+       "url": "https://archive.org/details/pbc.gda.pl.503231_01_01_01_1923_11478/page/n503/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Codice Arundel 263 (1923), fol. 87 verso, trascrizione critica, passage 2 of 2",
+     "it": {
+      "text": "Se si volessi vedere e' razi seperati, sia tolto lo spechio in figura d'un mezo anello il quale sia piano di dentro, di poi s'è fatto una mistura di biacca tenperato con uovo, e con quella coperta col penello due o tre volte, e secca ch'elle sia, sgraffiata e scoperto lo spechio collo stile di legno aciò non graffi lo spechio, e così vedrai li razi seperati sopra il piano a b c, come son seperate le lor cause.",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "If one wished to see the rays separately, take the mirror in the shape of a half ring which is flat inside [?]. Then a mixture is made of white lead tempered with egg, and with it [the piece] is covered with the brush two or three times. When it is dry, scratch it and uncover the mirror with the wooden stylus, so as not to scratch the mirror. And so you will see the rays separated on the plane a b c, just as their causes are separated.",
+      "kind": "ours",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Reale Commissione Vinciana (1923), checked against the edition's diplomatic transcription of the same folio. It may contain errors.",
+      "doubts": [
+       "'il quale sia piano di dentro' (which is flat inside) is unclear: most likely the half ring stands on a flat base, and the white coating stays on that base, where the reflected rays then show as separate lines. Marked [?].",
+       "The Italian does not say what is coated ('con quella coperta', covered with it); the translations add '[the piece]'. The tenses shift ('sia tolto', 's'è fatto'); the translations make them one instruction.",
+       "'biacca' is white lead; 'stile di legno' a wooden stylus, used so that the metal of the mirror is not scratched."
+      ]
+     },
+     "de": {
+      "text": "Wollte man die Strahlen getrennt sehen, so nehme man den Spiegel in Form eines halben Rings, der innen eben ist [?]. Dann wird eine Mischung aus Bleiweiß, mit Ei angerührt, gemacht, und damit wird [das Stück] zwei- oder dreimal mit dem Pinsel bestrichen. Ist es trocken, so kratze man es ab und lege den Spiegel mit dem Holzgriffel frei, damit man den Spiegel nicht zerkratzt. Und so wirst du die Strahlen getrennt auf der Ebene a b c sehen, so wie ihre Ursachen getrennt sind.",
+      "kind": "ours",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von der Reale Commissione Vinciana (1923) gedruckten Italienisch, geprüft an der diplomatischen Transkription derselben Ausgabe. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'il quale sia piano di dentro' (der innen eben ist) ist unklar: Höchstwahrscheinlich steht der halbe Ring auf einer ebenen Grundfläche, und der weiße Überzug bleibt auf dieser Fläche, wo sich die zurückgeworfenen Strahlen dann als getrennte Linien zeigen. Mit [?] markiert.",
+       "Das Italienische sagt nicht, was bestrichen wird ('con quella coperta', damit bedeckt); die Übersetzungen ergänzen '[das Stück]'. Die Zeitformen wechseln ('sia tolto', 's'è fatto'); die Übersetzungen machen daraus eine einzige Anweisung.",
+       "'biacca' ist Bleiweiß; 'stile di legno' ein Holzgriffel, damit das Metall des Spiegels nicht zerkratzt wird."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "I manoscritti e i disegni di Leonardo da Vinci, pubblicati dalla Reale Commissione Vinciana, vol. I: Il Codice Arundel 263 nel Museo Britannico. Riproduzione fototipica con trascrizioni diplomatica e critica. Parte prima (da fol. 1 a fol. 116), Roma: Danesi, 1923",
+       "page": "Parte prima, trascrizione critica, pp. 103*-104* (margin: f. 87 v); archive.org viewer pages n503 and n504",
+       "url": "https://archive.org/details/pbc.gda.pl.503231_01_01_01_1923_11478/page/n503/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
   "AR1.293": {
    "lead": 1,
    "notes": "The Italian is the edition's critical transcription ('trascrizione critica'), printed after the plates with its own page numbers (starred); it resolves Leonardo's abbreviations and adds modern punctuation and word division, keeping his spelling. The edition also prints a diplomatic transcription facing each plate (see it_other). The edition's '(1)' footnote marker is kept in passage 5. Passages 2 to 4 stand beside the large drawing of parallel rays on the curved mirror, so passage 2 is the lead; passages 8 and 9 belong to the small frame device with the dish. Page match: the SET image is this edition's plate of fol. 84 verso (p0293 of the same scan), and the diplomatic page facing it is headed 'Fol. 84 verso'.",
@@ -837,26 +704,26 @@
      "it": {
       "text": "Vengano i razi solari dentro ai labri dello spechio concavo, il quale agiunga alla somma della meza spera. La qual cosa acade, perchè il concorso de' razi solari termina nel centro del corpo solare, onde per necessità tale concorso di razi viene a essere piramidale, e per conseguenza pò cominciare la base di tale piramide dentro ai labri di detto spechio.",
       "label": {
-       "en": "Transcription: the printed Arundel edition, 1923",
-       "de": "Umschrift: die gedruckte Arundel-Ausgabe, 1923"
+       "en": null,
+       "de": null
       }
      },
      "en": {
-      "text": "Let the sun's rays come within the lips of the concave mirror that reaches the full height of the half sphere. This happens because the meeting of the sun's rays ends in the centre of the sun's body. So of necessity this meeting of rays becomes pyramidal, and in consequence the base of that pyramid can begin within the lips of the said mirror.",
+      "text": "The sun's rays come within the lips of the concave mirror that reaches the full height of the half sphere. This happens because the meeting of the sun's rays ends in the centre of the sun's body. So of necessity this meeting of rays becomes pyramidal, and in consequence the base of that pyramid can begin within the lips of the said mirror.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of the printed Arundel edition, 1923. It may contain errors.",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Reale Commissione Vinciana (1923), checked against the edition's diplomatic transcription of the same folio. It may contain errors.",
       "doubts": [
        "'agiunga alla somma della meza spera' (reaches the summit of the half sphere) is read as a mirror that is a full hemisphere.",
        "'labri' (lips) are the rim of the mirror; 'piramide' is Leonardo's word for a cone or fan of rays."
       ]
      },
      "de": {
-      "text": "Die Sonnenstrahlen sollen innerhalb der Ränder des Hohlspiegels einfallen, der bis zur vollen Höhe der Halbkugel reicht. Das geschieht, weil das Zusammentreffen der Sonnenstrahlen im Mittelpunkt des Sonnenkörpers endet. Daher wird dieses Zusammentreffen der Strahlen notwendig pyramidenförmig, und folglich kann die Grundfläche dieser Pyramide innerhalb der Ränder des genannten Spiegels beginnen.",
+      "text": "Die Sonnenstrahlen fallen innerhalb der Ränder des Hohlspiegels ein, der bis zur vollen Höhe der Halbkugel reicht. Das geschieht, weil das Zusammentreffen der Sonnenstrahlen im Mittelpunkt des Sonnenkörpers endet. Daher wird dieses Zusammentreffen der Strahlen notwendig pyramidenförmig, und folglich kann die Grundfläche dieser Pyramide innerhalb der Ränder des genannten Spiegels beginnen.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von die gedruckte Arundel-Ausgabe, 1923 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von der Reale Commissione Vinciana (1923) gedruckten Italienisch, geprüft an der diplomatischen Transkription derselben Ausgabe. Sie kann Fehler enthalten.",
       "doubts": [
-       "'agiunga alla somma della meza spera' (reaches the summit of the half sphere) is read as a mirror that is a full hemisphere.",
-       "'labri' (lips) are the rim of the mirror; 'piramide' is Leonardo's word for a cone or fan of rays."
+       "'agiunga alla somma della meza spera' (reicht bis zum Gipfel der Halbkugel) wird als Spiegel gelesen, der eine volle Halbkugel ist.",
+       "'labri' (Lippen) sind der Rand des Spiegels; 'piramide' ist Leonardos Wort für einen Kegel oder Fächer von Strahlen."
       ]
      },
      "fr": null,
@@ -875,14 +742,14 @@
      "it": {
       "text": "Quanto lo specchio concavo comune sarà più piano, tanta magiore somma di razi refressi conducerà nel medesimo sito. E così de converso: quanto sarà più cavo, tanta minor somma di razi si condurrà in el predetto sito.",
       "label": {
-       "en": "Transcription: the printed Arundel edition, 1923",
-       "de": "Umschrift: die gedruckte Arundel-Ausgabe, 1923"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "The flatter the common concave mirror, the greater the sum of reflected rays it will bring to the same place. And so conversely: the more hollow it is, the smaller the sum of rays that will be brought to that place.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of the printed Arundel edition, 1923. It may contain errors.",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Reale Commissione Vinciana (1923), checked against the edition's diplomatic transcription of the same folio. It may contain errors.",
       "doubts": [
        "'specchio concavo comune' (common concave mirror) is Leonardo's term for a mirror cut from a sphere, as against the deeper hemispherical one of the first passage.",
        "The print breaks 'condu-cerà' at a line end; joined as 'conducerà'."
@@ -891,10 +758,10 @@
      "de": {
       "text": "Je flacher der gewöhnliche Hohlspiegel ist, desto größer ist die Menge der zurückgeworfenen Strahlen, die er an dieselbe Stelle führt. Und umgekehrt: Je hohler er ist, desto kleiner ist die Menge der Strahlen, die an diese Stelle geführt wird.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von die gedruckte Arundel-Ausgabe, 1923 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von der Reale Commissione Vinciana (1923) gedruckten Italienisch, geprüft an der diplomatischen Transkription derselben Ausgabe. Sie kann Fehler enthalten.",
       "doubts": [
-       "'specchio concavo comune' (common concave mirror) is Leonardo's term for a mirror cut from a sphere, as against the deeper hemispherical one of the first passage.",
-       "The print breaks 'condu-cerà' at a line end; joined as 'conducerà'."
+       "'specchio concavo comune' (gewöhnlicher Hohlspiegel) ist Leonardos Begriff für einen Spiegel, der aus einer Kugel geschnitten ist, im Gegensatz zu dem tieferen halbkugelförmigen des ersten Abschnitts.",
+       "Der Druck trennt 'condu-cerà' am Zeilenende; zusammengefügt als 'conducerà'."
       ]
      },
      "fr": null,
@@ -913,14 +780,14 @@
      "it": {
       "text": "Tanto la piramide radiosa causata da' razi refressi mediante lo spechio concavo sarà di più rette ipotenisse, quanto lo spechio predetto sarà men cavo.",
       "label": {
-       "en": "Transcription: the printed Arundel edition, 1923",
-       "de": "Umschrift: die gedruckte Arundel-Ausgabe, 1923"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "The radiant pyramid made by the rays reflected from the concave mirror will have straighter hypotenuses the less hollow the said mirror is.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of the printed Arundel edition, 1923. It may contain errors.",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Reale Commissione Vinciana (1923), checked against the edition's diplomatic transcription of the same folio. It may contain errors.",
       "doubts": [
        "'ipotenisse' (hypotenuses) is Leonardo's word for the outer sides of the cone of reflected rays; for a deep mirror they are not straight lines but curves (the next passage), the curve now called a caustic."
       ]
@@ -928,9 +795,9 @@
      "de": {
       "text": "Die Strahlenpyramide, die von den am Hohlspiegel zurückgeworfenen Strahlen gebildet wird, hat umso geradere Hypotenusen, je weniger hohl der genannte Spiegel ist.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von die gedruckte Arundel-Ausgabe, 1923 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von der Reale Commissione Vinciana (1923) gedruckten Italienisch, geprüft an der diplomatischen Transkription derselben Ausgabe. Sie kann Fehler enthalten.",
       "doubts": [
-       "'ipotenisse' (hypotenuses) is Leonardo's word for the outer sides of the cone of reflected rays; for a deep mirror they are not straight lines but curves (the next passage), the curve now called a caustic."
+       "'ipotenisse' (Hypotenusen) ist Leonardos Wort für die äußeren Seiten des Kegels der zurückgeworfenen Strahlen; bei einem tiefen Spiegel sind sie keine geraden Linien, sondern Kurven (der nächste Abschnitt), die Kurve, die man heute Brennlinie oder Kaustik nennt."
       ]
      },
      "fr": null,
@@ -949,19 +816,19 @@
      "it": {
       "text": "E tanto sarà di più curva ipotenissa, quanto esso spechio fia di magiore concavità.",
       "label": {
-       "en": "Transcription: the printed Arundel edition, 1923",
-       "de": "Umschrift: die gedruckte Arundel-Ausgabe, 1923"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "And it will have a more curved hypotenuse the greater the mirror's concavity.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of the printed Arundel edition, 1923. It may contain errors."
+      "label": "AI translation (Opus 5.5) from the Italian printed by Reale Commissione Vinciana (1923), checked against the edition's diplomatic transcription of the same folio. It may contain errors."
      },
      "de": {
       "text": "Und sie hat eine umso gekrümmtere Hypotenuse, je größer die Höhlung des Spiegels ist.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von die gedruckte Arundel-Ausgabe, 1923 übersetzt. Sie kann Fehler enthalten."
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von der Reale Commissione Vinciana (1923) gedruckten Italienisch, geprüft an der diplomatischen Transkription derselben Ausgabe. Sie kann Fehler enthalten."
      },
      "fr": null,
      "label_only": false,
@@ -979,14 +846,14 @@
      "it": {
       "text": "Se lo spechio fia d'un braccio di diamitro, e lascierà (1) di circulo di 400 bracci di diamitro, esso sarà poco curvo, e gitterà i sua razi 100 bracci, cioè 1/4 del diamitro.",
       "label": {
-       "en": "Transcription: the printed Arundel edition, 1923",
-       "de": "Umschrift: die gedruckte Arundel-Ausgabe, 1923"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "If the mirror is one braccio across and is taken from a circle 400 braccia across, it will be only slightly curved, and will cast its rays 100 braccia, that is, 1/4 of the diameter.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of the printed Arundel edition, 1923. It may contain errors.",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Reale Commissione Vinciana (1923), checked against the edition's diplomatic transcription of the same folio. It may contain errors.",
       "doubts": [
        "'lascierà' is Leonardo's slip; the edition's footnote (1) reads 'Intendi nascierà' (read: will be born [of]), and the translations follow it ('is taken from').",
        "braccio (plural braccia, here also 'bracci'): the Italian arm's-length unit, left untranslated. The edition prints the fraction as 1 over 4."
@@ -995,10 +862,10 @@
      "de": {
       "text": "Hat der Spiegel einen Braccio Durchmesser und stammt er von einem Kreis mit 400 Braccia Durchmesser, so ist er nur wenig gekrümmt und wirft seine Strahlen 100 Braccia weit, das heißt 1/4 des Durchmessers.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von die gedruckte Arundel-Ausgabe, 1923 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von der Reale Commissione Vinciana (1923) gedruckten Italienisch, geprüft an der diplomatischen Transkription derselben Ausgabe. Sie kann Fehler enthalten.",
       "doubts": [
-       "'lascierà' is Leonardo's slip; the edition's footnote (1) reads 'Intendi nascierà' (read: will be born [of]), and the translations follow it ('is taken from').",
-       "braccio (plural braccia, here also 'bracci'): the Italian arm's-length unit, left untranslated. The edition prints the fraction as 1 over 4."
+       "'lascierà' ist ein Versehen Leonardos; die Fußnote (1) der Ausgabe liest 'Intendi nascierà' (lies: wird entstehen [aus]), und die Übersetzungen folgen ihr ('stammt von').",
+       "Braccio (Mehrzahl Braccia, hier auch 'bracci'): das italienische Maß von etwa einer Armlänge, unübersetzt gelassen. Die Ausgabe druckt den Bruch als 1 über 4."
       ]
      },
      "fr": null,
@@ -1017,14 +884,14 @@
      "it": {
       "text": "Lo spechio di comune concavità gitta l'ultima distanzia de' razi refressi insino alla quarta parte del diamitro del corpo sperico, donde tale spechio è derivato.",
       "label": {
-       "en": "Transcription: the printed Arundel edition, 1923",
-       "de": "Umschrift: die gedruckte Arundel-Ausgabe, 1923"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "The mirror of common concavity casts the farthest distance of the reflected rays as far as the fourth part of the diameter of the spherical body from which that mirror is derived.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of the printed Arundel edition, 1923. It may contain errors.",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Reale Commissione Vinciana (1923), checked against the edition's diplomatic transcription of the same folio. It may contain errors.",
       "doubts": [
        "'gitta l'ultima distanzia' (casts the last distance) is read as the farthest point the reflected rays reach, the focus; Leonardo puts it at a quarter of the sphere's diameter, which is right for rays near the axis."
       ]
@@ -1032,9 +899,9 @@
      "de": {
       "text": "Der Spiegel von gewöhnlicher Höhlung wirft die äußerste Weite der zurückgeworfenen Strahlen bis zum vierten Teil des Durchmessers des Kugelkörpers, von dem dieser Spiegel abgeleitet ist.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von die gedruckte Arundel-Ausgabe, 1923 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von der Reale Commissione Vinciana (1923) gedruckten Italienisch, geprüft an der diplomatischen Transkription derselben Ausgabe. Sie kann Fehler enthalten.",
       "doubts": [
-       "'gitta l'ultima distanzia' (casts the last distance) is read as the farthest point the reflected rays reach, the focus; Leonardo puts it at a quarter of the sphere's diameter, which is right for rays near the axis."
+       "'gitta l'ultima distanzia' (wirft die letzte Weite) wird als der fernste Punkt gelesen, den die zurückgeworfenen Strahlen erreichen, der Brennpunkt; Leonardo setzt ihn auf ein Viertel des Kugeldurchmessers, was für achsennahe Strahlen stimmt."
       ]
      },
      "fr": null,
@@ -1053,19 +920,19 @@
      "it": {
       "text": "Quanto la piramide radiosa dello spechio concavo si farà di minore angulo, tanto la sua basa sarà minore.",
       "label": {
-       "en": "Transcription: the printed Arundel edition, 1923",
-       "de": "Umschrift: die gedruckte Arundel-Ausgabe, 1923"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "The smaller the angle of the radiant pyramid of the concave mirror, the smaller its base will be.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of the printed Arundel edition, 1923. It may contain errors."
+      "label": "AI translation (Opus 5.5) from the Italian printed by Reale Commissione Vinciana (1923), checked against the edition's diplomatic transcription of the same folio. It may contain errors."
      },
      "de": {
       "text": "Je kleiner der Winkel der Strahlenpyramide des Hohlspiegels wird, desto kleiner wird ihre Grundfläche sein.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von die gedruckte Arundel-Ausgabe, 1923 übersetzt. Sie kann Fehler enthalten."
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von der Reale Commissione Vinciana (1923) gedruckten Italienisch, geprüft an der diplomatischen Transkription derselben Ausgabe. Sie kann Fehler enthalten."
      },
      "fr": null,
      "label_only": false,
@@ -1083,14 +950,14 @@
      "it": {
       "text": "Stanga di rame tirata per trafila.\nquesta stanga pò avere curvità di circulo di 400 braccia.\nTornio da orcioli.",
       "label": {
-       "en": "Transcription: the printed Arundel edition, 1923",
-       "de": "Umschrift: die gedruckte Arundel-Ausgabe, 1923"
+       "en": null,
+       "de": null
       }
      },
      "en": {
-      "text": "Copper rod drawn through a draw plate.\nThis rod can have the curvature of a circle of 400 braccia.\nWheel for jugs.",
+      "text": "Copper rod drawn through a draw plate.\nThis rod can have the curvature of a circle of 400 braccia.\nTurning wheel for jugs.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of the printed Arundel edition, 1923. It may contain errors.",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Reale Commissione Vinciana (1923), checked against the edition's diplomatic transcription of the same folio. It may contain errors.",
       "doubts": [
        "These three lines are the labels of the small drawing of a frame with a bent rod above a turning dish; the edition prints them beside its tracing of the drawing.",
        "'tornio da orcioli' is a turning wheel or lathe for small jars, most likely a potter's wheel; its use here, turning a dish under the bent rod, is not explained. 'trafila' is the draw plate through which metal rod or wire is drawn."
@@ -1099,10 +966,10 @@
      "de": {
       "text": "Kupferstange, durch ein Zieheisen gezogen.\nDiese Stange kann die Krümmung eines Kreises von 400 Braccia haben.\nDrehscheibe für Krüge.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von die gedruckte Arundel-Ausgabe, 1923 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von der Reale Commissione Vinciana (1923) gedruckten Italienisch, geprüft an der diplomatischen Transkription derselben Ausgabe. Sie kann Fehler enthalten.",
       "doubts": [
-       "These three lines are the labels of the small drawing of a frame with a bent rod above a turning dish; the edition prints them beside its tracing of the drawing.",
-       "'tornio da orcioli' is a turning wheel or lathe for small jars, most likely a potter's wheel; its use here, turning a dish under the bent rod, is not explained. 'trafila' is the draw plate through which metal rod or wire is drawn."
+       "Diese drei Zeilen sind die Beschriftungen der kleinen Zeichnung eines Gestells mit einer gebogenen Stange über einer drehenden Scheibe; die Ausgabe druckt sie neben ihre Nachzeichnung.",
+       "'tornio da orcioli' ist eine Drehscheibe oder Drehbank für kleine Krüge, höchstwahrscheinlich eine Töpferscheibe; wozu sie hier dient, eine Scheibe unter der gebogenen Stange zu drehen, wird nicht erklärt. 'trafila' ist das Zieheisen, durch das man Metallstangen oder Draht zieht."
       ]
      },
      "fr": null,
@@ -1121,14 +988,14 @@
      "it": {
       "text": "Tanto sarà qui la curvità della stanga magiore o minore, quanto i sua sostentaculi fieno più remoti o propinqui.",
       "label": {
-       "en": "Transcription: the printed Arundel edition, 1923",
-       "de": "Umschrift: die gedruckte Arundel-Ausgabe, 1923"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "The curvature of the rod here will be greater or smaller according as its supports are farther or nearer.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of the printed Arundel edition, 1923. It may contain errors.",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Reale Commissione Vinciana (1923), checked against the edition's diplomatic transcription of the same folio. It may contain errors.",
       "doubts": [
        "The sentence pairs greater with farther and smaller with nearer; which way the bending goes is not stated beyond that. It is printed at the top of p. 99*, before the margin mark f. 85 r, so it still belongs to 84 verso."
       ]
@@ -1136,9 +1003,9 @@
      "de": {
       "text": "Die Krümmung der Stange wird hier größer oder kleiner sein, je nachdem ihre Stützen weiter entfernt oder näher sind.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von die gedruckte Arundel-Ausgabe, 1923 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von der Reale Commissione Vinciana (1923) gedruckten Italienisch, geprüft an der diplomatischen Transkription derselben Ausgabe. Sie kann Fehler enthalten.",
       "doubts": [
-       "The sentence pairs greater with farther and smaller with nearer; which way the bending goes is not stated beyond that. It is printed at the top of p. 99*, before the margin mark f. 85 r, so it still belongs to 84 verso."
+       "Der Satz verbindet größer mit weiter und kleiner mit näher; in welche Richtung sich die Stange biegt, sagt er darüber hinaus nicht. Er steht oben auf S. 99*, vor der Randmarke f. 85 r, gehört also noch zu 84 verso."
       ]
      },
      "fr": null,
@@ -1148,6 +1015,51 @@
        "edition": "I manoscritti e i disegni di Leonardo da Vinci, pubblicati dalla Reale Commissione Vinciana, vol. I: Il Codice Arundel 263 nel Museo Britannico. Riproduzione fototipica con trascrizioni diplomatica e critica. Parte prima (da fol. 1 a fol. 116), Roma: Danesi, 1923",
        "page": "Parte prima, trascrizione critica, pp. 98*-99* (margin: f. 84 v); archive.org viewer pages n498 and n499",
        "url": "https://archive.org/details/pbc.gda.pl.503231_01_01_01_1923_11478/page/n498/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "D.030": {
+   "lead": 0,
+   "notes": "The only passage Richter prints from this side (Reference Table: §71 = D. 8a). The heading in small caps is Leonardo's (Richter's lines 1-2). Richter prints the camera obscura figure (letters a b c d e, m n, o r, s t, k, f) between the columns on p. 45; it is a drawing, not text. Richter's footnote: the chapter was known through Venturi's French translation (Paris, 1797).",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §71 (D. 8a), vol. I pp. 44-45",
+     "it": {
+      "text": "COME S'INTERSEGANO LE SPETIE DELLI OBBIETTI RICEVUTI DALL OCHIO DENTRO AL OMORE ALBUGINO.\n\nLa speriētia che mostra come li obbietti mandino le loro spetie over similitudini intersegate dentro all'ochio nello umore albugino si dimostra quando per alcuno piccolo spiraculo rotōdo penetrāno le spetie delli obbietti alluminati in abitatione fortemente oscura; allora tu riceverai tale spetie in vna carta bianca posta dentro a tale abitatione alquāto vicina a esso spiraculo e vedrai tutti li predetti obbietti in essa carta colle lor propie figure e colori, ma sarā minori e fieno sotto sopra per causa della detta intersegatione li quali simulacri se nascierāno di loco alluminato dal sole parā propio dipīti in essa carta, la qual' uole essere sottilissima e veduta da riverscio, e lo spiracolo detto sia fatto in piastra sottilissima di ferro; a b c d e sieno li detti obietti alluminati dal sole, o r sia la faccia della abitatione oscura, nella quale è lo spiracolo detto in n m, s t sia la detta carta dove si tagliano li razzi delle spetie d'essi obietti sotto sopra perchè essēdo li lor razzi diritti, a destro si fa sinistro in k e lo e sinistro si fa destro in · f ·, e cosi fa dentro alla popilla.",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "HOW THE IMAGES OF OBJECTS RECEIVED BY THE EYE INTERSECT WITHIN THE CRYSTALLINE HUMOUR OF THE EYE.\n\nAn experiment, showing how objects transmit their images or pictures, intersecting within the eye in the crystalline humour, is seen when by some small round hole penetrate the images of illuminated objects into a very dark chamber. Then, receive these images on a white paper placed within this dark room and rather near to the hole and you will see all the objects on the paper in their proper forms and colours, but much smaller; and they will be upside down by reason of that very intersection. These images being transmitted from a place illuminated by the sun will seem actually painted on this paper which must be extremely thin and looked at from behind. And let the little perforation be made in a very thin plate of iron. Let a b c d e be the object illuminated by the sun and o r the front of the dark chamber in which is the said hole at n m. Let s t be the sheet of paper intercepting the rays of the images of these objects upside down, because the rays being straight, a on the right hand becomes k on the left, and e on the left becomes f on the right; and the same takes place inside the pupil.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     },
+     "de": {
+      "text": "WIE SICH DIE BILDER DER DINGE, DIE DAS AUGE EMPFÄNGT, IN DER EIWEISSARTIGEN FLÜSSIGKEIT KREUZEN.\n\nDie Erfahrung, die zeigt, wie die Dinge ihre Bilder oder Abbilder aussenden, die sich im Auge in der eiweißartigen Flüssigkeit kreuzen, zeigt sich, wenn durch ein kleines rundes Loch die Bilder beleuchteter Dinge in einen sehr dunklen Raum dringen. Dann fängst du diese Bilder auf einem weißen Blatt auf, das in diesem Raum ziemlich nah an dem Loch steht, und du wirst alle genannten Dinge auf diesem Blatt in ihren eigenen Gestalten und Farben sehen. Aber sie werden kleiner sein und auf dem Kopf stehen, wegen dieser Kreuzung. Kommen diese Abbilder von einem Ort, den die Sonne beleuchtet, so erscheinen sie auf dem Blatt wie gemalt. Das Blatt soll sehr dünn sein und von hinten betrachtet werden, und das Loch soll in eine sehr dünne Eisenplatte gemacht sein. a b c d e seien die genannten Dinge, von der Sonne beleuchtet, o r sei die Vorderwand des dunklen Raumes, in der das Loch bei n m ist, s t sei das genannte Blatt, wo die Strahlen der Bilder dieser Dinge geschnitten werden, auf dem Kopf stehend. Denn da ihre Strahlen gerade sind, wird a rechts zu k links, und e links wird zu f rechts. Und so geschieht es auch im Inneren der Pupille.",
+      "kind": "ours",
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Jean Paul Richter, 1883, Englisch vor allem von Mrs R. C. Bell). Sie kann Fehler enthalten.",
+      "doubts": [
+       "'omore albugino': wörtlich die eiweißartige Flüssigkeit, in der älteren Anatomie der Name des Kammerwassers; Richter übersetzt 'crystalline humour' (die Augenlinse). Wir behalten den wörtlichen Sinn.",
+       "'la qual' uole': Das gedruckte Zeichen nach 'qual' wird als Apostroph gelesen; es kann auch ein hochgestellter Punkt sein. Der Sinn ('die sein soll') ändert sich dadurch nicht."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I pp. 44-45",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n83/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I pp. 44-45",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n83/mode/1up"
       }
      ]
     }
@@ -1163,14 +1075,14 @@
      "it": {
       "text": "Prospettiva · è ragione · dimostratiua · per la quale · la sperientia conferma tutte · le cose · mādare · all'occhio · per linie piramidali · la loro · similitudine;\n\nlinie · piramidali · intēdo · esser quelle · le quali · si partono dai superfitiali · stremi de' corpi · e per distante · cōcorso · si conducono · a vno · solo · pūto, il quale pūto in questo caso · mostrerò essere collocato · nell'ochio, vniversale givdice di tutti i corpi; punto · dico · esser · quello · il quale non si può diuidere · in alcuna parte; adūque sendo · questo punto indiuisibile · che collocato nella uista · nessuno corpo · fia veduto · dal'ochio: che nō sia maggiore d'esso pūto: essēdo cosi è neciessario · che le linie · che vengono · dal corpo al pūto · sieno piramidate, e se alcuno volesse provare · la uirtù visiua · nō cōsistere in esso punto anzi essere quello pūto nero che si uede in mezzo alla popilla, a questo si potrebbe rispōdere · che vna piccola cosa mai potrebbe diminvire per alcuna distantia · come sarebbe un grano di miglio o di panico o altra simile cosa e quella cosa · · che fusse maggiore che detto punto, mai potrebbe essere veduta interamēte come appare nella prova di sotto;",
       "label": {
-       "en": "Transcription: Jean Paul Richter, 1883",
-       "de": "Umschrift: Jean Paul Richter, 1883"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "Perspective is a rational demonstration, confirmed by experience, that all objects transmit their image to the eye by a pyramid of lines.\n\nBy a pyramid of lines I understand those lines which start from the edges of the surface of bodies, and converging from a distance, meet in a single point; and this point, in the present instance, I will show to be situated in the eye which is the universal judge of all objects. By a point I mean that which cannot be divided into parts; therefore this point, which is situated in the eye, being indivisible, no body is seen by the eye, that is not larger than this point. This being the case it is inevitable that the lines which come from the object to the point must form a pyramid. And if any man seeks to prove that the sense of sight does not reside in this point, but rather in the black spot which is visible in the middle of the pupil, I might reply to him that a small object could never diminish at any distance, as it might be a grain of millet or of oats or of some similar thing, and that object, if it were larger than the said [black] spot would never be seen as a whole; as may be seen in the diagram below.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter, 1883"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
      },
      "de": {
       "text": "Perspektive ist ein beweisführender Gegenstand, durch den die Erfahrung bestätigt, daß alle Dinge ihr Abbild mittels pyramidaler Linien ins Auge senden. Unter pyramidalen Linien verstehe ich die, welche von den oberflächlichen Enden der Körper ausgehen und durch ein Zusammenlaufen von fernher sich zu einem einzigen Punkte hinführen, welchen Punkt ich in diesem Fall als im Auge, dem allgemeinen Richter über alle Körper, gelegen zeigen will. Punkt sage ich von dem, was nicht zu trennen ist, in keinem Teile; also da dieser Punkt, der im Auge gelegen, unteilbar ist, wird kein Körper vom Gesicht gesehen werden, der nicht größer ist als dieser Punkt; sintemalen dem so ist, ist es notwendig, daß die Linien, die vom Körper zum Punkte kommen, pyramidisch seien. Und wenn jemand beweisen wollte, daß die Sehkraft nicht in diesem Punkte liegt, sondern im Gegenteil in jenem schwarzen Punkte, den man inmitten der Pupille sieht, könnte man diesem antworten, daß ein kleiner Gegenstand durch keine Entfernung je kleiner werden könnte, es möchte selbst ein Hirsekorn oder ein Fenchelsamen sein oder anderes dergleichen, und dann jener Gegenstand, der größer wäre als jener Punkt, niemals ganz gesehen werden könnte, wie aus folgendem Beweis usw.",
@@ -1199,26 +1111,26 @@
     },
     {
      "index": 1,
-     "ref": "Richter 1883 §52, second part (A. 10a), vol. I p. 32-33",
+     "ref": "Richter 1883 §52, second part (A. 10a), vol. I pp. 32-33",
      "it": {
       "text": "sia · a · la uirtù · visiua, b · e sia il concorso delle linie che uēgono al'occhio e. d. siano i grani del miglio dentro a detto · concorso: vedi per ragione questi mai per distātia diminvire · e il corpo · m · n · non potersi da quelle interamēte cōprēdere: adūque è neciessario · cōfessare l'occhio · avere ī se un solo pūto indiuisibile, a il quale conferiscono tutte le punte della piramide partite dai corpi, come appare qui di sotto a b · sia · l'occhio; il ciētro suo tēga il punto prenominato: se la linia · e · f · à a ētrare per similitudine per si piccolo · foro dell'occhio · bisogna · cōfessare che la cosa minore nō può entrare nella minore se quella nō diminviscie e diminvendosi cōuiene che cangi la piramide.",
       "label": {
-       "en": "Transcription: Jean Paul Richter, 1883",
-       "de": "Umschrift: Jean Paul Richter, 1883"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "Let a. be the seat of sight, b e the lines which reach the eye. Let e d be the grains of millet within these lines. You plainly see that these will never diminish by distance, and that the body mn could not be entirely covered by it. Therefore you must confess that the eye contains within itself one single indivisible point a, to which all the points converge of the pyramid of lines starting from an object, as is shown below. Let a. b. be the eye; in the centre of it is the point above mentioned. If the line ef is to enter as an image into so small an opening in the eye, you must confess that the smaller object cannot enter into what is smaller than itself unless it is diminished, and by diminishing it must take the form of a pyramid.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter, 1883"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
      },
      "de": {
-      "text": "Es sei a die Sehkraft, b e sei das Zusammenlaufen der Linien, die zum Auge kommen; e und d seien die Hirsekörner innerhalb dieses Zusammenlaufens. Du siehst aus Vernunftgründen, dass diese durch keine Entfernung je kleiner werden und dass der Körper m n von diesen Linien nicht ganz umfasst werden kann. Also muss man zugeben, dass das Auge in sich einen einzigen, unteilbaren Punkt a hat, zu dem alle Spitzen der Pyramide zusammenlaufen, die von den Körpern ausgehen, wie hier unten zu sehen ist. a b sei das Auge, und seine Mitte halte den vorgenannten Punkt. Wenn die Linie e f als Abbild durch ein so kleines Loch ins Auge eintreten soll, muss man zugeben, dass das kleinere [?] Ding nicht in das kleinere eintreten kann, ohne kleiner zu werden. Und indem es kleiner wird, muss es die Gestalt der Pyramide annehmen.",
+      "text": "Es sei a die Sehkraft, b e sei das Zusammenlaufen der Linien, die zum Auge kommen; e d seien die Hirsekörner innerhalb dieses Zusammenlaufens. Du siehst mit der Vernunft, dass diese durch keine Entfernung je kleiner werden und dass der Körper m n von diesen Linien nicht ganz umfasst werden kann. Also muss man zugeben, dass das Auge in sich einen einzigen, unteilbaren Punkt a hat, zu dem alle Spitzen der Pyramide zusammenlaufen, die von den Körpern ausgehen, wie hier unten zu sehen ist. a b sei das Auge, und seine Mitte halte den vorgenannten Punkt. Wenn die Linie e f als Abbild durch ein so kleines Loch ins Auge eintreten soll, muss man zugeben, dass das kleinere Ding nicht in etwas eintreten kann, das kleiner ist als es selbst, ohne kleiner zu werden. Und indem es kleiner wird, muss es die Gestalt der Pyramide annehmen.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Jean Paul Richter, 1883, Englisch vor allem von Mrs R. C. Bell). Sie kann Fehler enthalten.",
       "doubts": [
-       "'la cosa minore nō può entrare nella minore': the Italian says 'smaller' twice; the sense needs 'the larger thing cannot enter the smaller'. Kept as printed and marked [?]; Richter's English also keeps 'smaller'.",
-       "'cōprēdere' (take in, contain) rendered 'umfasst'; Richter has 'covered'."
+       "'la cosa minore nō può entrare nella minore': Das Italienische sagt zweimal 'kleiner'; mit Richter gelesen ('the smaller object cannot enter into what is smaller than itself'): Das kleinere Ding kann nicht in etwas eintreten, das kleiner ist als es selbst.",
+       "'cōprēdere' (aufnehmen, fassen) übersetzt mit 'umfasst'; Richter hat 'covered'."
       ]
      },
      "fr": null,
@@ -1226,13 +1138,101 @@
      "sources": [
       {
        "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
-       "page": "vol. I p. 32-33",
+       "page": "vol. I pp. 32-33",
        "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n69/mode/1up"
       },
       {
        "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
-       "page": "vol. I p. 32-33",
+       "page": "vol. I pp. 32-33",
        "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n69/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "A.088": {
+   "lead": 0,
+   "notes": "Placement confirmed: both passages carry 'A. 38b]', and Richter's Bibliography (vol. II p. 486, MS. A) lists '38b 41, Pl. XXXI, No. 3, 526'. Given in the edition's order (§41 in vol. I, §526 later in the same volume). Richter's notes to §526: 'See Pl. XXXI. 3. The second sketch, which in the plate is incomplete, is here reproduced and completed from the original to illustrate the text. In the original the larger diagram is placed between lines 5 and 6.' 'The translation here given renders the meaning of the passage as I think it must be understood. The MS. is perfectly legible and the construction of the sentence is simple and clear; difficulties can only arise from the very fullness of the meaning, particularly towards the end of the passage.' '17. che leverai dalla pariete r n. The letters refer to the larger sketch, No. 3 on Pl. XXXI.' '18. Leonardo here says nothing as to how the image foreshortened by perspective and thus produced on the vertical plane is to be transferred to the wall; but from what is said in Nos. 525 and 523 we may conclude that he was familiar with the process of casting the enlarged shadow of a squaring net on the surface of a wall to guide him in drawing the figure.' The curator's reason names §526 first: lead 1.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §41 (A. 38b), vol. I p. 27",
+     "it": {
+      "text": "¶La prospettiva · è di tale · natura · ch'ella fa · parere · il piano · rilievo e 'l rilievo piano.",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "The art of perspective is of such a nature as to make what is flat appear in relief and what is in relief flat.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     },
+     "de": {
+      "text": "Die Perspektive ist von solcher Natur, dass sie das Flache plastisch und das Plastische flach erscheinen lässt.",
+      "kind": "ours",
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Jean Paul Richter, 1883, Englisch vor allem von Mrs R. C. Bell). Sie kann Fehler enthalten.",
+      "doubts": [
+       "'rilievo': Relief, was räumlich hervortritt; übersetzt mit 'plastisch'."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 27",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n64/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 27",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n64/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Richter 1883 §526 (A. 38b), vol. I p. 263",
+     "it": {
+      "text": "A FARE · UNA · FIGURA · IN V̄ MURO · DI 12 BRACCIA CHE APPARISCA D'ALTEZZA DI 24 BRACCIA.\nSe voli fare · una · figura · o altra cosa · che apparisca d'altezza di 24 braccia farai · in questa · forma: figura · prima · la pariete · m · r · colla metà del'omo · che voi · fare: dipoi l'altra metà: farai nella volta · m · n · la figura che voi · fare detta di sopra;—fa prima la pariete in sul piā d'una sala della forma · che à · il mvro · colla · volta dov'ài a fare la tua figura ·, dipoi · farai dirieto a essa · pariete · la figura · disegniata ī proffilo · di che grādezza ti piace, e tira tutte le sue linie al pūto f e nel modo · ch'elle · si tagliano · sulla pariete m · n · così le figura sul mvro che à similitudine colla pariete ·, e avrai tutte l'altezze e sporti della · figura, e le larghezze over grossezze che si trovano nel mvro diritto · m · r ·, faraile in propia · forma, imperochè, nel fugire del mvro, la figura · diminvisce per se medesima; la figura · che va nella volta ti bisognia · diminvirla, come se ella fussi diritta, la quale diminvitione · ti bisognia fare ī sù una sala bē piana · e lì sarà la figura che leverai dalla pariete · r · n con le sue vere grossezze e bisogna ridiminuirla in sù una pariete di rilievo e fia bō modo.",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "TO DRAW A FIGURE ON A WALL 12 BRACCIA HIGH WHICH SHALL LOOK 24 BRACCIA HIGH.\nIf you wish to draw a figure or any other object to look 24 braccia high you must do it in this way. First, on the surface m r draw half the man you wish to represent; then the other half; then put on the vault m n [the rest of] the figure spoken of above; first set out the vertical plane on the floor of a room of the same shape as the wall with the coved part on which you are to paint your figure. Then, behind it, draw a figure set out in profile of whatever size you please, and draw lines from it to the point f and, as these lines cut m n on the vertical plane, so will the figure come on the wall, of which the vertical plane gives a likeness, and you will have all the [relative] heights and prominences of the figure. And the breadth or thickness which are on the upright wall m n are to be drawn in their proper form, since, as the wall recedes the figure will be foreshortened by itself; but [that part of] the figure which goes into the cove you must foreshorten, as if it were standing upright; this diminution you must set out on a flat floor and there must stand the figure which is to be transferred from the vertical plane r n in its real size and reduce it once more on a vertical plane; and this will be a good method.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     },
+     "de": {
+      "text": "EINE FIGUR AUF EINE MAUER VON 12 ELLEN ZU MALEN, DIE 24 ELLEN HOCH ERSCHEINT.\nWillst du eine Figur oder etwas anderes machen, das 24 Ellen hoch erscheinen soll, so gehst du so vor: Zeichne zuerst auf der Wand m r die Hälfte des Menschen, den du machen willst, dann die andere Hälfte: Im Gewölbe m n machst du die oben genannte Figur, die du machen willst. Zeichne zuerst die Wand auf dem Boden eines Saales auf, in der Form, die die Mauer mit dem Gewölbe hat, auf der du deine Figur machen sollst. Dann zeichne hinter diese Wand die Figur im Profil, so groß du willst, und ziehe alle ihre Linien zum Punkt f. Und so, wie sie die Wand m n schneiden, so zeichne sie auf die Mauer, die der Wand gleicht, und du hast alle Höhen und Vorsprünge der Figur. Die Breiten oder Stärken aber, die auf der geraden Mauer m r liegen, machst du in ihrer eigenen Form, denn wo die Mauer zurückweicht, verkürzt sich die Figur von selbst. Die Figur, die ins Gewölbe kommt, musst du verkürzen, als ob sie aufrecht stünde. Diese Verkürzung musst du auf einem ganz ebenen Saalboden machen, und dort wird die Figur stehen, die du mit ihren wahren Stärken von der Wand r n abnimmst, und du musst sie noch einmal verkürzen, auf einer Wand im Relief [?], und das wird ein gutes Verfahren sein.",
+      "kind": "ours",
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Jean Paul Richter, 1883, Englisch vor allem von Mrs R. C. Bell). Sie kann Fehler enthalten.",
+      "doubts": [
+       "'pariete' (die gezeichnete Wand, Richters 'vertical plane') ist mit 'Wand' übersetzt und 'mvro' (die wirkliche Mauer, die bemalt wird) mit 'Mauer', damit Leonardos zwei Wörter getrennt bleiben.",
+       "'figura prima la pariete m r colla metà del'omo': 'figura' ist hier ein Verb ('zeichne', 'bilde ab'); gelesen als: die Hälfte des Menschen auf m r zeichnen.",
+       "'dipoi l'altra metà: farai nella volta m n la figura ... detta di sopra': in Leonardos Reihenfolge übersetzt. Richter liest es so, dass '[the rest of] the figure' (der Rest der Figur) ins Gewölbe kommt; die Klammer ist seine eigene.",
+       "'nel mvro diritto m r': Das Italienische hat m r; Richters Englisch hat an dieser Stelle 'm n'. Das Deutsche folgt dem Italienischen.",
+       "'in sù una sala bē piana': wörtlich 'auf einem ganz ebenen Saal'; gelesen als der Boden des Saales, wie bei Richter ('a flat floor').",
+       "'pariete di rilievo' ist unklar und mit [?] markiert. Richters Fußnote nennt es einen rätselhaften Ausdruck (Ravaisson: 'sur une paroi en relief'; Ludwig: 'auf einer Schnittlinie zum Aufrichten') und verweist auf seine Nr. 545, Zeilen 15 bis 17.",
+       "Braccio ist mit 'Elle' übersetzt, dem üblichen deutschen Wort für das alte Maß; 'diminuire' im perspektivischen Sinn mit 'verkürzen'."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 263",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n360/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 263",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n360/mode/1up"
       }
      ]
     }

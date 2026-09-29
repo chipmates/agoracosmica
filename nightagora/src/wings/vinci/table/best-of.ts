@@ -63,11 +63,11 @@ export interface BestOfPage {
   /** his own hand, or a copy in another */
   hand: 'his' | 'copy'
   /** the other half of the opening this page is one side of */
-  spread: { with: string; half: 'left' | 'right' } | null
+  spread: { with: string; half: 'left' | 'right'; file: string } | null
   /** where the leaf stands on its photograph, for the framed opening */
   leaf: { left: number; top: number; right: number; bottom: number } | null
   /** the printed plate the mirror shows where the scan itself is not turned */
-  plate: { path: string; window: { left: number; top: number; right: number; bottom: number } | null } | null
+  plate: { path: string; window: { left: number; top: number; right: number; bottom: number } | null; width: number; height: number } | null
   /** what the mirror shows: the scan turned, the plate turned, or no mirror */
   mirror: 'own' | 'plate' | 'none'
 }

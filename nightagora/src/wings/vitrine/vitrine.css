@@ -157,7 +157,14 @@
 .vitrine[data-peek='true']:has(.reader[data-lined='true']) .vitrine-line {display:block;margin-bottom:8px;font-size:17px;line-height:1.3;}
 .vitrine[data-peek='true']:has(.reader[data-lined='true']) .vitrine-line[hidden] {display:none;}
 .vitrine[data-peek='true']:has(.reader[data-lined='true']) .vitrine-note {margin:-4px 0 6px;}
-.vitrine[data-peek='false'] .vitrine-note,.vitrine:not([data-peek='true']) .vitrine-note {margin-top:-4px;}
+.vitrine:not([data-peek='true']) .vitrine-note {margin-top:-4px;}
+/* the peek holds the page's name, its place, the line and the strip under
+   a third of the screen: the place sits beside the name where it fits, and
+   the line keeps two rows until the card rises */
+.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-name {display:inline-flex;margin:0 12px 0 0;vertical-align:middle;}
+.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-seat {display:inline-flex;margin:0;vertical-align:middle;}
+.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-seat[hidden] {display:none;}
+.vitrine[data-peek='true']:has(.reader[data-lined='true']) .vitrine-line {display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;}
 .vitrine[data-narrow='true'][data-fill='true'] .vitrine-card {background:#0d171ff5;}
 
 /* THE ONE LINE UNDER A PAGE is read over paper as often as over dark: the

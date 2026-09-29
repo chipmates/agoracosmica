@@ -115,9 +115,10 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
     const hand: ReaderWay = { id: 'hand', label: first, ...own }
     if (page.hand === 'copy' || page.mirror === 'none') return [hand]
     if (page.mirror === 'own') return [hand, { id: 'mirror', label: words.mirror, mirrored: true, line: note, ...own }]
-    const plate = page.plate && index ? bestOfRecord(index, page.plate.path) as { width?: number; height?: number; honesty_en?: string; honesty_de?: string; holder?: string } | undefined : undefined
-    if (!plate?.width || !plate.height || !page.plate) return [hand]
-    const source: DeepPlateSource = { pyramid: null, file: assetAddress(bestOfRecord(index!, page.plate.path)!), width: plate.width, height: plate.height }
+    const record = page.plate && index ? bestOfRecord(index, page.plate.path) : undefined
+    if (!record || !page.plate) return [hand]
+    const plate = record as { honesty_en?: string; honesty_de?: string }
+    const source: DeepPlateSource = { pyramid: null, file: assetAddress(record), width: page.plate.width, height: page.plate.height }
     const said = key('mirror_plate') ?? [note, language === 'de' ? plate.honesty_de : plate.honesty_en].filter(Boolean).join(' ')
     return [hand, { id: 'mirror', label: words.mirror, mirrored: true, source, window: page.plate.window, line: said, ...own }]
   }
@@ -128,15 +129,20 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
     if (!found) return null
     const { head, note } = lineOf(page)
     const pattern = deskControl('picture', 'place')[language] || '{n} / {total}'
+    // ONE HALF OF AN OPENING shows the open spread on the desktop, both
+    // sides whole, where the store holds the pair as one picture
+    const spread = page.spread && !options.narrow() ? bestOfRecord(index, page.spread.file) : undefined
+    const opening: DeepPlateSource | null = spread?.width && spread.height
+      ? { pyramid: null, file: assetAddress(spread), width: spread.width, height: spread.height } : null
     return {
       id: page.id,
       label: page.name?.[language] ?? page.seat[language],
       shows: page.caption?.[language] ?? '',
       notes: [topic?.line?.[language] ?? '', pictureWord(page) ?? '', !page.words ? BEST_OF_NOTICES.no_words[language] ?? '' : ''],
-      source: found.source,
+      source: opening ?? found.source,
       // the leaf, framed, where its photograph shows a ground around it: a
       // zoom state, with the whole photograph one step further out
-      window: page.leaf,
+      window: opening ? null : page.leaf,
       thumb: found.thumb,
       ways: waysOf(page),
       colour: options.colour,

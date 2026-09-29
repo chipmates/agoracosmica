@@ -1,397 +1,8 @@
 {
  "topic": "water-in-motion",
  "pages": {
-  "F.101": {
-   "lead": 1,
-   "notes": "Heading (the editor's): '[AIR ET POIDS. — EAU]'. The second passage, on water falling from a river into the air, belongs to the drawing of the jet plunging into the pool. Italics in 'it' and 'fr' mark words Leonardo struck out. Wide gaps in the printed line (around 'come sifa nelle coppette') are rendered as single spaces. Page match checked: Ravaisson's phototype plate of 47 verso (archive.org viewer n110) shows the same leaf as the SET image.",
-   "passages": [
-    {
-     "index": 0,
-     "ref": "Ravaisson-Mollien vol. IV (1889), Ms F fol. 47v, block 1 of 2",
-     "it": {
-      "text": "Quanta aria vole essere alleuare diuersi gravi. ~~indiv~~ diuarie materie Quanta ac qua entera nella barca affarla affondare Quale aria sostiene piu essendo rinchi vsa olla rarefacta come sifa nelle coppette olla comune ollacon densata come sifa nelle palle gonfiate per forza diuite sanza dubbio lararefatta e poi lacomune ella condensata mancoresiste",
-      "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
-      }
-     },
-     "en": {
-      "text": "How much air is needed to lift various weights of different materials. How much water will enter the boat to make it sink. Which air supports more when it is shut in: the rarefied, as is done in cupping glasses, or the ordinary, or the condensed, as is done in balls blown up by force of a screw? Without doubt the rarefied, and then the ordinary, and the condensed resists least.",
-      "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
-      "doubts": [
-       "'manco resiste' is literally 'resists less' (here: least, at the end of the ranking). Ravaisson renders 'ne résiste pas du tout' (does not resist at all), which says more than the Italian.",
-       "Ravaisson splits 'essendo rinchiusa' off as a first kind of air ('celui qui est enfermé ou du raréfié'); the Italian reads more naturally as one condition for all three kinds (air that is shut in), and the translations follow the Italian. The ranking itself is Leonardo's and is kept as written.",
-       "'indiv' is printed in italics, begun and struck out; left out of the translations."
-      ]
-     },
-     "de": {
-      "text": "Wie viel Luft man braucht, um verschiedene Lasten aus verschiedenen Stoffen zu heben. Wie viel Wasser in die Barke eindringen muss, um sie sinken zu lassen. Welche Luft trägt mehr, wenn sie eingeschlossen ist: die verdünnte, wie man sie in Schröpfköpfen erzeugt, oder die gewöhnliche, oder die verdichtete, wie man sie in Bällen erzeugt, die mit Schraubenkraft aufgepumpt sind? Ohne Zweifel die verdünnte, dann die gewöhnliche, und die verdichtete widersteht am wenigsten.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "'manco resiste' is literally 'resists less' (here: least, at the end of the ranking). Ravaisson renders 'ne résiste pas du tout' (does not resist at all), which says more than the Italian.",
-       "Ravaisson splits 'essendo rinchiusa' off as a first kind of air ('celui qui est enfermé ou du raréfié'); the Italian reads more naturally as one condition for all three kinds (air that is shut in), and the translations follow the Italian. The ranking itself is Leonardo's and is kept as written.",
-       "'indiv' is printed in italics, begun and struck out; left out of the translations."
-      ]
-     },
-     "fr": {
-      "text": "Combien d'air il faut pour élever divers graves ~~en div~~ de diverses matières.\nCombien d'eau entrera dans la barque pour la faire enfoncer. Quel air soutient le plus, de celui qui est enfermé ou du raréfié, comme il se fait dans les ventouses, ou du commun [de celui à l'état naturel], ou du condensé, comme il se fait dans les balles [ballons] gonflées par force de vis; sans doute le raréfié, et puis le commun, et le condensé ne résiste pas du tout."
-     },
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
-       "page": "Ms F, FOLIO 47 (verso), transcription (lower half of the page, under the heading [AIR ET POIDS. — EAU]); archive.org viewer page n109",
-       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n109/mode/1up"
-      },
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
-       "page": "Ms F, FOLIO 47 (verso), French translation (lower half of the page, below the Italian); archive.org viewer page n109",
-       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n109/mode/1up"
-      }
-     ]
-    },
-    {
-     "index": 1,
-     "ref": "Ravaisson-Mollien vol. IV (1889), Ms F fol. 47v, block 2 of 2",
-     "it": {
-      "text": "~~Ciascun moto e~~ ciasscu // n a parte dellagrosseza dellacqua che chade difiume infralaria segue la linia nella quale ~~co~~ fu principiato lin peto che intal caduta lacondusse —",
-      "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
-      }
-     },
-     "en": {
-      "text": "Every part of the thickness of the water that falls from a river into the air follows the line in which the impetus began that carried it into that fall.",
-      "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
-      "doubts": [
-       "'inpeto' (impeto) is Leonardo's term for the impetus a moving body carries; Ravaisson: 'l'impulsion'.",
-       "'Ciascun moto e' (every movement and) and 'co' are printed in italics, struck out by Leonardo; they are left out of the translations. The sign '//' is printed by the edition inside 'ciasscu // n a'; it is kept in the Italian."
-      ]
-     },
-     "de": {
-      "text": "Jeder Teil der Wassermasse, die von einem Fluss in die Luft fällt, folgt der Linie, in der der Antrieb begann, der ihn in diesen Fall geführt hat.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "'grosseza dellacqua' is literally 'the thickness of the water'; German 'Wassermasse' keeps the sense of the whole falling body of water.",
-       "'inpeto' (impeto) is Leonardo's term for the impetus a moving body carries; German 'Antrieb'.",
-       "'Ciascun moto e' and 'co' are printed in italics, struck out by Leonardo; they are left out."
-      ]
-     },
-     "fr": {
-      "text": "~~Chaque mouvement~~ Chaque partie de l'épaisseur de l'eau qui tombe du fleuve dans l'air suit la ligne dans laquelle fut commencée l'impulsion [« inpeto »] qui la conduisit à cette chute."
-     },
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
-       "page": "Ms F, FOLIO 47 (verso), transcription (lower half of the page, under the heading [AIR ET POIDS. — EAU]); archive.org viewer page n109",
-       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n109/mode/1up"
-      },
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
-       "page": "Ms F, FOLIO 47 (verso), French translation (lower half of the page, below the Italian); archive.org viewer page n109",
-       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n109/mode/1up"
-      }
-     ]
-    }
-   ]
-  },
-  "I.169": {
-   "lead": 0,
-   "notes": "Heading (the editor's): '[COURANTS ET TOURNANTS D'EAU]'. Ravaisson's '[31]' is the leaf number in the second part of Ms I; 79 is the current foliation. The first passage's sentence runs on onto the facing page 78 [30] verso; that continuation is passage 3, with a 'placement' flag. The second passage is the short question written in the ring beside the drawing. Italics in 'it' and 'fr' mark words Leonardo struck out. Page match checked: Ravaisson's phototype plate of 79 [31] recto (archive.org viewer n294) shows the same leaf as the SET image.",
-   "passages": [
-    {
-     "index": 0,
-     "ref": "Ravaisson-Mollien vol. IV (1889), Ms I fol. 79r, block 1 of 3",
-     "it": {
-      "text": "Le cose legieri ~~sono~~ piv chellacqua ~~so~~ non seguitano\nilcorso de la ~~co~~ risaltatione\neintersegatione dellacqua anzi pa\nssano perlo mezo de llo suo corso ovicino alle\nparti secondo chesse troverono nellentrare\ndessi chorsi e non sono inpedite se\nno non conequali\nsosspin te perche se\nlonda desstra della\nrisaltatione siscontra nella sinistra eglie neciessario selesono dequal potentia chellocho della percussione sia conequale risaltatione indirieto (onde lecose che intaloco sopra lacqua simove vano non nessendo sospinte piv dalluna chedallaltra percussione siresstano nella medesima linia de corso. Ma selluna potentia dellonda sara magio chellaltra coe pervelocita di corso nonintento [intendo] potentia per magiore [La suite au folio 78 [30] verso]",
-      "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
-      }
-     },
-     "en": {
-      "text": "Things lighter than water do not follow the course of the rebound and of the crossing of the water, but pass through the middle of its course, or near the sides [?], according to where they happened to be on entering those currents, and they are not hindered except by equal pushes. For if the right wave of the rebound meets the left one, it is necessary, if they are of equal power, that the place where they strike have an equal rebound backwards. (So the things that were moving on the water in that place, not being pushed more by the one blow than by the other, stay in the same line of the current. But if one power of the wave is greater than the other, that is, by speed of current, I do not mean power by greater [continued on folio 78 [30] verso]",
-      "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
-      "doubts": [
-       "The first nine printed lines are split in two columns because the writing runs round the drawing; each line is given here as Ravaisson's left part followed by his right part, which is how his French reads them.",
-       "'alle parti' (to the parts) is unclear; Ravaisson adds '[centrales?]'. Translated as 'the sides' with [?].",
-       "'se no non conequali sosspin te' is read as 'se non con equali sospinte' (except by equal pushes), as Ravaisson reads it.",
-       "The sentence breaks off at the foot of the text and runs on onto folio 78 [30] verso; that continuation is given as passage 3, flagged. The editor's note is translated in brackets. The parenthesis opened before 'onde' is never closed, in the Italian or in the French.",
-       "'sono' and 'so' in the first line and 'co' in the second are printed in italics, struck out by Leonardo; they are left out."
-      ]
-     },
-     "de": {
-      "text": "Dinge, die leichter sind als Wasser, folgen nicht dem Lauf des Rückpralls und der Kreuzung des Wassers, sondern ziehen durch die Mitte seines Laufs oder nahe an den Seiten [?] vorbei, je nachdem, wo sie sich beim Eintritt in diese Strömungen befanden, und sie werden nur durch gleiche Stöße gehemmt. Denn wenn die rechte Welle des Rückpralls auf die linke trifft, muss, wenn sie gleich stark sind, die Stelle des Aufpralls einen gleichen Rückprall nach hinten haben. (Deshalb bleiben die Dinge, die sich an dieser Stelle auf dem Wasser bewegten, in derselben Linie der Strömung, da sie von dem einen Stoß nicht stärker getrieben werden als vom anderen. Wenn aber die eine Kraft der Welle größer ist als die andere, nämlich durch die Geschwindigkeit der Strömung, so meine ich nicht Kraft durch größere [Fortsetzung auf Blatt 78 [30] verso]",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "The first nine printed lines are split in two columns because the writing runs round the drawing; each line is given here as Ravaisson's left part followed by his right part, which is how his French reads them.",
-       "'alle parti' (to the parts) is unclear; Ravaisson adds '[centrales?]'. Translated as 'the sides' with [?].",
-       "'se no non conequali sosspin te' is read as 'se non con equali sospinte' (except by equal pushes), as Ravaisson reads it.",
-       "The sentence breaks off at the foot of the text and runs on onto folio 78 [30] verso; that continuation is given as passage 3, flagged. The editor's note is translated in brackets. The parenthesis opened before 'onde' is never closed, in the Italian or in the French.",
-       "'sono' and 'so' in the first line and 'co' in the second are printed in italics, struck out by Leonardo; they are left out."
-      ]
-     },
-     "fr": {
-      "text": "Les choses légères ~~sont~~ plus que l'eau ~~so~~ ne suivent pas le courant du ressaut et de l'intersection de l'eau, mais passent par le milieu de son courant ou près des parties [centrales?] selon qu'elles se trouvent à l'entrée des courants et ne sont pas empêchées, si ce n'est par d'égales poussées, parce que si l'onde droite du ressaut se rencontre avec la gauche, il est nécessaire, si elles sont d'égales puissances, que le lieu de la percussion soit en arrière avec un égal ressaut. (Dès lors les choses qui se mouvaient en ce lieu sur l'eau, n'étant pas poussées plus par l'une que par l'autre percussion, restent dans la même ligne du courant. Mais si une des puissances de l'onde est plus grande que l'autre, c'est-à-dire par vitesse de courant, je n'entends pas [ne veux pas dire] puissance par plus grande [La suite au folio 78 [30] verso :]"
-     },
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
-       "page": "Ms I, FOLIO 79 [31] (recto), transcription (lower right column, under the heading [COURANTS ET TOURNANTS D'EAU]); archive.org viewer page n293",
-       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n293/mode/1up"
-      },
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
-       "page": "Ms I, FOLIO 79 [31] (recto), French translation (lower right column, below the Italian); archive.org viewer page n293",
-       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n293/mode/1up"
-      }
-     ]
-    },
-    {
-     "index": 1,
-     "ref": "Ravaisson-Mollien vol. IV (1889), Ms I fol. 79r, block 2 of 3",
-     "it": {
-      "text": "[Vers le bas de la figure :] dimi quali re trosi sono lar ghi di sotto enon disopra",
-      "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
-      }
-     },
-     "en": {
-      "text": "[Towards the bottom of the figure:] Tell me which eddies are wide below and not above.",
-      "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
-     },
-     "de": {
-      "text": "[Unten bei der Figur:] Sag mir, welche Wirbel unten breit sind und oben nicht.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
-     },
-     "fr": {
-      "text": "[Vers le bas de la figure :] Dis-moi quels tournants sont larges dessous et ne le sont pas dessus."
-     },
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
-       "page": "Ms I, FOLIO 79 [31] (recto), transcription (lower right column, under the heading [COURANTS ET TOURNANTS D'EAU]); archive.org viewer page n293",
-       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n293/mode/1up"
-      },
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
-       "page": "Ms I, FOLIO 79 [31] (recto), French translation (lower right column, below the Italian); archive.org viewer page n293",
-       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n293/mode/1up"
-      }
-     ]
-    },
-    {
-     "index": 2,
-     "ref": "Ravaisson-Mollien vol. IV (1889), Ms I, FOLIO 78 [30] (verso), first paragraphs: the continuation of 79 [31] recto",
-     "placement": "Not on this page: the end of the first passage's sentence, which Leonardo wrote on folio 78 [30] verso (the facing page of the opening). Ravaisson prints it at the head of 78 [30] verso, on the same printed page (archive.org viewer n293, lower left column). Show it only as the sentence's continuation.",
-     "it": {
-      "text": "[Suite du folio 79 [31] recto :] soma dacqua perche sunacqua fussi bene dimi nore grosseza chellaltra nonfa caso (diciamo chevnacqua sia ~~didoppia~~ di sub 2la grosseza avna tra e chessa sia poi di doppia vellocita perche esse acque scontrandosi insieme sono dequal gran deza nelcontatto come provai nella terza del quinto essen do lamagiore vn braccio quadro ella minore vnmezo laminore non percote lamagiore senon nella sua meta e cosi lamagiore percote laminore colla sua meta onde iicontatti fatti dalle perchussioni sono equali inquantita edisequali per dupla potentia perlo dopio veloce che al una allaltra —\nEcosi lacosa notante sara sospinta della retta linia delsuo corso conproportione vole torcimento",
-      "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
-      }
-     },
-     "en": {
-      "text": "sum of water, because if one water were even of much smaller thickness than the other, it makes no difference (let us say that one water is half as thick as another, and that it then has double the speed: because these waters, meeting each other, are of equal size where they touch, as I proved in the third of the fifth, the greater being one square braccio and the smaller a half, the smaller strikes the greater only with its half, and likewise the greater strikes the smaller with its half, so that the contacts made by the percussions are equal in quantity and unequal by double power, because of the double speed that the one has over the other.\nAnd so the floating thing will be pushed off the straight line of its course, in the proportion the turning requires [?].",
-      "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
-      "doubts": [
-       "'di sub 2la grosseza' is 'subdupla', half the thickness; 'didoppia' before it is printed in italics, struck out by Leonardo, and left out.",
-       "'la terza del quinto' (the third of the fifth) refers to a proposition in a book of his own treatise on water; the words 'proposition' and 'book' are not written.",
-       "The parenthesis opened before 'diciamo' is never closed in the print; the translations close it where the example ends.",
-       "'conproportione vole torcimento' is unclear ('con proporzione vuole torcimento', with proportion it wants twisting?); Ravaisson gives no French for this sentence. Rendered as 'in the proportion the turning requires' and marked [?].",
-       "'braccio quadro': a square braccio (the Italian arm's-length unit), left untranslated."
-      ]
-     },
-     "de": {
-      "text": "Wassermenge. Denn wäre ein Wasser auch von viel geringerer Dicke als das andere, so macht das nichts aus (sagen wir, ein Wasser sei halb so dick wie ein anderes und habe dann die doppelte Geschwindigkeit: weil diese Wasser, wenn sie aufeinandertreffen, dort, wo sie sich berühren, gleich groß sind, wie ich im dritten des fünften bewiesen habe, wobei das größere einen Quadratbraccio misst und das kleinere einen halben, trifft das kleinere das größere nur mit seiner Hälfte, und ebenso trifft das größere das kleinere mit seiner Hälfte, sodass die Berührungen, die durch die Aufpralle entstehen, an Menge gleich und an Kraft um das Doppelte ungleich sind, wegen der doppelten Geschwindigkeit, die das eine gegenüber dem anderen hat.\nUnd so wird der schwimmende Gegenstand aus der geraden Linie seines Laufs gedrängt, in dem Verhältnis, das die Drehung verlangt [?].",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "'di sub 2la grosseza' is 'subdupla', half the thickness; 'didoppia' before it is printed in italics, struck out by Leonardo, and left out.",
-       "'la terza del quinto' (the third of the fifth) refers to a proposition in a book of his own treatise on water; the words 'proposition' and 'book' are not written.",
-       "The parenthesis opened before 'diciamo' is never closed in the print; the translations close it where the example ends.",
-       "'conproportione vole torcimento' is unclear ('con proporzione vuole torcimento', with proportion it wants twisting?); Ravaisson gives no French for this sentence. Rendered as 'in the proportion the turning requires' and marked [?].",
-       "'braccio quadro': a square braccio (the Italian arm's-length unit), left untranslated."
-      ]
-     },
-     "fr": {
-      "text": "[Suite du folio 79 [31] recto :] somme d'eau, parce que si une eau était de bien moindre épaisseur que l'autre, cela ne fait pas cas [peu importerait]. Disons qu'une eau soit ~~de double~~ d'épaisseur sous-double à une autre, et qu'elle soit ensuite de vitesse double. Parce que ces eaux se rencontrant sont d'égales grandeurs au contact, comme je l'ai prouvé dans la troisième du cinquième, la plus grande étant d'une brasse carrée et la plus petite d'une demi-brasse, la plus petite ne frappe pas la plus grande si ce n'est dans [à] sa moitié, et de même la plus grande frappe la plus petite avec sa moitié, de sorte que les contacts faits par les percussions sont égaux en quantité et inégaux par double puissance, la vitesse de l'une étant double de celle de l'autre."
-     },
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
-       "page": "Ms I, FOLIO 78 [30] (verso), transcription (lower left column, first two paragraphs)",
-       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n293/mode/1up"
-      },
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
-       "page": "Ms I, FOLIO 78 [30] (verso), French translation (lower left column, first paragraph)",
-       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n293/mode/1up"
-      }
-     ]
-    }
-   ]
-  },
-  "AR3.169": {
-   "lead": 0,
-   "notes": "Placement confirmed: Richter prints 'Br. M. 269a]' (British Museum, Arundel 263, fol. 269 recto), and his Bibliography lists '269a 1074 and Pl. CXV' (facts-0929 Q1; the Reale Commissione Vinciana edition of 1923 prints the passage under 'Fol. 269 recto', p. 432). Richter's footnote: 'See Pl. CXV. Lines 1-7 are above, lines 8-10 in the middle of the large island and the word Isola is written above d in the smaller island; a is written on the margin on the bank of the river above 1. I; in the reproduction it is not visible. As may be seen from the last sentence, the observation was made after long study of the river's course, when Leonardo had resided for some time at, or near, Amboise.' Richter prints the Italian in four paragraphs, as here; the letters are labels on the drawing. His §1075 is on the other side (269b). The curator's reason points to this passage: lead 0.",
-   "passages": [
-    {
-     "index": 0,
-     "ref": "Richter 1883 §1074 (Br. M. 269a), vol. II p. 251",
-     "it": {
-      "text": "Loira fiume d'Ambosa.\nIl fiume è più alto dentro all'argine b d che fuori d'essa argine;\nIsola dove è vna parte d'Anbuosa.\nIl fiume Loira che passa per Anbosa passa per a b, c d, e poichè è passato il pōte, ritorna contro al suo avenimento per il canale d e, b f in contatto dell'argine che si interpone infra li due moti contrari del predetto fiume a b, c d, d e, b f; di poi si riuolta in giù per il canale f l, g h, n m, e si ricongiugnie col fiume dōde prima si diuise, che passa per k n, che fa k m, r t; ma quādo il fiume è grosso, allora elli corre tutto per uno solo verso, passādo l'argine b d.",
-      "label": {
-       "en": "Transcription: Jean Paul Richter, 1883",
-       "de": "Umschrift: Jean Paul Richter, 1883"
-      }
-     },
-     "en": {
-      "text": "The river Loire at Amboise.\nThe river is higher within the bank b d than outside that bank.\nThe island where there is a part of Amboise.\nThis is the river that passes through Amboise; it passes at a b c d, and when it has passed the bridge it turns back, against the original current, by the channel d e, b f in contact with the bank which lies between the two contrary currents of the said river, a b, c d, and d e, b f. It then turns down again by the channel f l, g h, n m, and reunites with the river from which it was at first separated, which passes by k n, which makes k m, r t. But when the river is very full it flows all in one channel passing over the bank b d.",
-      "kind": "printed",
-      "label": "Translation: Jean Paul Richter, 1883"
-     },
-     "de": {
-      "text": "Die Loire, der Fluss von Amboise.\nDer Fluss steht innerhalb des Damms b d höher als außerhalb dieses Damms.\nInsel, auf der ein Teil von Amboise liegt.\nDie Loire, die durch Amboise fließt, fließt durch a b, c d, und wenn sie die Brücke passiert hat, kehrt sie gegen ihre eigene Strömung durch den Kanal d e, b f zurück, entlang dem Damm, der zwischen den zwei gegenläufigen Strömungen des genannten Flusses liegt, a b, c d, d e, b f. Danach wendet sie sich wieder abwärts durch den Kanal f l, g h, n m und vereinigt sich wieder mit dem Fluss, von dem sie sich zuerst getrennt hat, der durch k n fließt und k m, r t bildet. Führt der Fluss aber Hochwasser, dann fließt er ganz in einer einzigen Richtung und geht über den Damm b d.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "'contro al suo avenimento': literally 'against its coming'; read as against its own current (Richter: 'against the original current').",
-       "'che fa k m, r t': literally 'which makes k m, r t'; the letters refer to the drawing and are kept as printed.",
-       "'è grosso': the river is swollen or in flood; Richter: 'very full'."
-      ]
-     },
-     "fr": null,
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
-       "page": "vol. II p. 251",
-       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n386/mode/1up"
-      },
-      {
-       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
-       "page": "vol. II p. 251",
-       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n386/mode/1up"
-      }
-     ]
-    }
-   ]
-  },
-  "F.022": {
-   "lead": 0,
-   "notes": "FOLIO CORRECTION: the SET row gives F 2 recto, but this leaf is F 8 recto (see folio_check); the words here are those of 8 recto. Heading (the editor's): '[EAU (MOULINS DE FLEUVES ET CANAUX)]'. His note 2: under the first two lines a red chalk draft beginning 'La potentia' and ending 'diuiso dal mo tore'; lower down a sketch in the same chalk. The braided falling water in the upper drawing has no words of its own; the second passage explains the sluice at the right (the gate m and the mouth f), so no passage is the lead. Italics in 'it' mark words Leonardo struck out.",
-   "passages": [
-    {
-     "index": 0,
-     "ref": "Ravaisson-Mollien vol. IV (1889), Ms F fol. 8r, block 1 of 2",
-     "it": {
-      "text": "8. — Dato lapotentia disgunta e con che moto simouera ilmobile dasuo motore",
-      "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
-      }
-     },
-     "en": {
-      "text": "Given the power disjoined, with what motion the moving body will be moved by its mover.",
-      "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
-      "doubts": [
-       "'8.' is the leaf number, which Ravaisson prints before the first line.",
-       "'potentia disgunta' (disgiunta) is literally 'disjoined power'; most likely a power that has left the body it moves, as in a thrown weight, but the line is only a heading and does not explain it. Ravaisson's note 1 points to Ms K, fol. 33 [32] recto."
-      ]
-     },
-     "de": {
-      "text": "Gegeben die getrennte Kraft: mit welcher Bewegung das Bewegliche von seinem Beweger bewegt wird.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "'8.' is the leaf number, which Ravaisson prints before the first line.",
-       "'potentia disgunta' (disgiunta) is literally 'disjoined power'; most likely a power that has left the body it moves, as in a thrown weight, but the line is only a heading and does not explain it. Ravaisson's note 1 points to Ms K, fol. 33 [32] recto."
-      ]
-     },
-     "fr": {
-      "text": "8. — Donné la puissance disjointe, avec quel mouvement sera mû le mobile par son moteur."
-     },
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
-       "page": "Ms F, FOLIO 8 (recto), transcription (upper half of the page, under the heading [EAU (MOULINS DE FLEUVES ET CANAUX)]); archive.org viewer page n31",
-       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n31/mode/1up"
-      },
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
-       "page": "Ms F, FOLIO 8 (recto), French translation (upper half of the page, below the Italian); archive.org viewer page n31",
-       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n31/mode/1up"
-      }
-     ]
-    },
-    {
-     "index": 1,
-     "ref": "Ravaisson-Mollien vol. IV (1889), Ms F fol. 8r, block 2 of 2",
-     "it": {
-      "text": "[2me fig. :] f n n m\nSosspignendo inanzi m lussciuolo sapre ellacqua nonversa piu perla boccha f do ue sipercosta larota delmolino ecques sto modo ditorre edare lacqua alle rote demo lini effatto nefiumi ochanali dicontinuo corso edoue carestia dispatio perdare loco alli cialatoi overo rissciacquatoi delle ~~mo~~ acque superchie demolini —",
-      "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
-      }
-     },
-     "en": {
-      "text": "[Second figure:] f n n m\nWhen m is pushed forward, the little door opens and the water no longer pours through the mouth f, where the mill wheel is struck. This way of taking the water away from the mill wheels and giving it back is used in rivers or canals of continuous flow, and where space is short for making room for the spillways [?], or flushing channels, for the mills' surplus water.",
-      "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
-      "doubts": [
-       "'lussciuolo' is read as 'l'usciuolo', a small door or gate, as Ravaisson's 'la petite porte'.",
-       "'cialatoi' is a rare word; Ravaisson renders the pair 'cialatoi overo rissciacquatoi' as 'conduits de dérivation' (bypass channels). Translated as spillways and marked [?]; 'rissciacquatoi' is literally 'rinsing places', here channels that flush the surplus water away.",
-       "'mo' is printed in italics, struck out by Leonardo; left out."
-      ]
-     },
-     "de": {
-      "text": "[Zweite Figur:] f n n m\nSchiebt man m nach vorn, öffnet sich das Türchen, und das Wasser fließt nicht mehr durch die Mündung f, wo das Mühlrad getroffen wird. Diese Art, den Mühlrädern das Wasser zu nehmen und zu geben, wendet man in Flüssen oder Kanälen mit ständiger Strömung an, und dort, wo der Platz fehlt für die Abläufe [?] oder Spülrinnen für das überschüssige Wasser der Mühlen.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "'lussciuolo' is read as 'l'usciuolo', a small door or gate, as Ravaisson's 'la petite porte'.",
-       "'cialatoi' is a rare word; Ravaisson renders the pair 'cialatoi overo rissciacquatoi' as 'conduits de dérivation' (bypass channels). Translated as spillways and marked [?]; 'rissciacquatoi' is literally 'rinsing places', here channels that flush the surplus water away.",
-       "'mo' is printed in italics, struck out by Leonardo; left out."
-      ]
-     },
-     "fr": {
-      "text": "[2ème fig. :] f n n m\nEn poussant en avant m, la petite porte s'ouvre, et l'eau ne se déverse plus par la bouche f, où se frappe [agit] la roue du moulin. Cette manière d'ôter et de donner l'eau aux roues des moulins s'emploie dans les fleuves ou canaux de courant continu, et où il y a manque d'espace pour donner place aux conduits de dérivation de l'excédent d'eau des moulins."
-     },
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
-       "page": "Ms F, FOLIO 8 (recto), transcription (upper half of the page, under the heading [EAU (MOULINS DE FLEUVES ET CANAUX)]); archive.org viewer page n31",
-       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n31/mode/1up"
-      },
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
-       "page": "Ms F, FOLIO 8 (recto), French translation (upper half of the page, below the Italian); archive.org viewer page n31",
-       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n31/mode/1up"
-      }
-     ]
-    }
-   ]
-  },
   "I.173": {
-   "lead": 1,
+   "lead": 0,
    "notes": "Heading (the editor's): '[AIR ET EAU]'. Ravaisson prints the two passages side by side, in the order left then right; on the leaf the first runs down the right margin beside the drawing and the second across the top and down the left margin. The second describes the churning, air-filled water of the main drawing, so it is the lead. '[33]' is the leaf number in the second part of Ms I. Page match checked: his phototype plate of 81 [33] recto (archive.org viewer n296) shows the same leaf as the SET image.",
    "passages": [
     {
@@ -400,14 +11,14 @@
      "it": {
       "text": "Come tutta laria cheresurge collacqua nonresta in superfitie anzi perlinpeto siri somergie dino vo infralle re uolutioni delle acque\n[2e fig. :]\nSito della risaltatione\nsito della perchussione",
       "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "How all the air that rises again with the water does not stay on the surface, but through the impetus is submerged anew among the revolutions of the waters.\n[Second figure:]\nPlace of the rebound\nplace of the percussion",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1889), checked against his French translation (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
       "doubts": [
        "'linpeto' (l'impeto) is Leonardo's impetus; Ravaisson keeps it in quotation marks.",
        "The two labels belong to the second figure, the small drawing of the basin at the lower right of the leaf: 'risaltatione' is the water's rebound, 'perchussione' the place where it strikes."
@@ -416,10 +27,10 @@
      "de": {
       "text": "Wie die ganze Luft, die mit dem Wasser wieder aufsteigt, nicht an der Oberfläche bleibt, sondern durch den Antrieb von Neuem unter die Umwälzungen des Wassers getaucht wird.\n[Zweite Figur:]\nOrt des Rückpralls\nOrt des Aufpralls",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1889) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
       "doubts": [
-       "'linpeto' (l'impeto) is Leonardo's impetus; Ravaisson keeps it in quotation marks.",
-       "The two labels belong to the second figure, the small drawing of the basin at the lower right of the leaf: 'risaltatione' is the water's rebound, 'perchussione' the place where it strikes."
+       "'linpeto' (l'impeto) ist Leonardos Impetus, im Deutschen 'Antrieb'; Ravaisson setzt das Wort in Anführungszeichen.",
+       "Die beiden Beschriftungen gehören zur zweiten Figur, der kleinen Zeichnung des Beckens unten rechts auf dem Blatt: 'risaltatione' ist der Rückprall des Wassers, 'perchussione' die Stelle, wo es aufschlägt."
       ]
      },
      "fr": {
@@ -445,14 +56,14 @@
      "it": {
       "text": "Come imoti dellacque infralle altre acque non sono costretti amo versi piv perlinia retta che curua e dopo ladesiderata resurgitio ne non son costrette ariposo an zi perritorna e in basso e comoto revertigi noso si vano a conpagni ando col corso del fiume perinsino attan to chesscari cano laria rinchivsa in sieme consecho alla superfitie de lo pelago —",
       "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "How the movements of waters among other waters are not constrained to move by a straight line rather than a curved one, and after their desired rising up again they are not constrained to rest, but, to go back down, and with a whirling motion, they go along with the course of the river until they have unloaded the air shut in with them at the surface of the pool.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1889), checked against his French translation (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
       "doubts": [
        "'la desiderata resurgitione' (the desired rising up) is Leonardo's own figure of speech: water that has been driven down 'wants' to rise again. Ravaisson: 'après avoir rejailli comme elles le voulaient'.",
        "'per ritornare in basso' (to go back down) is kept as written, even though the sentence then speaks of the air reaching the surface.",
@@ -462,11 +73,11 @@
      "de": {
       "text": "Wie die Bewegungen der Wasser inmitten anderer Wasser nicht gezwungen sind, sich eher in gerader als in gekrümmter Linie zu bewegen, und wie sie nach dem ersehnten Wiederauftauchen nicht zur Ruhe gezwungen sind, sondern, um wieder hinabzusinken, und in wirbelnder Bewegung, mit dem Lauf des Flusses mitziehen, bis sie die mit ihnen eingeschlossene Luft an der Oberfläche des Beckens entladen haben.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1889) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
       "doubts": [
-       "'la desiderata resurgitione' (the desired rising up) is Leonardo's own figure of speech: water that has been driven down 'wants' to rise again. Ravaisson: 'après avoir rejailli comme elles le voulaient'.",
-       "'per ritornare in basso' (to go back down) is kept as written, even though the sentence then speaks of the air reaching the surface.",
-       "'pelago' here is the pool or body of water below the fall, Ravaisson's 'nappe d'eau'."
+       "'la desiderata resurgitione' (das ersehnte Wiederauftauchen) ist Leonardos eigenes Sprachbild: Wasser, das hinabgedrückt wurde, 'will' wieder aufsteigen. Ravaisson: 'après avoir rejailli comme elles le voulaient'.",
+       "'per ritornare in basso' (um wieder hinabzugehen) bleibt, wie es geschrieben ist, obwohl der Satz dann davon spricht, dass die Luft die Oberfläche erreicht.",
+       "'pelago' ist hier das Becken oder die Wasserfläche unter dem Fall, Ravaissons 'nappe d'eau'."
       ]
      },
      "fr": {
@@ -488,6 +99,203 @@
     }
    ]
   },
+  "F.101": {
+   "lead": null,
+   "notes": "Heading (the editor's): '[AIR ET POIDS. — EAU]'. The second passage, on water falling from a river into the air, belongs to the drawing of the jet plunging into the pool. Italics in 'it' and 'fr' mark words Leonardo struck out. Wide gaps in the printed line (around 'come sifa nelle coppette') are rendered as single spaces. Page match checked: Ravaisson's phototype plate of 47 verso (archive.org viewer n110) shows the same leaf as the SET image.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. IV (1889), Ms F fol. 47v, block 1 of 2",
+     "it": {
+      "text": "Quanta aria vole essere alleuare diuersi gravi. ~~indiv~~ diuarie materie Quanta ac qua entera nella barca affarla affondare Quale aria sostiene piu essendo rinchi vsa olla rarefacta come sifa nelle coppette olla comune ollacon densata come sifa nelle palle gonfiate per forza diuite sanza dubbio lararefatta e poi lacomune ella condensata mancoresiste",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "How much air is needed to lift various weights of different materials. How much water will enter the boat to make it sink. Which air supports more when it is shut in: the rarefied, as is done in cupping glasses, or the ordinary, or the condensed, as is done in balls blown up by force of a screw? Without doubt the rarefied, and then the ordinary, and the condensed resists least.",
+      "kind": "ours",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1889), checked against his French translation (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
+      "doubts": [
+       "'manco resiste' is literally 'resists less' (here: least, at the end of the ranking). Ravaisson renders 'ne résiste pas du tout' (does not resist at all), which says more than the Italian.",
+       "Ravaisson splits 'essendo rinchiusa' off as a first kind of air ('celui qui est enfermé ou du raréfié'); the Italian reads more naturally as one condition for all three kinds (air that is shut in), and the translations follow the Italian. The ranking itself is Leonardo's and is kept as written.",
+       "'indiv' is printed in italics, begun and struck out; left out of the translations."
+      ]
+     },
+     "de": {
+      "text": "Wie viel Luft man braucht, um verschiedene Lasten aus verschiedenen Stoffen zu heben. Wie viel Wasser in die Barke eindringen muss, um sie sinken zu lassen. Welche Luft trägt mehr, wenn sie eingeschlossen ist: die verdünnte, wie man sie in Schröpfköpfen erzeugt, oder die gewöhnliche, oder die verdichtete, wie man sie in Bällen erzeugt, die mit Schraubenkraft aufgepumpt sind? Ohne Zweifel die verdünnte, dann die gewöhnliche, und die verdichtete widersteht am wenigsten.",
+      "kind": "ours",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1889) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
+      "doubts": [
+       "'manco resiste' heißt wörtlich 'widersteht weniger' (hier: am wenigsten, am Ende der Rangfolge). Ravaisson übersetzt 'ne résiste pas du tout' (widersteht gar nicht), was mehr sagt als das Italienische.",
+       "Ravaisson trennt 'essendo rinchiusa' als erste Art von Luft ab ('celui qui est enfermé ou du raréfié'); das Italienische liest sich natürlicher als eine Bedingung für alle drei Arten (eingeschlossene Luft), und die Übersetzungen folgen dem Italienischen. Die Rangfolge selbst ist Leonardos und bleibt, wie sie geschrieben ist.",
+       "'indiv' ist kursiv gedruckt, begonnen und gestrichen; in den Übersetzungen weggelassen."
+      ]
+     },
+     "fr": {
+      "text": "Combien d'air il faut pour élever divers graves ~~en div~~ de diverses matières.\nCombien d'eau entrera dans la barque pour la faire enfoncer. Quel air soutient le plus, de celui qui est enfermé ou du raréfié, comme il se fait dans les ventouses, ou du commun [de celui à l'état naturel], ou du condensé, comme il se fait dans les balles [ballons] gonflées par force de vis; sans doute le raréfié, et puis le commun, et le condensé ne résiste pas du tout."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
+       "page": "Ms F, FOLIO 47 (verso), transcription (lower half of the page, under the heading [AIR ET POIDS. — EAU]); archive.org viewer page n109",
+       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n109/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
+       "page": "Ms F, FOLIO 47 (verso), French translation (lower half of the page, below the Italian); archive.org viewer page n109",
+       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n109/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Ravaisson-Mollien vol. IV (1889), Ms F fol. 47v, block 2 of 2",
+     "it": {
+      "text": "~~Ciascun moto e~~ ciasscu // n a parte dellagrosseza dellacqua che chade difiume infralaria segue la linia nella quale ~~co~~ fu principiato lin peto che intal caduta lacondusse —",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "Every part of the thickness of the water that falls from a river into the air follows the line in which the impetus began that carried it into that fall.",
+      "kind": "ours",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1889), checked against his French translation (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
+      "doubts": [
+       "'inpeto' (impeto) is Leonardo's term for the impetus a moving body carries; Ravaisson: 'l'impulsion'.",
+       "'Ciascun moto e' (every movement and) and 'co' are printed in italics, struck out by Leonardo; they are left out of the translations. The sign '//' is printed by the edition inside 'ciasscu // n a'; it is kept in the Italian."
+      ]
+     },
+     "de": {
+      "text": "Jeder Teil der Wassermasse, die von einem Fluss in die Luft fällt, folgt der Linie, in der der Antrieb begann, der ihn in diesen Fall geführt hat.",
+      "kind": "ours",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1889) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
+      "doubts": [
+       "'grosseza dellacqua' heißt wörtlich 'die Dicke des Wassers'; das deutsche 'Wassermasse' bewahrt den Sinn des ganzen fallenden Wasserkörpers.",
+       "'inpeto' (impeto) ist Leonardos Begriff für den Impetus, den ein bewegter Körper mit sich trägt; im Deutschen 'Antrieb'.",
+       "'Ciascun moto e' und 'co' sind kursiv gedruckt, von Leonardo gestrichen; sie sind weggelassen."
+      ]
+     },
+     "fr": {
+      "text": "~~Chaque mouvement~~ Chaque partie de l'épaisseur de l'eau qui tombe du fleuve dans l'air suit la ligne dans laquelle fut commencée l'impulsion [« inpeto »] qui la conduisit à cette chute."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
+       "page": "Ms F, FOLIO 47 (verso), transcription (lower half of the page, under the heading [AIR ET POIDS. — EAU]); archive.org viewer page n109",
+       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n109/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
+       "page": "Ms F, FOLIO 47 (verso), French translation (lower half of the page, below the Italian); archive.org viewer page n109",
+       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n109/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "F.022": {
+   "lead": null,
+   "notes": "FOLIO CORRECTION: the SET row gives F 2 recto, but this leaf is F 8 recto (see folio_check); the words here are those of 8 recto. Heading (the editor's): '[EAU (MOULINS DE FLEUVES ET CANAUX)]'. His note 2: under the first two lines a red chalk draft beginning 'La potentia' and ending 'diuiso dal mo tore'; lower down a sketch in the same chalk. The braided falling water in the upper drawing has no words of its own; the second passage explains the sluice at the right (the gate m and the mouth f), so no passage is the lead. Italics in 'it' mark words Leonardo struck out.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. IV (1889), Ms F fol. 8r, block 1 of 2",
+     "it": {
+      "text": "8. — Dato lapotentia disgunta e con che moto simouera ilmobile dasuo motore",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "Given the power disjoined, with what motion the moving body will be moved by its mover.",
+      "kind": "ours",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1889), checked against his French translation (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
+      "doubts": [
+       "'8.' is the leaf number, which Ravaisson prints before the first line.",
+       "'potentia disgunta' (disgiunta) is literally 'disjoined power'; most likely a power that has left the body it moves, as in a thrown weight, but the line is only a heading and does not explain it. Ravaisson's note 1 points to Ms K, fol. 33 [32] recto."
+      ]
+     },
+     "de": {
+      "text": "Gegeben die getrennte Kraft: mit welcher Bewegung das Bewegliche von seinem Beweger bewegt wird.",
+      "kind": "ours",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1889) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
+      "doubts": [
+       "'8.' ist die Blattnummer, die Ravaisson vor die erste Zeile druckt.",
+       "'potentia disgunta' (disgiunta) heißt wörtlich 'getrennte Kraft'; höchstwahrscheinlich eine Kraft, die den Körper, den sie bewegt, verlassen hat, wie bei einem geworfenen Gewicht, aber die Zeile ist nur eine Überschrift und erklärt es nicht. Ravaissons Anmerkung 1 verweist auf Ms K, fol. 33 [32] recto."
+      ]
+     },
+     "fr": {
+      "text": "8. — Donné la puissance disjointe, avec quel mouvement sera mû le mobile par son moteur."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
+       "page": "Ms F, FOLIO 8 (recto), transcription (upper half of the page, under the heading [EAU (MOULINS DE FLEUVES ET CANAUX)]); archive.org viewer page n31",
+       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n31/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
+       "page": "Ms F, FOLIO 8 (recto), French translation (upper half of the page, below the Italian); archive.org viewer page n31",
+       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n31/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Ravaisson-Mollien vol. IV (1889), Ms F fol. 8r, block 2 of 2",
+     "it": {
+      "text": "[2me fig. :] f n n m\nSosspignendo inanzi m lussciuolo sapre ellacqua nonversa piu perla boccha f do ue sipercosta larota delmolino ecques sto modo ditorre edare lacqua alle rote demo lini effatto nefiumi ochanali dicontinuo corso edoue carestia dispatio perdare loco alli cialatoi overo rissciacquatoi delle ~~mo~~ acque superchie demolini —",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "[Second figure:] f n n m\nWhen m is pushed forward, the little door opens and the water no longer pours through the mouth f, where the mill wheel is struck. This way of taking the water from the mill wheels and giving it to them is used in rivers or canals of continuous flow, and where space is short for making room for the spillways [?], or flushing channels, for the mills' surplus water.",
+      "kind": "ours",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1889), checked against his French translation (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
+      "doubts": [
+       "'lussciuolo' is read as 'l'usciuolo', a small door or gate, as Ravaisson's 'la petite porte'.",
+       "'cialatoi' is a rare word; Ravaisson renders the pair 'cialatoi overo rissciacquatoi' as 'conduits de dérivation' (bypass channels). Translated as spillways and marked [?]; 'rissciacquatoi' is literally 'rinsing places', here channels that flush the surplus water away.",
+       "'mo' is printed in italics, struck out by Leonardo; left out."
+      ]
+     },
+     "de": {
+      "text": "[Zweite Figur:] f n n m\nSchiebt man m nach vorn, öffnet sich das Türchen, und das Wasser fließt nicht mehr durch die Mündung f, wo das Mühlrad getroffen wird. Diese Art, den Mühlrädern das Wasser zu nehmen und zu geben, wendet man in Flüssen oder Kanälen mit ständiger Strömung an, und dort, wo der Platz fehlt für die Abläufe [?] oder Spülrinnen für das überschüssige Wasser der Mühlen.",
+      "kind": "ours",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1889) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
+      "doubts": [
+       "'lussciuolo' wird als 'l'usciuolo' gelesen, eine kleine Tür oder Schleuse, wie Ravaissons 'la petite porte'.",
+       "'cialatoi' ist ein seltenes Wort; Ravaisson gibt das Paar 'cialatoi overo rissciacquatoi' als 'conduits de dérivation' (Umleitungskanäle) wieder. Übersetzt mit 'Abläufe' und mit [?] markiert; 'rissciacquatoi' heißt wörtlich 'Spülstellen', hier Rinnen, die das überschüssige Wasser fortspülen.",
+       "'mo' ist kursiv gedruckt, von Leonardo gestrichen; weggelassen."
+      ]
+     },
+     "fr": {
+      "text": "[2ème fig. :] f n n m\nEn poussant en avant m, la petite porte s'ouvre, et l'eau ne se déverse plus par la bouche f, où se frappe [agit] la roue du moulin. Cette manière d'ôter et de donner l'eau aux roues des moulins s'emploie dans les fleuves ou canaux de courant continu, et où il y a manque d'espace pour donner place aux conduits de dérivation de l'excédent d'eau des moulins."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
+       "page": "Ms F, FOLIO 8 (recto), transcription (upper half of the page, under the heading [EAU (MOULINS DE FLEUVES ET CANAUX)]); archive.org viewer page n31",
+       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n31/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
+       "page": "Ms F, FOLIO 8 (recto), French translation (upper half of the page, below the Italian); archive.org viewer page n31",
+       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n31/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
   "F.043": {
    "lead": 0,
    "notes": "Heading (the editor's): '[TOURNANTS ET COURANTS D'EAU]'. The bracketed placings ('[1re figure :]', '[Sous la 1re fig. :]', '[En haut :]', '[Dernière fig. :]') are Ravaisson's, telling where each line stands on the leaf. The first passage is the caption under the first figure, the whirling water round the object f. Italics in 'it' mark letters Leonardo struck out. Page match checked: Ravaisson's phototype plate of 18 verso (archive.org viewer n52) shows the same leaf as the SET image.",
@@ -498,14 +306,14 @@
      "it": {
       "text": "[1re figure :] f [Sous la 1re fig. :] tali ra voltamen ti dicorsi so fatti dalenpeto dellacqua sottolal tra acqua —",
       "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+       "en": null,
+       "de": null
       }
      },
      "en": {
-      "text": "[First figure:] f [Under the first figure:] Such rollings over of the currents are made by the impetus of the water beneath the other water.",
+      "text": "[First figure:] f [Under the first figure:] Such overturnings of the currents are made by the impetus of the water beneath the other water.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1889), checked against his French translation (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
       "doubts": [
        "'ra voltamen ti' (rivoltamenti) are turnings over or rollings; Ravaisson: 'tournoiements'. 'enpeto' (impeto) is Leonardo's impetus, kept by Ravaisson in quotation marks."
       ]
@@ -513,9 +321,9 @@
      "de": {
       "text": "[Erste Figur:] f [Unter der ersten Figur:] Solche Umwälzungen der Strömungen entstehen durch den Antrieb des Wassers unter dem anderen Wasser.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1889) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
       "doubts": [
-       "'ra voltamen ti' (rivoltamenti) are turnings over or rollings; Ravaisson: 'tournoiements'. 'enpeto' (impeto) is Leonardo's impetus, kept by Ravaisson in quotation marks."
+       "'ra voltamen ti' (rivoltamenti) sind Umwälzungen oder Überschläge; Ravaisson: 'tournoiements'. 'enpeto' (impeto) ist Leonardos Impetus, im Deutschen 'Antrieb'; Ravaisson setzt das Wort in Anführungszeichen."
       ]
      },
      "fr": {
@@ -541,28 +349,30 @@
      "it": {
       "text": "[En haut :] Della grosseza dellacqua percossa nellobietto laparte disotti eprima chepercote ilfondo ein media~~n~~ te refretta allasuperfi tie quella meza disopra non discende alfondo maisscon trandosi nella prima cherefre tte percote sopra di lei e de vr tata ecosi refrette ancora lei perle medesime linie ere uertigini —\nElle 2 acque nello scontrar si lainferiore colla superiore suniscano essi ragirano insieme — nelor contatti",
       "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+       "en": null,
+       "de": null
       }
      },
      "en": {
-      "text": "[At the top:] Of the thickness of water that strikes the object, the lowest part is the first to strike the bed, and it is at once thrown back to the surface. The part halfway up does not go down to the bed, but, meeting the first, which is thrown back, it strikes upon it and is pushed, and so it too is thrown back along the same lines and eddies.\nAnd the 2 waters, when the lower meets the upper, unite and turn round together, where they touch.",
+      "text": "[At the top:] Of the thickness of water that strikes the object, the lowest part is the first to strike the bed, and it is at once thrown back to the surface. The part halfway up [?] does not go down to the bed, but, meeting the first, which is thrown back, it strikes upon it and is pushed, and so it too is thrown back along the same lines and eddies.\nAnd the 2 waters, when the lower meets the upper, unite and turn round together, where they touch.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1889), checked against his French translation (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
       "doubts": [
        "'de vr tata' is read as 'ed è urtata' (and is pushed); Ravaisson: 'est heurtée'.",
        "'ein media<i>n</i> te' is read as 'e immediate' (and at once); the italic n is a letter Leonardo struck out.",
-       "'nelor contatti' (ne' lor contatti, in their contacts) stands after a dash at the end of the line, as an addition; it is attached to the sentence as Ravaisson does."
+       "'nelor contatti' (ne' lor contatti, in their contacts) stands after a dash at the end of the line, as an addition; it is attached to the sentence as Ravaisson does.",
+       "'quella meza di sopra' may mean the upper half, against 'la parte di sotto'; Ravaisson reads the part at mid-height ('à mi-hauteur'), followed here."
       ]
      },
      "de": {
-      "text": "[Oben:] Von der Wassermasse, die auf den Gegenstand trifft, trifft der untere Teil als erster auf den Grund und wird sogleich zur Oberfläche zurückgeworfen. Der Teil in halber Höhe sinkt nicht zum Grund hinab, sondern stößt auf den ersten, der zurückgeworfen wird, trifft auf ihn, wird gestoßen und so ebenfalls entlang derselben Linien und Wirbel zurückgeworfen.\nUnd wenn die 2 Wasser aufeinandertreffen, das untere mit dem oberen, vereinen sie sich und drehen sich gemeinsam, dort, wo sie sich berühren.",
+      "text": "[Oben:] Von der Wassermasse, die auf den Gegenstand trifft, trifft der untere Teil als erster auf den Grund und wird sogleich zur Oberfläche zurückgeworfen. Der Teil in halber Höhe [?] sinkt nicht zum Grund hinab, sondern stößt auf den ersten, der zurückgeworfen wird, trifft auf ihn, wird gestoßen und so ebenfalls entlang derselben Linien und Wirbel zurückgeworfen.\nUnd wenn die 2 Wasser aufeinandertreffen, das untere mit dem oberen, vereinen sie sich und drehen sich gemeinsam, dort, wo sie sich berühren.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1889) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
       "doubts": [
-       "'de vr tata' is read as 'ed è urtata' (and is pushed); Ravaisson: 'est heurtée'.",
-       "'ein media<i>n</i> te' is read as 'e immediate' (and at once); the italic n is a letter Leonardo struck out.",
-       "'nelor contatti' (ne' lor contatti, in their contacts) stands after a dash at the end of the line, as an addition; it is attached to the sentence as Ravaisson does."
+       "'de vr tata' wird als 'ed è urtata' (und wird gestoßen) gelesen; Ravaisson: 'est heurtée'.",
+       "'ein media<i>n</i> te' wird als 'e immediate' (und sogleich) gelesen; das kursive n ist ein Buchstabe, den Leonardo gestrichen hat.",
+       "'nelor contatti' (ne' lor contatti, in ihren Berührungen) steht nach einem Strich am Zeilenende, als Zusatz; es wird wie bei Ravaisson an den Satz angeschlossen.",
+       "'quella meza di sopra' kann die obere Hälfte meinen, im Gegensatz zu 'la parte di sotto'; Ravaisson liest den Teil in halber Höhe ('à mi-hauteur'), und dem folgt die Übersetzung."
       ]
      },
      "fr": {
@@ -588,19 +398,19 @@
      "it": {
       "text": "Dellacqua chechade infra laltra acqua quella che piu vicina almezo della cadu ta epiv obliqua ella piu vicina alli stremi epiudi ritta —",
       "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "Of water that falls into other water, the part nearest the middle of the fall is more slanting, and the part nearest the ends is more upright.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1889), checked against his French translation (Ravaisson-Mollien, vol. IV, 1889). It may contain errors."
      },
      "de": {
       "text": "Von Wasser, das in anderes Wasser fällt, ist der Teil, der der Mitte des Falls am nächsten ist, schräger, und der Teil, der den Rändern am nächsten ist, steiler.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1889) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten."
      },
      "fr": {
       "text": "Des eaux qui tombent dans d'autres eaux, celle qui est la plus voisine du milieu de la chute est plus oblique, et la plus voisine des extrémités est plus droite."
@@ -625,14 +435,14 @@
      "it": {
       "text": "[Dernière fig. :] a b c n\nIn a b stava piu lfondo chedallo posita parte perchediuerso lamagor corente delfiume famagore onda eretroso in a b che dila come mostra disopra lo bietto f e in n sironpe largine —",
       "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "[Last figure:] a b c n\nAt a b the bed lay deeper than on the opposite side, because towards the river's stronger current a greater wave and eddy is made at a b than beyond, as the object f shows above. And at n the bank breaks.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1889), checked against his French translation (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
       "doubts": [
        "'stava piu lfondo' (the bed stood more) is read as the bed lying deeper, as Ravaisson's 'il y avait plus de fond'.",
        "'dila' (di là, beyond) is read as the far side, away from the strongest current."
@@ -641,10 +451,10 @@
      "de": {
       "text": "[Letzte Figur:] a b c n\nBei a b lag der Grund tiefer als auf der Gegenseite, weil zur stärkeren Strömung des Flusses hin bei a b eine größere Welle und ein größerer Wirbel entsteht als drüben, wie oben der Gegenstand f zeigt. Und bei n bricht das Ufer ein.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1889) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
       "doubts": [
-       "'stava piu lfondo' (the bed stood more) is read as the bed lying deeper, as Ravaisson's 'il y avait plus de fond'.",
-       "'dila' (di là, beyond) is read as the far side, away from the strongest current."
+       "'stava piu lfondo' (der Grund stand mehr) wird so gelesen, dass der Grund tiefer lag, wie Ravaissons 'il y avait plus de fond'.",
+       "'dila' (di là, drüben) wird als die abgewandte Seite gelesen, fern der stärksten Strömung."
       ]
      },
      "fr": {
@@ -666,8 +476,155 @@
     }
    ]
   },
+  "F.102": {
+   "lead": null,
+   "notes": "Heading (the editor's): '[EAU (CHOSES PORTÉES ET COURANTS)]'. The drawing is not two falling jets: by the text it shows swift water flowing round two objects, a and b, and breaking into thin films (e f, m o) with the solid water at h. Italics in 'it' and 'fr' mark words Leonardo struck out. Page match checked: Ravaisson's phototype plate of 48 recto (archive.org viewer n112) shows the same leaf as the SET image.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. IV (1889), Ms F fol. 48r, block 1 of 3",
+     "it": {
+      "text": "48. — Perfare pelgli [belli?] espectaculi dacqua panniculata ponendo molti vari obietti nuna conrente bassa equale eveloce —",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "To make fine [?] displays of water in thin films, by placing many different objects in a shallow, even and swift current.",
+      "kind": "ours",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1889), checked against his French translation (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
+      "doubts": [
+       "'48.' is the leaf number, printed by Ravaisson before the first line.",
+       "'pelgli' is doubtful; the edition reads it '[belli?]' (beautiful), hence 'fine [?]'.",
+       "'panniculata' is Leonardo's word for water spread into thin films or veils (from 'pannicolo', a thin membrane); Ravaisson keeps it as 'panniculée'."
+      ]
+     },
+     "de": {
+      "text": "Um schöne [?] Schauspiele von Wasser in dünnen Häutchen zu erzeugen, indem man viele verschiedene Gegenstände in eine flache, gleichmäßige und schnelle Strömung setzt.",
+      "kind": "ours",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1889) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
+      "doubts": [
+       "'48.' ist die Blattnummer, von Ravaisson vor die erste Zeile gedruckt.",
+       "'pelgli' ist unsicher; die Ausgabe liest es '[belli?]' (schön), daher 'schöne [?]'.",
+       "'panniculata' ist Leonardos Wort für Wasser, das sich zu dünnen Häutchen oder Schleiern ausbreitet (von 'pannicolo', dünne Haut); Ravaisson behält es als 'panniculée'."
+      ]
+     },
+     "fr": {
+      "text": "48.— Pour faire de beaux spectacles d'eau panniculée en plaçant beaucoup d'objets divers dans un courant bas, égal et rapide."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
+       "page": "Ms F, FOLIO 48 (recto), transcription (upper half of the page, under the heading [EAU (CHOSES PORTÉES ET COURANTS)]); archive.org viewer page n111",
+       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n111/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
+       "page": "Ms F, FOLIO 48 (recto), French translation (upper half of the page, below the Italian); archive.org viewer page n111",
+       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n111/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Ravaisson-Mollien vol. IV (1889), Ms F fol. 48r, block 2 of 3",
+     "it": {
+      "text": "[Fig. :] a c d n g p — b r s t c f m o h q\n— LACQUA CHEPERCOTE ECIGNE LOBBIETTO LAQUAL SIA DI VELOCE CORSO SARA DI DUE QUALITA DELLE ~~qu li~~ QUALI LA PRIMA FIA PANNICHULATA ENCIDEN TE LALTRA SARA REALE EREFRESSA —",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "[Figure:] a c d n g p, b r s t c f m o h q\nTHE WATER THAT STRIKES AND GIRDLES THE OBJECT, WHEN IT RUNS SWIFTLY, WILL BE OF TWO KINDS: THE FIRST WILL BE IN FILMS AND INCIDENT, THE OTHER WILL BE REAL [?] AND REFLECTED.",
+      "kind": "ours",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1889), checked against his French translation (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
+      "doubts": [
+       "The edition sets this sentence in small capitals, as Leonardo's heading of a rule; the translations keep the capitals.",
+       "'reale' (real) is contrasted with the thin films; Ravaisson adds '[simple]'. It most likely means the solid body of the water, but the text does not say more, hence [?].",
+       "'incidente' and 'refressa' (riflessa) are Leonardo's terms for water moving towards an obstacle and water thrown back from it.",
+       "The dash in the editor's list of letters is replaced by a comma in the translations; 'qu li' (italics) is struck out and left out."
+      ]
+     },
+     "de": {
+      "text": "[Figur:] a c d n g p, b r s t c f m o h q\nDAS WASSER, DAS AUF DEN GEGENSTAND TRIFFT UND IHN UMGÜRTET, WIRD BEI SCHNELLEM LAUF VON ZWEIERLEI ART SEIN: DIE ERSTE HÄUTCHENARTIG UND EINFALLEND, DIE ANDERE WIRKLICH [?] UND ZURÜCKGEWORFEN.",
+      "kind": "ours",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1889) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
+      "doubts": [
+       "Die Ausgabe setzt diesen Satz in Kapitälchen, als Leonardos Überschrift einer Regel; die Übersetzungen behalten die Großbuchstaben.",
+       "'reale' (wirklich) steht im Gegensatz zu den dünnen Häutchen; Ravaisson ergänzt '[simple]'. Gemeint ist höchstwahrscheinlich der feste Körper des Wassers, aber mehr sagt der Text nicht, daher [?].",
+       "'incidente' und 'refressa' (riflessa) sind Leonardos Begriffe für Wasser, das auf ein Hindernis zuläuft, und Wasser, das von ihm zurückgeworfen wird.",
+       "Der Strich in der Buchstabenliste des Herausgebers ist in den Übersetzungen durch ein Komma ersetzt; 'qu li' (kursiv) ist gestrichen und weggelassen."
+      ]
+     },
+     "fr": {
+      "text": "[Fig. :] a c d n g p — b r s t c f m o h q\nL'EAU QUI FRAPPE ET CEINT L'OBJET [ET] QUI EST DE COURSE RAPIDE SERA DE DEUX QUALITÉS; LA PREMIÈRE SERA PANNICULÉE ET INCIDENTE, L'AUTRE SERA RÉELLE [SIMPLE] ET RÉFLÉCHIE."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
+       "page": "Ms F, FOLIO 48 (recto), transcription (upper half of the page, under the heading [EAU (CHOSES PORTÉES ET COURANTS)]); archive.org viewer page n111",
+       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n111/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
+       "page": "Ms F, FOLIO 48 (recto), French translation (upper half of the page, below the Italian); archive.org viewer page n111",
+       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n111/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Ravaisson-Mollien vol. IV (1889), Ms F fol. 48r, block 3 of 3",
+     "it": {
+      "text": "a b sono lidetti obbietti delli quali b ecin to dallacqua r s t eposiconuerte inpanniculo chee ~~n m~~ e f m o. La reale. sara h.",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "a b are the said objects, of which b is girdled by the water r s t, and this then turns into a film, which is e f, m o. The real one will be h.",
+      "kind": "ours",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1889), checked against his French translation (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
+      "doubts": [
+       "'n m' is printed in italics (struck out by Leonardo) in both the Italian and the French, and is left out of the translations.",
+       "'eposiconuerte' (e poi si converte, and then turns) has no written subject; it is read as the water r s t, not the object b."
+      ]
+     },
+     "de": {
+      "text": "a b sind die genannten Gegenstände. b wird vom Wasser r s t umgürtet, und dieses verwandelt sich dann in ein Häutchen, nämlich e f, m o. Das wirkliche wird h sein.",
+      "kind": "ours",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1889) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
+      "doubts": [
+       "'n m' ist im Italienischen wie im Französischen kursiv gedruckt (von Leonardo gestrichen) und in den Übersetzungen weggelassen.",
+       "'eposiconuerte' (e poi si converte, und verwandelt sich dann) hat kein geschriebenes Subjekt; es wird als das Wasser r s t gelesen, nicht als der Gegenstand b."
+      ]
+     },
+     "fr": {
+      "text": "A, b, sont lesdits objets; b est entouré par l'eau r s t, et puis se change en pannicules qui sont ~~n m~~ e f m o. La réelle sera h."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
+       "page": "Ms F, FOLIO 48 (recto), transcription (upper half of the page, under the heading [EAU (CHOSES PORTÉES ET COURANTS)]); archive.org viewer page n111",
+       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n111/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
+       "page": "Ms F, FOLIO 48 (recto), French translation (upper half of the page, below the Italian); archive.org viewer page n111",
+       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n111/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
   "I.221": {
-   "lead": 0,
+   "lead": null,
    "notes": "Heading (the editor's): '[PERCUSSION ET SAUTS DE L'EAU]'. The lettered figure is the drawing of water pouring over a wall into the pool (m, f, g, n on the leaf). Passage 2 is the continuation written on the facing page 104 [56] verso and carries a 'placement' flag; it completes the sentence of passage 1. Italics in 'it' mark words Leonardo struck out. '[57]' is the leaf number in the second part of Ms I. Page match checked: Ravaisson's phototype plate of 105 [57] recto (archive.org viewer n320) shows the same leaf as the SET image.",
    "passages": [
     {
@@ -676,14 +633,14 @@
      "it": {
       "text": "[Figure :] m f\ng\nn\nQuesta percussione dacqua sidiriza inverso m. epercote largine m poi chelle risaltata dalfondo erivoltasi inverso lapercussione superfitiale dove piv bassa lacqua etrovando laseconda caduta de f dovelacqua perlo balzo egia fatta alta ella non lapo montare anzi sisomergie conessa ac equa alta che poi disciende o ne [onde] efforza chepassi so tto ilbalzo cheprima fu fatto dallei essirivol ta in n elli cava ilfondo eprima passa [La suite au folio 104 [56] verso] —",
       "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "[Figure:] m f g n\nThis percussion of water heads towards m and strikes the bank m, after it has rebounded from the bed and turned back towards the surface percussion, where the water is lower. And finding the second fall from f, where the water has already been made high by the leap, it cannot climb over it, but is submerged with that high water, which then comes down. So it must pass under the leap it made before, and turn back at n, and there it digs the bed, and first passes [continued on folio 104 [56] verso]",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1889), checked against his French translation (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
       "doubts": [
        "'ne [onde]': Leonardo wrote 'o ne'; the edition prints its correction '[onde]' (whence), and the translations follow it.",
        "'la percussione superfitiale' (the surface percussion) is the place where the falling water first strikes the surface; the sentence does not define it further.",
@@ -694,12 +651,12 @@
      "de": {
       "text": "[Figur:] m f g n\nDieser Aufprall des Wassers richtet sich gegen m und trifft das Ufer m, nachdem er vom Grund zurückgeprallt ist und sich wieder dem Aufprall an der Oberfläche zugewandt hat, wo das Wasser niedriger ist. Und da er auf den zweiten Fall von f trifft, wo das Wasser durch den Sprung schon hoch geworden ist, kann er ihn nicht übersteigen, sondern taucht mit diesem hohen Wasser unter, das dann herabsinkt. Daher muss er unter dem Sprung hindurch, den er vorher selbst gemacht hat, wendet sich bei n, höhlt dort den Grund aus und zieht zuerst [Fortsetzung auf Blatt 104 [56] verso]",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1889) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
       "doubts": [
-       "'ne [onde]': Leonardo wrote 'o ne'; the edition prints its correction '[onde]' (whence), and the translations follow it.",
-       "'la percussione superfitiale' (the surface percussion) is the place where the falling water first strikes the surface; the sentence does not define it further.",
-       "The sentence breaks off at the foot of the page and runs on onto folio 104 [56] verso; that continuation is given as the next passage, flagged.",
-       "The figure letters are joined on one line in the translations; the edition prints them as they stand on the drawing."
+       "'ne [onde]': Leonardo schrieb 'o ne'; die Ausgabe druckt ihre Verbesserung '[onde]' (daher), und die Übersetzungen folgen ihr.",
+       "'la percussione superfitiale' (der Aufprall an der Oberfläche) ist die Stelle, wo das fallende Wasser zuerst auf die Oberfläche trifft; der Satz bestimmt es nicht näher.",
+       "Der Satz bricht unten auf der Seite ab und läuft auf Folio 104 [56] verso weiter; diese Fortsetzung steht als nächster Abschnitt, gekennzeichnet.",
+       "Die Buchstaben der Figur stehen in den Übersetzungen auf einer Zeile; die Ausgabe druckt sie so, wie sie auf der Zeichnung stehen."
       ]
      },
      "fr": {
@@ -726,14 +683,14 @@
      "it": {
       "text": "[Suite du folio 105 [57] recto] sotto e 2 balzi fatti da f eda g. eper ~~che~~ questo rimane alto ariscontro del suo balzo perche tal balzo si fa ponte alcorso dellacqua chessotto siliragira epoi coninpeto esscie",
       "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "under the 2 leaps made from f and from g. And for this reason it stays high opposite its leap, because such a leap makes itself a bridge over the course of the water that whirls round beneath it and then comes out with impetus.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1889), checked against his French translation (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
       "doubts": [
        "'questo rimane alto' (this stays high): the subject is not named; Ravaisson reads it as the water ('elle reste haute'). It may also be the leap itself.",
        "'che' after 'eper' is printed in italics, struck out by Leonardo; left out.",
@@ -743,11 +700,11 @@
      "de": {
       "text": "unter den 2 Sprüngen hindurch, die von f und von g ausgehen. Und deshalb bleibt es gegenüber seinem Sprung hoch, weil ein solcher Sprung zur Brücke über den Lauf des Wassers wird, das darunter kreist und dann mit Wucht herauskommt.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1889) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
       "doubts": [
-       "'questo rimane alto' (this stays high): the subject is not named; Ravaisson reads it as the water ('elle reste haute'). It may also be the leap itself.",
-       "'che' after 'eper' is printed in italics, struck out by Leonardo; left out.",
-       "'coninpeto' (con impeto) is rendered 'with impetus' in English and 'mit Wucht' in German."
+       "'questo rimane alto' (dies bleibt hoch): Das Subjekt ist nicht genannt; Ravaisson liest es als das Wasser ('elle reste haute'). Es kann auch der Sprung selbst sein.",
+       "'che' nach 'eper' ist kursiv gedruckt, von Leonardo gestrichen; weggelassen.",
+       "'coninpeto' (con impeto) ist im Englischen mit 'with impetus' und im Deutschen mit 'mit Wucht' übersetzt."
       ]
      },
      "fr": {
@@ -769,155 +726,8 @@
     }
    ]
   },
-  "F.102": {
-   "lead": 1,
-   "notes": "Heading (the editor's): '[EAU (CHOSES PORTÉES ET COURANTS)]'. The drawing is not two falling jets: by the text it shows swift water flowing round two objects, a and b, and breaking into thin films (e f, m o) with the solid water at h. Italics in 'it' and 'fr' mark words Leonardo struck out. Page match checked: Ravaisson's phototype plate of 48 recto (archive.org viewer n112) shows the same leaf as the SET image.",
-   "passages": [
-    {
-     "index": 0,
-     "ref": "Ravaisson-Mollien vol. IV (1889), Ms F fol. 48r, block 1 of 3",
-     "it": {
-      "text": "48. — Perfare pelgli [belli?] espectaculi dacqua panniculata ponendo molti vari obietti nuna conrente bassa equale eveloce —",
-      "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
-      }
-     },
-     "en": {
-      "text": "To make fine [?] displays of water in thin films, by placing many different objects in a shallow, even and swift current.",
-      "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
-      "doubts": [
-       "'48.' is the leaf number, printed by Ravaisson before the first line.",
-       "'pelgli' is doubtful; the edition reads it '[belli?]' (beautiful), hence 'fine [?]'.",
-       "'panniculata' is Leonardo's word for water spread into thin films or veils (from 'pannicolo', a thin membrane); Ravaisson keeps it as 'panniculée'."
-      ]
-     },
-     "de": {
-      "text": "Um schöne [?] Schauspiele von Wasser in dünnen Häutchen zu erzeugen, indem man viele verschiedene Gegenstände in eine flache, gleichmäßige und schnelle Strömung setzt.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "'48.' is the leaf number, printed by Ravaisson before the first line.",
-       "'pelgli' is doubtful; the edition reads it '[belli?]' (beautiful), hence 'fine [?]'.",
-       "'panniculata' is Leonardo's word for water spread into thin films or veils (from 'pannicolo', a thin membrane); Ravaisson keeps it as 'panniculée'."
-      ]
-     },
-     "fr": {
-      "text": "48.— Pour faire de beaux spectacles d'eau panniculée en plaçant beaucoup d'objets divers dans un courant bas, égal et rapide."
-     },
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
-       "page": "Ms F, FOLIO 48 (recto), transcription (upper half of the page, under the heading [EAU (CHOSES PORTÉES ET COURANTS)]); archive.org viewer page n111",
-       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n111/mode/1up"
-      },
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
-       "page": "Ms F, FOLIO 48 (recto), French translation (upper half of the page, below the Italian); archive.org viewer page n111",
-       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n111/mode/1up"
-      }
-     ]
-    },
-    {
-     "index": 1,
-     "ref": "Ravaisson-Mollien vol. IV (1889), Ms F fol. 48r, block 2 of 3",
-     "it": {
-      "text": "[Fig. :] a c d n g p — b r s t c f m o h q\n— LACQUA CHEPERCOTE ECIGNE LOBBIETTO LAQUAL SIA DI VELOCE CORSO SARA DI DUE QUALITA DELLE ~~qu li~~ QUALI LA PRIMA FIA PANNICHULATA ENCIDEN TE LALTRA SARA REALE EREFRESSA —",
-      "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
-      }
-     },
-     "en": {
-      "text": "[Figure:] a c d n g p, b r s t c f m o h q\nTHE WATER THAT STRIKES AND GIRDLES THE OBJECT, WHEN IT RUNS SWIFTLY, WILL BE OF TWO KINDS: THE FIRST WILL BE IN FILMS AND INCIDENT, THE OTHER WILL BE REAL [?] AND REFLECTED.",
-      "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
-      "doubts": [
-       "The edition sets this sentence in small capitals, as Leonardo's heading of a rule; the translations keep the capitals.",
-       "'reale' (real) is contrasted with the thin films; Ravaisson adds '[simple]'. It most likely means the solid body of the water, but the text does not say more, hence [?].",
-       "'incidente' and 'refressa' (riflessa) are Leonardo's terms for water moving towards an obstacle and water thrown back from it.",
-       "The dash in the editor's list of letters is replaced by a comma in the translations; 'qu li' (italics) is struck out and left out."
-      ]
-     },
-     "de": {
-      "text": "[Figur:] a c d n g p, b r s t c f m o h q\nDAS WASSER, DAS AUF DEN GEGENSTAND TRIFFT UND IHN UMGÜRTET, WIRD BEI SCHNELLEM LAUF VON ZWEIERLEI ART SEIN: DIE ERSTE HÄUTCHENARTIG UND EINFALLEND, DIE ANDERE WIRKLICH [?] UND ZURÜCKGEWORFEN.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "The edition sets this sentence in small capitals, as Leonardo's heading of a rule; the translations keep the capitals.",
-       "'reale' (real) is contrasted with the thin films; Ravaisson adds '[simple]'. It most likely means the solid body of the water, but the text does not say more, hence [?].",
-       "'incidente' and 'refressa' (riflessa) are Leonardo's terms for water moving towards an obstacle and water thrown back from it.",
-       "The dash in the editor's list of letters is replaced by a comma in the translations; 'qu li' (italics) is struck out and left out."
-      ]
-     },
-     "fr": {
-      "text": "[Fig. :] a c d n g p — b r s t c f m o h q\nL'EAU QUI FRAPPE ET CEINT L'OBJET [ET] QUI EST DE COURSE RAPIDE SERA DE DEUX QUALITÉS; LA PREMIÈRE SERA PANNICULÉE ET INCIDENTE, L'AUTRE SERA RÉELLE [SIMPLE] ET RÉFLÉCHIE."
-     },
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
-       "page": "Ms F, FOLIO 48 (recto), transcription (upper half of the page, under the heading [EAU (CHOSES PORTÉES ET COURANTS)]); archive.org viewer page n111",
-       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n111/mode/1up"
-      },
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
-       "page": "Ms F, FOLIO 48 (recto), French translation (upper half of the page, below the Italian); archive.org viewer page n111",
-       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n111/mode/1up"
-      }
-     ]
-    },
-    {
-     "index": 2,
-     "ref": "Ravaisson-Mollien vol. IV (1889), Ms F fol. 48r, block 3 of 3",
-     "it": {
-      "text": "a b sono lidetti obbietti delli quali b ecin to dallacqua r s t eposiconuerte inpanniculo chee ~~n m~~ e f m o. La reale. sara h.",
-      "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
-      }
-     },
-     "en": {
-      "text": "a b are the said objects, of which b is girdled by the water r s t, and this then turns into a film, which is e f, m o. The real one will be h.",
-      "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
-      "doubts": [
-       "'n m' is printed in italics (struck out by Leonardo) in both the Italian and the French, and is left out of the translations.",
-       "'eposiconuerte' (e poi si converte, and then turns) has no written subject; it is read as the water r s t, not the object b."
-      ]
-     },
-     "de": {
-      "text": "a b sind die genannten Gegenstände. b wird vom Wasser r s t umgürtet, und dieses verwandelt sich dann in ein Häutchen, nämlich e f, m o. Das wirkliche wird h sein.",
-      "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
-      "doubts": [
-       "'n m' is printed in italics (struck out by Leonardo) in both the Italian and the French, and is left out of the translations.",
-       "'eposiconuerte' (e poi si converte, and then turns) has no written subject; it is read as the water r s t, not the object b."
-      ]
-     },
-     "fr": {
-      "text": "A, b, sont lesdits objets; b est entouré par l'eau r s t, et puis se change en pannicules qui sont ~~n m~~ e f m o. La réelle sera h."
-     },
-     "label_only": false,
-     "sources": [
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
-       "page": "Ms F, FOLIO 48 (recto), transcription (upper half of the page, under the heading [EAU (CHOSES PORTÉES ET COURANTS)]); archive.org viewer page n111",
-       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n111/mode/1up"
-      },
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
-       "page": "Ms F, FOLIO 48 (recto), French translation (upper half of the page, below the Italian); archive.org viewer page n111",
-       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n111/mode/1up"
-      }
-     ]
-    }
-   ]
-  },
   "I.174": {
-   "lead": 0,
+   "lead": 1,
    "notes": "Heading (the editor's): '[EAU CIRCULAIRE. — COUDE DE COURANT]'. The first passage stands under the drawing of the burst of water and its spray, so it is the lead; the second stands under the small drawing of a bending current. Italics in 'it' and 'fr' mark words Leonardo struck out. '[33]' is the leaf number in the second part of Ms I. Page match checked: Ravaisson's phototype plate of 81 [33] verso (archive.org viewer n298) shows the same leaf as the SET image.",
    "passages": [
     {
@@ -926,14 +736,14 @@
      "it": {
       "text": "Sella entrata dellacqua nelpelago sara di figura circulare ~~il s~~ laconcavita del suo fondo sara lunare ricienvendo lagia ra incorcorpo overo infrai . 2 corni di tal figura —",
       "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+       "en": null,
+       "de": null
       }
      },
      "en": {
       "text": "If the water's entry into the pool is circular in shape, the hollow of its bed will be crescent-shaped, taking the gravel into its body, or else between the 2 horns of that shape.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1889), checked against his French translation (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
       "doubts": [
        "'lunare' (lunar) is read as crescent-shaped, with Ravaisson's '[en forme de croissant]'.",
        "'in corcorpo' is printed so (a doubled syllable, 'in corpo'); read as 'into its body', that is, into the hollow itself, as Ravaisson's 'en corps [en ce fond]'.",
@@ -943,11 +753,11 @@
      "de": {
       "text": "Ist der Eintritt des Wassers in das Becken kreisförmig, so wird die Höhlung seines Grundes mondsichelförmig sein und den Kies in ihren Leib aufnehmen oder aber zwischen die 2 Hörner dieser Form.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1889) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
       "doubts": [
-       "'lunare' (lunar) is read as crescent-shaped, with Ravaisson's '[en forme de croissant]'.",
-       "'in corcorpo' is printed so (a doubled syllable, 'in corpo'); read as 'into its body', that is, into the hollow itself, as Ravaisson's 'en corps [en ce fond]'.",
-       "'il s' is printed in italics, struck out by Leonardo; left out."
+       "'lunare' (mondförmig) wird wie bei Ravaisson ('[en forme de croissant]') als mondsichelförmig gelesen.",
+       "'in corcorpo' ist so gedruckt (eine doppelte Silbe, 'in corpo'); gelesen als 'in ihren Leib', also in die Höhlung selbst, wie Ravaissons 'en corps [en ce fond]'.",
+       "'il s' ist kursiv gedruckt, von Leonardo gestrichen; weggelassen."
       ]
      },
      "fr": {
@@ -973,14 +783,14 @@
      "it": {
       "text": "Domando sella corrente fara alcuno gomito sella cavera infondo oinmezo odisopra eilsimile desalti chepoi seguitano nellargine defiumi essendo ilfondo dequal materia ecosi largine ~~essuar~~ edoueleua epone essua ripari",
       "label": {
-       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
-       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+       "en": null,
+       "de": null
       }
      },
      "en": {
-      "text": "I ask, if the current makes a bend, whether it will dig at the bottom, or in the middle, or at the top; and the same of the leaps that then follow against the banks of rivers, the bed being of the same material, and likewise the bank; and where it lifts [material] and where it sets it down; and its remedies.",
+      "text": "I ask, if the current makes a bend, whether it will dig at the bottom, or in the middle, or at the top. And the same of the leaps that then follow against the banks of rivers, the bed being of the same material, and likewise the bank. And where it lifts [material] and where it sets it down, and its remedies.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1889), checked against his French translation (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
       "doubts": [
        "'leua e pone' (lifts and sets down) has no object; it is read as the current taking away and depositing material, and the translations add '[material]' in brackets. Ravaisson reads the bank as the subject ('où elle s'élève et se pose'); that reading is possible too.",
        "'sua ripari' (its remedies, repairs) are the works that protect the bank; Ravaisson adds '[l'améliorer]'.",
@@ -988,13 +798,13 @@
       ]
      },
      "de": {
-      "text": "Ich frage, ob die Strömung, wenn sie eine Biegung macht, am Grund, in der Mitte oder oben aushöhlen wird; und dasselbe von den Sprüngen, die danach gegen die Ufer der Flüsse folgen, wobei der Grund aus gleichem Stoff ist und ebenso das Ufer; und wo sie [Stoff] abträgt und wo sie ihn ablagert; und die Abhilfen dagegen.",
+      "text": "Ich frage, ob die Strömung, wenn sie eine Biegung macht, am Grund, in der Mitte oder oben aushöhlen wird. Und dasselbe von den Sprüngen, die danach gegen die Ufer der Flüsse folgen, wobei der Grund aus gleichem Stoff ist und ebenso das Ufer. Und wo sie [Stoff] abträgt und wo sie ihn ablagert, und die Abhilfen dagegen.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1889) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
       "doubts": [
-       "'leua e pone' (lifts and sets down) has no object; it is read as the current taking away and depositing material, and the translations add '[material]' in brackets. Ravaisson reads the bank as the subject ('où elle s'élève et se pose'); that reading is possible too.",
-       "'sua ripari' (its remedies, repairs) are the works that protect the bank; Ravaisson adds '[l'améliorer]'.",
-       "'essuar' (e sua r) is printed in italics, struck out by Leonardo; left out."
+       "'leua e pone' (hebt und setzt ab) hat kein Objekt; es wird so gelesen, dass die Strömung Stoff abträgt und ablagert, und die Übersetzungen ergänzen '[Stoff]' in Klammern. Ravaisson liest das Ufer als Subjekt ('où elle s'élève et se pose'); auch diese Lesart ist möglich.",
+       "'sua ripari' (seine Abhilfen, Ausbesserungen) sind die Bauten, die das Ufer schützen; Ravaisson ergänzt '[l'améliorer]'.",
+       "'essuar' (e sua r) ist kursiv gedruckt, von Leonardo gestrichen; weggelassen."
       ]
      },
      "fr": {
@@ -1011,6 +821,198 @@
        "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
        "page": "Ms I, FOLIO 81 [33] (verso), French translation (upper left column, below the Italian); archive.org viewer page n297",
        "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n297/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "AR3.169": {
+   "lead": 0,
+   "notes": "Placement confirmed: Richter prints 'Br. M. 269a]' (British Museum, Arundel 263, fol. 269 recto), and his Bibliography lists '269a 1074 and Pl. CXV' (facts-0929 Q1; the Reale Commissione Vinciana edition of 1923 prints the passage under 'Fol. 269 recto', p. 432). Richter's footnote: 'See Pl. CXV. Lines 1-7 are above, lines 8-10 in the middle of the large island and the word Isola is written above d in the smaller island; a is written on the margin on the bank of the river above 1. I; in the reproduction it is not visible. As may be seen from the last sentence, the observation was made after long study of the river's course, when Leonardo had resided for some time at, or near, Amboise.' Richter prints the Italian in four paragraphs, as here; the letters are labels on the drawing. His §1075 is on the other side (269b). The curator's reason points to this passage: lead 0.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §1074 (Br. M. 269a), vol. II p. 251",
+     "it": {
+      "text": "Loira fiume d'Ambosa.\nIl fiume è più alto dentro all'argine b d che fuori d'essa argine;\nIsola dove è vna parte d'Anbuosa.\nIl fiume Loira che passa per Anbosa passa per a b, c d, e poichè è passato il pōte, ritorna contro al suo avenimento per il canale d e, b f in contatto dell'argine che si interpone infra li due moti contrari del predetto fiume a b, c d, d e, b f; di poi si riuolta in giù per il canale f l, g h, n m, e si ricongiugnie col fiume dōde prima si diuise, che passa per k n, che fa k m, r t; ma quādo il fiume è grosso, allora elli corre tutto per uno solo verso, passādo l'argine b d.",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "The river Loire at Amboise.\nThe river is higher within the bank b d than outside that bank.\nThe island where there is a part of Amboise.\nThis is the river that passes through Amboise; it passes at a b c d, and when it has passed the bridge it turns back, against the original current, by the channel d e, b f in contact with the bank which lies between the two contrary currents of the said river, a b, c d, and d e, b f. It then turns down again by the channel f l, g h, n m, and reunites with the river from which it was at first separated, which passes by k n, which makes k m, r t. But when the river is very full it flows all in one channel passing over the bank b d.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     },
+     "de": {
+      "text": "Die Loire, der Fluss von Amboise.\nDer Fluss steht innerhalb des Damms b d höher als außerhalb dieses Damms.\nInsel, auf der ein Teil von Amboise liegt.\nDie Loire, die durch Amboise fließt, fließt durch a b, c d, und wenn sie die Brücke passiert hat, kehrt sie gegen ihre eigene Strömung durch den Kanal d e, b f zurück, entlang dem Damm, der zwischen den zwei gegenläufigen Strömungen des genannten Flusses liegt, a b, c d, d e, b f. Danach wendet sie sich wieder abwärts durch den Kanal f l, g h, n m und vereinigt sich wieder mit dem Fluss, von dem sie sich zuerst getrennt hat, der durch k n fließt und k m, r t bildet. Führt der Fluss aber Hochwasser, dann fließt er ganz in einer einzigen Richtung und geht über den Damm b d.",
+      "kind": "ours",
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Jean Paul Richter, 1883, Englisch vor allem von Mrs R. C. Bell). Sie kann Fehler enthalten.",
+      "doubts": [
+       "'contro al suo avenimento': wörtlich 'gegen sein Kommen'; gelesen als 'gegen ihre eigene Strömung' (Richter: 'against the original current').",
+       "'che fa k m, r t': wörtlich 'der k m, r t macht'; die Buchstaben beziehen sich auf die Zeichnung und bleiben wie gedruckt.",
+       "'è grosso': Der Fluss ist angeschwollen oder führt Hochwasser; Richter: 'very full' (sehr voll)."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 251",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n386/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 251",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n386/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "I.169": {
+   "lead": 1,
+   "notes": "Heading (the editor's): '[COURANTS ET TOURNANTS D'EAU]'. Ravaisson's '[31]' is the leaf number in the second part of Ms I; 79 is the current foliation. The first passage's sentence runs on onto the facing page 78 [30] verso; that continuation is passage 3, with a 'placement' flag. The second passage is the short question written in the ring beside the drawing. Italics in 'it' and 'fr' mark words Leonardo struck out. Page match checked: Ravaisson's phototype plate of 79 [31] recto (archive.org viewer n294) shows the same leaf as the SET image.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. IV (1889), Ms I fol. 79r, block 1 of 3",
+     "it": {
+      "text": "Le cose legieri ~~sono~~ piv chellacqua ~~so~~ non seguitano\nilcorso de la ~~co~~ risaltatione\neintersegatione dellacqua anzi pa\nssano perlo mezo de llo suo corso ovicino alle\nparti secondo chesse troverono nellentrare\ndessi chorsi e non sono inpedite se\nno non conequali\nsosspin te perche se\nlonda desstra della\nrisaltatione siscontra nella sinistra eglie neciessario selesono dequal potentia chellocho della percussione sia conequale risaltatione indirieto (onde lecose che intaloco sopra lacqua simove vano non nessendo sospinte piv dalluna chedallaltra percussione siresstano nella medesima linia de corso. Ma selluna potentia dellonda sara magio chellaltra coe pervelocita di corso nonintento [intendo] potentia per magiore [La suite au folio 78 [30] verso]",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "Things lighter than water do not follow the course of the rebound and of the crossing of the water, but pass through the middle of its course, or near the sides [?], according to where they happened to be on entering those currents, and they are not hindered except by equal pushes. For if the right wave of the rebound meets the left one, it is necessary, if they are of equal power, that the place where they strike have an equal rebound backwards. (So the things that were moving on the water in that place, not being pushed more by the one blow than by the other, stay in the same line of the current. But if one power of the wave is greater than the other, that is, by speed of current, I do not mean power by greater [continued on folio 78 [30] verso]",
+      "kind": "ours",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1889), checked against his French translation (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
+      "doubts": [
+       "The first nine printed lines are split in two columns because the writing runs round the drawing; each line is given here as Ravaisson's left part followed by his right part, which is how his French reads them.",
+       "'alle parti' (to the parts) is unclear; Ravaisson adds '[centrales?]'. Translated as 'the sides' with [?].",
+       "'se no non conequali sosspin te' is read as 'se non con equali sospinte' (except by equal pushes), as Ravaisson reads it.",
+       "The sentence breaks off at the foot of the text and runs on onto folio 78 [30] verso; that continuation is given as passage 3, flagged. The editor's note is translated in brackets. The parenthesis opened before 'onde' is never closed, in the Italian or in the French.",
+       "'sono' and 'so' in the first line and 'co' in the second are printed in italics, struck out by Leonardo; they are left out."
+      ]
+     },
+     "de": {
+      "text": "Dinge, die leichter sind als Wasser, folgen nicht dem Lauf des Rückpralls und der Kreuzung des Wassers, sondern ziehen durch die Mitte seines Laufs oder nahe an den Seiten [?] vorbei, je nachdem, wo sie sich beim Eintritt in diese Strömungen befanden, und sie werden nur durch gleiche Stöße gehemmt. Denn wenn die rechte Welle des Rückpralls auf die linke trifft, muss, wenn sie gleich stark sind, die Stelle des Aufpralls einen gleichen Rückprall nach hinten haben. (Deshalb bleiben die Dinge, die sich an dieser Stelle auf dem Wasser bewegten, in derselben Linie der Strömung, da sie von dem einen Stoß nicht stärker getrieben werden als vom anderen. Wenn aber die eine Kraft der Welle größer ist als die andere, nämlich durch die Geschwindigkeit der Strömung, so meine ich nicht Kraft durch größere [Fortsetzung auf Blatt 78 [30] verso]",
+      "kind": "ours",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1889) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
+      "doubts": [
+       "Die ersten neun gedruckten Zeilen sind in zwei Spalten geteilt, weil die Schrift um die Zeichnung läuft; jede Zeile steht hier als Ravaissons linker Teil, gefolgt von seinem rechten, so wie sein Französisch sie liest.",
+       "'alle parti' (zu den Teilen) ist unklar; Ravaisson ergänzt '[centrales?]'. Übersetzt mit 'an den Seiten' und [?].",
+       "'se no non conequali sosspin te' wird wie bei Ravaisson als 'se non con equali sospinte' (außer durch gleiche Stöße) gelesen.",
+       "Der Satz bricht am Ende des Textes ab und läuft auf Folio 78 [30] verso weiter; diese Fortsetzung steht als Abschnitt 3, gekennzeichnet. Die Anmerkung des Herausgebers ist in Klammern übersetzt. Die vor 'onde' geöffnete Klammer wird nie geschlossen, weder im Italienischen noch im Französischen.",
+       "'sono' und 'so' in der ersten Zeile und 'co' in der zweiten sind kursiv gedruckt, von Leonardo gestrichen; sie sind weggelassen."
+      ]
+     },
+     "fr": {
+      "text": "Les choses légères ~~sont~~ plus que l'eau ~~so~~ ne suivent pas le courant du ressaut et de l'intersection de l'eau, mais passent par le milieu de son courant ou près des parties [centrales?] selon qu'elles se trouvent à l'entrée des courants et ne sont pas empêchées, si ce n'est par d'égales poussées, parce que si l'onde droite du ressaut se rencontre avec la gauche, il est nécessaire, si elles sont d'égales puissances, que le lieu de la percussion soit en arrière avec un égal ressaut. (Dès lors les choses qui se mouvaient en ce lieu sur l'eau, n'étant pas poussées plus par l'une que par l'autre percussion, restent dans la même ligne du courant. Mais si une des puissances de l'onde est plus grande que l'autre, c'est-à-dire par vitesse de courant, je n'entends pas [ne veux pas dire] puissance par plus grande [La suite au folio 78 [30] verso :]"
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
+       "page": "Ms I, FOLIO 79 [31] (recto), transcription (lower right column, under the heading [COURANTS ET TOURNANTS D'EAU]); archive.org viewer page n293",
+       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n293/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
+       "page": "Ms I, FOLIO 79 [31] (recto), French translation (lower right column, below the Italian); archive.org viewer page n293",
+       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n293/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Ravaisson-Mollien vol. IV (1889), Ms I fol. 79r, block 2 of 3",
+     "it": {
+      "text": "[Vers le bas de la figure :] dimi quali re trosi sono lar ghi di sotto enon disopra",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "[Towards the bottom of the figure:] Tell me which eddies are wide below and not above.",
+      "kind": "ours",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1889), checked against his French translation (Ravaisson-Mollien, vol. IV, 1889). It may contain errors."
+     },
+     "de": {
+      "text": "[Unten bei der Figur:] Sag mir, welche Wirbel unten breit sind und oben nicht.",
+      "kind": "ours",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1889) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "[Vers le bas de la figure :] Dis-moi quels tournants sont larges dessous et ne le sont pas dessus."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
+       "page": "Ms I, FOLIO 79 [31] (recto), transcription (lower right column, under the heading [COURANTS ET TOURNANTS D'EAU]); archive.org viewer page n293",
+       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n293/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
+       "page": "Ms I, FOLIO 79 [31] (recto), French translation (lower right column, below the Italian); archive.org viewer page n293",
+       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n293/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Ravaisson-Mollien vol. IV (1889), Ms I, FOLIO 78 [30] (verso), first paragraphs: the continuation of 79 [31] recto",
+     "placement": "Not on this page: the end of the first passage's sentence, which Leonardo wrote on folio 78 [30] verso (the facing page of the opening). Ravaisson prints it at the head of 78 [30] verso, on the same printed page (archive.org viewer n293, lower left column). Show it only as the sentence's continuation.",
+     "it": {
+      "text": "[Suite du folio 79 [31] recto :] soma dacqua perche sunacqua fussi bene dimi nore grosseza chellaltra nonfa caso (diciamo chevnacqua sia ~~didoppia~~ di sub 2la grosseza avna tra e chessa sia poi di doppia vellocita perche esse acque scontrandosi insieme sono dequal gran deza nelcontatto come provai nella terza del quinto essen do lamagiore vn braccio quadro ella minore vnmezo laminore non percote lamagiore senon nella sua meta e cosi lamagiore percote laminore colla sua meta onde iicontatti fatti dalle perchussioni sono equali inquantita edisequali per dupla potentia perlo dopio veloce che al una allaltra —\nEcosi lacosa notante sara sospinta della retta linia delsuo corso conproportione vole torcimento",
+      "label": {
+       "en": null,
+       "de": null
+      }
+     },
+     "en": {
+      "text": "mass of water, because if one water were even of much smaller thickness than the other, it makes no difference (let us say that one water is half as thick as another, and that it then has double the speed: because these waters, meeting each other, are of equal size where they touch, as I proved in the third of the fifth, the greater being one square braccio and the smaller a half, the smaller strikes the greater only on half of it, and likewise the greater strikes the smaller with half of itself, so that the contacts made by the percussions are equal in quantity and unequal by double power, because of the double speed that the one has over the other.)\nAnd so the floating thing will be pushed off the straight line of its course with a proportionate turning.",
+      "kind": "ours",
+      "label": "AI translation (Opus 5.5) from the Italian printed by Ravaisson-Mollien (1889), checked against his French translation (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
+      "doubts": [
+       "'di sub 2la grosseza' is 'subdupla', half the thickness; 'didoppia' before it is printed in italics, struck out by Leonardo, and left out.",
+       "'la terza del quinto' (the third of the fifth) refers to a proposition in a book of his own treatise on water; the words 'proposition' and 'book' are not written.",
+       "The parenthesis opened before 'diciamo' is never closed in the print; the translations close it where the example ends.",
+       "'conproportione vole torcimento' is read as 'con proporzionevole torcimento' (with a proportionate turning), one word split by the hand; Ravaisson gives no French for this sentence.",
+       "'braccio quadro': a square braccio (the Italian arm's-length unit), left untranslated."
+      ]
+     },
+     "de": {
+      "text": "Wassermenge. Denn wäre ein Wasser auch von viel geringerer Dicke als das andere, so macht das nichts aus (sagen wir, ein Wasser sei halb so dick wie ein anderes und habe dann die doppelte Geschwindigkeit: weil diese Wasser, wenn sie aufeinandertreffen, dort, wo sie sich berühren, gleich groß sind, wie ich im dritten des fünften bewiesen habe, wobei das größere einen Quadratbraccio misst und das kleinere einen halben, trifft das kleinere das größere nur auf dessen Hälfte, und ebenso trifft das größere das kleinere mit seiner eigenen Hälfte, sodass die Berührungen, die durch die Aufpralle entstehen, an Menge gleich und an Kraft um das Doppelte ungleich sind, wegen der doppelten Geschwindigkeit, die das eine gegenüber dem anderen hat.)\nUnd so wird der schwimmende Gegenstand mit einer verhältnismäßigen Drehung aus der geraden Linie seines Laufs gedrängt.",
+      "kind": "ours",
+      "label": "KI-Übersetzung (Opus 5.5) aus dem von Ravaisson-Mollien (1889) gedruckten Italienisch, geprüft an seiner französischen Übersetzung (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
+      "doubts": [
+       "'di sub 2la grosseza' ist 'subdupla', die halbe Dicke; 'didoppia' davor ist kursiv gedruckt, von Leonardo gestrichen, und weggelassen.",
+       "'la terza del quinto' (das dritte des fünften) verweist auf einen Lehrsatz in einem Buch seiner eigenen Abhandlung über das Wasser; die Wörter 'Lehrsatz' und 'Buch' stehen nicht da.",
+       "Die vor 'diciamo' geöffnete Klammer wird im Druck nie geschlossen; die Übersetzungen schließen sie, wo das Beispiel endet.",
+       "'conproportione vole torcimento' wird als 'con proporzionevole torcimento' gelesen (mit einer verhältnismäßigen Drehung), ein Wort, das die Hand getrennt hat; Ravaisson gibt für diesen Satz kein Französisch.",
+       "'braccio quadro': ein Quadratbraccio (Braccio, das italienische Maß von etwa einer Armlänge), unübersetzt gelassen."
+      ]
+     },
+     "fr": {
+      "text": "[Suite du folio 79 [31] recto :] somme d'eau, parce que si une eau était de bien moindre épaisseur que l'autre, cela ne fait pas cas [peu importerait]. Disons qu'une eau soit ~~de double~~ d'épaisseur sous-double à une autre, et qu'elle soit ensuite de vitesse double. Parce que ces eaux se rencontrant sont d'égales grandeurs au contact, comme je l'ai prouvé dans la troisième du cinquième, la plus grande étant d'une brasse carrée et la plus petite d'une demi-brasse, la plus petite ne frappe pas la plus grande si ce n'est dans [à] sa moitié, et de même la plus grande frappe la plus petite avec sa moitié, de sorte que les contacts faits par les percussions sont égaux en quantité et inégaux par double puissance, la vitesse de l'une étant double de celle de l'autre."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
+       "page": "Ms I, FOLIO 78 [30] (verso), transcription (lower left column, first two paragraphs)",
+       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n293/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
+       "page": "Ms I, FOLIO 78 [30] (verso), French translation (lower left column, first paragraph)",
+       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n293/mode/1up"
       }
      ]
     }
