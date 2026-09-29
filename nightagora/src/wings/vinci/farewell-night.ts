@@ -223,9 +223,11 @@ const GRAINS = 1500
 const FAINT_QUAD_PX = 6.6
 /** the soft skirt round the brighter stars, as a share of the core, and its reach in the star's own radii */
 const SKIRT = 0.09, SKIRT_REACH = 1.5
-/** the sky's grain: its share in the first dusk and from the nautical twilight on, where the sky is dark
-    enough that less is averaged away by the encoder; the noise's frequency over a unit direction */
-const GRAIN_DUSK = 0.03, GRAIN_DARK = 0.058, GRAIN_FREQ = 300
+/** the sky's grain in two sizes (frequencies over a unit direction: cells of about 3.5 and 7.5 film pixels).
+    The fine one carries the dusk. Once the sky is dark and still rising, the encoder spends so little on it
+    that only the coarse one survives its key frames; the night at rest needs less of it. Shares by depression. */
+const GRAIN_FINE_FREQ = 300, GRAIN_COARSE_FREQ = 140
+const GRAIN_FINE = [0.03, 0.052, 0.02] as const, GRAIN_COARSE = [0.08, 0.05] as const
 /** one over the gradient noise's own spread, so a share is the grain's standard deviation */
 const GRAIN_NORM = 1 / 0.3
 
@@ -408,10 +410,14 @@ export function createFarewellNight(): FarewellNight {
   const grainMat = new MeshBasicNodeMaterial({ side: BackSide, transparent: true, depthWrite: false, blending: MultiplyBlending, premultipliedAlpha: true })
   grainMat.fog = false
   const gd: N = normalize(positionLocal)
+  const fine = float(GRAIN_FINE[0]).add(smoothstep(4, 8, uDepression).mul(GRAIN_FINE[1] - GRAIN_FINE[0]))
+    .sub(smoothstep(9, 12, uDepression).mul(GRAIN_FINE[1] - GRAIN_FINE[2]))
+  const coarse = smoothstep(6, 11, uDepression).mul(GRAIN_COARSE[0]).sub(smoothstep(16, 18, uDepression).mul(GRAIN_COARSE[0] - GRAIN_COARSE[1]))
+  const n = mx_noise_float(gd.mul(GRAIN_FINE_FREQ)).mul(fine)
+    .add(mx_noise_float(gd.mul(GRAIN_COARSE_FREQ).add(vec3(17.3, 5.1, 9.7))).mul(coarse))
   // a multiply grows with the light: the bright glow low over the horizon takes half
-  const share = mix(float(GRAIN_DUSK), float(GRAIN_DARK), smoothstep(4, 9, uDepression))
-    .mul(mix(float(0.5), float(1), smoothstep(0.1, 0.45, gd.y))).mul(smoothstep(1, 3, uDepression)).mul(uLevel)
-  grainMat.colorNode = vec3(1, 1, 1).mul(float(1).add(mx_noise_float(gd.mul(GRAIN_FREQ)).mul(GRAIN_NORM).mul(share)))
+  const share = mix(float(0.5), float(1), smoothstep(0.1, 0.45, gd.y)).mul(smoothstep(1, 3, uDepression)).mul(uLevel)
+  grainMat.colorNode = vec3(1, 1, 1).mul(float(1).add(n.mul(GRAIN_NORM).mul(share)))
   const grain = new Mesh(new SphereGeometry(GRAIN_RADIUS, 64, 32), grainMat)
   grain.frustumCulled = false
   // after the shell, before the stars: the grain is the sky's, never a star's
