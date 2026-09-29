@@ -800,7 +800,7 @@ const LENS_WAIT_DEG_PER_S = 15 * T1
 /** THE LENS CHANGED EVENLY IN THE PICTURE'S SCALE, at the calm zoom rate and
  * eased at both ends: its seconds, its share at a time from its start, the
  * lens at a share, and the stage's blend (in authored degrees) there. */
-function lensChange(zoom: number, fovs: readonly [number, number]) {
+export function lensChange(zoom: number, fovs: readonly [number, number]) {
   const seconds = Math.abs(zoom) / (CALM_GAZE.zoomPerSecond * PAN_SHARE) + LENS_EASE_S
   const ease = Math.min(LENS_EASE_S, seconds / 2), rate = 1 / (seconds - ease)
   const ramp = (x: number) => rate * (x / 2 - ease / (2 * Math.PI) * Math.sin(Math.PI * x / ease))

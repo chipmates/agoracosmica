@@ -12,7 +12,7 @@
  * end's turn and for as long as it needs.
  */
 import { gaitAt, gaitSecondsAt, type GaitLeg } from './gait'
-import { CALM_FILM, CALM_GAZE, type CalmGazePlan, type GazeAngles } from './rail-gaze'
+import { CALM_FILM, CALM_GAZE, lensChange, type CalmGazePlan, type GazeAngles } from './rail-gaze'
 
 const RAD = Math.PI / 180
 /** The pans hold under this share of the caps, as the rail's own pan does. */
@@ -62,6 +62,10 @@ export function planGalleryGaze(input: {
   first: { heading: boolean; elevation: boolean; lens: boolean }
   /** a long walk, whose arriving turn keeps to its second half */
   long: boolean
+  /** the two lenses as the stage fits them, and whether the lens may change
+   * evenly at the calm rate where that is quicker than one eased curve */
+  fovs?: readonly [number, number]
+  evenLens?: boolean
 }): CalmGazePlan {
   const byLens = input.lensPixels > 0 ? CALM_FILM.pixelsPerFrame * CALM_FILM.framesPerSecond / input.lensPixels / RAD : Infinity
   const share = Math.min(1, byLens / CALM_GAZE.turnDegPerSecond) * PAN_SHARE
@@ -71,7 +75,10 @@ export function planGalleryGaze(input: {
   const firstHeading = input.first.heading ? turnHeading : 0, firstElevation = input.first.elevation ? turnElevation : 0
   const lastHeading = turnHeading - firstHeading, lastElevation = turnElevation - firstElevation
   const firstAngle = Math.hypot(firstHeading, firstElevation) / RAD, lastAngle = Math.hypot(lastHeading, lastElevation) / RAD
-  const lensSeconds = 1.875 * Math.abs(input.zoom) / CALM_GAZE.zoomPerSecond
+  const curved = 1.875 * Math.abs(input.zoom) / CALM_GAZE.zoomPerSecond
+  const even = input.evenLens === true && input.fovs !== undefined && Math.abs(input.zoom) > 1e-9 ? lensChange(input.zoom, input.fovs) : null
+  const evenly = even !== null && even.seconds < curved ? even : null
+  const lensSeconds = evenly ? evenly.seconds : curved
   const least = (angle: number) => angle > 1e-6 ? angle / caps.rate + caps.least : 0
   const first = pan(firstAngle, least(firstAngle), caps), lastLeast = pan(lastAngle, least(lastAngle), caps).seconds
   // the lens runs from its end of the leg for as long as it needs, at least as long as that end's turn
@@ -91,7 +98,9 @@ export function planGalleryGaze(input: {
       target.elevation = a >= 1 && b >= 1 ? input.to.elevation : input.from.elevation + firstElevation * a + lastElevation * b
       return target
     },
-    lens: seconds => lens[1] > lens[0] ? smooth((seconds - lens[0]) / (lens[1] - lens[0])) : seconds >= lens[1] ? 1 : 0,
+    // an even lens keeps its own time at its end of the window, a curve fills the window
+    lens: seconds => evenly ? evenly.blend(input.first.lens ? evenly.share(seconds - lens[0]) : evenly.share(seconds - (lens[1] - evenly.seconds)))
+      : lens[1] > lens[0] ? smooth((seconds - lens[0]) / (lens[1] - lens[0])) : seconds >= lens[1] ? 1 : 0,
     walk: seconds => gaitAt(leg, seconds),
     secondsAt: metres => gaitSecondsAt(leg, metres),
   }
