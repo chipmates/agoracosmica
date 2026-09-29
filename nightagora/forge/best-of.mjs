@@ -13,6 +13,9 @@
  *   node forge/best-of.mjs --stage <dir>     also copy the set's new scans and
  *                                            cut their thumbnails into <dir>,
  *                                            with the store patch beside them
+ *   --deep <dir>                             the holders' larger views, by store
+ *                                            path: staged in place of the pool's
+ *                                            and cut into their pyramids
  *   --patch <file>                           where the store patch is written
  *   --from <dir>                             the research folder (default: found
  *                                            by walking up, or NA_BEST_OF)
@@ -26,8 +29,15 @@
  *                      "name_en", "name_de" (the short page name, at most four
  *                      words), "order" (the page's place in its topic, from 1)}
  *   words/keys.json    {"<key>": {"en", "de"}} for the room's new controls and
- *                      notes; KEYS below names every one, and a key not written
- *                      yet falls back to the room's existing words or stands down
+ *                      notes; KEYS below names every one (some under the words
+ *                      pass's own names, KEY_NAMES), and a key not written yet
+ *                      falls back to the room's existing words or stands down
+ *   words/notices.json printed_transcription.editions (each volume's label and
+ *                      short name) and .by_page (each page's own), which label
+ *                      every transcription and every AI translation
+ * and from the texts files: a German page's doubts only from `doubts_de`.
+ * Re-run order when the scans are staged anew: --stage, then the plate
+ * finder's stage (it appends the plates to the same patch), then a plain run.
  */
 import { createHash } from 'node:crypto'
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
