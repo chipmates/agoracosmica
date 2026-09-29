@@ -634,7 +634,7 @@ export function createWing():VinciWingModule {
   /** THE CLOSE LOOK. The registry is a read over the collection's own group,
    * the dots live in the label layer, and one owner holds the open exhibit. */
   let collectionRoot:Group|undefined, houseRoot:Group|undefined, courtRoot:Group|undefined, occluders:readonly Mesh[]=[]
-  let pictureWordsLayer:PictureWordsLayer|undefined, wordsPrint='', wordsSince=0, wordsDrawn=''
+  let pictureWordsLayer:PictureWordsLayer|undefined, pictureWordsSheet:SVGSVGElement|undefined, wordsPrint='', wordsSince=0, wordsDrawn=''
   let dots:VinciExhibitDots|undefined, closeLook:ReturnType<typeof createVinciCloseLook>|undefined
   let strip:ReturnType<typeof createVinciHangStrip>|undefined
   /** THE STORE'S OWN INDEX, held: a row is painted synchronously and every
@@ -1173,7 +1173,7 @@ export function createWing():VinciWingModule {
       // the word a pressed walking mark takes, and the leg its ring counts
       pressedWord:()=>text(deskControl('walk','walking')),
       leg:()=>{const nav=standing?rail.navigation:undefined;return nav?.active?nav.legWalked:null}})
-    pictureWordsLayer?.dispose();pictureWordsLayer=createPictureWords(layer=>h.labels.prepend(layer))
+    pictureWordsLayer?.dispose();pictureWordsLayer=createPictureWords(layer=>{pictureWordsSheet=layer;h.labels.prepend(layer)})
     closeLook=createVinciCloseLook({host:h.labels,narrow,
       // the one step back of a close look names the room it goes back to
       room:roomName,
@@ -2062,11 +2062,14 @@ export function createWing():VinciWingModule {
    * court they stay with their stones on every walk to its three places and
    * back: no wall stands between the court's eye and its stones, and the
    * year is cut into the stone, so a walk without its words showed the year
-   * alone. They follow the eye in every frame there. */
+   * alone. They follow the eye in every frame there, and stay under a
+   * door's band or plate, which stands the rest of the chrome down. */
   function paintPictureWords():void {
     if(!pictureWordsLayer||!hosts)return
     const nav=rail.navigation,cam=hosts.world.camera,station=hereContent().id
     const walksWithStones=standing&&station==='grave'&&inGraveCourt(cam.position)
+    // a door's window stands the labels' layer down; the court's words are its stones'
+    if(pictureWordsSheet)pictureWordsSheet.style.visibility=walksWithStones?'visible':''
     if(!walksWithStones&&(!standing||nav.active||nav.approaching)){if(wordsPrint){pictureWordsLayer.hide();wordsPrint='';wordsDrawn=''}return}
     const now=performance.now()
     const print=`${cam.position.toArray().map(v=>v.toFixed(4))}|${cam.quaternion.toArray().map(v=>v.toFixed(5))}|${cam.fov}|${innerWidth}x${deskStageHeight()}|${lang()}|${station}`
@@ -3620,7 +3623,7 @@ export function createWing():VinciWingModule {
       dots?.update(panels,undefined,name&&name.width>0?[{left:name.left,top:name.top,right:name.right,bottom:name.bottom}]:null)
       paintPictureWords()},
     // the evening's uniforms and the scene's light outlive a visit: the hour goes back before they are let go
-    stop(){if(hosts){delete hosts.stage.parentElement!.dataset['farewell'];delete hosts.stage.parentElement!.dataset['phoneForm'];delete hosts.labels.dataset['keepsFoot']}phone?.dispose();phone=undefined;phoneStop?.abort();phoneStop=undefined;farewellRun=null;farewellHeld=null;if(farewellShare!==null)applyEvening(null);pictureWordsLayer?.dispose();pictureWordsLayer=undefined;wordsPrint=wordsDrawn="";studySheet?.dispose();studySheet=undefined;releaseSheetMemory?.();releaseSheetMemory=undefined;desk?.dispose();desk=undefined;visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;life?.dispose();life=undefined;lifeControl?.remove();lifeControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;house=undefined;houseUp=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;hallSun=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;clearSky?.dispose();clearSky=undefined;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
+    stop(){if(hosts){delete hosts.stage.parentElement!.dataset['farewell'];delete hosts.stage.parentElement!.dataset['phoneForm'];delete hosts.labels.dataset['keepsFoot']}phone?.dispose();phone=undefined;phoneStop?.abort();phoneStop=undefined;farewellRun=null;farewellHeld=null;if(farewellShare!==null)applyEvening(null);pictureWordsLayer?.dispose();pictureWordsLayer=undefined;pictureWordsSheet=undefined;wordsPrint=wordsDrawn="";studySheet?.dispose();studySheet=undefined;releaseSheetMemory?.();releaseSheetMemory=undefined;desk?.dispose();desk=undefined;visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;life?.dispose();life=undefined;lifeControl?.remove();lifeControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;house=undefined;houseUp=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;hallSun=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;clearSky?.dispose();clearSky=undefined;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
   }
   return wingModule
 }
