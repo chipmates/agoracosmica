@@ -168,8 +168,8 @@
   },
   {
    "file": "src/wings/vinci/content.ts",
-   "sha256": "e89cf4db20d335c284abe4e64bbb875e2f6af54ffa47c5f5fda2912431a14d4e",
-   "bytes": 88786,
+   "sha256": "420e9df4a17a1f70f05cf49e6fa2d731e7de3c90092db1f971444f56c4bed1d2",
+   "bytes": 88971,
    "unchangedDuringAudit": true
   },
   {
@@ -594,14 +594,14 @@
   },
   {
    "file": "src/wings/vinci/rail-gallery-gaze.ts",
-   "sha256": "6b567b8d607a72251575e9465641e4be24c3bb7dac95524a240a51de1c8723f2",
-   "bytes": 6252,
+   "sha256": "3b46c10073c90376fb42f5307022cd116c9a48dd93557ab38512be6ad849c7e9",
+   "bytes": 6959,
    "unchangedDuringAudit": true
   },
   {
    "file": "src/wings/vinci/rail-gaze.ts",
-   "sha256": "a73c75e39558be025ce05202bbcac0bc5d619bceec1f7333343bfdc881731513",
-   "bytes": 104061,
+   "sha256": "3c78c45ae9267eab7125540a55a043f5d63198c94cafc063a79ad486dfea871b",
+   "bytes": 106525,
    "unchangedDuringAudit": true
   },
   {
@@ -636,8 +636,8 @@
   },
   {
    "file": "src/wings/vinci/rail.ts",
-   "sha256": "1f9b9d5c4bf56a2125ffebde2c3bf6b9f0ac2a9914af0dbed9d91a0e44e11bd9",
-   "bytes": 74682,
+   "sha256": "87a48415c6056791758e62f1b70b38118111697a6c469bbd209795a517167b1c",
+   "bytes": 77281,
    "unchangedDuringAudit": true
   },
   {

@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed toward a grey lit from the sun at up to 40 per cent. The dome keeps 82 per cent of its own saturation. Assumed weather, no observation claimed. The irradiance probe is the CIE clear sky (ISO 15469 type 12, circumsolar term held to a third) from the same sun, coloured from the rig zenith to its horizon and warmed toward the sun, levelled to the former two-colour band on an open horizontal face (src/wings/vinci/sky-probe.ts). Aerial perspective past 18 m at an assumed 0.004/m, cooler away from the sun and warmer toward it; none on a surface inside the collection seen from inside it; the displayed sky pales and loses up to 28 per cent of its saturation toward the horizon.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "28ac7e04a9ea4ef26cf1f742f41f729074185f1a386d09c7547503418092c028",
+      "sha256": "e8c2be54f9304e9e92056c97405b94df9b2b332b50c413112f626b4098478a10",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=8c9b9be738df3285931a694255770c477d0cf7a23804a954af3cf89c2460f684;"
     },
     {
@@ -62,7 +62,7 @@
       "prompt": "Museum camera poses and piecewise exterior circulation in the fixed dossier frame. All poses are exhibition choices. Latest target semantic navigation on measured gate/terrace/stair/apron routes. Bounded physical near-pyramid clearance; measured geometry identity at mount. CSS projection-derived drag with 0.1 second monotone response; explicit inspection entry and return. The active certified leg finishes before a direct certified route to the newest pending target. Static material inspection aliases have separate actual placement audits.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "1f9b9d5c4bf56a2125ffebde2c3bf6b9f0ac2a9914af0dbed9d91a0e44e11bd9",
+      "sha256": "87a48415c6056791758e62f1b70b38118111697a6c469bbd209795a517167b1c",
       "note": "brief/CONCEPT.md; src/wings/vinci/data/closluce.json; recipe_file=src/wings/vinci/rail.ts; companion_file=src/wings/vinci/input.ts; companion_file=src/wings/vinci/rail-gallery-gaze.ts; companion_recipe_ids=vinci/rail-smoothing,vinci/rail-proof,vinci/rail-fingerprint,vinci/rail-projection,vinci/projection-drag,vinci/rail-clearance,vinci/rail-waypoints,vinci/rail-solids,vinci/gait"
     },
     {
@@ -75,7 +75,7 @@
       "prompt": "Spoken bilingual museum labels with unchanged station names and canonical door questions. Plain source explanations and a separately opened complete record retain the original source chain, dimensional ranges, uncertainty and identical computed-hour arithmetic.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "e89cf4db20d335c284abe4e64bbb875e2f6af54ffa47c5f5fda2912431a14d4e",
+      "sha256": "420e9df4a17a1f70f05cf49e6fa2d731e7de3c90092db1f971444f56c4bed1d2",
       "note": "brief/CONCEPT-OPUS.md; brief/CONCEPT-GPT6.md; src/wings/vinci/data/doors.json; recipe_file=src/wings/vinci/content.ts; visitor_evidence_recipe=src/wings/vinci/evidence-copy.ts; visitor_evidence_sha256=1154b783a9a2b7bddd75d4d1294475ae82dbe74006e4b6ff5c0eb2df9247ed00"
     },
     {
@@ -413,7 +413,7 @@
       "prompt": "Regenerable actual geometry certificate for40 directed routes across five pose families and two viewport families. Includes foundation, entry, vegetation and all dressing; no sky, DOM or shadow-only duplicate.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-10",
-      "sha256": "b205fda06b347ccc4d37263e394ecbf2ad7237c582b132c8f666bf45b21f2c69",
+      "sha256": "17bff3fc758e06e29273796fa33488917fa9605367e1454c72deadddee43591f",
       "note": "recipe_file=src/wings/vinci/data/rail-clearance.json; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail; companion_file=src/wings/vinci/collection/approaches.ts"
     },
     {
@@ -4023,7 +4023,7 @@
       "prompt": "The grave court as the museum's own modern architecture: a leaf of long flat light-grey brick laid in front of the gallery's cast core, the back wall raised over it as a filter band of brick laid with open head joints so the western light passes in small slots, each slot's patch varied as a hand-laid joint varies, a plinth course and a string course of pale limestone, stone copings; an oiled oak walkway on two steel bearers from the court's open side to the foot of the slab, an oak bench on bronze feet, and three field maples of the region in steel-edged beds under cast-iron grates with their week's fall. The court's sky share and the warm light off its sunlit wall faces (raised by half for the later bounces of a closed court of pale stone) are baked once from the walls' boxes and the hour's sun as live-engine terms the film's export turns off. No figure: no record names one. A modern design, no claim about 1519, Saint-Florentin or Saint-Hubert. Each bed is covered by a cast-iron grate: three rings of radial slots round an open ring of earth at the trunk, a worn border to the steel edge.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-24",
-      "sha256": "02a95f696077a5b55c951b1333f2dd0a90c3c3aefc1d834caf5f1342d3900fcb",
+      "sha256": "0e3fbd28e6ab4db333ce7cccae88ffc571bfcd3bbd8a47f28c16ff20c9edd714",
       "note": "Modern museum court; no 1519 claim. recipe_file=src/wings/vinci/grave/court.ts"
     },
     {
@@ -4036,7 +4036,7 @@
       "prompt": "Three field maples, a tree of the region's hedges and a type of the season, planted by the museum in the grave court's steel-edged beds: 7 to 8.1 m, a stem clear to about a third of their height, their crowns grown by the site's own tree growth in sprays with every twig drawn near a stop, turned to their week's stage, and kept a hand past 1.2 m from every certified line through the court and out of its walls, its diagram and its lectern; their week's fall mostly in the beds and the rest carried north-east over the flags. Drawn within 58 m of the court's middle, the twigs and the shadows within 32 m, where the house stands between the court and every stop further off. Conjectural; the museum's modern planting, not a record of 1519.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-24",
-      "sha256": "02a95f696077a5b55c951b1333f2dd0a90c3c3aefc1d834caf5f1342d3900fcb",
+      "sha256": "0e3fbd28e6ab4db333ce7cccae88ffc571bfcd3bbd8a47f28c16ff20c9edd714",
       "note": "FLORA.md species as a type; the museum's own planting. recipe_file=src/wings/vinci/grave/court.ts"
     },
     {
