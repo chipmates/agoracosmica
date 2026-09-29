@@ -58,6 +58,33 @@ export interface FilmEdgeRecord {
   }>>
 }
 
+/** THE GRAVE'S LOOK UP (`forge/film/graph.mjs` eveningOf): the evening the
+    last stop's way on plays, at its own rate, from that stop's still to the
+    dark before the lobby. */
+export interface FilmEveningRecord {
+  id: string
+  /** the node whose way on plays it */
+  from: PictureNode
+  fps: number
+  seconds: number
+  framings: Partial<Record<PictureFraming, { frames: number; files: Record<Size, FilmFile> }>>
+}
+
+/** The evening as the chrome asks for it: nothing of it is a walk, so the
+    picture's state stays at rest under it. */
+export interface FilmEvening {
+  /** the release carries it in the framing shown, and the picture rests where it begins */
+  here(): boolean
+  /** its bytes fetched while the visitor reads the stop it leaves from */
+  ahead(): void
+  /** Played once, whole, at its own pace. `widen` is called at the bottom of
+      a short dip where the box must grow to the window first. Resolves with
+      'ended' after its last frame (the dark), 'cut' when stopped, and 'none'
+      when it could not start. */
+  play(how?: { widen?: () => void }): Promise<'ended' | 'cut' | 'none'>
+  stop(): void
+}
+
 export interface FilmRelease {
   format: typeof FILM_FORMAT
   wing: string
@@ -74,6 +101,8 @@ export interface FilmRelease {
   sets?: Record<string, string[]>
   /** a machine's filmed cycle by its exhibit, where the release carries one */
   cycles?: Record<string, FilmCycle>
+  /** the grave's look up, where the release carries it */
+  evening?: FilmEveningRecord
   nodes: Record<PictureNode, FilmNodeRecord>
   edges: FilmEdgeRecord[]
 }
@@ -113,6 +142,9 @@ const PACE_RATE: Record<Pace, number> = { stroll: 0.667, walk: 1, brisk: 1.5 }
 const CARRIED = 0.9, RATE_MOST = 2
 /** a clip's bytes the page keeps at once; the oldest idle one is let go */
 const KEPT_CLIPS = 6
+/** THE EVENING'S DIP where the desktop's band gives its strip back to the
+    picture, down and up, as the live wing's own (`index.ts` BAND_DOWN, BAND_UP) */
+const EVENING_DOWN_MS = 300, EVENING_UP_MS = 600
 
 type RouterGraph = Parameters<typeof route>[0]
 type RouterPlan = ReturnType<typeof route>
@@ -146,7 +178,7 @@ function pickRung(rungs: readonly [number, number][], aspect: number, box: Pictu
 
 interface Held { url: string; bytes: number; got: number; blob: Blob | null; head: ArrayBuffer | null; fetching: Promise<Blob | null> | null; abort: AbortController | null; used: number }
 
-export function createFilmSource(options: FilmOptions): PictureSource & { readout(): Record<string, unknown>[] } {
+export function createFilmSource(options: FilmOptions): PictureSource & { readout(): Record<string, unknown>[]; evening: FilmEvening } {
   const { release, host, base } = options
   const graphs: Partial<Record<PictureFraming, RouterGraph>> = {}
   const graphOf = (f: PictureFraming): RouterGraph => (graphs[f] ??= routerGraph(release, f))
@@ -173,11 +205,17 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
     video.setAttribute('playsinline', '')
     video.setAttribute('muted', '')
   }
+  const nightfall = make('video', 'na-film-evening')
+  nightfall.muted = true
+  nightfall.playsInline = true
+  nightfall.preload = 'none'
+  nightfall.disablePictureInPicture = true
+  for (const name of ['disableremoteplayback', 'playsinline', 'muted']) nightfall.setAttribute(name, '')
   const dark = make('div', 'na-film-dark')
   const wait = make('div', 'na-film-wait')
   const waitFill = make('span', 'na-film-wait-fill')
   wait.append(waitFill)
-  root.append(still, cross, ...videos, dark, wait)
+  root.append(still, cross, ...videos, nightfall, dark, wait)
   host.prepend(style, root)
 
   let here: PictureNode = release.nodes[options.at] ? options.at : release.story.find(n => release.nodes[n]) ?? Object.keys(release.nodes)[0]!
@@ -676,10 +714,114 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
 
   firstPicture = showStill(here).then(() => { fit(); set({ kind: 'rest', node: here }, 'rest') })
 
+  /* ---- the grave's look up ---- */
+  function eveningFile(): { url: string; bytes: number } | null {
+    const at = release.evening?.framings[framingOf()]
+    if (!at) return null
+    const file = at.files[rungNow(framingOf())] ?? Object.values(at.files)[0]
+    return file ? { url: address(file.file), bytes: file.bytes } : null
+  }
+  let eveningDone: (() => void) | null = null
+  let eveningCut = false
+  let eveningSrc = ''
+  /** the evening's bytes in hand, or its address where the line is lean and it
+      plays through in time; three seconds at most under the hairline, counted */
+  async function eveningBytes(file: { url: string; bytes: number }): Promise<string | null> {
+    const h = held.get(file.url)
+    if (h?.blob) return URL.createObjectURL(h.blob)
+    wait.classList.add('shown')
+    let timer = 0, shown = 0
+    const measure = (): void => {
+      const now = held.get(file.url)
+      let share = now ? now.got / Math.max(1, now.bytes) : 0
+      if (nightfall.duration > 0 && nightfall.buffered.length) share = Math.max(share, nightfall.buffered.end(nightfall.buffered.length - 1) / nightfall.duration)
+      shown = Math.max(shown, Math.min(1, share))
+      waitFill.style.transform = `scaleX(${shown.toFixed(3)})`
+      timer = requestAnimationFrame(measure)
+    }
+    measure()
+    try {
+      if (lean()) {
+        nightfall.preload = 'auto'
+        nightfall.src = file.url
+        nightfall.load()
+        const through = await Promise.race([
+          new Promise<boolean>(resolve => nightfall.addEventListener('canplaythrough', () => resolve(true), { once: true })),
+          sleep(WAIT_MOST_MS).then(() => false),
+        ])
+        return through ? file.url : null
+      }
+      const blob = await Promise.race([fetchWhole(file.url, file.bytes), sleep(WAIT_MOST_MS).then(() => null)])
+      if (!blob) { held.get(file.url)?.abort?.abort(); return null }
+      return URL.createObjectURL(blob)
+    } finally {
+      cancelAnimationFrame(timer)
+      wait.classList.remove('shown')
+      waitFill.style.transform = 'scaleX(0)'
+    }
+  }
+  const evening: FilmEvening = {
+    here: () => Boolean(release.evening && !busy && state.kind === 'rest' && here === release.evening.from && eveningFile()),
+    ahead() {
+      const file = eveningFile()
+      if (file && !lean()) void fetchWhole(file.url, file.bytes)
+    },
+    async play(how = {}) {
+      const file = eveningFile()
+      if (!file || busy || disposed) return 'none'
+      busy = true
+      eveningCut = false
+      try {
+        const src = nightfall.dataset['src'] === file.url && nightfall.readyState >= 3 ? file.url : await eveningBytes(file)
+        if (!src || disposed || eveningCut) return eveningCut ? 'cut' : 'none'
+        // THE BAND'S STRIP GOES BACK TO THE PICTURE at the bottom of a short dip, where the new frame cannot be seen to jump
+        if (how.widen) {
+          root.dataset['evening'] = 'down'
+          dark.classList.add('shown')
+          await sleep(reduced() ? 0 : EVENING_DOWN_MS)
+          how.widen()
+          fit()
+        }
+        if (nightfall.src !== src) {
+          nightfall.preload = 'auto'
+          nightfall.src = src
+        }
+        nightfall.dataset['src'] = src
+        if (src.startsWith('blob:')) eveningSrc = src
+        nightfall.playbackRate = 1
+        try { await nightfall.play() } catch { return 'none' }
+        await firstFrame(nightfall)
+        nightfall.classList.add('shown')
+        if (how.widen) {
+          root.dataset['evening'] = 'up'
+          dark.classList.remove('shown')
+          void sleep(EVENING_UP_MS).then(() => { if (root.dataset['evening'] === 'up') delete root.dataset['evening'] })
+        }
+        if (eveningCut) return 'cut'
+        await new Promise<void>(resolve => {
+          // an evening that never says it ended is ended by its own length, and a little air
+          const bound = setTimeout(() => done(), ((nightfall.duration || release.evening!.seconds) + 3) * 1000)
+          const done = (): void => { clearTimeout(bound); nightfall.removeEventListener('ended', done); eveningDone = null; resolve() }
+          eveningDone = done
+          nightfall.addEventListener('ended', done)
+        })
+        return eveningCut ? 'cut' : 'ended'
+      } finally {
+        busy = false
+      }
+    },
+    stop() {
+      eveningCut = true
+      nightfall.pause()
+      eveningDone?.()
+    },
+  }
+
   return {
     kind: 'film',
     element: root,
     readout: () => readouts.slice(),
+    evening,
     go,
     hurry() {
       if (dipSkip) { dipSkip(); return }
@@ -757,7 +899,8 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
     dispose() {
       disposed = true
       disarm()
-      for (const video of videos) tearDown(video)
+      for (const video of [...videos, nightfall]) tearDown(video)
+      if (eveningSrc) URL.revokeObjectURL(eveningSrc)
       for (const h of held.values()) h.abort?.abort()
       held.clear()
       listeners.clear()

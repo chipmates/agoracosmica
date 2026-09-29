@@ -39,6 +39,9 @@
   transition: opacity 450ms ease;
 }
 .na-film-dark.shown { opacity: 1; }
+/* THE LOOK UP'S DIP, as the live wing's band dip: down quickly, up with the rise */
+.na-film[data-evening='down'] > .na-film-dark { transition-duration: 300ms; }
+.na-film[data-evening='up'] > .na-film-dark { transition-duration: 600ms; }
 /* THE WAIT stands under the door's own hairline: one gold line, counted */
 .na-film-wait {
   position: absolute;

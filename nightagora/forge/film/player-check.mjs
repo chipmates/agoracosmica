@@ -6,7 +6,7 @@
 //
 //   node forge/film/player-check.mjs --base=https://127.0.0.1:5515 --release=w5 --out=<dir>
 //     [--engines=chromium,webkit,firefox] [--widths=360,390,430,1440,1512] [--langs=en,de]
-//     [--walk=full|short|none|life] [--joins] [--record] [--at=<stop>] [--stops=<n>]
+//     [--walk=full|short|none|life|lookup] [--joins] [--record] [--at=<stop>] [--stops=<n>] [--cut] [--reduced]
 //
 // `--walk=life` walks the whole life from `--at` (the entrance, `garden`, for
 // a whole wing's release): the way on pressed at every stop, a frame kept at
@@ -38,6 +38,8 @@ const TYPES = { chromium, webkit, firefox }
 const FIRST = String(flags.get('at') ?? 'picture-room-lisa')
 /** how many ways on the life walk presses (the life's sixteen by default) */
 const STOPS = Number(flags.get('stops') ?? 16)
+const CUT = flags.has('cut')
+const REDUCED = flags.has('reduced')
 
 const report = { base: BASE, release: RELEASE, runs: [] }
 mkdirSync(OUT, { recursive: true })
@@ -201,6 +203,7 @@ async function run(engine, width, lang) {
   mkdirSync(dir, { recursive: true })
   const browser = await TYPES[engine].launch(engine === 'chromium' ? { args: browserArgs() } : {})
   const ctxOptions = { viewport: { width, height }, deviceScaleFactor: phone ? 2 : 1, ignoreHTTPSErrors: true, locale: lang === 'de' ? 'de-DE' : 'en-GB',
+    ...(REDUCED ? { reducedMotion: 'reduce' } : {}),
     ...(phone && engine !== 'firefox' ? { isMobile: true, hasTouch: true } : {}),
     ...(RECORD ? { recordVideo: { dir, size: { width: Math.min(width, 960), height: Math.round(Math.min(width, 960) * height / width) } } } : {}) }
   const ctx = await browser.newContext(ctxOptions)
@@ -239,6 +242,65 @@ async function run(engine, width, lang) {
     await page.waitForTimeout(1200)
     shots.push(await shot(page, dir, '01-rest-lisa'))
     if (WALK === 'none') return record
+    if (WALK === 'lookup') {
+      /* THE GRAVE'S LOOK UP (`--at=grave`): the way on pressed at the last
+         stop, the chrome's fade and the evening kept as frames, the lobby's
+         arrival timed. `--cut` goes on inside the evening (Escape on the
+         desktop, a tap on the phone); `--reduced` asks for reduced motion,
+         where the press goes home at once */
+      const on = phone ? '.film-gold' : '.desk-on'
+      const lk = record.lookup = { cut: CUT, reduced: REDUCED }
+      lk.gold = await page.evaluate((s) => { const g = document.querySelector(s); return g ? { end: g.getAttribute('data-end'), words: g.textContent?.trim() ?? '' } : null }, on)
+      lk.fetchedAhead = requests.filter((r) => r.url.includes('evening')).map((r) => r.url)
+      const t = Date.now()
+      if (!(await press(page, on))) { lk.pressed = false; return record }
+      lk.fade = await burst(page, dir, '02-lookup-fade', 8, { x: 0, y: 0, width, height })
+      lk.played = await page.waitForFunction(() => { const v = document.querySelector('.na-film-evening'); return Boolean(v && !v.paused && v.currentTime > 0.2) }, null, { timeout: REDUCED ? 3000 : 30000, polling: 30 }).then(() => true).catch(() => false)
+      lk.msToPlay = lk.played ? Date.now() - t : null
+      const evening = () => {
+        const v = document.querySelector('.na-film-evening')
+        if (!v) return null
+        const r = v.getBoundingClientRect()
+        return { file: v.currentSrc.replace(/^.*\/film\//, ''), at: Math.round(v.currentTime * 100) / 100, duration: v.duration, box: { top: Math.round(r.top), width: Math.round(r.width), height: Math.round(r.height) } }
+      }
+      // what still shows over the evening: every visible leaf of the wing outside the picture, its opacity taken with its parents'
+      const chrome = () => [...document.querySelectorAll('#wing *')].filter((el) => {
+        if (el.closest('.na-film') || el.children.length || !(el.textContent?.trim() || el.tagName === 'BUTTON' || el.tagName === 'svg')) return false
+        const r = el.getBoundingClientRect()
+        if (r.width < 2 || r.height < 2 || r.bottom < 0 || r.top > innerHeight) return false
+        let o = 1
+        for (let p = el; p; p = p.parentElement) { const cs = getComputedStyle(p); if (cs.display === 'none' || cs.visibility === 'hidden') return false; o *= Number(cs.opacity) }
+        return o > 0.05
+      }).map((el) => `${el.tagName.toLowerCase()}.${String(el.className?.baseVal ?? el.className).split(' ')[0]}`)
+      if (lk.played) {
+        const at = async (s, name) => {
+          await page.waitForFunction((x) => (document.querySelector('.na-film-evening')?.currentTime ?? 99) >= x, s, { timeout: 40000, polling: 30 }).catch(() => null)
+          const shotAt = await shot(page, dir, name)
+          shotAt.evening = await page.evaluate(evening).catch(() => null)
+          shotAt.chrome = await page.evaluate(chrome).catch(() => null)
+          shots.push(shotAt)
+          return shotAt
+        }
+        await at(3, '03-evening-3s')
+        if (CUT) {
+          const c0 = Date.now()
+          if (phone) await page.mouse.click(Math.round(width / 2), Math.round(height / 2)).catch(() => null)
+          else await page.keyboard.press('Escape')
+          lk.cutHome = await page.waitForFunction(() => !document.querySelector('#wing[data-film]'), null, { timeout: 10000, polling: 20 }).then(() => true).catch(() => false)
+          lk.msCutToLobby = Date.now() - c0
+        } else {
+          await at(9, '04-evening-9s')
+          await at(15, '05-evening-15s')
+          await at(19, '06-evening-stars')
+        }
+      }
+      lk.home = await page.waitForFunction(() => !document.querySelector('#wing[data-film]'), null, { timeout: 60000, polling: 50 }).then(() => true).catch(() => false)
+      lk.msToLobby = Date.now() - t
+      lk.url = page.url().replace(BASE, '')
+      await page.waitForTimeout(1500)
+      shots.push(await shot(page, dir, '07-lobby'))
+      return record
+    }
     if (WALK === 'life') {
       /* THE WHOLE LIFE FROM THE ENTRANCE: every way on pressed as a visitor presses
          it; a leg the release carries plays, one it does not dissolves, a cut dips */
@@ -415,6 +477,7 @@ for (const engine of ENGINES) for (const width of WIDTHS) for (const lang of LAN
   report.runs.push(r)
   const s = r.shots.map((x) => `${x.name.slice(3)} ${x.pictureShare ?? '?'}%`).join(' · ')
   console.log(`${engine} ${width} ${lang}: first picture ${r.firstPicture?.toFixed?.(2)} s, ${Math.round((r.bytesToFirstPicture ?? 0) / 1024)} kB · ${s}${r.failed ? ` · FAILED ${r.failed}` : ''} · errors ${r.errors.length}`)
+  if (r.lookup) console.log(`   look up: gold ${JSON.stringify(r.lookup.gold)}, ahead ${r.lookup.fetchedAhead.length}, played ${r.lookup.played} after ${r.lookup.msToPlay} ms, fade step ${r.lookup.fade?.largestStep}, lobby ${r.lookup.home} at ${r.lookup.msToLobby} ms${CUT ? `, cut to lobby ${r.lookup.cutHome} in ${r.lookup.msCutToLobby} ms` : ''}`)
   if (r.joins) for (const j of r.joins) console.log(`   join ${j.clip}: start mean ${j.start?.mean} max ${j.start?.max} · end mean ${j.end?.mean} max ${j.end?.max}${j.error ? ` ${j.error}` : ''}`)
   writeFileSync(join(OUT, 'report.json'), JSON.stringify(report, null, 1))
 }

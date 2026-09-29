@@ -22,7 +22,7 @@ import { createDeskChrome, deskMark, type DeskChrome, type DeskStation } from '.
 import { gaitPace } from './gait'
 import { createVinciSourcesWindow } from './sources'
 import cardsSource from './data/cards.json?raw'
-import { createFilmSource, FILM_FORMAT, loadFilmRelease, LEAN_MS, type FilmRelease } from '../picture/film'
+import { createFilmSource, FILM_FORMAT, loadFilmRelease, LEAN_MS, type FilmEvening, type FilmRelease } from '../picture/film'
 import { createVinciWelcome, vinciWelcomeSeen, type VinciWelcome } from './welcome'
 import type { FilmLook } from './film-look'
 import { createPictureWords, type PictureWordsLayer } from './picture-words'
@@ -140,6 +140,11 @@ export function createWing(): WingModule {
   let hosts: WingHosts | undefined
   let release: FilmRelease | undefined
   let picture: PictureSource | undefined
+  /** the grave's look up, where the release carries it */
+  let evening: FilmEvening | undefined
+  /** while the evening plays: the chrome gone, the marks held, and on the desktop the band's strip given back to the picture */
+  let eveningOn = false
+  let eveningFull = false
   let desk: DeskChrome | undefined
   let sources: ReturnType<typeof createVinciSourcesWindow> | undefined
   let sourceButton: HTMLButtonElement | undefined
@@ -185,7 +190,7 @@ export function createWing(): WingModule {
   let tall: HTMLDivElement | undefined
   let cycleLayer: HTMLDivElement | undefined
   function box() {
-    if (wide) return { left: 0, top: 0, width: innerWidth, height: doorStanding ? innerHeight : deskStageHeight() }
+    if (wide) return { left: 0, top: 0, width: innerWidth, height: doorStanding || eveningFull ? innerHeight : deskStageHeight() }
     const height = Math.max(innerHeight, tall?.getBoundingClientRect().height ?? 0)
     return { left: 0, top: 0, width: innerWidth, height }
   }
@@ -671,6 +676,41 @@ export function createWing(): WingModule {
     if (above) { picture?.ahead([stopNode(LIFE[0]!.id)]); return }
     const next = nextIndex()
     if (next !== null) picture?.ahead([stopNode(LIFE[next]!.id)])
+    // at the last stop the way on is the look up: its evening is fetched while the visitor reads
+    else if (evening?.here()) evening.ahead()
+  }
+
+  /* ---- the grave's look up ---- */
+  /** THE EVENING, as the live wing's `lookUp()` plays it: the chrome fades,
+      the eye rises over the house, the sun sets, the stars hold, the print
+      dips, then the lobby. False where it cannot play (reduced motion, a
+      close look open, not at rest where it begins, a release without it):
+      the caller goes home as before. */
+  function lookUp(): boolean {
+    if (eveningOn) return true
+    if (!hosts || !evening || look?.id || matchMedia('(prefers-reduced-motion: reduce)').matches || !evening.here()) return false
+    const wing = hosts.stage.parentElement!
+    eveningOn = true
+    if (drawerOpen) setDrawer(false)
+    clearMarks()
+    words?.hide(); wordsAt = ''
+    wing.dataset['evening'] = ''
+    let gone = false
+    const home = (): void => {
+      if (gone) return
+      gone = true
+      evening?.stop()
+      wing.querySelector<HTMLElement>('.wing-lobby')?.click()
+    }
+    // a press anywhere, Escape, Enter or Space goes on at once; every other key is held, so nothing moves behind the evening
+    addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); home() }, { capture: true, signal })
+    addEventListener('keydown', e => {
+      e.preventDefault(); e.stopPropagation()
+      if (!e.repeat && (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ')) home()
+    }, { capture: true, signal })
+    const widen = wide && box().height < innerHeight - 0.5 ? () => { eveningFull = true } : undefined
+    void evening.play({ widen }).then(home, home)
+    return true
   }
   /** THE DESCENT: the walk's start to the first stop, after the opening and the door */
   async function descend(): Promise<void> {
@@ -758,8 +798,10 @@ export function createWing(): WingModule {
     above = mayDescend && card === 0 && Boolean(release.start && release.nodes[release.start])
     if (welcome && above) { welcome.dispose(); welcome = undefined }
     else if (welcome && early && mayDescend) openDoor()
-    picture = createFilmSource({ host: h.stage, base: filmReleaseBase(), release, at: above ? release.start! : stopNode(LIFE[card]!.id),
+    const film = createFilmSource({ host: h.stage, base: filmReleaseBase(), release, at: above ? release.start! : stopNode(LIFE[card]!.id),
       framing: () => (wide ? 'wide' : 'upright'), box, pace: () => gaitPace(), hold: title => readingMs(title) })
+    picture = film
+    evening = release.evening ? film.evening : undefined
     // the seam as the rigs read it, the way the live wing hands them `__forge`
     ;(window as unknown as { __naSeam?: PictureSource }).__naSeam = picture
     // a machine's filmed cycle stands over the film and under every word
@@ -838,7 +880,8 @@ export function createWing(): WingModule {
     // the grave's talk choice opens the library's door, as in the live wing
     addEventListener('na-wing-ending', e => {
       const asked = e as CustomEvent<{ ending?: string }>
-      if (asked.detail?.ending === 'talk' && talkAtTheGrave()) asked.preventDefault()
+      const ending = asked.detail?.ending
+      if (ending === 'talk' ? talkAtTheGrave() : ending === 'lookup' && lookUp()) asked.preventDefault()
     }, { signal })
     // a press on the picture folds the phone's words back to the one line
     h.stage.addEventListener('click', e => { if (drawerOpen && !(e.target as Element).closest('.film-box')) setDrawer(false) }, { signal })
@@ -923,7 +966,7 @@ export function createWing(): WingModule {
         leg?.setAttribute('stroke-dasharray', `${(2 * Math.PI * 20.5 * share).toFixed(1)} ${(2 * Math.PI * 20.5).toFixed(1)}`)
       }
       desk?.update()
-      if (s.kind === 'rest' && performance.now() > doorLeaving) { paintMarks(); paintWords() }
+      if (s.kind === 'rest' && performance.now() > doorLeaving && !eveningOn) { paintMarks(); paintWords() }
       else if (s.kind === 'wait' && dots.length) clearMarks()
       if (s.kind !== 'rest' && wordsAt) { words?.hide(); wordsAt = '' }
     },
@@ -937,13 +980,14 @@ export function createWing(): WingModule {
       clearMarks(); chip?.remove(); answering?.dot.remove(); answering = null
       words?.dispose(); words = undefined; wordsAt = ''
       cutCard?.remove()
+      evening = undefined; eveningOn = eveningFull = false
       welcome?.dispose(); welcome = undefined
       if (doorStanding) delete document.documentElement.dataset['naDoor']
       doorStanding = false
       releaseFirstStill()
       if (hosts) {
         const wing = hosts.stage.parentElement!
-        delete wing.dataset['wing']; delete wing.dataset['film']; delete wing.dataset['cut']
+        delete wing.dataset['wing']; delete wing.dataset['film']; delete wing.dataset['cut']; delete wing.dataset['evening']
         hosts.stage.textContent = ''
       }
       hosts = undefined

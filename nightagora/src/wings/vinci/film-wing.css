@@ -290,3 +290,11 @@ html:has(#wing[data-film='upright']) #instruments .inst-close {
 @media (prefers-reduced-motion: reduce) {
   #wing[data-door-leaving] .na-film { transition: none; }
 }
+
+/* THE LOOK UP OWNS THE SCREEN, as the live wing's: every piece of chrome steps
+   back while the evening plays and nothing of it takes a press; the picture,
+   which here stands inside the stage, stays */
+#wing[data-film][data-evening] > :not(.wing-stage),
+#wing[data-film][data-evening] .wing-stage > :not(.na-film) { opacity: 0; pointer-events: none; transition: opacity .9s ease; }
+body:has(#wing[data-film][data-evening]) :is(#rail-instruments, #rail-sound) { opacity: 0; visibility: hidden; }
+body:has(#wing[data-film][data-evening]) .brand { opacity: 0; transition: opacity .9s ease; }
