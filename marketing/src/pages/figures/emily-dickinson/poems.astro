@@ -61,20 +61,22 @@ const ECHO_AUDIO_WEBM = 'https://media.agoracosmica.org/trailers/dickinson/lette
 const ECHO_AUDIO_POEM = 'This is my letter to the World';
 
 // --- Themes: the page's spine (title + a short framing + the poems in it) ---
+// The first poem opens on arrival, so it is her most searched one, short
+// enough to fit a phone's first screen whole.
 const THEMES = [
-  {
-    id: 'death',
-    title: 'On death, and what waits',
-    framing:
-      'Death was never an ending for Dickinson. It was a visitor, a carriage, a fly in the room. She wrote about it the way you write about something you have looked at closely and stopped fearing.',
-    poems: ['chariot', 'dying', 'alabaster'],
-  },
   {
     id: 'self',
     title: 'The self, and its closed door',
     framing:
       'She chose her own company and shut the door on the rest. These are poems about identity and power, the inner life she guarded, and how vast it turned out to be.',
     poems: ['nobody', 'loadedgun', 'exclusion', 'letter'],
+  },
+  {
+    id: 'death',
+    title: 'On death, and what waits',
+    framing:
+      'Death was never an ending for Dickinson. It was a visitor, a carriage, a fly in the room. She wrote about it the way you write about something you have looked at closely and stopped fearing.',
+    poems: ['chariot', 'dying', 'alabaster'],
   },
   {
     id: 'hope',
@@ -188,7 +190,7 @@ const schemas = [
           fetchpriority="high"
           decoding="async"
         />
-        <figcaption class="ed-hero__caption">Emily Dickinson, c. 1847</figcaption>
+        <figcaption class="ed-hero__caption">Emily Dickinson, c.&nbsp;1847</figcaption>
       </figure>
       <div class="ed-hero__text">
         <p class="ed-hero__eyebrow">In her own words</p>
