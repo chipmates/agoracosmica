@@ -35,10 +35,10 @@ export const COLLECTIONS = [
     // The public copy carries the revision's station set, a twentieth question for the west end,
     // the closing question the walk's talk choice asks and the implemented tag contract; since the
     // words round of 2026-09-28 it carries the questions as the blind read of that day chose them
-    // (judge/door-words-2026-09-28). The sealed original does not. Sixteen of the twenty stations
-    // stand.
+    // (judge/door-words-2026-09-28), and the body door's German question in spoken order. The
+    // sealed original does not. Sixteen of the twenty stations stand.
     originalSHA256: 'c6bcb90a55fa4d3ce3ec00928ab276613233432468f05a1566ca306d81c47647',
-    normalizedSHA256: 'd5588e7abcc4631c10ab30f47c5a11d2cc8d9c951eaed9b61100ff28b3a76dd9',
+    normalizedSHA256: '1be944058d0d34ce1289c349ce7b5596c930d3986810dd536de601737793075f',
     expected: { doors: 20 },
   },
   {
