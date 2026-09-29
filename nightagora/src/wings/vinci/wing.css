@@ -526,6 +526,8 @@ html:has(#wing[data-phone-form]) #instruments .inst-close {
    the picture's foot just over the box, at its two edges, in the thumb's reach */
 .vinci-phone-wall {position:absolute;left:0;right:0;bottom:100%;display:flex;justify-content:space-between;padding:0 12px 12px;pointer-events:none;}
 .vinci-phone-wall[hidden] {display:none;}
+/* the drawer is read, not stepped: the hang's steps come back with the one line */
+.film-box[data-drawer='true'] .vinci-phone-wall {display:none;}
 .vinci-phone-step {position:relative;flex:0 0 44px;width:44px;height:44px;padding:0;border:0;border-radius:50%;pointer-events:auto;
   background:var(--glass);box-shadow:inset 0 0 0 1px var(--glass-ring);color:#ecdfc7;
   display:flex;align-items:center;justify-content:center;cursor:pointer;}
