@@ -1,4 +1,233 @@
 {
  "topic": "plants-and-animals",
- "pages": {}
+ "pages": {
+  "B.035": {
+   "lead": 0,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 14r, block 1 of 6",
+     "it": {
+      "text": "— sia lalinia data. a. b farai uno triangolo equilate. a. d. b e tira insuj mezo dela sua. basa. una. linia laquale discienda. dal superiore angolo laquale diuiderai in 5 parti. equali eponi una delle ~~su~~ punte del sesto sopra laquarta pare [parte] nelpunto. e. efa il tuo circulo chetochi lestremita della linia. data euedrai chessa. linia entera. 5 volte indetto. circhulo",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "Let the given line be a b. You will make an equilateral triangle a d b, and draw onto the middle of its base a line that comes down from the upper angle, and divide it into 5 equal parts. Put one of the points of the compasses on the fourth part, at the point e, and make your circle touch the ends of the given line, and you will see that this line goes 5 times into the said circle.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Die gegebene Linie sei a b. Du machst ein gleichseitiges Dreieck a d b und ziehst auf die Mitte seiner Grundlinie eine Linie, die vom oberen Winkel herabkommt, und teilst sie in 5 gleiche Teile. Setze eine der Zirkelspitzen auf den vierten Teil, in den Punkt e, und schlage deinen Kreis so, dass er die Enden der gegebenen Linie berührt; dann wirst du sehen, dass diese Linie 5 Mal in den Kreis passt.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Soit la ligne donnée a b, tu feras un triangle équilatéral a d b, et tu tireras sur le milieu de sa base une ligne qui descende de l'angle supérieur; tu la diviseras en 5 parties égales. Place une des pointes [du compas] sur la quatrième partie [division], au point e, et fais ton cercle [tel] qu'il touche les extrémités de la ligne donnée, et tu verras que cette ligne entrera 5 fois dans ledit cercle."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 14 (recto), the transcription below the facsimile plate; archive.org leaf n62",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n62/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 14 (recto), the facing page of the plate; archive.org leaf n61",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n61/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 14r, block 2 of 6",
+     "it": {
+      "text": "— laragion sie. ~~se~~ questa. se d. c. elospatio chessitrova infralcientro elle faccie che partano ilcirculo. in 6 parti tolli uia 1/5 parte della linia come da. d. e. ensudetto e fa iltuo punto delsesto effarai uno circhulo che sciema 1/6 parte delprimo adunque erimane diviso in 5",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "The reason is this: if d c is the space between the centre and the sides that divide the circle into 6 parts, take away 1/5 of the line, as from d to e, and on the said e set the point of your compasses, and you will make a circle that is less by 1/6 than the first; so it remains divided into 5.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Der Grund ist dieser: Wenn d c der Abstand zwischen dem Mittelpunkt und den Seiten ist, die den Kreis in 6 Teile teilen, dann nimm 1/5 der Linie weg, wie von d bis e, setze auf dieses e die Spitze deines Zirkels, und du schlägst einen Kreis, der um 1/6 kleiner ist als der erste; also bleibt er in 5 geteilt.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— La raison est celle-ci : Si d c est l'espace qui se trouve entre le centre et les côtés qui partagent le cercle en 6 parties, prends 1/5e partie de la ligne comme de d à e; sur ledit e, fais ton point de compas, et tu feras un cercle qui enlève 1/6e partie du premier. Donc, il reste divisé en 5."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 14 (recto), the transcription below the facsimile plate; archive.org leaf n62",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n62/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 14 (recto), the facing page of the plate; archive.org leaf n61",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n61/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 14r, block 3 of 6",
+     "it": {
+      "text": "— farai. lepiastre delpionbo sottili quanto poi perche sendo ruichiuse tra idue soli nonanno bisognio ditropa grosseza",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "Make the lead plates as thin as you can, because, being shut in between the two layers [?], they do not need much thickness.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Mache die Bleiplatten so dünn, wie du kannst, denn da sie zwischen den beiden Schichten [?] eingeschlossen sind, brauchen sie keine große Dicke.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Tu feras les plaques de plomb aussi minces que tu pourras, parce qu'étant enfermées entre les deux sols [?], elles n'ont pas besoin d'une trop [très] grande épaisseur."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 14 (recto), the transcription below the facsimile plate; archive.org leaf n62",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n62/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 14 (recto), the facing page of the plate; archive.org leaf n61",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n61/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 3,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 14r, block 4 of 6",
+     "it": {
+      "text": "— defferri. m. n. siuole auere. 2 accio. chequando. luno rafreda ilsuo pionbo chettu possi tirare ilfocolare allaltro echenon siperda tenpo",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "Of the irons m n one should have 2, so that while one is cooling its lead you can pull the hearth over to the other, and no time is lost.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Von den Eisen m n soll man 2 haben, damit du, während das eine sein Blei abkühlt, die Feuerstelle zum anderen ziehen kannst und keine Zeit verloren geht.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Des fers m n, on doit en avoir deux, afin que quand l'un refroidit son plomb, tu puisses tirer le fourneau [?] pour [?] l'autre et qu'on ne perde pas de temps."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 14 (recto), the transcription below the facsimile plate; archive.org leaf n62",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n62/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 14 (recto), the facing page of the plate; archive.org leaf n61",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n61/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 4,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 14r, block 5 of 6",
+     "it": {
+      "text": "MODO. DISALDARE. INSIEME UNO. SOLO. DI BIONBO. SOPRA. UNO. SCHOPERTO.",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "A way to solder together a lead covering on an open roof.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Wie man eine Bleidecke auf einem offenen Dach zusammenlötet.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "MANIÈRE DE SOUDER ENSEMBLE UN SOL [?] DE PLOMB SUR UN TOIT DÉCOUVERT."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 14 (recto), the transcription below the facsimile plate; archive.org leaf n62",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n62/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 14 (recto), the facing page of the plate; archive.org leaf n61",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n61/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 5,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 14r, block 6 of 6",
+     "it": {
+      "text": "— farai. chossi. quando. tuaj fatto lultima. volta. deltuo. chasamento. fauui. disopra. uno. solo. di mattoni. chessia. ben. piano. di poi. abbi. uno ferro largo. 1/3 dibraccio. cheabbj. 4. sponde taglienti. alte. quantuna. meza. chosstola. di choltello chome. appare. in. m. n. ecquesto metteraj. sotto. legiunture. delle piastre. delpionbo. dipoi batti. disopra. adecte. piastre. chol mazo. dilegnio imo. chetagli. delfero. visi. fichi. dentro di poi. abi. uno focolare. sanza. fondo chessia. larg 1/4 ealto. elsimile e lungo quanto ilferro. disotto. m. n. e enpi decto. focholare dicarboni. infocati effa. fondere insieme legiunture delpionbo echosi fa pertucto. poi chopri dichalcina olio dilino e mattonpresto [?] dedagli uno dito dichalo dalati",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "Do it like this: when you have made the last vault of your building, lay over it a floor of bricks that is quite level. Then have an iron 1/3 of a braccio wide with 4 sharp edges as high as half the back of a knife, as shown at m n, and put it under the joints of the lead plates. Then beat on the said plates from above with the wooden mallet, so that the edges of the iron sink into them. Then have a hearth without a bottom, 1/4 wide, as high, and as long as the iron m n below; fill the said hearth with glowing coals and melt the joints of the lead together, and do the same everywhere. Then cover it with lime, linseed oil and crushed brick [?], and give it a fall of one finger at the sides.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Mache es so: Wenn du das letzte Gewölbe deines Hauses gemacht hast, lege darauf einen Boden aus Ziegeln, der ganz eben ist. Dann nimm ein Eisen, 1/3 Braccio breit, mit 4 scharfen Kanten, so hoch wie ein halber Messerrücken, wie man bei m n sieht, und lege es unter die Fugen der Bleiplatten. Dann schlage von oben mit dem Holzhammer auf diese Platten, so dass sich die Schneiden des Eisens hineindrücken. Dann nimm eine Feuerstelle ohne Boden, 1/4 breit, ebenso hoch und so lang wie das Eisen m n darunter; fülle sie mit glühenden Kohlen und schmelze die Fugen des Bleis zusammen, und so mache es überall. Dann decke es mit Kalk, Leinöl und Ziegelmehl [?] ab und gib ihm an den Seiten einen Finger Gefälle.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Tu feras ainsi : lorsque tu auras fait la dernière voûte de ton édifice, tu y superposeras un sol de briques, qui soit bien plan [plat]; ensuite, tu auras un fer large d'1/3 de brasse ayant 4 bords tranchants hauts comme une demi-côte [lame] de couteau, ainsi qu'on le voit en m n, et tu le mettras sous les jointures des plaques de plomb. Ensuite frappe sur lesdites plaques avec le maillet de bois, en sorte que les tranchants du fer y pénètrent [?]; puis aie un fourneau [?] sans fond qui soit large d'1/4, haut de même et long autant que le fer de dessous m n. Emplis ledit fourneau [?] de charbons embrasés et fais fondre ensemble les jointures de plomb; fais ainsi partout, puis couvre de chaux, d'huile de lin et de briques. . . . [?] un doigt d'abaissement aux côtés [?]."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 14 (recto), the transcription below the facsimile plate; archive.org leaf n62",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n62/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 14 (recto), the facing page of the plate; archive.org leaf n61",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n61/mode/1up"
+      }
+     ]
+    }
+   ]
+  }
+ }
 }

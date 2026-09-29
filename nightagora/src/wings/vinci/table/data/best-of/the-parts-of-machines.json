@@ -1,27 +1,4 @@
 {
  "topic": "the-parts-of-machines",
- "pages": {
-  "H.233": {
-   "lead": null,
-   "notes": null,
-   "passages": [
-    {
-     "index": 0,
-     "ref": "Ravaisson-Mollien vol. VI (1891), Ms H, FOLIO 112 [31 verso] (recto)",
-     "it": null,
-     "en": null,
-     "de": null,
-     "fr": null,
-     "label_only": true,
-     "sources": [
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. VI]: Manuscrits H de la Bibliothèque de l'Institut, Ash. 2038 et 2037 de la Bibliothèque nationale, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, suivis d'un appendice, Paris: Maison Quantin, 1891",
-       "page": "Ms H, FOLIO 112 [31 verso] (recto), transcription (upper right column); archive.org viewer page n125",
-       "url": "https://archive.org/details/lesmanuscritsdel06lo/page/n125/mode/1up"
-      }
-     ]
-    }
-   ]
-  }
- }
+ "pages": {}
 }

@@ -230,7 +230,9 @@ for (const topic of new Set(SET.map(r => r.topic))) if (!order.includes(topic)) 
 function passagesOf(record) {
   return (record?.passages ?? []).map((p, index) => {
     const out = { index, ref: p.ref ?? null }
-    if (p.kind === 'missing' || (!p.it && !p.en && !p.de)) return { ...out, missing: true, note: p.note ?? null }
+    // a passage whose every language is missing is a note that nothing was printed
+    const printed = ['it', 'en', 'de'].some(key => p[key]?.text && p[key]?.kind !== 'missing')
+    if (p.kind === 'missing' || !printed) return { ...out, missing: true, note: p.note ?? p.it?.note ?? null }
     if (p.placement) out.placement = p.placement
     const it = p.it?.text ? struck(p.it.text) : null
     const itEdition = editionOf(p.it?.edition)
@@ -250,12 +252,25 @@ function passagesOf(record) {
   })
 }
 
+/** A LEAD IS WORD FOR WORD: each piece of it between ellipses stands in its
+ * passage as printed or translated, spaces and struck words aside. */
+const flatten = text => plain(text).replace(/^\s*[—–-]\s*/, '').replace(/\s+/g, ' ').trim()
+function verbatim(lead, passage) {
+  const whole = flatten(passage)
+  return String(lead).split(/…|\.\.\./).map(piece => flatten(piece).replace(/^[\s,;:]+|[\s,;:]+$/g, ''))
+    .filter(Boolean).every(piece => whole.includes(piece))
+}
+
 function leadOf(id, passages, record) {
   const written = LEADS.get(id)
   if (written) {
     if (written.passage === null) return { lead: null, none: true, placeholder: false }
     const p = passages[written.passage]
     if (!p || p.missing) { warn(`${id}: leads.jsonl names passage ${written.passage}, which the texts do not carry`); return { lead: null, none: false, placeholder: false } }
+    for (const lang of ['en', 'de', 'it']) {
+      if (written[lang] && p[lang]?.text && !verbatim(written[lang], p[lang].text)) warn(`${id}: the ${lang} lead line is not word for word in passage ${written.passage}`)
+      if (written[lang] && !p[lang]?.text) warn(`${id}: a ${lang} lead line for passage ${written.passage}, which has no ${lang} text`)
+    }
     return {
       lead: {
         passage: written.passage, placeholder: false,
@@ -472,7 +487,7 @@ const staged = option('--stage') ? await stage(resolve(option('--stage'))) : 0
 
 const count = test => pages.filter(test).length
 console.log(`best-of: ${topics.length} topics, ${pages.length} pages (${count(p => p.fresh)} new to the store)`)
-console.log(`  words: ${count(p => p.words)} pages carry words, ${count(p => p.text_class !== 'none' && !p.words)} still to arrive, ${count(p => p.text_class === 'none')} have none`)
+console.log(`  words: ${count(p => p.words)} pages carry words, ${count(p => p.text_class !== 'none' && !p.words && RECORDS.has(p.id))} written with nothing printed, ${count(p => p.text_class !== 'none' && !RECORDS.has(p.id))} still to arrive, ${count(p => p.text_class === 'none')} have none`)
 console.log(`  leads: ${count(p => p.lead && !p.lead.placeholder)} written, ${count(p => p.lead?.placeholder)} placeholders, ${count(p => p.lead_none)} none by choice`)
 console.log(`  captions ${count(p => p.caption)}/${pages.length}; topic words ${topics.filter(t => t.title).length}/${topics.length}; mirror on ${count(p => p.writing)}`)
 if (staged) console.log(`  staged ${staged} files into ${option('--stage')}`)

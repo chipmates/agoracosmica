@@ -544,6 +544,86 @@
      ]
     }
    ]
+  },
+  "B.120": {
+   "lead": 1,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 56v, block 1 of 2",
+     "it": {
+      "text": "— a b —",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "a b",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "a b",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— a b. —"
+     },
+     "label_only": true,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 56 (verso), the transcription below the facsimile plate; archive.org leaf n232",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n232/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 56 (verso), the facing page of the plate; archive.org leaf n231",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n231/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 56v, block 2 of 2",
+     "it": {
+      "text": "— questo. vole. avere 12. facce. con. 12 tabernaculi come. a. b.",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "This one should have 12 faces, with 12 tabernacles, like a b.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Dieser soll 12 Seiten haben, mit 12 Tabernakeln, wie a b.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Ceci veut avoir 12 façades, avec 12 tabernacles [chapelles à coupoles], comme a b."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 56 (verso), the transcription below the facsimile plate; archive.org leaf n232",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n232/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 56 (verso), the facing page of the plate; archive.org leaf n231",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n231/mode/1up"
+      }
+     ]
+    }
+   ]
   }
  }
 }

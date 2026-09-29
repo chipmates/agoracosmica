@@ -374,6 +374,92 @@
      ]
     }
    ]
+  },
+  "AshA.061": {
+   "lead": 0,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §529 (Ash. I. 11a), vol. I p. 264-265; Herzfeld 1906 p. 172-173, XXXII",
+     "it": {
+      "text": "COME LO SPECHIO È 'L MAESTRO DE' PITTORI.\n\nQuādo voi vedere ·, se la · tua · pittura · tutta īsieme à conformità colla cosa ritratta di naturale, abbi vno spechio · e favi dētro specchiare la cosa viua, e paragona la cosa · spechiata · colla tua pittura ·, e cōsidera bene se 'l subietto dell'una · e l'altra similitudine · à · cōfòrmità īsieme · e sopra tutto lo spechio; lo spechio si de' pigliare · per suo · maestro, cioè · lo spechio · piano, īpero · ch'ī sulla sua superficie · le cose ànno similitudine colla pittura ī molte parti; cioè tu vedi la pittura fatta sopra a uno piano dimostrare cose che paiono rilevate, e lo spechio sopra uno piano fa quel medesimo; · La pittura è vna sola superfitie e lo specchio quel medesimo ·; La pittura è īpalpabile ī quāto che quello che pare tōdo e spiccato nō si può circūdare colle mani, e lo spechio fa il simile; E se tu conosci che lo spechio per mezzo de liniamēti e ōbre e lumi ti fa parere le cose dispiccate e avēdo tu fra i tua colori l'ombre e lumi piv potēti che quelli dello spechio · cierto, se li saprai bē comporre īsieme, la tua pitura parrà ācora lei una cosa naturale vista ī vno grāde spechio.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "HOW THE MIRROR IS THE MASTER [AND GUIDE] OF PAINTERS.\n\nWhen you want to see if your picture corresponds throughout with the objects you have drawn from nature, take a mirror and look in that at the reflection of the real things, and compare the reflected image with your picture, and consider whether the subject of the two images duly corresponds in both, particularly studying the mirror. You should take the mirror for your guide—that is to say a flat mirror—because on its surface the objects appear in many respects as in a painting. Thus you see, in a painting done on a flat surface, objects which appear in relief, and in the mirror—also a flat surface—they look the same. The picture has one plane surface and the same with the mirror. The picture is intangible, in so far as that which appears round and prominent cannot be grasped in the hands; and it is the same with the mirror. And since you can see that the mirror, by means of outlines, shadows and lights, makes objects appear in relief, you, who have in your colours far stronger lights and shades than those in the mirror, can certainly, if you compose your picture well, make that also look like a natural scene reflected in a large mirror.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Wie der Spiegel den Malern ein Lehrer sei\n\nWillst du sehen, ob dein Bild im ganzen mit der Sache Übereinstimmung habe, die du nach der Natur gemacht hast, so nimm einen Spiegel, laß darin den lebendigen Gegenstand sich spiegeln, vergleiche den abgespiegelten Gegenstand mit deinem Gemälde und schau gut nach, ob das Objekt des einen und das andere Abbild miteinander in Übereinstimmung sind. Und vor allem den Spiegel. Man muß den Spiegel zum Meister nehmen, das heißt, den ebenen Spiegel, weil auf seiner Oberfläche die Dinge mit einem Bild in vielen Teilen Ähnlichkeit besitzen. Das will sagen, du siehst ein Bild, das auf einer Fläche gemacht ist, Dinge aufweisen, die erhaben scheinen, und der ebene Spiegel tut das gleiche; das Gemälde hat eine einzige Fläche und der Spiegel ebenfalls. Das gemalte Bild ist nicht greifbar, in der Hinsicht, daß, was darin rund und frei abgelöst scheint, nicht mit den Händen umfaßt werden kann, und ebenso ist es mit dem Spiegel; der Spiegel und das Gemälde zeigen Ähnlichkeiten der Dinge von Licht und Schatten umgeben; bei beiden erscheinen diese sehr weit hinter der Oberfläche zu stehen. Und wenn du weißt, daß der Spiegel durch das Mittel der Umrisse, der Lichter und Schatten die Dinge dir losgelöst und frei erscheinen läßt, und da du unter deinen Farben die Lichter und Schatten viel wirkungsvoller hast als jene des Spiegels, sicher, wenn du sie dann gut zusammenzusetzen verstehst, so wird auch dein Gemälde erscheinen wie ein Stück Natur (una cosa naturale), das in einem großen Spiegel gesehen ist.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 264-265",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n361/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 264-265",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n361/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 172-173",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n351/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Richter 1883 §656 (printed 'Ash. I. 11b'), vol. I p. 330; Herzfeld 1906 p. 158-159, IV (the part signed MS. ASH. I. FOL. 24 v.)",
+     "it": {
+      "text": "Noi sappiamo · bene che quello ·, che sarà pratico e bono, nō farà simili errori ·, anzi cō bone regole · andrà leuādo tanto poco per volta che bē cōducerà sua opera; · ācora lo scoltore, se fa di terra o ciera, può leuare e porre ·, e quādo è terminata · cō facilità · si gitta di brōzo ·, e questa è l'ultima operatione e la piv permanēte ch'abbi la scultura · Imperocchè quella ch'è sola di marmo è sottoposta alle rouine, e nō lo brōzo; adūque quella · pittura, fatta ī rame che si può, come dissi della pittura, levare e porre è pari al brōzo; che quādo facievi quell'opera prima di ciera, ancor si poteva leuare e porre; se questa scoltura di brōzo è eterna, questa di rame e di uetro è etternissima; se 'l brōzo rimane nero e brutto, questa è piena di uari e vaghi colori e d'infinite varietà, della quale com'è di sopra ·; e se tu volessi dire solamēte della pittura fatta ī tauola, di questa son io cōtēto dare la sētētia colla scultura, diciēdo così, come la pittura è piv bella e di piv fantasia e piv copiosa, è la scoltura piv durabile ·; altro nō à; la scoltura · cō poca fatica mostra quel che nella pittura · pare cosa miracolosa; a far parere palpabile cose īpalpabili, rileuate le cose piane, lontane le cose vicine; in effetto la pittura è ornata d'infinite speculationi che la scultura nō le adopera.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "We know very well that a really experienced and good painter will not make such mistakes; on the contrary, with sound rules he will remove so little at a time that he will bring his work to a good issue. Again the sculptor if working in clay or wax, can add or reduce, and when his model is finished it can easily be cast in bronze, and this is the last operation and is the most permanent form of sculpture. Inasmuch as that which is merely of marble is liable to ruin, but not bronze. Hence a painting done on copper which as I said of painting may be added to or altered, resembles sculpture in bronze, which, having first been made in wax could then be altered or added to; and if sculpture in bronze is durable, this work in copper and enamel is absolutely imperishable. Bronze is but dark and rough after all, but this latter is covered with various and lovely colours in infinite variety, as has been said above; or if you will have me only speak of painting on panel, I am content to pronounce between it and sculpture; saying that painting is the more beautiful and the more imaginative and the more copious, while sculpture is the more durable but it has nothing else. Sculpture shows with little labour what in painting appears a miraculous thing to do; to make what is impalpable appear palpable, flat objects appear in relief, distant objects seem close. In fact painting is adorned with infinite possibilities which sculpture cannot command.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Wir wissen wohl, wer praktisch und tüchtig ist, wird nicht dergleichen machen; im Gegenteil mit guten Regeln wird er vorwärts gehen und immer so wenig auf einmal wegnehmen, daß er sein Werk gut vollführt. Auch, wenn der Bildhauer in Lehm oder in Wachs arbeitet, kann er wegnehmen und zufügen, und wenn er fertig ist, wird es mit Leichtigkeit in Bronze gegossen, und das ist die letzte Operation und das dauerhafteste, was die Skulptur besitzt, indem jene Arbeit, die nur aus Marmor ist, der Zerstörung unterworfen ist, aber nicht die Bronze. Also, jene Malerei auf Kupfer, bei der man, wie ich dir von der Malerei sagte, wegnehmen und zufügen kann, ist gleich wie die Bronze, von der du, als du das Werk erst in Wachs machtest, auch wegnehmen und hinzufügen konntest. Wenn diese Skulptur in Bronze ewig ist, so ist diese aus Kupfer und Glasfluß allerewigst. Wenn die Bronze schwarz und häßlich wird, ist diese voll mannigfacher und lieblicher Farben und von unendlicher Abwechslung in obenerwähnter Art. Wenn du nur von der Malerei auf Tafeln reden wolltest, so wäre ich zufrieden, das Urteil gegen die Skulptur abzugeben, indem ich so sage: während die Malerei schöner ist und von größerer Phantasie und größerer Fülle, ist die Skulptur dauerhafter, und weiter hat die Skulptur nichts. Sie zeigt mit wenig Mühe, was sie ist; die Malerei scheint eine wunderbare Sache, indem sie Ungreifbares greifbar vorkommen läßt, erhaben die flachen Gegenstände und entfernt die nahen. In der Tat, die Malerei ist mit unendlichen Überlegungen geschmückt, so die Bildhauerei nicht in Anwendung bringt.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 330",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n451/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 330",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n451/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 158-159",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n337/mode/1up"
+      }
+     ]
+    }
+   ]
   }
  }
 }

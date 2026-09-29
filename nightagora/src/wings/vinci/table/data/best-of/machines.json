@@ -240,28 +240,6 @@
      ]
     }
    ]
-  },
-  "H.226": {
-   "lead": null,
-   "notes": null,
-   "passages": [
-    {
-     "index": 0,
-     "ref": "Ravaisson-Mollien vol. VI (1891), Ms H, FOLIO 108 [35 recto] (verso)",
-     "it": null,
-     "en": null,
-     "de": null,
-     "fr": null,
-     "label_only": true,
-     "sources": [
-      {
-       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. VI]: Manuscrits H de la Bibliothèque de l'Institut, Ash. 2038 et 2037 de la Bibliothèque nationale, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, suivis d'un appendice, Paris: Maison Quantin, 1891",
-       "page": "Ms H, FOLIO 108 [35 recto] (verso), transcription (lower left column); archive.org viewer page n121",
-       "url": "https://archive.org/details/lesmanuscritsdel06lo/page/n121/mode/1up"
-      }
-     ]
-    }
-   ]
   }
  }
 }

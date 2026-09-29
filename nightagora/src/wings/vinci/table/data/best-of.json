@@ -7,11 +7,11 @@
   "words/captions.jsonl": "417b8d41e2945a28108526a0c32ebc44a28a675157572c86fac82744ecdcee58",
   "words/topics.json": "a7df7b8a5d52f6c20863ab9958c96c6d6f998e748927b20e0c51d22d141cedfd",
   "words/notices.json": "5bc7adc44687428e05e3ae708a26f6f864714eaef087087bfaa8853a170dc4ee",
-  "texts-final/it-b.jsonl": "97fc4d6a945aece68c228f66d64c6bc0e6a1934c381288fb0567413089e39206",
-  "texts-final/it.jsonl": "21e5996caf2fc55cb943522236bcd9487671f07fcf2401831256363d53888caa",
-  "texts-final/rh-b.jsonl": "5c9f1b6fc32e1b68e2b645c9052a0a242a208c2a047e40a2745040b312f53ba3",
-  "texts-final/rh-c.jsonl": "f48a92cb66374ff588279233c2d7df170e38f965cccd9a187a198a0ff13dc8af",
-  "texts-final/rh.jsonl": "9aa529b65651dec6dd8cb69d9d809999ada324c6fe1745391e00e63f38994707",
+  "texts-final/it-b.jsonl": "d258e7c14a62ce571e2d60d957cf1cbc859ebe51028e201f35294271b611fdb8",
+  "texts-final/it.jsonl": "412900a6cd500a8c9561cdc9108636987cd3e6e1697223feaa70fb8f8c195b47",
+  "texts-final/rh-b.jsonl": "777c8d25293988c6dac43d5d46d0587a0b9704aeac01e3ae5ccf97759bca0a37",
+  "texts-final/rh-c.jsonl": "b1326d294592f29f7b585a2ef465f6cd0b504af840a42130292c4615575e0cb3",
+  "texts-final/rh.jsonl": "e6a0534ba34e08fd26405052434da7a25c83a9065664d4e2c52a99d804b96cee",
   "curator-250/work/CANDIDATES.csv": "2ac10c2236820ac09150b34ba50ebc98ada5b9b0bf4c19e3b4e74ca1d2ca18b8",
   "pool2/INDEX.csv": "3d1b06eef005e397854d8d7c4edb5990ab5fc13a8d63d3e00d41ddc5b1aebfda"
  },
@@ -1563,14 +1563,10 @@
    },
    "writing": true,
    "text_class": "Ravaisson Italian only",
-   "words": {
-    "en": null,
-    "de": null,
-    "it": false
-   },
+   "words": null,
    "lead": null,
    "lead_none": false,
-   "lead_placeholder": true,
+   "lead_placeholder": false,
    "long": false
   },
   {
@@ -1728,14 +1724,10 @@
    },
    "writing": true,
    "text_class": "Ravaisson Italian only",
-   "words": {
-    "en": null,
-    "de": null,
-    "it": false
-   },
+   "words": null,
    "lead": null,
    "lead_none": false,
-   "lead_placeholder": true,
+   "lead_placeholder": false,
    "long": false
   },
   {
@@ -2396,7 +2388,7 @@
      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
     },
     "de": {
-     "text": "Jeder Teil der Wassermasse, die von einem Fluss in die Luft fällt, folgt der Linie, in der der Antrieb begann, der es in diesen Fall geführt hat.",
+     "text": "Jeder Teil der Wassermasse, die von einem Fluss in die Luft fällt, folgt der Linie, in der der Antrieb begann, der ihn in diesen Fall geführt hat.",
      "kind": "ours",
      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
     },
@@ -3475,10 +3467,34 @@
    },
    "writing": true,
    "text_class": "Ravaisson Italian only",
-   "words": null,
-   "lead": null,
+   "words": {
+    "en": "ours",
+    "de": "ours",
+    "it": true
+   },
+   "lead": {
+    "passage": 1,
+    "placeholder": true,
+    "en": {
+     "text": "This one should have 12 faces, with 12 tabernacles, like a b.",
+     "kind": "ours",
+     "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+    },
+    "de": {
+     "text": "Dieser soll 12 Seiten haben, mit 12 Tabernakeln, wie a b.",
+     "kind": "ours",
+     "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+    },
+    "it": {
+     "text": "questo. vole. avere 12. facce. con. 12 tabernaculi come. a. b.",
+     "label": {
+      "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+      "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+     }
+    }
+   },
    "lead_none": false,
-   "lead_placeholder": false,
+   "lead_placeholder": true,
    "long": false
   },
   {
@@ -3568,10 +3584,34 @@
    },
    "writing": true,
    "text_class": "Ravaisson Italian only",
-   "words": null,
-   "lead": null,
+   "words": {
+    "en": "ours",
+    "de": "ours",
+    "it": true
+   },
+   "lead": {
+    "passage": 0,
+    "placeholder": true,
+    "en": {
+     "text": "Double stairs: one for the castellan, the other for the paid soldiers.",
+     "kind": "ours",
+     "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+    },
+    "de": {
+     "text": "Doppelte Treppen: eine für den Kastellan, die andere für die Söldner.",
+     "kind": "ours",
+     "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+    },
+    "it": {
+     "text": "schale. docpie. una perlochastellano. laltra. periprouisionati",
+     "label": {
+      "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+      "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+     }
+    }
+   },
    "lead_none": false,
-   "lead_placeholder": false,
+   "lead_placeholder": true,
    "long": false
   },
   {
@@ -3688,10 +3728,34 @@
    },
    "writing": true,
    "text_class": "Richter EN",
-   "words": null,
-   "lead": null,
+   "words": {
+    "en": "printed",
+    "de": "ours",
+    "it": true
+   },
+   "lead": {
+    "passage": 0,
+    "placeholder": true,
+    "en": {
+     "text": "Let the width of the streets be equal to the average height of the houses.",
+     "kind": "printed",
+     "label": "Translation: Jean Paul Richter, 1883"
+    },
+    "de": {
+     "text": "Die Straße soll so breit sein, wie die Häuser im Allgemeinen hoch sind.",
+     "kind": "ours",
+     "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+    },
+    "it": {
+     "text": "Tanto sia larga la strada ·, quanto è la universale altezza delle case.",
+     "label": {
+      "en": "Transcription: Jean Paul Richter, 1883",
+      "de": "Umschrift: Jean Paul Richter, 1883"
+     }
+    }
+   },
    "lead_none": false,
-   "lead_placeholder": false,
+   "lead_placeholder": true,
    "long": false
   },
   {
@@ -3781,11 +3845,35 @@
    },
    "writing": true,
    "text_class": "Ravaisson Italian only",
-   "words": null,
-   "lead": null,
+   "words": {
+    "en": "ours",
+    "de": "ours",
+    "it": true
+   },
+   "lead": {
+    "passage": 2,
+    "placeholder": true,
+    "en": {
+     "text": "A way to make a coping for a garden wall that cannot come apart [?].",
+     "kind": "ours",
+     "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+    },
+    "de": {
+     "text": "Wie man eine Abdeckung für eine Gartenmauer macht, die sich nicht lösen [?] kann.",
+     "kind": "ours",
+     "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+    },
+    "it": {
+     "text": "Modo difare vna copritura avno mvro dvnorto. chenonsi possi isconvienere",
+     "label": {
+      "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+      "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+     }
+    }
+   },
    "lead_none": false,
-   "lead_placeholder": false,
-   "long": false
+   "lead_placeholder": true,
+   "long": true
   },
   {
    "id": "M2.81",
@@ -4014,11 +4102,35 @@
    },
    "writing": true,
    "text_class": "Richter EN",
-   "words": null,
-   "lead": null,
+   "words": {
+    "en": "printed",
+    "de": "ours",
+    "it": true
+   },
+   "lead": {
+    "passage": 0,
+    "placeholder": true,
+    "en": {
+     "text": "It can be proved why the shadow o p c h is darker in proportion as it is nearer to the line p h and is lighter in proportion as it is nearer to the line o c.",
+     "kind": "printed",
+     "label": "Translation: Jean Paul Richter, 1883"
+    },
+    "de": {
+     "text": "Man beweist, warum der Schatten o p c h umso dunkler ist, je näher er der Linie p h kommt, und umso heller, je näher er der Linie o c kommt.",
+     "kind": "ours",
+     "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+    },
+    "it": {
+     "text": "Pruovasi perchè l'onbra o p c h è tanto piv oscura, quanto ella più s'avicina alla linia p · h, ed è tanto più chiara quāto essa più s'avicina alla linia o c, e sia il lume a b finestra, e la pariete …",
+     "label": {
+      "en": "Transcription: Jean Paul Richter, 1883",
+      "de": "Umschrift: Jean Paul Richter, 1883"
+     }
+    }
+   },
    "lead_none": false,
-   "lead_placeholder": false,
-   "long": false
+   "lead_placeholder": true,
+   "long": true
   },
   {
    "id": "A.088",
@@ -4060,11 +4172,35 @@
    },
    "writing": true,
    "text_class": "Richter EN",
-   "words": null,
-   "lead": null,
+   "words": {
+    "en": "printed",
+    "de": "ours",
+    "it": true
+   },
+   "lead": {
+    "passage": 0,
+    "placeholder": true,
+    "en": {
+     "text": "That part of the surface of a body on which the images [reflection] from other bodies placed opposite fall at the largest angle will assume their hue most strongly.",
+     "kind": "printed",
+     "label": "Translation: Jean Paul Richter, 1883"
+    },
+    "de": {
+     "text": "Der Teil der Oberfläche der Körper, der von den Bildern der gegenüberstehenden Körper unter dem größeren Winkel getroffen wird, färbt sich am stärksten in deren Farbe: 8 unten ist ein größerer Winkel …",
+     "kind": "ours",
+     "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+    },
+    "it": {
+     "text": "Quella parte della superfitie · de' corpi · che fia · percossa da maggiore · angolo delle spetie de' contra se posti corpi · piv si tignierà in nel color di quelle: 8 di sotto · è maggiore āgolo che …",
+     "label": {
+      "en": "Transcription: Jean Paul Richter, 1883",
+      "de": "Umschrift: Jean Paul Richter, 1883"
+     }
+    }
+   },
    "lead_none": false,
-   "lead_placeholder": false,
-   "long": false
+   "lead_placeholder": true,
+   "long": true
   },
   {
    "id": "AR1.305",
@@ -4433,11 +4569,35 @@
    },
    "writing": true,
    "text_class": "Herzfeld DE",
-   "words": null,
-   "lead": null,
+   "words": {
+    "en": "printed",
+    "de": "printed",
+    "it": true
+   },
+   "lead": {
+    "passage": 0,
+    "placeholder": true,
+    "en": {
+     "text": "HOW THE MIRROR IS THE MASTER [AND GUIDE] OF PAINTERS.",
+     "kind": "printed",
+     "label": "Translation: Jean Paul Richter, 1883"
+    },
+    "de": {
+     "text": "Wie der Spiegel den Malern ein Lehrer sei Willst du sehen, ob dein Bild im ganzen mit der Sache Übereinstimmung habe, die du nach der Natur gemacht hast, so nimm einen Spiegel, laß darin den …",
+     "kind": "printed",
+     "label": "Übersetzung: Marie Herzfeld, 1906"
+    },
+    "it": {
+     "text": "COME LO SPECHIO È 'L MAESTRO DE' PITTORI.",
+     "label": {
+      "en": "Transcription: Jean Paul Richter, 1883",
+      "de": "Umschrift: Jean Paul Richter, 1883"
+     }
+    }
+   },
    "lead_none": false,
-   "lead_placeholder": false,
-   "long": false
+   "lead_placeholder": true,
+   "long": true
   },
   {
    "id": "AshA.049",
@@ -4594,11 +4754,35 @@
    },
    "writing": true,
    "text_class": "Richter EN",
-   "words": null,
-   "lead": null,
+   "words": {
+    "en": "printed",
+    "de": "ours",
+    "it": true
+   },
+   "lead": {
+    "passage": 0,
+    "placeholder": true,
+    "en": {
+     "text": "Savage he is who saves himself.",
+     "kind": "printed",
+     "label": "Translation: Jean Paul Richter, 1883"
+    },
+    "de": {
+     "text": "Wild ist, wer sich rettet.",
+     "kind": "ours",
+     "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+    },
+    "it": {
+     "text": "Saluatico è quel che si salua.",
+     "label": {
+      "en": "Transcription: Jean Paul Richter, 1883",
+      "de": "Umschrift: Jean Paul Richter, 1883"
+     }
+    }
+   },
    "lead_none": false,
-   "lead_placeholder": false,
-   "long": false
+   "lead_placeholder": true,
+   "long": true
   },
   {
    "id": "ATL.0477.1",
@@ -4640,10 +4824,34 @@
    },
    "writing": true,
    "text_class": "Richter EN",
-   "words": null,
-   "lead": null,
+   "words": {
+    "en": "printed",
+    "de": "ours",
+    "it": true
+   },
+   "lead": {
+    "passage": 0,
+    "placeholder": true,
+    "en": {
+     "text": "Here I make a note to demonstrate the difference there is between man and the horse and in the same way with other animals.",
+     "kind": "printed",
+     "label": "Translation: Jean Paul Richter, 1883"
+    },
+    "de": {
+     "text": "Hier halte ich fest, dass ich den Unterschied zeigen will, der zwischen dem Menschen und dem Pferd besteht, und ebenso bei den anderen Tieren.",
+     "kind": "ours",
+     "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+    },
+    "it": {
+     "text": "Qui fo ricordo di dimostrare la differentia ch'è dall'omo al cauallo, e similmente delli altri animali; e prima comincerò all'ossa, e proseguirò tutti li muscoli che sanza corde nascono e finiscono …",
+     "label": {
+      "en": "Transcription: Jean Paul Richter, 1883",
+      "de": "Umschrift: Jean Paul Richter, 1883"
+     }
+    }
+   },
    "lead_none": false,
-   "lead_placeholder": false,
+   "lead_placeholder": true,
    "long": false
   },
   {
@@ -5225,11 +5433,35 @@
    },
    "writing": true,
    "text_class": "Ravaisson Italian only",
-   "words": null,
-   "lead": null,
+   "words": {
+    "en": "ours",
+    "de": "ours",
+    "it": true
+   },
+   "lead": {
+    "passage": 0,
+    "placeholder": true,
+    "en": {
+     "text": "Let the given line be a b.",
+     "kind": "ours",
+     "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+    },
+    "de": {
+     "text": "Die gegebene Linie sei a b.",
+     "kind": "ours",
+     "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+    },
+    "it": {
+     "text": "sia lalinia data. a. b farai uno triangolo equilate. a. d. b e tira insuj mezo dela sua. basa. una. linia laquale discienda. dal superiore angolo laquale diuiderai in 5 parti. equali eponi una delle …",
+     "label": {
+      "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+      "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+     }
+    }
+   },
    "lead_none": false,
-   "lead_placeholder": false,
-   "long": false
+   "lead_placeholder": true,
+   "long": true
   },
   {
    "id": "M.163",
@@ -5708,14 +5940,10 @@
    },
    "writing": true,
    "text_class": "Ravaisson Italian only",
-   "words": {
-    "en": null,
-    "de": null,
-    "it": false
-   },
+   "words": null,
    "lead": null,
    "lead_none": false,
-   "lead_placeholder": true,
+   "lead_placeholder": false,
    "long": false
   },
   {
