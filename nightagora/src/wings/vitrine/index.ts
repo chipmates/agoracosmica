@@ -194,8 +194,8 @@ export function createVitrine(options: {
   let surface: VitrineSurface = 'room', resizeFrames = 0, laidNarrow: boolean | null = null
   let raised = false
   /** THE LINE THE CARD SAYS, whole, and its source row; the peek may say its own. */
-  let spoken: { head: string | null; note: string | null; short: string | null; restNote: string | null } =
-    { head: null, note: null, short: null, restNote: null }
+  let spoken: { head: string | null; note: string | null; short: string | null; restNote: string | null; restSource: string | null } =
+    { head: null, note: null, short: null, restNote: null, restSource: null }
   const reducedMotion = view.matchMedia('(prefers-reduced-motion: reduce)')
   const rects = { view: { left: 0, top: 0, width: 0, height: 0 } as VitrineRect }
 
@@ -445,7 +445,7 @@ export function createVitrine(options: {
     namingText.textContent = 'M'
     seat.hidden = false; seatWords.hidden = false; seatWords.textContent = 'M'; countButton.hidden = false; countButton.textContent = 'M'
     line.hidden = false; line.replaceChildren('M', document.createElement('br'), 'M')
-    note.hidden = false; note.textContent = 'M'
+    note.hidden = false; note.replaceChildren('M', document.createElement('br'), 'M')
     // the card at no height, so the body's scroll height is its words' own
     placeAt(1)
     const own = view.getComputedStyle(card)
@@ -468,20 +468,21 @@ export function createVitrine(options: {
   }
 
   /** THE LINE AT THE PEEK IS NEVER CUT. Whole on the raised card and on a
-   * wide stage; at a peek that shows it, the line with the peek's own source
+   * wide stage; at a lined book's peek, the line with the peek's own source
    * row where it keeps two rows and the words fit the peek, else the short
-   * line where that does, else the name row stands alone. `room` says
-   * whether the words fit the peek; null off the peek. */
+   * line with the picture's source row where that does, else the name row
+   * with the source row alone. `room` says whether the words fit the peek;
+   * null off the peek. */
   function paintLine(room: (() => boolean) | null): void {
     const choices: Array<[string | null, string | null]> = [[spoken.head, room ? spoken.restNote ?? spoken.note : spoken.note]]
-    if (room) choices.push([spoken.short, null], [null, null])
+    if (room) choices.push([spoken.short, spoken.restSource], [null, spoken.restSource], [null, null])
     for (const [head, row] of choices) {
       line.textContent = head ?? ''
       line.hidden = !head
       note.textContent = row ?? ''
       note.hidden = !row
-      if (!room || !head || view.getComputedStyle(line).display === 'none') return
-      if (rowsOf(line) <= PEEK_LINE_ROWS && room()) return
+      if (!room || !exhibit?.payload?.lined) return
+      if ((!head || rowsOf(line) <= PEEK_LINE_ROWS) && room()) return
     }
   }
 
@@ -521,11 +522,12 @@ export function createVitrine(options: {
     rename: (title, head, certainty, place, said, peek) => {
       nameIt(title, certainty)
       const was = { ...spoken }
-      if (head !== undefined) spoken = { ...spoken, head, short: peek?.line ?? null, restNote: peek?.note ?? null }
+      if (head !== undefined) spoken = { ...spoken, head, short: peek?.line ?? null, restNote: peek?.note ?? null, restSource: peek?.source ?? null }
       if (said !== undefined) paintPlace(place, said)
       // a new line at the peek is chosen by the peek's own layout, which
       // measures it from the peek's least height; the same line stays as chosen
       const changed = was.head !== spoken.head || was.short !== spoken.short || was.note !== spoken.note || was.restNote !== spoken.restNote
+        || was.restSource !== spoken.restSource
       if (changed) {
         if (options.narrow() && root.dataset['peek'] === 'true' && !laying) layout()
         else paintLine(null)
@@ -720,7 +722,8 @@ export function createVitrine(options: {
       entryRow.textContent = entry ? [entry.date, entry.where].filter(Boolean).join(' · ') : ''
       entryRow.hidden = !entry
       entryRow.lang = options.lang()
-      spoken = { head: next.line ?? null, note: null, short: next.peek?.line ?? null, restNote: next.peek?.note ?? null }
+      spoken = { head: next.line ?? null, note: null, short: next.peek?.line ?? null, restNote: next.peek?.note ?? null,
+        restSource: next.peek?.source ?? null }
       line.lang = options.lang()
       paintPlace(next.set?.said || next.set?.seat ? next.set : null, next.note)
       paintLine(null)

@@ -160,27 +160,31 @@
 .vitrine:not([data-peek='true']) .vitrine-note {margin-top:-4px;}
 /* A LINED BOOK ON THE PHONE. At rest one height for every page: the name,
    the leaf and its place in the topic, the line in two rows with its source
-   row in one, the ways and the pinch's steps, and the strip with the page's
+   row in two, the ways and the pinch's steps, and the strip with the page's
    steps at its ends. No word under 14 px, raised or at rest. */
-.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-card {padding-top:0;padding-bottom:8px;}
+.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-card {padding-top:0;padding-bottom:4px;}
 /* the grab's 44 px reach over the name, which raises the card as the grab does */
 .vitrine[data-narrow='true'][data-fill='true']:has(.reader[data-lined='true']) .vitrine-grab {position:relative;z-index:1;
   align-items:flex-start;padding-top:10px;margin-bottom:-22px;}
 .vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-name {margin:0;font-size:17px;line-height:22px;}
-.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-seat {margin:2px 0 0;font:400 14px/20px var(--sans);column-gap:0;}
+/* the seat row's own margin is the count's reach, so the line starts under it */
+.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-seat {margin:0 0 20px;font:400 14px/20px var(--sans);column-gap:0;}
 .vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-seat:has(.vitrine-count:not([hidden])) .vitrine-seat-words:not([hidden])::after {
   content:'\00b7';margin:0 8px;}
-/* the count keeps its 44 px reach over the rows beside it, which carry no control */
-.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-count {position:relative;z-index:1;margin:-12px 0;font-size:14px;}
-.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-line {font-size:17px;line-height:22px;}
-.vitrine[data-peek='true']:has(.reader[data-lined='true']) .vitrine-line {margin:6px 0 0;}
-.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-note {font-size:14px;line-height:20px;}
-.vitrine[data-peek='true']:has(.reader[data-lined='true']) .vitrine-note {margin:2px 0 0;}
+/* the count's 44 px reach runs from the grab's foot down through that
+   margin: it meets neither the grab nor a word of the line */
+.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-count {position:relative;z-index:1;box-sizing:border-box;
+  align-self:flex-start;min-height:44px;margin:0 0 -24px;padding:0 0 24px;font-size:14px;line-height:20px;}
+.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-line {margin:0;font-size:17px;line-height:22px;}
+.vitrine[data-peek='true']:has(.reader[data-lined='true']) .vitrine-line {margin:0;}
+.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-note {margin:0 0 14px;font-size:14px;line-height:18px;}
+.vitrine[data-peek='true']:has(.reader[data-lined='true']) .vitrine-note {margin:0;}
+.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-line[hidden] + .vitrine-note {margin-top:4px;}
 .vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-control {font-size:14px;}
 /* the pinch's two steps stay marks, their words kept for a reader of the screen */
 .vitrine[data-narrow='true']:has(.reader[data-lined='true']) .reader-row .reader-zoom .vitrine-control {font-size:0;}
 .vitrine[data-narrow='true']:has(.reader[data-lined='true']) :is(.vitrine-words, .vitrine-aside) :is(p, li) {font-size:14px;}
-.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-payload-controls {position:relative;padding-top:6px;row-gap:10px;}
+.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-payload-controls {position:relative;padding-top:2px;row-gap:8px;}
 .vitrine[data-narrow='true']:has(.reader[data-lined='true']) .reader-row .vitrine-step {position:absolute;bottom:0;width:44px;height:44px;}
 .vitrine[data-narrow='true']:has(.reader[data-lined='true']) .reader-row .vitrine-step:first-child {left:0;}
 .vitrine[data-narrow='true']:has(.reader[data-lined='true']) .reader-row .vitrine-step:last-child {right:0;}

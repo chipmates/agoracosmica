@@ -70,11 +70,13 @@ export interface VitrinePlace {
 
 /** WHAT A FOLDED CARD SAYS AT REST, where the raised card says more. */
 export interface VitrinePeek {
-  /** the source row at rest, one row where the raised card's runs longer; empty for none */
+  /** the source row at rest, shorter where the raised card's runs longer; empty for none */
   note?: string | null
   /** the line a peek shows where the card's own would take more than its
-   * two rows there, without a source row; none, and the name row stands alone */
+   * two rows there; none, and the name row stands alone */
   line?: string | null
+  /** the picture's source row, under that line or under the name alone */
+  source?: string | null
 }
 
 export interface VitrinePayload {

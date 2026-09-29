@@ -379,17 +379,20 @@ body:has(dialog[open]) #wing[data-desk~='closelook'] .desk-clb {
 #wing[data-desk~='closelook'] .vitrine[data-payload='manuscript'] .desk-clb-ways { grid-area: ways; }
 /* A LINED BOOK'S INSTRUMENTS STAND IN THREE ROWS, its ways, the viewer's
    steps of distance and the way on, so its line takes the design's whole
-   measure, 860, and keeps two rows in both languages. The three rows end
-   with the words' last row: the band's height is the same on every page and
-   set by the words, not by the keys. */
+   measure, 860, and keeps two rows in both languages. The three rows start
+   with the name row and end with the reading row, the gold box's foot on its
+   underline: the band's height is the same on every page and set by the
+   words, not by the keys. */
 #wing[data-desk~='closelook'] .vitrine[data-payload='manuscript']:has(.reader[data-lined='true']) .desk-clb { --desk-clb-read: 860px; }
 #wing[data-desk~='closelook'] .vitrine[data-payload='manuscript']:has(.reader[data-lined='true']) .desk-clb-right {
   grid-template-columns: auto;
   grid-template-areas: 'inst' 'zoom' 'ways';
   justify-items: end;
-  padding-top: 11px;
+  padding-top: 0;
   row-gap: 10px;
 }
+/* no one word alone on the line's last row */
+#wing[data-desk~='closelook'] .vitrine[data-payload='manuscript']:has(.reader[data-lined='true']) .desk-clb-line { text-wrap: balance; }
 #wing[data-desk~='closelook'] .vitrine[data-payload='manuscript']:has(.reader[data-lined='true']) .desk-clb-inst .reader-zoom { margin-bottom: 0; }
 #wing[data-desk~='closelook'] .vitrine[data-payload='manuscript']:has(.reader[data-lined='true']) .desk-clb-ways { margin-bottom: 0; }
 

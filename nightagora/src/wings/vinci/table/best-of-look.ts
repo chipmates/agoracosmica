@@ -112,7 +112,8 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
     const record = index ? bestOfSource(page, index)?.record as (ScanRecord & { holder?: string }) | undefined : undefined
     const holder = record?.holder
     if (!holder) return null
-    const short = HOLDER_SHORT[holder] ?? holder.split(',')[0]!.trim()
+    // the holder's name never breaks across two rows of a credit
+    const short = (HOLDER_SHORT[holder] ?? holder.split(',')[0]!.trim()).replace(/ /g, '\u00a0')
     if (page.picture === 'leaf') return key('picture_leaf')?.replace('{holder}', short) ?? null
     const year = /facsimile\b[^.]*?(\d{4}(?:-\d{2})?)/i.exec(record?.honesty_en ?? '')?.[1]
     return year ? key('picture_facsimile')?.replace('{holder}', short).replace('{year}', year) ?? null : null
@@ -120,8 +121,8 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
 
   /** The lead in his words, with whose words they are and whose picture it
    * is; the caption where the page has no lead. At rest on the phone the
-   * lead's credit takes one row, and the caption stands in where the lead is
-   * too long for the peek. */
+   * translation's credit is its short one, the picture's source stands under
+   * every line, and the caption stands in where the lead is too long. */
   function lineOf(page: BestOfPage): { head: string | null; note: string | null; peek: VitrinePeek; label: string | null } {
     const lead = page.lead?.[language]
     const caption = page.caption?.[language] || null
@@ -131,11 +132,12 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
       const said = lead.kind === 'ours' ? key('ai_short') ?? lead.label : lead.rest ?? lead.label
       // the band's source row keeps one row; the phone's raised card has room for the whole credit
       const credit = options.narrow() ? lead.label ?? said : said
-      return { head: quoted(lead.text, language), note: row(credit, picture), peek: { note: lead.rest ?? said ?? '', line: caption },
+      return { head: quoted(lead.text, language), note: row(credit, picture),
+        peek: { note: row(lead.rest ?? said, picture) ?? '', line: caption, source: picture },
         label: lead.label && lead.label !== credit ? lead.label : null }
     }
-    // the caption is the museum's own words: at rest no row stands under it
-    return { head: caption, note: row(picture), peek: { note: '', line: null }, label: null }
+    // the caption is the museum's own words: only the picture's source stands under it
+    return { head: caption, note: row(picture), peek: { note: picture ?? '', line: null, source: picture }, label: null }
   }
   const pictureWord = (page: BestOfPage): string | null =>
     page.picture === 'leaf' ? key('kind_leaf') : page.picture === 'plate' ? key('kind_plate') : page.picture === 'facsimile' ? key('kind_facsimile') : null
@@ -377,7 +379,7 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
   }
 
   const first = pages.find(page => page.id === (options.start ?? LEFT.get(options.slug))) ?? pages[0]
-  const opening = first ? lineOf(first) : { head: null, note: null, peek: { note: '', line: null }, label: null }
+  const opening = first ? lineOf(first) : { head: null, note: null, peek: { note: '', line: null, source: null }, label: null }
   const exhibit: VitrineExhibit = {
     id,
     title: first ? first.name?.[language] ?? first.seat[language] : title,
