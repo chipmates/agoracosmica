@@ -1101,9 +1101,9 @@ function markPanel(): void {
   if (sheet) document.documentElement.dataset['naPanel'] = instrumentsEl.hidden ? 'wing' : 'open'
   else delete document.documentElement.dataset['naPanel']
   if (sheet) return
-  // a wing standing on a narrow stage keeps its rows: its way home and its
+  // a wing standing in the phone's form keeps its rows: its way home and its
   // plan stand only here once the phone's box has replaced the bar
-  if (wingRows.length && phase !== 'wing') { wingRows = []; paintWingRows() }
+  if (wingRows.length && !(phase === 'wing' && document.querySelector('#wing[data-phone-form]'))) { wingRows = []; paintWingRows() }
   for (const name of ['--desk-band-h', '--desk-panel-g'])
     document.documentElement.style.removeProperty(name)
 }
