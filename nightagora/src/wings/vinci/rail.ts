@@ -430,14 +430,23 @@ const RAIL_STAIRS:readonly (readonly [RailWaypoint,RailWaypoint,RailWaypoint])[]
  * landing (the turn seen from above), and on down the stair toward the
  * garden. Headings, west of north, at waypoints along the way and metres
  * past them; the walk leaves on its own view and turns standing from the
- * last heading to the one it arrives in. */
-const RAIL_TERRACE_LOOK:Readonly<Record<string,{keys:readonly (readonly [RailWaypoint,number,number])[];end:number;sign:1|-1}>>={
+ * last heading to the one it arrives in. A key's heading is one for both
+ * framings, or the desktop's then the phone's; a look with no end arrives on
+ * its arriving view's own heading, and a sign of 0 turns the short way. */
+const RAIL_TERRACE_LOOK:Readonly<Record<string,{keys:readonly (readonly [RailWaypoint,number,number,number?])[];end?:number;sign:1|-1|0}>>={
   'chamber>garden':{sign:1,end:176,keys:[[railAccessWaypoints[0]!,0,2],[railAccessWaypoints[3]!,0,4],[railAccessWaypoints[4]!,0,80],
     [railCollectionStairWaypoints[0]!,-.1,85],[railCollectionStairWaypoints[0]!,0,133],[railCollectionStairWaypoints[1]!,0,135],[railCollectionStairWaypoints[2]!,0,174]]},
   // THE WAY IN FROM THE STREET LOOKS THROUGH THE GATE, as the way back out
   // looks up the gallery: held on the street to the gallery's mouth, turned
   // into it there, and down it to the court, where the view turns standing
   'arrival>courtyard':{sign:1,end:123,keys:[[railGateWaypoints[0]!,-1,80],[railGateWaypoints[1]!,0,123],[railGateWaypoints[4]!,0,123]]},
+  // THE OPENER'S DESCENT TURNS RIGHT DOWN THE STAIR TO THE SUPPER ROOM'S DOOR:
+  // the Last Supper stands in it, square on, from the last three metres of
+  // the stair to the apron's corner, and nowhere above them (the room's roof,
+  // its north wall and the parachute hide it). Held there off the stair, it
+  // gives way to the picture room's own view through the entrance.
+  'stair-head>picture-room':{sign:0,keys:[[railCollectionStairWaypoints[1]!,1.5,150,126],[railCollectionStairWaypoints[2]!,-4,112,106],
+    [railCollectionStairWaypoints[2]!,-2.5,112,104],[railCollectionStairWaypoints[3]!,0,112,104]]},
 }
 /** Stretches walked without a stand, never backward. */
 const RAIL_FLIGHTS:readonly (readonly [RailWaypoint,RailWaypoint])[]=[[railAccessWaypoints[1]!,railAccessWaypoints[2]!]]
@@ -729,9 +738,9 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     lookKeys=undefined
     if(terrace){
       const keys=[{m:0,h:angles(camera.quaternion).heading}]
-      for(const [point,past,deg] of terrace.keys){const at=keyTurn(point);if(at<0){keys.length=0;break};keys.push({m:at+past,h:deg*Math.PI/180})}
+      for(const [point,past,deg,phoneDeg] of terrace.keys){const at=keyTurn(point);if(at<0){keys.length=0;break};keys.push({m:at+past,h:(request.phone?phoneDeg??deg:deg)*Math.PI/180})}
       if(keys.length){
-        keys.push({m:path.length,h:terrace.end*Math.PI/180})
+        keys.push({m:path.length,h:terrace.end!==undefined?terrace.end*Math.PI/180:angles(poseQuaternion(request.pose)).heading})
         for(let i=1;i<keys.length;i++){let d=Math.atan2(Math.sin(keys[i]!.h-keys[i-1]!.h),Math.cos(keys[i]!.h-keys[i-1]!.h));if(d*terrace.sign<0)d+=terrace.sign*2*Math.PI;keys[i]!.h=keys[i-1]!.h+d}
         lookKeys=keys
       }

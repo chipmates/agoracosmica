@@ -95,11 +95,12 @@ function valveDesktopPose(pose: WalkPose): WalkPose {
 /** THE HEAD OF THE COLLECTION STAIR, a stride back from its first tread on
  * the top landing: the stair goes down in front, the pavilion's glazing below
  * it, and the court with the display wall and its machines on the right. The
- * phone looks further round, so the display wall stands in its narrow frame.
- * The desktop's bearing is the one the stair is walked down under
- * (`rail.ts`, STAIR_VIEW_HEADING). Bearings are east of north. */
+ * phone looks further round, to the Supper room and the parachute: the walk
+ * down turns right on to the Last Supper's door (`rail.ts`, the descent's
+ * look), and the phone's turn there and back to the picture room stays under
+ * the film's heading line only from here. Bearings are east of north. */
 const STAIR_HEAD_BACK_M = .4, STAIR_HEAD_REACH_M = 20
-const STAIR_HEAD_LOOK = { desktop: { bearing: 210, pitch: -12, fov: 55 }, phone: { bearing: 220, pitch: -16, fov: 80 } }
+const STAIR_HEAD_LOOK = { desktop: { bearing: 210, pitch: -12, fov: 55 }, phone: { bearing: 234, pitch: -16, fov: 80 } }
 function stairHeadPose(narrow: boolean): WalkPose {
   const [east, north, height] = railCollectionStairWaypoints[0]!
   const look = STAIR_HEAD_LOOK[narrow ? 'phone' : 'desktop']

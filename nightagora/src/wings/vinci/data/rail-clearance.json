@@ -636,8 +636,8 @@
   },
   {
    "file": "src/wings/vinci/rail.ts",
-   "sha256": "4834ed53a34e61784d66b731b02e2bc3a4f1895889be0f494c26b0f9b49fef8a",
-   "bytes": 73764,
+   "sha256": "1a12a3fe58a86e8fcdf35337259609796c7406b5fb5a7adee477614d583d17d0",
+   "bytes": 74975,
    "unchangedDuringAudit": true
   },
   {
@@ -726,8 +726,8 @@
   },
   {
    "file": "src/wings/vinci/walk-poses.ts",
-   "sha256": "9280f525fe98ba9ec914b6cf10a6a1ce2127758e3a07286eddffd317cde8d964",
-   "bytes": 7115,
+   "sha256": "6596be9f17da2328351322f7f3474d05495097d14da79c4b6180206d8f1222a4",
+   "bytes": 7207,
    "unchangedDuringAudit": true
   },
   {
@@ -10946,9 +10946,9 @@
      14.1
     ],
     "at": [
-     -33.05774215630842,
+     -36.25354096111566,
      -5.762747116339983,
-     28.827383611133477
+     25.40030896932391
     ],
     "fov": 80
    },
