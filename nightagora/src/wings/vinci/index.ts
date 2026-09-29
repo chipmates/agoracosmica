@@ -793,7 +793,8 @@ export function createWing():VinciWingModule {
     cloudLit.value.setRGB((.71+(glowR-.71)*g)*dark,(.68+(glowG-.68)*g)*dark,(.62+(glowB-.62)*g)*dark)
     cloudShade.value.setRGB((.40+(.62-.40-.2*rose)*g)*dark,(.44+(.42-.44-.12*rose)*g)*dark,(.51+(.48-.51)*g)*dark)
     sky.sunPosition.value.copy(eveningSun).multiplyScalar(450000);sky.turbidity.value=light.turbidity;sky.rayleigh.value=light.rayleigh;sky.mieDirectionalG.value=light.mieFocus;sky.mieCoefficient.value=mieAtRest*light.mieShare
-    stars.sprite.visible=light.depression>1;stars.uDepression.value=light.depression;stars.uLevel.value=1
+    // the night is authored at the print: it divides by the print's opening at the grave, the closing dip left to fade it
+    stars.night.set({depression:light.depression,exposure:1/(exposureOf('grave')*light.exposureGain),sun:eveningSun});stars.sprite.visible=light.depression>1
     aimFarCascade();focusNearCascade(true)
   }
   /** THE PRINT'S OPENING THROUGH THE EVENING: the eye's adaptation to the
@@ -825,6 +826,8 @@ export function createWing():VinciWingModule {
     const c=hosts.world.camera, ahead=c.getWorldDirection(new Vector3()), now=hosts.world.clock(), band=deskBand()
     // the look up starts from the eye as it stands, the stop's own lens unfitted
     farewellRun={pressed:now,from:now+(band>0?BAND_DOWN:0),band,start:{eye:c.position.clone(),at:c.position.clone().addScaledVector(ahead,10),fov:stationPose('grave',narrow()).fov}}
+    // the night's one shooting star keeps the run's clock
+    stars?.night.startAt(farewellRun.from)
     hosts.stage.parentElement!.dataset['farewell']=''
     return true
   }

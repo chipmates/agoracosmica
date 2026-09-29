@@ -1,19 +1,19 @@
 /** THE EVENING'S SKY: the twilight the analytic dome does not carry once the
- * sun is down, and the stars that come out in it.
+ * sun is down, and the night that follows it.
  *
  * The Preetham dome goes dark two degrees under the horizon, so below it the
  * sky is this: the glow over the sunset, rising and fading as the sun sinks;
  * the earth's own shadow in the opposite sky with the band of rose above it;
- * and a zenith deepening from blue to night. Every colour and level here is a
- * scenic assumption (the rig's night rule), not a measured sky.
+ * and a zenith deepening from blue to night. The twilight's colours and levels
+ * are a scenic assumption (the rig's night rule), a type of an October evening.
  *
- * The stars are one instanced field hung at a fixed distance round the eye,
- * each with its own magnitude, which sets the depression of the sun at which
- * it is first seen: the brightest in the civil twilight, the rest as the sky
- * darkens. None is smaller than two pixels, so none shimmers as a grain.
+ * The night is `farewell-night.ts`: the stars are the record, the sky over
+ * Clos Lucé at 21:00 local apparent time on the day, held fixed while the
+ * evening runs, and the Milky Way is drawn after the real one.
  */
-import { AdditiveBlending, Color, InstancedBufferAttribute, PointsNodeMaterial, Sprite, Vector3 } from 'three/webgpu'
-import { clamp, cross, exp, float, instancedBufferAttribute, length, max, mix, normalize, pow, sin, smoothstep, step, uniform, uv, vec2, vec3 } from 'three/tsl'
+import { Color, Vector3, type Object3D } from 'three/webgpu'
+import { cross, exp, float, length, max, mix, normalize, pow, smoothstep, step, uniform, vec3 } from 'three/tsl'
+import { createFarewellNight, type FarewellNight } from './farewell-night'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type N = any
@@ -70,57 +70,10 @@ export function twilightRadiance(ray: N, evening: EveningSky): N {
   return dome.add(glow).add(rose).mul(evening.share)
 }
 
-/** A seeded draw, so the same sky stands at every visit. */
-function seeded(seed: number): () => number {
-  let a = seed >>> 0
-  return () => { a = (a + 0x6d2b79f5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296 }
-}
-
-export interface EveningStars { sprite: Sprite; uDepression: N; uLevel: N; uTime: N }
-/** THE STARS, one field of `count` round the eye at `radius` metres. */
-export function createEveningStars(count = 2600, radius = 620): EveningStars {
-  const rand = seeded(15171010)
-  const pos = new Float32Array(count * 3), col = new Float32Array(count * 3), size = new Float32Array(count), seen = new Float32Array(count * 2)
-  const tints = [new Color('#dfe7ff'), new Color('#f4f6ff'), new Color('#fff2dc'), new Color('#ffdcb4'), new Color('#cfdcff')]
-  for (let i = 0; i < count; i++) {
-    // a uniform sky, a little below the horizon too, which the ground hides
-    const y = -.08 + rand() * 1.08, th = rand() * Math.PI * 2, r = Math.sqrt(Math.max(0, 1 - y * y))
-    pos[i * 3] = Math.cos(th) * r * radius; pos[i * 3 + 1] = y * radius; pos[i * 3 + 2] = Math.sin(th) * r * radius
-    // magnitudes weighted to the faint, as the sky's own count is
-    const magnitude = -1.2 + 6.8 * Math.pow(rand(), .42)
-    const tint = tints[Math.floor(rand() * tints.length)]!
-    const bright = Math.min(1, Math.pow(10, -.4 * (magnitude - 1)) * .9 + .12)
-    col[i * 3] = tint.r * bright; col[i * 3 + 1] = tint.g * bright; col[i * 3 + 2] = tint.b * bright
-    size[i] = 2 + Math.max(0, 4.6 - magnitude) * .48
-    // the depression at which it is first seen, and a phase for its scintillation
-    seen[i * 2] = 2.2 + 2.1 * (magnitude + 1.2)
-    seen[i * 2 + 1] = rand() * Math.PI * 2
-  }
-  const uDepression: N = uniform(0), uLevel: N = uniform(0), uTime: N = uniform(0)
-  const mat = new PointsNodeMaterial({ transparent: true, depthWrite: false, blending: AdditiveBlending })
-  const posN: N = instancedBufferAttribute(new InstancedBufferAttribute(pos, 3))
-  const sizeN: N = instancedBufferAttribute(new InstancedBufferAttribute(size, 1))
-  const colN: N = instancedBufferAttribute(new InstancedBufferAttribute(col, 3))
-  const seenN: N = instancedBufferAttribute(new InstancedBufferAttribute(seen, 2))
-  mat.positionNode = posN
-  mat.sizeAttenuation = false
-  mat.sizeNode = sizeN
-  mat.fog = false
-  const dir = normalize(posN)
-  // more air toward the horizon: less light, and gone under three degrees
-  const air = smoothstep(.05, .5, dir.y).mul(.75).add(.25).mul(smoothstep(.02, .09, dir.y))
-  const out = smoothstep(seenN.x.sub(1.6), seenN.x.add(1.6), uDepression)
-  // the small ones scintillate a little; the bright ones burn steady
-  const scint = smoothstep(float(3.2), float(2), sizeN)
-  const twinkle = float(1).sub(sin(uTime.mul(2.3).add(seenN.y.mul(7))).mul(.5).add(.5).mul(scint.mul(.28)))
-  const kernel = smoothstep(.5, .06, length(uv().sub(vec2(.5, .5))))
-  mat.colorNode = colN
-  mat.opacityNode = clamp(kernel.mul(out).mul(air).mul(twinkle).mul(uLevel), 0, 1)
-  const sprite = new Sprite(mat)
-  sprite.count = count
-  sprite.frustumCulled = false
-  sprite.renderOrder = -1
-  sprite.visible = false
-  sprite.name = 'vinci/evening-stars'
-  return { sprite, uDepression, uLevel, uTime }
+export interface EveningStars { sprite: Object3D; uDepression: N; uLevel: N; uTime: N; night: FarewellNight }
+/** THE NIGHT, mounted where the stars always hung: its group rides with the
+ * eye, and the evening alone sets it. */
+export function createEveningStars(): EveningStars {
+  const night = createFarewellNight()
+  return { sprite: night.group, uDepression: night.uDepression, uLevel: night.uLevel, uTime: night.uTime, night }
 }
