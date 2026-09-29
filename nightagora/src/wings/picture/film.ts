@@ -644,6 +644,12 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
       // a node this release does not carry is not a place the film can stand
       return here
     }
+    // ONE EYE, TWO COMPOSITIONS: a stop asked for at its own work's eye stands by the dissolve
+    if (plan.type === 'open' && node !== here && release.nodes[node]?.kind === 'stop' && release.nodes[node]?.stills[f]) {
+      await dissolveTo(node)
+      set({ kind: 'rest', node: here }, 'rest')
+      return here
+    }
     if (plan.type === 'here' || plan.type === 'open') return here
     if (plan.type === 'dip') {
       if (!release.nodes[node]?.stills[f]) return here

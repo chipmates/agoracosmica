@@ -928,7 +928,7 @@ export function createWing():VinciWingModule {
       words:{next:LIFE_CARDS.controls.date.next,back:LIFE_CARDS.controls.date.previous,rail:WING_TEXT.rail},
       go:index=>h.navigate(index),
       // the way back goes up one level first: the phone's way back reads the same
-      up:upOneLevel,
+      up:upOneLevel,upward,
       leg:()=>{const nav=standing?rail.navigation:undefined;return nav?.active?nav.legWalked:null},
 
       // desk.panel: its host fields
@@ -2375,19 +2375,36 @@ export function createWing():VinciWingModule {
       if(Math.abs(dx)>48&&Math.abs(dx)>Math.abs(dy)*1.5)phoneLook()?.step(dx<0?1:-1)
     },{signal})
   }
-  /** ON THE PHONE A WORK BETWEEN TWO STOPS OF A WALL BELONGS TO THE STOP BEFORE
-   * IT along the wall, so the words, gold and the way back keep the story's
-   * order while the hang is stepped; the desk keeps the room's first stop. */
-  function storyStopOnWall(place:string,vertex:number|undefined,fallback:number):number {
-    const wall=phoneMount&&vertex!==undefined?vinciWallOfStation(place):undefined
-    if(!wall||vertex===undefined)return fallback
-    let best=fallback,bestVertex=-1
-    WALK.stops.forEach((stop,index)=>{
-      if(stop.place||!sameWall(stop.station,place))return
-      const at=walkVertex(stop)??vinciWallEndVertex(wall,stop.station)
-      if(at!==undefined&&at<=vertex&&at>bestVertex){best=index;bestVertex=at}
-    })
+  /** Where a stop of the walk stands on a wall's own line: a station at its
+   * end, a stop of the wall at its work. A stop at a place of its own stands
+   * on no line, as the film's graph reads it. */
+  function lineVertex(stop:VinciWalkStop,wall:VinciWall):number|undefined {
+    if(stop.place)return undefined
+    if(stop.wall)return stop.wall===wall.id&&stop.exhibit?vinciWallVertex(wall,stop.exhibit):undefined
+    return vinciWallEndVertex(wall,stop.station)
+  }
+  /** THE STORY STOP A PLACE ON A WALL BELONGS TO: the nearest stop on the
+   * wall's own line at or behind it, in the direction the story reads that
+   * wall, so the way back never walks ahead of the story. -1 off every line. */
+  function storyStopAt(wall:VinciWall,vertex:number):number {
+    const on=WALK.stops.flatMap((stop,index)=>{const at=lineVertex(stop,wall);return at===undefined?[]:[{index,at}]})
+    if(!on.length)return -1
+    const rising=on[0]!.at<=on[on.length-1]!.at
+    let best=on[0]!.index,bestAt:number|undefined
+    for(const {index,at} of on){
+      if(rising?at>vertex:at<vertex)continue
+      if(bestAt===undefined||(rising?at>bestAt:at<bestAt)){best=index;bestAt=at}
+    }
     return best
+  }
+  /** A WORK BETWEEN TWO STOPS OF A WALL BELONGS TO THE STOP BEFORE IT along
+   * the wall, so the words, gold and the way back keep the story's order
+   * while the hang is stepped. A stop at a place of its own keeps its card. */
+  function storyStopOnWall(place:string,vertex:number|undefined,fallback:number):number {
+    const wall=vertex!==undefined?vinciWallOfStation(place):undefined
+    if(!wall||vertex===undefined||WALK.stops[fallback]?.place)return fallback
+    const at=storyStopAt(wall,vertex)
+    return at>=0?at:fallback
   }
   /** THE SET A CLOSE LOOK BELONGS TO, walked on the phone as the desk's band
    * walks it: the work before in the book's seat, the work after in gold. */
@@ -2411,19 +2428,61 @@ export function createWing():VinciWingModule {
     if(standing&&walkUnderWay()){hosts?.navigate(station-1);return true}
     return standing&&toStationView()
   }
-  /** BACK AT A WORK IS ONE LEVEL UP: out of the work to the view the visitor
-   * arrived in at this stop, walked back along the wall's own line. */
+  /** BACK AT A WORK IS ONE LEVEL UP: out of the work to the view of the
+   * nearest story stop at or behind it, walked back along the wall's own
+   * line, and that stop stands as if the way on had arrived there. */
   function toStationView():boolean {
-    const wall=wallOn(), stop=stopAt(card)
-    if(!wall||!onWallStop()||!railReady()||activeView)return false
-    const place=railPlaceOf(stop), vertex=walkVertex(stop)??vinciWallEndVertex(wall,place)
-    if(vertex===undefined||vertex===wallAt())return false
+    const wall=wallOn(), at=wallAt()
+    if(!wall||at===undefined||!onWallStop()||!railReady()||activeView)return false
+    const index=storyStopAt(wall,at)
+    if(index<0)return false
+    const stop=stopAt(index), place=railPlaceOf(stop), vertex=walkVertex(stop)??vinciWallEndVertex(wall,place)
+    if(vertex===undefined)return false
+    // ONE EYE, TWO COMPOSITIONS: at the stop's own work the eye stays and the stop's view stands
+    if(vertex===at){
+      if(!rail.navigation.exhibit||rail.navigation.active)return false
+      yieldEye();station=index
+      rail.set(place,vinciWalkPose(stop,narrow()),true,narrow(),vertex)
+      return true
+    }
     yieldEye()
-    return proved(()=>rail.along(vertex,place,vinciWalkPose(stop,narrow())))
+    const walked=proved(()=>rail.along(vertex,place,vinciWalkPose(stop,narrow())))
+    if(walked)station=index
+    return walked
+  }
+  /** Standing at a stop's own view on a wall, not at a work of it. */
+  function atStopView():boolean {
+    const wall=wallOn(), at=wallAt()
+    if(!wall||at===undefined||rail.navigation.exhibit)return false
+    const index=storyStopAt(wall,at)
+    return index>=0&&lineVertex(stopAt(index),wall)===at
+  }
+  /** THE WAY BACK GOES UP A LEVEL HERE, not to the stop before: a close look
+   * stands, a walk is under way, or the eye stands at a work of a wall. */
+  const upward=():boolean=>standing&&(Boolean(closeLook?.id)||walkUnderWay()||onWallStop()&&!atStopView())
+  /** THE CLOSE LOOK OF THE WORK A STOP OF ITS OWN FRAMES ALONE, where that
+   * work hangs on a wall: back and close go up to the wall's own view, where
+   * the other works stand in the frame again (the story stop on the wall's
+   * line at or behind the work). Null for every other look. */
+  function wallAbove(id:string):(()=>void)|null {
+    const stop=WALK.stops[card]
+    const wall=stop?.place&&stop.opens===id?vinciWallOfExhibit(id):undefined
+    const vertex=wall?vinciWallVertex(wall,id):undefined
+    const index=wall&&vertex!==undefined?storyStopAt(wall,vertex):-1
+    if(index<0||index===card)return null
+    // shut without the history's own step back: that pop would land on this
+    // stop's address after the walk had left it, and reopen the stop
+    return ()=>{
+      if(!railReady()||activeView||!hosts){closeLook?.close();return}
+      quietly(()=>closeLook?.close(false))
+      hosts.navigate(index)
+    }
   }
   /** Off the wall at the nearer of the room's two ends, which is where a walk
-   * that leaves the wall begins. */
+   * that leaves the wall begins. Never from a stop's own view: that would
+   * walk ahead of the story. */
   function leaveWall():void {
+    if(atStopView())return
     const at=wallAt(), wall=wallOn()
     if(at===undefined||!wall||vinciWallOfStation(hereContent().id)&&!onWallStop())return
     const end=vinciWallNearerEnd(wall,at)
@@ -2783,11 +2842,12 @@ export function createWing():VinciWingModule {
       toFilm.setAttribute('aria-label',text(VINCI_VITRINE_WORDS.back))
       toFilm.addEventListener('click',back)
     }
+    const above=wallAbove(id)
     closeLook.open({id:door,title:named(opened),line:vinciLine(id),card:[],payload:reader,
-      controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())],
-      ...(toFilm?{walk:[toFilm]}:{}),...vinciLimits(id),...exhibitStand(id),
+      controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),control(VINCI_VITRINE_WORDS.close,above??(()=>closeLook?.close()))],
+      ...(toFilm?{walk:[toFilm]}:{}),...vinciLimits(id),...exhibitStand(id),...(above?{shut:above}:{}),
       // from a film's sheet one level up is the film, named as it is
-      ...(back?{up:back,upLabel:named(opened)}:{})},from,how)
+      ...(back?{up:back,upLabel:named(opened)}:above?{up:above}:{})},from,how)
   }
   /** A SHEET WHOSE FILM THE STORE CARRIES OPENS AS THAT FILM: the model the
    * sheet describes, its lines under it, and the sheet itself behind its own
@@ -2806,9 +2866,10 @@ export function createWing():VinciWingModule {
     }
     // the station's own row walks on from the film as from any work in it
     const walk=[stepControl('\u2039',exhibitStep(id,-1)),stepControl('\u203a',exhibitStep(id,1))]
+    const above=wallAbove(id)
     closeLook.open({id,title,line:vinciLine(id),card:[],payload,
-      controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())],
-      walk,...exhibitStand(id),certainty:show.certainty},from,how)
+      controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),control(VINCI_VITRINE_WORDS.close,above??(()=>closeLook?.close()))],
+      walk,...exhibitStand(id),certainty:show.certainty,...(above?{up:above,shut:above}:{})},from,how)
     return true
   }
   /** THE VITRINE, for every kind this wing can open: the line at its head,
@@ -3550,6 +3611,8 @@ export function createWing():VinciWingModule {
       const here=arriving?nav.active:nav.completed
       const vertex=arriving?nav.wallTo:nav.wall
       const arrived=here?storyStopOnWall(here,vertex,walkIndexAt(here,vertex)):-1
+      // A STEP ALONG A WALL ASKS FOR NO STOP: the stop it stands in is the one the next press counts from
+      if(arrived>=0&&arrived!==card&&!activeView&&nav.wallId!==undefined&&(nav.exhibit??nav.approaching)!==undefined)station=arrived
       if(arrived>=0&&arrived!==card&&!activeView){card=arrived;dock.scrollTop=0;paintHeader();paintDock();paintQuestion();standHere()}
       if(nav.completed&&nav.completed!==exposureAt)exposureAt=nav.completed
       const byRoom=activeView?null:roomPrint(nav,hosts.world.camera.position)

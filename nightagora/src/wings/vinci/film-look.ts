@@ -53,6 +53,9 @@ export interface FilmLookHost {
   standing(): boolean
   openRecord(id: string, title: VinciText, certainty: VinciCertainty, render: (host: HTMLElement) => void): void
   onClose(): void
+  /** THE WAY UP OUT OF A LOOK the stop frames alone, where that work hangs on
+      a wall: back and close both go to the wall's story stop. Null elsewhere. */
+  above?(id: string): (() => void) | null
   /** the release's filmed cycle of a machine, where it carries one, and its folder */
   cycle(id: string): { cycle: FilmCycle; base: string } | null
   /** where a filmed cycle stands: over the held canvas, under every word */
@@ -92,7 +95,7 @@ export function createFilmLook(h: FilmLookHost) {
     if (role) button.dataset['role'] = role
     return button
   }
-  const shut = (): HTMLButtonElement => control(VINCI_VITRINE_WORDS.close, () => closeLook.close(), 'close')
+  const shut = (up: (() => void) | null = null): HTMLButtonElement => control(VINCI_VITRINE_WORDS.close, up ?? (() => closeLook.close()), 'close')
   /** where a work stands in the hang, the row's own count */
   function hangPlace(id: string): { at: number; of: number } | null {
     const workId = id.split('/')[1]
@@ -236,9 +239,11 @@ export function createFilmLook(h: FilmLookHost) {
       sheet: sheet ? { src: Promise.resolve(assetAddress(sheet.thumb)), label: title, open: () => openSheet(show) } : undefined })
     film = { id: show.id, payload }
     const record = (): void => h.openRecord(show.id, { en: title, de: title }, show.certainty, host => renderVinciShowpieceRecord(show, sheet?.page ?? null, host))
+    const up = h.above?.(show.id) ?? null
     h.standDown(true)
     closeLook.open({ id: show.id, title, line: vinciLine(show.id), card: [], payload,
-      controls: [control(VINCI_VITRINE_WORDS.provenance, record, 'record'), shut()], set: null, certainty: show.certainty }, from, how)
+      controls: [control(VINCI_VITRINE_WORDS.provenance, record, 'record'), shut(up)], set: null, certainty: show.certainty,
+      ...(up ? { up, shut: up } : {}) }, from, how)
   }
   /** THE SHEET ITSELF, in the reader where the visitor stands; Back stands the film up again */
   function openSheet(show: VinciShowpiece): void {
@@ -262,9 +267,10 @@ export function createFilmLook(h: FilmLookHost) {
     back.dataset['role'] = 'back'
     back.setAttribute('aria-label', text(VINCI_VITRINE_WORDS.back))
     back.addEventListener('click', () => openShowpiece(show, null, 'advance'))
+    const up = h.above?.(show.id) ?? null
     closeLook.open({ id: door, title: sheet.title, line: vinciLine(show.id), card: [], payload: reader,
-      controls: [control(VINCI_VITRINE_WORDS.provenance, record, 'record'), shut()], walk: [back],
-      set: null, certainty: 'documented' }, null, 'advance')
+      controls: [control(VINCI_VITRINE_WORDS.provenance, record, 'record'), shut(up)], walk: [back],
+      set: null, certainty: 'documented', ...(up ? { up, shut: up } : {}) }, null, 'advance')
   }
   /** A PRESSED MARK FETCHES ITS FILM'S FIRST FRAME while the walk runs, so the
       still stands the moment the look opens */
@@ -318,7 +324,7 @@ export function createFilmLook(h: FilmLookHost) {
     get surface() { return closeLook.surface },
     open,
     warm,
-    close: () => closeLook.close(),
+    close: (pop = true) => closeLook.close(pop),
     key: (event: KeyboardEvent): boolean => closeLook.key(event),
     layout: () => closeLook.layout(),
     update: (dt: number) => closeLook.update(dt),

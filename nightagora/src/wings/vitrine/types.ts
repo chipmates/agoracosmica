@@ -106,6 +106,9 @@ export interface VitrineExhibit {
   up?: () => void
   /** The name of the close look `up` returns to, in the page's language. */
   upLabel?: string
+  /** THE SHUT MARK'S OWN WAY, where shutting this exhibit leads somewhere of
+   * its own. Absent, the mark only shuts the window. */
+  shut?: () => void
   /** What the evidence does not say, and what the view invents or refuses
    * to show. Read behind the record's control; empty until a text seat
    * writes them. */

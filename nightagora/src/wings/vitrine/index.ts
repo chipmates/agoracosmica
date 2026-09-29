@@ -518,7 +518,7 @@ export function createVitrine(options: {
     back?.focus({ preventScroll: true })
   }
   const leaving = new AbortController()
-  shutMark.addEventListener('click', () => shut())
+  shutMark.addEventListener('click', () => { if (exhibit?.shut) exhibit.shut(); else shut() })
   grab.addEventListener('click', () => setRaised(!raised))
   // what a card opens at its peek opens on the raised card, never in a peek's few lines
   body.addEventListener('click', event => {

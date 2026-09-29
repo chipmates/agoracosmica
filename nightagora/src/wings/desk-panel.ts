@@ -37,6 +37,8 @@ export interface DeskPanelHost {
   standing: () => { index: number; count: number }
   /** null at the end of the walk, which is where the way on leads up */
   next: () => unknown
+  /** true where the way back goes up a level, so it is no way out */
+  upward?: () => boolean
 }
 
 const ARROW_ON = 'M3 8h10M9 4l4 4-4 4'
@@ -89,7 +91,7 @@ export function createDeskPanel(host: DeskPanelHost): void {
      brings us here never answers our own hand. */
   function ways(): void {
     const at = host.standing()
-    const first = at.index === 0
+    const first = at.index === 0 && !host.upward?.()
     const end = host.next() === null
     if (out.hidden === first) out.hidden = !first
     if (first) {
@@ -114,8 +116,9 @@ export function createDeskPanel(host: DeskPanelHost): void {
   function leave(): void {
     host.wing.querySelector<HTMLElement>('.wing-lobby')?.click()
   }
+  // the wing's own step up, taken by the chrome's listener before this one, keeps the visitor in
   host.back.addEventListener('click', () => {
-    if (host.standing().index === 0) leave()
+    if (host.standing().index === 0 && !host.upward?.()) leave()
   }, { signal })
   /** An ending the wing answers for itself; unanswered, the walk goes home. */
   function endWith(ending: 'lookup' | 'talk'): boolean {

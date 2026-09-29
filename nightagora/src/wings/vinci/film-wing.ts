@@ -184,6 +184,66 @@ export function createWing(): WingModule {
     const s = picture?.state()
     return !s ? stopNode(LIFE[card]!.id) : s.kind === 'rest' ? s.node : s.kind === 'dip' ? s.to : s.from
   }
+  /** THE STORY STOP A PLACE ON A WALL BELONGS TO, as the live wing reads it:
+      the nearest stop on the wall's own line at or behind the vertex, in the
+      direction the story reads that wall, so back never walks ahead of it */
+  function storyStopAt(wall: string, vertex: number): number | null {
+    const on = LIFE.flatMap((s, i) => {
+      const n = release?.nodes[stopNode(s.id)]
+      return n?.kind === 'stop' && n.wall === wall && n.vertex !== undefined ? [{ i, at: n.vertex }] : []
+    })
+    if (!on.length) return null
+    const rising = on[0]!.at <= on[on.length - 1]!.at
+    let best = on[0]!.i, bestAt: number | undefined
+    for (const { i, at } of on) {
+      if (rising ? at > vertex : at < vertex) continue
+      if (bestAt === undefined || (rising ? at > bestAt : at < bestAt)) { best = i; bestAt = at }
+    }
+    return best
+  }
+  /** the story stop a work of a wall belongs to, or null for any other node */
+  const wallStop = (node: PictureNode): number | null => {
+    const n = release?.nodes[node]
+    return n?.kind === 'view' && n.wall && n.vertex !== undefined ? storyStopAt(n.wall, n.vertex) : null
+  }
+  /** a way up started and not yet arrived, so the first stop's way out stays shut */
+  let goingUp = false
+  /** THE WAY BACK AT A WORK OF A WALL IS ONE LEVEL UP: to the story stop the
+      work belongs to, by the clip that runs back along the wall, or at the
+      stop's own work by the dissolve from one composition to the other */
+  const upward = (): boolean => goingUp || (picture?.state().kind === 'rest' && wallStop(here()) !== null)
+  function up(): boolean {
+    if (!picture || picture.state().kind !== 'rest') return false
+    const to = wallStop(here())
+    if (to === null || !carried(to)) return false
+    goingUp = true
+    asked = to
+    void picture.go(stopNode(LIFE[to]!.id)).finally(() => { goingUp = false; paintDesk(); paintPhone() })
+    return true
+  }
+  /** A CLOSE LOOK SHUT BY THE VISITOR at a work of a wall goes up to its
+      story stop, as the live wing's does */
+  function outOfLook(): void {
+    if (picture?.state().kind === 'rest') up()
+  }
+  /** THE LOOK OF THE WORK A STOP FRAMES ALONE, where that work hangs on a
+      wall: back and close go to the wall's story stop, shut without the
+      history's own step back, whose pop would land on this stop's address
+      after the walk had left it and reopen the stop */
+  function wallAbove(id: string): (() => void) | null {
+    const at = here(), own = release?.opens.find(([a]) => a === at)?.[1]
+    const view = own ? release?.nodes[own] : undefined
+    if (release?.nodes[at]?.kind !== 'stop' || own !== viewNode(id) || !view?.wall || view.vertex === undefined) return null
+    const to = storyStopAt(view.wall, view.vertex)
+    if (to === null || !carried(to) || stopNode(LIFE[to]!.id) === at) return null
+    return () => {
+      lookLeaving = true
+      try { look?.close(false) } finally { lookLeaving = false }
+      hosts?.navigate(to)
+    }
+  }
+  /** a close look shut because the walk goes on elsewhere, not by the visitor */
+  let lookLeaving = false
 
   /* ---- the picture's box ---- */
   /** the phone's picture is sized once, to the large viewport */
@@ -377,7 +437,7 @@ export function createWing(): WingModule {
         station: () => stationOf(LIFE[card]!.station).id,
         stack: h.world.stack, scene: h.world.scene, camera: h.world.camera,
         standDown, veil: hidden => { picture?.veil(hidden); veiled = hidden; wordsAt = '' }, standing, openRecord,
-        onClose: () => { marksAt = '' },
+        onClose: () => { marksAt = ''; if (!lookLeaving) outOfLook() }, above: wallAbove,
         cycle: id => { const cycle = release?.cycles?.[id]; return cycle ? { cycle, base: filmReleaseBase() } : null },
         cycleLayer: () => cycleLayer!,
         box, framing: () => (wide ? 'wide' : 'upright') })
@@ -562,7 +622,7 @@ export function createWing(): WingModule {
     h.stage.append(root)
     more.addEventListener('click', () => setDrawer(!drawerOpen))
     from.addEventListener('click', () => { paintSources(null); sources?.select('station'); sources?.setOpen(true) })
-    back.addEventListener('click', () => { const to = backIndex(); if (to !== null) h.navigate(to) })
+    back.addEventListener('click', () => { if (up()) return; const to = backIndex(); if (to !== null) h.navigate(to) })
     book.addEventListener('click', () => document.getElementById('rail-instruments')?.click())
     talk.addEventListener('click', () => { endWith('talk') })
     gold.addEventListener('click', () => pressOn())
@@ -615,7 +675,7 @@ export function createWing(): WingModule {
     phone.from.textContent = text(deskControl('machine', 'provenance'))
     phone.count.textContent = `${String(card + 1).padStart(2, '0')} / ${LIFE.length}`
     const back = backIndex()
-    phone.back.disabled = back === null
+    phone.back.disabled = back === null && !upward()
     phone.back.setAttribute('aria-label', text(CARDS.controls.date.previous))
     phone.book.setAttribute('aria-label', document.getElementById('rail-instruments')?.getAttribute('aria-label') || text(deskControl('ways', 'chapters')))
     paintGold()
@@ -664,7 +724,7 @@ export function createWing(): WingModule {
   function paintDesk(): void {
     desk?.paint()
     const back = hosts?.stage.querySelector<HTMLButtonElement>('.desk-back')
-    if (back && backIndex() === null && card > 0) back.disabled = true
+    if (back && backIndex() === null && card > 0 && !upward()) back.disabled = true
     /* A REPAINT IN MID-LEG writes the way on's resting words; the band rewrites
        its walking words only on the edge of a walk, so the edge is given back */
     const on = hosts?.stage.querySelector<HTMLElement>('.desk-on')
@@ -819,8 +879,11 @@ export function createWing(): WingModule {
     picture.on('state', state => { paintDip(state); if (state.kind === 'rest') marksAt = '' })
     picture.on('rest', state => {
       if (state.kind !== 'rest') return
-      const at = LIFE.findIndex(s => stopNode(s.id) === state.node)
+      // a work of a wall belongs to the story stop before it along the wall
+      const atStop = LIFE.findIndex(s => stopNode(s.id) === state.node)
+      const at = atStop >= 0 ? atStop : wallStop(state.node) ?? -1
       if (at >= 0 && at !== card) { card = at; paint() }
+      else { paintDesk(); paintPhone() }
       if (at >= 0) asked = at
       stood.add(LIFE[card]!.id)
       paintGold()
@@ -838,6 +901,7 @@ export function createWing(): WingModule {
       question: () => text(stationOf(LIFE[card]!.station).door),
       words: { next: CARDS.controls.date.next, back: CARDS.controls.date.previous, rail: WING_TEXT.rail },
       go: index => { if (carried(index)) h.navigate(index) },
+      up, upward,
       // a wait is not a walk: the words and the way on stand until the clip can play through
       leg: () => { const s = picture?.state(); return s?.kind === 'walk' ? s.share : null },
       hurry: () => picture?.hurry(),
@@ -879,10 +943,12 @@ export function createWing(): WingModule {
       if (look?.id) return
       if (e.key === 'Escape' && desk?.key(e)) { e.preventDefault(); return }
       if (e.key === 'Escape' && drawerOpen) { e.preventDefault(); setDrawer(false); return }
+      // Escape at a work of a wall is the way up, as the live wing's
+      if (e.key === 'Escape' && up()) { e.preventDefault(); return }
       if (desk?.key(e)) { e.preventDefault(); return }
       if (!desk && (e.key === ' ' || e.key === 'Spacebar') && !target.closest('button,a')) { e.preventDefault(); pressOn(); return }
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); pressOn() }
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); const to = backIndex(); if (to !== null) h.navigate(to) }
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); if (up()) return; const to = backIndex(); if (to !== null) h.navigate(to) }
     }, { signal })
     // the grave's talk choice opens the library's door, as in the live wing
     addEventListener('na-wing-ending', e => {
@@ -923,7 +989,8 @@ export function createWing(): WingModule {
         return
       }
       if (!picture || !carried(index)) return
-      look?.close()
+      lookLeaving = true
+      try { look?.close() } finally { lookLeaving = false }
       if (drawerOpen) setDrawer(false)
       // ONLY THE NEXT AND THE PREVIOUS STOP ARE WALKED: a press on the plan
       // or on a far stop fades there, as the live wing's does

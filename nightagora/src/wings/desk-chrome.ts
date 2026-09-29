@@ -70,6 +70,9 @@ export interface DeskChromeHost {
   go: (index: number) => void
   /** one level up before the stop before: true when the wing took the step */
   up?: () => boolean
+  /** true where the way back goes up a level rather than to the stop before,
+      so the first stop's way back is not the way out while it does */
+  upward?: () => boolean
   /** how much of the leg under way is walked, 0 to 1, or null at rest */
   leg: () => number | null
   /** a second press on the gold control while a leg runs */
@@ -528,10 +531,19 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
       onTitle.hidden = !to
       on.setAttribute('aria-label', `${onKicker.textContent}${to ? ` · ${onTitle.textContent}` : ''}`)
       on.disabled = !to
-      back.setAttribute('aria-label', say(host.words.back))
-      back.disabled = at.index === 0
+      paintBack()
     }
     measure()
+  }
+
+  /** the way back's own state, painted again when going up starts or stops */
+  let upPainted: boolean | null = null
+  function paintBack(): void {
+    upPainted = host.upward?.() ?? false
+    back.setAttribute('aria-label', say(host.words.back))
+    back.disabled = host.standing().index === 0 && !upPainted
+    // the band's attribute is what the panel's observer reads the change by
+    band.dataset['up'] = String(upPainted)
   }
 
   /** the thread against the walk: where the visitor stands, where he has
@@ -636,6 +648,7 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
   let walked = -1
   function update(): void {
     if (!ways) return
+    if ((host.upward?.() ?? false) !== upPainted) paintBack()
     const share = host.leg()
     const running = share !== null
     if (on.dataset['leg'] !== String(running)) {
@@ -692,6 +705,7 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
       arrow: onArrow,
       standing: host.standing,
       next: host.next,
+      ...(host.upward ? { upward: host.upward } : {}),
     })
   }
 
