@@ -102,7 +102,7 @@ import { vinciWallById, vinciWallEndVertex, vinciWallIsEnd, vinciWallOrderOf, VI
 import { pathSpecifications } from './paths'
 import { roadGradeProvenance } from './road-grade'
 import { apronProvenance } from './apron'
-import { vinciContent, vinciPlanRooms, vinciThroughLine, vinciLifeBands, vinciLifePeople, vinciLifeSecondLine, vinciLifeCut, vinciLifeWorksRow, vinciLifeWorksCount, vinciLifeWorksEmpty, vinciLifeCertaintyCounted, vinciLifeHourMark, vinciLifeFloorCount, vinciHourValues, vinciWelcomeText, vinciLegacyStationIds, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, vinciAbsences, vinciGrounds, vinciRightsPolicy, vinciWingCounts, vinciSourcesHeadings, type VinciCertainty, type VinciStatement, type VinciStationContent, type VinciStationId, type VinciText } from './content'
+import { vinciContent, vinciPlanRooms, vinciThroughLine, vinciLifeBands, vinciLifePeople, vinciLifeSecondLine, vinciLifeCut, vinciLifeWorksRow, vinciLifeWorksCount, vinciLifeWorksEmpty, vinciLifeCertaintyCounted, vinciLifeHourMark, vinciLifeFloorCount, vinciHourValues, vinciWelcomeText, vinciLegacyStationIds, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciEveningSky, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, vinciAbsences, vinciGrounds, vinciRightsPolicy, vinciWingCounts, vinciSourcesHeadings, type VinciCertainty, type VinciStatement, type VinciStationContent, type VinciStationId, type VinciText } from './content'
 import wingCss from './wing.css?inline'
 // the phone's box wears the film player's own classes, so both phones look alike
 import filmWingCss from './film-wing.css?inline'
@@ -3311,6 +3311,7 @@ export function createWing():VinciWingModule {
     appendSourceStatement(panel,vinciCollectionThreshold,full)
     appendSourceStatement(panel,vinciHourLabel,full)
     appendSourceStatement(panel,vinciHourIntegrity,full)
+    appendSourceStatement(panel,vinciEveningSky,full)
     panel.append(make('h3','',text(vinciSourcesHeadings.grounds)))
     for(const ground of vinciGrounds)panel.append(make('p','vinci-statement',text(ground)))
     panel.append(make('h3','',text(vinciSourcesHeadings.policy)),make('p','vinci-statement',text(vinciRightsPolicy)))

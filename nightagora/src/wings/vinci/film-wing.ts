@@ -8,7 +8,7 @@
 import { setRegister, type WingHosts, type WingModule, type WingStation } from '../frame'
 import { lang, WING_TEXT } from '../content'
 import { LOBBY_TEXT } from '../../content/lobby'
-import { vinciAbsences, vinciCertaintyWords, vinciCollectionThreshold, vinciContent, vinciGrounds, vinciHourArithmetic, vinciHourIntegrity, vinciHourLabel,
+import { vinciAbsences, vinciCertaintyWords, vinciCollectionThreshold, vinciContent, vinciEveningSky, vinciGrounds, vinciHourArithmetic, vinciHourIntegrity, vinciHourLabel,
   vinciReconstruction, vinciRightsPolicy, vinciRoomStationIds, vinciSourcesHeadings, vinciWingCounts,
   type VinciCertainty, type VinciStatement, type VinciStationId, type VinciText } from './content'
 import { vinciStory } from './story'
@@ -558,7 +558,7 @@ export function createWing(): WingModule {
     wing.textContent = ''
     const full = make('div', 'vinci-record')
     setRegister(full, 'record')
-    for (const label of [vinciReconstruction, vinciCollectionThreshold, vinciHourLabel, vinciHourIntegrity]) statement(wing, label, full)
+    for (const label of [vinciReconstruction, vinciCollectionThreshold, vinciHourLabel, vinciHourIntegrity, vinciEveningSky]) statement(wing, label, full)
     wing.append(make('h3', '', text(vinciSourcesHeadings.grounds)))
     for (const ground of vinciGrounds) wing.append(make('p', 'vinci-statement', text(ground)))
     wing.append(make('h3', '', text(vinciSourcesHeadings.policy)), make('p', 'vinci-statement', text(vinciRightsPolicy)))
