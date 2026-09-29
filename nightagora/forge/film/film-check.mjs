@@ -193,6 +193,18 @@ export function writeStandIn(store, tree) {
     }))
     release.clips.push({ clip: c.clip, framing: c.framing, keys: keysOf(c, tree), frames: c.frames, seconds: c.seconds, files, sidecar })
   }
+  // THE GRAVE'S LOOK UP: its first frame the grave's still, its last the dark before the lobby
+  for (const v of tree.evenings?.values() ?? []) {
+    const stem = stillStem(v.evening)
+    const files = Object.fromEntries(tree.delivery.settings.rungs[v.framing].map((rung) => [rung, put(v.framing, stem, rung, 'mp4', `${v.evening} ${v.framing} ${rung}`)]))
+    const sidecar = `sidecars/${v.framing}/${stem}.json`
+    store.write(sidecar, JSON.stringify({
+      format: SIDECAR_FORMAT, evening: v.evening, framing: v.framing, renderer: STAND_IN, keys: keysOf(v, tree), frames: v.frames, fps: v.fps,
+      joins: { first: raw.get(`${v.from} ${v.framing}`), last: sha256(`the dark before the lobby ${v.framing}`) }, track: { maxDeviation: 0 }, projectionThrows: 0,
+      requestsAfterClock: 0, starvedSteps: 0, pageErrors: 0, pendingAtRest: 0, paintedOverCanvas: 0, letGo: true,
+    }))
+    ;(release.evenings ??= []).push({ evening: v.evening, framing: v.framing, keys: keysOf(v, tree), frames: v.frames, fps: v.fps, seconds: v.seconds, files, sidecar })
+  }
   // one sampled line per release: ten joins, three engines, colour included
   const sample = [...tree.clips.values()].filter((c, i) => i % Math.max(1, Math.floor(tree.clips.size / SAMPLED_JOINS)) === 0).slice(0, SAMPLED_JOINS)
   release.sampledJoins = sample.map((c) => ({ clip: c.clip, framing: c.framing, end: 'last', statistic: SAMPLED_STATISTIC, engines: Object.fromEntries(ENGINES.map((e) => [e, { maxDelta: 0, colour: true }])) }))
@@ -216,7 +228,7 @@ export function checkRelease(store, tree, { calm = null, motion = null } = {}) {
   const red = (l, at, why) => l.red.push({ at, why })
   const text = store.read('release.json')
   const L = {
-    graph: line('graph', 'every edge and node of the graph has its clip or still in the release, both framings'),
+    graph: line('graph', "every edge and node of the graph has its clip or still in the release, both framings, and the grave's look up its evening"),
     keys: line('keys', 'all four keys match: motion, picture, global, delivery'),
     files: line('files', 'every rung of every clip and still is on disk at its content address'),
     joins: line('joins', `frame 0 and the last frame equal the two stills' raw masters; between two sessions within ${JOIN_TOLERANCE} of 255`),
@@ -238,9 +250,11 @@ export function checkRelease(store, tree, { calm = null, motion = null } = {}) {
   const release = JSON.parse(text.toString('utf8'))
   if (release.format !== RELEASE_FORMAT) red(L.graph, 'release', `release format ${release.format}, the gate reads ${RELEASE_FORMAT}`)
   const read = (file) => { const b = store.read(file); return b ? JSON.parse(b.toString('utf8')) : null }
-  const held = new Map([...release.clips.map((e) => [`${e.clip} ${e.framing}`, { ...e, kind: 'clip' }]), ...release.stills.map((e) => [`${e.node} ${e.framing}`, { ...e, kind: 'still' }])])
-  const want = new Map([...[...tree.clips].map(([k, v]) => [k, { ...v, kind: 'clip' }]), ...[...tree.stills].map(([k, v]) => [k, { ...v, kind: 'still' }])])
-  for (const at of want.keys()) if (!held.has(at)) red(L.graph, at, `missing (new in the graph)`)
+  const held = new Map([...release.clips.map((e) => [`${e.clip} ${e.framing}`, { ...e, kind: 'clip' }]), ...release.stills.map((e) => [`${e.node} ${e.framing}`, { ...e, kind: 'still' }]),
+    ...(release.evenings ?? []).map((e) => [`${e.evening} ${e.framing}`, { ...e, kind: 'evening' }])])
+  const want = new Map([...[...tree.clips].map(([k, v]) => [k, { ...v, kind: 'clip' }]), ...[...tree.stills].map(([k, v]) => [k, { ...v, kind: 'still' }]),
+    ...[...(tree.evenings ?? [])].map(([k, v]) => [k, { ...v, kind: 'evening' }])])
+  for (const [at, now] of want) if (!held.has(at)) red(L.graph, at, now.kind === 'evening' ? "missing: the grave's look up goes straight to the lobby" : 'missing (new in the graph)')
   const orphans = [...held.keys()].filter((at) => !want.has(at))
   if (orphans.length) L.graph.notes.push(`${orphans.length} orphaned (dropped from the graph; kept until the owner deletes them): ${orphans.slice(0, 4).join(', ')}`)
   const sidecars = new Map()
@@ -257,7 +271,7 @@ export function checkRelease(store, tree, { calm = null, motion = null } = {}) {
     else if (Object.keys(current).some((k) => sidecar.keys?.[k] !== entry.keys?.[k])) moved.push('sidecar disagrees with the release')
     if (moved.length) L.keys.red.push({ at, why: moved.join(', '), moved })
     // FILES
-    const rungs = now.kind === 'clip' ? tree.delivery.settings.rungs[now.framing] : stillRungs(tree, now.framing)
+    const rungs = now.kind === 'still' ? stillRungs(tree, now.framing) : tree.delivery.settings.rungs[now.framing]
     const exemptRates = []
     for (const rung of rungs) {
       const f = entry.files?.[rung]
@@ -267,9 +281,9 @@ export function checkRelease(store, tree, { calm = null, motion = null } = {}) {
       else {
         const digest = sha256(bytes)
         if (digest !== f.sha256 || !f.file.includes(`.${digest.slice(0, 16)}.`) || bytes.length !== f.bytes) red(L.files, at, `${rung}: bytes are not the ones addressed`)
-        else if (now.kind === 'clip' && BYTE_LINES[rung]) {
+        else if (now.kind !== 'still' && BYTE_LINES[rung]) {
           const kbits = bytes.length * 8 / 1000 / Math.max(now.seconds, 1 / FPS)
-          const cap = lineOf(rung, now.clip)
+          const cap = lineOf(rung, now.clip ?? now.evening)
           if (!cap) exemptRates.push(`${rung} ${kbits.toFixed(0)}`)
           else if (kbits > cap) red(L.bytes, at, `${rung}: ${kbits.toFixed(0)} kbit/s over ${cap}`)
         }
@@ -280,6 +294,20 @@ export function checkRelease(store, tree, { calm = null, motion = null } = {}) {
     if (now.kind === 'still') {
       if (now.histories.prints > 1 || now.histories.exposures > 1) red(L.law3, at, `${now.histories.prints} prints, ${now.histories.exposures} exposures`)
       for (const k of ['pendingAtRest', 'pageErrors', 'paintedOverCanvas']) if (sidecar[k] !== 0) red(L.hygiene, at, `${k} ${sidecar[k]}`)
+      continue
+    }
+    if (now.kind === 'evening') {
+      /* THE EVENING opens on the grave's still, is the farewell's own track,
+         and is let go without the lobby; its drawn set may change on the
+         rise and its end is the dark, so neither is held to a still */
+      const from = sidecars.get(`${now.from} ${now.framing}`) ?? read(held.get(`${now.from} ${now.framing}`)?.sidecar ?? '')
+      const verdict = joinVerdict({ end: sidecar.joins?.first, still: from?.raw, clipSession: entry.session, stillSession: held.get(`${now.from} ${now.framing}`)?.session, gap: entry.joinGaps?.first })
+      if (!verdict.holds) red(L.joins, at, `frame 0 is not the still of ${now.from}: ${verdict.why}`)
+      else if (verdict.between) drift.push(verdict.between)
+      if (!(sidecar.track && sidecar.track.maxDeviation <= TRACK_TOLERANCE)) red(L.track, at, `the browser track is ${sidecar.track?.maxDeviation} off the farewell's path`)
+      if (sidecar.projectionThrows !== 0) red(L.track, at, `assertRailProjection threw ${sidecar.projectionThrows} times`)
+      for (const k of ['requestsAfterClock', 'starvedSteps', 'pageErrors', 'pendingAtRest', 'paintedOverCanvas']) if (sidecar[k] !== 0) red(L.hygiene, at, `${k} ${sidecar[k]}`)
+      if (sidecar.letGo !== true) red(L.hygiene, at, 'the evening was not let go after its last frame')
       continue
     }
     // JOINS

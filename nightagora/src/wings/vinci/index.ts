@@ -856,9 +856,10 @@ export function createWing():VinciWingModule {
     applyEvening(null)
   }
   /** A LOOK TEST OF THE FAREWELL, under the export only: the evening at a
-   * share, from the farewell's own path or from a pose that scouts one. */
+   * share, from the farewell's own path or from a pose that scouts one; null
+   * lets the evening go, a look up the film recorded included, without the lobby. */
   if(FILM_EXPORT)(window as Window&{__naFarewell?:unknown}).__naFarewell=(p:{share:number,eye?:number[],at?:number[],fov?:number}|null)=>{
-    if(!p){farewellHeld=null;applyEvening(null);return null}
+    if(!p){farewellHeld=null;farewellRun=null;if(hosts)delete hosts.stage.parentElement!.dataset['farewell'];applyEvening(null);return null}
     farewellHeld=p.eye&&p.at?{eye:world(p.eye[0]!,p.eye[1]!,p.eye[2]!),at:world(p.at[0]!,p.at[1]!,p.at[2]!),fov:p.fov??60}
       :farewellPose(p.share,stationPose('grave',narrow()),narrow())
     const e=farewellHeld.eye, d=farewellHeld.at.clone().sub(e).normalize(), ground=groundHeight(e.x,-e.z)

@@ -20,6 +20,7 @@ import { WING_DIR, createLoader } from './load.mjs'
 import { canonicalPrint, openReplay, replayEdge, trackKey } from './replay.mjs'
 import { mountWorld } from './scene.mjs'
 import { buildIndex, seenSet } from './seen.mjs'
+import { eveningTrack } from './evening.mjs'
 
 export const KEYS_FORMAT = 'vinci-film-keys-v1'
 const sha256 = (text) => createHash('sha256').update(text).digest('hex')
@@ -150,6 +151,18 @@ export function globalKey(loader, { library = [], claimed = new Set() } = {}) {
   return { key: short(JSON.stringify(Object.entries(parts).sort())), parts }
 }
 
+/** THE EVENING'S OWN LIGHT, which no global input names: the farewell's
+    modules and the index's functions that run it and meter its print. */
+const EVENING_FILES = [`${WING_DIR}/farewell.ts`, `${WING_DIR}/farewell-sky.ts`]
+const EVENING_DECLARATIONS = ['applyEvening', 'farewellExposure', 'farewellDip', 'holdFarewell', 'lookUp', 'runFarewell', 'endFarewell', 'cloudLit', 'cloudShade']
+export function eveningCode(loader) {
+  const parts = {}
+  for (const entry of EVENING_FILES) for (const file of closure(loader, entry, 'src/')) parts[file] = short(loader.text(file))
+  const held = declarations(declaringText(loader), EVENING_DECLARATIONS)
+  for (const [name, node] of held) parts[`${INDEX_FILE}#${name}`] = short(node.getText())
+  return short(JSON.stringify(Object.entries(parts).sort()))
+}
+
 export const deliveryKey = (delivery = DELIVERY) => short(JSON.stringify(delivery))
 /** A CLIP'S DELIVERY KEY: a clip exempt from its byte line names the
     exemption, every other clip carries the delivery's own key, unchanged. */
@@ -235,8 +248,26 @@ export async function treeKeys({ rev = '', overlay = {}, library, delivery = DEL
       histories: { prints: r.prints.size, exposures: r.exposures.size },
     })
   }
+  /* THE GRAVE'S LOOK UP: its track, the cells it can show, the grave's
+     exposure it opens on and the evening's own light */
+  const evenings = new Map()
+  if (graph.evening) {
+    const code = eveningCode(loader)
+    for (const framing of Object.keys(FRAMINGS)) {
+      const t = eveningTrack(replay.wing, graph, framing)
+      const cells = seen(graph.evening.id, framing, t.samples, world)
+      const at = stills.get(`${graph.evening.from} ${framing}`)
+      const station = graph.nodes.find((n) => n.id === graph.evening.from)?.station
+      const ex = at?.exposure ?? exposure.of(station)
+      evenings.set(`${graph.evening.id} ${framing}`, {
+        evening: graph.evening.id, from: graph.evening.from, framing, frames: graph.evening.frames, fps: graph.evening.fps, seconds: graph.evening.seconds,
+        delivery: clipDeliveryKey(graph.evening.id, delivery), motion: t.key, picture: pictureKey(cells, world.cells.hashes, [ex, `evening ${code}`]),
+        exposure: [ex, ex], stations: at?.stations ?? [station], first: canonicalPrint(t.prints[0]), seen: cells.length, cells,
+      })
+    }
+  }
   return {
-    format: KEYS_FORMAT, revision: replay.wing.loader.revision, graph, clips, stills,
+    format: KEYS_FORMAT, revision: replay.wing.loader.revision, graph, clips, stills, evenings,
     global, delivery: { key: deliveryKey(delivery), settings: delivery }, exposure, world,
     seconds: (Date.now() - t0) / 1000,
   }

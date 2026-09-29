@@ -1,6 +1,7 @@
 // THE WHOLE FILM AS ONE RESUMABLE JOB (render graph W7): every still, every clip
-// and every machine's filmed cycle of the graph, in both framings, in the life's
-// order from the entrance, so a film rendered in part is walkable from its start.
+// and every machine's filmed cycle of the graph, and the grave's look up, in both
+// framings, in the life's order from the entrance, so a film rendered in part is
+// walkable from its start.
 //
 //   node forge/film/render-all.mjs --job=<dir> --plan         write the job list (job.json); nothing rendered
 //   node forge/film/render-all.mjs --job=<dir>                render what the ledger does not hold (start and resume)
@@ -36,9 +37,10 @@ import sharp from 'sharp'
 import { APP_ROOT, assertServer, browserArgs, FRAME_TIME_FLAGS, headHere, waitForServer } from '../rig.mjs'
 import { FPS, FRAMINGS, buildGraph } from './graph.mjs'
 import { openReplay, replayEdge } from './replay.mjs'
+import { eveningTrack } from './evening.mjs'
 import { openSink } from './sink.mjs'
 import {
-  EXPORT_FORMAT, RUNGS, STILL_RUNG, X264, assertBuildFresh, cellNumbers, clipSidecar, exportClip, exportStill,
+  EXPORT_FORMAT, RUNGS, STILL_RUNG, X264, assertBuildFresh, cellNumbers, clipSidecar, eveningSidecar, exportClip, exportEvening, exportStill,
   inboxOf, openSession, recipeOf, silentWalk, stillSidecar,
 } from './export.mjs'
 
@@ -63,9 +65,10 @@ const YIELD_EVERY_MS = 10 * 60 * 1000
 const YIELD_FOR_MS = LOCK_POLL_MS + 2000
 
 /** THE PILOT: two legs of different weight both ways (the leg into the hall to
-    flight, and the garden's first), one machine's cycle, and every still */
+    flight, and the timeline's walk out to the Supper wall), one machine's
+    cycle, and every still */
 export const PILOT = {
-  clips: ['stop:picture-room-west>stop:flight', 'stop:flight>stop:picture-room-west', 'stop:garden>stop:line-early', 'stop:line-early>stop:garden'],
+  clips: ['stop:picture-room-west>stop:flight', 'stop:flight>stop:picture-room-west', 'stop:line-early>stop:supper-wall', 'stop:supper-wall>stop:line-early'],
   cycles: ['aerial-screw'],
   stills: 'all',
 }
@@ -81,6 +84,7 @@ const stemOf = (node) => node.replace(/[:/]/g, (c) => (c === ':' ? '-' : '.'))
 export const stillId = (node, framing) => `still ${node} ${framing}`
 export const clipId = (edge, framing) => `clip ${edge} ${framing}`
 export const cycleId = (slug, framing) => `cycle machine/${slug} ${framing}`
+export const eveningEntryId = (evening, framing) => `evening ${evening} ${framing}`
 
 /** the moving machines, their periods and their stations: the dossiers and the graph's views */
 export function machinesOf(graph, readDossier) {
@@ -95,11 +99,13 @@ export function machinesOf(graph, readDossier) {
 }
 
 /**
- * THE JOB'S ORDER, the life's own from the entrance. First the spine: each
- * stop's still and the leg that reaches it, both ways, both framings; then
- * every view's still, room by room, so every press is answered; then room by
- * room in the life's order the walls' runs and steps, the machines' approaches
- * and links, and their cycles. Both framings of one piece stand side by side.
+ * THE JOB'S ORDER, the life's own from the entrance. First the spine: the
+ * walk's start and its descent into the first stop, each stop's still and the
+ * leg that reaches it, both ways, both framings, and after the last stop's
+ * still the evening its way on plays; then every view's still, room by room,
+ * so every press is answered; then room by room in the life's order the
+ * walls' runs and steps, the machines' approaches and links, and their
+ * cycles. Both framings of one piece stand side by side.
  */
 export function orderEntries(graph, machines, { framings = Object.keys(FRAMINGS) } = {}) {
   const nodes = new Map(graph.nodes.map((n) => [n.id, n]))
@@ -119,9 +125,17 @@ export function orderEntries(graph, machines, { framings = Object.keys(FRAMINGS)
     }
   }
   const cycle = (m, phase) => { for (const f of framings) push({ id: cycleId(m.slug, f), kind: 'cycle', framing: f, slug: m.slug, station: m.station, period: m.period, phase, frames: Math.round(m.period * FPS), areas: [m.station, m.view, `machine/${m.slug}`] }) }
-  // 1 THE SPINE
+  const ev = graph.evening
+  const evening = (phase) => { for (const f of framings) push({ id: eveningEntryId(ev.id, f), kind: 'evening', framing: f, evening: ev.id, from: ev.from, phase, frames: ev.frames, fps: ev.fps, seconds: ev.seconds, areas: [nodes.get(ev.from).station, ev.from, ev.id] }) }
+  // 1 THE SPINE, from the walk's start above the first stop where the graph has one
+  if (graph.start) {
+    still(graph.start, 'spine')
+    const descent = graph.edges.find((e) => e.from === graph.start && e.to === graph.story[0])
+    if (descent) { still(graph.story[0], 'spine'); clip(descent, 'spine') }
+  }
   graph.story.forEach((stop, i) => {
     still(stop, 'spine')
+    if (ev && stop === ev.from) evening('spine')
     const prev = graph.story[i - 1]
     if (!prev || cut(prev, stop)) return
     // into the house the leg ends at the door's way in, out of it it begins at
@@ -149,6 +163,7 @@ export function orderEntries(graph, machines, { framings = Object.keys(FRAMINGS)
   }
   for (const e of graph.edges) clip(e, 'rooms')
   for (const m of machines) cycle(m, 'rooms')
+  if (ev) evening('rooms')
   return entries.map((e, order) => ({ ...e, order }))
 }
 
@@ -166,8 +181,8 @@ export function areaEntries(entries, names) {
 export function resumeWalks(todo, graph, framing) {
   const ids = new Set(todo.filter((x) => x.kind === 'clip' && x.framing === framing).map((x) => x.edge))
   for (const x of todo) {
-    if (x.kind !== 'still' || x.framing !== framing) continue
-    const leaving = graph.edges.find((e) => e.from === x.node)
+    if ((x.kind !== 'still' && x.kind !== 'evening') || x.framing !== framing) continue
+    const leaving = graph.edges.find((e) => e.from === (x.kind === 'evening' ? x.from : x.node))
     if (leaving) ids.add(leaving.id)
   }
   return graph.edges.filter((e) => ids.has(e.id))
@@ -279,7 +294,7 @@ function distDigest() {
   return existsSync(index) ? sha256(readFileSync(index)) : null
 }
 /** the files that turn a scene into frames, beside the build: a commit elsewhere leaves a job running */
-const RENDERER = ['forge/film/export.mjs', 'forge/film/cycle.mjs', 'forge/film/sink.mjs', 'forge/film/graph.mjs', 'forge/film/replay.mjs',
+const RENDERER = ['forge/film/export.mjs', 'forge/film/cycle.mjs', 'forge/film/sink.mjs', 'forge/film/graph.mjs', 'forge/film/replay.mjs', 'forge/film/evening.mjs',
   'forge/film/load.mjs', 'forge/rig.mjs', 'forge/prerender/clock.mjs', 'forge/prerender/pending.mjs']
 /** WHAT A JOB IS RENDERED FROM: the build (every source of the app is in it) and the renderer's own files */
 export function sourceKey() {
@@ -312,6 +327,8 @@ async function planJob(dir, log) {
     const k = e.kind === 'clip' ? tree.clips.get(`${e.edge} ${e.framing}`) : e.kind === 'still' ? tree.stills.get(`${e.node} ${e.framing}`) : null
     // a clip exempt from its byte line carries its own delivery key
     if (k) e.keys = { motion: k.motion, picture: k.picture, ...(k.delivery ? { delivery: k.delivery } : {}) }
+    const ek = e.kind === 'evening' ? tree.evenings?.get(`${e.evening} ${e.framing}`) : null
+    if (ek) e.keys = { motion: ek.motion, picture: ek.picture, delivery: ek.delivery }
     if (e.kind === 'cycle') {
       const files = [...new Set([...closure(loader, `src/wings/vinci/machines/${e.slug}.ts`, 'src/'), `src/wings/vinci/machines/data/${e.slug}.json`, ...island])].sort()
       e.keys = { motion: null, picture: sha256(files.map((f) => `${f} ${sha256(loader.text(f))}`).join('\n')).slice(0, 32) }
@@ -319,7 +336,7 @@ async function planJob(dir, log) {
   }
   const job = {
     format: JOB_FORMAT, created: stamp(), head: headHere(), source: sourceKey().key, build: distDigest(), fps: FPS, pace: 'walk',
-    certificate: graph.certificate.sha256, story: graph.story, cuts: graph.cuts,
+    certificate: graph.certificate.sha256, story: graph.story, cuts: graph.cuts, ...(graph.start ? { start: graph.start } : {}), ...(graph.evening ? { evening: graph.evening } : {}),
     keys: { format: tree.format, global: tree.global.key, delivery: tree.delivery.key },
     recipe: recipeOf({ mount: 'held' }), x264: X264, rungs: RUNGS, stillRung: STILL_RUNG,
     machines, counts: countsOf(entries), entries,
@@ -379,6 +396,9 @@ function writeRecord(dir, job, records) {
     } else if (e.kind === 'cycle') {
       const c = (cycles[`machine/${e.slug}`] ??= { period: r.period, fps: FPS, frames: r.cycleFrames, framings: {} })
       c.framings[e.framing] = r.framing
+    } else if (e.kind === 'evening') {
+      ;(release.evenings ??= []).push({ evening: e.evening, framing: e.framing, keys, frames: r.frames, fps: r.fps, seconds: r.seconds, files: r.files, sidecar: r.sidecar, session: r.session, ...(r.joinGaps ? { joinGaps: r.joinGaps } : {}) })
+      ;(summary.evenings ??= []).push({ evening: e.evening, from: e.from, framing: e.framing, stem: r.stem, frames: r.frames, fps: r.fps, seconds: r.seconds, files: r.files, joins: r.joins, joinsAgree: r.joinsAgree, mountedSetChanges: r.mountedSetChanges })
     }
   }
   // the pack's sampled joins (`sampled-joins.mjs`), kept while the files they decoded are the release's
@@ -424,8 +444,8 @@ export function statusOf(job, records, { now = Date.now() } = {}) {
   const joins = []
   for (const e of job.entries) {
     const r = done.get(e.id)
-    if (e.kind !== 'clip' || !r) continue
-    const a = stillRaw.get(`${e.from} ${e.framing}`), b = stillRaw.get(`${e.to} ${e.framing}`)
+    if ((e.kind !== 'clip' && e.kind !== 'evening') || !r) continue
+    const a = stillRaw.get(`${e.from} ${e.framing}`), b = e.kind === 'evening' ? r.joins.last : stillRaw.get(`${e.to} ${e.framing}`)
     joins.push({ id: e.id, first: a ? r.joins.first === a : null, last: b ? r.joins.last === b : null, gaps: r.joinGaps ?? null, frames: r.frames, graph: e.frames, session: r.session, stillSessions: [done.get(stillId(e.from, e.framing))?.session, done.get(stillId(e.to, e.framing))?.session] })
   }
   if (joins.length) {
@@ -579,7 +599,7 @@ async function run(flags) {
     // a smoke run stands only at the nodes its own entries touch
     const mode = String(flags.get('walk') ?? 'job')
     const warm = mode === 'run'
-      ? [...new Set(todo.filter((x) => x.framing === framing).flatMap((x) => (x.kind === 'clip' ? [x.from, x.to] : x.kind === 'still' ? [x.node] : [])))].map((id) => nodes.get(id))
+      ? [...new Set(todo.filter((x) => x.framing === framing).flatMap((x) => (x.kind === 'clip' ? [x.from, x.to] : x.kind === 'still' ? [x.node] : x.kind === 'evening' ? [x.from] : [])))].map((id) => nodes.get(id))
       : graph.nodes
     const s = await openSession(browser, framing, { base: BASE, scale: 1, sink, warmNodes: warm, log, view: null })
     lock.release()
@@ -658,7 +678,9 @@ async function run(flags) {
         r0 = Date.now()
         record = e.kind === 'still'
           ? await renderStill(e, fs, { dir, nodes, inbox, job, opts: opts(fs.opened.held) })
-          : await renderClip(e, fs, { dir, nodes, edges, inbox, job, replay, graph, records, opts: opts(fs.opened.held) })
+          : e.kind === 'evening'
+            ? await renderEvening(e, fs, { dir, inbox, job, replay, graph, records, opts: opts(fs.opened.held) })
+            : await renderClip(e, fs, { dir, nodes, edges, inbox, job, replay, graph, records, opts: opts(fs.opened.held) })
         r1 = Date.now()
         lock.release()
       }
@@ -733,6 +755,31 @@ async function renderClip(e, fs, { dir, nodes, edges, inbox, job, replay, graph,
     renderer: `chromium ${fs.version} webgpu, tier max`,
     kbits: Object.fromEntries(Object.entries(files).map(([rung, f]) => [rung, Math.round((f.bytes * 8) / 1000 / (r.frames / FPS))])),
     written: [...Object.values(files), seen, written(dir, join(dir, sidecarRel))],
+  }
+}
+
+/** THE GRAVE'S LOOK UP, one framing: the grave's still, the evening at its own rate, the dip; its rungs, its sidecar, its first frame against the grave's still */
+async function renderEvening(e, fs, { dir, inbox, job, replay, graph, records, opts }) {
+  if (!graph.evening || graph.evening.id !== e.evening) throw new Error(`${e.id}: the tree carries no such evening`)
+  const track = eveningTrack(replay.wing, graph, e.framing)
+  const r = await exportEvening(fs.s, inbox, graph, track, dir, opts)
+  if (!r.files) return { status: 'refused', refused: r.refused }
+  const keys = keysOf(e, job) ?? { motion: r.track.key, picture: null, global: null, delivery: null }
+  const sidecarRel = `sidecars/${e.framing}/${r.stem}.json`
+  writeAtomic(join(dir, sidecarRel), JSON.stringify(eveningSidecar(r, { version: fs.version, recipe: job.recipe, keys, head: job.head }), null, 1))
+  const files = Object.fromEntries(Object.entries(r.files).map(([rung, f]) => [rung, { file: relative(dir, f.file).split('\\').join('/'), bytes: f.bytes, sha256: f.sha256 }]))
+  const a = records.get(stillId(e.from, e.framing))
+  const joinsAgree = { first: a?.status === 'done' ? r.joins.first === a.raw : null }
+  const first = join(opts.frameDir, `${r.stem}-${e.framing}-f0000.png`)
+  const joinGaps = joinsAgree.first === false && a?.master?.file ? { first: { ...await joinGap(first, join(dir, a.master.file)), still: a.raw } } : null
+  return {
+    status: r.refused?.length ? 'refused' : 'done', ...(r.refused?.length ? { refused: r.refused } : {}),
+    stem: r.stem, frames: r.frames, fps: r.fps, seconds: r.seconds, files, joins: r.joins, joinsAgree, ...(joinGaps ? { joinGaps } : {}), track: r.track,
+    draws: r.draws, over: r.over, exportSeconds: r.exportSeconds, requestsAfterClock: r.requestsAfterClock, starvedSteps: r.starvedSteps, pageErrors: r.pageErrors,
+    pendingAtRest: r.pendingAtRest, mountedSetChanges: r.mountedSetChanges, letGo: r.letGo, sidecar: sidecarRel,
+    renderer: `chromium ${fs.version} webgpu, tier max`,
+    kbits: Object.fromEntries(Object.entries(files).map(([rung, f]) => [rung, Math.round((f.bytes * 8) / 1000 / r.seconds)])),
+    written: [...Object.values(files), written(dir, join(dir, sidecarRel))],
   }
 }
 

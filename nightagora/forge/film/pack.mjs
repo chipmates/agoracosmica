@@ -55,6 +55,7 @@ const stemOf = (node) => node.replace(/[:/]/g, (c) => (c === ':' ? '-' : '.'))
 const runs = EXPORTS.map((dir) => ({ dir, summary: JSON.parse(readFileSync(join(dir, 'export.json'), 'utf8')) }))
 const summary = { head: runs.at(-1).summary.head, heads: runs.map((r) => r.summary.head),
   clips: runs.flatMap((r) => r.summary.clips.map((c) => ({ ...c, dir: r.dir }))),
+  evenings: runs.flatMap((r) => (r.summary.evenings ?? []).map((c) => ({ ...c, dir: r.dir }))),
   stills: runs.flatMap((r) => r.summary.stills.map((s) => ({ ...s, dir: r.dir }))) }
 const marks = { nodes: {}, prints: {} }
 const emptyReadings = []
@@ -80,6 +81,29 @@ rmSync(OUT, { recursive: true, force: true })
 mkdirSync(OUT, { recursive: true })
 const rel = (file) => relative(OUT, file).split('\\').join('/')
 
+/** A CLIP'S RUNGS IN PLACE under the release, linked where the export's stream
+    says its transfer; one whose stream does not is tagged here by a stream
+    copy: the pixels are the export's, only the header changes */
+function placeClip(filesOf, dir, framing, label) {
+  const files = {}
+  for (const [rung, f] of Object.entries(filesOf)) {
+    const from = f.file.startsWith('/') ? f.file : join(dir, f.file)
+    mkdirSync(join(OUT, 'clips', framing, rung), { recursive: true })
+    let to = join(OUT, 'clips', framing, rung, basename(from))
+    if (tagged(from)) {
+      try { linkSync(from, to) } catch { copyFileSync(from, to) }
+    } else {
+      const part = to.replace(/\.[0-9a-f]{16}\.mp4$/, '.part.mp4')
+      execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', from, '-c', 'copy', '-bsf:v', SRGB_VUI, '-movflags', '+faststart', part])
+      to = part.replace(/\.part\.mp4$/, `.${sha(readFileSync(part)).slice(0, 16)}.mp4`)
+      renameSync(part, to)
+      retagged.push(`${label} ${rung}`)
+    }
+    files[rung] = { file: rel(to), bytes: statSync(to).size }
+  }
+  return files
+}
+
 /* ---- the clips and their tracks ---- */
 const edges = new Map()
 const refusals = []
@@ -95,24 +119,7 @@ for (const clip of summary.clips) {
   writeFileSync(trackFile, JSON.stringify(prints))
   firstPrint.set(`${meta.from} ${clip.framing}`, prints[0])
   lastPrint.set(`${meta.to} ${clip.framing}`, prints[prints.length - 1])
-  const files = {}
-  for (const [rung, f] of Object.entries(clip.files)) {
-    const from = f.file.startsWith('/') ? f.file : join(clip.dir, f.file)
-    mkdirSync(join(OUT, 'clips', clip.framing, rung), { recursive: true })
-    let to = join(OUT, 'clips', clip.framing, rung, basename(from))
-    if (tagged(from)) {
-      try { linkSync(from, to) } catch { copyFileSync(from, to) }
-    } else {
-      /* A CLIP WHOSE STREAM DOES NOT SAY ITS TRANSFER is tagged here by a stream
-         copy: the pixels are the export's, only the header changes */
-      const part = to.replace(/\.[0-9a-f]{16}\.mp4$/, '.part.mp4')
-      execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', from, '-c', 'copy', '-bsf:v', SRGB_VUI, '-movflags', '+faststart', part])
-      to = part.replace(/\.part\.mp4$/, `.${sha(readFileSync(part)).slice(0, 16)}.mp4`)
-      renameSync(part, to)
-      retagged.push(`${clip.clip} ${clip.framing} ${rung}`)
-    }
-    files[rung] = { file: rel(to), bytes: statSync(to).size }
-  }
+  const files = placeClip(clip.files, clip.dir, clip.framing, `${clip.clip} ${clip.framing}`)
   const walk = clip.frames / FPS
   const e = edges.get(clip.clip) ?? { id: clip.clip, from: meta.from, to: meta.to, kinds: meta.kinds, passes: meta.passes ?? [], framings: {} }
   e.framings[clip.framing] = {
@@ -134,6 +141,17 @@ if (WHOLE) {
     edges.set(meta.id, e)
     answered.push(`${meta.id} ${framing}`)
   }
+}
+
+/* ---- the grave's look up, where the export rendered it: the evening the
+   last stop's way on plays, at its own rate, before the lobby ---- */
+let evening = null
+for (const x of summary.evenings) {
+  if (!x.files || !graph.evening || x.evening !== graph.evening.id) continue
+  evening ??= { id: graph.evening.id, from: graph.evening.from, fps: graph.evening.fps, seconds: graph.evening.seconds, framings: {} }
+  // one picture a framing: the first run that rendered it stands, as a node's still does
+  if (evening.framings[x.framing]) continue
+  evening.framings[x.framing] = { frames: x.frames, files: placeClip(x.files, x.dir, x.framing, `${x.evening} ${x.framing}`) }
 }
 
 /* ---- the machines' filmed cycles, where a job recorded them ---- */
@@ -233,6 +251,7 @@ const release = {
   nodes,
   edges: [...edges.values()].map((e) => ({ ...e, framings: Object.fromEntries(Object.entries(e.framings).map(([f, x]) => [f, { seconds: x.seconds, frames: x.frames, files: x.files, track: x.track }])) })),
   ...(Object.keys(cycles).length ? { cycles } : {}),
+  ...(evening ? { evening } : {}),
 }
 writeFileSync(join(OUT, 'film.json'), JSON.stringify(release))
 writeFileSync(join(OUT, 'pack.json'), JSON.stringify({
@@ -242,7 +261,7 @@ writeFileSync(join(OUT, 'pack.json'), JSON.stringify({
   stills: stillRecords,
 }, null, 1))
 const kB = (n) => Math.round(n / 1024)
-console.log(`the release: ${Object.keys(nodes).length} nodes, ${edges.size} clips (${refusals.length} refused, ${retagged.length} rung files tagged sRGB here${WHOLE ? `, ${answered.length} edge framings answered by their stills` : ''}), ${stillRecords.length} stills (${kB(stillRecords.reduce((s, r) => s + r.bytes, 0))} kB)${Object.keys(cycles).length ? `, cycles ${Object.keys(cycles).join(', ')}` : ''}`)
+console.log(`the release: ${Object.keys(nodes).length} nodes, ${edges.size} clips (${refusals.length} refused, ${retagged.length} rung files tagged sRGB here${WHOLE ? `, ${answered.length} edge framings answered by their stills` : ''}), ${stillRecords.length} stills (${kB(stillRecords.reduce((s, r) => s + r.bytes, 0))} kB)${Object.keys(cycles).length ? `, cycles ${Object.keys(cycles).join(', ')}` : ''}${evening ? `, the look up in ${Object.keys(evening.framings).join(' and ')}` : graph.evening ? ', NO LOOK UP (the grave\'s way on goes to the lobby)' : ''}`)
 for (const p of projection) if (!p.same) console.log(`  PROJECTION ${p.node} ${p.framing}: still ${p.still} · marks ${p.marks}`)
 for (const s of showpieceMarks) console.log(`  ${s.nodes.length ? 'showpiece' : 'SHOWPIECE WITHOUT A MARK'} ${s.id} ${s.framing}${s.nodes.length ? `: marked at ${s.nodes.join(', ')}` : ': no node carries its mark, so the film wing cannot open it'}`)
 console.log(`  ${join(OUT, 'film.json')}`)

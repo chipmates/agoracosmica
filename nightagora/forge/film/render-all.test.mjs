@@ -32,16 +32,17 @@ test('every clip, still and cycle of the graph stands in the job once, in both f
   assert.equal(machines.length, 14, 'fourteen machines move; the parachute stands')
   assert.ok(!machines.some((m) => m.slug === 'parachute'))
   assert.equal(entries.filter((e) => e.kind === 'cycle').length, 28)
-  assert.equal(entries.length, 2 * (graph.edges.length + graph.nodes.length + machines.length))
+  assert.equal(entries.length, 2 * (graph.edges.length + graph.nodes.length + machines.length + (graph.evening ? 1 : 0)))
   const c = countsOf(entries)
   assert.equal(c['cycle wide'].frames, 318 * 30)
 })
 
 test('the spine comes first: a film rendered in part is walkable from the entrance', () => {
   const spine = entries.filter((e) => e.phase === 'spine')
-  // every stop of the life, the house door's two poses and every leg of the life, before anything else
+  // the walk's start, every stop of the life, the house door's two poses, every leg of the life
+  // (the descent from the start among them) and the grave's look up, before anything else
   const doorPoses = graph.nodes.filter((n) => n.kind === 'door').length
-  assert.equal(spine.length, 2 * (graph.story.length + doorPoses + graph.edges.filter((e) => e.kinds.includes('LEG')).length))
+  assert.equal(spine.length, 2 * (graph.story.length + doorPoses + (graph.start ? 1 : 0) + graph.edges.filter((e) => e.kinds.includes('LEG')).length + (graph.evening ? 1 : 0)))
   assert.ok(entries.slice(0, spine.length).every((e) => e.phase === 'spine'))
   /* at every cut through the spine the stops rendered so far are joined by their legs: a
      visitor walking from the entrance never meets a leg whose far still is missing */
@@ -83,7 +84,7 @@ test('an area names a stop and its legs, a room, or a machine with its clips and
   const room = areaEntries(entries, ['flight'])
   assert.ok(room.some((e) => e.kind === 'cycle' && e.slug === 'aerial-screw'))
   assert.ok(room.some((e) => e.id === clipId('stop:picture-room-west>stop:flight', 'wide')))
-  assert.ok(!room.some((e) => e.id === clipId('stop:garden>stop:line-early', 'wide')))
+  assert.ok(!room.some((e) => e.id === clipId('stop:line-early>stop:supper-wall', 'wide')))
 })
 
 test('the pilot: its four legs in both framings, its one cycle, every still', () => {
@@ -92,7 +93,7 @@ test('the pilot: its four legs in both framings, its one cycle, every still', ()
   assert.equal(pilot.filter((e) => e.kind === 'cycle').length, 2)
   assert.equal(pilot.filter((e) => e.kind === 'still').length, 2 * graph.nodes.length)
   for (const id of PILOT.clips) assert.ok(graph.edges.find((e) => e.id === id)?.kinds.includes('LEG'), `${id} is a leg of the life`)
-  // two legs of different weight: the long leg into the hall and the garden's
+  // two legs of different weight: the long leg into the hall and the timeline's walk out
   const frames = (id) => graph.edges.find((e) => e.id === id).framings.wide.frames
   assert.notEqual(frames(PILOT.clips[0]), frames(PILOT.clips[2]))
 })

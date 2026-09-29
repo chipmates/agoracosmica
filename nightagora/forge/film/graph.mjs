@@ -30,6 +30,11 @@ export const FRAMINGS = {
   wide: { viewport: 'desktop', phone: false, width: 1280, height: 720 },
   upright: { viewport: 'phone', phone: true, width: 390, height: 844 },
 }
+/** THE EVENING'S OWN RATE: the look up is rendered as the approved look test
+    was (`forge/sunset-frames.mjs`), not at the walks' thirty */
+export const EVENING_FPS = 24
+/** the stop whose way on is the look up, as the live wing's `lookUp()` names it */
+export const EVENING_STOP = 'grave'
 /** Decision D1: the wall's runs from both story stops that bracket a work, in
     and out ('both'), or in from the stop behind and on to the stop ahead. */
 export const WALL_RUNS = ['both', 'behind']
@@ -47,6 +52,7 @@ const samePose = (a, b) => near(a.eye, b.eye) && near(a.at, b.at) && Math.abs(a.
 const saved = (pose) => ({ eye: pose.eye.toArray(), at: pose.at.toArray(), fov: pose.fov })
 const sha256 = (text) => createHash('sha256').update(text).digest('hex')
 export const stopId = (walkId) => `stop:${walkId}`
+export const eveningId = (walkId) => `evening:${walkId}`
 export const viewId = (exhibit) => `view:${exhibit}`
 export const doorId = (place) => `door:${place}`
 export const startId = (place) => `start:${place}`
@@ -396,6 +402,8 @@ export function buildGraph(wing, { wall: wallRuns = 'both' } = {}) {
       .map((n) => n.id)
   }
 
+  const evening = eveningOf(wing, byId)
+
   return {
     format: 'vinci-film-graph-v1',
     wing: 'vinci',
@@ -411,8 +419,31 @@ export function buildGraph(wing, { wall: wallRuns = 'both' } = {}) {
     opens,
     nodes,
     edges: list,
+    ...(evening ? { evening } : {}),
     sources: wing.loader.sources(),
   }
+}
+
+/**
+ * THE GRAVE'S LOOK UP, the evening the last stop's way on plays: the live
+ * wing's farewell (`farewell.ts`, run by `runFarewell()`) from the grave's
+ * own pose through the stars to the dip before the lobby. A node the visitor
+ * never stands at, so it is carried beside the nodes and not among them:
+ * every reader of the nodes stands the eye at one. Its camera is the
+ * farewell's path (`evening.mjs`), its length the farewell's and the rest's.
+ * None at a revision before the look up.
+ */
+function eveningOf(wing, byId) {
+  let farewell
+  try { farewell = wing.loader.load(`${WING_DIR}/farewell.ts`) } catch { return null }
+  const { FAREWELL_SECONDS: run, FAREWELL_REST: rest, FAREWELL_DIP: dip } = farewell
+  const from = byId.get(stopId(EVENING_STOP))
+  if (!(run > 0) || !(rest >= 0) || !(dip >= 0) || !from) return null
+  const seconds = run + rest
+  /* frame i stands at i / fps of the run; the last one's shutter closes before
+     the run's end, where the live wing takes the lobby */
+  const frames = Math.round(seconds * EVENING_FPS)
+  return { id: eveningId(EVENING_STOP), from: from.id, fps: EVENING_FPS, seconds, farewell: run, rest, dip, frames }
 }
 
 /** The counts table of §2.3, measured: clips and seconds at the film's pace. */
@@ -475,6 +506,7 @@ export function formatTable(graph, table) {
     const t = table[name]
     lines.push(`${name}: ${t.frames} walking frames at ${graph.fps} fps; seconds live at each pace ${PACES.map((p) => `${p} ${f1(t.paces[p])}`).join(', ')}, the film played at a rate ${PACES.map((p) => `${p} ${f1(t.filmPaces[p])}`).join(', ')}; longest ${t.longest.id} ${t.longest.framings[name].seconds[FILM_PACE].toFixed(2)} s`)
   }
+  if (graph.evening) lines.push(`the grave's look up: ${graph.evening.id} from ${graph.evening.from}, ${graph.evening.frames} frames at ${graph.evening.fps} fps (the farewell ${graph.evening.farewell} s, the stars ${graph.evening.rest} s) in each framing`)
   lines.push('')
   if (graph.wallRuns !== 'both') lines.push('D1 is not the design default: the table is not compared.')
   else if (moved.length) lines.push(`WHAT MOVED against §2.3:\n  ${moved.join('\n  ')}`)

@@ -10,6 +10,7 @@
 //   node forge/film/export.mjs --grain=0.007                   the film baked into the frames
 //   node forge/film/export.mjs --stills=stop:flight,stop:works --stage=stills
 //                                                              stills only, on the stills' stage
+//   node forge/film/export.mjs --clips=<ids> --evening          the grave's look up too, after the clips
 //
 // Every clip starts and ends at rest. Its first frame is the departure node's
 // still and its last the arrival's, rendered by the same program, and the
@@ -39,6 +40,7 @@ import { restingPending } from '../prerender/pending.mjs'
 import { lineOf } from './film-check.mjs'
 import { FILM_PACE, FPS, FRAMINGS, SHUTTER, buildGraph } from './graph.mjs'
 import { camPrint as nodePrint, openReplay, replayEdge } from './replay.mjs'
+import { eveningTrack } from './evening.mjs'
 import { openSink, unpack } from './sink.mjs'
 
 /* ---- the recipe (design §4.2, the owner's T0 reading, M50) ---- */
@@ -72,11 +74,11 @@ export const X264 = { preset: 'medium', crf: 23, endsCrf: 12, endsFrames: 3, key
  * buffer of one second at the line holds the near-lossless first frame. The
  * line is the clip's own (`lineOf`): a clip exempt from it is not capped.
  */
-export function vbvOf(rung, frames, graphSeconds, clip = '', v = X264.vbv) {
+export function vbvOf(rung, frames, graphSeconds, clip = '', v = X264.vbv, fps = FPS) {
   const line = lineOf(rung, clip)
   if (!line || !(graphSeconds > 0)) return null
   const bufsize = Math.round(line * v.bufferSeconds)
-  const clipSeconds = (frames + v.spareFrames) / FPS
+  const clipSeconds = (frames + v.spareFrames) / fps
   const maxrate = Math.floor((v.share * line * graphSeconds - v.init * bufsize) / clipSeconds)
   // a clip too short to carry its buffer keeps a quarter of the line, and the gate judges it
   return { maxrate: Math.max(Math.round(line / 4), maxrate), bufsize, init: v.init }
@@ -145,10 +147,10 @@ export function motionOf(prints, i, height, nearM) {
   return { turn, walk, px: turn + walk }
 }
 /** draws for a frame: at least one per pixel the open shutter travels */
-export function drawsFor(px, shutter = SHUTTER) {
+export function drawsFor(px, shutter = SHUTTER, { min = MIN_DRAWS, max = MAX_DRAWS } = {}) {
   const want = Math.ceil(px * shutter)
-  const n = Math.max(MIN_DRAWS, Math.min(MAX_DRAWS, want + (want % 2)))
-  return { n, over: want > MAX_DRAWS }
+  const n = Math.max(min, Math.min(max, want + (want % 2)))
+  return { n, over: want > max }
 }
 
 /* ---- what a frame showed, from its ids and depth ---- */
@@ -477,8 +479,9 @@ function walkRay(cells, from, to) {
 /** one ffmpeg for a clip, every rung in one pass, the ends near lossless; without
     the graph seconds no rung is capped. A still passed as a one-frame clip
     (`frames` 1) is encoded as a clip's end is: the ends' crf and the buffer.
-    `clip` names the edge, whose byte line sets the caps. */
-export function openEncoder(framing, frames, dir, stem, stage = STAGES[framing], graphSeconds = 0, clip = '') {
+    `clip` names the edge, whose byte line sets the caps; `fps` is the clip's
+    own rate, one key frame a second of it (the evening's is not the walks'). */
+export function openEncoder(framing, frames, dir, stem, stage = STAGES[framing], graphSeconds = 0, clip = '', fps = FPS) {
   const [w, h] = [stage.width, stage.height]
   const rungs = RUNGS[framing]
   const last = frames - 1
@@ -490,17 +493,18 @@ export function openEncoder(framing, frames, dir, stem, stage = STAGES[framing],
     mkdirSync(join(dir, `${rw}x${rh}`), { recursive: true })
     return join(dir, `${rw}x${rh}`, `${stem}.part.mp4`)
   })
-  const args = ['-hide_banner', '-loglevel', 'error', '-y', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', `${w}x${h}`, '-r', String(FPS), '-i', '-',
+  const args = ['-hide_banner', '-loglevel', 'error', '-y', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', `${w}x${h}`, '-r', String(fps), '-i', '-',
     '-filter_complex', `[0:v]split=${rungs.length}${split};${scales}`]
   // a one-frame clip is drawn from the same buffer a clip's first frame is
   const firstOf = (line) => (line ? { maxrate: line, bufsize: Math.round(line * X264.vbv.bufferSeconds), init: X264.vbv.init } : null)
-  const caps = rungs.map(([rw, rh]) => (one ? firstOf(lineOf(`${rw}x${rh}`, clip)) : vbvOf(`${rw}x${rh}`, frames, graphSeconds, clip)))
+  const caps = rungs.map(([rw, rh]) => (one ? firstOf(lineOf(`${rw}x${rh}`, clip)) : vbvOf(`${rw}x${rh}`, frames, graphSeconds, clip, X264.vbv, fps)))
+  const keyint = fps === FPS ? X264.keyint : Math.round(fps)
   rungs.forEach((_, k) => {
     const vbv = caps[k] ? `:vbv-maxrate=${caps[k].maxrate}:vbv-bufsize=${caps[k].bufsize}:vbv-init=${caps[k].init}` : ''
     args.push('-map', `[o${k}]`, '-c:v', 'libx264', '-preset', X264.preset, '-crf', String(one ? X264.endsCrf : X264.crf), '-profile:v', 'high',
       // the colour goes into the stream's own header: the output options alone leave the transfer
       // untagged, and WebKit then paints the clip brighter than the still it hands over to
-      '-x264-params', `keyint=${X264.keyint}:min-keyint=${X264.keyint}:scenecut=0:aq-mode=${X264.aq}:threads=${X264.threads}:colorprim=bt709:transfer=iec61966-2-1:colormatrix=bt709${zones}${vbv}`,
+      '-x264-params', `keyint=${keyint}:min-keyint=${keyint}:scenecut=0:aq-mode=${X264.aq}:threads=${X264.threads}:colorprim=bt709:transfer=iec61966-2-1:colormatrix=bt709${zones}${vbv}`,
       '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'iec61966-2-1', '-color_range', 'tv',
       '-an', '-movflags', '+faststart', outs[k])
   })
@@ -650,9 +654,10 @@ export function inboxOf() {
 }
 
 /** a rest frame: every draw of the shutter at one pose */
-export async function restFrame(session, inbox, tag, i, from, { grain }) {
-  const times = Array.from({ length: MIN_DRAWS }, (_, k) => from + 1 + (k / MIN_DRAWS) * (SHUTTER * 1000) / FPS)
-  return renderFrame(session, inbox, { tag, i, times, jitter: jitterOf(MIN_DRAWS), anchor: MIN_DRAWS / 2, ids: true, send: true, grain, seed: 0 })
+export async function restFrame(session, inbox, tag, i, from, { grain, draws }) {
+  const n = draws?.min ?? MIN_DRAWS
+  const times = Array.from({ length: n }, (_, k) => from + 1 + (k / n) * (SHUTTER * 1000) / FPS)
+  return renderFrame(session, inbox, { tag, i, times, jitter: jitterOf(n), anchor: Math.floor(n / 2), ids: true, send: true, grain, seed: 0 })
 }
 
 /** THE SETTLED REST FRAME: a pose reached by a cut or by a walk can draw
@@ -824,9 +829,9 @@ export async function exportClip(session, inbox, edge, nodes, track, out, opts) 
   let last = -1, j = 0, idle = 0, settledLastIn = 0
   for (let i = 1; i < predicted + 60; i++) {
     const m = motionOf(track.prints, Math.min(j + 1, track.arrivedAt), stage.height, nearM)
-    const { n, over } = drawsFor(m.px)
+    const { n, over } = drawsFor(m.px, SHUTTER, opts.draws)
     const t = Date.now()
-    let res = await renderFrame(session, inbox, { tag, i, times: shutterTimes(origin.t, i, n), jitter: jitterOf(n), anchor: n / 2, ids: true, send: true, grain: opts.grain, seed: j + 1 })
+    let res = await renderFrame(session, inbox, { tag, i, times: shutterTimes(origin.t, i, n), jitter: jitterOf(n), anchor: Math.floor(n / 2), ids: true, send: true, grain: opts.grain, seed: j + 1 })
     if (j === 0 && printOf(res.report.cam) === stillPrint) {
       if (++idle > 40) throw new Error(`${tag}: the leg never got under way`)
       continue
@@ -887,6 +892,122 @@ export async function exportClip(session, inbox, edge, nodes, track, out, opts) 
     fastest: frames.reduce((b, f) => ((f.motion ?? 0) > (b.motion ?? 0) ? f : b), frames[0]).i,
     seconds, secondsPerFrame: round(seconds / frames.length, 3),
     files, seen: saveSeen(cells, join(out, 'seen', framing), stem), frameRecords: frames,
+  }
+}
+
+/** THE RISE PASSES THINGS THE DEPTH'S TENTH MISSES: the court's floating
+    leaves, the crowns and the coping go by within a metre or two of the
+    climbing eye, so the evening's walk is counted against this depth at most,
+    or its shutter shows them as a ladder of separate draws */
+export const EVENING_NEAR_M = 2
+/**
+ * THE EVENING AT THE GRAVE (`graph.mjs` eveningOf): the grave's still, then
+ * the look up asked as the band's way on asks it, so the wing's own farewell
+ * runs on the export's clock and every draw of a shutter stands at its own
+ * instant of the evening. Frames at the evening's rate to the dip before the
+ * lobby; the lobby itself is never taken, and the evening is let go after
+ * the last frame so the session stands on. `track` is `eveningTrack()`'s.
+ */
+export async function exportEvening(session, inbox, graph, track, out, opts) {
+  const ev = graph.evening
+  if (!ev) throw new Error('the graph carries no evening')
+  const { page, framing, stage } = session
+  const from = graph.nodes.find((n) => n.id === ev.from)
+  const tag = `${ev.id} ${framing}`
+  const lateBefore = session.record.late.length, chromeBefore = session.record.chrome.length
+  const errorsBefore = session.record.errors.length, projectionBefore = session.record.projection.length
+  const starvedBefore = await page.evaluate(() => window.__pre.starved())
+  await standAt(page, from)
+  const armed = await page.evaluate(() => window.__naExport.arm())
+  const pendingAtRest = await page.evaluate(() => window.__forge.state().texturesPending)
+  const paintedOverCanvas = await page.evaluate(chromeProof)
+  const refusal = []
+  if (pendingAtRest !== 0) refusal.push(`${pendingAtRest} textures in flight at rest (M49)`)
+  if (armed.casters > CASTER_CEILING) refusal.push(`${armed.casters} shadow-casting lights over the ceiling of ${CASTER_CEILING} (M50)`)
+  if (refusal.length && !opts.force) return { evening: ev.id, framing, refused: refusal }
+  const stem = ev.id.replace(/[:/]/g, (c) => (c === ':' ? '-' : '.'))
+  const encoder = openEncoder(framing, ev.frames, join(out, framing), stem, stage, ev.seconds, ev.id, ev.fps)
+  const frames = []
+  const began = Date.now()
+  const put = async (i, res, meta) => {
+    await encoder.write(Buffer.from(res.frame.rgb.buffer, res.frame.rgb.byteOffset, res.frame.rgb.byteLength))
+    const nearM = nearDepth(res.frame)
+    frames.push({ i, sha256: sha256(res.frame.rgb), print: printOf(res.report.cam), cam: { p: res.report.cam.p, q: res.report.cam.q, fov: res.report.cam.fov },
+      draws: res.report.drawn, walking: res.report.walking, mounted: res.report.mounted, ms: res.report.ms, nearM, ...meta })
+    if (opts.keep.has(i) || i === 0 || i === ev.frames - 1) await savePng(res.frame.rgb, stage.width, stage.height, join(opts.frameDir, `${stem}-${framing}-f${String(i).padStart(4, '0')}.png`))
+    return nearM
+  }
+  let nearM = 0
+  try {
+    // frame 0: the grave at rest, the still's own picture
+    const { res: f0, frames: settledIn } = await settledRest(session, inbox, tag, opts)
+    nearM = await put(0, f0, { motion: 0, over: false, wall: Date.now() - began, settledIn })
+    // THE PRESS: answered by the wing's look up, which starts at this instant of the clock
+    const asked = await page.evaluate(() => {
+      const ask = new CustomEvent('na-wing-ending', { detail: { ending: 'lookup' }, cancelable: true })
+      dispatchEvent(ask)
+      return { answered: ask.defaultPrevented, t: window.__pre.virtualTime(), running: document.getElementById('wing')?.dataset.farewell !== undefined }
+    })
+    if (!asked.answered || !asked.running) throw new Error(`${tag}: the wing did not answer the look up (${JSON.stringify(asked)})`)
+    for (let i = 1; i < ev.frames; i++) {
+      const m = motionOf(track.prints, i, stage.height, Math.min(nearM || EVENING_NEAR_M, EVENING_NEAR_M))
+      const { n, over } = drawsFor(m.px, SHUTTER, opts.draws)
+      const times = Array.from({ length: n }, (_, k) => asked.t + (i * 1000) / ev.fps + (k / n - 0.5) * (SHUTTER * 1000) / ev.fps)
+      const t = Date.now()
+      const res = await renderFrame(session, inbox, { tag, i, times, jitter: jitterOf(n), anchor: Math.floor(n / 2), ids: true, send: true, grain: opts.grain, seed: i })
+      nearM = await put(i, res, { motion: round(m.px, 2), turnPx: round(m.turn, 2), walkPx: round(m.walk, 2), over, wall: Date.now() - t })
+    }
+  } catch (err) {
+    await encoder.abort()
+    await page.evaluate(() => window.__naFarewell?.(null)).catch(() => {})
+    throw err
+  }
+  // THE EVENING LET GO: the hour back and no lobby, so the next entry stands where it is placed
+  const still = await page.evaluate(() => { window.__naFarewell?.(null); return document.getElementById('wing')?.dataset.farewell === undefined })
+  await encoder.close()
+  const files = {}
+  for (const r of encoder.rungs) files[r.rung] = address(r.file, 'mp4')
+  let maxDeviation = 0
+  for (const f of frames) {
+    const want = track.prints[f.i]
+    if (!want) continue
+    const a = parse(f.print), b = parse(want)
+    for (let k = 0; k < 7; k++) {
+      let d = Math.abs(a[k] - b[k])
+      if (k >= 3 && k <= 5) d = Math.min(d, Math.abs(Math.abs(d) - 2 * Math.PI))
+      maxDeviation = Math.max(maxDeviation, d)
+    }
+  }
+  const seconds = (Date.now() - began) / 1000
+  const signatures = new Set(frames.map((f) => f.mounted.signature))
+  const late = session.record.late.slice(lateBefore)
+  return {
+    evening: ev.id, framing, stem, fps: ev.fps, frames: frames.length, seconds: ev.seconds,
+    joins: { first: frames[0].sha256, last: frames[frames.length - 1].sha256 },
+    track: { maxDeviation: round(maxDeviation, 6), key: track.key },
+    projectionThrows: session.record.projection.length - projectionBefore,
+    requestsAfterClock: late.length, lateRequests: late.slice(0, 6), chromeImagesAfterClock: session.record.chrome.length - chromeBefore,
+    starvedSteps: (await page.evaluate(() => window.__pre.starved())) - starvedBefore, pageErrors: session.record.errors.length - errorsBefore,
+    pendingAtRest, paintedOverCanvas, casters: armed.casters, settledIn: frames[0].settledIn,
+    // the evening sees what no walk sees: its drawn set may change on the rise, which no join depends on
+    mountedSetChanges: signatures.size - 1, mount: { rule: opts.mount, held: opts.mount === 'held' ? opts.held : null, drawnFirst: frames[0].mounted.meshes, drawnLast: frames[frames.length - 1].mounted.meshes },
+    letGo: still, refused: refusal,
+    draws: frames.reduce((s, f) => s + f.draws, 0), over: frames.filter((f) => f.over).length,
+    secondsPerFrame: round(seconds / frames.length, 3), exportSeconds: round(seconds, 1),
+    files, frameRecords: frames,
+  }
+}
+
+/** an evening's sidecar: what its export measured, frame by frame */
+export function eveningSidecar(r, { version, recipe, keys, head = headHere() }) {
+  return {
+    format: 'vinci-film-sidecar-v1', exportFormat: EXPORT_FORMAT, evening: r.evening, framing: r.framing,
+    renderer: `chromium ${version} webgpu, tier max, ${head}`, recipe: { ...recipe, fps: r.fps }, keys,
+    frames: r.frames, fps: r.fps, joins: r.joins, track: r.track, projectionThrows: r.projectionThrows,
+    requestsAfterClock: r.requestsAfterClock, starvedSteps: r.starvedSteps, pageErrors: r.pageErrors, pendingAtRest: r.pendingAtRest,
+    paintedOverCanvas: r.paintedOverCanvas, mountedSetChanges: r.mountedSetChanges, mount: r.mount, casters: r.casters, lateRequests: r.lateRequests,
+    letGo: r.letGo, refused: r.refused, files: r.files,
+    perFrame: r.frameRecords.map((f) => ({ i: f.i, sha256: f.sha256, draws: f.draws, motion: f.motion ?? 0, turnPx: f.turnPx ?? 0, walkPx: f.walkPx ?? 0, nearM: round(f.nearM ?? 0, 3), meshes: f.mounted?.meshes, wallMs: f.wall, ms: f.ms, print: f.print })),
   }
 }
 
@@ -978,8 +1099,17 @@ async function main() {
   })) : null
   /* stills only: the named nodes stood at once and shot, no clip walked */
   const stillsOnly = flags.has('stills') ? String(flags.get('stills')).split(',').map((s) => s.trim()).filter(Boolean) : null
-  const keep = new Set(String(flags.get('keep') ?? '').split(',').filter(Boolean).map(Number))
+  // frames kept as PNG: indices and ranges (`0-200,300`)
+  const keep = new Set(String(flags.get('keep') ?? '').split(',').filter(Boolean).flatMap((k) => {
+    const [a, b] = k.split('-').map(Number)
+    return b === undefined ? [a] : Array.from({ length: b - a + 1 }, (_, i) => a + i)
+  }))
   const mount = String(flags.get('mount') ?? 'held')
+  /* THE SHUTTER'S DRAWS, for a look test only (a film job keeps the recipe's):
+     `--draws=1` one sample a pixel as the live wing draws it, `--draws=32` a
+     floor of thirty-two; `--max-draws` the ceiling */
+  const floor = Number(flags.get('draws') ?? MIN_DRAWS)
+  const draws = { min: floor, max: Number(flags.get('max-draws') ?? (floor === 1 ? 1 : Math.max(floor, MAX_DRAWS))) }
   if (!['held', 'live'].includes(mount)) throw new Error(`--mount is held (the rule) or live (the wing's streaming), not ${mount}`)
   const log = (s) => console.error(s)
   assertBuildFresh()
@@ -995,7 +1125,10 @@ async function main() {
   })
   const tracks = new Map()
   for (const e of edges) for (const f of framings) tracks.set(`${e.id} ${f}`, replayEdge(replay, graph, e, f, { tail: 2 }))
-  const warmNodes = [...new Set(stillsOnly ?? edges.flatMap((e) => [e.from, e.to]))].map((id) => {
+  const evening = flags.has('evening') && !stillsOnly
+  if (evening && !graph.evening) throw new Error('--evening: this tree carries no look up')
+  if (evening) for (const f of framings) tracks.set(`${graph.evening.id} ${f}`, eveningTrack(replay.wing, graph, f))
+  const warmNodes = [...new Set([...(stillsOnly ?? edges.flatMap((e) => [e.from, e.to])), ...(evening ? [graph.evening.from] : [])])].map((id) => {
     if (!nodes.has(id)) throw new Error(`the graph has no node ${id}`)
     return nodes.get(id)
   })
@@ -1018,10 +1151,11 @@ async function main() {
       const version = browser.version()
       const results = []
       const stills = []
+      let evenings = null
       try {
         for (const framing of framings) {
           const session = await openSession(browser, framing, { base: BASE, scale, sink, warmNodes, log, view })
-          const opts = { grain, keep, frameDir, force: flags.has('force'), mount, held: null }
+          const opts = { grain, keep, frameDir, force: flags.has('force'), mount, held: null, draws }
           const before = await session.page.evaluate(() => window.__naExport.mounted().meshes)
           const walked = []
           for (const edge of edges) walked.push(await silentWalk(session.page, nodes.get(edge.from), nodes.get(edge.to), edge.motion, mount === 'held' ? edge.id : null))
@@ -1048,6 +1182,20 @@ async function main() {
             r.joinsAgree = { first: r.joins.first === sf(edge.from), last: r.joins.last === sf(edge.to) }
             log(`  ${edge.id} ${framing}: ${r.frames} frames (the graph ${edge.framings[framing].frames + edge.framings[framing].restLag + 1}), ${r.draws} draws, ${r.secondsPerFrame} s a frame; settled in ${r.settledIn} and ${r.settledLastIn}; joins ${r.joinsAgree.first}/${r.joinsAgree.last}; track ${r.track.maxDeviation}; late ${r.requestsAfterClock}; mounted changes ${r.mountedSetChanges}; held ${r.mount.held}, stood ${r.mount.stoodAtFirst} at the first frame and ${r.mount.stoodAtLast} at the last; plate texels ${r.plateTexelRatioMax} (${r.plateTexel.plate ?? 'no plate'}, ${r.plateTexel.plates.length} plates, ${r.plateTexel.unmeasured.length} not measured)`)
           }
+          if (evening) {
+            let r
+            try {
+              r = await exportEvening(session, inbox, graph, tracks.get(`${graph.evening.id} ${framing}`), runDir, opts)
+            } catch (err) {
+              r = { evening: graph.evening.id, framing, refused: [`the export failed: ${String(err.message).slice(0, 240)}`] }
+            }
+            if (!r.files) log(`  REFUSED ${graph.evening.id} ${framing}: ${r.refused.join('; ')}`)
+            else {
+              r.joinsAgree = { first: r.joins.first === stills.find((x) => x.node === graph.evening.from && x.framing === framing)?.raw }
+              log(`  ${graph.evening.id} ${framing}: ${r.frames} frames at ${r.fps} fps, ${r.draws} draws (${r.over} over), ${r.secondsPerFrame} s a frame; first frame the grave's still ${r.joinsAgree.first}; track ${r.track.maxDeviation}; late ${r.requestsAfterClock}; drawn set changes ${r.mountedSetChanges}; let go ${r.letGo}`)
+            }
+            ;(evenings ??= []).push(r)
+          }
           if (mount === 'held') await session.page.evaluate(() => window.__naExport.hold(null))
           const sets = new Set([...stills.filter((x) => x.framing === framing).map((x) => x.drew.signature), ...results.filter((r) => r.framing === framing && r.mount?.signature !== undefined).map((r) => r.mount.signature)])
           log(`  ${framing}: drawn sets across its stills and clips ${sets.size}`)
@@ -1056,7 +1204,7 @@ async function main() {
       } finally {
         await browser.close()
       }
-      all.push({ run, dir: runDir, results, stills, version })
+      all.push({ run, dir: runDir, results, stills, version, evenings })
     }
   } finally {
     await sink.close()
@@ -1066,11 +1214,18 @@ async function main() {
   // ---- the record ----
   const first = all[0]
   const gate = stillsOnly ? { note: 'stills only: no clip, no keys' } : await gateKeys(first.results, log).catch((err) => ({ note: `the gate's keys failed: ${String(err.message).slice(0, 200)}` }))
-  const recipe = recipeOf({ mount, scale, view, grain })
+  const recipe = { ...recipeOf({ mount, scale, view, grain }), ...(draws.min !== MIN_DRAWS || draws.max !== MAX_DRAWS ? { minDraws: draws.min, maxDraws: draws.max, drawsNote: 'a look test off the recipe' } : {}) }
   for (const r of first.results) {
     if (!r.files) continue
     const keys = gate.keys?.get(`${r.clip} ${r.framing}`) ?? { motion: r.replay.key, picture: null, global: null, delivery: null }
     const sidecar = clipSidecar(r, { version: first.version, recipe, keys, keysNote: gate.note ?? null })
+    mkdirSync(join(first.dir, 'sidecars', r.framing), { recursive: true })
+    writeFileSync(join(first.dir, 'sidecars', r.framing, `${r.stem}.json`), JSON.stringify(sidecar, null, 1))
+  }
+  for (const r of first.evenings ?? []) {
+    if (!r.files) continue
+    const keys = gate.tree?.evenings?.get(`${r.evening} ${r.framing}`)
+    const sidecar = eveningSidecar(r, { version: first.version, recipe, keys: keys ? { motion: keys.motion, picture: keys.picture, global: gate.tree.global.key, delivery: keys.delivery } : { motion: r.track.key, picture: null, global: null, delivery: null } })
     mkdirSync(join(first.dir, 'sidecars', r.framing), { recursive: true })
     writeFileSync(join(first.dir, 'sidecars', r.framing, `${r.stem}.json`), JSON.stringify(sidecar, null, 1))
   }
@@ -1094,6 +1249,12 @@ async function main() {
       const files = Object.fromEntries(Object.entries(r.files).map(([rung, f]) => [rung, { file: f.file.slice(first.dir.length + 1), bytes: f.bytes, sha256: f.sha256 }]))
       release.clips.push({ clip: r.clip, framing: r.framing, keys: gate.keys.get(`${r.clip} ${r.framing}`), frames: r.frames, seconds: r.frames / FPS, files, sidecar: `sidecars/${r.framing}/${r.stem}.json` })
     }
+    for (const r of first.evenings ?? []) {
+      if (!r.files) continue
+      const k = gate.tree.evenings?.get(`${r.evening} ${r.framing}`)
+      const files = Object.fromEntries(Object.entries(r.files).map(([rung, f]) => [rung, { file: f.file.slice(first.dir.length + 1), bytes: f.bytes, sha256: f.sha256 }]))
+      ;(release.evenings ??= []).push({ evening: r.evening, framing: r.framing, keys: k ? { motion: k.motion, picture: k.picture, global: gate.tree.global.key, delivery: k.delivery } : null, frames: r.frames, fps: r.fps, seconds: r.seconds, files, sidecar: `sidecars/${r.framing}/${r.stem}.json` })
+    }
     writeFileSync(join(first.dir, 'release.json'), JSON.stringify(release, null, 1))
   }
   const summary = {
@@ -1101,6 +1262,7 @@ async function main() {
     keysNote: gate.note ?? 'the gate\'s keys, the picture from this export\'s own seen cells',
     stills: first.stills.map((s) => ({ ...s, cam: undefined })),
     clips: first.results.map((r) => ({ ...r, frameRecords: undefined })),
+    ...(first.evenings ? { evenings: first.evenings.map((r) => ({ ...r, frameRecords: undefined })) } : {}),
   }
   if (all.length > 1) {
     const b = all[1]
@@ -1121,6 +1283,11 @@ async function main() {
     if (!r.files) { console.log(`  REFUSED ${r.clip} ${r.framing}: ${r.refused.join('; ')}`); continue }
     const kb = Object.entries(r.files).map(([rung, f]) => `${rung} ${Math.round((f.bytes * 8) / 1000 / (r.frames / FPS))} kbit/s`).join(', ')
     console.log(`  ${r.clip} ${r.framing}: ${r.frames} frames, ${r.draws} draws (${r.over} over), ${r.secondsPerFrame} s a frame; joins ${r.joinsAgree?.first}/${r.joinsAgree?.last}; track ${r.track.maxDeviation}; late ${r.requestsAfterClock}, starved ${r.starvedSteps}, errors ${r.pageErrors}, pending ${r.pendingAtRest}, mounted changes ${r.mountedSetChanges}, casters ${r.casters}; ${kb}`)
+  }
+  for (const r of summary.evenings ?? []) {
+    if (!r.files) { console.log(`  REFUSED ${r.evening} ${r.framing}: ${r.refused.join('; ')}`); continue }
+    const kb = Object.entries(r.files).map(([rung, f]) => `${rung} ${Math.round((f.bytes * 8) / 1000 / r.seconds)} kbit/s`).join(', ')
+    console.log(`  ${r.evening} ${r.framing}: ${r.frames} frames at ${r.fps} fps, ${r.draws} draws (${r.over} over), ${r.secondsPerFrame} s a frame; first frame the still ${r.joinsAgree?.first}; track ${r.track.maxDeviation}; late ${r.requestsAfterClock}, starved ${r.starvedSteps}, errors ${r.pageErrors}, drawn set changes ${r.mountedSetChanges}; ${kb}`)
   }
   if (summary.proof) for (const p of summary.proof) console.log(`  proof ${p.clip} ${p.framing}: ${p.identical} / ${p.frames?.[0]} frames identical; mp4 ${p.mp4?.map((m) => `${m.rung} ${m.same}`).join(', ')}`)
   console.log(`  the record: ${join(out, 'export.json')}`)
