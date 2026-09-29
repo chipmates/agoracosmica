@@ -85,6 +85,9 @@ export interface ReaderSide {
   count?: string
   /** THE SOURCE ROW: whose words the side's line is, said under it. */
   note?: string | null
+  /** The line the phone's peek shows where the head would take more than
+   * two rows there. */
+  short?: string | null
   /** What the card says of this side besides what is on it. */
   notes?: readonly string[]
 }
@@ -403,7 +406,7 @@ export function createReaderPayload(options: {
       here.count !== undefined ? { at: place + 1, of: inside.length, seat: here.seat, said: here.count }
         : here.leaf ? { at: place + 1, of: inside.length, leaf: here.leaf }
           : inside.length > 1 ? { at: place + 1, of: inside.length } : null,
-      here.note !== undefined ? here.note : undefined)
+      here.note !== undefined ? here.note : undefined, here.short ?? null)
     // THE WHOLE TEXT ON THE PHONE rides the raised card, one press away
     if (reading && !banded && options.column) {
       const texts = make('div', 'vitrine-description reader-texts reader-column')

@@ -65,6 +65,10 @@ const RAISED_SHARE = .62
 /** However much its own peek asks for, a card never takes more of the sheet
  * than this: the work is what the window is for. */
 const PEEK_MOST = .42
+/** A peek that shows the line gives it this many rows and never cuts it,
+ * and keeps the work this share of the screen above the sheet. */
+const PEEK_LINE_ROWS = 2
+const WORK_AT_REST = 2 / 3
 /** A drag on the grabber this far decides; a shorter one is a press. */
 const GRAB_PX = 24
 const GRAB_SLOP = 8
@@ -189,6 +193,8 @@ export function createVitrine(options: {
   let exhibit: VitrineExhibit | null = null
   let surface: VitrineSurface = 'room', resizeFrames = 0, laidNarrow: boolean | null = null
   let raised = false
+  /** THE LINE THE CARD SAYS, whole, and its source row; the peek may show the short one. */
+  let spoken: { head: string | null; note: string | null; short: string | null } = { head: null, note: null, short: null }
   const reducedMotion = view.matchMedia('(prefers-reduced-motion: reduce)')
   const rects = { view: { left: 0, top: 0, width: 0, height: 0 } as VitrineRect }
 
@@ -220,8 +226,15 @@ export function createVitrine(options: {
    * standing clear of the bar. THE NARROW STAGE: one sheet from under the
    * brand line to the bar, the viewport above and the card below, and the
    * payload's own controls in the thumb zone at the sheet's foot. */
+  /** True while the window lays itself out: a payload's own layout renames
+   * the card from inside it. */
+  let laying = false
   function layout(): void {
-    if (!open) return
+    if (!open || laying) return
+    laying = true
+    try { layOut() } finally { laying = false }
+  }
+  function layOut(): void {
     const width = view.innerWidth, height = view.innerHeight
     const narrow = options.narrow()
     const floor = Math.min(height, Math.max(0, options.floor()))
@@ -255,10 +268,9 @@ export function createVitrine(options: {
       }
       if (fill && !raised) {
         place2(peek)
-        const asked = grab.getBoundingClientRect().height + body.scrollHeight
-          + payloadControls.getBoundingClientRect().height + 26
-        peek = Math.min(Math.max(peek, Math.ceil(asked)), Math.round(tall * PEEK_MOST))
-      }
+        paintLine(peekRoom)
+        peek = Math.min(Math.max(peek, peekAsked()), Math.round(tall * PEEK_MOST))
+      } else paintLine(null)
       // The sheet is the card's ground; the viewport above it stays open to
       // the stage, so the work is seen and not a shade through a panel.
       place2(fill ? (raised ? Math.round(tall * RAISED_SHARE) : peek) : bottom - top - viewHeight)
@@ -270,6 +282,7 @@ export function createVitrine(options: {
       grab.hidden = !fill
       shutMark.hidden = false
     } else if (inBand()) {
+      paintLine(null)
       // THE WORK OWNS THE STAGE. The picture's box is the window less the
       // band, and the work is fitted inside it: nothing of the museum stands
       // on the work, and the work stands on nothing of the museum.
@@ -294,6 +307,7 @@ export function createVitrine(options: {
       const slot = theBand().instruments
       if (payloadControls.parentElement !== slot) slot.append(payloadControls)
     } else {
+      paintLine(null)
       const cardWidth = Math.round(Math.min(380, Math.max(320, width * .26)))
       const top = 84, bottom = floor - 16, right = width - 28
       place(card, { left: right - cardWidth, top, width: cardWidth, height: bottom - top })
@@ -384,9 +398,8 @@ export function createVitrine(options: {
 
   /** The folio and the count a set of pages by topic says, the count a
    * control where the exhibit opens its set from it; and the source row. */
-  function paintPlace(place: VitrinePlace | null | undefined, said: string | null | undefined): void {
-    note.textContent = said ?? ''
-    note.hidden = !said
+  function paintPlace(place: VitrinePlace | null | undefined, row: string | null | undefined): void {
+    spoken.note = row ?? null
     note.lang = options.lang()
     const count = place?.said ?? ''
     seat.hidden = !place?.seat && !count
@@ -398,6 +411,43 @@ export function createVitrine(options: {
     countButton.disabled = !exhibit?.onCount
   }
   countButton.addEventListener('click', () => exhibit?.onCount?.())
+
+  /** The height the peek's words and the payload's row ask for; its slack
+   * shrinks with a peek that trims the card's padding, never grows. */
+  function peekAsked(): number {
+    const own = view.getComputedStyle(card)
+    const slack = Math.min(26, parseFloat(own.paddingTop) + parseFloat(own.paddingBottom) + 4)
+    return Math.ceil(grab.getBoundingClientRect().height + body.scrollHeight + payloadControls.getBoundingClientRect().height + slack)
+  }
+  /** The peek the words ask for keeps the work its share above the sheet. */
+  const peekRoom = (): boolean => view.innerHeight - 10 - peekAsked() >= Math.ceil(view.innerHeight * WORK_AT_REST)
+
+  /** Rows the line takes at its own width, by the font it is set in. */
+  function rowsOf(el: HTMLElement): number {
+    const range = document.createRange()
+    range.selectNodeContents(el)
+    const tops = new Set<number>()
+    for (const r of range.getClientRects()) if (r.height > 0) tops.add(Math.round(r.top))
+    return tops.size
+  }
+
+  /** THE LINE AT THE PEEK IS NEVER CUT. Whole on the raised card and on a
+   * wide stage; at a peek that shows it, the line where it keeps two rows
+   * and the work its share of the screen, else the short line where that
+   * does, else the name row stands alone. `room` says whether the peek the
+   * words ask for still keeps the work its share; null off the peek. */
+  function paintLine(room: (() => boolean) | null): void {
+    const choices: Array<[string | null, string | null]> = [[spoken.head, spoken.note]]
+    if (room) choices.push([spoken.short, null], [null, null])
+    for (const [head, row] of choices) {
+      line.textContent = head ?? ''
+      line.hidden = !head
+      note.textContent = row ?? ''
+      note.hidden = !row
+      if (!room || !head || view.getComputedStyle(line).display === 'none') return
+      if (rowsOf(line) <= PEEK_LINE_ROWS && room()) return
+    }
+  }
 
   /** The grabber says which way it goes, in the payload's own words where
    * it has them. */
@@ -432,13 +482,18 @@ export function createVitrine(options: {
     raise: open => setRaised(open),
     peeked: () => !raised,
     step: (at, of) => band?.step(at, of),
-    rename: (title, head, certainty, place, said) => {
+    rename: (title, head, certainty, place, said, short) => {
       nameIt(title, certainty)
-      if (head !== undefined) {
-        line.textContent = head ?? ''
-        line.hidden = !head
-      }
+      const was = { ...spoken }
+      if (head !== undefined) spoken = { ...spoken, head, short: short ?? null }
       if (said !== undefined) paintPlace(place, said)
+      // a new line at the peek is chosen by the peek's own layout, which
+      // measures it from the peek's least height; the same line stays as chosen
+      const changed = was.head !== spoken.head || was.short !== spoken.short || was.note !== spoken.note
+      if (changed) {
+        if (options.narrow() && root.dataset['peek'] === 'true' && !laying) layout()
+        else paintLine(null)
+      }
       if (exhibit && inBand()) showInBand({ ...exhibit, title, line: head ?? exhibit.line, set: place ?? exhibit.set,
         note: said === undefined ? exhibit.note : said })
     },
@@ -479,7 +534,7 @@ export function createVitrine(options: {
       // the name and the line the card is showing now, which a payload that
       // walks its own sides has already renamed
       title: namingText.textContent || next.title,
-      line: line.textContent || next.line,
+      line: spoken.head || next.line,
       note: next.note ?? null,
       kind: next.payload?.kind ?? '',
       certainty: next.certainty ?? null,
@@ -629,10 +684,10 @@ export function createVitrine(options: {
       entryRow.textContent = entry ? [entry.date, entry.where].filter(Boolean).join(' · ') : ''
       entryRow.hidden = !entry
       entryRow.lang = options.lang()
-      line.textContent = next.line ?? ''
-      line.hidden = !next.line
+      spoken = { head: next.line ?? null, note: null, short: next.short ?? null }
       line.lang = options.lang()
       paintPlace(next.set?.said || next.set?.seat ? next.set : null, next.note)
+      paintLine(null)
       words.replaceChildren(...next.card)
       after.replaceChildren(...next.after ?? [])
       body.scrollTop = 0

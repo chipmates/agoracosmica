@@ -52,7 +52,7 @@ export interface VitrinePayloadHost {
    * to has its own certainty. The words are the caller's, as every word
    * here is. */
   rename?(title: string, head?: string | null, certainty?: string | null,
-    place?: VitrinePlace | null, note?: string | null): void
+    place?: VitrinePlace | null, note?: string | null, short?: string | null): void
 }
 
 /** WHERE A WORK STANDS IN ITS SET: counted from one; a book that reads by its
@@ -108,6 +108,9 @@ export interface VitrineExhibit {
   set?: VitrinePlace | null
   /** THE SOURCE ROW: who the line's words are, small under the line. */
   note?: string | null
+  /** The line a peek shows where `line` would take more than its two rows
+   * there, without the source row; none, and the name row stands alone. */
+  short?: string | null
   /** the gold control's own word where the set names its next object itself */
   onKicker?: string | null
   /** the count, pressed on the phone, opens the set it counts */

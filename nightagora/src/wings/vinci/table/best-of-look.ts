@@ -98,14 +98,15 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
     (page.drawing_only ? BEST_OF_NOTICES.no_words_drawing_only?.[language] : null) ?? BEST_OF_NOTICES.no_words[language] ?? ''
 
   /** The lead in his words, with whose words they are; the caption where the
-   * page has no lead. */
-  function lineOf(page: BestOfPage): { head: string | null; note: string | null } {
+   * page has no lead, and where the lead is too long for the phone's peek. */
+  function lineOf(page: BestOfPage): { head: string | null; note: string | null; short: string | null } {
     const lead = page.lead?.[language]
+    const caption = page.caption?.[language] || null
     if (lead?.text) {
       const note = lead.kind === 'ours' ? key('ai_short') ?? lead.label : lead.label
-      return { head: quoted(lead.text, language), note: note ?? null }
+      return { head: quoted(lead.text, language), note: note ?? null, short: caption }
     }
-    return { head: page.caption?.[language] ?? null, note: null }
+    return { head: caption, note: null, short: null }
   }
   const pictureWord = (page: BestOfPage): string | null =>
     page.picture === 'leaf' ? key('kind_leaf') : page.picture === 'plate' ? key('kind_plate') : page.picture === 'facsimile' ? key('kind_facsimile') : null
@@ -140,7 +141,7 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
     if (!index) return null
     const found = bestOfSource(page, index)
     if (!found) return null
-    const { head, note } = lineOf(page)
+    const { head, note, short } = lineOf(page)
     // ONE HALF OF AN OPENING shows the open spread on the desktop, both
     // sides whole, where the store holds the pair as one picture
     const spread = page.spread && !options.narrow() ? bestOfRecord(index, page.spread.file) : undefined
@@ -161,6 +162,7 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
       named: null,
       head,
       note,
+      short,
       seat: page.name ? page.seat[language] : '',
       count: countOf(place, count),
       volume: options.slug,
@@ -345,12 +347,13 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
   }
 
   const first = pages.find(page => page.id === (options.start ?? LEFT.get(options.slug))) ?? pages[0]
-  const opening = first ? lineOf(first) : { head: null, note: null }
+  const opening = first ? lineOf(first) : { head: null, note: null, short: null }
   const exhibit: VitrineExhibit = {
     id,
     title: first ? first.name?.[language] ?? first.seat[language] : title,
     line: opening.head,
     note: opening.note,
+    short: opening.short,
     card: [],
     controls: [text, record, shut],
     walk: [back, on],
