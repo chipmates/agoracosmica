@@ -1557,7 +1557,7 @@
       },
       "privacyRights": {
         "title": "Your Privacy Rights",
-        "description": "We use no tracking cookies, and your privacy is protected by default. The only setting you can manage is the optional ad measurement for visits through one of our free Google ads. You can withdraw this consent at any time with the \"Ad measurement\" link at the foot of every page, or in the app under Settings › Legal. Withdrawing deletes the stored click ID and records your no. The rest of the storage is needed for functions you use, such as your language choice."
+        "description": "We use no tracking cookies, and your privacy is protected by default. The only setting you can manage is the optional ad measurement for visits through one of our free Google ads. You can withdraw this consent at any time with the \"Ad measurement\" link at the foot of every page, or in the app under Settings › Legal & Privacy. Withdrawing deletes the stored click ID and records your no. The rest of the storage is needed for functions you use, such as your language choice."
       },
       "privacyAnalytics": {
         "title": "Privacy-Preserving Analytics",
