@@ -59,7 +59,8 @@ export function findLockDir(from = APP_ROOT) {
 }
 const LOCK_SLOTS = ['.gate-lock', '.gate-lock-b']
 const SLOT_B_BATTERY = 90
-const LOCK_POLL_MS = 20000
+/** a waiter's poll; `FILM_LOCK_POLL_MS` shortens it where other holders poll every second and a 20 s poll never wins */
+const LOCK_POLL_MS = Number(process.env['FILM_LOCK_POLL_MS'] ?? 20000)
 /** a holder that has run this long without a gap lets go for longer than a waiter's poll */
 const YIELD_EVERY_MS = 10 * 60 * 1000
 const YIELD_FOR_MS = LOCK_POLL_MS + 2000
