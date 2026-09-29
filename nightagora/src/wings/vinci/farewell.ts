@@ -1,17 +1,15 @@
-/** THE FAREWELL AT THE GRAVE: the eye rises over the grave court and looks out
- * over the house while the afternoon runs on to its evening, the sun goes
- * down beside the house, and the eye tilts up into the sky as the first
- * stars come out.
+/** THE FAREWELL AT THE GRAVE: the eye stays where the visitor stands and looks
+ * up into the sky, as the lobby's own look up does, while the afternoon runs
+ * on to sunset, the blue hour and the first stars.
  *
- * The sun keeps the day's own hours: 10 October 1517 at Amboise, from the
- * hour the wing stands in to nautical dusk, its height computed from the
- * site's latitude and the day's own noon, which reproduces the ephemeris rows
- * in `data/light-rig.json` to a few hundredths of a degree. ITS AZIMUTH IS
- * THE MUSEUM'S, NOT THE DAY'S: the day's sunset (255.6 deg) lies behind the
- * eye over the unbuilt land, so during the rise the sun swings to the house's
- * side of the sky (`FAREWELL_SUN_AZIMUTH`). The light, the sky's twilight and
- * the stars are scenic assumptions, as the rig's night rule says of every
- * twilight: a type of an October evening, not a record of that one.
+ * The sun keeps the day's own hours and its own place in the sky: 10 October
+ * 1517 at Amboise, from the hour the wing stands in to nautical dusk, its
+ * height computed from the site's latitude and the day's own noon, which
+ * reproduces the ephemeris rows in `data/light-rig.json` to a few hundredths
+ * of a degree. It sets at 255.6 deg, west-south-west, behind the court's back
+ * wall and its trees. The light, the sky's twilight and the stars are scenic
+ * assumptions, as the rig's night rule says of every twilight: a type of an
+ * October evening, not a record of that one.
  */
 import { Vector3 } from 'three/webgpu'
 import { hourKey } from './site'
@@ -53,31 +51,44 @@ function curve(knots: readonly (readonly [number, number])[], x: number): number
   return knots[knots.length - 1]![1]
 }
 
-/** THE FAREWELL'S CLOCK, in shares of its length: the eye rises and turns
- * to the house; it holds there as the sun comes down beside it; it tilts up
- * as the sun reaches the hill, so the land is a dark band under the sky with
- * the house and the trees against it; it watches the disc go; it looks up
- * into the sky as the blue hour deepens and the stars come out. */
-export const FAREWELL_SECONDS = 18
-export const FAREWELL_BEATS = { risen: .22, held: .34, glow: .56, set: .7 } as const
-/** The hour at a share of the farewell: the sun at eight degrees when the eye
- * has risen, five as it starts to look up, three at the golden moment, where
- * it meets the hill's crest, half a degree when it is gone behind it, twelve
- * under at the end. */
-export function farewellHour(share: number): number {
-  const B = FAREWELL_BEATS
-  return curve([[0, FAREWELL_FROM_HOUR], [B.risen, 16.38], [B.held, 16.72], [B.glow, 16.95], [B.set, 17.2], [1, FAREWELL_TO_HOUR]], share)
+/** A monotone cubic through (x, y) knots (Fritsch and Carlson), level at
+ * both ends, so a key is passed through without overshoot or a stop. */
+function monotone(knots: readonly (readonly [number, number])[], x: number): number {
+  const n = knots.length
+  if (x <= knots[0]![0]) return knots[0]![1]
+  if (x >= knots[n - 1]![0]) return knots[n - 1]![1]
+  const h: number[] = [], d: number[] = [], m: number[] = new Array(n).fill(0)
+  for (let i = 0; i < n - 1; i++) { h.push(knots[i + 1]![0] - knots[i]![0]); d.push((knots[i + 1]![1] - knots[i]![1]) / h[i]!) }
+  for (let i = 1; i < n - 1; i++) {
+    if (d[i - 1]! * d[i]! <= 0) continue
+    const w1 = 2 * h[i]! + h[i - 1]!, w2 = h[i]! + 2 * h[i - 1]!
+    m[i] = (w1 + w2) / (w1 / d[i - 1]! + w2 / d[i]!)
+  }
+  let i = 0
+  while (i < n - 2 && x > knots[i + 1]![0]) i++
+  const t = (x - knots[i]![0]) / h[i]!, t2 = t * t, t3 = t2 * t
+  return (2 * t3 - 3 * t2 + 1) * knots[i]![1] + (t3 - 2 * t2 + t) * h[i]! * m[i]! + (-2 * t3 + 3 * t2) * knots[i + 1]![1] + (t3 - t2) * h[i]! * m[i + 1]!
 }
-/** Where the museum's sun goes down, clockwise from north: right of the house
- * as the risen eye sees it (the house at 58 deg), where the hill's crest and
- * its trees fall lowest before the open land. */
-export const FAREWELL_SUN_AZIMUTH = 84
-/** The sun at a share: the day's own at the grave, swung the short way to the
- * museum's azimuth while the eye rises and turns, then held there. */
-export function farewellSunAt(share: number): { azimuth: number; elevation: number } {
-  const day = farewellSun(farewellHour(share))
-  const swing = smooth(share / FAREWELL_BEATS.risen)
-  return { azimuth: (day.azimuth + shortestTurn(day.azimuth, FAREWELL_SUN_AZIMUTH) * swing + 360) % 360, elevation: day.elevation }
+
+/** THE FAREWELL'S CLOCK. The look up takes its first second and a half; the
+ * sky then carries the evening on through one continuous run of the hour. */
+export const FAREWELL_SECONDS = 18
+/** The stars held a breath before the lobby takes the visitor home, the last
+ * of it a dip of the print so the lobby's own night comes in on a cut. The
+ * film's evening is rendered to the same length (`forge/film/evening.mjs`). */
+export const FAREWELL_REST = 2
+export const FAREWELL_DIP = .8
+const sec = (seconds: number): number => seconds / FAREWELL_SECONDS
+/** The hour at a share of the farewell, through keys set by the sun's height:
+ * the afternoon while the eye looks up (12 degrees), the golden light on the
+ * crowns (5), the sun at the hill (1), the rose afterglow on the clouds
+ * (3 under), the blue hour with the first stars (7.5 under) and nautical dusk.
+ * From inside the court the walls hide the disc and the horizon, so the
+ * sunset is the sky's and the clouds' colour, and the afterglow gets the
+ * longest share. */
+const HOUR_KEYS = [[0, FAREWELL_FROM_HOUR], [sec(2.5), 16], [sec(5), 16.75], [sec(8), 17.15], [sec(11.5), 17.55], [sec(14.5), 18], [1, FAREWELL_TO_HOUR]] as const
+export function farewellHour(share: number): number {
+  return monotone(HOUR_KEYS, Math.max(0, Math.min(1, share)))
 }
 
 /** How the evening lights the wing at one sun elevation. The direct light
@@ -172,55 +183,18 @@ export function farewellLight(elevation: number): FarewellLight {
   }
 }
 
-/** THE AIR THINS WITH THE EYE'S HEIGHT over the ground it stands on: the
- * exhibition fog is set for a walker, and from fifteen metres up it washed the
- * whole view. A share of the fog kept, 1 at walking height. */
-export function farewellAir(heightAboveGroundM: number): number {
-  return 1 - .7 * smooth((heightAboveGroundM - 2) / 14)
-}
-
-/** THE EYE'S WAY, in the wing's metres (east, north, height): the poses it
- * passes through at the clock's beats, from the one it leaves at the grave.
- * Headings run clockwise from north and every turn takes the short way. */
-export interface FarewellBeat { eye: readonly [east: number, north: number, height: number]; heading: number; pitch: number; fov: number }
-/** Keys inside the rise, at shares of the farewell between the grave and
- * the risen beat: the share of the height climbed, the heading and the
- * pitch, each passed through without overshoot. */
-export interface FarewellRise { lift: readonly (readonly [number, number])[]; heading: readonly (readonly [number, number])[]; pitch: readonly (readonly [number, number])[] }
-export interface FarewellPath { risen: FarewellBeat; held: FarewellBeat; glow: FarewellBeat; set: FarewellBeat; up: FarewellBeat; rise: FarewellRise }
-const RISEN_EYE = [-47.5, -28.5, 15] as const
-/** THE RISE LOOKS UP OUT OF THE COURT. Every heading from the grave to the
- * house passes a tree at the court's height (the tall elm west of the back
- * wall, the court's maple, the cherry and the hornbeam over the north wall),
- * and a level eye crossing the walls' coping sees the coping edge on with a
- * crown filling the frame. So the eye turns off the elm while still low,
- * tilts up to the sky as it climbs past the coping, and comes down onto the
- * house by the risen beat. Keys in seconds of the farewell's own clock. */
-const sec = (seconds: number): number => seconds / FAREWELL_SECONDS
-const RISE_LIFT = [[sec(.7), .04], [sec(1.45), .24], [sec(2.1), .66], [sec(2.7), .91], [sec(3.3), .99]] as const
-/** From the golden moment the frame's lower edge stands near the house's
- * foot, so the land is a band of about a fifth of the frame with the house
- * and the crest's trees against the sky over it. */
-export const FAREWELL_PATH: { desktop: FarewellPath; phone: FarewellPath } = {
-  desktop: {
-    // the wide frame's right edge reaches the gallery's block 2.4 m east of
-    // the grave, so the heading holds west of it until the eye is over its
-    // roof; the elm stands in the sky at the left for that moment
-    rise: { lift: RISE_LIFT, heading: [[sec(1), -46], [sec(1.7), -30], [sec(2.3), 0], [sec(3), 38], [sec(3.5), 53]], pitch: [[sec(.35), -2], [sec(1.35), 40], [sec(2), 44], [sec(3), 6]] },
-    risen: { eye: RISEN_EYE, heading: 60, pitch: -10, fov: 60 },
-    held: { eye: [-47.3, -28.3, 15.3], heading: 62, pitch: -6, fov: 60 },
-    glow: { eye: [-47.3, -28.3, 15.5], heading: 64, pitch: 16, fov: 56 },
-    set: { eye: [-47.3, -28.3, 15.6], heading: 64, pitch: 24, fov: 58 },
-    up: { eye: [-47.3, -28.3, 16], heading: 65, pitch: 40, fov: 72 },
-  },
-  phone: {
-    rise: { lift: RISE_LIFT, heading: [[sec(1), -34], [sec(2), 2], [sec(3), 42]], pitch: [[sec(.2), -4], [sec(1.3), 40], [sec(2), 44], [sec(2.9), 12]] },
-    risen: { eye: RISEN_EYE, heading: 60, pitch: -4, fov: 76 },
-    held: { eye: [-47.3, -28.3, 15.3], heading: 63, pitch: -1, fov: 76 },
-    glow: { eye: [-47.3, -28.3, 15.5], heading: 72, pitch: 26, fov: 88 },
-    set: { eye: [-47.3, -28.3, 15.6], heading: 72, pitch: 32, fov: 88 },
-    up: { eye: [-47.3, -28.3, 16], heading: 72, pitch: 48, fov: 94 },
-  },
+/** THE LOOK UP, in seconds of the farewell's clock: the eye stays where it
+ * stands, keeps its heading and its lens, and tilts up from its own pitch.
+ * The tilt takes about the lobby's second and a half (from `from` to the
+ * first key); the gaze then keeps rising slowly into the sky while the stars
+ * come out, so the grave's board has left the frame before its light is the
+ * brightest thing in it. From the grave the view stands on the back wall's
+ * filter band with the tall elm over it, and the evening's glow on the left:
+ * no turn is needed. */
+export interface FarewellLook { from: number; pitch: readonly (readonly [number, number])[] }
+export const FAREWELL_LOOK: { desktop: FarewellLook; phone: FarewellLook } = {
+  desktop: { from: .2, pitch: [[1.6, 31], [FAREWELL_SECONDS, 42]] },
+  phone: { from: .2, pitch: [[1.6, 36], [FAREWELL_SECONDS, 48]] },
 }
 
 /** A heading clockwise from north and a pitch, as a direction in the engine. */
@@ -230,68 +204,21 @@ function along(heading: number, pitch: number, out: Vector3): Vector3 {
 }
 const headingOf = (d: Vector3): number => Math.atan2(d.x, -d.z) / RAD
 const pitchOf = (d: Vector3): number => Math.asin(Math.max(-1, Math.min(1, d.y / Math.max(1e-9, d.length())))) / RAD
-/** The shortest way round from one heading to another, in degrees. */
-export const shortestTurn = (from: number, to: number): number => ((to - from) % 360 + 540) % 360 - 180
-
-/** A monotone cubic through (x, y) knots (Fritsch and Carlson), level at
- * both ends, so a key is passed through without overshoot or a stop. */
-function monotone(knots: readonly (readonly [number, number])[], x: number): number {
-  const n = knots.length
-  if (x <= knots[0]![0]) return knots[0]![1]
-  if (x >= knots[n - 1]![0]) return knots[n - 1]![1]
-  const h: number[] = [], d: number[] = [], m: number[] = new Array(n).fill(0)
-  for (let i = 0; i < n - 1; i++) { h.push(knots[i + 1]![0] - knots[i]![0]); d.push((knots[i + 1]![1] - knots[i]![1]) / h[i]!) }
-  for (let i = 1; i < n - 1; i++) {
-    if (d[i - 1]! * d[i]! <= 0) continue
-    const w1 = 2 * h[i]! + h[i - 1]!, w2 = h[i]! + 2 * h[i - 1]!
-    m[i] = (w1 + w2) / (w1 / d[i - 1]! + w2 / d[i]!)
-  }
-  let i = 0
-  while (i < n - 2 && x > knots[i + 1]![0]) i++
-  const t = (x - knots[i]![0]) / h[i]!, t2 = t * t, t3 = t2 * t
-  return (2 * t3 - 3 * t2 + 1) * knots[i]![1] + (t3 - 2 * t2 + t) * h[i]! * m[i]! + (-2 * t3 + 3 * t2) * knots[i + 1]![1] + (t3 - t2) * h[i]! * m[i + 1]!
-}
 
 /** The eye at a share of the farewell, from the pose it leaves at the grave:
- * each stretch between two beats eased at both ends, the rise through its
- * own keys. */
+ * the same eye, the same heading and lens, the pitch through the look's keys. */
 export function farewellPose(share: number, start: { eye: Vector3; at: Vector3; fov: number }, phone: boolean): { eye: Vector3; at: Vector3; fov: number } {
-  const path = FAREWELL_PATH[phone ? 'phone' : 'desktop'], B = FAREWELL_BEATS
-  const s = Math.max(0, Math.min(1, share))
-  const d0 = start.at.clone().sub(start.eye)
-  const first: FarewellBeat = { eye: [start.eye.x, -start.eye.z, start.eye.y], heading: headingOf(d0), pitch: pitchOf(d0), fov: start.fov }
-  const beats: [number, FarewellBeat][] = [[0, first], [B.risen, path.risen], [B.held, path.held], [B.glow, path.glow], [B.set, path.set], [1, path.up]]
-  if (s < B.risen) return risePose(s, first, path)
-  let i = 1
-  while (i < beats.length - 1 && s > beats[i]![0]) i++
-  const [s0, a] = beats[i - 1]!, [s1, b] = beats[i]!
-  const u = smooth((s - s0) / Math.max(1e-9, s1 - s0))
-  // the rise leaves the ground slowly and arrives slowly: eased twice
-  const lift = i === 1 ? u * u * (3 - 2 * u) : u
-  const eye = new Vector3(lerp(a.eye[0], b.eye[0], lift), lerp(a.eye[2], b.eye[2], lift), -lerp(a.eye[1], b.eye[1], lift))
-  const heading = a.heading + shortestTurn(a.heading, b.heading) * u
-  const dir = along(heading, lerp(a.pitch, b.pitch, u), new Vector3())
-  return { eye, at: eye.clone().addScaledVector(dir, 10), fov: lerp(a.fov, b.fov, u) }
-}
-
-/** The rise from the grave's own pose to the risen beat, through the keys. */
-function risePose(s: number, first: FarewellBeat, path: FarewellPath): { eye: Vector3; at: Vector3; fov: number } {
-  const B = FAREWELL_BEATS, b = path.risen, rise = path.rise
-  const lift = monotone([[0, 0], ...rise.lift, [B.risen, 1]], s)
-  // headings unwrapped key to key, so every step takes the short way round
-  const headings: [number, number][] = [[0, first.heading]]
-  for (const [at, value] of [...rise.heading, [B.risen, b.heading] as const]) {
-    const last = headings[headings.length - 1]![1]
-    headings.push([at, last + shortestTurn(last, value)])
-  }
-  const eye = new Vector3(lerp(first.eye[0], b.eye[0], lift), lerp(first.eye[2], b.eye[2], lift), -lerp(first.eye[1], b.eye[1], lift))
-  const dir = along(monotone(headings, s), monotone([[0, first.pitch], ...rise.pitch, [B.risen, b.pitch]], s), new Vector3())
-  return { eye, at: eye.clone().addScaledVector(dir, 10), fov: lerp(first.fov, b.fov, smooth(s / B.risen)) }
+  const look = FAREWELL_LOOK[phone ? 'phone' : 'desktop']
+  const t = Math.max(0, Math.min(1, share)) * FAREWELL_SECONDS
+  const d0 = start.at.clone().sub(start.eye), pitch0 = pitchOf(d0)
+  const dir = along(headingOf(d0), monotone([[0, pitch0], [look.from, pitch0], ...look.pitch], t), new Vector3())
+  const eye = start.eye.clone()
+  return { eye, at: eye.clone().addScaledVector(dir, 10), fov: start.fov }
 }
 
 /** The whole state at a share: the hour, the sun and its light. */
 export function farewellAt(share: number): { hour: number; sun: { azimuth: number; elevation: number }; light: FarewellLight } {
   const hour = farewellHour(share)
-  const sun = farewellSunAt(share)
+  const sun = farewellSun(hour)
   return { hour, sun, light: farewellLight(sun.elevation) }
 }

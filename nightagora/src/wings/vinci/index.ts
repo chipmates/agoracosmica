@@ -1,7 +1,7 @@
 import { createStaticShadowCache } from './static-shadow-cache'
 import { warmWalk, WARM_EXTRA_FRAMES, type WarmWalk } from '../../stack/warm-up'
 import { applyDisplayedSkyAir, createAerialFog, applyDisplayedHorizonHaze, displayedHorizonHazeProvenance, createHazeLive, resetHazeLive, type HazeLive, type IndoorBox } from './display-sky-haze'
-import { FAREWELL_SECONDS, farewellAir, farewellAt, farewellPose, farewellSunDirection } from './farewell'
+import { FAREWELL_DIP, FAREWELL_REST, FAREWELL_SECONDS, farewellAt, farewellPose, farewellSunDirection } from './farewell'
 import { createEveningSky, createEveningStars, sunDiscRadiance, twilightRadiance, type EveningSky, type EveningStars } from './farewell-sky'
 import { kelvinToColour } from '../../stack/light'
 import { mineralSurfaceProvenance, closeSurfaceProvenance } from './surface'
@@ -686,7 +686,7 @@ export function createWing():VinciWingModule {
   let farewellShare:number|null=null
   let farewellHeld:{eye:Vector3,at:Vector3,fov:number}|null=null
   /** THE LOOK UP WHILE IT RUNS: when it began on the wing's clock and the
-   * eye it rose from */
+   * eye it looks up from */
   let farewellRun:{pressed:number,from:number,band:number,start:{eye:Vector3,at:Vector3,fov:number}}|null=null
   const hourSun=new Vector3(), eveningSun=new Vector3()
   /** the dome's own haze share at the hour, read once it is built */
@@ -736,12 +736,23 @@ export function createWing():VinciWingModule {
     if(!hosts||!key)return
     hosts.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key.light&&o.castShadow){o.position.copy(key.direction).multiplyScalar(80);o.updateMatrixWorld()}})
   }
+  /** THE FILM'S FALLING LEAVES LEAVE THE EVENING. The film pins their wind
+   * while nothing walks, so under the look up they would hang still in the
+   * sky for the whole evening; the live walk has none. */
+  let leavesOut=false
+  function leavesForEvening(out:boolean):void {
+    if(out===leavesOut||!hosts)return
+    leavesOut=out
+    const leaves=hosts.world.scene.getObjectByName('vinci generated falling leaves')
+    if(leaves)leaves.visible=!out
+  }
   /** THE EVENING AT A SHARE OF THE FAREWELL, or the hour again with null:
    * the sun where it stood that day, its light and the sky's, the air's
    * colours, the twilight and the stars. */
-  function applyEvening(share:number|null,aboveGround=1.6):void {
+  function applyEvening(share:number|null):void {
     if(!hosts||!key||!hazeLive||!evening||!stars||!sky)return
     const scene=hosts.world.scene, fog=scene.fog as FogExp2
+    leavesForEvening(share!==null)
     if(share===null){
       key.direction.copy(hourSun)
       key.light.color.copy(kelvinToColour(KEY_RIG.key.kelvin));key.light.intensity=KEY_RIG.key.lux/100
@@ -765,7 +776,7 @@ export function createWing():VinciWingModule {
     key.fill.color.setRGB(...light.fillSky);key.fill.groundColor.setRGB(...light.fillGround);key.fill.intensity=KEY_RIG.fill.intensity*light.fillShare
     scene.environmentIntensity=KEY_RIG.environmentIntensity*light.environmentShare
     hazeLive.sun.value.copy(eveningSun);hazeLive.warm.value.setRGB(...light.hazeWarm);hazeLive.mid.value.setRGB(...light.hazeMid);hazeLive.cool.value.setRGB(...light.hazeCool)
-    hazeLive.air.value=farewellAir(aboveGround);hazeLive.land.value=light.land;hazeLive.veil.value=light.veil;hazeLive.far.value=1
+    hazeLive.land.value=light.land;hazeLive.veil.value=light.veil;hazeLive.far.value=1
     evening.sun.value.copy(eveningSun);evening.depression.value=light.depression;evening.share.value=light.twilight;evening.disc.value=1
     // high cloud takes the low sun from below: orange on the sunward side and
     // rose away from it while the disc is up, rose and then mauve once it is
@@ -780,16 +791,10 @@ export function createWing():VinciWingModule {
     aimFarCascade();focusNearCascade(true)
   }
   /** THE PRINT'S OPENING THROUGH THE EVENING: the eye's adaptation to the
-   * falling light, closed again while it faces a low sun, as a camera meters
-   * a sunset so the land goes dark against the sky. */
-  const meterAhead=new Vector3()
-  function farewellExposure(share:number,camera:{getWorldDirection(v:Vector3):Vector3}):number {
-    const at=farewellAt(share)
-    camera.getWorldDirection(meterAhead);meterAhead.y=0;meterAhead.normalize()
-    const facing=meterAhead.x*eveningSun.x+meterAhead.z*eveningSun.z
-    const flat=Math.hypot(eveningSun.x,eveningSun.z)||1
-    const toward=Math.max(0,Math.min(1,(facing/flat-.25)/.65)), low=Math.max(0,Math.min(1,(12-at.sun.elevation)/8))*Math.max(0,Math.min(1,(at.sun.elevation+5)/4))
-    return at.light.exposureGain*(1-.62*toward*toward*(3-2*toward)*low)
+   * falling light. The court's walls hide the low sun and the horizon's glow
+   * from the grave, so nothing bright in the frame closes it again. */
+  function farewellExposure(share:number):number {
+    return farewellAt(share).light.exposureGain
   }
   /** The farewell's eye over the rail's, while the farewell runs. */
   function holdFarewell():void {
@@ -798,23 +803,21 @@ export function createWing():VinciWingModule {
     c.position.copy(farewellHeld.eye);c.lookAt(farewellHeld.at);c.fov=fittedRailFov(farewellHeld.fov,c.aspect,narrow())
     c.updateProjectionMatrix();c.updateMatrixWorld()
   }
-  /** the stars held a breath before the lobby takes the visitor home, the
-   * last of it a dip of the print so the lobby's own night comes in on a cut */
-  const FAREWELL_REST=2, FAREWELL_DIP=.8
   /** THE DESK'S BAND GOES UNDER A DIP: the evening was framed for the whole
    * window, so the band's strip is given back to the picture at the bottom
    * of a short dip of the print, where the new frame cannot be seen to jump. */
   const BAND_DOWN=.3, BAND_UP=.6
-  /** THE GRAVE'S LOOK UP: the eye rises over the house, the sun goes down
-   * behind it, the stars come out, then the lobby. False where it cannot run
-   * (away from the grave, mid-walk, reduced motion): the caller goes home. */
+  /** THE GRAVE'S LOOK UP: the eye looks up from where it stands, the sun goes
+   * down behind the court's wall, the stars come out, then the lobby. False
+   * where it cannot run (away from the grave, mid-walk, reduced motion): the
+   * caller goes home. */
   function lookUp():boolean {
     if(farewellRun)return true
     if(!hosts||!standing||matchMedia('(prefers-reduced-motion: reduce)').matches)return false
     const nav=rail.navigation
     if(hereContent().id!=='grave'||nav.active||nav.exhibit||nav.approaching||closeLook?.id)return false
     const c=hosts.world.camera, ahead=c.getWorldDirection(new Vector3()), now=hosts.world.clock(), band=deskBand()
-    // the rise starts from the eye as it stands, the stop's own lens unfitted
+    // the look up starts from the eye as it stands, the stop's own lens unfitted
     farewellRun={pressed:now,from:now+(band>0?BAND_DOWN:0),band,start:{eye:c.position.clone(),at:c.position.clone().addScaledVector(ahead,10),fov:stationPose('grave',narrow()).fov}}
     hosts.stage.parentElement!.dataset['farewell']=''
     return true
@@ -831,8 +834,7 @@ export function createWing():VinciWingModule {
     if(share>=1+FAREWELL_REST/FAREWELL_SECONDS){endFarewell(true);return !hosts}
     const s=Math.max(0,Math.min(1,share))
     farewellHeld=farewellPose(s,farewellRun.start,narrow())
-    const e=farewellHeld.eye
-    if(s!==farewellShare)applyEvening(s,e.y-groundHeight(e.x,-e.z))
+    if(s!==farewellShare)applyEvening(s)
     return false
   }
   /** The print's share left by the dips: the band's, down and up again at
@@ -860,7 +862,7 @@ export function createWing():VinciWingModule {
     farewellHeld=p.eye&&p.at?{eye:world(p.eye[0]!,p.eye[1]!,p.eye[2]!),at:world(p.at[0]!,p.at[1]!,p.at[2]!),fov:p.fov??60}
       :farewellPose(p.share,stationPose('grave',narrow()),narrow())
     const e=farewellHeld.eye, d=farewellHeld.at.clone().sub(e).normalize(), ground=groundHeight(e.x,-e.z)
-    applyEvening(p.share,e.y-ground)
+    applyEvening(p.share)
     // the pose in the wing's own terms, for the scout that asked
     return {eye:[e.x,-e.z,e.y],ground,heading:Math.atan2(d.x,-d.z)*180/Math.PI,pitch:Math.asin(d.y)*180/Math.PI,fov:farewellHeld.fov}
   }
@@ -3429,7 +3431,7 @@ export function createWing():VinciWingModule {
       if(arrived>=0&&arrived!==card&&!activeView){card=arrived;dock.scrollTop=0;paintHeader();paintDock();paintQuestion();standHere()}
       if(nav.completed&&nav.completed!==exposureAt)exposureAt=nav.completed
       const byRoom=activeView?null:roomPrint(nav,hosts.world.camera.position)
-      const dusk=farewellShare===null?1:farewellExposure(farewellShare,hosts.world.camera)*farewellDip()
+      const dusk=farewellShare===null?1:farewellExposure(farewellShare)*farewellDip()
       const opening=(activeView&&VIEW_EXPOSURE[activeView]!==undefined?VIEW_EXPOSURE[activeView]!:byRoom?.exposure??legExposure(nav))*dusk, rolling=activeView&&VIEW_SHOULDER[activeView]!==undefined?VIEW_SHOULDER[activeView]!:byRoom?.shoulder??legShoulder(nav)
       const bending=byRoom?.toe??legToe(nav)
       if(nav.completed&&(opening!==exposureShown||rolling!==shoulderShown||bending!==toeShown))aimPrint(nav.completed,opening,rolling,bending)
