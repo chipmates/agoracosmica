@@ -26,7 +26,8 @@ import * as TSL from 'three/tsl'
 import { reliefNormal, resolved, specularAA, surfaceDetail } from '../../../stack/detail'
 import { SHADOW_ONLY_LAYER } from '../../../stack/light'
 import { Construction, type ExhibitMaterials } from '../myths/construction'
-import { Body, fallenLeaf, fallenPalette, growTree, mulberry, type Refuse, type TreeResult, type TreeTier } from '../tree-growth'
+import { Body, fallenPalette, growTree, leafLengthOf, mulberry, type Refuse, type TreeResult, type TreeTier } from '../tree-growth'
+import { layBlade } from '../leaf-blade'
 import { vegetationMaterials, vegetationMesh } from '../vegetation'
 import { applyCourtLight, COURT_ENGINE_TERMS, SUN } from './court-light'
 import { windWanted } from '../wind'
@@ -564,7 +565,11 @@ export function growGraveCourtTrees(tier: TreeTier): GraveCourtTrees {
         if (inOther) continue
       }
       const length = (.075 + random() * .05) * grow
-      fallenLeaf(fall, 'maple', e, n, ground + .002, random() * Math.PI * 2, length, pick(random() * (inBed ? .8 : 1)), .04 + random() * .12, inBed ? null : touch)
+      const angle = random() * Math.PI * 2, colour = pick(random() * (inBed ? .8 : 1)), curl = .04 + random() * .12
+      // the blade is given its own height: one without it is lifted to the
+      // wing's datum, and the court's floor lies 6.4 m under it
+      layBlade(fall, { species: 'maple', east: e, north: n, floor: ground, y: ground + .002, angle, length, own: leafLengthOf('maple'), colour,
+        fold: .14 + curl * 1.5, tilt: 0, ao: .8 }, null, inBed ? null : touch)
     }
   }
   const meshes: Mesh[] = []
