@@ -7,7 +7,6 @@ import { getT } from '../../i18n';
 import { breadcrumbSchema, personSchema, audioObjectSchema, faqSchema, itemListSchema } from '../../lib/schemas';
 import { getSeedsFor } from '../../lib/seeds';
 import { dickinsonPoemsFaqEn } from '../../lib/dickinsonPoemsFaq';
-import { FROZEN_PAGES } from '../../lib/frozenPages';
 import { canonicalUrl, publicUrl, SITE_URL, MEDIA_URL } from '../../lib/urls';
 import { figureSlugToId } from '@client/data/public/slugMap';
 import { getFigureById } from '@client/data/public/figuresCatalog';
@@ -47,10 +46,8 @@ const figurePortrait = figureImage(figureId, 'main', 1200);
 // with a capsule emits it as FAQPage so the visible Q&A and the schema match.
 const figQA = getFigureQA(figureId, lang);
 // Pair 0 renders as the lead paragraph without its question, so the schema
-// starts at pair 1; pages in the running search test keep their old markup.
-const qaPairs = figQA
-  ? (FROZEN_PAGES.has(`/figures/${slug}/`) ? figQA.pairs : figQA.pairs.slice(1))
-  : [];
+// starts at pair 1.
+const qaPairs = figQA ? figQA.pairs.slice(1) : [];
 const figQaItems = (figureId !== 'dickinson' && figQA)
   ? [...qaPairs, figQA.disclosure]
   : [];
@@ -68,10 +65,8 @@ const schemaWorks = pageContent?.works?.length
   ? pageContent.works.map(w => w.title)
   : figure.primaryWorks;
 
-// The Person description is the answer the hero shows; pages in the running
-// search test keep the life paragraph they still show.
-const frozenPage = FROZEN_PAGES.has(`/figures/${slug}/`);
-const personDescription = (!frozenPage && figQA?.pairs[0]?.a) || aboutParas[0] || figure.about;
+// The Person description is the answer the hero shows.
+const personDescription = figQA?.pairs[0]?.a || aboutParas[0] || figure.about;
 
 const schemas = [
   personSchema({

@@ -61,7 +61,6 @@ import { figureThemes } from '@client/data/public/figureSeo';
 import { getFigureQA } from '@client/data/public/figureQA';
 import { getFigurePageContent } from '@client/data/public/figurePageContent';
 import { dickinsonPoemsFaqEn, dickinsonPoemsFaqDe } from '../lib/dickinsonPoemsFaq';
-import { isFrozenFigurePage, frozenWording } from '../lib/frozenPages';
 
 interface Props {
   figureId: string;
@@ -73,8 +72,6 @@ const { figureId, slug, lang } = Astro.props;
 const t = getT(lang);
 const de = lang === 'de';
 const figure = getFigureById(figureId, lang);
-// Pages in the running search test keep their old order and markup.
-const frozen = isFrozenFigurePage(lang, slug);
 
 if (!figure) {
   throw new Error(`Unknown figure: ${figureId}`);
@@ -84,8 +81,8 @@ const seeds = getSeedsFor(figureId, lang);
 const qa = getFigureQA(figureId, lang);
 const leadAnswer = qa?.pairs[0]?.a ?? '';
 // The life summary restates the answer, so it only stays where the answer is
-// missing, or on pages in the running search test.
-const aboutParas = frozen || !leadAnswer
+// missing.
+const aboutParas = !leadAnswer
   ? figure.about.split('\n').map(p => p.trim()).filter(Boolean)
   : [];
 
@@ -186,7 +183,7 @@ const conceptHeadings = new Set([
   ...(getFigurePageContent(figureId, lang)?.concepts ?? []).map(c => c.h2),
   ...(qa?.pairs.slice(1) ?? []).map(pair => pair.q),
 ]);
-const inSection = (link: DeepLink) => !frozen && !!link.under && conceptHeadings.has(link.under);
+const inSection = (link: DeepLink) => !!link.under && conceptHeadings.has(link.under);
 const sectionLinks = allDeepLinks.filter(inSection);
 const deepLinks = allDeepLinks.filter(link => !inSection(link));
 const deepLinksLead = de ? 'Zu einem Thema tiefer:' : 'Go deeper on one thing:';
@@ -237,11 +234,7 @@ if (figure.essence) {
 
   <FigureHero figure={figure} slug={slug} lang={lang} answer={leadAnswer} />
 
-  {frozen && leadAnswer && (
-    <p class="pub-section__text pub-fig-answer">{leadAnswer}</p>
-  )}
-
-  {!frozen && <FigureDeepLinks links={deepLinks} lead={deepLinksLead} placement="answer" />}
+  <FigureDeepLinks links={deepLinks} lead={deepLinksLead} />
 
   {aboutParas.length > 0 && (
     <section class="pub-section pub-fig-life">
@@ -274,8 +267,6 @@ if (figure.essence) {
       ))}
     </section>
   )}
-
-  {frozen && <FigureDeepLinks links={deepLinks} lead={deepLinksLead} placement="late" />}
 
   <FigureChapters
     figureId={figureId}
@@ -311,7 +302,7 @@ if (figure.essence) {
                 />
                 <div>
                   <div class="pub-figure-card__name">{relFigure.name}</div>
-                  <div class="pub-figure-card__tradition">{frozenWording(frozen, lang, `tradition.${relId}`, relFigure.tradition)}</div>
+                  <div class="pub-figure-card__tradition">{relFigure.tradition}</div>
                 </div>
               </a>
             );
@@ -328,7 +319,7 @@ if (figure.essence) {
         {themesForFigure.map(themeId => (
           <a href={publicUrl(lang, `/themes/${themeId}`)} class="pub-theme-card">
             <h3 class="pub-theme-card__name">{t(`themes.${themeId}.name`)}</h3>
-            <p class="pub-theme-card__tagline">{frozenWording(frozen, lang, `themes.${themeId}.tagline`, t(`themes.${themeId}.tagline`))}</p>
+            <p class="pub-theme-card__tagline">{t(`themes.${themeId}.tagline`)}</p>
           </a>
         ))}
       </div>
@@ -369,7 +360,6 @@ if (figure.essence) {
       it keeps the free note and the door; the footer carries the trust line. */}
   <div class="pub-cta pub-cta--sticky fig-rail">
     <div class="pub-cta__inner">
-      {frozen && <p class="pub-cta__trust">{t('cta.trust')}</p>}
       <p class="pub-cta__trust">{t('cta.freeNote')}</p>
       <a
         href={beginHref}

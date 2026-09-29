@@ -16,7 +16,6 @@ import { getFigureQA } from '@client/data/public/figureQA';
 import { getSeedsFor } from '../lib/seeds';
 import { cleanDisplayText } from '../lib/figureWorld';
 import { anchorIds } from '../lib/anchors';
-import { isFrozenFigurePage } from '../lib/frozenPages';
 
 interface Props {
   figureId: string;
@@ -62,10 +61,10 @@ for (const pair of qa?.pairs.slice(1) ?? []) {
 
 // Every concept heading gets an id from its own words, so an ad or a link can
 // land on the answer. The ids the rest of the figure page already uses stay
-// out of reach. Pages in the running search test keep their markup.
+// out of reach.
 const PAGE_IDS = ['main-content', 'pub-nav', 'story', 'wisdom', 'prism', 'quest', 'freetalk', 'council',
   ...Array.from({ length: 12 }, (_, i) => `idea-${i + 1}`)];
-const nextId = isFrozenFigurePage(lang, slug) ? null : anchorIds(PAGE_IDS);
+const nextId = anchorIds(PAGE_IDS);
 const anchored = blocks.map(b => ({
   ...b,
   id: nextId ? nextId(b.h2) : undefined,

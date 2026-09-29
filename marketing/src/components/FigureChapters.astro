@@ -21,7 +21,6 @@ import type { Lang } from '../i18n';
 import { getSeedsFor } from '../lib/seeds';
 import { getStoryChapter } from '../lib/stories';
 import { chapterDisplayMinutes } from '../lib/storyRuntime';
-import { isFrozenFigurePage } from '../lib/frozenPages';
 import { getChapterFactcheck } from '../lib/factchecks';
 import { cleanDisplayText, cleanFactText } from '../lib/figureWorld';
 
@@ -69,14 +68,12 @@ const seeds = getSeedsFor(figureId, lang);
 // prose to get past a guard.
 const LOCKED_FRAMING = /great(est)? minds|gr(ö|oe)(ß|ss)te[nr]? (denker|geister)/i;
 
-// One length per chapter across the page (hero, six ways, this rail); pages in
-// the running search test keep the text estimate they launched with.
-const frozen = isFrozenFigurePage(lang, slug);
+// One length per chapter across the page (hero, six ways, this rail).
 const chapters = seeds.map((seed, i) => {
   const n = i + 1;
   const fc = getChapterFactcheck(figureId, lang, n);
   const story = getStoryChapter(figureId, lang, n);
-  const minutes = frozen ? story?.minutes : chapterDisplayMinutes(figureId, lang, n);
+  const minutes = chapterDisplayMinutes(figureId, lang, n);
   const meta = [
     fc?.year,
     fc?.age ? `${S.age} ${fc.age}` : '',

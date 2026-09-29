@@ -17,9 +17,7 @@ import { getT } from '../i18n';
 import type { Lang } from '../i18n';
 import { getPublicTrailerUrl } from '@client/utils/public/publicMediaUrl';
 import { getSeedsFor } from '../lib/seeds';
-import { getStoryChapter } from '../lib/stories';
 import { chapterDisplayMinutes } from '../lib/storyRuntime';
-import { isFrozenFigurePage } from '../lib/frozenPages';
 import { getFigureWorld, numberWord, capitalize, cleanDisplayText } from '../lib/figureWorld';
 
 interface Figure {
@@ -42,13 +40,9 @@ interface Props {
 const { figure, slug, lang, answer } = Astro.props;
 const t = getT(lang);
 const de = lang === 'de';
-// Pages in the running search test keep the hero they launched with.
-const frozen = isFrozenFigurePage(lang, slug);
-const heroAnswer = frozen ? '' : (answer ?? '');
+const heroAnswer = answer ?? '';
 // The promise is our line about the figure, never a quotation of them.
-const learnLine = figure.learn
-  ? (frozen ? (de ? `„${figure.learn}“` : `“${figure.learn}”`) : figure.learn)
-  : '';
+const learnLine = figure.learn ?? '';
 
 const S = de
   ? {
@@ -84,10 +78,7 @@ const beginHref = `/app?figure=${slug}&lang=${lang}`;
 // below uses for chapter 1 and the runtime the story file reports. Nothing is
 // written by hand, and a figure missing either half drops that half.
 const chapterTitle = cleanDisplayText(getSeedsFor(figure.id, lang)[0]?.title);
-// Pages in the running search test keep the text estimate they launched with.
-const chapterMinutes = frozen
-  ? getStoryChapter(figure.id, lang, 1)?.minutes
-  : chapterDisplayMinutes(figure.id, lang, 1);
+const chapterMinutes = chapterDisplayMinutes(figure.id, lang, 1);
 let chapterBeat = `${S.chapterWord} 1`;
 if (chapterTitle) chapterBeat += `: ${chapterTitle}`;
 if (chapterMinutes) chapterBeat += ` · ${chapterMinutes} ${S.min}`;
@@ -100,7 +91,7 @@ const worldLine = [
   world.connections > 0 ? `${capitalize(numberWord(world.connections, lang))} ${S.worldEdges}.` : '',
 ].filter(Boolean).join(' ');
 ---
-<section class={frozen ? 'pub-fig-hero' : 'pub-fig-hero pub-fig-hero--answer'}>
+<section class="pub-fig-hero pub-fig-hero--answer">
   <figure class="pub-fig-hero__figure">
     <div class="pub-fig-hero__portrait">
       <FigurePortrait figureId={figure.id} name={figure.name} lang={lang} />
@@ -114,17 +105,15 @@ const worldLine = [
 
     {heroAnswer && <p class="pub-fig-answer pub-fig-hero__answer">{heroAnswer}</p>}
 
-    {!frozen && (
-      <p class="fig-begin">
-        <a
-          class="fig-begin__button pub-cta__button"
-          href={beginHref}
-          data-agc-cta="start-exploring"
-          data-agc-figure={figure.id}
-          data-agc-door="fig_begin"
-        >{S.begin}</a>
-      </p>
-    )}
+    <p class="fig-begin">
+      <a
+        class="fig-begin__button pub-cta__button"
+        href={beginHref}
+        data-agc-cta="start-exploring"
+        data-agc-figure={figure.id}
+        data-agc-door="fig_begin"
+      >{S.begin}</a>
+    </p>
 
     <FigureTrailer client:visible figureId={figure.id} lang={lang} chapterHref={chapterHref} />
     <noscript>
@@ -142,18 +131,6 @@ const worldLine = [
         data-agc-door="fig_hero_chapter"
       >{chapterBeat}<span class="fig-hero-chapter__go" aria-hidden="true"> →</span></a>
     </p>
-
-    {frozen && (
-      <p class="fig-begin">
-        <a
-          class="fig-begin__button pub-cta__button"
-          href={beginHref}
-          data-agc-cta="start-exploring"
-          data-agc-figure={figure.id}
-          data-agc-door="fig_begin"
-        >{S.begin}</a>
-      </p>
-    )}
 
     <p class="pub-fig-hero__world">{worldLine}</p>
     <p class="pub-fig-hero__caption pub-fig-hero__caption--end">{t('figures.echoGloss')}</p>

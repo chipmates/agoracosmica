@@ -22,7 +22,6 @@ import {
 import { hasCouncilPreview } from '@client/data/public/councilPreviews';
 import { getSeedsFor } from '../../lib/seeds';
 import { chapterDisplayMinutes, shortRuntimeLabel } from '../../lib/storyRuntime';
-import { isFrozenFigurePage } from '../../lib/frozenPages';
 import { MEDIA_URL, publicUrl } from '../../lib/urls';
 import type { LibMode } from './lab-library';
 
@@ -124,10 +123,7 @@ export function getFigureLibraryModes(
     : (lang === 'de' ? `Kapitel ${chapter} abspielen` : `Play Chapter ${chapter}`);
   const storyScale = chapter === 1 ? t.story.scale : t.story.scaleAny;
   // The chapter's own length, the one the hero and the chapter rail print.
-  // Pages in the running search test keep the round figure they launched with.
-  const storyDuration = isFrozenFigurePage(lang, slug ?? '')
-    ? t.story.duration
-    : shortRuntimeLabel(chapterDisplayMinutes(figureId, lang, chapter), lang);
+  const storyDuration = shortRuntimeLabel(chapterDisplayMinutes(figureId, lang, chapter), lang);
 
   const concept = figure?.keyConcepts?.[0];
   const conceptTerm = clean(concept?.term);
