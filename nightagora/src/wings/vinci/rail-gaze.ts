@@ -371,6 +371,10 @@ export function planCalmGaze(input: {
   tangent?: (from: number, to: number) => number
   /** a scripted look's stretch: its course is followed at the turns' own caps */
   quick?: boolean
+  /** a step whose lens change sets its time changes the lens evenly in the
+   * picture's scale at the calm rate, eased at both ends, where that is
+   * quicker than one eased curve over the whole change */
+  evenLens?: boolean
 }): CalmGazePlan {
   // A STATION WALK takes the plan that costs least of the one that follows
   // its way and the one held to the floor, walked forward: seconds, and twice
@@ -405,7 +409,9 @@ export function planCalmGaze(input: {
     const turning = planTurns(input as TurnInput)
     if (turning && !spins(turning, input.lengthM)) return turning
   }
-  return planWay(input)
+  const even = input.evenLens === true && input.fovs !== undefined && Math.abs(input.zoom) > 1e-9
+    && lensChange(input.zoom, input.fovs).seconds < 1.875 * Math.abs(input.zoom) / CALM_GAZE.zoomPerSecond
+  return planWay(input, even)
 }
 
 /** A SHORT WALK DOES NOT TURN ROUND AND BACK: between two views that face

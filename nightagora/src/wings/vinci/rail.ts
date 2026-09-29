@@ -10,7 +10,7 @@ import { filmLensPixels, planCalmGaze, TURN_TIME_SCALE, type CalmGazePlan, type 
 import { GALLERY_LIFT_RAD, planGalleryGaze } from './rail-gallery-gaze'
 import { collectionLayout } from './collection'
 import { collectionView } from './collection/views'
-import { GALLERY_WALK_M, vinciWallEndVertex, vinciWallIsEnd, vinciWallNearerEnd, vinciWallOfStation, type VinciWall } from './collection/wall'
+import { GALLERY_WALK_M, VINCI_PICTURE_WALL, vinciWallEndVertex, vinciWallIsEnd, vinciWallNearerEnd, vinciWallOfStation, type VinciWall } from './collection/wall'
 import { vinciApproachesAreNeighbours } from './collection/approaches'
 import { COURT, FLOOR, SUPPER_WALL } from './collection/layout'
 import { railAccessWaypoints, railCollectionStairWaypoints, railDoorTurns, railGateWaypoints, railDoorways, railGardenPorch, railPairTurns, railPorchStands, railReadingPorch, railSide, type RailSide, type RailWaypoint } from './rail-waypoints'
@@ -474,6 +474,12 @@ const RAIL_QUICK_WIDE=35*TURN_TIME_SCALE,RAIL_QUICK_WIDE_PHONE=25*TURN_TIME_SCAL
  * wall's end stations keeps the walk's, and a caller that does not ask (the
  * film's own graph) keeps every leg at the walk's. */
 const STOP_TO_STOP_PACE=1.4
+/** FROM ONE PAINTING OF THE HANG TO THE NEXT the lens changes evenly at its
+ * calm rate where one eased curve over the whole change would take longer:
+ * between a large work and a small one that curve, not the walk, set the
+ * step's time, and every other step ran two to four times the walk's. */
+const evenLensStep=(wall:VinciWall|undefined,from:number|undefined,to:number|undefined):boolean=>
+  wall?.id===VINCI_PICTURE_WALL&&from!==undefined&&to!==undefined&&Math.abs(to-from)===1&&!vinciWallIsEnd(wall,from)&&!vinciWallIsEnd(wall,to)
 /** THE WALK BETWEEN TWO STOPS RUNS 1.4 TIMES FASTER than the pace the visitor
  * set, except the legs found right at their own pace: the picture room's, the
  * walk from the pictures into the hall, the heart valve's, and the house's
@@ -777,7 +783,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
       first:{heading:held.turnFirst,elevation:lift,lens:held.lensFirst??lift},long:held.long===true})
       :planCalmGaze({from,to,lengthM:length,lensPixels,zoom,timed:seconds=>gaitLeg(length,seconds),
         fovs:[fittedRailFov(fromFov,camera.aspect,request.phone),fittedRailFov(targetFov,camera.aspect,request.phone)],
-        tangent:chordHeading,
+        tangent:chordHeading,evenLens:evenLensStep(request.wallOn,wallAt,request.wall),
         course:certified.aim&&length>=WALKED_LEG_M?aimedAt(certified.aim,from.heading,to.heading):certified.route&&length>=WALKED_LEG_M?course:null,
         // an aimed link turns to its object standing and walks on holding it
         ...(certified.aim&&length>=WALKED_LEG_M?{turns:{start:true,end:true,at:[],quickDegPerSecond:request.phone?RAIL_QUICK_TURN_PHONE:RAIL_QUICK_TURN,
