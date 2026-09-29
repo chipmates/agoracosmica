@@ -10,7 +10,7 @@ import { filmLensPixels, planCalmGaze, TURN_TIME_SCALE, type CalmGazePlan, type 
 import { GALLERY_LIFT_RAD, planGalleryGaze } from './rail-gallery-gaze'
 import { collectionLayout } from './collection'
 import { collectionView } from './collection/views'
-import { GALLERY_WALK_M, VINCI_PICTURE_WALL, vinciWallEndVertex, vinciWallIsEnd, vinciWallNearerEnd, vinciWallOfStation, type VinciWall } from './collection/wall'
+import { GALLERY_WALK_M, VINCI_BODY_WALL, VINCI_PICTURE_WALL, vinciWallEndVertex, vinciWallIsEnd, vinciWallNearerEnd, vinciWallOfStation, type VinciWall } from './collection/wall'
 import { vinciApproachesAreNeighbours } from './collection/approaches'
 import { COURT, FLOOR, SUPPER_WALL } from './collection/layout'
 import { railAccessWaypoints, railCollectionStairWaypoints, railDoorTurns, railGateWaypoints, railDoorways, railGardenPorch, railPairTurns, railPorchStands, railReadingPorch, railSide, type RailSide, type RailWaypoint } from './rail-waypoints'
@@ -492,9 +492,11 @@ const STOP_TO_STOP_PACE=1.4
  * the work beside it, the lens changes evenly at its calm rate where one eased
  * curve over the whole change would take longer: between a large work and a
  * small one that curve, not the walk, set the step's time, and every other
- * step ran two to four times the walk's (on the phone up to eight). */
+ * step ran two to four times the walk's (on the phone up to eight). On the
+ * body wall every run takes it: the sheets share one lens, and the runs from
+ * the station swing the phone's lens as far as the hang's ends do. */
 const evenLensStep=(wall:VinciWall|undefined,from:number|undefined,to:number|undefined):boolean=>
-  wall?.id===VINCI_PICTURE_WALL&&from!==undefined&&to!==undefined&&Math.abs(to-from)===1
+  from!==undefined&&to!==undefined&&(wall?.id===VINCI_BODY_WALL||(wall?.id===VINCI_PICTURE_WALL&&Math.abs(to-from)===1))
 /** THE WALK BETWEEN TWO STOPS RUNS 1.4 TIMES FASTER than the pace the visitor
  * set, except the legs found right at their own pace: the picture room's, the
  * walk from the pictures into the hall, the heart valve's, and the house's
