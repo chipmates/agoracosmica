@@ -16,9 +16,9 @@ type Rail = ReturnType<typeof createRail>
 
 export interface FilmNode {
   id: string
-  kind: 'stop' | 'view' | 'door'
+  kind: 'stop' | 'view' | 'door' | 'start'
   station: VinciStationId
-  /** the place a door or a stop of its own stands at on the rail */
+  /** the place a door, the walk's start or a stop of its own stands at on the rail */
   railId?: VinciWalkPoseId
   walkId?: string
   exhibit?: string
@@ -65,8 +65,10 @@ export function installFilm(parts: FilmParts): void {
     return stop
   }
   const railOf = (node: FilmNode): VinciStationId => (node.railId ?? node.station) as VinciStationId
+  // the rail's own places (the house door, the stair head) stand as a stop does, on their place's pose
+  const onItsPlace = (node: FilmNode): boolean => node.kind === 'stop' || node.kind === 'door' || node.kind === 'start'
   const poseOf = (node: FilmNode): Pose => {
-    if (node.kind === 'door' && node.railId) return parts.placePose(node.railId, phone())
+    if ((node.kind === 'door' || node.kind === 'start') && node.railId) return parts.placePose(node.railId, phone())
     if (node.kind === 'stop') return parts.walkPose(stopOf(node.walkId ?? node.station), phone())
     const pose = parts.approachPose(node.exhibit ?? '', phone())
     if (!pose) throw new Error(`${node.id}: no viewing pose`)
@@ -83,7 +85,7 @@ export function installFilm(parts: FilmParts): void {
     /** the eye stood at a node at once, as a cut stands it */
     place(node: FilmNode): boolean {
       const rail = parts.rail()
-      if (node.kind === 'stop' || node.kind === 'door') {
+      if (onItsPlace(node)) {
         rail.set(railOf(node), poseOf(node), true, phone(), node.exhibit ? node.vertex : undefined)
         return true
       }
