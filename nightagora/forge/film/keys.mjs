@@ -53,9 +53,43 @@ const declaringText = (loader) => DECLARING_FILES.map((f) => { try { return load
 /** The declarations of the wing's index that shape every frame: the print,
     the shadow, the light rig, and the generator that assembles the house. */
 const GLOBAL_DECLARATIONS = ['PRINT', 'SHADOW', 'KEY_RIG', 'buildTheHouse']
-/** Files that shape every frame besides the stack's own. */
-const GLOBAL_WING_FILES = ['display-sky-haze.ts', 'static-shadow-cache.ts', 'shadow-shell.ts', 'shadow-body.ts',
+/** Files that shape every frame besides the stack's own; the sky's probe is
+    baked by the house's generator from `sky-probe.ts`. */
+const GLOBAL_WING_FILES = ['display-sky-haze.ts', 'sky-probe.ts', 'static-shadow-cache.ts', 'shadow-shell.ts', 'shadow-body.ts',
   'receiver-plane-shadow.ts', 'data/light-rig.json', 'site.ts'].map((f) => `${WING_DIR}/${f}`)
+/** Declarations of other wing files that shape every frame: the day sky's
+    dome adds the evening's twilight and sun disc, weighted by the uniforms
+    `createEveningSky` opens at zero; the terms themselves are the evening's. */
+const GLOBAL_FOREIGN_DECLARATIONS = { [`${WING_DIR}/farewell-sky.ts`]: ['createEveningSky'] }
+
+/* THE LIBRARY'S RECIPE RECORDS. A procedural record (`procedural/...`) names
+   no file a frame binds: its sha256 is its recipe file's (provenance-check).
+   A record whose every recipe file another key already reads stays out of
+   the library part, so a commit re-recording it re-renders only what that
+   key says:
+     the camera's modules   the MOTION key (every clip's track is replayed
+                            through them; nothing else of a frame is theirs)
+     the wing's index       its frame-shaping declarations, keyed by name here
+                            (GLOBAL_DECLARATIONS), in the exposures and in the
+                            evening's code; the rest of it is the interface
+     a global input         already a part of this key */
+export const MOTION_FILES = ['rail.ts', 'rail-gaze.ts', 'rail-gallery-gaze.ts', 'rail-smoothing.ts', 'rail-waypoints.ts', 'rail-solids.ts',
+  'rail-projection.ts', 'projection-drag.ts', 'gait.ts', 'data/rail-clearance.json', 'rail-proof.ts', 'rail-fingerprint.ts'].map((f) => `${WING_DIR}/${f}`)
+/** The recipe files a record declares (field, list or note). */
+export function recipeFilesOf(entry) {
+  const out = new Set()
+  if (typeof entry.recipe_file === 'string') out.add(entry.recipe_file)
+  if (Array.isArray(entry.recipe_files)) for (const r of entry.recipe_files) out.add(typeof r === 'string' ? r : r?.path)
+  for (const m of String(entry.note ?? '').matchAll(/(?:^|[;\s])recipe_file=([^;\s]+)/g)) out.add(m[1])
+  out.delete(undefined)
+  return [...out]
+}
+/** Whether another key carries a record: a procedural record whose every recipe file is read there. */
+export function carriedElsewhere(entry, globalFiles) {
+  if (!String(entry.path ?? '').startsWith('procedural/')) return false
+  const files = recipeFilesOf(entry)
+  return files.length > 0 && files.every((f) => f === INDEX_FILE || MOTION_FILES.includes(f) || globalFiles.has(f))
+}
 
 /** Named declarations of a source, by their text, wherever they stand
     (`names` a list, or a test of a name). */
@@ -147,8 +181,16 @@ export function globalKey(loader, { library = [], claimed = new Set() } = {}) {
     if (!held.has(name)) throw new Error(`the wing's index declares no ${name}`)
     parts[`${INDEX_FILE}#${name}`] = short(held.get(name).getText())
   }
+  for (const [file, names] of Object.entries(GLOBAL_FOREIGN_DECLARATIONS)) {
+    const found = declarations(loader.text(file), names)
+    for (const name of names) {
+      if (!found.has(name)) throw new Error(`${file} declares no ${name}`)
+      parts[`${file}#${name}`] = short(found.get(name).getText())
+    }
+  }
   parts.recipe = short(JSON.stringify(RECIPE))
-  parts['library sets no plate claims'] = short(library.filter((e) => drawable(e) && !claimed.has(`${e.id}|${e.path}|${e.sha256 ?? ''}`))
+  const globalFiles = new Set(Object.keys(parts).filter((k) => !k.includes('#')))
+  parts['library sets no plate claims'] = short(library.filter((e) => drawable(e) && !claimed.has(`${e.id}|${e.path}|${e.sha256 ?? ''}`) && !carriedElsewhere(e, globalFiles))
     .map((e) => `${e.id}|${e.path}|${e.sha256 ?? ''}`).sort().join('\n'))
   return { key: short(JSON.stringify(Object.entries(parts).sort())), parts }
 }
