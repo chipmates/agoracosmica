@@ -176,7 +176,10 @@ test('the pavilion leg as first seen is red on the near line (wide)', () => {
 })
 
 test('the same two legs walked today are green on both lines, both framings', () => {
-  for (const id of [GALLERY, PAVILION]) for (const framing of ['wide', 'upright']) {
+  // the pavilion's leg left the walk with the garden: its first-seen track still proves the lines above
+  const today = [GALLERY, PAVILION].filter((id) => audit.tracks.some((t) => t.edge.id === id))
+  assert.ok(today.includes(GALLERY), 'the gallery leg is walked today')
+  for (const id of today) for (const framing of ['wide', 'upright']) {
     const at = `${id} ${framing}`
     assert.deepEqual(measured.get(at).verdict, { near: null, heading: null }, at)
   }

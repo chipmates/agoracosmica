@@ -250,12 +250,12 @@ test('the wing: every plan over every pair of nodes is a walk the graph holds', 
   assert.ok(walks > 0 && dips > 0)
 })
 
-test('the wing: the guided visit is the fifteen LEGs forward, the two cuts and the house door both ways', () => {
+test('the wing: the guided visit is the fourteen LEGs forward, the two cuts and the house door both ways', () => {
   const visit = guidedVisit(graph)
-  assert.equal(visit.steps.filter((s) => s.clip).length, 15)
+  assert.equal(visit.steps.filter((s) => s.clip).length, 14)
   assert.equal(visit.steps.filter((s) => s.dip && s.title).length, 2)
   assert.equal(visit.steps.filter((s) => s.dip && s.quiet).length, 2)
-  assert.equal(visit.steps.filter((s) => s.read !== undefined).length, 18)
+  assert.equal(visit.steps.filter((s) => s.read !== undefined).length, graph.story.length)
   // the life walked forward at the film's pace, whatever the certificate holds tonight: into the house
   // the leg ends at the door's way in, out of it the leg begins at its way out
   const doors = graph.cuts.filter((c) => c.quiet)

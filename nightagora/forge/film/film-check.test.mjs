@@ -26,8 +26,8 @@ function plant(file, from, to) {
   assert.equal(text.split(from).length, 2, `${file} holds the planted text exactly once`)
   return { [file]: text.replace(from, to) }
 }
-const all = (tree) => [...tree.clips.keys(), ...tree.stills.keys()]
-const entry = (tree, at) => tree.clips.get(at) ?? tree.stills.get(at)
+const all = (tree) => [...tree.clips.keys(), ...tree.stills.keys(), ...(tree.evenings?.keys() ?? [])]
+const entry = (tree, at) => tree.clips.get(at) ?? tree.stills.get(at) ?? tree.evenings?.get(at)
 /** The cells whose content differs between two trees. */
 function changedCells(a, b) {
   const out = new Set()
@@ -60,8 +60,8 @@ test('a clean tree is green on every line', () => {
   const result = gate(clean)
   for (const l of result.lines) assert.deepEqual(l.red, [], `${l.name} is green`)
   assert.equal(result.green, true)
-  assert.equal(clean.clips.size, 716)
-  assert.equal(clean.stills.size, 192)
+  assert.equal(clean.clips.size, 714)
+  assert.equal(clean.stills.size, 190)
   for (const s of clean.stills.values()) assert.deepEqual(s.histories, { prints: 1, exposures: 1 }, `${s.node} ${s.framing} has one picture`)
 })
 
@@ -182,7 +182,7 @@ test('the post chain turns every clip and still red, by the global key alone', a
 })
 
 test('every line of §5.2 fires on its own entry and on nothing else', () => {
-  const clip = 'stop:line-early>stop:picture-room upright'
+  const clip = 'stop:line-early>stop:supper-wall upright'
   // an exempt clip is never red on bytes: the lines fire on a clip that has one
   const other = [...clean.clips.keys()].find((k) => k.endsWith(' wide') && k !== clip && !byteExempt(clean.clips.get(k).clip))
   const fire = (mutate, options) => {
@@ -238,10 +238,39 @@ test('every line of §5.2 fires on its own entry and on nothing else', () => {
   console.log(`# calm at 12 deg/s and 12 deg/s2 on today's walk: ${over.length} of ${clean.clips.size} clips over`)
 })
 
+test('the grave\'s look up: missing is red on the graph line alone, and each of its own lines fires on it alone', () => {
+  assert.equal(clean.evenings.size, 2, 'the look up in both framings')
+  const at = [...clean.evenings.keys()].find((k) => k.endsWith(' wide'))
+  const ev = clean.evenings.get(at)
+  const fire = (mutate) => {
+    const store = release.fork()
+    const rel = JSON.parse(store.read('release.json'))
+    const e = rel.evenings.find((x) => `${x.evening} ${x.framing}` === at)
+    const side = JSON.parse(store.read(e.sidecar))
+    mutate(side, e, rel, store)
+    store.write(e.sidecar, JSON.stringify(side))
+    store.write('release.json', JSON.stringify(rel))
+    return gate(clean, store)
+  }
+  const only = (result, name, why) => {
+    for (const l of result.lines) assert.deepEqual(l.red.map((r) => r.at), l.name === name ? [at] : [], l.name)
+    if (why) assert.match(result.lines.find((l) => l.name === name).red[0].why, why)
+  }
+  only(fire((side, e, rel) => { rel.evenings = rel.evenings.filter((x) => x !== e) }), 'graph', /look up goes straight to the lobby/)
+  only(fire((side) => { side.joins.first = 'another picture' }), 'joins', new RegExp(`still of ${ev.from}`))
+  only(fire((side) => { side.track.maxDeviation = .002 }), 'track', /farewell's path/)
+  only(fire((side) => { side.requestsAfterClock = 3 }), 'hygiene')
+  only(fire((side) => { side.letGo = false }), 'hygiene', /let go/)
+  only(fire((side, e) => { e.keys = { ...e.keys, motion: 'a'.repeat(64) } }), 'keys', /motion/)
+  only(fire((side, e, rel, store) => { store.files.delete(e.files['854x480'].file) }), 'files')
+  // its last frame is the dark before the lobby, held to no still
+  only(fire((side) => { side.joins.last = 'anything' }), null)
+})
+
 test('the near and heading lines fire on their own clip alone, and wait with a note when not measured', () => {
   const calm = { heading: { yaw: { reversals: 0, totalDeg: 0, netDeg: 0, excessDeg: 0 }, way: { inView: { reversals: 0, totalDeg: 0, netDeg: 0 } } }, view: { minM: 1.5, minWhat: null, near: { longestSeconds: 0, longestAt: 0 } } }
   const readings = new Map([...clean.clips.keys()].map((at) => [at, calm]))
-  const weave = 'stop:picture-room>stop:picture-room-lisa wide', brush = 'stop:line-early>stop:garden wide'
+  const weave = 'stop:picture-room>stop:picture-room-lisa wide', brush = 'stop:line-early>stop:supper-wall wide'
   readings.set(weave, { ...calm, heading: { ...calm.heading, way: { inView: { reversals: 8, totalDeg: 557, netDeg: 108 } } } })
   readings.set(brush, { ...calm, view: { minM: 0.51, minWhat: 'jamb', near: { longestSeconds: 0.33, longestAt: 9.67 } } })
   const result = checkRelease(release, clean, { motion: { caps: MOTION_CAPS, readings } })
@@ -273,13 +302,13 @@ test('a join between two sessions holds within the tolerance, and inside one ses
 })
 
 test('the joins line reads the sessions and the gaps the release carries', () => {
-  const clip = 'stop:line-early>stop:picture-room upright'
+  const clip = 'stop:line-early>stop:supper-wall upright'
   const run = (change) => {
     const store = release.fork()
     const rel = JSON.parse(store.read('release.json'))
     const e = rel.clips.find((c) => `${c.clip} ${c.framing}` === clip)
     const side = JSON.parse(store.read(e.sidecar))
-    const arrival = rel.stills.find((s) => s.node === 'stop:picture-room' && s.framing === 'upright')
+    const arrival = rel.stills.find((s) => s.node === 'stop:supper-wall' && s.framing === 'upright')
     const raw = JSON.parse(store.read(arrival.sidecar)).raw
     side.joins.last = 'c'.repeat(64)
     change(e, arrival, raw)
@@ -314,8 +343,14 @@ function plantRate(store, at, rung, kbits) {
 
 test("the grass's legs are exempt from the byte line: their rate is noted, never red", () => {
   const garden = [...new Set([...clean.clips.values()].filter((c) => c.from === 'stop:garden' || c.to === 'stop:garden').map((c) => c.clip))].sort()
+  const plain = 'stop:line-early>stop:supper-wall'
+  // a walk without the garden (the order since the stair head) exempts nothing: every clip keeps its line
+  if (!garden.length) {
+    assert.equal([...clean.clips.values()].filter((c) => byteExempt(c.clip)).length, 0, 'no clip of the graph is exempt')
+    for (const r of Object.keys(BYTE_LINES)) assert.equal(lineOf(r, plain), BYTE_LINES[r])
+    return
+  }
   assert.deepEqual(garden, [...BYTE_EXEMPT.clips].sort(), 'the exemption names exactly the clips with the garden at either end')
-  const plain = 'stop:line-early>stop:picture-room'
   for (const r of Object.keys(BYTE_LINES)) {
     for (const clip of garden) assert.equal(lineOf(r, clip), undefined, `${clip} ${r}: no line`)
     assert.equal(lineOf(r, plain), BYTE_LINES[r])
@@ -350,6 +385,11 @@ test("the delivery key moves for the grass's legs alone, and a capped encode of 
   const plain = deliveryKey(DELIVERY)
   assert.equal(clean.delivery.key, plain, "the tree's delivery key is the delivery's own")
   const gardenClips = [...clean.clips.values()].filter((c) => byteExempt(c.clip)).map((c) => `${c.clip} ${c.framing}`).sort()
+  // a walk without the garden exempts nothing: every clip keeps the delivery's own key
+  if (!gardenClips.length) {
+    for (const [at, c] of clean.clips) assert.equal(c.delivery, plain, `${at} keeps the delivery's own key`)
+    return
+  }
   assert.equal(gardenClips.length, 4, 'two legs, two framings')
   for (const [at, c] of clean.clips) {
     if (gardenClips.includes(at)) assert.notEqual(c.delivery, plain, `${at} names the exemption`)
