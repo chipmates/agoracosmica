@@ -488,7 +488,12 @@ const RAIL_QUICK_WIDE=35*TURN_TIME_SCALE,RAIL_QUICK_WIDE_PHONE=25*TURN_TIME_SCAL
  * wall's end stations keeps the walk's, and a caller that does not ask (the
  * film's own graph) keeps every leg at the walk's. */
 const STOP_TO_STOP_PACE=1.4
-/** FROM ONE PAINTING OF THE HANG TO THE NEXT, and between an end station and
+/** ON THE PHONE EVERY LEG'S LENS CHANGES EVENLY where that is quicker: its
+ * upright views often change the lens several times as far as the desktop's,
+ * and one eased curve over that change set much of the phone's walk. The rules
+ * below keep the desktop's own legs as they were approved.
+ *
+ * FROM ONE PAINTING OF THE HANG TO THE NEXT, and between an end station and
  * the work beside it, the lens changes evenly at its calm rate where one eased
  * curve over the whole change would take longer: between a large work and a
  * small one that curve, not the walk, set the step's time, and every other
@@ -798,11 +803,11 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     // a walk between two stops runs at its own speed, planned at it
     const brisk=request.link===true&&viewing?.exhibit!==undefined&&request.exhibit!==undefined&&RAIL_BRISK_LINKS.has(`${viewing.exhibit}>${request.exhibit}`)
     gaze=withGaitLegSpeed(certified.station?railLegSpeed(completed!.id,request.id):1,()=>held?planGalleryGaze({from,to,zoom,lensPixels,timed:seconds=>gaitLeg(length,seconds),
-      fovs:[fittedRailFov(fromFov,camera.aspect,request.phone),fittedRailFov(targetFov,camera.aspect,request.phone)],evenLens:evenLensStep(request.wallOn,wallAt,request.wall),
+      fovs:[fittedRailFov(fromFov,camera.aspect,request.phone),fittedRailFov(targetFov,camera.aspect,request.phone)],evenLens:request.phone||evenLensStep(request.wallOn,wallAt,request.wall),
       first:{heading:held.turnFirst,elevation:lift,lens:held.lensFirst??lift},long:held.long===true})
       :planCalmGaze({from,to,lengthM:length,lensPixels,zoom,timed:seconds=>gaitLeg(length,seconds),
         fovs:[fittedRailFov(fromFov,camera.aspect,request.phone),fittedRailFov(targetFov,camera.aspect,request.phone)],
-        tangent:chordHeading,evenLens:brisk||evenLensStep(request.wallOn,wallAt,request.wall),briskWalk:brisk,
+        tangent:chordHeading,evenLens:request.phone||brisk||evenLensStep(request.wallOn,wallAt,request.wall),briskWalk:brisk,
         course:certified.aim&&length>=WALKED_LEG_M?aimedAt(certified.aim,from.heading,to.heading):certified.route&&length>=WALKED_LEG_M?course:null,
         // an aimed link turns to its object standing and walks on holding it
         ...(certified.aim&&length>=WALKED_LEG_M?{turns:{start:true,end:true,at:[],quickDegPerSecond:request.phone?RAIL_QUICK_TURN_PHONE:RAIL_QUICK_TURN,

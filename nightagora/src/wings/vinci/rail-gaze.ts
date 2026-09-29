@@ -414,7 +414,11 @@ export function planCalmGaze(input: {
   }
   const even = input.evenLens === true && input.fovs !== undefined && Math.abs(input.zoom) > 1e-9
     && lensChange(input.zoom, input.fovs).seconds < 1.875 * Math.abs(input.zoom) / CALM_GAZE.zoomPerSecond
-  return planWay(input, even)
+  if (!even) return planWay(input)
+  // an even lens turns under the caps of the lens of the moment, which can make
+  // a leg the turn sets longer: the quicker of the two plans is walked
+  const evenly = planWay(input, true), curved = planWay(input)
+  return evenly.leg.seconds <= curved.leg.seconds ? evenly : curved
 }
 
 /** A SHORT WALK DOES NOT TURN ROUND AND BACK: between two views that face
