@@ -314,23 +314,31 @@ export function createWing(): WingModule {
       dots.push(dot)
     }
   }
+  /** A WALK INSIDE THE GRAVE'S COURT: both its ends stand there. The year is
+   * cut into the stone and its words are laid on, so the words stay with the
+   * stones through the clip's own track, as the live wing keeps them. */
+  function inGraveCourt(s: PictureState | undefined): boolean {
+    return s?.kind === 'walk' && release?.nodes[s.from]?.station === 'grave' && release?.nodes[s.to]?.station === 'grave'
+  }
   /** THE WORDS THE OBJECTS CARRY, projected through the node's printed
-   * camera: drawn once the picture rests, gone for the walk, as the marks are. */
-  function paintWords(): void {
+   * camera: drawn once the picture rests, gone for the walk, as the marks are;
+   * inside the grave's court they follow the walk frame by frame. */
+  function paintWords(walking = false): void {
     if (!words || !picture) return
     const node = here()
     const b = picture.box()
     // the station is read into the key: a release that lands after the first rest paints then
     const station = veiled ? null : release?.nodes[node]?.station ?? null
     const key = `${node}|${station}|${lang()}|${b.left},${b.top},${b.width}x${b.height}`
-    if (key === wordsAt) return
+    if (!walking && key === wordsAt) return
     const seam = picture
     const drawn = words.paint(station, lang(), point => {
       const at = seam.project(point)
       return at ? { x: b.left + at.x, y: b.top + at.y } : null
     })
-    // a rest whose print is not read yet is asked again, for a second at most
-    if (drawn || ++wordsTries > 60) { wordsAt = key; wordsTries = 0 }
+    // a rest whose print is not read yet is asked again, for a second at most;
+    // a walk's key never stands for a rest, so the rest after it paints again
+    if (drawn || ++wordsTries > 60) { wordsAt = walking ? `${key}|walk` : key; wordsTries = 0 }
   }
   function pressMark(dot: HTMLButtonElement, id: string, walks: boolean): void {
     if (!picture || look?.id) return
@@ -965,9 +973,11 @@ export function createWing(): WingModule {
         leg?.setAttribute('stroke-dasharray', `${(2 * Math.PI * 20.5 * share).toFixed(1)} ${(2 * Math.PI * 20.5).toFixed(1)}`)
       }
       desk?.update()
+      const courtWalk = inGraveCourt(s) && !eveningOn
       if (s.kind === 'rest' && performance.now() > doorLeaving && !eveningOn) { paintMarks(); paintWords() }
       else if (s.kind === 'wait' && dots.length) clearMarks()
-      if (s.kind !== 'rest' && wordsAt) { words?.hide(); wordsAt = '' }
+      if (courtWalk) paintWords(true)
+      else if (s.kind !== 'rest' && wordsAt) { words?.hide(); wordsAt = '' }
     },
     stop() {
       controller.abort()
