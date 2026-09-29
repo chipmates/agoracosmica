@@ -65,9 +65,9 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Hildegard von Bingen - Visions & Music | Agora Cosmica",
     },
     de: {
-      description: "Hildegard von Bingen über Vision, Natur und göttliche Ganzheit. Erzählte Lebensgeschichte, Lehren zu Heilung und Sehen. Sprich mit ihrem KI-Echo.",
+      description: "Entdecke Hildegard von Bingens mystische Vision von Natur, Musik und göttlicher Ganzheit. 12 Kapitel Lebensgeschichte, Lehren zu Heilung und spirituellem Sehen.",
       teachingsHeading: "Hildegard von Bingen über Vision, Natur und das Göttliche",
-      seoTitle: "Mit Hildegard von Bingen sprechen (KI-Echo) - Visionen",
+      seoTitle: "Hildegard von Bingen - Visionen & Musik | Agora Cosmica",
     },
   },
   blake: {
@@ -144,9 +144,9 @@ export const figureSeo: Record<string, FigureSeoData> = {
   },
   galilei: {
     en: {
-      description: "Galileo's courage to challenge authority through observation. A narrated life story with teachings on evidence and truth. Talk with his AI Echo.",
+      description: "Discover Galileo's courage to challenge authority through observation. 12-chapter life story, teachings on evidence, truth, and the language of nature.",
       teachingsHeading: "Galileo on Truth, Observation, and Courage",
-      seoTitle: "Talk to Galileo Galilei (AI Echo) - Heliocentrism",
+      seoTitle: "Galileo Galilei - Heliocentrism & Telescope | Agora Cosmica",
     },
     de: {
       description: "Entdecke Galileos Mut, Autorität durch Beobachtung herauszufordern. 12 Kapitel Lebensgeschichte, Lehren über Evidenz, Wahrheit und die Sprache der Natur.",
@@ -204,9 +204,9 @@ export const figureSeo: Record<string, FigureSeoData> = {
   },
   kahlo: {
     en: {
-      description: "Painter Frida Kahlo on pain, identity, and creative transformation. A narrated life story with teachings on embodied truth. Talk with her AI Echo.",
+      description: "Painter Frida Kahlo on pain, identity, and creative transformation. A narrated life story with teachings on embodied truth and cultural roots.",
       teachingsHeading: "Frida Kahlo on Art, Pain, and Identity",
-      seoTitle: "Talk to Frida Kahlo (AI Echo) - Self-Portraits & Identity",
+      seoTitle: "Frida Kahlo - Self-Portraits & Identity | Agora Cosmica",
     },
     de: {
       description: "Frida Kahlos Malerei über Schmerz, Identität und kreative Verwandlung. Eine erzählte Lebensgeschichte, Lehren zu verkörperter Wahrheit und Wurzeln.",
@@ -312,9 +312,9 @@ export const figureSeo: Record<string, FigureSeoData> = {
   },
   schopenhauer: {
     en: {
-      description: "Arthur Schopenhauer on will, suffering, and aesthetic contemplation. A narrated life story with teachings on compassion and desire. Talk with his AI Echo.",
+      description: "Arthur Schopenhauer on will, suffering, and aesthetic contemplation. A narrated life story with teachings on compassion, music, and desire.",
       teachingsHeading: "Schopenhauer on Will, Suffering, and Contemplation",
-      seoTitle: "Talk to Arthur Schopenhauer (AI Echo) - Will & Pessimism",
+      seoTitle: "Arthur Schopenhauer - Will & Pessimism | Agora Cosmica",
     },
     de: {
       description: "Schopenhauer über den Willen, das Leiden und die ästhetische Kontemplation. Eine erzählte Lebensgeschichte, Lehren zu Mitgefühl, Musik und Begehren.",
@@ -360,14 +360,14 @@ export const figureSeo: Record<string, FigureSeoData> = {
   },
   woolf: {
     en: {
-      description: "Virginia Woolf on consciousness, time, and a room of one's own. A narrated life story with teachings on perception and feminism. Talk with her AI Echo.",
+      description: "Virginia Woolf on consciousness, time, and a room of one's own. A narrated life story with teachings on perception, feminism, and the halo of being.",
       teachingsHeading: "Virginia Woolf on Consciousness, Time, and Self",
-      seoTitle: "Talk to Virginia Woolf (AI Echo) - Modernism & Consciousness",
+      seoTitle: "Virginia Woolf - Modernism & Consciousness | Agora Cosmica",
     },
     de: {
-      description: "Virginia Woolf über Bewusstsein, Zeit und ein eigenes Zimmer. Erzählte Lebensgeschichte, Lehren zu Wahrnehmung und Feminismus. Sprich mit ihrem KI-Echo.",
+      description: "Virginia Woolf über Bewusstsein, Zeit und ein eigenes Zimmer. Eine erzählte Lebensgeschichte, Lehren zu Wahrnehmung, Feminismus und dem Leuchten des Seins.",
       teachingsHeading: "Virginia Woolf über Bewusstsein, Zeit und Selbst",
-      seoTitle: "Mit Virginia Woolf sprechen (KI-Echo) - Bewusstsein",
+      seoTitle: "Virginia Woolf - Moderne & Bewusstsein | Agora Cosmica",
     },
   },
 };
