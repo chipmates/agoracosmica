@@ -949,7 +949,10 @@ export function createWing():VinciWingModule {
       // desk.sheet: its host fields
 
       // desk.opening: its host fields
-      hurry:()=>{if(standing)rail.stride(1)}})
+      // A SECOND PRESS DOES WHAT THE CONTROL SAYS: "Walk faster" strides the
+      // leg, and once the band is painted again at the card's handover the
+      // control names the stop after this one, and the press is kept for it.
+      hurry:()=>{if(!standing)return;if(goldNamesNext){h.navigate(card+1);return}rail.stride(1)}})
     header=make('div','vinci-heading');header.id='vinci-station-card';h.stage.append(header)
     // THE NAME UNDER THE PAINTING. Standing at a stop with no card, the work
     // carries two sealed words of its own: the title and the year, with the
@@ -2883,7 +2886,7 @@ export function createWing():VinciWingModule {
     }
     paintSheet()
     paintExhibitTitle();paintStrip()
-    desk?.paint()
+    desk?.paint();goldNamesNext=true
   }
   /** The card names what the frame holds: a sub-view carries its own title.
    * THE NUMBER COUNTS STATIONS. Two frames could otherwise read the same
@@ -3311,6 +3314,9 @@ export function createWing():VinciWingModule {
   }
   /** The stop the frame's current mark stays on while a walk is under way. */
   let markLeft=0
+  /** Whether the desk's gold control names the next stop, or says "Walk
+   * faster" (from a leg's first frame until the band is painted again). */
+  let goldNamesNext=true, goldLeg=false
   const wingModule:VinciWingModule={
     stations:WALK.stops.map(walkStation),
     legacyStationIds:vinciLegacyStationIds,
@@ -3464,6 +3470,9 @@ export function createWing():VinciWingModule {
       // being left; the bar stays. Written on the edge, never every frame.
       const underWay=Boolean(nav.active)
       if(underWay!==legUnderWay){legUnderWay=underWay;hosts.walking(underWay)}
+      // the desk rewrites its gold control's words on the same edge
+      const goldRunning=Boolean(rail.navigation.active)
+      if(goldRunning!==goldLeg){goldLeg=goldRunning;goldNamesNext=!goldRunning}
       desk?.update()
       // THE MARKS AND THE ROW BELONG TO THE STOP THE EYE STANDS AT, so both
       // are taken again the moment it arrives at another one.
