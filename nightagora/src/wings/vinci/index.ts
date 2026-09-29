@@ -737,10 +737,12 @@ export function createWing():VinciWingModule {
     key.light.target.updateMatrixWorld();key.light.updateMatrixWorld()
   }
   /** THE KEY'S SECOND CASCADE looks at the origin from along the sun, as
-   * the rig stood it; an evening moves the sun, so it is stood again. */
+   * the rig stood it; an evening moves the sun, so it is stood again. The
+   * rig stands its cascades in the scene itself: a room's own shadowing
+   * light hangs in the room's group and keeps the aim its room gave it. */
   function aimFarCascade():void {
     if(!hosts||!key)return
-    hosts.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key.light&&o.castShadow){o.position.copy(key.direction).multiplyScalar(80);o.updateMatrixWorld()}})
+    for(const o of hosts.world.scene.children)if(o instanceof DirectionalLight&&o!==key.light&&o.castShadow){o.position.copy(key.direction).multiplyScalar(80);o.updateMatrixWorld()}
   }
   /** THE FILM'S FALLING LEAVES LEAVE THE EVENING. The film pins their wind
    * while nothing walks, so under the look up they would hang still in the
