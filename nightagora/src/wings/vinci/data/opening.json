@@ -3,19 +3,21 @@
   "provenance": {
     "scope": "the wing's opening card, words by key",
     "status": "written",
-    "rule": "The line keeps the facts sheet's limits: earliest DATED drawing, never 'first'; the country near Vinci where he grew up, never a named viewpoint or his birthplace. The start word is the owner's own.",
-    "facts": "briefs/walk-monday-0928/FACTS-PICTURE-ROOM.md section 5",
+    "rule": "The line opens with his birth and keeps the facts sheet's limits: born 15 April 1452 in Vinci (the town and its country, never a house or Anchiano); earliest DATED drawing, never 'first'; his age at it, 21; the country near Vinci where he grew up, never a named viewpoint or 'the view of his birthplace'. The birth outside marriage stays with the doors. The start word is the owner's own.",
+    "facts": "briefs/walk-monday-0928/FACTS-PICTURE-ROOM.md section 5; the birth facts in briefs/walk-monday-0928/BRIEF-ARNO-BIRTH.md",
     "start_word": "the owner's own words from the walk (FINDINGS item 23)",
-    "written": "2026-09-28, the wave 4 words round after the owner's walk"
+    "written": "2026-09-28, the wave 4 words round after the owner's walk; the birth sentence added 2026-09-29 on the owner's ask. Measured on the card: 4/4/2 rows EN and 5/4/2 rows DE at 360/390/1440, one row more than before at most; the region (Tuscany) was tried and costs the phone a second extra row in German."
   },
   "opening": {
     "arno": {
       "line": {
-        "en": "His earliest dated drawing, 5 August 1473: the Arno valley near Vinci, where he grew up.",
-        "de": "Seine früheste datierte Zeichnung, 5. August 1473: das Arnotal bei Vinci, wo er aufwuchs.",
+        "en": "Born 15 April 1452 in Vinci. At 21, his earliest dated drawing, 5 August 1473: the Arno valley near Vinci, where he grew up.",
+        "de": "Geboren am 15. April 1452 in Vinci. Mit 21 seine früheste datierte Zeichnung, 5. August 1473: das Arnotal bei Vinci, wo er aufwuchs.",
         "certainty": "documented",
-        "certainty_note": "The date and 'earliest dated' are documented by the holder; 'near Vinci, where he grew up' is likely when said loosely; the exact viewpoint is disputed and is not named.",
+        "certainty_note": "The birth date is documented: his grandfather Antonio recorded it in the family's notarial book (15 April 1452, a Saturday, three hours into the night), and the baptism in Santa Croce at Vinci. The place is likely when said loosely: 'in Vinci' means the town and its country; the house at Anchiano is tradition only and a birth elsewhere is not ruled out. That he grew up in Vinci is documented from 1457 (the tax record of his grandfather's household). The date and 'earliest dated' are documented by the holder; his age, 21, follows from the two dates; the exact viewpoint is disputed and is not named.",
         "sources": [
+          "https://it.wikipedia.org/wiki/Leonardo_da_Vinci",
+          "https://en.wikipedia.org/wiki/Leonardo_da_Vinci",
           "https://www.uffizi.it/en/news/diagnostic-campaign-first-landescape-leonardo-drawing-8p-opificio-pietre-dure",
           "https://www.latoscanadileonardo.it/en/places/province-of-pistoia/municipality-of-monsummano-terme/montevettolini.html"
         ]
