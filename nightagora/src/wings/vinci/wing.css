@@ -535,8 +535,9 @@ html:has(#wing[data-phone-form]) #instruments .inst-close {
 /* IN A CLOSE LOOK the box keeps its foot row only, under the window: the way
    back, the work before in the book's seat, and gold on to the work after */
 .film-box[data-look='true'] > :not(.film-foot) {display:none;}
-.vinci-phone-earlier {display:none;}
-.film-box[data-look='true'] .vinci-phone-earlier {display:flex;}
+/* the film's seat rule sets every .film-book to flex, so the earlier seat needs the box's weight to stand down */
+.film-box .film-book.vinci-phone-earlier {display:none;}
+.film-box[data-look='true'] .film-book.vinci-phone-earlier {display:flex;}
 .film-box[data-look='true'] .film-book:not(.vinci-phone-earlier) {display:none;}
 .vinci-phone-earlier:disabled {opacity:.45;cursor:default;}
 /* the panel's own sound and plan rows stand down in the wing, as on the desk:
