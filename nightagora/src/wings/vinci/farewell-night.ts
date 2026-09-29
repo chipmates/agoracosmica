@@ -76,7 +76,7 @@ const HORIZON_P = [0.0002, 0.0107, 0.0966] as const
 const LAPIS_P = [0.0, 0.005, 0.069] as const
 const ABYSS_P = [0.0, 0.0006, 0.049] as const
 /** the Milky Way's light at its brightest, and its colour: a warm grey pulled to silver */
-const RIVER_P = 0.012
+const RIVER_P = 0.0112
 const RIVER_TINT = [0.93, 0.97, 1.05] as const
 
 /* THE BAND ON THE CPU, the shell's own numbers without its noise, for placing the grain */
@@ -143,12 +143,13 @@ export function createFarewellNight(): FarewellNight {
     pos[i * 3] = dir.x; pos[i * 3 + 1] = dir.y; pos[i * 3 + 2] = dir.z
     // THE MAGNITUDE LAW, tuned on the print: a shade steeper than the flux itself, since the
     // print's toe already compresses the faint end, and capped where the core would clip
-    const peak = Math.min(1.3, 0.066 * Math.pow(10, 0.43 * (6 - V)))
+    const peak = Math.min(1.3, 0.072 * Math.pow(10, 0.43 * (6 - V)))
     // the eye reads faint light without colour: the faint are silver, the bright keep their tint
     const tint = scotopic(temperature(rampOf(bv)), 0.35 + 0.65 * ease(5.5, 1, V))
     col[i * 3] = tint.r * peak; col[i * 3 + 1] = tint.g * peak; col[i * 3 + 2] = tint.b * peak
-    // the lobby's footprints: a glow grows with the light to the third magnitude, then slowly
-    size[i] = Math.max(2.6, 2.8 + 1.3 * Math.min(3, 6.5 - V) + 0.35 * Math.max(0, 3.5 - V))
+    // the lobby's footprints: a glow grows with the light to the third magnitude, then slowly;
+    // the faintest keep a core the film's encoder does not quantize away
+    size[i] = Math.max(3, 3.1 + 1.25 * Math.min(3, 6.5 - V) + 0.35 * Math.max(0, 3.5 - V))
     tw[i * 2] = 0.5 + hash1(hr) * 1.3; tw[i * 2 + 1] = hash1(hr + 0.5) * TAU
     // the glints: four rays and a halo for the first magnitude, rays alone to 2.15 (six at most in a frame)
     hero[i * 2] = V < 1.5 ? 1 : V < 2.15 ? 0.6 : 0; hero[i * 2 + 1] = V < 1.5 ? 1 : 0
@@ -171,10 +172,10 @@ export function createFarewellNight(): FarewellNight {
     if (dir.y < 0.08) continue
     dir.normalize().multiplyScalar(STAR_RADIUS)
     pos[i * 3] = dir.x; pos[i * 3 + 1] = dir.y; pos[i * 3 + 2] = dir.z
-    const peak = 0.066 * Math.pow(10, 0.4 * (6 - (6.1 + rand() * 0.8)))
+    const peak = 0.072 * Math.pow(10, 0.43 * (6 - (6.1 + rand() * 0.8)))
     const tint = scotopic(temperature(rand() * 0.8), 0.12)
     col[i * 3] = tint.r * peak; col[i * 3 + 1] = tint.g * peak; col[i * 3 + 2] = tint.b * peak
-    size[i] = 2.6
+    size[i] = 3
     tw[i * 2] = 0.5 + rand() * 1.3; tw[i * 2 + 1] = rand() * TAU
     seen[i] = 14.8 + rand() * 1.4
     i++
