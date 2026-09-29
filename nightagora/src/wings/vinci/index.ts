@@ -754,6 +754,9 @@ export function createWing():VinciWingModule {
     const leaves=hosts.world.scene.getObjectByName('vinci generated falling leaves')
     if(leaves)leaves.visible=!out
   }
+  /** the key's colour as its rig built it (from the colour's hex), held
+   * while an evening changes it: the kelvin's own colour is not those bits */
+  const keyColourAtRest=new Color()
   /** THE EVENING AT A SHARE OF THE FAREWELL, or the hour again with null:
    * the sun where it stood that day, its light and the sky's, the air's
    * colours, the twilight and the stars. */
@@ -763,7 +766,8 @@ export function createWing():VinciWingModule {
     leavesForEvening(share!==null)
     if(share===null){
       key.direction.copy(hourSun)
-      key.light.color.copy(kelvinToColour(KEY_RIG.key.kelvin));key.light.intensity=KEY_RIG.key.lux/100
+      if(farewellShare!==null)key.light.color.copy(keyColourAtRest)
+      key.light.intensity=KEY_RIG.key.lux/100
       key.fill.color.set(KEY_RIG.fill.color);key.fill.groundColor.set(KEY_RIG.fill.groundColor);key.fill.intensity=KEY_RIG.fill.intensity
       scene.environmentIntensity=KEY_RIG.environmentIntensity
       resetHazeLive(hazeLive,fog,hourSun)
@@ -775,6 +779,7 @@ export function createWing():VinciWingModule {
       aimFarCascade();focusNearCascade(true)
       return
     }
+    if(farewellShare===null)keyColourAtRest.copy(key.light.color)
     farewellShare=share
     const at=farewellAt(share), light=at.light, el=at.sun.elevation
     farewellSunDirection(at.sun,eveningSun)
