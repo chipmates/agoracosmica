@@ -25,7 +25,7 @@
  * own skirt and halo.
  */
 import { AdditiveBlending, BackSide, ClampToEdgeWrapping, Color, DataTexture, Group, InstancedBufferAttribute, LinearFilter, Mesh, MeshBasicNodeMaterial, MultiplyBlending, NormalBlending, PointsNodeMaterial, RedFormat, SphereGeometry, Sprite, UnsignedByteType, Vector3 } from 'three/webgpu'
-import { abs, asin, atan, clamp, dot, exp, float, instancedBufferAttribute, length, max, min, mix, mx_noise_float, normalize, oneMinus, positionLocal, pow, screenDPR, sin, smoothstep, step, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl'
+import { abs, asin, atan, clamp, dot, exp, float, instancedBufferAttribute, length, max, min, mix, mx_noise_float, mx_noise_vec3, normalize, oneMinus, positionLocal, pow, screenDPR, sin, smoothstep, step, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl'
 import { FAREWELL_METEOR, along } from './farewell'
 import { NIGHT_GALACTIC, NIGHT_STARS, NIGHT_STARS_STRIDE } from './farewell-night-stars'
 
@@ -228,6 +228,10 @@ const SKIRT = 0.09, SKIRT_REACH = 1.5
     that only the coarse one survives its key frames; the night at rest needs less of it. Shares by depression. */
 const GRAIN_FINE_FREQ = 300, GRAIN_COARSE_FREQ = 140
 const GRAIN_FINE = [0.03, 0.052, 0.02] as const, GRAIN_COARSE = [0.08, 0.05] as const
+/** the dark sky's colour grain, added in the shell at the print's scale (about a level each at the print):
+    red and green sit on the print's lift there, which a multiply cannot move, and the encoder's colour
+    planes otherwise settle the lapis into plateaus with a hue edge */
+const GRAIN_COLOUR = [0.0012, 0.0008, 0.0015] as const
 /** one over the gradient noise's own spread, so a share is the grain's standard deviation */
 const GRAIN_NORM = 1 / 0.3
 
@@ -393,6 +397,8 @@ export function createFarewellNight(): FarewellNight {
   const flatSun = normalize(vec3(uSun.x, 0, uSun.z).add(vec3(1e-5, 0, 0)))
   const sunward = pow(dot(flatRay, flatSun).mul(0.5).add(0.5), 3)
   const glow = sunward.mul(oneMinus(smoothstep(0.02, 0.5, h))).mul(oneMinus(smoothstep(6, 18, uDepression)))
+  // coarse enough to outlive the colour planes' halved resolution
+  sky = sky.add(mx_noise_vec3(d.mul(GRAIN_COARSE_FREQ).add(vec3(3.7, 11.9, 6.2))).mul(vec3(...GRAIN_COLOUR)).mul(GRAIN_NORM).mul(smoothstep(8, 13, uDepression)))
   // the whole fragment, not a colour: a material's own output is clamped at zero, and the shell's red goes
   // under zero on purpose, so the print's lift is taken back where the night is deepest
   shellMat.fragmentNode = vec4(sky.mul(uExposure), smoothstep(4, 13, uDepression).mul(oneMinus(glow)).mul(uLevel))
