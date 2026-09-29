@@ -235,7 +235,7 @@ export function createVinciPhoneForm(host: VinciPhoneHost): VinciPhoneForm {
   function paint(): void {
     const look = host.look(), at = host.wall()
     const said = [host.at(), lang(), open, Boolean(look), look?.previous, look?.next?.title, at?.at, at?.of, at?.previous, at?.next,
-      host.leg().walking, document.getElementById('rail-instruments')?.getAttribute('aria-label'), host.wing.querySelector('.wing-door')?.textContent].join('|')
+      host.leg().walking, document.getElementById('rail-instruments')?.getAttribute('aria-label'), host.wing.querySelector('.wing-door')?.textContent, host.wing.querySelector('.wing-question')?.textContent].join('|')
     if (said === painted) { publish(); return }
     painted = said
     root.dataset['look'] = String(Boolean(look))
@@ -255,6 +255,9 @@ export function createVinciPhoneForm(host: VinciPhoneHost): VinciPhoneForm {
       // from here, so its disclosure still comes before the first press
       const door = host.wing.querySelector<HTMLElement>('.wing-door')
       if (door) {
+        // the question the door carries stands over it, the one italic on the sheet
+        const asked = host.wing.querySelector('.wing-question')?.textContent?.trim()
+        if (asked) drawer.append(make('p', 'vinci-phone-question', asked))
         const ask = make('button', 'film-ask', door.textContent ?? '')
         ask.type = 'button'
         ask.append(icon('M5 11l6-6M6 5h5v5', 'film-ic film-ic-out'))
