@@ -483,3 +483,64 @@
 body:has(#wing[data-wing='vinci'][data-farewell]) :is(#rail-instruments,#rail-sound) {opacity:0;visibility:hidden;}
 /* the museum's wordmark goes with it; it is back the moment the lobby stands */
 body:has(#wing[data-wing='vinci'][data-farewell]) .brand {opacity:0;transition:opacity .9s ease;}
+/* THE PHONE'S FROZEN FORM (phone-form.ts). The one box at the foot of the
+   glass carries every word and way, so the frame's bar, the old card with its
+   door block, the wall's row of small pictures and the museum's wordmark stand
+   down. The box wears the film player's classes; its states follow here, the
+   film's own rules keyed to this wing's attribute. */
+#wing[data-phone-form] :is(.wing-rail-group,.wing-doorblock,.vinci-heading,.vinci-strip) {display:none !important;}
+:root:has(#wing[data-phone-form]:not([hidden])) .brand {visibility:hidden;}
+/* walking: nothing but the dim way back and gold as a ring that is the leg */
+#wing[data-phone-form][data-walking] :is(.film-name,.film-line,.film-drawer,.film-keys,.film-book,.vinci-phone-wall) {visibility:hidden;}
+#wing[data-phone-form][data-walking] .film-box > :is(.film-name,.film-line,.film-drawer,.film-keys) {background:none;}
+#wing[data-phone-form][data-walking] .film-back {opacity:.45;}
+/* a dip keeps the gold and the way back over the dark, and nothing of the place */
+#wing[data-phone-form][data-cut] :is(.film-name,.film-line,.film-drawer,.film-keys,.film-book,.vinci-phone-wall) {visibility:hidden;}
+/* THE SHEET'S TALL HEIGHTS: the record and the panel rise from the foot of
+   the glass to 44 px under its top, the full width, one scroll each, and the
+   way out of them stands in the thumb's reach at the foot */
+#wing[data-phone-form] .vinci-dock {
+  left:0;right:0;top:44px;bottom:0;width:auto;height:auto;transform:none;margin:0;max-width:none;max-height:none;
+  padding:0 16px calc(80px + env(safe-area-inset-bottom));
+  border:0;border-top:1px solid #a9977355;border-radius:14px 14px 0 0;background:#0d171f;
+}
+#wing[data-phone-form] .vinci-dock::backdrop {background:#081016a6;}
+#wing[data-phone-form] .vinci-sources-toolbar .vinci-sources-close {
+  position:fixed;left:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:2;
+  width:48px;height:48px;max-width:48px;min-width:48px;padding:0;border-radius:50%;
+  background:#07101ad9;box-shadow:inset 0 0 0 1px #ffffff40;
+}
+html:has(#wing[data-phone-form]) #instruments {
+  left:0;right:0;top:44px;bottom:0;width:auto;max-width:none;max-height:none;
+  padding:22px 24px 0;border-radius:14px 14px 0 0;
+}
+html:has(#wing[data-phone-form]) #instruments:not([hidden]) {display:flex;flex-direction:column;}
+html:has(#wing[data-phone-form]) #instruments .inst-close {
+  position:sticky;bottom:0;z-index:1;flex:none;
+  width:calc(100% + 48px);max-width:none;min-height:60px;margin:auto -24px 0;
+  padding:18px 24px env(safe-area-inset-bottom);text-align:left;
+  font-size:15px;color:var(--press-white);
+  background:linear-gradient(to bottom,color-mix(in srgb,var(--na-abyss) 0%,transparent),var(--na-abyss) 18px);
+}
+/* THE HANG'S OWN STEPS, where the eye stands on a wall: two glass glyphs on
+   the picture's foot just over the box, at its two edges, in the thumb's reach */
+.vinci-phone-wall {position:absolute;left:0;right:0;bottom:100%;display:flex;justify-content:space-between;padding:0 12px 12px;pointer-events:none;}
+.vinci-phone-wall[hidden] {display:none;}
+.vinci-phone-step {position:relative;flex:0 0 44px;width:44px;height:44px;padding:0;border:0;border-radius:50%;pointer-events:auto;
+  background:var(--glass);box-shadow:inset 0 0 0 1px var(--glass-ring);color:#ecdfc7;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.vinci-phone-step:disabled {visibility:hidden;}
+/* IN A CLOSE LOOK the box keeps its foot row only, under the window: the way
+   back, the work before in the book's seat, and gold on to the work after */
+.film-box[data-look='true'] > :not(.film-foot) {display:none;}
+.vinci-phone-earlier {display:none;}
+.film-box[data-look='true'] .vinci-phone-earlier {display:flex;}
+.film-box[data-look='true'] .film-book:not(.vinci-phone-earlier) {display:none;}
+.vinci-phone-earlier:disabled {opacity:.45;cursor:default;}
+/* the panel's own sound and plan rows stand down in the wing, as on the desk:
+   the wing plays no sound, and the plan is one of the wing's rows */
+html:has(#wing[data-phone-form]) :is(#inst-sound,#inst-plan) {display:none;}
+/* the box takes both of its own swipes, up for the drawer and sideways along a
+   set; a close look's words scroll natively and leave the sideways swipe to it */
+#wing[data-phone-form] .film-box {touch-action:none;}
+#wing[data-phone-form] .vitrine[data-narrow='true'] .vitrine-body {touch-action:pan-y;}

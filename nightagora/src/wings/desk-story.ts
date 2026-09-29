@@ -87,6 +87,25 @@ export function deskStoryStop(id: string): DeskStoryStop | undefined {
   return byId.get(id)
 }
 
+/** ONE SENTENCE A ROW, cut as the desktop's drawer cuts them: a German day
+    or century keeps its period ("2. Mai", "19. Jahrhundert"). */
+export function storySentences(said: string, language: string): string[] {
+  const out: string[] = []
+  let start = 0
+  for (let i = 0; i < said.length; i++) {
+    const mark = said[i]
+    if (mark !== '.' && mark !== '!' && mark !== '?') continue
+    if (said[i + 1] !== ' ') continue
+    if (mark === '.' && language === 'de' && /(?:^|\D)\d{1,2}$/.test(said.slice(start, i))
+      && /^ (?:Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember|Jahrhunderts?)(?!\p{L})/u.test(said.slice(i + 1))) continue
+    out.push(said.slice(start, i + 1).trim())
+    start = i + 1
+  }
+  const rest = said.slice(start).trim()
+  if (rest) out.push(rest)
+  return out
+}
+
 /* THE CHAPTER CUTS, READ FROM THE SAME LIST AS THE STOPS. A cut stands on the
    thread between two stops the walk takes one after the other, and only when
    the walk runs the story's way between them: an order that is not the

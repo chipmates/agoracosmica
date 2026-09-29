@@ -1101,7 +1101,9 @@ function markPanel(): void {
   if (sheet) document.documentElement.dataset['naPanel'] = instrumentsEl.hidden ? 'wing' : 'open'
   else delete document.documentElement.dataset['naPanel']
   if (sheet) return
-  if (wingRows.length) { wingRows = []; paintWingRows() }
+  // a wing standing on a narrow stage keeps its rows: its way home and its
+  // plan stand only here once the phone's box has replaced the bar
+  if (wingRows.length && phase !== 'wing') { wingRows = []; paintWingRows() }
   for (const name of ['--desk-band-h', '--desk-panel-g'])
     document.documentElement.style.removeProperty(name)
 }
@@ -1133,7 +1135,8 @@ function setInstruments(open: boolean, focus = true): void {
     }
     if (sheet) addEventListener('pointerdown', pressOutside, true)
     if (focus) {
-      const first = sheet ? instrumentsEl.querySelector<HTMLElement>('.inst-wing button, .inst-links button') : instSound
+      // a wing's own rows lead the panel wherever they stand, and the hand lands on the first
+      const first = sheet || wingRows.length ? instrumentsEl.querySelector<HTMLElement>('.inst-wing button, .inst-links button') : instSound
       first?.focus()
     }
   } else {

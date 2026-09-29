@@ -104,6 +104,9 @@ import { roadGradeProvenance } from './road-grade'
 import { apronProvenance } from './apron'
 import { vinciContent, vinciPlanRooms, vinciThroughLine, vinciLifeBands, vinciLifePeople, vinciLifeSecondLine, vinciLifeCut, vinciLifeWorksRow, vinciLifeWorksCount, vinciLifeWorksEmpty, vinciLifeCertaintyCounted, vinciLifeHourMark, vinciLifeFloorCount, vinciHourValues, vinciWelcomeText, vinciLegacyStationIds, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, vinciAbsences, vinciGrounds, vinciRightsPolicy, vinciWingCounts, vinciSourcesHeadings, type VinciCertainty, type VinciStatement, type VinciStationContent, type VinciStationId, type VinciText } from './content'
 import wingCss from './wing.css?inline'
+// the phone's box wears the film player's own classes, so both phones look alike
+import filmWingCss from './film-wing.css?inline'
+import { createVinciPhoneForm, type VinciPhoneForm, type VinciPhoneLook, type VinciPhoneWall } from './phone-form'
 import { applyDeskSteps, deskOn } from '../desk-switches'
 import { deskBand, deskStageHeight, setDeskBand } from '../desk-stage'
 import { createDeskChrome, type DeskChrome, type DeskStation } from '../desk-chrome'
@@ -675,6 +678,8 @@ export function createWing():VinciWingModule {
   let sheetFoot:HTMLElement|undefined
   /** The desktop's new chrome, while one of its switches stands. */
   let desk:DeskChrome|undefined
+  /** THE PHONE'S FROZEN FORM: the one box at the foot of the glass, where the desk's band is not */
+  let phone:VinciPhoneForm|undefined, phoneMount=false
   /** How far down the screen a panel of this wing may stand. */
   let panelFloor:()=>number=()=>innerHeight
   let restoreEnvironmentRotation:(()=>void)|null=null
@@ -882,10 +887,12 @@ export function createWing():VinciWingModule {
     // THE PHONE KEEPS ITS OWN CHROME. The desktop's steps stand only on a stage
     // that is wide when the visit begins, and the word stays off a narrow one.
     const deskStage=!narrow()
+    phoneMount=!deskStage
+    if(phoneMount)standPhone(h)
     if(deskStage)applyDeskSteps(wing);else delete wing.dataset['desk']
     /* HOW FAR DOWN A PANEL MAY STAND. Today that is the top of the bar; where
        the desktop's words stand, it is the top of their own band. */
-    panelFloor=()=>desk?.floor()??wing.querySelector('.wing-rail-group')?.getBoundingClientRect().top??deskStageHeight()
+    panelFloor=()=>desk?.floor()??(phone&&closeLook?.id?phone.footTop():phone?.top())??wing.querySelector('.wing-rail-group')?.getBoundingClientRect().top??deskStageHeight()
     const deskStyle=make('style','');deskStyle.textContent=[deskTypeCss,deskCss,deskCloseLookCss,
       // desk.panel
       deskPanelCss,
@@ -901,6 +908,9 @@ export function createWing():VinciWingModule {
 
       // desk.opening
       '',
+
+      // the phone's box
+      deskStage?'':filmWingCss,
     ].filter(Boolean).join('\n');h.stage.append(deskStyle)
     if(deskStage&&(deskOn('words')||deskOn('ways')))desk=createDeskChrome({
       stage:h.stage,wing,lang,
@@ -917,11 +927,8 @@ export function createWing():VinciWingModule {
       question:()=>text(hereContent().door),
       words:{next:LIFE_CARDS.controls.date.next,back:LIFE_CARDS.controls.date.previous,rail:WING_TEXT.rail},
       go:index=>h.navigate(index),
-      // THE WAY BACK GOES UP ONE LEVEL: standing at a work of a wall, back is
-      // the view the visitor arrived in, before it is the stop before this one
-      // ON THE WAY BACK IS THE STOP BEFORE THE ONE ASKED FOR, as the arrow key
-      // and the wheel read it, and never the wall's own step back
-      up:()=>{if(closeLook?.id){closeLook.back();return true}if(standing&&walkUnderWay()){h.navigate(station-1);return true}return standing&&toStationView()},
+      // the way back goes up one level first: the phone's way back reads the same
+      up:upOneLevel,
       leg:()=>{const nav=standing?rail.navigation:undefined;return nav?.active?nav.legWalked:null},
 
       // desk.panel: its host fields
@@ -1788,11 +1795,14 @@ export function createWing():VinciWingModule {
    * card's own sheet, so the hand lands on the sheet's control instead of on
    * a word no eye can see. */
   function sourceControl():HTMLElement {
+    if(phone&&!phone.element.hidden)return phone.element.querySelector<HTMLElement>('.film-from')??source
     if(!narrow()||!header||header.hidden)return source
     return header.querySelector<HTMLElement>('.vinci-sheet-grab')??source
   }
   /** The bar carries the walk, so the hand lands there when a sheet closes. */
   function focusTheBar():void {
+    const gold=phone&&!phone.element.hidden?phone.element.querySelector<HTMLElement>('.film-gold'):null
+    if(gold){gold.focus({preventScroll:true});return}
     const group=hosts?.stage.parentElement?.querySelector('.wing-rail-group')
     const mark=group?.querySelector<HTMLElement>('.wing-step[aria-current="true"]')??group?.querySelector<HTMLElement>('.wing-step')
     mark?.focus({preventScroll:true})
@@ -2112,6 +2122,7 @@ export function createWing():VinciWingModule {
    * it is, or the frame's own foot where no row stands: both the quiet label
    * and the marks are held above it. */
   function markFloor():number {
+    if(phone&&!phone.element.hidden)return phone.top()
     const row=strip?.element.getBoundingClientRect()
     return row&&row.height>0?row.top:deskStageHeight()
   }
@@ -2186,6 +2197,7 @@ export function createWing():VinciWingModule {
     const open=closeLook?.id?closeLook.reading():null
     if(open)return {left:open.left,top:open.top,right:open.left+open.width,bottom:open.top+open.height}
     if(dock.open)return dock.getBoundingClientRect()
+    if(phone&&!phone.element.hidden)return phone.element.getBoundingClientRect()
     if(narrow()&&header&&!header.hidden&&header.dataset['sheet'])return header.getBoundingClientRect()
     return null
   }
@@ -2198,6 +2210,7 @@ export function createWing():VinciWingModule {
     // the words are a panel too, once the free area is a contract: no mark of
     // either kind may stand under them
     const panels:VinciLabelRect[]=reading?[reading,...(desk?.panels()??[])]:[...(desk?.panels()??[])]
+    if(phone)panels.push(...phone.panels())
     for(const node of [header,strip?.element,barEl]){
       if(!node||node.hidden)continue
       const box=node.getBoundingClientRect()
@@ -2305,6 +2318,94 @@ export function createWing():VinciWingModule {
     const stop=stops[want-1]!
     if(closeLook?.id){openExhibit(stop.exhibit,null);return}
     wallRun(stop.exhibit)
+  }
+  /** THE HANG, STEPPED ON THE PHONE. On the picture wall a step runs the eye
+   * to the next work along the wall, as the arrows do; the body wall is read
+   * whole, so there a step opens the next sheet where the visitor stands. */
+  function phoneWall():VinciPhoneWall|null {
+    const wall=wallOn(), vertex=wallAt()
+    if(!wall||vertex===undefined||activeView||closeLook?.id)return null
+    const stops=vinciWallStops(wall), at=onWallStop()?vertex:0, west=vertex>stops.length
+    const titles=new Map(stationExhibits().map(entry=>[entry.id,entry.title]))
+    const title=(i:number):string|null=>{const stop=stops[i];return stop?titles.get(stop.exhibit)??null:null}
+    // from an end the hang begins at its first work, or at its last from the west
+    return {at,of:stops.length,previous:at>0?title(at-2):west?title(stops.length-1):null,next:at>0?title(at):west?null:title(0),
+      step:direction=>{
+        if(wall.id!==VINCI_BODY_WALL){stepWall(direction);return}
+        const stop=stops[at>0?at-1+direction:direction>0?0:-1]
+        if(stop)openExhibit(stop.exhibit,null)
+      }}
+  }
+  /** THE PHONE STANDS IN ITS FROZEN FORM: the one box over the room, and the
+   * frame's bar, the old card with its door block and the wall's row stand
+   * down (wing.css). Stood at the mount, before the house is built, with its
+   * own listeners, so the house's build is the one the film reads. */
+  let phoneStop:AbortController|undefined
+  function standPhone(h:WingHosts):void {
+    phoneStop?.abort();phoneStop=new AbortController()
+    const signal=phoneStop.signal
+    phone=createVinciPhoneForm({layer:h.labels,wing:h.stage.parentElement!,signal,count:WALK.stops.length,
+      at:()=>card,id:index=>stopAt(index).id,name:index=>stopAt(index).name??contentAt(index).name,
+      // a dip is under way as a leg is: gold keeps its ring and nothing of the place stands
+      leg:()=>{const nav=standing?rail.navigation:undefined;return {walking:Boolean(nav?.active)||wingElement()?.dataset['cut']!==undefined,share:nav?.active?nav.legWalked:0}},
+      go:index=>h.navigate(index),
+      back:()=>{if(!upOneLevel()&&card>0)h.navigate(card-1)},
+      // gold says "Walk faster" for the whole leg on the phone, so a press only strides it
+      hurry:()=>{if(standing)rail.stride(1)},
+      record:()=>{if(!standing)return;sources.select('station');mode=2;paintDock()},
+      wall:phoneWall,look:phoneLook,
+      words:{next:LIFE_CARDS.controls.date.next,previous:LIFE_CARDS.controls.date.previous}})
+    h.stage.parentElement!.dataset['phoneForm']=''
+    // a press on the picture folds the words back to the one line
+    h.stage.addEventListener('pointerdown',()=>{if(phone?.drawerOpen())phone.setDrawer(false)},{signal})
+    // Escape folds the drawer first; the wing's own keys come after this one
+    window.addEventListener('keydown',e=>{if(e.key==='Escape'&&!e.defaultPrevented&&!closeLook?.id&&phone?.drawerOpen()){e.preventDefault();phone.setDrawer(false)}},{signal})
+    // A SIDEWAYS SWIPE ON A CLOSE LOOK'S CARD steps its set, as the box's own
+    // two ways do; the card's own pull stays vertical
+    let swipeX=0,swipeY=0,swiping=false
+    h.labels.addEventListener('pointerdown',e=>{swiping=Boolean(closeLook?.id)&&Boolean((e.target as Element|null)?.closest?.('.vitrine-card'));swipeX=e.clientX;swipeY=e.clientY},{signal})
+    h.labels.addEventListener('pointerup',e=>{
+      if(!swiping)return
+      swiping=false
+      const dx=e.clientX-swipeX,dy=e.clientY-swipeY
+      if(Math.abs(dx)>48&&Math.abs(dx)>Math.abs(dy)*1.5)phoneLook()?.step(dx<0?1:-1)
+    },{signal})
+  }
+  /** ON THE PHONE A WORK BETWEEN TWO STOPS OF A WALL BELONGS TO THE STOP BEFORE
+   * IT along the wall, so the words, gold and the way back keep the story's
+   * order while the hang is stepped; the desk keeps the room's first stop. */
+  function storyStopOnWall(place:string,vertex:number|undefined,fallback:number):number {
+    const wall=phoneMount&&vertex!==undefined?vinciWallOfStation(place):undefined
+    if(!wall||vertex===undefined)return fallback
+    let best=fallback,bestVertex=-1
+    WALK.stops.forEach((stop,index)=>{
+      if(stop.place||!sameWall(stop.station,place))return
+      const at=walkVertex(stop)??vinciWallEndVertex(wall,stop.station)
+      if(at!==undefined&&at<=vertex&&at>bestVertex){best=index;bestVertex=at}
+    })
+    return best
+  }
+  /** THE SET A CLOSE LOOK BELONGS TO, walked on the phone as the desk's band
+   * walks it: the work before in the book's seat, the work after in gold. */
+  function phoneLook():VinciPhoneLook|null {
+    const open=closeLook?.id
+    if(!open)return null
+    const id=isLeafDoor(open)?open.slice(0,-LEAF_DOOR.length):open
+    const previous=exhibitStep(id,-1), next=exhibitStep(id,1), kind=picks.find(pick=>pick.id===id)?.kind
+    const own=deskControl('walk','next_manuscript')
+    const word=kind==='machine'?deskControl('walk','next_machine'):kind==='manuscript'&&own.en&&own.de?own:deskControl('walk','next_work')
+    return {previous:previous?.title??null,next:next?{title:next.title,word}:null,
+      step:direction=>{const to=direction>0?next:previous;if(to)openExhibit(to.id,null)}}
+  }
+  /** THE WAY BACK GOES UP ONE LEVEL: standing at a work of a wall, back is
+   * the view the visitor arrived in, before it is the stop before this one.
+   * ON THE WAY BACK IS THE STOP BEFORE THE ONE ASKED FOR, as the arrow key
+   * and the wheel read it, and never the wall's own step back. True when the
+   * wing took the step. */
+  function upOneLevel():boolean {
+    if(closeLook?.id){closeLook.back();return true}
+    if(standing&&walkUnderWay()){hosts?.navigate(station-1);return true}
+    return standing&&toStationView()
   }
   /** BACK AT A WORK IS ONE LEVEL UP: out of the work to the view the visitor
    * arrived in at this stop, walked back along the wall's own line. */
@@ -2902,6 +3003,7 @@ export function createWing():VinciWingModule {
     paintSheet()
     paintExhibitTitle();paintStrip()
     desk?.paint();goldNamesNext=true
+    phone?.paint()
   }
   /** The card names what the frame holds: a sub-view carries its own title.
    * THE NUMBER COUNTS STATIONS. Two frames could otherwise read the same
@@ -2943,6 +3045,8 @@ export function createWing():VinciWingModule {
     const nav=standing?rail.navigation:undefined
     const away=Boolean(nav?.exhibit??nav?.approaching)||Boolean(activeView)
     header.hidden=mode===2||Boolean(closeLook?.id)||(away&&!hereContent().built)
+    // a room not open stands down with its card; in a close look the box keeps its foot row
+    if(phone){phone.show(Boolean(closeLook?.id)||!(away&&!hereContent().built));phone.paint()}
     paintSheet()
   }
   /** AN APPROACH EYE IS NEVER A STATION. It stands in the station's own room
@@ -3440,7 +3544,8 @@ export function createWing():VinciWingModule {
       // to decides which of them the card belongs to.
       const arriving=Boolean(nav.active&&nav.legWalked>=CARD_HANDOVER)
       const here=arriving?nav.active:nav.completed
-      const arrived=here?walkIndexAt(here,arriving?nav.wallTo:nav.wall):-1
+      const vertex=arriving?nav.wallTo:nav.wall
+      const arrived=here?storyStopOnWall(here,vertex,walkIndexAt(here,vertex)):-1
       if(arrived>=0&&arrived!==card&&!activeView){card=arrived;dock.scrollTop=0;paintHeader();paintDock();paintQuestion();standHere()}
       if(nav.completed&&nav.completed!==exposureAt)exposureAt=nav.completed
       const byRoom=activeView?null:roomPrint(nav,hosts.world.camera.position)
@@ -3485,6 +3590,7 @@ export function createWing():VinciWingModule {
       // being left; the bar stays. Written on the edge, never every frame.
       const underWay=Boolean(nav.active)
       if(underWay!==legUnderWay){legUnderWay=underWay;hosts.walking(underWay)}
+      phone?.update()
       // the desk rewrites its gold control's words on the same edge
       const goldRunning=Boolean(rail.navigation.active)
       if(goldRunning!==goldLeg){goldLeg=goldRunning;goldNamesNext=!goldRunning}
@@ -3492,7 +3598,7 @@ export function createWing():VinciWingModule {
       // THE MARKS AND THE ROW BELONG TO THE STOP THE EYE STANDS AT, so both
       // are taken again the moment it arrives at another one.
       const atWall=wallAt()
-      if(atWall!==wallWas){wallWas=atWall;paintExhibitMarks();paintStrip()}
+      if(atWall!==wallWas){wallWas=atWall;paintExhibitMarks();paintStrip();phone?.paint()}
       // A MARK PROMISES WHAT THE BODY WILL DO, so its kind is taken again the
       // moment the body's own state changes: at a viewing eye a press opens
       // where the visitor stands, at a station it walks.
@@ -3514,7 +3620,7 @@ export function createWing():VinciWingModule {
       dots?.update(panels,undefined,name&&name.width>0?[{left:name.left,top:name.top,right:name.right,bottom:name.bottom}]:null)
       paintPictureWords()},
     // the evening's uniforms and the scene's light outlive a visit: the hour goes back before they are let go
-    stop(){if(hosts)delete hosts.stage.parentElement!.dataset['farewell'];farewellRun=null;farewellHeld=null;if(farewellShare!==null)applyEvening(null);pictureWordsLayer?.dispose();pictureWordsLayer=undefined;wordsPrint=wordsDrawn="";studySheet?.dispose();studySheet=undefined;releaseSheetMemory?.();releaseSheetMemory=undefined;desk?.dispose();desk=undefined;visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;life?.dispose();life=undefined;lifeControl?.remove();lifeControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;house=undefined;houseUp=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;hallSun=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;clearSky?.dispose();clearSky=undefined;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
+    stop(){if(hosts){delete hosts.stage.parentElement!.dataset['farewell'];delete hosts.stage.parentElement!.dataset['phoneForm']}phone?.dispose();phone=undefined;phoneStop?.abort();phoneStop=undefined;farewellRun=null;farewellHeld=null;if(farewellShare!==null)applyEvening(null);pictureWordsLayer?.dispose();pictureWordsLayer=undefined;wordsPrint=wordsDrawn="";studySheet?.dispose();studySheet=undefined;releaseSheetMemory?.();releaseSheetMemory=undefined;desk?.dispose();desk=undefined;visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;life?.dispose();life=undefined;lifeControl?.remove();lifeControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;house=undefined;houseUp=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;hallSun=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;clearSky?.dispose();clearSky=undefined;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
   }
   return wingModule
 }

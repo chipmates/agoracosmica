@@ -225,7 +225,8 @@ export function createVitrine(options: {
       // THE WINDOW OWNS THE PHONE. The station's chrome stands down while a
       // window is open, so the sheet runs to the foot of the screen and the
       // work is not read through a third of it.
-      const top = 58, bottom = height - 10, left = 8, right = width - 8
+      // a wing that keeps its foot row under the window gives its top as the floor
+      const top = 58, bottom = floor - 10, left = 8, right = width - 8
       const tall = bottom - top
       const fill = Boolean(exhibit?.payload?.fill)
       const viewHeight = fill ? tall : Math.round(Math.max(160, Math.min(320, tall * .34)))
