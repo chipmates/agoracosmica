@@ -80,7 +80,7 @@ const HORIZON_P = [-0.001, 0.007, 0.075] as const
 const LAPIS_P = [-0.002, 0.003, 0.055] as const
 const ABYSS_P = [-0.003, 0.0, 0.043] as const
 /** the Milky Way's light at its brightest clump, and its colour: a warm grey pulled to silver */
-const RIVER_P = 0.045
+const RIVER_P = 0.04
 const RIVER_TINT = [0.93, 0.97, 1.05] as const
 
 /** mulberry32: a small seeded generator, so the band and its grain are the same in every run */
@@ -222,9 +222,10 @@ const GRAINS = 1500
     which the film's 4:2:0 encoder keeps where it averaged a one-pixel core away */
 const FAINT_QUAD_PX = 6.6
 /** the soft skirt round the brighter stars, as a share of the core, and its reach in the star's own radii */
-const SKIRT = 0.07, SKIRT_REACH = 1.5
-/** the sky's grain: its share at dusk and in the full night; the noise's frequency over a unit direction */
-const GRAIN_DUSK = 0.03, GRAIN_NIGHT = 0.022, GRAIN_FREQ = 300
+const SKIRT = 0.09, SKIRT_REACH = 1.5
+/** the sky's grain: its share in the first dusk and from the nautical twilight on, where the sky is dark
+    enough that less is averaged away by the encoder; the noise's frequency over a unit direction */
+const GRAIN_DUSK = 0.03, GRAIN_DARK = 0.058, GRAIN_FREQ = 300
 /** one over the gradient noise's own spread, so a share is the grain's standard deviation */
 const GRAIN_NORM = 1 / 0.3
 
@@ -279,7 +280,7 @@ export function createFarewellNight(): FarewellNight {
     tw[i * 2] = 0.5 + hash1(hr) * 1.3; tw[i * 2 + 1] = hash1(hr + 0.5) * TAU
     // the glints: four rays and a halo for the first magnitude, rays alone to 2.15 (six at most in a frame);
     // a soft skirt for every star brighter than about the fourth magnitude, fading out by the fifth; the faint kept sharp
-    hero[i * 3] = V < 1.5 ? 1 : V < 2.15 ? 0.6 : 0; hero[i * 3 + 1] = V < 1.5 ? 1 : 0; hero[i * 3 + 2] = ease(5.1, 3.9, V)
+    hero[i * 3] = V < 1.5 ? 1 : V < 2.15 ? 0.6 : 0; hero[i * 3 + 1] = V < 1.5 ? 1 : 0; hero[i * 3 + 2] = ease(5.3, 3.9, V)
     // each comes out at its own depression of the sun, the brightest in the civil twilight
     seen[i] = 3 + 2.3 * V
   }
@@ -406,8 +407,11 @@ export function createFarewellNight(): FarewellNight {
      blobs a few pixels across at a few percent survive it, where a pixel dither is averaged away. ---- */
   const grainMat = new MeshBasicNodeMaterial({ side: BackSide, transparent: true, depthWrite: false, blending: MultiplyBlending, premultipliedAlpha: true })
   grainMat.fog = false
-  const share = mix(float(GRAIN_DUSK), float(GRAIN_NIGHT), smoothstep(13, 18, uDepression)).mul(smoothstep(1, 3, uDepression)).mul(uLevel)
-  grainMat.colorNode = vec3(1, 1, 1).mul(float(1).add(mx_noise_float(normalize(positionLocal).mul(GRAIN_FREQ)).mul(GRAIN_NORM).mul(share)))
+  const gd: N = normalize(positionLocal)
+  // a multiply grows with the light: the bright glow low over the horizon takes half
+  const share = mix(float(GRAIN_DUSK), float(GRAIN_DARK), smoothstep(4, 9, uDepression))
+    .mul(mix(float(0.5), float(1), smoothstep(0.1, 0.45, gd.y))).mul(smoothstep(1, 3, uDepression)).mul(uLevel)
+  grainMat.colorNode = vec3(1, 1, 1).mul(float(1).add(mx_noise_float(gd.mul(GRAIN_FREQ)).mul(GRAIN_NORM).mul(share)))
   const grain = new Mesh(new SphereGeometry(GRAIN_RADIUS, 64, 32), grainMat)
   grain.frustumCulled = false
   // after the shell, before the stars: the grain is the sky's, never a star's
