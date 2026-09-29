@@ -57,7 +57,7 @@ const COPY = {
   en: {
     trust: 'Nonprofit · Open Source · No tracking cookies, no profiling',
     kicker: 'One question about this ad',
-    heading: 'Help a small nonprofit get found?',
+    heading: 'May we count your visit?',
     lead: 'We’re a small nonprofit, and Google gives us these ads for free. Counted visits help them reach more people searching for the same thing.',
     fine: 'A yes sends Google the ad’s click ID with each step you take here: this yes, opening the app, listening, starting a conversation, a third message, a council. Nothing else about you. Your browser remembers your answer for a year. You can turn this off anytime under “Ad measurement” at the foot of every page. Either way, the whole library stays open.',
     accept: 'Yes, count it',
@@ -70,7 +70,7 @@ const COPY = {
   de: {
     trust: 'Gemeinnützig · Open Source · Keine Tracking-Cookies, kein Profiling',
     kicker: 'Eine Frage zu dieser Anzeige',
-    heading: 'Hilfst du uns, gefunden zu werden?',
+    heading: 'Dürfen wir deinen Besuch zählen?',
     lead: 'Wir sind klein und gemeinnützig, und Google schenkt uns diese Anzeigen. Gezählte Besuche helfen ihnen, mehr Menschen zu erreichen, die dasselbe suchen.',
     fine: 'Ein Ja schickt Google die Klick-ID der Anzeige bei jedem Schritt, den du hier machst: diesem Ja, dem Öffnen der App, dem Zuhören, dem Beginn eines Gesprächs, deiner dritten Nachricht, einem Council. Sonst nichts über dich. Dein Browser merkt sich deine Antwort ein Jahr lang. Ausschalten kannst du das jederzeit unten auf jeder Seite unter „Werbe-Messung“. So oder so bleibt die Bibliothek offen.',
     accept: 'Ja, zählen',
