@@ -55,10 +55,10 @@ export const WING_TEXT = {
     en: 'Ask the Echo about this',
     de: 'Frag das Echo danach',
   },
-  /** the no-key case: the app's free tier is a daily quota, not a key */
+  /** the no-signup case, in the app's own words for its daily free messages */
   doorNote: {
-    en: 'Opens the library in a new tab. It has a free daily quota and needs no key for it.',
-    de: 'Öffnet die Bibliothek in einem neuen Tab. Sie hat ein freies Tageskontingent und braucht dafür keinen Schlüssel.',
+    en: 'Opens the library in a new tab. Free messages every day, no signup needed.',
+    de: 'Öffnet die Bibliothek in einem neuen Tab. Kostenlose Nachrichten jeden Tag, ohne Anmeldung.',
   },
   /* THE DOOR'S OWN PLATE. A first time visitor has never heard of the
      library, so the door says what it leads to before it opens. The name in
@@ -68,13 +68,14 @@ export const WING_TEXT = {
     en: 'Talk with the Echo of {name}',
     de: 'Sprich mit dem Echo von {name}',
   },
+  /** one row on the desktop's band, German included */
   doorLead: {
-    en: 'This door leads to Agora Cosmica, the library this museum belongs to. There you talk with the AI Echoes of thirty lives. You learn how they thought and what they knew about living, and you can put your own questions to them.',
-    de: 'Diese Tür führt zu Agora Cosmica, der Bibliothek, zu der dieses Museum gehört. Dort sprichst du mit den KI-Echos von dreißig Leben. Du lernst, wie sie dachten und was sie über das Leben wussten, und du kannst ihnen deine eigenen Fragen stellen.',
+    en: 'Behind this door is the Agora Cosmica library: thirty lives in chapters, and AI Echoes to talk with.',
+    de: 'Die Tür führt zur Bibliothek Agora Cosmica: dreißig Leben in Kapiteln und KI-Echos zum Gespräch.',
   },
   doorTerms: {
-    en: 'Nonprofit and Open Source. It opens in a new tab, with free turns every day and no key needed.',
-    de: 'Non-Profit und Open Source. Öffnet in einem neuen Tab, mit freien Gesprächsrunden jeden Tag und ohne Schlüssel.',
+    en: 'Nonprofit and Open Source. Opens in a new tab. Free messages every day, no signup needed.',
+    de: 'Non-Profit und Open Source. Öffnet sich in einem neuen Tab. Kostenlose Nachrichten jeden Tag, ohne Anmeldung.',
   },
   /** the plate's way in, which carries the station's own question */
   doorAsk: {

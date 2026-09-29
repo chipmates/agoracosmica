@@ -18,10 +18,11 @@ export interface DisclosureLine {
 }
 
 export const DISCLOSURES: Record<DisclosureKey, DisclosureLine> = {
-  /** passed on arrival: what the whole night is, before anyone speaks */
+  /** passed at the door into the library, and in the page's static mirror:
+      what an Echo is, before one speaks */
   stone: {
-    en: 'The historical figures speak as AI Echoes: interpretations built from what each person left behind. Not recordings. Not the dead themselves.',
-    de: 'Die historischen Persönlichkeiten sprechen als KI-Echos: Interpretationen dessen, was sie hinterlassen haben. Keine Aufnahmen. Nicht die Toten selbst.',
+    en: 'Each figure speaks as an AI Echo: an interpretation built from what they left behind.',
+    de: 'Jede Persönlichkeit spricht als KI-Echo: eine Deutung, gestützt auf das, was sie hinterließ.',
   },
   /** the colophon on every surface an Echo appears on. No surface of the
       museum carries one today: the figure pane used to, and it now shows a
@@ -29,8 +30,8 @@ export const DISCLOSURES: Record<DisclosureKey, DisclosureLine> = {
       layer stays in the canon for the surface that speaks in a figure's
       voice, and the honesty check reads the canon either way. */
   ink: {
-    en: 'An AI Echo · An interpretation, not a recording',
-    de: 'Ein KI-Echo · Eine Interpretation, keine Aufnahme',
+    en: 'An AI Echo · An interpretation built from what the person left behind',
+    de: 'Ein KI-Echo · Eine Deutung, gestützt auf das, was dieser Mensch hinterließ',
   },
 }
 

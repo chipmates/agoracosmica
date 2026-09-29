@@ -274,7 +274,7 @@
   border: 0;
   max-width: 860px;
 }
-#wing[data-desk~='panel'] .wing-door-plate[data-form='band'] :is(.na-plate-title, .wing-door-lead) { display: none; }
+#wing[data-desk~='panel'] .wing-door-plate[data-form='band'] .na-plate-title { display: none; }
 .wing-door-asked {
   margin: 0;
   max-width: 860px;
