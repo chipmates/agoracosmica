@@ -238,7 +238,7 @@
     {
       "station": "body",
       "question_en": "You told a visitor you had opened over thirty bodies. What were you looking for inside?",
-      "question_de": "Über dreißig Tote hast du geöffnet, sagtest du einem Besucher. Was hast du darin gesucht?",
+      "question_de": "Du hast einem Besucher erzählt, du hättest über dreißig Leichen geöffnet. Was hast du darin gesucht?",
       "source": {
         "converged_station": "CONCEPT.md section 3",
         "seat_questions": [
@@ -247,7 +247,7 @@
         ]
       },
       "editorial_note": "The number stays what he told the visitor, as the drawer says; the question does not state it as fact.",
-      "german_provenance": "Written in German for the words round of 2026-09-28, not translated from the English."
+      "german_provenance": "Written in German for the words round of 2026-09-28, not translated from the English. Revised 2026-09-29 after a blind read of the doors: the spoken order (\"Du hast einem Besucher erzählt, du hättest ...\") and \"Leichen\", the word German uses for opening bodies."
     },
     {
       "station": "myths",

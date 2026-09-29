@@ -80,7 +80,7 @@ const vinciDoors: Record<string, WingDoorQuestion> = {
   },
   body: {
     en: 'You told a visitor you had opened over thirty bodies. What were you looking for inside?',
-    de: 'Über dreißig Tote hast du geöffnet, sagtest du einem Besucher. Was hast du darin gesucht?',
+    de: 'Du hast einem Besucher erzählt, du hättest über dreißig Leichen geöffnet. Was hast du darin gesucht?',
   },
   myths: {
     en: 'People quote sentences as yours that you never wrote. Does that bother you?',
