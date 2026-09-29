@@ -39,9 +39,9 @@ import { isMachineSlug, type MachineSlug } from './machines'
 import { createPictureRecord, createPolicyWorkLabel, createWindowWorkLabel, holderLine, policyLabelText, PICTURE_CERTAINTY_KEY } from './pictures/policy-label'
 import { hangCatalogue } from './collection/catalogue'
 import { frameKey, hangNumber } from './collection/picture-room-plan'
-import { MAIN_HANG, REGISTER, type PictureRights } from './pictures/register'
+import { findPlateEntries, MAIN_HANG, REGISTER, type PictureRights, type PictureWork } from './pictures/register'
 import { MACHINE_SLUGS, machineCatalog } from './machines/catalog'
-import { validatePaintingRecord } from './pictures/policy'
+import { validatePaintingRecord, type PolicyPaintingEntry } from './pictures/policy'
 import { validateSheetRecord } from './pictures/sheet-record'
 import { assetAddress } from '../../stack/materials'
 import { createCollectionReceiverPlaneShadowFilter } from './receiver-plane-shadow'
@@ -3008,6 +3008,15 @@ export function createWing():VinciWingModule {
   }
   const ROOM_CLASS_WORD:Record<PictureRights,VinciText>={DG:vinciSourcesHeadings.classShown,
     RC:vinciSourcesHeadings.classUnderReview,REF:vinciSourcesHeadings.classReference}
+  /** The RC class is the historic register's. Once the store admits a tiered
+   * record for the work, the tier governs display and the class is no longer
+   * under review. */
+  function roomClassWord(work:PictureWork):VinciText {
+    if(work.rights_class!=='RC'||!assets)return ROOM_CLASS_WORD[work.rights_class]
+    let tiered=false
+    try{tiered=findPlateEntries(work,assets).some(entry=>(entry.plate as PolicyPaintingEntry).tier!==undefined)}catch{tiered=false}
+    return tiered?vinciSourcesHeadings.classPublicReproduction:ROOM_CLASS_WORD.RC
+  }
   /** What stands in the room, one line per exhibit with the collection that
    * holds it and the class its reproduction was given. */
   function appendRoomExhibits(host:HTMLElement,id:VinciStationId):void {
@@ -3020,7 +3029,7 @@ export function createWing():VinciWingModule {
     if(!works.length&&!machines.length&&!sheets.length)return
     host.append(make('h3','',text(vinciSourcesHeadings.inThisRoom)))
     const list=make('ul','vinci-room-list')
-    for(const work of works)list.append(make('li','',`${lang()==='de'?work.title_de:work.title_en} · ${holderLine(work,lang())} · ${text(ROOM_CLASS_WORD[work.rights_class])}`))
+    for(const work of works)list.append(make('li','',`${lang()==='de'?work.title_de:work.title_en} · ${holderLine(work,lang())} · ${text(roomClassWord(work))}`))
     for(const slug of machines){const machine=machineCatalog[slug];list.append(make('li','',`${text(machine.title)} · ${text(machine.label)}`))}
     const centimetres=(value:number)=>lang()==='de'?String(value).replace('.',','):String(value)
     for(const {sheet,page} of sheets){
