@@ -3263,6 +3263,8 @@ export function createWing():VinciWingModule {
       paintHeader();paintHeaderVisibility();paintDock();paintQuestion();standHere()
     })
   }
+  /** The stop the frame's current mark stays on while a walk is under way. */
+  let markLeft=0
   const wingModule:VinciWingModule={
     stations:WALK.stops.map(walkStation),
     legacyStationIds:vinciLegacyStationIds,
@@ -3277,11 +3279,25 @@ export function createWing():VinciWingModule {
     demonstrateMachine(slug:string|null){exhibits?.demonstrate(isMachineSlug(slug??'')?slug as MachineSlug:null)},
     navigation:()=>{
       const nav=standing?rail.navigation:undefined
-      // a stop of the walk's own place is named by its id; the door's two
-      // poses are passed through and name the stop the card stands at
-      const named=(id?:string):string|undefined=>id===undefined?undefined:isVinciWalkPose(id)?(walkIndexAt(id)>=0?id:undefined):id
-      const target=doorAhead>=0?stopAt(doorAhead).id:named(nav?.queued[0]??nav?.active)
-      return {completed:named(nav?.completed)??WALK.stops[card]?.id??hereContent().id,target,question:text(hereContent().door),door:hereContent().door.station}
+      // THE MARKS NAME STOPS OF THE WALK, not the rail's places: the portrait
+      // stands on the picture room's own wall, so a place is read with its
+      // vertex, and a door's pose or the stair head names no stop.
+      const stopOf=(id:string|undefined,vertex?:number):number=>id===undefined?-1:walkIndexAt(id,vertex)
+      const queued=nav?.queued[0]
+      const ahead=!nav?-1:doorAhead>=0?doorAhead:walkOnwards>=0?walkOnwards
+        // a queued leg carries no vertex: the place of the stop asked for is that stop
+        :queued!==undefined?(queued===railPlaceOf(stopAt(station))?station:stopOf(queued))
+        // an exhibit's own approach is a look, not a way to a stop
+        :nav.active!==undefined&&!(nav.approaching&&!nav.running)?stopOf(nav.active,nav.wallTo)
+        // under the dip of a door or a far press, the stop asked for is where it lands
+        :cutCard&&!cutCard.hidden?station:-1
+      const here=stopOf(nav?.completed,nav?.wall), onWay=ahead>=0&&ahead!==here
+      // AT REST THE MARK IS THE CARD'S STOP. Under way it stays on the stop
+      // left until the next is stood at: the card hands over at half the leg.
+      // A stop the eye stands at between the one left and the one ahead is reached.
+      if(!onWay)markLeft=card
+      else if(nav&&!nav.active&&here>=0&&(here-markLeft)*(ahead-here)>0)markLeft=here
+      return {completed:WALK.stops[onWay?markLeft:card]?.id??hereContent().id,target:onWay?stopAt(ahead).id:undefined,question:text(hereContent().door),door:hereContent().door.station}
     },
     // A MACHINE NOT YET WHOLE IS STILL IN FLIGHT, and one that cannot be is an error.
     pending:()=>(exhibits?.pending()??0)+machinesStanding().outstanding+(studySheet?.pending()??0),
