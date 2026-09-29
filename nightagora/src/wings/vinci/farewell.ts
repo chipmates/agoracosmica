@@ -95,7 +95,7 @@ const sec = (seconds: number): number => seconds / FAREWELL_SECONDS
  * longest stretch: the eye lingers where the colour is. From inside the court
  * the walls hide the disc and the horizon, so the sunset is the sky's and the
  * clouds' colour. */
-const HOUR_KEYS = [[0, FAREWELL_FROM_HOUR], [sec(1.2), 16.41], [sec(3.4), 17.143], [sec(6.8), 17.549], [sec(8.7), 17.999], [sec(10.6), 18.444], [1, FAREWELL_TO_HOUR]] as const
+const HOUR_KEYS = [[0, FAREWELL_FROM_HOUR], [sec(1.2), 16.41], [sec(3.4), 17.143], [sec(6.8), 17.549], [sec(8.9), 17.999], [sec(11), 18.444], [1, FAREWELL_TO_HOUR]] as const
 export function farewellHour(share: number): number {
   return monotone(HOUR_KEYS, Math.max(0, Math.min(1, share)))
 }
