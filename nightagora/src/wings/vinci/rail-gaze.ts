@@ -679,6 +679,10 @@ export interface GazeTurns {
   sideways?: boolean
   /** a walk that reads red every other way may pass a doorway askew */
   askew?: boolean
+  /** a walk whose stands turn whole, from the way it arrives on to the way it
+   * leaves on: each turn begins in the last steps into its stand, is made
+   * standing, and ends in the first steps out of it */
+  whole?: boolean
 }
 /** A held view this far off its way is turned from standing; a doorway whose
  * way turns this much is turned in from standing. */
@@ -771,6 +775,10 @@ const CARRIED_HELD_STRICT_DEG = 30
  * so more of the turn is made walking; it eases back over this much of its
  * own time, and a carry never takes more than this share of the walk. */
 const CREEP_LEAST = .25, CREEP_EASE_S = 3, CREEP_SHARE = .4
+/** A stand turned whole turns only while the body is under this speed, its
+ * last steps in and first steps out, and each stretch either side of it keeps
+ * within this of its own way there. */
+const WHOLE_BEGUN_MPS = 1.5, WHOLE_WITHIN_DEG = 10
 /** A body slower than this is standing. */
 const STILL_MPS = .02
 /** What the walk cannot take of a turn is made standing and quick, eased onto
@@ -1131,6 +1139,12 @@ function planTurns(input: TurnInput, waitLens = false): CalmGazePlan | null {
     const within = square.length ? square : within0
     const pool = forward.length ? forward : options
     const kept = within.length ? within : [pool.reduce((x, y) => (y.plan.leg.seconds < x.plan.leg.seconds ? y : x))]
+    // a walk whose stands turn whole arrives at each on its way and leaves it on its way
+    if (input.turns.whole === true) {
+      const whole = kept.filter(o => (first || Math.abs(o.start - out.heading) <= WHOLE_WITHIN_DEG * RAD)
+        && (last || Math.abs(o.start + o.turn - (out.heading + turn)) <= WHOLE_WITHIN_DEG * RAD))
+      if (whole.length) return { a, b, out, in: inn, options: whole }
+    }
     // a scripted walk follows its way wherever it can
     if (input.turns.scripted === true) {
       const led = kept.filter(o => o.mode === 'way')
@@ -1331,7 +1345,7 @@ function planTurns(input: TurnInput, waitLens = false): CalmGazePlan | null {
     // stops and finishes after it sets off, the walk slowed there as far as
     // needed, as long as the walk holds its own view there and the view keeps
     // near its way.
-    const doorList = input.turns.doors ?? []
+    const doorList = input.turns.doors ?? [], whole = input.turns.whole === true
     const angles = (plan: CalmGazePlan, seconds: number): GazeAngles => plan.at(seconds, { heading: 0, elevation: 0 })
     const heldOver = (plan: CalmGazePlan, from: number, to: number, on: GazeAngles) => {
       for (let t = Math.max(0, from); t <= to + 1e-9; t += 1 / 15) {
@@ -1362,7 +1376,9 @@ function planTurns(input: TurnInput, waitLens = false): CalmGazePlan | null {
       const T = w.plan.leg.seconds, span = share * x
       if (span > CREEP_SHARE * T) return false
       const at = w.from + gaitAt(w.plan.leg, T - span - (share < 1 ? CREEP_EASE_S : 0)).metres, held = angles(w.plan, T)
-      if (!clearOfDoors(w, at, w.to) || !heldOver(w.plan, T - span - (share < 1 ? CREEP_EASE_S : 0) - HELD_MARGIN_S, T, held)) return false
+      // a stand turned whole is begun on whatever view the walk still settles:
+      // the turn is added to it, so the two join without a step
+      if (!clearOfDoors(w, at, w.to) || (!whole && !heldOver(w.plan, T - span - (share < 1 ? CREEP_EASE_S : 0) - HELD_MARGIN_S, T, held))) return false
       const s0 = angles(turn.plan, 0).heading
       for (let t = 0; t <= x + 1e-9; t += 1 / 15) {
         const own = T - share * (x - t)
@@ -1374,7 +1390,7 @@ function planTurns(input: TurnInput, waitLens = false): CalmGazePlan | null {
       const F = turn.plan.leg.seconds, T = w.plan.leg.seconds, span = share * y
       if (span > CREEP_SHARE * T) return false
       const at = w.from + gaitAt(w.plan.leg, span + (share < 1 ? CREEP_EASE_S : 0)).metres, held = angles(w.plan, 0)
-      if (!clearOfDoors(w, w.from, at) || !heldOver(w.plan, 0, Math.min(T, span + (share < 1 ? CREEP_EASE_S : 0) + HELD_MARGIN_S), held)) return false
+      if (!clearOfDoors(w, w.from, at) || (!whole && !heldOver(w.plan, 0, Math.min(T, span + (share < 1 ? CREEP_EASE_S : 0) + HELD_MARGIN_S), held))) return false
       const e0 = angles(turn.plan, F).heading
       for (let t = 0; t <= y + 1e-9; t += 1 / 15) {
         const own = share * t
@@ -1425,8 +1441,11 @@ function planTurns(input: TurnInput, waitLens = false): CalmGazePlan | null {
         const own = longest(F, s => holds(s, 1)), slowed = floorOn ? 0 : longest(F, s => holds(s, CREEP_LEAST))
         return slowed > own ? slowed : own
       }
-      let x = carry && before?.kind === 'walk' ? most((s, r) => carriedBefore(before, turn, s, r)) : 0
-      let y = carry && after?.kind === 'walk' ? most((s, r) => carriedAfter(turn, after, s, r)) : 0
+      // a stand turned whole is carried only into its last steps in and first steps out, at the walk's own pace
+      const begun = (s: number) => gaitAt(before!.plan.leg, before!.plan.leg.seconds - s).metresPerSecond <= WHOLE_BEGUN_MPS
+      const ended = (s: number) => gaitAt(after!.plan.leg, s).metresPerSecond <= WHOLE_BEGUN_MPS
+      let x = !carry || before?.kind !== 'walk' ? 0 : whole ? longest(F, s => begun(s) && carriedBefore(before, turn, s, 1)) : most((s, r) => carriedBefore(before, turn, s, r))
+      let y = !carry || after?.kind !== 'walk' ? 0 : whole ? longest(F, s => ended(s) && carriedAfter(turn, after, s, 1)) : most((s, r) => carriedAfter(turn, after, s, r))
       if (x + y > F) { const k = F / (x + y); x *= k; y *= k }
       const xs = x > 0 ? brisk(r => carriedBefore(before!, turn, x, r)) : 1
       const ys = y > 0 ? brisk(r => carriedAfter(turn, after!, y, r)) : 1
