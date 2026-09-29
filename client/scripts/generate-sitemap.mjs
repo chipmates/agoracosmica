@@ -10,6 +10,7 @@ import { join } from 'path';
 // status cannot drift from what the sitemap claims. The Meditations page waits
 // behind the same flag.
 import { POEM_PAGES_INDEXABLE, poemRoutes } from '../../marketing/src/data/poems/index.mjs';
+import { SHAKESPEARE_QUOTES_INDEXABLE, SHAKESPEARE_QUOTES_PATH } from '../../marketing/src/data/quotes/shakespeare.mjs';
 import { MEDITATIONS_PATH } from '../../marketing/src/data/texts/aurelius.mjs';
 
 const SITE_URL = 'https://agoracosmica.org';
@@ -216,6 +217,15 @@ urls.push(url('/figures/william-blake/poems', '0.6', gitLastModified('marketing/
 urls.push(url('/figures/william-shakespeare/sonnets', '0.6', gitLastModified('marketing/src/pages/figures/william-shakespeare/sonnets.astro')));
 urls.push(url('/figures/rumi/poems', '0.6', gitLastModified('marketing/src/pages/figures/rumi/poems.astro')));
 urls.push(url('/talk-to-historical-figures', '0.7', gitLastModified('marketing/src/pages/talk-to-historical-figures.astro')));
+
+// The Shakespeare quotes page, English only; its flag also sets its noindex.
+if (SHAKESPEARE_QUOTES_INDEXABLE) {
+  NO_HREFLANG_PATHS.add(SHAKESPEARE_QUOTES_PATH);
+  urls.push(url(SHAKESPEARE_QUOTES_PATH, '0.6', gitLastModified(
+    'marketing/src/pages/figures/william-shakespeare/quotes.astro',
+    'marketing/src/data/quotes/shakespeare.mjs',
+  )));
+}
 
 // Poem pages, the poems index and the Meditations passages, English only. The
 // flag that puts noindex on them also keeps them out of the sitemap.

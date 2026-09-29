@@ -11,7 +11,7 @@ export const SHAKESPEARE_QUOTES_PATH = '/figures/william-shakespeare/quotes';
 
 /** Crawl status of the quotes page: the robots meta reads it, and the sitemap
  *  lists the page only once it is true. */
-export const SHAKESPEARE_QUOTES_INDEXABLE = false;
+export const SHAKESPEARE_QUOTES_INDEXABLE = true;
 
 /** The edition every line is copied from. The hash is of that source file. */
 export const quoteSource = {
