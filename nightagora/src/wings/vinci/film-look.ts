@@ -120,7 +120,7 @@ export function createFilmLook(h: FilmLookHost) {
     const asked = performance.now()
     assets ??= await loadManifest()
     // THE BOOK ON THE TABLE OPENS THE BEST-OF at the leaf it lies open at
-    if (id === EDITION_EXHIBIT) { openTopic(BEST_OF_OPENING.topic, BEST_OF_OPENING.page, from); return }
+    if (id === EDITION_EXHIBIT) { openTopic(BEST_OF_OPENING.topic, BEST_OF_OPENING.page, from, EDITION_EXHIBIT); return }
     if (id.startsWith('topic/')) { openTopic(id.slice('topic/'.length), undefined, from); return }
     if (id === EDITION_WHOLE) { openEdition(from); return }
     if (isCollectionBook(id)) { openBook(id, from); return }
@@ -310,8 +310,8 @@ export function createFilmLook(h: FilmLookHost) {
 
   const recordOf = (id: string, title: VinciText, render: (host: HTMLElement) => void): void => h.openRecord(id, title, 'documented', render)
   /** ONE TOPIC, in the window where the visitor stands; the gold walks topic to topic. */
-  function openTopic(slug: string, start: string | undefined, from: HTMLElement | null): void {
-    const look = createBestOfLook({ slug, start, manifest: loadManifest(), colour: certaintyColour('documented'), narrow: h.narrow,
+  function openTopic(slug: string, start: string | undefined, from: HTMLElement | null, asked?: string): void {
+    const look = createBestOfLook({ slug, start, ...(asked ? { id: asked } : {}), manifest: loadManifest(), colour: certaintyColour('documented'), narrow: h.narrow,
       tier: () => 'standard', openTopic: (next, button) => openTopic(next, undefined, button),
       openRecord: recordOf, openBook: book => void open(book === EDITION_EXHIBIT ? EDITION_WHOLE : book, null),
       openShelf: () => closeLook.close(), close: () => closeLook.close() })

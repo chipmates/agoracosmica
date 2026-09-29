@@ -24,6 +24,9 @@ import { MIRROR_EXPLANATION, TABLE_UI } from './content'
 
 export interface BestOfLookOptions {
   slug: string
+  /** the id the look answers to where a mark asked for it by another (the
+   * 1883 book's mark opens the first topic): the topic's own where absent */
+  id?: string
   /** the page the topic opens at, by its id; the topic's first where absent */
   start?: string
   manifest: Promise<ManifestIndex>
@@ -262,7 +265,7 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
   }
   const recordWord: VinciText = { en: bestOfKey('full_record', 'en') ?? VINCI_VITRINE_WORDS.provenance.en,
     de: bestOfKey('full_record', 'de') ?? VINCI_VITRINE_WORDS.provenance.de }
-  const id = topicExhibit(options.slug)
+  const id = options.id ?? topicExhibit(options.slug)
   const record = control(recordWord[language], () => options.openRecord(id, recordWord, renderRecord), 'record')
   const shut = control(VINCI_VITRINE_WORDS.close[language], () => options.close(), 'close')
 

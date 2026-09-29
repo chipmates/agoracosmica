@@ -2775,10 +2775,10 @@ export function createWing():VinciWingModule {
   }
   /** ONE TOPIC OF THE BEST-OF, OPENED WHERE THE VISITOR STANDS: no walk, the
    * reader takes the window at once, and its gold walks topic to topic. */
-  function openTopic(slug:string,start:string|undefined,from:HTMLElement|null,how:'auto'|'walk'|'cut'):void {
+  function openTopic(slug:string,start:string|undefined,from:HTMLElement|null,how:'auto'|'walk'|'cut',asked?:string):void {
     if(!closeLook||!hosts)return
-    const id=topicExhibit(slug)
-    const look=createBestOfLook({slug,start,manifest:loadManifest(),colour:certaintyColour('documented'),narrow,
+    const id=asked??topicExhibit(slug)
+    const look=createBestOfLook({slug,start,id,manifest:loadManifest(),colour:certaintyColour('documented'),narrow,
       tier:()=>hosts?.world.stack.tierName()??'standard',
       openTopic:(next,button)=>openTopic(next,undefined,button,'auto'),
       openRecord:(record,title,render)=>{
@@ -2944,7 +2944,7 @@ export function createWing():VinciWingModule {
     if(id===EDITION_WHOLE){wholeEdition=true;id=EDITION_EXHIBIT}
     if(isTopicExhibit(id)){openTopic(id.slice('topic/'.length),undefined,from,how);return}
     // the book on the table opens the best-of at the leaf it lies open at
-    if(id===EDITION_EXHIBIT&&!wholeEdition&&!leafAt){openTopic(BEST_OF_OPENING.topic,BEST_OF_OPENING.page,from,how);return}
+    if(id===EDITION_EXHIBIT&&!wholeEdition&&!leafAt){openTopic(BEST_OF_OPENING.topic,BEST_OF_OPENING.page,from,how,EDITION_EXHIBIT);return}
     wholeEdition=false
     if(isCollectionBook(id)){openCodexBook(id,from,how);return}
     const entry=picks.find(pick=>pick.id===id)
