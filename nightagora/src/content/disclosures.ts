@@ -21,7 +21,7 @@ export const DISCLOSURES: Record<DisclosureKey, DisclosureLine> = {
   /** passed on arrival: what the whole night is, before anyone speaks */
   stone: {
     en: 'The historical figures speak as AI Echoes: interpretations built from what each person left behind. Not recordings. Not the dead themselves.',
-    de: 'Die historischen Persönlichkeiten sprechen als AI Echoes: Interpretationen dessen, was sie hinterlassen haben. Keine Aufnahmen. Nicht die Toten selbst.',
+    de: 'Die historischen Persönlichkeiten sprechen als KI-Echos: Interpretationen dessen, was sie hinterlassen haben. Keine Aufnahmen. Nicht die Toten selbst.',
   },
   /** the colophon on every surface an Echo appears on. No surface of the
       museum carries one today: the figure pane used to, and it now shows a
@@ -30,7 +30,7 @@ export const DISCLOSURES: Record<DisclosureKey, DisclosureLine> = {
       voice, and the honesty check reads the canon either way. */
   ink: {
     en: 'An AI Echo · An interpretation, not a recording',
-    de: 'Ein AI Echo · Eine Interpretation, keine Aufnahme',
+    de: 'Ein KI-Echo · Eine Interpretation, keine Aufnahme',
   },
 }
 
