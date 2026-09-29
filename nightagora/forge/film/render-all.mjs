@@ -318,22 +318,18 @@ async function planJob(dir, log) {
   log('the keys of the tree (the world and every track, a few minutes)')
   const { treeKeys } = await import('./keys.mjs')
   const tree = await treeKeys({ log: (s) => log(`  keys: ${s}`) })
-  /* A CYCLE'S KEY is coarse: every file its machine's module and the island
-     read (the import closure), and the print; the gate keys no cycle yet */
-  const { closure } = await import('./keys.mjs')
+  /* A CYCLE'S KEY is the files and declarations its island draws from
+     (keys.mjs cycleKey); the gate keys no cycle yet */
+  const { cycleKey } = await import('./keys.mjs')
   const { createLoader } = await import('./load.mjs')
   const loader = await createLoader({})
-  const island = ['src/wings/vinci/film-look.ts', 'src/wings/vinci/print.ts'].flatMap((f) => closure(loader, f, 'src/'))
   for (const e of entries) {
     const k = e.kind === 'clip' ? tree.clips.get(`${e.edge} ${e.framing}`) : e.kind === 'still' ? tree.stills.get(`${e.node} ${e.framing}`) : null
     // a clip exempt from its byte line carries its own delivery key
     if (k) e.keys = { motion: k.motion, picture: k.picture, ...(k.delivery ? { delivery: k.delivery } : {}) }
     const ek = e.kind === 'evening' ? tree.evenings?.get(`${e.evening} ${e.framing}`) : null
     if (ek) e.keys = { motion: ek.motion, picture: ek.picture, delivery: ek.delivery }
-    if (e.kind === 'cycle') {
-      const files = [...new Set([...closure(loader, `src/wings/vinci/machines/${e.slug}.ts`, 'src/'), `src/wings/vinci/machines/data/${e.slug}.json`, ...island])].sort()
-      e.keys = { motion: null, picture: sha256(files.map((f) => `${f} ${sha256(loader.text(f))}`).join('\n')).slice(0, 32) }
-    }
+    if (e.kind === 'cycle') e.keys = { motion: null, picture: cycleKey(loader, e.slug).key }
   }
   const job = {
     format: JOB_FORMAT, created: stamp(), head: headHere(), source: sourceKey().key, build: distDigest(), fps: FPS, pace: 'walk',

@@ -143,26 +143,109 @@ export function exposures(text) {
   return { table, toes, fallback: literal(print.initializer), of }
 }
 
-/** A module's value imports, followed within the app (types are erased). */
-export function closure(loader, entry, within) {
-  const out = new Set()
+/** The file a relative import names, as the app resolves it; null outside the app. */
+function resolveImport(loader, from, specifier) {
+  const spec = specifier.replace(/\?(raw|inline)$/, '')
+  if (!spec.startsWith('.')) return null
   const exists = (file) => { try { loader.text(file); return true } catch { return false } }
+  const norm = [...from.split('/').slice(0, -1), spec].join('/').split('/')
+    .reduce((acc, part) => (part === '..' ? acc.slice(0, -1) : part === '.' ? acc : [...acc, part]), [])
+  const joined = norm.join('/')
+  return [joined, `${joined}.ts`, `${joined}/index.ts`].find((f) => /\.(ts|json)$/.test(f) && exists(f)) ?? null
+}
+
+/** A module's value imports, followed within the app (types are erased);
+    `cut` names files the walk never enters. */
+export function closure(loader, entry, within, cut = () => false) {
+  const out = new Set()
   const walk = (file) => {
     if (out.has(file)) return
     out.add(file)
     if (!file.endsWith('.ts')) return
     const text = loader.text(file)
     for (const hit of text.matchAll(/^\s*(?:import|export)\s+(?!type\b)[^'"]*?from\s+'(\.[^']+)'/gm)) {
-      const spec = hit[1].replace(/\?raw$/, '')
-      const base = spec.startsWith('.') ? [...file.split('/').slice(0, -1), spec].join('/') : spec
-      const norm = base.split('/').reduce((acc, part) => (part === '..' ? acc.slice(0, -1) : part === '.' ? acc : [...acc, part]), [])
-      const joined = norm.join('/')
-      const next = [joined, `${joined}.ts`, `${joined}/index.ts`].find((f) => /\.(ts|json)$/.test(f) && exists(f))
-      if (next && next.startsWith(within)) walk(next)
+      const next = resolveImport(loader, file, hit[1].replace(/\?raw$/, ''))
+      if (next && next.startsWith(within) && !cut(next)) walk(next)
     }
   }
   walk(entry)
   return [...out].sort()
+}
+
+/** THE PART OF A MIXED MODULE A DRAWING READS: the named top-level
+    declarations and every top-level declaration they name in turn, with the
+    files their value imports come from. */
+export function reachedFrom(loader, file, roots) {
+  const source = ts.createSourceFile(file, loader.text(file), ts.ScriptTarget.ES2022, true)
+  const top = new Map(), imported = new Map()
+  for (const st of source.statements) {
+    if (ts.isImportDeclaration(st)) {
+      const clause = st.importClause
+      if (!clause || clause.isTypeOnly) continue
+      const spec = st.moduleSpecifier.text
+      if (clause.name) imported.set(clause.name.text, spec)
+      const bound = clause.namedBindings
+      if (bound && ts.isNamespaceImport(bound)) imported.set(bound.name.text, spec)
+      if (bound && ts.isNamedImports(bound)) for (const el of bound.elements) if (!el.isTypeOnly) imported.set(el.name.text, spec)
+    } else if (ts.isVariableStatement(st)) {
+      for (const d of st.declarationList.declarations) if (ts.isIdentifier(d.name)) top.set(d.name.text, st)
+    } else if ((ts.isFunctionDeclaration(st) || ts.isClassDeclaration(st)) && st.name) top.set(st.name.text, st)
+  }
+  const texts = new Map(), specs = new Set(), queue = [...roots]
+  while (queue.length) {
+    const name = queue.pop()
+    if (texts.has(name)) continue
+    const node = top.get(name)
+    if (!node) throw new Error(`${file} declares no ${name}`)
+    texts.set(name, node.getText())
+    const visit = (n) => {
+      if (ts.isIdentifier(n)) {
+        if (top.has(n.text) && !texts.has(n.text)) queue.push(n.text)
+        else if (imported.has(n.text)) specs.add(imported.get(n.text))
+      }
+      ts.forEachChild(n, visit)
+    }
+    visit(node)
+  }
+  return { texts, files: [...specs].map((s) => resolveImport(loader, file, s)).filter(Boolean).sort() }
+}
+
+/* THE MACHINE CYCLE'S KEY. A cycle is the machine's island drawn alone: its
+   body (the machine's module and the build the island calls), the island's
+   stage (the turntable: camera, light, backdrop, playback), the island's
+   choice and fit, the station's print, the close look's machine payload (the
+   options it hands the turntable) and the look's `makeLive`, which wires the
+   body, the print and the light. The global key rides beside it. The rest of
+   the close look is the interface: its words, chrome and panels draw into the
+   page, never into the island, so no walk enters them, and another machine's
+   own module or dossier never keys this one. */
+const CLOSE_LOOK = `${WING_DIR}/collection/close-look.ts`, FILM_LOOK = `${WING_DIR}/film-look.ts`
+export const CYCLE_ISLAND = ['src/wings/vitrine/turntable.ts', 'src/wings/picture/island.ts', `${WING_DIR}/print.ts`]
+export const INTERFACE_FILES = ['src/wings/content.ts', 'src/wings/frame.ts', 'src/wings/window-chrome.ts', 'src/wings/visit.ts',
+  'src/wings/overview/index.ts', 'src/wings/desk-chrome.ts', 'src/wings/desk-closelook.ts', 'src/wings/desk-panel.ts', 'src/wings/desk-story.ts',
+  'src/wings/desk-switches.ts', 'src/wings/vitrine/index.ts', 'src/wings/vitrine/reader.ts', 'src/wings/vitrine/showpiece.ts',
+  'src/wings/vitrine/folio.ts', 'src/wings/vitrine/slider.ts', 'src/wings/picture/cycle.ts',
+  ...['content.ts', 'film-wing.ts', 'phone-form.ts', 'film-look.ts', 'collection/close-look.ts', 'collection/strip.ts', 'story.ts',
+    'pictures/visitor-copy.ts'].map((f) => `${WING_DIR}/${f}`)]
+export const isInterface = (file) => file.startsWith('src/content/') || INTERFACE_FILES.includes(file)
+/** every machine the island can build: the modules the machines' index builds from */
+export const machineSlugs = (loader) => [...loader.text(`${WING_DIR}/machines/index.ts`).matchAll(/import\s*\{\s*build\s+as\s+\w+\s*\}\s*from\s*'\.\/([a-z-]+)'/g)].map((m) => m[1])
+export function cycleKey(loader, slug) {
+  const slugs = machineSlugs(loader)
+  if (!slugs.includes(slug)) throw new Error(`the machines' index builds no ${slug}`)
+  const own = (s) => [`${WING_DIR}/machines/${s}.ts`, `${WING_DIR}/machines/data/${s}.json`]
+  const others = new Set(slugs.filter((s) => s !== slug).flatMap(own))
+  const cut = (file) => isInterface(file) || others.has(file)
+  const files = new Set([`${WING_DIR}/machines/data/${slug}.json`])
+  const payload = reachedFrom(loader, CLOSE_LOOK, ['createVinciMachinePayload'])
+  for (const entry of [`${WING_DIR}/machines/${slug}.ts`, `${WING_DIR}/machines/index.ts`, ...CYCLE_ISLAND, ...payload.files.filter((f) => !cut(f))])
+    for (const f of closure(loader, entry, 'src/', cut)) files.add(f)
+  const live = declarations(loader.text(FILM_LOOK), ['makeLive']).get('makeLive')
+  if (!live) throw new Error(`${FILM_LOOK} declares no makeLive`)
+  const lines = [...[...files].sort().map((f) => `${f} ${sha256(loader.text(f))}`),
+    ...[...payload.texts].sort(([a], [b]) => (a < b ? -1 : 1)).map(([n, t]) => `${CLOSE_LOOK}#${n} ${sha256(t)}`),
+    `${FILM_LOOK}#makeLive ${sha256(live.getText())}`]
+  return { key: sha256(lines.join('\n')).slice(0, 32), files: [...files].sort(), declarations: [...payload.texts.keys()].sort() }
 }
 
 /** WHAT NO FRAME CAN DRAW: time-based media (the world binds no video and no
