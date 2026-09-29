@@ -88,13 +88,14 @@ export const FAREWELL_DIP = .8
 export const FAREWELL_METEOR = 14.3
 const sec = (seconds: number): number => seconds / FAREWELL_SECONDS
 /** The hour at a share of the farewell, through keys set by the sun's height:
- * the tilt lands with the crowns already gold (8 degrees), the sun at the
- * hill (1), the rose afterglow and the first star (3 under), the blue hour
- * and the bright stars (7.5 under), nautical dusk and the field (12 under),
- * astronomical night and the Milky Way (18 under). From inside the court the
- * walls hide the disc and the horizon, so the sunset is the sky's and the
+ * the crowns already gold as the tilt lands (8 degrees), the sun at the hill
+ * (1), the rose afterglow and the first star (3 under), the blue hour and the
+ * bright stars (7.5 under), nautical dusk and the field (12 under),
+ * astronomical night and the Milky Way (18 under). The afterglow gets the
+ * longest stretch: the eye lingers where the colour is. From inside the court
+ * the walls hide the disc and the horizon, so the sunset is the sky's and the
  * clouds' colour. */
-const HOUR_KEYS = [[0, FAREWELL_FROM_HOUR], [sec(1.2), 16.41], [sec(3.4), 17.143], [sec(5.3), 17.549], [sec(7.4), 17.999], [sec(9.6), 18.444], [1, FAREWELL_TO_HOUR]] as const
+const HOUR_KEYS = [[0, FAREWELL_FROM_HOUR], [sec(1.2), 16.41], [sec(3.4), 17.143], [sec(6.8), 17.549], [sec(8.7), 17.999], [sec(10.6), 18.444], [1, FAREWELL_TO_HOUR]] as const
 export function farewellHour(share: number): number {
   return monotone(HOUR_KEYS, Math.max(0, Math.min(1, share)))
 }
@@ -193,17 +194,17 @@ export function farewellLight(elevation: number): FarewellLight {
 
 /** THE LOOK UP, in seconds of the farewell's clock: the eye stays where it
  * stands, keeps its heading and its lens, and tilts up from its own pitch.
- * The tilt starts at the press and lands in the lobby's second or so (the
- * first key); the gaze then keeps rising slowly into the sky while the stars
- * come out, so the grave's board has left the frame before its light is the
- * brightest thing in it, and ends where the Milky Way stands over the elm's
- * crown. From the grave the view stands on the back wall's filter band with
- * the tall elm over it, and the evening's glow on the left: no turn is
- * needed. */
+ * The tilt starts at the press, eases in and out and lands by a second and a
+ * half (the first key) at about half the speed a one-second tilt needs, so
+ * no frame of it smears; the gaze then keeps rising slowly into the sky while
+ * the stars come out, so the grave's board has left the frame before the
+ * afterglow's peak, and ends where the Milky Way stands over the elm's crown.
+ * From the grave the view stands on the back wall's filter band with the tall
+ * elm over it, and the evening's glow on the left: no turn is needed. */
 export interface FarewellLook { from: number; pitch: readonly (readonly [number, number])[] }
 export const FAREWELL_LOOK: { desktop: FarewellLook; phone: FarewellLook } = {
-  desktop: { from: 0, pitch: [[1.2, 32], [FAREWELL_SECONDS, 49]] },
-  phone: { from: 0, pitch: [[1.35, 37], [FAREWELL_SECONDS, 53]] },
+  desktop: { from: 0, pitch: [[1.5, 21], [FAREWELL_SECONDS, 49]] },
+  phone: { from: 0, pitch: [[1.5, 19], [FAREWELL_SECONDS, 53]] },
 }
 
 /** A heading clockwise from north and a pitch, as a direction in the engine. */
