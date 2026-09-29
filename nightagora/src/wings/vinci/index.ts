@@ -391,10 +391,12 @@ export function createWing():VinciWingModule {
   const CUT_CARD_WAITS_FOR_PRESS=false
   const CUT_DIP_SECONDS=.45
   let cutCard:HTMLElement|undefined, cutTimers:ReturnType<typeof setTimeout>[]=[], cutPress:(()=>void)|undefined
+  /** A dip whose next place is not stood yet: until then the walk is under way. */
+  let dipping=false
   const wingElement=():HTMLElement|undefined=>hosts?.stage.parentElement??undefined
   function endChapterCard():void {
     for(const timer of cutTimers)clearTimeout(timer)
-    cutTimers=[]
+    cutTimers=[];dipping=false
     if(cutPress){window.removeEventListener('pointerdown',cutPress,true);window.removeEventListener('keydown',cutPress,true);cutPress=undefined}
     const wing=wingElement()
     if(wing)delete wing.dataset['cut']
@@ -423,9 +425,11 @@ export function createWing():VinciWingModule {
     // transition and not a jump
     void cutCard.offsetWidth
     cutCard.dataset['on']='1'
+    dipping=true
     const land=():void=>{
       rail.set(railPlaceOf(stop),vinciWalkPose(stop,narrow()),true,narrow(),walkVertex(stop))
-      card=station=to;dock.scrollTop=0;aimPrint(s.id);exposureAt=s.id
+      // the stop asked for stays the one the presses named, which may lie further on
+      dipping=false;card=to;dock.scrollTop=0;aimPrint(s.id);exposureAt=s.id
       paintHeader();paintHeaderVisibility();paintDock();paintQuestion();standHere()
       cutPress=()=>moveOn()
       window.addEventListener('pointerdown',cutPress,true);window.addEventListener('keydown',cutPress,true)
@@ -462,11 +466,13 @@ export function createWing():VinciWingModule {
     if(wing)wing.dataset['cut']=''
     void cutCard.offsetWidth
     cutCard.dataset['on']='1'
+    dipping=true
     const up=():void=>{
       if(cutCard)delete cutCard.dataset['on']
       const wing=wingElement()
       if(wing)delete wing.dataset['cut']
       cutTimers.push(setTimeout(()=>{if(cutCard){cutCard.hidden=true;cutCard.textContent=''}},dip))
+      dipping=false
       rise?.()
     }
     const down=():void=>{land();cutTimers.push(setTimeout(up,still?0:QUIET_HOLD_MS))}
@@ -520,7 +526,7 @@ export function createWing():VinciWingModule {
       }
       const stop=stopAt(to), s=stationOf(stop.station)
       rail.set(railPlaceOf(stop),vinciWalkPose(stop,narrow()),true,narrow(),walkVertex(stop))
-      card=station=to;dock.scrollTop=0;aimPrint(s.id);exposureAt=s.id
+      card=to;dock.scrollTop=0;aimPrint(s.id);exposureAt=s.id
       paintHeader();paintHeaderVisibility();paintDock();paintQuestion();standHere()
     },outward?()=>walkOn(to,false):undefined)
   }
@@ -540,6 +546,30 @@ export function createWing():VinciWingModule {
     // you are still standing in is a lie the frame tells.
     if(cutHere||walkIndexAt(rail.navigation.completed??'',rail.navigation.wall)===index){card=index;dock.scrollTop=0;aimPrint(s.id);exposureAt=s.id;paintHeader();paintDock();standHere()}
     else if(closeSources)paintDock()
+  }
+  /** A PRESS MADE WHILE A WALK IS UNDER WAY IS KEPT. A leg is set up from
+   * where the eye stands (its wall, its vertex, its door), so the stop a
+   * press asks for on the way is walked to from the stop the leg lands on,
+   * one neighbour leg at a time; -1 while no press waits. */
+  let pressedOn=-1
+  /** A leg walking or about to leave, the way to a door or onto a wall still
+   * to go, or a dip that has not stood its place yet. */
+  function walkUnderWay():boolean {
+    const nav=rail.navigation
+    return Boolean(nav.active)||nav.queued.length>0||nav.returning||doorAhead>=0||walkOnwards>=0||dipping
+  }
+  /** The next leg toward the stop the presses asked for, from the stop the eye stands at. */
+  function goOn():void {
+    const nav=rail.navigation, stood=walkIndexAt(nav.completed??'',nav.wall), from=stood>=0?stood:card, want=pressedOn
+    if(want===from){pressedOn=-1;return}
+    const next=from+Math.sign(want-from)
+    if(next===want)pressedOn=-1
+    // the kept press is the press that moves a chapter's title on
+    if(cutPress)cutPress()
+    const cut=cutToStation()
+    if(!cut&&walkCutBoundary(from,next)){endChapterCard();crossChapter(next);return}
+    if(!cut&&crossDoor(next))return
+    walkOn(next,cut)
   }
   let clearSky:import('three/webgpu').DataTexture|undefined
   let header:HTMLElement,dock:HTMLDialogElement,drawer:HTMLElement,record:HTMLElement,source:HTMLButtonElement,sky:SkyMesh
@@ -885,7 +915,9 @@ export function createWing():VinciWingModule {
       go:index=>h.navigate(index),
       // THE WAY BACK GOES UP ONE LEVEL: standing at a work of a wall, back is
       // the view the visitor arrived in, before it is the stop before this one
-      up:()=>{if(closeLook?.id){closeLook.back();return true}return standing&&toStationView()},
+      // ON THE WAY BACK IS THE STOP BEFORE THE ONE ASKED FOR, as the arrow key
+      // and the wheel read it, and never the wall's own step back
+      up:()=>{if(closeLook?.id){closeLook.back();return true}if(standing&&walkUnderWay()){h.navigate(station-1);return true}return standing&&toStationView()},
       leg:()=>{const nav=standing?rail.navigation:undefined;return nav?.active?nav.legWalked:null},
 
       // desk.panel: its host fields
@@ -1153,6 +1185,9 @@ export function createWing():VinciWingModule {
         // visitor stands, so shutting it leaves the grid and the valve's niche
         // in one frame (a run behind the held reader walked the grid unseen).
         if(readWhole(isLeafDoor(id)?id.slice(0,-LEAF_DOOR.length):id))return false
+        // AT THE WORK THE EYE STANDS AT ON ITS WALL it opens where the visitor
+        // stands, as its mark says: that eye is the work's own viewing eye.
+        if(standsAtWork(id))return false
         if(wallRun(isLeafDoor(id)?id.slice(0,-LEAF_DOOR.length):id))return true
         // A LEAF DOOR IS THE SAME PLACE: the visitor already stands where the
         // work is, so the eye neither walks out to it nor back from it.
@@ -1866,10 +1901,7 @@ export function createWing():VinciWingModule {
   function markWalks(id:string):boolean {
     if(isLeafDoor(id)||activeView||!railReady()||opensHere(id)||readWhole(id))return false
     const wall=vinciWallOfExhibit(id), at=wallAt()
-    if(wall&&wall===wallOn()&&at!==undefined&&vinciWallVertex(wall,id)!==undefined){
-      const stops=wallRow()
-      return !(onWallStop()&&at>0&&at<=stops.length&&stops[at-1]!.exhibit===id)
-    }
+    if(wall&&wall===wallOn()&&at!==undefined&&vinciWallVertex(wall,id)!==undefined)return !standsAtWork(id)
     return vinciApproachStation(id)===hereContent().id&&Boolean(vinciApproachPose(id,narrow()))&&exhibitWalks()
   }
   /** THE WALKING MARK'S OWN WORD, from the card data by key: a walk that
@@ -2227,6 +2259,8 @@ export function createWing():VinciWingModule {
     return wall?vinciWallStops(wall):[]
   }
   const onWallStop=():boolean=>{const wall=wallOn(),at=wallAt();return Boolean(wall&&at!==undefined&&!vinciWallIsEnd(wall,at)&&at>0&&at<=wall.stops().length)}
+  /** The work a stop of the hang stands at: the eye is that work's own viewing eye. */
+  const standsAtWork=(id:string):boolean=>{const at=wallAt(),stops=wallRow();return onWallStop()&&at!==undefined&&at>0&&at<=stops.length&&stops[at-1]!.exhibit===id}
   /** A RUN ALONG THE WALL. The eye leaves the stop it stands at, slides past
    * every frame between here and there and stops square in front of the one
    * asked for. A second press is queued by the rail, never cut. */
@@ -3247,8 +3281,11 @@ export function createWing():VinciWingModule {
     // the rail walks from the station eye, which is the certified pair.
     quietly(()=>closeLook?.close())
     exhibitSources=null;endInspection();if(station!==index)sources.resetScroll();station=index;activeView='';measurement.hide()
-    endChapterCard()
     const cut=cutToStation()
+    // A NEIGHBOUR ASKED FOR ON THE WAY is walked to from where this walk lands.
+    if(!cut&&Math.abs(index-asked)<=1&&walkUnderWay()){pressedOn=index;if(closeSources)paintDock();return}
+    pressedOn=-1
+    endChapterCard()
     // A CHAPTER BOUNDARY IS CROSSED, NEVER WALKED. The leg under it exists
     // and is certified; what the story says is that the visitor is somewhere
     // else now, which is a title and a new place and no walk between them.
@@ -3292,20 +3329,22 @@ export function createWing():VinciWingModule {
       // stands on the picture room's own wall, so a place is read with its
       // vertex, and a door's pose or the stair head names no stop.
       const stopOf=(id:string|undefined,vertex?:number):number=>id===undefined?-1:walkIndexAt(id,vertex)
-      const queued=nav?.queued[0]
-      const ahead=!nav?-1:doorAhead>=0?doorAhead:walkOnwards>=0?walkOnwards
+      const queued=nav?.queued[0], here=stopOf(nav?.completed,nav?.wall)
+      const leg=!nav?-1:doorAhead>=0?doorAhead:walkOnwards>=0?walkOnwards
         // a queued leg carries no vertex: the place of the stop asked for is that stop
         :queued!==undefined?(queued===railPlaceOf(stopAt(station))?station:stopOf(queued))
         // an exhibit's own approach is a look, not a way to a stop
         :nav.active!==undefined&&!(nav.approaching&&!nav.running)?stopOf(nav.active,nav.wallTo)
         // under the dip of a door or a far press, the stop asked for is where it lands
         :cutCard&&!cutCard.hidden?station:-1
-      const here=stopOf(nav?.completed,nav?.wall), onWay=ahead>=0&&ahead!==here
+      // a press kept on the way names where the walk ends, unless it turns
+      // back to the stop left: then the stop this leg reaches first is ahead
+      const ahead=!nav?-1:pressedOn>=0&&pressedOn!==here?pressedOn:leg, onWay=ahead>=0&&ahead!==here
       // AT REST THE MARK IS THE CARD'S STOP. Under way it stays on the stop
       // left until the next is stood at: the card hands over at half the leg.
-      // A stop the eye stands at between the one left and the one ahead is reached.
+      // A stop the eye stands at on the way is reached.
       if(!onWay)markLeft=card
-      else if(nav&&!nav.active&&here>=0&&(here-markLeft)*(ahead-here)>0)markLeft=here
+      else if(nav&&!nav.active&&here>=0)markLeft=here
       return {completed:WALK.stops[onWay?markLeft:card]?.id??hereContent().id,target:onWay?stopAt(ahead).id:undefined,question:text(hereContent().door),door:hereContent().door.station}
     },
     // A MACHINE NOT YET WHOLE IS STILL IN FLIGHT, and one that cannot be is an error.
@@ -3396,6 +3435,14 @@ export function createWing():VinciWingModule {
         const want=walkOnwards, stop=stopAt(want), vertex=walkRunVertex(stop)
         walkOnwards=-1
         if(vertex!==undefined)rail.set(stop.station,vinciWalkPose(stop,narrow()),false,narrow(),vertex)
+      }
+      // A PRESS KEPT ON THE WAY: the next leg leaves from the stop just stood
+      // at, and stops still waiting behind a leg speed it, as a queued station does.
+      // A look opened since is the later press: the walk stands for it.
+      if(pressedOn>=0&&!walkUnderWay()){if(closeLook?.id)pressedOn=-1;else goOn()}
+      if(pressedOn>=0){
+        const way=rail.navigation, bound=doorAhead>=0?doorAhead:walkOnwards>=0?walkOnwards:way.active?walkIndexAt(way.active,way.wallTo):-1
+        if(way.active&&!way.approaching&&bound>=0)rail.hurry(Math.abs(pressedOn-bound))
       }
       // A WORK CHOSEN ON THE PLAN OPENS WHEN ITS WALK ENDS: the rail at rest,
       // the card already the work's own station, and the registry read.

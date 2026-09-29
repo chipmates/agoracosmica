@@ -908,6 +908,9 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
       wantsReturn=true
       return true
     },
+    /** Stops already asked for behind the leg under way speed it, by the same
+     * law as a queued station: a visitor who keeps pressing on is not strolling. */
+    hurry(stops:number){if(!active||active.exhibit||!(stops>waiting))return;waiting=stops;pace=carriedPace(waiting)},
     look(y:number,pit:number){look.snap(y,pit)},
     /** Walk on by hand. True when a leg was actually walking and took it. */
     stride(count:number){
