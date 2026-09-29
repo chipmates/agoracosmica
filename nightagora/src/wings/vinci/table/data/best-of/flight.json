@@ -1,0 +1,1489 @@
+{
+ "topic": "flight",
+ "pages": {
+  "B.174": {
+   "lead": 3,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 83v, block 1 of 4",
+     "it": {
+      "text": "— giostrare contro a",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "To joust against",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Tjostieren gegen",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Jouter contre....."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 83 (verso), the transcription below the facsimile plate; archive.org leaf n340",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n340/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 83 (verso), the facing page of the plate; archive.org leaf n339",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n339/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 83v, block 2 of 4",
+     "it": {
+      "text": "— sostegnio — questi. sono in loco deliofanti. e possi con queste giostrare e possi tenere soffioni dasspaventare ichavallj de nimicj e possi inquessti mettere schoppettieri cheronperanongni schiera",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "Support. These take the place of elephants. With these one can joust, and one can carry rockets [?] to frighten the enemy's horses, and one can put gunners in these who will break any rank.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Stütze. Diese stehen an der Stelle von Elefanten. Mit ihnen kann man tjostieren, man kann Raketen [?] mitführen, um die Pferde der Feinde zu erschrecken, und man kann Büchsenschützen hineinsetzen, die jede Schlachtreihe durchbrechen werden.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Support — Ceux-ci sont au lieu des [remplacent les] éléphants; avec eux, on peut jouter, et on peut tenir des fusées pour effrayer les chevaux des ennemis. On peut aussi y mettre des escopettiers qui rompent toute troupe."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 83 (verso), the transcription below the facsimile plate; archive.org leaf n340",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n340/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 83 (verso), the facing page of the plate; archive.org leaf n339",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n339/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 83v, block 3 of 4",
+     "it": {
+      "text": "— lastremita di fori della uite sia di filo di fero grosso una corda edalciercio alcientro sia braccia 8",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "Let the outer edge of the screw be of iron wire as thick as a cord, and from the circle to the centre let there be 8 braccia.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Der äußere Rand der Schraube soll aus Eisendraht sein, so dick wie ein Seil, und vom Kreis bis zur Mitte sollen es 8 Braccia sein.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Que l'extrémité du dehors [le contour extérieur] de la vis [hélice] soit de fil de fer, épais d'une [comme une] corde, et que du cercle [du bord] au centre, il y ait 8 brasses."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 83 (verso), the transcription below the facsimile plate; archive.org leaf n340",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n340/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 83 (verso), the facing page of the plate; archive.org leaf n339",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n339/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 3,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 83v, block 4 of 4",
+     "it": {
+      "text": "— truovo secquesto strumento. facto avite sara bene facto cioe facto. di tela lina stopata. isua. polj [pori] chonamido e voltato con presteza. che dettavite. sifa. la femina. nellaria e montera inalto piglia. loesenplo. davna riga larga essottile emenata confuria infrallaria. vedrai essere ghuidato iltuo braccio perla linia deltaglio. della. decta. asse —\nsia larmadura della sopradetta tela di canne lunge egrosse puossene fare vno. picciolo modelo dicharta che lostile suo sia di sottile piastra di fero ettorta per forza. e neltornare iliberta fa ravolgiere la uite",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "I find that if this instrument made as a screw is well made, that is, made of linen cloth with its pores stopped with starch, and is turned swiftly, the said screw will make its nut in the air and will rise high. Take the example of a wide, thin ruler swung with force through the air: you will see your arm guided along the line of the edge of the said board.\nLet the frame of the aforesaid cloth be of long, thick canes. One can make a small model of it out of paper, whose shaft is a thin strip of iron twisted by force; and when it is set free again, it makes the screw turn.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Ich finde: Wenn dieses als Schraube gebaute Instrument gut gemacht ist, das heißt aus Leinentuch, dessen Poren mit Stärke verschlossen sind, und schnell gedreht wird, dann macht sich die genannte Schraube ihre Mutter in der Luft und steigt in die Höhe. Nimm als Beispiel ein breites, dünnes Lineal, das mit Wucht durch die Luft geführt wird: Du wirst sehen, wie dein Arm entlang der Linie der Schneide dieses Brettes geführt wird.\nDas Gerüst des genannten Tuches sei aus langen, dicken Rohrstäben. Man kann davon ein kleines Modell aus Papier machen, dessen Achse ein dünnes Eisenblech ist, mit Kraft verdreht; wenn es wieder freikommt, lässt es die Schraube sich drehen.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Je trouve que si cet instrument fait à vis est bien fait, c'est-à-dire fait de toile de lin, dont on a bouché les pores avec de l'amidon, [et] est tourné avec vitesse, ladite vis se fera l'écrou dans l'air, et montera haut. Prends l'exemple d'une règle large et mince, et menée violemment en l'air; tu verras que ton bras sera guidé par la ligne du tranchant de ladite planchette.\nQue l'armature de la susdite soit de cannes longues et épaisses. On peut s'en faire un petit modèle de carton, dont le style [l'axe] soit en une mince lame de fer, tordue avec force; en redevenant libre, elle fait tourner la vis."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 83 (verso), the transcription below the facsimile plate; archive.org leaf n340",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n340/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 83 (verso), the facing page of the plate; archive.org leaf n339",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n339/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "CA.9": {
+   "lead": 0,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §1126 (C. A. 372b; 1158b), vol. II p. 279",
+     "it": {
+      "text": "Tāta forza si fa colla cosa īcōtro all'aria, quāto l'aria alla cosa; Vedi l'alie percosse cōtro all'aria fanno sostenere la pesante aquila sulla suprema sottile aria vicina all'elemēto del fuoco; Ancora vedi la mossa aria sopr'al mare ripercossa nelle gōfiate vele far correr la carica e pesāte nave; sichè per queste demostrative e assegnate ragioni potrai conosciere l'uomo colle sua cōgiegniate e grādi ale, facciēdo forza cōtro alla resistēte aria, vincēdo poterla soggiogare a levarsi sopra di lei.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "An object offers as much resistance to the air as the air does to the object. You may see that the beating of its wings against the air supports a heavy eagle in the highest and rarest atmosphere, close to the sphere of elemental fire. Again you may see the air in motion over the sea, fill the swelling sails and drive heavily laden ships. From these instances, and the reasons given, a man with wings large enough and duly connected might learn to overcome the resistance of the air, and by conquering it, succeed in subjugating it and rising above it.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "So viel Kraft übt ein Ding gegen die Luft aus, wie die Luft gegen das Ding. Sieh, wie die Flügel, die gegen die Luft schlagen, den schweren Adler hoch oben in der dünnen Luft tragen, nahe beim Element des Feuers. Sieh auch, wie die bewegte Luft über dem Meer in die geblähten Segel schlägt und das beladene, schwere Schiff laufen lässt. Aus diesen gezeigten und dargelegten Gründen kannst du erkennen, dass der Mensch mit seinen großen, gut gefügten Flügeln, wenn er Kraft gegen die widerstehende Luft ausübt und sie überwindet, sie bezwingen und sich über sie erheben kann.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 279",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n414/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 279",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n414/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "B.167": {
+   "lead": 2,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 80r, block 1 of 3",
+     "it": {
+      "text": "— questo. homo fa. cholsuo. chapo forza per libbre. 200 echolle mani fa forza per libbre 200-ecquelmedesimo pesa lomo ~~ellandare~~ elmenare dellali sari in croce simile allo andare delcavallo\nOnde perquesto affermo. questeser meglio chenessuno",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "This man exerts a force of 200 pounds with his head, and with his hands he exerts a force of 200 pounds, and that is just what the man weighs. The beating of the wings will be crosswise, like the gait of the horse.\nTherefore I affirm that this is better than any other.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Dieser Mann übt mit seinem Kopf eine Kraft von 200 Pfund aus, und mit den Händen übt er eine Kraft von 200 Pfund aus, und genau so viel wiegt der Mann. Das Schlagen der Flügel wird über Kreuz gehen, so wie der Gang des Pferdes.\nDeshalb behaupte ich, dass dies besser ist als jedes andere.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Cet homme fait avec sa tête de la force pour 200 livres, et avec les mains, il fait de la force pour 200 livres; et c'est cela même que pèse l'homme. Les ailes ~~iront...~~ seront menées en croix, semblablement à l'allure du cheval. C'est pourquoi j'affirme que ce [système] ci est meilleur qu'aucun [autre]."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 80 (recto), the transcription below the facsimile plate; archive.org leaf n326",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n326/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 80 (recto), the facing page of the plate; archive.org leaf n325",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n325/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 80r, block 2 of 3",
+     "it": {
+      "text": "— corda dela seconda giuntura passa alla seconda calcula",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "The cord of the second joint passes to the second treadle.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Das Seil des zweiten Gelenks läuft zum zweiten Tritt.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Corde de la seconde jointure; elle passe à la seconde marche [(pédale)]."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 80 (recto), the transcription below the facsimile plate; archive.org leaf n326",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n326/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 80 (recto), the facing page of the plate; archive.org leaf n325",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n325/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 80r, block 3 of 3",
+     "it": {
+      "text": "— schala dassalire edismontare sia alta. braccia 12 ellalie aprino braccia 40 ellaloro alzata sia braccia 8 elcorpo dapopa prua sia braccia 20 e alto 5 edallarmadura in fori tutto sia di canne ettela",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "Ladder for climbing up and down: let it be 12 braccia high, and let the wings open 40 braccia, and let their rise be 8 braccia, and the body from stern to prow 20 braccia and 5 high, and apart from the frame [?] let everything be of cane and cloth.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Leiter zum Hinauf- und Hinabsteigen: Sie sei 12 Braccia hoch, die Flügel sollen sich 40 Braccia weit öffnen, ihr Hub sei 8 Braccia, der Rumpf von Heck bis Bug 20 Braccia lang und 5 hoch, und außer dem Gerüst [?] sei alles aus Rohr und Tuch.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Échelle pour monter et descendre; qu'elle soit haute de 12 brasses, que les ailes ouvrent de 40 brasses, que leur montée soit de 8 brasses, que le corps de poupe [à] proue soit de 20 brasses, haut de 5, et que l'armature à l'extérieur soit toute de cannes et de toile."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 80 (recto), the transcription below the facsimile plate; archive.org leaf n326",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n326/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 80 (recto), the facing page of the plate; archive.org leaf n325",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n325/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "E.094": {
+   "lead": 0,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien 1888 (vol. III), Ms. E, FOLIO 43 (verso)",
+     "it": {
+      "text": "CHOMELLUCCIELLO SINALZA MEDIANTE ILUENTA SANZA BATTI MENTO DALIE —\n[1re figure :] e d c t a [2e fig. :] g a ef cd b [3e fig. :] dc h abeg\nLEVASI LUCIELLO INGRANDE ALTEZZA SANZA BATTI MENTO DALIE MEDIANTE ILUENTO CHE CHONGRAN SOMMA ILPERCHOTE SOTTO LALIE ECHODA POSSTE INOBBLIQUO ESSOPRA LASSCIENA POSSTA INOBBLIQUITA CHONTRARIA provasi essia cheiluento chondensato soc to lucciello faccia sotto esso vcciello sichomef far siuede alchonio spinto sotto ilpeso ilquale chonio inogni grado dimoto fa ~~ddesso~~ chesso peso acquissta vngrado daltezza Maperche lobbliquita chontraria delbus sto che allucciello he indispo sitione didissciendere chontro allo avvenimen to deluento cholla medesima potentia che tal vento loleua inalto medi ante lobbliquita delbussto chontraria acquella delle alie sichopretanto\n[Figures à gauche (marge) :] a b c d e\n[Sous la figure d'un secteur :] Qui bisognia chalculare l'gradi della obbliquita perche inesun gra do dobbliquita nella cosa sopra lacqua nelluccien sopra laria siferma ma sifaran tanto piu ommen veloci quanto ilsito sara ~~p~~ meno oppiu obbliquo\nQuello vcciel ~~cheppiu~~ menpesa che piu sallargha edeconuerso piv pe sa chepiu sirestrignie ecquessto sperimentano // lefarfalle nellilo ro dissciensi ec. —\n[Figure en bas :] a 10 b [levier] 9 c [poids] d ~~19~~ 20 e [levier]\nse a b dieci spignie c 9 perla obbliquita d e che magiore chella obbliquita a b leuera ilpe so 9 con minor faticha ma non lospingiera chontro al 10 perche lamagiore obliquita asolpo tentia ainnalzare",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "How the bird rises by means of the wind without beating its wings.\nThe bird rises to a great height without beating its wings, by means of the wind, which strikes it in great quantity under the wings and the tail, held slantwise, and on the back, held at the opposite slant. This is proved: let the wind packed under the bird act beneath it as one sees with a wedge driven under a weight, a wedge which with every degree of movement makes the weight gain one degree of height. But because the opposite slant of the bird's body disposes it to descend against the oncoming wind with the same power with which that wind lifts it up, by means of the slant of the body, opposite to that of the wings, it covers itself by as much [?].\n[Beneath the figure of a sector:] Here one must calculate the degrees of the slant, because at no degree of slant does a thing on the water, or the bird in the air, stand still; they will move faster or slower as the position is less or more slanted.\nThat bird weighs less which spreads itself more, and conversely it weighs more the more it draws itself in; and butterflies make trial of this in their descents, etc.\nIf a b, ten, pushes c, nine, by the slant d e, which is greater than the slant a b, it will lift the weight 9 with less effort, but will not push it against the 10, because the greater slant alone has the power to lift.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Wie der Vogel sich mit Hilfe des Windes erhebt, ohne die Flügel zu schlagen.\nDer Vogel steigt ohne Flügelschlag in große Höhe, mit Hilfe des Windes, der ihn in großer Menge unter die schräg gestellten Flügel und den Schwanz trifft, und auf den Rücken, der in die Gegenrichtung geneigt ist. Das wird so bewiesen: Der unter dem Vogel verdichtete Wind wirke unter ihm so, wie man es bei einem Keil sieht, der unter eine Last getrieben wird. Mit jedem Grad Bewegung lässt dieser Keil die Last um einen Grad an Höhe gewinnen. Weil aber die Gegenneigung des Rumpfes den Vogel dazu bringt, gegen den anströmenden Wind mit derselben Kraft abzusteigen, mit der dieser Wind ihn hebt, durch die Neigung des Rumpfes, die der Neigung der Flügel entgegengesetzt ist, deckt er sich um ebenso viel [?].\n[Unter der Figur eines Kreisausschnitts:] Hier muss man die Grade der Neigung berechnen. Denn bei keinem Grad der Neigung bleibt ein Ding auf dem Wasser oder der Vogel in der Luft stehen. Sie werden vielmehr umso schneller oder langsamer, je weniger oder je mehr ihre Lage geneigt ist.\nDer Vogel wiegt weniger, der sich mehr ausbreitet, und umgekehrt wiegt er mehr, je mehr er sich zusammenzieht. Das erproben die Schmetterlinge, wenn sie niedersinken, usw.\nWenn a b, zehn, c, neun, über die Neigung d e schiebt, die größer ist als die Neigung a b, hebt es die Last 9 mit weniger Mühe, schiebt sie aber nicht gegen die 10, denn nur die größere Neigung hat die Kraft zu heben.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "COMMENT L'OISEAU S'ÉLÈVE AU MOYEN DU VENT, SANS BATTEMENT D'AILES.\n[1ère figure :] e d c t a [2e fig. :] g a ef cd b [3e fig. :] dc b abeg.\nL'OISEAU S'ÉLÈVE EN GRANDE HAUTEUR SANS BATTEMENT D'AILES, AU MOYEN DU VENT QUI LE FRAPPE EN GRANDE SOMME SOUS LES AILES ET LA QUEUE PLACÉES OBLIQUEMENT, ET SUR L'ÉCHINE PLACÉE EN OBLIQUITÉ CONTRAIRE.\nOn le prouve : Soit le vent condensé sous l'oiseau faisant sous cet oiseau, comme on voit faire au coin poussé sous le poids, coin qui à chaque degré de mouvement fait ~~de ce~~ que ce poids acquiert un degré de hauteur. Mais parce que l'obliquité contraire du buste qu'a l'oiseau est en disposition de descendre contre l'arrivée du vent avec la même puissance avec laquelle le vent l'élève en haut, moyennant l'obliquité du buste contraire à celle des ailes, il se couvre d'autant.\n[Figures à gauche (marge) :] a b c d e.\n[Sous la fig. d'un secteur] Ici il est besoin de calculer les degrés de l'obliquité, parce qu'en aucun degré d'obliquité, ni la chose sur l'eau, ni l'oiseau dans l'air, ne s'arrêtent, mais leur vitesse se fera d'autant plus ou moins grande que la position sera ~~p~~ moins ou plus oblique,\nCet oiseau ~~qui~~ pèse ~~plus~~ moins qui s'élargit plus et à l'inverse celui-là pèse plus qui se resserre plus; c'est ce qu'expérimentent les papillons dans leurs descentes, etc.\n[Figures en bas :] a 10 b (levier) 9 c (poids) d ~~19~~ 20 e (levier).\nSi a b 10 pousse c 9 par l'obliquité d e, qui est plus grande que l'obliquité a b, a b enlèvera le poids 9 avec une moindre fatigue, mais ne le poussera pas contre le 10 parce que la plus grande obliquité a seule puissance pour élever."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien (ed.), Les manuscrits de Léonard de Vinci: Manuscrits C, E & K de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1888 (vol. III)",
+       "page": "Ms. E, transcription headed \"FOLIO 43 (verso)\" [VOL DES OISEAUX. — LEVIERS]; archive.org leaf 226",
+       "url": "https://archive.org/details/lesmanuscritsdel03lo/page/n215/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien (ed.), Les manuscrits de Léonard de Vinci: Manuscrits C, E & K de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1888 (vol. III)",
+       "page": "Ms. E, FOLIO 43 (verso), French translation below the transcription; archive.org leaf 226",
+       "url": "https://archive.org/details/lesmanuscritsdel03lo/page/n215/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Herzfeld 1906 p. 12, II \"Unverbrüchlichkeit des Naturgesetzes\" (MS. E. FOL. 43 v.); printed Italian: Ravaisson-Mollien 1888, Ms. E, FOLIO 43 (recto)",
+     "placement": "doubtful: Herzfeld cites E 43v, but Ravaisson prints this sentence under FOLIO 43 (recto), and his plate for 43 recto is the other side of this leaf (the SET image matches his plate for 43 verso). Do not show on this page unless the owner accepts the other side.",
+     "it": {
+      "text": "Molto piu ~~sinnalza~~ alto e ilfine delmote refresso (delli vccielli chevolano chontro aluento) chennone ilprinci pio del lor moto ~~refresso~~ incidente eperquessto natura nonron pe sue leggie ecquessto sipruova perla anteciedente",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "The end of the reflex movement is much higher (for the birds that fly against the wind) than the beginning of their incident reflex movement; and for this reason nature does not break her laws; and this is proved by the preceding [proposition].",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Die Natur bricht ihr Gesetz nicht.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": {
+      "text": "La fin du mouvement réfléchi ~~s'élève~~ est beaucoup plus haute (pour les oiseaux qui volent contre le vent) que n'est le principe de leur mouvement ~~réfléchi~~ incident ; et par cela, la Nature ne rompt pas ses lois ; on le prouve par l'antécédente."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien (ed.), Les manuscrits de Léonard de Vinci: Manuscrits C, E & K de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1888 (vol. III)",
+       "page": "Ms. E, transcription headed \"FOLIO 43 (recto)\" [VOL DES OISEAUX], last sentence; archive.org leaf 226",
+       "url": "https://archive.org/details/lesmanuscritsdel03lo/page/n215/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 12",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n191/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien (ed.), Les manuscrits de Léonard de Vinci: Manuscrits C, E & K de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1888 (vol. III)",
+       "page": "Ms. E, FOLIO 43 (recto), French translation; archive.org leaf 226",
+       "url": "https://archive.org/details/lesmanuscritsdel03lo/page/n215/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "B.155": {
+   "lead": 0,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 74r, block 1 of 6",
+     "it": {
+      "text": "— modo. chequando. lalja. sileua. inalto rimanghi traforata ecquando ella. chala. sia tucta. vnita e il suo vedere e di sotto in su",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "A way to make the wing stay perforated when it rises, and all closed when it comes down. And it is seen from below, looking up.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Ein Verfahren, damit der Flügel durchbrochen bleibt, wenn er sich hebt, und ganz geschlossen ist, wenn er sich senkt. Und man sieht ihn von unten nach oben.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Procédé pour que quand l'aile s'élève, elle reste transpercée, et que quand elle baisse, elle soit toute unie. Et pour le voir, il faut regarder par-dessous."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 74 (recto), the transcription below the facsimile plate; archive.org leaf n302",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n302/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 74 (recto), the facing page of the plate; archive.org leaf n301",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n301/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 74r, block 2 of 6",
+     "it": {
+      "text": "— A B C —",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "A B C",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "A B C",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": null,
+     "label_only": true,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 74 (recto), the transcription below the facsimile plate; archive.org leaf n302",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n302/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 74r, block 3 of 6",
+     "it": {
+      "text": "— fa le ~~g~~ maglie di questarete large 1/8",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "Make the meshes of this net 1/8 wide.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Mache die Maschen dieses Netzes 1/8 weit.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Fais les mailles de ce filet larges d'1/8e."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 74 (recto), the transcription below the facsimile plate; archive.org leaf n302",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n302/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 74 (recto), the facing page of the plate; archive.org leaf n301",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n301/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 3,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 74r, block 4 of 6",
+     "it": {
+      "text": "— A. sara asse dabete ~~chial~~ inerbata che attiglio e delegiere",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "A shall be a board of fir, inerbata [?], with a fibrous grain [?], and light.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "A sei ein Brett aus Tannenholz, inerbata [?], mit faseriger Maserung [?], und leicht.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— A sera [en] bois de sapin en herbe [?], qui a des filaments [?], et est léger."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 74 (recto), the transcription below the facsimile plate; archive.org leaf n302",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n302/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 74 (recto), the facing page of the plate; archive.org leaf n301",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n301/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 4,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 74r, block 5 of 6",
+     "it": {
+      "text": "— B sara fustagnio inchollatovi pivma accio chelavia di legieri non fuga",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "B shall be fustian with down glued onto it, so that the way [?] does not easily escape.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "B sei Barchent, auf den Flaumfedern geklebt sind, damit der Weg [?] nicht leicht entweicht.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "B sera de futaine, sur laquelle sera collée de la plume, afin que la voie ne fuie pas aisément."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 74 (recto), the transcription below the facsimile plate; archive.org leaf n302",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n302/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 74 (recto), the facing page of the plate; archive.org leaf n301",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n301/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 5,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 74r, block 6 of 6",
+     "it": {
+      "text": "— C fia taffetta. innamidato eperpruova torai carte sottilj",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "C shall be starched taffeta, and for a trial you will take thin sheets of paper.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "C sei gestärkter Taft, und für einen Versuch nimmst du dünne Papierbögen.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "C doit être de taffetas amidonné, et pour l'épreuve, tu prendras de minces cartons."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 74 (recto), the transcription below the facsimile plate; archive.org leaf n302",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n302/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 74 (recto), the facing page of the plate; archive.org leaf n301",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n301/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "FB15r": {
+   "lead": 0,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §1123 (Mz. 12a (16)), vol. II p. 278; Herzfeld 1906 p. 30-31, XLVII",
+     "it": {
+      "text": "Ricordati siccome jl tuo vccello non debbe imitare altro che 'l pipistrello per cavsa che i pannicoli fāno armadura over collegatione alle armadure, cioè maestre delle ali;\n\nE se tu imitassi l'alie delli vccelli pennvti, esse son di piv potēte nervatura, per essere esse traforate cioè che le lor penne sō disunite e passate dall'aria; Ma il pipistrello è aivtato dal panniculo che lega il tutto, e non è traforato.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "Remember that your flying machine must imitate no other than the bat, because the web is what by its union gives the armour, or strength to the wings.\n\nIf you imitate the wings of feathered birds, you will find a much stronger structure, because they are pervious; that is, their feathers are separate and the air passes through them. But the bat is aided by the web that connects the whole and is not pervious.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Erinnere dich, daß dein Vogel nichts anderes nachahmen darf als die Fledermaus, aus dem Grund, weil ihr Gewebe eine Armatur oder besser eine Verbindung der Armatur, das heißt das Hauptsegel der Flügel, ausmacht.\n\nUnd ahmtest du die Schwingen der gefiederten Vögel nach, selbige sind von mächtigeren Knochen und stärkerer Nervatur, weil sie durchlöchert sind, d. h. weil ihre Federn unverbunden und von der Luft durchstrichen sind.\n\nAber die Fledermaus hat die Hilfe des Gewebes, das alles verbindet und nicht durchlöchert ist.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 278",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n413/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 278",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n413/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 30-31",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n209/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "B.176": {
+   "lead": 2,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 88v, block 1 of 6",
+     "it": {
+      "text": "— ilmedesimo disocto",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "The same, below.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Dasselbe, unten.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Le même que ci-dessous."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 88 (verso), the transcription below the facsimile plate; archive.org leaf n346",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n346/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 88 (verso), the facing page of the plate; archive.org leaf n345",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n345/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 88v, block 2 of 6",
+     "it": {
+      "text": "— modo chome debe stare quella. di sopra",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "How the one above should be.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Wie die obere sein soll.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Comment doit être [fonctionner] celle ci-dessus."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 88 (verso), the transcription below the facsimile plate; archive.org leaf n346",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n346/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 88 (verso), the facing page of the plate; archive.org leaf n345",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n345/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 88v, block 3 of 6",
+     "it": {
+      "text": "— se voi. vedere la uera pruova. dellalie. fa di carta. armata di rete elle maesstre dichanna. vna. ale di largeza. ellumgeza. di braccia 20 ilmeno. effermala sopra vno panchore di peso di libbre. 200. effa chome disopra sifigura vna forza presta esse il pancone delle 200 libbre. si leua prima. innalto. chellalia sabassi la pruova e bona maffapure chella forza siapresta esse ilpredetto effetto non riessce nonui perdere piv tenpo",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "If you want to see the true test of the wings, make a wing of paper stiffened with netting, with the main ribs of cane, at least 20 braccia wide and long, and fix it on a plank weighing 200 pounds, and apply a sudden force, as drawn above. If the plank of 200 pounds rises before the wing comes down, the test is good. But make sure the force is sudden, and if the said effect does not follow, waste no more time on it.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Wenn du den wahren Versuch mit den Flügeln sehen willst, mache aus Papier, verstärkt mit einem Netz, und mit Hauptrippen aus Rohr einen Flügel von mindestens 20 Braccia Breite und Länge, befestige ihn auf einer Bohle von 200 Pfund Gewicht und übe, wie oben gezeichnet, eine rasche Kraft aus. Wenn sich die Bohle von 200 Pfund hebt, bevor der Flügel sich senkt, ist der Versuch gut. Sorge aber dafür, dass die Kraft rasch ist, und wenn die genannte Wirkung nicht eintritt, verliere keine Zeit mehr damit.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Si tu veux voir la véritable épreuve des ailes, fais de carton armé de filet, et les maîtresses de canne [roseau], une aile de la largeur et longueur de 20 brasses au moins, et fixe-la sur une palplanche [?] du poids de 200 livres; elle fera, comme il est ci-dessus figuré, une force prompte [à agir]. Et si la palplanche des 200 livres s'élève avant que l'aile s'abaisse, l'épreuve est bonne, mais fais aussi que la force soit prompte [à agir], et si le susdit effet n'est pas obtenu, n'y perds pas plus de temps."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 88 (verso), the transcription below the facsimile plate; archive.org leaf n346",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n346/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 88 (verso), the facing page of the plate; archive.org leaf n345",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n345/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 3,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 88v, block 4 of 6",
+     "it": {
+      "text": "— secquesta. alja persua. natura. douerebbe. chadere in. 4 tenpi. ettu laffacci pertuo ingiegnio chadere in. 2. conuera chelpancone delle 200 libbre si leui innalto",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "If this wing by its nature would fall in 4 units of time, and you by your skill make it fall in 2, the plank of 200 pounds will have to rise.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Wenn dieser Flügel von Natur aus in 4 Zeiteinheiten fallen würde und du ihn durch deinen Einfallsreichtum in 2 fallen lässt, dann muss sich die Bohle von 200 Pfund heben.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Si cette aile par sa nature devait tomber en 4 temps, et que tu saches t'ingénier à la faire tomber en 2, il faudra que la palplanche des 200 livres s'élève."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 88 (verso), the transcription below the facsimile plate; archive.org leaf n346",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n346/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 88 (verso), the facing page of the plate; archive.org leaf n345",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n345/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 4,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 88v, block 5 of 6",
+     "it": {
+      "text": "— Tussai che stando tu nelfondo dunalta. acqua eltenendo lebraccia aperte ecquele lassci chasschare chol naturale loro chadimento chole braccia sitroveranno chalate alle cosscie elomo sirimara nel primo sito.\nMassetucquelle braccia chedoueuano chadere in 4 tenpi le fai chalare in 2 sapi chelomo sipartira delsuo sito euolando chonfuria sifara secondo sito della superfitie dellacqua",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "You know that if you stand on the bottom of deep water, holding your arms open, and let them drop with their natural fall, the arms will end up lowered to the thighs and the man will stay in his first place.\nBut if you make those arms, which were to fall in 4 units of time, come down in 2, know that the man will leave his place and, flying up with force, will make the surface of the water his second place.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Du weißt: Wenn du am Grund eines tiefen Wassers stehst, die Arme ausgebreitet hältst und sie in ihrem natürlichen Fall sinken lässt, dann liegen die Arme am Ende an den Schenkeln, und der Mensch bleibt an seiner ersten Stelle.\nWenn du aber diese Arme, die in 4 Zeiteinheiten fallen sollten, in 2 herabbringst, dann wisse, dass der Mensch seine Stelle verlässt und, mit Wucht auffliegend, die Oberfläche des Wassers zu seiner zweiten Stelle macht.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Tu sais que si tu te trouves debout au fond d'une eau profonde, tenant les bras ouverts et que tu les laisses tomber de leur chute naturelle, les bras se trouveront descendus aux cuisses, et [tandis que] l'homme restera dans la première position.\nMais si ces bras qui devaient tomber en 4 temps, tu les fais tomber en 2, sache que l'homme quittera sa position, et, volant violemment, se fera une seconde position à la surface de l'eau."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 88 (verso), the transcription below the facsimile plate; archive.org leaf n346",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n346/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 88 (verso), the facing page of the plate; archive.org leaf n345",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n345/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 5,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 88v, block 6 of 6",
+     "it": {
+      "text": "— Essappi chessel sopra. decto pancone pesa 200 libbre 100 netocha allomo chettiene lalieua in mano e 100 sen scharicha sopra laria perla mezanita dellalia",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "And know that if the aforesaid plank weighs 200 pounds, 100 of them fall to the man who holds the lever in his hand, and 100 are discharged onto the air by means of the wing.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Und wisse: Wenn die genannte Bohle 200 Pfund wiegt, fallen 100 davon auf den Mann, der den Hebel in der Hand hält, und 100 werden durch den Flügel auf die Luft abgeladen.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Et sache que si la susdite palplanche pèse 200 livres, 100 en reviennent à l'homme qui tient le levier en main, et 100 s'en déchargent sur l'air par l'entremise de l'aile."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 88 (verso), the transcription below the facsimile plate; archive.org leaf n346",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n346/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 88 (verso), the facing page of the plate; archive.org leaf n345",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n345/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "B.165": {
+   "lead": 2,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 79r, block 1 of 3",
+     "it": {
+      "text": "— quando ilpeso. e visino. allecharuchole egli. sischosta chopali. over. lieue",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "When the weight is close to the pulleys, it moves away by means of the poles or levers.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Wenn das Gewicht nahe an den Rollen ist, rückt es mit den Stangen oder Hebeln ab.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Quand le poids est voisin des poulies, il s'éloigne avec les pieux ou leviers [?]."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 79 (recto), the transcription below the facsimile plate; archive.org leaf n322",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n322/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 79 (recto), the facing page of the plate; archive.org leaf n321",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n321/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 79r, block 2 of 3",
+     "it": {
+      "text": "— M —",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "M",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "M",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— M —"
+     },
+     "label_only": true,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 79 (recto), the transcription below the facsimile plate; archive.org leaf n322",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n322/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 79 (recto), the facing page of the plate; archive.org leaf n321",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n321/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 79r, block 3 of 3",
+     "it": {
+      "text": "— questo. po fare chonvnparo dalie. e anchora chon. 2 se vorai fare. chonuno le bracia lalzerano chunmolinello evnparo di chalci con furia le callerano effia vtile\nEsse uorrai fare di 2 para quando luna delleganbe sidistendera quellachalera vnparo dalie elmvlinelo delle mani ~~l~~ alzara ~~l~~ inquelmezo laltre dando ancora gran fauore acquelle checalano evolgiendo cholle mani ora adesstra ora assinistra dara fauore ora alluna ora allaltra Questo strumento sta chome quelgrande darouescio saluo che questo torce iltirare nella rozella [rotella ?]. M eva apiedi nischanbio de piedi farai vna schala in terzo di 3 aste dabete legieri essottili chome quidinanti figurato essia lunga 10 braccia",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "This can be done with one pair of wings and also with 2. If you want to do it with one, the arms will raise it with a windlass, and a pair of kicks will bring it down with force, and it will be useful.\nAnd if you want to do it with 2 pairs, when one of the legs stretches out it will bring down one pair of wings, and the windlass of the hands will meanwhile raise the others, giving great help as well to those that come down; and turning with the hands now to the right, now to the left, it will help now the one, now the other. This instrument is like that large one on the back, except that this one turns the pull round the little wheel [?] M and goes to the feet. Instead of the feet you will make a ladder 'in terzo' [?] of 3 light, thin fir poles, as drawn here in front, and let it be 10 braccia long.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Dies kann man mit einem Flügelpaar machen und auch mit 2. Wenn du es mit einem machen willst, heben die Arme es mit einer Haspel, und ein Paar Fußstöße senkt es mit Wucht, und das wird nützlich sein.\nUnd wenn du es mit 2 Paaren machen willst: Wenn sich eines der Beine streckt, senkt es ein Flügelpaar, und die Haspel der Hände hebt unterdessen die anderen und hilft dabei noch sehr denen, die sich senken; und wenn man mit den Händen bald nach rechts, bald nach links dreht, hilft sie bald dem einen, bald dem anderen. Dieses Instrument ist wie jenes große auf der Rückseite, nur dass dieses den Zug um das Rädchen [?] M lenkt und zu den Füßen geht. Statt der Füße machst du eine Leiter 'in terzo' [?] aus 3 leichten, dünnen Tannenstangen, wie hier vorne gezeichnet, und sie sei 10 Braccia lang.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Ceci peut faire avec une paire d'ailes, et aussi avec deux. Si tu veux faire avec une, les bras l'élèveront avec un moulinet, et une paire [un double coup] de talons [?], avec de la furie [avec un mouvement violent], l'abaissera; et ce sera utile.\nEt si tu veux te servir de 2 paires, quand l'une des jambes se tendra, elle abaissera une paire d'ailes, et le moulinet des mains élèvera, dans le même temps, les autres, favorisant [aidant] encore grandement celles qui s'abaissent, et en tournant avec les mains, tantôt à droite, tantôt à gauche, tu favoriseras tantôt l'une, tantôt l'autre. Cet instrument est comme ce grand au revers [(à la page suivante, folio 80, recto?)], sauf que celui-ci tord la traction dans la poulie M, et va aux pieds. Au lieu des pieds, tu feras une échelle en tiers [?], de 3 bâtons de sapin, légers et minces, comme il est figuré ci-dessus, et qui devra être longue de 10 brasses."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 79 (recto), the transcription below the facsimile plate; archive.org leaf n322",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n322/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 79 (recto), the facing page of the plate; archive.org leaf n321",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n321/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "AshB.045": {
+   "lead": 0,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §1382 (Ash. II. 13b), vol. II p. 422",
+     "it": {
+      "text": "A maestro Lodovico chiedi li cōdotti d'acqua.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "Ask maestro Lodovico for 'the conduits of water'.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Bitte Meister Lodovico um die Wasserleitungen.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 422",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n571/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 422",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n571/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Ravaisson-Mollien 1891 (vol. VI), Ms 2037 (Ashburnham II), FOLIO 10 (verso), the note beside the drawings",
+     "it": {
+      "text": "animale che fuge\ndelluno elemento\nnelaltro",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "An animal that flees from one element into the other.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Ein Tier, das aus dem einen Element in das andere flieht.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "Animal qui fuit d'un élément dans l'autre."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien (ed.), Les manuscrits de Léonard de Vinci: Manuscrit H de la Bibliothèque de l'Institut; Ashburnham 2038 et 2037 de la Bibliothèque nationale, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1891 (vol. VI)",
+       "page": "Ms 2037, transcription headed \"FOLIO 10 (verso)\" [NOTES DIVERSES. MAITRE LUDOVIC, MOUVEMENT CONTINU, VOL, ALLÉGORIE, CARICATURE, ETC.]; archive.org leaf 358",
+       "url": "https://archive.org/details/lesmanuscritsdel06lo/page/n335/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien (ed.), Les manuscrits de Léonard de Vinci: Manuscrit H de la Bibliothèque de l'Institut; Ashburnham 2038 et 2037 de la Bibliothèque nationale, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1891 (vol. VI)",
+       "page": "Ms 2037, FOLIO 10 (verso), French translation; archive.org leaf 358",
+       "url": "https://archive.org/details/lesmanuscritsdel06lo/page/n335/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "FB5r": {
+   "lead": 0,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §1122 (Mz. 3a (6)), vol. II p. 278; Herzfeld 1906 p. 32, L",
+     "it": {
+      "text": "L'uomo ne' volatili à a stare libero dalla cintura insù per potersi bilicare, come fa in barca acciò che 'l cētro della grauità di lui e dello strumēto si possa bilicare e trasmutarsi, dove necessità il dimāda alla mutatione del centro della sua resistētia.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "Man when flying must stand free from the waist upwards so as to be able to balance himself as he does in a boat so that the centre of gravity in himself and in the machine may counterbalance each other, and be shifted as necessity demands for the changes of its centre of resistance.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Der Mensch in seinem Flieger (volatile) hat sich vom Gürtel aufwärts frei zu halten, um zu balancieren, wie er es im Boote tat, damit sein Schwerpunkt und der seiner Maschine schwanken könne und sich wandeln, wo die Notwendigkeit bei der Änderung des Zentrums seines Widerstandes es verlangt.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 278",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n413/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 278",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n413/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 32",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n211/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Herzfeld 1906 p. 29, XLV (first paragraph; SP., MS. V. U. FOL. 6 r. und 6 v.); printed Italian: Sabachnikoff 1893, FOLIO 6 [5] recto, p. 72",
+     "it": {
+      "text": "Quando l'uccello si vorrà voltare (su) alla destra o sinistra parte, nel battere dell'alie, allora esso batterà più bassa l'alia onde esso si vorà voltare, e così l'uccello (si) torcerà il moto dirieto all'inpeto dell'alia che più si mosse.\n[FOLIO 6 [5] — verso. Seguito del Fol. 6 recto:] e fa il moto refresso sotto vento, dall'opposita parte.",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "When the bird wants to turn to the right or the left side while beating its wings, it will beat lower with the wing on the side towards which it wants to turn; and so the bird will twist its movement behind the impetus of the wing that moved more,\n[continued on the verso:] and it makes the reflex movement under the wind, from the opposite side.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Wenn der Vogel sich nach der rechten oder der linken Seite drehen will, beim Schlagen der Flügel, dann wird er dort den Flügel tiefer schlagen, wo er sich hinkehren will, und so wird der Vogel die Bewegung nach dem Antrieb (impeto) jenes Flügels drehen, der sich mehr bewegte, und macht die reflektierte Bewegung unter dem Wind, von der entgegengesetzten Seite.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": {
+      "text": "Quand l'oiseau se voudra tourner (su) du côté droit ou gauche, en battant des ailes, alors il battra plus bas de l'aile d'où il voudra se tourner, et ainsi l'oiseau (se) tordra le mouvement derrière l'élan de l'aile qui se mut le plus.\n[FOLIO 6 [5] — verso. Suite du Fol. 6 recto :] et fait le mouvement réfléchi sous le vent, du côté opposé."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "I manoscritti di Leonardo da Vinci: Codice sul volo degli uccelli e varie altre materie, pubblicato da Teodoro Sabachnikoff, trascrizioni e note di Giovanni Piumati, traduzione in lingua francese di Carlo Ravaisson-Mollien, Parigi: Edoardo Rouveyre, 1893",
+       "page": "p. 72, critical transcription (lower left column), end of FOLIO 6 [5] recto and first line of the verso",
+       "url": "https://archive.org/details/IManoscrittiDiLeonardoDaVinci/page/n83/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 29",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n208/mode/1up"
+      },
+      {
+       "edition": "I manoscritti di Leonardo da Vinci: Codice sul volo degli uccelli e varie altre materie, pubblicato da Teodoro Sabachnikoff, trascrizioni e note di Giovanni Piumati, traduzione in lingua francese di Carlo Ravaisson-Mollien, Parigi: Edoardo Rouveyre, 1893",
+       "page": "p. 72, French translation (lower right column)",
+       "url": "https://archive.org/details/IManoscrittiDiLeonardoDaVinci/page/n83/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "B.156": {
+   "lead": 1,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 74v, block 1 of 4",
+     "it": {
+      "text": "— M fa b c d —",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "M f a b c d",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "M f a b c d",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— M fabcd. —"
+     },
+     "label_only": true,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 74 (verso), the transcription below the facsimile plate; archive.org leaf n304",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n304/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 74 (verso), the facing page of the plate; archive.org leaf n303",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n303/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 74v, block 2 of 4",
+     "it": {
+      "text": "— a. torcie. lalia. b. lagira. cholla. lieua. c. lachala. ~~b~~ d. lalieua di basso. innalto ellomo guidatore. di questo. strumento tiene isua. piedi in. f. d. ulpiede. f. abassa. lalie elpie d lalza ellpolo M vuol pendere fori. delsuo perpendiculare. accio chellalj chalando in basso anchora chalino ~~ini~~ in vero [inverso] ipie delomo che quella cosa che fara andar luciello innanzj.",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "a twists the wing, b turns it with the lever, c lowers it, d raises it from below upward; and the man who steers this instrument keeps his feet at f and d. The foot f lowers the wings, the foot d raises them. The pivot M should hang out of its perpendicular, so that the wings, as they come down, also come down towards the man's feet: that is the thing that will make the bird go forward.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "a verdreht den Flügel, b dreht ihn mit dem Hebel, c senkt ihn, d hebt ihn von unten nach oben; und der Mann, der dieses Instrument lenkt, hat seine Füße in f und d. Der Fuß f senkt die Flügel, der Fuß d hebt sie. Der Drehpunkt M soll aus seiner Senkrechten heraushängen, damit die Flügel sich beim Senken auch zu den Füßen des Mannes hin senken: Das ist es, was den Vogel vorwärts bringen wird.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— a tord l'aile, b la tourne avec le levier, c l'abaisse, d l'élève de bas en haut, et l'homme, guide de cet instrument, tient ses pieds en f d. Le pied f abaisse les ailes et le pied d les élève. Le pôle [pivot] M veut [doit] pendre [avoir son centre de gravité?] en dehors de sa perpendiculaire [de la verticale], afin que les ailes, en descendant, s'abaissent aussi vers les pieds de l'homme; car c'est cette chose qui fera [car c'est là ce qui fera] aller l'oiseau en avant."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 74 (verso), the transcription below the facsimile plate; archive.org leaf n304",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n304/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 74 (verso), the facing page of the plate; archive.org leaf n303",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n303/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 74v, block 3 of 4",
+     "it": {
+      "text": "— Quessto. isstrumento. issperimenterai. sopra vno lago. eporterai. cinto. vnotro lungo acio chenelchadere. tu nonanegassi.",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "You will test this instrument over a lake, and you will wear a long wineskin tied round your waist, so that if you fall you do not drown.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Dieses Instrument wirst du über einem See erproben, und du wirst einen langen Lederschlauch um den Leib gebunden tragen, damit du nicht ertrinkst, wenn du fällst.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Tu expérimenteras cet instrument sur un lac, et tu porteras ceinte [à la ceinture] une longue outre, afin qu'en tombant, tu ne viennes pas à te noyer."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 74 (verso), the transcription below the facsimile plate; archive.org leaf n304",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n304/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 74 (verso), the facing page of the plate; archive.org leaf n303",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n303/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 3,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 74v, block 4 of 4",
+     "it": {
+      "text": "— Anchora siuole chelchalare dellali siafacto perforza di 2 piedi nvn solo tenpo. accioche. tu possi tenporegiare. e bilicharti cholchalare piv presto luna. chellaltra sechondo. ibisogni chome vedi fare alnibio ellialtri ucielli eanchora ilchalare de 2 piedi e piv forte altrettanto che chonvno vero e chel moto e piv tardo altrettanto Ellalzare fia perforza duna mola o voi chomano Overo neltirare atte ipiedi che meglio cai [che ai] libere le mani",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "Further, the lowering of the wings should be done by the force of 2 feet at one time, so that you can pace your movement and balance yourself by lowering one faster than the other, as need requires, as you see the kite and the other birds do. And again, the lowering by 2 feet is twice as strong as with one; true, the motion is twice as slow. And the raising shall be by the force of a spring, or, if you like, by hand, or else by drawing the feet towards you, which is better, for then you have your hands free.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Ferner soll das Senken der Flügel durch die Kraft von 2 Füßen zugleich geschehen, damit du dein Tempo bestimmen und dich im Gleichgewicht halten kannst, indem du je nach Bedarf den einen schneller senkst als den anderen, wie du es den Milan und die anderen Vögel tun siehst. Außerdem ist das Senken mit 2 Füßen doppelt so stark wie mit einem; freilich ist die Bewegung doppelt so langsam. Und das Heben geschehe durch die Kraft einer Feder, oder, wenn du willst, mit der Hand, oder indem du die Füße zu dir heranziehst, was besser ist, denn so hast du die Hände frei.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Il faut encore que l'abaissement des ailes soit fait par la force des 2 pieds en un seul temps; afin que tu puisses temporiser [ralentir ton mouvement], et te maintenir en équilibre, en abaissant [une aile] plus vite l'une que l'autre, selon les besoins, comme tu vois faire au milan et aux autres oiseaux.\nEt encore, l'abaissement des 2 pieds est une fois plus fort que celui d'un seul; il est vrai que le mouvement est une fois plus lent. Quant à s'élever, on l'obtient par la force d'un ressort, où, si tu veux, avec la main; ou bien en tirant à toi les pieds, ce qui est mieux, parce que tu as alors plus libres les mains."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 74 (verso), the transcription below the facsimile plate; archive.org leaf n304",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n304/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 74 (verso), the facing page of the plate; archive.org leaf n303",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n303/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "B.157": {
+   "lead": 3,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 75r, block 1 of 4",
+     "it": {
+      "text": "— iltimone inpolato sulcollo",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "The rudder, pivoted on the neck.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Das Steuer, am Hals drehbar gelagert.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Le timon [du gouvernail] ayant son pôle [pivot] sur le cou."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 75 (recto), the transcription below the facsimile plate; archive.org leaf n306",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n306/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 75 (recto), the facing page of the plate; archive.org leaf n305",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n305/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 75r, block 2 of 4",
+     "it": {
+      "text": "— ab cf nr ks Mg45 zyd",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "ab cf nr ks Mg45 zyd",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "ab cf nr ks Mg45 zyd",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— ab cf nr hl ks Mg 45 zy d —"
+     },
+     "label_only": true,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 75 (recto), the transcription below the facsimile plate; archive.org leaf n306",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n306/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 75 (recto), the facing page of the plate; archive.org leaf n305",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n305/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 75r, block 3 of 4",
+     "it": {
+      "text": "— coda che elegata choruna grilanda [con una ghirlanda] in chapo ne loco dela nvca",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "The tail, which is tied with a garland at the head, where the nape is.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Der Schwanz, der mit einem Kranz am Kopf festgebunden ist, an der Stelle des Nackens.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Queue [gouvernail], qui est attachée avec une guirlande [une couronne] à la tête, à la place de la nuque."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 75 (recto), the transcription below the facsimile plate; archive.org leaf n306",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n306/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 75 (recto), the facing page of the plate; archive.org leaf n305",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n305/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 3,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 75r, block 4 of 4",
+     "it": {
+      "text": "— la chorda. r. s. k. z. d. l. e vna medesima ma vna testa cioe. r. capita avnpie e. l. capita allaltro elacorda l. z abassa lalia che ferma nelpunto m e cosi la ~~torcie...~~ gira cola lieva. g. y. ecosi la piega colla corda. b. 4. 5. ella corda. k. r. alza lalia Ma ben tiricordo chellegnio delle carucole k z. nonnistia perlinia perpendichulare. anzi z dapie sia assai piv inverso. tua pie che. k. dacapo.",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "The cord r s k z d l is one and the same, but one end, that is r, comes to one foot, and l comes to the other; and the cord l z lowers the wing, which is fixed at the point m; and in the same way one turns it with the lever g y and bends it with the cord b 4 5; and the cord k r raises the wing. But I do remind you that the wood of the pulleys k z should not stand in a perpendicular line; rather, z at the bottom should be much further towards your feet than k at the top.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Das Seil r s k z d l ist ein und dasselbe, aber ein Ende, nämlich r, kommt an den einen Fuß, und l kommt an den anderen; und das Seil l z senkt den Flügel, der im Punkt m befestigt ist; und ebenso dreht man ihn mit dem Hebel g y und beugt ihn mit dem Seil b 4 5; und das Seil k r hebt den Flügel. Aber ich erinnere dich wohl daran, dass das Holz der Rollen k z nicht in einer senkrechten Linie stehen soll; vielmehr soll z unten viel weiter zu deinen Füßen hin liegen als k oben.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— La corde r s k, z d l, est une même, mais une tête [un de ses bouts], c'est-à-dire r, arrive à un pied, et l tombe à l'autre; et la corde l z abaisse l'aile qui est fixe au point m, et de même la ~~tord...~~ tourne avec le levier g y, et de même la ploie avec la corde b 4 5; la corde k r élève l'aile. Mais je te rappelle bien que le bois des poulies k z ne se trouve pas en ligne verticale, et par conséquent que z soit au pied [en bas] beaucoup plus vers tes pieds que k en tête [en haut]."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 75 (recto), the transcription below the facsimile plate; archive.org leaf n306",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n306/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 75 (recto), the facing page of the plate; archive.org leaf n305",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n305/mode/1up"
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

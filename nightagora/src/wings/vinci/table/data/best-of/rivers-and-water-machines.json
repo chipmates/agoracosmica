@@ -1,0 +1,282 @@
+{
+ "topic": "rivers-and-water-machines",
+ "pages": {
+  "AR.175": {
+   "lead": 0,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §1015 (Br. M. 149a), vol. II p. 233",
+     "it": {
+      "text": "Per fare il grā canale, fa prima il piccolo e dalli l'acqua, che colla rota farà il grāde.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "To make the great canal, first make the smaller one and conduct into it the waters which by a wheel will help to fill the great one.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Um den großen Kanal zu bauen, mach zuerst den kleinen und gib ihm das Wasser, das mit dem Rad den großen machen wird.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 233",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n348/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 233",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n348/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "B.114": {
+   "lead": 0,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 53v, block 1 of 4",
+     "it": {
+      "text": "— daleuare acqua —",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "For raising water.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Um Wasser zu heben.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Pour élever de l'eau. —"
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 53 (verso), the transcription below the facsimile plate; archive.org leaf n220",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n220/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 53 (verso), the facing page of the plate; archive.org leaf n219",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n219/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 53v, block 2 of 4",
+     "it": {
+      "text": "— quel medesimo e possi fare concorde come conrota dentata",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "The same. And it can be done with ropes as with a toothed wheel.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Dasselbe. Und man kann es mit Seilen machen wie mit einem Zahnrad.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— a — Ce même. Et on peut le faire avec des cordes, comme avec une roue à dents."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 53 (verso), the transcription below the facsimile plate; archive.org leaf n220",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n220/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 53 (verso), the facing page of the plate; archive.org leaf n219",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n219/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 53v, block 3 of 4",
+     "it": {
+      "text": "— m n a s — doccia — sia vnanimella nela boca. a difori",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "m n a s. Pipe. Let there be a valve in the mouth a, on the outside.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "m n a s. Rohr. In der Mündung a sitze außen ein Ventil.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— m n a s. — Tuyau. — Qu'il y ait une animelle dans la bouche a, au dehors."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 53 (verso), the transcription below the facsimile plate; archive.org leaf n220",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n220/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 53 (verso), the facing page of the plate; archive.org leaf n219",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n219/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 3,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 53v, block 4 of 4",
+     "it": {
+      "text": "— lacqua. che e. tra. m. n. sia libbre 25. ellacqua cheffara contrapeso. sialibbre 1000",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "Let the water that is between m and n be 25 pounds, and the water that acts as counterweight 1000 pounds.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Das Wasser zwischen m und n wiege 25 Pfund, und das Wasser, das als Gegengewicht wirkt, 1000 Pfund.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Que l'eau qui est entre m [et] n soit de 25 livres, et que l'eau qui fera contrepoids soit de 1,000 livres."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 53 (verso), the transcription below the facsimile plate; archive.org leaf n220",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n220/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 53 (verso), the facing page of the plate; archive.org leaf n219",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n219/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "CA.7": {
+   "lead": 0,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §1069 (C. A. 353b; 1105b), vol. II p. 249",
+     "it": {
+      "text": "ALEMAGNIA.\na. Austria,\nb. Sassonia,\nc. Norimberga,\nd. Fiandra;\nFRANCIA.\na. Picardia,\nb. Normandia,\nc. Delfinato;\nd.\nSPAGNIA.\na. Biscaglia,\nb. Castiglia,\nc. Galitia,\nd. Portogallo,\ne. Tarragona,\nf. Granada.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "GERMANY.\na. Austria.\nb. Saxony.\nc. Nuremberg.\nd. Flanders.\nFRANCE.\na. Picardy.\nb. Normandy.\nc. Dauphiné.\nSPAIN.\na. Biscay.\nb. Castille.\nc. Galicia.\nd. Portugal.\ne. Taragona.\nf. Granada.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "DEUTSCHLAND.\na. Österreich,\nb. Sachsen,\nc. Nürnberg,\nd. Flandern;\nFRANKREICH.\na. Picardie,\nb. Normandie,\nc. Dauphiné;\nd.\nSPANIEN.\na. Biskaya,\nb. Kastilien,\nc. Galicien,\nd. Portugal,\ne. Tarragona,\nf. Granada.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 249",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n382/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 249",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n382/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "B.086": {
+   "lead": 0,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §753 (B. 39b), vol. II p. 36",
+     "it": {
+      "text": "Senpre vno edifitio vole · essere spiccato dintorno a volere dimostrare la sua vera forma.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "A building should always be detached on all sides so that its form may be seen.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Ein Gebäude soll immer ringsum frei stehen, damit es seine wahre Gestalt zeigen kann.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 36",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n99/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 36",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n99/mode/1up"
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

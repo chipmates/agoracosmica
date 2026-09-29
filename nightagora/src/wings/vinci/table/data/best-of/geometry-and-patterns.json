@@ -1,0 +1,70 @@
+{
+ "topic": "geometry-and-patterns",
+ "pages": {
+  "H.075": {
+   "lead": null,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. VI (1891), Ms H, FOLIO 33 (recto)",
+     "it": null,
+     "en": null,
+     "de": null,
+     "fr": null,
+     "label_only": true,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. VI]: Manuscrits H de la Bibliothèque de l'Institut, Ash. 2038 et 2037 de la Bibliothèque nationale, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, suivis d'un appendice, Paris: Maison Quantin, 1891",
+       "page": "Ms H, FOLIO 33 (recto), transcription (lower right column); archive.org viewer page n45",
+       "url": "https://archive.org/details/lesmanuscritsdel06lo/page/n45/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "H.128": {
+   "lead": 0,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. VI (1891), Ms H fol. 59v, block 1 of 1",
+     "it": {
+      "text": "Quella cosa che aradise magiore somma nellaria che nellacqua simovera col corso dellaria —",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "That thing which has a greater share of itself in the air than in the water will move with the course of the air.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Ein Ding, das einen größeren Teil seiner selbst in der Luft hat als im Wasser, wird sich mit dem Lauf der Luft bewegen.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "La chose qui aura une plus grande somme de soi dans l'air que dans l'eau se mouvra avec le cours de l'air."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. VI]: Manuscrits H de la Bibliothèque de l'Institut, Ash. 2038 et 2037 de la Bibliothèque nationale, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, suivis d'un appendice, Paris: Maison Quantin, 1891",
+       "page": "Ms H, FOLIO 59 [11] (verso), transcription (upper left column, after the note [Sens dessus dessous :]); archive.org viewer page n73",
+       "url": "https://archive.org/details/lesmanuscritsdel06lo/page/n73/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. VI]: Manuscrits H de la Bibliothèque de l'Institut, Ash. 2038 et 2037 de la Bibliothèque nationale, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, suivis d'un appendice, Paris: Maison Quantin, 1891",
+       "page": "Ms H, FOLIO 59 [11] (verso), French translation (upper left column, below the Italian); archive.org viewer page n73",
+       "url": "https://archive.org/details/lesmanuscritsdel06lo/page/n73/mode/1up"
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

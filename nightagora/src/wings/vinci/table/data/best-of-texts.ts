@@ -1,0 +1,20 @@
+/** Written by forge/best-of.mjs: the words of each topic, loaded when it opens. */
+export const TOPIC_TEXTS: Readonly<Record<string, () => Promise<{ default: string }>>> = {
+  'flight': () => import('./best-of/flight.json?raw'),
+  'machines': () => import('./best-of/machines.json?raw'),
+  'the-parts-of-machines': () => import('./best-of/the-parts-of-machines.json?raw'),
+  'war-and-weapons': () => import('./best-of/war-and-weapons.json?raw'),
+  'water-in-motion': () => import('./best-of/water-in-motion.json?raw'),
+  'rivers-and-water-machines': () => import('./best-of/rivers-and-water-machines.json?raw'),
+  'churches-and-domes': () => import('./best-of/churches-and-domes.json?raw'),
+  'cities-and-fortresses': () => import('./best-of/cities-and-fortresses.json?raw'),
+  'light-and-the-eye': () => import('./best-of/light-and-the-eye.json?raw'),
+  'advice-to-painters': () => import('./best-of/advice-to-painters.json?raw'),
+  'faces-and-bodies': () => import('./best-of/faces-and-bodies.json?raw'),
+  'horses-and-the-great-horse': () => import('./best-of/horses-and-the-great-horse.json?raw'),
+  'plants-and-animals': () => import('./best-of/plants-and-animals.json?raw'),
+  'the-earth-and-the-sky': () => import('./best-of/the-earth-and-the-sky.json?raw'),
+  'geometry-and-patterns': () => import('./best-of/geometry-and-patterns.json?raw'),
+  'his-words': () => import('./best-of/his-words.json?raw'),
+  'letters-and-his-life': () => import('./best-of/letters-and-his-life.json?raw'),
+}

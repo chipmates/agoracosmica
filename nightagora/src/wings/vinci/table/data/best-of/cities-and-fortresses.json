@@ -1,0 +1,171 @@
+{
+ "topic": "cities-and-fortresses",
+ "pages": {
+  "B.039": {
+   "lead": 0,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §741 (B. 16a), vol. II pp. 27-28",
+     "it": {
+      "text": "Le strade · m · sono · piv · alte · che le strade · p · s · braccia 6., e ciascuna strada · de' essere larga braccia 20, e avere 1/2 braccio di calo dalle stremità al mezzo, e in esso mezzo sia a ogni braccio uno braccio di fessura, largo uno dito, dove l'acqua che pioue debba scolare nelle cave fatte al medesimo piano di · p · s ·, e da ogni stremità della larghezza di detta strada · sia · uno · portico di larghezza di braccia 6 ī sul · le colonne, e sappi che, chi volesse andare per tutta la terra per le strade alte, potrà a suo acconcio usarle, e chi volesse andare per le basse, ancora il simile; per le strade alte non devono andare carri, nè altre simili cose, anzi siano solamēte per li giēteli omini; per le basse deono andare i carri e altre some al uso e commodità del popolo ·; l'una casa de' volgiere le schiene all'altra ·, lasciādo la strada bassa in mezzo, ed agli usci · n si mettano le vettovaglie, come legnie, vino e simili cose; per le vie sotterrane si de' votare destri, stalle e simili cose fetide dall'uno arco all'altro",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "The roads m are 6 braccia higher than the roads p s, and each road must be 20 braccia wide and have 1/2 braccio slope from the sides towards the middle; and in the middle let there be at every braccio an opening, one braccio long and one finger wide, where the rain water may run off into hollows made on the same level as p s. And on each side at the extremity of the width of the said road let there be an arcade, 6 braccia broad, on columns; and understand that he who would go through the whole place by the high level streets can use them for this purpose, and he who would go by the low level can do the same. By the high streets no vehicles and similar objects should circulate, but they are exclusively for the use of gentlemen. The carts and burdens for the use and convenience of the inhabitants have to go by the low ones. One house must turn its back to the other, leaving the lower streets between them. Provisions, such as wood, wine and such things are carried in by the doors n, and privies, stables and other fetid matter must be emptied away underground. From one arch to the next",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Die Straßen m liegen 6 Braccia höher als die Straßen p s, und jede Straße soll 20 Braccia breit sein und von den Rändern zur Mitte hin 1/2 Braccio Gefälle haben. In dieser Mitte soll bei jedem Braccio ein Spalt sein, ein Braccio lang und einen Finger breit, durch den das Regenwasser in die Gruben ablaufen soll, die auf gleicher Höhe mit p s angelegt sind. Und an beiden Rändern dieser Straße soll ein Laubengang von 6 Braccia Breite auf Säulen stehen. Und wisse: Wer durch die ganze Stadt über die hohen Straßen gehen will, kann sie nach Belieben benutzen, und wer über die niedrigen gehen will, ebenso. Auf den hohen Straßen sollen keine Karren und ähnliche Dinge fahren, sie sollen allein den Edelleuten dienen. Über die niedrigen sollen die Karren und die anderen Lasten fahren, zum Gebrauch und zur Bequemlichkeit des Volkes. Ein Haus soll dem anderen den Rücken zukehren, so dass die niedrige Straße dazwischen bleibt, und durch die Türen n bringt man die Vorräte hinein, wie Holz, Wein und ähnliche Dinge. Durch die unterirdischen Gänge soll man Aborte, Ställe und ähnliche übelriechende Dinge leeren. Von einem Bogen zum anderen",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II pp. 27-28",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n74/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II pp. 27-28",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n74/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "L.108": {
+   "lead": null,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. V (1890), Ms L fol. 51r, block 1 of 1",
+     "it": {
+      "text": "[Figure sens dessus dessous. En haut, à gauche :] 20",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "[Figure upside down. At the top, on the left:] 20",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "[Figur auf dem Kopf stehend. Oben links:] 20",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "[Figure sens dessus dessous. En haut, à gauche :] 20."
+     },
+     "label_only": true,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. V]: Manuscrits G, L & M de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1890",
+       "page": "Ms L, FOLIO 51 (recto), transcription (lower right column, under the heading [FORTIFICATIONS]); archive.org viewer page n259",
+       "url": "https://archive.org/details/lesmanuscritsdel05lo/page/n259/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. V]: Manuscrits G, L & M de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1890",
+       "page": "Ms L, FOLIO 51 (recto), French translation (lower right column, below the Italian); archive.org viewer page n259",
+       "url": "https://archive.org/details/lesmanuscritsdel05lo/page/n259/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "CA.16": {
+   "lead": 0,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §1016 (C. A. 72b; 211b), vol. II p. 233",
+     "it": {
+      "text": "¶Poni il uero mezzo di Milano.¶\nMōforte—porta rēsa—porta nova—strada nova—navilio—porta cumana—barco—porta giovia—porta vercellina—porta sco Anbrogio—porta Tesinese—torre dell'Imperatore—porta Lodovica—acqua.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "Indicate the centre of Milan.\nMōforte—porta rēsa—porta nova—strada nova—navilio—porta cumana—barco—porta giovia—porta vercellina—porta sco Anbrogio—porta Tesinese—torre dell'Imperatore—porta Lodovica—acqua.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Setze die wahre Mitte von Mailand.\nMōforte, porta rēsa, porta nova, strada nova, navilio, porta cumana, barco, porta giovia, porta vercellina, porta sco Anbrogio, porta Tesinese, torre dell'Imperatore, porta Lodovica, acqua.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 233",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n348/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 233",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n348/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "B.085": {
+   "lead": 0,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §761 (B. 39a), vol. II p. 69",
+     "it": {
+      "text": "PER FARE VNA POLITA STALLA.\n\nModo · come · si de' · componere · vna · stalla: Dividerai in prima la sua larghezza · in parti · 3 · e la sua lunghezza è libera ·, e le · 3 · dette divisioni sieno equali e di larghezza di braccia 6 per ciascuna, e alte 10, e la parte di mezzo sia in uso · de' maestri di stalla ·, le 2 da cāto per i cavagli, de' quali ciascuno ne de' pigliare per larghezza braccia 6 ·, lūghezza braccia 6, e alte piv dinanti · che dirieto · 1/2 · braccio; la mangiatoia sia alta da terra braccia 2, il principio della rastrelliera braccia · 3 · e l'ultimo · braccia 4 ·; Ora · a volere atenere · quello ch'io prometto, cioè di fare detto sito cōtro allo universale vso · pulito e netto · inquāto al · di sopra della stalla ·, cioè dove sta il fieno ·, debe detto loco avere nella sua testa di fori vna finestra alta 6 · e larga 6, donde con vn facil modo si cōduca il fieno su detto solaro, come appare nello strumēto E ·, e sia collocata ī un sito di larghezza di braccia 6, e lungo quāto la stalla, come appare in · k · p · e l'altre 2 parti che mettano in mezzo · questa, ciascuna sia diuisa in 2 parti, le dua diverso il fieno siano braccia 4 ·, p · s ·, solo allo ofitio e andamento de' ministri d'essa stalla, l'altre 2 che confinano colle parieti murali · sieno di braccia 2, come appare in s · k ·, e queste sieno allo ofitio di dare · il feno alle māgiatoie · per condotti stretti nel principio e larghi sulle māgiatoie, acciò che'l feno nō si fermi infra via, sieno bene ītonicati e politi, figurati dov'è segnato 4 · f · s ·; in quanto al dare bere siano le māgiatoie di pietra, sopra le quali sia l'acqua, si chè si possino scoprire le māgiatoie come si scoprono le casse, alzādo i coperchi loro.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "FOR MAKING A CLEAN STABLE.\n\nThe manner in which one must arrange a stable. You must first divide its width in 3 parts, its depth matters not; and let these 3 divisions be equal and 6 braccia broad for each part and 10 high, and the middle part shall be for the use of the stablemasters; the 2 side ones for the horses, each of which must be 6 braccia in width and 6 in length, and be half a braccio higher at the head than behind. Let the manger be at 2 braccia from the ground, to the bottom of the rack, 3 braccia, and the top of it 4 braccia. Now, in order to attain to what I promise, that is to make this place, contrary to the general custom, clean and neat: as to the upper part of the stable, i. e. where the hay is, that part must have at its outer end a window 6 braccia high and 6 broad, through which by simple means the hay is brought up to the loft, as is shown by the machine E; and let this be erected in a place 6 braccia wide, and as long as the stable, as seen at k p. The other two parts, which are on either side of this, are again divided; those nearest to the hay-loft are 4 braccia, p s, and only for the use and circulation of the servants belonging to the stable; the other two which reach to the outer walls are 2 braccia, as seen at s k, and these are made for the purpose of giving hay to the mangers, by means of funnels, narrow at the top and wide over the manger, in order that the hay should not choke them. They must be well plastered and clean and are represented at 4 f s. As to the giving the horses water, the troughs must be of stone and above them [cisterns of] water. The mangers may be opened as boxes are uncovered by raising the lids.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "UM EINEN SAUBEREN STALL ZU BAUEN.\n\nWie man einen Stall anlegen soll: Du teilst zuerst seine Breite in 3 Teile, seine Länge ist frei, und die 3 genannten Abteilungen sollen gleich sein, jede 6 Braccia breit und 10 hoch. Der mittlere Teil soll den Stallmeistern dienen, die 2 seitlichen den Pferden, von denen jedes 6 Braccia in der Breite und 6 Braccia in der Länge einnehmen soll, vorn um 1/2 Braccio höher als hinten. Die Krippe soll 2 Braccia über dem Boden stehen, der Anfang der Raufe bei 3 Braccia und ihr oberes Ende bei 4 Braccia. Nun, um zu halten, was ich verspreche, nämlich diesen Ort gegen den allgemeinen Brauch sauber und reinlich zu machen: Was den oberen Teil des Stalles angeht, also dort, wo das Heu liegt, so soll dieser Raum an seiner Stirnseite nach außen ein Fenster haben, 6 hoch und 6 breit, durch das man das Heu auf einfache Weise auf diesen Boden bringt, wie es die Vorrichtung E zeigt. Und sie soll an einer Stelle liegen, die 6 Braccia breit und so lang wie der Stall ist, wie man bei k p sieht. Die anderen 2 Teile, die diesen zwischen sich nehmen, sollen jeder in 2 Teile geteilt werden. Die beiden zum Heu hin sollen 4 Braccia messen, p s, und allein dem Dienst und dem Gang der Stallknechte dienen. Die anderen 2, die an die Außenmauern grenzen, sollen 2 Braccia messen, wie man bei s k sieht, und sie sollen dazu dienen, das Heu den Krippen zuzuführen, durch Schächte, die oben eng und über den Krippen weit sind, damit das Heu unterwegs nicht stecken bleibt. Sie sollen gut verputzt und glatt sein und sind dort gezeichnet, wo 4 f s steht. Was das Tränken angeht, sollen die Krippen aus Stein sein und das Wasser über ihnen, so dass man die Krippen aufdecken kann, wie man Truhen aufdeckt, indem man ihre Deckel hebt.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 69",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n168/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 69",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n168/mode/1up"
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

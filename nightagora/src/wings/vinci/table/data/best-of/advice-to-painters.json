@@ -1,0 +1,379 @@
+{
+ "topic": "advice-to-painters",
+ "pages": {
+  "AshA.057": {
+   "lead": 2,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §23 (Ash. I. 13a), vol. I p. 19; Herzfeld 1906 p. 163, XV",
+     "it": {
+      "text": "DE' · 10 · OFITI DELL'OCHIO TUTTI APARTENENTI · ALLA · PICTURA.\n\nLa pictura s'astēde · in tutti i · 10 · ofiti dell'ochio · cioè · tenebre · luce corpo e colore · figura e sito · remotione · propīquita · moto · e quiete; de quali ofiti · sarà intessuta · questa mia piccola opera · ricordādo al pictore con che regola e modo debe imitare colla · sua arte tutte queste · cose, opera di natura e ornamēto del mōdo.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "OF THE 10 ATTRIBUTES OF THE EYE, ALL CONCERNED IN PAINTING.\n\nPainting is concerned with all the 10 attributes of sight; which are:—Darkness, Light, Solidity and Colour, Form and Position, Distance and Propinquity, Motion and Rest. This little work of mine will be a tissue [of the studies] of these attributes, reminding the painter of the rules and methods by which he should use his art to imitate all the works of Nature which adorn the world.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Von den zehn Ämtern des Auges, alle die Malerei betreffend\n\nDie Malerei erstreckt sich über alle die zehn Ämter des Auges, nämlich Dunkel, Licht, Körper und Farbe, Figur und Gegend, Entfernung und Nähe, Bewegung und Ruhe, von welchen Ämtern dies mein kleines Werk durchwebt sein wird, indem ich den Maler daran erinnere, mit welcher Regel und Art er alle diese Dinge, Werk der Natur und Schmuck der Welt, mittels seiner Kunst nachahmen soll.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 19",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n56/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 19",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n56/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 163",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n342/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Richter 1883 §294 (Ash. I. 13a), vol. I p. 158-159",
+     "it": {
+      "text": "COME IL PITTORE DEBE METTERE IN PRATICA LA PROSPETTIVA DE' COLORI.\n\nA volere · mettere questa · prospettiva del uariare e perdere over diminvire la propia · essētia de' colori · piglerai di ciēto ī ciento braccia cose poste īfra la cāpagnia come sono · albori case, omini e siti, e ī quāto al primo albore avrai uno uetro fermo bene e così sia fermo l'ochio tuo, e ī detto vetro disegnerai uno albero sopra la forma di quello, di poi scosta tāto per traverso che l'albero naturale · cōfini quasi col tuo disegniato; poi colorisci il tuo · disegnio in modo che per colore e forma stia a paragone l'uno dell'altro e che tutti e 2, chivdēdo uno ochio, paino dipīti sul detto vetro d'una medesima distātia; e questa regola medesima fa degli alberi secōdi e de' terzi di ciēto ī ciēto braccia di mano ī mano; e questi ti servā · come tua autori e maestri, sēpre operādo nelle tua opere doue s'appartēgono, e faranno bene fuggir l'opera; ma io trovo per regola · che'l secōdo diminviscie 4/5 del primo quādo fusse lōtano 20 · braccia dal primo.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "HOW A PAINTER SHOULD CARRY OUT THE PERSPECTIVE OF COLOUR IN PRACTICE.\n\nIn order to put into practice this perspective of the variation and loss or diminution of the essential character of colours, observe at every hundred braccia some objects standing in the landscape, such as trees, houses, men and particular places. Then in front of the first tree have a very steady plate of glass and keep your eye very steady, and then, on this plate of glass, draw a tree, tracing it over the form of that tree. Then move it on one side so far as that the real tree is close by the side of the tree you have drawn; then colour your drawing in such a way as that in colour and form the two may be alike, and that both, if you close one eye, seem to be painted on the glass and at the same distance. Then, by the same method, represent a second tree, and a third, with a distance of a hundred braccia between each. And these will serve as a standard and guide whenever you work on your own pictures, wherever they may apply, and will enable you to give due distance in those works. But I have found that as a rule the second is 4/5 of the first when it is 20 braccia beyond it.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "WIE DER MALER DIE PERSPEKTIVE DER FARBEN IN DIE PRAXIS UMSETZEN SOLL.\n\nWillst du diese Perspektive vom Wechsel, vom Verlust oder vom Schwinden der eigenen Art der Farben in die Praxis umsetzen, dann nimm dir alle hundert Braccia Dinge vor, die in der Landschaft stehen, wie Bäume, Häuser, Menschen und Orte. Vor den ersten Baum stellst du eine gut befestigte Glasscheibe, und ebenso fest halte dein Auge. Auf diese Scheibe zeichnest du einen Baum, genau über die Form jenes Baumes. Dann rücke so weit zur Seite, dass der wirkliche Baum fast an deine Zeichnung grenzt. Nun male deine Zeichnung so aus, dass beide sich in Farbe und Form die Waage halten und dass beide, wenn du ein Auge schließt, in derselben Entfernung auf die Scheibe gemalt scheinen. Nach derselben Regel verfahre mit dem zweiten und dem dritten Baum, von hundert zu hundert Braccia, einen nach dem anderen. Diese sollen dir als Autoren und Lehrmeister dienen, immer wenn du an deinen Werken arbeitest, wo sie hingehören, und sie lassen das Werk gut in die Tiefe fliehen. Ich finde aber als Regel, dass der zweite um 4/5 [?] gegenüber dem ersten abnimmt, wenn er 20 Braccia vom ersten entfernt ist.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 158-159",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n205/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 158-159",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n205/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Richter 1883 §508 (Ash. I. 13a), vol. I p. 254; Herzfeld 1906 p. 171-172, XXXI",
+     "it": {
+      "text": "MODO D'AUMĒTARE E DESTARE LO ĪGIEGNIO A VARIE ĪUĒTIONI.\n\nNō resterò però di mettere ītra questi precietti una nova īuētione di speculatione, · la quale · bēchè paia · piccola · e quasi degnia di riso, nōdimeno è di grāde vtilità · a destrare lo ingegno a varie invētioni, e questa · è · se tu riguarderai in alcuni mvri inbrattati di uarie machie o pietre di uari misti, se avrai a īuentionare qualche sito · potrai · lì · uedere similitudine di diuersi paesi, ornati di mōtagnie, fiumi, sassi, albori, pianvre, grādi valli e colli in diuersi modi, · ancora vi potrai vedere diuerse battaglie e atti prōti di figure ·, strane arie di uolti · e abiti · e infinite cose ·, le quali potrai ridurre in ītegra · e · bona · forma ·, e īterviene ī simili mvri e misti come del suono di cāpane · che ne' loro tochi vi troverai ogni nome e vocabolo che tu īmaginerai.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "A WAY OF DEVELOPING AND AROUSING THE MIND TO VARIOUS INVENTIONS.\n\nI cannot forbear to mention among these precepts a new device for study which, although it may seem but trivial and almost ludicrous, is nevertheless extremely useful in arousing the mind to various inventions. And this is, when you look at a wall spotted with stains, or with a mixture of stones, if you have to devise some scene, you may discover a resemblance to various landscapes, beautified with mountains, rivers, rocks, trees, plains, wide valleys and hills in varied arrangement; or again you may see battles and figures in action; or strange faces and costumes, and an endless variety of objects, which you could reduce to complete and well drawn forms. And these appear on such walls confusedly, like the sound of bells in whose jangle you may find any name or word you choose to imagine.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Art, den Geist zu bereichern und zu verschiedenen Erfindungen aufzuwecken\n\nIch kann nicht umhin, unter diese Vorschriften eine neue Erfindung von Spekulation zu setzen, die, obschon sie unbedeutend scheinen mag und fast des Lachens würdig, nichtsdestoweniger von großer Nützlichkeit ist, den Geist zu verschiedenen Erfindungen aufzuwecken, und das ist: wenn du in allerlei Gemäuer hineinschaust, das mit vielfachen Flecken beschmutzt ist, oder in Gestein von verschiedener Mischung, — hast du da irgendwelche Szenerie zu erfinden, so wirst du dort Ähnlichkeiten mit diversen Landschaften finden, die mit Bergen geschmückt sind, Flüsse, Felsen, Bäume, — Ebenen, große Täler und Hügel in wechselvoller Art; auch wirst du dort allerlei Schlachten sehen, und lebhafte Gebärden von Figuren, sonderbare Physiognomien und Trachten und unendlich viele Dinge, die du auf eine vollkommene und gute Form zurückbringen kannst. Und ist mit solchen Mauern und Gemisch wie mit dem Klang von Glocken, daß du in ihren Schlägen jeden Namen und jedes Vokabel finden kannst, so du auszudenken vermagst.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 254",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n349/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 254",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n349/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 171-172",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n350/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 3,
+     "ref": "Richter 1883 §591 (Ash. I. 13a), vol. I p. 295; Herzfeld 1906 p. 174, XXXVIII",
+     "it": {
+      "text": "DEL SERPEGGIARE E BILICO DELLE · FIGURE · E ALTRI ANIMALI.\n\nQualūque · figura · tu fai ·, o animale giētile, ricordati di fugire il legnioso, cioè ch'elle vadino · cōtrapesādo ossia bilāciando · in modo nō paia uno pezzo di legno; Quelli che vuoi figurare forti, nō li fare così, saluo il girare della testa.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "OF UNDULATING MOVEMENTS AND EQUIPOISE IN FIGURES AND OTHER ANIMALS.\n\nWhen representing a human figure or some graceful animal, be careful to avoid a wooden stiffness; that is to say make them move with equipoise and balance so as not to look like a piece of wood; but those you want to represent as strong you must not make so, excepting in the turn of the head.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Vom Schlängeln und Balancieren der Figuren und andern belebten Wesen\n\nWelche Gestalten oder welch anmutiges Lebendige du auch machest, bedenke das Hölzerne zu fliehen, das heißt, sie mögen sich in Kontraposten bewegen, oder besser: balancierend gehend, so daß sie nicht erscheinen wie ein Stock.\n\nDie du aber als stark darstellen willst, die nicht so machen, außer in der Wendung des Kopfes auf den Schultern.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 295",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n396/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 295",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n396/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 174",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n353/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "AshA.074": {
+   "lead": 1,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §536 (Ash. I. 4b), vol. I p. 269",
+     "it": {
+      "text": "COME SI DEBBE PORRE ALTO IL PŪTO.\n\nIl pūto · debbe essere · alto · all'altezza · dell'occhio d'uno homo · comvnale, e l'ultimo della pianura che cōfina · col cielo · debbe · essere · fatto all'altezza d'esso termine della terra col cielo ·, saluo che le mōtagnie · che sono libere.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "HOW HIGH THE POINT OF SIGHT SHOULD BE PLACED.\n\nThe point of sight must be at the level of the eye of an ordinary man, and the farthest limit of the plain where it touches the sky must be placed at the level of that line where the earth and sky meet; excepting mountains, which are independent of it.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "WIE HOCH MAN DEN AUGENPUNKT SETZEN SOLL.\n\nDer Augenpunkt muss so hoch liegen wie das Auge eines Menschen von gewöhnlicher Größe. Und das Ende der Ebene, wo sie an den Himmel grenzt, muss auf der Höhe dieser Grenze zwischen Erde und Himmel gemacht werden, ausgenommen die Berge, die frei davon sind.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 269",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n366/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 269",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n366/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Richter 1883 §601 (Ash. I. 4b), vol. I p. 301-302; Herzfeld 1906 p. 187-188, LXIV (first part)",
+     "it": {
+      "text": "MODO DI FIGURARE UNA BATTAGLIA.\n\nFarai prima il fumo dell'artiglieria, mischiato īfra l'aria · īsieme · colla polvere mossa dal movimēto de' cavalli e de' cōbattitori ·, la qual mistione · vserai così: la polvere perchè è · cosa · terrestre è pōderosa, e bēchè per la sua sottilità facilmēte si leva e mischia infra l'aria ·, niētedimeno volētieri ritorna · in basso; il suo sōmo mōtare è fatto dalla · parte · piv · sottile; Adūque lì meno fia veduta, e parrà quasi di colore d'aria ·; Il fumo che si mischia infra l'aria īpoluerata ·, quāto piv s'alza a certa · altezza, parirà oscura nuvola e vedrassi nelle sōmità piv espeditamente il fumo che la polvere; il fumo pēderà ī colore alquāto azzurro, e la polvere trarà al suo · colore ·; Dalla parte · che viene · il lume parrà questa mistione d'aria fumo e polvere molto · più · lucida · che dall'opposita parte; i cōbattitori quāto · piv fieno īfra detta turbulentia meno si vedrāno, e meno differētia fia dai lor lumi · alle loro · ōbre ·; Farai rosseggiare i volti e le persone e lor'aria, e li scoppettieri insieme cō vicini; E detto rossore quāto piv si parte dalla sua cagione piv si perde ·, e le figure che sono infra · te · e 'l lume, essēdo lōtane, parrāno scure in campo chiaro ·, e le loro gābe quāto piv s'appresserā alla terra mē fieno vedute, perchè la polvere è lì piv grossa e piv spessa: E se farai caualli corrēti fori della turba, fa li nvboletti di polvere distāti l'uno dall'altro, quāto può essere lo īteruallo de' salti fatti dal cavallo e quello nvvolo ·, ch'è · piv lontano da detto · cavallo, mē si uegga · anzi sia alto sparso · e raro ·, e 'l piv presso · sia piv euidēte e minore e piv dēso: L'aria sia · piena · di saettume di diverse ragioni: chi mōti ·, chi discēda, qual sia · per linia piana, e le pallotte delli scopietti sieno accōpagnate da alquāto · fumo dirieto al lor corso · e le prime figure farai poluerose ·, i capelli e ciglia e altri loghi piani atti a sostener la polvere; farai i vīcitori corrēti cō capegli, e altre cose leggiere, sparsi al uēto colle ciglia · basse",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "OF THE WAY OF REPRESENTING A BATTLE.\n\nFirst you must represent the smoke of artillery mingling in the air with the dust and tossed up by the movement of horses and the combatants. And this mixture you must express thus: The dust, being a thing of earth, has weight; and although from its fineness it is easily tossed up and mingles with the air, it nevertheless readily falls again. It is the finest part that rises highest; hence that part will be least seen and will look almost of the same colour as the air. The higher the smoke mixed with the dust-laden air rises towards a certain level, the more it will look like a dark cloud; and it will be seen that at the top, where the smoke is more separate from the dust, the smoke will assume a bluish tinge and the dust will tend to its colour. This mixture of air, smoke and dust will look much lighter on the side whence the light comes than on the opposite side. The more the combatants are in this turmoil the less will they be seen, and the less contrast will there be in their lights and shadows. Their faces and figures and their appearance, and the musketeers as well as those near them you must make of a glowing red. And this glow will diminish in proportion as it is remote from its cause. The figures which are between you and the light, if they be at a distance, will appear dark on a light background, and the lower part of their legs near the ground will be least visible, because there the dust is coarsest and densest. And if you introduce horses galloping outside the crowd, make the little clouds of dust distant from each other in proportion to the strides made by the horses; and the clouds which are furthest removed from the horses, should be least visible; make them high and spreading and thin, and the nearer ones will be more conspicuous and smaller and denser. The air must be full of arrows in every direction, some shooting upwards, some falling, some flying level. The balls from the guns must have a train of smoke following their flight. The figures in the foreground you must make with dust on the hair and eyebrows and on other flat places likely to retain it. The conquerors you will make rushing onwards with their hair and other light things flying on the wind, with their brows bent down,",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Art und Weise, eine Schlacht darzustellen\n\nDu wirst vor allem den Rauch der Artillerie machen, der in die Luft gemischt ist, zugleich mit dem Staub, den die Bewegung der Pferde und Kämpfer aufrührt. Welche Mischung du so anwendest: der Staub als eine erdige und schwere Sache, wenn er gleich vermöge seiner Feinheit sich leicht erhebt und in die Luft mengt, kehrt doch gern wieder in die Tiefe zurück herab, und am höchsten steigen die feinsten Teile, darum sieht man das am wenigsten, und es erscheint fast in der Farbe der Luft; der Rauch, der sich in die verstaubte Luft hineinmischt, erscheint, je mehr er sich zu einer gewissen Höhe erhebt, um so mehr als eine dunkle Wolke, und man sieht also ganz oben den Pulverdampf deutlicher als den Staub. Der Rauch wird in seiner Farbe ein wenig zum Blauen neigen, und der Staub wird an seiner Farbe festhalten: auf der Seite, wo das Licht herkommt, wird diese Mischung von Luft, Rauch und Staub viel leuchtender erscheinen als auf der entgegengesetzten Seite; je mehr die Kämpfer inmitten dieses Aufruhrs stecken, um so weniger sind sie sichtbar, und um so geringer wird der Unterschied zwischen ihren Lichtern und Schatten. Du wirst die Gesichter und die Gestalten, und das Geschütz und die Arkebusiere zugleich mit ihrer Nachbarschaft rötlich machen, und diese Röte verliert sich, je mehr sie sich von ihrer Ursache entfernt, und die Figuren, die zwischen dir und dem Licht sind, werden, da sie sich entfernt befinden, dunkel in hellem Feld erscheinen, und ihre Beine, je mehr sie sich dem Boden nähern, werden um so weniger gesehen werden, weil der Staub da gröber und dichter ist. Und wenn du Pferde machst, die aus dem Schwarm laufen, mache ihnen Staubwölkchen, die so weit voneinander entfernt seien, wie der Zwischenraum der Sprünge ist, die das Pferd gemacht, und jene Wolke, die von besagtem Pferd weiter entfernt ist, sehe man weniger; im Gegenteil, sie sei hoch oben, zerstreut und dünn, und die nähere sei besser sichtbar und kleiner und dichter.\n\nDie Luft sei voller Pfeilschwärme verschiedener Gattung: die einen steigen, die anderen fallen, manche fliegen in ebener Linie, und die Kugeln aus den Büchsen sind hinter sich längs ihres Laufs von ein wenig Rauch begleitet.\n\nUnd die vordersten Gestalten wirst du staubbedeckt machen, — die Haare und Augenbrauen und sonstige flache Stellen, die geeignet sind, den Staub aufzuhalten. Die Sieger wirst du laufend machen, Haare und sonstige leichte Sachen im Winde zerstreut; die Augenbrauen herabgezogen, […]",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 301-302",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n402/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 301-302",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n402/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 187-188",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n366/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "G.019": {
+   "lead": 0,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §607 (G. 6b), vol. I p. 306; Herzfeld 1906 p. 197, LXVII",
+     "it": {
+      "text": "FIGURATIONE DEL DILUVIO.\n\nL'aria era oscura per la spessa pioggia, la qual, con obbliqua disciesa, piegata dal trauersal corso de' vēti, facieva onde di se per l'aria, nō altramēti che farsi uegga alla poluere, ma sol si uariaua perchè tale inondatione era traversata dalli liniamēti che fanno le gocciole dell'acqua che disciēde; ma il colore suo era tinto dal fuoco, gienerato dalle saette fenditrici e squarciatricie delli nuvoli, e i vampi delle quali percuoteano e aprivano li grā pelaghi delle riēpiute valli, li quali aprimēti mostravano nelli lor vertici le piegate cime delle piante, e Nettuno si vedea in mezzo alle acque col tridēte e vedeasi Eolo colli sua vēti ravuilupare notāti piāte diradicate miste colle immēse ōde, l'orizzōte con tutto lo emisperio era turbo e focoso per li ricievuti vanpi delle continue saette, vedeasi li omini e vccielli che riēpievā di se li grandi alberi, che scoperti dalle dilatate onde cōponitrici delli colli, circūdatori delli grā baratri.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "TO REPRESENT THE DELUGE.\n\nThe air was darkened by the heavy rain whose oblique descent driven aslant by the rush of the winds, flew in drifts through the air not otherwise than as we see dust, varied only by the straight lines of the heavy drops of falling water. But it was tinged with the colour of the fire kindled by the thunder-bolts by which the clouds were rent and shattered; and whose flashes revealed the broad waters of the inundated valleys, above which was seen the verdure of the bending tree tops. Neptune will be seen in the midst of the water with his trident, and let Æolus with his winds be shown entangling the trees floating uprooted, and whirling in the huge waves. The horizon and the whole hemisphere were obscure, but lurid from the flashes of the incessant lightning. Men and birds might be seen crowded on the tall trees which remained uncovered by the swelling waters, originators of the mountains which surround the great abysses.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Darstellung der Sintflut\n\nDie Luft war finster vom dichten Regen, der in schrägem Fall, gebogen durch den queren Lauf der Winde, Wellen durch die Luft hin machte, nicht anders als man es den Staub machen sieht, aber nur mit der Abweichung, daß solche Überflutung von Linien durchzogen ist, hervorgerufen durch die kleinen Tropfen des Wassers, so herabkommt. Aber seine Farbe war gefärbt vom Feuer, erzeugt von den Blitzen, Spaltern und Vierteilern der Wolken, deren Flammen die großen Seen der gefüllten Täler durchzuckten und öffneten, welche Öffnungen in deren Bäuchen die gebogenen Wipfel der Bäume zeigten. Und Neptun sah man inmitten der Wasser mit dem Dreizack, und man sah Äolus mit seinen Winden die schwimmenden entwurzelten Gewächse, mit den unendlichen Wogen vermischt, einhüllen. Der Horizont mit der ganzen Hemisphäre war aufgewühlt und durchflammt von der Glut der unaufhörlichen Blitze. Man sah die Menschen und die Vögel, die mit sich die großen Bäume füllten, so von den ausgeweiteten Wogen bloß gelassen, Hügel bildeten, welche die großen Wasserschlünde umgaben.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 306",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n411/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 306",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n411/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 197",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n376/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "AshA.054": {
+   "lead": 1,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §594 (Ash. I. 14b), vol. I p. 296-298; Herzfeld 1906 p. 183-184, LIX",
+     "it": {
+      "text": "DEL FIGURARE UNO CHE PARLI INFRA PIV PERSONE.\n\nVserai fare quello ·, che tu voi che infra molte persone parli, di considerare la materia di che lui · à da trattare: e d'accomodare ī lui · li atti apartenenti a essa materia, cioè · se l'è materia persuasiua · che li atti sieno al proposito, se l'è materia dichiaratatativa per diuerse ragioni, che quello che dice pigli per le dita della mano destra uno dito della sinistra avēdone serrate li 2 minori, e col viso prōto rivolto uerso il popolo colla bocca alquāto aperta che paia che parli; e, se lui sederà, che paia che si solleui alquāto ritto e ināzi colla testa ·, e se lo fai in piè ·, fa lo alquāto chinarsi col petto e la testa inuerso il popolo, Il quale figurerai tacito e attēto, tutti riguardare l'oratore ī uolto con atti · amiratiui, e fare le bocche d'alcuno vecchio per maraviglia delle vdite sentētie tenere la bocca coi sua stremi · bassi, tirarsi dirietro molte · pieghe delle guācie ·, e colle ciglia alte nelle giunture le quali creino molte pieghe per la fronte; alcuni sedenti colle dita della mano īsieme tessute tenersi dētro lo stāco ginochio; altri col'uno ginochio sopra l'altro, sul quale tēga la man, che dētro a se ricieva il gomito del quale la sua mano vada a sostener el mēto barbuto d'alcuno chinato vecchio.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "OF REPRESENTING A MAN SPEAKING TO A MULTITUDE.\n\nWhen you wish to represent a man speaking to a number of people, consider the matter of which he has to treat and adapt his action to the subject. Thus, if he speaks persuasively, let his action be appropriate to it. If the matter in hand be to set forth an argument, let the speaker, with the fingers of the right hand hold one finger of the left hand, having the two smaller ones closed; and his face alert, and turned towards the people with mouth a little open, to look as though he spoke; and if he is sitting let him appear as though about to rise, with his head forward. If you represent him standing make him leaning slightly forward with body and head towards the people. These you must represent as silent and attentive, all looking at the orator's face with gestures of admiration; and make some old men in astonishment at the things they hear, with the corners of their mouths pulled down and drawn in, their cheeks full of furrows, and their eyebrows raised, and wrinkling the forehead where they meet. Again, some sitting with their fingers clasped holding their weary knees. Again, some bent old man, with one knee crossed over the other; on which let him hold his hand with his other elbow resting in it and the hand supporting his bearded chin.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Einen darzustellen, der zu mehreren Personen redet\n\nGewöhnlich wird jener, von dem du willst, daß er vor vielen Leuten rede, die Materie in Betracht nehmen, die er zu behandeln hat, und ihr die Gebärden anpassen, die zu dieser Materie gehören: das heißt, wenn seine Materie Überredung ist, daß die Gebärden nach der Absicht seien; wenn die Materie eine Klarlegung durch verschiedene Gründe ist, daß der, welcher spricht, mit zwei Fingern der rechten Hand einen von der linken fasse, von der er die zwei kleinen zusammengepreßt hat, und das Gesicht lebhaft dem Volk zugewendet; mit dem Mund ein wenig geöffnet, so daß es scheint, er rede, und wenn er saß, daß es scheint, er richte sich ein bißchen auf und strecke den Kopf vor; und wenn er steht, mache ihn mit vorgeneigter Brust und den Kopf gegen das Volk hin, welches du schweigend und aufmerksam darstellen wirst, alle dem Redner mit bewundernden Gebärden ins Antlitz schauend, und den Mund irgendwelcher Alten vor Staunen über die gehörten Sentenzen so, daß sie mit den Ausläufern des Mundes, die sie niedrig halten, nach rückwärts viele Falten über die Wangen ziehen und die Augenbrauen, wo sie zusammenstoßen, emporgerissen, viele Falten auf der Stirn schaffen. Einige Sitzende mögen mit den zusammengeflochtenen Fingern die müden Knie zwischen den Händen halten, andere ein Knie über das andre schlagen und die Hand darauf legen, die in ihrer Höhlung den Ellbogen aufnimmt, dessen Hand das bärtige Kinn irgendeines vorgebeugten Greises unterstützen wird.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 296-298",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n397/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 296-298",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n397/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 183-184",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n362/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Richter 1883 §606 (Ash. I. 14b), vol. I p. 305-306; Herzfeld 1906 p. 185-186, LXI",
+     "it": {
+      "text": "COME SI DEE FIGURARE UNA FORTUNA.\n\nSe tu uoi figurare una fortuna · cōsidera e poni bene i sua effetti; Quādo il uēto ·, soffiādo sopra la superfitie del mare e della · terra ·, rimove e porta cō seco quelle cose · che nō sono ferme colla vniuersale · massa, e per bē figurare · questa fortuna · farai ī prima li nuvoli spezzati e rotti dirizzarsi per lo corso del uēto ·, accōpagniati da l'arenosa polvere leuata da liti marini ·, e rami e foglie leuati per la potētia del furore del uēto sparse per l'aria: e ī conpagnia di quelle molte altre cose leggiere li alberi e l'erbe piegate a terra, quasi mostrarsi volere seguire il corso de' vēti coi rami storti fori del naturale corso e cō le scōpigliate e rouesciate foglie; gli omini che li si trouano parte caduti e rivolti per li panni e per la poluere, quasi sieno sconoscivti, e quelli che restano ritti sieno dopo qualche albero abbracciati a quello, perchè il uēto nō li strascini, altri colle mani alli ochi per la polvere chinati a terra ed i panni e capelli diritti al corso del uento; Il mare, turbato e tēpestoso, sia pieno di ritrosa schivma īfra l'eleuate ōde e 'l uēto levato īfra la cōbattuta aria della schivma piv sottile, a vso di spessa ed avviluppata nebbia: i navili, che dētro vi sono, alcuni se ne faccia colla vela rotta e i brani d'essa uētilādo īfra l'aria ī cōpagnia d'alcuna corda rotta, alcuni alberi rotti caduti col navilio intrauersato e rotto īfra le tēpestose ōde, cierti omini gridāti abbracciare il rimanēte del navilio, farai li nvuoli cacciati da l'īpetuosi venti, battuti nel'alte cime delle mōtagne e fare aquelli avviluppati, ritrosi, a similitudine dell'ōde percosse nelli scogli; l'aria spauētosa per le oscure tenebre fatte in nell'aria dalla poluere, nebbia e nvuoli folti.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "HOW TO REPRESENT A TEMPEST.\n\nIf you wish to represent a tempest consider and arrange well its effects as seen, when the wind, blowing over the face of the sea and earth, removes and carries with it such things as are not fixed to the general mass. And to represent the storm accurately you must first show the clouds scattered and torn, and flying with the wind, accompanied by clouds of sand blown up from the sea shore, and boughs and leaves swept along by the strength and fury of the blast and scattered with other light objects through the air. Trees and plants must be bent to the ground, almost as if they would follow the course of the gale, with their branches twisted out of their natural growth and their leaves tossed and turned about. Of the men who are there some must have fallen to the ground and be entangled in their garments, and hardly to be recognized for the dust, while those who remain standing may be behind some tree, with their arms round it that the wind may not tear them away; others with their hands over their eyes for the dust, bending to the ground with their clothes and hair streaming in the wind. Let the sea be rough and tempestuous and full of foam whirled among the lofty waves, while the wind flings the lighter spray through the stormy air, till it resembles a dense and swathing mist. Of the ships that are therein some should be shown with rent sails and the tatters fluttering through the air, with ropes broken and masts split and fallen. And the ship itself lying in the trough of the sea and wrecked by the fury of the waves with the men shrieking and clinging to the fragments of the vessel. Make the clouds driven by the impetuosity of the wind and flung against the lofty mountain tops, and wreathed and torn like waves beating upon rocks; the air itself terrible from the deep darkness caused by the dust and fog and heavy clouds.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Wie man ein Ungewitter darstellen soll\n\nWenn du ein Ungewitter gut darstellen willst, beachte und setze wohl seine Wirkungen hin, wenn der Wind, über die Oberfläche des Meeres und der Erde blasend, aufrührt und mit sich führt, was nicht fest in der allgemeinen Masse sitzt. Und um dieses Ungewitter recht darzustellen, wirst du erst die zerfetzten und auseinandergerissenen Wolken nach dem Lauf des Sturmes treiben und von dem sandigen Staub begleiten lassen, der vom Meeresstrand aufgewirbelt worden, und von Zweigen und Blättern, welche die Macht der Wut des Windes emporgehoben, in der Luft weit verstreut hat, in Gesellschaft von vielen andern leichten Sachen. Die Bäume und die Kräuter, zur Erde gebogen, scheinen fast der Richtung des Windes folgen zu wollen, mit Zweigen, die aus ihrer natürlichen Lage heraus verdreht sind und ihr Laub zerzaust und umgekehrt haben. Die Menschen, die sich vorfinden, zum Teil umgeworfen und herumgewirbelt durch ihre Gewänder und den Staub, seien fast unkenntlich, und die, welche sich aufrechterhalten, mögen hinter irgendeinem Baum sein, den sie umarmen, damit der Sturm sie nicht mitreiße; andere, mit der Hand vor den Augen, wegen des Staubes, zur Erde gebeugt, und Kleider und Haare in der Windrichtung flatternd. Das aufgewühlte und stürmische Meer sei voller wirbelnden Gischtes zwischen den sich aufbäumenden Wogen, und der Wind hebe in die gepeitschten Lüfte leichten Schaum, gleichwie einen dichten und verhüllenden Nebel. Von den Fahrzeugen, die sich darin befinden, mache einige mit zerbrochenen Segeln und die Fetzen davon in Gesellschaft einiger zerrissener Taue in den Lüften flatternd; Mastbäume zersplittert, umgestürzt, mit dem Schiff, das von den stürmischen Wogen überflutet und zerbrochen ist; mehrere Menschen, die schreiend die Trümmer des Fahrzeugs umklammern; du wirst die Wolken machen, die, von den ungestümen Winden dahergejagt, an die hohen Gipfel der Berge geschleudert, um diese verhüllende Wirbel bilden, ähnlich den Wellen, die gegen Klippen schlagen. Die Luft schauerlich durch das finstere Dunkel, das der Staub, der Nebel und das dichte Gewölk in der Luft erzeugen.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 305-306",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n410/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 305-306",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n410/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 185-186",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n364/mode/1up"
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

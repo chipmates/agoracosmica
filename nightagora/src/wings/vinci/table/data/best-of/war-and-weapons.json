@@ -1,0 +1,703 @@
+{
+ "topic": "war-and-weapons",
+ "pages": {
+  "B.112": {
+   "lead": 2,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 52v, block 1 of 3",
+     "it": {
+      "text": "— seste —",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "Compasses",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Zirkel",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Compas [Sorte de]. —"
+     },
+     "label_only": true,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 52 (verso), the transcription below the facsimile plate; archive.org leaf n216",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n216/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 52 (verso), the facing page of the plate; archive.org leaf n215",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n215/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 52v, block 2 of 3",
+     "it": {
+      "text": "— 2 tronbe chentrano invna sola —",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "2 pumps that run into a single one.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "2 Pumpen, die in eine einzige münden.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Deux pompes qui entrent en une seule. —"
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 52 (verso), the transcription below the facsimile plate; archive.org leaf n216",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n216/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 52 (verso), the facing page of the plate; archive.org leaf n215",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n215/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 52v, block 3 of 3",
+     "it": {
+      "text": "— Modo duna. forteza —",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "A kind of fortress.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Eine Art Festung.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Système de forteresse. —"
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 52 (verso), the transcription below the facsimile plate; archive.org leaf n216",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n216/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 52 (verso), the facing page of the plate; archive.org leaf n215",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n215/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "B.159": {
+   "lead": 3,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 76r, block 1 of 5",
+     "it": {
+      "text": "— legni resistenti altrare delle bonbarde insu lenavi —",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "Timbers that withstand the shot of bombards, on ships.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Hölzer, die dem Beschuss durch Bombarden standhalten, auf den Schiffen.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Bois résistants au tir des bombardes sur les navires. —"
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 76 (recto), the transcription below the facsimile plate; archive.org leaf n310",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n310/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 76 (recto), the facing page of the plate; archive.org leaf n309",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n309/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 76r, block 2 of 5",
+     "it": {
+      "text": "— scorpione —",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "Scorpion",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Skorpion",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Scorpion —"
+     },
+     "label_only": true,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 76 (recto), the transcription below the facsimile plate; archive.org leaf n310",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n310/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 76 (recto), the facing page of the plate; archive.org leaf n309",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n309/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 76r, block 3 of 5",
+     "it": {
+      "text": "— bona perle navi cioe contra diquelle — acio non falliassi iltaglio —",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "Good for ships, that is, against them. So that the cut should not fail.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Gut für Schiffe, das heißt gegen sie. Damit der Schnitt nicht fehlgeht.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Bonne pour les navires, c'est-à-dire contre eux. — Afin que le tranchant ne manque pas."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 76 (recto), the transcription below the facsimile plate; archive.org leaf n310",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n310/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 76 (recto), the facing page of the plate; archive.org leaf n309",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n309/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 3,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 76r, block 4 of 5",
+     "it": {
+      "text": "— nave di scorpioni bone attagliare le corde delle gran navi essia dalluno allaltro chorno delle falci. braccia 4 e sia la falce lunaria inel piv. largo uno piedi e nella chosta uno dito",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "A ship of scorpions, good for cutting the ropes of the great ships. Let it be 4 braccia from one horn of the scythes to the other, and let the scythe be moon-shaped, one foot at its widest and one finger at the back.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Ein Schiff mit Skorpionen, gut, um die Seile der großen Schiffe zu durchschneiden. Von einem Horn der Sensen zum anderen seien es 4 Braccia, und die Sense sei mondsichelförmig, an der breitesten Stelle einen Fuß breit und am Rücken einen Finger dick.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Navire de scorpions, bon pour couper les cordes des grands navires; et qu'il y ait de l'une à l'autre corne des faux, 4 brasses; que la faux soit lunaire [en forme de croissant], dans sa plus grande largeur d'un pied, et dans sa côte [à son dos] d'un doigt."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 76 (recto), the transcription below the facsimile plate; archive.org leaf n310",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n310/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 76 (recto), the facing page of the plate; archive.org leaf n309",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n309/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 4,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 76r, block 5 of 5",
+     "it": {
+      "text": "— bilico della bonbardella chegitta lischorpioni",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "The pivot of the little bombard that throws the scorpions.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Der Drehzapfen der kleinen Bombarde, die die Skorpione schleudert.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Ombilic [tourillon] de la bombardelle qui jette les scorpions."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 76 (recto), the transcription below the facsimile plate; archive.org leaf n310",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n310/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 76 (recto), the facing page of the plate; archive.org leaf n309",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n309/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "B.107": {
+   "lead": 2,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 50r, block 1 of 3",
+     "it": {
+      "text": "— traino dalochi montuosi e petrossi effassi disunita quella parte chettocha tera. accio chella. sia mendificile attirare perche quel peso che mentocha simove chon minore difichulta",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "A sledge for mountainous and stony places. The part that touches the ground is made broken up [?], so that it is less hard to pull, because a weight that touches less moves with less difficulty.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Ein Schlitten für bergige und steinige Orte. Der Teil, der den Boden berührt, wird unterbrochen [?] gemacht, damit er weniger schwer zu ziehen ist, denn ein Gewicht, das weniger aufliegt, bewegt sich mit geringerer Mühe.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Traîneau pour lieux montueux et pierreux. Et qu'on fasse désunie [bombée] la partie qui touche terre, afin qu'elle soit moins difficile à tirer, parce que le poids qui touche le moins se meut avec le moins de difficulté."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 50 (recto), the transcription below the facsimile plate; archive.org leaf n206",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n206/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 50 (recto), the facing page of the plate; archive.org leaf n205",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n205/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 50r, block 2 of 3",
+     "it": {
+      "text": "— taniuella —",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "Auger",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Bohrer",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Tarière —"
+     },
+     "label_only": true,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 50 (recto), the transcription below the facsimile plate; archive.org leaf n206",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n206/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 50 (recto), the facing page of the plate; archive.org leaf n205",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n205/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 50r, block 3 of 3",
+     "it": {
+      "text": "— quello chedachordo chollo scalatore porti quando saconcia colcastellano. con seco uno gomitolo di forterefe. ecquando lintocha laguardia tiri inalto condettorete uno filo di spago ilquale lifia dato dallo scalatore e poi colo spago tiri lacorda laquale dipoi siacta [sia atta] attirare la scala dicorde disopra figurata",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "The man who is in league with the climber, when he takes service with the castellan, should carry with him a ball of strong thread. And when his turn on guard comes, let him pull up with the said thread [?] a length of twine, which the climber will give him; and then with the twine let him pull up the rope, which afterwards will serve to pull up the rope ladder drawn above.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Wer mit dem Kletterer im Bund ist, soll, wenn er beim Kastellan in Dienst tritt, ein Knäuel starken Zwirns bei sich tragen. Und wenn er Wache hat, soll er mit diesem Zwirn [?] eine Schnur hinaufziehen, die ihm der Kletterer gibt; und dann soll er mit der Schnur das Seil hinaufziehen, das danach die oben gezeichnete Strickleiter hinaufziehen kann.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Que celui qui est d'accord avec celui qui escalade, porte, quand il s'abouche avec le châtelain, un peloton de fort fil; quand il conviendra [?], la garde tirera en haut avec ledit fil, lequel lui aura été donné par celui qui escalade; puis, avec la ficelle il tirera la corde, qui sera ensuite apte à tirer l'échelle de cordes ci-dessus figurée."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 50 (recto), the transcription below the facsimile plate; archive.org leaf n206",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n206/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 50 (recto), the facing page of the plate; archive.org leaf n205",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n205/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "L.097": {
+   "lead": 0,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. V (1890), Ms L fol. 45v, block 1 of 1",
+     "it": {
+      "text": "[1re fig. :] a b c d\nCo che qui e ordinato essol perche\nlepiramide a b c d. non\nsieno bactute fo\nri delsuo ango\nlo",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "[First figure:] a b c d\nWhat is laid out here is only so that the pyramids a b c d are not struck outside their angle.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "[Erste Figur:] a b c d\nWas hier angeordnet ist, dient nur dazu, dass die Pyramiden a b c d nicht außerhalb ihres Winkels getroffen werden.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "[1re fig. :] a b c d\nCe qui est ordonné ici est seulement pour que les pyramides a b c d ne soient pas frappées hors de leur angle."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. V]: Manuscrits G, L & M de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1890",
+       "page": "Ms L, FOLIO 45 (verso), transcription (upper left column, under the heading [ARTILLERIE]); archive.org viewer page n255",
+       "url": "https://archive.org/details/lesmanuscritsdel05lo/page/n255/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. V]: Manuscrits G, L & M de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1890",
+       "page": "Ms L, FOLIO 45 (verso), French translation (upper left column, below the Italian); archive.org viewer page n255",
+       "url": "https://archive.org/details/lesmanuscritsdel05lo/page/n255/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "B.053": {
+   "lead": 1,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 23r, block 1 of 4",
+     "it": {
+      "text": "— ponte — acqua — a b c d",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "Bridge. Water. a b c d",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Brücke. Wasser. a b c d",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Pont — Eau — a b c d."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 23 (recto), the transcription below the facsimile plate; archive.org leaf n98",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n98/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 23 (recto), the facing page of the plate; archive.org leaf n97",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n97/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 23r, block 2 of 4",
+     "it": {
+      "text": "— questo ponte sie. inronpibile. selle traue maestre. a. b. c. d. saran ano forte ebbene. inchatenate",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "This bridge is unbreakable if the main beams a b c d are strong and well chained together.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Diese Brücke ist unzerbrechlich, wenn die Hauptbalken a b c d stark und gut miteinander verkettet sind.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Ce pont ne pourra pas être rompu, si les poutres maîtresses a b c d sont fortes et bien enchaînées."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 23 (recto), the transcription below the facsimile plate; archive.org leaf n98",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n98/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 23 (recto), the facing page of the plate; archive.org leaf n97",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n97/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 23r, block 3 of 4",
+     "it": {
+      "text": "— potrebe questo ponte avere 2 transiti uno sopra laltro",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "This bridge could have 2 passages, one above the other.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Diese Brücke könnte 2 Übergänge haben, einen über dem anderen.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Ce pont pourrait avoir deux passages, l'un au-dessus de l'autre."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 23 (recto), the transcription below the facsimile plate; archive.org leaf n98",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n98/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 23 (recto), the facing page of the plate; archive.org leaf n97",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n97/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 3,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 23r, block 4 of 4",
+     "it": {
+      "text": "— puossi. fare. incento. miglia. ciento. case. nelequali stia cento guardie cheffarano per sotterani. choridoni sentire una novella in 1/4 dora",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "Over a hundred miles one can build a hundred houses, in which a hundred guards are posted, who will make a piece of news heard through underground corridors in 1/4 of an hour.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Man kann auf hundert Meilen hundert Häuser bauen, in denen hundert Wachen stehen, die durch unterirdische Gänge eine Nachricht in 1/4 Stunde hörbar machen.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— On peut faire en cent mille, cent maisons dans lesquelles il y ait cent gardes, qui feront, par les corridors souterrains, entendre une nouvelle en 1/4 d'heure."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 23 (recto), the transcription below the facsimile plate; archive.org leaf n98",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n98/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 23 (recto), the facing page of the plate; archive.org leaf n97",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n97/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "B.015": {
+   "lead": 0,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §1131 (B. 4a), vol. II p. 282",
+     "it": {
+      "text": "Pañi biāchi e cielesti, tessuti a scacchi per fare uno apparecchio; Pañi tirati in a · b · c · d · e · f · g · h · i · k ·, da fare uno ciclo a uno apparecchio.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "White and sky-blue cloths, woven in checks to make a decoration. Cloths with the threads drawn at a b c d e f g h i k, to go round the decoration.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Weiße und himmelblaue Tücher, im Schachbrettmuster gewebt, um daraus einen Festschmuck zu machen. Tücher, gespannt bei a b c d e f g h i k, um einen Kreis [?] um einen Festschmuck zu legen.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 282",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n417/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 282",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n417/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Richter 1883 §1509 (B. 4a), vol. II p. 454",
+     "it": {
+      "text": "A dì 28 d'aprile ebbi da Marchesino · lire 103 e S. 12.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "On the 28th day of April I received from the Marchesino 103 lire and 12 dinari.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Am 28. April erhielt ich vom Marchesino 103 Lire und 12 Soldi.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 454",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n603/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 454",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n603/mode/1up"
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

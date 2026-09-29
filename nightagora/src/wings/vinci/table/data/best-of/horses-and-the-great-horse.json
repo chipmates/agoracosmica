@@ -1,0 +1,85 @@
+{
+ "topic": "horses-and-the-great-horse",
+ "pages": {
+  "A.134": {
+   "lead": 1,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. I (1881), Ms A fol. 62v, block 1 of 2",
+     "it": {
+      "text": "— tanto e dalluna apichatura. dellorechio allaltra quanto e da ~~pi~~ legivnture dele ciglia al mento\n— tanto. egrande la bocha dunbeluolto quanto e dala diuision delabri aldisotto delmento",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "It is as far from where one ear is attached to the other as from the meeting of the eyebrows to the chin.\nThe mouth of a handsome face is as wide as it is from the parting of the lips to the underside of the chin.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Vom Ansatz des einen Ohrs bis zum anderen ist es so weit wie von der Stelle, wo die Brauen zusammentreffen, bis zum Kinn.\nDer Mund eines schönen Gesichts ist so breit, wie es von der Trennlinie der Lippen bis unter das Kinn ist.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Il y a autant de l'attache d'une oreille à l'attache de l'autre, que de l'intervalle des sourcils au menton.\n— La grandeur de la bouche d'un beau visage est égale à la distance qu'il y a de la division des lèvres au-dessous du menton."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. I]: Le manuscrit A de la Bibliothèque de l'Institut, publié en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1881",
+       "page": "Ms A, FOLIO 62 (verso), transcription (below the facsimile plate); archive.org viewer page n283",
+       "url": "https://archive.org/details/lesmanuscritsdel01lo/page/n283/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. I]: Le manuscrit A de la Bibliothèque de l'Institut, publié en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1881",
+       "page": "Ms A, FOLIO 62 (verso), French translation (the page after the plate, headed DESSIN (PROPORTIONS DE LA FIGURE HUMAINE ET DE LA TÊTE DU CHEVAL) — MOUFLES); archive.org viewer page n284",
+       "url": "https://archive.org/details/lesmanuscritsdel01lo/page/n284/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Ravaisson-Mollien vol. I (1881), Ms A fol. 62v, block 2 of 2",
+     "it": {
+      "text": "— tanto. fia. dalluno. orechio. allaltro. quanto. ella lungeza. desso. orechio\n— lorechio. deessere. lungo. la. quarta. parte. deluolto",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "It shall be as far from one ear to the other as the ear itself is long.\nThe ear must be a quarter of the face in length.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Von einem Ohr zum anderen soll es so weit sein, wie das Ohr selbst lang ist.\nDas Ohr muss ein Viertel des Gesichts lang sein.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Il doit y avoir d'une oreille [du cheval] à l'autre la longueur d'une de ces oreilles.\n— La longueur de l'oreille doit être égale au quart du visage."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. I]: Le manuscrit A de la Bibliothèque de l'Institut, publié en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1881",
+       "page": "Ms A, FOLIO 62 (verso), transcription (below the facsimile plate); archive.org viewer page n283",
+       "url": "https://archive.org/details/lesmanuscritsdel01lo/page/n283/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. I]: Le manuscrit A de la Bibliothèque de l'Institut, publié en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1881",
+       "page": "Ms A, FOLIO 62 (verso), French translation (the page after the plate, headed DESSIN (PROPORTIONS DE LA FIGURE HUMAINE ET DE LA TÊTE DU CHEVAL) — MOUFLES); archive.org viewer page n284",
+       "url": "https://archive.org/details/lesmanuscritsdel01lo/page/n284/mode/1up"
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

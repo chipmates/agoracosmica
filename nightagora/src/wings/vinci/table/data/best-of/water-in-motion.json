@@ -1,0 +1,126 @@
+{
+ "topic": "water-in-motion",
+ "pages": {
+  "F.101": {
+   "lead": 1,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. IV (1889), Ms F fol. 47v, block 1 of 2",
+     "it": {
+      "text": "Quanta aria vole essere alleuare diuersi gravi. ~~indiv~~ diuarie materie Quanta ac qua entera nella barca affarla affondare Quale aria sostiene piu essendo rinchi vsa olla rarefacta come sifa nelle coppette olla comune ollacon densata come sifa nelle palle gonfiate per forza diuite sanza dubbio lararefatta e poi lacomune ella condensata mancoresiste",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "How much air is needed to lift various weights of different materials. How much water will enter the boat to make it sink. Which air supports more when it is shut in: the rarefied, as is done in cupping glasses, or the ordinary, or the condensed, as is done in balls blown up by force of a screw? Without doubt the rarefied, and then the ordinary, and the condensed resists least.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Wie viel Luft man braucht, um verschiedene Lasten aus verschiedenen Stoffen zu heben. Wie viel Wasser in die Barke eindringen muss, um sie sinken zu lassen. Welche Luft trägt mehr, wenn sie eingeschlossen ist: die verdünnte, wie man sie in Schröpfköpfen erzeugt, oder die gewöhnliche, oder die verdichtete, wie man sie in Bällen erzeugt, die mit Schraubenkraft aufgepumpt sind? Ohne Zweifel die verdünnte, dann die gewöhnliche, und die verdichtete widersteht am wenigsten.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "Combien d'air il faut pour élever divers graves ~~en div~~ de diverses matières.\nCombien d'eau entrera dans la barque pour la faire enfoncer. Quel air soutient le plus, de celui qui est enfermé ou du raréfié, comme il se fait dans les ventouses, ou du commun [de celui à l'état naturel], ou du condensé, comme il se fait dans les balles [ballons] gonflées par force de vis; sans doute le raréfié, et puis le commun, et le condensé ne résiste pas du tout."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
+       "page": "Ms F, FOLIO 47 (verso), transcription (lower half of the page, under the heading [AIR ET POIDS. — EAU]); archive.org viewer page n109",
+       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n109/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
+       "page": "Ms F, FOLIO 47 (verso), French translation (lower half of the page, below the Italian); archive.org viewer page n109",
+       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n109/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Ravaisson-Mollien vol. IV (1889), Ms F fol. 47v, block 2 of 2",
+     "it": {
+      "text": "~~Ciascun moto e~~ ciasscu // n a parte dellagrosseza dellacqua che chade difiume infralaria segue la linia nella quale ~~co~~ fu principiato lin peto che intal caduta lacondusse —",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "Every part of the thickness of the water that falls from a river into the air follows the line in which the impetus began that carried it into that fall.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Jeder Teil der Wassermasse, die von einem Fluss in die Luft fällt, folgt der Linie, in der der Antrieb begann, der es in diesen Fall geführt hat.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "~~Chaque mouvement~~ Chaque partie de l'épaisseur de l'eau qui tombe du fleuve dans l'air suit la ligne dans laquelle fut commencée l'impulsion [« inpeto »] qui la conduisit à cette chute."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
+       "page": "Ms F, FOLIO 47 (verso), transcription (lower half of the page, under the heading [AIR ET POIDS. — EAU]); archive.org viewer page n109",
+       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n109/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. IV]: Manuscrits F & I de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1889",
+       "page": "Ms F, FOLIO 47 (verso), French translation (lower half of the page, below the Italian); archive.org viewer page n109",
+       "url": "https://archive.org/details/lesmanuscritsdel04lo/page/n109/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "AR3.169": {
+   "lead": 0,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §1074 (Br. M. 269a), vol. II p. 251",
+     "it": {
+      "text": "Loira fiume d'Ambosa.\nIl fiume è più alto dentro all'argine b d che fuori d'essa argine;\nIsola dove è vna parte d'Anbuosa.\nIl fiume Loira che passa per Anbosa passa per a b, c d, e poichè è passato il pōte, ritorna contro al suo avenimento per il canale d e, b f in contatto dell'argine che si interpone infra li due moti contrari del predetto fiume a b, c d, d e, b f; di poi si riuolta in giù per il canale f l, g h, n m, e si ricongiugnie col fiume dōde prima si diuise, che passa per k n, che fa k m, r t; ma quādo il fiume è grosso, allora elli corre tutto per uno solo verso, passādo l'argine b d.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "The river Loire at Amboise.\nThe river is higher within the bank b d than outside that bank.\nThe island where there is a part of Amboise.\nThis is the river that passes through Amboise; it passes at a b c d, and when it has passed the bridge it turns back, against the original current, by the channel d e, b f in contact with the bank which lies between the two contrary currents of the said river, a b, c d, and d e, b f. It then turns down again by the channel f l, g h, n m, and reunites with the river from which it was at first separated, which passes by k n, which makes k m, r t. But when the river is very full it flows all in one channel passing over the bank b d.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Die Loire, der Fluss von Amboise.\nDer Fluss steht innerhalb des Damms b d höher als außerhalb dieses Damms.\nInsel, auf der ein Teil von Amboise liegt.\nDie Loire, die durch Amboise fließt, fließt durch a b, c d, und wenn sie die Brücke passiert hat, kehrt sie gegen ihre eigene Strömung durch den Kanal d e, b f zurück, entlang dem Damm, der zwischen den zwei gegenläufigen Strömungen des genannten Flusses liegt, a b, c d, d e, b f. Danach wendet sie sich wieder abwärts durch den Kanal f l, g h, n m und vereinigt sich wieder mit dem Fluss, von dem sie sich zuerst getrennt hat, der durch k n fließt und k m, r t bildet. Führt der Fluss aber Hochwasser, dann fließt er ganz in einer einzigen Richtung und geht über den Damm b d.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 251",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n386/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 251",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n386/mode/1up"
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

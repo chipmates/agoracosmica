@@ -1,0 +1,267 @@
+{
+ "topic": "machines",
+ "pages": {
+  "B.105": {
+   "lead": 0,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 49r, block 1 of 1",
+     "it": {
+      "text": "— questi ~~bo~~ chortaldi deono stare sopra forti navili equesti 2 chortaldi arano con forte chatena o corda nova bagniata vna falce lunga braccia 12 larga nel mezo uno pie grssa [grossa] nella costa uno dito e debesidare focho invno tenpo",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "These short cannons must stand on strong ships, and these 2 short cannons shall have, on a strong chain or a new wet rope, a scythe 12 braccia long, one foot wide in the middle, one finger thick at the back; and they must be fired at the same moment.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Diese kurzen Kanonen müssen auf starken Schiffen stehen, und diese 2 kurzen Kanonen sollen an einer starken Kette oder einem neuen, nassen Seil eine Sense tragen, 12 Braccia lang, in der Mitte einen Fuß breit, am Rücken einen Finger dick; und man muss sie im selben Augenblick abfeuern.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Ces courtauds doivent être placés sur de forts navires; et ces 2 courtauds auront, avec une forte chaîne ou une corde neuve mouillée, une faux longue de 12 brasses, large au milieu d'un pied, épaisse au dos de sa lame d'un doigt; on doit donner [mettre] le feu en un temps."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 49 (recto), the transcription below the facsimile plate; archive.org leaf n202",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n202/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 49 (recto), the facing page of the plate; archive.org leaf n201",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n201/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "L.077": {
+   "lead": 0,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. V (1890), Ms L fol. 35v, block 1 of 1",
+     "it": {
+      "text": "vano braccia 7 1/2   1/4 . . [?]\ngrosseza di muro braccio uno e. . [?]",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "Clear space: 7 1/2 braccia   1/4 . . [?]\nThickness of the wall: one braccio and . . [?]",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Lichte Weite: 7 1/2 Braccia   1/4 . . [?]\nMauerstärke: ein Braccio und . . [?]",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "Vide : 7 brasses et 1/2   1/4 . . [?]\nÉpaisseur de mur : une brasse et . . [?]"
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. V]: Manuscrits G, L & M de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1890",
+       "page": "Ms L, FOLIO 35 (verso), transcription (upper left column, under the heading [MOULIN]); archive.org viewer page n245",
+       "url": "https://archive.org/details/lesmanuscritsdel05lo/page/n245/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. V]: Manuscrits G, L & M de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1890",
+       "page": "Ms L, FOLIO 35 (verso), French translation (upper left column, below the Italian); archive.org viewer page n245",
+       "url": "https://archive.org/details/lesmanuscritsdel05lo/page/n245/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "B.110": {
+   "lead": 3,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 51v, block 1 of 4",
+     "it": {
+      "text": "— sprone contro allinpito dun fiume",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "A spur against the onrush of a river.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Ein Sporn gegen den Ansturm eines Flusses.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Éperon contre l'impétuosité d'un fleuve."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 51 (verso), the transcription below the facsimile plate; archive.org leaf n212",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n212/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 51 (verso), the facing page of the plate; archive.org leaf n211",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n211/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 51v, block 2 of 4",
+     "it": {
+      "text": "— di questa natura vorebe. essere la shorza [scorza?] delle pescaie",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "The facing [?] of the weirs ought to be of this kind.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Von dieser Art sollte die Verkleidung [?] der Wehre sein.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— De cette nature voudrait [devrait] être ? l'écorce (le revêtement) ?] des épis [opposés au cours de l'eau]."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 51 (verso), the transcription below the facsimile plate; archive.org leaf n212",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n212/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 51 (verso), the facing page of the plate; archive.org leaf n211",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n211/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 51v, block 3 of 4",
+     "it": {
+      "text": "— afforare vna pietra maffa. chessenpre cagia. acqua",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "To bore a stone: but see that water keeps falling.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Um einen Stein zu bohren: Sorge aber dafür, dass immer Wasser fällt.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Pour forer [percer] une pierre; mais fais que de l'eau tombe toujours."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 51 (verso), the transcription below the facsimile plate; archive.org leaf n212",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n212/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 51 (verso), the facing page of the plate; archive.org leaf n211",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n211/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 3,
+     "ref": "Ravaisson-Mollien vol. II (1883), Ms B fol. 51v, block 4 of 4",
+     "it": {
+      "text": "— Modo difare una opera chomprestezza",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "A way to get a piece of work done quickly.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Wie man eine Arbeit rasch erledigt.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Manière de faire un ouvrage avec promptitude."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 51 (verso), the transcription below the facsimile plate; archive.org leaf n212",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n212/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. II]: Les manuscrits B & D de la Bibliothèque de l'Institut, publiés en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1883",
+       "page": "FOLIO 51 (verso), the facing page of the plate; archive.org leaf n211",
+       "url": "https://archive.org/details/lesmanuscritsdel02lo/page/n211/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "H.226": {
+   "lead": null,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. VI (1891), Ms H, FOLIO 108 [35 recto] (verso)",
+     "it": null,
+     "en": null,
+     "de": null,
+     "fr": null,
+     "label_only": true,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. VI]: Manuscrits H de la Bibliothèque de l'Institut, Ash. 2038 et 2037 de la Bibliothèque nationale, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, suivis d'un appendice, Paris: Maison Quantin, 1891",
+       "page": "Ms H, FOLIO 108 [35 recto] (verso), transcription (lower left column); archive.org viewer page n121",
+       "url": "https://archive.org/details/lesmanuscritsdel06lo/page/n121/mode/1up"
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

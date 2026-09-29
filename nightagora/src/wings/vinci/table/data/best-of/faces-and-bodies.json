@@ -1,0 +1,282 @@
+{
+ "topic": "faces-and-bodies",
+ "pages": {
+  "L.014": {
+   "lead": null,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. V (1890), Ms L fol. 4r, block 1 of 1",
+     "it": {
+      "text": "abe [?]",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "abe [?]",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "abe [?]",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": ". . . [?]"
+     },
+     "label_only": true,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. V]: Manuscrits G, L & M de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1890",
+       "page": "Ms L, FOLIO 4 (recto), transcription (upper right column, under the heading [PERSONNAGE ARMÉ A GENOUX]); archive.org viewer page n211",
+       "url": "https://archive.org/details/lesmanuscritsdel05lo/page/n211/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. V]: Manuscrits G, L & M de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1890",
+       "page": "Ms L, FOLIO 4 (recto), French translation (upper right column, below the Italian); archive.org viewer page n211",
+       "url": "https://archive.org/details/lesmanuscritsdel05lo/page/n211/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "L.012": {
+   "lead": null,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. V (1890), Ms L fol. 3r, block 1 of 1",
+     "it": {
+      "text": "[Sens dessus dessous :] c\ntramontana b\na\na b . 950\nb c 2100",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "[Upside down:] c\nNorth b\na\na b: 950\nb c: 2100",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "[Auf dem Kopf stehend:] c\nNorden b\na\na b: 950\nb c: 2100",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "[Sens dessus dessous :] c\nTramontane b\na\nA b : 950.\nB c : 2100."
+     },
+     "label_only": true,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. V]: Manuscrits G, L & M de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1890",
+       "page": "Ms L, FOLIO 3 (recto), transcription (lower right column, under the heading [PLANS ET NOTES. — PERSONNAGE]); archive.org viewer page n209",
+       "url": "https://archive.org/details/lesmanuscritsdel05lo/page/n209/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. V]: Manuscrits G, L & M de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1890",
+       "page": "Ms L, FOLIO 3 (recto), French translation (lower right column, below the Italian); archive.org viewer page n209",
+       "url": "https://archive.org/details/lesmanuscritsdel05lo/page/n209/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "A.135": {
+   "lead": 2,
+   "notes": null,
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. I (1881), Ms A fol. 63r, block 1 of 5",
+     "it": {
+      "text": "63 — iltaglio overo spigolo delabro disotto. della. bocha. eilmezo jnfra ildisotto delnaso eldisotto delmento — ~~lalarg~~",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "The cut, or edge, of the lower lip of the mouth is the midpoint between the underside of the nose and the underside of the chin.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Der Schnitt oder die Kante der Unterlippe des Mundes liegt in der Mitte zwischen der Unterseite der Nase und der Unterseite des Kinns.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "63 — La coupure ou l'angle de la lèvre inférieure est le milieu entre le dessous du nez et le dessous du menton — ~~la largeur~~...."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. I]: Le manuscrit A de la Bibliothèque de l'Institut, publié en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1881",
+       "page": "Ms A, FOLIO 63 (recto), transcription (below the facsimile plate); archive.org viewer page n285",
+       "url": "https://archive.org/details/lesmanuscritsdel01lo/page/n285/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. I]: Le manuscrit A de la Bibliothèque de l'Institut, publié en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1881",
+       "page": "Ms A, FOLIO 63 (recto), French translation (the page after the plate, headed PROPORTIONS DU VISAGE); archive.org viewer page n286",
+       "url": "https://archive.org/details/lesmanuscritsdel01lo/page/n286/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Ravaisson-Mollien vol. I (1881), Ms A fol. 63r, block 2 of 5",
+     "it": {
+      "text": "— jluiso fa inse uno quadro cioe lasualargeza edaluno alaltro stremo delochio elasua alteza eda ilfine disopra delnaso aldisotto delabro disotto dela bocha poi cio cheresta disopra edisotto aeso quadro fa lalteza dunsimile quadro",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "The face makes a square within itself: its width runs from one end of the eyes to the other, and its height from the top end of the nose to the underside of the lower lip of the mouth. Then what remains above and below this square makes the height of one more such square.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Das Gesicht bildet in sich ein Quadrat: Seine Breite reicht von einem Ende der Augen zum anderen, seine Höhe vom oberen Ende der Nase bis unter die Unterlippe des Mundes. Was dann über und unter diesem Quadrat übrig bleibt, ergibt die Höhe eines gleichen Quadrats.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— Le visage fait en lui un carré, dont la largeur est de l'une à l'autre extrémité de l'œil [des yeux] et la hauteur est de l'extrémité supérieure du nez au-dessous de la lèvre inférieure, puis ce qui reste au-dessus et au-dessous de ce carré fait la hauteur d'un pareil carré."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. I]: Le manuscrit A de la Bibliothèque de l'Institut, publié en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1881",
+       "page": "Ms A, FOLIO 63 (recto), transcription (below the facsimile plate); archive.org viewer page n285",
+       "url": "https://archive.org/details/lesmanuscritsdel01lo/page/n285/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. I]: Le manuscrit A de la Bibliothèque de l'Institut, publié en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1881",
+       "page": "Ms A, FOLIO 63 (recto), French translation (the page after the plate, headed PROPORTIONS DU VISAGE); archive.org viewer page n286",
+       "url": "https://archive.org/details/lesmanuscritsdel01lo/page/n286/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Ravaisson-Mollien vol. I (1881), Ms A fol. 63r, block 3 of 5",
+     "it": {
+      "text": "— a. b. essimile alospatio che. infra. c. d. — d. n. ecosi n. c. essimilmente. s. r. — q. p — h. k. sono infra loro simili — tanto eda m. s. quanto edaldisotto delnaso. almento",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "a b is equal to the space between c d. d n, and so n c, and likewise s r, q p, h k are equal to one another. It is as far from m to s as from the underside of the nose to the chin.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "a b ist gleich dem Abstand zwischen c d. d n und ebenso n c, und gleichermaßen s r, q p, h k sind untereinander gleich. Von m bis s ist es so weit wie von der Unterseite der Nase bis zum Kinn.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— a b est égal à l'espace qu'il y a entre c d [La distance a b est égale à la distance c d]. — d n, ainsi que n c et pareillement s r, q p, h k, sont [des espaces semblables entre eux.\n— Il y a autant de m à s que du dessous du nez au menton [au dessous du menton, en k]."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. I]: Le manuscrit A de la Bibliothèque de l'Institut, publié en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1881",
+       "page": "Ms A, FOLIO 63 (recto), transcription (below the facsimile plate); archive.org viewer page n285",
+       "url": "https://archive.org/details/lesmanuscritsdel01lo/page/n285/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. I]: Le manuscrit A de la Bibliothèque de l'Institut, publié en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1881",
+       "page": "Ms A, FOLIO 63 (recto), French translation (the page after the plate, headed PROPORTIONS DU VISAGE); archive.org viewer page n286",
+       "url": "https://archive.org/details/lesmanuscritsdel01lo/page/n286/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 3,
+     "ref": "Ravaisson-Mollien vol. I (1881), Ms A fol. 63r, block 4 of 5",
+     "it": {
+      "text": "— lorechio. eapunto tanto lungo quanto ilnaso — tanto e da x. s quanto dalnaso almento — iltaglio della bocha inproffilo sidiriza alangolo dela massciella — tanto debeesere altolorechio quanto daldisotto delnaso aldisopra delcoperchio. dellochio",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "The ear is exactly as long as the nose. It is as far from x to s as from the nose to the chin. The line of the mouth, in profile, points to the angle of the jaw. The ear must be as high as it is from the underside of the nose to the top of the eyelid.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Das Ohr ist genau so lang wie die Nase. Von x bis s ist es so weit wie von der Nase bis zum Kinn. Die Linie des Mundes zielt im Profil auf den Winkel des Kiefers. Das Ohr muss so hoch sein, wie es von der Unterseite der Nase bis zur Oberkante des Augenlids ist.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— L'oreille est précisément de la même longueur que le nez.\n— Il y a autant de x à s que [du dessous] du nez au [dessous du] menton [en k].\n— La coupure de la bouche en profil se dirige à l'angle de la mâchoire.\n— La hauteur de l'oreille doit être égale à la distance qu'il y a du dessous du nez au-dessus du couvercle [de la paupière supérieure] de l'œil."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. I]: Le manuscrit A de la Bibliothèque de l'Institut, publié en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1881",
+       "page": "Ms A, FOLIO 63 (recto), transcription (below the facsimile plate); archive.org viewer page n285",
+       "url": "https://archive.org/details/lesmanuscritsdel01lo/page/n285/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. I]: Le manuscrit A de la Bibliothèque de l'Institut, publié en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1881",
+       "page": "Ms A, FOLIO 63 (recto), French translation (the page after the plate, headed PROPORTIONS DU VISAGE); archive.org viewer page n286",
+       "url": "https://archive.org/details/lesmanuscritsdel01lo/page/n286/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 4,
+     "ref": "Ravaisson-Mollien vol. I (1881), Ms A fol. 63r, block 5 of 5",
+     "it": {
+      "text": "— tanto elosspatio. che infraliochi. quanda [quanta e] lagrandelza dunochio — lorechio chade nel mezo. delchollo. inproffilo — tanto. e. da. 4. a. 5. quanto. e. da. 5. a. r.",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "The space between the eyes is as large as one eye. The ear falls over the middle of the neck, in profile. It is as far from 4 to 5 as from 5 to r.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+     },
+     "de": {
+      "text": "Der Abstand zwischen den Augen ist so groß wie ein Auge. Das Ohr liegt im Profil über der Mitte des Halses. Von 4 bis 5 ist es so weit wie von 5 bis r.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": {
+      "text": "— L'espace qu'il y a entre les yeux est égal à la grandeur d'un œil.\n— L'oreille tombe au milieu du cou, en profil.\n— Il y a autant de 4 à 5 que de 5 à r."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. I]: Le manuscrit A de la Bibliothèque de l'Institut, publié en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1881",
+       "page": "Ms A, FOLIO 63 (recto), transcription (below the facsimile plate); archive.org viewer page n285",
+       "url": "https://archive.org/details/lesmanuscritsdel01lo/page/n285/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. I]: Le manuscrit A de la Bibliothèque de l'Institut, publié en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1881",
+       "page": "Ms A, FOLIO 63 (recto), French translation (the page after the plate, headed PROPORTIONS DU VISAGE); archive.org viewer page n286",
+       "url": "https://archive.org/details/lesmanuscritsdel01lo/page/n286/mode/1up"
+      }
+     ]
+    }
+   ]
+  }
+ }
+}
