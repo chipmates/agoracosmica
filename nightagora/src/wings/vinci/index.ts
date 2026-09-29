@@ -3612,8 +3612,11 @@ export function createWing():VinciWingModule {
       const vertex=arriving?nav.wallTo:nav.wall
       const arrived=here?storyStopOnWall(here,vertex,walkIndexAt(here,vertex)):-1
       // A STEP ALONG A WALL ASKS FOR NO STOP: the stop it stands in is the one the next press counts from
-      if(arrived>=0&&arrived!==card&&!activeView&&nav.wallId!==undefined&&(nav.exhibit??nav.approaching)!==undefined)station=arrived
-      if(arrived>=0&&arrived!==card&&!activeView){card=arrived;dock.scrollTop=0;paintHeader();paintDock();paintQuestion();standHere()}
+      const stepped=nav.wallId!==undefined&&(nav.exhibit??nav.approaching)!==undefined
+      // A CLOSE LOOK'S WALK ACROSS THE HALL'S TWO STATIONS takes the stop asked
+      // for with the card, or the next press counts from the stop left and fades.
+      const crossed=station===card&&pressedOn<0&&nav.wall===undefined&&!nav.running&&(nav.approaching??nav.exhibit)!==undefined
+      if(arrived>=0&&arrived!==card&&!activeView){if(stepped||crossed)station=arrived;card=arrived;dock.scrollTop=0;paintHeader();paintDock();paintQuestion();standHere()}
       if(nav.completed&&nav.completed!==exposureAt)exposureAt=nav.completed
       const byRoom=activeView?null:roomPrint(nav,hosts.world.camera.position)
       const dusk=farewellShare===null?1:farewellExposure(farewellShare)*farewellDip()

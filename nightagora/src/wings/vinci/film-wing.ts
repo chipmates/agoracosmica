@@ -884,7 +884,9 @@ export function createWing(): WingModule {
       const at = atStop >= 0 ? atStop : wallStop(state.node) ?? -1
       if (at >= 0 && at !== card) { card = at; paint() }
       else { paintDesk(); paintPhone() }
-      if (at >= 0) asked = at
+      // at a machine's view too: a walk through a stop to a view moved the card
+      // there, and a press counted from the stop left would dip, not walk
+      asked = card
       stood.add(LIFE[card]!.id)
       paintGold()
       ahead()
