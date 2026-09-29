@@ -90,6 +90,10 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
 
   /* ---- what a page says at rest ---- */
 
+  /** Nothing printed: the museum holds no transcription, or the edition prints the drawing alone. */
+  const noWords = (page: BestOfPage): string =>
+    (page.drawing_only ? BEST_OF_NOTICES.no_words_drawing_only?.[language] : null) ?? BEST_OF_NOTICES.no_words[language] ?? ''
+
   /** The lead in his words, with whose words they are; the caption where the
    * page has no lead. */
   function lineOf(page: BestOfPage): { head: string | null; note: string | null } {
@@ -123,12 +127,17 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
     return [hand, { id: 'mirror', label: words.mirror, mirrored: true, source, window: page.plate.window, line: said, ...own }]
   }
 
+  /** "Flight, 2 of 18": the topic and the page's place in it. */
+  function countOf(place: number, count: number): string {
+    const pattern = key('topic_count') ?? `{topic}, ${deskControl('picture', 'place')[language] || '{n} / {total}'}`
+    return pattern.replace('{topic}', title).replace('{n}', String(place + 1)).replace('{total}', String(count))
+  }
+
   function sideOf(page: BestOfPage, place: number, count: number): ReaderSide | null {
     if (!index) return null
     const found = bestOfSource(page, index)
     if (!found) return null
     const { head, note } = lineOf(page)
-    const pattern = deskControl('picture', 'place')[language] || '{n} / {total}'
     // ONE HALF OF AN OPENING shows the open spread on the desktop, both
     // sides whole, where the store holds the pair as one picture
     const spread = page.spread && !options.narrow() ? bestOfRecord(index, page.spread.file) : undefined
@@ -138,7 +147,7 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
       id: page.id,
       label: page.name?.[language] ?? page.seat[language],
       shows: page.caption?.[language] ?? '',
-      notes: [topic?.line?.[language] ?? '', pictureWord(page) ?? '', !page.words ? BEST_OF_NOTICES.no_words[language] ?? '' : ''],
+      notes: [topic?.line?.[language] ?? '', pictureWord(page) ?? '', !page.words ? noWords(page) : ''],
       source: opening ?? found.source,
       // the leaf, framed, where its photograph shows a ground around it: a
       // zoom state, with the whole photograph one step further out
@@ -150,7 +159,7 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
       head,
       note,
       seat: page.name ? page.seat[language] : '',
-      count: `${title}, ${pattern.replace('{n}', String(place + 1)).replace('{total}', String(count))}`,
+      count: countOf(place, count),
       volume: options.slug,
       honesty: '',
     }
@@ -174,7 +183,7 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
     const page = pages.find(entry => entry.id === side.id)
     const own = page ? texts[page.id] : undefined
     const shown = (own?.passages ?? []).filter((passage: BestOfPassage) => !passage.missing)
-    if (!page || !shown.length) return [node('p', 'vitrine-meta', BEST_OF_NOTICES.no_words[language] ?? '')]
+    if (!page || !shown.length) return [node('p', 'vitrine-meta', page ? noWords(page) : '')]
     const out: HTMLElement[] = []
     // THE PRINTED ITALIAN, swapped in by one control, never a tab of three
     if (shown.some(passage => passage.it)) {
@@ -208,9 +217,7 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
       if (side) sides.push(side)
     }
     // the count is the pages the store admits, so a page still waiting is never counted
-    const pattern = deskControl('picture', 'place')[language] || '{n} / {total}'
-    for (const [place, side] of sides.entries())
-      side.count = `${title}, ${pattern.replace('{n}', String(place + 1)).replace('{total}', String(sides.length))}`
+    for (const [place, side] of sides.entries()) side.count = countOf(place, sides.length)
     return { sides, stripLabel: () => title, holder: '', holderInRecord: true, honesty: '' }
   }
 
@@ -268,7 +275,7 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
     button.disabled = !target
     if (target) {
       const name = target.title?.[language] ?? ''
-      button.setAttribute('aria-label', prefix ? `${prefix} · ${name}` : name)
+      button.setAttribute('aria-label', prefix ? (prefix.includes('{name}') ? prefix.replace('{name}', name) : `${prefix} · ${name}`) : name)
       button.addEventListener('click', () => options.openTopic(target.slug, button))
     }
     return button
@@ -346,7 +353,8 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
     walk: [back, on],
     certainty: 'documented',
     payload,
-    onKicker: key('next_topic'),
+    // the gold's kicker is the template's words before the topic's own name
+    onKicker: key('next_topic')?.replace(/\s*·?\s*\{name\}\s*$/, '') || null,
     ...(options.openShelf ? { onCount: options.openShelf } : {}),
   }
   return { exhibit, payload, renderRecord }

@@ -96,7 +96,7 @@
      stage down to the card's edge */
   .reader[data-dock='card'] .reader-ground,
   .reader[data-dock='card'] .reader-stage {bottom:8px;}
-  .vitrine-payload-controls .reader-shelf {position:static;height:44px;margin:4px 0 0;padding:0;gap:4px;}
+  .vitrine-payload-controls .reader-shelf {position:static;height:44px;margin:2px 0 0;padding:0;gap:4px;}
   .vitrine-payload-controls .reader-page {width:44px;height:44px;min-width:44px;}
   .vitrine-payload-controls .reader-absence {height:44px;}
   .vitrine-payload-controls .reader-part {height:44px;}

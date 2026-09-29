@@ -139,15 +139,25 @@ export const KEYS = {
   kind_plate: 'Read more: the picture is a printed plate of a facsimile; until written, nothing',
   kind_facsimile: 'Read more: the picture is a photograph of a printed facsimile; until written, nothing',
   topic_pages: 'a topic cell\'s page count ("{n} pages"); until written, no count',
+  topic_count: 'the count in the name row ("{topic}, {n} of {total}"); until written, the topic and the picture room\'s place pattern',
   absence_paris_rest: 'the new reason for Paris manuscripts C and E to M, now that the Institut\'s own views are admitted; until written, the absence is not shown',
   absence_ashburnham: 'the new reason for the Ashburnham leaves, likewise; until written, not shown',
   absence_arundel_middle: 'the new reason for Codex Arundel ff. 117 to 220, now that the British Library\'s views are admitted; until written, not shown',
 }
+/** The names the words pass wrote some keys under. */
+const KEY_NAMES = { full_text: 'the_full_text', full_record: 'the_full_record', ai_short: 'ai_label_short', mirror_ordinary: 'mirror_note_ltr' }
+/** Two labels of printed transcriptions the notices lack, written as keys. */
+const LABEL_KEYS = { richter: 'label_richter_italian', sabachnikoff: 'label_flight_1893' }
 const keysOut = Object.fromEntries(Object.keys(KEYS).map(key => {
-  const said = KEYS_WRITTEN[key]
+  const said = KEYS_WRITTEN[key] ?? KEYS_WRITTEN[KEY_NAMES[key]]
   return [key, said?.en && said?.de ? { en: said.en, de: said.de } : null]
 }))
-for (const key of Object.keys(KEYS_WRITTEN)) if (!(key in KEYS) && key !== 'codex_short') warn(`words/keys.json carries ${key}, which the room does not read`)
+const READ_KEYS = new Set([...Object.keys(KEYS), ...Object.values(KEY_NAMES), ...Object.values(LABEL_KEYS), 'codex_short'])
+for (const key of Object.keys(KEYS_WRITTEN)) if (!READ_KEYS.has(key)) warn(`words/keys.json carries ${key}, which the room does not read`)
+/** Pages whose caption names writing although no edition prints a word of
+ * them: they read as "nothing printed" and keep their mirror, never as
+ * wordless (the blind judge of the words, 2026-09-29). */
+const WRITTEN_UNPRINTED = new Set(['FB15v', 'ATL.0359.1', 'ATL.0236.1', 'M2.312', 'M2.280', 'CA.41'])
 const TEXT_FILES = existsSync(join(FROM, 'texts-final'))
   ? readdirSync(join(FROM, 'texts-final')).filter(name => name.endsWith('.jsonl')).sort() : []
 const RECORDS = new Map()
@@ -192,6 +202,8 @@ const slug = topic => topic.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^
 function editionOf(text) {
   const said = String(text ?? '')
   if (/Herzfeld/i.test(said)) return 'herzfeld'
+  // the 1893 Flight of Birds names Ravaisson-Mollien as its French translator
+  if (/Sabachnikoff|Piumati/i.test(said)) return 'sabachnikoff'
   if (/Ravaisson/i.test(said)) return 'ravaisson'
   if (/Beltrami|Trivulz/i.test(said)) return 'beltrami'
   if (/Arundel|Reale Commissione|Commissione Vinciana/i.test(said)) return 'arundel'
@@ -202,6 +214,7 @@ function editionOf(text) {
 /** The name an edition goes by, as the notices print it after their label. */
 function editionName(edition, lang) {
   const printed = NOTICES.printed_transcription?.[edition]?.[lang] ?? NOTICES.printed_translation?.[edition]?.[lang]
+    ?? KEYS_WRITTEN[LABEL_KEYS[edition]]?.[lang]
   return printed ? printed.replace(/^[^:]+:\s*/, '') : null
 }
 const missing = new Set()
@@ -214,8 +227,28 @@ function notice(path, lang) {
 }
 /** The label under a translation: the printed translator, or the AI notice
  * naming the printed text it rests on. */
-function translationLabel(kind, edition, lang, record) {
+/* The notices name each printed transcription by its volume and year
+ * (`printed_transcription.editions`), and each page's own (`by_page`). */
+const EDITIONS = NOTICES.printed_transcription?.editions ?? null
+const BY_PAGE = NOTICES.printed_transcription?.by_page ?? {}
+/** The page's transcription for an edition family (ravaisson, richter, ...). */
+function editionKey(page, family) {
+  const keys = BY_PAGE[page]?.transcription ?? []
+  return keys.find(key => family && key.startsWith(`${family}-`)) ?? (keys.length === 1 ? keys[0] : null)
+}
+function editionWords(page, family, lang, form) {
+  const key = editionKey(page, family)
+  const said = key ? EDITIONS?.[key]?.[`${form}_${lang}`] : null
+  if (!said) missing.add(`printed_transcription.editions ${key ?? `(no ${family ?? 'edition'} for ${page})`}.${form}_${lang}`)
+  return said ?? null
+}
+function translationLabel(kind, edition, lang, record, page) {
   if (kind === 'printed') return edition ? notice(['printed_translation', edition], lang) : null
+  if (EDITIONS) {
+    const template = notice(['ai_translation'], lang)
+    const short = editionWords(page, edition, lang, 'short')
+    return template && short ? template.replace('{edition}', short) : record?.label ?? null
+  }
   const name = edition ? editionName(edition, lang) : null
   const template = notice(['ai_translation'], lang)
   if (template && name) return template.replace('{edition}', name)
@@ -226,8 +259,9 @@ function translationLabel(kind, edition, lang, record) {
 /** The label over the Italian: the transcription it was printed in. Richter
  * prints the Italian beside his English, so his name stands under the
  * transcription's own word. */
-function italianLabel(edition, lang) {
-  const own = edition ? NOTICES.printed_transcription?.[edition]?.[lang] : null
+function italianLabel(edition, lang, page) {
+  if (EDITIONS) return editionWords(page, edition, lang, 'label')
+  const own = edition ? NOTICES.printed_transcription?.[edition]?.[lang] ?? KEYS_WRITTEN[LABEL_KEYS[edition]]?.[lang] : null
   if (own) return own
   const word = NOTICES.printed_transcription?.ravaisson?.[lang]?.replace(/:.*$/, '')
   const name = edition ? editionName(edition, lang) : null
@@ -269,6 +303,7 @@ const order = TOPICS.map(t => t.topic)
 for (const topic of new Set(SET.map(r => r.topic))) if (!order.includes(topic)) { order.push(topic); warn(`topic ${topic} is not in TOPICS.csv`) }
 
 function passagesOf(record) {
+  const page = record?.id
   return (record?.passages ?? []).map((p, index) => {
     const out = { index, ref: p.ref ?? null }
     // a passage whose every language is missing is a note that nothing was printed
@@ -277,13 +312,13 @@ function passagesOf(record) {
     if (p.placement) out.placement = p.placement
     const it = p.it?.text ? struck(p.it.text) : null
     const itEdition = editionOf(p.it?.edition)
-    out.it = it ? { text: it, label: { en: italianLabel(itEdition, 'en'), de: italianLabel(itEdition, 'de') } } : null
+    out.it = it ? { text: it, label: { en: italianLabel(itEdition, 'en', page), de: italianLabel(itEdition, 'de', page) } } : null
     for (const lang of ['en', 'de']) {
       const t = p[lang]
       if (!t?.text || t.kind === 'missing') { out[lang] = null; continue }
       const kind = t.kind === 'printed' ? 'printed' : 'ours'
       const edition = kind === 'printed' ? editionOf(t.edition) : editionOf(t.basis) ?? itEdition
-      out[lang] = { text: struck(t.text), kind, label: translationLabel(kind, edition, lang, t) }
+      out[lang] = { text: struck(t.text), kind, label: translationLabel(kind, edition, lang, t, page) }
       // what the translator could not settle goes on the record; `doubts` is
       // English on every block, so a German page shows only `doubts_de`,
       // and nothing where that is not written, never the English
@@ -475,7 +510,9 @@ for (const topic of order) for (const [at, row] of byTopic.get(topic).entries())
     picture: pictureOf(row.file),
     credit: row.credit_line,
     caption: caption ? { en: caption.en, de: caption.de } : null,
-    writing: row.text_class !== 'none' || (DENSITY.get(row.file) ?? 0) >= 1,
+    writing: row.text_class !== 'none' || (DENSITY.get(row.file) ?? 0) >= 1 || WRITTEN_UNPRINTED.has(row.id),
+    // its printed edition prints the drawing and no words for it
+    drawing_only: Boolean(BY_PAGE[row.id]?.transcription?.length) && BY_PAGE[row.id].en === 'none' && BY_PAGE[row.id].de === 'none',
     direction, hand: COPIES.has(row.id) ? 'copy' : 'his',
     spread: spreadOf(row),
     text_class: row.text_class,
@@ -567,6 +604,8 @@ if (gaps && !flag('--draft') && !flag('--check')) {
 
 const noticesOut = {
   no_words: { en: notice(['no_words'], 'en'), de: notice(['no_words'], 'de') },
+  // a page whose printed edition prints the drawing without words
+  no_words_drawing_only: { en: NOTICES.no_words_drawing_only?.en ?? null, de: NOTICES.no_words_drawing_only?.de ?? null },
   how_made: { en: notice(['how_the_words_were_made'], 'en'), de: notice(['how_the_words_were_made'], 'de') },
 }
 

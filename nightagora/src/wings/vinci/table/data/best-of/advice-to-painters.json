@@ -11,8 +11,8 @@
      "it": {
       "text": "PITTURA.\n\nLo ingiegnio del pittore vol essere a similitudine · dello · spechio ·, jl quale · senpre si trasmuta nel colore · di quella · cosa ch'eli à per obietto ·, e di tāte similitudini s'enpie · quāte sono le cose che li sono contraposte; Adūque conosciēdo · tu · pittore nō potere esser · bono · se nō sei · vniversale · maestro di cōtrafare · colla · tua · arte · tutte le qualità · delle · forme · che produce la natura, le quali nō saprai · fare, se nō le vedi ·, e ritenerle nella mēte; Onde andādo tu per cāpagnie · fa che 'l tuo givditio si uolti a vari obietti e di mano ī mano riguardare or questa cosa ora quell'altra, faciēdo vn fascio di uarie cose · elette e scielte infra le mē bone; E nō facci come alcuni pittori, i quali ·, stāchi colla lor fantasia, dismettono l'opera e fāno esercitio col andare · a sollazzo, riserbandosi vna stāchezza nella mente, la quale, nō cheveghino, non porgono ī mente · varie cose, ma spesse volte scontrādo li amici e parēti, essendo · da quelli salutati ·, nō che li vedino · o sentino, e non altrementi sono cognioscivti ·, come se vi scontrassino altre tāt'aria.",
       "label": {
-       "en": null,
-       "de": null
+       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. I",
+       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. I"
       }
      },
      "en": {
@@ -57,8 +57,8 @@
      "it": {
       "text": "DE' · 10 · OFITI DELL'OCHIO TUTTI APARTENENTI · ALLA · PICTURA.\n\nLa pictura s'astēde · in tutti i · 10 · ofiti dell'ochio · cioè · tenebre · luce corpo e colore · figura e sito · remotione · propīquita · moto · e quiete; de quali ofiti · sarà intessuta · questa mia piccola opera · ricordādo al pictore con che regola e modo debe imitare colla · sua arte tutte queste · cose, opera di natura e ornamēto del mōdo.",
       "label": {
-       "en": null,
-       "de": null
+       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. I",
+       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. I"
       }
      },
      "en": {
@@ -97,8 +97,8 @@
      "it": {
       "text": "COME IL PITTORE DEBE METTERE IN PRATICA LA PROSPETTIVA DE' COLORI.\n\nA volere · mettere questa · prospettiva del uariare e perdere over diminvire la propia · essētia de' colori · piglerai di ciēto ī ciento braccia cose poste īfra la cāpagnia come sono · albori case, omini e siti, e ī quāto al primo albore avrai uno uetro fermo bene e così sia fermo l'ochio tuo, e ī detto vetro disegnerai uno albero sopra la forma di quello, di poi scosta tāto per traverso che l'albero naturale · cōfini quasi col tuo disegniato; poi colorisci il tuo · disegnio in modo che per colore e forma stia a paragone l'uno dell'altro e che tutti e 2, chivdēdo uno ochio, paino dipīti sul detto vetro d'una medesima distātia; e questa regola medesima fa degli alberi secōdi e de' terzi di ciēto ī ciēto braccia di mano ī mano; e questi ti servā · come tua autori e maestri, sēpre operādo nelle tua opere doue s'appartēgono, e faranno bene fuggir l'opera; ma io trovo per regola · che'l secōdo diminviscie 4/5 del primo quādo fusse lōtano 20 · braccia dal primo.",
       "label": {
-       "en": null,
-       "de": null
+       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. I",
+       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. I"
       }
      },
      "en": {
@@ -109,7 +109,7 @@
      "de": {
       "text": "WIE DER MALER DIE PERSPEKTIVE DER FARBEN IN DIE PRAXIS UMSETZEN SOLL.\n\nWillst du diese Perspektive vom Wechsel, vom Verlust oder vom Schwinden des eigenen Wesens der Farben in die Praxis umsetzen, dann nimm dir alle hundert Braccia Dinge vor, die in der Landschaft stehen, wie Bäume, Häuser, Menschen und Orte. Vor den ersten Baum stellst du eine gut befestigte Glasscheibe, und ebenso fest halte dein Auge. Auf diese Scheibe zeichnest du einen Baum, genau über die Form jenes Baumes. Dann rücke so weit zur Seite, dass der wirkliche Baum fast an deine Zeichnung grenzt. Nun male deine Zeichnung so aus, dass beide sich in Farbe und Form die Waage halten und dass beide, wenn du ein Auge schließt, in derselben Entfernung auf die Scheibe gemalt scheinen. Nach derselben Regel verfahre mit dem zweiten und dem dritten Baum, von hundert zu hundert Braccia, einen nach dem anderen. Diese sollen dir als Vorbilder und Lehrmeister dienen, wann immer du an deinen Werken arbeitest, dort, wo sie hingehören, und sie lassen das Werk gut in die Tiefe fliehen. Ich finde aber als Regel, dass der zweite um 4/5 [?] gegenüber dem ersten abnimmt, wenn er 20 Braccia vom ersten entfernt ist.",
       "kind": "ours",
-      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Jean Paul Richter, 1883, Englisch vor allem von Mrs R. C. Bell). Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
       "doubts": [
        "'diminviscie 4/5 del primo' kann heißen, dass der zweite 4/5 des ersten verliert oder 4/5 davon behält; Richter liest 'is 4/5 of the first' (ist 4/5 des ersten), und seine Fußnote zitiert Ludwigs 'decreases by four fifths' (nimmt um vier Fünftel ab). Mit [?] markiert.",
        "'faranno bene fuggir l'opera' (sie lassen das Werk gut zurückweichen) übersetzt mit 'lassen das Werk gut in die Tiefe fliehen'; Richter: 'give due distance in those works'."
@@ -136,8 +136,8 @@
      "it": {
       "text": "MODO D'AUMĒTARE E DESTARE LO ĪGIEGNIO A VARIE ĪUĒTIONI.\n\nNō resterò però di mettere ītra questi precietti una nova īuētione di speculatione, · la quale · bēchè paia · piccola · e quasi degnia di riso, nōdimeno è di grāde vtilità · a destrare lo ingegno a varie invētioni, e questa · è · se tu riguarderai in alcuni mvri inbrattati di uarie machie o pietre di uari misti, se avrai a īuentionare qualche sito · potrai · lì · uedere similitudine di diuersi paesi, ornati di mōtagnie, fiumi, sassi, albori, pianvre, grādi valli e colli in diuersi modi, · ancora vi potrai vedere diuerse battaglie e atti prōti di figure ·, strane arie di uolti · e abiti · e infinite cose ·, le quali potrai ridurre in ītegra · e · bona · forma ·, e īterviene ī simili mvri e misti come del suono di cāpane · che ne' loro tochi vi troverai ogni nome e vocabolo che tu īmaginerai.",
       "label": {
-       "en": null,
-       "de": null
+       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. I",
+       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. I"
       }
      },
      "en": {
@@ -176,8 +176,8 @@
      "it": {
       "text": "DEL SERPEGGIARE E BILICO DELLE · FIGURE · E ALTRI ANIMALI.\n\nQualūque · figura · tu fai ·, o animale giētile, ricordati di fugire il legnioso, cioè ch'elle vadino · cōtrapesādo ossia bilāciando · in modo nō paia uno pezzo di legno; Quelli che vuoi figurare forti, nō li fare così, saluo il girare della testa.",
       "label": {
-       "en": null,
-       "de": null
+       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. I",
+       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. I"
       }
      },
      "en": {
@@ -222,8 +222,8 @@
      "it": {
       "text": "COME SI DEBBE PORRE ALTO IL PŪTO.\n\nIl pūto · debbe essere · alto · all'altezza · dell'occhio d'uno homo · comvnale, e l'ultimo della pianura che cōfina · col cielo · debbe · essere · fatto all'altezza d'esso termine della terra col cielo ·, saluo che le mōtagnie · che sono libere.",
       "label": {
-       "en": null,
-       "de": null
+       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. I",
+       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. I"
       }
      },
      "en": {
@@ -234,7 +234,7 @@
      "de": {
       "text": "WIE HOCH MAN DEN AUGENPUNKT SETZEN SOLL.\n\nDer Augenpunkt muss so hoch liegen wie das Auge eines Menschen von gewöhnlicher Größe. Und das Ende der Ebene, wo sie an den Himmel grenzt, muss auf der Höhe dieser Grenze zwischen Erde und Himmel gemacht werden, ausgenommen die Berge, die frei davon sind.",
       "kind": "ours",
-      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Jean Paul Richter, 1883, Englisch vor allem von Mrs R. C. Bell). Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
       "doubts": [
        "'all'altezza d'esso termine della terra col cielo' wird mit Richter als die Linie gelesen, wo Erde und Himmel sich treffen; 'esso' kann auch auf den Augenpunkt zurückweisen.",
        "'le mōtagnie che sono libere' (die Berge, die frei sind) übersetzt mit 'die frei davon sind'; Richter: 'which are independent of it'."
@@ -261,8 +261,8 @@
      "it": {
       "text": "MODO DI FIGURARE UNA BATTAGLIA.\n\nFarai prima il fumo dell'artiglieria, mischiato īfra l'aria · īsieme · colla polvere mossa dal movimēto de' cavalli e de' cōbattitori ·, la qual mistione · vserai così: la polvere perchè è · cosa · terrestre è pōderosa, e bēchè per la sua sottilità facilmēte si leva e mischia infra l'aria ·, niētedimeno volētieri ritorna · in basso; il suo sōmo mōtare è fatto dalla · parte · piv · sottile; Adūque lì meno fia veduta, e parrà quasi di colore d'aria ·; Il fumo che si mischia infra l'aria īpoluerata ·, quāto piv s'alza a certa · altezza, parirà oscura nuvola e vedrassi nelle sōmità piv espeditamente il fumo che la polvere; il fumo pēderà ī colore alquāto azzurro, e la polvere trarà al suo · colore ·; Dalla parte · che viene · il lume parrà questa mistione d'aria fumo e polvere molto · più · lucida · che dall'opposita parte; i cōbattitori quāto · piv fieno īfra detta turbulentia meno si vedrāno, e meno differētia fia dai lor lumi · alle loro · ōbre ·; Farai rosseggiare i volti e le persone e lor'aria, e li scoppettieri insieme cō vicini; E detto rossore quāto piv si parte dalla sua cagione piv si perde ·, e le figure che sono infra · te · e 'l lume, essēdo lōtane, parrāno scure in campo chiaro ·, e le loro gābe quāto piv s'appresserā alla terra mē fieno vedute, perchè la polvere è lì piv grossa e piv spessa: E se farai caualli corrēti fori della turba, fa li nvboletti di polvere distāti l'uno dall'altro, quāto può essere lo īteruallo de' salti fatti dal cavallo e quello nvvolo ·, ch'è · piv lontano da detto · cavallo, mē si uegga · anzi sia alto sparso · e raro ·, e 'l piv presso · sia piv euidēte e minore e piv dēso: L'aria sia · piena · di saettume di diverse ragioni: chi mōti ·, chi discēda, qual sia · per linia piana, e le pallotte delli scopietti sieno accōpagnate da alquāto · fumo dirieto al lor corso · e le prime figure farai poluerose ·, i capelli e ciglia e altri loghi piani atti a sostener la polvere; farai i vīcitori corrēti cō capegli, e altre cose leggiere, sparsi al uēto colle ciglia · basse",
       "label": {
-       "en": null,
-       "de": null
+       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. I",
+       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. I"
       }
      },
      "en": {
@@ -307,8 +307,8 @@
      "it": {
       "text": "DEL FIGURARE UNO CHE PARLI INFRA PIV PERSONE.\n\nVserai fare quello ·, che tu voi che infra molte persone parli, di considerare la materia di che lui · à da trattare: e d'accomodare ī lui · li atti apartenenti a essa materia, cioè · se l'è materia persuasiua · che li atti sieno al proposito, se l'è materia dichiaratatativa per diuerse ragioni, che quello che dice pigli per le dita della mano destra uno dito della sinistra avēdone serrate li 2 minori, e col viso prōto rivolto uerso il popolo colla bocca alquāto aperta che paia che parli; e, se lui sederà, che paia che si solleui alquāto ritto e ināzi colla testa ·, e se lo fai in piè ·, fa lo alquāto chinarsi col petto e la testa inuerso il popolo, Il quale figurerai tacito e attēto, tutti riguardare l'oratore ī uolto con atti · amiratiui, e fare le bocche d'alcuno vecchio per maraviglia delle vdite sentētie tenere la bocca coi sua stremi · bassi, tirarsi dirietro molte · pieghe delle guācie ·, e colle ciglia alte nelle giunture le quali creino molte pieghe per la fronte; alcuni sedenti colle dita della mano īsieme tessute tenersi dētro lo stāco ginochio; altri col'uno ginochio sopra l'altro, sul quale tēga la man, che dētro a se ricieva il gomito del quale la sua mano vada a sostener el mēto barbuto d'alcuno chinato vecchio.",
       "label": {
-       "en": null,
-       "de": null
+       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. I",
+       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. I"
       }
      },
      "en": {
@@ -347,8 +347,8 @@
      "it": {
       "text": "COME SI DEE FIGURARE UNA FORTUNA.\n\nSe tu uoi figurare una fortuna · cōsidera e poni bene i sua effetti; Quādo il uēto ·, soffiādo sopra la superfitie del mare e della · terra ·, rimove e porta cō seco quelle cose · che nō sono ferme colla vniuersale · massa, e per bē figurare · questa fortuna · farai ī prima li nuvoli spezzati e rotti dirizzarsi per lo corso del uēto ·, accōpagniati da l'arenosa polvere leuata da liti marini ·, e rami e foglie leuati per la potētia del furore del uēto sparse per l'aria: e ī conpagnia di quelle molte altre cose leggiere li alberi e l'erbe piegate a terra, quasi mostrarsi volere seguire il corso de' vēti coi rami storti fori del naturale corso e cō le scōpigliate e rouesciate foglie; gli omini che li si trouano parte caduti e rivolti per li panni e per la poluere, quasi sieno sconoscivti, e quelli che restano ritti sieno dopo qualche albero abbracciati a quello, perchè il uēto nō li strascini, altri colle mani alli ochi per la polvere chinati a terra ed i panni e capelli diritti al corso del uento; Il mare, turbato e tēpestoso, sia pieno di ritrosa schivma īfra l'eleuate ōde e 'l uēto levato īfra la cōbattuta aria della schivma piv sottile, a vso di spessa ed avviluppata nebbia: i navili, che dētro vi sono, alcuni se ne faccia colla vela rotta e i brani d'essa uētilādo īfra l'aria ī cōpagnia d'alcuna corda rotta, alcuni alberi rotti caduti col navilio intrauersato e rotto īfra le tēpestose ōde, cierti omini gridāti abbracciare il rimanēte del navilio, farai li nvuoli cacciati da l'īpetuosi venti, battuti nel'alte cime delle mōtagne e fare aquelli avviluppati, ritrosi, a similitudine dell'ōde percosse nelli scogli; l'aria spauētosa per le oscure tenebre fatte in nell'aria dalla poluere, nebbia e nvuoli folti.",
       "label": {
-       "en": null,
-       "de": null
+       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. I",
+       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. I"
       }
      },
      "en": {
@@ -393,8 +393,8 @@
      "it": {
       "text": "DELLA DISCRETIONE DEL'ONBRE DE' SITI E DELLE COSE POSTE Ī QUELLI.\n\nSe il sole fia · nel'oriēte e guarderai īuerso · occidēte · vedrai tutte le cose luminate essere īteramēte private d'ōbra perchè vedi ciò che vede 'l sole, e se riguardi a mezzodì e tramōtana · vedrai tutt'i corpi essere circūdati da ōbra · e lume perchè vedi quello che nō vede · e vede il sole e se riguarderai īverso il cāmino del sole, tutti i corpi ti mostreranno la loro parte av̄brata, perchè quella parte nō può essere veduta dal sole.",
       "label": {
-       "en": null,
-       "de": null
+       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. I",
+       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. I"
       }
      },
      "en": {
@@ -405,7 +405,7 @@
      "de": {
       "text": "VON DER UNTERSCHEIDUNG DER SCHATTEN NACH DEN HIMMELSRICHTUNGEN UND VON DEN DINGEN, DIE DARIN STEHEN.\n\nSteht die Sonne im Osten und du schaust nach Westen, so siehst du alle beleuchteten Dinge ganz ohne Schatten, denn du siehst, was die Sonne sieht. Schaust du nach Süden und Norden, so siehst du alle Körper von Schatten und Licht umgeben, denn du siehst das, was die Sonne nicht sieht, und das, was sie sieht. Und schaust du in die Richtung, aus der die Sonne kommt, zeigen dir alle Körper ihre beschattete Seite, denn diese Seite kann von der Sonne nicht gesehen werden.",
       "kind": "ours",
-      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Jean Paul Richter, 1883, Englisch vor allem von Mrs R. C. Bell). Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
       "doubts": [
        "'se riguardi a mezzodì e tramōtana ... vedi quello che nō vede · e vede il sole': wörtlich 'du siehst, was [die Sonne] nicht sieht und [was sie] sieht'; Richter glättet es zu 'both the side towards the sun and the side away from it'. Unser Deutsch behält die wörtliche Form.",
        "'īverso il cāmino del sole' (zum Weg der Sonne hin, also in die Sonne blickend); Richter: 'towards the coming of the sun'."
@@ -432,8 +432,8 @@
      "it": {
       "text": "COME L'ARIA SI DEBE PIV FARE CHIARA QUĀTO PIV LA FAI FINIRE BASSA.\n\nPerchè quest'aria è grossa presso alla terra · e quāto piv si leua piv s'assottiglia; quādo · il sole · è per leuāte, e tu riguarderai il ponēte participāte di mezzodì e tramōtana, vedrai quel'aria grossa ricievere piv lume dal sole che la sottile, perchè i razzi trovano più resistētia; e se il cielo a la vista tua terminerà colla bassa pianvra, quella parte vltima del cielo · fia veduta per quella aria · piv grossa e piv bianca, la quale · corromperà la verità del colore che si vedrà pel suo · mezzo, e parrà lì · il cielo piv biāco che sopra te, che la linia visuale passa · per meno quātità d'aria corrotta da grossi umori; e se riguarderai inverso · leuāte ·, l'aria ti parrà piv scura, quāto piv s'abbassa, perchè in detta aria bassa i razzi luminosi meno passano.",
       "label": {
-       "en": null,
-       "de": null
+       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. I",
+       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. I"
       }
      },
      "en": {
@@ -444,7 +444,7 @@
      "de": {
       "text": "WIE MAN DIE LUFT UMSO HELLER MACHEN MUSS, JE TIEFER MAN SIE ENDEN LÄSST.\n\nDenn diese Luft ist dicht nahe der Erde, und je höher sie steigt, desto dünner wird sie. Steht die Sonne im Osten und du schaust nach Westen, ein wenig nach Süden und Norden hin, so siehst du, dass jene dichte Luft mehr Licht von der Sonne empfängt als die dünne, weil die Strahlen dort mehr Widerstand finden. Und wenn der Himmel für dein Auge an der tiefen Ebene endet, wird dieser letzte Teil des Himmels durch jene dichtere und weißere Luft gesehen. Sie verdirbt die wahre Farbe dessen, was man durch sie hindurch sieht, und der Himmel erscheint dort weißer als über dir, wo die Sehlinie durch weniger Luft geht, die von dicken Dünsten getrübt ist. Und schaust du nach Osten, erscheint dir die Luft umso dunkler, je tiefer sie hinabreicht, denn durch diese tiefe Luft dringen die Lichtstrahlen weniger hindurch.",
       "kind": "ours",
-      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Jean Paul Richter, 1883, Englisch vor allem von Mrs R. C. Bell). Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
       "doubts": [
        "'participāte di mezzodì e tramōtana' (teilhabend an Süden und Norden) mit Richter gelesen als 'ein wenig nach Süden und Norden hin'.",
        "'quāto piv s'abbassa' (je tiefer sie geht) so übersetzt, dass die Luft tiefer hinabreicht; Richter: 'as you look lower down'."
@@ -471,8 +471,8 @@
      "it": {
       "text": "DEL MODO DEL FIGURARE UNA NOTTE.\n\nQuella cosa che è priuata īteramēte di luce è tutta tenebre; essendo la notte · ī simile cōditione se tu vi vogli figurare una storia farai · che, essēdovi uno grāde fuoco, che quella cosa ch'è più propīqua a detto fuoco piv si tīga nel suo colore ·, perchè quella cosa ch'è piv vicina all'obietto piv partecipa della sua · natura ·, e faciēdo · il foco pēdere ī color rosso farai tutte le cose ·, alluminate da quello, ancora loro rosseggiare, e quelle che sono piv lontane · a detto fuoco piv siē tīte dal colore nero della notte ·; le figure che sono tratte al fuoco · appariscono · scure nella chiarezza d'esso foco, perchè quella parte d'essa cosa che vedi · è tinta dalla oscurità della notte e nō dalla chiarezza del foco ·, e quelli che si trovano dai lati sieno mezzi oscuri · e mezzi rosseggiāti, e quelli che si possono vedere dopo e' termini delle fiāme · saranno tutti alluminati · di rosseggiāte lume ī cāpo nero ·; in quāto a li atti farai quelli che lì sono presso farsi scudo colle mani e cō mātelli riparo del superchio · calore · e torti col uolto ī cōtraria parte mostrare fugire quelli piv lōtani farai grā parte di loro farsi colle mani alli ochi, offesi dal superchio splēdore.",
       "label": {
-       "en": null,
-       "de": null
+       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. I",
+       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. I"
       }
      },
      "en": {
@@ -517,8 +517,8 @@
      "it": {
       "text": "FIGURATIONE DEL DILUVIO.\n\nL'aria era oscura per la spessa pioggia, la qual, con obbliqua disciesa, piegata dal trauersal corso de' vēti, facieva onde di se per l'aria, nō altramēti che farsi uegga alla poluere, ma sol si uariaua perchè tale inondatione era traversata dalli liniamēti che fanno le gocciole dell'acqua che disciēde; ma il colore suo era tinto dal fuoco, gienerato dalle saette fenditrici e squarciatricie delli nuvoli, e i vampi delle quali percuoteano e aprivano li grā pelaghi delle riēpiute valli, li quali aprimēti mostravano nelli lor vertici le piegate cime delle piante, e Nettuno si vedea in mezzo alle acque col tridēte e vedeasi Eolo colli sua vēti ravuilupare notāti piāte diradicate miste colle immēse ōde, l'orizzōte con tutto lo emisperio era turbo e focoso per li ricievuti vanpi delle continue saette, vedeasi li omini e vccielli che riēpievā di se li grandi alberi, che scoperti dalle dilatate onde cōponitrici delli colli, circūdatori delli grā baratri.",
       "label": {
-       "en": null,
-       "de": null
+       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. I",
+       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. I"
       }
      },
      "en": {
@@ -563,8 +563,8 @@
      "it": {
       "text": "COME LO SPECHIO È 'L MAESTRO DE' PITTORI.\n\nQuādo voi vedere ·, se la · tua · pittura · tutta īsieme à conformità colla cosa ritratta di naturale, abbi vno spechio · e favi dētro specchiare la cosa viua, e paragona la cosa · spechiata · colla tua pittura ·, e cōsidera bene se 'l subietto dell'una · e l'altra similitudine · à · cōfòrmità īsieme · e sopra tutto lo spechio; lo spechio si de' pigliare · per suo · maestro, cioè · lo spechio · piano, īpero · ch'ī sulla sua superficie · le cose ànno similitudine colla pittura ī molte parti; cioè tu vedi la pittura fatta sopra a uno piano dimostrare cose che paiono rilevate, e lo spechio sopra uno piano fa quel medesimo; · La pittura è vna sola superfitie e lo specchio quel medesimo ·; La pittura è īpalpabile ī quāto che quello che pare tōdo e spiccato nō si può circūdare colle mani, e lo spechio fa il simile; E se tu conosci che lo spechio per mezzo de liniamēti e ōbre e lumi ti fa parere le cose dispiccate e avēdo tu fra i tua colori l'ombre e lumi piv potēti che quelli dello spechio · cierto, se li saprai bē comporre īsieme, la tua pitura parrà ācora lei una cosa naturale vista ī vno grāde spechio.",
       "label": {
-       "en": null,
-       "de": null
+       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. I",
+       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. I"
       }
      },
      "en": {
@@ -603,8 +603,8 @@
      "it": {
       "text": "Noi sappiamo · bene che quello ·, che sarà pratico e bono, nō farà simili errori ·, anzi cō bone regole · andrà leuādo tanto poco per volta che bē cōducerà sua opera; · ācora lo scoltore, se fa di terra o ciera, può leuare e porre ·, e quādo è terminata · cō facilità · si gitta di brōzo ·, e questa è l'ultima operatione e la piv permanēte ch'abbi la scultura · Imperocchè quella ch'è sola di marmo è sottoposta alle rouine, e nō lo brōzo; adūque quella · pittura, fatta ī rame che si può, come dissi della pittura, levare e porre è pari al brōzo; che quādo facievi quell'opera prima di ciera, ancor si poteva leuare e porre; se questa scoltura di brōzo è eterna, questa di rame e di uetro è etternissima; se 'l brōzo rimane nero e brutto, questa è piena di uari e vaghi colori e d'infinite varietà, della quale com'è di sopra ·; e se tu volessi dire solamēte della pittura fatta ī tauola, di questa son io cōtēto dare la sētētia colla scultura, diciēdo così, come la pittura è piv bella e di piv fantasia e piv copiosa, è la scoltura piv durabile ·; altro nō à; la scoltura · cō poca fatica mostra quel che nella pittura · pare cosa miracolosa; a far parere palpabile cose īpalpabili, rileuate le cose piane, lontane le cose vicine; in effetto la pittura è ornata d'infinite speculationi che la scultura nō le adopera.",
       "label": {
-       "en": null,
-       "de": null
+       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. I",
+       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. I"
       }
      },
      "en": {
@@ -649,8 +649,8 @@
      "it": {
       "text": "DELLA PROSPETTIVA AEREA.\n\nÈ ci una altra · prospectiva · la quale chiamo aerea, īperochè per la uarietà dell'aria · si può conosciere le diverse distātie di uari edifiti, terminati ne' lor nascimēti da una sola linia, come sarebbe il uedere molti edifiti di là da uno muro, che tutti apparischino sopra alla stremità di detto mvro d'una medesima grādezza, e tu volessi in pittura · fare parere piv lontano l'uno che l'altro e da figurare una aria vn poco grossa; Tu sai che ī simili arie l'ultime cose viste ī quella, come sono le mōtagnie · per la grā quātità dell'aria · che si truova infra l'ochio tuo · e la mōtagnia · quella pare azzurra quasi del colore dell'aria quādo il sole è per leuāte; Adūque farai sopra · detto mvro il primo edificio del suo colore, il · piv lōtano fa lo meno profilato e piv azzurro; quello · che tu vuo che sia piv in là · altrettāto ·, fa lo · altrettāto · piv · azzuro: quello che voi che sia cīque volte piv lōtano ·, fallo · 5 volte più azzuro; e questa regola farà che li edifiti che sopra una linia paiono d'una · medesima grādezza, chiaramēte si conoscierà qual è piv distāte e quale è maggiore che li altri.",
       "label": {
-       "en": null,
-       "de": null
+       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. I",
+       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. I"
       }
      },
      "en": {
@@ -661,7 +661,7 @@
      "de": {
       "text": "VON DER LUFTPERSPEKTIVE.\n\nEs gibt noch eine andere Perspektive, die ich Luftperspektive nenne, denn an den Unterschieden der Luft kann man die verschiedenen Entfernungen verschiedener Gebäude erkennen, die unten an einer einzigen Linie enden. So ist es, wenn man viele Gebäude jenseits einer Mauer sieht, die alle über dem Rand dieser Mauer gleich groß erscheinen, und du willst im Gemälde das eine weiter entfernt erscheinen lassen als das andere und eine etwas dichte Luft darstellen. Du weißt, dass in solcher Luft die fernsten Dinge, die man durch sie sieht, wie die Berge, wegen der großen Menge Luft zwischen deinem Auge und dem Berg blau erscheinen, fast in der Farbe der Luft, wenn die Sonne im Osten steht. Also mach über dieser Mauer das erste Gebäude in seiner eigenen Farbe, das entferntere mach weniger scharf umrissen und blauer. Das, von dem du willst, dass es noch einmal so weit dahinter liegt, mach noch einmal so blau. Das, was fünfmal weiter entfernt sein soll, mach fünfmal blauer. Und diese Regel bewirkt, dass man bei den Gebäuden, die über einer Linie gleich groß erscheinen, klar erkennt, welches weiter entfernt und welches größer ist als die anderen.",
       "kind": "ours",
-      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Jean Paul Richter, 1883, Englisch vor allem von Mrs R. C. Bell). Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
       "doubts": [
        "'terminati ne' lor nascimēti da una sola linia' (an ihrem Ansatz von einer einzigen Linie begrenzt) übersetzt mit 'die unten an einer einzigen Linie enden'; Richter: 'which appear placed on a single line'.",
        "'ī simili arie' (in solcher Luft) übersetzt mit 'in solcher Luft'; Richter liest 'in an atmosphere of equal density' (in einer Luft von gleicher Dichte).",
@@ -689,8 +689,8 @@
      "it": {
       "text": "DEL RITRARE.\n\nQual è meglio o ritrare di naturale o d'ātico, o qual è piv fatica o i proffili o l'onbra · e' lumi?",
       "label": {
-       "en": null,
-       "de": null
+       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. I",
+       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. I"
       }
      },
      "en": {
@@ -701,7 +701,7 @@
      "de": {
       "text": "VOM ZEICHNEN.\n\nWas ist besser, nach der Natur zu zeichnen oder nach der Antike? Und was ist mühsamer, die Umrisse oder Schatten und Lichter?",
       "kind": "ours",
-      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Jean Paul Richter, 1883, Englisch vor allem von Mrs R. C. Bell). Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
       "doubts": [
        "'ritrare' (abbilden, nach einem Vorbild zeichnen) übersetzt mit 'zeichnen'; 'i proffili o l'onbra e' lumi' mit 'die Umrisse oder Schatten und Lichter', wie bei Richter."
       ]
@@ -727,8 +727,8 @@
      "it": {
       "text": "COME IL PITTORE NON È LAUDABILE SE QUELLO NON È UNIVERSALE.\n\nD'alcuni · si può chiaramēte dire · che si ingānano ·, i quali chiamano bono maestro quello pittore, jl quale sol fa bene · una testa · o vna · figura: Cierto non è grā fatto · che studiādo una sola cosa · il tēpo · della · sua vita · che non vēghi a qualche perfectione ·, ma conosciēdo noi · che la · pittura · abraccia e contiene · in se · tutte le cose che produce la natura ·, e che cōduce l'accidētale operatione delli omini e in vltimo · ciò che si può cōprendere cogli ochi, mi pare uno tristo maestro quello · che solo una figura fa bene: Or nō vedi tu quāti e quali atti sieno solo facti da li omini · Nō vedi quāti diuersi animali e così albori, erbe, fiori, varietà di siti mōtuosi e piani ·, fōti, fiumi ·, città, edifiti publici e privati, strumēti opportuni all'vso vmano ·, vari abiti e ornamēti · e arti; tutte queste cose appartēgono d'essere di pari operazione e bontà vsate da quello che tu vogli chiamare bō pittore.",
       "label": {
-       "en": null,
-       "de": null
+       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. I",
+       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. I"
       }
      },
      "en": {
@@ -773,8 +773,8 @@
      "it": {
       "text": "PITTURA.\n\nLi omini e le parole son fatti, e tu pittore nō sapiēdo adoperare le tue figure, tu se' come l'oratore che nō sa adoperare le parole sue.",
       "label": {
-       "en": null,
-       "de": null
+       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. I",
+       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. I"
       }
      },
      "en": {
@@ -819,8 +819,8 @@
      "it": {
       "text": "PERCHÈ DI 2 COSE DI PARI GRĀDEZZA PARRÀ MAGGIORE LA DIPĪTA CHE QUELLA DI RILIEUO.\n\nQuesta · ragione · nō fia di facile dimostratione · come molte altre, ma pure m'īgiegnierò di sadisfare, se nō in tutto, in qualche parte; la prospettiva diminvita · ci dimostra per ragione ·, che le cose quāto · piv alōtanono dal'ochio piv diminviscono ·, e queste ragioni bē sono cōferme dalla · esperiēza; adūque · le linie visuali che si trouano īfra l'obietto · e l'occhio ·, quādo s'astēdono alla superfitie della · pittura ·, tutte si tagliano · a uno medesimo termine; E le linie che si truovano īfra l'ochio · e la scoltura · sono di uari termini e lūghezze: quella linia ch'è piv · lūga · s'astēde sopra uno mēbro piv · lōtano che li altri e però quel mēbro pare minore ·, essēdoui molte linie più lūghe che l'altre, e per cagione che le molte particule piv lōtane l'una che l'altra essēdo piv lontane, cōuiene che apparischino minori, apparēdo minori, vēgono a fare per loro diminvire minore tutta la sōma dello obietto; E questo nō accadēdo nella pittura per le linie terminate a vna medesima distātia cōuiene che sieno sāza diminvtione; adūque le particule nō diminvite · nō diminviscono · la sōma dello obbietto, e per questo nō diminuiscie la pittura come la scoltura.",
       "label": {
-       "en": null,
-       "de": null
+       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. I",
+       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. I"
       }
      },
      "en": {
@@ -831,7 +831,7 @@
      "de": {
       "text": "WARUM VON ZWEI DINGEN GLEICHER GRÖSSE DAS GEMALTE GRÖSSER ERSCHEINT ALS DAS PLASTISCHE.\n\nDiese Begründung ist nicht so leicht zu beweisen wie viele andere, doch will ich versuchen, ihr Genüge zu tun, wenn nicht ganz, so doch zum Teil. Die Perspektive der Verkleinerung zeigt uns mit Gründen, dass die Dinge umso kleiner werden, je weiter sie sich vom Auge entfernen, und diese Gründe werden von der Erfahrung gut bestätigt. Die Sehlinien zwischen dem Gegenstand und dem Auge werden also, wenn sie bis zur Fläche des Gemäldes reichen, alle an derselben Grenze geschnitten. Die Linien zwischen dem Auge und der Skulptur aber haben verschiedene Enden und Längen: Die längere Linie reicht zu einem Glied, das weiter entfernt ist als die anderen, und darum erscheint dieses Glied kleiner. Da es viele Linien gibt, die länger sind als die anderen, und da die vielen Teile, einer weiter entfernt als der andere, weiter weg liegen, müssen sie kleiner erscheinen. Und indem sie kleiner erscheinen, lassen sie durch ihre Verkleinerung die ganze Masse des Gegenstandes kleiner werden. Beim Gemälde geschieht das nicht, weil die Linien dort in derselben Entfernung enden, und so kann es keine Verkleinerung geben. Die nicht verkleinerten Teile verkleinern also die Masse des Gegenstandes nicht, und darum wird das Gemälde nicht kleiner, wie es die Skulptur wird.",
       "kind": "ours",
-      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Jean Paul Richter, 1883, Englisch vor allem von Mrs R. C. Bell). Sie kann Fehler enthalten.",
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
       "doubts": [
        "'la prospettiva diminvita' (die verkleinernde Perspektive) übersetzt mit 'die Perspektive der Verkleinerung', wie Richter ('the perspective of diminution').",
        "'tutte si tagliano · a uno medesimo termine' (alle werden an ein und derselben Grenze geschnitten): Richter 'intersected at uniform limits'; wörtlich beibehalten."
@@ -858,8 +858,8 @@
      "it": {
       "text": "COME LA PITTURA AVĀZA TUTTE L'OPERE VMANE PER SOTTILE SPECULATIONI APPARTENENTI · A QUELLA.\n\nL'occhio · che si dice finestra dell'anima è la prīcipale · via, dōde il comvne · sēso può piv copiosa- e magīficamēte · cōsiderare · le īfinite opere di natura ·, e l'orechio è il secōdo il quale si fa nobile · per le cose racōte, le quali à veduto l'ochio ·; se uoi istoriografi o poeti · o altri mattematici nō ui aveste col'ochio viste le cose, male le potreste riferire per le scritture, e se tu poeta figurerai · una storia colla pittura della penna, el pittore col pennello la farà di piv facile sadisfatione e mē tediosa a essere cōpresa: se tu dimāderai la pittura muta poesia, ācora il pittore potrà dire del poeta · orba pittura ·; or guarda quale è più dannoso morbo o cieco o mvto; se 'l poeta è libero come 'l pittore nelle īuētioni, le sua fintioni · nō sono di tāta sadisfatione ali omini quāto le pitture, perchè se la poesia s'astēde colle parole a figvrare forme, atti e siti, il pittore si move colle propie similitudini delle forme a cōtrafare esse forme; or guarda qual'è piv propīquo all'omo · o 'l nome d'omo o la similitudine d'esso omo; il nome dell'omo si uaria ī uari paesi e la forma non è mvtata se nō da morte.",
       "label": {
-       "en": null,
-       "de": null
+       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. I",
+       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. I"
       }
      },
      "en": {

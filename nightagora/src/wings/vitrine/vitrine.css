@@ -164,7 +164,11 @@
 .vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-name {display:inline-flex;margin:0 12px 0 0;vertical-align:middle;}
 .vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-seat {display:inline-flex;margin:0;vertical-align:middle;}
 .vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-seat[hidden] {display:none;}
-.vitrine[data-peek='true']:has(.reader[data-lined='true']) .vitrine-line {display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;}
+.vitrine[data-peek='true']:has(.reader[data-lined='true']) .vitrine-line {display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;margin-bottom:4px;}
+/* at the peek the count stands beside the name; the folio rises with the card */
+.vitrine[data-peek='true']:has(.reader[data-lined='true']) .vitrine-seat-words {display:none;}
+.vitrine[data-peek='true']:has(.reader[data-lined='true']) .vitrine-note {margin:0 0 2px;font-size:12px;line-height:1.35;}
+.vitrine[data-peek='true']:has(.reader[data-lined='true']) .vitrine-name {margin-bottom:0;}
 .vitrine[data-narrow='true'][data-fill='true'] .vitrine-card {background:#0d171ff5;}
 
 /* THE ONE LINE UNDER A PAGE is read over paper as often as over dark: the

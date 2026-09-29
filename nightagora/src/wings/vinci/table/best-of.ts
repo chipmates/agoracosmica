@@ -40,6 +40,8 @@ export interface BestOfPage {
   caption: BestOfWords | null
   /** the page carries writing, so the mirror is a way of reading it */
   writing: boolean
+  /** its printed edition prints the drawing and no words for it */
+  drawing_only: boolean
   text_class: string
   /** which kinds of words the page has in each language, or null for none */
   words: { en: string | null; de: string | null; it: boolean } | null
@@ -95,12 +97,13 @@ export interface BestOfPageTexts { lead: number | null; passages: readonly BestO
 
 /** The room's new words, by key, null until the words pass writes them. */
 export type BestOfKey = 'next_topic' | 'previous_topic' | 'full_text' | 'full_record' | 'ai_short' | 'italian' | 'the_page'
-  | 'mirror_ordinary' | 'mirror_plate' | 'kind_leaf' | 'kind_plate' | 'kind_facsimile' | 'topic_pages'
+  | 'mirror_ordinary' | 'mirror_plate' | 'kind_leaf' | 'kind_plate' | 'kind_facsimile' | 'topic_pages' | 'topic_count'
   | 'absence_paris_rest' | 'absence_ashburnham' | 'absence_arundel_middle'
 interface BestOfIndex {
   draft: boolean
   keys: Record<BestOfKey, BestOfWords | null>
-  notices: { no_words: { en: string | null; de: string | null }; how_made: { en: string | null; de: string | null } }
+  notices: { no_words: { en: string | null; de: string | null }; no_words_drawing_only: { en: string | null; de: string | null }
+    how_made: { en: string | null; de: string | null } }
   topics: BestOfTopic[]
   pages: BestOfPage[]
 }
