@@ -1,15 +1,18 @@
 /** THE FAREWELL AT THE GRAVE: the eye stays where the visitor stands and looks
  * up into the sky, as the lobby's own look up does, while the afternoon runs
- * on to sunset, the blue hour and the first stars.
+ * on to sunset, the blue hour and the night.
  *
  * The sun keeps the day's own hours and its own place in the sky: 10 October
- * 1517 at Amboise, from the hour the wing stands in to nautical dusk, its
+ * 1517 at Amboise, from the hour the wing stands in to astronomical night, its
  * height computed from the site's latitude and the day's own noon, which
  * reproduces the ephemeris rows in `data/light-rig.json` to a few hundredths
  * of a degree. It sets at 255.6 deg, west-south-west, behind the court's back
- * wall and its trees. The light, the sky's twilight and the stars are scenic
+ * wall and its trees. The light and the sky's twilight stay scenic
  * assumptions, as the rig's night rule says of every twilight: a type of an
- * October evening, not a record of that one.
+ * October evening, not a record of that one. The stars are the record: the
+ * sky over Clos Lucé at 21:00 local apparent time on the day, held fixed
+ * while the evening runs (`farewell-night.ts`); the Milky Way is drawn after
+ * the real one.
  */
 import { Vector3 } from 'three/webgpu'
 import { hourKey } from './site'
@@ -22,7 +25,8 @@ const NOON_ELEVATION_DEG = 32.36
 const DECLINATION_DEG = NOON_ELEVATION_DEG - 90 + LATITUDE_DEG
 /** The wing's own hour, and the evening the farewell runs to. */
 export const FAREWELL_FROM_HOUR = (hourKey as unknown as { lat_hour?: { value: number } }).lat_hour?.value ?? 15 + 19 / 60
-export const FAREWELL_TO_HOUR = 18.45
+/** the sun eighteen degrees under: astronomical night */
+export const FAREWELL_TO_HOUR = 19.035
 
 /** The sun at a local apparent hour of the day: azimuth clockwise from north,
  * elevation above the horizon, in degrees. */
@@ -70,23 +74,27 @@ function monotone(knots: readonly (readonly [number, number])[], x: number): num
   return (2 * t3 - 3 * t2 + 1) * knots[i]![1] + (t3 - 2 * t2 + t) * h[i]! * m[i]! + (-2 * t3 + 3 * t2) * knots[i + 1]![1] + (t3 - t2) * h[i]! * m[i + 1]!
 }
 
-/** THE FAREWELL'S CLOCK. The look up takes its first second and a half; the
- * sky then carries the evening on through one continuous run of the hour. */
-export const FAREWELL_SECONDS = 18
-/** The stars held a breath before the lobby takes the visitor home, the last
- * of it a dip of the print so the lobby's own night comes in on a cut. The
+/** THE FAREWELL'S CLOCK. The afternoon is spent while the eye looks up; the
+ * sky then carries the evening on through one continuous run of the hour, and
+ * the night gets the time a blue afternoon had. */
+export const FAREWELL_SECONDS = 13
+/** The full night held before the lobby takes the visitor home, the last of
+ * it a dip of the print so the lobby's own night comes in on a cut. The
  * film's evening is rendered to the same length (`forge/film/evening.mjs`). */
-export const FAREWELL_REST = 2
+export const FAREWELL_REST = 3.5
 export const FAREWELL_DIP = .8
+/** The shooting star, the museum's own, in the held night: seconds from the
+ * run's start. */
+export const FAREWELL_METEOR = 14.3
 const sec = (seconds: number): number => seconds / FAREWELL_SECONDS
 /** The hour at a share of the farewell, through keys set by the sun's height:
- * the afternoon while the eye looks up (12 degrees), the golden light on the
- * crowns (5), the sun at the hill (1), the rose afterglow on the clouds
- * (3 under), the blue hour with the first stars (7.5 under) and nautical dusk.
- * From inside the court the walls hide the disc and the horizon, so the
- * sunset is the sky's and the clouds' colour, and the afterglow gets the
- * longest share. */
-const HOUR_KEYS = [[0, FAREWELL_FROM_HOUR], [sec(2.5), 16], [sec(5), 16.75], [sec(8), 17.15], [sec(11.5), 17.55], [sec(14.5), 18], [1, FAREWELL_TO_HOUR]] as const
+ * the tilt lands with the crowns already gold (8 degrees), the sun at the
+ * hill (1), the rose afterglow and the first star (3 under), the blue hour
+ * and the bright stars (7.5 under), nautical dusk and the field (12 under),
+ * astronomical night and the Milky Way (18 under). From inside the court the
+ * walls hide the disc and the horizon, so the sunset is the sky's and the
+ * clouds' colour. */
+const HOUR_KEYS = [[0, FAREWELL_FROM_HOUR], [sec(1.2), 16.41], [sec(3.4), 17.143], [sec(5.3), 17.549], [sec(7.4), 17.999], [sec(9.6), 18.444], [1, FAREWELL_TO_HOUR]] as const
 export function farewellHour(share: number): number {
   return monotone(HOUR_KEYS, Math.max(0, Math.min(1, share)))
 }
@@ -185,20 +193,21 @@ export function farewellLight(elevation: number): FarewellLight {
 
 /** THE LOOK UP, in seconds of the farewell's clock: the eye stays where it
  * stands, keeps its heading and its lens, and tilts up from its own pitch.
- * The tilt takes about the lobby's second and a half (from `from` to the
+ * The tilt starts at the press and lands in the lobby's second or so (the
  * first key); the gaze then keeps rising slowly into the sky while the stars
  * come out, so the grave's board has left the frame before its light is the
- * brightest thing in it. From the grave the view stands on the back wall's
- * filter band with the tall elm over it, and the evening's glow on the left:
- * no turn is needed. */
+ * brightest thing in it, and ends where the Milky Way stands over the elm's
+ * crown. From the grave the view stands on the back wall's filter band with
+ * the tall elm over it, and the evening's glow on the left: no turn is
+ * needed. */
 export interface FarewellLook { from: number; pitch: readonly (readonly [number, number])[] }
 export const FAREWELL_LOOK: { desktop: FarewellLook; phone: FarewellLook } = {
-  desktop: { from: .2, pitch: [[1.6, 31], [FAREWELL_SECONDS, 42]] },
-  phone: { from: .2, pitch: [[1.6, 36], [FAREWELL_SECONDS, 48]] },
+  desktop: { from: 0, pitch: [[1.2, 32], [FAREWELL_SECONDS, 49]] },
+  phone: { from: 0, pitch: [[1.35, 37], [FAREWELL_SECONDS, 53]] },
 }
 
 /** A heading clockwise from north and a pitch, as a direction in the engine. */
-function along(heading: number, pitch: number, out: Vector3): Vector3 {
+export function along(heading: number, pitch: number, out: Vector3): Vector3 {
   const h = heading * RAD, p = pitch * RAD
   return out.set(Math.sin(h) * Math.cos(p), Math.sin(p), -Math.cos(h) * Math.cos(p))
 }
@@ -211,7 +220,9 @@ export function farewellPose(share: number, start: { eye: Vector3; at: Vector3; 
   const look = FAREWELL_LOOK[phone ? 'phone' : 'desktop']
   const t = Math.max(0, Math.min(1, share)) * FAREWELL_SECONDS
   const d0 = start.at.clone().sub(start.eye), pitch0 = pitchOf(d0)
-  const dir = along(headingOf(d0), monotone([[0, pitch0], [look.from, pitch0], ...look.pitch], t), new Vector3())
+  // a tilt from the press itself starts level from the spline's own end: a second knot at 0 would divide by zero
+  const hold: (readonly [number, number])[] = look.from > 0 ? [[0, pitch0], [look.from, pitch0]] : [[0, pitch0]]
+  const dir = along(headingOf(d0), monotone([...hold, ...look.pitch], t), new Vector3())
   const eye = start.eye.clone()
   return { eye, at: eye.clone().addScaledVector(dir, 10), fov: start.fov }
 }
