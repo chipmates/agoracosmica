@@ -115,6 +115,15 @@
   font-variant-numeric: normal;
 }
 #wing[data-desk~='closelook'] .desk-clb .desk-name[data-catalogue='true'] .desk-count::before { content: none; }
+#wing[data-desk~='closelook'] .desk-clb .desk-name[data-place='true'] { flex-wrap: wrap; row-gap: 0; }
+#wing[data-desk~='closelook'] .desk-clb .desk-name[data-place='true'] .desk-chapter { white-space: nowrap; }
+#wing[data-desk~='closelook'] .desk-clb .desk-name[data-wrapped='true'] .desk-count {
+  flex: 1 0 100%;
+  margin: -2px 0 0;
+  padding-left: 29px;
+  line-height: 1.375rem;
+}
+#wing[data-desk~='closelook'] .desk-clb .desk-name[data-wrapped='true'] .desk-count::before { content: none; }
 /* THE LINE HOLDS TWO ROWS FREE in every language and takes a third where a
    language needs one: the band grows by that one row and the stage gives it
    back, which is the only case in which a close look moves the picture. */

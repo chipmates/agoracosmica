@@ -313,6 +313,13 @@ export function createCloseLookBand(options: {
         : '')
       count.textContent = entry ? entry.where : place
       count.hidden = !count.textContent
+      // a page's name, folio and count share one row where they fit, and the
+      // count takes a second row of its own where they do not
+      nameRow.dataset['place'] = String(Boolean(!entry && next.set?.seat))
+      delete nameRow.dataset['wrapped']
+      requestAnimationFrame(() => {
+        if (nameRow.dataset['place'] === 'true' && !count.hidden && count.offsetTop > title.offsetTop + 4) nameRow.dataset['wrapped'] = 'true'
+      })
       line.textContent = next.line ?? ''
       line.hidden = !next.line
       line.lang = language
