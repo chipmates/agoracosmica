@@ -436,7 +436,17 @@ export function buildGraph(wing, { wall: wallRuns = 'both' } = {}) {
 function eveningOf(wing, byId) {
   let farewell
   try { farewell = wing.loader.load(`${WING_DIR}/farewell.ts`) } catch { return null }
-  const { FAREWELL_SECONDS: run, FAREWELL_REST: rest, FAREWELL_DIP: dip } = farewell
+  /* its length is the farewell module's own: the run and the stars' hold
+     before the lobby (the hold and the closing dip read from the index where
+     a farewell keeps them there), never a number of the film's */
+  const own = (name) => {
+    if (typeof farewell[name] === 'number') return farewell[name]
+    let text = ''
+    try { text = wing.loader.text(`${WING_DIR}/index.ts`) } catch { return undefined }
+    const hit = new RegExp(`\\b${name}\\s*=\\s*([0-9]*\\.?[0-9]+)`).exec(text)
+    return hit ? Number(hit[1]) : undefined
+  }
+  const run = own('FAREWELL_SECONDS'), rest = own('FAREWELL_REST'), dip = own('FAREWELL_DIP')
   const from = byId.get(stopId(EVENING_STOP))
   if (!(run > 0) || !(rest >= 0) || !(dip >= 0) || !from) return null
   const seconds = run + rest

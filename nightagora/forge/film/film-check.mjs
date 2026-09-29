@@ -299,7 +299,7 @@ export function checkRelease(store, tree, { calm = null, motion = null } = {}) {
     if (now.kind === 'evening') {
       /* THE EVENING opens on the grave's still, is the farewell's own track,
          and is let go without the lobby; its drawn set may change on the
-         rise and its end is the dark, so neither is held to a still */
+         way and its end is the dark, so neither is held to a still */
       const from = sidecars.get(`${now.from} ${now.framing}`) ?? read(held.get(`${now.from} ${now.framing}`)?.sidecar ?? '')
       const verdict = joinVerdict({ end: sidecar.joins?.first, still: from?.raw, clipSession: entry.session, stillSession: held.get(`${now.from} ${now.framing}`)?.session, gap: entry.joinGaps?.first })
       if (!verdict.holds) red(L.joins, at, `frame 0 is not the still of ${now.from}: ${verdict.why}`)

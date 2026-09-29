@@ -40,7 +40,7 @@ export function eveningTrack(wing, graph, framingName) {
   rail.update()
   const sample = () => [...camera.position.toArray(), ...camera.quaternion.toArray(), camera.fov]
   const prints = [camPrint(camera)], samples = [sample()]
-  // the rise starts from the eye as it stands, the stop's own lens unfitted (`lookUp()`)
+  // the farewell starts from the eye as it stands, the stop's own lens unfitted (`lookUp()`)
   const ahead = camera.getWorldDirection(new THREE.Vector3())
   const start = { eye: camera.position.clone(), at: camera.position.clone().addScaledVector(ahead, 10), fov: wing.rail.stationPose(node.station, phone).fov }
   for (let i = 1; i < ev.frames; i++) {
@@ -68,9 +68,7 @@ async function main() {
   for (const f of flags.has('framing') ? [String(flags.get('framing'))] : Object.keys(FRAMINGS)) {
     const t = eveningTrack(replay.wing, graph, f)
     out[f] = { key: t.key, prints: t.prints }
-    const at = (i) => t.prints[i].split(',').map(Number)
-    const rise = Math.max(...t.prints.map((p) => Number(p.split(',')[1]))) - at(0)[1]
-    console.log(`${f}: ${t.prints.length} frames at ${graph.evening.fps} fps, key ${t.key.slice(0, 12)}; frame 0 ${t.prints[0]}; the eye rises ${rise.toFixed(2)} m; the last ${t.prints.at(-1)}`)
+    console.log(`${f}: ${t.prints.length} frames at ${graph.evening.fps} fps, key ${t.key.slice(0, 12)}; frame 0 ${t.prints[0]}; the last ${t.prints.at(-1)}`)
   }
   if (flags.has('out')) writeFileSync(String(flags.get('out')), JSON.stringify({ evening: graph.evening, tracks: out }, null, 1))
 }

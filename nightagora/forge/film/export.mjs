@@ -895,10 +895,10 @@ export async function exportClip(session, inbox, edge, nodes, track, out, opts) 
   }
 }
 
-/** THE RISE PASSES THINGS THE DEPTH'S TENTH MISSES: the court's floating
-    leaves, the crowns and the coping go by within a metre or two of the
-    climbing eye, so the evening's walk is counted against this depth at most,
-    or its shutter shows them as a ladder of separate draws */
+/** THE EVENING'S EYE PASSES THINGS THE DEPTH'S TENTH MISSES: thin things
+    (the court's floating leaves, the crowns, the coping) can go by within a
+    metre or two, so the evening's motion is counted against this depth at
+    most, or its shutter shows them as a ladder of separate draws */
 export const EVENING_NEAR_M = 2
 /**
  * THE EVENING AT THE GRAVE (`graph.mjs` eveningOf): the grave's still, then
@@ -989,7 +989,7 @@ export async function exportEvening(session, inbox, graph, track, out, opts) {
     requestsAfterClock: late.length, lateRequests: late.slice(0, 6), chromeImagesAfterClock: session.record.chrome.length - chromeBefore,
     starvedSteps: (await page.evaluate(() => window.__pre.starved())) - starvedBefore, pageErrors: session.record.errors.length - errorsBefore,
     pendingAtRest, paintedOverCanvas, casters: armed.casters, settledIn: frames[0].settledIn,
-    // the evening sees what no walk sees: its drawn set may change on the rise, which no join depends on
+    // the evening sees what no walk sees: its drawn set may change on the way, which no join depends on
     mountedSetChanges: signatures.size - 1, mount: { rule: opts.mount, held: opts.mount === 'held' ? opts.held : null, drawnFirst: frames[0].mounted.meshes, drawnLast: frames[frames.length - 1].mounted.meshes },
     letGo: still, refused: refusal,
     draws: frames.reduce((s, f) => s + f.draws, 0), over: frames.filter((f) => f.over).length,

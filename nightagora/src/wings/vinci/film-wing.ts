@@ -682,8 +682,7 @@ export function createWing(): WingModule {
 
   /* ---- the grave's look up ---- */
   /** THE EVENING, as the live wing's `lookUp()` plays it: the chrome fades,
-      the eye rises over the house, the sun sets, the stars hold, the print
-      dips, then the lobby. False where it cannot play (reduced motion, a
+      the farewell plays as the film recorded it, then the lobby. False where it cannot play (reduced motion, a
       close look open, not at rest where it begins, a release without it):
       the caller goes home as before. */
   function lookUp(): boolean {

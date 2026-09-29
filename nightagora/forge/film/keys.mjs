@@ -57,15 +57,17 @@ const GLOBAL_DECLARATIONS = ['PRINT', 'SHADOW', 'KEY_RIG', 'buildTheHouse']
 const GLOBAL_WING_FILES = ['display-sky-haze.ts', 'static-shadow-cache.ts', 'shadow-shell.ts', 'shadow-body.ts',
   'receiver-plane-shadow.ts', 'data/light-rig.json', 'site.ts'].map((f) => `${WING_DIR}/${f}`)
 
-/** Named declarations of a source, by their text, wherever they stand. */
+/** Named declarations of a source, by their text, wherever they stand
+    (`names` a list, or a test of a name). */
 export function declarations(text, names) {
+  const wanted = typeof names === 'function' ? names : (n) => names.includes(n)
   const source = ts.createSourceFile('index.ts', text, ts.ScriptTarget.ES2022, true)
   const found = new Map()
   const visit = (node) => {
     let name
     if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name)) name = node.name.text
     else if ((ts.isFunctionDeclaration(node)) && node.name) name = node.name.text
-    if (name && names.includes(name) && !found.has(name)) found.set(name, node)
+    if (name && wanted(name) && !found.has(name)) found.set(name, node)
     ts.forEachChild(node, visit)
   }
   visit(source)
@@ -153,12 +155,21 @@ export function globalKey(loader, { library = [], claimed = new Set() } = {}) {
 
 /** THE EVENING'S OWN LIGHT, which no global input names: the farewell's
     modules and the index's functions that run it and meter its print. */
+/* THE EVENING'S CODE, found rather than listed where it can be: the farewell's
+   modules and every module the index imports by an evening's name, with their
+   closures, and the index's declarations named for it, so a farewell written
+   anew moves the key without an edit here */
 const EVENING_FILES = [`${WING_DIR}/farewell.ts`, `${WING_DIR}/farewell-sky.ts`]
 const EVENING_DECLARATIONS = ['applyEvening', 'farewellExposure', 'farewellDip', 'holdFarewell', 'lookUp', 'runFarewell', 'endFarewell', 'cloudLit', 'cloudShade']
+const EVENING_NAME = /farewell|evening|look-?up|sunset|stars/i
 export function eveningCode(loader) {
   const parts = {}
-  for (const entry of EVENING_FILES) for (const file of closure(loader, entry, 'src/')) parts[file] = short(loader.text(file))
-  const held = declarations(declaringText(loader), EVENING_DECLARATIONS)
+  const exists = (file) => { try { loader.text(file); return true } catch { return false } }
+  const index = exists(INDEX_FILE) ? loader.text(INDEX_FILE) : ''
+  const imported = [...index.matchAll(/^\s*import\s+(?!type\b)[^'"]*?from\s+'\.\/([^']+)'/gm)].map((m) => m[1]).filter((m) => EVENING_NAME.test(m))
+    .map((m) => `${WING_DIR}/${m.replace(/\.ts$/, '')}.ts`)
+  for (const entry of new Set([...EVENING_FILES, ...imported])) if (exists(entry)) for (const file of closure(loader, entry, 'src/')) parts[file] = short(loader.text(file))
+  const held = declarations(declaringText(loader), (n) => EVENING_DECLARATIONS.includes(n) || EVENING_NAME.test(n))
   for (const [name, node] of held) parts[`${INDEX_FILE}#${name}`] = short(node.getText())
   return short(JSON.stringify(Object.entries(parts).sort()))
 }
